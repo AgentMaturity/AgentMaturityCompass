@@ -170,6 +170,7 @@ export interface PurposeSignature { provider: KeyProviderId; algorithm: SigningA
 
 /** Preparation for the async owner revocation flow; no staging or publication occurs while the provider is awaited. */
 export async function signPurposeRevocationList(workspace: string, list: RevocationListV1, opts: { provider?: KeyProvider; beforeSign?: () => void } = {}): Promise<{ signed: SignedRevocationList; description: KeyDescription; provider: KeyProviderId }> {
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize revocation-list signing");
   const beforeSign = opts.beforeSign, providerOverride = opts.provider;
   beforeSign?.();
   const { provider, description, recheck } = await purposeSigner(workspace, "revocation-list", providerOverride, beforeSign);
@@ -184,6 +185,9 @@ export async function signPurposeRevocationList(workspace: string, list: Revocat
 
 /** Signs `message` with the purpose's key wherever it lives; the signature is checked against that key before it is returned. */
 export async function signWithPurposeKey(workspace: string, purpose: KeyPurpose, message: Uint8Array, opts: { provider?: KeyProvider; beforeSign?: () => void } = {}): Promise<PurposeSignature> {
+  // No real signature under AMC_NO_SIGN=1, even with an unlocked vault. The session purpose is exempt: it signs login
+  // and pairing credentials, not records, and without it no-sign Studio has no OWNER to reach the kill switch.
+  if (process.env.AMC_NO_SIGN === "1" && purpose !== "session") throw new Error(`no-sign mode does not authorize ${purpose} signing`);
   const bytes = Buffer.from(message), beforeSign = opts.beforeSign, providerOverride = opts.provider;
   beforeSign?.();
   const { provider, description, recheck } = await purposeSigner(workspace, assertLocal(purpose), providerOverride);

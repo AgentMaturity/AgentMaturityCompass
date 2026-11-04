@@ -43,6 +43,7 @@ import { actionPolicyPath } from "../governor/actionPolicyStore.js";
 import { writeEffectivePolicyReceipt } from "../policy/effectivePolicyReceipt.js";
 import { ToolRegistry, ToolLoadoutError } from "../tools/toolRegistry.js";
 import { openLedger } from "../ledger/ledger.js";
+import { writerStore } from "../ledger/ledgerConnection.js";
 import { openActionJournal, type ActionJournal } from "../actions/actionJournal.js";
 import { checkLease } from "../actions/authorize.js";
 import { toolEvidenceFor } from "../tools/toolEvidence.js";
@@ -389,7 +390,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   // Returns the row's evidence event id when the writer reports one.
   // Without a writer, rows go to the raw ledger only into a session it holds open (P1-78): never an unverifiable row.
   const rawLedger = (): ReturnType<typeof openLedger> => {
-    ledgerHandle ??= openLedger(workspace);
+    ledgerHandle ??= openLedger(workspace, writerStore());
     const session = ledgerHandle.getSessionById(options.sessionId);
     if (!session || session.ended_ts !== null) throw new UnverifiableToolEvidence(options.sessionId, session ? "sealed" : "missing");
     return ledgerHandle;

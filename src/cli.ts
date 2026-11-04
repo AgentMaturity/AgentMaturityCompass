@@ -110,7 +110,7 @@ import { exportLifecycleChangeReceipts, listLifecycleChangeReceipts, loadLifecyc
 import { exportLifecycleRunArtifact, listLifecycleRunArtifacts, loadLifecycleRunArtifact, writeLifecycleRunArtifact } from "./lifecycle/lifecycleRunArtifact.js";
 import { listObservabilityLaneRecords, loadObservabilityLaneRecord, writeObservabilityLaneRecord } from "./lifecycle/observabilityLane.js";
 import { getSigningKey, getPublicKeyHistory, signHexDigest } from "./crypto/keys.js";
-import { computeIncidentHash, createIncidentStore } from "./incidents/incidentStore.js";
+import { computeIncidentHash, createIncidentStore, incidentListLimit, withUnsignedIncidents } from "./incidents/incidentStore.js";
 import {
   RECORDABLE_TRIGGERS,
   clockListing,
@@ -7905,36 +7905,30 @@ incident
     if (status && status !== "open" && status !== "closed") {
       throw new Error("status must be open|closed");
     }
-    const limit = Number.parseInt(opts.limit, 10);
-    if (!Number.isFinite(limit) || limit <= 0) {
-      throw new Error("limit must be a positive integer");
-    }
+    const limit = incidentListLimit(opts.limit);
+    if (limit === undefined) throw new Error("limit must be a positive integer");
 
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const ledger = openLedger(process.cwd());
     try {
       const store = createIncidentStore(ledger.db);
       store.initTables();
-      const incidents = store
-        .getIncidentsByAgent(agentId)
-        .map((row) => ({ ...row, state: deriveIncidentState(store, row) }))
-        .filter((row) => {
-          if (!status) {
-            return true;
-          }
-          const isClosed = CLOSED_INCIDENT_STATES.has(row.state);
-          return status === "closed" ? isClosed : !isClosed;
-        })
-        .slice(0, limit);
-
-      if (incidents.length === 0) {
+      // AMC_NO_SIGN=1 incidents (an unsigned kill's) live in the unsigned store: listed apart, under their own cap.
+      const listed = withUnsignedIncidents(process.cwd(), agentId,
+        store.getIncidentsByAgent(agentId).map((row) => ({ ...row, state: deriveIncidentState(store, row) })),
+        (row) => !status || (status === "closed") === CLOSED_INCIDENT_STATES.has(row.state), limit);
+      for (const warning of listed.warnings) console.error(`Warning: ${warning}.`);
+      if (listed.signed.length + listed.unsigned.length === 0) {
         console.log(`No incidents found for agent '${agentId}'.`);
         return;
       }
-
-      for (const row of incidents) {
-        console.log(`${row.incidentId}  [${row.severity}/${row.state}]  ${row.title}`);
-      }
+      const print = (row: { incidentId: string; severity: string; state: string; title: string }, suffix = "") =>
+        console.log(`${row.incidentId}  [${row.severity}/${row.state}]  ${row.title}${suffix}`);
+      listed.signed.forEach((row) => print(row));
+      if (listed.pinnedSigned > 0) console.log(`${listed.pinnedSigned} OPEN CRITICAL incident(s) shown past --limit.`);
+      if (listed.unsigned.length > 0) console.log("Unsigned incidents (recorded under AMC_NO_SIGN=1, not verified):");
+      listed.unsigned.forEach((row) => print(row, "  (unsigned)"));
+      if (listed.pinnedUnsigned > 0) console.log(`${listed.pinnedUnsigned} unsigned OPEN CRITICAL incident(s) shown past --limit.`);
     } finally {
       ledger.close();
     }
@@ -17017,9 +17011,7 @@ audit
       throw new Error("format must be splunk|datadog|cloudtrail|azure");
     }
     const limit = Number.parseInt(opts.limit, 10);
-    if (!Number.isFinite(limit) || limit <= 0) {
-      throw new Error("limit must be a positive integer");
-    }
+    if (!Number.isFinite(limit) || limit <= 0) throw new Error("limit must be a positive integer");
     const out = auditEnterpriseExportCli({
       workspace: process.cwd(),
       format: format as "splunk" | "datadog" | "cloudtrail" | "azure",

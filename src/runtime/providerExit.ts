@@ -16,7 +16,7 @@ import { boundProviderKey } from "../keys/keyset.js";
 import { activeChangeEnvelope, evaluateChangeEnvelope, ledgerTestPassed } from "./changeEnvelope.js";
 import type { AgentVersionManifest } from "../lifecycle/versionManifest.js";
 import { activateKillSwitch, killSwitchDenial, releaseKillSwitch } from "./killSwitch.js";
-import { signDrillReceipt, type SignedDrillReceipt } from "./killSwitchDrill.js";
+import { assertDrillSigning, signDrillReceipt, type SignedDrillReceipt } from "./killSwitchDrill.js";
 
 interface ProviderRegisterEntry {
   providerId: string;
@@ -65,6 +65,7 @@ export interface ProviderExitDrillBody {
 export async function runProviderExitDrill(p: {
   workspace: string; agentId: string; provider: string; alternate?: { providerId: string; model: string }; owner?: string; nowTs?: number;
 }): Promise<SignedDrillReceipt<ProviderExitDrillBody>> {
+  assertDrillSigning();
   const drillId = `drill_${randomUUID().replace(/-/g, "")}`;
   const owner = p.owner ?? "drill-owner";
   const kill = await activateKillSwitch({ workspace: p.workspace, issuedBy: owner, scope: { kind: "provider", id: p.provider }, mode: "stop_all",

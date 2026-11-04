@@ -461,6 +461,8 @@ export function listKeys(workspace: string): { generation: number | null; digest
 function assertKeyRevocationRequest(workspace: string, purpose: KeyPurpose, keyId: string, reason: KeyRevocationReason,
   passphrase: string | undefined): LocalPurpose {
   assertOwnerMode(workspace, "keys revoke");
+  // A revocation list is a signed record; as with a rotation, revoke from a signing session.
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("Key revocation is unavailable in no-sign mode");
   if (!passphrase) throw new Error("Key revocation requires the vault passphrase (AMC_VAULT_PASSPHRASE or interactive input).");
   // The owner's gate, as for a rotation: the real passphrase opens the vault and its keys match the published ones.
   unlockedPayloadForKeyChange(workspace, passphrase);

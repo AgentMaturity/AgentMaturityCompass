@@ -76,12 +76,9 @@ test("assurance run --no-sign audits are plain unsigned rows without a receipt",
 test("ops audits (the deletion gate's record) are plain unsigned rows without a receipt", () => {
   const audit = appendOpsAuditEvent({ workspace, auditType: "DELETION_ALLOWED", payload: { executor: "test" } });
   expect(audit.eventHash).toMatch(/^[a-f0-9]{64}$/);
-  const reader = openLedger(workspace);
-  try {
-    const row = reader.db.prepare("SELECT writer_sig, meta_json FROM evidence_events WHERE id = ?").get(audit.eventId) as { writer_sig: string; meta_json: string };
-    expect(row.writer_sig).toBe("unsigned");
-    expect(JSON.parse(row.meta_json)).not.toHaveProperty("receipt");
-  } finally { reader.close(); }
+  const row = ledger.db.prepare("SELECT writer_sig, meta_json FROM evidence_events WHERE id = ?").get(audit.eventId) as { writer_sig: string; meta_json: string };
+  expect(row.writer_sig).toBe("unsigned");
+  expect(JSON.parse(row.meta_json)).not.toHaveProperty("receipt");
 });
 
 test("auto-linking to an open incident writes unsigned link and edge rows", () => {

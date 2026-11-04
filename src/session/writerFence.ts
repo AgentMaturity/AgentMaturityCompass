@@ -10,6 +10,7 @@
 import { randomUUID } from "node:crypto";
 import { AntiRollbackError, readHighWater, recordHighWater, workspaceScope } from "../keys/highWater.js";
 import { openLedger } from "../ledger/ledger.js";
+import { writerStore } from "../ledger/ledgerConnection.js";
 import { runImmediateTransaction } from "../ledger/ledgerSessionTransactions.js";
 import type { EvidenceEvent } from "../types.js";
 import { extractEnvelope } from "./sessionTypes.js";
@@ -68,7 +69,7 @@ export interface FenceRefusal {
  */
 export function recordFenceRefusal(workspace: string, refusal: FenceRefusal): string | null {
   try {
-    const ledger = openLedger(workspace);
+    const ledger = openLedger(workspace, writerStore());
     try {
       const sessionId = `writer-fence-${randomUUID()}`;
       const meta = { trustTier: "OBSERVED", auditType: FENCE_REFUSAL_AUDIT, ...refusal };

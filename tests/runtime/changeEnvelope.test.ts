@@ -123,6 +123,16 @@ describe("change envelopes at session open", () => {
     expect(() => open(withPrompt(NEW_PROMPT))).toThrow(/required tests have no passing evidence/);
   });
 
+  test("under AMC_NO_SIGN=1 an authenticated tester's result refuses before it is signed or recorded", async () => {
+    const env = await envelope();
+    const token = tester();
+    vi.stubEnv("AMC_NO_SIGN", "1");
+    try {
+      await expect(pass(env.envelopeId, withPrompt(NEW_PROMPT), true, token)).rejects.toThrow("no-sign mode does not authorize change envelope test result signing");
+    } finally { vi.stubEnv("AMC_NO_SIGN", "0"); }
+    expect(() => open(withPrompt(NEW_PROMPT))).toThrow(/required tests have no passing evidence/);
+  });
+
   test("the envelope's requester cannot attest its tests", async () => {
     const env = await envelope();
     await expect(pass(env.envelopeId, withPrompt(NEW_PROMPT), true, login("fixture-envelope-requester", "OPERATOR")))

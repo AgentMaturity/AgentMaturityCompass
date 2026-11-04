@@ -19,7 +19,7 @@
     "src/index.ts": 2495,
     "src/studio/openapi.ts": 2212,
     "src/enforce/resourceManifest.ts": 2032,
-    "src/eval/evalImporters.ts": 1970,
+    "src/eval/evalImporters.ts": 1968,
     "src/diagnostic/runner.ts": 1905,
     "src/gateway/server.ts": 1782,
     "src/workspaces/workspaceRouter.ts": 1774,

@@ -122,6 +122,7 @@ export function buildEffectivePolicyReceipt(input: ReceiptInput): EffectivePolic
  */
 export function writeEffectivePolicyReceipt(input: ReceiptInput & { readonly record: (row: Record<string, unknown>) => string | null }):
   { readonly receipt: EffectivePolicyReceiptV1; readonly evidenceRef: string } {
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize effective-policy receipt signing");
   const receipt = buildEffectivePolicyReceipt(input);
   const path = join(input.workspace, ".amc", "effective-policy", `${receipt.receiptId}.json`);
   const text = `${JSON.stringify(receipt, null, 2)}\n`;

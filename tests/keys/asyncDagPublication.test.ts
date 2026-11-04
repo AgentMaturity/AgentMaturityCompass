@@ -93,11 +93,13 @@ test("DAG final original generation is checked after the genuine provider result
   expect(reached).toBe(true); expect(rotated).toBe(generation + 1); expect(fs.readFileSync(file(f.workspace, dag.dagId))).toEqual(before);
   await appendDagNodeAsync(f.workspace, dag.dagId, input("fresh"));
 });
-test("DAG signed SDK compatibility permits unlocked no-sign but propagates locked ephemeral refusal without unsigned publication", async () => {
-  const f = fixture(); vi.stubEnv("AMC_NO_SIGN", "1"); const dag = await createDagAsync(f.workspace); raw(f, dag.dagHash, dag.dagSignature);
-  const before = fs.readFileSync(file(f.workspace, dag.dagId)); vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined); lockVault(f.workspace);
+test("DAG async signing refuses no-sign with an unlocked or locked vault and publishes nothing", async () => {
+  const f = fixture(), dag = createDag(f.workspace), before = fs.readFileSync(file(f.workspace, dag.dagId)); vi.stubEnv("AMC_NO_SIGN", "1");
+  await expect(createDagAsync(f.workspace)).rejects.toThrow("no-sign mode does not authorize artifact-seal signing");
+  await expect(appendDagNodeAsync(f.workspace, dag.dagId, input())).rejects.toThrow("no-sign mode does not authorize artifact-seal signing");
+  vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined); lockVault(f.workspace);
   await expect(appendDagNodeAsync(f.workspace, dag.dagId, input())).rejects.toThrow(); expect(fs.readFileSync(file(f.workspace, dag.dagId))).toEqual(before);
-  vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); await appendDagNodeAsync(f.workspace, dag.dagId, input("fresh"));
+  vi.stubEnv("AMC_NO_SIGN", "0"); vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); await appendDagNodeAsync(f.workspace, dag.dagId, input("fresh"));
 });
 test("real DAG rename refusal preserves old bytes/native cause and does not downgrade a bad provider response", async () => {
   const f = fixture(), dag = createDag(f.workspace), path = file(f.workspace, dag.dagId), before = fs.readFileSync(path), native = Object.assign(new Error("owned DAG rename fault"), { code: "EIO" }), rename = fs.renameSync.bind(fs);

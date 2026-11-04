@@ -14,12 +14,14 @@ export const vaultLocked = (error: unknown): boolean => /vault locked/i.test(err
 
 /**
  * The vault purpose keys (P1-08) a step signs with, read in any signing mode before its first side effect, so a key that
- * cannot sign refuses it before anything is revoked, written, minted or signed, never part-way through: a locked vault
- * 423 A4_VAULT_LOCKED; a key the workspace key revocation list names 409 A4_KEY_REVOKED, naming the purpose and the
- * recovery (`amc keys rotate --purpose <purpose>`), never "vault locked"; any other read failure (an unreadable or
- * unverifiable revocation list, an incomplete key set) 409 SIGNING_FAILED with its reason. `what` completes "unlock the vault to …".
+ * cannot sign refuses it before anything is revoked, written, minted or signed, never part-way through: AMC_NO_SIGN=1,
+ * under which nothing signs, 503 UNSIGNED_STORE; a locked vault 423 A4_VAULT_LOCKED; a key the workspace key revocation
+ * list names 409 A4_KEY_REVOKED, naming the purpose and the recovery (`amc keys rotate --purpose <purpose>`), never "vault
+ * locked"; any other read failure (an unreadable or unverifiable revocation list, an incomplete key set) 409
+ * SIGNING_FAILED with its reason. `what` completes "unlock the vault to …".
  */
 export function assertPurposeKeys(workspace: string, purposes: readonly LocalPurpose[], what: string): void {
+  if (process.env.AMC_NO_SIGN === "1") throw fail(503, "UNSIGNED_STORE", `AMC_NO_SIGN=1: cannot ${what}, since every record of it is signed`);
   for (const purpose of purposes) {
     try {
       getSigningKey(workspace, purpose);

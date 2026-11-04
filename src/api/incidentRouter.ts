@@ -6,7 +6,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { bodyJson, apiSuccess, apiError, apiRequestError, pathParam, queryParam } from './apiHelpers.js';
 import { openLedger } from '../ledger/ledger.js';
-import { createIncidentStore, computeIncidentHash } from '../incidents/incidentStore.js';
+import { createIncidentStore, computeIncidentHash, incidentListLimit, withUnsignedIncidents } from '../incidents/incidentStore.js';
 import type { Incident, IncidentSeverity, IncidentState } from '../incidents/incidentTypes.js';
 import {
   IncidentInputError,
@@ -162,34 +162,20 @@ export async function handleIncidentRoute(
 
       const agentId = queryParam(req.url ?? '', 'agent') ?? 'default';
       const status = queryParam(req.url ?? '', 'status');
-      const limit = parseInt(queryParam(req.url ?? '', 'limit') ?? '50', 10);
+      const limit = incidentListLimit(queryParam(req.url ?? '', 'limit')) ?? 50;
 
-      // Always fetch all incidents for this agent, then resolve latest state from transitions
+      // Always fetch all incidents for this agent, then resolve latest state from transitions. No-sign incidents are listed
+      // apart, labelled, under their own cap: an unsigned row never takes a signed row's place. OPEN CRITICAL ones pass the limit.
       const incidents = store.getIncidentsByAgent(agentId);
-      const incidentIds = incidents.map(i => i.incidentId);
-      const latestStates = store.getLatestIncidentStates(incidentIds);
-
-      let mapped = incidents.map(i => {
-        const currentState = latestStates.get(i.incidentId) ?? i.state;
-        return {
-          incidentId: i.incidentId,
-          agentId: i.agentId,
-          severity: i.severity,
-          state: currentState,
-          title: i.title,
-          createdTs: i.createdTs,
-        };
-      });
-
-      // Apply status filter on resolved state
-      if (status === 'closed') {
-        mapped = mapped.filter(i => i.state === 'RESOLVED');
-      } else if (status === 'open') {
-        mapped = mapped.filter(i => i.state === 'OPEN');
-      }
-
-      const limited = mapped.slice(0, limit);
-      apiSuccess(res, { count: limited.length, incidents: limited });
+      const latestStates = store.getLatestIncidentStates(incidents.map(i => i.incidentId));
+      const listed = withUnsignedIncidents(workspace, agentId, incidents.map(i => ({ ...i, state: latestStates.get(i.incidentId) ?? i.state })),
+        (i) => status === 'closed' ? i.state === 'RESOLVED' : status === 'open' ? i.state === 'OPEN' : true, limit);
+      const summary = <R extends Incident>(i: R) => ({ incidentId: i.incidentId, agentId: i.agentId, severity: i.severity, state: i.state,
+        title: i.title, createdTs: i.createdTs, ...('unsigned' in i ? { unsigned: true } : {}) });
+      apiSuccess(res, { count: listed.signed.length, incidents: listed.signed.map(summary), pinnedPastLimit: listed.pinnedSigned,
+        unsigned: { count: listed.unsigned.length, incidents: listed.unsigned.map(summary), pinnedPastLimit: listed.pinnedUnsigned,
+          rejected: listed.unsignedRejected, unreadable: listed.unsignedUnreadable },
+        ...(listed.warnings.length > 0 ? { warnings: listed.warnings } : {}) });
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Could not list incidents');
     } finally {

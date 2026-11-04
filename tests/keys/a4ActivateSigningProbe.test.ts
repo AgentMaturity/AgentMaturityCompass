@@ -49,7 +49,7 @@ import { initWorkspace } from "../../src/workspace.js";
 
 const PASS = "amc-test-passphrase";
 const roots: string[] = [];
-afterEach(() => { for (const root of roots.splice(0)) { lockVault(root); rmSync(root, { recursive: true, force: true }); } });
+afterEach(() => { vi.unstubAllEnvs(); for (const root of roots.splice(0)) { lockVault(root); rmSync(root, { recursive: true, force: true }); } });
 
 const owner = {
   key: "LOCAL_USER:owner", authSource: "LOCAL_USER", userId: "owner", username: "owner", roles: ["OWNER"], admission: "native_login_token",
@@ -124,8 +124,11 @@ describe("Activate's key probes name the purpose their later signer uses (P1-08 
     expect(leaseRevocationsWritten(root)).toBe(false);
   });
 
-  it.each(["revocation-list", "artifact-seal"] as const)("a rollback refuses before its EFFECT_STARTED, grant, freeze, restore or revocation while the %s key is revoked", (revoked) => {
-    const root = workspaceWithRevokedKey(revoked);
+  it.each(["revocation-list", "artifact-seal", "no-sign"] as const)("a rollback refuses before its EFFECT_STARTED, grant, freeze, restore or revocation: %s", (refusal) => {
+    const root = refusal === "no-sign" ? mkdtempSync(join(tmpdir(), "amc-a4-activate-probe-")) : workspaceWithRevokedKey(refusal);
+    if (refusal === "no-sign") { // every key usable and the vault unlocked: only AMC_NO_SIGN=1 refuses
+      roots.push(root); initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" }); initApprovalPolicy(root); vi.stubEnv("AMC_NO_SIGN", "1");
+    }
     const gate = { gate_id: "gate_direction", stage: "activate", gate: "direction", revision_no: 1 };
     const intent = { releaseId: RELEASE, toReleaseId: null, confirmManifestId: null, environment: "staging" };
     stub.state = {
@@ -141,7 +144,7 @@ describe("Activate's key probes name the purpose their later signer uses (P1-08 
     const transition = vi.fn(() => { throw new Error("EFFECT_STARTED reached"); });
     const store = { workspace: root, readChain: () => (stub.state as { chain: unknown[] }).chain, transition } as unknown as A4Store;
     expect(() => rollbackRelease(store, PROJECT, RELEASE, { principal: owner,
-      body: { expectedHeadSeq: 3, toReleaseId: null, confirmManifestId: null, environment: "staging", reason: "probe the signing keys first", clientRequestId: "req_probe" } })).toThrow(/A4_VAULT_LOCKED|revoked/);
+      body: { expectedHeadSeq: 3, toReleaseId: null, confirmManifestId: null, environment: "staging", reason: "probe the signing keys first", clientRequestId: "req_probe" } })).toThrow(refusal === "no-sign" ? /AMC_NO_SIGN=1/ : /A4_VAULT_LOCKED|revoked/);
     expect(transition).not.toHaveBeenCalled();
     expect(loadApprovalConsumed({ workspace: root, agentId: "default", approvalRequestId: "apr_rollback" })).toBeNull();
     expect(leaseRevocationsWritten(root)).toBe(false);

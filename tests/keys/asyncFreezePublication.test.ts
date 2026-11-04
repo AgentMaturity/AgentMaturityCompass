@@ -129,14 +129,15 @@ test("freeze lift uses the actual existing mode key initially and again after re
   await freeze.liftFreezeAsync({ workspace: f.workspace, incidentId: incident.incidentId, reason: "owner restored" });
 });
 
-test("retained sync no-sign semantics stay explicit while async refuses no-sign and an ephemeral mismatched signature", async () => {
+test("sync and async both refuse no-sign, unlocked or locked, and publish nothing", async () => {
   // Signed run-hash authority refuses no-sign mode even with an unlocked vault; nothing is published.
   const f = freezeFixture(); vi.stubEnv("AMC_NO_SIGN", "1"); const unlocked = names(f.dir);
   await expect(freeze.createFreezeIncidentAsync(f.params())).rejects.toThrow("no-sign mode does not authorize policy signing"); expect(names(f.dir)).toEqual(unlocked);
   lockVault(f.workspace); vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
   const before = names(f.dir); await expect(freeze.createFreezeIncidentAsync(f.params())).rejects.toThrow("no-sign mode does not authorize policy signing"); expect(names(f.dir)).toEqual(before);
-  const legacy = freeze.createFreezeIncident(f.params()); expect(freeze.verifyIncidentSignature(f.workspace, legacy)).toBe(false);
-  unlinkSync(f.incidentPath(legacy.incidentId)); f.unlock(); vi.stubEnv("AMC_NO_SIGN", "0"); expect(freeze.verifyIncidentSignature(f.workspace, await freeze.createFreezeIncidentAsync(f.params()))).toBe(true);
+  expect(() => freeze.createFreezeIncident(f.params())).toThrow("no-sign mode does not authorize policy signing"); expect(names(f.dir)).toEqual(before);
+  f.unlock(); expect(() => freeze.createFreezeIncident(f.params())).toThrow("no-sign mode does not authorize policy signing"); expect(names(f.dir)).toEqual(before);
+  vi.stubEnv("AMC_NO_SIGN", "0"); expect(freeze.verifyIncidentSignature(f.workspace, await freeze.createFreezeIncidentAsync(f.params()))).toBe(true);
 });
 
 test.each(["incident", "lift"] as const)("raw-valid config-purpose %s signatures in broad auditor history cannot clear or authenticate artifact authority", format => {

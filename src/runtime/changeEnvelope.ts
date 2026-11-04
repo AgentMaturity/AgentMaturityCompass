@@ -25,6 +25,7 @@ import {
   BoundRecordError, type BoundApproval
 } from "../governor/boundRecords.js";
 import { openLedger } from "../ledger/ledger.js";
+import { writerStore } from "../ledger/ledgerConnection.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -148,8 +149,9 @@ function envelopeDraftOf(envelope: ChangeEnvelope): EnvelopeDraft {
   return draft;
 }
 
+/** Record-only rows: under AMC_NO_SIGN=1 they go unsigned to the unsigned store. */
 function audit(workspace: string, auditType: string, meta: Record<string, unknown>): void {
-  const ledger = openLedger(workspace);
+  const ledger = openLedger(workspace, writerStore());
   try {
     const sessionId = `change-envelope-${randomUUID()}`;
     ledger.startSession({ sessionId, runtime: "unknown", binaryPath: "amc-change-envelope", binarySha256: "amc-change-envelope" });
@@ -178,6 +180,7 @@ export const manifestSha256 = (manifest: AgentVersionManifest): string => manife
 export async function recordEnvelopeTestResult(workspace: string, p: {
   sessionTokenFile: string; envelopeId: string; testId: string; passed: boolean; manifest: AgentVersionManifest;
 }): Promise<EnvelopeTestResult> {
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize change envelope test result signing");
   const recorder = sessionPrincipal(workspace, p.sessionTokenFile);
   const { envelope, problem } = activeChangeEnvelopeById(workspace, p.envelopeId);
   if (envelope === null) throw new BoundRecordError("unknown_envelope", problem ?? `no verified change envelope ${p.envelopeId}`);

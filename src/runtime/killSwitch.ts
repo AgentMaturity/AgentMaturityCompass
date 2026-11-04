@@ -10,6 +10,12 @@
  * an active workspace stop_all and raises an alert: denial is the safe direction, and whoever can write the file can
  * already stop the pod. Lifting needs a signed OWNER release naming the incident. Break-glass never overrides a kill.
  *
+ * Under AMC_NO_SIGN=1 an emergency stop still works, since refusing it is the unsafe direction: the kill is written
+ * with signature "unsigned" and no receipt, and every reader treats a well-formed unsigned kill as active for the scope
+ * and mode it names. An unsigned record never lifts anything: a release under no-sign is refused, an unsigned release
+ * file fails verification and so counts as an active workspace stop_all, and an unsigned kill sharing a signed kill's
+ * id sits beside it rather than replacing it. A signed OWNER release from a signing session lifts an unsigned kill.
+ *
  * P2-23 lifecycle (docs/AGENT_LIFECYCLE.md): an agent-scoped stop_all kill also suspends that agent with reason
  * "incident", so returning it to service takes both the kill's signed release and an OWNER's lifecycle resume; neither
  * lifts the other. Other kills suspend nothing: stop_new_effects keeps the agent's reads for reconciliation, which a
@@ -24,6 +30,7 @@ import { workspaceOversightPublicKeys } from "../incidents/oversightRecord.js";
 import { assertPurposePublicationCurrent, capturePurposePublication } from "../keys/purposePublication.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
 import { openLedger } from "../ledger/ledger.js";
+import { writerStore } from "../ledger/ledgerConnection.js";
 import { resolveGatewayConfigEnv, type GatewayConfig } from "../gateway/config.js";
 import { controlCheckpointDir } from "../lifecycle/signedControlJournalRecords.js";
 import { appendOpsAuditEvent } from "../ops/audit.js";
@@ -65,6 +72,8 @@ function mirrorDir(workspace: string): string | null {
   try { return controlCheckpointDir(workspace, "kill-switch"); } catch { return null; }
 }
 
+/** The signature a no-sign kill carries: an active kill for its scope, never a verified record. */
+const UNSIGNED = "unsigned";
 const killDigest = (record: Omit<KillSwitchRecord, "signature">) => sha256Hex(canonicalize({ ...record, kind: "amc.kill-switch/v1" }));
 const releaseDigest = (record: Omit<KillSwitchRelease, "signature">) => sha256Hex(canonicalize({ ...record, kind: "amc.kill-switch-release/v1" }));
 
@@ -107,18 +116,26 @@ export function killSwitchStatus(workspace: string): KillSwitchStatus {
   });
   if (files.length === 0) return { active: false, kills: [], unverifiable: [] };
   const unverifiable: string[] = [];
+  // Keyed by content, not killId, so no record (an unsigned one included) can replace another kill with the same id.
   const kills = new Map<string, KillSwitchRecord>();
   const releases = new Set<string>();
   let keys: string[] | null;
   try { keys = workspaceOversightPublicKeys(workspace); } catch { keys = null; }
   for (const file of files) {
     try {
-      if (keys === null) throw new Error("verification keys unavailable");
       const value = JSON.parse(readFileSync(file, "utf8")) as Record<string, unknown>;
+      // An unsigned kill only ever stops more, so it counts without a key; an unsigned release fails below.
+      if (isKill(value) && value.signature === UNSIGNED) {
+        // A scope that is not a plain id names nothing it could stop: the file then counts as a workspace stop_all.
+        if (!ID.test(value.killId) || !ID.test(value.scope.id)) throw new Error("unsigned kill with an untrusted scope");
+        kills.set(canonicalize(value), value);
+        continue;
+      }
+      if (keys === null) throw new Error("verification keys unavailable");
       if (isKill(value)) {
         const { signature, ...unsigned } = value;
         if (!verifyHexDigestAny(killDigest(unsigned as Omit<KillSwitchRecord, "signature">), signature, keys)) throw new Error("bad signature");
-        kills.set(value.killId, value);
+        kills.set(canonicalize(value), value);
       } else if (isRelease(value)) {
         const { signature, ...unsigned } = value;
         if (!verifyHexDigestAny(releaseDigest(unsigned as Omit<KillSwitchRelease, "signature">), signature, keys)) throw new Error("bad signature");
@@ -262,7 +279,7 @@ async function signDigest(workspace: string, digest: string): Promise<string> {
 }
 
 function ledgerAudit(workspace: string, auditType: string, ts: number, meta: Record<string, unknown>): void {
-  const ledger = openLedger(workspace);
+  const ledger = openLedger(workspace, writerStore());
   try {
     const sessionId = `kill-switch-${randomUUID()}`;
     ledger.startSession({ sessionId, runtime: "unknown", binaryPath: "amc-kill-switch", binarySha256: "amc-kill-switch" });
@@ -284,7 +301,10 @@ export interface ActivateKillSwitchInput {
   now?: () => number;
 }
 
-/** Signs and stores a kill, then records it in the ledger (which opens its incident through the detectors). */
+/**
+ * Signs and stores a kill, then records it in the ledger (which opens its incident through the detectors). Under
+ * AMC_NO_SIGN=1 the kill is stored unsigned and recorded as a plain unsigned row in the unsigned store.
+ */
 export async function activateKillSwitch(input: ActivateKillSwitchInput): Promise<KillSwitchRecord> {
   if (!input.issuedBy.trim()) throw new Error("kill switch refused: no authenticated principal");
   if (!SCOPES.includes(input.scope.kind) || !ID.test(input.scope.id)) throw new Error("kill switch refused: scope must be workspace, agent, tool_class or provider with a plain id");
@@ -295,11 +315,12 @@ export async function activateKillSwitch(input: ActivateKillSwitchInput): Promis
     v: 1, killId: `kill_${randomUUID().replace(/-/g, "")}`, scope: { ...input.scope }, mode: input.mode, reason: input.reason,
     incidentId: input.incidentId, issuedBy: input.issuedBy, issuedTs: (input.now ?? Date.now)()
   };
-  const record: KillSwitchRecord = { ...unsigned, signature: await signDigest(input.workspace, killDigest(unsigned)) };
+  const noSign = process.env.AMC_NO_SIGN === "1";
+  const record: KillSwitchRecord = { ...unsigned, signature: noSign ? UNSIGNED : await signDigest(input.workspace, killDigest(unsigned)) };
   publish(input.workspace, `${record.killId}.json`, record);
   ledgerAudit(input.workspace, "KILL_SWITCH_ACTIVATED", record.issuedTs,
     { killId: record.killId, scope: record.scope, mode: record.mode, incidentId: record.incidentId, issuedBy: record.issuedBy,
-      agentId: record.scope.kind === "agent" ? record.scope.id : "workspace" });
+      agentId: record.scope.kind === "agent" ? record.scope.id : "workspace", ...(noSign ? { unsigned: true } : {}) });
   if (record.scope.kind === "agent" && record.mode === "stop_all") await suspendKilledAgent(input.workspace, record);
   return record;
 }
@@ -321,6 +342,8 @@ async function suspendKilledAgent(workspace: string, kill: KillSwitchRecord): Pr
 
 /** An OWNER's signed release of one active kill, linked to an incident. The route checks the OWNER role. */
 export async function releaseKillSwitch(input: { workspace: string; releasedBy: string; killId: string; incidentId: string; now?: () => number }): Promise<KillSwitchRelease> {
+  // A release is the permissive direction, so it needs a signature: never released by an unsigned record.
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("kill switch release refused: no-sign mode cannot release a kill; release it with a signed OWNER release from a signing session");
   if (!input.releasedBy.trim()) throw new Error("kill switch release refused: no authenticated OWNER principal");
   if (!ID.test(input.incidentId)) throw new Error("kill switch release refused: the release must name the incident it closes");
   const kill = killSwitchStatus(input.workspace).kills.find((k) => k.killId === input.killId);

@@ -10,6 +10,7 @@ import { randomBytes } from "node:crypto";
 import { join } from "node:path";
 import { z } from "zod";
 import { openLedger } from "../ledger/ledger.js";
+import { writerStore } from "../ledger/ledgerConnection.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { loadOperatorConfig } from "./operatorSources.js";
@@ -61,7 +62,8 @@ function workspaceSalt(workspace: string): string {
 const reviewerPseudonym = (workspace: string, subject: string): string => sha256Hex(`${PROVIDER_ID}:${subject}:${workspaceSalt(workspace)}`);
 
 function readRecords(workspace: string, fromTs = 0, toTs = Number.MAX_SAFE_INTEGER): TimingRecord[] {
-  const ledger = openLedger(workspace, { readonly: true });
+  // Read where append writes: under AMC_NO_SIGN=1 that is the unsigned store.
+  const ledger = openLedger(workspace, process.env.AMC_NO_SIGN === "1" ? writerStore() : { readonly: true });
   try {
     return (ledger.db.prepare(`SELECT payload_inline FROM evidence_events WHERE event_type = 'audit' AND ts BETWEEN ? AND ?
       AND json_extract(meta_json, '$.auditType') = '${AUDIT_TYPE}' ORDER BY ts, rowid`).all(fromTs, toTs) as Array<{ payload_inline: string | null }>)
@@ -74,7 +76,7 @@ function readRecords(workspace: string, fromTs = 0, toTs = Number.MAX_SAFE_INTEG
 }
 
 function append(workspace: string, record: TimingRecord): string {
-  const ledger = openLedger(workspace);
+  const ledger = openLedger(workspace, writerStore());
   const sessionId = `review-timing-${record.sessionId}-${record.ts}-${randomBytes(4).toString("hex")}`;
   try {
     ledger.startSession({ sessionId, runtime: "unknown", binaryPath: "amc-review-timing", binarySha256: sha256Hex("amc-review-timing") });

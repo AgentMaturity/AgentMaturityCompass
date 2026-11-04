@@ -1,5 +1,8 @@
 import Database from "better-sqlite3";
 import { randomUUID } from "node:crypto";
+import { lstatSync, realpathSync, statSync } from "node:fs";
+import { join, sep } from "node:path";
+import { UNSIGNED_EVIDENCE_STORE } from "../ledger/ledgerConnection.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { signHexDigest, verifyHexDigestAny, getPublicKeyHistory } from "../crypto/keys.js";
@@ -343,9 +346,11 @@ function getIncident(db: Database.Database, incidentId: string): Incident | null
   };
 }
 
-function getIncidentsByAgent(db: Database.Database, agentId: string, state?: IncidentState): Incident[] {
+function getIncidentsByAgent(db: Database.Database, agentId: string, state?: IncidentState, limit?: number,
+  createdBetween?: readonly [number, number]): Incident[] {
   let query = "SELECT * FROM incidents WHERE agent_id = ?";
   const params: (string | number)[] = [agentId];
+  if (createdBetween) { query += " AND created_ts BETWEEN ? AND ?"; params.push(...createdBetween); }
 
   if (state) {
     query += " AND state = ?";
@@ -353,6 +358,7 @@ function getIncidentsByAgent(db: Database.Database, agentId: string, state?: Inc
   }
 
   query += " ORDER BY created_ts DESC";
+  if (limit !== undefined) { query += " LIMIT ?"; params.push(limit); }
 
   const rows = db.prepare(query).all(...params) as IncidentRow[];
 
@@ -516,6 +522,112 @@ export function createIncidentStore(db: Database.Database): IncidentStoreInstanc
     insertIncidentClockEvent: (event: IncidentClockEvent) => insertIncidentClockEvent(db, event),
     getIncidentClockEvents: (incidentId: string) => getIncidentClockEvents(db, incidentId)
   };
+}
+
+/** At most this many unsigned incidents are read, newest first: a planted store cannot make an incident list slow or huge. */
+const UNSIGNED_INCIDENT_READ_CAP = 500;
+/** The columns the unsigned reader reads, per table; a store missing any of them (or either table) is unreadable. */
+const UNSIGNED_INCIDENT_COLUMNS: Record<string, readonly string[]> = {
+  incidents: ["incident_id", "agent_id", "severity", "state", "title", "description", "trigger_type", "trigger_id",
+    "root_cause_claim_ids_json", "affected_question_ids_json", "causal_edges_json", "timeline_event_ids_json", "created_ts",
+    "updated_ts", "resolved_ts", "postmortem_ref", "prev_incident_hash", "incident_hash", "signature"],
+  incident_transitions: ["incident_id", "to_state", "ts"]
+};
+const INCIDENT_STATES = new Set(["OPEN", "INVESTIGATING", "MITIGATED", "RESOLVED", "POSTMORTEM"]);
+const INCIDENT_SEVERITIES = new Set(["INFO", "WARN", "CRITICAL"]);
+export type UnsignedIncident = Incident & { unsigned: true };
+
+/** Unsigned rows dated further than this past the clock, or this far before the workspace, are planted and never listed. */
+const UNSIGNED_CLOCK_SKEW_MS = 5 * 60_000;
+/** The store and the sidecars SQLite opens with it: each must be absent or a regular file, never a FIFO, device or link. */
+const UNSIGNED_STORE_FILES = ["", "-wal", "-shm", "-journal"];
+
+/** Whether the unsigned store is absent, a regular file inside the workspace (sidecars too), or anything else. */
+function unsignedStoreFile(workspace: string, path: string): "absent" | "file" | "refused" {
+  try {
+    const stats = UNSIGNED_STORE_FILES.map((suffix) => lstatSync(path + suffix, { throwIfNoEntry: false }));
+    if (!stats[0]) return "absent";
+    if (stats.some((stat) => stat && !stat.isFile())) return "refused";
+    // A symlinked directory on the way could still lead out of the workspace.
+    return realpathSync(path).startsWith(realpathSync(workspace) + sep) ? "file" : "refused";
+  } catch { return "refused"; }
+}
+
+/**
+ * The incidents AMC_NO_SIGN=1 detectors opened in the unsigned store (an unsigned kill's among them), with their latest
+ * state, for incident lists to show labelled unsigned. Read in any mode: the kill switch enforces unsigned kills in
+ * signing sessions too, so the incident must stay visible there. Never verified, and never merged into the signed store.
+ * Rows dated in the future past a small clock skew, or before the workspace was created, are not read but counted in
+ * `rejected`: a planted row cannot sit above every real one or use up the read cap. Anything wrong with that store (not
+ * a regular file, outside the workspace, not a database, a view, virtual table or generated column, a table or column
+ * missing, a malformed row) reads as no incidents with `unreadable` set, so it can never fail or block the signed list.
+ */
+export function unsignedIncidents(workspace: string, agentId: string, now = Date.now()):
+  { incidents: UnsignedIncident[]; rejected: number; unreadable: boolean } {
+  const path = join(workspace, UNSIGNED_EVIDENCE_STORE);
+  // ponytail: the check and the open are two steps; a writer racing them is one who could already rewrite the store.
+  const file = unsignedStoreFile(workspace, path);
+  if (file !== "file") return { incidents: [], rejected: 0, unreadable: file === "refused" };
+  try {
+    // birthtimeMs is 0 where the filesystem does not record it; the lower bound is then the epoch.
+    const window = [Math.max(0, statSync(join(workspace, ".amc")).birthtimeMs - UNSIGNED_CLOCK_SKEW_MS), now + UNSIGNED_CLOCK_SKEW_MS] as const;
+    const db = new Database(path, { readonly: true, fileMustExist: true });
+    try {
+      // Both names must be real tables: a view (a recursive CTE never ends), a virtual table or a generated column runs
+      // code on every read. ponytail: better-sqlite3 has no progress handler or interrupt to stop a query on time, so the
+      // bound is this check plus the read cap: what remains is a scan of a regular file's own rows.
+      const kinds = db.prepare(`SELECT type FROM pragma_table_list WHERE schema = 'main'
+        AND name COLLATE NOCASE IN ('incidents', 'incident_transitions')`).all() as Array<{ type: string }>;
+      // Detectors create both tables on their first incident; a store with neither has never held one.
+      if (kinds.length === 0) return { incidents: [], rejected: 0, unreadable: false };
+      if (kinds.length !== 2 || kinds.some((kind) => kind.type !== "table")) return { incidents: [], rejected: 0, unreadable: true };
+      const tables = Object.keys(UNSIGNED_INCIDENT_COLUMNS).map((table) => db.pragma(`table_xinfo(${table})`) as Array<{ name: string; hidden: number }>);
+      if (tables.some((columns) => columns.some((column) => column.hidden !== 0))
+        || Object.values(UNSIGNED_INCIDENT_COLUMNS).some((names, index) => names.some((name) => !tables[index]!.some((column) => column.name === name)))) {
+        return { incidents: [], rejected: 0, unreadable: true };
+      }
+      const incidents = getIncidentsByAgent(db, agentId, undefined, UNSIGNED_INCIDENT_READ_CAP, window);
+      const { rejected } = db.prepare("SELECT COUNT(*) AS rejected FROM incidents WHERE agent_id = ? AND created_ts NOT BETWEEN ? AND ?")
+        .get(agentId, ...window) as { rejected: number };
+      // One aggregate row per incident, never every transition: a planted store cannot fill memory here.
+      const states = new Map(incidents.length === 0 ? [] : (db.prepare(`SELECT incident_id, to_state, MAX(ts) FROM incident_transitions
+        WHERE incident_id IN (${incidents.map(() => "?").join(", ")}) GROUP BY incident_id`).all(...incidents.map((incident) => incident.incidentId)) as
+        Array<{ incident_id: string; to_state: IncidentState }>).map((row) => [row.incident_id, row.to_state]));
+      const listed = incidents.map((incident) => ({ ...incident, state: states.get(incident.incidentId) ?? incident.state, unsigned: true as const }));
+      const wellFormed = listed.every((incident) => INCIDENT_STATES.has(incident.state) && INCIDENT_SEVERITIES.has(incident.severity)
+        && Number.isSafeInteger(incident.createdTs) && typeof incident.title === "string");
+      return wellFormed ? { incidents: listed, rejected, unreadable: false } : { incidents: [], rejected: 0, unreadable: true };
+    } finally { db.close(); }
+  } catch { return { incidents: [], rejected: 0, unreadable: true }; }
+}
+
+/** An incident list's `limit`: a positive integer in plain digits of any size (clamped to the largest safe integer), or undefined. */
+export function incidentListLimit(raw: string | null | undefined): number | undefined {
+  const value = raw && /^\d+$/.test(raw.trim()) ? Number(raw.trim()) : 0;
+  return value > 0 ? Math.min(value, Number.MAX_SAFE_INTEGER) : undefined;
+}
+
+/**
+ * An incident list in two sections that never share a limit. `signed`: the signed incidents `keep` passes, newest first,
+ * cut to `limit`. `unsigned`: the unsigned store's, newest first, under their own cap of `limit`, so a planted unsigned
+ * row can never take a signed row's place. In each section an OPEN CRITICAL incident (an unsigned kill's among them) is
+ * never cut: it follows past the limit, counted in `pinnedSigned` or `pinnedUnsigned`.
+ */
+export function withUnsignedIncidents<T extends { createdTs: number; severity: string; state: string }>(workspace: string, agentId: string,
+  signed: T[], keep: (row: T | UnsignedIncident) => boolean, limit: number) {
+  const cut = <R extends T | UnsignedIncident>(listed: R[]) => {
+    const rows = listed.filter(keep).sort((a, b) => b.createdTs - a.createdTs);
+    const pinned = rows.slice(limit).filter((row) => row.severity === "CRITICAL" && row.state === "OPEN");
+    return { rows: [...rows.slice(0, limit), ...pinned], pinned: pinned.length };
+  };
+  const unsigned = unsignedIncidents(workspace, agentId);
+  const signedCut = cut(signed), unsignedCut = cut(unsigned.incidents);
+  const warnings = [
+    ...(unsigned.unreadable ? ["the unsigned evidence store could not be read; unsigned incidents are not shown"] : []),
+    ...(unsigned.rejected > 0 ? [`${unsigned.rejected} unsigned incident(s) dated in the future or before the workspace are not shown`] : [])
+  ];
+  return { signed: signedCut.rows, pinnedSigned: signedCut.pinned, unsigned: unsignedCut.rows, pinnedUnsigned: unsignedCut.pinned,
+    unsignedRejected: unsigned.rejected, unsignedUnreadable: unsigned.unreadable, warnings };
 }
 
 export function verifyIncidentSignature(
