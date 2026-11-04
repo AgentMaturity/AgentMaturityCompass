@@ -27,7 +27,7 @@ import { openA4Store } from "../src/a4/a4Store.js";
 import { A4_RUNTIME } from "../src/a4/a4RuntimeLifecycle.js";
 import { a4, A4Project, a4Workspace, requestId } from "./a4/a4Harness.js";
 
-const hook = vi.hoisted(() => ({ afterLedgerVerify: null as null | (() => void), failWitness: false, failMarkerLog: false }));
+const hook = vi.hoisted(() => ({ afterLedgerVerify: null as null | (() => void), failWitness: false, failMarkerLog: false, failLedgerOpen: false }));
 vi.mock("../src/transparency/logChain.js", async (original) => {
   const actual = await original<typeof import("../src/transparency/logChain.js")>();
   // failMarkerLog: init crashes between the marker's ledger row and its log entry.
@@ -45,7 +45,11 @@ vi.mock("../src/transparency/configWitness.js", async (original) => {
 });
 vi.mock("../src/ledger/ledger.js", async (original) => {
   const actual = await original<typeof import("../src/ledger/ledger.js")>();
-  return { ...actual, verifyLedgerIntegrity: (...args: Parameters<typeof actual.verifyLedgerIntegrity>) => {
+  // failLedgerOpen: init crashes after the log's key-history entries, before the ledger exists.
+  return { ...actual, openLedger: (...args: Parameters<typeof actual.openLedger>) => {
+    if (hook.failLedgerOpen) throw new Error("simulated crash before the ledger");
+    return actual.openLedger(...args);
+  }, verifyLedgerIntegrity: (...args: Parameters<typeof actual.verifyLedgerIntegrity>) => {
     const result = actual.verifyLedgerIntegrity(...args);
     hook.afterLedgerVerify?.();
     return result;
@@ -59,6 +63,7 @@ afterEach(() => {
   hook.afterLedgerVerify = null;
   hook.failWitness = false;
   hook.failMarkerLog = false;
+  hook.failLedgerOpen = false;
   vi.unstubAllEnvs();
   for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
 });
@@ -367,5 +372,18 @@ describe("verify all configuration witnesses", () => {
     const report = await run(ws);
     expect(report.status).toBe("PASS");
     expect(report.notConfigured).toEqual(expect.arrayContaining(["passport-policy-signature", "a4-projects"]));
+  });
+
+  test("an init interrupted before the ledger existed writes the marker on the next init", async () => {
+    const ws = temp("amc-verify-witness-");
+    hook.failLedgerOpen = true;
+    expect(() => initWorkspace({ workspacePath: ws, trustBoundaryMode: "isolated" })).toThrow("simulated crash");
+    hook.failLedgerOpen = false;
+    expect(logRows(ws, "KEY_HISTORY_REVISION")).toBeGreaterThan(0);
+    initWorkspace({ workspacePath: ws, trustBoundaryMode: "isolated" });
+    expect([ledgerRows(ws, "WITNESSING_ENABLED"), logRows(ws, "WITNESSING_ENABLED")]).toEqual([1, 1]);
+    const report = await run(ws);
+    expect(report.status).toBe("PASS");
+    expect(report.notConfigured).toEqual(expect.arrayContaining(["passport-policy-signature", "prompt-scheduler-signature", "prompt-packs", "forecast-signatures"]));
   });
 });
