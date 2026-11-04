@@ -83,6 +83,19 @@ describe("never all clear by default", () => {
     expect(inbox.items).toContainEqual(expect.objectContaining({ id: "a4:none", kind: "not_evaluated", severity: "mandatory" }));
   });
 
+  test("a ledger without incident tables answers the clock source with no items, not unavailable", () => {
+    // witnessing: false leaves the new ledger without the WITNESSING_ENABLED row and the incident tables.
+    const bare = realpathSync(mkdtempSync(join(tmpdir(), "amc-p222-bare-")));
+    try {
+      initWorkspace({ workspacePath: bare, agentId: "default", trustBoundaryMode: "isolated", witnessing: false });
+      const inbox = buildBlockerInbox({ workspace: bare, nowTs: NOW, sources: { incidentClocks: DEFAULT_INBOX_SOURCES.incidentClocks! } });
+      expect(inbox.sources).toEqual({ incidentClocks: "ok" });
+      expect(inbox.items).toEqual([]);
+    } finally {
+      rmSync(bare, { recursive: true, force: true });
+    }
+  });
+
   test("a throwing source adds source_unavailable and sources names it", () => {
     const inbox = buildBlockerInbox({ workspace, nowTs: NOW, sources: { ok: () => [], broken: () => { throw Object.assign(new Error("down"), { code: "DOWN" }); } } });
     expect(inbox.sources).toEqual({ ok: "ok", broken: "unavailable" });
