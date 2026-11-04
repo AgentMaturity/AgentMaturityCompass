@@ -62,9 +62,10 @@ function writeUrl(workspace: string, query = "sslmode=verify-full"): string {
   return file;
 }
 
-function makeWorkspace(): ConformanceWorkspace {
+/** `witnessing: false` for a conformance scratch, whose chain must start empty as the migration's parity scratch does. */
+function makeWorkspace(witnessing?: false): ConformanceWorkspace {
   const workspace = mkdtempSync(join(tmpdir(), "amc-pg-store-"));
-  initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
+  initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated", witnessing });
   mkdirSync(pgDir(workspace));
   return { workspace, dispose: () => rmSync(workspace, { recursive: true, force: true }) };
 }
@@ -87,7 +88,7 @@ function openPg(ws: string, options: { readOnly?: boolean; timeoutMs?: number } 
 const postgresBackend: ConformanceBackend = {
   backendId: "postgres",
   createWorkspace: () => {
-    const created = makeWorkspace();
+    const created = makeWorkspace(false);
     writeUrl(created.workspace);
     return created;
   },
@@ -97,7 +98,7 @@ const postgresBackend: ConformanceBackend = {
 
 const sqliteBackend: ConformanceBackend = {
   backendId: "sqlite",
-  createWorkspace: makeWorkspace,
+  createWorkspace: () => makeWorkspace(false),
   open: (ws) => openSessionEventStore(ws, "sqlite"),
   openReadOnly: (ws) => openSessionEventStore(ws, "sqlite", { readOnly: true })
 };
@@ -336,7 +337,8 @@ describe("amc evidence-stores migrate --to postgres", () => {
     const ws = sqliteWorkspace();
     const result = migrateSqliteToPostgres(ws, { pg: { driverModule: FAKE_PG } });
     expect(result.receipt.postgresChainHead).toBe(result.receipt.sqliteChainHead);
-    expect(result.receipt.rowsCopied).toMatchObject({ evidence_events: expect.any(Number), sessions: 1, runs: 0 });
+    // s-old and the WITNESSING_ENABLED marker's session, which the copy carries over.
+    expect(result.receipt.rowsCopied).toMatchObject({ evidence_events: expect.any(Number), sessions: 2, runs: 0 });
     expect(result.receipt.determinism.ok).toBe(true);
     expect(verifySignedMigrationReceipt(ws, result.receiptPath)).toBe(true);
     expect(readSessionStoreMarker(ws)).toBe("postgres");

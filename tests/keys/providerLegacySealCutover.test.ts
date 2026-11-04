@@ -49,7 +49,8 @@ function fixture(backend: "sqlite" | "jsonl", empty: boolean) {
   mkdirSync(home); const owned = { root, workspace, close: () => {} }; fixtures.push(owned);
   vi.stubEnv("AMC_HOME", home); vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); vi.stubEnv("AMC_NO_SIGN", "0");
   vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", ""); vi.stubEnv("AMC_SESSION_STORE", "sqlite");
-  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  // witnessing: false: this suite counts the ledger rows it writes from an empty ledger, without the creation marker.
+  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated", witnessing: false });
   const imported = fakeKey("ed25519"), importedPem = publicPem(imported), providerKey = fakeKey("p256");
   addPublicKeyToHistory(workspace, "monitor", importedPem, "imported");
   const arn = AWS_ARN("owned-seal-only-" + backend + (empty ? "-empty" : "-event")), fake = awsFake({ [arn]: providerKey });

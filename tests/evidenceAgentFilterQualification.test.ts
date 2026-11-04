@@ -36,7 +36,8 @@ function createFixture(name: string, tagged = false): Fixture {
   const workspace = join(root, "workspace"), home = join(root, "operator-home"); mkdirSync(home);
   vi.stubEnv("HOME", home); vi.stubEnv("AMC_HOME", home); vi.stubEnv("AMC_AGENT_ID", "");
   vi.stubEnv("AMC_NO_SIGN", undefined); vi.stubEnv("AMC_VAULT_PASSPHRASE", "owned-p0-27-export-fixture");
-  initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
+  // witnessing: false: this suite counts the ledger rows it writes from an empty ledger, without the creation marker.
+  initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated", witnessing: false });
   // The operator captures its monitor before any rows are authored, not from exported record signatures.
   const monitorPem = workspaceKeyPem(workspace, "monitor"), monitorId = sha256Hex(monitorPem);
   writeFileSync(join(evidence, `${name}-operator-monitor.pub`), monitorPem);

@@ -27,11 +27,10 @@ import { openA4Store } from "../src/a4/a4Store.js";
 import { A4_RUNTIME } from "../src/a4/a4RuntimeLifecycle.js";
 import { a4, A4Project, a4Workspace, requestId } from "./a4/a4Harness.js";
 
-const hook = vi.hoisted(() => ({ afterLedgerVerify: null as null | (() => void), failWitness: false, noMarker: false }));
+const hook = vi.hoisted(() => ({ afterLedgerVerify: null as null | (() => void), failWitness: false }));
 vi.mock("../src/transparency/configWitness.js", async (original) => {
   const actual = await original<typeof import("../src/transparency/configWitness.js")>();
-  // noMarker: initWorkspace as before witnessing existed (no WITNESSING_ENABLED pair), as an upgraded workspace has.
-  return { ...actual, witnessingEnabled: (workspace: string) => { if (!hook.noMarker) actual.witnessingEnabled(workspace); }, witnessA4Project: (...args: Parameters<typeof actual.witnessA4Project>) => {
+  return { ...actual, witnessA4Project: (...args: Parameters<typeof actual.witnessA4Project>) => {
     if (hook.failWitness) throw new Error("simulated crash after the project committed, before its witness");
     return actual.witnessA4Project(...args);
   } };
@@ -51,7 +50,6 @@ const roots: string[] = [];
 afterEach(() => {
   hook.afterLedgerVerify = null;
   hook.failWitness = false;
-  hook.noMarker = false;
   vi.unstubAllEnvs();
   for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
 });
@@ -265,9 +263,8 @@ describe("verify all configuration witnesses", () => {
 
   /** A workspace created before witnessing existed: no WITNESSING_ENABLED pair in either record. */
   function preMarker(): string {
-    hook.noMarker = true;
-    const ws = fresh();
-    hook.noMarker = false;
+    const ws = temp("amc-verify-witness-");
+    initWorkspace({ workspacePath: ws, trustBoundaryMode: "isolated", witnessing: false });
     expect([ledgerRows(ws, "WITNESSING_ENABLED"), logRows(ws, "WITNESSING_ENABLED")]).toEqual([0, 0]);
     return ws;
   }

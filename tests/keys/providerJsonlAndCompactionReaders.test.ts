@@ -38,7 +38,8 @@ async function fixture() {
   vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", undefined);
   // No environment backend selector is inherited: each actual test opens its one explicitly selected backend.
   vi.stubEnv("AMC_SESSION_STORE", "sqlite");
-  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  // witnessing: false: this suite verifies the ledger rows it writes against its own session records, without the creation marker.
+  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated", witnessing: false });
   const key = fakeKey("p256"), arn = AWS_ARN("owned-jsonl-compaction"), fake = awsFake({ [arn]: key }), pem = publicPem(key);
   // Independent operator choice precedes binding and every new-provider artifact.
   const trust = withPins(workspaceKeyTrust(workspace), [{ keyId: signingKeyId(pem)!, purposes: ["ledger-row"], origin: "owned independent reader operator" }]);

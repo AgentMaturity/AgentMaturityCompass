@@ -37,7 +37,8 @@ beforeEach(() => {
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "p0-27-owned-budget-fixture");
   vi.stubEnv("AMC_NO_SIGN", "0");
   vi.stubEnv("AMC_CONTROL_CHECKPOINT_DIR", join(outer, "control-checkpoints"));
-  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  // witnessing: false: this suite counts the ledger rows it writes from an empty ledger, without the creation marker.
+  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated", witnessing: false });
   observations.push({ phase: "independent-operator-pin-before-rows", workspace,
     monitorPublicKeySha256: hash(getPublicKeyPem(workspace, "monitor")) });
 });

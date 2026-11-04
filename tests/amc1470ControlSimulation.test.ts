@@ -59,7 +59,8 @@ let previousFirewallEnabled: string | undefined;
 function workspace(initialize = true): string {
   const root = mkdtempSync(join(tmpdir(), "amc-control-simulation-"));
   roots.push(root);
-  if (initialize) initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
+  // witnessing: false: this suite compares the workspace bytes before and after a read, without the creation marker.
+  if (initialize) initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated", witnessing: false });
   return root;
 }
 

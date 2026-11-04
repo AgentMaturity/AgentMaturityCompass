@@ -142,7 +142,8 @@ describe("a governed call leaves evidence", () => {
     expect((await toolset.seam.execute(request)).outcome).toBe("OK");
 
     const written = rows(workspace);
-    const audits = written.filter(row => row.event_type === "audit");
+    // WITNESSING_ENABLED is the workspace's creation marker (verify all), not tool evidence.
+    const audits = written.filter(row => row.event_type === "audit" && row.meta.auditType !== "WITNESSING_ENABLED");
     // Admission and disposition are separate facts. Exact types/counts keep
     // duplicate tool evidence visible instead of counting every audit as a call.
     // EFFECTIVE_POLICY is the session's one effective-policy receipt, written before its first governed call (P1-12).

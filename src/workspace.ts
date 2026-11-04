@@ -220,6 +220,8 @@ export interface InitWorkspaceOptions {
   trustBoundaryMode?: "isolated" | "shared";
   /** `false`: sign a declaration that this workspace has no Action Policy, the AXR-02 "not configured" state (fixtures). */
   actionPolicy?: false;
+  /** `false`: no WITNESSING_ENABLED marker, for a scratch ledger that must start empty (Postgres parity) or a pre-2.0 fixture. */
+  witnessing?: false;
 }
 
 export function defaultContextGraph(opts: InitWorkspaceOptions): Record<string, unknown> {
@@ -340,7 +342,7 @@ export function initWorkspace(opts: InitWorkspaceOptions = {}): { workspacePath:
 
   openLedger(workspace).close();
   // A new ledger: record WITNESSING_ENABLED before any part can be configured (an existing workspace never gets one).
-  if (ledgerIsNew) witnessingEnabled(workspace);
+  if (ledgerIsNew && opts.witnessing !== false) witnessingEnabled(workspace);
 
   if (opts.actionPolicy === false) {
     if (!pathExists(actionPolicyPath(workspace))) declareActionPolicyAbsent(workspace);

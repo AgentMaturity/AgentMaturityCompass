@@ -63,7 +63,7 @@ function forgeLedger(workspace: string, privateKey: KeyObject): void {
   }
 
   const rows = db.prepare("SELECT rowid AS rid, * FROM evidence_events ORDER BY rowid ASC").all() as Array<
-    Pick<EvidenceEvent, "id" | "ts" | "session_id" | "runtime" | "event_type" | "meta_json"> & { rid: number }
+    Pick<EvidenceEvent, "id" | "ts" | "session_id" | "runtime" | "event_type" | "meta_json" | "payload_inline"> & { rid: number }
   >;
   const update = db.prepare(
     `UPDATE evidence_events SET payload_inline=?, canonical_payload_inline=?, payload_sha256=?,
@@ -71,7 +71,8 @@ function forgeLedger(workspace: string, privateKey: KeyObject): void {
   );
   let prev = "GENESIS";
   for (const row of rows) {
-    const forged = "the agent behaved impeccably";
+    // Audit rows (the WITNESSING_ENABLED marker) keep their receipted payload; the agent's output is what is rewritten.
+    const forged = row.event_type === "audit" ? row.payload_inline! : "the agent behaved impeccably";
     const payloadSha = sha256Hex(forged);
     const canonical = canonicalMetadataForHash({
       id: row.id,

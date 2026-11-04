@@ -77,7 +77,8 @@ afterEach(async () => {
 function workspaceFixture(): string {
   const workspace = mkdtempSync(join(tmpdir(), "amc-p0-23-mcp-claims-"));
   roots.push(workspace);
-  initWorkspace({ workspacePath: workspace, agentId: AGENT_ID, trustBoundaryMode: "isolated" });
+  // witnessing: false: this suite reads an empty workspace's evidence, without the creation marker.
+  initWorkspace({ workspacePath: workspace, agentId: AGENT_ID, trustBoundaryMode: "isolated", witnessing: false });
   scaffoldAgent(workspace, buildAgentConfig({
     agentId: AGENT_ID, agentName: "Owned SDK claim fixture", role: "assistant", domain: "general",
     primaryTasks: ["fixture"], stakeholders: ["fixture-owner"], riskTier: "med", templateId: "openai",
