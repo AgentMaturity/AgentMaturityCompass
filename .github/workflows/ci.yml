@@ -35,7 +35,7 @@ jobs:
               core.setFailed("Missing changeset file. Add one with `npm run changeset` or apply `skip-changeset` label.");
             }
 
-  # The instrumented suite outgrew one runner (it hit the 45-minute step limit on 2026-11-03), so it runs in four
+  # The instrumented suite outgrew one runner (it hit the 45-minute step limit on 2026-11-03), so it runs in six
   # shards per Node version. Each shard writes a blob report; build-test merges them and enforces coverage once.
   test-shard:
     runs-on: ubuntu-latest
@@ -44,7 +44,7 @@ jobs:
       fail-fast: false
       matrix:
         node-version: ["22", "24"]
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5, 6]
     steps:
       - uses: actions/checkout@v6
         with:
@@ -109,7 +109,7 @@ jobs:
           AMC_REQUIRE_REAL_SANDBOX: "1"
         run: |
           mkdir -p tmp/ci-coverage tmp/vitest-blobs
-          npm run test:coverage -- --exclude 'tests/performance/**' --shard=${{ matrix.shard }}/4 --reporter=default --reporter=blob --reporter=hanging-process --outputFile.blob=tmp/vitest-blobs/blob-${{ matrix.shard }}.json 2>&1 | tee tmp/ci-coverage/tests-shard-${{ matrix.shard }}.log | cut -c1-4096
+          npm run test:coverage -- --exclude 'tests/performance/**' --shard=${{ matrix.shard }}/6 --reporter=default --reporter=blob --reporter=hanging-process --outputFile.blob=tmp/vitest-blobs/blob-${{ matrix.shard }}.json 2>&1 | tee tmp/ci-coverage/tests-shard-${{ matrix.shard }}.log | cut -c1-4096
 
       # Tests must use temp workspaces; a write to a tracked or untracked path fails here.
       - name: Tests left the checkout clean
@@ -293,7 +293,7 @@ jobs:
       # and incident-readiness regressions could merge and ship unchecked.
       # Coverage thresholds were pinned at 0, so the gate could never fail and
       # whole subsystems could lose their tests silently. Now enforced.
-      # The four test-shard reports together supply test outcomes and global/per-file coverage; a missing
+      # The six test-shard reports together supply test outcomes and global/per-file coverage; a missing
       # shard or a failed test fails this step.
       - name: Full suite and coverage thresholds
         timeout-minutes: 20
@@ -304,7 +304,7 @@ jobs:
         # log at all (every build-test run from 2026-09-16 to 2026-10-05).
         run: |
           mkdir -p tmp/ci-coverage
-          test "$(ls tmp/shards/vitest-blobs/blob-*.json | wc -l)" -eq 4
+          test "$(ls tmp/shards/vitest-blobs/blob-*.json | wc -l)" -eq 6
           npx vitest run --merge-reports tmp/shards/vitest-blobs --coverage --reporter=default --reporter=json --outputFile.json=tmp/ci-coverage/tests.json 2>&1 | tee tmp/ci-coverage/tests.log | cut -c1-4096
 
       # Throughput floors hold for uninstrumented code with the CPU to itself. Under

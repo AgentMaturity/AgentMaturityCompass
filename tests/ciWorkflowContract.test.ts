@@ -38,15 +38,15 @@ function ciWorkflowFailures(workflow: Workflow): string[] {
       "npm run check:duplicates", "npm run check:dead-code"]) {
       if (!required(commandStep(build, command))) failures.push(`build-test does not require ${command}`);
     }
-    // The instrumented suite runs the same Vitest tests as npm test, either in build-test or in test-shard's four
+    // The instrumented suite runs the same Vitest tests as npm test, either in build-test or in test-shard's six
     // shards that build-test merges with coverage; performance files run separately without coverage.
     const coverage = commandStep(build, "npm run test:coverage");
     const shards = workflow.jobs["test-shard"];
     const shardRun = commandStep(shards, "npm run test:coverage");
     const merge = build.steps.find(step => /(?:^|\n)\s*npx vitest run --merge-reports \S+ --coverage\b/.test(step.run ?? ""));
-    const sharded = required(shardRun) && /--shard=\$\{\{ matrix\.shard \}\}\/4\b/.test(shardRun?.run ?? "")
-      && JSON.stringify((shards as { strategy?: { matrix?: { shard?: unknown } } } | undefined)?.strategy?.matrix?.shard) === "[1,2,3,4]"
-      && required(merge) && /blob-\*\.json \| wc -l\)" -eq 4/.test(merge?.run ?? "");
+    const sharded = required(shardRun) && /--shard=\$\{\{ matrix\.shard \}\}\/6\b/.test(shardRun?.run ?? "")
+      && JSON.stringify((shards as { strategy?: { matrix?: { shard?: unknown } } } | undefined)?.strategy?.matrix?.shard) === "[1,2,3,4,5,6]"
+      && required(merge) && /blob-\*\.json \| wc -l\)" -eq 6/.test(merge?.run ?? "");
     if (!required(commandStep(build, "npm test")) && !((required(coverage) || sharded)
       && scripts.test === "vitest run" && scripts["test:coverage"] === "vitest run --coverage"
       && required(commandStep(build, "npx vitest run tests/performance --no-file-parallelism")))) {
@@ -118,7 +118,7 @@ describe("CI workflow contract (P0-33)", () => {
 
   test("dropping a shard or the merged coverage step fails the contract", () => {
     const fewer = parse() as Workflow & { jobs: Record<string, Job & { strategy?: { matrix?: { shard?: number[] } } }> };
-    fewer.jobs["test-shard"]!.strategy!.matrix!.shard = [1, 2, 3];
+    fewer.jobs["test-shard"]!.strategy!.matrix!.shard = [1, 2, 3, 4, 5];
     expect(ciWorkflowFailures(fewer)).toContain("build-test does not require the full test suite");
     const unmerged = parse();
     unmerged.jobs["build-test"]!.steps = unmerged.jobs["build-test"]!.steps.filter(step => !/--merge-reports/.test(step.run ?? ""));
