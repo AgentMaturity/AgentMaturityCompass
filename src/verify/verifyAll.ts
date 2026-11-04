@@ -113,7 +113,7 @@ function notConfigured(id: string, critical: boolean, details: string[]): Verify
 
 /**
  * The configuration witnesses: the verified transparency log's entry types and agents, and the witness types in the
- * verified, anchored evidence ledger (each type with the agents its rows name); each is null when its record is missing or
+ * verified, anchored evidence ledger (each type with the subjects, else agents, its rows name); each is null when its record is missing or
  * does not verify.
  */
 type Witness = { log: { types: Set<string>; agentsOf: (type: string) => Set<string> } | null; ledger: ReadonlyMap<string, ReadonlySet<string>> | null };
@@ -148,9 +148,17 @@ export async function verifyAll(params: {
     tlogError = String(error);
   }
   let ledger: Awaited<ReturnType<typeof verifyLedgerIntegrity>> | null = null, ledgerError: string | null = null;
+  const a4: { rows: ReturnType<typeof verifyA4Projects> | null } = { rows: null };
   try {
     // The witness rows come from the rows this verification checked, on its one ledger handle; the file is never reopened.
-    ledger = await verifyLedgerIntegrity(workspace, { trust: params.trust, auditTypes: WITNESS_GROUPS.flat() });
+    // The A4 projects are read on that same verified handle before it closes (a4-projects below).
+    ledger = await verifyLedgerIntegrity(workspace, { trust: params.trust, auditTypes: WITNESS_GROUPS.flat(), onVerifiedLedger: (handle) => {
+      try {
+        a4.rows = verifyA4Projects(handle, params.trust);
+      } catch (error) {
+        a4.rows = [{ status: "FAIL", details: [String(error)] }];
+      }
+    } });
   } catch (error) {
     ledgerError = String(error);
   }
@@ -430,14 +438,18 @@ export async function verifyAll(params: {
 
   // P1-57: each A4 project's chain, side rows and envelopes (integrity of bytes; never a claim about the agent).
   try {
-    // The projects are read on a second handle, so "none" and "one is gone" are decided from the verified witness records.
-    const rows = verifyA4Projects(workspace, params.trust), agents = new Set(rows.flatMap((row) => row.agentId ?? []));
+    // The projects were read on the handle ledger verification checked; "none" and "one is gone" are decided from the
+    // verified witness records, each naming its project (ledger row subjectId, log artifact id).
+    const rows = a4.rows;
+    if (rows === null) throw new Error("no readable evidence ledger: ledger verification did not reach the A4 checks");
+    const projects = new Set(rows.flatMap((row) => row.projectId ?? []));
     // With no project, absentPart fails it when either record holds a witness, and reads NOT_CONFIGURED only when both hold none.
     if (rows.length === 1 && rows[0]!.status === "NOT_CONFIGURED") checks.push(absentPart("a4-projects", true, witness, [A4_PROJECT_CREATED], "A4 project"));
     else {
-      const lost = ([["transparency log", witness.log?.agentsOf(A4_PROJECT_CREATED)], ["evidence ledger", witness.ledger?.get(A4_PROJECT_CREATED)]] as const)
-        .flatMap(([record, witnessed]) => [...witnessed ?? []].filter((agentId) => !agents.has(agentId))
-          .map((agentId) => `A4 project of agent ${agentId} missing from the ledger: the ${record} records it was created`));
+      const logged = entries?.filter((entry) => entry.type === A4_PROJECT_CREATED).map((entry) => entry.artifact.id ?? "(unnamed)");
+      const lost = ([["transparency log", logged], ["evidence ledger", witness.ledger?.get(A4_PROJECT_CREATED)]] as const)
+        .flatMap(([record, witnessed]) => [...witnessed ?? []].filter((projectId) => !projects.has(projectId))
+          .map((projectId) => `A4 project ${projectId} missing from the ledger: the ${record} records it was created`));
       for (const row of rows) checks.push({ id: "a4-projects", status: row.status, critical: true, details: row.details });
       if (lost.length > 0) checks.push(fail("a4-projects", true, lost));
     }

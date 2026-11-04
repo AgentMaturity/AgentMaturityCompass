@@ -7,6 +7,8 @@ export function appendOpsAuditEvent(params: {
   auditType: string;
   /** Recorded in the row's hash-covered meta, where ledger verification reads it (configuration witnesses). */
   agentId?: string;
+  /** What the witness names when it is not the agent (an A4 project id), in the same hash-covered meta. */
+  subjectId?: string;
   payload?: Record<string, unknown>;
   severity?: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 }): { eventId: string; eventHash: string } {
@@ -37,7 +39,8 @@ export function appendOpsAuditEvent(params: {
         severity: params.severity ?? "LOW",
         trustTier: "OBSERVED",
         source: "ops",
-        ...(params.agentId === undefined ? {} : { agentId: params.agentId })
+        ...(params.agentId === undefined ? {} : { agentId: params.agentId }),
+        ...(params.subjectId === undefined ? {} : { subjectId: params.subjectId })
       }
     };
     // AMC_NO_SIGN=1 mints no receipt: the audit is still recorded, as a plain unsigned row that ledger verification rejects.

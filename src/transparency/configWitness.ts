@@ -9,7 +9,8 @@
  * rollback until the next save completes it. A rollback of the whole workspace (ledger and log together) is not
  * detectable here: that needs an anchor outside the workspace (the public transparency anchor or high-water marks).
  * Prompt pack builds write a per-agent PROMPT_PACK_CREATED ledger row (witnessInLedger) before their own log entry, and the
- * A4 store writes the per-agent A4_PROJECT_CREATED pair (witnessRecords) after a new project's CREATED ledger rows commit.
+ * A4 store writes the per-project A4_PROJECT_CREATED pair (witnessRecords with the project id as subject) after a new
+ * project's CREATED ledger rows commit, and again on a replay of that create, so an interrupted pair is completed.
  *
  * Every explicit writer of the three files witnesses, sync and async, SDK exports included. Deliberately unwitnessed:
  * - the default passport policy an async reader creates lazily (loadPassportPolicyAttemptAsync): it is only the default
@@ -30,7 +31,7 @@ export const PROMPT_SCHEDULER_CONFIGURED = "PROMPT_SCHEDULER_CONFIGURED";
 export const FORECAST_SCHEDULER_CONFIGURED = "FORECAST_SCHEDULER_CONFIGURED";
 /** A prompt pack build: the build appends this log entry itself; its ledger row (per agent) comes from witnessInLedger. */
 export const PROMPT_PACK_CREATED = "PROMPT_PACK_CREATED";
-/** An A4 project's creation (preview only), per agent: a project either record shows was created must still be in the ledger. */
+/** An A4 project's creation (preview only), per project: a project either record shows was created must still be in the ledger. */
 export const A4_PROJECT_CREATED = "A4_PROJECT_CREATED";
 /** Types that show the passport policy was configured: the witness, or an applied policy (logged, and audited by Studio). */
 export const PASSPORT_POLICY_WITNESSES = [PASSPORT_POLICY_CONFIGURED, "PASSPORT_POLICY_APPLIED"] as const;
@@ -38,21 +39,22 @@ export const PASSPORT_POLICY_WITNESSES = [PASSPORT_POLICY_CONFIGURED, "PASSPORT_
 export const WITNESS_GROUPS: readonly (readonly string[])[] = [PASSPORT_POLICY_WITNESSES, [PROMPT_SCHEDULER_CONFIGURED], [FORECAST_SCHEDULER_CONFIGURED], [PROMPT_PACK_CREATED],
   [A4_PROJECT_CREATED]];
 
-/** Whether the ledger holds a `type` audit row for `agentId`. A forged row would fail ledger verification, which verify all reports. */
-function ledgerHolds(workspace: string, type: string, agentId: string): boolean {
+/** Whether the ledger holds a `type` audit row for `agentId` (and `subjectId`, or none). A forged row would fail ledger verification. */
+function ledgerHolds(workspace: string, type: string, agentId: string, subjectId?: string): boolean {
   if (!existsSync(join(workspace, ".amc", "evidence.sqlite"))) return false;
   const ledger = openLedger(workspace, { readonly: true });
   try {
     return ledger.db.prepare(`SELECT 1 FROM evidence_events WHERE event_type = 'audit' AND json_valid(meta_json)
-      AND json_extract(meta_json, '$.auditType') = ? AND json_extract(meta_json, '$.agentId') = ? LIMIT 1`).get(type, agentId) !== undefined;
+      AND json_extract(meta_json, '$.auditType') = ? AND json_extract(meta_json, '$.agentId') = ?
+      AND json_extract(meta_json, '$.subjectId') IS ? LIMIT 1`).get(type, agentId, subjectId ?? null) !== undefined;
   } finally {
     ledger.close();
   }
 }
 
-/** Writes the ledger witness (an ops audit row) of `type` for `agentId` unless the ledger already holds one. */
-export function witnessInLedger(workspace: string, type: string, agentId: string, payload: Record<string, unknown>): void {
-  if (!ledgerHolds(workspace, type, agentId)) appendOpsAuditEvent({ workspace, auditType: type, agentId, payload });
+/** Writes the ledger witness (an ops audit row) of `type` for `agentId` (and `subjectId`) unless the ledger already holds one. */
+export function witnessInLedger(workspace: string, type: string, agentId: string, payload: Record<string, unknown>, subjectId?: string): void {
+  if (!ledgerHolds(workspace, type, agentId, subjectId)) appendOpsAuditEvent({ workspace, auditType: type, agentId, subjectId, payload });
 }
 
 /**
@@ -68,13 +70,21 @@ export function witnessConfiguration(workspace: string, type: string, path: stri
 /**
  * Writes the `type` witness of `agentId` to both records, each decided on its own: the ledger row whenever the ledger lacks
  * one, then the log entry whenever the verified log (its parsed entries, read only) lacks one of this type and agent; neither
- * suppresses the other, so a rollback of either record is repaired on the next witness.
+ * suppresses the other, so a rollback of either record is repaired on the next witness. With `bySubject` the witness is per
+ * artifact id instead (an A4 project): the ledger row's meta subjectId and the log entry's artifact id name it.
  */
 export function witnessRecords(workspace: string, type: string, agentId: string, artifact: { kind: TransparencyArtifactKind; id: string; sha256: string },
-  payload: Record<string, unknown>): void {
-  witnessInLedger(workspace, type, agentId, payload);
+  payload: Record<string, unknown>, bySubject = false): void {
+  const subjectId = bySubject ? artifact.id : undefined;
+  witnessInLedger(workspace, type, agentId, payload, subjectId);
   // ponytail: one read-only verification of the log per witness (the schedulers save often); index it if the log grows large.
   const log = existsSync(transparencyLogPath(workspace)) ? verifiedTransparencyLog(workspace, { readOnly: true }) : null;
-  if (log?.ok === true && log.entries.some((entry) => entry.type === type && entry.agentId === agentId)) return;
+  if (log?.ok === true && log.entries.some((entry) => entry.type === type && entry.agentId === agentId && (subjectId === undefined || entry.artifact.id === subjectId))) return;
   appendTransparencyEntry({ workspace, type, agentId, artifact });
+}
+
+/** The A4_PROJECT_CREATED pair of a created or replayed project (preview only), per project; idempotent, so a replay completes it. */
+export function witnessA4Project(workspace: string, agentId: unknown, projectId: unknown, sha256: unknown): void {
+  if (typeof agentId !== "string" || typeof projectId !== "string" || typeof sha256 !== "string") return;
+  witnessRecords(workspace, A4_PROJECT_CREATED, agentId, { kind: "a4-project", id: projectId, sha256 }, { projectId, sha256 }, true);
 }

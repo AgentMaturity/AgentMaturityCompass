@@ -38,11 +38,11 @@ describe("WP37: empty inputs are not evaluated, never a pass", () => {
   test("verify all withholds PASS while a critical check was skipped, and the CLI exits non-zero", async () => {
     const ws = workspace();
     // --allow-unanchored skips the critical ledger trust root, and an unanchored ledger cannot show the passport policy was
-    // never configured, so that part is skipped too.
+    // never configured, so that part is skipped too, as is "no A4 project".
     const report = await verifyAll({ workspace: ws, trust: workspaceKeyTrust(ws, { allowUnanchored: true, explicitPins: [] }) });
     expect(report.checks.some((check) => check.status === "FAIL")).toBe(false);
     expect(report.status).toBe("INCOMPLETE");
-    expect(report.skippedCritical).toEqual(["passport-policy-signature", "ledger-trust-root"]);
+    expect(report.skippedCritical).toEqual(["passport-policy-signature", "ledger-trust-root", "a4-projects"]);
 
     const exit = vi.spyOn(process, "exit").mockImplementation(((code?: number) => { throw new Error(`exit ${code}`); }) as never);
     vi.spyOn(console, "error").mockImplementation(() => undefined);

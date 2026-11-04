@@ -120,7 +120,7 @@ export interface VerifyResult {
    * unreachable or vault locked). Not errors, and not verified: the chain over their ciphertext was still checked.
    */
   payloadsNotEvaluated?: readonly string[];
-  /** With options.auditTypes: each requested audit type found among the verified rows, with the meta agentIds of its rows. */
+  /** With options.auditTypes: each requested audit type found among the verified rows, with the meta subjectId (else agentId) of its rows. */
   audits?: ReadonlyMap<string, ReadonlySet<string>>;
 }
 
@@ -156,6 +156,8 @@ export interface LedgerVerifyOptions {
   trust?: TrustContext;
   /** Audit types to report (result.audits), read from the very rows this verification checked, never a second read. */
   auditTypes?: readonly string[];
+  /** Runs on the verified read-only handle after its checks, before it closes, so a caller's own reads see the rows verified. */
+  onVerifiedLedger?: (ledger: Ledger) => void;
 }
 type AuditCollector = { wanted: ReadonlySet<string>; found: Map<string, Set<string>> };
 
@@ -312,7 +314,8 @@ function verifyEvents(
       const meta = JSON.parse(event.meta_json) as Record<string, unknown>;
       if (audits && event.event_type === "audit" && typeof meta.auditType === "string" && audits.wanted.has(meta.auditType)) {
         const agents = audits.found.get(meta.auditType) ?? new Set<string>();
-        if (typeof meta.agentId === "string") agents.add(meta.agentId);
+        const id = typeof meta.subjectId === "string" ? meta.subjectId : meta.agentId;
+        if (typeof id === "string") agents.add(id);
         audits.found.set(meta.auditType, agents);
       }
       if (typeof meta.receipt === "string" && meta.receipt.length > 0) {
@@ -726,6 +729,7 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
       sessionLifecycle = verifySessions(ledger, workspacePath, chainErrors, staleAfterMs, continuation);
       verifyRuns(ledger, workspacePath, chainErrors);
       verifyOutcomeEvents(ledger, workspacePath, chainErrors);
+      options.onVerifiedLedger?.(ledger);
     }
     if (ledger || jsonlBackend) {
       try {

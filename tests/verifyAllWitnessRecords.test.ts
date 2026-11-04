@@ -20,9 +20,19 @@ import { openLedger } from "../src/ledger/ledger.js";
 import { closeAllSqlitePools } from "../src/storage/sqlitePool.js";
 import { verifiedTransparencyLog } from "../src/transparency/logChain.js";
 import { workspaceKeyTrust } from "./helpers/trustContext.js";
-import { A4Project, a4Workspace } from "./a4/a4Harness.js";
+import Database from "better-sqlite3";
+import { openA4Store } from "../src/a4/a4Store.js";
+import { A4_RUNTIME } from "../src/a4/a4RuntimeLifecycle.js";
+import { a4, A4Project, a4Workspace, requestId } from "./a4/a4Harness.js";
 
-const hook = vi.hoisted(() => ({ afterLedgerVerify: null as null | (() => void) }));
+const hook = vi.hoisted(() => ({ afterLedgerVerify: null as null | (() => void), failWitness: false }));
+vi.mock("../src/transparency/configWitness.js", async (original) => {
+  const actual = await original<typeof import("../src/transparency/configWitness.js")>();
+  return { ...actual, witnessA4Project: (...args: Parameters<typeof actual.witnessA4Project>) => {
+    if (hook.failWitness) throw new Error("simulated crash after the project committed, before its witness");
+    return actual.witnessA4Project(...args);
+  } };
+});
 vi.mock("../src/ledger/ledger.js", async (original) => {
   const actual = await original<typeof import("../src/ledger/ledger.js")>();
   return { ...actual, verifyLedgerIntegrity: (...args: Parameters<typeof actual.verifyLedgerIntegrity>) => {
@@ -37,6 +47,7 @@ vi.setConfig({ testTimeout: 60_000 });
 const roots: string[] = [];
 afterEach(() => {
   hook.afterLedgerVerify = null;
+  hook.failWitness = false;
   vi.unstubAllEnvs();
   for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
 });
@@ -178,24 +189,73 @@ describe("verify all configuration witnesses", () => {
     expect(check(report, "transparency-log")?.details.join(" ")).toContain("A4_PROJECT_CREATED");
   });
 
-  test("the A4 project witness is read from the verified ledger rows: both records rolled back after verification still fail", async () => {
+  test("the A4 projects and their witnesses are read on the verified handle: both records rolled back after verification change nothing", async () => {
     const { workspace, before } = await a4Created();
     before.restoreLog();
     hook.afterLedgerVerify = () => before.restoreLedger();
     const report = await run(workspace);
+    expect(check(report, "a4-projects")?.status).toBe("PASS");
+    expect(check(report, "transparency-log")?.details.join(" ")).toContain("A4_PROJECT_CREATED");
+    expect(report.status).toBe("FAIL");
+  });
+
+  test("an A4 chain that fails on the verified ledger still fails when a clean copy is swapped in after verification", async () => {
+    const { workspace, alice, sessionId } = a4Workspace();
+    const project = await A4Project.create(workspace, alice);
+    { const ledger = openLedger(workspace); try { ledger.sealSession(sessionId); } finally { ledger.close(); } }
+    vi.unstubAllEnvs();
+    const clean = snapshot(workspace);
+    closeAllSqlitePools();
+    const db = new Database(join(workspace, ".amc", "evidence.sqlite"));
+    try {
+      for (const { name } of db.prepare("SELECT name FROM sqlite_master WHERE type = 'trigger' AND tbl_name LIKE 'a4_%'").all() as Array<{ name: string }>) db.exec(`DROP TRIGGER ${name}`);
+      expect(db.prepare("DELETE FROM a4_transitions WHERE project_id = ?").run(project.projectId).changes).toBeGreaterThan(0);
+    } finally { db.close(); }
+    hook.afterLedgerVerify = () => clean.restoreLedger();
+    const report = await run(workspace);
     expect(check(report, "a4-projects")?.status).toBe("FAIL");
-    expect(check(report, "a4-projects")?.details.join(" ")).toContain("evidence ledger");
+    expect(report.status).toBe("FAIL");
+  });
+
+  test("a project of an agent whose first project was retired is witnessed on its own: rolled out of the ledger, it fails", async () => {
+    const { workspace, alice, sessionId } = a4Workspace();
+    const first = await A4Project.create(workspace, alice, "first", "a4-again");
+    const store = openA4Store(workspace);
+    try { store.transition(first.projectId, A4_RUNTIME, () => ({ kind: "STEP", payload: { fixture: "retire" }, head: { stage: "retired" } })); } finally { store.close(); }
+    { const ledger = openLedger(workspace); try { ledger.sealSession(sessionId); } finally { ledger.close(); } }
+    const before = snapshot(workspace);
+    const second = await A4Project.create(workspace, alice, "second", "a4-again");
+    expect([ledgerRows(workspace, "A4_PROJECT_CREATED"), logRows(workspace, "A4_PROJECT_CREATED")]).toEqual([2, 2]);
+    vi.unstubAllEnvs();
+    before.restoreLedger();
+    const rows = (await run(workspace)).checks.filter((row) => row.id === "a4-projects");
+    expect(rows.map((row) => row.status)).toEqual(["PASS", "FAIL"]);
+    expect(rows[1]!.details.join(" ")).toContain(`A4 project ${second.projectId}`);
+  });
+
+  test("a create interrupted after its commit and before its witness writes the witness when the request is replayed", async () => {
+    const { workspace, alice } = a4Workspace();
+    const body = { clientRequestId: requestId(), name: "interrupted", expertise: "practitioner", agentId: "a4-replayed" };
+    hook.failWitness = true;
+    expect((await a4(workspace, alice, "POST", "/api/v1/a4/projects", body)).status).toBeGreaterThanOrEqual(500);
+    hook.failWitness = false;
+    expect([ledgerRows(workspace, "A4_PROJECT_CREATED"), logRows(workspace, "A4_PROJECT_CREATED")]).toEqual([0, 0]);
+    const replay = await a4(workspace, alice, "POST", "/api/v1/a4/projects", body);
+    expect(replay.status).toBeLessThan(300);
+    expect([ledgerRows(workspace, "A4_PROJECT_CREATED"), logRows(workspace, "A4_PROJECT_CREATED")]).toEqual([1, 1]);
+    expect(verifiedTransparencyLog(workspace, { readOnly: true }).entries.find((entry) => entry.type === "A4_PROJECT_CREATED")?.artifact.id)
+      .toBe(replay.body.data?.projectId);
   });
 
   test("a second A4 project rolled out of the ledger fails while the first still verifies", async () => {
     const { workspace, alice } = a4Workspace();
     await A4Project.create(workspace, alice, "first", "a4-first");
     const before = snapshot(workspace);
-    await A4Project.create(workspace, alice, "second", "a4-second");
+    const second = await A4Project.create(workspace, alice, "second", "a4-second");
     vi.unstubAllEnvs();
     before.restoreLedger();
     const rows = (await run(workspace)).checks.filter((row) => row.id === "a4-projects");
     expect(rows.map((row) => row.status)).toEqual(["PASS", "FAIL"]);
-    expect(rows[1]!.details.join(" ")).toContain("agent a4-second");
+    expect(rows[1]!.details.join(" ")).toContain(`A4 project ${second.projectId}`);
   });
 });

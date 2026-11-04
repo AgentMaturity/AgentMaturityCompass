@@ -55,6 +55,7 @@ import { verifyA4Chain } from "./a4Verify.js";
 export { A4_API_PREFIX, A4_UNPARSED_RECORD, sendA4Error } from "./a4RouterError.js";
 import { A4_API_PREFIX, sendA4Error } from "./a4RouterError.js";
 import { currentRelease } from "./spec/activate.js";
+import { witnessA4Project } from "../transparency/configWitness.js";
 
 const BODY_LIMIT = 1024 * 1024;
 const SPEC_LIMIT = 256 * 1024;
@@ -267,7 +268,11 @@ async function createProject(route: A4Route): Promise<void> {
   const principal = requirePrincipal(route);
   const { body, request } = await readJson(route, createSchema);
   const replay = priorReplay(route.store, request, null);
-  if (replay) return apiSuccess(route.res, replay);
+  // A replay completes the creation witness a crash after the commit left unwritten (idempotent per project).
+  if (replay) {
+    witnessA4Project(route.workspace, replay.agentId, replay.projectId, replay.bodyDigest);
+    return apiSuccess(route.res, replay);
+  }
   assertNoSecrets({ name: body.name, archetype: body.archetype ?? null }, "The project name");
   const slug = body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "agent";
   const agentId = body.agentId ?? `${slug}-${randomBytes(3).toString("hex")}`;
