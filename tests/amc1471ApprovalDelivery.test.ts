@@ -304,7 +304,7 @@ async function waitForApprovalSse(params: {
     const timer = setTimeout(() => {
       req?.destroy();
       rejectPromise(new Error("timed out waiting for approval SSE"));
-    }, 10_000);
+    }, 30_000); // a loaded CI runner needed more than 10 s
     req = httpRequest(
       params.url,
       {

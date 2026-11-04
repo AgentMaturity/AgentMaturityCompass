@@ -336,7 +336,7 @@ export async function buildPagesSite({ output = defaultOutput, explicit = false,
     "--json", resolve(apiOutput, "reflection.json"),
     ...(revision ? ["--gitRevision", revision, "--disableGit", "--sourceLinkTemplate",
       typeDocOptions.sourceLinkTemplate.replace("{path}", "src/{path}")] : [])],
-  { cwd: repositoryRoot, stdio: "inherit", timeout: 120_000 });
+  { cwd: repositoryRoot, stdio: "inherit", timeout: 300_000 });
 
   return { output: resolvedOutput, manifestPath, manifest, brandManifestPath, brandManifest, apiOutput };
 }
