@@ -294,9 +294,21 @@ describe("verify all configuration witnesses", () => {
     initWorkspace({ workspacePath: ws, trustBoundaryMode: "isolated" });
     const report = await run(ws);
     expect(report.status).toBe("INCOMPLETE");
-    expect(report.skippedCritical).toEqual(["passport-policy-signature", "a4-projects"]);
+    expect(report.skippedCritical).toEqual(["passport-policy-signature"]);
     for (const id of ["prompt-scheduler-signature", "prompt-packs", "forecast-signatures"]) expect(check(report, id)?.status).toBe("SKIP");
     expect(report.notConfigured).not.toContain("passport-policy-signature");
+    // A4 is new in 2.0 and every create witnesses it, so no project and no witness proves never configured without the marker.
+    expect(check(report, "a4-projects")?.status).toBe("NOT_CONFIGURED");
+  });
+
+  test("a workspace without the marker passes after amc passport init, with A4 projects not configured", async () => {
+    const ws = preMarker();
+    passportInitForApi(ws);
+    const report = await run(ws);
+    expect(report.status).toBe("PASS");
+    expect(check(report, "passport-policy-signature")?.status).toBe("PASS");
+    expect(check(report, "a4-projects")?.status).toBe("NOT_CONFIGURED");
+    expect(report.notConfigured).toContain("a4-projects");
   });
 
   test("a workspace without the marker fails once amc passport init witnessed the policy and it was then deleted", async () => {
@@ -329,7 +341,7 @@ describe("verify all configuration witnesses", () => {
     expect([ledgerRows(ws, "WITNESSING_ENABLED"), logRows(ws, "WITNESSING_ENABLED")]).toEqual([0, 0]);
     const report = await run(ws);
     expect(report.status).toBe("INCOMPLETE");
-    expect(report.skippedCritical).toEqual(["passport-policy-signature", "a4-projects"]);
+    expect(report.skippedCritical).toEqual(["passport-policy-signature"]);
   });
 
   test("a marker written after the workspace's first log entries vouches for nothing", async () => {
@@ -341,7 +353,7 @@ describe("verify all configuration witnesses", () => {
     const report = await run(ws);
     expect(report.status).toBe("INCOMPLETE");
     expect(check(report, "passport-policy-signature")?.status).toBe("SKIP");
-    expect(check(report, "a4-projects")?.status).toBe("SKIP");
+    expect(check(report, "a4-projects")?.status).toBe("NOT_CONFIGURED");
   });
 
   test("an init interrupted between the marker's two records completes the pair on the next init", async () => {

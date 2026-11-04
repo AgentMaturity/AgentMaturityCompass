@@ -16,7 +16,8 @@
  * yet), before any part can be configured, and completes an interrupted pair on a later init. Only
  * where both verified records hold it does the absence of a part's witness show the part was never configured; a workspace
  * created before witnessing existed has no marker (none is backfilled: that would vouch for files already deleted), so its
- * unwitnessed parts read SKIP until an explicit save of each part witnesses it.
+ * unwitnessed parts read SKIP until an explicit save of each part witnesses it. A4 projects need no marker: A4 is new in 2.0 and
+ * every shipped create writes its pair, so both verified records holding none proves no project was created.
  *
  * Every explicit writer of the three files witnesses, sync and async, SDK exports included. Deliberately unwitnessed:
  * - the default passport policy an async reader creates lazily (loadPassportPolicyAttemptAsync): it is only the default

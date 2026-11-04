@@ -459,8 +459,11 @@ export async function verifyAll(params: {
     const rows = a4.rows;
     if (rows === null) throw new Error("no readable evidence ledger: ledger verification did not reach the A4 checks");
     const projects = new Set(rows.flatMap((row) => row.projectId ?? []));
-    // With no project, absentPart fails it when either record holds a witness, and reads NOT_CONFIGURED only when both hold none.
-    if (rows.length === 1 && rows[0]!.status === "NOT_CONFIGURED") checks.push(absentPart("a4-projects", true, witness, [A4_PROJECT_CREATED], "A4 project"));
+    // With no project, absentPart fails it when either record holds a witness, and reads NOT_CONFIGURED when both verified records
+    // hold none, marker or not: A4 is new in 2.0 and every shipped create writes the witness pair, so no unwitnessed project predates it.
+    if (rows.length === 1 && rows[0]!.status === "NOT_CONFIGURED") {
+      checks.push(absentPart("a4-projects", true, { ...witness, markedAtCreation: witness.log !== null && witness.ledger !== null }, [A4_PROJECT_CREATED], "A4 project"));
+    }
     else {
       const logged = entries?.filter((entry) => entry.type === A4_PROJECT_CREATED).map((entry) => entry.artifact.id ?? "(unnamed)");
       const lost = ([["transparency log", logged], ["evidence ledger", witness.ledger?.get(A4_PROJECT_CREATED)]] as const)
