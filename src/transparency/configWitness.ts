@@ -12,7 +12,8 @@
  * A4 store writes the per-project A4_PROJECT_CREATED pair (witnessRecords with the project id as subject) after a new
  * project's CREATED ledger rows commit, and again on a replay of that create, so an interrupted pair is completed.
  *
- * initWorkspace writes the WITNESSING_ENABLED pair once, when it creates the ledger, before any part can be configured. Only
+ * initWorkspace writes the WITNESSING_ENABLED pair once, when it creates the ledger of a new workspace (no transparency log
+ * yet), before any part can be configured, and completes an interrupted pair on a later init. Only
  * where both verified records hold it does the absence of a part's witness show the part was never configured; a workspace
  * created before witnessing existed has no marker (none is backfilled: that would vouch for files already deleted), so its
  * unwitnessed parts read SKIP until an explicit save of each part witnesses it.
@@ -64,9 +65,13 @@ export function witnessInLedger(workspace: string, type: string, agentId: string
   if (!ledgerHolds(workspace, type, agentId, subjectId)) appendOpsAuditEvent({ workspace, auditType: type, agentId, subjectId, payload });
 }
 
-/** The WITNESSING_ENABLED pair; initWorkspace calls it only when it creates the ledger, never on an existing workspace. */
-export function witnessingEnabled(workspace: string): void {
-  witnessRecords(workspace, WITNESSING_ENABLED, "workspace", { kind: "policy", id: "workspace", sha256: sha256Hex(WITNESSING_ENABLED) }, {});
+/**
+ * The WITNESSING_ENABLED pair. With `created` (initWorkspace created the ledger of a new workspace) it is written; otherwise only
+ * a pair whose ledger row exists is completed (an init interrupted between the two records), so no marker is ever started on
+ * an existing workspace.
+ */
+export function witnessingEnabled(workspace: string, created: boolean): void {
+  if (created || ledgerHolds(workspace, WITNESSING_ENABLED, "workspace")) witnessRecords(workspace, WITNESSING_ENABLED, "workspace", { kind: "policy", id: "workspace", sha256: sha256Hex(WITNESSING_ENABLED) }, {});
 }
 
 /**

@@ -122,6 +122,8 @@ export interface VerifyResult {
   payloadsNotEvaluated?: readonly string[];
   /** With options.auditTypes: each requested audit type found among the verified rows, with the meta subjectId (else agentId) of its rows. */
   audits?: ReadonlyMap<string, ReadonlySet<string>>;
+  /** With options.auditTypes: the requested audit type of the ledger's first row, when that row is one. */
+  firstAudit?: string;
 }
 
 /** P0-09 step 9: what a ledger verdict says when no pinned monitor key anchors it. */
@@ -159,7 +161,7 @@ export interface LedgerVerifyOptions {
   /** Runs on the verified read-only handle after its checks, before it closes, so a caller's own reads see the rows verified. */
   onVerifiedLedger?: (ledger: Ledger) => void;
 }
-type AuditCollector = { wanted: ReadonlySet<string>; found: Map<string, Set<string>> };
+type AuditCollector = { wanted: ReadonlySet<string>; found: Map<string, Set<string>>; first?: string };
 
 
 export function verifyEvidenceEventIntegrity(input: {
@@ -317,6 +319,7 @@ function verifyEvents(
         const id = typeof meta.subjectId === "string" ? meta.subjectId : meta.agentId;
         if (typeof id === "string") agents.add(id);
         audits.found.set(meta.auditType, agents);
+        if (event === events[0]) audits.first = meta.auditType;
       }
       if (typeof meta.receipt === "string" && meta.receipt.length > 0) {
         const verifyReceiptResult = verifyReceipt(meta.receipt, getPurposeKeyHistory(workspace, "receipt"));
@@ -773,6 +776,6 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
       closed: sessionLifecycle.closed
     },
     ...(payloadsNotEvaluated.length ? { payloadsNotEvaluated } : {}),
-    ...(auditsRead && audits ? { audits: audits.found } : {})
+    ...(auditsRead && audits ? { audits: audits.found, ...(audits.first ? { firstAudit: audits.first } : {}) } : {})
   };
 }

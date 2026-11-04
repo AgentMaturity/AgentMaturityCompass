@@ -116,13 +116,20 @@ function notConfigured(id: string, critical: boolean, details: string[]): Verify
  * verified, anchored evidence ledger (each type with the subjects, else agents, its rows name); each is null when its record is missing or
  * does not verify.
  */
-type Witness = { log: { types: Set<string>; agentsOf: (type: string) => Set<string> } | null; ledger: ReadonlyMap<string, ReadonlySet<string>> | null };
+type Witness = { log: { types: Set<string>; agentsOf: (type: string) => Set<string> } | null; ledger: ReadonlyMap<string, ReadonlySet<string>> | null;
+  /** Both verified records hold WITNESSING_ENABLED where workspace creation writes it (markedAtCreation): only then does a
+   * missing witness prove "never configured"; a workspace created before witnessing existed lacks it, so its parts read SKIP. */
+  markedAtCreation: boolean };
 
 /**
- * Whether a missing witness proves "never configured": both verified records hold the WITNESSING_ENABLED marker written at
- * workspace creation. A workspace created before witnessing existed lacks it, so its unwitnessed parts read SKIP.
+ * Whether both verified records hold the WITNESSING_ENABLED marker where workspace creation writes it: the ledger's first row,
+ * and a log entry preceded only by the creation-time KEY_HISTORY_REVISION entries. A marker anywhere else (a ledger deleted
+ * from an older workspace and recreated, or a marker written after the fact) vouches for nothing, so it counts as absent.
  */
-const witnessedFromCreation = (witness: Witness) => witness.ledger?.has(WITNESSING_ENABLED) === true && witness.log?.types.has(WITNESSING_ENABLED) === true;
+function markedAtCreation(ledgerFirstAudit: string | undefined, entries: readonly { type: string }[] | null): boolean {
+  const at = entries?.findIndex((entry) => entry.type === WITNESSING_ENABLED) ?? -1;
+  return ledgerFirstAudit === WITNESSING_ENABLED && at >= 0 && entries!.slice(0, at).every((entry) => entry.type === "KEY_HISTORY_REVISION");
+}
 
 /**
  * A witnessed part with nothing on disk: FAIL when either record holds a witness of its configuration (the files were
@@ -133,7 +140,7 @@ function absentPart(id: string, critical: boolean, witness: Witness, types: read
   if (inLedger !== undefined || inLog !== undefined) {
     return fail(id, critical, [`${what} missing: the ${inLedger !== undefined ? "evidence ledger" : "transparency log"} records it was configured (${inLedger ?? inLog})`]);
   }
-  return !witnessedFromCreation(witness)
+  return !witness.markedAtCreation
     ? skip(id, critical, [`${what} absent, and no verified evidence ledger and transparency log both show it was never configured (${WITNESSING_ENABLED} in both)`])
     : notConfigured(id, critical, [`${what} never configured (no ${types.join(" or ")} in the verified evidence ledger or transparency log)`]);
 }
@@ -171,7 +178,7 @@ export async function verifyAll(params: {
   // Only a verified ledger whose monitor key is anchored to the pinned fingerprint can witness, or show the absence of witnesses.
   const ledgerWitness = ledger?.ok === true && ledger.trustRoot.anchored ? ledger.audits ?? null : null;
   const entries = tlog?.ok === true ? tlog.entries : null;
-  const witness: Witness = { ledger: ledgerWitness, log: entries === null ? null : {
+  const witness: Witness = { ledger: ledgerWitness, markedAtCreation: ledgerWitness !== null && markedAtCreation(ledger?.firstAudit, entries), log: entries === null ? null : {
     types: new Set(entries.map((entry) => entry.type)),
     agentsOf: (type) => new Set(entries.filter((entry) => entry.type === type).map((entry) => entry.agentId))
   } };
@@ -293,7 +300,7 @@ export async function verifyAll(params: {
   }
   checks.push(
     promptAgents.length === 0 && promptErrors.length === 0
-      ? !witnessedFromCreation(witness) || witness.ledger?.has(PROMPT_PACK_CREATED) === true || witness.log?.types.has(PROMPT_PACK_CREATED) === true
+      ? !witness.markedAtCreation || witness.ledger?.has(PROMPT_PACK_CREATED) === true || witness.log?.types.has(PROMPT_PACK_CREATED) === true
         ? skip("prompt-packs", false, ["no prompt packs, and no verified evidence ledger and transparency log both show none were built"])
         : notConfigured("prompt-packs", false, ["no prompt packs built (none in the verified evidence ledger or transparency log)"])
       : promptErrors.length === 0

@@ -22,6 +22,7 @@ import { sha256Hex } from "./utils/hash.js";
 import { canonicalize } from "./utils/json.js";
 import { openLedger } from "./ledger/ledger.js";
 import { witnessingEnabled } from "./transparency/configWitness.js";
+import { transparencyLogPath } from "./transparency/logChain.js";
 import { getAgentPaths } from "./fleet/paths.js";
 import {
   ensureDefaultFleetAgent,
@@ -294,7 +295,8 @@ export function defaultWorkspaceArtifactBodies(paths: Pick<WorkspacePaths, "guar
 export function initWorkspace(opts: InitWorkspaceOptions = {}): { workspacePath: string; contextGraphHash: string } {
   const workspace = opts.workspacePath ?? process.cwd();
   const paths = getWorkspacePaths(workspace, opts.agentId);
-  const ledgerIsNew = !pathExists(join(paths.amcDir, "evidence.sqlite"));
+  // Only a new workspace (no ledger, no log: a log alone means its ledger was removed) starts the WITNESSING_ENABLED pair.
+  const workspaceIsNew = !pathExists(join(paths.amcDir, "evidence.sqlite")) && !pathExists(transparencyLogPath(workspace));
 
   ensureDir(paths.amcDir);
   ensureDir(paths.keysDir);
@@ -341,8 +343,7 @@ export function initWorkspace(opts: InitWorkspaceOptions = {}): { workspacePath:
   }
 
   openLedger(workspace).close();
-  // A new ledger: record WITNESSING_ENABLED before any part can be configured (an existing workspace never gets one).
-  if (ledgerIsNew && opts.witnessing !== false) witnessingEnabled(workspace);
+  if (opts.witnessing !== false) witnessingEnabled(workspace, workspaceIsNew);
 
   if (opts.actionPolicy === false) {
     if (!pathExists(actionPolicyPath(workspace))) declareActionPolicyAbsent(workspace);

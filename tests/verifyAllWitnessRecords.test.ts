@@ -27,7 +27,15 @@ import { openA4Store } from "../src/a4/a4Store.js";
 import { A4_RUNTIME } from "../src/a4/a4RuntimeLifecycle.js";
 import { a4, A4Project, a4Workspace, requestId } from "./a4/a4Harness.js";
 
-const hook = vi.hoisted(() => ({ afterLedgerVerify: null as null | (() => void), failWitness: false }));
+const hook = vi.hoisted(() => ({ afterLedgerVerify: null as null | (() => void), failWitness: false, failMarkerLog: false }));
+vi.mock("../src/transparency/logChain.js", async (original) => {
+  const actual = await original<typeof import("../src/transparency/logChain.js")>();
+  // failMarkerLog: init crashes between the marker's ledger row and its log entry.
+  return { ...actual, appendTransparencyEntry: (...args: Parameters<typeof actual.appendTransparencyEntry>) => {
+    if (hook.failMarkerLog && args[0].type === "WITNESSING_ENABLED") throw new Error("simulated crash before the marker's log entry");
+    return actual.appendTransparencyEntry(...args);
+  } };
+});
 vi.mock("../src/transparency/configWitness.js", async (original) => {
   const actual = await original<typeof import("../src/transparency/configWitness.js")>();
   return { ...actual, witnessA4Project: (...args: Parameters<typeof actual.witnessA4Project>) => {
@@ -50,6 +58,7 @@ const roots: string[] = [];
 afterEach(() => {
   hook.afterLedgerVerify = null;
   hook.failWitness = false;
+  hook.failMarkerLog = false;
   vi.unstubAllEnvs();
   for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
 });
@@ -304,12 +313,47 @@ describe("verify all configuration witnesses", () => {
     ["the ledger rolled back", (records: ReturnType<typeof snapshot>) => records.restoreLedger(), "transparency log records WITNESSING_ENABLED"]
   ])("the marker in one record only fails the transparency log (%s)", async (_how, rollBack, detail) => {
     const ws = preMarker(), before = snapshot(ws);
-    witnessingEnabled(ws);
+    witnessingEnabled(ws, true);
     expect(check(await run(ws), "transparency-log")?.status).toBe("PASS");
     rollBack(before);
     const report = await run(ws);
     expect(check(report, "transparency-log")?.status).toBe("FAIL");
     expect(check(report, "transparency-log")?.details.join(" ")).toContain(detail);
     expect(report.notConfigured).not.toContain("passport-policy-signature");
+  });
+  test("a workspace without the marker whose ledger was deleted gets no marker on re-init and still reads INCOMPLETE", async () => {
+    const ws = preMarker();
+    closeAllSqlitePools();
+    for (const file of ledgerFiles(ws)) rmSync(file, { force: true });
+    initWorkspace({ workspacePath: ws, trustBoundaryMode: "isolated" });
+    expect([ledgerRows(ws, "WITNESSING_ENABLED"), logRows(ws, "WITNESSING_ENABLED")]).toEqual([0, 0]);
+    const report = await run(ws);
+    expect(report.status).toBe("INCOMPLETE");
+    expect(report.skippedCritical).toEqual(["passport-policy-signature", "a4-projects"]);
+  });
+
+  test("a marker written after the workspace's first log entries vouches for nothing", async () => {
+    const ws = preMarker();
+    closeAllSqlitePools();
+    for (const file of ledgerFiles(ws)) rmSync(file, { force: true });
+    witnessingEnabled(ws, true); // a new ledger whose first row is the marker, its log entry after the older log history
+    expect([ledgerRows(ws, "WITNESSING_ENABLED"), logRows(ws, "WITNESSING_ENABLED")]).toEqual([1, 1]);
+    const report = await run(ws);
+    expect(report.status).toBe("INCOMPLETE");
+    expect(check(report, "passport-policy-signature")?.status).toBe("SKIP");
+    expect(check(report, "a4-projects")?.status).toBe("SKIP");
+  });
+
+  test("an init interrupted between the marker's two records completes the pair on the next init", async () => {
+    const ws = temp("amc-verify-witness-");
+    hook.failMarkerLog = true;
+    expect(() => initWorkspace({ workspacePath: ws, trustBoundaryMode: "isolated" })).toThrow("simulated crash");
+    hook.failMarkerLog = false;
+    expect([ledgerRows(ws, "WITNESSING_ENABLED"), logRows(ws, "WITNESSING_ENABLED")]).toEqual([1, 0]);
+    initWorkspace({ workspacePath: ws, trustBoundaryMode: "isolated" });
+    expect([ledgerRows(ws, "WITNESSING_ENABLED"), logRows(ws, "WITNESSING_ENABLED")]).toEqual([1, 1]);
+    const report = await run(ws);
+    expect(report.status).toBe("PASS");
+    expect(report.notConfigured).toEqual(expect.arrayContaining(["passport-policy-signature", "a4-projects"]));
   });
 });
