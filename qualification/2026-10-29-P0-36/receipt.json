@@ -99,7 +99,7 @@
   "artifacts": [
     {
       "path": "check-advisory-facts.mjs",
-      "sha256": "062764a0d393863ddd7d15440391cccd32f3bd910735dee91a279a4d28174971"
+      "sha256": "59f37b2186cb8d18aa2ca647566418814aa7977b8c73fbfe7be69d8c93bd9963"
     },
     {
       "path": "advisory-facts.txt",
@@ -114,5 +114,5 @@
       "sha256": "54a342c95e3017095b2fe9e40399623167dccca8ceb5411314a58c55b2eeb015"
     }
   ],
-  "notes": "Draft only: no GitHub advisory was created and no gh write call was made. commit is the measured base; facts were checked there. Durations for the first two commands and check:changelog-page are approximate (not timed). check:freeze exits 1 on the base for twelve freeze-exception keys (P0-37, P1-32, P1-33, P1-65, P2-09, P2-09d, P2-23, P2-25, P2-30, P3-14) missing from the base baseline's allowedExceptionKeys, which the integrator lands; P0-36 adds no command path and no freeze exception. Pending: reproduction on npm 1.1.1 and on the 2.0.0 release candidate, the archive probe on GNU tar and Alpine tar, P0-37's distrust entries for issue 4, and Sid's severity, CWE, split, CVE and publication decisions (see README.md)."
+  "notes": "Draft only: no GitHub advisory was created and no gh write call was made. commit is the measured base; facts were checked there. Durations for the first two commands and check:changelog-page are approximate (not timed). check:freeze exits 1 on the base for twelve freeze-exception keys (P0-37, P1-32, P1-33, P1-65, P2-09, P2-09d, P2-23, P2-25, P2-30, P3-14) missing from the base baseline's allowedExceptionKeys, which the integrator lands; P0-36 adds no command path and no freeze exception. Pending: reproduction on npm 1.1.1 and on the 2.0.0 release candidate, the archive probe on GNU tar and Alpine tar, P0-37's distrust entries for issue 4, and Sid's severity, CWE, split, CVE and publication decisions (see README.md).\nAmended 2026-11-04: check-advisory-facts.mjs changed after this receipt (sha256 062764a0d393 -> 59f37b2186cb). The checker now resolves paths from the repository root and fails closed when an anchor file is missing (lanes notesaudit, commits cc8afb553 and 0da39fe4f); the recorded counts stay valid."
 }
