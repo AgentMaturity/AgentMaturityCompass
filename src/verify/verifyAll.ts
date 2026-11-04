@@ -4,7 +4,7 @@ import { verifyTrustConfigSignature, checkNotaryTrust } from "../trust/trustConf
 import { verifyOpsPolicySignature } from "../ops/policy.js";
 import { verifyPluginWorkspace } from "../plugins/pluginApi.js";
 import { transparencyLogPath, transparencySealPath, transparencySealSigPath, verifiedTransparencyLog } from "../transparency/logChain.js";
-import { A4_PROJECT_CREATED, FORECAST_SCHEDULER_CONFIGURED, PASSPORT_POLICY_WITNESSES, PROMPT_PACK_CREATED, PROMPT_SCHEDULER_CONFIGURED, WITNESS_GROUPS } from "../transparency/configWitness.js";
+import { A4_PROJECT_CREATED, FORECAST_SCHEDULER_CONFIGURED, PASSPORT_POLICY_WITNESSES, PROMPT_PACK_CREATED, PROMPT_SCHEDULER_CONFIGURED, WITNESS_GROUPS, WITNESSING_ENABLED } from "../transparency/configWitness.js";
 import { verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { LEDGER_UNANCHORED_MESSAGE } from "../ledger/ledgerVerification.js";
@@ -119,6 +119,12 @@ function notConfigured(id: string, critical: boolean, details: string[]): Verify
 type Witness = { log: { types: Set<string>; agentsOf: (type: string) => Set<string> } | null; ledger: ReadonlyMap<string, ReadonlySet<string>> | null };
 
 /**
+ * Whether a missing witness proves "never configured": both verified records hold the WITNESSING_ENABLED marker written at
+ * workspace creation. A workspace created before witnessing existed lacks it, so its unwitnessed parts read SKIP.
+ */
+const witnessedFromCreation = (witness: Witness) => witness.ledger?.has(WITNESSING_ENABLED) === true && witness.log?.types.has(WITNESSING_ENABLED) === true;
+
+/**
  * A witnessed part with nothing on disk: FAIL when either record holds a witness of its configuration (the files were
  * removed), NOT_CONFIGURED only when both verified records hold none, and SKIP when either cannot be read to tell.
  */
@@ -127,8 +133,8 @@ function absentPart(id: string, critical: boolean, witness: Witness, types: read
   if (inLedger !== undefined || inLog !== undefined) {
     return fail(id, critical, [`${what} missing: the ${inLedger !== undefined ? "evidence ledger" : "transparency log"} records it was configured (${inLedger ?? inLog})`]);
   }
-  return witness.log === null || witness.ledger === null
-    ? skip(id, critical, [`${what} absent, and no verified evidence ledger and transparency log both show it was never configured`])
+  return !witnessedFromCreation(witness)
+    ? skip(id, critical, [`${what} absent, and no verified evidence ledger and transparency log both show it was never configured (${WITNESSING_ENABLED} in both)`])
     : notConfigured(id, critical, [`${what} never configured (no ${types.join(" or ")} in the verified evidence ledger or transparency log)`]);
 }
 
@@ -287,7 +293,7 @@ export async function verifyAll(params: {
   }
   checks.push(
     promptAgents.length === 0 && promptErrors.length === 0
-      ? witness.log === null || witness.ledger === null || witness.ledger.has(PROMPT_PACK_CREATED) || witness.log.types.has(PROMPT_PACK_CREATED)
+      ? !witnessedFromCreation(witness) || witness.ledger?.has(PROMPT_PACK_CREATED) === true || witness.log?.types.has(PROMPT_PACK_CREATED) === true
         ? skip("prompt-packs", false, ["no prompt packs, and no verified evidence ledger and transparency log both show none were built"])
         : notConfigured("prompt-packs", false, ["no prompt packs built (none in the verified evidence ledger or transparency log)"])
       : promptErrors.length === 0
@@ -398,11 +404,14 @@ export async function verifyAll(params: {
   const lagging = WITNESS_GROUPS.filter((group) => group.some((type) => ledgerWitness?.has(type)) && !group.some((type) => witness.log?.types.has(type)))
     .map((group) => group.join(" or "));
   const rolledBack = `the evidence ledger records ${lagging.join(", ")} but the transparency log does not: the log was rolled back or removed`;
+  // The marker is written once, ledger row first: a verified ledger without the one the verified log holds was replaced.
+  const markerOnlyInLog = ledgerWitness !== null && !ledgerWitness.has(WITNESSING_ENABLED) && witness.log?.types.has(WITNESSING_ENABLED) === true;
   checks.push(
     !tlogPresent ? (lagging.length > 0 ? fail("transparency-log", true, [tlogMissing, rolledBack]) : skip("transparency-log", true, [tlogMissing]))
       : tlog === null ? fail("transparency-log", true, [tlogError ?? "transparency log unreadable"])
       : !tlog.ok ? fail("transparency-log", true, tlog.errors)
       : lagging.length > 0 ? fail("transparency-log", true, [rolledBack])
+      : markerOnlyInLog ? fail("transparency-log", true, [`the transparency log records ${WITNESSING_ENABLED} but the evidence ledger does not: the records disagree`])
       : pass("transparency-log", true, [`entries=${tlog.entryCount}`, `lastHash=${tlog.lastHash}`])
   );
 

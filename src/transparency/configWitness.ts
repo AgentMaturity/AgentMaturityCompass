@@ -12,6 +12,11 @@
  * A4 store writes the per-project A4_PROJECT_CREATED pair (witnessRecords with the project id as subject) after a new
  * project's CREATED ledger rows commit, and again on a replay of that create, so an interrupted pair is completed.
  *
+ * initWorkspace writes the WITNESSING_ENABLED pair once, when it creates the ledger, before any part can be configured. Only
+ * where both verified records hold it does the absence of a part's witness show the part was never configured; a workspace
+ * created before witnessing existed has no marker (none is backfilled: that would vouch for files already deleted), so its
+ * unwitnessed parts read SKIP until an explicit save of each part witnesses it.
+ *
  * Every explicit writer of the three files witnesses, sync and async, SDK exports included. Deliberately unwitnessed:
  * - the default passport policy an async reader creates lazily (loadPassportPolicyAttemptAsync): it is only the default
  *   and the next read recreates it; every explicit init witnesses it afterwards;
@@ -33,11 +38,13 @@ export const FORECAST_SCHEDULER_CONFIGURED = "FORECAST_SCHEDULER_CONFIGURED";
 export const PROMPT_PACK_CREATED = "PROMPT_PACK_CREATED";
 /** An A4 project's creation (preview only), per project: a project either record shows was created must still be in the ledger. */
 export const A4_PROJECT_CREATED = "A4_PROJECT_CREATED";
+/** Written at workspace creation: witnesses were recorded from the start, so a missing witness means never configured. */
+export const WITNESSING_ENABLED = "WITNESSING_ENABLED";
 /** Types that show the passport policy was configured: the witness, or an applied policy (logged, and audited by Studio). */
 export const PASSPORT_POLICY_WITNESSES = [PASSPORT_POLICY_CONFIGURED, "PASSPORT_POLICY_APPLIED"] as const;
 /** One group per part: when the ledger holds a type of a group, verify all requires the log to hold a type of it too. */
 export const WITNESS_GROUPS: readonly (readonly string[])[] = [PASSPORT_POLICY_WITNESSES, [PROMPT_SCHEDULER_CONFIGURED], [FORECAST_SCHEDULER_CONFIGURED], [PROMPT_PACK_CREATED],
-  [A4_PROJECT_CREATED]];
+  [A4_PROJECT_CREATED], [WITNESSING_ENABLED]];
 
 /** Whether the ledger holds a `type` audit row for `agentId` (and `subjectId`, or none). A forged row would fail ledger verification. */
 function ledgerHolds(workspace: string, type: string, agentId: string, subjectId?: string): boolean {
@@ -55,6 +62,11 @@ function ledgerHolds(workspace: string, type: string, agentId: string, subjectId
 /** Writes the ledger witness (an ops audit row) of `type` for `agentId` (and `subjectId`) unless the ledger already holds one. */
 export function witnessInLedger(workspace: string, type: string, agentId: string, payload: Record<string, unknown>, subjectId?: string): void {
   if (!ledgerHolds(workspace, type, agentId, subjectId)) appendOpsAuditEvent({ workspace, auditType: type, agentId, subjectId, payload });
+}
+
+/** The WITNESSING_ENABLED pair; initWorkspace calls it only when it creates the ledger, never on an existing workspace. */
+export function witnessingEnabled(workspace: string): void {
+  witnessRecords(workspace, WITNESSING_ENABLED, "workspace", { kind: "policy", id: "workspace", sha256: sha256Hex(WITNESSING_ENABLED) }, {});
 }
 
 /**
