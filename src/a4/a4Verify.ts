@@ -290,37 +290,30 @@ export function verifyA4Chain(ledger: Ledger, projectId: string, trust: TrustCon
 }
 
 /**
- * The `a4-projects` rows of `amc verify all`: one per project, opened read-only. A ledger whose schema is a contiguous
- * prefix below migration 13 skips (no A4 tables yet); a schema at or above it without the tables fails, never an empty pass.
+ * The `a4-projects` rows of `amc verify all`: one per project, read on the handle ledger verification checked (verify all
+ * passes its verified read-only handle, so a file swapped after verification is never what these rows judge). A ledger whose
+ * schema is a contiguous prefix below migration 13 skips (no A4 tables yet); a schema at or above it without the tables
+ * fails, never an empty pass. A migrated ledger with no project reads NOT_CONFIGURED here; verify all decides that from its
+ * witnesses. Each project row names its project id so verify all can match the A4_PROJECT_CREATED witnesses.
  */
-export function verifyA4Projects(workspace: string, trust: TrustContext): Array<{ status: "PASS" | "FAIL" | "SKIP"; details: string[] }> {
-  let ledger: Ledger;
-  try {
-    ledger = openLedger(workspace, { readonly: true });
-  } catch (error) {
-    return [{ status: "SKIP", details: [`no readable evidence ledger: ${error instanceof Error ? error.message : String(error)}`] }];
+export function verifyA4Projects(ledger: Ledger, trust: TrustContext): Array<{ status: "PASS" | "FAIL" | "SKIP" | "NOT_CONFIGURED"; details: string[]; projectId?: string }> {
+  const db = ledger.db;
+  if (!hasTable(db, "a4_projects")) {
+    const versions = hasTable(db, "schema_migrations") ? (db.prepare("SELECT version FROM schema_migrations ORDER BY version").all() as Array<{ version: number }>) : [];
+    const prefix = versions.length > 0 && versions.length < A4_MIGRATION && versions.every((row, index) => row.version === index + 1);
+    return [prefix ? { status: "SKIP", details: [`ledger schema predates migration ${A4_MIGRATION}; no A4 tables`] }
+      : { status: "FAIL", details: [`A4 tables are missing from a ledger schema at or after migration ${A4_MIGRATION}`] }];
   }
-  try {
-    const db = ledger.db;
-    if (!hasTable(db, "a4_projects")) {
-      const versions = hasTable(db, "schema_migrations") ? (db.prepare("SELECT version FROM schema_migrations ORDER BY version").all() as Array<{ version: number }>) : [];
-      const prefix = versions.length > 0 && versions.length < A4_MIGRATION && versions.every((row, index) => row.version === index + 1);
-      return [prefix ? { status: "SKIP", details: [`ledger schema predates migration ${A4_MIGRATION}; no A4 tables`] }
-        : { status: "FAIL", details: [`A4 tables are missing from a ledger schema at or after migration ${A4_MIGRATION}`] }];
-    }
-    // A deleted head row (or project) fails as A4_CHAIN_INVALID / A4_PROJECT_NOT_FOUND, never reads as a smaller passing set.
-    const projects = a4ProjectIds(db);
-    if (projects.length === 0) return [{ status: "SKIP", details: ["no A4 projects"] }];
-    return projects.map((projectId) => {
-      const report = verifyA4Chain(ledger, projectId, trust, Date.now(), { mirror: true });
-      const failed = report.integrity.status === "fail";
-      return { status: failed ? "FAIL" : "PASS", details: [projectId, ...(failed ? report.integrity.errors.slice(0, 20)
-        : ["chain, side rows and envelopes verify (integrity of bytes under this workspace's keys)"]),
-        ...(report.freshness.status === "fail" ? report.freshness.reasons.slice(0, 5) : [])] };
-    });
-  } finally {
-    ledger.close();
-  }
+  // A deleted head row (or project) fails as A4_CHAIN_INVALID / A4_PROJECT_NOT_FOUND, never reads as a smaller passing set.
+  const projects = a4ProjectIds(db);
+  if (projects.length === 0) return [{ status: "NOT_CONFIGURED", details: ["no A4 projects"] }];
+  return projects.map((projectId) => {
+    const report = verifyA4Chain(ledger, projectId, trust, Date.now(), { mirror: true });
+    const failed = report.integrity.status === "fail";
+    return { status: failed ? "FAIL" : "PASS", projectId, details: [projectId, ...(failed ? report.integrity.errors.slice(0, 20)
+      : ["chain, side rows and envelopes verify (integrity of bytes under this workspace's keys)"]),
+      ...(report.freshness.status === "fail" ? report.freshness.reasons.slice(0, 5) : [])] };
+  });
 }
 
 // ── Offline verification of an exported project (P1-63; spec/ACCEPTANCE_RULES.md "A4 project record") ──

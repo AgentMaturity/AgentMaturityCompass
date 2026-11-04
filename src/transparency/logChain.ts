@@ -307,7 +307,7 @@ export function verifyTransparencyLog(workspace: string): { ok: boolean; errors:
 }
 
 /** `verifyTransparencyLog` plus the entries it read and checked: search these, never a second read the log could be swapped under. */
-export function verifiedTransparencyLog(workspace: string): {
+export function verifiedTransparencyLog(workspace: string, options: { readOnly?: boolean } = {}): {
   ok: boolean;
   errors: string[];
   entryCount: number;
@@ -315,7 +315,7 @@ export function verifiedTransparencyLog(workspace: string): {
   entries: TransparencyEntry[];
 } {
   const errors: string[] = [];
-  initTransparencyLog(workspace);
+  if (options.readOnly !== true) initTransparencyLog(workspace); // readOnly: a missing seal is an error, never a fresh seal
   let entries: TransparencyEntry[] = [];
   try {
     entries = readEntries(workspace);

@@ -13,6 +13,7 @@ import { rmSync } from "node:fs";
 import { z } from "zod";
 import { createApprovalForIntent, consumeApprovedExecution, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
+import { PASSPORT_POLICY_CONFIGURED, witnessConfiguration } from "../transparency/configWitness.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -26,6 +27,7 @@ import {
 import {
   loadPassportCache,
   loadPassportPolicy,
+  passportPolicyPath,
   savePassportPolicy,
   getPassportRevocation,
   revokePassport
@@ -171,20 +173,11 @@ type PublicVerifyError = {
   message: string;
 };
 
+/** Explicit init: witnessed even when a lazy async reader created the (unwitnessed) default policy first. */
 export function passportInitForApi(workspace: string) {
-  if (pathExists(join(workspace, ".amc", "passport", "policy.yaml"))) {
-    return {
-      path: join(workspace, ".amc", "passport", "policy.yaml"),
-      sigPath: `${join(workspace, ".amc", "passport", "policy.yaml")}.sig`,
-      policy: loadPassportPolicy(workspace)
-    };
-  }
-  const policy = passportPolicySchema.parse(loadPassportPolicy(workspace));
-  return {
-    path: join(workspace, ".amc", "passport", "policy.yaml"),
-    sigPath: `${join(workspace, ".amc", "passport", "policy.yaml")}.sig`,
-    policy
-  };
+  const path = join(workspace, ".amc", "passport", "policy.yaml"), policy = loadPassportPolicy(workspace);
+  witnessConfiguration(workspace, PASSPORT_POLICY_CONFIGURED, path);
+  return { path, sigPath: `${path}.sig`, policy };
 }
 
 export function passportPolicyForApi(workspace: string): {
@@ -684,12 +677,14 @@ export function capturePassportInitialization(workspace: string, options: Passpo
   return Object.freeze({ async initialize() {
     beforePublish(); assertInputsCurrent();
     const loaded = await loadPassportPolicyAttemptAsync(workspace, { beforePublish, assertInputsCurrent });
-    loaded.assertCurrent(); return { path, sigPath: `${path}.sig`, policy: loaded.policy };
+    loaded.assertCurrent(); witnessConfiguration(workspace, PASSPORT_POLICY_CONFIGURED, path); return { path, sigPath: `${path}.sig`, policy: loaded.policy };
   } });
 }
+/** The explicit init path (`amc passport init`): it witnesses the policy, unlike the lazy readers. */
 export async function passportPolicyForApiAsync(workspace: string, options: PassportPublicationOptions = {}) {
   const loaded = await loadPassportPolicyAttemptAsync(workspace, { ...options });
-  loaded.assertCurrent(); const signature = verifyPassportPolicySignature(workspace); loaded.assertCurrent();
+  loaded.assertCurrent(); witnessConfiguration(workspace, PASSPORT_POLICY_CONFIGURED, passportPolicyPath(workspace));
+  const signature = verifyPassportPolicySignature(workspace); loaded.assertCurrent();
   return { policy: loaded.policy, signature };
 }
 /** Internal actual maintained suffix retains the genuine pair; SDK result shape stays unchanged. */
@@ -719,7 +714,8 @@ export async function passportPolicyApplyAttemptForApiAsync(params: Parameters<t
   }
 }
 export async function passportPolicyApplyForApiAsync(params: Parameters<typeof passportPolicyApplyForApi>[0], options: PassportPublicationOptions = {}) {
-  return (await passportPolicyApplyAttemptForApiAsync(params, options)).result;
+  const result = (await passportPolicyApplyAttemptForApiAsync(params, options)).result;
+  witnessConfiguration(params.workspace, PASSPORT_POLICY_CONFIGURED, result.path); return result;
 }
 export async function passportCreateAttemptForApiAsync(params: Parameters<typeof passportCreateForApi>[0], options: PassportPublicationOptions = {}) {
   const input = structuredClone(params), scope = parseScope(input);

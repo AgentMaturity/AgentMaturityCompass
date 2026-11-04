@@ -120,6 +120,8 @@ export interface VerifyResult {
    * unreachable or vault locked). Not errors, and not verified: the chain over their ciphertext was still checked.
    */
   payloadsNotEvaluated?: readonly string[];
+  /** With options.auditTypes: each requested audit type found among the verified rows, with the meta subjectId (else agentId) of its rows. */
+  audits?: ReadonlyMap<string, ReadonlySet<string>>;
 }
 
 /** P0-09 step 9: what a ledger verdict says when no pinned monitor key anchors it. */
@@ -152,7 +154,12 @@ export interface LedgerVerifyOptions {
   sessionStaleAfterMs?: number;
   /** P0-09: when given, trustRoot.anchored means the monitor key is admitted for ledger-row by this context. */
   trust?: TrustContext;
+  /** Audit types to report (result.audits), read from the very rows this verification checked, never a second read. */
+  auditTypes?: readonly string[];
+  /** Runs on the verified read-only handle after its checks, before it closes, so a caller's own reads see the rows verified. */
+  onVerifiedLedger?: (ledger: Ledger) => void;
 }
+type AuditCollector = { wanted: ReadonlySet<string>; found: Map<string, Set<string>> };
 
 
 export function verifyEvidenceEventIntegrity(input: {
@@ -272,7 +279,8 @@ function verifyEvents(
   workspace: string,
   errors: string[],
   externallyAuthenticatedPayloads?: ReadonlyMap<string, string>,
-  notEvaluated?: string[]
+  notEvaluated?: string[],
+  audits?: AuditCollector
 ): void {
   const events = ledger.getAllEvents();
   const retentionProofs = events.some((event) => event.archived === 1 || event.payload_pruned === 1)
@@ -304,6 +312,12 @@ function verifyEvents(
 
     try {
       const meta = JSON.parse(event.meta_json) as Record<string, unknown>;
+      if (audits && event.event_type === "audit" && typeof meta.auditType === "string" && audits.wanted.has(meta.auditType)) {
+        const agents = audits.found.get(meta.auditType) ?? new Set<string>();
+        const id = typeof meta.subjectId === "string" ? meta.subjectId : meta.agentId;
+        if (typeof id === "string") agents.add(id);
+        audits.found.set(meta.auditType, agents);
+      }
       if (typeof meta.receipt === "string" && meta.receipt.length > 0) {
         const verifyReceiptResult = verifyReceipt(meta.receipt, getPurposeKeyHistory(workspace, "receipt"));
         if (!verifyReceiptResult.ok || !verifyReceiptResult.payload) {
@@ -657,6 +671,8 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
   const governanceErrors: string[] = [];
   const staleAfterMs = options.sessionStaleAfterMs ?? SESSION_STALE_AFTER_MS;
   let sessionLifecycle: SessionLifecycle = { open: [], released: [], interrupted: [], closed: [] };
+  const audits: AuditCollector | undefined = options.auditTypes ? { wanted: new Set(options.auditTypes), found: new Map() } : undefined;
+  let auditsRead = false;
 
   // The trust root comes first: if the key every signature is checked against
   // is not the key the operator expects, nothing below this line means
@@ -707,11 +723,13 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
     if (ledger) {
       chainErrors.push(...operationalLedgerProblems(workspacePath, ledger, options.trust));
       chainErrors.push(...receiptLedgerProblems(ledger, options.trust));
-      verifyEvents(ledger, workspacePath, chainErrors, options.externallyAuthenticatedPayloads, payloadsNotEvaluated);
+      verifyEvents(ledger, workspacePath, chainErrors, options.externallyAuthenticatedPayloads, payloadsNotEvaluated, audits);
+      auditsRead = audits !== undefined;
       verifySessionChains(ledger, chainErrors, { trust: options.trust });
       sessionLifecycle = verifySessions(ledger, workspacePath, chainErrors, staleAfterMs, continuation);
       verifyRuns(ledger, workspacePath, chainErrors);
       verifyOutcomeEvents(ledger, workspacePath, chainErrors);
+      options.onVerifiedLedger?.(ledger);
     }
     if (ledger || jsonlBackend) {
       try {
@@ -754,6 +772,7 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
       interrupted: sessionLifecycle.interrupted,
       closed: sessionLifecycle.closed
     },
-    ...(payloadsNotEvaluated.length ? { payloadsNotEvaluated } : {})
+    ...(payloadsNotEvaluated.length ? { payloadsNotEvaluated } : {}),
+    ...(auditsRead && audits ? { audits: audits.found } : {})
   };
 }

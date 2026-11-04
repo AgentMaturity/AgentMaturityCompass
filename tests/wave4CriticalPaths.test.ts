@@ -253,6 +253,7 @@ describe("wave4 critical scoring + verification paths", () => {
       status: "FAIL",
       criticalFail: true,
       skippedCritical: [],
+      notConfigured: [],
       generatedTs: 1,
       checks: [
         { id: "a", status: "FAIL", critical: true, details: ["a-1", "a-2"] },

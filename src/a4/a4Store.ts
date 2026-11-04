@@ -39,6 +39,7 @@ import { prepareA4Record, SIDE_TABLE_KEYS, NEW_HEAD, headProblems, type A4Actor,
 export type { A4Actor, A4ChangeSpec, A4RequestKey, A4TransitionOptions, A4TransitionResult } from "./a4TransitionRecords.js";
 import { captureA4RecordSigner, assertA4HotWriters, createA4CurrentLatch, A4TransitionPublicationError, type A4TransitionAttempt, type A4TransitionProgress } from "./a4TransitionSigning.js";
 import { A4BlobError, a4ProjectsRoot, createProjectKey, putPrivate } from "./a4Blobs.js";
+import { witnessA4Project } from "../transparency/configWitness.js";
 import { a4MirrorDivergence, LEDGER_BACKEND_INCOMPLETE_MESSAGE, ledgerBackendGap, writeA4Mirror } from "./a4LedgerBackend.js";
 import { ledgerRefClaim, liveLedgerRowAgent, resolveLedgerEvent } from "./a4Evidence.js";
 import { type LedgerMirror, openLedgerMirror } from "../persistence/postgres/postgresLedgerMirror.js";
@@ -656,7 +657,7 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext, mi
         hostedRouter: input.hostedRouter, regulated: false, workspaceFloor: undefined, ratcheted: false, decidingPrincipal: input.actor });
       const gatePolicy = defaultGatePolicyFor(a4FloorFor(signed.policy));
       let projectPublicKeySha256: string | null = null;
-      return commit(projectId, input.actor, ({ seq, ts }) => {
+      const created = commit(projectId, input.actor, ({ seq, ts }) => {
         if (db.prepare("SELECT 1 FROM a4_projects WHERE agent_id = ? AND stage <> 'retired'").get(input.agentId)) {
           throw new A4StoreError(409, "A4_AGENT_HAS_ACTIVE_PROJECT", `agent ${input.agentId} already has an active A4 project; retire it first`);
         }
@@ -676,6 +677,11 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext, mi
         };
       }, { request: input.request, response: { agentId: input.agentId } }, { project_id: projectId, workspace_id: workspaceId, agent_id: input.agentId, name: input.name.trim(),
         created_by_key: input.actor.key });
+      // After the CREATED rows commit, and on a replay (idempotent per project, so one interrupted before its witness completes
+      // it): verify all fails a project either witness record holds that the ledger lost (a rollback).
+      if (created.replay) witnessA4Project(workspace, created.response.agentId, created.response.projectId, created.response.bodyDigest);
+      else witnessA4Project(workspace, input.agentId, created.projectId, created.bodyDigest);
+      return created;
     },
 
     /** A new accepted specification: revision N+1 with its content digest and the resource digests it depends on. */

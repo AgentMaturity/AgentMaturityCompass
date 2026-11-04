@@ -9,6 +9,7 @@ import { pathExists, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
+import { PROMPT_PACK_CREATED, witnessInLedger } from "../transparency/configWitness.js";
 import { verifyWorkspacePromptPack } from "./promptPackVerifier.js";
 import { buildPromptPackArtifact, inspectPromptPackArtifact } from "./promptPackArtifact.js";
 import { diffLatestPromptPack } from "./promptDiff.js";
@@ -296,6 +297,7 @@ export function buildPromptPackForApi(params: {
     lint: built.lint
   });
   commitPromptLessons(params.workspace, agentId, built.pack.packId, built.pack.checkpoints.lessonTransfer);
+  witnessInLedger(params.workspace, PROMPT_PACK_CREATED, agentId, { packId: built.pack.packId, sha256: built.sha256 });
   appendTransparencyEntry({
     workspace: params.workspace,
     type: "PROMPT_PACK_CREATED",

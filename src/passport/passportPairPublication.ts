@@ -2,6 +2,7 @@ import YAML from "yaml";
 import { assertOrgPairsCurrent, captureOrgPairs, orgPairBytes, prepareOrgPairsAsync, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
 import { defaultPassportPolicy, passportPolicySchema, type PassportPolicy } from "./passportPolicySchema.js";
 import { passportJsonSchema } from "./passportSchema.js";
+import { PASSPORT_POLICY_CONFIGURED, witnessConfiguration } from "../transparency/configWitness.js";
 import { passportPolicyPath, passportLatestCachePath, type savePassportCache } from "./passportStore.js";
 import { capturePassportDirectories, passportRequiredDirectories, passportPublicationFailure, type PassportPublicationOptions } from "./passportPublication.js";
 
@@ -21,8 +22,10 @@ export async function preparePassportPolicyAsync(workspace: string, input: Passp
     }
   } });
 }
+/** The SDK's explicit async save: witnessed after the publish (no flow holds the transparency state across it). */
 export async function savePassportPolicyAsync(workspace: string, policy: PassportPolicy, options: PassportPublicationOptions = {}) {
-  return (await preparePassportPolicyAsync(workspace, policy, options)).publish();
+  const saved = (await preparePassportPolicyAsync(workspace, policy, options)).publish();
+  witnessConfiguration(workspace, PASSPORT_POLICY_CONFIGURED, saved.path); return saved;
 }
 /** Existing policy body reads require no fresh signing authority. Only a missing body creates the default pair. */
 export async function loadPassportPolicyAttemptAsync(workspace: string, options: PassportPublicationOptions = {}) {

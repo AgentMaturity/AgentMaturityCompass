@@ -14,6 +14,7 @@ import {
   passportCacheLatestForApi,
   passportCreateForApi,
   passportExportLatestForApi,
+  passportInitForApi,
   passportPolicyApplyForApi,
   passportPolicyForApi,
   passportPublicUrlForApi,
@@ -84,6 +85,7 @@ function loadOrCreateAgentPassport(workspace: string, agentId: string) {
 }
 
 export function passportInitCli(workspace: string) {
+  passportInitForApi(workspace); // the explicit init witnesses the policy
   return passportPolicyForApi(workspace);
 }
 

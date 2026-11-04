@@ -21,6 +21,9 @@ import { MERKLE_ALGORITHMS } from "./merkle.js";
  *
  * `a4-package` (P1-62) records the signed manifest of an A4 agent package (src/a4/a4Package.ts).
  *
+ * `a4-project` records an A4 project's creation (`id` = project id, `sha256` = its CREATED transition digest), the log
+ * half of the A4_PROJECT_CREATED witness verify all reads (src/transparency/configWitness.ts).
+ *
  * `revocation-list`, `key-rotation` and `key-history` (P1-08) anchor each signed revocation list, rotation statement
  * and key-history revision, with `id` = `<list or chain id>#<sequence>`, so an older file can be refused even after the
  * per-machine high-water mark is lost (src/keys/anchors.ts).
@@ -41,6 +44,7 @@ export const TRANSPARENCY_ARTIFACT_KINDS = [
   "merkle-migration",
   "a4-binder",
   "a4-package",
+  "a4-project",
   "revocation-list",
   "key-rotation",
   "key-history"

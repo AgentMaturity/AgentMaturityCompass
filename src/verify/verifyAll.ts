@@ -3,7 +3,8 @@ import { readdirSync, statSync } from "node:fs";
 import { verifyTrustConfigSignature, checkNotaryTrust } from "../trust/trustConfig.js";
 import { verifyOpsPolicySignature } from "../ops/policy.js";
 import { verifyPluginWorkspace } from "../plugins/pluginApi.js";
-import { verifyTransparencyLog } from "../transparency/logChain.js";
+import { transparencyLogPath, transparencySealPath, transparencySealSigPath, verifiedTransparencyLog } from "../transparency/logChain.js";
+import { A4_PROJECT_CREATED, FORECAST_SCHEDULER_CONFIGURED, PASSPORT_POLICY_WITNESSES, PROMPT_PACK_CREATED, PROMPT_SCHEDULER_CONFIGURED, WITNESS_GROUPS } from "../transparency/configWitness.js";
 import { verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { LEDGER_UNANCHORED_MESSAGE } from "../ledger/ledgerVerification.js";
@@ -37,12 +38,13 @@ import { verifyAuditPolicySignature } from "../audit/auditPolicyStore.js";
 import { verifyAuditMapActiveSignature, verifyAuditMapBuiltinSignature } from "../audit/auditMapStore.js";
 import { listExportedAuditBinders } from "../audit/binderArtifact.js";
 import { verifyAuditBinderFile, verifyAuditWorkspace } from "../audit/binderVerifier.js";
-import { listPassportExportFiles, verifyPassportPolicySignature } from "../passport/passportStore.js";
+import { listPassportExportFiles, passportPolicySigPath, verifyPassportPolicySignature } from "../passport/passportStore.js";
 import { verifyPassportWorkspace } from "../passport/passportVerifier.js";
 import { verifyStandardSchemas } from "../standard/standardGenerator.js";
 import { verifyA4Projects } from "../a4/a4Verify.js";
 
-type VerifyStatus = "PASS" | "FAIL" | "SKIP";
+/** NOT_CONFIGURED: an optional feature the workspace never set up, so there is nothing to verify; SKIP: something exists but was not verified. */
+type VerifyStatus = "PASS" | "FAIL" | "SKIP" | "NOT_CONFIGURED";
 
 export interface VerifyAllCheck {
   id: string;
@@ -57,6 +59,8 @@ export interface VerifyAllReport {
   criticalFail: boolean;
   /** Ids of critical checks recorded as SKIP (never performed). */
   skippedCritical: string[];
+  /** Ids of checks recorded as NOT_CONFIGURED: they neither pass nor withhold the headline. */
+  notConfigured: string[];
   generatedTs: number;
   checks: VerifyAllCheck[];
 }
@@ -103,6 +107,31 @@ function skip(id: string, critical: boolean, details: string[]): VerifyAllCheck 
   return { id, status: "SKIP", critical, details };
 }
 
+function notConfigured(id: string, critical: boolean, details: string[]): VerifyAllCheck {
+  return { id, status: "NOT_CONFIGURED", critical, details };
+}
+
+/**
+ * The configuration witnesses: the verified transparency log's entry types and agents, and the witness types in the
+ * verified, anchored evidence ledger (each type with the subjects, else agents, its rows name); each is null when its record is missing or
+ * does not verify.
+ */
+type Witness = { log: { types: Set<string>; agentsOf: (type: string) => Set<string> } | null; ledger: ReadonlyMap<string, ReadonlySet<string>> | null };
+
+/**
+ * A witnessed part with nothing on disk: FAIL when either record holds a witness of its configuration (the files were
+ * removed), NOT_CONFIGURED only when both verified records hold none, and SKIP when either cannot be read to tell.
+ */
+function absentPart(id: string, critical: boolean, witness: Witness, types: readonly string[], what: string): VerifyAllCheck {
+  const inLedger = types.find((type) => witness.ledger?.has(type)), inLog = types.find((type) => witness.log?.types.has(type));
+  if (inLedger !== undefined || inLog !== undefined) {
+    return fail(id, critical, [`${what} missing: the ${inLedger !== undefined ? "evidence ledger" : "transparency log"} records it was configured (${inLedger ?? inLog})`]);
+  }
+  return witness.log === null || witness.ledger === null
+    ? skip(id, critical, [`${what} absent, and no verified evidence ledger and transparency log both show it was never configured`])
+    : notConfigured(id, critical, [`${what} never configured (no ${types.join(" or ")} in the verified evidence ledger or transparency log)`]);
+}
+
 export async function verifyAll(params: {
   workspace: string;
   /** The operator's trust context (P0-09): it anchors the ledger and admits release keys; --allow-unanchored lives here. */
@@ -110,6 +139,36 @@ export async function verifyAll(params: {
 }): Promise<VerifyAllReport> {
   const workspace = resolve(params.workspace);
   const checks: VerifyAllCheck[] = [];
+  // Verify all is read-only: a missing log or seal is never recreated (a fresh seal would erase the witnesses).
+  const tlogPresent = [transparencyLogPath(workspace), transparencySealPath(workspace), transparencySealSigPath(workspace)].every(statExists);
+  let tlog: ReturnType<typeof verifiedTransparencyLog> | null = null, tlogError: string | null = null;
+  try {
+    tlog = tlogPresent ? verifiedTransparencyLog(workspace, { readOnly: true }) : null;
+  } catch (error) {
+    tlogError = String(error);
+  }
+  let ledger: Awaited<ReturnType<typeof verifyLedgerIntegrity>> | null = null, ledgerError: string | null = null;
+  const a4: { rows: ReturnType<typeof verifyA4Projects> | null } = { rows: null };
+  try {
+    // The witness rows come from the rows this verification checked, on its one ledger handle; the file is never reopened.
+    // The A4 projects are read on that same verified handle before it closes (a4-projects below).
+    ledger = await verifyLedgerIntegrity(workspace, { trust: params.trust, auditTypes: WITNESS_GROUPS.flat(), onVerifiedLedger: (handle) => {
+      try {
+        a4.rows = verifyA4Projects(handle, params.trust);
+      } catch (error) {
+        a4.rows = [{ status: "FAIL", details: [String(error)] }];
+      }
+    } });
+  } catch (error) {
+    ledgerError = String(error);
+  }
+  // Only a verified ledger whose monitor key is anchored to the pinned fingerprint can witness, or show the absence of witnesses.
+  const ledgerWitness = ledger?.ok === true && ledger.trustRoot.anchored ? ledger.audits ?? null : null;
+  const entries = tlog?.ok === true ? tlog.entries : null;
+  const witness: Witness = { ledger: ledgerWitness, log: entries === null ? null : {
+    types: new Set(entries.map((entry) => entry.type)),
+    agentsOf: (type) => new Set(entries.filter((entry) => entry.type === type).map((entry) => entry.agentId))
+  } };
 
   const trustSig = verifyTrustConfigSignature(workspace);
   checks.push(
@@ -200,13 +259,22 @@ export async function verifyAll(params: {
 
   const promptSchedulerSig = verifyPromptSchedulerStateSignature(workspace);
   checks.push(
-    promptSchedulerSig.valid || !promptSchedulerSig.signatureExists
-      ? pass("prompt-scheduler-signature", false, [promptSchedulerSig.signatureExists ? promptSchedulerSig.path : "scheduler not initialized"])
-      : fail("prompt-scheduler-signature", false, [promptSchedulerSig.reason ?? "signature verification failed"])
+    // A state file without its signature, or a signature without its state file, is unverifiable and fails; only the
+    // absence of both is not configured.
+    !statExists(promptSchedulerSig.path) && !statExists(promptSchedulerSig.sigPath)
+      ? absentPart("prompt-scheduler-signature", false, witness, [PROMPT_SCHEDULER_CONFIGURED], "prompt scheduler state")
+      : promptSchedulerSig.valid && statExists(promptSchedulerSig.path)
+      ? pass("prompt-scheduler-signature", false, [promptSchedulerSig.path])
+      : fail("prompt-scheduler-signature", false, [promptSchedulerSig.reason ?? "state file missing beside its signature"])
   );
 
   const promptErrors: string[] = [];
-  for (const agentId of listPromptAgentsWithPacks(workspace)) {
+  const promptAgents = listPromptAgentsWithPacks(workspace);
+  // Packs are enforced on agents, so a pack either record shows was built (PROMPT_PACK_CREATED) must still be on disk.
+  for (const [record, agents] of [["transparency log", witness.log?.agentsOf(PROMPT_PACK_CREATED)], ["evidence ledger", witness.ledger?.get(PROMPT_PACK_CREATED)]] as const) {
+    for (const agentId of agents ?? []) if (!promptAgents.includes(agentId)) promptErrors.push(`pack(${agentId}): missing; the ${record} records a pack built for this agent`);
+  }
+  for (const agentId of promptAgents) {
     const packPath = promptLatestPackPath(workspace, agentId);
     const verify = verifyWorkspacePromptPack(workspace, packPath);
     if (!verify.ok) {
@@ -218,7 +286,11 @@ export async function verifyAll(params: {
     }
   }
   checks.push(
-    promptErrors.length === 0
+    promptAgents.length === 0 && promptErrors.length === 0
+      ? witness.log === null || witness.ledger === null || witness.ledger.has(PROMPT_PACK_CREATED) || witness.log.types.has(PROMPT_PACK_CREATED)
+        ? skip("prompt-packs", false, ["no prompt packs, and no verified evidence ledger and transparency log both show none were built"])
+        : notConfigured("prompt-packs", false, ["no prompt packs built (none in the verified evidence ledger or transparency log)"])
+      : promptErrors.length === 0
       ? pass("prompt-packs", false, ["all prompt packs + lint signatures verified"])
       : fail("prompt-packs", false, promptErrors)
   );
@@ -259,7 +331,8 @@ export async function verifyAll(params: {
       : fail("audit-workspace-integrity", false, auditWorkspace.errors)
   );
   const auditExportErrors: string[] = [];
-  for (const row of listExportedAuditBinders(workspace)) {
+  const auditExports = listExportedAuditBinders(workspace);
+  for (const row of auditExports) {
     const verify = verifyAuditBinderFile({
       file: row.file,
       workspace,
@@ -270,7 +343,9 @@ export async function verifyAll(params: {
     }
   }
   checks.push(
-    auditExportErrors.length === 0
+    auditExports.length === 0
+      ? notConfigured("audit-binder-exports", false, ["no .amcaudit files exported"])
+      : auditExportErrors.length === 0
       ? pass("audit-binder-exports", false, ["all exported .amcaudit files verified"])
       : fail("audit-binder-exports", false, auditExportErrors)
   );
@@ -282,18 +357,20 @@ export async function verifyAll(params: {
   const passportCacheEntries = statExists(passportCachePath)
     ? readdirSync(passportCachePath).filter((name) => name.startsWith("latest_") && name.endsWith(".json"))
     : [];
+  // An orphaned policy signature proves a policy once existed, so the missing body fails rather than reading as never configured.
   const passportUninitialized =
     passportPolicyFileMissing &&
+    !statExists(passportPolicySigPath(workspace)) &&
     listPassportExportFiles(workspace).length === 0 &&
     passportCacheEntries.length === 0;
-  if (passportUninitialized) {
-    checks.push(skip("passport-policy-signature", true, ["passport not initialized yet"]));
-    checks.push(skip("passport-workspace-integrity", false, ["passport not initialized yet"]));
+  const passportAbsent = passportUninitialized ? absentPart("passport-policy-signature", true, witness, PASSPORT_POLICY_WITNESSES, "passport policy") : null;
+  if (passportAbsent !== null && passportAbsent.status !== "FAIL") {
+    checks.push(passportAbsent, { ...passportAbsent, id: "passport-workspace-integrity", critical: false });
   } else {
     checks.push(
       passportPolicy.valid
         ? pass("passport-policy-signature", true, [passportPolicy.path])
-        : fail("passport-policy-signature", true, [passportPolicy.reason ?? "invalid"])
+        : fail("passport-policy-signature", true, [passportPolicy.reason ?? "invalid", ...(passportAbsent?.details ?? [])])
     );
     const passportWorkspace = verifyPassportWorkspace({
       workspace
@@ -307,7 +384,7 @@ export async function verifyAll(params: {
 
   const standard = verifyStandardSchemas(workspace);
   if (!standard.meta && standard.errors.some((row) => row.toLowerCase().includes("meta.json missing"))) {
-    checks.push(skip("standard-schema-bundle", false, ["schema bundle not generated yet"]));
+    checks.push(notConfigured("standard-schema-bundle", false, ["schema bundle not generated yet"]));
   } else {
     checks.push(
       standard.ok
@@ -316,21 +393,24 @@ export async function verifyAll(params: {
     );
   }
 
-  try {
-    const tlog = verifyTransparencyLog(workspace);
-    checks.push(
-      tlog.ok
-        ? pass("transparency-log", true, [`entries=${tlog.entryCount}`, `lastHash=${tlog.lastHash}`])
-        : fail("transparency-log", true, tlog.errors)
-    );
-  } catch (error) {
-    checks.push(fail("transparency-log", true, [String(error)]));
-  }
+  const tlogMissing = "transparency log or its seal missing: not verified, and verify all does not recreate it";
+  // The ledger row is written before the log entry, so a log that lacks a witness the ledger holds was restored to an older copy.
+  const lagging = WITNESS_GROUPS.filter((group) => group.some((type) => ledgerWitness?.has(type)) && !group.some((type) => witness.log?.types.has(type)))
+    .map((group) => group.join(" or "));
+  const rolledBack = `the evidence ledger records ${lagging.join(", ")} but the transparency log does not: the log was rolled back or removed`;
+  checks.push(
+    !tlogPresent ? (lagging.length > 0 ? fail("transparency-log", true, [tlogMissing, rolledBack]) : skip("transparency-log", true, [tlogMissing]))
+      : tlog === null ? fail("transparency-log", true, [tlogError ?? "transparency log unreadable"])
+      : !tlog.ok ? fail("transparency-log", true, tlog.errors)
+      : lagging.length > 0 ? fail("transparency-log", true, [rolledBack])
+      : pass("transparency-log", true, [`entries=${tlog.entryCount}`, `lastHash=${tlog.lastHash}`])
+  );
 
   try {
-    const merkle = verifyTransparencyMerkle(workspace);
+    const merkle = tlogPresent ? verifyTransparencyMerkle(workspace) : null;
     checks.push(
-      merkle.ok
+      merkle === null ? skip("transparency-merkle", true, [tlogMissing])
+      : merkle.ok
         ? pass("transparency-merkle", true, [`leafCount=${merkle.leafCount}`, `root=${merkle.root ?? ""}`])
         : fail("transparency-merkle", true, merkle.errors)
     );
@@ -338,8 +418,9 @@ export async function verifyAll(params: {
     checks.push(fail("transparency-merkle", true, [String(error)]));
   }
 
-  try {
-    const ledger = await verifyLedgerIntegrity(workspace, { trust: params.trust });
+  if (ledger === null) {
+    checks.push(fail("ledger-hash-chain", true, [ledgerError ?? "ledger unreadable"]));
+  } else {
     checks.push(
       ledger.ok
         ? pass("ledger-hash-chain", true, ["event hash-chain and signatures verified"])
@@ -353,14 +434,24 @@ export async function verifyAll(params: {
       : params.trust.allowUnanchored
         ? skip("ledger-trust-root", true, ["UNANCHORED (--allow-unanchored): internal consistency only"])
         : fail("ledger-trust-root", true, [LEDGER_UNANCHORED_MESSAGE]));
-  } catch (error) {
-    checks.push(fail("ledger-hash-chain", true, [String(error)]));
   }
 
   // P1-57: each A4 project's chain, side rows and envelopes (integrity of bytes; never a claim about the agent).
   try {
-    for (const row of verifyA4Projects(workspace, params.trust)) {
-      checks.push((row.status === "PASS" ? pass : row.status === "FAIL" ? fail : skip)("a4-projects", true, row.details));
+    // The projects were read on the handle ledger verification checked; "none" and "one is gone" are decided from the
+    // verified witness records, each naming its project (ledger row subjectId, log artifact id).
+    const rows = a4.rows;
+    if (rows === null) throw new Error("no readable evidence ledger: ledger verification did not reach the A4 checks");
+    const projects = new Set(rows.flatMap((row) => row.projectId ?? []));
+    // With no project, absentPart fails it when either record holds a witness, and reads NOT_CONFIGURED only when both hold none.
+    if (rows.length === 1 && rows[0]!.status === "NOT_CONFIGURED") checks.push(absentPart("a4-projects", true, witness, [A4_PROJECT_CREATED], "A4 project"));
+    else {
+      const logged = entries?.filter((entry) => entry.type === A4_PROJECT_CREATED).map((entry) => entry.artifact.id ?? "(unnamed)");
+      const lost = ([["transparency log", logged], ["evidence ledger", witness.ledger?.get(A4_PROJECT_CREATED)]] as const)
+        .flatMap(([record, witnessed]) => [...witnessed ?? []].filter((projectId) => !projects.has(projectId))
+          .map((projectId) => `A4 project ${projectId} missing from the ledger: the ${record} records it was created`));
+      for (const row of rows) checks.push({ id: "a4-projects", status: row.status, critical: true, details: row.details });
+      if (lost.length > 0) checks.push(fail("a4-projects", true, lost));
     }
   } catch (error) {
     checks.push(fail("a4-projects", true, [String(error)]));
@@ -371,10 +462,8 @@ export async function verifyAll(params: {
     checks.push(
       fail("forecast-signatures", false, [`forecast policy: ${forecast.policy.reason ?? "invalid"}`])
     );
-  } else if (!forecast.scheduler.valid && (forecast.scheduler.reason ?? "").toLowerCase().includes("file missing")) {
-    checks.push(
-      skip("forecast-signatures", false, ["forecast scheduler not initialized yet"])
-    );
+  } else if (!forecast.scheduler.valid && !statExists(forecast.scheduler.path) && !statExists(forecast.scheduler.sigPath)) {
+    checks.push(absentPart("forecast-signatures", false, witness, [FORECAST_SCHEDULER_CONFIGURED], "forecast scheduler state"));
   } else if (!forecast.scheduler.valid) {
     checks.push(
       fail("forecast-signatures", false, [`forecast scheduler: ${forecast.scheduler.reason ?? "invalid"}`])
@@ -393,13 +482,15 @@ export async function verifyAll(params: {
   );
 
   const benchErrors: string[] = [];
-  for (const artifact of listExportedBenchArtifacts(workspace)) {
+  const benchExports = listExportedBenchArtifacts(workspace);
+  const benchImports = listImportedBenchArtifacts(workspace);
+  for (const artifact of benchExports) {
     const verify = verifyBenchArtifactFile({ file: artifact.file, trust: workspaceSelfTrust(workspace) });
     if (!verify.ok) {
       benchErrors.push(`export ${artifact.file}: ${untrustedReasons(verify.report).join("; ")}`);
     }
   }
-  for (const imported of listImportedBenchArtifacts(workspace)) {
+  for (const imported of benchImports) {
     let artifactPath: string;
     try {
       artifactPath = importedBenchPath(workspace, imported.benchId, imported.version).artifactPath;
@@ -424,14 +515,16 @@ export async function verifyAll(params: {
     }
   }
   checks.push(
-    benchErrors.length === 0
+    benchExports.length + benchImports.length === 0
+      ? notConfigured("bench-artifacts", false, ["no .amcbench files imported or exported"])
+      : benchErrors.length === 0
       ? pass("bench-artifacts", false, ["all imported/exported .amcbench files verified"])
       : fail("bench-artifacts", false, benchErrors)
   );
 
   const backupFiles = recursiveFiles(workspace, (file) => file.endsWith(".amcbackup"));
   if (backupFiles.length === 0) {
-    checks.push(skip("backup-manifests", false, ["no .amcbackup files found under workspace"]));
+    checks.push(notConfigured("backup-manifests", false, ["no .amcbackup files found under workspace"]));
   } else {
     const backupErrors: string[] = [];
     let requiresPassphraseOnly = true;
@@ -483,7 +576,7 @@ export async function verifyAll(params: {
   const distDir = join(workspace, "dist");
   const releaseFiles = recursiveFiles(distDir, (file) => file.endsWith(".amcrelease"));
   if (releaseFiles.length === 0) {
-    checks.push(skip("release-bundles", false, ["no .amcrelease files found in dist/"]));
+    checks.push(notConfigured("release-bundles", false, ["no .amcrelease files found in dist/"]));
   } else {
     const releaseErrors: string[] = [];
     for (const file of releaseFiles) {
@@ -513,6 +606,7 @@ export async function verifyAll(params: {
     status: anyFail ? "FAIL" : skippedCritical.length > 0 ? "INCOMPLETE" : "PASS",
     criticalFail,
     skippedCritical,
+    notConfigured: checks.filter((check) => check.status === "NOT_CONFIGURED").map((check) => check.id),
     generatedTs: Date.now(),
     checks
   };
