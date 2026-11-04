@@ -73,7 +73,7 @@ export function witnessConfiguration(workspace: string, type: string, path: stri
  * suppresses the other, so a rollback of either record is repaired on the next witness. With `bySubject` the witness is per
  * artifact id instead (an A4 project): the ledger row's meta subjectId and the log entry's artifact id name it.
  */
-export function witnessRecords(workspace: string, type: string, agentId: string, artifact: { kind: TransparencyArtifactKind; id: string; sha256: string },
+function witnessRecords(workspace: string, type: string, agentId: string, artifact: { kind: TransparencyArtifactKind; id: string; sha256: string },
   payload: Record<string, unknown>, bySubject = false): void {
   const subjectId = bySubject ? artifact.id : undefined;
   witnessInLedger(workspace, type, agentId, payload, subjectId);
