@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -26,10 +26,13 @@ const seam = vi.hoisted(() => ({
     revision: null as number | null,
     reason: "No Runtime Firewall policy has been initialized."
   },
-  vaultUnlocked: false
+  vaultUnlocked: false,
+  rememberedAt: null as string | null
 }));
 vi.mock("../src/studio/studioSupervisor.js", () => ({ studioStatus: () => ({ running: false, state: null }) }));
 vi.mock("../src/vault/vaultCli.js", () => ({ vaultStatusNow: () => ({ unlocked: seam.vaultUnlocked }) }));
+vi.mock("../src/vault/passphraseStore.js", () => ({ rememberedStores: () => "the macOS Keychain (service amc-vault) or /fixture/amc-home/vault-credentials.json",
+  rememberedUnlockLocation: () => seam.rememberedAt }));
 vi.mock("../src/governor/actionPolicyEngine.js", () => ({ verifyActionPolicySignature: () => seam.signature }));
 vi.mock("../src/toolhub/toolhubCli.js", () => ({ verifyToolhubConfig: () => seam.signature }));
 vi.mock("../src/budgets/budgets.js", () => ({ verifyBudgetsConfigSignature: () => seam.signature }));
@@ -68,6 +71,7 @@ describe("amc doctor names each first-run precondition and its fix", () => {
     seam.signature = { valid: true, signatureExists: true, reason: null };
     seam.firewall = { integrity: "uninitialized", policy: null, revision: null, reason: "No Runtime Firewall policy has been initialized." };
     seam.vaultUnlocked = false;
+    seam.rememberedAt = null;
     root = mkdtempSync(join(tmpdir(), "amc-first-run-doctor-"));
     mkdirSync(join(root, ".amc"));
     writeFileSync(join(root, ".amc", "amc.config.yaml"), "{}\n");
@@ -146,6 +150,31 @@ describe("amc doctor names each first-run precondition and its fix", () => {
     expect(vault?.message).toContain("amc firewall enable");
     expect(vault?.fixHint).toContain("export AMC_VAULT_PASSPHRASE=");
     expect(vault?.fixHint).toContain("amc vault unlock");
+    // B2: a newcomer whose passphrase `amc up` generated never saw it; the advice names where it is kept.
+    expect(vault?.fixHint).toContain("remembered is kept in the macOS Keychain (service amc-vault) or /fixture/amc-home/vault-credentials.json");
+  });
+
+  it("passes the vault check when a remembered passphrase unlocked it, naming where it was kept", async () => {
+    seam.vaultUnlocked = true;
+    seam.rememberedAt = "/fixture/amc-home/vault-credentials.json";
+    const vault = (await runDoctorRules(root)).checks.find((row) => row.id === "vault");
+    expect(vault?.status).toBe("PASS");
+    expect(vault?.message).toContain("remembered in /fixture/amc-home/vault-credentials.json");
+  });
+
+  it("fails when the AMC home is open to group or other, as Studio would refuse to start", async () => {
+    const home = join(root, "amc-home");
+    mkdirSync(home, { mode: 0o755 });
+    chmodSync(home, 0o755);
+    vi.stubEnv("AMC_HOME", home);
+    try {
+      const report = await runDoctorRules(root);
+      const check = report.checks.find((row) => row.id === "amc-home-permissions");
+      if (process.platform === "win32") { expect(check?.status).toBe("INFO"); return; }
+      expect(check?.status).toBe("FAIL");
+      expect(check?.fixHint).toBe(`Run: chmod 700 ${home}`);
+      expect(report.ok).toBe(false);
+    } finally { vi.unstubAllEnvs(); }
   });
 
   it("passes the vault check when AMC_VAULT_PASSPHRASE is set, without echoing it", async () => {

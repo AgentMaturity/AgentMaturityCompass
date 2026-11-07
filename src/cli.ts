@@ -290,8 +290,8 @@ import { assertOwnerMode, getMode, leaveAgentMode, setMode, type AMCMode } from 
 import { writeRuntimeFirewallPolicyAsync, migrateRuntimeFirewallPolicySignatureAsync } from "./runtime/firewallPolicyAsync.js";
 import { installFatalHandlers } from "./runtime/fatalDiagnostic.js";
 import { initVaultInteractive, lockVaultNow, promptPassphrase, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
-import { forgetVaultPassphrase } from "./vault/passphraseStore.js";
-import { ensureUpVaultPassphrase, runFirstBaselineIfNeeded } from "./studio/oneCommandUp.js";
+import { forgetVaultPassphrase, unlockWithRememberedPassphrase } from "./vault/passphraseStore.js";
+import { ensureUpVaultPassphrase, printConsoleSignInStep, runFirstBaselineIfNeeded } from "./studio/oneCommandUp.js";
 import { agentRunFiles, latestRunSummary } from "./diagnostic/runReportResolution.js";
 import { buildConnectInstructions } from "./studio/connectWizard.js";
 import { registerHookIntegrationCommands } from "./adapters/hookIntegrationCli.js";
@@ -1430,7 +1430,7 @@ function localVaultPassphrasePath(workspace: string): string {
 }
 
 function ensureInstantVaultMode(workspace: string): InstantVaultMode {
-  if (process.env.AMC_VAULT_PASSPHRASE && process.env.AMC_VAULT_PASSPHRASE.length > 0) {
+  if ((process.env.AMC_VAULT_PASSPHRASE ?? "").length > 0 || vaultStatusNow(workspace).unlocked) { // unlocked: a remembered passphrase (B2)
     return { noSign: false, createdLocalPassphrase: false, localPassphrasePath: null, reason: null };
   }
 
@@ -2150,6 +2150,8 @@ program.hook("preAction", (_thisCommand, actionCommand) => {
   if (path.length > 0) {
     assertOwnerMode(process.cwd(), path);
   }
+  // B2: `amc up` reads it itself (--no-remember); the agent host's MCP server and hook forwarder never hold the vault.
+  if (!/^(up|mcp|connect hooks forward)( |$)/.test(path)) unlockWithRememberedPassphrase(process.cwd());
 });
 installClaimLabelHooks(program);
 
@@ -3714,6 +3716,7 @@ program
     if (state.untrustedConfig) {
       console.log(chalk.yellow("UNTRUSTED CONFIG: one or more signed config files are invalid."));
     }
+    printConsoleSignInStep(workspace, `http://${state.host}:${state.apiPort}/console`);
   });
 
 const hostCmd = program.command("host").description("Multi-workspace host mode operations");
@@ -11591,10 +11594,7 @@ vault
   .command("unlock")
   .description("Unlock vault into memory for signing operations")
   .action(async () => {
-    const passphrase = await unlockVaultInteractive(process.cwd());
-    if (!process.env.AMC_VAULT_PASSPHRASE) {
-      process.env.AMC_VAULT_PASSPHRASE = passphrase;
-    }
+    await unlockVaultInteractive(process.cwd()); // the unlock lives in this process only; the environment is left as it was
     const status = vaultStatusNow(process.cwd());
     console.log(chalk.green(`Vault unlocked: ${status.unlocked ? "yes" : "no"}`));
   });

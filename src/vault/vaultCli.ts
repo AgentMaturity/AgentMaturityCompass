@@ -1,6 +1,7 @@
 import inquirer from "inquirer";
 import { rotateMonitorKeyInVault } from "../keys/purposeKeys.js";
 import { createVault, ensureVaultAndPublicKeys, lockVault, unlockVault, vaultExists, vaultPaths, vaultStatus } from "./vault.js";
+import { operatorRememberedPassphrase } from "./passphraseStore.js";
 import { generateKeyPairSync } from "node:crypto";
 
 export async function promptPassphrase(message: string): Promise<string> {
@@ -49,8 +50,10 @@ export async function initVaultInteractive(workspace: string): Promise<{ vaultFi
   });
 }
 
+/** AMC_VAULT_PASSPHRASE, else the passphrase `amc up` remembered for this workspace (not in agent mode), else a prompt. */
 export async function unlockVaultInteractive(workspace: string): Promise<string> {
-  const passphrase = process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Unlock vault passphrase:"));
+  const passphrase = process.env.AMC_VAULT_PASSPHRASE ?? operatorRememberedPassphrase(workspace)?.passphrase
+    ?? (await promptPassphrase("Unlock vault passphrase:"));
   unlockVault(workspace, passphrase);
   return passphrase;
 }
