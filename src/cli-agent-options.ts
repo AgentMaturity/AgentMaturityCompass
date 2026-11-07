@@ -104,6 +104,10 @@ export interface RunOptions {
   /** AXR-20: issued agent lease file, verified before use and never logged. */
   leaseFile?: string;
   goalRounds?: string;
+  /** SH-ORCH-03: a reviewed plan file to run headless, and the durable run to resume in a resumed session. */
+  workflowPlan?: string;
+  workflowRunId?: string;
+  listAgents?: boolean | string;
   json?: boolean;
   stream?: boolean;
 }

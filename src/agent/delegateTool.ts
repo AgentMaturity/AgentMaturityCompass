@@ -1,9 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { defineTool } from "../tools/toolRegistry.js";
-import { spawnSubagent, type DelegationRecorder, type SubagentRunner } from "./subagentSpawn.js";
+import { spawnSubagent, type DelegationRecorder, type SubagentRequest, type SubagentRunner } from "./subagentSpawn.js";
 import { DEFAULT_MAX_DELEGATION_DEPTH, type DelegationIdentity } from "./delegationIdentity.js";
 import type { ToolDefinition, ToolExecution } from "../tools/toolTypes.js";
 import type { ActionClass } from "../types.js";
+import { applyAgentDefinition, describeAgentDefinitions, resolveAgentDefinition, type AgentDefinition } from "./agentDefinitions.js";
 
 /**
  * `ctx.subagents`, in AMC's idiom (P6.1a).
@@ -69,6 +70,12 @@ export interface SubagentCapability {
    * delegated lease extends. Set by whoever composes the toolset, never by the model. Absent at the root.
    */
   readonly parentLeaseToken?: string;
+  /**
+   * Operator-admitted agent definitions (SH-ORCH-01). The model may NAME one; the
+   * narrowing it applies comes from the file the operator reviewed, never from
+   * the call. Absent or empty, `agent` is refused with that fact.
+   */
+  readonly definitions?: ReadonlyMap<string, AgentDefinition>;
 }
 
 const DELEGATE_PARAMETERS = Object.freeze({
@@ -81,6 +88,10 @@ const DELEGATE_PARAMETERS = Object.freeze({
     goal: {
       type: "string",
       description: "what the delegate should do, in full — it sees none of this conversation"
+    },
+    agent: {
+      type: "string",
+      description: "optional: the name of an operator-defined agent role; it only narrows what the delegate may do"
     }
   },
   required: ["runAs", "goal"]
@@ -89,6 +100,7 @@ const DELEGATE_PARAMETERS = Object.freeze({
 interface DelegateArgs {
   readonly runAs: string;
   readonly goal: string;
+  readonly agent?: string;
 }
 
 /**
@@ -111,7 +123,11 @@ function readArgs(raw: unknown): { ok: true; args: DelegateArgs } | { ok: false;
   if (goal.length === 0) {
     return { ok: false, detail: "goal must be a non-empty string; a delegate sees none of this conversation" };
   }
-  return { ok: true, args: { runAs, goal } };
+  const agent = record["agent"];
+  if (agent !== undefined && (typeof agent !== "string" || agent.trim().length === 0)) {
+    return { ok: false, detail: "agent, when given, must name a defined agent" };
+  }
+  return { ok: true, args: { runAs, goal, ...(agent === undefined ? {} : { agent: agent.trim() }) } };
 }
 
 /**
@@ -135,7 +151,7 @@ export function delegateTool(capability: SubagentCapability): ToolDefinition {
     description:
       "Hand a self-contained task to a delegate agent and wait for its answer. The delegate shares "
       + "this run's budget and permissions, starts with no memory of this conversation, and its work "
-      + "is recorded against this run.",
+      + "is recorded against this run." + describeAgentDefinitions(capability.definitions ?? new Map()),
     parameters: DELEGATE_PARAMETERS,
     body: async (execution: ToolExecution) => {
       const parsed = readArgs(execution.arguments);
@@ -143,18 +159,29 @@ export function delegateTool(capability: SubagentCapability): ToolDefinition {
         return { ok: false, output: `[amc] delegation refused: ${parsed.detail}` };
       }
 
+      let request: SubagentRequest = {
+        runAs: parsed.args.runAs,
+        goal: parsed.args.goal,
+        // From the capability, never from `parsed.args`.
+        ...(capability.delegationScope === undefined
+          ? {}
+          : { delegationScope: capability.delegationScope }),
+        ...(stopConditions === undefined ? {} : { stopConditions })
+      };
+      if (parsed.args.agent !== undefined) {
+        // Resolved against the operator's catalog and applied BEFORE the spawn, so the packet signs the narrowed request.
+        const resolved = resolveAgentDefinition(capability.definitions, parsed.args.agent);
+        if (!resolved.ok) return { ok: false, output: `[amc] delegation refused: ${resolved.reason}` };
+        const applied = applyAgentDefinition(request, resolved.definition);
+        if (!applied.ok) return { ok: false, output: `[amc] delegation refused: ${applied.reason}` };
+        request = applied.request;
+      }
+
       const outcome = await spawnSubagent({
         workspace: execution.workspace,
         parent: capability.identity,
-        request: {
-          runAs: parsed.args.runAs,
-          goal: parsed.args.goal,
-          // From the capability, never from `parsed.args`.
-          ...(capability.delegationScope === undefined
-            ? {}
-            : { delegationScope: capability.delegationScope }),
-          ...(stopConditions === undefined ? {} : { stopConditions })
-        },
+        request,
+        ...(capability.definitions === undefined ? {} : { definitions: capability.definitions }),
         session: capability.session,
         runner: capability.runner,
         mintSessionId,

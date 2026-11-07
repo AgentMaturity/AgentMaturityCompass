@@ -41,7 +41,18 @@ export interface Skill {
   readonly digest: string;
   /** `disable-model-invocation: true`: loads on `/name` only, never advertised to or loaded by the model. */
   readonly disableModelInvocation?: true;
+  /** Every frontmatter field as written, for a layout whose validator reads more than name and description. */
+  readonly fields: Readonly<Record<string, string>>;
 }
+
+/**
+ * Where an entry lives under a layer root. Skills are `<root>/<name>/SKILL.md`;
+ * agent definitions (../agent/agentDefinitions.ts) are `<root>/<name>.md`. The
+ * same discovery, limits, symlink refusal, change witnesses and digests apply to
+ * both; only the path shape and the name-to-location check differ.
+ */
+export type CatalogLayout = { readonly kind: "directory"; readonly fileName: string } | { readonly kind: "flat" };
+const SKILL_LAYOUT: CatalogLayout = Object.freeze({ kind: "directory", fileName: "SKILL.md" });
 
 export interface SkillProblem {
   readonly name: string;
@@ -78,7 +89,7 @@ function sameSource(a: Stats, b: Stats): boolean {
 
 const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/;
 
-function parseSkill(dirName: string, sourcePath: string, raw: string): Skill | SkillProblem {
+function parseSkill(dirName: string, sourcePath: string, raw: string, where = "directory"): Skill | SkillProblem {
   const matched = FRONTMATTER.exec(raw);
   if (!matched) {
     return { name: dirName, sourcePath, reason: "no --- frontmatter block at the top of the file" };
@@ -105,7 +116,7 @@ function parseSkill(dirName: string, sourcePath: string, raw: string): Skill | S
     return {
       name: dirName,
       sourcePath,
-      reason: `frontmatter name ${JSON.stringify(name)} does not match its directory ${JSON.stringify(dirName)}`
+      reason: `frontmatter name ${JSON.stringify(name)} does not match its ${where} ${JSON.stringify(dirName)}`
     };
   }
   if (description.length === 0) {
@@ -118,7 +129,7 @@ function parseSkill(dirName: string, sourcePath: string, raw: string): Skill | S
   if (!/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$/.test(name))
     return { name: dirName, sourcePath, reason: "skill name must be a slash-command name of at most 128 characters" };
 
-  return { name, description, body, sourcePath, digest: sha256Hex(raw),
+  return { name, description, body, sourcePath, digest: sha256Hex(raw), fields: Object.freeze(Object.fromEntries(fields)),
     ...(fields.get("disable-model-invocation") === "true" ? { disableModelInvocation: true as const } : {}) };
 }
 
@@ -128,7 +139,7 @@ function parseSkill(dirName: string, sourcePath: string, raw: string): Skill | S
  * A root that does not exist contributes nothing and is not an error: layering a
  * workspace directory over a shared one means the workspace usually has none.
  */
-export function buildSkillCatalog(roots: readonly string[]): SkillCatalog {
+export function buildSkillCatalog(roots: readonly string[], layout: CatalogLayout = SKILL_LAYOUT): SkillCatalog {
   const winners = new Map<string, Skill>();
   const problems = new Map<string, SkillProblem>();
   const observations: { sourcePath: string; status: "absent" | "read" | "incomplete" }[] = [];
@@ -181,23 +192,29 @@ export function buildSkillCatalog(roots: readonly string[]): SkillCatalog {
       continue;
     }
 
-    for (const dirName of entries.sort()) {
-      const dir = join(root, dirName), sourcePath = join(dir, "SKILL.md");
+    for (const entryName of entries.sort()) {
+      // Flat layout: `<root>/<name>.md`, a regular file; anything else in the root is ignored.
+      if (layout.kind === "flat" && !/^[^.][^/\\]*\.md$/.test(entryName)) continue;
+      const dirName = layout.kind === "flat" ? entryName.slice(0, -3) : entryName;
+      const relative = layout.kind === "flat" ? entryName : `${entryName}/${layout.fileName}`;
+      const sourcePath = join(root, relative);
       try {
-        const directory = witness(dir);
-        if (directory.isSymbolicLink()) throw new Error("symbolic-link skill directory");
-        if (!directory.isDirectory()) continue;
+        const entry = witness(join(root, entryName));
+        if (entry.isSymbolicLink()) throw new Error("symbolic-link skill directory");
+        if (layout.kind === "directory" && !entry.isDirectory()) continue;
+        if (layout.kind === "flat" && !entry.isFile()) continue;
         let before: Stats;
         try { before = witness(sourcePath); }
         catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") continue; throw error; }
         // Reuse the contained, nonblocking, no-follow reader. Recheck its exact
         // source witness after reading and once more before publishing a catalog.
-        const bytes = readContainedOrNull(root, `${dirName}/SKILL.md`, SKILL_CATALOG_LIMITS.fileBytes);
+        const bytes = readContainedOrNull(root, relative, SKILL_CATALOG_LIMITS.fileBytes);
         const after = lstatSync(sourcePath);
         if (bytes === null || !sameSource(before, after) || bytes.length !== after.size)
           throw new Error("skill changed during discovery");
         if ((totalBytes += bytes.length) > SKILL_CATALOG_LIMITS.totalBytes) throw new Error("aggregate byte limit");
-        const parsed = parseSkill(dirName, sourcePath, new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes));
+        const parsed = parseSkill(dirName, sourcePath, new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes),
+          layout.kind === "flat" ? "file name" : "directory");
         if ("digest" in parsed) { winners.set(dirName, parsed); problems.delete(dirName); }
         else { observation.status = "incomplete"; report(dirName, sourcePath, parsed.reason); }
       } catch (error) {

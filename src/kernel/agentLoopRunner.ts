@@ -79,6 +79,8 @@ import { admitSessionAtOpen } from "../runtime/changeEnvelope.js";
 import { nativeSessionManifest } from "../lifecycle/versionManifest.js";
 import { runDueSchedules, type ScheduleRunResult } from "../autonomy/scheduleRunner.js";
 import { runGoalRounds, type GoalRoundsResult } from "../autonomy/goalRounds.js";
+import { assertNonModelPassAdmission, runWorkflowPass, type WorkflowPassOptions } from "../workflow/workflowPass.js";
+import type { WorkflowRunResult } from "../workflow/workflowRunner.js";
 import { assertNativeScheduleAdmission } from "../autonomy/scheduleService.js";
 import type { SubagentCapability } from "../agent/delegateTool.js";
 import type { TurnCancelCause } from "../session/sessionTypes.js";
@@ -307,6 +309,8 @@ export interface ComposedTurnOptions {
    * delegation; `maxRounds` is the hard ceiling and nothing extends it.
    */
   readonly goalRounds?: { readonly maxRounds: number; readonly signal?: AbortSignal };
+  /** Run a reviewed workflow plan headless under this run's delegation grant (SH-ORCH-03) instead of a model turn. */
+  readonly workflowPass?: WorkflowPassOptions;
 }
 
 export interface ComposedTurnOutcome {
@@ -317,6 +321,7 @@ export interface ComposedTurnOutcome {
   readonly scheduleResults?: readonly ScheduleRunResult[];
   /** How a goal-rounds run stopped; mechanical, never a goal-quality claim. */
   readonly goalRounds?: GoalRoundsResult;
+  readonly workflow?: WorkflowRunResult;
   readonly validation: NativeValidationResult;
   /**
    * The `system/prompt` row every request in this run cites.
@@ -461,17 +466,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     assertNativeScheduleAdmission({ workspace: options.workspace, ...options.schedulePass,
       approvalClass: options.approvalGate.actionClass });
   }
-  if (options.goalRounds !== undefined) {
-    if (options.delegation?.maxActiveChildren !== undefined) {
-      throw new Error("Configured --max-active-children root child limits are not supported for --goal-rounds; no execution occurred.");
-    }
-    const { maxRounds } = options.goalRounds;
-    if (options.delegation === undefined || options.delegation.runner !== undefined || options.schedulePass !== undefined
-      || options.audioParts !== undefined || images.length > 0 || options.prompt.trim() === "") {
-      throw new Error("Goal rounds need a text goal and in-process delegation (--delegate with workspace tools); schedules, audio, images and foreign delegates are not goal rounds.");
-    }
-    if (!Number.isSafeInteger(maxRounds) || maxRounds < 1 || maxRounds > 100) throw new Error("Goal rounds must be an integer from 1 through 100.");
-  }
+  assertNonModelPassAdmission(options, images.length);
   // P1-79: no in-process child may run without the run's principal; refused before any session row, spawn or lease.
   if ((options.schedulePass !== undefined || (options.delegation !== undefined && options.delegation.runner === undefined))
     && options.leaseToken === undefined && planRequiresPrincipal(options.workspace)) {
@@ -679,6 +674,13 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           validation: projectNativeValidation(options.workspace, session.readEvents()),
           systemPromptEventId: systemPromptRef.eventId,
           promptSections: prompt.assemble().sections.map(section => section.name) };
+      }
+      if (options.workflowPass !== undefined) {
+        composed = true; // as for goal rounds: a non-model pass whose composition succeeded is not composition_failed
+        const workflow = await runWorkflowPass({ workspace: options.workspace, parent: rootIdentity(options.agentId), session, runner,
+          delegation: options.delegation!, pass: options.workflowPass });
+        return { sessionId, status: "idle", workflow, validation: projectNativeValidation(options.workspace, session.readEvents()),
+          systemPromptEventId: systemPromptRef.eventId, promptSections: prompt.assemble().sections.map(section => section.name) };
       }
       if (options.goalRounds !== undefined) {
         composed = true; // composition succeeded: a goal-rounds parent is not sealed composition_failed

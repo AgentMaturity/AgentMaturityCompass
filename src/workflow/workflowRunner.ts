@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto";
-import { spawnSubagent, type DelegationRecorder, type SubagentRunner } from "../agent/subagentSpawn.js";
-import { parseWorkflowPlan, planAgentCount, type WorkflowNode } from "./workflowPlan.js";
+import { spawnSubagent, type DelegationRecorder, type SubagentRequest, type SubagentRunner } from "../agent/subagentSpawn.js";
+import { isWorkflowLeaf, parseWorkflowPlan, planAgentCount, type WorkflowNode } from "./workflowPlan.js";
+import { readVerdict, verdictInstruction } from "./workflowVerdict.js";
+import { agentDefinitionsDigest, applyAgentDefinition, resolveAgentDefinition, type AgentDefinition } from "../agent/agentDefinitions.js";
 import type { DelegationIdentity } from "../agent/delegationIdentity.js";
 import type { ActionClass } from "../types.js";
 import { canonicalize } from "../utils/json.js";
@@ -26,6 +28,8 @@ export interface WorkflowRunInit {
   /** Operator capability restrictions, intersected with each node's request. */
   readonly delegationScope?: readonly ActionClass[];
   readonly stopConditions?: readonly string[];
+  /** Operator-admitted agent definitions; a node's `agent` resolves here, and their digest fences a resume. */
+  readonly definitions?: ReadonlyMap<string, AgentDefinition>;
 }
 export interface WorkflowFailure { readonly nodeId: string; readonly reason: string }
 export interface WorkflowRunResult {
@@ -56,8 +60,13 @@ function fail(state: RunState, nodeId: string, reason: string): NodeOutcome {
   return { ok: false };
 }
 
-async function runAgent(node: Extract<WorkflowNode, { kind: "agent" }>, input: string | null,
-  init: WorkflowRunInit, state: RunState): Promise<NodeOutcome> {
+type Leaf = Extract<WorkflowNode, { kind: "agent" | "verify" }>;
+
+async function runAgent(node: Leaf, carried: string | null, init: WorkflowRunInit, state: RunState): Promise<NodeOutcome> {
+  // A verify node's input is the reviewed output, so the checkpoint's input digest covers what was judged.
+  const input = node.kind === "verify" ? state.outputs.get(node.of) ?? null : carried;
+  if (node.kind === "verify" && input === null) return fail(state, node.id, `node ${node.of} produced no output to review`);
+  const nonce = randomUUID();
   const inputDigest = sha256Hex(canonicalize({ input }));
   let prior = state.progress.nodes.get(node.id);
   if (prior !== undefined) {
@@ -84,6 +93,19 @@ async function runAgent(node: Extract<WorkflowNode, { kind: "agent" }>, input: s
     if (blocked !== undefined) return fail(state, node.id, blocked);
     const scope = intersectDelegationScopes(init.delegationScope, node.scope);
     if (scope !== undefined && scope.length === 0) return fail(state, node.id, "workflow node scope has no operator-permitted action class");
+    let request: SubagentRequest = { runAs: node.runAs,
+      goal: node.kind === "verify" ? `${node.goal}\n\n${verdictInstruction(nonce)}\n\nOutput under review (node ${node.of}):\n${input}`
+        : input === null ? node.goal : `${node.goal}\n\nInput from the previous step:\n${input}`,
+      ...(scope === undefined ? {} : { delegationScope: scope }),
+      ...(init.stopConditions === undefined ? {} : { stopConditions: init.stopConditions }) };
+    if (node.agent !== undefined) {
+      // Resolved against the operator's catalog and applied before the spawn, as the delegate tool does.
+      const resolved = resolveAgentDefinition(init.definitions, node.agent);
+      if (!resolved.ok) return fail(state, node.id, resolved.reason);
+      const applied = applyAgentDefinition(request, resolved.definition);
+      if (!applied.ok) return fail(state, node.id, applied.reason);
+      request = applied.request;
+    }
     state.progress.record(node.id, { ...checkpoint, status: "running" }, canonicalize({ input }));
     state.progress.assertDispatchFence();
     dispatched = true;
@@ -99,11 +121,8 @@ async function runAgent(node: Extract<WorkflowNode, { kind: "agent" }>, input: s
       finally { runnerSettled = true; }
     }, init.runner.hookControl === undefined ? {} : { hookControl: init.runner.hookControl });
     const outcome = await spawnSubagent({
-      workspace: init.workspace, parent: init.parent,
-      request: { runAs: node.runAs,
-        goal: input === null ? node.goal : `${node.goal}\n\nInput from the previous step:\n${input}`,
-        ...(scope === undefined ? {} : { delegationScope: scope }),
-        ...(init.stopConditions === undefined ? {} : { stopConditions: init.stopConditions }) },
+      workspace: init.workspace, parent: init.parent, request,
+      ...(init.definitions === undefined ? {} : { definitions: init.definitions }),
       session: init.session, runner, mintSessionId: () => checkpoint.childSessionId,
       ...(init.parentLeaseToken === undefined ? {} : { parentLeaseToken: init.parentLeaseToken }),
       ...(init.maxDepth === undefined ? {} : { maxDepth: init.maxDepth }),
@@ -119,9 +138,20 @@ async function runAgent(node: Extract<WorkflowNode, { kind: "agent" }>, input: s
       state.progress.record(node.id, { ...checkpoint, status: unknown ? "TOOL_OUTCOME_UNKNOWN" : "failed", reason }, "", outcome.packetId ?? undefined);
       return fail(state, node.id, reason);
     }
-    state.progress.record(node.id, { ...checkpoint, status: "succeeded", output: outcome.childText }, canonicalize(outcome.childText), outcome.packetId);
-    state.outputs.set(node.id, outcome.childText);
-    return { ok: true, text: outcome.childText };
+    let output = outcome.childText;
+    if (node.kind === "verify") {
+      // Judged BEFORE the final checkpoint, so the log never says "succeeded" for a node the run reports as failed.
+      const verdict = readVerdict(outcome.childText, nonce);
+      if (verdict !== "pass") {
+        const reason = `verify ${verdict === "fail" ? "verdict: fail" : `verdict ${verdict}`}: ${outcome.childText.slice(0, 2000)}`;
+        state.progress.record(node.id, { ...checkpoint, status: "failed", reason }, "", outcome.packetId);
+        return fail(state, node.id, reason);
+      }
+      output = input!; // The reviewed output carries forward; the verifier's own text is in its child session.
+    }
+    state.progress.record(node.id, { ...checkpoint, status: "succeeded", output }, canonicalize(output), outcome.packetId);
+    state.outputs.set(node.id, output);
+    return { ok: true, text: output };
   } catch (error) {
     // A failed result commit leaves the durable dispatch intact. Never publish its uncommitted answer.
     state.stopped = `${dispatched ? "TOOL_OUTCOME_UNKNOWN: " : ""}${error instanceof Error ? error.message : String(error)}`;
@@ -132,7 +162,7 @@ async function runAgent(node: Extract<WorkflowNode, { kind: "agent" }>, input: s
 async function runNode(node: WorkflowNode, input: string | null, init: WorkflowRunInit, state: RunState): Promise<NodeOutcome> {
   if (init.signal?.aborted) return fail(state, node.id, "workflow cancelled before admission");
   if (state.stopped !== undefined) return fail(state, node.id, state.stopped);
-  if (node.kind === "agent") {
+  if (isWorkflowLeaf(node)) {
     try { return await runAgent(node, input, init, state); }
     catch (error) {
       state.stopped = error instanceof Error ? error.message : String(error);
@@ -177,7 +207,8 @@ export async function runWorkflowPlan(init: WorkflowRunInit): Promise<WorkflowRu
     const progress = workflowProgress({ ...init, runId, controls: {
       maxDepth: init.maxDepth ?? null, delegationScope: init.delegationScope ?? null,
       ...(init.maxActiveChildren === undefined ? {} : { maxActiveChildren: init.maxActiveChildren }),
-      stopConditions: init.stopConditions ?? null, hookControl: init.runner.hookControl ?? null
+      stopConditions: init.stopConditions ?? null, hookControl: init.runner.hookControl ?? null,
+      agentDefinitions: init.definitions === undefined ? null : agentDefinitionsDigest(init.definitions)
     } });
     sessionKey = progress.sessionKey;
     const admission = activeSessions.get(sessionKey) ?? { runs: new Set<string>(), live: 0, waiting: [], blocked: undefined as string | undefined };

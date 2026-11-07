@@ -41,7 +41,9 @@ const WORKFLOW_PARAMETERS = Object.freeze({
     plan: {
       type: "object",
       description:
-        "A workflow plan. One of: {kind:'agent', id, runAs, goal, scope?} to delegate one task; "
+        "A workflow plan. One of: {kind:'agent', id, runAs, goal, scope?, agent?} to delegate one task; "
+        + "{kind:'verify', id, runAs, goal, of:<earlier leaf id>, agent?} to have a delegate review that node's "
+        + "output and gate the plan on its verdict (on pass the reviewed output carries forward); "
         + "{kind:'parallel', id, children:[...]} to run nodes concurrently and wait for all; "
         + "{kind:'pipeline', id, stages:[...]} to run nodes in order, each receiving the previous "
         + "answer. Every id must be unique — answers come back keyed by it. A delegate sees none "
@@ -88,6 +90,7 @@ export function workflowTool(capability: SubagentCapability): ToolDefinition {
         ...(maxActiveChildren === undefined ? {} : { maxActiveChildren }),
         ...(capability.delegationScope === undefined ? {} : { delegationScope: capability.delegationScope }),
         ...(capability.stopConditions === undefined ? {} : { stopConditions: capability.stopConditions }),
+        ...(capability.definitions === undefined ? {} : { definitions: capability.definitions }),
         ...(capability.parentLeaseToken === undefined ? {} : { parentLeaseToken: capability.parentLeaseToken }),
         ...(execution.signal === undefined ? {} : { signal: execution.signal })
       });

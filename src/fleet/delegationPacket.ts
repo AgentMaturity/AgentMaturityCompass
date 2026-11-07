@@ -54,6 +54,13 @@ export interface DelegationPacketRequest {
    * timeout-ms:N; minting this packet alone does not execute or enforce them.
    */
   readonly stopConditions?: readonly string[];
+  /** The agent definition the request was narrowed by (SH-ORCH-01), recorded as constraints beside governedAs/depth. */
+  readonly agentDefinition?: { readonly name: string; readonly sha256: string };
+}
+
+/** Beside `governedAs=`/`depth=`: which role text the child ran under, as `amc fleet handoff verify` shows it. */
+function definitionConstraints(definition: DelegationPacketRequest["agentDefinition"]): string[] {
+  return definition === undefined ? [] : [`agentDefinition=${definition.name}`, `agentDefinitionSha256=${definition.sha256}`];
 }
 
 /** A refused delegation. A partial publication cause records any uncertain on-disk member. */
@@ -91,7 +98,8 @@ export function mintDelegationPacket(
     stopConditions: [...(request.stopConditions ?? [])],
     constraints: [
       `governedAs=${request.child.governedAs}`,
-      `depth=${request.child.depth}`
+      `depth=${request.child.depth}`,
+      ...definitionConstraints(request.agentDefinition)
     ]
   });
 
@@ -124,7 +132,7 @@ export async function mintDelegationPacketAsync(workspace: string, request: Dele
     packet = await createHandoffPacketAsync(workspace, {
       fromAgentId: captured.parent.runAs, toAgentId: captured.child.runAs, goal: captured.goal,
       delegationScope: [...(captured.delegationScope ?? [])], stopConditions: [...(captured.stopConditions ?? [])],
-      constraints: [`governedAs=${captured.child.governedAs}`, `depth=${captured.child.depth}`]
+      constraints: [`governedAs=${captured.child.governedAs}`, `depth=${captured.child.depth}`, ...definitionConstraints(captured.agentDefinition)]
     }, { signal, requireUnexpired: true });
   } catch (cause) {
     const code = (cause as { code?: unknown } | null)?.code;

@@ -1,4 +1,6 @@
 import { showSkillCatalogSelection } from "./cli/skillCatalogOptions.js";
+import { loadAgentDefinitionsForRun, showAgentDefinitionSelection } from "./cli/agentDefinitionOptions.js";
+import { workflowTool } from "./workflow/workflowTool.js";
 import { randomUUID } from "node:crypto";
 import { hostname } from "node:os";
 /**
@@ -251,8 +253,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     )
     .option("--json", "Output as JSON")
     .option("--list-skills [name]", "list skill discovery, sources and digests; pass a name to inspect its literal body")
+    .option("--list-agents [name]", "list agent definitions (.amc/agents/<name>.md), their narrowing and digests; pass a name to inspect its body")
     .action(async (promptParts: string[], opts: RunOptions, command: Command) => {
-      if (showSkillCatalogSelection(opts, io)) return;
+      if (showSkillCatalogSelection(opts, io) || showAgentDefinitionSelection(opts, io)) return;
       const agentId = resolveAgentId(process.cwd(), selectedAgentOption(command));
       let validation: ReturnType<typeof resolveNativeValidationSelection>;
       try { validation = resolveNativeValidationSelection(opts); }
@@ -314,7 +317,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         return;
       }
       const prompt = skillTurn.prompt;
-      if (prompt.length === 0 && opts.audioInput === undefined) {
+      if (prompt.length === 0 && opts.audioInput === undefined && opts.workflowPlan === undefined) {
         io.error(chalk.red("a prompt is required: amc agent-loop run \"...\""));
         io.fail();
         return;
@@ -442,7 +445,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       // echo tool exists precisely to make a multi-step turn observable.
       const toolMode = opts.tools ?? preset?.tools ?? (providerId === STUB_PROVIDER_ID ? "echo" : "none");
       const wantsDelegation = opts.delegate === true;
-      const breadth = resolveBreadthRun(io, opts, { toolMode, wantsDelegation });
+      const definitions = wantsDelegation ? loadAgentDefinitionsForRun(opts, line => (opts.json ? io.error : io.log)(chalk.dim(line))) : undefined;
+      const breadth = resolveBreadthRun(io, opts, { toolMode, wantsDelegation, ...(definitions === undefined ? {} : { definitions }) });
       if (breadth === null) return;
       const maxActiveChildren = activeChildLimitOption(io, opts.maxActiveChildren, wantsDelegation && toolMode === "workspace"); if (maxActiveChildren === null) return;
       if (!wantsDelegation && opts.delegateStop !== undefined) {
@@ -492,7 +496,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         const toolset = workspaceToolset = agentToolset({
           workspace: process.cwd(), extensionHooks: extensionTurn.hooks,
           agentId,
-          additionalCapabilities: [...mcpServers.flatMap(entry => entry.review.capabilities), ...(wantsDelegation ? [{ name: "delegate", actionClass: "READ_ONLY" as const }] : [])],
+          additionalCapabilities: [...mcpServers.flatMap(entry => entry.review.capabilities), ...(wantsDelegation ? [{ name: "delegate", actionClass: "READ_ONLY" as const }, { name: "workflow", actionClass: "READ_ONLY" as const }] : [])],
           // Fork chooses a different ID; resume chooses the existing writer.
           get sessionId() { return actualSession().sessionId; },
           recorder: { recordProjectedEvidence: (row) => actualSession().recordProjectedEvidence(row), assertWritable: () => actualSession().assertWritable() },
@@ -584,7 +588,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
               ? "delegates run in-process, under this run's own driver"
               : `delegates run out-of-process: ${foreignRunnerDescription}`
           ));
-          grantDelegation = (capability) => { toolset.registry.define(delegateTool(capability)); };
+          // Both tools, as a child's toolset gets them; `workflow` stays hidden and denied unless the signed allowlist names it too.
+          grantDelegation = (capability) => { const granted = { ...capability, ...(definitions === undefined ? {} : { definitions }) };
+            toolset.registry.define(delegateTool(granted)); toolset.registry.define(workflowTool(granted)); };
           // Beside the write-scope line, and for the same reason: a bound the
           // operator cannot see is one they cannot check. It is also the only
           // place the parsed depth becomes observable, so a build that dropped
