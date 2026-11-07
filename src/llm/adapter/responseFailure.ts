@@ -15,7 +15,7 @@
  * adapter that has no opinion (or a broken one) still produces a correctly
  * classified failure.
  */
-import { LlmError, httpFailureCode, parseProviderRetryAfterMs } from "../llmFailure.js";
+import { LlmError, httpFailureCode, parseProviderRetryAfterMs, parseRateLimitResetMs } from "../llmFailure.js";
 import type { AdapterFailureHint, LlmAdapter } from "./adapterTypes.js";
 import type { HttpResponse } from "./transport.js";
 
@@ -56,8 +56,13 @@ export function classifyResponseFailure(input: {
   const { adapter, response, bodyText } = input;
   const hint = hintFrom(adapter, { status: response.status, headers: response.headers, bodyText });
   const code = hint.code ?? httpFailureCode(response.status, bodyText);
-  const retryAfter =
-    hint.providerRetryAfterMs ?? parseProviderRetryAfterMs(response.headers["retry-after"], input.now());
+  // The delay and WHICH header said so. A rate-limit reset is consulted only on a 429 without Retry-After, and the
+  // recorded fact names the reset header so a derived wait is never signed as a Retry-After the provider never sent.
+  const retryAfterHeader = parseProviderRetryAfterMs(response.headers["retry-after"], input.now());
+  const reset = hint.providerRetryAfterMs !== undefined || retryAfterHeader !== undefined || response.status !== 429
+    ? undefined : parseRateLimitResetMs(response.headers, input.now());
+  const retryAfter = hint.providerRetryAfterMs ?? retryAfterHeader ?? reset?.ms;
+  const delayHeader = hint.providerRetryAfterMs !== undefined ? undefined : retryAfterHeader !== undefined ? "retry-after" : reset?.header;
   const quoted = (hint.message ?? bodyText).trim().slice(0, MAX_QUOTED_DETAIL);
   const message =
     quoted.length > 0
@@ -68,6 +73,7 @@ export function classifyResponseFailure(input: {
     // provider failure needs and the one a message quote cannot be parsed for.
     status: response.status,
     ...(retryAfter === undefined ? {} : { providerRetryAfterMs: retryAfter }),
+    ...(delayHeader === undefined ? {} : { providerDelayHeader: delayHeader }),
     ...(hint.requestId === undefined || hint.requestId.length === 0 ? {} : { requestId: hint.requestId })
   });
 }

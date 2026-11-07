@@ -390,17 +390,22 @@ describe("P3.2 — request-boundary retry inside one step", () => {
       expect(delays).toEqual([100, 200, 400, null]);
     });
 
-    test("never lets a provider hint exceed the policy ceiling", () => {
+    test("never lets a provider hint exceed the policy's PROVIDER ceiling", () => {
       // A remote-controlled sleep is a remote denial of service; the ceiling is
       // what stops "Retry-After: 86400" from parking the agent for a day.
+      // SH-PROVIDERS-04: the old assertion (clamp to the 1000 ms LOCAL backoff
+      // ceiling) encoded the defect that a provider's honest 30 s became a 10 s
+      // early retry that failed again; the provider ceiling is separate and
+      // defaults to max(60 s, maxDelayMs).
       const verdict = decideRetry(
         policy,
         { message: "x", code: "RATE_LIMIT", providerRetryAfterMs: 86_400_000 },
         1,
         () => 0.5
       );
-      expect(verdict.delayMs).toBe(1000);
+      expect(verdict.delayMs).toBe(60_000);
       expect(verdict.delaySource).toBe("provider");
+      expect(decideRetry(policy, { message: "x", code: "RATE_LIMIT", providerRetryAfterMs: 30_000 }, 1, () => 0.5).delayMs).toBe(30_000);
     });
 
     test("an unbounded policy never reports a remaining budget it does not have", () => {
