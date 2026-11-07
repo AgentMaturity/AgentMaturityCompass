@@ -1,0 +1,94 @@
+import type { Command } from "commander";
+import { NATIVE_BUILTIN_CAPABILITIES, NATIVE_DELEGATION_CAPABILITIES } from "./agent/nativeToolCapabilities.js";
+import {
+  commandHookMatches, loadNativeCommandHooks, NATIVE_COMMAND_HOOK_DENY_EVENTS, NATIVE_COMMAND_HOOK_EMITTED, NATIVE_COMMAND_HOOK_EVENTS,
+  NativeCommandHookError, trustNativeCommandHooks, type NativeCommandHookEvent
+} from "./extensions/nativeCommandHookConfig.js";
+import { nativeCommandHookInput, runNativeCommandHook } from "./extensions/nativeCommandHooks.js";
+
+/**
+ * `amc native-extension hooks inspect | trust | test` (SH-EXT-01). Inspect never runs anything; trust records this
+ * machine's acceptance of the file's exact bytes; test runs the matching handlers of a trusted file with a synthetic
+ * input and prints what the loop would have done with their answer.
+ */
+
+const BUILTIN_NAMES = [...NATIVE_BUILTIN_CAPABILITIES, ...NATIVE_DELEGATION_CAPABILITIES].map(capability => capability.name);
+
+function fail(error: unknown, json: boolean): void {
+  const code = error instanceof NativeCommandHookError ? error.code : "HOOKS_OPERATION_FAILED";
+  const message = error instanceof Error ? error.message : "The hooks operation failed.";
+  if (json) console.log(JSON.stringify({ ok: false, code, message }, null, 2)); else console.error(message);
+  process.exitCode = 1;
+}
+
+function inspection(workspace: string) {
+  const load = loadNativeCommandHooks(workspace);
+  const handlers = load.status === "trusted" ? load.handlers.map(handler => ({
+    event: handler.event, index: handler.index, matcher: handler.matcher || "*", argv: handler.argv, timeoutMs: handler.timeoutMs,
+    acceptTruncatedInput: handler.acceptTruncatedInput, emitted: NATIVE_COMMAND_HOOK_EMITTED.includes(handler.event),
+    denyCapable: NATIVE_COMMAND_HOOK_DENY_EVENTS.includes(handler.event),
+    // Built-in names only: MCP tools are mcp_<server>_<hash> and exist per mount, so a matcher for one is checked at run time.
+    matchesBuiltinTools: handler.event === "PreToolUse" || handler.event === "PostToolUse" ? BUILTIN_NAMES.filter(name => commandHookMatches(handler.matcher, name)) : null
+  })) : [];
+  return { ok: true, ...load, handlers, authority: "Hooks observe, or deny PreToolUse and UserPromptSubmit. They never allow, rewrite arguments, add context or bypass an approval (D55)." };
+}
+
+export function registerNativeHookCommands(extension: Command): void {
+  const hooks = extension.command("hooks").description("Operator command hooks in .amc/hooks.json: inspect, trust this machine to run them, test one event");
+  hooks.command("inspect")
+    .description("Show the workspace hooks file, its digest, trust state and resolved handlers without running anything")
+    .option("--json", "machine-readable output")
+    .action((opts: { json?: boolean }) => {
+      try {
+        const view = inspection(process.cwd());
+        if (opts.json) { console.log(JSON.stringify(view, null, 2)); return; }
+        console.log(`Hooks file: ${view.path}\nStatus: ${view.status}${"sha256" in view && view.sha256 ? `\nsha256: ${view.sha256}` : ""}${"reason" in view ? `\n${view.reason}` : ""}`);
+        for (const handler of view.handlers) {
+          const warn = handler.denyCapable && handler.matchesBuiltinTools !== null && handler.matchesBuiltinTools.length === 0 ? " (matches no built-in tool; only an MCP tool of that name would be guarded)" : "";
+          console.log(`${handler.event} #${handler.index} matcher=${handler.matcher} ${handler.emitted ? "" : "[not emitted by this build] "}timeout=${handler.timeoutMs}ms: ${handler.argv.join(" ")}${warn}`);
+        }
+        console.log(view.authority);
+      } catch (error) { fail(error, opts.json === true); }
+    });
+  hooks.command("trust")
+    .description("Accept the workspace hooks file's exact bytes on this machine; required again after any change")
+    .requiredOption("--sha256 <digest>", "the file digest printed by hooks inspect, reviewed by you")
+    .option("--json", "machine-readable output")
+    .action((opts: { sha256: string; json?: boolean }) => {
+      try {
+        const result = trustNativeCommandHooks(process.cwd(), opts.sha256);
+        if (opts.json) console.log(JSON.stringify({ ok: true, ...result }, null, 2));
+        else console.log(`Trusted ${result.path} (sha256 ${result.sha256}, ${result.handlers} handlers) on this machine.`);
+      } catch (error) { fail(error, opts.json === true); }
+    });
+  hooks.command("test <event>")
+    .description(`Run the trusted handlers for one event with a synthetic input: ${NATIVE_COMMAND_HOOK_EVENTS.join(", ")}`)
+    .option("--tool <name>", "tool name for PreToolUse/PostToolUse matchers (default fs.write)")
+    .option("--json", "machine-readable output")
+    .action(async (eventInput: string, opts: { tool?: string; json?: boolean }) => {
+      try {
+        const event = NATIVE_COMMAND_HOOK_EVENTS.find(candidate => candidate === eventInput) as NativeCommandHookEvent | undefined;
+        if (event === undefined) throw new NativeCommandHookError("EVENT_UNKNOWN", `Unknown hook event ${JSON.stringify(eventInput)}; one of ${NATIVE_COMMAND_HOOK_EVENTS.join(", ")}.`);
+        const load = loadNativeCommandHooks(process.cwd());
+        if (load.status !== "trusted") throw new NativeCommandHookError(load.status === "absent" ? "HOOKS_ABSENT" : "HOOKS_UNTRUSTED", load.status === "absent" ? `${load.path} does not exist.` : load.reason);
+        const tool = opts.tool ?? "fs.write";
+        const input = nativeCommandHookInput(event, { sessionId: null, cwd: process.cwd() }, event === "PreToolUse"
+          ? { tool_name: tool, tool_use_id: "hooks-test", action_class: "WRITE_LOW", requested_mode: "SIMULATE", tool_input: { path: "hooks-test.txt", content: "" }, tool_input_truncated: false, synthetic: true }
+          : event === "PostToolUse" ? { tool_name: tool, tool_use_id: "hooks-test", tool_response: { ok: true, output_sha256: "0".repeat(64), output_bytes: 0 }, synthetic: true }
+          : event === "UserPromptSubmit" ? { prompt: "hooks test", prompt_truncated: false, synthetic: true } : { synthetic: true });
+        const matching = load.handlers.filter(handler => handler.event === event && (handler.event !== "PreToolUse" && handler.event !== "PostToolUse" || commandHookMatches(handler.matcher, tool)));
+        const runs = [];
+        for (const handler of matching) {
+          const run = await runNativeCommandHook(handler, input, process.cwd());
+          runs.push({ index: handler.index, matcher: handler.matcher || "*", argv: handler.argv, decision: run.decision, ...(run.reason === undefined ? {} : { reason: run.reason }), exitCode: run.exitCode, terminatedBy: run.terminatedBy, stderr: run.stderr });
+        }
+        const denied = NATIVE_COMMAND_HOOK_DENY_EVENTS.includes(event) ? runs.find(run => run.decision === "deny") : undefined;
+        const result = { ok: true, event, tool, emitted: NATIVE_COMMAND_HOOK_EMITTED.includes(event), denyCapable: NATIVE_COMMAND_HOOK_DENY_EVENTS.includes(event),
+          outcome: denied ? "deny" : NATIVE_COMMAND_HOOK_DENY_EVENTS.includes(event) ? "allowed-to-proceed (no hook denied; the loop's own guards still apply)" : "observed", runs };
+        if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+        console.log(`${event} (${tool}): ${result.outcome}${result.emitted ? "" : " [event not emitted by this build]"}`);
+        for (const run of runs) console.log(`#${run.index} ${run.argv.join(" ")}: ${run.decision}${run.reason === undefined ? "" : ` (${run.reason})`} exit=${run.exitCode ?? run.terminatedBy ?? "none"}${run.stderr ? ` stderr: ${run.stderr}` : ""}`);
+        if (runs.length === 0) console.log("No handler matched.");
+      } catch (error) { fail(error, opts.json === true); }
+    });
+}

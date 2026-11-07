@@ -52,6 +52,7 @@ import { parseSubagentStopConditions } from "./agent/subagentStopConditions.js";
 import { prepareSkillTurn, workspaceSkillRoots } from "./skills/skillTurn.js";
 import { buildSkillCatalog } from "./skills/skillCatalog.js";
 import { loadNativeExtensions, type NativeExtensionManager, type NativeExtensionTurn } from "./extensions/nativeExtensionRuntime.js";
+import { denyPromptByCommandHooks } from "./extensions/nativeCommandHooks.js";
 import { bindNativeMcpResourceStatus, projectNativeResourceStatus, type NativeMcpResourceSource } from "./prompt/context/nativeResourceStatus.js";
 import { explicitPresetCompositionOptions, nativePresetCompositionSources } from "./cli/agentCompositionSources.js";
 import { resolvePreset, type AgentPreset } from "./presets/agentPresets.js";
@@ -314,6 +315,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         return;
       }
       const prompt = skillTurn.prompt;
+      // SH-EXT-01 UserPromptSubmit: a trusted hooks.json may stop the turn here, before any session row exists.
+      const promptDenied = await denyPromptByCommandHooks({ workspace: process.cwd(), prompt });
+      if (promptDenied !== undefined) { io.error(chalk.red(`prompt refused by hook: ${promptDenied}`)); io.fail(); return; }
       if (prompt.length === 0 && opts.audioInput === undefined) {
         io.error(chalk.red("a prompt is required: amc agent-loop run \"...\""));
         io.fail();
@@ -702,7 +706,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...(providerId === STUB_PROVIDER_ID
             ? { transport: stubProviderTransport({ failFirst, thinkMs, retryAfterSeconds: 1 }) }
             : {}),
-          ...(toolSeam === null && !extensionTurn.hooks ? {} : { tools: { ...(toolSeam ?? EMPTY_TOOL_SEAM), extensionHooks: extensionTurn.hooks } }),
+          ...(toolSeam === null && !extensionTurn.hooks ? {} : { tools: { ...(toolSeam ?? EMPTY_TOOL_SEAM), ...(toolSeam?.extensionHooks ? {} : { extensionHooks: extensionTurn.hooks }) } }),
           ...(bindToolSession === undefined ? {} : { bindToolSession }),
           ...(grantDelegation === null
             ? {}
