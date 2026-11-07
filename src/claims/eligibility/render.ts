@@ -34,7 +34,8 @@ export const REASON_TEXT: Record<ClaimReasonCode, string> = {
   NOT_APPLICABLE: "the control does not apply",
   APPLICABILITY_UNRESOLVED: "no applicability decision is recorded",
   EVIDENCE_NOT_CLAIM_READY: "the run did not meet AMC's evidence-readiness gate for claims",
-  RESULT_NOT_BOUND: "this result is not yet bound to claim-eligible evidence"
+  RESULT_NOT_BOUND: "this result is not yet bound to claim-eligible evidence",
+  LEDGER_NOT_FINALIZED: "the evidence ledger verified only up to a session that is still open"
 };
 
 // These explain the kind or the level, never why a result was withheld.

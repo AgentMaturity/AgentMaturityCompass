@@ -1235,7 +1235,7 @@ export class Ledger {
 // here so the ~10 existing importers keep their import path; the split is about
 // where the code lives and what it reports, not about churning call sites.
 export {
-  verifyLedgerIntegrity,
+  verifyLedgerIntegrity, verifiedLedgerPrefix,
   verifyEvidenceEventIntegrity,
   type VerifyResult
 } from "./ledgerVerification.js";

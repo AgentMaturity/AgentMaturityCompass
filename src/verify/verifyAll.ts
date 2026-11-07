@@ -7,7 +7,7 @@ import { transparencyLogPath, transparencySealPath, transparencySealSigPath, ver
 import { A4_PROJECT_CREATED, FORECAST_SCHEDULER_CONFIGURED, PASSPORT_POLICY_WITNESSES, PROMPT_PACK_CREATED, PROMPT_SCHEDULER_CONFIGURED, WITNESS_GROUPS, WITNESSING_ENABLED } from "../transparency/configWitness.js";
 import { verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
-import { LEDGER_UNANCHORED_MESSAGE } from "../ledger/ledgerVerification.js";
+import { describeLedgerPrefix, LEDGER_UNANCHORED_MESSAGE, verifiedLedgerPrefix } from "../ledger/ledgerVerification.js";
 import { withPins, workspaceSelfTrust, type TrustContext } from "../trust/trustContext.js";
 import { untrustedReasons } from "../trust/verifierReport.js";
 import { isKeyRefused } from "../trust/signatureCheck.js";
@@ -437,10 +437,12 @@ export async function verifyAll(params: {
   if (ledger === null) {
     checks.push(fail("ledger-hash-chain", true, [ledgerError ?? "ledger unreadable"]));
   } else {
+    // H3: when open sessions (a running Studio's gateway) are the only failure, the check says so and still fails.
+    const prefix = verifiedLedgerPrefix(workspace, ledger, { trust: params.trust });
     checks.push(
       ledger.ok
         ? pass("ledger-hash-chain", true, ["event hash-chain and signatures verified"])
-        : fail("ledger-hash-chain", true, ledger.errors)
+        : fail("ledger-hash-chain", true, prefix ? [`only a prefix verified: ${describeLedgerPrefix(prefix)}`] : ledger.errors)
     );
     const monitor = ledger.trustRoot.monitorAdmission;
     checks.push(ledger.trustRoot.anchored

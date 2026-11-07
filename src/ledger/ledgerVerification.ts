@@ -36,6 +36,7 @@ import { openLedger, targetsDir, type Ledger, type EvidenceLedgerReader } from "
 import { extractEnvelope } from "../session/sessionTypes.js";
 import { readSessionWriter } from "../session/sessionOwnership.js";
 import { verifySessionChains } from "./sessionVerification.js";
+import { verifyOutcomeEvents } from "./outcomeVerification.js";
 import { verifyAlternateBackendEvidence } from "./alternateBackendVerification.js";
 import { readSessionStoreMarker } from "../persistence/openSessionEventStore.js";
 import type { EvidenceEvent } from "../types.js";
@@ -374,9 +375,17 @@ interface SessionLifecycle {
   closed: string[];
 }
 
-interface NativeContinuationScope {
-  readonly targetSessionId: string;
-  readonly incompleteLegacySessions: string[];
+/** A session a verified prefix names instead of failing: unended, with neither seal field. `runtime` is as recorded. */
+interface UnfinalizedSession { readonly sessionId: string; readonly runtime: string }
+
+/**
+ * P0-14's live scope: an unended legacy session with neither seal field (a running gateway's) is named here instead of
+ * failed, while every recorded row and every present seal is still checked. `targetSessionId` is the native session a
+ * continuation resumes, or null for a workspace-wide verified prefix (verifiedLedgerPrefix).
+ */
+interface LiveScope {
+  readonly targetSessionId: string | null;
+  readonly incompleteLegacySessions: UnfinalizedSession[];
 }
 
 
@@ -385,7 +394,7 @@ function verifySessions(
   workspace: string,
   errors: string[],
   staleAfterMs: number,
-  continuation?: NativeContinuationScope
+  continuation?: LiveScope
 ): SessionLifecycle {
   const monitorKeys = legacyLedgerRowKeys(workspace);
   const sessions = ledger.getAllSessions();
@@ -412,7 +421,7 @@ function verifySessions(
   }
 
   const knownSessionIds = new Set(sessions.map((session) => session.session_id));
-  if (continuation) {
+  if (continuation && continuation.targetSessionId !== null) {
     const opening = events.find(event => event.session_id === continuation.targetSessionId);
     const envelope = opening ? extractEnvelope(opening.meta_json) : null;
     if (!knownSessionIds.has(continuation.targetSessionId) || opening?.event_type !== "session/open"
@@ -478,7 +487,7 @@ function verifySessions(
     if (!session.session_final_event_hash || !session.session_seal_sig) {
       if (continuation && session.session_id !== continuation.targetSessionId && !isAgentSession
         && session.ended_ts === null && session.session_final_event_hash === null && session.session_seal_sig === null) {
-        continuation.incompleteLegacySessions.push(session.session_id);
+        continuation.incompleteLegacySessions.push({ sessionId: session.session_id, runtime: session.runtime });
         continue;
       }
       errors.push(`Session ${session.session_id} missing seal`);
@@ -513,61 +522,6 @@ function verifyRuns(ledger: Ledger, workspace: string, errors: string[]): void {
     if (!verifyHexDigestAny(run.report_json_sha256, run.run_seal_sig, auditorKeys)) {
       errors.push(`Assurance run ${run.assurance_run_id} seal signature invalid`);
     }
-  }
-}
-
-function verifyOutcomeEvents(ledger: Ledger, workspace: string, errors: string[]): void {
-  const monitorKeys = legacyLedgerRowKeys(workspace);
-  const rows = ledger.getAllOutcomeEvents();
-  let previous = "GENESIS_OUTCOME";
-  for (const row of rows) {
-    if (row.prev_event_hash !== previous) {
-      errors.push(`Outcome event ${row.outcome_event_id} previous hash mismatch`);
-    }
-    const metaJson = row.meta_json;
-    let parsedValue: unknown = row.value;
-    try {
-      parsedValue = JSON.parse(row.value);
-    } catch {
-      parsedValue = row.value;
-    }
-    const recalculated = sha256Hex(
-      `${row.prev_event_hash}${canonicalize({
-        outcome_event_id: row.outcome_event_id,
-        ts: row.ts,
-        agent_id: row.agent_id,
-        work_order_id: row.work_order_id,
-        category: row.category,
-        metric_id: row.metric_id,
-        value: parsedValue,
-        unit: row.unit,
-        trust_tier: row.trust_tier,
-        source: row.source,
-        meta_json: metaJson,
-        payload_sha256: row.payload_sha256
-      })}`
-    );
-    if (recalculated !== row.event_hash) {
-      errors.push(`Outcome event ${row.outcome_event_id} event_hash mismatch`);
-    }
-    if (!verifyHexDigestAny(row.event_hash, row.signature, monitorKeys)) {
-      errors.push(`Outcome event ${row.outcome_event_id} signature invalid`);
-    }
-    const verifiedReceipt = verifyReceipt(row.receipt, getPurposeKeyHistory(workspace, "receipt"));
-    if (!verifiedReceipt.ok || !verifiedReceipt.payload) {
-      errors.push(`Outcome event ${row.outcome_event_id} receipt invalid`);
-    } else {
-      if (verifiedReceipt.payload.event_hash !== row.event_hash) {
-        errors.push(`Outcome event ${row.outcome_event_id} receipt event hash mismatch`);
-      }
-      if (verifiedReceipt.payload.body_sha256 !== row.payload_sha256) {
-        errors.push(`Outcome event ${row.outcome_event_id} receipt payload hash mismatch`);
-      }
-      if (verifiedReceipt.payload.receipt_id !== row.receipt_id) {
-        errors.push(`Outcome event ${row.outcome_event_id} receipt id mismatch`);
-      }
-    }
-    previous = row.event_hash;
   }
 }
 
@@ -661,13 +615,46 @@ export function verifyNativeSessionContinuation(workspacePath: string, targetSes
   scope: "verified-prefix"; targetSessionId: string; chain: VerifyResult["chain"];
   trustRoot: VerifyResult["trustRoot"]; sessions: VerifyResult["sessions"]; incompleteLegacySessions: readonly string[];
 } {
-  const continuation: NativeContinuationScope = { targetSessionId, incompleteLegacySessions: [] };
+  const continuation: LiveScope = { targetSessionId, incompleteLegacySessions: [] };
   const result = verifyLedger(workspacePath, options, continuation);
   return { scope: "verified-prefix", targetSessionId, chain: result.chain, trustRoot: result.trustRoot, sessions: result.sessions,
-    incompleteLegacySessions: continuation.incompleteLegacySessions };
+    incompleteLegacySessions: continuation.incompleteLegacySessions.map((session) => session.sessionId) };
 }
 
-function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, continuation?: NativeContinuationScope): VerifyResult {
+/** A workspace ledger that verified as a prefix only: there is no `ok`, so it never reads as a complete verification. */
+export interface LedgerPrefixVerdict {
+  readonly scope: "verified-prefix";
+  readonly unfinalizedSessions: readonly UnfinalizedSession[];
+  readonly trustRoot: VerifyResult["trustRoot"];
+  /** Payloads not checked because the ledger key is out of reach (P2-09): never counted as verified. */
+  readonly payloadsNotEvaluated: readonly string[];
+}
+
+/**
+ * H3: a running Studio's own gateway session is never sealed while it serves, so a complete-ledger verdict fails on it.
+ * When `complete` failed, this re-runs the same checks in P0-14's live scope over the whole workspace and returns the
+ * verified prefix only if every check passed and at least one unended, unsealed legacy session was named; otherwise
+ * null, and the complete verdict's errors stand. Nothing is claimed about how a named session ends.
+ */
+export function verifiedLedgerPrefix(workspacePath: string, complete: Pick<VerifyResult, "ok">,
+  options: LedgerVerifyOptions = {}): LedgerPrefixVerdict | null {
+  if (complete.ok) return null;
+  const scope: LiveScope = { targetSessionId: null, incompleteLegacySessions: [] };
+  const prefix = verifyLedger(workspacePath, options, scope);
+  return prefix.ok && scope.incompleteLegacySessions.length > 0
+    ? { scope: "verified-prefix", unfinalizedSessions: scope.incompleteLegacySessions, trustRoot: prefix.trustRoot,
+      payloadsNotEvaluated: prefix.payloadsNotEvaluated ?? [] } : null;
+}
+
+/** What a verified prefix leaves open, in the same words on every surface (`amc verify`, `amc verify all`, `amc run`). */
+export function describeLedgerPrefix(prefix: LedgerPrefixVerdict): string {
+  const count = prefix.unfinalizedSessions.length;
+  const open = prefix.unfinalizedSessions.map((session) => `${session.sessionId} (${session.runtime})`).join(", ");
+  return `${count === 1 ? "1 session is" : `${count} sessions are`} still open, with no end or seal recorded: ${open}. `
+    + "A running gateway seals its session when it stops (amc down stops Studio and its gateway).";
+}
+
+function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, continuation?: LiveScope): VerifyResult {
   let ledger: Ledger | null = null;
   const chainErrors: string[] = [];
   const payloadsNotEvaluated: string[] = [];
@@ -721,7 +708,9 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
     } else if (!jsonlBackend) {
       chainErrors.push("Evidence ledger is missing; verification does not initialize a workspace");
     }
-    if (continuation && (!ledger || jsonlBackend)) chainErrors.push("Native continuation requires the SQLite native session store");
+    if (continuation && continuation.targetSessionId !== null && (!ledger || jsonlBackend)) {
+      chainErrors.push("Native continuation requires the SQLite native session store");
+    }
     chainErrors.push(...verifyAlternateBackendEvidence(workspacePath, expectedFingerprint, options.trust));
     if (ledger) {
       chainErrors.push(...operationalLedgerProblems(workspacePath, ledger, options.trust));

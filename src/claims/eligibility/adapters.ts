@@ -76,7 +76,14 @@ function evidence(eventCount: number, tiers: ClaimEligibilityInput["evidence"]["
 }
 
 export type DiagnosticReportClaimInput = DiagnosticEvidenceReadinessInput
-  & Pick<DiagnosticReport, "agentId" | "runId" | "windowEndTs" | "layerScores" | "contradictionCount">;
+  & Pick<DiagnosticReport, "agentId" | "runId" | "windowEndTs" | "layerScores" | "contradictionCount">
+  & {
+    /**
+     * H3, as the run recorded it: present only on an INVALID run whose sole failure is ledger sessions still open (a
+     * running Studio's gateway) over a prefix that verified (verifiedLedgerPrefix). It never makes a run VALID.
+     */
+    ledgerPrefix?: { unfinalizedSessions: readonly string[] };
+  };
 
 /**
  * Keeps a diagnostic run's real level. A run proposes a pass only when AMC's own evidence-readiness gate
@@ -87,6 +94,9 @@ export function envelopeForDiagnosticReport(report: DiagnosticReportClaimInput, 
   const layers = report.layerScores;
   const level = layers.length === 0 ? null : layers.reduce((sum, layer) => sum + layer.avgFinalLevel, 0) / layers.length;
   const readiness = evaluateDiagnosticEvidenceReadiness(report);
+  // H3: an open session is incomplete evidence, not a signature that does not verify; the run still cannot pass.
+  const open = report.ledgerPrefix?.unfinalizedSessions;
+  const openLedger = report.status === "INVALID" && !report.trustBoundaryViolated && Array.isArray(open) && open.length > 0;
   const envelope = evaluateClaimEligibility({
     producer: `diagnostic:${report.agentId}`,
     method: "runtime_observation",
@@ -98,17 +108,17 @@ export function envelopeForDiagnosticReport(report: DiagnosticReportClaimInput, 
         // An INVALID or UNSIGNED run vouches for nothing it recorded: its rows cannot make the claim observed.
         report.status === "VALID" && coverage.observed > 0 ? ["OBSERVED"] : ["SELF_REPORTED"], report.windowEndTs),
       contradictory: report.contradictionCount > 0,
-      signatureValid: report.status === "VALID"
+      signatureValid: openLedger ? null : report.status === "VALID"
     },
     evidenceRefs: [report.runId],
     now
   });
   if (readiness.claimEligible) return envelope;
-  const untrusted = readiness.status === "UNVERIFIED" || report.trustLabel === "UNRELIABLE — DO NOT USE FOR CLAIMS";
+  const untrusted = !openLedger && (readiness.status === "UNVERIFIED" || report.trustLabel === "UNRELIABLE — DO NOT USE FOR CLAIMS");
   const current = envelope.statusDimensions.evidence;
   const evidenceState = untrusted ? "untrusted" : current === "sufficient" ? "incomplete" : current;
   return { ...envelope, statusDimensions: { ...envelope.statusDimensions, evidence: evidenceState },
-    reasons: [...envelope.reasons, "EVIDENCE_NOT_CLAIM_READY"] };
+    reasons: [...envelope.reasons, ...(openLedger ? ["LEDGER_NOT_FINALIZED" as const] : []), "EVIDENCE_NOT_CLAIM_READY"] };
 }
 
 interface AdapterBase { producer: string; regulated?: boolean; applicability?: Applicability;

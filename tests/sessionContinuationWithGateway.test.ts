@@ -8,7 +8,7 @@ import { initWorkspace } from "../src/workspace.js";
 import { lockVault } from "../src/vault/vault.js";
 import { startGateway, type GatewayHandle } from "../src/gateway/server.js";
 import { openLedger } from "../src/ledger/ledger.js";
-import { verifyLedgerIntegrity, verifyNativeSessionContinuation } from "../src/ledger/ledgerVerification.js";
+import { describeLedgerPrefix, verifiedLedgerPrefix, verifyLedgerIntegrity, verifyNativeSessionContinuation } from "../src/ledger/ledgerVerification.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { resumeSession } from "../src/session/sessionResume.js";
 import { recoverSession } from "../src/session/sessionRecovery.js";
@@ -119,6 +119,37 @@ test("a present malformed seal on the open native target is refused, and a legac
   raw(db => { expect(db.prepare("UPDATE sessions SET session_seal_sig = '' WHERE session_id = ?").run(sessionId).changes).toBe(1); });
   expect(verifyNativeSessionContinuation(root, sessionId).chain.ok).toBe(false);
   expect(() => resume(sessionId)).toThrow();
+});
+
+test("H3: a live gateway session reads as a named verified prefix of the workspace, never as a pass", async () => {
+  const gatewayId = rows().find(row => row.runtime === "gateway")!.session_id;
+  const complete = verifyLedgerIntegrity(root);
+  expect(complete.ok).toBe(false);
+  const prefix = verifiedLedgerPrefix(root, complete);
+  expect(prefix).toMatchObject({ scope: "verified-prefix", unfinalizedSessions: [{ sessionId: gatewayId, runtime: "gateway" }] });
+  expect(prefix).not.toHaveProperty("ok");
+  expect(describeLedgerPrefix(prefix!)).toBe(`1 session is still open, with no end or seal recorded: ${gatewayId} (gateway). `
+    + "A running gateway seals its session when it stops (amc down stops Studio and its gateway).");
+  // A pin the workspace key does not match fails the prefix too, so the complete verdict's errors stand.
+  expect(verifiedLedgerPrefix(root, complete, { expectedMonitorFingerprint: "0".repeat(64) })).toBeNull();
+  await gateway!.close(); gateway = undefined;
+  const sealed = verifyLedgerIntegrity(root);
+  expect(sealed.ok).toBe(true);
+  expect(verifiedLedgerPrefix(root, sealed)).toBeNull();
+});
+
+test.each(["unrelated-signature", "ended-unsealed"] as const)("H3: %s is never explained away as an open session", async (kind) => {
+  const gatewayRow = rows().find(row => row.runtime === "gateway")!;
+  if (kind === "ended-unsealed") { await gateway!.close(); gateway = undefined; }
+  raw(db => {
+    const result = kind === "ended-unsealed"
+      ? db.prepare("UPDATE sessions SET session_final_event_hash = NULL, session_seal_sig = NULL WHERE session_id = ?").run(gatewayRow.session_id)
+      : db.prepare("UPDATE evidence_events SET writer_sig = ? WHERE id = ?").run("invalid-fixture-signature", gatewayRow.id);
+    expect(result.changes).toBe(1);
+  });
+  const complete = verifyLedgerIntegrity(root);
+  expect(complete.ok).toBe(false);
+  expect(verifiedLedgerPrefix(root, complete)).toBeNull();
 });
 
 test("an ended unrelated legacy session with its seal removed remains a continuation failure", async () => {

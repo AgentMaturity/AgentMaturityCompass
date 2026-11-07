@@ -5,7 +5,7 @@
  */
 import type { ComplianceCategoryResult, ComplianceReportJson } from "../../../compliance/mappingSchema.js";
 import type { AssuranceReport, DiagnosticReport } from "../../../types.js";
-import { envelopeForDiagnosticReport, envelopeForLegacyResult } from "../adapters.js";
+import { envelopeForDiagnosticReport, envelopeForLegacyResult, type DiagnosticReportClaimInput } from "../adapters.js";
 import { evaluateClaimEligibility } from "../evaluate.js";
 import {
   CLAIM_KINDS, type Applicability, type ClaimEnvelope, type ClaimKind, type ClaimReasonCode, type EvidenceState, type ResultState,
@@ -44,7 +44,9 @@ export function envelopeForStoredRun(report: DiagnosticReport, options: { sealVe
   if (!report.evidenceTrustCoverage || !Array.isArray(report.layerScores)) {
     return envelopeForUnverifiedResult({ producer: `diagnostic:${report.agentId}`, recordCount: 0, evidenceRefs: [report.runId], now: options.now });
   }
-  const trusted = options.sealVerified || report.status !== "VALID" ? report : { ...report, status: "INVALID" as const };
+  // Nothing an unverified report says about itself is trusted: not VALID, and not an open ledger session (H3).
+  const trusted: DiagnosticReportClaimInput = options.sealVerified ? report
+    : { ...report, status: report.status === "VALID" ? "INVALID" : report.status, ledgerPrefix: undefined };
   const envelope = envelopeForDiagnosticReport(trusted, options.now);
   return options.sealVerified ? envelope : { ...envelope, claimKind: "self_reported" };
 }
