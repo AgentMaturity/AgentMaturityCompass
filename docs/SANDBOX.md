@@ -184,7 +184,10 @@ profile AMC writes per call. Writes are allowed only to the signed
 `writableDirectories`, a private per-call temporary directory (the shell's
 `TMPDIR` and `HOME`) and `/dev/null`. Reads and writes are denied for `~/.ssh`,
 `~/.aws`, `~/.config/gcloud`, `~/.azure`, `~/.gnupg`, `~/.kube`, `~/.docker`,
-`~/.netrc`, `~/.npmrc`, `~/Library/Keychains`, `~/.amc`, the workspace's `.amc`
+`~/.netrc`, `~/.npmrc`, `~/Library/Keychains`, `~/.amc`, AMC's own home
+(`~/.config/amc` or `AMC_HOME`: provider credentials, the vault passphrase
+store, high-water marks), the credentials file named by `AMC_CREDENTIALS_FILE`,
+the user `~/.env` layer, `AMC_VAULT_REMEMBER_FILE`, the workspace's `.amc`
 and the signed `readDeny` paths. All networking is denied, including Unix
 sockets such as an SSH agent; with a signed egress allowlist the only exception
 is AMC's proxy port on localhost. Every path is resolved first, because Seatbelt

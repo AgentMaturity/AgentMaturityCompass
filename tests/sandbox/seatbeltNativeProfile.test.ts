@@ -1,6 +1,6 @@
 /** P1-05 profile/source contracts only. No sandbox-exec or kernel execution is claimed. */
 import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, type Stats } from "node:fs";
-import { tmpdir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { within } from "../../src/sandbox/bwrapBackend.js";
@@ -207,5 +207,19 @@ describe("native backend prelaunch refusals with a synthetic prerequisite and a 
       ...policy(), signal: controller.signal
     })).toEqual(declined("The shell was cancelled before launch.", true));
     expect(synthetic.launch).not.toHaveBeenCalled();
+  });
+});
+
+describe("AMC's own authority is on the macOS deny list (SH-SANDBOX-08)", () => {
+  test("denies the AMC home, the credentials file, the user .env layer and the vault remember file, honouring the overrides", async () => {
+    const { amcSecretPaths } = await import("../../src/sandbox/seatbeltNativeShell.js");
+    const defaults = amcSecretPaths({});
+    expect(defaults).toContain(join(homedir(), ".config", "amc"));
+    expect(defaults).toContain(join(homedir(), ".config", "amc", ".credentials.yaml"));
+    expect(defaults).toContain(join(homedir(), ".env"));
+    const overridden = amcSecretPaths({ AMC_HOME: "/synthetic/amc-home", AMC_CREDENTIALS_FILE: "/synthetic/elsewhere/creds.yaml", AMC_VAULT_REMEMBER_FILE: "/synthetic/vault/remember.json" });
+    expect(overridden).toEqual(expect.arrayContaining(["/synthetic/amc-home", "/synthetic/elsewhere/creds.yaml", "/synthetic/vault/remember.json", join(homedir(), ".env")]));
+    // Never the legacy spelling alone: `~/.amc` is not where AMC keeps credentials.
+    expect(defaults.some(path => path.endsWith("/.config/amc"))).toBe(true);
   });
 });

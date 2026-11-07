@@ -134,6 +134,19 @@ describe("real native shell escape attempts with owned canaries", () => {
     } finally { await f.finish(passed); }
   });
 
+  // SH-SANDBOX-08: AMC's own home (AMC_HOME, where provider credentials live) is denied by the backend itself, not only by a signed readDeny.
+  realTest("the AMC home's credentials file cannot be read even when no signed readDeny names it", async () => {
+    const f = nativeContainmentFixture({ readDenyHome: false }); let passed = false;
+    try {
+      const canary = `synthetic-not-a-real-secret-${randomUUID()}`;
+      const path = join(process.env.AMC_HOME!, ".credentials.yaml");
+      writeFileSync(path, canary);
+      const call = await f.run(`let value=null,denied=false,code=null;try{value=require("node:fs").readFileSync(${JSON.stringify(path)},"utf8");}catch(error){denied=true;code=error.code;}${emit('{attempted:true,denied,code}')} `);
+      applied(call); expect(call.receipt.stdout).not.toContain(canary);
+      expect(call.data.denied).toBe(true); expect(readFileSync(path, "utf8")).toBe(canary); passed = true;
+    } finally { await f.finish(passed); }
+  });
+
   // Linux only: macOS reports Node's own kqueue descriptors as directories, and Seatbelt passes no extra fd.
   (process.platform === "linux" ? realTest : test.skip)("the command inherits no launcher descriptor and cannot write the read-only workspace", async () => {
     const f = nativeContainmentFixture(); let passed = false;
