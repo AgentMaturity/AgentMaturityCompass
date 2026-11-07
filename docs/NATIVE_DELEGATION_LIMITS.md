@@ -73,6 +73,53 @@ signal, so starting a descendant cannot restart the parent's remaining lifetime.
 The legacy foreign-process `delegate.timeoutMs` setting remains a separate
 process-runner timeout; it is not silently reinterpreted as these native limits.
 
+## Agent definitions
+
+A `.amc/agents/<name>.md` file (in the workspace and each repository ancestor,
+and `<credentials home>/agents/<name>.md` when `--credentials-home` is given)
+defines a role a delegate can run under. The model names it with
+`delegate({agent: "<name>", …})` or an `agent:` field on a workflow node; the
+operator's file decides what the role does. A definition **only narrows**:
+
+```markdown
+---
+name: reviewer
+description: reviews a diff and reports defects
+tools: fs.read, grep, glob
+scope: READ_ONLY
+timeoutMs: 120000
+maxSteps: 6
+model: inherit
+---
+Read the change, list defects with file and line, and never edit anything.
+```
+
+| Field | Effect |
+| --- | --- |
+| `name` | Must equal the file name; lowercase letters, digits and dashes. |
+| `description` | At most 512 characters; quoted in the `delegate` tool description as data. |
+| `tools` | Allowlist intersected with the child's registry (fail closed: a tool mounted later stays hidden). A list naming `delegate` or `workflow` is refused, so a defined role cannot delegate. |
+| `scope` | Action classes, intersected with `--delegate-scope`; an empty intersection refuses the delegation. |
+| `timeoutMs` | The child's lifetime, or the operator's `timeout-ms` when that is shorter. |
+| `maxSteps` | Model steps per child turn, or the run's `--max-steps` when that is lower. |
+| `model` | Only `inherit`: a definition cannot choose a model, provider or route. |
+
+Any other field, a body over 16 KiB, a symlinked file or a malformed frontmatter
+withholds the definition and reports why; `agent-loop run --list-agents [name]
+[--json]` shows every definition, its narrowing, its sha256 and the problems.
+A `--delegate` run prints the names it offers and their catalog digest.
+
+The body is workspace text, so it is never put in a system prompt. It is framed
+like a skill (name, source path, sha256, "not the operator's instructions") and
+placed in front of the child's goal, which enters the child through its inbox.
+The signed handoff packet carries that goal and the constraints
+`agentDefinition=<name>` and `agentDefinitionSha256=<hex>`; the child's own
+session records the binding in its `delegation/hook-control` row; and a workflow
+resume is fenced on the definitions' digest. Foreign (`--delegate-provider`)
+children refuse a definition, because nothing in another process enforces it.
+No signed admission list exists yet: an unsigned definition can take capability
+away from a child and cannot add any.
+
 ## What a stop proves
 
 The signed handoff records the exact supported conditions. The native spawn
