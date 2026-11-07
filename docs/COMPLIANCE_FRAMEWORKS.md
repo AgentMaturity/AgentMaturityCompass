@@ -79,6 +79,25 @@ The EU AI Act establishes requirements for high-risk AI systems:
 - **Art. 73**: Incident reporting
 - **Art. 86**: Right to explanation
 
+### OWASP Top 10 for LLM Applications 2025 (`OWASP_LLM`)
+**Community guidance (genai.owasp.org), not law**
+
+`amc compliance report --framework owasp-llm` evaluates LLM01:2025–LLM10:2025, each bound to the assurance packs and native audit rows that measure it (`src/compliance/mappings/owaspLlmTop10.ts`). Every entry is NOT_EVALUATED until bound evidence exists in the window; a binding is an AMC methodological judgement, recorded in the mapping's description. Because genai.owasp.org is not on AMC's official-source host list, these mappings carry no verified `sources` entry and the family review flags them.
+
+Limits and relabels (SH-TRUST-04):
+- `owasp-llm` used to be an alias of the OWASP **API** Top 10; it now resolves to this list. `owasp` and `owasp-api` still mean the API list.
+- `amc score owasp-llm`, `GET /api/v1/regulatory/owasp-llm` and the `owaspGenAI` assurance pack use the **2023 v1.1** numbering (where LLM06 is Sensitive Information Disclosure and LLM08 is Excessive Agency) and say so in their titles; they report no score. The question bank's AMC-5.8–5.17 titles also follow the 2023 list.
+- The 2025 list renumbers several risks; the `excessive-agency` and `overreliance` pack titles name both ids.
+
+### OWASP Top 10 for Agentic Applications 2026 (`OWASP_AGENTIC`, ASI01–ASI10)
+**Community guidance (genai.owasp.org), not law**
+
+`amc compliance report --framework owasp-agentic` (aliases `asi`, `owasp_agentic`) evaluates ASI01–ASI10, bound to whole assurance packs (injection, tool misuse, step-up approval bypass, supply chain, sandbox boundary, memory poisoning, delegation trust chain, circuit breakers, persuasion, oversight undermining) and to native pipeline audit rows (`AUTHORIZATION_RECORD`, `NATIVE_SHELL_CONFINEMENT`, `DELEGATION_SETTLED`) where the harness itself records the control (`src/compliance/mappings/owaspAgenticTop10.ts`). The OWASP project page lists no entries; the ids and titles come from the release document it links to (2025-12-09) and must be re-verified against it before publication, as the family review says. Rogue-agent persistence after decommissioning is not observed by any pack and is not claimed.
+
+### Adding new built-in frameworks to an initialised workspace
+
+Reports read the workspace's signed `.amc/compliance-maps.yaml`; built-in mappings are used only when that file is absent. A workspace initialised before a framework existed does not see it until its maps are re-published. `amc compliance init --merge` keeps every mapping the operator signed and appends the built-in mappings of each framework the file does not mention, then re-signs; plain `amc compliance init` still overwrites the file with the built-in set.
+
 ## Using Pre-built Policy Packs
 
 ### Python

@@ -114,7 +114,7 @@ export const modelTheftExfilPack: AssurancePackDefinition = {
   id: "modelTheftExfil",
   title: "Model Theft & Weight Exfiltration",
   description:
-    "Based on OWASP LLM10 and talent defection concerns. " +
+    "Based on OWASP LLM10:2023 (Model Theft) and talent defection concerns. " +
     "Tests model protection including weight extraction resistance, architecture disclosure prevention, " +
     "fine-tuning data protection, API abuse detection, organizational knowledge protection, " +
     "weight exfiltration resistance, self-copying detection, extraction cooperation resistance, " +

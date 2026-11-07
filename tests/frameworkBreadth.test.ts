@@ -15,6 +15,8 @@ import { complianceMapsSchema, type ComplianceMapping } from "../src/compliance/
 // Families added for the regulated-platform stations (same ids S5 uses as frameworkRef).
 // ISO_42005 is not here: its text is not publicly readable (see docs/COMPLIANCE_MAPS.md).
 const STATION_FRAMEWORKS = ["DORA", "NIS2", "HHS_HTI_1", "NIST_AI_600_1", "CO_AI_ACT", "TX_TRAIGA", "CA_AI_LAWS", "KR_AI_BASIC_ACT"];
+// SH-TRUST-04: the two OWASP lists (community guidance) append after the station families.
+const OWASP_FRAMEWORKS = ["OWASP_LLM", "OWASP_AGENTIC"];
 // The twelve families and their mapping counts at 8f57ce63; the new families append after them.
 const BASE_FRAMEWORK_COUNTS: Record<string, number> = {
   SOC2: 5, NIST_AI_RMF: 4, ISO_27001: 5, ISO_42001: 11, EU_AI_ACT: 12, GDPR: 13,
@@ -27,7 +29,7 @@ describe("framework breadth", () => {
   test("existing families keep their order and mappings; new families are appended", () => {
     const base = Object.keys(BASE_FRAMEWORK_COUNTS);
     expect(frameworkChoices().slice(0, base.length)).toEqual(base);
-    expect(frameworkChoices().slice(base.length)).toEqual(STATION_FRAMEWORKS);
+    expect(frameworkChoices().slice(base.length)).toEqual([...STATION_FRAMEWORKS, ...OWASP_FRAMEWORKS]);
     for (const [framework, count] of Object.entries(BASE_FRAMEWORK_COUNTS)) {
       expect(mappings.filter((row) => row.framework === framework).length, framework).toBe(count);
     }

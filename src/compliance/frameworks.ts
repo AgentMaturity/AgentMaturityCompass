@@ -1,9 +1,12 @@
 import { descopedFrameworkNamePattern, frameworkAliases, frameworkNamePatterns } from "./frameworks/aliases.js";
+import { OWASP_AGENTIC_CATEGORIES } from "./mappings/owaspAgenticTop10.js";
+import { OWASP_LLM_CATEGORIES } from "./mappings/owaspLlmTop10.js";
 
 export type ComplianceFramework =
   | "SOC2" | "NIST_AI_RMF" | "ISO_27001" | "ISO_42001" | "EU_AI_ACT" | "GDPR" | "MITRE_ATLAS"
   | "OWASP_API_TOP10" | "HIPAA" | "SOX" | "FEDRAMP" | "PCI_DSS" | "DORA" | "NIS2" | "HHS_HTI_1"
-  | "NIST_AI_600_1" | "CO_AI_ACT" | "TX_TRAIGA" | "CA_AI_LAWS" | "KR_AI_BASIC_ACT";
+  | "NIST_AI_600_1" | "CO_AI_ACT" | "TX_TRAIGA" | "CA_AI_LAWS" | "KR_AI_BASIC_ACT"
+  | "OWASP_LLM" | "OWASP_AGENTIC";
 
 export interface ComplianceFrameworkFamily {
   framework: ComplianceFramework;
@@ -317,6 +320,17 @@ export const complianceFrameworkFamilies: ComplianceFrameworkFamily[] = [
       "Art. 35 Fundamental-rights impact assessment",
       "Art. 36 Domestic representative"
     ]
+  },
+  {
+    // SH-TRUST-04. Community guidance (genai.owasp.org), not a regulator; see src/compliance/mappings/owaspLlmTop10.ts.
+    framework: "OWASP_LLM",
+    displayName: "OWASP Top 10 for LLM Applications 2025 (community guidance)",
+    categories: [...OWASP_LLM_CATEGORIES]
+  },
+  {
+    framework: "OWASP_AGENTIC",
+    displayName: "OWASP Top 10 for Agentic Applications 2026, ASI01-ASI10 (community guidance)",
+    categories: [...OWASP_AGENTIC_CATEGORIES]
   }
 ];
 
@@ -383,6 +397,11 @@ const FAMILY_FLAGS: Partial<Record<ComplianceFramework, readonly string[]>> = {
     + "Pinpoint, commencement and current-law applicability review remain pending; re-verify before publishing."],
   KR_AI_BASIC_ACT: ["Article text comes from the KLRI English reference translation, not an official publisher, and the Korean text "
     + "governs. The Art. 31-35 pinpoints were not verified against an official text; re-verify before publishing."],
+  OWASP_LLM: ["Community security guidance from genai.owasp.org, not law or a regulator's standard; the host is not on AMC's "
+    + "official-source list, so the mappings carry no verified source and each binding is an AMC methodological judgement."],
+  OWASP_AGENTIC: ["Community security guidance from genai.owasp.org (release document of 2025-12-09). The project page lists no entries; "
+    + "the ASI01-ASI10 ids and titles come from the linked release document and must be re-verified against it before publishing. "
+    + "Each binding is an AMC methodological judgement."],
   ISO_42001: ["ISO/IEC 42005 descoped 2026-10-04 (iso.org unreachable): an alias with zero mapped controls, status "
     + "\"unverified: source unreachable\". Its three mapping IDs stay NOT_EVALUATED even after a display-category rename; the original category also stays descoped. The ISO 42006 "
     + "category is an AMC signal, not a clause mapping."]

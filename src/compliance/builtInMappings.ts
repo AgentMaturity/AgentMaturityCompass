@@ -1,4 +1,6 @@
 import type { ComplianceMapping, ComplianceMappingSource, ComplianceMapsFile } from "./mappingSchema.js";
+import { owaspAgenticTop10Mappings } from "./mappings/owaspAgenticTop10.js";
+import { owaspLlmTop10Mappings } from "./mappings/owaspLlmTop10.js";
 
 /** `catalogControls` (P1-53) is optional here, as in a signed map, and defaults to []. */
 function mapping(params: Omit<ComplianceMapping, "catalogControls"> & { catalogControls?: string[] }): ComplianceMapping {
@@ -2725,6 +2727,9 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     related: { questions: ["AMC-2.12", "AMC-2.13", "AMC-2.14"], packs: ["iso42005ImpactAssessment"], configs: [] },
     sources: [KR_AI_ACT_KLRI, KR_AI_ACT_LAW_GO_KR]
   }),
+  // SH-TRUST-04: the two OWASP lists live in their own modules (src/compliance/mappings/).
+  ...owaspLlmTop10Mappings,
+  ...owaspAgenticTop10Mappings,
 ];
 
 export function defaultComplianceMapsFile(): ComplianceMapsFile {

@@ -12526,8 +12526,9 @@ withTrustFlags(transparencyMerkle
 compliance
   .command("init")
   .description("Create and sign compliance-maps.yaml")
-  .action(async () => {
-    const out = await initComplianceMapsCliAsync(process.cwd());
+  .option("--merge", "keep the workspace's existing mappings and add the built-in frameworks it lacks, then re-sign")
+  .action(async (opts: { merge?: boolean }) => {
+    const out = await initComplianceMapsCliAsync(process.cwd(), { merge: opts.merge === true });
     console.log(chalk.green(`Compliance maps created: ${out.path}`));
     console.log(`Signature: ${out.sigPath}`);
   });
@@ -22440,13 +22441,13 @@ score
 
 score
   .command("owasp-llm")
-  .description("OWASP LLM Top 10 coverage (all 10 risks); not evaluated: file presence is not evidence")
+  .description("OWASP LLM Top 10 (2023 v1.1) coverage; not evaluated: file presence is not evidence. The evidence-bound 2025 list is `amc compliance report --framework owasp-llm`")
   .option("--json", "Output as JSON")
   .action(async (opts: { json?: boolean }) => {
     try {
       const { scoreOWASPLLMCoverage } = await import("./score/owaspLLMCoverage.js");
       const result = scoreOWASPLLMCoverage();
-      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🛡️  OWASP LLM Top 10 Coverage"), result, unverifiedClaim("score:owaspLLMCoverage", 0, { regulated: true }), opts)) return;
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🛡️  OWASP LLM Top 10 (2023 v1.1) Coverage"), result, unverifiedClaim("score:owaspLLMCoverage", 0, { regulated: true }), opts)) return;
       printNotEvaluatedCriteria(result.risks, result.recommendations);
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });

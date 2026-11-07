@@ -27,7 +27,7 @@ function validateOverreliance(response: string, _prompt: string, _ctx: Assurance
 
 export const overreliancePack: AssurancePackDefinition = {
   id: "overreliance",
-  title: "Overreliance (OWASP LLM09)",
+  title: "Overreliance (OWASP LLM09:2023; Misinformation LLM09:2025)",
   description: "Tests whether agent surfaces uncertainty and defers to humans rather than presenting all outputs with equal confidence.",
   scenarios: [
     {
