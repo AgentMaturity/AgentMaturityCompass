@@ -90,7 +90,7 @@ describe("the prompt seam on the composed tree", () => {
       GOVERNANCE_SECTION,
       PERSONA_SECTION
     ]);
-    expect(prompt.contextPluginNames).toEqual(["context:workspace-instructions", "context:time"]);
+    expect(prompt.contextPluginNames).toEqual(["context:workspace-instructions", "context:plan-mode", "context:time"]);
 
     // Before a refresh the plugins have said nothing, and that reads as silence
     // rather than as an error or as stale text from some other run.

@@ -228,7 +228,9 @@ describe("amc system-prompt — the operator surface", () => {
       GOVERNANCE_SECTION,
       PERSONA_SECTION
     ]);
-    expect(report.contexts).toEqual(["context:workspace-instructions", "context:time"]);
+    // The plan-mode plugin is registered on every native profile (SH-LOOP-04) so the plugin list is the same for a
+    // planning turn and the executing turn that resumes it; it says nothing unless plan mode is on.
+    expect(report.contexts).toEqual(["context:workspace-instructions", "context:plan-mode", "context:time"]);
   });
 
   it("shows the assembled prompt and, on request, the context it would carry", async () => {
@@ -266,13 +268,16 @@ describe("amc system-prompt — the operator surface", () => {
       searched: string[];
       included: { displayPath: string; scope: string }[];
     };
-    // All four places are reported whether or not a file is there: discovery
-    // order is a property of the harness, not of what happens to exist.
+    // Every place a NATIVE RUN looks is reported whether or not a file is there: discovery order is a property of
+    // the harness, not of what happens to exist. The old assertion listed the legacy user-plus-root scan, which
+    // named $AMC_HOME files a native run never loads (SH-LOOP-05): the command now reports workspace-only discovery.
     expect(report.searched).toEqual([
-      "$AMC_HOME/CLAUDE.md",
-      "$AMC_HOME/AGENTS.md",
       "CLAUDE.md",
-      "AGENTS.md"
+      "AMC.md",
+      "AGENTS.md",
+      "CLAUDE.local.md",
+      "AMC.local.md",
+      "AGENTS.local.md"
     ]);
     expect(report.included.map((file) => file.displayPath)).toEqual(["AGENTS.md"]);
     expect(report.included[0]?.scope).toBe("project");

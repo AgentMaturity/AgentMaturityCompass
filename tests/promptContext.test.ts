@@ -79,11 +79,13 @@ describe("P3.3 — instruction precedence agrees with what AMC writes", () => {
 
     expect(candidates.map((candidate) => candidate.displayPath)).toEqual([
       "$AMC_HOME/CLAUDE.md",
+      "$AMC_HOME/AMC.md",
       "$AMC_HOME/AGENTS.md",
       "CLAUDE.md",
+      "AMC.md",
       "AGENTS.md"
     ]);
-    expect(candidates.map((candidate) => candidate.precedence)).toEqual([0, 1, 2, 3]);
+    expect(candidates.map((candidate) => candidate.precedence)).toEqual([0, 1, 2, 3, 4, 5]);
     // No absolute host path reaches model-visible text: the user scope is shown
     // as $AMC_HOME, which does not carry the operator's account name.
     expect(candidates.every((candidate) => !candidate.displayPath.includes("/nowhere/home"))).toBe(true);
