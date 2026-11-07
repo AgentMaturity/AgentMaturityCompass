@@ -1,9 +1,13 @@
 import { randomBytes } from "node:crypto";
-import { existsSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { versions } from "node:process";
 import { studioStatus } from "../studio/studioSupervisor.js";
 import { vaultStatusNow } from "../vault/vaultCli.js";
+import { rememberedStores, rememberedUnlockLocation } from "../vault/passphraseStore.js";
+import { resolveCredentialsPaths } from "../credentials/credentialsPaths.js";
+import { assertOwnerOnly, permissionsAreEnforced } from "../credentials/credentialsFilePermissions.js";
+import { CredentialsFilePermissionsError } from "../credentials/credentialsStoreErrors.js";
 import { loadActionPolicy, verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
 import { DEFAULT_RUN_INTEGRITY_AT_LEAST, runIntegrityAtLeast } from "../governor/actionPolicySchema.js";
 import { actionPolicyDeclaredAbsent } from "../governor/actionPolicyStore.js";
@@ -167,6 +171,24 @@ function pushWorkspaceRecordHeadCheck(checks: DoctorCheck[], workspace: string):
   });
 }
 
+/**
+ * Studio refuses to start while the AMC home (the directory holding the credentials file) or that file is open to group
+ * or other; this runs the same check (assertOwnerOnly) and fails with the same fix, before Studio is ever started.
+ */
+export function amcHomeCheck(env: NodeJS.ProcessEnv = process.env): DoctorCheck {
+  const id = "amc-home-permissions", paths = resolveCredentialsPaths({ env, projectDir: null });
+  if (!permissionsAreEnforced()) return { id, status: "INFO", message: `AMC home ${paths.homeDir}: POSIX modes are not checked on this platform (access is governed by ACLs)` };
+  try {
+    for (const [path, kind] of [[paths.homeDir, "directory"], [paths.file, "file"]] as const) {
+      if (existsSync(path)) assertOwnerOnly({ path, kind, stats: statSync(path) });
+    }
+    return { id, status: "PASS", message: existsSync(paths.homeDir) ? `AMC home ${paths.homeDir} is reachable by its owner alone` : `AMC home ${paths.homeDir} does not exist yet` };
+  } catch (error) {
+    if (error instanceof CredentialsFilePermissionsError) return { id, status: "FAIL", message: `${error.message} (Studio refuses to start until then)`, fixHint: `Run: ${error.fixCommand}` };
+    return { id, status: "FAIL", message: `AMC home ${paths.homeDir} could not be checked: ${error instanceof Error ? error.message : String(error)}` };
+  }
+}
+
 function safeDoctorError(error: unknown, workspace: string): string {
   const raw = error instanceof Error ? error.message : String(error);
   return raw.replaceAll(workspace, ".").replace(/\s+/g, " ").trim().slice(0, 240) || "unknown error";
@@ -185,6 +207,7 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
       : { id: "node-version", status: "FAIL", message: `Node ${versions.node} is below required >=20`, fixHint: "Install Node.js 20+" }
   );
   checks.push(nativeModuleCheck());
+  checks.push(amcHomeCheck());
 
   // The key history decides which public keys may verify as each role, so a
   // silent insertion there forges every signature of that role. Report a broken
@@ -236,20 +259,23 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
       : { id: "studio-running", status: "INFO", message: "Studio is not running (optional — needed for dashboard/API)", fixHint: "Run: amc up" }
   );
 
-  // Signing commands (amc firewall enable, amc agent-loop run) read the
-  // passphrase from the shell; a process-local unlock never reaches them. Say
-  // which shell action makes them work rather than reporting "locked" as
-  // normal. The passphrase value itself is never rendered.
+  // Signing commands (amc firewall enable, amc agent-loop run) unlock the vault
+  // in their own process from AMC_VAULT_PASSPHRASE or, outside agent mode, the
+  // passphrase `amc up` remembered (B2). Say which source applies, or which
+  // action makes them work. The passphrase value itself is never rendered.
   const vault = vaultStatusNow(workspace);
   const passphraseInShell = (process.env.AMC_VAULT_PASSPHRASE ?? "").length > 0;
+  const remembered = rememberedUnlockLocation(workspace);
   checks.push(
     vault.unlocked || passphraseInShell
-      ? { id: "vault", status: "PASS", message: passphraseInShell ? "Vault passphrase available from AMC_VAULT_PASSPHRASE; signing commands can run" : "Vault unlocked" }
+      ? { id: "vault", status: "PASS", message: passphraseInShell ? "Vault passphrase available from AMC_VAULT_PASSPHRASE; signing commands can run"
+        : remembered ? `Vault unlocked with the passphrase remembered in ${remembered}; signing commands in this workspace use it too` : "Vault unlocked" }
       : {
         id: "vault",
         status: "WARN",
         message: "Vault locked in this shell: signing commands (amc firewall enable, amc agent-loop run) will refuse with \"Vault locked\"",
-        fixHint: "Run: export AMC_VAULT_PASSPHRASE='<the passphrase chosen or shown at amc init>' (interactive alternative: amc vault unlock)"
+        fixHint: "Run: export AMC_VAULT_PASSPHRASE='<the passphrase chosen or shown at amc init>' (interactive alternative: amc vault unlock). "
+          + `A passphrase \`amc up\` remembered is kept in ${rememberedStores()}; outside agent mode, amc commands in this workspace unlock with it.`
       }
   );
 

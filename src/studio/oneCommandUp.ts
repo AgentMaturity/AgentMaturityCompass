@@ -6,16 +6,19 @@
  * prompt, or non-interactive generation — then run the first 8-surface
  * baseline when the workspace has no prior assessment.
  */
+import { existsSync } from "node:fs";
 import chalk from "chalk";
 import inquirer from "inquirer";
-import { getRememberedVaultPassphrase, rememberVaultPassphrase } from "../vault/passphraseStore.js";
+import { usersConfigPath } from "../auth/authApi.js";
+import { getRememberedVaultPassphrase, rememberedLocation, rememberedStores, rememberVaultPassphrase } from "../vault/passphraseStore.js";
+import { vaultExists } from "../vault/vault.js";
 
 export async function ensureUpVaultPassphrase(workspace: string, remember: boolean): Promise<void> {
   if (!process.env.AMC_VAULT_PASSPHRASE && remember) {
     const remembered = getRememberedVaultPassphrase(workspace);
     if (remembered) {
       process.env.AMC_VAULT_PASSPHRASE = remembered.passphrase;
-      console.log(chalk.gray(`Vault passphrase loaded from ${remembered.backend === "keychain" ? "the macOS Keychain" : "the AMC credentials file"} (run \`amc vault forget\` to remove).`));
+      console.log(chalk.gray(`Vault passphrase loaded from ${rememberedLocation(remembered.backend)} (run \`amc vault forget\` to remove).`));
       return;
     }
   }
@@ -53,7 +56,7 @@ export async function ensureUpVaultPassphrase(workspace: string, remember: boole
       const { rememberChoice } = await inquirer.prompt([{
         type: "confirm",
         name: "rememberChoice",
-        message: "Remember this passphrase on this machine so `amc up` starts without prompts?",
+        message: "Remember this passphrase on this machine so `amc up` and other amc commands in this workspace use it without asking?",
         default: true
       }]);
       if (rememberChoice) {
@@ -63,12 +66,18 @@ export async function ensureUpVaultPassphrase(workspace: string, remember: boole
     }
     return;
   }
+  if (remember && vaultExists(workspace)) {
+    // A new passphrase cannot open the vault that exists; remembering one would only replace the right one.
+    throw new Error(`This workspace already has a vault, and no passphrase for it was found in AMC_VAULT_PASSPHRASE or in ${rememberedStores()}. `
+      + "Run: export AMC_VAULT_PASSPHRASE='<the vault passphrase>', then amc up again.");
+  }
   if (remember) {
     const crypto = await import("node:crypto");
     const generated = crypto.randomBytes(16).toString("base64url");
     process.env.AMC_VAULT_PASSPHRASE = generated;
-    const saved = rememberVaultPassphrase(workspace, generated);
+    // B1: said before storing, so a slow or failing store never leaves the operator without it.
     console.log(chalk.yellow("No vault passphrase found in a non-interactive shell; generated one for this workspace."));
+    const saved = rememberVaultPassphrase(workspace, generated);
     console.log(chalk.yellow(`It is remembered in ${saved.location}. Run \`amc vault forget\` to remove it, or set AMC_VAULT_PASSPHRASE to manage it yourself.`));
     return;
   }
@@ -88,6 +97,13 @@ export async function ensureUpVaultPassphrase(workspace: string, remember: boole
       "  amc up --demo --dry-run"
     ].join("\n")
   );
+}
+
+/** The Compass Console signs people in with users.yaml accounts; until the first exists, `amc up` ends by saying how to make it. */
+export function printConsoleSignInStep(workspace: string, consoleUrl: string): void {
+  if (existsSync(usersConfigPath(workspace))) return;
+  console.log(`\n  ${chalk.bold("Sign in to the Compass Console")} (${consoleUrl}): create your owner account once with `
+    + `${chalk.bold("amc user init --username <you>")}; it asks for the password you will sign in with.`);
 }
 
 export interface BaselineWorkspaceState {
