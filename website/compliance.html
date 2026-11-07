@@ -13,6 +13,7 @@
 body{font-family:var(--amc-font-sans);background:var(--bg);color:var(--text);line-height:1.7}
 a{color:var(--accent);text-decoration:none}
 a:hover{text-decoration:underline}
+p a{text-decoration:underline;text-underline-offset:2px}
 .w{max-width:800px;margin:0 auto;padding:0 1.5rem}
 nav{border-bottom:1px solid var(--border);padding:1rem 0;background:rgba(10,10,10,.95);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
 nav .w{display:flex;justify-content:space-between;align-items:center}
@@ -130,7 +131,7 @@ footer{padding:2rem 0;text-align:center;color:var(--muted);font-size:.85rem}
   <ul class="checklist">
     <li><span class="check">✓</span><div><span class="article-ref">Article 9 — Risk Management</span><br>Relevant assurance receipts can support risk identification and mitigation review. Applicability and sufficiency remain system-specific.</div></li>
     <li><span class="check">✓</span><div><span class="article-ref">Article 12 — Record Keeping</span><br>AMC hash-chains captured or ingested evidence events with Ed25519 signatures. Uncaptured activity is not represented in the ledger.</div></li>
-    <li><span class="check">✓</span><div><span class="article-ref">Article 13 — Transparency</span><br>Reports expose L0–L5 scores, evidence references, and unsupported states. Reviewers can verify AMC artifacts offline with <code>amc verify all --json</code>.</div></li>
+    <li><span class="check">✓</span><div><span class="article-ref">Article 13 — Transparency</span><br>Reports expose L0–L5 scores, evidence references, and unsupported states. Reviewers can verify AMC artifacts offline with <code>amc verify all --json --expect-monitor &lt;monitor sha256&gt;</code>, pinned to a monitor key fingerprint recorded outside the workspace; without the pin the ledger check reports UNANCHORED.</div></li>
     <li><span class="check">✓</span><div><span class="article-ref">Article 14 — Human Oversight</span><br>Oversight scoring and signed action policies can provide evidence about approval boundaries; they do not establish legal conformity by themselves.</div></li>
     <li><span class="check">✓</span><div><span class="article-ref">Article 17 — Quality Management</span><br>Fleet consistency, policy canaries, monitoring, and drift alerts can support an evidence review when those controls are configured and operating.</div></li>
   </ul>

@@ -49,8 +49,10 @@ Every event in the ledger includes:
 
 ```bash
 amc transparency tail --agent my-agent --limit 20   # View recent chain entries
-amc verify all --json                                 # Verify full chain integrity
+amc verify all --json --expect-monitor <monitor sha256>   # Verify full chain integrity against your pinned monitor key
 ```
+
+`<monitor sha256>` is the fingerprint of `.amc/keys/monitor_ed25519.pub`, recorded outside the workspace. Without a pin, `verify all` reports the ledger UNANCHORED and exits 1: a monitor key read from the workspace being verified proves internal consistency, not authorship.
 
 ### Key Difference from prior art
 

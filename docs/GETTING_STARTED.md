@@ -153,7 +153,7 @@ command behind it:
 | Langfuse / Helicone / Lunary | You ran `amc watch connect` for that provider |
 | The pack registry | You ran `amc pack search`, `install`, or `publish` |
 
-Scores, evidence and the ledger stay in your workspace under `.amc/`.
+Scores, evidence and the ledger stay in your workspace under `.amc/`. Keep `.amc/` out of version control by default (add it to `.gitignore`): it holds the signing keys, the Studio admin token (`.amc/studio/`), the evidence ledger and, when `amc` generated one, `.amc/local-vault-passphrase`. A new workspace also gets `.amc/.gitignore`, which keeps those secrets and per-machine runtime state out of git. If you deliberately commit a workspace for CI (the `amc-action` GitHub Action), never commit `.amc/local-vault-passphrase` or `.amc/studio/`, supply `AMC_VAULT_PASSPHRASE` from a CI secret, and keep that repository private: the encrypted vault is offline brute-force material.
 
 ---
 
@@ -311,7 +311,7 @@ amc score transparency-log
 
 ## Studio (Local Control Plane)
 
-Studio is AMC's local web UI for managing agents, viewing scores, and running evaluations. macOS and Windows desktop packages also include the `Agent Maturity Compass Studio` launcher app, which opens this same local console in the system browser.
+Studio is AMC's local web UI for managing agents, viewing scores, and running evaluations. macOS and Windows desktop packages also include the `Agent Maturity Compass Studio` launcher app, which opens this same local console (in a native WebKit window on macOS, in the system browser on Windows).
 
 ```bash
 # Start Studio
@@ -323,6 +323,17 @@ amc status
 # Stop Studio
 amc down
 ```
+
+The Compass Console asks you to sign in. Create the first login, an OWNER:
+
+```bash
+amc user init --username <you>    # asks for a password; signs .amc/users.yaml
+```
+
+It signs with the workspace vault, so it needs the vault passphrase: if it reports `Vault locked`, set
+`AMC_VAULT_PASSPHRASE` in that shell. `amc user init` replaces `.amc/users.yaml`, so on a workspace that already has
+logins (for example after `amc init --coding`) use `amc user add` instead. Add more logins with `amc user add --username <name> --role <roles>`
+(see [RBAC](RBAC.md)).
 
 Studio gives you:
 - Live dashboard with agent scores
@@ -339,9 +350,13 @@ open "Agent Maturity Compass Studio.app"
 ```
 
 ```powershell
-# Windows package
-.\Agent Maturity Compass Studio.cmd
+# Windows package: double-click the .cmd file, or from PowerShell
+& ".\Agent Maturity Compass Studio.cmd"
 ```
+
+The macOS app is not notarized (the current source build ad-hoc signs it): if macOS says it cannot verify it, open
+System Settings > Privacy & Security and choose Open Anyway. Studio keeps running after you close the app window or browser tab;
+[Desktop Packages](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/DESKTOP_PACKAGES.md) has the command that stops it.
 
 ---
 

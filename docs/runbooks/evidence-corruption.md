@@ -2,9 +2,11 @@
 
 Use this when AMC integrity checks indicate tampering, corruption, or signature-chain failure.
 
+`<monitor sha256>` below is the fingerprint of `.amc/keys/monitor_ed25519.pub` (`shasum -a 256`), recorded outside the workspace when it was created. Without that pin (or `AMC_EXPECTED_MONITOR_FINGERPRINT`, or a trust list), `amc verify all` reports the ledger UNANCHORED and exits 1; that alone is not evidence of corruption.
+
 ## Trigger Signals
 
-- `amc verify all --json` returns `fail`
+- `amc verify all --json --expect-monitor <monitor sha256>` reports `FAIL`
 - transparency/merkle verification fails
 - ledger hash-chain mismatch or artifact signature mismatch
 - unexpected `UNKNOWN` spikes caused by unreadable/missing evidence
@@ -17,7 +19,7 @@ amc down
 ```
 2. Capture verification output for incident record.
 ```bash
-amc verify all --json
+amc verify all --json --expect-monitor <monitor sha256>
 amc transparency verify
 amc trust status
 ```
@@ -40,7 +42,7 @@ amc backup restore .amc/backups/latest.amcbackup --to /tmp/amc-restore --force -
 2. Verify restored workspace offline.
 ```bash
 cd /tmp/amc-restore
-amc verify all --json
+amc verify all --json --expect-monitor <monitor sha256>
 amc transparency verify
 ```
 3. If restored workspace is clean, promote it as new active workspace and restart Studio.
@@ -50,7 +52,7 @@ amc transparency verify
 ```bash
 amc up
 amc studio healthcheck
-amc verify all --json
+amc verify all --json --expect-monitor <monitor sha256>
 ```
 
 ## Exit Criteria

@@ -9,6 +9,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text-muted);line-h
 .desktop-download .btn{text-transform:none}
 .hero-download{display:flex;flex-direction:column;gap:.75rem;width:100%;max-width:360px}
 .hero-download .btn{width:100%;justify-content:center;text-transform:none}
+@media(max-width:480px){.desktop-download{padding:1rem}.hero-download .btn,.desktop-download .btn{padding-left:1rem;padding-right:1rem;font-size:.88rem;text-align:center}}
 .hero-reassure{font-family:var(--mono);font-size:.8rem;color:var(--text-muted);margin:.4rem 0 1rem;width:100%;max-width:360px;text-align:center}
 .hero-browser{width:100%;max-width:360px;justify-content:center;margin-bottom:1.4rem}
 .hero-dev{border-top:1px solid var(--border);padding-top:1.1rem;margin-top:.4rem;width:100%;max-width:360px}
@@ -276,12 +277,12 @@ section{padding:clamp(5rem,10vw,8rem) 0;position:relative;z-index:1}
 .footer-inner{max-width:1200px;margin:0 auto;padding:0 clamp(1.5rem,4vw,3rem)}
 .footer-top{display:flex;justify-content:space-between;gap:3rem;flex-wrap:wrap;padding-bottom:3rem;border-bottom:1px solid rgba(0,0,0,.08)}
 .footer-brand{font-family:var(--mono);font-size:1.6rem;font-weight:700;letter-spacing:0;color:#1a1a1a}
-.footer-tagline{font-size:.82rem;color:#777;margin-top:.5rem;line-height:1.5}
+.footer-tagline{font-size:.82rem;color:#666;margin-top:.5rem;line-height:1.5}
 .footer-col{display:flex;flex-direction:column;gap:.5rem}
-.footer-col h3{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:#999;margin-bottom:.5rem}
+.footer-col h3{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:#666;margin-bottom:.5rem}
 .footer-col a{font-size:.82rem;color:#555;transition:color .2s}.footer-col a:hover{color:#1a1a1a}
 .footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:2rem;flex-wrap:wrap;gap:1rem}
-.footer-copy{font-size:.72rem;color:#999}
+.footer-copy{font-size:.72rem;color:#666}.footer-note{margin-top:1rem;max-width:760px}
 
 /* ═══ GSAP — immediate visibility, animate on scroll ═══ */
 .gs{opacity:0;transform:translateY(20px);will-change:opacity,transform;-webkit-backface-visibility:hidden;backface-visibility:hidden}

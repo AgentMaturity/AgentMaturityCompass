@@ -6,7 +6,7 @@ This runbook is for post-launch AMC operation with verifiable controls.
 
 1. Build + test candidate:
    ```bash
-   npm ci
+   pnpm install --frozen-lockfile
    npm test
    npm run build
    ```
@@ -15,8 +15,11 @@ This runbook is for post-launch AMC operation with verifiable controls.
    ```bash
    amc studio healthcheck
    amc doctor --strict --json
-   amc verify all --json
+   amc verify all --json --expect-monitor <monitor sha256>
    ```
+   `<monitor sha256>` is `shasum -a 256 .amc/keys/monitor_ed25519.pub`, recorded outside the workspace when it was
+   created. Without that pin (or `AMC_EXPECTED_MONITOR_FINGERPRINT`, or a trust list), the ledger check reports
+   UNANCHORED and `verify all` exits 1.
 4. Verify trust and transparency state:
    ```bash
    amc trust status
@@ -48,7 +51,7 @@ Restore drill:
 
 ```bash
 amc backup restore .amc/backups/latest.amcbackup --to /tmp/amc-restore --force --pubkey <recorded-auditor.pub>
-AMC_WORKSPACE_DIR=/tmp/amc-restore amc verify all --json
+AMC_WORKSPACE_DIR=/tmp/amc-restore amc verify all --json --expect-monitor <monitor sha256>
 ```
 
 ## 4) Maintenance Tasks
@@ -98,7 +101,7 @@ If integrity checks fail:
 1. Freeze change paths (owner/operator controls only).
 2. Preserve artifacts and logs.
 3. Run:
-   - `amc verify all --json`
+   - `amc verify all --json --expect-monitor <monitor sha256>`
    - `amc transparency verify`
    - `amc trust status`
 4. Restore from last known-good `.amcbackup` if recovery is required.
