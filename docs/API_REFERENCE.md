@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-11-04
+> Auto-generated from source on 2026-11-07
 
 ## Table of Contents
 
@@ -379,13 +379,13 @@ AMC provides 1,268 public CLI command paths in the live command inventory.
 | 360 | `amc domain list` | List all 7 domains with metadata |
 | 361 | `amc domain modules` | Show module activation map for domain |
 | 362 | `amc domain pack` | Industry sector packs — 41 packs across 7 domains |
-| 363 | `amc domain pack access` | Show Industry Packs access, licence verification and checkout availability |
-| 364 | `amc domain pack activate` | Activate Industry Packs with a licence signed by a key pinned in the AMC trust list |
-| 365 | `amc domain pack checkout` | Print the checkout link when this deployment has a checkout and licence verification configured |
+| 363 | `amc domain pack access` | Show Industry Packs access (free: every pack is included, no licence needed) |
+| 364 | `amc domain pack activate` | Record a legacy Industry Packs licence (not needed: Industry Packs are free) |
+| 365 | `amc domain pack checkout` | Industry Packs are free; there is nothing to buy (kept for scripts that call it) |
 | 366 | `amc domain pack describe` | Show details of a specific industry sector pack |
 | 367 | `amc domain pack list` | List all available industry sector packs |
 | 368 | `amc domain pack run` | Run an industry sector pack — interactive assessment or baseline score |
-| 369 | `amc domain pack verify` | Verify an Industry Packs license key against the licence key pinned in the AMC trust list |
+| 369 | `amc domain pack verify` | Verify a legacy Industry Packs license key against the licence key pinned in the AMC trust list |
 | 370 | `amc domain report` | Build full domain report and write it to a file (not evaluated without evidence) |
 | 371 | `amc domain roadmap` | Generate 30/60/90-day roadmap for this domain (not evaluated without evidence) |
 | 372 | `amc down` | Stop AMC Studio local control plane |
@@ -4199,7 +4199,7 @@ Alias: `amc sector pack`
 
 #### `amc domain pack access`
 
-Show Industry Packs access, licence verification and checkout availability
+Show Industry Packs access (free: every pack is included, no licence needed)
 
 Alias: `amc domain pack subscribe`, `amc sector pack access`
 
@@ -4209,7 +4209,7 @@ Alias: `amc domain pack subscribe`, `amc sector pack access`
 
 #### `amc domain pack activate`
 
-Activate Industry Packs with a licence signed by a key pinned in the AMC trust list
+Record a legacy Industry Packs licence (not needed: Industry Packs are free)
 
 Alias: `amc sector pack activate`
 
@@ -4220,7 +4220,7 @@ Alias: `amc sector pack activate`
 
 #### `amc domain pack checkout`
 
-Print the checkout link when this deployment has a checkout and licence verification configured
+Industry Packs are free; there is nothing to buy (kept for scripts that call it)
 
 Alias: `amc sector pack checkout`
 
@@ -4269,7 +4269,7 @@ Alias: `amc sector pack run`
 
 #### `amc domain pack verify`
 
-Verify an Industry Packs license key against the licence key pinned in the AMC trust list
+Verify a legacy Industry Packs license key against the licence key pinned in the AMC trust list
 
 Alias: `amc sector pack verify`
 

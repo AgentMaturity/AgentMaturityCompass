@@ -119,10 +119,7 @@ export const TRUTH_CLAIM_EXCEPTIONS = [
 ];
 
 /** Commands a promoted doc may name although the inventory lacks them, each with its reason. */
-export const COMMAND_EXCEPTIONS = [
-  { file: "docs/A4_FORGE.md", command: "amc a4",
-    reason: "owned by the A4 session; the doc names it as the planned entry point (P1-65) and says it is a library function for now" }
-];
+export const COMMAND_EXCEPTIONS = [];
 
 const lineOf = (text, index) => text.slice(0, index).split("\n").length;
 const blank = (match) => match.replace(/[^\n]/g, " ");

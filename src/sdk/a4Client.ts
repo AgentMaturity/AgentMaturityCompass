@@ -6,7 +6,7 @@
  * non-JSON answer throws. Identity is the caller's Studio session (its cookie and native CSRF proof) or the admin
  * token, which reads only; no body names a user. Every route answers 404 A4_PREVIEW_DISABLED unless the server runs
  * with AMC_A4_PREVIEW=1. Nothing is cached, so a one-time token in a response reaches the caller once.
- * Release, deployment and rollback routes arrive with Activate (P1-62).
+ * The release, deployment and rollback routes (Activate, P1-62) exist on the server but have no client method yet.
  */
 import { randomUUID } from "node:crypto";
 import type { a4Events } from "../a4/a4Events.js";

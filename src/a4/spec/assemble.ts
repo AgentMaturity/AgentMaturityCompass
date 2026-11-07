@@ -54,9 +54,9 @@ export const RESOLUTION_PURPOSE = "outcome_unknown_resolution";
 /** The seam the native task lane owns before composition.compositionDigest and composition.policyDigest can be recomputed per session. */
 const COMPOSITION_SEAM_KEY = "NATIVE_TASK_COMPOSITION_DIGESTS";
 /**
- * The seam before Assemble's completion can advance the lifecycle development → testing (design §7 item 9, §10.2): the
- * A4 lifecycle wrapper (a4Lifecycle.advance, planned in P1-62's a4Lifecycle.ts, whose issue bridges only →staging and
- * →production). Until it lands, nothing in A4 advances an agent past its recorded stage, and readiness says so.
+ * The key Assemble's readiness names for the lifecycle move development → testing (design §7 item 9, §10.2). The A4
+ * lifecycle wrapper (src/a4/a4Lifecycle.ts, P1-62) makes that move after Activate's release, never at Assemble's
+ * completion, so Assemble's lifecycle_bridge item stays NOT_EVALUATED and names this key.
  */
 export const LIFECYCLE_SEAM_KEY = "A4_LIFECYCLE_WRAPPER";
 /** The workspace preset Build signs for the agent (src/presets/agentPresets.ts, `.amc/agents.yaml`). */
@@ -302,7 +302,7 @@ function buildItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Reco
   items.push(item("lifecycle_bridge", "NOT_EVALUATED", { kind: "not_evaluated", mandatory: false,
     reasonCodes: [`LIFECYCLE_STAGE:${stage}`, ...(typeof lifecycle.reason === "string" ? [lifecycle.reason] : []),
       `UNIT_TESTS_PASSING:${typeof lifecycle.unitTestsPassing === "string" ? lifecycle.unitTestsPassing : "not_evaluated"}`, `KEY:${LIFECYCLE_SEAM_KEY}`],
-    nextAction: { label: `Lifecycle stage ${stage}, as Review read it. Assemble's development → testing bridge is not built (${LIFECYCLE_SEAM_KEY}): nothing in A4 advances it yet` } }));
+    nextAction: { label: `Lifecycle stage ${stage}, as Review read it. Assemble does not advance the lifecycle: A4 moves development → testing after Activate's release (${LIFECYCLE_SEAM_KEY})` } }));
   return items;
 }
 

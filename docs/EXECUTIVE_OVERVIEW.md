@@ -45,7 +45,7 @@ We tested a content moderation agent with two methods:
 
 ### For Your Engineering Team
 - **Evidence-weighted diagnostic scoring** that reveals exactly where agents are weak
-- **632 sector-specific questions** for regulated industries (healthcare, finance, education, etc.)
+- **723 sector-specific questions** for regulated industries (healthcare, finance, education, etc.): experimental, self-reported questionnaires
 - **<!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs** that test real adversarial scenarios (prompt injection, data exfiltration, etc.)
 - **Auto-generated guardrails** that plug directly into agent config files
 - **CI/CD integration** — fail builds if agents don't meet maturity targets

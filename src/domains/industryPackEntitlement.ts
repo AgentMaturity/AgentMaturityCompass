@@ -51,11 +51,18 @@ export interface IndustryPackEntitlement {
   checkoutUrl: null;
   /** A licence signing key is pinned in the operator's trust list; nothing the client supplies counts (P1-51). */
   licenseVerificationConfigured: boolean;
+  /** Always null: free access does not expire. */
+  expiresAt: null;
+  message: string;
+}
+
+/** What a recorded legacy licence says about itself (activation reports it; it gates nothing). */
+export interface IndustryPackLicenceRecord {
+  planId: string;
+  status: IndustryPackLicenseStatus;
   expiresAt: string | null;
   customerId?: string;
   subscriptionId?: string;
-  licenseStatus?: IndustryPackLicenseStatus;
-  message: string;
 }
 
 export interface IndustryPackCatalogItem {
@@ -368,7 +375,7 @@ export function activateIndustryPackAccess(params: {
   workspace?: string;
   licenseKey: string;
   env?: NodeJS.ProcessEnv;
-}): IndustryPackEntitlement {
+}): IndustryPackEntitlement & { licence: IndustryPackLicenceRecord } {
   const workspace = params.workspace ?? process.cwd();
   const env = params.env ?? process.env;
   const key = params.licenseKey.trim();
@@ -395,7 +402,14 @@ export function activateIndustryPackAccess(params: {
     licenseStatus: verified.payload?.status ?? "active"
   };
   writeFileAtomic(entitlementPath(workspace), JSON.stringify(stored, null, 2), 0o600);
-  return getIndustryPackEntitlement(workspace, { ...env, AMC_INDUSTRY_PACKS_LICENSE_KEY: undefined, AMC_DOMAIN_PACKS_LICENSE_KEY: undefined }, trust);
+  const licence: IndustryPackLicenceRecord = {
+    planId: INDUSTRY_PACKS_PLAN_ID,
+    status: stored.licenseStatus ?? "active",
+    expiresAt: stored.expiresAt ?? null,
+    ...(stored.customerId ? { customerId: stored.customerId } : {}),
+    ...(stored.subscriptionId ? { subscriptionId: stored.subscriptionId } : {})
+  };
+  return { ...getIndustryPackEntitlement(workspace, env, trust), licence };
 }
 
 /** A catalogue row; every pack is unlocked because Industry Packs are free. */

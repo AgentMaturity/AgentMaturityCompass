@@ -8394,22 +8394,24 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const { activateIndustryPackAccess } = await import("../domains/industryPackEntitlement.js");
-        let entitlement: ReturnType<typeof activateIndustryPackAccess>;
+        let recorded: ReturnType<typeof activateIndustryPackAccess>;
         // Not configured, unpinned, expired or forged: the reason goes back to the caller, nothing is stored.
-        try { entitlement = activateIndustryPackAccess({ workspace: options.workspace, licenseKey }); }
+        try { recorded = activateIndustryPackAccess({ workspace: options.workspace, licenseKey }); }
         catch (error) { json(res, 422, { error: error instanceof Error ? error.message : String(error), entitlementNote: ENTITLEMENT_NOTE }); return; }
+        const { licence, ...entitlement } = recorded;
+        // The audit row describes the legacy licence that was recorded; access was free before and after it.
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "INDUSTRY_PACKS_ACTIVATED",
           severity: "LOW",
           payload: {
-            source: entitlement.source,
-            planId: entitlement.planId,
-            expiresAt: entitlement.expiresAt,
-            subscriptionId: entitlement.subscriptionId
+            planId: licence.planId,
+            licenseStatus: licence.status,
+            expiresAt: licence.expiresAt,
+            subscriptionId: licence.subscriptionId
           }
         });
-        json(res, 200, { entitlement, entitlementNote: ENTITLEMENT_NOTE });
+        json(res, 200, { entitlement, licence, entitlementNote: ENTITLEMENT_NOTE });
         return;
       }
 

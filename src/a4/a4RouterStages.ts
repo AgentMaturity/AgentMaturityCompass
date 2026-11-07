@@ -1,10 +1,10 @@
 /**
  * The A4 stage, gate and effect routes (P1-57; design §6, §9, §12.1). The six generic stage routes (understand,
- * confirm-understanding, explain, propose, build, review) plus answers run the fixed step order; while a stage has no
- * producer (its spec module's PRODUCERS is empty, until P1-59…P1-62) they take the "no producer registered" path: the
- * human-authored content goes to the project's encrypted blob store, is signed as an `a4-stage-output` artifact outside
- * any transaction and is recorded as a `stage_output` ref (self_reported, lane implementation), so `built` and `reviewed`
- * are reachable now. A stage's producer (P1-59 on) runs on rows checked under the step order before the transaction; each
+ * confirm-understanding, explain, propose, build, review) plus answers run the fixed step order. Every stage registers
+ * producers (P1-59…P1-62); a stage with none would take the "no producer registered" path, where the human-authored
+ * content goes to the project's encrypted blob store, is signed as an `a4-stage-output` artifact outside any
+ * transaction and is recorded as a `stage_output` ref (self_reported, lane implementation). A stage's producer runs on
+ * rows checked under the step order before the transaction; each
  * of its outputs takes the same blob, signature and ref path, and the member's own text, when sent, is recorded beside it. Every write is governed (src/a4/a4Gates.ts): freeze refusal, readiness on rows read inside the
  * transaction, signing outside it. Decisions, consumption and effects reuse the slice A functions unchanged. Stage
  * modules register through src/a4/a4Stages.ts, which evaluation and effect lookups run first.
@@ -47,7 +47,7 @@ import { handleAssembleRoute } from "./assembleResolve.js";
 import { handleAdaptRoute } from "./adaptContextPlugin.js";
 import { handleMechanicRoute } from "./a4Mechanic.js";
 
-/** Each stage's question bank as its lane publishes it (empty until P1-59…P1-62). */
+/** Each stage's question bank as its lane publishes it (P1-59…P1-62). */
 export const STAGE_QUESTIONS: Readonly<Record<A4Stage, readonly A4Question[]>> = {
   aspire: ASPIRE_QUESTIONS, assemble: ASSEMBLE_QUESTIONS, adapt: ADAPT_QUESTIONS, activate: ACTIVATE_QUESTIONS
 };

@@ -466,7 +466,7 @@ export async function reviewAssemble(ctx: A4ProducerContext): Promise<A4Producer
     : { lane: "recommendation" as const, method: null }), label: "assemble review: capabilities and limitations, plan against built", body: { capabilities, limitations } });
   const executedAll = sessions.length > 0 && sessions.every((session) => (session.validation as { allPassed: boolean }).allPassed);
   const unitTestsPassing = anyStub ? "not_evaluated (stub provider)" : sessions.length === 0 ? "not_evaluated (no executed test)"
-    : !executedAll ? "not_evaluated (checks pending, unavailable or failed)" : `evidence present (no A4 bridge advances the lifecycle yet: ${LIFECYCLE_SEAM_KEY})`;
+    : !executedAll ? "not_evaluated (checks pending, unavailable or failed)" : `evidence present (A4 advances the lifecycle after Activate's release, not here: ${LIFECYCLE_SEAM_KEY})`;
   return {
     outputs,
     notEvaluated: anyStub ? ["SYNTHETIC_VALUES", "STUB_PROVIDER"] : ["NO_OBSERVED_REF"],

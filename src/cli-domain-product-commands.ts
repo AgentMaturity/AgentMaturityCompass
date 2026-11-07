@@ -72,12 +72,13 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       }
       try {
         const { activateIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
-        const entitlement = activateIndustryPackAccess({ workspace: process.cwd(), licenseKey: opts.key });
+        const recorded = activateIndustryPackAccess({ workspace: process.cwd(), licenseKey: opts.key });
         if (opts.json) {
-          console.log(JSON.stringify(entitlement, null, 2));
+          console.log(JSON.stringify(recorded, null, 2));
           return;
         }
         console.log(chalk.green("Licence recorded: it verified against a pinned licence key. Industry Packs are free, so it changes nothing."));
+        if (recorded.licence.expiresAt) console.log(chalk.gray(`Licence expires: ${recorded.licence.expiresAt}`));
       } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
     });
 

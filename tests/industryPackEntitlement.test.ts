@@ -115,7 +115,8 @@ describe("legacy licences stay verifiable", () => {
     const licence = pinnedLicence();
     const entitlement = activateIndustryPackAccess({ workspace, licenseKey: licence.licenseKey, env: { AMC_HOME: licence.amcHome } });
 
-    expect(entitlement).toMatchObject({ active: true, source: "free", licenseVerificationConfigured: true });
+    expect(entitlement).toMatchObject({ active: true, source: "free", licenseVerificationConfigured: true,
+      licence: { planId: "industry-packs-monthly", status: "active", expiresAt: "2099-01-01T00:00:00.000Z", subscriptionId: "sub_test" } });
     const stored = JSON.parse(readFileSync(join(workspace, ".amc", "industry-packs-access.json"), "utf8")) as Record<string, unknown>;
     expect(stored).toMatchObject({ subscriptionId: "sub_test", expiresAt: "2099-01-01T00:00:00.000Z" });
     const raw = readFileSync(join(workspace, ".amc", "industry-packs-access.json"), "utf8");

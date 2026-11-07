@@ -25,9 +25,10 @@ describe("executive and board-facing path", () => {
     expect(combined).toContain("244");
     expect(combined).toContain("<!-- amc:count:assurancePacksRegistered -->");
     expect(combined).toContain("41");
-    expect(combined).toContain("632 sector");
+    expect(combined).toContain("723 sector");
     expect(docs).toContain("**Mobility** | 6");
-    expect(docs).toContain("$9.99/month");
+    expect(docs).toContain("Industry Packs need no licence, account or payment");
+    expect(combined).not.toContain("$9.99");
     expect(docs).toContain("amc up");
 
     expect(combined).not.toContain("593 sector-specific");
