@@ -58,6 +58,8 @@ export function registerAcpCommands(program: Command): void {
     .option("--validate <id>", "Run this public check after each completed turn; repeat to select more", (id: string, previous: string[] = []) => [...previous, id])
     .option("--approve-tools <actionClass>", "Require the existing signed approval gate for tool calls")
     .option("--approve-risk <tier>", "Signed approval risk tier; requires --approve-tools")
+    .option("--reviewer-session-token-file <path>", "Offer allow_once on session/request_permission, recorded under this private tracked-login token file's own roles; requires --approve-tools")
+    .option("--reviewer-reason <text>", "Decision reason for allow_once when the client's response carries none; requires --reviewer-session-token-file")
     .option("--mcp-config <path>", "Reviewed native MCP config; repeat for more servers; requires workspace tools and signed approvals", (path: string, previous: string[] = []) => [...previous, path])
     .option("--mcp-config-sha256 <digest>", "Pin exact reviewed MCP configuration bytes; one per --mcp-config in the same order", (digest: string, previous: string[] = []) => [...previous, digest])
     .option("--max-tokens <n>", "Positive output-token bound per model request", "512")
@@ -89,6 +91,8 @@ export function registerAcpCommands(program: Command): void {
       validate?: string[];
       approveTools?: string;
       approveRisk?: string;
+      reviewerSessionTokenFile?: string;
+      reviewerReason?: string;
       mcpConfig?: string[];
       mcpConfigSha256?: string[];
       maxTokens: string;
@@ -139,6 +143,8 @@ export function registerAcpCommands(program: Command): void {
           credentialsMode: opts.credentialsMode as "layered" | "operator-only",
           ...(opts.approveTools === undefined ? {} : { approveTools: opts.approveTools }),
           ...(opts.approveRisk === undefined ? {} : { approveRisk: opts.approveRisk }),
+          ...(opts.reviewerSessionTokenFile === undefined ? {} : { reviewerSessionTokenFile: opts.reviewerSessionTokenFile }),
+          ...(opts.reviewerReason === undefined ? {} : { reviewerReason: opts.reviewerReason }),
           ...(opts.mcpConfig === undefined ? {} : { mcpConfig: opts.mcpConfig }),
           ...(opts.mcpConfigSha256 === undefined ? {} : { mcpConfigSha256: opts.mcpConfigSha256 }),
           ...(opts.model === undefined ? {} : { model: opts.model }),
