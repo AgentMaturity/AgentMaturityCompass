@@ -130,6 +130,11 @@ export interface AcpStdioInit {
   readonly maxTokens?: number;
   readonly thinking?: string;
   readonly reasoningEffort?: string;
+  /** SH-PROVIDERS-02/04/06: the same route and reasoning flags `agent-loop run` takes, as typed. */
+  readonly thinkingBudget?: string;
+  readonly cacheRetention?: string;
+  readonly maxRetries?: string;
+  readonly retryMaxDelay?: string;
   readonly maxSteps?: number;
   /** Operator-declared automatic compaction, fixed at startup like the step bound. */
   readonly compaction?: Partial<CompactionConfig>;

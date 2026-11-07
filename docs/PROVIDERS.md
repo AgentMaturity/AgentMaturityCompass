@@ -1,5 +1,7 @@
 # Providers
 
+Native agent routes (`--provider` on `agent-loop run`, `acp`, schedules and the SDKs) are documented in [NATIVE_PROVIDERS.md](NATIVE_PROVIDERS.md); this page covers the gateway templates.
+
 AMC provider coverage is config-driven via gateway routes and templates. Defaults are provided where stable, and all base URLs are overrideable.
 
 ## Supported Provider Templates

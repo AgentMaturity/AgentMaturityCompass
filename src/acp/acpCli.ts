@@ -61,8 +61,12 @@ export function registerAcpCommands(program: Command): void {
     .option("--mcp-config <path>", "Reviewed native MCP config; repeat for more servers; requires workspace tools and signed approvals", (path: string, previous: string[] = []) => [...previous, path])
     .option("--mcp-config-sha256 <digest>", "Pin exact reviewed MCP configuration bytes; one per --mcp-config in the same order", (digest: string, previous: string[] = []) => [...previous, digest])
     .option("--max-tokens <n>", "Positive output-token bound per model request", "512")
-    .option("--thinking <mode>", "DeepSeek only: enabled (default) or disabled")
-    .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high (default), or max with enabled thinking")
+    .option("--thinking <mode>", "enabled or disabled: DeepSeek, Anthropic (tools-free, with --thinking-budget), Gemini and Ollama")
+    .option("--reasoning-effort <effort>", "Sent verbatim: DeepSeek low|high|max, Gemini MINIMAL|LOW|MEDIUM|HIGH, Ollama low|medium|high|max")
+    .option("--thinking-budget <tokens>", "Anthropic budget_tokens (>= 1024, below --max-tokens) or Gemini thinkingBudget")
+    .option("--cache-retention <mode>", "short or long prompt-cache retention on anthropic, openai and openai-responses routes")
+    .option("--max-retries <n>", "Model-request retries after the first attempt (default 5; 0 gives up on the first failure)")
+    .option("--retry-max-delay <ms>", "Local backoff ceiling in milliseconds (default 10000)")
     .option("--max-steps <n>", "Positive model-step bound per turn (default 8, stub 2)")
     .option("--context-window <tokens>", "Override the reviewed model context window for automatic compaction")
     .option("--compact-threshold <fraction>", "Use ratio trigger instead of the catalog token reserve (0.5-0.95; requires --context-window)")
@@ -94,6 +98,10 @@ export function registerAcpCommands(program: Command): void {
       maxTokens: string;
       thinking?: string;
       reasoningEffort?: string;
+      thinkingBudget?: string;
+      cacheRetention?: string;
+      maxRetries?: string;
+      retryMaxDelay?: string;
       maxSteps?: string;
       contextWindow?: string;
       compactThreshold?: string;
@@ -133,6 +141,10 @@ export function registerAcpCommands(program: Command): void {
           maxTokens: Number(opts.maxTokens),
           ...(opts.thinking === undefined ? {} : { thinking: opts.thinking }),
           ...(opts.reasoningEffort === undefined ? {} : { reasoningEffort: opts.reasoningEffort }),
+          ...(opts.thinkingBudget === undefined ? {} : { thinkingBudget: opts.thinkingBudget }),
+          ...(opts.cacheRetention === undefined ? {} : { cacheRetention: opts.cacheRetention }),
+          ...(opts.maxRetries === undefined ? {} : { maxRetries: opts.maxRetries }),
+          ...(opts.retryMaxDelay === undefined ? {} : { retryMaxDelay: opts.retryMaxDelay }),
           ...(opts.maxSteps === undefined ? {} : { maxSteps: Number(opts.maxSteps) }),
           ...(opts.credentialsHome === undefined ? {} : { credentialsHome: opts.credentialsHome }),
           ...(opts.credentialsFile === undefined ? {} : { credentialsFile: opts.credentialsFile }),
