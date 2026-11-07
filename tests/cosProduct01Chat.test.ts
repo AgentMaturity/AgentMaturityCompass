@@ -246,7 +246,8 @@ describe("P01 connected native chat behavior", () => {
 
   it("stops approval input before the cancellation signal, drains the reply and does not retry", async () => {
     seam.cancelWhileApproving = true; seam.answers = ["task", "/exit"];
-    seam.results = [{ code: 0, body: summary({ endings: [{ reason: "cancelled", turn: 1 }] }) }];
+    // A cancelled turn exits 3 (SH-UI-01), which chat reports as "not established", not as a failure.
+    seam.results = [{ code: 3, body: summary({ endings: [{ reason: "cancelled", turn: 1 }] }) }];
     await run({ approveTools: "WRITE_LOW" });
     expect(seam.commands).toHaveLength(1);
     expect(seam.signals).toEqual(["SIGINT"]);

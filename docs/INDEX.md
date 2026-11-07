@@ -59,6 +59,8 @@ Use this page to reach the shortest evidence-backed path for your task. AMC's pu
 - [Framework Adapters](ADAPTERS.md)
 - [Provider Configuration](PROVIDERS.md)
 - [SDK](SDK.md)
+- [Headless native runs](NATIVE_HEADLESS.md): stdin prompt, `--output-format text|json|stream-json`, exit codes
+- [Agent Client Protocol](ACP.md): `amc acp` for Zed and JetBrains, permission requests, tool kinds, negotiation with the SDKs
 - [API Reference](API_REFERENCE.md)
 - [OpenAPI Surfaces](API_SURFACES.md)
 - [CI Templates](CI_TEMPLATES.md)

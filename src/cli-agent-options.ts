@@ -41,8 +41,35 @@ import { createScopedExceptionAnswerer } from "./governor/scopedExceptions.js";
 export interface AgentLoopCliIo {
   readonly log: (line: string) => void;
   readonly error: (line: string) => void;
-  /** Marks the run as failed. */
+  /** Marks the run as failed (exit code 1). */
   readonly fail: () => void;
+  /** Reports a non-failure exit code from the run table (3–6, src/cli/agentLoopOutputOptions.ts). Absent: the code is not observable. */
+  readonly exit?: (code: number) => void;
+  /** The prompt on stdin (SH-UI-01): null when stdin is a terminal and `-` was not given. Absent: this invocation has no stdin. */
+  readonly readStdin?: (options: { readonly explicit: boolean }) => Promise<string | null>;
+}
+
+export const defaultAgentLoopIo: AgentLoopCliIo = {
+  log: (line: string) => { console.log(line); },
+  error: (line: string) => { console.error(line); },
+  fail: () => { process.exitCode = 1; },
+  exit: (code: number) => { if (code !== 0) process.exitCode = code; },
+  readStdin: options => import("./cli/agentLoopOutputOptions.js").then(module => module.readProcessStdin(options))
+};
+
+/** Import the composed runner, or explain that the kernel is not installed. */
+export async function importRunner(io: AgentLoopCliIo): Promise<typeof import("./kernel/agentLoopRunner.js") | null> {
+  try {
+    return await import("./kernel/agentLoopRunner.js");
+  } catch (error: unknown) {
+    if ((error as { code?: string } | null)?.code === "ERR_MODULE_NOT_FOUND") {
+      io.error(chalk.yellow("The packaged native runtime could not be loaded. Reinstall AMC from a complete package.\n"
+        + "For a source checkout, install workspace dependencies and rebuild before running."));
+      io.fail();
+      return null;
+    }
+    throw error;
+  }
 }
 
 export interface RunOptions {

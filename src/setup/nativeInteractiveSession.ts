@@ -538,7 +538,9 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       io.log(renderNativeRunDiagnostics(summary.diagnostics));
       io.log(`Public task validation: ${summary.validation?.status ?? "unavailable"}. Passing selected checks does not guarantee correctness.`);
       if (tools === "workspace") for (const line of renderSessionLists(cwd, sessionId)) io.log(line);
-      if (outcome.code !== 0 || outcome.truncated || summary.driverStatus === "failed") {
+      // Exit codes 3-6 (cancelled, bounded, blocked, side effects unsettled; src/cli/agentLoopOutputOptions.ts) are
+      // recorded endings, not failed turns; the recorded ending below says which.
+      if ((outcome.code !== 0 && !(outcome.code !== null && outcome.code >= 3 && outcome.code <= 6)) || outcome.truncated || summary.driverStatus === "failed") {
         io.error("The turn failed or was interrupted. No successful task completion is claimed; /inspect and /verify show what was recorded.");
         io.fail();
       } else if (outcome.cancelRequested || ending?.reason !== "complete") {
