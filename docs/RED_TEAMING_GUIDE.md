@@ -177,6 +177,16 @@ Certificate: NOT ISSUED (threshold breach)
 
 ---
 
+## Signed, Ledgered Red-Team Runs (SH-TRUST-03)
+
+`amc redteam run` without `--no-sign` writes every attack prompt, reply and graded result into its own sealed `amc-redteam-runner` ledger session (rows carry `source: "redteam"`), seals the session, verifies the workspace ledger, and seals the report JSON with the artifact-seal key (`reportJsonSha256` + `runSealSig`, the same shape `sealedRunReportVerifies` reads for assurance and diagnostic runs). The report then says `verification: { signed: true, status: "SIGNED_VALID", mode: "vault-signed" }` and names its `sessionId`; a run whose ledger did not verify is `SIGNED_INVALID`. A locked vault refuses a signed run with the same remediation as `amc assurance run`.
+
+`--no-sign` (and the `amc ci redteam` default) stays local evidence: under `AMC_NO_SIGN=1` the rows go to the unsigned store (`evidenceStore` is recorded, signed readers never open it); otherwise no ledger rows are written and the report says so (`mode: "unsigned-local"`).
+
+Readers (`src/redteam/redteamStore.ts`): `verifiedRedTeamReports` returns only runs that are signed, SIGNED_VALID, whose report seal verifies and whose graded rows resolve to their session (the same provenance predicate as assurance, `REDTEAM_PROVENANCE_*`); unsigned runs are refused as `REDTEAM_UNSIGNED`, a tampered file as `REDTEAM_SEAL_INVALID`. `amc ci redteam` re-reads a signed run it just wrote and fails with the refusal's name when it does not verify. The passport's harness companion carries the newest verified run. Red-team results do not satisfy compliance `requires_assurance_pack` bindings: their row ids are `scenario::strategy` and they carry no grading eligibility; they are their own evidence.
+
+`amc redteam attack` (the attack-plugin engine) is unchanged and still writes no ledger rows.
+
 ## Assurance Lab: Deterministic Defensive Testing
 
 ### Available Packs

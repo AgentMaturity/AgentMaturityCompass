@@ -17,6 +17,11 @@ import { loadContextGraph } from "../context/contextGraph.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { loadAgentConfig } from "../fleet/registry.js";
 import { openLedger, verifyLedgerIntegrity } from "../ledger/ledger.js";
+import { UNSIGNED_EVIDENCE_STORE } from "../ledger/ledgerConnection.js";
+import { captureRunHashAuthority } from "../ledger/runHashSignature.js";
+import { parseReceipt } from "../receipts/receipt.js";
+import { workspaceSelfTrust } from "../trust/trustContext.js";
+import { sealAbortedAssuranceSession, startAssuranceSession, writeAssuranceAudit, writeScenarioPrompt, writeScenarioResponse, writeScenarioTestResult } from "../assurance/evidenceWriters.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -96,7 +101,7 @@ export interface RedTeamPluginResult {
   >;
 }
 
-export type RedTeamVerificationStatus = "SIGNED_VALID" | "UNSIGNED_VALID";
+export type RedTeamVerificationStatus = "SIGNED_VALID" | "SIGNED_INVALID" | "UNSIGNED_VALID";
 
 export interface RedTeamVerification {
   status: RedTeamVerificationStatus;
@@ -128,6 +133,16 @@ export interface RedTeamReport {
   agentId: string;
   ts: number;
   verification: RedTeamVerification;
+  /**
+   * The sealed `amc-redteam-runner` ledger session every attack prompt, reply and result row of this run was written
+   * into (SH-TRUST-03); absent when the run wrote no rows (`noSign` without AMC_NO_SIGN=1).
+   */
+  sessionId?: string;
+  /** The unsigned store the rows went to under AMC_NO_SIGN=1; signed readers never open it. */
+  evidenceStore?: string;
+  /** Seal fields in the shape `sealedRunReportVerifies` reads; "unsigned" when the run was not signed. */
+  reportJsonSha256?: string;
+  runSealSig?: string;
   strategies: string[];
   plugins: string[];
   pluginResults: RedTeamPluginResult[];
@@ -160,8 +175,8 @@ export interface RunRedTeamInput {
   /** Path to write markdown report. */
   output?: string;
   /**
-   * Run as unsigned local red-team evidence. The runner currently has no
-   * vault-signing path, so this defaults to true and is reported explicitly.
+   * Run as unsigned local red-team evidence (the default, as the CI gate runs it). `false` writes every attack row
+   * into a sealed ledger session and signs the report with the artifact-seal key; a locked vault then refuses the run.
    */
   noSign?: boolean;
   /** Also run built-in Evil MCP agent-provider scenarios. */
@@ -450,18 +465,14 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
   const context = buildPromptContext(workspace, agentId);
   const runId = randomUUID();
   const now = Date.now();
-  const explicitNoSign = input.noSign ?? true;
-  const verification: RedTeamVerification = {
-    status: "UNSIGNED_VALID",
-    signed: false,
-    mode: "unsigned-local",
-    evidenceUse: "local-redteam",
-    explanation:
-      explicitNoSign
-        ? "Valid local red-team evidence for adversarial testing; not a cryptographically signed AMC claim."
-        : "Red-team vault signing is not available in this runner yet; treating output as valid local evidence, not a cryptographically signed AMC claim.",
-    requiredForClaims: true,
-  };
+  const noSign = input.noSign ?? true;
+  // SH-TRUST-03: a signed run writes its rows into the signed ledger; an unsigned run writes them only under
+  // AMC_NO_SIGN=1, into the unsigned store, and otherwise records nothing (no vault is needed for local red-teaming).
+  const unsignedStore = process.env.AMC_NO_SIGN === "1";
+  const recordRows = !noSign || unsignedStore;
+  const assertOriginal = captureRunHashAuthority(workspace, noSign);
+  const ledger = recordRows ? openLedger(workspace, unsignedStore ? { store: "unsigned" } : {}) : null;
+  const trustTier = "OBSERVED" as const;
 
   // Resolve plugins (packs)
   const packs: AssurancePackDefinition[] =
@@ -480,6 +491,10 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
     agentId,
     model: input.model
   });
+  const sessionId = ledger === null ? null
+    : startAssuranceSession({ ledger, mode: "supervise", agentId, packIds: packs.map((pack) => pack.id), trustTier, source: "redteam" });
+  const rows = ledger === null || sessionId === null ? null : { ledger, sessionId, runtime: "any" as const, trustTier, agentId, source: "redteam" as const };
+  try {
 
   const allVulns: RedTeamVulnerability[] = [];
   const pluginResults: RedTeamPluginResult[] = [];
@@ -505,6 +520,12 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
           strategyId: strat.id,
           strategyName: strat.name
         };
+        const scenarioRow = { packId: pack.id, scenarioId: row.scenarioId };
+        const promptEventId = rows === null ? null : writeScenarioPrompt({ ...rows, ...scenarioRow, prompt: attackPrompt });
+        const inconclusiveRow = (response: string, reasons: string[], ids: string[]) => {
+          if (rows !== null) writeAssuranceAudit({ ...rows, ...scenarioRow, auditType: "REDTEAM_SCENARIO_INCONCLUSIVE", severity: "HIGH", message: `Attack not measured: ${reasons.join(" | ")}` });
+          return { ...row, response, pass: false, score0to5: 0, score0to100: 0, reasons, auditEventTypes: [] as string[], evidenceEventIds: ids, inconclusive: true };
+        };
         const answer = await responder.respond(attackPrompt).catch((error: unknown) => {
           if (!(error instanceof AgentResponderInvocationError)) throw error;
           return error;
@@ -512,20 +533,28 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
         // Not reached => not attacked. Refused, tool-call-only or token-claim => not graded. Neither is ever scored.
         if (answer instanceof AgentResponderInvocationError) {
           inconclusiveCount += 1;
-          scenarioResults.push({ ...row, response: "", pass: false, score0to5: 0, score0to100: 0,
-            reasons: [`INCONCLUSIVE: agent under test could not be invoked — ${answer.message}`], auditEventTypes: [], inconclusive: true });
+          scenarioResults.push(inconclusiveRow("", [`INCONCLUSIVE: agent under test could not be invoked — ${answer.message}`], promptEventId === null ? [] : [promptEventId]));
           continue;
         }
         const response = answer.text;
         const toolCalls = answer.toolCalls.length > 0 ? { toolCalls: answer.toolCalls } : {};
+        const correlatedRequestIds = answer.receiptId === undefined ? [] : [receiptIdOf(answer.receiptId) ?? sha256Hex(answer.receiptId)];
+        const responseEventId = rows === null ? null : writeScenarioResponse({ ...rows, ...scenarioRow, response, toolCalls: answer.toolCalls,
+          ...(answer.receiptId === undefined ? {} : { requestReceipt: answer.receiptId }), ...(answer.responseReceipt === undefined ? {} : { responseReceipt: answer.responseReceipt }) });
+        const exchangeIds = promptEventId === null || responseEventId === null ? [] : [promptEventId, responseEventId];
         const grade = gradeScenarioReply(scenario, answer, attackPrompt, context);
         if (grade.kind === "inconclusive") {
           inconclusiveCount += 1;
-          scenarioResults.push({ ...row, response, pass: false, score0to5: 0, score0to100: 0, reasons: grade.reasons,
-            auditEventTypes: grade.auditTypes, inconclusive: true, inconclusiveCause: grade.cause, ...toolCalls });
+          scenarioResults.push({ ...inconclusiveRow(response, grade.reasons, exchangeIds), auditEventTypes: grade.auditTypes, inconclusiveCause: grade.cause, ...toolCalls });
           continue;
         }
         const { validation } = grade;
+        const testEventId = rows === null ? null : writeScenarioTestResult({ ...rows, ...scenarioRow, score0to100: grade.score0to100, pass: validation.pass,
+          reasons: validation.reasons, correlatedRequestIds });
+        for (const auditType of rows === null ? [] : validation.auditTypes) {
+          writeAssuranceAudit({ ...rows!, ...scenarioRow, auditType, severity: auditType.endsWith("_SUCCEEDED") ? "CRITICAL" : "HIGH",
+            message: validation.pass ? `${auditType} observed during red-team execution.` : validation.reasons.join(" | ") });
+        }
 
         scenarioResults.push({
           ...row,
@@ -536,6 +565,9 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
           reasons: validation.reasons,
           auditEventTypes: validation.auditTypes,
           gradingMethod: grade.gradingMethod,
+          correlatedRequestIds,
+          evidenceEventIds: testEventId === null ? exchangeIds : [...exchangeIds, testEventId],
+          responseTransport: responder.target.transport,
           ...toolCalls
         });
 
@@ -586,11 +618,25 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
     totalScenarios === 0 ? "INSUFFICIENT_EVIDENCE" : "MEASURED";
   const overallScore = totalScenarios === 0 ? 0 : Math.round((totalPass / totalScenarios) * 100);
 
+  if (ledger !== null && sessionId !== null) ledger.sealSession(sessionId);
+  const integrity = noSign ? null : await verifyLedgerIntegrity(workspace, { trust: workspaceSelfTrust(workspace) });
+  const verification: RedTeamVerification = noSign
+    ? { status: "UNSIGNED_VALID", signed: false, mode: "unsigned-local", evidenceUse: "local-redteam", requiredForClaims: true,
+        explanation: unsignedStore
+          ? "Valid local red-team evidence for adversarial testing, recorded unsigned in the AMC_NO_SIGN store; not a cryptographically signed AMC claim."
+          : "Valid local red-team evidence for adversarial testing; no ledger rows were written and nothing is signed. Run without --no-sign to seal and sign the run." }
+    : { status: integrity!.ok ? "SIGNED_VALID" : "SIGNED_INVALID", signed: true, mode: "vault-signed", evidenceUse: integrity!.ok ? "verified-claim" : "local-redteam", requiredForClaims: true,
+        explanation: integrity!.ok
+          ? "Every attack prompt, reply and result is a signed row of a sealed ledger session, and the report is sealed with the artifact-seal key."
+          : `The run's rows are sealed, but the workspace ledger did not verify: ${integrity!.errors.slice(0, 3).join("; ")}` };
+
   const report: RedTeamReport = {
     runId,
     agentId,
     ts: now,
     verification,
+    ...(sessionId === null ? {} : { sessionId }),
+    ...(unsignedStore && sessionId !== null ? { evidenceStore: UNSIGNED_EVIDENCE_STORE } : {}),
     strategies: strats.map((s) => s.id),
     plugins: packs.map((p) => p.id),
     pluginResults,
@@ -635,15 +681,39 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
     };
   }
 
+  // Seal the report the way the assurance runner seals its own: hash with the seal fields emptied, sign that hash
+  // with the artifact-seal key (`sealedRunReportVerifies` is the one reader of this shape).
+  const body: RedTeamReport = { ...report, reportJsonSha256: "", runSealSig: "" };
+  const hash = sha256Hex(canonicalize(body));
+  let runSealSig = "unsigned";
+  if (!noSign) {
+    const prepared = await ledger!.signRunHashAsync(hash, assertOriginal);
+    prepared.assertCurrent();
+    runSealSig = prepared.signature;
+  }
+  const sealed: RedTeamReport = { ...body, reportJsonSha256: hash, runSealSig };
+
   // Write outputs
   const reportsDir = join(workspace, ".amc", "redteam", agentId);
   await ensureDir(reportsDir);
 
   const jsonPath = join(reportsDir, `${runId}.json`);
-  await writeFileAtomic(jsonPath, canonicalize(report));
+  assertOriginal();
+  await writeFileAtomic(jsonPath, canonicalize(sealed));
 
   const mdPath = input.output || join(reportsDir, `${runId}.md`);
-  await writeFileAtomic(mdPath, renderRedTeamMarkdown(report));
+  await writeFileAtomic(mdPath, renderRedTeamMarkdown(sealed));
 
-  return report;
+  return sealed;
+  } catch (error) {
+    if (ledger !== null && sessionId !== null) throw sealAbortedAssuranceSession({ ledger, sessionId, runId, agentId, error });
+    throw error;
+  } finally {
+    ledger?.close();
+  }
+}
+
+/** The receipt id inside a gateway receipt string, or null when it does not parse. */
+function receiptIdOf(receipt: string): string | null {
+  try { return parseReceipt(receipt).payload.receipt_id; } catch { return null; }
 }
