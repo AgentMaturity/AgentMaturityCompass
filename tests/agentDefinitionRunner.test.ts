@@ -83,14 +83,16 @@ describe("a real child under a definition", () => {
     if (!applied.ok) throw new Error(applied.reason);
     const session = parentSession(dir);
     const outcome = await spawnSubagent({ workspace: dir, parent: rootIdentity("payments-agent"), request: applied.request, session,
-      runner: runnerFor(dir, [toolStep("t1", "fs.read", JSON.stringify({ path: "README.md" })), textStep("fs.read was not available to me.")]),
+      runner: runnerFor(dir, [toolStep("t0", "glob", JSON.stringify({ pattern: "*.md" })),
+        toolStep("t1", "fs.read", JSON.stringify({ path: "README.md" })), textStep("fs.read was not available to me.")]),
       mintSessionId: () => "child-under-reviewer" });
     expect(outcome.ok, outcome.ok ? "" : outcome.reason).toBe(true);
     const child = rows(dir, "child-under-reviewer");
     const control = child.find(meta => meta["kind"] === "delegation/hook-control")!;
     expect(control["agentDefinition"]).toEqual({ name: "reviewer", sha256: "c".repeat(64), tools: ["glob"], maxSteps: null });
-    const denied = child.filter(meta => typeof meta["denialStage"] === "string");
-    expect(denied.length, "the fs.read call outside the allowlist was denied").toBeGreaterThan(0);
+    // Exactly one denial: the allowlisted glob call went through, and fs.read is not even a name the child's registry knows.
+    const denials = child.filter(meta => meta["auditType"] === "TOOL_CALL_DENIED").map(meta => ({ stage: meta["denialStage"], reason: meta["denialReason"] }));
+    expect(denials).toEqual([{ stage: "visibility", reason: expect.stringMatching(/unknown tool "fs.read"/) }]);
     session.disposeWithoutClosing();
   });
 

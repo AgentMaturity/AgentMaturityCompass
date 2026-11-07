@@ -1,5 +1,5 @@
 import { realpathSync } from "node:fs";
-import { relative, resolve, sep } from "node:path";
+import { relative, resolve } from "node:path";
 import { readContainedOrNull } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { MAX_PLAN_BYTES, parseWorkflowPlan, type WorkflowNode } from "./workflowPlan.js";
@@ -20,12 +20,11 @@ export function readWorkflowPlanFile(workspace: string, file: string): WorkflowP
   try { root = realpathSync(workspace); }
   catch { return { ok: false, reason: "the workspace could not be resolved" }; }
   const rel = relative(root, resolve(root, file));
-  if (rel.length === 0 || rel.startsWith("..") || rel.startsWith(sep) || rel.includes(`${sep}..${sep}`)) {
-    return { ok: false, reason: `--workflow-plan must name a regular file inside the workspace: ${file}` };
-  }
+  if (rel.length === 0) return { ok: false, reason: `--workflow-plan must name a regular file inside the workspace: ${file}` };
+  // The contained reader refuses traversal, symlinks, special files and oversize in one place; nothing is re-checked here.
   let bytes: Buffer | null;
   try { bytes = readContainedOrNull(root, rel, MAX_PLAN_BYTES); }
-  catch (error) { return { ok: false, reason: `--workflow-plan could not be read as a regular file inside the workspace: ${error instanceof Error ? error.message : String(error)}` }; }
+  catch (error) { return { ok: false, reason: `--workflow-plan must name a regular file inside the workspace (${file}): ${error instanceof Error ? error.message : String(error)}` }; }
   if (bytes === null) return { ok: false, reason: `--workflow-plan file not found: ${file}` };
   let raw: unknown;
   try { raw = JSON.parse(bytes.toString("utf8")); }
