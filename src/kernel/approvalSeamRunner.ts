@@ -55,7 +55,7 @@ export interface ComposedApprovalOutcome {
 }
 
 /** Read a composed service off the tree by the name its seam declares. */
-function serviceOn<T>(ctx: Context, name: string): T {
+export function serviceOn<T>(ctx: Context, name: string): T {
   const found = (ctx as unknown as Record<string, T | undefined>)[name];
   if (found === undefined) {
     throw new Error(`composition did not provide ${name}; the fiber booted but registered no service`);

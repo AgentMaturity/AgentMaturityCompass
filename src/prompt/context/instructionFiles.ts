@@ -203,23 +203,17 @@ function probe(candidate: InstructionCandidate, workspace: string): Probe {
   }
 }
 
-/** Read one candidate that a probe called present. */
-function readCandidate(
-  candidate: InstructionCandidate,
-  options: InstructionLoadOptions,
-  maxFileBytes: number
-): { readonly content: string; readonly bytes: number } | null {
+/**
+ * Read one bounded UTF-8 workspace file, or null when it cannot be read exactly. Shared with the import reader.
+ * An oversize file returns empty content with its true size so the caller can name the cap.
+ */
+export function readBoundedInstructionText(root: string, path: string, maxFileBytes: number, readTextFile?: (absolutePath: string) => string): { readonly content: string; readonly bytes: number } | null {
   try {
-    if (options.readTextFile !== undefined) {
-      const content = options.readTextFile(candidate.absolutePath);
+    if (readTextFile !== undefined) {
+      const content = readTextFile(resolve(root, path));
       return { content, bytes: Buffer.byteLength(content, "utf8") };
     }
-    const result = readWorkspaceFile(
-      candidate.scope === "project" ? options.workspace : dirname(candidate.absolutePath),
-      candidate.scope === "project" ? candidate.displayPath : candidate.fileName,
-      maxFileBytes + 1,
-      maxFileBytes
-    );
+    const result = readWorkspaceFile(root, path, maxFileBytes + 1, maxFileBytes);
     if (result === null) return null;
     if (result.size > maxFileBytes) return { content: "", bytes: result.size };
     if (!result.complete) return null;
@@ -233,6 +227,15 @@ function readCandidate(
     // it: something was there a moment ago, and the operator should hear so.
     return null;
   }
+}
+
+/** Read one candidate that a probe called present. */
+function readCandidate(candidate: InstructionCandidate, options: InstructionLoadOptions, maxFileBytes: number): { readonly content: string; readonly bytes: number } | null {
+  return readBoundedInstructionText(
+    candidate.scope === "project" ? options.workspace : dirname(candidate.absolutePath),
+    candidate.scope === "project" ? candidate.displayPath : candidate.fileName,
+    maxFileBytes, options.readTextFile
+  );
 }
 
 /**
@@ -319,7 +322,7 @@ export function loadInstructionFiles(options: InstructionLoadOptions): Instructi
     const resolved = candidate.scope === "project"
       ? resolveInstructionImports({ workspace: identity?.realPath ?? resolve(options.workspace), importedBy: candidate.displayPath,
         content: content.content, maxFileBytes, alreadyLoaded: new Set(loaded.flatMap((file) => [file.candidate.displayPath, ...file.imports.map((entry) => entry.displayPath)])),
-        ...(options.readTextFile === undefined ? {} : { readTextFile: (path: string) => options.readTextFile!(resolve(options.workspace, path)) }) })
+        ...(options.readTextFile === undefined ? {} : { readTextFile: options.readTextFile }) })
       : { imports: [], omitted: [] };
     omitted.push(...resolved.omitted);
     loaded.push({ candidate, content: content.content, bytes: content.bytes, sha256: sha256Hex(content.content), imports: resolved.imports });

@@ -19,8 +19,8 @@ export interface ContinuityOptions extends RunOptions {
   readonly interactiveSteer?: boolean;
 }
 
-export const CONTINUE_HELP = "continue the most recent released native session for this agent in this workspace (the same flags as its original run are required)";
-export const STOP_HELP = "repeatable run limit: max-turns:N (highest session turn number that may open), max-tokens:N (provider-reported tokens over the session) or timeout-ms:N (wall clock from start); a breach is a signed cancel with cause limit";
+const CONTINUE_HELP = "continue the most recent released native session for this agent in this workspace (the same flags as its original run are required)";
+const STOP_HELP = "repeatable run limit: max-turns:N (highest session turn number that may open), max-tokens:N (provider-reported tokens over the session) or timeout-ms:N (wall clock from start); a breach is a signed cancel with cause limit";
 
 function collect(value: string, previous: string[] = []): string[] { return [...previous, value]; }
 

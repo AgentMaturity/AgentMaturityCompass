@@ -25,10 +25,10 @@ it("reports last and peak prompt tokens per turn, keeps null null, and matches t
   session.startTurn({ trigger: "user" });
   session.startStep(); session.endStep({ stopReason: "tool_calls", usage: { inputTokens: 100, outputTokens: 5, cacheRead: 20, cacheWrite: null } });
   session.startStep(); session.endStep({ stopReason: "stop", usage: { inputTokens: 140, outputTokens: 5, cacheRead: 30, cacheWrite: null } });
-  session.endTurn({ reason: "complete", cancelCause: null }); session.sealTurn();
+  session.endTurn({ reason: "complete" }); session.sealTurn();
   session.startTurn({ trigger: "followup" });
   session.startStep(); session.endStep({ stopReason: "stop", usage: null });
-  session.endTurn({ reason: "complete", cancelCause: null }); session.sealTurn();
+  session.endTurn({ reason: "complete" }); session.sealTurn();
   session.close({ reason: "completed" });
   const ledger = openLedger(workspace, { readonly: true });
   const rows = ledger.getAllEvents().filter(row => row.session_id === session.sessionId);

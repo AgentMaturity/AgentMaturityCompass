@@ -73,7 +73,7 @@ export const INSTRUCTION_FILE_NAMES: readonly string[] = Object.freeze([
 ]);
 
 /** Local overlays, weakest first; discovered per directory in native (workspace-only or touched) mode. */
-export const LOCAL_OVERLAY_FILE_NAMES: readonly string[] = Object.freeze(["CLAUDE.local.md", "AMC.local.md", "AGENTS.local.md"]);
+const LOCAL_OVERLAY_FILE_NAMES: readonly string[] = Object.freeze(["CLAUDE.local.md", "AMC.local.md", "AGENTS.local.md"]);
 
 /** The scopes, WEAKEST FIRST. Project overrides user; see the module header. */
 export const INSTRUCTION_SCOPES: readonly InstructionScope[] = Object.freeze([

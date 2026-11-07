@@ -22,7 +22,7 @@ import { readSessionWriter } from "./sessionOwnership.js";
 import { assertSessionContinuationControls, SessionContinuationControlRefused } from "./sessionContinuationControls.js";
 import { extractEnvelope } from "./sessionTypes.js";
 
-export type NativeSessionState = "released" | "active" | "sealed" | "interrupted" | "unknown";
+type NativeSessionState = "released" | "active" | "sealed" | "interrupted" | "unknown";
 
 /** One native session as navigation sees it. */
 export interface NativeSessionSummary {

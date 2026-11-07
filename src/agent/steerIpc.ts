@@ -17,13 +17,14 @@
  * the turn ends so an IPC channel never keeps the child alive.
  */
 import type { InboxReceipt } from "./loopTypes.js";
+import { ipcFrame as record } from "../setup/nativeInteractiveAskUser.js";
 
 export const STEER_FRAME = "amc/native-steer";
 export const WITHDRAW_FRAME = "amc/native-withdraw";
 export const INBOX_RECEIPT_FRAME = "amc/native-inbox-receipt";
 
 /** Larger text is still accepted by the inbox (it spills); this bounds what one IPC frame may carry. */
-export const MAX_STEER_FRAME_BYTES = 256 * 1024;
+const MAX_STEER_FRAME_BYTES = 256 * 1024;
 const MESSAGE_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
 const CLIENT_REQUEST_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
 
@@ -40,11 +41,6 @@ export interface SteerTarget {
   steer(text: string, clientRequestId?: string): InboxReceipt;
   queue(text: string, clientRequestId?: string): InboxReceipt;
   withdraw(messageId: string): boolean;
-}
-
-function record(value: unknown, type: string): Record<string, unknown> | null {
-  return value !== null && typeof value === "object" && (value as { type?: unknown }).type === type && (value as { v?: unknown }).v === 1
-    ? value as Record<string, unknown> : null;
 }
 
 /** Validate one steer frame: the exact shape, or the reason it is refused. */

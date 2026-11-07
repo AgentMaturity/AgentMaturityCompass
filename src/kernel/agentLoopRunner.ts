@@ -82,6 +82,7 @@ import type { SubagentCapability } from "../agent/delegateTool.js";
 import type { TurnCancelCause } from "../session/sessionTypes.js";
 import { amcVersion } from "../version.js";
 import { compositionDigestOf, policyDigestOf, promptProfileFor } from "./composedTurnIdentity.js";
+import { serviceOn } from "./approvalSeamRunner.js";
 import { recordPlanMode } from "../agent/planMode.js";
 import { priorTokensOf, type RunLimits } from "../agent/runLimits.js";
 import { sessionTokenCounts } from "../session/sessionTokenCounts.js";
@@ -350,15 +351,6 @@ export interface ComposedTurnOutcome {
   readonly parent?: SessionLineage | null;
   /** True when the session was left unsealed for a later process. */
   readonly keptOpen?: boolean;
-}
-
-/** Read a composed service off the tree by the name its seam declares. */
-function serviceOn<T>(ctx: Context, name: string): T {
-  const found = (ctx as unknown as Record<string, T | undefined>)[name];
-  if (found === undefined) {
-    throw new Error(`composition did not provide ${name}; the fiber booted but registered no service`);
-  }
-  return found;
 }
 
 /**

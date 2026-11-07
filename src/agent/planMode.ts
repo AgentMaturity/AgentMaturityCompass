@@ -34,12 +34,12 @@ import type { ContextPlugin } from "../prompt/context/contextTypes.js";
 import type { SessionService } from "../session/sessionService.js";
 import { deniedToolNamesForScope } from "./delegationScope.js";
 
-export const PLAN_MODE_CONTEXT = "context:plan-mode";
+const PLAN_MODE_CONTEXT = "context:plan-mode";
 /** After instructions (100) and mission (125), before the clock (900). */
 export const PLAN_MODE_CONTEXT_ORDER = 150;
 
 /** READ_ONLY by class, denied by name: they cause effects through another seam. */
-export const PLAN_MODE_DENIED_TOOLS: readonly string[] = Object.freeze(["delegate", "workflow", "job_kill"]);
+const PLAN_MODE_DENIED_TOOLS: readonly string[] = Object.freeze(["delegate", "workflow", "job_kill"]);
 
 export const PLAN_MODE_GUARD = "plan-mode";
 export const PLAN_MODE_DENIAL = "plan mode: only READ_ONLY tools run in this turn; record the plan with the plan tool and the operator executes it in a turn started without --plan";

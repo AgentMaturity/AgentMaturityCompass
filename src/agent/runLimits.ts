@@ -30,7 +30,7 @@
  */
 import type { TokenUsage } from "../session/sessionTypes.js";
 
-export type RunLimitCondition = "max-turns" | "max-tokens" | "deadline";
+type RunLimitCondition = "max-turns" | "max-tokens" | "deadline";
 
 export interface RunLimits {
   /** The highest session turn number that may open. */
@@ -87,7 +87,7 @@ export function priorTokensOf(counts: { readonly turns: readonly { readonly step
 }
 
 /** All tokens a step reported, or null when it reported none. */
-export function totalTokensOf(usage: TokenUsage | null): number | null {
+function totalTokensOf(usage: TokenUsage | null): number | null {
   if (usage === null) return null;
   const total = usage.inputTokens + usage.outputTokens + (usage.cacheRead ?? 0) + (usage.cacheWrite ?? 0);
   return Number.isSafeInteger(total) && total >= 0 ? total : null;

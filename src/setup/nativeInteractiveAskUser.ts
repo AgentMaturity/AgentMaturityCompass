@@ -24,7 +24,8 @@ const SESSION_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/;
 
 interface Asked { readonly type: typeof ASKED; readonly v: 1; readonly sessionId: string; readonly questionId: string }
 
-function message(value: unknown, type: string): Record<string, unknown> | null {
+/** One versioned IPC frame of the given type, or null. Shared with the steer frames (src/agent/steerIpc.ts). */
+export function ipcFrame(value: unknown, type: string): Record<string, unknown> | null {
   return value !== null && typeof value === "object" && (value as { type?: unknown }).type === type && (value as { v?: unknown }).v === 1
     ? value as Record<string, unknown> : null;
 }
@@ -41,7 +42,7 @@ export function ipcAskUserAnswerer(): AskUserAnswerer {
       signal.removeEventListener("abort", onAbort);
     };
     const onMessage = (value: unknown): void => {
-      const reply = message(value, ANSWERED);
+      const reply = ipcFrame(value, ANSWERED);
       if (reply?.questionId !== question.questionId) return;
       cleanup();
       resolveAnswer((reply.answer ?? null) as SignedAskUserAnswer | null);
@@ -123,9 +124,9 @@ export function createNativeInteractiveAskUser(options: NativeAskUserPromptOptio
   };
   const onMessage = (value: unknown): void => {
     if (closed) return;
-    const cancel = message(value, CANCELLED);
+    const cancel = ipcFrame(value, CANCELLED);
     if (cancel) { aborts.get(String(cancel.questionId))?.abort(); return; }
-    const asked = message(value, ASKED) as Asked | null;
+    const asked = ipcFrame(value, ASKED) as Asked | null;
     if (!asked) return;
     if (typeof asked.questionId !== "string" || !QUESTION_ID.test(asked.questionId) || typeof asked.sessionId !== "string" || !SESSION_ID.test(asked.sessionId)) {
       options.error("ask_user IPC named an invalid question; no answer was given."); return;
