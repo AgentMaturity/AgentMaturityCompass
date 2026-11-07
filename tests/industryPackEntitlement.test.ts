@@ -92,6 +92,12 @@ describe("Industry Packs are free", () => {
       expect(getIndustryPackEntitlement(createWorkspace(), env)).toMatchObject({ active: true, source: "free", checkoutUrl: null });
     }
     expect(getIndustryPackEntitlement(createWorkspace(), { AMC_HOME: licence.amcHome } as NodeJS.ProcessEnv).licenseVerificationConfigured).toBe(true);
+    // The two values the trust list still computes: a broken list configures nothing, and activation says why and writes nothing.
+    expect(getIndustryPackEntitlement(createWorkspace(), { AMC_HOME: home } as NodeJS.ProcessEnv).licenseVerificationConfigured).toBe(false);
+    const workspace = createWorkspace();
+    expect(() => activateIndustryPackAccess({ workspace, licenseKey: licence.licenseKey, env: { AMC_HOME: home } }))
+      .toThrow(/trust configuration could not be read/);
+    expect(existsSync(join(workspace, ".amc", "industry-packs-access.json"))).toBe(false);
   });
 
   test("the hosted API offers no checkout", () => {

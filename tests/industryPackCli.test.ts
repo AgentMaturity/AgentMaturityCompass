@@ -8,6 +8,8 @@ import { statusDimensionsSchema } from "../src/claims/eligibility/index.js";
 import {
   getIndustryPackEntitlement, INDUSTRY_PACKS_FREE_MESSAGE, INDUSTRY_PACKS_FREE_PLAN_ID
 } from "../src/domains/industryPackEntitlement.js";
+import { getPackById } from "../src/domains/industryPacks.js";
+import { QUESTIONNAIRE_NOTICE } from "../src/domains/questionnaireLabel.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { testIndustryPackLicence, type TestIndustryPackLicence } from "./helpers/industryPackLicence.js";
 
@@ -48,9 +50,10 @@ for (const name of ["lookup", "resolve", "resolve4", "resolve6", "resolveAny", "
 }
 globalThis.fetch = deny; globalThis.WebSocket = class { constructor() { deny(); } };
 syncBuiltinESMExports();\n`);
-  // No licence and no trust list: the CLI child runs every pack command on the free plan.
+  // No licence and no trust list: the CLI child runs every pack command on the free plan. AMC_HOME is explicit so the
+  // in-process check below reads the fixture home, never the developer's real one (tests/setup/guardWorkspace.ts).
   environment = {
-    PATH: `${dirname(process.execPath)}${delimiter}/usr/bin${delimiter}/bin`, HOME: fixtureHome,
+    PATH: `${dirname(process.execPath)}${delimiter}/usr/bin${delimiter}/bin`, HOME: fixtureHome, AMC_HOME: join(fixtureHome, ".config", "amc"),
     NO_COLOR: "1", TERM: "dumb", NODE_ENV: "test", AMC_CLAIM_LABELS_STRICT: "1",
     NODE_OPTIONS: `--import=${pathToFileURL(guard).href}`,
   };
@@ -141,8 +144,50 @@ describe("Industry Pack CLI with no licence", () => {
     expect(result.status, result.stderr).toBe(1);
     expect(result.stderr).toContain(`Pack not found: ${packId}`);
     expect(result.stdout + result.stderr).not.toMatch(/industry_packs_locked|Industry Packs are locked|requires active/i);
-    expect(result.stdout).not.toContain('"packId"');
-    expect(result.stdout).not.toContain('"claimKind"');
+    // --json: the refusal and its hint go to stderr, so stdout carries no result and no plain text.
+    expect(result.stdout).toBe("");
+  });
+
+  test("describe and run --json keep stdout clean for an unknown pack", async () => {
+    for (const command of ["describe", "run"]) {
+      const result = await invoke(`unknown-${command}`, ["domain", "pack", command, "--pack", "no-such-pack", "--json"]);
+      completed(result);
+      expect(result.status, result.stderr).toBe(1);
+      expect(result.stdout).toBe("");
+      expect(result.stderr).toContain("List available packs: amc domain pack list");
+    }
+  });
+
+  test("describe and a baseline run in text say the content is experimental and self-reported", async () => {
+    const describe = await invoke("free-describe-text", ["domain", "pack", "describe", "--pack", "clinical-trials"]);
+    completed(describe);
+    expect(describe.status, describe.stderr).toBe(0);
+    expect(describe.stdout).toContain(`Content:    experimental, self-reported questionnaire. ${QUESTIONNAIRE_NOTICE}`);
+    const run = await invoke("free-run-text", ["domain", "pack", "run", "--pack", "clinical-trials", "--baseline"]);
+    completed(run);
+    expect(run.status, run.stderr).toBe(0);
+    expect(run.stdout).toContain(QUESTIONNAIRE_NOTICE);
+    // A baseline answers nothing: the result names how many of the pack's questions were evaluated, not a bare 0.
+    expect(run.stdout).toContain(`Evaluated:           0 of ${getPackById("clinical-trials")!.questions.length} questions`);
+    expect(run.stdout).not.toMatch(/Questions: +0\b/);
+  });
+});
+
+describe("colour switches on pack text output", () => {
+  test("forced colour reaches the output; --no-color and NO_COLOR keep it plain", async () => {
+    // A `false` default on the global --no-color once switched colour off for every command (shell children included).
+    const coloured: NodeJS.ProcessEnv = { ...environment, FORCE_COLOR: "1" };
+    delete coloured.NO_COLOR;
+    const forced = await invoke("colour-forced", ["domain", "pack", "access"], coloured);
+    completed(forced);
+    expect(forced.stdout).toContain("\x1b[");
+    for (const [name, args, env] of [["colour-flag-off", ["--no-color", "domain", "pack", "access"], coloured],
+      ["colour-env-off", ["domain", "pack", "access"], { ...coloured, NO_COLOR: "1" }]] as const) {
+      const plain = await invoke(name, [...args], env);
+      completed(plain);
+      expect(plain.status, plain.stderr).toBe(0);
+      expect(plain.stdout).not.toContain("\x1b");
+    }
   });
 });
 

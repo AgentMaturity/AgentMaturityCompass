@@ -2,6 +2,8 @@
  * Unified Run Renderer — formats the unified run result as terminal output.
  */
 
+import { stripVTControlCharacters } from "node:util";
+import chalk from "chalk";
 import type { UnifiedRunResult, LetterGrade, ModuleResult } from "./unifiedRun.js";
 
 /* ── Color helpers (ANSI) ───────────────────────────────────── */
@@ -131,7 +133,8 @@ export function renderUnifiedResult(result: UnifiedRunResult, opts?: { ci?: bool
   }
   lines.push("");
 
-  return lines.join("\n");
+  // Escapes only where chalk would colour: a terminal, without NO_COLOR or --no-color (the CLI sets chalk.level 0 for those).
+  return chalk.level > 0 ? lines.join("\n") : stripVTControlCharacters(lines.join("\n"));
 }
 
 /* ── CI-friendly output (GitHub Actions annotations) ────────── */

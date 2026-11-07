@@ -47,8 +47,8 @@ export function firstRunActions(): readonly FirstRunAction[] {
       desc: "Run the first turn keyless: the stub provider records a canned response through the signed session log (no real model answer). Its echo tool is a demonstration seam outside the firewall and allowlist; workspace tools are what the signed policy governs."
     },
     {
-      cmd: "amc agent-loop verify <session-id>",
-      desc: "Verify the recorded evidence of that turn; the run prints the session id. Verification checks integrity, not answer quality."
+      cmd: "amc agent-loop verify <session-id> --expect-monitor <monitor sha256>",
+      desc: "Verify the recorded evidence of that turn; the run prints the session id. Pin the monitor key with the sha256 of .amc/keys/monitor_ed25519.pub, recorded outside the workspace after init; without the pin the verdict is UNANCHORED and exits 1. Verification checks integrity, not answer quality."
     }
   ];
 }

@@ -182,7 +182,9 @@ describe("the first-run action plan `amc init` prints", () => {
     expect(actions).toHaveLength(3);
     expect(actions[0]?.cmd).toBe("amc firewall enable");
     expect(actions[1]?.cmd).toBe(STUB_FIRST_TURN_COMMAND);
-    expect(actions[2]?.cmd).toBe("amc agent-loop verify <session-id>");
+    // Without a pinned monitor key the verdict is UNANCHORED (exit 1), so the plan names the pin.
+    expect(actions[2]?.cmd).toBe("amc agent-loop verify <session-id> --expect-monitor <monitor sha256>");
+    expect(actions[2]?.desc).toContain(".amc/keys/monitor_ed25519.pub");
     // The keyless turn must be the stub provider with the stub model and no credential reference.
     expect(STUB_FIRST_TURN_COMMAND).toContain("--provider stub");
     expect(STUB_FIRST_TURN_COMMAND).toContain("--model amc-stub-1");

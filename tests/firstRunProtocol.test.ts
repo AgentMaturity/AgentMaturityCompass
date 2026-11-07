@@ -49,7 +49,8 @@ describe("first-run protocol against the built CLI", () => {
   test("registers the built-CLI cases only when dist/cli.js exists, and the plan names the three actions", () => {
     expect(testWithDist === undefined).toBe(!distPresent);
     const actions = firstRunActions();
-    expect(actions.map((action) => action.cmd)).toEqual(["amc firewall enable", STUB_FIRST_TURN_COMMAND, "amc agent-loop verify <session-id>"]);
+    expect(actions.map((action) => action.cmd)).toEqual(["amc firewall enable", STUB_FIRST_TURN_COMMAND,
+      "amc agent-loop verify <session-id> --expect-monitor <monitor sha256>"]);
     expect(STUB_FIRST_TURN_COMMAND).toContain("--provider stub");
   });
 

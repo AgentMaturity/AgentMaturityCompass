@@ -572,8 +572,10 @@ describe("verifyReleaseBundle (amc release verify)", () => {
     mkdirSync(join(workspace, "dist"), { recursive: true });
     writeFileSync(join(workspace, "dist", "release.amcrelease"), readFileSync(release.file));
     const result = amc(workspace, ["verify", "all", "--json"]);
-    // The JSON report comes first; the command may print its verdict after it.
-    const report = JSON.parse(`${result.stdout.split(/\n}\n/)[0]}\n}`) as { checks: Array<{ id: string; status: string; details: string[] }> };
+    // With --json stdout is one JSON document; the critical-failure summary goes to stderr, and the exit stays 1.
+    const report = JSON.parse(result.stdout) as { checks: Array<{ id: string; status: string; details: string[] }> };
+    expect(result.status, result.output).toBe(1);
+    expect(result.stderr).toContain("Critical verification failures detected.");
     const check = report.checks.find(row => row.id === "release-bundles");
     expect(check?.status, result.output).toBe("FAIL");
     expect(check?.details.join("\n")).toContain(`key ${sha(readFileSync(release.publicKeyPath, "utf8"))} is not pinned`);

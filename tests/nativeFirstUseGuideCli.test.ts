@@ -25,6 +25,8 @@ describe("native first-use CLI discovery", () => {
     expect(native.helpInformation()).toContain("guide");
     expect(renderGroupedHelp(program)).toContain("amc agent-loop guide");
     expect(renderGroupedHelp(program)).toContain("Assess existing evidence");
+    // A 33-character path still gets a space before its description.
+    expect(renderGroupedHelp(program)).toContain("  amc agent-loop verify <sessionId> Verify recorded native task evidence");
   });
 
   it.each([

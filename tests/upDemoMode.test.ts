@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
@@ -129,6 +129,15 @@ ${body}\n`);
     const began = Date.now();
     await expect(start(fakeDaemon(dir, "process.exit(3);"), dir)).rejects.toThrow(/exited during startup \(exit code 3\).*studio\.log/);
     expect(Date.now() - began).toBeLessThan(4_000);
+  });
+
+  test("names the reason the daemon logged during this start, not an earlier start's lines", async () => {
+    const dir = workspace();
+    mkdirSync(join(dir, ".amc", "studio", "logs"), { recursive: true });
+    writeFileSync(join(dir, ".amc", "studio", "logs", "studio.log"), "stale line from an earlier start\n");
+    const failure = start(fakeDaemon(dir, `console.error("credentials directory is mode 0755. Fix: chmod 700 the AMC home"); process.exit(1);`), dir);
+    await expect(failure).rejects.toThrow(/exited during startup \(exit code 1\): credentials directory is mode 0755\. Fix: chmod 700 the AMC home\. See .*studio\.log/);
+    await expect(failure).rejects.not.toThrow(/stale line/);
   });
 
   test("keeps waiting for a live daemon that is slow to write its state, as under host load", async () => {

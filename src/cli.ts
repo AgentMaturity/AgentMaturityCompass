@@ -1997,14 +1997,8 @@ async function runInstantFullScoreForAgent(params: { workspace: string; agentId:
 
 function normalizeCliErrorMessage(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error);
-  if (/User force closed the prompt/i.test(message)) {
-    return [
-      "Interactive prompt aborted.",
-      "If you are running in a non-interactive shell, set AMC_VAULT_PASSPHRASE and run:",
-      "  amc setup --non-interactive",
-      "  amc up"
-    ].join("\n");
-  }
+  // Ctrl+C in any prompt (pack run, quickscore, setup); vault-setup advice would be unrelated to most of them.
+  if (/User force closed the prompt/i.test(message)) return "Interactive prompt aborted.";
   // Publication errors wrap the actual refusal; show its cause chain so the reason is not hidden.
   const causes: string[] = [], seen = new Set<unknown>();
   for (let cause = error instanceof Error ? error.cause : undefined; cause instanceof Error && !seen.has(cause) && causes.length < 8; cause = cause.cause) {
@@ -2028,7 +2022,8 @@ program
   .addHelpText("afterAll", cliDiscoverabilityFooter());
 program.option("--agent <agentId>", "agent ID (defaults to .amc/current-agent)");
 program.option("--json", "emit structured JSON for the top-level full score", false);
-program.option("--no-color", "disable ANSI color output; equivalent to NO_COLOR=1", false);
+// No default: a `false` default made `color` false on every command, so preAction switched colour off everywhere.
+program.option("--no-color", "disable ANSI color output; equivalent to NO_COLOR=1");
 program
   .command("help [commandPath...]")
   .description("Show help for a command (for example: amc help run)")
@@ -3707,7 +3702,8 @@ program
     console.log(`\n  ${chalk.bold("Open your report card:")}  ${chalk.hex("#4AEF79").bold(`http://${state.host}:${state.apiPort}/console`)}`);
     const advancedEndpoints = [`Gateway :${state.gatewayPort}`, state.proxyPort > 0 ? `Proxy :${state.proxyPort}` : "", `Dashboard :${state.dashboardPort}`, `Studio API :${state.apiPort}`, `Bridge :${state.apiPort}/bridge`].filter(Boolean).join(" · ");
     console.log(chalk.gray(`  Advanced endpoints (optional): ${advancedEndpoints}`));
-    console.log(chalk.gray(latest ? `  Latest run: ${latest.runId} | IntegrityIndex ${latest.integrityIndex.toFixed(3)} (${latest.trustLabel})` : "  Latest run: none — running your first one below"));
+    console.log(chalk.gray(latest ? `  Latest run: ${latest.runId} | IntegrityIndex ${latest.integrityIndex.toFixed(3)} (${latest.trustLabel})`
+      : opts.baseline === false ? "  Latest run: none (baseline skipped with --no-baseline; run `amc run` when ready)" : "  Latest run: none — running your first one below"));
     await runFirstBaselineIfNeeded({
       workspace,
       agentId: state.currentAgent,
@@ -6289,9 +6285,11 @@ withTrustFlags(verifyCmd
       }
     }
     if (out.criticalFail) {
-      console.log(chalk.red("Critical verification failures detected."));
+      // --json keeps stdout one JSON document; the human summary goes to stderr.
+      const say = opts.json ? console.error : console.log;
+      say(chalk.red("Critical verification failures detected."));
       for (const reason of verifyAllTopReasons(out)) {
-        console.log(`- ${reason}`);
+        say(`- ${reason}`);
       }
       process.exit(1);
     }
@@ -23468,7 +23466,7 @@ score
         console.log(chalk.gray(`${questionIds.length} questions across 5 dimensions\n`));
         for (const qid of questionIds) {
           const { answer } = await inq.default.prompt([{
-            type: "editor",
+            type: "input",
             name: "answer",
             message: `${qid}: Describe your system's approach (or press Enter to skip):`,
           }]);
@@ -23541,7 +23539,7 @@ score
         console.log(chalk.gray("oversight integrity, CBRN governance, organizational safety posture.\n"));
         for (const qid of questionIds) {
           const { answer } = await inq.default.prompt([{
-            type: "editor",
+            type: "input",
             name: "answer",
             message: `${qid}: Describe your system's approach (or press Enter to skip):`,
           }]);

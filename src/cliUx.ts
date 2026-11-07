@@ -220,7 +220,8 @@ export const CLI_ALIASES: CliAliasEntry[] = [
 function formatHelpRow(path: string, description: string): string {
   const left = `amc ${path}`;
   const width = 33;
-  return `  ${left.padEnd(width)}${description}`;
+  // Always at least one space: a path of `width` characters or more must not run into its description.
+  return `  ${left.padEnd(width - 1)} ${description}`;
 }
 
 function commandPathSet(program: Command): Set<string> {

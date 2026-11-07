@@ -623,6 +623,7 @@ export async function startStudioDaemon(workspace: string, options: StartStudioD
   const logFile = join(studioLogsDir(workspace), "studio.log");
   const outFd = openSync(logFile, "a");
   const errFd = openSync(logFile, "a");
+  const logStart = statSync(logFile).size; // what this start appends begins here
 
   const args = [process.argv[1] ?? "", "_studio-daemon", "--workspace", workspace];
   if (options.hostDir) {
@@ -658,7 +659,11 @@ export async function startStudioDaemon(workspace: string, options: StartStudioD
     if (state && state.pid > 0 && processRunning(state.pid)) {
       return state;
     }
-    if (exited !== null) throw new Error(`Studio daemon exited during startup (${exited}). See ${logFile}.`);
+    if (exited !== null) {
+      // Name the daemon's own reason (often its fix), not only the log path; earlier runs' lines are left out.
+      const reason = readFileSync(logFile).subarray(logStart).toString("utf8").trim().slice(-600);
+      throw new Error(`Studio daemon exited during startup (${exited})${reason ? `: ${reason}` : ""}. See ${logFile}.`);
+    }
     await new Promise((resolvePromise) => setTimeout(resolvePromise, 100));
   }
 

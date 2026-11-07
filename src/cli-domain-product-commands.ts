@@ -30,7 +30,7 @@ async function packOrExit(packId: string) {
   const pack = getPackById(packId);
   if (!pack) {
     console.error(chalk.red(`Pack not found: ${packId}`));
-    console.log(chalk.gray("List available packs: amc domain pack list"));
+    console.error(chalk.gray("List available packs: amc domain pack list")); // stderr: --json stdout stays clean
     process.exit(1);
   }
   return pack;
@@ -180,6 +180,8 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       console.log(chalk.gray(`  Station:    ${pack.stationId}`));
       console.log(chalk.gray(`  Risk level: ${pack.riskTier}`));
       console.log(chalk.gray(`  Questions:  ${pack.questions.length}`));
+      const { QUESTIONNAIRE_CONTENT_STATUS, QUESTIONNAIRE_NOTICE } = await import("./domains/questionnaireLabel.js");
+      console.log(chalk.gray(`  Content:    ${pack.contentStatus ?? QUESTIONNAIRE_CONTENT_STATUS}, self-reported questionnaire. ${QUESTIONNAIRE_NOTICE}`));
       if (pack.description) console.log(`\n  ${pack.description}`);
       if (pack.regulatoryBasis?.length) {
         console.log(chalk.bold("\n  Regulatory basis:"));
@@ -254,7 +256,7 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       const { complete, answered, total } = result.selfAssessment;
       console.log(`    Self-assessment:     ${complete ? "complete" : "incomplete"} (${answered}/${total} answered; self-reported; not a certification)`);
       console.log(`    Eligible level:      ${result.eligibleLevel === null ? "none" : `L${result.eligibleLevel}`} (self-reported answers cap at L1)`);
-      console.log(`    Questions:  ${result.questionResults.length}`);
+      console.log(`    Evaluated:           ${result.questionResults.length} of ${pack.questions.length} questions`);
       const lowScoring = result.questionResults.filter(q => q.percentage < 50);
       if (lowScoring.length > 0) {
         console.log(chalk.yellow(`\n  Gaps (${lowScoring.length} below 50%):`));

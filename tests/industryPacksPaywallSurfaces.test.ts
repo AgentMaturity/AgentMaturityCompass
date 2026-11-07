@@ -84,7 +84,19 @@ describe("CLI amc domain pack", () => {
     expect(`${verify.stdout}${verify.stderr}`).toMatch(/licence verification is not configured/i);
 
     const run = amc(["domain", "pack", "run", "--pack", pack.id, "--baseline", "--json"]);
-    expect(`${run.stdout}${run.stderr}`).not.toContain("industry_packs_locked");
+    expect(run.status, run.stderr).toBe(0);
+    expect(JSON.parse(run.stdout)).toMatchObject({ packId: pack.id, claimKind: "self_reported", contentStatus: "experimental", percentage: null });
+  }, 120_000);
+
+  test("domain assess, gaps, roadmap, assurance and apply --audit run with no licence", () => {
+    for (const command of ["assess", "gaps", "roadmap", "assurance"]) {
+      const result = amc(["domain", command, "--agent", "default", "--domain", "health", "--json"]);
+      expect(result.status, `${command}: ${result.stderr}`).toBe(0);
+      expect(JSON.parse(result.stdout).claimKind, command).toBe("self_reported");
+    }
+    const audit = amc(["domain", "apply", "--agent", "default", "--pack", "clinical-trials", "--audit", "--dry-run", "--json"]);
+    expect(audit.status, audit.stderr).toBe(0);
+    expect(JSON.parse(audit.stdout)).toMatchObject({ packId: "clinical-trials", claimKind: "self_reported" });
   }, 120_000);
 });
 
@@ -148,7 +160,12 @@ describe("MCP and dashboard", () => {
     await client.connect(clientTransport);
     try {
       const result = await client.callTool({ name: "amc_score_sector_pack", arguments: { packId: pack.id, responses: {} } });
-      expect((result.content as Array<{ text: string }>)[0]!.text).not.toContain("Industry Packs are locked");
+      // A result, not an error (unknown pack, rate limit, handler failure): self-reported and, unanswered, not evaluated.
+      expect(result.isError).toBeFalsy();
+      const text = (result.content as Array<{ text: string }>)[0]!.text;
+      expect(text).toContain("**Score:** not evaluated");
+      expect(text).toContain("not a certification");
+      expect(text).not.toContain("Industry Packs are locked");
     } finally {
       await client.close();
       await server.close();
