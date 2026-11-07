@@ -1,0 +1,30 @@
+{
+  "schema": "amc.adapter-claim-manifest/v1",
+  "adapter": "gemini-cli",
+  "harness": {
+    "package": "@google/gemini-cli",
+    "versions": [],
+    "commit": "f354eebaf43b25bacb176007e449bb9a638fd101"
+  },
+  "hooks": [
+    {
+      "name": "AfterTool",
+      "role": "observe",
+      "tools": [
+        "every tool Gemini CLI reports at AfterTool"
+      ],
+      "onFailure": "proceeds",
+      "source": "docs/adapters/gemini.md",
+      "cases": []
+    }
+  ],
+  "notCovered": [
+    "every Gemini CLI tool call: `amc connect hooks install --provider gemini-cli` installs a BeforeTool command hook that answers allow or deny from the signed policy (run_shell_command is parsed into a command plan), but the Bridge registers no Gemini session and binds no authorization record for it, so the answer is advisory: AMC claims no enforcement at BeforeTool",
+    "no Gemini CLI version is qualified: neither hook has a recorded run of a pinned Gemini CLI binary, and there is no qualification record",
+    "what Gemini CLI does when the BeforeTool hook fails or times out (not verified by AMC)",
+    "calls Gemini CLI does not report at AfterTool, and sessions where the project hooks file was not loaded",
+    "tool input and output contents (AMC records their SHA-256 only)"
+  ],
+  "qualifiedAt": null,
+  "receipt": null
+}

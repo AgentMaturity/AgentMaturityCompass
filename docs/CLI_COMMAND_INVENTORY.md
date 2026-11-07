@@ -638,6 +638,14 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc integrations export-journal` | Export integration delivery journal (receipts + dead letters) | `--out <file>` | - |
 | `amc integrations init` | Create and sign integrations.yaml with vault-backed secret refs | - | - |
 | `amc integrations setup` | Generate integration config files | `--type <type>`<br>`--min-score <score>`<br>`--agent <agentId>`<br>`--output <dir>` | - |
+| `amc integrations source` | Source-driven work: observe GitHub events, admit explicit requests, propose work for human approval | - | - |
+| `amc integrations source admit` | Admit recorded observations: an explicit request by an allowed human becomes one approval request for the source's work order | `--observation <id>`<br>`--all-pending` | - |
+| `amc integrations source check` | Decide admission for one event payload against the signed policy; stores and files nothing (exit 1 when not admitted) | `--source <id>`<br>`--event <file>` | - |
+| `amc integrations source init` | Write and sign a source policy template (.amc/integrations/sources.yaml, admission off) | - | - |
+| `amc integrations source observe` | Record one GitHub issue_comment or issues event payload (the JSON at $GITHUB_EVENT_PATH) as a SourceObservation | `--source <id>`<br>`--event <file>` | - |
+| `amc integrations source sign` | Sign the edited source policy (owner mode; an invalid policy is refused) | - | - |
+| `amc integrations source status` | Show the source policy, sources, pending observations and proposals with their approval state | - | - |
+| `amc integrations source verify` | Verify the source policy signature and parse | - | - |
 | `amc integrations status` | Show integration channels and routing | - | - |
 | `amc integrations test` | Dispatch deterministic test event to an integration channel | `--channel <id>` | - |
 | `amc integrations verify` | Verify integrations config signature | - | - |

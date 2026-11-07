@@ -75,6 +75,7 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/assurance/evidenceWriters.ts", why: "assurance run start and abort bookkeeping" },
   { module: "src/assurance/packs/mobilityFunctionalSafetyPack.ts", why: "failure findings; a finding against the agent cannot raise its level" },
   { module: "src/bridge/bridgeAuth.ts", why: "lease refusal; read only by score caps" },
+  { module: "src/integrations/source/sourcePolicyStore.ts", why: "source policy signed (SH-INTEG-02): operator configuration bookkeeping, never maturity evidence" },
   { module: "src/bridge/bridgePolicyEnforcer.ts", why: "bridge refusals; read only by score caps and penalties" },
   { module: "src/bridge/bridgeServer.ts", why: "bridge failures and policy violations; read only by score caps" },
   { module: "src/budgets/budgets.ts", why: "operator budget reset" },

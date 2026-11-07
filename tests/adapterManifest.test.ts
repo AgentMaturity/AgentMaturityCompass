@@ -32,9 +32,9 @@ function enforceManifest(overrides: Partial<AdapterClaimManifest["hooks"][number
 const record = { runs: [{ version: "1.0.0", effect: false }] };
 
 describe("committed adapter claim manifests", () => {
-  test("all four harnesses have a manifest and every claim is backed by its qualification record", () => {
+  test("all five harnesses have a manifest and every claim is backed by its qualification record", () => {
     const checked = loadAdapterManifests(root);
-    expect(checked.map((entry) => entry.manifest?.adapter).sort()).toEqual(["claude-code", "codex", "dsh", "pi"]);
+    expect(checked.map((entry) => entry.manifest?.adapter).sort()).toEqual(["claude-code", "codex", "dsh", "gemini-cli", "pi"]);
     expect(checked.flatMap((entry) => entry.problems)).toEqual([]);
   });
 

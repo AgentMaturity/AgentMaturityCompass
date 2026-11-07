@@ -35,7 +35,7 @@ const hookSchema = z.strictObject({
 
 const adapterClaimManifestSchema = z.strictObject({
   schema: z.literal(ADAPTER_MANIFEST_SCHEMA),
-  adapter: z.enum(["pi", "claude-code", "codex", "dsh"]),
+  adapter: z.enum(["pi", "claude-code", "codex", "dsh", "gemini-cli"]),
   harness: z.strictObject({ package: z.string().min(1), versions: z.array(z.string().min(1)), commit: z.string().min(1).optional() }),
   hooks: z.array(hookSchema),
   notCovered: z.array(z.string().min(1)),

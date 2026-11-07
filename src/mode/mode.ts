@@ -88,6 +88,9 @@ export function assertOwnerMode(workspace: string, commandPath: string): void {
     "workorder create",
     "workorder expire",
     "ticket issue",
+    // SH-INTEG-02: writing or signing the source policy grants admission authority.
+    "integrations source init",
+    "integrations source sign",
     "lease issue",
     "lease revoke",
     // P1-23: clearing the hook audit latch (src/bridge/hookAuditLatch.ts).

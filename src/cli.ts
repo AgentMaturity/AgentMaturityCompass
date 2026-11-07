@@ -494,14 +494,8 @@ import {
   federateVerifyBundleCli,
   federateVerifyCli
 } from "./federation/federationCli.js";
-import {
-  integrationsDispatchCli,
-  integrationsExportJournalCli,
-  integrationsInitCliAsync as integrationsInitCli,
-  integrationsStatusCli,
-  integrationsTestCli,
-  integrationsVerifyCli
-} from "./integrations/integrationsCli.js";
+import { integrationsDispatchCli } from "./integrations/integrationsCli.js";
+import { registerIntegrationsCommands } from "./cli-integrations-commands.js";
 import {
   outcomesAttestCliAsync, assertOutcomesAttestOwnerMode,
   outcomesDiffCli,
@@ -13006,75 +13000,7 @@ withTrustFlags(federate
     finishVerify("Federation package", out.report, { json: opts.json, result: out, details: [`sourceOrg=${out.manifest?.sourceOrgId ?? "unknown"}`] });
   });
 
-integrations
-  .command("init")
-  .description("Create and sign integrations.yaml with vault-backed secret refs")
-  .action(async () => {
-    const out = await integrationsInitCli(process.cwd());
-    console.log(chalk.green(`Integrations config created: ${out.path}`));
-    console.log(`Signature: ${out.sigPath}`);
-  });
-
-integrations
-  .command("verify")
-  .description("Verify integrations config signature")
-  .action(() => {
-    const out = integrationsVerifyCli(process.cwd());
-    if (out.valid) {
-      console.log(chalk.green(`Integrations signature valid: ${out.sigPath}`));
-      return;
-    }
-    console.log(chalk.red(`Integrations signature invalid: ${out.reason ?? "unknown reason"}`));
-    process.exit(1);
-  });
-
-integrations
-  .command("status")
-  .description("Show integration channels and routing")
-  .action(() => {
-    console.log(JSON.stringify(integrationsStatusCli(process.cwd()), null, 2));
-  });
-
-integrations
-  .command("test")
-  .description("Dispatch deterministic test event to an integration channel")
-  .option("--channel <id>", "specific channel ID")
-  .action(async (opts: { channel?: string }) => {
-    const out = await integrationsTestCli({
-      workspace: process.cwd(),
-      channelId: opts.channel
-    });
-    console.log(JSON.stringify(out, null, 2));
-  });
-
-integrations
-  .command("dispatch")
-  .description("Dispatch a deterministic integration event")
-  .requiredOption("--event <name>", "event name")
-  .requiredOption("--agent <id>", "agent ID")
-  .option("--summary <text>", "summary")
-  .action(async (opts: { event: string; agent: string; summary?: string }) => {
-    const out = await integrationsDispatchCli({
-      workspace: process.cwd(),
-      eventName: opts.event,
-      agentId: opts.agent,
-      summary: opts.summary
-    });
-    console.log(JSON.stringify(out, null, 2));
-  });
-
-integrations
-  .command("export-journal")
-  .description("Export integration delivery journal (receipts + dead letters)")
-  .requiredOption("--out <file>", "output JSON file path")
-  .action((opts: { out: string }) => {
-    const out = integrationsExportJournalCli({
-      workspace: process.cwd(),
-      outFile: opts.out
-    });
-    console.log(chalk.green(`Integration delivery journal exported: ${out.outFile}`));
-    console.log(`receipts=${out.receiptCount} deadLetters=${out.deadLetterCount}`);
-  });
+registerIntegrationsCommands(integrations);
 
 outcomes
   .command("init")
