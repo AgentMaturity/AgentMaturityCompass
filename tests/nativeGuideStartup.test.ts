@@ -1,8 +1,10 @@
+import { resolve } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-const native = vi.hoisted(() => ({ probe: vi.fn(), rebuild: vi.fn() }));
+// A desktop launcher runtime (`npm install --prefix <runtime> <tgz>`) hoists better-sqlite3 above the AMC package.
+const native = vi.hoisted(() => ({ probe: vi.fn(), rebuild: vi.fn(), sqlite: "/runtime/node_modules/better-sqlite3/package.json" }));
 vi.mock("node:child_process", () => ({ execFileSync: native.rebuild }));
-vi.mock("node:module", () => ({ createRequire: () => () => native.probe }));
+vi.mock("node:module", () => ({ createRequire: () => Object.assign(() => native.probe, { cache: {}, resolve: () => native.sqlite }) }));
 
 const originalArgv = process.argv;
 afterEach(() => { process.argv = originalArgv; vi.unstubAllEnvs(); vi.restoreAllMocks(); vi.resetModules(); native.probe.mockReset(); native.rebuild.mockReset(); });
@@ -42,6 +44,21 @@ describe("read-only guide startup", () => {
   ])("retains ABI repair for non-guide command %j", async (...args) => {
     await startup(args);
     expect(native.probe).toHaveBeenCalledTimes(2);
-    expect(native.rebuild).toHaveBeenCalledWith(expect.any(String), ["rebuild", "better-sqlite3"], expect.objectContaining({ stdio: "ignore" }));
+    expect(native.rebuild).toHaveBeenCalledWith("npm", ["rebuild", "better-sqlite3"], expect.objectContaining({ stdio: "ignore" }));
+  });
+  it("rebuilds in the project whose node_modules holds better-sqlite3, through a shell on Windows", async () => {
+    await startup(["up", "--demo"]);
+    expect(native.rebuild).toHaveBeenCalledWith("npm", ["rebuild", "better-sqlite3"], expect.objectContaining({ cwd: resolve(native.sqlite, "../../..") }));
+    vi.resetModules();
+    native.rebuild.mockReset();
+    const platform = Object.getOwnPropertyDescriptor(process, "platform")!;
+    Object.defineProperty(process, "platform", { value: "win32" });
+    try {
+      await startup(["up", "--demo"]);
+    } finally {
+      Object.defineProperty(process, "platform", platform);
+    }
+    // npm.cmd starts only through a shell (CVE-2024-27980); one command string avoids DEP0190.
+    expect(native.rebuild).toHaveBeenCalledWith("npm rebuild better-sqlite3", expect.objectContaining({ cwd: resolve(native.sqlite, "../../.."), shell: true }));
   });
 });

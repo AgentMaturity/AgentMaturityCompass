@@ -1,15 +1,19 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createServer } from "node:net";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
-import { spawnSync } from "node:child_process";
+import { dirname, join, resolve } from "node:path";
+import { type ChildProcess, spawn, spawnSync } from "node:child_process";
 import { expect, test } from "vitest";
+
+const packager = resolve("scripts/package-desktop-installers.mjs");
 
 test.skipIf(process.platform === "win32")("macOS launcher preserves an operator-selected runtime before Finder fallbacks", () => {
   const directory = mkdtempSync(join(tmpdir(), "amc-launcher-runtime-"));
   try {
     const selectedNode = join(directory, "node");
     writeFileSync(selectedNode, "#!/bin/sh\nprintf '%s' selected-runtime\n", { mode: 0o755 });
-    const source = readFileSync(resolve("scripts/package-desktop-installers.mjs"), "utf8");
+    const source = readFileSync(packager, "utf8");
     const pathSetup = source.match(/^export PATH="[^"]+"$/m)?.[0];
     expect(pathSetup).toBeDefined();
     // Execute the production launcher's PATH setup and a real executable lookup.
@@ -20,6 +24,89 @@ test.skipIf(process.platform === "win32")("macOS launcher preserves an operator-
     expect(result.status).toBe(0);
     expect(result.stdout).toBe("selected-runtime");
     expect(result.stderr).toBe("");
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test.skipIf(process.platform === "win32")("moved macOS app installs from its own tarball, stops the old Studio on upgrade and names a taken port", async () => {
+  const directory = mkdtempSync(join(tmpdir(), "amc-launcher-flow-"));
+  const server = createServer();
+  let daemon: ChildProcess | undefined;
+  try {
+    // The app alone, moved away from the extracted archive folder that also holds a tarball.
+    const resources = join(directory, "Applications", "Agent Maturity Compass Studio.app", "Contents", "Resources");
+    mkdirSync(resources, { recursive: true });
+    writeFileSync(join(resources, "amc.tgz"), "packaged amc");
+    const digest = createHash("sha256").update("packaged amc").digest("hex");
+    const template = readFileSync(packager, "utf8").match(/const launchScript = `([\s\S]*?)`;\n/)?.[1];
+    expect(template).toBeDefined();
+    // Evaluate the production template literal with the two values the generator substitutes.
+    writeFileSync(join(resources, "launch-studio.sh"), new Function("tarballName", "tarballDigest", `return \`${template}\`;`)("amc.tgz", digest));
+
+    const stubs = join(directory, "stubs");
+    const calls = join(directory, "calls.log");
+    mkdirSync(stubs);
+    writeFileSync(join(stubs, "npm"), `#!/bin/sh\necho "npm $1 $6" >>"${calls}"\nmkdir -p "$3/node_modules/.bin"\ncp "${stubs}/amc-stub" "$3/node_modules/.bin/amc"\n`, { mode: 0o755 });
+    writeFileSync(join(stubs, "osascript"), `#!/bin/sh\necho dialog >>"${calls}"\n`, { mode: 0o755 });
+    writeFileSync(join(stubs, "amc-stub"), `#!/bin/sh
+old=gone
+[ -n "\${STUDIO_PID:-}" ] && kill -0 "$STUDIO_PID" 2>/dev/null && old=alive
+echo "amc $1 $old $(basename "$PWD")" >>"${calls}"
+[ "$1" = down ] && kill "$STUDIO_PID"
+[ "$1" = up ] && exit "\${AMC_UP_STATUS:-0}"
+exit 0
+`, { mode: 0o755 });
+    const home = join(directory, "home");
+    const support = join(home, "Library", "Application Support", "Agent Maturity Compass");
+    // Asynchronous, so this process keeps reaping its children and serving its listener while the launcher runs.
+    const launch = (env: Record<string, string> = {}) => new Promise<{ status: number | null; calls: string[] }>((done) => {
+      rmSync(calls, { force: true });
+      spawn("/bin/sh", [join(resources, "launch-studio.sh")], {
+        env: { HOME: home, PATH: `${stubs}:${dirname(process.execPath)}:/usr/bin:/bin`, ...env }, stdio: "ignore"
+      }).on("exit", (status) => done({ status, calls: existsSync(calls) ? readFileSync(calls, "utf8").trim().split("\n") : [] }));
+    });
+
+    expect(await launch()).toEqual({ status: 0, calls: [`npm install ${join(resources, "amc.tgz")}`, "amc up gone studio-workspace"] });
+    expect(readFileSync(join(support, "runtime", "package.sha256"), "utf8").trim()).toBe(digest);
+
+    // An upgrade while the previous runtime's Studio runs: a daemon that needs a moment to exit after SIGTERM.
+    writeFileSync(join(directory, "daemon.sh"), "trap 'sleep 1; exit 0' TERM\nwhile :; do sleep 1; done\n");
+    daemon = spawn("/bin/sh", [join(directory, "daemon.sh")], { stdio: "ignore" });
+    mkdirSync(join(support, "studio-workspace", ".amc", "studio"), { recursive: true });
+    writeFileSync(join(support, "studio-workspace", ".amc", "studio", "state.json"), JSON.stringify({ pid: daemon.pid }));
+    writeFileSync(join(support, "runtime", "package.sha256"), "previous-package-digest\n");
+    expect((await launch({ STUDIO_PID: String(daemon.pid) })).calls).toEqual([
+      "amc down alive studio-workspace",
+      `npm install ${join(resources, "amc.tgz")}`,
+      "amc up gone studio-workspace"
+    ]);
+
+    // A failed start explains a taken Studio port, and only then.
+    await new Promise<void>((done) => server.listen(0, "127.0.0.1", done));
+    const port = String((server.address() as { port: number }).port);
+    expect(await launch({ AMC_UP_STATUS: "1", AMC_HOST_PORT: port })).toEqual({ status: 1, calls: ["amc up gone studio-workspace", "dialog"] });
+    await new Promise<void>((done) => server.close(() => done()));
+    expect(await launch({ AMC_UP_STATUS: "1", AMC_HOST_PORT: port })).toEqual({ status: 1, calls: ["amc up gone studio-workspace"] });
+  } finally {
+    if (server.listening) server.close();
+    daemon?.kill();
+    rmSync(directory, { recursive: true, force: true });
+  }
+}, 60_000);
+
+test.each([".", ".."])("desktop packager refuses AMC_DESKTOP_PACKAGE_OUT=%s, which contains the checkout", (out) => {
+  const directory = mkdtempSync(join(tmpdir(), "amc-package-out-"));
+  try {
+    const checkout = join(directory, "checkout");
+    mkdirSync(checkout);
+    writeFileSync(join(checkout, "package.json"), "{}");
+    const result = spawnSync(process.execPath, [packager], {
+      cwd: checkout, env: { ...process.env, AMC_DESKTOP_PACKAGE_OUT: out, AMC_DESKTOP_NPM_TARBALL: "" }, encoding: "utf8", timeout: 30_000
+    });
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain("AMC_DESKTOP_PACKAGE_OUT must not contain the repository");
+    expect(existsSync(join(checkout, "package.json"))).toBe(true);
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }

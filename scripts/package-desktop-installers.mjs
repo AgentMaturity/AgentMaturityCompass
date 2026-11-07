@@ -2,12 +2,17 @@
 import { createHash } from "node:crypto";
 import { chmodSync, cpSync, mkdtempSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { basename, join, relative, resolve } from "node:path";
+import { basename, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { spawnSync } from "node:child_process";
 
 const root = resolve(process.cwd());
 const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
 const outRoot = resolve(root, process.env.AMC_DESKTOP_PACKAGE_OUT || "dist/installers");
+const outToRoot = relative(outRoot, root);
+// outRoot is deleted below, so it must never be the checkout or one of its parents.
+if (!isAbsolute(outToRoot) && outToRoot !== ".." && !outToRoot.startsWith(`..${sep}`)) {
+  throw new Error(`AMC_DESKTOP_PACKAGE_OUT must not contain the repository: ${outRoot}`);
+}
 const stagingRoot = join(outRoot, "staging");
 const packRoot = join(outRoot, "npm-pack");
 const workRoot = mkdtempSync(join(tmpdir(), "amc-desktop-package-"));
@@ -20,9 +25,15 @@ const studioWindowsPs1Name = "Agent Maturity Compass Studio.ps1";
 const studioUrl = "http://127.0.0.1:3212/w/demo/console/";
 const studioMacBrowserOpenCommand = `open "${studioUrl}"`;
 const studioWindowsOpenCommand = 'Start-Process "http://127.0.0.1:3212/w/demo/console/"';
+const studioMacStopCommand = 'cd ~/"Library/Application Support/Agent Maturity Compass/studio-workspace" && ../runtime/node_modules/.bin/amc down';
+const studioWindowsStopCommand = 'cd "$env:LOCALAPPDATA\\Agent Maturity Compass\\studio-workspace"; ..\\runtime\\node_modules\\.bin\\amc.cmd down';
 
 function run(command, args, options = {}) {
-  const result = spawnSync(command, args, {
+  // Windows starts npm.cmd only through a shell (CVE-2024-27980); one quoted command string avoids Node's DEP0190.
+  const viaShell = process.platform === "win32" && command === "npm";
+  const shellCommand = [command, ...args].map((arg) => (/\s/.test(arg) ? `"${arg}"` : arg)).join(" ");
+  const result = spawnSync(viaShell ? shellCommand : command, viaShell ? [] : args, {
+    shell: viaShell,
     cwd: options.cwd ?? root,
     env: { ...process.env, ...(options.env ?? {}) },
     encoding: "utf8",
@@ -96,6 +107,11 @@ echo "AMC installed. Run: amc --version && amc doctor"
   writeFileSync(path, script, { mode: 0o755 });
 }
 
+// A double-clicked console closes on exit, so pause on failure and keep the exit code for scripted callers.
+function windowsCmd(ps1Name) {
+  return `@echo off\r\npowershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0${ps1Name}"\r\nif errorlevel 1 (pause & exit /b 1)\r\n`;
+}
+
 function writeWindowsInstaller(targetDir, tarballName, tarballDigest) {
   const script = `$ErrorActionPreference = "Stop"
 
@@ -106,7 +122,7 @@ if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
   Write-Error "npm is required. Install Node.js 22 or 24 LTS from https://nodejs.org and rerun this installer."
 }
 
-$ActualSha256 = (Get-FileHash -Algorithm SHA256 -Path $Package).Hash.ToLowerInvariant()
+$ActualSha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $Package).Hash.ToLowerInvariant()
 if ($ActualSha256 -ne $PackageSha256) {
   throw "AMC package checksum mismatch; refusing to install."
 }
@@ -123,7 +139,7 @@ if ($InstallExitCode -ne 0) {
 Write-Host "AMC installed. Run: amc --version; amc doctor"
 `;
   writeFileSync(join(targetDir, "install.ps1"), script);
-  writeFileSync(join(targetDir, "install.cmd"), `@echo off\r\npowershell -ExecutionPolicy Bypass -File "%~dp0install.ps1"\r\n`);
+  writeFileSync(join(targetDir, "install.cmd"), windowsCmd("install.ps1"));
 }
 
 function writeMacLauncherExecutable(executablePath) {
@@ -243,6 +259,20 @@ int main(int argc, const char * argv[]) {
   @autoreleasepool {
     NSApplication *application = [NSApplication sharedApplication];
     [application setActivationPolicy:NSApplicationActivationPolicyRegular];
+    // AppKit routes Cmd+Q and the editing shortcuts through main-menu key equivalents.
+    NSMenu *mainMenu = [[NSMenu alloc] init];
+    NSMenu *appMenu = [[NSMenu alloc] init];
+    [appMenu addItemWithTitle:@"Quit ${studioAppName}" action:@selector(terminate:) keyEquivalent:@"q"];
+    [[mainMenu addItemWithTitle:@"" action:nil keyEquivalent:@""] setSubmenu:appMenu];
+    NSMenu *editMenu = [[NSMenu alloc] initWithTitle:@"Edit"];
+    [editMenu addItemWithTitle:@"Undo" action:@selector(undo:) keyEquivalent:@"z"];
+    [editMenu addItemWithTitle:@"Redo" action:@selector(redo:) keyEquivalent:@"Z"];
+    [editMenu addItemWithTitle:@"Cut" action:@selector(cut:) keyEquivalent:@"x"];
+    [editMenu addItemWithTitle:@"Copy" action:@selector(copy:) keyEquivalent:@"c"];
+    [editMenu addItemWithTitle:@"Paste" action:@selector(paste:) keyEquivalent:@"v"];
+    [editMenu addItemWithTitle:@"Select All" action:@selector(selectAll:) keyEquivalent:@"a"];
+    [[mainMenu addItemWithTitle:@"Edit" action:nil keyEquivalent:@""] setSubmenu:editMenu];
+    [application setMainMenu:mainMenu];
     AMCStudioDelegate *delegate = [[AMCStudioDelegate alloc] init];
     [application setDelegate:delegate];
     [application run];
@@ -282,6 +312,8 @@ function writeMacStudioApp(targetDir, tarballName, tarballDigest) {
   const resourcesDir = join(contentsDir, "Resources");
   mkdirSync(macosDir, { recursive: true });
   mkdirSync(resourcesDir, { recursive: true });
+  // The app carries its own copy so it still starts after it is moved out of the extracted folder.
+  cpSync(join(targetDir, tarballName), join(resourcesDir, tarballName));
 
   writeFileSync(join(contentsDir, "Info.plist"), `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -323,8 +355,7 @@ function writeMacStudioApp(targetDir, tarballName, tarballDigest) {
 set -eu
 
 APP_RESOURCES_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-PACKAGE_DIR=$(CDPATH= cd -- "$APP_RESOURCES_DIR/../../.." && pwd)
-PACKAGE="$PACKAGE_DIR/${tarballName}"
+PACKAGE="$APP_RESOURCES_DIR/${tarballName}"
 PACKAGE_DIGEST="${tarballDigest}"
 LOG_DIR="$HOME/Library/Logs/Agent Maturity Compass"
 LOG_FILE="$LOG_DIR/studio-launcher.log"
@@ -332,6 +363,7 @@ RUNTIME_DIR="$HOME/Library/Application Support/Agent Maturity Compass/runtime"
 WORKSPACE_DIR="$HOME/Library/Application Support/Agent Maturity Compass/studio-workspace"
 DIGEST_FILE="$RUNTIME_DIR/package.sha256"
 AMC_BIN="$RUNTIME_DIR/node_modules/.bin/amc"
+STATE_FILE="$WORKSPACE_DIR/.amc/studio/state.json"
 
 # Preserve an explicitly selected Node/npm runtime. Finder/LaunchServices have
 # a minimal PATH, so append the common installation locations as fallbacks.
@@ -360,6 +392,18 @@ if [ "$CURRENT_DIGEST" != "$PACKAGE_DIGEST" ] || [ ! -x "$AMC_BIN" ]; then
     osascript -e 'display dialog "Node.js 22 or 24 LTS with npm is required before launching Agent Maturity Compass Studio." buttons {"OK"} default button "OK"' >/dev/null 2>&1 || true
     exit 1
   fi
+  if [ -x "$AMC_BIN" ] && [ -f "$STATE_FILE" ]; then
+    # Stop the Studio that the previous runtime started, so the upgraded runtime serves the console.
+    # AMC_NO_AUTO_REBUILD: the old runtime is about to be replaced, so it must not repair its database engine first.
+    OLD_PID=$(node -e 'try { console.log(require(process.argv[1]).pid || "") } catch {}' "$STATE_FILE" 2>/dev/null || true)
+    (cd "$WORKSPACE_DIR" && AMC_NO_AUTO_REBUILD=1 "$AMC_BIN" down) >>"$LOG_FILE" 2>&1 || true
+    # amc down only signals the daemon, which can take up to 10 s to release its port.
+    WAITED=0
+    while [ -n "$OLD_PID" ] && kill -0 "$OLD_PID" 2>/dev/null && [ "$WAITED" -lt 15 ]; do
+      sleep 1
+      WAITED=$((WAITED + 1))
+    done
+  fi
   mkdir -p "$RUNTIME_DIR"
   npm install --prefix "$RUNTIME_DIR" --no-audit --no-fund "$PACKAGE" >>"$LOG_FILE" 2>&1
   printf '%s\n' "$PACKAGE_DIGEST" > "$DIGEST_FILE"
@@ -367,7 +411,13 @@ fi
 
 mkdir -p "$WORKSPACE_DIR"
 cd "$WORKSPACE_DIR"
-"$AMC_BIN" up --demo --no-open >>"$LOG_FILE" 2>&1
+if ! "$AMC_BIN" up --demo --no-open >>"$LOG_FILE" 2>&1; then
+  # Studio did not start, so a listener on its port belongs to another program.
+  if node -e 'require("node:net").connect(Number(process.argv[1]), "127.0.0.1").on("connect", () => process.exit(0)).on("error", () => process.exit(1))' "\${AMC_HOST_PORT:-3212}" >/dev/null 2>&1; then
+    osascript -e 'display dialog "AMC Studio could not start because another program is using its port on 127.0.0.1 (3212 unless AMC_HOST_PORT is set). Stop that program, for example with amc down in the folder where amc up was run, and open the app again." buttons {"OK"} default button "OK"' >/dev/null 2>&1 || true
+  fi
+  exit 1
+fi
 `;
   writeFileSync(join(resourcesDir, "launch-studio.sh"), launchScript, { mode: 0o755 });
   const macRuntime = writeMacLauncherExecutable(join(macosDir, studioAppName));
@@ -405,6 +455,7 @@ $RuntimeDir = Join-Path $env:LOCALAPPDATA "Agent Maturity Compass\\runtime"
 $WorkspaceDir = Join-Path $env:LOCALAPPDATA "Agent Maturity Compass\\studio-workspace"
 $DigestFile = Join-Path $RuntimeDir "package.sha256"
 $AmcBin = Join-Path $RuntimeDir "node_modules\\.bin\\amc.cmd"
+$StateFile = Join-Path $WorkspaceDir ".amc\\studio\\state.json"
 New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 
 Write-Host ""
@@ -420,29 +471,51 @@ if ($ActualPackageDigest -ne $PackageDigest.ToLowerInvariant()) {
   throw "AMC package checksum mismatch; refusing to launch. Re-download the desktop archive."
 }
 
-$CurrentDigest = if (Test-Path $DigestFile) { (Get-Content $DigestFile -Raw).Trim() } else { "" }
-if ($CurrentDigest -ne $PackageDigest -or -not (Test-Path $AmcBin)) {
+# Windows PowerShell 5.1 turns redirected native stderr (npm warnings) into terminating errors under "Stop",
+# so every native call below runs under "Continue" and is judged by its exit code.
+$CurrentDigest = if (Test-Path -LiteralPath $DigestFile) { (Get-Content -LiteralPath $DigestFile -Raw).Trim() } else { "" }
+if ($CurrentDigest -ne $PackageDigest -or -not (Test-Path -LiteralPath $AmcBin)) {
   if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
     Write-Error "Node.js 22 or 24 LTS with npm is required before launching Agent Maturity Compass Studio."
   }
+  if ((Test-Path -LiteralPath $AmcBin) -and (Test-Path -LiteralPath $StateFile)) {
+    # Stop the Studio that the previous runtime started, so the upgraded runtime serves the console.
+    # AMC_NO_AUTO_REBUILD: the old runtime is about to be replaced, so it must not repair its database engine first.
+    $OldPid = try { (Get-Content -LiteralPath $StateFile -Raw | ConvertFrom-Json).pid } catch { $null }
+    Push-Location -LiteralPath $WorkspaceDir
+    $NoAutoRebuild = $env:AMC_NO_AUTO_REBUILD
+    $env:AMC_NO_AUTO_REBUILD = "1"
+    $ErrorActionPreference = "Continue"
+    & $AmcBin down *>> $LogFile
+    $ErrorActionPreference = "Stop"
+    $env:AMC_NO_AUTO_REBUILD = $NoAutoRebuild
+    Pop-Location
+    if ($OldPid) { Wait-Process -Id $OldPid -Timeout 15 -ErrorAction SilentlyContinue }
+  }
   New-Item -ItemType Directory -Force -Path $RuntimeDir | Out-Null
+  $ErrorActionPreference = "Continue"
   npm install --prefix $RuntimeDir --no-audit --no-fund $Package *>> $LogFile
-  if ($LASTEXITCODE -ne 0) {
+  $InstallExitCode = $LASTEXITCODE
+  $ErrorActionPreference = "Stop"
+  if ($InstallExitCode -ne 0) {
     throw "Could not install the packaged AMC runtime. See $LogFile."
   }
-  Set-Content -Path $DigestFile -Value $PackageDigest -NoNewline
+  Set-Content -LiteralPath $DigestFile -Value $PackageDigest -NoNewline
 }
 
 New-Item -ItemType Directory -Force -Path $WorkspaceDir | Out-Null
 Set-Location $WorkspaceDir
+$ErrorActionPreference = "Continue"
 & $AmcBin up --demo --no-open *>> $LogFile
-if ($LASTEXITCODE -ne 0) {
+$StartExitCode = $LASTEXITCODE
+$ErrorActionPreference = "Stop"
+if ($StartExitCode -ne 0) {
   throw "Could not start AMC Studio. See $LogFile."
 }
 ${studioWindowsOpenCommand}
 `;
   writeFileSync(join(targetDir, ps1Name), ps1);
-  writeFileSync(join(targetDir, cmdName), `@echo off\r\npowershell -ExecutionPolicy Bypass -File "%~dp0${ps1Name}"\r\n`);
+  writeFileSync(join(targetDir, cmdName), windowsCmd(ps1Name));
   return [{
     name: cmdName,
     kind: "windows-command-launcher",
@@ -458,25 +531,28 @@ ${studioWindowsOpenCommand}
   }];
 }
 
+// install.cmd runs install.ps1 with -ExecutionPolicy Bypass, which the default Windows client policy requires.
+function installCommandFor(platform) {
+  return platform.kind === "windows" ? ".\\install.cmd" : "sh ./install.sh";
+}
+
 function writePackageReadme(targetDir, platform, tarballName, appLaunchers) {
-  const installCommand = platform.kind === "windows"
-    ? ".\\install.ps1"
-    : "sh ./install.sh";
+  const installCommand = installCommandFor(platform);
   const appCommand = platform.id === "macos-universal"
     ? `open "${studioMacAppBundleName}"`
     : platform.kind === "windows"
-      ? `.\\${studioWindowsCmdName}`
+      ? `& ".\\${studioWindowsCmdName}"`
       : null;
   const macRuntime = appLaunchers.find((launcher) => launcher.kind === "macos-app-bundle")?.runtime;
   writeFileSync(join(targetDir, "README.md"), `# Agent Maturity Compass ${platform.label} Installer
 
 This package installs AMC from the included npm tarball: \`${tarballName}\`.
 
-The Studio launcher uses the archive's exact package digest and installs that version into an isolated per-user runtime. It never falls back to an older global \`amc\` executable.
+${appLaunchers.length > 0 ? `The Studio launcher uses the archive's exact package digest and installs that version into an isolated per-user runtime. It never falls back to an older global \`amc\` executable.
 
 Mutable demo data is stored in a separate persistent \`studio-workspace\` directory, not beside the extracted archive.
 
-## Requirements
+` : ""}## Requirements
 
 - Node.js 22 or 24 LTS
 - npm available on PATH
@@ -498,6 +574,16 @@ ${platform.id === "macos-universal"
       ? `The ${studioAppName} native app starts local demo-mode Studio and renders ${studioUrl} in a macOS WebKit window. It does not bundle Electron, Chromium, or a browser runtime.`
       : `The ${studioAppName} cross-build fallback starts local demo-mode Studio and opens ${studioUrl} in the macOS system browser. It does not bundle Electron or a browser runtime.`
     : `The ${studioAppName} launcher starts local demo-mode Studio and opens ${studioUrl} in the system browser. It does not bundle Electron or a browser runtime.`}
+${platform.id === "macos-universal"
+    ? `
+The app is not notarized. If macOS says it cannot verify the app, open System Settings > Privacy & Security and choose Open Anyway.
+`
+    : ""}
+Studio keeps running after you close the ${platform.id === "macos-universal" ? "window" : "browser tab"}. Stop it with:
+
+\`\`\`${platform.kind === "windows" ? "powershell" : "sh"}
+${platform.kind === "windows" ? studioWindowsStopCommand : studioMacStopCommand}
+\`\`\`
 
 ` : ""}
 ## Verify
@@ -583,7 +669,7 @@ No competitor implementation code, GitHub repository source snapshots, academic 
     kind: platform.kind,
     archive: fileInfo(archivePath),
     installer: platform.kind === "windows" ? "install.ps1" : "install.sh",
-    installCommand: platform.kind === "windows" ? ".\\install.ps1" : "sh ./install.sh",
+    installCommand: installCommandFor(platform),
     appLaunchers
   });
 }

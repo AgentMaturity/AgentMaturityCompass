@@ -280,6 +280,9 @@ describe("truthful public distribution and brand contract", () => {
     expect(windows).toContain("SHA256SUMS");
     expect(windows).toContain("Get-FileHash");
     expect(windows).toContain("checksum mismatch");
+    // The default client execution policy refuses a .ps1 file, so the extracted installer runs in a Bypass child.
+    expect(windows).toContain("& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $Installer");
+    expect(windows).not.toMatch(/^\s*& \$Installer\s*$/m);
     expect(workflow).toContain("npm run package:desktop");
     expect(workflow).toContain("npm run package:desktop:verify");
     expect(workflow).toContain("dist/release-assets/SHA256SUMS");
