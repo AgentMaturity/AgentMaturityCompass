@@ -21,11 +21,12 @@ function computeInputHashes(workspace: string): {
   tsconfigSha256: string;
   buildScriptSha256: string;
 } {
-  const packageLockPath = join(workspace, "package-lock.json");
+  // AMC itself builds from pnpm-lock.yaml: pin whichever lockfile exists, npm's first, as readResolvedDependencies does.
+  const packageLockPath = ["package-lock.json", "pnpm-lock.yaml"].map((name) => join(workspace, name)).find((path) => pathExists(path));
   const tsconfigPath = join(workspace, "tsconfig.json");
   const buildScriptPath = join(workspace, "package.json");
   return {
-    packageLockSha256: pathExists(packageLockPath) ? fileSha256(packageLockPath) : "",
+    packageLockSha256: packageLockPath ? fileSha256(packageLockPath) : "",
     tsconfigSha256: pathExists(tsconfigPath) ? fileSha256(tsconfigPath) : "",
     buildScriptSha256: pathExists(buildScriptPath) ? fileSha256(buildScriptPath) : ""
   };

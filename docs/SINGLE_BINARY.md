@@ -1,75 +1,60 @@
-# Single-binary install (experimental Node SEA)
+# Single-binary build (experimental Node SEA, does not start yet)
 
-AMC now includes an **experimental** single-binary packaging path using **Node SEA (Single Executable Applications)**.
+AMC has an **experimental** build script for a single binary using **Node SEA (Single Executable Applications)**. Its current status:
 
-This is the honest version, not brochure cosplay:
-- it builds a host-specific binary on the machine/runner that creates it
-- it is **not** cross-compiling macOS/Linux/Windows from one host
-- native/runtime behavior still depends on AMC's real Node ecosystem constraints
-- it should be treated as a convenience distribution path, not yet the default install method
+- it is a **local experimental build only**: it builds a binary for the host that runs it, and never cross-compiles;
+- the binary it builds **does not start yet**, on any host tried;
+- it is **not a release asset**: the release workflow neither builds nor uploads it.
 
-## What it is good for
-- local demos
-- internal distribution on a known host platform
-- release artifacts for users who want `./amc` instead of `node dist/cli.js`
+Install AMC with npm or the verified release installer instead ([INSTALL_PACKAGES.md](INSTALL_PACKAGES.md)).
 
-## What it does not promise yet
-- universal static binaries
-- zero-dependency guarantees across every OS image
-- replacement for npm as the primary install path
+## Why it does not start
+
+Node SEA runs the embedded main script as CommonJS. AMC's `dist/cli.js` is an unbundled ES module (its first statement is `import "./storage/nativeGuard.js";`), so the binary exits at startup with `SyntaxError: Cannot use import statement outside a module`. ES module support alone would not be enough: inside a SEA, `require()` in the main script loads only Node's built-in modules, so the CLI's other files under `dist/` and the `better-sqlite3` native addon could not load the way they do today.
+
+Making it start needs the CLI bundled into one CommonJS file (esbuild is already a dev dependency) with the native addon kept on disk beside the binary. That work has not been done.
 
 ## Build locally
 
-Prerequisites:
-- Node version with SEA support (the repo currently builds with modern Node)
-- `npm ci`
-- `npm run build`
-- `npx postject` available (the build script will invoke it via `npx --yes postject`)
+This is for work on the build itself. Prerequisites:
+
+- Node with SEA support (`node --experimental-sea-config`)
+- `pnpm install --frozen-lockfile` and `npm run build`
+- network access: the script runs `npx --yes postject`, and when the local Node binary has no SEA fuse it downloads the official Node binary of the same version and platform from nodejs.org
 
 ```bash
 npm run build
 npm run build:sea
 ```
 
-Output:
-- binary: `dist/sea/amc` (or `dist/sea/amc.exe` on Windows)
+`npm run build:sea` writes:
+
+- binary: `dist/sea/amc` (`dist/sea/amc.exe` on Windows)
 - metadata: `dist/sea/manifest.json`
 - SEA blob: `dist/sea/amc-prep.blob`
 
-## Smoke test
+It then runs the binary with `--version`. When the binary does not start, the build exits 1 and prints the binary's own error output. Today it always exits 1 at this step, with the `SyntaxError` above. `npm pack` never includes `dist/sea/` (`package.json` excludes it).
 
-Planned verification flow:
+## Verification status
 
-```bash
-./dist/sea/amc doctor --json
-./dist/sea/amc quickscore --json || true
-```
+Checked on 2026-11-07:
 
-Use `AMC_VAULT_PASSPHRASE` when needed for commands that initialize workspace state.
+- blob generation: works.
+- injection: works on macOS arm64. On macOS the blob now goes into the `NODE_SEA` segment, which is where Node reads it; postject's default segment (`__POSTJECT`) made the binary crash at startup (SIGSEGV, no output).
+- fallback to the official Node release binary when the local Node has no SEA fuse (Homebrew's Node 22 has none): works on macOS arm64.
+- startup: fails on macOS arm64 with Node 22 and Node 24 (`SyntaxError: Cannot use import statement outside a module`). Linux was not run; SEA runs the main script through the same CommonJS path on every platform, so it is expected to fail there the same way.
+- Windows: not run, and `build:sea` is unlikely to work there yet. The script spawns `npx` without a shell, which Node cannot do with `npx.cmd`, and its fallback extracts the Node zip with `unzip`, which stock Windows does not have.
 
-### Current verification status
-- blob generation: verified
-- binary injection: verified
-- fallback to official Node release binary when local Node lacks SEA fuse: verified
-- runtime execution on the current macOS arm64 host: **not yet green** (current binary exits during startup on this host)
+## Release status
 
-So today this is a real packaging path with partial verification, not a fully proven default install route.
+`.github/workflows/release.yml` does not build, copy or upload a SEA binary, and its contract test (`tests/releaseWorkflowContract.test.ts`) fails if one is added back. Both stay that way until `npm run build:sea` produces a binary that starts.
 
-## CI / release direction
+The 1.1.1 GitHub release carries an experimental Linux SEA binary, `amc-linux-x64-sea-1.1.1`. An earlier release workflow built it the same way (with `dist/cli.js`, an ES module, as the SEA main) and attached it without starting it first. Do not rely on it; use npm or the release installer.
 
-The release workflow can build **host-specific SEA artifacts** on matching runners and upload them as release assets. That is the intended MVP path.
+## Next steps
 
-## Why SEA instead of pretending pkg is done?
+- bundle the CLI into one CommonJS file and point the SEA `main` at it, keeping the `better-sqlite3` addon on disk
+- then add a release asset per OS, each started on its own runner (`--version`, then `doctor --json`) before upload
+- on Windows, spawn npx through npm's JavaScript entry point instead of the `npx.cmd` shim, and extract the zip with `tar`
 
-Because SEA is part of the modern Node runtime story and is honest about what it is. `pkg` may still be useful later, but AMC now has a real, inspectable single-binary path wired into the repo.
-
-Files created/updated: `scripts/build-sea.mjs`
-Acceptance checks: `npm run build:sea` creates `dist/sea/*` and `./dist/sea/amc doctor --json` runs on the same host
-Next actions:
-- add per-OS release assets in `release.yml`
-- add Windows runner verification if release demand warrants it
-- evaluate startup size/perf tradeoffs before making SEA the primary install path
-Risks/unknowns:
-- SEA behavior may vary by Node release
-- binary is host-specific, not universal
-- native dependency/runtime edge cases still need wider matrix coverage
+Acceptance check for that work: `npm run build:sea` exits 0 (so the binary printed its version), then `./dist/sea/amc doctor --json` runs on the same host.
