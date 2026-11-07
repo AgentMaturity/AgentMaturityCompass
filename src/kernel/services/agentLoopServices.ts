@@ -35,7 +35,7 @@
  */
 import { AmcSeam, defineSeam } from "../amcRuntime.js";
 import type { Context } from "../amcRuntime.js";
-import { AgentDriver, type AgentShutdownResult } from "../../agent/agentDriver.js";
+import { AgentDriver, type AgentDriverInit, type AgentShutdownResult } from "../../agent/agentDriver.js";
 import type { NativeImageInput } from "../../attachments/nativeImageInput.js";
 import type {
   AgentLoopConfig,
@@ -83,6 +83,8 @@ export interface AgentLoopServiceConfig {
   readonly config?: Partial<AgentLoopConfig>;
   /** Injected so a test can pin the retry wait and jitter. */
   readonly retryRuntime?: LoopRetryRuntime;
+  /** Operator run limits (SH-LOOP-06), handed to the driver unchanged. */
+  readonly runLimits?: AgentDriverInit["runLimits"];
 }
 
 /**
@@ -109,7 +111,8 @@ export class AgentLoopSeamService extends AmcSeam {
       ...(config.validation !== undefined ? { validation: config.validation } : {}),
       ...(config.hooks !== undefined ? { hooks: config.hooks } : {}),
       ...(config.config !== undefined ? { config: config.config } : {}),
-      ...(config.retryRuntime !== undefined ? { retryRuntime: config.retryRuntime } : {})
+      ...(config.retryRuntime !== undefined ? { retryRuntime: config.retryRuntime } : {}),
+      ...(config.runLimits !== undefined ? { runLimits: config.runLimits } : {})
     });
     // Async disposer: cordis awaits it, so the fiber does not report itself
     // unloaded while a turn is still mid-unwind with its `turn/end` unwritten.
@@ -141,8 +144,8 @@ export class AgentLoopSeamService extends AmcSeam {
   }
 
   /** Queue a prompt that gets its own turn, and wake the driver. */
-  followup(text: string, images?: readonly NativeImageInput[]): InboxReceipt {
-    return this.driver.followup(text, images);
+  followup(text: string, images?: readonly NativeImageInput[], clientRequestId?: string): InboxReceipt {
+    return this.driver.followup(text, images, clientRequestId);
   }
 
   /** Steer the nearest step boundary. An idle driver starts a turn for it. */

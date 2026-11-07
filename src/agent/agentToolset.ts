@@ -37,6 +37,7 @@ import { actionPolicyGuard, actionPolicyMode, actionPolicyState, type ActionPoli
 import { compiledApprovalClasses, compiledPolicyFacts, compiledPolicyGuard, compiledPolicyShows, planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
 import { ToolPipeline } from "../tools/toolPipeline.js";
 import type { ActionClass } from "../types.js";
+import { applyPlanMode } from "./planMode.js";
 import { ControlCheckpointRootInWorkspaceError, loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { actionPolicyPath } from "../governor/actionPolicyStore.js";
@@ -115,6 +116,8 @@ export interface AgentToolsetOptions {
   readonly webSearchProvider?: WebSearchProvider;
   /** Skill roots `skill.load` advertises and loads from. Defaults to the workspace's own `.amc/skills`. */
   readonly skillRoots?: readonly string[];
+  /** Plan mode (SH-LOOP-04): narrow the registry to READ_ONLY before any call. The names withheld are `planModeWithheld`. */
+  readonly planMode?: boolean;
   /** Session the evidence rows belong to. Defaults to a per-agent bucket. */
   /**
    * The session tool evidence belongs to. REQUIRED, and deliberately so.
@@ -283,6 +286,8 @@ export interface AgentToolset {
   readonly registry: ToolRegistry;
   readonly pipeline: ToolPipeline;
   readonly readiness: ToolsetReadiness;
+  /** The tool names plan mode withheld at construction, or null when the toolset is not in plan mode. */
+  readonly planModeWithheld: readonly string[] | null;
   /**
    * Release the evidence handle this toolset holds.
    *
@@ -625,6 +630,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     }));
   }
 
+  const planModeWithheld = options.planMode === true ? applyPlanMode(registry) : null;
   const seam = pipelineToolSeam({ registry, pipeline, agentId });
   const closeHandles = (): void => { ledgerHandle?.close(); ledgerHandle = null; journal?.close(); journal = null; };
   return {
@@ -650,6 +656,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     registry,
     pipeline,
     readiness,
+    planModeWithheld,
     recordAudit,
     ...(options.askUser ? { humanQuestion: { answerer: options.askUser, sessionId: currentSessionId } } : {}),
     hasOwnedWork: () => background.hasOwnedWork(),

@@ -29,7 +29,7 @@ import { credentialRef } from "../../src/credentials/credentialRef.js";
 import type { CredentialsService } from "../../src/credentials/credentialsService.js";
 import type { CredentialDescription } from "../../src/credentials/credentialSources.js";
 import { SessionService } from "../../src/session/sessionService.js";
-import { AgentDriver } from "../../src/agent/agentDriver.js";
+import { AgentDriver, type AgentDriverInit } from "../../src/agent/agentDriver.js";
 import type { AgentLoopConfig, LoopHooks, LoopRetryRuntime } from "../../src/agent/loopTypes.js";
 import { NO_HOOKS } from "../../src/agent/loopTypes.js";
 import type { AgentToolSeam, ToolCallOutcome, ToolCallRequest } from "../../src/agent/toolSeam.js";
@@ -242,6 +242,8 @@ export interface LoopHarnessOptions {
   readonly transport?: HttpTransport;
   /** The route's retry policy. Omitted means the shipped defaults. */
   readonly retry?: RetryPolicyConfig;
+  /** Operator run limits (SH-LOOP-06). */
+  readonly runLimits?: AgentDriverInit["runLimits"];
   /**
    * Pins the retry wait and jitter.
    *
@@ -324,7 +326,8 @@ export function loopHarness(options: LoopHarnessOptions): LoopHarness {
     systemPromptEventId: systemPrompt.eventId,
     hooks: { ...NO_HOOKS, ...options.hooks },
     ...(options.config === undefined ? {} : { config: options.config }),
-    ...(options.retryRuntime === undefined ? {} : { retryRuntime: options.retryRuntime })
+    ...(options.retryRuntime === undefined ? {} : { retryRuntime: options.retryRuntime }),
+    ...(options.runLimits === undefined ? {} : { runLimits: options.runLimits })
   });
 
   const sessionId = session.sessionId;

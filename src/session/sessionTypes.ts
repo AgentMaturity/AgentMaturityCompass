@@ -150,7 +150,9 @@ export type TurnCancelCause =
   | { readonly kind: "user" }
   | { readonly kind: "parent" }
   | { readonly kind: "hook"; readonly reason: string }
-  | { readonly kind: "disposed" };
+  | { readonly kind: "disposed" }
+  /** An operator run limit the driver enforced (SH-LOOP-06, src/agent/runLimits.ts). */
+  | { readonly kind: "limit"; readonly condition: "max-turns" | "max-tokens" | "deadline"; readonly bound: number; readonly unmeasured?: true };
 
 /**
  * Boundary validation for a cause. A cause read back out of a stored row is
@@ -170,6 +172,10 @@ export function isTurnCancelCause(value: unknown): value is TurnCancelCause {
       return true;
     case "hook":
       return typeof candidate.reason === "string";
+    case "limit":
+      return (candidate.condition === "max-turns" || candidate.condition === "max-tokens" || candidate.condition === "deadline")
+        && typeof candidate.bound === "number" && Number.isSafeInteger(candidate.bound) && candidate.bound >= 0
+        && (candidate.unmeasured === undefined || candidate.unmeasured === true);
     default:
       return false;
   }

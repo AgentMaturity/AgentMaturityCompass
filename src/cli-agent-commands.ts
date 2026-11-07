@@ -39,6 +39,7 @@ import type { LoopNotification } from "./agent/loopTypes.js";
 import { echoToolSeam } from "./agent/echoTool.js";
 import { MAX_ACTIVE_CHILDREN_HELP, NO_DELEGATE_STOP_HELP, VALIDATION_REPAIR_HELP, WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
 import { leaseFileToken, withLeaseFileOption } from "./cli/agentLoopLeaseFile.js";
+import { continuedSession, reportContinueRefusal, resolveContinuityRun, withContinuityChatOptions, withContinuityRunOptions, type ContinuityOptions } from "./cli/agentLoopContinuityOptions.js";
 import { agentToolset, type AgentToolset } from "./agent/agentToolset.js";
 import { runLease } from "./leases/runLease.js";
 import { selectSupportedNativeTools } from "./agent/nativeToolCapabilities.js";
@@ -76,7 +77,7 @@ import type { NativeAudioPart } from "./attachments/nativeAudioInput.js";
 
 import {
   activeChildLimitOption, approvalGateFor, armTurnSignals, collectOption, collectDelegateStop, compactionOption, integerOption, liveTextPreviewPrinter, paramsFor, piAiRouteSelection, renderNotification, resetDelegateStops, routeFor,
-  type AgentLoopCliIo, type RunOptions
+  type AgentLoopCliIo
 } from "./cli-agent-options.js";
 export type { AgentLoopCliIo, RunOptions } from "./cli-agent-options.js";
 
@@ -128,7 +129,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
 
   registerAgentGuideCommands(group, io);
 
-  withLeaseFileOption(group
+  withLeaseFileOption(withContinuityChatOptions(group
     .command("chat")
     .option("--agent <id>", "agent identity; defaults to AMC_AGENT_ID, the current agent, then default")
     .description("Interactive native tasks over the existing governed run/resume path for the selected agent")
@@ -166,12 +167,18 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--no-auto-compact", "turn automatic compaction off (on by default for a reviewed model context window)")
     .option("--session <id>", "resume this unsealed session; each turn verifies before acquiring its writer")
     .option("--fork-from <id>", "create a child of this verified parent on the first task")
-    .action(async (opts: import("./setup/nativeInteractiveSession.js").NativeChatOptions, command: Command) => {
+    .action(async (opts: import("./setup/nativeInteractiveSession.js").NativeChatOptions & { continue?: boolean }, command: Command) => {
       const { runNativeInteractiveSession } = await import("./setup/nativeInteractiveSession.js");
-      await runNativeInteractiveSession({ ...opts, agentId: selectedAgentOption(command), workspace: process.cwd() }, io);
-    }));
+      const agentId = selectedAgentOption(command);
+      if (opts.continue) {
+        if (opts.session !== undefined || opts.forkFrom !== undefined) { io.error(chalk.red("--continue chooses the session itself; it cannot be combined with --session or --fork-from.")); io.fail(); return; }
+        const session = continuedSession(io, { workspace: process.cwd(), agentId: resolveAgentId(process.cwd(), agentId) });
+        if (session === null) return; else opts = { ...opts, session };
+      }
+      await runNativeInteractiveSession({ ...opts, agentId, workspace: process.cwd() }, io);
+    })));
 
-  withLeaseFileOption(withBreadthRunOptions(group
+  withLeaseFileOption(withContinuityRunOptions(withBreadthRunOptions(group
     .command("run")
     .option("--agent <id>", "agent identity; defaults to AMC_AGENT_ID, the current agent, then default")
     .description("Run one agent turn and report what the signed log recorded")
@@ -244,14 +251,14 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       "require a signed human approval before every tool call, decided under this action class"
     )
     .option("--approve-risk <tier>", "risk tier the approval is raised at (default high)")
-    .option("--interactive-approvals", "send actual queued approval IDs to the native chat parent over dedicated Node IPC")))
+    .option("--interactive-approvals", "send actual queued approval IDs to the native chat parent over dedicated Node IPC"))))
     .option(
       "--approval-exception <file>",
       "ADR-5 exception note (JSON) that auto-allows the classes it names until it expires"
     )
     .option("--json", "Output as JSON")
     .option("--list-skills [name]", "list skill discovery, sources and digests; pass a name to inspect its literal body")
-    .action(async (promptParts: string[], opts: RunOptions, command: Command) => {
+    .action(async (promptParts: string[], opts: ContinuityOptions, command: Command) => {
       if (showSkillCatalogSelection(opts, io)) return;
       const agentId = resolveAgentId(process.cwd(), selectedAgentOption(command));
       let validation: ReturnType<typeof resolveNativeValidationSelection>;
@@ -418,6 +425,11 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           io.fail(); return;
         }
       }
+      const toolMode = opts.tools ?? preset?.tools ?? (providerId === STUB_PROVIDER_ID ? "echo" : "none");
+      const wantsDelegation = opts.delegate === true;
+      const continuity = resolveContinuityRun(io, opts, { workspace: process.cwd(), agentId, wantsDelegation, toolMode });
+      if (continuity === null) return;
+      opts = { ...opts, session: continuity.session };
       if (opts.takeoverExpiredWriter !== undefined && opts.session === undefined) { io.error("--takeover-expired-writer requires --session <id>."); io.fail(); return; }
       if (opts.session !== undefined && mcpServers.length) {
         // Mounting can execute a process or contact a server. Check the signed
@@ -440,8 +452,6 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       // `echo` stays the stub-route default: spending an operator's tokens to
       // exercise the real toolset is not a default anyone would choose, and the
       // echo tool exists precisely to make a multi-step turn observable.
-      const toolMode = opts.tools ?? preset?.tools ?? (providerId === STUB_PROVIDER_ID ? "echo" : "none");
-      const wantsDelegation = opts.delegate === true;
       const breadth = resolveBreadthRun(io, opts, { toolMode, wantsDelegation });
       if (breadth === null) return;
       const maxActiveChildren = activeChildLimitOption(io, opts.maxActiveChildren, wantsDelegation && toolMode === "workspace"); if (maxActiveChildren === null) return;
@@ -498,6 +508,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           recorder: { recordProjectedEvidence: (row) => actualSession().recordProjectedEvidence(row), assertWritable: () => actualSession().assertWritable() },
           ...lease,
           ...(dispatchMode === "code" ? { mode: dispatchMode } : {}),
+          ...(continuity.planMode ? { planMode: true } : {}),
           ...breadth.toolset,
           ...shellOptIn
         });
@@ -611,7 +622,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         toolSeam = echoToolSeam();
       }
       const timers: NodeJS.Timeout[] = [];
-      let disarmSignals = (): void => undefined;
+      let disarmSignals = (): void => undefined, disarmSteer = (): void => undefined;
       const mcpMounts: MountedNativeMcpServer[] = [];
       const mcpStatus: NativeMcpResourceSource[] = [];
       const mcpAbort = new AbortController();
@@ -633,11 +644,14 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           }
         }
         let priorTurnEndings = 0;
-        const outcome = await runner.runComposedTurn({
+        let outcome: Awaited<ReturnType<typeof runner.runComposedTurn>>;
+        try { outcome = await runner.runComposedTurn({
           sessionId: turnSessionId,
           ...(opts.session === undefined ? {} : { resume: { claimant, ...(opts.takeoverExpiredWriter === undefined ? {} : { takeover: { reason: opts.takeoverExpiredWriter } }) } }),
           ...(opts.forkFrom === undefined ? {} : { forkFrom: { parentSessionId: opts.forkFrom, claimant } }),
           ...(opts.keepOpen ? { keepOpen: true } : {}),
+          ...(continuity.planMode ? { planMode: { withheldTools: workspaceToolset?.planModeWithheld ?? [] } } : {}),
+          ...(continuity.runLimits === undefined ? {} : { runLimits: continuity.runLimits }),
           workspace: process.cwd(),
           agentId,
           ...(compositionSources === undefined ? {} : { compositionSources }),
@@ -738,6 +752,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             // outcome; the driver's idle state means it can accept more work.
             priorTurnEndings = readAgentRunSummary(process.cwd(), handle.sessionId, "idle").endings.length;
             disarmSignals = armTurnSignals(handle, io);
+            disarmSteer = continuity.listen(handle);
             if (cancelAfter > 0) {
               timers.push(setTimeout(() => handle.cancel({ kind: "user" }), cancelAfter));
             }
@@ -749,12 +764,13 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                 // there is no privileged path for a flag.
                 onSteer: { afterMs: steerAfter, text: opts.steer }
               })
-        });
+        }); } catch (error) { if (reportContinueRefusal(io, error, continuity.continued ? opts.session : undefined)) return; throw error; }
 
         breadth.reportRun(outcome, priorTurnEndings, validation !== undefined);
       } finally {
         for (const timer of timers) clearTimeout(timer);
         disarmSignals();
+        disarmSteer();
         const closed = await Promise.allSettled(mcpMounts.map(mount => mount.close()));
         try { if (closed.some(result => result.status === "rejected")) { io.error("MCP cleanup failed; this mount must not be reused."); io.fail(); } }
         finally {

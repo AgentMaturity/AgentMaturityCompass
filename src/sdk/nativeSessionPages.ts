@@ -40,7 +40,8 @@ const usage = z.object({ scope: z.literal("recorded-session"), status: z.enum(["
     eligibleRequests: count, excludedRequests: count, hitRate: ratio }).optional() });
 const end = z.object({ turn: count.min(1), reason: z.enum(["complete", "cancelled", "error", "interrupted", "max_steps", "max_tokens", "blocked"]),
   interrupted: z.boolean(), cancelCause: z.union([z.null(), z.object({ kind: z.enum(["user", "parent", "disposed"]) }),
-    z.object({ kind: z.literal("hook"), reason: z.string() })]) })
+    z.object({ kind: z.literal("hook"), reason: z.string() }),
+    z.object({ kind: z.literal("limit"), condition: z.enum(["max-turns", "max-tokens", "deadline"]), bound: count, unmeasured: z.literal(true).optional() })]) })
   .refine(value => value.interrupted === (value.reason === "interrupted") && (value.reason === "cancelled") === (value.cancelCause !== null));
 const committedTurn = z.object({ turn: count.min(1), seq: count, eventId: z.string().min(1).max(1024).regex(/^[^\x00-\x1f\x7f]+$/),
   eventHash: z.string().regex(/^[a-f0-9]{64}$/) }).strict();
