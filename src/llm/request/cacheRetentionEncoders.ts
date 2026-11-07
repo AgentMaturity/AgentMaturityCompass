@@ -27,7 +27,15 @@ const RETENTION_VERSIONS: ReadonlyMap<string, number> = new Map([
   [`${ANTHROPIC_MESSAGES_ENCODER_ID}@4`, 5], [`${OPENAI_CHAT_ENCODER_ID}@4`, 5], [`${OPENAI_RESPONSES_ENCODER_ID}@3`, 4]
 ]);
 
-export function cacheRetentionEncoderVersion(encoderId: string, version: number): number | null {
+/**
+ * The adapters whose SERVER honours the retention keys. An OpenAI-compatible or Azure route shares the openai-chat
+ * encoder bytes, so admission is keyed by adapter id as well: a third-party server must never receive
+ * `prompt_cache_key`/`prompt_cache_retention` under a signed header that claims a retention it may ignore.
+ */
+const RETENTION_ADAPTERS: ReadonlySet<string> = new Set(["anthropic-messages", "openai-chat", "openai-responses"]);
+
+export function cacheRetentionEncoderVersion(adapterId: string, encoderId: string, version: number): number | null {
+  if (!RETENTION_ADAPTERS.has(adapterId)) return null;
   return RETENTION_VERSIONS.get(`${encoderId}@${version}`) ?? null;
 }
 

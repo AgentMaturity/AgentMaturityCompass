@@ -12,7 +12,7 @@ import { openSessionEventStore } from "../../../persistence/openSessionEventStor
 import { parseRequestHeaderMeta } from "../../../session/requestHeaderMeta.js";
 import type { LlmRouteConfig } from "../../adapter/adapterRegistry.js";
 import type { LlmAdapter } from "../../adapter/adapterTypes.js";
-import { CAPABILITY_NAMES, type CapabilitySupport, type ProviderCapabilities, type ProviderCapability } from "../../adapter/providerCapabilities.js";
+import { provenContract, type CapabilitySupport, type ProviderCapabilities, type ProviderCapability } from "../../adapter/providerCapabilities.js";
 import { BUILT_IN_REQUEST_ENCODERS } from "../../request/builtInEncoders.js";
 import { RequestEncoderRegistry } from "../../request/requestEncoder.js";
 import { openaiAdapter } from "../openaiAdapter.js";
@@ -31,12 +31,8 @@ const PROVEN: Partial<Record<ProviderCapability, CapabilitySupport>> = {
   "text-input": "supported", "text-output": "supported", "tool-calls": "supported", "tool-replay": "supported",
   usage: "supported", "tool-result-error-flag": "unsupported", "tool-result-error-text": "unsupported"
 };
-export const PI_AI_CAPABILITIES: ProviderCapabilities = Object.freeze({
-  schemaVersion: 1, protocol: PI_AI_PROTOCOL,
-  features: Object.freeze(Object.fromEntries(CAPABILITY_NAMES.map((name) => [name, PROVEN[name] ?? "unknown"])) as Record<ProviderCapability, CapabilitySupport>),
-  usage: "reported-required", cache: "none", thinking: "unsupported", toolReplay: "provider-call-id-and-text-result",
-  toolErrorRepresentation: "unsupported", modelSupport: "not-probed"
-});
+export const PI_AI_CAPABILITIES: ProviderCapabilities = provenContract(PI_AI_PROTOCOL, PROVEN,
+  { usage: "reported-required", cache: "none", thinking: "unsupported", toolErrorRepresentation: "unsupported" });
 
 /** Credential reference names pi-ai's own provider definitions read. AMC resolves them through its credentials seam. */
 const DEFAULT_CREDENTIAL_REFS: Readonly<Record<PiAiProviderId, string>> = Object.freeze({
