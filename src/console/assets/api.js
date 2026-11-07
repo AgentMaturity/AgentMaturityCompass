@@ -1,3 +1,6 @@
+// The console's page scripts all import this module, so the focusable-scroll fix reaches their pages from here.
+import "./focusableScroll.js";
+
 const state = {
   adminToken: null,
   me: null
