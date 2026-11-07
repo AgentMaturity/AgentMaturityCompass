@@ -18,6 +18,24 @@ type DomainProductCliDeps = {
   domainCmd: Command;
 };
 
+/** The free Industry Packs entitlement for this workspace (every pack is included). */
+async function packEntitlement() {
+  const { getIndustryPackEntitlement } = await import("./domains/industryPackEntitlement.js");
+  return getIndustryPackEntitlement(process.cwd());
+}
+
+/** The pack with this id, or a "not found" message and exit code 1. */
+async function packOrExit(packId: string) {
+  const { getPackById } = await import("./domains/industryPacks.js");
+  const pack = getPackById(packId);
+  if (!pack) {
+    console.error(chalk.red(`Pack not found: ${packId}`));
+    console.log(chalk.gray("List available packs: amc domain pack list"));
+    process.exit(1);
+  }
+  return pack;
+}
+
 export function registerDomainProductCliCommands({ product, productGlossary, domainCmd }: DomainProductCliDeps): void {
   // ── Blocker #13: sector-pack CLI commands for industry packs ──────────────
   const sectorPack = domainCmd.command("pack").description("Industry sector packs — 41 packs across 7 domains");
@@ -28,8 +46,7 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
     .description("Show Industry Packs access (free: every pack is included, no licence needed)")
     .option("--json", "Output as JSON")
     .action(async (opts: { json?: boolean }) => {
-      const { getIndustryPackEntitlement } = await import("./domains/industryPackEntitlement.js");
-      const entitlement = getIndustryPackEntitlement(process.cwd());
+      const entitlement = await packEntitlement();
       if (opts.json) {
         console.log(JSON.stringify(entitlement, null, 2));
         return;
@@ -52,8 +69,7 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
     .option("--reference <id>", "Ignored: there is no checkout")
     .option("--json", "Output as JSON")
     .action(async (opts: { json?: boolean }) => {
-      const { getIndustryPackEntitlement } = await import("./domains/industryPackEntitlement.js");
-      const entitlement = getIndustryPackEntitlement(process.cwd());
+      const entitlement = await packEntitlement();
       if (opts.json) console.log(JSON.stringify({ checkoutUrl: null, entitlement }, null, 2));
       else console.log(entitlement.message);
     });
@@ -156,13 +172,7 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
     .requiredOption("--pack <packId>", "Pack ID (from 'amc domain pack list')")
     .option("--json", "Output as JSON")
     .action(async (opts: { pack: string; json?: boolean }) => {
-      const { getPackById } = await import("./domains/industryPacks.js");
-      const pack = getPackById(opts.pack);
-      if (!pack) {
-        console.error(chalk.red(`Pack not found: ${opts.pack}`));
-        console.log(chalk.gray("List available packs: amc domain pack list"));
-        process.exit(1); return;
-      }
+      const pack = await packOrExit(opts.pack);
       if (opts.json) { console.log(JSON.stringify(pack, null, 2)); return; }
 
       console.log(chalk.bold.hex('#4AEF79')(`\n🏭  ${pack.name}`));
@@ -197,15 +207,10 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
     .option("--baseline", "Run with no answers: every question is not evaluated and no score is computed (no interaction needed)", false)
     .option("--json", "Output as JSON")
     .action(async (opts: { pack: string; baseline: boolean; json?: boolean }) => {
-      const { getPackById, scoreIndustryPack } = await import("./domains/industryPacks.js");
+      const { scoreIndustryPack } = await import("./domains/industryPacks.js");
       const { packSelfAssessmentEnvelope } = await import("./domains/packSelfAssessment.js");
       type PackIdType = Parameters<typeof scoreIndustryPack>[0];
-      const pack = getPackById(opts.pack);
-      if (!pack) {
-        console.error(chalk.red(`Pack not found: ${opts.pack}`));
-        console.log(chalk.gray("List available packs: amc domain pack list"));
-        process.exit(1); return;
-      }
+      const pack = await packOrExit(opts.pack);
       if (!opts.json) {
         console.log(chalk.bold.hex('#4AEF79')(`\n🏭  Running: ${pack.name}`));
         console.log(chalk.gray(`  Questions: ${pack.questions.length}\n`));
