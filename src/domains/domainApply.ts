@@ -3,7 +3,6 @@ import YAML from "yaml";
 import { getAgentPaths } from "../fleet/paths.js";
 import { KNOWN_AGENT_CONFIGS, applyGuardrails } from "../guide/guideGenerator.js";
 import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import { assertIndustryPackAccess } from "./industryPackEntitlement.js";
 import { assessDomainForAgent } from "./domainCliIntegration.js";
 import { parseDomain, type Domain } from "./domainRegistry.js";
 import {
@@ -185,7 +184,6 @@ export async function applyDomainToAgent(opts: DomainApplyOptions): Promise<Doma
   }
 
   const workspacePath = resolve(opts.workspacePath ?? process.cwd());
-  assertIndustryPackAccess(workspacePath);
   const { domain, packs } = resolveDomainAndPacks(opts);
   const dryRun = opts.dryRun === true;
   // Refuse a profile target under .amc/ before anything else is written.

@@ -5,25 +5,19 @@
 the `amc mcp list-tools` entries: `src/mcp/amcMcpServer.ts`. See [MCP_SERVER.md](MCP_SERVER.md) for
 client setup.
 
-## Industry Packs licence
+## Access
 
-The Industry Packs licence gate stays (ADR-005, decision D-06 = B). Pack questions and scoring need an
-Industry Packs licence that verifies against a licence key pinned in this machine's AMC trust list
-(see [PRICING.md](PRICING.md)); nothing the MCP client sends can unlock them. Without one,
-`amc_get_industry_pack` and `amc_score_industry_pack` refuse with `industry_packs_locked` and the same
-text every locked surface prints: what is locked, the price, and either a working checkout or
-"Checkout is not available in this deployment; contact sales for access."
+Industry Packs are free (ADR 019, `docs/adr/019-industry-packs-free.md`; see [PRICING.md](PRICING.md)).
+Every tool, pack questions and scoring included, works with no licence, account or payment, and no
+tool refuses for lack of a licence. Each catalog item keeps its `locked` field for API compatibility;
+it is always `false`. Access never changes a listing, a summary, a score or any other result.
 
-A licence unlocks access only. It never changes a listing, a summary, a score or any other result:
-the listing and the station summary return the same data with and without a licence (each catalog
-item's `locked` flag says whether its questions are locked), and a licensed score is the same score.
-
-| Tool | Input | Licence needed | Returns |
-|---|---|---|---|
-| `amc_list_industry_packs` | `{ station? }` | no | packs grouped by station: name, description, regulatory basis, frameworks, question count and `locked` |
-| `amc_get_industry_pack` | `{ packId }` | yes | the pack as stored: questions, `regulatoryBasis`, `complianceFrameworks`, `euAIActClassification` |
-| `amc_score_industry_pack` | `{ packId, responses }` | yes | `result`: the `scoreIndustryPack()` result |
-| `amc_industry_station_summary` | `{ station }` | no | `getStationSummary()`: pack count, question count and frameworks |
+| Tool | Input | Returns |
+|---|---|---|
+| `amc_list_industry_packs` | `{ station? }` | packs grouped by station: name, description, regulatory basis, frameworks, question count and `locked` (always `false`) |
+| `amc_get_industry_pack` | `{ packId }` | the pack as stored: questions, `regulatoryBasis`, `complianceFrameworks`, `euAIActClassification` |
+| `amc_score_industry_pack` | `{ packId, responses }` | `result`: the `scoreIndustryPack()` result |
+| `amc_industry_station_summary` | `{ station }` | `getStationSummary()`: pack count, question count and frameworks |
 
 `station` is one of the ids from `listDomainIds()` in `src/domains/domainRegistry.ts`.
 
@@ -62,13 +56,9 @@ question without an answer is not evaluated and is never given a default level:
   `{ "ok": false, "error": { "code", "message", ... } }`, never a thrown error. Refusals carry no claim.
   - `unknown_pack_id`: the id is not an own key of `INDUSTRY_PACKS` (`getPackById`, which also refuses
     `__proto__`, `constructor` and `toString`). The body lists `availablePackIds`.
-  - `industry_packs_locked`: no licence verifies against a pinned licence key. The message is the
-    entitlement's own text (`getIndustryPackEntitlement`), which starts with the paywall message.
   - `unknown_question_id`: a `responses` key is not a question of the pack.
   - `rate_limited`: the server's shared limit of 60 calls per minute was exceeded.
-- The server resolves the licence with `getIndustryPackEntitlement(<server workspace>)`, which reads the
-  licence from the environment or the workspace's access file and verifies it against the operator's
-  trust list. These tools make no network calls.
+- These tools make no network calls.
 
 ## Not covered
 
@@ -79,7 +69,7 @@ question without an answer is not evaluated and is never given a default level:
 
 `tests/industryPackNotEvaluated.test.ts` pins the not-evaluated rule in the shared scorer, the CLI, both MCP scoring
 tools and the pack audit. `tests/industryPackMcpTools.test.ts` and `tests/industryPackMcpClaims.test.ts` run the tools through an
-in-memory MCP client with licences signed by a key pinned in a temporary trust list.
+in-memory MCP client.
 `tests/industryPackMcpToolsWiring.test.ts` starts the real `startMcpServer()` with its stdio transport
 replaced by an in-memory pair. `tests/mcpServer.test.ts` pins the `amc mcp list-tools` entries: 15
 tools, or 20 with `AMC_A4_PREVIEW=1`.

@@ -19,7 +19,7 @@ const STATIONS = ["health", "wealth", "governance"] as const;
 const ARTIFACTS = [
   "domain-modules.json",
   "pack-catalog.json",
-  "pack-run-gate.json",
+  "pack-run.json",
   "risk-classification.json",
   "assurance-pack.json",
   "agent-run.json",
@@ -90,8 +90,16 @@ describe("regulated-industry examples run keyless against the built CLI", () => 
         expect(risk.claimKind).toBe("self_reported");
         expect(risk.statusDimensions.result).toBe("not_evaluated");
 
-        // Paid and target-dependent steps fail closed instead of producing a score.
-        expect(readJson(join(out, "pack-run-gate.json")).error).toBe("industry_packs_locked");
+        // Industry Packs are free: the baseline pack run answers nothing, so it is a self-reported, experimental
+        // questionnaire result with every question not evaluated and no score.
+        const packRun = readJson(join(out, "pack-run.json"));
+        expect(packRun).toMatchObject({ packId: fixture.industryPack, claimKind: "self_reported", contentStatus: "experimental",
+          percentage: null, level: null, eligibleLevel: null, selfAssessment: { complete: false, answered: 0 }, questionResults: [] });
+        expect(packRun.notEvaluatedQuestionIds.length).toBe(packRun.selfAssessment.total);
+        expect(packRun.statusDimensions.result).toBe("not_evaluated");
+        expect(packRun.claimLabel).toContain("Claim: Self-reported");
+
+        // The target-dependent step fails closed instead of producing a score.
         const gate = summary.steps.find((s: { id: string }) => s.id === "assurance-gate");
         const gatePackFlag = gate.argv.indexOf("--pack");
         expect(gate.argv).toContain("--pack");

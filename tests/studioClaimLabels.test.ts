@@ -9,7 +9,7 @@ import { claimKindSchema, statusDimensionsSchema } from "../src/claims/eligibili
 import { getPublicKeyHistory } from "../src/crypto/keys.js";
 import { evaluateDiagnosticEvidenceReadiness } from "../src/diagnostic/evidenceReadiness.js";
 import { sealedRunReportVerifies } from "../src/diagnostic/reportSeal.js";
-import { getIndustryPackEntitlement } from "../src/domains/industryPackEntitlement.js";
+import { getIndustryPackEntitlement, INDUSTRY_PACKS_FREE_MESSAGE } from "../src/domains/industryPackEntitlement.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { getPublicMethodologyManifest } from "../src/methodology/publicMethodology.js";
@@ -157,12 +157,12 @@ function requireError(response: Response): void {
   for (const key of ["claimKind", "statusDimensions", "claimLabel", "runId", "runSealSig"]) expect(response.json).not.toHaveProperty(key);
 }
 
-/** A licence signed by a key pinned in a temp AMC home trust list (P1-51), the only key a licence gate accepts. */
-function signedEntitlement(workspace: string): void {
+/** A legacy licence whose key the trust list pins, so it verifies here; not needed, since Industry Packs are free. */
+function legacyLicence(workspace: string): void {
   const licence = testIndustryPackLicence();
   licences.push(licence);
   for (const [key, value] of Object.entries(licence.env)) vi.stubEnv(key, value);
-  expect(getIndustryPackEntitlement(workspace)).toMatchObject({ active: true, source: "env" });
+  expect(getIndustryPackEntitlement(workspace)).toMatchObject({ active: true, source: "free", licenseVerificationConfigured: true });
 }
 
 describe("Studio claims over actual authenticated loopback HTTP (P0-23)", () => {
@@ -297,50 +297,43 @@ describe("Studio claims over actual authenticated loopback HTTP (P0-23)", () => 
     expect(response.json).toEqual({ error: "not found" });
   });
 
-  test("paid catalog access changes content availability without changing any pack claim or truth-rule note", async () => {
+  test("Industry Packs are free: catalog and pack content need no licence, and a legacy licence changes no pack claim or note", async () => {
     const fixture = await studioFixture();
-    expect(getIndustryPackEntitlement(fixture.workspace).active).toBe(false);
-    const unpaid = await get(fixture, "/industry-packs/list", "studio-catalog-unpaid");
-    expect(unpaid.status, unpaid.body).toBe(200);
-    expect(unpaid.json.entitlement.active).toBe(false);
-    expect(unpaid.json.entitlementNote).toBe(ENTITLEMENT_NOTE);
-    expect(ENTITLEMENT_NOTE).toBe("Payment unlocks access to pack content; it never changes a result, a trust tier or a verification outcome.");
-    expect(unpaid.json.packs.length).toBeGreaterThan(0);
-    const packId = unpaid.json.packs[0].packId;
-    const refused = await get(fixture, `/industry-packs/${encodeURIComponent(packId)}`, "studio-pack-unpaid-refusal");
-    requireError(refused);
-    expect(refused.status).toBe(402);
-    expect(refused.json).toMatchObject({ error: "industry_packs_locked", entitlement: { active: false }, entitlementNote: ENTITLEMENT_NOTE });
-    signedEntitlement(fixture.workspace);
-    const paid = await get(fixture, "/industry-packs/list", "studio-catalog-paid");
-    expect(paid.status, paid.body).toBe(200);
-    expect(paid.json.entitlement.active).toBe(true);
-    expect(paid.json.entitlementNote).toBe(ENTITLEMENT_NOTE);
-    expect(paid.json.packs.map((pack: { packId: string }) => pack.packId)).toEqual(unpaid.json.packs.map((pack: { packId: string }) => pack.packId));
-    for (let i = 0; i < unpaid.json.packs.length; i += 1) {
-      const before = unpaid.json.packs[i], after = paid.json.packs[i];
-      expect(before.locked).toBe(true);
-      expect(after.locked).toBe(false);
-      expect(before.claim.claimKind).toBe("self_reported");
-      expect(before.claim.statusDimensions.result).toBe("not_evaluated");
-      expect(before.claim.claimLabel).toMatch(/^Claim: Self-reported/);
-      expect(claimKindSchema.safeParse(before.claim.claimKind).success).toBe(true);
-      expect(statusDimensionsSchema.safeParse(before.claim.statusDimensions).success).toBe(true);
-      expect(after.claim).toEqual(before.claim);
+    expect(ENTITLEMENT_NOTE).toBe("Industry Packs are free; access never changes a result, a trust tier or a verification outcome.");
+    const catalog = await get(fixture, "/industry-packs/list", "studio-catalog-free");
+    expect(catalog.status, catalog.body).toBe(200);
+    expect(catalog.json.entitlement).toMatchObject({
+      active: true, source: "free", checkoutAvailable: false, checkoutUrl: null, message: INDUSTRY_PACKS_FREE_MESSAGE
+    });
+    expect(catalog.json.entitlementNote).toBe(ENTITLEMENT_NOTE);
+    expect(catalog.json.packs.length).toBeGreaterThan(0);
+    for (const pack of catalog.json.packs) {
+      expect(pack.locked).toBe(false);
+      expect(pack.claim.claimKind).toBe("self_reported");
+      expect(pack.claim.statusDimensions.result).toBe("not_evaluated");
+      expect(pack.claim.claimLabel).toMatch(/^Claim: Self-reported/);
+      expect(claimKindSchema.safeParse(pack.claim.claimKind).success).toBe(true);
+      expect(statusDimensionsSchema.safeParse(pack.claim.statusDimensions).success).toBe(true);
     }
-    const content = await get(fixture, `/industry-packs/${encodeURIComponent(packId)}`, "studio-pack-paid");
+    const packId = catalog.json.packs[0].packId;
+    const content = await get(fixture, `/industry-packs/${encodeURIComponent(packId)}`, "studio-pack-free");
     expect(content.status, content.body).toBe(200);
     expect(content.json.pack.id).toBe(packId);
-    expect(content.json.entitlement.active).toBe(true);
+    expect(content.json.entitlement).toMatchObject({ active: true, source: "free", message: INDUSTRY_PACKS_FREE_MESSAGE });
     expect(content.json.entitlementNote).toBe(ENTITLEMENT_NOTE);
     expect(content.json.claimKind).toBe("self_reported");
     expect(content.json.statusDimensions.result).toBe("not_evaluated");
     expect(content.json.claimLabel).toMatch(/^Claim: Self-reported/);
+    legacyLicence(fixture.workspace);
+    const licensedCatalog = await get(fixture, "/industry-packs/list", "studio-catalog-legacy-licence");
+    expect(licensedCatalog.json.packs).toEqual(catalog.json.packs);
+    expect(licensedCatalog.json.entitlementNote).toBe(ENTITLEMENT_NOTE);
+    const licensedContent = await get(fixture, `/industry-packs/${encodeURIComponent(packId)}`, "studio-pack-legacy-licence");
+    expect({ ...licensedContent.json, entitlement: null }).toEqual({ ...content.json, entitlement: null });
   });
 
-  test.each(["__proto__", "constructor", "toString", "hasOwnProperty"])("a genuine signed entitlement still refuses inherited pack ID %s", async packId => {
+  test.each(["__proto__", "constructor", "toString", "hasOwnProperty"])("refuses inherited pack ID %s, with no entitlement needed", async packId => {
     const fixture = await studioFixture();
-    signedEntitlement(fixture.workspace);
     const response = await get(fixture, `/industry-packs/${encodeURIComponent(packId)}`, `studio-pack-inherited-${packId}`);
     requireError(response);
     expect(response.status).toBe(404);

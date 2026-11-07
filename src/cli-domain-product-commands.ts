@@ -25,7 +25,7 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
   sectorPack
     .command("access")
     .alias("subscribe")
-    .description("Show Industry Packs access, licence verification and checkout availability")
+    .description("Show Industry Packs access (free: every pack is included, no licence needed)")
     .option("--json", "Output as JSON")
     .action(async (opts: { json?: boolean }) => {
       const { getIndustryPackEntitlement } = await import("./domains/industryPackEntitlement.js");
@@ -36,11 +36,8 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       }
       console.log(chalk.bold.hex('#4AEF79')("\n🏭  Industry Packs Access"));
       console.log(chalk.gray("Plan:"), entitlement.planId);
-      console.log(chalk.gray("Price:"), `US$${entitlement.priceUsdMonthly}/month`);
-      console.log(chalk.gray("Status:"), entitlement.active ? chalk.green("active") : chalk.yellow("locked"));
-      console.log(chalk.gray("Licence verification:"), entitlement.licenseVerificationConfigured ? chalk.green("configured") : chalk.yellow("not configured"));
-      console.log(chalk.gray("Checkout:"), entitlement.checkoutAvailable ? chalk.green("available") : chalk.yellow("not available in this deployment"));
-      console.log(chalk.gray("Source:"), entitlement.source);
+      console.log(chalk.gray("Price:"), "free");
+      console.log(chalk.gray("Status:"), chalk.green("active"));
       console.log("");
       console.log(entitlement.message);
       console.log("");
@@ -48,42 +45,23 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
 
   sectorPack
     .command("checkout")
-    .description("Print the checkout link when this deployment has a checkout and licence verification configured")
-    .option("--success-url <url>", "Return URL after successful payment")
-    .option("--cancel-url <url>", "Return URL if checkout is cancelled")
-    .option("--email <email>", "Customer email to prefill at checkout")
-    .option("--reference <id>", "Client reference ID for the checkout provider")
+    .description("Industry Packs are free; there is nothing to buy (kept for scripts that call it)")
+    .option("--success-url <url>", "Ignored: there is no checkout")
+    .option("--cancel-url <url>", "Ignored: there is no checkout")
+    .option("--email <email>", "Ignored: there is no checkout")
+    .option("--reference <id>", "Ignored: there is no checkout")
     .option("--json", "Output as JSON")
-    .action(async (opts: { successUrl?: string; cancelUrl?: string; email?: string; reference?: string; json?: boolean }) => {
-      const { buildIndustryPackCheckoutUrl, getIndustryPackEntitlement } = await import("./domains/industryPackEntitlement.js");
+    .action(async (opts: { json?: boolean }) => {
+      const { getIndustryPackEntitlement } = await import("./domains/industryPackEntitlement.js");
       const entitlement = getIndustryPackEntitlement(process.cwd());
-      if (!entitlement.checkoutAvailable) {
-        if (opts.json) console.log(JSON.stringify({ error: "checkout_not_available", message: entitlement.message, entitlement }, null, 2));
-        else console.error(chalk.yellow(entitlement.message));
-        process.exit(1); return;
-      }
-      try {
-        const checkoutUrl = buildIndustryPackCheckoutUrl({
-          successUrl: opts.successUrl,
-          cancelUrl: opts.cancelUrl,
-          customerEmail: opts.email,
-          clientReferenceId: opts.reference
-        });
-        if (opts.json) {
-          console.log(JSON.stringify({ checkoutUrl, entitlement }, null, 2));
-          return;
-        }
-        console.log(chalk.bold.hex('#4AEF79')("\n🏭  Industry Packs Checkout"));
-        console.log(chalk.gray("Price:"), `US$${entitlement.priceUsdMonthly}/month`);
-        console.log(checkoutUrl);
-        console.log(chalk.gray("\nAfter payment, activate the licence: amc domain pack activate --key <licence-key>"));
-      } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+      if (opts.json) console.log(JSON.stringify({ checkoutUrl: null, entitlement }, null, 2));
+      else console.log(entitlement.message);
     });
 
   sectorPack
     .command("activate")
-    .description("Activate Industry Packs with a licence signed by a key pinned in the AMC trust list")
-    .requiredOption("--key <licenseKey>", "License key from checkout")
+    .description("Record a legacy Industry Packs licence (not needed: Industry Packs are free)")
+    .requiredOption("--key <licenseKey>", "Legacy Industry Packs licence key")
     // Kept only to refuse it by name: the expiry is the one the issuer signed into the licence, enforced at verification.
     .addOption(new Option("--expires-at <isoDate>").hideHelp())
     .option("--json", "Output as JSON")
@@ -99,15 +77,14 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
           console.log(JSON.stringify(entitlement, null, 2));
           return;
         }
-        console.log(chalk.green("Industry Packs activated: the licence verified against a pinned licence key."));
-        if (entitlement.expiresAt) console.log(chalk.gray(`Expires: ${entitlement.expiresAt}`));
+        console.log(chalk.green("Licence recorded: it verified against a pinned licence key. Industry Packs are free, so it changes nothing."));
       } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
     });
 
   withTrustFlags(sectorPack
     .command("verify")
-    .description("Verify an Industry Packs license key against the licence key pinned in the AMC trust list")
-    .requiredOption("--key <licenseKey>", "License key from checkout"),
+    .description("Verify a legacy Industry Packs license key against the licence key pinned in the AMC trust list")
+    .requiredOption("--key <licenseKey>", "Legacy Industry Packs licence key"),
   { json: true })
     .action(async (opts: { key: string } & TrustFlags) => {
       const { verifyIndustryPackLicenseReport } = await import("./domains/industryPackEntitlement.js");
@@ -141,7 +118,7 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       }
       const entitlement = getIndustryPackEntitlement(process.cwd());
 
-      let packs: Array<{ packId: string; name: string; domain: string; questionCount: number; riskLevel: string; locked: boolean }>;
+      let packs: Array<{ packId: string; name: string; domain: string; questionCount: number; riskLevel: string }>;
 
       if (station) {
         packs = getIndustryPacksByStation(station).map(p => toIndustryPackCatalogItem(p, entitlement));
@@ -162,18 +139,14 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       const { QUESTIONNAIRE_NOTICE } = await import("./domains/questionnaireLabel.js");
       console.log(chalk.gray(`  Experimental, self-reported questionnaires. ${QUESTIONNAIRE_NOTICE}\n`));
       const maxName = Math.max(...packs.map(p => p.name.length), 10);
-      console.log(`  ${"Pack ID".padEnd(30)} ${"Name".padEnd(maxName + 2)} ${"Domain".padEnd(14)} ${"Questions".padEnd(12)} ${"Access".padEnd(10)} Risk`);
-      console.log(chalk.gray(`  ${"─".repeat(30)} ${"─".repeat(maxName + 2)} ${"─".repeat(14)} ${"─".repeat(12)} ${"─".repeat(10)} ${"─".repeat(10)}`));
+      console.log(`  ${"Pack ID".padEnd(30)} ${"Name".padEnd(maxName + 2)} ${"Domain".padEnd(14)} ${"Questions".padEnd(12)} Risk`);
+      console.log(chalk.gray(`  ${"─".repeat(30)} ${"─".repeat(maxName + 2)} ${"─".repeat(14)} ${"─".repeat(12)} ${"─".repeat(10)}`));
       for (const p of packs) {
-        console.log(`  ${chalk.cyan(p.packId.padEnd(30))} ${p.name.padEnd(maxName + 2)} ${p.domain.padEnd(14)} ${String(p.questionCount).padEnd(12)} ${(p.locked ? "locked" : "active").padEnd(10)} ${p.riskLevel}`);
+        console.log(`  ${chalk.cyan(p.packId.padEnd(30))} ${p.name.padEnd(maxName + 2)} ${p.domain.padEnd(14)} ${String(p.questionCount).padEnd(12)} ${p.riskLevel}`);
       }
-      console.log(chalk.gray(`\n  Total: ${packs.length} packs, ${packs.reduce((s, p) => s + p.questionCount, 0)} questions`));
-      if (!entitlement.active) {
-        console.log(chalk.yellow(`\n${entitlement.message}`));
-      } else {
-        console.log(chalk.gray(`\n  Run a pack: amc domain pack run --pack <packId> --agent <agentId>`));
-        console.log(chalk.gray(`  Describe:   amc domain pack describe --pack <packId>`));
-      }
+      console.log(chalk.gray(`\n  Total: ${packs.length} packs, ${packs.reduce((s, p) => s + p.questionCount, 0)} questions (free, all included)`));
+      console.log(chalk.gray(`\n  Run a pack: amc domain pack run --pack <packId>`));
+      console.log(chalk.gray(`  Describe:   amc domain pack describe --pack <packId>`));
     });
 
   sectorPack
@@ -183,21 +156,10 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
     .option("--json", "Output as JSON")
     .action(async (opts: { pack: string; json?: boolean }) => {
       const { getPackById } = await import("./domains/industryPacks.js");
-      const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
       const pack = getPackById(opts.pack);
       if (!pack) {
         console.error(chalk.red(`Pack not found: ${opts.pack}`));
         console.log(chalk.gray("List available packs: amc domain pack list"));
-        process.exit(1); return;
-      }
-      try {
-        assertIndustryPackAccess(process.cwd());
-      } catch (e: unknown) {
-        if (opts.json && e instanceof Error && "entitlement" in e) {
-          console.log(JSON.stringify({ error: "industry_packs_locked", message: e.message }, null, 2));
-        } else {
-          console.error(chalk.yellow(toErrorMessage(e)));
-        }
         process.exit(1); return;
       }
       if (opts.json) { console.log(JSON.stringify(pack, null, 2)); return; }
@@ -235,23 +197,12 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
     .option("--json", "Output as JSON")
     .action(async (opts: { pack: string; baseline: boolean; json?: boolean }) => {
       const { getPackById, scoreIndustryPack } = await import("./domains/industryPacks.js");
-      const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
       const { packSelfAssessmentEnvelope } = await import("./domains/packSelfAssessment.js");
       type PackIdType = Parameters<typeof scoreIndustryPack>[0];
       const pack = getPackById(opts.pack);
       if (!pack) {
         console.error(chalk.red(`Pack not found: ${opts.pack}`));
         console.log(chalk.gray("List available packs: amc domain pack list"));
-        process.exit(1); return;
-      }
-      try {
-        assertIndustryPackAccess(process.cwd());
-      } catch (e: unknown) {
-        if (opts.json && e instanceof Error && "entitlement" in e) {
-          console.log(JSON.stringify({ error: "industry_packs_locked", message: e.message }, null, 2));
-        } else {
-          console.error(chalk.yellow(toErrorMessage(e)));
-        }
         process.exit(1); return;
       }
       if (!opts.json) {
@@ -496,8 +447,6 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
     .option("--json", "Output as JSON")
     .action(async (opts: DomainCommandOpts & { output: string }) => {
       try {
-        const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
-        assertIndustryPackAccess(process.cwd());
         const { buildDomainReportForAgent, parseDomainOrThrow } = await import("./domains/domainCliIntegration.js");
         const domain = parseDomainOrThrow(opts.domain);
         const report = buildDomainReportForAgent({ agentId: opts.agent, domain, outputPath: opts.output, example: opts.example === true });
@@ -524,8 +473,6 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
     .option("--json", "Output as JSON")
     .action(async (opts: DomainCommandOpts) => {
       try {
-        const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
-        assertIndustryPackAccess(process.cwd());
         const { parseDomainOrThrow, runDomainAssurance } = await import("./domains/domainCliIntegration.js");
         const domain = parseDomainOrThrow(opts.domain);
         const run = runDomainAssurance(opts.agent, domain, { example: opts.example === true });
@@ -687,8 +634,6 @@ type DomainCommandOpts = { agent: string; domain: string; example?: boolean; jso
 type ClaimOutcome = { status: string; reasons: string[]; claimKind: ClaimKind; statusDimensions: StatusDimensions; banner?: string };
 
 async function assessForCli(opts: DomainCommandOpts) {
-  const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
-  assertIndustryPackAccess(process.cwd());
   const { assessDomainForAgent, parseDomainOrThrow } = await import("./domains/domainCliIntegration.js");
   return assessDomainForAgent({ agentId: opts.agent, domain: parseDomainOrThrow(opts.domain), example: opts.example === true });
 }

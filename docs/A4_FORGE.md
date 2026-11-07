@@ -7,11 +7,15 @@ approvers decided on. A4 produces signed, `self_reported` records of how the age
 statement that the agent is safe, correct or lawful.
 
 Status: preview. Every A4 route and Studio page is absent unless the operator sets `AMC_A4_PREVIEW=1` in the Studio
-process environment (D-20), and every `amc a4` command refuses without it in its own environment. The spine (store, gates, readiness, verification, Studio shell) has landed; each stage's
-producers land with its own plan item (Aspire P1-59, Assemble P1-60, Adapt P1-61, Activate P1-62), and until then a
-stage records human-authored content through the "no producer registered" path, labelled as such. The decisions behind
-the design are in `docs/adr/013-a4-forge-spine.md`; the verifier rules are in `spec/ACCEPTANCE_RULES.md`
-("A4 project record").
+process environment (D-20), and every `amc a4` command refuses without it in its own environment. The spine (store,
+gates, readiness, verification, Studio shell) and every stage's producers have landed (Aspire P1-59, Assemble P1-60,
+Adapt P1-61, Activate P1-62; Activate's Build is the release effect, `POST …/releases`), and so have the `amc a4` command
+line (P1-65, below) and, with P1-64, five MCP tools (four reads and a self-reported comment; none decides, builds,
+completes or releases; [MCP_SERVER.md](MCP_SERVER.md)) and the Node client `createA4Client` ([SDK.md](SDK.md) lists the
+routes it covers). Since every stage registers producers, the "no producer registered" path, which records
+human-authored content labelled as such, serves no stage now: text a member sends with a step is recorded beside AMC's
+outputs as their own statement. The decisions behind the design are in `docs/adr/013-a4-forge-spine.md`; the verifier
+rules are in `spec/ACCEPTANCE_RULES.md` ("A4 project record").
 
 ## The journey
 
@@ -237,8 +241,8 @@ framework through a scaffold, connect instructions and a trace import.
   completion, evidence verification). On the stub provider every ref about the agent is `synthetic_example` and the
   review reads "tool pipeline observed on a stub model; agent behaviour not evaluated". Review records the agent's
   lifecycle stage as `lifecycle/state.json` holds it (`not_evaluated` with the reason when the file is absent or
-  unreadable) and advances nothing: the development → testing bridge (design §7 item 9) waits for the A4 lifecycle
-  wrapper, so `lifecycle_bridge` reads NOT_EVALUATED with `KEY:A4_LIFECYCLE_WRAPPER`. `unit_tests_passing` needs every
+  unreadable) and advances nothing: the development → testing bridge (design §7 item 9) runs after Activate's `RELEASE`
+  (below), so Assemble's `lifecycle_bridge` reads NOT_EVALUATED with `KEY:A4_LIFECYCLE_WRAPPER`. `unit_tests_passing` needs every
   pinned check executed and passed on a non-stub provider. Review itself records no observed ref yet: it does not
   reference the session's runtime-written rows as ledger refs. Every answered capability is `not_evaluated`: nothing
   maps a check or a session output to it.
@@ -969,7 +973,7 @@ reads them, decides gates, completes them and runs the release, deployment and r
   `--trust-list`, the only A4 surface where the caller names a trust list. `amc a4 export <projectId> --run <runId>
   --out <file>` is `amc bundle export` for the project's agent; `--out` must lie inside the workspace.
 
-## Using the API before the Studio pages
+## Using the API directly
 
 With `AMC_A4_PREVIEW=1` and a Studio session (`amc approvals login` or the Studio login), read the native CSRF token
 from `GET /auth/me` (field `nativeCsrfToken`), then send on every call:

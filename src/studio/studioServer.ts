@@ -8374,30 +8374,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
-        const { buildIndustryPackCheckoutUrl, getIndustryPackEntitlement } = await import("../domains/industryPackEntitlement.js");
-        const entitlement = getIndustryPackEntitlement(options.workspace);
-        if (!entitlement.checkoutAvailable) {
-          json(res, 503, { error: entitlement.message, entitlement, entitlementNote: ENTITLEMENT_NOTE });
-          return;
-        }
-        const parsed = req.method === "POST"
-          ? (JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576) || "{}") as {
-              successUrl?: string;
-              cancelUrl?: string;
-              customerEmail?: string;
-              clientReferenceId?: string;
-            })
-          : {};
-        const checkoutUrl = buildIndustryPackCheckoutUrl({
-          successUrl: parsed.successUrl ?? url.searchParams.get("successUrl") ?? undefined,
-          cancelUrl: parsed.cancelUrl ?? url.searchParams.get("cancelUrl") ?? undefined,
-          customerEmail: parsed.customerEmail ?? url.searchParams.get("email") ?? undefined,
-          clientReferenceId: parsed.clientReferenceId ?? url.searchParams.get("reference") ?? undefined
-        });
-        json(res, 200, {
-          checkoutUrl,
-          entitlement, entitlementNote: ENTITLEMENT_NOTE
-        });
+        // Industry Packs are free: there is no checkout, and the route answers so for clients that still call it.
+        const { getIndustryPackEntitlement } = await import("../domains/industryPackEntitlement.js");
+        json(res, 200, { checkoutUrl: null, entitlement: getIndustryPackEntitlement(options.workspace), entitlementNote: ENTITLEMENT_NOTE });
         return;
       }
 
@@ -8465,7 +8444,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         json(res, 200, {
           entitlement, entitlementNote: ENTITLEMENT_NOTE,
           packs: listIndustryPacks().filter((pack) => station === null || pack.stationId === station)
-            .map((pack) => toIndustryPackCatalogItem(pack, entitlement))
+            .map((pack) => toIndustryPackCatalogItem(pack))
         });
         return;
       }
@@ -8478,14 +8457,6 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const { getPackById } = await import("../domains/industryPacks.js");
         const { getIndustryPackEntitlement } = await import("../domains/industryPackEntitlement.js");
         const entitlement = getIndustryPackEntitlement(options.workspace);
-        if (!entitlement.active) {
-          json(res, 402, {
-            error: "industry_packs_locked",
-            message: entitlement.message,
-            entitlement, entitlementNote: ENTITLEMENT_NOTE
-          });
-          return;
-        }
         const packId = decodeURIComponent(industryPackMatch[1] ?? "");
         const pack = getPackById(packId);
         if (!pack) {

@@ -3,7 +3,7 @@
  * 
  * Endpoints:
  *   GET  /api/health          — Health check
- *   GET  /api/industry-packs/access — Industry Packs price and checkout availability in this deployment
+ *   GET  /api/industry-packs/access — Industry Packs access: free, with no licence, checkout or payment
  *   POST /api/quickscore      — Quick self-assessment score
  *   GET  /api/badge/:agentId  — Labelled placeholder SVG badge
  * 
@@ -21,10 +21,10 @@ import { questionBank } from '../src/diagnostic/questionBank.js';
 import { listAssurancePacks } from '../src/assurance/packs/index.js';
 import { listIndustryPacks } from '../src/domains/industryPacks.js';
 import {
-  buildIndustryPackCheckoutUrl,
   createIndustryPackLicenseKey,
   hostedIndustryPackAccess,
   INDUSTRY_PACKS_MONTHLY_PRICE_USD,
+  INDUSTRY_PACKS_FREE_PLAN_ID,
   INDUSTRY_PACKS_PLAN_ID,
   verifyIndustryPackLicenseKey,
   type IndustryPackLicenseStatus
@@ -51,13 +51,6 @@ interface ScoreResult {
   packageVersion: string;
   assessmentBasis: 'self_reported';
   evidenceVerified: false;
-}
-
-interface CheckoutRequest {
-  successUrl?: string;
-  cancelUrl?: string;
-  customerEmail?: string;
-  clientReferenceId?: string;
 }
 
 interface LicenseIssueRequest {
@@ -245,6 +238,7 @@ interface PaymentEvent {
 }
 
 /**
+ * Legacy licences only: Industry Packs are free, so access never needs this webhook or a licence.
  * A verified, paid checkout is recorded once per event id as a fulfilment request. The webhook never issues a licence:
  * issue stays on the admin path (POST /api/industry-packs/license/issue), and delivery to the buyer is not wired.
  */
@@ -310,7 +304,7 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
       assurancePacks: listAssurancePacks().length,
       sectorPacks: listIndustryPacks().length,
       inventoryBasis: 'registered_catalogs_and_installed_files',
-      industryPacksPlan: INDUSTRY_PACKS_PLAN_ID,
+      industryPacksPlan: INDUSTRY_PACKS_FREE_PLAN_ID,
       industryPacksPriceUsdMonthly: INDUSTRY_PACKS_MONTHLY_PRICE_USD,
     });
     return;
@@ -322,28 +316,8 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
   }
 
   if (path === '/api/industry-packs/checkout' && method === 'POST') {
-    const access = hostedIndustryPackAccess();
-    if (!access.checkoutAvailable) {
-      sendJson(res, 503, { error: 'checkout_not_available', ...access });
-      return;
-    }
-    let data: CheckoutRequest;
-    try {
-      data = await readJsonBody<CheckoutRequest>(req);
-    } catch {
-      sendJson(res, 400, { error: 'Invalid JSON body' });
-      return;
-    }
-    sendJson(res, 200, {
-      planId: INDUSTRY_PACKS_PLAN_ID,
-      priceUsdMonthly: INDUSTRY_PACKS_MONTHLY_PRICE_USD,
-      checkoutUrl: buildIndustryPackCheckoutUrl({
-        successUrl: data.successUrl,
-        cancelUrl: data.cancelUrl,
-        customerEmail: data.customerEmail,
-        clientReferenceId: data.clientReferenceId,
-      }),
-    });
+    // Industry Packs are free: there is no checkout, and the route answers so for clients that still call it.
+    sendJson(res, 200, hostedIndustryPackAccess());
     return;
   }
 
@@ -462,11 +436,11 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
       version: amcVersion,
       endpoints: {
         'GET /api/health': 'Health check',
-        'GET /api/industry-packs/access': 'Industry Packs price and whether checkout is available in this deployment',
-        'POST /api/industry-packs/checkout': 'Create an Industry Packs checkout handoff URL (503 when checkout is not available)',
-        'POST /api/industry-packs/license/verify': 'Verify an Industry Packs license key against this server\'s issuing key',
-        'POST /api/industry-packs/license/issue': 'Admin only: issue a signed Industry Packs license key for a paid customer',
-        'POST /api/industry-packs/webhook': 'Payment provider webhook (Stripe-Signature); records a paid checkout for admin issue',
+        'GET /api/industry-packs/access': 'Industry Packs access: free, with no licence, checkout or payment',
+        'POST /api/industry-packs/checkout': 'Industry Packs are free: returns the free access record (no checkout)',
+        'POST /api/industry-packs/license/verify': 'Legacy licences: verify an Industry Packs license key against this server\'s issuing key (none is needed for access)',
+        'POST /api/industry-packs/license/issue': 'Legacy licences, admin only: issue a signed Industry Packs license key (none is needed for access)',
+        'POST /api/industry-packs/webhook': 'Legacy licences: payment provider webhook (Stripe-Signature); records a paid checkout for admin issue',
         'POST /api/quickscore': 'Quick self-assessment score',
         'GET /api/badge/:agentId': 'SVG badge for agent score',
       },

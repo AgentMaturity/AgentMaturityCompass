@@ -20,7 +20,7 @@ Different tools for different jobs. Promptfoo evaluates prompt quality. AMC answ
 
 **What's free:** Everything — the entire trust stack (Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport), all 14 adapters, the 244-question default diagnostic bank, CI gates. MIT licensed.
 
-**What's paid:** 41 industry-specific domain packs for regulated verticals (healthcare, finance, education, logistics).
+**What's paid:** Nothing. The 41 industry-specific domain packs for regulated verticals (healthcare, finance, education, logistics) are free too: experimental, self-reported questionnaires, with no licence or account.
 
 2,399 Vitest test source files. Would love feedback from this community.
 

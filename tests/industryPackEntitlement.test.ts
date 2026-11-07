@@ -5,12 +5,11 @@ import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import {
   activateIndustryPackAccess,
-  buildIndustryPackCheckoutUrl,
   createIndustryPackLicenseKey,
-  assertIndustryPackAccess,
-  formatIndustryPackPaywallMessage,
   getIndustryPackEntitlement,
-  INDUSTRY_PACKS_MONTHLY_PRICE_USD,
+  hostedIndustryPackAccess,
+  INDUSTRY_PACKS_FREE_MESSAGE,
+  INDUSTRY_PACKS_FREE_PLAN_ID,
   toIndustryPackCatalogItem,
   verifyIndustryPackLicenseKey,
   verifyIndustryPackLicenseReport
@@ -56,64 +55,53 @@ afterEach(() => {
   }
 });
 
-describe("industry pack entitlement", () => {
-  test("catalog exposes every industry pack, locked, by default", () => {
+describe("Industry Packs are free", () => {
+  test("every workspace has access with no licence, checkout or payment", () => {
+    const entitlement = getIndustryPackEntitlement(createWorkspace(), unpinnedEnv());
+    expect(entitlement).toMatchObject({
+      active: true, source: "free", planId: INDUSTRY_PACKS_FREE_PLAN_ID, priceUsdMonthly: "0.00",
+      checkoutAvailable: false, checkoutUrl: null, licenseVerificationConfigured: false, message: INDUSTRY_PACKS_FREE_MESSAGE
+    });
+    expect(entitlement.message).toMatch(/never changes a score/);
+    expect(entitlement.message).not.toMatch(/https?:\/\/|Buy:|subscribe|locked|US\$/i);
+  });
+
+  test("the catalogue lists every pack, unlocked, with its own description and regulatory basis", () => {
     const entitlement = getIndustryPackEntitlement(createWorkspace(), unpinnedEnv());
     const catalog = listIndustryPacks().map((pack) => toIndustryPackCatalogItem(pack, entitlement));
-
     expect(catalog).toHaveLength(listIndustryPacks().length);
-    expect(catalog.every((pack) => pack.locked)).toBe(true);
-    expect(new Set(catalog.map((pack) => pack.packId)).size).toBe(catalog.length);
-  });
-
-  test("a locked pack still shows its name, its own description and its regulatory basis", () => {
-    const entitlement = getIndustryPackEntitlement(createWorkspace(), unpinnedEnv());
+    expect(catalog.every((row) => row.locked === false)).toBe(true);
+    expect(new Set(catalog.map((row) => row.packId)).size).toBe(catalog.length);
     const pack = getIndustryPack("clinical-trials");
-    const catalog = toIndustryPackCatalogItem(pack, entitlement);
-
-    expect(entitlement.active).toBe(false);
-    expect(catalog.locked).toBe(true);
-    expect(catalog.name).toBe(pack.name);
-    expect(catalog.description).toBe(pack.description);
-    expect(catalog.regulatoryBasis).toEqual(pack.regulatoryBasis);
-    expect(catalog.complianceFrameworks).toEqual(pack.complianceFrameworks);
-    expect(catalog.questionCount).toBe(pack.questions.length);
+    expect(toIndustryPackCatalogItem(pack)).toMatchObject({
+      name: pack.name, description: pack.description, regulatoryBasis: pack.regulatoryBasis,
+      complianceFrameworks: pack.complianceFrameworks, questionCount: pack.questions.length
+    });
   });
 
-  test("unsigned environment flags cannot unlock packs", () => {
-    const entitlement = getIndustryPackEntitlement(createWorkspace(), unpinnedEnv({ AMC_INDUSTRY_PACKS_ACTIVE: "1" }));
-    expect(entitlement.active).toBe(false);
-  });
-
-  test("a public key, HMAC secret or legacy allowlist the client supplies never unlocks packs", () => {
-    const keys = operatorEnvKeys();
-    const signed = createIndustryPackLicenseKey({ expiresAt: "2099-01-01T00:00:00.000Z", env: keys as NodeJS.ProcessEnv });
-    const legacy = "AMC-INDUSTRY-PACKS-TESTKEY123";
-    const legacyDigest = "518ccf6ef3fbe1622babaa1e40276236a29bac755abd7cc1d67b4b97ac37ec2f";
-    for (const env of [
-      unpinnedEnv({ ...keys, AMC_INDUSTRY_PACKS_LICENSE_KEY: signed }),
-      unpinnedEnv({ AMC_INDUSTRY_PACKS_LICENSE_SECRET: "client-secret", AMC_INDUSTRY_PACKS_LICENSE_KEY: signed }),
-      unpinnedEnv({ AMC_INDUSTRY_PACKS_LEGACY_KEY_SHA256_ALLOWLIST: legacyDigest, AMC_INDUSTRY_PACKS_LICENSE_KEY: legacy })
-    ]) {
-      const entitlement = getIndustryPackEntitlement(createWorkspace(), env);
-      expect(entitlement.active).toBe(false);
-      expect(entitlement.licenseVerificationConfigured).toBe(false);
-    }
-  });
-
-  test("a licence signed by a key pinned in the operator trust list unlocks packs", () => {
+  test("a licence, a checkout URL or a broken trust list changes nothing about access", () => {
     const licence = pinnedLicence();
-    const entitlement = getIndustryPackEntitlement(createWorkspace(), { ...licence.env } as NodeJS.ProcessEnv);
-    expect(entitlement).toMatchObject({ active: true, source: "env", licenseVerificationConfigured: true, subscriptionId: "sub_test" });
-
-    const other = pinnedLicence();
-    const forged = getIndustryPackEntitlement(createWorkspace(),
-      { AMC_HOME: other.amcHome, AMC_INDUSTRY_PACKS_LICENSE_KEY: licence.licenseKey } as NodeJS.ProcessEnv);
-    expect(forged.active).toBe(false);
-    expect(forged.licenseVerificationConfigured).toBe(true);
-    expect(forged.message).toContain("The environment licence was refused: the licence is not signed by a pinned Industry Packs licence key.");
+    const home = createWorkspace();
+    mkdirSync(join(home, "trust"), { recursive: true });
+    writeFileSync(join(home, "trust", "amc-trust-list.json"), "{}");
+    for (const env of [
+      { ...licence.env },
+      { AMC_HOME: licence.amcHome, AMC_INDUSTRY_PACKS_CHECKOUT_URL: "https://payments.example.test/checkout" },
+      { AMC_HOME: home }
+    ] as NodeJS.ProcessEnv[]) {
+      expect(getIndustryPackEntitlement(createWorkspace(), env)).toMatchObject({ active: true, source: "free", checkoutUrl: null });
+    }
+    expect(getIndustryPackEntitlement(createWorkspace(), { AMC_HOME: licence.amcHome } as NodeJS.ProcessEnv).licenseVerificationConfigured).toBe(true);
   });
 
+  test("the hosted API offers no checkout", () => {
+    expect(hostedIndustryPackAccess()).toEqual({
+      planId: INDUSTRY_PACKS_FREE_PLAN_ID, priceUsdMonthly: "0.00", checkoutAvailable: false, checkoutUrl: null, message: INDUSTRY_PACKS_FREE_MESSAGE
+    });
+  });
+});
+
+describe("legacy licences stay verifiable", () => {
   test("activation refuses when no licence key is pinned and writes no access file", () => {
     const workspace = createWorkspace();
     const licence = pinnedLicence({ pinned: false });
@@ -127,10 +115,9 @@ describe("industry pack entitlement", () => {
     const licence = pinnedLicence();
     const entitlement = activateIndustryPackAccess({ workspace, licenseKey: licence.licenseKey, env: { AMC_HOME: licence.amcHome } });
 
-    expect(entitlement.active).toBe(true);
-    expect(entitlement.source).toBe("file");
-    expect(entitlement.subscriptionId).toBe("sub_test");
-    expect(entitlement.expiresAt).toBe("2099-01-01T00:00:00.000Z");
+    expect(entitlement).toMatchObject({ active: true, source: "free", licenseVerificationConfigured: true });
+    const stored = JSON.parse(readFileSync(join(workspace, ".amc", "industry-packs-access.json"), "utf8")) as Record<string, unknown>;
+    expect(stored).toMatchObject({ subscriptionId: "sub_test", expiresAt: "2099-01-01T00:00:00.000Z" });
     const raw = readFileSync(join(workspace, ".amc", "industry-packs-access.json"), "utf8");
     expect(raw).not.toContain(licence.licenseKey);
     expect(getIndustryPackEntitlement(workspace, { AMC_HOME: licence.amcHome } as NodeJS.ProcessEnv).active).toBe(true);
@@ -159,110 +146,14 @@ describe("industry pack entitlement", () => {
   test("signed licences reject tampering and expiry", () => {
     const active = pinnedLicence();
     const expired = pinnedLicence({ expiresAt: "2000-01-01T00:00:00.000Z" });
+    const trust = loadTrustContext({ amcHome: active.amcHome });
 
-    expect(getIndustryPackEntitlement(createWorkspace(),
-      { AMC_HOME: active.amcHome, AMC_INDUSTRY_PACKS_LICENSE_KEY: `${active.licenseKey}x` } as NodeJS.ProcessEnv).active).toBe(false);
-    expect(getIndustryPackEntitlement(createWorkspace(), { ...expired.env } as NodeJS.ProcessEnv).active).toBe(false);
+    expect(verifyIndustryPackLicenseReport(`${active.licenseKey}x`, trust).valid).toBe(false);
+    expect(verifyIndustryPackLicenseReport(expired.licenseKey, loadTrustContext({ amcHome: expired.amcHome })).valid).toBe(false);
     expect(() => activateIndustryPackAccess({ workspace: createWorkspace(), licenseKey: expired.licenseKey, env: { AMC_HOME: expired.amcHome } }))
       .toThrow(/expired/);
   });
 
-  test("expired local entitlement returns locked state", () => {
-    const workspace = createWorkspace();
-    mkdirSync(join(workspace, ".amc"), { recursive: true });
-    writeFileSync(join(workspace, ".amc", "industry-packs-access.json"), JSON.stringify({
-      active: true,
-      planId: "industry-packs-monthly",
-      expiresAt: "2000-01-01T00:00:00.000Z",
-      licenseKeySha256: "redacted"
-    }));
-
-    const entitlement = getIndustryPackEntitlement(workspace, unpinnedEnv());
-    expect(entitlement.active).toBe(false);
-    expect(entitlement.source).toBe("none");
-  });
-
-  test("forged active local entitlement and tampered signed proof both fail closed", () => {
-    const workspace = createWorkspace();
-    const licence = pinnedLicence();
-    const env = { AMC_HOME: licence.amcHome } as NodeJS.ProcessEnv;
-    mkdirSync(join(workspace, ".amc"), { recursive: true });
-    const accessPath = join(workspace, ".amc", "industry-packs-access.json");
-    writeFileSync(accessPath, JSON.stringify({
-      active: true,
-      planId: "industry-packs-monthly",
-      expiresAt: "2099-01-01T00:00:00.000Z",
-    }));
-    expect(getIndustryPackEntitlement(workspace, env).active).toBe(false);
-
-    activateIndustryPackAccess({ workspace, licenseKey: licence.licenseKey, env });
-    const stored = JSON.parse(readFileSync(accessPath, "utf8")) as Record<string, unknown>;
-    stored.licenseSignature = `${String(stored.licenseSignature)}x`;
-    writeFileSync(accessPath, JSON.stringify(stored));
-    expect(getIndustryPackEntitlement(workspace, env).active).toBe(false);
-  });
-
-  test("a broken trust configuration keeps packs locked and says why", () => {
-    const home = createWorkspace();
-    mkdirSync(join(home, "trust"), { recursive: true });
-    writeFileSync(join(home, "trust", "amc-trust-list.json"), "{}");
-    const entitlement = getIndustryPackEntitlement(createWorkspace(), { AMC_HOME: home } as NodeJS.ProcessEnv);
-    expect(entitlement.active).toBe(false);
-    expect(entitlement.licenseVerificationConfigured).toBe(false);
-    expect(entitlement.message).toMatch(/trust configuration could not be read/);
-  });
-});
-
-describe("the paywall tells the truth", () => {
-  test("without checkout or a pinned key: what is locked, the price and no purchase step", () => {
-    const entitlement = getIndustryPackEntitlement(createWorkspace(), unpinnedEnv());
-    const text = formatIndustryPackPaywallMessage(entitlement);
-
-    expect(entitlement).toMatchObject({ checkoutAvailable: false, checkoutUrl: null, licenseVerificationConfigured: false });
-    expect(entitlement.message).toBe(text);
-    expect(text).toMatch(/^Industry Packs are locked/);
-    expect(text).toContain("amc domain pack describe");
-    expect(text).toContain("amc_score_sector_pack");
-    expect(text).toContain(`US$${INDUSTRY_PACKS_MONTHLY_PRICE_USD}/month`);
-    expect(text).toMatch(/never changes a score/);
-    expect(text).toContain("Checkout is not available in this deployment; contact sales for access.");
-    expect(text).toMatch(/licence verification is not configured/i);
-    expect(text).not.toMatch(/https?:\/\//);
-    expect(text).not.toMatch(/activate --key|Buy:|subscribe/i);
-  });
-
-  test("a checkout URL without a pinned licence key is still no purchase step", () => {
-    const entitlement = getIndustryPackEntitlement(createWorkspace(),
-      unpinnedEnv({ AMC_INDUSTRY_PACKS_CHECKOUT_URL: "https://payments.example.test/checkout" }));
-    expect(entitlement).toMatchObject({ checkoutAvailable: false, checkoutUrl: null });
-    expect(entitlement.message).not.toContain("payments.example.test");
-    expect(entitlement.message).toContain("Checkout is not available in this deployment");
-  });
-
-  test("a pinned key without checkout offers activation of a licence already held, not a purchase", () => {
-    const licence = pinnedLicence();
-    const entitlement = getIndustryPackEntitlement(createWorkspace(), { AMC_HOME: licence.amcHome } as NodeJS.ProcessEnv);
-    expect(entitlement).toMatchObject({ active: false, checkoutAvailable: false, licenseVerificationConfigured: true });
-    expect(entitlement.message).toContain("Checkout is not available in this deployment; contact sales for access.");
-    expect(entitlement.message).toContain("If you already hold a licence: amc domain pack activate --key <licence-key>");
-    expect(entitlement.message).not.toMatch(/Buy:/);
-  });
-
-  test("checkout and a pinned key together show the purchase and activation steps", () => {
-    const licence = pinnedLicence();
-    const entitlement = getIndustryPackEntitlement(createWorkspace(),
-      { AMC_HOME: licence.amcHome, AMC_INDUSTRY_PACKS_CHECKOUT_URL: "https://payments.example.test/checkout" } as NodeJS.ProcessEnv);
-    expect(entitlement).toMatchObject({ checkoutAvailable: true, checkoutUrl: "https://payments.example.test/checkout" });
-    expect(entitlement.message).toContain("Buy: https://payments.example.test/checkout");
-    expect(entitlement.message).toContain("Then activate it: amc domain pack activate --key <licence-key>");
-    expect(entitlement.message).not.toContain("contact sales");
-  });
-
-  test("the access error carries the same text", () => {
-    const workspace = createWorkspace();
-    const env = unpinnedEnv();
-    expect(() => assertIndustryPackAccess(workspace, env)).toThrow(getIndustryPackEntitlement(workspace, env).message);
-  });
 });
 
 describe("amc domain pack verify uses the same pinned key as the gate", () => {
@@ -286,38 +177,5 @@ describe("amc domain pack verify uses the same pinned key as the gate", () => {
     expect(verified.report.trusted).toBe(true);
     const other = pinnedLicence();
     expect(verifyIndustryPackLicenseReport(other.licenseKey, trust).valid).toBe(false);
-  });
-});
-
-describe("checkout URL", () => {
-  test("default public checkout state fails closed instead of presenting a non-checkout URL", () => {
-    expect(() => buildIndustryPackCheckoutUrl({ env: {} as NodeJS.ProcessEnv })).toThrow(
-      /checkout.*not configured|not.*available/i,
-    );
-  });
-
-  test("checkout URLs include the Industry Packs plan and return targets", () => {
-    const url = new URL(buildIndustryPackCheckoutUrl({
-      successUrl: "https://agentmaturity.co/success",
-      cancelUrl: "https://agentmaturity.co/pricing",
-      customerEmail: "buyer@example.com",
-      clientReferenceId: "agent-123",
-      env: { AMC_INDUSTRY_PACKS_CHECKOUT_URL: "https://payments.example.test/checkout" } as NodeJS.ProcessEnv
-    }));
-
-    expect(url.origin).toBe("https://payments.example.test");
-    expect(url.searchParams.get("plan")).toBe("industry-packs-monthly");
-    expect(url.searchParams.get("price")).toBe(INDUSTRY_PACKS_MONTHLY_PRICE_USD);
-    expect(url.searchParams.get("success_url")).toBe("https://agentmaturity.co/success");
-    expect(url.searchParams.get("client_reference_id")).toBe("agent-123");
-  });
-
-  test("checkout rejects malformed and non-HTTPS provider URLs", () => {
-    expect(() => buildIndustryPackCheckoutUrl({
-      env: { AMC_INDUSTRY_PACKS_CHECKOUT_URL: "not-a-url" } as NodeJS.ProcessEnv,
-    })).toThrow(/checkout.*url|valid.*https/i);
-    expect(() => buildIndustryPackCheckoutUrl({
-      env: { AMC_INDUSTRY_PACKS_CHECKOUT_URL: "http://payments.example.test/checkout" } as NodeJS.ProcessEnv,
-    })).toThrow(/https/i);
   });
 });

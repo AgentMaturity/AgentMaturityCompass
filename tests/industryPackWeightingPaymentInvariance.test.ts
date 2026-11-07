@@ -5,10 +5,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { Readable } from "node:stream";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import {
-  activateIndustryPackAccess,
-  getIndustryPackEntitlement
-} from "../src/domains/industryPackEntitlement.js";
+import { activateIndustryPackAccess } from "../src/domains/industryPackEntitlement.js";
 import {
   INDUSTRY_PACK_WEIGHTING_REMOVED_MESSAGE,
   LIFECYCLE_QUESTION_SET_VERSION,
@@ -48,19 +45,18 @@ function tempDir(prefix: string): string {
   return dir;
 }
 
-/** A licence signed by a key pinned in a temp AMC home trust list: since P1-51 the only licence a gate accepts. */
+/** A legacy licence signed by a key pinned in a temp AMC home trust list (not needed: Industry Packs are free). */
 function issueLicence(expiresAt = "2099-01-01T00:00:00.000Z"): TestIndustryPackLicence {
   const licence = testIndustryPackLicence({ expiresAt });
   roots.push(licence.amcHome);
   return licence;
 }
 
-/** Licence on: the pinned AMC home and the licence in the environment, checked to be really active. */
-function licenceOn(workspace = tempDir("amc-p151-probe-")): void {
+/** Licence on: the pinned AMC home and a legacy licence in the environment. */
+function licenceOn(): void {
   const licence = issueLicence();
   vi.stubEnv("AMC_HOME", licence.amcHome);
   vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_KEY", licence.licenseKey);
-  expect(getIndustryPackEntitlement(workspace).active).toBe(true);
 }
 
 // Lifts one core question above level 0 so its layer mixes unequal levels; any
@@ -133,7 +129,6 @@ describe("industry pack weighting never depends on payment", () => {
     const { licenseKey, amcHome } = issueLicence();
     vi.stubEnv("AMC_HOME", amcHome);
     vi.stubEnv("AMC_DOMAIN_PACKS_LICENSE_KEY", licenseKey);
-    expect(getIndustryPackEntitlement(tempDir("amc-p044-a3p-")).active).toBe(true);
     expectBaseline(weighted(tempDir("amc-p044-a3-")));
   });
 
@@ -243,9 +238,7 @@ describe("industry pack weighting never depends on payment", () => {
       return loadRunReport(workspace, runId).layerScores;
     }
     const off = run({});
-    const licence = issueLicence();
-    expect(getIndustryPackEntitlement(tempDir("amc-p151-d3p-"), { ...licence.env } as NodeJS.ProcessEnv).active).toBe(true);
-    expect(run(licence.env)).toEqual(off);
+    expect(run(issueLicence().env)).toEqual(off);
   }, 240_000);
 
   test("C1: scoring code never reads the Industry Packs entitlement", () => {

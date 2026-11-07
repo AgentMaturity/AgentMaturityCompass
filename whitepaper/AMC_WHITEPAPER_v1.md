@@ -957,7 +957,7 @@ AMC is not a compliance checkbox or a one-time audit exercise. It is a continuou
 
 ### Appendix A: Platform Module Registry (Summary)
 
-The AMC platform comprises 1,130 modules across six packages. Module names are listed for transparency; implementation details are available to licensed users.
+The AMC platform comprises 1,130 modules across six packages. Module names are listed for transparency; implementation details are in the MIT-licensed source repository.
 
 **`shield` Package (31 modules) — Input & Output Protection:**
 - Input validation layer (schema validation, content length enforcement, encoding normalization)

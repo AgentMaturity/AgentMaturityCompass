@@ -1,5 +1,5 @@
 /**
- * Industry Pack Audit — the paid, auditor-ready deliverable for an Industry Pack.
+ * Industry Pack Audit — the auditor-ready deliverable for an Industry Pack (free, like every Industry Pack).
  *
  * For each control in a pack this produces: a level score, a PASS/ADEQUATE/GAP
  * verdict (NOT_EVALUATED, with no level, for an unanswered control), an indicative multi-framework crosswalk (EU AI Act, NIST AI RMF,

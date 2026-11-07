@@ -44,7 +44,7 @@
 - Demo with LangChain, CrewAI, Claude Code
 
 ### Day 6: Industry Packs
-- Thread: "Healthcare agents need HIPAA compliance. Finance agents need MiFID II. We mapped all of it."
+- Thread: "41 Industry Packs, free for everyone: sector questionnaires for healthcare (HIPAA), finance (MiFID II) and more. Self-reported and experimental, never a compliance verdict."
 - Domain pack walkthrough
 
 ### Day 7: What's Next

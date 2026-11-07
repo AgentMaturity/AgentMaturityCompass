@@ -234,7 +234,7 @@ Example pack IDs (`amc_list_industry_packs` lists every pack):
 ---
 
 ### Industry pack tools
-`amc_list_industry_packs`, `amc_get_industry_pack`, `amc_score_industry_pack` and `amc_industry_station_summary` list, show and score the industry packs. Pack questions and scoring need an Industry Packs licence; a licence changes access, never a result. `amc_score_industry_pack` returns the same scorer's result: unanswered questions are listed in `notEvaluatedQuestionIds`, and `percentage` and `level` are `null` until every question is answered. See [MCP_INDUSTRY_PACKS.md](MCP_INDUSTRY_PACKS.md).
+`amc_list_industry_packs`, `amc_get_industry_pack`, `amc_score_industry_pack` and `amc_industry_station_summary` list, show and score the industry packs. Industry Packs are free, so every tool works without a licence; access never changes a result. `amc_score_industry_pack` returns the same scorer's result: unanswered questions are listed in `notEvaluatedQuestionIds`, and `percentage` and `level` are `null` until every question is answered. See [MCP_INDUSTRY_PACKS.md](MCP_INDUSTRY_PACKS.md).
 
 ```
 amc_list_industry_packs       { station?: string }
@@ -342,7 +342,7 @@ No network ports are opened. No data leaves your machine. The server reads from 
 - **Read-mostly** — the MCP server reads AMC data; it does not run diagnostics or modify agent configs
 - **Read-only tools** — no tool modifies agent configs or runs diagnostics; the only write is the A4 preview's `amc_a4_comment`, which asks the running Studio to record a self-reported comment as the configured signed-in user
 - **Workspace-scoped** — all data comes from the local `.amc/` directory in your project
-- **Credentials** — the fifteen core tools need none; the pack-content tools (`amc_score_sector_pack`, `amc_get_industry_pack`, `amc_score_industry_pack`) need an Industry Packs licence that verifies against a key pinned in the trust list. The A4 preview's `amc_a4_comment` needs the `amc approvals login --a4-comment-only` session file named by `AMC_A4_SESSION_TOKEN_FILE`, and when it is set the A4 reads verify it too. The agent host can read that file, so the server accepts only a comment-scoped session of a `VIEWER`-only user, which Studio admits for A4 reads and comments and nothing else (see A4 Forge tools)
+- **Credentials** — the fifteen core tools need none, the pack-content tools (`amc_score_sector_pack`, `amc_get_industry_pack`, `amc_score_industry_pack`) included, because Industry Packs are free. The A4 preview's `amc_a4_comment` needs the `amc approvals login --a4-comment-only` session file named by `AMC_A4_SESSION_TOKEN_FILE`, and when it is set the A4 reads verify it too. The agent host can read that file, so the server accepts only a comment-scoped session of a `VIEWER`-only user, which Studio admits for A4 reads and comments and nothing else (see A4 Forge tools)
 - **No vault in the agent host** — never set `AMC_VAULT_PASSPHRASE` or `AMC_VAULT_PASSPHRASE_FILE` in the MCP server's environment (its MCP config `env` or the agent host's shell). The passphrase, or the file holding it, opens the vault that holds the auditor key signing users.yaml, so an agent host holding it could make itself an `OWNER`. The server signs nothing: `amc_a4_comment` is signed by Studio, and every A4 tool refuses with 403 `A4_SIGNING_KEY_IN_AGENT_HOST` while either variable is set
 
 ---

@@ -1,6 +1,6 @@
 # Industry Pack Audit
 
-The **Industry Pack Audit** is the paid Industry Packs deliverable: it turns a
+The **Industry Pack Audit** is part of the free Industry Packs: it turns a
 sector diagnostic from *a score* into *an audit artifact you can hand to a
 regulator, customer, or your own risk team*.
 
@@ -30,7 +30,7 @@ has only the checksum and says so: `checksum only — not signed`.
 
 ## Usage
 
-The audit is part of the paid Industry Packs tier and is entitlement-gated.
+The audit is part of Industry Packs, which are free: it needs no licence, account or payment.
 
 ```bash
 # Full audit for a pack (JSON), written to a bundle signed by the workspace auditor key

@@ -21,6 +21,7 @@
 <p align="center">
   <a href="#run-a-native-agent-task">Native Tasks</a> ·
   <a href="#60-seconds-to-your-first-score">First Score</a> ·
+  <a href="#a4-forge-preview">A4 Forge</a> ·
   <a href="https://agentmaturity.co/playground.html">Web Playground</a> ·
   <a href="docs/GETTING_STARTED.md">Docs</a> ·
   <a href="#recipes--copy-paste-examples">Recipes</a> ·
@@ -54,16 +55,16 @@ AMC also assesses an agent from L0 to L5 using attributable evidence. An importe
 
 ```bash
 curl -fsSL https://agentmaturity.co/install.sh | sh
-amc start
+amc up
 ```
 
-`amc start` is another name for `amc up`. In the run recorded for this README (a new workspace and home directory, current source build, 2026-10-11; [record](qualification/2026-10-11-P0-28/README.md)), it:
+In the current source build `amc start` is another name for `amc up`. In the run recorded for this README (a new workspace and home directory, current source build, 2026-10-11; [record](qualification/2026-10-11-P0-28/README.md)), it:
 
 - Created the workspace under `.amc/`: signing keys, a vault and signed configuration. It needs a vault passphrase: it reads `AMC_VAULT_PASSPHRASE`, uses one it remembered, asks in a terminal, or generates and remembers one in a non-interactive shell. **No account. No provider API key. No cloud.**
 - Started Studio (API and Compass Console), the gateway, a proxy, the dashboard and the bridge on `127.0.0.1` in the background, and printed the console URL. It did not open a browser.
 - Ran a first 8-surface baseline (`amc run`), because the workspace had no earlier run, and printed the result. With no agent connected it graded F, with 4 of 8 surfaces evaluated.
 
-`amc down` stops the background services. A second `amc start` in the same workspace reused it and, in the recorded run, ran the baseline again. `amc up --no-baseline` skips the baseline; `amc up --demo` starts a no-vault demo instead.
+`amc down` stops the background services. A second `amc up` in the same workspace reused it and, in the recorded run, ran the baseline again. `amc up --no-baseline` skips the baseline; `amc up --demo` starts a no-vault demo instead. The installers give the published 1.1.1 release: its `amc up` starts Studio and the gateway but runs no baseline, and it has no `amc start` (use [From source](#from-source) for the current build).
 
 **What you get:**
 
@@ -118,9 +119,9 @@ That is the entire thesis: **trust, but verify — with receipts**.
 # macOS or Linux: download the pinned GitHub release and verify SHA-256
 curl -fsSL https://agentmaturity.co/install.sh | sh
 
-# Start Studio and the gateway, and run a first 8-surface baseline (prints the console URL)
+# Start Studio and the gateway (prints the console URL); the current source build also runs a first 8-surface baseline
 cd your-agent-project
-amc start
+amc up
 
 # Or just print the full score in your terminal
 amc
@@ -132,7 +133,7 @@ On Windows PowerShell:
 
 ```powershell
 irm https://agentmaturity.co/install.ps1 | iex
-amc start
+amc up
 ```
 
 Want a fast legacy pulse check instead of the full evidence score?
@@ -154,7 +155,7 @@ curl -fsSL https://agentmaturity.co/install.sh | sh
 irm https://agentmaturity.co/install.ps1 | iex
 ```
 
-Each installer pins the published AMC release, downloads the platform archive and `SHA256SUMS` from GitHub Releases, verifies the archive, then installs the included package. The published npm package and GitHub release are 1.1.1; use the source build for the current native workflow (unreleased; the next release is 2.0.0). The Homebrew tap is not publicly available. See [publication evidence](website/publication-status.json).
+Each installer pins the published AMC release, downloads the platform archive and `SHA256SUMS` from GitHub Releases, verifies the archive, then installs the included package. The published npm package and GitHub release are 1.1.1; use the source build for the current native workflow, free Industry Packs and A4 Forge (unreleased; the next release is 2.0.0). The Homebrew tap is not publicly available. See [publication evidence](website/publication-status.json).
 
 **Docker**
 ```bash
@@ -163,7 +164,7 @@ docker run -it --rm amc-quickstart            # interactive quickscore
 docker run --rm amc-quickstart --version
 ```
 
-Use the local build command unless a GHCR package has been verified public.
+Use the local build command unless a GHCR package has been verified public. The quickstart image installs the published 1.1.1 release tarball after a SHA-256 check, not the source tree ([container guide](docker/README.md#quickstart-image)).
 
 **From source**
 ```bash
@@ -184,7 +185,7 @@ amc agent-loop guide
 amc agent-loop chat
 ```
 
-The guide creates nothing and calls no provider. Chat asks you to choose a provider and model, then shows the local setup or credential steps still needed. Choose OpenAI Chat Completions, OpenAI Responses, or Anthropic for a real task; `stub` is an explicit local recording demonstration. Select an agent with `--agent reviewer`; the resolved identity stays pinned through turns and resume.
+The guide creates nothing and calls no provider. Chat asks you to choose a provider and model, then shows the local setup or credential steps still needed. Choose `openai` (Chat Completions), `openai-responses`, `anthropic`, `deepseek`, `gemini`, `gemini-audio` or `ollama` (a local model server) for a real task; `stub` is an explicit local recording demonstration. Select an agent with `--agent reviewer`; the resolved identity stays pinned through turns and resume.
 
 Chat shows provisional live text and then the recorded result. Use `/inspect` to see history, `/verify` to check evidence, `/compact` to summarize a reviewed range, `/fork` to queue a new conversation with parent lineage, and `/exit` to leave. Resume eligible sessions across processes while preserving original evidence. Start with tools disabled, then enable workspace or MCP tools after reviewing their signed policy and grants. Applications can own an AMC process through the native SDK.
 
@@ -270,7 +271,16 @@ In these counts, registered = packs returned by `listAssurancePacks()`; files on
 | Environment | 6 | EU Farm-to-Fork, REACH, IEC 61850 |
 | Governance | 5 | EU eIDAS 2.0, UNCAC, UNGPs |
 
-Industry Packs are paid, self-reported questionnaires behind a licence gate, with a planned price of `$9.99/month` for all 41 packs. A licence unlocks access to pack questions and runs only; the same answers and evidence give the same score, gap, report, assurance result and roadmap with or without one, and pack names and descriptions stay visible without one. **Public checkout is not live.** `amc domain pack access` states what your deployment offers: checkout appears only when a checkout URL and a licence signing key pinned in your AMC trust list are both configured; otherwise it says checkout is not available in this deployment and to contact sales. Do not send payment based on repository copy alone.
+Industry Packs are free in the current source build: every pack's questions and runs are included, with no licence, account or payment ([ADR 019](docs/adr/019-industry-packs-free.md)). The published 1.1.1 release predates that change and still asks for a licence before pack questions and runs, and public checkout never went live, so use the [source build](#from-source) for packs. Each pack is a self-reported questionnaire whose content is experimental (AI-drafted until a named expert signs it), and self-reported answers cap at level 1. A pack result is never a certification, a compliance verdict or proof of safety, and access never changes a score, gap, report, assurance result, roadmap, trust tier or verification outcome.
+
+```bash
+amc domain pack list                       # all 41 packs and their question counts
+amc domain pack describe --pack <packId>   # a pack's regulatory basis and every question
+amc domain pack run --pack <packId>        # in a terminal: choose L1, L3 or L5 for each question
+amc domain pack run --pack <packId> --baseline --json   # no answers: every question not evaluated, no score
+```
+
+`amc domain pack access` prints `Price: free` and `Status: active`. More detail: [Domain Packs](docs/DOMAIN_PACKS.md).
 
 ### Simulation & Forecast Evaluation Lane
 
@@ -378,6 +388,31 @@ AMC is one trust stack with eight named product surfaces:
 | **Comply** | Map trust evidence to real frameworks | Turns technical evidence into regulator-readable artifacts for audits and risk reviews. |
 | **Fleet** | Govern many agents like an actual platform | Benchmarks multiple agents, compares risk posture, and enforces org-wide trust baselines. |
 | **Passport** | Make trust portable between environments | Issues a portable, signed trust identity that can move between tools, teams, and environments. |
+
+---
+
+## A4 Forge (preview)
+
+A4 Forge takes one agent from a brief to a recorded, customer-controlled deployment in four stages. Each stage runs the same eight steps, from questions through a direction gate, a build and a review to a completion gate, and every gate binds the exact bytes its approvers decided on.
+
+- **Aspire** (conceptualization): turns people's answers into a brief (problem, audience, goals, success metrics, constraints, forbidden actions, risk tier, markets), with hypotheses that leave `proposed` only through a runtime-written row.
+- **Assemble** (creation): turns the approved brief into a built agent, through a native build session in Studio or an external framework (a scaffold, connect instructions and a trace import).
+- **Adapt** (contextualization): compiles and signs the control plan for the agent's markets, sector and data, writes its context plugin and memory policy, and records a conformance statement as counts, never a percentage.
+- **Activate** (commercialization): builds a signed release package and its leases, prepares Compose or Helm files for an operator to run, and records the operator's deployment receipts, AMC's own reachability check, rollback and value claims.
+
+**What the records are, and are not.** Every record A4 writes is signed and `self_reported` (references to stub-model runs are labelled `synthetic_example`); runtime observations enter only by reference to rows the runtime wrote. A signature proves who wrote a record and that it is unchanged, never that its statement is true, and no A4 output says the agent is safe, correct or lawful. A second approver in the same workspace satisfies separation of duties, but two members of one workspace are not two independent reviews. The regulatory records Adapt uses are `experimental`: drafted by an agent, with citations not yet fetched, hashed or legally reviewed, and approved by no named expert. AMC never deploys: it prepares the plan and records what the operator says happened.
+
+**Try it.** A4 Forge is in the current source build only (see [From source](#from-source)); the published 1.1.1 release does not contain it. Set `AMC_A4_PREVIEW=1` in the environment Studio starts in and for each `amc a4` command; a Studio that is already running keeps its environment, so run `amc down` first. Creating a project needs a signed-in local account with the OWNER or OPERATOR role ([RBAC](docs/RBAC.md)).
+
+```bash
+AMC_A4_PREVIEW=1 amc up                     # then sign in to the Compass Console and start a project on its A4 page
+AMC_A4_PREVIEW=1 amc a4 list                # the projects this identity may read
+AMC_A4_PREVIEW=1 amc a4 guide <projectId>   # the next action, and the pins each open gate's decision needs
+AMC_A4_PREVIEW=1 amc a4 readiness <projectId>
+AMC_A4_PREVIEW=1 amc a4 verify <projectId> --trust-list <file>   # the record chain under your own trust list
+```
+
+**Status: preview.** Without the variable, the `/api/v1/a4` routes answer 404 `A4_PREVIEW_DISABLED`, Studio shows no A4 entry, and every `amc a4` command refuses with exit code 1. `amc mcp serve` started with the variable adds five A4 tools (four reads and a self-reported comment), and the Node SDK's `createA4Client` calls the routes of a Studio that has it. Not available yet: independently reviewed claims (P2-24, P3-21); a real deployment target (P2-40: v1 records a same-host restart of the Studio that built the agent, and AMC's own destination check cannot report `passed`); CI qualification of the Compose and Helm overlays. Details: [docs/A4_FORGE.md](docs/A4_FORGE.md).
 
 ---
 
@@ -650,7 +685,7 @@ amc domain conformance --station health --agent default --max-evidence-age 30d  
 amc domain conformance --station wealth --agent default --max-evidence-age 30d
 ```
 
-On the new workspace recorded above, with no agent evidence, the compliance report said `Result: not evaluated (no evidence events were recorded)`, and the health and wealth conformance runs reported `PASS 0, FAIL 0` with every requirement (163 and 92) `NOT_EVALUATED`. These are evidence of conformity, never a compliance verdict. `amc domain assess` needs an Industry Packs license, which is not purchasable yet; without one it prints a locked notice and exits 1.
+On the new workspace recorded above, with no agent evidence, the compliance report said `Result: not evaluated (no evidence events were recorded)`, and the health and wealth conformance runs reported `PASS 0, FAIL 0` with every requirement (163 and 92) `NOT_EVALUATED`. These are evidence of conformity, never a compliance verdict. `amc domain assess --agent default --domain health` needs no licence, because Industry Packs are free in the current source build. Outside `--example` its result is always `not evaluated`, because the domain-rubric questions have no evidence source: in a new `amc init` workspace it exited 0 with `Result: not evaluated`, naming that reason and the missing diagnostic run. `--example` prints labelled synthetic output, which is never evidence.
 
 ### GitHub Actions — preview boundary
 
@@ -736,7 +771,7 @@ curl -fsSL https://agentmaturity.co/install.sh | sh
 irm https://agentmaturity.co/install.ps1 | iex
 ```
 
-Both scripts install the published 1.1.1 GitHub release after SHA-256 verification. npm also publishes 1.1.1; neither channel contains the current source workflow (unreleased; the next release is 2.0.0). The Homebrew tap is not publicly available. Use Node.js 22 or 24 for the current production qualification targets; the installer retains a Node 20 compatibility floor. See [platform qualification](docs/PLATFORM_QUALIFICATION.md) and [publication evidence](website/publication-status.json).
+Both scripts install the published 1.1.1 GitHub release after SHA-256 verification. npm also publishes 1.1.1; neither channel contains the current source features, such as the native workflow, free Industry Packs and A4 Forge (unreleased; the next release is 2.0.0). The Homebrew tap is not publicly available. Use Node.js 22 or 24 for the current production qualification targets; the installer retains a Node 20 compatibility floor. See [platform qualification](docs/PLATFORM_QUALIFICATION.md) and [publication evidence](website/publication-status.json).
 
 ### Docker
 ```bash
@@ -745,7 +780,7 @@ docker run -it --rm amc-quickstart            # interactive quickscore
 docker run --rm amc-quickstart --version
 ```
 
-Use the local build command unless a GHCR package has been verified public.
+Use the local build command unless a GHCR package has been verified public. The quickstart image installs the published 1.1.1 release tarball after a SHA-256 check, not the source tree; [Deploy](#deploy) covers Studio with Docker Compose, which builds from the source tree.
 
 ### From source
 
@@ -779,15 +814,14 @@ All four targets stay documented (decision D-03). Only a qualified target may be
 
 ## Pricing
 
-The full trust stack is **free and MIT licensed**. Industry Packs are the planned commercial add-on, but checkout and license issuance are not yet publicly live. Payment unlocks access only: it never changes a result, a trust tier or a verification outcome.
+AMC is **free and MIT licensed**, and in the current source build all 41 Industry Packs are free too, with no licence, account or payment ([ADR 019](docs/adr/019-industry-packs-free.md); the published 1.1.1 release predates this, see [41 Industry Domain Packs](#41-industry-domain-packs)). There is nothing to buy, so checkout is not available: `amc domain pack checkout` prints the free message and exits 0. Access never changes a result, a trust tier or a verification outcome.
 
 | Tier | What you get |
 |---|---|
-| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, 1,268 registered CLI command paths, browser playground, CI gates |
-| **Industry Packs (planned; not yet purchasable)** | Planned `$9.99/month` tier for all 41 Industry Domain Packs, which are self-reported questionnaires; public checkout is not live |
-| **Enterprise (contact-first; not self-serve)** | Planned Industry Packs access plus priority support, custom pack development, and deployment assistance |
+| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 41 Industry Packs, all <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, 1,268 registered CLI command paths, browser playground, CI gates |
+| **Enterprise (contact-first; not self-serve)** | Planned priority support, custom pack development, and deployment assistance; not needed for any feature or pack |
 
-> Industry Packs are 41 sector-specific domain packs (healthcare, finance, education, logistics, government, etc.) that require ongoing regulatory research and maintenance. The core trust stack stays MIT licensed. See [`website/publication-status.json`](website/publication-status.json) before making any availability claim.
+> Industry Packs are 41 sector-specific questionnaires (healthcare, finance, education, logistics, government, etc.) that need ongoing regulatory research and expert review; their content stays experimental until a named expert signs it. See [`website/publication-status.json`](website/publication-status.json) for what each distribution channel publishes before making any availability claim.
 
 ---
 
@@ -865,7 +899,7 @@ npm run package:desktop
 npm run package:desktop:verify
 ```
 
-See [docs/DESKTOP_PACKAGES.md](docs/DESKTOP_PACKAGES.md) for archive contents and platform commands.
+Run these in a source checkout ([From source](#from-source)); the desktop archives on the published GitHub release are 1.1.1 builds ([publication evidence](website/publication-status.json)). See [docs/DESKTOP_PACKAGES.md](docs/DESKTOP_PACKAGES.md) for archive contents and platform commands.
 
 ### Single-binary install (experimental)
 
@@ -883,7 +917,7 @@ The build path is wired in and produces SEA artifacts plus a manifest. Runtime v
 AMC now includes a scheduled GitHub Actions workflow that validates packaged CLI installs across a small OS/Node matrix and uploads JSON artifacts for inspection:
 
 - workflow: `.github/workflows/nightly-compatibility-matrix.yml`
-- current matrix: `ubuntu-latest`, `macos-latest` and `windows-latest`, Node `22` + `24`
+- current matrix: `ubuntu-latest`, `ubuntu-24.04-arm` (runner label not yet confirmed), `macos-latest` and `windows-latest`, Node `22` + `24`, plus a desktop lane on `macos-latest` and `windows-latest` that runs `npm run package:desktop` and `npm run package:desktop:verify`
 - checks: fresh installed artifact, private-kernel absence, guide, initialization, signed native tool turn, cold verification and launcher restoration; see [platform qualification](docs/PLATFORM_QUALIFICATION.md) for the 13-step receipt scope
 
 ### Workspace config profiles (MVP)

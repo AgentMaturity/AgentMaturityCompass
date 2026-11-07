@@ -120,7 +120,7 @@ For the board interpretation of an L3 result, attach [What L3 Means For Business
 
 ## Cost
 
-The core trust stack is MIT licensed: scoring, evidence, reports, Studio, adapters, and CI gates. AMC plans a $9.99/month per user add-on for all 41 Industry Domain Packs, but public checkout and automatic license issuance are not live. The packs are self-reported questionnaires, and a licence unlocks access only: it never changes a result.
+AMC is MIT licensed and free: scoring, evidence, reports, Studio, adapters, CI gates and all 41 Industry Domain Packs. Since 2026-11-07 Industry Packs need no licence, account or payment. The packs are self-reported questionnaires whose content is experimental, and access never changes a result.
 
 ## Contact
 

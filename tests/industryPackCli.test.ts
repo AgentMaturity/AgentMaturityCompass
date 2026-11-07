@@ -5,21 +5,27 @@ import { delimiter, dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { statusDimensionsSchema } from "../src/claims/eligibility/index.js";
-import { getIndustryPackEntitlement } from "../src/domains/industryPackEntitlement.js";
+import {
+  getIndustryPackEntitlement, INDUSTRY_PACKS_FREE_MESSAGE, INDUSTRY_PACKS_FREE_PLAN_ID
+} from "../src/domains/industryPackEntitlement.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { testIndustryPackLicence, type TestIndustryPackLicence } from "./helpers/industryPackLicence.js";
 
 const cli = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
 const records: Array<Record<string, unknown>> = [];
+/** Industry Packs are free (2026-11-07): every workspace has this record, with no licence, checkout or payment. */
+const FREE_ENTITLEMENT = {
+  active: true, source: "free", planId: INDUSTRY_PACKS_FREE_PLAN_ID, priceUsdMonthly: "0.00",
+  checkoutAvailable: false, checkoutUrl: null, message: INDUSTRY_PACKS_FREE_MESSAGE
+};
 let root: string;
 let workspace: string;
 let fixtureHome: string;
 let logs: string;
 let guard: string;
-let licenseKey: string;
 let licence: TestIndustryPackLicence | undefined;
 let environment: NodeJS.ProcessEnv;
-let paidControl: Promise<void> | undefined;
+let freeControl: Promise<void> | undefined;
 
 beforeAll(() => {
   expect(process.versions.node.split(".")[0], "CLI qualification requires the prepared Node 22 or 24 runtime").toMatch(/^(22|24)$/);
@@ -42,16 +48,15 @@ for (const name of ["lookup", "resolve", "resolve4", "resolve6", "resolveAny", "
 }
 globalThis.fetch = deny; globalThis.WebSocket = class { constructor() { deny(); } };
 syncBuiltinESMExports();\n`);
-  // A licence signed by a key pinned in a temp AMC home trust list (P1-51); the CLI child reads both from its env.
-  licence = testIndustryPackLicence();
-  licenseKey = licence.licenseKey;
+  // No licence and no trust list: the CLI child runs every pack command on the free plan.
   environment = {
     PATH: `${dirname(process.execPath)}${delimiter}/usr/bin${delimiter}/bin`, HOME: fixtureHome,
     NO_COLOR: "1", TERM: "dumb", NODE_ENV: "test", AMC_CLAIM_LABELS_STRICT: "1",
     NODE_OPTIONS: `--import=${pathToFileURL(guard).href}`,
-    ...licence.env,
   };
-  expect(getIndustryPackEntitlement(workspace, environment)).toMatchObject({ active: true, source: "env" });
+  expect(getIndustryPackEntitlement(workspace, environment)).toMatchObject({ ...FREE_ENTITLEMENT, licenseVerificationConfigured: false });
+  // A legacy licence signed by a key pinned in a temp AMC home trust list (P1-51), for activate and verify only.
+  licence = testIndustryPackLicence();
   writeFileSync(join(logs, "fixture.json"), JSON.stringify({
     root, workspace, home: fixtureHome, node: process.version, executable: process.execPath,
     strict: true, transport: "denied", environmentKeys: Object.keys(environment).sort(),
@@ -67,11 +72,11 @@ afterAll(() => {
   licence?.cleanup();
 });
 
-async function invoke(name: string, args: string[]) {
+async function invoke(name: string, args: string[], env: NodeJS.ProcessEnv = environment) {
   const started = Date.now();
   const result = await new Promise<{ status: number | null; signal: string | null; error?: string; stdout: string; stderr: string }>((done) => {
     execFile(process.execPath, ["--import", pathToFileURL(guard).href, cli, ...args], {
-      cwd: workspace, env: environment, encoding: "utf8", timeout: 30_000, maxBuffer: 1024 * 1024,
+      cwd: workspace, env, encoding: "utf8", timeout: 30_000, maxBuffer: 1024 * 1024,
     }, (error, stdout, stderr) => {
       const failure = error as (Error & { code?: string | number; signal?: string }) | null;
       done({ status: !failure ? 0 : typeof failure.code === "number" ? failure.code : null,
@@ -82,10 +87,10 @@ async function invoke(name: string, args: string[]) {
   const stderrPath = join(logs, `${name}.stderr`);
   writeFileSync(stdoutPath, result.stdout);
   writeFileSync(stderrPath, result.stderr);
-  records.push({ name, args, status: result.status, signal: result.signal, durationMs: Date.now() - started,
-    stdoutPath, stderrPath, stdoutSha256: sha256Hex(result.stdout), stderrSha256: sha256Hex(result.stderr) });
+  records.push({ name, args: args.map((arg) => (arg === licence?.licenseKey ? "<licence>" : arg)), status: result.status, signal: result.signal,
+    durationMs: Date.now() - started, stdoutPath, stderrPath, stdoutSha256: sha256Hex(result.stdout), stderrSha256: sha256Hex(result.stderr) });
   writeFileSync(join(logs, "commands.json"), JSON.stringify(records, null, 2));
-  if ((result.stdout + result.stderr).includes(licenseKey)) throw new Error("Fixture license appeared in private child output");
+  if (licence && (result.stdout + result.stderr).includes(licence.licenseKey)) throw new Error("Fixture license appeared in private child output");
   return result;
 }
 
@@ -97,17 +102,18 @@ function completed(result: Awaited<ReturnType<typeof invoke>>): void {
   expect(result.stdout + result.stderr).not.toMatch(/unknown option|missing required argument|required option .+ not specified|unknown command|P0_23_OFFLINE_FIXTURE/i);
 }
 
-function validPaidControl(): Promise<void> {
-  return paidControl ??= (async () => {
-    const access = await invoke("paid-entitlement", ["domain", "pack", "access", "--json"]);
+function validFreeControl(): Promise<void> {
+  return freeControl ??= (async () => {
+    const access = await invoke("free-entitlement", ["domain", "pack", "access", "--json"]);
     completed(access);
     expect(access.status, access.stderr).toBe(0);
-    expect(JSON.parse(access.stdout)).toMatchObject({ active: true, source: "env" });
-    const baseline = await invoke("paid-valid-pack", ["domain", "pack", "run", "--pack", "clinical-trials", "--baseline", "--json"]);
+    expect(JSON.parse(access.stdout)).toMatchObject(FREE_ENTITLEMENT);
+    const baseline = await invoke("free-valid-pack", ["domain", "pack", "run", "--pack", "clinical-trials", "--baseline", "--json"]);
     completed(baseline);
     expect(baseline.status, baseline.stderr).toBe(0);
     const body = JSON.parse(baseline.stdout) as Record<string, unknown>;
-    expect(body).toMatchObject({ packId: "clinical-trials", claimKind: "self_reported", selfAssessment: { complete: false, answered: 0 } });
+    expect(body).toMatchObject({ packId: "clinical-trials", claimKind: "self_reported", contentStatus: "experimental",
+      selfAssessment: { complete: false, answered: 0 } });
     expect(statusDimensionsSchema.parse(body.statusDimensions).result).toBe("not_evaluated");
     expect(body.claimLabel).toContain("Claim: Self-reported");
     // P1-44: a baseline answers nothing, so no question has a result and every question is listed as not evaluated.
@@ -116,13 +122,20 @@ function validPaidControl(): Promise<void> {
   })();
 }
 
-describe("Industry Pack CLI inherited-name refusal", () => {
-  test("a locally signed paid fixture accepts a legitimate pack with current syntax", async () => {
-    await validPaidControl();
+describe("Industry Pack CLI with no licence", () => {
+  test("access reports the free plan, and a legitimate pack runs with current syntax", async () => {
+    await validFreeControl();
   });
 
-  test.each(["__proto__", "constructor", "toString", "hasOwnProperty"])("refuses inherited pack ID %s after valid paid control", async (packId) => {
-    await validPaidControl();
+  test("checkout has nothing to sell and exits 0", async () => {
+    const checkout = await invoke("free-checkout", ["domain", "pack", "checkout", "--json"]);
+    completed(checkout);
+    expect(checkout.status, checkout.stderr).toBe(0);
+    expect(JSON.parse(checkout.stdout)).toMatchObject({ checkoutUrl: null, entitlement: FREE_ENTITLEMENT });
+  });
+
+  test.each(["__proto__", "constructor", "toString", "hasOwnProperty"])("refuses inherited pack ID %s after the valid control", async (packId) => {
+    await validFreeControl();
     const result = await invoke(`refused-${packId}`, ["domain", "pack", "run", "--pack", packId, "--baseline", "--json"]);
     completed(result);
     expect(result.status, result.stderr).toBe(1);
@@ -130,5 +143,26 @@ describe("Industry Pack CLI inherited-name refusal", () => {
     expect(result.stdout + result.stderr).not.toMatch(/industry_packs_locked|Industry Packs are locked|requires active/i);
     expect(result.stdout).not.toContain('"packId"');
     expect(result.stdout).not.toContain('"claimKind"');
+  });
+});
+
+describe("legacy Industry Packs licences", () => {
+  test("verify still checks a pinned licence, and activate records it without changing access", async () => {
+    const pinned = { ...environment, AMC_HOME: licence!.amcHome };
+    const verify = await invoke("legacy-verify", ["domain", "pack", "verify", "--key", licence!.licenseKey, "--json"], pinned);
+    completed(verify);
+    expect(verify.status, verify.stderr).toBe(0);
+    expect(JSON.parse(verify.stdout)).toMatchObject({ valid: true, payload: { subscriptionId: "sub_test" } });
+
+    const activate = await invoke("legacy-activate", ["domain", "pack", "activate", "--key", licence!.licenseKey], pinned);
+    completed(activate);
+    expect(activate.status, activate.stderr).toBe(0);
+    expect(activate.stdout).toContain("Industry Packs are free, so it changes nothing.");
+    expect(existsSync(join(workspace, ".amc", "industry-packs-access.json"))).toBe(true);
+
+    const access = await invoke("legacy-access", ["domain", "pack", "access", "--json"], pinned);
+    completed(access);
+    expect(access.status, access.stderr).toBe(0);
+    expect(JSON.parse(access.stdout)).toMatchObject({ ...FREE_ENTITLEMENT, licenseVerificationConfigured: true });
   });
 });

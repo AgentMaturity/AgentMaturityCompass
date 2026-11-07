@@ -28,6 +28,7 @@
       <a href="./" class="nav-brand">amc<span class="accent">_</span></a>
       <ul class="nav-links">
         <li><a href="#capabilities">how it works</a></li>
+        <li><a href="#a4-forge">a4 forge</a></li>
         <li><a href="#pricing">pricing</a></li>
         <li><a href="docs/index.html">docs</a></li>
       </ul>
@@ -44,6 +45,7 @@
     <a href="#install">install</a>
     <a href="#desktop">desktop app</a>
     <a href="#domains">industry packs</a>
+    <a href="#a4-forge">a4 forge (preview)</a>
     <a href="executive.html">for executives</a>
     <a href="https://github.com/AgentMaturity/AgentMaturityCompass">github</a>
   </div>
@@ -147,7 +149,7 @@
               <div class="terminal-line"><span class="terminal-label">Windows</span><span class="terminal-value">Agent Maturity Compass Studio.cmd</span></div>
               <div class="terminal-line"><span class="terminal-label">Run full score</span><span class="terminal-value">button + CLI</span></div>
               <div class="terminal-line"><span class="terminal-label">Assurance packs</span><span class="terminal-value"><!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs</span></div>
-              <div class="terminal-line"><span class="terminal-label">Industry Packs</span><span class="terminal-value">commercial checkout not live</span></div>
+              <div class="terminal-line"><span class="terminal-label">Industry Packs</span><span class="terminal-value">41 packs · free</span></div>
               <div class="terminal-line"><span class="terminal-label">Reports</span><span class="terminal-value">artifact + evidence status</span></div>
             </div>
           </div>
@@ -155,7 +157,7 @@
             <div class="product-info-grid">
               <div class="product-info-card"><span>apps</span><strong>Launch locally</strong><p>The macOS native WebKit app and Windows system-browser launcher use a version-pinned AMC runtime, without bundling Electron or trusting a stale global CLI.</p></div>
               <div class="product-info-card"><span>score</span><strong>See the trust baseline</strong><p>Overall level, layer bars, evidence coverage, top gaps, and an explicit READY or blocked claim state.</p></div>
-              <div class="product-info-card"><span>packs</span><strong>Browse free and paid depth</strong><p>Assurance is free core. Industry Packs show locked and unlocked states.</p></div>
+              <div class="product-info-card"><span>packs</span><strong>Browse every pack</strong><p>Assurance packs and all 41 Industry Packs are free; Industry Pack results stay self-reported.</p></div>
               <div class="product-info-card"><span>reports</span><strong>Share with the team</strong><p>Generate outputs for engineering, compliance, and leadership review.</p></div>
             </div>
           </div>
@@ -243,6 +245,50 @@
       </div>
     </section>
 
+    <section id="a4-forge">
+      <div class="container">
+        <div class="section-heading gs" style="text-align:center">
+          <p class="label">from brief to deployment</p>
+          <h2>A4 Forge <strong>(preview)<span class="accent blink-cursor">_</span></strong></h2>
+          <p class="section-desc" style="margin:1rem auto 0;text-align:center;max-width:740px">A4 Forge takes one agent from a brief to a recorded, customer-controlled deployment in four stages. Each stage records what people asked, understood, proposed, built and reviewed, and every gate binds the exact bytes its approvers decided on. Every record A4 writes is signed and self-reported: a signature shows who wrote it and that it has not changed, never that it is true. No A4 output says the agent is safe, correct or lawful, and a second approver in the same workspace satisfies separation of duties, not independent review.</p>
+        </div>
+        <div class="pricing-grid">
+          <div class="pricing-card gs">
+            <span class="tier">01 · conceptualization</span>
+            <h3>Aspire</h3>
+            <p>Turns people's answers into a brief (problem, audience, goals, success metrics, constraints, forbidden actions, risk tier and markets), with hypotheses that leave "proposed" only through a runtime-written row.</p>
+          </div>
+          <div class="pricing-card gs">
+            <span class="tier">02 · creation</span>
+            <h3>Assemble</h3>
+            <p>Turns the approved brief into a built agent, through a native build session in Studio or an external framework (a scaffold, connect instructions and a trace import).</p>
+          </div>
+          <div class="pricing-card gs">
+            <span class="tier">03 · contextualization</span>
+            <h3>Adapt</h3>
+            <p>Compiles and signs the control plan for the agent's markets, sector and data, and records a conformance statement as counts, never a percentage; its regulatory records stay experimental until a named expert approves them.</p>
+          </div>
+          <div class="pricing-card gs">
+            <span class="tier">04 · commercialization</span>
+            <h3>Activate</h3>
+            <p>Builds a signed release package, prepares Compose or Helm files for an operator to run, and records the operator's deployment receipts, rollback and value claims; AMC itself never deploys.</p>
+          </div>
+          <div class="pricing-card gs">
+            <span class="tier">status · preview</span>
+            <h3>Current source build only</h3>
+            <p>Preview, in the current source build only: the published 1.1.1 release does not contain it. It stays off unless the operator sets <span class="hl">AMC_A4_PREVIEW=1</span> for Studio and for each amc a4 command; without it the A4 API answers 404 and every amc a4 command exits 1. Not available yet: independently reviewed claims (P2-24, P3-21) and a real deployment target (P2-40); v1 records a same-host restart of the Studio that built the agent.</p>
+          </div>
+          <div class="pricing-card gs">
+            <span class="tier">try it</span>
+            <h3>Turn it on</h3>
+            <div class="items install-command"><span class="hl">$</span> AMC_A4_PREVIEW=1 amc up<br><span class="hl">$</span> AMC_A4_PREVIEW=1 amc a4 list<br><span class="hl">$</span> AMC_A4_PREVIEW=1 amc a4 guide &lt;projectId&gt;<br><span class="hl">$</span> AMC_A4_PREVIEW=1 amc a4 verify &lt;projectId&gt; --trust-list &lt;file&gt;</div>
+            <p>A running Studio keeps its environment, so run amc down first. Then sign in to the Compass Console and start a project on its A4 page; creating one needs a signed-in local account with the OWNER or OPERATOR role.</p>
+            <a href="./docs/#A4_FORGE" class="btn btn-outline btn-xl" aria-label="Read the A4 Forge guide">read the guide →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="section-alt">
       <div class="container">
         <div class="section-heading gs" style="text-align:center">
@@ -314,7 +360,7 @@
       <div class="container">
         <div class="section-heading gs" style="text-align:center">
           <p class="label">pricing</p>
-          <h2>Free forever<span class="accent">.</span> <strong>Pro packs for industries<span class="accent blink-cursor">_</span></strong></h2>
+          <h2>Free forever<span class="accent">.</span><br><strong>Industry Packs included<span class="accent blink-cursor">_</span></strong></h2>
         </div>
         <div class="pricing-grid">
           <div class="pricing-card gs">
@@ -325,17 +371,17 @@
             <a href="#install" class="btn btn-primary btn-xl">start free →</a>
           </div>
           <div class="pricing-card gs">
-            <span class="tier">planned · $9.99 / month · per user</span>
-            <h3>Industry Packs — preview</h3>
-            <p><span class="hl">All 41 Industry Domain Packs</span> for regulated verticals: self-reported questionnaires. A licence unlocks access, never a better result. Public checkout is not yet publicly live or available.</p>
+            <span class="tier">free · no licence · no account</span>
+            <h3>Industry Packs</h3>
+            <p><span class="hl">All 41 Industry Domain Packs</span> for regulated verticals: every pack's questions and runs are included, with no licence, account or payment, and access never changes a result. They are self-reported questionnaires whose content is experimental, AI-drafted until a named expert signs it. Free in the current source build; the published 1.1.1 release still locks them behind the earlier licence gate.</p>
             <div class="items">Health · Wealth · Education · Mobility · Technology · Governance · Environment</div>
-            <a href="https://github.com/AgentMaturity/AgentMaturityCompass/discussions" class="btn btn-outline btn-xl">follow launch status →</a>
+            <a href="#domains" class="btn btn-outline btn-xl">browse the packs →</a>
           </div>
         </div>
         <p class="pricing-buyer-link gs">
           Procurement path:
           <a href="./docs/#BUYER_PACKAGES">Compare buyer packages</a>
-          for commercial offers by buyer type, proof surfaces, and purchase-ready artifacts.
+          for the AMC surfaces each buyer type focuses on. There is nothing to buy, so checkout is not available.
         </p>
       </div>
     </section>
@@ -345,55 +391,55 @@
         <div class="section-heading gs" style="text-align:center">
           <p class="label">industry packs</p>
           <h2>7 stations<span class="accent">.</span> 41 packs<span class="accent">.</span><br><strong>regulated depth<span class="accent blink-cursor">_</span></strong></h2>
-          <p class="section-desc" style="margin:1rem auto 0;text-align:center;max-width:680px">The planned commercial packs are sector-specific, self-reported questionnaires mapped to regulations such as the EU AI Act, HIPAA, FDA, NERC CIP, CITES, ILO, ISO and other domain frameworks. A licence unlocks access only; the same answers give the same result with or without one. The target tier is $9.99/month per user for all 41 packs; public checkout and license issuance are not live.</p>
+          <p class="section-desc" style="margin:1rem auto 0;text-align:center;max-width:680px">Industry Packs are sector-specific, self-reported questionnaires mapped to regulations such as the EU AI Act, HIPAA, FDA, NERC CIP, CITES, ILO, ISO and other domain frameworks. All 41 are free in the current source build, with no licence, account or payment, and access never changes a score, gap or report. Their content is experimental: AI-drafted until a named expert signs it, and never a certification or compliance verdict.</p>
         </div>
         <div class="station-cards gs">
           <a href="station-environment.html" class="station-card">
             <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg></div>
             <h3>Environment</h3>
-            <p class="station-card-meta">6 packs · 91 questions</p>
+            <p class="station-card-meta">6 packs · 104 questions</p>
             <p class="station-card-desc">Farm to Fork, Weave to Wear, Material to Machines, Source to Sustenance, Ubiquity to Utility, Sip to Sanitation.</p>
             <span class="station-card-link">SEE +</span>
           </a>
           <a href="station-health.html" class="station-card">
             <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
             <h3>Health</h3>
-            <p class="station-card-meta">9 packs · 151 questions</p>
+            <p class="station-card-meta">9 packs · 161 questions</p>
             <p class="station-card-desc">Digital Health Record, Wellness, Patient Lifecycle, Clinical Lifecycle, Professional Practice, Life Technology, Drug Discovery, Clinical Trials, Specialized Medicine.</p>
             <span class="station-card-link">SEE +</span>
           </a>
           <a href="station-wealth.html" class="station-card">
             <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
             <h3>Wealth</h3>
-            <p class="station-card-meta">5 packs · 75 questions</p>
+            <p class="station-card-meta">5 packs · 89 questions</p>
             <p class="station-card-desc">Future of Work, Digital Payments, No Poverty, Circular Economy, Blockchain and DeFi.</p>
             <span class="station-card-link">SEE +</span>
           </a>
           <a href="station-education.html" class="station-card">
             <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
             <h3>Education</h3>
-            <p class="station-card-meta">5 packs · 75 questions</p>
+            <p class="station-card-meta">5 packs · 87 questions</p>
             <p class="station-card-desc">K-12, Higher Education, Skills and Vocational, Specialized Education, Differently Abled.</p>
             <span class="station-card-link">SEE +</span>
           </a>
           <a href="station-mobility.html" class="station-card">
             <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></div>
             <h3>Mobility</h3>
-            <p class="station-card-meta">6 packs · 90 questions</p>
+            <p class="station-card-meta">6 packs · 94 questions</p>
             <p class="station-card-desc">Sustainable Communities, Sustainable Ports, Sustainable Real Estate, Virtual Infrastructure, Privacy and Security, Freight/3PL/Warehouse.</p>
             <span class="station-card-link">SEE +</span>
           </a>
           <a href="station-technology.html" class="station-card">
             <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/></svg></div>
             <h3>Technology</h3>
-            <p class="station-card-meta">5 packs · 75 questions</p>
+            <p class="station-card-meta">5 packs · 97 questions</p>
             <p class="station-card-desc">Cognition to Intelligence, Networked Ecosystems, OS for Sustainable Outcomes, Infotainment, Partnerships for Prosperity.</p>
             <span class="station-card-link">SEE +</span>
           </a>
           <a href="station-governance.html" class="station-card">
             <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-4h6v4"/></svg></div>
             <h3>Governance</h3>
-            <p class="station-card-meta">5 packs · 75 questions</p>
+            <p class="station-card-meta">5 packs · 91 questions</p>
             <p class="station-card-desc">Digital Citizens and Rights, Dance of Democracy, Petition to Law, Citizen Services, Public and Private Collaboration.</p>
             <span class="station-card-link">SEE +</span>
           </a>
@@ -413,11 +459,11 @@
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">How is AMC different from other evaluation tools?<span class="faq-icon">+</span></button><div class="faq-a"><p>AMC is a trusted observer. Self-reported evidence is capped at <span class="hl">0.4x weight</span>; observed runtime evidence carries <span class="hl">1.0x weight</span>. It scores maturity, finds gaps, runs assurance packs, and preserves verifiable evidence.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Which frameworks does AMC support?<span class="faq-icon">+</span></button><div class="faq-a"><p><span class="hl">16 adapters</span>: AutoGen, Claude Code, CrewAI, DeepSeek Harness, Gemini CLI, Generic CLI, Hermes Agent, LangChain for Node and Python, LangGraph, LlamaIndex, OpenAI Agents SDK, OpenClaw, OpenHands, Python AMC SDK, and Semantic Kernel. OpenAI-compatible endpoints use the Generic CLI adapter with the <code>/openai</code> gateway route. Optional DeepSeek Harness capture requires a reviewed, signed launcher and does not prove internal tool or provider coverage. Run <code>amc adapters capabilities</code> for signed, current coverage instead of relying on a static badge.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Can I use AMC in CI/CD?<span class="faq-icon">+</span></button><div class="faq-a"><p>Yes. Use gates such as <code>amc gate --min-score L3</code> to fail builds below threshold and prevent trust regressions.</p></div></div>
-          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Do Industry Packs require an account?<span class="faq-icon">+</span></button><div class="faq-a"><p>No account is needed for the free core. Industry Packs are a planned commercial add-on; checkout is not publicly live.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Do Industry Packs require an account?<span class="faq-icon">+</span></button><div class="faq-a"><p>No. All 41 Industry Packs are free in the current source build, with no account, licence or payment; the published 1.1.1 release still locks them behind the earlier licence gate. Pack results are self-reported questionnaires, and access never changes a result.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Do I need Docker?<span class="faq-icon">+</span></button><div class="faq-a"><p>No. Use the verified macOS/Linux or Windows release installer above. Docker is optional.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Can non-engineers use it?<span class="faq-icon">+</span></button><div class="faq-a"><p>Yes. Run <code>amc up</code> and use the local Studio dashboard.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Can AMC fix my agent, not just score it?<span class="faq-icon">+</span></button><div class="faq-a"><p>Yes. Run <code>amc fix</code> — it scores your agent, explains the top gaps in plain words, asks once, then writes guardrail rules into your agent's own file (AGENTS.md, CLAUDE.md, .cursorrules, and 12 more). It never touches your API keys, and it leaves a hash-sealed receipt of exactly what changed.</p></div></div>
-          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">What is free and what is paid?<span class="faq-icon">+</span></button><div class="faq-a"><p>The core trust stack is MIT licensed: Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, adapters, Studio, reports, and CI gates. AMC plans a <span class="hl">$9.99/month per user</span> Industry Packs add-on of self-reported questionnaires, but public checkout and automatic license issuance are not yet available. Payment never changes a result.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">What is free and what is paid?<span class="faq-icon">+</span></button><div class="faq-a"><p>The whole product is free. The core trust stack is MIT licensed: Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, adapters, Studio, reports, and CI gates. <span class="hl">All 41 Industry Packs are free</span> too: the current source build asks for no licence and has no checkout. They are self-reported questionnaires whose content is experimental, and access never changes a result.</p></div></div>
         </div>
       </div>
     </section>

@@ -28,7 +28,7 @@ What makes it different from eval tools like Promptfoo:
 
 - **41 industry domain packs** — healthcare/HIPAA, finance/MiFID II, education/FERPA, logistics reliability, and more.
 
-The entire trust stack is MIT licensed and free. Only the industry-specific domain packs are paid.
+The entire product is MIT licensed and free, the industry domain packs included (experimental, self-reported questionnaires; no licence or account).
 
 Tech: TypeScript, Commander CLI, Ed25519 crypto, SQLite evidence ledger, 2,399 Vitest test source files, MCP server for AI coding assistants.
 

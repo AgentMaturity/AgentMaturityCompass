@@ -53,7 +53,7 @@ Steps, in order (all run against the same workspace):
 | init | `amc init --skip-vault` [C9] | 0 | `.amc/` |
 | domain-modules | `amc domain modules --domain <station> --json` [C10] | 0 | `out/domain-modules.json` |
 | pack-catalog | `amc domain pack list --domain <station> --json` [C11] | 0 | `out/pack-catalog.json` |
-| pack-run-gate | `amc domain pack run --pack <id> --baseline --json` [C12] | 1 | `out/pack-run-gate.json` |
+| pack-run | `amc domain pack run --pack <id> --baseline --json` [C12] | 0 | `out/pack-run.json` |
 | risk-classify | `amc compliance risk-classify --capabilities <fixture> --json` [C13] | 0 | `out/risk-classification.json` |
 | assurance-pack | `amc assurance describe <pack>` [C14] | 0 | `out/assurance-pack.json` |
 | agent-run | `amc --agent default agent-loop run "<prompt>" --provider stub ...` [C15] | 0 | `out/agent-run.json` |
@@ -67,12 +67,15 @@ A step whose exit code differs from the expected one stops the run [C21].
 
 ## What the outputs show, and what they do not
 
-- `pack-run-gate`: industry pack scoring checks the Industry Packs licence
-  first [C22] and, with `--json`, prints `industry_packs_locked` [C23]. The
-  licence is read from `AMC_INDUSTRY_PACKS_LICENSE_KEY` or a stored file [C24]
-  and counts only when it verifies against a licence key pinned in the
-  operator's trust list [C41]. These examples hold no licence, so no industry
-  pack score is produced; a licence would change access, never a result.
+- `pack-run`: Industry Packs are free, so the pack runs with no licence,
+  account or payment [C22]. `--baseline` runs with no answers, so every
+  question is not evaluated and no score is computed [C23]; the output lists
+  each unanswered question as not evaluated, never at a default level [C24].
+  Pack answers are self-reported, claim at most L1 and are never a
+  certification [C41]. The pack content is experimental [C48]: AI-drafted and
+  not reviewed by a qualified expert [C49]. Access never changes a score or
+  other result [C50]. The output is a questionnaire result, not an
+  observation of the agent or a compliance verdict.
 - `risk-classify`: the CLI parses the fixture's capability JSON [C25] and runs
   its own classifier on it [C26]. The fixture flags describe a hypothetical
   agent, and the result is labelled self-reported and not evaluated [C42]: it
@@ -106,7 +109,8 @@ test recomputes those digests.
 
 ## Not covered
 
-- Industry pack scoring, `amc domain apply` and `amc domain assess` (licensed).
+- An answered industry pack run (the examples run `--baseline`, which answers
+  nothing), `amc domain apply` and `amc domain assess`.
 - An assurance scan with a score (needs a reachable agent under test).
 - Any statement about whether an output meets a regulation.
 
@@ -128,7 +132,7 @@ text, not a line number, so unrelated edits do not break a citation.
 | C9 | `examples/regulated-industries/lib/runStation.mjs` | `{ id: "init", args: ["init", "--skip-vault"] }` |
 | C10 | `examples/regulated-industries/lib/runStation.mjs` | `args: ["domain", "modules", "--domain", station, "--json"]` |
 | C11 | `examples/regulated-industries/lib/runStation.mjs` | `args: ["domain", "pack", "list", "--domain", station, "--json"]` |
-| C12 | `examples/regulated-industries/lib/runStation.mjs` | `stdoutTo: "pack-run-gate.json", expectExit: 1` |
+| C12 | `examples/regulated-industries/lib/runStation.mjs` | `args: ["domain", "pack", "run", "--pack", fixture.industryPack, "--baseline", "--json"], stdoutTo: "pack-run.json"` |
 | C13 | `examples/regulated-industries/lib/runStation.mjs` | `"--capabilities", JSON.stringify(fixture.capabilities)` |
 | C14 | `examples/regulated-industries/lib/runStation.mjs` | `args: ["assurance", "describe", fixture.assurancePack]` |
 | C15 | `examples/regulated-industries/lib/runStation.mjs` | `"--provider", "stub", "--model", STUB_MODEL` |
@@ -138,9 +142,9 @@ text, not a line number, so unrelated edits do not break a citation.
 | C19 | `examples/regulated-industries/lib/runStation.mjs` | `"audit", "binder", "verify", "out/binder.amcaudit", "--pubkey", pins.auditorPub]` |
 | C20 | `examples/regulated-industries/lib/runStation.mjs` | `{ id: "assurance-gate", args: ["assurance", "run"` |
 | C21 | `examples/regulated-industries/lib/runStation.mjs` | `if (result.status !== expectExit) {` |
-| C22 | `src/cli-domain-product-commands.ts` (`domain pack run`) | `assertIndustryPackAccess(process.cwd());` |
-| C23 | `src/cli-domain-product-commands.ts` (`domain pack run`) | `error: "industry_packs_locked"` |
-| C24 | `src/domains/industryPackEntitlement.ts` | `const envLicense = env.AMC_INDUSTRY_PACKS_LICENSE_KEY` |
+| C22 | `src/domains/industryPackEntitlement.ts` | `Industry Packs are free: every pack's questions and runs are included, with no licence, account or payment.` |
+| C23 | `src/cli-domain-product-commands.ts` (`domain pack run`) | `Run with no answers: every question is not evaluated and no score is computed` |
+| C24 | `src/domains/packSelfAssessment.ts` | `The questions without an answer, in pack order: not evaluated, never a default level.` |
 | C25 | `src/cli.ts` (`compliance risk-classify`) | `capabilities = JSON.parse(opts.capabilities)` |
 | C26 | `src/cli.ts` | `const result = classifyEuAiActRisk(capabilities);` |
 | C27 | `src/doctor/firstRunPlan.ts` | `the stub provider records a canned response through the signed session log (no real model answer)` |
@@ -157,10 +161,13 @@ text, not a line number, so unrelated edits do not break a citation.
 | C38 | `examples/regulated-industries/lib/runStation.mjs` | `network: opts.denyNetwork ? { mode: "denied", attempts }` |
 | C39 | `examples/regulated-industries/lib/runStation.mjs` | `artifacts: written.map((name) => ({ path: ` |
 | C40 | `examples/regulated-industries/lib/runStation.mjs` | `if (step.id === "init") pins = recordPins(workspace, join(workdir, "pins"));` |
-| C41 | `src/domains/industryPackEntitlement.ts` | `const fromEnv = envLicense ? verifyPinnedIndustryPackLicense(envLicense, trust) : null;` |
+| C41 | `src/domains/packSelfAssessment.ts` | `What self-declared pack answers may claim: self-reported, at most L1, never a certification.` |
 | C42 | `src/cli.ts` (`compliance risk-classify`) | `const claim = unverifiedClaim("compliance:euAiActRiskTier", 1, { regulated: true });` |
 | C43 | `src/assurance/evidenceWriters.ts` | `auditType: "ASSURANCE_RUN_ABORTED",` |
 | C44 | `examples/regulated-industries/lib/runStation.mjs` | `pins: { monitorSha256: pins.monitorSha256, auditorPubSha256: sha256(readFileSync(pins.auditorPub))` |
 | C45 | `examples/regulated-industries/lib/runStation.mjs` | `const TARGET_GATE_PACK = "injection";` |
 | C46 | `src/assurance/assurancePackExecution.ts` | `const responder = await input.getResponder();` |
 | C47 | `src/assurance/executed/compiledExecution.ts` | `if (scope === null) return unavailable("verified_execution_scope_unavailable");` |
+| C48 | `src/domains/questionnaireLabel.ts` | `export const QUESTIONNAIRE_CONTENT_STATUS = "experimental" as const;` |
+| C49 | `src/domains/questionnaireLabel.ts` | `AI-drafted; not reviewed by a qualified expert; not legal advice.` |
+| C50 | `src/domains/industryPackEntitlement.ts` | `access never changes a score, gap, report or other result.` |

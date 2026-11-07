@@ -1,10 +1,8 @@
 /**
  * Read-only MCP tools over the industry packs in src/domains (O17, P1-44).
  *
- * Access follows P1-51 (D-06 = B): pack names, descriptions, regulatory basis, frameworks and station summaries are
- * public; pack questions and scoring need an Industry Packs licence verified against a pinned key, and a locked call is
- * refused with the one paywall message. A licence unlocks access only: no tool returns a different result because a
- * licence is present. Every result carries its claim through withClaim (P0-23); refusals are tool results, never throws.
+ * Industry Packs are free (2026-11-07): every tool, including pack questions and scoring, works with no licence.
+ * Every result carries its claim through withClaim (P0-23); refusals are tool results, never throws.
  */
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
@@ -16,11 +14,7 @@ import {
   listIndustryPackIds,
   scoreIndustryPack,
 } from "../domains/industryPacks.js";
-import {
-  getIndustryPackEntitlement,
-  toIndustryPackCatalogItem,
-  type IndustryPackEntitlement,
-} from "../domains/industryPackEntitlement.js";
+import { toIndustryPackCatalogItem } from "../domains/industryPackEntitlement.js";
 import { packSelfAssessmentEnvelope } from "../domains/packSelfAssessment.js";
 import { unboundClaim, withClaim } from "./mcpClaimOutput.js";
 import type { ClaimEnvelope } from "../claims/eligibility/index.js";
@@ -34,14 +28,12 @@ export const INDUSTRY_PACK_TOOL_NAMES = [
 
 export const INDUSTRY_PACK_TOOL_METADATA = [
   { name: "amc_list_industry_packs", description: "List industry packs by station: names, descriptions, regulatory basis and frameworks (read-only)", input: "{ station?: string }" },
-  { name: "amc_get_industry_pack", description: "Get one industry pack's questions; needs an Industry Packs licence (read-only)", input: "{ packId: string }" },
-  { name: "amc_score_industry_pack", description: "Self-reported pack score; unanswered questions are not evaluated; needs an Industry Packs licence (read-only)", input: "{ packId: string, responses: Record<string, number> }" },
+  { name: "amc_get_industry_pack", description: "Get one industry pack's questions; free, no licence needed (read-only)", input: "{ packId: string }" },
+  { name: "amc_score_industry_pack", description: "Self-reported pack score; unanswered questions are not evaluated; free, no licence needed (read-only)", input: "{ packId: string, responses: Record<string, number> }" },
   { name: "amc_industry_station_summary", description: "Pack count, question count and frameworks of one station (read-only)", input: "{ station: string }" },
 ];
 
 export interface IndustryPackToolOptions {
-  /** Resolves the entitlement per call; defaults to the workspace in process.cwd(). */
-  resolveEntitlement?: () => IndustryPackEntitlement;
   /** Host guard run before every call (the server passes its rate limiter); a throw is refused as rate_limited. */
   beforeCall?: () => void;
 }
@@ -76,7 +68,6 @@ function unknownPack(packId: string): ToolResult {
 }
 
 export function registerIndustryPackTools(server: McpServer, options: IndustryPackToolOptions = {}): void {
-  const resolveEntitlement = options.resolveEntitlement ?? (() => getIndustryPackEntitlement(process.cwd()));
   const guarded =
     <A>(handler: (args: A) => ToolResult) =>
     async (args: A): Promise<ToolResult> => {
@@ -87,24 +78,18 @@ export function registerIndustryPackTools(server: McpServer, options: IndustryPa
       }
       return handler(args);
     };
-  /** Without an active licence: the refusal with P1-51's one paywall message. */
-  const lockedRefusal = (): ToolResult | null => {
-    const entitlement = resolveEntitlement();
-    return entitlement.active ? null : refuse("industry_packs_locked", entitlement.message);
-  };
 
   server.registerTool(
     "amc_list_industry_packs",
     {
-      description: "List AMC industry packs grouped by station, optionally for one station: names, descriptions, regulatory basis and frameworks. Each item says whether its questions are locked; a licence never changes this listing. (read-only)",
+      description: "List AMC industry packs grouped by station, optionally for one station: names, descriptions, regulatory basis and frameworks. Industry Packs are free, so every pack is unlocked. (read-only)",
       inputSchema: z.object({ station: stationSchema.optional().describe("Station id") }).strict(),
       annotations: READ_ONLY,
     },
     guarded(({ station }: { station?: Domain }) => {
-      const entitlement = resolveEntitlement();
       const stations = (station ? [station] : STATION_IDS).map((stationId) => ({
         stationId,
-        packs: getIndustryPacksByStation(stationId).map((pack) => toIndustryPackCatalogItem(pack, entitlement)),
+        packs: getIndustryPacksByStation(stationId).map((pack) => toIndustryPackCatalogItem(pack)),
       }));
       const packCount = stations.reduce((n, s) => n + s.packs.length, 0);
       return ok({ packCount, stations }, catalogClaim("amc_list_industry_packs"));
@@ -114,21 +99,21 @@ export function registerIndustryPackTools(server: McpServer, options: IndustryPa
   server.registerTool(
     "amc_get_industry_pack",
     {
-      description: "Get one industry pack: questions, regulatory basis, compliance frameworks and EU AI Act classification, as stored. Requires an Industry Packs licence. (read-only)",
+      description: "Get one industry pack: questions, regulatory basis, compliance frameworks and EU AI Act classification, as stored. Free; no licence needed. (read-only)",
       inputSchema: z.object({ packId: packIdSchema }).strict(),
       annotations: READ_ONLY,
     },
     guarded(({ packId }: { packId: string }) => {
       const pack = getPackById(packId);
       if (!pack) return unknownPack(packId);
-      return lockedRefusal() ?? ok({ pack }, catalogClaim("amc_get_industry_pack"));
+      return ok({ pack }, catalogClaim("amc_get_industry_pack"));
     }),
   );
 
   server.registerTool(
     "amc_score_industry_pack",
     {
-      description: "Score self-reported question levels (1-5) against an industry pack. The result is self-reported, never a certification. Unanswered questions are not evaluated: the result lists them in notEvaluatedQuestionIds, and its percentage and level are null until every question is answered. Requires an Industry Packs licence. (read-only)",
+      description: "Score self-reported question levels (1-5) against an industry pack. The result is self-reported, never a certification. Unanswered questions are not evaluated: the result lists them in notEvaluatedQuestionIds, and its percentage and level are null until every question is answered. Free; no licence needed. (read-only)",
       inputSchema: z
         .object({
           packId: packIdSchema,
@@ -140,8 +125,6 @@ export function registerIndustryPackTools(server: McpServer, options: IndustryPa
     guarded(({ packId, responses }: { packId: string; responses: Record<string, number> }) => {
       const pack = getPackById(packId);
       if (!pack) return unknownPack(packId);
-      const locked = lockedRefusal();
-      if (locked) return locked;
       const questionIds = new Set(pack.questions.map((q) => q.id));
       const unknown = Object.keys(responses).filter((id) => !questionIds.has(id));
       if (unknown.length > 0) {

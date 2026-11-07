@@ -83,6 +83,7 @@ const F = {
   compiledExecution: "src/assurance/executed/compiledExecution.ts",
   domainCli: "src/domains/domainCliIntegration.ts",
   cliDomain: "src/cli-domain-product-commands.ts",
+  entitlement: "src/domains/industryPackEntitlement.ts",
   cli: "src/cli.ts",
   compReport: "src/compliance/complianceReport.ts",
   frameworks: "src/compliance/frameworks.ts",
@@ -161,7 +162,6 @@ function frameworkTargets(strings: string[]) {
 }
 
 function packSection(c: Cites, station: Domain, packs: IndustryPack[], total: number): string[] {
-  const run = "Run an industry sector pack";
   return [
     "## Sector packs",
     "",
@@ -173,7 +173,7 @@ function packSection(c: Cites, station: Domain, packs: IndustryPack[], total: nu
     "",
     `Total: ${packs.length} packs, ${total} questions.`,
     "",
-    `Run one with \`amc domain pack run --pack <id>\` ${c.ref("Sector pack run command", F.cliDomain, "Run an industry sector pack")}. The command requires the industry-pack entitlement ${c.ref("Pack run checks entitlement", F.cliDomain, "assertIndustryPackAccess(process.cwd());", run)}. In a terminal the operator picks a level per question (L1, L3 or L5) ${c.ref("Interactive runs offer L1, L3 and L5", F.cliDomain, '{ name: "L3 — " + q.l3.slice(0, 80), value: 3 }')}; with \`--baseline\`, or without a terminal, no question is answered, so every question is not evaluated and no score is computed ${c.ref("Baseline answers nothing", F.cliDomain, "every question is not evaluated and no score is computed")}. The answers are self-reported and cap the eligible level at L1 ${c.ref("Self-reported answers cap at L1", F.cliDomain, "self-reported answers cap at L1")}, so a pack result is a self-assessment, not an observation of the agent. Meeting the self-assessment target certifies nothing.`,
+    `Run one with \`amc domain pack run --pack <id>\` ${c.ref("Sector pack run command", F.cliDomain, "Run an industry sector pack")}. Industry Packs are free, so the command needs no licence, account or payment ${c.ref("Every workspace's Industry Packs access is free", F.entitlement, 'source: "free"', "export function getIndustryPackEntitlement")}. In a terminal the operator picks a level per question (L1, L3 or L5) ${c.ref("Interactive runs offer L1, L3 and L5", F.cliDomain, '{ name: "L3 — " + q.l3.slice(0, 80), value: 3 }')}; with \`--baseline\`, or without a terminal, no question is answered, so every question is not evaluated and no score is computed ${c.ref("Baseline answers nothing", F.cliDomain, "every question is not evaluated and no score is computed")}. The answers are self-reported and cap the eligible level at L1 ${c.ref("Self-reported answers cap at L1", F.cliDomain, "self-reported answers cap at L1")}, so a pack result is a self-assessment, not an observation of the agent. Meeting the self-assessment target certifies nothing.`,
     ""
   ];
 }

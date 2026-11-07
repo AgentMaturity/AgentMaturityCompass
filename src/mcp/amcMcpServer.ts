@@ -33,7 +33,6 @@ import { effectiveTrustTier } from "../claims/evidenceProvenance.js";
 import { getPackById, INDUSTRY_PACKS, scoreIndustryPack } from "../domains/industryPacks.js";
 import { QUESTIONNAIRE_NOTICE } from "../domains/questionnaireLabel.js";
 import { packSelfAssessmentEnvelope } from "../domains/packSelfAssessment.js";
-import { getIndustryPackEntitlement } from "../domains/industryPackEntitlement.js";
 import { openLedger } from "../ledger/ledger.js";
 import { getPublicKeyHistory } from "../crypto/keys.js";
 import { createIncidentStore } from "../incidents/incidentStore.js";
@@ -385,18 +384,6 @@ export function createAmcMcpServer(defaultWorkspace = process.cwd()): McpServer 
     },
     async ({ packId, responses }) => {
       enforceRateLimit();
-      const entitlement = getIndustryPackEntitlement(defaultWorkspace);
-      if (!entitlement.active) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: entitlement.message,
-            },
-          ],
-          isError: true,
-        };
-      }
       const pack = getPackById(packId);
       if (!pack) {
         const available = Object.keys(INDUSTRY_PACKS).join(", ");
@@ -758,7 +745,7 @@ export function createAmcMcpServer(defaultWorkspace = process.cwd()): McpServer 
     }
   );
 
-  registerIndustryPackTools(server, { resolveEntitlement: () => getIndustryPackEntitlement(defaultWorkspace), beforeCall: enforceRateLimit });
+  registerIndustryPackTools(server, { beforeCall: enforceRateLimit });
   registerA4Tools(server, { defaultWorkspace, enforceRateLimit, validateWorkspace });
   return server;
 }

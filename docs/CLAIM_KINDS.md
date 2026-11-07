@@ -45,7 +45,7 @@ A result is regulated when it asserts conformity with a law, regulation, standar
 
 The service reads no clock, file or environment: callers pass `now`. Changing `now` can only change staleness.
 
-Payment unlocks access, never a better result or a higher trust tier. The envelope copies `entitlement` through untouched, and no rule reads it.
+Access never gives a better result or a higher trust tier: Industry Packs are free, the envelope copies an `entitlement` input through untouched, and no rule reads it.
 
 ## Mappings
 
@@ -196,4 +196,4 @@ All fifteen tools in `src/mcp/amcMcpServer.ts` and `src/mcp/industryPackTools.ts
 
 ### Studio
 
-`src/studio/studioClaimOutput.ts` lists the Studio routes that feed result pages; Studio's JSON helper adds the claim fields to their 2xx bodies. The console shows each claim in a strip above the page (`src/console/assets/components/claimBadge.js`): the kind and result in a pill, the five dimensions in its tooltip, and a link to the legend, which the dashboard, transparency, compliance, assurance, passport and industry-packs pages show open. "Not evaluated" is a neutral pill with its reason, never 0 and never a failure. Pack-gate responses add `entitlementNote`, and claim fields are the same with or without entitlement.
+`src/studio/studioClaimOutput.ts` lists the Studio routes that feed result pages; Studio's JSON helper adds the claim fields to their 2xx bodies. The console shows each claim in a strip above the page (`src/console/assets/components/claimBadge.js`): the kind and result in a pill, the five dimensions in its tooltip, and a link to the legend, which the dashboard, transparency, compliance, assurance, passport and industry-packs pages show open. "Not evaluated" is a neutral pill with its reason, never 0 and never a failure. Industry Packs responses add `entitlementNote` (Industry Packs are free; access never changes a result), and claim fields never depend on a licence.

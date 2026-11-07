@@ -13,12 +13,13 @@ shape mismatch raises :class:`AmcProtocolError` rather than returning a partial
 result. Pack and domain ids are checked against the CLI's own id sets before
 anything runs; domain aliases (``healthcare``) are refused, pass the canonical id.
 
-Pack details, baseline scoring and apply need an Industry Packs licence that
-verifies against a key pinned in the operator's trust list; without one the CLI
-refuses and so does this module (:class:`AmcIndustryLockedError` or
-:class:`AmcIndustryCommandError`). A licence changes access, never a result.
-Scores are self-reported: each carries ``claimKind`` and ``statusDimensions``
-from AMC's claim service, and none is a certification.
+Industry Packs are free: no command here needs a licence, account or payment,
+and access never changes a score, result, trust tier or verification outcome.
+Pack results are self-reported questionnaires whose content is experimental
+(AI-drafted, not reviewed by a qualified expert): each score carries
+``claimKind`` and ``statusDimensions`` from AMC's claim service, and none is a
+certification. :class:`AmcIndustryLockedError` remains only for older CLIs that
+refused unlicensed pack commands; with a current CLI it is never raised.
 """
 from __future__ import annotations
 
@@ -55,7 +56,10 @@ DOMAIN_IDS: tuple[str, ...] = ("health", "education", "environment", "mobility",
 
 
 class AmcIndustryLockedError(AmcError):
-    """The CLI's JSON refusal ``{"error": "industry_packs_locked", "message": ...}``."""
+    """An older CLI's JSON refusal ``{"error": "industry_packs_locked", "message": ...}``.
+
+    Industry Packs are free, so current CLIs never print it; kept so callers that catch it keep working.
+    """
 
     def __init__(self, message: str) -> None:
         super().__init__(message)
@@ -101,13 +105,18 @@ class _Entitlement(TypedDict):
 
 
 class IndustryPackEntitlement(_Entitlement, total=False):
+    """Current CLIs: ``active`` True, ``source`` ``"free"``, ``planId`` ``"industry-packs-free"``,
+    ``priceUsdMonthly`` ``"0.00"``, ``checkoutAvailable`` False, ``checkoutUrl`` and ``expiresAt`` None.
+    ``licenseVerificationConfigured`` only says whether a key pinned in the operator's trust list could
+    verify a legacy licence. The optional keys came only from older CLIs holding a licence.
+    """
     customerId: str
     subscriptionId: str
     licenseStatus: str
 
 
 class IndustryPackCatalogItem(TypedDict):
-    """Public with or without a licence; ``locked`` says whether the pack's questions are locked."""
+    """``locked`` is always False on current CLIs (Industry Packs are free); the key is kept for compatibility."""
     packId: str
     name: str
     domain: str
@@ -315,6 +324,7 @@ class AmcIndustry:
                 refusal = json.loads(completed.stdout)
             except ValueError:
                 refusal = None
+            # Older CLIs only: Industry Packs are free, so current CLIs never print this refusal.
             if (isinstance(refusal, dict) and refusal.get("error") == "industry_packs_locked"
                     and isinstance(refusal.get("message"), str)):
                 raise AmcIndustryLockedError(refusal["message"])
@@ -333,7 +343,7 @@ class AmcIndustry:
         return self._json(["domain", "list"], list[DomainMetadata])
 
     def list_packs(self, domain: Optional[str] = None) -> IndustryPackCatalog:
-        """``amc domain pack list [--domain D] --json``; works without an entitlement."""
+        """``amc domain pack list [--domain D] --json``."""
         args = ["domain", "pack", "list"]
         if domain is not None:
             args += ["--domain", _known(domain, DOMAIN_IDS, "domain")]

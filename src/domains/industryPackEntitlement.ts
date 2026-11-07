@@ -1,7 +1,7 @@
 import { createHmac, createPrivateKey, createPublicKey, sign as signEd25519, timingSafeEqual, verify as verifyEd25519 } from "node:crypto";
 import { join } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { toErrorMessage } from "../utils/errors.js";
 import type { IndustryPack } from "./industryPacks.js";
 import { QUESTIONNAIRE_CONTENT_STATUS } from "./questionnaireLabel.js";
@@ -9,16 +9,21 @@ import {
   admitKey, admittedListKeys, buildVerifierReport, loadTrustContext, type TrustContext, type VerifierReportV1
 } from "../trust/index.js";
 
+/** The plan id signed into legacy licences; licences stay verifiable, but none is needed (Industry Packs are free). */
 export const INDUSTRY_PACKS_PLAN_ID = "industry-packs-monthly";
-export const INDUSTRY_PACKS_MONTHLY_PRICE_USD = "9.99";
+/** The plan every workspace has: Industry Packs are free and included. */
+export const INDUSTRY_PACKS_FREE_PLAN_ID = "industry-packs-free";
+export const INDUSTRY_PACKS_MONTHLY_PRICE_USD = "0.00";
 export const INDUSTRY_PACKS_ACCESS_FILE = "industry-packs-access.json";
 export const INDUSTRY_PACKS_LICENSE_PREFIX = "AMC-INDUSTRY-PACKS";
 /**
- * The purpose a trust-list entry must carry for a gate to accept its key as a licence signer, as `amc domain pack verify`
+ * The purpose a trust-list entry must carry for its key to count as a legacy licence signer, as `amc domain pack verify`
  * (P0-51) already checks. ponytail: shares artifact-seal; a dedicated licence purpose needs a trust-list schema change.
  */
 const INDUSTRY_PACKS_LICENSE_PURPOSE = "artifact-seal";
-export const INDUSTRY_PACKS_CHECKOUT_NOT_AVAILABLE = "Checkout is not available in this deployment; contact sales for access.";
+export const INDUSTRY_PACKS_FREE_MESSAGE =
+  "Industry Packs are free: every pack's questions and runs are included, with no licence, account or payment."
+  + " Pack results are self-reported questionnaires; access never changes a score, gap, report or other result.";
 const LICENSE_VERIFICATION_NOT_CONFIGURED =
   "Industry Packs licence verification is not configured: no licence signing key is pinned in this machine's AMC trust list (purpose artifact-seal).";
 
@@ -36,13 +41,14 @@ export interface IndustryPackLicensePayload {
 }
 
 export interface IndustryPackEntitlement {
-  active: boolean;
-  source: "env" | "file" | "none";
+  /** Always true: Industry Packs are free. */
+  active: true;
+  source: "free";
   planId: string;
   priceUsdMonthly: string;
-  /** True only when a checkout URL is configured and a licence bought there could be verified here. */
-  checkoutAvailable: boolean;
-  checkoutUrl: string | null;
+  /** Always false: there is nothing to buy. */
+  checkoutAvailable: false;
+  checkoutUrl: null;
   /** A licence signing key is pinned in the operator's trust list; nothing the client supplies counts (P1-51). */
   licenseVerificationConfigured: boolean;
   expiresAt: string | null;
@@ -58,7 +64,8 @@ export interface IndustryPackCatalogItem {
   domain: string;
   riskLevel: string;
   questionCount: number;
-  locked: boolean;
+  /** Always false: Industry Packs are free. Kept so existing API consumers keep their field. */
+  locked: false;
   description: string;
   regulatoryBasis?: string[];
   complianceFrameworks?: string[];
@@ -79,22 +86,6 @@ interface StoredEntitlement {
   licenseStatus?: IndustryPackLicenseStatus;
 }
 
-export class IndustryPackAccessError extends Error {
-  readonly entitlement: IndustryPackEntitlement;
-
-  constructor(entitlement: IndustryPackEntitlement) {
-    super(entitlement.message);
-    this.name = "IndustryPackAccessError";
-    this.entitlement = entitlement;
-  }
-}
-
-function configuredCheckoutUrl(env: NodeJS.ProcessEnv): string | null {
-  return env.AMC_INDUSTRY_PACKS_CHECKOUT_URL
-    ?? env.AMC_DOMAIN_PACKS_CHECKOUT_URL
-    ?? null;
-}
-
 function licenseSecret(env: NodeJS.ProcessEnv): string | null {
   return env.AMC_INDUSTRY_PACKS_LICENSE_SECRET
     ?? env.AMC_DOMAIN_PACKS_LICENSE_SECRET
@@ -103,19 +94,6 @@ function licenseSecret(env: NodeJS.ProcessEnv): string | null {
 
 function entitlementPath(workspace: string): string {
   return join(workspace, ".amc", INDUSTRY_PACKS_ACCESS_FILE);
-}
-
-function parseStoredEntitlement(workspace: string): StoredEntitlement | null {
-  const file = entitlementPath(workspace);
-  if (!pathExists(file)) {
-    return null;
-  }
-  try {
-    const parsed = JSON.parse(readUtf8(file)) as StoredEntitlement;
-    return parsed && typeof parsed === "object" ? parsed : null;
-  } catch {
-    return null;
-  }
 }
 
 function licensePrivateKeyPem(env: NodeJS.ProcessEnv): string | null {
@@ -289,7 +267,7 @@ export function verifyIndustryPackLicenseKey(
 }
 
 /**
- * `amc domain pack verify` (P0-51): the licence verdict as a VerifierReportV1, against the same keys the gate uses
+ * `amc domain pack verify` (P0-51): the licence verdict as a VerifierReportV1, against the same keys activation uses
  * (P1-51): only a key the trust list pins for artifact-seal, never --pubkey or an environment key. With none pinned the
  * verdict is "not configured". A list key the list refuses that did sign the licence is named with that refusal (P0-51).
  * An HMAC-signed or legacy allowlisted licence names no signer, so it is never trusted.
@@ -304,41 +282,10 @@ export function verifyIndustryPackLicenseReport(licenseKey: string, trust: Trust
   return { ...result, valid: result.valid && report.trusted, report };
 }
 
-export function buildIndustryPackCheckoutUrl(params: {
-  successUrl?: string;
-  cancelUrl?: string;
-  customerEmail?: string;
-  clientReferenceId?: string;
-  env?: NodeJS.ProcessEnv;
-} = {}): string {
-  const env = params.env ?? process.env;
-  const raw = configuredCheckoutUrl(env);
-  if (!raw) {
-    throw new Error(
-      "Industry Packs checkout is not configured or publicly available yet. Set AMC_INDUSTRY_PACKS_CHECKOUT_URL only after a live checkout has been verified.",
-    );
-  }
-  let parsed: URL;
-  try {
-    parsed = new URL(raw);
-  } catch {
-    throw new Error("Industry Packs checkout URL is not a valid https URL.");
-  }
-  if (parsed.protocol !== "https:") {
-    throw new Error("Industry Packs checkout URL must use https.");
-  }
-  parsed.searchParams.set("plan", INDUSTRY_PACKS_PLAN_ID);
-  parsed.searchParams.set("price", INDUSTRY_PACKS_MONTHLY_PRICE_USD);
-  if (params.successUrl) parsed.searchParams.set("success_url", params.successUrl);
-  if (params.cancelUrl) parsed.searchParams.set("cancel_url", params.cancelUrl);
-  if (params.customerEmail) parsed.searchParams.set("customer_email", params.customerEmail);
-  if (params.clientReferenceId) parsed.searchParams.set("client_reference_id", params.clientReferenceId);
-  return parsed.toString();
-}
-
 /**
- * The licence verdict a gate uses: the signature must come from a key the operator's signed trust list admits for
- * artifact-seal. A key, secret or allowlist in the environment is client-supplied, so it never counts here.
+ * The legacy licence verdict that activation and Studio's licence verify use (it gates no access): the signature must
+ * come from a key the operator's signed trust list admits for artifact-seal. A key, secret or allowlist in the
+ * environment is client-supplied, so it never counts here.
  */
 export function verifyPinnedIndustryPackLicense(licenseKey: string, trust: TrustContext, now = Date.now()): ReturnType<typeof verifyIndustryPackLicenseKey> {
   return pinnedLicenseVerdict(licenseKey, trust, now).result;
@@ -379,89 +326,44 @@ function operatorTrust(env: NodeJS.ProcessEnv): { trust: TrustContext | null; er
   }
 }
 
+/**
+ * Industry Packs are free (2026-11-07): every workspace has access, with no licence, checkout or payment. The trust list is
+ * read only to report whether a legacy licence could still be verified here; it never gates access.
+ */
 export function getIndustryPackEntitlement(
-  workspace = process.cwd(),
+  _workspace = process.cwd(),
   env: NodeJS.ProcessEnv = process.env,
   trustContext?: TrustContext
 ): IndustryPackEntitlement {
-  const { trust, error } = trustContext ? { trust: trustContext, error: null } : operatorTrust(env);
-  const verificationConfigured = trust !== null && admittedListKeys(trust, INDUSTRY_PACKS_LICENSE_PURPOSE).length > 0;
-  const checkoutUrl = verificationConfigured ? configuredCheckoutUrl(env) : null;
-  const base = {
-    planId: INDUSTRY_PACKS_PLAN_ID,
+  const trust = trustContext ?? operatorTrust(env).trust;
+  return {
+    active: true,
+    source: "free",
+    planId: INDUSTRY_PACKS_FREE_PLAN_ID,
     priceUsdMonthly: INDUSTRY_PACKS_MONTHLY_PRICE_USD,
-    checkoutAvailable: checkoutUrl !== null,
-    checkoutUrl,
-    licenseVerificationConfigured: verificationConfigured,
-    expiresAt: null as string | null
+    checkoutAvailable: false,
+    checkoutUrl: null,
+    licenseVerificationConfigured: trust !== null && admittedListKeys(trust, INDUSTRY_PACKS_LICENSE_PURPOSE).length > 0,
+    expiresAt: null,
+    message: INDUSTRY_PACKS_FREE_MESSAGE
   };
-  const unlocked = (source: "env" | "file", payload: IndustryPackLicensePayload | null): IndustryPackEntitlement => ({
-    ...base, active: true, source, expiresAt: payload?.expiresAt ?? null, customerId: payload?.customerId,
-    subscriptionId: payload?.subscriptionId, licenseStatus: payload?.status,
-    message: `Industry Packs active via ${source === "env" ? "environment" : "local"} licence, verified against a pinned licence key.`
-  });
+}
 
-  const refusals: string[] = [];
-  if (trust) {
-    const envLicense = env.AMC_INDUSTRY_PACKS_LICENSE_KEY ?? env.AMC_DOMAIN_PACKS_LICENSE_KEY;
-    const fromEnv = envLicense ? verifyPinnedIndustryPackLicense(envLicense, trust) : null;
-    if (fromEnv?.valid) return unlocked("env", fromEnv.payload);
-    if (fromEnv && verificationConfigured) refusals.push(`The environment licence was refused: ${fromEnv.reason ?? "verification failed"}.`);
-    // The stored proof is re-verified on every read; no field of the editable file is trusted on its own.
-    const stored = parseStoredEntitlement(workspace);
-    if (stored?.active === true && stored.licensePayload && stored.licenseSignature) {
-      const fromFile = verifyPinnedIndustryPackLicense(
-        `${INDUSTRY_PACKS_LICENSE_PREFIX}.${stored.licensePayload}.${stored.licenseSignature}`, trust);
-      if (fromFile.valid) return unlocked("file", fromFile.payload);
-      if (verificationConfigured) refusals.push(`The stored licence was refused: ${fromFile.reason ?? "verification failed"}.`);
-    }
-  }
-  const locked = { ...base, active: false, source: "none" as const, message: "" };
-  return { ...locked, message: [formatIndustryPackPaywallMessage(locked), ...refusals, ...(error ? [error] : [])].join("\n") };
+/** The hosted API's view (api/index.ts): Industry Packs are free, so there is no checkout to offer. */
+export function hostedIndustryPackAccess() {
+  return {
+    planId: INDUSTRY_PACKS_FREE_PLAN_ID,
+    priceUsdMonthly: INDUSTRY_PACKS_MONTHLY_PRICE_USD,
+    checkoutAvailable: false as const,
+    checkoutUrl: null,
+    message: INDUSTRY_PACKS_FREE_MESSAGE
+  };
 }
 
 /**
- * The issuing server's view (api/index.ts). Checkout is live there only when a payment could become a licence: a checkout
- * URL, an Ed25519 issuing key and the admin issue path must all be configured. The server's own licence is irrelevant.
+ * Stores a legacy licence that verifies against a pinned licence key; anything else is refused and nothing is written.
+ * Not needed for access (Industry Packs are free); kept so existing licence holders can still record theirs.
  */
-export function hostedIndustryPackAccess(env: NodeJS.ProcessEnv = process.env) {
-  let checkoutUrl: string | null = null;
-  if (licensePrivateKeyPem(env) && env.AMC_INDUSTRY_PACKS_ADMIN_TOKEN) {
-    try { checkoutUrl = buildIndustryPackCheckoutUrl({ env }); } catch { /* unset or not https: there is no checkout to offer */ }
-  }
-  const plan = { planId: INDUSTRY_PACKS_PLAN_ID, priceUsdMonthly: INDUSTRY_PACKS_MONTHLY_PRICE_USD, checkoutAvailable: checkoutUrl !== null, checkoutUrl };
-  return { ...plan, message: formatIndustryPackPaywallMessage({ ...plan, licenseVerificationConfigured: true }) };
-}
-
-/** One text for every locked surface (CLI, Studio, console, dashboard, MCP): what is locked, the price, how to get access. */
-export function formatIndustryPackPaywallMessage(
-  entitlement: Pick<IndustryPackEntitlement, "priceUsdMonthly" | "planId" | "checkoutUrl" | "licenseVerificationConfigured">
-): string {
-  const access = entitlement.checkoutUrl
-    ? [`Buy: ${entitlement.checkoutUrl}`, "Then activate it: amc domain pack activate --key <licence-key>"]
-    : [INDUSTRY_PACKS_CHECKOUT_NOT_AVAILABLE,
-      entitlement.licenseVerificationConfigured
-        ? "If you already hold a licence: amc domain pack activate --key <licence-key>"
-        : LICENSE_VERIFICATION_NOT_CONFIGURED];
-  return [
-    "Industry Packs are locked: pack questions and pack runs need an Industry Packs licence (CLI: amc domain pack describe|run and"
-      + " amc domain assess|gaps|report|assurance|roadmap|apply; Studio: GET /industry-packs/<id>; MCP: amc_score_sector_pack,"
-      + " amc_get_industry_pack, amc_score_industry_pack).",
-    "Pack names and descriptions stay visible. A licence unlocks access only; it never changes a score, gap, report or other result.",
-    `Price: US$${entitlement.priceUsdMonthly}/month (plan ${entitlement.planId}).`,
-    ...access
-  ].join("\n");
-}
-
-export function assertIndustryPackAccess(workspace = process.cwd(), env: NodeJS.ProcessEnv = process.env): IndustryPackEntitlement {
-  const entitlement = getIndustryPackEntitlement(workspace, env);
-  if (!entitlement.active) {
-    throw new IndustryPackAccessError(entitlement);
-  }
-  return entitlement;
-}
-
-/** Stores a licence that verifies against a pinned licence key; anything else is refused and nothing is written. */
 export function activateIndustryPackAccess(params: {
   workspace?: string;
   licenseKey: string;
@@ -496,10 +398,10 @@ export function activateIndustryPackAccess(params: {
   return getIndustryPackEntitlement(workspace, { ...env, AMC_INDUSTRY_PACKS_LICENSE_KEY: undefined, AMC_DOMAIN_PACKS_LICENSE_KEY: undefined }, trust);
 }
 
-/** Names and descriptions are public whether or not a licence is active; the licence gates pack questions and runs. */
+/** A catalogue row; every pack is unlocked because Industry Packs are free. */
 export function toIndustryPackCatalogItem(
   pack: IndustryPack,
-  entitlement: IndustryPackEntitlement
+  _entitlement?: IndustryPackEntitlement
 ): IndustryPackCatalogItem {
   return {
     packId: pack.id,
@@ -507,7 +409,7 @@ export function toIndustryPackCatalogItem(
     domain: pack.stationId,
     riskLevel: pack.riskTier,
     questionCount: pack.questions.length,
-    locked: !entitlement.active,
+    locked: false,
     description: pack.description,
     regulatoryBasis: pack.regulatoryBasis,
     complianceFrameworks: pack.complianceFrameworks,

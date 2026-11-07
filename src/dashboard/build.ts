@@ -216,8 +216,8 @@ function getDomainSummaries(): Array<{
   }));
 }
 
-/** Names, descriptions and regulatory basis are public; a licence gates pack questions and runs, never these (P1-51). */
-function getPackSummaries(locked: boolean): Array<{
+/** Every pack's summary; Industry Packs are free, so none is locked. */
+function getPackSummaries(): Array<{
   id: string;
   name: string;
   domain: string;
@@ -225,7 +225,7 @@ function getPackSummaries(locked: boolean): Array<{
   questionCount: number;
   description: string;
   regulatoryBasis: string[];
-  locked: boolean;
+  locked: false;
   contentStatus: IndustryPack["contentStatus"];
 }> {
   return listIndustryPacks().map((pack) => ({
@@ -236,7 +236,7 @@ function getPackSummaries(locked: boolean): Array<{
     questionCount: pack.questions.length,
     description: pack.description,
     regulatoryBasis: pack.regulatoryBasis,
-    locked,
+    locked: false,
     contentStatus: pack.contentStatus
   }));
 }
@@ -364,7 +364,7 @@ export function buildDashboard(input: DashboardBuildInput): DashboardBuildResult
     trends,
     assurance,
     domains: getDomainSummaries(),
-    industryPacks: getPackSummaries(!packAccess.active),
+    industryPacks: getPackSummaries(),
     industryPacksAccess: { active: packAccess.active, message: packAccess.message },
     guardrails: getGuardrailsList(input.workspace),
     trustGraph: dashboardTrustGraph(input.workspace),

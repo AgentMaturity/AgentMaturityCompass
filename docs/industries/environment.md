@@ -38,7 +38,7 @@ Packs whose `stationId` is `environment`, as returned by `getIndustryPacksByStat
 
 Total: 6 packs, 104 questions.
 
-Run one with `amc domain pack run --pack <id>` [C9]. The command requires the industry-pack entitlement [C10]. In a terminal the operator picks a level per question (L1, L3 or L5) [C11]; with `--baseline`, or without a terminal, no question is answered, so every question is not evaluated and no score is computed [C12]. The answers are self-reported and cap the eligible level at L1 [C13], so a pack result is a self-assessment, not an observation of the agent. Meeting the self-assessment target certifies nothing.
+Run one with `amc domain pack run --pack <id>` [C9]. Industry Packs are free, so the command needs no licence, account or payment [C10]. In a terminal the operator picks a level per question (L1, L3 or L5) [C11]; with `--baseline`, or without a terminal, no question is answered, so every question is not evaluated and no score is computed [C12]. The answers are self-reported and cap the eligible level at L1 [C13], so a pack result is a self-assessment, not an observation of the agent. Meeting the self-assessment target certifies nothing.
 
 ## Frameworks referenced
 
@@ -150,7 +150,7 @@ D-14/D-10's two experts, independent human/legal sign-offs, a partner per domain
 | C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts` | `export function getIndustryPacksByStation` |
 | C8 | The registry stamps every pack experimental | `src/domains/industryPacks.ts` | `contentStatus: QUESTIONNAIRE_CONTENT_STATUS` |
 | C9 | Sector pack run command | `src/cli-domain-product-commands.ts` | `Run an industry sector pack` |
-| C10 | Pack run checks entitlement | `src/cli-domain-product-commands.ts` | `Run an industry sector pack` … `assertIndustryPackAccess(process.cwd());` |
+| C10 | Every workspace's Industry Packs access is free | `src/domains/industryPackEntitlement.ts` | `export function getIndustryPackEntitlement` … `source: "free"` |
 | C11 | Interactive runs offer L1, L3 and L5 | `src/cli-domain-product-commands.ts` | `{ name: "L3 — " + q.l3.slice(0, 80), value: 3 }` |
 | C12 | Baseline answers nothing | `src/cli-domain-product-commands.ts` | `every question is not evaluated and no score is computed` |
 | C13 | Self-reported answers cap at L1 | `src/cli-domain-product-commands.ts` | `self-reported answers cap at L1` |

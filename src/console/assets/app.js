@@ -1382,7 +1382,7 @@ async function renderHome() {
           <div class="studio-terminal-line"><strong>Gateway</strong><span>${htmlEscape(status.studio?.gatewayPort || "-")}</span></div>
           <div class="studio-terminal-line"><strong>ToolHub/API</strong><span>${htmlEscape(status.studio?.apiPort || "-")}</span></div>
           <div class="studio-terminal-line"><strong>Vault</strong><span>${htmlEscape(vaultState)}</span></div>
-          <div class="studio-terminal-line"><strong>Industry Packs</strong><span>planned tier · checkout not live</span></div>
+          <div class="studio-terminal-line"><strong>Industry Packs</strong><span>free · all packs included</span></div>
         </div>
       </div>
     </section>
@@ -2299,31 +2299,19 @@ async function renderIndustryPacks() {
   const response = await apiGet("/industry-packs/list");
   const entitlement = response.entitlement || {};
   const packs = response.packs || [];
-  const locked = !entitlement.active;
-  // The server's paywall text (src/domains/industryPackEntitlement.ts) is the one source for price and access steps.
-  const lockedMessage = entitlement.message || "Industry Packs are locked.";
   root.innerHTML = `
     ${card("Industry Packs", `
       <div class="grid">
         <div>
           <div class="muted">Access</div>
-          <div class="tile-value">${locked ? "Locked" : "Active"}</div>
+          <div class="tile-value">Active</div>
         </div>
         <div>
           <div class="muted">Price</div>
-          <div class="tile-value">US$${htmlEscape(entitlement.priceUsdMonthly || "")}/mo</div>
+          <div class="tile-value">Free</div>
         </div>
       </div>
-      ${locked ? `
-        <p class="muted" style="white-space:pre-line">${htmlEscape(lockedMessage)}</p>
-        ${entitlement.checkoutAvailable === true ? `<div class="row"><button id="industryCheckout">Open checkout</button></div>` : ""}
-        ${entitlement.licenseVerificationConfigured === true ? `
-        <div class="form-row">
-          <label for="industryLicenseKey">Licence key</label>
-          <input id="industryLicenseKey" placeholder="AMC-INDUSTRY-PACKS..." autocomplete="off" />
-        </div>
-        <button id="industryActivate" class="secondary">Activate access</button>` : ""}
-      ` : `<p class="status-ok">Industry Packs are unlocked. A licence never changes a result.</p>`}
+      <p class="status-ok">${htmlEscape(entitlement.message || "Industry Packs are free. Access never changes a result.")}</p>
     `)}
     ${card("Pack Catalog", `<div id="industryPackRows" class="scroll"></div><pre id="industryPackOut" class="muted"></pre>`)}
   `;
@@ -2333,44 +2321,20 @@ async function renderIndustryPacks() {
       <div class="card">
         <div class="row spaced">
           <strong>${htmlEscape(pack.name || pack.packId)}</strong>
-          <span>${pack.locked ? "locked" : htmlEscape(pack.riskLevel || "active")}</span>
+          <span>${htmlEscape(pack.riskLevel || "active")}</span>
         </div>
         <p class="muted">${htmlEscape(pack.description || "")}</p>
         <div class="row spaced">
           <span class="muted">${htmlEscape(pack.domain || "")} · ${Number(pack.questionCount || 0)} questions${pack.contentStatus ? ` · ${htmlEscape(pack.contentStatus)}, self-reported` : ""}</span>
-          <button class="secondary" data-industry-pack="${htmlEscape(pack.packId)}">${pack.locked ? "Locked" : "Open"}</button>
+          <button class="secondary" data-industry-pack="${htmlEscape(pack.packId)}">Open</button>
         </div>
       </div>
     `)
     .join("");
   const out = document.getElementById("industryPackOut");
-  document.getElementById("industryCheckout")?.addEventListener("click", async () => {
-    const payload = await apiPost("/industry-packs/checkout", {
-      successUrl: window.location.href,
-      cancelUrl: window.location.href,
-      clientReferenceId: currentAgent()
-    });
-    if (payload.checkoutUrl) window.open(payload.checkoutUrl, "_blank", "noopener");
-    else out.textContent = payload.error || lockedMessage;
-  });
-  document.getElementById("industryActivate")?.addEventListener("click", async () => {
-    const input = document.getElementById("industryLicenseKey");
-    const licenseKey = input?.value?.trim();
-    if (!licenseKey) {
-      out.textContent = "Paste the Industry Packs licence key first.";
-      return;
-    }
-    const activated = await apiPost("/industry-packs/activate", { licenseKey });
-    out.textContent = JSON.stringify(activated, null, 2);
-    await renderIndustryPacks();
-  });
   rows.querySelectorAll("button[data-industry-pack]").forEach((button) => {
     button.addEventListener("click", async () => {
       const id = button.getAttribute("data-industry-pack");
-      if (locked) {
-        out.textContent = lockedMessage;
-        return;
-      }
       const detail = await apiGet(`/industry-packs/${encodeURIComponent(id)}`);
       out.textContent = JSON.stringify(detail, null, 2);
     });

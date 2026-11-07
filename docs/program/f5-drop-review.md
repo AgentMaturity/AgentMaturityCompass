@@ -64,7 +64,7 @@ F5: drop 30. Meta-review: 8 sampled, 8 agreed. Agent rec.: defer 1, drop 28, kee
 
 - **Scores.** The question's weight leaves its pack's weighted total, so every later self-assessment of the pack is normalised over the remaining questions and is not comparable with earlier results. All scoring surfaces read the same registry (`listIndustryPacks`): the `amc domain` pack commands, the MCP server, Studio and the dashboard.
 - **Conformance.** The requirement `industry-pack:<packId>:<questionId>` disappears from conformance runs (`docs/CONFORMANCE_RUNS.md`).
-- **Paid packs.** All 41 sector packs sit behind the ADR-005 entitlement; the catalogue's `questionCount` for the pack falls.
+- **Catalogue.** The catalogue's `questionCount` for the pack falls. Every pack is free (ADR 019), so no licence or entitlement is involved.
 - **Counts.** `stationPackQuestions` in `scripts/freeze-baseline.json` and the station totals in `docs/DOMAIN_PACKS.md` fall; regenerate them and name `freeze-exception: P0-26` in the changeset.
 - **Station tags** (`src/compliance/stationTags.ts`): with all 30 dropped, gri loses technology. Per-item results are in the detail.
 - **Candidate.** `37c1466b` already removed all 30 (commit per item below). Its content lands with P1-42, which must restore every `keep` and `defer`.

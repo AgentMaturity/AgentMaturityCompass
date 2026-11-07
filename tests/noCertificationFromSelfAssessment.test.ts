@@ -27,10 +27,6 @@ vi.mock("@modelcontextprotocol/sdk/server/mcp.js", () => ({
   ResourceTemplate: class {}
 }));
 vi.mock("@modelcontextprotocol/sdk/server/stdio.js", () => ({ StdioServerTransport: class {} }));
-vi.mock("../src/domains/industryPackEntitlement.js", () => ({
-  getIndustryPackEntitlement: () => ({ active: true }),
-  formatIndustryPackPaywallMessage: () => "locked"
-}));
 
 /** "certif" may appear only inside the negation "not a certification". */
 function certificationWords(text: string): string[] {

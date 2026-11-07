@@ -11,7 +11,7 @@ vi.mock("node:crypto", async (importOriginal) => {
 });
 
 const { handleRequest } = await import("../api/index.js");
-const { INDUSTRY_PACKS_MONTHLY_PRICE_USD, verifyIndustryPackLicenseKey } = await import("../src/domains/industryPackEntitlement.js");
+const { INDUSTRY_PACKS_FREE_MESSAGE, INDUSTRY_PACKS_FREE_PLAN_ID, verifyIndustryPackLicenseKey } = await import("../src/domains/industryPackEntitlement.js");
 
 const server = http.createServer(handleRequest);
 let origin: string;
@@ -35,50 +35,41 @@ const ISSUING_ENV = ["AMC_INDUSTRY_PACKS_CHECKOUT_URL", "AMC_DOMAIN_PACKS_CHECKO
 beforeEach(() => { for (const key of ISSUING_ENV) vi.stubEnv(key, undefined); });
 afterEach(() => { vi.unstubAllEnvs(); vi.restoreAllMocks(); });
 
-const NOT_AVAILABLE = "Checkout is not available in this deployment; contact sales for access.";
-
 function configureIssuing(): { publicKeyPem: string; adminToken: string } {
   const { privateKey, publicKey } = generateKeyPairSync("ed25519");
   const adminToken = randomBytes(24).toString("hex");
-  vi.stubEnv("AMC_INDUSTRY_PACKS_CHECKOUT_URL", "https://checkout.example.invalid/amc");
   vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY", privateKey.export({ type: "pkcs8", format: "pem" }).toString());
   vi.stubEnv("AMC_INDUSTRY_PACKS_ADMIN_TOKEN", adminToken);
   return { publicKeyPem: publicKey.export({ type: "spki", format: "pem" }).toString(), adminToken };
 }
 
-describe("hosted Industry Packs checkout tells the truth", () => {
-  it("unconfigured: access and checkout say checkout is not available, with the one price and no purchase URL", async () => {
-    const access = await (await fetch(`${origin}/api/industry-packs/access`)).json();
-    expect(access).toMatchObject({ checkoutAvailable: false, checkoutUrl: null, priceUsdMonthly: INDUSTRY_PACKS_MONTHLY_PRICE_USD });
-    expect(access).not.toHaveProperty("entitlement");
-    expect(access.message).toContain(NOT_AVAILABLE);
-    expect(access.message).not.toMatch(/https?:\/\//);
+describe("hosted Industry Packs are free", () => {
+  const FREE = {
+    planId: INDUSTRY_PACKS_FREE_PLAN_ID, priceUsdMonthly: "0.00", checkoutAvailable: false, checkoutUrl: null, message: INDUSTRY_PACKS_FREE_MESSAGE
+  };
 
-    const checkout = await fetch(`${origin}/api/industry-packs/checkout`, { method: "POST", body: "{}" });
-    expect(checkout.status).toBe(503);
-    const body = await checkout.json();
-    expect(body).toMatchObject({ error: "checkout_not_available", checkoutAvailable: false });
-    expect(body.message).toContain(NOT_AVAILABLE);
-    expect(body.checkoutUrl).toBeNull();
+  it("access and checkout return the free record, with no price or purchase URL, whatever checkout or issuing is configured", async () => {
+    for (const configure of [() => undefined, () => {
+      vi.stubEnv("AMC_INDUSTRY_PACKS_CHECKOUT_URL", "https://checkout.example.invalid/amc");
+      configureIssuing();
+    }]) {
+      configure();
+      const access = await fetch(`${origin}/api/industry-packs/access`);
+      expect(access.status).toBe(200);
+      expect(await access.json()).toEqual(FREE);
+      const checkout = await fetch(`${origin}/api/industry-packs/checkout`, { method: "POST", body: JSON.stringify({ clientReferenceId: "agent-1" }) });
+      expect(checkout.status).toBe(200);
+      expect(await checkout.json()).toEqual(FREE);
+    }
   });
 
-  it("a checkout URL alone is no purchase step: no licence could be issued for the payment", async () => {
-    vi.stubEnv("AMC_INDUSTRY_PACKS_CHECKOUT_URL", "https://checkout.example.invalid/amc");
-    const access = await (await fetch(`${origin}/api/industry-packs/access`)).json();
-    expect(access).toMatchObject({ checkoutAvailable: false, checkoutUrl: null });
-    expect((await fetch(`${origin}/api/industry-packs/checkout`, { method: "POST", body: "{}" })).status).toBe(503);
-  });
-
-  it("configured: the checkout handoff carries the plan and the one price", async () => {
-    configureIssuing();
-    const access = await (await fetch(`${origin}/api/industry-packs/access`)).json();
-    expect(access.checkoutAvailable).toBe(true);
-    expect(access.message).toContain("Buy: https://checkout.example.invalid/amc");
-    const checkout = await fetch(`${origin}/api/industry-packs/checkout`, { method: "POST", body: JSON.stringify({ clientReferenceId: "agent-1" }) });
-    expect(checkout.status).toBe(200);
-    const url = new URL((await checkout.json()).checkoutUrl);
-    expect(url.searchParams.get("price")).toBe(INDUSTRY_PACKS_MONTHLY_PRICE_USD);
-    expect(url.searchParams.get("client_reference_id")).toBe("agent-1");
+  it("health and the endpoint list name the free plan", async () => {
+    expect(await (await fetch(`${origin}/api/health`)).json())
+      .toMatchObject({ industryPacksPlan: INDUSTRY_PACKS_FREE_PLAN_ID, industryPacksPriceUsdMonthly: "0.00" });
+    const { endpoints } = await (await fetch(`${origin}/api`)).json() as { endpoints: Record<string, string> };
+    expect(endpoints["GET /api/industry-packs/access"]).toMatch(/free/i);
+    expect(endpoints["POST /api/industry-packs/checkout"]).toMatch(/free/i);
+    expect(Object.values(endpoints).join("\n")).not.toMatch(/paid customer|\$\d/i);
   });
 });
 

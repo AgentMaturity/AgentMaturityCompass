@@ -29,14 +29,15 @@
     },
     "industryPacksCheckout": {
       "status": "not_live",
-      "evidence": "On 2026-09-29, GET https://agentmaturity.co/pricing and https://agentmaturity.co/api/industry-packs/checkout both returned HTTP 404. No working public checkout was verified; no payment or checkout submission was attempted."
+      "evidence": "On 2026-09-29, GET https://agentmaturity.co/pricing and https://agentmaturity.co/api/industry-packs/checkout both returned HTTP 404. No working public checkout was verified; no payment or checkout submission was attempted.",
+      "note": "Since 2026-11-07 Industry Packs are free (docs/adr/019-industry-packs-free.md), so no checkout is planned. In the current source, the hosted API's POST /api/industry-packs/checkout (api/index.ts) answers 200 with checkoutUrl null; no deployment of that API has been verified. The published 1.1.1 release still locks the packs behind the earlier licence gate."
     },
     "containerRegistry": {
       "status": "unverified",
       "evidence": "No anonymous public image pull was performed during the 2026-09-29 publication audit. Container availability and the published image revision remain unverified."
     }
   },
-  "claimBoundary": "A green CI workflow or GitHub Release is not evidence that npm, Homebrew, paid checkout, container images, or the latest source revision are publicly distributed.",
+  "claimBoundary": "A green CI workflow or GitHub Release is not evidence that npm, Homebrew, the hosted Industry Packs checkout endpoint, container images, or the latest source revision are publicly distributed.",
   "sourceVersion": "1.2.0",
   "retrievalWindow": {
     "startedAt": "2026-09-29T08:13:40Z",
