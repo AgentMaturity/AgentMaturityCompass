@@ -42,6 +42,7 @@ export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly approvalMode?: string;
   readonly tools?: string;
   readonly unsafeUnconfinedShell?: boolean;
+  readonly trustWorkspace?: boolean;
   readonly webSearchSearxng?: string;
   readonly maxTokens?: string;
   readonly thinking?: string;
@@ -288,6 +289,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       ...(options.credentialsHome === undefined ? [] : ["--credentials-home", options.credentialsHome]), "--credentials-file", credentialFile,
       ...(guide.credential === null ? [] : ["--credential", guide.credential.ref]),
       "--tools", tools, "--max-steps", maxSteps, "--max-tokens", maxTokens, ...(options.unsafeUnconfinedShell === true ? ["--unsafe-unconfined-shell"] : []),
+      ...(options.trustWorkspace === true ? ["--trust-workspace"] : []),
       ...(options.webSearchSearxng === undefined ? [] : ["--web-search-searxng", options.webSearchSearxng]),
       ...(options.thinking === undefined ? [] : ["--thinking", options.thinking]),
       ...(options.reasoningEffort === undefined ? [] : ["--reasoning-effort", options.reasoningEffort]),

@@ -100,6 +100,8 @@ export interface RunOptions {
   approveRisk?: string;
   /** SH-SANDBOX-04: plan | default | accept-edits | untrusted. */
   approvalMode?: string;
+  /** SH-SANDBOX-07: operator consent for this workspace's signed configuration. */
+  trustWorkspace?: boolean;
   approvalException?: string;
   interactiveApprovals?: boolean;
   interactiveAskUser?: boolean;

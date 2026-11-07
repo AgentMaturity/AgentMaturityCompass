@@ -1,4 +1,5 @@
 import { showSkillCatalogSelection } from "./cli/skillCatalogOptions.js";
+import { requireWorkspaceTrust, suppliedTrustConsent } from "./security/workspaceTrust.js";
 import { randomUUID } from "node:crypto";
 import { hostname } from "node:os";
 /**
@@ -156,6 +157,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--approval-mode <mode>", "plan, default, accept-edits or untrusted: which calls a human is asked about, on top of every signed policy; plan runs nothing (SIMULATE); not with --approve-tools")
     .option("--tools <mode>", "none, echo, or explicitly enabled workspace tools; existing policy still applies")
     .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")
+    .option("--trust-workspace", "trust this workspace's signed configuration (key set and tools policy) on this machine, recording the consent in the AMC home; otherwise a workspace this machine never trusted is refused (AMC_TRUST_WORKSPACE=1 for headless hosts)")
     .option("--web-search-searxng <origin>", WEB_SEARCH_SEARXNG_HELP)
     .option("--max-tokens <n>", "output-token limit per request (default 512)")
     .option("--thinking <mode>", "DeepSeek only: enabled or disabled; tools-free chat requires explicit disabled")
@@ -204,6 +206,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--tools <mode>", 'tool seam: "workspace" (the governed built-ins), "echo", or "none"')
     .option("--tool-mode <mode>", '"native" (one call per step) or "code" (dispatch from a program)')
     .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")
+    .option("--trust-workspace", "trust this workspace's signed configuration (key set and tools policy) on this machine, recording the consent in the AMC home; otherwise a workspace this machine never trusted is refused (AMC_TRUST_WORKSPACE=1 for headless hosts)")
     .option("--session <id>", "resume this existing, unsealed session as its next writer (verified before dispatch)")
     .option("--takeover-expired-writer <reason>", "with --session: claim a remote or unresponsive writer whose lease lapsed one lease ago; the reason is recorded")
     .option("--fork-from <id>", "copy this verified parent conversation into a new signed session")
@@ -293,6 +296,10 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       if (opts.audioInput !== undefined && (promptParts.length > 0 || opts.image !== undefined)) {
         io.error("--audio-input is exclusive with positional text and --image; put every original part in its manifest order."); io.fail(); return;
       }
+      // SH-SANDBOX-07: before anything the workspace signed is loaded (extensions, skills, presets, the tools policy).
+      const trust = requireWorkspaceTrust(process.cwd(), suppliedTrustConsent(opts.trustWorkspace ? "cli-flag" : undefined));
+      if (!trust.ok) { io.error(chalk.red(trust.reason)); io.fail(); return; }
+      if (trust.recorded !== null) io.error(chalk.dim(`workspace trusted on this machine (${trust.recorded.by}); revoke with: amc trust workspace --revoke`));
       let extensionTurn: NativeExtensionTurn;
       let extensions: NativeExtensionManager;
       try {

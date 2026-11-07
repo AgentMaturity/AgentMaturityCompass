@@ -68,6 +68,8 @@ export type AMCNativeMcpStatus = NativeMcpStatus;
   readonly tools?: "none" | "workspace";
   /** Passes --unsafe-unconfined-shell: macOS without Seatbelt only, an UNCONFINED shell with full user rights; refused on Windows. */
   readonly allowUnconfinedShell?: boolean;
+  /** SH-SANDBOX-07: trust this workspace's signed configuration on this machine (consent recorded in the AMC home). */
+  readonly trustWorkspace?: boolean;
   /** Pin the signed workspace tool policy for every native tool dispatch. */
   readonly expectedToolsDigest?: string;
   /** Operator-owned file and explicit check IDs; ACP prompts cannot supply commands. */
@@ -295,6 +297,7 @@ export class AMCNativeClient {
     }
     args.push(...mcpConfigArgv(options.mcpConfig, options.mcpConfigSha256));
     if (options.allowUnconfinedShell === true) args.push("--unsafe-unconfined-shell");
+    if (options.trustWorkspace === true) args.push("--trust-workspace");
     if (options.validate !== undefined) {
       if (!Array.isArray(options.validate) || options.validate.length < 1 || options.validate.length > 8
         || new Set(options.validate).size !== options.validate.length

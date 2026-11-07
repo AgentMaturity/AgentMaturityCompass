@@ -107,6 +107,8 @@ export interface AcpStdioInit {
   readonly tools?: "none" | "workspace";
   /** `--unsafe-unconfined-shell`: macOS only, see `AgentToolsetOptions.unconfinedShell`. */
   readonly unconfinedShell?: boolean;
+  /** `--trust-workspace` (SH-SANDBOX-07): consent for this workspace's signed configuration, recorded in the AMC home. */
+  readonly trustWorkspace?: boolean;
   /** `--ask-user`: ask_user goes to the client as `_amc/ask_user`, answers signed host-side (WP40). Workspace tools only. */
   readonly askUser?: boolean;
   /** `--web-search-searxng`: the opt-in web_search provider origin (WP40). Workspace tools only. */
@@ -190,6 +192,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   // Preserve existing one-server session identities while binding every server in a composed run.
   const mcpIdentity = mcp.length === 0 ? null : mcp.length === 1 ? mcp[0]!.config.sha256 : mcp.map(entry => entry.config.sha256);
   const shellOptIn = init.unconfinedShell === true ? { unconfinedShell: "cli-flag" as const } : {};
+  const trustOptIn = init.trustWorkspace === true ? { trustWorkspace: true as const } : {};
   if ((init.askUser === true || init.webSearchSearxng !== undefined) && tools !== "workspace") throw new Error("--ask-user and --web-search-searxng configure workspace tools; add --tools workspace.");
   const webSearchProvider = init.webSearchSearxng === undefined ? undefined : searxngSearchProvider(init.webSearchSearxng);
   let shellRefusal: string | null = null;
@@ -257,7 +260,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
       policyDigest: sha256Hex(JSON.stringify({ tools, signedTools: tools === "workspace" ? loadVerifiedToolsConfigSnapshot(params.workspace).digestSha256 : null, approval, mcp: mcpIdentity,
         ...(validation === undefined ? {} : { validation }),
         ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }) })),
-      tools, maxSteps, ...shellOptIn, ...(compaction === undefined ? {} : { compaction }), ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
+      tools, maxSteps, ...shellOptIn, ...trustOptIn, ...(compaction === undefined ? {} : { compaction }), ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
       ...(validation === undefined ? {} : { validation }), ...lease,
       // `agent` exists by the time any session is composed; its connection carries the client request.
       ...(init.askUser === true ? { askUser: acpAskUserAnswerer({ workspace: params.workspace, request: (method, body, signal) => agent.connection.request(method, body, signal) }) } : {}),
