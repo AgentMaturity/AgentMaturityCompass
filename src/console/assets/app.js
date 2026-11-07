@@ -2,6 +2,7 @@ import { renderNeutralImportReview } from "./neutralImportReview.js";
 import { renderNativeTasksPage } from "./nativeTasks.js";
 import { apiGet, apiPost, getAdminToken, getCurrentUser, login, logout, onClaims, setAdminToken, whoami } from "./api.js";
 import { installClaimStrip } from "./components/claimBadge.js";
+import { industryPackDetailHtml } from "./industryPackView.js";
 import { renderBars, renderLine } from "./charts.js";
 import { renderQrLike } from "./qr.js";
 import { renderPluginTable } from "./components/pluginTable.js";
@@ -1331,6 +1332,9 @@ function renderAuthScreen() {
   });
 }
 
+// The vault unlocks per process: Studio's state, not the state a separate `amc status` shell reports.
+const STUDIO_VAULT_NOTE = "Vault state of the running Studio process; each CLI process unlocks the vault on its own.";
+
 async function renderHome() {
   const status = await apiGet("/status");
   const agentsResp = await apiGet("/agents");
@@ -1349,7 +1353,7 @@ async function renderHome() {
     : "operate through the workspace-authenticated trust boundary.";
   const modeMeta = demoMode
     ? '<span class="pill ok">loopback-only demo</span><span class="pill muted">mutable local data</span><span class="pill muted">unsigned outputs</span>'
-    : `<span class="pill ok">workspace authenticated</span><span class="pill muted">vault ${vaultState.toLowerCase()}</span><span class="pill muted">evidence-first runtime</span>`;
+    : `<span class="pill ok">workspace authenticated</span><span class="pill muted" title="${STUDIO_VAULT_NOTE}">Studio vault ${vaultState.toLowerCase()}</span><span class="pill muted">evidence-first runtime</span>`;
   const launchCommand = demoMode ? "$ amc up --demo --no-open" : "$ amc up";
   root.innerHTML = `
     ${firstUseCard(agentId)}
@@ -1381,7 +1385,7 @@ async function renderHome() {
           <div class="studio-terminal-line"><strong>Agent</strong><span>${htmlEscape(agentId)}</span></div>
           <div class="studio-terminal-line"><strong>Gateway</strong><span>${htmlEscape(status.studio?.gatewayPort || "-")}</span></div>
           <div class="studio-terminal-line"><strong>ToolHub/API</strong><span>${htmlEscape(status.studio?.apiPort || "-")}</span></div>
-          <div class="studio-terminal-line"><strong>Vault</strong><span>${htmlEscape(vaultState)}</span></div>
+          <div class="studio-terminal-line" title="${STUDIO_VAULT_NOTE}"><strong>Vault (Studio)</strong><span>${htmlEscape(vaultState)}</span></div>
           <div class="studio-terminal-line"><strong>Industry Packs</strong><span>free · all packs included</span></div>
         </div>
       </div>
@@ -2313,7 +2317,8 @@ async function renderIndustryPacks() {
       </div>
       <p class="status-ok">${htmlEscape(entitlement.message || "Industry Packs are free. Access never changes a result.")}</p>
     `)}
-    ${card("Pack Catalog", `<div id="industryPackRows" class="scroll"></div><pre id="industryPackOut" class="muted"></pre>`)}
+    <section id="industryPackDetail" class="card" tabindex="-1" hidden></section>
+    ${card("Pack Catalog", `<div id="industryPackRows" class="scroll"></div>`)}
   `;
   const rows = document.getElementById("industryPackRows");
   rows.innerHTML = packs
@@ -2326,17 +2331,22 @@ async function renderIndustryPacks() {
         <p class="muted">${htmlEscape(pack.description || "")}</p>
         <div class="row spaced">
           <span class="muted">${htmlEscape(pack.domain || "")} · ${Number(pack.questionCount || 0)} questions${pack.contentStatus ? ` · ${htmlEscape(pack.contentStatus)}, self-reported` : ""}</span>
-          <button class="secondary" data-industry-pack="${htmlEscape(pack.packId)}">Open</button>
+          <button class="secondary" data-industry-pack="${htmlEscape(pack.packId)}" aria-label="Open ${htmlEscape(pack.name || pack.packId)}">Open</button>
         </div>
       </div>
     `)
     .join("");
-  const out = document.getElementById("industryPackOut");
+  const detail = document.getElementById("industryPackDetail");
   rows.querySelectorAll("button[data-industry-pack]").forEach((button) => {
     button.addEventListener("click", async () => {
       const id = button.getAttribute("data-industry-pack");
-      const detail = await apiGet(`/industry-packs/${encodeURIComponent(id)}`);
-      out.textContent = JSON.stringify(detail, null, 2);
+      try {
+        detail.innerHTML = industryPackDetailHtml((await apiGet(`/industry-packs/${encodeURIComponent(id)}`)).pack);
+      } catch (error) {
+        detail.innerHTML = `<p class="status-bad">${htmlEscape(errText(error))}</p>`;
+      }
+      detail.hidden = false;
+      detail.focus();
     });
   });
 }
