@@ -26,6 +26,7 @@ Complete these checks before going live. Every item is a real `amc` command.
 - [ ] Action policy created — `amc policy action init && amc policy action verify`
 - [ ] Approval policy created — `amc policy approval init && amc policy approval verify`
 - [ ] RBAC configured — `amc user init && amc user add --username <admin> --role OWNER`
+- [ ] Runtime Firewall policy signed — `amc firewall enable` (add `--mode block` to enforce). Without a policy every native tool call is denied and `amc doctor --strict` fails.
 
 ## Trust & Anti-Cheat
 
@@ -61,8 +62,8 @@ Complete these checks before going live. Every item is a real `amc` command.
 
 ## Verification
 
-- [ ] Full verification passes — `amc verify all --json`
-- [ ] E2E smoke test — `amc e2e smoke --mode local --json`
+- [ ] Full verification passes — `amc verify all --json --expect-monitor <monitor sha256>`, where `<monitor sha256>` is the output of `shasum -a 256 .amc/keys/monitor_ed25519.pub`, recorded outside the workspace when you created it. Without a pin (this flag, `AMC_EXPECTED_MONITOR_FINGERPRINT` or a trust list), the ledger check fails as unanchored.
+- [ ] E2E smoke test (source checkout only) — at the root of a built checkout: `node dist/cli.js e2e smoke --mode local --json`. It starts the checkout's `dist/cli.js` and packs a release bundle from its lockfile, so it fails from an installed package. With an installed package, the operator checks are `amc doctor --strict` and the pinned `amc verify all` above.
 
 ## Optional: Enterprise
 

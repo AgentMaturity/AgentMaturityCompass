@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 
 const root = process.cwd();
 const distCli = path.join(root, 'dist', 'cli.js');
@@ -71,14 +71,19 @@ function buildBlob(nodeExe) {
 }
 
 function inject(baseNodeExe) {
+  const darwin = process.platform === 'darwin';
   fs.copyFileSync(baseNodeExe, seaBundle);
   fs.chmodSync(seaBundle, 0o755);
+  // macOS: Node reads the blob from the NODE_SEA segment (postject's default, __POSTJECT, crashes the binary at
+  // startup), and the signature comes off before injection and back on after, as Node's SEA instructions say.
+  if (darwin) execFileSync('codesign', ['--remove-signature', seaBundle], { stdio: 'inherit' });
   execFileSync(
     'npx',
-    ['--yes', 'postject', seaBundle, 'NODE_SEA_BLOB', seaPrepBlob, '--sentinel-fuse', seaFuse],
+    ['--yes', 'postject', seaBundle, 'NODE_SEA_BLOB', seaPrepBlob, '--sentinel-fuse', seaFuse,
+      ...(darwin ? ['--macho-segment-name', 'NODE_SEA'] : [])],
     { stdio: 'inherit' }
   );
-  if (process.platform === 'darwin') {
+  if (darwin) {
     execFileSync('codesign', ['--sign', '-', '--force', seaBundle], { stdio: 'inherit' });
   }
 }
@@ -118,4 +123,15 @@ const manifest = {
 };
 fs.writeFileSync(path.join(outDir, 'manifest.json'), JSON.stringify(manifest, null, 2));
 fs.rmSync(vendorDir, { recursive: true, force: true });
-console.log(`SEA binary ready: ${seaBundle}`);
+
+// A binary that does not start is not a build result: fail here instead of handing one on (docs/SINGLE_BINARY.md).
+const probe = spawnSync(seaBundle, ['--version'], { encoding: 'utf8', timeout: 60_000 });
+if (probe.status !== 0) {
+  const how = probe.error ? probe.error.message : probe.signal ? `killed by ${probe.signal}` : `exit ${probe.status}`;
+  const output = `${probe.stderr ?? ''}${probe.stdout ?? ''}`.trim();
+  console.error(`\nSEA build failed: ${path.relative(root, seaBundle)} does not start (\`--version\`: ${how}).`);
+  if (output) console.error(output.slice(-2000));
+  console.error('The single binary is experimental and does not start yet; see docs/SINGLE_BINARY.md.');
+  process.exit(1);
+}
+console.log(`SEA binary ready: ${seaBundle} (${probe.stdout.trim()})`);

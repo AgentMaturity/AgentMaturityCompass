@@ -8,7 +8,7 @@ This runbook is aligned to the current CLI surfaces in `src/cli.ts` and deployme
 - Build/test gate is green:
 
 ```bash
-npm ci
+pnpm install --frozen-lockfile
 npm test
 npm run build
 ```
@@ -125,7 +125,8 @@ Minimum operational telemetry:
 
 ### Day 0
 - `setup` + `up`
-- `doctor --json`, `verify all --json`, `e2e smoke --mode local --json`
+- `doctor --json` and `verify all --json --expect-monitor <monitor sha256>` (the fingerprint of `.amc/keys/monitor_ed25519.pub`, recorded outside the workspace)
+- From a built source checkout only: `node dist/cli.js e2e smoke --mode local --json` at the checkout root. It needs the checkout's `dist/` and lockfile, so it fails from an installed package, where the two checks above are the operator checks.
 - Enable backup schedule + metrics scraping
 
 ### Day 7

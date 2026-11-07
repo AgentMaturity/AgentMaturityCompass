@@ -63,7 +63,8 @@ jobs:
       contents: read
     # Measured 2026-10-11 (local macOS arm64, load about 20; qualification/2026-10-11-P0-34): the release gate took
     # 1,242 s with its full suite stopped at the gate's own 900 s cap. The gate's per-step caps sum to 6,195 s;
-    # install, build, prepack guardrails, packing, SBOM and SEA add about 15 minutes. 150 minutes covers both.
+    # install, build, prepack guardrails, packing and SBOM took about 15 minutes, measured with a SEA build the gate
+    # no longer runs. 150 minutes covers both.
     timeout-minutes: 200
     outputs:
       commit: ${{ steps.commit.outputs.sha }}
@@ -122,7 +123,8 @@ jobs:
       - name: Prepack release guardrails
         run: npm run release:prepack-check
 
-      - name: Pack the npm tarball once, with its SBOM, licence inventory and SEA binary
+      # No SEA single binary is built or shipped: it does not start yet (docs/SINGLE_BINARY.md).
+      - name: Pack the npm tarball once, with its SBOM and licence inventory
         id: pack
         env:
           AMC_RELEASE_COMMIT: ${{ steps.commit.outputs.sha }}
@@ -132,9 +134,6 @@ jobs:
           TARBALL=$(npm pack --ignore-scripts --json --pack-destination tmp/npm-release | node -e 'process.stdout.write(JSON.parse(require("node:fs").readFileSync(0, "utf8"))[0].filename)')
           node dist/cli.js release sbom --out tmp/npm-release/sbom.cdx.json
           node dist/cli.js release licenses --out tmp/npm-release/licenses.json
-          npm run build:sea
-          cp dist/sea/amc "tmp/npm-release/amc-linux-x64-sea-${AMC_RELEASE_TAG#v}"
-          cp dist/sea/manifest.json "tmp/npm-release/amc-linux-x64-sea-${AMC_RELEASE_TAG#v}.manifest.json"
           node scripts/release-record.mjs write tmp/npm-release --tag "$AMC_RELEASE_TAG" --commit "$AMC_RELEASE_COMMIT" --tarball "$TARBALL"
           cat tmp/npm-release/record.json
           echo "tarball=$TARBALL" >> "$GITHUB_OUTPUT"
@@ -679,7 +678,7 @@ jobs:
           shopt -s failglob
           gh release create "$AMC_RELEASE_TAG" --verify-tag --title "AMC $AMC_RELEASE_TAG" --notes-file tmp/release-notes.md \
             dist/release-assets/* tmp/image-index/image-digests.json tmp/signed/*.amcrelease tmp/signed/sbom.cdx.json \
-            tmp/signed/licenses.json tmp/signed/provenance.json tmp/signed/release-verify.txt tmp/npm-release/amc-linux-x64-sea-*
+            tmp/signed/licenses.json tmp/signed/provenance.json tmp/signed/release-verify.txt
 
   # Homebrew stays off until the tap exists (P0-39): set the repository variable AMC_HOMEBREW_TAP=enabled and the
   # release environment secret HOMEBREW_TAP_TOKEN. Then a missing token fails this job. The token reaches git only

@@ -215,6 +215,8 @@ function releaseContract(text: string): string[] {
     failures.push("release assets may be silently missing");
   }
   for (const asset of ["tmp/signed/sbom.cdx.json", "tmp/signed/licenses.json"]) if (!ghRelease.includes(asset)) failures.push(`${asset} is not attached`);
+  // The SEA single binary does not start yet (docs/SINGLE_BINARY.md): nothing builds or attaches one until it does.
+  if (/build:sea|build-sea|dist\/sea\/|-sea-/.test(text)) failures.push("release builds or attaches a SEA binary that does not start");
   failures.push(...exposureContract(workflow));
   failures.push(...unpinnedActions(text));
   return failures;
@@ -368,6 +370,8 @@ describe("release workflow contract (P0-34)", () => {
     expect(mutate(publishLine, '\n$2if [ -z "$NODE_AUTH_TOKEN" ]; then\n$2  echo "Skipping npm publish"\n$2  exit 0\n$2fi$1'))
       .toContain('exit 0 under: if [ -z "$NODE_AUTH_TOKEN" ]; then');
     expect(mutate(publishLine, "\n$2npm install -g npm@latest$1")).toContain("release installs or builds: npm install");
+    expect(mutate(/(\n(\s+)node scripts\/release-record\.mjs write)/, "\n$2npm run build:sea$1"))
+      .toContain("release builds or attaches a SEA binary that does not start");
     expect(mutate(publishLine, "\n$2npx --yes some-tool$1")).toContain("release installs or builds: npx");
     expect(mutate(publishLine, "\n$2pnpm install --frozen-lockfile && npm run build$1")).toContain("release installs or builds: pnpm install");
     expect(mutate('npm_cli publish "$AMC_NPM_TARBALL"', "npm_cli publish")).toContain("publish does not use the gated tarball with the pinned npm CLI");
