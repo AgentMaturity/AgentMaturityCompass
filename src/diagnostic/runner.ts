@@ -57,6 +57,7 @@ import { pathExists, readUtf8 } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { parseWindowToMs, dayKey } from "../utils/time.js";
+import { clamp } from "../utils/ratio.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { loadAssuranceSummary, type AssuranceSummary } from "./assuranceSummary.js";
 import { sealedRunReportVerifies } from "./reportSeal.js";
@@ -109,10 +110,6 @@ function parseEventForRunner(workspace: string, event: EvidenceEvent, reader: ()
 const claimsSchema = z.object({
   claimedLevels: z.record(z.string(), z.number().int().min(0).max(5))
 });
-
-function clamp(n: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, n));
-}
 
 async function getClaimedLevels(params: {
   mode: "auto" | "owner" | "harness";
