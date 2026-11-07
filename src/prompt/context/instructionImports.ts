@@ -14,7 +14,12 @@
  * files use (`readWorkspaceFile`: no `..` escape, no symlink anywhere in the
  * path). `~`, absolute host paths and `$AMC_HOME` are refused outright, and so
  * are AMC's own state and the usual credential carriers: `.amc/`, `.git/`,
- * `node_modules/` and any `.env*` file. User-scope files never import. There is
+ * `node_modules/`, `.ssh/`, `.aws/`, any `.env*` file, rc files that hold
+ * tokens (`.npmrc`, `.netrc`, `.pypirc`, `.git-credentials`) and private keys
+ * (`id_*`, `*.pem`, `*.key`, `*.p12`, `*.pfx`). Names are compared
+ * case-insensitively: on APFS and NTFS `.AMC/` IS `.amc/`, and on a
+ * case-sensitive filesystem refusing the upper-case spelling loses nothing.
+ * User-scope files never import. There is
  * no approval dialog for a foreign path, which is stricter than Claude Code's
  * prompt-for-approval, and it is said in the docs.
  *
@@ -23,14 +28,22 @@
  * must not look like a rule that never existed.
  */
 import { posix } from "node:path";
-import { readWorkspaceFile } from "../../tools/builtin/workspaceWalk.js";
 import { sha256Hex } from "../../utils/hash.js";
-import type { InstructionOmission } from "./instructionFiles.js";
+import { readBoundedInstructionText, type InstructionOmission } from "./instructionFiles.js";
 
 export const MAX_IMPORT_DEPTH = 4;
 const IMPORT_LINE = /^@(\S+)$/;
-/** Directories and files an import may never name, however the path is written. */
-const REFUSED_SEGMENTS: readonly string[] = Object.freeze([".amc", ".git", "node_modules"]);
+/** Directories an import may never name, however the path is written (lower-case; compared case-insensitively). */
+const REFUSED_SEGMENTS: readonly string[] = Object.freeze([".amc", ".git", "node_modules", ".ssh", ".aws", ".gnupg", ".kube", ".docker"]);
+/** Credential carriers by exact lower-case file name. */
+const REFUSED_FILE_NAMES: readonly string[] = Object.freeze([".envrc", ".npmrc", ".netrc", ".pypirc", ".git-credentials", "credentials"]);
+/** Credential carriers by lower-case name shape: `.env*`, SSH identities, and key-file extensions. */
+const REFUSED_FILE_PATTERNS: readonly RegExp[] = Object.freeze([/^\.env(\.|$)/, /^id_[a-z0-9]+(\.pub)?$/, /\.(pem|key|p12|pfx|jks|keystore)$/]);
+
+/** True when a lower-cased final path segment is a file an import may never read. */
+function isRefusedFileName(name: string): boolean {
+  return REFUSED_FILE_NAMES.includes(name) || REFUSED_FILE_PATTERNS.some((pattern) => pattern.test(name));
+}
 
 export interface LoadedImport {
   /** Workspace-relative, as the model sees it. */
@@ -66,9 +79,10 @@ export function resolveImportPath(target: string, importedBy: string): { ok: tru
   if (resolved === "." || resolved === ".." || resolved.startsWith("../") || resolved.startsWith("/")) {
     return { ok: false, detail: "the import leaves the workspace" };
   }
-  const segments = resolved.split("/");
-  if (segments.some((segment) => REFUSED_SEGMENTS.includes(segment))) return { ok: false, detail: "the import names AMC state, version control or dependencies" };
-  if (/^\.env(\.|$)/.test(segments.at(-1)!)) return { ok: false, detail: "the import names an environment file" };
+  // Case-insensitive on purpose: the filesystem may be, and `.AMC/vault.json` must not read what `.amc/vault.json` cannot.
+  const segments = resolved.split("/").map((segment) => segment.toLowerCase());
+  if (segments.some((segment) => REFUSED_SEGMENTS.includes(segment))) return { ok: false, detail: "the import names AMC state, version control, dependencies or a credential directory" };
+  if (isRefusedFileName(segments.at(-1)!)) return { ok: false, detail: "the import names an environment or credential file" };
   return { ok: true, path: resolved };
 }
 
@@ -84,7 +98,7 @@ export function resolveInstructionImports(params: {
   readonly content: string;
   readonly maxFileBytes: number;
   readonly alreadyLoaded: ReadonlySet<string>;
-  readonly readTextFile?: (workspaceRelativePath: string) => string;
+  readonly readTextFile?: (absolutePath: string) => string;
 }): ImportResolution {
   const imports: LoadedImport[] = [];
   const omitted: InstructionOmission[] = [];
@@ -104,7 +118,7 @@ export function resolveInstructionImports(params: {
           omitted.push({ displayPath: resolved.path, reason: "import-depth", detail: `imported by ${file.importedBy} beyond the ${MAX_IMPORT_DEPTH}-hop import limit` });
           continue;
         }
-        const read = readImport(params, resolved.path);
+        const read = readBoundedInstructionText(params.workspace, resolved.path, params.maxFileBytes, params.readTextFile);
         if (read === null) { omitted.push({ displayPath: resolved.path, reason: "unreadable", detail: `imported by ${file.importedBy}; not a readable regular workspace file` }); continue; }
         if (read.bytes > params.maxFileBytes) {
           omitted.push({ displayPath: resolved.path, reason: "oversize", detail: `imported by ${file.importedBy}; ${read.bytes} bytes exceeds the ${params.maxFileBytes}-byte per-file limit` });
@@ -117,22 +131,4 @@ export function resolveInstructionImports(params: {
     frontier = next;
   }
   return { imports, omitted };
-}
-
-function readImport(params: { readonly workspace: string; readonly maxFileBytes: number; readonly readTextFile?: (path: string) => string }, path: string): { content: string; bytes: number } | null {
-  try {
-    if (params.readTextFile !== undefined) {
-      const content = params.readTextFile(path);
-      return { content, bytes: Buffer.byteLength(content, "utf8") };
-    }
-    const result = readWorkspaceFile(params.workspace, path, params.maxFileBytes + 1, params.maxFileBytes);
-    if (result === null) return null;
-    if (result.size > params.maxFileBytes) return { content: "", bytes: result.size };
-    if (!result.complete) return null;
-    const content = result.bytes.toString("utf8");
-    if (!Buffer.from(content, "utf8").equals(result.bytes)) return null;
-    return { content, bytes: result.bytes.length };
-  } catch {
-    return null;
-  }
 }

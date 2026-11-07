@@ -86,7 +86,7 @@ A line that is exactly `@<path>` inside a project instruction file imports that 
 Confinement, stated:
 
 - An import reaches only a regular file inside the workspace, read through the same bounded reader the instruction files use: no `..` escape, no symlink anywhere in the path.
-- `~`, absolute host paths and `$AMC_HOME` are refused. So are `.amc/`, `.git/`, `node_modules/` and any `.env*` file, however the path is written. There is no approval prompt for a foreign path; the import is omitted and the omission is stated in the model's context. This is stricter than Claude Code's approval dialog.
+- `~`, absolute host paths and `$AMC_HOME` are refused. So are `.amc/`, `.git/`, `node_modules/`, `.ssh/`, `.aws/`, `.gnupg/`, `.kube/`, `.docker/`, any `.env*` file, `.envrc`, `.npmrc`, `.netrc`, `.pypirc`, `.git-credentials`, a file named `credentials`, SSH identities (`id_*`) and key files (`*.pem`, `*.key`, `*.p12`, `*.pfx`, `*.jks`, `*.keystore`), however the path is written and whatever its letter case (a case-insensitive filesystem resolves `.AMC/` to `.amc/`). There is no approval prompt for a foreign path; the import is omitted and the omission is stated in the model's context. This is stricter than Claude Code's approval dialog.
 - User-scope files never import; an `@` line in one is text.
 - `amc agent-loop system-prompt instructions` now lists exactly what a native run loads (workspace-only discovery), not the legacy user-plus-root scan.
 

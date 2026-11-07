@@ -43,6 +43,13 @@ describe("resolveImportPath", () => {
       expect(resolveImportPath(target, "AMC.md").ok, target).toBe(false);
     }
   });
+  it("refuses AMC state and credential carriers case-insensitively, as a case-insensitive filesystem would resolve them (S17, S18)", () => {
+    // MUTATION: drop the toLowerCase() and `.AMC/vault.json` resolves; on APFS that reads .amc/vault.json.
+    const refused = [".AMC/vault.json", "/.Git/config", "Node_Modules/x/README.md", ".ENV", "conf/.Env.Local", ".envrc", ".npmrc", ".netrc", ".pypirc",
+      ".git-credentials", ".ssh/id_ed25519", "keys/id_rsa", "keys/ID_RSA.pub", ".aws/credentials", "certs/server.pem", "certs/Server.KEY", "store.p12", "store.pfx", "ops/.NetRC"];
+    for (const target of refused) expect(resolveImportPath(target, "AMC.md").ok, target).toBe(false);
+    for (const target of ["docs/environment.md", "envs/README.md", "keys.md", "identity/notes.md", "pemberton.md"]) expect(resolveImportPath(target, "AMC.md").ok, target).toBe(true);
+  });
   it("reads only exact @ lines", () => {
     expect(importTargets("@a.md\nsee @b.md inline\n  @c.md  \n@ spaced\n@d.md\n")).toEqual(["a.md", "d.md"]);
   });
