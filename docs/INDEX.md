@@ -64,6 +64,12 @@ Use this page to reach the shortest evidence-backed path for your task. AMC's pu
 - [CI Templates](CI_TEMPLATES.md)
 - [Examples Index](EXAMPLES_INDEX.md)
 
+## Native Harness Controls
+
+- [Sandbox](SANDBOX.md): the confined native shell (Bubblewrap on Linux, Seatbelt on macOS), what each boundary enforces and what it does not
+- [Approvals](APPROVALS.md): the signed approval engine, the tool approval gate and `--approval-mode plan|default|accept-edits|untrusted`
+- [Tool Output Redaction](TOOL_OUTPUT_REDACTION.md): secrets in tool output replaced before the model, the session and evidence see them
+
 ## Operate And Deploy
 
 - [Operations](OPERATIONS.md)

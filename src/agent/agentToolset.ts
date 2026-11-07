@@ -35,6 +35,7 @@ import {
 } from "../tools/guards/policyGuards.js";
 import { actionPolicyGuard, actionPolicyMode, actionPolicyState, type ActionPolicyState } from "../tools/guards/actionPolicyGuard.js";
 import { approvalModeNarrowing, type ApprovalMode } from "../approvals/approvalModes.js";
+import { redactionCountsFor, secretRedactionFilter } from "../shield/redaction/toolOutputRedaction.js";
 import { compiledApprovalClasses, compiledPolicyFacts, compiledPolicyGuard, compiledPolicyShows, planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
 import { ToolPipeline } from "../tools/toolPipeline.js";
 import type { ActionClass } from "../types.js";
@@ -586,6 +587,8 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     workspace,
     ...(options.mode ? { mode: options.mode } : {}),
     journal: () => (journal ??= openActionJournal(workspace)),
+    // SH-SANDBOX-06: every tool's output (and a thrown body's message) has its secrets replaced before the outcome exists.
+    filters: [secretRedactionFilter],
     narrowMode: composeNarrowing(actionPolicyMode(workspace), options.approvalMode === undefined ? null : approvalModeNarrowing(options.approvalMode)),
     // Under a compiled policy every call is bound to a record, and its approval classes need a signed approval.
     ...(compiled ? { authorizeClasses: new Set<string>(ACTION_CLASSES), boundApprovalRequiredFor: compiledApprovalClasses(compiled) } : {}),
@@ -627,6 +630,12 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
         rawLedger().appendEvidenceBatch(evidence.map((row) => ({ sessionId: options.sessionId, runtime: "amc" as const,
           eventType: row.eventType, payload: row.payload, payloadExt: "json" as const, meta: row.meta })));
       });
+      // Counts by type only, never the text; written through the same latching path as the call's own rows.
+      const redacted = redactionCountsFor(execution);
+      if (redacted !== null) {
+        recordAudit({ schemaVersion: "2026-11-07", auditType: "TOOL_OUTPUT_REDACTED", tool: execution.name, actionClass: execution.actionClass,
+          counts: redacted, sessionId: options.sessionId, agentId: execution.agentId, callId: execution.callId, rootCallId: execution.rootCallId, token: execution.token });
+      }
     }
   });
 

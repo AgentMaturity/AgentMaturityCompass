@@ -1,4 +1,5 @@
 import { mkdirSync, realpathSync } from "node:fs";
+import { containsRedactionPlaceholder, REDACTION_PLACEHOLDER_PREFIX } from "../../shield/redaction/toolOutputRedaction.js";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { z } from "zod";
 import { redactSecrets } from "../../shield/redaction/redactSecrets.js";
@@ -254,6 +255,16 @@ function editsOf(args: z.infer<typeof editArgs>): LiteralEdit[] {
 
 const withDiff = (head: string, diff: string): string => (diff === "" ? head : `${head}\n${diff}`);
 
+/**
+ * SH-SANDBOX-06: tool output has its secrets replaced by `[AMC_REDACTED:<type>]`. Content carrying that placeholder was
+ * copied from a redacted read; writing it would put the placeholder over the real value on disk, silently.
+ */
+function refuseRedactionPlaceholder(content: string, tool: string): void {
+  if (containsRedactionPlaceholder(content)) {
+    throw new Error(`${tool} refused: the content contains an AMC redaction placeholder (${REDACTION_PLACEHOLDER_PREFIX}…]) copied from redacted tool output; writing it would replace a real value on disk. Edit around the redacted span instead.`);
+  }
+}
+
 export interface FsToolDeps {
   readonly ledger: ReadBeforeEditLedger;
 }
@@ -310,6 +321,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
       },
       body: (execution) => {
         const args = writeArgs.parse(execution.arguments);
+        refuseRedactionPlaceholder(args.content, "fs.write");
         const { full, rel } = insideWorkspace(execution.workspace, args.path);
         const before = readIfExists(full);
         const verdict = ledger.mayWrite(execution.agentId, full, before === null ? undefined : sha256Hex(before));
@@ -379,7 +391,9 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
         if (before === null) {
           throw new Error(`"${args.path}" is not valid UTF-8; fs.edit would change bytes it was not asked to change`);
         }
-        const plan = planLiteralEdits(before, editsOf(args), args.path);
+        const edits = editsOf(args);
+        for (const edit of edits) refuseRedactionPlaceholder(edit.replace, "fs.edit");
+        const plan = planLiteralEdits(before, edits, args.path);
         const after = Buffer.from(plan.after, "utf8");
         const diff = shownDiff(rel, raw, after);
         const summary = `${plan.replacements} replacement${plan.replacements === 1 ? "" : "s"}`;

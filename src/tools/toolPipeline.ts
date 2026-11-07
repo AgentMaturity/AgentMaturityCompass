@@ -517,6 +517,13 @@ export class ToolPipeline {
     return recheck.ok ? null : recheck.failures.join(", ");
   }
 
+  /** A thrown body's message after the same output filters: an error that quotes a secret (a confined shell's stderr) is redacted too. */
+  private thrown(execution: ToolExecution, error: unknown): ToolOutcome {
+    const raw = thrownOutcome(error);
+    const output = (this.init.filters ?? []).reduce((text, filter) => filter(text, execution), raw.output);
+    return output === raw.output ? raw : { ...raw, output };
+  }
+
   /** The body's result after the output filters. A filter may rewrite output and nothing else. */
   private bodyOutcome(execution: ToolExecution, result: ToolBodyResult): ToolOutcome {
     // A body that states no result is a failed call, never a success by default (DXC-02).
@@ -559,7 +566,7 @@ export class ToolPipeline {
     try {
       return this.bodyOutcome(execution, await body(execution));
     } catch (error: unknown) {
-      return thrownOutcome(error);
+      return this.thrown(execution, error);
     }
   }
 
@@ -698,9 +705,9 @@ export class ToolPipeline {
     }
     let outcome: ToolOutcome;
     try {
-      outcome = "result" in settled ? this.bodyOutcome(execution, settled.result) : thrownOutcome(settled.error);
+      outcome = "result" in settled ? this.bodyOutcome(execution, settled.result) : this.thrown(execution, settled.error);
     } catch (error: unknown) {
-      outcome = thrownOutcome(error);
+      outcome = this.thrown(execution, error);
     }
     const verdict = effectVerdict(execution.actionClass, settled);
     try {
