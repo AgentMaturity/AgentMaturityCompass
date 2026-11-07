@@ -25,7 +25,21 @@ Each launcher app verifies the included tarball digest, installs that exact AMC 
 
 The native macOS build renders the local Studio URL in a native WebKit window. The Windows launcher, and the macOS cross-build fallback, opens the same local Studio console in the system browser. The launcher app does not bundle Electron, Chromium, WebKit content, or another browser runtime.
 
-Launcher runtimes are stored under `~/Library/Application Support/Agent Maturity Compass/runtime` on macOS and `%LOCALAPPDATA%\Agent Maturity Compass\runtime` on Windows. Mutable demo data lives separately in the adjacent `studio-workspace` directory, so moving, replacing, or rebuilding an extracted app cannot corrupt the active workspace. A package digest marker makes launcher upgrades deterministic.
+Launcher runtimes are stored under `~/Library/Application Support/Agent Maturity Compass/runtime` on macOS and `%LOCALAPPDATA%\Agent Maturity Compass\runtime` on Windows. Mutable demo data lives separately in the adjacent `studio-workspace` directory, so moving, replacing, or rebuilding an extracted app cannot corrupt the active workspace. The macOS app carries its own copy of the package tarball, so it keeps working after you move it, for example to `/Applications`. A package digest marker makes launcher upgrades deterministic: when the digest changes, the launcher stops the Studio that the previous runtime started, installs the new package, and starts Studio again.
+
+Studio listens on `127.0.0.1:3212`. If another program already holds that port, for example a CLI `amc up` in another folder, Studio cannot start; the macOS app says so in a dialog, and the Windows launcher points to its log.
+
+Studio keeps running after you close the app window or browser tab. Stop it with the launcher runtime's own `amc`:
+
+```bash
+# macOS
+cd ~/"Library/Application Support/Agent Maturity Compass/studio-workspace" && ../runtime/node_modules/.bin/amc down
+```
+
+```powershell
+# Windows
+cd "$env:LOCALAPPDATA\Agent Maturity Compass\studio-workspace"; ..\runtime\node_modules\.bin\amc.cmd down
+```
 
 ## User Install
 
@@ -45,20 +59,24 @@ macOS Studio app launch:
 open "Agent Maturity Compass Studio.app"
 ```
 
+The app is ad-hoc signed, not notarized. If macOS says it cannot verify the app, open System Settings > Privacy & Security and choose Open Anyway. If you checked the archive against the release's `SHA256SUMS`, you can instead clear the download quarantine in the extracted folder with `xattr -dr com.apple.quarantine "Agent Maturity Compass Studio.app"`.
+
 Windows PowerShell:
 
 ```powershell
-Expand-Archive .\amc-<version>-windows-x64.zip
+Expand-Archive .\amc-<version>-windows-x64.zip -DestinationPath .
 cd .\amc-<version>-windows-x64
-.\install.ps1
+.\install.cmd
 amc --version
 amc doctor
 ```
 
-Launch the Studio app:
+`install.cmd` runs `install.ps1` with `-ExecutionPolicy Bypass`, because the default execution policy on Windows clients refuses to run `.ps1` files directly.
+
+Launch the Studio app by double-clicking `Agent Maturity Compass Studio.cmd`, or from PowerShell:
 
 ```powershell
-.\Agent Maturity Compass Studio.cmd
+& ".\Agent Maturity Compass Studio.cmd"
 ```
 
 ## Requirements
@@ -91,4 +109,4 @@ npm run package:desktop
 npm run package:desktop:verify
 ```
 
-The verifier checks archive hashes, required platform files, macOS and Windows launcher files, npm tarball contents, and the manifest legal posture.
+The verifier checks archive hashes, required platform files, macOS and Windows launcher files, that every installer and Studio launcher pins the npm tarball digest, npm tarball contents, and the manifest legal posture.

@@ -99,7 +99,9 @@ try {
   if (-not (Test-Path -PathType Leaf $Installer)) {
     Fail-AmcInstall "release archive is missing install.ps1"
   }
-  & $Installer
+  # A child process with Bypass: the default client execution policy refuses to run a .ps1 file, even though
+  # `irm | iex` can run this text.
+  & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $Installer
   if ($LASTEXITCODE -ne 0) {
     Fail-AmcInstall "packaged installer exited with code $LASTEXITCODE"
   }

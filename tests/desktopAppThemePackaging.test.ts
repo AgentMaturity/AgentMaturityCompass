@@ -52,6 +52,39 @@ describe("desktop app packaging and visual identity", () => {
     expect(script).toContain("appLaunchers");
   });
 
+  // No PowerShell host runs in CI, so these pin the generated Windows text.
+  test("Windows launchers survive Windows PowerShell 5.1, the default execution policy and bracketed folders", () => {
+    const script = read("scripts/package-desktop-installers.mjs");
+
+    // Redirected native stderr (npm warnings) must not become a terminating error under "Stop".
+    const lines = script.split("\n").map((line) => line.trim());
+    const nativeCalls = lines.flatMap((line, index) => (line.endsWith("*>> $LogFile") ? [index] : []));
+    expect(nativeCalls).toHaveLength(3);
+    for (const index of nativeCalls) {
+      expect(lines[index - 1]).toBe('$ErrorActionPreference = "Continue"');
+      expect(lines.slice(index + 1, index + 3)).toContain('$ErrorActionPreference = "Stop"');
+    }
+    expect(script).toContain('powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0${ps1Name}"\\r\\nif errorlevel 1 (pause & exit /b 1)');
+    expect(script).toContain('return platform.kind === "windows" ? ".\\\\install.cmd" : "sh ./install.sh";');
+    expect(script).toContain('`& ".\\\\${studioWindowsCmdName}"`');
+    expect(script).toContain("Get-FileHash -Algorithm SHA256 -LiteralPath $Package");
+    expect(script).toContain("Test-Path -LiteralPath $DigestFile");
+    expect(script).toContain("Set-Content -LiteralPath $DigestFile");
+    expect(script).not.toMatch(/(?:Test-Path|Get-Content|Set-Content|Get-FileHash)(?: -Algorithm SHA256)? (?:-Path )?\$(?:Package|DigestFile|AmcBin)\b/);
+    expect(script).toContain("Wait-Process -Id $OldPid -Timeout 15");
+    expect(script).toContain('process.platform === "win32" && command === "npm"');
+  });
+
+  test("macOS app has a main menu and the Linux archive does not describe a launcher it lacks", () => {
+    const script = read("scripts/package-desktop-installers.mjs");
+
+    for (const item of ["terminate:", "undo:", "redo:", "cut:", "copy:", "paste:", "selectAll:"]) {
+      expect(script).toContain(`@selector(${item})`);
+    }
+    expect(script).toContain("[application setMainMenu:mainMenu];");
+    expect(script).toContain("${appLaunchers.length > 0 ? `The Studio launcher uses the archive's exact package digest");
+  });
+
   test("desktop verifier checks app launcher files inside platform archives", () => {
     const verifier = read("scripts/verify-desktop-installers.mjs");
 
@@ -63,6 +96,9 @@ describe("desktop app packaging and visual identity", () => {
     expect(verifier).toContain("appLaunchers");
     expect(verifier).toContain("nested npm tarball hash mismatch");
     expect(verifier).toContain("installer does not pin the nested npm tarball hash");
+    expect(verifier).toContain("${appResources}/agent-maturity-compass-${manifest.packageVersion}.tgz");
+    expect(verifier).toContain("[`${base}/Agent Maturity Compass Studio.ps1`]");
+    expect(verifier).toContain("does not pin the nested npm tarball hash`);");
   });
 
   test("Studio dashboard uses the shared website-aligned console shell", () => {
