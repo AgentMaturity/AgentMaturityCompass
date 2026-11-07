@@ -55,6 +55,7 @@ function validateRuntimeConfig(config: StudioRuntimeConfig, env: NodeJS.ProcessE
     [config.gatewayPort, "AMC_GATEWAY_PORT", 1, 65535],
     [config.proxyPort, "AMC_PROXY_PORT", 1, 65535],
     [config.toolhubPort, "AMC_TOOLHUB_PORT", 1, 65535],
+    [config.dashboardPort, "AMC_DASHBOARD_PORT", 1, 65535],
     [config.metricsPort, "AMC_METRICS_PORT", 1, 65535],
     [config.trustedProxyHops, "AMC_TRUSTED_PROXY_HOPS", 0, 32],
     [config.dataRetentionDays, "AMC_DATA_RETENTION_DAYS", 1, 3650],
@@ -80,7 +81,9 @@ function validateRuntimeConfig(config: StudioRuntimeConfig, env: NodeJS.ProcessE
       [config.gatewayPort, "AMC_GATEWAY_PORT"],
       [config.proxyPort, "AMC_PROXY_PORT"],
       [config.toolhubPort, "AMC_TOOLHUB_PORT"],
-      [config.metricsPort, "AMC_METRICS_PORT"]
+      [config.metricsPort, "AMC_METRICS_PORT"],
+      // The dashboard moves to a free port when its default is taken, so only an explicit choice must not collide.
+      ...(env.AMC_DASHBOARD_PORT ? [[config.dashboardPort, "AMC_DASHBOARD_PORT"] as [number, string]] : [])
     ];
     for (const [port, key] of portRows) {
       const current = runtimePorts.get(port);
@@ -131,6 +134,7 @@ export function loadStudioRuntimeConfig(
     AMC_GATEWAY_PORT: env.AMC_GATEWAY_PORT,
     AMC_PROXY_PORT: env.AMC_PROXY_PORT,
     AMC_TOOLHUB_PORT: env.AMC_TOOLHUB_PORT,
+    AMC_DASHBOARD_PORT: env.AMC_DASHBOARD_PORT,
     AMC_LOG_LEVEL: env.AMC_LOG_LEVEL,
     AMC_LAN_MODE: env.AMC_LAN_MODE,
     AMC_ALLOWED_CIDRS: env.AMC_ALLOWED_CIDRS,
@@ -177,6 +181,7 @@ export function loadStudioRuntimeConfig(
     gatewayPort: parsed.AMC_GATEWAY_PORT,
     proxyPort: parsed.AMC_PROXY_PORT,
     toolhubPort: parsed.AMC_TOOLHUB_PORT,
+    dashboardPort: parsed.AMC_DASHBOARD_PORT,
     logLevel: parsed.AMC_LOG_LEVEL,
     lanMode: parsed.AMC_LAN_MODE,
     allowedCidrs: parseAllowedCidrs(parsed.AMC_ALLOWED_CIDRS),

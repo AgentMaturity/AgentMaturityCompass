@@ -8,6 +8,7 @@
  */
 import chalk from "chalk";
 import inquirer from "inquirer";
+import { buildDashboard } from "../dashboard/build.js";
 import { getRememberedVaultPassphrase, rememberVaultPassphrase } from "../vault/passphraseStore.js";
 
 export async function ensureUpVaultPassphrase(workspace: string, remember: boolean): Promise<void> {
@@ -121,6 +122,14 @@ export async function runFirstBaselineIfNeeded(params: {
       vaultReason: instant.vault.reason
     });
     console.log(renderUnifiedResult(baseline, { ci: false, firstRun: true }));
+    if (baseline.diagnosticRunId) {
+      // Studio built its dashboard before this first run existed; rebuild the directory it serves.
+      try {
+        buildDashboard({ workspace: params.workspace, agentId: params.agentId });
+      } catch (error) {
+        console.log(chalk.yellow(`Dashboard not refreshed: ${error instanceof Error ? error.message : String(error)}. Run \`amc dashboard build\`.`));
+      }
+    }
     console.log(chalk.green("\u2713 Baseline complete — your first score is saved. Follow \"What to do next\" above."));
   } catch (error) {
     console.log(chalk.yellow(`Baseline assessment could not run: ${error instanceof Error ? error.message : String(error)}. Run \`amc run\` manually.`));

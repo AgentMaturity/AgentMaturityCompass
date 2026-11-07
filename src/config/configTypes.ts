@@ -12,6 +12,7 @@ export interface StudioRuntimeConfig {
   gatewayPort: number;
   proxyPort: number;
   toolhubPort: number;
+  dashboardPort: number;
   logLevel: LogLevel;
   lanMode: boolean;
   allowedCidrs: string[];

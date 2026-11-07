@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { existsSync, openSync, readFileSync, readdirSync, statSync, unlinkSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { verifyGatewayConfigSignature } from "../gateway/config.js";
@@ -13,7 +13,7 @@ import { adaptersConfigPath, initAdaptersConfigAsync } from "../adapters/adapter
 import { resolveAgentId } from "../fleet/paths.js";
 import { ensureSigningKeys } from "../crypto/keys.js";
 import { vaultExists, unlockVault, vaultStatus } from "../vault/vault.js";
-import { buildDashboard } from "../dashboard/build.js";
+import { agentDashboardDir, buildDashboard } from "../dashboard/build.js";
 import { serveDashboard } from "../dashboard/serve.js";
 import { startGateway } from "../gateway/server.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
@@ -453,20 +453,21 @@ export async function runStudioForeground(params: {
     }
   }
 
-  const dashboardOut = `.amc/agents/${agentId}/dashboard`;
+  const dashboardOut = agentDashboardDir(workspace, agentId);
   try {
     buildDashboard({
       workspace,
       agentId,
       outDir: dashboardOut
     });
-  } catch {
-    // Fresh workspaces may not have runs yet; serve a bootstrap page and build later on demand.
-    const root = join(workspace, dashboardOut);
-    ensureDir(root);
+  } catch (error) {
+    // A fresh workspace has no run yet: serve a page naming why until `amc up`'s baseline or `amc dashboard build` replaces it.
+    const reason = (error instanceof Error ? error.message : String(error)).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    ensureDir(dashboardOut);
     writeFileAtomic(
-      join(root, "index.html"),
-      "<!doctype html><html><body><h1>AMC Studio</h1><p>No diagnostic runs yet. Run `amc run` then rebuild dashboard.</p></body></html>",
+      join(dashboardOut, "index.html"),
+      "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+        + `<title>AMC Dashboard</title></head><body><h1>AMC Studio</h1><p>${reason}</p><p>Then run <code>amc dashboard build</code> to show it here.</p></body></html>`,
       0o644
     );
   }
@@ -670,13 +671,45 @@ export async function startStudioDaemon(workspace: string, options: StartStudioD
   throw new Error(`Studio daemon did not start within ${STUDIO_DAEMON_START_MS / 1000} s. See ${logFile}.`);
 }
 
+/** The pid's command line, or null when it cannot be read: /proc on Linux, ps on other POSIX hosts, CIM on Windows. */
+function processCommandLine(pid: number): string | null {
+  try {
+    if (process.platform === "win32") {
+      const out = spawnSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command",
+        `(Get-CimInstance Win32_Process -Filter 'ProcessId=${pid}').CommandLine`], { encoding: "utf8", timeout: 15_000, windowsHide: true });
+      return out.status === 0 && out.stdout.trim() ? out.stdout.trim() : null;
+    }
+    if (existsSync(`/proc/${pid}/cmdline`)) return readFileSync(`/proc/${pid}/cmdline`, "utf8").replace(/\0/g, " ").trim() || null;
+    const out = spawnSync("ps", ["-ww", "-o", "command=", "-p", String(pid)], { encoding: "utf8", timeout: 5_000 });
+    return out.status === 0 && out.stdout.trim() ? out.stdout.trim() : null;
+  } catch {
+    return null;
+  }
+}
+
 export function stopStudioDaemon(workspace: string): { stopped: boolean; message: string } {
   const state = readStudioState(workspace);
   if (!state || !state.pid) {
     return { stopped: false, message: "Studio is not running." };
   }
+  // state.json is unsigned and outlives a crashed Studio, so its pid can be invalid or reused by another program:
+  // only a pid whose command line carries the daemon entry (`amc up` spawns `cli.js _studio-daemon`) is signalled.
+  if (!Number.isSafeInteger(state.pid) || state.pid < 1) {
+    return { stopped: false, message: `Studio state names an invalid pid (${String(state.pid)}); nothing was signalled.` };
+  }
   if (!processRunning(state.pid)) {
     return { stopped: false, message: "Studio state exists but process is not running." };
+  }
+  const commandLine = processCommandLine(state.pid);
+  if (commandLine === null) {
+    return { stopped: false, message: `Could not read the command line of pid ${state.pid}, so it is not confirmed as the AMC Studio daemon; nothing was signalled. If it is Studio, stop it yourself.` };
+  }
+  if (!commandLine.split(/[\s"']+/).includes("_studio-daemon")) {
+    return {
+      stopped: false,
+      message: `pid ${state.pid} in .amc/studio/state.json is not the AMC Studio daemon; nothing was signalled. `
+        + "A foreground Studio (amc studio start) stops with Ctrl+C; if Studio is not running, the state file is stale and can be removed."
+    };
   }
   try {
     process.kill(state.pid, "SIGTERM");
