@@ -149,9 +149,14 @@ export interface BudgetUsage {
 const period = (): BudgetPeriodUsage => ({ llmRequests: 0, llmPreparedRequests: 0, llmTokens: 0, llmCostUsd: 0,
   unknownLlmTokenRequests: 0, blockingUnknownLlmTokenRequests: 0, unknownLlmCostRequests: 0, llmTokenUsageComplete: true, llmCostUsageComplete: true });
 
+/** Start of the local calendar day containing `ts`: the day boundary budgets and `amc usage` share. */
+export function localDayStart(ts: number): number {
+  const date = new Date(ts); date.setHours(0, 0, 0, 0);
+  return date.getTime();
+}
+
 export function projectBudgetUsage(rows: readonly EvidenceEvent[], agentId: string, now: number): BudgetUsage {
-  const date = new Date(now); date.setHours(0, 0, 0, 0);
-  const dayStart = date.getTime();
+  const dayStart = localDayStart(now);
   const result: BudgetUsage = { daily: { ...period(), toolExecutes: toolCounts(), toolDenied: toolCounts(), toolPending: toolCounts(), llmPendingRequests: 0,
     llmReservedCostUsd: 0, llmBudgetCostUsd: 0, llmBudgetCostUnits: "0", llmUnreservedCostRequests: 0 }, minute: period() };
   let budgetCostUnits = 0n, reservedCostUnits = 0n;
