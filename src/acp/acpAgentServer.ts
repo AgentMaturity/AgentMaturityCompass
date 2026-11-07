@@ -281,7 +281,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       currentPlanUpdates = amcClient?.currentPlanUpdates === "amc-current-plan-v1";
       thoughtUpdates = amcClient === null || amcClient.thoughtUpdates === ACP_THOUGHT_UPDATES_CONTRACT;
       availableCommands = init.availableCommands !== undefined && (amcClient === null || amcClient.availableCommands === ACP_AVAILABLE_COMMANDS_CONTRACT);
-      permissionRequests = init.onApprovalRaised !== undefined && (amcClient === null || amcClient.permissionRequests === ACP_PERMISSION_CONTRACT);
+      permissionRequests = init.onApprovalRaised !== undefined;
       protocolVersion = await acpProtocolVersion();
       if (closing) throw new AcpFailure(ACP_ERROR.internal, "the agent is shutting down");
       initialized = true;

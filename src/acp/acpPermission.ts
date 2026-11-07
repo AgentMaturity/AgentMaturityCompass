@@ -37,7 +37,7 @@ export interface AcpApprovalRaised {
   readonly cancelTurn: (by: string) => void;
 }
 
-export interface AcpPermissionReviewer {
+interface AcpPermissionReviewer {
   /** A private (0600) file holding an active tracked workspace login; read at each decision, never logged. */
   readonly tokenFile: string;
   /** The fixed decision reason, used when the client's response carries none. */

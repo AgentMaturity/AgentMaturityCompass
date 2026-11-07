@@ -667,7 +667,6 @@
     {"id":"a4220cee234eed9cb2b8f25694556c138d4c429c2a7f6dcd667aceb1a6c829f7","paths":["studio/studioServer.ts","studio/studioServer.ts"],"format":"typescript"},
     {"id":"a44e469f1de76426f38a2f6bbfc8a82628d751f36cc58c3cc5811ab2aa006bf9","paths":["observability/routerFallbackSafety.ts","runtime/degradedModeContract.ts"],"format":"typescript"},
     {"id":"a4bf7b90de9d6489ad89f58aef3a3f39c04453cf86ecf7a9f02c87afdf907ce1","paths":["adapters/builtins/crewaiCli.ts","adapters/builtins/langchainPython.ts"],"format":"typescript"},
-    {"id":"a4ea6a9f3dfd5a5ed52615beeb8d1844104f9cdb397f9ba45a57d983d9411ae4","paths":["cli-agent-commands.ts","cli-prompt-commands.ts"],"format":"typescript"},
     {"id":"a5738f2c2e8a30399be16bf824d0fc5cc5684b698462770ec1be1a55be06de4a","paths":["score/capabilityGovernance.ts","score/organizationalSafetyPosture.ts"],"format":"typescript"},
     {"id":"a599f7bd8cab78ad6d364c1b89839a185881aea4ea78794aad39c21e95b1d3b9","paths":["benchmarks/helmProviderDrift.ts","benchmarks/humanloopProviderDrift.ts"],"format":"typescript"},
     {"id":"a5a16f3c847fb0402fcca3865cccd70e956b7633622052778455bcdeec05d9d8","paths":["diagnostic/questionScoreExplainability.ts","diagnostic/questionScoreExplainability.ts"],"format":"typescript"},
