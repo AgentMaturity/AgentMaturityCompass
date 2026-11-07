@@ -105,6 +105,10 @@ export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
       init.pipeline.bindApprovalGate(gate);
     },
 
+    actionClassOf(toolName: string) {
+      return init.registry.visible(init.agentId).get(toolName)?.actionClass ?? null;
+    },
+
     schemas(): readonly ToolSchema[] | null {
       const visible = [...init.registry.offered(init.agentId).values()];
       const offered = visible

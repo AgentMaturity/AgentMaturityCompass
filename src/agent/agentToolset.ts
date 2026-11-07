@@ -34,6 +34,7 @@ import {
   toolhubAllowlistGuard
 } from "../tools/guards/policyGuards.js";
 import { actionPolicyGuard, actionPolicyMode, actionPolicyState, type ActionPolicyState } from "../tools/guards/actionPolicyGuard.js";
+import { approvalModeNarrowing, type ApprovalMode } from "../approvals/approvalModes.js";
 import { compiledApprovalClasses, compiledPolicyFacts, compiledPolicyGuard, compiledPolicyShows, planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
 import { ToolPipeline } from "../tools/toolPipeline.js";
 import type { ActionClass } from "../types.js";
@@ -64,6 +65,14 @@ import { NATIVE_BUILTIN_CAPABILITIES, NATIVE_DELEGATION_CAPABILITIES, selectSupp
  * is how one of them eventually gets left out.
  */
 
+/** SIMULATE when either narrowing says so: a mode composes with the Action Policy and neither can widen the other. */
+function composeNarrowing(policy: ReturnType<typeof actionPolicyMode>, mode: ReturnType<typeof approvalModeNarrowing> | null): ReturnType<typeof actionPolicyMode> {
+  return call => {
+    const narrowed = policy(call);
+    return narrowed === "SIMULATE" || mode === null ? narrowed : mode({ actionClass: call.actionClass, requestedMode: narrowed });
+  };
+}
+
 export interface AgentToolsetOptions {
   /** Explicit interactive authority; an argv-bound bash approval cannot supply this grant. */
   readonly nativeTerminal?: NativeTerminalHostOptions;
@@ -87,6 +96,12 @@ export interface AgentToolsetOptions {
   readonly unconfinedShell?: ExplicitShellOptIn;
   /** Set only for a delegated child: the parent's decision (null when unknown), which the child can never widen. */
   readonly parentShell?: NativeShellReadiness | null;
+  /**
+   * The operator's approval mode (SH-SANDBOX-04). Only `plan` changes the toolset: every EXECUTE outside READ_ONLY
+   * enters as SIMULATE, composed with the signed Action Policy's own narrowing (never wider than either). A delegated
+   * child is composed under its parent's mode.
+   */
+  readonly approvalMode?: ApprovalMode;
   /**
    * Enables the `delegate` tool (P6.1a).
    *
@@ -571,7 +586,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     workspace,
     ...(options.mode ? { mode: options.mode } : {}),
     journal: () => (journal ??= openActionJournal(workspace)),
-    narrowMode: actionPolicyMode(workspace),
+    narrowMode: composeNarrowing(actionPolicyMode(workspace), options.approvalMode === undefined ? null : approvalModeNarrowing(options.approvalMode)),
     // Under a compiled policy every call is bound to a record, and its approval classes need a signed approval.
     ...(compiled ? { authorizeClasses: new Set<string>(ACTION_CLASSES), boundApprovalRequiredFor: compiledApprovalClasses(compiled) } : {}),
     // Read per call: the CLI binds its session writer after composing.

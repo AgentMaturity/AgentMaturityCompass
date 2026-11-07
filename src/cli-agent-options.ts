@@ -28,6 +28,7 @@ import type { ActionClass } from "./types.js";
 import type { LiveTextPreviewEvent } from "./llm/adapter/liveTextPreview.js";
 import type { ComposedTurnHandle } from "./kernel/agentLoopRunner.js";
 import type { ApprovalAnswerer, ApprovalRiskTier } from "./approvals/seam/approvalSeamTypes.js";
+import { approvalModeExemptTools, approvalModeGatedClasses, parseApprovalMode, type ApprovalMode } from "./approvals/approvalModes.js";
 import {
   createApprovalExceptionAnswerer,
   describeApprovalException,
@@ -97,6 +98,8 @@ export interface RunOptions {
   listSkills?: boolean | string;
   approveTools?: string;
   approveRisk?: string;
+  /** SH-SANDBOX-04: plan | default | accept-edits | untrusted. */
+  approvalMode?: string;
   approvalException?: string;
   interactiveApprovals?: boolean;
   interactiveAskUser?: boolean;
@@ -129,6 +132,39 @@ export interface ApprovalGateChoice {
   readonly actionClass: ActionClass;
   readonly riskTier: ApprovalRiskTier;
   readonly answerers: readonly ApprovalAnswerer[];
+  /** Set by --approval-mode: the classes the mode gates (omitted: every tool, the --approve-tools form). */
+  readonly gatesClasses?: ReadonlySet<ActionClass>;
+  readonly exemptToolNames?: readonly string[];
+  readonly mode?: ApprovalMode;
+}
+
+/** The parsed --approval-mode, or undefined when none was given; an invalid spelling is reported by `approvalGateFor`. */
+export function parsedApprovalMode(opts: Pick<RunOptions, "approvalMode">): ApprovalMode | undefined {
+  if (opts.approvalMode === undefined) return undefined;
+  const parsed = parseApprovalMode(opts.approvalMode);
+  return parsed.ok ? parsed.mode : undefined;
+}
+
+/** The class a mode's question is raised under when the call carries no authorization intent, and its tier. */
+const MODE_QUESTION_CLASS: ActionClass = "WRITE_HIGH";
+const MODE_QUESTION_TIER: ApprovalRiskTier = "high";
+
+/**
+ * SH-SANDBOX-04: an approval mode composes its own gate. `plan` composes none (nothing executes, so there is nothing
+ * to ask); the others gate by class. Combining it with the expert `--approve-tools` form is a contradiction, refused.
+ */
+function approvalModeGate(io: AgentLoopCliIo, opts: RunOptions): ApprovalGateChoice | null | undefined {
+  const parsed = parseApprovalMode(opts.approvalMode ?? "");
+  if (!parsed.ok) { io.error(chalk.red(parsed.reason)); io.fail(); return null; }
+  if (opts.approveTools !== undefined || opts.approveRisk !== undefined || opts.approvalException !== undefined) {
+    io.error(chalk.red("--approval-mode composes its own gate; it cannot be combined with --approve-tools, --approve-risk or --approval-exception."));
+    io.fail();
+    return null;
+  }
+  const gatesClasses = approvalModeGatedClasses(parsed.mode);
+  io.error(chalk.dim(`approval mode ${parsed.mode}: ${gatesClasses === null ? "nothing executes (every call outside READ_ONLY is SIMULATE)" : `calls in ${[...gatesClasses].join(", ")} are asked`}`));
+  if (gatesClasses === null) return undefined;
+  return { actionClass: MODE_QUESTION_CLASS, riskTier: MODE_QUESTION_TIER, answerers: [], gatesClasses, exemptToolNames: approvalModeExemptTools(parsed.mode), mode: parsed.mode };
 }
 
 /**
@@ -153,6 +189,7 @@ export function approvalGateFor(
   opts: RunOptions,
   scope: { readonly workspace: string; readonly agentId: string }
 ): ApprovalGateChoice | null | undefined {
+  if (opts.approvalMode !== undefined) return approvalModeGate(io, opts);
   if (opts.approveTools === undefined) {
     if (opts.approvalException !== undefined) {
       io.error(

@@ -40,6 +40,7 @@
 import { Context } from "./amcRuntime.js";
 import { createHash, randomUUID } from "node:crypto";
 import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "../agent/approvalGate.js";
+import type { ApprovalMode } from "../approvals/approvalModes.js";
 import type { AgentLoopConfig, AgentStatus, CancelOptions, LoopHooks, LoopNotification } from "../agent/loopTypes.js";
 import type { LoopRoute } from "../agent/stepRunner.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "../agent/toolSeam.js";
@@ -220,6 +221,8 @@ export interface ComposedTurnOptions {
    * row, so the claim is derived from the gate rather than configured beside it.
    */
   readonly approvalGate?: ComposedApprovalGate;
+  /** The operator's approval mode (SH-SANDBOX-04), inherited by every delegated child this turn composes. */
+  readonly approvalMode?: ApprovalMode;
   /** The prompt that opens the turn. Enters the durable inbox like any other message. */
   readonly prompt: string;
   /** Original image bytes, captured before asynchronous composition and queued durably. */
@@ -646,6 +649,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           policyDigest: policyDigestOf(options),
           ...(options.config === undefined ? {} : { config: options.config }),
           ...(gate === undefined ? {} : { approvalGate: gate }),
+          ...(options.approvalMode === undefined ? {} : { approvalMode: options.approvalMode }),
           ...(options.parentShell === undefined ? {} : { parentShell: options.parentShell }),
           ...(options.leaseToken === undefined ? {} : { leaseToken: options.leaseToken }),
           ...(options.delegation === undefined ? {} : { grantDelegation: { runner: runNative,

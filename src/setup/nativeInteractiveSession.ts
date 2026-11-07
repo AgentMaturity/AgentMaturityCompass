@@ -5,6 +5,7 @@ import { renderNativeRunUsage } from "../agent/nativeRunUsage.js";
 import { renderNativeRunDiagnostics } from "../agent/nativeFailureGuidance.js";
 import { parseNativeChatResult, type NativeChatChildSummary } from "./nativeChatResult.js";
 import { isActionClass } from "../governor/actionCatalog.js";
+import { approvalModeGatedClasses, parseApprovalMode } from "../approvals/approvalModes.js";
 import { reviewNativeMcpConfigurations, NativeMcpConfigError } from "./nativeMcpConfig.js";
 import { inspectNativeFirstUse, renderNativeFirstUseGuide, renderNativeGuideCommand } from "./nativeFirstUseGuide.js";
 import { resolveNativeChatProfile, nativeChatProfileArgv, assertNativeChatProfileCurrent, type NativeChatProfileOptions } from "./nativeChatProfile.js";
@@ -37,6 +38,8 @@ export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly mcpConfigSha256?: readonly string[];
   readonly approveTools?: string;
   readonly approveRisk?: string;
+  /** SH-SANDBOX-04: forwarded verbatim to every turn's child run, which validates and composes it. */
+  readonly approvalMode?: string;
   readonly tools?: string;
   readonly unsafeUnconfinedShell?: boolean;
   readonly webSearchSearxng?: string;
@@ -250,6 +253,13 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     } catch (error) { io.error(error instanceof Error ? error.message : "Invalid thinking options."); io.fail(); return; }
     const approvalClass = options.approveTools?.trim().toUpperCase();
     const approvalRisk = (options.approveRisk ?? "high").trim().toLowerCase();
+    const approvalMode = options.approvalMode === undefined ? undefined : parseApprovalMode(options.approvalMode);
+    if (approvalMode !== undefined && !approvalMode.ok) { io.error(approvalMode.reason); io.fail(); return; }
+    if (approvalMode !== undefined && (approvalClass !== undefined || options.approveRisk !== undefined)) {
+      io.error("--approval-mode composes its own gate; it cannot be combined with --approve-tools or --approve-risk."); io.fail(); return;
+    }
+    // A mode other than plan composes a gate in the child run, so this terminal reviews its requests too.
+    const modeGated = approvalMode !== undefined && approvalMode.ok && approvalModeGatedClasses(approvalMode.mode) !== null;
     if ((approvalClass !== undefined && !isActionClass(approvalClass)) ||
         !["low", "medium", "high", "critical"].includes(approvalRisk) ||
         (options.approveRisk !== undefined && approvalClass === undefined)) {
@@ -285,7 +295,8 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       ...(options.contextWindow === undefined ? [] : ["--context-window", options.contextWindow]),
       ...(options.compactThreshold === undefined ? [] : ["--compact-threshold", options.compactThreshold]),
       ...(options.autoSummary === false ? ["--no-auto-summary"] : []), ...(options.autoCompact === false ? ["--no-auto-compact"] : []),
-      ...(approvalClass === undefined ? [] : ["--approve-tools", approvalClass, "--approve-risk", approvalRisk]), ...mcpArgs,
+      ...(approvalClass === undefined ? [] : ["--approve-tools", approvalClass, "--approve-risk", approvalRisk]),
+      ...(approvalMode === undefined || !approvalMode.ok ? [] : ["--approval-mode", approvalMode.mode]), ...mcpArgs,
       ...(validation === undefined ? [] : ["--validation-config", resolve(options.validationConfig!), "--validation-config-sha256", validation.configSha256,
         ...validation.checks.flatMap(check => ["--validate", check.id]),
         ...(validation.repair === undefined ? [] : ["--validation-repair", JSON.stringify(validation.repair)])])];
@@ -301,6 +312,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         ? "Workspace tools enabled explicitly. The existing signed allowlist and governor still control access; no approval or policy bypass is added."
         : tools === "echo" ? "Echo demonstration tool only; no workspace editing tool is offered."
           : "No tools offered; model replies cannot edit workspace files through this session.");
+      if (approvalMode !== undefined && approvalMode.ok) io.log(`Approval mode: ${approvalMode.mode}${modeGated ? ". This terminal asks you to review actual queued requests using an existing authenticated reviewer session; quorum still applies." : " (nothing executes: every call outside READ_ONLY is simulated)."}`);
       if (approvalClass !== undefined) io.log(`Tool approval gate: ${approvalClass}, risk ${approvalRisk}. This terminal asks you to review actual queued requests using an existing authenticated reviewer session; quorum still applies.`);
       if (mcpArgs.length > 0) io.log("MCP tools use each reviewed catalog and pinned config. Each turn starts and disposes its own configured servers; a changed catalog or config refuses the run. /mcp shows each mount.");
       if (extensions.list().length > 0) io.log(`Signed native extensions: ${extensions.list().map(item => item.id).join(", ")}. /extensions lists their commands and reviewed digests.`);
@@ -511,7 +523,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       const priorSession = sessionId;
       const pendingFork = forkFrom;
       const outcome = await execute(["agent-loop", "run", ...routeArgs, ...nativeExtensionRunArgv(extensions),
-        ...(approvalClass === undefined ? [] : ["--interactive-approvals"]), ...(tools === "workspace" ? ["--interactive-ask-user"] : []),
+        ...(approvalClass === undefined && !modeGated ? [] : ["--interactive-approvals"]), ...(tools === "workspace" ? ["--interactive-ask-user"] : []),
         "--keep-open", "--json", "--stream",
         ...(forkFrom !== null ? ["--fork-from", forkFrom] : sessionId === null ? [] : ["--session", sessionId]), "--", prompt],
         { interactiveApprovals: approvalClass !== undefined, askUser: tools === "workspace", stream: true });

@@ -5,6 +5,7 @@ import { deniedToolNamesForScope, intersectDelegationScopes, parseDelegationScop
 import { parseSubagentStopConditions } from "./subagentStopConditions.js";
 import { ApprovalSeam, type ApprovalSeamInit } from "../approvals/seam/approvalSeam.js";
 import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "./approvalGate.js";
+import type { ApprovalMode } from "../approvals/approvalModes.js";
 import { NO_HOOKS, type AgentLoopConfig, type LoopHookControl, type LoopHooks } from "./loopTypes.js";
 import type { ActionClass } from "../types.js";
 import { agentToolset } from "./agentToolset.js";
@@ -83,6 +84,8 @@ export interface DriverRunnerInit {
   readonly config?: Partial<AgentLoopConfig>;
   /** Existing policy and answerers, rebound to each actual child session. */
   readonly approvalGate?: ToolApprovalGateOptions & Pick<ApprovalSeamInit, "answerers" | "onRaised" | "initiator">;
+  /** The parent's approval mode (SH-SANDBOX-04): every child toolset is composed under it, so `plan` runs nothing in a child either. */
+  readonly approvalMode?: ApprovalMode;
   /**
    * The parent loop's hook CONTROL, inherited by every child this runner builds
    * (IMPL-3).
@@ -358,6 +361,7 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
               recorder: session, agentId: ctx.toolsetAgentId,
               ...(ctx.getGoal === undefined ? {} : { getGoal: ctx.getGoal }),
               parentShell: init.parentShell ?? null,
+              ...(init.approvalMode === undefined ? {} : { approvalMode: init.approvalMode }),
               ...(childLease === undefined ? {} : { leaseToken: childLease }),
               delegation: { runAs: ctx.identity.runAs, depth: ctx.identity.depth, parentExecutionId: ctx.packetId ?? null,
                 ...(scope === undefined ? {} : { allowedActionClasses: scope }) },

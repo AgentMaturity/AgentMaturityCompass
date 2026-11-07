@@ -72,6 +72,29 @@ amc approvals deny --agent <agentId> <requestId> --reason "not approved" --usern
 
 `--expect-request-digest` accepts the inbox digest or the engine's binding digest of the request (the one P2-24 break-glass prints, which leaves the request's initiator out), and the decision binds the binding digest. `--username` and `--roles` are required for decisions; `--user-id` can bind a stable identity distinct from its display name. Unknown roles and a repeated reviewer on a distinct-user request fail closed. CLI decisions use the same lifecycle delivery path as Studio. `APPROVED` remains an input compatibility alias for canonical `QUORUM_MET`.
 
+### Approval modes (`--approval-mode`)
+
+`amc agent-loop run` and `agent-loop chat` take `--approval-mode <plan|default|accept-edits|untrusted>`, the
+operator-facing form of the gate, comparable to Claude Code's `plan`/`default`/`acceptEdits` and Codex's
+`untrusted`/`on-request`. A mode only narrows. It sits on top of the signed tools policy, the compiled policy's
+approval classes, every guard, every freeze and the signed Action Policy; none of those is removed by any mode.
+
+| Mode | What is asked | What executes |
+|---|---|---|
+| `plan` | nothing (no gate is composed) | nothing outside `READ_ONLY`: every other call enters as `SIMULATE` and the tool reports what it would do. The mode is composed with the Action Policy's own narrowing (neither can widen the other) and is inherited by every delegated child, so `--delegate` under `plan` cannot write through a child either |
+| `default` | every call outside `READ_ONLY` (file edits, the shell, network, deploys, secrets) | what a human allows |
+| `accept-edits` | as `default`, except `WRITE_LOW` (the file tools' workspace edits) | `WRITE_LOW` runs without a question; the shell still asks. AMC does not pre-approve "filesystem-looking" shell commands by inspecting their text |
+| `untrusted` | every call, `READ_ONLY` included, except `ask_user` | what a human allows |
+
+A call that carries an authorization intent is still asked under its own signed class, as with `--approve-tools`;
+a call without one is raised under `WRITE_HIGH`, risk `high`. A tool whose class the composition cannot name is
+gated. `--approval-mode` composes its own gate, so it refuses `--approve-tools`, `--approve-risk` and
+`--approval-exception` beside it; a preset's `approveTools` is replaced by an explicit mode, and the run says so.
+`never`, `bypass`, `yolo`, `dontAsk`, `auto` and `danger-full-access` are refused by name: AMC has no bypass mode
+(omit the flag for no gate outside a regulated profile, or use `plan` to run nothing), and no classifier that can
+allow. `on-failure` is refused until the sandbox denial-to-escalation loop exists. The mode is recorded in the run's
+composition output; the SDK, ACP and Studio native-task options still take the expert `approveTools` form.
+
 ### Native one-shot and interactive review
 
 The native one-shot approval prompt reads the actual signed pending request and

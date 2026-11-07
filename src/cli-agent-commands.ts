@@ -75,7 +75,7 @@ import { loadNativeAudioManifest } from "./attachments/nativeAudioFiles.js";
 import type { NativeAudioPart } from "./attachments/nativeAudioInput.js";
 
 import {
-  activeChildLimitOption, approvalGateFor, armTurnSignals, collectOption, collectDelegateStop, compactionOption, integerOption, liveTextPreviewPrinter, paramsFor, piAiRouteSelection, renderNotification, resetDelegateStops, routeFor,
+  activeChildLimitOption, approvalGateFor, armTurnSignals, parsedApprovalMode, collectOption, collectDelegateStop, compactionOption, integerOption, liveTextPreviewPrinter, paramsFor, piAiRouteSelection, renderNotification, resetDelegateStops, routeFor,
   type AgentLoopCliIo, type RunOptions
 } from "./cli-agent-options.js";
 export type { AgentLoopCliIo, RunOptions } from "./cli-agent-options.js";
@@ -153,6 +153,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--mcp-config-sha256 <digest>", "require these exact reviewed MCP config bytes; one per --mcp-config, in the same order", collectOption)
     .option("--approve-tools <actionClass>", "require the signed approval gate before each tool call")
     .option("--approve-risk <tier>", "approval risk tier (default high)")
+    .option("--approval-mode <mode>", "plan, default, accept-edits or untrusted: which calls a human is asked about, on top of every signed policy; plan runs nothing (SIMULATE); not with --approve-tools")
     .option("--tools <mode>", "none, echo, or explicitly enabled workspace tools; existing policy still applies")
     .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")
     .option("--web-search-searxng <origin>", WEB_SEARCH_SEARXNG_HELP)
@@ -244,6 +245,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       "require a signed human approval before every tool call, decided under this action class"
     )
     .option("--approve-risk <tier>", "risk tier the approval is raised at (default high)")
+    .option("--approval-mode <mode>", "plan, default, accept-edits or untrusted: which calls a human is asked about, on top of every signed policy; plan runs nothing (SIMULATE); not with --approve-tools")
     .option("--interactive-approvals", "send actual queued approval IDs to the native chat parent over dedicated Node IPC")))
     .option(
       "--approval-exception <file>",
@@ -276,7 +278,10 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         preset = resolved.preset;
         (opts.json ? io.error : io.log)(chalk.dim(`composed from preset "${preset.id}": ${preset.description}`));
         // Apply preset approval before constructing policy controls.
-        opts = { ...opts, approveTools: opts.approveTools ?? preset.approveTools };
+        // An explicit --approval-mode replaces the preset's approveTools gate (the mode composes its own); the two flags together are refused below.
+        if (opts.approvalMode !== undefined && opts.approveTools === undefined && preset.approveTools !== undefined) {
+          io.error(chalk.dim(`--approval-mode ${opts.approvalMode} replaces the preset's approveTools ${preset.approveTools}`));
+        } else opts = { ...opts, approveTools: opts.approveTools ?? preset.approveTools };
       }
       try { opts = applyNativeDelegationPreset(opts, preset?.delegate); }
       catch {
@@ -401,9 +406,10 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         io.error("MCP tools require the actual signed approval gate; approval exceptions are not accepted."); io.fail(); return;
       }
       const gate = approvalGateFor(io, opts, { workspace: process.cwd(), agentId });
+      const approvalMode = gate === null ? undefined : gate?.mode ?? parsedApprovalMode(opts);
       if (gate === null) return;
       if (opts.interactiveApprovals && gate === undefined) {
-        io.error("--interactive-approvals requires --approve-tools to raise actual signed requests."); io.fail(); return;
+        io.error("--interactive-approvals requires --approve-tools or a gating --approval-mode to raise actual signed requests."); io.fail(); return;
       }
       let mcpServers: readonly ReviewedNativeMcpServer[] = [];
       if (opts.mcpConfig !== undefined) {
@@ -498,6 +504,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           recorder: { recordProjectedEvidence: (row) => actualSession().recordProjectedEvidence(row), assertWritable: () => actualSession().assertWritable() },
           ...lease,
           ...(dispatchMode === "code" ? { mode: dispatchMode } : {}),
+          ...(approvalMode === undefined ? {} : { approvalMode }),
           ...breadth.toolset,
           ...shellOptIn
         });
@@ -641,6 +648,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           workspace: process.cwd(),
           agentId,
           ...(compositionSources === undefined ? {} : { compositionSources }),
+          ...(approvalMode === undefined ? {} : { approvalMode }),
           resourceStatus: () => projectNativeResourceStatus({ extensions, mcp: mcpStatus,
             skillRoots: workspaceSkillRoots(extensions.workspace, opts.credentialsHome) }),
           ...(opts.stream ? { onLiveText: liveTextPreviewPrinter() } : {}),
@@ -671,6 +679,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                 approvalGate: { ...reviewedNativeMcpApprovalOptions(mcpServers),
                   actionClass: gate.actionClass,
                   riskTier: gate.riskTier,
+                  ...(gate.gatesClasses === undefined ? {} : { gatesClasses: gate.gatesClasses }),
+                  ...(gate.exemptToolNames === undefined ? {} : { exemptToolNames: gate.exemptToolNames }),
                   answerers: gate.answerers,
                   onRaised: (event) => {
                     if (opts.interactiveApprovals) {

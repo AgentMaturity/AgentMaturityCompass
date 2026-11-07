@@ -22,6 +22,7 @@ import type { NativeExtensionHooks } from "../extensions/nativeExtensionHooks.js
 import type { AuthorizationIntentResult } from "../actions/authorize.js";
 import type { ToolSchema } from "../llm/request/requestSpec.js";
 import type { ToolDispatch, ToolOutcome } from "../session/sessionTypes.js";
+import type { ActionClass } from "../types.js";
 import type { BoundApprovalGate, ToolAuthority } from "../tools/toolPipeline.js";
 
 /** One tool call, exactly as the model asked for it. */
@@ -99,6 +100,8 @@ export interface AgentToolSeam {
   authorizationIntent?(request: ToolCallRequest): AuthorizationIntentResult | null;
   /** Pipeline-backed seams: a composed approval gate binds itself, so sub-calls are asked and approvals required. */
   bindApprovalGate?(gate: BoundApprovalGate): void;
+  /** The signed action class of a visible tool, or null when the seam cannot name it (an approval mode then gates it). */
+  actionClassOf?(toolName: string): ActionClass | null;
 }
 
 /**
