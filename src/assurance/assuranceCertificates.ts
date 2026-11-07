@@ -28,6 +28,8 @@ import { verifySignatureEnvelope } from "../crypto/signing/signatureEnvelope.js"
 import { orgSignatureSchema } from "../org/orgSchema.js";
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { assurancePolicySchema } from "./assurancePolicySchema.js";
+import { assuranceReportProvenance } from "./reportProvenance.js";
+import { getAgentPaths } from "../fleet/paths.js";
 import {
   assuranceCertSchema,
   assuranceFindingsDocSchema,
@@ -198,6 +200,12 @@ export async function issueAssuranceCertificate(input: {
   if (runText.split(/\r?\n/).some(line => line.trim() === EXAMPLE_BANNER)) throw new Error("synthetic_example results cannot be issued an assurance certificate");
   const runValue: unknown = JSON.parse(runText); assertNotExample(runValue, "issued an assurance certificate");
   const run = assuranceRunSchema.parse(runValue);
+  // SH-TRUST-02: a certificate binds to the sealed run report, and only when every graded row of that report resolves to
+  // the runner's own sealed ledger session. No sealed report, or a score with no rows behind it, issues nothing.
+  const sealedReportPath = join(getAgentPaths(params.workspace, run.scope.id).reportsDir, "assurance", `${params.runId}.json`);
+  if (!pathExists(sealedReportPath)) throw new Error(`certificate issuance blocked: sealed assurance report not found for run ${params.runId}`);
+  const provenance = assuranceReportProvenance(params.workspace, JSON.parse(readUtf8(sealedReportPath)) as Record<string, unknown>);
+  if (!provenance.ok) throw new Error(`certificate issuance blocked: assurance run provenance ${provenance.reason} (${provenance.detail})`);
   const findingsBytes = sourceInputs.get(findingsPath)!;
   if (findingsBytes === null) {
     throw new Error(`assurance findings not found for run: ${params.runId}`);

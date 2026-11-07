@@ -76,8 +76,10 @@ export interface AgentResponse {
   toolCalls: AgentToolCall[];
   target: AgentResponderTarget;
   latencyMs: number;
-  /** Gateway receipt id, when the gateway captured this exchange. */
+  /** The gateway's signed request receipt (`x-amc-request-receipt`), when the gateway captured this exchange. */
   receiptId?: string;
+  /** The gateway's signed response receipt (`x-amc-receipt`), when present. */
+  responseReceipt?: string;
   finishReason?: string;
   usage?: { promptTokens?: number; completionTokens?: number };
 }
@@ -421,6 +423,7 @@ class HttpAgentResponder implements AgentResponder {
       target: this.target,
       latencyMs,
       receiptId: response.headers.get("x-amc-request-receipt") ?? undefined,
+      responseReceipt: response.headers.get("x-amc-receipt") ?? undefined,
       finishReason: extractFinishReason(parsed),
       usage: extractUsage(parsed)
     };

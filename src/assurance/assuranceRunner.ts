@@ -2,6 +2,7 @@ import { captureRunHashAuthority, runHashVerificationKeys, type RunHashPublicati
 import { publishAssuranceReport } from "./runReportPublication.js";
 import { verifyHexDigestAny } from "../crypto/keys.js";
 import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
+import { ProvenanceChecker } from "./reportProvenance.js";
 import { refusedRunsBlocking, type RefusedRun } from "../diagnostic/runReportResolution.js";
 import type { GovernorAssuranceSummary } from "../governor/actionPolicyEngine.js";
 import { validateExecutedReportRow, isExecutedReportPack } from "./executed/reportValidation.js";
@@ -489,6 +490,8 @@ export function scanVerifiedAssuranceByPack(params: {
     .sort((a, b) => a.localeCompare(b));
   const map = new Map<string, { ts: number; pack: AssurancePackResult }>();
   const unverifiedReports: string[] = [];
+  const provenance = new ProvenanceChecker(params.workspace);
+  try {
   for (const file of files) {
     let report: AssuranceReport;
     try {
@@ -503,7 +506,8 @@ export function scanVerifiedAssuranceByPack(params: {
     if (report.ts < params.windowStartTs || report.ts > params.windowEndTs) {
       continue;
     }
-    if (!sealedRunReportVerifies(params.workspace, report as unknown as Record<string, unknown>)) {
+    // A seal proves who wrote the report; provenance proves its graded rows exist in that writer's sealed session (SH-TRUST-02).
+    if (!sealedRunReportVerifies(params.workspace, report as unknown as Record<string, unknown>) || !provenance.check(report).ok) {
       unverifiedReports.push(file);
       continue;
     }
@@ -513,6 +517,9 @@ export function scanVerifiedAssuranceByPack(params: {
         map.set(pack.packId, { ts: report.ts, pack });
       }
     }
+  }
+  } finally {
+    provenance.close();
   }
   return {
     byPack: new Map<string, AssurancePackResult>([...map.entries()].map(([packId, row]) => [packId, row.pack])),
@@ -717,6 +724,8 @@ export function latestAssuranceReports(params: {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const reportsDir = assuranceReportsDir(params.workspace, agentId);
   const reports: AssuranceReport[] = [], refused: RefusedRun[] = [];
+  const provenance = new ProvenanceChecker(params.workspace);
+  try {
   for (const file of readdirSync(reportsDir).filter((name) => name.endsWith(".json")).map((name) => join(reportsDir, name))) {
     let parsed: Record<string, unknown> | null;
     try {
@@ -728,11 +737,16 @@ export function latestAssuranceReports(params: {
     const ts = typeof parsed?.ts === "number" && Number.isFinite(parsed.ts) ? parsed.ts : null;
     if (parsed?.agentId !== agentId || (ts !== null && (ts < params.windowStartTs || ts > params.windowEndTs))) continue;
     if (sealedRunReportVerifies(params.workspace, parsed)) {
-      reports.push(parsed as unknown as AssuranceReport);
+      // Sealed but unbacked: a graded row the writer's session does not hold reads as tampered, never as older evidence.
+      if (provenance.check(parsed).ok) { reports.push(parsed as unknown as AssuranceReport); continue; }
+      refused.push({ file, ts, tampered: true });
       continue;
     }
     const seal = parsed.runSealSig;
     refused.push({ file, ts, tampered: typeof seal === "string" && seal.length > 0 && seal !== "unsigned" });
+  }
+  } finally {
+    provenance.close();
   }
   reports.sort((a, b) => b.ts - a.ts);
   const blocking = refusedRunsBlocking(refused, reports[0]?.ts ?? null);

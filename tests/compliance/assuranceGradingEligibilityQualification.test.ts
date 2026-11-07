@@ -1,3 +1,4 @@
+import { backScenarioRows } from "../helpers/provenancedAssurance.js";
 import { spawnSync } from "node:child_process";
 import { verify } from "node:crypto";
 import { mkdirSync, mkdtempSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
@@ -92,8 +93,10 @@ try{
  const now=Date.now(),scenarios=[];
  for(let i=0;i<input.measured;i++)scenarios.push({scenarioId:'operator-measured-'+i,pass:input.score>=50,score0to100:input.score,score0to5:input.score/20,auditEventTypes:input.score<50?['TOOL_GOVERNANCE_SUCCEEDED']:[],inconclusive:false});
  for(let i=0;i<(input.inconclusive??0);i++)scenarios.push({scenarioId:'operator-inconclusive-'+i,pass:false,score0to100:0,score0to5:0,auditEventTypes:[],inconclusive:true});
- const pack={packId:'toolGovernance',score0to100:input.score,scenarioResults:scenarios,...(input.method===undefined?{}:{gradingMethod:input.method}),...(input.eligible===undefined?{}:{regulatedEligible:input.eligible})};
- const base={assuranceRunId:'p0-19-'+input.name,agentId:'default',ts:now,mode:'supervise',windowStartTs:now-1000,windowEndTs:now,trustTier:'OBSERVED',status:'VALID',verificationPassed:true,sessionId:'operator-authored-no-agent-session',...(input.evidenceStatus==='missing'?{}:{evidenceStatus:input.evidenceStatus??'MEASURED'}),packResults:[pack],overallScore0to100:input.score,integrityIndex:1,trustLabel:'OPERATOR_AUTHORED_READER_CONTROL',reportJsonSha256:'',runSealSig:''};
+ // SH-TRUST-02: the operator-authored rows are backed by a sealed runner session, as the gate now requires of every scored row.
+ const backed=backScenarioRows(workspace,{agentId:'default',packId:'toolGovernance',scenarios});
+ const pack={packId:'toolGovernance',score0to100:input.score,scenarioResults:backed.scenarioResults,...(input.method===undefined?{}:{gradingMethod:input.method}),...(input.eligible===undefined?{}:{regulatedEligible:input.eligible})};
+ const base={assuranceRunId:'p0-19-'+input.name,agentId:'default',ts:now,mode:'supervise',windowStartTs:now-1000,windowEndTs:now,trustTier:'OBSERVED',status:'VALID',verificationPassed:true,sessionId:backed.sessionId,...(input.evidenceStatus==='missing'?{}:{evidenceStatus:input.evidenceStatus??'MEASURED'}),packResults:[pack],overallScore0to100:input.score,integrityIndex:1,trustLabel:'OPERATOR_AUTHORED_READER_CONTROL',reportJsonSha256:'',runSealSig:''};
  const digest=sha(canonicalize(base)),ledger=openLedger(workspace);let signature;try{signature=ledger.signRunHash(digest);}finally{ledger.close();}
  const sealed={...base,reportJsonSha256:digest,runSealSig:signature};
  const reportDir=join(getAgentPaths(workspace,'default').reportsDir,'assurance');mkdirSync(reportDir,{recursive:true});const reportPath=join(reportDir,base.assuranceRunId+'.json');writeFileSync(reportPath,JSON.stringify(sealed,null,2)+'\n');

@@ -11,6 +11,7 @@ import { evidenceProducer, PRODUCER_BY_SOURCE } from "../../src/claims/evidenceP
 import { isBoundToControl, subjectRole, verifiedAssuranceByPack } from "../../src/compliance/evidenceBinding.js";
 import type { ComplianceEvidenceRequirement, ComplianceMapping } from "../../src/compliance/mappingSchema.js";
 import type { EvidenceEvent } from "../../src/types.js";
+import { writeProvenancedAssuranceReport } from "../helpers/provenancedAssurance.js";
 
 function event(fields: { meta?: Record<string, unknown> | string; session?: string; type?: string; auditType?: string }): EvidenceEvent {
   return {
@@ -96,6 +97,9 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   "envelope", "lifecycle_bound", "not_governed", "reassessment",
   // Origin of a catalog questionnaire item (P1-53, src/catalog/types.ts QuestionnaireItem.source), never a ledger meta.source.
   "domain_rubric",
+  // An industry pack's entitlement source (src/domains/industryPackEntitlement.ts, free packs lane): a licence record
+  // label, never a ledger meta.source.
+  "free",
 ]);
 
 function sourceFiles(dir: string): string[] {
@@ -172,6 +176,11 @@ describe("verifiedAssuranceByPack", () => {
 
   function write(ws: string, name: string, fields: Record<string, unknown>, seal: boolean): void {
     const now = Date.now();
+    // A sealed report counts only when its graded rows live in its sealed runner session (SH-TRUST-02).
+    if (seal) {
+      writeProvenancedAssuranceReport(ws, { name, packs: [{ packId: name, scenarios: [{ scenarioId: "s1", pass: true }], score0to100: 90 }], extra: fields });
+      return;
+    }
     const base = {
       assuranceRunId: name, agentId: "default", ts: now, windowStartTs: now - 1000, windowEndTs: now,
       status: "VALID", verificationPassed: true, evidenceStatus: "MEASURED", packResults: [{ packId: name, score0to100: 90, scenarioResults: [] }],

@@ -30,6 +30,20 @@ Runs store privacy-safe trace references (`trace.refs.json`) only:
 
 Raw prompts/outputs are not stored by default.
 
+## Provenance Gate (SH-TRUST-02)
+
+A sealed report proves who wrote it; the provenance gate proves its graded rows exist in that writer's own sealed ledger session. Every reader that feeds a pack score forward (`verifiedAssuranceByPack` for compliance, `scanVerifiedAssuranceByPack` for the governor, drift, indices, dashboards and bench, `latestAssuranceReports` for the readiness gate, and `amc assurance cert-issue`) calls one predicate, `src/assurance/reportProvenance.ts`, right after the seal check:
+
+- the report names its runner session (`sessionId`), that session is sealed and its seal verifies against the monitor key;
+- every graded row (`inconclusive !== true`) names its stdin, stdout and test rows, which exist in that session with the same pack, scenario and agent, and the test row's pass/fail agrees with the row;
+- a pack that claims a score or a pass/fail count with no graded row behind it is refused (`PROVENANCE_MISSING`);
+- a report written to the AMC_NO_SIGN store (`evidenceStore`) is refused by signed readers (`PROVENANCE_UNSIGNED_STORE`);
+- when the gateway captured the exchange, its signed request receipt is stored on the stdout row (`requestReceipt`) and its id fills `correlatedRequestIds`; the gate verifies the receipt against the workspace receipt keys and that it names the agent.
+
+A report that graded nothing (every row inconclusive, score 0) has nothing to prove and passes the gate; it still never counts as MEASURED. Refusals surface as `unverifiable[].reason` in compliance, `unverifiedReports` for the governor (which then reads every required pack as missing) and `INSUFFICIENT_EVIDENCE` for the readiness gate. Reports written before this change carry rows the gate can resolve when their runner session is still in the ledger; a report whose session was pruned stops counting, which is the intended effect: re-run `amc assurance run`.
+
+Limits: the gate binds a row to the exchange AMC itself recorded (P0-18, OBSERVED); it does not re-grade the row (`amc assurance verify` does that), and it does not yet match a native-loop session's own rows (SH-TRUST-01 is deferred).
+
 ## Grading Methods and Inconclusive Results
 
 `amc assurance run` and `amc redteam` grade every reply with one rule (`gradeScenarioReply` in `src/assurance/scenarioGrading.ts`). A reply is graded only when its scenario can judge it. Otherwise the row is inconclusive: `pass: false`, both scores 0, `inconclusive: true`, an `ASSURANCE_SCENARIO_INCONCLUSIVE` audit (severity HIGH), and no effect on the pack score. A run in which every row is inconclusive reports `evidenceStatus: "INSUFFICIENT_EVIDENCE"`.

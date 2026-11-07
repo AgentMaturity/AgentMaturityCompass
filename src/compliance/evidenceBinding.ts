@@ -2,6 +2,7 @@ import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import { eventMeta } from "../claims/evidenceProvenance.js";
 import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
+import { ProvenanceChecker } from "../assurance/reportProvenance.js";
 import { getAgentPaths } from "../fleet/paths.js";
 import type { AssurancePackResult, AssuranceReport, EvidenceEvent } from "../types.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
@@ -58,10 +59,10 @@ export interface VerifiedAssurance {
   /** The sealed run each entry of `packs` came from: its id, its time and its verified seal hash. */
   runs: Map<string, { runId: string; ts: number; reportSha256: string }>;
   /**
-   * In-window reports (or unreadable files) whose hash, seal or ledger integrity did not verify; they count for nothing.
-   * `sha256` is of the file bytes.
+   * In-window reports (or unreadable files) whose hash, seal, ledger integrity or provenance did not verify; they count
+   * for nothing. `sha256` is of the file bytes; `reason` names a provenance refusal (SH-TRUST-02), absent for a seal refusal.
    */
-  unverifiable: Array<{ file: string; packIds: string[]; sha256: string }>;
+  unverifiable: Array<{ file: string; packIds: string[]; sha256: string; reason?: string }>;
 }
 
 function readReport(file: string): { report: Partial<AssuranceReport> | null; sha256: string } {
@@ -77,8 +78,9 @@ function readReport(file: string): { report: Partial<AssuranceReport> | null; sh
 
 /**
  * The window logic of `latestAssuranceByPack`, but a report counts only when its seal verifies
- * (`sealedRunReportVerifies`), the run itself verified (status VALID, verificationPassed) and it
- * measured something (evidenceStatus MEASURED; a missing or unknown status counts for nothing).
+ * (`sealedRunReportVerifies`), the run itself verified (status VALID, verificationPassed), its graded rows are backed
+ * by its sealed ledger session (`ProvenanceChecker`, SH-TRUST-02) and it measured something (evidenceStatus MEASURED;
+ * a missing or unknown status counts for nothing).
  */
 export function verifiedAssuranceByPack(params: {
   workspace: string;
@@ -90,6 +92,8 @@ export function verifiedAssuranceByPack(params: {
   const dir = join(getAgentPaths(params.workspace, params.agentId).reportsDir, "assurance");
   if (!pathExists(dir)) return out;
   const latest = new Map<string, { ts: number; pack: AssurancePackResult; runId: string; reportSha256: string }>();
+  const provenance = new ProvenanceChecker(params.workspace);
+  try {
   for (const name of readdirSync(dir).filter((file) => file.endsWith(".json")).sort((a, b) => a.localeCompare(b))) {
     const file = join(dir, name);
     const { report, sha256 } = readReport(file);
@@ -106,6 +110,11 @@ export function verifiedAssuranceByPack(params: {
       out.unverifiable.push({ file, packIds: packResults.map((pack) => String(pack?.packId)), sha256 });
       continue;
     }
+    const backed = provenance.check(report);
+    if (!backed.ok) {
+      out.unverifiable.push({ file, packIds: packResults.map((pack) => String(pack?.packId)), sha256, reason: backed.reason });
+      continue;
+    }
     if (report.evidenceStatus !== "MEASURED") continue;
     for (const pack of packResults) {
       const prior = latest.get(pack.packId);
@@ -113,6 +122,9 @@ export function verifiedAssuranceByPack(params: {
         latest.set(pack.packId, { ts: report.ts, pack, runId: String(report.assuranceRunId), reportSha256: String(report.reportJsonSha256) });
       }
     }
+  }
+  } finally {
+    provenance.close();
   }
   for (const [packId, row] of latest) {
     out.packs.set(packId, row.pack);

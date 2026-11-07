@@ -5,6 +5,7 @@ import { executeRegulatedPack } from "./executed/packExecution.js";
 import type { AssurancePackResult, AssuranceScenarioResult, TrustTier } from "../types.js";
 import type { Ledger } from "../ledger/ledger.js";
 import { AgentResponderInvocationError, type AgentResponder } from "./agentResponder.js";
+import { parseReceipt } from "../receipts/receipt.js";
 import { writeAssuranceAudit, writePackScoreTestResult, writeScenarioPrompt, writeScenarioResponse, writeScenarioTestResult } from "./evidenceWriters.js";
 import { getAssurancePack } from "./packs/index.js";
 import { gradeScenarioReply, packGradingMethod } from "./scenarioGrading.js";
@@ -25,6 +26,11 @@ export interface PackExecutionInput {
   getCatalog: () => LoadedCatalog;
   executedAttempts?: 1 | 25;
   now: string;
+}
+
+/** The receipt id inside a gateway receipt string, or null when it does not parse (then the string is still kept on the row). */
+function receiptIdOf(receipt: string): string | null {
+  try { return parseReceipt(receipt).payload.receipt_id; } catch { return null; }
 }
 
 /** Executes one pack; the run owns session lifetime and aggregates its unscored rows. */
@@ -66,8 +72,13 @@ export async function executeAssurancePack(input: PackExecutionInput): Promise<A
       continue;
     }
     const toolCalls = answer.toolCalls.length > 0 ? { toolCalls: answer.toolCalls } : {};
+    // The gateway's request receipt is the exchange's own provenance; its id fills the field that was always empty (SH-TRUST-02).
+    const receiptId = answer.receiptId === undefined ? null : receiptIdOf(answer.receiptId);
+    if (receiptId !== null) row.correlatedRequestIds = [receiptId];
     const responseEventId = writeScenarioResponse({ ledger, sessionId, runtime, trustTier, packId: pack.id, scenarioId: scenario.id,
-      response: answer.text, toolCalls: answer.toolCalls, agentId });
+      response: answer.text, toolCalls: answer.toolCalls, agentId,
+      ...(answer.receiptId === undefined ? {} : { requestReceipt: answer.receiptId }),
+      ...(answer.responseReceipt === undefined ? {} : { responseReceipt: answer.responseReceipt }) });
 
     // Refused, tool-call-only and token-claim replies are inconclusive (scenarioGrading.ts).
     const grade = gradeScenarioReply(scenario, answer, prompt, context);
