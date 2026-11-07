@@ -58,8 +58,11 @@ Create three local secret files in `deploy/compose/secrets/` before starting: `a
 ```bash
 docker run --rm \
   -p 3210:3210 -p 3211:3211 -p 3212:3212 \
-  --read-only --cap-drop=ALL --security-opt=no-new-privileges \
-  --tmpfs /tmp --tmpfs /home/amc:uid=10001,gid=10001,mode=0700 \
+  --read-only --cap-drop=ALL --security-opt=no-new-privileges --stop-timeout 40 \
+  --tmpfs /tmp \
+  -v amc_state:/home/amc/.config/amc/state \
+  -v amc_control_checkpoints:/workspace \
+  -e AMC_CONTROL_CHECKPOINT_DIR=/workspace/control-checkpoints \
   -e AMC_BOOTSTRAP=1 \
   -e AMC_BIND=0.0.0.0 \
   -e AMC_ALLOWED_CIDRS=127.0.0.1/32,::1/128,172.16.0.0/12,10.0.0.0/8,192.168.0.0/16 \
@@ -75,7 +78,7 @@ docker run --rm \
 
 Studio defaults to bootstrap mode and stops if bootstrap fails. Keep the same data volume and vault secret across restarts. For an already initialized workspace, `AMC_BOOTSTRAP=0` skips bootstrap. Secret values are supplied only at runtime. The example allows private-network client addresses through Docker networking; narrow `AMC_ALLOWED_CIDRS` to your deployment. LAN pairing and authentication remain enabled; open `http://localhost:3212/console` and follow the pairing flow.
 
-The image owns `/data/amc`, `/data/notary`, `/workspace`, and `/home/amc` as UID/GID 10001. Named volumes inherit the image directory ownership on first use. Host bind mounts must already be writable by that user. Read-only root filesystems need the writable data volume and temporary home shown above. An existing volume owned by a different UID needs an operator-managed ownership adjustment before startup; the entrypoint does not run as root or change host permissions.
+The image owns `/data/amc`, `/data/notary`, `/workspace`, and the 0700 home `/home/amc` as UID/GID 10001. Named volumes inherit the image directory ownership on first use. Host bind mounts must already be writable by that user. On the read-only root filesystem, the state volume (`/home/amc/.config/amc/state`: anti-rollback marks and key-set recovery copies) and the checkpoint volume (`/workspace`, with `AMC_CONTROL_CHECKPOINT_DIR=/workspace/control-checkpoints`: signed firewall, guardrail, legal-hold and compiled-control checkpoints) are the only writable paths besides `/data/amc` and `/tmp`. Keep all three volumes together across restarts, backups and rollbacks. Never mount a volume under a tmpfs at `/home/amc`: Docker creates the nested mount point as `root:root 0755`, and Studio refuses an AMC home that is not owner-only. An existing volume owned by a different UID needs an operator-managed ownership adjustment before startup; the entrypoint does not run as root or change host permissions. `--stop-timeout 40` gives Studio time to drain and seal its session on `docker stop`.
 
 The healthcheck uses the installed command `amc studio healthcheck`, which checks `/healthz` and `/readyz`. Explicit CLI mode, such as `amc-studio:local notary start ...`, bypasses Studio bootstrap; disable the Studio healthcheck for long-running non-Studio commands. TLS Compose does this for its notary service.
 

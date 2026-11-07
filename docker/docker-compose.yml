@@ -9,18 +9,24 @@ services:
     image: amc-studio:local
     container_name: amc-studio
     restart: unless-stopped
+    # Studio drains up to 10 s, then seals its session; the default 10 s can kill it before the seal.
+    stop_grace_period: 40s
+    # Loopback by default: AMC_ALLOWED_CIDRS is a request filter, not a bind restriction.
     ports:
-      - "3210:3210"   # Gateway proxy
-      - "3211:3211"   # Transparent proxy
-      - "3212:3212"   # Studio API
-      - "3213:3213"   # Toolhub
-      - "4173:4173"   # Dashboard UI
+      - "${AMC_PUBLISH_ADDRESS:-127.0.0.1}:${AMC_GATEWAY_PORT:-3210}:3210"   # Gateway proxy
+      - "${AMC_PUBLISH_ADDRESS:-127.0.0.1}:${AMC_PROXY_PORT:-3211}:3211"   # Transparent proxy
+      - "${AMC_PUBLISH_ADDRESS:-127.0.0.1}:${AMC_STUDIO_PORT:-3212}:3212"   # Studio API
+      - "${AMC_PUBLISH_ADDRESS:-127.0.0.1}:${AMC_TOOLHUB_PORT:-3213}:3213"   # Toolhub
+      - "${AMC_PUBLISH_ADDRESS:-127.0.0.1}:${AMC_DASHBOARD_PORT:-4173}:4173"   # Dashboard UI
     volumes:
       - amc-data:/data/amc
       # P1-08: anti-rollback marks and key-set recovery copies (<AMC home>/state) must survive a restart.
       - amc-state:/home/amc/.config/amc/state
+      # Signed control journals (firewall, guardrails, legal holds, compiled controls) checkpoint here; must persist and stay outside /data/amc (src/lifecycle/signedControlJournalRecords.ts).
+      - amc_control_checkpoints:/workspace
     environment:
       - NODE_ENV=production
+      - AMC_CONTROL_CHECKPOINT_DIR=/workspace/control-checkpoints
       - AMC_BIND=0.0.0.0
       - AMC_ALLOWED_CIDRS=${AMC_ALLOWED_CIDRS:-127.0.0.1/32,::1/128,172.16.0.0/12,10.0.0.0/8,192.168.0.0/16}
       # Native routes admit only the bind host or these origins; amc-verify calls http://amc-studio:3212.
@@ -37,10 +43,10 @@ services:
       start_period: 20s
     security_opt:
       - no-new-privileges:true
+    # The image owns the 0700 home; the state and checkpoint volumes are its only writable paths besides /data/amc and /tmp.
     read_only: true
     tmpfs:
       - /tmp:noexec,nosuid,size=64m
-      - /home/amc:uid=10001,gid=10001,mode=0700
     secrets:
       - amc_vault_passphrase
       - amc_owner_username
@@ -77,6 +83,8 @@ volumes:
   amc-data:
     driver: local
   amc-state:
+    driver: local
+  amc_control_checkpoints:
     driver: local
 
 secrets:

@@ -6,12 +6,76 @@ import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 import * as YAML from "yaml";
 import { loadStudioRuntimeConfig } from "../src/config/loadConfig.js";
+import { interpolate, serviceEnv } from "./helpers/composeInterpolate.js";
 
 const workspace = fileURLToPath(new URL("../", import.meta.url));
 
 function read(path: string): string {
   return readFileSync(resolve(workspace, path), "utf8");
 }
+
+const COMPOSE_FILES = ["deploy/compose/docker-compose.yml", "deploy/compose/docker-compose.tls.yml",
+  "deploy/compose/docker-compose.studio-api.yml", "docker/docker-compose.yml"] as const;
+/** The Studio services by name: a check keyed on build.target would also catch the notary (studio target, not Studio). */
+const STUDIO_SERVICES = [["deploy/compose/docker-compose.yml", "studio"], ["deploy/compose/docker-compose.tls.yml", "amc-studio"],
+  ["docker/docker-compose.yml", "amc-studio"]] as const;
+const HTTP_STACKS = ["deploy/compose/docker-compose.yml", "docker/docker-compose.yml"] as const;
+type ComposeService = { tmpfs?: string | string[]; volumes?: (string | { target?: string })[]; ports?: string[];
+  environment?: string[] | Record<string, unknown>; stop_grace_period?: string; restart?: string };
+const composeServices = (path: string): Record<string, ComposeService> => YAML.parse(read(path)).services;
+/** Container path of a volume entry: `src:dst[:opts]` or the long form's `target`. */
+const volumeTarget = (entry: string | { target?: string }) => typeof entry === "string" ? entry.split(":")[1] ?? entry : entry.target;
+
+describe("compose runtime layout (LIVE-DEPLOY-01)", () => {
+  it("mounts no volume beneath a tmpfs path (docker-helm 2026-11-07)", () => {
+    // Docker creates the mount point of a volume nested in a tmpfs as root:root 0755, which assertOwnerOnly refuses.
+    const nested: string[] = [];
+    for (const file of COMPOSE_FILES) {
+      for (const [name, service] of Object.entries(composeServices(file))) {
+        const tmpfs = [service.tmpfs ?? []].flat().map((entry) => entry.split(":")[0]!);
+        for (const target of (service.volumes ?? []).map(volumeTarget)) {
+          for (const path of tmpfs) if (target === path || target?.startsWith(`${path}/`)) nested.push(`${file} ${name}: ${target} under tmpfs ${path}`);
+        }
+      }
+    }
+    expect(nested).toEqual([]);
+  });
+
+  it("persists the signed-control checkpoint root outside /data/amc", () => {
+    for (const [file, name] of STUDIO_SERVICES) {
+      const service = composeServices(file)[name]!;
+      expect(serviceEnv(service).AMC_CONTROL_CHECKPOINT_DIR, `${file} ${name}`).toBe("/workspace/control-checkpoints");
+      expect((service.volumes ?? []).map(volumeTarget), `${file} ${name}`).toContain("/workspace");
+    }
+    const dockerRun = /```bash\ndocker run --rm \\\n[\s\S]*?```/.exec(read("docker/README.md"))?.[0] ?? "";
+    expect(dockerRun).toContain("-e AMC_CONTROL_CHECKPOINT_DIR=/workspace/control-checkpoints");
+    expect(dockerRun).toContain("-v amc_control_checkpoints:/workspace");
+    expect(dockerRun).toContain("-v amc_state:/home/amc/.config/amc/state");
+    expect(dockerRun).not.toContain("--tmpfs /home/amc");
+  });
+
+  it("gives Studio a stop grace period and a restart policy", () => {
+    // Studio drains up to 10 s before it seals its session; Docker's 10 s default can kill it first.
+    for (const [file, name] of [...STUDIO_SERVICES, ["deploy/compose/docker-compose.studio-api.yml", "amc-api"]] as const) {
+      expect(composeServices(file)[name]!.stop_grace_period, `${file} ${name}`).toBe("40s");
+    }
+    expect(composeServices("deploy/compose/docker-compose.yml").studio!.restart).toBe("unless-stopped");
+  });
+
+  it("publishes HTTP ports on loopback unless AMC_PUBLISH_ADDRESS says otherwise", () => {
+    for (const file of HTTP_STACKS) {
+      for (const [name, service] of Object.entries(composeServices(file))) {
+        for (const port of service.ports ?? []) expect(port, `${file} ${name}`).toMatch(/^\$\{AMC_PUBLISH_ADDRESS:-127\.0\.0\.1\}:/);
+      }
+    }
+    const studioPort = (env: Record<string, string>) => composeServices("deploy/compose/docker-compose.yml").studio!.ports!
+      .map((port) => interpolate(port, env)).find((port) => port.endsWith(":3212"));
+    expect(studioPort({})).toBe("127.0.0.1:3212:3212");
+    expect(studioPort({ AMC_STUDIO_PORT: "47123" })).toBe("127.0.0.1:47123:3212");
+    expect(studioPort({ AMC_PUBLISH_ADDRESS: "0.0.0.0" })).toBe("0.0.0.0:3212:3212");
+    expect(read("deploy/compose/.env.example")).toMatch(/^AMC_PUBLISH_ADDRESS=127\.0\.0\.1$/m);
+  });
+});
 
 describe("deployment pack assets", () => {
   it("includes docker runtime assets", () => {

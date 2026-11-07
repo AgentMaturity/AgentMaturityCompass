@@ -43,9 +43,12 @@ services:
     image: amc-studio:local
     container_name: amc-studio
     restart: unless-stopped
+    # Studio drains up to 10 s, then seals its session; the default 10 s can kill it before the seal.
+    stop_grace_period: 40s
     environment:
       AMC_BOOTSTRAP: ${AMC_BOOTSTRAP:-1}
       AMC_WORKSPACE_DIR: /data/amc
+      AMC_CONTROL_CHECKPOINT_DIR: /workspace/control-checkpoints
       AMC_BIND: 0.0.0.0
       AMC_STUDIO_PORT: 3212
       AMC_GATEWAY_PORT: 3210
@@ -72,15 +75,17 @@ services:
       - amc_data:/data/amc
       # P1-08: anti-rollback marks and key-set recovery copies (<AMC home>/state) must survive a restart.
       - amc_state:/home/amc/.config/amc/state
+      # Signed control journals (firewall, guardrails, legal holds, compiled controls) checkpoint here; must persist and stay outside /data/amc (src/lifecycle/signedControlJournalRecords.ts).
+      - amc_control_checkpoints:/workspace
     secrets:
       - amc_vault_passphrase
       - amc_owner_username
       - amc_owner_password
       - amc_notary_auth_secret
+    # The image owns the 0700 home; the state and checkpoint volumes are its only writable paths besides /data/amc and /tmp.
     read_only: true
     tmpfs:
       - /tmp
-      - /home/amc:uid=10001,gid=10001,mode=0700
     cap_drop:
       - ALL
 
@@ -114,6 +119,8 @@ volumes:
     name: amc_notary_data
   amc_state:
     name: amc_state
+  amc_control_checkpoints:
+    name: amc_control_checkpoints
   caddy_data:
   caddy_config:
 

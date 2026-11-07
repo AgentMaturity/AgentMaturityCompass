@@ -122,6 +122,7 @@ test_model.pkl
 # filling in real values cannot commit them by accident.
 deploy/compose/secrets/*.txt
 !deploy/compose/secrets/*.txt.example
+deploy/compose/.env
 deploy/k8s/secret.yaml
 !deploy/k8s/secret.example.yaml
 

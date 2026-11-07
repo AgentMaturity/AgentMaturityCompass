@@ -7,6 +7,8 @@ services:
       target: api
     image: amc-api:local
     restart: unless-stopped
+    # Same stop budget as Studio and deploy/k8s (40 s), so a recreate lets in-flight requests finish.
+    stop_grace_period: 40s
     environment:
       PORT: "3220"
       NODE_ENV: production
@@ -16,10 +18,10 @@ services:
       - amc_data:/data/amc:ro
       # P1-08: anti-rollback marks and key-set recovery copies (<AMC home>/state) must survive a restart.
       - amc_api_state:/home/amc/.config/amc/state
+    # The image owns the 0700 home; the state volume is its only writable path besides /tmp.
     read_only: true
     tmpfs:
       - /tmp
-      - /home/amc:uid=10001,gid=10001,mode=0700
     cap_drop:
       - ALL
     security_opt:
