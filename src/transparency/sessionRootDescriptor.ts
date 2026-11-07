@@ -78,12 +78,12 @@ function readMeta(event: EvidenceEvent): Record<string, unknown> {
 
 /**
  * Per-row integrity for ONE session: the hash pre-image, the writer signature,
- * and the envelope chain. The global `prev_event_hash` chain is deliberately not
+ * and the envelope chain. Exported for `amc session export` (SH-OBS-03), which
+ * verifies the same rules against the one key an export embeds. The global `prev_event_hash` chain is deliberately not
  * checked here (a session slice cannot be) — `verifyLedgerIntegrity` and
  * `verifyStoredSessionEvents` remain the authority for that.
  */
-function verifySessionRows(workspace: string, rows: readonly EvidenceEvent[], errors: string[]): void {
-  const monitorKeys = getPublicKeyHistory(workspace, "monitor");
+export function verifySessionRows(monitorKeys: readonly string[], rows: readonly EvidenceEvent[], errors: string[]): void {
   let expectedSeq = 0;
   let expectedPrevHash = SESSION_GENESIS;
   for (const event of rows) {
@@ -100,7 +100,7 @@ function verifySessionRows(workspace: string, rows: readonly EvidenceEvent[], er
     if (sha256Hex(`${event.prev_event_hash}${canonicalMetadata}${event.payload_sha256}`) !== event.event_hash) {
       errors.push(`Event ${event.id} event_hash mismatch`);
     }
-    if (!verifyHexDigestAny(event.event_hash, event.writer_sig, monitorKeys)) {
+    if (!verifyHexDigestAny(event.event_hash, event.writer_sig, [...monitorKeys])) {
       errors.push(`Event ${event.id} writer signature invalid`);
     }
 
@@ -128,8 +128,8 @@ function verifySessionRows(workspace: string, rows: readonly EvidenceEvent[], er
   }
 }
 
-function verifySeal(
-  workspace: string,
+export function verifySeal(
+  monitorKeys: readonly string[],
   record: SessionRecord | null,
   rows: readonly EvidenceEvent[],
   sessionId: string,
@@ -156,7 +156,7 @@ function verifySeal(
   // session ended here". Same pairing as `verifySessionRecords`.
   if (
     record.session_seal_sig === null ||
-    !verifyHexDigestAny(record.session_final_event_hash, record.session_seal_sig, getPublicKeyHistory(workspace, "monitor"))
+    !verifyHexDigestAny(record.session_final_event_hash, record.session_seal_sig, [...monitorKeys])
   ) {
     errors.push(`Session ${sessionId} seal signature invalid`);
   }
@@ -220,8 +220,9 @@ export function buildSessionRootDescriptor(params: {
   if (rows.length === 0) {
     throw new SessionAnchorError(sessionId, [...errors, `session ${sessionId} has no events`]);
   }
-  verifySessionRows(workspace, rows, errors);
-  verifySeal(workspace, record, rows, sessionId, errors);
+  const monitorKeys = getPublicKeyHistory(workspace, "monitor");
+  verifySessionRows(monitorKeys, rows, errors);
+  verifySeal(monitorKeys, record, rows, sessionId, errors);
 
   const openEvent = rows[0]!;
   const closeEvent = rows[rows.length - 1]!;
