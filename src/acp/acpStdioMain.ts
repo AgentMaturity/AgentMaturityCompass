@@ -12,6 +12,7 @@ import type { CompactionConfig } from "../agent/loopTypes.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import { checkToolsetReadiness } from "../agent/agentToolset.js";
 import { NativeMcpConfigError, reviewNativeMcpConfigurations } from "../setup/nativeMcpConfig.js";
+import { mergeScopedMcpSelection } from "../mcp/mcpScopes.js";
 import { loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ToolApprovalGateOptions } from "../agent/approvalGate.js";
@@ -124,6 +125,8 @@ export interface AcpStdioInit {
   readonly approveRisk?: string;
   readonly mcpConfig?: string | readonly string[];
   readonly mcpConfigSha256?: string | readonly string[];
+  /** Scoped server ids (SH-EXT-02), resolved to paths and pins before the review. */
+  readonly mcp?: readonly string[];
   readonly credentialsHome?: string;
   readonly credentialsFile?: string;
   readonly credentialsMode?: "layered" | "operator-only";
@@ -182,6 +185,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   if (actionClass !== undefined && tools !== "workspace") throw new Error("ACP tool approvals require explicit --tools workspace.");
   const approval: ToolApprovalGateOptions | undefined = actionClass === undefined ? undefined : {
     actionClass: actionClass as ToolApprovalGateOptions["actionClass"], riskTier: riskTier as ToolApprovalGateOptions["riskTier"] };
+  init = mergeScopedMcpSelection(init, init.workspace);
   if (init.mcpConfigSha256 !== undefined && init.mcpConfig === undefined) throw new NativeMcpConfigError("ACP MCP digest pin requires an explicit config path.", "mcp-config-unpaired");
   if (init.mcpConfig !== undefined && (tools !== "workspace" || !approval)) throw new Error("ACP MCP requires --tools workspace and --approve-tools.");
   const mcpPaths = init.mcpConfig === undefined ? [] : typeof init.mcpConfig === "string" ? [init.mcpConfig] : init.mcpConfig;

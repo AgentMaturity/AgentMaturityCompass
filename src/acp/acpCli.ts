@@ -60,6 +60,7 @@ export function registerAcpCommands(program: Command): void {
     .option("--approve-risk <tier>", "Signed approval risk tier; requires --approve-tools")
     .option("--mcp-config <path>", "Reviewed native MCP config; repeat for more servers; requires workspace tools and signed approvals", (path: string, previous: string[] = []) => [...previous, path])
     .option("--mcp-config-sha256 <digest>", "Pin exact reviewed MCP configuration bytes; one per --mcp-config in the same order", (digest: string, previous: string[] = []) => [...previous, digest])
+    .option("--mcp <id>", "Mount a scoped MCP server by id (project:<id> or user:<id> when both exist); repeatable", (id: string, previous: string[] = []) => [...previous, id])
     .option("--max-tokens <n>", "Positive output-token bound per model request", "512")
     .option("--thinking <mode>", "DeepSeek only: enabled (default) or disabled")
     .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high (default), or max with enabled thinking")
@@ -91,6 +92,7 @@ export function registerAcpCommands(program: Command): void {
       approveRisk?: string;
       mcpConfig?: string[];
       mcpConfigSha256?: string[];
+      mcp?: string[];
       maxTokens: string;
       thinking?: string;
       reasoningEffort?: string;
@@ -141,6 +143,7 @@ export function registerAcpCommands(program: Command): void {
           ...(opts.approveRisk === undefined ? {} : { approveRisk: opts.approveRisk }),
           ...(opts.mcpConfig === undefined ? {} : { mcpConfig: opts.mcpConfig }),
           ...(opts.mcpConfigSha256 === undefined ? {} : { mcpConfigSha256: opts.mcpConfigSha256 }),
+          ...(opts.mcp === undefined ? {} : { mcp: opts.mcp }),
           ...(opts.model === undefined ? {} : { model: opts.model }),
           ...(opts.baseUrl === undefined ? {} : { baseUrl: opts.baseUrl }),
           ...(opts.credential === undefined ? {} : { credential: opts.credential })

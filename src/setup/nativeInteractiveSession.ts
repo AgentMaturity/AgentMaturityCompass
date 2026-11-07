@@ -6,6 +6,7 @@ import { renderNativeRunDiagnostics } from "../agent/nativeFailureGuidance.js";
 import { parseNativeChatResult, type NativeChatChildSummary } from "./nativeChatResult.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import { reviewNativeMcpConfigurations, NativeMcpConfigError } from "./nativeMcpConfig.js";
+import { mergeScopedMcpSelection } from "../mcp/mcpScopes.js";
 import { inspectNativeFirstUse, renderNativeFirstUseGuide, renderNativeGuideCommand } from "./nativeFirstUseGuide.js";
 import { resolveNativeChatProfile, nativeChatProfileArgv, assertNativeChatProfileCurrent, type NativeChatProfileOptions } from "./nativeChatProfile.js";
 import { createNativeInteractiveApprovals } from "./nativeInteractiveApprovals.js";
@@ -35,6 +36,8 @@ export interface NativeChatOptions extends NativeChatProfileOptions {
   /** One reviewed config per server; each grant keeps its signed action class. */
   readonly mcpConfig?: readonly string[];
   readonly mcpConfigSha256?: readonly string[];
+  /** Scoped server ids (SH-EXT-02), resolved to paths and pins before the review. */
+  readonly mcp?: readonly string[];
   readonly approveTools?: string;
   readonly approveRisk?: string;
   readonly tools?: string;
@@ -255,6 +258,8 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         (options.approveRisk !== undefined && approvalClass === undefined)) {
       io.error("Choose a valid --approve-tools action class and --approve-risk low, medium, high, or critical."); io.fail(); return;
     }
+    try { options = mergeScopedMcpSelection(options, cwd); }
+    catch (error) { io.error(error instanceof Error ? error.message : "MCP scope resolution refused."); io.fail(); return; }
     if (options.mcpConfigSha256 !== undefined && options.mcpConfig === undefined) {
       io.error("--mcp-config-sha256 requires --mcp-config."); io.fail(); return;
     }

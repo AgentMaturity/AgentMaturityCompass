@@ -6,6 +6,7 @@ import { Command } from "commander";
 import chalk from "chalk";
 import { INDUSTRY_PACKS } from "../domains/industryPacks.js";
 import { startMcpServer, MCP_TOOL_METADATA } from "./amcMcpServer.js";
+import { registerMcpScopeCommands } from "./mcpScopesCli.js";
 
 const CLAUDE_CODE_CONFIG = {
   mcpServers: {
@@ -51,7 +52,8 @@ const VERIFIED_INSTALL_COMMAND = process.platform === "win32"
 export function registerMcpCommands(program: Command): void {
   const mcp = program
     .command("mcp")
-    .description("AMC Model Context Protocol (MCP) server for AI coding assistants");
+    .description("AMC Model Context Protocol (MCP) server for AI coding assistants, and scoped MCP server configs for the native loop");
+  registerMcpScopeCommands(mcp);
 
   // amc mcp serve
   mcp
