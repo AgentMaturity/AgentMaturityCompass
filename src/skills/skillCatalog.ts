@@ -42,7 +42,7 @@ export interface Skill {
   /** `disable-model-invocation: true`: loads on `/name` only, never advertised to or loaded by the model. */
   readonly disableModelInvocation?: true;
   /** Every frontmatter field as written, for a layout whose validator reads more than name and description. */
-  readonly fields: Readonly<Record<string, string>>;
+  readonly fields?: Readonly<Record<string, string>>;
 }
 
 /**

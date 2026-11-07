@@ -34,7 +34,7 @@ export const MAX_PLAN_NODES = 64;
 export const MAX_PLAN_DEPTH = 16;
 export const MAX_PLAN_BYTES = 256 * 1024;
 
-export interface WorkflowLeaf {
+interface WorkflowLeaf {
   readonly id: string;
   readonly runAs: string;
   readonly goal: string;

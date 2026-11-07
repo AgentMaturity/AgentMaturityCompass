@@ -16,7 +16,6 @@ import { applyAgentDefinition, type AgentDefinition } from "../src/agent/agentDe
 import { createForeignRunner } from "../src/agent/foreignSubagentRunner.js";
 import { credentialRef } from "../src/credentials/credentialRef.js";
 import { FixedCredentials, LOOP_MODEL, LOOP_PROVIDER, scriptedAdapter, silentTransport, textStep, toolStep } from "./helpers/agentLoopHarness.js";
-import type { StreamChunk } from "../src/llm/adapter/adapterTypes.js";
 
 /**
  * A real child under a definition (SH-ORCH-01): the tool allowlist is applied
@@ -44,7 +43,7 @@ function workspace(): string {
   return dir;
 }
 
-function runnerFor(dir: string, scripts: StreamChunk[][], maxStepsPerTurn = 8) {
+function runnerFor(dir: string, scripts: ReturnType<typeof textStep>[], maxStepsPerTurn = 8) {
   const registry = new AdapterRegistry();
   registry.register({ providerId: LOOP_PROVIDER, adapter: scriptedAdapter(scripts), baseUrl: "https://api.anthropic.invalid",
     credentialRef: credentialRef("AMC_LOOP_TEST_KEY"), models: [LOOP_MODEL] });
@@ -114,7 +113,7 @@ describe("a real child under a definition", () => {
   it("is refused by a foreign runner, which cannot enforce the definition", async () => {
     const dir = workspace();
     const runner = createForeignRunner({ workspace: dir, spawn: () => ({ command: "false", args: [] }), governedEnv: () => ({ env: {}, lease: "lease" }) });
-    const result = await runner({ continuable: false, toolsetAgentId: "payments-agent", identity: { runAs: "r", governedAs: "payments-agent", depth: 1 },
+    const result = await runner({ continuable: false, toolsetAgentId: "payments-agent", identity: { runAs: "r", governedAs: "payments-agent", parent: "payments-agent", depth: 1 },
       childSessionId: "foreign-child", goal: "g", agentDefinition: { name: "reviewer", sha256: "c".repeat(64) } });
     expect(result.ok).toBe(false);
     expect(result.reason).toMatch(/foreign child cannot run under agent definition "reviewer"/);

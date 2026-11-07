@@ -65,7 +65,7 @@ const KNOWN_FIELDS = new Set(["name", "description", "tools", "scope", "timeoutM
 const TOOL_NAME = /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$/;
 const MAX_BODY_BYTES = 16 * 1024;
 const MAX_DESCRIPTION_CHARS = 512;
-export const MAX_AGENT_DEFINITION_STEPS = 256;
+const MAX_AGENT_DEFINITION_STEPS = 256;
 
 /** Beside the skill layers: `<home>/agents` and every `.amc/agents` on the repository chain. */
 export function agentDefinitionRoots(workspace: string, amcHome?: string): string[] {
@@ -80,12 +80,12 @@ function list(raw: string): string[] {
 
 function validate(entry: Skill): AgentDefinition | SkillProblem {
   const refuse = (reason: string): SkillProblem => ({ name: entry.name, sourcePath: entry.sourcePath, reason });
-  const unknown = Object.keys(entry.fields).filter(key => !KNOWN_FIELDS.has(key));
+  const fields = entry.fields ?? {};
+  const unknown = Object.keys(fields).filter(key => !KNOWN_FIELDS.has(key));
   if (unknown.length > 0) return refuse(`unknown frontmatter field(s) ${unknown.map(key => JSON.stringify(key)).join(", ")}; a definition only narrows: tools, scope, timeoutMs, maxSteps, model`);
   if (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(entry.name)) return refuse("agent name must be lowercase letters, digits and dashes, at most 64 characters");
   if (entry.description.length > MAX_DESCRIPTION_CHARS) return refuse(`description exceeds ${MAX_DESCRIPTION_CHARS} characters`);
   if (Buffer.byteLength(entry.body, "utf8") > MAX_BODY_BYTES) return refuse(`body exceeds ${MAX_BODY_BYTES} bytes`);
-  const fields = entry.fields;
   if (fields["model"] !== undefined && fields["model"] !== "inherit") {
     return refuse("model must be \"inherit\": a definition cannot choose a model, provider or route (the parent's is pinned)");
   }
