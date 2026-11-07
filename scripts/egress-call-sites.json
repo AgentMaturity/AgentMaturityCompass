@@ -220,25 +220,25 @@
       "reason": "Private drift webhook receives captured explicit workspace and agent from dispatchAlert; prepared URL/options/secret headers are checked as callback immediately before requestImpl. Classes/purpose remain unknown. Native HTTP does not follow redirects; typed refusal rejects unchanged. Source-only; prior channel sends, monitor error suppression, unpinned DNS, no timeout/body cap and separate config/signature reads remain limits."
     },
     {
-      "siteId": "src/e2e/smoke.ts:168:1",
+      "siteId": "src/e2e/smoke.ts:172:1",
       "path": "src/e2e/smoke.ts",
-      "line": 168,
+      "line": 172,
       "call": "fetch(",
       "status": "deferred",
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/e2e/smoke.ts:190:1",
+      "siteId": "src/e2e/smoke.ts:194:1",
       "path": "src/e2e/smoke.ts",
-      "line": 190,
+      "line": 194,
       "call": "fetch(",
       "status": "deferred",
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/e2e/smoke.ts:211:1",
+      "siteId": "src/e2e/smoke.ts:215:1",
       "path": "src/e2e/smoke.ts",
-      "line": 211,
+      "line": 215,
       "call": "fetch(",
       "status": "deferred",
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."

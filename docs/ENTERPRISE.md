@@ -2,7 +2,7 @@
 
 ## What Enterprise adds
 
-The whole AMC product, the trust stack and all 41 Industry Packs, is free and MIT licensed (Industry Packs in the current source build; see [Industry Packs are free](#industry-packs-are-free)). Enterprise is a contact-first plan, not a self-serve product, and adds services only:
+The whole AMC product, the trust stack and all 41 Industry Packs, is free and MIT licensed (Industry Packs in the current source build; the published 1.1.1 release still asks for a licence for them). Enterprise is a contact-first plan, not a self-serve product, and adds services only:
 
 1. **Priority support** — faster response times and dedicated channels
 2. **Custom pack development** — bespoke domain packs for your specific regulatory or industry needs

@@ -52,8 +52,9 @@ async function execAmcCommand(command: string, ctx: ReplContext): Promise<{ outp
     let output = "";
     const proc = spawn(process.execPath, [bin, ...args], {
       stdio: ["inherit", "pipe", "pipe"],
-      // Colour for the piped child unless the operator asked for none: FORCE_COLOR beside NO_COLOR makes Node warn.
-      env: { ...process.env, ...(process.env.NO_COLOR ? {} : { FORCE_COLOR: "1" }), AMC_REPL: "1" },
+      // The piped child follows this shell's colour decision (chalk already honours NO_COLOR, --no-color,
+      // FORCE_COLOR=0, TERM=dumb and a non-TTY); FORCE_COLOR beside NO_COLOR would also make Node warn.
+      env: { ...process.env, ...(chalk.level > 0 ? { FORCE_COLOR: String(chalk.level) } : {}), AMC_REPL: "1" },
       cwd: process.cwd(),
     });
 

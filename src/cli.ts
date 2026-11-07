@@ -5848,7 +5848,7 @@ program
             const val = Math.max(0, Math.min(5, ds.values[i] ?? 0));
             const blocks = Math.round(val * 6);
             const color = ds.label === datasets[0]?.label ? "#4AEF79" : "#FFB347";
-            bar += " " + chalk.hex(color)("█".repeat(blocks)).padEnd(blocks < 30 ? 30 : blocks) + ` ${val.toFixed(1)}`;
+            bar += " " + chalk.hex(color)("█".repeat(blocks).padEnd(blocks < 30 ? 30 : blocks)) + ` ${val.toFixed(1)}`;
           }
           lines.push(bar);
         }
