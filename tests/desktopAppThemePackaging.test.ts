@@ -131,8 +131,10 @@ describe("desktop app packaging and visual identity", () => {
     expect(app).toContain("status.policyCommitted");
     expect(app).toContain("status.mirrorExists");
     expect(app).toContain("const launchCommand = demoMode");
-    expect(app).toContain('setAttribute("aria-label", "Toggle navigation")');
-    expect(app).toContain('nav.classList.toggle("mobile-nav-open"');
+    // LIVE-UX-02: the phone menu toggle lives in the shared shell, which reaches pages that do not load app.js.
+    const shell = read("src/console/assets/shell.js");
+    expect(shell).toContain('setAttribute("aria-label", "Toggle navigation")');
+    expect(shell).toContain('nav.classList.toggle("mobile-nav-open"');
     const worker = read("src/console/assets/sw.js");
     expect(worker).toMatch(/const CACHE_NAME = "amc-console-v[1-9]\d*";/);
     const staticAssets = worker.match(/function staticAssets\(\) \{([\s\S]*?)\n\}/)?.[1];

@@ -4,6 +4,7 @@ import { apiGet, apiPost, getAdminToken, getCurrentUser, login, logout, onClaims
 import { installClaimStrip } from "./components/claimBadge.js";
 import { industryPackDetailHtml } from "./industryPackView.js";
 import { renderBars, renderLine } from "./charts.js";
+import { decorateNav } from "./shell.js";
 import { renderQrLike } from "./qr.js";
 import { renderPluginTable } from "./components/pluginTable.js";
 import { renderPluginDetail } from "./components/pluginDetail.js";
@@ -250,29 +251,7 @@ function currentWorkspaceLabel() {
 }
 
 function decorateShell() {
-  const nav = document.querySelector("nav");
-  if (nav && !nav.querySelector(".mobile-nav-toggle")) {
-    nav.id = nav.id || "amc-main-navigation";
-    const toggle = document.createElement("button");
-    toggle.type = "button";
-    toggle.className = "mobile-nav-toggle";
-    toggle.setAttribute("aria-label", "Toggle navigation");
-    toggle.setAttribute("aria-controls", nav.id);
-    toggle.setAttribute("aria-expanded", "false");
-    toggle.title = "Toggle navigation";
-    toggle.innerHTML = '<span class="mobile-nav-icon" aria-hidden="true"></span>';
-    toggle.addEventListener("click", () => {
-      const open = nav.classList.toggle("mobile-nav-open");
-      toggle.setAttribute("aria-expanded", String(open));
-    });
-    nav.insertBefore(toggle, nav.querySelector("a"));
-  }
-
-  document.querySelectorAll("nav a").forEach((anchor) => {
-    const href = anchor.getAttribute("href") || "";
-    const normalizedHref = href.replace(/^\.\//, "").replace(/\.html$/, "");
-    anchor.classList.toggle("active", normalizedHref === page);
-  });
+  decorateNav(document.querySelector("nav"), page);
 
   const main = document.querySelector("main");
   if (!main || main.querySelector(".topbar")) {
@@ -1220,6 +1199,7 @@ async function refreshUnifiedBanner() {
         <span><strong>Transparency:</strong> ${transparency.ok ? "OK" : "BROKEN"}</span>
       </div>
     `;
+    bannerEl.hidden = false;
   } catch {
     try {
       const snapshot = await fetch(withConsolePath("/snapshot")).then((res) => res.json());
@@ -1230,8 +1210,10 @@ async function refreshUnifiedBanner() {
           <span><strong>Current agent:</strong> ${htmlEscape(snapshot?.studio?.currentAgent || "default")}</span>
         </div>
       `;
+      bannerEl.hidden = false;
     } catch {
       bannerEl.innerHTML = `<strong>Unified Clarity</strong> <span class="muted">Unavailable.</span>`;
+      bannerEl.hidden = false;
     }
   }
 }
