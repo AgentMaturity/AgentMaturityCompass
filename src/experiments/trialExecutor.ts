@@ -48,7 +48,7 @@ export interface TrialRunInput {
   readonly signal: AbortSignal;
 }
 
-type TrialRunResult = { readonly ok: true } | { readonly ok: false; readonly reason: string };
+export type TrialRunResult = { readonly ok: true } | { readonly ok: false; readonly reason: string };
 export type TrialRunner = (input: TrialRunInput) => Promise<TrialRunResult>;
 
 export interface TrialLimits {
@@ -132,7 +132,8 @@ function writeTrialRow(workspace: string, sessionId: string, stamp: TrialRunInpu
   }
 }
 
-async function runBounded(runner: TrialRunner, input: Omit<TrialRunInput, "signal">, timeoutMs: number): Promise<TrialRunResult> {
+/** One execution under a wall-clock limit: abort on timeout, then a bounded grace for the session to settle. Shared with eval suites. */
+export async function runBounded(runner: TrialRunner, input: Omit<TrialRunInput, "signal">, timeoutMs: number): Promise<TrialRunResult> {
   const controller = new AbortController();
   let timer: NodeJS.Timeout | undefined;
   const run = Promise.resolve().then(() => runner({ ...input, signal: controller.signal }))

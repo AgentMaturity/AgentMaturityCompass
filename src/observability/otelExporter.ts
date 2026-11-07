@@ -3,7 +3,12 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import { getWorkspaceScope, withWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import type { Incident } from "../incidents/incidentTypes.js";
 import type { EvidenceEvent, TrustTier } from "../types.js";
-import { dispatchTelemetryRequest, type PreparedTelemetryRequest } from "./otelExportTransport.js";
+import { canonicalize } from "../utils/json.js";
+import { dispatchTelemetryRequest, type PreparedTelemetryRequest, type TelemetryDispatchOptions } from "./otelExportTransport.js";
+import { resolveOtelEnvConfig } from "./otelEnvConfig.js";
+import { NativeSpanFolder, type FoldOutput } from "./nativeSessionSpans.js";
+import { msToNanos, otelAttr as attr, type OTelAttribute, type OTelMetricPoint, type OTelSpan } from "./otelValues.js";
+import { toZipkinSpans } from "./otelZipkin.js";
 import { noteTelemetryDropped } from "./telemetryDrops.js";
 
 export type ObservabilitySignal = "traces" | "metrics" | "logs";
@@ -14,6 +19,8 @@ export interface ObservabilityExporterTarget {
   endpoint: string;
   headers?: Record<string, string>;
   enabledSignals?: Partial<Record<ObservabilitySignal, boolean>>;
+  /** Signal-specific OTLP endpoints, used verbatim (OTEL_EXPORTER_OTLP_<SIGNAL>_ENDPOINT). */
+  signalEndpoints?: Partial<Record<ObservabilitySignal, string>>;
 }
 
 export interface ObservabilityOTELConfig {
@@ -23,6 +30,8 @@ export interface ObservabilityOTELConfig {
   resourceAttributes?: Record<string, string>;
   targets: ObservabilityExporterTarget[];
   maxBufferSize: number;
+  /** Why the exporter is off although export was asked for (unsupported protocol, no target). */
+  disabledReason?: string | null;
 }
 
 export interface ScoreComputationMetric {
@@ -51,34 +60,7 @@ export interface IncidentLogInput {
   ts?: number;
 }
 
-interface OTelAnyValue {
-  stringValue?: string;
-  intValue?: number;
-  doubleValue?: number;
-  boolValue?: boolean;
-}
-
-interface OTelAttribute {
-  key: string;
-  value: OTelAnyValue;
-}
-
-interface BufferedSpan {
-  traceId: string;
-  spanId: string;
-  parentSpanId?: string;
-  name: string;
-  startTimeUnixNano: string;
-  endTimeUnixNano: string;
-  kind: number;
-  attributes: OTelAttribute[];
-  status: { code: number; message?: string };
-  events: Array<{
-    name: string;
-    timeUnixNano: string;
-    attributes: OTelAttribute[];
-  }>;
-}
+type BufferedSpan = OTelSpan;
 
 interface BufferedMetric {
   metricName: string;
@@ -86,6 +68,20 @@ interface BufferedMetric {
   ts: number;
   value: number;
   attributes: OTelAttribute[];
+}
+
+/** One delta stream, aggregated between flushes: a sum, or a histogram with fixed explicit bounds. */
+interface AggregatedStream {
+  readonly kind: "sum" | "histogram";
+  readonly name: string;
+  readonly unit: string;
+  readonly attributes: readonly OTelAttribute[];
+  readonly startTs: number;
+  count: number;
+  sum: number;
+  min: number;
+  max: number;
+  readonly bucketCounts: number[];
 }
 
 interface BufferedLog {
@@ -100,6 +96,7 @@ interface BufferedBatch {
   spans: BufferedSpan[];
   metrics: BufferedMetric[];
   logs: BufferedLog[];
+  streams: AggregatedStream[];
 }
 interface CapturedWorkspace {
   workspace: string | undefined;
@@ -148,24 +145,11 @@ const DEFAULT_CONFIG: ObservabilityOTELConfig = {
 const DEFAULT_FLUSH_TIMEOUT_MS = 5_000;
 const DEFAULT_FLUSH_MAX_RETRIES = 1;
 const DEFAULT_FLUSH_RETRY_BASE_DELAY_MS = 200;
+/** Seconds; the GenAI convention's duration buckets, reused for tool durations. */
+const DURATION_BOUNDS = [0.01, 0.02, 0.04, 0.08, 0.16, 0.32, 0.64, 1.28, 2.56, 5.12, 10.24, 20.48, 40.96, 81.92];
+const AGGREGATION_TEMPORALITY_DELTA = 1;
 
 const TRUST_TIER_ORDER: TrustTier[] = ["SELF_REPORTED", "ATTESTED", "OBSERVED", "OBSERVED_HARDENED"];
-
-function attr(key: string, value: string | number | boolean | undefined | null): OTelAttribute | null {
-  if (value === undefined || value === null) {
-    return null;
-  }
-  if (typeof value === "string") {
-    return { key, value: { stringValue: value } };
-  }
-  if (typeof value === "number") {
-    if (Number.isInteger(value)) {
-      return { key, value: { intValue: value } };
-    }
-    return { key, value: { doubleValue: value } };
-  }
-  return { key, value: { boolValue: value } };
-}
 
 function normalizeHex(input: string, bytes: number): string {
   const raw = input.replace(/[^a-fA-F0-9]/g, "").toLowerCase();
@@ -183,10 +167,6 @@ function generateTraceId(seed?: string): string {
 function generateSpanId(seed?: string): string {
   const base = seed ?? randomUUID().replace(/-/g, "");
   return normalizeHex(base, 8);
-}
-
-function msToNanos(ts: number): string {
-  return String(BigInt(ts) * BigInt(1_000_000));
 }
 
 function toTrustTier(value: unknown, fallbackEventType?: string): TrustTier {
@@ -211,14 +191,6 @@ function toSeverityNumber(severity: string): number {
   if (normalized === "WARN" || normalized === "WARNING" || normalized === "MEDIUM") return 13;
   if (normalized === "LOW" || normalized === "DEBUG") return 5;
   return 9;
-}
-
-function toBoolean(value: string | undefined, fallback: boolean): boolean {
-  if (!value) return fallback;
-  const normalized = value.trim().toLowerCase();
-  if (normalized === "1" || normalized === "true" || normalized === "yes" || normalized === "on") return true;
-  if (normalized === "0" || normalized === "false" || normalized === "no" || normalized === "off") return false;
-  return fallback;
 }
 
 function toInt(value: string | undefined, fallback: number): number {
@@ -272,8 +244,10 @@ function toResourceAttributes(config: ObservabilityOTELConfig): OTelAttribute[] 
   return base;
 }
 
-function otlpEndpoint(base: string, signal: ObservabilitySignal): string {
-  const trimmed = base.replace(/\/+$/, "");
+function otlpEndpoint(target: ObservabilityExporterTarget, signal: ObservabilitySignal): string {
+  const specific = target.signalEndpoints?.[signal];
+  if (specific) return specific;
+  const trimmed = target.endpoint.replace(/\/+$/, "");
   const normalizedSignal = signal === "traces" ? "traces" : signal === "metrics" ? "metrics" : "logs";
   if (/\/v1\/(traces|metrics|logs)$/i.test(trimmed)) {
     return trimmed.replace(/\/v1\/(traces|metrics|logs)$/i, `/v1/${normalizedSignal}`);
@@ -305,6 +279,7 @@ export class ObservabilityOTELExporter {
   private spans: BufferedSpan[] = [];
   private metrics: BufferedMetric[] = [];
   private logs: BufferedLog[] = [];
+  private streams = new Map<string, AggregatedStream>();
   private readonly itemScopes = new WeakMap<object, CapturedWorkspace>();
   private inFlightFlush: Promise<ObservabilityFlushResult> | null = null;
 
@@ -314,6 +289,15 @@ export class ObservabilityOTELExporter {
       ...config,
       targets: config.targets ?? DEFAULT_CONFIG.targets
     };
+  }
+
+  isEnabled(): boolean {
+    return this.config.enabled && this.config.targets.length > 0;
+  }
+
+  /** Why nothing is exported although export was asked for; null when enabled or never asked. */
+  disabledReason(): string | null {
+    return this.config.disabledReason ?? null;
   }
 
   recordEvidenceEvent(event: EvidenceEvent): void {
@@ -361,10 +345,37 @@ export class ObservabilityOTELExporter {
     this.enforceBufferLimits();
   }
 
+  /** A finished span from the native session folder (SH-OBS-01). */
+  recordSpan(span: OTelSpan): void {
+    this.spans.push(this.captureItem({ ...span }, { workspace: getWorkspaceScope(), run: AsyncLocalStorage.snapshot() }));
+    this.enforceBufferLimits();
+  }
+
+  /** Aggregate one increment or observation into its delta stream; one data point per stream per flush. */
+  recordMetricPoint(point: OTelMetricPoint): void {
+    const key = canonicalize({ k: point.kind, n: point.name, u: point.unit, a: point.attributes });
+    let stream = this.streams.get(key);
+    if (!stream) {
+      if (this.streams.size >= this.config.maxBufferSize) { noteTelemetryDropped(1); return; }
+      stream = { kind: point.kind, name: point.name, unit: point.unit, attributes: [...point.attributes], startTs: Date.now(), count: 0, sum: 0,
+        min: Number.POSITIVE_INFINITY, max: Number.NEGATIVE_INFINITY, bucketCounts: new Array<number>(DURATION_BOUNDS.length + 1).fill(0) };
+      this.captureItem(stream, { workspace: getWorkspaceScope(), run: AsyncLocalStorage.snapshot() });
+      this.streams.set(key, stream);
+    }
+    stream.count += 1;
+    stream.sum += point.value;
+    stream.min = Math.min(stream.min, point.value);
+    stream.max = Math.max(stream.max, point.value);
+    if (point.kind === "histogram") {
+      const at = DURATION_BOUNDS.findIndex((bound) => point.value <= bound);
+      const slot = at === -1 ? DURATION_BOUNDS.length : at;
+      stream.bucketCounts[slot] = (stream.bucketCounts[slot] ?? 0) + 1;
+    }
+  }
+
   recordScoreComputation(metric: ScoreComputationMetric): void {
     const scope = { workspace: getWorkspaceScope(), run: AsyncLocalStorage.snapshot() };
     const ts = metric.ts ?? Date.now();
-    msToNanos(ts);
     const percentage = metric.percentage ?? (
       typeof metric.maxScore === "number" && metric.maxScore > 0
         ? (metric.score / metric.maxScore) * 100
@@ -383,28 +394,10 @@ export class ObservabilityOTELExporter {
       if (candidate) commonAttrs.push(candidate);
     }
 
-    this.metrics.push(this.captureItem({
-      metricName: "amc.score.value",
-      unit: "score",
-      ts,
-      value: metric.score,
-      attributes: [...commonAttrs]
-    }, scope));
-    this.metrics.push(this.captureItem({
-      metricName: "amc.score.percentage",
-      unit: "percent",
-      ts,
-      value: percentage,
-      attributes: [...commonAttrs]
-    }, scope));
+    this.metrics.push(this.captureItem({ metricName: "amc.score.value", unit: "score", ts, value: metric.score, attributes: [...commonAttrs] }, scope));
+    this.metrics.push(this.captureItem({ metricName: "amc.score.percentage", unit: "percent", ts, value: percentage, attributes: [...commonAttrs] }, scope));
     if (typeof metric.level === "number") {
-      this.metrics.push(this.captureItem({
-        metricName: "amc.score.level",
-        unit: "level",
-        ts,
-        value: metric.level,
-        attributes: [...commonAttrs]
-      }, scope));
+      this.metrics.push(this.captureItem({ metricName: "amc.score.level", unit: "level", ts, value: metric.level, attributes: [...commonAttrs] }, scope));
     }
 
     this.enforceBufferLimits();
@@ -413,7 +406,6 @@ export class ObservabilityOTELExporter {
   recordIncident(incident: IncidentLogInput): void {
     const scope = { workspace: getWorkspaceScope(), run: AsyncLocalStorage.snapshot() };
     const ts = incident.ts ?? Date.now();
-    msToNanos(ts);
     const severityText = incident.severity.toUpperCase();
     const severityNumber = toSeverityNumber(severityText);
     const body = incident.description
@@ -432,20 +424,14 @@ export class ObservabilityOTELExporter {
     for (const candidate of values) {
       if (candidate) attributes.push(candidate);
     }
-    this.logs.push(this.captureItem({
-      ts,
-      severityText,
-      severityNumber,
-      body,
-      attributes
-    }, scope));
+    this.logs.push(this.captureItem({ ts, severityText, severityNumber, body, attributes }, scope));
     this.enforceBufferLimits();
   }
 
   getBufferStats(): { traces: number; metrics: number; logs: number } {
     return {
       traces: this.spans.length,
-      metrics: this.metrics.length,
+      metrics: this.metrics.length + this.streams.size,
       logs: this.logs.length
     };
   }
@@ -464,11 +450,11 @@ export class ObservabilityOTELExporter {
     }));
   }
 
-  async flush(): Promise<ObservabilityFlushResult> {
+  async flush(options: Partial<TelemetryDispatchOptions> = {}): Promise<ObservabilityFlushResult> {
     if (this.inFlightFlush) {
       return this.inFlightFlush;
     }
-    const run = this.flushInternal();
+    const run = this.flushInternal(options);
     this.inFlightFlush = run;
     try {
       return await run;
@@ -479,12 +465,10 @@ export class ObservabilityOTELExporter {
     }
   }
 
-  private async flushInternal(): Promise<ObservabilityFlushResult> {
+  private async flushInternal(overrides: Partial<TelemetryDispatchOptions>): Promise<ObservabilityFlushResult> {
     const exported: SignalCounts = { traces: 0, metrics: 0, logs: 0 };
     if (!this.config.enabled || this.config.targets.length === 0) {
-      this.spans = [];
-      this.metrics = [];
-      this.logs = [];
+      this.clearBuffers();
       return { ts: Date.now(), exported, requests: [] };
     }
 
@@ -506,23 +490,23 @@ export class ObservabilityOTELExporter {
       }
     }
     const options = {
-      timeoutMs: toInt(process.env.AMC_OTEL_FLUSH_TIMEOUT_MS, DEFAULT_FLUSH_TIMEOUT_MS),
-      maxRetries: toInt(process.env.AMC_OTEL_FLUSH_MAX_RETRIES, DEFAULT_FLUSH_MAX_RETRIES),
-      retryBaseDelayMs: toInt(process.env.AMC_OTEL_FLUSH_RETRY_BASE_DELAY_MS, DEFAULT_FLUSH_RETRY_BASE_DELAY_MS)
+      timeoutMs: overrides.timeoutMs ?? toInt(process.env.AMC_OTEL_FLUSH_TIMEOUT_MS, DEFAULT_FLUSH_TIMEOUT_MS),
+      maxRetries: overrides.maxRetries ?? toInt(process.env.AMC_OTEL_FLUSH_MAX_RETRIES, DEFAULT_FLUSH_MAX_RETRIES),
+      retryBaseDelayMs: overrides.retryBaseDelayMs ?? toInt(process.env.AMC_OTEL_FLUSH_RETRY_BASE_DELAY_MS, DEFAULT_FLUSH_RETRY_BASE_DELAY_MS)
     };
     // A preparation failure leaves the buffered items and their captured scopes intact.
-    this.spans = [];
-    this.metrics = [];
-    this.logs = [];
+    this.clearBuffers();
     await Promise.resolve();
 
+    // Targets and signals are independent: dispatched together so an exit flush is bounded by one timeout, not their sum.
+    const results = await Promise.all(requests.map((request) => dispatchTelemetryRequest(request, options).catch((error: unknown) => ({
+      ok: false, error: error instanceof Error ? error.message : String(error)
+    }))));
     const out: ObservabilityDispatchResult[] = [];
     const countedSignals = new Map<string | undefined, Set<ObservabilitySignal>>();
     let dropped = 0;
-    for (const request of requests) {
-      const result = await dispatchTelemetryRequest(request, options).catch((error: unknown) => ({
-        ok: false, error: error instanceof Error ? error.message : String(error)
-      }));
+    requests.forEach((request, index) => {
+      const result = results[index]!;
       out.push({ targetKind: request.targetKind, signal: request.signal, endpoint: request.endpoint, ...result });
       if (result.ok) {
         const counted = countedSignals.get(request.workspace) ?? new Set<ObservabilitySignal>();
@@ -536,7 +520,7 @@ export class ObservabilityOTELExporter {
       } else {
         dropped += request.counts.traces + request.counts.metrics + request.counts.logs;
       }
-    }
+    });
     if (dropped > 0) noteTelemetryDropped(dropped);
 
     return {
@@ -544,6 +528,13 @@ export class ObservabilityOTELExporter {
       exported,
       requests: out
     };
+  }
+
+  private clearBuffers(): void {
+    this.spans = [];
+    this.metrics = [];
+    this.logs = [];
+    this.streams = new Map();
   }
 
   private enforceBufferLimits(): void {
@@ -569,7 +560,7 @@ export class ObservabilityOTELExporter {
       if (!scope) throw new Error("telemetry buffer scope is missing");
       let batch = groups.get(scope.workspace);
       if (!batch) {
-        batch = { scope, spans: [], metrics: [], logs: [] };
+        batch = { scope, spans: [], metrics: [], logs: [], streams: [] };
         groups.set(scope.workspace, batch);
       }
       return batch;
@@ -577,17 +568,20 @@ export class ObservabilityOTELExporter {
     for (const span of this.spans) groupFor(span).spans.push(span);
     for (const metric of this.metrics) groupFor(metric).metrics.push(metric);
     for (const log of this.logs) groupFor(log).logs.push(log);
+    for (const stream of this.streams.values()) groupFor(stream).streams.push(stream);
     return [...groups.values()];
   }
 
-  private buildDispatchRequests(batch: BufferedBatch = { spans: this.spans, metrics: this.metrics, logs: this.logs }): DispatchRequest[] {
+  private buildDispatchRequests(batch: BufferedBatch = { spans: this.spans, metrics: this.metrics, logs: this.logs, streams: [...this.streams.values()] }): DispatchRequest[] {
     if (this.config.targets.length === 0) {
       return [];
     }
 
     const resourceAttributes = toResourceAttributes(this.config);
     const requests: DispatchRequest[] = [];
-    const { spans, metrics, logs } = batch;
+    const { spans, metrics, logs, streams } = batch;
+    const metricCount = metrics.length + streams.length;
+    const scope = { name: "amc.observability", version: this.config.serviceVersion };
 
     for (const target of this.config.targets) {
       const headers = {
@@ -596,87 +590,37 @@ export class ObservabilityOTELExporter {
       };
 
       if (target.kind === "zipkin") {
-        const payload = this.toZipkinSpans(batch);
+        const payload = toZipkinSpans(batch, this.config.serviceName);
         if (payload.length === 0) continue;
-        requests.push({
-          targetKind: target.kind,
-          signal: "traces",
-          endpoint: zipkinEndpoint(target.endpoint),
-          headers,
-          payload,
-          counts: { traces: spans.length, metrics: metrics.length, logs: logs.length }
-        });
+        requests.push({ targetKind: target.kind, signal: "traces", endpoint: zipkinEndpoint(target.endpoint), headers, payload,
+          counts: { traces: spans.length, metrics: metricCount, logs: logs.length } });
         continue;
       }
 
       if (spans.length > 0 && enabledForSignal(target, "traces")) {
-        requests.push({
-          targetKind: target.kind,
-          signal: "traces",
-          endpoint: otlpEndpoint(target.endpoint, "traces"),
-          headers,
-          payload: {
-            resourceSpans: [
-              {
-                resource: { attributes: resourceAttributes },
-                scopeSpans: [
-                  {
-                    scope: { name: "amc.observability", version: this.config.serviceVersion },
-                    spans
-                  }
-                ]
-              }
-            ]
-          },
-          counts: { traces: spans.length, metrics: 0, logs: 0 }
-        });
+        requests.push({ targetKind: target.kind, signal: "traces", endpoint: otlpEndpoint(target, "traces"), headers,
+          payload: { resourceSpans: [{ resource: { attributes: resourceAttributes }, scopeSpans: [{ scope, spans }] }] },
+          counts: { traces: spans.length, metrics: 0, logs: 0 } });
       }
 
-      if (metrics.length > 0 && enabledForSignal(target, "metrics")) {
-        requests.push({
-          targetKind: target.kind,
-          signal: "metrics",
-          endpoint: otlpEndpoint(target.endpoint, "metrics"),
-          headers,
-          payload: this.toOTLPMetricsPayload(resourceAttributes, metrics),
-          counts: { traces: 0, metrics: metrics.length, logs: 0 }
-        });
+      if (metricCount > 0 && enabledForSignal(target, "metrics")) {
+        requests.push({ targetKind: target.kind, signal: "metrics", endpoint: otlpEndpoint(target, "metrics"), headers,
+          payload: this.toOTLPMetricsPayload(resourceAttributes, metrics, streams), counts: { traces: 0, metrics: metricCount, logs: 0 } });
       }
 
       if (logs.length > 0 && enabledForSignal(target, "logs")) {
-        requests.push({
-          targetKind: target.kind,
-          signal: "logs",
-          endpoint: otlpEndpoint(target.endpoint, "logs"),
-          headers,
-          payload: {
-            resourceLogs: [
-              {
-                resource: { attributes: resourceAttributes },
-                scopeLogs: [
-                  {
-                    scope: { name: "amc.observability", version: this.config.serviceVersion },
-                    logRecords: logs.map((entry) => ({
-                      timeUnixNano: msToNanos(entry.ts),
-                      severityNumber: entry.severityNumber,
-                      severityText: entry.severityText,
-                      body: { stringValue: entry.body },
-                      attributes: entry.attributes
-                    }))
-                  }
-                ]
-              }
-            ]
-          },
-          counts: { traces: 0, metrics: 0, logs: logs.length }
-        });
+        requests.push({ targetKind: target.kind, signal: "logs", endpoint: otlpEndpoint(target, "logs"), headers,
+          payload: { resourceLogs: [{ resource: { attributes: resourceAttributes }, scopeLogs: [{ scope, logRecords: logs.map((entry) => ({
+            timeUnixNano: msToNanos(entry.ts), severityNumber: entry.severityNumber, severityText: entry.severityText,
+            body: { stringValue: entry.body }, attributes: entry.attributes })) }] }] },
+          counts: { traces: 0, metrics: 0, logs: logs.length } });
       }
     }
 
     return requests;
   }
 
-  private toOTLPMetricsPayload(resourceAttributes: OTelAttribute[], entries: BufferedMetric[]): unknown {
+  private toOTLPMetricsPayload(resourceAttributes: OTelAttribute[], entries: BufferedMetric[], streams: readonly AggregatedStream[]): unknown {
     const byName = new Map<string, BufferedMetric[]>();
     for (const metric of entries) {
       const key = `${metric.metricName}::${metric.unit}`;
@@ -685,7 +629,7 @@ export class ObservabilityOTELExporter {
       byName.set(key, current);
     }
 
-    const metrics = [...byName.entries()].map(([key, points]) => {
+    const metrics: unknown[] = [...byName.entries()].map(([key, points]) => {
       const [metricName, unit] = key.split("::");
       return {
         name: metricName,
@@ -699,6 +643,21 @@ export class ObservabilityOTELExporter {
         }
       };
     });
+    const now = Date.now();
+    const byStream = new Map<string, AggregatedStream[]>();
+    for (const stream of streams) {
+      const key = `${stream.kind}::${stream.name}::${stream.unit}`;
+      byStream.set(key, [...(byStream.get(key) ?? []), stream]);
+    }
+    for (const [, group] of byStream) {
+      const first = group[0]!;
+      const points = group.map((stream) => ({ startTimeUnixNano: msToNanos(stream.startTs), timeUnixNano: msToNanos(Math.max(now, stream.startTs)), attributes: stream.attributes,
+        ...(stream.kind === "sum" ? { asDouble: stream.sum }
+          : { count: stream.count, sum: stream.sum, min: stream.min, max: stream.max, bucketCounts: stream.bucketCounts, explicitBounds: DURATION_BOUNDS }) }));
+      metrics.push({ name: first.name, unit: first.unit, ...(first.kind === "sum"
+        ? { sum: { aggregationTemporality: AGGREGATION_TEMPORALITY_DELTA, isMonotonic: true, dataPoints: points } }
+        : { histogram: { aggregationTemporality: AGGREGATION_TEMPORALITY_DELTA, dataPoints: points } }) });
+    }
 
     return {
       resourceMetrics: [
@@ -714,125 +673,18 @@ export class ObservabilityOTELExporter {
       ]
     };
   }
-
-  private toZipkinSpans(batch: BufferedBatch): Array<Record<string, unknown>> {
-    const localEndpoint = { serviceName: this.config.serviceName };
-    const spans = batch.spans.map((span) => {
-      const tags: Record<string, string> = {};
-      for (const attribute of span.attributes) {
-        const value = attribute.value.stringValue
-          ?? attribute.value.doubleValue
-          ?? attribute.value.intValue
-          ?? attribute.value.boolValue;
-        tags[attribute.key] = value === undefined ? "" : String(value);
-      }
-      return {
-        traceId: span.traceId,
-        id: span.spanId,
-        parentId: span.parentSpanId,
-        name: span.name,
-        timestamp: Math.floor(Number(span.startTimeUnixNano) / 1000),
-        duration: Math.max(1, Math.floor((Number(span.endTimeUnixNano) - Number(span.startTimeUnixNano)) / 1000)),
-        localEndpoint,
-        tags
-      };
-    });
-
-    for (const metric of batch.metrics) {
-      const tags: Record<string, string> = {
-        "amc.metric.name": metric.metricName,
-        "amc.metric.unit": metric.unit,
-        "amc.metric.value": String(metric.value)
-      };
-      for (const attribute of metric.attributes) {
-        const value = attribute.value.stringValue
-          ?? attribute.value.doubleValue
-          ?? attribute.value.intValue
-          ?? attribute.value.boolValue;
-        tags[attribute.key] = value === undefined ? "" : String(value);
-      }
-      spans.push({
-        traceId: generateTraceId(metric.metricName),
-        id: generateSpanId(`${metric.metricName}-${metric.ts}`),
-        parentId: undefined,
-        name: `amc.metric.${metric.metricName}`,
-        timestamp: metric.ts * 1000,
-        duration: 1,
-        localEndpoint,
-        tags
-      });
-    }
-
-    for (const entry of batch.logs) {
-      const tags: Record<string, string> = {
-        "amc.log.severity": entry.severityText,
-        "amc.log.message": entry.body
-      };
-      for (const attribute of entry.attributes) {
-        const value = attribute.value.stringValue
-          ?? attribute.value.doubleValue
-          ?? attribute.value.intValue
-          ?? attribute.value.boolValue;
-        tags[attribute.key] = value === undefined ? "" : String(value);
-      }
-      spans.push({
-        traceId: generateTraceId(entry.body),
-        id: generateSpanId(`${entry.ts}`),
-        parentId: undefined,
-        name: "amc.incident.log",
-        timestamp: entry.ts * 1000,
-        duration: 1,
-        localEndpoint,
-        tags
-      });
-    }
-
-    return spans;
-  }
 }
 
+/** The exporter the environment asks for; `OTEL_*` variables are honoured (src/observability/otelEnvConfig.ts). */
 export function createObservabilityOTELExporterFromEnv(): ObservabilityOTELExporter {
-  const enabled = toBoolean(process.env.AMC_OTEL_ENABLED, false);
-  const serviceName = process.env.AMC_OTEL_SERVICE_NAME ?? DEFAULT_CONFIG.serviceName;
-  const serviceVersion = process.env.AMC_OTEL_SERVICE_VERSION ?? DEFAULT_CONFIG.serviceVersion;
-  const maxBufferSize = toInt(process.env.AMC_OTEL_MAX_BUFFER_SIZE, DEFAULT_CONFIG.maxBufferSize);
-  const exportersRaw = process.env.AMC_OTEL_EXPORTERS ?? "";
-  const requested = exportersRaw
-    .split(",")
-    .map((entry) => entry.trim().toLowerCase())
-    .filter((entry) => entry.length > 0);
-
-  const targets: ObservabilityExporterTarget[] = [];
-  if (requested.includes("otlp")) {
-    targets.push({
-      kind: "otlp",
-      endpoint: process.env.AMC_OTEL_OTLP_ENDPOINT ?? "http://127.0.0.1:4318"
-    });
-  }
-  if (requested.includes("jaeger")) {
-    targets.push({
-      kind: "jaeger",
-      endpoint: process.env.AMC_OTEL_JAEGER_ENDPOINT ?? "http://127.0.0.1:4318"
-    });
-  }
-  if (requested.includes("zipkin")) {
-    targets.push({
-      kind: "zipkin",
-      endpoint: process.env.AMC_OTEL_ZIPKIN_ENDPOINT ?? "http://127.0.0.1:9411"
-    });
-  }
-
-  return new ObservabilityOTELExporter({
-    enabled,
-    serviceName,
-    serviceVersion,
-    maxBufferSize,
-    targets
-  });
+  const resolved = resolveOtelEnvConfig();
+  return new ObservabilityOTELExporter({ ...resolved.config, disabledReason: resolved.disabledReason });
 }
 
 let sharedExporter: ObservabilityOTELExporter | null = null;
+let sharedFolder: NativeSpanFolder | null = null;
 const SHARED_FLUSH_THRESHOLD = 128;
+const DEFAULT_EXIT_FLUSH_BUDGET_MS = 2_000;
 
 export function getSharedObservabilityExporter(): ObservabilityOTELExporter {
   if (!sharedExporter) {
@@ -843,16 +695,50 @@ export function getSharedObservabilityExporter(): ObservabilityOTELExporter {
 
 export function resetSharedObservabilityExporterForTests(): void {
   sharedExporter = null;
+  sharedFolder = null;
+}
+
+/** Hand a folder's output to the exporter. */
+export function recordFoldOutput(exporter: ObservabilityOTELExporter, output: FoldOutput): void {
+  for (const span of output.spans) exporter.recordSpan(span);
+  for (const point of output.metrics) exporter.recordMetricPoint(point);
 }
 
 export function queueEvidenceEventSpan(event: EvidenceEvent, workspace?: string): void {
   try {
     const exporter = getSharedObservabilityExporter();
-    workspace !== undefined ? withWorkspaceScope(workspace, () => exporter.recordEvidenceEvent(event)) : exporter.recordEvidenceEvent(event);
+    const record = (): void => {
+      // Native session rows fold into GenAI spans; the folder stays inert while export is off (nothing to drop).
+      if (exporter.isEnabled()) {
+        sharedFolder ??= new NativeSpanFolder();
+        const folded = sharedFolder.ingest(event);
+        if (folded !== null) {
+          recordFoldOutput(exporter, folded);
+          if (event.event_type === "session/close" || event.event_type === "session/release") {
+            void exporter.flush().catch(() => { /* Preparation failures retain the batch for a later flush. */ });
+          }
+          return;
+        }
+      }
+      exporter.recordEvidenceEvent(event);
+    };
+    workspace !== undefined ? withWorkspaceScope(workspace, record) : record();
     maybeFlushSharedExporter(exporter);
   } catch {
     noteTelemetryDropped(1); // Observability must never block core workflows; the drop is counted.
   }
+}
+
+/**
+ * Flush before a short-lived process exits, within a wall-clock budget. Spans still open are emitted unterminated;
+ * what cannot be sent in time is counted as dropped by the transport's own accounting, never silently lost.
+ */
+export async function flushSharedObservabilityExporter(options: { budgetMs?: number } = {}): Promise<ObservabilityFlushResult | null> {
+  const exporter = sharedExporter;
+  if (!exporter || !exporter.isEnabled()) return null;
+  const budgetMs = options.budgetMs ?? DEFAULT_EXIT_FLUSH_BUDGET_MS;
+  if (sharedFolder) recordFoldOutput(exporter, sharedFolder.drain());
+  return exporter.flush({ timeoutMs: budgetMs, maxRetries: 0 });
 }
 
 export function queueScoreComputationMetric(metric: ScoreComputationMetric, workspace?: string): void {

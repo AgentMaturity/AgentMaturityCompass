@@ -6,11 +6,22 @@
 import type { Command } from "commander";
 import chalk from "chalk";
 import { aggregateClaim, emitClaimResult, runIdClaim } from "./cli/claimOutput.js";
+import { registerOtelPreviewCommand } from "./cli-observability-otel-commands.js";
+import { registerUsageCommand } from "./cli-usage-commands.js";
+import { registerEvalSuiteCommands } from "./cli-eval-suite-commands.js";
 
 export function registerObservabilityCommands(program: Command, activeAgent: (p: Command) => string | undefined): void {
   const observe = program
     .command("observe")
     .description("Observability — timeline, anomaly detection, and tracing");
+  registerOtelPreviewCommand(observe);
+  registerUsageCommand(program);
+  registerEvalSuiteCommands(program);
+  // A short-lived command exits before the shared exporter's size-triggered flush: send what it buffered, bounded.
+  program.hook("postAction", async () => {
+    const { flushSharedObservabilityExporter } = await import("./observability/otelExporter.js");
+    await flushSharedObservabilityExporter().catch(() => null);
+  });
 
   /* ── observe timeline ──────────────────────────────────────────── */
   observe
