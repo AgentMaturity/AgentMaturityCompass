@@ -13,6 +13,8 @@
  *
  * The caller validates the result through the provider contract (`deepseekParams`, `geminiParams`, `ollamaParams`).
  */
+import { deepseekParams } from "./providers/deepseekContract.js";
+
 export interface ReasoningOptions {
   readonly thinking?: string;
   readonly reasoningEffort?: string;
@@ -55,8 +57,11 @@ export function reasoningParamsFor(providerId: string, options: ReasoningOptions
   switch (providerId) {
     case "deepseek": {
       if (options.thinkingBudget !== undefined) throw new Error("--thinking-budget is not a DeepSeek wire option; DeepSeek takes --thinking and --reasoning-effort.");
-      return { ...(options.thinking === undefined ? {} : { thinking: { type: options.thinking } }),
+      const params = { ...(options.thinking === undefined ? {} : { thinking: { type: options.thinking } }),
         ...(options.reasoningEffort === undefined ? {} : { reasoning_effort: options.reasoningEffort }) };
+      // The contract refuses an unknown mode or a remapped effort here, before any surface spawns or records anything.
+      deepseekParams({ max_tokens: context.maxTokens, ...params });
+      return params;
     }
     case "anthropic": {
       if (options.reasoningEffort !== undefined) throw new Error("--reasoning-effort is not an Anthropic wire option; use --thinking enabled --thinking-budget <tokens>.");

@@ -10,7 +10,7 @@
  * Default origins are the ones each provider documents for its OpenAI-compatible endpoint, written WITHOUT `/v1` because
  * the adapter appends `/v1/chat/completions`. A provider whose endpoint does not follow that path (Perplexity, Azure
  * resource hosts) ships no default and requires `--base-url`. Origins were read from the documentation cited in
- * docs/NATIVE_PROVIDERS.md on 2026-11-07; `--base-url` always overrides.
+ * docs/NATIVE_PROVIDERS.md on 2026-11-07 (llama-server listens on 127.0.0.1:9931 by default at that date); `--base-url` always overrides.
  *
  * Local servers (LM Studio, vLLM, llama.cpp) default to a loopback origin and need no credential there. A non-loopback
  * origin without a credential reference is refused: an unauthenticated request to a remote host is never a default.
@@ -63,11 +63,11 @@ export const OPENAI_COMPATIBLE_ROUTES: readonly OpenaiCompatibleRoute[] = Object
   compat("mistral", "Mistral", "https://api.mistral.ai", "MISTRAL_API_KEY"),
   compat("xai", "xAI", "https://api.x.ai", "XAI_API_KEY"),
   compat("openrouter", "OpenRouter", "https://openrouter.ai/api", "OPENROUTER_API_KEY"),
-  compat("together", "Together", "https://api.together.xyz", "TOGETHER_API_KEY"),
+  compat("together", "Together", "https://api.together.ai", "TOGETHER_API_KEY"),
   compat("fireworks", "Fireworks", "https://api.fireworks.ai/inference", "FIREWORKS_API_KEY"),
   compat("lmstudio", "LM Studio (local)", "http://127.0.0.1:1234", null),
   compat("vllm", "vLLM (local)", "http://127.0.0.1:8000", null),
-  compat("llamacpp", "llama.cpp server (local)", "http://127.0.0.1:8080", null),
+  compat("llamacpp", "llama.cpp server (local)", "http://127.0.0.1:9931", null),
   Object.freeze({ providerId: "azure-openai", displayName: "Azure OpenAI (v1 surface)", defaultBaseUrl: null,
     defaultCredentialRef: "AZURE_OPENAI_API_KEY", adapter: azureOpenaiAdapter })
 ]);

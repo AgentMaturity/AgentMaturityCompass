@@ -14,7 +14,9 @@ import { ollamaChatEncoder } from "../src/llm/request/ollamaChatEncoder.js";
 import { STUB_PROVIDER_MODEL } from "../src/agent/stubProvider.js";
 
 const MODEL = "batch1-scripted-model:tag";
-const PROVIDERS = ["stub", "anthropic", "openai", "openai-responses", "deepseek", "gemini", "gemini-audio", "ollama"];
+const PROVIDERS = ["stub", "anthropic", "openai", "openai-responses", "deepseek", "gemini", "gemini-audio", "ollama",
+  // SH-PROVIDERS-01: the OpenAI-compatible family and Azure, in inventory order.
+  "groq", "mistral", "xai", "openrouter", "together", "fireworks", "lmstudio", "vllm", "llamacpp", "azure-openai"];
 const io = () => ({ log: vi.fn<(line: string) => void>(), error: vi.fn<(line: string) => void>(), fail: vi.fn<() => void>() });
 const acpOptions = (extra: Partial<AcpStdioInit> = {}): AcpStdioInit => ({
   workspace: "/batch1-no-workspace-created", agentId: "default", providerId: "ollama", model: MODEL,
@@ -32,8 +34,10 @@ afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.unstubAllEnvs(
 describe("P01 native CLI/ACP selectors", () => {
   it.each(PROVIDERS)("uses the same actual %s route in both selectors and discovery", providerId => {
     const output = io(), model = providerId === "stub" ? undefined : MODEL;
-    const cli = routeFor(output, providerId, {}, model);
-    const acp = acpRouteFor(acpOptions({ providerId, model }));
+    // azure-openai has no default origin (resource hosts differ), so the selectors need an explicit one.
+    const extra = providerId === "azure-openai" ? { baseUrl: "https://resource.openai.azure.com/openai", credential: "AZURE_OPENAI_API_KEY" } : {};
+    const cli = routeFor(output, providerId, extra, model);
+    const acp = acpRouteFor(acpOptions({ providerId, model, ...extra }));
     expect(cli).not.toBeNull();
     expect(acp).toEqual(cli);
     if (cli === null || "error" in acp) throw new Error("Expected a native route");
@@ -126,10 +130,12 @@ describe("P01 native CLI/ACP selectors", () => {
     expect(() => paramsFor("ollama", limit)).toThrow();
   });
 
-  it.each([{ thinking: "enabled" }, { reasoningEffort: "high" }])("does not silently reinterpret DeepSeek-only controls for Ollama: %j", options => {
-    expect(() => paramsFor("ollama", 32, options)).toThrow(/require --provider deepseek/);
+  // SH-PROVIDERS-02: Ollama now has its own `think` mapping; the provider without a decoded reasoning wire is OpenAI, which
+  // is refused with the limit named instead of silently reinterpreting the flag.
+  it.each([{ thinking: "enabled" }, { reasoningEffort: "high" }])("does not silently reinterpret reasoning controls for a provider without a reasoning wire: %j", options => {
+    expect(() => paramsFor("openai", 32, options)).toThrow(/not admitted for provider "openai"/);
     // Startup rejects before a credential store, session, transport or stdio listener is created.
-    expect(() => startAcpStdio(acpOptions(options))).toThrow(/require --provider deepseek/);
+    expect(() => startAcpStdio({ ...acpOptions(options), providerId: "openai", model: "fixture-model", credential: "OPENAI_API_KEY" })).toThrow(/not admitted for provider "openai"/);
   });
 
   it("retains the existing provider-specific parameter shapes", () => {
