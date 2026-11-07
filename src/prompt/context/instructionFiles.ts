@@ -54,6 +54,7 @@ import {
   type InstructionCandidateOptions
 } from "./instructionPrecedence.js";
 import { MAX_INSTRUCTION_DIRECTORIES, MAX_INSTRUCTION_DIRECTORY_DEPTH, MAX_INSTRUCTION_TOUCH_PATHS } from "./touchedInstructions.js";
+import { resolveInstructionImports, type LoadedImport } from "./instructionImports.js";
 
 /** One instruction file whose content is in the contribution. */
 export interface LoadedInstruction {
@@ -62,10 +63,12 @@ export interface LoadedInstruction {
   readonly bytes: number;
   /** SHA-256 of the exact, untrimmed UTF-8 content included in context. */
   readonly sha256: string;
+  /** Files this one pulled in through `@path` lines (SH-LOOP-05), each with its own digest. Empty for user-scope files. */
+  readonly imports: readonly LoadedImport[];
 }
 
 /** Why an instruction file or part of discovery is absent from the contribution. */
-export type InstructionOmissionReason = "unreadable" | "oversize" | "over-budget" | "discovery-limit";
+export type InstructionOmissionReason = "unreadable" | "oversize" | "over-budget" | "discovery-limit" | "import-refused" | "import-depth";
 
 /** A file omission or incomplete discovery, stated safely to the model. */
 export interface InstructionOmission {
@@ -312,7 +315,14 @@ export function loadInstructionFiles(options: InstructionLoadOptions): Instructi
       });
       continue;
     }
-    loaded.push({ candidate, content: content.content, bytes: content.bytes, sha256: sha256Hex(content.content) });
+    // Imports follow only from project files, through the same bounded reader; a user-scope `@` line stays text.
+    const resolved = candidate.scope === "project"
+      ? resolveInstructionImports({ workspace: identity?.realPath ?? resolve(options.workspace), importedBy: candidate.displayPath,
+        content: content.content, maxFileBytes, alreadyLoaded: new Set(loaded.flatMap((file) => [file.candidate.displayPath, ...file.imports.map((entry) => entry.displayPath)])),
+        ...(options.readTextFile === undefined ? {} : { readTextFile: (path: string) => options.readTextFile!(resolve(options.workspace, path)) }) })
+      : { imports: [], omitted: [] };
+    omitted.push(...resolved.omitted);
+    loaded.push({ candidate, content: content.content, bytes: content.bytes, sha256: sha256Hex(content.content), imports: resolved.imports });
   }
 
   if (identity !== null && !workspaceMatches(identity)) return unverifiedWorkspace();
@@ -348,7 +358,8 @@ function retain(
       duplicates.push({ displayPath: file.candidate.displayPath, duplicateOf: kept });
       continue;
     }
-    if (total + file.bytes > maxTotalBytes) {
+    const withImports = file.bytes + file.imports.reduce((sum, entry) => sum + entry.bytes, 0);
+    if (total + withImports > maxTotalBytes) {
       overBudget.push({
         displayPath: file.candidate.displayPath,
         reason: "over-budget",
@@ -357,7 +368,7 @@ function retain(
       continue;
     }
     keptByDigest.set(digest, file.candidate.displayPath);
-    total += file.bytes;
+    total += withImports;
     included.push(file);
   }
 

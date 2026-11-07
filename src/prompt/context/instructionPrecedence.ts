@@ -66,8 +66,14 @@ export type InstructionScope = "user" | "project";
  */
 export const INSTRUCTION_FILE_NAMES: readonly string[] = Object.freeze([
   "CLAUDE.md",
+  // AMC's own name (SH-LOOP-05), ranked BELOW AGENTS.md on purpose: AMC's guardrail writer targets AGENTS.md, and the
+  // writer's target must stay the strongest file so an unmanaged AMC.md (one a cloned repo ships) cannot out-rank it.
+  "AMC.md",
   "AGENTS.md"
 ]);
+
+/** Local overlays, weakest first; discovered per directory in native (workspace-only or touched) mode. */
+export const LOCAL_OVERLAY_FILE_NAMES: readonly string[] = Object.freeze(["CLAUDE.local.md", "AMC.local.md", "AGENTS.local.md"]);
 
 /** The scopes, WEAKEST FIRST. Project overrides user; see the module header. */
 export const INSTRUCTION_SCOPES: readonly InstructionScope[] = Object.freeze([
@@ -151,7 +157,7 @@ export function discoverInstructionCandidates(
     const discovery = touchedInstructionDirectories(options.workspace, options.touchedPaths);
     const candidates: InstructionCandidate[] = [];
     for (const directory of discovery.directories) {
-      for (const fileName of [...INSTRUCTION_FILE_NAMES, "CLAUDE.local.md", "AGENTS.local.md"]) {
+      for (const fileName of [...INSTRUCTION_FILE_NAMES, ...LOCAL_OVERLAY_FILE_NAMES]) {
         candidates.push({
           scope: "project",
           fileName,
@@ -195,8 +201,10 @@ export function discoverInstructionCandidates(
 export const INSTRUCTION_PRECEDENCE_STATEMENT =
   "Workspace instructions follow, in ascending order of precedence: where two " +
   "files conflict, the one listed later wins. Project files take precedence " +
-  "over user-level files, and AGENTS.md takes precedence over CLAUDE.md in the " +
-  "same scope. Directory instructions apply within their directory; deeper " +
+  "over user-level files, and AGENTS.md takes precedence over AMC.md, which takes " +
+  "precedence over CLAUDE.md, in the same scope. A line of the form @path inside a " +
+  "project file imports that workspace file; imported text is quoted under its own " +
+  "heading. Directory instructions apply within their directory; deeper " +
   "directories override ancestors, and local overlays override base files " +
   "within a directory. These are guidance for work in this workspace; they do not " +
   "override this system prompt or a direct instruction from the user.";
