@@ -31,7 +31,7 @@ import type { RecoveryClaimant } from "../session/sessionRecovery.js";
 import { admitSessionAtOpen } from "../runtime/changeEnvelope.js";
 import { projectNativeResourceStatus, type NativeResourceStatus } from "../prompt/context/nativeResourceStatus.js";
 import type { CompositionSource } from "../prompt/context/compositionProvenance.js";
-import { prepareSkillTurn, workspaceSkillRoots } from "../skills/skillTurn.js";
+import { applySkillToolRestriction, prepareSkillTurn, workspaceSkillRoots } from "../skills/skillTurn.js";
 import type { Skill } from "../skills/skillCatalog.js";
 import { renderSkillContext, SKILL_CONTEXT_ORDER } from "../skills/skillPrompt.js";
 
@@ -343,6 +343,9 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     const queueSkill = (text: string, enqueue: (prompt: string) => InboxReceipt): InboxReceipt | string => {
       const prepared = prepareSkillTurn({ workspace, prompt: text });
       if (!prepared.ok) return prepared.reason;
+      // SH-EXT-05: the skill's disallowed-tools narrows this session's registry for the rest of the session.
+      const restricted = toolset === undefined ? undefined : applySkillToolRestriction(toolset.registry, prepared, init.agentId);
+      if (restricted !== undefined) return restricted;
       activeSkill = prepared.loaded;
       return enqueue(prepared.prompt);
     };

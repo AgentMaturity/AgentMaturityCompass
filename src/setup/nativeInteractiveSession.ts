@@ -470,8 +470,8 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       if (entered === null) break;
       const text = entered.trim();
       if (text.length === 0) continue;
-      if (text.startsWith("/") && (entered[0] !== "/" || !/^\/[a-z][a-z0-9_-]{0,63}(?:[ \t]+[\s\S]*)?$/.test(text))) {
-        io.error("Slash commands must start at the first character and use lowercase names. /help lists commands."); continue;
+      if (text.startsWith("/") && (entered[0] !== "/" || !/^\/[a-z][a-z0-9_-]{0,63}(?::[a-z0-9][a-z0-9_-]{0,63})?(?:[ \t]+[\s\S]*)?$/.test(text))) {
+        io.error("Slash commands must start at the first character and use lowercase names (ns:name for a namespaced command). /help lists commands."); continue;
       }
       const name = /^\/([^ \t]+)/.exec(text)?.[1];
       if (NATIVE_INTERACTIVE_COMMANDS.some(command => command.name === name)) {

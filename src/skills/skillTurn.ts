@@ -2,6 +2,7 @@ import { lstatSync, realpathSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { buildSkillCatalog, resolveSkillCommand, type Skill } from "./skillCatalog.js";
 import { skillContextPlugin } from "./skillPrompt.js";
+import { renderSkillBody, SkillArgumentError } from "./skillArguments.js";
 import type { ContextPlugin } from "../prompt/context/contextTypes.js";
 
 /**
@@ -69,8 +70,25 @@ export type PreparedSkillTurn =
       /** Empty unless a skill loaded. Hand straight to `promptProfile.contextPlugins`. */
       readonly contextPlugins: readonly ContextPlugin[];
       readonly loaded?: Skill;
+      /** `disallowed-tools` of the loaded skill: names the turn's toolset must not offer. Empty when none. */
+      readonly disallowedTools: readonly string[];
     }
   | { readonly ok: false; readonly reason: string };
+
+/**
+ * Narrow a turn's registry by the loaded skill's `disallowed-tools` (SH-EXT-05). A name that is not registered is an
+ * ERROR, not a no-op: a restriction that silently restricts nothing is worse than none. `allowed-tools` is never
+ * applied; workspace text cannot widen a signed policy.
+ */
+export function applySkillToolRestriction(registry: { visible(scope?: string): ReadonlyMap<string, unknown>; restrict(restriction: { readonly deny?: ReadonlySet<string> }): unknown },
+  turn: PreparedSkillTurn, agentId: string): string | undefined {
+  if (!turn.ok || turn.disallowedTools.length === 0) return undefined;
+  const known = registry.visible(agentId);
+  const unknown = turn.disallowedTools.filter(name => !known.has(name));
+  if (unknown.length > 0) return `skill "${turn.loaded?.name}" disallows tools that are not registered for this run: ${unknown.join(", ")}; fix the frontmatter or run without the skill`;
+  registry.restrict({ deny: new Set(turn.disallowedTools) });
+  return undefined;
+}
 
 /**
  * Read a user's line, loading a skill when it names one.
@@ -92,7 +110,7 @@ export function prepareSkillTurn(init: PrepareSkillTurnInit): PreparedSkillTurn 
   const resolved = resolveSkillCommand(catalog, init.prompt);
 
   if (resolved.kind === "message") {
-    return { ok: true, prompt: init.prompt, contextPlugins: [] };
+    return { ok: true, prompt: init.prompt, contextPlugins: [], disallowedTools: [] };
   }
 
   if (resolved.kind === "unknown-skill") {
@@ -113,6 +131,18 @@ export function prepareSkillTurn(init: PrepareSkillTurnInit): PreparedSkillTurn 
     };
   }
 
+  if (resolved.skill.userInvocable === false) {
+    return { ok: false, reason: `skill "${resolved.skill.name}" is model-invoked only (user-invocable: false); the model loads it through skill.load` };
+  }
+  let rendering: ReturnType<typeof renderSkillBody>;
+  try {
+    rendering = renderSkillBody(resolved.skill.body, { rest: resolved.rest, workspace: init.workspace,
+      ...(resolved.skill.argumentNames === undefined ? {} : { argumentNames: resolved.skill.argumentNames }),
+      ...(resolved.skill.directory === undefined ? {} : { skillDirectory: resolved.skill.directory }) });
+  } catch (error) {
+    if (error instanceof SkillArgumentError) return { ok: false, reason: `skill "${resolved.skill.name}": ${error.message}` };
+    throw error;
+  }
   return {
     ok: true,
     // A bare `/name` still needs something for the model to act on: the skill's
@@ -120,7 +150,8 @@ export function prepareSkillTurn(init: PrepareSkillTurnInit): PreparedSkillTurn 
     // and no request. The description is the skill's own one-line statement of
     // what it does, which is the closest thing to what the user meant.
     prompt: resolved.rest.length > 0 ? resolved.rest : resolved.skill.description,
-    contextPlugins: [skillContextPlugin(resolved.skill)],
-    loaded: resolved.skill
+    contextPlugins: [skillContextPlugin(resolved.skill, rendering)],
+    loaded: resolved.skill,
+    disallowedTools: resolved.skill.disallowedTools ?? []
   };
 }

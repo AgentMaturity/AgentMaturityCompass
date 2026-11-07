@@ -49,7 +49,7 @@ import { delegateTool } from "./agent/delegateTool.js";
 import { DEFAULT_MAX_DELEGATION_DEPTH } from "./agent/delegationIdentity.js";
 import { parseDelegationScope } from "./agent/delegationScope.js";
 import { parseSubagentStopConditions } from "./agent/subagentStopConditions.js";
-import { prepareSkillTurn, workspaceSkillRoots } from "./skills/skillTurn.js";
+import { applySkillToolRestriction, prepareSkillTurn, workspaceSkillRoots } from "./skills/skillTurn.js";
 import { buildSkillCatalog } from "./skills/skillCatalog.js";
 import { loadNativeExtensions, type NativeExtensionManager, type NativeExtensionTurn } from "./extensions/nativeExtensionRuntime.js";
 import { denyPromptByCommandHooks } from "./extensions/nativeCommandHooks.js";
@@ -505,6 +505,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...breadth.toolset,
           ...shellOptIn
         });
+        // SH-EXT-05: a loaded skill's disallowed-tools narrows this run; an unregistered name is refused, never ignored.
+        const restricted = applySkillToolRestriction(toolset.registry, skillTurn, agentId);
+        if (restricted !== undefined) { toolset.close(); io.error(chalk.red(restricted)); io.fail(); return; }
         bindToolSession = (session) => { boundSession = session; };
         if (wantsDelegation) {
           // Said up front, not discovered mid-run. The capability and the signed
