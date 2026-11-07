@@ -9,9 +9,13 @@
 import type { Command } from "commander";
 import chalk from "chalk";
 import { join } from "node:path";
-import { LEDGER_UNANCHORED_MESSAGE } from "./ledger/ledgerVerification.js";
+import {
+  describeLedgerPrefix, LEDGER_UNANCHORED_MESSAGE, verifiedLedgerPrefix, type LedgerPrefixVerdict, type VerifyResult
+} from "./ledger/ledgerVerification.js";
 import type { IssuerAdmission } from "./trust/admission.js";
 import { isKeyRefused } from "./trust/signatureCheck.js";
+import type { TrustContext } from "./trust/trustContext.js";
+import { printArchivedStoreNote } from "./cli-verify-repair.js";
 
 export function registerEvidenceStoreCommands(program: Command): void {
   program
@@ -249,4 +253,39 @@ export function renderLedgerVerdict(result: {
     : chalk.red(LEDGER_UNANCHORED_MESSAGE);
   // The full key id, so an operator can compare it with the fingerprint recorded outside the workspace and pin that.
   return `${headline}\n${chalk.gray(`  Signed by monitor key ${fingerprint ?? "(absent)"}, read from inside the workspace.`)}`;
+}
+
+/**
+ * H3: a ledger whose only failure is sessions still open (a running Studio's gateway) verified as a prefix. It is never a
+ * pass: `amc verify` exits 1 as for any verdict short of complete, and an unanchored prefix still says UNANCHORED.
+ */
+export function renderLedgerPrefixVerdict(prefix: LedgerPrefixVerdict): string {
+  const { monitorFingerprint, monitorAdmission, anchored } = prefix.trustRoot;
+  if (monitorAdmission && isKeyRefused(monitorAdmission)) {
+    return chalk.red(`Ledger verification FAILED: monitor key ${monitorAdmission.status}. ${monitorAdmission.detail ?? ""}`);
+  }
+  const notEvaluated = prefix.payloadsNotEvaluated.length;
+  const lines = [
+    chalk.yellow(anchored ? "Ledger verification INCOMPLETE: verified prefix, not a complete-ledger verdict"
+      : "Ledger verification INCOMPLETE: prefix integrity verified, authorship not (UNANCHORED)"),
+    `  ${describeLedgerPrefix(prefix)}`,
+    chalk.gray("  No other check failed; nothing is claimed about how an open session ends. Run amc verify again once it has ended."),
+    ...(notEvaluated > 0 ? [chalk.yellow(`  ${notEvaluated} payload(s) not evaluated: the ledger key is unavailable here.`)] : [])
+  ];
+  return [...lines, anchored ? chalk.gray(`  Anchored to the pinned monitor key ${monitorFingerprint ?? ""}`)
+    : `${chalk.red(LEDGER_UNANCHORED_MESSAGE)}\n${chalk.gray(`  Signed by monitor key ${monitorFingerprint ?? "(absent)"}, read from inside the workspace.`)}`].join("\n");
+}
+
+/**
+ * H3, for `amc verify` after a complete verdict failed: when open sessions are the only failure, print the verified
+ * prefix and the archived-store note, then exit 1. Otherwise return, and the failure prints as before.
+ */
+export function exitIfLedgerPrefix(workspace: string, result: VerifyResult,
+  flags: { expectMonitor?: string; relabelLegacy?: boolean }, trust: TrustContext): void {
+  const prefix = verifiedLedgerPrefix(workspace, result, { trust, ...(flags.expectMonitor ? { expectedMonitorFingerprint: flags.expectMonitor } : {}) });
+  if (!prefix) return;
+  console.log(renderLedgerPrefixVerdict(prefix));
+  printArchivedStoreNote(workspace);
+  if (flags.relabelLegacy) console.log("Legacy relabel skipped: the ledger verified only as a prefix. Nothing was written.");
+  process.exit(1);
 }

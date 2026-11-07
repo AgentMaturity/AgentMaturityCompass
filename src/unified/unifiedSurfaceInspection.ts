@@ -10,7 +10,8 @@ import {
   verifyFleetConfigSignature,
 } from "../fleet/registry.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
-import { verifyLedgerIntegrity } from "../ledger/ledger.js";
+import { verifiedLedgerPrefix, verifyLedgerIntegrity } from "../ledger/ledger.js";
+import { describeLedgerPrefix, type LedgerPrefixVerdict } from "../ledger/ledgerVerification.js";
 import { listObservabilityLaneRecords } from "../lifecycle/observabilityLane.js";
 import {
   listPassportExportFiles,
@@ -124,15 +125,19 @@ async function inspectVault(workspace: string): Promise<UnifiedSurfaceModuleResu
   const ledgerExists = pathExists(ledgerPath);
   let ledgerValid = false;
   let ledgerErrors: string[] = [];
+  let prefix: LedgerPrefixVerdict | null = null;
   if (ledgerExists) {
     try {
       const verified = await verifyLedgerIntegrity(workspace);
       ledgerValid = verified.ok;
-      ledgerErrors = verified.errors;
+      // H3: a running Studio's gateway session is open, not broken. Pending over a verified prefix, never verified.
+      prefix = verifiedLedgerPrefix(workspace, verified);
+      ledgerErrors = prefix ? [] : verified.errors;
     } catch (error) {
       ledgerErrors = [String(error)];
     }
   }
+  const pending = status.exists && prefix !== null;
   const score = (status.exists ? 25 : 0)
     + (pathExists(status.metaPath) ? 15 : 0)
     + (ledgerExists ? 15 : 0)
@@ -140,17 +145,19 @@ async function inspectVault(workspace: string): Promise<UnifiedSurfaceModuleResu
   const issues = [
     ...(!status.exists ? ["encrypted vault is missing"] : []),
     ...(!ledgerExists ? ["evidence ledger is missing"] : []),
+    ...(prefix ? [`ledger verified as a prefix only: ${describeLedgerPrefix(prefix)}`] : []),
     ...ledgerErrors.map((error) => `ledger integrity: ${error}`),
   ];
   return result({
     name: "Vault",
-    status: status.exists && ledgerValid ? "success" : "failed",
+    status: status.exists && ledgerValid ? "success" : pending ? "skipped" : "failed",
     score,
     summary: status.exists && ledgerValid
       ? `Encrypted vault present; evidence ledger verified${status.unlocked ? " with an active local session" : " while locked"}.`
+      : pending ? "Encrypted vault present; the complete ledger verdict waits for an open session to end."
       : "Vault or ledger proof is incomplete.",
     issues,
-    upgradePath: "Run `amc vault status`, `amc ledger verify`, and repair every integrity error before using proof externally.",
+    upgradePath: "Run `amc vault status` and `amc verify`, and repair every integrity error before using proof externally.",
     evidenceRefs: [status.vaultPath, status.metaPath, ledgerPath],
   });
 }
