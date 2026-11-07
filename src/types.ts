@@ -3271,6 +3271,11 @@ export interface DiagnosticReport {
   windowEndTs: number;
   status: "VALID" | "INVALID" | "UNSIGNED";
   verificationPassed: boolean;
+  /**
+   * H3: only on an INVALID run whose sole failure is ledger sessions still open (a running Studio's gateway) over a prefix
+   * that verified (verifiedLedgerPrefix). It never makes a run VALID; its claim reads LEDGER_NOT_FINALIZED.
+   */
+  ledgerPrefix?: { unfinalizedSessions: string[] };
   trustBoundaryViolated: boolean;
   trustBoundaryMessage: string | null;
   integrityIndex: number;

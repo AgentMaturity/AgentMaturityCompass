@@ -575,7 +575,7 @@ This is the largest API surface today and should be treated as internal operatio
 
 Claim labels (P0-23):
 - the Studio routes that feed result pages, listed in `src/studio/studioClaimOutput.ts`, add `claimKind`, `statusDimensions` and `claimLabel` to every 2xx body, or a `claim` on each item of `/assurance/runs` and `/industry-packs/list`
-- the console shows those claims in a strip on each result page, with the kind and result in a pill, the five dimensions in its tooltip and a link to the legend; "not evaluated" is a neutral state with its reason, never 0
+- the console shows those claims in a strip on each result page, with the kind and result in a pill, the five dimensions in its tooltip and a collapsed legend below the pills; "not evaluated" is a neutral state with its reason, never 0
 - Studio's `/industry-packs/*` success responses add `entitlementNote`: Industry Packs are free, and access never changes a result, a trust tier or a verification outcome. Claim fields never depend on a licence
 - `/industry-packs/:id` refuses inherited names such as `__proto__` and `constructor` as pack ids
 

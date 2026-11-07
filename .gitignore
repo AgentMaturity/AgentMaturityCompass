@@ -81,7 +81,7 @@ sales_playbook.md
 memory/
 amc_ai_army/
 AMC_OS/
-ASSETS/
+/ASSETS/
 security-audit/
 
 # Stray CLI artifacts. These were the symptom of scripts taking argv[2] as an

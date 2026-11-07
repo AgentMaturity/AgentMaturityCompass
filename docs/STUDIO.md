@@ -25,7 +25,7 @@ Logs:
 
 ## Local API
 
-Studio host/port come from runtime config (`AMC_BIND`, `AMC_STUDIO_PORT`).
+Studio host/port come from runtime config (`AMC_BIND`, `AMC_STUDIO_PORT`). The dashboard port is `AMC_DASHBOARD_PORT` (default 4173); `amc dashboard build` writes `.amc/agents/<agent>/dashboard`, the directory Studio serves.
 `amc up` defaults to localhost in local workflows.
 
 Token file:
