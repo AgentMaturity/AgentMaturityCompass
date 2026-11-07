@@ -37,6 +37,21 @@
     "P2-09d",
     "P2-25",
     "P2-30",
-    "P3-14"
+    "P3-14",
+    "LIVE-VAULT",
+    "LIVE-INTEGRITY",
+    "LIVE-DEPLOY",
+    "LIVE-RUNTIME",
+    "LIVE-UX",
+    "SH-LOOP",
+    "SH-PROVIDERS",
+    "SH-TOOLS",
+    "SH-SANDBOX",
+    "SH-EXT",
+    "SH-ORCH",
+    "SH-UI",
+    "SH-OBS",
+    "SH-TRUST",
+    "SH-INTEG"
   ]
 }
