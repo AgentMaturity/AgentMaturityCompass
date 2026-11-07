@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runDoctorRules } from "../src/doctor/doctorRules.js";
 import { renderDoctorText } from "../src/doctor/doctorReport.js";
-import { firstRunActions, firstRunFixCommands, STUB_FIRST_TURN_COMMAND } from "../src/doctor/firstRunPlan.js";
+import { doctorNextSteps, firstRunActions, firstRunFixCommands, STUB_FIRST_TURN_COMMAND } from "../src/doctor/firstRunPlan.js";
 
 /**
  * First-run diagnostic (brief §7 item 4, §7a): `amc doctor` must name each
@@ -202,6 +202,17 @@ describe("amc doctor names each first-run precondition and its fix", () => {
     expect(firstFail).toBe(0);
     expect(fixes[0]!.checkId).toBe("runtime-firewall-policy");
     expect(firstWarn === -1 || firstFail < firstWarn).toBe(true);
+  });
+
+  it("lists optional adapter installs after the closing steps, so the first score is not ranked below them", () => {
+    const steps = doctorNextSteps({ ok: true, mode: "WORKSPACE", workspaceInitialized: true, strict: false, checks: [
+      { id: "adapter-openhands-cli", status: "WARN", message: "openhands-cli: missing commands: openhands", fixHint: "Install/enable openhands-cli CLI or use generic-cli" },
+      { id: "runtime-firewall-policy", status: "WARN", message: "Runtime Firewall policy missing", fixHint: "Run: amc firewall enable" },
+      { id: "sig-tools", status: "FAIL", message: "tools.yaml signature invalid", fixHint: "Run: amc fix-signatures" },
+      { id: "node-version", status: "PASS", message: "Node 22" }
+    ] }, [{ cmd: "amc", desc: "Get your first full maturity score" }]);
+    expect(steps.map((step) => step.cmd)).toEqual(["amc fix-signatures", "amc firewall enable", "amc", "Install/enable openhands-cli CLI or use generic-cli"]);
+    expect(steps[0]?.desc).toBe("[FAIL] sig-tools: tools.yaml signature invalid");
   });
 });
 

@@ -178,6 +178,15 @@ describe("deployment pack assets", () => {
     }
   });
 
+  it("reads the dashboard port from AMC_DASHBOARD_PORT and refuses one another service uses", () => {
+    expect(loadStudioRuntimeConfig({ AMC_WORKSPACE_DIR: "/tmp/amc" }).dashboardPort).toBe(4173);
+    expect(loadStudioRuntimeConfig({ AMC_WORKSPACE_DIR: "/tmp/amc", AMC_DASHBOARD_PORT: "45173" }).dashboardPort).toBe(45173);
+    expect(() => loadStudioRuntimeConfig({ AMC_WORKSPACE_DIR: "/tmp/amc", AMC_DASHBOARD_PORT: "3212" }))
+      .toThrow(/port 3212 is assigned to multiple services \(AMC_STUDIO_PORT, AMC_DASHBOARD_PORT\)/);
+    // Unset, the dashboard keeps falling back to a free port, so a service already on 4173 stays valid.
+    expect(loadStudioRuntimeConfig({ AMC_WORKSPACE_DIR: "/tmp/amc", AMC_METRICS_PORT: "4173" }).metricsPort).toBe(4173);
+  });
+
   it("rejects duplicate runtime port assignments", () => {
     expect(() =>
       loadStudioRuntimeConfig({

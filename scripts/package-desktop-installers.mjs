@@ -395,14 +395,20 @@ if [ "$CURRENT_DIGEST" != "$PACKAGE_DIGEST" ] || [ ! -x "$AMC_BIN" ]; then
   if [ -x "$AMC_BIN" ] && [ -f "$STATE_FILE" ]; then
     # Stop the Studio that the previous runtime started, so the upgraded runtime serves the console.
     # AMC_NO_AUTO_REBUILD: the old runtime is about to be replaced, so it must not repair its database engine first.
-    OLD_PID=$(node -e 'try { console.log(require(process.argv[1]).pid || "") } catch {}' "$STATE_FILE" 2>/dev/null || true)
-    (cd "$WORKSPACE_DIR" && AMC_NO_AUTO_REBUILD=1 "$AMC_BIN" down) >>"$LOG_FILE" 2>&1 || true
-    # amc down only signals the daemon, which can take up to 10 s to release its port.
-    WAITED=0
-    while [ -n "$OLD_PID" ] && kill -0 "$OLD_PID" 2>/dev/null && [ "$WAITED" -lt 15 ]; do
-      sleep 1
-      WAITED=$((WAITED + 1))
-    done
+    OLD_PID=$(node -e 'try { const pid = require(process.argv[1]).pid; console.log(Number.isSafeInteger(pid) && pid > 0 ? pid : "") } catch {}' "$STATE_FILE" 2>/dev/null || true)
+    # The old runtime's amc down signals any live pid in the state file; a stale file's pid may now be another program's.
+    if [ -n "$OLD_PID" ] && ps -ww -o command= -p "$OLD_PID" 2>/dev/null | grep -q '_studio-daemon'; then
+      (cd "$WORKSPACE_DIR" && AMC_NO_AUTO_REBUILD=1 "$AMC_BIN" down) >>"$LOG_FILE" 2>&1 || true
+      # amc down only signals the daemon, which can take up to 10 s to release its port.
+      WAITED=0
+      while kill -0 "$OLD_PID" 2>/dev/null && [ "$WAITED" -lt 15 ]; do
+        sleep 1
+        WAITED=$((WAITED + 1))
+      done
+    else
+      # No Studio daemon runs under that pid, so the state file is stale; the new runtime must not trust it.
+      rm -f "$STATE_FILE"
+    fi
   fi
   mkdir -p "$RUNTIME_DIR"
   npm install --prefix "$RUNTIME_DIR" --no-audit --no-fund "$PACKAGE" >>"$LOG_FILE" 2>&1
@@ -481,16 +487,23 @@ if ($CurrentDigest -ne $PackageDigest -or -not (Test-Path -LiteralPath $AmcBin))
   if ((Test-Path -LiteralPath $AmcBin) -and (Test-Path -LiteralPath $StateFile)) {
     # Stop the Studio that the previous runtime started, so the upgraded runtime serves the console.
     # AMC_NO_AUTO_REBUILD: the old runtime is about to be replaced, so it must not repair its database engine first.
-    $OldPid = try { (Get-Content -LiteralPath $StateFile -Raw | ConvertFrom-Json).pid } catch { $null }
-    Push-Location -LiteralPath $WorkspaceDir
-    $NoAutoRebuild = $env:AMC_NO_AUTO_REBUILD
-    $env:AMC_NO_AUTO_REBUILD = "1"
-    $ErrorActionPreference = "Continue"
-    & $AmcBin down *>> $LogFile
-    $ErrorActionPreference = "Stop"
-    $env:AMC_NO_AUTO_REBUILD = $NoAutoRebuild
-    Pop-Location
-    if ($OldPid) { Wait-Process -Id $OldPid -Timeout 15 -ErrorAction SilentlyContinue }
+    $OldPid = try { [int](Get-Content -LiteralPath $StateFile -Raw | ConvertFrom-Json).pid } catch { 0 }
+    # The old runtime's amc down signals any live pid in the state file; a stale file's pid may now be another program's.
+    $OldCommandLine = if ($OldPid -gt 0) { try { (Get-CimInstance Win32_Process -Filter "ProcessId=$OldPid" -ErrorAction Stop).CommandLine } catch { $null } } else { $null }
+    if ($OldCommandLine -and $OldCommandLine.Contains("_studio-daemon")) {
+      Push-Location -LiteralPath $WorkspaceDir
+      $NoAutoRebuild = $env:AMC_NO_AUTO_REBUILD
+      $env:AMC_NO_AUTO_REBUILD = "1"
+      $ErrorActionPreference = "Continue"
+      & $AmcBin down *>> $LogFile
+      $ErrorActionPreference = "Stop"
+      $env:AMC_NO_AUTO_REBUILD = $NoAutoRebuild
+      Pop-Location
+      Wait-Process -Id $OldPid -Timeout 15 -ErrorAction SilentlyContinue
+    } else {
+      # No Studio daemon runs under that pid, so the state file is stale; the new runtime must not trust it.
+      Remove-Item -LiteralPath $StateFile -Force -ErrorAction SilentlyContinue
+    }
   }
   New-Item -ItemType Directory -Force -Path $RuntimeDir | Out-Null
   $ErrorActionPreference = "Continue"

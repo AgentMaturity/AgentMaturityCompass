@@ -39,7 +39,7 @@ import { applyAMCConfigProfile, initWorkspace, loadAMCConfig, quickstartWizard, 
 import { initWorkspaceAsync } from "./workspaceInitializationAsync.js";
 import { captureInstantWorkspaceDiagnostic } from "./cli/instantWorkspaceDiagnostic.js";
 import { runDoctorCli } from "./doctor/doctorCli.js";
-import { firstRunActions, firstRunFixCommands } from "./doctor/firstRunPlan.js";
+import { doctorNextSteps, firstRunActions, firstRunFixCommands } from "./doctor/firstRunPlan.js";
 import {
   buildCommandInventory,
   cliDiscoverabilityFooter,
@@ -2201,10 +2201,10 @@ async function initializeMinimalStartupWorkspace(opts: {
   console.log("");
 }
 
-/** The three operator actions from an initialized workspace to a first governed, verified, keyless turn. */
-function printFirstRunActions(fmt: typeof import("./cliFormat.js")): void {
-  console.log(fmt.info("Three actions reach a first governed, verified turn without any provider key:"));
-  console.log(fmt.nextSteps(firstRunActions().map((action) => ({ cmd: action.cmd, desc: action.desc }))));
+/** One What's next list: the three actions to a first governed, verified, keyless turn, then any further steps. */
+function printFirstRunActions(fmt: typeof import("./cliFormat.js"), more: Array<{ cmd: string; desc: string }> = []): void {
+  console.log(fmt.info("The first three steps reach a first governed, verified turn without any provider key:"));
+  console.log(fmt.nextSteps([...firstRunActions().map((action) => ({ cmd: action.cmd, desc: action.desc })), ...more]));
 }
 
 program
@@ -2296,14 +2296,13 @@ program
     console.log(fmt.logo());
     console.log(fmt.pass("Workspace initialized"));
     console.log(fmt.info(`Location: ${init.workspacePath}`));
-    printFirstRunActions(fmt);
-    console.log(fmt.nextSteps([
+    printFirstRunActions(fmt, [
       { cmd: "amc", desc: "Generate the full evidence score immediately" },
-      { cmd: `amc config profile ${opts.profile}`, desc: "Re-apply the selected workspace config profile" },
-      { cmd: "amc setup --demo", desc: "Load demo data and explore all features" },
-      { cmd: "amc doctor", desc: "Check what's available in your environment" },
       { cmd: "amc up", desc: "Start Studio (web dashboard)" },
-    ]));
+      { cmd: "amc doctor", desc: "Check what's available in your environment" },
+      { cmd: "amc setup --demo", desc: "Load demo data and explore all features" },
+      { cmd: `amc config profile ${opts.profile}`, desc: "Re-apply the selected workspace config profile" },
+    ]);
     console.log(fmt.colors.dim("  Full guide: https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md"));
     console.log("");
 
@@ -2361,22 +2360,18 @@ program
     // Every failing or warning check names its own fix; print those verbatim,
     // blocking ones first, so the operator copies rather than hunts. A warning
     // with a fix is still a missing precondition even when the exit code is 0.
-    const fixes = firstRunFixCommands({ ok: result.ok, checks: result.checks, mode: result.mode, workspaceInitialized: result.workspaceInitialized, strict: result.strict, liveProbes: result.liveProbes })
-      .map((fix) => ({ cmd: fix.cmd, desc: `[${fix.status}] ${fix.checkId}: ${fix.desc}` }));
+    // Optional adapter installs follow the closing steps (doctorNextSteps).
+    const fixCount = firstRunFixCommands(result).length;
     if (!result.ok) {
-      console.log(fmt.nextSteps([
-        ...fixes,
-        ...(result.workspaceInitialized
-          ? [{ cmd: "amc doctor-fix", desc: "Auto-repair common workspace issues" }]
-          : [{ cmd: "amc", desc: "Initialize this workspace and generate its first evidence result" }]),
+      console.log(fmt.nextSteps(doctorNextSteps(result, [
+        result.workspaceInitialized
+          ? { cmd: "amc doctor-fix", desc: "Auto-repair common workspace issues" }
+          : { cmd: "amc", desc: "Initialize this workspace and generate its first evidence result" },
         { cmd: "amc help", desc: "All available commands" },
-      ]));
-    } else if (fixes.length > 0) {
-      console.log(fmt.warn(`${fixes.length} precondition(s) still missing; each names its fix:`));
-      console.log(fmt.nextSteps([
-        ...fixes,
-        { cmd: "amc", desc: "Get your first full maturity score" },
-      ]));
+      ])));
+    } else if (fixCount > 0) {
+      console.log(fmt.warn(`${fixCount} precondition(s) still missing; each names its fix:`));
+      console.log(fmt.nextSteps(doctorNextSteps(result, [{ cmd: "amc", desc: "Get your first full maturity score" }])));
     } else {
       console.log(fmt.pass(result.workspaceInitialized ? "The listed diagnostic checks passed; this does not qualify a governed task or a release." : "CLI install checks passed."));
       console.log(fmt.nextSteps([
@@ -4197,7 +4192,7 @@ studio
       studioPort: opts.port ? Number(opts.port) : undefined
     });
     const hostMode = Boolean(runtimeConfig.hostDir);
-    const dashboardPort = opts.dashboardPort ? Number(opts.dashboardPort) : 4173;
+    const dashboardPort = opts.dashboardPort ? Number(opts.dashboardPort) : runtimeConfig.dashboardPort;
     const lan = loadLanMode(runtimeConfig.workspaceDir);
     const lanSig = verifyLanModeSignature(runtimeConfig.workspaceDir);
     const queryCarrierAllowed = runtimeConfig.queryLeaseCarrierEnabled && lan.enabled && lanSig.valid;
@@ -10855,12 +10850,10 @@ dashboard
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .option("--out <dir>", "output dashboard directory")
   .action((opts: { agent?: string; out?: string }) => {
-    const resolvedAgent = opts.agent ?? activeAgent(program);
-    const defaultOut = resolvedAgent ? `.amc/agents/${resolvedAgent}/dashboard` : ".amc/dashboard";
     const built = buildDashboard({
       workspace: process.cwd(),
-      agentId: resolvedAgent,
-      outDir: opts.out ?? defaultOut
+      agentId: opts.agent ?? activeAgent(program),
+      outDir: opts.out
     });
     console.log(chalk.green(`Dashboard built: ${built.outDir}`));
     console.log(`Agent: ${built.agentId}`);
@@ -10876,13 +10869,12 @@ dashboard
   .option("--no-open", "don't automatically open browser")
   .action(async (opts: { agent?: string; port: string; out?: string; open: boolean }) => {
     const resolvedAgent = opts.agent ?? activeAgent(program);
-    const defaultOut = resolvedAgent ? `.amc/agents/${resolvedAgent}/dashboard` : ".amc/dashboard";
     
     // Build dashboard first
     const built = buildDashboard({
       workspace: process.cwd(),
       agentId: resolvedAgent,
-      outDir: opts.out ?? defaultOut
+      outDir: opts.out
     });
     
     // Start server
@@ -10890,7 +10882,7 @@ dashboard
       workspace: process.cwd(),
       agentId: resolvedAgent,
       port: Number(opts.port),
-      outDir: opts.out ?? defaultOut
+      outDir: opts.out
     });
     
     console.log(chalk.green(`AMC Web UI running: ${handle.url}`));
@@ -18604,7 +18596,7 @@ program
     const lan = loadLanMode(runtimeConfig.workspaceDir);
     const lanSig = verifyLanModeSignature(runtimeConfig.workspaceDir);
     const resolvedApiPort = explicitApiPort ?? (hostMode ? runtimeConfig.hostPort : runtimeConfig.studioPort);
-    const resolvedDashboardPort = explicitDashboardPort ?? 4173;
+    const resolvedDashboardPort = explicitDashboardPort ?? runtimeConfig.dashboardPort;
     const runtime = await runStudioForeground({
       workspace: runtimeConfig.workspaceDir,
       hostDir: runtimeConfig.hostDir ?? undefined,
@@ -23968,9 +23960,8 @@ dashboard
   .option("--no-open", "do not automatically open the browser")
   .action(async (opts: { agent?: string; port: string; view?: string; open?: boolean }) => {
     const resolvedAgent = opts.agent ?? activeAgent(program);
-    const outDir = resolvedAgent ? `.amc/agents/${resolvedAgent}/dashboard` : ".amc/dashboard";
     try {
-      buildDashboard({ workspace: process.cwd(), agentId: resolvedAgent, outDir });
+      buildDashboard({ workspace: process.cwd(), agentId: resolvedAgent });
     } catch (e: unknown) {
       console.log(chalk.yellow(`Note: ${toErrorMessage(e)}`));
       console.log(chalk.gray("Dashboard will serve with available data."));
@@ -23979,7 +23970,6 @@ dashboard
       workspace: process.cwd(),
       agentId: resolvedAgent,
       port: Number(opts.port),
-      outDir,
     });
     console.log(chalk.green(`\n🌐  Dashboard serving at ${handle.url}`));
     console.log(chalk.gray(`View: ${opts.view || "engineer"}`));

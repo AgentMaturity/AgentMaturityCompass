@@ -50,6 +50,7 @@ export const studioEnvSchema = z.object({
   AMC_GATEWAY_PORT: portish.default(3210),
   AMC_PROXY_PORT: portish.default(3211),
   AMC_TOOLHUB_PORT: portish.default(3213),
+  AMC_DASHBOARD_PORT: portish.default(4173),
   AMC_LOG_LEVEL: z.enum(["error", "warn", "info", "debug"]).default("info"),
   AMC_LAN_MODE: boolish.default(false),
   AMC_ALLOWED_CIDRS: z.string().default("127.0.0.1/32,::1/128"),
