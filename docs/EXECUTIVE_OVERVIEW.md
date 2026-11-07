@@ -120,7 +120,7 @@ For the board interpretation of an L3 result, attach [What L3 Means For Business
 
 ## Cost
 
-AMC is MIT licensed and free: scoring, evidence, reports, Studio, adapters, CI gates and all 41 Industry Domain Packs. Since 2026-11-07 Industry Packs need no licence, account or payment. The packs are self-reported questionnaires whose content is experimental, and access never changes a result.
+AMC is MIT licensed and free: scoring, evidence, reports, Studio, adapters, CI gates and all 41 Industry Domain Packs. In the current source build (unreleased; the next release is 2.0.0) Industry Packs need no licence, account or payment; the published 1.1.1 release still asks for a licence before pack questions and runs. The packs are self-reported questionnaires whose content is experimental, and access never changes a result.
 
 ## Contact
 

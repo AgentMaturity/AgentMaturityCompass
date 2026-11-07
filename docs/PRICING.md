@@ -2,7 +2,7 @@
 
 ## The model
 
-AMC is open source and MIT licensed, and the whole product is free, including all 41 **Industry Packs**. Since 2026-11-07 Industry Packs need no licence, account or payment ([ADR 019](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/adr/019-industry-packs-free.md), which supersedes the paid-packs plan of ADR-005). There is nothing to buy in the product: checkout is not available, because every feature and every pack is free.
+AMC is open source and MIT licensed, and the whole product is free, including all 41 **Industry Packs**. In the current source build (unreleased; the next release is 2.0.0) Industry Packs need no licence, account or payment ([ADR 019](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/adr/019-industry-packs-free.md), decided on 2026-11-07, which supersedes the paid-packs plan of ADR-005). The published 1.1.1 release predates that decision: it still asks for a licence before pack questions and runs, and its checkout never went live, so use the [source build](INSTALL.md#option-b-from-github-development) for packs. There is nothing to buy in the product: checkout is not available, because every feature and every pack is free.
 
 Industry Packs are self-reported questionnaires whose content is experimental: AI-drafted until a named expert signs it. Access never changes a score, gap, report, assurance result or roadmap, nor a trust tier or verification outcome. A pack result is never a certification, a compliance verdict or proof of safety.
 
@@ -36,7 +36,7 @@ CLI:
 
 ```bash
 amc domain pack list      # every pack, all included
-amc domain pack access    # Price: free, Status: active
+amc domain pack access    # source build: Price: free, Status: active (1.1.1 without a licence: locked)
 amc domain pack describe --pack <packId>
 amc domain pack run --pack <packId>
 ```
@@ -57,10 +57,10 @@ A licence issued under the earlier plan is not needed for anything. `amc domain 
 ## FAQ
 
 ### Is AMC really free?
-Yes. Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport and all 41 Industry Packs — all free, all MIT licensed. No feature gating on the trust stack itself, and no licence gate on Industry Packs.
+Yes. Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport and all 41 Industry Packs — all free, all MIT licensed. No feature gating on the trust stack itself, and no licence gate on Industry Packs in the current source build.
 
 ### Do I need a licence for Industry Packs?
-No. Every pack's questions and runs are included for everyone. A licence from the earlier plan still verifies, but it unlocks nothing, because nothing is locked.
+No, with the current source build (unreleased; the next release is 2.0.0): every pack's questions and runs are included for everyone. The published 1.1.1 release still asks for a licence before pack questions and runs. A licence from the earlier plan still verifies, but in the source build it unlocks nothing, because nothing is locked.
 
 ### Can I build my own domain packs?
 Yes. AMC's pack system is extensible. You can create custom packs for your own domain.

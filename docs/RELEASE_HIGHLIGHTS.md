@@ -8,6 +8,8 @@ This page exists to show momentum without making users read the entire changelog
 - help visitors see that AMC is active
 
 ## Current highlights
+- Industry Packs are free in the current source build (unreleased; the next release is 2.0.0): all 41 packs' questions and runs need no licence, account or payment ([ADR 019](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/adr/019-industry-packs-free.md)). The published 1.1.1 release still asks for a licence. Pack results stay self-reported questionnaires whose content is experimental, and access never changes a result
+- A4 Forge preview, in the current source build only: one agent from a brief to a recorded, customer-controlled deployment in four gated stages (Aspire, Assemble, Adapt, Activate), off unless the operator sets `AMC_A4_PREVIEW=1` ([A4 Forge](A4_FORGE.md)). Its records are signed and self-reported, never a statement that the agent is safe, correct or lawful
 - Explicit provider-native signed control for Claude Code and Gemini CLI: observe by default, opt into loopback-only Enforce decisions backed by existing signed policies and receipts
 - Least-privilege Studio module API authorization: route-level viewer, operator, approver, auditor, and owner boundaries replace the former shared human-role gate
 - Domain Proof API containment: inline schema-validated checks, realpath-confined deprecated fixtures, bounded errors, and no caller-selected server writes

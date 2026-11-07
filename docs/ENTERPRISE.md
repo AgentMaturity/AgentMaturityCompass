@@ -2,7 +2,7 @@
 
 ## What Enterprise adds
 
-The whole AMC product, the trust stack and all 41 Industry Packs, is free and MIT licensed. Enterprise is a contact-first plan, not a self-serve product, and adds services only:
+The whole AMC product, the trust stack and all 41 Industry Packs, is free and MIT licensed (Industry Packs in the current source build; see [Industry Packs are free](#industry-packs-are-free)). Enterprise is a contact-first plan, not a self-serve product, and adds services only:
 
 1. **Priority support** — faster response times and dedicated channels
 2. **Custom pack development** — bespoke domain packs for your specific regulatory or industry needs
@@ -12,7 +12,7 @@ The whole AMC product, the trust stack and all 41 Industry Packs, is free and MI
 
 Everything else:
 - Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport
-- All 14 framework adapters
+- All <!-- amc:count:adapters -->16<!-- /amc:count --> framework adapters
 - 1,268 CLI command paths
 - 244 default diagnostic questions plus the free, opt-in 20-question lifecycle expansion
 - <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered adversarial assurance packs
@@ -23,7 +23,7 @@ Everything else:
 
 ## Industry Packs are free
 
-All 41 domain-specific packs are free for everyone, with no licence, account or payment; they are not an Enterprise feature. They span seven stations: Health, Wealth, Education, Mobility, Technology, Environment and Governance ([DOMAIN_PACKS.md](DOMAIN_PACKS.md) gives the counts per station; `amc domain pack list` lists every pack). Each is a self-reported questionnaire whose content is experimental, never a certification or a compliance verdict.
+All 41 domain-specific packs are free for everyone in the current source build (unreleased; the next release is 2.0.0), with no licence, account or payment; they are not an Enterprise feature. The published 1.1.1 release still asks for a licence before pack questions and runs, and its checkout never went live. They span seven stations: Health, Wealth, Education, Mobility, Technology, Environment and Governance ([DOMAIN_PACKS.md](DOMAIN_PACKS.md) gives the counts per station; `amc domain pack list` lists every pack). Each is a self-reported questionnaire whose content is experimental, never a certification or a compliance verdict.
 
 ## Deployment options
 

@@ -1,6 +1,6 @@
 # BUYER_PACKAGES.md — Commercial offers by buyer type
 
-The whole AMC product, the trust stack and all 41 Industry Packs included, is free and MIT licensed for every buyer type. The planned commercial offer is Enterprise: contact-first priority support, custom pack development and deployment assistance (`docs/PRICING.md`). No feature or pack depends on it.
+The whole AMC product, the trust stack and all 41 Industry Packs included, is free and MIT licensed for every buyer type. Industry Packs are free in the current source build (unreleased; the next release is 2.0.0); the published 1.1.1 release still asks for a licence before pack questions and runs. The planned commercial offer is Enterprise: contact-first priority support, custom pack development and deployment assistance (`docs/PRICING.md`). No feature or pack depends on it.
 
 ## Startup / small AI team
 Best fit:

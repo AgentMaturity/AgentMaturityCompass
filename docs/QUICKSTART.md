@@ -238,7 +238,7 @@ amc quickscore --answers answers.json --json
 amc quickscore --rapid --answers '{"AMC-1.1":3,"AMC-2.1":4}' --json
 ```
 
-If `amc quickscore` cannot open terminal prompts, its placeholder L0 output includes the hint "Did you mean to run the interactive score?" so first-run users know to rerun in a terminal or pass answer JSON.
+Without a terminal, `amc quickscore` generates no placeholder score: it exits 1 with the hint "Did you mean to run the interactive score?" so first-run users know to rerun in a terminal or pass answer JSON.
 
 If `amc quickscore --auto --json` cannot find captured execution evidence, it returns `scoreStatus: "AUTO_NO_EVIDENCE"` and no measured score fields. Use `amc adapters run --agent <id> --adapter <id> -- <your-agent-command>` to capture evidence first, or use `amc quickscore --answers answers.json --json` when you want CI-safe survey scoring.
 

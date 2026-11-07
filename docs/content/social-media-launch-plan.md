@@ -44,7 +44,7 @@
 - Demo with LangChain, CrewAI, Claude Code
 
 ### Day 6: Industry Packs
-- Thread: "41 Industry Packs, free for everyone: sector questionnaires for healthcare (HIPAA), finance (MiFID II) and more. Self-reported and experimental, never a compliance verdict."
+- Thread: "41 Industry Packs, free in the current source build: sector questionnaires for healthcare (HIPAA), finance (MiFID II) and more. Self-reported and experimental, never a compliance verdict. The published 1.1.1 release still asks for a licence."
 - Domain pack walkthrough
 
 ### Day 7: What's Next

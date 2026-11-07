@@ -23,7 +23,8 @@ Industry Packs are free for everyone: no licence, checkout, account or payment.
 Legacy licence verification, for anyone who already holds a licence. None of it is needed for access.
 
 - `amc domain pack activate --key` records a licence that verifies against an `artifact-seal` key pinned in the operator's trust list, and prints that it changes nothing. `amc domain pack verify --key` verifies one. Both still refuse a licence that no pinned key signed.
-- Studio `POST /industry-packs/activate` and `POST /industry-packs/license/verify`, and the hosted licence issue, verify and webhook endpoints in `api/index.ts`, are unchanged.
+- Studio `POST /industry-packs/activate` still verifies and records a licence. It answers 200 `{ entitlement, licence, entitlementNote }`: `entitlement` is the free record, and `licence` (`{ planId, status, expiresAt, customerId?, subscriptionId? }`) describes the recorded licence; `amc domain pack activate --json` adds the same `licence` object to the free entitlement. Its `INDUSTRY_PACKS_ACTIVATED` audit payload is `{ planId, licenseStatus, expiresAt, subscriptionId }`, taken from the licence.
+- Studio `POST /industry-packs/license/verify` and the hosted licence issue, verify and webhook endpoints in `api/index.ts` behave as before.
 - Licences keep the plan id `industry-packs-monthly` (`INDUSTRY_PACKS_PLAN_ID`). `entitlement.licenseVerificationConfigured` reports whether this machine pins a key that could verify one.
 
 ## Truth rule

@@ -149,7 +149,7 @@
               <div class="terminal-line"><span class="terminal-label">Windows</span><span class="terminal-value">Agent Maturity Compass Studio.cmd</span></div>
               <div class="terminal-line"><span class="terminal-label">Run full score</span><span class="terminal-value">button + CLI</span></div>
               <div class="terminal-line"><span class="terminal-label">Assurance packs</span><span class="terminal-value"><!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs</span></div>
-              <div class="terminal-line"><span class="terminal-label">Industry Packs</span><span class="terminal-value">41 packs · free</span></div>
+              <div class="terminal-line"><span class="terminal-label">Industry Packs</span><span class="terminal-value">41 packs · free in the source build (1.1.1 locks them)</span></div>
               <div class="terminal-line"><span class="terminal-label">Reports</span><span class="terminal-value">artifact + evidence status</span></div>
             </div>
           </div>
@@ -157,7 +157,7 @@
             <div class="product-info-grid">
               <div class="product-info-card"><span>apps</span><strong>Launch locally</strong><p>The macOS native WebKit app and Windows system-browser launcher use a version-pinned AMC runtime, without bundling Electron or trusting a stale global CLI.</p></div>
               <div class="product-info-card"><span>score</span><strong>See the trust baseline</strong><p>Overall level, layer bars, evidence coverage, top gaps, and an explicit READY or blocked claim state.</p></div>
-              <div class="product-info-card"><span>packs</span><strong>Browse every pack</strong><p>Assurance packs and all 41 Industry Packs are free; Industry Pack results stay self-reported.</p></div>
+              <div class="product-info-card"><span>packs</span><strong>Browse every pack</strong><p>Assurance packs are free. All 41 Industry Packs are free in the current source build; the published 1.1.1 desktop archives still lock them behind the earlier licence gate. Industry Pack results stay self-reported.</p></div>
               <div class="product-info-card"><span>reports</span><strong>Share with the team</strong><p>Generate outputs for engineering, compliance, and leadership review.</p></div>
             </div>
           </div>
@@ -463,7 +463,7 @@
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Do I need Docker?<span class="faq-icon">+</span></button><div class="faq-a"><p>No. Use the verified macOS/Linux or Windows release installer above. Docker is optional.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Can non-engineers use it?<span class="faq-icon">+</span></button><div class="faq-a"><p>Yes. Run <code>amc up</code> and use the local Studio dashboard.</p></div></div>
           <div class="faq-item gs"><button class="faq-q" aria-expanded="false">Can AMC fix my agent, not just score it?<span class="faq-icon">+</span></button><div class="faq-a"><p>Yes. Run <code>amc fix</code> — it scores your agent, explains the top gaps in plain words, asks once, then writes guardrail rules into your agent's own file (AGENTS.md, CLAUDE.md, .cursorrules, and 12 more). It never touches your API keys, and it leaves a hash-sealed receipt of exactly what changed.</p></div></div>
-          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">What is free and what is paid?<span class="faq-icon">+</span></button><div class="faq-a"><p>The whole product is free. The core trust stack is MIT licensed: Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, adapters, Studio, reports, and CI gates. <span class="hl">All 41 Industry Packs are free</span> too: the current source build asks for no licence and has no checkout. They are self-reported questionnaires whose content is experimental, and access never changes a result.</p></div></div>
+          <div class="faq-item gs"><button class="faq-q" aria-expanded="false">What is free and what is paid?<span class="faq-icon">+</span></button><div class="faq-a"><p>The whole product is free. The core trust stack is MIT licensed: Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, adapters, Studio, reports, and CI gates. <span class="hl">All 41 Industry Packs are free</span> too in the current source build, which asks for no licence and has no checkout; the published 1.1.1 release still locks them behind the earlier licence gate. They are self-reported questionnaires whose content is experimental, and access never changes a result.</p></div></div>
         </div>
       </div>
     </section>

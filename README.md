@@ -64,7 +64,7 @@ In the current source build `amc start` is another name for `amc up`. In the run
 - Started Studio (API and Compass Console), the gateway, a proxy, the dashboard and the bridge on `127.0.0.1` in the background, and printed the console URL. It did not open a browser.
 - Ran a first 8-surface baseline (`amc run`), because the workspace had no earlier run, and printed the result. With no agent connected it graded F, with 4 of 8 surfaces evaluated.
 
-`amc down` stops the background services. A second `amc up` in the same workspace reused it and, in the recorded run, ran the baseline again. `amc up --no-baseline` skips the baseline; `amc up --demo` starts a no-vault demo instead. The installers give the published 1.1.1 release: its `amc up` starts Studio and the gateway but runs no baseline, and it has no `amc start` (use [From source](#from-source) for the current build).
+`amc down` stops the background services. A second `amc up` in the same workspace reuses it, prints the latest run and skips the baseline, because the workspace already has a run (in the 2026-10-11 recorded run it did not yet find that run and ran the baseline again). `amc up --no-baseline` skips the baseline; `amc up --demo` starts a no-vault demo instead. The installers give the published 1.1.1 release: its `amc up` starts Studio and the gateway but runs no baseline, and it has no `amc start` (use [From source](#from-source) for the current build).
 
 **What you get:**
 
@@ -430,7 +430,7 @@ Need a fast pulse check for a demo or README badge? Use `amc quickscore --rapid`
 
 Need a CI-safe score without terminal prompts? Use `amc quickscore --answers answers.json --json`, where `answers.json` maps question IDs to L0-L5 numbers.
 
-If `amc quickscore` prints a placeholder L0 because no terminal prompt was available, it now shows a first-run hint: "Did you mean to run the interactive score?" Run it in a terminal, or pass answers explicitly for CI.
+Without a terminal, `amc quickscore` generates no placeholder score: it exits 1 with the hint "Did you mean to run the interactive score?" Run it in a terminal, or pass answers explicitly for CI.
 
 If `amc quickscore --auto --json` cannot find captured execution evidence, it fails closed with `scoreStatus: "AUTO_NO_EVIDENCE"` and does not emit a measured zero score. Capture evidence with `amc wrap <runtime> -- <your-agent-command>`, or use `amc quickscore --answers answers.json --json` for CI-safe survey scoring.
 

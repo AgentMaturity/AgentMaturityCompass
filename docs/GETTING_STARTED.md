@@ -85,7 +85,7 @@ For CI, scripted demos, or other non-interactive runs, provide answer JSON expli
 amc quickscore --answers answers.json --json
 ```
 
-If a no-prompt run prints a placeholder L0 score, AMC now shows: "Did you mean to run the interactive score?" Use `amc quickscore` in a terminal for prompted scoring, or keep using `--answers` for CI.
+Without a terminal, `amc quickscore` generates no placeholder score: it exits 1 with the hint "Did you mean to run the interactive score?" Use `amc quickscore` in a terminal for prompted scoring, or keep using `--answers` for CI.
 
 If `amc quickscore --auto --json` has no captured ledger evidence, AMC fails closed with `scoreStatus: "AUTO_NO_EVIDENCE"` and no measured score fields. Capture evidence first with `amc wrap <runtime> -- <your-agent-command>`, or use `amc quickscore --answers answers.json --json` for a CI-safe survey score.
 
