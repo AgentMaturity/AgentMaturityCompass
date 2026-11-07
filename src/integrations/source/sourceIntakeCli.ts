@@ -14,7 +14,7 @@ import { proposeSourceRequest, recordNotAdmitted, type ProposalOutcome } from ".
 
 const MAX_EVENT_FILE_BYTES = 1_048_576;
 
-export function parseEventFile(file: string, sourceId: string, receivedAt = Date.now()) {
+function parseEventFile(file: string, sourceId: string, receivedAt = Date.now()) {
   const bytes = readFileSync(file);
   if (bytes.byteLength > MAX_EVENT_FILE_BYTES) throw new Error(`event file exceeds ${MAX_EVENT_FILE_BYTES} bytes`);
   let payload: unknown;
@@ -26,7 +26,7 @@ export function parseEventFile(file: string, sourceId: string, receivedAt = Date
   return observationFromGitHubEvent(payload, { sourceId, receivedAt });
 }
 
-export function summarize(observation: SourceObservation) {
+function summarize(observation: SourceObservation) {
   return {
     observationId: observation.observationId, sourceId: observation.sourceId, nativeEventId: observation.nativeEventId,
     repositoryId: observation.repository.id, threadKey: observation.primaryThreadKey, actor: observation.actor, mentions: observation.mentions,
@@ -46,7 +46,7 @@ export function sourceObserveCli(params: { workspace: string; sourceId: string; 
   }
 }
 
-export function decideWithPolicy(workspace: string, observation: SourceObservation): { decision: AdmissionDecision; policyDigest: string | null; detail?: string } {
+function decideWithPolicy(workspace: string, observation: SourceObservation): { decision: AdmissionDecision; policyDigest: string | null; detail?: string } {
   const loaded = loadVerifiedSourcePolicy(workspace);
   if (!loaded.ok) return { decision: { kind: "not_admitted", reason: "policy_unverified" }, policyDigest: null, detail: loaded.detail };
   return { decision: admitSourceObservation(observation, loaded.policy), policyDigest: loaded.digest };

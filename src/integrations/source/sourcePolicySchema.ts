@@ -8,12 +8,12 @@
 import { z } from "zod";
 import { githubLoginSchema, sourceRepositorySchema } from "./sourceObservationSchema.js";
 
-export const SOURCE_POLICY_VERSION = 1;
-export const DEFAULT_MENTION = "@amc";
+const SOURCE_POLICY_VERSION = 1;
+const DEFAULT_MENTION = "@amc";
 
 const mentionSchema = z.string().regex(/^@[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/, "a mention is `@` plus a GitHub-style handle");
 
-export const sourcePolicySourceSchema = z.strictObject({
+const sourcePolicySourceSchema = z.strictObject({
   id: z.string().regex(/^[a-z0-9][a-z0-9._-]{0,127}$/),
   kind: z.literal("github"),
   repository: sourceRepositorySchema,

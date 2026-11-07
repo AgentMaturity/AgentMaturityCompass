@@ -11,11 +11,11 @@ import { join } from "node:path";
 import { ensureDir } from "../../utils/fs.js";
 import { sourceObservationSchema, type SourceObservation } from "./sourceObservationSchema.js";
 
-export const SOURCE_INTAKE_DB = join(".amc", "integrations", "source-intake.sqlite");
+const SOURCE_INTAKE_DB = join(".amc", "integrations", "source-intake.sqlite");
 /** A reservation older than this with no request id was left by a crashed filer and may be taken over. */
-export const PROPOSAL_RESERVATION_TTL_MS = 60_000;
+const PROPOSAL_RESERVATION_TTL_MS = 60_000;
 
-export type ProposalState = "reserved" | "proposed" | "not_admitted";
+type ProposalState = "reserved" | "proposed" | "not_admitted";
 export interface ProposalRow {
   observationId: string;
   state: ProposalState;
@@ -88,7 +88,7 @@ function toProposal(row: Record<string, unknown>): ProposalRow {
   };
 }
 
-export function getProposal(db: Database.Database, observationId: string): ProposalRow | null {
+function getProposal(db: Database.Database, observationId: string): ProposalRow | null {
   const row = db.prepare("SELECT * FROM proposals WHERE observation_id = ?").get(observationId) as Record<string, unknown> | undefined;
   return row ? toProposal(row) : null;
 }

@@ -7,10 +7,8 @@ import type { SourceObservation } from "./sourceObservationSchema.js";
 import { SOURCE_REPLY_MARKER } from "./sourceObservationSchema.js";
 import type { SourcePolicy, SourcePolicySource } from "./sourcePolicySchema.js";
 
-export const NOT_ADMITTED_REASONS = [
-  "source_unknown", "admission_off", "repository_mismatch", "body_unavailable", "actor_not_human", "sender_not_allowed", "reply_marker", "not_mentioned"
-] as const;
-export type NotAdmittedReason = (typeof NOT_ADMITTED_REASONS)[number] | "policy_unverified";
+type NotAdmittedReason =
+  | "policy_unverified" | "source_unknown" | "admission_off" | "repository_mismatch" | "body_unavailable" | "actor_not_human" | "sender_not_allowed" | "reply_marker" | "not_mentioned";
 
 export type AdmissionDecision =
   | { kind: "explicit_request"; source: SourcePolicySource; sender: { id: number; login: string } }

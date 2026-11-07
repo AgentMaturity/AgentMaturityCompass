@@ -19,8 +19,8 @@ import { releaseProposal, reserveProposal, settleProposal } from "./sourceIntake
 import type { SourceObservation } from "./sourceObservationSchema.js";
 import type { SourcePolicySource } from "./sourcePolicySchema.js";
 
-export const SOURCE_ADMIT_TOOL = "amc.source.admit";
-export const SOURCE_REQUEST_INTENT_SCHEMA = "amc.source-request/v1";
+const SOURCE_ADMIT_TOOL = "amc.source.admit";
+const SOURCE_REQUEST_INTENT_SCHEMA = "amc.source-request/v1";
 
 export type ProposalOutcome =
   | { state: "proposed"; approvalRequestId: string; actionClass: ActionClass; notification: string }
@@ -33,7 +33,7 @@ export function sourceIntentId(observationId: string): string {
 }
 
 /** The most restrictive class the work order allows, so the proposal is filed under the strictest rule it can reach. */
-export function proposalActionClass(allowed: readonly ActionClass[]): ActionClass {
+function proposalActionClass(allowed: readonly ActionClass[]): ActionClass {
   return [...allowed].sort((a, b) => ACTION_CLASSES.indexOf(b) - ACTION_CLASSES.indexOf(a))[0]!;
 }
 

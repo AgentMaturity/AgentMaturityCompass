@@ -58,7 +58,6 @@ export const sourceObservationSchema = z.strictObject({
 });
 
 export type SourceObservation = z.infer<typeof sourceObservationSchema>;
-export type SourceRepository = z.infer<typeof sourceRepositorySchema>;
 
 export function sourceObservationId(value: Pick<SourceObservation, "sourceId" | "nativeEventId" | "revisionDigest">): string {
   return sha256Hex(canonicalize({ sourceId: value.sourceId, nativeEventId: value.nativeEventId, revisionDigest: value.revisionDigest }));

@@ -46,21 +46,21 @@ const eventSchema = z.object({
   repository: repositorySchema
 }).passthrough();
 
-export const SUPPORTED_EVENT_ACTIONS: Readonly<Record<"issue_comment" | "issues", readonly string[]>> = {
+const SUPPORTED_EVENT_ACTIONS: Readonly<Record<"issue_comment" | "issues", readonly string[]>> = {
   issue_comment: ["created", "edited"],
   issues: ["opened", "edited"]
 };
 
-export type ParseRefusal = "event_shape_invalid" | "event_action_unsupported" | "event_time_invalid";
+type ParseRefusal = "event_shape_invalid" | "event_action_unsupported" | "event_time_invalid";
 export type ParsedObservation = { ok: true; observation: SourceObservation } | { ok: false; reason: ParseRefusal; detail: string };
 
-export function actorClass(user: { login: string; type?: string | undefined }): SourceObservation["actor"]["class"] {
+function actorClass(user: { login: string; type?: string | undefined }): SourceObservation["actor"]["class"] {
   if (user.type === "Bot" || user.login.endsWith("[bot]")) return "bot";
   return user.type === "User" ? "human" : "unknown";
 }
 
 /** The text a reader is addressed by: fenced and inline code, HTML comments and quoted lines removed. */
-export function addressableText(markdown: string): string {
+function addressableText(markdown: string): string {
   return markdown
     .replace(/<!--[\s\S]*?-->/g, " ")
     .replace(/```[\s\S]*?```/g, " ")
