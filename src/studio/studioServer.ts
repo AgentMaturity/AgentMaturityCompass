@@ -1366,10 +1366,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           if (shuttingDown) throw new Error("readiness check stopped");
           if (options.workspace !== readinessWorkspace || resolve(readinessWorkspace) !== readinessRoot) throw new Error("original readiness workspace changed");
         });
+        // LIVE-RUNTIME-14 (D-R10): probes read status and reason codes; messages and checks go to signed-in humans only.
+        // A non-writing check: requireRoles would answer agents and role-less callers 403 instead of the anonymous body.
+        const readyAuth = authenticate(req, options.workspace, options.token);
+        const human = readyAuth !== null && enforceRoleOrAdmin({ access: accessContext(readyAuth), requiredAny: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"],
+          usersConfigValid: verifyUsersConfigSignature(options.workspace).valid || readyAuth.sessionAuthSource === "WORKSPACE_ROUTER" }).ok;
         json(res, readiness.ok ? 200 : 503, {
           status: readiness.ok ? "READY" : "NOT_READY",
-          reasons: readiness.reasons,
-          checks: readiness.checks,
+          reasons: human ? readiness.reasons : readiness.reasons.map((reason) => reason.split(":", 1)[0]!.trim()),
+          ...(human ? { checks: readiness.checks } : {}),
           ts: Date.now()
         });
         return;
