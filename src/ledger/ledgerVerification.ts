@@ -127,7 +127,8 @@ export interface VerifyResult {
   };
   /**
    * P2-09: encrypted inline payloads this verifier could not check because the ledger key was out of reach (provider
-   * unreachable or vault locked). Not errors, and not verified: the chain over their ciphertext was still checked.
+   * unreachable or vault locked), and with blobKeyOptional encrypted blobs whose key a locked vault holds. Not errors,
+   * and not verified: the chain over their ciphertext was still checked, so a caller must never report them as a pass.
    */
   payloadsNotEvaluated?: readonly string[];
   /** With options.auditTypes: each requested audit type found among the verified rows, with the meta subjectId (else agentId) of its rows. */
@@ -174,6 +175,12 @@ export interface LedgerVerifyOptions {
   auditTypes?: readonly string[];
   /** Runs on the verified read-only handle after its checks, before it closes, so a caller's own reads see the rows verified. */
   onVerifiedLedger?: (ledger: Ledger) => void;
+  /**
+   * B1: an encrypted blob payload whose vaulted key a locked vault holds is listed in payloadsNotEvaluated instead of
+   * failing (verifyEvidencePayload). Only for a caller that reports payloadsNotEvaluated as not verified (the CLI verify
+   * commands); every other caller still fails such a row.
+   */
+  blobKeyOptional?: boolean;
 }
 type AuditCollector = { wanted: ReadonlySet<string>; found: Map<string, Set<string>>; first?: string };
 
@@ -296,7 +303,8 @@ function verifyEvents(
   errors: string[],
   externallyAuthenticatedPayloads?: ReadonlyMap<string, string>,
   notEvaluated?: string[],
-  audits?: AuditCollector
+  audits?: AuditCollector,
+  blobKeyOptional = false
 ): void {
   const events = ledger.getAllEvents();
   const retentionProofs = events.some((event) => event.archived === 1 || event.payload_pruned === 1)
@@ -311,7 +319,7 @@ function verifyEvents(
 
   let previous = "GENESIS";
   for (const event of events) {
-    verifyEvidencePayload(event, workspace, errors, externallyAuthenticatedPayloads, retentionProofs, notEvaluated);
+    verifyEvidencePayload(event, workspace, errors, externallyAuthenticatedPayloads, retentionProofs, notEvaluated, blobKeyOptional);
 
     if (event.prev_event_hash !== previous) {
       errors.push(`Event ${event.id} previous hash mismatch`);
@@ -695,7 +703,7 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
     if (ledger) {
       chainErrors.push(...operationalLedgerProblems(workspacePath, ledger, options.trust));
       chainErrors.push(...receiptLedgerProblems(ledger, options.trust));
-      verifyEvents(ledger, workspacePath, chainErrors, options.externallyAuthenticatedPayloads, payloadsNotEvaluated, audits);
+      verifyEvents(ledger, workspacePath, chainErrors, options.externallyAuthenticatedPayloads, payloadsNotEvaluated, audits, options.blobKeyOptional);
       auditsRead = audits !== undefined;
       verifySessionChains(ledger, chainErrors, { trust: options.trust });
       sessionLifecycle = verifySessions(ledger, workspacePath, chainErrors, staleAfterMs, liveness, continuation);

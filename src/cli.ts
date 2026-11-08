@@ -6158,7 +6158,8 @@ withTrustFlags(verifyCmd, { expectMonitor: true, ledgerOnly: true })
     }
     if (opts.apply || opts.yes) { console.error("--apply and --yes only work with --repair"); process.exit(2); }
     const trust = trustFromFlags(opts, ["ledger-row"]);
-    const result = await verifyLedgerIntegrity(process.cwd(), { trust, ...(opts.expectMonitor ? { expectedMonitorFingerprint: opts.expectMonitor } : {}) });
+    // B1: payloads a locked vault keeps closed are NOT EVALUATED (exit 1), never "authentication failed".
+    const result = await verifyLedgerIntegrity(process.cwd(), { trust, blobKeyOptional: true, ...(opts.expectMonitor ? { expectedMonitorFingerprint: opts.expectMonitor } : {}) });
     if (result.ok) {
       console.log(renderLedgerVerdict(result, trust.allowUnanchored));
       printArchivedStoreNote(process.cwd());
