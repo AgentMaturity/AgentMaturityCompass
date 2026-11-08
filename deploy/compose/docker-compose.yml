@@ -36,6 +36,8 @@ services:
       - AMC_GATEWAY_PORT=3210
       - AMC_PROXY_PORT=3211
       - AMC_ALLOWED_CIDRS=${AMC_ALLOWED_CIDRS:-127.0.0.1/32,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,::1/128}
+      # Native and A4 routes admit only the bind host or these browser origins (src/studio/nativeAdmission.ts). Append LAN/phone origins through AMC_EXTRA_ORIGINS; an origin is scheme://host[:port] with no path.
+      - AMC_CORS_ALLOWED_ORIGINS=http://localhost:${AMC_STUDIO_PORT:-3212},http://127.0.0.1:${AMC_STUDIO_PORT:-3212},${AMC_EXTRA_ORIGINS:-}
       - AMC_QUERY_LEASE_CARRIER_ENABLED=${AMC_QUERY_LEASE_CARRIER_ENABLED:-false}
       - AMC_VAULT_PASSPHRASE_FILE=/run/secrets/amc_vault_passphrase
       - AMC_BOOTSTRAP_OWNER_USERNAME_FILE=/run/secrets/amc_owner_username

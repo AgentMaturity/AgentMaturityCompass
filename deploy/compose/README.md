@@ -75,9 +75,11 @@ When `AMC_ENABLE_NOTARY=1`, bootstrap writes and signs `.amc/trust.yaml` in `NOT
 
 ## Phone/LAN Access
 
+0. HTTP stack only: set `AMC_PUBLISH_ADDRESS=0.0.0.0` in `.env`. By default the HTTP stack publishes its ports on `127.0.0.1` only; `AMC_ALLOWED_CIDRS` filters requests but does not restrict which interfaces the ports are published on. The TLS stack already publishes `8443` on every interface.
 1. Ensure host firewall allows inbound to `3212` (or `8443` for TLS).
 2. Keep pairing enabled (`AMC_LAN_MODE=true`).
 3. Open Console URL from phone and pair before login.
+4. Add the origin you open the console from to `AMC_EXTRA_ORIGINS` in `.env` (for example `AMC_EXTRA_ORIGINS=http://192.168.1.20:3212`; comma-separated, `scheme://host[:port]`, no path, no trailing slash) and run `docker compose up -d` again. Otherwise native and A4 routes answer `403 NATIVE_HOST_DENIED`. The defaults (`http://localhost:<AMC_STUDIO_PORT>` and `http://127.0.0.1:<AMC_STUDIO_PORT>` on the HTTP stack, `https://<AMC_TLS_HOST>:<AMC_TLS_PORT>` on the TLS stack) stay admitted. An entry with a path is not validated at startup and turns native routes into errors, so check the value before you restart.
 
 ## Security Notes
 
