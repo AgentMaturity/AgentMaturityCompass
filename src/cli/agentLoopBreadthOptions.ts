@@ -7,7 +7,7 @@ import { executionStatusFor } from "../execution/executionStatus.js";
 import { renderNativeGuideCommand } from "../setup/nativeFirstUseGuide.js";
 import type { GoalRoundsResult } from "../autonomy/goalRounds.js";
 import { integerOption, type AgentLoopCliIo, type RunOptions } from "../cli-agent-options.js";
-import { reportExitCode, runExitCode, withOutputFormatOption, type RunOutput } from "./agentLoopOutputOptions.js";
+import { goalRunReceiptStates, reportExitCode, runExitCode, withOutputFormatOption, type RunOutput } from "./agentLoopOutputOptions.js";
 import { ipcAskUserAnswerer } from "../setup/nativeInteractiveAskUser.js";
 import { workspaceSkillRoots } from "../skills/skillTurn.js";
 import { renderSessionLists } from "../tools/builtin/todoTool.js";
@@ -84,10 +84,11 @@ export function resolveBreadthRun(io: AgentLoopCliIo, opts: RunOptions, context:
       // P2-13: the four execution phases; evidence verification stays pending until `agent-loop verify`.
       const execution = executionStatusFor(process.cwd(), { sessionId: summary.sessionId, admission: "admitted",
         turn: ending?.reason ?? (summary.driverStatus === "failed" ? "error" : null), verified: null });
-      const report = { summary, execution, ending, validationRequested, ...(goal === undefined ? {} : { goalStop: goal.stoppedBy }) };
+      const report = { summary, execution, ending, validationRequested,
+        ...(goal === undefined ? {} : { goalStop: goal.stoppedBy, goalReceiptStates: goalRunReceiptStates(process.cwd(), summary.sessionId) }) };
       const exitCode = runExitCode(report);
       if (context.output?.sink) context.output.sink.result({ ...report, exitCode, ...(goal === undefined ? {} : { goalRounds: goal }) });
-      else io.log(opts.json ? JSON.stringify({ ...summary, ...(goal === undefined ? {} : { goalRounds: goal }), execution, exitCode }, null, 2) : renderRunSummary(summary));
+      else io.log(opts.json ? JSON.stringify({ ...summary, ...(goal === undefined ? {} : { goalRounds: goal, goalReceiptStates: report.goalReceiptStates }), execution, exitCode }, null, 2) : renderRunSummary(summary));
       if (!opts.json) {
         if (goal !== undefined) {
           io.log(`Goal rounds: ${goal.rounds} run, stopped by ${goal.stoppedBy} (${goal.reason}). Each round is a delegated child session in this session's log.`);

@@ -611,17 +611,19 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
    * The launcher's gate hook, resolved per raised request against the live negotiation and the prompt slot that is
    * active NOW: a late or stale answer cancels that prompt or nothing, never whichever prompt is active when it
    * arrives. The committed tail is flushed first, so the `tool_call` the permission names reaches the client before
-   * the request that asks about it.
+   * the request that asks about it. When that flush fails the session is unusable and its prompt's poll disposes the
+   * turn; no request naming a tool call the client never received is sent.
    */
   function approvalRaised(sessionId: string, event: { readonly approvalId: string; readonly approvalRequestId: string; readonly toolCallId: string }): void {
     if (init.onApprovalRaised === undefined) return;
     const entry = sessions.get(sessionId), slot = entry?.active;
-    if (entry && permissionRequests && !entry.projectionFailed) {
+    if (entry && permissionRequests) {
       try { flush(entry, sessionId); }
-      catch (error) { log(`committed updates could not be flushed before a permission request: ${error instanceof Error ? error.message : String(error)}`); }
+      catch (error) { log(`no permission request sent for ${event.approvalRequestId}: committed updates could not be flushed (${error instanceof Error ? error.message : String(error)})`); return; }
     }
     init.onApprovalRaised({ sessionId, ...event, negotiated: permissionRequests,
-      request: (method, params, signal) => connection.request(method, params, signal),
+      // Withdrawn (prompt ended, approval expired or decided elsewhere): the client is told with `$/cancel_request`.
+      request: (method, params, signal) => connection.request(method, params, signal, { announceCancel: true }),
       turnEnded: slot?.ended.signal ?? AbortSignal.abort(),
       cancelTurn: by => { if (entry && slot) requestCancel(entry, slot, by); } });
   }

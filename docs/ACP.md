@@ -49,15 +49,22 @@ identity in `_meta["dev.agentmaturity.amc"]` (`approvalRequestId`, `requestDiges
   (a private 0600 file) at launch. Selecting it re-checks the inbox item's integrity, that it is still `PENDING` with the
   digest the client was shown, that the login's roles may decide it, then records the decision through
   `amc approvals approve --expect-request-digest ...` under that login. The approval gate continues as soon as its own
-  engine poll sees the recorded decision; the server's read-back afterwards only confirms that a decision by that login
-  with the shown digest exists, and cancels the turn when it does not (for example when the decision was recorded but
-  the approve command then failed). The reason is never invented: the client supplies one in
+  engine poll sees the recorded decision; the server's read-back afterwards only confirms, after the fact, that a
+  decision by that login with the shown digest exists. It cancels the turn when none exists, and also when the decision
+  was recorded but the approve command did not complete cleanly (for example lifecycle delivery failed); the log line
+  says which of the two happened, and no retry is sent. The reason is never invented: the client supplies one in
   `_meta["dev.agentmaturity.amc"].reason` on its response, or the operator fixed one with `--reviewer-reason <text>`;
   with neither, the turn is cancelled.
 
-The request is bound to the prompt that raised it: a late answer (the client replying after the request was decided
-out of band with `amc approvals approve`, or after the prompt ended) cancels that prompt or nothing, never a later
-prompt on the session, and the outstanding request is withdrawn when its prompt ends or the approval expires.
+The request is bound to the prompt that raised it: a late answer cancels that prompt or nothing, never a later prompt
+on the session. The server stops waiting on an outstanding request when its prompt ends, when the approval expires,
+and when the approval is decided elsewhere (for example with `amc approvals approve` or `deny`; the server re-reads
+the request about once a second). It then sends `$/cancel_request` for it, so a client that implements that
+notification (unstable in ACP 0.18, and a client may ignore it) closes the dialog, and it ignores any later answer. An
+`allow_once` that lands after the approval was decided elsewhere records nothing and cancels nothing; a `reject_once`
+still cancels the prompt that raised it, because cancelling is the safe side. When the committed tail cannot be
+delivered before a request (a row that does not authenticate, or the output bound), no request is sent: the session is
+unusable, and its prompt's poll disposes the turn.
 
 Client text never grants authority on its own: the client only chooses between options this process offered, and the
 engine's quorum and role rules apply unchanged. A client answer of `cancelled` is the client's own cancellation.

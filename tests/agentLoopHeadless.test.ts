@@ -11,6 +11,9 @@ import type { RoundStop } from "../src/autonomy/goalRounds.js";
 import { deriveExecutionStatus, INTEGRITY_FAILED } from "../src/execution/executionContract.js";
 import type { AgentRunSummary } from "../src/agent/runReport.js";
 import { readNativeSessionEvents } from "../src/session/readNativeSessionEvents.js";
+import { SessionService } from "../src/session/sessionService.js";
+import type { NativeReceiptRecorder } from "../src/tools/builtin/nativeToolBreadth/nativeReceipt.js";
+import { todoTool } from "../src/tools/builtin/todoTool.js";
 import { initWorkspace } from "../src/workspace.js";
 
 /**
@@ -254,18 +257,26 @@ describe("runExitCode — derived from the execution phases", () => {
     ({ driverStatus, validation: { status: validation } } as unknown as AgentRunSummary);
   const execution = (turn: string | null, receiptStates: string[] = []) =>
     deriveExecutionStatus({ sessionId: "s", admission: "admitted", turn, receiptStates, verified: null });
-  const code = (reason: string | undefined, states: string[] = [], extra: Partial<{ driverStatus: "idle" | "failed"; validationRequested: boolean; validation: string; goalStop: RoundStop }> = {}) =>
-    runExitCode({ summary: summary(extra.driverStatus, extra.validation), execution: execution(reason ?? (extra.goalStop === undefined ? null : "complete"), states),
-      ending: reason === undefined ? undefined : { turn: 1, reason, cancelCause: null, interrupted: false }, validationRequested: extra.validationRequested ?? false,
-      ...(extra.goalStop === undefined ? {} : { goalStop: extra.goalStop }) });
+  const code = (reason: string | undefined, states: string[] = [], extra: Partial<{ driverStatus: "idle" | "failed"; validationRequested: boolean; validation: string }> = {}) =>
+    runExitCode({ summary: summary(extra.driverStatus, extra.validation), execution: execution(reason ?? null, states),
+      ending: reason === undefined ? undefined : { turn: 1, reason, cancelCause: null, interrupted: false }, validationRequested: extra.validationRequested ?? false });
+  // As reportRun builds it: goal rounds record no root turn, so the root's own phases stay pending, and the side effects
+  // are the goal run's receipts over the root and every session its rounds ran in.
+  const goalCode = (stop: RoundStop, goalReceiptStates: readonly string[] | undefined) =>
+    runExitCode({ summary: summary(), execution: execution(null), ending: undefined, validationRequested: false, goalStop: stop,
+      ...(goalReceiptStates === undefined ? {} : { goalReceiptStates }) });
 
-  it("maps every goal-rounds stop explicitly, and only done with settled side effects is 0", () => {
+  it("maps every goal-rounds stop explicitly, and only done with every round's receipts completed is 0", () => {
     const table: Record<RoundStop, number> = { done: 0, failed: 1, refused: 1, "check-failed": 1, "check-unavailable": 1, cancelled: 3, human: 3, "max-rounds": 4, blocked: 5 };
     expect(GOAL_STOP_EXIT_CODES).toEqual(table);
-    for (const [stop, expected] of Object.entries(table) as [RoundStop, number][]) expect(code(undefined, [], { goalStop: stop }), stop).toBe(expected);
-    expect(code(undefined, ["denied"], { goalStop: "done" })).toBe(6);
-    expect(code(undefined, [INTEGRITY_FAILED], { goalStop: "done" })).toBe(1);
-    expect(code(undefined, [], { goalStop: "something_new" as RoundStop })).toBe(1);
+    for (const [stop, expected] of Object.entries(table) as [RoundStop, number][]) expect(goalCode(stop, []), stop).toBe(expected);
+    expect(goalCode("done", ["completed", "completed"])).toBe(0);
+    expect(goalCode("done", ["completed", "denied"])).toBe(6);
+    expect(goalCode("done", ["started"])).toBe(6); // The rounds have ended: an open receipt did not settle.
+    expect(goalCode("done", [INTEGRITY_FAILED])).toBe(1);
+    expect(goalCode("max-rounds", ["completed", INTEGRITY_FAILED])).toBe(1);
+    expect(goalCode("done", undefined)).toBe(1); // Receipts nobody read are not settled ones.
+    expect(goalCode("something_new" as RoundStop, [])).toBe(1);
   });
 
   it("maps every ending to its code and never reads an unknown ending or unsettled receipts as success", () => {
@@ -293,6 +304,37 @@ describe("runWithOutput — the stream and the exit status agree", () => {
     await runWithOutput({ log: line => out.push(line), error: () => {}, fail: () => failures.push(1) }, process.cwd(), { outputFormat: "stream-json" }, async () => {});
     expect(out.map(line => JSON.parse(line) as Record<string, unknown>)).toEqual([{ type: "error", message: "the run ended without a result", exitCode: 1, sessionId: null }]);
     expect(failures).toEqual([1]);
+  });
+});
+
+describe("createRunEventSink — the signed current plan", () => {
+  it("emits a plan update after a todo call, from the same authenticated tail as every other update", async () => {
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "sh-ui-sink-plan");
+    const dir = mkdtempSync(join(tmpdir(), "amc-sink-plan-"));
+    const sessionId = "plan-stream";
+    const writer = new SessionService(dir);
+    try {
+      initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
+      writer.open({ sessionId, agentId: "default", harnessVersion: "fixture", compositionDigest: "fixture", policyDigest: "fixture" });
+      writer.startTurn({ trigger: "user" }); writer.startStep();
+      const out: string[] = [], failures: number[] = [];
+      const sink = createRunEventSink({ log: line => out.push(line), error: () => {}, fail: () => failures.push(1) }, dir);
+      sink.ready({ sessionId, resourceStatus: () => ({ mcp: [], skills: [], extensions: null }) as never, cancel: () => {}, shutdown: async () => true,
+        readEvents: () => writer.readEvents() }, { agentId: "default", provider: "stub", model: "m", tools: "workspace", approvals: null });
+      const record: NativeReceiptRecorder = (execution, receipt) => {
+        const meta = { ...receipt, sessionId, agentId: execution.agentId, callId: execution.callId, tool: execution.name };
+        writer.recordProjectedEvidence({ eventType: "audit", payload: JSON.stringify(meta), meta });
+      };
+      await todoTool({ sessionId, record }).body({ token: "1", callId: "1", rootCallId: "1", parentToken: null, name: "todo", agentId: "default", workspace: dir,
+        actionClass: "READ_ONLY", requestedMode: "EXECUTE", effectiveMode: "EXECUTE", arguments: { items: [{ id: "a", content: "Check the recording path", status: "in_progress" }] } });
+      sink.notification({ kind: "step-end", turn: 1, step: 1 });
+      sink.dispose();
+      const plans = out.map(line => JSON.parse(line) as { type: string; update?: { sessionUpdate: string; entries?: unknown } })
+        .filter(line => line.type === "update" && line.update!.sessionUpdate === "plan");
+      expect(plans).toHaveLength(1);
+      expect(plans[0]!.update!.entries).toEqual([{ content: "Check the recording path", priority: "medium", status: "in_progress" }]);
+      expect(failures).toEqual([]);
+    } finally { writer.disposeWithoutClosing(); rmSync(dir, { recursive: true, force: true }); vi.unstubAllEnvs(); }
   });
 });
 

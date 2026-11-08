@@ -7,6 +7,7 @@ import type { RoundStop } from "../autonomy/goalRounds.js";
 import { COMMITTED_CURSOR_START, chargeUpdateBudget, projectCommittedTail, type CommittedCursor } from "../acp/acpCommittedStream.js";
 import { liveNativeFailureGuidance } from "../agent/nativeFailureGuidance.js";
 import { INTEGRITY_FAILED, type ExecutionStatus } from "../execution/executionContract.js";
+import { sessionReceipts } from "../execution/executionStatus.js";
 import type { AgentLoopCliIo } from "../cli-agent-options.js";
 import type { ComposedTurnHandle } from "../kernel/agentLoopRunner.js";
 import { readNativeSessionEvents } from "../session/readNativeSessionEvents.js";
@@ -37,7 +38,10 @@ const FLUSH_INTERVAL_MS = 100;
  */
 export const RUN_EXIT_CODES = Object.freeze({ ok: 0, failed: 1, cancelled: 3, bounded: 4, blocked: 5, sideEffectsUnsettled: 6 });
 
-/** How each goal-rounds stop (src/autonomy/goalRounds.ts) exits; a stop this table does not know is not success. */
+/**
+ * How each goal-rounds stop (src/autonomy/goalRounds.ts) exits; a stop this table does not know is not success. `done`
+ * is 0 only when every receipt of the goal run settled `completed` (goalRunReceiptStates).
+ */
 export const GOAL_STOP_EXIT_CODES: Readonly<Record<RoundStop, number>> = Object.freeze({
   done: RUN_EXIT_CODES.ok,
   failed: RUN_EXIT_CODES.failed, refused: RUN_EXIT_CODES.failed, "check-failed": RUN_EXIT_CODES.failed, "check-unavailable": RUN_EXIT_CODES.failed,
@@ -104,6 +108,29 @@ export interface RunReport {
   readonly validationRequested: boolean;
   /** How goal rounds stopped; undefined when the run was one root turn. */
   readonly goalStop?: RoundStop;
+  /** Under goal rounds: the receipts of the root and every session its rounds ran in (goalRunReceiptStates). Absent is never settled. */
+  readonly goalReceiptStates?: readonly string[];
+}
+
+/**
+ * A goal run's receipts, for its exit code. Goal rounds run no root turn, so the root session's own side-effect phase
+ * stays pending; each round is a delegated child session named by a signed `agent_delegation_started` row, and a round
+ * may delegate further. The receipts of the root and of every session in that tree are read. A delegation row whose
+ * child cannot be named reads as an integrity failure, never as nothing.
+ */
+export function goalRunReceiptStates(workspace: string, rootSessionId: string): string[] {
+  const seen = new Set([rootSessionId]), queue = [rootSessionId], states: string[] = [];
+  for (let sessionId = queue.shift(); sessionId !== undefined; sessionId = queue.shift()) {
+    states.push(...sessionReceipts(workspace, sessionId).states);
+    for (const row of readNativeSessionEvents(workspace, sessionId)) {
+      if (row.event_type !== "agent_delegation_started") continue;
+      let child: unknown;
+      try { child = (JSON.parse(row.meta_json) as { childSessionId?: unknown }).childSessionId; } catch { child = undefined; }
+      if (typeof child !== "string" || child.length === 0) states.push(INTEGRITY_FAILED);
+      else if (!seen.has(child)) { seen.add(child); queue.push(child); }
+    }
+  }
+  return states.sort();
 }
 
 /**
@@ -116,8 +143,11 @@ export function runExitCode(report: RunReport): number {
     || (report.validationRequested && summary.validation.status !== "passed") || execution.receiptStates.includes(INTEGRITY_FAILED)) return RUN_EXIT_CODES.failed;
   const settled = execution.phases["side-effect-completion"] === "succeeded";
   if (goalStop !== undefined) {
+    const states = report.goalReceiptStates;
+    if (states === undefined || states.includes(INTEGRITY_FAILED)) return RUN_EXIT_CODES.failed;
     const code = GOAL_STOP_EXIT_CODES[goalStop] ?? RUN_EXIT_CODES.failed;
-    return code === RUN_EXIT_CODES.ok && !settled ? RUN_EXIT_CODES.sideEffectsUnsettled : code;
+    // The rounds have ended, so an open receipt is as unsettled as a refused one: only all-`completed` settles.
+    return code === RUN_EXIT_CODES.ok && !states.every(state => state === "completed") ? RUN_EXIT_CODES.sideEffectsUnsettled : code;
   }
   switch (ending?.reason) {
     case "cancelled": case "interrupted": return RUN_EXIT_CODES.cancelled;

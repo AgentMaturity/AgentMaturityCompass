@@ -74,8 +74,14 @@ The ending is this invocation's: a `--session` turn is judged by the ending it r
 The side-effect phase is the whole session's receipts (the same `execution` object the summary prints), so a
 `--session` turn after a turn whose side effect was refused exits 6 even when it made no tool call; the `execution`
 field says which receipt. Under `--goal-rounds` the stop reason decides (`src/cli/agentLoopOutputOptions.ts`
-`GOAL_STOP_EXIT_CODES`; a stop reason this version does not know exits 1), and the side-effect phase read is the root
-session's: each round's child session carries its own receipts, which `amc agent-loop verify <childSessionId>` reports.
+`GOAL_STOP_EXIT_CODES`; a stop reason this version does not know exits 1). A goal run records no root turn, so its
+side effects are read from the receipts of the root session and of every session its rounds ran in: each round is a
+delegated child session named by a signed `agent_delegation_started` row, and a round's own delegates are read too.
+`done` exits 0 only when all of those receipts settled `completed` (else 6), an integrity failure in any of them exits
+1 whatever the stop reason, and a delegation row that names no child reads as an integrity failure. The `json` summary
+carries those receipts as `goalReceiptStates`; its `execution` object stays the root session's own phases. `agent-loop
+run` configures no completion check, done claim or human checkpoint for its goal rounds, so today they stop by
+`max-rounds`, `blocked`, `failed`, `refused` or `cancelled`; the table maps every stop the driver defines.
 
 `2` is `amc agent-loop verify`'s integrity-only exit and is never produced by `run`. The `json` summary and the
 `result` event carry the same `exitCode`; the process exit code is authoritative (a cleanup failure after the result

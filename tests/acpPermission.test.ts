@@ -14,6 +14,7 @@ import { createApprovalForIntent } from "../src/approvals/approvalEngine.js";
 import { listApprovalDecisions } from "../src/approvals/approvalChainStore.js";
 import { getApprovalInboxItem } from "../src/approvals/approvalInbox.js";
 import { createSession, initUsersConfig } from "../src/auth/authApi.js";
+import { readNativeApprovalActor } from "../src/setup/nativeApprovalIdentity.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { initActionPolicy } from "../src/governor/actionPolicyEngine.js";
 import { SessionService } from "../src/session/sessionService.js";
@@ -49,6 +50,15 @@ function reviewerToken(): string {
   return path;
 }
 const decisions = (approvalRequestId: string) => listApprovalDecisions({ workspace, agentId: "default", approvalRequestId });
+/** A reviewer decides the request out of band, as docs/ACP.md allows, through the real `amc approvals deny`. */
+function denyElsewhere(approvalRequestId: string, tokenFile: string): void {
+  const actor = readNativeApprovalActor(workspace, tokenFile);
+  const digest = getApprovalInboxItem({ workspace, agentId: "default", approvalRequestId }).requestDigestSha256;
+  const denied = spawnSync(process.execPath, [CLI, "approvals", "deny", "--agent", "default", "--reason", "denied out of band",
+    "--username", actor.username, "--roles", actor.roles.join(","), "--user-id", actor.userId, "--session-token-file", tokenFile,
+    "--expect-request-digest", digest, "--", approvalRequestId], { cwd: workspace, env: process.env, encoding: "utf8" });
+  expect(denied.status, denied.stderr).toBe(0);
+}
 
 function event(raised: { approvalId: string; approvalRequestId: string; toolCallId: string }, answer: unknown, negotiated = true) {
   const requests: unknown[] = [], cancels: string[] = [];
@@ -148,6 +158,61 @@ describe("createAcpPermissionHandler", () => {
     expect(logs.join("\n")).toContain("answered after its prompt ended; nothing decided");
   });
 
+  it("withdraws an outstanding request once the approval is decided elsewhere, and a stale allow_once decides nothing and cancels nothing", async () => {
+    const tokenFile = reviewerToken();
+    const logs: string[] = [];
+    const handler = createAcpPermissionHandler({ workspace, agentId: "default", cli: { execPath: process.execPath, execArgv: [], entry: CLI },
+      reviewer: { tokenFile, reason: "reviewed in the editor" }, log: m => logs.push(m) });
+    // The dialog is open when a reviewer denies the request with `amc approvals deny`: the server stops waiting on it.
+    const open = raise();
+    const waiting = event(open, (signal: AbortSignal) => new Promise((_resolve, reject) => { signal.addEventListener("abort", () => reject(new Error("request cancelled")), { once: true }); }));
+    handler.handle(waiting.event); await flush();
+    expect(waiting.requests).toHaveLength(1);
+    denyElsewhere(open.approvalRequestId, tokenFile);
+    await vi.waitFor(() => expect(logs.join("\n")).toContain(`approval ${open.approvalRequestId} was decided elsewhere (DENIED) before the client answered; request withdrawn`), { timeout: 10_000, interval: 50 });
+    expect(waiting.cancels).toEqual([]);
+    // The client's allow_once lands after an out-of-band deny: nothing is left to record and the turn is not cancelled.
+    const stale = raise();
+    const answered = event(stale, () => { denyElsewhere(stale.approvalRequestId, tokenFile); return { outcome: { outcome: "selected", optionId: "allow_once" } }; });
+    handler.handle(answered.event);
+    await vi.waitFor(() => expect(logs.join("\n")).toContain(`approval ${stale.approvalRequestId} was already DENIED when the client chose allow_once; nothing decided`), { timeout: 30_000, interval: 50 });
+    expect(answered.cancels).toEqual([]);
+    expect(decisions(stale.approvalRequestId).map(row => row.decision)).toEqual(["DENY"]);
+  }, 90_000);
+
+  it("never reads its own allow_once decision as one made elsewhere, however long the approve command takes to exit", async () => {
+    const tokenFile = reviewerToken();
+    // WRITE_LOW needs one approval, so the request leaves PENDING the moment our decision lands; the command then lingers.
+    const entry = join(workspace, "approve-then-linger.mjs");
+    writeFileSync(entry, `import { spawnSync } from "node:child_process";\nconst run = spawnSync(process.execPath, [${JSON.stringify(CLI)}, ...process.argv.slice(2)], { stdio: "inherit" });\nsetTimeout(() => process.exit(run.status ?? 1), 2500);\n`);
+    const logs: string[] = [];
+    const handler = createAcpPermissionHandler({ workspace, agentId: "default", cli: { execPath: process.execPath, execArgv: [], entry },
+      reviewer: { tokenFile, reason: "reviewed in the editor" }, log: m => logs.push(m) });
+    const allowed = event(raise(), { outcome: { outcome: "selected", optionId: "allow_once" } });
+    handler.handle(allowed.event);
+    await vi.waitFor(() => expect(logs.join("\n")).toMatch(/signed approve decision \S+; request status QUORUM_MET, quorum 1\/1/), { timeout: 60_000, interval: 100 });
+    expect(allowed.cancels).toEqual([]);
+    expect(logs.join("\n")).not.toContain("decided elsewhere");
+  }, 90_000);
+
+  it("names a decision that was recorded although its approve command failed, and still cancels the turn", async () => {
+    const tokenFile = reviewerToken();
+    // The real `amc approvals approve` records the decision, then the command reports failure (as when lifecycle delivery fails).
+    const entry = join(workspace, "approve-then-fail.mjs");
+    writeFileSync(entry, `import { spawnSync } from "node:child_process";\nspawnSync(process.execPath, [${JSON.stringify(CLI)}, ...process.argv.slice(2)], { stdio: "inherit" });\nprocess.exit(1);\n`);
+    const logs: string[] = [];
+    const handler = createAcpPermissionHandler({ workspace, agentId: "default", cli: { execPath: process.execPath, execArgv: [], entry },
+      reviewer: { tokenFile, reason: "reviewed in the editor" }, log: m => logs.push(m) });
+    const raised = raise();
+    const allowed = event(raised, { outcome: { outcome: "selected", optionId: "allow_once" } });
+    handler.handle(allowed.event);
+    await vi.waitFor(() => expect(allowed.cancels).toEqual(["acp-permission-unconfirmed"]), { timeout: 60_000, interval: 100 });
+    const recorded = decisions(raised.approvalRequestId);
+    expect(recorded.map(row => row.decision)).toEqual(["APPROVE_EXECUTE"]);
+    expect(logs.join("\n")).toContain(`the decision ${recorded[0]!.approvalDecisionId} is recorded, but its approve command did not complete cleanly`);
+    expect(logs.join("\n")).not.toContain("no matching signed decision was confirmed");
+  }, 90_000);
+
   it("takes the reason from the client's _meta, else the launch default, and refuses empty or oversize text", () => {
     expect(permissionReason({ _meta: { "dev.agentmaturity.amc": { reason: " from client " } } }, "default")).toBe("from client");
     expect(permissionReason({}, "launch default")).toBe("launch default");
@@ -162,11 +227,16 @@ describe("ACP server negotiation of the new frames", () => {
   const agents: AcpAgent[] = [];
   afterEach(async () => { for (const agent of agents.splice(0)) await agent.close(); });
 
-  function peer(options: { onApprovalRaised?: (event: AcpApprovalRaised) => void; commands?: boolean;
-    /** Runs inside the fixture's prompt, between turn/start and turn/end. */
-    onPrompt?: (context: { writer: SessionService; sessionId: string; hook: AcpApprovalRaisedHook }) => Promise<void> } = {}) {
+  function peer(options: { onApprovalRaised?: (event: AcpApprovalRaised) => void; commands?: boolean; tamperReads?: boolean;
+    /** Runs inside the fixture's prompt, between turn/start and turn/end. `tamper()` makes later reads return a forged last row. */
+    onPrompt?: (context: { writer: SessionService; sessionId: string; hook: AcpApprovalRaisedHook; tamper: () => void }) => Promise<void> } = {}) {
     const frames: Frame[] = [], cancels: string[] = [];
-    let writer!: SessionService, hook: AcpApprovalRaisedHook | undefined;
+    let writer!: SessionService, hook: AcpApprovalRaisedHook | undefined, tampered = false;
+    const tamper = (): void => { tampered = true; };
+    const reads = (): ReturnType<SessionService["readEvents"]> => {
+      const rows = writer.readEvents();
+      return tampered && options.tamperReads ? [...rows.slice(0, -1), { ...rows.at(-1)!, writer_sig: "ab".repeat(64) }] : rows;
+    };
     const agent = createAcpAgent({ workspace, agentId: "default", write: bytes => frames.push(JSON.parse(bytes.toString("utf8")) as Frame),
       ...(options.onApprovalRaised ? { onApprovalRaised: options.onApprovalRaised } : {}),
       ...(options.commands === false ? {} : { availableCommands: () => [{ name: "review", description: "Review the diff", input: { hint: "what to focus on" } }] }),
@@ -174,9 +244,9 @@ describe("ACP server negotiation of the new frames", () => {
         hook = approvalRaised;
         writer = new SessionService(workspace);
         writer.open({ sessionId, agentId: "default", harnessVersion: "fixture", compositionDigest: "fixture", policyDigest: "fixture" });
-        return { sessionId, prompt: async () => { writer.startTurn({ trigger: "user" }); await options.onPrompt?.({ writer, sessionId, hook: hook! }); writer.endTurn({ reason: "complete" }); writer.sealTurn();
+        return { sessionId, prompt: async () => { writer.startTurn({ trigger: "user" }); await options.onPrompt?.({ writer, sessionId, hook: hook!, tamper }); writer.endTurn({ reason: "complete" }); writer.sealTurn();
           return { ok: true, text: "", status: "idle", validation: { status: "not-requested", turn: null, configSha256: null, checks: [] } }; },
-          cancel: (_cause, by) => { cancels.push(by); }, readEvents: () => writer.readEvents(),
+          cancel: (_cause, by) => { cancels.push(by); }, readEvents: reads,
           close: () => { try { writer.close({ reason: "completed" }); } finally { writer.disposeWithoutClosing(); } } };
       } });
     agents.push(agent); let sequence = 0;
@@ -220,7 +290,12 @@ describe("ACP server negotiation of the new frames", () => {
       // The hook's request goes out as an agent-to-client JSON-RPC request on this connection.
       const aborted = new AbortController(); const pending = seen.at(-1)!.request("ping", {}, aborted.signal); aborted.abort();
       await expect(pending).rejects.toThrow(/cancelled/);
-      expect(client.frames.some(frame => frame.method === "ping" && typeof frame.id === "string")).toBe(true);
+      const ping = client.frames.filter(frame => frame.method === "ping").at(-1)!;
+      expect(typeof ping.id).toBe("string");
+      // A withdrawn request is announced, so a client that implements `$/cancel_request` closes its dialog.
+      const cancel = client.frames.find(frame => frame.method === "$/cancel_request" && frame.params?.requestId === ping.id);
+      expect(cancel).toBeDefined();
+      expect(await checkAcpDefinition("CancelRequestNotification", cancel!.params)).toEqual({ ok: true });
     }
   });
 
@@ -256,6 +331,25 @@ describe("ACP server negotiation of the new frames", () => {
     release();
     expect((await client.reply(second)).result).toMatchObject({ stopReason: "end_turn" });
     expect(client.cancels).toEqual([]);
+  });
+
+  it("sends no permission request when the gated tool_call cannot be delivered first, and the prompt fails instead", async () => {
+    const seen: AcpApprovalRaised[] = [];
+    const client = peer({ onApprovalRaised: e => seen.push(e), tamperReads: true,
+      onPrompt: async ({ writer, sessionId, hook, tamper }) => {
+        writer.startStep();
+        writer.recordToolCall({ toolCallId: "call-1", toolName: "fs.read", dispatch: "native", parentToken: null, args: JSON.stringify({ path: "a.md" }) });
+        tamper(); // The committed tail no longer authenticates when the approval is raised.
+        hook(sessionId, { approvalId: "apr_1", approvalRequestId: "apprreq_1", toolCallId: "call-1" });
+        writer.endStep({ stopReason: "tool_use", usage: null });
+      } });
+    await client.call("initialize", { protocolVersion: 1, clientCapabilities: {} });
+    const sessionId = (await client.call("session/new", { cwd: workspace, mcpServers: [] })).result!.sessionId as string;
+    const answered = await client.call("session/prompt", { sessionId, prompt: [{ type: "text", text: "one" }] });
+    expect(answered.result).toBeUndefined();
+    expect(seen).toEqual([]);
+    expect(client.frames.some(frame => frame.method === "session/request_permission")).toBe(false);
+    expect(client.frames.some(frame => frame.method === "session/update" && (frame.params?.update as { sessionUpdate?: string })?.sessionUpdate === "tool_call")).toBe(false);
   });
 
   it("does not advertise permission requests or commands when the launcher wired neither", async () => {
