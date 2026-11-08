@@ -320,3 +320,19 @@ describe("website phone navigation", () => {
     expect(verify).toContain(".plain-page pre code{overflow-wrap:normal}");
   });
 });
+
+// LIVE-UX-13: two pages kept sub-AA grey literals (#555 on #111/#050505, #666 on #0a0a0a); both load only brand.css.
+describe("website colour contrast literals", () => {
+  const website = join(process.cwd(), "website");
+  test("no page uses the #555 or #666 text colour; demo and methodology use brand.css's --amc-dim", () => {
+    for (const file of readdirSync(website).filter((name) => name.endsWith(".html"))) {
+      expect(readFileSync(join(website, file), "utf8"), file).not.toMatch(/color:\s*#(?:555|666)\b/i);
+    }
+    for (const file of ["demo.html", "methodology.html"]) {
+      const html = readFileSync(join(website, file), "utf8");
+      expect(html, file).not.toContain("--text-dim");
+      expect(html, file).toContain("var(--amc-dim)");
+    }
+    expect(readFileSync(join(website, "brand.css"), "utf8")).toMatch(/--amc-dim:/);
+  });
+});
