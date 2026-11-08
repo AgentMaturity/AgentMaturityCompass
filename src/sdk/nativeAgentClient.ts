@@ -287,8 +287,7 @@ export class AMCNativeClient {
       ["--validation-config", options.validationConfig], ["--validation-config-sha256", options.validationConfigSha256],
       ["--validation-repair", options.validationRepair],
       ["--approve-tools", options.approveTools], ["--approve-risk", options.approveRisk],
-      ["--credentials-home", options.credentialsHome], ["--credentials-file", options.credentialsFile],
-      ["--credentials-mode", options.credentialsMode],
+      ["--credentials-home", options.credentialsHome], ["--credentials-file", options.credentialsFile], ["--credentials-mode", options.credentialsMode],
       ["--thinking", options.thinking], ["--reasoning-effort", options.reasoningEffort], ["--thinking-budget", options.thinkingBudget],
       ["--cache-retention", options.cacheRetention], ["--max-retries", options.maxRetries], ["--retry-max-delay", options.retryMaxDelayMs], ["--retry-max-provider-delay", options.retryMaxProviderDelayMs ?? options.retryMaxDelayMs ?? 10_000],
       ["--max-tokens", options.maxTokens], ["--max-steps", options.maxSteps]] as const) {
