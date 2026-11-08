@@ -120,7 +120,7 @@ describe("compose upgrade/rollback rehearsal (LIVE-DEPLOY-16)", () => {
       const guarded = fakeDocker({ refuse: { image: refuse, logs: `starting\n${GUARD}\n` } });
       const failed = await runComposeRehearsal({ ...base, docker: guarded.docker, probe: verified });
       expect(statuses(failed)).toEqual(expected);
-      expect(failed.downgradeGuard?.phase).toBe(expected.at(-1)!.split("=")[0]);
+      expect(failed.downgradeGuard).toMatchObject({ phase: expected.at(-1)!.split("=")[0] });
       expect(failed.status).toBe("failed");
     }
 
