@@ -3,11 +3,11 @@ import type { ServerResponse } from "node:http";
 /**
  * Fixed-window, in-memory request limiters for Studio, the host router and the hosted API (LIVE-RUNTIME-04).
  *
- * Keys come from clients (an address, an address plus a route), so the bucket map must stay bounded: once it passes
- * PRUNE_AT entries, expired buckets are swept before a new key is added, and past MAX_KEYS a new key is refused like
- * any limited request (D-R16). A restart clears every bucket.
+ * Keys come from clients (an address, an address plus a route), so the bucket map must stay bounded (D-R16). Buckets
+ * sit in creation order, which is expiry order, so expired ones are swept from the front as new keys arrive; a map of
+ * MAX_KEYS live buckets drops its oldest. It never refuses a new key: refusing let one client that rotated keys lock
+ * every other client out, health and readiness probes included (skeptic D3). A restart clears every bucket.
  */
-const PRUNE_AT = 10_000;
 const MAX_KEYS = 50_000;
 
 export interface RateLimitDecision {
@@ -23,16 +23,15 @@ interface Bucket {
   resetTs: number;
 }
 
-/** The live bucket for `key`, a fresh one, or null when the map is full of live buckets. */
-function bucketFor(buckets: Map<string, Bucket>, key: string, now: number, intervalMs: number): Bucket | null {
+/** The live bucket for `key`, or a fresh one. */
+function bucketFor(buckets: Map<string, Bucket>, key: string, now: number, intervalMs: number): Bucket {
   const existing = buckets.get(key);
   if (existing && existing.resetTs > now) return existing;
   if (existing) buckets.delete(key);
-  // ponytail: an O(n) sweep only when a new key arrives past PRUNE_AT; a timer wheel if that ever shows in a profile.
-  if (buckets.size >= PRUNE_AT) {
-    for (const [name, bucket] of buckets) if (bucket.resetTs <= now) buckets.delete(name);
+  for (const [name, bucket] of buckets) {
+    if (bucket.resetTs > now && buckets.size < MAX_KEYS) break; // the oldest is live and there is room
+    buckets.delete(name); // expired, or the oldest live bucket of a full map
   }
-  if (buckets.size >= MAX_KEYS) return null;
   const fresh = { count: 0, resetTs: now + intervalMs };
   buckets.set(key, fresh);
   return fresh;
@@ -43,9 +42,8 @@ export function makeRateLimiterDetailed(limit: number, intervalMs: number, now: 
   return (key: string): RateLimitDecision => {
     const at = now();
     const bucket = bucketFor(buckets, key, at, intervalMs);
-    if (!bucket || bucket.count >= limit) {
-      const resetTs = bucket?.resetTs ?? at + intervalMs;
-      return { allowed: false, limit, remaining: 0, resetTs, retryAfterSeconds: Math.max(1, Math.ceil((resetTs - at) / 1000)) };
+    if (bucket.count >= limit) {
+      return { allowed: false, limit, remaining: 0, resetTs: bucket.resetTs, retryAfterSeconds: Math.max(1, Math.ceil((bucket.resetTs - at) / 1000)) };
     }
     bucket.count += 1;
     return { allowed: true, limit, remaining: Math.max(0, limit - bucket.count), resetTs: bucket.resetTs, retryAfterSeconds: 0 };

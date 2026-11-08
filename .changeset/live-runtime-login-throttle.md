@@ -6,4 +6,4 @@ Studio's `/auth/login`, the host router's `/host/api/login` and the workspace `/
 
 Every login failure now answers 401 with exactly `{"error":"invalid credentials"}`, including a revoked or disabled account and a users file that fails to load (LIVE-RUNTIME-06). The reason goes to the audit record and the server log. Policy refusals keep their text: 403 for an invalid users signature or for local password login disabled by identity policy, and 429 from the limiters.
 
-The in-memory request limiters now prune expired buckets once they hold 10,000 keys and refuse new keys past 50,000, so spoofed client keys cannot grow memory without bound.
+The in-memory request limiters now hold at most 50,000 client keys: expired buckets are pruned as new keys arrive, and a map full of live buckets drops its oldest one. A new key is never refused because the map is full, so a client that rotates keys cannot lock other clients, or the health and readiness probes, out.
