@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runDoctorRules } from "../src/doctor/doctorRules.js";
 import { renderDoctorText } from "../src/doctor/doctorReport.js";
 import { doctorNextSteps, firstRunActions, firstRunFixCommands, STUB_FIRST_TURN_COMMAND } from "../src/doctor/firstRunPlan.js";
+import { AGENT_ENV_MARKERS } from "../src/vault/operatorContext.js";
 
 /**
  * First-run diagnostic (brief §7 item 4, §7a): `amc doctor` must name each
@@ -78,6 +79,7 @@ describe("amc doctor names each first-run precondition and its fix", () => {
     writeFileSync(join(root, ".amc", "gateway.yaml"), "{}\n");
   });
   afterEach(() => {
+    vi.unstubAllEnvs();
     rmSync(root, { recursive: true, force: true });
     if (priorPassphrase === undefined) delete process.env[PASSPHRASE_ENV];
     else process.env[PASSPHRASE_ENV] = priorPassphrase;
@@ -152,6 +154,15 @@ describe("amc doctor names each first-run precondition and its fix", () => {
     expect(vault?.fixHint).toContain("amc vault unlock");
     // B2: a newcomer whose passphrase `amc up` generated never saw it; the advice names where it is kept.
     expect(vault?.fixHint).toContain("remembered is kept in the macOS Keychain (service amc-vault) or /fixture/amc-home/vault-credentials.json");
+  });
+
+  it("says why a remembered passphrase is not used in this shell (LIVE-VAULT-01)", async () => {
+    for (const name of AGENT_ENV_MARKERS) vi.stubEnv(name, undefined);
+    vi.stubEnv("CLAUDECODE", "1");
+    const vault = (await runDoctorRules(root)).checks.find((row) => row.id === "vault");
+    expect(vault?.status).toBe("WARN");
+    expect(vault?.fixHint).toContain("remembered is kept in the macOS Keychain (service amc-vault) or /fixture/amc-home/vault-credentials.json; "
+      + "it is not used here because this shell carries the agent marker CLAUDECODE");
   });
 
   it("passes the vault check when a remembered passphrase unlocked it, naming where it was kept", async () => {

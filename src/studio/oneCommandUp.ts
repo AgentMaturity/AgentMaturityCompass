@@ -11,11 +11,18 @@ import chalk from "chalk";
 import inquirer from "inquirer";
 import { usersConfigPath } from "../auth/authApi.js";
 import { buildDashboard } from "../dashboard/build.js";
+import { agentMarker } from "../vault/operatorContext.js";
 import { getRememberedVaultPassphrase, rememberedLocation, rememberedStores, rememberVaultPassphrase } from "../vault/passphraseStore.js";
 import { vaultExists } from "../vault/vault.js";
 
 export async function ensureUpVaultPassphrase(workspace: string, remember: boolean): Promise<void> {
   if (!process.env.AMC_VAULT_PASSPHRASE && remember) {
+    // LIVE-VAULT-01 (D3): an agent harness's shell never starts a Studio daemon holding the remembered passphrase.
+    const marker = agentMarker();
+    if (marker !== null) {
+      throw new Error(`This shell carries the agent marker ${marker}, so amc up does not use a remembered vault passphrase here. `
+        + "Export AMC_VAULT_PASSPHRASE deliberately, or run amc up from your own terminal.");
+    }
     const remembered = getRememberedVaultPassphrase(workspace);
     if (remembered) {
       process.env.AMC_VAULT_PASSPHRASE = remembered.passphrase;

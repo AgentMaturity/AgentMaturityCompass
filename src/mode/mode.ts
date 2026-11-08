@@ -67,11 +67,8 @@ export async function leaveAgentMode(workspace: string, passphrase: string): Pro
   setMode(workspace, "owner");
 }
 
-export function assertOwnerMode(workspace: string, commandPath: string): void {
-  if (getMode(workspace) !== "agent") {
-    return;
-  }
-  const blocked = new Set([
+/** Commands agent mode refuses (assertOwnerMode); the vault's governance confirmation (src/vault/operatorContext.ts) reuses them. */
+export const OWNER_ONLY_COMMAND_PATHS: readonly string[] = [
     "init",
     "quickstart",
     "up",
@@ -206,8 +203,14 @@ export function assertOwnerMode(workspace: string, commandPath: string): void {
     "a4 retire",
     "a4 rollback",
     "a4 tune"
-  ]);
-  if (blocked.has(commandPath)) {
+];
+const OWNER_ONLY = new Set(OWNER_ONLY_COMMAND_PATHS);
+
+export function assertOwnerMode(workspace: string, commandPath: string): void {
+  if (getMode(workspace) !== "agent") {
+    return;
+  }
+  if (OWNER_ONLY.has(commandPath)) {
     throw new Error(`Command '${commandPath}' is blocked in agent mode. Switch to owner mode with: amc mode owner`);
   }
 }

@@ -291,6 +291,7 @@ import { writeRuntimeFirewallPolicyAsync, migrateRuntimeFirewallPolicySignatureA
 import { installFatalHandlers } from "./runtime/fatalDiagnostic.js";
 import { initVaultInteractive, lockVaultNow, promptPassphrase, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
 import { forgetVaultPassphrase, unlockWithRememberedPassphrase } from "./vault/passphraseStore.js";
+import { confirmRememberedUnlock } from "./vault/operatorContext.js";
 import { ensureUpVaultPassphrase, printConsoleSignInStep, runFirstBaselineIfNeeded } from "./studio/oneCommandUp.js";
 import { agentRunFiles, latestRunSummary } from "./diagnostic/runReportResolution.js";
 import { buildConnectInstructions } from "./studio/connectWizard.js";
@@ -2137,7 +2138,7 @@ program
     }
     process.stdout.write(body.endsWith("\n") ? body : `${body}\n`);
   });
-program.hook("preAction", (_thisCommand, actionCommand) => {
+program.hook("preAction", async (_thisCommand, actionCommand) => {
   const opts = actionCommand.optsWithGlobals<{ agent?: string; color?: boolean }>();
   if (opts.agent && opts.agent.trim().length > 0) {
     process.env.AMC_AGENT_ID = opts.agent.trim();
@@ -2151,7 +2152,8 @@ program.hook("preAction", (_thisCommand, actionCommand) => {
     assertOwnerMode(process.cwd(), path);
   }
   // B2: `amc up` reads it itself (--no-remember); the agent host's MCP server and hook forwarder never hold the vault.
-  if (!/^(up|mcp|connect hooks forward)( |$)/.test(path)) unlockWithRememberedPassphrase(process.cwd());
+  // LIVE-VAULT-01: the unlock is for an interactive operator only, and a governance command then confirms it.
+  if (!/^(up|mcp|connect hooks forward)( |$)/.test(path)) { unlockWithRememberedPassphrase(process.cwd()); await confirmRememberedUnlock(process.cwd(), path); }
 });
 installClaimLabelHooks(program);
 
@@ -6912,10 +6914,7 @@ vault
   .command("forget")
   .description("Remove the remembered vault passphrase for this workspace (Keychain or credentials file)")
   .action(() => {
-    const removed = forgetVaultPassphrase(process.cwd());
-    console.log(removed
-      ? chalk.green("Remembered vault passphrase removed.")
-      : "No remembered vault passphrase found for this workspace.");
+    console.log(forgetVaultPassphrase(process.cwd()) ? chalk.green("Remembered vault passphrase removed.") : "No remembered vault passphrase found for this workspace.");
   });
 registerVaultHistoryCommands(vault);
 const dlp = program.command("dlp").description("DLP scanner for PII and secrets");

@@ -4,23 +4,27 @@ import { join } from "node:path";
 import { stripVTControlCharacters } from "node:util";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const seam = vi.hoisted(() => ({ vaultExists: false, events: [] as string[] }));
+const seam = vi.hoisted(() => ({ vaultExists: false, events: [] as string[], remembered: null as null | { passphrase: string; backend: "file" } }));
 vi.mock("../src/vault/vault.js", () => ({ vaultExists: () => seam.vaultExists }));
 vi.mock("../src/vault/passphraseStore.js", () => ({
-  getRememberedVaultPassphrase: () => null,
+  getRememberedVaultPassphrase: () => { seam.events.push("load"); return seam.remembered; },
   rememberedLocation: () => "the store",
   rememberedStores: () => "the macOS Keychain (service amc-vault) or /home/x/.config/amc/vault-credentials.json",
   rememberVaultPassphrase: () => { seam.events.push("store"); return { backend: "file", location: "/home/x/.config/amc/vault-credentials.json" }; }
 }));
 
 import { ensureUpVaultPassphrase, printConsoleSignInStep } from "../src/studio/oneCommandUp.js";
+import { AGENT_ENV_MARKERS } from "../src/vault/operatorContext.js";
 
 const roots: string[] = [];
+// The vitest worker inherits CLAUDECODE from a Claude Code shell; amc up refuses the store under it (LIVE-VAULT-01).
+beforeEach(() => { for (const name of AGENT_ENV_MARKERS) vi.stubEnv(name, undefined); });
 afterEach(() => {
   vi.unstubAllEnvs();
   vi.restoreAllMocks();
   seam.vaultExists = false;
   seam.events = [];
+  seam.remembered = null;
   while (roots.length > 0) rmSync(roots.pop()!, { recursive: true, force: true });
 });
 
@@ -54,6 +58,18 @@ describe("amc up in a non-interactive shell (B1)", () => {
     seam.vaultExists = true;
     logged();
     await expect(ensureUpVaultPassphrase("/nonexistent/amc-up-ws", true)).rejects.toThrow(/already has a vault.*AMC_VAULT_PASSPHRASE or in the macOS Keychain/);
+    expect(seam.events).not.toContain("store");
+    expect(process.env.AMC_VAULT_PASSPHRASE).toBeUndefined();
+  });
+
+  it("does not read the remembered store in a shell carrying an agent marker (LIVE-VAULT-01)", async () => {
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
+    vi.stubEnv("CLAUDECODE", "1");
+    seam.remembered = { passphrase: "remembered-up-pass-123", backend: "file" };
+    logged();
+    await expect(ensureUpVaultPassphrase("/nonexistent/amc-up-ws", true)).rejects.toThrow(
+      /This shell carries the agent marker CLAUDECODE, so amc up does not use a remembered vault passphrase here\. Export AMC_VAULT_PASSPHRASE deliberately/);
+    expect(seam.events).not.toContain("load");
     expect(seam.events).not.toContain("store");
     expect(process.env.AMC_VAULT_PASSPHRASE).toBeUndefined();
   });

@@ -2,7 +2,8 @@
  * Remembered vault passphrase store.
  *
  * Lets `amc up` start without prompts for returning users, and lets the other amc commands in that workspace unlock
- * the vault with it (unlockWithRememberedPassphrase). Storage prefers the macOS Keychain (`security` CLI) when stdin
+ * the vault with it (unlockWithRememberedPassphrase) when an interactive operator runs them (LIVE-VAULT-01: stdin a
+ * terminal, no agent mode, no agent marker; operatorRememberedPassphrase). Storage prefers the macOS Keychain (`security` CLI) when stdin
  * is a terminal; on other platforms, in a non-interactive shell, when a Keychain call fails or does not answer within
  * SECURITY_TIMEOUT_MS, or when AMC_VAULT_REMEMBER_FILE is set, a 0600 JSON file in the AMC home ($AMC_HOME, else
  * ~/.config/amc) is used. The passphrase reaches `security` on stdin, never as a process argument. Remembering is a
@@ -13,8 +14,8 @@ import { spawnSync } from "node:child_process";
 import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { resolveAmcHome } from "../credentials/credentialsPaths.js";
-import { getMode } from "../mode/mode.js";
 import { sha256Hex } from "../utils/hash.js";
+import { interactiveOperator, operatorRefusalText } from "./operatorContext.js";
 import { unlockVault, vaultExists, vaultStatus } from "./vault.js";
 
 export type RememberBackend = "keychain" | "file";
@@ -123,12 +124,12 @@ export function getRememberedVaultPassphrase(
 }
 
 /**
- * The remembered passphrase for an operator's command. None in agent mode (`amc up`, its only user before, is blocked
- * there) or in a process holding an agent's credential (AMC_LEASE, AMC_TOKEN): an agent AMC launched never gets the
- * vault this way, as it never gets AMC_VAULT_PASSPHRASE.
+ * LIVE-VAULT-01: the remembered passphrase, for an interactive operator only (src/vault/operatorContext.ts): stdin a
+ * terminal, the workspace not in agent mode, no agent marker (AMC_LEASE, AMC_TOKEN, a coding-agent harness), and not
+ * declined earlier in this process. Every reader but `amc up` comes through here, so a caller added later inherits the gate.
  */
 export function operatorRememberedPassphrase(workspace: string, env: NodeJS.ProcessEnv = process.env): ReturnType<typeof getRememberedVaultPassphrase> {
-  return getMode(workspace) === "agent" || env.AMC_LEASE || env.AMC_TOKEN ? null : getRememberedVaultPassphrase(workspace, env);
+  return interactiveOperator({ workspace, env }).ok ? getRememberedVaultPassphrase(workspace, env) : null;
 }
 
 export function rememberVaultPassphrase(
@@ -167,8 +168,9 @@ export function forgetVaultPassphrase(
 const rememberedUnlocks = new Map<string, string>();
 
 /**
- * B2: a command in a workspace whose vault passphrase was remembered starts with that vault unlocked in this process,
- * as `amc vault unlock` leaves it, so signing and verification work in a new shell. AMC_VAULT_PASSPHRASE wins. The
+ * B2: a command an interactive operator runs in a workspace whose vault passphrase was remembered starts with that vault
+ * unlocked in this process, as `amc vault unlock` leaves it, so signing and verification work in a new terminal; governance
+ * commands then confirm it (confirmRememberedUnlock). AMC_VAULT_PASSPHRASE wins. The
  * passphrase stays in the vault session and never enters the environment, so no child process inherits it. One that
  * does not open the vault leaves it locked, as before, and says why on stderr.
  * ponytail: a session idle past the vault's 30-minute TTL is not reopened from here; long-running servers get
@@ -177,7 +179,10 @@ const rememberedUnlocks = new Map<string, string>();
 export function unlockWithRememberedPassphrase(workspace: string, env: NodeJS.ProcessEnv = process.env): void {
   if ((env.AMC_VAULT_PASSPHRASE ?? "").length > 0 || !vaultExists(workspace) || vaultStatus(workspace).unlocked) return;
   const remembered = operatorRememberedPassphrase(workspace, env);
-  if (remembered === null) return;
+  if (remembered === null) {
+    sayWhyNotUsed(workspace, env);
+    return;
+  }
   const location = rememberedLocation(remembered.backend, env);
   try {
     unlockVault(workspace, remembered.passphrase);
@@ -188,7 +193,21 @@ export function unlockWithRememberedPassphrase(workspace: string, env: NodeJS.Pr
   }
 }
 
+/** An operator in a pseudo-terminal harness or in agent mode learns why the store was skipped; a hook (no terminal) stays silent. */
+function sayWhyNotUsed(workspace: string, env: NodeJS.ProcessEnv): void {
+  if (process.stdin.isTTY !== true) return;
+  const gate = interactiveOperator({ workspace, env });
+  if (gate.ok || (gate.reason !== "agent-marker" && gate.reason !== "agent-mode")) return;
+  const entry = getRememberedVaultPassphrase(workspace, env);
+  if (entry !== null) process.stderr.write(`Vault passphrase remembered in ${rememberedLocation(entry.backend, env)} not used: ${operatorRefusalText(gate)}\n`);
+}
+
 /** Where the passphrase that unlocked `workspace` in this process was remembered, or null when it was not that one. */
 export function rememberedUnlockLocation(workspace: string): string | null {
   return rememberedUnlocks.get(resolve(workspace)) ?? null;
+}
+
+/** Clears the mark rememberedUnlockLocation reads (the operator declined to sign from the store). */
+export function forgetRememberedUnlock(workspace: string): void {
+  rememberedUnlocks.delete(resolve(workspace));
 }

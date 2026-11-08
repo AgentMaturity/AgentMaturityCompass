@@ -50,12 +50,22 @@ export async function initVaultInteractive(workspace: string): Promise<{ vaultFi
   });
 }
 
-/** AMC_VAULT_PASSPHRASE, else the passphrase `amc up` remembered for this workspace (not in agent mode), else a prompt. */
+/**
+ * AMC_VAULT_PASSPHRASE, else the passphrase `amc up` remembered for this workspace (an interactive operator only:
+ * operatorRememberedPassphrase), else a prompt. Without a terminal there is nobody to prompt, so it refuses with the fix.
+ */
 export async function unlockVaultInteractive(workspace: string): Promise<string> {
   const passphrase = process.env.AMC_VAULT_PASSPHRASE ?? operatorRememberedPassphrase(workspace)?.passphrase
-    ?? (await promptPassphrase("Unlock vault passphrase:"));
+    ?? (await promptUnlockPassphrase());
   unlockVault(workspace, passphrase);
   return passphrase;
+}
+
+function promptUnlockPassphrase(): Promise<string> {
+  if (process.stdin.isTTY !== true) {
+    throw new Error("Vault passphrase needed: export AMC_VAULT_PASSPHRASE for this shell, or re-run this command from your terminal.");
+  }
+  return promptPassphrase("Unlock vault passphrase:");
 }
 
 export function lockVaultNow(workspace: string): void {
