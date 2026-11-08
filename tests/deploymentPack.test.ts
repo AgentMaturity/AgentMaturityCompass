@@ -58,6 +58,16 @@ describe("compose runtime layout (LIVE-DEPLOY-01)", () => {
     expect(dockerRun).not.toContain("--tmpfs /home/amc");
   });
 
+  it("passes the operator's monitor-key pin to Studio, empty (unanchored) by default (LIVE-DEPLOY-16)", () => {
+    // Native-task verdicts count only when anchored to a pinned monitor key (P0-51); the chart passes the same key.
+    for (const [file, name] of STUDIO_SERVICES) {
+      const pin = serviceEnv(composeServices(file)[name]!).AMC_EXPECTED_MONITOR_FINGERPRINT;
+      expect(pin, `${file} ${name}`).toBe("${AMC_EXPECTED_MONITOR_FINGERPRINT:-}");
+      expect(interpolate(pin!, { AMC_EXPECTED_MONITOR_FINGERPRINT: "ab".repeat(32) })).toBe("ab".repeat(32));
+    }
+    expect(read("deploy/compose/.env.example")).toMatch(/^AMC_EXPECTED_MONITOR_FINGERPRINT=$/m);
+  });
+
   it("gives Studio a stop grace period and a restart policy", () => {
     // Studio drains up to 10 s before it seals its session; Docker's 10 s default can kill it first.
     for (const [file, name] of [...STUDIO_SERVICES, ["deploy/compose/docker-compose.studio-api.yml", "amc-api"]] as const) {
