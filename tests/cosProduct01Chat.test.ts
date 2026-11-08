@@ -259,6 +259,17 @@ describe("P01 connected native chat behavior", () => {
     expect(logs.join("\n")).toContain("Recorded reply:");
   });
 
+  it("keeps an ordinary prompt out of the turn child's argv as well: it travels on stdin only", async () => {
+    seam.answers = ["summarise the private notes", "/exit"];
+    seam.results = [{ code: 0, body: summary() }];
+    await run();
+    expect(seam.commands).toHaveLength(1);
+    expect(seam.commands[0]!.slice(-2)).toEqual(["--", "-"]);
+    expect(seam.commands[0]!.join(" ")).not.toContain("summarise the private notes");
+    await vi.waitFor(() => expect(seam.stdins).toEqual(["summarise the private notes"]));
+    expect(fail).not.toHaveBeenCalled();
+  });
+
   it("reads child exit code 6 as completion not established, named from the code, not as a successful turn", async () => {
     seam.answers = ["task", "/exit"];
     // The turn completed but the session's side effects did not all settle (SH-UI-01 exit 6): chat must say so.
