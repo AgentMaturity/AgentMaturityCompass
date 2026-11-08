@@ -117,6 +117,10 @@ Protected `/api/v1` routes require a signed Studio session or the bootstrap admi
 
 The policy also treats vault secret reads as owner-only, restricts Studio log reads to operational/audit roles, defaults unknown state-changing routes to `OPERATOR`/`OWNER`, and requires `OWNER` for unsupported methods. This role boundary does not make Studio internet-safe; keep Studio bound to localhost or behind a trusted private ingress.
 
+### Host Header and DNS Rebinding
+
+Studio and the host router (`amc host`) refuse a request whose `Host` names neither an IP literal, `localhost` (or `*.localhost`), nor a host the operator configured (`AMC_CORS_ALLOWED_ORIGINS`, `AMC_HOST_PUBLIC_BASEURL`), so a page whose name rebinds to 127.0.0.1 is answered 403. A request a trusted proxy forwarded is not checked here; the proxy answers for its own name. In host mode each workspace API the router starts listens on 127.0.0.1 and trusts the router as its one forwarding hop, so the router sends a per-boot random secret (`x-amc-router-secret`, held in memory only) on every request it proxies, and the workspace API refuses any request without it with 403. A page or local process that reaches a workspace API port directly therefore cannot skip the router's checks by adding `X-Forwarded-For`.
+
 ### Domain Proof API Filesystem Boundary
 
 `POST /api/v1/proof/check` evaluates schema-validated inline manifest and input objects without arbitrary server filesystem access. The current toy checker also requires the canonical AMC source text and manifest structure; a caller cannot substitute a merely schema-valid source and obtain `proven`. API-side `outFile` writes are disabled. Deprecated path-string compatibility is limited to the built-in `fixtures/domain-proof/` and `examples/domain-proof/` roots with lexical containment, realpath containment, regular-file, and 1 MiB checks. Absolute paths, traversal, non-proof workspace paths, and symlink escapes fail closed with errors that omit host paths and file names.

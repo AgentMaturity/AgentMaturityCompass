@@ -18,6 +18,7 @@ import { applyServerTimeouts } from "../studio/serverTimeouts.js";
 import { HostSseHub, serveHostConsole } from "./hostConsole.js";
 import { WorkspaceManager } from "./workspaceManager.js";
 import { proxyStudioWorkspaceRequest } from "./workspaceStudioProxy.js";
+import { newRouterSecret } from "../studio/routerSecret.js";
 import { WorkspaceRuntimeRegistry, WorkspaceRuntimeClosingError } from "./workspaceRuntimeRegistry.js";
 import { DEFAULT_WORKSPACE_ID, normalizeWorkspaceId } from "./workspaceId.js";
 import {
@@ -67,6 +68,7 @@ interface WorkspaceApiRuntime {
   port: number;
   host: string;
   token: string;
+  routerSecret: string;
   close: () => Promise<void>;
 }
 
@@ -635,6 +637,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
   });
   const defaultWorkspaceId = manager.resolveWorkspaceId(options.defaultWorkspaceId ?? DEFAULT_WORKSPACE_ID);
   const workspaceApis = new WorkspaceRuntimeRegistry<WorkspaceApiRuntime>();
+  const routerSecret = newRouterSecret(); // follow-up 11: the workspace APIs answer this router only
   let shutdown: Promise<void> | undefined;
   const hostEvents = new HostSseHub();
   const hostStreams = createStreamCap(64, 4); // LIVE-RUNTIME-13, SR-8: per hub and host user; host admins always admitted
@@ -676,13 +679,15 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         maxRequestBytes: options.maxRequestBytes,
         corsAllowedOrigins: options.corsAllowedOrigins,
         nativeAllowedOrigins: publicNativeOrigins(),
-        publicConsoleBasePath: `/w/${normalized}/console`
+        publicConsoleBasePath: `/w/${normalized}/console`,
+        routerSecret
       });
       const result: WorkspaceApiRuntime = {
         workspaceId: normalized,
         host: "127.0.0.1",
         port: api.port,
         token: runtime.token,
+        routerSecret,
         close: async () => api.close()
       };
       return result;

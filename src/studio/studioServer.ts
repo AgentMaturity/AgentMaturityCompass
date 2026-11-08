@@ -121,6 +121,7 @@ import { createStreamCap, makeRateLimiter, makeRateLimiterDetailed, setRateLimit
 import { admitLoginAttempt, createLoginThrottle } from "./loginThrottle.js";
 import { ipAllowedByCidrs, LOOPBACK_CIDRS, requestUsesHttps, resolveClientAddress } from "./clientAddress.js";
 import { allowedHostnamesFrom, hostAllowed } from "./hostAllow.js";
+import { routerSecretValid } from "./routerSecret.js";
 import { applySecurityHeaders, isConsoleStaticAsset } from "./securityHeaders.js";
 import { missingOutcomeContract, missingStandardSchema, missingValueInput, type EmptyState } from "./emptyStates.js";
 import { applyServerTimeouts } from "./serverTimeouts.js";
@@ -432,6 +433,8 @@ interface StudioApiOptions {
   nativeAllowedOrigins?: readonly string[];
   minFreeDiskMb?: number;
   publicConsoleBasePath?: string;
+  /** Set by the host router for a workspace API it starts: every request must carry it (routerSecret.ts). */
+  routerSecret?: string;
 }
 
 async function readBody(req: IncomingMessage, maxBytes = 1_048_576): Promise<string> {
@@ -1281,6 +1284,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       recordHttpRequestMetric(metricRoute, metricMethod, res.statusCode || 0, Date.now() - requestStartedAt);
     });
     try {
+      // Follow-up 11: a workspace API the host router started answers the router only.
+      if (options.routerSecret !== undefined && !routerSecretValid(req, options.routerSecret)) { json(res, 403, { error: "this workspace API answers its host router only" }); return; }
       // LIVE-RUNTIME-19, SR-4: a request no trusted proxy forwarded must name a host DNS rebinding cannot forge.
       const { clientIp, trustForwarded, addressTrusted } = resolveClientAddress(req, { trustedProxyHops: options.trustedProxyHops ?? 0, trustedProxyCidrs: options.trustedProxyCidrs ?? [] });
       if (!trustForwarded && !hostAllowed(req.headers.host, allowedHostnames)) {

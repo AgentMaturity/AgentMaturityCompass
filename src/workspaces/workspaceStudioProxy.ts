@@ -1,12 +1,13 @@
 import { request as httpRequest, type IncomingMessage, type ServerResponse } from "node:http";
 import { socketIp } from "../studio/clientAddress.js";
+import { ROUTER_SECRET_HEADER } from "../studio/routerSecret.js";
 import { isNativeProtectedPath } from "../studio/nativeAdmission.js";
 
 /** Native callers must first pass the router's browser proof and current membership checks. */
 export async function proxyStudioWorkspaceRequest(
   req: IncomingMessage,
   res: ServerResponse,
-  runtime: { readonly host: string; readonly port: number },
+  runtime: { readonly host: string; readonly port: number; readonly routerSecret?: string },
   targetPath: string,
   // Absent (an older caller), the client is the socket peer and nothing is https: never the client's own claim.
   forwarded: { readonly clientIp: string; readonly trustedHttps: boolean } = { clientIp: socketIp(req.socket.remoteAddress), trustedHttps: false }
@@ -18,6 +19,7 @@ export async function proxyStudioWorkspaceRequest(
   const forwardHeaders = Object.fromEntries(Object.entries(clientHeaders).filter(([name]) => !name.startsWith("x-forwarded-")));
   forwardHeaders["x-forwarded-for"] = forwarded.clientIp;
   if (forwarded.trustedHttps) forwardHeaders["x-forwarded-proto"] = "https";
+  if (runtime.routerSecret !== undefined) forwardHeaders[ROUTER_SECRET_HEADER] = runtime.routerSecret; // follow-up 11: replaces any client copy
   const targetPathname = new URL(targetPath, "http://workspace.internal").pathname;
   const nativeRequest = isNativeProtectedPath(targetPathname, method);
   let upstreamResponse: IncomingMessage | undefined;
