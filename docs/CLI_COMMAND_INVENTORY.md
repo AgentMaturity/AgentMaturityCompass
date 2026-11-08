@@ -419,7 +419,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc eval run` | One-shot evaluation: read amcconfig.yaml, run all diagnostic tests, output results | `--format <format>`<br>`--output <path>`<br>`--window <window>`<br>`--agent <agentId>`<br>`--fail-on-error`<br>`--threshold <n>` | - |
 | `amc eval status` | Show imported eval coverage per AMC dimension | `--agent <agentId>`<br>`--window <window>`<br>`--json` | - |
 | `amc eval suite` | Task suites run against the native agent: graders, pass@k, baselines and gates | - | - |
-| `amc eval suite baseline` | Reduce a results file to a baseline and record its digest in the ledger | `--out <path>` | - |
+| `amc eval suite baseline` | Reduce a recorded results file to a baseline and record its digest in the ledger | `--out <path>` | - |
 | `amc eval suite compare` | Gate a results file against a baseline: pass (0), fail (1) or inconclusive (2) | `--gate <path>`<br>`--json` | - |
 | `amc eval suite run` | Run every task of a suite N times through the governed native agent and grade each attempt | `--provider <id>`<br>`--model <model>`<br>`--base-url <url>`<br>`--credential <ref>`<br>`--attempts <n>`<br>`--out <path>`<br>`--tasks <ids>`<br>`--agent <agentId>`<br>`--max-steps <n>`<br>`--unsafe-unconfined-graders`<br>`--keep-dirs`<br>`--json` | - |
 | `amc evidence` | Evidence lifecycle workflows | - | - |
@@ -1074,7 +1074,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc session` | Native signed sessions: inspect, compact, verify, replay and recover | - | - |
 | `amc session anchor` | Anchor a closed session's root into the transparency log | `--json` | - |
 | `amc session compact` | List signed history origins, then apply an explicit native summary or drop without rewriting evidence | `--list`<br>`--origins <ids>`<br>`--summary-file <path>`<br>`--expect-head <hash>`<br>`--reason <text>`<br>`--summary-role <role>`<br>`--replace`<br>`--drop`<br>`--json` | - |
-| `amc session export` | Export a session as a self-contained HTML viewer (digests only unless --include-content), verifiable offline | `--out <path>`<br>`--include-content`<br>`--json-out <path>` | - |
+| `amc session export` | Export a session as a self-contained HTML viewer (payload digests only unless --include-content; signed row metadata always), verifiable offline | `--out <path>`<br>`--include-content`<br>`--json-out <path>` | - |
 | `amc session proof` | Export a session's inclusion proof (verifiable offline, without this workspace) | `--out <path>` | - |
 | `amc session recover` | Recover a crashed session by appending synthetic closers under a fenced claim (append-only) | `--force`<br>`--close`<br>`--stale-after <ms>`<br>`--json` | - |
 | `amc session replay-request` | Rebuild each request this session sent from its signed rows and check it against the recorded digest | `--json`<br>`--out <path>` | - |

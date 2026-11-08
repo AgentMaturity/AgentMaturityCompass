@@ -22,7 +22,7 @@ Different tools for different jobs. Promptfoo evaluates prompt quality. AMC answ
 
 **What's paid:** Nothing. The 41 industry-specific domain packs for regulated verticals (healthcare, finance, education, logistics) are free too in the current source build: experimental, self-reported questionnaires, with no licence or account (the 1.1.1 release that the install script fetches still asks for a licence for them).
 
-2,405 Vitest test source files. Would love feedback from this community.
+2,483 Vitest test source files. Would love feedback from this community.
 
 GitHub: https://github.com/AgentMaturity/AgentMaturityCompass
 
@@ -46,7 +46,7 @@ Sharing a project I've been working on: an open-source framework for evaluating 
 
 The framework generates compliance mappings for EU AI Act, ISO 42001, NIST AI RMF, and OWASP LLM Top 10.
 
-MIT licensed, 2,405 Vitest test source files, TypeScript.
+MIT licensed, 2,483 Vitest test source files, TypeScript.
 
 Paper references and methodology: https://agentmaturity.co/methodology.html
 GitHub: https://github.com/AgentMaturity/AgentMaturityCompass
