@@ -79,6 +79,35 @@ describe("assurance report provenance gate", () => {
     expect(assuranceReportProvenance(ws, { ...backed.report, sessionId: open })).toMatchObject({ ok: false, reason: "PROVENANCE_SESSION_UNSEALED" });
   });
 
+  test("a reordered or gapped runner session under a valid seal is refused (fix3 S12b)", () => {
+    // Runner rows are legacy rows (no session envelope), so their order is the global chain's: each row must link to the
+    // stored row just before it. Both tampers keep every row's own hash and signature and the seal (which names the
+    // session's last row) intact, and leave the report's referenced rows in place.
+    const scenarios = [{ scenarioId: "s1", pass: true }, { scenarioId: "s2", pass: false }];
+    const tamper = (edit: (db: ReturnType<typeof openLedger>["db"], rows: Array<{ id: string; rowid: number }>) => void) => {
+      const ws = workspace();
+      const { report, sessionId } = writeProvenancedAssuranceReport(ws, { name: "chain", packs: [{ packId: "injection", scenarios }] });
+      expect(assuranceReportProvenance(ws, report)).toEqual({ ok: true });
+      const ledger = openLedger(ws);
+      try {
+        // A workspace writer with file access, not the monitor key: the append-only triggers are SQL, not cryptography.
+        ledger.db.exec("DROP TRIGGER IF EXISTS no_update_evidence; DROP TRIGGER IF EXISTS no_delete_evidence;");
+        edit(ledger.db, ledger.db.prepare("SELECT id, rowid FROM evidence_events WHERE session_id = ? ORDER BY rowid").all(sessionId) as Array<{ id: string; rowid: number }>);
+      } finally { ledger.close(); }
+      return assuranceReportProvenance(ws, report);
+    };
+    // Swap two middle rows (s1's stdout and test rows): the session is reordered under its seal.
+    expect(tamper((db, rows) => {
+      const [a, b] = [rows[2]!, rows[3]!];
+      db.prepare("UPDATE evidence_events SET rowid = -1 WHERE id = ?").run(a.id);
+      db.prepare("UPDATE evidence_events SET rowid = ? WHERE id = ?").run(a.rowid, b.id);
+      db.prepare("UPDATE evidence_events SET rowid = ? WHERE id = ?").run(b.rowid, a.id);
+    })).toMatchObject({ ok: false, reason: "PROVENANCE_LEDGER_INVALID", detail: expect.stringMatching(/previous hash mismatch/) });
+    // Drop the run's first row (ASSURANCE_RUN_STARTED, referenced by no scenario): the chain forks around a gap.
+    expect(tamper((db, rows) => { db.prepare("DELETE FROM evidence_events WHERE id = ?").run(rows[0]!.id); }))
+      .toMatchObject({ ok: false, reason: "PROVENANCE_LEDGER_INVALID", detail: expect.stringMatching(/previous hash mismatch/) });
+  });
+
   test("a report that graded nothing has nothing to prove, and an unsigned-store report never counts", () => {
     const ws = workspace();
     const inconclusive = writeProvenancedAssuranceReport(ws, { name: "inconclusive", packs: [{ packId: "injection", scenarios: [{ scenarioId: "s1", pass: false, inconclusive: true }] }] });

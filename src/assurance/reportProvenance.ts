@@ -1,7 +1,8 @@
 import { eventMeta } from "../claims/evidenceProvenance.js";
-import { legacyLedgerRowKeys } from "../keys/operationalLedgerReader.js";
+import { createOperationalEvidenceVerifier, legacyLedgerRowKeys } from "../keys/operationalLedgerReader.js";
 import { openLedger, type Ledger } from "../ledger/ledger.js";
 import { verifyRowIntegrity, verifySeal } from "../transparency/sessionRootDescriptor.js";
+import type { TrustContext } from "../trust/trustContext.js";
 import type { AssuranceScenarioResult, EvidenceEvent } from "../types.js";
 import { isExecutedReportPack } from "./executed/reportValidation.js";
 
@@ -17,9 +18,12 @@ import { isExecutedReportPack } from "./executed/reportValidation.js";
  * count with no scored row behind it is refused: a score from missing evidence is the exact thing this gate exists
  * to stop. A report whose every pack claims nothing (all inconclusive, score 0) has nothing to prove and passes.
  *
- * Only the runner session's own rows are verified (hash pre-image, writer signature, seal), O(session) per report:
- * the ledger-wide chain is `verifyLedgerIntegrity`'s job, which both runners call at run time. This gate sits on the
- * governor's per-intent path, so it must not rehash the whole ledger on every call.
+ * Only the runner session's own rows are verified, O(session) per report, because this gate sits on the governor's
+ * per-intent path and must not rehash the whole ledger on every call: each row's hash pre-image and writer signature,
+ * its link to the stored row just before it (runner rows carry no session envelope, so their order and enclosure are the
+ * global chain's: a reordered, spliced or gapped session fails even under a valid seal), the seal, and the delegated
+ * signing authority of exactly those rows under the caller's trust (fix3 S12b). The rest of the ledger-wide chain stays
+ * `verifyLedgerIntegrity`'s job, which both runners call at run time.
  *
  * A gateway receipt on a stdout row is extra, not provenance: the runner verified it when the reply arrived and stores
  * only admitted receipts (`admitGatewayReceipt`), so this gate never re-judges one. An agent under test could otherwise
@@ -71,19 +75,26 @@ type SessionVerdict = { ok: true } | { ok: false; reason: "PROVENANCE_SESSION_UN
 export class ProvenanceChecker {
   private ledger: Ledger | null = null;
   private keys: string[] | null = null;
+  private operational: ((rows: readonly EvidenceEvent[]) => string[]) | null = null;
   private readonly sessions = new Map<string, SessionVerdict>();
 
-  constructor(private readonly workspace: string, private readonly options: { ledger?: Ledger } = {}) {}
+  constructor(private readonly workspace: string, private readonly options: { ledger?: Ledger; trust?: TrustContext } = {}) {}
 
   private open(): Ledger { return (this.ledger ??= this.options.ledger ?? openLedger(this.workspace)); }
   private rowKeys(): string[] { return (this.keys ??= legacyLedgerRowKeys(this.workspace)); }
-
-  /** The session's rows in the order the runner appended them (ledger `rowid`). */
-  private sessionRows(sessionId: string): EvidenceEvent[] {
-    return this.open().db.prepare("SELECT * FROM evidence_events WHERE session_id = ? ORDER BY rowid ASC").all(sessionId) as EvidenceEvent[];
+  /** Delegated (provider-bound) row authority under the caller's trust; a no-op for a workspace with no bound provider. */
+  private authority(): (rows: readonly EvidenceEvent[]) => string[] {
+    return (this.operational ??= createOperationalEvidenceVerifier(this.workspace, { ledger: this.open(), trust: this.options.trust }));
   }
 
-  /** Is `sessionId` a sealed session of this runner whose every row hashes, is monitor-signed and is covered by the seal? */
+  /** The session's rows in stored order (ledger `rowid`), each with the `event_hash` of the stored row just before it. */
+  private sessionRows(sessionId: string): Array<EvidenceEvent & { predecessor_hash: string }> {
+    return this.open().db.prepare(`SELECT e.*, COALESCE((SELECT p.event_hash FROM evidence_events p WHERE p.rowid < e.rowid
+      ORDER BY p.rowid DESC LIMIT 1), 'GENESIS') AS predecessor_hash FROM evidence_events e WHERE e.session_id = ? ORDER BY e.rowid ASC`)
+      .all(sessionId) as Array<EvidenceEvent & { predecessor_hash: string }>;
+  }
+
+  /** Is `sessionId` a sealed session of this runner whose rows hash, are signed, link into the chain and end at the seal? */
   private session(sessionId: string, kind: ProvenanceKind): SessionVerdict {
     const cached = this.sessions.get(sessionId);
     if (cached !== undefined) return cached;
@@ -95,8 +106,12 @@ export class ProvenanceChecker {
     } else {
       const rows = this.sessionRows(sessionId), keys = this.rowKeys(), errors: string[] = [];
       if (rows.length === 0) errors.push(`session ${sessionId} has no rows`);
-      for (const row of rows) verifyRowIntegrity(keys, row, errors);
+      for (const row of rows) {
+        verifyRowIntegrity(keys, row, errors);
+        if (row.prev_event_hash !== row.predecessor_hash) errors.push(`Event ${row.id} previous hash mismatch`);
+      }
       verifySeal(keys, record, rows, sessionId, errors);
+      errors.push(...this.authority()(rows));
       verdict = errors.length === 0 ? { ok: true } : { ok: false, reason: "PROVENANCE_LEDGER_INVALID", detail: errors.slice(0, 3).join("; ") };
     }
     this.sessions.set(sessionId, verdict);
@@ -157,12 +172,14 @@ export class ProvenanceChecker {
   close(): void {
     if (this.ledger && !this.options.ledger) this.ledger.close();
     this.ledger = null;
+    this.operational = null;
     this.sessions.clear();
   }
 }
 
 /** One-shot form for a single report (certificates, CLI verify). */
-export function assuranceReportProvenance(workspace: string, report: ProvenancedReport, options: { kind?: ProvenanceKind; ledger?: Ledger } = {}): ProvenanceResult {
+export function assuranceReportProvenance(workspace: string, report: ProvenancedReport,
+  options: { kind?: ProvenanceKind; ledger?: Ledger; trust?: TrustContext } = {}): ProvenanceResult {
   const checker = new ProvenanceChecker(workspace, options);
   try { return checker.check(report, options.kind); } finally { checker.close(); }
 }
