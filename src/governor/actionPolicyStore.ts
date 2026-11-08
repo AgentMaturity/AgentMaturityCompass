@@ -8,17 +8,13 @@ import { actionPolicySchema, type ActionPolicy } from "./actionPolicySchema.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
-import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
+import { assertPurposePublicationCurrent } from "../keys/purposePublication.js";
 import { verifyCurrentPurposeCredentialSignature } from "../keys/purposeCredentialSignature.js";
-import { assertKeysetComplete, boundProviderKey } from "../keys/keyset.js";
-import { canonicalSigningKey, verifyWithKey } from "../keys/algorithmPolicy.js";
-import { keyPolicy, loadKeysConfig } from "../keys/keysConfig.js";
-import { KeyProviderError } from "../keys/provider.js";
-import { assertSigningKeyUsable, getSigningPublicKeyPem } from "../keys/signingKeys.js";
-import { vaultStatus } from "../vault/vault.js";
+import { assertKeysetComplete } from "../keys/keyset.js";
+import { verifyWithKey } from "../keys/algorithmPolicy.js";
 import { canonicalize } from "../utils/json.js";
 import { captureOrgFiles, captureOrgPairs, assertOrgPairsCurrent, orgPairBytes, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
-import { VAULT_LOCKED_NO_SIGN_MESSAGE } from "../vault/vaultLockedError.js";
+import { captureConfigSignatureAuthority } from "../keys/configSignatureAuthority.js";
 
 export const ACTION_POLICY_WRITER_LOCK = "action-policy-writer" as const;
 
@@ -327,23 +323,6 @@ export interface ActionPolicyPairOptions {
   beforePublish?: () => void; assertInputsCurrent?: () => void;
 }
 
-/** Original committed config holder; no private getter or invented checked signature in resumed gates. */
-function captureActionPolicyAuthority(workspace: string) {
-  const captured = capturePurposePublication(workspace, "config-signature"), bound = boundProviderKey(workspace, "config-signature");
-  const holder = bound?.binding.provider ?? "file", publicKeyPem = bound?.publicKeyPem ?? getSigningPublicKeyPem(workspace, "config-signature");
-  const algorithm = canonicalSigningKey(publicKeyPem)?.algorithm;
-  if (algorithm === undefined) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original action-policy config signer is unsupported");
-  const assertCurrent = () => {
-    const policy = keyPolicy(loadKeysConfig(workspace));
-    if (canonicalize(assertKeysetComplete(workspace)) !== captured.keyset || !policy.allowed.includes(algorithm)
-      || (holder === "file" && policy.requireNonExportable))
-      throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original action-policy config authority changed or is refused");
-    assertSigningKeyUsable(workspace, "config-signature", publicKeyPem, holder);
-    if (holder === "file" && !vaultStatus(workspace).unlocked)
-      throw new Error(VAULT_LOCKED_NO_SIGN_MESSAGE);
-  };
-  assertCurrent(); return { captured, publicKeyPem, assertCurrent };
-}
 
 function withActionPolicyLock<T>(file: string, operation: () => T): T {
   return withControlFileLock({ root: dirname(file), name: ACTION_POLICY_WRITER_LOCK, timeoutMs: 500, operation });
@@ -361,7 +340,7 @@ function captureActionPolicyPlan(workspace: string, replacement?: Uint8Array, op
   // Async/prepared bodies are schema checked without reserializing their actual reviewed bytes.
   // The retained sync sign-only API preserves its original raw-body signing contract.
   if (validate) actionPolicySchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
-  const original = captureActionPolicyAuthority(workspace); // Ordinary entry warm/migration stays OUTSIDE the writer lock.
+  const original = captureConfigSignatureAuthority(workspace, "action-policy config"); // Ordinary entry warm/migration stays OUTSIDE the writer lock.
   const digest = sha256Hex(bytes);
   const beforeSign = () => { beforePublish?.(); assertInputsCurrent?.(); assertActionPolicyWriterReady(workspace); original.assertCurrent(); assertOrgPairsCurrent(before); };
   beforeSign(); return { workspace, file, bytes, digest, replacement: copy !== undefined, before, original, beforePublish, assertInputsCurrent, beforeSign };

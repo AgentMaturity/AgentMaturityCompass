@@ -1,4 +1,5 @@
-import { constants, openSync, closeSync, fstatSync, readSync } from "node:fs";
+import { constants, openSync, closeSync, fstatSync } from "node:fs";
+import { readBoundedBytes } from "../utils/fs.js";
 import { verifyTrackedSessionToken } from "../auth/authApi.js";
 
 /** A secret token from a private regular file (0600, owned by this user, no symlink); never logged. */
@@ -8,14 +9,10 @@ export function readPrivateTokenFile(path: string, label: string): string {
     const stat = fstatSync(fd);
     if (!stat.isFile()) throw new Error(`${label} must be a regular file`);
     if (process.platform !== "win32" && ((stat.mode & 0o077) !== 0 || stat.uid !== process.getuid?.())) throw new Error(`${label} file must be private to its owner (0600)`);
-    const buffer = Buffer.alloc(16_385); let offset = 0;
-    while (offset < buffer.length) {
-      const count = readSync(fd, buffer, offset, buffer.length - offset, null);
-      if (!count) break; offset += count;
-    }
-    if (offset === 0 || offset > 16_384) throw new Error(`${label} file is empty or exceeds its size limit`);
-    const token = new TextDecoder("utf-8", { fatal: true }).decode(buffer.subarray(0, offset)).trim();
-    buffer.fill(0);
+    const bytes = readBoundedBytes(fd, 16_384);
+    if (bytes === null || bytes.length === 0) throw new Error(`${label} file is empty or exceeds its size limit`);
+    const token = new TextDecoder("utf-8", { fatal: true }).decode(bytes).trim();
+    bytes.fill(0);
     return token;
   } finally { closeSync(fd); }
 }

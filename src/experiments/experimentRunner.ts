@@ -600,8 +600,7 @@ export async function runExperimentAsync(params: Parameters<typeof runExperiment
     const signed = await signWithPurposeKey(input.workspace, "artifact-seal", Buffer.from(reportJsonSha256, "hex"), { beforeSign });
     // Do not let the inherited file getter reopen an explicitly locked vault through an environment passphrase.
     const assertFileVaultCurrent = () => {
-      if (signed.provider === "file" && !vaultStatus(input.workspace).unlocked)
-        throw new Error(VAULT_LOCKED_MESSAGE);
+      if (signed.provider === "file" && !vaultStatus(input.workspace).unlocked) throw new Error(VAULT_LOCKED_MESSAGE);
     };
     assertFileVaultCurrent(); phase = "members";
     const report: ExperimentReport = { ...prepared.base, reportJsonSha256, reportSealSig: signed.signature.toString("base64") };

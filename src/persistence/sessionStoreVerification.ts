@@ -253,19 +253,7 @@ export function verifyStoredSessionEvents(
   rows: readonly EvidenceEvent[],
   options: StoredSessionVerifyOptions = {}
 ): StoredSessionVerifyResult {
-  const errors: string[] = [];
-  const expected =
-    options.expectedMonitorFingerprint ?? monitorPinFromEnv() ?? null;
-  const trustRoot = verifyMonitorTrustRoot(workspace, expected, errors, options.trust);
-  errors.push(...operationalSessionProblems(workspace, rows, options.trust));
-  verifyGlobalChainAndSignatures(rows, workspace, errors);
-  verifySessionEnvelopeChains(rows, errors);
-  try { validateSurfaceCompactions(workspace, rows, { trust: options.trust }); }
-  catch (error) { errors.push(`Session compaction invalid: ${error instanceof Error ? error.message : "unsupported history"}`); }
-  if (options.sessionRecords !== undefined) {
-    verifySessionRecords(rows, options.sessionRecords, legacyLedgerRowKeys(workspace), errors);
-  }
-  return { ok: errors.length === 0, errors, trustRoot };
+  return verifyStoredSession(workspace, rows, options, true);
 }
 
 /**
@@ -278,12 +266,20 @@ export function verifyStoredSessionEventMetadata(
   rows: readonly EvidenceEvent[],
   options: StoredSessionVerifyOptions = {}
 ): StoredSessionVerifyResult {
+  return verifyStoredSession(workspace, rows, options, false);
+}
+
+/** Both verdicts: trust root, operational rows, chain and signatures, envelopes, records; `full` adds payloads and compactions. */
+function verifyStoredSession(workspace: string, rows: readonly EvidenceEvent[], options: StoredSessionVerifyOptions, full: boolean): StoredSessionVerifyResult {
   const errors: string[] = [];
-  const expected = options.expectedMonitorFingerprint ?? monitorPinFromEnv() ?? null;
-  const trustRoot = verifyMonitorTrustRoot(workspace, expected, errors, options.trust);
+  const trustRoot = verifyMonitorTrustRoot(workspace, options.expectedMonitorFingerprint ?? monitorPinFromEnv() ?? null, errors, options.trust);
   errors.push(...operationalSessionProblems(workspace, rows, options.trust));
-  verifyGlobalChainAndSignatures(rows, workspace, errors, false);
+  verifyGlobalChainAndSignatures(rows, workspace, errors, full);
   verifySessionEnvelopeChains(rows, errors);
+  if (full) {
+    try { validateSurfaceCompactions(workspace, rows, { trust: options.trust }); }
+    catch (error) { errors.push(`Session compaction invalid: ${error instanceof Error ? error.message : "unsupported history"}`); }
+  }
   if (options.sessionRecords !== undefined) verifySessionRecords(rows, options.sessionRecords, legacyLedgerRowKeys(workspace), errors);
   return { ok: errors.length === 0, errors, trustRoot };
 }

@@ -14,7 +14,7 @@
         "src/console/assets/app.js", "src/console/assets/sw.js", "src/console/assets/a4.js",
         "src/console/assets/benchCompare.js", "src/console/assets/benchPortfolio.js",
         "src/console/assets/benchRegistry.js", "src/console/assets/benchmarks.js",
-        "src/console/assets/equalizer.js", "src/console/assets/mechanic.js",
+        "src/console/assets/equalizer.js", "src/console/assets/mechanic.js", "src/console/assets/ops.js",
         "src/console/assets/simulator.js", "src/console/assets/upgradeWizard.js",
         "src/dashboard/templates/app.js", "src/dashboard/templates/api.js",
         "src/dashboard/templates/components/domains.js", "src/dashboard/templates/components/guardrailsView.js",

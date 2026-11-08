@@ -1,5 +1,6 @@
 import type { Command } from "commander";
-import { constants, openSync, closeSync, fstatSync, readSync } from "node:fs";
+import { constants, openSync, closeSync, fstatSync } from "node:fs";
+import { readBoundedBytes } from "./utils/fs.js";
 import { compactReleasedSession, inspectSessionCompaction } from "./session/sessionCompactionWorkflow.js";
 
 interface Options {
@@ -10,13 +11,9 @@ function summaryFile(path: string): string {
   const fd = openSync(path, constants.O_RDONLY | constants.O_NONBLOCK);
   try {
     if (!fstatSync(fd).isFile()) throw new Error("Summary must be a regular UTF-8 text file");
-    const buffer = Buffer.alloc(1_000_001); let offset = 0;
-    while (offset < buffer.length) {
-      const count = readSync(fd, buffer, offset, buffer.length - offset, null);
-      if (!count) break; offset += count;
-    }
-    if (offset > 1_000_000) throw new Error("Summary exceeds the one-million-byte limit");
-    return new TextDecoder("utf-8", { fatal: true }).decode(buffer.subarray(0, offset));
+    const bytes = readBoundedBytes(fd, 1_000_000);
+    if (bytes === null) throw new Error("Summary exceeds the one-million-byte limit");
+    return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
   } finally { closeSync(fd); }
 }
 

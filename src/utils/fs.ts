@@ -1,4 +1,4 @@
-import { chmodSync, existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, readFileSync, readSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { randomBytes } from "node:crypto";
 import { noteCheckPassWrite } from "./checkPass.js";
@@ -35,4 +35,18 @@ export function writeUtf8(path: string, data: string): void {
 
 export function pathExists(path: string): boolean {
   return existsSync(path);
+}
+
+/** Up to `maxBytes` read from `fd` to its end, or null when it holds more (that buffer is zeroed). The caller owns the fd. */
+export function readBoundedBytes(fd: number, maxBytes: number): Buffer | null {
+  const buffer = Buffer.alloc(maxBytes + 1);
+  let offset = 0;
+  while (offset < buffer.length) {
+    const count = readSync(fd, buffer, offset, buffer.length - offset, null);
+    if (!count) break;
+    offset += count;
+  }
+  if (offset <= maxBytes) return buffer.subarray(0, offset);
+  buffer.fill(0);
+  return null;
 }

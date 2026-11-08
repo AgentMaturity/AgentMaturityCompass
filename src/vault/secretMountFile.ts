@@ -12,8 +12,9 @@
  * Refused: a group- or world-writable file, and a file this user could replace (one it owns that others can read, a
  * symlink in a directory it can write, a file in such a directory). The value is never logged.
  */
-import { accessSync, closeSync, constants, fstatSync, lstatSync, openSync, readlinkSync, readSync, statSync } from "node:fs";
+import { accessSync, closeSync, constants, fstatSync, lstatSync, openSync, readlinkSync, statSync } from "node:fs";
 import { dirname, isAbsolute, join, resolve, sep } from "node:path";
+import { readBoundedBytes } from "../utils/fs.js";
 
 const MAX_LINKS = 32;
 const MAX_BYTES = 16_384;
@@ -55,16 +56,9 @@ export function secretLookup(path: string): { file: string; dirs: string[] } {
 }
 
 function readContent(fd: number, label: string): string {
-  const buffer = Buffer.alloc(MAX_BYTES + 1);
-  let offset = 0;
-  while (offset < buffer.length) {
-    const count = readSync(fd, buffer, offset, buffer.length - offset, null);
-    if (!count) break;
-    offset += count;
-  }
-  if (offset === 0 || offset > MAX_BYTES) throw new Error(`${label} file is empty or exceeds its size limit`);
-  const value = new TextDecoder("utf-8", { fatal: true }).decode(buffer.subarray(0, offset)).trim();
-  buffer.fill(0);
+  const bytes = readBoundedBytes(fd, MAX_BYTES);
+  const value = bytes === null ? "" : new TextDecoder("utf-8", { fatal: true }).decode(bytes).trim();
+  bytes?.fill(0);
   if (value.length === 0) throw new Error(`${label} file is empty or exceeds its size limit`);
   return value;
 }

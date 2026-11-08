@@ -22,7 +22,7 @@ async function child(options: { leaseToken?: string }): Promise<{ token: string 
   const out = join(dir, "seen.json");
   const fixture = join(dir, "child.mjs");
   writeFileSync(fixture, `import { writeFileSync } from "node:fs";
-const { takeNativeTaskLease } = await import(${JSON.stringify(pathToFileURL(resolve("dist/acp/acpCli.js")).href)});
+const { takeNativeTaskLease } = await import(${JSON.stringify(pathToFileURL(resolve("dist/acp/nativeTaskLease.js")).href)});
 const token = takeNativeTaskLease();
 writeFileSync(process.env.LEASE_FIXTURE_OUT, JSON.stringify({ token: token ?? null, env: process.env }));
 process.exit(0);

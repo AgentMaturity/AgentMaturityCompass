@@ -648,32 +648,21 @@ function createProxyServer(params: {
     const row = { request_id: requestId, agentId, destinationHost: host, destinationPort: port, stage: "egress_unresolved", status: 502, reason: egress.decision.reason };
     params.appendEvidence({ eventType: "gateway", payload: JSON.stringify(row), meta: { ...row, ...meta, proxyMode: true, trustTier: "OBSERVED" } });
   };
+  // A client outside the allow list, over HTTP or CONNECT: refused, with a bounded NETWORK_EGRESS_BLOCKED audit.
+  const clientRefused = (requestId: string, clientIp: string): boolean => {
+    if (ipAllowedByCidrs(clientIp, params.allowedCidrs ?? [])) return false;
+    if (params.preAuthAudit.shouldAudit(clientIp, "NETWORK_EGRESS_BLOCKED")) {
+      const row = { auditType: "NETWORK_EGRESS_BLOCKED", severity: "HIGH", request_id: requestId, reason: "client_cidr_denied", clientIp, proxyMode: true };
+      params.appendEvidence({ eventType: "audit", payload: JSON.stringify(row), meta: { ...row, trustTier: "OBSERVED" } });
+    }
+    return true;
+  };
   const onRequest = async (req: IncomingMessage, res: ServerResponse): Promise<void> => {
     const requestId = randomUUID();
     const method = (req.method ?? "GET").toUpperCase();
     const clientIp = normalizeRemoteIp(req.socket.remoteAddress);
     applySecurityHeaders(res, { trustedHttps: requestUsesHttps(req, false), noStore: true }); // LIVE-RUNTIME-07; upstream headers override by name
-    if (!ipAllowedByCidrs(clientIp, params.allowedCidrs ?? [])) {
-      if (params.preAuthAudit.shouldAudit(clientIp, "NETWORK_EGRESS_BLOCKED")) params.appendEvidence({
-        eventType: "audit",
-        payload: JSON.stringify({
-          auditType: "NETWORK_EGRESS_BLOCKED",
-          severity: "HIGH",
-          request_id: requestId,
-          reason: "client_cidr_denied",
-          clientIp,
-          proxyMode: true
-        }),
-        meta: {
-          auditType: "NETWORK_EGRESS_BLOCKED",
-          severity: "HIGH",
-          request_id: requestId,
-          reason: "client_cidr_denied",
-          clientIp,
-          proxyMode: true,
-          trustTier: "OBSERVED"
-        }
-      });
+    if (clientRefused(requestId, clientIp)) {
       res.statusCode = 403;
       res.end("client IP not allowed");
       return;
@@ -846,27 +835,7 @@ function createProxyServer(params: {
     if (!params.fence.admitTunnel(clientSocket)) return;
     const requestId = randomUUID();
     const clientIp = normalizeRemoteIp(req.socket.remoteAddress);
-    if (!ipAllowedByCidrs(clientIp, params.allowedCidrs ?? [])) {
-      if (params.preAuthAudit.shouldAudit(clientIp, "NETWORK_EGRESS_BLOCKED")) params.appendEvidence({
-        eventType: "audit",
-        payload: JSON.stringify({
-          auditType: "NETWORK_EGRESS_BLOCKED",
-          severity: "HIGH",
-          request_id: requestId,
-          reason: "client_cidr_denied",
-          clientIp,
-          proxyMode: true
-        }),
-        meta: {
-          auditType: "NETWORK_EGRESS_BLOCKED",
-          severity: "HIGH",
-          request_id: requestId,
-          reason: "client_cidr_denied",
-          clientIp,
-          proxyMode: true,
-          trustTier: "OBSERVED"
-        }
-      });
+    if (clientRefused(requestId, clientIp)) {
       clientSocket.write("HTTP/1.1 403 Forbidden\r\n\r\n");
       clientSocket.destroy();
       return;

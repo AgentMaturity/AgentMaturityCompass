@@ -14,7 +14,7 @@ import { admitLoginAttempt, createLoginThrottle } from "../studio/loginThrottle.
 import { ipAllowedByCidrs, LOOPBACK_CIDRS, requestUsesHttps, resolveClientAddress, withLoopbackCidrs } from "../studio/clientAddress.js";
 import { allowedHostnamesFrom, hostAllowed } from "../studio/hostAllow.js";
 import { applySecurityHeaders, SECURITY_HEADER_NAMES } from "../studio/securityHeaders.js";
-import { applyServerTimeouts } from "../studio/serverTimeouts.js";
+import { listenWithTimeouts } from "../studio/serverTimeouts.js";
 import { HostSseHub, serveHostConsole } from "./hostConsole.js";
 import { WorkspaceManager } from "./workspaceManager.js";
 import { proxyStudioWorkspaceRequest } from "./workspaceStudioProxy.js";
@@ -692,6 +692,20 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       };
       return result;
     });
+  };
+
+  /** A host user's workspace session and its cookie; refused (401, revoked) when the host authority changed while it was signed. */
+  const mintHostUserWorkspaceSession = async (res: ServerResponse, workspaceId: string, user: { userId: string; username: string },
+    roles: SessionPayload["roles"], trustedHttps: boolean): Promise<boolean> => {
+    const workspaceDir = manager.withWorkspace(workspaceId, (context) => context.workspaceDir);
+    const issued = await createTrackedSessionAsync({ workspace: workspaceDir, ...user, roles, ttlMs: 8 * 60 * 60_000, authSource: "WORKSPACE_ROUTER" });
+    if (!workspaceSessionAuthorityCurrent(options.hostDir, workspaceId, issued.payload)) {
+      revokeSessionByToken({ workspace: workspaceDir, token: issued.token });
+      writeControlError(res, 401, "workspace session authority changed");
+      return false;
+    }
+    setWorkspaceSessionCookie(res, workspaceId, issued.token, Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000), trustedHttps);
+    return true;
   };
 
   const server = createServer(async (req, res) => {
@@ -1467,27 +1481,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           return;
         }
         const runtime = await ensureWorkspaceApi(urlWorkspaceId).catch(() => null);
-        const workspaceDir = manager.withWorkspace(urlWorkspaceId, (context) => context.workspaceDir);
-        const issued = await createTrackedSessionAsync({
-          workspace: workspaceDir,
-          userId,
-          username,
-          roles,
-          ttlMs: 8 * 60 * 60_000,
-          authSource: "WORKSPACE_ROUTER"
-        });
-        if (!workspaceSessionAuthorityCurrent(options.hostDir, urlWorkspaceId, issued.payload)) {
-          revokeSessionByToken({ workspace: workspaceDir, token: issued.token });
-          writeControlError(res, 401, "workspace session authority changed");
-          return;
-        }
-        setWorkspaceSessionCookie(
-          res,
-          urlWorkspaceId,
-          issued.token,
-          Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000),
-          trustedHttps
-        );
+        if (!await mintHostUserWorkspaceSession(res, urlWorkspaceId, { userId, username }, roles, trustedHttps)) return;
         json(res, 200, {
           ok: true,
           workspaceId: urlWorkspaceId,
@@ -1623,26 +1617,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           }
           const canMintWorkspaceSession = hostAccess.username && hostAccess.userId;
           if (!workspaceSessionValid && canMintWorkspaceSession && (workspacePath === "/" || workspacePath.startsWith("/console"))) {
-            const issued = await createTrackedSessionAsync({
-              workspace: manager.withWorkspace(urlWorkspaceId, (context) => context.workspaceDir),
-              userId: hostAccess.userId!,
-              username: hostAccess.username!,
-              roles,
-              ttlMs: 8 * 60 * 60_000,
-              authSource: "WORKSPACE_ROUTER"
-            });
-            if (!workspaceSessionAuthorityCurrent(options.hostDir, urlWorkspaceId, issued.payload)) {
-              revokeSessionByToken({ workspace: manager.withWorkspace(urlWorkspaceId, (context) => context.workspaceDir), token: issued.token });
-              writeControlError(res, 401, "workspace session authority changed");
-              return;
-            }
-            setWorkspaceSessionCookie(
-              res,
-              urlWorkspaceId,
-              issued.token,
-              Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000),
-              trustedHttps
-            );
+            if (!await mintHostUserWorkspaceSession(res, urlWorkspaceId, { userId: hostAccess.userId!, username: hostAccess.username! }, roles, trustedHttps)) return;
             res.statusCode = 302;
             res.setHeader("location", workspacePath === "/console" ? `${pathname}/${url.search}` : pathname + url.search);
             res.end();
@@ -1702,11 +1677,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
     }
   });
 
-  applyServerTimeouts(server, { requestTimeout: 120_000 }); // LIVE-RUNTIME-12
-  await new Promise<void>((resolvePromise, rejectPromise) => {
-    server.once("error", rejectPromise);
-    server.listen(options.port, options.host, () => resolvePromise());
-  });
+  await listenWithTimeouts(server, options.port, options.host, { requestTimeout: 120_000 }); // LIVE-RUNTIME-12
 
   const bound = server.address(); // the bound port, so `port: 0` reports the port the router really listens on
   return {
