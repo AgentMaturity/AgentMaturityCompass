@@ -1400,9 +1400,10 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       }
 
       if (workspacePath === "/readyz") {
-        // LIVE-RUNTIME-09: one answer for every id to an anonymous caller, so readiness is no existence oracle.
+        // LIVE-RUNTIME-09: one answer for every id to an anonymous caller, so readiness is no existence oracle. SR-5: a host
+        // user who is no member of this workspace (host admins are members of all) gets that same answer.
         const sessionOk = (() => { try { return verifyWorkspaceSession(manager, urlWorkspaceId, req.headers.cookie).ok; } catch { return false; } })();
-        if (!sessionOk && !resolveHostAccess(req, options.hostDir).ok) {
+        if (!sessionOk && resolveWorkspaceRolesForHostAccess(options.hostDir, urlWorkspaceId, resolveHostAccess(req, options.hostDir)).length === 0) {
           writeControlError(res, 401, "authentication required");
           return;
         }

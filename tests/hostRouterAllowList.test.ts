@@ -97,6 +97,24 @@ describe("host router readiness", () => {
     expect(signedIn.status).toBe(200);
     expect(JSON.parse(signedIn.body)).toMatchObject({ status: "READY", workspaceId: "ws-a" });
   }, 120_000);
+
+  // SR-5: any valid host session used to read any workspace's readiness, a cross-tenant disclosure.
+  test("a host user reads only the workspaces they belong to; another tenant answers as to an anonymous caller", async () => {
+    const port = await router(host());
+    const cookie = await login(port, "member", "member-pass-123"); // a member of ws-b only
+    const own = await call(port, "/w/ws-b/readyz", { headers: { cookie } });
+    expect(own.status).toBe(200);
+    expect(JSON.parse(own.body)).toMatchObject({ workspaceId: "ws-b" });
+    const other = await call(port, "/w/ws-a/readyz", { headers: { cookie } });
+    const anonymous = await call(port, "/w/ws-a/readyz");
+    expect({ status: other.status, body: other.body }).toEqual({ status: anonymous.status, body: anonymous.body });
+    expect(other.body).not.toContain("ws-a");
+    const otherApi = await call(port, "/w/ws-a/api/status", { headers: { cookie } });
+    expect(otherApi.status, "the other tenant's API is not proxied either").toBe(403);
+    expect(JSON.parse(otherApi.body)).toEqual({ error: "membership required" });
+    const unknownApi = await call(port, "/w/no-such-workspace/api/status", { headers: { cookie } });
+    expect({ status: unknownApi.status, body: unknownApi.body }, "and that refusal names no workspace that exists").toEqual({ status: otherApi.status, body: otherApi.body });
+  }, 120_000);
 });
 
 describe("host router allow list and forwarding", () => {
