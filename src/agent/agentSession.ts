@@ -32,8 +32,8 @@ import { admitSessionAtOpen } from "../runtime/changeEnvelope.js";
 import { projectNativeResourceStatus, type NativeResourceStatus } from "../prompt/context/nativeResourceStatus.js";
 import type { CompositionSource } from "../prompt/context/compositionProvenance.js";
 import { applySkillToolRestriction, prepareSkillTurn, workspaceSkillRoots } from "../skills/skillTurn.js";
-import type { Skill } from "../skills/skillCatalog.js";
-import { renderSkillContext, SKILL_CONTEXT_ORDER } from "../skills/skillPrompt.js";
+import type { ContextPlugin } from "../prompt/context/contextTypes.js";
+import { SKILL_CONTEXT_ORDER } from "../skills/skillPrompt.js";
 
 /**
  * One AMC session, many prompts (plan P7.1a).
@@ -241,7 +241,8 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     let sessionClosed = false;
     let shutdownPromise: Promise<AgentSessionShutdownResult> | undefined;
     let shutdownPending = false;
-    let activeSkill: Skill | undefined;
+    /** The loaded skill as the plugin `prepareSkillTurn` composed, so `$ARGUMENTS` substitution and its digests reach shared sessions too. */
+    let activeSkill: ContextPlugin | undefined;
     let toolset: ReturnType<typeof agentToolset> | undefined;
     /**
      * How much assistant text the caller has already been told.
@@ -301,7 +302,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       const profile = agentPromptProfile({ workspace, agentId: init.agentId, persona: init.systemPrompt, approvalGated: init.approvalGated === true,
         ...(init.missionContext === true ? { missionContext: true } : {}),
         extraContextPlugins: [{ name: "context:operator-skill", order: SKILL_CONTEXT_ORDER,
-          collect: async () => activeSkill === undefined ? "" : renderSkillContext(activeSkill) }] });
+          collect: async (context) => activeSkill === undefined ? "" : activeSkill.collect(context) }] });
       composing = true;
       composed = composeNativeAgent({
         session,
@@ -346,7 +347,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       // SH-EXT-05: the skill's disallowed-tools narrows this session's registry for the rest of the session.
       const restricted = toolset === undefined ? undefined : applySkillToolRestriction(toolset.registry, prepared, init.agentId);
       if (restricted !== undefined) return restricted;
-      activeSkill = prepared.loaded;
+      activeSkill = prepared.contextPlugins[0];
       return enqueue(prepared.prompt);
     };
 

@@ -2,14 +2,15 @@ import type { Command } from "commander";
 import { NATIVE_BUILTIN_CAPABILITIES, NATIVE_DELEGATION_CAPABILITIES } from "./agent/nativeToolCapabilities.js";
 import {
   commandHookMatches, loadNativeCommandHooks, NATIVE_COMMAND_HOOK_DENY_EVENTS, NATIVE_COMMAND_HOOK_EMITTED, NATIVE_COMMAND_HOOK_EVENTS,
-  NativeCommandHookError, trustNativeCommandHooks, type NativeCommandHookEvent
+  NativeCommandHookError, trustNativeCommandHooks, untrustNativeCommandHooks, type NativeCommandHookEvent
 } from "./extensions/nativeCommandHookConfig.js";
 import { nativeCommandHookInput, runNativeCommandHook } from "./extensions/nativeCommandHooks.js";
 
 /**
- * `amc native-extension hooks inspect | trust | test` (SH-EXT-01). Inspect never runs anything; trust records this
- * machine's acceptance of the file's exact bytes; test runs the matching handlers of a trusted file with a synthetic
- * input and prints what the loop would have done with their answer.
+ * `amc native-extension hooks inspect | trust | untrust | test` (SH-EXT-01). Inspect never runs anything and shows the
+ * parsed handlers, every bound file with its digest and the trust value for an UNTRUSTED file too, so the review
+ * happens before acceptance; trust records this machine's acceptance of exactly that value; untrust retires it; test
+ * runs the matching handlers of a trusted file with a synthetic input and prints what the loop would have done.
  */
 
 const BUILTIN_NAMES = [...NATIVE_BUILTIN_CAPABILITIES, ...NATIVE_DELEGATION_CAPABILITIES].map(capability => capability.name);
@@ -23,7 +24,7 @@ function fail(error: unknown, json: boolean): void {
 
 function inspection(workspace: string) {
   const load = loadNativeCommandHooks(workspace);
-  const handlers = load.status === "trusted" ? load.handlers.map(handler => ({
+  const handlers = load.status === "trusted" || load.status === "untrusted" ? load.handlers.map(handler => ({
     event: handler.event, index: handler.index, matcher: handler.matcher || "*", argv: handler.argv, timeoutMs: handler.timeoutMs,
     acceptTruncatedInput: handler.acceptTruncatedInput, emitted: NATIVE_COMMAND_HOOK_EMITTED.includes(handler.event),
     denyCapable: NATIVE_COMMAND_HOOK_DENY_EVENTS.includes(handler.event),
@@ -44,6 +45,7 @@ export function registerNativeHookCommands(extension: Command): void {
         if (opts.json) { console.log(JSON.stringify(view, null, 2)); return; }
         console.log(`Hooks file: ${view.path}\nStatus: ${view.status}${"sha256" in view && view.sha256 ? `\nsha256: ${view.sha256}` : ""}${"reason" in view ? `\n${view.reason}` : ""}`);
         for (const reference of "references" in view ? view.references : []) console.log(`bound workspace file: ${reference.rel} sha256=${reference.sha256}`);
+        if ("mark" in view) console.log(`trust value (--sha256): ${view.mark}`);
         for (const handler of view.handlers) {
           const warn = handler.denyCapable && handler.matchesBuiltinTools !== null && handler.matchesBuiltinTools.length === 0 ? " (matches no built-in tool; only an MCP tool of that name would be guarded)" : "";
           console.log(`${handler.event} #${handler.index} matcher=${handler.matcher} ${handler.emitted ? "" : "[not emitted by this build] "}timeout=${handler.timeoutMs}ms: ${handler.argv.join(" ")}${warn}`);
@@ -52,14 +54,24 @@ export function registerNativeHookCommands(extension: Command): void {
       } catch (error) { fail(error, opts.json === true); }
     });
   hooks.command("trust")
-    .description("Accept the workspace hooks file's exact bytes on this machine; required again after any change")
-    .requiredOption("--sha256 <digest>", "the file digest printed by hooks inspect, reviewed by you")
+    .description("Accept the workspace hooks file's trust value (its digest bound to every file under .amc/hooks/) on this machine; required again after any change")
+    .requiredOption("--sha256 <value>", "the trust value printed by hooks inspect, after you reviewed the file and its bound files")
     .option("--json", "machine-readable output")
     .action((opts: { sha256: string; json?: boolean }) => {
       try {
         const result = trustNativeCommandHooks(process.cwd(), opts.sha256);
         if (opts.json) console.log(JSON.stringify({ ok: true, ...result }, null, 2));
         else console.log(`Trusted ${result.path} (sha256 ${result.sha256}, ${result.handlers} handlers${result.references.length === 0 ? "" : `, bound to ${result.references.map(reference => reference.rel).join(", ")}`}) on this machine.`);
+      } catch (error) { fail(error, opts.json === true); }
+    });
+  hooks.command("untrust")
+    .description("Retire this machine's acceptance of the workspace hooks file; a present file is untrusted again and a missing one no longer fails closed")
+    .option("--json", "machine-readable output")
+    .action((opts: { json?: boolean }) => {
+      try {
+        const result = untrustNativeCommandHooks(process.cwd());
+        if (opts.json) console.log(JSON.stringify({ ok: true, ...result }, null, 2));
+        else console.log(result.retired ? `Retired this machine's acceptance of ${result.path}.` : `This machine had not accepted ${result.path}; nothing to retire.`);
       } catch (error) { fail(error, opts.json === true); }
     });
   hooks.command("test <event>")

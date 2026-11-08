@@ -81,8 +81,8 @@ export function nativeMcpConfigurationBytes(loaded: LoadedNativeMcpConfiguration
 }
 const CONFIGURATION_BYTES = 256 * 1024;
 
-/** A growing file stays bounded; a FIFO cannot block operator-config admission. */
-function readConfigurationBytes(path: string): Buffer {
+/** A growing file stays bounded; a FIFO cannot block operator-config admission. Exported for the scoped `.sig` read. */
+export function readNativeMcpConfigurationBytes(path: string): Buffer {
   const fd = openSync(path, constants.O_RDONLY | constants.O_NONBLOCK);
   try {
     const stat = fstatSync(fd);
@@ -104,7 +104,7 @@ export function loadNativeMcpConfiguration(path: string, expectedSha256?: string
   const absolute = resolve(path);
   let bytes: Buffer;
   try {
-    bytes = readConfigurationBytes(absolute);
+    bytes = readNativeMcpConfigurationBytes(absolute);
   } catch (error) {
     if (error instanceof NativeMcpConfigError) throw error;
     return refuse("Could not read the explicit MCP config file.");
@@ -223,7 +223,7 @@ export function requireReviewedNativeMcpGrants(loaded: LoadedNativeMcpConfigurat
   if (grants.some(grant => grant.alias !== undefined)) {
     try {
       const bytes = configurationBytes.get(loaded);
-      const signature = readConfigurationBytes(`${loaded.path}.sig`);
+      const signature = readNativeMcpConfigurationBytes(`${loaded.path}.sig`);
       if (!bytes || !verifyAuditorSignatureBytes(workspace, "BUNDLE", bytes, signature).valid) throw new Error("Invalid alias configuration signature");
     } catch { return refuse("MCP aliases require a valid BUNDLE signature over the exact config bytes in <config>.sig; review and sign with the existing AMC signing provider.", "mcp-config-unreviewed"); }
   }

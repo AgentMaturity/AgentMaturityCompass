@@ -35,6 +35,23 @@ describe("config provenance", () => {
     expect(replaced.history["/agents/0/id"]?.map(entry => entry.value)).toEqual(["a", "b"]);
     expect(replaced.provenance["/agents/0/id"]?.layer).toBe("user");
   });
+  it("prints the resolved value for a leaf that fell back to its default after a subtree replacement, and for an untouched default (skeptic)", () => {
+    const root = workspace();
+    writeFileSync(join(root, "amcconfig.yaml"), "agents: [{ id: a, riskTier: high }]\n");
+    const user = join(root, "user.yaml"); writeFileSync(user, "agents: [{ id: b }]\n");
+    const resolved = loadDeclarativeConfig(undefined, root, { userConfig: user });
+    const cli = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
+    const amc = (...args: string[]) => spawnSync(process.execPath, [cli, "config", "provenance", ...args], { cwd: root, encoding: "utf8", env: { ...process.env, AMC_NO_AUTO_REBUILD: "1", NO_COLOR: "1" } });
+    const tier = JSON.parse(amc("/agents/0/riskTier", "--user-config", user, "--json").stdout);
+    expect(tier.winner).toMatchObject({ layer: "default", value: resolved.config.agents[0]!.riskTier });
+    expect(tier.winner.value).not.toBe("high");
+    expect(tier.shadowed).toEqual([expect.objectContaining({ layer: "workspace", value: "high" })]);
+    expect(amc("/agents/0/riskTier", "--user-config", user).stdout).toContain(`/agents/0/riskTier: ${JSON.stringify(resolved.config.agents[0]!.riskTier)} from default`);
+    const version = JSON.parse(amc("/version", "--json").stdout);
+    expect(version.winner).toEqual({ layer: "default", path: null, sha256: null, value: resolved.config.version });
+    expect(amc("/version").stdout).not.toContain("undefined");
+  }, 120_000);
+
   it("amc config provenance shows the winner and the shadowed values through the built CLI", () => {
     const root = workspace();
     writeFileSync(join(root, "amcconfig.yaml"), "agents: [{ id: a }]\nthresholds: { minOverallLevel: 1 }\n");

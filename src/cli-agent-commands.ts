@@ -318,8 +318,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         return;
       }
       const prompt = skillTurn.prompt;
-      // SH-EXT-01 UserPromptSubmit: a trusted hooks.json may stop the turn here, before any session row exists.
-      const promptDenied = await denyPromptByCommandHooks({ workspace: process.cwd(), prompt });
+      // SH-EXT-01 UserPromptSubmit: a trusted hooks.json may stop the turn here, before any session row exists. It sees the line as typed.
+      const promptDenied = await denyPromptByCommandHooks({ workspace: process.cwd(), prompt: rawPrompt, ...(skillTurn.loaded === undefined ? {} : { skill: skillTurn.loaded.name }) });
       if (promptDenied !== undefined) { io.error(chalk.red(`prompt refused by hook: ${promptDenied}`)); io.fail(); return; }
       if (prompt.length === 0 && opts.audioInput === undefined) {
         io.error(chalk.red("a prompt is required: amc agent-loop run \"...\""));

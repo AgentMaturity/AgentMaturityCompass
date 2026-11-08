@@ -3,8 +3,9 @@ import type { Command } from "commander";
 import { prepareFileSignatureWithAuditor } from "../org/orgSigner.js";
 import { NativeMcpConfigError, type NativeMcpConfiguration } from "../setup/nativeMcpConfig.js";
 import { writeFileAtomic } from "../utils/fs.js";
+import { sha256Hex } from "../utils/hash.js";
 import {
-  listScopedMcpConfigs, MCP_SCOPES, McpScopeError, removeScopedMcpConfig, resolveScopedMcpSelection, scopedMcpDirs, writeScopedMcpConfig, type McpScope
+  listScopedMcpConfigs, MCP_SCOPES, McpScopeError, removeScopedMcpConfig, resolveScopedMcpSelection, scopedMcpDirs, scopedMcpId, writeScopedMcpConfig, type McpScope
 } from "./mcpScopes.js";
 
 /**
@@ -57,7 +58,7 @@ export function registerMcpScopeCommands(mcp: Command): void {
         }
         const written = writeScopedMcpConfig(dirsFor(opts), scopeOf(opts.scope), { schemaVersion: 1, server }, opts.force === true);
         const next = [`Review the catalog: amc agent-loop mcp-catalog --mcp-config ${written.path}`, "Add expectedCatalogDigest and grants to the file, and the generated tool names to the signed allowlist.",
-          ...(opts.scope === "project" ? [`Sign it: amc mcp sign ${id} --scope project`] : []), `Mount it: amc agent-loop run --mcp ${id} --tools workspace --approve-tools READ_ONLY ...`];
+          ...(opts.scope === "project" ? [`Sign it: amc mcp sign ${id} --scope project --expect-digest <sha256 from amc mcp list>`] : []), `Mount it: amc agent-loop run --mcp ${id} --tools workspace --approve-tools READ_ONLY ...`];
         if (opts.json) console.log(JSON.stringify({ ok: true, id, scope: opts.scope, ...written, reviewed: false, next }, null, 2));
         else console.log([`Wrote ${written.path} (sha256 ${written.sha256}); not yet reviewed.`, ...next.map(line => `- ${line}`)].join("\n"));
       } catch (error) { fail(error, opts.json === true); }
@@ -105,13 +106,16 @@ export function registerMcpScopeCommands(mcp: Command): void {
       } catch (error) { fail(error, opts.json === true); }
     });
   mcp.command("sign <id>")
-    .description("Sign a project-scope config's exact bytes with the workspace BUNDLE signing policy (writes <file>.sig)")
-    .requiredOption("--scope <scope>", "project (the user scope needs no signature)").option("--json", "machine-readable output")
-    .action(async (id: string, opts: { scope?: string; json?: boolean }) => {
+    .description("Sign a project-scope config's exact bytes with the workspace BUNDLE signing policy (writes <file>.sig); the bytes must have the digest you reviewed")
+    .requiredOption("--scope <scope>", "project (the user scope needs no signature)")
+    .requiredOption("--expect-digest <sha256>", "the file digest shown by amc mcp list, reviewed by you; nothing is signed when the file differs")
+    .option("--json", "machine-readable output")
+    .action(async (id: string, opts: { scope?: string; expectDigest: string; json?: boolean }) => {
       try {
         if (scopeOf(opts.scope) !== "project") throw new McpScopeError("Only the project scope is signed; a user-scope file is admitted as your private file.");
-        const path = `${dirsFor({}).project}/${id}.json`;
+        const path = `${dirsFor({}).project}/${scopedMcpId(id)}.json`; // the id is checked before it becomes a path
         const bytes = readFileSync(path);
+        if (sha256Hex(bytes) !== opts.expectDigest) throw new McpScopeError(`${path} has sha256 ${sha256Hex(bytes)}, not the --expect-digest you reviewed; nothing was signed.`, "mcp-scope-digest-mismatch");
         const prepared = await prepareFileSignatureWithAuditor(process.cwd(), path, bytes, "BUNDLE");
         prepared.assertCurrent();
         writeFileAtomic(`${path}.sig`, prepared.signatureBytes, 0o600);

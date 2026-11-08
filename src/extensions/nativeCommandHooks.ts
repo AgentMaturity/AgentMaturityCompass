@@ -26,6 +26,12 @@ import {
  * `updatedInput`, `additionalContext`, `continue:false` and `systemMessage` are authority AMC does not hand a hook, so
  * on a deny-capable event they deny and on an observe event they are reported. Plain stdout on exit 0 is ignored.
  * Any other exit, a timeout, a spawn failure or a cancellation denies on deny-capable events and is reported otherwise.
+ * Stdout over the 64 KiB capture is a denial too: the collector keeps head and tail, so a JSON deny written past the
+ * cap would otherwise fail to parse and read as an abstention (fail-open on a guard).
+ *
+ * THE BOUND FILES ARE RE-CHECKED BEFORE EVERY SPAWN, not once per decision: handlers run one after another for up to
+ * 60 s each, and an interpreter re-opens its script by path after spawn. ponytail: a concurrent writer can still swap a
+ * script between this check and the interpreter's open; executing the verified bytes from a private copy closes that.
  */
 
 type Decision = { readonly deny: string } | { readonly abstain: true };
@@ -38,6 +44,7 @@ function decisionOf(outcome: ProcessOutcome): Decision {
   if (outcome.terminatedBy === "cancel") return { deny: "hook cancelled" };
   if (outcome.exitCode === 2) return { deny: safeText(outcome.stderr.text.split(/\r?\n/)[0] ?? "") || "hook denied (exit 2)" };
   if (outcome.exitCode !== 0) return { deny: `hook exited ${outcome.exitCode ?? outcome.signal ?? "abnormally"}` };
+  if (outcome.stdout.droppedBytes > 0) return { deny: `hook output exceeded ${NATIVE_COMMAND_HOOK_LIMITS.outputBytes} bytes; its decision could not be read` };
   const text = outcome.stdout.text.trim();
   if (text.length === 0) return { abstain: true };
   let parsed: unknown;
@@ -108,8 +115,9 @@ export class NativeCommandHooks implements NativeHookRuntime {
   private identity(handler?: NativeCommandHookHandler): string {
     return `hooks.json sha256 ${this.sha256 ?? "unreadable"}${handler === undefined ? "" : ` ${handler.event} #${handler.index}`}`;
   }
+  /** `manifestDigest` is null, never a made-up digest, when the file could not be read. */
   private report(kind: NativeExtensionHookEvent["kind"], code: string): NativeExtensionHookFailure {
-    const report = Object.freeze({ extensionId: "hooks.json", manifestDigest: this.sha256 ?? "0".repeat(64), kind, code });
+    const report = Object.freeze({ extensionId: "hooks.json", manifestDigest: this.sha256, kind, code });
     this.failures.push(report);
     if (this.failures.length > 128) this.failures.shift();
     return report;
@@ -141,6 +149,7 @@ export class NativeCommandHooks implements NativeHookRuntime {
       : { turn: event.turn ?? null };
     const reports: NativeExtensionHookFailure[] = [];
     for (const handler of this.handlers(mapped, mapped === "PostToolUse" ? event.toolName ?? "" : undefined)) {
+      if (staleCommandHookReferences(this.context.workspace, this.load) !== undefined) { reports.push(this.report(event.kind, "HOOKS_UNTRUSTED")); break; }
       const run = await runNativeCommandHook(handler, nativeCommandHookInput(mapped, this.base(), detail), this.context.workspace, signal);
       if (run.decision === "deny") reports.push(this.report(event.kind, run.terminatedBy === "timeout" ? "HOOK_TIMEOUT" : run.exitCode === null ? "HOOK_SPAWN_FAILED" : "HOOK_FAILED"));
     }
@@ -153,6 +162,8 @@ export class NativeCommandHooks implements NativeHookRuntime {
     if (refused !== undefined) return refused;
     for (const handler of this.handlers(event, toolName)) {
       if (truncated && !handler.acceptTruncatedInput) return `${this.identity(handler)}: the input exceeds ${NATIVE_COMMAND_HOOK_LIMITS.inputBytes} bytes and the hook did not declare acceptTruncatedInput`;
+      const stale = this.refusal(); // immediately before each spawn, not once per decision
+      if (stale !== undefined) return stale;
       const run = await runNativeCommandHook(handler, nativeCommandHookInput(event, this.base(), detail), this.context.workspace, signal);
       if (run.decision === "deny") return `${this.identity(handler)}: ${run.reason ?? "hook denied"}`;
     }
@@ -175,18 +186,21 @@ export class NativeCommandHooks implements NativeHookRuntime {
     return this.prepared.get(execution);
   };
 
-  /** UserPromptSubmit: a denial stops the turn before composition; the prompt crosses capped at 32 KiB. */
-  async promptSubmit(prompt: string, signal?: AbortSignal): Promise<string | undefined> {
+  /**
+   * UserPromptSubmit: a denial stops the turn before composition. `prompt` is the line as the operator typed it (so a
+   * hook can deny `/deploy` by name), capped at 32 KiB; `skill` is the resolved skill or command name, or null.
+   */
+  async promptSubmit(prompt: string, signal?: AbortSignal, skill?: string): Promise<string | undefined> {
     const bytes = Buffer.byteLength(prompt);
     const truncated = bytes > NATIVE_COMMAND_HOOK_LIMITS.inputBytes;
-    const detail = { prompt: truncated ? null : prompt, prompt_truncated: truncated, prompt_sha256: sha256Hex(prompt), prompt_bytes: bytes };
+    const detail = { prompt: truncated ? null : prompt, prompt_truncated: truncated, prompt_sha256: sha256Hex(prompt), prompt_bytes: bytes, skill: skill ?? null };
     return this.decide("UserPromptSubmit", undefined, detail, truncated, signal);
   }
 }
 
 /** For the run path: the workspace's UserPromptSubmit denial, or undefined when there is no hooks.json or no denial. */
-export async function denyPromptByCommandHooks(init: { readonly workspace: string; readonly prompt: string; readonly signal?: AbortSignal }): Promise<string | undefined> {
+export async function denyPromptByCommandHooks(init: { readonly workspace: string; readonly prompt: string; readonly signal?: AbortSignal; readonly skill?: string }): Promise<string | undefined> {
   const load = loadNativeCommandHooks(init.workspace);
   if (load.status === "absent") return undefined;
-  return new NativeCommandHooks(load, { workspace: init.workspace, sessionId: () => null }).promptSubmit(init.prompt, init.signal);
+  return new NativeCommandHooks(load, { workspace: init.workspace, sessionId: () => null }).promptSubmit(init.prompt, init.signal, init.skill);
 }

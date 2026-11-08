@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Command } from "commander";
@@ -61,6 +61,37 @@ describe("scoped files", () => {
     expect(() => assertPrivateFile(join(dirs.user, "mine.json"))).toThrow(/group- or world-writable/);
     chmodSync(join(dirs.user, "mine.json"), 0o600);
     expect(() => assertPrivateFile(join(dirs.user, "mine.json"))).not.toThrow();
+  });
+  it("refuses a user file whose directory is group-writable, on list, get and --mcp (skeptic: test gap)", () => {
+    const { workspace, dirs } = fixture();
+    writeScopedMcpConfig(dirs, "user", stdio("mine"));
+    expect(listScopedMcpConfigs(workspace, dirs).problems).toEqual([]);
+    chmodSync(dirs.user, 0o770);
+    expect(() => assertPrivateFile(join(dirs.user, "mine.json"))).toThrow(/not a private directory/);
+    expect(listScopedMcpConfigs(workspace, dirs).problems.map(problem => problem.reason)).toEqual([expect.stringContaining("not a private directory")]);
+    expect(() => resolveScopedMcpSelection(workspace, ["mine"], dirs)).toThrow(/not a private directory/);
+    expect(() => mergeScopedMcpSelection({ mcp: ["mine"] }, workspace)).toThrow(/not a private directory/);
+  });
+  it("creates the user-scope directory owner-only under umask 002 (skeptic: Ubuntu and Fedora default)", () => {
+    const { workspace, dirs } = fixture();
+    const previous = process.umask(0o002);
+    try { writeScopedMcpConfig(dirs, "user", stdio("mine")); }
+    finally { process.umask(previous); }
+    expect(statSync(dirs.user).mode & 0o777).toBe(0o700);
+    expect(listScopedMcpConfigs(workspace, dirs).problems).toEqual([]);
+    expect(resolveScopedMcpSelection(workspace, ["mine"], dirs).entries).toHaveLength(1);
+  });
+  it("validates an added file before it lands: a rejected add leaves nothing behind, and --force keeps a valid file and its .sig (skeptic)", () => {
+    const { dirs } = fixture();
+    const broken = { ...stdio("t1"), server: { ...stdio("t1").server, timeoutMs: Number("abc") } } as never;
+    expect(() => writeScopedMcpConfig(dirs, "project", broken)).toThrow(/timeoutMs/);
+    expect(existsSync(join(dirs.project, "t1.json"))).toBe(false);
+    expect(readdirSync(dirs.project)).toEqual([]);
+    const valid = writeScopedMcpConfig(dirs, "project", stdio("t1"));
+    writeFileSync(`${valid.path}.sig`, "sidecar");
+    expect(() => writeScopedMcpConfig(dirs, "project", broken, true)).toThrow(/timeoutMs/);
+    expect(readFileSync(valid.path, "utf8")).toBe(`${JSON.stringify(stdio("t1"), null, 2)}\n`);
+    expect(existsSync(`${valid.path}.sig`)).toBe(true);
   });
 });
 
@@ -128,7 +159,13 @@ describe("real surfaces", () => {
       const unsigned = await run("--mcp", "fixture");
       expect(unsigned.failures).toHaveLength(1); expect(unsigned.errors.join("\n")).toContain("needs a valid BUNDLE signature");
       expect(readFileSync(log, "utf8")).toBe("");
-      const signed = amc("sign", "fixture", "--scope", "project", "--json");
+      // The id is checked before it becomes a path, and only the reviewed bytes are signed.
+      expect(amc("sign", "../../escape", "--scope", "project", "--expect-digest", "0".repeat(64)).status).toBe(1);
+      expect(existsSync(join(workspace, "escape.json.sig"))).toBe(false);
+      expect(amc("sign", "fixture", "--scope", "project", "--expect-digest", "0".repeat(64)).status).toBe(1);
+      expect(existsSync(`${path}.sig`)).toBe(false);
+      const reviewed = JSON.parse(amc("list", "--json").stdout).servers[0].sha256 as string;
+      const signed = amc("sign", "fixture", "--scope", "project", "--expect-digest", reviewed, "--json");
       expect(signed.status, signed.stderr + signed.stdout).toBe(0);
       expect(JSON.parse(signed.stdout)).toMatchObject({ reviewed: true, signaturePath: `${path}.sig` });
       expect(JSON.parse(amc("get", "fixture", "--json").stdout)).toMatchObject({ scope: "project", signatureValid: true, reviewed: true });
@@ -142,6 +179,14 @@ describe("real surfaces", () => {
       const swapped = loadNativeMcpConfiguration(path); // unsigned bytes, pinned
       writeFileSync(path, signedBytes); // the path shows the signed bytes again while `swapped` is what would mount
       expect(scopedProjectSignatureValid(workspace, swapped)).toBe(false);
+      expect(scopedProjectSignatureValid(workspace, loadNativeMcpConfiguration(path))).toBe(true);
+      // A FIFO in place of the .sig cannot hang admission: the bounded non-blocking reader refuses it.
+      const sig = readFileSync(`${path}.sig`); rmSync(`${path}.sig`);
+      if (spawnSync("mkfifo", [`${path}.sig`]).status === 0) {
+        expect(scopedProjectSignatureValid(workspace, loadNativeMcpConfiguration(path))).toBe(false);
+        rmSync(`${path}.sig`);
+      }
+      writeFileSync(`${path}.sig`, sig);
       expect(scopedProjectSignatureValid(workspace, loadNativeMcpConfiguration(path))).toBe(true);
       // A changed file loses its pin and its signature at once.
       writeFileSync(path, readFileSync(path, "utf8").replace("5000", "5001"));

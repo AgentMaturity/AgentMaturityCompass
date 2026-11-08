@@ -74,6 +74,18 @@ describe("DXC-30: shared native sessions resolve operator skills before enqueue"
     expect(payloads(dir, session, "user/message").at(-1)?.bytes.toString()).not.toContain("# Skill: review");
   });
 
+  it("substitutes $ARGUMENTS into the recorded request of a shared session (SH-EXT-05, skeptic: shared sessions)", async () => {
+    const { dir } = workspace(), { session } = sessionAt(dir);
+    mkdirSync(join(dir, ".amc", "commands"), { recursive: true });
+    writeFileSync(join(dir, ".amc", "commands", "deploy.md"), "---\ndescription: deploy\n---\nDeploy to $ARGUMENTS now (first word: $0).\n");
+    expect(await session.prompt("/deploy staging")).toMatchObject({ ok: true });
+    const events = session.readEvents(), header = events.find(event => event.event_type === "request/header")!;
+    const request = deriveRecordedRequest({ workspace: dir, events, headerEventId: header.id }).bytes!.toString("utf8");
+    expect(request).toContain("Deploy to staging now (first word: staging).");
+    expect(request).not.toContain("Deploy to $ARGUMENTS"); // the frame still NAMES the placeholder it substituted
+    expect(request).toContain("Operator-supplied arguments (sha256 " + sha256Hex("staging"));
+  });
+
   it("refuses unknown or malformed skills before any turn or provider request", async () => {
     const { dir, skillDir } = workspace(), { session, requests } = sessionAt(dir);
     expect(await session.prompt("/missing request")).toMatchObject({ ok: false, reason: expect.stringContaining("missing") });

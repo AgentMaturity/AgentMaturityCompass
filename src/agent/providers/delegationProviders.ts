@@ -4,6 +4,7 @@ import { claudeCliForeignRunner } from "./claudeCliProvider.js";
 import type { SubagentRunner } from "../subagentSpawn.js";
 import type { SubagentCapability } from "../delegateTool.js";
 import type { ActionClass } from "../../types.js";
+import { loadNativeCommandHooks } from "../../extensions/nativeCommandHookConfig.js";
 
 /**
  * Which executors a delegation may be handed to, and what each one needs.
@@ -55,6 +56,12 @@ export function resolveForeignRunner(params: {
       ok: false,
       reason: `unknown delegation provider ${JSON.stringify(params.providerId)}; this build has ${delegationProviderIds().join(", ")}`
     };
+  }
+
+  // A foreign child's tool calls never consult the workspace's .amc/hooks.json (they are governed by AMC's provider
+  // control hook), so while a hooks file is present a PreToolUse guard could be routed around through it. Refused.
+  if (loadNativeCommandHooks(params.workspace).status !== "absent") {
+    return { ok: false, reason: `delegating to ${params.providerId} is refused while ${params.workspace}/.amc/hooks.json is present: a foreign child does not run the workspace's command hooks, so a PreToolUse denial could be routed around through it. Remove the hooks file, or delegate in-process.` };
   }
 
   const status = studioStatus(params.workspace);

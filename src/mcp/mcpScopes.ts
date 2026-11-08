@@ -1,8 +1,9 @@
-import { closeSync, constants, existsSync, fstatSync, lstatSync, openSync, readdirSync, readFileSync, unlinkSync } from "node:fs";
+import { chmodSync, closeSync, constants, existsSync, fstatSync, lstatSync, mkdirSync, openSync, readdirSync, renameSync, unlinkSync } from "node:fs";
+import { randomBytes } from "node:crypto";
 import { basename, dirname, join, resolve } from "node:path";
 import { resolveAmcHome } from "../credentials/credentialsPaths.js";
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
-import { loadNativeMcpConfiguration, nativeMcpConfigurationBytes, NativeMcpConfigError, type LoadedNativeMcpConfiguration, type NativeMcpConfiguration } from "../setup/nativeMcpConfig.js";
+import { loadNativeMcpConfiguration, nativeMcpConfigurationBytes, NativeMcpConfigError, readNativeMcpConfigurationBytes, type LoadedNativeMcpConfiguration, type NativeMcpConfiguration } from "../setup/nativeMcpConfig.js";
 import { sha256Hex } from "../utils/hash.js";
 import { writeFileAtomic } from "../utils/fs.js";
 
@@ -24,6 +25,11 @@ import { writeFileAtomic } from "../utils/fs.js";
 export type McpScope = "user" | "project";
 export const MCP_SCOPES: readonly McpScope[] = Object.freeze(["user", "project"]);
 const MCP_SCOPED_ID = /^[a-zA-Z0-9_-]{1,32}$/;
+/** A server id as every scope command must check it BEFORE building a path from it. */
+export function scopedMcpId(id: string): string {
+  if (!MCP_SCOPED_ID.test(id)) throw new McpScopeError("A server id is 1 to 32 letters, digits, _ or -.");
+  return id;
+}
 
 export interface McpScopeDirs { readonly user: string; readonly project: string }
 export function scopedMcpDirs(workspace: string, credentialsHome?: string): McpScopeDirs {
@@ -71,7 +77,8 @@ export function scopedProjectSignatureValid(workspace: string, loaded: LoadedNat
   const sidecar = `${loaded.path}.sig`;
   const bytes = nativeMcpConfigurationBytes(loaded);
   if (bytes === undefined || sha256Hex(bytes) !== loaded.sha256 || !existsSync(sidecar)) return false;
-  try { return verifyAuditorSignatureBytes(workspace, "BUNDLE", bytes, readFileSync(sidecar)).valid; }
+  // The bounded, non-blocking reader: a FIFO or an oversize .sig cannot hang admission on run, chat or ACP.
+  try { return verifyAuditorSignatureBytes(workspace, "BUNDLE", bytes, readNativeMcpConfigurationBytes(sidecar)).valid; }
   catch { return false; }
 }
 
@@ -122,7 +129,7 @@ export function resolveScopedMcpSelection(workspace: string, selection: readonly
     const chosen = scope ?? present[0]!;
     if (!present.includes(chosen)) return refuse(`--mcp ${item}: no ${dirs[chosen]}/${id}.json.`, "mcp-scope-missing");
     const entry = describe(workspace, chosen, join(dirs[chosen], `${id}.json`), uid);
-    if (entry.scope === "project" && entry.signatureValid !== true) return refuse(`${entry.path} needs a valid BUNDLE signature in ${entry.path}.sig; review it, then run amc mcp sign ${id} --scope project.`, "mcp-scope-unsigned");
+    if (entry.scope === "project" && entry.signatureValid !== true) return refuse(`${entry.path} needs a valid BUNDLE signature in ${entry.path}.sig; review it, then run amc mcp sign ${id} --scope project --expect-digest ${entry.sha256}.`, "mcp-scope-unsigned");
     paths.push(entry.path); pins.push(entry.sha256); entries.push(entry);
   }
   return { paths, pins, entries };
@@ -142,23 +149,32 @@ export function mergeScopedMcpSelection<T extends { readonly mcp?: readonly stri
   return { ...options, mcpConfig: [...explicit, ...resolved.paths], mcpConfigSha256: [...explicitPins, ...resolved.pins] };
 }
 
-/** `amc mcp add`: write a new unreviewed file; never overwrite, never shadow the other scope, without `--force`. */
+/**
+ * `amc mcp add`: write a new unreviewed file; never overwrite, never shadow the other scope, without `--force`. The
+ * file is VALIDATED BEFORE IT LANDS: it is written to a temporary name, admitted exactly as an explicit `--mcp-config`
+ * would be, and only then renamed over `<id>.json` (and the stale `.sig` removed), so a rejected add leaves nothing
+ * behind and a `--force` add never replaces a valid file with an invalid one. The user-scope directory is created
+ * owner-only regardless of umask, because `assertPrivateFile` refuses a group-writable parent.
+ */
 export function writeScopedMcpConfig(dirs: McpScopeDirs, scope: McpScope, config: NativeMcpConfiguration, force = false): { readonly path: string; readonly sha256: string } {
-  const id = config.server.id;
-  if (!MCP_SCOPED_ID.test(id)) return refuse("A server id is 1 to 32 letters, digits, _ or -.");
+  const id = scopedMcpId(config.server.id);
   const path = join(dirs[scope], `${id}.json`), other = scope === "project" ? "user" : "project";
   if (!force && existsSync(path)) return refuse(`${path} exists; pass --force to replace it (its signature, if any, no longer applies).`);
   if (!force && existsSync(join(dirs[other], `${id}.json`))) return refuse(`${id} already exists in the ${other} scope (${join(dirs[other], `${id}.json`)}); use another id, or --force to create a collision that --mcp must then qualify.`);
+  mkdirSync(dirs[scope], { recursive: true, mode: 0o700 });
+  if (scope === "user") chmodSync(dirs[scope], 0o700); // mkdir's mode is masked by umask (002 on Ubuntu and Fedora)
   const bytes = `${JSON.stringify(config, null, 2)}\n`;
-  writeFileAtomic(path, bytes, 0o600);
+  const pending = join(dirs[scope], `.${id}.${randomBytes(6).toString("hex")}.pending`);
+  writeFileAtomic(pending, bytes, 0o600);
+  try { loadNativeMcpConfiguration(pending); }
+  catch (error) { try { unlinkSync(pending); } catch { /* already gone */ } throw error; }
+  renameSync(pending, path);
   if (existsSync(`${path}.sig`)) unlinkSync(`${path}.sig`);
-  loadNativeMcpConfiguration(path); // the written file must admit exactly as an explicit --mcp-config would
   return { path, sha256: sha256Hex(Buffer.from(bytes)) };
 }
 
 export function removeScopedMcpConfig(dirs: McpScopeDirs, scope: McpScope, id: string): string {
-  if (!MCP_SCOPED_ID.test(id)) return refuse("A server id is 1 to 32 letters, digits, _ or -.");
-  const path = join(dirs[scope], `${id}.json`);
+  const path = join(dirs[scope], `${scopedMcpId(id)}.json`);
   if (!existsSync(path)) return refuse(`${path} does not exist.`, "mcp-scope-missing");
   unlinkSync(path);
   if (existsSync(`${path}.sig`)) unlinkSync(`${path}.sig`);
