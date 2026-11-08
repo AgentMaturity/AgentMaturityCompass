@@ -37,13 +37,14 @@ describe("password hashing", () => {
     expect(verifyPassword("legacy-password", oldHash("legacy-password"))).toBe(true);
   });
 
-  test("a hash string asking for more than N=2^20 or r=32 is refused quickly instead of allocating", () => {
+  test("a hash string asking for more than 64 MiB, p=4 or a 128-byte key is refused quickly instead of running", () => {
     const salt = randomBytes(16).toString("base64"), derived = randomBytes(64).toString("base64");
-    // Valid scrypt parameters (N < 2^(16r)) that would cost 512 and 256 MiB if accepted, so only the caps refuse them.
-    for (const [n, r] of [[2 ** 21, 2], [2 ** 15, 64]]) {
+    // Valid scrypt parameters (N < 2^(16r)) that would cost 512, 256 and 128 MiB, 16 times a current verify (skeptic SK-11)
+    // or a 16 MiB derivation if accepted, so only the caps refuse them.
+    for (const [n, r, p, keylen] of [[2 ** 21, 2, 1, 64], [2 ** 15, 64, 1, 64], [2 ** 17, 8, 1, 64], [2 ** 15, 8, 16, 64], [2 ** 15, 8, 1, 2 ** 24]]) {
       const started = performance.now();
-      expect(verifyPassword("whatever-password", ["scrypt", n, r, 1, 64, salt, derived].join("$")), `${n}/${r}`).toBe(false);
-      expect(performance.now() - started).toBeLessThan(100);
+      expect(verifyPassword("whatever-password", ["scrypt", n, r, p, keylen, salt, derived].join("$")), `${n}/${r}/${p}/${keylen}`).toBe(false);
+      expect(performance.now() - started, `${n}/${r}/${p}/${keylen}`).toBeLessThan(100);
     }
   });
 

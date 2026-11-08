@@ -20,9 +20,13 @@ const DEFAULT_PARAMS = {
   p: 1,
   keylen: 64
 };
-/** A stored hash asking for more is refused, so a hostile hash string cannot ask scrypt for gigabytes. */
-const MAX_N = 2 ** 20;
-const MAX_R = 32;
+/**
+ * A stored hash asking for more is refused, so a hostile hash string can make scrypt use at most 64 MiB (128·N·r, twice a
+ * current verifier) and eight times a current verifier's work (p at most 4), about half a second.
+ */
+const MAX_MEMORY = 64 * 1024 * 1024;
+const MAX_P = 4;
+const MAX_KEYLEN = 128;
 export const MIN_PASSWORD_LENGTH = 12;
 
 /** A new password the policy refuses; the console account routes answer it with 400. */
@@ -50,7 +54,7 @@ function parsePasswordHash(encoded: string): ParsedPasswordHash {
   const keylen = parts[4]!;
   const saltB64 = parts[5]!;
   const hashB64 = parts[6]!;
-  if (!(Number(n) <= MAX_N) || !(Number(r) <= MAX_R)) {
+  if (!(128 * Number(n) * Number(r) <= MAX_MEMORY) || !(Number(p) <= MAX_P) || !(Number(keylen) <= MAX_KEYLEN)) {
     throw new Error("password hash parameters out of range");
   }
   return {
