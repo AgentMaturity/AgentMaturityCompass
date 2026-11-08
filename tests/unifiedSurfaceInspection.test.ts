@@ -127,19 +127,21 @@ describe("unified run surface inspection", { timeout: 120_000 }, () => {
     expect(vault?.summary).toMatch(/ledger.*verified|verified.*ledger/i);
   });
 
-  test("H3: a running gateway's open session leaves Vault pending over a verified prefix, never failed or verified", async () => {
+  // LIVE-INTEGRITY-02 rewrote r2-c's "Vault pending over a verified prefix" case: a live gateway session verifies and is named.
+  // Ephemeral ports for both listeners: the default proxy port (3211) collides with any concurrent Studio or test.
+  test("a running gateway's open session leaves Vault verified, with the open session named and no issue", async () => {
     const root = workspace();
-    const gateway = await startGateway({ workspace: root, listenPort: 0, logger: { log() {}, error() {} } });
+    const gateway = await startGateway({ workspace: root, listenPort: 0, proxyPort: 0, logger: { log() {}, error() {} } });
     try {
       const vault = (await inspectUnifiedConfiguredSurfaces({ workspace: root, agentId: "default" })).find((module) => module.name === "Vault");
-      expect(vault).toMatchObject({ status: "skipped", score: 55 });
-      expect(vault?.issues).toEqual([expect.stringMatching(/^ledger verified as a prefix only: 1 session is still open, .*\(gateway\)\./)]);
-      expect(vault?.issues.join(" ")).not.toMatch(/missing seal/);
+      expect(vault).toMatchObject({ status: "success", issues: [] });
+      expect(vault?.summary).toContain(`1 session open: ${gateway.gatewaySessionId} (gateway;`);
     } finally {
       await gateway.close();
     }
     const sealed = (await inspectUnifiedConfiguredSurfaces({ workspace: root, agentId: "default" })).find((module) => module.name === "Vault");
     expect(sealed?.status).toBe("success");
+    expect(sealed?.summary).not.toContain("session open");
   });
 
   test("H3: a failed ledger on an initialized vault suggests diagnosing the ledger, never amc vault init", { timeout: 120_000 }, async () => {

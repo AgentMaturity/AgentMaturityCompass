@@ -215,7 +215,7 @@ import { registerMirofishCommands } from "./mirofish/cli.js";
 import { registerCompositionCommands } from "./cli-composition-commands.js";
 import { registerVaultZkCommands } from "./cli-vault-zk-commands.js";
 import { registerKeysCommands, registerVaultHistoryCommands, registerVaultRotationCommand } from "./cli-vault-history-commands.js";
-import { exitIfLedgerPrefix, registerEvidenceStoreCommands, renderLedgerVerdict } from "./cli-evidence-store-commands.js";
+import { registerEvidenceStoreCommands, renderLedgerVerdict } from "./cli-evidence-store-commands.js";
 import { registerLifecycleGovernanceCommands } from "./cli-lifecycle-governance-commands.js";
 import {
   exitIfUntrusted, finishVerify, ledgerExitCode, trustFromFlags, unsignedArtifactReport, verifyAllExit, withTrustFlags, type TrustFlags
@@ -6229,7 +6229,6 @@ withTrustFlags(verifyCmd, { expectMonitor: true, ledgerOnly: true })
       if (code !== 0) process.exit(code);
       return;
     }
-    exitIfLedgerPrefix(process.cwd(), result, opts, trust); // H3: open sessions are the only failure: a verified prefix, exit 1
 
     // Say which of the two failed. "Ledger verification FAILED" over a
     // gateway config signature reads as evidence tampering, which devalues the

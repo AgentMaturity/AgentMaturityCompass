@@ -3,81 +3,76 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { stripVTControlCharacters } from "node:util";
 import { describe, expect, test, vi } from "vitest";
-import { exitIfLedgerPrefix, renderLedgerPrefixVerdict } from "../src/cli-evidence-store-commands.js";
+import { renderLedgerVerdict } from "../src/cli-evidence-store-commands.js";
+import { ledgerExitCode } from "../src/cli-trust-flags.js";
 import { startGateway } from "../src/gateway/server.js";
-import { LEDGER_UNANCHORED_MESSAGE, verifyLedgerIntegrity, type LedgerPrefixVerdict } from "../src/ledger/ledgerVerification.js";
-import type { IssuerAdmission } from "../src/trust/admission.js";
+import { LEDGER_UNANCHORED_MESSAGE, verifyLedgerIntegrity, type VerifyResult } from "../src/ledger/ledgerVerification.js";
 import { lockVault } from "../src/vault/vault.js";
 import { initWorkspace } from "../src/workspace.js";
 import { workspaceKeyTrust } from "./helpers/trustContext.js";
 
-/** H3: what `amc verify` prints when a running Studio's gateway session is the only thing short of a complete verdict. */
+/**
+ * LIVE-INTEGRITY-02: what `amc verify` prints while a running Studio's gateway session is open. The file kept its name
+ * (no tracked-file deletion); r2-c's "verified prefix" verdict it used to cover was removed by LIVE-INTEGRITY-01.
+ */
 const FINGERPRINT = "a".repeat(64);
-const prefix = (trustRoot: Partial<LedgerPrefixVerdict["trustRoot"]> = {}, payloadsNotEvaluated: string[] = []): LedgerPrefixVerdict => ({
-  scope: "verified-prefix",
-  unfinalizedSessions: [{ sessionId: "gw-1", runtime: "gateway" }],
+const verdict = (ok: boolean, trustRoot: Partial<VerifyResult["trustRoot"]> = {}): Pick<VerifyResult, "ok" | "trustRoot" | "sessions"> => ({
+  ok,
   trustRoot: { anchored: false, monitorFingerprint: FINGERPRINT, expectedFingerprint: null, ...trustRoot },
-  payloadsNotEvaluated
+  sessions: { open: [], released: [], interrupted: [], closed: [], liveLegacy: [{ sessionId: "gw-1", runtime: "gateway", lastSignedTs: Date.now() - 120_000 }] }
 });
-const render = (verdict: LedgerPrefixVerdict) => stripVTControlCharacters(renderLedgerPrefixVerdict(verdict));
+const render = (result: Pick<VerifyResult, "ok" | "trustRoot" | "sessions">, allowUnanchored = false) =>
+  stripVTControlCharacters(renderLedgerVerdict(result, allowUnanchored));
 
-describe("renderLedgerPrefixVerdict", () => {
-  test("an anchored prefix names the open session and never says PASSED", () => {
-    const out = render(prefix({ anchored: true, expectedFingerprint: FINGERPRINT }));
-    expect(out.split("\n")[0]).toBe("Ledger verification INCOMPLETE: verified prefix, not a complete-ledger verdict");
-    expect(out).toContain("1 session is still open, with no end or seal recorded: gw-1 (gateway).");
+describe("renderLedgerVerdict with an open session", () => {
+  test("anchored: PASSED, then the open session by id, never INCOMPLETE, missing seal or a bad signature", () => {
+    const out = render(verdict(true, { anchored: true, expectedFingerprint: FINGERPRINT }));
+    expect(out.split("\n")[0]).toBe("Ledger verification PASSED");
     expect(out).toContain(`Anchored to the pinned monitor key ${FINGERPRINT}`);
-    expect(out).not.toMatch(/PASSED|signature does not verify|missing seal/);
+    expect(out).toContain("1 session open: gw-1 (gateway; last signed activity 2 min ago).");
+    expect(out).not.toMatch(/INCOMPLETE|missing seal|signature does not verify/);
   });
 
-  test("an unanchored prefix keeps the word-for-word UNANCHORED message", () => {
-    const out = render(prefix());
-    expect(out.split("\n")[0]).toBe("Ledger verification INCOMPLETE: prefix integrity verified, authorship not (UNANCHORED)");
-    expect(out).toContain(LEDGER_UNANCHORED_MESSAGE);
+  test("unanchored keeps the UNANCHORED message word for word, plus the open-session line", () => {
+    const out = render(verdict(true));
+    expect(out.split("\n")[0]).toBe(LEDGER_UNANCHORED_MESSAGE);
     expect(out).toContain(`Signed by monitor key ${FINGERPRINT}, read from inside the workspace.`);
+    expect(out).toContain("1 session open: gw-1 (gateway;");
   });
 
-  test.each(["distrusted", "revoked"] as const)("a %s monitor key fails whatever the prefix", (status) => {
-    const monitorAdmission: IssuerAdmission = { signature: "ledger monitor key", purpose: "ledger-row", keyId: null, status,
-      source: null, listId: null, timeBasis: null, detail: "listed by the operator" };
-    expect(render(prefix({ monitorAdmission }))).toBe(`Ledger verification FAILED: monitor key ${status}. listed by the operator`);
+  test("a failed verdict prints no open-session line", () => {
+    expect(render(verdict(false, { anchored: true }))).toBe("Ledger verification FAILED");
   });
 
-  test("payloads the verifier could not check are counted, never verified", () => {
-    expect(render(prefix({}, ["Event e1 payload not evaluated: the ledger key is unavailable here"])))
-      .toContain("1 payload(s) not evaluated: the ledger key is unavailable here.");
+  test("no open session, no line", () => {
+    const result = { ...verdict(true, { anchored: true }), sessions: { ...verdict(true).sessions, liveLegacy: [] } };
+    expect(render(result)).not.toContain("session open");
   });
 });
 
-describe("exitIfLedgerPrefix (amc verify)", () => {
-  test("a live gateway session exits 1 over a named, anchored prefix; a sealed ledger falls through", { timeout: 120_000 }, async () => {
-    vi.stubEnv("AMC_VAULT_PASSPHRASE", "synthetic-prefix-cli-vault");
+describe("amc verify against a running gateway", () => {
+  test("exit 0 with the gateway session named while it runs; no open-session line once it stopped", { timeout: 120_000 }, async () => {
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "synthetic-open-session-cli-vault");
     vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", undefined);
-    const root = mkdtempSync(join(tmpdir(), "amc-prefix-cli-"));
-    const out: string[] = [];
-    const log = vi.spyOn(console, "log").mockImplementation((line: unknown) => { out.push(stripVTControlCharacters(String(line))); });
-    const exit = vi.spyOn(process, "exit").mockImplementation(((code?: number) => { throw new Error(`exit ${code}`); }) as never);
+    const root = mkdtempSync(join(tmpdir(), "amc-open-session-cli-"));
     try {
       initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
       const trust = workspaceKeyTrust(root);
-      const gateway = await startGateway({ workspace: root, listenPort: 0, logger: { log() {}, error() {} } });
+      const gateway = await startGateway({ workspace: root, listenPort: 0, proxyPort: 0, logger: { log() {}, error() {} } });
       try {
-        const complete = verifyLedgerIntegrity(root, { trust });
-        expect(complete.ok).toBe(false);
-        expect(() => exitIfLedgerPrefix(root, complete, {}, trust)).toThrow("exit 1");
-        expect(out[0]).toContain("Ledger verification INCOMPLETE: verified prefix, not a complete-ledger verdict");
-        expect(out[0]).toMatch(/1 session is still open, with no end or seal recorded: .+ \(gateway\)\./);
-        expect(out.join("\n")).not.toMatch(/PASSED|missing seal/);
+        const live = verifyLedgerIntegrity(root, { trust });
+        expect(ledgerExitCode(live, trust)).toBe(0);
+        const out = render(live);
+        expect(out.split("\n")[0]).toBe("Ledger verification PASSED");
+        expect(out).toContain(`1 session open: ${gateway.gatewaySessionId} (gateway; last signed activity 0 min ago)`);
       } finally {
         await gateway.close();
       }
-      out.length = 0;
-      exitIfLedgerPrefix(root, verifyLedgerIntegrity(root, { trust }), {}, trust);
-      expect(out).toEqual([]);
-      expect(exit).toHaveBeenCalledTimes(1);
+      const stopped = verifyLedgerIntegrity(root, { trust });
+      expect(ledgerExitCode(stopped, trust)).toBe(0);
+      expect(render(stopped)).not.toContain("session open");
     } finally {
-      log.mockRestore(); exit.mockRestore(); vi.unstubAllEnvs();
-      lockVault(root); rmSync(root, { recursive: true, force: true });
+      vi.unstubAllEnvs(); lockVault(root); rmSync(root, { recursive: true, force: true });
     }
   });
 });
