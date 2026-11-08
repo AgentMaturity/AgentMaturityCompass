@@ -197,7 +197,8 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       }
       console.log(chalk.bold(`\n  Questions (${pack.questions.length}):`));
       for (const q of pack.questions) {
-        console.log(`    ${chalk.cyan(q.id)} [${q.dimension}] ${q.text.slice(0, 100)}${q.text.length > 100 ? "..." : ""}`);
+        // Whole texts (LIVE-UX-14): describe is for reading; the terminal wraps.
+        console.log(`    ${chalk.cyan(q.id)} [${q.dimension}] ${q.text}`);
       }
       console.log("");
     });
@@ -222,18 +223,25 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       // score or level is computed (packSelfAssessment.ts), and the self-assessment reads incomplete.
       const responses: Record<string, number> = {};
 
-      if (!opts.baseline && process.stdin.isTTY) {
-        // Interactive assessment
+      const interactive = !opts.baseline && process.stdin.isTTY;
+      if (interactive) {
+        // Interactive assessment. Under --json, stdout carries only the JSON (LIVE-UX-10): the question lines and the
+        // prompts go to stderr. inquirer takes its output stream from createPromptModule, not from prompt().
         const inq = await import("inquirer");
+        const ask = opts.json ? inq.default.createPromptModule({ output: process.stderr }) : inq.default.prompt;
         for (const q of pack.questions) {
-          const { level } = await inq.default.prompt([{
+          // Full texts: the question prints once above the prompt, so only the levels redraw as the cursor moves.
+          (opts.json ? console.error : console.log)(`\n  ${chalk.cyan(q.id)} [${q.dimension}]: ${q.text}`);
+          const { level } = await ask([{
             type: "select",
             name: "level",
-            message: `${q.id} [${q.dimension}]: ${q.text.slice(0, 120)}`,
+            message: `Level for ${q.id}`,
+            // Inquirer wraps long choices; its default page of 7 rows would cut wrapped level texts off.
+            pageSize: 30,
             choices: [
-              { name: "L1 — " + q.l1.slice(0, 80), value: 1 },
-              { name: "L3 — " + q.l3.slice(0, 80), value: 3 },
-              { name: "L5 — " + q.l5.slice(0, 80), value: 5 },
+              { name: `L1 — ${q.l1}`, short: "L1", value: 1 },
+              { name: `L3 — ${q.l3}`, short: "L3", value: 3 },
+              { name: `L5 — ${q.l5}`, short: "L5", value: 5 },
             ]
           }]);
           responses[q.id] = level;
@@ -270,6 +278,10 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
         for (const gap of result.complianceGaps.slice(0, 5)) {
           console.log(`    • ${gap}`);
         }
+      }
+      if (interactive) {
+        console.log(chalk.gray(`\n  This self-assessment is shown only; it is not stored in the workspace. To keep it: amc domain pack run --pack ${pack.id} `
+          + `--json > ${pack.id}-self-assessment.json (the questions are asked again, on the terminal; the file gets only the result).`));
       }
       console.log("");
     });

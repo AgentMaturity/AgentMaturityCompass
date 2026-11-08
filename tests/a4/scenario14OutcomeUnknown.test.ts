@@ -61,10 +61,17 @@ describe("scenario: outcome_unknown lockout", () => {
 
     // Resolve before approval: refused. The operator who stated it cannot approve it.
     expect((await j.p.post(j.t.alice, `/outcome-unknown/${executionId}/resolve`)).status).toBe(409);
-    const decide = (who: { userId: string }) => a4(j.t.workspace, who, "POST", `${j.p.path}/approvals/${approvalRequestId}/approve`,
-      { reason: "checked the provider", expectedRequestDigestSha256: requestDigestSha256 });
+    const decide = (who: { userId: string }, extra: Record<string, unknown> = {}) => a4(j.t.workspace, who, "POST", `${j.p.path}/approvals/${approvalRequestId}/approve`,
+      { reason: "checked the provider", expectedRequestDigestSha256: requestDigestSha256, ...extra });
     expect(refusal(await decide(j.t.alice))).toEqual([400, "SOD_VIOLATION"]);
-    for (const who of [j.t.bob, j.t.owner]) expect((await decide(who)).status).toBe(201);
+    // fix3 A-12 (coordinator section 9): the decide route takes clientRequestId with the other mutations' idempotency.
+    const first = await decide(j.t.bob, { clientRequestId: "decide-bob-0001" });
+    expect(first.status).toBe(201);
+    const retried = await decide(j.t.bob, { clientRequestId: "decide-bob-0001" });
+    expect(retried.status).toBe(201);
+    expect(retried.body.data).toMatchObject({ approvalRequestId, replay: true });
+    expect(refusal(await decide(j.t.bob, { clientRequestId: "decide-bob-0001", reason: "a different body" }))).toEqual([409, "REQUEST_CONFLICT"]);
+    expect((await decide(j.t.owner)).status).toBe(201);
 
     expect((await j.p.post(j.t.alice, `/outcome-unknown/${executionId}/resolve`)).status).toBe(201);
     expect(await j.item("no_open_outcome_unknown")).toMatchObject({ status: "READY" });

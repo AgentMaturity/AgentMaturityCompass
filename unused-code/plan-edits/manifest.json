@@ -248,6 +248,13 @@
       "sha256": "b7efcef92effb50588606e9a95d1bcc28b2e0de34a1a59b556194cca7fee7e7a"
     },
     {
+      "path": "src/auth/apiKeyCli.ts",
+      "issue": "LIVE-VAULT-07",
+      "baseCommit": "7ca0cf9c5c26d38b742ad1a6733d45d784376f35",
+      "archivePath": "unused-code/plan-edits/LIVE-VAULT-07/src/auth/apiKeyCli.ts.landed",
+      "sha256": "97e20293ac2f4c14135f9419754e29905d76ad663fb9aae82bad4fa19722241f"
+    },
+    {
       "path": "src/auth/authApi.ts",
       "issue": "P1-56",
       "baseCommit": "2a592a00f0e3c6452f19e9a3902b569c111eb4c1",

@@ -148,7 +148,7 @@ code, pre { font-family: var(--mono); }
   transition: color 0.15s; border: none; background: none;
 }
 .sidebar-section h4:hover { color: var(--green); }
-.sidebar-count { font-size: 0.62rem; color: var(--muted); opacity: 0.6; margin-left: auto; }
+.sidebar-count { font-size: 0.62rem; color: var(--amc-dim); margin-left: auto; }
 .sidebar-section .items { display: none; padding-bottom: 6px; }
 .sidebar-section .items.expanded { display: flex; flex-direction: column; }
 .sidebar-section .items a {

@@ -1,0 +1,5 @@
+---
+"agent-maturity-compass": patch
+---
+
+The macOS and Linux installers give non-root users a working path (LIVE-DEPLOY-05, LIVE-DEPLOY-12). When the global npm folder is not writable by the user, the archive's `install.sh` now stops before npm runs, and the hosted installer (`website/install.sh`, `install.sh`) stops before it downloads anything; both print the folder, the rerun command with `AMC_INSTALL_PREFIX="$HOME/.local"`, and `sudo` last, with the warning that it runs the package postinstall and the native build as root. Previously npm failed late with EACCES (exit 243) and no hint. After an install into `AMC_INSTALL_PREFIX`, both print the `export PATH="<prefix>/bin:$PATH"` line before the `Run:` line. On Linux the hosted installer notes which of `python3`, `make` and `g++` are missing, in case npm has to build `better-sqlite3`. It also warns that Node 20 reached end of life on 2026-04-30 and continues. `AMC_INSTALL_PREFIX` is now documented in `docs/INSTALL.md`, `docs/DESKTOP_PACKAGES.md` and the archive README. `install.ps1` prints the same Node 20 warning (untested: no PowerShell run was made).

@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { studioEnvSchema, type StudioEnv } from "./envSchema.js";
 import type { StudioRuntimeConfig } from "./configTypes.js";
+import { canonicalOrigin } from "../studio/nativeAdmission.js";
 
 export function readSecretFromEnvOrFile(env: NodeJS.ProcessEnv, key: string): string | null {
   const fileKey = `${key}_FILE`;
@@ -55,11 +56,13 @@ function validateRuntimeConfig(config: StudioRuntimeConfig, env: NodeJS.ProcessE
     [config.gatewayPort, "AMC_GATEWAY_PORT", 1, 65535],
     [config.proxyPort, "AMC_PROXY_PORT", 1, 65535],
     [config.toolhubPort, "AMC_TOOLHUB_PORT", 1, 65535],
+    [config.dashboardPort, "AMC_DASHBOARD_PORT", 1, 65535],
     [config.metricsPort, "AMC_METRICS_PORT", 1, 65535],
     [config.trustedProxyHops, "AMC_TRUSTED_PROXY_HOPS", 0, 32],
     [config.dataRetentionDays, "AMC_DATA_RETENTION_DAYS", 1, 3650],
     [config.minFreeDiskMb, "AMC_MIN_FREE_DISK_MB", 1, Number.MAX_SAFE_INTEGER],
-    [config.maxRequestBytes, "AMC_MAX_REQUEST_BYTES", 1024, 268_435_456]
+    [config.maxRequestBytes, "AMC_MAX_REQUEST_BYTES", 1024, 268_435_456],
+    [config.gatewayMaxRequestBytes, "AMC_GATEWAY_MAX_REQUEST_BYTES", 1024, 268_435_456]
   ];
 
   for (const [value, label, min, max] of numericChecks) {
@@ -80,7 +83,9 @@ function validateRuntimeConfig(config: StudioRuntimeConfig, env: NodeJS.ProcessE
       [config.gatewayPort, "AMC_GATEWAY_PORT"],
       [config.proxyPort, "AMC_PROXY_PORT"],
       [config.toolhubPort, "AMC_TOOLHUB_PORT"],
-      [config.metricsPort, "AMC_METRICS_PORT"]
+      [config.metricsPort, "AMC_METRICS_PORT"],
+      // The dashboard moves to a free port when its default is taken, so only an explicit choice must not collide.
+      ...(env.AMC_DASHBOARD_PORT ? [[config.dashboardPort, "AMC_DASHBOARD_PORT"] as [number, string]] : [])
     ];
     for (const [port, key] of portRows) {
       const current = runtimePorts.get(port);
@@ -104,6 +109,12 @@ function validateRuntimeConfig(config: StudioRuntimeConfig, env: NodeJS.ProcessE
     } else if (!existsSync(resolve(passphraseFile))) {
       errors.push(`AMC_VAULT_PASSPHRASE_FILE not found: ${resolve(passphraseFile)}`);
     }
+  }
+
+  // A value with a path, query or credentials used to pass here and fail every native request with a 500 (section 9 P2).
+  const badOrigins = config.corsAllowedOrigins.filter((origin) => canonicalOrigin(origin) === null);
+  if (badOrigins.length > 0) {
+    errors.push(`AMC_CORS_ALLOWED_ORIGINS takes origins only (scheme://host[:port], no path, query or credentials): ${badOrigins.join(", ")}`);
   }
 
   if (config.bootstrap && config.enableNotary && !config.notaryAuthSecret) {
@@ -131,6 +142,7 @@ export function loadStudioRuntimeConfig(
     AMC_GATEWAY_PORT: env.AMC_GATEWAY_PORT,
     AMC_PROXY_PORT: env.AMC_PROXY_PORT,
     AMC_TOOLHUB_PORT: env.AMC_TOOLHUB_PORT,
+    AMC_DASHBOARD_PORT: env.AMC_DASHBOARD_PORT,
     AMC_LOG_LEVEL: env.AMC_LOG_LEVEL,
     AMC_LAN_MODE: env.AMC_LAN_MODE,
     AMC_ALLOWED_CIDRS: env.AMC_ALLOWED_CIDRS,
@@ -139,6 +151,7 @@ export function loadStudioRuntimeConfig(
     AMC_DATA_RETENTION_DAYS: env.AMC_DATA_RETENTION_DAYS,
     AMC_MIN_FREE_DISK_MB: env.AMC_MIN_FREE_DISK_MB,
     AMC_MAX_REQUEST_BYTES: env.AMC_MAX_REQUEST_BYTES,
+    AMC_GATEWAY_MAX_REQUEST_BYTES: env.AMC_GATEWAY_MAX_REQUEST_BYTES,
     AMC_CORS_ALLOWED_ORIGINS: env.AMC_CORS_ALLOWED_ORIGINS,
     AMC_ALLOW_PUBLIC_BIND: env.AMC_ALLOW_PUBLIC_BIND,
     AMC_METRICS_BIND: env.AMC_METRICS_BIND,
@@ -177,6 +190,7 @@ export function loadStudioRuntimeConfig(
     gatewayPort: parsed.AMC_GATEWAY_PORT,
     proxyPort: parsed.AMC_PROXY_PORT,
     toolhubPort: parsed.AMC_TOOLHUB_PORT,
+    dashboardPort: parsed.AMC_DASHBOARD_PORT,
     logLevel: parsed.AMC_LOG_LEVEL,
     lanMode: parsed.AMC_LAN_MODE,
     allowedCidrs: parseAllowedCidrs(parsed.AMC_ALLOWED_CIDRS),
@@ -185,6 +199,7 @@ export function loadStudioRuntimeConfig(
     dataRetentionDays: Math.max(1, parsed.AMC_DATA_RETENTION_DAYS),
     minFreeDiskMb: Math.max(1, parsed.AMC_MIN_FREE_DISK_MB),
     maxRequestBytes: Math.max(1_024, parsed.AMC_MAX_REQUEST_BYTES),
+    gatewayMaxRequestBytes: parsed.AMC_GATEWAY_MAX_REQUEST_BYTES,
     corsAllowedOrigins: parseAllowedOrigins(parsed.AMC_CORS_ALLOWED_ORIGINS),
     allowPublicBind: parsed.AMC_ALLOW_PUBLIC_BIND,
     metricsBind: parsed.AMC_METRICS_BIND,

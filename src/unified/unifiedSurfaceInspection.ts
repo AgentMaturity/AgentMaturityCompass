@@ -11,6 +11,7 @@ import {
 } from "../fleet/registry.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
+import { describeOpenSessions } from "../ledger/sessionLiveness.js";
 import { listObservabilityLaneRecords } from "../lifecycle/observabilityLane.js";
 import {
   listPassportExportFiles,
@@ -124,11 +125,14 @@ async function inspectVault(workspace: string): Promise<UnifiedSurfaceModuleResu
   const ledgerExists = pathExists(ledgerPath);
   let ledgerValid = false;
   let ledgerErrors: string[] = [];
+  let openSessions = "";
   if (ledgerExists) {
     try {
       const verified = await verifyLedgerIntegrity(workspace);
       ledgerValid = verified.ok;
       ledgerErrors = verified.errors;
+      // A running Studio's gateway session is open, not broken: named, never an issue (sessionLiveness.ts).
+      if (verified.ok && verified.sessions.liveLegacy.length > 0) openSessions = ` (${describeOpenSessions(verified.sessions.liveLegacy, Date.now())})`;
     } catch (error) {
       ledgerErrors = [String(error)];
     }
@@ -147,10 +151,10 @@ async function inspectVault(workspace: string): Promise<UnifiedSurfaceModuleResu
     status: status.exists && ledgerValid ? "success" : "failed",
     score,
     summary: status.exists && ledgerValid
-      ? `Encrypted vault present; evidence ledger verified${status.unlocked ? " with an active local session" : " while locked"}.`
+      ? `Encrypted vault present; evidence ledger verified${status.unlocked ? " with an active local session" : " while locked"}.${openSessions}`
       : "Vault or ledger proof is incomplete.",
     issues,
-    upgradePath: "Run `amc vault status`, `amc ledger verify`, and repair every integrity error before using proof externally.",
+    upgradePath: "Run `amc vault status` and `amc verify`, and repair every integrity error before using proof externally.",
     evidenceRefs: [status.vaultPath, status.metaPath, ledgerPath],
   });
 }

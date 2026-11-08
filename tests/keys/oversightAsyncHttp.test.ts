@@ -2,7 +2,7 @@ import { createServer, type Server } from "node:http";
 import { existsSync, readFileSync } from "node:fs";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { handleIncidentRoute } from "../../src/api/incidentRouter.js";
-import { initUsersConfig, createSession, verifyTrackedSessionToken, revokeSessionByToken, setUserRoles, activeUserRecord } from "../../src/auth/authApi.js";
+import { addUser, initUsersConfig, createSession, verifyTrackedSessionToken, revokeSessionByToken, setUserRoles, activeUserRecord } from "../../src/auth/authApi.js";
 import { readOversightRecords, oversightRecordPath, verifyOversightChain, workspaceOversightPublicKeys } from "../../src/incidents/oversightRecord.js";
 import { fixture, cleanupFixtures, seedIncident, deferred } from "../helpers/consoleOversightFixture.js";
 const control=vi.hoisted(()=>({afterSign:undefined as (()=>Promise<void>)|undefined,calls:0,bad:false}));
@@ -29,7 +29,7 @@ describe("actual incident router trusted async oversight contract",()=>{
   test.each(["revoke","roles"] as const)("actual tracked %s change during the signature await refuses without record or second response",async change=>{
     const f=await serve(),entered=deferred(),gate=deferred();control.afterSign=async()=>{control.afterSign=undefined;entered.resolve();await gate.promise;};const pending=f.post();
     try{expect(await Promise.race([entered.promise.then(()=>"signed"),pending.then(()=>"returned",()=>"failed")])).toBe("signed");
-      if(change==="revoke")revokeSessionByToken({workspace:f.workspace,token:f.session.token});else{setUserRoles({workspace:f.workspace,username:f.owner.username,roles:["VIEWER"]});expect(activeUserRecord(f.workspace,f.owner.userId)?.roles).toEqual(["VIEWER"]);}
+      if(change==="revoke")revokeSessionByToken({workspace:f.workspace,token:f.session.token});else{addUser({workspace:f.workspace,username:"backup-owner",password:"backup-owner-pass-123",roles:["OWNER"]});setUserRoles({workspace:f.workspace,username:f.owner.username,roles:["VIEWER"]});expect(activeUserRecord(f.workspace,f.owner.userId)?.roles).toEqual(["VIEWER"]);}
       expect(verifyTrackedSessionToken({workspace:f.workspace,token:f.session.token}).ok).toBe(false);gate.resolve();const res=await pending,text=await res.text();expect(res.status).toBe(401);expect(text).toBe(JSON.stringify({error:"current session refused"}));expect(existsSync(f.path)).toBe(false);
     }finally{gate.resolve();await Promise.allSettled([pending]);}
   });

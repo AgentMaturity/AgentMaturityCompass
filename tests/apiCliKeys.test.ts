@@ -39,6 +39,7 @@ describe("api key CLI helpers", () => {
     });
 
     expect(created.apiKey).toMatch(/^amc_key_/);
+    expect(created.note).toBe("Note: Studio HTTP routes do not accept API keys yet (docs/API_SURFACES.md).");
     expect(created.record).toMatchObject({
       keyId: created.keyId,
       label: "mobile bridge",

@@ -8,6 +8,7 @@ import { loadAssuranceFindings, loadAssuranceRun, assuranceRunJsonPath } from ".
 import { getAssurancePack } from "../src/assurance/packs/index.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
 import { openLedger, verifyLedgerIntegrity } from "../src/ledger/ledger.js";
+import { GATEWAY_SESSION_STALE_AFTER_MS } from "../src/ledger/sessionLiveness.js";
 import { orgSignatureSchema } from "../src/org/orgSchema.js";
 import { runRedTeam, type RedTeamReport } from "../src/redteam/runner.js";
 import { loadBlobPlaintext } from "../src/storage/blobs/blobStore.js";
@@ -135,15 +136,19 @@ async function completionFault(kind: "seal" | "markdown") {
     const jsonReports = reportFiles.filter(file => file.endsWith(".json")).map(file => ({ file,
       bytesSha256: sha256Hex(readFileSync(join(reportsDir, file))), report: JSON.parse(readFileSync(join(reportsDir, file), "utf8")) as AssuranceReport }));
     const sealUpdates = kind === "markdown" ? ledger.db.prepare("SELECT * FROM p019_seal_updates").all() : [];
-    const integrity = verifyLedgerIntegrity(workspace, { expectedMonitorFingerprint: monitorId,
+    // LIVE-INTEGRITY-01: an unended, unsealed session whose last signed row is fresh is open for the liveness window
+    // (sessionLiveness.ts). Verify past the window, as sessionVerifierNegative does, so a seal the fault kept from being
+    // written is a missing seal; liveIntegrity is the verdict at the real time.
+    const verifyAt = (now?: number) => verifyLedgerIntegrity(workspace, { expectedMonitorFingerprint: monitorId, ...(now === undefined ? {} : { now }),
       trust: loadTrustContext({ amcHome: home, expectMonitor: monitorId, env: {} }) });
+    const integrity = verifyAt(Date.now() + GATEWAY_SESSION_STALE_AFTER_MS + 1), liveIntegrity = verifyAt();
     const errorValue = (error: unknown) => error instanceof Error ? { name: error.name, message: error.message,
       code: (error as NodeJS.ErrnoException).code, path: (error as NodeJS.ErrnoException).path, syscall: (error as NodeJS.ErrnoException).syscall } : error;
     records.push({ name, phase: "actual-faulted-producer-result", returned: returned ?? null, error: errorValue(caught),
       cause: errorValue(caught instanceof Error ? caught.cause : undefined), calls: agent.prompts.length,
       sessions, events, runs, reportFiles, jsonReports, sealUpdates, integrity, after: snapshot(root),
       scope: "Actual serial SQL/FS faults. A late report-write error may leave an already-written JSON artifact; report persistence is not transactional." });
-    return { returned, caught, sessions, events, runs, reportFiles, jsonReports, sealUpdates, integrity, monitorPem, auditorPem,
+    return { returned, caught, sessions, events, runs, reportFiles, jsonReports, sealUpdates, integrity, liveIntegrity, monitorPem, auditorPem,
       blocker, calls: agent.prompts.length };
   } finally {
     try {
@@ -347,7 +352,10 @@ describe("P0-19 actual local runner inconclusive contracts", () => {
     expect(result.sessions[0]).toMatchObject({ ended_ts: null, session_final_event_hash: null, session_seal_sig: null });
     expect(result.events.filter(row => JSON.parse(row.meta_json).auditType === "ASSURANCE_RUN_ABORTED")).toHaveLength(1);
     for (const row of result.events) expect(verify(null, Buffer.from(row.event_hash, "hex"), result.monitorPem, Buffer.from(row.writer_sig, "base64"))).toBe(true);
-    expect(result.integrity.chain.ok).toBe(false); expect(result.integrity.chain.errors.join("\n")).toContain("missing seal");
+    // Within the window the unsealed session is named open, never counted as sealed; past it, the missing seal is reported.
+    expect(result.liveIntegrity.sessions.liveLegacy.map(row => row.sessionId)).toEqual([result.sessions[0]!.session_id]);
+    expect(result.integrity.chain.ok).toBe(false); expect(result.integrity.chain.errors.join("\n")).toContain(`Session ${result.sessions[0]!.session_id} missing seal`);
+    expect(result.integrity.sessions.liveLegacy).toEqual([]);
     expect(result.reportFiles).toEqual([]); expect(result.runs).toEqual([]);
   });
 

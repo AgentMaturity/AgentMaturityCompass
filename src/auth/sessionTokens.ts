@@ -15,7 +15,9 @@ const sessionPayloadSchema = z.object({
   expiresTs: z.number().int(),
   nonce: z.string().min(8),
   /** A narrowed credential (P1-64 follow-up): verifyTrackedSessionToken refuses it except where a caller accepts this scope. */
-  scope: z.literal("a4_comment").optional()
+  scope: z.literal("a4_comment").optional(),
+  /** The user's passwordChangedTs when the password that minted it was checked; verifyTrackedSessionToken compares it. */
+  passwordChangedTs: z.number().int().optional()
 });
 
 export type SessionPayload = z.infer<typeof sessionPayloadSchema>;
@@ -36,6 +38,7 @@ type IssueSessionTokenInput = {
   roles: SessionPayload["roles"];
   ttlMs?: number;
   scope?: SessionPayload["scope"];
+  passwordChangedTs?: number;
 };
 
 function prepareSessionToken(params: IssueSessionTokenInput): { payload: SessionPayload; payloadBytes: Buffer } {
@@ -48,7 +51,8 @@ function prepareSessionToken(params: IssueSessionTokenInput): { payload: Session
     issuedTs: now,
     expiresTs: now + Math.max(5 * 60_000, params.ttlMs ?? 8 * 60 * 60_000),
     nonce: randomUUID().replace(/-/g, ""),
-    ...(params.scope === undefined ? {} : { scope: params.scope })
+    ...(params.scope === undefined ? {} : { scope: params.scope }),
+    ...(params.passwordChangedTs === undefined ? {} : { passwordChangedTs: params.passwordChangedTs })
   });
   return { payload, payloadBytes: Buffer.from(canonicalize(payload), "utf8") };
 }

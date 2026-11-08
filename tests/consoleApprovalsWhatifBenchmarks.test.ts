@@ -508,7 +508,7 @@ describe("console + approvals + what-if + benchmarks", () => {
     initUsersConfig({
       workspace,
       username: "owner",
-      password: "owner-pass"
+      password: "owner-pass-1234"
     });
     const port = await pickFreePort();
     const token = "admin-token";
@@ -522,7 +522,7 @@ describe("console + approvals + what-if + benchmarks", () => {
       const login = await httpRequestRaw({
         url: `http://127.0.0.1:${port}/auth/login`,
         method: "POST",
-        body: { username: "owner", password: "owner-pass" }
+        body: { username: "owner", password: "owner-pass-1234" }
       });
       expect(login.status).toBe(200);
       const setCookie = login.headers["set-cookie"];
@@ -543,7 +543,7 @@ describe("console + approvals + what-if + benchmarks", () => {
       const blockedLogin = await httpRequestJson({
         url: `http://127.0.0.1:${port}/auth/login`,
         method: "POST",
-        body: { username: "owner", password: "owner-pass" }
+        body: { username: "owner", password: "owner-pass-1234" }
       });
       expect(blockedLogin.status).toBe(403);
 
@@ -551,7 +551,7 @@ describe("console + approvals + what-if + benchmarks", () => {
         url: `http://127.0.0.1:${port}/users/add`,
         method: "POST",
         adminToken: token,
-        body: { username: "viewer", password: "viewer-pass", roles: ["VIEWER"] }
+        body: { username: "viewer", password: "viewer-pass-1234", roles: ["VIEWER"] }
       });
       expect(blockedWrite.status).toBe(403);
     } finally {
@@ -564,7 +564,7 @@ describe("console + approvals + what-if + benchmarks", () => {
     initUsersConfig({
       workspace,
       username: "owner",
-      password: "owner-pass"
+      password: "owner-pass-1234"
     });
     enableLanMode({
       workspace,
@@ -586,7 +586,7 @@ describe("console + approvals + what-if + benchmarks", () => {
       const blocked = await httpRequestJson({
         url: `http://127.0.0.1:${port}/auth/login`,
         method: "POST",
-        body: { username: "owner", password: "owner-pass" }
+        body: { username: "owner", password: "owner-pass-1234" }
       });
       expect(blocked.status).toBe(403);
 
@@ -609,7 +609,7 @@ describe("console + approvals + what-if + benchmarks", () => {
         url: `http://127.0.0.1:${port}/auth/login`,
         method: "POST",
         cookie: pairCookie,
-        body: { username: "owner", password: "owner-pass" }
+        body: { username: "owner", password: "owner-pass-1234" }
       });
       expect(login.status).toBe(200);
 

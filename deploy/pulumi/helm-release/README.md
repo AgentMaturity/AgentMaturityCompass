@@ -58,7 +58,7 @@ Common stack config keys:
 | `imageTag` | `latest` | AMC image tag |
 | `imageDigest` | empty | `sha256:<64 hex>`; when set the chart deploys `repository@digest` and ignores `imageTag` |
 | `bootstrapSecretName` | `amc-bootstrap` | Existing Kubernetes Secret with bootstrap keys |
-| `ingressEnabled` | `false` | Enable chart ingress |
+| `ingressEnabled` | `false` | Enable chart ingress. A values file must then set `env.AMC_TRUSTED_PROXY_HOPS` and `env.AMC_TRUSTED_PROXY_CIDRS` (the ingress controller pods' addresses), or the chart refuses to render |
 | `ingressHost` | `amc.example.com` | Hostname for ingress |
 | `ingressTlsSecretName` | empty | Existing TLS secret name |
 | `storageClassName` | empty | Workspace PVC storage class |

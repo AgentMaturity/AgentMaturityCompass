@@ -364,8 +364,9 @@ amc transparency merkle verify-proof &lt;file&gt; --pubkey &lt;recorded-auditor.
 
       <!-- Verification -->
       <h2 id="verification">End-to-End Verification</h2>
-      <pre><code><span class="comment"># Verify all AMC artifacts in one pass</span>
-amc verify all --json
+      <pre><code><span class="comment"># Verify all AMC artifacts in one pass, against the monitor key fingerprint recorded outside the workspace</span>
+<span class="comment"># (without the pin the ledger check reports UNANCHORED and the command exits 1)</span>
+amc verify all --json --expect-monitor &lt;monitor sha256&gt;
 
 <span class="comment"># Verify specific components</span>
 amc diagnostic bank verify     <span class="comment"># Question bank integrity</span>
