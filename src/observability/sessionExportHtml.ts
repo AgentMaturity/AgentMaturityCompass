@@ -7,7 +7,7 @@
 import { createHash } from "node:crypto";
 import type { SessionExportDocument } from "./sessionExport.js";
 
-export const SESSION_EXPORT_JSON_ID = "amc-session-export";
+const SESSION_EXPORT_JSON_ID = "amc-session-export";
 
 /** JSON that is safe inside a <script> element and immune to U+2028/2029 line terminators. */
 export function embedJson(value: unknown): string {
@@ -83,9 +83,24 @@ export function renderSessionExportHtml(doc: SessionExportDocument): string {
 `;
 }
 
-/** The embedded document of an export file, or null when the file carries none. Parsing only: nothing in the file runs. */
-export function extractSessionExportJson(html: string): unknown | null {
-  const match = new RegExp(`<script type="application/json" id="${SESSION_EXPORT_JSON_ID}">([\\s\\S]*?)</script>`).exec(html);
-  if (!match) return null;
-  try { return JSON.parse(match[1]!); } catch { return null; }
+export type ExtractedSessionExport = { readonly doc: unknown; readonly error: null } | { readonly doc: null; readonly error: string };
+
+/**
+ * The embedded document of an export file. The file must be, byte for byte, the canonical rendering of that document
+ * (S14): a decoy block ahead of the real one, an edited page around a valid document, a comment or trailing bytes are
+ * all refused, so what the verifier checks is exactly what the page shows. Parsing only: nothing in the file runs.
+ */
+export function extractSessionExportJson(html: string): ExtractedSessionExport {
+  const open = `<script type="application/json" id="${SESSION_EXPORT_JSON_ID}">`;
+  const start = html.indexOf(open);
+  if (start < 0) return { doc: null, error: "the file carries no embedded session export" };
+  const end = html.indexOf("</script>", start + open.length);
+  if (end < 0) return { doc: null, error: "the embedded session export is not terminated" };
+  let doc: unknown;
+  try { doc = JSON.parse(html.slice(start + open.length, end)); } catch { return { doc: null, error: "the embedded session export is not valid JSON" }; }
+  if (!doc || typeof doc !== "object" || typeof (doc as { sessionId?: unknown }).sessionId !== "string") return { doc: null, error: "the embedded JSON is not a session export document" };
+  if (renderSessionExportHtml(doc as SessionExportDocument) !== html) {
+    return { doc: null, error: "the file is not the canonical rendering of its embedded document: it was edited or carries extra content" };
+  }
+  return { doc, error: null };
 }

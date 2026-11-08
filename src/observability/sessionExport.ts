@@ -12,6 +12,7 @@ import { projectNativeRunUsage, type NativeRunUsage } from "../agent/nativeRunUs
 import { getPublicKeyPem, verifyHexDigest } from "../crypto/keys.js";
 import { boundProviderKey } from "../keys/keyset.js";
 import { isEncryptedField } from "../ledger/encryption/ledgerCipher.js";
+import { loadOpsPolicy } from "../ops/policy.js";
 import { readEventPayload } from "../session/eventPayload.js";
 import { loadSessionEventHistory } from "../session/sessionEventHistory.js";
 import { extractEnvelope } from "../session/sessionTypes.js";
@@ -22,12 +23,12 @@ import { verifySeal, verifySessionRows } from "../transparency/sessionRootDescri
 import type { EvidenceEvent, SessionRecord } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 
-export const SESSION_EXPORT_SCHEMA = "amc.session-export/v1";
+const SESSION_EXPORT_SCHEMA = "amc.session-export/v1";
 const CONTENT_EVENT_TYPES = new Set(["system/prompt", "user/message", "assistant/block", "tool/call", "tool/result"]);
 const MAX_CONTENT_BYTES = 256 * 1024;
 const MAX_TOTAL_CONTENT_BYTES = 16 * 1024 * 1024;
 
-export interface ExportedContent {
+interface ExportedContent {
   readonly text: string;
   /** Digest of the full committed bytes (the row's payload_sha256, or the spill commitment). */
   readonly sha256: string;
@@ -50,13 +51,21 @@ export interface SessionExportDocument {
   readonly usage: NativeRunUsage;
 }
 
-export interface SessionExportVerdict {
+interface SessionExportVerdict {
   readonly ok: boolean;
   readonly fingerprint: string;
   readonly rowsChecked: number;
   readonly tail: "sealed" | "unproven";
   readonly content: { readonly verified: number; readonly unverifiable: number; readonly unavailable: number };
+  /** The usage summary recomputed from the document's rows (the embedded copy is checked against it, cost estimate aside). */
+  readonly usage: NativeRunUsage | null;
   readonly errors: readonly string[];
+}
+
+export interface SessionExportVerifyOptions {
+  readonly expectedFingerprint: string;
+  /** Redacted, truncated or spilled content cannot be checked against its digest; without this it fails the verdict (S15). */
+  readonly acceptUnverifiableContent?: boolean;
 }
 
 function ledgerRowKeyPem(workspace: string): string {
@@ -68,6 +77,19 @@ function spillLocator(event: EvidenceEvent): string | null {
     const ref = (JSON.parse(event.meta_json) as Record<string, unknown>)[SPILL_META_KEY];
     return ref && typeof ref === "object" && typeof (ref as { locator?: unknown }).locator === "string" ? (ref as { locator: string }).locator : null;
   } catch { return null; }
+}
+
+/**
+ * S16: the first reason this session falls under the ledger payload encryption regime (P2-09), or null. The regime is
+ * the operator's opt-in: the policy flag covers every row of the session, blobs included (before, only a row whose
+ * inline field was encrypted refused, so a regime-on session stored as blobs left in plaintext). Blob and spill payloads
+ * under the workspace's default blob encryption are not that regime: every reader decrypts them, and the export carries
+ * them redacted and bounded like `amc session show` does.
+ */
+function underLedgerEncryption(workspace: string, rows: readonly EvidenceEvent[]): string | null {
+  if (loadOpsPolicy(workspace).opsPolicy.encryption.ledgerEncryptionEnabled === true) return "the workspace operations policy enables ledger payload encryption";
+  const row = rows.find((candidate) => isEncryptedField(candidate.payload_inline));
+  return row === undefined ? null : `the inline payload of event ${row.id} is encrypted`;
 }
 
 function redacted(text: string): { text: string; redactions: number } {
@@ -115,8 +137,9 @@ export function buildSessionExport(options: { workspace: string; sessionId: stri
   verifySessionRows([pem], rows, errors);
   if (record?.ended_ts !== null && record?.ended_ts !== undefined) verifySeal([pem], record, rows, options.sessionId, errors);
   if (errors.length > 0) throw new Error(`session ${options.sessionId} cannot be exported under the current ledger-row key: ${errors.slice(0, 3).join("; ")}`);
-  if (options.includeContent && rows.some((row) => isEncryptedField(row.payload_inline))) {
-    throw new Error("this workspace encrypts ledger payloads; an export with content would carry decrypted payloads. Export digests only (omit --include-content).");
+  const encrypted = options.includeContent ? underLedgerEncryption(options.workspace, rows) : null;
+  if (encrypted !== null) {
+    throw new Error(`${encrypted}; an export with content would carry decrypted payloads. Export digests only (omit --include-content).`);
   }
   return { schema: SESSION_EXPORT_SCHEMA, exportedAt: options.now ?? Date.now(), sessionId: options.sessionId, monitorPublicKeyPem: pem,
     monitorKeyFingerprint: sha256Hex(pem), record, rows, content: options.includeContent ? exportContent(options.workspace, rows) : null,
@@ -126,17 +149,28 @@ export function buildSessionExport(options: { workspace: string; sessionId: stri
 function isDocument(value: unknown): value is SessionExportDocument {
   const doc = value as Partial<SessionExportDocument> | null;
   return !!doc && typeof doc === "object" && doc.schema === SESSION_EXPORT_SCHEMA && typeof doc.sessionId === "string"
-    && typeof doc.monitorPublicKeyPem === "string" && Array.isArray(doc.rows) && (doc.content === null || (typeof doc.content === "object" && doc.content !== null));
+    && typeof doc.monitorPublicKeyPem === "string" && Array.isArray(doc.rows) && (doc.content === null || (typeof doc.content === "object" && doc.content !== null))
+    && typeof doc.usage === "object" && doc.usage !== null;
 }
+
+/** The usage summary without its catalog cost estimate, whose freshness labels depend on the clock. */
+function usageWithoutCost(usage: NativeRunUsage): Omit<NativeRunUsage, "cost"> {
+  const { cost: _cost, ...rest } = usage;
+  return rest;
+}
+
+const EMPTY_VERDICT = { fingerprint: "", rowsChecked: 0, tail: "unproven" as const, content: { verified: 0, unverifiable: 0, unavailable: 0 }, usage: null };
 
 /**
  * Offline verification of a document: the embedded key must match the operator's pin, every row must hash and verify
  * under that key with a contiguous per-session chain, a closed session's seal must name the last row, and embedded
- * content must hash to its row's digest where it was neither redacted nor truncated. Nothing in the document runs.
+ * content must hash to its row's digest where it was neither redacted nor truncated; content that cannot be checked
+ * fails the verdict unless explicitly accepted, and the embedded usage summary must equal the one recomputed from the
+ * rows (S15). Nothing in the document runs.
  */
-export function verifySessionExport(value: unknown, options: { expectedFingerprint: string }): SessionExportVerdict {
+export function verifySessionExport(value: unknown, options: SessionExportVerifyOptions): SessionExportVerdict {
   const errors: string[] = [];
-  if (!isDocument(value)) return { ok: false, fingerprint: "", rowsChecked: 0, tail: "unproven", content: { verified: 0, unverifiable: 0, unavailable: 0 }, errors: ["not an amc.session-export/v1 document"] };
+  if (!isDocument(value)) return { ok: false, ...EMPTY_VERDICT, errors: ["not an amc.session-export/v1 document"] };
   const fingerprint = sha256Hex(value.monitorPublicKeyPem);
   const expected = options.expectedFingerprint.trim().toLowerCase();
   if (!/^[0-9a-f]{64}$/.test(expected)) errors.push("expected monitor fingerprint must be a 64-hex sha256 obtained out of band");
@@ -155,13 +189,19 @@ export function verifySessionExport(value: unknown, options: { expectedFingerpri
       if ("unavailable" in entry) { content.unavailable += 1; continue; }
       const row = byId.get(id);
       if (!row) { errors.push(`content for unknown event ${id}`); continue; }
+      if (!CONTENT_EVENT_TYPES.has(row.event_type)) { errors.push(`content attached to ${row.event_type} event ${id}, which carries no exportable content`); continue; }
       if (entry.source === "spill" || entry.truncated || entry.redactions > 0) { content.unverifiable += 1; continue; }
       if (sha256Hex(Buffer.from(entry.text, "utf8")) !== row.payload_sha256) errors.push(`content of event ${id} does not hash to its committed payload digest`);
       else content.verified += 1;
     }
+    if (content.unverifiable > 0 && options.acceptUnverifiableContent !== true) {
+      errors.push(`${content.unverifiable} content entr${content.unverifiable === 1 ? "y is" : "ies are"} redacted, truncated or spilled and cannot be checked against the committed digests; pass --accept-unverifiable-content to accept them as display-only`);
+    }
   }
+  const usage = projectNativeRunUsage(rows, value.sessionId);
+  if (JSON.stringify(usageWithoutCost(usage)) !== JSON.stringify(usageWithoutCost(value.usage))) errors.push("the embedded usage summary does not match the usage recomputed from the rows");
   // Belt and braces: the seal signature over the final hash is also checked with the single-key verifier.
   if (sealed && value.record?.session_seal_sig && value.record.session_final_event_hash
       && !verifyHexDigest(value.record.session_final_event_hash, value.record.session_seal_sig, value.monitorPublicKeyPem)) errors.push("seal signature does not verify under the embedded key");
-  return { ok: errors.length === 0, fingerprint, rowsChecked: rows.length, tail: sealed ? "sealed" : "unproven", content, errors };
+  return { ok: errors.length === 0, fingerprint, rowsChecked: rows.length, tail: sealed ? "sealed" : "unproven", content, usage, errors };
 }

@@ -8,6 +8,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import chalk from "chalk";
 import { finishVerify, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
+import type { ExtractedSessionExport } from "./observability/sessionExportHtml.js";
 import { admitKey, buildVerifierReport, withPins } from "./trust/index.js";
 import { fileSha256 } from "./trust/signatureCheck.js";
 
@@ -40,8 +41,9 @@ export function registerSessionExportCommands(session: Command): void {
     .command("verify-export")
     .description("Verify an exported session file offline against a pinned monitor key fingerprint")
     .argument("<file>", "HTML or JSON export")
+    .option("--accept-unverifiable-content", "Accept redacted, truncated or spilled content entries as display-only (they cannot be checked against their digests)")
     .option("--json", "Output as JSON"), { expectMonitor: true, ledgerOnly: true })
-    .action(async (file: string, opts: TrustFlags) => {
+    .action(async (file: string, opts: TrustFlags & { acceptUnverifiableContent?: boolean }) => {
       const { verifySessionExport } = await import("./observability/sessionExport.js");
       const { extractSessionExportJson } = await import("./observability/sessionExportHtml.js");
       if (opts.expectMonitor === undefined) {
@@ -51,8 +53,11 @@ export function registerSessionExportCommands(session: Command): void {
       }
       const path = resolve(file);
       const text = readFileSync(path, "utf8");
-      const doc: unknown = text.trimStart().startsWith("{") ? JSON.parse(text) : extractSessionExportJson(text);
-      const verdict = verifySessionExport(doc, { expectedFingerprint: opts.expectMonitor });
+      const parseJson = (): ExtractedSessionExport => { try { return { doc: JSON.parse(text) as unknown, error: null }; } catch { return { doc: null, error: "the file is not valid JSON" }; } };
+      const extracted = text.trimStart().startsWith("{") ? parseJson() : extractSessionExportJson(text);
+      const doc = extracted.doc;
+      const checked = verifySessionExport(doc, { expectedFingerprint: opts.expectMonitor, acceptUnverifiableContent: opts.acceptUnverifiableContent === true });
+      const verdict = extracted.error === null ? checked : { ...checked, ok: false, errors: [extracted.error, ...checked.errors] };
       const trust = trustFromFlags(opts, ["ledger-row"]);
       const pinned = /^[0-9a-f]{64}$/i.test(opts.expectMonitor) ? opts.expectMonitor.toLowerCase() : null;
       const context = pinned === null ? trust : withPins(trust, [{ keyId: pinned, purposes: ["ledger-row"], origin: "--expect-monitor" }]);
@@ -62,6 +67,6 @@ export function registerSessionExportCommands(session: Command): void {
         signatures: [admitKey({ publicKeyPem: pem, purpose: "ledger-row", signature: "session rows and seal", context })],
         warnings: verdict.tail === "unproven" ? ["session is open or released: the tail is not sealed, so a truncated row list cannot be detected"] : [] });
       finishVerify("Session export", report, { json: opts.json, result: { ...verdict, ok: report.trusted, report },
-        details: [`rows checked: ${verdict.rowsChecked}; tail ${verdict.tail}; content verified ${verdict.content.verified}, unverifiable (redacted, truncated or spilled) ${verdict.content.unverifiable}, unavailable ${verdict.content.unavailable}`] });
+        details: [`rows checked: ${verdict.rowsChecked}; tail ${verdict.tail}; content verified ${verdict.content.verified}, unverifiable (redacted, truncated or spilled) ${verdict.content.unverifiable}${verdict.content.unverifiable > 0 && opts.acceptUnverifiableContent === true ? " (accepted as display-only)" : ""}, unavailable ${verdict.content.unavailable}`] });
     });
 }

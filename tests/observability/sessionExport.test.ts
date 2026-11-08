@@ -1,5 +1,5 @@
 /** SH-OBS-03: session export viewer and offline verifier: single embedded key, seal, content digests, escaping, CLI. */
-import { readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { Command } from "commander";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -13,7 +13,10 @@ import { buildSessionExport, verifySessionExport, type SessionExportDocument } f
 import { embedJson, extractSessionExportJson, renderSessionExportHtml } from "../../src/observability/sessionExportHtml.js";
 import { registerSessionExportCommands } from "../../src/cli-session-export-commands.js";
 import { generateKeyPairSync } from "node:crypto";
+import YAML from "yaml";
 import { signHexDigest } from "../../src/crypto/keys.js";
+import { defaultOpsPolicy, loadOpsPolicy, opsPolicyPath } from "../../src/ops/policy.js";
+import { readEventPayload } from "../../src/session/eventPayload.js";
 import { removeWorkspace, runStubSession, stubWorkspace } from "./helpers/stubSessionWorkspace.js";
 
 vi.setConfig({ testTimeout: 120_000 });
@@ -24,7 +27,8 @@ afterEach(() => { process.chdir(cwd); process.exitCode = undefined; vi.restoreAl
 
 /** A governed stub session that reads a seeded file, then edits it, so the log carries a unified diff. */
 async function diffSession(): Promise<string> {
-  writeFileSync(join(ws, "workspace", "note.txt"), "alpha\nbeta\n");
+  mkdirSync(join(ws, "workspace", "output"), { recursive: true });
+  writeFileSync(join(ws, "workspace", "output", "note.txt"), "alpha\nbeta\n");
   const route = nativeRouteFor(STUB_PROVIDER_ID, {}, STUB_PROVIDER_MODEL);
   const registry = new AdapterRegistry();
   registry.register(route);
@@ -33,8 +37,8 @@ async function diffSession(): Promise<string> {
     makeLlm: (s) => new LlmRuntime({ session: s, credentials, registry, transport: stubProviderTransport({}) }),
     route: { providerId: STUB_PROVIDER_ID, model: STUB_PROVIDER_MODEL, params: paramsFor(STUB_PROVIDER_ID, 256) },
     systemPrompt: "You are an AMC-governed agent.", compositionDigest: "0".repeat(64), policyDigest: "0".repeat(64) });
-  await session.prompt(JSON.stringify({ tool: "fs.read", arguments: { path: "workspace/note.txt" } }));
-  await session.prompt(JSON.stringify({ tool: "fs.edit", arguments: { path: "workspace/note.txt", find: "beta", replace: "gamma AKIAIOSFODNN7EXAMPLE" } }));
+  await session.prompt(JSON.stringify({ tool: "fs.read", arguments: { path: "workspace/output/note.txt" } }));
+  await session.prompt(JSON.stringify({ tool: "fs.edit", arguments: { path: "workspace/output/note.txt", find: "beta", replace: "gamma AKIAIOSFODNN7EXAMPLE" } }));
   await session.close();
   return session.sessionId;
 }
@@ -51,10 +55,16 @@ describe("session export", () => {
     expect(texts).toContain("-beta");
     expect(texts).toContain("+gamma");
     expect(texts, "secrets inside tool output are redacted on export").not.toContain("AKIAIOSFODNN7EXAMPLE");
-    const ok = verifySessionExport(doc, { expectedFingerprint: doc.monitorKeyFingerprint });
+    // S15: redacted entries cannot be checked against their digests, so the default verdict fails closed.
+    const strict = verifySessionExport(doc, { expectedFingerprint: doc.monitorKeyFingerprint });
+    expect(strict.ok).toBe(false);
+    expect(strict.errors.join()).toContain("--accept-unverifiable-content");
+    const ok = verifySessionExport(doc, { expectedFingerprint: doc.monitorKeyFingerprint, acceptUnverifiableContent: true });
     expect(ok.ok, ok.errors.join("; ")).toBe(true);
     expect(ok.tail).toBe("sealed");
     expect(ok.content.verified).toBeGreaterThan(0);
+    expect(ok.content.unverifiable).toBeGreaterThan(0);
+    expect(ok.usage?.requests).toBe(doc.usage.requests);
     const wrong = verifySessionExport(doc, { expectedFingerprint: "f".repeat(64) });
     expect(wrong.ok).toBe(false);
     expect(wrong.errors.join()).toContain("does not match the pinned");
@@ -74,6 +84,14 @@ describe("session export", () => {
     const [id, entry] = Object.entries(doc.content!).find(([, value]) => !("unavailable" in value) && value.redactions === 0)!;
     const editedContent = { ...doc, content: { ...doc.content, [id]: { ...(entry as { text: string }), text: "tampered" } } };
     expect(verifySessionExport(editedContent, { expectedFingerprint: fp }).errors.join()).toContain("does not hash to its committed payload digest");
+    // S15: the embedded usage copy is checked against the usage recomputed from the rows.
+    const usageEdit = { ...doc, usage: { ...doc.usage, requests: doc.usage.requests + 1 } };
+    expect(verifySessionExport(usageEdit, { expectedFingerprint: fp }).errors.join()).toContain("usage summary does not match");
+    // S15: content may only be attached to content rows, even when it hashes to that row's payload.
+    const lifecycle = doc.rows.find((row) => row.event_type === "turn/end")!;
+    const payload = readEventPayload(ws, lifecycle);
+    const foreign = { ...doc, content: { ...doc.content, [lifecycle.id]: { text: payload.status === "ok" ? payload.bytes.toString("utf8") : "", sha256: lifecycle.payload_sha256, source: "inline" as const, truncated: false, redactions: 0 } } };
+    expect(verifySessionExport(foreign, { expectedFingerprint: fp }).errors.join()).toContain("carries no exportable content");
     // An attacker re-signs every row with their own key and ships that key: the pinned fingerprint no longer matches.
     const attacker = generateKeyPairSync("ed25519");
     const pem = attacker.publicKey.export({ type: "spki", format: "pem" }).toString();
@@ -98,10 +116,45 @@ describe("session export", () => {
     expect(html).toContain("default-src 'none'");
     expect(html).not.toMatch(/<script src=|<link /);
     expect(html).toContain("performs no verification");
-    const back = extractSessionExportJson(html) as SessionExportDocument;
+    const extracted = extractSessionExportJson(html);
+    expect(extracted.error).toBeNull();
+    const back = extracted.doc as SessionExportDocument;
     expect(back.sessionId).toBe(sessionId);
     expect(verifySessionExport(back, { expectedFingerprint: back.monitorKeyFingerprint }).ok).toBe(true);
     expect(embedJson("< >")).toBe('"\\u003c\\u2028\\u003e"');
+  });
+
+  it("S14: only the canonical rendering of its embedded document is accepted; decoys, comments, edits and trailing bytes are refused", async () => {
+    const { sessionId } = await runStubSession(ws, "hello");
+    const doc = buildSessionExport({ workspace: ws, sessionId, includeContent: false });
+    const html = renderSessionExportHtml(doc);
+    expect(extractSessionExportJson(html).error).toBeNull();
+    const refused = (text: string) => extractSessionExportJson(text);
+    // A decoy JSON block ahead of the real one: the first block parses as a valid document, but the file is not its rendering.
+    const decoy = { ...doc, sessionId: `${sessionId}-decoy` };
+    const decoyed = html.replace("<main id=\"amc-view\">", `<script type="application/json" id="amc-session-export">${embedJson(decoy)}</script>\n<main id="amc-view">`);
+    expect(decoyed).not.toBe(html);
+    expect(refused(decoyed).doc).toBeNull();
+    expect(refused(decoyed).error).toContain("not the canonical rendering");
+    // An HTML comment, an edited visible title and trailing bytes each change the page without touching the signed JSON.
+    expect(refused(html.replace("<body>", "<body><!-- reviewed: all good -->")).error).toContain("not the canonical rendering");
+    expect(refused(html.replace("<title>AMC session", "<title>VERIFIED AMC session")).error).toContain("not the canonical rendering");
+    expect(refused(`${html}\n<div>VERIFIED</div>`).error).toContain("not the canonical rendering");
+    // Files without a block, with an unterminated block or with a non-JSON block are refused with the reason named.
+    expect(refused("<html></html>").error).toContain("carries no embedded session export");
+    expect(refused(html.slice(0, html.indexOf("</script>"))).error).toContain("not terminated");
+    expect(refused(html.replace(embedJson(doc), "{not json")).error).toContain("not valid JSON");
+    expect(refused(html.replace(embedJson(doc), "[]")).error).toContain("not a session export document");
+  });
+
+  it("S16: --include-content is refused when the workspace policy encrypts ledger payloads; digests-only still exports", async () => {
+    const { sessionId } = await runStubSession(ws, "hello");
+    expect(buildSessionExport({ workspace: ws, sessionId, includeContent: true }).content).not.toBeNull();
+    const policy = defaultOpsPolicy();
+    writeFileSync(opsPolicyPath(ws), YAML.stringify({ ...policy, opsPolicy: { ...policy.opsPolicy, encryption: { ...policy.opsPolicy.encryption, ledgerEncryptionEnabled: true } } }));
+    expect(loadOpsPolicy(ws).opsPolicy.encryption.ledgerEncryptionEnabled).toBe(true);
+    expect(() => buildSessionExport({ workspace: ws, sessionId, includeContent: true })).toThrow(/enables ledger payload encryption.*Export digests only/);
+    expect(buildSessionExport({ workspace: ws, sessionId, includeContent: false }).content).toBeNull();
   });
 
   it("CLI: export writes the file and prints the fingerprint; verify-export passes with the pin, fails after an edit", async () => {
@@ -123,5 +176,18 @@ describe("session export", () => {
     await expect(program.parseAsync(["session", "verify-export", out, "--expect-monitor", "0".repeat(64)], { from: "user" })).rejects.toThrow("exit 1");
     writeFileSync(out, readFileSync(out, "utf8").replace('"event_type":"turn/end"', '"event_type":"turn/ended"'));
     await expect(program.parseAsync(["session", "verify-export", out, "--expect-monitor", fp], { from: "user" })).rejects.toThrow("exit 1");
+    logs.length = 0;
+    // S15 through the CLI: an export whose content carries redactions fails closed until the operator accepts display-only entries.
+    const redactedId = await diffSession();
+    const withContent = join(ws, "c.html");
+    await program.parseAsync(["session", "export", redactedId, "--out", withContent, "--include-content"], { from: "user" });
+    const fp2 = logs.join("\n").match(/^\s+([0-9a-f]{64})$/m)![1]!;
+    logs.length = 0;
+    await expect(program.parseAsync(["session", "verify-export", withContent, "--expect-monitor", fp2], { from: "user" })).rejects.toThrow("exit 1");
+    expect(logs.join("\n")).toContain("--accept-unverifiable-content");
+    logs.length = 0;
+    await program.parseAsync(["session", "verify-export", withContent, "--expect-monitor", fp2, "--accept-unverifiable-content"], { from: "user" });
+    expect(logs.join("\n")).toContain("verification PASSED");
+    expect(logs.join("\n")).toContain("accepted as display-only");
   });
 });
