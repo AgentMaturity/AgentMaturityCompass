@@ -61,7 +61,7 @@ describe("amc user without a terminal", () => {
     expect(`${init.out}${reset.out}`).not.toContain("owner-cli-pass-");
   });
 
-  test("without --password-file it names the option instead of failing in the prompt; an empty file is refused", () => {
+  test("without --password-file it names the option instead of failing in the prompt; an empty or short file is refused (LIVE-VAULT-13)", () => {
     const { secret, amc } = fixture();
     const missing = amc("user", "init", "--username", "owner");
     expect(missing.status).toBe(1);
@@ -69,7 +69,10 @@ describe("amc user without a terminal", () => {
     const empty = amc("user", "init", "--username", "owner", "--password-file", secret("empty.pw", ""));
     expect(empty.status).toBe(1);
     expect(empty.out).toContain("password file is empty");
-    expect(amc("user", "init", "--username", "owner", "--password-file", secret("ok.pw", "owner-cli-pass-123")).status).toBe(0);
+    const eleven = amc("user", "init", "--username", "owner", "--password-file", secret("eleven.pw", "eleven-char"));
+    expect(eleven.status).toBe(1);
+    expect(eleven.out).toContain("password must be at least 12 characters");
+    expect(amc("user", "init", "--username", "owner", "--password-file", secret("twelve.pw", "twelve-chars")).status).toBe(0);
     const add = amc("user", "add", "--username", "viewer", "--role", "VIEWER");
     expect(add.status).toBe(1);
     expect(add.out).toContain("--password-file");

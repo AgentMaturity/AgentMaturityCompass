@@ -9,6 +9,7 @@ import chalk from "chalk";
 import inquirer from "inquirer";
 import type { Command } from "commander";
 import { usersConfigPath } from "./auth/authApi.js";
+import { MIN_PASSWORD_LENGTH } from "./auth/passwordHash.js";
 import {
   parseRolesCsv,
   userAddCliAsync as userAddCli,
@@ -21,16 +22,19 @@ import {
 } from "./auth/authCli.js";
 
 const PASSWORD_FILE = ["--password-file <path>", "read the password from this private file (for shells without a terminal)"] as const;
+const TOO_SHORT = `password must be at least ${MIN_PASSWORD_LENGTH} characters`;
 
 /** --password-file's trimmed contents, else a masked prompt. A shell without a terminal must name a file: never an inline password (argv). */
 async function accountPassword(username: string, passwordFile: string | undefined): Promise<string> {
   if (passwordFile !== undefined) {
     const password = readFileSync(passwordFile, "utf8").trim();
     if (password.length === 0) throw new Error("password file is empty");
+    if (password.length < MIN_PASSWORD_LENGTH) throw new Error(TOO_SHORT);
     return password;
   }
   if (process.stdin.isTTY !== true) throw new Error("No terminal for the password prompt: pass --password-file <path> (a private file holding the password).");
-  const answer = await inquirer.prompt<{ password: string }>([{ type: "password", name: "password", message: `Password for ${username}`, mask: "*" }]);
+  const answer = await inquirer.prompt<{ password: string }>([{ type: "password", name: "password", message: `Password for ${username}`, mask: "*",
+    validate: (value: string) => value.length >= MIN_PASSWORD_LENGTH || TOO_SHORT }]);
   return answer.password;
 }
 

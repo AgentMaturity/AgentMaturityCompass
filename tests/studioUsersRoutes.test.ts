@@ -80,6 +80,15 @@ describe("console account routes", () => {
     expect(usersFiles()).toEqual(before);
   });
 
+  test("a new password under 12 characters is refused with 400 and users.yaml unchanged (LIVE-VAULT-13)", async () => {
+    const { post, ownerCookie, usersFiles } = await studio();
+    const before = usersFiles();
+    const refused = await post("/users/add", { username: "shorty", password: "eleven-char", roles: ["VIEWER"] }, { cookie: ownerCookie });
+    expect(refused.status).toBe(400);
+    expect(refused.body).toEqual({ error: "password must be at least 12 characters" });
+    expect(usersFiles()).toEqual(before);
+  });
+
   test("an OWNER session adds, re-roles and revokes accounts, and each change names the owner in the audit trail", async () => {
     const { workspace, post, ownerCookie } = await studio();
     const added = await post("/users/add", ROUTES[0]![1], { cookie: ownerCookie });

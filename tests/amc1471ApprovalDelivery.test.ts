@@ -1382,8 +1382,8 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
 
   test("revalidates session revocation, user status, and current roles on every request", () => {
     const workspace = newWorkspace(false);
-    initUsersConfig({ workspace, username: "owner", password: "owner-pass" });
-    const login = authenticateUser({ workspace, username: "owner", password: "owner-pass" });
+    initUsersConfig({ workspace, username: "owner", password: "owner-pass-1234" });
+    const login = authenticateUser({ workspace, username: "owner", password: "owner-pass-1234" });
     if (!login.user) throw new Error("expected owner user");
 
     const first = createSession({ workspace, user: login.user });
@@ -1405,7 +1405,7 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
       error: "session roles changed"
     }));
 
-    const current = authenticateUser({ workspace, username: "owner", password: "owner-pass" });
+    const current = authenticateUser({ workspace, username: "owner", password: "owner-pass-1234" });
     if (!current.user) throw new Error("expected current user");
     const third = createSession({ workspace, user: current.user });
     revokeUser({ workspace, username: "owner" });
@@ -1417,7 +1417,7 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
 
   test("marks session cookies Secure only when the request is HTTPS", async () => {
     const workspace = newWorkspace(false);
-    initUsersConfig({ workspace, username: "owner", password: "owner-pass" });
+    initUsersConfig({ workspace, username: "owner", password: "owner-pass-1234" });
     const token = "amc-1471-cookie-token";
     const studio = await startStudioApiServer({
       workspace,
@@ -1429,7 +1429,7 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
       const httpsLogin = await postJson(
         `${studio.url}/auth/login`,
         token,
-        { username: "owner", password: "owner-pass" },
+        { username: "owner", password: "owner-pass-1234" },
         { "x-forwarded-proto": "https" }
       );
       expect(httpsLogin.status).toBe(200);
@@ -1438,7 +1438,7 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
       const httpLogin = await postJson(
         `${studio.url}/auth/login`,
         token,
-        { username: "owner", password: "owner-pass" }
+        { username: "owner", password: "owner-pass-1234" }
       );
       expect(httpLogin.status).toBe(200);
       expect(String(httpLogin.headers["set-cookie"] ?? "")).not.toContain("; Secure;");

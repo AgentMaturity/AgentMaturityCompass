@@ -8,7 +8,8 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { isA4CommentScopeRoute } from "../studio/nativeAdmission.js";
 import { parseCookieHeader, issueSessionToken, issueSessionTokenAsync, verifySessionToken, type SessionPayload } from "./sessionTokens.js";
-import { hashPassword, verifyPassword } from "./passwordHash.js";
+import { hashPassword, passwordHashNeedsUpgrade, PasswordPolicyError, rehashPassword, verifyPassword } from "./passwordHash.js";
+import { vaultStatus } from "../vault/vault.js";
 import { createUserRecord, usersFileSchema, type UserRecord, type UsersFile } from "./userSchema.js";
 import type { UserRole } from "./roles.js";
 import { enforceRoleOrAdmin, type AccessContext } from "./rbac.js";
@@ -127,7 +128,7 @@ function signUsersConfig(workspace: string): string {
     signer: "auditor"
   };
   const sigPath = usersSigPath(workspace);
-  writeFileAtomic(sigPath, JSON.stringify(payload, null, 2), 0o644);
+  writeFileAtomic(sigPath, JSON.stringify(payload, null, 2), 0o600);
   return sigPath;
 }
 
@@ -151,7 +152,7 @@ function saveUsersConfig(workspace: string, users: UsersFile): void {
   // Compatibility writers must refuse a held/locked key before replacing the authenticated body.
   getSigningKey(workspace, "config-signature");
   ensureDir(join(workspace, ".amc"));
-  writeFileAtomic(usersPath(workspace), YAML.stringify(usersFileSchema.parse(users)), 0o644);
+  writeFileAtomic(usersPath(workspace), YAML.stringify(usersFileSchema.parse(users)), 0o600);
 }
 
 export function initUsersConfig(params: {
@@ -163,7 +164,7 @@ export function initUsersConfig(params: {
   const owner = createUserRecord({
     username: params.username,
     roles: ["OWNER"],
-    passwordHash: hashPassword(params.password)
+    passwordHash: hashPassword(params.password, { username: params.username })
   });
   const config: UsersFile = {
     v: 1,
@@ -216,7 +217,7 @@ export function addUser(params: {
   const record = createUserRecord({
     username: params.username,
     roles: params.roles,
-    passwordHash: hashPassword(params.password)
+    passwordHash: hashPassword(params.password, { username: params.username })
   });
   const next: UsersFile = {
     ...config,
@@ -336,6 +337,9 @@ export function respondUsersMutationError(request: Pick<IncomingMessage, "method
   if (error instanceof UsersLastOwnerError) {
     send(409, { error: error.message }); return true;
   }
+  if (error instanceof PasswordPolicyError) {
+    send(400, { error: error.message }); return true;
+  }
   if (error instanceof KeyProviderError && Object.hasOwn(KEY_PROVIDER_ERRORS, error.code)) {
     send(KEY_PROVIDER_ERRORS[error.code], { error: `${error.code}: user mutation signing refused`, code: error.code }); return true;
   }
@@ -401,8 +405,8 @@ async function mutateUsersConfigAsync<T>(workspace: string, change: (current: Us
     assertPurposePublicationCurrent(workspace, authority, signed);
     assertPredecessorCurrent();
     // Same YAML, digest and sidecar shape as the synchronous APIs; a partial pair still fails closed.
-    writeFileAtomic(usersPath(workspace), prepared.bytes, 0o644);
-    writeFileAtomic(usersSigPath(workspace), signature, 0o644);
+    writeFileAtomic(usersPath(workspace), prepared.bytes, 0o600);
+    writeFileAtomic(usersSigPath(workspace), signature, 0o600);
     return prepared.result;
   });
 }
@@ -410,7 +414,7 @@ async function mutateUsersConfigAsync<T>(workspace: string, change: (current: Us
 export async function initUsersConfigAsync(input: Parameters<typeof initUsersConfig>[0], opts: UsersMutationOptions = {}): Promise<ReturnType<typeof initUsersConfig>> {
   const params = { ...input };
   const created = await mutateUsersConfigAsync(params.workspace, () => {
-    const owner = createUserRecord({ username: params.username, roles: ["OWNER"], passwordHash: hashPassword(params.password) });
+    const owner = createUserRecord({ username: params.username, roles: ["OWNER"], passwordHash: hashPassword(params.password, { username: params.username }) });
     return { config: { v: 1, updatedTs: Date.now(), users: [owner] },
       result: { path: usersPath(params.workspace), sigPath: usersSigPath(params.workspace), owner } };
   }, opts, true);
@@ -423,7 +427,7 @@ export async function addUserAsync(input: Parameters<typeof addUser>[0], opts: U
   return recorded(params.workspace, "add", opts, await mutateUsersConfigAsync(params.workspace, current => {
     const config = current!;
     if (config.users.some(user => user.username.toLowerCase() === params.username.toLowerCase())) throw new Error(`user already exists: ${params.username}`);
-    const record = createUserRecord({ username: params.username, roles: params.roles, passwordHash: hashPassword(params.password) });
+    const record = createUserRecord({ username: params.username, roles: params.roles, passwordHash: hashPassword(params.password, { username: params.username }) });
     return { config: { ...config, updatedTs: Date.now(), users: [...config.users, record] }, result: record };
   }, opts));
 }
@@ -459,7 +463,7 @@ export async function setUserPasswordAsync(input: { workspace: string; username:
   const updated = await mutateUsersConfigAsync(params.workspace, current => {
     const config = current!, index = config.users.findIndex(user => user.username.toLowerCase() === params.username.toLowerCase());
     if (index < 0) throw new Error(`user not found: ${params.username}`);
-    const record = { ...config.users[index]!, passwordHash: hashPassword(params.password) }, users = config.users.slice(); users[index] = record;
+    const record = { ...config.users[index]!, passwordHash: hashPassword(params.password, { username: config.users[index]!.username }) }, users = config.users.slice(); users[index] = record;
     return { config: { ...config, updatedTs: Date.now(), users }, result: record };
   }, opts);
   forEachSessionRecord(params.workspace, (path, parsed) => { if (parsed.userId === updated.userId && !parsed.revoked) markSessionRevoked(path, parsed); });
@@ -512,10 +516,31 @@ export function authenticateUser(params: {
       error: "invalid credentials"
     };
   }
+  if (passwordHashNeedsUpgrade(user.passwordHash)) maybeRehashOnLogin(params.workspace, user, params.password);
   return {
     ok: true,
     user
   };
+}
+
+/**
+ * LIVE-VAULT-13: a verifier made at an older scrypt cost is replaced on the next successful login, through the signed
+ * write, when this process holds the unlocked vault (Studio does; a CLI may not). Best effort: on any failure the old
+ * verifier stays, still valid, and the login goes on.
+ */
+function maybeRehashOnLogin(workspace: string, user: UserRecord, password: string): void {
+  if (!vaultStatus(workspace).unlocked) return;
+  try {
+    withUsersConfigLock(workspace, () => {
+      const config = loadUsersConfig(workspace);
+      const index = config.users.findIndex((row) => row.userId === user.userId && row.passwordHash === user.passwordHash);
+      if (index < 0) return;
+      const users = config.users.slice();
+      users[index] = { ...users[index]!, passwordHash: rehashPassword(password) };
+      saveUsersConfig(workspace, { ...config, updatedTs: Date.now(), users });
+      signUsersConfig(workspace);
+    });
+  } catch { /* the old verifier stays */ }
 }
 
 export function createTrackedSession(params: {
