@@ -89,7 +89,9 @@ describe("fs.read line ranges", () => {
     expect(outcome.output).toBe("     2\tl2\n\n[amc: truncated at 10 bytes; 19 more]\n[amc: lines 2-4 of 10]");
   });
 
-  it("refuses binary and non-UTF-8 files deterministically, and leaves the raw read as it was", async () => {
+  // SH-TOOLS-02 (R5): the raw read used to decode NUL bytes into the model's context (`"a\u0000b"`); that assertion
+  // encoded the defect. Binary content is now described; NUL-free non-UTF-8 text is shown lossily and labelled.
+  it("refuses binary and non-UTF-8 files on the ranged path, describes binaries and labels lossy text on the raw read", async () => {
     const h = harness();
     h.put("nul.bin", Buffer.from([0x61, 0x00, 0x62]));
     h.put("latin1.txt", Buffer.from([0x63, 0x61, 0x66, 0xe9]));
@@ -98,7 +100,29 @@ describe("fs.read line ranges", () => {
       expect(outcome.ok).toBe(false);
       expect(outcome.output).toContain("is not UTF-8 text");
     }
-    expect((await h.run("fs.read", { path: "nul.bin" })).output).toBe("a\u0000b");
+    const binary = await h.run("fs.read", { path: "nul.bin" });
+    expect(binary.ok).toBe(true);
+    expect(binary.output).toBe(`[amc: "nul.bin" is binary (application/octet-stream, 3 bytes, sha256 ${sha256(Buffer.from([0x61, 0x00, 0x62]))}); fs.read shows UTF-8 text only]`);
+    expect(binary.output).not.toContain("\u0000");
+    const lossy = await h.run("fs.read", { path: "latin1.txt" });
+    expect(lossy.output).toBe("caf\uFFFD\n[amc: not valid UTF-8; shown with replacement characters]");
+    // The read still records the digest, so an edit is refused as non-UTF-8, not as unread.
+    expect((await h.run("fs.edit", { path: "latin1.txt", find: "caf", replace: "x" })).output).toContain("not valid UTF-8");
+  });
+
+  it("names common binary types from their header on the raw read (SH-TOOLS-02)", async () => {
+    const h = harness();
+    const big = Buffer.alloc(600, 0);
+    h.put("i.png", Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), big]));
+    h.put("i.jpg", Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), big]));
+    h.put("i.gif", Buffer.concat([Buffer.from("GIF89a", "latin1"), big]));
+    h.put("i.webp", Buffer.concat([Buffer.from("RIFF\0\0\0\0WEBPVP8 ", "latin1"), big]));
+    h.put("d.pdf", Buffer.concat([Buffer.from("%PDF-1.7\n", "latin1"), big]));
+    for (const [name, type] of [["i.png", "image/png"], ["i.jpg", "image/jpeg"], ["i.gif", "image/gif"], ["i.webp", "image/webp"], ["d.pdf", "application/pdf"]]) {
+      // maxBytes below the file size: the header alone names the type, as a prefix read must.
+      const outcome = await h.run("fs.read", { path: name, maxBytes: 16 });
+      expect(outcome.output).toContain(`is binary (${type}, ${600 + (name === "i.png" ? 8 : name === "i.jpg" ? 4 : name === "i.gif" ? 6 : name === "i.webp" ? 16 : 9)} bytes`);
+    }
   });
 
   it("lets a slice read satisfy read-before-edit for the whole file", async () => {

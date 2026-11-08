@@ -147,6 +147,24 @@ export interface ToolOutcome {
    * and the `stdout` row carry the same form. Absent outside the pipeline: evidence then uses the plain SHA-256.
    */
   readonly outputDigest?: OutputDigest;
+  /** Every file the body changed (SH-TOOLS-06c); copied from the body result, absent when it declared none. */
+  readonly fileChanges?: readonly FileChange[];
+}
+
+/**
+ * What a filesystem tool changed (P1-36): hashes and sizes of the bytes it read and wrote, and the digest of the
+ * redacted diff it returned. Never the content. `beforeSha256` is null for a created file; `afterSha256` is null for a
+ * deleted one; `replacements` is null for a write; `diffSha256` is null when no diff was shown.
+ */
+export interface FileChange {
+  readonly path: string;
+  readonly beforeSha256: string | null;
+  readonly afterSha256: string | null;
+  readonly bytesBefore: number;
+  readonly bytesAfter: number;
+  readonly replacements: number | null;
+  readonly diffSha256: string | null;
+  readonly diffTruncated: boolean;
 }
 
 /** What a tool body receives and returns. */
@@ -164,6 +182,8 @@ export interface ToolBodyResult {
   readonly effect?: "applied" | "not_applied" | "unknown";
   /** The system of record's reference for the effect, e.g. a payment id. Recorded as given. */
   readonly externalRef?: string;
+  /** Every file this body wrote or deleted, for the audit row and the loop's checkpoints. Digests and sizes only. */
+  readonly fileChanges?: readonly FileChange[];
 }
 
 /**

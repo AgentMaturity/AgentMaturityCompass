@@ -1,32 +1,24 @@
-import { mkdirSync, realpathSync } from "node:fs";
-import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { mkdirSync } from "node:fs";
+import { dirname } from "node:path";
 import { z } from "zod";
-import { redactSecrets } from "../../shield/redaction/redactSecrets.js";
 import { sha256Hex } from "../../utils/hash.js";
-import { aliasedSegmentReason, fileIdentity, protectedDirectoryIdentities } from "../../toolhub/protectedPaths.js";
-import { noteFileChange } from "../toolEvidence.js";
 import { defineTool } from "../toolRegistry.js";
 import type { ToolDefinition, ToolExecution } from "../toolTypes.js";
 import type { ReadBeforeEditLedger } from "./readBeforeEdit.js";
-import { writeFileAtomicSync } from "./atomicWrite.js";
 import { planLiteralEdits, type LiteralEdit } from "./fsEditPlan.js";
-import { unifiedDiff } from "./lineDiff.js";
-import { readRegularFile, scanRegularFile } from "./fsRegularFile.js";
+import { scanRegularFile } from "./fsRegularFile.js";
+import { readIfExists, refuseBeforeWrite, shownDiff, utf8, writeIfUnchanged } from "./fsWritePrimitives.js";
+import { insideWorkspace } from "./workspacePath.js";
+
+export { insideWorkspace } from "./workspacePath.js";
 
 /**
  * Filesystem tools (P4.3).
  *
- * Three tools and one policy. The policy — read before you edit — lives in
- * `readBeforeEdit.ts` and is threaded through here rather than reimplemented,
- * because a rule enforced in three bodies is a rule that will shortly be
- * enforced in two.
- *
- * WHY THE WORKSPACE BOUND IS HERE AND NOT ONLY IN A GUARD. The signed
- * `tools.yaml` allowlist governs `fs.read`/`fs.write` by path glob, and that
- * remains the policy. This is the second, cruder check that a resolved path
- * stays inside the workspace at all — because the allowlist is a per-tool
- * configuration a deployment can widen, and escaping the workspace entirely is
- * not something any configuration should be able to express by accident.
+ * Three tools and one policy. The policy — read before you edit — lives in `readBeforeEdit.ts` and is threaded through
+ * here rather than reimplemented, because a rule enforced in three bodies is a rule that will shortly be enforced in
+ * two. The workspace bound (`workspacePath.ts`) and the write primitives (`fsWritePrimitives.ts`) are shared with
+ * `apply_patch` for the same reason.
  */
 
 const readArgs = z.object({
@@ -52,100 +44,15 @@ const editArgs = z.object({
 );
 
 const DEFAULT_LINE_LIMIT = 2_000;
-const UTF8 = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
-
-/**
- * Directories inside the workspace that a tool must not touch.
- *
- * `.amc` holds the vault and the signing keys, and the signed tool policy
- * itself; `.git` holds hooks, which are arbitrary code execution at the next
- * commit. Both are inside the workspace, so containment alone permits them.
- *
- * The signed `tools.yaml` allowlist denies these globs as well. This is the
- * second lock rather than the only one, because that allowlist is applied by a
- * guard — and a guard that a composition forgets to install enforces nothing.
- *
- * Decided by file identity (`protectedDirectoryIdentities`), because names
- * alias: `.AMC` on a case-insensitive volume, `AMC~1` or `.amc.` on Windows.
- * The folded name (`aliasedSegmentReason`) is the second lock.
- */
-
-/**
- * Resolve every symlink on the deepest existing prefix of a path.
- *
- * A file that does not exist yet still has an existing ancestor, and that
- * ancestor is where a link would be. Walking up until something resolves and
- * re-appending the rest is what makes the check work for a write to a new file.
- */
-function realPathOfNearestExisting(target: string): string {
-  const trailing: string[] = [];
-  let current = target;
-  for (;;) {
-    try {
-      return trailing.length === 0 ? realpathSync.native(current) : join(realpathSync.native(current), ...trailing);
-    } catch {
-      const parent = dirname(current);
-      if (parent === current) return target; // reached the root; nothing exists
-      trailing.unshift(basename(current));
-      current = parent;
-    }
-  }
+/** Header-only signatures: the retained prefix is enough to name a common binary type (R15). */
+function binaryMediaType(prefix: Buffer): string {
+  if (prefix.subarray(0, 4).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47]))) return "image/png";
+  if (prefix.subarray(0, 3).equals(Buffer.from([0xff, 0xd8, 0xff]))) return "image/jpeg";
+  if (prefix.subarray(0, 4).toString("latin1") === "GIF8") return "image/gif";
+  if (prefix.subarray(0, 4).toString("latin1") === "RIFF" && prefix.subarray(8, 12).toString("latin1") === "WEBP") return "image/webp";
+  if (prefix.subarray(0, 5).toString("latin1") === "%PDF-") return "application/pdf";
+  return "application/octet-stream";
 }
-
-/**
- * Resolve inside the workspace, or refuse.
- *
- * `..` is not filtered — it is resolved and then checked, because filtering
- * strings is a guessing game and resolution is what the filesystem does.
- *
- * And the check is made on the REAL path, not the typed one. A lexical
- * `resolve`/`relative` pair does not follow symlinks while `readFileSync`
- * does, so `ln -s /etc/shadow ws/notes.txt` passes a textual containment test
- * and then reads the target. Containment has to be decided on the path the
- * filesystem will actually open. Both sides are realpath'd, because the
- * workspace root is itself often a link (`/var` to `/private/var` on macOS).
- */
-export function insideWorkspace(workspace: string, path: string): { readonly full: string; readonly rel: string } {
-  const root = realPathOfNearestExisting(resolve(workspace));
-  const requested = isAbsolute(path) ? resolve(path) : resolve(root, path);
-  const real = realPathOfNearestExisting(requested);
-  const rel = relative(root, real);
-  if (rel.startsWith("..") || isAbsolute(rel)) {
-    throw new Error(`path escapes the workspace: ${path}`);
-  }
-  const protectedIds = protectedDirectoryIdentities(root);
-  let current = root;
-  for (const segment of rel.split(/[/\\]/)) {
-    current = join(current, segment);
-    const alias = aliasedSegmentReason(segment);
-    if (alias !== null) throw new Error(`${alias}: ${path}`);
-    const id = protectedIds.size === 0 ? null : fileIdentity(current);
-    if (id !== null && protectedIds.has(id)) throw new Error(`path is inside a protected directory (${segment}): ${path}`);
-  }
-  return { full: real, rel: rel.split(sep).join("/") };
-}
-
-/** The file's bytes, or null when it does not exist. Any other failure (a directory, no permission) is thrown. */
-function readIfExists(full: string): Buffer | null {
-  try {
-    return readRegularFile(full);
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
-    throw error;
-  }
-}
-
-/** The exact text of `raw`, or null when it is not valid UTF-8: decoding would replace bytes, and writing back would change them. */
-function utf8(raw: Buffer): string | null {
-  try {
-    return UTF8.decode(raw);
-  } catch {
-    return null;
-  }
-}
-
-/** Text fit to show as lines: valid UTF-8 with no NUL byte, which marks binary content. */
-const displayText = (raw: Buffer): string | null => (raw.includes(0) ? null : utf8(raw));
 
 /** Stream the full observation while retaining only a capped raw prefix or numbered line range. */
 function readPresentation(full: string, path: string, maxBytes: number, range: { offset: number; limit: number } | null) {
@@ -208,43 +115,14 @@ function readPresentation(full: string, path: string, maxBytes: number, range: {
     ? `\n[amc: truncated at ${maxBytes} bytes; ${shownBytes - slice.length} more]`
     : "";
   const trailer = range === null ? "" : `\n[amc: lines ${range.offset}-${Math.min(totalLines, range.offset + range.limit - 1)} of ${totalLines}]`;
-  return { ...observation, retainedBytes: slice.length, output: `${slice.toString("utf8")}${truncated}${trailer}` };
-}
-
-/**
- * The diff a tool result shows, redacted with the shared secret patterns before it reaches the model or the ledger.
- * Redaction is display only: the file gets the bytes the agent asked for.
- */
-function shownDiff(rel: string, before: Buffer, after: Buffer): { readonly text: string; readonly truncated: boolean } {
-  const oldText = displayText(before);
-  const newText = displayText(after);
-  const diff = oldText === null || newText === null
-    ? { text: before.equals(after) ? "" : `Binary files a/${rel} and b/${rel} differ`, truncated: false }
-    : unifiedDiff(rel, oldText, newText);
-  return { text: redactSecrets(diff.text, (type) => `[AMC_REDACTED:${type}]`).redacted, truncated: diff.truncated };
-}
-
-/**
- * Validate the planning snapshot and observation at publication, after staging has finished.
- *
- * These synchronous bodies cannot interleave within one JavaScript thread. Portable Node has no digest-CAS
- * against external writers: an uncooperative process can still race the final check and rename.
- */
-function writeIfUnchanged(execution: ToolExecution, ledger: ReadBeforeEditLedger, full: string, path: string,
-  before: Buffer | null, after: Buffer): void {
-  const snapshotDigest = before === null ? undefined : sha256Hex(before);
-  writeFileAtomicSync(full, after, {
-    createOnly: before === null,
-    beforeCommit: () => {
-      if (insideWorkspace(execution.workspace, path).full !== full) {
-        throw new Error(`"${path}" changed location while this call ran — read it again, then retry`);
-      }
-      const verdict = before === null
-        ? ledger.mayWrite(execution.agentId, full)
-        : ledger.mayEdit(execution.agentId, full, snapshotDigest);
-      if (!verdict.ok) throw new Error(`"${path}" changed while this call ran — ${verdict.reason}`);
-    }
-  });
+  // A NUL in the first 8 KB marks binary content (grep's heuristic): describe it rather than decode bytes into the
+  // model's context and the ledger. NUL-free invalid UTF-8 (Latin-1, CP1252) is still shown, lossily and labelled.
+  if (range === null && slice.subarray(0, 8_000).includes(0)) {
+    const description = `[amc: "${path}" is binary (${binaryMediaType(slice)}, ${observation.bytes} bytes, sha256 ${observation.digest}); fs.read shows UTF-8 text only]`;
+    return { ...observation, retainedBytes: 0, output: description };
+  }
+  const notice = range === null && utf8(slice) === null ? "\n[amc: not valid UTF-8; shown with replacement characters]" : "";
+  return { ...observation, retainedBytes: slice.length, output: `${slice.toString("utf8")}${truncated}${notice}${trailer}` };
 }
 
 function editsOf(args: z.infer<typeof editArgs>): LiteralEdit[] {
@@ -269,6 +147,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
       actionClass: "READ_ONLY",
       description:
         "Read a regular file from the workspace, with file content capped at maxBytes on UTF-8 character boundaries. " +
+        "Binary content (a NUL byte in the first 8 KB) is described by media type, size and sha256, not shown. " +
         "With offset or limit, returns numbered UTF-8 lines: each line is its number " +
         "right-aligned in 6 columns, a tab, then the text. The number and tab are not part of the file; leave them out " +
         "of fs.edit find text.",
@@ -313,7 +192,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
         const { full, rel } = insideWorkspace(execution.workspace, args.path);
         const before = readIfExists(full);
         const verdict = ledger.mayWrite(execution.agentId, full, before === null ? undefined : sha256Hex(before));
-        if (!verdict.ok) throw new Error(verdict.reason);
+        if (!verdict.ok) throw refuseBeforeWrite(verdict.reason);
         const after = Buffer.from(args.content, "utf8");
         const diff = before === null ? null : shownDiff(rel, before, after);
         if (simulated(execution)) {
@@ -324,12 +203,12 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
         // Refresh: the agent now knows this file's contents, because it just
         // produced them.
         ledger.recordRead(execution.agentId, full, after);
-        noteFileChange(execution.token, {
+        const change = {
           path: rel, beforeSha256: before === null ? null : sha256Hex(before), afterSha256: sha256Hex(after),
           bytesBefore: before?.length ?? 0, bytesAfter: after.length, replacements: null,
           diffSha256: diff === null ? null : sha256Hex(diff.text), diffTruncated: diff?.truncated ?? false
-        });
-        return { ok: true, output: diff === null ? `created ${args.path}` : withDiff(`wrote ${args.path}`, diff.text), bytes: after.length };
+        };
+        return { ok: true, output: diff === null ? `created ${args.path}` : withDiff(`wrote ${args.path}`, diff.text), bytes: after.length, fileChanges: [change] };
       }
     }),
 
@@ -373,13 +252,18 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
         // these bytes: the plan, the diff and the evidence all describe them.
         const raw = readIfExists(full);
         const verdict = ledger.mayEdit(execution.agentId, full, raw === null ? undefined : sha256Hex(raw));
-        if (!verdict.ok) throw new Error(verdict.reason);
-        if (raw === null) throw new Error(`"${args.path}" changed while this call ran — read it again, then retry`);
+        if (!verdict.ok) throw refuseBeforeWrite(verdict.reason);
+        if (raw === null) throw refuseBeforeWrite(`"${args.path}" changed while this call ran — read it again, then retry`);
         const before = utf8(raw);
         if (before === null) {
-          throw new Error(`"${args.path}" is not valid UTF-8; fs.edit would change bytes it was not asked to change`);
+          throw refuseBeforeWrite(`"${args.path}" is not valid UTF-8; fs.edit would change bytes it was not asked to change`);
         }
-        const plan = planLiteralEdits(before, editsOf(args), args.path);
+        let plan;
+        try {
+          plan = planLiteralEdits(before, editsOf(args), args.path);
+        } catch (error) {
+          throw refuseBeforeWrite(error instanceof Error ? error.message : String(error));
+        }
         const after = Buffer.from(plan.after, "utf8");
         const diff = shownDiff(rel, raw, after);
         const summary = `${plan.replacements} replacement${plan.replacements === 1 ? "" : "s"}`;
@@ -388,11 +272,11 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
         }
         writeIfUnchanged(execution, ledger, full, args.path, raw, after);
         ledger.recordRead(execution.agentId, full, after);
-        noteFileChange(execution.token, {
+        const change = {
           path: rel, beforeSha256: sha256Hex(raw), afterSha256: sha256Hex(after), bytesBefore: raw.length,
           bytesAfter: after.length, replacements: plan.replacements, diffSha256: sha256Hex(diff.text), diffTruncated: diff.truncated
-        });
-        return { ok: true, output: withDiff(`edited ${args.path} (${summary})`, diff.text), bytes: after.length };
+        };
+        return { ok: true, output: withDiff(`edited ${args.path} (${summary})`, diff.text), bytes: after.length, fileChanges: [change] };
       }
     })
   ];
