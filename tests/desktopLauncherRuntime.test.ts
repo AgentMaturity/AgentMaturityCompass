@@ -33,6 +33,7 @@ test.skipIf(process.platform === "win32")("moved macOS app installs from its own
   const directory = mkdtempSync(join(tmpdir(), "amc-launcher-flow-"));
   const server = createServer();
   let daemon: ChildProcess | undefined;
+  let other: ChildProcess | undefined;
   try {
     // The app alone, moved away from the extracted archive folder that also holds a tarball.
     const resources = join(directory, "Applications", "Agent Maturity Compass Studio.app", "Contents", "Resources");
@@ -71,16 +72,29 @@ exit 0
     expect(readFileSync(join(support, "runtime", "package.sha256"), "utf8").trim()).toBe(digest);
 
     // An upgrade while the previous runtime's Studio runs: a daemon that needs a moment to exit after SIGTERM.
+    // Its command line carries the daemon entry, as `cli.js _studio-daemon --workspace …` does.
     writeFileSync(join(directory, "daemon.sh"), "trap 'sleep 1; exit 0' TERM\nwhile :; do sleep 1; done\n");
-    daemon = spawn("/bin/sh", [join(directory, "daemon.sh")], { stdio: "ignore" });
-    mkdirSync(join(support, "studio-workspace", ".amc", "studio"), { recursive: true });
-    writeFileSync(join(support, "studio-workspace", ".amc", "studio", "state.json"), JSON.stringify({ pid: daemon.pid }));
+    daemon = spawn("/bin/sh", [join(directory, "daemon.sh"), "_studio-daemon"], { stdio: "ignore" });
+    const stateFile = join(support, "studio-workspace", ".amc", "studio", "state.json");
+    mkdirSync(dirname(stateFile), { recursive: true });
+    writeFileSync(stateFile, JSON.stringify({ pid: daemon.pid }));
     writeFileSync(join(support, "runtime", "package.sha256"), "previous-package-digest\n");
     expect((await launch({ STUDIO_PID: String(daemon.pid) })).calls).toEqual([
       "amc down alive studio-workspace",
       `npm install ${join(resources, "amc.tgz")}`,
       "amc up gone studio-workspace"
     ]);
+
+    // A stale state file whose pid now belongs to another program: the old runtime's amc down would signal it,
+    // so the launcher leaves that program alone and drops the stale file before the new runtime starts.
+    other = spawn("/bin/sh", ["-c", "while :; do sleep 1; done"], { stdio: "ignore" });
+    writeFileSync(stateFile, JSON.stringify({ pid: other.pid }));
+    writeFileSync(join(support, "runtime", "package.sha256"), "previous-package-digest\n");
+    expect((await launch({ STUDIO_PID: String(other.pid) })).calls).toEqual([
+      `npm install ${join(resources, "amc.tgz")}`,
+      "amc up alive studio-workspace"
+    ]);
+    expect(existsSync(stateFile)).toBe(false);
 
     // A failed start explains a taken Studio port, and only then.
     await new Promise<void>((done) => server.listen(0, "127.0.0.1", done));
@@ -91,9 +105,45 @@ exit 0
   } finally {
     if (server.listening) server.close();
     daemon?.kill();
+    other?.kill();
     rmSync(directory, { recursive: true, force: true });
   }
 }, 60_000);
+
+test.skipIf(process.platform === "win32")("macOS launcher reports the console URL with the port Studio bound, from state.json (coordinator P2)", () => {
+  const directory = mkdtempSync(join(tmpdir(), "amc-launcher-port-"));
+  try {
+    const resources = join(directory, "Resources");
+    mkdirSync(resources, { recursive: true });
+    writeFileSync(join(resources, "amc.tgz"), "packaged amc");
+    const digest = createHash("sha256").update("packaged amc").digest("hex");
+    const template = readFileSync(packager, "utf8").match(/const launchScript = `([\s\S]*?)`;\n/)?.[1];
+    writeFileSync(join(resources, "launch-studio.sh"), new Function("tarballName", "tarballDigest", `return \`${template}\`;`)("amc.tgz", digest));
+    const home = join(directory, "home");
+    const runtime = join(home, "Library", "Application Support", "Agent Maturity Compass", "runtime");
+    mkdirSync(join(runtime, "node_modules", ".bin"), { recursive: true });
+    writeFileSync(join(runtime, "package.sha256"), `${digest}\n`);
+    // amc up writes the state file the way Studio does, with the port it bound.
+    writeFileSync(join(runtime, "node_modules", ".bin", "amc"), `#!/bin/sh
+[ "$1" = up ] || exit 0
+mkdir -p .amc/studio
+[ -n "\${STATE_JSON:-}" ] && printf '%s' "$STATE_JSON" > .amc/studio/state.json
+exit 0
+`, { mode: 0o755 });
+    const launch = (stateJson: string) => spawnSync("/bin/sh", [join(resources, "launch-studio.sh")], {
+      env: { HOME: home, PATH: `${dirname(process.execPath)}:/usr/bin:/bin`, STATE_JSON: stateJson }, encoding: "utf8"
+    });
+    const bound = launch(JSON.stringify({ pid: 1, apiPort: 47123, host: "127.0.0.1" }));
+    expect(bound.status, bound.stderr).toBe(0);
+    expect(bound.stdout.trim().split("\n").at(-1)).toBe("AMC_STUDIO_URL=http://127.0.0.1:47123/w/demo/console/");
+    // An unreadable or implausible state falls back to the default port.
+    for (const state of ["not json", JSON.stringify({ apiPort: 70000 }), JSON.stringify({ apiPort: "3213" })]) {
+      expect(launch(state).stdout.trim().split("\n").at(-1)).toBe("AMC_STUDIO_URL=http://127.0.0.1:3212/w/demo/console/");
+    }
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
 
 test.each([".", ".."])("desktop packager refuses AMC_DESKTOP_PACKAGE_OUT=%s, which contains the checkout", (out) => {
   const directory = mkdtempSync(join(tmpdir(), "amc-package-out-"));

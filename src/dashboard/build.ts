@@ -3,7 +3,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readdirSync } from "node:fs";
 import type { DiagnosticReport } from "../types.js";
-import { fleetRoot, getAgentPaths, resolveAgentId } from "../fleet/paths.js";
+import { agentRoot, fleetRoot, getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { listAgents } from "../fleet/registry.js";
 import { listDelegationEdges, type DelegationEdge } from "../fleet/trustComposition.js";
 import { loadTargetProfile } from "../targets/targetProfile.js";
@@ -29,7 +29,8 @@ import { listGuardrailsWithRuntimeStatus } from "../enforce/guardrailRuntimeBind
 export interface DashboardBuildInput {
   workspace: string;
   agentId?: string;
-  outDir: string;
+  /** Defaults to agentDashboardDir, the directory Studio serves. */
+  outDir?: string;
 }
 
 export interface DashboardBuildResult {
@@ -37,6 +38,11 @@ export interface DashboardBuildResult {
   outDir: string;
   latestRunId: string;
   generatedFiles: string[];
+}
+
+/** The agent's dashboard directory: Studio serves it, and `amc dashboard build`/`serve` use it unless --out names another. */
+export function agentDashboardDir(workspace: string, agentId?: string): string {
+  return join(agentRoot(workspace, resolveAgentId(workspace, agentId)), "dashboard");
 }
 
 function moduleDir(): string {
@@ -583,7 +589,7 @@ export function buildDashboard(input: DashboardBuildInput): DashboardBuildResult
     ledger.close();
   }
 
-  const outDir = resolve(input.workspace, input.outDir);
+  const outDir = resolve(input.workspace, input.outDir ?? agentDashboardDir(input.workspace, agentId));
   ensureDir(outDir);
   ensureDir(join(outDir, "components"));
   ensureDir(join(outDir, "fonts"));

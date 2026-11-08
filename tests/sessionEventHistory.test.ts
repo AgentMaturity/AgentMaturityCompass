@@ -185,6 +185,9 @@ describe("public complete persisted session history", () => {
     expect(() => loadSessionEventHistory({ workspace, sessionId: id, agentId: "different" })).toThrow("IDENTITY_MISMATCH");
     expect(() => loadSessionEventHistory({ workspace, expectedMonitorFingerprint: "0".repeat(64) })).toThrow("TAMPERED");
     expect(() => loadSessionEventHistory({ workspace, expectedMonitorFingerprint: "" })).toThrow("INVALID_INPUT");
+    // An empty AMC_EXPECTED_MONITOR_FINGERPRINT in the environment (a chart or .env with no pin yet) is no pin, not a refusal.
+    vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", "");
+    expect(loadSessionEventHistory({ workspace }).verification.trustRoot.anchored).toBe(false);
   });
   test("observed history changes return no stale snapshot or partial rows", () => {
     record("jsonl");

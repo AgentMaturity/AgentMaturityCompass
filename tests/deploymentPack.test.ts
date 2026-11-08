@@ -6,12 +6,189 @@ import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 import * as YAML from "yaml";
 import { loadStudioRuntimeConfig } from "../src/config/loadConfig.js";
+import { interpolate, serviceEnv } from "./helpers/composeInterpolate.js";
+import { dockerfileStudioHealthcheck } from "./helpers/deployPackFixtures.js";
+import { ipAllowedByCidrs } from "../src/studio/clientAddress.js";
+import { PROXY_TRUST_REFUSAL, assertProxyTrustNamed, resolveListenPolicy } from "../src/studio/listenPolicy.js";
 
 const workspace = fileURLToPath(new URL("../", import.meta.url));
 
 function read(path: string): string {
   return readFileSync(resolve(workspace, path), "utf8");
 }
+
+const COMPOSE_FILES = ["deploy/compose/docker-compose.yml", "deploy/compose/docker-compose.tls.yml",
+  "deploy/compose/docker-compose.studio-api.yml", "docker/docker-compose.yml"] as const;
+/** The Studio services by name: a check keyed on build.target would also catch the notary (studio target, not Studio). */
+const STUDIO_SERVICES = [["deploy/compose/docker-compose.yml", "studio"], ["deploy/compose/docker-compose.tls.yml", "amc-studio"],
+  ["docker/docker-compose.yml", "amc-studio"]] as const;
+const HTTP_STACKS = ["deploy/compose/docker-compose.yml", "docker/docker-compose.yml"] as const;
+type ComposeService = { image?: string; build?: { target?: string }; secrets?: string[];
+  deploy?: { resources?: { limits?: { cpus?: string; memory?: string }; reservations?: { memory?: string } } }; tmpfs?: string | string[]; volumes?: (string | { target?: string })[]; ports?: string[];
+  environment?: string[] | Record<string, unknown>; stop_grace_period?: string; restart?: string;
+  healthcheck?: { test: string[]; interval?: string; timeout?: string; retries?: number; start_period?: string } };
+const composeServices = (path: string): Record<string, ComposeService> => YAML.parse(read(path)).services;
+/** Container path of a volume entry: `src:dst[:opts]` or the long form's `target`. */
+const volumeTarget = (entry: string | { target?: string }) => typeof entry === "string" ? entry.split(":")[1] ?? entry : entry.target;
+/** Compose/Docker duration (`30s`, `2m`, `1m30s`) in seconds. */
+const seconds = (duration = "") => [...duration.matchAll(/(\d+)(h|m|s)/g)].reduce((total, [, n, unit]) => total + Number(n) * ({ h: 3600, m: 60, s: 1 } as Record<string, number>)[unit!]!, 0);
+
+describe("compose runtime layout (LIVE-DEPLOY-01)", () => {
+  it("mounts no volume beneath a tmpfs path (docker-helm 2026-11-07)", () => {
+    // Docker creates the mount point of a volume nested in a tmpfs as root:root 0755, which assertOwnerOnly refuses.
+    const nested: string[] = [];
+    for (const file of COMPOSE_FILES) {
+      for (const [name, service] of Object.entries(composeServices(file))) {
+        const tmpfs = [service.tmpfs ?? []].flat().map((entry) => entry.split(":")[0]!);
+        for (const target of (service.volumes ?? []).map(volumeTarget)) {
+          for (const path of tmpfs) if (target === path || target?.startsWith(`${path}/`)) nested.push(`${file} ${name}: ${target} under tmpfs ${path}`);
+        }
+      }
+    }
+    expect(nested).toEqual([]);
+  });
+
+  it("persists the signed-control checkpoint root outside /data/amc", () => {
+    for (const [file, name] of STUDIO_SERVICES) {
+      const service = composeServices(file)[name]!;
+      expect(serviceEnv(service).AMC_CONTROL_CHECKPOINT_DIR, `${file} ${name}`).toBe("/workspace/control-checkpoints");
+      expect((service.volumes ?? []).map(volumeTarget), `${file} ${name}`).toContain("/workspace");
+    }
+    const dockerRun = /```bash\ndocker run --rm \\\n[\s\S]*?```/.exec(read("docker/README.md"))?.[0] ?? "";
+    expect(dockerRun).toContain("-e AMC_CONTROL_CHECKPOINT_DIR=/workspace/control-checkpoints");
+    expect(dockerRun).toContain("-v amc_control_checkpoints:/workspace");
+    expect(dockerRun).toContain("-v amc_state:/home/amc/.config/amc/state");
+    expect(dockerRun).not.toContain("--tmpfs /home/amc");
+  });
+
+  it("passes the operator's monitor-key pin to Studio only when it is set: unset by default, never empty (skeptic 2026-11-08)", () => {
+    // Native-task verdicts count only when anchored to a pinned monitor key (P0-51). An empty value is not "unpinned":
+    // loadSessionEventHistory refuses it as an invalid fingerprint, so Studio would show no task history and archive nothing.
+    for (const [file, name] of STUDIO_SERVICES) {
+      // A bare key (list) or a null value (mapping): Compose takes the value from .env or the shell and drops the variable when unset.
+      const env = composeServices(file)[name]!.environment!;
+      if (Array.isArray(env)) expect(env.filter((entry) => entry.startsWith("AMC_EXPECTED_MONITOR_FINGERPRINT")), `${file} ${name}`).toEqual(["AMC_EXPECTED_MONITOR_FINGERPRINT"]);
+      else expect(env, `${file} ${name}`).toHaveProperty("AMC_EXPECTED_MONITOR_FINGERPRINT", null);
+    }
+    const example = read("deploy/compose/.env.example");
+    expect(example).not.toMatch(/^AMC_EXPECTED_MONITOR_FINGERPRINT=/m);
+    expect(example).toMatch(/^# AMC_EXPECTED_MONITOR_FINGERPRINT=<sha256/m);
+  });
+
+  it("gives Studio a stop grace period and a restart policy", () => {
+    // Studio drains up to 10 s before it seals its session; Docker's 10 s default can kill it first.
+    for (const [file, name] of [...STUDIO_SERVICES, ["deploy/compose/docker-compose.studio-api.yml", "amc-api"]] as const) {
+      expect(composeServices(file)[name]!.stop_grace_period, `${file} ${name}`).toBe("40s");
+    }
+    expect(composeServices("deploy/compose/docker-compose.yml").studio!.restart).toBe("unless-stopped");
+  });
+
+  it("publishes HTTP ports on loopback unless AMC_PUBLISH_ADDRESS says otherwise", () => {
+    for (const file of HTTP_STACKS) {
+      for (const [name, service] of Object.entries(composeServices(file))) {
+        for (const port of service.ports ?? []) expect(port, `${file} ${name}`).toMatch(/^\$\{AMC_PUBLISH_ADDRESS:-127\.0\.0\.1\}:/);
+      }
+    }
+    const studioPort = (env: Record<string, string>) => composeServices("deploy/compose/docker-compose.yml").studio!.ports!
+      .map((port) => interpolate(port, env)).find((port) => port.endsWith(":3212"));
+    expect(studioPort({})).toBe("127.0.0.1:3212:3212");
+    expect(studioPort({ AMC_STUDIO_PORT: "47123" })).toBe("127.0.0.1:47123:3212");
+    expect(studioPort({ AMC_PUBLISH_ADDRESS: "0.0.0.0" })).toBe("0.0.0.0:3212:3212");
+    expect(read("deploy/compose/.env.example")).toMatch(/^AMC_PUBLISH_ADDRESS=127\.0\.0\.1$/m);
+  });
+});
+
+describe("compose image pins, limits and the backup secret (LIVE-DEPLOY-08)", () => {
+  it("names every studio-target and api-target image through a pin variable", () => {
+    // `up -d --build` keeps working for a first install; an upgrade or rollback changes the pin in .env, never by rebuild.
+    let studioTargets = 0;
+    for (const file of COMPOSE_FILES) {
+      for (const [name, service] of Object.entries(composeServices(file))) {
+        const target = service.build?.target ?? (name === "amc-verify" ? "studio" : undefined);
+        if (target === "studio") { studioTargets += 1; expect(service.image, `${file} ${name}`).toMatch(/^\$\{AMC_STUDIO_IMAGE:-amc-studio:local\}$/); }
+        if (target === "api") expect(service.image, `${file} ${name}`).toMatch(/^\$\{AMC_API_IMAGE:-amc-api:local\}$/);
+      }
+    }
+    expect(studioTargets).toBe(5);
+    expect(read("deploy/compose/.env.example")).toMatch(/^AMC_STUDIO_IMAGE=amc-studio:local$/m);
+    expect(read("deploy/compose/.env.example")).toMatch(/^AMC_API_IMAGE=amc-api:local$/m);
+  });
+
+  it("pins every other TLS-stack image by digest", () => {
+    // caddy:2.8 was pulled once, anonymously, on 2026-11-08; the manifest-list digest resolves on amd64 and arm64.
+    for (const [name, service] of Object.entries(composeServices("deploy/compose/docker-compose.tls.yml"))) {
+      if (service.image?.startsWith("${")) continue;
+      expect(service.image, name).toMatch(/@sha256:[a-f0-9]{64}$/);
+    }
+  });
+
+  it("limits the deploy/compose Studio services and hands them the backup passphrase secret", () => {
+    for (const [file, name] of STUDIO_SERVICES.filter(([path]) => path.startsWith("deploy/compose/"))) {
+      const service = composeServices(file)[name]!;
+      expect(service.deploy?.resources, `${file} ${name}`).toEqual({ limits: { cpus: "${AMC_STUDIO_CPUS:-2}", memory: "2g" }, reservations: { memory: "512m" } });
+      // Docker refuses a CPU limit above the host's CPU count, so a 1-vCPU host lowers it from .env (skeptic 2026-11-08).
+      expect(interpolate(service.deploy!.resources!.limits!.cpus!, {}), `${file} ${name}`).toBe("2");
+      expect(interpolate(service.deploy!.resources!.limits!.cpus!, { AMC_STUDIO_CPUS: "1" }), `${file} ${name}`).toBe("1");
+      expect(service.secrets, `${file} ${name}`).toContain("amc_backup_passphrase");
+      expect(serviceEnv(service).AMC_BACKUP_PASSPHRASE_FILE, `${file} ${name}`).toBe("/run/secrets/amc_backup_passphrase");
+      expect(YAML.parse(read(file)).secrets.amc_backup_passphrase).toEqual({ file: "./secrets/amc_backup_passphrase.txt" });
+    }
+    expect(read("deploy/compose/.env.example")).toMatch(/^AMC_STUDIO_CPUS=2$/m);
+    expect(existsSync(resolve(workspace, "deploy/compose/secrets/amc_backup_passphrase.txt.example"))).toBe(true);
+    expect(read("deploy/compose/README.md")).toContain("`amc_backup_passphrase.txt`");
+  });
+});
+
+describe("Caddy upstream keep-alive (coordinator P2)", () => {
+  it("closes idle upstream connections before the Node server behind them does", () => {
+    // Node's default keep-alive is 5 s (65 s only once the runtime lane sets it), and Caddy's default 2 min would reuse a
+    // connection the server already closed (a 502), so every upstream closes first (skeptic 2026-11-08).
+    for (const file of ["deploy/compose/Caddyfile", "deploy/compose/Caddyfile.studio-api"]) {
+      const text = read(file);
+      const proxies = [...text.matchAll(/reverse_proxy ([\w-]+:\d+)(?: \{[^{}]*?transport http \{\s*keepalive (\d+)s\s*\}\s*\})?/g)];
+      expect(proxies.length, file).toBe((text.match(/reverse_proxy /g) ?? []).length);
+      for (const [, upstream, seconds] of proxies) expect(Number(seconds ?? Infinity), `${file} ${upstream}`).toBeLessThan(5);
+    }
+  });
+});
+
+describe("Helm chart 0.4.1 signed-control checkpoint root (LIVE-DEPLOY-15)", () => {
+  it("roots signed-control checkpoints on the state claim, outside the workspace, in the chart and the raw manifests", () => {
+    // Firewall, guardrail, legal-hold and compiled-control journals checkpoint under AMC_CONTROL_CHECKPOINT_DIR; its default
+    // ($HOME/.amc/control-checkpoints) is on the read-only root filesystem, and the root must be outside the workspace.
+    expect(read("deploy/helm/amc/templates/configmap.yaml")).toContain(
+      "AMC_CONTROL_CHECKPOINT_DIR: {{ printf \"%s/control-checkpoints\" .Values.amcHomeState.mountPath | quote }}");
+    expect(YAML.parse(read("deploy/helm/amc/Chart.yaml")).version).toBe("0.4.1");
+    const values = YAML.parse(read("deploy/helm/amc/values.yaml"));
+    const rendered = `${values.amcHomeState.mountPath}/control-checkpoints`;
+    expect(rendered.startsWith(`${values.workspace.mountPath}/`)).toBe(false);
+    const studio = YAML.parse(read("deploy/k8s/deployment.yaml")).spec.template.spec.containers[0];
+    expect(studio.env).toContainEqual({ name: "AMC_CONTROL_CHECKPOINT_DIR", value: rendered });
+    expect(studio.volumeMounts).toContainEqual({ name: "amc-home-state", mountPath: values.amcHomeState.mountPath });
+  });
+});
+
+describe("container healthcheck (LIVE-DEPLOY-03, L-HC)", () => {
+  it("probes Studio over HTTP with a bounded timeout in the image and every compose Studio service", () => {
+    // The CLI probe loaded the whole CLI for two GETs: 42 s under load against a 10 s timeout while /readyz was READY.
+    const dockerfile = read("Dockerfile");
+    const { options, cmd } = dockerfileStudioHealthcheck(dockerfile);
+    expect(cmd?.slice(0, 2)).toEqual(["node", "-e"]);
+    const probe = cmd![2]!;
+    for (const part of ["/healthz", "/readyz", "AbortSignal.timeout("]) expect(probe).toContain(part);
+    expect(dockerfile).not.toContain("\"studio\", \"healthcheck\"");
+    expect(options).toBe("--interval=30s --timeout=10s --start-period=120s --retries=5");
+    for (const [file, name] of STUDIO_SERVICES) {
+      const healthcheck = composeServices(file)[name]!.healthcheck;
+      expect(healthcheck?.test.slice(0, 3), `${file} ${name}`).toEqual(["CMD", "node", "-e"]);
+      expect(healthcheck?.test[3], `${file} ${name}`).toBe(probe);
+      expect(seconds(healthcheck?.timeout), `${file} ${name}`).toBeLessThanOrEqual(10);
+      expect(seconds(healthcheck?.start_period), `${file} ${name}`).toBeGreaterThanOrEqual(60);
+    }
+    // The notary is built from the studio target but runs `amc notary start`; it keeps its own probe.
+    expect(composeServices("deploy/compose/docker-compose.tls.yml")["amc-notary"]!.healthcheck?.test[3]).toContain("http://127.0.0.1:4343/readyz");
+  });
+});
 
 describe("deployment pack assets", () => {
   it("includes docker runtime assets", () => {
@@ -23,7 +200,6 @@ describe("deployment pack assets", () => {
     expect(dockerfile).toMatch(/FROM (\$\{NODE_IMAGE\}|node:20)/);
     expect(dockerfile).toContain("USER 10001:10001");
     expect(dockerfile).toContain("HEALTHCHECK");
-    expect(dockerfile).toContain("\"studio\", \"healthcheck\"");
   });
 
   it("does not advertise unverified GHCR quickstart images as published", () => {
@@ -52,6 +228,70 @@ describe("deployment pack assets", () => {
     const tls = read("deploy/compose/docker-compose.tls.yml");
     expect(tls).toContain("caddy");
     expect(tls).toContain("AMC_TRUSTED_PROXY_HOPS");
+  });
+
+  // SR-10: the shipped configs trusted every private range as a proxy, so any container or pod could forge X-Forwarded-For.
+  const startWarnings = (env: Record<string, string>): string[] => {
+    const lines: string[] = [];
+    assertProxyTrustNamed(Number(env.AMC_TRUSTED_PROXY_HOPS ?? 0), resolveListenPolicy({ env, hostMode: false }), (line) => lines.push(line));
+    return lines;
+  };
+
+  it("the TLS stack trusts only Caddy's fixed address, on a network declared in the file that only Caddy and Studio join", () => {
+    const compose = YAML.parse(read("deploy/compose/docker-compose.tls.yml"));
+    const studio = compose.services["amc-studio"];
+    const caddy = compose.services.caddy;
+    const fallback = (value: string): string => /^\$\{[A-Z_]+:-(.*)\}$/.exec(value)?.[1] ?? "";
+    const proxyIp: string = caddy.networks.amc_edge.ipv4_address;
+    expect(fallback(studio.environment.AMC_TRUSTED_PROXY_CIDRS)).toBe(`${proxyIp}/32`);
+    expect(Object.keys(caddy.networks)).toEqual(["amc_edge"]);
+    expect(ipAllowedByCidrs(proxyIp, [compose.networks.amc_edge.ipam.config[0].subnet])).toBe(true);
+    const onEdge = Object.entries(compose.services as Record<string, { networks?: unknown }>)
+      .filter(([, service]) => JSON.stringify(service.networks ?? []).includes("amc_edge")).map(([name]) => name);
+    expect(onEdge.sort()).toEqual(["amc-studio", "caddy"]);
+    expect(startWarnings({ AMC_TRUSTED_PROXY_HOPS: String(studio.environment.AMC_TRUSTED_PROXY_HOPS),
+      AMC_TRUSTED_PROXY_CIDRS: fallback(studio.environment.AMC_TRUSTED_PROXY_CIDRS), AMC_ALLOWED_CIDRS: fallback(studio.environment.AMC_ALLOWED_CIDRS) })).toEqual([]);
+  });
+
+  it("the Helm chart trusts no proxy by default; the raw manifests refuse to start until one is named; the docs say so", () => {
+    const values = YAML.parse(read("deploy/helm/amc/values.yaml"));
+    expect([values.env.AMC_TRUSTED_PROXY_HOPS, values.env.AMC_TRUSTED_PROXY_CIDRS]).toEqual(["0", ""]);
+    const example = YAML.parse(read("deploy/helm/amc/examples/values-ingress-tls.yaml"));
+    expect(example.env.AMC_TRUSTED_PROXY_CIDRS, "the ingress example leaves the proxy for the operator to name").toBe("");
+    expect(() => startWarnings({ ...values.env, ...example.env })).toThrow(PROXY_TRUST_REFUSAL);
+    expect(startWarnings({ ...values.env, ...example.env, AMC_TRUSTED_PROXY_CIDRS: "10.244.1.17/32" }), "a real ingress pod address").toEqual([]);
+    const k8s = YAML.parse(read("deploy/k8s/configmap.yaml")).data;
+    expect(k8s.AMC_TRUSTED_PROXY_CIDRS).toBe("");
+    expect(() => startWarnings(k8s)).toThrow(PROXY_TRUST_REFUSAL);
+    expect(read("docs/KUBERNETES_HELM_DEPLOYMENT.md")).toContain('--set env.AMC_TRUSTED_PROXY_CIDRS="$INGRESS_POD_CIDRS"');
+    expect(read("docs/SECURITY_DEPLOYMENT.md")).not.toContain("name the private ranges");
+    expect(read("deploy/compose/README.md")).toContain("`amc_edge` network");
+  });
+
+  it("helm refuses an Ingress or proxy hops without named proxies, when the helm binary is available", () => {
+    if (spawnSync("helm", ["version"], { encoding: "utf8" }).status !== 0) return;
+    const chart = join(workspace, "deploy/helm/amc");
+    const render = (...args: string[]) => spawnSync("helm", ["template", "amc", chart, ...args], { encoding: "utf8" });
+    for (const args of [["--set", "ingress.enabled=true"], ["--set", "env.AMC_TRUSTED_PROXY_HOPS=1"],
+      ["--set", "ingress.enabled=true", "--set", "env.AMC_TRUSTED_PROXY_CIDRS=10.244.1.0/24"]]) {
+      const refused = render(...args);
+      expect(refused.status, args.join(" ")).toBe(1);
+      expect(refused.stderr).toContain("env.AMC_TRUSTED_PROXY_CIDRS set to the ingress controller pods' addresses");
+    }
+    const named = render("--set", "ingress.enabled=true", "--set", "env.AMC_TRUSTED_PROXY_HOPS=1", "--set", "env.AMC_TRUSTED_PROXY_CIDRS=10.244.1.0/24");
+    expect(named.status, named.stderr).toBe(0);
+    expect(named.stdout).toContain('AMC_TRUSTED_PROXY_CIDRS: "10.244.1.0/24"');
+    // The ingress example renders only once the operator names a real proxy; documentation ranges are refused.
+    const example = join(chart, "examples/values-ingress-tls.yaml");
+    const asShipped = render("-f", example);
+    expect(asShipped.status).toBe(1);
+    expect(asShipped.stderr).toContain("env.AMC_TRUSTED_PROXY_CIDRS set to the ingress controller pods' addresses");
+    expect(render("-f", example, "--set", "env.AMC_TRUSTED_PROXY_CIDRS=10.244.1.17/32").status).toBe(0);
+    for (const cidr of ["198.51.100.0/24", "192.0.2.7/32", "203.0.113.0/24", "2001:db8::/32", "10.244.1.17/32\\,198.51.100.9/32"]) {
+      const placeholder = render("-f", example, "--set", `env.AMC_TRUSTED_PROXY_CIDRS=${cidr}`);
+      expect(placeholder.status, cidr).toBe(1);
+      expect(placeholder.stderr, cidr).toContain("is a documentation range (RFC 5737/3849)");
+    }
   });
 
   it("persists <AMC home>/state, where anti-rollback marks live, in compose and the Helm chart (P1-08 review M4)", () => {
@@ -176,6 +416,15 @@ describe("deployment pack assets", () => {
     } finally {
       rmSync(tmp, { recursive: true, force: true });
     }
+  });
+
+  it("reads the dashboard port from AMC_DASHBOARD_PORT and refuses one another service uses", () => {
+    expect(loadStudioRuntimeConfig({ AMC_WORKSPACE_DIR: "/tmp/amc" }).dashboardPort).toBe(4173);
+    expect(loadStudioRuntimeConfig({ AMC_WORKSPACE_DIR: "/tmp/amc", AMC_DASHBOARD_PORT: "45173" }).dashboardPort).toBe(45173);
+    expect(() => loadStudioRuntimeConfig({ AMC_WORKSPACE_DIR: "/tmp/amc", AMC_DASHBOARD_PORT: "3212" }))
+      .toThrow(/port 3212 is assigned to multiple services \(AMC_STUDIO_PORT, AMC_DASHBOARD_PORT\)/);
+    // Unset, the dashboard keeps falling back to a free port, so a service already on 4173 stays valid.
+    expect(loadStudioRuntimeConfig({ AMC_WORKSPACE_DIR: "/tmp/amc", AMC_METRICS_PORT: "4173" }).metricsPort).toBe(4173);
   });
 
   it("rejects duplicate runtime port assignments", () => {

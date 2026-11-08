@@ -25,5 +25,16 @@ export function verifyPublishedInstallerVersion(root) {
     if (pin !== version) throw new Error(`Published installer version mismatch: ${source}=${String(pin)} expected=${version}`);
   }
   if (read("install.sh") !== unix) throw new Error("Repository and hosted Unix installers differ");
-  return { version, ...pins };
+  // The homepage download buttons name and link the same pinned release, so the pins pull request moves them too.
+  const homepage = read("website/index.html");
+  if (homepage.includes("AgentMaturityCompass/releases/latest")) {
+    throw new Error("website/index.html links releases/latest; link the pinned release tag instead");
+  }
+  const downloads = [...homepage.matchAll(/<a\b[^>]*\bhref="https:\/\/github\.com\/AgentMaturity\/AgentMaturityCompass\/releases\/([^"]*)"[^>]*>\s*(Download\b[^<]*?)\s*<\/a>/g)];
+  for (const [, target, label] of downloads) {
+    if (target !== `tag/v${version}` || !label.includes(` ${version} `)) {
+      throw new Error(`Published installer version mismatch: website/index.html "${label}" links releases/${target} expected=${version}`);
+    }
+  }
+  return { version, ...pins, websiteDownloads: downloads.length };
 }

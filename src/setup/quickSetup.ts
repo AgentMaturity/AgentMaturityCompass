@@ -1,9 +1,10 @@
-import { randomBytes } from "node:crypto";
 import { join, resolve } from "node:path";
 import inquirer from "inquirer";
 import { presetGatewayConfigForProvider, saveGatewayConfig, signGatewayConfig, type GatewayConfig } from "../gateway/config.js";
 import { pathExists } from "../utils/fs.js";
 import { initWorkspace } from "../workspace.js";
+import { generatedPassphraseForInit } from "../cli/initPassphrase.js";
+import { rememberEnabled, rememberVaultPassphrase } from "../vault/passphraseStore.js";
 import { detectFrameworksForOnboarding as detectFrameworks, detectAgentInstructionSources, type FrameworkDetection } from "./setupWizard.js";
 import {
   createOnboardingState,
@@ -212,11 +213,15 @@ export async function runQuickSetup(options: QuickSetupOptions): Promise<QuickSe
 
   let bootstrapped = false;
   if (!pathExists(join(workspace, ".amc"))) {
-    // Auto-generate vault passphrase if not set — quick setup should "just work"
+    // LIVE-VAULT-15: a generated passphrase is remembered (never printed), so the vault opens after this process exits.
+    let generated: string | null = null;
     if (!process.env.AMC_VAULT_PASSPHRASE) {
-      process.env.AMC_VAULT_PASSPHRASE = `amc-${randomBytes(16).toString("hex")}`;
+      if (!rememberEnabled()) throw new Error("amc setup needs a passphrase to remember: export AMC_VAULT_PASSPHRASE, or unset AMC_VAULT_REMEMBER.");
+      generated = generatedPassphraseForInit();
+      process.env.AMC_VAULT_PASSPHRASE = generated;
     }
     initWorkspace({ workspacePath: workspace });
+    if (generated !== null) logger.log(`Vault passphrase generated and remembered in ${rememberVaultPassphrase(workspace, generated).location}.`);
     bootstrapped = true;
     logger.log("Initialized AMC workspace (.amc/)");
   } else {

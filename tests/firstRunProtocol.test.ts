@@ -147,4 +147,13 @@ describe("first-run protocol against the built CLI", () => {
     expect(vault?.status).toBe("WARN");
     expect(vault?.fixHint).toContain("export AMC_VAULT_PASSPHRASE=");
   });
+
+  testWithDist?.("full init prints one What's next list: the three actions first, then the other first steps", () => {
+    const init = amc(freshWorkspace(), ["init"]);
+    expect(init.status, init.text).toBe(0);
+    expect(init.stdout.match(/What's next/g)).toHaveLength(1);
+    const list = init.stdout.slice(init.stdout.indexOf("What's next"));
+    expect(list.indexOf("amc agent-loop verify")).toBeLessThan(list.indexOf("amc up"));
+    expect(list).toContain("amc doctor");
+  });
 });

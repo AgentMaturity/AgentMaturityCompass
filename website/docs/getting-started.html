@@ -91,7 +91,7 @@ npm --version    <span class="comment"># Should be v9+ or higher</span></code></
       <h3>Windows PowerShell</h3>
       <pre><code>irm https://agentmaturity.co/install.ps1 | iex</code></pre>
 
-      <p>Both installers pin the GitHub release, download the platform archive and <code>SHA256SUMS</code>, and refuse to run the packaged installer when verification fails. Verify the installed CLI:</p>
+      <p>Both installers pin the published 1.1.1 GitHub release, download the platform archive and <code>SHA256SUMS</code>, and refuse to run the packaged installer when verification fails. Verify the installed CLI:</p>
       <pre><code>amc --version
 amc doctor</code></pre>
       <p>In a new directory, <code>amc doctor</code> verifies install readiness and exits successfully without pretending workspace configuration already exists. After initialization, it runs the full workspace checks. CI and production deployments should use <code>amc doctor --strict</code>.</p>
@@ -108,11 +108,13 @@ docker run -it --rm amc-quickstart</code></pre>
       <p>The image's entry point is already <code>amc</code>, so pass only its arguments (a second <code>amc</code> fails with "too many arguments"). Signing needs a vault passphrase: set a strong <code>AMC_VAULT_PASSPHRASE</code> of your own and pass it through with <code>docker run -e AMC_VAULT_PASSPHRASE …</code>, or let <code>amc init</code> prompt for one. Never use an example or guessable value. The image installs the published 1.1.1 release.</p>
 
       <h3>From source</h3>
-      <pre><code>git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
+      <pre><code>corepack enable
+git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
-npm ci
-npm run build
+pnpm install --frozen-lockfile
+pnpm run build
 npm link</code></pre>
+      <p>AMC is a pnpm workspace, so <code>npm ci</code> fails here by design. The source build is the current, unreleased build; the installers above give the published 1.1.1.</p>
 
       <!-- First Score -->
       <h2 id="first-score">Your First Full Score in 2 Minutes</h2>
@@ -139,7 +141,9 @@ npm link</code></pre>
         <div class="step-num">3</div>
         <div class="step-content">
           <h4>Open Studio when ready</h4>
-          <pre><code>amc up</code></pre>
+          <pre><code>amc up
+amc user init --username &lt;you&gt;   # new workspace only: the first console login (asks for a password)</code></pre>
+          <p>Then sign in to the Compass Console at the URL amc up printed. If the workspace already has logins, an OWNER adds yours with <code>amc user add</code>.</p>
           <p>Studio shows the same score, lifecycle evidence, reports, assurance packs, domain packs, run history, and advanced org runs in a local dashboard. The packaged macOS and Windows desktop apps launch Agent Maturity Compass Studio and open this same local console in your system browser.</p>
         </div>
       </div>

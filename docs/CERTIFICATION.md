@@ -36,6 +36,7 @@ Verification checks:
 - run hash + run seal signature,
 - gate policy signature,
 - ledger hash chain/signatures/blob hashes,
+- the carried evidence database and blob digests that `cert.json` signs (`references.evidence`); only then is the carried ledger verified as of the signed issue time, and a certificate without them (issued by an earlier release) is verified at the real time,
 - gate policy evaluation on bundled report/evidence.
 
 ## Revoke

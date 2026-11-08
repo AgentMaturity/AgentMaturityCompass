@@ -110,3 +110,35 @@ describe("an agent token cannot reach the CLI bridge", () => {
       .not.toBe(403);
   }, 30_000);
 });
+
+// LIVE-RUNTIME-05: the listing, the validator and the onboarding run sit behind the same gate as /cli/exec. The
+// onboarding run spawns the bare `amc` with Studio's environment (the vault passphrase included), so an agent there
+// would get an operator-signed score.
+describe("the CLI listing, validator and onboarding run need the CLI bridge roles", () => {
+  it("refuses an agent token on all three before anything runs", async () => {
+    const { url, agentToken } = await studio();
+    const headers = { "x-amc-agent-token": agentToken };
+    const started = Date.now();
+    const responses = [
+      await fetch(`${url}/cli/commands`, { headers }),
+      await post(`${url}/cli/validate`, { command: "version" }, headers),
+      await post(`${url}/onboarding/run`, {}, headers)
+    ];
+    for (const response of responses) {
+      expect(response.status, response.url).toBe(403);
+      expect(await response.text(), response.url).toContain("requires role");
+    }
+    expect(Date.now() - started, "refused at the gate: no amc child ran").toBeLessThan(1_000);
+  }, 30_000);
+
+  it("serves an OWNER session on all three", async () => {
+    const { url } = await studio();
+    const login = await post(`${url}/auth/login`, { username: "owner", password: "owner-password" }, {});
+    expect(login.status).toBe(200);
+    const headers = { cookie: String(login.headers.get("set-cookie") ?? "").split(";", 1)[0]! };
+    expect((await fetch(`${url}/cli/commands`, { headers })).status).toBe(200);
+    expect((await post(`${url}/cli/validate`, { command: "version" }, headers)).status).toBe(200);
+    // The run itself may fail in a bare test workspace; only the gate is under test.
+    expect((await post(`${url}/onboarding/run`, {}, headers)).status).not.toBe(403);
+  }, 180_000);
+});

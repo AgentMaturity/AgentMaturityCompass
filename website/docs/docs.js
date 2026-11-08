@@ -408,6 +408,8 @@ function parseDocsRoute(hash) {
 }
 
 function resolveRenderedGuideLink(docName, href) {
+  // An in-page anchor stays on the current guide; a bare '#' is left alone.
+  if (href && href.length > 1 && href.startsWith('#')) return { available: true, docName, section: safeDecode(href.slice(1)) };
   if (!href || href.startsWith('#') || /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(href)) return null;
 
   try {
