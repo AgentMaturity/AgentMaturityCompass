@@ -103,6 +103,30 @@ files read unsigned until that verifier admits the pinned notary.
 - **Two local users are not evidence of two people.** Every LOCAL_USER key is minted under one workspace signing
   authority. A regulated project whose approvers are all LOCAL_USER is labelled `SOD_DEGRADED_SELF_PROVISIONED`, and a
   user created with no recorded creator is self-provisioned.
+- **Approvers are project members.** A workspace APPROVER, AUDITOR or OWNER decides a gate only as a member of the
+  project with the `approver` or `owner` project role; anyone else is refused with `403 A4_NOT_A_MEMBER`
+  (`PRINCIPAL_NOT_MEMBER`). Add approvers before requesting a gate:
+  `amc a4 members <projectId> --member LOCAL_USER:<userId> --project-role approver` (a `MEMBER` change supersedes
+  every open gate, which is then requested again). Readiness says so: `members.candidates` reads WAITING with
+  `NO_SECOND_APPROVER` while the project has fewer than two members who may approve.
+- **How many people a walk needs.** Each gate's action class decides its quorum under the signed workspace approval
+  policy (`amc policy approval init` signs the default). With the default policy:
+
+  | Gate | Action class | Approvals | Workspace roles that may approve |
+  |---|---|---|---|
+  | Aspire direction, Aspire completion, Assemble direction | `WRITE_LOW` | 1 | APPROVER, OWNER |
+  | Assemble completion, Adapt direction | `WRITE_HIGH` | 2, distinct users | APPROVER, OWNER |
+  | Adapt completion | `SECURITY` | 2, distinct users, one of them holding AUDITOR (the role vote) | OWNER, AUDITOR |
+  | Activate direction, Activate completion | `DEPLOY` | 2, distinct users | APPROVER, OWNER |
+  | A gate-policy change | `WRITE_HIGH` | 2, distinct users | APPROVER, OWNER |
+
+  The approvers exclude the revision's author, the gate's requester and, on a completion gate, its builders; each
+  effect's engine request is approved the same way. So an owner who authors, builds and requests needs two more
+  members: both with APPROVER or OWNER for the `WRITE_HIGH` and `DEPLOY` gates, both with OWNER or AUDITOR for Adapt
+  completion, one of them an AUDITOR (for example one OWNER and one user with both APPROVER and AUDITOR). With fewer, a
+  gate cannot reach its quorum before it expires: the `sod` item reads WAITING with `QUORUM_UNREACHABLE`, `ELIGIBLE:<n>` and
+  `REQUIRED:<m>` on a non-regulated project too (a warning, never a refusal), except in a single-user workspace,
+  where self-approval counts (below).
 
 ### The single-user rule
 
@@ -185,8 +209,11 @@ framework through a scaffold, connect instructions and a trace import.
   config from Studio's own native task service, the frameworks, mechanic profiles, the compiled plan (and whether it
   shows the `workflow` tool), the open `outcome_unknown` executions and the path table.
 - **Paths.** Each path has an IntegrationClaim: which boundary enforces it, what its evidence can reach and what it does
-  not cover. Native is `tool_pipeline`; `claude-code` is preview (P1-23, held on D-02); `pi` is unsupported (P1-22, held
-  on D-02); the framework paths are gateway-only previews (P1-54). An unsupported path or plan item stays listed with its
+  not cover. Native is `tool_pipeline`. `claude-code` (`hook:PreToolUse`, P1-23) and `pi` (`pi:tool_call`, P1-22) are
+  read from their adapter claim manifests (`docs/adapters/manifests`): `supported` when the manifest's tool-call hook
+  enforces and blocks on failure and a conformance receipt backs the pinned harness versions (the path table names
+  them), `preview` when the manifest does not back that claim, `unsupported` when there is no manifest; the framework
+  paths are gateway-only previews (P1-54). An unsupported path or plan item stays listed with its
   key, and the stage completes only after an owner acknowledges it out of scope with a reason. A `tools` answer narrower
   than the signed scope is listed too (`NATIVE_TASKS_WHOLE_SCOPE`): a native session is granted the whole scope.
 - **Propose** records the plan: the typed graph with the agent's permissions, tasks by executor (`deterministic`,
@@ -218,6 +245,10 @@ framework through a scaffold, connect instructions and a trace import.
   (`POLICY_UNVERIFIED`), still surface as the session's start error after the step is recorded. Propose already leaves such checks out of the plan and lists them as
   unsupported (`NOT_IN_VALIDATION_CONFIG`, `VALIDATION_SCOPE_REQUIRED`), and builds the prompt from the capabilities with
   control characters removed, cut by code point.
+  With the `stub` provider and autonomy `act_with_approval`, the stub calls the first tool it is offered; when that
+  call needs approval, Studio's native task service cancels the turn at its 120-second turn limit unless the approvals
+  arrive first (the call can need two), so the session closes `cancelled` and Review still records it.
+  Decide the pending approval within two minutes, or build with autonomy `advise` (no tools).
 - **External path.** After Build and before Review, an owner can write the path's scaffold, the bridge contract tests
   and the agent's policy pack into a new workspace directory outside `.amc/` (the record binds a manifest of every
   file's sha256; the files are written after it commits), get connect instructions (the lease token is shown once and

@@ -7,7 +7,7 @@
  */
 import { A4_STEPS } from "../../contracts/v1/a4Project.js";
 import { MAX_PLAN_NODES, parseWorkflowPlan, planAgentCount, type WorkflowNode } from "../../workflow/workflowPlan.js";
-import { readinessItemBuilders, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState } from "../a4Readiness.js";
+import { proposeNextAction, readinessItemBuilders, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState } from "../a4Readiness.js";
 import type { A4Producer } from "../a4RouterStages.js";
 import { flatSlots, type A4Answer, type A4Question, type A4Step } from "../a4Schema.js";
 import { INTEGRATION_PATHS, integrationClaimFor } from "../assemblePaths.js";
@@ -185,7 +185,8 @@ function baselineItem(state: A4ReadinessState, spec: Record<string, unknown>): A
   const next = baseline.nextAction ?? null;
   return item("baseline_manifest", "BLOCKED", { kind: "scope_changed",
     reasonCodes: [baseline.state === "ACTIVE" ? "BASELINE_MOVED_AT_PROPOSE" : `BASELINE_${String(baseline.state)}`],
-    nextAction: { label: `${typeof next?.label === "string" ? next.label : "Review the agent's Enforce resources"}, then propose again`,
+    // Propose runs only at explained (A-3): a new baseline needs a new revision, so the way back starts at Ask.
+    nextAction: { label: `${typeof next?.label === "string" ? next.label : "Review the agent's Enforce resources"}, then answer again, then understand, confirm, explain and propose`,
       ...(typeof next?.command === "string" ? { command: next.command } : {}) } });
 }
 
@@ -330,7 +331,7 @@ export function assembleItems(state: A4ReadinessState, query: A4ReadinessQuery):
         ? waiting("understanding_confirmed", ["UNDERSTANDING_STALE"], { section: "recommendation", nextAction: { label: "Answers changed: run Understand again, then confirm it" } })
         : item("understanding_confirmed", "READY", { section: "recommendation" }),
     proposed ? item("plan_proposed", "READY", { section: "recommendation" })
-      : waiting("plan_proposed", [spec.schema === ASSEMBLE_SPEC_SCHEMA ? "PLAN_STALE" : "NOT_PROPOSED"], { section: "recommendation", nextAction: { label: "Propose the plan" } }),
+      : waiting("plan_proposed", [spec.schema === ASSEMBLE_SPEC_SCHEMA ? "PLAN_STALE" : "NOT_PROPOSED"], { section: "recommendation", nextAction: proposeNextAction(state, "assemble", "Propose the plan") }),
     proposed ? baselineItem(state, spec) : waiting("baseline_manifest", ["PRODUCED_AT_PROPOSE"]),
     claim === null ? waiting("path_supported", ["ANSWER_MISSING:path"], { section: "recommendation" })
       : claim.supported === "supported" ? item("path_supported", "READY", { section: "recommendation", reasonCodes: [`BOUNDARY:${claim.enforcementBoundary}`] })

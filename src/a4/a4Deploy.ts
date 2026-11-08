@@ -126,7 +126,7 @@ function helmSteps(input: DeployPlanInput): Step[] {
     { phase: "deploy", command: `helm${ns} upgrade --install amc deploy/helm/amc -f ${name} --atomic --wait`, note: "Restarts the hosted Studio." },
     { phase: "deploy", command: `kubectl${ns} set env deploy/amc-amc -c amc-studio AMC_A4_PREVIEW=1`,
       note: "A4_PREVIEW_NOT_SET_BY_CHART: the chart cannot set the A4 preview flag, so set it on the Studio container after each upgrade (this restarts it once more); without it A4 answers 404 and the receipt cannot be recorded." },
-    { phase: "verify", command: `helm${ns} history amc`, note: "The revision this upgrade made is the receipt's helmRevision." },
+    { phase: "verify", command: `helm${ns} history amc`, note: "The revision this upgrade made, an integer from helm history, is the receipt's helmRevision (it replaces the form's 0)." },
     { phase: "verify", command: `curl -fsS https://${input.destinationRef}/readyz`, note: "Reachability only; release identity is not evaluated at the destination (P2-40)." },
     { phase: "verify", command: `${exec} amc verify all --json`, note: "Integrity of the workspace records." },
     { phase: "verify", command: `sha256sum ${name}`, note: "The overlayDigest for the receipt." },
@@ -157,7 +157,7 @@ export function deploymentPlan(input: DeployPlanInput): { files: Array<{ path: s
     steps,
     receiptForm: { method: "POST", route: `/api/v1/a4/projects/${input.projectId}/releases/${input.releaseId}/deployments`, body: {
       kind: "deploy", environment: "staging", target: input.target, packageDigest: "<packageDigest from the release response>", imageDigest: null,
-      overlayDigest: "<sha256sum of the overlay you applied>", restartedAt: "<ISO 8601 time the Studio restarted>", helmRevision: helm ? "<revision from helm history>" : null,
+      overlayDigest: "<sha256sum of the overlay you applied>", restartedAt: "<ISO 8601 time the Studio restarted>", helmRevision: helm ? 0 : null,
       leaseIds: ["<the lease id from the release response>"], destinationRef: input.destinationRef, operatorStated: { status: "succeeded | failed | partial" },
       expectedHeadSeq: "<the project's head seq>", clientRequestId: "<8 to 128 letters, digits, _ or ->" } },
     gaps: [
