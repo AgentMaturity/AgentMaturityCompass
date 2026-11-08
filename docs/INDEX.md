@@ -60,6 +60,7 @@ Use this page to reach the shortest evidence-backed path for your task. AMC's pu
 - [Provider Configuration](PROVIDERS.md)
 - [SDK](SDK.md)
 - [Native Command Hooks](NATIVE_HOOKS.md)
+- [Declarative Config Layers And Provenance](DECLARATIVE_CONFIG.md)
 - [API Reference](API_REFERENCE.md)
 - [OpenAPI Surfaces](API_SURFACES.md)
 - [CI Templates](CI_TEMPLATES.md)

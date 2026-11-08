@@ -9,7 +9,7 @@ import { existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, resolve, join, dirname } from "node:path";
 import YAML from "yaml";
-import { resolveConfigOverlays, type ConfigOverlayOptions, type ConfigProvenance } from "./configOverlays.js";
+import { resolveConfigOverlays, type ConfigHistory, type ConfigOverlayOptions, type ConfigProvenance } from "./configOverlays.js";
 import {
   defaultDeclarativeConfig,
   type AMCDeclarativeConfig,
@@ -58,6 +58,8 @@ export interface LoadConfigResult {
   configPath: string;
   warnings: string[];
   provenance: ConfigProvenance;
+  /** Every value each leaf was given, in layer order (shadowed values included). */
+  history: ConfigHistory;
 }
 
 /**
@@ -100,7 +102,7 @@ export function loadDeclarativeConfig(
   } catch (error) {
     throw new Error(`Invalid amcconfig.yaml (${configPath}): ${error instanceof Error ? error.message : String(error)}`);
   }
-  const { config, provenance } = resolved;
+  const { config, provenance, history } = resolved;
 
   // Post-validation warnings
   if (config.agents.length === 0) {
@@ -129,7 +131,7 @@ export function loadDeclarativeConfig(
     }
   }
 
-  return { config, configPath, warnings, provenance };
+  return { config, configPath, warnings, provenance, history };
 }
 
 // ---------------------------------------------------------------------------
