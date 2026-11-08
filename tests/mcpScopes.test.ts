@@ -10,8 +10,9 @@ import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { discoverNativeMcpCatalog, nativeMcpToolName } from "../src/mcp/nativeMcpClient.js";
 import { registerAgentCommands } from "../src/cli-agent-commands.js";
+import { loadNativeMcpConfiguration } from "../src/setup/nativeMcpConfig.js";
 import {
-  assertPrivateFile, listScopedMcpConfigs, mergeScopedMcpSelection, removeScopedMcpConfig, resolveScopedMcpSelection, scopedMcpDirs, writeScopedMcpConfig
+  assertPrivateFile, listScopedMcpConfigs, mergeScopedMcpSelection, removeScopedMcpConfig, resolveScopedMcpSelection, scopedMcpDirs, scopedProjectSignatureValid, writeScopedMcpConfig
 } from "../src/mcp/mcpScopes.js";
 
 /** SH-EXT-02: user and project MCP config scopes, `amc mcp add|remove|list|get|sign`, and `--mcp <id>`. */
@@ -135,6 +136,13 @@ describe("real surfaces", () => {
       expect(mounted.failures, mounted.errors.join("\n")).toEqual([]);
       expect(JSON.parse(mounted.out.at(-1)!)).toMatchObject({ endings: [{ turn: 1 }] });
       expect(readFileSync(log, "utf8").split("\n").filter(Boolean)).toEqual(expect.arrayContaining(["initialize", "tools/list"]));
+      // S13: the signature is verified over the bytes that were parsed and pinned, never a second read of the path.
+      const signedBytes = readFileSync(path);
+      writeFileSync(path, signedBytes.toString("utf8").replace("5000", "5002"));
+      const swapped = loadNativeMcpConfiguration(path); // unsigned bytes, pinned
+      writeFileSync(path, signedBytes); // the path shows the signed bytes again while `swapped` is what would mount
+      expect(scopedProjectSignatureValid(workspace, swapped)).toBe(false);
+      expect(scopedProjectSignatureValid(workspace, loadNativeMcpConfiguration(path))).toBe(true);
       // A changed file loses its pin and its signature at once.
       writeFileSync(path, readFileSync(path, "utf8").replace("5000", "5001"));
       const changed = await run("--mcp", "fixture");

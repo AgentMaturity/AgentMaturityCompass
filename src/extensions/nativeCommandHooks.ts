@@ -7,7 +7,7 @@ import type { NativeExtensionHookFailure } from "./nativeExtensionHooks.js";
 import type { NativeExtensionHookEvent } from "./nativeExtensionHookSchema.js";
 import type { NativeHookRuntime } from "./nativeHookRuntime.js";
 import {
-  commandHookMatches, loadNativeCommandHooks, NATIVE_COMMAND_HOOK_LIMITS,
+  commandHookMatches, loadNativeCommandHooks, NATIVE_COMMAND_HOOK_LIMITS, resolveHookProgram, staleCommandHookReferences,
   type NativeCommandHookEvent, type NativeCommandHookHandler, type NativeCommandHookLoad
 } from "./nativeCommandHookConfig.js";
 
@@ -69,8 +69,11 @@ export interface NativeCommandHookRun {
 /** Run one handler with one input. Exported for `hooks test`; nothing else calls it directly. */
 export async function runNativeCommandHook(handler: NativeCommandHookHandler, input: Record<string, unknown>, workspace: string, signal?: AbortSignal): Promise<NativeCommandHookRun> {
   let outcome: ProcessOutcome;
+  let program: string;
+  try { program = resolveHookProgram(handler.argv[0]!, workspace); }
+  catch (error) { return { handler, decision: "deny", reason: error instanceof Error ? error.message : "hook program could not be resolved", exitCode: null, terminatedBy: null, stderr: "" }; }
   try {
-    const running = runProcess({ argv: handler.argv, cwd: workspace,
+    const running = runProcess({ argv: [program, ...handler.argv.slice(1)], cwd: workspace,
       env: { PATH: process.env.PATH ?? "", HOME: process.env.HOME ?? "", AMC_HOOK_EVENT: handler.event, AMC_WORKSPACE: workspace },
       stdin: "pipe", stdout: "capture", stderr: "capture", maxCaptureBytes: NATIVE_COMMAND_HOOK_LIMITS.outputBytes, scrubValues: [],
       graceMs: 500, timeoutMs: handler.timeoutMs, ...(signal === undefined ? {} : { signal }) });
@@ -120,15 +123,18 @@ export class NativeCommandHooks implements NativeHookRuntime {
     try { sessionId = this.context.sessionId(); } catch { /* a root toolset before its session is bound */ }
     return { sessionId, cwd: this.context.workspace };
   }
-  /** Not-trusted and invalid files fail closed on every deny-capable event. */
+  /** Not-trusted and invalid files, and a bound workspace script that changed since trust, fail closed on every deny-capable event. */
   private refusal(): string | undefined {
-    return this.load.status === "trusted" ? undefined : `${this.identity()}: ${this.load.reason}`;
+    if (this.load.status !== "trusted") return `${this.identity()}: ${this.load.reason}`;
+    const stale = staleCommandHookReferences(this.context.workspace, this.load);
+    return stale === undefined ? undefined : `${this.identity()}: ${stale}`;
   }
 
   async observe(event: NativeExtensionHookEvent, signal?: AbortSignal): Promise<readonly NativeExtensionHookFailure[]> {
     const mapped = EVENT_OF[event.kind];
     if (mapped === undefined) return [];
     if (this.load.status !== "trusted") return this.load.status === "untrusted" ? [this.report(event.kind, "HOOKS_UNTRUSTED")] : [this.report(event.kind, "HOOKS_INVALID")];
+    if (staleCommandHookReferences(this.context.workspace, this.load) !== undefined) return [this.report(event.kind, "HOOKS_UNTRUSTED")];
     const detail = mapped === "PostToolUse"
       ? { tool_name: event.toolName ?? null, tool_use_id: event.callId ?? null, turn: event.turn ?? null, step: event.step ?? null,
         tool_response: { ok: event.ok ?? null, output_sha256: event.outputSha256 ?? null, output_bytes: event.outputBytes ?? null } }

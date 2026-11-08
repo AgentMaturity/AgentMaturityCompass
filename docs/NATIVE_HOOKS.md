@@ -28,6 +28,10 @@ A hooks.json is workspace content that causes commands to run with your rights. 
 
 Until it is accepted, the file is not ignored: `PreToolUse` and `UserPromptSubmit` deny every call with the reason, `PostToolUse` and `Stop` record a `HOOKS_UNTRUSTED` report. A guard you configured must not switch itself off because someone edited the file.
 
+The acceptance binds more than the file. `["node", ".amc/hooks/check.js"]` runs the script, and the script is workspace content too, so the recorded mark is the file digest bound to the digest of every workspace file the argv names: the program when it sits inside the workspace, and any argument that names a regular workspace file. `hooks inspect` and `hooks trust` list them as `bound workspace file`. They are re-checked before every run; editing one makes the file untrusted again until you run `hooks trust` with the same `--sha256` (the file did not change; its bound scripts did). A symlink or a file over 4 MiB cannot be bound and makes the file invalid.
+
+Programs: an absolute path runs as written; a bare name (`node`, `python3`) is found in an absolute `PATH` entry, never in the working directory, on Windows too; a bare name that lands inside the workspace is refused, because the environment rather than the accepted file chose the code. A relative program path (`./scripts/hook.sh`, `scripts/hook.sh`) is refused at load.
+
 ```text
 amc native-extension hooks inspect            # path, sha256, trust state, resolved handlers; runs nothing
 amc native-extension hooks trust --sha256 …   # accept these exact bytes on this machine

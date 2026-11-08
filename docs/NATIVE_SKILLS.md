@@ -36,7 +36,7 @@ Frontmatter is YAML (block lists work) with Claude Code's field names:
 | `user-invocable: false` | model only (`skill.load`); `/name` is refused with the reason |
 | `argument-hint` | shown by `--list-skills` |
 | `arguments: [a, b]` | declared names, fed positionally, for `$a`, `$b` |
-| `disallowed-tools: [fs.write, bash]` | the run's registry is narrowed before the turn; a name that is not registered REFUSES the run rather than restricting nothing. In an ACP session the narrowing lasts for the rest of the session. |
+| `disallowed-tools: [fs.write, bash]` | the run's registry is narrowed before the turn; a name that is not registered REFUSES the run rather than restricting nothing. In an ACP session the narrowing lasts for the rest of the session. `delegate` and `workflow` are withheld with it when present: a delegated child composes its own toolset without the skill and would hand the denied tool back. |
 | `allowed-tools`, `model`, `effort`, `when_to_use` | parsed and reported only. Workspace text cannot widen a signed tool policy or choose a route. |
 
 A list field that cannot be read is a reported problem, never an empty list.

@@ -4,6 +4,7 @@ import { buildSkillCatalog, resolveSkillCommand, type Skill } from "./skillCatal
 import { skillContextPlugin } from "./skillPrompt.js";
 import { renderSkillBody, SkillArgumentError } from "./skillArguments.js";
 import type { ContextPlugin } from "../prompt/context/contextTypes.js";
+import { NATIVE_DELEGATION_CAPABILITIES } from "../agent/nativeToolCapabilities.js";
 
 /**
  * Turn a `/name` into a composed turn (plan P6.2).
@@ -79,6 +80,9 @@ export type PreparedSkillTurn =
  * Narrow a turn's registry by the loaded skill's `disallowed-tools` (SH-EXT-05). A name that is not registered is an
  * ERROR, not a no-op: a restriction that silently restricts nothing is worse than none. `allowed-tools` is never
  * applied; workspace text cannot widen a signed policy.
+ *
+ * Delegation is withheld with it (S8): a delegated child composes its own toolset without the skill, so `delegate` or
+ * `workflow` would hand the model the denied tool back. ponytail: an inherited deny set in subagentRunner (D23) lifts this.
  */
 export function applySkillToolRestriction(registry: { visible(scope?: string): ReadonlyMap<string, unknown>; restrict(restriction: { readonly deny?: ReadonlySet<string> }): unknown },
   turn: PreparedSkillTurn, agentId: string): string | undefined {
@@ -86,7 +90,9 @@ export function applySkillToolRestriction(registry: { visible(scope?: string): R
   const known = registry.visible(agentId);
   const unknown = turn.disallowedTools.filter(name => !known.has(name));
   if (unknown.length > 0) return `skill "${turn.loaded?.name}" disallows tools that are not registered for this run: ${unknown.join(", ")}; fix the frontmatter or run without the skill`;
-  registry.restrict({ deny: new Set(turn.disallowedTools) });
+  const deny = new Set(turn.disallowedTools);
+  for (const capability of NATIVE_DELEGATION_CAPABILITIES) if (known.has(capability.name)) deny.add(capability.name);
+  registry.restrict({ deny });
   return undefined;
 }
 

@@ -125,7 +125,8 @@ describe("disallowed-tools", () => {
     const turn = prepareSkillTurn({ workspace: root, prompt: "/readonly go" });
     expect(turn.ok && turn.disallowedTools).toEqual(["fs.write"]);
     const registry = new ToolRegistry();
-    for (const name of ["fs.read", "fs.write"]) registry.define(defineTool({ name, description: name, actionClass: "READ_ONLY", parameters: { type: "object" }, body: () => ({ ok: true, output: "" }) }));
+    // S8: a delegated child would compose its own toolset without the skill, so delegation is withheld with the denied tool.
+    for (const name of ["fs.read", "fs.write", "delegate", "workflow"]) registry.define(defineTool({ name, description: name, actionClass: "READ_ONLY", parameters: { type: "object" }, body: () => ({ ok: true, output: "" }) }));
     expect(applySkillToolRestriction(registry, turn, "default")).toBeUndefined();
     expect([...registry.visible("default").keys()]).toEqual(["fs.read"]);
     skillDir(root, "typo", "name: typo\ndescription: x\ndisallowed-tools: [Write]", "Body.");

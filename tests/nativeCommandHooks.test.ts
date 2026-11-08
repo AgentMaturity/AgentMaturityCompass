@@ -1,6 +1,6 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { delimiter, join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { Command } from "commander";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -65,6 +65,9 @@ describe("hooks.json parsing and matchers", () => {
     expect(() => parseNativeCommandHooks(hooksFile({ BeforeModel: [{ hooks: [{ type: "command", command: "x" }] }] }))).toThrow(/not a valid hooks file/);
     expect(() => parseNativeCommandHooks(hooksFile({ PreToolUse: [{ hooks: [{ type: "http", url: "https://x" }] }] }))).toThrow(/not a valid hooks file/);
     expect(() => parseNativeCommandHooks("{")).toThrow(/not valid JSON/);
+    // S6: a relative program would be found against the working directory; an absolute path or a bare PATH name only.
+    expect(() => parseNativeCommandHooks(hooksFile({ Stop: [{ hooks: [{ type: "command", command: "./scripts/hook.sh" }] }] }))).toThrow(/relative path/);
+    expect(() => parseNativeCommandHooks(hooksFile({ Stop: [{ hooks: [{ type: "command", command: ["scripts/hook.sh"] }] }] }))).toThrow(/relative path/);
   });
   it.each([["", "fs.write", true], ["*", "bash", true], ["fs.write", "fs.write", true], ["fs.write", "fsXwrite", false], ["fs.write", "fs.writer", false],
     ["Write|fs.write", "fs.write", true], ["mcp_github_*", "mcp_github_ab12", true], ["mcp_github_*", "mcp_gitlab_ab12", false]])("matcher %j against %s", (matcher, tool, expected) => {
@@ -86,7 +89,42 @@ describe("trust on this machine", () => {
     install(root, { Stop: [{ hooks: [{ type: "command", command: "false" }] }] }, false);
     const changed = loadNativeCommandHooks(root);
     expect(changed.status).toBe("untrusted");
-    expect(changed.status === "untrusted" && changed.reason).toContain(`changed since this machine trusted sha256 ${sha256}`);
+    expect(changed.status === "untrusted" && changed.reason).toContain("changed since this machine trusted it");
+  });
+  it("binds the workspace scripts a hook names: an edited script is refused until the file is trusted again (S6)", async () => {
+    const root = workspace();
+    mkdirSync(join(root, ".amc", "hooks"), { recursive: true });
+    const script = join(root, ".amc", "hooks", "check.js");
+    writeFileSync(script, "process.exit(0)");
+    const sha256 = install(root, { PreToolUse: [{ hooks: [{ type: "command", command: [process.execPath, ".amc/hooks/check.js"] }] }] }, false);
+    expect(trustNativeCommandHooks(root, sha256).references).toEqual([{ rel: ".amc/hooks/check.js", sha256: sha256Hex(Buffer.from("process.exit(0)")) }]);
+    const hooks = runtime(root);
+    const first = execution("fs.write");
+    await hooks.prepare(first);
+    expect(hooks.guard(first)).toBeUndefined();
+    writeFileSync(script, "process.exit(0) // edited after trust");
+    const second = execution("fs.write");
+    await hooks.prepare(second); // the same runtime instance re-checks the bound files before every run
+    expect(hooks.guard(second)).toContain("changed since this machine trusted it");
+    expect(await hooks.observe({ kind: "turn-end", turn: 1 })).toMatchObject([{ code: "HOOKS_UNTRUSTED" }]);
+    expect(loadNativeCommandHooks(root)).toMatchObject({ status: "untrusted", sha256 });
+    expect(trustNativeCommandHooks(root, sha256).references[0]?.sha256).toBe(sha256Hex(Buffer.from("process.exit(0) // edited after trust")));
+    expect(loadNativeCommandHooks(root).status).toBe("trusted");
+  });
+  it("finds a bare program on PATH only, and refuses one that resolves inside the workspace (S6)", async () => {
+    const root = workspace();
+    writeFileSync(join(root, "hookprog"), "#!/bin/sh\nexit 0\n"); chmodSync(join(root, "hookprog"), 0o755);
+    install(root, { PreToolUse: [{ hooks: [{ type: "command", command: "hookprog" }] }], Stop: [{ hooks: [{ type: "command", command: "amc-no-such-program-xyz" }] }] });
+    vi.stubEnv("PATH", `${root}${delimiter}.${delimiter}${process.env.PATH ?? ""}`);
+    const hooks = runtime(root);
+    const call = execution("fs.write");
+    await hooks.prepare(call);
+    expect(hooks.guard(call)).toContain("resolves inside the workspace");
+    expect(await hooks.observe({ kind: "turn-end", turn: 1 })).toMatchObject([{ code: "HOOK_SPAWN_FAILED" }]);
+    vi.stubEnv("PATH", `${root}${delimiter}`);
+    const unfound = execution("fs.write");
+    await hooks.prepare(unfound);
+    expect(hooks.guard(unfound)).toContain("resolves inside the workspace");
   });
   it("never trusts bytes that do not parse", () => {
     const root = workspace();

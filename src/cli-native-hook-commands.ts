@@ -43,6 +43,7 @@ export function registerNativeHookCommands(extension: Command): void {
         const view = inspection(process.cwd());
         if (opts.json) { console.log(JSON.stringify(view, null, 2)); return; }
         console.log(`Hooks file: ${view.path}\nStatus: ${view.status}${"sha256" in view && view.sha256 ? `\nsha256: ${view.sha256}` : ""}${"reason" in view ? `\n${view.reason}` : ""}`);
+        for (const reference of "references" in view ? view.references : []) console.log(`bound workspace file: ${reference.rel} sha256=${reference.sha256}`);
         for (const handler of view.handlers) {
           const warn = handler.denyCapable && handler.matchesBuiltinTools !== null && handler.matchesBuiltinTools.length === 0 ? " (matches no built-in tool; only an MCP tool of that name would be guarded)" : "";
           console.log(`${handler.event} #${handler.index} matcher=${handler.matcher} ${handler.emitted ? "" : "[not emitted by this build] "}timeout=${handler.timeoutMs}ms: ${handler.argv.join(" ")}${warn}`);
@@ -58,7 +59,7 @@ export function registerNativeHookCommands(extension: Command): void {
       try {
         const result = trustNativeCommandHooks(process.cwd(), opts.sha256);
         if (opts.json) console.log(JSON.stringify({ ok: true, ...result }, null, 2));
-        else console.log(`Trusted ${result.path} (sha256 ${result.sha256}, ${result.handlers} handlers) on this machine.`);
+        else console.log(`Trusted ${result.path} (sha256 ${result.sha256}, ${result.handlers} handlers${result.references.length === 0 ? "" : `, bound to ${result.references.map(reference => reference.rel).join(", ")}`}) on this machine.`);
       } catch (error) { fail(error, opts.json === true); }
     });
   hooks.command("test <event>")

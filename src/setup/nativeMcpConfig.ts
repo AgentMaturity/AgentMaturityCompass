@@ -75,6 +75,10 @@ function onlyKeys(value: Record<string, unknown>, allowed: readonly string[]): b
 }
 
 const configurationBytes = new WeakMap<LoadedNativeMcpConfiguration, Buffer>();
+/** The exact bytes a loaded configuration was parsed and pinned from, so a signature check never re-reads the path (TOCTOU). */
+export function nativeMcpConfigurationBytes(loaded: LoadedNativeMcpConfiguration): Buffer | undefined {
+  return configurationBytes.get(loaded);
+}
 const CONFIGURATION_BYTES = 256 * 1024;
 
 /** A growing file stays bounded; a FIFO cannot block operator-config admission. */

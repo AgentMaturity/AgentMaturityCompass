@@ -81,7 +81,7 @@ amc agent-loop run --mcp github --tools workspace --approve-tools READ_ONLY "…
 Rules, each one deliberate:
 
 - No merge and no silent shadowing. An id present in both scopes is refused until you write `--mcp project:<id>` or `--mcp user:<id>`; `amc mcp add` refuses to create such a collision without `--force`. A cloned repository cannot replace your server of the same id.
-- A project file must carry a valid `<file>.sig` BUNDLE signature (`amc mcp sign`), verified against the workspace keyset, which is adopted on first use like every other workspace signature; a changed file loses both its pin and its signature. A user file must be your own private file: owned by you, not group- or world-writable, in a directory with the same properties.
+- A project file must carry a valid `<file>.sig` BUNDLE signature (`amc mcp sign`), verified over the exact bytes that were parsed and pinned (never a second read of the path) against the workspace keyset, which is adopted on first use like every other workspace signature; a changed file loses both its pin and its signature. A user file must be your own private file: owned by you, not group- or world-writable, in a directory with the same properties.
 - `server.id` must equal the file name. Ids are 1 to 32 of `[A-Za-z0-9_-]`; on a case-insensitive filesystem choose ids that differ in more than case.
 - No `${VAR}` expansion: `envRefs` and `headerRefs` already keep credential values out of the file.
 - `amc mcp add` writes an unreviewed file and prints the review steps. `mountable` in `amc mcp list` means reviewed and (for the project scope) signed; the allowlist is checked at mount, not here. `amc mcp list` shows an OAuth server's `auth.kind` and scopes from the file, not token state.

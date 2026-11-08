@@ -2,7 +2,7 @@ import { closeSync, constants, existsSync, fstatSync, lstatSync, openSync, readd
 import { basename, dirname, join, resolve } from "node:path";
 import { resolveAmcHome } from "../credentials/credentialsPaths.js";
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
-import { loadNativeMcpConfiguration, NativeMcpConfigError, type LoadedNativeMcpConfiguration, type NativeMcpConfiguration } from "../setup/nativeMcpConfig.js";
+import { loadNativeMcpConfiguration, nativeMcpConfigurationBytes, NativeMcpConfigError, type LoadedNativeMcpConfiguration, type NativeMcpConfiguration } from "../setup/nativeMcpConfig.js";
 import { sha256Hex } from "../utils/hash.js";
 import { writeFileAtomic } from "../utils/fs.js";
 
@@ -63,10 +63,15 @@ export function assertPrivateFile(path: string, uid: number | undefined = typeof
   } finally { closeSync(fd); }
 }
 
-function projectSignatureValid(workspace: string, loaded: LoadedNativeMcpConfiguration): boolean {
+/**
+ * The project signature is verified over the bytes `loaded` was parsed and pinned from, never a second read of the
+ * path: a file swapped between the two reads would otherwise get a valid verdict for bytes other than the ones that mount.
+ */
+export function scopedProjectSignatureValid(workspace: string, loaded: LoadedNativeMcpConfiguration): boolean {
   const sidecar = `${loaded.path}.sig`;
-  if (!existsSync(sidecar)) return false;
-  try { return verifyAuditorSignatureBytes(workspace, "BUNDLE", readFileSync(loaded.path), readFileSync(sidecar)).valid; }
+  const bytes = nativeMcpConfigurationBytes(loaded);
+  if (bytes === undefined || sha256Hex(bytes) !== loaded.sha256 || !existsSync(sidecar)) return false;
+  try { return verifyAuditorSignatureBytes(workspace, "BUNDLE", bytes, readFileSync(sidecar)).valid; }
   catch { return false; }
 }
 
@@ -77,7 +82,7 @@ function describe(workspace: string, scope: McpScope, path: string, uid?: number
   if (loaded.config.server.id !== id) refuse(`${path} declares server id ${JSON.stringify(loaded.config.server.id)}; a scoped file must be named exactly <id>.json`);
   return { id, scope, path, sha256: loaded.sha256, transport: loaded.config.server.transport ?? "stdio",
     reviewed: typeof loaded.config.expectedCatalogDigest === "string" && (loaded.config.grants?.length ?? 0) > 0,
-    signatureValid: scope === "project" ? projectSignatureValid(workspace, loaded) : null, config: loaded.config };
+    signatureValid: scope === "project" ? scopedProjectSignatureValid(workspace, loaded) : null, config: loaded.config };
 }
 
 /** Every `<id>.json` in both scopes; a file that cannot be admitted is a problem, never a silent omission. */
