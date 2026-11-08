@@ -158,7 +158,9 @@ before any packet is signed.
 - **Bounds.** Each continuation is one more executor turn: `max-turns:N` counts
   it, and when the ceiling is reached the delegate reports and is released.
   `timeout-ms:N` covers the whole lifetime, idle time included. A kept-open
-  delegate holds its `--max-active-children` slot until it is released.
+  delegate holds its `--max-active-children` slot until it is released, so
+  while it is open a `delegate` call or `workflow` node over the cap is
+  refused at admission rather than queued.
 - **Lifetime.** A kept-open delegate lives no longer than its caller's toolset:
   at the end of the run (an `agent-loop run`, or one native chat message), and
   when a delegated caller is released, every delegate it kept open is released
