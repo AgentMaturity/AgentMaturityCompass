@@ -6,6 +6,7 @@ import { sha256Hex } from "../utils/hash.js";
 import type { NativeExtensionHookFailure } from "./nativeExtensionHooks.js";
 import type { NativeExtensionHookEvent } from "./nativeExtensionHookSchema.js";
 import type { NativeHookRuntime } from "./nativeHookRuntime.js";
+import { hookChildPath } from "./nativeCommandHookArgv.js";
 import {
   commandHookMatches, loadNativeCommandHooks, NATIVE_COMMAND_HOOK_LIMITS, resolveHookProgram, staleCommandHookReferences,
   type NativeCommandHookEvent, type NativeCommandHookHandler, type NativeCommandHookLoad
@@ -81,7 +82,7 @@ export async function runNativeCommandHook(handler: NativeCommandHookHandler, in
   catch (error) { return { handler, decision: "deny", reason: error instanceof Error ? error.message : "hook program could not be resolved", exitCode: null, terminatedBy: null, stderr: "" }; }
   try {
     const running = runProcess({ argv: [program, ...handler.argv.slice(1)], cwd: workspace,
-      env: { PATH: process.env.PATH ?? "", HOME: process.env.HOME ?? "", AMC_HOOK_EVENT: handler.event, AMC_WORKSPACE: workspace },
+      env: { PATH: hookChildPath(workspace, process.env.PATH), HOME: process.env.HOME ?? "", AMC_HOOK_EVENT: handler.event, AMC_WORKSPACE: workspace },
       stdin: "pipe", stdout: "capture", stderr: "capture", maxCaptureBytes: NATIVE_COMMAND_HOOK_LIMITS.outputBytes, scrubValues: [],
       graceMs: 500, timeoutMs: handler.timeoutMs, ...(signal === undefined ? {} : { signal }) });
     try { await running.write(Buffer.from(JSON.stringify(input), "utf8")); } catch { /* a child that exited first still answers through its exit code */ }

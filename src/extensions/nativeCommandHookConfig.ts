@@ -1,9 +1,10 @@
-import { lstatSync, realpathSync, statSync } from "node:fs";
-import { basename, delimiter, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { lstatSync, statSync } from "node:fs";
+import { delimiter, isAbsolute, join, resolve } from "node:path";
 import { z } from "zod";
 import { listContainedDir, readContainedOrNull } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { highWaterKey, readHighWater, recordHighWater, workspaceScope, type HighWaterOptions } from "../keys/highWater.js";
+import { argvPathCandidates, canonicalPath, hookArgvRefusal, isBareProgram, workspaceLocation } from "./nativeCommandHookArgv.js";
 
 /**
  * Operator command hooks for the native loop (SH-EXT-01): `<workspace>/.amc/hooks.json`.
@@ -98,30 +99,6 @@ export interface NativeCommandHookHandler {
   readonly index: number;
 }
 
-/** Flags through which an interpreter loads code that is not a bound file; `--flag=value` forms are matched by prefix. */
-const CODE_LOADING_FLAGS: Record<string, readonly string[]> = {
-  node: ["-e", "--eval", "-p", "--print", "-r", "--require", "--import", "--loader", "--experimental-loader", "-i", "--interactive"],
-  python: ["-c", "-m"], bash: ["-c"], sh: ["-c"], zsh: ["-c"], dash: ["-c"], ruby: ["-e", "-r"], perl: ["-e", "-E", "-M", "-m"]
-};
-const INTERPRETER = /^(node|python|bash|sh|zsh|dash|ruby|perl)[\d.]*(?:\.exe)?$/i;
-/** Process-relative and descriptor paths name whatever the process has open, never a reviewable file. */
-const PROCESS_RELATIVE = /^\/(proc\/|dev\/fd\/)/;
-
-function checkArgv(event: NativeCommandHookEvent, argv: readonly string[]): void {
-  const program = argv[0]!;
-  if (!isAbsolute(program) && /[\\/]/.test(program)) {
-    throw new NativeCommandHookError("HOOKS_INVALID", `A ${event} hook names its program by a relative path (${program}); use an absolute path, or a bare name found on PATH.`);
-  }
-  const offending = argv.find(item => PROCESS_RELATIVE.test(item));
-  if (offending !== undefined) throw new NativeCommandHookError("HOOKS_INVALID", `A ${event} hook names ${offending}; /proc and /dev/fd paths name whatever the process has open, not a reviewable file.`);
-  const interpreter = INTERPRETER.exec(basename(program).toLowerCase())?.[1];
-  const flags = interpreter === undefined ? [] : CODE_LOADING_FLAGS[interpreter] ?? [];
-  const flag = argv.slice(1).find(item => flags.some(known => item === known || (known.startsWith("--") && item.startsWith(`${known}=`))));
-  if (flag !== undefined) {
-    throw new NativeCommandHookError("HOOKS_INVALID", `A ${event} hook passes ${flag} to ${basename(program)}, which loads code trust cannot bind; put the code in a file under ${NATIVE_COMMAND_HOOKS_DIR}/ and name that file.`);
-  }
-}
-
 export function parseNativeCommandHooks(text: string): readonly NativeCommandHookHandler[] {
   let value: unknown;
   try { value = JSON.parse(text); } catch { throw new NativeCommandHookError("HOOKS_INVALID", "hooks.json is not valid JSON."); }
@@ -136,7 +113,8 @@ export function parseNativeCommandHooks(text: string): readonly NativeCommandHoo
       for (const handler of group.hooks) {
         const argv = typeof handler.command === "string" ? handler.command.split(/\s+/).filter(part => part.length > 0) : [...handler.command];
         if (argv.length === 0 || argv.length > NATIVE_COMMAND_HOOK_LIMITS.argv) throw new NativeCommandHookError("HOOKS_INVALID", `A ${event} hook has an empty or oversized command.`);
-        checkArgv(event, argv);
+        const refused = hookArgvRefusal(event, argv, NATIVE_COMMAND_HOOKS_DIR);
+        if (refused !== undefined) throw new NativeCommandHookError("HOOKS_INVALID", refused);
         handlers.push(Object.freeze({ event, matcher, argv: Object.freeze(argv), index: ++index,
           timeoutMs: (handler.timeout ?? NATIVE_COMMAND_HOOK_LIMITS.defaultTimeoutMs / 1000) * 1000,
           acceptTruncatedInput: handler.acceptTruncatedInput === true }));
@@ -150,38 +128,26 @@ export function parseNativeCommandHooks(text: string): readonly NativeCommandHoo
 /** A file under .amc/hooks/, bound into the trust mark. `rel` is POSIX-separated, relative to the workspace. */
 export interface NativeCommandHookReference { readonly rel: string; readonly sha256: string }
 
-/** The path as the filesystem knows it: symlinks followed and case as stored; a missing leaf is joined to its canonical parent. */
-function canonical(path: string): string {
-  try { return realpathSync.native(path); }
-  catch {
-    const parent = dirname(path);
-    return parent === path ? path : join(canonical(parent), basename(path));
-  }
-}
-
-/** `item` as a path inside `root`, by canonical location, or null when it is elsewhere or escapes the root. */
-function workspaceRelative(root: string, item: string): string | null {
-  const rel = relative(canonical(root), canonical(resolve(root, item)));
-  if (rel === "" || rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel)) return null;
-  return rel.split(sep).join("/");
-}
-
-/** Every workspace path a handler's argv names must be a regular file under .amc/hooks/; anything else cannot be bound. */
+/**
+ * Every workspace path a handler's argv may name (nativeCommandHookArgv.ts lists the candidates) must be a regular file
+ * under .amc/hooks/. The workspace itself and any directory in it are refused: code may be loaded from them that trust
+ * cannot bind (`node .` runs the workspace's package entry point).
+ */
 function checkWorkspaceReferences(root: string, handlers: readonly NativeCommandHookHandler[]): void {
   for (const handler of handlers) {
-    for (const item of handler.argv) {
-      const flagValue = /^--?[A-Za-z][\w-]*=(.+)$/.exec(item)?.[1];
-      for (const candidate of flagValue === undefined ? [item] : [item, flagValue]) {
-        const rel = workspaceRelative(root, candidate);
-        if (rel === null) continue;
-        const stat = lstatSync(join(canonical(root), ...rel.split("/")), { throwIfNoEntry: false });
-        if (stat === undefined) continue; // a flag or a value that names no file
-        const where = `A ${handler.event} hook names ${candidate}, which is ${rel} inside the workspace`;
-        if (stat.isDirectory()) throw new NativeCommandHookError("HOOKS_INVALID", `${where}: a directory; code may be loaded from it that trust cannot bind. Name a single file under ${NATIVE_COMMAND_HOOKS_DIR}/.`);
-        if (!stat.isFile()) throw new NativeCommandHookError("HOOKS_INVALID", `${where}: not a regular file, so its digest cannot be bound.`);
-        if (!rel.startsWith(`${NATIVE_COMMAND_HOOKS_DIR}/`)) {
-          throw new NativeCommandHookError("HOOKS_INVALID", `${where}: outside ${NATIVE_COMMAND_HOOKS_DIR}/. Hook scripts must live under ${NATIVE_COMMAND_HOOKS_DIR}/, which trust binds whole and agent tools cannot write.`);
-        }
+    for (const candidate of argvPathCandidates(handler.argv)) {
+      if (isBareProgram(handler.argv, candidate)) continue;
+      const rel = workspaceLocation(root, candidate);
+      if (rel === null) continue;
+      const where = `A ${handler.event} hook names ${candidate}, which is ${rel === "" ? "the workspace itself" : `${rel} inside the workspace`}`;
+      let stat: ReturnType<typeof lstatSync>;
+      // A value that names no file (absent, `a.txt/b`, over-long) is no file the hook can load as this user either.
+      try { stat = lstatSync(join(canonicalPath(root), ...rel.split("/").filter(part => part.length > 0)), { throwIfNoEntry: false }); } catch { stat = undefined; }
+      if (stat === undefined) continue;
+      if (stat.isDirectory()) throw new NativeCommandHookError("HOOKS_INVALID", `${where}: a directory; code may be loaded from it that trust cannot bind. Name a single file under ${NATIVE_COMMAND_HOOKS_DIR}/ (the workspace path is in the hook input's cwd and AMC_WORKSPACE).`);
+      if (!stat.isFile()) throw new NativeCommandHookError("HOOKS_INVALID", `${where}: not a regular file, so its digest cannot be bound.`);
+      if (!rel.startsWith(`${NATIVE_COMMAND_HOOKS_DIR}/`)) {
+        throw new NativeCommandHookError("HOOKS_INVALID", `${where}: outside ${NATIVE_COMMAND_HOOKS_DIR}/. Hook scripts must live under ${NATIVE_COMMAND_HOOKS_DIR}/, which trust binds whole and agent tools cannot write.`);
       }
     }
   }
@@ -232,7 +198,7 @@ export function resolveHookProgram(program: string, workspace: string, env: Node
       const candidate = join(dir, program + extension);
       const stat = statSync(candidate, { throwIfNoEntry: false });
       if (stat === undefined || !stat.isFile()) continue;
-      if (workspaceRelative(resolve(workspace), candidate) !== null) {
+      if (workspaceLocation(resolve(workspace), candidate) !== null) {
         throw new NativeCommandHookError("HOOK_PROGRAM_IN_WORKSPACE", `hook program ${program} resolves inside the workspace (${candidate}); name it by absolute path under ${NATIVE_COMMAND_HOOKS_DIR}/ so trust binds its digest`);
       }
       return candidate;

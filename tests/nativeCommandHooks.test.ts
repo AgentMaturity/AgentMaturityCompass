@@ -20,6 +20,7 @@ import {
 } from "../src/extensions/nativeCommandHookConfig.js";
 import { denyPromptByCommandHooks, NativeCommandHooks } from "../src/extensions/nativeCommandHooks.js";
 import { workspaceNativeHooks } from "../src/extensions/nativeHookRuntime.js";
+import { hookChildPath } from "../src/extensions/nativeCommandHookArgv.js";
 
 /**
  * SH-EXT-01: operator command hooks (.amc/hooks.json) on every platform. Hook processes are small node scripts written
@@ -87,6 +88,21 @@ describe("hooks.json parsing and matchers", () => {
     expect(() => parseNativeCommandHooks(hooksFile({ Stop: [{ hooks: [{ type: "command", command: ["/bin/sh", "/proc/self/cwd/hook.sh"] }] }] }))).toThrow(/\/proc and \/dev\/fd/);
     expect(() => parseNativeCommandHooks(hooksFile({ Stop: [{ hooks: [{ type: "command", command: ["/dev/fd/3"] }] }] }))).toThrow(/\/proc and \/dev\/fd/);
     expect(parseNativeCommandHooks(hooksFile({ Stop: [{ hooks: [{ type: "command", command: ["/usr/bin/some-tool", "-e", "--require"] }] }] }))).toHaveLength(1); // not an interpreter
+    // The same flags reached through a wrapper, a short-flag cluster, an attached value or a split string, and the
+    // interpreter's other ways to run code it was not given as a file.
+    for (const argv of [["/usr/bin/env", "node", "-e", "require('./x')"], ["/usr/bin/env", "-S", "node -e 1"], ["nice", "python3", "-c", "1"], ["sudo", "-u", "bob", "ruby", "-rjson", "a.rb"],
+      ["node", "-pe", "1"], ["python3", "-Bc", "1"], ["bash", "-xc", "ls"], ["python3", "-W", "ignore", "-c", "1"], ["perl", "-I./lib", "a.pl"], ["pwsh", "-Com", "x"], ["cmd", "/c", "x"], ["deno", "eval", "1"]]) {
+      expect(() => parseNativeCommandHooks(hooksFile({ Stop: [{ hooks: [{ type: "command", command: argv }] }] })), argv.join(" ")).toThrow(/loads code trust cannot bind/);
+    }
+    for (const argv of [["python3"], ["node", "-"], ["/usr/bin/env", "bash", "-e"]]) {
+      expect(() => parseNativeCommandHooks(hooksFile({ Stop: [{ hooks: [{ type: "command", command: argv }] }] })), argv.join(" ")).toThrow(/read its program from stdin/);
+    }
+    expect(() => parseNativeCommandHooks(hooksFile({ Stop: [{ hooks: [{ type: "command", command: ["/bin/sh", "/dev/stdin"] }] }] }))).toThrow(/\/proc and \/dev\/fd/);
+    // Options after the script are the script's own; a value the interpreter consumes is not the script.
+    for (const argv of [["node", "/opt/hooks/check.js", "-e", "x"], ["python3", "-W", "ignore", "/opt/hooks/h.py"], ["/bin/sh", "-e", "/opt/hooks/h.sh"], ["/usr/bin/env", "node", "/opt/hooks/check.js"],
+      ["pwsh", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "/opt/hooks/h.ps1"], ["deno", "run", "--allow-read", "/opt/hooks/h.ts"], ["/usr/bin/jq", "-e", ".tool_name"]]) {
+      expect(parseNativeCommandHooks(hooksFile({ Stop: [{ hooks: [{ type: "command", command: argv }] }] })), argv.join(" ")).toHaveLength(1);
+    }
   });
   it.each([["", "fs.write", true], ["*", "bash", true], ["fs.write", "fs.write", true], ["fs.write", "fsXwrite", false], ["fs.write", "fs.writer", false],
     ["Write|fs.write", "fs.write", true], ["mcp_github_*", "mcp_github_ab12", true], ["mcp_github_*", "mcp_gitlab_ab12", false]])("matcher %j against %s", (matcher, tool, expected) => {
@@ -157,9 +173,28 @@ describe("trust on this machine", () => {
     invalid([process.execPath, ".amc/hooks/check.js", "--config=scripts/policy.json"], /scripts\/policy\.json inside the workspace: outside/);
     // An alias path (a symlinked ancestor, like macOS /var for /private/var) is the same file: refused, not treated as outside.
     invalid([process.execPath, join(alias, "ws", "scripts", "guard.js")], /outside \.amc\/hooks\//);
+    // The workspace itself (`node .` runs its package entry point), environment assignments and attached values.
+    invalid([process.execPath, "."], /the workspace itself: a directory/);
+    invalid([process.execPath, root], /the workspace itself: a directory/);
+    invalid(["/usr/bin/env", "PYTHONPATH=./scripts", "python3", ".amc/hooks/check.js"], /scripts inside the workspace: a directory/);
+    invalid(["/usr/bin/env", "NODE_OPTIONS=--require=./scripts/guard.js", process.execPath, ".amc/hooks/check.js"], /scripts\/guard\.js inside the workspace: outside/);
+    invalid(["/usr/local/bin/some-tool", "-c./scripts/policy.json"], /scripts\/policy\.json inside the workspace: outside/);
     // The same alias naming a file under .amc/hooks/ is admitted and bound.
     install(root, { PreToolUse: [{ hooks: [{ type: "command", command: [process.execPath, join(alias, "ws", ".amc", "hooks", "check.js")] }] }] });
     expect(loadNativeCommandHooks(root)).toMatchObject({ status: "trusted", references: [{ rel: ".amc/hooks/check.js" }, { rel: ".amc/hooks/dirmod/index.js" }] });
+  });
+  it("gives the hook process a PATH without relative entries or entries inside the workspace, so its own bare commands never resolve there (S6)", async () => {
+    const root = workspace();
+    mkdirSync(join(root, "bin")); const marker = join(root, "ran-workspace-binary");
+    writeFileSync(join(root, "bin", "wsonly"), `#!/bin/sh\necho > "${marker}"\n`); chmodSync(join(root, "bin", "wsonly"), 0o755);
+    const alias = realpathSync(mkdtempSync(join(tmpdir(), "amc-hooks-childpath-"))); directories.push(alias);
+    symlinkSync(join(root, "bin"), join(alias, "linkbin"), "dir");
+    expect(hookChildPath(root, [join(root, "bin"), "bin", ".", join(alias, "linkbin"), "/usr/bin", "/bin"].join(delimiter))).toBe(["/usr/bin", "/bin"].join(delimiter));
+    const script = join(scripts, `child-path-${++scriptCount}.sh`); writeFileSync(script, "wsonly; exit 0\n");
+    install(root, { Stop: [{ hooks: [{ type: "command", command: ["/bin/sh", script] }] }] });
+    vi.stubEnv("PATH", [join(root, "bin"), join(alias, "linkbin"), "/usr/bin", "/bin"].join(delimiter));
+    expect(await runtime(root).observe({ kind: "turn-end", turn: 1 })).toEqual([]);
+    expect(existsSync(marker)).toBe(false);
   });
   it("finds a bare program on PATH only, and refuses one whose canonical location is inside the workspace (S6)", async () => {
     const root = workspace();
