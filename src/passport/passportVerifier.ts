@@ -42,8 +42,11 @@ interface PassportVerifyError {
 export interface PassportVerifyResult {
   ok: boolean;
   passport: PassportJson | null;
-  /** The signed harness companion (SH-TRUST-05) when the archive carries one and it verified; null otherwise. */
-  harness: PassportHarness | null;
+  /**
+   * The signed harness companion (SH-TRUST-05), present only when the archive carries one and the whole passport
+   * verified; absent otherwise, so an archive without a companion verifies to exactly the result it always did.
+   */
+  harness?: PassportHarness;
   errors: PassportVerifyError[];
   fileSha256: string;
   report: VerifierReportV1;
@@ -80,7 +83,7 @@ export function verifyPassportArtifactFile(params: {
   const finish = (): PassportVerifyResult => {
     const report = buildVerifierReport({ artifact: { kind: "passport", path: file, sha256: fileSha256 }, context: params.trust,
       integrityErrors: errors.map((error) => `${error.code}: ${error.message}`), signatures, anchoring });
-    return { ok: report.trusted, passport, harness: report.trusted ? harness : null, errors, fileSha256, report };
+    return { ok: report.trusted, passport, ...(report.trusted && harness !== null ? { harness } : {}), errors, fileSha256, report };
   };
   try {
     tarExtract(file, tmp);

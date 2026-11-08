@@ -67,7 +67,7 @@ describe("passport harness companion", () => {
     const verdict = verifyPassportArtifactFile({ file: restated, workspace: ws, trust: workspaceSelfTrust(ws) });
     expect(verdict.ok).toBe(false);
     expect(verdict.errors.map((row) => row.code)).toContain("HARNESS_SIGNATURE_INVALID");
-    expect(verdict.harness).toBeNull();
+    expect(verdict.harness).toBeUndefined();
 
     // A genuine companion of another passport: its signature verifies, its binding does not.
     const other = create(ws);
