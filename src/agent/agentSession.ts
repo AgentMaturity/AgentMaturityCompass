@@ -34,6 +34,7 @@ import type { CompositionSource } from "../prompt/context/compositionProvenance.
 import { applySkillToolRestriction, prepareSkillTurn, workspaceSkillRoots } from "../skills/skillTurn.js";
 import type { ContextPlugin } from "../prompt/context/contextTypes.js";
 import { SKILL_CONTEXT_ORDER } from "../skills/skillPrompt.js";
+import { denyPromptByCommandHooks } from "../extensions/nativeCommandHooks.js";
 
 /**
  * One AMC session, many prompts (plan P7.1a).
@@ -340,10 +341,22 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       throw error;
     }
 
+    /**
+     * SH-EXT-01 UserPromptSubmit on shared sessions (ACP, SDK, Studio), as on `agent-loop run`: the workspace's trusted
+     * hooks see the submitted text (every text part, as typed) and the skill it names, and may refuse it before it is queued.
+     */
+    const promptRefusal = async (submitted: string, skill?: string): Promise<string | undefined> => {
+      const denied = await denyPromptByCommandHooks({ workspace, prompt: submitted, ...(skill === undefined ? {} : { skill }) });
+      return denied === undefined ? undefined : `prompt refused by hook: ${denied}`;
+    };
+    const textOf = (parts: readonly { readonly type: string; readonly text?: string }[]): string => parts.flatMap(part => part.type === "text" && part.text !== undefined ? [part.text] : []).join("\n");
+
     /** A refused skill command is a string; an admitted prompt is the inbox receipt. */
-    const queueSkill = (text: string, enqueue: (prompt: string) => InboxReceipt): InboxReceipt | string => {
+    const queueSkill = async (text: string, enqueue: (prompt: string) => InboxReceipt, submitted = text): Promise<InboxReceipt | string> => {
       const prepared = prepareSkillTurn({ workspace, prompt: text });
       if (!prepared.ok) return prepared.reason;
+      const refused = await promptRefusal(submitted, prepared.loaded?.name);
+      if (refused !== undefined) return refused;
       // SH-EXT-05: the skill's disallowed-tools narrows this session's registry for the rest of the session.
       const restricted = toolset === undefined ? undefined : applySkillToolRestriction(toolset.registry, prepared, init.agentId);
       if (restricted !== undefined) return restricted;
@@ -351,7 +364,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       return enqueue(prepared.prompt);
     };
 
-    const runPrompt = (enqueue: () => InboxReceipt | string, clientRequestId?: string): Promise<AgentPromptResult> =>
+    const runPrompt = (enqueue: () => Promise<InboxReceipt | string> | InboxReceipt | string, clientRequestId?: string): Promise<AgentPromptResult> =>
       withWorkspaceScope(workspace, async (): Promise<AgentPromptResult> => {
         if (closed || shutdownPromise) return { ok: false, reason: "session is closed or shutting down" };
         // Claimed before any await. Checking after one would let two callers both
@@ -360,7 +373,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
         running = true;
         try {
           const previous = clientRequestId === undefined ? undefined : driver.inbox.requestReceipt(clientRequestId);
-          const receipt = enqueue();
+          const receipt = await enqueue();
           if (typeof receipt === "string") return { ok: false, reason: receipt };
           if (previous) return { ok: false, reason: "duplicate clientRequestId; the original submission is already admitted", submission: receipt };
           await driver.whenIdle();
@@ -411,19 +424,19 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       sessionId,
       resourceStatus: () => composed!.resourceStatus(),
       prompt: (text, images, options) => runPrompt(() => queueSkill(text, prompt => driver.followup(prompt, images, options?.clientRequestId)), options?.clientRequestId),
-      promptParts: (parts, options) => runPrompt(() => {
+      promptParts: (parts, options) => runPrompt(async () => {
         // Validate and snapshot before changing the leading command. Media,
         // suffix text, empty parts and their relative order remain exact.
         const stable = materializeNativeInputParts(snapshotNativeInputParts(parts));
         const first = stable[0];
-        if (first?.type !== "text") return driver.followupParts(stable, options?.clientRequestId);
-        return queueSkill(first.text, text => driver.followupParts([{ type: "text", text }, ...stable.slice(1)], options?.clientRequestId));
+        if (first?.type !== "text") return (await promptRefusal(textOf(stable))) ?? driver.followupParts(stable, options?.clientRequestId);
+        return queueSkill(first.text, text => driver.followupParts([{ type: "text", text }, ...stable.slice(1)], options?.clientRequestId), textOf(stable));
       }, options?.clientRequestId),
-      promptAudioParts: (parts, options) => runPrompt(() => {
+      promptAudioParts: (parts, options) => runPrompt(async () => {
         const stable = materializeNativeAudioParts(snapshotNativeAudioParts(parts));
         const first = stable[0];
-        if (first?.type !== "text") return driver.followupAudioParts(stable, options?.clientRequestId);
-        return queueSkill(first.text, text => driver.followupAudioParts([{ type: "text", text }, ...stable.slice(1)], options?.clientRequestId));
+        if (first?.type !== "text") return (await promptRefusal(textOf(stable))) ?? driver.followupAudioParts(stable, options?.clientRequestId);
+        return queueSkill(first.text, text => driver.followupAudioParts([{ type: "text", text }, ...stable.slice(1)], options?.clientRequestId), textOf(stable));
       }, options?.clientRequestId),
       submissionReceipt: clientRequestId => withWorkspaceScope(workspace, () => driver.inbox.requestReceipt(clientRequestId)),
       withdraw: messageId => withWorkspaceScope(workspace, () => { if (closed) throw new Error("Session is closed."); return driver.withdraw(messageId); }),

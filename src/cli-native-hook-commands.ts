@@ -2,7 +2,7 @@ import type { Command } from "commander";
 import { NATIVE_BUILTIN_CAPABILITIES, NATIVE_DELEGATION_CAPABILITIES } from "./agent/nativeToolCapabilities.js";
 import {
   commandHookMatches, loadNativeCommandHooks, NATIVE_COMMAND_HOOK_DENY_EVENTS, NATIVE_COMMAND_HOOK_EMITTED, NATIVE_COMMAND_HOOK_EVENTS,
-  NativeCommandHookError, trustNativeCommandHooks, untrustNativeCommandHooks, type NativeCommandHookEvent
+  NativeCommandHookError, staleCommandHookReferences, trustNativeCommandHooks, untrustNativeCommandHooks, type NativeCommandHookEvent
 } from "./extensions/nativeCommandHookConfig.js";
 import { nativeCommandHookInput, runNativeCommandHook } from "./extensions/nativeCommandHooks.js";
 
@@ -92,6 +92,8 @@ export function registerNativeHookCommands(extension: Command): void {
         const matching = load.handlers.filter(handler => handler.event === event && (handler.event !== "PreToolUse" && handler.event !== "PostToolUse" || commandHookMatches(handler.matcher, tool)));
         const runs = [];
         for (const handler of matching) {
+          const stale = staleCommandHookReferences(process.cwd(), load); // before every spawn, as the loop does
+          if (stale !== undefined) throw new NativeCommandHookError("HOOKS_UNTRUSTED", stale);
           const run = await runNativeCommandHook(handler, input, process.cwd());
           runs.push({ index: handler.index, matcher: handler.matcher || "*", argv: handler.argv, decision: run.decision, ...(run.reason === undefined ? {} : { reason: run.reason }), exitCode: run.exitCode, terminatedBy: run.terminatedBy, stderr: run.stderr });
         }

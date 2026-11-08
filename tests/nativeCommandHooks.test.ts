@@ -21,6 +21,12 @@ import {
 import { denyPromptByCommandHooks, NativeCommandHooks } from "../src/extensions/nativeCommandHooks.js";
 import { workspaceNativeHooks } from "../src/extensions/nativeHookRuntime.js";
 import { hookChildPath } from "../src/extensions/nativeCommandHookArgv.js";
+import { openAgentSession } from "../src/agent/agentSession.js";
+import { credentialRef } from "../src/credentials/credentialRef.js";
+import { AdapterRegistry } from "../src/llm/adapter/adapterRegistry.js";
+import { LlmRuntime } from "../src/llm/adapter/llmRuntime.js";
+import { FixedCredentials, LOOP_MODEL, LOOP_PROVIDER, scriptedAdapter, silentTransport, textStep } from "./helpers/agentLoopHarness.js";
+import { imageInput } from "./fixtures/nativeAcpImageRuntime.js";
 
 /**
  * SH-EXT-01: operator command hooks (.amc/hooks.json) on every platform. Hook processes are small node scripts written
@@ -431,6 +437,30 @@ describe("composition into every toolset", () => {
 });
 
 describe("real surfaces", () => {
+  it("fires UserPromptSubmit on shared sessions (ACP, SDK, Studio) too: the typed text, every text part and the skill name, before anything is queued", async () => {
+    const root = workspace();
+    initWorkspace({ workspacePath: root, agentId: "default", trustBoundaryMode: "isolated" });
+    mkdirSync(join(root, ".amc", "commands"), { recursive: true });
+    writeFileSync(join(root, ".amc", "commands", "deploy.md"), "---\ndescription: deploy something\n---\nDeploy $ARGUMENTS.\n");
+    install(root, { UserPromptSubmit: [{ hooks: [{ type: "command", command: node(`${READ_STDIN}if(/password/.test(i.prompt)){process.stderr.write('no secrets in prompts');process.exit(2)}if(i.skill==='deploy'){process.stderr.write('no deploys: '+i.prompt);process.exit(2)}})`) }] }] });
+    const registry = new AdapterRegistry();
+    let requests = 0;
+    registry.register({ providerId: LOOP_PROVIDER, adapter: scriptedAdapter([textStep("first"), textStep("second")]), baseUrl: "https://api.anthropic.invalid",
+      credentialRef: credentialRef("AMC_LOOP_TEST_KEY"), models: [LOOP_MODEL] });
+    const session = openAgentSession({ workspace: root, agentId: "default", tools: "none", systemPrompt: "You are a careful assistant.", harnessVersion: "3.2.0",
+      compositionDigest: "hooks-session-fixture", policyDigest: "hooks-session-fixture", route: { providerId: LOOP_PROVIDER, model: LOOP_MODEL, params: { max_tokens: 256 } },
+      makeLlm: own => new LlmRuntime({ session: own, registry, credentials: new FixedCredentials(), transport: async request => { requests++; return silentTransport(request); } }) });
+    try {
+      expect(await session.prompt("my password is hunter2")).toMatchObject({ ok: false, reason: expect.stringContaining("prompt refused by hook: hooks.json sha256") });
+      expect(await session.prompt("/deploy prod")).toMatchObject({ ok: false, reason: expect.stringContaining("no deploys: /deploy prod") });
+      // A secret in a later text part, after an image, is still submitted: the hook sees every text part.
+      expect(await session.promptParts!([{ type: "image", image: imageInput() }, { type: "text", text: "the password is x" }])).toMatchObject({ ok: false, reason: expect.stringContaining("no secrets in prompts") });
+      expect(await session.promptParts!([{ type: "text", text: "summarise" }, { type: "image", image: imageInput() }, { type: "text", text: "password" }])).toMatchObject({ ok: false, reason: expect.stringContaining("no secrets in prompts") });
+      expect(requests).toBe(0);
+      expect(await session.prompt("hello")).toMatchObject({ ok: true });
+      expect(requests).toBe(1);
+    } finally { session.close(); }
+  }, 60_000);
   it("agent-loop run stops on a UserPromptSubmit denial before any session exists, and runs otherwise", async () => {
     const root = workspace();
     const home = realpathSync(mkdtempSync(join(tmpdir(), "amc-hooks-cred-home-"))); directories.push(home);
