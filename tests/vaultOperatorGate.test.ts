@@ -216,10 +216,10 @@ describe("governance signing from the remembered store asks first", () => {
     unlockWithRememberedPassphrase(workspace, env);
     prompt.mockResolvedValue({ sign: true });
     for (const path of ["score", "vault status", "user list", "verify", "keys list", "firewall status", "firewall events", "tools list",
-      "gateway status", "policy controls", "policy test", "connect hooks health", "down"]) await confirmRememberedUnlock(workspace, path);
+      "gateway status", "policy controls", "policy test", "connect hooks health", "down", "integrations source observe"]) await confirmRememberedUnlock(workspace, path);
     expect(prompt, "governance reads that sign nothing (skeptic SK-6)").not.toHaveBeenCalled();
-    for (const path of ["policy sign", "lease issue", "studio lan enable", "connect hooks install"]) await confirmRememberedUnlock(workspace, path);
-    expect(prompt).toHaveBeenCalledTimes(4);
+    for (const path of ["policy sign", "lease issue", "studio lan enable", "connect hooks install", "integrations source admit"]) await confirmRememberedUnlock(workspace, path);
+    expect(prompt).toHaveBeenCalledTimes(5);
     expect(vaultStatus(workspace).unlocked).toBe(true);
   });
 

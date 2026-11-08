@@ -21,13 +21,17 @@ and the journaled reply (slice 3) are not built yet; see "Limits".
   the request is `github:<login>`; it is self-reported and can only refuse, never grant.
 - The actor is the payload's `sender`, whoever caused the event, never the item's author alone. An event whose
   sender is not the author (a maintainer, admin or app editing an allowed sender's comment or retitling their issue)
-  is refused as `editor_not_author`, so an edit is admitted only when its author made it.
+  is refused as `editor_not_author`, so an edit is admitted only when its author made it. Sender and author must
+  agree on both user id and login, since GitHub sends one user object for both; a payload where they differ is not
+  credited to the author.
 - Bots are never requesters: a sender whose login ends in `[bot]` or whose type is `Bot` is `bot`, and a bot in
   `allowedSenders` fails the policy parse. Senders match by GitHub user id **and** login. Enterprise Managed User
   logins (`handle_shortcode`) are accepted.
 - `admission: off` is the default. `amc integrations source init` writes a template that admits nothing until an
   operator edits it, sets `admission: explicit`, and signs it with `amc integrations source sign` (owner mode; the
-  signing is recorded in the ledger as `SOURCE_POLICY_SIGNED`).
+  signing is recorded in the ledger as `SOURCE_POLICY_SIGNED`). Each source's `agentId` must be the canonical id the
+  work order carries (lowercase letters, digits, `-` and `_`); a policy naming `Default` or a blank agent fails the
+  parse and is never signed.
 - The payload file is trusted input: `observe` and `check` record or decide whatever JSON they are given, so the file
   must be one the runner wrote (`$GITHUB_EVENT_PATH` in GitHub Actions), never one an agent or a job step composed.
   `observe` and `admit` are therefore owner-mode commands, like `init` and `sign`; nothing authenticates an
@@ -40,7 +44,7 @@ and the journaled reply (slice 3) are not built yet; see "Limits".
 | `amc integrations source init` | writes and signs the template (refuses to overwrite) | no | yes |
 | `amc integrations source sign` | strict-parses and signs the edited policy; the bytes parsed are the bytes signed | no | yes |
 | `amc integrations source verify` | verifies signature and parse | no | no |
-| `amc integrations source observe --source <id> --event <file>` | records one `issue_comment` (`created`/`edited`) or `issues` (`opened`/`edited`) event payload, the JSON at `$GITHUB_EVENT_PATH` | no | yes |
+| `amc integrations source observe --source <id> --event <file>` | records one `issue_comment` (`created`/`edited`) or `issues` (`opened`/`edited`) event payload of at most 1 MiB, the JSON at `$GITHUB_EVENT_PATH` | no | yes (signs nothing, so a vault opened from a remembered passphrase is not asked about) |
 | `amc integrations source check --source <id> --event <file>` | decides admission for one payload against the signed policy and verifies the bound work order as `admit` does; stores and files nothing; exit 1 when not admitted | no | no |
 | `amc integrations source admit [--observation <id> \| --all-pending]` | decides recorded observations (a batch of up to 1000; `remainingPending` counts what is left); an explicit request files one approval request | only through the lifecycle delivery, when a signed `integrations.yaml` routes the notification | yes |
 | `amc integrations source status` | policy state, sources with exact observation and pending counts, proposals (newest first, capped at 1000 with `proposalsTotal` and `proposalsTruncated`) with their approval quorum | no | no |
@@ -48,6 +52,13 @@ and the journaled reply (slice 3) are not built yet; see "Limits".
 `check` is the entry point for a CI job: it answers the admission question without touching the store, so a job
 can refuse before it runs anything. It refuses what `admit` would refuse, an expired, revoked or unsigned work order
 included (`work_order_unavailable`, `work_order_agent_mismatch`).
+
+`admit --all-pending` decides only observations with no recorded decision. A refusal the policy decided (for
+example `admission_off` or `sender_not_allowed`) is recorded, so a later policy edit does not turn an old message into
+a proposal by itself; to decide such an observation again under the current policy, name it with
+`admit --observation <id>`. A refusal from workspace state (`policy_unverified`, the work-order refusals, and an
+`approval_refused` from the approval policy or the inbox) is not recorded: the observation stays pending and the
+next run tries it again.
 
 ## The observation record
 
@@ -57,7 +68,8 @@ normalized content (body, plus the title for an issue), the actor `{ id, login, 
 the thread key `github:<repoId>:issue:<number>`, correlated keys (the pull request, when the issue is one),
 timestamps, the original body's SHA-256 and length, and the retained body. `observationId` is the digest of
 (source id, native event id, revision digest): the same delivery twice is one row, an edit is a second row on the
-same thread.
+same thread. Every admitted revision files its own proposal: an author who edits an admitted request (a typo, a
+retitled issue) gets a second approval request for the new text, and each is decided on its own.
 
 The retained body is passed through the secret redactor before it is stored and capped at 64 KiB; a larger body is
 `oversized` (digest only, no text) and is never admitted. Mentions are found only in the text GitHub renders: HTML
@@ -66,7 +78,8 @@ backtick-run length, `<code>`/`<pre>` elements, HTML tags with their attributes 
 code (four spaces or a tab) and quoted lines (`> ...` with the lazy continuation lines that follow until a blank
 line) are stripped first. Where GitHub's rendering is ambiguous the stripping takes more, never less, so a mention it
 drops fails closed as `not_mentioned`. `a@b.c` is not a mention, a sentence-final `@amc.` and an emphasised `_@amc_`
-are, and matching is case-insensitive with handle boundaries (`@amc-bot` does not satisfy `@amc`).
+are, and matching is case-insensitive with handle boundaries (`@amc-bot` does not satisfy `@amc`). Mentions are read
+from the body only, never from an issue title.
 
 The store is `.amc/integrations/source-intake.sqlite` (WAL, secure_delete), tables `observations` and
 `proposals`. The proposals row is reserved before the approval request is created and completed after, so two
@@ -74,14 +87,21 @@ concurrent `admit` runs file one request; a filer that crashed in between is rec
 (`source:<observationId>`). A reservation carries a token only its holder can settle or release; a reservation older
 than 60 s is taken over, and a slow filer that then files anyway finds its settle refused and cancels its own request,
 so one request stays filed. A `policy_unverified` refusal is not recorded: nothing was decided, and the observation
-stays pending until the policy is signed.
+stays pending until the policy is signed. Any failure before the approval request exists (an unreadable approval
+policy or inbox) releases the reservation and is reported as `approval_refused`; the rest of the batch still runs.
+
+Nothing prunes the store. It holds the redacted bodies of every observed message, from allowed senders and others
+alike. To clear it, delete `.amc/integrations/source-intake.sqlite`: filed proposals stay in the approval inbox, and a
+replayed event whose proposal still exists there is recovered by its intentId rather than filed twice, but a replayed
+refusal is decided again.
 
 ## Admission reasons
 
 `not_admitted` names the first failing check: `policy_unverified` (missing, unsigned, edited after signing, or
 invalid), `source_unknown`, `admission_off`, `repository_mismatch` (the event's `repository.id` is not the policy's:
 a renamed or transferred repository changes nothing, a fork is refused), `body_unavailable` (oversized),
-`actor_not_human`, `sender_not_allowed`, `reply_marker` (the body carries AMC's own reply marker), `not_mentioned`.
+`actor_not_human`, `sender_not_allowed`, `reply_marker` (the body carries `<!-- amc-reply`, the marker reserved for
+AMC's own replies so a reply can never trigger itself; this slice posts no replies), `not_mentioned`.
 Before admission the parser refuses `event_shape_invalid`, `event_action_unsupported`, `event_time_invalid` and
 `editor_not_author`; after it, `check` and `admit` refuse `work_order_unavailable` and `work_order_agent_mismatch`.
 

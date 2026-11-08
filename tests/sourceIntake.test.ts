@@ -4,13 +4,14 @@
  * in for GitHub, the approvals engine and work orders are the real ones in a temporary workspace.
  */
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, truncateSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import YAML from "yaml";
 import { afterAll, describe, expect, test } from "vitest";
 import { listApprovalRequests, loadApprovalRequestRecord } from "../src/approvals/approvalChainStore.js";
 import { approvalStatusPayload, decideApprovalForIntent } from "../src/approvals/approvalEngine.js";
+import { approvalPolicyPath, signApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
 import { observationFromGitHubEvent, findMentions } from "../src/integrations/source/githubObservationParser.js";
 import { admitSourceObservation } from "../src/integrations/source/sourceAdmission.js";
 import {
@@ -140,6 +141,11 @@ describe("SourceObservation parser (SH-INTEG-01)", () => {
     expect(refusal(issueEvent({ action: "edited", sender: MALLORY, title: "@amc run the release job" }))).toMatchObject({ ok: false, reason: "editor_not_author" });
     // A payload whose sender is not the author on `created` is malformed or forged, never credited to the author.
     expect(refusal(commentEvent({ sender: MALLORY }))).toMatchObject({ ok: false, reason: "editor_not_author" });
+    // GitHub sends one user object for both: the same id under another login is not the author either.
+    expect(refusal(commentEvent({ action: "edited", sender: { ...ALICE, login: "alice-renamed" } }))).toMatchObject({ ok: false, reason: "editor_not_author" });
+    expect(parse(commentEvent({ sender: { ...ALICE, login: "Alice" } })).actor.login).toBe("Alice");
+    // The class is the sender's, never the author record's: a payload calling the same user a Bot is a bot request.
+    expect(parse(commentEvent({ sender: { ...ALICE, type: "Bot" } })).actor.class).toBe("bot");
     // No sender at all is not an event.
     const { sender: _sender, ...noSender } = commentEvent();
     expect(refusal(noSender)).toMatchObject({ ok: false, reason: "event_shape_invalid", detail: expect.stringContaining("sender") });
@@ -236,6 +242,19 @@ describe("SourceObservation parser (SH-INTEG-01)", () => {
 describe("source policy and admission (SH-INTEG-02)", () => {
   test("a bot is refused as an allowed sender at parse time", () => {
     expect(() => policy({ allowedSenders: [{ id: 5, login: "helper[bot]" }] })).toThrow(/bot is never an allowed sender/);
+  });
+
+  test("the policy's agentId is canonical, so it names the inbox the work order lives in", () => {
+    for (const agentId of ["Default", " ", "ops/../default", "-ops"]) expect(() => policy({ agentId }), agentId).toThrow(/canonical agent id/);
+    expect(() => policy({ agentId: "ops-bot_2" })).not.toThrow();
+  });
+
+  test("an event file over the cap is refused before it is read", () => {
+    const root = workspace();
+    const file = join(root, "huge.json");
+    writeFileSync(file, "");
+    truncateSync(file, 3 * 1024 ** 3); // sparse: no disk is used
+    expect(() => sourceCheckCli({ workspace: root, sourceId: "github-main", file })).toThrow(/^event file exceeds 1048576 bytes$/);
   });
 
   test("every refusal reason, in order, and the one explicit request", () => {
@@ -447,6 +466,29 @@ describe("proposals for human approval (SH-INTEG-02)", () => {
     decide("o1", ["OWNER"]);
     decide("o2", ["OWNER"]);
     expect(quorum()).toMatchObject({ required: 2, received: 2, status: "QUORUM_MET" });
+    db.close();
+  });
+
+  test("an approval policy that cannot be read refuses the proposal, releases the reservation and keeps the batch going", async () => {
+    const root = workspace();
+    const { observation, db } = await proposalSetup(root);
+    db.close();
+    // Signed (the signer hashes any bytes) but not a valid policy: reading it throws.
+    writeFileSync(approvalPolicyPath(root), "approvalPolicy:\n  version: 99\n");
+    signApprovalPolicy(root);
+    const out = await sourceAdmitCli({ workspace: root, allPending: true });
+    expect(out.results).toMatchObject([{ observationId: observation.observationId, admitted: true, state: "refused", reason: "approval_refused" }]);
+    expect(out.remainingPending).toBe(1);
+    expect(listApprovalRequests({ workspace: root, agentId: "default" })).toHaveLength(0);
+  });
+
+  test("a failed inbox read before any request exists releases the reservation", async () => {
+    const root = workspace();
+    const { observation, db, source, loaded } = await proposalSetup(root);
+    // A source naming no usable agent (the policy schema refuses one; called directly here) makes the inbox read throw.
+    const outcome = await proposeSourceRequest({ workspace: root, db, observation, source: { ...source, agentId: "!!!" }, sender: { id: 1001, login: "alice" }, policyDigest: loaded.digest });
+    expect(outcome).toMatchObject({ state: "refused", reason: "approval_refused", detail: expect.stringContaining("agentId cannot be empty") });
+    expect(listSourceObservationIds(db, { pendingOnly: true })).toEqual([observation.observationId]);
     db.close();
   });
 

@@ -79,7 +79,7 @@ const READS = new Set(["vault status", "vault lock", "vault forget", "user list"
   "firewall status", "firewall events", "tools list", "tools verify", "gateway status", "trust status", "identity verify",
   "identity workload-trust show", "identity workload-trust verify", "policy controls", "policy simulate", "policy test", "policy pack list",
   "policy pack describe", "policy pack diff", "policy scope list", "policy action verify", "policy action logic show", "policy approval verify",
-  "workorder list", "workorder show", "workorder verify"]);
+  "workorder list", "workorder show", "workorder verify", "integrations source observe"]);
 
 /**
  * D4: a governance command whose vault was opened from the remembered store (not from AMC_VAULT_PASSPHRASE or a prompt)

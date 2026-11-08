@@ -8,7 +8,7 @@
  * `observe` and `admit` trust the payload file and the store rows they are given, so they are owner-mode commands: in
  * agent mode an agent could record a forged payload and have it filed as an allowed sender's request.
  */
-import { readFileSync } from "node:fs";
+import { readFileSync, statSync } from "node:fs";
 import { approvalStatusPayload } from "../../approvals/approvalEngine.js";
 import { assertOwnerMode } from "../../mode/mode.js";
 import { observationFromGitHubEvent } from "./githubObservationParser.js";
@@ -24,8 +24,12 @@ import { proposeSourceRequest, recordNotAdmitted, verifyBoundWorkOrder, type Pro
 const MAX_EVENT_FILE_BYTES = 1_048_576;
 
 function parseEventFile(file: string, sourceId: string, receivedAt = Date.now()) {
+  const tooLarge = () => new Error(`event file exceeds ${MAX_EVENT_FILE_BYTES} bytes`);
+  // Size first, so a wrong path to a large file fails here instead of being read into memory; the length is checked
+  // again after the read, since the file can change between the two.
+  if (statSync(file).size > MAX_EVENT_FILE_BYTES) throw tooLarge();
   const bytes = readFileSync(file);
-  if (bytes.byteLength > MAX_EVENT_FILE_BYTES) throw new Error(`event file exceeds ${MAX_EVENT_FILE_BYTES} bytes`);
+  if (bytes.byteLength > MAX_EVENT_FILE_BYTES) throw tooLarge();
   let payload: unknown;
   try {
     payload = JSON.parse(bytes.toString("utf8"));

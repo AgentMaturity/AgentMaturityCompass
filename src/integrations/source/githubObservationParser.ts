@@ -125,7 +125,10 @@ export function observationFromGitHubEvent(payload: unknown, context: { sourceId
   const kind = event.comment ? "issue_comment" : "issues";
   if (!SUPPORTED_EVENT_ACTIONS[kind].includes(event.action)) return { ok: false, reason: "event_action_unsupported", detail: `${kind}.${event.action}` };
   const item = event.comment ?? event.issue;
-  if (event.sender.id !== item.user.id) return { ok: false, reason: "editor_not_author", detail: `${kind}.${event.action} by ${event.sender.login} (${event.sender.id}) on an item authored by ${item.user.login} (${item.user.id})` };
+  // Same user id and login: GitHub sends one user object for both, so a payload that disagrees is not credited to the author.
+  if (event.sender.id !== item.user.id || event.sender.login.toLowerCase() !== item.user.login.toLowerCase()) {
+    return { ok: false, reason: "editor_not_author", detail: `${kind}.${event.action} by ${event.sender.login} (${event.sender.id}) on an item authored by ${item.user.login} (${item.user.id})` };
+  }
   const body = item.body ?? "";
   const sourceAt = parseTime(item.updated_at, item.created_at);
   if (sourceAt === null) return { ok: false, reason: "event_time_invalid", detail: String(item.updated_at ?? item.created_at) };

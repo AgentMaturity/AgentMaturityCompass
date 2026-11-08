@@ -6,10 +6,19 @@
  * is refused at parse time: a bot is never an explicit requester. `admission: off` (the default) admits nothing.
  */
 import { z } from "zod";
+import { normalizeAgentId } from "../../fleet/paths.js";
 import { GITHUB_HANDLE_PATTERN, githubLoginSchema, sourceRepositorySchema } from "./sourceObservationSchema.js";
 
 const SOURCE_POLICY_VERSION = 1;
 const DEFAULT_MENTION = "@amc";
+
+function isCanonicalAgentId(value: string): boolean {
+  try {
+    return normalizeAgentId(value) === value;
+  } catch {
+    return false;
+  }
+}
 
 const mentionSchema = z.string().regex(new RegExp(`^@${GITHUB_HANDLE_PATTERN}$`), "a mention is `@` plus a GitHub-style handle");
 
@@ -17,8 +26,11 @@ const sourcePolicySourceSchema = z.strictObject({
   id: z.string().regex(/^[a-z0-9][a-z0-9._-]{0,127}$/),
   kind: z.literal("github"),
   repository: sourceRepositorySchema,
-  /** The agent whose work order and approval inbox the proposal lands in. Must equal the work order's agentId. */
-  agentId: z.string().min(1).max(128),
+  /**
+   * The agent whose work order and approval inbox the proposal lands in. Must equal the work order's agentId, and so must
+   * be canonical (as `normalizeAgentId` writes it): "Default" or " " would name another inbox than the work order's.
+   */
+  agentId: z.string().min(1).max(128).refine(isCanonicalAgentId, "agentId must be a canonical agent id: lowercase letters, digits, - and _"),
   /** An existing signed work order; the proposal binds its digest and never widens it. */
   workOrderId: z.string().min(1).max(256),
   mention: mentionSchema.default(DEFAULT_MENTION),

@@ -83,5 +83,9 @@ describe("public distribution and pricing truthfulness", () => {
     expect(support).not.toContain("Published via npm and GitHub Releases");
     expect(bugTemplate).not.toMatch(/npm\s+(?:i|install)\s+-g\s+agent-maturity-compass/);
     expect(readme).not.toContain("AgentMaturity/AgentMaturityCompass/amc-action@main");
+    // The root action's guide: no @main pin in its example, and no claim that a release which does not exist installs today.
+    const rootActionGuide = text("docs/GITHUB_ACTION.md");
+    expect(rootActionGuide).not.toMatch(/uses:\s*AgentMaturity\/AgentMaturityCompass@main\b/);
+    expect(rootActionGuide).not.toContain("works today");
   });
 });

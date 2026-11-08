@@ -111,8 +111,14 @@ export async function proposeSourceRequest(params: {
     return { state: "refused", reason, detail };
   };
   // A crashed filer may have created the request before settling the row: recover it by intentId rather than file twice.
+  // Until a request exists, any failure releases the reservation, so one bad read never holds the observation or ends the batch.
   const intentId = sourceIntentId(observation.observationId);
-  const recovered = listApprovalRequests({ workspace, agentId: source.agentId }).find((request) => request.intentId === intentId && request.toolName === SOURCE_ADMIT_TOOL);
+  let recovered: ReturnType<typeof listApprovalRequests>[number] | undefined;
+  try {
+    recovered = listApprovalRequests({ workspace, agentId: source.agentId }).find((request) => request.intentId === intentId && request.toolName === SOURCE_ADMIT_TOOL);
+  } catch (error) {
+    return refuse("approval_refused", String(error));
+  }
   if (recovered) {
     settleProposal(db, observation.observationId, token, { state: "proposed", approvalRequestId: recovered.approvalRequestId }, now);
     return { state: "already_proposed", approvalRequestId: recovered.approvalRequestId };
@@ -120,9 +126,11 @@ export async function proposeSourceRequest(params: {
   const bound = verifyBoundWorkOrder(workspace, source);
   if (!bound.ok) return refuse(bound.reason, bound.detail);
   const { workOrder } = bound;
-  const { actionClass, quorumFloor } = proposalQuorum(workspace, workOrder.allowedActionClasses);
-  let approvalRequestId: string;
+  let approvalRequestId: string, actionClass: ActionClass;
   try {
+    const quorum = proposalQuorum(workspace, workOrder.allowedActionClasses);
+    actionClass = quorum.actionClass;
+    const quorumFloor = quorum.quorumFloor;
     const created = createApprovalForIntent({
       workspace, agentId: source.agentId, intentId, toolName: SOURCE_ADMIT_TOOL, actionClass, workOrderId: workOrder.workOrderId,
       requestedMode: workOrder.requestedMode, effectiveMode: workOrder.requestedMode, riskTier: workOrder.riskTier,

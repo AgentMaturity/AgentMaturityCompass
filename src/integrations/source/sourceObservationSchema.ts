@@ -14,7 +14,10 @@ import { canonicalize } from "../../utils/json.js";
 export const SOURCE_OBSERVATION_VERSION = 1;
 export const SOURCE_OBSERVATION_ADAPTER_VERSION = "github-event/1";
 export const MAX_RETAINED_BODY_BYTES = 65_536;
-/** A body carrying this marker was written by AMC's own reply path and is never an explicit request. */
+/**
+ * Reserved for AMC's own replies on a thread, so a reply can never trigger itself: a body carrying it is never an
+ * explicit request. Nothing in this slice posts a reply (docs/SOURCE_INTAKE.md, "Limits").
+ */
 export const SOURCE_REPLY_MARKER = "<!-- amc-reply";
 
 const hex64 = z.string().regex(/^[0-9a-f]{64}$/);
