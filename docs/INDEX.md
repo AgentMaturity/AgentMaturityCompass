@@ -59,6 +59,8 @@ Use this page to reach the shortest evidence-backed path for your task. AMC's pu
 - [Framework Adapters](ADAPTERS.md)
 - [Provider Configuration](PROVIDERS.md)
 - [SDK](SDK.md)
+- [Native Agent Workflow](NATIVE_AGENT_WORKFLOW.md): the built-in tools (`fs.read`, `fs.write`, `fs.edit`, `apply_patch`, `ls`, `glob`, `grep`, `bash`), their bounds, and how the signed policy grants them
+- [Native Tools: web, ask-user, todo, plan](NATIVE_TOOLS.md): `web_fetch` rendering and egress, `web_search`, signed session records, and `amc tools list --schemas`
 - [API Reference](API_REFERENCE.md)
 - [OpenAPI Surfaces](API_SURFACES.md)
 - [CI Templates](CI_TEMPLATES.md)

@@ -121,7 +121,19 @@ Sharing one workspace allowlist with other tools is part of P2-13.
   5 000 000) and an optional per-call `maxBytes`. Bytes are counted as they arrive.
   When the body passes the cap, the read stops and the call refuses. The body is
   never truncated.
-- Non-text content types are described rather than rendered.
+- HTML bodies (`text/html`, `application/xhtml+xml`) are rendered before they
+  reach the model, as the `format` argument says. `markdown` (the default) keeps
+  headings, paragraphs, emphasis, inline and fenced code, lists, tables,
+  blockquotes, images as `![alt](url)` and links as `[text](url)`, resolved
+  against the response URL; only `http`, `https` and `mailto` targets are kept.
+  `text` is the same with no markdown syntax. `html` is the raw body. `script`,
+  `style`, `noscript`, `template`, `svg`, `iframe`, `object`, `embed`, `head` and
+  comments are dropped with their content, and every attribute except `href`,
+  `src` and `alt` is ignored. The renderer adds no dependency and builds no DOM.
+  It is lossy by design: the receipt's `contentSha256` digests the body as
+  received, and `format` and `renderedBytes` say what the model was given.
+- Other content types ignore `format`: textual bodies are returned as text, the
+  rest are described rather than rendered.
 - Output passes through `redactSecrets` (the shared P5.3 table). Each match becomes
   `[AMC_REDACTED:<type>]`.
 - `SIMULATE` checks the policy and the URL, then stops before any request.
@@ -146,7 +158,7 @@ rows go through the native session writer when one is bound, else the raw ledger
 
 | Receipt | Written | Allow fields |
 | --- | --- | --- |
-| `NATIVE_WEB_FETCH` | before content is returned | URL, origin, connected address, status, content type, bytes, `contentSha256` (the body as received), `deliveredSha256` (what the model saw), redaction counts, the signed policy digest |
+| `NATIVE_WEB_FETCH` | before content is returned | URL, origin, connected address, status, content type, bytes, `format` (`markdown`, `text` or `html`) and `renderedBytes`, `contentSha256` (the body as received), `deliveredSha256` (what the model saw), redaction counts, the signed policy digest |
 | `NATIVE_WEB_SEARCH` | before results are returned | provider id, `querySha256`, each request's origin, address, status, bytes and `contentSha256`, result count, `deliveredSha256`, redaction counts, policy digest |
 | `NATIVE_WEB_EGRESS` | before each connection | host, port, decision, reason, the address to connect to (one row per egress decision, in addition to the call receipt) |
 | `NATIVE_ASK_USER` | before the answer is returned | question id, `questionSha256`, `answerSha256` (never the answer text) |
@@ -201,6 +213,22 @@ workspace's auditor key. That is the same trust the approvals store relies on.
 It does not prove which human answered. `answeredBy` is recorded as the
 surface's claim and is not verified. Signatures checked against the workspace's
 own keys are a local audit trail only.
+
+## Published tool schemas
+
+`amc tools list --schemas [--json] [--tool <name>]` prints every native
+built-in tool's name, action class, description, JSON Schema and
+`schemaDigestSha256`, the SHA-256 of the canonical schema, which is the digest
+`tool_search` hands the model and `NATIVE_TOOL_ACTIVATED` receipts carry. It also
+prints `documentDigestSha256` over the whole listing (a document digest, not any
+session's catalog identity, which also covers exposure and the signed subset)
+and, for the current workspace, which of the tools the signed policy grants, or
+that the policy is not verifiable. Every schema is validated as JSON Schema at
+print time; an invalid one fails the command with exit code 1. The definitions
+are built with inert dependencies and no tool body runs. `delegate` and
+`workflow` need a live composition and are named as unavailable rather than left
+out. SDK users can validate arguments client-side against the printed schemas.
+Source: `src/tools/builtin/nativeToolSchemas.ts`, `src/toolhub/toolSchemasCli.ts`.
 
 ## Not covered here
 
