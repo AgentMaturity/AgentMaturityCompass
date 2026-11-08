@@ -124,13 +124,39 @@ export function assertPublicBindAcknowledged(policy: Pick<ListenPolicy, "publicB
 export const PROXY_TRUST_REFUSAL = "AMC_TRUSTED_PROXY_HOPS is set, but AMC_TRUSTED_PROXY_CIDRS names no proxy. "
   + "Set it to your reverse proxy's addresses: forwarded headers are believed only from them.";
 
+const WIDE_PROXY_RANGE = 2 ** 20; // a /12: the size of 172.16.0.0/12, the narrowest private range
+
+/**
+ * Warnings for proxies named too broadly (SR-10): any host inside a trusted range can name its own client address. An
+ * IPv4 range of /12 or wider, or a range (not a single address) that overlaps the client allow list, so that admitted
+ * clients would count as proxies. IPv6 entries other than ::1 match nothing (clientAddress.ts), so they trust nobody.
+ */
+export function proxyTrustWarnings(policy: Pick<ListenPolicy, "trustedProxyCidrs" | "allowedCidrs">): string[] {
+  const allowed = policy.allowedCidrs.map((cidr) => [cidr, ipv4CidrRange(cidr)] as const);
+  return policy.trustedProxyCidrs.flatMap((cidr) => {
+    const range = ipv4CidrRange(cidr);
+    if (range === null) return [];
+    const advice = "can name its own client address in X-Forwarded-For. Name only your reverse proxies' own addresses.";
+    if (range[1] - range[0] + 1 >= WIDE_PROXY_RANGE) return [`AMC_TRUSTED_PROXY_CIDRS entry ${cidr} spans a /12 or wider range: any host in it ${advice}`];
+    const overlapping = range[0] === range[1] ? [] : allowed.filter(([, other]) => other !== null && other[0] <= range[1] && range[0] <= other[1]);
+    return overlapping.length > 0
+      ? [`AMC_TRUSTED_PROXY_CIDRS entry ${cidr} overlaps the client allow list (${overlapping.map(([name]) => name).join(", ")}): a client in both ${advice}`]
+      : [];
+  });
+}
+
 /**
  * Throws PROXY_TRUST_REFUSAL when proxy hops are declared but no proxy is named (SR-1). Forwarding headers would then
  * count from nobody: every client behind the proxy would share its address, and the allow list would judge the proxy
- * instead of the client, admitting everyone it forwards. Refusing the start is the fail-closed answer.
+ * instead of the client, admitting everyone it forwards. Refusing the start is the fail-closed answer. With hops
+ * declared, a proxy list named too broadly is warned about (SR-10): a warning, because some clusters can only name their
+ * ingress controller by its pod range.
  */
-export function assertProxyTrustNamed(trustedProxyHops: number | undefined, policy: Pick<ListenPolicy, "trustedProxyCidrs">): void {
-  if ((trustedProxyHops ?? 0) > 0 && policy.trustedProxyCidrs.length === 0) throw new Error(PROXY_TRUST_REFUSAL);
+export function assertProxyTrustNamed(trustedProxyHops: number | undefined, policy: Pick<ListenPolicy, "trustedProxyCidrs" | "allowedCidrs">,
+  warn: (line: string) => void = (line) => console.warn(line)): void {
+  if ((trustedProxyHops ?? 0) <= 0) return;
+  if (policy.trustedProxyCidrs.length === 0) throw new Error(PROXY_TRUST_REFUSAL);
+  for (const warning of proxyTrustWarnings(policy)) warn(`studio: ${warning}`);
 }
 
 /** The standalone `amc gateway start` allow list: the environment only (no LAN config), refused like Studio's. */

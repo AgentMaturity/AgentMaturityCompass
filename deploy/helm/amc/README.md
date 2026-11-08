@@ -48,7 +48,10 @@ helm template amc ./deploy/helm/amc -f ./deploy/helm/amc/examples/values-interna
 Render ingress + TLS deployment:
 
 ```bash
-helm template amc ./deploy/helm/amc -f ./deploy/helm/amc/examples/values-ingress-tls.yaml
+# The ingress controller pods' addresses (kubectl -n ingress-nginx get pods -o wide); escape commas as \, for several.
+INGRESS_POD_CIDRS=10.244.1.17/32
+helm template amc ./deploy/helm/amc -f ./deploy/helm/amc/examples/values-ingress-tls.yaml \
+  --set env.AMC_TRUSTED_PROXY_CIDRS="$INGRESS_POD_CIDRS"
 ```
 
 Render persistent bootstrap deployment:

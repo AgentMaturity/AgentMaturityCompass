@@ -40,6 +40,8 @@ Endpoints:
 - HTTPS console/API: `https://<AMC_TLS_HOST>:8443/console`
 - Notary (internal to this TLS stack): `http://amc-notary:4343`
 
+Caddy and Studio share a dedicated `amc_edge` network (subnet `172.16.250.0/28`), on which Caddy has the fixed address `172.16.250.2`. Studio believes `X-Forwarded-*` headers only from that address (`AMC_TRUSTED_PROXY_CIDRS`, SR-10), so no other container can name its own client address. If the subnet collides with a network on your host, change the subnet, Caddy's `ipv4_address` and the `AMC_TRUSTED_PROXY_CIDRS` default in `docker-compose.tls.yml` together.
+
 Caddy retains only `NET_BIND_SERVICE`, required by the official image's executable and port 443; Studio and notary still drop all capabilities. The proxy creates a private local CA in its persistent `caddy_data` volume. Certificate issuance stays enabled, HTTP redirects are disabled because this stack does not publish port 80, and automatic trust-store installation is disabled.
 
 Export only the public CA certificate and explicitly trust it in each client that uses this deployment:

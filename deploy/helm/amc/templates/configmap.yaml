@@ -1,3 +1,6 @@
+{{- if and (or .Values.ingress.enabled (gt (int .Values.env.AMC_TRUSTED_PROXY_HOPS) 0)) (or (eq (int .Values.env.AMC_TRUSTED_PROXY_HOPS) 0) (not .Values.env.AMC_TRUSTED_PROXY_CIDRS)) }}
+{{- fail "ingress.enabled or env.AMC_TRUSTED_PROXY_HOPS above 0 needs env.AMC_TRUSTED_PROXY_HOPS (1 behind one ingress controller) and env.AMC_TRUSTED_PROXY_CIDRS set to the ingress controller pods' addresses (kubectl -n ingress-nginx get pods -o wide): X-Forwarded-* headers are believed only from them" }}
+{{- end }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

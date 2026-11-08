@@ -6,6 +6,8 @@ import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 import * as YAML from "yaml";
 import { loadStudioRuntimeConfig } from "../src/config/loadConfig.js";
+import { ipAllowedByCidrs } from "../src/studio/clientAddress.js";
+import { PROXY_TRUST_REFUSAL, assertProxyTrustNamed, resolveListenPolicy } from "../src/studio/listenPolicy.js";
 
 const workspace = fileURLToPath(new URL("../", import.meta.url));
 
@@ -52,6 +54,58 @@ describe("deployment pack assets", () => {
     const tls = read("deploy/compose/docker-compose.tls.yml");
     expect(tls).toContain("caddy");
     expect(tls).toContain("AMC_TRUSTED_PROXY_HOPS");
+  });
+
+  // SR-10: the shipped configs trusted every private range as a proxy, so any container or pod could forge X-Forwarded-For.
+  const startWarnings = (env: Record<string, string>): string[] => {
+    const lines: string[] = [];
+    assertProxyTrustNamed(Number(env.AMC_TRUSTED_PROXY_HOPS ?? 0), resolveListenPolicy({ env, hostMode: false }), (line) => lines.push(line));
+    return lines;
+  };
+
+  it("the TLS stack trusts only Caddy's fixed address, on a network declared in the file that only Caddy and Studio join", () => {
+    const compose = YAML.parse(read("deploy/compose/docker-compose.tls.yml"));
+    const studio = compose.services["amc-studio"];
+    const caddy = compose.services.caddy;
+    const fallback = (value: string): string => /^\$\{[A-Z_]+:-(.*)\}$/.exec(value)?.[1] ?? "";
+    const proxyIp: string = caddy.networks.amc_edge.ipv4_address;
+    expect(fallback(studio.environment.AMC_TRUSTED_PROXY_CIDRS)).toBe(`${proxyIp}/32`);
+    expect(Object.keys(caddy.networks)).toEqual(["amc_edge"]);
+    expect(ipAllowedByCidrs(proxyIp, [compose.networks.amc_edge.ipam.config[0].subnet])).toBe(true);
+    const onEdge = Object.entries(compose.services as Record<string, { networks?: unknown }>)
+      .filter(([, service]) => JSON.stringify(service.networks ?? []).includes("amc_edge")).map(([name]) => name);
+    expect(onEdge.sort()).toEqual(["amc-studio", "caddy"]);
+    expect(startWarnings({ AMC_TRUSTED_PROXY_HOPS: String(studio.environment.AMC_TRUSTED_PROXY_HOPS),
+      AMC_TRUSTED_PROXY_CIDRS: fallback(studio.environment.AMC_TRUSTED_PROXY_CIDRS), AMC_ALLOWED_CIDRS: fallback(studio.environment.AMC_ALLOWED_CIDRS) })).toEqual([]);
+  });
+
+  it("the Helm chart trusts no proxy by default; the raw manifests refuse to start until one is named; the docs say so", () => {
+    const values = YAML.parse(read("deploy/helm/amc/values.yaml"));
+    expect([values.env.AMC_TRUSTED_PROXY_HOPS, values.env.AMC_TRUSTED_PROXY_CIDRS]).toEqual(["0", ""]);
+    const example = YAML.parse(read("deploy/helm/amc/examples/values-ingress-tls.yaml"));
+    expect(startWarnings({ ...values.env, ...example.env }), "the ingress example's placeholder").toEqual([]);
+    const k8s = YAML.parse(read("deploy/k8s/configmap.yaml")).data;
+    expect(k8s.AMC_TRUSTED_PROXY_CIDRS).toBe("");
+    expect(() => startWarnings(k8s)).toThrow(PROXY_TRUST_REFUSAL);
+    expect(read("docs/KUBERNETES_HELM_DEPLOYMENT.md")).toContain('--set env.AMC_TRUSTED_PROXY_CIDRS="$INGRESS_POD_CIDRS"');
+    expect(read("docs/SECURITY_DEPLOYMENT.md")).not.toContain("name the private ranges");
+    expect(read("deploy/compose/README.md")).toContain("`amc_edge` network");
+  });
+
+  it("helm refuses an Ingress or proxy hops without named proxies, when the helm binary is available", () => {
+    if (spawnSync("helm", ["version"], { encoding: "utf8" }).status !== 0) return;
+    const chart = join(workspace, "deploy/helm/amc");
+    const render = (...args: string[]) => spawnSync("helm", ["template", "amc", chart, ...args], { encoding: "utf8" });
+    for (const args of [["--set", "ingress.enabled=true"], ["--set", "env.AMC_TRUSTED_PROXY_HOPS=1"],
+      ["--set", "ingress.enabled=true", "--set", "env.AMC_TRUSTED_PROXY_CIDRS=10.244.1.0/24"]]) {
+      const refused = render(...args);
+      expect(refused.status, args.join(" ")).toBe(1);
+      expect(refused.stderr).toContain("env.AMC_TRUSTED_PROXY_CIDRS set to the ingress controller pods' addresses");
+    }
+    const named = render("--set", "ingress.enabled=true", "--set", "env.AMC_TRUSTED_PROXY_HOPS=1", "--set", "env.AMC_TRUSTED_PROXY_CIDRS=10.244.1.0/24");
+    expect(named.status, named.stderr).toBe(0);
+    expect(named.stdout).toContain('AMC_TRUSTED_PROXY_CIDRS: "10.244.1.0/24"');
+    expect(render("-f", join(chart, "examples/values-ingress-tls.yaml")).status).toBe(0);
   });
 
   it("persists <AMC home>/state, where anti-rollback marks live, in compose and the Helm chart (P1-08 review M4)", () => {

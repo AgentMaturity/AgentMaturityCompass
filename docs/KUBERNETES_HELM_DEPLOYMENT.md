@@ -130,15 +130,21 @@ helm upgrade --install amc deploy/helm/amc \
 Ingress and TLS profile:
 
 ```bash
+# The ingress controller pods' addresses; escape commas as \, for several.
+kubectl -n ingress-nginx get pods -o wide
+INGRESS_POD_CIDRS=10.244.1.17/32
 helm upgrade --install amc deploy/helm/amc \
   --namespace amc-system \
   --create-namespace \
   --atomic \
   --wait \
   -f deploy/helm/amc/examples/values-ingress-tls.yaml \
+  --set env.AMC_TRUSTED_PROXY_CIDRS="$INGRESS_POD_CIDRS" \
   --set image.repository=ghcr.io/agentmaturity/amc-studio \
   --set image.tag=latest
 ```
+
+Studio believes `X-Forwarded-For` and `X-Forwarded-Proto` (the client address for limits and the login throttle, and the `Secure` cookie flag) only from the addresses in `env.AMC_TRUSTED_PROXY_CIDRS` (SR-10). By default the chart trusts no proxy (`AMC_TRUSTED_PROXY_HOPS: "0"`, empty CIDRs), and it refuses to render with `ingress.enabled` or hops above 0 until both are set. The example file's `198.51.100.0/24` is a documentation range that matches no pod, so replace it. Name the controller pods' own addresses, or their node's pod range if they move. Never name a whole private range: any pod inside it could name its own client address. Studio warns at start about a trusted range of /12 or wider, or one that overlaps `AMC_ALLOWED_CIDRS`. On a CNI that allocates pods from one large pool, the controller's range may be wide; the NetworkPolicy, which admits only the ingress controller pods, then limits who can send forwarded headers.
 
 ### KeyProvider and ledger encryption
 

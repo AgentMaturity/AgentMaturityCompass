@@ -58,6 +58,27 @@ describe("listen policy", () => {
     expect(() => assertProxyTrustNamed(0, resolveListenPolicy({ env: {}, hostMode: false })), "no hops: nothing to name").not.toThrow();
   });
 
+  // SR-10: the shipped configs trusted every private range, so any container or pod could forge X-Forwarded-For. At start,
+  // a trusted range of /12 or wider, or a trusted range (not a single address) overlapping the allow list, is warned about.
+  test("a wide trusted proxy range, or one overlapping the client allow list, is warned about at start", () => {
+    const warnings = (env: NodeJS.ProcessEnv, hops = 1): string[] => {
+      const lines: string[] = [];
+      assertProxyTrustNamed(hops, resolveListenPolicy({ env, hostMode: false }), (line) => lines.push(line));
+      return lines;
+    };
+    expect(warnings({ AMC_TRUSTED_PROXY_CIDRS: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16" })).toEqual([
+      expect.stringContaining("AMC_TRUSTED_PROXY_CIDRS entry 10.0.0.0/8 spans a /12 or wider range"),
+      expect.stringContaining("AMC_TRUSTED_PROXY_CIDRS entry 172.16.0.0/12 spans a /12 or wider range")
+    ]);
+    expect(warnings({ AMC_TRUSTED_PROXY_CIDRS: "10.0.0.0/08" }), "decided on the parsed range").toEqual([expect.stringContaining("10.0.0.0/08 spans")]);
+    expect(warnings({ AMC_ALLOWED_CIDRS: "192.168.0.0/16", AMC_TRUSTED_PROXY_CIDRS: "192.168.1.0/24" })).toEqual([
+      expect.stringContaining("AMC_TRUSTED_PROXY_CIDRS entry 192.168.1.0/24 overlaps the client allow list (192.168.0.0/16)")
+    ]);
+    expect(warnings({ AMC_ALLOWED_CIDRS: "192.168.0.0/16", AMC_TRUSTED_PROXY_CIDRS: "192.168.1.5/32,127.0.0.1/32,172.16.250.2/32" }),
+      "a single proxy address inside the allow list is how a proxy is named").toEqual([]);
+    expect(warnings({ AMC_TRUSTED_PROXY_CIDRS: "10.0.0.0/8" }, 0), "no hops: the list is not used").toEqual([]);
+  });
+
   test("host mode ignores the LAN values and reads the host variables", () => {
     expect(resolveListenPolicy({ env: {}, hostMode: true, lan })).toMatchObject({
       apiHost: "127.0.0.1", apiPort: 3212, apiPortConfigured: false, allowedCidrs: ["127.0.0.1/32", "::1/128"], lanEnabled: false
