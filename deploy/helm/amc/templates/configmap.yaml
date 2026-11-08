@@ -1,6 +1,11 @@
 {{- if and (or .Values.ingress.enabled (gt (int .Values.env.AMC_TRUSTED_PROXY_HOPS) 0)) (or (eq (int .Values.env.AMC_TRUSTED_PROXY_HOPS) 0) (not .Values.env.AMC_TRUSTED_PROXY_CIDRS)) }}
 {{- fail "ingress.enabled or env.AMC_TRUSTED_PROXY_HOPS above 0 needs env.AMC_TRUSTED_PROXY_HOPS (1 behind one ingress controller) and env.AMC_TRUSTED_PROXY_CIDRS set to the ingress controller pods' addresses (kubectl -n ingress-nginx get pods -o wide): X-Forwarded-* headers are believed only from them" }}
 {{- end }}
+{{- range $cidr := splitList "," (toString .Values.env.AMC_TRUSTED_PROXY_CIDRS) }}
+{{- if regexMatch "^(192\\.0\\.2\\.|198\\.51\\.100\\.|203\\.0\\.113\\.|2001:0?db8:)" (lower (trim $cidr)) }}
+{{- fail (printf "env.AMC_TRUSTED_PROXY_CIDRS entry %s is a documentation range (RFC 5737/3849): it matches no real proxy; set the ingress controller pods' addresses" (trim $cidr)) }}
+{{- end }}
+{{- end }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

@@ -79,6 +79,32 @@ describe("listen policy", () => {
     expect(warnings({ AMC_TRUSTED_PROXY_CIDRS: "10.0.0.0/8" }, 0), "no hops: the list is not used").toEqual([]);
   });
 
+  // SR-10, coordinator correction: a documentation range passes CIDR validation but matches no real proxy, so a copied
+  // placeholder left the real proxy untrusted. It is refused. With the allow list admitting private ranges that no named
+  // proxy can be in (nor loopback, a same-host proxy), a proxy there would be untrusted and everyone it forwards would
+  // share its admitted address, which is warned about.
+  test("documentation ranges are refused; a proxy list that misses every private range the allow list admits is warned about", () => {
+    const named = (env: NodeJS.ProcessEnv) => resolveListenPolicy({ env, hostMode: false });
+    for (const cidr of ["198.51.100.0/24", "192.0.2.7/32", "203.0.113.0/24", "2001:db8::/32", "2001:DB8::1/128", "10.244.1.17/32,198.51.100.9/32"]) {
+      expect(() => assertProxyTrustNamed(1, named({ AMC_TRUSTED_PROXY_CIDRS: cidr }), () => undefined), cidr).toThrow(/is a documentation range \(RFC 5737\/3849\)/);
+    }
+    expect(() => assertProxyTrustNamed(0, named({ AMC_TRUSTED_PROXY_CIDRS: "198.51.100.0/24" })), "no hops: the list is not used").not.toThrow();
+    const warnings = (env: NodeJS.ProcessEnv): string[] => {
+      const lines: string[] = [];
+      assertProxyTrustNamed(1, named(env), (line) => lines.push(line));
+      return lines;
+    };
+    expect(warnings({ AMC_ALLOWED_CIDRS: "10.0.0.0/8,192.168.0.0/16", AMC_TRUSTED_PROXY_CIDRS: "203.0.114.5/32" })).toEqual([
+      expect.stringContaining("AMC_TRUSTED_PROXY_CIDRS matches no address in the private ranges AMC_ALLOWED_CIDRS admits (10.0.0.0/8, 192.168.0.0/16)")
+    ]);
+    expect(warnings({ AMC_ALLOWED_CIDRS: "0.0.0.0/1", AMC_TRUSTED_PROXY_CIDRS: "100.64.0.5/32" }), "only the private part of a broad entry counts").toEqual([
+      expect.stringContaining("the private ranges AMC_ALLOWED_CIDRS admits (0.0.0.0/1)")
+    ]);
+    expect(warnings({ AMC_ALLOWED_CIDRS: "10.0.0.0/8", AMC_TRUSTED_PROXY_CIDRS: "10.244.1.17/32" }), "the proxy can be in the private range").toEqual([]);
+    expect(warnings({ AMC_ALLOWED_CIDRS: "192.168.0.0/16", AMC_TRUSTED_PROXY_CIDRS: "127.0.0.1/32" }), "a same-host proxy").toEqual([]);
+    expect(warnings({ AMC_ALLOWED_CIDRS: "203.0.114.0/24", AMC_TRUSTED_PROXY_CIDRS: "203.0.114.5/32" }), "no private range admitted").toEqual([]);
+  });
+
   test("host mode ignores the LAN values and reads the host variables", () => {
     expect(resolveListenPolicy({ env: {}, hostMode: true, lan })).toMatchObject({
       apiHost: "127.0.0.1", apiPort: 3212, apiPortConfigured: false, allowedCidrs: ["127.0.0.1/32", "::1/128"], lanEnabled: false

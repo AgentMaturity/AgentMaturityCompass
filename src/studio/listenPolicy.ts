@@ -1,6 +1,6 @@
 import { isPublicBind } from "../config/loadConfig.js";
-import { isIP } from "node:net";
-import { cidrSyntaxValid, ipv4CidrRange, LOOPBACK_CIDRS, withLoopbackCidrs } from "./clientAddress.js";
+import { BlockList, isIP } from "node:net";
+import { cidrSyntaxValid, ipAllowedByCidrs, ipv4CidrRange, LOOPBACK_CIDRS, withLoopbackCidrs } from "./clientAddress.js";
 
 /**
  * Where Studio listens and whom it admits (LIVE-RUNTIME-03, D-R4), decided once from the raw environment, the CLI flags
@@ -125,37 +125,71 @@ export const PROXY_TRUST_REFUSAL = "AMC_TRUSTED_PROXY_HOPS is set, but AMC_TRUST
   + "Set it to your reverse proxy's addresses: forwarded headers are believed only from them.";
 
 const WIDE_PROXY_RANGE = 2 ** 20; // a /12: the size of 172.16.0.0/12, the narrowest private range
+const PRIVATE_RANGES = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"].map((cidr) => ipv4CidrRange(cidr) as [number, number]);
+/** RFC 5737 and RFC 3849 documentation ranges: an entry there is a placeholder that matches no real proxy (SR-10). */
+const DOCUMENTATION_RANGES = new BlockList();
+for (const [network, prefix, type] of [["192.0.2.0", 24, "ipv4"], ["198.51.100.0", 24, "ipv4"], ["203.0.113.0", 24, "ipv4"], ["2001:db8::", 32, "ipv6"]] as const) {
+  DOCUMENTATION_RANGES.addSubnet(network, prefix, type);
+}
+
+const overlap = (a: [number, number], b: [number, number]): [number, number] | null =>
+  Math.max(a[0], b[0]) <= Math.min(a[1], b[1]) ? [Math.max(a[0], b[0]), Math.min(a[1], b[1])] : null;
+
+function documentationEntry(cidr: string): boolean {
+  const ip = cidr.trim().split("/")[0] ?? "";
+  const family = isIP(ip);
+  return family !== 0 && DOCUMENTATION_RANGES.check(ip, family === 4 ? "ipv4" : "ipv6");
+}
 
 /**
- * Warnings for proxies named too broadly (SR-10): any host inside a trusted range can name its own client address. An
- * IPv4 range of /12 or wider, or a range (not a single address) that overlaps the client allow list, so that admitted
- * clients would count as proxies. IPv6 entries other than ::1 match nothing (clientAddress.ts), so they trust nobody.
+ * Warnings for proxies named too broadly or not at all where they sit (SR-10). Any host inside a trusted range can name
+ * its own client address: an IPv4 range of /12 or wider, or a range (not a single address) that overlaps the client
+ * allow list, would let admitted clients count as proxies. And when the allow list admits private ranges, where a proxy
+ * usually sits, but no named proxy can be in them (nor on loopback, a same-host proxy), a proxy there is not trusted:
+ * everyone it forwards is seen as its own admitted address. IPv6 entries other than ::1 match nothing (clientAddress.ts).
  */
-export function proxyTrustWarnings(policy: Pick<ListenPolicy, "trustedProxyCidrs" | "allowedCidrs">): string[] {
+function proxyTrustWarnings(policy: Pick<ListenPolicy, "trustedProxyCidrs" | "allowedCidrs">): string[] {
   const allowed = policy.allowedCidrs.map((cidr) => [cidr, ipv4CidrRange(cidr)] as const);
-  return policy.trustedProxyCidrs.flatMap((cidr) => {
-    const range = ipv4CidrRange(cidr);
+  const trusted = policy.trustedProxyCidrs.map((cidr) => [cidr, ipv4CidrRange(cidr)] as const);
+  const advice = "can name its own client address in X-Forwarded-For. Name only your reverse proxies' own addresses.";
+  const warnings = trusted.flatMap(([cidr, range]) => {
     if (range === null) return [];
-    const advice = "can name its own client address in X-Forwarded-For. Name only your reverse proxies' own addresses.";
     if (range[1] - range[0] + 1 >= WIDE_PROXY_RANGE) return [`AMC_TRUSTED_PROXY_CIDRS entry ${cidr} spans a /12 or wider range: any host in it ${advice}`];
-    const overlapping = range[0] === range[1] ? [] : allowed.filter(([, other]) => other !== null && other[0] <= range[1] && range[0] <= other[1]);
+    const overlapping = range[0] === range[1] ? [] : allowed.filter(([, other]) => other !== null && overlap(range, other) !== null);
     return overlapping.length > 0
       ? [`AMC_TRUSTED_PROXY_CIDRS entry ${cidr} overlaps the client allow list (${overlapping.map(([name]) => name).join(", ")}): a client in both ${advice}`]
       : [];
   });
+  const privateAllowed = allowed.flatMap(([name, range]) => range === null ? [] : PRIVATE_RANGES.flatMap((ours) => {
+    const shared = overlap(range, ours);
+    return shared === null ? [] : [[name, shared] as const];
+  }));
+  const sameHost = policy.trustedProxyCidrs.some((cidr) => ipAllowedByCidrs("127.0.0.1", [cidr]) || ipAllowedByCidrs("::1", [cidr]));
+  const reachable = trusted.some(([, range]) => range !== null && privateAllowed.some(([, shared]) => overlap(range, shared) !== null));
+  if (privateAllowed.length > 0 && !sameHost && !reachable) {
+    warnings.push(`AMC_TRUSTED_PROXY_CIDRS matches no address in the private ranges AMC_ALLOWED_CIDRS admits (${[...new Set(privateAllowed.map(([name]) => name))].join(", ")}): `
+      + "a proxy there is not trusted, so everyone it forwards is seen as its own address, which the allow list admits. Name your reverse proxy's address.");
+  }
+  return warnings;
 }
 
 /**
  * Throws PROXY_TRUST_REFUSAL when proxy hops are declared but no proxy is named (SR-1). Forwarding headers would then
  * count from nobody: every client behind the proxy would share its address, and the allow list would judge the proxy
- * instead of the client, admitting everyone it forwards. Refusing the start is the fail-closed answer. With hops
- * declared, a proxy list named too broadly is warned about (SR-10): a warning, because some clusters can only name their
- * ingress controller by its pod range.
+ * instead of the client, admitting everyone it forwards. Refusing the start is the fail-closed answer, and so is
+ * refusing a documentation range (RFC 5737/3849), a copied placeholder that names no real proxy (SR-10). With hops
+ * declared, a proxy list named too broadly, or missing the private ranges the allow list admits, is warned about: a
+ * warning, because some clusters can only name their ingress controller by its pod range.
  */
 export function assertProxyTrustNamed(trustedProxyHops: number | undefined, policy: Pick<ListenPolicy, "trustedProxyCidrs" | "allowedCidrs">,
   warn: (line: string) => void = (line) => console.warn(line)): void {
   if ((trustedProxyHops ?? 0) <= 0) return;
   if (policy.trustedProxyCidrs.length === 0) throw new Error(PROXY_TRUST_REFUSAL);
+  const placeholder = policy.trustedProxyCidrs.find(documentationEntry);
+  if (placeholder !== undefined) {
+    throw new Error(`AMC_TRUSTED_PROXY_CIDRS entry ${placeholder} is a documentation range (RFC 5737/3849): it matches no real proxy. `
+      + "Set it to your reverse proxy's addresses.");
+  }
   for (const warning of proxyTrustWarnings(policy)) warn(`studio: ${warning}`);
 }
 

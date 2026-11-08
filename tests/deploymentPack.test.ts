@@ -83,7 +83,9 @@ describe("deployment pack assets", () => {
     const values = YAML.parse(read("deploy/helm/amc/values.yaml"));
     expect([values.env.AMC_TRUSTED_PROXY_HOPS, values.env.AMC_TRUSTED_PROXY_CIDRS]).toEqual(["0", ""]);
     const example = YAML.parse(read("deploy/helm/amc/examples/values-ingress-tls.yaml"));
-    expect(startWarnings({ ...values.env, ...example.env }), "the ingress example's placeholder").toEqual([]);
+    expect(example.env.AMC_TRUSTED_PROXY_CIDRS, "the ingress example leaves the proxy for the operator to name").toBe("");
+    expect(() => startWarnings({ ...values.env, ...example.env })).toThrow(PROXY_TRUST_REFUSAL);
+    expect(startWarnings({ ...values.env, ...example.env, AMC_TRUSTED_PROXY_CIDRS: "10.244.1.17/32" }), "a real ingress pod address").toEqual([]);
     const k8s = YAML.parse(read("deploy/k8s/configmap.yaml")).data;
     expect(k8s.AMC_TRUSTED_PROXY_CIDRS).toBe("");
     expect(() => startWarnings(k8s)).toThrow(PROXY_TRUST_REFUSAL);
@@ -105,7 +107,17 @@ describe("deployment pack assets", () => {
     const named = render("--set", "ingress.enabled=true", "--set", "env.AMC_TRUSTED_PROXY_HOPS=1", "--set", "env.AMC_TRUSTED_PROXY_CIDRS=10.244.1.0/24");
     expect(named.status, named.stderr).toBe(0);
     expect(named.stdout).toContain('AMC_TRUSTED_PROXY_CIDRS: "10.244.1.0/24"');
-    expect(render("-f", join(chart, "examples/values-ingress-tls.yaml")).status).toBe(0);
+    // The ingress example renders only once the operator names a real proxy; documentation ranges are refused.
+    const example = join(chart, "examples/values-ingress-tls.yaml");
+    const asShipped = render("-f", example);
+    expect(asShipped.status).toBe(1);
+    expect(asShipped.stderr).toContain("env.AMC_TRUSTED_PROXY_CIDRS set to the ingress controller pods' addresses");
+    expect(render("-f", example, "--set", "env.AMC_TRUSTED_PROXY_CIDRS=10.244.1.17/32").status).toBe(0);
+    for (const cidr of ["198.51.100.0/24", "192.0.2.7/32", "203.0.113.0/24", "2001:db8::/32", "10.244.1.17/32\\,198.51.100.9/32"]) {
+      const placeholder = render("-f", example, "--set", `env.AMC_TRUSTED_PROXY_CIDRS=${cidr}`);
+      expect(placeholder.status, cidr).toBe(1);
+      expect(placeholder.stderr, cidr).toContain("is a documentation range (RFC 5737/3849)");
+    }
   });
 
   it("persists <AMC home>/state, where anti-rollback marks live, in compose and the Helm chart (P1-08 review M4)", () => {
