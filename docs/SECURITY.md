@@ -94,11 +94,20 @@ Private signing keys (Monitor + Auditor) are stored in an encrypted vault:
 - AES-256-GCM encryption with PBKDF2/scrypt-derived key
 - Passphrase entered by owner during initialization
 - Keys never stored unencrypted on disk
-- Auto-lock: vault unlocked only in memory
-- Agent processes never have access to private keys
-- CI unlock via `AMC_VAULT_PASSPHRASE` environment variable (never printed/stored)
+- Auto-lock: the vault is unlocked only in memory, per process
+- CI unlock via the `AMC_VAULT_PASSPHRASE` environment variable
+- The passphrase can also be remembered for your user: the macOS Keychain item `amc-vault`, or `$AMC_HOME/vault-credentials.json` (0600, plaintext). Any process running as the same OS user can read that file and that item. A remembered passphrase unlocks the vault only for an interactive operator (stdin a terminal, the workspace not in agent mode, no agent marker such as `AMC_LEASE`, `AMC_TOKEN`, `CLAUDECODE` or `CODEX_SANDBOX`), and governance commands opened from it ask for confirmation first.
+- `.amc/local-vault-passphrase` (0600, written by bare `amc` and `amc monitor start` for a vault they create) is never read in agent mode or under an agent marker.
+- A coding-agent harness that runs commands in a pseudo-terminal and sets none of the known markers is indistinguishable from you; export `AMC_VAULT_PASSPHRASE` only in shells you control. The full rule, the marker list, the opt-outs and when to rotate are in [VAULT.md](VAULT.md).
 
-Key rotation is supported via `amc vault rotate-keys`, which maintains key history for verifying older signatures.
+Key rotation is supported via `amc vault rotate-keys`, which maintains key history for verifying older signatures. Rotated keys are sealed under the same passphrase, so rotation does not answer a passphrase leak; [VAULT.md](VAULT.md) "When to rotate" gives the remedy.
+
+### Identity and API-key readiness
+
+- Console accounts are the signed `.amc/users.yaml` (scrypt password hashes). AMC keeps at least one active OWNER: revoking or demoting the last one is refused. A revoked account cannot be reactivated. Passwords are reset with `amc user password` on the Studio host.
+- The Studio admin token (`.amc/studio/admin.token`) authorizes reads and non-account mutations, but it cannot create, revoke or re-role console accounts.
+- OIDC and SAML are host-scope and unqualified: no identity-provider interoperability has been recorded, and SAML accepts only AMC's compact JSON assertion ([SSO_OIDC.md](SSO_OIDC.md), [SSO_SAML.md](SSO_SAML.md)). SCIM is host-scope too ([SCIM.md](SCIM.md)).
+- Keys from `amc api key create` are a hashed local store; no Studio HTTP route accepts them today ([API_SURFACES.md](API_SURFACES.md)).
 
 ## Network Security
 
