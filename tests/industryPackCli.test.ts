@@ -130,6 +130,26 @@ describe("Industry Pack CLI with no licence", () => {
     await validFreeControl();
   });
 
+  // Follow-up 6: without a terminal, run used to show the baseline silently. One stderr line says so; the exit code and
+  // the --json stdout stay what --baseline gives.
+  test("without a terminal, run says on stderr that it shows the baseline; exit code and --json stdout are unchanged", async () => {
+    await validFreeControl();
+    const notice = "Interactive mode needs a terminal; showing the baseline";
+    const asked = await invoke("no-terminal-run", ["domain", "pack", "run", "--pack", "clinical-trials", "--json"]);
+    const chosen = await invoke("no-terminal-baseline", ["domain", "pack", "run", "--pack", "clinical-trials", "--baseline", "--json"]);
+    completed(asked);
+    completed(chosen);
+    expect(asked.status, asked.stderr).toBe(chosen.status);
+    expect(asked.stderr.split("\n").filter((line) => line.includes(notice))).toHaveLength(1);
+    expect(chosen.stderr).not.toContain(notice);
+    const stable = (stdout: string) => JSON.stringify(JSON.parse(stdout), (key, value) => /(?:Ts|At)$/.test(key) ? undefined : value);
+    expect(stable(asked.stdout)).toBe(stable(chosen.stdout));
+    const human = await invoke("no-terminal-human", ["domain", "pack", "run", "--pack", "clinical-trials"]);
+    completed(human);
+    expect(human.stderr).toContain(notice);
+    expect(human.stdout).not.toContain(notice);
+  });
+
   test("checkout has nothing to sell and exits 0", async () => {
     const checkout = await invoke("free-checkout", ["domain", "pack", "checkout", "--json"]);
     completed(checkout);

@@ -224,6 +224,8 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       const responses: Record<string, number> = {};
 
       const interactive = !opts.baseline && process.stdin.isTTY;
+      // stderr only: exit codes and --json stdout stay as they were (follow-up 6).
+      if (!opts.baseline && !interactive) console.error("Interactive mode needs a terminal; showing the baseline (no answers, no score). Pass --baseline to run it on purpose.");
       if (interactive) {
         // Interactive assessment. Under --json, stdout carries only the JSON (LIVE-UX-10): the question lines and the
         // prompts go to stderr. inquirer takes its output stream from createPromptModule, not from prompt().
