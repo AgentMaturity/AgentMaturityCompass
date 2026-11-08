@@ -3,7 +3,10 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, expect, test, vi } from "vitest";
 import { agentToolset } from "../src/agent/agentToolset.js";
+import { applyPatchTool } from "../src/tools/builtin/applyPatchTool.js";
 import { bashTool } from "../src/tools/builtin/bashTool.js";
+import { lsTool } from "../src/tools/builtin/lsTool.js";
+import { ReadBeforeEditLedger } from "../src/tools/builtin/readBeforeEdit.js";
 import { searchTools } from "../src/tools/builtin/searchTools.js";
 import { toolSearchTool } from "../src/tools/builtin/toolSearchTool.js";
 import { DEFAULT_AGENT_LOOP_CONFIG } from "../src/agent/loopTypes.js";
@@ -148,7 +151,8 @@ test("an already cancelled native step remains cancelled before schema admission
 // P1-36: fs.read gained `offset`/`limit`; fs.edit gained `replaceAll` and `edits`, and `required` is now `["path"]`.
 // WP33 (PXA-22): fs.read `maxBytes` states the body's bounds (minimum 1, maximum 10,000,000), now enforced before approval.
 // WP34a: fs.read now documents regular-file admission and UTF-8-safe bounded output; arguments remain unchanged.
-const FS_TOOL_SCHEMAS_SHA256 = "e4afe883083c1c347c9ce9ffb00be4fe6c701a6f642d32b3a6290457dd047bc3";
+// SH-TOOLS-02: fs.read's description states that binary content (a NUL in the first 8 KB) is described, not shown; arguments unchanged.
+const FS_TOOL_SCHEMAS_SHA256 = "50528424bffe1ed609da88abc79aa5c744e670da368fca5123981409ccdc26ed";
 const edit: ToolDefinition = { name: "fs.edit", actionClass: "WRITE_LOW", allow: { paths: ["./workspace/**"] } };
 
 test("the offered fs tool schemas are pinned by digest and keep one top-level path argument (P1-36)", () => {
@@ -217,12 +221,24 @@ test("a native session without a signed spill reader grant cannot invoke it", as
 
 // WP34b follows the canonical-schema review process above. The fs schema digest is unchanged.
 // Review optional bash workdir/description and search path through one explicit digest change.
-const BASH_SEARCH_TOOL_SCHEMAS_SHA256 = "f82eccbf1763c16bcf3652d24f7950cddef0043fa66ab9ea395903104784168c";
+// SH-TOOLS-04: grep gained fixedStrings, multiline, context, mode and offset; glob gained sortBy. bash is unchanged.
+const BASH_SEARCH_TOOL_SCHEMAS_SHA256 = "ab26f7a69e7845808a20193e704e222e4dd8c86b226e38d673641ffa92a25fb0";
 test("the bash and search schemas pin the reviewed WP34b arguments", () => {
   const offered = [bashTool(), ...searchTools()].map(({ name, description, parameters }) => ({ name, description, parameters }))
     .sort((a, b) => a.name.localeCompare(b.name));
   expect(offered.map(schema => schema.name)).toEqual(["bash", "glob", "grep"]);
   expect(sha256Hex(canonicalize(offered))).toBe(BASH_SEARCH_TOOL_SCHEMAS_SHA256);
+});
+
+// SH-TOOLS-01/02 follow the same review process: apply_patch (one `patch` argument; its paths are projected onto
+// `path` for the signed path policy by `governedToolArguments`) and ls (no path policy, like glob and grep).
+const APPLY_PATCH_LS_TOOL_SCHEMAS_SHA256 = "7ea3a2e0506f49cd15674167e12bb59cc073f6d0743cc999e78cc645e45fc672";
+test("the apply_patch and ls schemas are pinned", () => {
+  const offered = [applyPatchTool({ ledger: new ReadBeforeEditLedger() }), lsTool()]
+    .map(({ name, description, parameters }) => ({ name, description, parameters })).sort((a, b) => a.name.localeCompare(b.name));
+  expect(offered.map(schema => schema.name)).toEqual(["apply_patch", "ls"]);
+  expect(offered[0]!.parameters.required).toEqual(["patch"]);
+  expect(sha256Hex(canonicalize(offered))).toBe(APPLY_PATCH_LS_TOOL_SCHEMAS_SHA256);
 });
 
 // WP13b follows the canonical-schema review process above. Review the new explicit name/digest activation operation;

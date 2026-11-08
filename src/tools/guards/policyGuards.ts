@@ -10,6 +10,7 @@ import {
   type VerifiedToolsConfigSnapshot
 } from "../../toolhub/toolhubValidators.js";
 import { BLOCK_CONFIDENCE, matchInjection } from "../../shield/injection/injectionMatcher.js";
+import { patchPaths } from "../builtin/applyPatchParse.js";
 import { RUN_CODE_TOOL } from "../toolPipeline.js";
 import type { ToolDefinition, ToolExecution, ToolGuard } from "../toolTypes.js";
 import { checkEgress, EgressBlocked } from "../../residency/checkEgress.js";
@@ -34,7 +35,18 @@ import { checkEgress, EgressBlocked } from "../../residency/checkEgress.js";
  * `web_search` reaches its provider's declared origin, never a model-chosen url).
  */
 export type GovernedArguments = (execution: ToolExecution) => Readonly<Record<string, unknown>>;
-const ownArguments: GovernedArguments = (execution) => execution.arguments;
+
+/**
+ * The call's own arguments, with the paths a multi-file tool carries inside another argument projected onto `path`
+ * so the declared path policy sees every file (SH-TOOLS-01). `apply_patch` names its files inside `patch`; a patch
+ * that does not parse projects no path, and a tool with a path policy then denies "path is required": fail closed.
+ * Pure, so every plane (native pipeline, ToolHub, hook control) projects the same way.
+ */
+export const governedToolArguments: GovernedArguments = (execution) =>
+  execution.name === "apply_patch"
+    ? { ...execution.arguments, path: patchPaths(execution.arguments.patch) }
+    : execution.arguments;
+const ownArguments: GovernedArguments = governedToolArguments;
 
 /**
  * The Runtime Firewall over the call's arguments.

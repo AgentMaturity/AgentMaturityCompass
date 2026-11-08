@@ -12,6 +12,9 @@ export const NATIVE_BUILTIN_CAPABILITIES: readonly NativeToolCapability[] = Obje
   { name: "fs.read", actionClass: "READ_ONLY" },
   { name: "fs.write", actionClass: "WRITE_LOW" },
   { name: "fs.edit", actionClass: "WRITE_LOW" },
+  // SH-TOOLS: the Codex patch editor and the directory listing, bounded like their fs.* and glob siblings.
+  { name: "apply_patch", actionClass: "WRITE_LOW" },
+  { name: "ls", actionClass: "READ_ONLY" },
   { name: "glob", actionClass: "READ_ONLY" },
   { name: "grep", actionClass: "READ_ONLY" },
   { name: "tool_search", actionClass: "READ_ONLY" },
