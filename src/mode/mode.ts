@@ -85,6 +85,8 @@ export const OWNER_ONLY_COMMAND_PATHS: readonly string[] = [
     "workorder create",
     "workorder expire",
     "ticket issue",
+    // SH-INTEG: signing integrations.yaml chooses where notifications go.
+    "integrations sign",
     // SH-INTEG-02: writing or signing the source policy grants admission authority; observe and admit trust a local
     // payload file and store rows, which an agent could forge into an allowed sender's request.
     "integrations source init",

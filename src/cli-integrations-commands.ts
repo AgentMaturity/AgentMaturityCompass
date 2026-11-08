@@ -1,6 +1,7 @@
 /**
  * The `amc integrations ...` command group: the delivery-hub commands (moved out of cli.ts whole, as the lease and
- * agent groups were, so the ratchet prices no growth there) plus `amc integrations source ...` (SH-INTEG-01/02):
+ * agent groups were, so the ratchet prices no growth there), `amc integrations sign` for an edited integrations.yaml,
+ * and `amc integrations source ...` (SH-INTEG-01/02):
  * source observations, the signed source policy, deterministic admission and proposals for human approval.
  */
 import chalk from "chalk";
@@ -13,6 +14,7 @@ import {
   integrationsTestCli,
   integrationsVerifyCli
 } from "./integrations/integrationsCli.js";
+import { signIntegrationsConfigAsync } from "./integrations/integrationStore.js";
 import { sourceAdmitCli, sourceCheckCli, sourceObserveCli, sourceStatusCli } from "./integrations/source/sourceIntakeCli.js";
 import { initSourcePolicy, loadVerifiedSourcePolicy, signSourcePolicy } from "./integrations/source/sourcePolicyStore.js";
 
@@ -110,6 +112,14 @@ export function registerIntegrationsCommands(integrations: Command): void {
       }
       console.log(chalk.red(`Integrations signature invalid: ${out.reason ?? "unknown reason"}`));
       process.exit(1);
+    });
+
+  integrations
+    .command("sign")
+    .description("Sign the edited integrations.yaml: channel urls, enabled flags, routing (owner mode; an invalid config is refused)")
+    .action(async () => {
+      const out = await signIntegrationsConfigAsync(process.cwd());
+      console.log(chalk.green(`Integrations config signed: ${out.sigPath} (sha256 ${out.digest})`));
     });
 
   integrations

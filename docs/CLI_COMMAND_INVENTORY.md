@@ -638,6 +638,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc integrations export-journal` | Export integration delivery journal (receipts + dead letters) | `--out <file>` | - |
 | `amc integrations init` | Create and sign integrations.yaml with vault-backed secret refs | - | - |
 | `amc integrations setup` | Generate integration config files | `--type <type>`<br>`--min-score <score>`<br>`--agent <agentId>`<br>`--output <dir>` | - |
+| `amc integrations sign` | Sign the edited integrations.yaml: channel urls, enabled flags, routing (owner mode; an invalid config is refused) | - | - |
 | `amc integrations source` | Source-driven work: observe GitHub events, admit explicit requests, propose work for human approval | - | - |
 | `amc integrations source admit` | Admit recorded observations: an explicit request by an allowed human becomes one approval request for the source's work order | `--observation <id>`<br>`--all-pending` | - |
 | `amc integrations source check` | Decide admission for one event payload against the signed policy; stores and files nothing (exit 1 when not admitted) | `--source <id>`<br>`--event <file>` | - |

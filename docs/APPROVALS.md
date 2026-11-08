@@ -123,7 +123,7 @@ Decision values are `APPROVE_EXECUTE`, `APPROVE_SIMULATE`, or `DENY`. Unknown va
 
 ## Lifecycle Delivery
 
-Run `amc integrations init`, store channel credentials in Vault, configure signed routing in `.amc/integrations.yaml`, then verify with:
+Run `amc integrations init`, store channel credentials in Vault, configure routing in `.amc/integrations.yaml`, sign the edited file with `amc integrations sign` (owner mode; `init` rewrites the template), then verify with:
 
 ```bash
 amc integrations verify

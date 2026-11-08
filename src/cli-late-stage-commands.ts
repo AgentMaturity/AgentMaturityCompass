@@ -1378,7 +1378,7 @@ export function registerLateStageCliCommands({
   integrations
     .command("setup")
     .description("Generate integration config files")
-    .requiredOption("--type <type>", "Integration: github-action | gitlab-ci | slack | discord | pagerduty | webhook | langfuse | helicone | datadog")
+    .requiredOption("--type <type>", "Integration: github-action | gitlab-ci | slack | webhook | langfuse | helicone | datadog")
     .option("--min-score <score>", "Minimum passing score for CI gates", "60")
     .option("--agent <agentId>", "Agent ID")
     .option("--output <dir>", "Output directory", ".")
@@ -1389,9 +1389,10 @@ export function registerLateStageCliCommands({
         opts.type as any,
         { minScore: parseInt(opts.minScore, 10), agentId: opts.agent },
       );
-      console.log(chalk.green(`✅ Integration setup complete\n`));
+      // A notification target writes no file (its channel lives in the signed integrations.yaml): no "complete" banner then.
+      if (result.files.length > 0) console.log(chalk.green(`✅ Integration setup complete\n`));
       for (const f of result.files) console.log(chalk.gray(`  Created: ${f.path}`));
-      console.log(`\n${result.instructions}`);
+      console.log(`${result.files.length > 0 ? "\n" : ""}${result.instructions}`);
     });
 
   integrations
@@ -1402,10 +1403,8 @@ export function registerLateStageCliCommands({
       const integrations = [
         { name: "github-action", desc: "GitHub Actions CI gate — block PRs below score threshold" },
         { name: "gitlab-ci", desc: "GitLab CI pipeline gate" },
-        { name: "slack", desc: "Slack webhook notifications for alerts" },
-        { name: "discord", desc: "Discord webhook notifications" },
-        { name: "pagerduty", desc: "PagerDuty incident triggers" },
-        { name: "webhook", desc: "Generic webhook notifications" },
+        { name: "slack", desc: "Slack notifications: the slack_webhook channel of the signed .amc/integrations.yaml (setup prints the steps)" },
+        { name: "webhook", desc: "HMAC-signed webhook notifications: the webhook channel of the signed .amc/integrations.yaml (setup prints the steps)" },
         { name: "langfuse", desc: "Langfuse observability connector" },
         { name: "helicone", desc: "Helicone observability connector" },
         { name: "datadog", desc: "Datadog observability connector" },

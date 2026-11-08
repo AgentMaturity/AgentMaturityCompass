@@ -6,7 +6,8 @@ import YAML from "yaml";
 import { afterEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { dispatchIntegrationEvent } from "../src/integrations/integrationDispatcher.js";
-import { initIntegrationsConfig, integrationsConfigPath, integrationsConfigSigPath } from "../src/integrations/integrationStore.js";
+import { initIntegrationsConfig, integrationsConfigPath, integrationsConfigSigPath, signIntegrationsConfigAsync, verifyIntegrationsConfigSignature } from "../src/integrations/integrationStore.js";
+import { setMode } from "../src/mode/mode.js";
 import { getPrivateKeyPem, signHexDigest } from "../src/crypto/keys.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { setVaultSecret } from "../src/vault/vault.js";
@@ -55,6 +56,27 @@ afterEach(async () => {
       rmSync(dir, { recursive: true, force: true });
     }
   }
+});
+
+describe("amc integrations sign", () => {
+  test("signs an edited integrations.yaml in owner mode and never signs an invalid one", async () => {
+    const workspace = newWorkspace();
+    const path = integrationsConfigPath(workspace);
+    const config = YAML.parse(readFileSync(path, "utf8")) as { integrations: { channels: Array<{ url?: string }> } };
+    config.integrations.channels[0]!.url = "http://127.0.0.1:9/edited";
+    writeFileSync(path, YAML.stringify(config));
+    expect(verifyIntegrationsConfigSignature(workspace)).toMatchObject({ valid: false, reason: "digest mismatch" });
+    setMode(workspace, "agent");
+    await expect(signIntegrationsConfigAsync(workspace)).rejects.toThrow(/agent mode/);
+    setMode(workspace, "owner");
+    const signed = await signIntegrationsConfigAsync(workspace);
+    expect(signed.digest).toBe(sha256Hex(readFileSync(path)));
+    expect(verifyIntegrationsConfigSignature(workspace)).toMatchObject({ valid: true });
+    // An invalid config is refused before signing: the old signature stays and no longer matches.
+    writeFileSync(path, "integrations: { version: 2 }\n");
+    await expect(signIntegrationsConfigAsync(workspace)).rejects.toThrow();
+    expect(verifyIntegrationsConfigSignature(workspace)).toMatchObject({ valid: false, reason: "digest mismatch" });
+  });
 });
 
 describe("slack webhook integration channel", () => {

@@ -5,6 +5,7 @@ import YAML from "yaml";
 import { z } from "zod";
 import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { capturePublicConfigAuthority, captureRawConfigPairForAsync, verifyRawConfigSignature } from "../config/configSignaturePair.js";
+import { assertOwnerMode } from "../mode/mode.js";
 import { captureOrgPairs } from "../org/preparedOrgPairs.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -181,6 +182,23 @@ export async function initIntegrationsConfigAsync(workspace: string, beforePubli
     if (!secretWriteAttempted) throw cause;
     throw new IntegrationsInitializationError(secretWriteAttempted, secretWriteReturned, cause);
   }
+}
+
+/**
+ * Signs the operator-edited integrations.yaml (owner mode), so a channel's url, its enabled flag and the routing can
+ * change after `init`. The captured bytes are strict-parsed and those same bytes are signed; an invalid config is
+ * never signed. Secrets stay vault references: a missing one fails at delivery, never here.
+ */
+export async function signIntegrationsConfigAsync(workspace: string): Promise<{ path: string; sigPath: string; digest: string }> {
+  assertOwnerMode(workspace, "integrations sign");
+  const path = integrationsConfigPath(workspace);
+  if (!pathExists(path)) throw new Error("integrations config missing: run `amc integrations init` first");
+  const pair = captureRawConfigPairForAsync(workspace, path);
+  integrationsConfigSchema.parse(YAML.parse(pair.bytes.toString("utf8")) as unknown);
+  const prepared = await pair.prepare();
+  const result = prepared.publish();
+  prepared.assertCurrent();
+  return { ...result, digest: pair.digestSha256 };
 }
 
 export function loadIntegrationsConfig(workspace: string): IntegrationsConfig {

@@ -114,8 +114,9 @@ Before admission the parser refuses `event_shape_invalid`, `event_action_unsuppo
 - No inbound webhook and no polling: observations enter through `observe`/`check` from a payload file. In GitHub
   Actions that is `$GITHUB_EVENT_PATH`. Only `issue_comment` and `issues` payloads are accepted; a REST list item is
   a different shape and is refused.
-- Notification reuses the approval lifecycle delivery (`APPROVAL_REQUEST_CREATED` through `integrations.yaml`), which
-  sends over the configured channels: this is the one place the slice reaches the network. The outcome is reported
+- Notification reuses the approval lifecycle delivery (`APPROVAL_REQUEST_CREATED` through `integrations.yaml`, whose
+  channels and routing an operator edits and signs with `amc integrations sign`), which sends over the configured
+  channels: this is the one place the slice reaches the network. The outcome is reported
   on the admit result as `notification` (`DELIVERED`, `QUEUED`, `SKIPPED` when a signed config routes no channel,
   `BLOCKED:INTEGRATIONS_UNTRUSTED` without a signed `integrations.yaml`, or `BLOCKED:<reason>` when the workspace has
   no signed action policy, tools or budgets). A refused notification never rolls back the proposal.
