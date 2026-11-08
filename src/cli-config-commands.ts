@@ -6,9 +6,7 @@ import { loadDeclarativeConfig } from "./config/amcConfigLoader.js";
  * sha256), and for one JSON Pointer the winning source plus every value the lower layers gave it. `config validate
  * --json` already prints the per-leaf provenance; this is the human view and the shadow history.
  */
-export function registerConfigProvenanceCommand(program: Command): void {
-  const config = program.commands.find(command => command.name() === "config");
-  if (config === undefined) throw new Error("the config command group must be registered before its provenance subcommand");
+export function registerConfigProvenanceCommand(config: Command): void {
   config.command("provenance [pointer]")
     .description("Show which layer and file set each resolved amcconfig.yaml value; with a JSON Pointer, the winner and every shadowed value")
     .option("--config <path>", "explicit config file (replaces the discovered workspace file)")

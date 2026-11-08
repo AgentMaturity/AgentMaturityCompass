@@ -3,7 +3,6 @@ import { previewNativeExtensionCommand } from "./extensions/nativeExtensionRunti
 import { NativeExtensionError } from "./extensions/nativeExtensionManifest.js";
 import { describeNativeExtension, installNativeExtension, readNativeExtension, signNativeExtensionAsync } from "./extensions/nativeExtensionStore.js";
 import { registerNativeHookCommands } from "./cli-native-hook-commands.js";
-import { registerConfigProvenanceCommand } from "./cli-config-commands.js";
 
 function reportFailure(error: unknown, json: boolean): void {
   const code = error instanceof NativeExtensionError ? error.code : "EXTENSION_OPERATION_FAILED";
@@ -62,6 +61,4 @@ export function registerNativeExtensionCommands(program: Command): void {
       catch (error) { reportFailure(error, opts.json === true); }
     });
   registerNativeHookCommands(extension);
-  // The ext domain's registrations share this one cli.ts call site: src/cli.ts is at its line budget.
-  registerConfigProvenanceCommand(program);
 }

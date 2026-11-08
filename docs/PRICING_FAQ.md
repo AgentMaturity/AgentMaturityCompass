@@ -1,7 +1,7 @@
 # PRICING_FAQ.md — Pricing Questions
 
 ## Is AMC free?
-Yes. The whole product is MIT licensed and free: Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 41 Industry Packs (in the current source build; see the next answer), all 16 adapters, 1,268 CLI command paths, browser playground, and CI gates.
+Yes. The whole product is MIT licensed and free: Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 41 Industry Packs (in the current source build; see the next answer), all 16 adapters, 1,278 CLI command paths, browser playground, and CI gates.
 
 ## What costs money?
 Nothing in the product. Industry Packs, the 41 sector-specific domain packs for regulated verticals like healthcare, finance, education, and government, are free in the current source build (unreleased; the next release is 2.0.0): no licence, account or payment (ADR 019, `docs/adr/019-industry-packs-free.md`, decided on 2026-11-07), and there is no checkout. The published 1.1.1 release still asks for a licence before pack questions and runs, and its checkout never went live, so use the source build for packs.

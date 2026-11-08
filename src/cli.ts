@@ -230,6 +230,7 @@ import { registerAcpCommands } from "./acp/acpCli.js";
 import { registerAgentCommands } from "./cli-agent-commands.js";
 import { registerNativeProviderCommands } from "./cli-agent-options.js";
 import { registerNativeExtensionCommands } from "./cli-native-extension-commands.js";
+import { registerConfigProvenanceCommand } from "./cli-config-commands.js";
 import { registerCredentialsCommands } from "./cli-credentials-commands.js";
 import { issueCertificate, inspectCertificate, revokeCertificateAsync, verifyCertificate, verifyRevocation } from "./assurance/certificate.js";
 import { generateTrustCertificateAsync } from "./cert/trustCertificate.js";
@@ -4006,6 +4007,7 @@ program
   });
 
 const configCmd = program.command("config").description("Inspect resolved runtime configuration");
+registerConfigProvenanceCommand(configCmd);
 
 // ── Declarative amcconfig.yaml pipeline ──────────────────────────────────
 // The loader, validator and runner existed as ~1,100 lines with no CLI path:
