@@ -1638,7 +1638,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const authUser = authenticateUser({ workspace: options.workspace, username, password });
         if (!authUser.ok || !authUser.user) {
           // LIVE-RUNTIME-06: one body for every failure; the reason (revoked user, unreadable users config) is audited and logged only.
-          loginThrottle.fail(username, clientIp);
+          loginThrottle.fail(username, clientIp, addressTrusted);
           const reason = authUser.error ?? "invalid credentials";
           console.error(`studio: login refused on ${pathname}: ${reason}`);
           await writeStudioAuditEventAsync({ workspace: options.workspace, auditType: "HUMAN_LOGIN_FAILED", severity: "MEDIUM", payload: { username, reason } });

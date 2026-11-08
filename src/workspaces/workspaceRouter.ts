@@ -881,7 +881,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             });
             return;
           }
-          loginThrottle.fail(username, clientIp);
+          loginThrottle.fail(username, clientIp, addressTrusted);
           appendHostAudit(options.hostDir, "HUMAN_LOGIN_FAILED", username || null, {
             route: "/host/api/login",
             mode: "legacy_fallback",
@@ -891,7 +891,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           return;
         }
         // LIVE-RUNTIME-06: a disabled account answers like a wrong password; a policy refusal (403) keeps its text.
-        if (local.status === 401) loginThrottle.fail(username, clientIp);
+        if (local.status === 401) loginThrottle.fail(username, clientIp, addressTrusted);
         writeControlError(res, local.status, local.status === 401 ? "invalid credentials" : local.error ?? "login failed");
         return;
       }
@@ -1443,7 +1443,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             password: inputPassword
           });
           if (!auth.ok || !auth.user) {
-            loginThrottle.fail(inputUsername, clientIp);
+            loginThrottle.fail(inputUsername, clientIp, addressTrusted);
             appendHostAudit(options.hostDir, "HUMAN_LOGIN_FAILED", inputUsername || null, { route: `/w/${urlWorkspaceId}/login`, reason: auth.error ?? "invalid credentials" });
             writeControlError(res, 401, "invalid credentials");
             return;

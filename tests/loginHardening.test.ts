@@ -5,11 +5,20 @@ import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 // Pass-through spies, so one case can make the users loader or the host password login fail its own way (LIVE-RUNTIME-06).
-const spies = vi.hoisted(() => ({ authenticateUser: vi.fn(), localPasswordLogin: vi.fn() }));
+const spies = vi.hoisted(() => ({ authenticateUser: vi.fn(), localPasswordLogin: vi.fn(), throttleFails: [] as unknown[][] }));
 vi.mock("../src/auth/authApi.js", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../src/auth/authApi.js")>();
   spies.authenticateUser.mockImplementation(actual.authenticateUser);
   return { ...actual, authenticateUser: spies.authenticateUser };
+});
+// SR-11: records what each login route reports to the throttle's fail(); the throttle itself is the real one.
+vi.mock("../src/studio/loginThrottle.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../src/studio/loginThrottle.js")>();
+  const createLoginThrottle: typeof actual.createLoginThrottle = (options) => {
+    const throttle = actual.createLoginThrottle(options);
+    return { ...throttle, fail: (...args) => { spies.throttleFails.push(args); throttle.fail(...args); } };
+  };
+  return { ...actual, createLoginThrottle };
 });
 vi.mock("../src/identity/identityApi.js", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../src/identity/identityApi.js")>();
@@ -132,6 +141,39 @@ describe("forwarded addresses from a peer that is no named proxy", () => {
     expect((await post(`${api.url}/auth/login`, { username: "owner", password: "owner-password" })).status).toBe(200);
     expect(Date.now() - started).toBeGreaterThanOrEqual(1_900);
   }, 60_000);
+});
+
+// SR-11: only failures from untrusted addresses feed the untrusted refusal, so every failure site must say which it was.
+describe("failed logins reach the throttle with their address trust", () => {
+  test("Studio and all three host-router failure paths pass the resolved trust", async () => {
+    spies.throttleFails.length = 0;
+    const forwarded = (client: string) => ({ "x-forwarded-for": client }); // loopback is the named proxy in both servers
+    const { url } = await studio();
+    for (const headers of [forwarded("10.9.8.1"), {}]) expect((await post(`${url}/auth/login`, { username: "owner", password: "wrong" }, headers)).status).toBe(401);
+    const host = await hostRouter(1, ["127.0.0.1/32"]);
+    for (const headers of [forwarded("10.5.9.1"), {}]) {
+      expect((await post(`${host.url}/host/api/login`, { username: "admin", password: "wrong" }, headers)).status).toBe(401);
+    }
+    for (const headers of [forwarded("10.5.9.2"), {}]) { // the legacy fallback, taken when identity sessions are unavailable
+      spies.localPasswordLogin.mockImplementationOnce(() => { throw new Error("identity sessions not initialised"); });
+      expect((await post(`${host.url}/host/api/login`, { username: "member", password: "wrong" }, headers)).status).toBe(401);
+    }
+    for (const headers of [forwarded("10.5.9.3"), {}]) expect((await post(`${host.url}/w/ws-a/login`, { username: "member", password: "wrong" }, headers)).status).toBe(401);
+    expect(spies.throttleFails).toEqual([["owner", "10.9.8.1", true], ["owner", "127.0.0.1", false], ["admin", "10.5.9.1", true], ["admin", "127.0.0.1", false],
+      ["member", "10.5.9.2", true], ["member", "127.0.0.1", false], ["member", "10.5.9.3", true], ["member", "127.0.0.1", false]]);
+  }, 60_000);
+
+  // SR-11: an untrusted refusal used to count every failure, so 30 failures through the named proxy refused the account on
+  // every untrusted address, loopback included. Loopback is exempt, and those failures no longer feed that count anyway.
+  test("after 30 failures through the named proxy, the owner still signs in from loopback", async () => {
+    const { url } = await studio();
+    for (let i = 0; i < 30; i += 1) {
+      expect((await post(`${url}/auth/login`, { username: "owner", password: "wrong" }, { "x-forwarded-for": `10.9.7.${i + 1}` })).status).toBe(401);
+    }
+    const started = Date.now();
+    expect((await post(`${url}/auth/login`, { username: "owner", password: "owner-password" })).status).toBe(200);
+    expect(Date.now() - started, "the username cap still delays").toBeGreaterThanOrEqual(1_900);
+  }, 120_000);
 });
 
 describe("host router login throttle", () => {

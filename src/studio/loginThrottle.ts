@@ -1,14 +1,18 @@
+import { ipAllowedByCidrs, LOOPBACK_CIDRS } from "./clientAddress.js";
+
 /**
  * Failed-login throttle shared by Studio's /auth/login and the host router's two login routes (LIVE-RUNTIME-04, D-R5).
  *
  * On an address that stands for one client (no proxy declared, or a trusted proxy named the client), the hard refusal
  * is keyed on (username, client address): 10 failures in 15 minutes refuse that pair only, so a client at another
- * address can never lock the owner out of their own address, and 30 failures for the username from any addresses add
- * a fixed delay to every attempt for it, right or wrong. On an address that may be a proxy's own, shared by everyone
- * behind it (AMC_TRUSTED_PROXY_HOPS set but this peer is not a trusted proxy), the two swap: the pair only delays, so
- * one client cannot lock out every client behind the proxy (SR-2), and the 30 failures refuse further attempts for
- * the username from such addresses, so rotating addresses buys no extra guesses (SR-1). Attempts that a trusted proxy
- * forwards are never refused because of them. Behind an undeclared proxy (hops 0) every client shares its address.
+ * address can never lock the owner out of their own address. On an address that may be a proxy's own, shared by
+ * everyone behind it (AMC_TRUSTED_PROXY_HOPS set but this peer is not a trusted proxy), the pair only delays, so one
+ * client cannot lock out every client behind the proxy (SR-2); there 30 failures from such addresses refuse further
+ * attempts from them, so rotating addresses buys no extra guesses (SR-1). That count holds failures from untrusted
+ * addresses only, so failures a trusted proxy forwards never lock anyone out (SR-11), and loopback (the local console,
+ * `amc studio healthcheck`, a port-forward) neither feeds it nor meets it. On every address, 30 failures for the username
+ * from any addresses add a fixed delay to every attempt for it, right or wrong; that is never a refusal. Behind an
+ * undeclared proxy (hops 0) every client shares its address.
  *
  * ponytail: in-memory and per process, so a restart clears it and replicas do not share it; a shared store when one
  * Studio serves a workspace from several processes.
@@ -30,7 +34,7 @@ type LoginGate =
 export interface LoginThrottle {
   /** `addressTrusted`: the address stands for one client (resolveClientAddress); false when it may be a shared proxy's. */
   check(username: string, clientIp: string, addressTrusted?: boolean): LoginGate;
-  fail(username: string, clientIp: string): void;
+  fail(username: string, clientIp: string, addressTrusted: boolean): void;
   succeed(username: string, clientIp: string): void;
 }
 
@@ -46,7 +50,9 @@ export function createLoginThrottle(options: {
 } = {}): LoginThrottle {
   const { maxPairFailures = 10, delayAfterUserFailures = 30, windowMs = 15 * 60_000, delayMs = 2_000, now = Date.now } = options;
   const pairs = new Map<string, Window>();
-  const users = new Map<string, Window>();
+  const users = new Map<string, Window>(); // every failure for the username: the delay
+  const untrusted = new Map<string, Window>(); // failures from untrusted, non-loopback addresses: their refusal (SR-11)
+  const loopback = (clientIp: string): boolean => ipAllowedByCidrs(clientIp, LOOPBACK_CIDRS);
   const live = (map: Map<string, Window>, key: string, at: number): Window | null => {
     const entry = map.get(key);
     if (entry && entry.resetTs > at) return entry;
@@ -68,21 +74,23 @@ export function createLoginThrottle(options: {
       const at = now();
       const pair = live(pairs, pairKey(username, clientIp), at);
       const user = live(users, userKey(username), at);
+      const shared = addressTrusted || loopback(clientIp) ? null : live(untrusted, userKey(username), at);
       const pairOver = pair !== null && pair.count >= maxPairFailures;
       const userOver = user !== null && user.count >= delayAfterUserFailures;
-      const refusing = addressTrusted ? (pairOver ? pair : null) : (userOver ? user : null);
+      const refusing = addressTrusted ? (pairOver ? pair : null) : (shared !== null && shared.count >= delayAfterUserFailures ? shared : null);
       if (refusing) {
         const firstRefusal = !refusing.refused;
         refusing.refused = true;
         return { allowed: false, retryAfterSeconds: Math.max(1, Math.ceil((refusing.resetTs - at) / 1000)), firstRefusal,
           error: addressTrusted ? LOGIN_THROTTLED_ERROR : LOGIN_THROTTLED_ACCOUNT_ERROR };
       }
-      return { allowed: true, delayMs: (addressTrusted ? userOver : pairOver) ? delayMs : 0 };
+      return { allowed: true, delayMs: userOver || (!addressTrusted && pairOver) ? delayMs : 0 };
     },
-    fail(username, clientIp) {
+    fail(username, clientIp, addressTrusted) {
       const at = now();
       count(pairs, pairKey(username, clientIp), at);
       count(users, userKey(username), at);
+      if (!addressTrusted && !loopback(clientIp)) count(untrusted, userKey(username), at);
     },
     // Per pair: the per-username count is the distributed-attack signal, and one owner login must not restart it.
     succeed(username, clientIp) {
