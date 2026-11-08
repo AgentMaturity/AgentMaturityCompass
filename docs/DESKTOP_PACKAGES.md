@@ -10,7 +10,7 @@ npm run package:desktop:verify
 The command writes:
 
 - `dist/installers/archives/amc-<version>-macos-universal.tar.gz`
-- `dist/installers/archives/amc-<version>-linux-x64.tar.gz`
+- `dist/installers/archives/amc-<version>-linux-x64.tar.gz` (Linux x64 and arm64: the archive is architecture-neutral, so the `linux-x64` name covers both)
 - `dist/installers/archives/amc-<version>-windows-x64.zip`
 - `dist/installers/manifest.json`
 
@@ -92,6 +92,7 @@ Launch the Studio app by double-clicking `Agent Maturity Compass Studio.cmd`, or
 
 - Node.js 22 or 24 LTS
 - npm available on PATH
+- Linux: the archive is architecture-neutral (npm tarball + sh installer). On arm64, or whenever prebuilt `better-sqlite3` binaries cannot be downloaded, npm builds the native module and needs `python3`, `make` and `g++`.
 
 These packages intentionally install AMC from a local npm tarball, so they work before the public AMC registry package is available. npm still needs access to AMC's public runtime dependencies unless they are already present in the user's npm cache or installed by an enterprise package mirror.
 

@@ -583,7 +583,9 @@ Mutable demo data is stored in a separate persistent \`studio-workspace\` direct
 
 - Node.js 22 or 24 LTS
 - npm available on PATH
-
+${platform.id === "linux-x64" ? `
+The archive is architecture-neutral (npm tarball + sh installer). On arm64, or whenever prebuilt \`better-sqlite3\` binaries cannot be downloaded, npm builds the native module and needs \`python3\`, \`make\` and \`g++\`.
+` : ""}
 ## Install
 
 \`\`\`${platform.kind === "windows" ? "powershell" : "sh"}
@@ -656,7 +658,9 @@ function createArchive(platform, packageDir) {
 
 const platforms = [
   { id: "macos-universal", label: "macOS", kind: "unix" },
-  { id: "linux-x64", label: "Linux x64", kind: "unix" },
+  // The id stays linux-x64 (SHA256SUMS, the hosted installer and the matrix consume it); the archive is an npm tarball and
+  // an sh installer, so it is architecture-neutral.
+  { id: "linux-x64", label: "Linux (x64, arm64)", kind: "unix" },
   { id: "windows-x64", label: "Windows x64", kind: "windows" }
 ];
 

@@ -328,6 +328,28 @@ describe("truthful public distribution and brand contract", () => {
     expect(readFileSync(fixture.marker, "utf8")).toBe("installed");
   });
 
+  test("detects Linux aarch64 from uname and refuses it until an arm64 install of the archive has run (LIVE-DEPLOY-07)", async () => {
+    const directory = temporaryDirectory();
+    const version = "9.9.7";
+    const fixture = writeUnixFixture(directory, version);
+    const bin = join(directory, "bin");
+    mkdirSync(bin);
+    writeFileSync(join(bin, "uname"), "#!/bin/sh\ncase \"$1\" in -s) echo Linux ;; -m) echo aarch64 ;; esac\n", { mode: 0o755 });
+
+    const result = await withFixtureServer(directory, async (baseUrl) => await runInstaller({
+      AMC_INSTALL_TEST_MODE: "1",
+      AMC_RELEASE_BASE_URL: baseUrl,
+      AMC_RELEASE_VERSION: version,
+      AMC_INSTALL_PLATFORM: "",
+      AMC_TEST_MARKER: fixture.marker,
+      PATH: `${bin}:${process.env.PATH}`
+    }));
+
+    expect(result.code).not.toBe(0);
+    expect(result.stderr).toContain("Linux architecture aarch64 is not packaged yet");
+    expect(existsSync(fixture.marker)).toBe(false);
+  });
+
   test("fails closed before execution when the release checksum is invalid", async () => {
     const directory = temporaryDirectory();
     const version = "9.9.8";
