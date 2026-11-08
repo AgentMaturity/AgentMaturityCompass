@@ -5,6 +5,7 @@ import { afterEach, describe, expect, test } from "vitest";
 import {
   forgetVaultPassphrase,
   getRememberedVaultPassphrase,
+  rememberEnabled,
   rememberedStores,
   rememberVaultPassphrase
 } from "../src/vault/passphraseStore.js";
@@ -56,6 +57,11 @@ describe("vault passphrase store (file backend)", () => {
     expect(getRememberedVaultPassphrase(`${workspace}-b`, env)?.passphrase).toBe("pass-b");
     forgetVaultPassphrase(workspace, env);
     expect(getRememberedVaultPassphrase(`${workspace}-b`, env)?.passphrase).toBe("pass-b");
+  });
+
+  test("rememberEnabled reads the AMC_VAULT_REMEMBER opt-out (LIVE-VAULT-03)", () => {
+    for (const off of ["0", "false", "off", "no", " OFF ", "No"]) expect(rememberEnabled({ AMC_VAULT_REMEMBER: off }), off).toBe(false);
+    for (const on of [undefined, "", "1", "yes", "true"]) expect(rememberEnabled({ AMC_VAULT_REMEMBER: on }), String(on)).toBe(true);
   });
 
   test("disabled via AMC_VAULT_REMEMBER=0", () => {

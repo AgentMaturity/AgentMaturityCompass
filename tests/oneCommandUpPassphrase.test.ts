@@ -8,6 +8,7 @@ const seam = vi.hoisted(() => ({ vaultExists: false, events: [] as string[], rem
 vi.mock("../src/vault/vault.js", () => ({ vaultExists: () => seam.vaultExists }));
 vi.mock("../src/vault/passphraseStore.js", () => ({
   getRememberedVaultPassphrase: () => { seam.events.push("load"); return seam.remembered; },
+  rememberEnabled: (env: NodeJS.ProcessEnv = process.env) => !["0", "false", "off", "no"].includes((env.AMC_VAULT_REMEMBER ?? "").trim().toLowerCase()),
   rememberedLocation: () => "the store",
   rememberedStores: () => "the macOS Keychain (service amc-vault) or /home/x/.config/amc/vault-credentials.json",
   rememberVaultPassphrase: () => { seam.events.push("store"); return { backend: "file", location: "/home/x/.config/amc/vault-credentials.json" }; }
@@ -17,8 +18,9 @@ import { ensureUpVaultPassphrase, printConsoleSignInStep } from "../src/studio/o
 import { AGENT_ENV_MARKERS } from "../src/vault/operatorContext.js";
 
 const roots: string[] = [];
-// The vitest worker inherits CLAUDECODE from a Claude Code shell; amc up refuses the store under it (LIVE-VAULT-01).
-beforeEach(() => { for (const name of AGENT_ENV_MARKERS) vi.stubEnv(name, undefined); });
+// The vitest worker inherits CLAUDECODE from a Claude Code shell; amc up refuses the store under it (LIVE-VAULT-01). A CI
+// runner sets CI/GITHUB_ACTIONS, under which amc up never generates a passphrase (LIVE-VAULT-03).
+beforeEach(() => { for (const name of [...AGENT_ENV_MARKERS, "CI", "GITHUB_ACTIONS", "AMC_VAULT_REMEMBER"]) vi.stubEnv(name, undefined); });
 afterEach(() => {
   vi.unstubAllEnvs();
   vi.restoreAllMocks();
@@ -51,6 +53,50 @@ describe("amc up in a non-interactive shell (B1)", () => {
     expect(generated).toBeGreaterThanOrEqual(0);
     expect(seam.events.indexOf("store")).toBeGreaterThan(generated);
     expect(seam.events.join("\n")).not.toContain(process.env.AMC_VAULT_PASSPHRASE!);
+  });
+
+  it("never prints the generated passphrase or an export line for it, and names the store the operator's terminal reads", async () => {
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
+    const lines = logged();
+    await ensureUpVaultPassphrase("/nonexistent/amc-up-ws", true);
+    expect(lines.some((line) => line.includes("export AMC_VAULT_PASSPHRASE="))).toBe(false);
+    expect(lines.join("\n")).not.toContain(process.env.AMC_VAULT_PASSPHRASE!);
+    expect(lines.join("\n")).toContain("Your own terminal (same user, same AMC_HOME) unlocks from that store; export AMC_VAULT_PASSPHRASE for other hosts.");
+  });
+
+  it.each(["CI", "GITHUB_ACTIONS"])("does not generate a passphrase on a CI runner (%s set), whose store dies with the job (LIVE-VAULT-03)", async (name) => {
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
+    vi.stubEnv(name, "true");
+    const lines = logged();
+    const error = await ensureUpVaultPassphrase("/nonexistent/amc-up-ws", true).catch((caught: unknown) => caught as Error);
+    expect(error.message).toMatch(/^A CI runner's remembered store does not outlive the job, so amc up does not generate a passphrase here\.\n🔐 Vault passphrase required in non-interactive shells\./);
+    expect(error.message).toContain("Option 2 — first-time setup in a terminal (remembers a generated passphrase):");
+    expect(seam.events).not.toContain("store");
+    expect(lines.join("\n")).not.toContain("generated one");
+    expect(process.env.AMC_VAULT_PASSPHRASE).toBeUndefined();
+  });
+
+  it("with AMC_VAULT_REMEMBER=0 and no vault, refuses to generate instead of failing after it (Linux D4)", async () => {
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
+    vi.stubEnv("AMC_VAULT_REMEMBER", "0");
+    const lines = logged();
+    await expect(ensureUpVaultPassphrase("/nonexistent/amc-up-ws", true)).rejects.toThrow(/^🔐 Vault passphrase required in non-interactive shells\.\n\nOption 1 — set passphrase/);
+    expect(seam.events).not.toContain("store");
+    expect(seam.events).not.toContain("load");
+    expect(lines.join("\n")).not.toContain("generated one");
+    expect(process.env.AMC_VAULT_PASSPHRASE).toBeUndefined();
+  });
+
+  it("with AMC_VAULT_REMEMBER=0 and a vault, names the opt-out instead of stores it does not read", async () => {
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
+    vi.stubEnv("AMC_VAULT_REMEMBER", "0");
+    seam.vaultExists = true;
+    logged();
+    const error = await ensureUpVaultPassphrase("/nonexistent/amc-up-ws", true).catch((caught: unknown) => caught as Error);
+    expect(error.message).toContain("already has a vault");
+    expect(error.message).toContain("remembering is disabled by AMC_VAULT_REMEMBER=0");
+    expect(error.message).not.toContain("vault-credentials.json");
+    expect(seam.events).not.toContain("load");
   });
 
   it("never invents a passphrase for a vault that already exists", async () => {

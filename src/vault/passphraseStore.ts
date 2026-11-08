@@ -24,9 +24,10 @@ const KEYCHAIN_SERVICE = "amc-vault";
 /** A Keychain call can wait forever on a dialog nobody can answer (no GUI session, no default keychain). */
 const SECURITY_TIMEOUT_MS = 5_000;
 
-function rememberDisabled(env: NodeJS.ProcessEnv): boolean {
+/** False when AMC_VAULT_REMEMBER opts out ("0", "false", "off", "no"): no store is read or written. */
+export function rememberEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
   const raw = (env.AMC_VAULT_REMEMBER ?? "").trim().toLowerCase();
-  return raw === "0" || raw === "false" || raw === "off" || raw === "no";
+  return !(raw === "0" || raw === "false" || raw === "off" || raw === "no");
 }
 
 function credentialsFile(env: NodeJS.ProcessEnv): string {
@@ -109,7 +110,7 @@ export function getRememberedVaultPassphrase(
   workspace: string,
   env: NodeJS.ProcessEnv = process.env
 ): { passphrase: string; backend: RememberBackend } | null {
-  if (rememberDisabled(env)) {
+  if (!rememberEnabled(env)) {
     return null;
   }
   const account = workspaceKey(workspace);
@@ -137,7 +138,7 @@ export function rememberVaultPassphrase(
   passphrase: string,
   env: NodeJS.ProcessEnv = process.env
 ): { backend: RememberBackend; location: string } {
-  if (rememberDisabled(env)) {
+  if (!rememberEnabled(env)) {
     throw new Error("Vault passphrase remembering is disabled (AMC_VAULT_REMEMBER=0).");
   }
   const account = workspaceKey(workspace);
