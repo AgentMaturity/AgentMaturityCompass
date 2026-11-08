@@ -94,8 +94,27 @@ interface CertificatePayload {
     runReportSig: string;
     gatePolicySha256: string;
     gatePolicySigSha256: string;
+    /** SHA-256 of evidence/evidence.sqlite and of each evidence/blobs file, so cert.sig covers the carried ledger. Absent in older certificates. */
+    evidence?: EvidenceDigests;
   };
   verificationInstructions: string[];
+}
+
+interface EvidenceDigests { sqliteSha256: string; blobSha256: Record<string, string> }
+
+function evidenceDigests(root: string): EvidenceDigests {
+  const blobs = join(root, "evidence", "blobs");
+  return { sqliteSha256: fileSha256(join(root, "evidence", "evidence.sqlite")),
+    blobSha256: Object.fromEntries(readdirSync(blobs).sort().map((name) => [name, fileSha256(join(blobs, name))])) };
+}
+
+/** The carried blobs whose stored bytes cert.sig authenticates, iff its evidence digests are well formed and the sqlite copy matches. */
+function boundBlobs(root: string, digests: unknown): Map<string, string> | null {
+  const { sqliteSha256, blobSha256 } = (digests ?? {}) as Partial<EvidenceDigests>;
+  if (typeof sqliteSha256 !== "string" || blobSha256 === null || typeof blobSha256 !== "object"
+    || fileSha256(join(root, "evidence", "evidence.sqlite")) !== sqliteSha256) return null;
+  return new Map(Object.entries(blobSha256).filter((entry): entry is [string, string] => typeof entry[1] === "string")
+    .map(([name, sha256]) => [`.amc/blobs/${name}`, sha256]));
 }
 
 interface RevocationPayload {
@@ -362,7 +381,8 @@ export async function issueCertificate(params: {
         runReportSha256: run.reportJsonSha256,
         runReportSig: run.runSealSig,
         gatePolicySha256: sha256Hex(readFileSync(policyAbs)),
-        gatePolicySigSha256: sha256Hex(readFileSync(policySigAbs))
+        gatePolicySigSha256: sha256Hex(readFileSync(policySigAbs)),
+        evidence: evidenceDigests(certRoot)
       },
       verificationInstructions: [
         "Run `amc cert verify <file.amccert> --pubkey <issuer .pub> --expect-monitor <monitor sha256>`, with keys recorded outside this certificate, to verify signatures and ledger integrity offline.",
@@ -589,14 +609,18 @@ export async function verifyCertificate(params: {
       errors.push(...gate.reasons.map((reason) => `gate policy failed: ${reason}`));
     }
 
+    // cert.sig covers the carried ledger only through these digests; a certificate without them (older) is unbound.
+    const blobs = cert.references?.evidence === undefined ? null : boundBlobs(extracted, cert.references.evidence);
+    if (cert.references?.evidence !== undefined && !blobs) errors.push("certificate evidence digest mismatch: evidence/evidence.sqlite");
+    const signedLedger = issuer !== null && certSha === certSig.certSha256 && blobs !== null;
     const verifyWorkspace = materializeCertWorkspace(extracted);
     try {
       const monitor = admitKey({ publicKeyPem: readUtf8(join(extracted, "public-keys", "monitor.pub")), purpose: "ledger-row",
         signature: "public-keys/monitor.pub", context: params.trust, keyHistory: certKeyHistory(extracted, "monitor") });
-      // D-INT-7: the carried ledger is verified as of the signed issuedTs, iff the certificate's own signer is admitted.
-      const now = verifyInstantFor({ signedTs: cert.issuedTs, admitted: issuer?.status === "admitted" && certSha === certSig.certSha256 });
-      const ledgerResult = await verifyLedgerIntegrity(verifyWorkspace,
-        { now, ...(monitor.status === "admitted" && monitor.keyId ? { expectedMonitorFingerprint: monitor.keyId } : {}) });
+      // D-INT-7: the carried ledger is verified as of the signed issuedTs, iff cert.sig covers it and its signer is admitted.
+      const now = verifyInstantFor({ signedTs: cert.issuedTs, admitted: signedLedger && issuer?.status === "admitted" });
+      const ledgerResult = await verifyLedgerIntegrity(verifyWorkspace, { now, ...(signedLedger ? { externallyAuthenticatedPayloads: blobs } : {}),
+        ...(monitor.status === "admitted" && monitor.keyId ? { expectedMonitorFingerprint: monitor.keyId } : {}) });
       if (!ledgerResult.ok) {
         errors.push(...ledgerResult.errors.map((error) => `ledger verify failed: ${error}`));
       }
