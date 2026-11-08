@@ -106,3 +106,33 @@ describe("receipt-based platform status where users install (LIVE-DEPLOY-10)", (
     expect(desktop).toMatch(/Linux archive ships no Studio launcher/);
   });
 });
+
+describe("one documented way to run AMC for live users (LIVE-DEPLOY-17)", () => {
+  it("routes live users in D-03 vocabulary and claims no support", () => {
+    const first = section(read("docs/DEPLOYMENT.md"), "## Running AMC for live users");
+    expect(first).toContain("not qualified");
+    expect(first).not.toMatch(/\bsupported\b/i);
+    for (const runbook of ["INSTALL.md", "UPGRADE.md", "ROLLBACK.md", "BACKUP_RESTORE.md", "RECOVERY_TARGETS.md", "COMPOSE.md"]) {
+      expect(first).toContain(`deploy/reference/${runbook}`);
+    }
+  });
+
+  it("gives the Compose backup, rollback and 1.1.1 commands their safe form", () => {
+    const compose = read("docs/deploy/reference/COMPOSE.md");
+    // Command lines only: they start with docker compose (inside a code block, or as a numbered step's inline command).
+    const backups = compose.split("\n").filter((line) => /^\s*(?:\d+\.\s*)?`?docker compose\b/.test(line) && /(?:amc|dist\/cli\.js) backup create/.test(line));
+    expect(backups.length).toBeGreaterThan(1);
+    for (const line of backups) {
+      expect(line).toContain("-w /data/amc");
+      expect(line).toContain("AMC_VAULT_PASSPHRASE=");
+      expect(line).toContain("--out /tmp/");
+    }
+    expect(compose).toMatch(/[Nn]ever (?:run )?`(?:docker compose )?down -v`/);
+    expect(compose).toContain("chown -R 10001:10001");
+    expect(compose).not.toMatch(/docker compose[^`\n]* cp amc-studio:\/tmp\//);
+  });
+
+  it("starts the Upgrading section with the backup", () => {
+    expect(section(read("docs/INSTALL.md"), "## Upgrading").trimStart().startsWith("Back up first")).toBe(true);
+  });
+});

@@ -9,4 +9,4 @@
     4. Replace `/data/amc/.amc` with `/data/amc/.restore/.amc`, delete the tool pod and scale back to 1.
 4. Confirm `PRAGMA integrity_check` returns `ok`, the chain equals the pre-upgrade chain, and a governed turn passes. (check RB-2)
 
-The container-level drill (`scripts/deploy/rollback-drill.mjs`) remains the Compose equivalent; see [docs/runbooks/amc-service-down.md](../../runbooks/amc-service-down.md) when Studio does not come back.
+For Compose, the image switch and the restore are in [COMPOSE.md](COMPOSE.md#rollback), rehearsed by `scripts/deploy/compose-rehearsal.mjs`; the container-level drill (`scripts/deploy/rollback-drill.mjs`) uses `docker run`. See [docs/runbooks/amc-service-down.md](../../runbooks/amc-service-down.md) when Studio does not come back.

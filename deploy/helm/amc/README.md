@@ -14,7 +14,7 @@ helm lint ./deploy/helm/amc
 
 ## Install
 
-Create the `amc-bootstrap` secret first (see `docs/KUBERNETES_HELM_DEPLOYMENT.md`). The chart references it and never renders a default. `bootstrap.createSecret=true` renders it from `bootstrap.values` instead; every value is then required and a `change-me` value is refused.
+The reference deployment's topology, scope statement (documented; not qualified) and runbooks are in `docs/deploy/reference/TOPOLOGY.md`. Create the `amc-bootstrap` secret first (see `docs/KUBERNETES_HELM_DEPLOYMENT.md`). The chart references it and never renders a default. `bootstrap.createSecret=true` renders it from `bootstrap.values` instead; every value is then required and a `change-me` value is refused.
 
 Registry publication is not yet verified (`website/publication-status.json`): do not pull `ghcr.io/agentmaturity/amc-studio` until it is, because an unpublished tag puts the pod in `ImagePullBackOff`. Build the image locally (`docker/README.md`) and deploy it by digest, from your own registry or, on kind, through `scripts/deploy/kind-image-digest.mjs` (`docs/KUBERNETES_HELM_DEPLOYMENT.md`, "Install With Helm"):
 

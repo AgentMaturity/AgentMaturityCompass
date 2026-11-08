@@ -2,7 +2,13 @@
 
 Backups are signed by the workspace auditor key and encrypted with `AMC_BACKUP_PASSPHRASE_FILE`. SQLite files are captured as consistent snapshots, so a backup can run while Studio writes (P2-09).
 
-1. Create a backup while the workload runs: `amc backup create --out <file>` in the Studio pod. Copy it off the volume. (check BR-1)
+1. Create a backup while the workload runs: `amc backup create --out <file>` in the Studio pod. Copy it off the volume. (check BR-1) The chart has no values key for the backup passphrase: feed it on stdin into a file in `/tmp` and delete it in the same command, so it never reaches argv, a values file or the volume:
+
+    ```bash
+    kubectl -n <ns> exec -i deploy/<fullname> -c amc-studio -- sh -c 'umask 077; cat > /tmp/amc-backup-pass; cd /data/amc && AMC_BACKUP_PASSPHRASE_FILE=/tmp/amc-backup-pass AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")" amc backup create --out /tmp/amc-backup.amcbackup >&2 && cat /tmp/amc-backup.amcbackup; status=$?; rm -f /tmp/amc-backup-pass /tmp/amc-backup.amcbackup; exit $status' < ./backup-passphrase.txt > ./amc-<ts>.amcbackup
+    ```
+
+    This Helm form is documented and was not run (no cluster in the 2026-11-08 run); the Compose form in [COMPOSE.md](COMPOSE.md#backup) was.
 2. Verify it where it will be restored: `amc backup verify <file> --pubkey <auditor.pub> --json` with the passphrase file set. The auditor key must be pinned from a source other than the backup itself. (check BR-1)
 3. Restore into a new namespace and volume: a pod with the same image, the `amc-bootstrap` Secret copied in, and `amc backup restore <file> --to <new dir> --pubkey <auditor.pub>`. Read `<new dir>/.amc/RESTORE_WARNING.txt`; seals missing on sessions that were open at backup time are expected, anything else is not. (check BR-1)
 4. Confirm the restored chain is a prefix of the source chain and `PRAGMA integrity_check` returns `ok`. (check BR-1)

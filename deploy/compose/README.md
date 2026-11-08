@@ -89,6 +89,17 @@ When `AMC_ENABLE_NOTARY=1`, bootstrap writes and signs `.amc/trust.yaml` in `NOT
 - Keep notary auth and passphrase in Docker secrets only.
 - Never store secrets directly in compose YAML; use Docker secrets files.
 
+## Upgrade, rollback and backups
+
+The stacks name their image through `AMC_STUDIO_IMAGE` in `.env` (the API overlay through `AMC_API_IMAGE`). An upgrade sets it to the new image and runs `up -d --no-build`; a rollback sets the previous value back. Change it in `.env`, never as a one-shot prefix, and keep the previous image (`docker image prune` deletes an untagged one):
+
+```bash
+# .env
+AMC_STUDIO_IMAGE=amc-studio:<git sha>   # previous: amc-studio:<old sha>
+```
+
+Backups run inside the Studio container to `/tmp` and are copied out; the state and checkpoint volumes are archived beside them. The full procedures (install, backup, upgrade from N-1 and from 1.1.1, rollback, TLS for a public hostname) are in [docs/deploy/reference/COMPOSE.md](../../docs/deploy/reference/COMPOSE.md), and `scripts/deploy/compose-rehearsal.mjs` rehearses the upgrade and rollback.
+
 ## Optional standalone API alongside Studio
 
 Add `-f docker-compose.studio-api.yml` after `-f docker-compose.tls.yml` to both `config` and `up` commands. The overlay retains Studio and notary, adds the production API image, and mounts `Caddyfile.studio-api`. Studio `/api/v1/*` stays on Studio; the legacy `/api/*` namespace goes to the separate API on internal port 3220. No API host port is published.

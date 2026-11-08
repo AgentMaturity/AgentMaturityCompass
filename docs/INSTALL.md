@@ -133,7 +133,7 @@ Replace all four template values with your own vault passphrase, owner username,
 docker compose up -d --build
 ```
 
-Studio available at `http://localhost:3212` (published on `127.0.0.1` unless `AMC_PUBLISH_ADDRESS` says otherwise). Gateway at `http://localhost:3210`. Running AMC for live users, and the Compose runbooks: [docs/DEPLOYMENT.md](DEPLOYMENT.md#running-amc-for-live-users) and [docs/deploy/reference/COMPOSE.md](deploy/reference/COMPOSE.md).
+Studio available at `http://localhost:3212` (published on `127.0.0.1` unless `AMC_PUBLISH_ADDRESS` says otherwise). Gateway at `http://localhost:3210`. Running AMC for live users, and the Compose runbooks: [docs/DEPLOYMENT.md](DEPLOYMENT.md#running-amc-for-live-users) and [docs/deploy/reference/COMPOSE.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/deploy/reference/COMPOSE.md).
 
 For TLS termination (production):
 
@@ -217,7 +217,7 @@ In a new directory, default doctor exits zero when the CLI is healthy and tells 
 
 ## Upgrading
 
-Back up first: a signed `amc backup create` bundle, copied off the machine, before any new version touches the workspace. From 1.1.1, read [docs/releases/2.0.0.md](releases/2.0.0.md), "Migration from 1.1.1", and [docs/MIGRATION_RUNBOOK.md](MIGRATION_RUNBOOK.md) first.
+Back up first: a signed `amc backup create` bundle, copied off the machine, before any new version touches the workspace. From 1.1.1, read [docs/releases/2.0.0.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/releases/2.0.0.md), "Migration from 1.1.1", and [docs/MIGRATION_RUNBOOK.md](MIGRATION_RUNBOOK.md) first.
 
 ```bash
 # Verified release channel
@@ -230,8 +230,8 @@ irm https://agentmaturity.co/install.ps1 | iex
 cd AgentMaturityCompass && git pull && pnpm install --frozen-lockfile && pnpm run build
 ```
 
-- Docker Compose: pin the new image in `.env` (`AMC_STUDIO_IMAGE`), keep the previous one for rollback, and follow [docs/deploy/reference/COMPOSE.md](deploy/reference/COMPOSE.md) (backup, upgrade, upgrade from 1.1.1, rollback).
-- Helm: upgrade by digest with `--reuse-values`, as [docs/deploy/reference/UPGRADE.md](deploy/reference/UPGRADE.md) describes.
+- Docker Compose: pin the new image in `.env` (`AMC_STUDIO_IMAGE`), keep the previous one for rollback, and follow [docs/deploy/reference/COMPOSE.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/deploy/reference/COMPOSE.md) (backup, upgrade, upgrade from 1.1.1, rollback).
+- Helm: upgrade by digest with `--reuse-values`, as [docs/deploy/reference/UPGRADE.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/deploy/reference/UPGRADE.md) describes.
 
 ## Uninstalling
 

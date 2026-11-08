@@ -2,6 +2,25 @@
 
 AMC Studio can run as a production service with persistence, TLS, and hardened defaults.
 
+## Running AMC for live users
+
+Every path below is documented and none is qualified. In D-03's vocabulary a deployment is "qualified within scope S, versions V, window W" only with the receipts and agreed recovery targets that [docs/deploy/reference/TOPOLOGY.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/deploy/reference/TOPOLOGY.md) describes; no deployment has them yet.
+
+| Audience | Path | Status |
+|---|---|---|
+| Single host | Compose TLS stack (`deploy/compose/docker-compose.tls.yml`): Caddy with a private CA, named volumes `amc_data`, `amc_state`, `amc_control_checkpoints`, `amc_notary_data` and `caddy_data`, the image pinned by `AMC_STUDIO_IMAGE` in `.env` | documented; not qualified; run end to end on 2026-11-08 on linux/arm64 ([COMPOSE.md, What was run](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/deploy/reference/COMPOSE.md#what-was-run)) |
+| Cluster | Helm chart 0.4.1 (`deploy/helm/amc`) with `image.digest` and `image.requireDigest=true`, claims `<release>-amc` and `<release>-amc-state` | documented; not qualified ([TOPOLOGY.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/deploy/reference/TOPOLOGY.md)) |
+| Loopback or private network | Compose HTTP stack (`deploy/compose/docker-compose.yml`), ports published on `AMC_PUBLISH_ADDRESS` (default `127.0.0.1`) | documented; not qualified |
+| Not for Studio | Railway, Vercel | standalone API only; not qualified |
+
+Helm: install, upgrade, roll back and back up with the reference runbooks: [INSTALL.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/deploy/reference/INSTALL.md), [UPGRADE.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/deploy/reference/UPGRADE.md), [ROLLBACK.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/deploy/reference/ROLLBACK.md) and [BACKUP_RESTORE.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/deploy/reference/BACKUP_RESTORE.md).
+
+Compose: [COMPOSE.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/deploy/reference/COMPOSE.md) holds the same procedures for a single host: install, backup, upgrade from the previous release and from 1.1.1, rollback with the restore, and the rehearsal script that exercised them.
+
+Recovery cadence, RPO and RTO live in [RECOVERY_TARGETS.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/deploy/reference/RECOVERY_TARGETS.md); Sid agrees them, and until then no deployment states them.
+
+A public hostname changes the TLS certificate, the client address ranges Studio admits and nothing about per-device pairing: [COMPOSE.md, TLS for a public hostname](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/deploy/reference/COMPOSE.md#tls-for-a-public-hostname) (documented; not run).
+
 ## Docker (Compose)
 
 Source images use the root Dockerfile with explicit `studio` and `runner` targets. Review the [container runtime requirements](#container-runtime-requirements) before starting Compose.
@@ -10,6 +29,7 @@ Source images use the root Dockerfile with explicit `studio` and `runner` target
    - `deploy/compose/secrets/amc_vault_passphrase.txt`
    - `deploy/compose/secrets/amc_owner_username.txt`
    - `deploy/compose/secrets/amc_owner_password.txt`
+   - `deploy/compose/secrets/amc_backup_passphrase.txt`
 2. Start local deployment:
 
 ```bash
@@ -23,7 +43,7 @@ docker compose up -d --build
 
 ### Container runtime requirements
 
-Supply your own values in the three secret files above; `.example` files are templates. These files are excluded from the image build and mounted only at runtime. Keep the vault secret and data volume together across restarts.
+Supply your own values in the four secret files above; `.example` files are templates. These files are excluded from the image build and mounted only at runtime. Keep the vault secret and data volume together across restarts.
 
 Images run as UID/GID 10001. New named volumes inherit the image directory ownership; host bind mounts must already be writable by that user, and mounted secret files must be readable by it. Existing volumes owned by another UID require an operator-managed ownership adjustment. The entrypoint does not run as root or change host permissions.
 
