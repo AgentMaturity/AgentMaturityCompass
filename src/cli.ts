@@ -289,7 +289,7 @@ import inquirer from "inquirer";
 import { assertOwnerMode, getMode, leaveAgentMode, setMode, type AMCMode } from "./mode/mode.js";
 import { writeRuntimeFirewallPolicyAsync, migrateRuntimeFirewallPolicySignatureAsync } from "./runtime/firewallPolicyAsync.js";
 import { installFatalHandlers } from "./runtime/fatalDiagnostic.js";
-import { changeVaultPassphraseInteractive, initVaultInteractive, lockVaultNow, promptPassphrase, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
+import { changeVaultPassphraseInteractive, initVaultInteractive, lockVaultNow, printVaultPassphraseChange, promptPassphrase, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
 import { forgetVaultPassphrase, unlockWithRememberedPassphrase } from "./vault/passphraseStore.js";
 import { confirmRememberedUnlock } from "./vault/operatorContext.js";
 import { ensureInstantVaultMode, type InstantVaultMode } from "./cli/instantVaultMode.js";
@@ -6866,8 +6866,7 @@ vault
   .command("passphrase")
   .description("Change the vault passphrase (the keys stay the same); forgets the remembered passphrase")
   .action(async () => {
-    await changeVaultPassphraseInteractive(process.cwd());
-    console.log(chalk.green("Passphrase changed; remembered entry forgotten. Rotate keys too if the old passphrase may have been used: docs/VAULT.md \"When to rotate\"."));
+    printVaultPassphraseChange(await changeVaultPassphraseInteractive(process.cwd()));
   });
 registerVaultHistoryCommands(vault);
 const dlp = program.command("dlp").description("DLP scanner for PII and secrets");
