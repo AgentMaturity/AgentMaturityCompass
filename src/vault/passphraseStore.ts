@@ -143,14 +143,16 @@ const rememberedUnlocks = new Map<string, string>();
 /**
  * B2: a command an interactive operator runs in a workspace whose vault passphrase was remembered starts with that vault
  * unlocked in this process, as `amc vault unlock` leaves it, so signing and verification work in a new terminal; governance
- * commands then confirm it (confirmRememberedUnlock). AMC_VAULT_PASSPHRASE wins. The
+ * commands then confirm it (confirmRememberedUnlock). AMC_VAULT_PASSPHRASE wins, and so does AMC_VAULT_PASSPHRASE_FILE
+ * (passphraseFile.ts), even when it was refused. The
  * passphrase stays in the vault session and never enters the environment, so no child process inherits it. One that
  * does not open the vault leaves it locked, as before, and says why on stderr.
  * ponytail: a session idle past the vault's 30-minute TTL is not reopened from here; long-running servers get
  * AMC_VAULT_PASSPHRASE from `amc up`.
  */
 export function unlockWithRememberedPassphrase(workspace: string, env: NodeJS.ProcessEnv = process.env): void {
-  if ((env.AMC_VAULT_PASSPHRASE ?? "").length > 0 || !vaultExists(workspace) || vaultStatus(workspace).unlocked) return;
+  if ((env.AMC_VAULT_PASSPHRASE ?? "").length > 0 || (env.AMC_VAULT_PASSPHRASE_FILE ?? "").trim().length > 0
+    || !vaultExists(workspace) || vaultStatus(workspace).unlocked) return;
   const remembered = operatorRememberedPassphrase(workspace, env);
   if (remembered === null) {
     sayWhyNotUsed(workspace, env);
