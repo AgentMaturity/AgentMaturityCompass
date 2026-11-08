@@ -8,14 +8,8 @@
 import { lookupProviderCatalog } from "./providerCatalog.js";
 import { openaiCompatibleRouteFor } from "./providers/openaiCompatibleRoutes.js";
 
-export interface NativeRouteDefaults {
-  /** The provider's documented origin, or null when the operator must supply one. */
-  readonly defaultBaseUrl: string | null;
-  /** A credential reference name (never a value), or null when there is none to default to. */
-  readonly defaultCredentialRef: string | null;
-}
-
-export function nativeRouteDefaults(providerId: string): NativeRouteDefaults | null {
+/** The provider's documented origin (null: the operator supplies one) and default credential reference name (never a value). */
+export function nativeRouteDefaults(providerId: string): { readonly defaultBaseUrl: string | null; readonly defaultCredentialRef: string | null } | null {
   return openaiCompatibleRouteFor(providerId) ?? lookupProviderCatalog(providerId);
 }
 
