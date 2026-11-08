@@ -53,7 +53,7 @@ For IaC-driven Kubernetes installs, use the Terraform example at `deploy/terrafo
 
 ## AWS reference architecture
 
-Recommended starting point: AWS Fargate with Amazon ECS, an Application Load Balancer, AWS Secrets Manager, CloudWatch Logs, and EFS or another managed persistent storage option for the AMC workspace.
+Recommended starting point: AWS Fargate with Amazon ECS, an Application Load Balancer, AWS Secrets Manager, CloudWatch Logs, and an Amazon EBS volume attached to a single task (desired count 1) for the AMC workspace. EFS and other network filesystems are not usable for the workspace: its ledger is SQLite in WAL mode (`src/ledger/ledgerConnection.ts`), and Studio is a single writer, so a multi-task or autoscaled ECS service is not a Studio target. EKS with the Helm chart is the documented cluster path.
 
 Traffic flow:
 
@@ -63,7 +63,7 @@ Traffic flow:
 4. Store `AMC_VAULT_PASSPHRASE`, bootstrap owner credentials, notary secrets, and webhook secrets in AWS Secrets Manager.
 5. Inject secrets through ECS task definition `secrets` entries or mount them as files through your internal secret projection pattern.
 6. Attach IAM roles with least privilege for logging, secret reads, image pulls, and storage access.
-7. Persist `/data/amc` on managed storage; do not use task-local scratch storage for production evidence.
+7. Persist `/data/amc` on the task's EBS volume; task-local scratch storage loses production evidence, and EFS is not usable (SQLite WAL).
 
 EKS alternative:
 
@@ -74,7 +74,7 @@ EKS alternative:
 
 ## GCP reference architecture
 
-Recommended starting point: Google Cloud Run when you can externalize persistence, or Google Kubernetes Engine when the AMC workspace must be mounted as a Kubernetes persistent volume.
+Recommended starting point: Google Kubernetes Engine with the Helm chart and a Persistent Disk claim for the AMC workspace. Google Cloud Run is not a Studio target: it scales instances out, and Studio is a single writer whose SQLite WAL workspace needs a block or local filesystem, which Cloud Run does not provide.
 
 Cloud Run path:
 
@@ -82,7 +82,7 @@ Cloud Run path:
 2. Set the public API root for clients to `https://{host}/api`.
 3. Configure startup/liveness behavior with the container health endpoints: `GET /healthz` and `GET /readyz`.
 4. Store sensitive values in Secret Manager and expose them to the service as mounted files or pinned environment variables.
-5. Use a persistent external storage design for `/data/amc`; Cloud Run instance filesystem state is not the right production evidence store.
+5. Do not place `/data/amc` on Cloud Run: instance filesystem state is ephemeral, and Cloud Storage FUSE or Filestore mounts are network filesystems, which are not usable for the SQLite WAL workspace. Use Cloud Run only for the standalone API.
 6. Assign a dedicated service identity and grant only the secret, logging, registry, and storage permissions AMC needs.
 
 GKE alternative:
@@ -94,7 +94,7 @@ GKE alternative:
 
 ## Azure reference architecture
 
-Recommended starting point: Azure Container Apps with managed ingress, Azure Key Vault references, Log Analytics, Azure Container Registry, and Azure Files or another managed persistent storage option for the AMC workspace.
+Recommended starting point: Azure Kubernetes Service with the Helm chart and an Azure Disk claim for the AMC workspace, with Azure Key Vault, Log Analytics and Azure Container Registry. Azure Container Apps can mount only Azure Files or ephemeral storage for the workspace; Azure Files is a network filesystem and not usable for the SQLite WAL workspace, so Azure Container Apps is not a Studio target.
 
 Traffic flow:
 
@@ -102,7 +102,7 @@ Traffic flow:
 2. Point OpenAPI clients at `https://{host}/api`.
 3. Configure Container Apps health probes to `GET /healthz` and `GET /readyz`.
 4. Store production credentials in Azure Key Vault and reference them from Container Apps secrets through managed identity.
-5. Mount or otherwise provide durable workspace storage for `/data/amc`; avoid relying on ephemeral revision-local storage.
+5. Container Apps cannot give `/data/amc` the block or local storage Studio needs (its persistent option, Azure Files, is not usable for the SQLite WAL workspace, and revision-local storage is ephemeral), so use these steps for the standalone API and AKS for Studio.
 6. Send container logs to Log Analytics and restrict inbound traffic with ingress, private networking, or an upstream gateway.
 
 AKS alternative:
@@ -110,7 +110,7 @@ AKS alternative:
 - Install AMC with `deploy/helm/amc/` or `deploy/k8s/`.
 - Use an ingress controller, Application Gateway Ingress Controller, or your platform gateway for TLS and routing.
 - Use Azure Key Vault CSI Driver, External Secrets Operator, or your secure secret pipeline for bootstrap credentials.
-- Use Azure Files, Azure Disk, or a platform-approved storage class for the AMC workspace PVC.
+- Use an Azure Disk storage class (block storage) for the AMC workspace PVC; Azure Files is not usable for it (SQLite WAL, `src/ledger/ledgerConnection.ts`).
 
 ## Production readiness checklist
 

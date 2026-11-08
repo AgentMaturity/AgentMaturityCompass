@@ -48,3 +48,25 @@ describe("Kubernetes doc truth (LIVE-DEPLOY-09)", () => {
     expect(offenders).toEqual([]);
   });
 });
+
+describe("cloud docs recommend only what the runtime can do (LIVE-DEPLOY-18)", () => {
+  // The ledger is SQLite in WAL mode (src/ledger/ledgerConnection.ts), which network filesystems do not support, and Studio
+  // is a single writer.
+  const sentences = (text: string) => text.replace(/\n(?!\n)/g, " ").split(/(?<=[.!?])\s+/);
+
+  it("offers no hosted AMC and no scale-out or network-filesystem Studio target", () => {
+    const options = read("docs/DEPLOYMENT_OPTIONS.md");
+    expect(options).not.toContain("Managed / hosted AMC");
+    expect(options).toContain("Hosted AMC: not offered; D-03 names no hosted target.");
+    expect(options).not.toMatch(/Cloud Run when persistence is externalized/);
+  });
+
+  it("says EFS and Azure Files are not usable for the workspace, in the sentence that names them", () => {
+    const cloud = read("docs/CLOUD_REFERENCE_ARCHITECTURES.md");
+    const efs = sentences(cloud).filter((sentence) => sentence.includes("EFS"));
+    expect(efs.length).toBeGreaterThan(0);
+    for (const sentence of efs) expect(sentence).toContain("not usable");
+    for (const sentence of sentences(cloud).filter((s) => s.includes("Azure Files"))) expect(sentence).toMatch(/not usable|cannot use/);
+    expect(cloud).not.toMatch(/EFS or another managed persistent storage option/);
+  });
+});

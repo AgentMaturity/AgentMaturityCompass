@@ -10,21 +10,23 @@ This page clarifies the deployment and usage paths for AMC.
 | **Local CLI** | real scoring, evidence, traces, reports | execution evidence workflows and hands-on local usage |
 | **CI / GitHub Action** | release gates, score thresholds, repeatable checks | automation, regression prevention, artifacts |
 | **Self-hosted team deployment** | teams that need shared internal workflows | team-accessible deployment and internal control |
-| **Managed / hosted AMC** | teams that want convenience and shared ops | hosted trust workflows with reduced operational overhead |
+| **Hosted AMC** | not offered | Hosted AMC: not offered; D-03 names no hosted target. |
 | **Enterprise / on-prem** | regulated orgs, large deployments | governance, support, enterprise controls, audit-ready deployment |
 
 ## Honest path guidance
 - **Browser** is the fastest intro, not the deepest path.
 - **CLI** is the serious execution-evidence path.
 - **CI** is where trust standards become repeatable.
-- **Self-hosted / managed / enterprise** are where collaboration, governance, and regulated delivery become real.
+- **Self-hosted / enterprise** are where collaboration, governance, and regulated delivery become real.
 - **Cloud self-hosting** is documented as customer-operated AWS, GCP, or Azure deployment architecture. This repo does not publish an AMC-operated hosted SaaS API endpoint.
 
 ## Self-hosted cloud starting points
 
-- **AWS:** ECS on Fargate with an Application Load Balancer, or EKS with the Helm chart.
-- **GCP:** Cloud Run when persistence is externalized, or Google Kubernetes Engine with the Helm chart.
-- **Azure:** Azure Container Apps with managed ingress, or AKS with the Helm chart.
+The Helm chart on EKS, GKE or AKS is the documented cluster path; like every deployment path it is documented, not qualified (`docs/deploy/reference/TOPOLOGY.md`). The workspace ledger is SQLite in WAL mode (`src/ledger/ledgerConnection.ts`), so the workspace volume must be a block or local filesystem (EBS, Persistent Disk, Azure Disk); EFS, Azure Files and other network filesystems are not usable for it. Studio is a single writer, so autoscaled or multi-instance services (Cloud Run scale-out, multi-task ECS services) are not Studio targets.
+
+- **AWS:** EKS with the Helm chart and an EBS-backed claim. ECS on Fargate only as one task (desired count 1) with an EBS volume for the workspace.
+- **GCP:** Google Kubernetes Engine with the Helm chart and a Persistent Disk claim. Cloud Run is not a Studio target: it scales out and gives the workspace no block storage.
+- **Azure:** AKS with the Helm chart and an Azure Disk claim. Azure Container Apps can mount only Azure Files or ephemeral storage, which the workspace cannot use.
 - **OpenAPI clients:** use `https://{host}/api` for your own DNS name and keep `http://localhost:3000/api` for local development.
 
 ## Read next
