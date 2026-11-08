@@ -121,7 +121,7 @@ export interface VerifyResult {
      * running writer's own session (the gateway's, an in-flight bridge request, a tool run). Not an error; nothing is
      * claimed about how it ends. Any other unended or unsealed legacy session is a `chain` error (missing seal), and so
      * is every unsealed legacy session when any row failed verification. `lastSignedTs` is the last signed event's
-     * time, or the session's recorded start while it has none.
+     * time, or null for a session with no signed event yet (open only briefly after its unsigned recorded start).
      */
     liveLegacy: readonly LiveLegacySession[];
   };
@@ -492,7 +492,7 @@ function verifySessions(
     if (!session.session_final_event_hash || !session.session_seal_sig) {
       const lastSignedTs = lastEventTsBySession.get(session.session_id) ?? null;
       if (!isAgentSession && authenticatedEvidence && isLiveLegacySession(session, lastSignedTs, liveness.now, liveness.legacyStaleAfterMs)) {
-        lifecycle.liveLegacy.push({ sessionId: session.session_id, runtime: session.runtime, lastSignedTs: lastSignedTs ?? session.started_ts });
+        lifecycle.liveLegacy.push({ sessionId: session.session_id, runtime: session.runtime, lastSignedTs });
         continue;
       }
       errors.push(`Session ${session.session_id} missing seal`);

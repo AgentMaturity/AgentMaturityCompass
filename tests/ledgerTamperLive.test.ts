@@ -104,6 +104,18 @@ test("a forged future started_ts on an event-less session: missing seal, never o
   expect(result.sessions.liveLegacy.map((open) => open.sessionId)).not.toContain("empty-1");
 });
 
+test("an inserted session row with no signed row, recorded as started 3 min ago: missing seal, never open (skeptic low)", () => {
+  const started = Date.now() - 3 * 60_000;
+  writer((db) => db.prepare(`INSERT INTO sessions (session_id, started_ts, runtime, binary_path, binary_sha256)
+    VALUES ('phantom-gw', ?, 'gateway', 'gateway', 'fixture')`).run(started));
+  const result = verdict();
+  expect(result.errors).toContain("Session phantom-gw missing seal");
+  expect(result.sessions.liveLegacy.map((open) => open.sessionId)).not.toContain("phantom-gw");
+  // Inside the one-minute start grace it is open, and named with no signed activity: its recorded start is not signed.
+  expect(verdict(started + 10_000).sessions.liveLegacy.find((open) => open.sessionId === "phantom-gw"))
+    .toEqual({ sessionId: "phantom-gw", runtime: "gateway", lastSignedTs: null });
+});
+
 test("documented non-detection: deleting the newest rows of an open session leaves the ledger verifying", () => {
   const ledger = openLedger(root);
   try {

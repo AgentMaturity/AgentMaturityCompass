@@ -8,7 +8,7 @@ import { openLedger } from "../src/ledger/ledger.js";
 import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
 import {
   describeOpenSessions, GATEWAY_HEARTBEAT_AFTER_MS, GATEWAY_HEARTBEAT_CHECK_MS, GATEWAY_RECOVER_AFTER_MS,
-  GATEWAY_SESSION_STALE_AFTER_MS, isLiveLegacySession, isLivenessRow
+  GATEWAY_SESSION_STALE_AFTER_MS, isLiveLegacySession, isLivenessRow, LEGACY_START_GRACE_MS
 } from "../src/ledger/sessionLiveness.js";
 import { lockVault } from "../src/vault/vault.js";
 import { initWorkspace } from "../src/workspace.js";
@@ -28,6 +28,9 @@ describe("isLiveLegacySession", () => {
     ["a tail one ms past the window", unsealed, NOW - WINDOW - 1, false],
     ["no signed event: the recorded start decides (stale)", unsealed, null, false],
     ["no signed event: the recorded start decides (fresh)", { ...unsealed, started_ts: NOW - 1_000 }, null, true],
+    ["no signed event: open only for the start grace", { ...unsealed, started_ts: NOW - LEGACY_START_GRACE_MS }, null, true],
+    ["no signed event: 1 ms past the start grace", { ...unsealed, started_ts: NOW - LEGACY_START_GRACE_MS - 1 }, null, false],
+    ["no signed event, recorded start 3 min ago (unsigned, so never 15 min of liveness)", { ...unsealed, started_ts: NOW - 3 * 60_000 }, null, false],
     ["a future tail", unsealed, NOW + 1, false],
     ["a future start with no event", { ...unsealed, started_ts: NOW + 1 }, null, false]
   ] as const)("%s", (_label, session, lastSignedTs, expected) => {
@@ -55,6 +58,14 @@ test("describeOpenSessions states observed facts only", () => {
   expect(describeOpenSessions([
     { sessionId: "gw-1", runtime: "gateway", lastSignedTs: NOW }, { sessionId: "tool-1", runtime: "unknown", lastSignedTs: NOW - 61_000 }
   ], NOW)).toMatch(/^2 sessions open: gw-1 \(gateway; last signed activity 0 min ago\), tool-1 \(unknown; last signed activity 1 min ago\)\. /);
+  // A session with no signed row yet claims no signed activity: its recorded start is not signed.
+  expect(describeOpenSessions([{ sessionId: "bridge-1", runtime: "gateway", lastSignedTs: null }], NOW))
+    .toMatch(/^1 session open: bridge-1 \(gateway; no signed row yet\)\. /);
+});
+
+test("the start grace stays far inside the window", () => {
+  expect(LEGACY_START_GRACE_MS).toBe(60_000);
+  expect(LEGACY_START_GRACE_MS).toBeLessThan(GATEWAY_SESSION_STALE_AFTER_MS);
 });
 
 test("isLivenessRow matches only the gateway's heartbeat and recovery marker rows", () => {
