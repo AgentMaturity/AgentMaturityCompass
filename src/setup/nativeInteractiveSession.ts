@@ -6,7 +6,7 @@ import { renderNativeRunDiagnostics } from "../agent/nativeFailureGuidance.js";
 import { parseNativeChatResult, type NativeChatChildSummary } from "./nativeChatResult.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import { reviewNativeMcpConfigurations, NativeMcpConfigError } from "./nativeMcpConfig.js";
-import { inspectNativeFirstUse, renderNativeFirstUseGuide, renderNativeGuideCommand } from "./nativeFirstUseGuide.js";
+import { inspectNativeFirstUse, NATIVE_FIRST_USE_PROVIDER_LIST, renderNativeFirstUseGuide, renderNativeGuideCommand } from "./nativeFirstUseGuide.js";
 import { resolveNativeChatProfile, nativeChatProfileArgv, assertNativeChatProfileCurrent, type NativeChatProfileOptions } from "./nativeChatProfile.js";
 import { createNativeInteractiveApprovals } from "./nativeInteractiveApprovals.js";
 import { createNativeInteractiveAskUser } from "./nativeInteractiveAskUser.js";
@@ -15,7 +15,7 @@ import { loadNativeExtensions, nativeExtensionRunArgv, type NativeExtensionManag
 import { prepareSkillTurn, workspaceSkillRoots } from "../skills/skillTurn.js";
 import { buildSkillCatalog } from "../skills/skillCatalog.js";
 import { resolveNativeValidationSelection } from "./nativeValidationConfig.js";
-import { deepseekParams } from "../llm/providers/deepseekContract.js";
+import { nativeRouteFor, paramsFor } from "../cli-agent-options.js";
 import { NATIVE_INTERACTIVE_COMMANDS, nativeInteractiveCompleter } from "./nativeInteractiveCommands.js";
 import { listNativeInteractiveSessions, renderNativeInteractiveSession, assertNativeInteractiveSelection, type NativeInteractiveSessionSummary } from "./nativeInteractiveNavigation.js";
 import { createNativeInteractiveBookmark, listNativeInteractiveBookmarks, navigateNativeInteractiveBookmark } from "./nativeInteractiveBookmarks.js";
@@ -43,6 +43,11 @@ export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly maxTokens?: string;
   readonly thinking?: string;
   readonly reasoningEffort?: string;
+  readonly thinkingBudget?: string;
+  readonly cacheRetention?: string;
+  readonly maxRetries?: string;
+  readonly retryMaxDelay?: string;
+  readonly retryMaxProviderDelay?: string;
   readonly maxSteps?: string;
   readonly contextWindow?: string;
   readonly compactThreshold?: string;
@@ -209,7 +214,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
   try {
     let provider = options.provider;
     if (provider === undefined) {
-      io.log("Choose openai (Chat Completions), openai-responses, anthropic, deepseek, gemini, gemini-audio, or ollama (local model server) for a real model task; choose stub for a local recording demonstration.");
+      io.log(`Choose ${NATIVE_FIRST_USE_PROVIDER_LIST.replace(/, or stub$/, "")} for a real model task; choose stub for a local recording demonstration.`);
       const choice = await question("Provider (no default): ");
       if (choice === null) return;
       provider = choice.trim();
@@ -237,17 +242,17 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       io.error("--max-tokens and --max-steps must be positive integers."); io.fail(); return;
     }
     try {
-      if (provider === "deepseek") {
-        deepseekParams({ max_tokens: Number(maxTokens),
-          ...(options.thinking === undefined ? {} : { thinking: { type: options.thinking } }),
-          ...(options.reasoningEffort === undefined ? {} : { reasoning_effort: options.reasoningEffort }) });
-        if (tools === "none" && options.thinking !== "disabled") {
-          throw new Error("Tools-free DeepSeek chat requires --thinking disabled from its first turn. Signed reasoning is never discarded; select tools explicitly for thinking replay.");
-        }
-      } else if (options.thinking !== undefined || options.reasoningEffort !== undefined) {
-        throw new Error("--thinking and --reasoning-effort require --provider deepseek; unused options are not ignored.");
+      // Each turn's run child applies the same rules; checked here so a refusal comes before the first turn, not during it.
+      paramsFor(provider, Number(maxTokens), { ...options, tools });
+      nativeRouteFor(provider, { ...options, ...(guide.baseUrl === null ? {} : { baseUrl: guide.baseUrl }),
+        ...(guide.credential === null ? {} : { credential: guide.credential.ref }) }, guide.model ?? undefined);
+      if (provider === "deepseek" && tools === "none" && options.thinking !== "disabled") {
+        throw new Error("Tools-free DeepSeek chat requires --thinking disabled from its first turn. Signed reasoning is never discarded; select tools explicitly for thinking replay.");
       }
-    } catch (error) { io.error(error instanceof Error ? error.message : "Invalid thinking options."); io.fail(); return; }
+      if (provider === "anthropic" && options.thinking === "enabled") {
+        throw new Error("Anthropic thinking cannot continue a chat: anthropic-messages@4 cannot replay a signed thinking block, so the second turn would be refused before spend (D-01). Use agent-loop run --tools none for one thinking turn.");
+      }
+    } catch (error) { io.error(error instanceof Error ? error.message : "Invalid reasoning or route options."); io.fail(); return; }
     const approvalClass = options.approveTools?.trim().toUpperCase();
     const approvalRisk = (options.approveRisk ?? "high").trim().toLowerCase();
     if ((approvalClass !== undefined && !isActionClass(approvalClass)) ||
@@ -279,8 +284,9 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       ...(guide.credential === null ? [] : ["--credential", guide.credential.ref]),
       "--tools", tools, "--max-steps", maxSteps, "--max-tokens", maxTokens, ...(options.unsafeUnconfinedShell === true ? ["--unsafe-unconfined-shell"] : []),
       ...(options.webSearchSearxng === undefined ? [] : ["--web-search-searxng", options.webSearchSearxng]),
-      ...(options.thinking === undefined ? [] : ["--thinking", options.thinking]),
-      ...(options.reasoningEffort === undefined ? [] : ["--reasoning-effort", options.reasoningEffort]),
+      ...([["--thinking", options.thinking], ["--reasoning-effort", options.reasoningEffort], ["--thinking-budget", options.thinkingBudget],
+        ["--cache-retention", options.cacheRetention], ["--max-retries", options.maxRetries], ["--retry-max-delay", options.retryMaxDelay],
+        ["--retry-max-provider-delay", options.retryMaxProviderDelay]] as const).flatMap(([flag, value]) => value === undefined ? [] : [flag, value]),
       // Each turn's child run validates these; they are forwarded verbatim, never defaulted here.
       ...(options.contextWindow === undefined ? [] : ["--context-window", options.contextWindow]),
       ...(options.compactThreshold === undefined ? [] : ["--compact-threshold", options.compactThreshold]),

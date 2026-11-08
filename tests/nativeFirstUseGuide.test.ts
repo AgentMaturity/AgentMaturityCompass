@@ -57,7 +57,9 @@ describe("native first-use local inspection", () => {
 
   it("pins a custom provider origin through every real-provider action without contacting it", async () => {
     workspaceMarker(); ownedStore();
-    const ready = await inspect({ baseUrl: "http://127.0.0.1:43123/" });
+    // The reference is explicit: a default one goes only to the provider's own origin (nativeRouteDefaults), as on
+    // agent-loop run. This case used to rely on OPENAI_API_KEY being carried to the custom origin implicitly.
+    const ready = await inspect({ baseUrl: "http://127.0.0.1:43123/", credential: "OPENAI_API_KEY" });
     expect(ready.baseUrl).toBe("http://127.0.0.1:43123");
     for (const action of [ready.nextAction, ready.recheck]) expect(action?.argv).toEqual(expect.arrayContaining(["--base-url", "http://127.0.0.1:43123"]));
     const choices = await inspect({ provider: undefined, baseUrl: "https://models.example" });

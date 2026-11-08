@@ -88,6 +88,7 @@ vi.mock("../src/setup/nativeChatProfile.js", () => ({
 }));
 vi.mock("../src/setup/nativeValidationConfig.js", () => ({ resolveNativeValidationSelection: () => undefined }));
 vi.mock("../src/setup/nativeFirstUseGuide.js", () => ({
+  NATIVE_FIRST_USE_PROVIDER_LIST: "openai, stub",
   inspectNativeFirstUse: async (options: NativeChatOptions) => ({ status: "ready", agentId: options.agentId ?? "reviewer",
     model: "synthetic-model", baseUrl: null, credential: null,
     nextAction: { argv: ["amc", "agent-loop", "run", "--credentials-file", "/synthetic/refs.yaml"] } }),
@@ -234,6 +235,30 @@ describe("P01 connected native chat behavior", () => {
     await run();
     expect(seam.commands).toEqual([]);
     expect(errors.length).toBeGreaterThan(0);
+  });
+
+  // Opus completion (SH-PROVIDERS-02/04/06 on chat): chat applies run's provider-honest rules before the first turn and
+  // forwards the reasoning and route flags verbatim. Mutation: drop the paramsFor/nativeRouteFor preflight → the refusal
+  // rows dispatch a turn and fail; drop a flag from the forwarded list → the argv assertion fails.
+  it("forwards route and reasoning flags to each turn and refuses what run would refuse before any turn", async () => {
+    seam.answers = ["task", "/exit"];
+    seam.results = [{ code: 0, body: summary() }];
+    await run({ provider: "gemini", model: "synthetic-model", thinking: "enabled", thinkingBudget: "512", maxRetries: "0", retryMaxDelay: "2000", retryMaxProviderDelay: "5000" });
+    const turn = seam.commands.find(argv => argv.includes("run"))!;
+    expect([option(turn, "--thinking"), option(turn, "--thinking-budget"), option(turn, "--max-retries"), option(turn, "--retry-max-delay"),
+      option(turn, "--retry-max-provider-delay")]).toEqual(["enabled", "512", "0", "2000", "5000"]);
+    for (const [extra, refusal] of [
+      [{ provider: "stub", thinking: "enabled" }, "not admitted for provider \"stub\""],
+      [{ provider: "stub", cacheRetention: "long" }, "--cache-retention is not admitted for provider stub"],
+      [{ provider: "openai", model: "synthetic-model", reasoningEffort: "high" }, "OpenAI reasoning output is not decoded yet"],
+      [{ provider: "stub", retryMaxDelay: "100" }, "--retry-max-delay must be an integer"],
+      [{ provider: "anthropic", model: "synthetic-model", thinking: "enabled", thinkingBudget: "2048", maxTokens: "4096" }, "Anthropic thinking cannot continue a chat"]
+    ] as const) {
+      seam.commands = []; errors = []; seam.answers = ["task", "/exit"];
+      await run(extra);
+      expect(seam.commands).toEqual([]);
+      expect(errors.join("\n")).toContain(refusal);
+    }
   });
 
   it("refuses non-terminal input before provider setup or child execution", async () => {

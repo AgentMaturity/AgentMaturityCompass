@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 import type { LlmRouteConfig, ProviderDescription } from "./llm/adapter/adapterRegistry.js";
 import type { LlmAdapter } from "./llm/adapter/adapterTypes.js";
 import { snapshotCapabilities } from "./llm/adapter/providerCapabilities.js";
-import { lookupProviderCatalog } from "./llm/providerCatalog.js";
+import { defaultCredentialRefFor, nativeRouteDefaults } from "./llm/nativeRouteDefaults.js";
 import { listModelMetadata, type ModelMetadataSnapshot } from "./llm/modelCatalog.js";
 import { anthropicAdapter } from "./llm/providers/anthropicAdapter.js";
 import { openaiAdapter } from "./llm/providers/openaiAdapter.js";
@@ -348,6 +348,18 @@ function nativeAdapterFor(providerId: string): LlmAdapter {
 /** Route-level options every native route accepts from the command line: retry policy and cache retention. */
 export type RouteOptions = Pick<RunOptions, "baseUrl" | "credential" | "cacheRetention" | "maxRetries" | "retryMaxDelay" | "retryMaxProviderDelay">;
 
+/** The reasoning and route flags `agent-loop run` and `chat` share; chat forwards them verbatim to each turn's run. */
+export function withReasoningAndRouteOptions(command: Command, thinkingHelp: string): Command {
+  return command
+    .option("--thinking <mode>", thinkingHelp)
+    .option("--reasoning-effort <effort>", "sent verbatim: DeepSeek low|high|max, Gemini MINIMAL|LOW|MEDIUM|HIGH (thinkingLevel), Ollama low|medium|high|max (think)")
+    .option("--thinking-budget <tokens>", "Anthropic budget_tokens (>= 1024, below --max-tokens) or Gemini thinkingBudget")
+    .option("--cache-retention <mode>", "short or long prompt-cache retention on anthropic, openai and openai-responses routes (refused elsewhere)")
+    .option("--max-retries <n>", "model-request retries after the first attempt (default 5; 0 gives up on the first failure)")
+    .option("--retry-max-delay <ms>", "local backoff ceiling in milliseconds (500 to 2147483647, default 10000)")
+    .option("--retry-max-provider-delay <ms>", "ceiling on a provider-requested wait (Retry-After, reset headers), default 60000; never below --retry-max-delay");
+}
+
 /** A flag's integer, or a refusal naming the flag; the bounds are the ones resolveRetryPolicy enforces, checked here so the operator reads the flag's name, not a config path. */
 function flagInteger(flag: string, raw: string | undefined, min: number, max: number, bound: string): number | undefined {
   if (raw === undefined) return undefined;
@@ -404,12 +416,10 @@ export function nativeRouteFor(
   }
   // SH-PROVIDERS-01: the native inventory is the one source of compat defaults; gateway templates serve the rest.
   const compat = openaiCompatibleRouteFor(providerId);
-  const defaults = compat ?? lookupProviderCatalog(providerId);
-  const baseUrl = options.baseUrl ?? defaults?.defaultBaseUrl;
+  const baseUrl = options.baseUrl ?? nativeRouteDefaults(providerId)?.defaultBaseUrl;
   if (baseUrl === undefined || baseUrl === null) throw new Error(`--base-url is required for provider ${providerId}`);
   // The default credential goes only to the provider's own origin, as model enumeration rules (modelEnumeration.ts).
-  const ownOrigin = defaults?.defaultBaseUrl != null && new URL(baseUrl).origin === new URL(defaults.defaultBaseUrl).origin;
-  const credential = options.credential ?? (ownOrigin ? defaults?.defaultCredentialRef : undefined);
+  const credential = options.credential ?? defaultCredentialRefFor(providerId, options.baseUrl);
   if (credential === undefined || credential === null) {
     // A local OpenAI-compatible server on a loopback origin needs no credential; anything else is refused, never guessed.
     if (compat !== null && credentialOptionalOrigin(baseUrl)) return { providerId, adapter, baseUrl, credentialRef: null, models: [model], ...extras };
