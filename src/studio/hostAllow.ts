@@ -7,7 +7,7 @@ import { isIP } from "node:net";
  * any other name must be one the operator configured. A request through a trusted hop is not checked here: the proxy
  * terminates for its own configured name.
  */
-export function hostnameOf(hostHeader: string | undefined): string | null {
+function hostnameOf(hostHeader: string | undefined): string | null {
   const value = (hostHeader ?? "").trim().toLowerCase();
   if (value.length === 0) return null;
   if (value.startsWith("[")) {

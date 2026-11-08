@@ -7,7 +7,7 @@ import { createServer } from "node:net";
 
 const addressInUse = (error: unknown): boolean => String(error).includes("EADDRINUSE");
 
-export function portInUseError(port: number, source: string): Error {
+function portInUseError(port: number, source: string): Error {
   return new Error(`Port ${port} (from ${source}) is already in use. Stop the other process or change the port.`);
 }
 

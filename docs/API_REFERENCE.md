@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-11-07
+> Auto-generated from source on 2026-11-08
 
 ## Table of Contents
 
@@ -11067,6 +11067,7 @@ export interface StudioRuntimeConfig {
   dataRetentionDays: number;
   minFreeDiskMb: number;
   maxRequestBytes: number;
+  gatewayMaxRequestBytes: number;
   corsAllowedOrigins: string[];
   allowPublicBind: boolean;
   metricsBind: string;

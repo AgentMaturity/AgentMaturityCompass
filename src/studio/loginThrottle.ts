@@ -18,7 +18,7 @@ interface Window {
   refused: boolean;
 }
 
-export type LoginGate =
+type LoginGate =
   | { allowed: true; delayMs: number }
   | { allowed: false; retryAfterSeconds: number; firstRefusal: boolean };
 
