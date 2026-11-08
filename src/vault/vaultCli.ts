@@ -1,7 +1,9 @@
 import inquirer from "inquirer";
 import { rotateMonitorKeyInVault } from "../keys/purposeKeys.js";
-import { createVault, ensureVaultAndPublicKeys, lockVault, unlockVault, vaultExists, vaultPaths, vaultStatus } from "./vault.js";
-import { operatorRememberedPassphrase } from "./passphraseStore.js";
+import { createVault, encryptedVaultBytes, ensureVaultAndPublicKeys, lockVault, unlockedPayloadForKeyChange, unlockVault, vaultExists, vaultMetaBytes,
+  vaultPaths, vaultStatus } from "./vault.js";
+import { forgetVaultPassphrase, operatorRememberedPassphrase } from "./passphraseStore.js";
+import { writeFileAtomic } from "../utils/fs.js";
 import { generateKeyPairSync } from "node:crypto";
 
 export async function promptPassphrase(message: string): Promise<string> {
@@ -66,6 +68,30 @@ function promptUnlockPassphrase(): Promise<string> {
     throw new Error("Vault passphrase needed: export AMC_VAULT_PASSPHRASE for this shell, or re-run this command from your terminal.");
   }
   return promptPassphrase("Unlock vault passphrase:");
+}
+
+/**
+ * LIVE-VAULT-19: re-seals the vault under a new passphrase with the same keys, so every key id, signature and the key set
+ * stay as they are. The envelope and its meta are rewritten (each atomically) the way createVault writes them; then this
+ * process's session is locked and the remembered entry, which holds the old passphrase, is forgotten.
+ */
+export function changeVaultPassphrase(workspace: string, current: string, next: string): void {
+  if (next === current) throw new Error("The new vault passphrase is the current one; nothing changed.");
+  const payload = unlockedPayloadForKeyChange(workspace, current);
+  const paths = vaultPaths(workspace);
+  writeFileAtomic(paths.vaultFile, encryptedVaultBytes(payload, next), 0o600);
+  writeFileAtomic(paths.metaFile, vaultMetaBytes(payload), 0o644);
+  lockVault(workspace);
+  forgetVaultPassphrase(workspace);
+}
+
+/** `amc vault passphrase`: the current passphrase from AMC_VAULT_PASSPHRASE, the operator-gated remembered store or a prompt; the new one typed twice, never argv. */
+export async function changeVaultPassphraseInteractive(workspace: string): Promise<void> {
+  if (process.stdin.isTTY !== true) throw new Error("A new vault passphrase is typed at a prompt, never passed on the command line: re-run this command from your terminal.");
+  const current = process.env.AMC_VAULT_PASSPHRASE || operatorRememberedPassphrase(workspace)?.passphrase || (await promptPassphrase("Current vault passphrase:"));
+  const next = await promptPassphrase("New vault passphrase (at least 8 characters):");
+  if ((await promptPassphrase("Repeat the new vault passphrase:")) !== next) throw new Error("The new passphrases do not match; nothing changed.");
+  changeVaultPassphrase(workspace, current, next);
 }
 
 export function lockVaultNow(workspace: string): void {

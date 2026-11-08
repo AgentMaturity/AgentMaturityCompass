@@ -100,7 +100,7 @@ Private signing keys (Monitor + Auditor) are stored in an encrypted vault:
 - `.amc/local-vault-passphrase` (0600, written by bare `amc` and `amc monitor start` for a vault they create) is never read in agent mode or under an agent marker.
 - A coding-agent harness that runs commands in a pseudo-terminal and sets none of the known markers is indistinguishable from you; export `AMC_VAULT_PASSPHRASE` only in shells you control. The full rule, the marker list, the opt-outs and when to rotate are in [VAULT.md](VAULT.md).
 
-Key rotation is supported via `amc vault rotate-keys`, which maintains key history for verifying older signatures. Rotated keys are sealed under the same passphrase, so rotation does not answer a passphrase leak; [VAULT.md](VAULT.md) "When to rotate" gives the remedy.
+Key rotation is supported via `amc vault rotate-keys`, which maintains key history for verifying older signatures. Rotated keys are sealed under the same passphrase, so rotation alone does not answer a passphrase leak: `amc vault passphrase` changes the passphrase without changing a key, and [VAULT.md](VAULT.md) "When to rotate" gives the full remedy.
 
 ### Identity and API-key readiness
 

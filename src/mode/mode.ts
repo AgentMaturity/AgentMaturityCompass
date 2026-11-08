@@ -94,6 +94,7 @@ export const OWNER_ONLY_COMMAND_PATHS: readonly string[] = [
     "vault unlock",
     "vault lock",
     "vault rotate-keys",
+    "vault passphrase",
     // P1-08: every state-changing key-set operation, checked again inside the function that does the work.
     "keys rotate",
     "keys revoke",

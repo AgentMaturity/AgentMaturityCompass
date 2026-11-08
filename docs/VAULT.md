@@ -16,6 +16,8 @@ amc vault unlock
 amc vault lock
 amc vault status
 amc vault rotate-keys
+amc vault passphrase   # change the passphrase; the keys stay the same
+amc vault forget       # remove the remembered passphrase for this workspace
 ```
 
 If vault is locked, signing commands fail with an actionable error.
@@ -73,7 +75,7 @@ Rotation now requires authenticated history. Existing unsigned histories need ex
 
 Rotate when `.amc/` was committed or copied somewhere else, when the remembered store or `.amc/local-vault-passphrase` may have been read by something else, when a laptop holding the workspace was lost, or when a person with the OWNER role leaves.
 
-A leaked passphrase together with a copy of the vault file decrypts every key the vault holds, now and after `amc keys rotate`, because rotated keys are sealed under the same passphrase. AMC has no command that changes the passphrase of an existing vault yet. Until it does, the remedy is a new vault: run `amc vault forget`, move `.amc/vault.amcvault` and `.amc/vault.amcvault.meta.json` aside, and run `amc up` with a new passphrase. Then rotate every key with `amc keys rotate --purpose <p> --reason key-compromise`, which needs this machine's pinned trust-list root keys held outside AMC (`--root-key`, see [KEY_LIFECYCLE.md](KEY_LIFECYCLE.md)); the verification chain starts a new epoch.
+A leaked passphrase together with a copy of the vault file decrypts every key the vault holds, now and after `amc keys rotate`, because rotated keys are sealed under the same passphrase. First change the passphrase with `amc vault passphrase`: it asks for the current passphrase and the new one twice (never on the command line), re-seals the vault under the new one without changing a key, locks the vault and forgets the remembered entry. The old passphrase then no longer opens the vault file, but a copy of the file taken earlier still opens with it, so when one may exist also rotate every key with `amc keys rotate --purpose <p> --reason key-compromise`, which needs this machine's pinned trust-list root keys held outside AMC (`--root-key`, see [KEY_LIFECYCLE.md](KEY_LIFECYCLE.md)); the verification chain starts a new epoch.
 
 Then the accounts and tokens: `amc user password <name>` for every console account whose password may be known (it also ends that user's sessions), `amc user revoke <name>` for anyone who left (a revoked account cannot be reactivated, so a returning person gets a new username; AMC refuses to revoke or demote the last active OWNER), a new Studio admin token (`amc down`, delete `.amc/studio/admin.token`, `amc up`; every client holding the old token stops working at once), and for SCIM a new token from `amc scim token create`, replaced in the identity provider ([SCIM.md](SCIM.md)).
 
