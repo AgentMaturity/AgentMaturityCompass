@@ -21,6 +21,7 @@ import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { KeyProviderError, KEY_PROVIDER_ERRORS } from "../keys/provider.js";
 import { KeyRevokedError } from "../keys/keyRevocations.js";
 import { recordUserChange, type UserChange, type UserChangeActor } from "./userAudit.js";
+import { pruneSessions } from "./sessionPrune.js";
 export { sessionActor } from "./userAudit.js";
 
 interface UsersSignature {
@@ -543,6 +544,7 @@ function storeTrackedSession(params: Parameters<typeof createTrackedSession>[0],
     authSource: params.authSource
   };
   ensureDir(sessionsDir(params.workspace));
+  pruneSessions(sessionsDir(params.workspace));
   writeFileAtomic(sessionStorePath(params.workspace, sessionId), JSON.stringify(store, null, 2), 0o600);
   return issued;
 }
