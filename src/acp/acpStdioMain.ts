@@ -322,8 +322,9 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
     sessionFactory: params => nativeSession(sessionOptions(params), params.signal, false, params.approvalRaised),
     resumeSessionFactory: params => nativeSession(sessionOptions(params), params.signal, true, params.approvalRaised),
     ...(permission === undefined ? {} : { onApprovalRaised: event => permission.handle(event) }),
-    // Skills only: `amc acp` loads no native extensions, so nothing else is runnable here.
-    availableCommands: () => buildSkillCatalog(workspaceSkillRoots(init.workspace, init.credentialsHome)).skills
+    // Skills only: `amc acp` loads no native extensions, so nothing else is runnable here. The same roots an ACP prompt
+    // resolves (`prepareSkillTurn` in agentSession takes no home): a command offered here is one the session can run.
+    availableCommands: () => buildSkillCatalog(workspaceSkillRoots(init.workspace)).skills
       .map(skill => ({ name: skill.name, description: skill.description, input: { hint: "text after the command name" } })),
     onUnusable: () => { void close().catch(reportShutdownFailure); },
     // stderr, never stdout. See the module note.

@@ -98,6 +98,8 @@ interface PromptSlot {
   started: boolean;
   cancelled: boolean;
   cancelFailed: boolean;
+  /** Aborted when this prompt settles, so a permission dialog raised under it never outlives it. */
+  readonly ended: AbortController;
 }
 
 interface Registered {
@@ -481,7 +483,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
     // Reserve protocol ownership BEFORE any await, but commit no native inbox
     // work until the whole prompt is validated. Same-read cancellation can now
     // target this slot without ever cancelling the next prompt on this session.
-    const slot: PromptSlot = { started: false, cancelled: signal.aborted, cancelFailed: false };
+    const slot: PromptSlot = { started: false, cancelled: signal.aborted, cancelFailed: false, ended: new AbortController() };
     entry.active = slot;
     entry.running = true;
     const onAbort = (): void => requestCancel(entry, slot, "acp-request-abort");
@@ -596,6 +598,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       signal.removeEventListener("abort", onAbort);
       entry.running = false;
       entry.active = undefined;
+      slot.ended.abort();
     }
   }
 
@@ -604,11 +607,23 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
     return init.nativeExecution ? { execution: executionStatusFor(init.workspace, { sessionId, admission: "admitted", turn, verified: null }) } : undefined;
   }
 
-  /** The launcher's gate hook, resolved per raised request against the live negotiation and the owning session's prompt slot. */
-  function approvalRaised(sessionId: string, event: { readonly approvalId: string; readonly approvalRequestId: string }): void {
-    init.onApprovalRaised?.({ sessionId, ...event, negotiated: permissionRequests,
+  /**
+   * The launcher's gate hook, resolved per raised request against the live negotiation and the prompt slot that is
+   * active NOW: a late or stale answer cancels that prompt or nothing, never whichever prompt is active when it
+   * arrives. The committed tail is flushed first, so the `tool_call` the permission names reaches the client before
+   * the request that asks about it.
+   */
+  function approvalRaised(sessionId: string, event: { readonly approvalId: string; readonly approvalRequestId: string; readonly toolCallId: string }): void {
+    if (init.onApprovalRaised === undefined) return;
+    const entry = sessions.get(sessionId), slot = entry?.active;
+    if (entry && permissionRequests && !entry.projectionFailed) {
+      try { flush(entry, sessionId); }
+      catch (error) { log(`committed updates could not be flushed before a permission request: ${error instanceof Error ? error.message : String(error)}`); }
+    }
+    init.onApprovalRaised({ sessionId, ...event, negotiated: permissionRequests,
       request: (method, params, signal) => connection.request(method, params, signal),
-      cancelTurn: by => { const entry = sessions.get(sessionId); if (entry?.active) requestCancel(entry, entry.active, by); } });
+      turnEnded: slot?.ended.signal ?? AbortSignal.abort(),
+      cancelTurn: by => { if (entry && slot) requestCancel(entry, slot, by); } });
   }
 
   /**

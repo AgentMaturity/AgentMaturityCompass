@@ -172,7 +172,7 @@ function updateFor(workspace: string, event: EvidenceEvent, includeThoughts: boo
       // Standard kind/title/locations from the signed row's name and frozen
       // arguments (src/acp/acpToolCallView.ts); the arguments themselves are
       // not sent.
-      ...acpToolCallView(toolName, payloadJson(workspace, event)),
+      ...acpToolCallView(workspace, toolName, payloadJson(workspace, event)),
       // `pending` rather than `in_progress`: the row records that the call was
       // decided on, and the ledger has no separate "started" moment to read.
       status: "pending"

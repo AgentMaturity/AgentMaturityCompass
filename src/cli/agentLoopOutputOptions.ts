@@ -3,6 +3,7 @@ import type { Command } from "commander";
 import type { LoopNotification } from "../agent/loopTypes.js";
 import type { AgentRunSummary } from "../agent/runReport.js";
 import type { LiveTextPreviewEvent } from "../llm/adapter/liveTextPreview.js";
+import type { RoundStop } from "../autonomy/goalRounds.js";
 import { COMMITTED_CURSOR_START, chargeUpdateBudget, projectCommittedTail, type CommittedCursor } from "../acp/acpCommittedStream.js";
 import { liveNativeFailureGuidance } from "../agent/nativeFailureGuidance.js";
 import { INTEGRITY_FAILED, type ExecutionStatus } from "../execution/executionContract.js";
@@ -29,23 +30,36 @@ const FLUSH_INTERVAL_MS = 100;
  * Derived from the execution contract's phases (docs/sdk/EXECUTION_API.md), not restated beside it:
  * 0 admission, model completion and side effects all succeeded; 1 the run failed (driver, `error` ending, requested
  * validation not passed, goal rounds failed, or a refusal before dispatch); 3 cancelled or interrupted; 4 a bounded
- * ending (`max_steps`, `max_tokens`); 5 `blocked` (a guard refused the turn); 6 the turn completed but its side effects
- * did not all settle as completed (a refused, unknown, pending or integrity-failed receipt chain). 2 is `agent-loop
+ * ending (`max_steps`, `max_tokens`); 5 `blocked` (a guard refused the turn); 6 the turn completed but the session's
+ * side effects did not all settle as completed (a refused, unknown, pending or integrity-failed receipt chain; the
+ * receipts are the whole session's, so a `--session` turn after a refused one still exits 6). 2 is `agent-loop
  * verify`'s integrity-only exit and is never produced by `run`.
  */
 export const RUN_EXIT_CODES = Object.freeze({ ok: 0, failed: 1, cancelled: 3, bounded: 4, blocked: 5, sideEffectsUnsettled: 6 });
+
+/** How each goal-rounds stop (src/autonomy/goalRounds.ts) exits; a stop this table does not know is not success. */
+export const GOAL_STOP_EXIT_CODES: Readonly<Record<RoundStop, number>> = Object.freeze({
+  done: RUN_EXIT_CODES.ok,
+  failed: RUN_EXIT_CODES.failed, refused: RUN_EXIT_CODES.failed, "check-failed": RUN_EXIT_CODES.failed, "check-unavailable": RUN_EXIT_CODES.failed,
+  cancelled: RUN_EXIT_CODES.cancelled, human: RUN_EXIT_CODES.cancelled,
+  "max-rounds": RUN_EXIT_CODES.bounded,
+  blocked: RUN_EXIT_CODES.blocked
+});
 
 export function withOutputFormatOption(command: Command): Command {
   return command.option("--output-format <format>", `${OUTPUT_FORMATS.join("|")}: the final summary as text (default) or one JSON object, or one JSON event per line on stdout (exit codes 0/1/3/4/5/6; see docs/NATIVE_HEADLESS.md)`);
 }
 
+interface OutputFormatOptions { readonly json?: boolean; readonly outputFormat?: string; readonly goalRounds?: string; readonly listSkills?: string | boolean }
+
 /** `--json` stays the alias of `--output-format json`; a format and a conflicting `--json` is refused. Null after a reported refusal. */
-export function resolveOutputFormat(io: AgentLoopCliIo, opts: { readonly json?: boolean; readonly outputFormat?: string; readonly goalRounds?: string }): OutputFormat | null {
+export function resolveOutputFormat(io: AgentLoopCliIo, opts: OutputFormatOptions): OutputFormat | null {
   const refuse = (message: string): null => { io.error(chalk.red(message)); io.fail(); return null; };
   if (opts.outputFormat === undefined) return opts.json ? "json" : "text";
   if (!(OUTPUT_FORMATS as readonly string[]).includes(opts.outputFormat)) return refuse(`--output-format must be one of ${OUTPUT_FORMATS.join(", ")}`);
   if (opts.json && opts.outputFormat !== "json") return refuse("--json means --output-format json; drop one of them.");
   if (opts.outputFormat === "stream-json" && opts.goalRounds !== undefined) return refuse("--output-format stream-json follows one root turn; goal rounds run child sessions with no root turn to stream. Use --output-format json.");
+  if (opts.outputFormat === "stream-json" && opts.listSkills !== undefined) return refuse("--list-skills prints a catalog, not a run; use --output-format json with it.");
   return opts.outputFormat as OutputFormat;
 }
 
@@ -85,23 +99,32 @@ export async function readProcessStdin(options: { readonly explicit: boolean }):
 export interface RunReport {
   readonly summary: AgentRunSummary;
   readonly execution: ExecutionStatus;
+  /** This invocation's newly recorded root turn ending; undefined under goal rounds (no root turn) or when none was recorded. */
   readonly ending: AgentRunSummary["endings"][number] | undefined;
   readonly validationRequested: boolean;
-  readonly goalFailed: boolean;
+  /** How goal rounds stopped; undefined when the run was one root turn. */
+  readonly goalStop?: RoundStop;
 }
 
-/** The exit code of a run that reached a result; see RUN_EXIT_CODES. */
+/**
+ * The exit code of a run that reached a result; see RUN_EXIT_CODES and GOAL_STOP_EXIT_CODES. A root turn with no
+ * readable ending exits 1: an outcome that was not established is not success.
+ */
 export function runExitCode(report: RunReport): number {
-  const { summary, execution, ending } = report;
-  if (summary.driverStatus === "failed" || ending?.reason === "error" || report.goalFailed
+  const { summary, execution, ending, goalStop } = report;
+  if (summary.driverStatus === "failed" || ending?.reason === "error"
     || (report.validationRequested && summary.validation.status !== "passed") || execution.receiptStates.includes(INTEGRITY_FAILED)) return RUN_EXIT_CODES.failed;
+  const settled = execution.phases["side-effect-completion"] === "succeeded";
+  if (goalStop !== undefined) {
+    const code = GOAL_STOP_EXIT_CODES[goalStop] ?? RUN_EXIT_CODES.failed;
+    return code === RUN_EXIT_CODES.ok && !settled ? RUN_EXIT_CODES.sideEffectsUnsettled : code;
+  }
   switch (ending?.reason) {
     case "cancelled": case "interrupted": return RUN_EXIT_CODES.cancelled;
     case "max_steps": case "max_tokens": return RUN_EXIT_CODES.bounded;
     case "blocked": return RUN_EXIT_CODES.blocked;
-    case "complete": return execution.phases["side-effect-completion"] === "succeeded" ? RUN_EXIT_CODES.ok : RUN_EXIT_CODES.sideEffectsUnsettled;
-    case undefined: return RUN_EXIT_CODES.ok; // No root turn (goal rounds, schedule pass) and nothing above failed.
-    default: return RUN_EXIT_CODES.failed; // An ending this version does not know is not success.
+    case "complete": return settled ? RUN_EXIT_CODES.ok : RUN_EXIT_CODES.sideEffectsUnsettled;
+    default: return RUN_EXIT_CODES.failed; // No recorded ending, or one this version does not know: not success.
   }
 }
 
@@ -118,8 +141,8 @@ export interface RunEventSink {
   liveText(event: LiveTextPreviewEvent): void;
   /** The terminal line: a final authenticated flush, then `result`. */
   result(report: RunReport & { readonly exitCode: number; readonly goalRounds?: unknown }): void;
-  /** A terminal `error` line when no result will follow (refusal before dispatch, projection failure). Idempotent. */
-  error(message: string, exitCode: number): void;
+  /** A terminal `error` line when no result will follow (refusal before dispatch, projection failure). Idempotent: true when this call wrote it. */
+  error(message: string, exitCode: number): boolean;
   /** The last human-facing error line, so a refusal's terminal event can name it. */
   noteError(line: string): void;
   dispose(): void;
@@ -133,7 +156,7 @@ export function streamJsonIo(io: AgentLoopCliIo, sink: RunEventSink): AgentLoopC
 export interface RunOutput { readonly format: OutputFormat; readonly sink: RunEventSink | null }
 
 /** Resolve the format, build the sink for `stream-json`, run the command body under the matching IO, and always end the stream. */
-export async function runWithOutput(io: AgentLoopCliIo, workspace: string, opts: { json?: boolean; readonly outputFormat?: string; readonly goalRounds?: string },
+export async function runWithOutput(io: AgentLoopCliIo, workspace: string, opts: OutputFormatOptions & { json?: boolean },
   body: (io: AgentLoopCliIo, output: RunOutput) => Promise<void>): Promise<void> {
   const format = resolveOutputFormat(io, opts);
   if (format === null) return;
@@ -143,7 +166,9 @@ export async function runWithOutput(io: AgentLoopCliIo, workspace: string, opts:
   try { await body(streamJsonIo(io, sink), { format, sink }); }
   // The exception's own text stays on the stderr path (the CLI prints it there); stdout gets a fixed line (S9).
   catch (error) { sink.error("the run ended with an unhandled error; see stderr", RUN_EXIT_CODES.failed); throw error; }
-  finally { sink.error("the run ended without a result", RUN_EXIT_CODES.failed); sink.dispose(); }
+  // A body that ended with neither a result nor a failure gets a terminal error that also fails the process: the
+  // stream's `exitCode: 1` and the exit status never disagree.
+  finally { if (sink.error("the run ended without a result", RUN_EXIT_CODES.failed)) io.fail(); sink.dispose(); }
 }
 
 /**
@@ -203,7 +228,7 @@ export function createRunEventSink(io: AgentLoopCliIo, workspace: string): RunEv
   const flush = (read: () => readonly EvidenceEvent[] = () => handle!.readEvents()): void => {
     if (handle === null || failed) return;
     try {
-      const tail = projectCommittedTail({ workspace, sessionId: handle.sessionId, events: read(), cursor, emit: true });
+      const tail = projectCommittedTail({ workspace, sessionId: handle.sessionId, events: read(), cursor, emit: true, includeCurrentPlans: true });
       cursor = tail.cursor;
       for (const entry of tail.updates) {
         const event = { type: "update", seq: entry.seq, eventId: entry.eventId, eventHash: entry.eventHash, update: entry.update };
@@ -216,6 +241,11 @@ export function createRunEventSink(io: AgentLoopCliIo, workspace: string): RunEv
     ready(turn, facts) {
       handle = turn; sessionId = turn.sessionId;
       emit({ type: "system", subtype: "init", schemaVersion: RUN_EVENT_SCHEMA_VERSION, ...facts });
+      // The rows a resumed (`--session`) or forked (`--fork-from`) session already holds are earlier turns' output, not
+      // this run's: authenticate them under the same checks, emit none, charge none, and start after them (ACP does the
+      // same after session/load and fork). `ready` runs before this run's prompt is enqueued, so nothing of this turn is skipped.
+      try { cursor = projectCommittedTail({ workspace, sessionId: turn.sessionId, events: turn.readEvents(), cursor, emit: false }).cursor; }
+      catch (error) { fail(error instanceof Error ? error.message : "the session's existing rows did not authenticate", "projection"); return; }
       timer = setInterval(() => flush(), FLUSH_INTERVAL_MS); timer.unref();
       process.stdout.on("error", onStdoutError);
     },
@@ -239,9 +269,10 @@ export function createRunEventSink(io: AgentLoopCliIo, workspace: string): RunEv
       terminal = true;
     },
     error(message, exitCode) {
-      if (terminal) return;
+      if (terminal) return false;
       emit({ type: "error", message: message || lastError || "the run was refused", exitCode });
       terminal = true;
+      return true;
     },
     noteError(line) { lastError = line.replace(/\x1b\[[0-9;]*m/g, ""); },
     dispose() {

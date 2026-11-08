@@ -15,11 +15,18 @@ describe("acpToolCallView", () => {
       .toEqual(["read", "edit", "edit", "execute", "search", "fetch", "think", "other", "other"]);
   });
 
-  it("derives locations only from the path arguments of fs tools, refusing control characters", () => {
-    expect(acpToolCallView("fs.read", { path: "src/a.ts" })).toEqual({ title: "fs.read", kind: "read", locations: [{ path: "src/a.ts" }] });
-    expect(acpToolCallView("fs.edit", { path: "x\u0000y", find: "a" })).toEqual({ title: "fs.edit", kind: "edit" });
-    expect(acpToolCallView("bash", { command: "ls /etc" })).toEqual({ title: "bash", kind: "execute" });
-    expect(acpToolCallView("fs.read", "not an object")).toEqual({ title: "fs.read", kind: "read" });
+  it("derives absolute, workspace-contained locations only from the path arguments of fs tools, refusing control characters", () => {
+    const root = realpathSync(mkdtempSync(join(tmpdir(), "amc-tool-call-root-")));
+    try {
+      // ACP requires absolute paths: the frozen workspace-relative argument is resolved against the session workspace.
+      expect(acpToolCallView(root, "fs.read", { path: "src/a.ts" })).toEqual({ title: "fs.read", kind: "read", locations: [{ path: join(root, "src/a.ts") }] });
+      // An argument that escapes the workspace (or names a protected directory) is not announced as a location at all.
+      expect(acpToolCallView(root, "fs.read", { path: "../../.ssh/id_rsa" })).toEqual({ title: "fs.read", kind: "read" });
+      expect(acpToolCallView(root, "fs.read", { path: "/etc/passwd" })).toEqual({ title: "fs.read", kind: "read" });
+      expect(acpToolCallView(root, "fs.edit", { path: "x\u0000y", find: "a" })).toEqual({ title: "fs.edit", kind: "edit" });
+      expect(acpToolCallView(root, "bash", { command: "ls /etc" })).toEqual({ title: "bash", kind: "execute" });
+      expect(acpToolCallView(root, "fs.read", "not an object")).toEqual({ title: "fs.read", kind: "read" });
+    } finally { rmSync(root, { recursive: true, force: true }); }
   });
 });
 
@@ -39,7 +46,7 @@ describe("projection of tool calls and thoughts", () => {
   it("emits a schema-valid tool_call with kind and locations from the committed arguments", async () => {
     writer.recordToolCall({ toolCallId: "c1", toolName: "fs.read", dispatch: "native", parentToken: null, args: JSON.stringify({ path: "notes/a.md" }) });
     const { updates } = projectSessionUpdates(workspace, writer.readEvents(), 0);
-    expect(updates).toEqual([{ sessionUpdate: "tool_call", toolCallId: "c1", title: "fs.read", kind: "read", locations: [{ path: "notes/a.md" }], status: "pending" }]);
+    expect(updates).toEqual([{ sessionUpdate: "tool_call", toolCallId: "c1", title: "fs.read", kind: "read", locations: [{ path: join(workspace, "notes/a.md") }], status: "pending" }]);
     expect(await checkAcpDefinition("ToolCall", updates[0])).toEqual({ ok: true });
     expect(await checkAcpDefinition("SessionNotification", { sessionId: "view-fixture", update: updates[0] })).toEqual({ ok: true });
   });

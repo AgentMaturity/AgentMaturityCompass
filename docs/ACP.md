@@ -31,24 +31,33 @@ is validated. Outbound frames are checked against the same schema in tests.
 | `agent_message_chunk` | each committed assistant text block (block-sized, when committed: there is no token stream over ACP by design, see `src/acp/acpProjection.ts`) |
 | `agent_thought_chunk` | each committed `thinking` block |
 | `user_message_chunk` | history replay only |
-| `tool_call` | the committed `tool/call` row: `title` (tool name), `kind` (`fs.read` → `read`, `fs.edit`/`fs.write` → `edit`, `bash` → `execute`, `glob`/`grep`/`tool_search` → `search`, `web_fetch`/`web_search` → `fetch`, `todo` → `think`, anything else `other`), `locations` for fs tools from the frozen `path` argument, `status: "pending"`. No `rawInput`: complete arguments can exceed a frame and the row's digest already binds them |
+| `tool_call` | the committed `tool/call` row: `title` (tool name), `kind` (`fs.read` → `read`, `fs.edit`/`fs.write` → `edit`, `bash` → `execute`, `glob`/`grep`/`tool_search` → `search`, `web_fetch`/`web_search` → `fetch`, `todo` → `think`, anything else `other`), `locations` for fs tools from the frozen `path` argument, resolved to an absolute path inside the session workspace (an argument that escapes it is not announced), `status: "pending"`. No `rawInput`: complete arguments can exceed a frame and the row's digest already binds them |
 | `tool_call_update` | the committed result: `completed` or `failed`, the recorded text as content. `fs.edit`/`fs.write` results carry the recorded, bounded, secret-redacted unified diff as text. No `{type: "diff"}` block: ACP's Diff needs the file's full new text, which the ledger never records |
 | `plan` | the signed current plan (`todo`), only for clients that negotiated `currentPlanUpdates` |
-| `available_commands_update` | after `session/new`, `session/load` and `session/fork`: the workspace skills (`/name`), from the same catalog a prompt resolves. Skills only: `amc acp` loads no native extensions |
+| `available_commands_update` | after `session/new`, `session/load` and `session/fork`: the workspace skills (`/name`), from the same roots an ACP prompt resolves (the workspace's; `--credentials-home` skills are not offered or resolvable under ACP). Skills only: `amc acp` loads no native extensions |
 
 ## Permission requests
 
 With `--approve-tools <class>`, every tool call raises a signed approval request through the approvals engine. The
-server then sends `session/request_permission` with the raised request's identity in `_meta["dev.agentmaturity.amc"]`
-(`approvalRequestId`, `requestDigestSha256`, `actionClass`, `riskTier`, `boundHashes`, `expiresAt`) and these options:
+server flushes the committed tail (so the `tool_call` being decided has reached the client), then sends
+`session/request_permission` whose `toolCall.toolCallId` is that committed tool call's id, with the raised request's
+identity in `_meta["dev.agentmaturity.amc"]` (`approvalRequestId`, `requestDigestSha256`, `actionClass`, `riskTier`,
+`boundHashes`, `expiresAt`) and these options:
 
 - `reject_once` (always): cancels the turn, cause `user`, by `acp-client`. The request stays in the inbox.
 - `allow_once` (only with `--reviewer-session-token-file <path>`): the operator pinned an active tracked workspace login
   (a private 0600 file) at launch. Selecting it re-checks the inbox item's integrity, that it is still `PENDING` with the
   digest the client was shown, that the login's roles may decide it, then records the decision through
-  `amc approvals approve --expect-request-digest ...` under that login, and reads the signed decision back before the
-  turn continues. The reason is never invented: the client supplies one in `_meta["dev.agentmaturity.amc"].reason` on
-  its response, or the operator fixed one with `--reviewer-reason <text>`; with neither, the turn is cancelled.
+  `amc approvals approve --expect-request-digest ...` under that login. The approval gate continues as soon as its own
+  engine poll sees the recorded decision; the server's read-back afterwards only confirms that a decision by that login
+  with the shown digest exists, and cancels the turn when it does not (for example when the decision was recorded but
+  the approve command then failed). The reason is never invented: the client supplies one in
+  `_meta["dev.agentmaturity.amc"].reason` on its response, or the operator fixed one with `--reviewer-reason <text>`;
+  with neither, the turn is cancelled.
+
+The request is bound to the prompt that raised it: a late answer (the client replying after the request was decided
+out of band with `amc approvals approve`, or after the prompt ended) cancels that prompt or nothing, never a later
+prompt on the session, and the outstanding request is withdrawn when its prompt ends or the approval expires.
 
 Client text never grants authority on its own: the client only chooses between options this process offered, and the
 engine's quorum and role rules apply unchanged. A client answer of `cancelled` is the client's own cancellation.

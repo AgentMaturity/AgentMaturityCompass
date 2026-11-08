@@ -318,11 +318,18 @@ function purposeWorkspace(surface: string): Fixture {
 
 const purposeLegs: Record<string, (f: Fixture) => Promise<{ turn: StatusRecord; verified: StatusRecord }>> = {
   async cli(f) {
-    const run = await cli(f, ["agent-loop", "run", PURPOSE_CALL, "--provider", "stub", "--tools", "workspace", "--json"]).done;
+    const run = await cli(f, ["agent-loop", "run", PURPOSE_CALL, "--provider", "stub", "--tools", "workspace", "--json", "--keep-open"]).done;
     // The turn completed but its one side effect was refused: exit 6 (RUN_EXIT_CODES.sideEffectsUnsettled, SH-UI-01). The
     // earlier 0 let a script read a refused side effect as success.
     expect(run.code, run.stderr).toBe(RUN_EXIT_CODES.sideEffectsUnsettled);
     const summary = cliJson(run);
+    // Exit 6 reads the SESSION's receipts (docs/NATIVE_HEADLESS.md): a later --session turn that makes no tool call still
+    // exits 6 while that refused receipt is in the session, and its JSON `execution` names it.
+    const resumed = await cli(f, ["agent-loop", "run", "hello, no tools this time", "--session", summary.sessionId, "--provider", "stub", "--tools", "workspace", "--json"]).done;
+    expect(resumed.code, resumed.stderr).toBe(RUN_EXIT_CODES.sideEffectsUnsettled);
+    const resumedSummary = cliJson(resumed);
+    expect(resumedSummary.toolCalls).toBe(summary.toolCalls);
+    expect(resumedSummary.execution.receiptStates).toEqual(["denied"]);
     const verified = await cli(f, ["agent-loop", "verify", summary.sessionId, "--json"]).done;
     expect(verified.code, verified.stderr).toBe(0);
     return { turn: statusOf(summary.execution), verified: statusOf((JSON.parse(verified.stdout) as { execution: StatusRecord }).execution) };

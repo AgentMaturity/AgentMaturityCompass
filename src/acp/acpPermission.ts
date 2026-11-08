@@ -15,10 +15,15 @@ import { acpToolKind } from "./acpToolCallView.js";
  *   - `reject_once` is always offered and cancels the turn (cause `user`, by `acp-client`);
  *   - `allow_once` is offered only when the operator pinned an authenticated tracked login at launch
  *     (`amc acp --reviewer-session-token-file`). Selecting it records the decision through the same digest-bound
- *     `amc approvals approve` path native chat uses, under that login's own roles, and the signed decision is read
- *     back before the turn is allowed to continue. The reason is never invented: the client supplies one in
- *     `_meta["dev.agentmaturity.amc"].reason` on its response, or the operator fixed one with `--reviewer-reason`.
+ *     `amc approvals approve` path native chat uses, under that login's own roles. The approval gate continues as soon
+ *     as its own engine poll sees that recorded decision; the read-back here only confirms, after the fact, that a
+ *     decision by the pinned login with the shown digest exists, and cancels the turn when none does. The reason is
+ *     never invented: the client supplies one in `_meta["dev.agentmaturity.amc"].reason` on its response, or the
+ *     operator fixed one with `--reviewer-reason`.
  * Anything short of a confirmed signed decision cancels the turn; the request stays in the inbox for the approvals CLI.
+ * The request names the gated `tool_call` by its committed id (the server flushes that row first), and it is bound to
+ * the prompt that raised it: a late answer cancels that prompt or nothing, and the dialog is withdrawn when the prompt
+ * ends or the approval expires.
  *
  * A client that identifies itself as an AMC SDK (it sends `clientCapabilities._meta["dev.agentmaturity.amc"]`) receives
  * this request only when it negotiated `permissionRequests: "amc-permission-v1"`; the current SDK clients did not, so
@@ -31,9 +36,14 @@ export interface AcpApprovalRaised {
   readonly sessionId: string;
   readonly approvalId: string;
   readonly approvalRequestId: string;
+  /** The committed `tool/call` row the approval gates; the permission request names this tool call. */
+  readonly toolCallId: string;
   /** Whether the connected client negotiated permission requests (or is a generic ACP client). */
   readonly negotiated: boolean;
   readonly request: (method: string, params: unknown, signal: AbortSignal) => Promise<unknown>;
+  /** Aborted when the prompt that raised the approval has settled; the outbound request is withdrawn with it. */
+  readonly turnEnded: AbortSignal;
+  /** Cancels the prompt that raised the approval; a no-op once that prompt has ended. */
   readonly cancelTurn: (by: string) => void;
 }
 
@@ -108,6 +118,7 @@ export function createAcpPermissionHandler(init: AcpPermissionHandlerInit): { re
     if (item.status !== "PENDING") { init.log(`approval ${event.approvalRequestId} is already ${item.status}; no permission requested`); return; }
     const controller = new AbortController();
     const expiry = setTimeout(() => controller.abort(), Math.max(0, Math.min(2_147_483_647, item.request.expiresTs - Date.now())));
+    const signal = AbortSignal.any([controller.signal, event.turnEnded]);
     try {
       const request = item.request;
       const options = [
@@ -118,16 +129,18 @@ export function createAcpPermissionHandler(init: AcpPermissionHandlerInit): { re
       try {
         result = await event.request("session/request_permission", {
           sessionId: event.sessionId,
-          toolCall: { toolCallId: event.approvalId, title: request.toolName, kind: acpToolKind(request.toolName), status: "pending" },
+          toolCall: { toolCallId: event.toolCallId, title: request.toolName, kind: acpToolKind(request.toolName), status: "pending" },
           options,
           _meta: { [ACP_RUNTIME_META_KEY]: { approvalRequestId: request.approvalRequestId, requestDigestSha256: item.requestDigestSha256,
             actionClass: request.actionClass, riskTier: request.riskTier, effectiveMode: request.effectiveMode, boundHashes: request.boundHashes,
             expiresAt: new Date(request.expiresTs).toISOString(), decision: init.reviewer ? "signed-reviewer" : "reject-only" } }
-        }, controller.signal);
+        }, signal);
       } catch (error) {
+        if (event.turnEnded.aborted) { init.log(`approval ${event.approvalRequestId}: the prompt ended before the client answered; request withdrawn`); return; }
         if (controller.signal.aborted) { init.log(`approval ${event.approvalRequestId} expired before the client answered`); return; }
         throw error;
       }
+      if (event.turnEnded.aborted) { init.log(`approval ${event.approvalRequestId} was answered after its prompt ended; nothing decided`); return; }
       const shape = await checkAcpShape("RequestPermissionResponse", result);
       if (!shape.ok) throw new Error(`malformed permission response: ${shape.reason}`);
       const outcome = (result as { outcome: { outcome: string; optionId?: string } }).outcome;
@@ -141,7 +154,7 @@ export function createAcpPermissionHandler(init: AcpPermissionHandlerInit): { re
       if (current.status !== "PENDING" || current.requestDigestSha256 !== item.requestDigestSha256) throw new Error("The approval changed while the client was deciding; no decision sent");
       const completed = await approve(["approvals", "approve", "--agent", request.agentId, "--mode", request.effectiveMode.toLowerCase(),
         "--reason", reason, "--username", actor.username, "--roles", actor.roles.join(","), "--user-id", actor.userId,
-        "--session-token-file", init.reviewer.tokenFile, "--expect-request-digest", item.requestDigestSha256, "--", request.approvalRequestId], controller.signal);
+        "--session-token-file", init.reviewer.tokenFile, "--expect-request-digest", item.requestDigestSha256, "--", request.approvalRequestId], signal);
       const after = pending(event);
       const kind = request.effectiveMode === "EXECUTE" ? "APPROVE_EXECUTE" : "APPROVE_SIMULATE";
       const signed = after.decisions.find(row => !item.decisions.some(old => old.approvalDecisionId === row.approvalDecisionId)

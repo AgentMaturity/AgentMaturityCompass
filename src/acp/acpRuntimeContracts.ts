@@ -41,7 +41,7 @@ export const ACP_RUNTIME_LIMITS = Object.freeze({
  * Factories must clean up partial construction on rejection, just like the native new/load seams.
  */
 /** The gate's `onRaised` event, bound by the launcher to the session that raised it (SH-UI-04). */
-export type AcpApprovalRaisedHook = (sessionId: string, event: { readonly approvalId: string; readonly approvalRequestId: string }) => void;
+export type AcpApprovalRaisedHook = (sessionId: string, event: { readonly approvalId: string; readonly approvalRequestId: string; readonly toolCallId: string }) => void;
 
 export interface AcpForkSessionParams {
   readonly parentSessionId: string;

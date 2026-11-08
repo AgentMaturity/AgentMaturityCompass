@@ -84,7 +84,7 @@ export function resolveBreadthRun(io: AgentLoopCliIo, opts: RunOptions, context:
       // P2-13: the four execution phases; evidence verification stays pending until `agent-loop verify`.
       const execution = executionStatusFor(process.cwd(), { sessionId: summary.sessionId, admission: "admitted",
         turn: ending?.reason ?? (summary.driverStatus === "failed" ? "error" : null), verified: null });
-      const report = { summary, execution, ending, validationRequested, goalFailed: goal !== undefined && ["failed", "refused", "cancelled"].includes(goal.stoppedBy) };
+      const report = { summary, execution, ending, validationRequested, ...(goal === undefined ? {} : { goalStop: goal.stoppedBy }) };
       const exitCode = runExitCode(report);
       if (context.output?.sink) context.output.sink.result({ ...report, exitCode, ...(goal === undefined ? {} : { goalRounds: goal }) });
       else io.log(opts.json ? JSON.stringify({ ...summary, ...(goal === undefined ? {} : { goalRounds: goal }), execution, exitCode }, null, 2) : renderRunSummary(summary));

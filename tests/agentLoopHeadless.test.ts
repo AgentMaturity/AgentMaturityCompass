@@ -6,7 +6,8 @@ import { Command } from "commander";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { registerAgentCommands, type AgentLoopCliIo } from "../src/cli-agent-commands.js";
 import { defaultAgentLoopIo } from "../src/cli-agent-options.js";
-import { MAX_STDIN_PROMPT_BYTES, RUN_EXIT_CODES, createRunEventSink, notificationEvent, readProcessStdin, runExitCode } from "../src/cli/agentLoopOutputOptions.js";
+import { GOAL_STOP_EXIT_CODES, MAX_STDIN_PROMPT_BYTES, RUN_EXIT_CODES, createRunEventSink, notificationEvent, readProcessStdin, runExitCode, runWithOutput } from "../src/cli/agentLoopOutputOptions.js";
+import type { RoundStop } from "../src/autonomy/goalRounds.js";
 import { deriveExecutionStatus, INTEGRITY_FAILED } from "../src/execution/executionContract.js";
 import type { AgentRunSummary } from "../src/agent/runReport.js";
 import { readNativeSessionEvents } from "../src/session/readNativeSessionEvents.js";
@@ -104,6 +105,47 @@ describe("amc agent-loop run — headless", () => {
     expect(deltas.length).toBeGreaterThan(0);
     expect(deltas.every(delta => delta.trust === "provisional")).toBe(true);
     expect(lines.map(line => line.type)).toEqual(expect.arrayContaining(["turn_start", "step_start", "step_end", "turn_end"]));
+  });
+
+  it("stream-json on --session and --fork-from carries only this run's rows: the inherited prefix is authenticated, never re-emitted", async () => {
+    const first = programWith(null);
+    await run(first.program, ["Check the recording path.", "--keep-open", "--json"]);
+    const parent = (JSON.parse(first.captured.out.at(-1)!) as AgentRunSummary).sessionId;
+    const prefix = new Set(readNativeSessionEvents(dir, parent).map(row => row.id));
+    expect(prefix.size).toBeGreaterThan(0);
+    const resumed = programWith(null);
+    await run(resumed.program, ["hello again", "--session", parent, "--output-format", "stream-json"]);
+    expect(resumed.captured.failures).toEqual([]);
+    const resumedLines = events(resumed.captured);
+    expect(resumedLines[0]).toMatchObject({ type: "system", subtype: "init", sessionId: parent });
+    const resumedUpdates = resumedLines.filter(line => line.type === "update") as Array<{ eventId: string; update: { sessionUpdate: string } }>;
+    expect(resumedUpdates.length).toBeGreaterThan(0);
+    // Turn 1's tool call and reply were written by the earlier run; none of them is this run's output.
+    expect(resumedUpdates.filter(entry => prefix.has(entry.eventId))).toEqual([]);
+    expect(resumedUpdates.map(entry => entry.update.sessionUpdate)).not.toContain("tool_call");
+    expect(resumedLines.at(-1)).toMatchObject({ type: "result", sessionId: parent, exitCode: 0 });
+    const forked = programWith(null);
+    await run(forked.program, ["hello again", "--fork-from", parent, "--output-format", "stream-json"]);
+    expect(forked.captured.failures).toEqual([]);
+    const forkedLines = events(forked.captured);
+    const child = forkedLines[0]!.sessionId as string;
+    expect(child).not.toBe(parent);
+    const forkedUpdates = forkedLines.filter(line => line.type === "update") as Array<{ seq: number; eventId: string; update: { sessionUpdate: string } }>;
+    expect(forkedUpdates.length).toBeGreaterThan(0);
+    // The copied parent history (its tool call, result and reply) is the child's inherited prefix, not this run's rows.
+    expect(forkedUpdates.map(entry => entry.update.sessionUpdate)).not.toContain("tool_call");
+    const childRows = readNativeSessionEvents(dir, child);
+    const ownTurnStart = childRows.map(row => row.event_type).lastIndexOf("turn/start");
+    for (const entry of forkedUpdates) expect(childRows.findIndex(row => row.id === entry.eventId)).toBeGreaterThan(ownTurnStart);
+    expect(forkedLines.at(-1)).toMatchObject({ type: "result", sessionId: child, exitCode: 0 });
+  });
+
+  it("refuses --list-skills with stream-json before anything reaches stdout", async () => {
+    const { program, captured } = programWith(null);
+    await run(program, ["--list-skills", "--output-format", "stream-json"]);
+    expect(captured.failures).toEqual([1]);
+    expect(captured.errors.join("\n")).toContain("--list-skills prints a catalog");
+    expect(captured.out).toEqual([]);
   });
 
   it("stream-json ends a refusal with a terminal error event and exit 1", async () => {
@@ -212,9 +254,19 @@ describe("runExitCode — derived from the execution phases", () => {
     ({ driverStatus, validation: { status: validation } } as unknown as AgentRunSummary);
   const execution = (turn: string | null, receiptStates: string[] = []) =>
     deriveExecutionStatus({ sessionId: "s", admission: "admitted", turn, receiptStates, verified: null });
-  const code = (reason: string | undefined, states: string[] = [], extra: Partial<{ driverStatus: "idle" | "failed"; validationRequested: boolean; validation: string; goalFailed: boolean }> = {}) =>
-    runExitCode({ summary: summary(extra.driverStatus, extra.validation), execution: execution(reason ?? null, states),
-      ending: reason === undefined ? undefined : { turn: 1, reason, cancelCause: null, interrupted: false }, validationRequested: extra.validationRequested ?? false, goalFailed: extra.goalFailed ?? false });
+  const code = (reason: string | undefined, states: string[] = [], extra: Partial<{ driverStatus: "idle" | "failed"; validationRequested: boolean; validation: string; goalStop: RoundStop }> = {}) =>
+    runExitCode({ summary: summary(extra.driverStatus, extra.validation), execution: execution(reason ?? (extra.goalStop === undefined ? null : "complete"), states),
+      ending: reason === undefined ? undefined : { turn: 1, reason, cancelCause: null, interrupted: false }, validationRequested: extra.validationRequested ?? false,
+      ...(extra.goalStop === undefined ? {} : { goalStop: extra.goalStop }) });
+
+  it("maps every goal-rounds stop explicitly, and only done with settled side effects is 0", () => {
+    const table: Record<RoundStop, number> = { done: 0, failed: 1, refused: 1, "check-failed": 1, "check-unavailable": 1, cancelled: 3, human: 3, "max-rounds": 4, blocked: 5 };
+    expect(GOAL_STOP_EXIT_CODES).toEqual(table);
+    for (const [stop, expected] of Object.entries(table) as [RoundStop, number][]) expect(code(undefined, [], { goalStop: stop }), stop).toBe(expected);
+    expect(code(undefined, ["denied"], { goalStop: "done" })).toBe(6);
+    expect(code(undefined, [INTEGRITY_FAILED], { goalStop: "done" })).toBe(1);
+    expect(code(undefined, [], { goalStop: "something_new" as RoundStop })).toBe(1);
+  });
 
   it("maps every ending to its code and never reads an unknown ending or unsettled receipts as success", () => {
     expect(code("complete")).toBe(0);
@@ -230,9 +282,17 @@ describe("runExitCode — derived from the execution phases", () => {
     expect(code("complete", [], { driverStatus: "failed" })).toBe(1);
     expect(code("complete", [], { validationRequested: true, validation: "failed" })).toBe(1);
     expect(code("complete", [], { validationRequested: true, validation: "passed" })).toBe(0);
-    expect(code(undefined, [], { goalFailed: true })).toBe(1);
-    expect(code(undefined)).toBe(0);
+    expect(code(undefined)).toBe(1); // A root turn whose ending was not recorded or could not be read is not success.
     expect(code("something_new")).toBe(1);
+  });
+});
+
+describe("runWithOutput — the stream and the exit status agree", () => {
+  it("a body that ends with neither a result nor a failure gets a terminal error that also fails the run", async () => {
+    const out: string[] = [], failures: number[] = [];
+    await runWithOutput({ log: line => out.push(line), error: () => {}, fail: () => failures.push(1) }, process.cwd(), { outputFormat: "stream-json" }, async () => {});
+    expect(out.map(line => JSON.parse(line) as Record<string, unknown>)).toEqual([{ type: "error", message: "the run ended without a result", exitCode: 1, sessionId: null }]);
+    expect(failures).toEqual([1]);
   });
 });
 
@@ -248,15 +308,17 @@ describe("createRunEventSink — projection failure", () => {
         readEvents: () => [{ id: "x", ts: 1, session_id: "ghost", runtime: "r", event_type: "assistant/block", payload_path: null, payload_inline: null, payload_sha256: "0".repeat(64),
           prev_event_hash: "0".repeat(64), event_hash: "1".repeat(64), writer_sig: "ab".repeat(64), meta_json: "{}" } as never] },
         { agentId: "default", provider: "stub", model: "m", tools: "none", approvals: null });
+      // The row already exists when the stream starts, so the prefix authentication at `ready` refuses it; a later
+      // notification adds nothing after the terminal error.
       sink.notification({ kind: "step-end", turn: 1, step: 1 });
       sink.dispose();
       const lines = out.map(line => JSON.parse(line) as Record<string, unknown>);
-      expect(lines.map(line => line.type)).toEqual(["system", "step_end", "error"]);
+      expect(lines.map(line => line.type)).toEqual(["system", "error"]);
       expect(lines.at(-1)).toMatchObject({ type: "error", exitCode: 1, sessionId: "ghost" });
       expect(cancels).toEqual([[{ kind: "disposed" }, { by: "stream-json:projection" }]]);
       expect(failures).toEqual([1]);
-      sink.result({ summary: {} as never, execution: {} as never, ending: undefined, validationRequested: false, goalFailed: false, exitCode: 0 });
-      expect(out.length).toBe(3); // Nothing after the terminal error, not even a result.
+      sink.result({ summary: {} as never, execution: {} as never, ending: undefined, validationRequested: false, exitCode: 0 });
+      expect(out.length).toBe(2); // Nothing after the terminal error, not even a result.
     } finally { rmSync(dir, { recursive: true, force: true }); }
   });
 });
