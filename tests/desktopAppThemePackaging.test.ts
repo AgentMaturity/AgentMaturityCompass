@@ -48,7 +48,14 @@ describe("desktop app packaging and visual identity", () => {
     expect(script).not.toContain("open \\\"http://127.0.0.1:3212/w/demo/console/\\\"");
     expect(script).toContain("writeWindowsStudioApp");
     expect(script).toContain("Agent Maturity Compass Studio.cmd");
-    expect(script).toContain("Start-Process \"http://127.0.0.1:3212/w/demo/console/\"");
+    // The launchers open the console on the port Studio bound (state.json apiPort), not an assumed 3212.
+    expect(script).not.toContain("Start-Process \"http://127.0.0.1:3212/w/demo/console/\"");
+    expect(script).toContain("Start-Process \"http://127.0.0.1:$StudioPort/w/demo/console/\"");
+    expect(script).toContain("(Get-Content -LiteralPath $StateFile -Raw | ConvertFrom-Json).apiPort");
+    expect(script).toContain('[task setStandardOutput:pipe];');
+    expect(script).toContain('[line hasPrefix:@"AMC_STUDIO_URL=http://127.0.0.1:"]');
+    expect(script).toContain('[candidate hasSuffix:@"/w/demo/console/"]');
+    expect(script).toContain("sed -n 's/^AMC_STUDIO_URL=//p'");
     expect(script).toContain("appLaunchers");
   });
 

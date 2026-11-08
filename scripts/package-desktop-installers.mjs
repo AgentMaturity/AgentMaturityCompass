@@ -23,8 +23,12 @@ const studioMacAppBundleName = "Agent Maturity Compass Studio.app";
 const studioWindowsCmdName = "Agent Maturity Compass Studio.cmd";
 const studioWindowsPs1Name = "Agent Maturity Compass Studio.ps1";
 const studioUrl = "http://127.0.0.1:3212/w/demo/console/";
-const studioMacBrowserOpenCommand = `open "${studioUrl}"`;
-const studioWindowsOpenCommand = 'Start-Process "http://127.0.0.1:3212/w/demo/console/"';
+// STUDIO_URL: the console URL launch-studio.sh printed (the port Studio bound); the default URL when it printed none.
+const studioMacBrowserOpenCommand = `open "\${STUDIO_URL:-${studioUrl}}"`;
+// The console opens on the port Studio bound (state.json apiPort); 3212 only when the state cannot be read.
+const studioWindowsOpenCommand = `$StudioPort = 3212
+try { $BoundPort = [int](Get-Content -LiteralPath $StateFile -Raw | ConvertFrom-Json).apiPort; if ($BoundPort -gt 0 -and $BoundPort -lt 65536) { $StudioPort = $BoundPort } } catch { }
+Start-Process "http://127.0.0.1:$StudioPort/w/demo/console/"`;
 const studioMacStopCommand = 'cd ~/"Library/Application Support/Agent Maturity Compass/studio-workspace" && ../runtime/node_modules/.bin/amc down';
 const studioWindowsStopCommand = 'cd "$env:LOCALAPPDATA\\Agent Maturity Compass\\studio-workspace"; ..\\runtime\\node_modules\\.bin\\amc.cmd down';
 
@@ -218,10 +222,15 @@ static NSString * const AMCStudioURL = @"${studioUrl}";
   dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
     @autoreleasepool {
       NSTask *task = [[NSTask alloc] init];
+      NSPipe *pipe = [NSPipe pipe];
       [task setLaunchPath:@"/bin/sh"];
       [task setArguments:@[script]];
+      [task setStandardOutput:pipe];
+      NSData *output = nil;
       @try {
         [task launch];
+        // Read to end of file before waiting, so a full pipe can never stall the script.
+        output = [[pipe fileHandleForReading] readDataToEndOfFile];
         [task waitUntilExit];
       } @catch (NSException *exception) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -236,15 +245,24 @@ static NSString * const AMCStudioURL = @"${studioUrl}";
         });
         return;
       }
+      // The script prints the console URL on the port Studio bound; only that loopback console URL is accepted.
+      NSString *studioURL = AMCStudioURL;
+      NSString *text = output ? [[NSString alloc] initWithData:output encoding:NSUTF8StringEncoding] : @"";
+      for (NSString *line in [text componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]]) {
+        if ([line hasPrefix:@"AMC_STUDIO_URL=http://127.0.0.1:"]) {
+          NSString *candidate = [line substringFromIndex:[@"AMC_STUDIO_URL=" length]];
+          if ([candidate hasSuffix:@"/w/demo/console/"]) studioURL = candidate;
+        }
+      }
       dispatch_async(dispatch_get_main_queue(), ^{
-        [self loadStudio];
+        [self loadStudio:studioURL];
       });
     }
   });
 }
 
-- (void)loadStudio {
-  NSURL *url = [NSURL URLWithString:AMCStudioURL];
+- (void)loadStudio:(NSString *)studioURL {
+  NSURL *url = [NSURL URLWithString:studioURL];
   if (!url) {
     [self.statusLabel setStringValue:@"Invalid AMC Studio URL."];
     return;
@@ -313,7 +331,8 @@ int main(int argc, const char * argv[]) {
   writeFileSync(executablePath, `#!/usr/bin/env sh
 set -eu
 APP_BIN_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-/bin/sh "$APP_BIN_DIR/../Resources/launch-studio.sh"
+OUTPUT=$(/bin/sh "$APP_BIN_DIR/../Resources/launch-studio.sh")
+STUDIO_URL=$(printf '%s\n' "$OUTPUT" | sed -n 's/^AMC_STUDIO_URL=//p' | tail -n 1)
 ${studioMacBrowserOpenCommand}
 `, { mode: 0o755 });
   return "system-browser";
@@ -438,6 +457,9 @@ if ! "$AMC_BIN" up --demo --no-open >>"$LOG_FILE" 2>&1; then
   fi
   exit 1
 fi
+# The console URL on the port Studio bound (state.json apiPort), for the app to open; 3212 when the state cannot be read.
+STUDIO_PORT=$(node -e 'try { const port = require(process.argv[1]).apiPort; console.log(Number.isInteger(port) && port > 0 && port < 65536 ? port : 3212) } catch { console.log(3212) }' "$STATE_FILE" 2>/dev/null || printf '3212')
+printf 'AMC_STUDIO_URL=http://127.0.0.1:%s/w/demo/console/\n' "$STUDIO_PORT"
 `;
   writeFileSync(join(resourcesDir, "launch-studio.sh"), launchScript, { mode: 0o755 });
   const macRuntime = writeMacLauncherExecutable(join(macosDir, studioAppName));
