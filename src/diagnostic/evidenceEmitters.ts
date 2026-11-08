@@ -95,6 +95,7 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/experiments/trialExecutor.ts", why: "experiment trial start and settle records (GAP-WP04); executor bookkeeping a casebook judge reads, never agent behaviour" },
   { module: "src/governor/decisionLog.ts", why: "AuthZEN authorization decision log (P2-25): one AMC decision per call, allow or deny, untagged and never maturity evidence" },
   { module: "src/gateway/server.ts", why: "gateway refusals and misconfiguration; read only by score caps and penalties" },
+  { module: "src/gateway/requestBody.ts", why: "gateway refusal of an oversized request body (LIVE-RUNTIME-01); a refusal, read only by score caps and penalties" },
   { module: "src/ingest/ingest.ts", why: "ingest bookkeeping; imported rows are self-reported" },
   { module: "src/integrations/integrationDispatcher.ts", why: "outbound integration dispatch bookkeeping" },
   { module: "src/integrations/noCodeWebhookAdapters.ts", why: "webhook ingestion; external reports are self-reported" },

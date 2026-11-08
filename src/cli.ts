@@ -299,7 +299,9 @@ import { agentRunFiles, latestRunSummary } from "./diagnostic/runReportResolutio
 import { buildConnectInstructions } from "./studio/connectWizard.js";
 import { registerHookIntegrationCommands } from "./adapters/hookIntegrationCli.js";
 import { runStudioForeground, startStudioDaemon, stopStudioDaemon, studioStatus } from "./studio/studioSupervisor.js";
-import { readAdminToken, readStudioState, studioLogsDir } from "./studio/studioState.js";
+import { standaloneGatewayAllowList } from "./studio/listenPolicy.js";
+import { installStudioShutdown } from "./studio/studioShutdown.js";
+import { readAdminToken, readStudioState, studioLogsDir, studioProbeBase } from "./studio/studioState.js";
 import { fixSignaturesAsync, FixSignaturesPublicationError, inspectSignatures } from "./studio/signatures.js";
 import {
   completeOnboarding,
@@ -4158,24 +4160,23 @@ studio
       );
     }
 
+    // Bind, port and allow list resolve from the flags, the raw environment and the signed LAN config (LIVE-RUNTIME-03).
     const studioRuntime = await runStudioForeground({
       workspace: runtimeConfig.workspaceDir,
       hostDir: runtimeConfig.hostDir ?? undefined,
       defaultWorkspaceId: runtimeConfig.defaultWorkspaceId,
-      apiHost: hostMode ? runtimeConfig.hostBind : runtimeConfig.bind,
-      apiPort: hostMode ? runtimeConfig.hostPort : runtimeConfig.studioPort,
+      env: process.env,
+      apiHost: hostMode ? undefined : opts.bind,
+      apiPort: hostMode || !opts.port ? undefined : Number(opts.port),
       dashboardPort,
-      gatewayHost: hostMode ? runtimeConfig.hostBind : runtimeConfig.bind,
       gatewayPort: runtimeConfig.gatewayPort,
       proxyPort: runtimeConfig.proxyPort,
       allowPublicBind: runtimeConfig.allowPublicBind || runtimeConfig.lanMode,
-      allowedCidrs: runtimeConfig.allowedCidrs,
       trustedProxyHops: runtimeConfig.trustedProxyHops,
       maxRequestBytes: runtimeConfig.maxRequestBytes,
+      gatewayMaxRequestBytes: runtimeConfig.gatewayMaxRequestBytes,
       corsAllowedOrigins: runtimeConfig.corsAllowedOrigins,
       dataRetentionDays: runtimeConfig.dataRetentionDays,
-      metricsHost: runtimeConfig.metricsBind,
-      metricsPort: runtimeConfig.metricsPort,
       queryLeaseCarrierEnabled: queryCarrierAllowed
     });
 
@@ -4195,16 +4196,7 @@ studio
       `Metrics: http://${studioRuntime.state.metricsHost ?? runtimeConfig.metricsBind}:${studioRuntime.state.metricsPort ?? runtimeConfig.metricsPort}/metrics`
     );
 
-    await new Promise<void>((resolvePromise) => {
-      const shutdown = async () => {
-        process.off("SIGINT", shutdown);
-        process.off("SIGTERM", shutdown);
-        await studioRuntime.stop();
-        resolvePromise();
-      };
-      process.on("SIGINT", shutdown);
-      process.on("SIGTERM", shutdown);
-    });
+    await new Promise<never>(() => installStudioShutdown({ stop: () => studioRuntime.stop() })); // LIVE-RUNTIME-02: one stop, signal-safe, bounded
   });
 
 studio
@@ -4215,11 +4207,10 @@ studio
     const runtime = loadStudioRuntimeConfig(process.env, {
       workspaceDir: opts.workspace ? resolve(opts.workspace) : undefined
     });
-    const modeHost = runtime.hostDir ? runtime.hostBind : runtime.bind;
-    const modePort = runtime.hostDir ? runtime.hostPort : runtime.studioPort;
-    const host = modeHost === "0.0.0.0" || modeHost === "::" ? "127.0.0.1" : modeHost;
-    const health = await httpGetJson(`http://${host}:${modePort}/healthz`);
-    const ready = await httpGetJson(`http://${host}:${modePort}/readyz`);
+    // The running Studio's bound address from state.json; the configured one when Studio wrote none.
+    const base = studioProbeBase(runtime.workspaceDir, runtime.hostDir ? { host: runtime.hostBind, port: runtime.hostPort } : { host: runtime.bind, port: runtime.studioPort });
+    const health = await httpGetJson(`${base}/healthz`);
+    const ready = await httpGetJson(`${base}/readyz`);
     if (health.status >= 200 && health.status < 300 && ready.status >= 200 && ready.status < 300) {
       console.log(`OK ${health.status}/${ready.status}`);
       return;
@@ -10177,7 +10168,8 @@ gateway
     const handle = await startGateway({
       workspace: process.cwd(),
       workspaceId: workspaceIdFromDirectory(process.cwd()),
-      configPath: opts.config
+      configPath: opts.config,
+      allowedCidrs: standaloneGatewayAllowList(process.env, loadGatewayConfig(process.cwd(), opts.config).listen.host)
     });
 
     console.log(chalk.hex('#4AEF79')(`Gateway session: ${handle.gatewaySessionId}`));
@@ -10192,16 +10184,7 @@ gateway
       console.log(`- ${route.prefix} -> ${route.upstream} openaiCompatible=${route.openaiCompatible ? "yes" : "no"} agent=${route.agentId ?? "unbound"}`);
     }
 
-    await new Promise<void>((resolvePromise) => {
-      const shutdown = async () => {
-        process.off("SIGINT", shutdown);
-        process.off("SIGTERM", shutdown);
-        await handle.close();
-        resolvePromise();
-      };
-      process.on("SIGINT", shutdown);
-      process.on("SIGTERM", shutdown);
-    });
+    await new Promise<never>(() => installStudioShutdown({ stop: () => handle.close() })); // LIVE-RUNTIME-02: one stop, signal-safe, bounded
   });
 
 gateway
@@ -18440,43 +18423,29 @@ program
       hostDir: opts.hostDir ? resolve(opts.hostDir) : undefined,
       defaultWorkspaceId: opts.defaultWorkspaceId
     });
-    const hostMode = Boolean(runtimeConfig.hostDir);
     const lan = loadLanMode(runtimeConfig.workspaceDir);
     const lanSig = verifyLanModeSignature(runtimeConfig.workspaceDir);
-    const resolvedApiPort = explicitApiPort ?? (hostMode ? runtimeConfig.hostPort : runtimeConfig.studioPort);
     const resolvedDashboardPort = explicitDashboardPort ?? runtimeConfig.dashboardPort;
     const runtime = await runStudioForeground({
       workspace: runtimeConfig.workspaceDir,
       hostDir: runtimeConfig.hostDir ?? undefined,
       defaultWorkspaceId: runtimeConfig.defaultWorkspaceId,
       allowLocalDemoWorkspace: opts.allowLocalDemoWorkspace === true,
-      apiPort: resolvedApiPort,
+      env: process.env, // bind, port and allow list: the raw environment and the signed LAN config (LIVE-RUNTIME-03)
+      apiPort: explicitApiPort,
       dashboardPort: resolvedDashboardPort,
-      apiHost: hostMode ? runtimeConfig.hostBind : runtimeConfig.bind,
-      gatewayHost: hostMode ? runtimeConfig.hostBind : runtimeConfig.bind,
       gatewayPort: runtimeConfig.gatewayPort,
       proxyPort: runtimeConfig.proxyPort,
       allowPublicBind: runtimeConfig.allowPublicBind || runtimeConfig.lanMode,
-      allowedCidrs: runtimeConfig.allowedCidrs,
       trustedProxyHops: runtimeConfig.trustedProxyHops,
       maxRequestBytes: runtimeConfig.maxRequestBytes,
+      gatewayMaxRequestBytes: runtimeConfig.gatewayMaxRequestBytes,
       corsAllowedOrigins: runtimeConfig.corsAllowedOrigins,
       dataRetentionDays: runtimeConfig.dataRetentionDays,
-      metricsHost: runtimeConfig.metricsBind,
-      metricsPort: runtimeConfig.metricsPort,
       queryLeaseCarrierEnabled: runtimeConfig.queryLeaseCarrierEnabled && lan.enabled && lanSig.valid
     });
 
-    await new Promise<void>((resolvePromise) => {
-      const shutdown = async () => {
-        process.off("SIGINT", shutdown);
-        process.off("SIGTERM", shutdown);
-        await runtime.stop();
-        resolvePromise();
-      };
-      process.on("SIGINT", shutdown);
-      process.on("SIGTERM", shutdown);
-    });
+    await new Promise<never>(() => installStudioShutdown({ stop: () => runtime.stop() })); // LIVE-RUNTIME-02: one stop, signal-safe, bounded
   });
 
 // ── Model Cognition Lab CLI ──────────────────────────────────────────

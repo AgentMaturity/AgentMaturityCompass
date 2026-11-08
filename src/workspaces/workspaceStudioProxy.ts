@@ -1,4 +1,5 @@
 import { request as httpRequest, type IncomingMessage, type ServerResponse } from "node:http";
+import { socketIp } from "../studio/clientAddress.js";
 import { isNativeProtectedPath } from "../studio/nativeAdmission.js";
 
 /** Native callers must first pass the router's browser proof and current membership checks. */
@@ -6,10 +7,17 @@ export async function proxyStudioWorkspaceRequest(
   req: IncomingMessage,
   res: ServerResponse,
   runtime: { readonly host: string; readonly port: number },
-  targetPath: string
+  targetPath: string,
+  // Absent (an older caller), the client is the socket peer and nothing is https: never the client's own claim.
+  forwarded: { readonly clientIp: string; readonly trustedHttps: boolean } = { clientIp: socketIp(req.socket.remoteAddress), trustedHttps: false }
 ): Promise<void> {
   const method = (req.method ?? "GET").toUpperCase();
-  const { origin, host, "x-amc-admin-token": _clientAdminToken, ...forwardHeaders } = req.headers;
+  const { origin, host, "x-amc-admin-token": _clientAdminToken, forwarded: _forwarded, ...clientHeaders } = req.headers;
+  // LIVE-RUNTIME-20: the workspace API trusts one hop, this router, so the client's own forwarding headers never reach
+  // it; the router states the client it computed and https only when it trusts that itself.
+  const forwardHeaders = Object.fromEntries(Object.entries(clientHeaders).filter(([name]) => !name.startsWith("x-forwarded-")));
+  forwardHeaders["x-forwarded-for"] = forwarded.clientIp;
+  if (forwarded.trustedHttps) forwardHeaders["x-forwarded-proto"] = "https";
   const targetPathname = new URL(targetPath, "http://workspace.internal").pathname;
   const nativeRequest = isNativeProtectedPath(targetPathname, method);
   let upstreamResponse: IncomingMessage | undefined;

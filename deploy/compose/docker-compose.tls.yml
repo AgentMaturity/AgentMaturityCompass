@@ -57,6 +57,8 @@ services:
       AMC_TOOLHUB_PORT: 3213
       AMC_LAN_MODE: "true"
       AMC_TRUSTED_PROXY_HOPS: 1
+      # Caddy's fixed address on the amc_edge network below: only its X-Forwarded-* headers count (SR-10).
+      AMC_TRUSTED_PROXY_CIDRS: ${AMC_TRUSTED_PROXY_CIDRS:-172.16.250.2/32}
       AMC_ALLOWED_CIDRS: ${AMC_ALLOWED_CIDRS:-127.0.0.1/32,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,::1/128}
       # Native and A4 routes admit only the bind host or these browser origins (src/studio/nativeAdmission.ts). Append LAN/phone origins through AMC_EXTRA_ORIGINS; an origin is scheme://host[:port] with no path.
       AMC_CORS_ALLOWED_ORIGINS: "https://${AMC_TLS_HOST:-localhost}:${AMC_TLS_PORT:-8443},${AMC_EXTRA_ORIGINS:-}"
@@ -81,6 +83,9 @@ services:
       timeout: 10s
       retries: 5
       start_period: 120s
+    networks:
+      - default
+      - amc_edge
     expose:
       - "3210"
       - "3211"
@@ -122,6 +127,9 @@ services:
       - amc-studio
     environment:
       AMC_TLS_HOST: ${AMC_TLS_HOST:-localhost}
+    networks:
+      amc_edge:
+        ipv4_address: 172.16.250.2
     ports:
       - "${AMC_TLS_PORT:-8443}:443"
     volumes:
@@ -136,6 +144,15 @@ services:
     # The official Caddy executable carries this file capability for port 443.
     cap_add:
       - NET_BIND_SERVICE
+
+networks:
+  # Caddy and Studio only (SR-10). Caddy's fixed address here is the one proxy Studio trusts, so no other container can
+  # forge X-Forwarded-For. If this subnet collides with a network on your host, change it, Caddy's ipv4_address and the
+  # AMC_TRUSTED_PROXY_CIDRS default together.
+  amc_edge:
+    ipam:
+      config:
+        - subnet: 172.16.250.0/28
 
 volumes:
   amc_data:

@@ -21,6 +21,7 @@ export interface StudioRuntimeConfig {
   dataRetentionDays: number;
   minFreeDiskMb: number;
   maxRequestBytes: number;
+  gatewayMaxRequestBytes: number;
   corsAllowedOrigins: string[];
   allowPublicBind: boolean;
   metricsBind: string;

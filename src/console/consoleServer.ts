@@ -8,9 +8,10 @@ import { pathExists, readUtf8 } from "../utils/fs.js";
  * attributes in rendered markup need inline styles; scripts get no inline allowance. Referrer-Policy is same-origin, not
  * no-referrer: under no-referrer a browser sends `Origin: null` on form posts, which Studio's CORS check refuses.
  */
+export const CONSOLE_CONTENT_SECURITY_POLICY = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; "
+  + "base-uri 'none'; form-action 'self'; frame-ancestors 'none'";
 const CONSOLE_SECURITY_HEADERS: Readonly<Record<string, string>> = {
-  "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; "
-    + "base-uri 'none'; form-action 'self'; frame-ancestors 'none'",
+  "Content-Security-Policy": CONSOLE_CONTENT_SECURITY_POLICY,
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
   "Referrer-Policy": "same-origin"

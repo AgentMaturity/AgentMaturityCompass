@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { studioEnvSchema, type StudioEnv } from "./envSchema.js";
 import type { StudioRuntimeConfig } from "./configTypes.js";
+import { canonicalOrigin } from "../studio/nativeAdmission.js";
 
 export function readSecretFromEnvOrFile(env: NodeJS.ProcessEnv, key: string): string | null {
   const fileKey = `${key}_FILE`;
@@ -60,7 +61,8 @@ function validateRuntimeConfig(config: StudioRuntimeConfig, env: NodeJS.ProcessE
     [config.trustedProxyHops, "AMC_TRUSTED_PROXY_HOPS", 0, 32],
     [config.dataRetentionDays, "AMC_DATA_RETENTION_DAYS", 1, 3650],
     [config.minFreeDiskMb, "AMC_MIN_FREE_DISK_MB", 1, Number.MAX_SAFE_INTEGER],
-    [config.maxRequestBytes, "AMC_MAX_REQUEST_BYTES", 1024, 268_435_456]
+    [config.maxRequestBytes, "AMC_MAX_REQUEST_BYTES", 1024, 268_435_456],
+    [config.gatewayMaxRequestBytes, "AMC_GATEWAY_MAX_REQUEST_BYTES", 1024, 268_435_456]
   ];
 
   for (const [value, label, min, max] of numericChecks) {
@@ -109,6 +111,12 @@ function validateRuntimeConfig(config: StudioRuntimeConfig, env: NodeJS.ProcessE
     }
   }
 
+  // A value with a path, query or credentials used to pass here and fail every native request with a 500 (section 9 P2).
+  const badOrigins = config.corsAllowedOrigins.filter((origin) => canonicalOrigin(origin) === null);
+  if (badOrigins.length > 0) {
+    errors.push(`AMC_CORS_ALLOWED_ORIGINS takes origins only (scheme://host[:port], no path, query or credentials): ${badOrigins.join(", ")}`);
+  }
+
   if (config.bootstrap && config.enableNotary && !config.notaryAuthSecret) {
     errors.push("AMC_ENABLE_NOTARY=true with AMC_BOOTSTRAP=true requires AMC_NOTARY_AUTH_SECRET_FILE (or AMC_NOTARY_AUTH_SECRET)");
   }
@@ -143,6 +151,7 @@ export function loadStudioRuntimeConfig(
     AMC_DATA_RETENTION_DAYS: env.AMC_DATA_RETENTION_DAYS,
     AMC_MIN_FREE_DISK_MB: env.AMC_MIN_FREE_DISK_MB,
     AMC_MAX_REQUEST_BYTES: env.AMC_MAX_REQUEST_BYTES,
+    AMC_GATEWAY_MAX_REQUEST_BYTES: env.AMC_GATEWAY_MAX_REQUEST_BYTES,
     AMC_CORS_ALLOWED_ORIGINS: env.AMC_CORS_ALLOWED_ORIGINS,
     AMC_ALLOW_PUBLIC_BIND: env.AMC_ALLOW_PUBLIC_BIND,
     AMC_METRICS_BIND: env.AMC_METRICS_BIND,
@@ -190,6 +199,7 @@ export function loadStudioRuntimeConfig(
     dataRetentionDays: Math.max(1, parsed.AMC_DATA_RETENTION_DAYS),
     minFreeDiskMb: Math.max(1, parsed.AMC_MIN_FREE_DISK_MB),
     maxRequestBytes: Math.max(1_024, parsed.AMC_MAX_REQUEST_BYTES),
+    gatewayMaxRequestBytes: parsed.AMC_GATEWAY_MAX_REQUEST_BYTES,
     corsAllowedOrigins: parseAllowedOrigins(parsed.AMC_CORS_ALLOWED_ORIGINS),
     allowPublicBind: parsed.AMC_ALLOW_PUBLIC_BIND,
     metricsBind: parsed.AMC_METRICS_BIND,

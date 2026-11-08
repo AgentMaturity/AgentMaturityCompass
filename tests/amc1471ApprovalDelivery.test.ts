@@ -1419,18 +1419,21 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
     const workspace = newWorkspace(false);
     initUsersConfig({ workspace, username: "owner", password: "owner-pass-1234" });
     const token = "amc-1471-cookie-token";
+    // x-forwarded-proto counts only from a trusted proxy that forwarded the request: one hop, loopback named as the proxy.
     const studio = await startStudioApiServer({
       workspace,
       host: "127.0.0.1",
       port: await pickFreePort(),
-      token
+      token,
+      trustedProxyHops: 1,
+      trustedProxyCidrs: ["127.0.0.1/32", "::1/128"]
     });
     try {
       const httpsLogin = await postJson(
         `${studio.url}/auth/login`,
         token,
         { username: "owner", password: "owner-pass-1234" },
-        { "x-forwarded-proto": "https" }
+        { "x-forwarded-proto": "https", "x-forwarded-for": "127.0.0.1" }
       );
       expect(httpsLogin.status).toBe(200);
       expect(String(httpsLogin.headers["set-cookie"] ?? "")).toContain("; Secure;");
