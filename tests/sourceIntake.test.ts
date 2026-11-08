@@ -8,7 +8,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, truncateSync, writeFileSy
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import YAML from "yaml";
-import { afterAll, describe, expect, test } from "vitest";
+import { afterAll, describe, expect, test, vi } from "vitest";
 import { listApprovalRequests, loadApprovalRequestRecord } from "../src/approvals/approvalChainStore.js";
 import { approvalStatusPayload, decideApprovalForIntent } from "../src/approvals/approvalEngine.js";
 import { approvalPolicyPath, signApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
@@ -320,6 +320,24 @@ describe("source policy and admission (SH-INTEG-02)", () => {
     // check only reads, so CI in agent mode still gets its answer.
     expect(sourceCheckCli({ workspace: root, sourceId: "github-main", file })).toMatchObject({ admitted: false, reason: "policy_unverified" });
     setMode(root, "owner");
+  });
+
+  test("sign signs the bytes it parsed: a policy swapped on disk while it is parsed is never signed or audited", async () => {
+    const root = workspace();
+    const parsedText = YAML.stringify(policy());
+    writePolicy(root, parsedText);
+    const realParse = YAML.parse.bind(YAML);
+    const spy = vi.spyOn(YAML, "parse").mockImplementation(((text: string, ...rest: unknown[]) => {
+      // A concurrent writer replaces the file with another valid policy while sign parses the first one.
+      if (text === parsedText) writeFileSync(sourcePolicyPath(root), YAML.stringify(policy({ agentId: "other" })));
+      return (realParse as (...args: unknown[]) => unknown)(text, ...rest);
+    }) as typeof YAML.parse);
+    try {
+      await expect(signSourcePolicy(root)).rejects.toThrow();
+    } finally {
+      spy.mockRestore();
+    }
+    expect(loadVerifiedSourcePolicy(root)).toMatchObject({ ok: false, reason: "policy_unverified" });
   });
 
   test("init writes a signed template with admission off and refuses to overwrite; sign is owner-only", async () => {
