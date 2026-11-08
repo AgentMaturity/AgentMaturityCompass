@@ -2,6 +2,7 @@ import type { Command } from "commander";
 import chalk from "chalk";
 import { formatToolhubContextText, initToolhubConfigAsync, inspectToolhubContextForCli, verifyToolhubConfig } from "./toolhub/toolhubCli.js";
 import { signToolsConfigAsync, toolsConfigPath } from "./toolhub/toolhubValidators.js";
+import { formatToolSchemasText, toolSchemasReport } from "./toolhub/toolSchemasCli.js";
 
 export function registerToolsCommands(program: Command): void {
   const tools = program.command("tools").description("ToolHub tools config");
@@ -44,9 +45,21 @@ export function registerToolsCommands(program: Command): void {
     });
 
   tools.command("list")
-    .description("List signed ToolHub tools grouped by provider context")
+    .description("List signed ToolHub tools grouped by provider context; --schemas prints every built-in tool's published JSON Schema and digest")
     .option("--json", "emit the complete tool context projection as JSON", false)
-    .action((opts: { json?: boolean }) => {
+    .option("--schemas", "print the native built-in tools' JSON Schemas, digests and whether the signed policy grants each", false)
+    .option("--tool <name>", "with --schemas: only this tool")
+    .action((opts: { json?: boolean; schemas?: boolean; tool?: string }) => {
+      if (opts.schemas) {
+        try {
+          const report = toolSchemasReport(process.cwd(), opts.tool);
+          console.log(opts.json ? JSON.stringify(report, null, 2) : formatToolSchemasText(report));
+        } catch (error) {
+          console.error(error instanceof Error ? error.message : String(error));
+          process.exitCode = 1;
+        }
+        return;
+      }
       const projection = inspectToolhubContextForCli(process.cwd());
       console.log(opts.json ? JSON.stringify(projection, null, 2) : formatToolhubContextText(projection));
       if (projection.integrity.status !== "trusted") process.exitCode = 1;
