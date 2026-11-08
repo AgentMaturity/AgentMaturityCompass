@@ -158,7 +158,20 @@ describe("the built CLI without a terminal (run `npm run build` first)", () => {
       expect(none.stdout).toContain("Ledger verification NOT EVALUATED");
       expect(none.stdout).toContain("vault locked: export AMC_VAULT_PASSPHRASE");
       expect(none.stdout).toContain(open);
-      for (const run of [ok, refused, none]) {
+      // The other CLI verdicts take the same path: session verify renders it, verify all exits through verifyAllExit.
+      const session = amc({}, "session", "verify", "--expect-monitor", monitor);
+      expect(session.status).toBe(1);
+      expect(session.stdout).toContain("Ledger verification NOT EVALUATED");
+      const all = amc({}, "verify", "all", "--json", "--expect-monitor", monitor);
+      expect(all.status).toBe(1);
+      const report = JSON.parse(all.stdout) as { status: string; checks: Array<{ id: string; status: string }> };
+      expect(report.status).toBe("INCOMPLETE");
+      expect(report.checks.find((check) => check.id === "ledger-hash-chain")?.status).toBe("SKIP");
+      expect(all.stderr).toContain("INCOMPLETE: critical checks not performed: ledger-hash-chain");
+      const allWithFile = amc({ AMC_VAULT_PASSPHRASE_FILE: secret(PASSPHRASE, 0o600) }, "verify", "all", "--json", "--expect-monitor", monitor);
+      expect(allWithFile.status, allWithFile.stderr).toBe(0);
+      expect((JSON.parse(allWithFile.stdout) as typeof report).checks.find((check) => check.id === "ledger-hash-chain")?.status).toBe("PASS");
+      for (const run of [ok, refused, none, session, all, allWithFile]) {
         expect(run.stdout + run.stderr).not.toMatch(/authentication failed|missing seal/);
         expect(run.stdout + run.stderr).not.toContain(PASSPHRASE);
       }
