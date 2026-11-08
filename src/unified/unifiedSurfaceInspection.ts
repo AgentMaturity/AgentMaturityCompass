@@ -25,6 +25,7 @@ import { projectOnboardingActivation } from "../setup/onboardingActivation.js";
 import { verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
 import { pathExists } from "../utils/fs.js";
 import { vaultStatus } from "../vault/vault.js";
+import { describePayloadsNotEvaluated } from "../verify/payloadsNotEvaluated.js";
 
 export type UnifiedSurfaceModuleStatus = "success" | "failed" | "skipped";
 
@@ -125,11 +126,14 @@ async function inspectVault(workspace: string): Promise<UnifiedSurfaceModuleResu
   const ledgerExists = pathExists(ledgerPath);
   let ledgerValid = false;
   let ledgerErrors: string[] = [];
+  let notEvaluated: readonly string[] = [];
   let openSessions = "";
   if (ledgerExists) {
     try {
-      const verified = await verifyLedgerIntegrity(workspace);
-      ledgerValid = verified.ok;
+      // B1: payloads a locked vault holds the key for are not evaluated here, never failed (payloadsNotEvaluated.ts).
+      const verified = await verifyLedgerIntegrity(workspace, { blobKeyOptional: true });
+      notEvaluated = verified.ok ? verified.payloadsNotEvaluated ?? [] : [];
+      ledgerValid = verified.ok && notEvaluated.length === 0;
       ledgerErrors = verified.errors;
       // A running Studio's gateway session is open, not broken: named, never an issue (sessionLiveness.ts).
       if (verified.ok && verified.sessions.liveLegacy.length > 0) openSessions = ` (${describeOpenSessions(verified.sessions.liveLegacy, Date.now())})`;
@@ -142,16 +146,20 @@ async function inspectVault(workspace: string): Promise<UnifiedSurfaceModuleResu
     + (ledgerExists ? 15 : 0)
     + (ledgerValid ? 45 : 0);
   const issues = [
+    ...(notEvaluated.length > 0 ? [describePayloadsNotEvaluated(notEvaluated)] : []),
     ...(!status.exists ? ["encrypted vault is missing"] : []),
     ...(!ledgerExists ? ["evidence ledger is missing"] : []),
     ...ledgerErrors.map((error) => `ledger integrity: ${error}`),
   ];
+  // Not evaluated is pending (skipped): never success, and never failed, since nothing says a payload was altered.
+  const pending = status.exists && notEvaluated.length > 0;
   return result({
     name: "Vault",
-    status: status.exists && ledgerValid ? "success" : "failed",
+    status: status.exists && ledgerValid ? "success" : pending ? "skipped" : "failed",
     score,
     summary: status.exists && ledgerValid
       ? `Encrypted vault present; evidence ledger verified${status.unlocked ? " with an active local session" : " while locked"}.${openSessions}`
+      : pending ? `Evidence ledger not evaluated: chain and signatures checked, ${notEvaluated.length} payload(s) not opened while the vault is locked.${openSessions}`
       : "Vault or ledger proof is incomplete.",
     issues,
     upgradePath: "Run `amc vault status` and `amc verify`, and repair every integrity error before using proof externally.",
