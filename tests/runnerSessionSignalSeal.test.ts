@@ -5,12 +5,14 @@ import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { openLedger, verifyLedgerIntegrity } from "../src/ledger/ledger.js";
+import { GATEWAY_SESSION_STALE_AFTER_MS } from "../src/ledger/sessionLiveness.js";
 import { eventMeta } from "../src/claims/evidenceProvenance.js";
 
 /**
  * An interrupted assurance or red-team run (Ctrl-C, a CI timeout's SIGTERM) seals its runner session before dying of
- * the signal. Runner sessions are legacy sessions, which whole-ledger verification requires to carry a seal: left
- * open, one interruption would make every later signed run in the workspace INVALID, with no CLI path to seal it.
+ * the signal. Runner sessions are legacy sessions, which whole-ledger verification requires to carry a seal once their
+ * last signed row is older than the liveness window: left open, one interruption would make every later signed run in
+ * the workspace INVALID until `amc verify --repair --apply` seals it.
  * The signal path can only be exercised in a child process, so the child does what both runners do around a session.
  */
 const PASS = "signal-seal-passphrase";
@@ -60,13 +62,18 @@ describe("runner sessions are sealed when the run is interrupted", () => {
     expect((await verifyLedgerIntegrity(ws)).ok).toBe(true);
   }, 90_000);
 
-  test("without the handler the interruption leaves the session open and the whole ledger fails to verify (the exposure)", async () => {
+  test("without the handler the interruption leaves the session open: live for the liveness window, then a missing seal (the exposure)", async () => {
     const { ws, out, sessionId } = run("SIGTERM", "no");
     expect(out.signal).toBe("SIGTERM");
     const ledger = openLedger(ws);
     try { expect(ledger.getSessionById(sessionId)?.session_seal_sig).toBeNull(); } finally { ledger.close(); }
-    const integrity = await verifyLedgerIntegrity(ws);
-    expect(integrity.ok).toBe(false);
-    expect(integrity.errors.join(" ")).toMatch(new RegExp(`Session ${sessionId} missing seal`));
+    // LIVE-INTEGRITY-01: an unsealed legacy session reads as a running writer's own until its last signed row is older
+    // than the window; after that it is a missing seal and every later signed run in the workspace is INVALID.
+    const now = await verifyLedgerIntegrity(ws);
+    expect(now.ok).toBe(true);
+    expect(now.sessions.liveLegacy.map((session) => session.sessionId)).toContain(sessionId);
+    const later = await verifyLedgerIntegrity(ws, { now: Date.now() + GATEWAY_SESSION_STALE_AFTER_MS + 60_000 });
+    expect(later.ok).toBe(false);
+    expect(later.errors.join(" ")).toMatch(new RegExp(`Session ${sessionId} missing seal`));
   }, 90_000);
 });

@@ -1,4 +1,5 @@
 import { execFile } from "node:child_process";
+import { randomUUID } from "node:crypto";
 import { promisify } from "node:util";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -9,6 +10,7 @@ import { runRedTeam, type RedTeamReport } from "../src/redteam/runner.js";
 import { redTeamReportsDir, verifiedRedTeamReports, verifyRedTeamReportFile } from "../src/redteam/redteamStore.js";
 import { runRedTeamCiGate } from "../src/ci/redteamGate.js";
 import { openLedger, verifyLedgerIntegrity } from "../src/ledger/ledger.js";
+import { GATEWAY_SESSION_STALE_AFTER_MS } from "../src/ledger/sessionLiveness.js";
 import { startAssuranceSession } from "../src/assurance/evidenceWriters.js";
 import { sealedRunReportVerifies } from "../src/diagnostic/reportSeal.js";
 import { eventMeta } from "../src/claims/evidenceProvenance.js";
@@ -181,9 +183,15 @@ describe("signed red-team runs are ledgered and sealed", () => {
     const signed = await runRedTeamCiGate({ workspace: ws, agentId: "default", plugins: ["injection"], strategies: ["direct"], noSign: false, includeGamingResistance: false });
     expect(signed.report.verification.signed).toBe(true);
     expect(signed.reasons.some((reason) => reason.startsWith("REDTEAM_"))).toBe(false);
-    // An unsealed runner session planted in the ledger makes the next signed run SIGNED_INVALID; the gate says so by name.
+    // An interrupted runner session (no seal) whose last signed row is older than the liveness window reads as a missing
+    // seal (LIVE-INTEGRITY-01), so the next signed run is SIGNED_INVALID; the gate says so by name.
     const ledger = openLedger(ws);
-    try { startAssuranceSession({ ledger, mode: "supervise", agentId: "default", packIds: ["injection"], trustTier: "OBSERVED" }); } finally { ledger.close(); }
+    try {
+      const sessionId = randomUUID(), meta = { auditType: "ASSURANCE_RUN_STARTED", severity: "LOW", mode: "supervise", agentId: "default", packIds: ["injection"], source: "redteam" };
+      ledger.startSession({ sessionId, runtime: "unknown", binaryPath: "amc-redteam-runner", binarySha256: sha256Hex("amc-redteam-runner") });
+      ledger.appendEvidence({ sessionId, runtime: "unknown", eventType: "audit", ts: Date.now() - GATEWAY_SESSION_STALE_AFTER_MS - 60_000,
+        payload: JSON.stringify(meta), payloadExt: "json", inline: true, meta: { ...meta, trustTier: "OBSERVED" } });
+    } finally { ledger.close(); }
     const invalid = await runRedTeamCiGate({ workspace: ws, agentId: "default", plugins: ["injection"], strategies: ["direct"], noSign: false, includeGamingResistance: false });
     expect(invalid.report.verification.status).toBe("SIGNED_INVALID");
     expect(invalid.passed).toBe(false);
