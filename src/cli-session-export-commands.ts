@@ -33,13 +33,14 @@ export function registerSessionExportCommands(session: Command): void {
     .description("Export a session as a self-contained HTML viewer (payload digests only unless --include-content; signed row metadata always), verifiable offline")
     .argument("<id>", "session id")
     .requiredOption("--out <path>", "HTML file to write")
-    .option("--include-content", "Embed message, tool argument and output text (redacted, bounded; refused when payloads are encrypted)")
+    .option("--include-content", "Embed message, tool argument and output text (redacted, bounded; refused under ledger payload encryption)")
+    .option("--decrypt-content", "With --include-content: write payloads stored encrypted at rest (encrypted blobs, the default, and spills) decrypted into the file")
     .option("--json-out <path>", "Also write the export document as JSON")
-    .action(async (id: string, opts: { out: string; includeContent?: boolean; jsonOut?: string }) => {
+    .action(async (id: string, opts: { out: string; includeContent?: boolean; decryptContent?: boolean; jsonOut?: string }) => {
       const { buildSessionExport } = await import("./observability/sessionExport.js");
       const { renderSessionExportHtml } = await import("./observability/sessionExportHtml.js");
       try {
-        const doc = buildSessionExport({ workspace: process.cwd(), sessionId: id, includeContent: opts.includeContent === true });
+        const doc = buildSessionExport({ workspace: process.cwd(), sessionId: id, includeContent: opts.includeContent === true, decryptContent: opts.decryptContent === true });
         writeFileSync(resolve(opts.out), renderSessionExportHtml(doc));
         if (opts.jsonOut !== undefined) writeFileSync(resolve(opts.jsonOut), JSON.stringify(doc, null, 2));
         console.log(chalk.green(`Wrote ${resolve(opts.out)} (${doc.rows.length} rows, ${doc.content === null ? "payload digests only" : "content included"}, tail ${doc.record?.ended_ts != null ? "sealed" : "unproven"})`));

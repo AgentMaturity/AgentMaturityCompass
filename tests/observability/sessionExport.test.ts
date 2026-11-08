@@ -48,7 +48,7 @@ const content = (doc: SessionExportDocument) => Object.values(doc.content ?? {})
 describe("session export", () => {
   it("exports a sealed session with diffs, verifies against the right fingerprint and fails against a wrong one", async () => {
     const sessionId = await diffSession();
-    const doc = buildSessionExport({ workspace: ws, sessionId, includeContent: true });
+    const doc = buildSessionExport({ workspace: ws, sessionId, includeContent: true, decryptContent: true });
     expect(doc.rows.length).toBeGreaterThan(5);
     expect(doc.record?.ended_ts).not.toBeNull();
     const texts = content(doc).map((entry) => entry.text).join("\n");
@@ -72,7 +72,7 @@ describe("session export", () => {
 
   it("detects a dropped tail row, a dropped middle row, edited metadata, edited content and an injected key", async () => {
     const { sessionId } = await runStubSession(ws, "hello");
-    const doc = buildSessionExport({ workspace: ws, sessionId, includeContent: true });
+    const doc = buildSessionExport({ workspace: ws, sessionId, includeContent: true, decryptContent: true });
     const fp = doc.monitorKeyFingerprint;
     expect(verifySessionExport(doc, { expectedFingerprint: fp }).ok).toBe(true);
     const tailCut = { ...doc, rows: doc.rows.slice(0, -1) };
@@ -139,7 +139,7 @@ describe("session export", () => {
     const { sessionId } = await runStubSession(ws, "</script><div>VERIFIED</div><meta http-equiv=refresh content=0>");
     const plain = buildSessionExport({ workspace: ws, sessionId, includeContent: false });
     expect(plain.content).toBeNull();
-    const html = renderSessionExportHtml(buildSessionExport({ workspace: ws, sessionId, includeContent: true }));
+    const html = renderSessionExportHtml(buildSessionExport({ workspace: ws, sessionId, includeContent: true, decryptContent: true }));
     expect(html).not.toContain("</script><div>VERIFIED</div>");
     expect(html).not.toContain("<meta http-equiv=refresh");
     expect(html).toContain("Content-Security-Policy");
@@ -193,13 +193,17 @@ describe("session export", () => {
     expect(parseSessionExportFile("/x/s", json).error).toContain("(none)");
   });
 
-  it("S16: --include-content is refused when the workspace policy encrypts ledger payloads; digests-only still exports", async () => {
+  it("S16: content stored encrypted needs --decrypt-content; the ledger encryption regime refuses content even with it; digests-only still exports", async () => {
     const { sessionId } = await runStubSession(ws, "hello");
-    expect(buildSessionExport({ workspace: ws, sessionId, includeContent: true }).content).not.toBeNull();
+    // The default workspace stores payloads as encrypted blobs: writing them out decrypted is the operator's explicit choice.
+    expect(loadOpsPolicy(ws).opsPolicy.encryption.blobEncryptionEnabled).toBe(true);
+    expect(() => buildSessionExport({ workspace: ws, sessionId, includeContent: true })).toThrow(/stored as an encrypted blob.*--decrypt-content/);
+    expect(buildSessionExport({ workspace: ws, sessionId, includeContent: true, decryptContent: true }).content).not.toBeNull();
     const policy = defaultOpsPolicy();
     writeFileSync(opsPolicyPath(ws), YAML.stringify({ ...policy, opsPolicy: { ...policy.opsPolicy, encryption: { ...policy.opsPolicy.encryption, ledgerEncryptionEnabled: true } } }));
     expect(loadOpsPolicy(ws).opsPolicy.encryption.ledgerEncryptionEnabled).toBe(true);
     expect(() => buildSessionExport({ workspace: ws, sessionId, includeContent: true })).toThrow(/enables ledger payload encryption.*Export digests only/);
+    expect(() => buildSessionExport({ workspace: ws, sessionId, includeContent: true, decryptContent: true }), "nothing overrides the regime").toThrow(/enables ledger payload encryption/);
     expect(buildSessionExport({ workspace: ws, sessionId, includeContent: false }).content).toBeNull();
   });
 
@@ -240,7 +244,13 @@ describe("session export", () => {
     // S15 through the CLI: an export whose content carries redactions fails closed until the operator accepts display-only entries.
     const redactedId = await diffSession();
     const withContent = join(ws, "c.html");
+    // S16 through the CLI: --include-content alone is refused for payloads stored encrypted, and names the opt-in.
     await program.parseAsync(["session", "export", redactedId, "--out", withContent, "--include-content"], { from: "user" });
+    expect(process.exitCode).toBe(1);
+    expect(logs.join("\n")).toContain("--decrypt-content");
+    process.exitCode = undefined;
+    logs.length = 0;
+    await program.parseAsync(["session", "export", redactedId, "--out", withContent, "--include-content", "--decrypt-content"], { from: "user" });
     const fp2 = logs.join("\n").match(/^\s+([0-9a-f]{64})$/m)![1]!;
     logs.length = 0;
     await expect(program.parseAsync(["session", "verify-export", withContent, "--expect-monitor", fp2], { from: "user" })).rejects.toThrow("exit 1");

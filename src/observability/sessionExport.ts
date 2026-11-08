@@ -6,11 +6,13 @@
  * the seal must verify under it at export time; a session signed by a rotated key is refused rather than exported
  * with a key list anyone could extend. The fingerprint an operator pins at verify time travels out of band. Content
  * is digests only unless asked for; asked-for content is checked against each row's committed digest, redacted, and
- * bounded. Nothing in the document is ever executed by the verifier.
+ * bounded, and payloads stored encrypted are written out only with the operator's explicit `--decrypt-content` (never under
+ * the ledger encryption regime). Nothing in the document is ever executed by the verifier.
  */
 import { projectNativeRunUsage, type NativeRunUsage } from "../agent/nativeRunUsage.js";
 import { getPublicKeyPem, verifyHexDigest } from "../crypto/keys.js";
 import { boundProviderKey } from "../keys/keyset.js";
+import { loadBlobMetadata } from "../storage/blobs/blobStore.js";
 import { isEncryptedField } from "../ledger/encryption/ledgerCipher.js";
 import { loadOpsPolicy } from "../ops/policy.js";
 import { readEventPayload } from "../session/eventPayload.js";
@@ -81,15 +83,30 @@ function spillLocator(event: EvidenceEvent): string | null {
 
 /**
  * S16: the first reason this session falls under the ledger payload encryption regime (P2-09), or null. The regime is
- * the operator's opt-in: the policy flag covers every row of the session, blobs included (before, only a row whose
- * inline field was encrypted refused, so a regime-on session stored as blobs left in plaintext). Blob and spill payloads
- * under the workspace's default blob encryption are not that regime: every reader decrypts them, and the export carries
- * them redacted and bounded like `amc session show` does.
+ * the operator's opt-in to keep payloads encrypted: the policy flag covers every row of the session, blobs included,
+ * and nothing overrides it.
  */
 function underLedgerEncryption(workspace: string, rows: readonly EvidenceEvent[]): string | null {
   if (loadOpsPolicy(workspace).opsPolicy.encryption.ledgerEncryptionEnabled === true) return "the workspace operations policy enables ledger payload encryption";
   const row = rows.find((candidate) => isEncryptedField(candidate.payload_inline));
   return row === undefined ? null : `the inline payload of event ${row.id} is encrypted`;
+}
+
+/**
+ * S16: the first content payload this session stores encrypted at rest (an encrypted blob, the workspace default, or a
+ * v2 spill), or null. Exporting it writes plaintext to a file, so it needs the operator's explicit `--decrypt-content`.
+ */
+function encryptedAtRest(workspace: string, rows: readonly EvidenceEvent[]): string | null {
+  for (const row of rows) {
+    if (!CONTENT_EVENT_TYPES.has(row.event_type) || row.payload_pruned === 1) continue;
+    if (row.event_type === "tool/result" && extractSpillRef(row.meta_json)?.v === 2) return `the spilled output of event ${row.id} is stored encrypted`;
+    const path = row.payload_inline === null || row.payload_inline === undefined ? row.payload_path ?? row.canonical_payload_path ?? null : null;
+    if (path === null) continue;
+    try {
+      if (loadBlobMetadata(workspace, path).encrypted) return `the payload of event ${row.id} is stored as an encrypted blob`;
+    } catch { /* unreadable: the export marks it unavailable */ }
+  }
+  return null;
 }
 
 function redacted(text: string): { text: string; redactions: number } {
@@ -127,8 +144,11 @@ function exportContent(workspace: string, rows: readonly EvidenceEvent[]): Recor
   return out;
 }
 
-/** Read, verify and assemble. Throws on any refusal; never writes a partial document. */
-export function buildSessionExport(options: { workspace: string; sessionId: string; includeContent: boolean; now?: number }): SessionExportDocument {
+/**
+ * Read, verify and assemble. Throws on any refusal; never writes a partial document. Content is refused under the
+ * ledger encryption regime, and for payloads stored encrypted at rest unless `decryptContent` says to write them out.
+ */
+export function buildSessionExport(options: { workspace: string; sessionId: string; includeContent: boolean; decryptContent?: boolean; now?: number }): SessionExportDocument {
   const history = loadSessionEventHistory({ workspace: options.workspace, sessionId: options.sessionId });
   const rows = history.events;
   const record = history.sessions.find((session) => session.session_id === options.sessionId) ?? null;
@@ -140,6 +160,10 @@ export function buildSessionExport(options: { workspace: string; sessionId: stri
   const encrypted = options.includeContent ? underLedgerEncryption(options.workspace, rows) : null;
   if (encrypted !== null) {
     throw new Error(`${encrypted}; an export with content would carry decrypted payloads. Export digests only (omit --include-content).`);
+  }
+  const atRest = options.includeContent && options.decryptContent !== true ? encryptedAtRest(options.workspace, rows) : null;
+  if (atRest !== null) {
+    throw new Error(`${atRest}; an export with content would write it decrypted into the file. Pass --decrypt-content to accept that, or export digests only (omit --include-content).`);
   }
   const exportedAt = options.now ?? Date.now();
   return { schema: SESSION_EXPORT_SCHEMA, exportedAt, sessionId: options.sessionId, monitorPublicKeyPem: pem,

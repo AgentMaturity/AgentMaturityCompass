@@ -1,5 +1,8 @@
 /** SH-OBS-01: GenAI-shaped spans and metrics for native sessions, OTLP/HTTP JSON export, OTEL_* env, otel-preview. */
+import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { createServer, type Server } from "node:http";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { Command } from "commander";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NativeSpanFolder } from "../../src/observability/nativeSessionSpans.js";
@@ -286,6 +289,32 @@ describe("flush and buffers", () => {
     expect(rows).toHaveLength(1);
     expect((JSON.parse(rows[0]!.meta_json) as { dropped: number }).dropped).toBe(1);
     expect(takeDroppedTelemetry(), "the count was taken into the row").toBe(0);
+    // A second short command within the minute still writes its row: no later action would carry the count.
+    await program.parseAsync(["noop"], { from: "user" });
+    expect(allEvents(ws).filter((row) => row.event_type === "audit" && (JSON.parse(row.meta_json) as { auditType?: string }).auditType === "TELEMETRY_DROPPED")).toHaveLength(2);
+  });
+
+  it("outside a workspace the exit flush creates no ledger for the row and prints the count instead", async () => {
+    process.env.AMC_OTEL_ENABLED = "1";
+    process.env.OTEL_EXPORTER_OTLP_ENDPOINT = "http://127.0.0.1:9";
+    process.env.AMC_OTEL_FLUSH_MAX_RETRIES = "0";
+    resetSharedObservabilityExporterForTests();
+    takeDroppedTelemetry();
+    const bare = mkdtempSync(join(tmpdir(), "amc-no-ws-"));
+    try {
+      const program = new Command().exitOverride();
+      registerObservabilityCommands(program, () => "default");
+      program.command("noop").action(() => { getSharedObservabilityExporter().recordSpan(testSpan("lost")); });
+      const errors: string[] = [];
+      vi.spyOn(console, "error").mockImplementation((...args: unknown[]) => { errors.push(args.join(" ")); });
+      process.chdir(bare);
+      await program.parseAsync(["noop"], { from: "user" });
+      expect(existsSync(join(bare, ".amc")), "no ledger, keys or vault were created in a non-workspace").toBe(false);
+      expect(errors.join("\n")).toContain("1 item(s) could not be exported before exit");
+    } finally {
+      takeDroppedTelemetry();
+      rmSync(bare, { recursive: true, force: true });
+    }
   });
 });
 
