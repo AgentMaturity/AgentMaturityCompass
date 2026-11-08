@@ -11,9 +11,9 @@ import { defaultOpsPolicy, opsPolicyPath, signOpsPolicy } from "../src/ops/polic
 import { initWorkspace } from "../src/workspace.js";
 import YAML from "yaml";
 
-// LIVE-RUNTIME-01 (D-R1): request bodies are capped (413, nothing forwarded), an unleased request is refused before its
-// body is read, and upstream responses stay uncapped. The cap stays under the default ops policy's 64 KiB evidence
-// payload limit, which refuses a larger llm_request row on its own (a separate, operator-configurable limit).
+// LIVE-RUNTIME-01 (D-R1): request bodies are capped (413, nothing forwarded), a request whose lease does not verify is
+// refused before its body is read, and upstream responses stay uncapped. The cap stays under the default ops policy's
+// 64 KiB evidence payload limit, which refuses a larger llm_request row on its own (a separate, operator-configurable limit).
 const CAP = 16 * 1024;
 const roots: string[] = [];
 const servers: Server[] = [];
@@ -80,6 +80,25 @@ function post(port: number, path: string, body: Buffer, headers: Record<string, 
   });
 }
 
+/**
+ * The status (and Connection header) of a POST that sends its headers and one chunk of a 1 MiB body, then never ends
+ * it; fails after 2 s. The chunk stays under the cap, so a gateway that reads the body waits for the rest instead of
+ * answering 413.
+ */
+function statusBeforeBodyEnds(port: number, headers: Record<string, string>): Promise<{ status: number; connection: string | undefined }> {
+  return new Promise((resolvePromise, rejectPromise) => {
+    const req = httpRequest({ host: "127.0.0.1", port, path: "/test/v1/x", method: "POST", headers: { "content-length": 1_048_576, ...headers } }, (res) => {
+      clearTimeout(timer);
+      res.resume();
+      resolvePromise({ status: res.statusCode ?? 0, connection: res.headers.connection });
+      req.destroy();
+    });
+    const timer = setTimeout(() => { req.destroy(); rejectPromise(new Error("no response within 2 s")); }, 2_000);
+    req.on("error", () => undefined);
+    req.write(Buffer.alloc(CAP / 2, 0x63));
+  });
+}
+
 function auditRows(workspace: string, type: string): Array<Record<string, unknown>> {
   const ledger = openLedger(workspace);
   try {
@@ -117,22 +136,44 @@ describe("gateway request body cap", () => {
   test("an unleased request is refused before its body is read", async () => {
     const { gateway } = await setup();
     try {
-      const status = await new Promise<number>((resolvePromise, rejectPromise) => {
-        const timer = setTimeout(() => rejectPromise(new Error("no response within 2 s")), 2_000);
-        const req = httpRequest({ host: "127.0.0.1", port: gateway.port, path: "/test/v1/x", method: "POST",
-          headers: { "content-length": 1_048_576, "x-amc-agent-id": "default" } }, (res) => {
-          clearTimeout(timer);
-          res.resume();
-          resolvePromise(res.statusCode ?? 0);
-          req.destroy();
-        });
-        req.on("error", () => undefined);
-        req.write(Buffer.alloc(64 * 1024, 0x63)); // headers plus one chunk; the body never ends
-      });
-      expect(status).toBe(401);
+      expect(await statusBeforeBodyEnds(gateway.port, { "x-amc-agent-id": "default" })).toEqual({ status: 401, connection: "close" });
     } finally {
       await gateway.close();
     }
+  }, 60_000);
+
+  // A lease-shaped carrier is not a lease: a forged one used to make the gateway buffer up to the cap before the lease
+  // was verified, so N held connections pinned N x cap bytes (skeptic D1).
+  test("a forged lease is refused before its body is read", async () => {
+    const { workspace, gateway } = await setup();
+    try {
+      // Answered at once, and the unread body is not drained: the connection closes.
+      expect(await statusBeforeBodyEnds(gateway.port, { "x-amc-agent-id": "default", "x-amc-lease": "forged.notalease" })).toEqual({ status: 401, connection: "close" });
+    } finally {
+      await gateway.close();
+    }
+    expect(auditRows(workspace, "LEASE_INVALID_OR_MISSING")).toEqual([expect.objectContaining({ agentId: "default" })]);
+  }, 60_000);
+
+  // It also used to write one signed GATEWAY_PAYLOAD_TOO_LARGE row per request, outside the pre-auth audit bound and
+  // attributed to whichever agent the client named (skeptic D2). Now it is an invalid lease, inside that bound.
+  test("an oversized body under a forged lease is an invalid lease, audited within the pre-auth bound", async () => {
+    const { workspace, gateway, received } = await setup();
+    const statuses: number[] = [];
+    try {
+      for (let i = 0; i < 12; i += 1) {
+        const forged = { "x-amc-agent-id": "victim-agent", "x-amc-lease": "forged.notalease" };
+        statuses.push((await post(gateway.port, "/test/v1/x", Buffer.alloc(CAP + 1, 0x62), forged)).status);
+      }
+    } finally {
+      await gateway.close();
+    }
+    expect(statuses).toEqual(Array(12).fill(401));
+    expect(received).toEqual([]);
+    expect(auditRows(workspace, "GATEWAY_PAYLOAD_TOO_LARGE")).toEqual([]);
+    const refusals = auditRows(workspace, "LEASE_INVALID_OR_MISSING");
+    expect(refusals.filter((row) => row.suppressed === undefined)).toHaveLength(10);
+    expect(refusals.filter((row) => row.suppressed !== undefined)).toEqual([expect.objectContaining({ suppressed: 2 })]);
   }, 60_000);
 
   test("the forward proxy caps a leased request body the same way", async () => {

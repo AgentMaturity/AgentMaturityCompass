@@ -1,4 +1,5 @@
 import { createServer, request as httpRequest, type Server } from "node:http";
+import { connect } from "node:net";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -38,6 +39,21 @@ describe("pre-auth audit limiter", () => {
     expect(summaries).toEqual([expect.objectContaining({ auditType: "NETWORK_EGRESS_BLOCKED", suppressed: 2 })]);
   });
 
+  // SR-3: kill-switch refusals and the carrier audits of an unverified request are bounded too, at their own severity.
+  test("kill-switch refusals and carrier audits share the bound; summaries keep each type's severity", () => {
+    const summaries: PreAuthAuditSummary[] = [];
+    const limiter = createPreAuthAuditLimiter({ appendSummary: (row) => summaries.push(row), now: () => 0 });
+    const types = ["KILL_SWITCH_DENIED", "AGENT_PROVIDED_KEY_IGNORED", "LEASE_QUERY_CARRIER_USED"];
+    const decisions = Array.from({ length: 13 }, (_, i) => limiter.shouldAudit("10.0.0.1", types[i % 3]!));
+    expect(decisions.filter(Boolean)).toHaveLength(10);
+    limiter.flushAll();
+    expect(summaries).toEqual([
+      expect.objectContaining({ auditType: "AGENT_PROVIDED_KEY_IGNORED", severity: "MED", suppressed: 1 }),
+      expect.objectContaining({ auditType: "LEASE_QUERY_CARRIER_USED", severity: "LOW", suppressed: 1 }),
+      expect.objectContaining({ auditType: "KILL_SWITCH_DENIED", severity: "HIGH", suppressed: 1 })
+    ]);
+  });
+
   test("past 10,000 live clients the rest share one bounded window", () => {
     const summaries: PreAuthAuditSummary[] = [];
     const limiter = createPreAuthAuditLimiter({ appendSummary: (row) => summaries.push(row), now: () => 0 });
@@ -57,9 +73,9 @@ describe("gateway pre-auth audit rows", () => {
     while (roots.length > 0) rmSync(roots.pop()!, { recursive: true, force: true });
   });
 
-  function call(port: number, headers: Record<string, string>): Promise<number> {
+  function call(port: number, headers: Record<string, string>, path = "/test/v1/x"): Promise<number> {
     return new Promise((resolvePromise, rejectPromise) => {
-      const req = httpRequest({ host: "127.0.0.1", port, path: "/test/v1/x", method: "POST", headers: { "content-type": "application/json", ...headers } }, (res) => {
+      const req = httpRequest({ host: "127.0.0.1", port, path, method: "POST", headers: { "content-type": "application/json", ...headers } }, (res) => {
         res.resume();
         res.on("end", () => resolvePromise(res.statusCode ?? 0));
       });
@@ -68,20 +84,49 @@ describe("gateway pre-auth audit rows", () => {
     });
   }
 
-  test("30 unleased requests: 30 refusals, 10 audit rows and one summary of 20; a leased request is unaffected", async () => {
+  const listen = (server: Server) => new Promise<number>((done) => server.listen(0, "127.0.0.1", () => done((server.address() as { port: number }).port)));
+
+  async function start(options: { proxy?: boolean; queryCarrier?: boolean } = {}) {
     const workspace = mkdtempSync(join(tmpdir(), "amc-gateway-preauth-"));
     roots.push(workspace);
     initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
     const upstream = createServer((req, res) => { req.resume(); req.on("end", () => res.writeHead(200).end("{}")); });
     servers.push(upstream);
-    const port = await new Promise<number>((done) => upstream.listen(0, "127.0.0.1", () => done((upstream.address() as { port: number }).port)));
+    const port = await listen(upstream);
+    const probe = createServer();
+    const proxyPort = await listen(probe);
+    await new Promise<void>((done) => probe.close(() => done()));
     initGatewayConfig(workspace, gatewayConfigSchema.parse({
       listen: { host: "127.0.0.1", port: 0 },
       redaction: { headerKeysDenylist: ["authorization"], jsonPathsDenylist: [], textRegexDenylist: [] },
       upstreams: { test: { baseUrl: `http://127.0.0.1:${port}`, auth: { type: "none" }, allowLocalhost: true } },
-      routes: [{ prefix: "/test", upstream: "test", stripPrefix: true, openaiCompatible: false }]
+      routes: [{ prefix: "/test", upstream: "test", stripPrefix: true, openaiCompatible: false }],
+      ...(options.proxy ? { proxy: { enabled: true, port: proxyPort, allowlistHosts: ["127.0.0.1"], denyByDefault: true } } : {}),
+      ...(options.queryCarrier ? { lease: { allowQueryCarrier: true } } : {})
     }));
-    const gateway = await startGateway({ workspace });
+    return { workspace, gateway: await startGateway({ workspace }), upstreamPort: port };
+  }
+
+  function connectStatus(port: number, headers: Record<string, string>, authority: string): Promise<number> {
+    return new Promise((resolvePromise, rejectPromise) => {
+      const req = httpRequest({ host: "127.0.0.1", port, method: "CONNECT", path: authority, headers });
+      req.on("connect", (res, socket) => { resolvePromise(res.statusCode ?? 0); socket.destroy(); });
+      req.on("error", rejectPromise);
+      req.end();
+    });
+  }
+
+  function auditMetas(workspace: string): Array<Record<string, unknown>> {
+    const ledger = openLedger(workspace);
+    try {
+      return ledger.getAllEvents().map((event) => ({ eventType: event.event_type, ...(JSON.parse(event.meta_json ?? "{}") as Record<string, unknown>) }));
+    } finally {
+      ledger.close();
+    }
+  }
+
+  test("30 unleased requests: 30 refusals, 10 audit rows and one summary of 20; a leased request is unaffected", async () => {
+    const { workspace, gateway } = await start();
     try {
       const statuses = await Promise.all(Array.from({ length: 30 }, () => call(gateway.port, { "x-amc-agent-id": "default" })));
       expect(statuses).toEqual(Array.from({ length: 30 }, () => 401));
@@ -100,5 +145,48 @@ describe("gateway pre-auth audit rows", () => {
     } finally {
       ledger.close();
     }
+  }, 60_000);
+
+  // SR-3: the provider-key and query-carrier audits used to be written before the lease was checked, one per request.
+  test("unleased requests carrying a provider key or a query carrier stay within the bound, on both servers", async () => {
+    const { workspace, gateway, upstreamPort } = await start({ proxy: true, queryCarrier: true });
+    const keyed = { "x-amc-agent-id": "default", authorization: "Bearer sk-not-a-lease-1234567890" };
+    try {
+      for (let i = 0; i < 10; i += 1) expect(await call(gateway.port, keyed)).toBe(401);
+      for (let i = 0; i < 10; i += 1) expect(await call(gateway.port, { "x-amc-agent-id": "default" }, "/test/v1/x?amc_lease=forged.notalease")).toBe(401);
+      for (let i = 0; i < 10; i += 1) expect(await call(gateway.proxyPort!, keyed, `http://127.0.0.1:${upstreamPort}/x`)).toBe(401);
+      for (let i = 0; i < 5; i += 1) expect(await connectStatus(gateway.proxyPort!, keyed, `127.0.0.1:${upstreamPort}`)).toBe(401);
+      const lease = issueLeaseForCli({ workspace, agentId: "default", ttl: "60m", scopes: "gateway:llm", routes: "/test",
+        models: "*", rpm: 1000, tpm: 1_000_000, maxCostUsdPerDay: null }).token;
+      expect(await call(gateway.port, { "x-amc-agent-id": "default" }, `/test/v1/x?amc_lease=${lease}`)).toBe(200);
+    } finally {
+      await gateway.close();
+    }
+    const metas = auditMetas(workspace).filter((meta) => meta.eventType === "audit");
+    const rows = metas.filter((meta) => meta.suppressed === undefined && ["LEASE_INVALID_OR_MISSING", "AGENT_PROVIDED_KEY_IGNORED", "LEASE_QUERY_CARRIER_USED"].includes(String(meta.auditType)));
+    // 10 for the 35 refused requests, plus the leased request's own query-carrier row: a verified lease is never limited.
+    expect(rows).toHaveLength(11);
+    expect(rows.at(-1)).toMatchObject({ auditType: "LEASE_QUERY_CARRIER_USED", agentId: "default" });
+    const summaries = metas.filter((meta) => meta.suppressed !== undefined);
+    expect(summaries.reduce((total, meta) => total + Number(meta.suppressed), 0)).toBe(60); // 35 refusals, 25 carrier audits, 10 written
+    expect(new Set(summaries.map((meta) => meta.auditType))).toEqual(new Set(["LEASE_INVALID_OR_MISSING", "AGENT_PROVIDED_KEY_IGNORED", "LEASE_QUERY_CARRIER_USED"]));
+  }, 60_000);
+
+  // SR-3: a request that fails before its lease is checked (here an unparsable Host) used to write a request_error row.
+  test("a failure before the lease is checked writes no ledger row", async () => {
+    const { workspace, gateway } = await start();
+    try {
+      const status = await new Promise<string>((resolvePromise, rejectPromise) => {
+        const socket = connect(gateway.port, "127.0.0.1", () => socket.write("POST /test/v1/x HTTP/1.1\r\nHost: a b\r\nContent-Length: 2\r\nConnection: close\r\n\r\n{}"));
+        let head = "";
+        socket.on("data", (chunk: Buffer) => { head += chunk.toString("latin1"); });
+        socket.on("end", () => resolvePromise(head.split("\r\n", 1)[0] ?? ""));
+        socket.on("error", rejectPromise);
+      });
+      expect(status).toMatch(/^HTTP\/1\.1 5\d\d /);
+    } finally {
+      await gateway.close();
+    }
+    expect(auditMetas(workspace).filter((meta) => meta.stage === "request_error")).toEqual([]);
   }, 60_000);
 });

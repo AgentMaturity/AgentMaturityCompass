@@ -121,4 +121,32 @@ describe("the running gateway", () => {
       ledger.close();
     }
   });
+
+  // SR-3: the kill switch is checked before any lease, so its refusal rows are pre-auth and share the per-client bound.
+  test("kill-switch refusals write at most 10 rows per client a minute, then one summary", async () => {
+    const gateway = await startGateway({ workspace });
+    try {
+      await kill({ kind: "provider", id: "openai" });
+      for (let i = 0; i < 15; i += 1) {
+        const status = await new Promise<number>((done, fail) => {
+          const req = httpRequest({ host: gateway.host, port: gateway.port, method: "POST", path: "/openai/v1/chat/completions", headers: { "x-amc-agent-id": "default" } });
+          req.on("response", (res) => { done(res.statusCode ?? 0); res.resume(); });
+          req.on("error", fail);
+          req.end("{}");
+        });
+        expect(status).toBe(403);
+      }
+    } finally {
+      await gateway.close();
+    }
+    const ledger = openLedger(workspace);
+    try {
+      const denied = ledger.getAllEvents().filter((e) => e.event_type === "audit").map((e) => JSON.parse(e.meta_json ?? "{}") as Record<string, unknown>)
+        .filter((meta) => meta.auditType === "KILL_SWITCH_DENIED");
+      expect(denied.filter((meta) => meta.suppressed === undefined)).toHaveLength(10);
+      expect(denied.filter((meta) => meta.suppressed !== undefined)).toEqual([expect.objectContaining({ suppressed: 5, severity: "HIGH" })]);
+    } finally {
+      ledger.close();
+    }
+  });
 });

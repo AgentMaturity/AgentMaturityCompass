@@ -668,48 +668,6 @@ function createProxyServer(params: {
       url: targetUrl,
       allowQueryCarrier: params.config.lease.allowQueryCarrier
     });
-    if (leaseCarrier.nonLeaseCarrier) {
-      params.appendEvidence({
-        eventType: "audit",
-        payload: JSON.stringify({
-          auditType: "AGENT_PROVIDED_KEY_IGNORED",
-          severity: "MED",
-          request_id: requestId,
-          agentId: proxyAgentId ?? null,
-          leaseCarrier: leaseCarrier.nonLeaseCarrier,
-          proxyMode: true
-        }),
-        meta: {
-          auditType: "AGENT_PROVIDED_KEY_IGNORED",
-          severity: "MED",
-          request_id: requestId,
-          agentId: proxyAgentId ?? null,
-          leaseCarrier: leaseCarrier.nonLeaseCarrier,
-          proxyMode: true,
-          trustTier: "OBSERVED"
-        }
-      });
-    }
-    if (leaseCarrier.queryCarrierUsed) {
-      params.appendEvidence({
-        eventType: "audit",
-        payload: JSON.stringify({
-          auditType: "LEASE_QUERY_CARRIER_USED",
-          severity: "LOW",
-          request_id: requestId,
-          agentId: proxyAgentId ?? null,
-          proxyMode: true
-        }),
-        meta: {
-          auditType: "LEASE_QUERY_CARRIER_USED",
-          severity: "LOW",
-          request_id: requestId,
-          agentId: proxyAgentId ?? null,
-          proxyMode: true,
-          trustTier: "OBSERVED"
-        }
-      });
-    }
     const leaseVerification = verifyLeaseAndMapError({
       workspace: params.workspace,
       expectedWorkspaceId: params.workspaceId,
@@ -717,6 +675,50 @@ function createProxyServer(params: {
       expectedAgentId: proxyAgentId ?? "unknown",
       requiredScope: "proxy:connect", egress: { host: targetUrl.hostname, config: params.config }
     });
+    // SR-3: a request no lease vouches for writes its carrier audits within the pre-auth bound.
+    const carrierAudited = (auditType: string): boolean => (Boolean(proxyAgentId) && leaseVerification.ok) || params.preAuthAudit.shouldAudit(clientIp, auditType);
+    if (leaseCarrier.nonLeaseCarrier && carrierAudited("AGENT_PROVIDED_KEY_IGNORED")) {
+      params.appendEvidence({
+        eventType: "audit",
+        payload: JSON.stringify({
+          auditType: "AGENT_PROVIDED_KEY_IGNORED",
+          severity: "MED",
+          request_id: requestId,
+          agentId: proxyAgentId ?? null,
+          leaseCarrier: leaseCarrier.nonLeaseCarrier,
+          proxyMode: true
+        }),
+        meta: {
+          auditType: "AGENT_PROVIDED_KEY_IGNORED",
+          severity: "MED",
+          request_id: requestId,
+          agentId: proxyAgentId ?? null,
+          leaseCarrier: leaseCarrier.nonLeaseCarrier,
+          proxyMode: true,
+          trustTier: "OBSERVED"
+        }
+      });
+    }
+    if (leaseCarrier.queryCarrierUsed && carrierAudited("LEASE_QUERY_CARRIER_USED")) {
+      params.appendEvidence({
+        eventType: "audit",
+        payload: JSON.stringify({
+          auditType: "LEASE_QUERY_CARRIER_USED",
+          severity: "LOW",
+          request_id: requestId,
+          agentId: proxyAgentId ?? null,
+          proxyMode: true
+        }),
+        meta: {
+          auditType: "LEASE_QUERY_CARRIER_USED",
+          severity: "LOW",
+          request_id: requestId,
+          agentId: proxyAgentId ?? null,
+          proxyMode: true,
+          trustTier: "OBSERVED"
+        }
+      });
+    }
     if (!proxyAgentId || !leaseVerification.ok) {
       if (params.preAuthAudit.shouldAudit(clientIp, leaseVerification.ok ? "LEASE_INVALID_OR_MISSING" : leaseVerification.auditType)) params.appendEvidence({
         eventType: "audit",
@@ -877,7 +879,15 @@ function createProxyServer(params: {
       url: connectUrl,
       allowQueryCarrier: params.config.lease.allowQueryCarrier
     });
-    if (leaseCarrier.nonLeaseCarrier) {
+    const leaseVerification = verifyLeaseAndMapError({
+      workspace: params.workspace,
+      expectedWorkspaceId: params.workspaceId,
+      leaseToken: leaseCarrier.leaseToken ?? undefined,
+      expectedAgentId: proxyAgentId ?? "unknown",
+      requiredScope: "proxy:connect", egress: { host: host ?? "", config: params.config }
+    });
+    // SR-3: as in the request handler, a CONNECT no lease vouches for audits its carrier within the pre-auth bound.
+    if (leaseCarrier.nonLeaseCarrier && ((Boolean(proxyAgentId) && leaseVerification.ok) || params.preAuthAudit.shouldAudit(clientIp, "AGENT_PROVIDED_KEY_IGNORED"))) {
       params.appendEvidence({
         eventType: "audit",
         payload: JSON.stringify({
@@ -903,13 +913,6 @@ function createProxyServer(params: {
         }
       });
     }
-    const leaseVerification = verifyLeaseAndMapError({
-      workspace: params.workspace,
-      expectedWorkspaceId: params.workspaceId,
-      leaseToken: leaseCarrier.leaseToken ?? undefined,
-      expectedAgentId: proxyAgentId ?? "unknown",
-      requiredScope: "proxy:connect", egress: { host: host ?? "", config: params.config }
-    });
 
     if (!authority || !host || !Number.isInteger(port) || port < 1 || port > 65535) {
       clientSocket.write("HTTP/1.1 400 Bad Request\r\n\r\n");
@@ -1140,6 +1143,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       return;
     }
 
+    let leaseVerified = false; // SR-3: a failure before the lease verified is logged, never a ledger row
     try {
       const hostForUrl = req.headers.host ?? `${resolvedConfig.listen.host}:${resolvedConfig.listen.port}`;
       const incomingUrl = new URL(req.url ?? "/", `http://${hostForUrl}`);
@@ -1192,15 +1196,22 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         url: incomingUrl,
         allowQueryCarrier: config.lease.allowQueryCarrier
       });
-      // LIVE-RUNTIME-01: no lease carrier, no body read (the verification below refuses it); past the cap, 413 and nothing forwarded.
-      const requestBody = leaseCarrier.leaseToken ? await readBoundedBody(req, maxRequestBytes) : Buffer.alloc(0);
+      const verifyLease = (model?: string | null) => verifyLeaseAndMapError({ workspace: options.workspace, expectedWorkspaceId: options.workspaceId,
+        leaseToken: leaseCarrier.leaseToken ?? undefined, expectedAgentId: attributedAgentId, requiredScope: "gateway:llm", routePath: incomingUrl.pathname, model, upstreamId: route.upstream });
+      // LIVE-RUNTIME-01: a lease that does not verify (all but its model, which the body names) gets no body read, so a
+      // forged one cannot make the gateway buffer; past the cap, 413 (audited for the lease's own agent) and nothing forwarded.
+      const preVerification = verifyLease();
+      const requestBody = preVerification.ok ? await readBoundedBody(req, maxRequestBytes) : Buffer.alloc(0);
       if (requestBody === null) {
         refuseOversizedRequest(req, res, { requestId, agentId: attributedAgentId, maxBytes: maxRequestBytes,
           append: (row) => appendEvidence({ eventType: "audit", payload: JSON.stringify(row), meta: row }) });
         return;
       }
       const requestInfo = bestEffortJsonInfo(requestBody, incomingUrl.pathname, route.openaiCompatible);
-      if (leaseCarrier.nonLeaseCarrier) {
+      const leaseVerification = preVerification.ok ? verifyLease(requestInfo.model ?? null) : preVerification;
+      // SR-3: a request no lease vouches for writes its carrier audits within the pre-auth bound.
+      const carrierAudited = (auditType: string): boolean => leaseVerification.ok || preAuthAudit.shouldAudit(clientIp, auditType);
+      if (leaseCarrier.nonLeaseCarrier && carrierAudited("AGENT_PROVIDED_KEY_IGNORED")) {
         appendEvidence({
           eventType: "audit",
           payload: JSON.stringify({
@@ -1220,7 +1231,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
           }
         });
       }
-      if (leaseCarrier.queryCarrierUsed) {
+      if (leaseCarrier.queryCarrierUsed && carrierAudited("LEASE_QUERY_CARRIER_USED")) {
         appendEvidence({
           eventType: "audit",
           payload: JSON.stringify({
@@ -1238,16 +1249,6 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
           }
         });
       }
-      const leaseVerification = verifyLeaseAndMapError({
-        workspace: options.workspace,
-        expectedWorkspaceId: options.workspaceId,
-        leaseToken: leaseCarrier.leaseToken ?? undefined,
-        expectedAgentId: attributedAgentId,
-        requiredScope: "gateway:llm",
-        routePath: incomingUrl.pathname,
-        model: requestInfo.model ?? null,
-        upstreamId: route.upstream
-      });
       if (!leaseVerification.ok) {
         if (preAuthAudit.shouldAudit(clientIp, leaseVerification.auditType)) appendEvidence({
           eventType: "audit",
@@ -1269,10 +1270,11 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         });
         res.statusCode = leaseVerification.statusCode;
         res.setHeader("content-type", "application/json");
-        if (!leaseCarrier.leaseToken) res.setHeader("connection", "close"); // its body was never read
+        if (!preVerification.ok) res.setHeader("connection", "close"); // its body was never read
         res.end(JSON.stringify({ error: leaseVerification.message }));
         return;
       }
+      leaseVerified = true;
 
       // The upstream is resolved and checked now (P1-66); refused fields (e.g. dsh_session_log) are decided on these addresses and the connection
       // below is pinned to them. An unreadable body is refused; the audit keeps names and size, never content.
@@ -1608,7 +1610,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       logger.error(`gateway error (request ${requestId}): ${withoutUrlQueries(String(error))}`);
       const status = gatewayErrorStatusCode(error);
       const body = gatewayErrorBody(error);
-      appendEvidence({
+      if (leaseVerified) appendEvidence({
         eventType: "gateway",
         payload: JSON.stringify({
           request_id: requestId,

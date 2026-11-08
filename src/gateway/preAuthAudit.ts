@@ -1,7 +1,8 @@
 /**
- * Bounded audit rows for unauthenticated gateway refusals (LIVE-RUNTIME-21, D-R13): a client outside the allow list, or
- * a request with no valid lease. Each used to append a signed HIGH row with no limit, so anyone who reached the port
- * could grow the ledger and pollute audit counts.
+ * Bounded audit rows for unauthenticated gateway refusals (LIVE-RUNTIME-21, D-R13): a client outside the allow list, a
+ * request with no valid lease, a kill-switch refusal (checked before any lease), and the carrier audits of a request no
+ * lease vouches for (SR-3). Each used to append a signed row with no limit, so anyone who reached the port could grow
+ * the ledger and pollute audit counts.
  *
  * Per client address, at most `perMinute` such rows per minute. Past that the refusal is still answered and counted,
  * and the counts are written as one summary row per audit type (`suppressed: n`) when that client's window rolls over
@@ -10,11 +11,12 @@
 const WINDOW_MS = 60_000;
 const MAX_CLIENTS = 10_000;
 const OVERFLOW = "*"; // refusals from clients past MAX_CLIENTS share one window, so the map stays bounded
-const LIMITED = new Set(["NETWORK_EGRESS_BLOCKED", "LEASE_INVALID_OR_MISSING"]);
+const LIMITED = new Map<string, PreAuthAuditSummary["severity"]>([["NETWORK_EGRESS_BLOCKED", "HIGH"], ["LEASE_INVALID_OR_MISSING", "HIGH"],
+  ["KILL_SWITCH_DENIED", "HIGH"], ["AGENT_PROVIDED_KEY_IGNORED", "MED"], ["LEASE_QUERY_CARRIER_USED", "LOW"]]);
 
 export interface PreAuthAuditSummary {
   auditType: string;
-  severity: "HIGH";
+  severity: "HIGH" | "MED" | "LOW"; // the severity of the rows it stands for
   clientIp: string;
   suppressed: number;
   windowStartTs: number;
@@ -42,7 +44,7 @@ export function createPreAuthAuditLimiter(options: {
   const windows = new Map<string, Window>();
   const flush = (clientIp: string, window: Window): void => {
     for (const [auditType, suppressed] of window.suppressed) {
-      appendSummary({ auditType, severity: "HIGH", clientIp, suppressed, windowStartTs: window.start });
+      appendSummary({ auditType, severity: LIMITED.get(auditType) ?? "HIGH", clientIp, suppressed, windowStartTs: window.start });
     }
   };
   const live = (clientIp: string, at: number): Window | undefined => {
