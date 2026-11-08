@@ -69,6 +69,17 @@ describe("console account routes", () => {
     expect(usersFiles()).toEqual(before);
   });
 
+  test("the last active OWNER cannot revoke or demote themselves: 409 and users.yaml unchanged (LIVE-VAULT-17)", async () => {
+    const { post, ownerCookie, usersFiles } = await studio();
+    const before = usersFiles();
+    for (const [path, body] of [["/users/revoke", { username: "owner" }], ["/users/roles", { username: "owner", roles: ["VIEWER"] }]] as const) {
+      const refused = await post(path, body, { cookie: ownerCookie });
+      expect(refused.status, path).toBe(409);
+      expect(refused.body).toEqual({ error: "refused: this would leave no active OWNER" });
+    }
+    expect(usersFiles()).toEqual(before);
+  });
+
   test("an OWNER session adds, re-roles and revokes accounts, and each change names the owner in the audit trail", async () => {
     const { workspace, post, ownerCookie } = await studio();
     const added = await post("/users/add", ROUTES[0]![1], { cookie: ownerCookie });

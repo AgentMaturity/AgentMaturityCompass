@@ -244,6 +244,7 @@ export function revokeUser(params: {
   };
   const users = config.users.slice();
   users[index] = updated;
+  assertOwnerRemains(users);
   saveUsersConfig(params.workspace, {
     ...config,
     updatedTs: Date.now(),
@@ -271,6 +272,7 @@ export function setUserRoles(params: {
   };
   const users = config.users.slice();
   users[index] = updated;
+  assertOwnerRemains(users);
   saveUsersConfig(params.workspace, {
     ...config,
     updatedTs: Date.now(),
@@ -305,6 +307,13 @@ async function recorded<T extends UserRecord>(workspace: string, action: UserCha
 class UsersAuthorizationChangedError extends Error {
   constructor() { super("user mutation authority changed while signing"); this.name = "UsersAuthorizationChangedError"; }
 }
+/** LIVE-VAULT-17: a revoke or role change never leaves the workspace without an ACTIVE OWNER (a revoked account is permanent). */
+class UsersLastOwnerError extends Error {
+  constructor() { super("refused: this would leave no active OWNER"); this.name = "UsersLastOwnerError"; }
+}
+function assertOwnerRemains(users: readonly UserRecord[]): void {
+  if (!users.some((user) => user.status === "ACTIVE" && user.roles.includes("OWNER"))) throw new UsersLastOwnerError();
+}
 /** LIVE-VAULT-16 (D13): the admin token is a bearer file inside the workspace, so it never mints, revokes or promotes an account. */
 class UsersAdminTokenRefusedError extends Error {
   constructor() { super("the admin token cannot change console accounts; sign in as an OWNER"); this.name = "UsersAdminTokenRefusedError"; }
@@ -322,6 +331,9 @@ export function respondUsersMutationError(request: Pick<IncomingMessage, "method
   if (!["/users/add", "/users/revoke", "/users/roles"].includes(path)) return false;
   if (error instanceof UsersAuthorizationChangedError || error instanceof UsersAdminTokenRefusedError) {
     send(403, { error: error.message }); return true;
+  }
+  if (error instanceof UsersLastOwnerError) {
+    send(409, { error: error.message }); return true;
   }
   if (error instanceof KeyProviderError && Object.hasOwn(KEY_PROVIDER_ERRORS, error.code)) {
     send(KEY_PROVIDER_ERRORS[error.code], { error: `${error.code}: user mutation signing refused`, code: error.code }); return true;
@@ -421,6 +433,7 @@ export async function revokeUserAsync(input: Parameters<typeof revokeUser>[0], o
     const config = current!, index = config.users.findIndex(user => user.username.toLowerCase() === params.username.toLowerCase());
     if (index < 0) throw new Error(`user not found: ${params.username}`);
     const updated = { ...config.users[index]!, status: "REVOKED" as const }, users = config.users.slice(); users[index] = updated;
+    assertOwnerRemains(users);
     return { config: { ...config, updatedTs: Date.now(), users }, result: updated };
   }, opts));
 }
@@ -431,6 +444,7 @@ export async function setUserRolesAsync(input: Parameters<typeof setUserRoles>[0
     const config = current!, index = config.users.findIndex(user => user.username.toLowerCase() === params.username.toLowerCase());
     if (index < 0) throw new Error(`user not found: ${params.username}`);
     const updated = { ...config.users[index]!, roles: params.roles }, users = config.users.slice(); users[index] = updated;
+    assertOwnerRemains(users);
     return { config: { ...config, updatedTs: Date.now(), users }, result: updated };
   }, opts));
 }

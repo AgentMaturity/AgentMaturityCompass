@@ -3,8 +3,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import {
-  addUser, authenticateUser, createSession, initUsersConfig, listUsers, setUserPasswordAsync, usersConfigPath, usersConfigSigPath,
-  verifyTrackedSessionToken, verifyUsersConfigSignature
+  addUser, addUserAsync, authenticateUser, createSession, initUsersConfig, listUsers, revokeUser, revokeUserAsync, setUserPasswordAsync,
+  setUserRoles, setUserRolesAsync, usersConfigPath, usersConfigSigPath, verifyTrackedSessionToken, verifyUsersConfigSignature
 } from "../src/auth/authApi.js";
 import { lockVault } from "../src/vault/vault.js";
 import { initWorkspace } from "../src/workspace.js";
@@ -53,5 +53,34 @@ describe("amc user password (LIVE-VAULT-06)", () => {
     const before = usersFiles(workspace);
     await expect(setUserPasswordAsync({ workspace, username: "nobody", password: NEW })).rejects.toThrow("user not found: nobody");
     expect(usersFiles(workspace)).toEqual(before);
+  });
+});
+
+describe("a workspace always keeps one ACTIVE OWNER (LIVE-VAULT-17)", () => {
+  const REFUSAL = "refused: this would leave no active OWNER";
+
+  test("the last active owner cannot be revoked or demoted, async or sync", async () => {
+    const workspace = workspaceWithOwner();
+    const before = usersFiles(workspace);
+    await expect(revokeUserAsync({ workspace, username: "owner" })).rejects.toThrow(REFUSAL);
+    await expect(setUserRolesAsync({ workspace, username: "owner", roles: ["VIEWER"] })).rejects.toThrow(REFUSAL);
+    expect(() => revokeUser({ workspace, username: "owner" })).toThrow(REFUSAL);
+    expect(() => setUserRoles({ workspace, username: "owner", roles: ["AUDITOR"] })).toThrow(REFUSAL);
+    expect(usersFiles(workspace)).toEqual(before);
+  });
+
+  test("a revoked owner does not count as the one that remains", async () => {
+    const workspace = workspaceWithOwner();
+    await addUserAsync({ workspace, username: "second", password: "second-pass-1234", roles: ["OWNER"] });
+    await revokeUserAsync({ workspace, username: "second" });
+    await expect(revokeUserAsync({ workspace, username: "owner" })).rejects.toThrow(REFUSAL);
+  });
+
+  test("with a second active owner both changes go through", async () => {
+    const workspace = workspaceWithOwner();
+    await addUserAsync({ workspace, username: "second", password: "second-pass-1234", roles: ["OWNER", "AUDITOR"] });
+    await expect(setUserRolesAsync({ workspace, username: "owner", roles: ["VIEWER"] })).resolves.toMatchObject({ roles: ["VIEWER"] });
+    await expect(revokeUserAsync({ workspace, username: "owner" })).resolves.toMatchObject({ status: "REVOKED" });
+    expect(user(workspace, "second").status).toBe("ACTIVE");
   });
 });

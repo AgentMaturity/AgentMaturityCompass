@@ -14,7 +14,7 @@ import { exportBenchmarkArtifact, exportBenchmarkArtifactAsync } from "../../src
 import { verifyBenchmarkArtifact } from "../../src/benchmarks/benchVerify.js";
 import { handleBenchmarkRoute } from "../../src/api/benchmarkRouter.js";
 import { resolveApiRolePolicy } from "../../src/api/accessPolicy.js";
-import { initUsersConfigAsync, createSession, verifyTrackedSessionToken, setUserRolesAsync, activeUserRecord } from "../../src/auth/authApi.js";
+import { addUserAsync, initUsersConfigAsync, createSession, verifyTrackedSessionToken, setUserRolesAsync, activeUserRecord } from "../../src/auth/authApi.js";
 import { getSigningKey, getSigningPublicKeyPem } from "../../src/keys/signingKeys.js";
 import type { KeyRef } from "../../src/keys/provider.js";
 import { lockVault, unlockVault } from "../../src/vault/vault.js";
@@ -221,6 +221,7 @@ test("the trusted direct router refuses an actual current-role loss during file 
   const p = pause(), pending = api(f, "refused-api.amcbench", currentAuthority);
   try {
     await expectEntered(p, pending); assertActualSignature(f);
+    await addUserAsync({ workspace: f.workspace, username: "backup-owner", password: "backup-owner-pass-123", roles: ["OWNER"] }); // LIVE-VAULT-17: one OWNER remains
     await setUserRolesAsync({ workspace: f.workspace, username: owner.username, roles: ["VIEWER"] }); expect(currentAuthority()).toBe(false);
     const log = readFileSync(transparencyLogPath(f.workspace)); p.release.resolve(); const refused = await pending;
     expect(refused.status).toBe(403); expect(existsSync(join(f.workspace, "refused-api.amcbench"))).toBe(false); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(log);
@@ -304,6 +305,7 @@ test("trusted benchmark route rechecks actual current-role loss after archive pu
   try {
     expect(await Promise.race([gate.entered.promise.then(() => "paused"), pending.then(() => "returned", () => "refused")])).toBe("paused");
     const out = join(f.workspace, "late-api.amcbench"); inspect(f, out); const archive = readFileSync(out);
+    await addUserAsync({ workspace: f.workspace, username: "backup-owner", password: "backup-owner-pass-123", roles: ["OWNER"] }); // LIVE-VAULT-17: one OWNER remains
     await setUserRolesAsync({ workspace: f.workspace, username: owner.username, roles: ["VIEWER"] }); expect(current()).toBe(false);
     const log = readFileSync(transparencyLogPath(f.workspace)); gate.release.resolve(); const result = await pending;
     expect(result.status).toBe(403); expect(readFileSync(out)).toEqual(archive); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(log);

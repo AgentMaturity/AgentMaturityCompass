@@ -41,6 +41,7 @@ import {
 } from "../src/approvals/approvalEngine.js";
 import { cancelApprovalRequest } from "../src/approvals/approvalChainStore.js";
 import {
+  addUser,
   authenticateUser,
   createSession,
   initUsersConfig,
@@ -1397,6 +1398,7 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
     }));
 
     const second = createSession({ workspace, user: login.user });
+    addUser({ workspace, username: "backup-owner", password: "backup-owner-pass-123", roles: ["OWNER"] }); // LIVE-VAULT-17: one OWNER remains
     setUserRoles({ workspace, username: "owner", roles: ["VIEWER"] });
     expect(sessionFromRequest({ workspace, req: requestFor(second.token) })).toEqual(expect.objectContaining({
       ok: false,
