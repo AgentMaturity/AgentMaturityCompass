@@ -179,6 +179,8 @@ interface HookControlRecordInput {
   readonly scope: readonly ActionClass[] | undefined;
   readonly descendantScope: readonly ActionClass[] | undefined;
   readonly descendantStops: readonly string[] | undefined;
+  /** The model-step ceiling this child's driver runs under (the driver default when nothing set one). */
+  readonly stepCeiling: number;
 }
 
 /**
@@ -209,6 +211,8 @@ function recordHookControl(input: HookControlRecordInput): void {
     agentDefinition: ctx.agentDefinition === undefined ? null : { name: ctx.agentDefinition.name, sha256: ctx.agentDefinition.sha256,
       tools: ctx.agentDefinition.tools === undefined ? null : [...ctx.agentDefinition.tools],
       maxSteps: ctx.agentDefinition.maxSteps ?? null },
+    // The ceiling actually composed, so a reader can check that a definition only ever lowered it.
+    stepCeiling: input.stepCeiling,
     governedAs: ctx.toolsetAgentId, runAs: ctx.identity.runAs, depth: ctx.identity.depth
   } });
 }
@@ -399,7 +403,8 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
           },
           cleanup: () => toolset?.shutdown() ?? Promise.resolve(true),
           hasOwnedWork: () => toolset?.hasOwnedWork() ?? false,
-          admit: () => recordHookControl({ session, ctx, inherited, gate, scope, descendantScope, descendantStops }),
+          admit: () => recordHookControl({ session, ctx, inherited, gate, scope, descendantScope, descendantStops,
+            stepCeiling: childConfig?.maxStepsPerTurn ?? DEFAULT_AGENT_LOOP_CONFIG.maxStepsPerTurn }),
           ...(childConfig === undefined ? {} : { driver: { config: childConfig } })
         });
       } catch (error) {

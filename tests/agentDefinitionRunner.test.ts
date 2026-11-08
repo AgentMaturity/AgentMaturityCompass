@@ -50,8 +50,8 @@ function workspace(): string {
   return dir;
 }
 
-/** `maxStepsPerTurn: undefined` composes the runner with no config at all, as a host calling createDriverRunner directly may. */
-function runnerFor(dir: string, scripts: ReturnType<typeof textStep>[], maxStepsPerTurn: number | undefined = 8, extra: Partial<DriverRunnerInit> = {}) {
+/** `maxStepsPerTurn: null` composes the runner with no config at all, as a host calling createDriverRunner directly may. */
+function runnerFor(dir: string, scripts: ReturnType<typeof textStep>[], maxStepsPerTurn: number | null = 8, extra: Partial<DriverRunnerInit> = {}) {
   const registry = new AdapterRegistry();
   registry.register({ providerId: LOOP_PROVIDER, adapter: scriptedAdapter(scripts), baseUrl: "https://api.anthropic.invalid",
     credentialRef: credentialRef("AMC_LOOP_TEST_KEY"), models: [LOOP_MODEL] });
@@ -62,7 +62,7 @@ function runnerFor(dir: string, scripts: ReturnType<typeof textStep>[], maxSteps
       now: () => { clock += 5; return clock; } }),
     route: { providerId: LOOP_PROVIDER, model: LOOP_MODEL, params: { max_tokens: 256 } },
     systemPrompt: "You are a careful delegate.", harnessVersion: "3.2.0", compositionDigest: "composition-digest", policyDigest: "policy-digest",
-    ...(maxStepsPerTurn === undefined ? {} : { config: { maxStepsPerTurn } }), ...extra
+    ...(maxStepsPerTurn === null ? {} : { config: { maxStepsPerTurn } }), ...extra
   });
 }
 
@@ -136,23 +136,26 @@ describe("a real child under a definition", () => {
         textStep("three steps were needed.")], 2),
       mintSessionId: () => "child-parent-ceiling" });
     expect(outcome.ok).toBe(false);
-    expect(!outcome.ok && outcome.reason).toMatch(/child turn did not complete/);
+    expect(!outcome.ok && outcome.reason).toMatch(/child turn did not complete \(max_steps\)/);
+    expect(rows(dir, "child-parent-ceiling").find(meta => meta["kind"] === "delegation/hook-control")!["stepCeiling"]).toBe(2);
     session.disposeWithoutClosing();
   });
 
   it("bounds the child by the loop default when the parent composed no ceiling, never by the definition's own value", async () => {
+    // The harness cannot run 64 live steps (its request cap is lower), so the composed ceiling is read from the child's own
+    // signed hook-control row, which records the bound the driver ran under.
     const dir = workspace();
     const applied = applyAgentDefinition({ runAs: "researcher", goal: "read the ledger" }, { ...reviewer, tools: undefined as never, maxSteps: 100 });
     if (!applied.ok) throw new Error(applied.reason);
     const session = parentSession(dir);
-    const steps = Array.from({ length: 70 }, (_, index) => toolStep(`t${index}`, "glob", JSON.stringify({ pattern: "*.md" })));
     const outcome = await spawnSubagent({ workspace: dir, parent: rootIdentity("payments-agent"), request: applied.request, session,
-      runner: runnerFor(dir, [...steps, textStep("seventy steps were needed.")], undefined),
-      mintSessionId: () => "child-default-ceiling" });
-    expect(outcome.ok).toBe(false);
-    expect(!outcome.ok && outcome.reason).toMatch(/child turn did not complete/);
+      runner: runnerFor(dir, [textStep("done.")], null), mintSessionId: () => "child-default-ceiling" });
+    expect(outcome.ok, outcome.ok ? "" : outcome.reason).toBe(true);
+    const control = rows(dir, "child-default-ceiling").find(meta => meta["kind"] === "delegation/hook-control")!;
+    expect(control["stepCeiling"]).toBe(64);
+    expect((control["agentDefinition"] as { maxSteps: number }).maxSteps).toBe(100);
     session.disposeWithoutClosing();
-  }, 60_000);
+  });
 
   it("is a leaf: a role without a tools list has no delegate tool, so its step ceiling bounds everything run under it", async () => {
     const dir = workspace();

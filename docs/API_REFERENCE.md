@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-11-07
+> Auto-generated from source on 2026-11-08
 
 ## Table of Contents
 
@@ -1911,6 +1911,7 @@ Run one agent turn and report what the signed log recorded
 | `--web-search-searxng <origin>` | - |
 | `--goal-rounds <n>` | - |
 | `--workflow-plan <file>` | - |
+| `--workflow-plan-sha256 <hex>` | - |
 | `--workflow-run-id <id>` | - |
 | `--lease-file <path>` | - |
 | `--approval-exception <file>` | - |
