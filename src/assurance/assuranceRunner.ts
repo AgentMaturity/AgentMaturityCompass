@@ -13,7 +13,8 @@ import { executeStationQuestionAspects, STATION_QUESTION_ASPECT_PACK } from "./e
 import { STATION_QUESTION_CONVERSIONS } from "./executed/registry.js";
 import { finalizeExecutedResults } from "./executed/finalize.js";
 import { randomUUID } from "node:crypto";
-import { executeAssurancePack, workspaceReceiptKeys } from "./assurancePackExecution.js";
+import { executeAssurancePack } from "./assurancePackExecution.js";
+import { gatewayReceiptAdmitter } from "./gatewayReceiptAdmission.js";
 import { readdirSync } from "node:fs";
 import { basename, join } from "node:path";
 import type { AssurancePackResult, AssuranceReport, AssuranceScenarioResult, RiskTier, TrustLabel, TrustTier } from "../types.js";
@@ -280,9 +281,9 @@ export async function runAssurance(input: RunAssuranceInput, options: RunHashPub
 
     const packResults: AssurancePackResult[] = [];
 
+    const admitReceipts = gatewayReceiptAdmitter(workspace);
     const executePack = (packId: string): Promise<AssurancePackResult> => executeAssurancePack({
-      packId, ledger, sessionId, agentId, runId, trustTier, context, getResponder, getExecutedScope, getCatalog,
-      receiptKeys: () => workspaceReceiptKeys(workspace),
+      packId, ledger, sessionId, agentId, runId, trustTier, context, getResponder, getExecutedScope, getCatalog, admitReceipts,
       executedAttempts: input.executedAttempts, now: new Date(now).toISOString(), mode: input.mode
     });
 

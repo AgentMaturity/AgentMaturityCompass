@@ -25,6 +25,7 @@ import { loadGatewayConfig } from "../gateway/config.js";
 import { issueLeaseToken } from "../leases/leaseSigner.js";
 import { checkScopedEgress, EgressBlocked } from "../residency/checkEgress.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
+import { sha256Hex } from "../utils/hash.js";
 
 /** How the agent under test was reached. */
 export type AgentResponderTransport = "gateway" | "direct";
@@ -80,6 +81,12 @@ export interface AgentResponse {
   receiptId?: string;
   /** The gateway's signed response receipt (`x-amc-receipt`), when present. */
   responseReceipt?: string;
+  /**
+   * What AMC itself put on and took off the wire, so a gateway receipt can be bound to this exchange (fix3 S12c):
+   * sha256 of the request body sent, the response body's digests as a gateway may sign them (the raw bytes, and a JSON
+   * body re-serialized as the gateway's redaction pass emits it), and when the exchange started and finished.
+   */
+  wire?: { requestSha256: string; responseSha256: string[]; sentTs: number; receivedTs: number };
   finishReason?: string;
   usage?: { promptTokens?: number; completionTokens?: number };
 }
@@ -363,13 +370,14 @@ class HttpAgentResponder implements AgentResponder {
   async respond(prompt: string, options?: AgentRespondOptions): Promise<AgentResponse> {
     const endpoint = this.target.endpoint;
     const started = Date.now();
+    const requestBody = JSON.stringify(this.body(prompt, options?.tools));
     let response: Response;
     try {
       response = await withTimeout(this.timeoutMs, (signal) => {
         const init: RequestInit = {
           method: "POST",
           headers: { "content-type": "application/json", ...this.headers },
-          body: JSON.stringify(this.body(prompt, options?.tools)),
+          body: requestBody,
           redirect: "manual",
           signal
         };
@@ -388,7 +396,9 @@ class HttpAgentResponder implements AgentResponder {
     }
 
     const latencyMs = Date.now() - started;
-    const text = await response.text();
+    const bytes = Buffer.from(await response.arrayBuffer());
+    const receivedTs = Date.now();
+    const text = new TextDecoder().decode(bytes);
 
     if (!response.ok) {
       throw new AgentResponderInvocationError(
@@ -422,8 +432,11 @@ class HttpAgentResponder implements AgentResponder {
       toolCalls,
       target: this.target,
       latencyMs,
-      receiptId: response.headers.get("x-amc-request-receipt") ?? undefined,
-      responseReceipt: response.headers.get("x-amc-receipt") ?? undefined,
+      // The gateway sends an empty receipt header once its session is sealed: that is no receipt, not a bad one.
+      receiptId: response.headers.get("x-amc-request-receipt") || undefined,
+      responseReceipt: response.headers.get("x-amc-receipt") || undefined,
+      wire: { requestSha256: sha256Hex(requestBody), responseSha256: [...new Set([sha256Hex(bytes), sha256Hex(JSON.stringify(parsed))])],
+        sentTs: started, receivedTs },
       finishReason: extractFinishReason(parsed),
       usage: extractUsage(parsed)
     };

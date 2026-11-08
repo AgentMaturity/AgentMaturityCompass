@@ -4,9 +4,8 @@ import { INDUSTRY_ASSURANCE_PACK_IDS } from "../domains/domainRegistry.js";
 import { executeRegulatedPack } from "./executed/packExecution.js";
 import type { AssurancePackResult, AssuranceScenarioResult, TrustTier } from "../types.js";
 import type { Ledger } from "../ledger/ledger.js";
-import { AgentResponderInvocationError, type AgentResponder } from "./agentResponder.js";
-import { getPurposeKeyHistory } from "../keys/signingKeys.js";
-import { verifyReceipt } from "../receipts/receipt.js";
+import { AgentResponderInvocationError, type AgentResponder, type AgentResponse } from "./agentResponder.js";
+import type { GatewayReceiptAdmission } from "./gatewayReceiptAdmission.js";
 import { writeAssuranceAudit, writePackScoreTestResult, writeScenarioPrompt, writeScenarioResponse, writeScenarioTestResult } from "./evidenceWriters.js";
 import { getAssurancePack } from "./packs/index.js";
 import { gradeScenarioReply, packGradingMethod } from "./scenarioGrading.js";
@@ -25,31 +24,10 @@ export interface PackExecutionInput {
   getResponder: () => Promise<AgentResponder>;
   getExecutedScope: () => ExecutedRunScope | null;
   getCatalog: () => LoadedCatalog;
-  /** This workspace's receipt public keys; a gateway receipt is stored only when one of them verifies it (fix3 S12). */
-  receiptKeys: () => string[];
+  /** The run's gateway receipt admission (`gatewayReceiptAdmitter`): only a receipt bound to its exchange is stored (fix3 S12, S12c). */
+  admitReceipts: (answer: AgentResponse, agentId: string) => GatewayReceiptAdmission;
   executedAttempts?: 1 | 25;
   now: string;
-}
-
-/** The workspace's receipt public keys for admitting gateway receipts; none when the key set is unreadable (then no receipt is admitted). */
-export function workspaceReceiptKeys(workspace: string): string[] {
-  try { return getPurposeKeyHistory(workspace, "receipt"); } catch { return []; }
-}
-
-export type GatewayReceiptAdmission = { admitted: { receipt: string; receiptId: string } | null; rejected: string | null };
-
-/**
- * A gateway receipt is admitted onto the stdout row only when it verifies against this workspace's receipt keys and
- * names the agent under test. An invalid one is never stored and never refused as provenance later: it is recorded as
- * a rejection (`ASSURANCE_RECEIPT_REJECTED`) and the graded result still counts, so the system under test cannot
- * suppress its own report by answering with a bad receipt (fix3 S12).
- */
-export function admitGatewayReceipt(receipt: string | undefined, keys: readonly string[], agentId: string): GatewayReceiptAdmission {
-  if (receipt === undefined) return { admitted: null, rejected: null };
-  const verified = verifyReceipt(receipt, [...keys]);
-  if (!verified.ok || verified.payload === null) return { admitted: null, rejected: `gateway request receipt does not verify (${verified.error ?? "no payload"})` };
-  if (verified.payload.agentId !== agentId) return { admitted: null, rejected: "gateway request receipt names another agent" };
-  return { admitted: { receipt, receiptId: verified.payload.receipt_id }, rejected: null };
 }
 
 /** Executes one pack; the run owns session lifetime and aggregates its unscored rows. */
@@ -91,18 +69,18 @@ export async function executeAssurancePack(input: PackExecutionInput): Promise<A
       continue;
     }
     const toolCalls = answer.toolCalls.length > 0 ? { toolCalls: answer.toolCalls } : {};
-    // The gateway's verified request receipt is the exchange's own provenance; its id fills the field that was always
-    // empty (SH-TRUST-02). An unverifiable receipt is audited and dropped; the row is graded all the same (S12).
-    const receipt = admitGatewayReceipt(answer.receiptId, input.receiptKeys(), agentId);
-    if (receipt.rejected !== null) {
+    // A gateway receipt bound to this exchange is its own provenance; its id fills the field that was always empty
+    // (SH-TRUST-02). A forged or replayed one is audited and dropped; the row is graded all the same (S12, S12c).
+    const receipt = input.admitReceipts(answer, agentId);
+    if (receipt.rejected.length > 0) {
       writeAssuranceAudit({ ledger, sessionId, runtime, trustTier, agentId, packId: pack.id, scenarioId: scenario.id,
-        auditType: "ASSURANCE_RECEIPT_REJECTED", severity: "HIGH", message: `Gateway receipt rejected: ${receipt.rejected}` });
+        auditType: "ASSURANCE_RECEIPT_REJECTED", severity: "HIGH", message: `Gateway receipt rejected: ${receipt.rejected.join(" | ")}` });
     }
-    if (receipt.admitted !== null) row.correlatedRequestIds = [receipt.admitted.receiptId];
+    if (receipt.request !== null) row.correlatedRequestIds = [receipt.request.receiptId];
     const responseEventId = writeScenarioResponse({ ledger, sessionId, runtime, trustTier, packId: pack.id, scenarioId: scenario.id,
       response: answer.text, toolCalls: answer.toolCalls, agentId,
-      ...(receipt.admitted === null ? {} : { requestReceipt: receipt.admitted.receipt }),
-      ...(receipt.admitted === null || answer.responseReceipt === undefined ? {} : { responseReceipt: answer.responseReceipt }) });
+      ...(receipt.request === null ? {} : { requestReceipt: receipt.request.receipt }),
+      ...(receipt.response === null ? {} : { responseReceipt: receipt.response }) });
 
     // Refused, tool-call-only and token-claim replies are inconclusive (scenarioGrading.ts).
     const grade = gradeScenarioReply(scenario, answer, prompt, context);

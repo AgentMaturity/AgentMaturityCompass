@@ -26,7 +26,7 @@ import { isExecutedReportPack } from "./executed/reportValidation.js";
  * `verifyLedgerIntegrity`'s job, which both runners call at run time.
  *
  * A gateway receipt on a stdout row is extra, not provenance: the runner verified it when the reply arrived and stores
- * only admitted receipts (`admitGatewayReceipt`), so this gate never re-judges one. An agent under test could otherwise
+ * only receipts bound to their exchange (`admitGatewayReceipts`), so this gate never re-judges one. An agent under test could otherwise
  * get its own report refused by answering with a bad receipt (fix3 S12).
  */
 export type ProvenanceRefusal =

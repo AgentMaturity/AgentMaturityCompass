@@ -24,8 +24,13 @@ export interface StartFakeAgentOptions {
   failWithStatus?: number;
   /** When set, the agent answers with these tool calls and no text (`content: null`). */
   toolCalls?: (prompt: string) => Array<{ name: string; arguments: Record<string, unknown> }>;
-  /** Extra response headers, e.g. a forged `x-amc-request-receipt` the agent under test might send (fix3 S12). */
-  headers?: Record<string, string>;
+  /**
+   * Extra response headers, e.g. a forged `x-amc-request-receipt` the agent under test might send (fix3 S12), or a
+   * function of the exact request and response bodies, e.g. a gateway receipt bound to this exchange (fix3 S12c).
+   */
+  headers?: Record<string, string> | ((exchange: { requestBody: string; responseBody: string }) => Record<string, string>);
+  /** Pretty-print the JSON reply, as many providers do, so it differs from its re-serialized form. */
+  pretty?: boolean;
 }
 
 /**
@@ -60,8 +65,9 @@ export async function startFakeAgentServer(options: StartFakeAgentOptions = {}):
       }
 
       let prompt = "";
+      const requestBody = Buffer.concat(chunks).toString("utf8");
       try {
-        const body = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}") as {
+        const body = JSON.parse(requestBody || "{}") as {
           messages?: Array<{ content?: unknown }>;
         };
         const content = body.messages?.[0]?.content;
@@ -82,17 +88,17 @@ export async function startFakeAgentServer(options: StartFakeAgentOptions = {}):
             }))
           }
         : { role: "assistant", content: reply(prompt) };
+      const responseBody = JSON.stringify({
+        id: "fake-completion",
+        model: "fake-model",
+        choices: [{ index: 0, message, finish_reason: options.toolCalls ? "tool_calls" : "stop" }],
+        usage: { prompt_tokens: 10, completion_tokens: 20 }
+      }, null, options.pretty ? 2 : undefined);
       res.statusCode = 200;
       res.setHeader("content-type", "application/json");
-      for (const [name, value] of Object.entries(options.headers ?? {})) res.setHeader(name, value);
-      res.end(
-        JSON.stringify({
-          id: "fake-completion",
-          model: "fake-model",
-          choices: [{ index: 0, message, finish_reason: options.toolCalls ? "tool_calls" : "stop" }],
-          usage: { prompt_tokens: 10, completion_tokens: 20 }
-        })
-      );
+      const headers = typeof options.headers === "function" ? options.headers({ requestBody, responseBody }) : options.headers ?? {};
+      for (const [name, value] of Object.entries(headers)) res.setHeader(name, value);
+      res.end(responseBody);
     });
   });
 

@@ -21,7 +21,7 @@ import { UNSIGNED_EVIDENCE_STORE } from "../ledger/ledgerConnection.js";
 import { captureRunHashAuthority } from "../ledger/runHashSignature.js";
 import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { sealAbortedAssuranceSession, sealAbortedSessionOnSignal, startAssuranceSession, writeAssuranceAudit, writeScenarioPrompt, writeScenarioResponse, writeScenarioTestResult } from "../assurance/evidenceWriters.js";
-import { admitGatewayReceipt, workspaceReceiptKeys } from "../assurance/assurancePackExecution.js";
+import { gatewayReceiptAdmitter } from "../assurance/gatewayReceiptAdmission.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -477,7 +477,7 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
   const assertOriginal = captureRunHashAuthority(workspace, noSign);
   const ledger = recordRows ? openLedger(workspace, unsignedStore ? { store: "unsigned" } : {}) : null;
   const trustTier = "OBSERVED" as const;
-  const receiptKeys = workspaceReceiptKeys(workspace);
+  const admitReceipts = gatewayReceiptAdmitter(workspace);
 
   // Resolve plugins (packs)
   const packs: AssurancePackDefinition[] =
@@ -545,13 +545,13 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
         }
         const response = answer.text;
         const toolCalls = answer.toolCalls.length > 0 ? { toolCalls: answer.toolCalls } : {};
-        // The gateway's receipt is verified as the reply arrives; the agent under test can send any header it likes, so a
-        // receipt that does not verify is audited and dropped, never stored and never a reason to refuse the run (fix3 S12).
-        const receipt = admitGatewayReceipt(answer.receiptId, receiptKeys, agentId);
-        if (rows !== null && receipt.rejected !== null) writeAssuranceAudit({ ...rows, ...scenarioRow, auditType: "ASSURANCE_RECEIPT_REJECTED", severity: "HIGH", message: `Gateway receipt rejected: ${receipt.rejected}` });
-        const correlatedRequestIds = receipt.admitted === null ? [] : [receipt.admitted.receiptId];
+        // Gateway receipts are admitted as the reply arrives, only when bound to this exchange; the agent under test can send
+        // any header it likes, so a forged or replayed one is audited and dropped, never a reason to refuse the run (S12, S12c).
+        const receipt = admitReceipts(answer, agentId);
+        if (rows !== null && receipt.rejected.length > 0) writeAssuranceAudit({ ...rows, ...scenarioRow, auditType: "ASSURANCE_RECEIPT_REJECTED", severity: "HIGH", message: `Gateway receipt rejected: ${receipt.rejected.join(" | ")}` });
+        const correlatedRequestIds = receipt.request === null ? [] : [receipt.request.receiptId];
         const responseEventId = rows === null ? null : writeScenarioResponse({ ...rows, ...scenarioRow, response, toolCalls: answer.toolCalls,
-          ...(receipt.admitted === null ? {} : { requestReceipt: receipt.admitted.receipt, ...(answer.responseReceipt === undefined ? {} : { responseReceipt: answer.responseReceipt }) }) });
+          ...(receipt.request === null ? {} : { requestReceipt: receipt.request.receipt }), ...(receipt.response === null ? {} : { responseReceipt: receipt.response }) });
         const exchangeIds = promptEventId === null || responseEventId === null ? [] : [promptEventId, responseEventId];
         const grade = gradeScenarioReply(scenario, answer, attackPrompt, context);
         if (grade.kind === "inconclusive") {
