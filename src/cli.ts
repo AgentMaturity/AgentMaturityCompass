@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import "./storage/nativeGuard.js";
 import { withWorkspaceScope } from "./enforce/evidenceEmitter.js";
-import { randomBytes, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { spawn } from "node:child_process";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { stdin } from "node:process";
@@ -293,6 +293,7 @@ import { initVaultInteractive, lockVaultNow, promptPassphrase, unlockVaultIntera
 import { forgetVaultPassphrase, unlockWithRememberedPassphrase } from "./vault/passphraseStore.js";
 import { confirmRememberedUnlock } from "./vault/operatorContext.js";
 import { ensureInstantVaultMode, type InstantVaultMode } from "./cli/instantVaultMode.js";
+import { generatedPassphraseForInit, rememberInitPassphrase, skipVaultPassphrase } from "./cli/initPassphrase.js";
 import { ensureUpVaultPassphrase, printConsoleSignInStep, runFirstBaselineIfNeeded } from "./studio/oneCommandUp.js";
 import { agentRunFiles, latestRunSummary } from "./diagnostic/runReportResolution.js";
 import { buildConnectInstructions } from "./studio/connectWizard.js";
@@ -2122,7 +2123,7 @@ async function initializeMinimalStartupWorkspace(opts: {
   // command can unlock, so it is shown once, below, with the export to run.
   let generatedPassphrase: string | null = null;
   if (!process.env.AMC_VAULT_PASSPHRASE) {
-    generatedPassphrase = `amc-local-${randomBytes(18).toString("base64url")}`;
+    generatedPassphrase = generatedPassphraseForInit();
     process.env.AMC_VAULT_PASSPHRASE = generatedPassphrase;
   }
 
@@ -2150,6 +2151,7 @@ async function initializeMinimalStartupWorkspace(opts: {
   console.log(fmt.info(`Profile: ${opts.profile}`));
   if (generatedPassphrase !== null) {
     console.log(fmt.warn("No AMC_VAULT_PASSPHRASE was set, so one was generated for this vault. Save it; signing commands need it in the shell:"));
+    if (process.env.GITHUB_ACTIONS) console.log(`::add-mask::${generatedPassphrase}`); // LIVE-VAULT-04: GitHub masks it in the job log
     console.log(`    export AMC_VAULT_PASSPHRASE='${generatedPassphrase}'`);
   }
   printFirstRunActions(fmt);
@@ -2170,7 +2172,7 @@ program
   .option("--trust-boundary <mode>", "isolated|shared")
   .option("--profile <name>", "workspace config profile: dev|ci|prod", "dev")
   .option("--force", "Force re-initialization, overwrite existing .amc directory", false)
-  .option("--skip-vault", "Skip vault setup (useful for CI/headless init)", false)
+  .option("--skip-vault", "Skip the vault prompt: a random passphrase is generated and remembered for your user (CI/headless init)", false)
   .option("--minimal", "Startup-friendly setup without vault prompt or immediate full score", false)
   .option("--coding", "Starter profile: signed coding tools, a contained shell without network, firewall warn (P1-40)")
   .option("--regulated", "Starter profile: deny-by-default egress, firewall block, approvals on, a signed Layer 0 plan (P1-40)")
@@ -2181,6 +2183,8 @@ program
       const starter = starterProfileFlag(opts);
       if (starter) { await runStarterInit(process.cwd(), starter, opts.force, opts.webAllowHost); return; }
     } catch (error) { console.error(chalk.red(toErrorMessage(error))); process.exit(1); }
+    const skip = opts.skipVault && !opts.minimal ? skipVaultPassphrase() : { generated: null }; // LIVE-VAULT-04: refused before any write
+    if ("refused" in skip) { console.error(chalk.red(skip.refused)); process.exit(1); }
     // Force mode: delete existing .amc directory before re-init
     if (opts.force) {
       const { rmSync, existsSync } = await import("fs");
@@ -2199,12 +2203,6 @@ program
       return;
     }
     // Ensure vault passphrase is available before init (it creates crypto keys)
-    if (opts.skipVault) {
-      // Skip vault entirely — workspace will work without signing
-      if (!process.env.AMC_VAULT_PASSPHRASE) {
-        process.env.AMC_VAULT_PASSPHRASE = "skip-vault-" + Date.now();
-      }
-    }
     if (!process.env.AMC_VAULT_PASSPHRASE) {
       if (process.stdin.isTTY) {
         const crypto = await import("node:crypto");
@@ -2253,6 +2251,7 @@ program
     console.log(fmt.logo());
     console.log(fmt.pass("Workspace initialized"));
     console.log(fmt.info(`Location: ${init.workspacePath}`));
+    if (skip.generated) console.log(fmt.info(rememberInitPassphrase(init.workspacePath, skip.generated)));
     printFirstRunActions(fmt, [
       { cmd: "amc", desc: "Generate the full evidence score immediately" },
       { cmd: "amc up", desc: "Start Studio (web dashboard)" },
