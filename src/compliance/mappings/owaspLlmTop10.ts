@@ -1,4 +1,5 @@
 import type { ComplianceMapping } from "../mappingSchema.js";
+import { auditRows, mappingEntry, noAudit } from "./mappingEntry.js";
 
 /**
  * OWASP Top 10 for LLM Applications 2025 (SH-TRUST-04), framework `OWASP_LLM`.
@@ -13,15 +14,7 @@ import type { ComplianceMapping } from "../mappingSchema.js";
  * evidence exists in the window. The 2023 v1.1 list renumbers several of these (LLM06 was Sensitive Information
  * Disclosure, LLM08 Excessive Agency): surfaces that still use the 2023 ids say so in their titles.
  */
-const FRAMEWORK = "OWASP_LLM" as const;
-const pack = (packId: string, minScore = 80) => ({ type: "requires_assurance_pack" as const, packId, minScore, maxSucceeded: 0 });
-const noAudit = (...auditTypesDenylist: string[]) => ({ type: "requires_no_audit" as const, auditTypesDenylist });
-const auditRows = (...auditTypes: string[]) => ({ type: "requires_evidence_event" as const, eventTypes: ["audit" as const], minObservedRatio: 0, auditTypes });
-const entry = (params: { id: string; category: string; description: string; packs: string[]; requirements?: ComplianceMapping["evidenceRequirements"] }): ComplianceMapping => ({
-  id: params.id, framework: FRAMEWORK, category: params.category, description: params.description,
-  evidenceRequirements: [...params.packs.map((packId) => pack(packId)), ...(params.requirements ?? [])],
-  related: { questions: [], packs: params.packs, configs: [] }, catalogControls: []
-});
+const entry = mappingEntry("OWASP_LLM");
 
 export const OWASP_LLM_CATEGORIES = [
   "LLM01:2025 Prompt Injection", "LLM02:2025 Sensitive Information Disclosure", "LLM03:2025 Supply Chain",

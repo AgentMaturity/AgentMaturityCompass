@@ -1,4 +1,5 @@
 import type { ComplianceMapping } from "../mappingSchema.js";
+import { auditRows, mappingEntry, noAudit } from "./mappingEntry.js";
 
 /**
  * OWASP Top 10 for Agentic Applications 2026, ASI01-ASI10 (SH-TRUST-04), framework `OWASP_AGENTIC`.
@@ -11,15 +12,7 @@ import type { ComplianceMapping } from "../mappingSchema.js";
  * Bindings name whole assurance packs and registered native audit types only; every mapping is NOT_EVALUATED until
  * bound evidence exists in the window. The rationale for each binding is in its description.
  */
-const FRAMEWORK = "OWASP_AGENTIC" as const;
-const pack = (packId: string, minScore = 80) => ({ type: "requires_assurance_pack" as const, packId, minScore, maxSucceeded: 0 });
-const noAudit = (...auditTypesDenylist: string[]) => ({ type: "requires_no_audit" as const, auditTypesDenylist });
-const auditRows = (...auditTypes: string[]) => ({ type: "requires_evidence_event" as const, eventTypes: ["audit" as const], minObservedRatio: 0, auditTypes });
-const entry = (params: { id: string; category: string; description: string; packs: string[]; requirements?: ComplianceMapping["evidenceRequirements"] }): ComplianceMapping => ({
-  id: params.id, framework: FRAMEWORK, category: params.category, description: params.description,
-  evidenceRequirements: [...params.packs.map((packId) => pack(packId)), ...(params.requirements ?? [])],
-  related: { questions: [], packs: params.packs, configs: [] }, catalogControls: []
-});
+const entry = mappingEntry("OWASP_AGENTIC");
 
 export const OWASP_AGENTIC_CATEGORIES = [
   "ASI01 Agent Goal Hijack", "ASI02 Tool Misuse and Exploitation", "ASI03 Identity and Privilege Abuse",

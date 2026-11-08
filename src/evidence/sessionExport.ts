@@ -21,7 +21,7 @@ import { canonicalize } from "../utils/json.js";
  * session's slice and is not claimed; that remains `amc session verify` on the workspace, or `session proof` for an
  * anchored session.
  */
-export const SESSION_EXPORT_KIND = "amc.session-export";
+const SESSION_EXPORT_KIND = "amc.session-export";
 
 const rowSchema = z.object({
   id: z.string().min(1), ts: z.number().int(), session_id: z.string().min(1), runtime: z.string(), event_type: z.string().min(1),
@@ -30,7 +30,7 @@ const rowSchema = z.object({
   canonical_payload_path: z.string().nullable().optional(), canonical_payload_inline: z.string().nullable().optional()
 }).passthrough();
 
-export const sessionExportSchema = z.strictObject({
+const sessionExportSchema = z.strictObject({
   v: z.literal(1),
   kind: z.literal(SESSION_EXPORT_KIND),
   sessionId: z.string().min(1),

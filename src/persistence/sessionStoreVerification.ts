@@ -158,6 +158,30 @@ function verifyPayload(event: EvidenceEvent, workspace: string, errors: string[]
   }
 }
 
+/**
+ * One row's own integrity: its hash pre-image and its writer signature. Shared by this verifier, the session anchor's
+ * per-session checks (`src/transparency/sessionRootDescriptor.ts`) and the assurance/red-team provenance gate
+ * (`src/assurance/reportProvenance.ts`), so the three cannot drift apart.
+ */
+export function verifyRowIntegrity(monitorKeys: readonly string[], event: EvidenceEvent, errors: string[]): void {
+  const canonicalMetadata = canonicalMetadataForHash({
+    id: event.id,
+    ts: event.ts,
+    sessionId: event.session_id,
+    runtime: event.runtime,
+    eventType: event.event_type,
+    payloadPath: event.canonical_payload_path ?? event.payload_path,
+    payloadInline: event.canonical_payload_inline ?? event.payload_inline,
+    metaJson: event.meta_json
+  });
+  if (sha256Hex(`${event.prev_event_hash}${canonicalMetadata}${event.payload_sha256}`) !== event.event_hash) {
+    errors.push(`Event ${event.id} event_hash mismatch`);
+  }
+  if (!verifyHexDigestAny(event.event_hash, event.writer_sig, [...monitorKeys])) {
+    errors.push(`Event ${event.id} writer signature invalid`);
+  }
+}
+
 function verifyGlobalChainAndSignatures(
   rows: readonly EvidenceEvent[],
   workspace: string,
@@ -179,23 +203,7 @@ function verifyGlobalChainAndSignatures(
       errors.push(`Event ${event.id} previous hash mismatch`);
     }
 
-    const canonicalMetadata = canonicalMetadataForHash({
-      id: event.id,
-      ts: event.ts,
-      sessionId: event.session_id,
-      runtime: event.runtime,
-      eventType: event.event_type,
-      payloadPath: event.canonical_payload_path ?? event.payload_path,
-      payloadInline: event.canonical_payload_inline ?? event.payload_inline,
-      metaJson: event.meta_json
-    });
-    if (sha256Hex(`${event.prev_event_hash}${canonicalMetadata}${event.payload_sha256}`) !== event.event_hash) {
-      errors.push(`Event ${event.id} event_hash mismatch`);
-    }
-
-    if (!verifyHexDigestAny(event.event_hash, event.writer_sig, monitorKeys)) {
-      errors.push(`Event ${event.id} writer signature invalid`);
-    }
+    verifyRowIntegrity(monitorKeys, event, errors);
 
     previous = event.event_hash;
   }

@@ -19,16 +19,15 @@
  * identical so a divergence between the two shows up as different wording rather
  * than as a quietly missing rule.
  */
+import { eventMeta } from "../claims/evidenceProvenance.js";
 import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
-import { canonicalMetadataForHash } from "../ledger/eventHash.js";
 import { openSessionEventStore, resolveSessionStoreBackend } from "../persistence/openSessionEventStore.js";
 import { extractEnvelope, SESSION_GENESIS } from "../session/sessionTypes.js";
 import { merkleRoot } from "../session/sessionMerkle.js";
 import type { EvidenceEvent, SessionRecord } from "../types.js";
-import { sha256Hex } from "../utils/hash.js";
 import { sessionRootDescriptorSchema, type SessionRootDescriptor } from "./sessionAnchorSchema.js";
 import { operationalEvidenceProblems } from "../keys/operationalLedgerReader.js";
-import { verifyMonitorTrustRoot } from "../persistence/sessionStoreVerification.js";
+import { verifyMonitorTrustRoot, verifyRowIntegrity } from "../persistence/sessionStoreVerification.js";
 import type { TrustContext } from "../trust/trustContext.js";
 
 /**
@@ -64,40 +63,6 @@ export interface SessionRootDescriptorOptions {
    * would be a way around ADR-0007 with a transparency entry attached.
    */
   readonly expectedMonitorFingerprint?: string;
-}
-
-/** Parsed `meta_json` of a session event, or an empty object when unreadable. */
-function readMeta(event: EvidenceEvent): Record<string, unknown> {
-  try {
-    const parsed: unknown = JSON.parse(event.meta_json);
-    return typeof parsed === "object" && parsed !== null ? (parsed as Record<string, unknown>) : {};
-  } catch {
-    return {};
-  }
-}
-
-/**
- * One row's own integrity: its hash pre-image and its writer signature. Shared by the session anchor and by the
- * assurance/red-team provenance gate (`src/assurance/reportProvenance.ts`), which verifies a runner session's rows
- * without rehashing the whole ledger.
- */
-export function verifyRowIntegrity(monitorKeys: readonly string[], event: EvidenceEvent, errors: string[]): void {
-  const canonicalMetadata = canonicalMetadataForHash({
-    id: event.id,
-    ts: event.ts,
-    sessionId: event.session_id,
-    runtime: event.runtime,
-    eventType: event.event_type,
-    payloadPath: event.canonical_payload_path ?? event.payload_path,
-    payloadInline: event.canonical_payload_inline ?? event.payload_inline,
-    metaJson: event.meta_json
-  });
-  if (sha256Hex(`${event.prev_event_hash}${canonicalMetadata}${event.payload_sha256}`) !== event.event_hash) {
-    errors.push(`Event ${event.id} event_hash mismatch`);
-  }
-  if (!verifyHexDigestAny(event.event_hash, event.writer_sig, [...monitorKeys])) {
-    errors.push(`Event ${event.id} writer signature invalid`);
-  }
 }
 
 /**
@@ -182,7 +147,7 @@ function verifyCloseClaims(
   recomputed: { turnCount: number; sealCount: number; sessionMerkleRoot: string },
   errors: string[]
 ): void {
-  const meta = readMeta(closeEvent);
+  const meta = eventMeta(closeEvent);
   if (typeof meta.sessionMerkleRoot === "string" && meta.sessionMerkleRoot !== recomputed.sessionMerkleRoot) {
     errors.push(
       `session/close claims merkle root ${meta.sessionMerkleRoot} but the sealed turns hash to ${recomputed.sessionMerkleRoot}`
@@ -198,7 +163,7 @@ function verifyCloseClaims(
 
 /** The agent id a session was opened for, taken from the `session/open` meta. */
 function agentIdFromOpen(openEvent: EvidenceEvent): string {
-  const meta = readMeta(openEvent);
+  const meta = eventMeta(openEvent);
   return typeof meta.agentId === "string" && meta.agentId.length > 0 ? meta.agentId : "unknown";
 }
 

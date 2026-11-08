@@ -1,7 +1,8 @@
 import { eventMeta } from "../claims/evidenceProvenance.js";
 import { createOperationalEvidenceVerifier, legacyLedgerRowKeys } from "../keys/operationalLedgerReader.js";
 import { openLedger, type Ledger } from "../ledger/ledger.js";
-import { verifyRowIntegrity, verifySeal } from "../transparency/sessionRootDescriptor.js";
+import { verifyRowIntegrity } from "../persistence/sessionStoreVerification.js";
+import { verifySeal } from "../transparency/sessionRootDescriptor.js";
 import type { TrustContext } from "../trust/trustContext.js";
 import type { AssuranceScenarioResult, EvidenceEvent } from "../types.js";
 import { isExecutedReportPack } from "./executed/reportValidation.js";
@@ -43,7 +44,7 @@ export interface ProvenanceKind {
   binaryPath: "amc-assurance-runner" | "amc-redteam-runner";
   source: "assurance" | "redteam";
 }
-export const ASSURANCE_PROVENANCE: ProvenanceKind = { binaryPath: "amc-assurance-runner", source: "assurance" };
+const ASSURANCE_PROVENANCE: ProvenanceKind = { binaryPath: "amc-assurance-runner", source: "assurance" };
 export const REDTEAM_PROVENANCE: ProvenanceKind = { binaryPath: "amc-redteam-runner", source: "redteam" };
 
 /** The shape both assurance reports and red-team reports share for this check. */

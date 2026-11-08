@@ -61,14 +61,10 @@ export function loadAssuranceSummary(
     return summary;
   }
 
-  const files = readdirSync(dir)
-    .filter((file) => file.endsWith(".json"))
-    .map((file) => join(dir, file))
-    .sort((a, b) => a.localeCompare(b));
   // A seal proves who wrote the report; provenance proves its graded rows exist in that writer's sealed session (SH-TRUST-02).
   const provenance = new ProvenanceChecker(workspace);
   try {
-  for (const file of files) {
+  for (const file of readdirSync(dir).filter((name) => name.endsWith(".json")).sort((a, b) => a.localeCompare(b)).map((name) => join(dir, name))) {
     let parsed: ParsedReport;
     try {
       parsed = JSON.parse(readUtf8(file)) as ParsedReport;

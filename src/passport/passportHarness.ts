@@ -45,7 +45,7 @@ export const passportHarnessSchema = z.strictObject({
 export type PassportHarness = z.infer<typeof passportHarnessSchema>;
 export type PassportHarnessSignature = z.infer<typeof passportSignatureSchema>;
 
-export const passportDigest = (passport: PassportJson): string => sha256Hex(Buffer.from(canonicalize(passport), "utf8"));
+const passportDigest = (passport: PassportJson): string => sha256Hex(Buffer.from(canonicalize(passport), "utf8"));
 
 function nativeSessions(workspace: string, unknown: string[]): PassportHarness["nativeSessions"] {
   try {

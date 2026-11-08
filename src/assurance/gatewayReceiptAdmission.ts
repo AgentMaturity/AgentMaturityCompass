@@ -17,7 +17,7 @@ import type { AgentResponse } from "./agentResponder.js";
 export const RECEIPT_CLOCK_SKEW_MS = 5_000;
 
 /** This workspace's receipt public keys; none when the key set is unreadable, and then no receipt is admitted. */
-export function workspaceReceiptKeys(workspace: string): string[] {
+function workspaceReceiptKeys(workspace: string): string[] {
   try { return getPurposeKeyHistory(workspace, "receipt"); } catch { return []; }
 }
 
