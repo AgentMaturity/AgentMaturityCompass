@@ -5,7 +5,8 @@ import { Readable } from "node:stream";
 import { Command } from "commander";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { registerAgentCommands, type AgentLoopCliIo } from "../src/cli-agent-commands.js";
-import { MAX_STDIN_PROMPT_BYTES, RUN_EXIT_CODES, createRunEventSink, readProcessStdin, runExitCode } from "../src/cli/agentLoopOutputOptions.js";
+import { defaultAgentLoopIo } from "../src/cli-agent-options.js";
+import { MAX_STDIN_PROMPT_BYTES, RUN_EXIT_CODES, createRunEventSink, notificationEvent, readProcessStdin, runExitCode } from "../src/cli/agentLoopOutputOptions.js";
 import { deriveExecutionStatus, INTEGRITY_FAILED } from "../src/execution/executionContract.js";
 import type { AgentRunSummary } from "../src/agent/runReport.js";
 import { readNativeSessionEvents } from "../src/session/readNativeSessionEvents.js";
@@ -153,6 +154,56 @@ describe("amc agent-loop run — headless", () => {
     await run(failed.program, ["hi", "--fail-first", "9", "--output-format", "json"]);
     expect(failed.captured.failures).toEqual([1]);
     expect(failed.captured.exits).toEqual([]);
+  });
+
+  it("stream-json error events carry the fixed failure guidance, never the provider's own error text (S9)", async () => {
+    const { program, captured } = programWith(null);
+    await run(program, ["hi", "--fail-first", "9", "--output-format", "stream-json"]);
+    expect(captured.failures).toEqual([1]);
+    expect(captured.out.join("\n")).not.toContain("injected rate limit"); // The stub's injected provider message.
+    const errors = events(captured).filter(line => line.type === "error" && typeof line.turn === "number");
+    expect(errors.length).toBeGreaterThan(0);
+    for (const event of errors) {
+      expect(Object.keys(event).sort()).toEqual(["code", "httpStatus", "nextAction", "sessionId", "step", "summary", "turn", "type"]);
+      expect(typeof event.code).toBe("string");
+    }
+    expect(events(captured).find(line => line.type === "turn_end")).toMatchObject({ ending: { reason: "error", cancelCause: null } });
+    expect(events(captured).at(-1)).toMatchObject({ type: "result", exitCode: 1 });
+  });
+});
+
+describe("notificationEvent — named fields only (S9)", () => {
+  it("projects an error notification to the public guidance and drops the exception", () => {
+    const error = Object.assign(new Error("Bearer sk-live-SECRET123 was rejected"), { code: "AUTH", failure: { code: "AUTH", status: 401 } });
+    const event = notificationEvent({ kind: "error", turn: 2, step: 3, error });
+    expect(event).toMatchObject({ type: "error", turn: 2, step: 3, code: "AUTH", httpStatus: 401 });
+    expect(Object.keys(event).sort()).toEqual(["code", "httpStatus", "nextAction", "step", "summary", "turn", "type"]);
+    expect(JSON.stringify(event)).not.toContain("SECRET123");
+    expect(notificationEvent({ kind: "error", turn: 1, step: 1, error: new Error("x-api-key: SECRET456") })).toMatchObject({ code: "UNKNOWN", httpStatus: null });
+    expect(JSON.stringify(notificationEvent({ kind: "error", turn: 1, step: 1, error: new Error("x-api-key: SECRET456") }))).not.toContain("SECRET456");
+    expect(notificationEvent({ kind: "retry", turn: 1, step: 2, attempt: 3, decision: "give-up", delayMs: null }))
+      .toEqual({ type: "retry", turn: 1, step: 2, attempt: 3, decision: "give-up", delayMs: null });
+    expect(notificationEvent({ kind: "turn-end", turn: 1, ending: { reason: "error", error } })).toEqual({ type: "turn_end", turn: 1, ending: { reason: "error", cancelCause: null } });
+    expect(notificationEvent({ kind: "turn-end", turn: 2, ending: { reason: "cancelled", cause: { kind: "user" } as never } })).toEqual({ type: "turn_end", turn: 2, ending: { reason: "cancelled", cancelCause: "user" } });
+  });
+});
+
+describe("defaultAgentLoopIo.exit — never downgrades a recorded code (S10)", () => {
+  it("keeps a failure over a later table code and the first table code over a second", () => {
+    const original = process.exitCode;
+    try {
+      process.exitCode = undefined;
+      defaultAgentLoopIo.fail(); defaultAgentLoopIo.exit!(RUN_EXIT_CODES.bounded);
+      expect(process.exitCode).toBe(1);
+      process.exitCode = undefined;
+      defaultAgentLoopIo.exit!(RUN_EXIT_CODES.cancelled); defaultAgentLoopIo.exit!(RUN_EXIT_CODES.sideEffectsUnsettled);
+      expect(process.exitCode).toBe(RUN_EXIT_CODES.cancelled);
+      process.exitCode = undefined;
+      defaultAgentLoopIo.exit!(0);
+      expect(process.exitCode).toBeUndefined();
+      defaultAgentLoopIo.exit!(RUN_EXIT_CODES.blocked); defaultAgentLoopIo.fail();
+      expect(process.exitCode).toBe(1); // A failure after a table code still wins.
+    } finally { process.exitCode = original; }
   });
 });
 

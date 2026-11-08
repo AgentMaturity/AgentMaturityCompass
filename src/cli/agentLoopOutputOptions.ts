@@ -4,6 +4,7 @@ import type { LoopNotification } from "../agent/loopTypes.js";
 import type { AgentRunSummary } from "../agent/runReport.js";
 import type { LiveTextPreviewEvent } from "../llm/adapter/liveTextPreview.js";
 import { COMMITTED_CURSOR_START, chargeUpdateBudget, projectCommittedTail, type CommittedCursor } from "../acp/acpCommittedStream.js";
+import { liveNativeFailureGuidance } from "../agent/nativeFailureGuidance.js";
 import { INTEGRITY_FAILED, type ExecutionStatus } from "../execution/executionContract.js";
 import type { AgentLoopCliIo } from "../cli-agent-options.js";
 import type { ComposedTurnHandle } from "../kernel/agentLoopRunner.js";
@@ -140,8 +141,37 @@ export async function runWithOutput(io: AgentLoopCliIo, workspace: string, opts:
   if (format !== "stream-json") { await body(io, { format, sink: null }); return; }
   const sink = createRunEventSink(io, workspace);
   try { await body(streamJsonIo(io, sink), { format, sink }); }
-  catch (error) { sink.error(error instanceof Error ? error.message : String(error), RUN_EXIT_CODES.failed); throw error; }
+  // The exception's own text stays on the stderr path (the CLI prints it there); stdout gets a fixed line (S9).
+  catch (error) { sink.error("the run ended with an unhandled error; see stderr", RUN_EXIT_CODES.failed); throw error; }
   finally { sink.error("the run ended without a result", RUN_EXIT_CODES.failed); sink.dispose(); }
+}
+
+/**
+ * A live notification as a stream event, its fields named per kind (S9): nothing a notification carries reaches
+ * stdout unnamed, and the `error` kind projects only the fixed public guidance the text path prints
+ * (`liveNativeFailureGuidance`), never the provider's or exception's own text, which can hold request details or
+ * credentials.
+ */
+export function notificationEvent(notification: LoopNotification): Record<string, unknown> {
+  switch (notification.kind) {
+    case "status": return { type: "status", status: notification.status };
+    case "turn-start": return { type: "turn_start", turn: notification.turn };
+    case "turn-end": {
+      // The ending as the recorded summary spells it: `reason` and the cancel cause's kind. An `error` ending's exception
+      // (a provider failure with its message) is projected through the `error` event above, never carried here.
+      const { ending } = notification;
+      return { type: "turn_end", turn: notification.turn, ending: { reason: ending.reason, cancelCause: ending.reason === "cancelled" ? ending.cause.kind : null } };
+    }
+    case "step-start": return { type: "step_start", turn: notification.turn, step: notification.step };
+    case "step-end": return { type: "step_end", turn: notification.turn, step: notification.step };
+    case "inbox": return { type: "inbox", op: notification.op, target: notification.target, messageIds: notification.messageIds };
+    case "retry": return { type: "retry", turn: notification.turn, step: notification.step, attempt: notification.attempt, decision: notification.decision, delayMs: notification.delayMs };
+    case "compaction": return { type: "compaction", turn: notification.turn, step: notification.step, message: notification.message, eventIds: notification.eventIds };
+    case "error": {
+      const { code, httpStatus, summary, nextAction } = liveNativeFailureGuidance(notification.error);
+      return { type: "error", turn: notification.turn, step: notification.step, code, httpStatus, summary, nextAction };
+    }
+  }
 }
 
 /**
@@ -190,8 +220,8 @@ export function createRunEventSink(io: AgentLoopCliIo, workspace: string): RunEv
       process.stdout.on("error", onStdoutError);
     },
     notification(notification) {
-      const { kind, ...rest } = notification;
-      emit({ type: kind.replace("-", "_"), ...rest, ...(kind === "error" ? { error: notification.error instanceof Error ? notification.error.message : String(notification.error) } : {}) });
+      const { kind } = notification;
+      emit(notificationEvent(notification));
       if (settled) return;
       if (kind === "step-end" || kind === "turn-end") flush();
       if (kind === "turn-end") { settled = true; stopPolling(); }

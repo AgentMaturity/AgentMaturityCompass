@@ -53,7 +53,8 @@ export const defaultAgentLoopIo: AgentLoopCliIo = {
   log: (line: string) => { console.log(line); },
   error: (line: string) => { console.error(line); },
   fail: () => { process.exitCode = 1; },
-  exit: (code: number) => { if (code !== 0) process.exitCode = code; },
+  // A code already recorded is never replaced (S10): `fail()`'s 1 stands over a later 3–6, and the first table code stands.
+  exit: (code: number) => { if (code !== 0 && !process.exitCode) process.exitCode = code; },
   readStdin: options => import("./cli/agentLoopOutputOptions.js").then(module => module.readProcessStdin(options))
 };
 

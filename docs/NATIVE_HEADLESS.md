@@ -30,11 +30,12 @@ Every event has `type` and `sessionId` (`null` before a session exists). The sch
 | Event | When | Fields |
 |---|---|---|
 | `system` (`subtype: "init"`) | once the session exists, so a `--fork-from` run reports the child's id | `schemaVersion`, `agentId`, `provider`, `model`, `tools`, `approvals` (the action class, or null) |
-| `turn_start`, `turn_end`, `step_start`, `step_end`, `retry`, `compaction`, `inbox`, `status`, `error` (with `turn`/`step`) | the loop's live notifications, as they happen | the notification's own fields (`turn`, `step`, `ending`, `attempt`, `decision`, `message`, ...) |
+| `turn_start`, `turn_end`, `step_start`, `step_end`, `retry`, `compaction`, `inbox`, `status` | the loop's live notifications, as they happen | the notification's own fields, named per kind in `notificationEvent` (`turn`, `step`, `ending`, `attempt`, `decision`, `delayMs`, `message`, `eventIds`, `op`, `target`, `messageIds`, `status`) |
+| `error` (with `turn`/`step`) | a request or step failed inside the loop | `turn`, `step`, `code`, `httpStatus`, `summary`, `nextAction`: the fixed public guidance the text path prints, never the provider's or exception's own text (it can carry request details or credentials) |
 | `text_delta`, `text_end` | the provider's live text, as it streams | `trust: "provisional"`, `headerEventId`, `text` or `truncated`. Provisional means not yet recorded: the committed `agent_message_chunk` below is the reply of record. |
 | `update` | each newly committed, authenticated session row, in commit order | `seq`, `eventId`, `eventHash`, and `update` in ACP's `session/update` shape: `agent_message_chunk`, `tool_call` (with `kind`, `title`, `locations`), `tool_call_update`, `plan` |
 | `result` | last, after a final flush of the rows written while the turn settled | the recorded summary, `execution` phases, `goalRounds` when present, `exitCode` |
-| `error` | last, instead of `result` | `message`, `exitCode` |
+| `error` | last, instead of `result` | `message` (the last refusal line, a projection failure, or a fixed line for an unhandled exception whose text stays on stderr), `exitCode` |
 
 Committed updates go through the same authentication ACP uses before an editor sees them (`src/acp/acpCommittedStream.ts`):
 each new row's signature, hash chain and sequence envelope are checked, unsigned rows are refused, and one event is
@@ -68,8 +69,9 @@ Derived from the execution phases in `src/execution/executionContract.ts`, never
 
 `2` is `amc agent-loop verify`'s integrity-only exit and is never produced by `run`. The `json` summary and the
 `result` event carry the same `exitCode`; the process exit code is authoritative (a cleanup failure after the result
-line still exits 1). `agent-loop chat` reads 3 to 6 from its turn child as "completion not established", not as a
-failed turn.
+line still exits 1). A code once recorded is never replaced by a later, lesser one: a failure (1) reported before the
+summary stands over the summary's 3 to 6, and the first table code stands over a second. `agent-loop chat` reads 3 to
+6 from its turn child as "completion not established", not as a failed turn.
 
 ## What this is not
 
