@@ -38,7 +38,7 @@ export interface ListenPolicy {
 
 const TRUE_VALUES = new Set(["1", "true", "yes", "on"]);
 
-/** True when the list admits every address. */
+/** True when the list admits every address (also used by `amc config explain`). */
 export function weakCidrs(cidrs: readonly string[]): boolean {
   const normalized = new Set(cidrs.map((item) => item.trim()));
   return normalized.has("0.0.0.0/0") || normalized.has("::/0");

@@ -4226,6 +4226,7 @@ studio
       trustedProxyHops: runtimeConfig.trustedProxyHops,
       maxRequestBytes: runtimeConfig.maxRequestBytes,
       corsAllowedOrigins: runtimeConfig.corsAllowedOrigins,
+      gatewayMaxRequestBytes: runtimeConfig.gatewayMaxRequestBytes,
       dataRetentionDays: runtimeConfig.dataRetentionDays,
       queryLeaseCarrierEnabled: queryCarrierAllowed
     });
@@ -18592,6 +18593,7 @@ program
       studioPort: explicitApiPort,
       hostDir: opts.hostDir ? resolve(opts.hostDir) : undefined,
       defaultWorkspaceId: opts.defaultWorkspaceId
+      gatewayMaxRequestBytes: runtimeConfig.gatewayMaxRequestBytes,
     });
     const lan = loadLanMode(runtimeConfig.workspaceDir);
     const lanSig = verifyLanModeSignature(runtimeConfig.workspaceDir);

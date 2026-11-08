@@ -308,6 +308,8 @@ export async function runStudioForeground(params: {
   allowedCidrs?: string[];
   trustedProxyHops?: number;
   maxRequestBytes?: number;
+  /** The gateway's request body cap (AMC_GATEWAY_MAX_REQUEST_BYTES); the gateway's 8 MiB default when absent. */
+  gatewayMaxRequestBytes?: number;
   corsAllowedOrigins?: string[];
   dataRetentionDays?: number;
   queryLeaseCarrierEnabled?: boolean;
@@ -430,6 +432,7 @@ export async function runStudioForeground(params: {
     listenPort: params.gatewayPort,
     proxyPort: params.proxyPort,
     allowedCidrs: listen.allowedCidrs,
+    maxRequestBytes: params.gatewayMaxRequestBytes,
     allowQueryCarrierOverride: params.queryLeaseCarrierEnabled
   });
   // Anything that fails from here closes what already started, newest first, so a refused start leaves no open session.

@@ -60,7 +60,8 @@ function validateRuntimeConfig(config: StudioRuntimeConfig, env: NodeJS.ProcessE
     [config.trustedProxyHops, "AMC_TRUSTED_PROXY_HOPS", 0, 32],
     [config.dataRetentionDays, "AMC_DATA_RETENTION_DAYS", 1, 3650],
     [config.minFreeDiskMb, "AMC_MIN_FREE_DISK_MB", 1, Number.MAX_SAFE_INTEGER],
-    [config.maxRequestBytes, "AMC_MAX_REQUEST_BYTES", 1024, 268_435_456]
+    [config.maxRequestBytes, "AMC_MAX_REQUEST_BYTES", 1024, 268_435_456],
+    [config.gatewayMaxRequestBytes, "AMC_GATEWAY_MAX_REQUEST_BYTES", 1024, 268_435_456]
   ];
 
   for (const [value, label, min, max] of numericChecks) {
@@ -143,6 +144,7 @@ export function loadStudioRuntimeConfig(
     AMC_DATA_RETENTION_DAYS: env.AMC_DATA_RETENTION_DAYS,
     AMC_MIN_FREE_DISK_MB: env.AMC_MIN_FREE_DISK_MB,
     AMC_MAX_REQUEST_BYTES: env.AMC_MAX_REQUEST_BYTES,
+    AMC_GATEWAY_MAX_REQUEST_BYTES: env.AMC_GATEWAY_MAX_REQUEST_BYTES,
     AMC_CORS_ALLOWED_ORIGINS: env.AMC_CORS_ALLOWED_ORIGINS,
     AMC_ALLOW_PUBLIC_BIND: env.AMC_ALLOW_PUBLIC_BIND,
     AMC_METRICS_BIND: env.AMC_METRICS_BIND,
@@ -190,6 +192,7 @@ export function loadStudioRuntimeConfig(
     dataRetentionDays: Math.max(1, parsed.AMC_DATA_RETENTION_DAYS),
     minFreeDiskMb: Math.max(1, parsed.AMC_MIN_FREE_DISK_MB),
     maxRequestBytes: Math.max(1_024, parsed.AMC_MAX_REQUEST_BYTES),
+    gatewayMaxRequestBytes: parsed.AMC_GATEWAY_MAX_REQUEST_BYTES,
     corsAllowedOrigins: parseAllowedOrigins(parsed.AMC_CORS_ALLOWED_ORIGINS),
     allowPublicBind: parsed.AMC_ALLOW_PUBLIC_BIND,
     metricsBind: parsed.AMC_METRICS_BIND,

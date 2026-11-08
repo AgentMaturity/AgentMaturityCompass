@@ -59,6 +59,7 @@ export const studioEnvSchema = z.object({
   AMC_DATA_RETENTION_DAYS: intish.refine((value) => value >= 1, "must be >= 1").default(30),
   AMC_MIN_FREE_DISK_MB: intish.refine((value) => value >= 1, "must be >= 1").default(1024),
   AMC_MAX_REQUEST_BYTES: intish.refine((value) => value >= 1_024, "must be >= 1024").default(1_048_576),
+  AMC_GATEWAY_MAX_REQUEST_BYTES: intish.refine((value) => value >= 1_024, "must be >= 1024").default(8_388_608),
   AMC_CORS_ALLOWED_ORIGINS: z.string().default(""),
   AMC_ALLOW_PUBLIC_BIND: boolish.default(false),
   AMC_METRICS_BIND: z.string().default("127.0.0.1"),

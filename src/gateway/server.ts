@@ -40,6 +40,9 @@ import { checkUpstreamEgress, pinnedLookup, prepareFieldGuard, requestFieldRefus
 import { checkEgress, EgressBlocked } from "../residency/checkEgress.js";
 import { parseConnectAuthority } from "./connectResidency.js";
 import { ipAllowedByCidrs as ipAllowedByList, LOOPBACK_CIDRS, socketIp } from "../studio/clientAddress.js";
+import { DEFAULT_GATEWAY_MAX_REQUEST_BYTES, readAll, readBoundedBody, refuseOversizedRequest } from "./requestBody.js";
+import { withoutUrlQueries } from "./logSafe.js";
+import { createPreAuthAuditLimiter, type PreAuthAuditLimiter } from "./preAuthAudit.js";
 import { killSwitchDenial, killSwitchEgressDenial } from "../runtime/killSwitch.js";
 export interface StartGatewayOptions {
   workspace: string;
@@ -50,6 +53,8 @@ export interface StartGatewayOptions {
   listenPort?: number;
   proxyPort?: number;
   allowedCidrs?: string[];
+  /** Request body cap in bytes (LIVE-RUNTIME-01); 8 MiB when absent. Upstream responses are not capped. */
+  maxRequestBytes?: number;
   allowQueryCarrierOverride?: boolean;
   /**
    * Credential source for outbound upstream auth. Defaults to the local
@@ -97,13 +102,6 @@ function joinPath(basePathname: string, forwardedPathname: string): string {
     return left || "/";
   }
   return `${left}${right}`;
-}
-async function readAll(stream: IncomingMessage): Promise<Buffer> {
-  const chunks: Buffer[] = [];
-  for await (const chunk of stream) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-  }
-  return Buffer.concat(chunks);
 }
 function routePath(pathname: string, route: GatewayConfig["routes"][number]): string {
   if (!route.stripPrefix) {
@@ -600,6 +598,8 @@ function createProxyServer(params: {
   config: GatewayConfig;
   gatewaySessionId: string;
   allowedCidrs?: string[];
+  maxRequestBytes: number;
+  preAuthAudit: PreAuthAuditLimiter;
   fieldGuard: FieldGuard;
   logger: Pick<Console, "error">;
   appendEvidence: (input: {
@@ -625,7 +625,7 @@ function createProxyServer(params: {
     const method = (req.method ?? "GET").toUpperCase();
     const clientIp = normalizeRemoteIp(req.socket.remoteAddress);
     if (!ipAllowedByCidrs(clientIp, params.allowedCidrs ?? [])) {
-      params.appendEvidence({
+      if (params.preAuthAudit.shouldAudit(clientIp, "NETWORK_EGRESS_BLOCKED")) params.appendEvidence({
         eventType: "audit",
         payload: JSON.stringify({
           auditType: "NETWORK_EGRESS_BLOCKED",
@@ -714,7 +714,7 @@ function createProxyServer(params: {
       requiredScope: "proxy:connect", egress: { host: targetUrl.hostname, config: params.config }
     });
     if (!proxyAgentId || !leaseVerification.ok) {
-      params.appendEvidence({
+      if (params.preAuthAudit.shouldAudit(clientIp, leaseVerification.ok ? "LEASE_INVALID_OR_MISSING" : leaseVerification.auditType)) params.appendEvidence({
         eventType: "audit",
         payload: JSON.stringify({
           auditType: leaseVerification.ok ? "LEASE_INVALID_OR_MISSING" : leaseVerification.auditType,
@@ -748,7 +748,12 @@ function createProxyServer(params: {
       return;
     }
 
-    const body = await readAll(req);
+    const body = await readBoundedBody(req, params.maxRequestBytes);
+    if (body === null) {
+      refuseOversizedRequest(req, res, { requestId, agentId: proxyAgentId, maxBytes: params.maxRequestBytes,
+        append: (row) => params.appendEvidence({ eventType: "audit", payload: JSON.stringify(row), meta: { ...row, proxyMode: true, trustTier: "OBSERVED" } }) });
+      return;
+    }
     const outboundHeaders = normalizeResponseHeaders(req.headers);
     delete outboundHeaders.host;
     delete outboundHeaders["x-amc-agent-id"];
@@ -825,7 +830,7 @@ function createProxyServer(params: {
     });
   };
   // A rejected handler (a client reset during a body read, a ledger write failure) ends its own connection, never the gateway process.
-  const contain = (end: () => void) => (error: unknown): void => { params.logger.error(`gateway proxy error: ${String(error)}`); end(); };
+  const contain = (end: () => void) => (error: unknown): void => { params.logger.error(`gateway proxy error: ${withoutUrlQueries(String(error))}`); end(); };
   const proxy = createServer((req, res) => {
     onRequest(req, res).catch(contain(() => { if (res.headersSent || req.destroyed) res.destroy(); else res.writeHead(502).end("gateway proxy failure"); }));
   });
@@ -834,7 +839,7 @@ function createProxyServer(params: {
     const requestId = randomUUID();
     const clientIp = normalizeRemoteIp(req.socket.remoteAddress);
     if (!ipAllowedByCidrs(clientIp, params.allowedCidrs ?? [])) {
-      params.appendEvidence({
+      if (params.preAuthAudit.shouldAudit(clientIp, "NETWORK_EGRESS_BLOCKED")) params.appendEvidence({
         eventType: "audit",
         payload: JSON.stringify({
           auditType: "NETWORK_EGRESS_BLOCKED",
@@ -909,7 +914,7 @@ function createProxyServer(params: {
     }
 
     if (!proxyAgentId || !leaseVerification.ok) {
-      params.appendEvidence({
+      if (params.preAuthAudit.shouldAudit(clientIp, leaseVerification.ok ? "LEASE_INVALID_OR_MISSING" : leaseVerification.auditType)) params.appendEvidence({
         eventType: "audit",
         payload: JSON.stringify({
           auditType: leaseVerification.ok ? "LEASE_INVALID_OR_MISSING" : leaseVerification.auditType,
@@ -1014,6 +1019,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
   });
   const fieldGuard = prepareFieldGuard(resolvedConfig); // resolves guarded upstreams per request, only when a route refuses fields
   const runtimeListenHost = options.listenHost ?? resolvedConfig.listen.host;
+  const maxRequestBytes = options.maxRequestBytes ?? DEFAULT_GATEWAY_MAX_REQUEST_BYTES;
   const runtimeListenPort = options.listenPort ?? resolvedConfig.listen.port;
   const runtimeProxyPort = options.proxyPort ?? config.proxy.port;
   const signature = verifyGatewayConfigSignature(options.workspace, options.configPath);
@@ -1046,6 +1052,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
     });
   };
 
+  const preAuthAudit = createPreAuthAuditLimiter({ appendSummary: (row) => appendEvidence({ eventType: "audit", payload: JSON.stringify(row), meta: { ...row } }) });
   ledger.startSession({
     sessionId: gatewaySessionId,
     runtime: "gateway",
@@ -1104,7 +1111,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
     const method = (req.method ?? "GET").toUpperCase();
     const clientIp = normalizeRemoteIp(req.socket.remoteAddress);
     if (!ipAllowedByCidrs(clientIp, options.allowedCidrs ?? [])) {
-      appendEvidence({
+      if (preAuthAudit.shouldAudit(clientIp, "NETWORK_EGRESS_BLOCKED")) appendEvidence({
         eventType: "audit",
         payload: JSON.stringify({
           auditType: "NETWORK_EGRESS_BLOCKED",
@@ -1160,17 +1167,10 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
 
       const upstreamResolved = resolvedConfig.upstreams[route.upstream];
       const upstreamConfigured = config.upstreams[route.upstream];
-      if (!upstreamResolved || !upstreamConfigured) {
-        res.statusCode = 500;
-        res.setHeader("content-type", "application/json");
-        res.end(JSON.stringify({ error: `invalid upstream ${route.upstream}` }));
-        return;
-      }
-
-      if (!upstreamResolved.baseUrl) {
-        res.statusCode = 500;
-        res.setHeader("content-type", "application/json");
-        res.end(JSON.stringify({ error: `missing resolved baseUrl for upstream ${route.upstream}` }));
+      // LIVE-RUNTIME-11: the client gets a fixed code; which upstream is broken, and how, goes to the log with the request id.
+      if (!upstreamResolved || !upstreamConfigured || !upstreamResolved.baseUrl) {
+        logger.error(`gateway: upstream ${route.upstream} for ${route.prefix} is ${upstreamResolved && upstreamConfigured ? "missing its resolved baseUrl" : "not configured"} (request ${requestId})`);
+        res.writeHead(500, { "content-type": "application/json" }).end(JSON.stringify({ error: "gateway misconfigured", code: "AMC_GATEWAY_CONFIG" }));
         return;
       }
 
@@ -1180,14 +1180,20 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       targetUrl.pathname = joinPath(upstreamUrl.pathname, forwardedPath);
       targetUrl.search = incomingUrl.search;
 
-      const requestBody = await readAll(req);
-      const requestInfo = bestEffortJsonInfo(requestBody, incomingUrl.pathname, route.openaiCompatible);
       const attributedAgentId = extractAgentId(route, req.headers);
       const leaseCarrier = extractLeaseCarrier({
         headers: req.headers,
         url: incomingUrl,
         allowQueryCarrier: config.lease.allowQueryCarrier
       });
+      // LIVE-RUNTIME-01: no lease carrier, no body read (the verification below refuses it); past the cap, 413 and nothing forwarded.
+      const requestBody = leaseCarrier.leaseToken ? await readBoundedBody(req, maxRequestBytes) : Buffer.alloc(0);
+      if (requestBody === null) {
+        refuseOversizedRequest(req, res, { requestId, agentId: attributedAgentId, maxBytes: maxRequestBytes,
+          append: (row) => appendEvidence({ eventType: "audit", payload: JSON.stringify(row), meta: row }) });
+        return;
+      }
+      const requestInfo = bestEffortJsonInfo(requestBody, incomingUrl.pathname, route.openaiCompatible);
       if (leaseCarrier.nonLeaseCarrier) {
         appendEvidence({
           eventType: "audit",
@@ -1237,7 +1243,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         upstreamId: route.upstream
       });
       if (!leaseVerification.ok) {
-        appendEvidence({
+        if (preAuthAudit.shouldAudit(clientIp, leaseVerification.auditType)) appendEvidence({
           eventType: "audit",
           payload: JSON.stringify({
             auditType: leaseVerification.auditType,
@@ -1257,6 +1263,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         });
         res.statusCode = leaseVerification.statusCode;
         res.setHeader("content-type", "application/json");
+        if (!leaseCarrier.leaseToken) res.setHeader("connection", "close"); // its body was never read
         res.end(JSON.stringify({ error: leaseVerification.message }));
         return;
       }
@@ -1397,9 +1404,8 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       const authResult = applyUpstreamAuth(targetUrl, outboundHeaders, upstreamResolved.auth, credentials.resolve);
 
       if (!authResult.ok) {
-        res.statusCode = 500;
-        res.setHeader("content-type", "application/json");
-        res.end(JSON.stringify({ error: authResult.error }));
+        logger.error(`gateway: upstream credential unavailable for ${route.upstream} (request ${requestId}): ${withoutUrlQueries(authResult.error)}`);
+        res.writeHead(500, { "content-type": "application/json" }).end(JSON.stringify({ error: "upstream credential unavailable", code: "AMC_UPSTREAM_AUTH" }));
 
         appendEvidence({
           eventType: "audit",
@@ -1593,7 +1599,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         res.end(responseBody);
       }
     } catch (error) {
-      logger.error(`gateway error: ${String(error)}`);
+      logger.error(`gateway error (request ${requestId}): ${withoutUrlQueries(String(error))}`);
       const status = gatewayErrorStatusCode(error);
       const body = gatewayErrorBody(error);
       appendEvidence({
@@ -1638,6 +1644,8 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       config: resolvedConfig,
       gatewaySessionId,
       allowedCidrs: options.allowedCidrs,
+      maxRequestBytes,
+      preAuthAudit,
       fieldGuard,
       logger,
       appendEvidence
@@ -1676,6 +1684,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         });
       }
 
+      preAuthAudit.flushAll(); // LIVE-RUNTIME-21: suppressed refusal counts are recorded before the seal
       appendEvidence({
         eventType: "gateway",
         payload: JSON.stringify({ stage: "stop" }),
