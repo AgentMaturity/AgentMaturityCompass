@@ -525,10 +525,13 @@ function createJournal(workspace: string, ledger: Ledger, staleAfterMs: number):
   };
 }
 
-/** At most one TELEMETRY_DROPPED row a minute, with the count since the last one. A failed write gives the count back. */
-function writeTelemetryDrops(ledger: Ledger): void {
+/**
+ * At most one TELEMETRY_DROPPED row a minute, with the count since the last one. A failed write gives the count back.
+ * `atExit` skips the minute: a process about to end has no later action to carry the count.
+ */
+export function writeTelemetryDrops(ledger: Ledger, atExit = false): void {
   const now = Date.now();
-  if (now - lastTelemetryRowTs < TELEMETRY_ROW_EVERY_MS) return;
+  if (!atExit && now - lastTelemetryRowTs < TELEMETRY_ROW_EVERY_MS) return;
   const dropped = takeDroppedTelemetry();
   if (dropped === 0) return;
   try {

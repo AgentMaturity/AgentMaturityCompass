@@ -26,7 +26,7 @@ const VIEWER_SCRIPT = `(function () {
   el("h1", null, "AMC session " + doc.sessionId, head);
   el("p", "warn", "This page renders the embedded signed rows and performs no verification. Verify authenticity with: amc session verify-export <this file> --expect-monitor <fingerprint obtained out of band>", head);
   el("p", null, "Embedded monitor key fingerprint (display only, not a trust anchor): " + doc.monitorKeyFingerprint, head);
-  el("p", null, "Rows: " + doc.rows.length + "; lifecycle: " + (doc.record && doc.record.ended_ts !== null ? "sealed" : "open or released (tail unproven)") + "; content: " + (doc.content ? "included (redacted, bounded)" : "digests only"), head);
+  el("p", null, "Rows: " + doc.rows.length + "; lifecycle: " + (doc.record && doc.record.ended_ts !== null ? "sealed" : "open or released (tail unproven)") + "; content: " + (doc.content ? "included (redacted, bounded)" : "payload digests only (the signed row metadata is embedded in full)"), head);
   var usage = el("section", "usage");
   el("h2", null, "Usage", usage);
   var u = doc.usage || {};
@@ -49,7 +49,7 @@ const VIEWER_SCRIPT = `(function () {
     el("h3", null, title, box);
     el("p", "digest", "event " + row.id + " · ts " + new Date(row.ts).toISOString() + " · payload sha256 " + row.payload_sha256, box);
     var c = content(row);
-    if (c && c.unavailable) el("p", "unavailable", "content unavailable: " + c.unavailable, box);
+    if (c && c.unavailable !== undefined) el("p", "unavailable", "content not exported for this row (the reason is in the JSON; the verifier does not check that text)", box);
     else if (c) { var pre = el("pre", "content", c.text, box); if (c.truncated) el("p", "note", "truncated; full digest " + c.sha256, box); if (c.redactions) el("p", "note", c.redactions + " secret(s) redacted; digest not checkable on this copy", box); if (c.source === "spill") el("p", "note", "spilled output; commitment " + c.sha256, box); }
   });
 })();`;

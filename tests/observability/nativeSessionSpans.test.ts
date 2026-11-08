@@ -3,11 +3,20 @@ import { createServer, type Server } from "node:http";
 import { Command } from "commander";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NativeSpanFolder } from "../../src/observability/nativeSessionSpans.js";
-import { ObservabilityOTELExporter, flushSharedObservabilityExporter, recordFoldOutput, resetSharedObservabilityExporterForTests } from "../../src/observability/otelExporter.js";
+import { ObservabilityOTELExporter, flushSharedObservabilityExporter, getSharedObservabilityExporter, recordFoldOutput, resetSharedObservabilityExporterForTests } from "../../src/observability/otelExporter.js";
 import { resolveOtelEnvConfig } from "../../src/observability/otelEnvConfig.js";
-import { traceIdFor } from "../../src/observability/otelValues.js";
+import { takeDroppedTelemetry } from "../../src/observability/telemetryDrops.js";
+import { traceIdFor, type OTelSpan } from "../../src/observability/otelValues.js";
 import { registerOtelPreviewCommand } from "../../src/cli-observability-otel-commands.js";
-import { removeWorkspace, runStubSession, sessionEvents, stubWorkspace } from "./helpers/stubSessionWorkspace.js";
+import { registerObservabilityCommands } from "../../src/cli-observability-commands.js";
+import { withWorkspaceScope } from "../../src/enforce/evidenceEmitter.js";
+import { openAgentSession } from "../../src/agent/agentSession.js";
+import { stubProviderTransport, STUB_PROVIDER_ID, STUB_PROVIDER_MODEL } from "../../src/agent/stubProvider.js";
+import { nativeRouteFor, paramsFor } from "../../src/cli-agent-options.js";
+import { LocalCredentialsService } from "../../src/credentials/localCredentialsService.js";
+import { AdapterRegistry } from "../../src/llm/adapter/adapterRegistry.js";
+import { LlmRuntime } from "../../src/llm/adapter/llmRuntime.js";
+import { allEvents, removeWorkspace, runStubSession, sessionEvents, stubWorkspace } from "./helpers/stubSessionWorkspace.js";
 
 vi.setConfig({ testTimeout: 120_000 });
 const ENV = ["AMC_OTEL_ENABLED", "AMC_OTEL_EXPORTERS", "AMC_OTEL_OTLP_ENDPOINT", "OTEL_EXPORTER_OTLP_ENDPOINT", "OTEL_EXPORTER_OTLP_HEADERS", "OTEL_EXPORTER_OTLP_PROTOCOL", "OTEL_SDK_DISABLED", "OTEL_SERVICE_NAME", "OTEL_RESOURCE_ATTRIBUTES", "AMC_OTEL_FLUSH_MAX_RETRIES"];
@@ -26,12 +35,12 @@ afterEach(async () => {
   vi.restoreAllMocks();
 });
 
-async function collector(): Promise<{ base: string; received: Array<{ path: string; headers: Record<string, string | string[] | undefined>; body: unknown }> }> {
+async function collector(answerAfterMs = 0): Promise<{ base: string; received: Array<{ path: string; headers: Record<string, string | string[] | undefined>; body: unknown }> }> {
   const received: Array<{ path: string; headers: Record<string, string | string[] | undefined>; body: unknown }> = [];
   const server = createServer((req, res) => {
     let body = "";
     req.on("data", (chunk: Buffer) => { body += chunk.toString("utf8"); });
-    req.on("end", () => { received.push({ path: req.url ?? "", headers: req.headers, body: JSON.parse(body) }); res.writeHead(200).end("{}"); });
+    req.on("end", () => { received.push({ path: req.url ?? "", headers: req.headers, body: JSON.parse(body) }); setTimeout(() => res.writeHead(200).end("{}"), answerAfterMs); });
   });
   await new Promise<void>((done) => server.listen(0, "127.0.0.1", done));
   servers.push(server);
@@ -90,6 +99,42 @@ describe("native session span folder", () => {
     expect(names).toContain("turn 1");
     expect(drained.spans.every((span) => span.attributes.some((a) => a.key === "amc.span.unterminated" && a.value.boolValue === true))).toBe(true);
     expect(folder.size()).toBe(0);
+  });
+
+  it("a segment that starts at session/resume (a resumed session in a fresh process) carries the resume row's agent id, not `unknown`", async () => {
+    const { sessionId } = await runStubSession(ws, "hello", { agentId: "resumed-agent" });
+    const open = sessionEvents(ws, sessionId).find((row) => row.event_type === "session/open")!;
+    expect((JSON.parse(open.meta_json) as { agentId: string }).agentId).toBe("resumed-agent");
+    const folder = new NativeSpanFolder();
+    folder.ingest({ ...open, event_type: "session/resume" });
+    const [segment] = folder.drain(open.ts + 10).spans;
+    expect(segment!.name).toBe("invoke_agent resumed-agent");
+    expect(segment!.attributes.find((a) => a.key === "gen_ai.agent.name")!.value).toEqual({ stringValue: "resumed-agent" });
+    expect(segment!.attributes.find((a) => a.key === "amc.session.segment")!.value).toEqual({ stringValue: "resume" });
+  });
+
+  it("otel-preview prints the spans still open in an unclosed session, marked unterminated, in its text tree", async () => {
+    const route = nativeRouteFor(STUB_PROVIDER_ID, {}, STUB_PROVIDER_MODEL);
+    const registry = new AdapterRegistry();
+    registry.register(route);
+    const credentials = new LocalCredentialsService({ projectDir: ws, watch: false });
+    const session = openAgentSession({ workspace: ws, agentId: "default", harnessVersion: "test", tools: "none", maxSteps: 4,
+      makeLlm: (s) => new LlmRuntime({ session: s, credentials, registry, transport: stubProviderTransport({}) }),
+      route: { providerId: STUB_PROVIDER_ID, model: STUB_PROVIDER_MODEL, params: paramsFor(STUB_PROVIDER_ID, 256) },
+      systemPrompt: "You are an AMC-governed agent.", compositionDigest: "0".repeat(64), policyDigest: "0".repeat(64) });
+    try {
+      await session.prompt("hello");
+      const program = new Command();
+      registerOtelPreviewCommand(program.command("observe"));
+      const logs: string[] = [];
+      vi.spyOn(console, "log").mockImplementation((...args: unknown[]) => { logs.push(args.join(" ")); });
+      process.chdir(ws);
+      await program.parseAsync(["observe", "otel-preview", "--session", session.sessionId], { from: "user" });
+      const text = logs.join("\n");
+      expect(text, "the open invoke_agent segment is in the tree").toContain("invoke_agent default");
+      expect(text).toContain("amc.span.unterminated=true");
+      expect(text).toContain("turn 1");
+    } finally { await session.close(); }
   });
 });
 
@@ -179,6 +224,68 @@ describe("end to end: a stub run exports a GenAI trace to a loopback OTLP collec
     expect(previewNames).toEqual(names.filter((name) => !name.startsWith("amc.evidence.")).sort());
     expect(logs.join("\n")).not.toContain("top-secret-token");
     expect(preview.requests[0]!.endpoint).toBe(base);
+  });
+});
+
+const testSpan = (name: string): OTelSpan => ({ traceId: "a".repeat(32), spanId: Buffer.from(name.padEnd(8, "-")).toString("hex").slice(0, 16), name, kind: 1,
+  startTimeUnixNano: "1000000", endTimeUnixNano: "2000000", attributes: [], status: { code: 1 }, events: [] });
+const spanNames = (received: Array<{ path: string; body: unknown }>) => received.filter((r) => r.path === "/v1/traces").flatMap((r) => ((r.body as any).resourceSpans[0].scopeSpans[0].spans as Span[]).map((span) => span.name));
+
+describe("flush and buffers", () => {
+  it("a flush that finds one in flight waits within its own budget, then sends what was buffered since under its own options", async () => {
+    const { base, received } = await collector(400);
+    const exporter = new ObservabilityOTELExporter({ enabled: true, targets: [{ kind: "otlp", endpoint: base }] });
+    exporter.recordSpan(testSpan("first"));
+    const first = exporter.flush({ timeoutMs: 5_000, maxRetries: 0 });
+    exporter.recordSpan(testSpan("second"));
+    const started = Date.now();
+    const second = await exporter.flush({ timeoutMs: 5_000, maxRetries: 0 });
+    expect(Date.now() - started, "the second flush waited for the first").toBeGreaterThanOrEqual(350);
+    await first;
+    expect(second.exported.traces, "the later span went out under the second flush, not left buffered").toBe(1);
+    expect(spanNames(received).sort()).toEqual(["first", "second"]);
+    expect(exporter.getBufferStats().traces).toBe(0);
+  });
+
+  it("keeps one metric stream per workspace scope, so a point recorded for workspace B never merges into A's stream", () => {
+    const exporter = new ObservabilityOTELExporter({ enabled: false, targets: [{ kind: "otlp", endpoint: "http://127.0.0.1:4318" }] });
+    const point = (value: number) => exporter.recordMetricPoint({ kind: "sum", name: "gen_ai.client.inference.usage.input_tokens", unit: "{token}", value, attributes: [] });
+    withWorkspaceScope("/ws/A", () => point(100));
+    withWorkspaceScope("/ws/B", () => point(5));
+    const list = (exporter.previewRequests().find((r) => r.signal === "metrics")!.payload as any).resourceMetrics[0].scopeMetrics[0].metrics as Array<Record<string, any>>;
+    const values = list.filter((m) => m.name === "gen_ai.client.inference.usage.input_tokens").flatMap((m) => m.sum.dataPoints.map((p: { asDouble: number }) => p.asDouble)).sort((a: number, b: number) => a - b);
+    expect(values).toEqual([5, 100]);
+  });
+
+  it("Zipkin carries no aggregated streams: they are counted as dropped, not as exported metrics", async () => {
+    const { base, received } = await collector();
+    takeDroppedTelemetry();
+    const exporter = new ObservabilityOTELExporter({ enabled: true, targets: [{ kind: "zipkin", endpoint: base }] });
+    exporter.recordSpan(testSpan("s"));
+    exporter.recordMetricPoint({ kind: "sum", name: "amc.request.cost.usd", unit: "USD", value: 0.01, attributes: [] });
+    const result = await exporter.flush({ timeoutMs: 5_000, maxRetries: 0 });
+    expect(received).toHaveLength(1);
+    expect(result.exported.traces).toBe(1);
+    expect(result.exported.metrics).toBe(0);
+    expect(takeDroppedTelemetry()).toBe(1);
+  });
+
+  it("the exit flush writes a TELEMETRY_DROPPED row for what its budget left behind", async () => {
+    process.env.AMC_OTEL_ENABLED = "1";
+    process.env.OTEL_EXPORTER_OTLP_ENDPOINT = "http://127.0.0.1:9"; // discard port: every dispatch fails
+    process.env.AMC_OTEL_FLUSH_MAX_RETRIES = "0";
+    resetSharedObservabilityExporterForTests();
+    takeDroppedTelemetry();
+    const program = new Command().exitOverride();
+    registerObservabilityCommands(program, () => "default");
+    program.command("noop").action(() => { getSharedObservabilityExporter().recordSpan(testSpan("lost")); });
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    process.chdir(ws);
+    await program.parseAsync(["noop"], { from: "user" });
+    const rows = allEvents(ws).filter((row) => row.event_type === "audit" && (JSON.parse(row.meta_json) as { auditType?: string }).auditType === "TELEMETRY_DROPPED");
+    expect(rows).toHaveLength(1);
+    expect((JSON.parse(rows[0]!.meta_json) as { dropped: number }).dropped).toBe(1);
+    expect(takeDroppedTelemetry(), "the count was taken into the row").toBe(0);
   });
 });
 

@@ -6,8 +6,10 @@
  */
 import { copyFileSync, lstatSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
-import { dirname, join, relative, resolve, sep } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { SandboxRunner } from "../sandbox/sandboxRunner.js";
+import { isWithin } from "../utils/pathSafety.js";
+import type { SandboxOutcome, SandboxPolicy } from "../sandbox/sandboxTypes.js";
 import type { FixtureFile } from "./suiteLoader.js";
 import type { EvalGrader } from "./suiteSchema.js";
 
@@ -62,9 +64,9 @@ interface CommandGradingInput {
   readonly runner?: SandboxRunner;
 }
 
+/** Strictly under `root` (isWithin refuses `..` segments and, on Windows, another drive). */
 function inside(root: string, candidate: string): boolean {
-  const rel = relative(root, candidate);
-  return rel !== "" && !rel.startsWith("..") && !rel.startsWith(sep);
+  return relative(root, candidate) !== "" && isWithin(root, candidate);
 }
 
 /** A pristine grading directory: fixture from the snapshot, then only the declared outputs from the attempt. */
@@ -91,17 +93,30 @@ export function stageGradingDir(input: CommandGradingInput): { dir: string; copi
   return { dir, copiedOutputs, missingOutputs };
 }
 
+/**
+ * The grader command through the sandbox seam. Without the explicit opt-in, no enforced backend means refusal. With it,
+ * a run the runner had to perform unconfined (no backend, or the selected backend refused the grader policy, as the
+ * write-only Seatbelt profile does) is graded by its exit status and recorded `confined: false`, `backend: "none"`.
+ */
+async function runGrader(command: readonly string[], cwd: string, policy: SandboxPolicy, input: CommandGradingInput): Promise<{ outcome: SandboxOutcome; unconfinedByOptIn: boolean }> {
+  const runner = input.runner ?? new SandboxRunner({ allowUnconfined: input.allowUnconfined });
+  let outcome = await runner.run(command, cwd, policy);
+  if (!input.allowUnconfined) return { outcome, unconfinedByOptIn: false };
+  // The selected backend refused the policy and launched nothing: the opt-in says run it anyway, unconfined and said so.
+  if (outcome.failure?.kind === "unavailable" && outcome.backend !== "none") outcome = await new SandboxRunner({ backends: [], allowUnconfined: true }).run(command, cwd, policy);
+  return { outcome, unconfinedByOptIn: outcome.backend === "none" && outcome.failure?.kind === "unavailable" };
+}
+
 export async function gradeCommand(grader: Extract<EvalGrader, { type: "script" | "tests" }>, input: CommandGradingInput): Promise<GraderResult> {
   const staged = stageGradingDir(input);
   try {
-    const runner = input.runner ?? new SandboxRunner({ allowUnconfined: input.allowUnconfined });
     const home = homedir();
-    const outcome = await runner.run(grader.command, staged.dir, {
+    const { outcome, unconfinedByOptIn } = await runGrader(grader.command, staged.dir, {
       writableRoots: [staged.dir], timeoutMs: grader.timeoutMs, network: "deny", maxProcesses: 64,
       readDeny: [join(home, ".ssh"), join(home, ".aws"), join(home, ".config", "gcloud"), join(input.workspace, ".amc"), input.attemptDir]
-    });
-    const note = `${staged.copiedOutputs.length} output(s) copied${staged.missingOutputs.length ? `, missing: ${staged.missingOutputs.join(", ")}` : ""}`;
-    if (outcome.failure !== null) {
+    }, input);
+    const note = `${staged.copiedOutputs.length} output(s) copied${staged.missingOutputs.length ? `, missing: ${staged.missingOutputs.join(", ")}` : ""}${unconfinedByOptIn ? "; ran UNCONFINED by --unsafe-unconfined-graders" : ""}`;
+    if (outcome.failure !== null && !unconfinedByOptIn) {
       return { type: grader.type, status: "error", confined: false, backend: outcome.backend, exitCode: null,
         detail: outcome.failure.kind === "unavailable" && !input.allowUnconfined ? `unconfined grader refused: ${outcome.failure.reason}. Pass --unsafe-unconfined-graders to run it with your full user rights.` : outcome.failure.reason };
     }

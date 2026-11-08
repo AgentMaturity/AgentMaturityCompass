@@ -16,7 +16,7 @@ import { loadOpsPolicy } from "../ops/policy.js";
 import { readEventPayload } from "../session/eventPayload.js";
 import { loadSessionEventHistory } from "../session/sessionEventHistory.js";
 import { extractEnvelope } from "../session/sessionTypes.js";
-import { SPILL_META_KEY } from "../session/spill/spillTypes.js";
+import { extractSpillRef, SPILL_META_KEY } from "../session/spill/spillTypes.js";
 import { readSessionSpillRange } from "../session/spill/spillRead.js";
 import { redactSecrets } from "../shield/redaction/redactSecrets.js";
 import { verifySeal, verifySessionRows } from "../transparency/sessionRootDescriptor.js";
@@ -57,7 +57,7 @@ interface SessionExportVerdict {
   readonly rowsChecked: number;
   readonly tail: "sealed" | "unproven";
   readonly content: { readonly verified: number; readonly unverifiable: number; readonly unavailable: number };
-  /** The usage summary recomputed from the document's rows (the embedded copy is checked against it, cost estimate aside). */
+  /** The usage summary recomputed from the document's rows at the recorded export instant (the embedded copy is checked against it, cost included). */
   readonly usage: NativeRunUsage | null;
   readonly errors: readonly string[];
 }
@@ -141,22 +141,43 @@ export function buildSessionExport(options: { workspace: string; sessionId: stri
   if (encrypted !== null) {
     throw new Error(`${encrypted}; an export with content would carry decrypted payloads. Export digests only (omit --include-content).`);
   }
-  return { schema: SESSION_EXPORT_SCHEMA, exportedAt: options.now ?? Date.now(), sessionId: options.sessionId, monitorPublicKeyPem: pem,
+  const exportedAt = options.now ?? Date.now();
+  return { schema: SESSION_EXPORT_SCHEMA, exportedAt, sessionId: options.sessionId, monitorPublicKeyPem: pem,
     monitorKeyFingerprint: sha256Hex(pem), record, rows, content: options.includeContent ? exportContent(options.workspace, rows) : null,
-    usage: projectNativeRunUsage(rows, options.sessionId) };
+    usage: projectNativeRunUsage(rows, options.sessionId, exportedAt) };
 }
 
+const DOCUMENT_KEYS = new Set<keyof SessionExportDocument>(["schema", "exportedAt", "sessionId", "monitorPublicKeyPem", "monitorKeyFingerprint", "record", "rows", "content", "usage"]);
+
+/** Exactly the exporter's shape: an unknown top-level key is refused, since the page would carry text the verifier never looked at. */
 function isDocument(value: unknown): value is SessionExportDocument {
   const doc = value as Partial<SessionExportDocument> | null;
-  return !!doc && typeof doc === "object" && doc.schema === SESSION_EXPORT_SCHEMA && typeof doc.sessionId === "string"
-    && typeof doc.monitorPublicKeyPem === "string" && Array.isArray(doc.rows) && (doc.content === null || (typeof doc.content === "object" && doc.content !== null))
-    && typeof doc.usage === "object" && doc.usage !== null;
+  return !!doc && typeof doc === "object" && Object.keys(doc).every((key) => DOCUMENT_KEYS.has(key as keyof SessionExportDocument))
+    && doc.schema === SESSION_EXPORT_SCHEMA && typeof doc.exportedAt === "number" && Number.isFinite(doc.exportedAt) && typeof doc.sessionId === "string"
+    && typeof doc.monitorPublicKeyPem === "string" && typeof doc.monitorKeyFingerprint === "string" && Array.isArray(doc.rows)
+    && (doc.record === null || (typeof doc.record === "object" && doc.record !== undefined && !Array.isArray(doc.record)))
+    && (doc.content === null || (typeof doc.content === "object" && doc.content !== undefined && !Array.isArray(doc.content))) && typeof doc.usage === "object" && doc.usage !== null;
 }
 
-/** The usage summary without its catalog cost estimate, whose freshness labels depend on the clock. */
-function usageWithoutCost(usage: NativeRunUsage): Omit<NativeRunUsage, "cost"> {
-  const { cost: _cost, ...rest } = usage;
-  return rest;
+const CONTENT_KEYS = "redactions,sha256,source,text,truncated";
+
+/**
+ * A content entry exactly as the exporter writes it, or the reason it is not: an `unavailable` marker alone, or text
+ * whose source and digest are its row's (the payload digest, or the signed spill commitment for spilled output). The
+ * page renders these fields, so none may be a value the verifier did not tie to a signed row.
+ */
+function contentEntryProblem(entry: unknown, row: EvidenceEvent): string | null {
+  if (entry === null || typeof entry !== "object" || Array.isArray(entry)) return "is not a content entry";
+  const keys = Object.keys(entry).sort().join(",");
+  if (keys === "unavailable") return typeof (entry as { unavailable: unknown }).unavailable === "string" && (entry as { unavailable: string }).unavailable !== "" ? null : "has an empty or non-text unavailable marker";
+  if (keys !== CONTENT_KEYS) return "carries fields the exporter never writes";
+  const e = entry as ExportedContent;
+  if (typeof e.text !== "string" || typeof e.truncated !== "boolean" || !Number.isSafeInteger(e.redactions) || e.redactions < 0) return "is malformed";
+  const spilled = row.event_type === "tool/result" && spillLocator(row) !== null;
+  const source = spilled ? "spill" : row.payload_inline !== null && row.payload_inline !== undefined ? "inline" : "blob";
+  if (e.source !== source) return `claims source ${String(e.source)} but its row's payload is ${source}`;
+  const committed = spilled ? extractSpillRef(row.meta_json)?.contentSha256 : row.payload_sha256;
+  return e.sha256 === committed ? null : "names a digest that is not its row's committed digest";
 }
 
 const EMPTY_VERDICT = { fingerprint: "", rowsChecked: 0, tail: "unproven" as const, content: { verified: 0, unverifiable: 0, unavailable: 0 }, usage: null };
@@ -165,16 +186,27 @@ const EMPTY_VERDICT = { fingerprint: "", rowsChecked: 0, tail: "unproven" as con
  * Offline verification of a document: the embedded key must match the operator's pin, every row must hash and verify
  * under that key with a contiguous per-session chain, a closed session's seal must name the last row, and embedded
  * content must hash to its row's digest where it was neither redacted nor truncated; content that cannot be checked
- * fails the verdict unless explicitly accepted, and the embedded usage summary must equal the one recomputed from the
- * rows (S15). Nothing in the document runs.
+ * fails the verdict unless explicitly accepted, and the embedded usage summary, cost included, must equal the one
+ * recomputed from the rows at the recorded export instant (S15). Nothing in the document runs.
  */
 export function verifySessionExport(value: unknown, options: SessionExportVerifyOptions): SessionExportVerdict {
+  if (!isDocument(value)) return { ok: false, ...EMPTY_VERDICT, errors: ["not an amc.session-export/v1 document (unknown or missing fields)"] };
+  try {
+    return verifyDocument(value, options);
+  } catch (error) {
+    // A row or entry malformed past the shape check fails closed with a reason, never with a crash.
+    return { ok: false, ...EMPTY_VERDICT, errors: [`malformed session export: ${error instanceof Error ? error.message : String(error)}`] };
+  }
+}
+
+function verifyDocument(value: SessionExportDocument, options: SessionExportVerifyOptions): SessionExportVerdict {
   const errors: string[] = [];
-  if (!isDocument(value)) return { ok: false, ...EMPTY_VERDICT, errors: ["not an amc.session-export/v1 document"] };
   const fingerprint = sha256Hex(value.monitorPublicKeyPem);
   const expected = options.expectedFingerprint.trim().toLowerCase();
   if (!/^[0-9a-f]{64}$/.test(expected)) errors.push("expected monitor fingerprint must be a 64-hex sha256 obtained out of band");
   else if (expected !== fingerprint) errors.push(`embedded monitor key fingerprint ${fingerprint} does not match the pinned ${expected}`);
+  // The page prints the embedded fingerprint; it must be the one the embedded key actually has.
+  if (value.monitorKeyFingerprint !== fingerprint) errors.push("the displayed monitor key fingerprint is not the sha256 of the embedded key");
   const rows = value.rows;
   if (rows.length === 0) errors.push("the document carries no rows");
   if (rows.some((row) => row.session_id !== value.sessionId)) errors.push("a row belongs to another session");
@@ -186,10 +218,13 @@ export function verifySessionExport(value: unknown, options: SessionExportVerify
   if (value.content !== null) {
     const byId = new Map(rows.map((row) => [row.id, row]));
     for (const [id, entry] of Object.entries(value.content)) {
-      if ("unavailable" in entry) { content.unavailable += 1; continue; }
+      // Every entry, an unavailable marker included, must sit on a content row of this session.
       const row = byId.get(id);
       if (!row) { errors.push(`content for unknown event ${id}`); continue; }
       if (!CONTENT_EVENT_TYPES.has(row.event_type)) { errors.push(`content attached to ${row.event_type} event ${id}, which carries no exportable content`); continue; }
+      const problem = contentEntryProblem(entry, row);
+      if (problem !== null) { errors.push(`content of event ${id} ${problem}`); continue; }
+      if ("unavailable" in entry) { content.unavailable += 1; continue; }
       if (entry.source === "spill" || entry.truncated || entry.redactions > 0) { content.unverifiable += 1; continue; }
       if (sha256Hex(Buffer.from(entry.text, "utf8")) !== row.payload_sha256) errors.push(`content of event ${id} does not hash to its committed payload digest`);
       else content.verified += 1;
@@ -198,8 +233,9 @@ export function verifySessionExport(value: unknown, options: SessionExportVerify
       errors.push(`${content.unverifiable} content entr${content.unverifiable === 1 ? "y is" : "ies are"} redacted, truncated or spilled and cannot be checked against the committed digests; pass --accept-unverifiable-content to accept them as display-only`);
     }
   }
-  const usage = projectNativeRunUsage(rows, value.sessionId);
-  if (JSON.stringify(usageWithoutCost(usage)) !== JSON.stringify(usageWithoutCost(value.usage))) errors.push("the embedded usage summary does not match the usage recomputed from the rows");
+  // Recomputed at the recorded export instant, so the catalog cost freshness labels match and the whole summary, cost included, must agree (S15b).
+  const usage = projectNativeRunUsage(rows, value.sessionId, value.exportedAt);
+  if (JSON.stringify(usage) !== JSON.stringify(value.usage)) errors.push("the embedded usage summary (cost included) does not match the usage recomputed from the rows at the recorded export time");
   // Belt and braces: the seal signature over the final hash is also checked with the single-key verifier.
   if (sealed && value.record?.session_seal_sig && value.record.session_final_event_hash
       && !verifyHexDigest(value.record.session_final_event_hash, value.record.session_seal_sig, value.monitorPublicKeyPem)) errors.push("seal signature does not verify under the embedded key");

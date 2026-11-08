@@ -75,7 +75,8 @@ function version(value: unknown): number | null {
 }
 
 /** Fold matching recorded request outcomes once; step/end copies are never added. */
-export function projectNativeRunUsage(events: readonly EvidenceEvent[], sessionId: string): NativeRunUsage {
+/** `now` fixes the catalog price freshness labels, so a projection can be recomputed byte for byte at a recorded instant. */
+export function projectNativeRunUsage(events: readonly EvidenceEvent[], sessionId: string, now = Date.now()): NativeRunUsage {
   const headers = new Map<string, RequestHeaderMeta>();
   const requestReports = new Map<string, NativeUsageRequest>();
   const settled = new Set<string>();
@@ -178,7 +179,7 @@ export function projectNativeRunUsage(events: readonly EvidenceEvent[], sessionI
   const invalid = issues.length > 0;
   if (invalid) for (const key of TOKEN_FIELDS) { totals[key].observedTokens = null; totals[key].reportedRequests = 0; }
   return {
-    cost: projectNativeCost(events, sessionId),
+    cost: projectNativeCost(events, sessionId, now),
     scope: "recorded-session",
     status: invalid ? "invalid" : reportedRequests === 0 ? "unavailable" : completeRequests < providerRequests ? "partial" : "recorded",
     requests, syntheticRequests, reportedRequests, completeRequests,

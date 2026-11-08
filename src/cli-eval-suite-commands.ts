@@ -11,9 +11,16 @@ import { sha256Hex } from "./utils/hash.js";
 interface RunOptions { provider?: string; model?: string; baseUrl?: string; credential?: string; attempts?: string; out?: string; tasks?: string;
   agent?: string; unsafeUnconfinedGraders?: boolean; keepDirs?: boolean; maxSteps?: string; json?: boolean }
 
+/** A whole number within bounds, or a thrown error naming the flag: a typo must never run (and sign) a suite of crashed attempts. */
+function parseBounded(flag: string, raw: string, min: number, max: number): number {
+  const value = /^\d+$/.test(raw.trim()) ? Number(raw.trim()) : Number.NaN;
+  if (!Number.isSafeInteger(value) || value < min || value > max) throw new Error(`${flag} must be an integer from ${min} to ${max}, got ${JSON.stringify(raw)}`);
+  return value;
+}
+
 export function registerEvalSuiteCommands(program: Command): void {
-  const evalGroup = program.commands.find((command) => command.name() === "eval");
-  if (!evalGroup) throw new Error("the eval command group must be registered before eval suite commands");
+  // The real CLI creates `eval` first (src/cli.ts); a host that registers the late-stage commands on a bare program gets the group here.
+  const evalGroup = program.commands.find((command) => command.name() === "eval") ?? program.command("eval").description("Eval interop import and coverage status");
   const suite = evalGroup.command("suite").description("Task suites run against the native agent: graders, pass@k, baselines and gates");
 
   suite
@@ -36,11 +43,12 @@ export function registerEvalSuiteCommands(program: Command): void {
       const { loadEvalSuite } = await import("./eval/suiteLoader.js");
       const { runEvalSuite } = await import("./eval/suiteRunner.js");
       try {
-        const attempts = Number.parseInt(opts.attempts ?? "1", 10);
+        const attempts = parseBounded("--attempts", opts.attempts ?? "1", 1, 10);
+        const maxSteps = opts.maxSteps === undefined ? undefined : parseBounded("--max-steps", opts.maxSteps, 1, 1024);
         const loaded = loadEvalSuite(suitePath);
         const { results, json, resultsSha256 } = await runEvalSuite({ workspace: process.cwd(), loaded, attempts,
           provider: { providerId: opts.provider ?? "stub", ...(opts.model === undefined ? {} : { model: opts.model }), ...(opts.baseUrl === undefined ? {} : { baseUrl: opts.baseUrl }),
-            ...(opts.credential === undefined ? {} : { credential: opts.credential }), maxSteps: opts.maxSteps === undefined ? loaded.suite.defaults.maxSteps : Number.parseInt(opts.maxSteps, 10) },
+            ...(opts.credential === undefined ? {} : { credential: opts.credential }), maxSteps: maxSteps ?? loaded.suite.defaults.maxSteps },
           ...(opts.agent === undefined ? {} : { agentId: opts.agent }), ...(opts.tasks === undefined ? {} : { taskIds: opts.tasks.split(",").map((id) => id.trim()).filter(Boolean) }),
           allowUnconfinedGraders: opts.unsafeUnconfinedGraders === true, keepDirs: opts.keepDirs === true, onProgress: (line) => { if (!opts.json) console.error(chalk.gray(line)); } });
         if (opts.out !== undefined) writeFileSync(resolve(opts.out), json);
@@ -52,7 +60,7 @@ export function registerEvalSuiteCommands(program: Command): void {
           for (const attempt of task.attempts) for (const grader of attempt.graders) if (grader.status !== "pass") console.log(chalk.gray(`    #${attempt.attempt} ${grader.type} ${grader.status}: ${grader.detail.split("\n")[0]}`));
         }
         const cost = results.summary.cost;
-        console.log(`  pass rate ${results.summary.passRate === null ? "n/a" : (results.summary.passRate * 100).toFixed(1) + "%"} over ${results.summary.attempts} attempts; task pass rate ${results.summary.taskPassRate === null ? "n/a" : (results.summary.taskPassRate * 100).toFixed(1) + "%"}`);
+        console.log(`  pass rate ${results.summary.passRate === null ? "n/a" : (results.summary.passRate * 100).toFixed(1) + "%"} over ${results.summary.attempts - results.summary.errors} graded attempt(s)${results.summary.errors ? ` (${results.summary.errors} error(s) neither pass nor fail)` : ""}; task pass rate ${results.summary.taskPassRate === null ? "n/a" : (results.summary.taskPassRate * 100).toFixed(1) + "%"}`);
         console.log(`  cost ${cost.complete && cost.attributedUsd !== null ? `$${cost.attributedUsd.toFixed(6)}` : `unavailable (${cost.unknownRequests} unknown requests)`}; latency p50 ${results.summary.latency.p50Ms ?? "n/a"} ms, p95 ${results.summary.latency.p95Ms ?? "n/a"} ms`);
         console.log(chalk.gray(`  results sha256 ${resultsSha256} recorded as ${"EVAL_SUITE_RUN"}${opts.out ? `; written to ${resolve(opts.out)}` : ""}`));
         if (results.provider.providerId === "stub") console.log(chalk.gray("  stub provider: this run proves the grading path, not model quality."));
@@ -64,17 +72,24 @@ export function registerEvalSuiteCommands(program: Command): void {
 
   suite
     .command("baseline")
-    .description("Reduce a results file to a baseline and record its digest in the ledger")
-    .argument("<results>", "results JSON from `eval suite run --out`")
+    .description("Reduce a recorded results file to a baseline and record its digest in the ledger")
+    .argument("<results>", "results JSON from `eval suite run --out` (its digest must be a recorded EVAL_SUITE_RUN)")
     .requiredOption("--out <path>", "baseline JSON to write (amc.eval-baseline/v1)")
     .action(async (resultsPath: string, opts: { out: string }) => {
-      const { baselineFromResults, recordBaseline } = await import("./eval/suiteCompare.js");
+      const { baselineFromResults, recordBaseline, recordedDigests } = await import("./eval/suiteCompare.js");
       try {
-        const baseline = baselineFromResults(readFileSync(resolve(resultsPath), "utf8"));
+        if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode cannot build a baseline: the run digest it would check is not signed");
+        const resultsJson = readFileSync(resolve(resultsPath), "utf8");
+        const recorded = recordedDigests(process.cwd());
+        // An edited results file must not be laundered into a signed baseline that every later run is gated against.
+        if (!recorded.runs.has(sha256Hex(resultsJson))) throw new Error("results file digest is not a recorded EVAL_SUITE_RUN in this workspace's verified ledger (edited, or from another workspace); a baseline is only built from a recorded run");
+        const baseline = baselineFromResults(resultsJson);
         const json = JSON.stringify(baseline, null, 2);
-        recordBaseline(process.cwd(), baseline, sha256Hex(json));
+        const digest = sha256Hex(json);
+        // File first, then the record; recording is idempotent, so a retry after a failed write never hits a duplicate session id.
         writeFileSync(resolve(opts.out), json);
-        console.log(chalk.green(`Wrote ${resolve(opts.out)} (${Object.keys(baseline.tasks).length} task(s) from run ${baseline.fromRunId})`));
+        if (!recorded.baselines.has(digest)) recordBaseline(process.cwd(), baseline, digest);
+        console.log(chalk.green(`Wrote ${resolve(opts.out)} (${Object.keys(baseline.tasks).length} task(s) from run ${baseline.fromRunId}${recorded.baselines.has(digest) ? "; digest already recorded" : ""})`));
       } catch (error) {
         console.error(chalk.red(`eval suite baseline failed: ${error instanceof Error ? error.message : String(error)}`));
         process.exitCode = 1;
@@ -95,10 +110,10 @@ export function registerEvalSuiteCommands(program: Command): void {
         const baselineJson = readFileSync(resolve(baselinePath), "utf8");
         const resultsJson = readFileSync(resolve(resultsPath), "utf8");
         const gate = gateSchema.parse(opts.gate === undefined ? {} : JSON.parse(readFileSync(resolve(opts.gate), "utf8")));
-        const recorded = recordedDigests(process.cwd(), sha256Hex(resultsJson), sha256Hex(baselineJson));
+        const recorded = recordedDigests(process.cwd());
         const verdict = compareResults({ baselineJson, resultsJson, gate, recorded });
         const code = verdict.status === "pass" ? 0 : verdict.status === "fail" ? 1 : 2;
-        if (opts.json) console.log(JSON.stringify({ ...verdict, gate, recorded }, null, 2));
+        if (opts.json) console.log(JSON.stringify({ ...verdict, gate, recorded: { results: recorded.runs.has(sha256Hex(resultsJson)), baseline: recorded.baselines.has(sha256Hex(baselineJson)) } }, null, 2));
         else {
           const colour = verdict.status === "pass" ? chalk.green : verdict.status === "fail" ? chalk.red : chalk.yellow;
           console.log(colour(`Eval gate ${verdict.status.toUpperCase()}`));

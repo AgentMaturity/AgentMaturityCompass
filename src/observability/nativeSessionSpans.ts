@@ -69,7 +69,8 @@ export class NativeSpanFolder {
     switch (event.event_type) {
       case "session/open":
       case "session/resume": {
-        if (event.event_type === "session/open") state.agentId = str(m.agentId) ?? state.agentId;
+        // A resumed session in a fresh process has no `session/open` in its segment: the resume row carries the agent id too.
+        state.agentId = str(m.agentId) ?? state.agentId;
         if (state.segment) close(state.segment, event.ts, otelAttrs([attr("amc.span.unterminated", true)]), { code: STATUS.UNSET });
         state.segment = { spanId: spanIdFor(event.id), parentSpanId: undefined, name: `invoke_agent ${state.agentId}`, kind: SPAN_KIND.INTERNAL, startTs: event.ts, events: [],
           attributes: otelAttrs([attr("gen_ai.operation.name", "invoke_agent"), attr("gen_ai.agent.name", state.agentId), attr("gen_ai.conversation.id", event.session_id),

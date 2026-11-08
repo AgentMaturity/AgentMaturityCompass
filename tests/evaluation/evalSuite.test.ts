@@ -9,9 +9,13 @@ import { passAtK, scoreTask } from "../../src/eval/suiteScoring.js";
 import { gradeCommand, gradeText, stageGradingDir } from "../../src/eval/suiteGraders.js";
 import { loadEvalSuite } from "../../src/eval/suiteLoader.js";
 import { suiteSchema } from "../../src/eval/suiteSchema.js";
-import { baselineFromResults, compareResults, type EvalBaseline } from "../../src/eval/suiteCompare.js";
-import { runEvalSuite, type EvalResults } from "../../src/eval/suiteRunner.js";
+import { baselineFromResults, canDetectTotalRegression, compareResults, gateSchema, type EvalBaseline } from "../../src/eval/suiteCompare.js";
+import { attemptGuard, runEvalSuite, type EvalResults } from "../../src/eval/suiteRunner.js";
 import { registerEvalSuiteCommands } from "../../src/cli-eval-suite-commands.js";
+import { SandboxRunner } from "../../src/sandbox/sandboxRunner.js";
+import type { SandboxBackend } from "../../src/sandbox/sandboxTypes.js";
+import type { ToolExecution } from "../../src/tools/toolTypes.js";
+import { sha256Hex } from "../../src/utils/hash.js";
 import { allEvents, removeWorkspace, stubWorkspace } from "../observability/helpers/stubSessionWorkspace.js";
 
 vi.setConfig({ testTimeout: 300_000 });
@@ -33,9 +37,45 @@ describe("scoring and graders (pure)", () => {
     expect(passAtK(4, 1, 1)).toBeCloseTo(0.25, 10);
     expect(passAtK(3, 0, 2)).toBe(0);
     expect(() => passAtK(2, 1, 3)).toThrow(/undefined/);
+    // An error attempt is neither a pass nor a fail: rates and pass@k run over the two graded attempts, never over three.
     const score = scoreTask("t", ["pass", "fail", "error"]);
-    expect(score).toMatchObject({ attempts: 3, passes: 1, errors: 1, passRate: 1 / 3 });
-    expect(score.passAtK["pass@3"]).toBe(1);
+    expect(score).toMatchObject({ attempts: 3, passes: 1, errors: 1, passRate: 0.5 });
+    expect(score.passAtK).toEqual({ "pass@1": 0.5, "pass@2": 1 });
+    expect(scoreTask("t", ["error", "error"]).passRate, "nothing graded: no rate, not 0").toBeNull();
+  });
+
+  it("--unsafe-unconfined-graders grades an unconfined run by its exit status (confined:false) and falls back when the selected backend refuses the policy", async () => {
+    const grader = { type: "script" as const, command: [process.execPath, "-e", "process.exit(3)"], timeoutMs: 60_000, passExitCode: 3 };
+    const input = { fixture: [], attemptDir: probeDir, outputs: [], workspace: probeDir };
+    const none = await gradeCommand(grader, { ...input, allowUnconfined: true, runner: new SandboxRunner({ backends: [], allowUnconfined: true }) });
+    expect(none, none.detail).toMatchObject({ status: "pass", confined: false, backend: "none", exitCode: 3 });
+    expect(none.detail).toContain("UNCONFINED");
+    expect((await gradeCommand({ ...grader, passExitCode: 0 }, { ...input, allowUnconfined: true, runner: new SandboxRunner({ backends: [], allowUnconfined: true }) })).status, "a wrong exit status under the opt-in is a fail, not an error").toBe("fail");
+    // The write-only Seatbelt profile is selected on macOS but refuses network/readDeny/maxProcesses with nothing run: the opt-in falls back to an unconfined run.
+    const refusing: SandboxBackend = { kind: "seatbelt", available: () => ({ ok: true }), run: async (_command, _cwd, policy) => ({ confined: false, backend: "seatbelt", exitCode: null, timedOut: false, stdout: "", stderr: "",
+      writableRoots: policy.writableRoots, failure: { kind: "unavailable", reason: "the write-only Seatbelt backend cannot enforce network; nothing was run" } }) };
+    const fallen = await gradeCommand(grader, { ...input, allowUnconfined: true, runner: new SandboxRunner({ backends: [refusing], allowUnconfined: true }) });
+    expect(fallen, fallen.detail).toMatchObject({ status: "pass", confined: false, backend: "none", exitCode: 3 });
+    // Without the opt-in the same refusal stays an error that names the flag.
+    const refused = await gradeCommand(grader, { ...input, allowUnconfined: false, runner: new SandboxRunner({ backends: [refusing] }) });
+    expect(refused.status).toBe("error");
+    expect(refused.detail).toContain("--unsafe-unconfined-graders");
+  });
+
+  it("the attempt guard allows only listed tools, and file tools only with a path inside the attempt directory", () => {
+    const guard = attemptGuard("/ws", "/ws/workspace/output/amc-eval/r/t/1", "eval s/t#1");
+    const call = (name: string, args: Record<string, unknown> = {}) => guard({ name, arguments: args } as unknown as ToolExecution);
+    for (const name of ["bash", "shell.exec", "job_start", "terminal_open", "terminal_send", "web_fetch", "web_search", "delegate", "workflow", "run_code", "skill.load", "ask_user", "mcp__fs__read_file"]) {
+      expect(call(name, { path: "workspace/output/amc-eval/r/t/1/a.txt" }), name).toContain("is not offered to eval attempts");
+    }
+    for (const name of ["todo", "plan", "get_goal", "tool_search", "session.spill_read"]) expect(call(name), name).toBeUndefined();
+    expect(call("fs.write", { path: "workspace/output/amc-eval/r/t/1/answer.txt", content: "42" })).toBeUndefined();
+    expect(call("grep", { pattern: "x", path: "workspace/output/amc-eval/r/t/1" })).toBeUndefined();
+    expect(call("grep", { pattern: "x" })).toContain("names no path");
+    expect(call("glob", { pattern: "**/*.yaml", path: "." })).toContain("outside the attempt directory");
+    expect(call("fs.read", { path: "workspace/output/amc-eval/r/t/2/answer.txt" })).toContain("outside the attempt directory");
+    expect(call("fs.read", { path: "workspace/output/amc-eval/r/t/1/../../suite.yaml" })).toContain("outside the attempt directory");
+    expect(call("fs.read", { path: 7 })).toContain("names no path");
   });
 
   it("text graders: exact/contains/regex/not_contains, and an unreadable answer is an error, never a pass", () => {
@@ -82,31 +122,90 @@ describe("scoring and graders (pure)", () => {
     expect(staged.missingOutputs).toEqual(["../escape.txt", "missing.txt"]);
   });
 
+  type Counts = Record<string, { attempts: number; passes: number; errors: number }>;
+  const mk = (tasks: Counts, cost: number | null = null, suiteSha256 = "s1", fixtures: Record<string, Record<string, string>> = {}, runId = "r"): string => {
+    const sum = (key: "attempts" | "passes" | "errors") => Object.values(tasks).reduce((s, t) => s + t[key], 0);
+    const graded = sum("attempts") - sum("errors");
+    return JSON.stringify({ schema: "amc.eval-results/v1", runId, suiteId: "x", suiteSha256, fixtures,
+      tasks: Object.entries(tasks).map(([taskId, score]) => ({ taskId, score: { ...score, passRate: score.attempts - score.errors ? score.passes / (score.attempts - score.errors) : null } })),
+      summary: { attempts: sum("attempts"), passes: sum("passes"), errors: sum("errors"), passRate: graded > 0 ? sum("passes") / graded : null, cost: { attributedUsd: cost, complete: cost !== null } } });
+  };
+  /** Baseline from `from`, compared with `cur`; the verified ledger is simulated by the digest sets (`unrecorded` names what it lacks). */
+  const cmp = (from: string, cur: string, gate: Record<string, unknown> = {}, unrecorded: Array<"results" | "baseline" | "baselineSource"> = []) => {
+    const baselineJson = JSON.stringify(baselineFromResults(from) satisfies EvalBaseline);
+    const runs = new Set<string>([...(unrecorded.includes("baselineSource") ? [] : [sha256Hex(from)]), ...(unrecorded.includes("results") ? [] : [sha256Hex(cur)])]);
+    const baselines = new Set<string>(unrecorded.includes("baseline") ? [] : [sha256Hex(baselineJson)]);
+    return compareResults({ baselineJson, resultsJson: cur, gate: gateSchema.parse(gate), recorded: { runs, baselines } });
+  };
+
   it("compare: Wilson-based regression, inconclusive on unrecorded digests, suite change, unknown cost or too few attempts", () => {
-    const mk = (tasks: Record<string, { attempts: number; passes: number; errors: number }>, cost: number | null = null, suiteSha256 = "s1"): string => JSON.stringify({
-      schema: "amc.eval-results/v1", runId: "r", suiteId: "x", suiteSha256, tasks: Object.entries(tasks).map(([taskId, score]) => ({ taskId, score: { ...score, passRate: score.attempts ? score.passes / score.attempts : null } })),
-      summary: { attempts: Object.values(tasks).reduce((s, t) => s + t.attempts, 0), passes: Object.values(tasks).reduce((s, t) => s + t.passes, 0), errors: 0,
-        passRate: Object.values(tasks).reduce((s, t) => s + t.passes, 0) / Math.max(1, Object.values(tasks).reduce((s, t) => s + t.attempts, 0)), cost: { attributedUsd: cost, complete: cost !== null } } });
-    const baseline = (json: string): string => JSON.stringify(baselineFromResults(json) satisfies EvalBaseline);
-    const recorded = { results: true, baseline: true };
-    const gate = { maxRegressedTasks: 0, minAttemptsPerTask: 1, requireSameSuite: true };
     // A task passing 9/10 then 2/3 is noise, not a regression: the intervals overlap.
-    expect(compareResults({ baselineJson: baseline(mk({ a: { attempts: 10, passes: 9, errors: 0 } })), resultsJson: mk({ a: { attempts: 3, passes: 2, errors: 0 } }), gate, recorded }).status).toBe("pass");
+    expect(cmp(mk({ a: { attempts: 10, passes: 9, errors: 0 } }), mk({ a: { attempts: 3, passes: 2, errors: 0 } })).status).toBe("pass");
     // 10/10 -> 0/10 is a regression.
-    const regressed = compareResults({ baselineJson: baseline(mk({ a: { attempts: 10, passes: 10, errors: 0 } })), resultsJson: mk({ a: { attempts: 10, passes: 0, errors: 0 } }), gate, recorded });
+    const regressed = cmp(mk({ a: { attempts: 10, passes: 10, errors: 0 } }), mk({ a: { attempts: 10, passes: 0, errors: 0 } }));
     expect(regressed.status).toBe("fail");
     expect(regressed.regressedTasks).toEqual(["a"]);
-    expect(compareResults({ baselineJson: baseline(mk({ a: { attempts: 2, passes: 2, errors: 0 } })), resultsJson: mk({ a: { attempts: 2, passes: 2, errors: 0 } }), gate, recorded: { results: false, baseline: true } }).status).toBe("inconclusive");
-    expect(compareResults({ baselineJson: baseline(mk({ a: { attempts: 2, passes: 2, errors: 0 } })), resultsJson: mk({ a: { attempts: 2, passes: 2, errors: 0 } }, null, "s2"), gate, recorded }).status).toBe("inconclusive");
-    expect(compareResults({ baselineJson: baseline(mk({ a: { attempts: 2, passes: 2, errors: 0 } })), resultsJson: mk({ a: { attempts: 2, passes: 2, errors: 0 } }), gate: { ...gate, maxCostIncreaseRatio: 1.1 }, recorded }).status).toBe("inconclusive");
-    expect(compareResults({ baselineJson: baseline(mk({ a: { attempts: 2, passes: 2, errors: 0 } }, 1)), resultsJson: mk({ a: { attempts: 2, passes: 2, errors: 0 } }, 2), gate: { ...gate, maxCostIncreaseRatio: 1.1 }, recorded }).status).toBe("fail");
-    expect(compareResults({ baselineJson: baseline(mk({ a: { attempts: 1, passes: 1, errors: 0 } })), resultsJson: mk({ a: { attempts: 1, passes: 1, errors: 0 } }), gate: { ...gate, minAttemptsPerTask: 2 }, recorded }).status).toBe("inconclusive");
-    expect(compareResults({ baselineJson: baseline(mk({ a: { attempts: 2, passes: 2, errors: 0 } })), resultsJson: mk({ a: { attempts: 2, passes: 1, errors: 0 } }), gate: { ...gate, minPassRate: 0.9 }, recorded }).status).toBe("fail");
+    const ten = mk({ a: { attempts: 10, passes: 10, errors: 0 } });
+    // A second run with the same counts: its own digest, recorded or not independently of the baseline's source run.
+    const tenAgain = mk({ a: { attempts: 10, passes: 10, errors: 0 } }, null, "s1", {}, "r2");
+    expect(cmp(ten, tenAgain).status).toBe("pass");
+    expect(cmp(ten, tenAgain, {}, ["results"]).status).toBe("inconclusive");
+    expect(cmp(ten, tenAgain, {}, ["results"]).reasons.join()).toContain("results file digest is not recorded");
+    expect(cmp(ten, tenAgain, {}, ["baseline"]).reasons.join()).toContain("baseline file digest is not recorded");
+    // A baseline built from an edited results file (whose digest was never recorded) cannot launder it into a gate.
+    expect(cmp(ten, tenAgain, {}, ["baselineSource"]).status).toBe("inconclusive");
+    expect(cmp(ten, tenAgain, {}, ["baselineSource"]).reasons.join()).toContain("built from an edited file");
+    expect(cmp(ten, mk({ a: { attempts: 10, passes: 10, errors: 0 } }, null, "s2")).status).toBe("inconclusive");
+    expect(cmp(ten, ten, { maxCostIncreaseRatio: 1.1 }).status).toBe("inconclusive");
+    expect(cmp(mk({ a: { attempts: 10, passes: 10, errors: 0 } }, 1), mk({ a: { attempts: 10, passes: 10, errors: 0 } }, 2), { maxCostIncreaseRatio: 1.1 }).status).toBe("fail");
+    expect(cmp(mk({ a: { attempts: 1, passes: 1, errors: 0 } }), mk({ a: { attempts: 1, passes: 1, errors: 0 } }), { minAttemptsPerTask: 2 }).status).toBe("inconclusive");
+    expect(cmp(ten, mk({ a: { attempts: 10, passes: 5, errors: 0 } }), { minPassRate: 0.9 }).status).toBe("fail");
+  });
+
+  it("compare has a power floor: counts that cannot separate even a total regression are inconclusive under the default gate, never a pass", () => {
+    expect(canDetectTotalRegression(4, 4)).toBe(true);
+    expect(canDetectTotalRegression(3, 3)).toBe(false);
+    expect(canDetectTotalRegression(10, 3)).toBe(true);
+    for (const n of [1, 2, 3]) {
+      const verdict = cmp(mk({ a: { attempts: n, passes: n, errors: 0 } }), mk({ a: { attempts: n, passes: 0, errors: 0 } }));
+      expect(verdict.status, `${n}/${n} -> 0/${n} under the default gate`).toBe("inconclusive");
+      expect(verdict.reasons.join()).toContain("cannot separate even a total regression");
+    }
+    const four = cmp(mk({ a: { attempts: 4, passes: 4, errors: 0 } }), mk({ a: { attempts: 4, passes: 0, errors: 0 } }));
+    expect(four.status).toBe("fail");
+    expect(four.regressedTasks).toEqual(["a"]);
+  });
+
+  it("compare: a baseline task absent from the results, a changed fixture, and grader errors each make the gate inconclusive, not a pass or a fail", () => {
+    const both = mk({ easy: { attempts: 10, passes: 10, errors: 0 }, hard: { attempts: 10, passes: 10, errors: 0 } });
+    const subset = cmp(both, mk({ easy: { attempts: 10, passes: 10, errors: 0 } }));
+    expect(subset.status).toBe("inconclusive");
+    expect(subset.reasons.join()).toContain("baseline task hard is absent from the results");
+    const fixtureChanged = cmp(mk({ a: { attempts: 10, passes: 10, errors: 0 } }, null, "s1", { a: { "check.mjs": "aa" } }), mk({ a: { attempts: 10, passes: 10, errors: 0 } }, null, "s1", { a: { "check.mjs": "bb" } }));
+    expect(fixtureChanged.status).toBe("inconclusive");
+    expect(fixtureChanged.reasons.join()).toContain("fixture files changed");
+    // Two passes and one refused grader: the rate over graded attempts is 1.0, and the errored task is inconclusive, not a pass-rate failure.
+    const errored = cmp(mk({ a: { attempts: 10, passes: 10, errors: 0 } }), mk({ a: { attempts: 3, passes: 2, errors: 1 } }), { minPassRate: 0.9 });
+    expect(errored.status).toBe("inconclusive");
+    expect(errored.reasons.join()).not.toContain("is below");
+    // Below the rate however the errors resolve (even all passing gives 3/4 < 0.9): a fail, errors or not.
+    const certain = cmp(mk({ a: { attempts: 10, passes: 10, errors: 0 } }), mk({ a: { attempts: 4, passes: 1, errors: 2 } }), { minPassRate: 0.9 });
+    expect(certain.status).toBe("fail");
+    expect(certain.reasons.join()).toContain("even if all 2 errored attempt(s) had passed");
+    // Below the rate over graded attempts (8/9), but one errored attempt passing would meet it (9/10): inconclusive, not a fail.
+    const open = cmp(mk({ a: { attempts: 10, passes: 10, errors: 0 } }), mk({ a: { attempts: 10, passes: 8, errors: 1 } }), { minPassRate: 0.9 });
+    expect(open.status).toBe("inconclusive");
+    expect(open.reasons.join()).toContain("could still decide it");
+    expect(open.reasons.join()).not.toContain("even if all");
   });
 });
 
 describe("end to end through the CLI with the stub provider", () => {
   it("runs the shipped stub-smoke suite twice per task, records the run, gates it, and refuses an edited results file", async () => {
+    // A host without an `eval` group gets one (the late-stage registration used to throw here).
+    const bare = new Command();
+    registerEvalSuiteCommands(bare);
+    expect(bare.commands.find((command) => command.name() === "eval")?.commands.map((command) => command.name())).toEqual(["suite"]);
     const program = new Command();
     program.command("eval");
     registerEvalSuiteCommands(program);
@@ -151,19 +250,62 @@ describe("end to end through the CLI with the stub provider", () => {
     expect(stamped).toHaveLength(6);
     expect((JSON.parse(stamped[0]!.meta_json) as { agentId: string }).agentId).toBe("eval-suite");
 
+    expect(results.taskSelection, "a whole-suite run records no selection").toBeNull();
+
     logs.length = 0;
     await program.parseAsync(["eval", "suite", "baseline", out, "--out", baseline], { from: "user" });
-    expect(process.exitCode).toBeUndefined();
+    expect(process.exitCode, logs.join("\n")).toBeUndefined();
+    // Re-running baseline on the same results file is idempotent (the record exists; no duplicate session id).
+    await program.parseAsync(["eval", "suite", "baseline", out, "--out", baseline], { from: "user" });
+    expect(process.exitCode, logs.join("\n")).toBeUndefined();
+    expect(logs.join("\n")).toContain("digest already recorded");
     await program.parseAsync(["eval", "suite", "compare", baseline, out, "--json"], { from: "user" });
     const verdict = JSON.parse(logs[logs.length - 1]!) as { status: string; reasons: string[] };
-    if (confined) { expect(verdict.status, verdict.reasons.join("; ")).toBe("pass"); expect(process.exitCode).toBe(0); }
-    else { expect(verdict.status).toBe("inconclusive"); expect(process.exitCode).toBe(2); }
+    // Two attempts per side cannot separate even a total regression: the gate says so instead of passing (and names the refused graders where there is no backend).
+    expect(verdict.status, verdict.reasons.join("; ")).toBe("inconclusive");
+    expect(verdict.reasons.join("; ")).toContain("cannot separate even a total regression");
+    if (!confined) expect(verdict.reasons.join("; ")).toContain("grader error");
+    expect(process.exitCode).toBe(2);
     // Mutation: an edited results file is no longer recorded in the ledger, so the gate is inconclusive (exit 2), never a pass.
     process.exitCode = undefined;
-    writeFileSync(out, readFileSync(out, "utf8").replace('"passes": 2', '"passes": 1'));
-    await program.parseAsync(["eval", "suite", "compare", baseline, out, "--json"], { from: "user" });
+    const edited = join(ws, "r-edited.json");
+    writeFileSync(edited, readFileSync(out, "utf8").replace('"passes": 2', '"passes": 1'));
+    await program.parseAsync(["eval", "suite", "compare", baseline, edited, "--json"], { from: "user" });
     expect(process.exitCode).toBe(2);
     expect(logs[logs.length - 1]).toContain("not recorded in the verified ledger");
+    // Nor can the edited file be laundered through `baseline`: only a recorded run becomes a baseline.
+    process.exitCode = undefined;
+    logs.length = 0;
+    await program.parseAsync(["eval", "suite", "baseline", edited, "--out", join(ws, "b-laundered.json")], { from: "user" });
+    expect(process.exitCode).toBe(1);
+    expect(logs.join("\n")).toContain("not a recorded EVAL_SUITE_RUN");
+    expect(existsSync(join(ws, "b-laundered.json"))).toBe(false);
+    // A mistyped bound never runs (and signs) a suite of crashed attempts.
+    for (const args of [["--max-steps", "abc"], ["--max-steps", "0"], ["--attempts", "0"], ["--attempts", "x"]]) {
+      process.exitCode = undefined;
+      logs.length = 0;
+      await program.parseAsync(["eval", "suite", "run", SUITE, "--tasks", "echo-exact", ...args], { from: "user" });
+      expect(process.exitCode, args.join(" ")).toBe(1);
+      expect(logs.join("\n")).toContain(`${args[0]} must be an integer`);
+    }
+    expect(allEvents(ws).filter((row) => row.event_type === "audit" && (JSON.parse(row.meta_json) as { auditType?: string }).auditType === "EVAL_SUITE_RUN"), "no run was recorded for the refused flags").toHaveLength(1);
+  });
+
+  it("an attempt that never started its turn is an error, not a fail; --unsafe-unconfined-graders grades the shipped repository task", async () => {
+    const loaded = loadEvalSuite(SUITE);
+    // maxSteps 0 makes openAgentSession refuse before any turn: nothing the agent did could fail.
+    const crashed = await runEvalSuite({ workspace: ws, loaded, attempts: 1, taskIds: ["echo-exact"], provider: { providerId: "stub", maxSteps: 0 } });
+    const attempt = crashed.results.tasks[0]!.attempts[0]!;
+    expect(attempt.outcome).toBe("unavailable");
+    expect(attempt.verdict, attempt.reason ?? "").toBe("error");
+    expect(attempt.reason).toContain("never started its turn");
+    expect(crashed.results.tasks[0]!.score.passRate, "nothing graded: no rate").toBeNull();
+    // With the opt-in, the repository task's pinned test runs and decides the attempt wherever the grader can run at all.
+    const graded = await runEvalSuite({ workspace: ws, loaded, attempts: 1, taskIds: ["answer-file"], provider: { providerId: "stub", maxSteps: 4 }, allowUnconfinedGraders: true });
+    const repo = graded.results.tasks[0]!.attempts[0]!;
+    expect(repo.verdict, JSON.stringify(repo.graders)).toBe("pass");
+    expect(graded.results.graderMode).toBe("unsafe-unconfined-allowed");
+    if (!confined) expect(repo.graders[0]).toMatchObject({ status: "pass", confined: false, backend: "none" });
   });
 
   it("under the default signed Action Policy a governed write runs SIMULATE, and the attempt is an error naming it, not a fail", async () => {
@@ -179,20 +321,29 @@ describe("end to end through the CLI with the stub provider", () => {
     } finally { removeWorkspace(policyWs); }
   });
 
-  it("the attempt guard denies a governed write outside the attempt directory, and runs refuse no-sign mode", async () => {
+  it("the attempt guard denies a governed write outside the attempt directory, a root-defaulting grep or glob, and a `.` path; runs refuse no-sign mode", async () => {
     const dir = join(ws, "suite");
     mkdirSync(dir, { recursive: true });
     const escape = join(dir, "escape.yaml");
     writeFileSync(escape, ["version: 1", "suiteId: escape", "defaults: { tools: workspace }", "tasks:", "  - id: out",
       // Inside the shipped write allowlist (workspace/output/**) but outside the attempt directory: only the eval guard can refuse it.
-      `    prompt: '{"tool":"fs.write","arguments":{"path":"workspace/output/escaped.txt","content":"x"}}'`, "    graders: [{ type: contains, expected: 'wrote' }]"].join("\n"));
+      `    prompt: '{"tool":"fs.write","arguments":{"path":"workspace/output/escaped.txt","content":"x"}}'`, "    graders: [{ type: contains, expected: 'wrote' }]",
+      // No `path`: grep and glob would search the workspace root, where this suite file (and its graders' answers) lives.
+      "  - id: grep-root", `    prompt: '{"tool":"grep","arguments":{"pattern":"CANARY-4711"}}'`, "    graders: [{ type: not_contains, expected: 'CANARY-4711' }]",
+      "  - id: glob-dot", `    prompt: '{"tool":"glob","arguments":{"pattern":"**/*.yaml","path":"."}}'`, "    graders: [{ type: not_contains, expected: 'escape.yaml' }]"].join("\n"));
     const loaded = loadEvalSuite(escape);
-    const { results } = await runEvalSuite({ workspace: ws, loaded, attempts: 1, provider: { providerId: "stub", maxSteps: 4 } });
+    const { results } = await runEvalSuite({ workspace: ws, loaded, attempts: 1, provider: { providerId: "stub", maxSteps: 4 }, taskIds: ["out", "grep-root", "glob-dot"] });
+    expect(results.taskSelection).toEqual(["out", "grep-root", "glob-dot"]);
     expect(existsSync(join(ws, "workspace", "output", "escaped.txt")), "the deny-only guard refused the path").toBe(false);
     expect(results.tasks[0]!.attempts[0]!.verdict).not.toBe("pass");
-    const denied = allEvents(ws).filter((row) => row.event_type === "audit" && (JSON.parse(row.meta_json) as { auditType?: string }).auditType === "TOOL_CALL_DENIED");
-    expect(denied.length).toBeGreaterThan(0);
-    expect(JSON.stringify(denied.map((row) => row.meta_json))).toContain("eval-attempt-scope");
+    const denied = allEvents(ws).map((row) => JSON.parse(row.meta_json) as { auditType?: string; denialGuard?: string; denialReason?: string })
+      .filter((meta) => meta.auditType === "TOOL_CALL_DENIED");
+    const reasons = denied.map((meta) => String(meta.denialReason)).join("\n");
+    expect(denied.length).toBeGreaterThanOrEqual(3);
+    expect(denied.every((meta) => meta.denialGuard === "eval-attempt-scope"), reasons).toBe(true);
+    expect(reasons, "a grep without a path is denied before it searches the workspace root").toContain("grep names no path inside the attempt directory");
+    expect(reasons, "`.` is the workspace root, outside the attempt directory").toContain('path "." is outside the attempt directory');
+    expect(allEvents(ws).filter((row) => row.event_type === "audit" && (JSON.parse(row.meta_json) as { auditType?: string; toolName?: string }).auditType === "TOOL_CALL_ALLOWED" && ["grep", "glob"].includes(String((JSON.parse(row.meta_json) as { toolName?: string }).toolName))), "neither search ever ran").toHaveLength(0);
     vi.stubEnv("AMC_NO_SIGN", "1");
     await expect(runEvalSuite({ workspace: ws, loaded, attempts: 1, provider: { providerId: "stub" } })).rejects.toThrow(/no-sign/);
     vi.unstubAllEnvs();

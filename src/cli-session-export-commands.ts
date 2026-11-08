@@ -5,17 +5,32 @@
  */
 import type { Command } from "commander";
 import { readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { extname, resolve } from "node:path";
 import chalk from "chalk";
 import { finishVerify, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
-import type { ExtractedSessionExport } from "./observability/sessionExportHtml.js";
+import { extractSessionExportJson, type ExtractedSessionExport } from "./observability/sessionExportHtml.js";
 import { admitKey, buildVerifierReport, withPins } from "./trust/index.js";
 import { fileSha256 } from "./trust/signatureCheck.js";
+
+/**
+ * The parser is chosen by the file's extension, never by sniffing its bytes (S14b): a JSON body saved as `.html` renders
+ * as HTML in a browser, so it must pass the canonical-rendering check like any other page. A `.json` file must be,
+ * byte for byte, the `--json-out` form of its document, so an edited or reformatted copy is refused as well.
+ */
+export function parseSessionExportFile(path: string, text: string): ExtractedSessionExport {
+  const ext = extname(path).toLowerCase();
+  if (ext === ".html" || ext === ".htm") return extractSessionExportJson(text);
+  if (ext !== ".json") return { doc: null, error: `unsupported export file extension ${ext || "(none)"}: pass the .html export or the .json written by --json-out` };
+  let doc: unknown;
+  try { doc = JSON.parse(text); } catch { return { doc: null, error: "the file is not valid JSON" }; }
+  if (JSON.stringify(doc, null, 2) !== text) return { doc: null, error: "the file is not the canonical --json-out form of its document: it was edited or reformatted" };
+  return { doc, error: null };
+}
 
 export function registerSessionExportCommands(session: Command): void {
   session
     .command("export")
-    .description("Export a session as a self-contained HTML viewer (digests only unless --include-content), verifiable offline")
+    .description("Export a session as a self-contained HTML viewer (payload digests only unless --include-content; signed row metadata always), verifiable offline")
     .argument("<id>", "session id")
     .requiredOption("--out <path>", "HTML file to write")
     .option("--include-content", "Embed message, tool argument and output text (redacted, bounded; refused when payloads are encrypted)")
@@ -27,7 +42,9 @@ export function registerSessionExportCommands(session: Command): void {
         const doc = buildSessionExport({ workspace: process.cwd(), sessionId: id, includeContent: opts.includeContent === true });
         writeFileSync(resolve(opts.out), renderSessionExportHtml(doc));
         if (opts.jsonOut !== undefined) writeFileSync(resolve(opts.jsonOut), JSON.stringify(doc, null, 2));
-        console.log(chalk.green(`Wrote ${resolve(opts.out)} (${doc.rows.length} rows, ${doc.content === null ? "digests only" : "content included"}, tail ${doc.record?.ended_ts != null ? "sealed" : "unproven"})`));
+        console.log(chalk.green(`Wrote ${resolve(opts.out)} (${doc.rows.length} rows, ${doc.content === null ? "payload digests only" : "content included"}, tail ${doc.record?.ended_ts != null ? "sealed" : "unproven"})`));
+        // Redacting the signed metadata would break verification, so it travels verbatim even in a digests-only export.
+        if (doc.content === null) console.log(chalk.gray("  signed row metadata is embedded verbatim: provider failure messages, approval questions and answer reasons included"));
         // The fingerprint must travel out of band, not inside the file it authenticates.
         console.log(chalk.gray("  monitor key fingerprint (share out of band; verify with --expect-monitor):"));
         console.log(`    ${doc.monitorKeyFingerprint}`);
@@ -40,21 +57,18 @@ export function registerSessionExportCommands(session: Command): void {
   withTrustFlags(session
     .command("verify-export")
     .description("Verify an exported session file offline against a pinned monitor key fingerprint")
-    .argument("<file>", "HTML or JSON export")
+    .argument("<file>", "the .html export, or the .json written by --json-out (the extension picks the parser)")
     .option("--accept-unverifiable-content", "Accept redacted, truncated or spilled content entries as display-only (they cannot be checked against their digests)")
     .option("--json", "Output as JSON"), { expectMonitor: true, ledgerOnly: true })
     .action(async (file: string, opts: TrustFlags & { acceptUnverifiableContent?: boolean }) => {
       const { verifySessionExport } = await import("./observability/sessionExport.js");
-      const { extractSessionExportJson } = await import("./observability/sessionExportHtml.js");
       if (opts.expectMonitor === undefined) {
         console.error(chalk.red("verify-export needs --expect-monitor <sha256>: a file cannot vouch for its own key."));
         process.exit(1);
         return;
       }
       const path = resolve(file);
-      const text = readFileSync(path, "utf8");
-      const parseJson = (): ExtractedSessionExport => { try { return { doc: JSON.parse(text) as unknown, error: null }; } catch { return { doc: null, error: "the file is not valid JSON" }; } };
-      const extracted = text.trimStart().startsWith("{") ? parseJson() : extractSessionExportJson(text);
+      const extracted = parseSessionExportFile(path, readFileSync(path, "utf8"));
       const doc = extracted.doc;
       const checked = verifySessionExport(doc, { expectedFingerprint: opts.expectMonitor, acceptUnverifiableContent: opts.acceptUnverifiableContent === true });
       const verdict = extracted.error === null ? checked : { ...checked, ok: false, errors: [extracted.error, ...checked.errors] };

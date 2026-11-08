@@ -4,9 +4,10 @@
  * the digests are pinned in the results file.
  */
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { dirname, join, relative, resolve, sep } from "node:path";
 import YAML from "yaml";
 import { sha256Hex } from "../utils/hash.js";
+import { isWithin } from "../utils/pathSafety.js";
 import { suiteSchema, type EvalSuite } from "./suiteSchema.js";
 
 const MAX_FIXTURE_BYTES = 50 * 1024 * 1024;
@@ -19,11 +20,6 @@ export interface LoadedSuite {
   readonly suiteSha256: string;
   /** Per task id, the fixture files in snapshot order. */
   readonly fixtures: ReadonlyMap<string, readonly FixtureFile[]>;
-}
-
-function insideRoot(root: string, candidate: string): boolean {
-  const rel = relative(root, candidate);
-  return rel === "" || (!rel.startsWith("..") && !isAbsolute(rel));
 }
 
 function snapshotDir(root: string, budget: { left: number }): FixtureFile[] {
@@ -57,7 +53,7 @@ export function loadEvalSuite(path: string): LoadedSuite {
   for (const task of result.data.tasks) {
     if (task.fixture === undefined) continue;
     const dir = resolve(suiteDir, task.fixture.dir);
-    if (!insideRoot(suiteDir, dir)) throw new Error(`task ${task.id}: fixture ${task.fixture.dir} is outside the suite directory`);
+    if (!isWithin(suiteDir, dir)) throw new Error(`task ${task.id}: fixture ${task.fixture.dir} is outside the suite directory`);
     if (!statSync(dir, { throwIfNoEntry: false })?.isDirectory()) throw new Error(`task ${task.id}: fixture directory ${task.fixture.dir} does not exist`);
     fixtures.set(task.id, snapshotDir(dir, budget));
   }

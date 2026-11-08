@@ -17,10 +17,24 @@ export function registerObservabilityCommands(program: Command, activeAgent: (p:
   registerOtelPreviewCommand(observe);
   registerUsageCommand(program);
   registerEvalSuiteCommands(program);
-  // A short-lived command exits before the shared exporter's size-triggered flush: send what it buffered, bounded.
+  // A short-lived command exits before the shared exporter's size-triggered flush: send what it buffered, bounded, and
+  // record what the budget left behind, since no later governed action will write that TELEMETRY_DROPPED row.
   program.hook("postAction", async () => {
     const { flushSharedObservabilityExporter } = await import("./observability/otelExporter.js");
-    await flushSharedObservabilityExporter().catch(() => null);
+    if (await flushSharedObservabilityExporter().catch(() => null) === null) return;
+    const { peekDroppedTelemetry } = await import("./observability/telemetryDrops.js");
+    if (peekDroppedTelemetry() === 0) return;
+    // Never create a ledger (and its keys) in a directory that is not a workspace just to hold this row.
+    const [{ existsSync }, { join }] = await Promise.all([import("node:fs"), import("node:path")]);
+    if (existsSync(join(process.cwd(), ".amc", "evidence.sqlite"))) {
+      try {
+        const [{ openLedger }, { writeTelemetryDrops }] = await Promise.all([import("./ledger/ledger.js"), import("./actions/actionJournal.js")]);
+        const ledger = openLedger(process.cwd());
+        try { writeTelemetryDrops(ledger, true); } finally { ledger.close(); }
+      } catch { /* the count stays with the process; reported below */ }
+    }
+    const left = peekDroppedTelemetry();
+    if (left > 0) console.error(chalk.yellow(`telemetry: ${left} item(s) could not be exported before exit, and no TELEMETRY_DROPPED row could be written`));
   });
 
   /* ── observe timeline ──────────────────────────────────────────── */

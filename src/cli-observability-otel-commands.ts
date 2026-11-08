@@ -29,8 +29,9 @@ export function registerOtelPreviewCommand(observe: Command): void {
       const targets = resolved.config.targets.length > 0 ? resolved.config.targets : [{ kind: "otlp" as const, endpoint: "http://127.0.0.1:4318" }];
       const exporter = new ObservabilityOTELExporter({ ...resolved.config, enabled: true, targets: targets.map((target) => ({ ...target, headers: {} })) });
       const folder = new NativeSpanFolder();
-      const folded = events.map((event) => folder.ingest(event)).filter((output) => output !== null);
-      for (const output of [...folded, folder.drain(events[events.length - 1]!.ts)]) recordFoldOutput(exporter, output);
+      // The drained output holds the spans still open at the last row (a crashed or `--keep-open` session), marked unterminated; the tree shows them too.
+      const folded = [...events.map((event) => folder.ingest(event)).filter((output) => output !== null), folder.drain(events[events.length - 1]!.ts)];
+      for (const output of folded) recordFoldOutput(exporter, output);
       const requests = exporter.previewRequests().map((request) => ({ ...request, endpoint: endpointHostOnly(request.endpoint) }));
       if (opts.json) {
         console.log(JSON.stringify({ sessionId: opts.session, export: resolved.config.enabled ? "enabled" : "disabled", disabledReason: resolved.disabledReason, requests }, null, 2));

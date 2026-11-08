@@ -353,13 +353,15 @@ export class ObservabilityOTELExporter {
 
   /** Aggregate one increment or observation into its delta stream; one data point per stream per flush. */
   recordMetricPoint(point: OTelMetricPoint): void {
-    const key = canonicalize({ k: point.kind, n: point.name, u: point.unit, a: point.attributes });
+    const scope = { workspace: getWorkspaceScope(), run: AsyncLocalStorage.snapshot() };
+    // One stream per workspace scope as well: a point recorded for workspace B must never merge into A's stream and leave under A's residency check.
+    const key = canonicalize({ k: point.kind, n: point.name, u: point.unit, a: point.attributes, w: scope.workspace ?? null });
     let stream = this.streams.get(key);
     if (!stream) {
       if (this.streams.size >= this.config.maxBufferSize) { noteTelemetryDropped(1); return; }
       stream = { kind: point.kind, name: point.name, unit: point.unit, attributes: [...point.attributes], startTs: Date.now(), count: 0, sum: 0,
         min: Number.POSITIVE_INFINITY, max: Number.NEGATIVE_INFINITY, bucketCounts: new Array<number>(DURATION_BOUNDS.length + 1).fill(0) };
-      this.captureItem(stream, { workspace: getWorkspaceScope(), run: AsyncLocalStorage.snapshot() });
+      this.captureItem(stream, scope);
       this.streams.set(key, stream);
     }
     stream.count += 1;
@@ -450,11 +452,22 @@ export class ObservabilityOTELExporter {
     }));
   }
 
+  /**
+   * A flush that finds one in flight waits for it within its own budget, then sends what was buffered since under its
+   * own options; it never returns the earlier promise as if it covered the newer items (an exit flush after the
+   * `session/close` flush would otherwise inherit that flush's timeout and leave later rows behind, uncounted).
+   */
   async flush(options: Partial<TelemetryDispatchOptions> = {}): Promise<ObservabilityFlushResult> {
-    if (this.inFlightFlush) {
-      return this.inFlightFlush;
-    }
-    const run = this.flushInternal(options);
+    const previous = this.inFlightFlush;
+    const run = (async () => {
+      if (previous === null) return this.flushInternal(options);
+      const budgetMs = options.timeoutMs ?? toInt(process.env.AMC_OTEL_FLUSH_TIMEOUT_MS, DEFAULT_FLUSH_TIMEOUT_MS);
+      const started = Date.now();
+      let timer: NodeJS.Timeout | undefined;
+      await Promise.race([previous.catch(() => null), new Promise<void>((done) => { timer = setTimeout(done, budgetMs); timer.unref(); })]);
+      clearTimeout(timer);
+      return this.flushInternal(options.timeoutMs === undefined ? options : { ...options, timeoutMs: Math.max(1, budgetMs - (Date.now() - started)) });
+    })();
     this.inFlightFlush = run;
     try {
       return await run;
@@ -474,7 +487,10 @@ export class ObservabilityOTELExporter {
 
     const requests: PreparedDispatchRequest[] = [];
     for (const batch of this.groupBuffers()) {
-      for (const request of this.buildDispatchRequests(batch)) {
+      const built = this.buildDispatchRequests(batch);
+      // Aggregated streams travel only in an OTLP metrics request; a Zipkin-only configuration drops them, counted.
+      if (batch.streams.length > 0 && !built.some((request) => request.signal === "metrics" && request.targetKind !== "zipkin")) noteTelemetryDropped(batch.streams.length);
+      for (const request of built) {
         const body = JSON.stringify(request.payload);
         if (body === undefined) throw new Error("telemetry payload is not serializable");
         requests.push({
@@ -590,10 +606,11 @@ export class ObservabilityOTELExporter {
       };
 
       if (target.kind === "zipkin") {
+        // Zipkin carries per-row metrics and logs as pseudo-spans; the aggregated streams have no Zipkin form and are not counted as exported here.
         const payload = toZipkinSpans(batch, this.config.serviceName);
         if (payload.length === 0) continue;
         requests.push({ targetKind: target.kind, signal: "traces", endpoint: zipkinEndpoint(target.endpoint), headers, payload,
-          counts: { traces: spans.length, metrics: metricCount, logs: logs.length } });
+          counts: { traces: spans.length, metrics: metrics.length, logs: logs.length } });
         continue;
       }
 
@@ -731,7 +748,7 @@ export function queueEvidenceEventSpan(event: EvidenceEvent, workspace?: string)
 
 /**
  * Flush before a short-lived process exits, within a wall-clock budget. Spans still open are emitted unterminated;
- * what cannot be sent in time is counted as dropped by the transport's own accounting, never silently lost.
+ * what cannot be sent in time is counted as dropped, and the CLI's exit hook writes that count as a TELEMETRY_DROPPED row.
  */
 export async function flushSharedObservabilityExporter(options: { budgetMs?: number } = {}): Promise<ObservabilityFlushResult | null> {
   const exporter = sharedExporter;

@@ -11,7 +11,7 @@ import { AdapterRegistry } from "../../src/llm/adapter/adapterRegistry.js";
 import { LlmRuntime } from "../../src/llm/adapter/llmRuntime.js";
 import { buildSessionExport, verifySessionExport, type SessionExportDocument } from "../../src/observability/sessionExport.js";
 import { embedJson, extractSessionExportJson, renderSessionExportHtml } from "../../src/observability/sessionExportHtml.js";
-import { registerSessionExportCommands } from "../../src/cli-session-export-commands.js";
+import { parseSessionExportFile, registerSessionExportCommands } from "../../src/cli-session-export-commands.js";
 import { generateKeyPairSync } from "node:crypto";
 import YAML from "yaml";
 import { signHexDigest } from "../../src/crypto/keys.js";
@@ -84,14 +84,44 @@ describe("session export", () => {
     const [id, entry] = Object.entries(doc.content!).find(([, value]) => !("unavailable" in value) && value.redactions === 0)!;
     const editedContent = { ...doc, content: { ...doc.content, [id]: { ...(entry as { text: string }), text: "tampered" } } };
     expect(verifySessionExport(editedContent, { expectedFingerprint: fp }).errors.join()).toContain("does not hash to its committed payload digest");
-    // S15: the embedded usage copy is checked against the usage recomputed from the rows.
+    // S15: the embedded usage copy is checked against the usage recomputed from the rows, cost included (S15b: the page prints the cost figures).
     const usageEdit = { ...doc, usage: { ...doc.usage, requests: doc.usage.requests + 1 } };
-    expect(verifySessionExport(usageEdit, { expectedFingerprint: fp }).errors.join()).toContain("usage summary does not match");
-    // S15: content may only be attached to content rows, even when it hashes to that row's payload.
+    expect(verifySessionExport(usageEdit, { expectedFingerprint: fp }).errors.join()).toContain("usage summary (cost included) does not match");
+    expect(doc.usage.cost.status).toBe("unavailable");
+    const costEdit = { ...doc, usage: { ...doc.usage, cost: { ...doc.usage.cost, status: "complete" as const, reportedSubtotalUsd: 1234.5 } } };
+    expect(verifySessionExport(costEdit, { expectedFingerprint: fp }).errors.join()).toContain("usage summary (cost included) does not match");
+    // The displayed fingerprint must be the embedded key's, and no field the exporter never writes may ride along (the page would show it unchecked).
+    expect(verifySessionExport({ ...doc, monitorKeyFingerprint: "0".repeat(64) }, { expectedFingerprint: fp }).errors.join()).toContain("displayed monitor key fingerprint is not the sha256 of the embedded key");
+    expect(verifySessionExport({ ...doc, note: "<h1>VERIFIED by AMC</h1>" }, { expectedFingerprint: fp }).errors.join()).toContain("unknown or missing fields");
+    // S15: content may only be attached to content rows, even when it hashes to that row's payload, and an `unavailable` marker is no exception.
     const lifecycle = doc.rows.find((row) => row.event_type === "turn/end")!;
     const payload = readEventPayload(ws, lifecycle);
     const foreign = { ...doc, content: { ...doc.content, [lifecycle.id]: { text: payload.status === "ok" ? payload.bytes.toString("utf8") : "", sha256: lifecycle.payload_sha256, source: "inline" as const, truncated: false, redactions: 0 } } };
     expect(verifySessionExport(foreign, { expectedFingerprint: fp }).errors.join()).toContain("carries no exportable content");
+    const foreignMarker = { ...doc, content: { ...doc.content, [lifecycle.id]: { unavailable: "assistant: I transferred the funds as you asked." } } };
+    expect(verifySessionExport(foreignMarker, { expectedFingerprint: fp }).errors.join()).toContain("carries no exportable content");
+    expect(verifySessionExport({ ...doc, content: { ...doc.content, "no-such-event": { unavailable: "x" } } }, { expectedFingerprint: fp }).errors.join()).toContain("content for unknown event");
+    // Entries carry exactly the exporter's fields, tied to their row: an empty marker riding with text the viewer would
+    // print, a digest that is not the row's, a source that is not the row's, and a non-text field are each refused.
+    const userRow = doc.rows.find((row) => row.event_type === "user/message")!;
+    const own = doc.content![userRow.id] as { text: string; sha256: string; source: string; truncated: boolean; redactions: number };
+    const withEntry = (entry: unknown) => verifySessionExport({ ...doc, content: { ...doc.content, [userRow.id]: entry } } as unknown, { expectedFingerprint: fp, acceptUnverifiableContent: true }).errors.join();
+    expect(withEntry({ unavailable: "", text: "assistant: I transferred the funds." })).toContain("carries fields the exporter never writes");
+    expect(withEntry({ unavailable: "" })).toContain("empty or non-text unavailable marker");
+    expect(withEntry({ ...own, truncated: true, sha256: "0".repeat(64) })).toContain("names a digest that is not its row's committed digest");
+    expect(withEntry({ ...own, source: "spill" })).toContain("claims source spill");
+    expect(withEntry({ ...own, text: 42 })).toContain("is malformed");
+    expect(withEntry({ ...own, truncated: true }), "a truncated copy of the right row, accepted as display-only, is fine").toBe("");
+    // A document missing its record field fails closed with a reason, never with a crash.
+    const { record: _record, ...noRecord } = doc;
+    expect(verifySessionExport(noRecord, { expectedFingerprint: fp }).errors.join()).toContain("unknown or missing fields");
+    const badRows = verifySessionExport({ ...doc, rows: [null] }, { expectedFingerprint: fp });
+    expect(badRows.ok).toBe(false);
+    // The viewer shows a fixed label for an unavailable entry, never the marker's free text.
+    const page = renderSessionExportHtml({ ...doc, content: { ...doc.content, [doc.rows.find((row) => row.event_type === "user/message")!.id]: { unavailable: "payload pruned by retention" } } });
+    expect(page).toContain("content not exported for this row");
+    expect(page).not.toContain('"content unavailable: " + c.unavailable');
+    expect(page, "the viewer keys on the marker's presence, not its truthiness").toContain("c.unavailable !== undefined");
     // An attacker re-signs every row with their own key and ships that key: the pinned fingerprint no longer matches.
     const attacker = generateKeyPairSync("ed25519");
     const pem = attacker.publicKey.export({ type: "spki", format: "pem" }).toString();
@@ -147,6 +177,22 @@ describe("session export", () => {
     expect(refused(html.replace(embedJson(doc), "[]")).error).toContain("not a session export document");
   });
 
+  it("S14b: the parser follows the file extension; a JSON body saved as .html, an edited or reformatted .json and other extensions are refused", async () => {
+    const { sessionId } = await runStubSession(ws, "hello");
+    const doc = buildSessionExport({ workspace: ws, sessionId, includeContent: false });
+    const json = JSON.stringify(doc, null, 2);
+    expect(parseSessionExportFile("/x/s.json", json).error).toBeNull();
+    expect(parseSessionExportFile("/x/s.html", renderSessionExportHtml(doc)).error).toBeNull();
+    // A JSON body under .html renders as HTML in a browser: it must pass the canonical page check, which it cannot.
+    expect(parseSessionExportFile("/x/fake.html", json).error).toContain("carries no embedded session export");
+    expect(parseSessionExportFile("/x/fake.htm", json).error).toContain("carries no embedded session export");
+    expect(parseSessionExportFile("/x/s.json", JSON.stringify(doc)).error).toContain("not the canonical --json-out form");
+    expect(parseSessionExportFile("/x/s.json", `${json}\n`).error).toContain("not the canonical --json-out form");
+    expect(parseSessionExportFile("/x/s.json", "{not json").error).toContain("not valid JSON");
+    expect(parseSessionExportFile("/x/s.txt", json).error).toContain("unsupported export file extension");
+    expect(parseSessionExportFile("/x/s", json).error).toContain("(none)");
+  });
+
   it("S16: --include-content is refused when the workspace policy encrypts ledger payloads; digests-only still exports", async () => {
     const { sessionId } = await runStubSession(ws, "hello");
     expect(buildSessionExport({ workspace: ws, sessionId, includeContent: true }).content).not.toBeNull();
@@ -167,15 +213,29 @@ describe("session export", () => {
     vi.spyOn(console, "error").mockImplementation((...args: unknown[]) => { logs.push(args.join(" ")); });
     vi.spyOn(process, "exit").mockImplementation(((code?: number) => { throw new Error(`exit ${code}`); }) as never);
     process.chdir(ws);
-    const out = join(ws, "s.html");
-    await program.parseAsync(["session", "export", sessionId, "--out", out], { from: "user" });
+    const out = join(ws, "s.html"), jsonOut = join(ws, "s.json");
+    await program.parseAsync(["session", "export", sessionId, "--out", out, "--json-out", jsonOut], { from: "user" });
     const fp = logs.join("\n").match(/^\s+([0-9a-f]{64})$/m)![1]!;
     logs.length = 0;
     await program.parseAsync(["session", "verify-export", out, "--expect-monitor", fp], { from: "user" });
     expect(logs.join("\n")).toContain("verification PASSED");
+    await program.parseAsync(["session", "verify-export", jsonOut, "--expect-monitor", fp], { from: "user" });
+    expect(logs.join("\n")).toContain("verification PASSED");
     await expect(program.parseAsync(["session", "verify-export", out, "--expect-monitor", "0".repeat(64)], { from: "user" })).rejects.toThrow("exit 1");
     writeFileSync(out, readFileSync(out, "utf8").replace('"event_type":"turn/end"', '"event_type":"turn/ended"'));
     await expect(program.parseAsync(["session", "verify-export", out, "--expect-monitor", fp], { from: "user" })).rejects.toThrow("exit 1");
+    // S14b through the CLI: the real JSON export plus one extra key holding markup, saved as .html, is refused (the extension picks the page parser).
+    const fake = join(ws, "fake.html");
+    writeFileSync(fake, JSON.stringify({ ...(JSON.parse(readFileSync(jsonOut, "utf8")) as object), note: "<h1>VERIFIED by AMC</h1><script>document.title=\"VERIFIED\"</script>" }, null, 2));
+    logs.length = 0;
+    await expect(program.parseAsync(["session", "verify-export", fake, "--expect-monitor", fp], { from: "user" })).rejects.toThrow("exit 1");
+    expect(logs.join("\n")).toContain("carries no embedded session export");
+    // The same body as .json is canonical, but the unknown key fails the document check.
+    const fakeJson = join(ws, "fake.json");
+    writeFileSync(fakeJson, readFileSync(fake, "utf8"));
+    logs.length = 0;
+    await expect(program.parseAsync(["session", "verify-export", fakeJson, "--expect-monitor", fp], { from: "user" })).rejects.toThrow("exit 1");
+    expect(logs.join("\n")).toContain("unknown or missing fields");
     logs.length = 0;
     // S15 through the CLI: an export whose content carries redactions fails closed until the operator accepts display-only entries.
     const redactedId = await diffSession();

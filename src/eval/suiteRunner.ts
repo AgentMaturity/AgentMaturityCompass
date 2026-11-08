@@ -19,6 +19,7 @@ import type { ToolGuard } from "../tools/toolTypes.js";
 import type { EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { isWithin } from "../utils/pathSafety.js";
 import { amcVersion } from "../version.js";
 import { gradeCommand, gradeText, type GraderResult } from "./suiteGraders.js";
 import { fixtureDigests, type LoadedSuite } from "./suiteLoader.js";
@@ -56,6 +57,8 @@ export interface EvalResults {
   readonly startedAt: number;
   readonly endedAt: number;
   readonly attemptsPerTask: number;
+  /** The `--tasks` selection this run was limited to, or null for the whole suite (a subset run cannot gate the suite). */
+  readonly taskSelection: readonly string[] | null;
   readonly graderMode: "confined-or-refused" | "unsafe-unconfined-allowed";
   readonly tasks: ReadonlyArray<{ readonly taskId: string; readonly attempts: readonly EvalAttemptRecord[]; readonly score: TaskScore }>;
   readonly summary: SuiteSummary & { readonly cost: { readonly attributedUsd: number | null; readonly complete: boolean; readonly unknownRequests: number } };
@@ -73,19 +76,28 @@ interface RunEvalSuiteOptions {
   readonly onProgress?: (line: string) => void;
 }
 
-function inside(root: string, candidate: string): boolean {
-  const rel = relative(root, candidate);
-  return rel === "" || (!rel.startsWith("..") && !rel.startsWith(sep));
-}
+/**
+ * The tools an eval attempt may call. A file tool must name its `path` inside the attempt directory (`glob` and `grep`
+ * search the workspace root when it is omitted, which holds the suite file with the graders' answers and other
+ * attempts' outputs); a session tool reaches no file (todo and plan are session-bound records). Every other tool is
+ * refused: shells, jobs and terminals run commands, web tools leave the machine, delegation composes its own toolset,
+ * MCP servers read what they like, and a tool added later is refused until it is listed here.
+ */
+const ATTEMPT_TOOLS: ReadonlyMap<string, "path" | null> = new Map([
+  ["fs.read", "path"], ["fs.write", "path"], ["fs.edit", "path"], ["glob", "path"], ["grep", "path"],
+  ["todo", null], ["plan", null], ["get_goal", null], ["tool_search", null], ["session.spill_read", null]
+]);
 
-/** Deny-only: fs paths outside the attempt directory and any shell are refused; nothing is ever allowed by it. */
-function attemptGuard(workspace: string, attemptDir: string, label: string): ToolGuard {
+/** Deny-only (D55): refuses any tool outside {@link ATTEMPT_TOOLS} and any file path outside the attempt directory; it never allows a call. */
+export function attemptGuard(workspace: string, attemptDir: string, label: string): ToolGuard {
+  const relDir = relative(workspace, attemptDir);
   return (execution) => {
-    if (execution.name === "bash" || execution.name.startsWith("shell")) return `${label}: shell tools are not offered to eval attempts`;
-    for (const key of ["path", "from", "to", "dir", "cwd", "file"]) {
-      const value = execution.arguments[key];
-      if (typeof value === "string" && !inside(attemptDir, resolve(workspace, value))) return `${label}: ${key} ${JSON.stringify(value)} is outside the attempt directory ${relative(workspace, attemptDir)}`;
-    }
+    if (!ATTEMPT_TOOLS.has(execution.name)) return `${label}: ${execution.name} is not offered to eval attempts (only ${[...ATTEMPT_TOOLS.keys()].join(", ")})`;
+    const key = ATTEMPT_TOOLS.get(execution.name);
+    if (key === null || key === undefined) return undefined;
+    const value = execution.arguments[key];
+    if (typeof value !== "string") return `${label}: ${execution.name} names no ${key} inside the attempt directory ${relDir}; a call that would default to the workspace root is refused`;
+    if (!isWithin(attemptDir, resolve(workspace, value))) return `${label}: ${key} ${JSON.stringify(value)} is outside the attempt directory ${relDir}`;
     return undefined;
   };
 }
@@ -179,11 +191,15 @@ export async function runEvalSuite(options: RunEvalSuiteOptions): Promise<{ resu
       // `fail` would blame the agent for what the workspace's policy decided (docs/GOVERNOR.md "Reaching EXECUTE").
       const simulatedWrites = rows.filter((row) => { const meta = budgetMeta(row); return row.event_type === "audit" && meta.auditType === "TOOL_CALL_ALLOWED" && meta.effectiveMode === "SIMULATE" && meta.actionClass !== "READ_ONLY"; }).length;
       const simulatedReason = simulatedWrites > 0 ? `${simulatedWrites} governed write call(s) ran in SIMULATE under the workspace Action Policy, so the attempt produced no gradable output; grant EXECUTE for the task's action classes (docs/GOVERNOR.md "Reaching EXECUTE")` : null;
-      const verdict: EvalAttemptRecord["verdict"] = !result.ok ? "fail" : simulatedReason !== null || graders.some((g) => g.status === "error") ? "error" : graders.every((g) => g.status === "pass") ? "pass" : "fail";
+      // A trial that failed before its turn started (a session that never opened, a crashed harness) gave the agent nothing to fail.
+      const turnStarted = rows.some((row) => row.event_type === "turn/start");
+      const verdict: EvalAttemptRecord["verdict"] = !result.ok ? (turnStarted ? "fail" : "error")
+        : simulatedReason !== null || graders.some((g) => g.status === "error") ? "error" : graders.every((g) => g.status === "pass") ? "pass" : "fail";
       const cost = session?.cost ?? null;
       if (cost === null || cost.status !== "complete" || cost.attributedSubtotalUsd === null) costComplete = false; else costUsd += cost.attributedSubtotalUsd;
       unknownCostRequests += cost?.unknownRequests ?? 0;
-      records.push({ attempt, sessionId: sessionId ?? session?.sessionId ?? null, outcome: result.ok ? "completed" : "unavailable", reason: result.ok ? simulatedReason : result.reason, verdict, graders, durationMs,
+      records.push({ attempt, sessionId: sessionId ?? session?.sessionId ?? null, outcome: result.ok ? "completed" : "unavailable",
+        reason: result.ok ? simulatedReason : turnStarted ? result.reason : `the attempt never started its turn: ${result.reason}`, verdict, graders, durationMs,
         usage: session?.usage ?? null, cost: cost === null ? null : { status: cost.status, attributedUsd: cost.attributedSubtotalUsd, unknownRequests: cost.unknownRequests } });
       options.onProgress?.(`${label} ${verdict}${result.ok ? (simulatedReason === null ? "" : " (simulated)") : ` (${result.reason})`}`);
       if (!options.keepDirs) rmSync(attemptDir, { recursive: true, force: true });
@@ -194,7 +210,7 @@ export async function runEvalSuite(options: RunEvalSuiteOptions): Promise<{ resu
   const summary = summarizeSuite(tasks.map((task) => task.score), durations);
   const results: EvalResults = { schema: EVAL_RESULTS_SCHEMA, runId, suiteId: suite.suiteId, suiteSha256: options.loaded.suiteSha256, suitePath: options.loaded.path, fixtures: fixtureDigests(options.loaded),
     provider: { providerId: options.provider.providerId, model: options.provider.model ?? null }, agentId, amcVersion, startedAt, endedAt: Date.now(), attemptsPerTask: options.attempts,
-    graderMode: options.allowUnconfinedGraders ? "unsafe-unconfined-allowed" : "confined-or-refused", tasks,
+    taskSelection: options.taskIds === undefined ? null : [...options.taskIds], graderMode: options.allowUnconfinedGraders ? "unsafe-unconfined-allowed" : "confined-or-refused", tasks,
     summary: { ...summary, cost: { attributedUsd: costComplete && summary.attempts > 0 ? costUsd : null, complete: costComplete && summary.attempts > 0, unknownRequests: unknownCostRequests } } };
   const json = JSON.stringify(results, null, 2);
   const resultsSha256 = sha256Hex(json);

@@ -1,6 +1,7 @@
 /**
  * Eval suite scoring (SH-OBS-04): the unbiased pass@k estimator (Chen et al. 2021) and Wilson intervals from
- * src/experiments/stats.ts. No rate is reported over an unknown denominator.
+ * src/experiments/stats.ts. No rate is reported over an unknown denominator: an `error` attempt (a refused grader, a
+ * SIMULATE write, an unreadable answer) is neither a pass nor a fail, so rates and pass@k run over graded attempts only.
  */
 import { nearestRank, wilsonInterval } from "../experiments/stats.js";
 
@@ -20,8 +21,10 @@ export interface TaskScore {
   readonly attempts: number;
   readonly passes: number;
   readonly errors: number;
+  /** Over graded attempts (attempts minus errors); null when nothing was graded. */
   readonly passRate: number | null;
   readonly wilson95: { readonly lower: number; readonly upper: number } | null;
+  /** pass@1..pass@g over the g graded attempts. */
   readonly passAtK: Readonly<Record<string, number>>;
 }
 
@@ -29,10 +32,11 @@ export function scoreTask(taskId: string, outcomes: ReadonlyArray<"pass" | "fail
   const n = outcomes.length;
   const c = outcomes.filter((outcome) => outcome === "pass").length;
   const errors = outcomes.filter((outcome) => outcome === "error").length;
+  const graded = n - errors;
   const atK: Record<string, number> = {};
-  if (n > 0) for (let k = 1; k <= n; k += 1) atK[`pass@${k}`] = passAtK(n, c, k);
-  const wilson = n > 0 ? wilsonInterval(c, n) : null;
-  return { taskId, attempts: n, passes: c, errors, passRate: n > 0 ? c / n : null, wilson95: wilson ? { lower: wilson.lower, upper: wilson.upper } : null, passAtK: atK };
+  for (let k = 1; k <= graded; k += 1) atK[`pass@${k}`] = passAtK(graded, c, k);
+  const wilson = graded > 0 ? wilsonInterval(c, graded) : null;
+  return { taskId, attempts: n, passes: c, errors, passRate: graded > 0 ? c / graded : null, wilson95: wilson ? { lower: wilson.lower, upper: wilson.upper } : null, passAtK: atK };
 }
 
 export interface SuiteSummary {
@@ -40,7 +44,7 @@ export interface SuiteSummary {
   readonly attempts: number;
   readonly passes: number;
   readonly errors: number;
-  /** Over all attempts. */
+  /** Over graded attempts (attempts minus errors). */
   readonly passRate: number | null;
   /** Share of tasks whose every attempt passed. */
   readonly taskPassRate: number | null;
@@ -51,7 +55,8 @@ export function summarizeSuite(scores: readonly TaskScore[], durationsMs: readon
   const attempts = scores.reduce((sum, score) => sum + score.attempts, 0);
   const passes = scores.reduce((sum, score) => sum + score.passes, 0);
   const errors = scores.reduce((sum, score) => sum + score.errors, 0);
-  return { tasks: scores.length, attempts, passes, errors, passRate: attempts > 0 ? passes / attempts : null,
+  const graded = attempts - errors;
+  return { tasks: scores.length, attempts, passes, errors, passRate: graded > 0 ? passes / graded : null,
     taskPassRate: scores.length > 0 ? scores.filter((score) => score.attempts > 0 && score.passes === score.attempts).length / scores.length : null,
     latency: { p50Ms: durationsMs.length ? nearestRank(durationsMs, 0.5) : null, p95Ms: durationsMs.length ? nearestRank(durationsMs, 0.95) : null } };
 }
