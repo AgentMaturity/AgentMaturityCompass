@@ -612,6 +612,22 @@ function createProxyServer(params: {
   }) => void;
 }): Server {
   const resilience = gatewayResilienceConfig();
+  // Both proxy handlers verify the same way. SR-3: a request this does not verify writes its carrier audits within the
+  // pre-auth bound, so `audited` answers whether one such audit gets its own row.
+  const verifyProxyLease = (carrier: ReturnType<typeof extractLeaseCarrier>, agentId: string | undefined, host: string, clientIp: string) => {
+    const verification = verifyLeaseAndMapError({ workspace: params.workspace, expectedWorkspaceId: params.workspaceId, leaseToken: carrier.leaseToken ?? undefined,
+      expectedAgentId: agentId ?? "unknown", requiredScope: "proxy:connect", egress: { host, config: params.config } });
+    return { verification, audited: (auditType: string): boolean => (Boolean(agentId) && verification.ok) || params.preAuthAudit.shouldAudit(clientIp, auditType) };
+  };
+  // The lease refusal row of both handlers, within the pre-auth bound (LIVE-RUNTIME-21); CONNECT adds its target.
+  const auditLeaseRefusal = (requestId: string, clientIp: string, agentId: string | undefined, verification: ReturnType<typeof verifyLeaseAndMapError>,
+    kind: "request" | "connect", target: { destinationHost?: string; destinationPort?: number } = {}): void => {
+    const auditType = verification.ok ? "LEASE_INVALID_OR_MISSING" : verification.auditType;
+    if (!params.preAuthAudit.shouldAudit(clientIp, auditType)) return;
+    const row = { auditType, severity: "HIGH", request_id: requestId, ...target, agentId: agentId ?? null };
+    params.appendEvidence({ eventType: "audit", payload: JSON.stringify({ ...row, message: agentId ? verification.message : `missing x-amc-agent-id for proxy ${kind}` }),
+      meta: { ...row, proxyMode: true, trustTier: "OBSERVED" } });
+  };
   // A refusal by name, address or guarded target is a NETWORK_EGRESS_BLOCKED audit for the lease-verified agent. A DNS failure (the
   // target's, or a guarded upstream's) is not an egress attempt: HTTP 502 and an egress_unresolved gateway row for that agent, no audit.
   const recordRefusal = (requestId: string, agentId: string, host: string, port: number, egress: EgressCheck, meta: Record<string, unknown>): void => {
@@ -668,15 +684,7 @@ function createProxyServer(params: {
       url: targetUrl,
       allowQueryCarrier: params.config.lease.allowQueryCarrier
     });
-    const leaseVerification = verifyLeaseAndMapError({
-      workspace: params.workspace,
-      expectedWorkspaceId: params.workspaceId,
-      leaseToken: leaseCarrier.leaseToken ?? undefined,
-      expectedAgentId: proxyAgentId ?? "unknown",
-      requiredScope: "proxy:connect", egress: { host: targetUrl.hostname, config: params.config }
-    });
-    // SR-3: a request no lease vouches for writes its carrier audits within the pre-auth bound.
-    const carrierAudited = (auditType: string): boolean => (Boolean(proxyAgentId) && leaseVerification.ok) || params.preAuthAudit.shouldAudit(clientIp, auditType);
+    const { verification: leaseVerification, audited: carrierAudited } = verifyProxyLease(leaseCarrier, proxyAgentId, targetUrl.hostname, clientIp);
     if (leaseCarrier.nonLeaseCarrier && carrierAudited("AGENT_PROVIDED_KEY_IGNORED")) {
       params.appendEvidence({
         eventType: "audit",
@@ -720,24 +728,7 @@ function createProxyServer(params: {
       });
     }
     if (!proxyAgentId || !leaseVerification.ok) {
-      if (params.preAuthAudit.shouldAudit(clientIp, leaseVerification.ok ? "LEASE_INVALID_OR_MISSING" : leaseVerification.auditType)) params.appendEvidence({
-        eventType: "audit",
-        payload: JSON.stringify({
-          auditType: leaseVerification.ok ? "LEASE_INVALID_OR_MISSING" : leaseVerification.auditType,
-          severity: "HIGH",
-          request_id: requestId,
-          agentId: proxyAgentId ?? null,
-          message: proxyAgentId ? leaseVerification.message : "missing x-amc-agent-id for proxy request"
-        }),
-        meta: {
-          auditType: leaseVerification.ok ? "LEASE_INVALID_OR_MISSING" : leaseVerification.auditType,
-          severity: "HIGH",
-          request_id: requestId,
-          agentId: proxyAgentId ?? null,
-          proxyMode: true,
-          trustTier: "OBSERVED"
-        }
-      });
+      auditLeaseRefusal(requestId, clientIp, proxyAgentId, leaseVerification, "request");
       res.statusCode = proxyAgentId ? leaseVerification.statusCode : 401;
       res.end(proxyAgentId ? leaseVerification.message : "missing x-amc-agent-id");
       return;
@@ -879,15 +870,8 @@ function createProxyServer(params: {
       url: connectUrl,
       allowQueryCarrier: params.config.lease.allowQueryCarrier
     });
-    const leaseVerification = verifyLeaseAndMapError({
-      workspace: params.workspace,
-      expectedWorkspaceId: params.workspaceId,
-      leaseToken: leaseCarrier.leaseToken ?? undefined,
-      expectedAgentId: proxyAgentId ?? "unknown",
-      requiredScope: "proxy:connect", egress: { host: host ?? "", config: params.config }
-    });
-    // SR-3: as in the request handler, a CONNECT no lease vouches for audits its carrier within the pre-auth bound.
-    if (leaseCarrier.nonLeaseCarrier && ((Boolean(proxyAgentId) && leaseVerification.ok) || params.preAuthAudit.shouldAudit(clientIp, "AGENT_PROVIDED_KEY_IGNORED"))) {
+    const { verification: leaseVerification, audited: carrierAudited } = verifyProxyLease(leaseCarrier, proxyAgentId, host ?? "", clientIp);
+    if (leaseCarrier.nonLeaseCarrier && carrierAudited("AGENT_PROVIDED_KEY_IGNORED")) {
       params.appendEvidence({
         eventType: "audit",
         payload: JSON.stringify({
@@ -921,28 +905,7 @@ function createProxyServer(params: {
     }
 
     if (!proxyAgentId || !leaseVerification.ok) {
-      if (params.preAuthAudit.shouldAudit(clientIp, leaseVerification.ok ? "LEASE_INVALID_OR_MISSING" : leaseVerification.auditType)) params.appendEvidence({
-        eventType: "audit",
-        payload: JSON.stringify({
-          auditType: leaseVerification.ok ? "LEASE_INVALID_OR_MISSING" : leaseVerification.auditType,
-          severity: "HIGH",
-          request_id: requestId,
-          destinationHost: host,
-          destinationPort: port,
-          agentId: proxyAgentId ?? null,
-          message: proxyAgentId ? leaseVerification.message : "missing x-amc-agent-id for proxy connect"
-        }),
-        meta: {
-          auditType: leaseVerification.ok ? "LEASE_INVALID_OR_MISSING" : leaseVerification.auditType,
-          severity: "HIGH",
-          request_id: requestId,
-          destinationHost: host,
-          destinationPort: port,
-          agentId: proxyAgentId ?? null,
-          proxyMode: true,
-          trustTier: "OBSERVED"
-        }
-      });
+      auditLeaseRefusal(requestId, clientIp, proxyAgentId, leaseVerification, "connect", { destinationHost: host, destinationPort: port });
       clientSocket.write(`HTTP/1.1 ${proxyAgentId ? leaseVerification.statusCode : 401} Unauthorized\r\n\r\n`);
       clientSocket.destroy();
       return;
