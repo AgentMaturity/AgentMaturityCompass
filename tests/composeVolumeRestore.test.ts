@@ -66,7 +66,7 @@ describe("Compose volume backup and restore as COMPOSE.md writes them (skeptic 2
   it("takes the bundle and the volume archive at one point, with Studio stopped, and checks the controls after a restore", () => {
     const backup = doc.slice(doc.indexOf("## Backup\n"), doc.indexOf("## Upgrade (N-1 to N)\n"));
     const at = (pattern: RegExp) => backup.search(pattern);
-    expect(at(/docker compose -f docker-compose\.tls\.yml stop amc-studio/)).toBeGreaterThanOrEqual(0);
+    expect(backup).toMatch(/docker compose -f docker-compose\.tls\.yml stop amc-studio/);
     expect(at(/stop amc-studio/)).toBeLessThan(at(/ run --rm --no-deps -T -w \/data\/amc --entrypoint sh amc-studio -c '[^']*amc backup create/));
     expect(at(/amc backup create/)).toBeLessThan(at(/-czf - -C \/ home\/amc\/\.config\/amc\/state workspace\/control-checkpoints/));
     expect(at(/-czf - -C \//)).toBeLessThan(at(/docker compose -f docker-compose\.tls\.yml start amc-studio/));

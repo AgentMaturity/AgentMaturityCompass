@@ -49,9 +49,7 @@ describe("amc up in a non-interactive shell (B1)", () => {
     logged();
     await ensureUpVaultPassphrase("/nonexistent/amc-up-ws", true);
     expect(process.env.AMC_VAULT_PASSPHRASE).toMatch(/^[A-Za-z0-9_-]{22}$/);
-    const generated = seam.events.findIndex((line) => line.includes("generated one for this workspace"));
-    expect(generated).toBeGreaterThanOrEqual(0);
-    expect(seam.events.indexOf("store")).toBeGreaterThan(generated);
+    expect(seam.events.slice(0, 3)).toEqual(["load", "No vault passphrase found in a non-interactive shell; generated one for this workspace.", "store"]);
     expect(seam.events.join("\n")).not.toContain(process.env.AMC_VAULT_PASSPHRASE!);
   });
 

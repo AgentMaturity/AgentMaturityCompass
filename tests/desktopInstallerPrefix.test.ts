@@ -55,9 +55,9 @@ describe.skipIf(!nonRootPosix)("archive installer without root (LIVE-DEPLOY-05, 
     const result = run(archiveInstaller(dir), bin, { AMC_INSTALL_PREFIX: prefix });
     expect(result.status).toBe(0);
     expect(readFileSync(log, "utf8")).toContain(`install -g --prefix ${prefix}`);
-    const pathLine = result.stdout.indexOf(`export PATH="${prefix}/bin:$PATH"`);
-    expect(pathLine).toBeGreaterThanOrEqual(0);
-    expect(pathLine).toBeLessThan(result.stdout.indexOf("Run: amc --version"));
+    const pathLine = `export PATH="${prefix}/bin:$PATH"`;
+    expect(result.stdout).toContain(pathLine);
+    expect(result.stdout.indexOf(pathLine)).toBeLessThan(result.stdout.indexOf("Run: amc --version"));
   });
 });
 
