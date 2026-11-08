@@ -50,6 +50,14 @@ describe("resolveImportPath", () => {
     for (const target of refused) expect(resolveImportPath(target, "AMC.md").ok, target).toBe(false);
     for (const target of ["docs/environment.md", "envs/README.md", "keys.md", "identity/notes.md", "pemberton.md"]) expect(resolveImportPath(target, "AMC.md").ok, target).toBe(true);
   });
+  it("refuses segment shapes that alias another name on some volumes, and anything that is not a text file (S17 follow-up)", () => {
+    // MUTATION: drop aliasedSegmentReason and `.amc./notes.md` resolves; Win32 strips the trailing dot and opens .amc.
+    const aliasing = [".amc./notes.md", ".AMC /notes.md", "docs./rules.md", "notes.md:secret", "notes.md:x.md", "a/b~1/x.md", "docs/bad<name>.md", "docs/bad|name.md", "docs/q?.md", "docs/star*.md", "docs/\u0001.md", ".ａmc/notes.md"];
+    for (const target of aliasing) expect(resolveImportPath(target, "AMC.md").ok, JSON.stringify(target)).toBe(false);
+    // MUTATION: drop the extension allowlist and `@package.json` or `@scripts/deploy.sh` is quoted to the provider.
+    for (const target of ["package.json", "scripts/deploy.sh", "notes", "image.png", "docs/rules.MD.bak"]) expect(resolveImportPath(target, "AMC.md").ok, target).toBe(false);
+    for (const target of ["docs/rules.MD", "docs/guide.mdx", "notes/plain.txt"]) expect(resolveImportPath(target, "AMC.md").ok, target).toBe(true);
+  });
   it("reads only exact @ lines", () => {
     expect(importTargets("@a.md\nsee @b.md inline\n  @c.md  \n@ spaced\n@d.md\n")).toEqual(["a.md", "d.md"]);
   });
@@ -70,6 +78,19 @@ describe("resolveInstructionImports", () => {
       expect.objectContaining({ displayPath: "link.md", reason: "unreadable" })
     ]));
     expect(JSON.stringify(resolved)).not.toContain("never");
+  });
+
+  it("refuses a symlink into .amc, and judges the canonical on-disk path even when the workspace is named through a symlink", () => {
+    put(".amc/notes.md", "state\n"); symlinkSync(join(workspace, ".amc", "notes.md"), join(workspace, "state.md"));
+    put("docs/rules.md", "rules\n");
+    const content = "@state.md\n@docs/rules.md\n";
+    const linked = join(workspace, "..", "amc-import-link-" + process.pid); symlinkSync(workspace, linked);
+    try {
+      const resolved = resolveInstructionImports({ workspace: linked, importedBy: "AMC.md", content, maxFileBytes: 4096, alreadyLoaded: new Set() });
+      expect(resolved.imports.map(entry => entry.displayPath)).toEqual(["docs/rules.md"]);
+      expect(resolved.omitted).toEqual([expect.objectContaining({ displayPath: "state.md", reason: "unreadable" })]);
+      expect(JSON.stringify(resolved)).not.toContain("state\\n");
+    } finally { rmSync(linked, { force: true }); }
   });
 
   it("is applied by the loader to project files only, counted against the total budget and rendered with provenance", () => {

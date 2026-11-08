@@ -16,10 +16,18 @@
  * are AMC's own state and the usual credential carriers: `.amc/`, `.git/`,
  * `node_modules/`, `.ssh/`, `.aws/`, any `.env*` file, rc files that hold
  * tokens (`.npmrc`, `.netrc`, `.pypirc`, `.git-credentials`) and private keys
- * (`id_*`, `*.pem`, `*.key`, `*.p12`, `*.pfx`). Names are compared
- * case-insensitively: on APFS and NTFS `.AMC/` IS `.amc/`, and on a
- * case-sensitive filesystem refusing the upper-case spelling loses nothing.
- * User-scope files never import. There is
+ * (`id_*`, `*.pem`, `*.key`, `*.p12`, `*.pfx`). Beyond the denylist, the
+ * target must be a text file by extension (`.md`, `.mdx`, `.txt`), which is
+ * what memory-file imports are for. Segments are folded the way the toolhub's
+ * protected-path check folds them (NFKC, lower-case): on APFS and NTFS `.AMC/`
+ * IS `.amc/`, and on a case-sensitive filesystem refusing the upper-case
+ * spelling loses nothing. Segment shapes that alias a directory on some
+ * volumes are refused outright (a trailing dot or space, which Win32 strips;
+ * `:`, which reaches an NTFS alternate data stream; `~1` short names; the other
+ * Win32-reserved characters), and after the read the canonical on-disk path
+ * (`realpathSync.native`) is checked against the same denylist, so the name the
+ * filesystem actually opened is the name that was judged. User-scope files
+ * never import. There is
  * no approval dialog for a foreign path, which is stricter than Claude Code's
  * prompt-for-approval, and it is said in the docs.
  *
@@ -27,7 +35,9 @@
  * same reason an unreadable instruction file is: a rule the model was not shown
  * must not look like a rule that never existed.
  */
-import { posix } from "node:path";
+import { realpathSync } from "node:fs";
+import { posix, relative, resolve, sep } from "node:path";
+import { aliasedSegmentReason, foldName } from "../../toolhub/protectedPaths.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { readBoundedInstructionText, type InstructionOmission } from "./instructionFiles.js";
 
@@ -39,6 +49,10 @@ const REFUSED_SEGMENTS: readonly string[] = Object.freeze([".amc", ".git", "node
 const REFUSED_FILE_NAMES: readonly string[] = Object.freeze([".envrc", ".npmrc", ".netrc", ".pypirc", ".git-credentials", "credentials"]);
 /** Credential carriers by lower-case name shape: `.env*`, SSH identities, and key-file extensions. */
 const REFUSED_FILE_PATTERNS: readonly RegExp[] = Object.freeze([/^\.env(\.|$)/, /^id_[a-z0-9]+(\.pub)?$/, /\.(pem|key|p12|pfx|jks|keystore)$/]);
+/** The only things an instruction import is for: text, by extension (folded). */
+const ALLOWED_EXTENSIONS: readonly string[] = Object.freeze([".md", ".mdx", ".txt"]);
+/** Win32-reserved and control characters; `:` and separators are refused by {@link aliasedSegmentReason}. */
+const RESERVED_CHARACTERS = /[<>"|?*\u0000-\u001f]/;
 
 /** True when a lower-cased final path segment is a file an import may never read. */
 function isRefusedFileName(name: string): boolean {
@@ -79,11 +93,39 @@ export function resolveImportPath(target: string, importedBy: string): { ok: tru
   if (resolved === "." || resolved === ".." || resolved.startsWith("../") || resolved.startsWith("/")) {
     return { ok: false, detail: "the import leaves the workspace" };
   }
-  // Case-insensitive on purpose: the filesystem may be, and `.AMC/vault.json` must not read what `.amc/vault.json` cannot.
-  const segments = resolved.split("/").map((segment) => segment.toLowerCase());
-  if (segments.some((segment) => REFUSED_SEGMENTS.includes(segment))) return { ok: false, detail: "the import names AMC state, version control, dependencies or a credential directory" };
-  if (isRefusedFileName(segments.at(-1)!)) return { ok: false, detail: "the import names an environment or credential file" };
+  const refusal = refusedPathDetail(resolved.split("/"));
+  if (refusal !== null) return { ok: false, detail: refusal };
+  if (!ALLOWED_EXTENSIONS.some((extension) => foldName(resolved).endsWith(extension))) return { ok: false, detail: "only .md, .mdx and .txt files can be imported" };
   return { ok: true, path: resolved };
+}
+
+/**
+ * Why a workspace-relative path's segments may never be imported, or null.
+ * Folded on purpose: the filesystem may be case-insensitive, and `.AMC/vault.json` must not read what `.amc/vault.json` cannot.
+ */
+function refusedPathDetail(segments: readonly string[]): string | null {
+  for (const segment of segments) {
+    if (RESERVED_CHARACTERS.test(segment) || aliasedSegmentReason(segment) !== null) return "a path segment may alias another name on some volumes";
+  }
+  const folded = segments.map(foldName);
+  if (folded.some((segment) => REFUSED_SEGMENTS.includes(segment))) return "the import names AMC state, version control, dependencies or a credential directory";
+  if (isRefusedFileName(folded.at(-1)!)) return "the import names an environment or credential file";
+  return null;
+}
+
+/**
+ * The name the filesystem actually opened, judged again. `readWorkspaceFile` already refused symlinks and escapes, so this
+ * catches only what spelling hides: a case-insensitive or short-name volume resolving the written path onto a refused one.
+ */
+function canonicalRefusal(workspace: string, path: string): string | null {
+  try {
+    const root = realpathSync.native(workspace);
+    const rel = relative(root, realpathSync.native(resolve(root, path)));
+    if (rel === "" || rel.startsWith("..")) return "the import resolves outside the workspace";
+    return refusedPathDetail(rel.split(sep));
+  } catch {
+    return "the import could not be resolved on disk";
+  }
 }
 
 /**
@@ -124,6 +166,8 @@ export function resolveInstructionImports(params: {
           omitted.push({ displayPath: resolved.path, reason: "oversize", detail: `imported by ${file.importedBy}; ${read.bytes} bytes exceeds the ${params.maxFileBytes}-byte per-file limit` });
           continue;
         }
+        const canonical = params.readTextFile === undefined ? canonicalRefusal(params.workspace, resolved.path) : null;
+        if (canonical !== null) { omitted.push({ displayPath: resolved.path, reason: "import-refused", detail: `imported by ${file.importedBy}; ${canonical}` }); continue; }
         imports.push({ displayPath: resolved.path, importedBy: file.importedBy, content: read.content, bytes: read.bytes, sha256: sha256Hex(read.content) });
         next.push({ importedBy: resolved.path, content: read.content });
       }
