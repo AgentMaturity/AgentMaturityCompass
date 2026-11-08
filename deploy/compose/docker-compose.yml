@@ -13,6 +13,8 @@ services:
       context: ../..
       dockerfile: Dockerfile
       target: studio
+    # Set AMC_STUDIO_IMAGE in .env to an image id or tag you built and recorded; change it there for an upgrade or rollback.
+    image: ${AMC_STUDIO_IMAGE:-amc-studio:local}
     restart: unless-stopped
     # Studio drains up to 10 s, then seals its session; the default 10 s can kill it before the seal.
     stop_grace_period: 40s
@@ -44,6 +46,8 @@ services:
       - AMC_VAULT_PASSPHRASE_FILE=/run/secrets/amc_vault_passphrase
       - AMC_BOOTSTRAP_OWNER_USERNAME_FILE=/run/secrets/amc_owner_username
       - AMC_BOOTSTRAP_OWNER_PASSWORD_FILE=/run/secrets/amc_owner_password
+      # Encrypts `amc backup create` bundles made inside this container (docs/deploy/reference/COMPOSE.md, Backup).
+      - AMC_BACKUP_PASSPHRASE_FILE=/run/secrets/amc_backup_passphrase
       - NODE_ENV=production
     # The image owns the 0700 home; the state and checkpoint volumes are its only writable paths besides /data/amc and /tmp.
     read_only: true
@@ -55,6 +59,14 @@ services:
       - NET_BIND_SERVICE
     security_opt:
       - no-new-privileges:true
+    # One host, no scheduler: 2 CPUs leave room for the in-container backup and verify runs that share this cgroup; the chart's 1-CPU limit is a cluster value.
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2g
+        reservations:
+          memory: 512m
     healthcheck:
       # HTTP probe of /healthz and /readyz bounded at 8 s in-process; the same script as the Dockerfile HEALTHCHECK (scripts/lib/studio-http-probe.mjs).
       test: ["CMD", "node", "-e", "const h=['0.0.0.0','::',''].includes(process.env.AMC_BIND||'')?'127.0.0.1':process.env.AMC_BIND;const b='http://'+(h.includes(':')?'['+h+']':h)+':'+(process.env.AMC_STUDIO_PORT||3212);Promise.all(['/healthz','/readyz'].map(p=>fetch(b+p,{signal:AbortSignal.timeout(8000)}))).then(r=>process.exit(r.every(x=>x.ok)?0:1),()=>process.exit(1))"]
@@ -67,6 +79,7 @@ services:
       - amc_vault_passphrase
       - amc_owner_username
       - amc_owner_password
+      - amc_backup_passphrase
 
 secrets:
   amc_vault_passphrase:
@@ -75,6 +88,8 @@ secrets:
     file: ./secrets/amc_owner_username.txt
   amc_owner_password:
     file: ./secrets/amc_owner_password.txt
+  amc_backup_passphrase:
+    file: ./secrets/amc_backup_passphrase.txt
 
 volumes:
   amc_data:

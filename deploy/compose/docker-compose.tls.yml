@@ -6,7 +6,7 @@ services:
       context: ../..
       dockerfile: Dockerfile
       target: studio
-    image: amc-studio:local
+    image: ${AMC_STUDIO_IMAGE:-amc-studio:local}
     container_name: amc-notary
     restart: unless-stopped
     healthcheck:
@@ -40,7 +40,8 @@ services:
       context: ../..
       dockerfile: Dockerfile
       target: studio
-    image: amc-studio:local
+    # Set AMC_STUDIO_IMAGE in .env to an image id or tag you built and recorded; change it there for an upgrade or rollback.
+    image: ${AMC_STUDIO_IMAGE:-amc-studio:local}
     container_name: amc-studio
     restart: unless-stopped
     # Studio drains up to 10 s, then seals its session; the default 10 s can kill it before the seal.
@@ -68,6 +69,8 @@ services:
       AMC_VAULT_PASSPHRASE_FILE: /run/secrets/amc_vault_passphrase
       AMC_BOOTSTRAP_OWNER_USERNAME_FILE: /run/secrets/amc_owner_username
       AMC_BOOTSTRAP_OWNER_PASSWORD_FILE: /run/secrets/amc_owner_password
+      # Encrypts `amc backup create` bundles made inside this container (docs/deploy/reference/COMPOSE.md, Backup).
+      AMC_BACKUP_PASSPHRASE_FILE: /run/secrets/amc_backup_passphrase
     depends_on:
       amc-notary:
         condition: service_healthy
@@ -93,6 +96,15 @@ services:
       - amc_owner_username
       - amc_owner_password
       - amc_notary_auth_secret
+      - amc_backup_passphrase
+    # One host, no scheduler: 2 CPUs leave room for the in-container backup and verify runs that share this cgroup; the chart's 1-CPU limit is a cluster value.
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2g
+        reservations:
+          memory: 512m
     # The image owns the 0700 home; the state and checkpoint volumes are its only writable paths besides /data/amc and /tmp.
     read_only: true
     tmpfs:
@@ -146,3 +158,5 @@ secrets:
     file: ./secrets/amc_notary_passphrase.txt
   amc_notary_auth_secret:
     file: ./secrets/amc_notary_auth_secret.txt
+  amc_backup_passphrase:
+    file: ./secrets/amc_backup_passphrase.txt

@@ -11,6 +11,7 @@ Both HTTP and TLS builds use the root Dockerfile `studio` target. Every AMC serv
   - `amc_owner_password.txt`
   - `amc_notary_passphrase.txt`
   - `amc_notary_auth_secret.txt`
+  - `amc_backup_passphrase.txt` (encrypts `amc backup create` bundles made inside the Studio container; both `deploy/compose` stacks need it)
 - Replace all `change-me-*` placeholder values before first deployment.
 
 ## Local/Private Deployment (HTTP)

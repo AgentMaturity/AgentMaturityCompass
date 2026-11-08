@@ -5,7 +5,7 @@ services:
       context: ../..
       dockerfile: Dockerfile
       target: api
-    image: amc-api:local
+    image: ${AMC_API_IMAGE:-amc-api:local}
     restart: unless-stopped
     # Same stop budget as Studio and deploy/k8s (40 s), so a recreate lets in-flight requests finish.
     stop_grace_period: 40s

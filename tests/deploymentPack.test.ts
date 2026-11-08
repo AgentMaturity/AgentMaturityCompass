@@ -21,7 +21,8 @@ const COMPOSE_FILES = ["deploy/compose/docker-compose.yml", "deploy/compose/dock
 const STUDIO_SERVICES = [["deploy/compose/docker-compose.yml", "studio"], ["deploy/compose/docker-compose.tls.yml", "amc-studio"],
   ["docker/docker-compose.yml", "amc-studio"]] as const;
 const HTTP_STACKS = ["deploy/compose/docker-compose.yml", "docker/docker-compose.yml"] as const;
-type ComposeService = { tmpfs?: string | string[]; volumes?: (string | { target?: string })[]; ports?: string[];
+type ComposeService = { image?: string; build?: { target?: string }; secrets?: string[];
+  deploy?: { resources?: { limits?: { cpus?: string; memory?: string }; reservations?: { memory?: string } } }; tmpfs?: string | string[]; volumes?: (string | { target?: string })[]; ports?: string[];
   environment?: string[] | Record<string, unknown>; stop_grace_period?: string; restart?: string;
   healthcheck?: { test: string[]; interval?: string; timeout?: string; retries?: number; start_period?: string } };
 const composeServices = (path: string): Record<string, ComposeService> => YAML.parse(read(path)).services;
@@ -88,6 +89,35 @@ describe("compose runtime layout (LIVE-DEPLOY-01)", () => {
     expect(studioPort({ AMC_STUDIO_PORT: "47123" })).toBe("127.0.0.1:47123:3212");
     expect(studioPort({ AMC_PUBLISH_ADDRESS: "0.0.0.0" })).toBe("0.0.0.0:3212:3212");
     expect(read("deploy/compose/.env.example")).toMatch(/^AMC_PUBLISH_ADDRESS=127\.0\.0\.1$/m);
+  });
+});
+
+describe("compose image pins, limits and the backup secret (LIVE-DEPLOY-08)", () => {
+  it("names every studio-target and api-target image through a pin variable", () => {
+    // `up -d --build` keeps working for a first install; an upgrade or rollback changes the pin in .env, never by rebuild.
+    let studioTargets = 0;
+    for (const file of COMPOSE_FILES) {
+      for (const [name, service] of Object.entries(composeServices(file))) {
+        const target = service.build?.target ?? (name === "amc-verify" ? "studio" : undefined);
+        if (target === "studio") { studioTargets += 1; expect(service.image, `${file} ${name}`).toMatch(/^\$\{AMC_STUDIO_IMAGE:-amc-studio:local\}$/); }
+        if (target === "api") expect(service.image, `${file} ${name}`).toMatch(/^\$\{AMC_API_IMAGE:-amc-api:local\}$/);
+      }
+    }
+    expect(studioTargets).toBe(5);
+    expect(read("deploy/compose/.env.example")).toMatch(/^AMC_STUDIO_IMAGE=amc-studio:local$/m);
+    expect(read("deploy/compose/.env.example")).toMatch(/^AMC_API_IMAGE=amc-api:local$/m);
+  });
+
+  it("limits the deploy/compose Studio services and hands them the backup passphrase secret", () => {
+    for (const [file, name] of STUDIO_SERVICES.filter(([path]) => path.startsWith("deploy/compose/"))) {
+      const service = composeServices(file)[name]!;
+      expect(service.deploy?.resources, `${file} ${name}`).toEqual({ limits: { cpus: "2", memory: "2g" }, reservations: { memory: "512m" } });
+      expect(service.secrets, `${file} ${name}`).toContain("amc_backup_passphrase");
+      expect(serviceEnv(service).AMC_BACKUP_PASSPHRASE_FILE, `${file} ${name}`).toBe("/run/secrets/amc_backup_passphrase");
+      expect(YAML.parse(read(file)).secrets.amc_backup_passphrase).toEqual({ file: "./secrets/amc_backup_passphrase.txt" });
+    }
+    expect(existsSync(resolve(workspace, "deploy/compose/secrets/amc_backup_passphrase.txt.example"))).toBe(true);
+    expect(read("deploy/compose/README.md")).toContain("`amc_backup_passphrase.txt`");
   });
 });
 

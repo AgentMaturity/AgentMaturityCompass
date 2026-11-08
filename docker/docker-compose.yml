@@ -6,7 +6,8 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: studio
-    image: amc-studio:local
+    # Set AMC_STUDIO_IMAGE to an image id or tag you built and recorded; change it for an upgrade or rollback.
+    image: ${AMC_STUDIO_IMAGE:-amc-studio:local}
     container_name: amc-studio
     restart: unless-stopped
     # Studio drains up to 10 s, then seals its session; the default 10 s can kill it before the seal.
@@ -59,7 +60,7 @@ services:
   # Same probe as the Helm test pod (scripts/deploy/governed-turn-probe.mjs); exits 0 only on a verified turn.
   amc-verify:
     profiles: ["verify"]
-    image: amc-studio:local
+    image: ${AMC_STUDIO_IMAGE:-amc-studio:local}
     depends_on:
       amc-studio:
         condition: service_healthy
