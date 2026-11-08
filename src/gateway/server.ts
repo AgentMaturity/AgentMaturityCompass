@@ -1407,7 +1407,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       const authResult = applyUpstreamAuth(targetUrl, outboundHeaders, upstreamResolved.auth, credentials.resolve);
 
       if (!authResult.ok) {
-        logger.error(`gateway: upstream credential unavailable for ${route.upstream} (request ${requestId}): ${withoutUrlQueries(authResult.error)}`);
+        logger.error(`gateway: upstream credential unavailable for ${route.upstream} (request ${requestId}): ${withoutUrlQueries(authResult.error ?? "no reason given")}`);
         res.writeHead(500, { "content-type": "application/json" }).end(JSON.stringify({ error: "upstream credential unavailable", code: "AMC_UPSTREAM_AUTH" }));
 
         appendEvidence({
