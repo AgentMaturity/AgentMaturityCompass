@@ -220,6 +220,8 @@ describe("the Anthropic adapter refuses what it cannot describe honestly", () =>
     expect(chunks.at(-1)).toMatchObject({ type: "finish", reason: { kind: "stop" } });
     const error = await decode(anthropicAdapter, [frame("content_block_start", { index: 0, content_block: { type: "server_tool_use", id: "x" } })]).catch((caught: unknown) => caught);
     expect((error as Error).message).toContain('unsupported content block type "server_tool_use"');
+    // Deterministic for the request, so not retried (as the Chat and Responses decoders refuse their unsupported output).
+    expect(isLlmError(error) && error.code).toBe(LLM_FAILURE_CODE.INVALID_REQUEST);
   });
 
   test("NEGATIVE: a tool_use block opened without a call id is refused", async () => {
