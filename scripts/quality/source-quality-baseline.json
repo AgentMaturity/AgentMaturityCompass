@@ -3202,7 +3202,6 @@
     {"id":"e11b723c9d61b1e463ac6e385b86a4d208d1dc85fa1968d38d83e3f4b03db9b3","file":"src/benchmarks/replayBenchmarkCorpus.ts","kind":"types"},
     {"id":"e1210c3cc75d144297fde1dd83aa878d4ef74019eba38f5444bf39541182e67a","file":"src/eval/judgeCalibration.ts","kind":"types"},
     {"id":"e1380982d3ead0bf105768b9e313d6dd2dc546e4b3e0dbbde1418106501d258b","file":"src/enforce/resourceManifest.ts","kind":"types"},
-    {"id":"e1620b799ae497357ea25a498eb8f959a70a790e0ee51f76f43ce003b2563621","file":"src/autonomy/goalRounds.ts","kind":"types"},
     {"id":"e165330ed5ac4216f2f4dad7cf3dc2d205eb40a6a1ec50b6f5b5d1e7714dc3df","file":"src/score/crossFrameworkMapping.ts","kind":"types"},
     {"id":"e180ca67029ab6a7c1fcb378d7596163fce82eb236888d91b08ccae07de658d1","file":"src/cliUx.ts","kind":"exports"},
     {"id":"e19093bf2685624c1c9a618cee698d8a39020bbcea085e4b956d28b2e2b76259","file":"src/integrations/integrationQueueSchema.ts","kind":"exports"},
