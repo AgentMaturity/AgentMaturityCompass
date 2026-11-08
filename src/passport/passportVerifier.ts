@@ -11,6 +11,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
 import { passportJsonSchema, passportPiiScanSchema, passportSignatureSchema, type PassportJson } from "./passportSchema.js";
+import { passportHarnessSchema, type PassportHarness } from "./passportHarness.js";
 import { digestFile } from "./passportSigner.js";
 import { verifyProofsAgainstSignedRoot } from "../bench/benchProofs.js";
 import { buildVerifierReport, checkDigestSignature, envelopePublicKey, workspaceSelfTrust, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
@@ -41,6 +42,8 @@ interface PassportVerifyError {
 export interface PassportVerifyResult {
   ok: boolean;
   passport: PassportJson | null;
+  /** The signed harness companion (SH-TRUST-05) when the archive carries one and it verified; null otherwise. */
+  harness: PassportHarness | null;
   errors: PassportVerifyError[];
   fileSha256: string;
   report: VerifierReportV1;
@@ -73,10 +76,11 @@ export function verifyPassportArtifactFile(params: {
   const fileSha256 = digestFile(file);
   const tmp = mkdtempSync(join(tmpdir(), "amc-passport-verify-"));
   let passport: PassportJson | null = null;
+  let harness: PassportHarness | null = null;
   const finish = (): PassportVerifyResult => {
     const report = buildVerifierReport({ artifact: { kind: "passport", path: file, sha256: fileSha256 }, context: params.trust,
       integrityErrors: errors.map((error) => `${error.code}: ${error.message}`), signatures, anchoring });
-    return { ok: report.trusted, passport, errors, fileSha256, report };
+    return { ok: report.trusted, passport, harness: report.trusted ? harness : null, errors, fileSha256, report };
   };
   try {
     tarExtract(file, tmp);
@@ -128,6 +132,26 @@ export function verifyPassportArtifactFile(params: {
     signatures.push(check.admission);
     if (!check.verified || (signature.envelope !== undefined && signature.signature !== signature.envelope.sigB64)) {
       errors.push({ code: "SIGNATURE_INVALID", message: "passport signature verification failed" });
+    }
+
+    // SH-TRUST-05: a harness companion, when present, must carry its own verifying signature and bind to this passport.json.
+    const harnessPath = join(root, "harness", "harness.json");
+    if (pathExists(harnessPath)) {
+      const harnessSigPath = join(root, "harness", "harness.sig");
+      const parsedHarness = passportHarnessSchema.safeParse(JSON.parse(readUtf8(harnessPath)) as unknown);
+      if (!parsedHarness.success) errors.push({ code: "HARNESS_INVALID", message: "harness/harness.json does not parse" });
+      else if (!pathExists(harnessSigPath)) errors.push({ code: "HARNESS_SIG_MISSING", message: "harness/harness.sig missing" });
+      else {
+        const harnessSig = passportSignatureSchema.parse(JSON.parse(readUtf8(harnessSigPath)) as unknown);
+        const harnessDigest = sha256Hex(Buffer.from(canonicalize(parsedHarness.data), "utf8"));
+        const harnessCheck = checkDigestSignature({ signature: "harness.sig", purpose: "artifact-seal", digestHex: harnessDigest,
+          signatureB64: harnessSig.signature, envelope: harnessSig.envelope, candidates, context: params.trust, claimedSignedAt: harnessSig.signedTs });
+        signatures.push(harnessCheck.admission);
+        if (harnessDigest !== harnessSig.digestSha256 || !harnessCheck.verified) errors.push({ code: "HARNESS_SIGNATURE_INVALID", message: "harness companion signature verification failed" });
+        else if (parsedHarness.data.passportSha256 !== digest || parsedHarness.data.passportId !== passport.passportId) {
+          errors.push({ code: "HARNESS_BINDING_MISMATCH", message: "harness companion does not bind to this passport.json" });
+        } else harness = parsedHarness.data;
+      }
     }
 
     verifySignedArtifactPiiScan({

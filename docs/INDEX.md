@@ -79,6 +79,9 @@ Use this page to reach the shortest evidence-backed path for your task. AMC's pu
 
 - [Evidence Trust](EVIDENCE_TRUST.md)
 - [Receipts](RECEIPTS.md)
+- [Session Export](SESSION_EXPORT.md): one sealed native session verified offline with a pinned monitor fingerprint
+- [Assurance Lab](ASSURANCE_LAB.md): packs, sealed reports and the provenance gate
+- [Compliance Frameworks](COMPLIANCE_FRAMEWORKS.md): framework ids, aliases and evidence bindings
 - [Claim Provenance](CLAIM_PROVENANCE.md)
 - [Scoring Methodology](SCORING_METHODOLOGY.md)
 - [Evaluator Registry](EVALUATOR_REGISTRY.md)
