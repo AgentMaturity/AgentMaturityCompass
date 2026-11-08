@@ -29,3 +29,15 @@ export function watchApiKey(opts: { apiKey?: string; apiKeyFile?: string }): str
   return resolveSecretOption({ inline: opts.apiKey, file: opts.apiKeyFile }, "AMC_WATCH_API_KEY",
     { option: "--api-key", alternatives: "--api-key-file <path> or AMC_WATCH_API_KEY" }) ?? undefined;
 }
+
+/**
+ * `amc watch connect` and `amc monitor live` with `--provider langfuse`: Langfuse's API takes HTTP Basic with the public
+ * key (the API key) and the secret key together, and the adapter reads the secret from this header. The secret comes
+ * from --secret-key-file or AMC_WATCH_SECRET_KEY, never argv; any other provider refuses one.
+ */
+export function watchSecretHeaders(opts: { provider?: string; secretKeyFile?: string }, env: NodeJS.ProcessEnv = process.env): Record<string, string> | undefined {
+  const secret = resolveSecretOption({ file: opts.secretKeyFile }, "AMC_WATCH_SECRET_KEY", undefined, env);
+  if (secret === null) return undefined;
+  if (opts.provider !== "langfuse") throw new Error("--secret-key-file (AMC_WATCH_SECRET_KEY) is for --provider langfuse only");
+  return { "x-langfuse-secret-key": secret };
+}

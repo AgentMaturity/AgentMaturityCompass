@@ -286,23 +286,25 @@ amc-gate:
 
 /* ── Observability connectors (amc watch connect) ──────────────── */
 
-const CONNECTORS = {
+const CONNECTORS: Readonly<Record<"langfuse" | "helicone" | "datadog", { name: string; endpoint: string; key: string; secret?: string }>> = {
+  langfuse: { name: "Langfuse", endpoint: "https://cloud.langfuse.com", key: "your Langfuse public key", secret: "your Langfuse secret key" },
   helicone: { name: "Helicone", endpoint: "https://api.helicone.ai", key: "your Helicone API key" },
   datadog: { name: "Datadog", endpoint: "https://api.datadoghq.com", key: "your Datadog API key (sent as the DD-API-KEY header)" }
-} as const;
+};
 
 /**
- * The `amc watch connect` steps for a provider the CLI can authenticate to. The key goes in a private file or in
- * AMC_WATCH_API_KEY, never argv, and no file is written, because nothing reads one. Langfuse is not offered: the CLI
- * sends one key, and Langfuse's API needs the public key and the secret key together.
+ * The `amc watch connect` steps for a provider. Keys go in private files or in AMC_WATCH_API_KEY (and, for Langfuse's
+ * secret key, AMC_WATCH_SECRET_KEY), never argv; no file is written, because nothing reads one.
  */
 export function generateConnectorConfig(provider: keyof typeof CONNECTORS): { instructions: string } {
   const connector = CONNECTORS[provider];
+  const secret = connector.secret;
   return {
     instructions: [
       `${connector.name} traces are read by \`amc watch connect\`; setup writes no file, because nothing reads one.`,
-      `1. Save ${connector.key} in a file only you can read (chmod 600).`,
-      `2. amc watch connect --provider ${provider} --endpoint ${connector.endpoint} --api-key-file <that file>   (or set AMC_WATCH_API_KEY; --api-key would put the key in argv)`
+      `1. Save ${connector.key} in a file only you can read (chmod 600)${secret === undefined ? "" : `, and ${secret} in another`}.`,
+      `2. amc watch connect --provider ${provider} --endpoint ${connector.endpoint} --api-key-file <that file>${secret === undefined ? "" : " --secret-key-file <the secret file>"}`
+        + `   (or set AMC_WATCH_API_KEY${secret === undefined ? "" : " and AMC_WATCH_SECRET_KEY"}; --api-key would put the key in argv)`
     ].join("\n")
   };
 }
@@ -363,9 +365,6 @@ export function setupIntegration(
         + "channels of the signed .amc/integrations.yaml; point a webhook channel at a relay you run (amc integrations setup --type webhook).");
 
     case "langfuse":
-      throw new Error("`amc watch connect` cannot authenticate to Langfuse yet: it sends one key, and Langfuse's API needs the public key "
-        + "and the secret key together (HTTP Basic). No file was written.");
-
     case "helicone":
     case "datadog":
       instructions = generateConnectorConfig(type).instructions;

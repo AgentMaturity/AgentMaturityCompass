@@ -1139,11 +1139,11 @@ export function registerLateStageCliCommands({
     .description("Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook)")
     .requiredOption("--provider <provider>", "Provider type: otlp | langfuse | helicone | datadog | webhook")
     .requiredOption("--endpoint <url>", "Provider API endpoint URL")
-    .option("--api-key <key>", "API key for authentication (visible in ps; prefer --api-key-file)").option("--api-key-file <path>", "read the API key from this private file (or set AMC_WATCH_API_KEY)")
+    .option("--api-key <key>", "API key for authentication (visible in ps; prefer --api-key-file)").option("--api-key-file <path>", "read the API key from this private file (or set AMC_WATCH_API_KEY)").option("--secret-key-file <path>", "Langfuse: read the secret key from this private file (or set AMC_WATCH_SECRET_KEY)")
     .option("--poll-interval <ms>", "Poll interval in milliseconds", "10000")
     .option("--agent <agentId>", "Agent ID to associate traces with")
-    .action(async (opts: { provider: string; endpoint: string; apiKey?: string; apiKeyFile?: string; pollInterval: string; agent?: string }) => {
-      const [{ createObservabilityBridge }, { watchApiKey }] = await Promise.all([import("./watch/observabilityBridge.js"), import("./cli/argvSecret.js")]);
+    .action(async (opts: { provider: string; endpoint: string; apiKey?: string; apiKeyFile?: string; secretKeyFile?: string; pollInterval: string; agent?: string }) => {
+      const [{ createObservabilityBridge }, { watchApiKey, watchSecretHeaders }] = await Promise.all([import("./watch/observabilityBridge.js"), import("./cli/argvSecret.js")]);
       const agentId = opts.agent ?? resolveAgentId(process.cwd());
       const bridge = createObservabilityBridge({
         workspace: process.cwd(),
@@ -1152,6 +1152,7 @@ export function registerLateStageCliCommands({
           provider: opts.provider as any,
           endpoint: opts.endpoint,
           apiKey: watchApiKey(opts),
+          headers: watchSecretHeaders(opts),
           pollIntervalMs: parseInt(opts.pollInterval, 10),
         }],
         pollIntervalMs: parseInt(opts.pollInterval, 10),
@@ -1184,12 +1185,12 @@ export function registerLateStageCliCommands({
     .option("--agent <agentId>", "Agent ID")
     .option("--provider <provider>", "Observability provider", "otlp")
     .option("--endpoint <url>", "Provider endpoint")
-    .option("--api-key <key>", "Provider API key (visible in ps; prefer --api-key-file)").option("--api-key-file <path>", "read the API key from this private file (or set AMC_WATCH_API_KEY)")
+    .option("--api-key <key>", "Provider API key (visible in ps; prefer --api-key-file)").option("--api-key-file <path>", "read the API key from this private file (or set AMC_WATCH_API_KEY)").option("--secret-key-file <path>", "Langfuse: read the secret key from this private file (or set AMC_WATCH_SECRET_KEY)")
     .option("--budget <usd>", "Cost budget in USD", "100")
     .option("--max-latency <ms>", "Max acceptable latency in ms", "30000")
     .option("--alert-severity <level>", "Alert on this severity and above", "warning")
-    .action(async (opts: { agent?: string; provider?: string; endpoint?: string; apiKey?: string; apiKeyFile?: string; budget: string; maxLatency: string; alertSeverity?: string }) => {
-      const [{ createObservabilityBridge }, { watchApiKey }] = await Promise.all([import("./watch/observabilityBridge.js"), import("./cli/argvSecret.js")]);
+    .action(async (opts: { agent?: string; provider?: string; endpoint?: string; apiKey?: string; apiKeyFile?: string; secretKeyFile?: string; budget: string; maxLatency: string; alertSeverity?: string }) => {
+      const [{ createObservabilityBridge }, { watchApiKey, watchSecretHeaders }] = await Promise.all([import("./watch/observabilityBridge.js"), import("./cli/argvSecret.js")]);
       const { createRealtimeAssuranceEngine} = await import("./watch/realtimeAssurance.js");
       const agentId = opts.agent ?? resolveAgentId(process.cwd());
 
@@ -1200,6 +1201,7 @@ export function registerLateStageCliCommands({
           provider: (opts.provider ?? "otlp") as any,
           endpoint: opts.endpoint,
           apiKey: watchApiKey(opts),
+          headers: watchSecretHeaders({ ...opts, provider: opts.provider ?? "otlp" }),
         }] : [],
       });
 
@@ -1378,7 +1380,7 @@ export function registerLateStageCliCommands({
   integrations
     .command("setup")
     .description("Generate integration config files")
-    .requiredOption("--type <type>", "Integration: github-action | gitlab-ci | slack | webhook | helicone | datadog")
+    .requiredOption("--type <type>", "Integration: github-action | gitlab-ci | slack | webhook | langfuse | helicone | datadog")
     .option("--min-score <score>", "Minimum passing score for CI gates", "60")
     .option("--agent <agentId>", "Agent ID")
     .option("--output <dir>", "Output directory", ".")
@@ -1389,8 +1391,7 @@ export function registerLateStageCliCommands({
         opts.type as any,
         { minScore: parseInt(opts.minScore, 10), agentId: opts.agent },
       );
-      // A notification target writes no file (its channel lives in the signed integrations.yaml): no "complete" banner then.
-      if (result.files.length > 0) console.log(chalk.green(`✅ Integration setup complete\n`));
+      if (result.files.length > 0) console.log(chalk.green(`✅ Integration setup complete\n`)); // targets that write no file print steps only
       for (const f of result.files) console.log(chalk.gray(`  Created: ${f.path}`));
       console.log(`${result.files.length > 0 ? "\n" : ""}${result.instructions}`);
     });
@@ -1405,6 +1406,7 @@ export function registerLateStageCliCommands({
         { name: "gitlab-ci", desc: "GitLab CI pipeline gate" },
         { name: "slack", desc: "Slack notifications: the slack_webhook channel of the signed .amc/integrations.yaml (setup prints the steps)" },
         { name: "webhook", desc: "HMAC-signed webhook notifications: the webhook channel of the signed .amc/integrations.yaml (setup prints the steps)" },
+        { name: "langfuse", desc: "Langfuse traces through amc watch connect (setup prints the steps)" },
         { name: "helicone", desc: "Helicone traces through amc watch connect (setup prints the steps)" },
         { name: "datadog", desc: "Datadog traces through amc watch connect (setup prints the steps)" },
       ];

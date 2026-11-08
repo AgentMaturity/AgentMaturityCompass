@@ -777,7 +777,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc monitor` | Continuous production monitoring — real-time scoring, drift detection, and alerting | `--runtime <name>`<br>`--stdin` | - |
 | `amc monitor check` | One-shot trust drift analysis (check for degradation without running continuously) | `--agent <agentId>`<br>`--alert-threshold <n>` | - |
 | `amc monitor events` | Show recent monitoring events | `--limit <n>`<br>`--json` | - |
-| `amc monitor live` | Start real-time monitoring with live assurance checks on incoming traces | `--agent <agentId>`<br>`--provider <provider>`<br>`--endpoint <url>`<br>`--api-key <key>`<br>`--api-key-file <path>`<br>`--budget <usd>`<br>`--max-latency <ms>`<br>`--alert-severity <level>` | - |
+| `amc monitor live` | Start real-time monitoring with live assurance checks on incoming traces | `--agent <agentId>`<br>`--provider <provider>`<br>`--endpoint <url>`<br>`--api-key <key>`<br>`--api-key-file <path>`<br>`--secret-key-file <path>`<br>`--budget <usd>`<br>`--max-latency <ms>`<br>`--alert-severity <level>` | - |
 | `amc monitor metrics` | Get metrics for a specific agent | `--agent <id>`<br>`--json` | - |
 | `amc monitor start` | Start continuous monitoring: scores agent at intervals, detects drift, sends alerts on degradation | `--agent <id>`<br>`--scoring-interval <ms>`<br>`--drift-interval <ms>`<br>`--score-drop-threshold <n>`<br>`--no-webhooks` | - |
 | `amc monitor status` | Show monitoring status for all agents | `--json` | - |
@@ -1260,7 +1260,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc watch` | Observability, attestation, and safety testing | - | - |
 | `amc watch alerts` | Show recent alerts for a monitored agent | `--agent <id>`<br>`--limit <n>`<br>`--json` | - |
 | `amc watch attest` | Attest an agent output | `--json` | - |
-| `amc watch connect` | Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook) | `--provider <provider>`<br>`--endpoint <url>`<br>`--api-key <key>`<br>`--api-key-file <path>`<br>`--poll-interval <ms>`<br>`--agent <agentId>` | - |
+| `amc watch connect` | Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook) | `--provider <provider>`<br>`--endpoint <url>`<br>`--api-key <key>`<br>`--api-key-file <path>`<br>`--secret-key-file <path>`<br>`--poll-interval <ms>`<br>`--agent <agentId>` | - |
 | `amc watch explain` | Generate explainability packet for an agent run | `--json` | - |
 | `amc watch host-hardening` | Check host hardening status for this AMC deployment | `--json` | - |
 | `amc watch profiler-anomalies` | List detected behavioral anomalies for an agent | `--agent <id>`<br>`--limit <n>` | - |

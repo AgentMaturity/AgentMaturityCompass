@@ -7285,6 +7285,7 @@ Start real-time monitoring with live assurance checks on incoming traces
 | `--endpoint <url>` | - |
 | `--api-key <key>` | - |
 | `--api-key-file <path>` | - |
+| `--secret-key-file <path>` | - |
 | `--budget <usd>` | - |
 | `--max-latency <ms>` | - |
 | `--alert-severity <level>` | - |
@@ -10880,6 +10881,7 @@ Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook
 | `--endpoint <url>` | - |
 | `--api-key <key>` | - |
 | `--api-key-file <path>` | - |
+| `--secret-key-file <path>` | - |
 | `--poll-interval <ms>` | - |
 | `--agent <agentId>` | - |
 

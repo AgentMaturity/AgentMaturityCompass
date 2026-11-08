@@ -170,20 +170,22 @@ describe("generated CI templates: real flags and package, no evidence yet is nev
 describe("Connector Config Generator", () => {
   // The earlier assertions pinned AMC_LANGFUSE_*/AMC_HELICONE_*/AMC_DD_* variables, which nothing reads: they encoded the defect.
   it("names the key inputs amc watch connect reads, never argv or variables nothing reads", () => {
-    for (const provider of ["helicone", "datadog"] as const) {
+    for (const provider of ["langfuse", "helicone", "datadog"] as const) {
       const { instructions } = generateConnectorConfig(provider);
       expect(instructions).toContain(`amc watch connect --provider ${provider} --endpoint https://`);
       expect(instructions).toContain("--api-key-file");
       expect(instructions).toContain("AMC_WATCH_API_KEY");
       expect(instructions).not.toMatch(/AMC_(HELICONE|DD|LANGFUSE)_/);
     }
+    // Langfuse's API takes the public and the secret key together.
+    expect(generateConnectorConfig("langfuse").instructions).toMatch(/--secret-key-file <the secret file>.*AMC_WATCH_SECRET_KEY/s);
+    expect(generateConnectorConfig("helicone").instructions).not.toContain("--secret-key-file");
   });
 
-  it("setup writes no connector file, and refuses Langfuse, which the CLI cannot authenticate to", () => {
+  it("setup writes no connector file", () => {
     const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-setup-connector-")));
     roots.push(dir);
-    for (const type of ["helicone", "datadog"] as const) expect(setupIntegration(dir, type, { outputDir: dir }).files).toEqual([]);
-    expect(() => setupIntegration(dir, "langfuse", { outputDir: dir })).toThrow(/cannot authenticate to Langfuse/);
+    for (const type of ["langfuse", "helicone", "datadog"] as const) expect(setupIntegration(dir, type, { outputDir: dir }).files).toEqual([]);
     expect(readdirSync(dir)).toEqual([]);
   });
 });
