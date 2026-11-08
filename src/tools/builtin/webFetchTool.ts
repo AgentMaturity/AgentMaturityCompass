@@ -5,6 +5,7 @@ import { sha256Hex } from "../../utils/hash.js";
 import { defineTool } from "../toolRegistry.js";
 import type { ToolDefinition } from "../toolTypes.js";
 import { admitUrl, governedGet, isTextual, labelUntrusted, redactFetched, type ResolveHost } from "./nativeToolBreadth/governedFetch.js";
+import { renderHtml } from "./nativeToolBreadth/htmlToMarkdown.js";
 import { receiptedBody, type NativeReceiptRecorder } from "./nativeToolBreadth/nativeReceipt.js";
 import { loadOriginPolicy } from "./nativeToolBreadth/originPolicy.js";
 
@@ -29,8 +30,12 @@ import { loadOriginPolicy } from "./nativeToolBreadth/originPolicy.js";
 const argsSchema = z.object({
   url: z.string().min(1).max(4_096),
   /** May narrow the signed cap, never widen it. */
-  maxBytes: z.number().int().positive().optional()
+  maxBytes: z.number().int().positive().optional(),
+  /** How an HTML body reaches the model (SH-TOOLS-03); other content types ignore it. */
+  format: z.enum(["markdown", "text", "html"]).default("markdown")
 }).strict();
+
+const isHtml = (contentType: string): boolean => /^(text\/html|application\/xhtml\+xml)\b/i.test(contentType.trim());
 
 export interface WebFetchToolOptions {
   readonly record: NativeReceiptRecorder;
@@ -43,12 +48,13 @@ export function webFetchTool(options: WebFetchToolOptions): ToolDefinition {
   return defineTool({
     name: "web_fetch",
     actionClass: "NETWORK_EXTERNAL",
-    description: "GET a URL whose exact origin is on the signed allowlist. No redirects, no custom headers, no private addresses unless listed; size-capped; secrets redacted. The result is untrusted data.",
+    description: "GET a URL whose exact origin is on the signed allowlist. No redirects, no custom headers, no private addresses unless listed; size-capped; secrets redacted. HTML is rendered as markdown unless format says otherwise. The result is untrusted data.",
     parameters: {
       type: "object",
       properties: {
         url: { type: "string", description: "absolute http(s) URL on an allowlisted origin" },
-        maxBytes: { type: "integer", description: "optional lower cap than the signed policy's" }
+        maxBytes: { type: "integer", description: "optional lower cap than the signed policy's" },
+        format: { type: "string", enum: ["markdown", "text", "html"], description: "for HTML bodies: markdown (default), plain text, or the raw html" }
       },
       required: ["url"],
       additionalProperties: false
@@ -70,9 +76,11 @@ export function webFetchTool(options: WebFetchToolOptions): ToolDefinition {
         ...(execution.signal ? { signal: execution.signal } : {}),
         ...(options.timeoutMs ? { timeoutMs: options.timeoutMs } : {})
       });
-      const raw = isTextual(response.contentType)
-        ? response.body.toString("utf8")
-        : `[amc: ${response.contentType} body of ${response.body.byteLength} bytes not rendered as text]`;
+      const rendered = isHtml(response.contentType) && args.format !== "html";
+      const raw = !isTextual(response.contentType) && !isHtml(response.contentType)
+        ? `[amc: ${response.contentType} body of ${response.body.byteLength} bytes not rendered as text]`
+        : rendered ? renderHtml(response.body.toString("utf8"), { format: args.format === "text" ? "text" : "markdown", base: response.url })
+          : response.body.toString("utf8");
       const redacted = redactFetched(raw);
       const ok = response.status >= 200 && response.status < 300;
       const output = `${ok ? "" : `[amc: HTTP ${response.status}]\n`}${labelUntrusted(response.origin, redacted.text)}`;
@@ -83,6 +91,8 @@ export function webFetchTool(options: WebFetchToolOptions): ToolDefinition {
         status: response.status,
         contentType: response.contentType,
         bytes: response.body.byteLength,
+        format: rendered ? args.format : "html",
+        renderedBytes: Buffer.byteLength(raw, "utf8"),
         // The body exactly as received, and what the model was given (redacted, labelled). Keyed in a workspace that
         // opted in to protected-data redaction (P2-02): a plain hash of a short body (a bare SSN) can be brute-forced.
         ...digestField("content", outputDigestFor(execution.workspace, sha256Hex(response.body))),
