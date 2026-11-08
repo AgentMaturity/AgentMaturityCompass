@@ -154,6 +154,19 @@ describe("trust on this machine", () => {
     expect(trustNativeCommandHooks(root, markOf(root)).references[1]?.sha256).toBe(sha256Hex(Buffer.from("process.exit(2) // the import, not the named script, changed")));
     expect(loadNativeCommandHooks(root).status).toBe("trusted");
   });
+  it("re-checks the bound tree immediately before EVERY spawn, not once per decision (skeptic: TOCTOU)", async () => {
+    const root = workspace();
+    mkdirSync(join(root, ".amc", "hooks"), { recursive: true });
+    const marker = join(root, "second-hook-ran");
+    writeFileSync(join(root, ".amc", "hooks", "check.js"), `require('fs').writeFileSync(${JSON.stringify(marker)}, 'ran')`);
+    // The first handler stands in for a concurrent writer: it rewrites the bound script the second handler is about to run.
+    const writer = node(`require('fs').appendFileSync(require('path').join(process.env.AMC_WORKSPACE, '.amc/hooks/check.js'), '\\n// swapped');`);
+    install(root, { PreToolUse: [{ hooks: [{ type: "command", command: writer }, { type: "command", command: [process.execPath, ".amc/hooks/check.js"] }] }] });
+    const hooks = runtime(root), call = execution("fs.write");
+    await hooks.prepare(call);
+    expect(hooks.guard(call)).toContain(".amc/hooks/check.js changed since this machine trusted");
+    expect(existsSync(marker)).toBe(false);
+  });
   it("refuses workspace code anywhere but .amc/hooks/: outside paths, directories, --flag=value paths, and alias spellings of them (S6)", () => {
     const root = workspace();
     mkdirSync(join(root, "scripts"), { recursive: true }); mkdirSync(join(root, ".amc", "hooks", "dirmod"), { recursive: true });
@@ -173,6 +186,8 @@ describe("trust on this machine", () => {
     invalid([process.execPath, ".amc/hooks/check.js", "--config=scripts/policy.json"], /scripts\/policy\.json inside the workspace: outside/);
     // An alias path (a symlinked ancestor, like macOS /var for /private/var) is the same file: refused, not treated as outside.
     invalid([process.execPath, join(alias, "ws", "scripts", "guard.js")], /outside \.amc\/hooks\//);
+    // A case variant on a case-insensitive volume (the macOS and Windows default) is the same file too.
+    if (root.toUpperCase() !== root && existsSync(root.toUpperCase())) invalid([process.execPath, join(root.toUpperCase(), "scripts", "guard.js")], /outside \.amc\/hooks\//);
     // The workspace itself (`node .` runs its package entry point), environment assignments and attached values.
     invalid([process.execPath, "."], /the workspace itself: a directory/);
     invalid([process.execPath, root], /the workspace itself: a directory/);

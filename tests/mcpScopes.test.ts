@@ -80,6 +80,11 @@ describe("scoped files", () => {
     expect(statSync(dirs.user).mode & 0o777).toBe(0o700);
     expect(listScopedMcpConfigs(workspace, dirs).problems).toEqual([]);
     expect(resolveScopedMcpSelection(workspace, ["mine"], dirs).entries).toHaveLength(1);
+    // A directory that already exists group-writable (what an earlier add made under umask 002) is tightened on the next add.
+    chmodSync(dirs.user, 0o775);
+    writeScopedMcpConfig(dirs, "user", stdio("second"));
+    expect(statSync(dirs.user).mode & 0o777).toBe(0o700);
+    expect(listScopedMcpConfigs(workspace, dirs).problems).toEqual([]);
   });
   it("validates an added file before it lands: a rejected add leaves nothing behind, and --force keeps a valid file and its .sig (skeptic)", () => {
     const { dirs } = fixture();

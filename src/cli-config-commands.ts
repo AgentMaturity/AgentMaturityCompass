@@ -41,7 +41,8 @@ export function registerConfigProvenanceCommand(config: Command): void {
           if (shadowed.length === 0 && winner.layer === "default") console.log("  (built-in default; no layer set it)");
           return;
         }
-        const rows = Object.entries(result.provenance).map(([at, source]) => ({ pointer: at, ...source, shadowed: Math.max(0, (result.history[at]?.length ?? 0) - 1) }));
+        const rows = Object.entries(result.provenance).map(([at, source]) => ({ pointer: at, ...source,
+          shadowed: source.layer === "default" ? result.history[at]?.length ?? 0 : Math.max(0, (result.history[at]?.length ?? 0) - 1) }));
         if (opts.json) { console.log(JSON.stringify({ ok: true, configPath: result.configPath, leaves: rows }, null, 2)); return; }
         console.log(`Resolved from ${result.configPath}`);
         for (const row of rows) console.log(`${row.pointer}: ${row.layer}${row.path === null ? "" : ` ${row.path}`}${row.shadowed > 0 ? ` (shadows ${row.shadowed})` : ""}`);

@@ -154,7 +154,7 @@ export function mergeScopedMcpSelection<T extends { readonly mcp?: readonly stri
  * file is VALIDATED BEFORE IT LANDS: it is written to a temporary name, admitted exactly as an explicit `--mcp-config`
  * would be, and only then renamed over `<id>.json` (and the stale `.sig` removed), so a rejected add leaves nothing
  * behind and a `--force` add never replaces a valid file with an invalid one. The user-scope directory is created
- * owner-only regardless of umask, because `assertPrivateFile` refuses a group-writable parent.
+ * owner-only and an existing one is tightened, because `assertPrivateFile` refuses a group-writable parent.
  */
 export function writeScopedMcpConfig(dirs: McpScopeDirs, scope: McpScope, config: NativeMcpConfiguration, force = false): { readonly path: string; readonly sha256: string } {
   const id = scopedMcpId(config.server.id);
@@ -162,7 +162,7 @@ export function writeScopedMcpConfig(dirs: McpScopeDirs, scope: McpScope, config
   if (!force && existsSync(path)) return refuse(`${path} exists; pass --force to replace it (its signature, if any, no longer applies).`);
   if (!force && existsSync(join(dirs[other], `${id}.json`))) return refuse(`${id} already exists in the ${other} scope (${join(dirs[other], `${id}.json`)}); use another id, or --force to create a collision that --mcp must then qualify.`);
   mkdirSync(dirs[scope], { recursive: true, mode: 0o700 });
-  if (scope === "user") chmodSync(dirs[scope], 0o700); // mkdir's mode is masked by umask (002 on Ubuntu and Fedora)
+  if (scope === "user") chmodSync(dirs[scope], 0o700); // a directory that already existed (an earlier add under umask 002 made it 0775) is tightened too
   const bytes = `${JSON.stringify(config, null, 2)}\n`;
   const pending = join(dirs[scope], `.${id}.${randomBytes(6).toString("hex")}.pending`);
   writeFileAtomic(pending, bytes, 0o600);

@@ -3,9 +3,11 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { afterEach, describe, expect, it } from "vitest";
+import { Command } from "commander";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { loadDeclarativeConfig } from "../src/config/amcConfigLoader.js";
 import { sha256Hex } from "../src/utils/hash.js";
+import { registerConfigProvenanceCommand } from "../src/cli-config-commands.js";
 
 /** SH-EXT-07: shadowed values are tracked per leaf and shown by `amc config provenance`. */
 const directories: string[] = [];
@@ -51,6 +53,29 @@ describe("config provenance", () => {
     expect(version.winner).toEqual({ layer: "default", path: null, sha256: null, value: resolved.config.version });
     expect(amc("/version").stdout).not.toContain("undefined");
   }, 120_000);
+
+  it("in process: the winner value comes from the resolved config, and a default winner shadows every recorded value in both views", async () => {
+    const root = workspace();
+    writeFileSync(join(root, "amcconfig.yaml"), "agents: [{ id: a, riskTier: high }]\n");
+    const user = join(root, "user.yaml"); writeFileSync(user, "agents: [{ id: b }]\n");
+    const resolved = loadDeclarativeConfig(undefined, root, { userConfig: user });
+    const run = async (...args: string[]) => {
+      const lines: string[] = [], spy = vi.spyOn(console, "log").mockImplementation((...parts: unknown[]) => { lines.push(parts.join(" ")); });
+      const cwd = process.cwd(); process.chdir(root);
+      try {
+        const program = new Command(); program.exitOverride();
+        registerConfigProvenanceCommand(program.command("config"));
+        await program.parseAsync(["node", "amc", "config", "provenance", ...args, "--user-config", user, "--json"]);
+      } finally { process.chdir(cwd); spy.mockRestore(); }
+      return JSON.parse(lines.join("\n"));
+    };
+    const tier = await run("/agents/0/riskTier");
+    expect(tier.winner).toMatchObject({ layer: "default", value: resolved.config.agents[0]!.riskTier });
+    expect(tier.shadowed).toEqual([expect.objectContaining({ layer: "workspace", value: "high" })]);
+    const leaves = (await run()).leaves as { pointer: string; layer: string; shadowed: number }[];
+    expect(leaves.find(leaf => leaf.pointer === "/agents/0/riskTier")).toMatchObject({ layer: "default", shadowed: 1 });
+    expect(leaves.find(leaf => leaf.pointer === "/agents/0/id")).toMatchObject({ layer: "user", shadowed: 1 });
+  });
 
   it("amc config provenance shows the winner and the shadowed values through the built CLI", () => {
     const root = workspace();
