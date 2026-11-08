@@ -12,6 +12,7 @@ export interface StudioRuntimeConfig {
   gatewayPort: number;
   proxyPort: number;
   toolhubPort: number;
+  dashboardPort: number;
   logLevel: LogLevel;
   lanMode: boolean;
   allowedCidrs: string[];
@@ -20,6 +21,7 @@ export interface StudioRuntimeConfig {
   dataRetentionDays: number;
   minFreeDiskMb: number;
   maxRequestBytes: number;
+  gatewayMaxRequestBytes: number;
   corsAllowedOrigins: string[];
   allowPublicBind: boolean;
   metricsBind: string;

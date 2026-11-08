@@ -9,14 +9,30 @@
  * 
  * Development: pnpm api:start; production: pnpm build && pnpm api:start:production
  * Or deploy to Vercel/Railway/Fly.io
+ *
+ * POST routes are rate limited per route and client, 120 a minute (LIVE-RUNTIME-16, SR-6, SR-7). Behind a platform proxy
+ * every request arrives from the proxy, so name the client one of two ways: AMC_API_TRUSTED_CLIENT_IP_HEADER, a
+ * single-value header the platform overwrites with the client address (x-vercel-forwarded-for, cf-connecting-ip,
+ * fly-client-ip), or AMC_API_TRUSTED_PROXY_HOPS=N, the X-Forwarded-For entry N from the right. Never the left-most
+ * X-Forwarded-For entry: the client writes it. A value that is not one IP address counts for nothing and the socket
+ * address stands in. On Vercel, Railway or Fly with neither set, every client shares one bucket per route at ten
+ * clients' ceiling, and that is logged once (SR-12: never off). A bucket is a fixed route id plus the client; any other
+ * path is "other", never the path itself (SR-13). The Stripe webhook is never limited here (its signature is its gate),
+ * and the admin route has its own bucket. In memory, so on serverless platforms it counts per instance.
  */
 
 import http from 'node:http';
-import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
+import { createHmac, timingSafeEqual } from 'node:crypto';
+import { isIP } from 'node:net';
 import { readdirSync, realpathSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { amcVersion } from '../src/version.js';
+import { secretEquals } from '../src/utils/secretEquals.js';
+import { applySecurityHeaders } from '../src/studio/securityHeaders.js';
+import { applyServerTimeouts } from '../src/studio/serverTimeouts.js';
+import { makeRateLimiter } from '../src/studio/rateLimiter.js';
+import { forwardedClientIp } from '../src/studio/clientAddress.js';
 import { questionBank } from '../src/diagnostic/questionBank.js';
 import { listAssurancePacks } from '../src/assurance/packs/index.js';
 import { listIndustryPacks } from '../src/domains/industryPacks.js';
@@ -169,6 +185,42 @@ function computeQuickScore(req: QuickScoreRequest): ScoreResult {
   };
 }
 
+const POST_LIMIT_PER_MINUTE = 120;
+const SHARED_PROXY_LIMIT_PER_MINUTE = 10 * POST_LIMIT_PER_MINUTE; // SR-12: everyone behind an unnamed platform proxy shares it
+const clientPostLimiter = makeRateLimiter(POST_LIMIT_PER_MINUTE, 60_000);
+const sharedProxyPostLimiter = makeRateLimiter(SHARED_PROXY_LIMIT_PER_MINUTE, 60_000);
+const PLATFORM_PROXY_ENV = ['VERCEL', 'RAILWAY_ENVIRONMENT', 'FLY_APP_NAME'];
+// SR-13: bucket keys carry these fixed route ids, never the raw path, so varying the path mints no bucket.
+const POST_ROUTE_IDS = new Map([
+  ['/api/industry-packs/checkout', 'checkout'],
+  ['/api/industry-packs/license/issue', 'license/issue'],
+  ['/api/industry-packs/license/verify', 'license/verify'],
+  ['/api/quickscore', 'quickscore'],
+]);
+let sharedBucketLogged = false;
+
+/** The client address the platform vouches for (see the top of this file), or null: then the socket address counts. */
+function platformClientIp(req: http.IncomingMessage): string | null {
+  const header = process.env.AMC_API_TRUSTED_CLIENT_IP_HEADER?.trim().toLowerCase();
+  const hops = Number(process.env.AMC_API_TRUSTED_PROXY_HOPS ?? 0);
+  const value = header ? req.headers[header] : Number.isInteger(hops) && hops > 0 ? forwardedClientIp(req, hops) : null;
+  const ip = (typeof value === 'string' ? value : null)?.trim() ?? '';
+  return isIP(ip) !== 0 ? ip : null;
+}
+
+/** Whether a POST is within its route's limit: per client, or in one shared bucket behind an unnamed platform proxy. */
+function postAllowed(req: http.IncomingMessage, path: string): boolean {
+  const route = POST_ROUTE_IDS.get(path) ?? 'other';
+  const named = Boolean(process.env.AMC_API_TRUSTED_CLIENT_IP_HEADER?.trim()) || Number(process.env.AMC_API_TRUSTED_PROXY_HOPS ?? 0) > 0;
+  if (!named && PLATFORM_PROXY_ENV.some((name) => process.env[name])) {
+    if (!sharedBucketLogged) console.warn('hosted API: per-client POST rate limiting is unavailable: behind the platform proxy every client shares one bucket '
+      + `per route (${SHARED_PROXY_LIMIT_PER_MINUTE} a minute). Set AMC_API_TRUSTED_CLIENT_IP_HEADER or AMC_API_TRUSTED_PROXY_HOPS.`);
+    sharedBucketLogged = true;
+    return sharedProxyPostLimiter(`${route} proxy`);
+  }
+  return clientPostLimiter(`${route} ${platformClientIp(req) ?? req.socket.remoteAddress ?? 'unknown'}`);
+}
+
 function sendJson(res: http.ServerResponse, status: number, payload: unknown) {
   res.writeHead(status, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify(payload, null, 2));
@@ -193,12 +245,6 @@ async function readJsonBody<T>(req: http.IncomingMessage, maxBytes = 1_048_576):
   return (raw ? JSON.parse(raw) : {}) as T;
 }
 
-/** Equal-length digests, so the compare takes the same time whatever was sent and leaks no length. */
-function sameSecret(provided: string, expected: string): boolean {
-  const digest = (value: string) => createHash('sha256').update(value, 'utf8').digest();
-  return timingSafeEqual(digest(provided), digest(expected));
-}
-
 function hasAdminToken(req: http.IncomingMessage): boolean {
   const expected = process.env.AMC_INDUSTRY_PACKS_ADMIN_TOKEN;
   if (!expected) {
@@ -209,7 +255,7 @@ function hasAdminToken(req: http.IncomingMessage): boolean {
     : null;
   const header = req.headers['x-amc-admin-token'];
   const provided = bearer ?? (Array.isArray(header) ? header[0] : header);
-  return typeof provided === 'string' && sameSecret(provided, expected);
+  return secretEquals(provided, expected);
 }
 
 const WEBHOOK_TOLERANCE_SECONDS = 300;
@@ -286,10 +332,17 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-AMC-Admin-Token');
+  // LIVE-RUNTIME-07: HSTS only on a TLS socket here; behind the platform proxy it is the platform's setting.
+  applySecurityHeaders(res, { trustedHttps: (req.socket as { encrypted?: boolean }).encrypted === true, noStore: true });
   
   if (method === 'OPTIONS') {
     res.writeHead(204);
     res.end();
+    return;
+  }
+  // SR-7: the webhook's gate is its signature, so a flood elsewhere never starves it; each other route has its own bucket.
+  if (method === 'POST' && path !== '/api/industry-packs/webhook' && !postAllowed(req, path)) {
+    sendJson(res, 429, { error: 'rate limited' });
     return;
   }
   
@@ -341,8 +394,10 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
         activationCommand: 'amc domain pack activate --key <license-key>',
       });
     } catch (e) {
+      // LIVE-RUNTIME-16: a fixed answer; the reason (it can quote a key parse failure) goes to the server log only.
+      console.error(`industry packs: licence issue failed: ${e instanceof Error ? e.message : String(e)}`);
       sendJson(res, 503, {
-        error: e instanceof Error ? e.message : 'license issue failed',
+        error: 'licence issuing is not configured',
         requiredEnv: ['AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY', 'AMC_INDUSTRY_PACKS_ADMIN_TOKEN'],
       });
     }
@@ -461,8 +516,15 @@ try {
   // Embedders may supply an argv entry that is not a local file.
 }
 
-if (invokedFile === currentFile) {
+/** The hosted API server, with keep-alive above a platform proxy's idle timeout (LIVE-RUNTIME-12). */
+function createApiServer(): http.Server {
   const server = http.createServer(handleRequest);
+  applyServerTimeouts(server, { requestTimeout: 120_000 });
+  return server;
+}
+
+if (invokedFile === currentFile) {
+  const server = createApiServer();
   server.listen(PORT, () => {
     const address = server.address();
     const actualPort = address && typeof address === 'object' ? address.port : PORT;
@@ -474,4 +536,4 @@ if (invokedFile === currentFile) {
 }
 
 export default handleRequest;
-export { handleRequest, computeQuickScore, generateBadgeSvg };
+export { handleRequest, computeQuickScore, generateBadgeSvg, createApiServer };

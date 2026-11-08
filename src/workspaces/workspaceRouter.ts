@@ -9,6 +9,13 @@ import {
   nativeCsrfTokenForSession, NativeAdmissionError
 } from "../studio/nativeAdmission.js";
 import { ensureAdminToken } from "../studio/studioState.js";
+import { createStreamCap, makeRateLimiter } from "../studio/rateLimiter.js";
+import { admitLoginAttempt, createLoginThrottle } from "../studio/loginThrottle.js";
+import { ipAllowedByCidrs, LOOPBACK_CIDRS, requestUsesHttps, resolveClientAddress, withLoopbackCidrs } from "../studio/clientAddress.js";
+import { allowedHostnamesFrom, hostAllowed } from "../studio/hostAllow.js";
+import { applySecurityHeaders, SECURITY_HEADER_NAMES } from "../studio/securityHeaders.js";
+import { applyServerTimeouts } from "../studio/serverTimeouts.js";
+import { HostSseHub, serveHostConsole } from "./hostConsole.js";
 import { WorkspaceManager } from "./workspaceManager.js";
 import { proxyStudioWorkspaceRequest } from "./workspaceStudioProxy.js";
 import { WorkspaceRuntimeRegistry, WorkspaceRuntimeClosingError } from "./workspaceRuntimeRegistry.js";
@@ -66,6 +73,7 @@ interface WorkspaceApiRuntime {
 interface HostRuntime {
   host: string;
   port: number;
+  server: Server;
   close: () => Promise<void>;
 }
 
@@ -77,6 +85,8 @@ interface StartWorkspaceRouterOptions {
   allowLocalDemoWorkspace?: boolean;
   allowedCidrs?: string[];
   trustedProxyHops?: number;
+  /** The proxies whose forwarding headers count (AMC_TRUSTED_PROXY_CIDRS, SR-1/SR-2); absent or empty, none do. */
+  trustedProxyCidrs?: readonly string[];
   maxRequestBytes?: number;
   corsAllowedOrigins?: string[];
 }
@@ -84,62 +94,6 @@ interface StartWorkspaceRouterOptions {
 function isLoopbackHost(host: string): boolean {
   const normalized = host.trim().toLowerCase().replace(/^\[|\]$/g, "");
   return normalized === "127.0.0.1" || normalized === "::1" || normalized === "localhost";
-}
-
-interface HostEventPayload {
-  type: string;
-  ts: number;
-  workspaceId?: string;
-  summaryHash?: string;
-  version?: number;
-}
-
-class HostSseHub {
-  private readonly clients = new Set<ServerResponse>();
-
-  add(res: ServerResponse): void {
-    this.clients.add(res);
-  }
-
-  remove(res: ServerResponse): void {
-    this.clients.delete(res);
-  }
-
-  emit(event: HostEventPayload): void {
-    const payload = `data: ${JSON.stringify(event)}\n\n`;
-    for (const res of this.clients) {
-      try {
-        res.write(payload);
-      } catch {
-        this.clients.delete(res);
-      }
-    }
-  }
-
-  closeAll(): void {
-    for (const res of this.clients) {
-      try {
-        res.end();
-      } catch {
-        // noop
-      }
-    }
-    this.clients.clear();
-  }
-}
-
-async function pickFreeLocalPort(host = "127.0.0.1"): Promise<number> {
-  const probe = createServer();
-  await new Promise<void>((resolvePromise, rejectPromise) => {
-    probe.once("error", rejectPromise);
-    probe.listen(0, host, () => resolvePromise());
-  });
-  const addr = probe.address();
-  await new Promise<void>((resolvePromise) => probe.close(() => resolvePromise()));
-  if (!addr || typeof addr === "string") {
-    throw new Error("failed to allocate local port");
-  }
-  return addr.port;
 }
 
 async function readBody(req: IncomingMessage, maxBytes = 1_048_576): Promise<string> {
@@ -160,49 +114,12 @@ function json(res: ServerResponse, status: number, payload: unknown): void {
   writeControlJson(res, status, payload);
 }
 
-function extractClientIp(req: IncomingMessage): string {
-  const remote = req.socket.remoteAddress ?? "127.0.0.1";
-  if (remote.startsWith("::ffff:")) {
-    return remote.slice("::ffff:".length);
-  }
-  return remote;
-}
-
-function makeRateLimiter(limit: number, intervalMs: number): (key: string) => boolean {
-  const buckets = new Map<string, { count: number; resetTs: number }>();
-  return (key: string): boolean => {
-    const now = Date.now();
-    const existing = buckets.get(key);
-    if (!existing || existing.resetTs <= now) {
-      buckets.set(key, {
-        count: 1,
-        resetTs: now + intervalMs
-      });
-      return true;
-    }
-    existing.count += 1;
-    if (existing.count > limit) {
-      return false;
-    }
-    return true;
-  };
-}
-
 function hostSessionCookiePath(): string {
   return "/host";
 }
 
 function hostSessionCookieName(): string {
   return "amc_host_session";
-}
-
-function requestUsesHttps(req: IncomingMessage): boolean {
-  const forwarded = req.headers["x-forwarded-proto"];
-  const first = (Array.isArray(forwarded) ? forwarded[0] : forwarded)?.split(",", 1)[0]?.trim().toLowerCase();
-  if (first === "https") {
-    return true;
-  }
-  return (req.socket as { encrypted?: boolean }).encrypted === true;
 }
 
 function setHostSessionCookie(res: ServerResponse, token: string, maxAgeSeconds: number, secure = false): void {
@@ -720,8 +637,16 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
   const workspaceApis = new WorkspaceRuntimeRegistry<WorkspaceApiRuntime>();
   let shutdown: Promise<void> | undefined;
   const hostEvents = new HostSseHub();
+  const hostStreams = createStreamCap(64, 4); // LIVE-RUNTIME-13, SR-8: per hub and host user; host admins always admitted
   const hostLoginLimiter = makeRateLimiter(20, 60_000);
   const workspaceLoginLimiter = makeRateLimiter(20, 60_000);
+  const loginThrottle = createLoginThrottle(); // host accounts: one throttle for the host and workspace login routes
+  const routerCidrs = withLoopbackCidrs(options.allowedCidrs); // LIVE-RUNTIME-20: loopback always admitted
+  const allowedHostnames = allowedHostnamesFrom([...(options.corsAllowedOrigins ?? []), options.host, process.env.AMC_HOST_PUBLIC_BASEURL]);
+  // SR-2: the address the router resolved, and whether it stands for one client; a shared proxy address never hard-refuses a pair.
+  const admitHostLogin = (res: ServerResponse, route: string, username: string, clientIp: string, addressTrusted: boolean): Promise<boolean> => admitLoginAttempt(loginThrottle,
+    { username, clientIp, addressTrusted, refuse: (retryAfter, error) => { res.setHeader("retry-after", String(retryAfter)); writeControlError(res, 429, error); },
+    audit: () => appendHostAudit(options.hostDir, "HUMAN_LOGIN_THROTTLED", username || null, { route, clientIp }) });
   const publicNativeOrigins = (): readonly string[] => {
     const address = server.address();
     const port = typeof address === "object" && address ? address.port : options.port;
@@ -739,15 +664,15 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           token
         };
       });
-      const localPort = await pickFreeLocalPort("127.0.0.1");
       if (workspaceApis.closing) throw new WorkspaceRuntimeClosingError();
+      // Port 0: the kernel picks the port at listen time, so no other process can take it between a probe and the bind.
       const api = await startStudioApiServer({
         workspace: runtime.workspaceDir,
         host: "127.0.0.1",
-        port: localPort,
+        port: 0,
         token: runtime.token,
-        allowedCidrs: options.allowedCidrs,
-        trustedProxyHops: options.trustedProxyHops,
+        allowedCidrs: routerCidrs,
+        trustedProxyHops: 1, trustedProxyCidrs: LOOPBACK_CIDRS, // the router is its only peer and sets x-forwarded-for itself (LIVE-RUNTIME-20)
         maxRequestBytes: options.maxRequestBytes,
         corsAllowedOrigins: options.corsAllowedOrigins,
         nativeAllowedOrigins: publicNativeOrigins(),
@@ -756,7 +681,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       const result: WorkspaceApiRuntime = {
         workspaceId: normalized,
         host: "127.0.0.1",
-        port: localPort,
+        port: api.port,
         token: runtime.token,
         close: async () => api.close()
       };
@@ -769,19 +694,33 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
     try {
       const url = new URL(req.url ?? "/", `http://${options.host}:${options.port}`);
       const pathname = url.pathname;
-      const clientIp = extractClientIp(req);
+      // LIVE-RUNTIME-19/-20: the client and whether a trusted hop vouches for it; the host name; the allow list; headers.
+      const { clientIp, trustForwarded, addressTrusted } = resolveClientAddress(req, { trustedProxyHops: options.trustedProxyHops ?? 0, trustedProxyCidrs: options.trustedProxyCidrs ?? [] });
+      if (!trustForwarded && !hostAllowed(req.headers.host, allowedHostnames)) {
+        writeControlError(res, 403, "host not allowed");
+        return;
+      }
+      if (!ipAllowedByCidrs(clientIp, routerCidrs)) {
+        json(res, 403, { error: "client IP not allowed", ip: clientIp });
+        return;
+      }
+      const trustedHttps = requestUsesHttps(req, trustForwarded);
+      applySecurityHeaders(res, { trustedHttps, noStore: true });
 
-      if (pathname === "/host/healthz") {
+      if (pathname === "/host/healthz" || pathname === "/healthz") { // D-R14: host liveness, never one tenant's readiness
         json(res, 200, { ok: true, mode: "host" });
         return;
       }
 
-      if (pathname === "/host/readyz" || pathname === "/readyz" || pathname === "/healthz") {
+      if (pathname === "/host/readyz" || pathname === "/readyz") {
         const ids = manager.listWorkspaceIds();
         const workspaces = ids.map((workspaceId) => summarizeWorkspaceReadiness(manager, workspaceId));
         const readyCount = workspaces.filter((row) => row.ready).length;
         const notReadyCount = workspaces.length - readyCount;
         const hostReady = notReadyCount === 0;
+        // LIVE-RUNTIME-09: the per-workspace rows only for a signed-in host user (admins all, members their own).
+        const access = resolveHostAccess(req, options.hostDir);
+        const visible = access.ok && !access.isHostAdmin ? new Set(listAccessibleWorkspaces(options.hostDir, access.username ?? "").map((row) => row.workspaceId)) : null;
         json(res, hostReady ? 200 : 503, {
           status: hostReady ? "READY" : "NOT_READY",
           mode: "host",
@@ -790,7 +729,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             ready: readyCount,
             notReady: notReadyCount
           },
-          workspaces
+          ...(access.ok ? { workspaces: visible ? workspaces.filter((row) => visible.has(row.workspaceId)) : workspaces } : {})
         });
         return;
       }
@@ -801,6 +740,8 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           writeControlError(res, auth.status, auth.error ?? "unauthorized");
           return;
         }
+        const release = hostStreams.admit(`host-user:${auth.userId ?? auth.username ?? clientIp}`, () => { hostEvents.remove(res); res.destroy(); }, auth.isHostAdmin === true);
+        if (!release) { writeControlError(res, 503, "too many event streams"); return; }
         res.writeHead(200, {
           "content-type": "text/event-stream",
           "cache-control": "no-cache",
@@ -808,7 +749,8 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         });
         res.write(`data: ${JSON.stringify({ type: "PORTFOLIO_UPDATED", ts: Date.now(), version: 1 })}\n\n`);
         hostEvents.add(res);
-        req.on("close", () => hostEvents.remove(res));
+        req.on("close", () => { hostEvents.remove(res); release(); });
+        res.once("close", release);
         return;
       }
 
@@ -843,7 +785,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         };
         const username = typeof body.username === "string" ? body.username : "";
         const password = typeof body.password === "string" ? body.password : "";
-
+        if (!await admitHostLogin(res, "/host/api/login", username, clientIp, addressTrusted)) return;
         let local:
           | ReturnType<typeof localPasswordLogin>
           | {
@@ -876,6 +818,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           };
         }
         if (local.ok && local.user) {
+          loginThrottle.succeed(username, clientIp);
           // Backward-compatible host-only session cookie for legacy clients/tests.
           const issued = issueHostSessionToken({
             hostDir: options.hostDir,
@@ -884,7 +827,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             isHostAdmin: local.user.isHostAdmin
           });
           const existingSetCookie = res.getHeader("set-cookie");
-          const legacy = `${hostSessionCookieName()}=${encodeURIComponent(issued.token)}; HttpOnly${requestUsesHttps(req) ? "; Secure" : ""}; SameSite=Strict; Path=${hostSessionCookiePath()}; Max-Age=${Math.max(
+          const legacy = `${hostSessionCookieName()}=${encodeURIComponent(issued.token)}; HttpOnly${trustedHttps ? "; Secure" : ""}; SameSite=Strict; Path=${hostSessionCookiePath()}; Max-Age=${Math.max(
             60,
             Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000)
           )}`;
@@ -910,6 +853,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             password
           });
           if (legacyAuth.ok && legacyAuth.user) {
+            loginThrottle.succeed(username, clientIp);
             const issued = issueHostSessionToken({
               hostDir: options.hostDir,
               userId: legacyAuth.user.userId,
@@ -920,7 +864,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
               res,
               issued.token,
               Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000),
-              requestUsesHttps(req)
+              trustedHttps
             );
             appendHostAudit(options.hostDir, "HUMAN_LOGIN_SUCCESS", legacyAuth.user.username, {
               route: "/host/api/login",
@@ -937,14 +881,18 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             });
             return;
           }
+          loginThrottle.fail(username, clientIp, addressTrusted);
           appendHostAudit(options.hostDir, "HUMAN_LOGIN_FAILED", username || null, {
             route: "/host/api/login",
-            mode: "legacy_fallback"
+            mode: "legacy_fallback",
+            reason: legacyAuth.error ?? "invalid credentials"
           });
-          writeControlError(res, 401, legacyAuth.error ?? "invalid credentials");
+          writeControlError(res, 401, "invalid credentials");
           return;
         }
-        writeControlError(res, local.status, local.error ?? "login failed");
+        // LIVE-RUNTIME-06: a disabled account answers like a wrong password; a policy refusal (403) keeps its text.
+        if (local.status === 401) loginThrottle.fail(username, clientIp, addressTrusted);
+        writeControlError(res, local.status, local.status === 401 ? "invalid credentials" : local.error ?? "login failed");
         return;
       }
 
@@ -985,7 +933,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       }
 
       if ((pathname === "/host/api/auth/logout" || pathname === "/host/api/logout") && req.method === "POST") {
-        clearHostSessionCookie(res, requestUsesHttps(req));
+        clearHostSessionCookie(res, trustedHttps);
         clearIdentityCookieHeader({
           config: identityConfig,
           setHeader: (name, value) => {
@@ -1417,21 +1365,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         return;
       }
 
-      if (pathname === "/host/console") {
-        res.statusCode = 302;
-        res.setHeader("location", "/host/console/host.html");
-        res.end();
-        return;
-      }
-
-      if (pathname === "/host/console/host.html") {
-        res.statusCode = 200;
-        res.setHeader("content-type", "text/html; charset=utf-8");
-        res.end(
-          "<!doctype html><html><head><meta charset='utf-8'/><meta name='viewport' content='width=device-width,initial-scale=1'/><title>AMC Host</title><style>body{font-family:system-ui;margin:1rem}input,button{font:inherit}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ddd;padding:.4rem}code{background:#f4f4f4;padding:.1rem .25rem}</style></head><body><h1>AMC Host Portfolio</h1><p id='status'>Loading…</p><div><label>Username <input id='u'/></label> <label>Password <input id='p' type='password'/></label> <button id='login'>Login</button></div><h2>Workspaces</h2><table id='tbl'><thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Roles</th><th>Open</th></tr></thead><tbody></tbody></table><script type='module'>const st=document.getElementById('status');const tbody=document.querySelector('#tbl tbody');async function load(){try{const r=await fetch('/host/api/workspaces',{credentials:'include'});if(!r.ok){st.textContent='Not logged in';tbody.innerHTML='';return;}const j=await r.json();st.textContent='Loaded';tbody.innerHTML=(j.workspaces||[]).map(w=>`<tr><td><code>${w.workspaceId}</code></td><td>${w.name}</td><td>${w.status}</td><td>${(w.roles||[]).join(', ')}</td><td><a href='/w/${w.workspaceId}/console'>Open</a></td></tr>`).join('');}catch(e){st.textContent=String(e);}}document.getElementById('login').addEventListener('click',async()=>{const username=document.getElementById('u').value;const password=document.getElementById('p').value;const r=await fetch('/host/api/login',{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({username,password})});if(!r.ok){st.textContent='Login failed';return;}await load();});load();</script></body></html>"
-        );
-        return;
-      }
+      if (serveHostConsole(pathname, res)) return; // LIVE-RUNTIME-15: the host portfolio page and its script, under CSP
 
       const isDefaultWorkspaceAlias = pathname.startsWith("/api/") ||
         pathname === "/api" ||
@@ -1468,6 +1402,13 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       }
 
       if (workspacePath === "/readyz") {
+        // LIVE-RUNTIME-09: one answer for every id to an anonymous caller, so readiness is no existence oracle. SR-5: a host
+        // user who is no member of this workspace (host admins are members of all) gets that same answer.
+        const sessionOk = (() => { try { return verifyWorkspaceSession(manager, urlWorkspaceId, req.headers.cookie).ok; } catch { return false; } })();
+        if (!sessionOk && resolveWorkspaceRolesForHostAccess(options.hostDir, urlWorkspaceId, resolveHostAccess(req, options.hostDir)).length === 0) {
+          writeControlError(res, 401, "authentication required");
+          return;
+        }
         const readiness = summarizeWorkspaceReadiness(manager, urlWorkspaceId);
         json(res, readiness.ready ? 200 : 503, {
           status: readiness.ready ? "READY" : "NOT_READY",
@@ -1495,15 +1436,19 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           const body = JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576)) as { username?: unknown; password?: unknown };
           const inputUsername = typeof body.username === "string" ? body.username : "";
           const inputPassword = typeof body.password === "string" ? body.password : "";
+          if (!await admitHostLogin(res, `/w/${urlWorkspaceId}/login`, inputUsername, clientIp, addressTrusted)) return;
           const auth = authenticateHostUser({
             hostDir: options.hostDir,
             username: inputUsername,
             password: inputPassword
           });
           if (!auth.ok || !auth.user) {
-            writeControlError(res, 401, auth.error ?? "invalid credentials");
+            loginThrottle.fail(inputUsername, clientIp, addressTrusted);
+            appendHostAudit(options.hostDir, "HUMAN_LOGIN_FAILED", inputUsername || null, { route: `/w/${urlWorkspaceId}/login`, reason: auth.error ?? "invalid credentials" });
+            writeControlError(res, 401, "invalid credentials");
             return;
           }
+          loginThrottle.succeed(inputUsername, clientIp);
           userId = auth.user.userId;
           username = auth.user.username;
           roles = auth.user.isHostAdmin
@@ -1536,7 +1481,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           urlWorkspaceId,
           issued.token,
           Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000),
-          requestUsesHttps(req)
+          trustedHttps
         );
         json(res, 200, {
           ok: true,
@@ -1556,7 +1501,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           const workspace = manager.withWorkspace(urlWorkspaceId, (context) => context.workspaceDir);
           revokeSessionByToken({ workspace, token });
         }
-        clearWorkspaceSessionCookie(res, urlWorkspaceId, requestUsesHttps(req));
+        clearWorkspaceSessionCookie(res, urlWorkspaceId, trustedHttps);
         json(res, 200, { ok: true });
         return;
       }
@@ -1651,7 +1596,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         if (workspaceSessionValid && workspaceSession.payload) {
           if (workspaceSession.payload.userId === "local-demo") {
             if (!allowLocalDemoAccess) {
-              clearWorkspaceSessionCookie(res, urlWorkspaceId, requestUsesHttps(req));
+              clearWorkspaceSessionCookie(res, urlWorkspaceId, trustedHttps);
               writeControlError(res, 401, "local demo session is not enabled");
               return;
             }
@@ -1659,7 +1604,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             const sessionCurrent = workspaceSessionAuthorityCurrent(options.hostDir, urlWorkspaceId, workspaceSession.payload);
             if (!sessionCurrent) {
               workspaceSessionValid = false;
-              clearWorkspaceSessionCookie(res, urlWorkspaceId, requestUsesHttps(req));
+              clearWorkspaceSessionCookie(res, urlWorkspaceId, trustedHttps);
               writeControlError(res, 401, "workspace session authority changed");
               return;
             }
@@ -1691,7 +1636,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
               urlWorkspaceId,
               issued.token,
               Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000),
-              requestUsesHttps(req)
+              trustedHttps
             );
             res.statusCode = 302;
             res.setHeader("location", workspacePath === "/console" ? `${pathname}/${url.search}` : pathname + url.search);
@@ -1713,7 +1658,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
               urlWorkspaceId,
               issued.token,
               Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000),
-              requestUsesHttps(req)
+              trustedHttps
             );
             req.headers.cookie = replaceSessionCookie(req.headers.cookie, issued.token);
           }
@@ -1731,7 +1676,8 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       }
 
       const runtime = await ensureWorkspaceApi(urlWorkspaceId);
-      await proxyStudioWorkspaceRequest(req, res, runtime, nativeRequest ? `${workspacePath}${url.search}` : workspacePath);
+      for (const name of SECURITY_HEADER_NAMES) res.removeHeader(name); // the workspace API's own headers apply (LIVE-RUNTIME-07)
+      await proxyStudioWorkspaceRequest(req, res, runtime, nativeRequest ? `${workspacePath}${url.search}` : workspacePath, { clientIp, trustedHttps });
     } catch (error) {
       if (error instanceof WorkspaceRuntimeClosingError) { writeControlError(res, 503, error.message); return; }
       if (error instanceof NativeAdmissionError) {
@@ -1751,14 +1697,17 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
     }
   });
 
+  applyServerTimeouts(server, { requestTimeout: 120_000 }); // LIVE-RUNTIME-12
   await new Promise<void>((resolvePromise, rejectPromise) => {
     server.once("error", rejectPromise);
     server.listen(options.port, options.host, () => resolvePromise());
   });
 
+  const bound = server.address(); // the bound port, so `port: 0` reports the port the router really listens on
   return {
     host: options.host,
-    port: options.port,
+    port: typeof bound === "object" && bound ? bound.port : options.port,
+    server,
     close: () => {
       if (shutdown) return shutdown;
       hostEvents.closeAll();

@@ -25,7 +25,7 @@ export function nativeCsrfTokenForSession(payload: Pick<SessionPayload, "nonce">
   return createHash("sha256").update("amc-native-studio-csrf-v1\0").update(payload.nonce).digest("hex");
 }
 
-function canonicalOrigin(value: string): string | null {
+export function canonicalOrigin(value: string): string | null {
   try {
     const parsed = new URL(value);
     if (!/^https?:$/.test(parsed.protocol) || parsed.username || parsed.password || parsed.search || parsed.hash

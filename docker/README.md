@@ -58,10 +58,14 @@ Create three local secret files in `deploy/compose/secrets/` before starting: `a
 ```bash
 docker run --rm \
   -p 3210:3210 -p 3211:3211 -p 3212:3212 \
-  --read-only --cap-drop=ALL --security-opt=no-new-privileges \
-  --tmpfs /tmp --tmpfs /home/amc:uid=10001,gid=10001,mode=0700 \
+  --read-only --cap-drop=ALL --security-opt=no-new-privileges --stop-timeout 40 \
+  --tmpfs /tmp \
+  -v amc_state:/home/amc/.config/amc/state \
+  -v amc_control_checkpoints:/workspace \
+  -e AMC_CONTROL_CHECKPOINT_DIR=/workspace/control-checkpoints \
   -e AMC_BOOTSTRAP=1 \
   -e AMC_BIND=0.0.0.0 \
+  -e AMC_CORS_ALLOWED_ORIGINS=http://localhost:3212,http://127.0.0.1:3212 \
   -e AMC_ALLOWED_CIDRS=127.0.0.1/32,::1/128,172.16.0.0/12,10.0.0.0/8,192.168.0.0/16 \
   -e AMC_VAULT_PASSPHRASE_FILE=/run/secrets/amc_vault_passphrase \
   -e AMC_BOOTSTRAP_OWNER_USERNAME_FILE=/run/secrets/amc_owner_username \
@@ -73,11 +77,11 @@ docker run --rm \
   amc-studio:local
 ```
 
-Studio defaults to bootstrap mode and stops if bootstrap fails. Keep the same data volume and vault secret across restarts. For an already initialized workspace, `AMC_BOOTSTRAP=0` skips bootstrap. Secret values are supplied only at runtime. The example allows private-network client addresses through Docker networking; narrow `AMC_ALLOWED_CIDRS` to your deployment. LAN pairing and authentication remain enabled; open `http://localhost:3212/console` and follow the pairing flow.
+Studio defaults to bootstrap mode and stops if bootstrap fails. Keep the same data volume and vault secret across restarts. For an already initialized workspace, `AMC_BOOTSTRAP=0` skips bootstrap. Secret values are supplied only at runtime. The example allows private-network client addresses through Docker networking; narrow `AMC_ALLOWED_CIDRS` to your deployment. LAN pairing and authentication remain enabled; open `http://localhost:3212/console` and follow the pairing flow. Native and A4 routes admit only the bind host or the browser origins in `AMC_CORS_ALLOWED_ORIGINS` (`src/studio/nativeAdmission.ts`); under `--bind 0.0.0.0` the bind host is `http://0.0.0.0:3212`, so list every origin you open the console from, such as a LAN address (`scheme://host[:port]`, no path, no trailing slash), or native routes answer `403 NATIVE_HOST_DENIED`.
 
-The image owns `/data/amc`, `/data/notary`, `/workspace`, and `/home/amc` as UID/GID 10001. Named volumes inherit the image directory ownership on first use. Host bind mounts must already be writable by that user. Read-only root filesystems need the writable data volume and temporary home shown above. An existing volume owned by a different UID needs an operator-managed ownership adjustment before startup; the entrypoint does not run as root or change host permissions.
+The image owns `/data/amc`, `/data/notary`, `/workspace`, and the 0700 home `/home/amc` as UID/GID 10001. Named volumes inherit the image directory ownership on first use. Host bind mounts must already be writable by that user. On the read-only root filesystem, the state volume (`/home/amc/.config/amc/state`: anti-rollback marks and key-set recovery copies) and the checkpoint volume (`/workspace`, with `AMC_CONTROL_CHECKPOINT_DIR=/workspace/control-checkpoints`: signed firewall, guardrail, legal-hold and compiled-control checkpoints) are the only writable paths besides `/data/amc` and `/tmp`. Keep all three volumes together across restarts, backups and rollbacks. Never mount a volume under a tmpfs at `/home/amc`: Docker creates the nested mount point as `root:root 0755`, and Studio refuses an AMC home that is not owner-only. An existing volume owned by a different UID needs an operator-managed ownership adjustment before startup; the entrypoint does not run as root or change host permissions. `--stop-timeout 40` gives Studio time to drain and seal its session on `docker stop`.
 
-The healthcheck uses the installed command `amc studio healthcheck`, which checks `/healthz` and `/readyz`. Explicit CLI mode, such as `amc-studio:local notary start ...`, bypasses Studio bootstrap; disable the Studio healthcheck for long-running non-Studio commands. TLS Compose does this for its notary service.
+The image's HEALTHCHECK probes `/healthz` and `/readyz` over HTTP with a bounded in-process timeout (8 s per request; interval 30 s, timeout 10 s, start period 120 s, 5 retries). It covers the entrypoint's single-workspace `amc studio start`; a container running `amc host` (multi-workspace mode) is not probed by it. `amc studio healthcheck` is the CLI probe for operators. Explicit CLI mode, such as `amc-studio:local notary start ...`, bypasses Studio bootstrap; disable the Studio healthcheck for long-running non-Studio commands. TLS Compose does this for its notary service.
 
 ## Compose
 

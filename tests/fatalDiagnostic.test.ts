@@ -38,6 +38,46 @@ describe("fatal process diagnostics", () => {
     expect(diagnostic.error.cause.message).toBe("root cause here");
   });
 
+  // LIVE-RUNTIME-02: Studio registers its stop, so a crash closes the servers (and seals) before the exit.
+  it("runs the registered stop once, waits for it, then exits 1; a second fatal event does not run it again", () => {
+    const cwd = workspace();
+    const marker = join(cwd, "stop-calls.txt");
+    const module = pathToFileURL(resolve("dist/runtime/fatalDiagnostic.js")).href;
+    const script = `const m = await import(${JSON.stringify(module)}); const fs = await import("node:fs"); m.installFatalHandlers();
+      m.setFatalShutdownHook(async () => { fs.appendFileSync(${JSON.stringify(marker)}, "stop\\n"); await new Promise((r) => setTimeout(r, 200)); fs.appendFileSync(${JSON.stringify(marker)}, "stopped\\n"); }, 5000);
+      Promise.reject(new Error("first failure")); Promise.reject(new Error("second failure"));`;
+    const run = spawnSync(process.execPath, ["--input-type=module", "-e", script], { cwd, encoding: "utf8" });
+    expect(run.status).toBe(1);
+    expect(readFileSync(marker, "utf8")).toBe("stop\nstopped\n");
+    expect(run.stderr).toContain("Unhandled rejection: first failure");
+    expect(run.stderr).toContain("Unhandled rejection: second failure");
+  });
+
+  // Skeptic D5: with the real modules, an uncaught error during a stop that SIGTERM started exited 0.
+  it("a crash during a signal-started Studio stop exits 1", () => {
+    const cwd = workspace();
+    const fatalModule = pathToFileURL(resolve("dist/runtime/fatalDiagnostic.js")).href;
+    const shutdownModule = pathToFileURL(resolve("dist/studio/studioShutdown.js")).href;
+    const script = `const m = await import(${JSON.stringify(fatalModule)}); const s = await import(${JSON.stringify(shutdownModule)});
+      const { EventEmitter } = await import("node:events"); m.installFatalHandlers(); const signals = new EventEmitter();
+      s.installStudioShutdown({ stop: () => new Promise((r) => setTimeout(r, 300)), signals, log: () => undefined });
+      signals.emit("SIGTERM", "SIGTERM"); setTimeout(() => { throw new Error("crash while stopping"); }, 50); setInterval(() => {}, 1000);`;
+    const run = spawnSync(process.execPath, ["--input-type=module", "-e", script], { cwd, encoding: "utf8", timeout: 10_000 });
+    expect(run.stderr).toContain("Uncaught exception: crash while stopping");
+    expect(run.status).toBe(1);
+  });
+
+  it("cuts a stop that never finishes off at its cap", () => {
+    const cwd = workspace();
+    const module = pathToFileURL(resolve("dist/runtime/fatalDiagnostic.js")).href;
+    const script = `const m = await import(${JSON.stringify(module)}); m.installFatalHandlers();
+      m.setFatalShutdownHook(() => new Promise(() => undefined), 300); Promise.reject(new Error("stuck"));`;
+    const started = Date.now();
+    const run = spawnSync(process.execPath, ["--input-type=module", "-e", script], { cwd, encoding: "utf8", timeout: 10_000 });
+    expect(run.status).toBe(1);
+    expect(Date.now() - started).toBeLessThan(5_000);
+  });
+
   it("bounds what it writes: cause depth, aggregate members and field size", () => {
     const cwd = workspace();
     let error: Error = new Error("x".repeat(40_000));

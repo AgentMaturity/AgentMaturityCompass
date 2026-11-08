@@ -22,3 +22,11 @@ export function mergeValues(base: any, override: any): any {
 }
 
 export const zeroDigest = `sha256:${"0".repeat(64)}`;
+
+/** The `studio` stage's HEALTHCHECK: its option text and its exec-form CMD array (null when absent or not JSON). */
+export function dockerfileStudioHealthcheck(dockerfile: string): { options: string; cmd: string[] | null } {
+  const stage = dockerfile.slice(dockerfile.indexOf("FROM runtime AS studio"));
+  const match = /^HEALTHCHECK ([^\n]*?)\s*\\\n\s+CMD (\[.*\])$/m.exec(stage);
+  if (!match) return { options: "", cmd: null };
+  try { return { options: match[1]!, cmd: JSON.parse(match[2]!) as string[] }; } catch { return { options: match[1]!, cmd: null }; }
+}

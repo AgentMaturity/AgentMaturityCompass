@@ -156,7 +156,7 @@ describe("studio + vault + mode + loop", () => {
 
   test("signed human sessions can read workspace agent status without bootstrap admin", async () => {
     const workspace = newWorkspace();
-    initUsersConfig({ workspace, username: "owner", password: "owner-pass" });
+    initUsersConfig({ workspace, username: "owner", password: "owner-pass-1234" });
     const port = await pickFreePort();
     const server = await startStudioApiServer({
       workspace,
@@ -168,7 +168,7 @@ describe("studio + vault + mode + loop", () => {
       const login = await fetch(`http://127.0.0.1:${port}/auth/login`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ username: "owner", password: "owner-pass" }),
+        body: JSON.stringify({ username: "owner", password: "owner-pass-1234" }),
       });
       expect(login.status).toBe(200);
       const cookie = login.headers.get("set-cookie")?.split(";", 1)[0];

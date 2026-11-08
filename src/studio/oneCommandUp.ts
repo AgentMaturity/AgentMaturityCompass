@@ -6,16 +6,30 @@
  * prompt, or non-interactive generation — then run the first 8-surface
  * baseline when the workspace has no prior assessment.
  */
+import { existsSync } from "node:fs";
 import chalk from "chalk";
 import inquirer from "inquirer";
-import { getRememberedVaultPassphrase, rememberVaultPassphrase } from "../vault/passphraseStore.js";
+import { usersConfigPath } from "../auth/authApi.js";
+import { buildDashboard } from "../dashboard/build.js";
+import { agentMarker } from "../vault/operatorContext.js";
+import { getRememberedVaultPassphrase, rememberEnabled, rememberedLocation, rememberedStores, rememberVaultPassphrase } from "../vault/passphraseStore.js";
+import { vaultExists } from "../vault/vault.js";
 
-export async function ensureUpVaultPassphrase(workspace: string, remember: boolean): Promise<void> {
+export async function ensureUpVaultPassphrase(workspace: string, rememberRequested: boolean): Promise<void> {
+  // LIVE-VAULT-03: AMC_VAULT_REMEMBER=0 turns the stores off, so nothing below reads, offers or writes one.
+  const envOptOut = !rememberEnabled();
+  const remember = rememberRequested && !envOptOut;
   if (!process.env.AMC_VAULT_PASSPHRASE && remember) {
+    // LIVE-VAULT-01 (D3): an agent harness's shell never starts a Studio daemon holding the remembered passphrase.
+    const marker = agentMarker();
+    if (marker !== null) {
+      throw new Error(`This shell carries the agent marker ${marker}, so amc up does not use a remembered vault passphrase here. `
+        + "Export AMC_VAULT_PASSPHRASE deliberately, or run amc up from your own terminal.");
+    }
     const remembered = getRememberedVaultPassphrase(workspace);
     if (remembered) {
       process.env.AMC_VAULT_PASSPHRASE = remembered.passphrase;
-      console.log(chalk.gray(`Vault passphrase loaded from ${remembered.backend === "keychain" ? "the macOS Keychain" : "the AMC credentials file"} (run \`amc vault forget\` to remove).`));
+      console.log(chalk.gray(`Vault passphrase loaded from ${rememberedLocation(remembered.backend)} (run \`amc vault forget\` to remove).`));
       return;
     }
   }
@@ -53,7 +67,7 @@ export async function ensureUpVaultPassphrase(workspace: string, remember: boole
       const { rememberChoice } = await inquirer.prompt([{
         type: "confirm",
         name: "rememberChoice",
-        message: "Remember this passphrase on this machine so `amc up` starts without prompts?",
+        message: "Remember this passphrase on this machine so `amc up` and other amc commands in this workspace use it without asking?",
         default: true
       }]);
       if (rememberChoice) {
@@ -63,31 +77,57 @@ export async function ensureUpVaultPassphrase(workspace: string, remember: boole
     }
     return;
   }
+  if ((remember || envOptOut) && vaultExists(workspace)) {
+    // A new passphrase cannot open the vault that exists; remembering one would only replace the right one.
+    const looked = envOptOut ? "AMC_VAULT_PASSPHRASE (remembering is disabled by AMC_VAULT_REMEMBER=0)" : `AMC_VAULT_PASSPHRASE or in ${rememberedStores()}`;
+    throw new Error(`This workspace already has a vault, and no passphrase for it was found in ${looked}. `
+      + "Run: export AMC_VAULT_PASSPHRASE='<the vault passphrase>', then amc up again.");
+  }
   if (remember) {
+    // LIVE-VAULT-03: generated only into a store that outlives this job, and never printed.
+    if ((process.env.CI ?? "").length > 0 || (process.env.GITHUB_ACTIONS ?? "").length > 0) {
+      throw nonInteractivePassphraseError("A CI runner's remembered store does not outlive the job, so amc up does not generate a passphrase here.");
+    }
     const crypto = await import("node:crypto");
     const generated = crypto.randomBytes(16).toString("base64url");
     process.env.AMC_VAULT_PASSPHRASE = generated;
-    const saved = rememberVaultPassphrase(workspace, generated);
+    // B1: said before storing, so a slow or failing store never leaves the operator without it.
     console.log(chalk.yellow("No vault passphrase found in a non-interactive shell; generated one for this workspace."));
+    const saved = rememberVaultPassphrase(workspace, generated);
     console.log(chalk.yellow(`It is remembered in ${saved.location}. Run \`amc vault forget\` to remove it, or set AMC_VAULT_PASSPHRASE to manage it yourself.`));
+    console.log(chalk.yellow("Your own terminal (same user, same AMC_HOME) unlocks from that store; export AMC_VAULT_PASSPHRASE for other hosts."));
     return;
   }
-  throw new Error(
-    [
-      "🔐 Vault passphrase required in non-interactive shells.",
-      "",
-      "Option 1 — set passphrase (recommended):",
-      "  export AMC_VAULT_PASSPHRASE='your-passphrase'",
-      "  amc up",
-      "",
-      "Option 2 — first-time setup (generates passphrase):",
-      "  amc setup",
-      "",
-      "Option 3 — explore without signing (local demo mode):",
-      "  amc up --demo",
-      "  amc up --demo --dry-run"
-    ].join("\n")
-  );
+  throw nonInteractivePassphraseError();
+}
+
+function nonInteractivePassphraseError(lead?: string): Error {
+  return new Error([
+    ...(lead === undefined ? [] : [lead]),
+    "🔐 Vault passphrase required in non-interactive shells.",
+    "",
+    "Option 1 — set passphrase (recommended):",
+    "  export AMC_VAULT_PASSPHRASE='your-passphrase'",
+    "  amc up",
+    "",
+    "Option 2 — first-time setup in a terminal (remembers a generated passphrase):",
+    "  amc setup",
+    "",
+    "Option 3 — explore without signing (local demo mode):",
+    "  amc up --demo",
+    "  amc up --demo --dry-run"
+  ].join("\n"));
+}
+
+/**
+ * The Compass Console signs people in with users.yaml accounts; until the first exists, `amc up` ends by saying how to make
+ * it. Without a terminal the remembered passphrase is not used (operatorContext.ts), so that shell needs the passphrase too.
+ */
+export function printConsoleSignInStep(workspace: string, consoleUrl: string): void {
+  if (existsSync(usersConfigPath(workspace))) return;
+  console.log(`\n  ${chalk.bold("Sign in to the Compass Console")} (${consoleUrl}): create your owner account once with `
+    + `${chalk.bold("amc user init --username <you>")}; it asks for the password you will sign in with. Without a terminal, export `
+    + "AMC_VAULT_PASSPHRASE (or set AMC_VAULT_PASSPHRASE_FILE) first, then run amc user init --username <you> --password-file <file>.");
 }
 
 export interface BaselineWorkspaceState {
@@ -121,6 +161,14 @@ export async function runFirstBaselineIfNeeded(params: {
       vaultReason: instant.vault.reason
     });
     console.log(renderUnifiedResult(baseline, { ci: false, firstRun: true }));
+    if (baseline.diagnosticRunId) {
+      // Studio built its dashboard before this first run existed; rebuild the directory it serves.
+      try {
+        buildDashboard({ workspace: params.workspace, agentId: params.agentId });
+      } catch (error) {
+        console.log(chalk.yellow(`Dashboard not refreshed: ${error instanceof Error ? error.message : String(error)}. Run \`amc dashboard build\`.`));
+      }
+    }
     console.log(chalk.green("\u2713 Baseline complete — your first score is saved. Follow \"What to do next\" above."));
   } catch (error) {
     console.log(chalk.yellow(`Baseline assessment could not run: ${error instanceof Error ? error.message : String(error)}. Run \`amc run\` manually.`));

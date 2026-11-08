@@ -96,6 +96,9 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   "envelope", "lifecycle_bound", "not_governed", "reassessment",
   // Origin of a catalog questionnaire item (P1-53, src/catalog/types.ts QuestionnaireItem.source), never a ledger meta.source.
   "domain_rubric",
+  // The Industry Packs entitlement's source (src/domains/industryPackEntitlement.ts IndustryPackEntitlement.source):
+  // packs are free on every surface; an access label, never a ledger meta.source.
+  "free",
 ]);
 
 function sourceFiles(dir: string): string[] {

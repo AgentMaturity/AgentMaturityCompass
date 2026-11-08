@@ -6,8 +6,16 @@
 |-----------|---------|
 | Node.js | 22 or 24 LTS for production; package engine floor remains ≥ 20 |
 | RAM | 512 MB |
+| CPU (Compose stacks) | 2 vCPUs by default: Docker refuses a container whose CPU limit exceeds the host's CPUs, so on a 1-vCPU host set `AMC_STUDIO_CPUS=1` in `deploy/compose/.env` |
 | Disk | 100 MB + evidence storage |
-| OS | macOS, Linux (Ubuntu/Debian, RHEL/CentOS), Windows |
+| OS | One line per platform, from run receipts: [Platform status](#platform-status) |
+
+### Platform status
+
+- macOS arm64: qualified (`docs/PLATFORM_MATRIX.md`).
+- Linux arm64: the npm package and the desktop archive were installed and run on `node:22-bookworm` (aarch64) on 2026-11-07, in a maintainer verification run that recorded install defects; on 2026-11-08 the hosted installer installed the pinned 1.1.1 archive on `node:22-bookworm` and `node:22-bookworm-slim` (aarch64, prebuilt `better-sqlite3`), so it maps Linux aarch64 to the architecture-neutral `linux-x64` archive; no platform-matrix receipt.
+- Linux x64, macOS x64, Windows x64: packages built and checksum-verified by the release scripts; no run receipt.
+- Container images: built for amd64 and arm64. The container smoke passed on arm64, and on amd64 only under emulation on an arm64 host (2026-10-11, `qualification/2026-10-11-P0-35/`); no native amd64 run.
 
 ## Option A: Verified GitHub Release Install
 
@@ -24,6 +32,15 @@ Windows PowerShell:
 ```powershell
 irm https://agentmaturity.co/install.ps1 | iex
 ```
+
+Without root: when the global npm folder (`$(npm prefix -g)/lib/node_modules`) is not writable by your user, the macOS and Linux installer stops before it downloads anything and prints the rerun command. Install into a folder you own, then add its `bin` directory to PATH:
+
+```bash
+AMC_INSTALL_PREFIX="$HOME/.local" sh -c "$(curl -fsSL https://agentmaturity.co/install.sh)"
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+Running the installer with `sudo` is the last resort: it runs the package postinstall and the native build as root. On Linux, if prebuilt `better-sqlite3` binaries cannot be downloaded, npm builds the native module and needs `python3`, `make` and `g++`; the installer names any that are missing.
 
 Both hosted installers pin the published 1.1.1 release, fetch the platform archive and `SHA256SUMS` from GitHub Releases, and refuse to execute the packaged installer when integrity verification fails. The downloaded archive then verifies its included package tarball before npm installs that local file. npm also publishes 1.1.1; the Homebrew tap is not publicly available.
 
@@ -95,6 +112,8 @@ npm run package:desktop:verify
 
 Archives are written to `dist/installers/archives/` and install AMC from the included AMC npm tarball. The macOS and Windows archives also include the `Agent Maturity Compass Studio` launcher app. It verifies the included package digest, installs that exact build into a version-pinned per-user runtime, and starts the loopback-only local demo from a separate persistent `studio-workspace` directory. The native macOS build uses a native WebKit window; Windows uses the system browser. Neither launcher falls back to a global `amc` installation or bundles a browser runtime. npm still needs access to AMC's public runtime dependencies unless they are already cached or mirrored.
 
+Without root, the macOS and Linux archive installer takes the same `AMC_INSTALL_PREFIX`: `AMC_INSTALL_PREFIX="$HOME/.local" sh ./install.sh`, then `export PATH="$HOME/.local/bin:$PATH"`. It stops before npm runs when the global npm folder is not writable; `sudo sh ./install.sh` is the last resort, because it runs the package postinstall and the native build as root.
+
 See `docs/DESKTOP_PACKAGES.md` for user install commands, manifest hashes, and legal/provenance notes.
 
 ## Option D: Docker Compose
@@ -106,15 +125,16 @@ cp .env.example .env    # edit ports and deployment settings
 cp secrets/amc_vault_passphrase.txt.example secrets/amc_vault_passphrase.txt
 cp secrets/amc_owner_username.txt.example secrets/amc_owner_username.txt
 cp secrets/amc_owner_password.txt.example secrets/amc_owner_password.txt
+cp secrets/amc_backup_passphrase.txt.example secrets/amc_backup_passphrase.txt
 ```
 
-Replace all three template values with your own vault passphrase, owner username and owner password before starting. These are untracked runtime files, not `.env` settings. Keep them private on the host and readable by container UID 10001, as described in [the container guide](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docker/README.md#studio-with-persistent-state). Then run:
+Replace all four template values with your own vault passphrase, owner username, owner password and backup passphrase before starting; Compose refuses to start while one of the files is missing. These are untracked runtime files, not `.env` settings. Keep them private on the host and readable by container UID 10001, as described in [the container guide](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docker/README.md#studio-with-persistent-state). Then run:
 
 ```bash
 docker compose up -d --build
 ```
 
-Studio available at `http://localhost:3212`. Gateway at `http://localhost:3210`.
+Studio available at `http://localhost:3212` (published on `127.0.0.1` unless `AMC_PUBLISH_ADDRESS` says otherwise). Gateway at `http://localhost:3210`. Running AMC for live users, and the Compose runbooks: [docs/DEPLOYMENT.md](DEPLOYMENT.md#running-amc-for-live-users) and [docs/deploy/reference/COMPOSE.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/deploy/reference/COMPOSE.md).
 
 For TLS termination (production):
 
@@ -132,7 +152,7 @@ Validate the chart first (helm lint, the render checks and kubeconform run when 
 node scripts/deploy/deploy-pack-check.mjs
 ```
 
-Chart 0.4.0, like every chart since 0.2.0, runs one replica only (the workspace has a single writer; `replicaCount=2` is refused) and renders no Secret by default. Create `amc-bootstrap` from files only you can read before installing:
+Chart 0.4.1, like every chart since 0.2.0, runs one replica only (the workspace has a single writer; `replicaCount=2` is refused) and renders no Secret by default. Create `amc-bootstrap` from files only you can read before installing:
 
 ```bash
 kubectl create namespace amc-system
@@ -140,7 +160,7 @@ kubectl -n amc-system create secret generic amc-bootstrap \
   --from-file=vaultPassphrase=./vault-passphrase.txt \
   --from-file=ownerUsername=./owner-username.txt \
   --from-file=ownerPassword=./owner-password.txt
-helm upgrade --install amc deploy/helm/amc --namespace amc-system --atomic --wait \
+helm upgrade --install amc deploy/helm/amc --namespace amc-system --atomic --wait --reuse-values \
   --set workspace.persistence.size=10Gi \
   --set ingress.enabled=true \
   --set env.AMC_CORS_ALLOWED_ORIGINS=https://amc.local
@@ -183,6 +203,8 @@ curl -fsSL https://agentmaturity.co/install.sh | sh
 
 Run `irm https://agentmaturity.co/install.ps1 | iex` in PowerShell. It downloads and verifies the Windows release archive, which includes `install.ps1` plus the `Agent Maturity Compass Studio.cmd` launcher. You can also install WSL2 with Ubuntu and follow the Ubuntu instructions above.
 
+No maintainer-run Windows receipt exists (`docs/PLATFORM_MATRIX.md` has no Windows run); the CLI natively and Studio under WSL2 are both untested.
+
 ## Post-Install Verification
 
 ```bash
@@ -196,6 +218,8 @@ In a new directory, default doctor exits zero when the CLI is healthy and tells 
 
 ## Upgrading
 
+Back up first: a signed `amc backup create` bundle, copied off the machine, before any new version touches the workspace. From 1.1.1, read [docs/releases/2.0.0.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/releases/2.0.0.md), "Migration from 1.1.1", and [docs/MIGRATION_RUNBOOK.md](MIGRATION_RUNBOOK.md) first.
+
 ```bash
 # Verified release channel
 curl -fsSL https://agentmaturity.co/install.sh | sh
@@ -205,13 +229,10 @@ irm https://agentmaturity.co/install.ps1 | iex
 
 # GitHub
 cd AgentMaturityCompass && git pull && pnpm install --frozen-lockfile && pnpm run build
-
-# Docker
-cd deploy/compose && docker compose pull && docker compose up -d --build
-
-# Helm
-helm upgrade amc deploy/helm/amc
 ```
+
+- Docker Compose: pin the new image in `.env` (`AMC_STUDIO_IMAGE`), keep the previous one for rollback, never run `docker compose up --build` once that pin names a release (Compose would tag the newly built code with it), and follow [docs/deploy/reference/COMPOSE.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/deploy/reference/COMPOSE.md) (backup, upgrade, upgrade from 1.1.1, rollback).
+- Helm: upgrade by digest with `--reuse-values`, as [docs/deploy/reference/UPGRADE.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/deploy/reference/UPGRADE.md) describes.
 
 ## Uninstalling
 

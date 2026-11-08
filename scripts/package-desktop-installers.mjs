@@ -23,8 +23,12 @@ const studioMacAppBundleName = "Agent Maturity Compass Studio.app";
 const studioWindowsCmdName = "Agent Maturity Compass Studio.cmd";
 const studioWindowsPs1Name = "Agent Maturity Compass Studio.ps1";
 const studioUrl = "http://127.0.0.1:3212/w/demo/console/";
-const studioMacBrowserOpenCommand = `open "${studioUrl}"`;
-const studioWindowsOpenCommand = 'Start-Process "http://127.0.0.1:3212/w/demo/console/"';
+// STUDIO_URL: the console URL launch-studio.sh printed (the port Studio bound); the default URL when it printed none.
+const studioMacBrowserOpenCommand = `open "\${STUDIO_URL:-${studioUrl}}"`;
+// The console opens on the port Studio bound (state.json apiPort); 3212 only when the state cannot be read.
+const studioWindowsOpenCommand = `$StudioPort = 3212
+try { $BoundPort = [int](Get-Content -LiteralPath $StateFile -Raw | ConvertFrom-Json).apiPort; if ($BoundPort -gt 0 -and $BoundPort -lt 65536) { $StudioPort = $BoundPort } } catch { }
+Start-Process "http://127.0.0.1:$StudioPort/w/demo/console/"`;
 const studioMacStopCommand = 'cd ~/"Library/Application Support/Agent Maturity Compass/studio-workspace" && ../runtime/node_modules/.bin/amc down';
 const studioWindowsStopCommand = 'cd "$env:LOCALAPPDATA\\Agent Maturity Compass\\studio-workspace"; ..\\runtime\\node_modules\\.bin\\amc.cmd down';
 
@@ -96,10 +100,24 @@ if [ "$ACTUAL_SHA256" != "$PACKAGE_SHA256" ]; then
   exit 1
 fi
 
+if [ -z "\${AMC_INSTALL_PREFIX:-}" ]; then
+  GLOBAL_LIB="$(npm prefix -g)/lib/node_modules"
+  [ -d "$GLOBAL_LIB" ] || GLOBAL_LIB="$(npm prefix -g)/lib"
+  if [ ! -w "$GLOBAL_LIB" ]; then
+    printf 'The global npm folder %s is not writable by %s.\n' "$GLOBAL_LIB" "$(id -un)" >&2
+    printf 'Rerun as: AMC_INSTALL_PREFIX="$HOME/.local" sh ./install.sh   (then add $HOME/.local/bin to PATH)\n' >&2
+    printf 'Last resort: sudo sh ./install.sh. It runs the package postinstall and the native build as root.\n' >&2
+    exit 1
+  fi
+fi
+
 if [ -n "\${AMC_INSTALL_PREFIX:-}" ]; then
   npm install -g --prefix "$AMC_INSTALL_PREFIX" --no-audit --no-fund "$PACKAGE"
 else
   npm install -g --no-audit --no-fund "$PACKAGE"
+fi
+if [ -n "\${AMC_INSTALL_PREFIX:-}" ]; then
+  printf 'Add it to PATH: export PATH="%s/bin:$PATH"\n' "$AMC_INSTALL_PREFIX"
 fi
 echo "AMC installed. Run: amc --version && amc doctor"
 `;
@@ -204,10 +222,15 @@ static NSString * const AMCStudioURL = @"${studioUrl}";
   dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
     @autoreleasepool {
       NSTask *task = [[NSTask alloc] init];
+      NSPipe *pipe = [NSPipe pipe];
       [task setLaunchPath:@"/bin/sh"];
       [task setArguments:@[script]];
+      [task setStandardOutput:pipe];
+      NSData *output = nil;
       @try {
         [task launch];
+        // Read to end of file before waiting, so a full pipe can never stall the script.
+        output = [[pipe fileHandleForReading] readDataToEndOfFile];
         [task waitUntilExit];
       } @catch (NSException *exception) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -222,15 +245,24 @@ static NSString * const AMCStudioURL = @"${studioUrl}";
         });
         return;
       }
+      // The script prints the console URL on the port Studio bound; only that loopback console URL is accepted.
+      NSString *studioURL = AMCStudioURL;
+      NSString *text = output ? [[NSString alloc] initWithData:output encoding:NSUTF8StringEncoding] : @"";
+      for (NSString *line in [text componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]]) {
+        if ([line hasPrefix:@"AMC_STUDIO_URL=http://127.0.0.1:"]) {
+          NSString *candidate = [line substringFromIndex:[@"AMC_STUDIO_URL=" length]];
+          if ([candidate hasSuffix:@"/w/demo/console/"]) studioURL = candidate;
+        }
+      }
       dispatch_async(dispatch_get_main_queue(), ^{
-        [self loadStudio];
+        [self loadStudio:studioURL];
       });
     }
   });
 }
 
-- (void)loadStudio {
-  NSURL *url = [NSURL URLWithString:AMCStudioURL];
+- (void)loadStudio:(NSString *)studioURL {
+  NSURL *url = [NSURL URLWithString:studioURL];
   if (!url) {
     [self.statusLabel setStringValue:@"Invalid AMC Studio URL."];
     return;
@@ -299,7 +331,8 @@ int main(int argc, const char * argv[]) {
   writeFileSync(executablePath, `#!/usr/bin/env sh
 set -eu
 APP_BIN_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-/bin/sh "$APP_BIN_DIR/../Resources/launch-studio.sh"
+OUTPUT=$(/bin/sh "$APP_BIN_DIR/../Resources/launch-studio.sh")
+STUDIO_URL=$(printf '%s\n' "$OUTPUT" | sed -n 's/^AMC_STUDIO_URL=//p' | tail -n 1)
 ${studioMacBrowserOpenCommand}
 `, { mode: 0o755 });
   return "system-browser";
@@ -395,14 +428,20 @@ if [ "$CURRENT_DIGEST" != "$PACKAGE_DIGEST" ] || [ ! -x "$AMC_BIN" ]; then
   if [ -x "$AMC_BIN" ] && [ -f "$STATE_FILE" ]; then
     # Stop the Studio that the previous runtime started, so the upgraded runtime serves the console.
     # AMC_NO_AUTO_REBUILD: the old runtime is about to be replaced, so it must not repair its database engine first.
-    OLD_PID=$(node -e 'try { console.log(require(process.argv[1]).pid || "") } catch {}' "$STATE_FILE" 2>/dev/null || true)
-    (cd "$WORKSPACE_DIR" && AMC_NO_AUTO_REBUILD=1 "$AMC_BIN" down) >>"$LOG_FILE" 2>&1 || true
-    # amc down only signals the daemon, which can take up to 10 s to release its port.
-    WAITED=0
-    while [ -n "$OLD_PID" ] && kill -0 "$OLD_PID" 2>/dev/null && [ "$WAITED" -lt 15 ]; do
-      sleep 1
-      WAITED=$((WAITED + 1))
-    done
+    OLD_PID=$(node -e 'try { const pid = require(process.argv[1]).pid; console.log(Number.isSafeInteger(pid) && pid > 0 ? pid : "") } catch {}' "$STATE_FILE" 2>/dev/null || true)
+    # The old runtime's amc down signals any live pid in the state file; a stale file's pid may now be another program's.
+    if [ -n "$OLD_PID" ] && ps -ww -o command= -p "$OLD_PID" 2>/dev/null | grep -q '_studio-daemon'; then
+      (cd "$WORKSPACE_DIR" && AMC_NO_AUTO_REBUILD=1 "$AMC_BIN" down) >>"$LOG_FILE" 2>&1 || true
+      # amc down only signals the daemon, which can take up to 10 s to release its port.
+      WAITED=0
+      while kill -0 "$OLD_PID" 2>/dev/null && [ "$WAITED" -lt 15 ]; do
+        sleep 1
+        WAITED=$((WAITED + 1))
+      done
+    else
+      # No Studio daemon runs under that pid, so the state file is stale; the new runtime must not trust it.
+      rm -f "$STATE_FILE"
+    fi
   fi
   mkdir -p "$RUNTIME_DIR"
   npm install --prefix "$RUNTIME_DIR" --no-audit --no-fund "$PACKAGE" >>"$LOG_FILE" 2>&1
@@ -418,6 +457,9 @@ if ! "$AMC_BIN" up --demo --no-open >>"$LOG_FILE" 2>&1; then
   fi
   exit 1
 fi
+# The console URL on the port Studio bound (state.json apiPort), for the app to open; 3212 when the state cannot be read.
+STUDIO_PORT=$(node -e 'try { const port = require(process.argv[1]).apiPort; console.log(Number.isInteger(port) && port > 0 && port < 65536 ? port : 3212) } catch { console.log(3212) }' "$STATE_FILE" 2>/dev/null || printf '3212')
+printf 'AMC_STUDIO_URL=http://127.0.0.1:%s/w/demo/console/\n' "$STUDIO_PORT"
 `;
   writeFileSync(join(resourcesDir, "launch-studio.sh"), launchScript, { mode: 0o755 });
   const macRuntime = writeMacLauncherExecutable(join(macosDir, studioAppName));
@@ -481,16 +523,23 @@ if ($CurrentDigest -ne $PackageDigest -or -not (Test-Path -LiteralPath $AmcBin))
   if ((Test-Path -LiteralPath $AmcBin) -and (Test-Path -LiteralPath $StateFile)) {
     # Stop the Studio that the previous runtime started, so the upgraded runtime serves the console.
     # AMC_NO_AUTO_REBUILD: the old runtime is about to be replaced, so it must not repair its database engine first.
-    $OldPid = try { (Get-Content -LiteralPath $StateFile -Raw | ConvertFrom-Json).pid } catch { $null }
-    Push-Location -LiteralPath $WorkspaceDir
-    $NoAutoRebuild = $env:AMC_NO_AUTO_REBUILD
-    $env:AMC_NO_AUTO_REBUILD = "1"
-    $ErrorActionPreference = "Continue"
-    & $AmcBin down *>> $LogFile
-    $ErrorActionPreference = "Stop"
-    $env:AMC_NO_AUTO_REBUILD = $NoAutoRebuild
-    Pop-Location
-    if ($OldPid) { Wait-Process -Id $OldPid -Timeout 15 -ErrorAction SilentlyContinue }
+    $OldPid = try { [int](Get-Content -LiteralPath $StateFile -Raw | ConvertFrom-Json).pid } catch { 0 }
+    # The old runtime's amc down signals any live pid in the state file; a stale file's pid may now be another program's.
+    $OldCommandLine = if ($OldPid -gt 0) { try { (Get-CimInstance Win32_Process -Filter "ProcessId=$OldPid" -ErrorAction Stop).CommandLine } catch { $null } } else { $null }
+    if ($OldCommandLine -and $OldCommandLine.Contains("_studio-daemon")) {
+      Push-Location -LiteralPath $WorkspaceDir
+      $NoAutoRebuild = $env:AMC_NO_AUTO_REBUILD
+      $env:AMC_NO_AUTO_REBUILD = "1"
+      $ErrorActionPreference = "Continue"
+      & $AmcBin down *>> $LogFile
+      $ErrorActionPreference = "Stop"
+      $env:AMC_NO_AUTO_REBUILD = $NoAutoRebuild
+      Pop-Location
+      Wait-Process -Id $OldPid -Timeout 15 -ErrorAction SilentlyContinue
+    } else {
+      # No Studio daemon runs under that pid, so the state file is stale; the new runtime must not trust it.
+      Remove-Item -LiteralPath $StateFile -Force -ErrorAction SilentlyContinue
+    }
   }
   New-Item -ItemType Directory -Force -Path $RuntimeDir | Out-Null
   $ErrorActionPreference = "Continue"
@@ -556,14 +605,27 @@ Mutable demo data is stored in a separate persistent \`studio-workspace\` direct
 
 - Node.js 22 or 24 LTS
 - npm available on PATH
-
+${platform.id === "linux-x64" ? `
+The archive is architecture-neutral (npm tarball + sh installer). On arm64, or whenever prebuilt \`better-sqlite3\` binaries cannot be downloaded, npm builds the native module and needs \`python3\`, \`make\` and \`g++\`.
+` : ""}
 ## Install
 
 \`\`\`${platform.kind === "windows" ? "powershell" : "sh"}
 ${installCommand}
 \`\`\`
 
-${appCommand ? `## Launch Studio
+${platform.kind === "unix" ? `## Install without root
+
+When the global npm folder is not writable by your user, the installer stops before npm runs. Install into a folder you own, then add its \`bin\` directory to PATH:
+
+\`\`\`sh
+AMC_INSTALL_PREFIX="$HOME/.local" sh ./install.sh
+export PATH="$HOME/.local/bin:$PATH"
+\`\`\`
+
+\`sudo sh ./install.sh\` is the last resort: it runs the package postinstall and the native build as root.
+
+` : ""}${appCommand ? `## Launch Studio
 
 \`\`\`${platform.kind === "windows" ? "powershell" : "sh"}
 ${appCommand}
@@ -610,13 +672,17 @@ function createArchive(platform, packageDir) {
     return archivePath;
   }
   const archivePath = join(archivesRoot, `${archiveBase}.tar.gz`);
-  run("tar", ["-czf", archivePath, "-C", stagingRoot, basename(packageDir)], { timeoutMs: 120_000 });
+  // bsdtar on macOS (the release runner) adds AppleDouble ._* entries and com.apple.* xattr pax headers unless told not to.
+  run("tar", [...(process.platform === "darwin" ? ["--no-mac-metadata", "--no-xattrs"] : []), "-czf", archivePath, "-C", stagingRoot, basename(packageDir)],
+    { timeoutMs: 120_000, env: { COPYFILE_DISABLE: "1" } });
   return archivePath;
 }
 
 const platforms = [
   { id: "macos-universal", label: "macOS", kind: "unix" },
-  { id: "linux-x64", label: "Linux x64", kind: "unix" },
+  // The id stays linux-x64 (SHA256SUMS, the hosted installer and the matrix consume it); the archive is an npm tarball and
+  // an sh installer, so it is architecture-neutral.
+  { id: "linux-x64", label: "Linux (x64, arm64)", kind: "unix" },
   { id: "windows-x64", label: "Windows x64", kind: "windows" }
 ];
 

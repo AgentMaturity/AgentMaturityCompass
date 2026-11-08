@@ -13,8 +13,9 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { loadRunReport, generateReport } from "../diagnostic/runner.js";
 import { getAuthenticatedKeyHistory, getSigningKey, signHexDigest } from "../crypto/keys.js";
-import { verifyKeyHistoryEnvelope, type KeyHistoryEnvelope } from "../crypto/keyHistoryEnvelope.js";
+import { authenticatedHistoryFromBundle, bundleKeyHistory, collectAuditorKeysFromBundle } from "./bundleKeys.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
+import { openSessionsAt, unsealedLegacySessionIds, verifyInstantFor } from "../ledger/verifyAsOf.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
 import { admitKey, buildVerifierReport, checkDigestSignature, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
@@ -557,35 +558,9 @@ function readBundleManifestSig(root: string): BundleManifestSignature {
   return JSON.parse(readUtf8(file)) as BundleManifestSignature;
 }
 
-/** The key-history envelope a bundle carries for a role, unverified: admitKey checks it against a pinned anchor. */
-function bundleKeyHistory(root: string, kind: "monitor" | "auditor"): unknown {
-  try {
-    const parsed: unknown = JSON.parse(readUtf8(join(root, "public-keys", "key-history.json")));
-    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? (parsed as Record<string, unknown>)[kind] : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-function authenticatedHistoryFromBundle(root: string, kind: "monitor" | "auditor"): KeyHistoryEnvelope | null {
-  // The history cannot choose its own anchor or gain authority merely by
-  // being copied into a manifest. Only the direct role key admits old keys.
-  const result = verifyKeyHistoryEnvelope(bundleKeyHistory(root, kind), kind, readUtf8(join(root, "public-keys", `${kind}.pub`)));
-  return result.valid ? result.envelope : null;
-}
-
-function collectRoleKeysFromBundle(root: string, kind: "monitor" | "auditor"): string[] {
-  const direct = readUtf8(join(root, "public-keys", `${kind}.pub`));
-  const history = authenticatedHistoryFromBundle(root, kind);
-  return [...new Set([direct, ...(history?.entries.map((entry) => entry.publicKeyPem) ?? [])])];
-}
-
-function collectAuditorKeysFromBundle(root: string): string[] {
-  return collectRoleKeysFromBundle(root, "auditor");
-}
-
-function collectMonitorKeysFromBundle(root: string): string[] {
-  return collectRoleKeysFromBundle(root, "monitor");
+/** metadata/exportInfo.json's exportTs, or null when it is missing or unreadable (the caller then verifies at the real now). */
+function readExportTs(root: string): unknown {
+  try { return (JSON.parse(readUtf8(join(root, "metadata", "exportInfo.json"))) as { exportTs?: unknown }).exportTs ?? null; } catch { return null; }
 }
 
 function materializeBundleWorkspace(root: string): { workspace: string; spillGaps: string[] } {
@@ -640,7 +615,7 @@ export function exportEvidenceBundle(params: {
   outFile: string;
   agentId?: string;
   attest?: boolean; // P1-27: add the AIBOM and a DSSE-signed in-toto statement, both listed in the manifest
-}): { outFile: string; manifest: BundleManifest; fileCount: number; eventCount: number; sessionCount: number } {
+}): { outFile: string; manifest: BundleManifest; fileCount: number; eventCount: number; sessionCount: number; openSessions: string[] } {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const agentPaths = getAgentPaths(params.workspace, agentId);
   const report = loadRunReport(params.workspace, params.runId, agentId);
@@ -724,6 +699,7 @@ export function exportEvidenceBundle(params: {
     const sourceDbPath = join(params.workspace, ".amc", "evidence.sqlite");
     const outputDbPath = join(root, "evidence", "evidence.sqlite");
     const copied = copyA4Slice({ workspace: params.workspace, root, agentId, slice: copyEvidenceSlice({ sourceDbPath, outputDbPath, report }) });
+    const openSessions = unsealedLegacySessionIds(outputDbPath); // open in the copy: it verifies as of its exportTs
 
     // Transport authenticated encrypted objects, never vault keys or legacy
     // plaintext. The signed bundle manifest includes this index and its gaps.
@@ -809,7 +785,8 @@ export function exportEvidenceBundle(params: {
       manifest,
       fileCount: manifest.files.length,
       eventCount: copied.eventCount,
-      sessionCount: copied.sessionCount
+      sessionCount: copied.sessionCount,
+      openSessions
     };
   } finally {
     cleanup();
@@ -835,9 +812,11 @@ export async function verifyEvidenceBundle(bundleFile: string, trust: TrustConte
   const errors: string[] = [];
   const spillGaps: string[] = [];
   const signatures: IssuerAdmission[] = [];
+  const notes: string[] = []; // informational (warnings), never errors: an open session in the copy
   let anchoring: VerifierReportV1["anchoring"] = { status: "unanchored", detail: "the bundle ledger was not verified" };
   let manifestSignatureVerified = false;
   let manifestFilesVerified = false;
+  let manifestAdmitted = false; // the manifest signer's admission: only an admitted signer's exportTs is a verification instant
   // Claimed signing times (step 6): each signature's own claim where it has one, else the bundle's manifest.sig claim.
   let bundleClaim: number | null = null;
   const sealedBy = (signature: string, digestHex: string, signatureB64: string, claimedSignedAt = bundleClaim): boolean => {
@@ -872,6 +851,7 @@ export async function verifyEvidenceBundle(bundleFile: string, trust: TrustConte
         errors.push("Manifest signature payload digest mismatch.");
       }
       const signatureMatches = sealedBy("manifest.sig", digest, manifestSig.signature);
+      manifestAdmitted = signatures.at(-1)?.status === "admitted";
       if (!signatureMatches) {
         errors.push("Manifest signature verification failed.");
       }
@@ -983,13 +963,17 @@ export async function verifyEvidenceBundle(bundleFile: string, trust: TrustConte
         }
         const monitor = admitKey({ publicKeyPem: readUtf8(join(extracted.rootDir, "public-keys", "monitor.pub")), purpose: "ledger-row",
           signature: "public-keys/monitor.pub", context: trust, keyHistory: bundleKeyHistory(extracted.rootDir, "monitor") });
+        // D-INT-7: the copy is verified as of its signed export time, iff the manifest and its files verified and its signer is admitted.
+        const now = verifyInstantFor({ signedTs: readExportTs(extracted.rootDir), admitted: manifestSignatureVerified && manifestFilesVerified && manifestAdmitted });
         const ledgerResult = await verifyLedgerIntegrity(verifyWorkspace, {
-          externallyAuthenticatedPayloads,
+          externallyAuthenticatedPayloads, now,
           ...(monitor.status === "admitted" && monitor.keyId ? { expectedMonitorFingerprint: monitor.keyId } : {})
         });
         for (const error of ledgerResult.errors) {
           errors.push(`Ledger verify: ${error}`);
         }
+        const open = openSessionsAt(ledgerResult, now);
+        if (open) notes.push(open);
         anchoring = carriedLedgerAnchoring(monitor, ledgerResult.trustRoot.anchored, signatures);
       } finally {
         rmSync(verifyWorkspace, { recursive: true, force: true });
@@ -1011,7 +995,7 @@ export async function verifyEvidenceBundle(bundleFile: string, trust: TrustConte
     }
 
     const report = buildVerifierReport({ artifact: { kind: "bundle", path: bundleFile, sha256: sha256Hex(readFileSync(bundleFile)) },
-      context: trust, integrityErrors: errors, signatures, anchoring });
+      context: trust, integrityErrors: errors, signatures, anchoring, warnings: notes });
     return {
       ok: report.trusted,
       errors,

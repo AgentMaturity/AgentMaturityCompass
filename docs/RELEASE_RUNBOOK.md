@@ -30,7 +30,11 @@ copies the [release checklist](./program/release-checklist.md) into its `RELEASE
 5. `post-publish-verify.yml` runs when the Release run succeeds (section 4). Copy its artifacts into
    `qualification/<YYYY-MM-DD>-release-<version>/`, then record the published version in
    `website/publication-status.json` through the post-publish pins pull request: `release:prepare` plans the next
-   version from it.
+   version from it. The same pull request moves every published-release pin to the new version: the hosted
+   installers (`website/install-channel.json`, `install.sh`, `website/install.sh`, `website/install.ps1`),
+   `docker/Dockerfile.quickstart`, `Formula/amc.rb` and the homepage download buttons in `website/index.html` (their
+   label and their `releases/tag/v<version>` link). `npm run build:pages` refuses installer pins or download buttons
+   that name another version.
 
 ---
 
@@ -212,7 +216,8 @@ Before cutting a production tag, run the migration checklist in:
 At minimum:
 - signed backup created and verified
 - restore drill passes in an isolated path
-- `amc verify all --json` baseline captured before rollout
+- `amc verify all --json --expect-monitor <monitor sha256>` baseline captured before rollout (without the monitor pin
+  the ledger check reports UNANCHORED and the command exits 1)
 
 ---
 
@@ -300,7 +305,8 @@ on clean machines to this workflow.
   fixed version.
 - **Installers:** pin them back to the last good release through a post-publish pins pull request
   (`website/install-channel.json`, `website/publication-status.json`, `install.sh`, `website/install.sh`,
-  `website/install.ps1`).
+  `website/install.ps1`, `docker/Dockerfile.quickstart`, `Formula/amc.rb` and the download buttons in
+  `website/index.html`).
 
 ### A bad deployment
 
@@ -317,7 +323,7 @@ Rollback sequence:
 4. Re-run:
 
 ```bash
-amc verify all --json
+amc verify all --json --expect-monitor <monitor sha256>
 amc retention verify
 amc backup verify <backup-file> --pubkey <recorded-auditor.pub>
 ```

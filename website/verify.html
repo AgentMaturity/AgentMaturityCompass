@@ -21,7 +21,8 @@
     .plain-page h2{font-size:1.15rem;text-transform:none;letter-spacing:0;color:var(--text);margin:2rem 0 .75rem}
     .plain-page a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
     .plain-page pre{max-width:760px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:1rem;overflow-x:auto;margin:0 0 1.5rem}
-    .plain-page code{font-size:.9rem}
+    .plain-page code{font-size:.9rem;overflow-wrap:anywhere}
+    .plain-page pre code{overflow-wrap:normal}
   </style>
 </head>
 <body>
@@ -35,8 +36,15 @@
         <li><a href="./docs/index.html">docs</a></li>
         <li><a href="https://github.com/AgentMaturity/AgentMaturityCompass">github</a></li>
       </ul>
+      <button class="nav-hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
   </nav>
+  <div class="nav-mobile" id="navMobile">
+    <a href="./#install">install</a>
+    <a href="./playground.html">playground</a>
+    <a href="./docs/index.html">docs</a>
+    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">github</a>
+  </div>
   <span id="main-content" tabindex="-1"></span>
   <main class="plain-page">
     <div class="container">
@@ -90,5 +98,6 @@ amc bundle inspect their-agent-evidence.amcbundle</code></pre>
       <p>The full methodology — levels, evidence tiers, decay, gates, and the compliance-framework crosswalk — is public: <a href="methodology.html">methodology</a> · <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/METHODOLOGY_CROSSWALK.md">framework crosswalk</a>.</p>
     </div>
   </main>
+  <script src="script.js?v=12"></script>
 </body>
 </html>

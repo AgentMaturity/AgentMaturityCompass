@@ -135,6 +135,10 @@ afterAll(async () => {
   }
 });
 
+// LIVE-RUNTIME-07 adds these exact transport headers to every response the current side writes; the archived side
+// predates them, so they are compared apart, as Date and the request id are.
+const SECURITY_HEADER_VALUES: Record<string, string> = { "x-content-type-options": "nosniff", "x-frame-options": "DENY",
+  "referrer-policy": "same-origin", "cache-control": "no-store" };
 type Wire = { status: number; headers: IncomingHttpHeaders; body: string };
 async function wire(base: string, path: string, method = "GET", body = "", headers: Record<string, string> = {}): Promise<Wire> {
   return new Promise((resolvePromise, reject) => {
@@ -144,7 +148,8 @@ async function wire(base: string, path: string, method = "GET", body = "", heade
       res.on("end", () => {
         // Node generates the Date transport header independently of application code. P1-55's request id is
         // random per response, so only its presence is compared.
-        const { date: _date, "x-request-id": requestId, ...stableHeaders } = res.headers;
+        const { date: _date, "x-request-id": requestId, ...allHeaders } = res.headers;
+        const stableHeaders = Object.fromEntries(Object.entries(allHeaders).filter(([name, value]) => SECURITY_HEADER_VALUES[name] !== value));
         const headers = requestId === undefined ? stableHeaders : { ...stableHeaders, "x-request-id": "<request-id>" };
         resolvePromise({ status: res.statusCode ?? 0, headers, body: Buffer.concat(chunks).toString("utf8") });
       });

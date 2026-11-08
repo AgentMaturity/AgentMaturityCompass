@@ -28,7 +28,8 @@ export function verifyEvidencePayload(
   /**
    * WP35c: an encrypted blob whose vaulted key is held by a locked vault here is listed in `notEvaluated` instead of
    * failing, as an encrypted inline payload always is. Only for a reader of the signed metadata (a delegated child's hook
-   * forwarder, which never holds the vault passphrase); every other key or blob failure still fails (blobKeyOutOfReach).
+   * forwarder, which never holds the vault passphrase) and for the CLI verify commands, which report such a row as not
+   * evaluated and never as a pass (B1); every other key or blob failure still fails (blobKeyOutOfReach).
    */
   blobKeyOptional = false
 ): void {
