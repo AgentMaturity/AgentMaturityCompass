@@ -5,6 +5,7 @@ import { versions } from "node:process";
 import { studioStatus } from "../studio/studioSupervisor.js";
 import { vaultStatusNow } from "../vault/vaultCli.js";
 import { rememberedStores, rememberedUnlockLocation } from "../vault/passphraseStore.js";
+import { interactiveOperator, operatorRefusalText } from "../vault/operatorContext.js";
 import { resolveCredentialsPaths } from "../credentials/credentialsPaths.js";
 import { assertOwnerOnly, permissionsAreEnforced } from "../credentials/credentialsFilePermissions.js";
 import { CredentialsFilePermissionsError } from "../credentials/credentialsStoreErrors.js";
@@ -26,6 +27,7 @@ import { signDigestWithPolicyAsync } from "../crypto/signing/signer.js";
 import { verifyKeyHistoryChain } from "../crypto/keys.js";
 import { inspectRuntimeFirewallPolicy } from "../runtime/firewall.js";
 import { nativeModuleCheck } from "./nativeModuleProbe.js";
+import { adminTokenCheck, amcGitignoreCheck } from "./secretFileChecks.js";
 import { requestDoctorStatus, doctorCarrierCheck } from "./doctorLiveProbe.js";
 import { adoptWorkspaceRecordHead, type RecordLocation } from "../storage/workspaceRecordStore.js";
 
@@ -208,6 +210,7 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
   );
   checks.push(nativeModuleCheck());
   checks.push(amcHomeCheck());
+  for (const check of [amcGitignoreCheck(workspace), adminTokenCheck(workspace)]) if (check !== null) checks.push(check);
 
   // The key history decides which public keys may verify as each role, so a
   // silent insertion there forges every signature of that role. Report a broken
@@ -266,6 +269,7 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
   const vault = vaultStatusNow(workspace);
   const passphraseInShell = (process.env.AMC_VAULT_PASSPHRASE ?? "").length > 0;
   const remembered = rememberedUnlockLocation(workspace);
+  const gate = interactiveOperator({ workspace }); // LIVE-VAULT-01: the remembered store unlocks for an interactive operator only
   checks.push(
     vault.unlocked || passphraseInShell
       ? { id: "vault", status: "PASS", message: passphraseInShell ? "Vault passphrase available from AMC_VAULT_PASSPHRASE; signing commands can run"
@@ -275,7 +279,9 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
         status: "WARN",
         message: "Vault locked in this shell: signing commands (amc firewall enable, amc agent-loop run) will refuse with \"Vault locked\"",
         fixHint: "Run: export AMC_VAULT_PASSPHRASE='<the passphrase chosen or shown at amc init>' (interactive alternative: amc vault unlock). "
-          + `A passphrase \`amc up\` remembered is kept in ${rememberedStores()}; outside agent mode, amc commands in this workspace unlock with it.`
+          + `A passphrase \`amc up\` remembered is kept in ${rememberedStores()}; `
+          + (gate.ok ? "amc commands you run in this workspace from your own terminal unlock with it."
+            : `it is not used here because ${operatorRefusalText(gate)} (it unlocks only for commands you run from your own terminal, outside agent mode).`)
       }
   );
 

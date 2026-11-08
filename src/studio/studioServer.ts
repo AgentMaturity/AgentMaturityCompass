@@ -174,7 +174,7 @@ import { driftCheckForStudio } from "../drift/studioDriftCheck.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import YAML from "yaml";
 import {
-  addUserAsync, revokeUserAsync, setUserRolesAsync, createUsersMutationGuard, publicUsersMutationRecord, respondUsersMutationError,
+  addUserAsync, revokeUserAsync, setUserRolesAsync, createUsersMutationGuard, publicUsersMutationRecord, respondUsersMutationError, sessionActor,
   authenticateUser,
   clearSessionCookie,
   createSessionAsync,
@@ -5326,7 +5326,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           username: parsed.username,
           password: parsed.password,
           roles: parseUserRoles(parsed.roles)
-        }, { assertAuthorized: assertUsersMutationAuthorized });
+        }, { assertAuthorized: assertUsersMutationAuthorized, actor: sessionActor(auth) });
         json(res, 200, {
           user: {
             userId: user.userId,
@@ -5355,7 +5355,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const user = await revokeUserAsync({
           workspace: options.workspace,
           username: parsed.username
-        }, { assertAuthorized: assertUsersMutationAuthorized });
+        }, { assertAuthorized: assertUsersMutationAuthorized, actor: sessionActor(auth) });
         json(res, 200, { user: publicUsersMutationRecord(user) });
         return;
       }
@@ -5378,7 +5378,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspace: options.workspace,
           username: parsed.username,
           roles: parseUserRoles(parsed.roles)
-        }, { assertAuthorized: assertUsersMutationAuthorized });
+        }, { assertAuthorized: assertUsersMutationAuthorized, actor: sessionActor(auth) });
         json(res, 200, { user: publicUsersMutationRecord(user) });
         return;
       }

@@ -1,9 +1,12 @@
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { runDoctorFix } from "../src/doctor/doctorFix.js";
+import { amcGitignoreCheck } from "../src/doctor/secretFileChecks.js";
 import { initWorkspace } from "../src/workspace.js";
+import { ensureAmcGitignore } from "../src/workspaceGitignore.js";
 
 /**
  * H1: a new workspace keeps its secrets and runtime state out of git. A committed .amc workspace is supported (the GitHub
@@ -56,5 +59,46 @@ describe("a new workspace's .amc/.gitignore", () => {
     vi.stubEnv("AMC_VAULT_PASSPHRASE", "gitignore-test-pass-123");
     initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
     expect(readFileSync(join(root, ".amc", ".gitignore"), "utf8")).toBe("*\n");
+  });
+});
+
+describe("amc doctor's amc-gitignore check (LIVE-VAULT-11)", () => {
+  const git = (root: string, ...args: string[]) => spawnSync("git", args, { cwd: root, env: gitEnv(root), encoding: "utf8" });
+
+  it("fails while .amc/.gitignore is missing, and passes once it is written", () => {
+    const root = repoWithWorkspace();
+    rmSync(join(root, ".amc", ".gitignore"));
+    const missing = amcGitignoreCheck(root, gitEnv(root));
+    expect(missing).toMatchObject({ id: "amc-gitignore", status: "FAIL", message: ".amc/local-vault-passphrase is not git-ignored in this repository" });
+    expect(missing?.fixHint).toContain("amc up (writes .amc/.gitignore once)");
+    ensureAmcGitignore(join(root, ".amc"));
+    expect(amcGitignoreCheck(root, gitEnv(root))).toEqual({ id: "amc-gitignore", status: "PASS", message: ".amc secrets are git-ignored" });
+  });
+
+  it("fails for a secret committed before the ignore file existed, and says to remove and rotate it", () => {
+    const root = repoWithWorkspace();
+    mkdirSync(join(root, ".amc", "studio"), { recursive: true });
+    writeFileSync(join(root, ".amc", "studio", "admin.token"), `${"a".repeat(64)}\n`);
+    expect(git(root, "add", "-f", ".amc/studio/admin.token").status).toBe(0);
+    expect(git(root, "-c", "user.email=t@example.invalid", "-c", "user.name=t", "commit", "-q", "-m", "x").status).toBe(0);
+    const tracked = amcGitignoreCheck(root, gitEnv(root));
+    expect(tracked).toMatchObject({ status: "FAIL", message: ".amc/studio/admin.token is committed to this repository" });
+    expect(tracked?.fixHint).toBe('Run: git rm --cached .amc/studio/admin.token && git commit, then rotate it (docs/VAULT.md "When to rotate")');
+  });
+
+  it("amc doctor-fix writes a missing .amc/.gitignore, and leaves it missing under --dry-run", async () => {
+    const root = repoWithWorkspace();
+    rmSync(join(root, ".amc", ".gitignore"));
+    await runDoctorFix(root, { dryRun: true });
+    expect(existsSync(join(root, ".amc", ".gitignore"))).toBe(false);
+    await runDoctorFix(root);
+    expect(amcGitignoreCheck(root, gitEnv(root))).toMatchObject({ status: "PASS" });
+  });
+
+  it("is INFO outside a git repository", () => {
+    const root = mkdtempSync(join(tmpdir(), "amc-gitignore-norepo-"));
+    roots.push(root);
+    mkdirSync(join(root, ".amc"));
+    expect(amcGitignoreCheck(root, gitEnv(root))).toMatchObject({ id: "amc-gitignore", status: "INFO" });
   });
 });

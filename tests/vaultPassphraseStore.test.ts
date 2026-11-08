@@ -1,10 +1,13 @@
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { afterEach, describe, expect, test } from "vitest";
+import { join, resolve } from "node:path";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import {
+  credentialsFile,
   forgetVaultPassphrase,
   getRememberedVaultPassphrase,
+  legacyCredentialsFile,
+  rememberEnabled,
   rememberedStores,
   rememberVaultPassphrase
 } from "../src/vault/passphraseStore.js";
@@ -56,6 +59,11 @@ describe("vault passphrase store (file backend)", () => {
     expect(getRememberedVaultPassphrase(`${workspace}-b`, env)?.passphrase).toBe("pass-b");
     forgetVaultPassphrase(workspace, env);
     expect(getRememberedVaultPassphrase(`${workspace}-b`, env)?.passphrase).toBe("pass-b");
+  });
+
+  test("rememberEnabled reads the AMC_VAULT_REMEMBER opt-out (LIVE-VAULT-03)", () => {
+    for (const off of ["0", "false", "off", "no", " OFF ", "No"]) expect(rememberEnabled({ AMC_VAULT_REMEMBER: off }), off).toBe(false);
+    for (const on of [undefined, "", "1", "yes", "true"]) expect(rememberEnabled({ AMC_VAULT_REMEMBER: on }), String(on)).toBe(true);
   });
 
   test("disabled via AMC_VAULT_REMEMBER=0", () => {
@@ -189,6 +197,64 @@ describe("vault passphrase store (macOS Keychain backend, B1)", () => {
     const file = join(tempDir("amc-remember-override-"), "creds.json");
     const saved = rememberVaultPassphrase(join(tmpdir(), "amc-keychain-override-ws"), "override-pass", { ...env, AMC_VAULT_REMEMBER_FILE: file });
     expect(saved).toEqual({ backend: "file", location: file });
+    expect(log()).toBe("");
+  });
+});
+
+describe("the store's path resolvers (S5: the sandbox's secret deny list reuses them)", () => {
+  test("credentialsFile is AMC_VAULT_REMEMBER_FILE, else vault-credentials.json in the AMC home; the legacy path comes from the env's own home", () => {
+    expect(credentialsFile({ AMC_VAULT_REMEMBER_FILE: " /srv/amc/creds.json ", AMC_HOME: "/srv/home" })).toBe(resolve("/srv/amc/creds.json"));
+    expect(credentialsFile({ AMC_HOME: "/srv/home" })).toBe(join(resolve("/srv/home"), "vault-credentials.json"));
+    expect(legacyCredentialsFile({ HOME: "/home/op" })).toBe(join("/home/op", ".config", "amc", "vault-credentials.json"));
+    expect(legacyCredentialsFile({ USERPROFILE: "/users/op" })).toBe(join("/users/op", ".config", "amc", "vault-credentials.json"));
+    expect(legacyCredentialsFile({})).toBeNull();
+  });
+});
+
+describe("a passphrase remembered under the pre-AMC_HOME path (LIVE-VAULT-08)", () => {
+  const restores: Array<() => void> = [];
+  afterEach(() => { while (restores.length > 0) restores.pop()!(); vi.unstubAllEnvs(); });
+
+  /** macOS with the fake security(1) on PATH, HOME and AMC_HOME in temp dirs (process.env and the env argument): never the real home or Keychain. */
+  function legacySetup() {
+    restores.push(forcePlatform("darwin"), forceStdinTty(false));
+    const { env: fake, log } = fakeSecurity();
+    const home = tempDir("amc-legacy-home-"), amcHome = join(tempDir("amc-legacy-amc-home-"), "amc-home");
+    vi.stubEnv("HOME", home);
+    vi.stubEnv("AMC_HOME", amcHome);
+    vi.stubEnv("AMC_VAULT_REMEMBER_FILE", undefined);
+    const env = { ...fake, HOME: home, AMC_HOME: amcHome } as NodeJS.ProcessEnv;
+    const legacy = legacyCredentialsFile(env)!;
+    expect(legacy.startsWith(home)).toBe(true);
+    const workspace = join(tmpdir(), "amc-legacy-ws"), other = join(tmpdir(), "amc-legacy-other-ws");
+    rememberVaultPassphrase(workspace, "legacy-pass-123", { AMC_VAULT_REMEMBER_FILE: legacy });
+    rememberVaultPassphrase(other, "other-operator-pass", { AMC_VAULT_REMEMBER_FILE: legacy });
+    return { env, legacy, workspace, log };
+  }
+
+  test("is moved into the AMC home file on first read, for that workspace only", () => {
+    const { env, legacy, workspace } = legacySetup();
+    expect(getRememberedVaultPassphrase(workspace, env)).toEqual({ passphrase: "legacy-pass-123", backend: "file" });
+    expect(credentialsFile(env)).toBe(join(env.AMC_HOME!, "vault-credentials.json"));
+    expect(statSync(credentialsFile(env)).mode & 0o777).toBe(0o600);
+    expect(Object.values(JSON.parse(readFileSync(credentialsFile(env), "utf8")))).toEqual(["legacy-pass-123"]);
+    expect(Object.values(JSON.parse(readFileSync(legacy, "utf8")))).toEqual(["other-operator-pass"]);
+    expect(getRememberedVaultPassphrase(workspace, env)?.passphrase).toBe("legacy-pass-123");
+  });
+
+  test("amc vault forget also removes it there, so a later read cannot bring it back", () => {
+    const { env, legacy, workspace } = legacySetup();
+    expect(forgetVaultPassphrase(workspace, env)).toBe(true);
+    expect(getRememberedVaultPassphrase(workspace, env)).toBeNull();
+    expect(Object.values(JSON.parse(readFileSync(legacy, "utf8")))).toEqual(["other-operator-pass"]);
+  });
+
+  test("is not migrated when AMC_VAULT_REMEMBER_FILE names the store", () => {
+    const { env, legacy, workspace, log } = legacySetup();
+    const file = join(tempDir("amc-legacy-override-"), "creds.json");
+    expect(getRememberedVaultPassphrase(workspace, { ...env, AMC_VAULT_REMEMBER_FILE: file })).toBeNull();
+    expect(existsSync(file)).toBe(false);
+    expect(Object.values(JSON.parse(readFileSync(legacy, "utf8"))).sort()).toEqual(["legacy-pass-123", "other-operator-pass"]);
     expect(log()).toBe("");
   });
 });

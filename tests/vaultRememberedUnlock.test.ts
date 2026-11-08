@@ -1,17 +1,20 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { setMode } from "../src/mode/mode.js";
 import { initWorkspace } from "../src/workspace.js";
 import { lockVault, vaultStatus } from "../src/vault/vault.js";
+import { AGENT_ENV_MARKERS } from "../src/vault/operatorContext.js";
 import { rememberedUnlockLocation, rememberVaultPassphrase, unlockWithRememberedPassphrase } from "../src/vault/passphraseStore.js";
 import { unlockVaultInteractive } from "../src/vault/vaultCli.js";
 
 /**
  * B2: the passphrase `amc up` remembered unlocks the vault for the other commands of that workspace in a new shell
  * (amc verify, amc user init, amc vault unlock), in their own process only. AMC_VAULT_PASSPHRASE still wins, agent mode
- * never uses it, and the passphrase never reaches the environment or the output.
+ * never uses it, and the passphrase never reaches the environment or the output. LIVE-VAULT-01: only an interactive
+ * operator gets it, so these cases run as one (stdin a terminal, the agent markers a Claude Code shell exports cleared);
+ * tests/vaultOperatorGate.test.ts covers the refusals.
  */
 const PASS = "remembered-unlock-pass-123";
 const roots: string[] = [];
@@ -28,9 +31,17 @@ function lockedWorkspace(): { workspace: string; env: NodeJS.ProcessEnv; file: s
   return { workspace, env: { AMC_VAULT_REMEMBER_FILE: file } as NodeJS.ProcessEnv, file };
 }
 
+const stdinTTY = Object.getOwnPropertyDescriptor(process.stdin, "isTTY");
+beforeEach(() => {
+  for (const name of AGENT_ENV_MARKERS) vi.stubEnv(name, undefined);
+  Object.defineProperty(process.stdin, "isTTY", { value: true, configurable: true, writable: true });
+});
+
 afterEach(() => {
   vi.unstubAllEnvs();
   vi.restoreAllMocks();
+  if (stdinTTY) Object.defineProperty(process.stdin, "isTTY", stdinTTY);
+  else delete (process.stdin as { isTTY?: boolean }).isTTY;
   while (roots.length > 0) rmSync(roots.pop()!, { recursive: true, force: true });
 });
 
@@ -70,6 +81,7 @@ describe("remembered vault passphrase in later commands", () => {
   it("is never used in agent mode, nor by a process holding an agent's lease or bridge token", () => {
     const { workspace, env } = lockedWorkspace();
     rememberVaultPassphrase(workspace, PASS, env);
+    vi.spyOn(process.stderr, "write").mockImplementation(() => true);
     unlockWithRememberedPassphrase(workspace, { ...env, AMC_LEASE: "lease.token" });
     unlockWithRememberedPassphrase(workspace, { ...env, AMC_TOKEN: "bridge-token" });
     expect(vaultStatus(workspace).unlocked).toBe(false);

@@ -218,6 +218,8 @@ export function rotatePurposeKeys(input: RotatePurposeKeysInput): RotationResult
   if (process.env.AMC_NO_SIGN === "1") throw new Error("Key rotation is unavailable in no-sign mode");
   const passphrase = input.passphrase ?? process.env.AMC_VAULT_PASSPHRASE;
   if (!passphrase) throw new Error("Key rotation requires the vault passphrase (AMC_VAULT_PASSPHRASE or interactive input).");
+  // The generation the vault is read from: one committed meanwhile (`amc vault passphrase` re-seals the vault) refuses the commit.
+  const prepared = keysetIdentity(workspace)?.generation;
   const payload = unlockedPayloadForKeyChange(workspace, passphrase);
   assertKeysetComplete(workspace);
   // The statements are logged after the commit: refuse now whatever would make that log append refuse then.
@@ -286,7 +288,7 @@ export function rotatePurposeKeys(input: RotatePurposeKeysInput): RotationResult
   const keyset = withControlFileLock({ root: vaultPaths(workspace).keysDir, name: "key-revocations", operation: () => {
     const resigned = targets.has("revocation-list") ? resignedKeyRevocations(workspace, nextPayload) : null;
     if (resigned) writes.push(resigned.write);
-    const committed = commitKeyset(workspace, { keys: keyIdsOf(nextPayload), writes, statements: statements.map(row => row.sha256) });
+    const committed = commitKeyset(workspace, { keys: keyIdsOf(nextPayload), writes, statements: statements.map(row => row.sha256), expectedGeneration: prepared });
     forgetVaultEnvelope(workspace);
     unlockVault(workspace, passphrase);
     markWrittenHistories(workspace, writes);

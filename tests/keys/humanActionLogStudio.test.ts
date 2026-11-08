@@ -73,7 +73,8 @@ test.each(["roles", "tracked-token"] as const)("actual maintenance primary effec
   const f = fixture(), api = await server(f), before = f.snapshot(), wait = pauseHuman(f), pending = postPrune(api, f.session);
   try {
     await reached(wait, pending); expect(fs.existsSync(f.target)).toBe(false);
-    if (change === "roles") authApi.setUserRoles({ workspace: f.workspace, username: "owner", roles: ["VIEWER"] });
+    // LIVE-VAULT-17: the last active OWNER cannot be demoted, so a second one exists before the owner loses the role.
+    if (change === "roles") { authApi.addUser({ workspace: f.workspace, username: "backup-owner", password: "backup-owner-pass-123", roles: ["OWNER"] }); authApi.setUserRoles({ workspace: f.workspace, username: "owner", roles: ["VIEWER"] }); }
     else authApi.revokeSessionByToken({ workspace: f.workspace, token: f.session.token });
     expect(authApi.verifyTrackedSessionToken({ workspace: f.workspace, token: f.session.token }).ok).toBe(false);
     wait.gate.resolve(); const response = await pending, body = await response.json();

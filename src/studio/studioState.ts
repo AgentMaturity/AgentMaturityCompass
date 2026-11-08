@@ -107,7 +107,10 @@ export function ensureAdminToken(workspace: string): string {
   const tokenFile = studioTokenPath(workspace);
   ensureDir(studioDir(workspace));
   if (pathExists(tokenFile)) {
-    return readFileSync(tokenFile, "utf8").trim();
+    const existing = readFileSync(tokenFile, "utf8").trim();
+    // LIVE-VAULT-12: only a 64-hex token is valid (an empty file matched an empty header); anything else is replaced.
+    if (/^[0-9a-f]{64}$/.test(existing)) return existing;
+    process.stderr.write("Replaced a malformed .amc/studio/admin.token\n");
   }
   const token = randomBytes(32).toString("hex");
   writeFileAtomic(tokenFile, `${token}\n`, 0o600);
