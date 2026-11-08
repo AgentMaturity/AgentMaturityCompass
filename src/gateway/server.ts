@@ -389,9 +389,6 @@ function verifyLeaseAndMapError(input: {
   auditType: "LEASE_INVALID_OR_MISSING" | "LEASE_WORKSPACE_MISMATCH_ATTEMPT" | "LEASE_AGENT_MISMATCH" | "LEASE_SCOPE_DENIED" | "LEASE_ROUTE_DENIED" | "LEASE_MODEL_DENIED" | "KILL_SWITCH_DENIED";
   message: string;
 } {
-  // P2-26: before any lease work, a kill switch (stop_all, or this provider) refuses the model call with a 403 and an audit row.
-  const killed = input.egress ? killSwitchEgressDenial(input.workspace, input.expectedAgentId, input.egress.host, input.egress.config) : killSwitchDenial(input.workspace, { kind: "model", agentId: input.expectedAgentId, providerId: input.upstreamId ?? null });
-  if (killed !== null) return { ok: false, statusCode: 403, auditType: "KILL_SWITCH_DENIED", message: killed };
   if (!input.leaseToken) {
     return {
       ok: false,
@@ -423,6 +420,10 @@ function verifyLeaseAndMapError(input: {
     revokedLeaseIds: revoked
   });
   if (verification.ok) {
+    // P2-26, SR-9: a kill switch (stop_all, or this provider) refuses a verified request with a 403 and an audit row that is
+    // never limited; a request no lease vouches for got its bounded lease refusal above and learns nothing of the kill.
+    const killed = input.egress ? killSwitchEgressDenial(input.workspace, input.expectedAgentId, input.egress.host, input.egress.config) : killSwitchDenial(input.workspace, { kind: "model", agentId: input.expectedAgentId, providerId: input.upstreamId ?? null });
+    if (killed !== null) return { ok: false, statusCode: 403, auditType: "KILL_SWITCH_DENIED", message: killed };
     return {
       ok: true,
       payload: verification.payload
@@ -458,6 +459,9 @@ function verifyLeaseAndMapError(input: {
   }
   return { ok: false, statusCode: 401, auditType: "LEASE_INVALID_OR_MISSING", message: error };
 }
+
+/** SR-9: the lease verified, whether or not the kill switch then refused; such a request's audit rows are never limited. */
+const leaseVouched = (verification: { ok: boolean; auditType: string }): boolean => verification.ok || verification.auditType === "KILL_SWITCH_DENIED";
 
 function usageCountersLastMinute(ledger: ReturnType<typeof openLedger>, agentId: string, now = Date.now()): {
   llmRequests: number;
@@ -617,7 +621,7 @@ function createProxyServer(params: {
   const verifyProxyLease = (carrier: ReturnType<typeof extractLeaseCarrier>, agentId: string | undefined, host: string, clientIp: string) => {
     const verification = verifyLeaseAndMapError({ workspace: params.workspace, expectedWorkspaceId: params.workspaceId, leaseToken: carrier.leaseToken ?? undefined,
       expectedAgentId: agentId ?? "unknown", requiredScope: "proxy:connect", egress: { host, config: params.config } });
-    return { verification, audited: (auditType: string): boolean => (Boolean(agentId) && verification.ok) || params.preAuthAudit.shouldAudit(clientIp, auditType) };
+    return { verification, audited: (auditType: string): boolean => (Boolean(agentId) && leaseVouched(verification)) || params.preAuthAudit.shouldAudit(clientIp, auditType) };
   };
   // The lease refusal row of both handlers, within the pre-auth bound (LIVE-RUNTIME-21); CONNECT adds its target.
   const auditLeaseRefusal = (requestId: string, clientIp: string, agentId: string | undefined, verification: ReturnType<typeof verifyLeaseAndMapError>,
@@ -1173,7 +1177,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       const requestInfo = bestEffortJsonInfo(requestBody, incomingUrl.pathname, route.openaiCompatible);
       const leaseVerification = preVerification.ok ? verifyLease(requestInfo.model ?? null) : preVerification;
       // SR-3: a request no lease vouches for writes its carrier audits within the pre-auth bound.
-      const carrierAudited = (auditType: string): boolean => leaseVerification.ok || preAuthAudit.shouldAudit(clientIp, auditType);
+      const carrierAudited = (auditType: string): boolean => leaseVouched(leaseVerification) || preAuthAudit.shouldAudit(clientIp, auditType);
       if (leaseCarrier.nonLeaseCarrier && carrierAudited("AGENT_PROVIDED_KEY_IGNORED")) {
         appendEvidence({
           eventType: "audit",

@@ -20,13 +20,11 @@ describe("pre-auth audit limiter", () => {
     const decisions = Array.from({ length: 30 }, () => limiter.shouldAudit("10.0.0.1", "LEASE_INVALID_OR_MISSING"));
     expect(decisions.filter(Boolean)).toHaveLength(10);
     expect(limiter.shouldAudit("10.0.0.2", "LEASE_INVALID_OR_MISSING"), "another client has its own budget").toBe(true);
-    expect(limiter.shouldAudit("10.0.0.1", "NETWORK_EGRESS_BLOCKED")).toBe(false);
     expect(summaries).toEqual([]);
     at = 60_000;
     expect(limiter.shouldAudit("10.0.0.1", "LEASE_INVALID_OR_MISSING"), "the next window audits again").toBe(true);
     expect(summaries).toEqual([
-      { auditType: "LEASE_INVALID_OR_MISSING", severity: "HIGH", clientIp: "10.0.0.1", suppressed: 20, windowStartTs: 0 },
-      { auditType: "NETWORK_EGRESS_BLOCKED", severity: "HIGH", clientIp: "10.0.0.1", suppressed: 1, windowStartTs: 0 }
+      { auditType: "LEASE_INVALID_OR_MISSING", severity: "HIGH", clientIp: "10.0.0.1", suppressed: 20, windowStartTs: 0 }
     ]);
   });
 
@@ -39,18 +37,20 @@ describe("pre-auth audit limiter", () => {
     expect(summaries).toEqual([expect.objectContaining({ auditType: "NETWORK_EGRESS_BLOCKED", suppressed: 2 })]);
   });
 
-  // SR-3: kill-switch refusals and the carrier audits of an unverified request are bounded too, at their own severity.
-  test("kill-switch refusals and carrier audits share the bound; summaries keep each type's severity", () => {
+  // SR-9: one budget per client used to cover every type, so a flood of one type (carrier audits, say) silenced the
+  // rest. A kill-switch refusal comes only after a lease verified, so it is never limited.
+  test("each audit type has its own budget, summaries keep each type's severity, and kill-switch refusals are never limited", () => {
     const summaries: PreAuthAuditSummary[] = [];
     const limiter = createPreAuthAuditLimiter({ appendSummary: (row) => summaries.push(row), now: () => 0 });
-    const types = ["KILL_SWITCH_DENIED", "AGENT_PROVIDED_KEY_IGNORED", "LEASE_QUERY_CARRIER_USED"];
-    const decisions = Array.from({ length: 13 }, (_, i) => limiter.shouldAudit("10.0.0.1", types[i % 3]!));
-    expect(decisions.filter(Boolean)).toHaveLength(10);
+    for (let i = 0; i < 30; i += 1) limiter.shouldAudit("10.0.0.1", "AGENT_PROVIDED_KEY_IGNORED");
+    expect(limiter.shouldAudit("10.0.0.1", "LEASE_INVALID_OR_MISSING"), "a flood of one type leaves another's budget").toBe(true);
+    expect(limiter.shouldAudit("10.0.0.1", "NETWORK_EGRESS_BLOCKED")).toBe(true);
+    expect(Array.from({ length: 12 }, () => limiter.shouldAudit("10.0.0.1", "KILL_SWITCH_DENIED")).every(Boolean)).toBe(true);
+    expect(Array.from({ length: 13 }, () => limiter.shouldAudit("10.0.0.1", "LEASE_QUERY_CARRIER_USED")).filter(Boolean)).toHaveLength(10);
     limiter.flushAll();
     expect(summaries).toEqual([
-      expect.objectContaining({ auditType: "AGENT_PROVIDED_KEY_IGNORED", severity: "MED", suppressed: 1 }),
-      expect.objectContaining({ auditType: "LEASE_QUERY_CARRIER_USED", severity: "LOW", suppressed: 1 }),
-      expect.objectContaining({ auditType: "KILL_SWITCH_DENIED", severity: "HIGH", suppressed: 1 })
+      expect.objectContaining({ auditType: "AGENT_PROVIDED_KEY_IGNORED", severity: "MED", suppressed: 20 }),
+      expect.objectContaining({ auditType: "LEASE_QUERY_CARRIER_USED", severity: "LOW", suppressed: 3 })
     ]);
   });
 
@@ -164,12 +164,13 @@ describe("gateway pre-auth audit rows", () => {
     }
     const metas = auditMetas(workspace).filter((meta) => meta.eventType === "audit");
     const rows = metas.filter((meta) => meta.suppressed === undefined && ["LEASE_INVALID_OR_MISSING", "AGENT_PROVIDED_KEY_IGNORED", "LEASE_QUERY_CARRIER_USED"].includes(String(meta.auditType)));
-    // 10 for the 35 refused requests, plus the leased request's own query-carrier row: a verified lease is never limited.
-    expect(rows).toHaveLength(11);
+    // SR-9: 10 per audit type for the 35 refused requests (35 lease refusals, 25 provider-key and 10 query-carrier audits),
+    // plus the leased request's own query-carrier row: a verified lease is never limited.
+    expect(rows).toHaveLength(31);
     expect(rows.at(-1)).toMatchObject({ auditType: "LEASE_QUERY_CARRIER_USED", agentId: "default" });
     const summaries = metas.filter((meta) => meta.suppressed !== undefined);
-    expect(summaries.reduce((total, meta) => total + Number(meta.suppressed), 0)).toBe(60); // 35 refusals, 25 carrier audits, 10 written
-    expect(new Set(summaries.map((meta) => meta.auditType))).toEqual(new Set(["LEASE_INVALID_OR_MISSING", "AGENT_PROVIDED_KEY_IGNORED", "LEASE_QUERY_CARRIER_USED"]));
+    expect(summaries.map((meta) => [meta.auditType, meta.suppressed])).toEqual(expect.arrayContaining([["LEASE_INVALID_OR_MISSING", 25], ["AGENT_PROVIDED_KEY_IGNORED", 15]]));
+    expect(summaries).toHaveLength(2);
   }, 60_000);
 
   // SR-3: a request that fails before its lease is checked (here an unparsable Host) used to write a request_error row.

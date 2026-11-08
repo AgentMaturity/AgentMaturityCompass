@@ -1,18 +1,19 @@
 /**
  * Bounded audit rows for unauthenticated gateway refusals (LIVE-RUNTIME-21, D-R13): a client outside the allow list, a
- * request with no valid lease, a kill-switch refusal (checked before any lease), and the carrier audits of a request no
- * lease vouches for (SR-3). Each used to append a signed row with no limit, so anyone who reached the port could grow
- * the ledger and pollute audit counts.
+ * request with no valid lease, and the carrier audits of a request no lease vouches for (SR-3). Each used to append a
+ * signed row with no limit, so anyone who reached the port could grow the ledger and pollute audit counts.
  *
- * Per client address, at most `perMinute` such rows per minute. Past that the refusal is still answered and counted,
- * and the counts are written as one summary row per audit type (`suppressed: n`) when that client's window rolls over
- * (on its next refusal) or when the gateway closes. Every other audit type is never limited.
+ * Per client address and audit type, at most `perMinute` such rows per minute (SR-9: one budget per type, so a flood of
+ * one type never silences another). Past that the refusal is still answered and counted, and the counts are written as
+ * one summary row per audit type (`suppressed: n`) when that client's window rolls over (on its next refusal) or when
+ * the gateway closes. Every other audit type is never limited, the kill-switch refusal among them: it comes only after
+ * a lease verified, and a verified request's rows are always written.
  */
 const WINDOW_MS = 60_000;
 const MAX_CLIENTS = 10_000;
 const OVERFLOW = "*"; // refusals from clients past MAX_CLIENTS share one window, so the map stays bounded
 const LIMITED = new Map<string, PreAuthAuditSummary["severity"]>([["NETWORK_EGRESS_BLOCKED", "HIGH"], ["LEASE_INVALID_OR_MISSING", "HIGH"],
-  ["KILL_SWITCH_DENIED", "HIGH"], ["AGENT_PROVIDED_KEY_IGNORED", "MED"], ["LEASE_QUERY_CARRIER_USED", "LOW"]]);
+  ["AGENT_PROVIDED_KEY_IGNORED", "MED"], ["LEASE_QUERY_CARRIER_USED", "LOW"]]);
 
 export interface PreAuthAuditSummary {
   auditType: string;
@@ -31,7 +32,7 @@ export interface PreAuthAuditLimiter {
 
 interface Window {
   start: number;
-  audited: number;
+  audited: Map<string, number>; // per audit type (SR-9)
   suppressed: Map<string, number>;
 }
 
@@ -70,11 +71,12 @@ export function createPreAuthAuditLimiter(options: {
         }
       }
       if (!window) {
-        window = { start: at, audited: 0, suppressed: new Map() };
+        window = { start: at, audited: new Map(), suppressed: new Map() };
         windows.set(key, window);
       }
-      if (window.audited < perMinute) {
-        window.audited += 1;
+      const audited = window.audited.get(auditType) ?? 0;
+      if (audited < perMinute) {
+        window.audited.set(auditType, audited + 1);
         return true;
       }
       window.suppressed.set(auditType, (window.suppressed.get(auditType) ?? 0) + 1);
