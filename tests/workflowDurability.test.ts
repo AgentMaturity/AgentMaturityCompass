@@ -52,6 +52,57 @@ describe("durable workflow admission", () => {
     expect([...second.outputs]).toEqual([...first.outputs]);
   });
 
+  it("parks a node whose child acted but whose release is unconfirmed, though its runner settled (S24)", async () => {
+    const f = fixture();
+    let effects = 0;
+    // The child reports, but the resource it handed back refuses release: spawnSubagent's cleanup is unknown.
+    const runner: SubagentRunner = async () => { effects++; return { ok: true, text: "acted", continuation: {
+      continue: async () => ({ ok: true, text: "" }), close: () => { throw new Error("injected release failure"); } } }; };
+    const first = await f.run(agent("a"), runner);
+    expect(first.ok).toBe(false);
+    expect(first.failures[0]).toMatchObject({ nodeId: "a", unknown: true, reason: expect.stringContaining("TOOL_OUTCOME_UNKNOWN") });
+    // Parked, not failed: a new run id cannot repeat the effect without reconciliation.
+    const renamed = await f.run(agent("a"), runner, { runId: "new-name" });
+    expect(renamed.ok).toBe(false);
+    expect(renamed.failures[0]?.unknown).toBe(true);
+    expect(effects).toBe(1);
+  });
+
+  it("parks a node whose child acted but whose completion could not be recorded (S24)", async () => {
+    const f = fixture();
+    const record = f.session.recordLoopEvent.bind(f.session);
+    f.session.recordLoopEvent = row => {
+      if (row.kind === "delegation-completed") throw new Error("injected completion failure");
+      return record(row);
+    };
+    let effects = 0;
+    const first = await f.run(agent("a"), async () => { effects++; return { ok: true, text: "acted" }; });
+    f.session.recordLoopEvent = record;
+    expect(first.ok).toBe(false);
+    expect(first.failures[0]).toMatchObject({ nodeId: "a", unknown: true });
+    expect(effects).toBe(1);
+  });
+
+  it("keeps a node unknown when its interrupted checkpoint cannot even be converted (S24)", async () => {
+    const f = fixture();
+    const write = f.session.recordProjectedEvidence.bind(f.session);
+    f.session.recordProjectedEvidence = row => {
+      if (row.meta.kind === "workflow/progress" && row.meta.status === "succeeded") throw new Error("injected result commit failure");
+      return write(row);
+    };
+    await f.run(agent("a"), async () => ({ ok: true, text: "acted" }));
+    // The node's last checkpoint is `running`. Converting it to TOOL_OUTCOME_UNKNOWN on resume also fails to commit.
+    f.session.recordProjectedEvidence = row => {
+      if (row.meta.kind === "workflow/progress" && row.meta.status === "TOOL_OUTCOME_UNKNOWN") throw new Error("injected conversion failure");
+      return write(row);
+    };
+    const resumed = await f.run(agent("a"), async () => ({ ok: true, text: "must not run" }));
+    f.session.recordProjectedEvidence = write;
+    expect(resumed.ok).toBe(false);
+    expect(resumed.agentsRun).toBe(0);
+    expect(resumed.failures[0]).toMatchObject({ nodeId: "a", unknown: true });
+  });
+
   it("blocks an admitted node whose result commit failed instead of repeating its effect", async () => {
     const f = fixture();
     const record = f.session.recordProjectedEvidence.bind(f.session);

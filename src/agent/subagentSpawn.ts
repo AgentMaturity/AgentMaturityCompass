@@ -250,6 +250,11 @@ export type SubagentOutcome =
       readonly childText?: string;
       /** Null when the delegation was refused before it was ever announced. */
       readonly packetId: string | null;
+      /**
+       * The child ran, but its release or its accounting is unconfirmed (cleanup unknown, or the completion or lineage
+       * record failed): it may have acted, so a caller must not treat this as a delegation that did nothing.
+       */
+      readonly unknown?: true;
     };
 
 /**
@@ -620,7 +625,8 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
     ...(init.definitions === undefined ? {} : { definitions: init.definitions }),
     ...(request.stopConditions === undefined ? {} : { stopConditions: stops.conditions }), signal: controller.signal }));
   if (!first.ok) return { ok: false, reason: first.reason ?? closeReason, packetId,
-    ...(first.text.length === 0 ? {} : { childText: first.text }) };
+    ...(first.text.length === 0 ? {} : { childText: first.text }),
+    ...(cleanupUnknown || accountingError !== undefined ? { unknown: true as const } : {}) };
   if (closed) return { ok: true, identity, packetId, childSessionId, childText: first.text };
   const handle: SubagentHandle = {
     identity, childSessionId, packetId,

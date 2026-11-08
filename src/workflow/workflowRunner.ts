@@ -141,7 +141,8 @@ async function runAgent(node: Leaf, carried: string | null, init: WorkflowRunIni
     });
     if (!outcome.ok) {
       // A settled negative report is a failed node. Throws/cancellation/abandonment cannot prove its outcome.
-      const unknown = outcome.packetId !== null && (runnerThrew || runnerSignal?.aborted === true || !runnerSettled);
+      // Also when the spawn says the child's release or accounting is unconfirmed (S24): the child may have acted.
+      const unknown = outcome.packetId !== null && (runnerThrew || runnerSignal?.aborted === true || !runnerSettled || outcome.unknown === true);
       const reason = unknown ? `TOOL_OUTCOME_UNKNOWN: ${outcome.reason}; explicit operator reconciliation required before retry` : outcome.reason;
       if (!runnerSettled) state.block(reason, unknown);
       state.progress.record(node.id, { ...checkpoint, status: unknown ? "TOOL_OUTCOME_UNKNOWN" : "failed", reason }, "", outcome.packetId ?? undefined);
@@ -176,9 +177,11 @@ async function runNode(node: WorkflowNode, input: string | null, init: WorkflowR
   if (isWorkflowLeaf(node)) {
     try { return await runAgent(node, input, init, state); }
     catch (error) {
-      // Thrown before runAgent's own dispatch guard: nothing was dispatched, so nothing is unknown.
-      state.stopped = { reason: error instanceof Error ? error.message : String(error), unknown: false };
-      return fail(state, node.id, state.stopped.reason);
+      // Thrown before runAgent's own dispatch guard, so nothing new was dispatched. A node whose last checkpoint was
+      // running or parked unknown may still have acted earlier, and stays unknown (S24).
+      const last = state.progress.nodes.get(node.id)?.status;
+      state.stopped = { reason: error instanceof Error ? error.message : String(error), unknown: last === "running" || last === "TOOL_OUTCOME_UNKNOWN" };
+      return fail(state, node.id, state.stopped.reason, state.stopped.unknown);
     }
   }
   if (node.kind === "parallel") {
