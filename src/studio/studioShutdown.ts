@@ -1,12 +1,12 @@
-import { setFatalShutdownHook } from "../runtime/fatalDiagnostic.js";
+import { fatalEventSeen, setFatalShutdownHook } from "../runtime/fatalDiagnostic.js";
 
 /**
  * One signal policy for `amc studio start`, `amc _studio-daemon` and `amc gateway start` (LIVE-RUNTIME-02, D-R2).
  *
  * The first SIGINT or SIGTERM runs `stop()` once. A later signal while stopping is absorbed with one log line, so a
- * second Ctrl+C no longer kills the process mid-shutdown. `stop()` resolved: exit 0. Still unresolved `capMs` after the
- * first signal: exit 1. A fatal error runs the same stop once (joining a stop already in progress) through
- * fatalDiagnostic's hook, which then exits 1.
+ * second Ctrl+C no longer kills the process mid-shutdown. `stop()` resolved: exit 0, or 1 when a fatal error happened
+ * meanwhile. Still unresolved `capMs` after the first signal: exit 1. A fatal error runs the same stop once (joining a
+ * stop already in progress) through fatalDiagnostic's hook, which then exits 1.
  */
 export function installStudioShutdown(input: {
   stop: () => Promise<void>;
@@ -30,7 +30,7 @@ export function installStudioShutdown(input: {
     cap.unref();
     stopOnce().then(() => {
       clearTimeout(cap);
-      exit(0);
+      exit(fatalEventSeen() ? 1 : 0); // this resolution runs before the fatal path's own exit(1), so it decides the code
     }, (error: unknown) => {
       clearTimeout(cap);
       log(`amc: shutdown failed: ${error instanceof Error ? error.message : String(error)}`);

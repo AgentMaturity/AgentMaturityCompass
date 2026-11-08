@@ -2,9 +2,10 @@ import { EventEmitter } from "node:events";
 import { describe, expect, test, vi } from "vitest";
 
 // The fatal hook is captured, so the test can fire it the way fatalDiagnostic's handler would.
-const fatal = vi.hoisted(() => ({ hook: null as null | (() => Promise<void>), capMs: 0 }));
+const fatal = vi.hoisted(() => ({ hook: null as null | (() => Promise<void>), capMs: 0, seen: false }));
 vi.mock("../src/runtime/fatalDiagnostic.js", () => ({
-  setFatalShutdownHook: (hook: () => Promise<void>, capMs: number) => { fatal.hook = hook; fatal.capMs = capMs; }
+  setFatalShutdownHook: (hook: () => Promise<void>, capMs: number) => { fatal.hook = hook; fatal.capMs = capMs; },
+  fatalEventSeen: () => fatal.seen
 }));
 const { installStudioShutdown } = await import("../src/studio/studioShutdown.js");
 
@@ -43,6 +44,20 @@ describe("installStudioShutdown", () => {
     installStudioShutdown({ stop: () => Promise.reject(new Error("api close failed")), exit, log: () => undefined, signals });
     signals.emit("SIGTERM", "SIGTERM");
     await wait(20);
+    expect(exit.mock.calls).toEqual([[1]]);
+  });
+
+  // Skeptic D5: the signal's resolution handler runs before the fatal path's exit(1), so a crash while stopping exited 0.
+  test("a fatal error during a stop a signal started exits 1, not 0", async () => {
+    const signals = new EventEmitter();
+    const exit = vi.fn();
+    installStudioShutdown({ stop: () => wait(200), exit, log: () => undefined, signals });
+    signals.emit("SIGTERM", "SIGTERM");
+    await wait(50);
+    fatal.seen = true; // what fatalDiagnostic records when an uncaught error arrives
+    void fatal.hook!();
+    await wait(250);
+    fatal.seen = false;
     expect(exit.mock.calls).toEqual([[1]]);
   });
 

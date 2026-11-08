@@ -85,6 +85,12 @@ export function writeFatalDiagnostic(kind: FatalKind, error: unknown, cwd = proc
 
 let shutdownHook: { run: () => Promise<void>; capMs: number } | null = null;
 let shutdownStarted = false;
+let fatalSeen = false;
+
+/** True once a fatal event happened: a stop a signal started must then exit 1, not 0 (skeptic D5). */
+export function fatalEventSeen(): boolean {
+  return fatalSeen;
+}
 
 /**
  * A bounded stop to run once before the fatal exit (LIVE-RUNTIME-02). Studio registers its own stop, so a crash closes the
@@ -97,6 +103,7 @@ export function setFatalShutdownHook(run: () => Promise<void>, capMs: number): v
 /** Replace message-only fatal handlers: report, leave the diagnostic, run the registered stop once (bounded), exit 1. */
 export function installFatalHandlers(report: (line: string) => void = (line) => process.stderr.write(`${line}\n`)): void {
   const fatal = (kind: FatalKind, error: unknown): void => {
+    fatalSeen = true;
     const path = writeFatalDiagnostic(kind, error);
     try {
       const message = redactSecrets(error instanceof Error ? error.message : String(error), (type) => `[AMC_REDACTED:${type}]`).redacted;
