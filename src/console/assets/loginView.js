@@ -6,8 +6,11 @@ const DEMO_BANNER = '<p class="banner">Local demo mode creates a no-login sessio
 const LOCAL_HINT = "No account yet? Ask an OWNER of this workspace to run <code>amc user add --username &lt;you&gt; --role &lt;role&gt;</code> in its folder. "
   + "On a brand-new workspace, the first account is created once with <code>amc user init --username &lt;you&gt;</code> "
   + "(it replaces any existing logins, so never run it on a workspace that has accounts).";
-const HOST_HINT = "No account yet? Ask the host administrator to run "
-  + "<code>amc host user add --dir &lt;hostDir&gt; --username &lt;you&gt; --password-file &lt;file&gt;</code>.";
+// A host login alone is answered 403 "membership required" on /w/<id>/: the membership grant is the second step.
+const HOST_HINT = "No account yet? Ask the host administrator to create your host login with "
+  + "<code>amc host user add --dir &lt;hostDir&gt; --username &lt;you&gt; --password-file &lt;file&gt;</code> and to grant it this workspace with "
+  + "<code>amc host membership grant --dir &lt;hostDir&gt; --username &lt;you&gt; --workspace &lt;id&gt; --role &lt;role&gt;</code> "
+  + "(the id follows /w/ in this page's address).";
 const NO_ACCOUNT = "No console account exists yet in this workspace. In the terminal where you ran amc up, run "
   + "amc user init --username <you> (asks for a password), then sign in here.";
 

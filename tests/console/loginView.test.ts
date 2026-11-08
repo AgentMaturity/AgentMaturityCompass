@@ -62,6 +62,22 @@ describe("loginCardHtml", () => {
     expect(host).not.toContain("amc user add");
   });
 
+  // Skeptic round: a host login alone still answers 403 "membership required" on /w/<id>/ (workspaceRouter.ts).
+  test("host mode names both steps: the host login, then this workspace's membership, with flags the CLI has", () => {
+    const host = loginCardHtml({ demoMode: false, hostMode: true });
+    const add = "amc host user add --dir &lt;hostDir&gt; --username &lt;you&gt; --password-file &lt;file&gt;";
+    const grant = "amc host membership grant --dir &lt;hostDir&gt; --username &lt;you&gt; --workspace &lt;id&gt; --role &lt;role&gt;";
+    expect(host).toContain(add);
+    expect(host).toContain(grant);
+    expect(host.indexOf(add)).toBeLessThan(host.indexOf(grant));
+    const inventory = readFileSync("docs/CLI_COMMAND_INVENTORY.md", "utf8").split("\n");
+    for (const command of [add, grant]) {
+      const name = command.slice(0, command.indexOf(" --"));
+      const row = inventory.find((line) => line.startsWith(`| \`${name}\` |`))!;
+      for (const flag of command.match(/--[a-z-]+/g)!) expect(row).toContain(`\`${flag} `);
+    }
+  });
+
   test("demo mode keeps the demo banner and names neither command", () => {
     const demo = loginCardHtml({ demoMode: true, hostMode: false });
     expect(demo).toContain("Local demo mode creates a no-login session");
