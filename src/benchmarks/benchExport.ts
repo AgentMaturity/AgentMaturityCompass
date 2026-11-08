@@ -9,6 +9,8 @@ import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { loadAgentConfig, agentConfigSchema } from "../fleet/registry.js";
 import { loadRunReport } from "../diagnostic/runner.js";
 import { latestAssuranceByPack } from "../assurance/assuranceRunner.js";
+import { ProvenanceChecker } from "../assurance/reportProvenance.js";
+import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
 import { computeFailureRiskIndices } from "../assurance/indices.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -225,11 +227,16 @@ export async function exportBenchmarkArtifactAsync(input: BenchmarkExportInput, 
   const agent = agentConfigSchema.parse(YAML.parse(agentBytes.toString("utf8")) as unknown);
   ensureDir(reportsDir); // Retain latestAssuranceByPack's existing initialization, before the first wait.
   const latest = new Map<string, { ts: number; pack: AssurancePackResult }>();
-  for (const path of reportPaths) {
-    const report = JSON.parse(read(path)!.toString("utf8")) as AssuranceReport;
-    if (report.agentId !== agentId || report.ts < run.windowStartTs || report.ts > run.windowEndTs) continue;
-    for (const pack of report.packResults) { const prior = latest.get(pack.packId); if (!prior || report.ts > prior.ts) latest.set(pack.packId, { ts: report.ts, pack }); }
-  }
+  // Only a sealed report whose graded rows resolve to its runner session feeds a signed benchmark (SH-TRUST-02).
+  const provenance = new ProvenanceChecker(workspace);
+  try {
+    for (const path of reportPaths) {
+      const report = JSON.parse(read(path)!.toString("utf8")) as AssuranceReport;
+      if (report.agentId !== agentId || report.ts < run.windowStartTs || report.ts > run.windowEndTs) continue;
+      if (!sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>) || !provenance.check(report).ok) continue;
+      for (const pack of report.packResults) { const prior = latest.get(pack.packId); if (!prior || report.ts > prior.ts) latest.set(pack.packId, { ts: report.ts, pack }); }
+    }
+  } finally { provenance.close(); }
   const prepared = prepareBenchmarkArtifact({ ...params, workspace, agentId }, { run, agent, assurance: new Map([...latest].map(([id, row]) => [id, row.pack])),
     reportSha256: read(scopedRunPath) === null ? null : sha256Hex(read(scopedRunPath)!), bomSha256: read(join(workspace, "amc-bom.json")) === null ? null : sha256Hex(read(join(workspace, "amc-bom.json"))!) });
   if (prepared.bench.run.runId !== params.runId) throw new Error("benchmark run reference does not match the requested record");

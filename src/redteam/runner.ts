@@ -19,9 +19,9 @@ import { loadAgentConfig } from "../fleet/registry.js";
 import { openLedger, verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { UNSIGNED_EVIDENCE_STORE } from "../ledger/ledgerConnection.js";
 import { captureRunHashAuthority } from "../ledger/runHashSignature.js";
-import { parseReceipt } from "../receipts/receipt.js";
 import { workspaceSelfTrust } from "../trust/trustContext.js";
-import { sealAbortedAssuranceSession, startAssuranceSession, writeAssuranceAudit, writeScenarioPrompt, writeScenarioResponse, writeScenarioTestResult } from "../assurance/evidenceWriters.js";
+import { sealAbortedAssuranceSession, sealAbortedSessionOnSignal, startAssuranceSession, writeAssuranceAudit, writeScenarioPrompt, writeScenarioResponse, writeScenarioTestResult } from "../assurance/evidenceWriters.js";
+import { admitGatewayReceipt, workspaceReceiptKeys } from "../assurance/assurancePackExecution.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -126,6 +126,8 @@ export interface RedTeamEvilMcpResult {
   overallScore0to100: number;
   dangerousToolCalls: number;
   categoryScores: MCPAgentRedTeamReport["categoryScores"];
+  /** Each scenario's verdict and its stdin/stdout/test rows in the run's session; the provenance check reads them as pack `evil-mcp`. */
+  scenarioResults: Array<{ scenarioId: string; pass: boolean; score0to100: number; evidenceEventIds: string[] }>;
 }
 
 export interface RedTeamReport {
@@ -465,14 +467,17 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
   const context = buildPromptContext(workspace, agentId);
   const runId = randomUUID();
   const now = Date.now();
-  const noSign = input.noSign ?? true;
   // SH-TRUST-03: a signed run writes its rows into the signed ledger; an unsigned run writes them only under
   // AMC_NO_SIGN=1, into the unsigned store, and otherwise records nothing (no vault is needed for local red-teaming).
+  // AMC_NO_SIGN=1 makes the run unsigned whatever the caller passed, as the assurance runner does: no-sign mode never
+  // signs, and a locked vault is not needed for it.
   const unsignedStore = process.env.AMC_NO_SIGN === "1";
+  const noSign = input.noSign !== false || unsignedStore;
   const recordRows = !noSign || unsignedStore;
   const assertOriginal = captureRunHashAuthority(workspace, noSign);
   const ledger = recordRows ? openLedger(workspace, unsignedStore ? { store: "unsigned" } : {}) : null;
   const trustTier = "OBSERVED" as const;
+  const receiptKeys = workspaceReceiptKeys(workspace);
 
   // Resolve plugins (packs)
   const packs: AssurancePackDefinition[] =
@@ -494,6 +499,8 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
   const sessionId = ledger === null ? null
     : startAssuranceSession({ ledger, mode: "supervise", agentId, packIds: packs.map((pack) => pack.id), trustTier, source: "redteam" });
   const rows = ledger === null || sessionId === null ? null : { ledger, sessionId, runtime: "any" as const, trustTier, agentId, source: "redteam" as const };
+  // An interrupted run (Ctrl-C, CI timeout) seals its session before dying; an unsealed runner session would fail every later verification.
+  const releaseSignals = rows === null ? () => {} : sealAbortedSessionOnSignal({ ledger: rows.ledger, sessionId: rows.sessionId, runId, agentId });
   try {
 
   const allVulns: RedTeamVulnerability[] = [];
@@ -538,9 +545,13 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
         }
         const response = answer.text;
         const toolCalls = answer.toolCalls.length > 0 ? { toolCalls: answer.toolCalls } : {};
-        const correlatedRequestIds = answer.receiptId === undefined ? [] : [receiptIdOf(answer.receiptId) ?? sha256Hex(answer.receiptId)];
+        // The gateway's receipt is verified as the reply arrives; the agent under test can send any header it likes, so a
+        // receipt that does not verify is audited and dropped, never stored and never a reason to refuse the run (fix3 S12).
+        const receipt = admitGatewayReceipt(answer.receiptId, receiptKeys, agentId);
+        if (rows !== null && receipt.rejected !== null) writeAssuranceAudit({ ...rows, ...scenarioRow, auditType: "ASSURANCE_RECEIPT_REJECTED", severity: "HIGH", message: `Gateway receipt rejected: ${receipt.rejected}` });
+        const correlatedRequestIds = receipt.admitted === null ? [] : [receipt.admitted.receiptId];
         const responseEventId = rows === null ? null : writeScenarioResponse({ ...rows, ...scenarioRow, response, toolCalls: answer.toolCalls,
-          ...(answer.receiptId === undefined ? {} : { requestReceipt: answer.receiptId }), ...(answer.responseReceipt === undefined ? {} : { responseReceipt: answer.responseReceipt }) });
+          ...(receipt.admitted === null ? {} : { requestReceipt: receipt.admitted.receipt, ...(answer.responseReceipt === undefined ? {} : { responseReceipt: answer.responseReceipt }) }) });
         const exchangeIds = promptEventId === null || responseEventId === null ? [] : [promptEventId, responseEventId];
         const grade = gradeScenarioReply(scenario, answer, attackPrompt, context);
         if (grade.kind === "inconclusive") {
@@ -618,7 +629,10 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
     totalScenarios === 0 ? "INSUFFICIENT_EVIDENCE" : "MEASURED";
   const overallScore = totalScenarios === 0 ? 0 : Math.round((totalPass / totalScenarios) * 100);
 
+  // Evil MCP runs before the session seals, so its rows are part of the sealed session (see below).
+  const evilMcp = input.evilMcp ? await runEvilMcp(input, { workspace, agentId, rows }) : null;
   if (ledger !== null && sessionId !== null) ledger.sealSession(sessionId);
+  releaseSignals();
   const integrity = noSign ? null : await verifyLedgerIntegrity(workspace, { trust: workspaceSelfTrust(workspace) });
   const verification: RedTeamVerification = noSign
     ? { status: "UNSIGNED_VALID", signed: false, mode: "unsigned-local", evidenceUse: "local-redteam", requiredForClaims: true,
@@ -654,32 +668,7 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
     },
   };
 
-  if (input.evilMcp) {
-    const mcpCategories = normalizeMCPAttackCategories(input.mcpAttackCategories);
-    const mcpReport = await runMCPAgentRedTeam({
-      workspace,
-      model: input.model,
-      agentId,
-      attackCategories: mcpCategories,
-    });
-    const mcpReportsDir = join(workspace, ".amc", "redteam", "mcp-agent-provider", agentId);
-    const testedCategories = Object.keys(mcpReport.categoryScores) as MCPAttackCategory[];
-    report.evilMcp = {
-      enabled: true,
-      source: "built-in-mcp-agent-provider",
-      runId: mcpReport.runId,
-      reportPath: join(mcpReportsDir, `${mcpReport.runId}.json`),
-      markdownPath: join(mcpReportsDir, `${mcpReport.runId}.md`),
-      requestedCategories: input.mcpAttackCategories?.length ? input.mcpAttackCategories : ["all"],
-      testedCategories,
-      totalScenarios: mcpReport.totalScenarios,
-      passedScenarios: mcpReport.passedScenarios,
-      failedScenarios: mcpReport.failedScenarios,
-      overallScore0to100: mcpReport.overallScore,
-      dangerousToolCalls: mcpReport.dangerousCallsSummary.length,
-      categoryScores: mcpReport.categoryScores,
-    };
-  }
+  if (evilMcp !== null) report.evilMcp = evilMcp;
 
   // Seal the report the way the assurance runner seals its own: hash with the seal fields emptied, sign that hash
   // with the artifact-seal key (`sealedRunReportVerifies` is the one reader of this shape).
@@ -709,11 +698,30 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
     if (ledger !== null && sessionId !== null) throw sealAbortedAssuranceSession({ ledger, sessionId, runId, agentId, error });
     throw error;
   } finally {
+    releaseSignals();
     ledger?.close();
   }
 }
 
-/** The receipt id inside a gateway receipt string, or null when it does not parse. */
-function receiptIdOf(receipt: string): string | null {
-  try { return parseReceipt(receipt).payload.receipt_id; } catch { return null; }
+/** The built-in Evil MCP scenarios, written into the run's session when it has one (SH-TRUST-03). */
+async function runEvilMcp(input: RunRedTeamInput, run: { workspace: string; agentId: string; rows: Parameters<typeof runMCPAgentRedTeam>[0]["rows"] | null }): Promise<RedTeamEvilMcpResult> {
+  const mcpReport = await runMCPAgentRedTeam({ workspace: run.workspace, model: input.model, agentId: run.agentId,
+    attackCategories: normalizeMCPAttackCategories(input.mcpAttackCategories), ...(run.rows === null ? {} : { rows: run.rows }) });
+  const mcpReportsDir = join(run.workspace, ".amc", "redteam", "mcp-agent-provider", run.agentId);
+  return {
+    enabled: true,
+    source: "built-in-mcp-agent-provider",
+    runId: mcpReport.runId,
+    reportPath: join(mcpReportsDir, `${mcpReport.runId}.json`),
+    markdownPath: join(mcpReportsDir, `${mcpReport.runId}.md`),
+    requestedCategories: input.mcpAttackCategories?.length ? input.mcpAttackCategories : ["all"],
+    testedCategories: Object.keys(mcpReport.categoryScores) as MCPAttackCategory[],
+    totalScenarios: mcpReport.totalScenarios,
+    passedScenarios: mcpReport.passedScenarios,
+    failedScenarios: mcpReport.failedScenarios,
+    overallScore0to100: mcpReport.overallScore,
+    dangerousToolCalls: mcpReport.dangerousCallsSummary.length,
+    categoryScores: mcpReport.categoryScores,
+    scenarioResults: mcpReport.scenarioResults.map((row) => ({ scenarioId: row.scenarioId, pass: row.passed, score0to100: row.score, evidenceEventIds: row.evidenceEventIds })),
+  };
 }

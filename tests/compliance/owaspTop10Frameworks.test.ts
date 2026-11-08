@@ -57,6 +57,12 @@ describe("OWASP LLM and Agentic Top 10 frameworks", () => {
         }
       }
       for (const packId of mapping.related.packs) expect(packIds.has(packId), `${mapping.id} related ${packId}`).toBe(true);
+      // ASI05 binds packs and the escape denylist only: NATIVE_SHELL_CONFINEMENT rows are written for unconfined and failed
+      // runs too and carry no agent id, so they can neither satisfy nor fail an agent-scoped control.
+      if (mapping.id === "owasp_asi05_unexpected_code_execution") {
+        expect(mapping.evidenceRequirements.map((row) => row.type).sort()).toEqual(["requires_assurance_pack", "requires_assurance_pack", "requires_no_audit"]);
+        expect(readFileSync(join(process.cwd(), "src/compliance/mappings/owaspAgenticTop10.ts"), "utf8")).not.toMatch(/auditRows\("NATIVE_SHELL_CONFINEMENT"\)/);
+      }
       expect(mapping.sources).toBeUndefined(); // genai.owasp.org is not an official source host
       expect(mapping.description).toMatch(/Signals/);
     }
@@ -70,7 +76,9 @@ describe("OWASP LLM and Agentic Top 10 frameworks", () => {
     expect(normalizeFrameworkName("OWASP Top 10 for Agentic Applications")).toBe("OWASP_AGENTIC");
     expect(normalizeFrameworkName("owasp")).toBe("OWASP_API_TOP10");
     expect(normalizeFrameworkName("OWASP API Security Top 10")).toBe("OWASP_API_TOP10");
-    expect(classifyFrameworkString("owasp-llm")).toEqual({ framework: "OWASP_LLM", reason: "alias" });
+    // "owasp-llm" upper-cases to the id itself, so it classifies as exact; "asi" is a true alias.
+    expect(classifyFrameworkString("owasp-llm")).toEqual({ framework: "OWASP_LLM", reason: "exact" });
+    expect(classifyFrameworkString("asi")).toEqual({ framework: "OWASP_AGENTIC", reason: "alias" });
     for (const framework of ["OWASP_LLM", "OWASP_AGENTIC"] as const) {
       expect(familyReview(framework).status).toBe("experimental");
       expect(familyReview(framework).flags.join(" ")).toMatch(/community/i);

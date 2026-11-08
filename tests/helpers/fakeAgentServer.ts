@@ -24,6 +24,8 @@ export interface StartFakeAgentOptions {
   failWithStatus?: number;
   /** When set, the agent answers with these tool calls and no text (`content: null`). */
   toolCalls?: (prompt: string) => Array<{ name: string; arguments: Record<string, unknown> }>;
+  /** Extra response headers, e.g. a forged `x-amc-request-receipt` the agent under test might send (fix3 S12). */
+  headers?: Record<string, string>;
 }
 
 /**
@@ -82,6 +84,7 @@ export async function startFakeAgentServer(options: StartFakeAgentOptions = {}):
         : { role: "assistant", content: reply(prompt) };
       res.statusCode = 200;
       res.setHeader("content-type", "application/json");
+      for (const [name, value] of Object.entries(options.headers ?? {})) res.setHeader(name, value);
       res.end(
         JSON.stringify({
           id: "fake-completion",

@@ -80,6 +80,28 @@ export function sealAbortedAssuranceSession(params: {
   return params.error;
 }
 
+/**
+ * Seals the run's session if the process is interrupted (Ctrl-C, a CI timeout's SIGTERM), then dies of the same
+ * signal. Runner sessions are legacy sessions, which whole-ledger verification requires to carry a seal: one
+ * interrupted run would otherwise turn every later signed run in the workspace INVALID, with no CLI path to seal it.
+ * Returns the disposer to call once the run has sealed or aborted the session itself. A SIGKILL or a crash still
+ * leaves the session open: nothing of this process runs then.
+ */
+export function sealAbortedSessionOnSignal(params: { ledger: Ledger; sessionId: string; runId: string; agentId: string }): () => void {
+  const signals: NodeJS.Signals[] = ["SIGINT", "SIGTERM"];
+  const onSignal = (signal: NodeJS.Signals): void => {
+    dispose();
+    sealAbortedAssuranceSession({ ...params, error: Object.assign(new Error(`run interrupted by ${signal}`), { name: "RunInterrupted" }) });
+    process.kill(process.pid, signal);
+  };
+  const dispose = (): void => { for (const signal of signals) process.off(signal, onSignal); };
+  for (const signal of signals) process.once(signal, onSignal);
+  return dispose;
+}
+
+/** What every scenario writer needs beyond the pack and scenario: the session a run writes into. */
+export type ScenarioEvidenceRows = Pick<Parameters<typeof writeScenarioPrompt>[0], "ledger" | "sessionId" | "runtime" | "trustTier" | "agentId" | "source">;
+
 
 /**
  * Renders scenario text for the evidence ledger under the assurance policy.

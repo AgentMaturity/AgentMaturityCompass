@@ -1,4 +1,3 @@
-import { backScenarioRows } from "../helpers/provenancedAssurance.js";
 import { spawnSync } from "node:child_process";
 import { verify } from "node:crypto";
 import { mkdirSync, mkdtempSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
@@ -70,6 +69,11 @@ const {getAgentPaths}=await import(moduleAt('fleet/paths.js'));
 const {canonicalize}=await import(moduleAt('utils/json.js'));
 const {initComplianceMaps,generateComplianceReport}=await import(moduleAt('compliance/complianceEngine.js'));
 const {verifiedAssuranceByPack}=await import(moduleAt('compliance/evidenceBinding.js'));
+const {startAssuranceSession,writeScenarioPrompt,writeScenarioResponse,writeScenarioTestResult}=await import(moduleAt('assurance/evidenceWriters.js'));
+// SH-TRUST-02: the operator-authored rows are backed by a sealed amc-assurance-runner session, as the gate requires of every scored row (the child cannot import the vitest helper).
+function backScenarioRows(workspace,{agentId,packId,scenarios}){const ledger=openLedger(workspace);try{const sessionId=startAssuranceSession({ledger,mode:'supervise',agentId,packIds:[packId],trustTier:'OBSERVED'});
+const scenarioResults=scenarios.map(s=>{const common={ledger,sessionId,runtime:'any',trustTier:'OBSERVED',packId,scenarioId:s.scenarioId,agentId};const ids=[writeScenarioPrompt({...common,prompt:'prompt '+s.scenarioId}),writeScenarioResponse({...common,response:'response '+s.scenarioId})];
+if(!s.inconclusive)ids.push(writeScenarioTestResult({...common,score0to100:s.score0to100,pass:s.pass,reasons:[],correlatedRequestIds:[]}));return{...s,evidenceEventIds:ids};});ledger.sealSession(sessionId);return{sessionId,scenarioResults};}finally{ledger.close();}}
 const sha=value=>createHash('sha256').update(value).digest('hex');
 function files(root){const result=[];function walk(path){if(!existsSync(path))return;const st=lstatSync(path);if(st.isDirectory()){for(const n of readdirSync(path).sort())walk(join(path,n));}
 else result.push({path,mode:st.mode,links:st.nlink,...(st.isSymbolicLink()?{kind:'link',target:readlinkSync(path)}:{kind:'file',bytes:st.size,sha256:sha(readFileSync(path))})});}walk(root);return result;}
@@ -93,7 +97,6 @@ try{
  const now=Date.now(),scenarios=[];
  for(let i=0;i<input.measured;i++)scenarios.push({scenarioId:'operator-measured-'+i,pass:input.score>=50,score0to100:input.score,score0to5:input.score/20,auditEventTypes:input.score<50?['TOOL_GOVERNANCE_SUCCEEDED']:[],inconclusive:false});
  for(let i=0;i<(input.inconclusive??0);i++)scenarios.push({scenarioId:'operator-inconclusive-'+i,pass:false,score0to100:0,score0to5:0,auditEventTypes:[],inconclusive:true});
- // SH-TRUST-02: the operator-authored rows are backed by a sealed runner session, as the gate now requires of every scored row.
  const backed=backScenarioRows(workspace,{agentId:'default',packId:'toolGovernance',scenarios});
  const pack={packId:'toolGovernance',score0to100:input.score,scenarioResults:backed.scenarioResults,...(input.method===undefined?{}:{gradingMethod:input.method}),...(input.eligible===undefined?{}:{regulatedEligible:input.eligible})};
  const base={assuranceRunId:'p0-19-'+input.name,agentId:'default',ts:now,mode:'supervise',windowStartTs:now-1000,windowEndTs:now,trustTier:'OBSERVED',status:'VALID',verificationPassed:true,sessionId:backed.sessionId,...(input.evidenceStatus==='missing'?{}:{evidenceStatus:input.evidenceStatus??'MEASURED'}),packResults:[pack],overallScore0to100:input.score,integrityIndex:1,trustLabel:'OPERATOR_AUTHORED_READER_CONTROL',reportJsonSha256:'',runSealSig:''};

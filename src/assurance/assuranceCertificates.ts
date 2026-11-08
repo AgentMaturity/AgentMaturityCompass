@@ -29,7 +29,10 @@ import { orgSignatureSchema } from "../org/orgSchema.js";
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { assurancePolicySchema } from "./assurancePolicySchema.js";
 import { assuranceReportProvenance } from "./reportProvenance.js";
+import { assuranceRunRecord } from "./assuranceArtifactPersistence.js";
+import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
 import { getAgentPaths } from "../fleet/paths.js";
+import type { AssuranceReport } from "../types.js";
 import {
   assuranceCertSchema,
   assuranceFindingsDocSchema,
@@ -177,7 +180,7 @@ export async function issueAssuranceCertificate(input: {
   const runPath = assuranceRunJsonPath(params.workspace, params.runId);
   const findingsPath = join(dirname(runPath), "findings.json");
   const policyPath = assurancePolicyPath(params.workspace);
-  const sourceState = captureOrgFiles([policyPath, assurancePolicySigPath(params.workspace), runPath, findingsPath]);
+  const sourceState = captureOrgFiles([policyPath, assurancePolicySigPath(params.workspace), runPath, `${runPath}.sig`, findingsPath, `${findingsPath}.sig`]);
   const sourceInputs = new Map(sourceState.members.map(row => [row.path, row.bytes]));
   let bindingsState: OrgPairsSnapshot | null = null;
   const assertInputsCurrent = () => { assertOrgPairsCurrent(sourceState); if (bindingsState !== null) assertOrgPairsCurrent(bindingsState); };
@@ -200,17 +203,34 @@ export async function issueAssuranceCertificate(input: {
   if (runText.split(/\r?\n/).some(line => line.trim() === EXAMPLE_BANNER)) throw new Error("synthetic_example results cannot be issued an assurance certificate");
   const runValue: unknown = JSON.parse(runText); assertNotExample(runValue, "issued an assurance certificate");
   const run = assuranceRunSchema.parse(runValue);
-  // SH-TRUST-02: a certificate binds to the sealed run report, and only when every graded row of that report resolves to
-  // the runner's own sealed ledger session. No sealed report, or a score with no rows behind it, issues nothing.
-  const sealedReportPath = join(getAgentPaths(params.workspace, run.scope.id).reportsDir, "assurance", `${params.runId}.json`);
-  if (!pathExists(sealedReportPath)) throw new Error(`certificate issuance blocked: sealed assurance report not found for run ${params.runId}`);
-  const provenance = assuranceReportProvenance(params.workspace, JSON.parse(readUtf8(sealedReportPath)) as Record<string, unknown>);
-  if (!provenance.ok) throw new Error(`certificate issuance blocked: assurance run provenance ${provenance.reason} (${provenance.detail})`);
   const findingsBytes = sourceInputs.get(findingsPath)!;
   if (findingsBytes === null) {
     throw new Error(`assurance findings not found for run: ${params.runId}`);
   }
   assuranceFindingsDocSchema.parse(JSON.parse(findingsBytes.toString("utf8")) as unknown);
+  // SH-TRUST-02: the certificate rests only on files a workspace writer cannot forge, bound to one another. run.json and
+  // findings.json carry the auditor's signature; the run's report names this run and agent, verifies its seal when it
+  // claims one, derives to exactly run.json's score, and every graded row resolves to the runner's own sealed ledger
+  // session. No report, an unsigned run record, a disagreement, or a score with no rows behind it issues nothing.
+  const blocked = (why: string): never => { throw new Error(`certificate issuance blocked: ${why}`); };
+  for (const [label, path, bytes] of [["run.json", runPath, runBytes], ["findings.json", findingsPath, findingsBytes]] as const) {
+    const sidecar = sourceInputs.get(`${path}.sig`);
+    const verdict = sidecar === null || sidecar === undefined ? { valid: false, reason: "signature missing" } : verifyAuditorSignatureBytes(params.workspace, "BUNDLE", bytes, sidecar);
+    if (!verdict.valid) blocked(`${label} auditor signature invalid (${verdict.reason ?? "unknown"})`);
+  }
+  const reportPath = join(getAgentPaths(params.workspace, run.scope.id).reportsDir, "assurance", `${params.runId}.json`);
+  const reportState = captureOrgFiles([reportPath]), reportBytes = reportState.members[0]!.bytes;
+  if (reportBytes === null) blocked(`sealed assurance report not found for run ${params.runId}`);
+  const report = JSON.parse(reportBytes!.toString("utf8")) as Record<string, unknown>;
+  if (report === null || typeof report !== "object" || report.assuranceRunId !== params.runId || report.agentId !== run.scope.id) blocked("the assurance report does not name this run and agent");
+  if (report.runSealSig !== "unsigned" && !sealedRunReportVerifies(params.workspace, report)) blocked("the assurance report seal does not verify");
+  let derived: ReturnType<typeof assuranceRunRecord>["score"];
+  try { derived = assuranceRunRecord(report as unknown as AssuranceReport).score; } catch { return blocked("the assurance report does not derive to a run record"); }
+  if (derived.status !== run.score.status || derived.riskAssuranceScore !== run.score.riskAssuranceScore || derived.pass !== run.score.pass
+    || canonicalize(derived.findingCounts) !== canonicalize(run.score.findingCounts)) blocked("run.json's score is not the one its assurance report derives to");
+  const provenance = assuranceReportProvenance(params.workspace, report);
+  if (!provenance.ok) blocked(`assurance run provenance ${provenance.reason} (${provenance.detail})`);
+  bindingsState = reportState;
   assertInputsCurrent();
   const evidence = evaluateAssuranceEvidenceGates({
     policy,
@@ -228,7 +248,7 @@ export async function issueAssuranceCertificate(input: {
     if (JSON.stringify(loadTrustConfig(params.workspace)) !== signingPolicy) throw new Error("assurance certificate signing policy changed while preparing");
   };
   const promptPath = promptPolicyPath(params.workspace), cgxPath = run.scope.type === "AGENT" ? cgxLatestPackPath(params.workspace, run.scope.id) : null;
-  bindingsState = captureOrgFiles([promptPath, ...(cgxPath === null ? [] : [cgxPath])]);
+  bindingsState = captureOrgFiles([promptPath, ...(cgxPath === null ? [] : [cgxPath]), reportPath]);
   const bindingDigest = (path: string | null) => { const bytes = bindingsState!.members.find(row => row.path === path)?.bytes; return bytes === undefined || bytes === null ? "0".repeat(64) : sha256Hex(bytes); };
   const proofState = captureTransparencyState(params.workspace, true);
   const proofs = buildBenchProofs({ workspace: params.workspace, includeEventKinds: ["ASSURANCE_RUN_STARTED", "ASSURANCE_RUN_COMPLETED", "ASSURANCE_FINDING_RECORDED", "ASSURANCE_CERT_ISSUED", "NOTARY_ATTESTATION_OBSERVED"], maxProofs: 40 });

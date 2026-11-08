@@ -1,11 +1,7 @@
-import { ledgerChainError } from "../catalog/evidence/mappingAdapter.js";
 import { eventMeta } from "../claims/evidenceProvenance.js";
-import { verifyHexDigestAny } from "../crypto/keys.js";
 import { legacyLedgerRowKeys } from "../keys/operationalLedgerReader.js";
-import { getPurposeKeyHistory } from "../keys/signingKeys.js";
 import { openLedger, type Ledger } from "../ledger/ledger.js";
-import { verifyReceipt } from "../receipts/receipt.js";
-import type { TrustContext } from "../trust/trustContext.js";
+import { verifyRowIntegrity, verifySeal } from "../transparency/sessionRootDescriptor.js";
 import type { AssuranceScenarioResult, EvidenceEvent } from "../types.js";
 import { isExecutedReportPack } from "./executed/reportValidation.js";
 
@@ -20,14 +16,21 @@ import { isExecutedReportPack } from "./executed/reportValidation.js";
  * sealed, with meta naming the same source, pack, scenario and agent. A pack that claims a score or a pass/fail
  * count with no scored row behind it is refused: a score from missing evidence is the exact thing this gate exists
  * to stop. A report whose every pack claims nothing (all inconclusive, score 0) has nothing to prove and passes.
+ *
+ * Only the runner session's own rows are verified (hash pre-image, writer signature, seal), O(session) per report:
+ * the ledger-wide chain is `verifyLedgerIntegrity`'s job, which both runners call at run time. This gate sits on the
+ * governor's per-intent path, so it must not rehash the whole ledger on every call.
+ *
+ * A gateway receipt on a stdout row is extra, not provenance: the runner verified it when the reply arrived and stores
+ * only admitted receipts (`admitGatewayReceipt`), so this gate never re-judges one. An agent under test could otherwise
+ * get its own report refused by answering with a bad receipt (fix3 S12).
  */
 export type ProvenanceRefusal =
   | "PROVENANCE_MISSING"
   | "PROVENANCE_UNRESOLVED"
   | "PROVENANCE_UNSIGNED_STORE"
   | "PROVENANCE_SESSION_UNSEALED"
-  | "PROVENANCE_LEDGER_INVALID"
-  | "PROVENANCE_RECEIPT_INVALID";
+  | "PROVENANCE_LEDGER_INVALID";
 
 export type ProvenanceResult = { ok: true } | { ok: false; reason: ProvenanceRefusal; detail: string };
 
@@ -59,40 +62,45 @@ function claimsAScore(pack: PackLike): boolean {
   return count > 0 || (typeof pack.score0to100 === "number" && pack.score0to100 > 0);
 }
 
+type SessionVerdict = { ok: true } | { ok: false; reason: "PROVENANCE_SESSION_UNSEALED" | "PROVENANCE_LEDGER_INVALID"; detail: string };
+
 /**
- * One ledger read per reader call, shared across the reports it checks: the chain is rehashed once, the session
- * seals are verified per session. Close it when the reader is done.
+ * One ledger handle per reader call, shared across the reports it checks; each runner session is verified once.
+ * Close it when the reader is done.
  */
 export class ProvenanceChecker {
   private ledger: Ledger | null = null;
-  private snapshot: { events: EvidenceEvent[]; keys: string[]; chainError: string | null } | null = null;
-  private receiptKeys: string[] | null = null;
-  private readonly sessions = new Map<string, boolean>();
+  private keys: string[] | null = null;
+  private readonly sessions = new Map<string, SessionVerdict>();
 
-  constructor(private readonly workspace: string, private readonly options: { trust?: TrustContext; ledger?: Ledger } = {}) {}
+  constructor(private readonly workspace: string, private readonly options: { ledger?: Ledger } = {}) {}
 
-  private load() {
-    if (this.snapshot) return this.snapshot;
-    this.ledger = this.options.ledger ?? openLedger(this.workspace);
-    const keys = legacyLedgerRowKeys(this.workspace);
-    const events = this.ledger.getAllEvents();
-    // ponytail: rehashes the whole chain once per reader call; cache by verified head hash if readers get hot.
-    const chainError = ledgerChainError(events, keys, { workspace: this.workspace, ledger: this.ledger, trust: this.options.trust });
-    this.snapshot = { events, keys, chainError };
-    return this.snapshot;
+  private open(): Ledger { return (this.ledger ??= this.options.ledger ?? openLedger(this.workspace)); }
+  private rowKeys(): string[] { return (this.keys ??= legacyLedgerRowKeys(this.workspace)); }
+
+  /** The session's rows in the order the runner appended them (ledger `rowid`). */
+  private sessionRows(sessionId: string): EvidenceEvent[] {
+    return this.open().db.prepare("SELECT * FROM evidence_events WHERE session_id = ? ORDER BY rowid ASC").all(sessionId) as EvidenceEvent[];
   }
 
-  private sealedSession(sessionId: string, kind: ProvenanceKind): boolean {
+  /** Is `sessionId` a sealed session of this runner whose every row hashes, is monitor-signed and is covered by the seal? */
+  private session(sessionId: string, kind: ProvenanceKind): SessionVerdict {
     const cached = this.sessions.get(sessionId);
     if (cached !== undefined) return cached;
-    const { events, keys } = this.load();
-    const session = this.ledger!.getSessionById(sessionId);
-    const last = events.filter((event) => event.session_id === sessionId).at(-1);
-    const ok = session !== null && session.binary_path === kind.binaryPath && session.ended_ts !== null
-      && typeof session.session_final_event_hash === "string" && session.session_final_event_hash === last?.event_hash
-      && typeof session.session_seal_sig === "string" && verifyHexDigestAny(session.session_final_event_hash, session.session_seal_sig, keys);
-    this.sessions.set(sessionId, ok);
-    return ok;
+    const record = this.open().getSessionById(sessionId);
+    let verdict: SessionVerdict;
+    if (record === null || record.binary_path !== kind.binaryPath || record.ended_ts === null
+      || record.session_final_event_hash === null || record.session_seal_sig === null) {
+      verdict = { ok: false, reason: "PROVENANCE_SESSION_UNSEALED", detail: `session ${sessionId} is not a sealed ${kind.binaryPath} session` };
+    } else {
+      const rows = this.sessionRows(sessionId), keys = this.rowKeys(), errors: string[] = [];
+      if (rows.length === 0) errors.push(`session ${sessionId} has no rows`);
+      for (const row of rows) verifyRowIntegrity(keys, row, errors);
+      verifySeal(keys, record, rows, sessionId, errors);
+      verdict = errors.length === 0 ? { ok: true } : { ok: false, reason: "PROVENANCE_LEDGER_INVALID", detail: errors.slice(0, 3).join("; ") };
+    }
+    this.sessions.set(sessionId, verdict);
+    return verdict;
   }
 
   private rowBacked(row: AssuranceScenarioResult, sessionId: string, agentId: string, packId: string, kind: ProvenanceKind): string | null {
@@ -100,33 +108,19 @@ export class ProvenanceChecker {
     if (!Array.isArray(ids) || ids.length < 3 || ids.slice(0, 3).some((id) => typeof id !== "string") || new Set(ids).size !== ids.length) {
       return `${packId}/${row.scenarioId}: a graded row needs its stdin, stdout and test event ids`;
     }
-    const { events } = this.load();
     const expected = [
       { type: "stdin", direction: "assurance_to_agent" },
       { type: "stdout", direction: "agent_to_assurance" },
       { type: "test", direction: null }
     ] as const;
     for (const [index, want] of expected.entries()) {
-      const event = events.find((candidate) => candidate.id === ids[index]);
+      const event = this.open().getEventById(ids[index]!);
       if (!event || event.session_id !== sessionId || event.event_type !== want.type) return `${packId}/${row.scenarioId}: event ${ids[index]} is not the ${want.type} row of its session`;
       const meta = eventMeta(event);
       if (meta.source !== kind.source || meta.packId !== packId || meta.scenarioId !== row.scenarioId || meta.agentId !== agentId
         || (want.direction !== null && meta.direction !== want.direction)) return `${packId}/${row.scenarioId}: event ${ids[index]} names another exchange`;
       if (want.type === "test" && (meta.testType !== "ASSURANCE_SCENARIO_RESULT" || meta.pass !== row.pass)) return `${packId}/${row.scenarioId}: test row disagrees with the graded result`;
-      if (want.type === "stdout" && typeof meta.requestReceipt === "string") {
-        const receipt = this.verifyRequestReceipt(meta.requestReceipt, agentId);
-        if (receipt !== null) return `${packId}/${row.scenarioId}: ${receipt}`;
-      }
     }
-    return null;
-  }
-
-  /** A gateway request receipt the stdout row carries must verify against this workspace's receipt keys and name the agent. */
-  private verifyRequestReceipt(receipt: string, agentId: string): string | null {
-    this.receiptKeys ??= (() => { try { return getPurposeKeyHistory(this.workspace, "receipt"); } catch { return []; } })();
-    const verified = verifyReceipt(receipt, this.receiptKeys);
-    if (!verified.ok || verified.payload === null) return `gateway receipt does not verify (${verified.error ?? "no payload"})`;
-    if (verified.payload.agentId !== agentId) return "gateway receipt names another agent";
     return null;
   }
 
@@ -148,12 +142,11 @@ export class ProvenanceChecker {
     if (sessionId === null) return refuse("PROVENANCE_MISSING", "report names no ledger session");
     if (agentId === "") return refuse("PROVENANCE_MISSING", "report names no agent");
     try {
-      const { chainError } = this.load();
-      if (chainError !== null) return refuse("PROVENANCE_LEDGER_INVALID", chainError);
-      if (!this.sealedSession(sessionId, kind)) return refuse("PROVENANCE_SESSION_UNSEALED", `session ${sessionId} is not a sealed ${kind.binaryPath} session`);
+      const session = this.session(sessionId, kind);
+      if (!session.ok) return refuse(session.reason, session.detail);
       for (const { packId, row } of scored) {
         const problem = this.rowBacked(row, sessionId, agentId, packId, kind);
-        if (problem !== null) return refuse(problem.includes("receipt") ? "PROVENANCE_RECEIPT_INVALID" : "PROVENANCE_UNRESOLVED", problem);
+        if (problem !== null) return refuse("PROVENANCE_UNRESOLVED", problem);
       }
       return { ok: true };
     } catch (error) {
@@ -164,12 +157,12 @@ export class ProvenanceChecker {
   close(): void {
     if (this.ledger && !this.options.ledger) this.ledger.close();
     this.ledger = null;
-    this.snapshot = null;
+    this.sessions.clear();
   }
 }
 
 /** One-shot form for a single report (certificates, CLI verify). */
-export function assuranceReportProvenance(workspace: string, report: ProvenancedReport, options: { kind?: ProvenanceKind; trust?: TrustContext; ledger?: Ledger } = {}): ProvenanceResult {
+export function assuranceReportProvenance(workspace: string, report: ProvenancedReport, options: { kind?: ProvenanceKind; ledger?: Ledger } = {}): ProvenanceResult {
   const checker = new ProvenanceChecker(workspace, options);
   try { return checker.check(report, options.kind); } finally { checker.close(); }
 }

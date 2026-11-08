@@ -13,7 +13,7 @@ import { executeStationQuestionAspects, STATION_QUESTION_ASPECT_PACK } from "./e
 import { STATION_QUESTION_CONVERSIONS } from "./executed/registry.js";
 import { finalizeExecutedResults } from "./executed/finalize.js";
 import { randomUUID } from "node:crypto";
-import { executeAssurancePack } from "./assurancePackExecution.js";
+import { executeAssurancePack, workspaceReceiptKeys } from "./assurancePackExecution.js";
 import { readdirSync } from "node:fs";
 import { basename, join } from "node:path";
 import type { AssurancePackResult, AssuranceReport, AssuranceScenarioResult, RiskTier, TrustLabel, TrustTier } from "../types.js";
@@ -27,7 +27,7 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { measureProcessConfinement, processConfinementReason, processIsConfined } from "../sandbox/processConfinement.js";
-import { sealAbortedAssuranceSession } from "./evidenceWriters.js";
+import { sealAbortedAssuranceSession, sealAbortedSessionOnSignal } from "./evidenceWriters.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { loadGatewayConfig } from "../gateway/config.js";
 import { writeAssuranceAudit, startAssuranceSession } from "./evidenceWriters.js";
@@ -237,6 +237,8 @@ export async function runAssurance(input: RunAssuranceInput, options: RunHashPub
     packIds: allPackIds,
     trustTier
   });
+  // An interrupted run seals its session before dying (see sealAbortedSessionOnSignal).
+  const releaseSignals = sealAbortedSessionOnSignal({ ledger, sessionId, runId, agentId });
 
   try {
     if (confined) {
@@ -279,6 +281,7 @@ export async function runAssurance(input: RunAssuranceInput, options: RunHashPub
 
     const executePack = (packId: string): Promise<AssurancePackResult> => executeAssurancePack({
       packId, ledger, sessionId, agentId, runId, trustTier, context, getResponder, getExecutedScope, getCatalog,
+      receiptKeys: () => workspaceReceiptKeys(workspace),
       executedAttempts: input.executedAttempts, now: new Date(now).toISOString(), mode: input.mode
     });
 
@@ -368,6 +371,7 @@ export async function runAssurance(input: RunAssuranceInput, options: RunHashPub
   } catch (error) {
     throw sealAbortedAssuranceSession({ ledger, sessionId, runId, agentId, error });
   } finally {
+    releaseSignals();
     ledger.close();
   }
 }

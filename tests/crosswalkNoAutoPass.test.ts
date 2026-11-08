@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -11,9 +11,7 @@ import type { ComplianceMapping, ComplianceReportJson } from "../src/compliance/
 import { openLedger } from "../src/ledger/ledger.js";
 import type { EvidenceEventType } from "../src/types.js";
 import { initWorkspace } from "../src/workspace.js";
-import { getAgentPaths } from "../src/fleet/paths.js";
-import { canonicalize } from "../src/utils/json.js";
-import { sha256Hex } from "../src/utils/hash.js";
+import { writeProvenancedAssuranceReport } from "./helpers/provenancedAssurance.js";
 
 /**
  * P1-45: a result for one framework never sets a result for another, although mappings of different frameworks share
@@ -41,29 +39,14 @@ const ofFramework = (framework: string) => builtInComplianceMappings.filter((row
 /** A mapping whose requirements bound runtime events alone can meet (no assurance run needed). */
 const eventsOnly = (mapping: ComplianceMapping) => mapping.evidenceRequirements.every((req) => req.type !== "requires_assurance_pack");
 
-/** Synthetic structured report using the existing complianceFailClosed fixture shape, with native sealing/admission. */
+/** Synthetic structured report, sealed and backed by a runner session as the gate requires (SH-TRUST-02). */
 function structuredAssuranceFixture() {
-  const now = Date.now();
-  return {
-    assuranceRunId: `crosswalk-${randomUUID()}`, agentId: AGENT, ts: now, mode: "supervise",
-    windowStartTs: now - 1000, windowEndTs: now, trustTier: "OBSERVED", status: "VALID", verificationPassed: true,
-    sessionId: "synthetic-crosswalk-fixture", evidenceStatus: "MEASURED",
-    packResults: [{ packId: "sbom-supply-chain", score0to100: 100,
-      scenarioResults: [{ auditEventTypes: [] as string[], inconclusive: false }],
-      gradingMethod: "structured", regulatedEligible: true }],
-    overallScore0to100: 100, integrityIndex: 1, trustLabel: "MEASURED", reportJsonSha256: "", runSealSig: ""
-  };
+  return { name: `crosswalk-${randomUUID()}`, agentId: AGENT, packs: [{ packId: "sbom-supply-chain", scenarios: [{ scenarioId: "s1", pass: true }], score0to100: 100 }],
+    extra: { trustLabel: "MEASURED", integrityIndex: 1 } };
 }
 
 function writeSealedAssuranceFixture(workspace: string, base: ReturnType<typeof structuredAssuranceFixture>): void {
-  const hash = sha256Hex(canonicalize(base));
-  const ledger = openLedger(workspace);
-  let signature: string;
-  try { signature = ledger.signRunHash(hash); } finally { ledger.close(); }
-  const dir = join(getAgentPaths(workspace, AGENT).reportsDir, "assurance");
-  mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, `${base.assuranceRunId}.json`),
-    JSON.stringify({ ...base, reportJsonSha256: hash, runSealSig: signature }, null, 2));
+  writeProvenancedAssuranceReport(workspace, base);
 }
 
 /** One OBSERVED runtime event per (mapping, required event type), bound to that mapping when `bind`. */

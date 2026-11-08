@@ -77,32 +77,40 @@ function readMeta(event: EvidenceEvent): Record<string, unknown> {
 }
 
 /**
+ * One row's own integrity: its hash pre-image and its writer signature. Shared by the session anchor and by the
+ * assurance/red-team provenance gate (`src/assurance/reportProvenance.ts`), which verifies a runner session's rows
+ * without rehashing the whole ledger.
+ */
+export function verifyRowIntegrity(monitorKeys: readonly string[], event: EvidenceEvent, errors: string[]): void {
+  const canonicalMetadata = canonicalMetadataForHash({
+    id: event.id,
+    ts: event.ts,
+    sessionId: event.session_id,
+    runtime: event.runtime,
+    eventType: event.event_type,
+    payloadPath: event.canonical_payload_path ?? event.payload_path,
+    payloadInline: event.canonical_payload_inline ?? event.payload_inline,
+    metaJson: event.meta_json
+  });
+  if (sha256Hex(`${event.prev_event_hash}${canonicalMetadata}${event.payload_sha256}`) !== event.event_hash) {
+    errors.push(`Event ${event.id} event_hash mismatch`);
+  }
+  if (!verifyHexDigestAny(event.event_hash, event.writer_sig, [...monitorKeys])) {
+    errors.push(`Event ${event.id} writer signature invalid`);
+  }
+}
+
+/**
  * Per-row integrity for ONE session: the hash pre-image, the writer signature,
  * and the envelope chain. The global `prev_event_hash` chain is deliberately not
  * checked here (a session slice cannot be) — `verifyLedgerIntegrity` and
  * `verifyStoredSessionEvents` remain the authority for that.
  */
-function verifySessionRows(workspace: string, rows: readonly EvidenceEvent[], errors: string[]): void {
-  const monitorKeys = getPublicKeyHistory(workspace, "monitor");
+export function verifySessionRows(monitorKeys: readonly string[], rows: readonly EvidenceEvent[], errors: string[]): void {
   let expectedSeq = 0;
   let expectedPrevHash = SESSION_GENESIS;
   for (const event of rows) {
-    const canonicalMetadata = canonicalMetadataForHash({
-      id: event.id,
-      ts: event.ts,
-      sessionId: event.session_id,
-      runtime: event.runtime,
-      eventType: event.event_type,
-      payloadPath: event.canonical_payload_path ?? event.payload_path,
-      payloadInline: event.canonical_payload_inline ?? event.payload_inline,
-      metaJson: event.meta_json
-    });
-    if (sha256Hex(`${event.prev_event_hash}${canonicalMetadata}${event.payload_sha256}`) !== event.event_hash) {
-      errors.push(`Event ${event.id} event_hash mismatch`);
-    }
-    if (!verifyHexDigestAny(event.event_hash, event.writer_sig, monitorKeys)) {
-      errors.push(`Event ${event.id} writer signature invalid`);
-    }
+    verifyRowIntegrity(monitorKeys, event, errors);
 
     const envelope = extractEnvelope(event.meta_json);
     if (envelope === null) {
@@ -128,8 +136,8 @@ function verifySessionRows(workspace: string, rows: readonly EvidenceEvent[], er
   }
 }
 
-function verifySeal(
-  workspace: string,
+export function verifySeal(
+  monitorKeys: readonly string[],
   record: SessionRecord | null,
   rows: readonly EvidenceEvent[],
   sessionId: string,
@@ -156,7 +164,7 @@ function verifySeal(
   // session ended here". Same pairing as `verifySessionRecords`.
   if (
     record.session_seal_sig === null ||
-    !verifyHexDigestAny(record.session_final_event_hash, record.session_seal_sig, getPublicKeyHistory(workspace, "monitor"))
+    !verifyHexDigestAny(record.session_final_event_hash, record.session_seal_sig, [...monitorKeys])
   ) {
     errors.push(`Session ${sessionId} seal signature invalid`);
   }
@@ -220,8 +228,11 @@ export function buildSessionRootDescriptor(params: {
   if (rows.length === 0) {
     throw new SessionAnchorError(sessionId, [...errors, `session ${sessionId} has no events`]);
   }
-  verifySessionRows(workspace, rows, errors);
-  verifySeal(workspace, record, rows, sessionId, errors);
+  // The per-row and seal checks take the keys as a value so `src/evidence/sessionExport.ts` can run them offline
+  // against the keys an export carries (SH-TRUST-06); here they are the workspace's own monitor key history.
+  const monitorKeys = getPublicKeyHistory(workspace, "monitor");
+  verifySessionRows(monitorKeys, rows, errors);
+  verifySeal(monitorKeys, record, rows, sessionId, errors);
 
   const openEvent = rows[0]!;
   const closeEvent = rows[rows.length - 1]!;

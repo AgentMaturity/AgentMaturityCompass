@@ -62,6 +62,26 @@ function verifyComplianceMapsBytes(workspace: string, path: string, body: Buffer
   if (sidecar === null) return { valid: false, signatureExists: false, reason: "compliance maps signature missing", path, sigPath };
   return { ...verifyAuditorSignatureBytes(workspace, "COMPLIANCE_MAPS", body, sidecar), signatureExists: true, path, sigPath };
 }
+export class ComplianceMapsUntrustedError extends Error {
+  readonly code = "COMPLIANCE_MAPS_UNTRUSTED";
+  constructor(readonly path: string, reason: string | null) {
+    super(`COMPLIANCE_MAPS_UNTRUSTED: ${path} ${reason ?? "does not verify"}; fix or remove the file (plain \`amc compliance init\` rewrites the built-in set), nothing was merged or re-signed`);
+    this.name = "ComplianceMapsUntrustedError";
+  }
+}
+/**
+ * The workspace's signed maps, parsed from the very bytes whose signature verified (one read: nothing can change between
+ * the check and the parse), or the built-in defaults when no file exists. A file that is unsigned or does not verify is
+ * refused, never merged and re-signed as trusted (fix3 S11).
+ */
+export function loadVerifiedComplianceMaps(workspace: string): ComplianceMapsFile {
+  const path = complianceMapsPath(workspace);
+  const pair = readComplianceMapsPair(path);
+  if (pair.body === null) return defaultComplianceMapsFile();
+  const verdict = verifyComplianceMapsBytes(workspace, path, pair.body.bytes, pair.sidecar?.bytes ?? null);
+  if (!verdict.valid) throw new ComplianceMapsUntrustedError(path, verdict.reason);
+  return complianceMapsSchema.parse(YAML.parse(pair.body.bytes.toString("utf8")) as unknown);
+}
 export function verifyComplianceMapsSignature(workspace: string, explicitPath?: string): ReturnType<typeof verifyComplianceMapsBytes> {
   const path = explicitPath ? resolve(workspace, explicitPath) : complianceMapsPath(workspace);
   try { const pair = readComplianceMapsPair(path); return verifyComplianceMapsBytes(workspace, path, pair.body?.bytes ?? null, pair.sidecar?.bytes ?? null); }
