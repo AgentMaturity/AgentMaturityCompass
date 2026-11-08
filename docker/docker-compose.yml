@@ -36,11 +36,12 @@ services:
       - AMC_BOOTSTRAP_OWNER_USERNAME_FILE=/run/secrets/amc_owner_username
       - AMC_BOOTSTRAP_OWNER_PASSWORD_FILE=/run/secrets/amc_owner_password
     healthcheck:
-      test: ["CMD", "amc", "studio", "healthcheck"]
+      # HTTP probe of /healthz and /readyz bounded at 8 s in-process; the same script as the Dockerfile HEALTHCHECK (scripts/lib/studio-http-probe.mjs).
+      test: ["CMD", "node", "-e", "const h=['0.0.0.0','::',''].includes(process.env.AMC_BIND||'')?'127.0.0.1':process.env.AMC_BIND;const b='http://'+(h.includes(':')?'['+h+']':h)+':'+(process.env.AMC_STUDIO_PORT||3212);Promise.all(['/healthz','/readyz'].map(p=>fetch(b+p,{signal:AbortSignal.timeout(8000)}))).then(r=>process.exit(r.every(x=>x.ok)?0:1),()=>process.exit(1))"]
       interval: 30s
-      timeout: 5s
+      timeout: 10s
       retries: 5
-      start_period: 20s
+      start_period: 120s
     security_opt:
       - no-new-privileges:true
     # The image owns the 0700 home; the state and checkpoint volumes are its only writable paths besides /data/amc and /tmp.

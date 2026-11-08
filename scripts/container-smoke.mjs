@@ -6,6 +6,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { verifyPackedRun } from "./packed-evidence-verification.mjs";
+import { STUDIO_HTTP_PROBE } from "./lib/studio-http-probe.mjs";
 
 const args = process.argv.slice(2);
 const value = (flag) => { const i = args.indexOf(flag); return i >= 0 ? args[i + 1] : null; };
@@ -69,7 +70,8 @@ async function studio() {
   async function ready() {
     const deadline = Date.now() + 180000;
     while (Date.now() < deadline) {
-      if (docker(["exec", name, "amc", "studio", "healthcheck"], { checked: false, timeout: 15000 }).ok) return;
+      // The image HEALTHCHECK script: it bounds its own requests, so nothing is left running in the container.
+      if (docker(["exec", name, "node", "-e", STUDIO_HTTP_PROBE], { checked: false, timeout: 15000 }).ok) return;
       const state = docker(["inspect", "--format", "{{.State.Running}}", name]).stdout.trim();
       if (state !== "true") throw new Error("Studio exited before readiness");
       await new Promise((done) => setTimeout(done, 1000));

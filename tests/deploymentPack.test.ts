@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 import * as YAML from "yaml";
 import { loadStudioRuntimeConfig } from "../src/config/loadConfig.js";
 import { interpolate, serviceEnv } from "./helpers/composeInterpolate.js";
+import { dockerfileStudioHealthcheck } from "./helpers/deployPackFixtures.js";
 
 const workspace = fileURLToPath(new URL("../", import.meta.url));
 
@@ -21,10 +22,13 @@ const STUDIO_SERVICES = [["deploy/compose/docker-compose.yml", "studio"], ["depl
   ["docker/docker-compose.yml", "amc-studio"]] as const;
 const HTTP_STACKS = ["deploy/compose/docker-compose.yml", "docker/docker-compose.yml"] as const;
 type ComposeService = { tmpfs?: string | string[]; volumes?: (string | { target?: string })[]; ports?: string[];
-  environment?: string[] | Record<string, unknown>; stop_grace_period?: string; restart?: string };
+  environment?: string[] | Record<string, unknown>; stop_grace_period?: string; restart?: string;
+  healthcheck?: { test: string[]; interval?: string; timeout?: string; retries?: number; start_period?: string } };
 const composeServices = (path: string): Record<string, ComposeService> => YAML.parse(read(path)).services;
 /** Container path of a volume entry: `src:dst[:opts]` or the long form's `target`. */
 const volumeTarget = (entry: string | { target?: string }) => typeof entry === "string" ? entry.split(":")[1] ?? entry : entry.target;
+/** Compose/Docker duration (`30s`, `2m`, `1m30s`) in seconds. */
+const seconds = (duration = "") => [...duration.matchAll(/(\d+)(h|m|s)/g)].reduce((total, [, n, unit]) => total + Number(n) * ({ h: 3600, m: 60, s: 1 } as Record<string, number>)[unit!]!, 0);
 
 describe("compose runtime layout (LIVE-DEPLOY-01)", () => {
   it("mounts no volume beneath a tmpfs path (docker-helm 2026-11-07)", () => {
@@ -77,6 +81,28 @@ describe("compose runtime layout (LIVE-DEPLOY-01)", () => {
   });
 });
 
+describe("container healthcheck (LIVE-DEPLOY-03, L-HC)", () => {
+  it("probes Studio over HTTP with a bounded timeout in the image and every compose Studio service", () => {
+    // The CLI probe loaded the whole CLI for two GETs: 42 s under load against a 10 s timeout while /readyz was READY.
+    const dockerfile = read("Dockerfile");
+    const { options, cmd } = dockerfileStudioHealthcheck(dockerfile);
+    expect(cmd?.slice(0, 2)).toEqual(["node", "-e"]);
+    const probe = cmd![2]!;
+    for (const part of ["/healthz", "/readyz", "AbortSignal.timeout("]) expect(probe).toContain(part);
+    expect(dockerfile).not.toContain("\"studio\", \"healthcheck\"");
+    expect(options).toBe("--interval=30s --timeout=10s --start-period=120s --retries=5");
+    for (const [file, name] of STUDIO_SERVICES) {
+      const healthcheck = composeServices(file)[name]!.healthcheck;
+      expect(healthcheck?.test.slice(0, 3), `${file} ${name}`).toEqual(["CMD", "node", "-e"]);
+      expect(healthcheck?.test[3], `${file} ${name}`).toBe(probe);
+      expect(seconds(healthcheck?.timeout), `${file} ${name}`).toBeLessThanOrEqual(10);
+      expect(seconds(healthcheck?.start_period), `${file} ${name}`).toBeGreaterThanOrEqual(60);
+    }
+    // The notary is built from the studio target but runs `amc notary start`; it keeps its own probe.
+    expect(composeServices("deploy/compose/docker-compose.tls.yml")["amc-notary"]!.healthcheck?.test[3]).toContain("http://127.0.0.1:4343/readyz");
+  });
+});
+
 describe("deployment pack assets", () => {
   it("includes docker runtime assets", () => {
     expect(existsSync(resolve(workspace, "Dockerfile"))).toBe(true);
@@ -87,7 +113,6 @@ describe("deployment pack assets", () => {
     expect(dockerfile).toMatch(/FROM (\$\{NODE_IMAGE\}|node:20)/);
     expect(dockerfile).toContain("USER 10001:10001");
     expect(dockerfile).toContain("HEALTHCHECK");
-    expect(dockerfile).toContain("\"studio\", \"healthcheck\"");
   });
 
   it("does not advertise unverified GHCR quickstart images as published", () => {

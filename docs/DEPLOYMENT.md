@@ -87,7 +87,8 @@ Bootstrap creates and signs required configs, initializes transparency + Merkle 
 
 - Liveness: `/healthz`
 - Readiness: `/readyz`
-- CLI probe: `amc studio healthcheck`
+- Container probe: the image's HEALTHCHECK, and the compose Studio services' `healthcheck`, probe `/healthz` and `/readyz` over HTTP with a bounded in-process timeout (8 s per request; interval 30 s, timeout 10 s, start period 120 s, 5 retries). It covers the entrypoint's single-workspace `amc studio start`; a container running `amc host` (multi-workspace mode) is not probed by it.
+- CLI probe for operators: `amc studio healthcheck`
 
 ## Terraform Helm Release
 
