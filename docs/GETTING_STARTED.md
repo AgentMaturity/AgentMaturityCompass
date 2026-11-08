@@ -330,8 +330,8 @@ The Compass Console asks you to sign in. Create the first login, an OWNER:
 amc user init --username <you>    # asks for a password; signs .amc/users.yaml
 ```
 
-It signs with the workspace vault, so it needs the vault passphrase: if it reports `Vault locked`, set
-`AMC_VAULT_PASSPHRASE` in that shell. `amc user init` replaces `.amc/users.yaml`, so on a workspace that already has
+It signs with the workspace vault; after `amc up` the passphrase it remembered is used. If it reports `Vault locked`, set `AMC_VAULT_PASSPHRASE` in that shell and run it again.
+`amc user init` replaces `.amc/users.yaml`, so on a workspace that already has
 logins (for example after `amc init --coding`) use `amc user add` instead. Add more logins with `amc user add --username <name> --role <roles>`
 (see [RBAC](RBAC.md)).
 
