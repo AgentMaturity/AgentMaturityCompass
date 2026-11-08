@@ -211,7 +211,8 @@ async function* decodeOpenai(response: HttpResponse): AsyncIterable<StreamChunk>
       const delta = record(choice.delta);
       if (delta?.audio != null || delta?.function_call != null || text(delta?.reasoning_content).length > 0
           || text(delta?.refusal).length > 0 || (Array.isArray(delta?.annotations) && delta.annotations.length > 0)) {
-        throw protocolFailure("unsupported audio, reasoning, refusal, annotation or legacy function-call output");
+        // Deterministic for this request and model, so not retried: coded as the Responses adapter codes its unsupported output.
+        throw new LlmError(`${OPENAI_ADAPTER_ID} stream: unsupported audio, reasoning, refusal, annotation or legacy function-call output; this adapter decodes text and function calls only`, LLM_FAILURE_CODE.INVALID_REQUEST);
       }
 
       const content = text(delta?.content);

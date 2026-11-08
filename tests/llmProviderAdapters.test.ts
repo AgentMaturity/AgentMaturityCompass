@@ -18,6 +18,8 @@ import {
 } from "../src/llm/index.js";
 import type { LlmAdapter, StreamChunk, ToolSchema } from "../src/llm/index.js";
 import { anthropicTextStream, errorResponse, okStream } from "./helpers/llmStubUpstream.js";
+import { decideRetry } from "../src/agent/requestRetry.js";
+import { resolveRetryPolicy } from "../src/llm/retryPolicy.js";
 
 /**
  * P3.1 stage 3 — the three providers, at the level where they differ.
@@ -158,6 +160,18 @@ describe("the OpenAI adapter synthesizes the block boundaries its wire format la
     // Transport, not an AMC protocol code: a dropped connection is worth
     // retrying and an adapter bug is not, and the two must not share a code.
     expect((error as { code: string }).code).toBe(LLM_FAILURE_CODE.TRANSPORT);
+  });
+});
+
+describe("the OpenAI Chat decoder's refusals are deterministic, so they are not retried", () => {
+  // Opus fix: a reasoning model behind a compat route (xai grok-3-mini, a local reasoning model) streams reasoning_content
+  // on every attempt; coded TRANSPORT it was retried five times, each a billed request. The Responses adapter already codes
+  // its unsupported output INVALID_REQUEST. Mutation: code it TRANSPORT again → the code and give-up assertions fail.
+  test.each([{ reasoning_content: "thinking" }, { refusal: "no" }, { audio: { id: "a" } }])("%j is refused as INVALID_REQUEST and gives up at once", async (delta) => {
+    const failure = await decode(openaiAdapter, openaiFrames([{ choices: [{ index: 0, delta }] }])).then(() => null, (error: unknown) => error);
+    expect(isLlmError(failure) && failure.code).toBe(LLM_FAILURE_CODE.INVALID_REQUEST);
+    if (!isLlmError(failure)) throw new Error("expected an LlmError");
+    expect(decideRetry(resolveRetryPolicy(undefined, "t"), failure.failure, 1, () => 0.5).decision).toBe("give-up");
   });
 });
 
