@@ -29,8 +29,10 @@ const RETENTION_VERSIONS: ReadonlyMap<string, number> = new Map([
 
 /**
  * The adapters whose SERVER honours the retention keys. An OpenAI-compatible or Azure route shares the openai-chat
- * encoder bytes, so admission is keyed by adapter id as well: a third-party server must never receive
- * `prompt_cache_key`/`prompt_cache_retention` under a signed header that claims a retention it may ignore.
+ * encoder bytes, so admission is keyed by adapter id as well: the named compat and Azure routes never receive
+ * `prompt_cache_key`/`prompt_cache_retention` under a signed header that claims a retention they may ignore. The
+ * `openai` route pointed at a foreign --base-url with an explicit --credential is the operator's claim that the origin
+ * is OpenAI's wire; it keeps OpenAI's adapter id and so its retention (the same off-origin limit as its catalog identity).
  */
 const RETENTION_ADAPTERS: ReadonlySet<string> = new Set(["anthropic-messages", "openai-chat", "openai-responses"]);
 

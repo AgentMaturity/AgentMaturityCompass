@@ -68,8 +68,10 @@ export const OPENAI_COMPATIBLE_ROUTES: readonly OpenaiCompatibleRoute[] = Object
   compat("lmstudio", "LM Studio (local)", "http://127.0.0.1:1234", null),
   compat("vllm", "vLLM (local)", "http://127.0.0.1:8000", null),
   compat("llamacpp", "llama.cpp server (local)", "http://127.0.0.1:9931", null),
+  // No default origin, so no default credential reference either: a default is admitted only against the provider's own
+  // documented origin, and Azure resource hosts differ. Both --base-url and --credential are explicit.
   Object.freeze({ providerId: "azure-openai", displayName: "Azure OpenAI (v1 surface)", defaultBaseUrl: null,
-    defaultCredentialRef: "AZURE_OPENAI_API_KEY", adapter: azureOpenaiAdapter })
+    defaultCredentialRef: null, adapter: azureOpenaiAdapter })
 ]);
 
 export function openaiCompatibleRouteFor(providerId: string): OpenaiCompatibleRoute | null {

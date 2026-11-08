@@ -255,7 +255,7 @@ describe("native DeepSeek actual public source surfaces (authored, unexecuted)",
       "--credential", "FIXTURE_DEEPSEEK_REF", "--base-url", "https://deepseek.invalid",
       ...("thinking" in thinkingOptions ? ["--thinking", thinkingOptions.thinking] : []),
       ...("reasoningEffort" in thinkingOptions ? ["--reasoning-effort", thinkingOptions.reasoningEffort] : []),
-      "--max-tokens", "64"]);
+      "--retry-max-provider-delay", "10000", "--max-tokens", "64"]);
     expect(options).toMatchObject({ cwd: realpathSync(path), shell: false, stdio: "pipe" });
     expect(client.agentInfo.name).toBe("agent-maturity-compass");
     await client.close(); clients.delete(client);

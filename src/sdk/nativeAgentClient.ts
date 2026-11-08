@@ -93,6 +93,7 @@ export type AMCNativeMcpStatus = NativeMcpStatus;
   readonly cacheRetention?: "short" | "long";
   readonly maxRetries?: number;
   readonly retryMaxDelayMs?: number;
+  /** Ceiling on a provider-requested wait. Defaults to the local ceiling here (not the CLI's 60 s): this client's prompt deadline is `timeoutMs`, and the child cannot see it. */ readonly retryMaxProviderDelayMs?: number;
   readonly maxSteps?: number;
   /** Defaults to the CLI shipped in this same installed package. Never resolves another AMC from PATH. */
   readonly command?: readonly [string, ...string[]];
@@ -289,7 +290,7 @@ export class AMCNativeClient {
       ["--credentials-home", options.credentialsHome], ["--credentials-file", options.credentialsFile],
       ["--credentials-mode", options.credentialsMode],
       ["--thinking", options.thinking], ["--reasoning-effort", options.reasoningEffort], ["--thinking-budget", options.thinkingBudget],
-      ["--cache-retention", options.cacheRetention], ["--max-retries", options.maxRetries], ["--retry-max-delay", options.retryMaxDelayMs],
+      ["--cache-retention", options.cacheRetention], ["--max-retries", options.maxRetries], ["--retry-max-delay", options.retryMaxDelayMs], ["--retry-max-provider-delay", options.retryMaxProviderDelayMs ?? options.retryMaxDelayMs ?? 10_000],
       ["--max-tokens", options.maxTokens], ["--max-steps", options.maxSteps]] as const) {
       if (value !== undefined) args.push(flag, String(value));
     }

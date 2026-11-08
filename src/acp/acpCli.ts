@@ -67,7 +67,8 @@ export function registerAcpCommands(program: Command): void {
     .option("--thinking-budget <tokens>", "Anthropic budget_tokens (>= 1024, below --max-tokens) or Gemini thinkingBudget")
     .option("--cache-retention <mode>", "short or long prompt-cache retention on anthropic, openai and openai-responses routes")
     .option("--max-retries <n>", "Model-request retries after the first attempt (default 5; 0 gives up on the first failure)")
-    .option("--retry-max-delay <ms>", "Local backoff ceiling in milliseconds (default 10000)")
+    .option("--retry-max-delay <ms>", "Local backoff ceiling in milliseconds (500 to 2147483647, default 10000)")
+    .option("--retry-max-provider-delay <ms>", "Ceiling on a provider-requested wait, default 60000; never below --retry-max-delay")
     .option("--max-steps <n>", "Positive model-step bound per turn (default 8, stub 2)")
     .option("--context-window <tokens>", "Override the reviewed model context window for automatic compaction")
     .option("--compact-threshold <fraction>", "Use ratio trigger instead of the catalog token reserve (0.5-0.95; requires --context-window)")
@@ -75,7 +76,7 @@ export function registerAcpCommands(program: Command): void {
     .option("--no-auto-compact", "Turn automatic compaction off (on by default for a reviewed model context window)")
     .option("--agent-id <id>", "Agent identity recorded in the ledger", "default")
     .option("--system-prompt <text>", "System prompt for each session", "You are a careful assistant.")
-    .action((opts: Pick<RunOptions, "thinking" | "reasoningEffort" | "thinkingBudget" | "cacheRetention" | "maxRetries" | "retryMaxDelay" | "maxSteps" | "contextWindow" | "compactThreshold" | "autoSummary" | "autoCompact"> & {
+    .action((opts: Pick<RunOptions, "thinking" | "reasoningEffort" | "thinkingBudget" | "cacheRetention" | "maxRetries" | "retryMaxDelay" | "retryMaxProviderDelay" | "maxSteps" | "contextWindow" | "compactThreshold" | "autoSummary" | "autoCompact"> & {
       provider: string;
       model?: string;
       baseUrl?: string;
@@ -135,6 +136,7 @@ export function registerAcpCommands(program: Command): void {
           ...(opts.cacheRetention === undefined ? {} : { cacheRetention: opts.cacheRetention }),
           ...(opts.maxRetries === undefined ? {} : { maxRetries: opts.maxRetries }),
           ...(opts.retryMaxDelay === undefined ? {} : { retryMaxDelay: opts.retryMaxDelay }),
+          ...(opts.retryMaxProviderDelay === undefined ? {} : { retryMaxProviderDelay: opts.retryMaxProviderDelay }),
           ...(opts.maxSteps === undefined ? {} : { maxSteps: Number(opts.maxSteps) }),
           ...(opts.credentialsHome === undefined ? {} : { credentialsHome: opts.credentialsHome }),
           ...(opts.credentialsFile === undefined ? {} : { credentialsFile: opts.credentialsFile }),

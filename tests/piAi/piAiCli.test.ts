@@ -3,6 +3,8 @@
  * runs a verifiable turn against a local fixture server, and lists pi routes apart from the native default.
  */
 import { chmodSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { createServer } from "node:http";
+import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Command } from "commander";
@@ -66,6 +68,33 @@ describe("amc agent-loop run with a pi-ai route (P1-38)", () => {
     ] as const) {
       const cli = programWith();
       await cli.run(["agent-loop", "run", "hi", ...argv, "--credentials-home", home]);
+      expect(cli.failures).toEqual([1]);
+      expect(cli.errors.join("\n")).toContain(expected);
+    }
+  });
+
+  // Skeptic fix (SH-PROVIDERS): the route flags every native route takes reach a pi route too, instead of being ignored.
+  // Mutation check: drop `routeExtras` from piAiRouteSelection → the 429 fixture receives 6 requests and the refusals vanish.
+  test("route flags apply to a pi route: --max-retries 0 stops after one 429; retention and out-of-range retry flags are refused before any session", async () => {
+    const hits: string[] = [];
+    const server = createServer((request, response) => { hits.push(request.url ?? ""); response.writeHead(429, { "retry-after": "1", "content-type": "application/json" }).end("{}"); });
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const { port } = server.address() as AddressInfo;
+    process.chdir(dir);
+    try {
+      const cli = programWith();
+      await cli.run(["agent-loop", "run", "hi", "--provider", "pi-ai:groq", "--model", PI_FIXTURE_MODELS.groq, "--base-url", `http://127.0.0.1:${port}/openai/v1`,
+        "--credentials-home", home, "--max-tokens", "64", "--max-retries", "0", "--json"]);
+      expect(hits).toEqual(["/openai/v1/chat/completions"]);
+      expect(cli.failures).toEqual([1]);
+    } finally { await new Promise<void>((resolve) => server.close(() => resolve())); }
+    for (const [flags, expected] of [
+      [["--cache-retention", "long"], "--cache-retention is not admitted for provider pi-ai:groq"],
+      [["--retry-max-delay", "100"], "--retry-max-delay must be an integer of milliseconds from 500"],
+      [["--max-retries", "-1"], "--max-retries must be an integer of 0 or more"]
+    ] as const) {
+      const cli = programWith();
+      await cli.run(["agent-loop", "run", "hi", "--provider", "pi-ai:groq", "--model", PI_FIXTURE_MODELS.groq, "--credentials-home", home, ...flags]);
       expect(cli.failures).toEqual([1]);
       expect(cli.errors.join("\n")).toContain(expected);
     }

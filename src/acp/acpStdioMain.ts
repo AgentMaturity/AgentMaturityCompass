@@ -135,6 +135,7 @@ export interface AcpStdioInit {
   readonly cacheRetention?: string;
   readonly maxRetries?: string;
   readonly retryMaxDelay?: string;
+  readonly retryMaxProviderDelay?: string;
   readonly maxSteps?: number;
   /** Operator-declared automatic compaction, fixed at startup like the step bound. */
   readonly compaction?: Partial<CompactionConfig>;

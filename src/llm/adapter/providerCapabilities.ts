@@ -45,7 +45,9 @@ export const OPENAI_CHAT_CAPABILITIES = contract("openai-chat-completions", [...
   { usage: "reported-required", cache: "automatic", thinking: "unsupported", toolErrorRepresentation: "amc-text-envelope-v1" });
 /**
  * SH-PROVIDERS-01: a third-party server speaking the Chat Completions dialect. Only what the shared decoder proves on
- * any such server is supported; images, cache counters and reasoning stay unknown until a route-specific test proves them.
+ * any such server is supported; image input and the cache counters stay unknown until a route-specific test proves them;
+ * thinking, audio, image output, video input, prompt-cache control and the tool-result error flag are unsupported
+ * (the shared decoder refuses or never emits them).
  */
 export const OPENAI_COMPATIBLE_CAPABILITIES = provenContract("openai-chat-completions",
   { "text-input": "supported", "text-output": "supported", "tool-calls": "supported", "tool-replay": "supported", usage: "supported",

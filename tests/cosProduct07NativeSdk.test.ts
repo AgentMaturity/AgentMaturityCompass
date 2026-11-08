@@ -291,9 +291,10 @@ describe("P07 controlled native lifecycle and transport", () => {
         ...(allowUnconfinedShell === undefined ? {} : { allowUnconfinedShell }) });
     }
     expect(processMock.spawn.mock.calls.map(([executable, argv]) => [executable, argv])).toEqual([
-      ["fixture-node", ["fixture-cli.js", "acp", "--provider", "stub", "--unsafe-unconfined-shell"]],
-      ["fixture-node", ["fixture-cli.js", "acp", "--provider", "stub"]],
-      ["fixture-node", ["fixture-cli.js", "acp", "--provider", "stub"]]
+      // The SDK always forwards its provider-wait ceiling (SH-PROVIDERS skeptic fix): its prompt deadline is invisible to the child.
+      ["fixture-node", ["fixture-cli.js", "acp", "--provider", "stub", "--retry-max-provider-delay", "10000", "--unsafe-unconfined-shell"]],
+      ["fixture-node", ["fixture-cli.js", "acp", "--provider", "stub", "--retry-max-provider-delay", "10000"]],
+      ["fixture-node", ["fixture-cli.js", "acp", "--provider", "stub", "--retry-max-provider-delay", "10000"]]
     ]);
   });
   test("several reviewed MCP configs reach amc acp in order, each with its own pin (WP21c)", async () => {
@@ -301,9 +302,9 @@ describe("P07 controlled native lifecycle and transport", () => {
       mcpConfig: ["first.json", "second.json"], mcpConfigSha256: ["a".repeat(64), "b".repeat(64)] });
     await connect(new ControlledPeer(), { command: ["fixture-node", "fixture-cli.js"], mcpConfig: "only.json" });
     expect(processMock.spawn.mock.calls.map(([, argv]) => argv)).toEqual([
-      ["fixture-cli.js", "acp", "--provider", "stub", "--mcp-config", "first.json", "--mcp-config-sha256", "a".repeat(64),
+      ["fixture-cli.js", "acp", "--provider", "stub", "--retry-max-provider-delay", "10000", "--mcp-config", "first.json", "--mcp-config-sha256", "a".repeat(64),
         "--mcp-config", "second.json", "--mcp-config-sha256", "b".repeat(64)],
-      ["fixture-cli.js", "acp", "--provider", "stub", "--mcp-config", "only.json"]
+      ["fixture-cli.js", "acp", "--provider", "stub", "--retry-max-provider-delay", "10000", "--mcp-config", "only.json"]
     ]);
   });
   test.each([

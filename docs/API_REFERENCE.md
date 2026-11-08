@@ -1613,6 +1613,7 @@ Serve the Agent Client Protocol on stdio (for editors; prints nothing but frames
 | `--cache-retention <mode>` | - |
 | `--max-retries <n>` | - |
 | `--retry-max-delay <ms>` | - |
+| `--retry-max-provider-delay <ms>` | - |
 | `--max-steps <n>` | - |
 | `--context-window <tokens>` | - |
 | `--compact-threshold <fraction>` | - |
@@ -1882,6 +1883,7 @@ Run one agent turn and report what the signed log recorded
 | `--cache-retention <mode>` | - |
 | `--max-retries <n>` | - |
 | `--retry-max-delay <ms>` | - |
+| `--retry-max-provider-delay <ms>` | - |
 | `--max-steps <n>` | - |
 | `--context-window <tokens>` | - |
 | `--compact-threshold <fraction>` | - |

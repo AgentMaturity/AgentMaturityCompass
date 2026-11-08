@@ -101,7 +101,10 @@ describe("SH-PROVIDERS-04 provider-driven retry delays", () => {
     // --max-retries 0 from the command line becomes a route policy that gives up on the first failure.
     expect(nativeRouteFor("stub", { maxRetries: "0", retryMaxDelay: "2000" }, undefined).retry).toEqual({ mode: "normal", maxRetries: 0, backoff: { maxDelayMs: 2000 } });
     expect(() => nativeRouteFor("stub", { maxRetries: "-1" }, undefined)).toThrow(/--max-retries/);
-    expect(() => nativeRouteFor("stub", { retryMaxDelay: "0" }, undefined)).toThrow(/--retry-max-delay/);
+    // Skeptic fix: the bounds resolveRetryPolicy enforces are checked at the flag, so the refusal names the flag rather
+    // than a config path (or, on run, a swallowed composition error).
+    for (const raw of ["0", "100", "499", "2147483648", "1.5"]) expect(() => nativeRouteFor("stub", { retryMaxDelay: raw }, undefined)).toThrow(/--retry-max-delay must be an integer of milliseconds from 500/);
+    expect(nativeRouteFor("stub", { retryMaxDelay: "500" }, undefined).retry).toEqual({ mode: "normal", backoff: { maxDelayMs: 500 } });
     const none = loopHarness({ scripts: [textStep("never")], transport, retry: { mode: "normal", maxRetries: 0 }, retryRuntime: recordingRetryRuntime() });
     open.push(none);
     seen = 0;
@@ -111,5 +114,20 @@ describe("SH-PROVIDERS-04 provider-driven retry delays", () => {
     const rows = none.events();
     expect(rows.filter((event) => event.event_type === "request/header")).toHaveLength(1);
     expect(readLoopRetryMeta(rows.find((event) => event.event_type === "loop/retry")!.meta_json)).toMatchObject({ decision: "give-up", attemptsRemaining: 0 });
+  });
+
+  // Skeptic fix: a surface with a turn deadline (the SDK's 120 s prompt timeout, Studio through it) bounds provider waits
+  // itself. Mutation check: let --retry-max-provider-delay below the local ceiling through → the refusal assertion fails.
+  test("(6) --retry-max-provider-delay sets the provider ceiling, never below the local one, and a 10 s ceiling clamps a Retry-After of 30", () => {
+    expect(nativeRouteFor("stub", { retryMaxProviderDelay: "10000" }, undefined).retry).toEqual({ mode: "normal", backoff: { maxProviderDelayMs: 10_000 } });
+    expect(nativeRouteFor("stub", { retryMaxDelay: "20000", retryMaxProviderDelay: "20000" }, undefined).retry)
+      .toEqual({ mode: "normal", backoff: { maxDelayMs: 20_000, maxProviderDelayMs: 20_000 } });
+    expect(() => nativeRouteFor("stub", { retryMaxProviderDelay: "9999" }, undefined)).toThrow(/--retry-max-provider-delay must be an integer of milliseconds from the local ceiling \(10000, --retry-max-delay\)/);
+    expect(() => nativeRouteFor("stub", { retryMaxDelay: "20000", retryMaxProviderDelay: "15000" }, undefined)).toThrow(/local ceiling \(20000/);
+    expect(() => nativeRouteFor("stub", { retryMaxProviderDelay: "2147483648" }, undefined)).toThrow(/--retry-max-provider-delay/);
+    const policy = resolveRetryPolicy(nativeRouteFor("stub", { retryMaxProviderDelay: "10000" }, undefined).retry, "t");
+    const clamped = decideRetry(policy, { message: "x", code: "RATE_LIMIT", providerRetryAfterMs: 30_000, providerDelayHeader: "retry-after" }, 1, () => 0.5);
+    expect(clamped).toMatchObject({ decision: "retry", delayMs: 10_000, delaySource: "provider" });
+    expect(clamped.reason).toMatch(/asked for 30000ms \(retry-after\), clamped to the route's 10000ms provider ceiling/);
   });
 });

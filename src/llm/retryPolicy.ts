@@ -36,8 +36,8 @@ import { LLM_FAILURE_CODE } from "./llmFailure.js";
 export const MAX_RETRY_DELAY_MS = 2_147_483_647;
 
 const DEFAULT_MAX_RETRIES = 5;
-const DEFAULT_INITIAL_DELAY_MS = 500;
-const DEFAULT_MAX_DELAY_MS = 10_000;
+export const DEFAULT_INITIAL_DELAY_MS = 500;
+export const DEFAULT_MAX_DELAY_MS = 10_000;
 /** SH-PROVIDERS-04: a provider's own `Retry-After` may exceed the local backoff ceiling, up to this one. */
 const DEFAULT_MAX_PROVIDER_DELAY_MS = 60_000;
 const DEFAULT_JITTER_RATIO = 0.1;

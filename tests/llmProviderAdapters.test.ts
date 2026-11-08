@@ -189,6 +189,25 @@ describe("the Anthropic adapter refuses what it cannot describe honestly", () =>
     });
   });
 
+  test("a redacted_thinking block opens and closes as a thinking block with no text; its encrypted data is not surfaced (skeptic fix)", async () => {
+    const frame = (event: string, data: Record<string, unknown>) => ({ event, data: JSON.stringify({ type: event, ...data }) });
+    const chunks = await decode(anthropicAdapter, [
+      frame("message_start", { message: { usage: { input_tokens: 4, output_tokens: 0 } } }),
+      frame("content_block_start", { index: 0, content_block: { type: "redacted_thinking", data: "EqQBCgIYAhIM" } }),
+      frame("content_block_stop", { index: 0 }),
+      frame("content_block_start", { index: 1, content_block: { type: "text", text: "" } }),
+      frame("content_block_delta", { index: 1, delta: { type: "text_delta", text: "answer" } }),
+      frame("content_block_stop", { index: 1 }),
+      frame("message_delta", { delta: { stop_reason: "end_turn" }, usage: { output_tokens: 3 } }),
+      frame("message_stop", {})
+    ]);
+    expect(chunks.slice(0, 2)).toEqual([{ type: "block-start", index: 0, blockKind: "thinking" }, { type: "block-end", index: 0, block: { kind: "thinking", text: "" } }]);
+    expect(JSON.stringify(chunks)).not.toContain("EqQBCgIYAhIM");
+    expect(chunks.at(-1)).toMatchObject({ type: "finish", reason: { kind: "stop" } });
+    const error = await decode(anthropicAdapter, [frame("content_block_start", { index: 0, content_block: { type: "server_tool_use", id: "x" } })]).catch((caught: unknown) => caught);
+    expect((error as Error).message).toContain('unsupported content block type "server_tool_use"');
+  });
+
   test("NEGATIVE: a tool_use block opened without a call id is refused", async () => {
     const error = await decode(anthropicAdapter, [
       {

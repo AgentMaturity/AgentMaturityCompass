@@ -31,6 +31,9 @@ describe("SH-PROVIDERS-01 native OpenAI-compatible routes", () => {
       expect(route.baseUrl.startsWith("http://127.0.0.1:")).toBe(true);
     }
     expect(() => nativeRouteFor("azure-openai", {}, "m")).toThrow(/--base-url is required/);
+    // Skeptic fix: no default origin means no default credential reference; the inventory says so instead of carrying one that can never apply.
+    expect(OPENAI_COMPATIBLE_ROUTES.find((r) => r.providerId === "azure-openai")!.defaultCredentialRef).toBeNull();
+    expect(() => nativeRouteFor("azure-openai", { baseUrl: "https://res.openai.azure.com/openai" }, "m")).toThrow(/--credential is required for provider azure-openai/);
     const azure = nativeRouteFor("azure-openai", { baseUrl: "https://res.openai.azure.com/openai", credential: "AZ" }, "m");
     expect(azure.adapter.id).toBe("azure-openai-chat");
     expect(() => nativeRouteFor("perplexity", {}, "m")).toThrow(/unknown provider/);

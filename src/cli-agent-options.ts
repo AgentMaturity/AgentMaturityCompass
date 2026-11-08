@@ -21,7 +21,7 @@ import { ollamaParams } from "./llm/providers/ollamaContract.js";
 import { credentialOptionalOrigin, OPENAI_COMPATIBLE_ROUTES, openaiCompatibleRouteFor } from "./llm/providers/openaiCompatibleRoutes.js";
 import { reasoningParamsFor } from "./llm/reasoningParams.js";
 import { isCacheRetention } from "./llm/request/cacheRetentionEncoders.js";
-import type { RetryPolicyConfig } from "./llm/retryPolicy.js";
+import { DEFAULT_INITIAL_DELAY_MS, DEFAULT_MAX_DELAY_MS, MAX_RETRY_DELAY_MS, type RetryPolicyConfig } from "./llm/retryPolicy.js";
 import { credentialRef } from "./credentials/credentialRef.js";
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL, stubProviderAdapter, stubProviderRoute } from "./agent/stubProvider.js";
 import type { CompactionConfig, LoopNotification } from "./agent/loopTypes.js";
@@ -85,6 +85,8 @@ export interface RunOptions {
   /** SH-PROVIDERS-04: route retry policy from the command line; 0 retries means give up on the first failure. */
   maxRetries?: string;
   retryMaxDelay?: string;
+  /** Ceiling on a provider-requested wait (Retry-After, reset headers); a surface with a turn deadline sets it to fit. */
+  retryMaxProviderDelay?: string;
   maxSteps?: string;
   contextWindow?: string;
   compactThreshold?: string;
@@ -344,15 +346,27 @@ function nativeAdapterFor(providerId: string): LlmAdapter {
 }
 
 /** Route-level options every native route accepts from the command line: retry policy and cache retention. */
-export type RouteOptions = Pick<RunOptions, "baseUrl" | "credential" | "cacheRetention" | "maxRetries" | "retryMaxDelay">;
+export type RouteOptions = Pick<RunOptions, "baseUrl" | "credential" | "cacheRetention" | "maxRetries" | "retryMaxDelay" | "retryMaxProviderDelay">;
+
+/** A flag's integer, or a refusal naming the flag; the bounds are the ones resolveRetryPolicy enforces, checked here so the operator reads the flag's name, not a config path. */
+function flagInteger(flag: string, raw: string | undefined, min: number, max: number, bound: string): number | undefined {
+  if (raw === undefined) return undefined;
+  const value = Number(raw);
+  if (!Number.isSafeInteger(value) || value < min || value > max) throw new Error(`${flag} must be an integer ${bound}.`);
+  return value;
+}
 
 function retryFromFlags(options: RouteOptions): RetryPolicyConfig | undefined {
-  if (options.maxRetries === undefined && options.retryMaxDelay === undefined) return undefined;
-  const maxRetries = options.maxRetries === undefined ? undefined : Number(options.maxRetries);
-  const maxDelayMs = options.retryMaxDelay === undefined ? undefined : Number(options.retryMaxDelay);
-  if (maxRetries !== undefined && (!Number.isSafeInteger(maxRetries) || maxRetries < 0)) throw new Error("--max-retries must be a non-negative integer.");
-  if (maxDelayMs !== undefined && (!Number.isSafeInteger(maxDelayMs) || maxDelayMs < 1)) throw new Error("--retry-max-delay must be a positive integer of milliseconds.");
-  return { mode: "normal", ...(maxRetries === undefined ? {} : { maxRetries }), ...(maxDelayMs === undefined ? {} : { backoff: { maxDelayMs } }) };
+  if (options.maxRetries === undefined && options.retryMaxDelay === undefined && options.retryMaxProviderDelay === undefined) return undefined;
+  const maxRetries = flagInteger("--max-retries", options.maxRetries, 0, Number.MAX_SAFE_INTEGER, "of 0 or more");
+  const maxDelayMs = flagInteger("--retry-max-delay", options.retryMaxDelay, DEFAULT_INITIAL_DELAY_MS, MAX_RETRY_DELAY_MS,
+    `of milliseconds from ${DEFAULT_INITIAL_DELAY_MS} (the initial delay) through ${MAX_RETRY_DELAY_MS}`);
+  // Never below the local ceiling, which is the default when --retry-max-delay is absent.
+  const localCeiling = maxDelayMs ?? DEFAULT_MAX_DELAY_MS;
+  const maxProviderDelayMs = flagInteger("--retry-max-provider-delay", options.retryMaxProviderDelay, localCeiling, MAX_RETRY_DELAY_MS,
+    `of milliseconds from the local ceiling (${localCeiling}, --retry-max-delay) through ${MAX_RETRY_DELAY_MS}`);
+  const backoff = { ...(maxDelayMs === undefined ? {} : { maxDelayMs }), ...(maxProviderDelayMs === undefined ? {} : { maxProviderDelayMs }) };
+  return { mode: "normal", ...(maxRetries === undefined ? {} : { maxRetries }), ...(Object.keys(backoff).length === 0 ? {} : { backoff }) };
 }
 
 /** Providers whose adapter has a reviewed retention wire (the registry enforces the same set by adapter id). */
@@ -507,8 +521,8 @@ export function registerNativeProviderCommands(program: Command, io: AgentLoopCl
   }
   const help = "\nNative provider routes: " + NATIVE_ADAPTERS.map(entry => entry.providerId).join(", ")
     + ".\nUse amc agent-loop providers --json for adapter contracts, not model availability. "
-    + "Ollama, lmstudio, vllm and llamacpp default to a loopback origin without a credential; azure-openai needs --base-url https://<resource>.openai.azure.com/openai. "
-    + "See docs/NATIVE_PROVIDERS.md for origins, reasoning flags, --cache-retention and --max-retries.";
+    + "Ollama, lmstudio, vllm and llamacpp default to a loopback origin without a credential; azure-openai needs --base-url https://<resource>.openai.azure.com/openai and --credential (no default reference). "
+    + "See docs/NATIVE_PROVIDERS.md for origins, reasoning flags, --cache-retention, --max-retries and the retry ceilings.";
   agentLoop.commands.find(command => command.name() === "run")?.addHelpText("after", help + PI_AI_ROUTES_HELP);
   acp.addHelpText("after", help);
 }
@@ -523,12 +537,16 @@ export const PI_AI_ROUTES_HELP = "\nThird-party library routes (agent-loop run o
  * A pi-ai route and the encoder registry its runtime must use; undefined for any other provider, null after a refusal
  * was reported. The pi modules, and the optional peer they load, are imported only here and only for a pi route.
  */
-export async function piAiRouteSelection(io: AgentLoopCliIo, providerId: string, options: Pick<RunOptions, "baseUrl" | "credential">,
+export async function piAiRouteSelection(io: AgentLoopCliIo, providerId: string, options: RouteOptions,
   model: string | undefined): Promise<Awaited<ReturnType<typeof import("./llm/providers/piAi/piAiAdapter.js").piAiRouteFor>> | null | undefined> {
   if (!providerId.startsWith(PI_AI_ROUTE_PREFIX)) return undefined;
   try {
+    // The same route flags every native route takes, refused or applied here before the pi modules load: a pi route
+    // has no retention wire (its encoder pins retention to none), and its retry policy is the operator's, not the default.
+    const extras = routeExtras(providerId, options);
     const { piAiRouteFor } = await import("./llm/providers/piAi/piAiAdapter.js");
-    return await piAiRouteFor(providerId, options, model);
+    const selection = await piAiRouteFor(providerId, options, model);
+    return Object.freeze({ ...selection, route: { ...selection.route, ...extras } });
   } catch (error) {
     io.error(chalk.red(error instanceof Error ? error.message : "pi-ai route selection failed."));
     io.fail();
