@@ -222,13 +222,16 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       // score or level is computed (packSelfAssessment.ts), and the self-assessment reads incomplete.
       const responses: Record<string, number> = {};
 
-      if (!opts.baseline && process.stdin.isTTY) {
-        // Interactive assessment
+      const interactive = !opts.baseline && process.stdin.isTTY;
+      if (interactive) {
+        // Interactive assessment. Under --json, stdout carries only the JSON (LIVE-UX-10): the question lines and the
+        // prompts go to stderr. inquirer takes its output stream from createPromptModule, not from prompt().
         const inq = await import("inquirer");
+        const ask = opts.json ? inq.default.createPromptModule({ output: process.stderr }) : inq.default.prompt;
         for (const q of pack.questions) {
           // Full texts: the question prints once above the prompt, so only the levels redraw as the cursor moves.
-          console.log(`\n  ${chalk.cyan(q.id)} [${q.dimension}]: ${q.text}`);
-          const { level } = await inq.default.prompt([{
+          (opts.json ? console.error : console.log)(`\n  ${chalk.cyan(q.id)} [${q.dimension}]: ${q.text}`);
+          const { level } = await ask([{
             type: "select",
             name: "level",
             message: `Level for ${q.id}`,
@@ -274,6 +277,10 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
         for (const gap of result.complianceGaps.slice(0, 5)) {
           console.log(`    • ${gap}`);
         }
+      }
+      if (interactive) {
+        console.log(chalk.gray(`\n  This self-assessment is shown only; it is not stored in the workspace. To keep it: amc domain pack run --pack ${pack.id} `
+          + `--json > ${pack.id}-self-assessment.json (the questions are asked again, on the terminal; the file gets only the result).`));
       }
       console.log("");
     });
