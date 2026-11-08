@@ -1664,7 +1664,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           payload: {
             userId: authUser.user.userId,
             username: authUser.user.username,
-            roles: authUser.user.roles
+            roles: authUser.user.roles,
+            ...(authUser.rehash ? { reason: authUser.rehash } : {}) // LIVE-VAULT-13: an older verifier's re-hash outcome
           }
         }, () => { if (!verifyTrackedSessionToken({ workspace: options.workspace, token: session.token }).ok) throw new Error("issued login session is no longer current"); });
         json(res, 200, {
