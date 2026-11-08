@@ -625,6 +625,9 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext, mi
     heartbeatEffect: (effectId: string): unknown => db.prepare("UPDATE a4_effects SET heartbeat_ts = ? WHERE effect_id = ? AND state = 'running'").run(Date.now(), effectId),
     verifyIncremental,
     transition: (projectId: string, actor: A4Actor, build: Build, options: A4TransitionOptions = {}): A4TransitionResult => commit(projectId, actor, build, options, null),
+    /** The replay row of a mutation that records no transition (the engine-request decide route), as dedupeRequest keeps it. */
+    rememberRequest: (request: A4RequestKey, projectId: string, response: Record<string, unknown>): A4TransitionResult | null =>
+      db.transaction(() => dedupeRequest(request, projectId, false, response, Date.now()))(),
     transitionAsync: (projectId: string, actor: A4Actor, build: Build, options: A4TransitionOptions, beforeSign: () => void) => commitAsync(projectId, actor, build, options, beforeSign),
     readRevision: (projectId: string, revisionNo: number) => {
       const row = namedSideRows(projectId, "a4_revisions").find((candidate) => candidate.revision_no === revisionNo);
