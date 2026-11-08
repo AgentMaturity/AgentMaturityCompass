@@ -9,7 +9,7 @@ import {
   nativeCsrfTokenForSession, NativeAdmissionError
 } from "../studio/nativeAdmission.js";
 import { ensureAdminToken } from "../studio/studioState.js";
-import { createClientCap, makeRateLimiter } from "../studio/rateLimiter.js";
+import { createStreamCap, makeRateLimiter } from "../studio/rateLimiter.js";
 import { admitLoginAttempt, createLoginThrottle } from "../studio/loginThrottle.js";
 import { ipAllowedByCidrs, LOOPBACK_CIDRS, requestUsesHttps, resolveClientAddress, withLoopbackCidrs } from "../studio/clientAddress.js";
 import { allowedHostnamesFrom, hostAllowed } from "../studio/hostAllow.js";
@@ -637,7 +637,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
   const workspaceApis = new WorkspaceRuntimeRegistry<WorkspaceApiRuntime>();
   let shutdown: Promise<void> | undefined;
   const hostEvents = new HostSseHub();
-  const hostStreams = createClientCap(64); // LIVE-RUNTIME-13
+  const hostStreams = createStreamCap(64, 4); // LIVE-RUNTIME-13, SR-8: per hub and host user; host admins always admitted
   const hostLoginLimiter = makeRateLimiter(20, 60_000);
   const workspaceLoginLimiter = makeRateLimiter(20, 60_000);
   const loginThrottle = createLoginThrottle(); // host accounts: one throttle for the host and workspace login routes
@@ -740,7 +740,8 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           writeControlError(res, auth.status, auth.error ?? "unauthorized");
           return;
         }
-        if (!hostStreams.acquire()) { writeControlError(res, 503, "too many event streams"); return; }
+        const release = hostStreams.admit(`host-user:${auth.userId ?? auth.username ?? clientIp}`, () => { hostEvents.remove(res); res.destroy(); }, auth.isHostAdmin === true);
+        if (!release) { writeControlError(res, 503, "too many event streams"); return; }
         res.writeHead(200, {
           "content-type": "text/event-stream",
           "cache-control": "no-cache",
@@ -748,7 +749,8 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         });
         res.write(`data: ${JSON.stringify({ type: "PORTFOLIO_UPDATED", ts: Date.now(), version: 1 })}\n\n`);
         hostEvents.add(res);
-        req.on("close", () => { hostEvents.remove(res); hostStreams.release(); });
+        req.on("close", () => { hostEvents.remove(res); release(); });
+        res.once("close", release);
         return;
       }
 

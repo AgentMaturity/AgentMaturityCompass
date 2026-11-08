@@ -70,11 +70,38 @@ export function setRateLimitHeaders(res: ServerResponse, decision: RateLimitDeci
   }
 }
 
-/** A count of open long-lived streams with a ceiling (LIVE-RUNTIME-13): `acquire` is false at the cap. */
-export function createClientCap(max: number): { acquire: () => boolean; release: () => void } {
-  let open = 0;
+/**
+ * Open long-lived streams per hub (LIVE-RUNTIME-13, SR-8): at most `max` in all and `perPrincipal` per principal (a
+ * user, a token, an agent). A principal at its own limit gets its oldest stream closed to make room, so one signed-in
+ * user can never hold the hub against everyone else. A full hub refuses new principals, except privileged ones (host
+ * admins, the admin token), who are always admitted within their own limit.
+ */
+export function createStreamCap(max: number, perPrincipal: number): {
+  /** Null when refused (answer 503); else the release to call when the stream closes (calling it twice is harmless). */
+  admit(principal: string, close: () => void, privileged?: boolean): (() => void) | null;
+} {
+  const open = new Map<string, Set<{ close: () => void }>>(); // per principal, oldest first
+  let total = 0;
+  const drop = (principal: string, entry: { close: () => void }): void => {
+    const own = open.get(principal);
+    if (!own?.delete(entry)) return;
+    if (own.size === 0) open.delete(principal);
+    total -= 1;
+  };
   return {
-    acquire: () => (open < max ? (open += 1, true) : false),
-    release: () => { open = Math.max(0, open - 1); }
+    admit(principal, close, privileged = false) {
+      const own = open.get(principal) ?? new Set<{ close: () => void }>();
+      if (own.size >= perPrincipal) {
+        const oldest = own.values().next().value!;
+        drop(principal, oldest);
+        oldest.close();
+      } else if (total >= max && !privileged) {
+        return null;
+      }
+      const entry = { close };
+      open.set(principal, own.add(entry));
+      total += 1;
+      return () => drop(principal, entry);
+    }
   };
 }
