@@ -4,7 +4,7 @@ import { apiGet, apiPost, getAdminToken, getCurrentUser, login, logout, onClaims
 import { installClaimStrip } from "./components/claimBadge.js";
 import { industryPackDetailHtml } from "./industryPackView.js";
 import { renderBars, renderLine } from "./charts.js";
-import { decorateNav } from "./shell.js";
+import { decorateNav, topbarHtml } from "./shell.js";
 import { loginCardHtml, loginFailureText } from "./loginView.js";
 import { renderQrLike } from "./qr.js";
 import { renderPluginTable } from "./components/pluginTable.js";
@@ -255,26 +255,14 @@ function decorateShell() {
   decorateNav(document.querySelector("nav"), page);
 
   const main = document.querySelector("main");
-  if (!main || main.querySelector(".topbar")) {
+  if (!main) {
     return;
   }
+  const topbar = main.querySelector(".topbar") || main.insertBefore(Object.assign(document.createElement("section"), { className: "topbar" }), main.firstChild);
   const workspace = currentWorkspaceLabel();
-  const demoMode = workspace === "demo";
-  const topbar = document.createElement("section");
-  topbar.className = "topbar";
-  topbar.innerHTML = `
-    <div>
-      <div class="topbar-kicker">Agent Maturity Compass</div>
-      <strong>Compass Console</strong>
-      <span class="muted">/ ${htmlEscape(workspace)} workspace</span>
-    </div>
-    <div class="topbar-actions">
-      ${demoMode ? '<span class="pill ok">local demo session</span>' : '<span class="pill muted">session protected</span>'}
-      <a class="button secondary" href="./evidence">Evidence</a>
-      <a class="button secondary" href="./standard">Open Standard</a>
-    </div>
-  `;
-  main.insertBefore(topbar, main.firstChild);
+  topbar.innerHTML = topbarHtml({ workspace, demoMode: workspace === "demo", me: getCurrentUser() });
+  topbar.querySelector("#signOutBtn")?.addEventListener("click", () => logout()
+    .then(() => window.location.assign("./login"), (error) => setStatus(`Sign out failed: ${errText(error)}`, true)));
 }
 
 const FALLBACK_SURFACES = [
@@ -3534,6 +3522,7 @@ async function renderPage() {
     renderAuthScreen();
     return;
   }
+  decorateShell();
 
   const me = getCurrentUser();
   if (me) {

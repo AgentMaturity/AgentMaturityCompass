@@ -88,6 +88,23 @@ export function decorateNav(nav, page) {
   }
 }
 
+/** The page top bar (LIVE-UX-17): workspace, session pill, two shortcuts and, once someone is signed in, Sign out. */
+export function topbarHtml({ workspace = "local", demoMode = false, me = null } = {}) {
+  return `
+    <div>
+      <div class="topbar-kicker">Agent Maturity Compass</div>
+      <strong>Compass Console</strong>
+      <span class="muted">/ ${esc(workspace)} workspace</span>
+    </div>
+    <div class="topbar-actions">
+      ${demoMode ? '<span class="pill ok">local demo session</span>' : '<span class="pill muted">session protected</span>'}
+      <a class="button secondary" href="./evidence">Evidence</a>
+      <a class="button secondary" href="./standard">Open Standard</a>
+      ${me ? '<button id="signOutBtn" type="button" class="secondary">Sign out</button>' : ""}
+    </div>
+  `;
+}
+
 /** Runs once per page load. A page without a <nav> (ops, score) still gets the status role. */
 export function initShell(doc) {
   const status = doc.getElementById("status");

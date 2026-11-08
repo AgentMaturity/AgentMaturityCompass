@@ -227,3 +227,36 @@ describe("canonical navigation", () => {
     expect(styles).toMatch(/nav a\[hidden\]\s*\{\s*display:\s*none !important;\s*\}/);
   });
 });
+
+// LIVE-UX-17: the only Logout button was on the Leases page; the top bar offers Sign out once someone is signed in.
+describe("topbarHtml", () => {
+  const topbar = (shell as unknown as { topbarHtml?: (options: Record<string, unknown>) => string }).topbarHtml ?? (() => "");
+
+  test("shows Sign out, as a plain button, only when a user is signed in", () => {
+    const signedIn = topbar({ me: { username: "a" } });
+    expect(signedIn).toMatch(/<button id="signOutBtn" type="button"[^>]*>Sign out<\/button>/);
+    expect(topbar({ me: null })).not.toContain("Sign out");
+    expect(topbar({})).not.toContain("Sign out");
+  });
+
+  test("keeps the workspace label escaped and the existing shortcuts, with no inline handler", () => {
+    const html = topbar({ workspace: "<acme>", demoMode: false, me: { username: "a" } });
+    expect(html).toContain("/ &lt;acme&gt; workspace");
+    expect(html).toContain('href="./evidence"');
+    expect(html).toContain('href="./standard"');
+    expect(html).toContain("session protected");
+    expect(topbar({ demoMode: true })).toContain("local demo session");
+    for (const variant of [html, topbar({ me: null }), topbar({ demoMode: true })]) expect(variant).not.toMatch(/\son[a-z]+\s*=|javascript:/i);
+  });
+
+  test("app.js renders the top bar from it, refreshes it after sign-in and wires Sign out to logout then the login page", () => {
+    const app = readFileSync("src/console/assets/app.js", "utf8");
+    const shellFn = app.slice(app.indexOf("function decorateShell()"), app.indexOf("\n}\n", app.indexOf("function decorateShell()")));
+    expect(shellFn).toContain("topbarHtml({");
+    expect(shellFn).toContain("me: getCurrentUser()");
+    expect(shellFn).toMatch(/#signOutBtn"\)\?\.addEventListener\("click"[\s\S]*logout\(\)[\s\S]*"\.\/login"/);
+    const render = app.slice(app.indexOf("async function renderPage()"));
+    expect(render.indexOf("decorateShell();", render.indexOf("ensureAuthenticated()"))).toBeGreaterThan(-1);
+    expect(render.indexOf("decorateShell();", render.indexOf("ensureAuthenticated()"))).toBeLessThan(render.indexOf("const me = getCurrentUser();"));
+  });
+});
