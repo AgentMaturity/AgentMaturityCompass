@@ -5,7 +5,7 @@
  */
 import type { ComplianceCategoryResult, ComplianceReportJson } from "../../../compliance/mappingSchema.js";
 import type { AssuranceReport, DiagnosticReport } from "../../../types.js";
-import { envelopeForDiagnosticReport, envelopeForLegacyResult, type DiagnosticReportClaimInput } from "../adapters.js";
+import { envelopeForDiagnosticReport, envelopeForLegacyResult } from "../adapters.js";
 import { evaluateClaimEligibility } from "../evaluate.js";
 import {
   CLAIM_KINDS, type Applicability, type ClaimEnvelope, type ClaimKind, type ClaimReasonCode, type EvidenceState, type ResultState,
@@ -23,6 +23,15 @@ export function isLegacyAmcVersion(version: string | null | undefined): boolean 
 function meanLevel(report: Pick<DiagnosticReport, "layerScores">): number | null {
   const layers = Array.isArray(report.layerScores) ? report.layerScores : [];
   return layers.length === 0 ? null : layers.reduce((sum, layer) => sum + layer.avgFinalLevel, 0) / layers.length;
+}
+
+/**
+ * S2: the only place an unsealed report's self-asserted fields are stripped. A report whose seal does not verify cannot
+ * sign for itself, so its own VALID reads INVALID; any other status already vouches for nothing. Every reader of an
+ * unsealed report (envelopeForStoredRun, the GRC export) goes through this one gate.
+ */
+export function distrustUnsealedReport<T extends { status: DiagnosticReport["status"] }>(report: T): T {
+  return report.status !== "VALID" ? report : { ...report, status: "INVALID" };
 }
 
 /**
@@ -44,10 +53,7 @@ export function envelopeForStoredRun(report: DiagnosticReport, options: { sealVe
   if (!report.evidenceTrustCoverage || !Array.isArray(report.layerScores)) {
     return envelopeForUnverifiedResult({ producer: `diagnostic:${report.agentId}`, recordCount: 0, evidenceRefs: [report.runId], now: options.now });
   }
-  // Nothing an unverified report says about itself is trusted: not VALID, and not an open ledger session (H3).
-  const trusted: DiagnosticReportClaimInput = options.sealVerified ? report
-    : { ...report, status: report.status === "VALID" ? "INVALID" : report.status, ledgerPrefix: undefined };
-  const envelope = envelopeForDiagnosticReport(trusted, options.now);
+  const envelope = envelopeForDiagnosticReport(options.sealVerified ? report : distrustUnsealedReport(report), options.now);
   return options.sealVerified ? envelope : { ...envelope, claimKind: "self_reported" };
 }
 
