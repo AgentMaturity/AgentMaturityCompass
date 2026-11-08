@@ -95,6 +95,50 @@ describe("session export verifies offline", () => {
     expect(verdict.errors.some((error) => /seal names|does not end with session\/close/.test(error))).toBe(true);
   });
 
+  test("every descriptor field is recomputed from the signed rows: editing any one, or the unsigned record times with it, is refused (fix3 S21)", () => {
+    const { bundle, fingerprint } = exportAndDetach();
+    // The window is the open and close rows' own timestamps (inside their hash pre-images), not the record's columns.
+    expect(bundle.descriptor).toMatchObject({ startedTs: bundle.rows[0]!.ts, endedTs: bundle.rows.at(-1)!.ts, agentId: "default", runtime: bundle.rows[0]!.runtime });
+    const verify = (edited: SessionExport) => verifySessionExport({ bundle: edited, expectedMonitorFingerprint: fingerprint });
+    const other = "f".repeat(64);
+    const edits: Record<keyof SessionExport["descriptor"], (descriptor: Record<string, unknown>) => void> = {
+      v: (d) => { d.v = 2; },
+      sessionId: (d) => { d.sessionId = "another-session"; },
+      lifecycle: (d) => { d.lifecycle = "interrupted"; },
+      runtime: (d) => { d.runtime = `${String(d.runtime)}-edited`; },
+      agentId: (d) => { d.agentId = "someone-else"; },
+      startedTs: (d) => { d.startedTs = Number(d.startedTs) - 1_000; },
+      endedTs: (d) => { d.endedTs = Number(d.endedTs) + 1_000; },
+      eventCount: (d) => { d.eventCount = Number(d.eventCount) + 1; },
+      turnCount: (d) => { d.turnCount = Number(d.turnCount) + 1; },
+      sealCount: (d) => { d.sealCount = Number(d.sealCount) + 1; },
+      sealEventHashes: (d) => { d.sealEventHashes = [other, ...(d.sealEventHashes as string[]).slice(1)]; },
+      sessionMerkleRoot: (d) => { d.sessionMerkleRoot = other; },
+      openEventHash: (d) => { d.openEventHash = other; },
+      closeEventHash: (d) => { d.closeEventHash = other; },
+      monitorKeyFingerprint: (d) => { d.monitorKeyFingerprint = other; }
+    };
+    expect(Object.keys(edits).sort()).toEqual(Object.keys(bundle.descriptor).sort());
+    for (const [field, edit] of Object.entries(edits)) {
+      const tampered = structuredClone(bundle);
+      edit(tampered.descriptor as unknown as Record<string, unknown>);
+      expect(verify(tampered).ok, field).toBe(false);
+    }
+    const renamed = structuredClone(bundle);
+    renamed.descriptor.sessionId = "another-session";
+    expect(verify(renamed).errors).toContain("descriptor names another session than the bundle");
+    for (const field of ["agentId", "runtime", "startedTs", "endedTs"] as const) {
+      const tampered = structuredClone(bundle);
+      edits[field](tampered.descriptor as unknown as Record<string, unknown>);
+      expect(verify(tampered).errors, field).toContain("descriptor does not match the rows it describes");
+    }
+    // The record's lifecycle columns are not signed: moving them, and the descriptor with them, changes nothing it vouches for.
+    const shifted = structuredClone(bundle);
+    shifted.record.started_ts -= 60_000; shifted.record.ended_ts += 60_000;
+    shifted.descriptor.startedTs = shifted.record.started_ts; shifted.descriptor.endedTs = shifted.record.ended_ts;
+    expect(verify(shifted).errors).toContain("descriptor does not match the rows it describes");
+  });
+
   test("an open session is refused at export", () => {
     const workspace = newWorkspace();
     const sessionId = runSession(workspace, false);

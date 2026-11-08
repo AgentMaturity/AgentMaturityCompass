@@ -1,9 +1,8 @@
 import { z } from "zod";
 import { getPublicKeyHistory } from "../crypto/keys.js";
 import { openSessionEventStore, resolveSessionStoreBackend } from "../persistence/openSessionEventStore.js";
-import { merkleRoot } from "../session/sessionMerkle.js";
-import { sessionRootDescriptorSchema, type SessionRootDescriptor } from "../transparency/sessionAnchorSchema.js";
-import { buildSessionRootDescriptor, verifySeal, verifySessionRows } from "../transparency/sessionRootDescriptor.js";
+import { sessionRootDescriptorSchema } from "../transparency/sessionAnchorSchema.js";
+import { buildSessionRootDescriptor, describeSessionRows, verifySeal, verifySessionRows } from "../transparency/sessionRootDescriptor.js";
 import type { TrustContext } from "../trust/trustContext.js";
 import type { EvidenceEvent, SessionRecord } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -94,7 +93,8 @@ export interface SessionExportVerification {
 /**
  * Verifies an export with nothing but the document and a pinned monitor fingerprint: the pin selects the one carried
  * key that may vouch; every row's hash pre-image, writer signature and session envelope are recomputed; the seal must
- * name the last row and verify; and the carried descriptor must equal the one recomputed from the rows.
+ * name the last row and verify; and the carried descriptor must equal, field for field, the one derived from the signed
+ * rows alone (`describeSessionRows`). The record's lifecycle columns other than the seal are not signed and feed nothing.
  */
 export function verifySessionExport(params: { bundle: unknown; expectedMonitorFingerprint: string }): SessionExportVerification {
   const errors: string[] = [];
@@ -115,13 +115,12 @@ export function verifySessionExport(params: { bundle: unknown; expectedMonitorFi
   verifySessionRows(keys, rows, errors);
   const record = { session_id: bundle.sessionId, ...bundle.record } as SessionRecord;
   verifySeal(keys, record, rows, bundle.sessionId, errors);
-  // The descriptor is recomputed from the rows, never read from the bundle's own claim.
-  const sealEventHashes = rows.filter((row) => row.event_type === "turn/seal").map((row) => row.event_hash);
-  const recomputed: SessionRootDescriptor = { ...bundle.descriptor, eventCount: rows.length, sealEventHashes, sessionMerkleRoot: merkleRoot(sealEventHashes),
-    turnCount: rows.filter((row) => row.event_type === "turn/start").length, sealCount: sealEventHashes.length,
-    openEventHash: rows[0]!.event_hash, closeEventHash: rows[rows.length - 1]!.event_hash, monitorKeyFingerprint: expected,
-    startedTs: bundle.record.started_ts, endedTs: bundle.record.ended_ts };
-  if (canonicalize(recomputed) !== canonicalize(bundle.descriptor)) errors.push("descriptor does not match the rows it describes");
+  // The descriptor is derived from the signed rows alone, never read from the bundle's own claim (fix3 S21).
+  if (bundle.descriptor.sessionId !== bundle.sessionId) errors.push("descriptor names another session than the bundle");
+  let recomputed: unknown = null;
+  try { recomputed = describeSessionRows(bundle.sessionId, rows, expected); }
+  catch (error) { errors.push(`descriptor cannot be derived from the rows: ${error instanceof Error ? error.message : String(error)}`); }
+  if (recomputed !== null && canonicalize(recomputed) !== canonicalize(bundle.descriptor)) errors.push("descriptor does not match the rows it describes");
   if (rows[0]!.event_type !== "session/open") errors.push(`session ${bundle.sessionId} does not begin with session/open`);
   if (rows[rows.length - 1]!.event_type !== "session/close") errors.push(`session ${bundle.sessionId} does not end with session/close`);
   return { ok: errors.length === 0, errors, sessionId: bundle.sessionId, descriptorSha256: sha256Hex(canonicalize(bundle.descriptor)),

@@ -16,7 +16,7 @@ Spilled payloads are not embedded. A row's `payload_sha256` is inside its hash p
 1. `--expect-monitor` is required and must match one carried key; the carried keys never vouch for themselves (ADR-0007).
 2. Every row's hash pre-image recomputes to its `event_hash`, its writer signature verifies against the pinned key, and the per-session envelope chain (sequence and previous hash) is intact. These are the rules of `src/transparency/sessionRootDescriptor.ts`, run against the carried key.
 3. The seal names the last row and verifies against the pinned key.
-4. The descriptor recomputed from the rows equals the carried descriptor, and the session begins with `session/open` and ends with `session/close`.
+4. The carried descriptor equals, field for field, the one derived from the signed rows alone (`describeSessionRows`): agent and runtime from the signed `session/open` row, the window from the open and close rows' own timestamps, the counts, seal leaves and merkle root recomputed, the session id the bundle's own, the monitor fingerprint the pin. The session begins with `session/open` and ends with `session/close`. The record's lifecycle columns other than the seal are not signed and feed nothing; `amc session anchor` derives its descriptor the same way, so an export carries the descriptor an anchor commits to.
 5. `admitKey` applies the operator's trust and distrust lists to the pinned key, so a revoked monitor key fails even when its fingerprint matches.
 
 ## Limits

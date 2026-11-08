@@ -203,6 +203,36 @@ function agentIdFromOpen(openEvent: EvidenceEvent): string {
 }
 
 /**
+ * Every descriptor field from the session's own signed rows, and nothing else (pure): runtime and agent from
+ * `session/open`, the window from the open and close rows' own timestamps (inside their hash pre-images; the session
+ * record's time columns are not signed), the counts, seal leaves and merkle root recomputed. The workspace builder and
+ * the offline export verifier both derive through here, so an export carries the descriptor an anchor commits to and no
+ * field of it can be edited in transit (fix3 S21). Call it only on rows already verified as one closed session.
+ */
+export function describeSessionRows(sessionId: string, rows: readonly EvidenceEvent[], monitorKeyFingerprint: string): SessionRootDescriptor {
+  const openEvent = rows[0]!;
+  const closeEvent = rows[rows.length - 1]!;
+  const sealEventHashes = rows.filter((row) => row.event_type === "turn/seal").map((row) => row.event_hash);
+  return sessionRootDescriptorSchema.parse({
+    v: 1,
+    sessionId,
+    lifecycle: "closed",
+    runtime: openEvent.runtime,
+    agentId: agentIdFromOpen(openEvent),
+    startedTs: openEvent.ts,
+    endedTs: closeEvent.ts,
+    eventCount: rows.length,
+    turnCount: rows.filter((row) => row.event_type === "turn/start").length,
+    sealCount: sealEventHashes.length,
+    sealEventHashes,
+    sessionMerkleRoot: merkleRoot(sealEventHashes),
+    openEventHash: openEvent.event_hash,
+    closeEventHash: closeEvent.event_hash,
+    monitorKeyFingerprint
+  });
+}
+
+/**
  * Builds the descriptor for a session from rows already read out of a store.
  *
  * Separated from `readSessionRootDescriptor` so a caller that already holds the
@@ -257,23 +287,7 @@ export function buildSessionRootDescriptor(params: {
     throw new SessionAnchorError(sessionId, errors);
   }
 
-  return sessionRootDescriptorSchema.parse({
-    v: 1,
-    sessionId,
-    lifecycle: "closed",
-    runtime: openEvent.runtime,
-    agentId: agentIdFromOpen(openEvent),
-    startedTs: record?.started_ts ?? openEvent.ts,
-    endedTs: record?.ended_ts ?? closeEvent.ts,
-    eventCount: rows.length,
-    turnCount,
-    sealCount: sealEventHashes.length,
-    sealEventHashes,
-    sessionMerkleRoot,
-    openEventHash: openEvent.event_hash,
-    closeEventHash: closeEvent.event_hash,
-    monitorKeyFingerprint
-  });
+  return describeSessionRows(sessionId, rows, monitorKeyFingerprint);
 }
 
 /**
