@@ -5,8 +5,7 @@
  */
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
-import * as shell from "../../src/console/assets/shell.js";
-import { decorateNav, initShell } from "../../src/console/assets/shell.js";
+import { CANONICAL_NAV, canonicalNavHtml, decorateNav, initShell, renderCanonicalNav, topbarHtml } from "../../src/console/assets/shell.js";
 import { FakeDocument, type FakeElement } from "./fakeDom.js";
 
 function pageWithNav(doc: FakeDocument, hrefs: string[], page = ""): FakeElement {
@@ -142,7 +141,7 @@ describe("app.js shows the Unified Clarity banner only with content", () => {
 // LIVE-UX-06: 38 different menus across the console's pages; one canonical menu now, each page's own links kept.
 describe("canonical navigation", () => {
   type NavLink = { href: string; label: string; id?: string; hidden?: boolean; group?: string };
-  const api = shell as unknown as { CANONICAL_NAV?: NavLink[]; canonicalNavHtml?: (extra: NavLink[]) => string;
+  const api = { CANONICAL_NAV, canonicalNavHtml, renderCanonicalNav } as unknown as { CANONICAL_NAV?: NavLink[]; canonicalNavHtml?: (extra: NavLink[]) => string;
     renderCanonicalNav?: (nav: FakeElement) => void };
   const hrefs = (html: string) => [...html.matchAll(/href="([^"]+)"/g)].map((match) => match[1]!);
 
@@ -230,7 +229,7 @@ describe("canonical navigation", () => {
 
 // LIVE-UX-17: the only Logout button was on the Leases page; the top bar offers Sign out once someone is signed in.
 describe("topbarHtml", () => {
-  const topbar = (shell as unknown as { topbarHtml?: (options: Record<string, unknown>) => string }).topbarHtml ?? (() => "");
+  const topbar = topbarHtml as unknown as (options: Record<string, unknown>) => string;
 
   test("shows Sign out, as a plain button, only when a user is signed in", () => {
     const signedIn = topbar({ me: { username: "a" } });
