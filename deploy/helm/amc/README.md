@@ -70,6 +70,10 @@ helm template amc ./deploy/helm/amc -f ./deploy/helm/amc/examples/values-persist
 - PDB + ServiceAccount templates
 - P2-08 KeyProvider credentials from a Secret (`keyProvider.*`) and P2-09 ledger field encryption (`ledgerEncryption.enabled`), both off by default; see `docs/KUBERNETES_HELM_DEPLOYMENT.md` "KeyProvider and ledger encryption"
 
+## Changelog
+
+- 0.4.1: the ConfigMap sets `AMC_CONTROL_CHECKPOINT_DIR=<amcHomeState.mountPath>/control-checkpoints` (default `/home/amc/.config/amc/state/control-checkpoints`). On 0.4.0 the signed-control checkpoint root defaulted to `$HOME/.amc/control-checkpoints` on the read-only root filesystem. Upgrade notes: `docs/KUBERNETES_HELM_DEPLOYMENT.md`, "Upgrading to chart 0.4.1".
+
 ## Terraform
 
 The example under `deploy/terraform/helm-release/` deploys this chart with Terraform's Helm provider while keeping bootstrap secrets outside Terraform state.
@@ -97,7 +101,7 @@ Known gaps, each a WAITING item or a note in the plan, never a blocker:
 
 - The overlay pins the image by tag (`IMAGE_TAG_ONLY`): AMC's bootstrap report records no digest of the image the Studio runs, so the overlay leaves the chart's `image.digest` unset. Set it yourself to deploy by digest.
 - The plan reads `TOPOLOGY_QUALIFIED_LOCALLY_ONLY`: decision D-03 keeps Helm documented, and the chart passed its qualification checks locally only (kind, 2026-10-11); its CI qualification is pending.
-- The chart has no volume of its own for the signed-journal checkpoint root, so `AMC_CONTROL_CHECKPOINT_DIR` is not set.
+- Since chart 0.4.1 the ConfigMap sets `AMC_CONTROL_CHECKPOINT_DIR` to `<amcHomeState.mountPath>/control-checkpoints`, on the state claim and outside the workspace, so signed firewall, guardrail, legal-hold and compiled-control journals keep their checkpoints across restarts. The overlay does not change it.
 - The chart renders a fixed environment list, so the values overlay cannot set `AMC_A4_PREVIEW=1`
   (`A4_PREVIEW_NOT_SET_BY_CHART`). Set it on the Studio container yourself after each upgrade, for example with the
   `kubectl set env` step above, which restarts the Studio once more. Without it A4 answers 404 and the receipt cannot be

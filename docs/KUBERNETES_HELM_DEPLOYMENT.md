@@ -312,6 +312,16 @@ node scripts/deploy/rollback-drill.mjs --image-a amc-studio:s1-a --image-b amc-s
   --secrets-dir ./drill-secrets --out ./rollback-receipt.json
 ```
 
+### Upgrading to chart 0.4.1
+
+Chart 0.4.1 sets `AMC_CONTROL_CHECKPOINT_DIR` to `<amcHomeState.mountPath>/control-checkpoints` (by default `/home/amc/.config/amc/state/control-checkpoints`), on the `<release>-amc-state` claim and outside the workspace. Signed control journals (firewall, guardrails, legal holds, compiled-control activation) keep their checkpoints and trust pins there. On chart 0.4.0 the root defaulted to `$HOME/.amc/control-checkpoints`, on the read-only root filesystem, where those journals cannot write. Existing releases need this upgrade before a firewall, guardrail, legal-hold or compiled-control change can be published:
+
+```bash
+helm upgrade amc deploy/helm/amc --namespace amc-system --reuse-values --atomic --wait --timeout 10m
+```
+
+With `amcHomeState.persistence.enabled=false` the checkpoints live in an `emptyDir` and are lost with the pod, as the anti-rollback marks are.
+
 ### Upgrading to chart 0.4.0
 
 Chart 0.4.0 (P2-06) changes the `PodDisruptionBudget` default from `minAvailable: 1` to `maxUnavailable: 1`, so node drains no longer block on the single pod. To keep the old behaviour, set `podDisruptionBudget.minAvailable=1` and `podDisruptionBudget.maxUnavailable=null`; setting both, or neither, fails the render. It also adds `metrics.*` values, off by default: `metrics.enabled=true` exposes Prometheus metrics on port 9464 inside the cluster, admitted by the NetworkPolicy from the monitoring namespace only, with optional ServiceMonitor and PrometheusRule objects ([deploy/reference/MONITORING.md](deploy/reference/MONITORING.md)). It adds `keyProvider.*` and `ledgerEncryption.*` values whose defaults render nothing new ([KeyProvider and ledger encryption](#keyprovider-and-ledger-encryption)). The reference deployment runbooks are in [deploy/reference/](deploy/reference/TOPOLOGY.md).

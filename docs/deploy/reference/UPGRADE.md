@@ -9,4 +9,6 @@ Every upgrade has an outage: the chart uses `strategy: Recreate`, so the old pod
 5. Run `helm test` and `scripts/deploy-verify.mjs` again. (check UPG-1)
 6. If the new image never becomes Ready (for example a migration throws), the ledger file must be unchanged; run `helm rollback amc-rd <previous revision> --wait`. (check UPG-2)
 
+Chart 0.4.1 changes from 0.4.0: the ConfigMap sets `AMC_CONTROL_CHECKPOINT_DIR` to `<amcHomeState.mountPath>/control-checkpoints` on the state claim, so signed control journals (firewall, guardrails, legal holds, compiled controls) can write their checkpoints; on 0.4.0 the default root was on the read-only root filesystem.
+
 Chart 0.4.0 changes from 0.3.0: the PodDisruptionBudget defaults to `maxUnavailable: 1` (0.3.0 used `minAvailable: 1`, which blocked every drain), and `metrics.*`, `keyProvider.*` and `ledgerEncryption.*` values are new; their defaults render nothing new.

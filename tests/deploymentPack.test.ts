@@ -81,6 +81,22 @@ describe("compose runtime layout (LIVE-DEPLOY-01)", () => {
   });
 });
 
+describe("Helm chart 0.4.1 signed-control checkpoint root (LIVE-DEPLOY-15)", () => {
+  it("roots signed-control checkpoints on the state claim, outside the workspace, in the chart and the raw manifests", () => {
+    // Firewall, guardrail, legal-hold and compiled-control journals checkpoint under AMC_CONTROL_CHECKPOINT_DIR; its default
+    // ($HOME/.amc/control-checkpoints) is on the read-only root filesystem, and the root must be outside the workspace.
+    expect(read("deploy/helm/amc/templates/configmap.yaml")).toContain(
+      "AMC_CONTROL_CHECKPOINT_DIR: {{ printf \"%s/control-checkpoints\" .Values.amcHomeState.mountPath | quote }}");
+    expect(YAML.parse(read("deploy/helm/amc/Chart.yaml")).version).toBe("0.4.1");
+    const values = YAML.parse(read("deploy/helm/amc/values.yaml"));
+    const rendered = `${values.amcHomeState.mountPath}/control-checkpoints`;
+    expect(rendered.startsWith(`${values.workspace.mountPath}/`)).toBe(false);
+    const studio = YAML.parse(read("deploy/k8s/deployment.yaml")).spec.template.spec.containers[0];
+    expect(studio.env).toContainEqual({ name: "AMC_CONTROL_CHECKPOINT_DIR", value: rendered });
+    expect(studio.volumeMounts).toContainEqual({ name: "amc-home-state", mountPath: values.amcHomeState.mountPath });
+  });
+});
+
 describe("container healthcheck (LIVE-DEPLOY-03, L-HC)", () => {
   it("probes Studio over HTTP with a bounded timeout in the image and every compose Studio service", () => {
     // The CLI probe loaded the whole CLI for two GETs: 42 s under load against a 10 s timeout while /readyz was READY.

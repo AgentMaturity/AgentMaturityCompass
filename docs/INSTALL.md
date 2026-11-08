@@ -132,7 +132,7 @@ Validate the chart first (helm lint, the render checks and kubeconform run when 
 node scripts/deploy/deploy-pack-check.mjs
 ```
 
-Chart 0.4.0, like every chart since 0.2.0, runs one replica only (the workspace has a single writer; `replicaCount=2` is refused) and renders no Secret by default. Create `amc-bootstrap` from files only you can read before installing:
+Chart 0.4.1, like every chart since 0.2.0, runs one replica only (the workspace has a single writer; `replicaCount=2` is refused) and renders no Secret by default. Create `amc-bootstrap` from files only you can read before installing:
 
 ```bash
 kubectl create namespace amc-system

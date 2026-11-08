@@ -43,7 +43,7 @@ Open:
 
 ## Kubernetes (Helm)
 
-Chart 0.4.0, like every chart since 0.2.0, renders no Secret by default and refuses `replicaCount` other than 1 (the workspace has a single writer). Create the `amc-bootstrap` Secret first, from files only you can read, then install:
+Chart 0.4.1, like every chart since 0.2.0, renders no Secret by default and refuses `replicaCount` other than 1 (the workspace has a single writer). Create the `amc-bootstrap` Secret first, from files only you can read, then install:
 
 ```bash
 node scripts/deploy/deploy-pack-check.mjs   # helm lint, renders and kubeconform when installed
