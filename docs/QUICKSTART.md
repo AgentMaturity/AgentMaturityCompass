@@ -152,7 +152,7 @@ in a signed `users.yaml`. It asks for the owner's Studio login (or reads `AMC_BO
 Until the next release is published, `npm install agent-maturity-compass` installs 1.1.1, which has neither the native SDK nor `amc init --coding`. Install your source build instead: in the checkout from step 1, after `pnpm run build`, run `npm pack --ignore-scripts` (without that flag `npm pack` first runs the full release gate), then `npm install <the .tgz it wrote>` in your project.
 
 ```bash
-npm install agent-maturity-compass
+npm install <the .tgz that npm pack --ignore-scripts wrote in the checkout>   # not the npm 1.1.1 release
 export AMC_VAULT_PASSPHRASE='<a passphrase you keep>'
 npx amc init --coding
 export AMC_EXPECTED_MONITOR_FINGERPRINT=<the fingerprint init printed>
