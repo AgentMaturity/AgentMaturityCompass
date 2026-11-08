@@ -15,6 +15,7 @@ import { ipAllowedByCidrs, requestUsesHttps, resolveClientAddress, withLoopbackC
 import { allowedHostnamesFrom, hostAllowed } from "../studio/hostAllow.js";
 import { applySecurityHeaders, SECURITY_HEADER_NAMES } from "../studio/securityHeaders.js";
 import { applyServerTimeouts } from "../studio/serverTimeouts.js";
+import { HostSseHub, serveHostConsole } from "./hostConsole.js";
 import { WorkspaceManager } from "./workspaceManager.js";
 import { proxyStudioWorkspaceRequest } from "./workspaceStudioProxy.js";
 import { WorkspaceRuntimeRegistry, WorkspaceRuntimeClosingError } from "./workspaceRuntimeRegistry.js";
@@ -91,48 +92,6 @@ interface StartWorkspaceRouterOptions {
 function isLoopbackHost(host: string): boolean {
   const normalized = host.trim().toLowerCase().replace(/^\[|\]$/g, "");
   return normalized === "127.0.0.1" || normalized === "::1" || normalized === "localhost";
-}
-
-interface HostEventPayload {
-  type: string;
-  ts: number;
-  workspaceId?: string;
-  summaryHash?: string;
-  version?: number;
-}
-
-class HostSseHub {
-  private readonly clients = new Set<ServerResponse>();
-
-  add(res: ServerResponse): void {
-    this.clients.add(res);
-  }
-
-  remove(res: ServerResponse): void {
-    this.clients.delete(res);
-  }
-
-  emit(event: HostEventPayload): void {
-    const payload = `data: ${JSON.stringify(event)}\n\n`;
-    for (const res of this.clients) {
-      try {
-        res.write(payload);
-      } catch {
-        this.clients.delete(res);
-      }
-    }
-  }
-
-  closeAll(): void {
-    for (const res of this.clients) {
-      try {
-        res.end();
-      } catch {
-        // noop
-      }
-    }
-    this.clients.clear();
-  }
 }
 
 async function readBody(req: IncomingMessage, maxBytes = 1_048_576): Promise<string> {
@@ -1401,21 +1360,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         return;
       }
 
-      if (pathname === "/host/console") {
-        res.statusCode = 302;
-        res.setHeader("location", "/host/console/host.html");
-        res.end();
-        return;
-      }
-
-      if (pathname === "/host/console/host.html") {
-        res.statusCode = 200;
-        res.setHeader("content-type", "text/html; charset=utf-8");
-        res.end(
-          "<!doctype html><html><head><meta charset='utf-8'/><meta name='viewport' content='width=device-width,initial-scale=1'/><title>AMC Host</title><style>body{font-family:system-ui;margin:1rem}input,button{font:inherit}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ddd;padding:.4rem}code{background:#f4f4f4;padding:.1rem .25rem}</style></head><body><h1>AMC Host Portfolio</h1><p id='status'>Loading…</p><div><label>Username <input id='u'/></label> <label>Password <input id='p' type='password'/></label> <button id='login'>Login</button></div><h2>Workspaces</h2><table id='tbl'><thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Roles</th><th>Open</th></tr></thead><tbody></tbody></table><script type='module'>const st=document.getElementById('status');const tbody=document.querySelector('#tbl tbody');async function load(){try{const r=await fetch('/host/api/workspaces',{credentials:'include'});if(!r.ok){st.textContent='Not logged in';tbody.innerHTML='';return;}const j=await r.json();st.textContent='Loaded';tbody.innerHTML=(j.workspaces||[]).map(w=>`<tr><td><code>${w.workspaceId}</code></td><td>${w.name}</td><td>${w.status}</td><td>${(w.roles||[]).join(', ')}</td><td><a href='/w/${w.workspaceId}/console'>Open</a></td></tr>`).join('');}catch(e){st.textContent=String(e);}}document.getElementById('login').addEventListener('click',async()=>{const username=document.getElementById('u').value;const password=document.getElementById('p').value;const r=await fetch('/host/api/login',{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({username,password})});if(!r.ok){st.textContent='Login failed';return;}await load();});load();</script></body></html>"
-        );
-        return;
-      }
+      if (serveHostConsole(pathname, res)) return; // LIVE-RUNTIME-15: the host portfolio page and its script, under CSP
 
       const isDefaultWorkspaceAlias = pathname.startsWith("/api/") ||
         pathname === "/api" ||
