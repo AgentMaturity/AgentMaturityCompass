@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Command } from "commander";
@@ -10,7 +10,11 @@ import { applySkillToolRestriction, prepareSkillTurn } from "../src/skills/skill
 import { renderSkillContext } from "../src/skills/skillPrompt.js";
 import { ToolRegistry, defineTool } from "../src/tools/toolRegistry.js";
 import { initWorkspace } from "../src/workspace.js";
+import { initBudgets } from "../src/budgets/budgets.js";
+import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
+import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { registerAgentCommands } from "../src/cli-agent-commands.js";
+import { initWorkspaceWithoutActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 /** SH-EXT-05: command files, YAML frontmatter fields, $ARGUMENTS and disallowed-tools. */
 const directories: string[] = [];
@@ -41,6 +45,14 @@ describe("frontmatter", () => {
     expect(parseSkillFrontmatter("name: a\ndescription: b\ndisallowed-tools:\n  - 'has space'")).toEqual({ reason: "disallowed-tools contains an item that is not a tool name" });
     expect(parseSkillFrontmatter("name: a\nname: b")).toMatchObject({ reason: expect.stringContaining("not valid YAML") });
     expect(parseSkillFrontmatter("- a\n- b")).toEqual({ reason: "frontmatter must be a YAML mapping" });
+  });
+  it("still reads the line-parser descriptions skills were written with when YAML cannot (skeptic: regression)", () => {
+    expect(parseSkillFrontmatter("name: deploy\ndescription: Deploy: ships the app to prod")).toEqual({ fields: { name: "deploy", description: "Deploy: ships the app to prod" } });
+    expect(parseSkillFrontmatter("name: x\ndescription: *important* tool")).toEqual({ fields: { name: "x", description: "*important* tool" } });
+    expect(parseSkillFrontmatter("name: x\ndescription: #1 helper\ndisallowed-tools: [bash]")).toEqual({ fields: { name: "x", description: "#1 helper", disallowedTools: ["bash"] } });
+    expect(parseSkillFrontmatter("name: x\ndescription: `code` and @mentions\narguments:\n  - a")).toEqual({ fields: { name: "x", description: "`code` and @mentions", argumentNames: ["a"] } });
+    // The fallback does not reopen what both readers refuse: a repeated key, a block list under a broken line.
+    expect(parseSkillFrontmatter("name: a\ndescription: *x\nname: b")).toMatchObject({ reason: expect.stringContaining("not valid YAML") });
   });
 });
 
@@ -92,8 +104,25 @@ describe("$ARGUMENTS", () => {
     expect(rendered.text).toBe("All: \"$0 twice\" second\nFirst: $0 twice / second\nNamed: $0 twice\nDir: /ws/.amc/skills/s Ws: /ws\nLiteral: $HOME $unknown $ARGUMENTSX");
     expect(rendered.substituted).toBe(true);
     expect(renderSkillBody("no placeholders", { rest: "x", workspace: "/ws" })).toMatchObject({ substituted: false, text: "no placeholders" });
-    expect(() => renderSkillBody("$ARGUMENTS", { rest: "\"open", workspace: "/ws" })).toThrow(/unterminated quote/);
     expect(() => renderSkillBody("$ARGUMENTS", { rest: "x".repeat(20_000), workspace: "/ws" })).toThrow(/exceed/);
+    expect(() => renderSkillBody("$1", { rest: Array.from({ length: 40 }, (_, i) => `w${i}`).join(" "), workspace: "/ws" })).toThrow(/more than 32/);
+  });
+  it("tokenizes only when a placeholder needs words, never refuses the prompt itself, and leaves a bare /name's body as written (skeptic: regression)", () => {
+    const forty = Array.from({ length: 40 }, (_, i) => `w${i}`).join(" ");
+    // No placeholder: apostrophes, 40 words and 17 KB pass through untouched.
+    for (const rest of ["don't write anything, just summarise", forty, "y".repeat(17_000)]) {
+      expect(renderSkillBody("Read only.", { rest, workspace: "/ws" })).toMatchObject({ substituted: false, text: "Read only.", argumentsText: rest });
+    }
+    // $ARGUMENTS needs no words: an unbalanced quote is inserted as typed; the byte cap still bounds what is substituted.
+    expect(renderSkillBody("Fix: $ARGUMENTS", { rest: "the user's login bug", workspace: "/ws" }).text).toBe("Fix: the user's login bug");
+    expect(renderSkillBody("Fix: $ARGUMENTS", { rest: forty, workspace: "/ws" }).text).toBe(`Fix: ${forty}`);
+    // $1 needs words: quotes that do not balance fall back to whitespace words instead of refusing.
+    expect(renderSkillBody("First: $0, second: $1", { rest: "fix the user's bug", workspace: "/ws" }).text).toBe("First: fix, second: the");
+    // A bare /awk keeps the author's $1.
+    expect(renderSkillBody("Run awk '{print $1}' then $ARGUMENTS", { rest: "", workspace: "/ws" })).toMatchObject({ substituted: false, text: "Run awk '{print $1}' then $ARGUMENTS" });
+    const root = workspace();
+    skillDir(root, "readonly", "name: readonly\ndescription: no writes", "Read only.");
+    expect(prepareSkillTurn({ workspace: root, prompt: "/readonly don't write anything, just summarise" })).toMatchObject({ ok: true, prompt: "don't write anything, just summarise" });
   });
   it("prepares a turn whose frame names the file, the arguments and the rendered text, and lists supporting files", () => {
     const root = workspace();
@@ -111,6 +140,21 @@ describe("$ARGUMENTS", () => {
     // The plugin the loop consumes renders the same way.
     return prepared.contextPlugins[0]!.collect({ turn: 1, step: 1 } as never).then(rendered => { expect(rendered).toContain("Focus on error handling in src/x.ts."); });
   });
+  it("states the rendered digest when only path placeholders were resolved, and says no argument was inserted", () => {
+    const root = workspace();
+    skillDir(root, "paths", "name: paths\ndescription: read a file", "Read ${AMC_SKILL_DIR}/notes.md first.");
+    const prepared = prepareSkillTurn({ workspace: root, prompt: "/paths go" });
+    expect(prepared.ok).toBe(true);
+    if (!prepared.ok) return;
+    const rendering = renderSkillBody(prepared.loaded!.body, { rest: "go", skillDirectory: prepared.loaded!.directory!, workspace: root });
+    expect(rendering.substituted).toBe(false);
+    expect(rendering.text).toContain(`Read ${prepared.loaded!.directory!}/notes.md first.`);
+    const text = renderSkillContext(prepared.loaded!, rendering);
+    expect(text).toContain(`placeholders were resolved (no operator argument was inserted); the rendered text below has sha256 ${rendering.renderedSha256}.`);
+    expect(text).not.toContain("Operator-supplied arguments");
+    // A bare /paths leaves the body as written, so the frame names only the file's digest.
+    expect(renderSkillContext(prepared.loaded!, renderSkillBody(prepared.loaded!.body, { rest: "", workspace: root }))).not.toContain("rendered text");
+  });
   it("refuses a model-only skill on /name", () => {
     const root = workspace();
     skillDir(root, "hidden", "name: hidden\ndescription: model only\nuser-invocable: false", "Body.");
@@ -125,10 +169,20 @@ describe("disallowed-tools", () => {
     const turn = prepareSkillTurn({ workspace: root, prompt: "/readonly go" });
     expect(turn.ok && turn.disallowedTools).toEqual(["fs.write"]);
     const registry = new ToolRegistry();
-    // S8: a delegated child would compose its own toolset without the skill, so delegation is withheld with the denied tool.
-    for (const name of ["fs.read", "fs.write", "delegate", "workflow"]) registry.define(defineTool({ name, description: name, actionClass: "READ_ONLY", parameters: { type: "object" }, body: () => ({ ok: true, output: "" }) }));
+    const tool = (name: string) => defineTool({ name, description: name, actionClass: "READ_ONLY", parameters: { type: "object" }, body: () => ({ ok: true, output: "" }) });
+    for (const name of ["fs.read", "fs.write"]) registry.define(tool(name));
     expect(applySkillToolRestriction(registry, turn, "default")).toBeUndefined();
     expect([...registry.visible("default").keys()]).toEqual(["fs.read"]);
+    // S8, in the run path's real order: the kernel defines `delegate` AFTER the skill restricted the registry. A delegated
+    // child would compose its own toolset without the skill, so the name is denied before it exists.
+    for (const name of ["delegate", "workflow"]) registry.define(tool(name));
+    expect([...registry.visible("default").keys()]).toEqual(["fs.read"]);
+    // The Code Mode transport is refused with a reason, not a throw that would leave the toolset open.
+    skillDir(root, "nocode", "name: nocode\ndescription: x\ndisallowed-tools: [run_code]", "Body.");
+    expect(applySkillToolRestriction(registry, prepareSkillTurn({ workspace: root, prompt: "/nocode" }), "default")).toContain("disallows run_code, the Code Mode transport");
+    // Any other restriction failure is a refusal too, never a throw that skips the caller's close-the-toolset path.
+    const throwing = { visible: () => new Map([["fs.write", {}]]), restrict: () => { throw new Error("boom"); } };
+    expect(applySkillToolRestriction(throwing, turn, "default")).toContain("could not be applied (boom)");
     skillDir(root, "typo", "name: typo\ndescription: x\ndisallowed-tools: [Write]", "Body.");
     const wrong = prepareSkillTurn({ workspace: root, prompt: "/typo" });
     expect(applySkillToolRestriction(registry, wrong, "default")).toContain("not registered for this run: Write");
@@ -161,4 +215,37 @@ describe("real surface", () => {
       expect(unknown.failures).toHaveLength(1); expect(unknown.errors.join("\n")).toContain("no skill named \"ops:deplo\"");
     } finally { process.chdir(cwd); }
   }, 60_000);
+  it("agent-loop run --delegate cannot hand a skill's disallowed tool back through a delegated child (S8)", async () => {
+    const root = workspace();
+    const home = realpathSync(mkdtempSync(join(tmpdir(), "amc-skill-home-"))); directories.push(home);
+    const controls = realpathSync(mkdtempSync(join(tmpdir(), "amc-skill-controls-"))); directories.push(controls);
+    process.env["AMC_CONTROL_CHECKPOINT_DIR"] = controls; process.env["AMC_VAULT_PASSPHRASE"] = "skill-delegate-fixture";
+    initWorkspaceWithoutActionPolicy({ workspacePath: root, trustBoundaryMode: "isolated" }); // with the default policy every EXECUTE is simulated
+    initBudgets(root, "default"); writeRuntimeFirewallPolicy({ workspace: root, mode: "observe" });
+    const tools = loadToolsConfig(root);
+    initToolsConfig(root, { ...tools, tools: { ...tools.tools, allowedTools: [...tools.tools.allowedTools, { name: "delegate", actionClass: "READ_ONLY" }] } });
+    skillDir(root, "readonly", "name: readonly\ndescription: no writes\ndisallowed-tools: [fs.write]", "Read only.");
+    const childWrite = JSON.stringify({ tool: "fs.write", arguments: { path: "workspace/output/child.txt", content: "written by child" } });
+    const delegateCall = JSON.stringify({ tool: "delegate", arguments: { runAs: "writer", goal: childWrite } });
+    const cwd = process.cwd(); process.chdir(root);
+    try {
+      const invoke = async (prompt: string) => {
+        const out: string[] = [], errors: string[] = [], failures: number[] = [];
+        const program = new Command(); program.exitOverride();
+        registerAgentCommands(program, { log: line => out.push(line), error: line => errors.push(line), fail: () => failures.push(1) });
+        await program.parseAsync(["node", "amc", "agent-loop", "run", prompt, "--tools", "workspace", "--delegate", "--credentials-home", home, "--json"]);
+        return { out, errors, failures };
+      };
+      // Control: without the skill the stub parent delegates and the stub child writes the file.
+      const control = await invoke(delegateCall);
+      expect(control.failures, control.errors.join("\n")).toEqual([]);
+      expect(existsSync(join(root, "workspace", "output", "child.txt"))).toBe(true);
+      rmSync(join(root, "workspace", "output", "child.txt"));
+      // With the skill, `delegate` is withheld: the turn runs, nothing writes.
+      const guarded = await invoke(`/readonly ${delegateCall}`);
+      expect(guarded.failures, guarded.errors.join("\n")).toEqual([]);
+      expect(JSON.parse(guarded.out.at(-1)!)).toMatchObject({ endings: [{ turn: 1 }] });
+      expect(existsSync(join(root, "workspace", "output", "child.txt"))).toBe(false);
+    } finally { process.chdir(cwd); delete process.env["AMC_CONTROL_CHECKPOINT_DIR"]; delete process.env["AMC_VAULT_PASSPHRASE"]; }
+  }, 120_000);
 });

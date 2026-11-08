@@ -5,6 +5,7 @@ import { skillContextPlugin } from "./skillPrompt.js";
 import { renderSkillBody, SkillArgumentError } from "./skillArguments.js";
 import type { ContextPlugin } from "../prompt/context/contextTypes.js";
 import { NATIVE_DELEGATION_CAPABILITIES } from "../agent/nativeToolCapabilities.js";
+import { RUN_CODE_TOOL } from "../tools/toolPipeline.js";
 
 /**
  * Turn a `/name` into a composed turn (plan P6.2).
@@ -82,17 +83,23 @@ export type PreparedSkillTurn =
  * applied; workspace text cannot widen a signed policy.
  *
  * Delegation is withheld with it (S8): a delegated child composes its own toolset without the skill, so `delegate` or
- * `workflow` would hand the model the denied tool back. ponytail: an inherited deny set in subagentRunner (D23) lifts this.
+ * `workflow` would hand the model the denied tool back. They are denied BY NAME, unconditionally: the run path applies
+ * this before the kernel defines `delegate` (`--delegate`'s grant comes at composition), and a restriction narrows by
+ * name, so a tool defined later is covered too. ponytail: an inherited deny set in subagentRunner (D23) lifts this.
+ *
+ * Never throws: `run_code` (the Code Mode transport, which `restrict()` refuses to name) and any other restriction
+ * failure become a refusal string, so every caller's close-the-toolset path runs.
  */
 export function applySkillToolRestriction(registry: { visible(scope?: string): ReadonlyMap<string, unknown>; restrict(restriction: { readonly deny?: ReadonlySet<string> }): unknown },
   turn: PreparedSkillTurn, agentId: string): string | undefined {
   if (!turn.ok || turn.disallowedTools.length === 0) return undefined;
+  const skill = `skill "${turn.loaded?.name}"`;
+  if (turn.disallowedTools.includes(RUN_CODE_TOOL)) return `${skill} disallows ${RUN_CODE_TOOL}, the Code Mode transport, which cannot be restricted by name; list the tools it dispatches instead`;
   const known = registry.visible(agentId);
   const unknown = turn.disallowedTools.filter(name => !known.has(name));
-  if (unknown.length > 0) return `skill "${turn.loaded?.name}" disallows tools that are not registered for this run: ${unknown.join(", ")}; fix the frontmatter or run without the skill`;
-  const deny = new Set(turn.disallowedTools);
-  for (const capability of NATIVE_DELEGATION_CAPABILITIES) if (known.has(capability.name)) deny.add(capability.name);
-  registry.restrict({ deny });
+  if (unknown.length > 0) return `${skill} disallows tools that are not registered for this run: ${unknown.join(", ")}; fix the frontmatter or run without the skill`;
+  try { registry.restrict({ deny: new Set([...turn.disallowedTools, ...NATIVE_DELEGATION_CAPABILITIES.map(capability => capability.name)]) }); }
+  catch (error) { return `${skill}: its disallowed-tools could not be applied (${error instanceof Error ? error.message : "restriction refused"})`; }
   return undefined;
 }
 

@@ -24,7 +24,7 @@ export interface RenderedSkillBody {
 
 export class SkillArgumentError extends Error {}
 
-/** Shell-like words: whitespace-separated, with `"..."` and `'...'` grouping and `\` escaping inside double quotes. */
+/** Shell-like words: whitespace-separated, with `"..."` and `'...'` grouping and `\` escaping inside double quotes. Throws on an unbalanced quote. */
 export function tokenizeSkillArguments(rest: string): string[] {
   const words: string[] = [];
   let current = "", quote: "\"" | "'" | null = null, open = false;
@@ -47,22 +47,40 @@ export function tokenizeSkillArguments(rest: string): string[] {
 
 const PLACEHOLDER = /\\\$|\$\{AMC_SKILL_DIR\}|\$\{AMC_WORKSPACE\}|\$ARGUMENTS\[(\d{1,2})\]|\$ARGUMENTS\b|\$(\d{1,2})\b|\$([A-Za-z_][A-Za-z0-9_]{0,31})\b/g;
 
+/** Quote-aware words; quotes that do not balance (`the user's bug`) fall back to whitespace words, never a refusal. */
+function wordsOf(rest: string): string[] {
+  try { return tokenizeSkillArguments(rest); }
+  catch (error) { if (error instanceof SkillArgumentError) return rest.split(/\s+/).filter(word => word.length > 0); throw error; }
+}
+
+/**
+ * THE PROMPT IS NEVER REFUSED FOR ITS SHAPE. A bare `/name` leaves the body exactly as written (as before SH-EXT-05, so
+ * an `awk '{print $1}'` example survives). Otherwise the text is split into words only when a `$N`, `$ARGUMENTS[N]` or
+ * declared `$name` placeholder needs them, and the argument caps bound only what is substituted.
+ */
 export function renderSkillBody(body: string, init: { readonly rest: string; readonly argumentNames?: readonly string[];
   readonly skillDirectory?: string; readonly workspace: string }): RenderedSkillBody {
   const rest = init.rest.trim();
-  if (Buffer.byteLength(rest) > NATIVE_EXTENSION_LIMITS.argumentBytes) throw new SkillArgumentError(`skill arguments exceed ${NATIVE_EXTENSION_LIMITS.argumentBytes} bytes`);
-  const words = tokenizeSkillArguments(rest);
-  if (words.length > NATIVE_EXTENSION_LIMITS.positionalArguments) throw new SkillArgumentError(`more than ${NATIVE_EXTENSION_LIMITS.positionalArguments} positional skill arguments`);
-  const named = new Map<string, string>();
-  for (const [index, name] of (init.argumentNames ?? []).entries()) named.set(name, words[index] ?? "");
+  if (rest.length === 0) return { text: body, substituted: false, argumentsText: rest, argumentsSha256: sha256Hex(rest), renderedSha256: sha256Hex(body) };
+  const names = init.argumentNames ?? [];
+  let words: string[] | undefined;
+  const argument = (): string => {
+    if (Buffer.byteLength(rest) > NATIVE_EXTENSION_LIMITS.argumentBytes) throw new SkillArgumentError(`skill arguments exceed ${NATIVE_EXTENSION_LIMITS.argumentBytes} bytes`);
+    return rest;
+  };
+  const word = (index: number): string => {
+    words ??= wordsOf(argument());
+    if (words.length > NATIVE_EXTENSION_LIMITS.positionalArguments) throw new SkillArgumentError(`more than ${NATIVE_EXTENSION_LIMITS.positionalArguments} positional skill arguments`);
+    return words[index] ?? "";
+  };
   let substituted = false;
   const text = body.replace(PLACEHOLDER, (match, indexed?: string, positional?: string, name?: string) => {
     if (match === "\\$") return "$";
     if (match === "${AMC_SKILL_DIR}") return init.skillDirectory ?? "";
     if (match === "${AMC_WORKSPACE}") return init.workspace;
-    if (indexed !== undefined || positional !== undefined) { substituted = true; return words[Number(indexed ?? positional)] ?? ""; }
-    if (name !== undefined) { if (!named.has(name)) return match; substituted = true; return named.get(name)!; }
-    substituted = true; return rest; // $ARGUMENTS
+    if (indexed !== undefined || positional !== undefined) { substituted = true; return word(Number(indexed ?? positional)); }
+    if (name !== undefined) { if (!names.includes(name)) return match; substituted = true; return word(names.lastIndexOf(name)); }
+    substituted = true; return argument(); // $ARGUMENTS
   });
   if (Buffer.byteLength(text) > NATIVE_EXTENSION_LIMITS.expansionBytes) throw new SkillArgumentError("the rendered skill exceeds the expansion limit");
   return { text, substituted, argumentsText: rest, argumentsSha256: sha256Hex(rest), renderedSha256: sha256Hex(text) };

@@ -49,11 +49,11 @@ function flag(fields: Record<string, unknown>, key: string): boolean | undefined
   if (value === "false") return false;
   return fail(`${key} must be true or false`);
 }
-/** A YAML list, or one string split on commas and whitespace; every item must look like a name. */
+/** A YAML list, or one string (a `[a, b]` flow list read as text included) split on commas and whitespace; every item must look like a name. */
 function list(fields: Record<string, unknown>, key: string, pattern: RegExp, what: string): readonly string[] | undefined {
   const value = fields[key];
   if (value === undefined || value === null) return undefined;
-  const items = typeof value === "string" ? value.split(/[\s,]+/).filter(item => item.length > 0)
+  const items = typeof value === "string" ? value.replace(/^\[(.*)\]$/, "$1").split(/[\s,]+/).filter(item => item.length > 0)
     : Array.isArray(value) ? value : fail(`${key} must be a list or a string`);
   if (items.length > 64) return fail(`${key} lists more than 64 items`);
   const out: string[] = [];
@@ -64,14 +64,57 @@ function list(fields: Record<string, unknown>, key: string, pattern: RegExp, wha
   return Object.freeze(out);
 }
 
-/** Parse one frontmatter block. Returns the fields, or the reason it cannot be read. */
+const TEXT_FIELDS = ["name", "description", "argument-hint", "when_to_use", "model", "effort"] as const;
+const unquote = (value: string): string => /^(["'])(.*)\1$/.exec(value)?.[2] ?? value;
+
+/**
+ * The reader skills were written against before YAML: `key: rest of line`, plus `- item` lines under a `key:` with no
+ * value. Null when a key repeats, which is a problem under both readers.
+ */
+function lineFields(front: string): Record<string, unknown> | null {
+  const fields: Record<string, unknown> = {};
+  let open: string[] | undefined;
+  for (const line of front.split(/\r?\n/)) {
+    const item = /^\s*-\s+(.*)$/.exec(line);
+    if (item !== null && open !== undefined) { open.push(unquote(item[1]!.trim())); continue; }
+    open = undefined;
+    const at = line.indexOf(":");
+    if (at <= 0) continue;
+    const key = line.slice(0, at).trim(), value = line.slice(at + 1).trim();
+    if (Object.hasOwn(fields, key)) return null;
+    if (value.length > 0) fields[key] = value;
+    else { open = []; fields[key] = open; }
+  }
+  for (const [key, value] of Object.entries(fields)) if (Array.isArray(value) && value.length === 0) fields[key] = "";
+  return fields;
+}
+
+/**
+ * Parse one frontmatter block. Returns the fields, or the reason it cannot be read.
+ *
+ * LEGACY TEXT STILL LOADS. Skills were written for a `key: rest of line` reader, under which `description: Deploy:
+ * ships it`, `*important* tool` and `#1 helper` were plain text; YAML rejects the first two and reads the third as a
+ * comment. So when YAML cannot read the block, the line reader decides; and when YAML reads a text field as something
+ * other than a string, the line as written wins for that field. A repeated key stays a problem either way.
+ */
 export function parseSkillFrontmatter(front: string): { fields: SkillFields } | { reason: string } {
-  let raw: unknown;
+  let raw: unknown, yamlProblem: string | undefined;
   try { raw = YAML.parse(front, { maxAliasCount: 8, uniqueKeys: true }); }
-  catch (error) { return { reason: `frontmatter is not valid YAML: ${error instanceof Error ? error.message.split("\n")[0] : "parse error"}` }; }
+  catch (error) { yamlProblem = `frontmatter is not valid YAML: ${error instanceof Error ? error.message.split("\n")[0] : "parse error"}`; }
+  const lines = lineFields(front);
+  if (yamlProblem !== undefined) {
+    if (lines === null) return { reason: yamlProblem };
+    raw = lines;
+  }
   if (raw === null || raw === undefined) raw = {};
   if (typeof raw !== "object" || Array.isArray(raw)) return { reason: "frontmatter must be a YAML mapping" };
-  const fields = raw as Record<string, unknown>;
+  let fields = raw as Record<string, unknown>;
+  if (yamlProblem === undefined && lines !== null) {
+    for (const key of TEXT_FIELDS) {
+      const written = lines[key];
+      if (typeof fields[key] !== "string" && typeof written === "string" && written.length > 0) fields = { ...fields, [key]: written };
+    }
+  }
   try {
     const disable = flag(fields, "disable-model-invocation");
     const invocable = flag(fields, "user-invocable");
