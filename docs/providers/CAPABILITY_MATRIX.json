@@ -805,6 +805,1146 @@
       }
     },
     {
+      "route": "groq",
+      "protocol": "openai-chat-completions",
+      "adapter": "openai-compatible-chat@1",
+      "encoder": "openai-chat@4",
+      "bytesBuiltBy": "AMC",
+      "features": {
+        "text-input": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > groq: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "text-output": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > groq: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "image-input": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "image-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "audio-input": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "audio-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "video-input": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "thinking-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "thinking-replay": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "tool-calls": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > groq: a tool call decodes under the offered name",
+              "status": "passed"
+            }
+          ]
+        },
+        "tool-replay": {
+          "support": "unknown",
+          "declared": "supported",
+          "tests": []
+        },
+        "tool-result-error-flag": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "tool-result-error-text": {
+          "support": "unknown",
+          "declared": "supported",
+          "tests": []
+        },
+        "usage": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > groq: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "cache-read-usage": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "cache-write-usage": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "prompt-cache-control": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        }
+      }
+    },
+    {
+      "route": "mistral",
+      "protocol": "openai-chat-completions",
+      "adapter": "openai-compatible-chat@1",
+      "encoder": "openai-chat@4",
+      "bytesBuiltBy": "AMC",
+      "features": {
+        "text-input": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > mistral: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "text-output": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > mistral: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "image-input": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "image-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "audio-input": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "audio-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "video-input": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "thinking-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "thinking-replay": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "tool-calls": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > mistral: a tool call decodes under the offered name",
+              "status": "passed"
+            }
+          ]
+        },
+        "tool-replay": {
+          "support": "unknown",
+          "declared": "supported",
+          "tests": []
+        },
+        "tool-result-error-flag": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "tool-result-error-text": {
+          "support": "unknown",
+          "declared": "supported",
+          "tests": []
+        },
+        "usage": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > mistral: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "cache-read-usage": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "cache-write-usage": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "prompt-cache-control": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        }
+      }
+    },
+    {
+      "route": "xai",
+      "protocol": "openai-chat-completions",
+      "adapter": "openai-compatible-chat@1",
+      "encoder": "openai-chat@4",
+      "bytesBuiltBy": "AMC",
+      "features": {
+        "text-input": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > xai: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "text-output": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > xai: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "image-input": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "image-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "audio-input": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "audio-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "video-input": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "thinking-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "thinking-replay": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "tool-calls": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > xai: a tool call decodes under the offered name",
+              "status": "passed"
+            }
+          ]
+        },
+        "tool-replay": {
+          "support": "unknown",
+          "declared": "supported",
+          "tests": []
+        },
+        "tool-result-error-flag": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "tool-result-error-text": {
+          "support": "unknown",
+          "declared": "supported",
+          "tests": []
+        },
+        "usage": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > xai: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "cache-read-usage": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "cache-write-usage": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "prompt-cache-control": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        }
+      }
+    },
+    {
+      "route": "openrouter",
+      "protocol": "openai-chat-completions",
+      "adapter": "openai-compatible-chat@1",
+      "encoder": "openai-chat@4",
+      "bytesBuiltBy": "AMC",
+      "features": {
+        "text-input": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > openrouter: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "text-output": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > openrouter: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "image-input": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "image-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "audio-input": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "audio-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "video-input": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "thinking-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "thinking-replay": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "tool-calls": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > openrouter: a tool call decodes under the offered name",
+              "status": "passed"
+            }
+          ]
+        },
+        "tool-replay": {
+          "support": "unknown",
+          "declared": "supported",
+          "tests": []
+        },
+        "tool-result-error-flag": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "tool-result-error-text": {
+          "support": "unknown",
+          "declared": "supported",
+          "tests": []
+        },
+        "usage": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > openrouter: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "cache-read-usage": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "cache-write-usage": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "prompt-cache-control": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        }
+      }
+    },
+    {
+      "route": "together",
+      "protocol": "openai-chat-completions",
+      "adapter": "openai-compatible-chat@1",
+      "encoder": "openai-chat@4",
+      "bytesBuiltBy": "AMC",
+      "features": {
+        "text-input": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > together: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "text-output": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > together: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "image-input": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "image-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "audio-input": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "audio-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "video-input": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "thinking-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "thinking-replay": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "tool-calls": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > together: a tool call decodes under the offered name",
+              "status": "passed"
+            }
+          ]
+        },
+        "tool-replay": {
+          "support": "unknown",
+          "declared": "supported",
+          "tests": []
+        },
+        "tool-result-error-flag": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "tool-result-error-text": {
+          "support": "unknown",
+          "declared": "supported",
+          "tests": []
+        },
+        "usage": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > together: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "cache-read-usage": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "cache-write-usage": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "prompt-cache-control": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        }
+      }
+    },
+    {
+      "route": "fireworks",
+      "protocol": "openai-chat-completions",
+      "adapter": "openai-compatible-chat@1",
+      "encoder": "openai-chat@4",
+      "bytesBuiltBy": "AMC",
+      "features": {
+        "text-input": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > fireworks: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "text-output": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > fireworks: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "image-input": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "image-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "audio-input": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "audio-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "video-input": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "thinking-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "thinking-replay": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "tool-calls": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > fireworks: a tool call decodes under the offered name",
+              "status": "passed"
+            }
+          ]
+        },
+        "tool-replay": {
+          "support": "unknown",
+          "declared": "supported",
+          "tests": []
+        },
+        "tool-result-error-flag": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "tool-result-error-text": {
+          "support": "unknown",
+          "declared": "supported",
+          "tests": []
+        },
+        "usage": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > fireworks: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "cache-read-usage": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "cache-write-usage": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "prompt-cache-control": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        }
+      }
+    },
+    {
+      "route": "lmstudio",
+      "protocol": "openai-chat-completions",
+      "adapter": "openai-compatible-chat@1",
+      "encoder": "openai-chat@4",
+      "bytesBuiltBy": "AMC",
+      "features": {
+        "text-input": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > lmstudio: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "text-output": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > lmstudio: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "image-input": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "image-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "audio-input": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "audio-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "video-input": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "thinking-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "thinking-replay": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "tool-calls": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > lmstudio: a tool call decodes under the offered name",
+              "status": "passed"
+            }
+          ]
+        },
+        "tool-replay": {
+          "support": "unknown",
+          "declared": "supported",
+          "tests": []
+        },
+        "tool-result-error-flag": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "tool-result-error-text": {
+          "support": "unknown",
+          "declared": "supported",
+          "tests": []
+        },
+        "usage": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > lmstudio: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "cache-read-usage": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "cache-write-usage": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "prompt-cache-control": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        }
+      }
+    },
+    {
+      "route": "vllm",
+      "protocol": "openai-chat-completions",
+      "adapter": "openai-compatible-chat@1",
+      "encoder": "openai-chat@4",
+      "bytesBuiltBy": "AMC",
+      "features": {
+        "text-input": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > vllm: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "text-output": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > vllm: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "image-input": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "image-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "audio-input": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "audio-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "video-input": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "thinking-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "thinking-replay": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "tool-calls": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > vllm: a tool call decodes under the offered name",
+              "status": "passed"
+            }
+          ]
+        },
+        "tool-replay": {
+          "support": "unknown",
+          "declared": "supported",
+          "tests": []
+        },
+        "tool-result-error-flag": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "tool-result-error-text": {
+          "support": "unknown",
+          "declared": "supported",
+          "tests": []
+        },
+        "usage": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > vllm: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "cache-read-usage": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "cache-write-usage": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "prompt-cache-control": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        }
+      }
+    },
+    {
+      "route": "llamacpp",
+      "protocol": "openai-chat-completions",
+      "adapter": "openai-compatible-chat@1",
+      "encoder": "openai-chat@4",
+      "bytesBuiltBy": "AMC",
+      "features": {
+        "text-input": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > llamacpp: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "text-output": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > llamacpp: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "image-input": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "image-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "audio-input": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "audio-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "video-input": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "thinking-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "thinking-replay": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "tool-calls": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > llamacpp: a tool call decodes under the offered name",
+              "status": "passed"
+            }
+          ]
+        },
+        "tool-replay": {
+          "support": "unknown",
+          "declared": "supported",
+          "tests": []
+        },
+        "tool-result-error-flag": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "tool-result-error-text": {
+          "support": "unknown",
+          "declared": "supported",
+          "tests": []
+        },
+        "usage": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > llamacpp: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "cache-read-usage": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "cache-write-usage": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "prompt-cache-control": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        }
+      }
+    },
+    {
+      "route": "azure-openai",
+      "protocol": "openai-chat-completions",
+      "adapter": "azure-openai-chat@1",
+      "encoder": "openai-chat@4",
+      "bytesBuiltBy": "AMC",
+      "features": {
+        "text-input": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > azure-openai: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "text-output": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > azure-openai: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "image-input": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "image-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "audio-input": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "audio-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "video-input": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "thinking-output": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "thinking-replay": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "tool-calls": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > azure-openai: a tool call decodes under the offered name",
+              "status": "passed"
+            }
+          ]
+        },
+        "tool-replay": {
+          "support": "unknown",
+          "declared": "supported",
+          "tests": []
+        },
+        "tool-result-error-flag": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        },
+        "tool-result-error-text": {
+          "support": "unknown",
+          "declared": "supported",
+          "tests": []
+        },
+        "usage": {
+          "support": "supported",
+          "declared": "supported",
+          "tests": [
+            {
+              "test": "tests/nativeCapabilityContract.test.ts > azure-openai: a text reply decodes with reported usage, and the fixture received exactly the signed bytes",
+              "status": "passed"
+            }
+          ]
+        },
+        "cache-read-usage": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "cache-write-usage": {
+          "support": "unknown",
+          "declared": "unknown",
+          "tests": []
+        },
+        "prompt-cache-control": {
+          "support": "unknown",
+          "declared": "unsupported",
+          "tests": []
+        }
+      }
+    },
+    {
       "route": "pi-ai:groq",
       "protocol": "pi-ai-openai-completions",
       "adapter": "pi-ai-openai-completions@1",

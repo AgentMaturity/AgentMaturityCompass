@@ -24,48 +24,78 @@ that run. Do not edit by hand: `npm run check:capability-matrix` runs the tests 
 | `gemini` | gemini-generate-content | gemini-generate-content@1 | gemini-generate-content@1 | AMC | not run |
 | `gemini-audio` | gemini-generate-content | gemini-generate-content@2 | gemini-generate-content@2 | AMC | not run |
 | `ollama` | ollama-chat | ollama-chat@1 | ollama-chat@1 | AMC | not run |
+| `groq` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@4 | AMC | not run |
+| `mistral` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@4 | AMC | not run |
+| `xai` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@4 | AMC | not run |
+| `openrouter` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@4 | AMC | not run |
+| `together` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@4 | AMC | not run |
+| `fireworks` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@4 | AMC | not run |
+| `lmstudio` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@4 | AMC | not run |
+| `vllm` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@4 | AMC | not run |
+| `llamacpp` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@4 | AMC | not run |
+| `azure-openai` | openai-chat-completions | azure-openai-chat@1 | openai-chat@4 | AMC | not run |
 | `pi-ai:groq` | pi-ai-openai-completions | pi-ai-openai-completions@1 | pi-ai:groq@1 | @earendil-works/pi-ai@1.3.0 (third-party library, pinned) | not run |
 | `pi-ai:huggingface` | pi-ai-openai-completions | pi-ai-openai-completions@1 | pi-ai:huggingface@1 | @earendil-works/pi-ai@1.3.0 (third-party library, pinned) | not run |
 | `pi-ai:together` | pi-ai-openai-completions | pi-ai-openai-completions@1 | pi-ai:together@1 | @earendil-works/pi-ai@1.3.0 (third-party library, pinned) | not run |
 
 ## Features
 
-| Feature | `anthropic` | `openai` | `openai-responses` | `deepseek` | `gemini` | `gemini-audio` | `ollama` | `pi-ai:groq` | `pi-ai:huggingface` | `pi-ai:together` |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| text-input | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported |
-| text-output | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported |
-| image-input | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared unsupported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown | unknown | unknown |
-| image-output | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown | unknown | unknown |
-| audio-input | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared supported) | unknown (declared unsupported) | unknown | unknown | unknown |
-| audio-output | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown | unknown | unknown |
-| video-input | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown | unknown | unknown |
-| thinking-output | unknown (declared supported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown | unknown | unknown |
-| thinking-replay | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown | unknown | unknown |
-| tool-calls | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported |
-| tool-replay | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | supported | supported | supported |
-| tool-result-error-flag | unknown (declared supported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unsupported | unsupported | unsupported |
-| tool-result-error-text | unknown (declared unsupported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unsupported | unsupported | unsupported |
-| usage | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported |
-| cache-read-usage | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown | unknown | unknown |
-| cache-write-usage | unknown (declared supported) | unknown (declared unsupported) | unknown (declared supported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown | unknown | unknown |
-| prompt-cache-control | unknown (declared supported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown | unknown | unknown |
+| Feature | `anthropic` | `openai` | `openai-responses` | `deepseek` | `gemini` | `gemini-audio` | `ollama` | `groq` | `mistral` | `xai` | `openrouter` | `together` | `fireworks` | `lmstudio` | `vllm` | `llamacpp` | `azure-openai` | `pi-ai:groq` | `pi-ai:huggingface` | `pi-ai:together` |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| text-input | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported |
+| text-output | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported |
+| image-input | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared unsupported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown | unknown | unknown | unknown | unknown | unknown | unknown | unknown | unknown | unknown | unknown | unknown | unknown |
+| image-output | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown | unknown | unknown |
+| audio-input | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared supported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown | unknown | unknown |
+| audio-output | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown | unknown | unknown |
+| video-input | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown | unknown | unknown |
+| thinking-output | unknown (declared supported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown | unknown | unknown |
+| thinking-replay | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown | unknown | unknown |
+| tool-calls | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported |
+| tool-replay | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | supported | supported | supported |
+| tool-result-error-flag | unknown (declared supported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unsupported | unsupported | unsupported |
+| tool-result-error-text | unknown (declared unsupported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unsupported | unsupported | unsupported |
+| usage | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported | supported |
+| cache-read-usage | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown (declared supported) | unknown | unknown | unknown | unknown | unknown | unknown | unknown | unknown | unknown | unknown | unknown | unknown | unknown |
+| cache-write-usage | unknown (declared supported) | unknown (declared unsupported) | unknown (declared supported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown | unknown | unknown | unknown | unknown | unknown | unknown | unknown | unknown | unknown | unknown | unknown | unknown |
+| prompt-cache-control | unknown (declared supported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown (declared unsupported) | unknown | unknown | unknown |
 
 ## Passing tests cited
 
 - tests/nativeCapabilityContract.test.ts > anthropic: a text reply decodes with reported usage, and the fixture received exactly the signed bytes
 - tests/nativeCapabilityContract.test.ts > anthropic: a tool call decodes under the offered name
+- tests/nativeCapabilityContract.test.ts > azure-openai: a text reply decodes with reported usage, and the fixture received exactly the signed bytes
+- tests/nativeCapabilityContract.test.ts > azure-openai: a tool call decodes under the offered name
 - tests/nativeCapabilityContract.test.ts > deepseek: a text reply decodes with reported usage, and the fixture received exactly the signed bytes
 - tests/nativeCapabilityContract.test.ts > deepseek: a tool call decodes under the offered name
+- tests/nativeCapabilityContract.test.ts > fireworks: a text reply decodes with reported usage, and the fixture received exactly the signed bytes
+- tests/nativeCapabilityContract.test.ts > fireworks: a tool call decodes under the offered name
 - tests/nativeCapabilityContract.test.ts > gemini-audio: a text reply decodes with reported usage, and the fixture received exactly the signed bytes
 - tests/nativeCapabilityContract.test.ts > gemini-audio: a tool call decodes under the offered name
 - tests/nativeCapabilityContract.test.ts > gemini: a text reply decodes with reported usage, and the fixture received exactly the signed bytes
 - tests/nativeCapabilityContract.test.ts > gemini: a tool call decodes under the offered name
+- tests/nativeCapabilityContract.test.ts > groq: a text reply decodes with reported usage, and the fixture received exactly the signed bytes
+- tests/nativeCapabilityContract.test.ts > groq: a tool call decodes under the offered name
+- tests/nativeCapabilityContract.test.ts > llamacpp: a text reply decodes with reported usage, and the fixture received exactly the signed bytes
+- tests/nativeCapabilityContract.test.ts > llamacpp: a tool call decodes under the offered name
+- tests/nativeCapabilityContract.test.ts > lmstudio: a text reply decodes with reported usage, and the fixture received exactly the signed bytes
+- tests/nativeCapabilityContract.test.ts > lmstudio: a tool call decodes under the offered name
+- tests/nativeCapabilityContract.test.ts > mistral: a text reply decodes with reported usage, and the fixture received exactly the signed bytes
+- tests/nativeCapabilityContract.test.ts > mistral: a tool call decodes under the offered name
 - tests/nativeCapabilityContract.test.ts > ollama: a text reply decodes with reported usage, and the fixture received exactly the signed bytes
 - tests/nativeCapabilityContract.test.ts > ollama: a tool call decodes under the offered name
 - tests/nativeCapabilityContract.test.ts > openai-responses: a text reply decodes with reported usage, and the fixture received exactly the signed bytes
 - tests/nativeCapabilityContract.test.ts > openai-responses: a tool call decodes under the offered name
 - tests/nativeCapabilityContract.test.ts > openai: a text reply decodes with reported usage, and the fixture received exactly the signed bytes
 - tests/nativeCapabilityContract.test.ts > openai: a tool call decodes under the offered name
+- tests/nativeCapabilityContract.test.ts > openrouter: a text reply decodes with reported usage, and the fixture received exactly the signed bytes
+- tests/nativeCapabilityContract.test.ts > openrouter: a tool call decodes under the offered name
+- tests/nativeCapabilityContract.test.ts > together: a text reply decodes with reported usage, and the fixture received exactly the signed bytes
+- tests/nativeCapabilityContract.test.ts > together: a tool call decodes under the offered name
+- tests/nativeCapabilityContract.test.ts > vllm: a text reply decodes with reported usage, and the fixture received exactly the signed bytes
+- tests/nativeCapabilityContract.test.ts > vllm: a tool call decodes under the offered name
+- tests/nativeCapabilityContract.test.ts > xai: a text reply decodes with reported usage, and the fixture received exactly the signed bytes
+- tests/nativeCapabilityContract.test.ts > xai: a tool call decodes under the offered name
 - tests/piAi/piAiAdapterContract.test.ts > groq: a failed tool result is refused before a header, because the pinned encoding cannot carry it
 - tests/piAi/piAiAdapterContract.test.ts > groq: a streamed tool call decodes under the offered name and replays as history
 - tests/piAi/piAiAdapterContract.test.ts > groq: the fixture receives exactly the bytes the signed header commits to, and text and usage decode

@@ -2,7 +2,7 @@
 
 The native agent harness (`amc agent-loop run`, `amc agent-loop chat` and `guide`, `amc acp`, the schedules runner, `amc wire`, and the TypeScript and Python SDKs, which spawn `acp` and take the same reasoning, retention and retry options: `thinkingBudget`, `cacheRetention`, `maxRetries`, `retryMaxDelayMs`, `retryMaxProviderDelayMs` in TypeScript, `thinking_budget`, `cache_retention`, `max_retries`, `retry_max_delay_ms`, `retry_max_provider_delay_ms` in Python) sends model requests through AMC's own adapter seam: a route is pinned once per call, the request is committed in a signed `request/header` before any bytes leave, the credential is resolved per request by reference, the egress gate runs, and the settlement is signed. This page lists the routes `--provider` accepts, what each one sends, and the limits that hold in the current source build. Gateway templates (`docs/PROVIDERS.md`) are a different surface: they configure the recording proxy, not these routes.
 
-`amc agent-loop providers --json` prints the bundled adapter contracts, explicit unknowns and the reporting rules. It never probes a server, a model, a credential or a cache.
+`amc agent-loop providers --json` prints the bundled adapter contracts, explicit unknowns and the reporting rules. It never probes a server, a model, a credential or a cache. `docs/providers/CAPABILITY_MATRIX.md` lists, for every route here except the stub, what a contract test proved against a local fixture of that wire.
 
 ## Routes
 
