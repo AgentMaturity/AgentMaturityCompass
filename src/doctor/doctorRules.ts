@@ -27,7 +27,7 @@ import { signDigestWithPolicyAsync } from "../crypto/signing/signer.js";
 import { verifyKeyHistoryChain } from "../crypto/keys.js";
 import { inspectRuntimeFirewallPolicy } from "../runtime/firewall.js";
 import { nativeModuleCheck } from "./nativeModuleProbe.js";
-import { amcGitignoreCheck } from "./secretFileChecks.js";
+import { adminTokenCheck, amcGitignoreCheck } from "./secretFileChecks.js";
 import { requestDoctorStatus, doctorCarrierCheck } from "./doctorLiveProbe.js";
 import { adoptWorkspaceRecordHead, type RecordLocation } from "../storage/workspaceRecordStore.js";
 
@@ -210,8 +210,7 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
   );
   checks.push(nativeModuleCheck());
   checks.push(amcHomeCheck());
-  const gitignore = amcGitignoreCheck(workspace);
-  if (gitignore !== null) checks.push(gitignore);
+  for (const check of [amcGitignoreCheck(workspace), adminTokenCheck(workspace)]) if (check !== null) checks.push(check);
 
   // The key history decides which public keys may verify as each role, so a
   // silent insertion there forges every signature of that role. Report a broken

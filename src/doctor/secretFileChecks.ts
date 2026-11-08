@@ -2,8 +2,9 @@
  * Doctor checks on the secret files inside a workspace's .amc directory.
  */
 import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { permissionsAreEnforced } from "../credentials/credentialsFilePermissions.js";
 import { AMC_SECRET_FILES } from "../workspaceGitignore.js";
 import type { DoctorCheck } from "./doctorRules.js";
 
@@ -32,4 +33,20 @@ export function amcGitignoreCheck(workspace: string, env: NodeJS.ProcessEnv = pr
     }
   }
   return { id, status: "PASS", message: ".amc secrets are git-ignored" };
+}
+
+/** LIVE-VAULT-12: the Studio admin token is a bearer secret, kept as `amc up` writes it: 0600 and 64 hex characters. Null when absent. */
+export function adminTokenCheck(workspace: string): DoctorCheck | null {
+  const id = "studio-admin-token", file = join(workspace, ".amc", "studio", "admin.token");
+  if (!existsSync(file)) return null;
+  if (!permissionsAreEnforced()) return { id, status: "INFO", message: ".amc/studio/admin.token: POSIX modes are not checked on this platform" };
+  const mode = statSync(file).mode & 0o777;
+  if ((mode & 0o077) !== 0) {
+    return { id, status: "FAIL", message: `.amc/studio/admin.token is open to group or other users (mode ${mode.toString(8)})`, fixHint: "Run: chmod 600 .amc/studio/admin.token" };
+  }
+  if (!/^[0-9a-f]{64}$/.test(readFileSync(file, "utf8").trim())) {
+    return { id, status: "FAIL", message: ".amc/studio/admin.token is not 64 hexadecimal characters",
+      fixHint: "Run: amc down, delete .amc/studio/admin.token, then amc up (a new token is written)" };
+  }
+  return { id, status: "PASS", message: ".amc/studio/admin.token is private and well formed" };
 }

@@ -32,6 +32,8 @@ Token file:
 - `.amc/studio/admin.token`
 - The admin token cannot create, revoke or re-role console accounts: `/users/add`, `/users/revoke` and `/users/roles` answer 403 to it. Sign in as an OWNER for those.
 
+The first `amc up` creates the token file: mode 0600, 64 hexadecimal characters. AMC replaces a file that holds anything else (and says so on stderr), and never prints the token. `amc studio ping` and SDK clients send it as `x-amc-admin-token`; on A4 routes it reads only. `amc doctor` checks the file's mode and shape (`studio-admin-token`). To rotate it: `amc down`, delete the file, `amc up`. Every client holding the old value stops working at once.
+
 Header required for protected endpoints:
 - `x-amc-admin-token: <token>`
 
