@@ -58,8 +58,10 @@ describe("the sign-in paragraphs stay true", () => {
 describe("round-2 features are documented as the code behaves", () => {
   test("GETTING_STARTED names AMC_DASHBOARD_PORT and the busy-port fallback the supervisor has", () => {
     expect(read("src/config/envSchema.ts")).toContain("AMC_DASHBOARD_PORT: portish.default(4173)");
+    // LIVE-RUNTIME-10: the dashboard is started with no configured source, so a busy port falls back to a free one.
     const supervisor = read("src/studio/studioSupervisor.ts");
-    expect(supervisor).toContain('if (!message.includes("EADDRINUSE"))');
+    expect(supervisor).toContain('listenOnPolicyPort({ label: "Dashboard", port: params.dashboardPort ?? 4173, source: null');
+    expect(read("src/studio/studioLifecycle.ts")).toContain("if (input.source !== null) throw portInUseError(input.port, input.source);");
     expect(gettingStarted).toContain("The dashboard port is `AMC_DASHBOARD_PORT`, default 4173; when that port is busy, `amc up` falls back to a free port and prints the dashboard URL.");
   });
 
