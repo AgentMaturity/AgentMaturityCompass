@@ -51,6 +51,12 @@ describe("container source build and runtime contracts", () => {
     expect(file.match(/max-old-space-size/g)).toHaveLength(1);
   });
 
+  it("copies the shared TypeScript base config the vendored packages extend (LIVE-DEPLOY-13)", () => {
+    const stage = read("Dockerfile").split(/^FROM /m).find((block) => / AS build\n/.test(block))!;
+    const copied = [...stage.matchAll(/^COPY (?!--from)(.+)$/gm)].flatMap((match) => match[1]!.split(/\s+/).slice(0, -1));
+    expect(copied).toContain("tsconfig.base.json");
+  });
+
   it("copies every path the build and npm pack read into the build stage (P2-06-D1)", () => {
     const stage = read("Dockerfile").split(/^FROM /m).find((block) => / AS build\n/.test(block))!;
     const sources = [...stage.matchAll(/^COPY (?!--from)(.+)$/gm)].flatMap((match) => match[1]!.split(/\s+/).filter((token) => !token.startsWith("--")).slice(0, -1));

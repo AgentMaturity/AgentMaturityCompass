@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 FROM native-tools AS build
 WORKDIR /build/amc
 ENV CI=1
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json README.md LICENSE THIRD_PARTY_NOTICES ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json tsconfig.base.json README.md LICENSE THIRD_PARTY_NOTICES ./
 RUN npm install --global "$(node -p 'require("./package.json").packageManager')"
 # All workspace members and lifecycle/build scripts are required by the frozen install.
 COPY vendor/ vendor/
