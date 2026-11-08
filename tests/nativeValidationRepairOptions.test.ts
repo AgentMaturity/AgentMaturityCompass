@@ -29,7 +29,8 @@ vi.mock("node:child_process", async importOriginal => {
   return { ...actual, spawn: (_executable: string, argv: string[]) => {
     seam.commands.push([...argv]);
     const child = Object.assign(new EventEmitter(), {
-      stdout: new PassThrough(), stderr: new PassThrough(), exitCode: null as number | null, signalCode: null
+      // Chat writes the turn prompt to a piped stdin (`run -`, SH-UI-01); this child does not read it.
+      stdin: new PassThrough(), stdout: new PassThrough(), stderr: new PassThrough(), exitCode: null as number | null, signalCode: null
     });
     queueMicrotask(() => {
       child.stdout.end(JSON.stringify({ sessionId: "repair-chat-session", driverStatus: "idle", assistantText: [],

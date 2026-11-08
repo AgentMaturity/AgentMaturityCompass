@@ -431,8 +431,11 @@ describe("amc agent-loop run flags (D45, DXC-24, DXC-25)", () => {
   it("runs bounded goal rounds through --goal-rounds and reports how they stopped", async () => {
     const { out, failures, errors } = await runCli(["--tools", "workspace", "--delegate", "--goal-rounds", "2", "--json"]);
     expect(failures, errors.join("\n")).toEqual([]);
-    const summary = JSON.parse(out.at(-1)!) as { sessionId: string; goalRounds?: { rounds: number; stoppedBy: string } };
+    const summary = JSON.parse(out.at(-1)!) as { sessionId: string; goalRounds?: { rounds: number; stoppedBy: string }; goalReceiptStates?: string[]; exitCode?: number };
     expect(summary.goalRounds).toMatchObject({ rounds: 2, stoppedBy: "max-rounds" });
+    // SH-UI-01: a goal run's exit code reads the receipts of every session its rounds ran in, reported beside it.
+    expect(summary.goalReceiptStates).toEqual([]);
+    expect(summary.exitCode).toBe(4); // max-rounds is a bounded ending, never success.
     // A successful goal-rounds parent is sealed "completed", never "composition_failed".
     const reader = openSessionEventStore(dir, undefined, { readOnly: true });
     try {
