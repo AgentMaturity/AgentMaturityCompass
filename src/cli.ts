@@ -298,7 +298,7 @@ import { registerHookIntegrationCommands } from "./adapters/hookIntegrationCli.j
 import { runStudioForeground, startStudioDaemon, stopStudioDaemon, studioStatus } from "./studio/studioSupervisor.js";
 import { standaloneGatewayAllowList } from "./studio/listenPolicy.js";
 import { installStudioShutdown } from "./studio/studioShutdown.js";
-import { readAdminToken, readStudioState, studioLogsDir } from "./studio/studioState.js";
+import { readAdminToken, readStudioState, studioLogsDir, studioProbeBase } from "./studio/studioState.js";
 import { fixSignaturesAsync, FixSignaturesPublicationError, inspectSignatures } from "./studio/signatures.js";
 import {
   completeOnboarding,
@@ -4259,11 +4259,10 @@ studio
     const runtime = loadStudioRuntimeConfig(process.env, {
       workspaceDir: opts.workspace ? resolve(opts.workspace) : undefined
     });
-    const modeHost = runtime.hostDir ? runtime.hostBind : runtime.bind;
-    const modePort = runtime.hostDir ? runtime.hostPort : runtime.studioPort;
-    const host = modeHost === "0.0.0.0" || modeHost === "::" ? "127.0.0.1" : modeHost;
-    const health = await httpGetJson(`http://${host}:${modePort}/healthz`);
-    const ready = await httpGetJson(`http://${host}:${modePort}/readyz`);
+    // The running Studio's bound address from state.json; the configured one when Studio wrote none.
+    const base = studioProbeBase(runtime.workspaceDir, runtime.hostDir ? { host: runtime.hostBind, port: runtime.hostPort } : { host: runtime.bind, port: runtime.studioPort });
+    const health = await httpGetJson(`${base}/healthz`);
+    const ready = await httpGetJson(`${base}/readyz`);
     if (health.status >= 200 && health.status < 300 && ready.status >= 200 && ready.status < 300) {
       console.log(`OK ${health.status}/${ready.status}`);
       return;

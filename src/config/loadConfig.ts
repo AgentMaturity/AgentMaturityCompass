@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { studioEnvSchema, type StudioEnv } from "./envSchema.js";
 import type { StudioRuntimeConfig } from "./configTypes.js";
+import { canonicalOrigin } from "../studio/nativeAdmission.js";
 
 export function readSecretFromEnvOrFile(env: NodeJS.ProcessEnv, key: string): string | null {
   const fileKey = `${key}_FILE`;
@@ -108,6 +109,12 @@ function validateRuntimeConfig(config: StudioRuntimeConfig, env: NodeJS.ProcessE
     } else if (!existsSync(resolve(passphraseFile))) {
       errors.push(`AMC_VAULT_PASSPHRASE_FILE not found: ${resolve(passphraseFile)}`);
     }
+  }
+
+  // A value with a path, query or credentials used to pass here and fail every native request with a 500 (section 9 P2).
+  const badOrigins = config.corsAllowedOrigins.filter((origin) => canonicalOrigin(origin) === null);
+  if (badOrigins.length > 0) {
+    errors.push(`AMC_CORS_ALLOWED_ORIGINS takes origins only (scheme://host[:port], no path, query or credentials): ${badOrigins.join(", ")}`);
   }
 
   if (config.bootstrap && config.enableNotary && !config.notaryAuthSecret) {
