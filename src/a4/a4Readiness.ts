@@ -93,6 +93,8 @@ export interface A4ReadinessState {
 /** Live facts the caller gathered (a4Gates.collectFacts); null = could not be read. */
 export interface A4LiveFacts {
   readonly activeLocal: string[] | null;
+  /** The ACTIVE local users holding the workspace role OWNER, by user id (implicit project owners); null when unreadable, absent when not read. */
+  readonly localOwners?: readonly string[] | null;
   readonly hostPrincipals: number | null;
   readonly hostedRouter: boolean;
   readonly hostMode: boolean;
@@ -379,10 +381,30 @@ export function proposeNextAction(state: A4ReadinessState, stage: A4Stage, label
   const at = A4_STEPS.indexOf(state.project.step), explained = A4_STEPS.indexOf("explained");
   return at === explained ? { label } : at > explained ? { label: REDO_PROPOSAL } : null;
 }
-/** A-4/A-5: approvers decide only as project members, and a MEMBER transition supersedes every open gate. */
-const addApprovers = (projectId: string): NonNullable<A4ReadinessItem["nextAction"]> => ({
-  label: "Add approvers as project members before requesting a gate (adding a member supersedes open gates, which are then requested again)",
-  command: `amc a4 members ${projectId} --member LOCAL_USER:<userId> --project-role approver` });
+/**
+ * A-4/A-5: who may decide a gate as roleRefusals and assertMember admit them, by key: approver or owner members (any workspace
+ * role: generous) and the ACTIVE local workspace OWNERs (implicit owners). Null when unread, or with a host session live (a hosted
+ * call has one): host roles are unread. ponytail: an OWNER of the host who is not signed in is not seen; read host memberships then.
+ */
+function localDeciders(state: A4ReadinessState, live: A4LiveFacts): Set<string> | null {
+  if (live.localOwners == null || live.hostPrincipals !== 0) return null;
+  return new Set([...state.members.filter((member) => member.roles.includes("approver") || member.roles.includes("owner")).map((member) => member.principalKey),
+    ...live.localOwners.map((userId) => `LOCAL_USER:${userId}`)]);
+}
+/**
+ * Whether the one ACTIVE local user self-approves (design §5.3; a stage gate's exclusions then do not bar them), regulated status
+ * aside: a regulated project (an unstated risk tier too) has SOD_VIOLATION, and adding a user before the tier is stated ends self-approval.
+ */
+function soloSelfApproval(state: A4ReadinessState, query: A4ReadinessQuery): boolean {
+  const { activeLocal, hostPrincipals, hostedRouter } = query.live;
+  const only = activeLocal?.length === 1 ? { authSource: "LOCAL_USER", userId: activeLocal[0]! } as A4Principal : null;
+  return only !== null && deriveSelfApprovalAllowed({ activeLocal, hostPrincipals, hostedRouter, regulated: false, workspaceFloor: query.floor.allowSelfApproval,
+    ratcheted: selfApprovalFacts(state, query, only).ratcheted, decidingPrincipal: only });
+}
+/** `amc a4 members` as it runs: a writer names its `amc approvals login` token and the head it read (`amc a4 guide` prints it). */
+const addApprovers = (projectId: string, label: string): NonNullable<A4ReadinessItem["nextAction"]> => ({ label,
+  command: `amc a4 members ${projectId} --member LOCAL_USER:<userId> --project-role approver --session-token-file <file> --expect-head-seq <n>` });
+const QUORUM_UNREACHABLE = "QUORUM_UNREACHABLE"; // A-5's warning: progress never refuses on it (allowedFor)
 const unread = (id: string, reason: string, mandatory = true): A4ReadinessItem =>
   item(id, "NOT_EVALUATED", { kind: "source_unavailable", reasonCodes: [reason], mandatory });
 
@@ -398,11 +420,13 @@ function governanceItems(state: A4ReadinessState, query: A4ReadinessQuery, gates
   const { live, now } = query;
   const owners = state.members.filter((member) => member.roles.includes("owner"));
   const approvers = state.members.filter((member) => member.roles.includes("approver") || member.roles.includes("owner"));
+  const deciders = localDeciders(state, live), solo = soloSelfApproval(state, query);
   const items: A4ReadinessItem[] = [
     owners.length > 0 ? item("members.present", "READY") : item("members.present", "BLOCKED", { kind: "evidence_missing", reasonCodes: ["NO_OWNER"] }),
     live.activeLocal === null || live.hostPrincipals === null ? unread("members.candidates", "MEMBER_CANDIDATES_LIMITED", false)
-      : approvers.length < 2 ? item("members.candidates", "WAITING", { kind: "evidence_missing", mandatory: false, nextAction: addApprovers(state.project.project_id),
-        reasonCodes: ["NO_SECOND_APPROVER", ...(live.hostMode ? ["MEMBER_CANDIDATES_LIMITED"] : [])] })
+      : deciders !== null && deciders.size < 2 && !solo ? item("members.candidates", "WAITING", { kind: "evidence_missing", mandatory: false,
+        nextAction: addApprovers(state.project.project_id, "Add approvers as project members before requesting a gate (adding a member supersedes open gates, which are then requested again)"),
+        reasonCodes: ["NO_SECOND_APPROVER"] })
         : item("members.candidates", "READY", { reasonCodes: live.hostMode ? ["MEMBER_CANDIDATES_LIMITED"] : [], mandatory: false }),
     live.vaultUnlocked === null ? unread("signing.available", "VAULT_LOCKED")
       : item("signing.available", live.vaultUnlocked ? "READY" : "WAITING", live.vaultUnlocked ? {} : { kind: "source_unavailable", reasonCodes: ["VAULT_LOCKED"] }),
@@ -451,7 +475,7 @@ function governanceItems(state: A4ReadinessState, query: A4ReadinessQuery, gates
     nextAction: { label: `Required on this gate: ${pending.map((entry) => entry.label).join("; ")}` } }) : item("gate.required_reviews", "READY"));
   const stale = open.some((gate) => gate.counted.length < state.decisions.filter((decision) => decision.gate_id === gate.row.gate_id).length);
   items.push(stale ? item("approvals.fresh", "WAITING", { kind: "evidence_stale", reasonCodes: ["GATE_STALE"], mandatory: false }) : item("approvals.fresh", "READY", { mandatory: false }));
-  items.push(sodItem(state, open, regulated, query));
+  items.push(sodItem(state, open, regulated, deciders, solo));
   if (query.stage === "activate") items.push(lineageItem(state, query, regulated));
   return items;
 }
@@ -521,24 +545,25 @@ function effectsItem(state: A4ReadinessState, lost: readonly string[]): A4Readin
   return item("effects.failed", "READY");
 }
 
-/** The gate-derived SoD view: a regulated gate that the member set cannot satisfy waits with SOD_VIOLATION (design §5.3). */
-function sodItem(state: A4ReadinessState, open: readonly A4GateStatus[], regulated: boolean, query: A4ReadinessQuery): A4ReadinessItem {
+/**
+ * The gate-derived SoD view: a regulated gate that the member set cannot satisfy waits with SOD_VIOLATION (design §5.3). A-5:
+ * elsewhere a PENDING gate its deciders (localDeciders less its requester, authors and builders; one self-approving user counts
+ * once) cannot bring to quorum waits with QUORUM_UNREACHABLE, a warning progress never refuses on (allowedFor).
+ */
+function sodItem(state: A4ReadinessState, open: readonly A4GateStatus[], regulated: boolean, deciders: ReadonlySet<string> | null, solo: boolean): A4ReadinessItem {
   const selfApproved = open.some((gate) => gate.counted.some((decision) => decision.self_approved === 1));
-  const only = query.live.activeLocal?.length === 1 ? query.live.activeLocal[0]! : null;
-  const solo = only !== null && selfApprovalFacts(state, query, { authSource: "LOCAL_USER", userId: only } as A4Principal).selfApprovalAllowed;
   for (const gate of open) {
     const excluded = new Set<string>(parseJson(gate.row.excluded_keys_json) as string[] ?? []);
     const eligible = state.members.filter((member) => (member.roles.includes("approver") || member.roles.includes("owner")) && !excluded.has(member.principalKey));
-    const count = new Set(eligible.map((member) => member.principalKey)).size;
-    if (regulated && count < gate.required) {
+    if (regulated && new Set(eligible.map((member) => member.principalKey)).size < gate.required) {
       return item("sod", "WAITING", { kind: "sod_violation", reasonCodes: ["SOD_VIOLATION"],
         nextAction: { label: "Add a second member (`amc user add` or a host membership), then re-request the gate", command: "amc user add" } });
     }
-    // A-5: a gate whose eligible members (approver or owner, not its requester, authors or builders) are fewer than its
-    // quorum can never complete; warned, never refused, and not in a single-user workspace, where self-approval counts.
-    if (!regulated && !solo && count < gate.required) {
-      return item("sod", "WAITING", { kind: "sod_violation", reasonCodes: ["QUORUM_UNREACHABLE", `ELIGIBLE:${count}`, `REQUIRED:${gate.required}`],
-        nextAction: addApprovers(state.project.project_id) });
+    const reachable = deciders === null ? null : solo ? deciders.size : [...deciders].filter((key) => !excluded.has(key)).length;
+    if (!regulated && gate.status === "PENDING" && reachable !== null && reachable < gate.required) {
+      return item("sod", "WAITING", { kind: "sod_violation", reasonCodes: [QUORUM_UNREACHABLE, `ELIGIBLE:${reachable}`, `REQUIRED:${gate.required}`],
+        nextAction: addApprovers(state.project.project_id, `This gate can reach ${reachable} of the ${gate.required} approvals it needs: add approvers as project `
+          + "members (a new user first needs `amc user add`); adding one supersedes the gate, so request it again") });
     }
   }
   return item("sod", "READY", { kind: selfApproved ? "self_approved" : null,
@@ -640,8 +665,9 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
     progress: [
       ...principalUnresolved,
       ...(gateList.some((gate) => gate?.status === "QUORUM_MET") ? [] : ["GATE_PENDING"]),
-      ...ids((candidate) => (nonGate(candidate) || candidate.id === "sod" || candidate.id === "gate.required_reviews") && candidate.status !== "READY"
-        && candidate.status !== "COMPLETE" && candidate.acknowledged === null)
+      // sod's A-5 quorum warning is advice: it never refuses (SOD_VIOLATION, the regulated view, does).
+      ...ids((candidate) => (nonGate(candidate) || (candidate.id === "sod" && !candidate.reasonCodes.includes(QUORUM_UNREACHABLE))
+        || candidate.id === "gate.required_reviews") && candidate.status !== "READY" && candidate.status !== "COMPLETE" && candidate.acknowledged === null)
     ]
   };
   return Object.fromEntries(A4_ACTIONS.map((action) => {
@@ -700,12 +726,13 @@ export function readinessHeadline(state: Pick<A4ReadinessState, "project">, quer
   const named = mandatory.find((candidate) => candidate.status !== "READY" && candidate.status !== "COMPLETE" && candidate.nextAction !== null)?.nextAction ?? null;
   if (named !== null || state.project.stage !== query.stage || status === "COMPLETE") return { status, nextAction: named };
   if (status === "ON_HOLD") return { status, nextAction: { label: "On hold: an owner resumes the project" } };
-  if (status === "BLOCKED") return { status, nextAction: { label: `Blocked by ${blocked.map((candidate) => candidate.id).join(", ") || "store.integrity"}: see each item's reason codes` } };
   const gateName = state.project.step === "proposed" ? "direction" : state.project.step === "reviewed" ? "completion" : null;
   const gate = gateName === null ? null : gates[gateName];
+  // A denied gate blocks through its own item (GATE_DENIED); unless another item blocks too, the way back is a new revision.
+  if (gate?.status === "DENIED" && blocked.every((candidate) => GATE_DERIVED.has(candidate.id))) return { status, nextAction: { label: `The ${gateName} gate was denied on this revision. ${REDO_PROPOSAL}` } };
+  if (status === "BLOCKED") return { status, nextAction: { label: `Blocked by ${blocked.map((candidate) => candidate.id).join(", ") || "store.integrity"}: see each item's reason codes` } };
   if (gate?.status === "QUORUM_MET") return { status, nextAction: { label: `Complete the ${gateName} gate` } };
   if (gate?.status === "PENDING") return { status, nextAction: { label: `Approvers decide on the ${gateName} gate (${gate.approvals} of ${gate.required} approvals)` } };
-  if (gate?.status === "DENIED") return { status, nextAction: { label: `The ${gateName} gate was denied on this revision. ${REDO_PROPOSAL}` } };
   const label = STEP_NEXT[state.project.step];
   return { status, nextAction: label === undefined ? null : { label } };
 }

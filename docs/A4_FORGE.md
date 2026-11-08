@@ -103,12 +103,15 @@ files read unsigned until that verifier admits the pinned notary.
 - **Two local users are not evidence of two people.** Every LOCAL_USER key is minted under one workspace signing
   authority. A regulated project whose approvers are all LOCAL_USER is labelled `SOD_DEGRADED_SELF_PROVISIONED`, and a
   user created with no recorded creator is self-provisioned.
-- **Approvers are project members.** A workspace APPROVER, AUDITOR or OWNER decides a gate only as a member of the
-  project with the `approver` or `owner` project role; anyone else is refused with `403 A4_NOT_A_MEMBER`
-  (`PRINCIPAL_NOT_MEMBER`). Add approvers before requesting a gate:
-  `amc a4 members <projectId> --member LOCAL_USER:<userId> --project-role approver` (a `MEMBER` change supersedes
-  every open gate, which is then requested again). Readiness says so: `members.candidates` reads WAITING with
-  `NO_SECOND_APPROVER` while the project has fewer than two members who may approve.
+- **Who may decide.** A workspace OWNER is an implicit project owner and decides a gate without being added. A
+  workspace APPROVER or AUDITOR decides only as a member of the project with the `approver` or `owner` project role;
+  otherwise the decision is refused with `403 A4_NOT_A_MEMBER` (`PRINCIPAL_NOT_MEMBER`). Each gate's own roles apply
+  too (table below). Add such approvers before requesting a gate, since a `MEMBER` change supersedes every open gate,
+  which is then requested again. With the token file `amc approvals login --username <you> --token-file <file>` wrote:
+  `amc a4 members <projectId> --member LOCAL_USER:<userId> --project-role approver --session-token-file <file> --expect-head-seq <n>`
+  (`<n>` is the head seq `amc a4 guide` prints). Readiness says so: `members.candidates` reads WAITING with
+  `NO_SECOND_APPROVER` while fewer than two people may decide (members with the `approver` or `owner` role and active
+  local workspace OWNERs, counted as for `sod` below), except in a single-user workspace, where self-approval counts.
 - **How many people a walk needs.** Each gate's action class decides its quorum under the signed workspace approval
   policy (`amc policy approval init` signs the default). With the default policy:
 
@@ -121,12 +124,18 @@ files read unsigned until that verifier admits the pinned notary.
   | A gate-policy change | `WRITE_HIGH` | 2, distinct users | APPROVER, OWNER |
 
   The approvers exclude the revision's author, the gate's requester and, on a completion gate, its builders; each
-  effect's engine request is approved the same way. So an owner who authors, builds and requests needs two more
-  members: both with APPROVER or OWNER for the `WRITE_HIGH` and `DEPLOY` gates, both with OWNER or AUDITOR for Adapt
-  completion, one of them an AUDITOR (for example one OWNER and one user with both APPROVER and AUDITOR). With fewer, a
-  gate cannot reach its quorum before it expires: the `sod` item reads WAITING with `QUORUM_UNREACHABLE`, `ELIGIBLE:<n>` and
-  `REQUIRED:<m>` on a non-regulated project too (a warning, never a refusal), except in a single-user workspace,
-  where self-approval counts (below).
+  effect's engine request is approved the same way. So an owner who authors, builds and requests needs two more people
+  who may decide (workspace OWNERs, or project members with the approver role): both with APPROVER or OWNER for the
+  `WRITE_HIGH` and `DEPLOY` gates, both with OWNER or AUDITOR for Adapt completion, one of them an AUDITOR (for example
+  one OWNER and one user with both APPROVER and AUDITOR). With fewer, a gate cannot reach its quorum before it expires.
+  While a gate waits for approvals and the people who may decide it, less its requester, authors and builders, are
+  fewer than its quorum, the `sod` item reads WAITING with `QUORUM_UNREACHABLE`, `ELIGIBLE:<n>` and `REQUIRED:<m>` on a
+  non-regulated project too, and the next action names the members command. It is a warning: completing a gate whose
+  quorum is met is never refused on it. In a single-user workspace self-approval lets the one user count once, so
+  there it warns only on a gate that needs more than one approval. The count is generous: every member with the
+  `approver` or `owner` role counts, whatever their workspace roles and the gate's roles, so it can miss a shortfall.
+  It counts local users only: with a live host (WORKSPACE_ROUTER) session or on a call through the hosted router it is
+  not made, since readiness cannot read host users' roles, and a host OWNER who is not signed in is not counted.
 
 ### The single-user rule
 

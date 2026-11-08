@@ -228,7 +228,7 @@ function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, appr
   const createdTs = state.chain.find((link) => link.kind === "CREATED")?.body.ts;
   const blocking = stage === "assemble" ? blockingExecutionsOf(store, state.project.agent_id) : null;
   return {
-    activeLocal: live.activeLocal, hostPrincipals: live.hostPrincipals, hostedRouter: live.hostedRouter, hostMode: call.hostMode === true,
+    activeLocal: live.activeLocal, localOwners: live.localOwners, hostPrincipals: live.hostPrincipals, hostedRouter: live.hostedRouter, hostMode: call.hostMode === true,
     freeze: live.freeze ? { active: live.freeze.active, incidentIds: live.freeze.incidentIds } : null, readOnly: live.readOnly,
     approvalPolicy,
     vaultUnlocked: availability(workspace), signingRoute: route,

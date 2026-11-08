@@ -405,16 +405,18 @@ A4 Forge takes one agent from a brief to a recorded, customer-controlled deploym
 
 **What the records are, and are not.** Every record A4 writes is signed and `self_reported` (references to stub-model runs are labelled `synthetic_example`); runtime observations enter only by reference to rows the runtime wrote. A signature proves who wrote a record and that it is unchanged, never that its statement is true, and no A4 output says the agent is safe, correct or lawful. Separation of duties keeps a gate's author, requester and builders from approving it, and under the default approval policy the Assemble completion, Adapt and Activate gates need two approvals each, so a full walk needs the owner plus two more approvers with the roles each gate allows, one of them an AUDITOR for Adapt's completion ([who approves which gate](docs/A4_FORGE.md#approvals-and-separation-of-duties)). Two members of one workspace are not two independent reviews. The regulatory records Adapt uses are `experimental`: drafted by an agent, with citations not yet fetched, hashed or legally reviewed, and approved by no named expert. AMC never deploys: it prepares the plan and records what the operator says happened.
 
-**Try it.** A4 Forge is in the current source build only (see [From source](#from-source)); the published 1.1.1 release does not contain it. Set `AMC_A4_PREVIEW=1` in the environment Studio starts in and for each `amc a4` command; a Studio that is already running keeps its environment, so run `amc down` first. Creating a project needs a signed-in local account with the OWNER or OPERATOR role ([RBAC](docs/RBAC.md)). Approvers decide only as project members: add them before requesting a gate, because adding a member supersedes open gates. On a Studio that does not run under Compose or Helm, Activate's release approval is refused (`deployment.same_host`, P2-40), so the walk ends after Adapt.
+**Try it.** A4 Forge is in the current source build only (see [From source](#from-source)); the published 1.1.1 release does not contain it. Set `AMC_A4_PREVIEW=1` in the environment Studio starts in and for each `amc a4` command; a Studio that is already running keeps its environment, so run `amc down` first. Creating a project needs a signed-in local account with the OWNER or OPERATOR role ([RBAC](docs/RBAC.md)). Workspace OWNERs decide gates as implicit project owners; an APPROVER or AUDITOR decides only once added as a project member with the approver role, so add them before requesting a gate, because adding a member supersedes open gates. On a Studio that does not run under Compose or Helm, Activate's release approval is refused (`deployment.same_host`, P2-40), so the walk ends after Adapt.
 
 ```bash
 AMC_A4_PREVIEW=1 amc up                     # starts Studio with the A4 page
 amc user init --username <you>              # first console login (OWNER); with existing logins use amc user add
                                             # then sign in to the Compass Console and start a project on its A4 page
-AMC_A4_PREVIEW=1 amc a4 members <projectId> --member LOCAL_USER:<userId> --project-role approver   # before a gate
 AMC_A4_PREVIEW=1 amc a4 list                # the projects this identity may read
-AMC_A4_PREVIEW=1 amc a4 guide <projectId>   # the next action, and the pins each open gate's decision needs
+AMC_A4_PREVIEW=1 amc a4 guide <projectId>   # the next action, the head seq, and the pins each open gate's decision needs
 AMC_A4_PREVIEW=1 amc a4 readiness <projectId>
+amc approvals login --username <you> --token-file <file>   # the session file every amc a4 write names
+# before a gate, add each approver who is not a workspace OWNER (<n>: the head seq amc a4 guide printed)
+AMC_A4_PREVIEW=1 amc a4 members <projectId> --member LOCAL_USER:<userId> --project-role approver --session-token-file <file> --expect-head-seq <n>
 AMC_A4_PREVIEW=1 amc a4 verify <projectId> --trust-list <file> --allow-unanchored   # the chain's integrity (exit 2): a project's ledger is unanchored, so it never reads trusted
 ```
 
