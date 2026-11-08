@@ -272,7 +272,7 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
   const gate = interactiveOperator({ workspace }); // LIVE-VAULT-01: the remembered store unlocks for an interactive operator only
   checks.push(
     vault.unlocked || passphraseInShell
-      ? { id: "vault", status: "PASS", message: passphraseInShell ? "Vault passphrase available from AMC_VAULT_PASSPHRASE; signing commands can run"
+      ? { id: "vault", status: "PASS", message: passphraseInShell ? "Vault passphrase available from AMC_VAULT_PASSPHRASE (or AMC_VAULT_PASSPHRASE_FILE); signing commands can run"
         : remembered ? `Vault unlocked with the passphrase remembered in ${remembered}; signing commands in this workspace use it too` : "Vault unlocked" }
       : {
         id: "vault",

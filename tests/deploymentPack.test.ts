@@ -247,6 +247,12 @@ describe("deployment pack assets", () => {
     expect(fallback(studio.environment.AMC_TRUSTED_PROXY_CIDRS)).toBe(`${proxyIp}/32`);
     expect(Object.keys(caddy.networks)).toEqual(["amc_edge"]);
     expect(ipAllowedByCidrs(proxyIp, [compose.networks.amc_edge.ipam.config[0].subnet])).toBe(true);
+    // Follow-up 13 (TLS qualification run): Studio joins amc_edge before Caddy and took .2 dynamically, so Caddy failed
+    // with "Address already in use". Dynamic addresses come from ip_range, inside the subnet and clear of Caddy's address.
+    const { subnet, ip_range: dynamic } = compose.networks.amc_edge.ipam.config[0] as { subnet: string; ip_range?: string };
+    expect(dynamic, "amc_edge needs an ip_range that leaves Caddy's fixed address free").toBeDefined();
+    expect(ipAllowedByCidrs(proxyIp, [dynamic!])).toBe(false);
+    expect(ipAllowedByCidrs(dynamic!.split("/")[0]!, [subnet])).toBe(true);
     const onEdge = Object.entries(compose.services as Record<string, { networks?: unknown }>)
       .filter(([, service]) => JSON.stringify(service.networks ?? []).includes("amc_edge")).map(([name]) => name);
     expect(onEdge.sort()).toEqual(["amc-studio", "caddy"]);

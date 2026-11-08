@@ -147,12 +147,15 @@ services:
 
 networks:
   # Caddy and Studio only (SR-10). Caddy's fixed address here is the one proxy Studio trusts, so no other container can
-  # forge X-Forwarded-For. If this subnet collides with a network on your host, change it, Caddy's ipv4_address and the
+  # forge X-Forwarded-For. Studio joins first (Caddy depends on it) and takes its address from ip_range, which leaves
+  # Caddy's .2 free; without the range Studio took .2 and Caddy failed with "Address already in use" (follow-up 13).
+  # If this subnet collides with a network on your host, change it, ip_range, Caddy's ipv4_address and the
   # AMC_TRUSTED_PROXY_CIDRS default together.
   amc_edge:
     ipam:
       config:
         - subnet: 172.16.250.0/28
+          ip_range: 172.16.250.8/29
 
 volumes:
   amc_data:
