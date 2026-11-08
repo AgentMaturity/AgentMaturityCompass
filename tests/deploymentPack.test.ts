@@ -121,6 +121,18 @@ describe("compose image pins, limits and the backup secret (LIVE-DEPLOY-08)", ()
   });
 });
 
+describe("Caddy upstream keep-alive (coordinator P2)", () => {
+  it("closes idle upstream connections to Studio before Studio does", () => {
+    // Studio keeps idle connections 65 s (runtime); Caddy's default 2 min would reuse one Studio already closed (a 502).
+    for (const file of ["deploy/compose/Caddyfile", "deploy/compose/Caddyfile.studio-api"]) {
+      const text = read(file);
+      const proxies = [...text.matchAll(/reverse_proxy (amc-studio:\d+)(?: \{[^{}]*?transport http \{\s*keepalive (\d+)s\s*\}\s*\})?/g)];
+      expect(proxies.length, file).toBeGreaterThan(0);
+      for (const [, upstream, seconds] of proxies) expect(Number(seconds ?? Infinity), `${file} ${upstream}`).toBeLessThan(65);
+    }
+  });
+});
+
 describe("Helm chart 0.4.1 signed-control checkpoint root (LIVE-DEPLOY-15)", () => {
   it("roots signed-control checkpoints on the state claim, outside the workspace, in the chart and the raw manifests", () => {
     // Firewall, guardrail, legal-hold and compiled-control journals checkpoint under AMC_CONTROL_CHECKPOINT_DIR; its default
