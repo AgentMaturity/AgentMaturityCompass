@@ -2,6 +2,18 @@ import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir, userInfo } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
+
+/** os.userInfo() as on a uid with no passwd entry (arbitrary-UID containers): it throws. */
+const passwd = vi.hoisted(() => ({ missing: false }));
+vi.mock("node:os", async (importOriginal) => {
+  const real = await importOriginal<typeof import("node:os")>();
+  const userInfo = ((options?: { encoding: BufferEncoding }) => {
+    if (passwd.missing) throw Object.assign(new Error("A system error occurred: uv_os_get_passwd returned ENOENT (no such file or directory)"), { code: "ERR_SYSTEM_ERROR" });
+    return real.userInfo(options);
+  }) as typeof real.userInfo;
+  return { ...real, userInfo, default: { ...real, userInfo } };
+});
+
 import { addUserAsync, initUsersConfig } from "../src/auth/authApi.js";
 import { userAddCliAsync, userPasswordCliAsync, userRevokeCliAsync, userRoleSetCliAsync } from "../src/auth/authCli.js";
 import { verifyHumanActionLog } from "../src/auth/humanLog.js";
@@ -36,6 +48,13 @@ function userChanges(workspace: string): Entry[] {
 }
 
 describe("account changes in the human action log", () => {
+  test.skipIf(process.platform === "win32")("an OS account without a passwd entry still changes accounts, recorded as uid:<n> (skeptic SK-10)", async () => {
+    const workspace = workspaceWithOwner();
+    passwd.missing = true;
+    try { await userAddCliAsync({ workspace, username: "member", roles: ["VIEWER"], password: "member-audit-pass-123" }); } finally { passwd.missing = false; }
+    expect(userChanges(workspace).at(-1)!.payload).toMatchObject({ action: "add", username: "member", actor: { kind: "cli", osUser: `uid:${process.getuid!()}` } });
+  });
+
   test("recordUserChange writes one HUMAN_USER_CHANGE entry and nothing secret", async () => {
     const workspace = workspaceWithOwner();
     const user = await addUserAsync({ workspace, username: "viewer", password: "viewer-audit-pass-123", roles: ["VIEWER"] });

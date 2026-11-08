@@ -15,8 +15,12 @@ export interface UserChange {
   actor: UserChangeActor;
 }
 
+/**
+ * The OS account running the command. A uid with no passwd entry (an arbitrary-UID container) has no username and
+ * os.userInfo() throws there, so it is recorded as `uid:<n>`: the audit never stops the change it records.
+ */
 export function cliActor(): UserChangeActor {
-  return { kind: "cli", osUser: userInfo().username };
+  try { return { kind: "cli", osUser: userInfo().username }; } catch { return { kind: "cli", osUser: `uid:${process.getuid?.() ?? "unknown"}` }; }
 }
 
 /** The signed-in console user behind a /users/* request (the admin token never gets this far: LIVE-VAULT-16). */
