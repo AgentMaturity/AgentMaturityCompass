@@ -189,4 +189,19 @@ describe("P10 native task media lifecycle", () => {
     await expect(s.start(demo, input())).rejects.toMatchObject({ code: "NATIVE_SCOPE_REFUSED" });
     expect(AMCNativeClient.start).not.toHaveBeenCalled();
   });
+
+  // Opus fix: Studio offers ollama with no credential reference, then refused every ollama task for lacking a configured
+  // one. Mutation: restore `!offered?.credential?.configured` → the ollama start fails before the client.
+  test("a local model server starts without a credential reference; an unset reference still refuses its provider", async () => {
+    const s = service(), text = (provider: NativeTaskStartRequest["provider"]): NativeTaskStartRequest =>
+      ({ clientRequestId: randomUUID(), agentId: "default", provider, model: "local-model", tools: "none", prompt: "hello" });
+    const ollama = await s.start(actor, text("ollama"));
+    expect(ollama.state).not.toBe("failed");
+    expect(vi.mocked(AMCNativeClient.start).mock.calls.at(-1)?.[0]).toMatchObject({ provider: "ollama", model: "local-model" });
+    expect(vi.mocked(AMCNativeClient.start).mock.calls.at(-1)?.[0]).not.toHaveProperty("credential");
+    const calls = vi.mocked(AMCNativeClient.start).mock.calls.length;
+    const anthropic = await s.start(actor, text("anthropic"));
+    expect(anthropic).toMatchObject({ state: "failed", error: "The selected provider's operator credential reference is not configured." });
+    expect(vi.mocked(AMCNativeClient.start).mock.calls).toHaveLength(calls);
+  });
 });
