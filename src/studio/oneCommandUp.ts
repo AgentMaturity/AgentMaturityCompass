@@ -123,7 +123,7 @@ function nonInteractivePassphraseError(lead?: string): Error {
 export function printConsoleSignInStep(workspace: string, consoleUrl: string): void {
   if (existsSync(usersConfigPath(workspace))) return;
   console.log(`\n  ${chalk.bold("Sign in to the Compass Console")} (${consoleUrl}): create your owner account once with `
-    + `${chalk.bold("amc user init --username <you>")}; it asks for the password you will sign in with.`);
+    + `${chalk.bold("amc user init --username <you>")}; it asks for the password you will sign in with (without a terminal, pass --password-file <path>).`);
 }
 
 export interface BaselineWorkspaceState {

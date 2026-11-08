@@ -424,6 +424,22 @@ export async function setUserRolesAsync(input: Parameters<typeof setUserRoles>[0
   }, opts);
 }
 
+/**
+ * LIVE-VAULT-06: a new password for an existing account (the same userId, status and roles); every tracked session of that
+ * user is revoked once the signed users.yaml is written, so a leaked password stops working everywhere.
+ */
+export async function setUserPasswordAsync(input: { workspace: string; username: string; password: string }, opts: UsersMutationOptions = {}): Promise<UserRecord> {
+  const params = { ...input };
+  const updated = await mutateUsersConfigAsync(params.workspace, current => {
+    const config = current!, index = config.users.findIndex(user => user.username.toLowerCase() === params.username.toLowerCase());
+    if (index < 0) throw new Error(`user not found: ${params.username}`);
+    const record = { ...config.users[index]!, passwordHash: hashPassword(params.password) }, users = config.users.slice(); users[index] = record;
+    return { config: { ...config, updatedTs: Date.now(), users }, result: record };
+  }, opts);
+  forEachSessionRecord(params.workspace, (path, parsed) => { if (parsed.userId === updated.userId && !parsed.revoked) markSessionRevoked(path, parsed); });
+  return updated;
+}
+
 let cachedDummyHash: string | null = null;
 /** LIVE-VAULT-05: a verifier to run scrypt against for an unknown or revoked username. Lazy: every amc start imports this module. */
 function dummyHash(): string {
@@ -553,40 +569,30 @@ export function revokeSessionByToken(params: {
   if (!verified.ok || !verified.payload) {
     return;
   }
-  const dir = sessionsDir(params.workspace);
-  if (!pathExists(dir)) {
-    return;
-  }
-  const files = readdirSync(dir).filter((name) => name.endsWith(".json"));
-  const tokenSha256 = sha256Hex(params.token);
-  for (const file of files) {
+  const tokenSha256 = sha256Hex(params.token), payload = verified.payload;
+  forEachSessionRecord(params.workspace, (path, parsed) => {
+    const matchesToken = parsed.tokenSha256
+      ? parsed.tokenSha256 === tokenSha256
+      : parsed.userId === payload.userId && parsed.expiresTs === payload.expiresTs && parsed.issuedTs === payload.issuedTs;
+    if (!matchesToken) return;
+    try { markSessionRevoked(path, parsed); } catch { /* as before: an unwritable record does not stop the others */ }
+  });
+}
+
+/** Every parseable session record of the workspace; an unreadable one is skipped. */
+function forEachSessionRecord(workspace: string, visit: (path: string, parsed: SessionStoreRecord) => void): void {
+  const dir = sessionsDir(workspace);
+  if (!pathExists(dir)) return;
+  for (const file of readdirSync(dir).filter((name) => name.endsWith(".json"))) {
     const path = join(dir, file);
-    try {
-      const parsed = JSON.parse(readUtf8(path)) as SessionStoreRecord;
-      const matchesToken = parsed.tokenSha256
-        ? parsed.tokenSha256 === tokenSha256
-        : parsed.userId === verified.payload.userId &&
-          parsed.expiresTs === verified.payload.expiresTs &&
-          parsed.issuedTs === verified.payload.issuedTs;
-      if (matchesToken) {
-        writeFileAtomic(
-          path,
-          JSON.stringify(
-            {
-              ...parsed,
-              revoked: true,
-              revokedTs: Date.now()
-            },
-            null,
-            2
-          ),
-          0o600
-        );
-      }
-    } catch {
-      continue;
-    }
+    let parsed: SessionStoreRecord;
+    try { parsed = JSON.parse(readUtf8(path)) as SessionStoreRecord; } catch { continue; }
+    visit(path, parsed);
   }
+}
+
+function markSessionRevoked(path: string, parsed: SessionStoreRecord): void {
+  writeFileAtomic(path, JSON.stringify({ ...parsed, revoked: true, revokedTs: Date.now() }, null, 2), 0o600);
 }
 
 export function verifyTrackedSessionToken(params: {

@@ -1189,9 +1189,10 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc up` | Start AMC control plane in one command (studio + gateway + bridge) | `--demo`<br>`--read-only`<br>`--dry-run`<br>`--no-open`<br>`--no-remember`<br>`--no-baseline` | `start` |
 | `amc upgrade` | Generate upgrade plan | `--to <destination>` | - |
 | `amc user` | Multi-user RBAC account management | - | - |
-| `amc user add` | Add a user with RBAC roles | `--username <name>`<br>`--role <roles>` | - |
-| `amc user init` | Initialize signed users.yaml with first OWNER user | `--username <name>` | - |
+| `amc user add` | Add a user with RBAC roles | `--username <name>`<br>`--role <roles>`<br>`--password-file <path>` | - |
+| `amc user init` | Initialize signed users.yaml with first OWNER user | `--username <name>`<br>`--password-file <path>`<br>`--force` | - |
 | `amc user list` | List RBAC users | - | - |
+| `amc user password` | Set a new password for a console account; its signed-in sessions end | `--password-file <path>` | - |
 | `amc user revoke` | Revoke a user account | - | - |
 | `amc user role` | Set user roles | - | - |
 | `amc user role set` | Replace roles for a user | `--roles <roles>` | - |

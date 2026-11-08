@@ -16,6 +16,16 @@ amc status
 
 `amc up` prints Studio, gateway, proxy, and dashboard URLs.
 
+## Accounts
+
+```bash
+amc user init --username <owner> [--password-file <path>] [--force]
+amc user add --username <name> --role <roles> [--password-file <path>]
+amc user password <name> [--password-file <path>]
+```
+
+Without a terminal, pass `--password-file` (a private file holding the password); AMC never takes a password as an argument. `amc user init` refuses when `.amc/users.yaml` exists unless `--force` is given, which replaces every account. `amc user password` sets a new password and revokes that user's signed-in sessions.
+
 ## Security Model
 
 - No external CDNs; console assets are local.

@@ -1,5 +1,5 @@
 import { initUsersConfig, addUser, listUsers, revokeUser, setUserRoles, verifyUsersConfigSignature } from "./authApi.js";
-import { initUsersConfigAsync, addUserAsync, revokeUserAsync, setUserRolesAsync } from "./authApi.js";
+import { initUsersConfigAsync, addUserAsync, revokeUserAsync, setUserPasswordAsync, setUserRolesAsync } from "./authApi.js";
 import { parseUserRoles, type UserRole } from "./roles.js";
 
 export function parseRolesCsv(raw: string): UserRole[] {
@@ -96,4 +96,7 @@ export async function userRevokeCliAsync(params: Parameters<typeof userRevokeCli
 }
 export async function userRoleSetCliAsync(params: Parameters<typeof userRoleSetCli>[0]): Promise<ReturnType<typeof userRoleSetCli>> {
   const user = await setUserRolesAsync({ ...params, roles: [...params.roles] }); return { username: user.username, roles: user.roles };
+}
+export async function userPasswordCliAsync(params: { workspace: string; username: string; password: string }): Promise<{ username: string }> {
+  const user = await setUserPasswordAsync({ ...params }); return { username: user.username };
 }

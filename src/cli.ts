@@ -423,15 +423,7 @@ import {
   packRegistryInitCli
 } from "./packs/packCli.js";
 import { request as httpRequest } from "node:http";
-import {
-  parseRolesCsv,
-  userAddCliAsync as userAddCli,
-  userInitCliAsync as userInitCli,
-  userListCli,
-  userRevokeCliAsync as userRevokeCli,
-  userRoleSetCliAsync as userRoleSetCli,
-  userVerifyCli
-} from "./auth/authCli.js";
+import { registerUserCommands } from "./cli-user-commands.js";
 import { verifyUsersConfigSignature } from "./auth/authApi.js";
 import {
   identityInitCli,
@@ -6881,7 +6873,7 @@ const truthguard = program.command("truthguard").description("Deterministic outp
 const proof = program.command("proof").description("Domain Proof Lane source-to-rule proof checks");
 const mode = program.command("mode").description("Switch CLI role mode");
 const loop = program.command("loop").description("Continuous self-serve maturity loop");
-const user = program.command("user").description("Multi-user RBAC account management");
+registerUserCommands(program);
 const identity = program.command("identity").description("Enterprise identity (OIDC/SAML) configuration");
 registerWorkloadTrustCommands(identity);
 const sso = program.command("sso").description("SSO setup shortcuts for OIDC and SAML providers");
@@ -11864,109 +11856,6 @@ mode.action(() => {
   const current: AMCMode = getMode(process.cwd());
   console.log(`Current mode: ${current}`);
 });
-
-user
-  .command("init")
-  .description("Initialize signed users.yaml with first OWNER user")
-  .requiredOption("--username <name>", "owner username")
-  .action(async (opts: { username: string }) => {
-    const passwordAnswer = await inquirer.prompt([
-      {
-        type: "password",
-        name: "password",
-        message: `Password for ${opts.username}`,
-        mask: "*"
-      }
-    ]);
-    const created = await userInitCli({
-      workspace: process.cwd(),
-      username: opts.username,
-      password: passwordAnswer.password
-    });
-    console.log(chalk.green(`Users config created: ${created.path}`));
-    console.log(`Signature: ${created.sigPath}`);
-    console.log(`Owner: ${created.username} roles=${created.roles.join(",")}`);
-  });
-
-user
-  .command("add")
-  .description("Add a user with RBAC roles")
-  .requiredOption("--username <name>", "username")
-  .requiredOption("--role <roles>", "comma-separated roles, e.g. APPROVER or OWNER,APPROVER")
-  .action(async (opts: { username: string; role: string }) => {
-    const passwordAnswer = await inquirer.prompt([
-      {
-        type: "password",
-        name: "password",
-        message: `Password for ${opts.username}`,
-        mask: "*"
-      }
-    ]);
-    const created = await userAddCli({
-      workspace: process.cwd(),
-      username: opts.username,
-      roles: parseRolesCsv(opts.role),
-      password: passwordAnswer.password
-    });
-    console.log(chalk.green(`User added: ${created.username}`));
-    console.log(`Roles: ${created.roles.join(",")}`);
-  });
-
-user
-  .command("list")
-  .description("List RBAC users")
-  .action(() => {
-    const rows = userListCli(process.cwd());
-    if (rows.length === 0) {
-      console.log("No users configured.");
-      return;
-    }
-    for (const row of rows) {
-      console.log(`${row.username} | roles=${row.roles.join(",")} | status=${row.status} | created=${new Date(row.createdTs).toISOString()}`);
-    }
-  });
-
-user
-  .command("revoke")
-  .description("Revoke a user account")
-  .argument("<username>")
-  .action(async (username: string) => {
-    const out = await userRevokeCli({
-      workspace: process.cwd(),
-      username
-    });
-    console.log(chalk.green(`User updated: ${out.username} status=${out.status}`));
-  });
-
-user
-  .command("role")
-  .description("Set user roles")
-  .command("set")
-  .description("Replace roles for a user")
-  .argument("<username>")
-  .requiredOption("--roles <roles>", "comma-separated roles")
-  .action(async (username: string, opts: { roles: string }) => {
-    const out = await userRoleSetCli({
-      workspace: process.cwd(),
-      username,
-      roles: parseRolesCsv(opts.roles)
-    });
-    console.log(chalk.green(`User roles updated: ${out.username}`));
-    console.log(`Roles: ${out.roles.join(",")}`);
-  });
-
-user
-  .command("verify")
-  .description("Verify users.yaml signature")
-  .action(() => {
-    const verify = userVerifyCli(process.cwd());
-    if (verify.valid) {
-      console.log(chalk.green(`Users signature valid: ${verify.sigPath}`));
-      return;
-    }
-    console.log(chalk.red(`Users signature invalid: ${verify.reason ?? "unknown reason"}`));
-    process.exit(1);
-  });
 
 identity
   .command("init")
