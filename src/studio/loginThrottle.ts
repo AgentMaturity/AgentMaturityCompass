@@ -9,10 +9,11 @@ import { ipAllowedByCidrs, LOOPBACK_CIDRS } from "./clientAddress.js";
  * everyone behind it (AMC_TRUSTED_PROXY_HOPS set but this peer is not a trusted proxy), the pair only delays, so one
  * client cannot lock out every client behind the proxy (SR-2); there 30 failures from such addresses refuse further
  * attempts from them, so rotating addresses buys no extra guesses (SR-1). That count holds failures from untrusted
- * addresses only, so failures a trusted proxy forwards never lock anyone out (SR-11), and loopback (the local console,
- * `amc studio healthcheck`, a port-forward) neither feeds it nor meets it. On every address, 30 failures for the username
- * from any addresses add a fixed delay to every attempt for it, right or wrong; that is never a refusal. Behind an
- * undeclared proxy (hops 0) every client shares its address.
+ * addresses only, so failures a trusted proxy forwards never lock anyone out (SR-11). Loopback is the exception both
+ * ways: behind a same-host proxy AMC does not trust, every outside client arrives from it, so it keeps the pair refusal
+ * in every mode, as one address (127.0.0.1 and ::1 share a window), and stays out of the untrusted count. On every
+ * address, 30 failures for the username from any addresses add a fixed delay to every attempt for it, right or wrong;
+ * that is never a refusal. Behind an undeclared proxy (hops 0) every client shares its address.
  *
  * ponytail: in-memory and per process, so a restart clears it and replicas do not share it; a shared store when one
  * Studio serves a workspace from several processes.
@@ -39,7 +40,8 @@ export interface LoginThrottle {
 }
 
 const userKey = (username: string): string => username.trim().toLowerCase();
-const pairKey = (username: string, clientIp: string): string => `${userKey(username)}\u0000${clientIp}`;
+const loopback = (clientIp: string): boolean => ipAllowedByCidrs(clientIp, LOOPBACK_CIDRS);
+const pairKey = (username: string, clientIp: string): string => `${userKey(username)}\u0000${loopback(clientIp) ? "loopback" : clientIp}`;
 
 export function createLoginThrottle(options: {
   maxPairFailures?: number;
@@ -52,7 +54,6 @@ export function createLoginThrottle(options: {
   const pairs = new Map<string, Window>();
   const users = new Map<string, Window>(); // every failure for the username: the delay
   const untrusted = new Map<string, Window>(); // failures from untrusted, non-loopback addresses: their refusal (SR-11)
-  const loopback = (clientIp: string): boolean => ipAllowedByCidrs(clientIp, LOOPBACK_CIDRS);
   const live = (map: Map<string, Window>, key: string, at: number): Window | null => {
     const entry = map.get(key);
     if (entry && entry.resetTs > at) return entry;
@@ -74,17 +75,18 @@ export function createLoginThrottle(options: {
       const at = now();
       const pair = live(pairs, pairKey(username, clientIp), at);
       const user = live(users, userKey(username), at);
-      const shared = addressTrusted || loopback(clientIp) ? null : live(untrusted, userKey(username), at);
+      const pairRefuses = addressTrusted || loopback(clientIp); // loopback keeps a window of its own in every mode (SR-11)
+      const shared = pairRefuses ? null : live(untrusted, userKey(username), at);
       const pairOver = pair !== null && pair.count >= maxPairFailures;
       const userOver = user !== null && user.count >= delayAfterUserFailures;
-      const refusing = addressTrusted ? (pairOver ? pair : null) : (shared !== null && shared.count >= delayAfterUserFailures ? shared : null);
+      const refusing = pairRefuses ? (pairOver ? pair : null) : (shared !== null && shared.count >= delayAfterUserFailures ? shared : null);
       if (refusing) {
         const firstRefusal = !refusing.refused;
         refusing.refused = true;
         return { allowed: false, retryAfterSeconds: Math.max(1, Math.ceil((refusing.resetTs - at) / 1000)), firstRefusal,
-          error: addressTrusted ? LOGIN_THROTTLED_ERROR : LOGIN_THROTTLED_ACCOUNT_ERROR };
+          error: pairRefuses ? LOGIN_THROTTLED_ERROR : LOGIN_THROTTLED_ACCOUNT_ERROR };
       }
-      return { allowed: true, delayMs: userOver || (!addressTrusted && pairOver) ? delayMs : 0 };
+      return { allowed: true, delayMs: userOver || (!pairRefuses && pairOver) ? delayMs : 0 };
     },
     fail(username, clientIp, addressTrusted) {
       const at = now();

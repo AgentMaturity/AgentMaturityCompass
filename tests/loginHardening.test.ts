@@ -129,21 +129,21 @@ describe("forwarded addresses from a peer that is no named proxy", () => {
     expect(JSON.parse(next.body)).toEqual({ error: "too many login attempts" });
   }, 60_000);
 
-  // SR-2: on such an address (proxy hops declared, peer no named proxy) a pair refusal would lock out everyone sharing it.
-  test("on Studio, a shared address's pair is delayed, never refused", async () => {
+  // SR-11, coordinator correction: with proxy hops declared and no named proxy, loopback only delayed, so behind a
+  // same-host proxy AMC does not trust (every outside client arrives from loopback) guesses were unlimited.
+  test("on Studio, 10 wrong passwords from loopback with no named proxy are refused, not only delayed", async () => {
     const workspace = newDir("amc-login-shared-");
     initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
     initUsersConfig({ workspace, username: "owner", password: "owner-password" });
     const api = await startStudioApiServer({ workspace, host: "127.0.0.1", port: 0, token: "admin-token-login-shared", trustedProxyHops: 1 });
     closers.push(() => api.close());
     for (let i = 0; i < 10; i += 1) expect((await post(`${api.url}/auth/login`, { username: "owner", password: "wrong" })).status).toBe(401);
-    const started = Date.now();
-    expect((await post(`${api.url}/auth/login`, { username: "owner", password: "owner-password" })).status).toBe(200);
-    expect(Date.now() - started).toBeGreaterThanOrEqual(1_900);
+    const refused = await post(`${api.url}/auth/login`, { username: "owner", password: "owner-password" });
+    expect(refused.status).toBe(429);
+    expect(JSON.parse(refused.body)).toEqual({ error: "too many failed logins for this account from this address" });
   }, 60_000);
 });
 
-// SR-11: only failures from untrusted addresses feed the untrusted refusal, so every failure site must say which it was.
 describe("failed logins reach the throttle with their address trust", () => {
   test("Studio and all three host-router failure paths pass the resolved trust", async () => {
     spies.throttleFails.length = 0;
@@ -164,7 +164,7 @@ describe("failed logins reach the throttle with their address trust", () => {
   }, 60_000);
 
   // SR-11: an untrusted refusal used to count every failure, so 30 failures through the named proxy refused the account on
-  // every untrusted address, loopback included. Loopback is exempt, and those failures no longer feed that count anyway.
+  // every untrusted address, loopback included. Those failures now feed neither that count nor loopback's own window.
   test("after 30 failures through the named proxy, the owner still signs in from loopback", async () => {
     const { url } = await studio();
     for (let i = 0; i < 30; i += 1) {
@@ -177,7 +177,7 @@ describe("failed logins reach the throttle with their address trust", () => {
 });
 
 describe("host router login throttle", () => {
-  // SR-2, both modes: a named proxy's clients are told apart; without one, the shared address is delayed, not refused.
+  // SR-2, both modes: a named proxy's clients are told apart; without one, every client shares loopback's own window.
   test("behind a named proxy the throttled pair is refused and another forwarded client signs in", async () => {
     const { url } = await hostRouter(1, ["127.0.0.1/32"]);
     for (let i = 0; i < 10; i += 1) {
@@ -187,14 +187,13 @@ describe("host router login throttle", () => {
     expect((await post(`${url}/host/api/login`, { username: "admin", password: "admin-pass-123" }, { "x-forwarded-for": "10.5.0.2" })).status).toBe(200);
   }, 60_000);
 
-  test("with proxy hops but no named proxy, the shared address is delayed, never refused", async () => {
+  // SR-11, coordinator correction: the peer is loopback (its X-Forwarded-For counts for nothing), which keeps a refusing window.
+  test("with proxy hops but no named proxy, 10 wrong passwords from loopback are refused, not only delayed", async () => {
     const { url } = await hostRouter(1);
     for (let i = 0; i < 10; i += 1) {
-      expect((await post(`${url}/host/api/login`, { username: "admin", password: "wrong" }, { "x-forwarded-for": "10.5.0.1" })).status).toBe(401);
+      expect((await post(`${url}/host/api/login`, { username: "admin", password: "wrong" }, { "x-forwarded-for": `10.5.0.${i + 1}` })).status).toBe(401);
     }
-    const started = Date.now();
-    expect((await post(`${url}/host/api/login`, { username: "admin", password: "admin-pass-123" }, { "x-forwarded-for": "10.5.0.1" })).status).toBe(200);
-    expect(Date.now() - started).toBeGreaterThanOrEqual(1_900);
+    expect((await post(`${url}/host/api/login`, { username: "admin", password: "admin-pass-123" }, { "x-forwarded-for": "10.5.1.1" })).status).toBe(429);
   }, 60_000);
 
   test("/host/api/login refuses the throttled pair and serves another account", async () => {

@@ -78,16 +78,24 @@ describe("login throttle", () => {
     expect(throttle.check("owner", "192.0.2.60", false).allowed, "the 30th does").toBe(false);
   });
 
-  // SR-11: loopback (the local console, `amc studio healthcheck`, a port-forward) keeps a way in during an untrusted flood.
-  test("loopback is exempt: an untrusted flood never refuses it, and its failures never feed the untrusted count", () => {
+  // SR-11, coordinator correction: behind a same-host proxy AMC does not trust, every outside client arrives from loopback,
+  // so exempting loopback gave unlimited guesses. Loopback keeps a refusing window of its own in both modes (127.0.0.1
+  // and ::1 share it), and failures from other untrusted addresses neither feed nor trip it, nor it theirs.
+  test("loopback keeps a finite refusing window of its own, in both modes", () => {
     const throttle = createLoginThrottle({ now: clock().now });
-    for (let i = 0; i < 30; i += 1) throttle.fail("owner", `10.4.${i}.1`, false);
-    expect(throttle.check("owner", "192.0.2.70", false).allowed).toBe(false);
-    expect(throttle.check("owner", "127.0.0.1", false)).toEqual({ allowed: true, delayMs: 2_000 });
-    expect(throttle.check("owner", "::1", false)).toEqual({ allowed: true, delayMs: 2_000 });
-    const local = createLoginThrottle({ now: clock().now });
-    for (let i = 0; i < 40; i += 1) local.fail("owner", "127.0.0.1", false);
-    expect(local.check("owner", "192.0.2.71", false)).toEqual({ allowed: true, delayMs: 2_000 });
+    for (let i = 0; i < 9; i += 1) throttle.fail("owner", i % 2 === 0 ? "127.0.0.1" : "::1", false);
+    expect(throttle.check("owner", "127.0.0.1", false)).toEqual({ allowed: true, delayMs: 0 });
+    throttle.fail("owner", "::1", false);
+    expect(throttle.check("owner", "127.0.0.1", false)).toEqual({ allowed: false, retryAfterSeconds: 900, firstRefusal: true,
+      error: "too many failed logins for this account from this address" });
+    expect(throttle.check("owner", "::1", true), "the same window when no proxy is involved").toMatchObject({ allowed: false });
+    expect(throttle.check("owner", "192.0.2.80", true), "a trusted address elsewhere is not locked").toEqual({ allowed: true, delayMs: 0 });
+    for (let i = 0; i < 30; i += 1) throttle.fail("owner", "127.0.0.1", false);
+    expect(throttle.check("owner", "192.0.2.81", false), "loopback failures never feed the untrusted count").toEqual({ allowed: true, delayMs: 2_000 });
+    const flooded = createLoginThrottle({ now: clock().now });
+    for (let i = 0; i < 30; i += 1) flooded.fail("owner", `10.4.${i}.1`, false);
+    expect(flooded.check("owner", "192.0.2.70", false).allowed, "the untrusted flood refuses other untrusted addresses").toBe(false);
+    expect(flooded.check("owner", "127.0.0.1", false), "but not loopback, whose window is its own").toEqual({ allowed: true, delayMs: 2_000 });
   });
 
   test("usernames are compared trimmed and case-insensitively", () => {
