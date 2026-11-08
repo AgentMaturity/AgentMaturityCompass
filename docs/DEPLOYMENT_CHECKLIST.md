@@ -67,18 +67,21 @@ Complete these checks before going live. Every item is a real `amc` command.
 
 ### Scheduled verification
 
-Run the pinned check on a schedule, **inside** the deployment: on the host that runs Studio, with `docker exec <container>`, or with `kubectl exec deploy/<amc deployment> -- …`. `amc verify all` checks the current directory, and the image's working directory is `/workspace`, not the workspace: run it in `/data/amc` (the image's `AMC_WORKSPACE_DIR`, and the Helm chart's `workspace.mountPath`).
+Run the pinned check on a schedule, **inside** the deployment: on the host that runs Studio, with `docker exec <container>`, or with `kubectl exec deploy/<amc deployment> -- …`. `amc verify all` checks the current directory, and the image's working directory is `/workspace`, not the workspace: run it in `/data/amc` (the image's `AMC_WORKSPACE_DIR`, and the Helm chart's `workspace.mountPath`). A scheduled run has no terminal, so it cannot use a remembered passphrase: give it the vault passphrase as each line below does, or it reports the encrypted payloads as not evaluated and exits 1.
 
 ```bash
 amc verify all --json --expect-monitor <monitor sha256>
 ```
 
-- Host or Docker: a cron line, every 30 minutes, that alerts on failure:
+- Docker: a cron line on the host, every 30 minutes, that alerts on failure. It reads the container's secret file (`AMC_VAULT_PASSPHRASE_FILE`) into the variable for this one command, as [the Compose runbook](deploy/reference/COMPOSE.md) does:
   ```cron
-  */30 * * * * docker exec -w /data/amc amc-studio amc verify all --json --expect-monitor <monitor sha256> > /var/log/amc-verify.json 2>&1 || <your alert command>
+  */30 * * * * docker exec -w /data/amc amc-studio sh -c 'AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")" amc verify all --json --expect-monitor <monitor sha256>' > /var/log/amc-verify.json 2>&1 || <your alert command>
   ```
-  On a plain host, replace `docker exec -w /data/amc amc-studio` with `cd <workspace> &&`.
-- Kubernetes: a `CronJob` that runs `kubectl exec` against the running pod, under a Role that may only read pods and deployments and exec into pods:
+- Plain host: point `AMC_VAULT_PASSPHRASE_FILE` at a file the cron user owns, mode 0600 or 0400, holding the vault passphrase. `amc` refuses a symlink or a file the group or others can read, and then reports the payloads as not evaluated:
+  ```cron
+  */30 * * * * cd <workspace> && AMC_VAULT_PASSPHRASE_FILE=<passphrase file> amc verify all --json --expect-monitor <monitor sha256> > /var/log/amc-verify.json 2>&1 || <your alert command>
+  ```
+- Kubernetes: a `CronJob` that runs `kubectl exec` against the running pod, under a Role that may only read pods and deployments and exec into pods. The chart mounts the passphrase as a secret volume, whose files `amc` does not accept as `AMC_VAULT_PASSPHRASE_FILE` (they are root-owned symlinks), so the command reads the file into the variable, as on Docker:
   ```yaml
   apiVersion: batch/v1
   kind: CronJob
@@ -97,7 +100,7 @@ amc verify all --json --expect-monitor <monitor sha256>
               - name: verify
                 image: bitnami/kubectl:<pinned tag>
                 command: ["kubectl", "exec", "-n", "amc-system", "deploy/<amc deployment>", "--", "sh", "-c",
-                          "cd /data/amc && amc verify all --json --expect-monitor <monitor sha256>"]
+                          "cd /data/amc && AMC_VAULT_PASSPHRASE=\"$(cat \"$AMC_VAULT_PASSPHRASE_FILE\")\" amc verify all --json --expect-monitor <monitor sha256>"]
   ---
   apiVersion: rbac.authorization.k8s.io/v1
   kind: Role
@@ -113,10 +116,10 @@ amc verify all --json --expect-monitor <monitor sha256>
   | Exit | Meaning |
   | --- | --- |
   | 0 | PASS: every check passed and the ledger is anchored to the pinned monitor key |
-  | 1 | FAIL; INCOMPLETE (a critical check was skipped); or UNANCHORED without `--allow-unanchored` |
+  | 1 | FAIL; INCOMPLETE (a critical check was skipped, such as a ledger check whose payloads were not evaluated because the run had no vault passphrase, even with `--allow-unanchored`); or UNANCHORED without `--allow-unanchored` |
   | 2 | integrity verified but untrusted: UNANCHORED and accepted only by `--allow-unanchored` |
 
-- While Studio runs, the ledger check passes and names open sessions (the gateway's own, requests in flight, running tools), for example `1 session open: <id> (gateway; last signed activity 3 min ago)`. That line is normal. A `missing seal` is not: a crashed gateway session is sealed by the running Studio within about 10 minutes; any other `missing seal` is in [the evidence-corruption runbook](runbooks/evidence-corruption.md).
+- While Studio runs, the ledger check passes and names open sessions (the gateway's own, requests in flight, running tools), for example `1 session open: <id> (gateway; last signed activity 3 min ago). An open session is the running writer's own; nothing is claimed about how it ends.` That line is normal. A run without the vault passphrase reports no tampering either: `ledger-hash-chain` is `SKIP` with `<n> payloads not evaluated: the key that opens them is out of reach in this process (vault locked: …)`, still naming the open sessions, the status is `INCOMPLETE` and the exit code 1; give the job the passphrase as above. A `missing seal` is not normal: a crashed gateway session is sealed by the running Studio within about 10 minutes; any other `missing seal` is in [the evidence-corruption runbook](runbooks/evidence-corruption.md).
 
 #### Open sessions and what verification cannot see
 
