@@ -70,7 +70,7 @@ describe("amc doctor's amc-gitignore check (LIVE-VAULT-11)", () => {
     rmSync(join(root, ".amc", ".gitignore"));
     const missing = amcGitignoreCheck(root, gitEnv(root));
     expect(missing).toMatchObject({ id: "amc-gitignore", status: "FAIL", message: ".amc/local-vault-passphrase is not git-ignored in this repository" });
-    expect(missing.fixHint).toContain("amc up (writes .amc/.gitignore once)");
+    expect(missing?.fixHint).toContain("amc up (writes .amc/.gitignore once)");
     ensureAmcGitignore(join(root, ".amc"));
     expect(amcGitignoreCheck(root, gitEnv(root))).toEqual({ id: "amc-gitignore", status: "PASS", message: ".amc secrets are git-ignored" });
   });
@@ -83,7 +83,7 @@ describe("amc doctor's amc-gitignore check (LIVE-VAULT-11)", () => {
     expect(git(root, "-c", "user.email=t@example.invalid", "-c", "user.name=t", "commit", "-q", "-m", "x").status).toBe(0);
     const tracked = amcGitignoreCheck(root, gitEnv(root));
     expect(tracked).toMatchObject({ status: "FAIL", message: ".amc/studio/admin.token is committed to this repository" });
-    expect(tracked.fixHint).toBe('Run: git rm --cached .amc/studio/admin.token && git commit, then rotate it (docs/VAULT.md "When to rotate")');
+    expect(tracked?.fixHint).toBe('Run: git rm --cached .amc/studio/admin.token && git commit, then rotate it (docs/VAULT.md "When to rotate")');
   });
 
   it("amc doctor-fix writes a missing .amc/.gitignore, and leaves it missing under --dry-run", async () => {

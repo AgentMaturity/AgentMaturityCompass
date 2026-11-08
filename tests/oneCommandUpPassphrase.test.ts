@@ -68,7 +68,7 @@ describe("amc up in a non-interactive shell (B1)", () => {
     vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
     vi.stubEnv(name, "true");
     const lines = logged();
-    const error = await ensureUpVaultPassphrase("/nonexistent/amc-up-ws", true).catch((caught: unknown) => caught as Error);
+    const error = (await ensureUpVaultPassphrase("/nonexistent/amc-up-ws", true).catch((caught: unknown) => caught)) as Error;
     expect(error.message).toMatch(/^A CI runner's remembered store does not outlive the job, so amc up does not generate a passphrase here\.\n🔐 Vault passphrase required in non-interactive shells\./);
     expect(error.message).toContain("Option 2 — first-time setup in a terminal (remembers a generated passphrase):");
     expect(seam.events).not.toContain("store");
@@ -92,7 +92,7 @@ describe("amc up in a non-interactive shell (B1)", () => {
     vi.stubEnv("AMC_VAULT_REMEMBER", "0");
     seam.vaultExists = true;
     logged();
-    const error = await ensureUpVaultPassphrase("/nonexistent/amc-up-ws", true).catch((caught: unknown) => caught as Error);
+    const error = (await ensureUpVaultPassphrase("/nonexistent/amc-up-ws", true).catch((caught: unknown) => caught)) as Error;
     expect(error.message).toContain("already has a vault");
     expect(error.message).toContain("remembering is disabled by AMC_VAULT_REMEMBER=0");
     expect(error.message).not.toContain("vault-credentials.json");

@@ -1,5 +1,4 @@
 import { basename, dirname, join, resolve } from "node:path";
-import { watchApiKey } from "./cli/argvSecret.js";
 import { pathToFileURL } from "node:url";
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import chalk from "chalk";
@@ -1144,7 +1143,7 @@ export function registerLateStageCliCommands({
     .option("--poll-interval <ms>", "Poll interval in milliseconds", "10000")
     .option("--agent <agentId>", "Agent ID to associate traces with")
     .action(async (opts: { provider: string; endpoint: string; apiKey?: string; apiKeyFile?: string; pollInterval: string; agent?: string }) => {
-      const { createObservabilityBridge} = await import("./watch/observabilityBridge.js");
+      const [{ createObservabilityBridge }, { watchApiKey }] = await Promise.all([import("./watch/observabilityBridge.js"), import("./cli/argvSecret.js")]);
       const agentId = opts.agent ?? resolveAgentId(process.cwd());
       const bridge = createObservabilityBridge({
         workspace: process.cwd(),
@@ -1190,7 +1189,7 @@ export function registerLateStageCliCommands({
     .option("--max-latency <ms>", "Max acceptable latency in ms", "30000")
     .option("--alert-severity <level>", "Alert on this severity and above", "warning")
     .action(async (opts: { agent?: string; provider?: string; endpoint?: string; apiKey?: string; apiKeyFile?: string; budget: string; maxLatency: string; alertSeverity?: string }) => {
-      const { createObservabilityBridge} = await import("./watch/observabilityBridge.js");
+      const [{ createObservabilityBridge }, { watchApiKey }] = await Promise.all([import("./watch/observabilityBridge.js"), import("./cli/argvSecret.js")]);
       const { createRealtimeAssuranceEngine} = await import("./watch/realtimeAssurance.js");
       const agentId = opts.agent ?? resolveAgentId(process.cwd());
 
