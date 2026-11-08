@@ -82,14 +82,17 @@ function derive(password: string): string {
   ].join("$");
 }
 
-/** A verifier for a new password: at least MIN_PASSWORD_LENGTH characters and, when the account is named, not its username. */
+/** Why the policy refuses a new password (fewer than MIN_PASSWORD_LENGTH characters, or the account's username), else null. */
+export function passwordPolicyProblem(password: string, username?: string): string | null {
+  if (password.length < MIN_PASSWORD_LENGTH) return `password must be at least ${MIN_PASSWORD_LENGTH} characters`;
+  if (username !== undefined && password.toLowerCase() === username.toLowerCase()) return "password must not be the username";
+  return null;
+}
+
+/** A verifier for a new password the policy accepts (passwordPolicyProblem; the username when the account is named). */
 export function hashPassword(password: string, options: { username?: string } = {}): string {
-  if (password.length < MIN_PASSWORD_LENGTH) {
-    throw new PasswordPolicyError(`password must be at least ${MIN_PASSWORD_LENGTH} characters`);
-  }
-  if (options.username !== undefined && password.toLowerCase() === options.username.toLowerCase()) {
-    throw new PasswordPolicyError("password must not be the username");
-  }
+  const problem = passwordPolicyProblem(password, options.username);
+  if (problem !== null) throw new PasswordPolicyError(problem);
   return derive(password);
 }
 
