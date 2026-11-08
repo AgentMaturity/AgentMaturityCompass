@@ -11,10 +11,9 @@
  * prompt-per-start semantics can pass `--no-remember` to `amc up`, set AMC_VAULT_REMEMBER=0, or run `amc vault forget`.
  */
 import { spawnSync } from "node:child_process";
-import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
-import { resolveAmcHome } from "../credentials/credentialsPaths.js";
+import { resolve } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
+import { credentialsFile, migrateLegacyEntry, readFileStore, removeLegacyEntry, writeFileStore } from "./passphraseFileStore.js";
 import { interactiveOperator, operatorRefusalText } from "./operatorContext.js";
 import { unlockVault, vaultExists, vaultStatus } from "./vault.js";
 
@@ -30,13 +29,7 @@ export function rememberEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
   return !(raw === "0" || raw === "false" || raw === "off" || raw === "no");
 }
 
-function credentialsFile(env: NodeJS.ProcessEnv): string {
-  const override = env.AMC_VAULT_REMEMBER_FILE;
-  if (override && override.trim().length > 0) {
-    return resolve(override.trim());
-  }
-  return join(resolveAmcHome({ env }), "vault-credentials.json");
-}
+export { credentialsFile, legacyCredentialsFile } from "./passphraseFileStore.js";
 
 function workspaceKey(workspace: string): string {
   return sha256Hex(resolve(workspace)).slice(0, 32);
@@ -75,27 +68,6 @@ function keychainWrite(account: string, passphrase: string, env: NodeJS.ProcessE
     && keychainRead(account, env) === passphrase;
 }
 
-function readFileStore(env: NodeJS.ProcessEnv): Record<string, string> {
-  const file = credentialsFile(env);
-  if (!existsSync(file)) {
-    return {};
-  }
-  try {
-    const parsed = JSON.parse(readFileSync(file, "utf8")) as Record<string, string>;
-    return parsed && typeof parsed === "object" ? parsed : {};
-  } catch {
-    return {};
-  }
-}
-
-function writeFileStore(store: Record<string, string>, env: NodeJS.ProcessEnv): string {
-  const file = credentialsFile(env);
-  mkdirSync(dirname(file), { recursive: true, mode: 0o700 });
-  writeFileSync(file, JSON.stringify(store, null, 2), { mode: 0o600 });
-  chmodSync(file, 0o600);
-  return file;
-}
-
 /** Where a remembered passphrase is kept, as the operator would look for it. */
 export function rememberedLocation(backend: RememberBackend, env: NodeJS.ProcessEnv = process.env): string {
   return backend === "keychain" ? `the macOS Keychain (service ${KEYCHAIN_SERVICE})` : credentialsFile(env);
@@ -118,7 +90,7 @@ export function getRememberedVaultPassphrase(
   if (fromKeychain !== null && fromKeychain.length > 0) {
     return { passphrase: fromKeychain, backend: "keychain" };
   }
-  const stored = readFileStore(env)[account];
+  const stored = readFileStore(env)[account] || migrateLegacyEntry(account, env); // LIVE-VAULT-08: the pre-AMC_HOME file, once
   return typeof stored === "string" && stored.length > 0
     ? { passphrase: stored, backend: "file" }
     : null;
@@ -163,7 +135,7 @@ export function forgetVaultPassphrase(
     writeFileStore(store, env);
     removed = true;
   }
-  return removed;
+  return removeLegacyEntry(account, env) || removed;
 }
 
 const rememberedUnlocks = new Map<string, string>();
