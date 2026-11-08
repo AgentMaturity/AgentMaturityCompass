@@ -11,7 +11,7 @@ import { runDiagnostic } from "../diagnostic/runner.js";
 import { runAssurance } from "../assurance/assuranceRunner.js";
 import type { DiagnosticReport, AssuranceReport } from "../types.js";
 import { listAssurancePacks } from "../assurance/packs/index.js";
-import { vaultExists, vaultStatus } from "../vault/vault.js";
+import { vaultExists } from "../vault/vault.js";
 import { loadComplianceMaps } from "../compliance/complianceEngine.js";
 import { pathExists } from "../utils/fs.js";
 import { join } from "node:path";
@@ -284,7 +284,7 @@ async function runShieldModule(workspace: string, agentId: string): Promise<Modu
 
 /* ── Top fixes generator ────────────────────────────────────── */
 
-function generateTopFixes(modules: ModuleResult[]): UnifiedRunResult["topFixes"] {
+function generateTopFixes(modules: ModuleResult[], hasVault: boolean): UnifiedRunResult["topFixes"] {
   const fixes: Array<{ action: string; impact: string; command?: string; priority: number }> = [];
 
   for (const mod of modules) {
@@ -335,10 +335,11 @@ function generateTopFixes(modules: ModuleResult[]): UnifiedRunResult["topFixes"]
       });
     }
     if (mod.name === "Vault" && mod.score < 60) {
+      // H3: an initialized vault never needs `amc vault init`; what failed there is the ledger verdict.
       fixes.push({
-        action: "Initialize signing vault",
+        action: hasVault ? "Diagnose the failed ledger verification" : "Initialize signing vault",
         impact: `Vault → ${scoreToGrade(Math.min(100, mod.score + 50))} (+${potentialGain.toFixed(1)} overall)`,
-        command: "amc vault init",
+        command: hasVault ? "amc verify --repair" : "amc vault init",
         priority: potentialGain,
       });
     }
@@ -421,7 +422,7 @@ export async function unifiedRun(input: UnifiedRunInput): Promise<UnifiedRunResu
     failed: failedSurfaces,
   };
 
-  const topFixes = generateTopFixes(modules);
+  const topFixes = generateTopFixes(modules, vaultExists(workspace));
   let diagnosticRunId: string | undefined;
   let episodeRecordPath: string | undefined;
   let findingProofsPath: string | undefined;

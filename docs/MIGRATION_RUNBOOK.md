@@ -8,9 +8,14 @@ Use this checklist when upgrading AMC versions that may impact data, signatures,
 
 ```bash
 amc status
-amc verify all --json
+shasum -a 256 .amc/keys/monitor_ed25519.pub   # the monitor fingerprint: record it outside the workspace
+amc verify all --json --expect-monitor <monitor sha256>
 amc maintenance stats
 ```
+
+The 1.1.1 CLI has no `--expect-monitor`; on 1.1.1 run `amc verify all --json` without it. In the current source
+build and from 2.0.0, `verify all` without a monitor pin (this flag, `AMC_EXPECTED_MONITOR_FINGERPRINT` or a trust
+list) reports the ledger UNANCHORED and exits 1.
 
 Record current:
 - AMC version
@@ -66,7 +71,7 @@ If verification fails, stop.
 Run immediately after upgrade:
 
 ```bash
-amc verify all --json
+amc verify all --json --expect-monitor <monitor sha256>
 amc retention verify
 amc transparency verify
 ```

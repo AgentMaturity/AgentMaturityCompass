@@ -559,8 +559,9 @@ Certificates are bundled as deterministic `.tar.gz` archives (`amc-cert/cert.jso
 ### 6.5 Verification Protocol
 
 ```bash
-# Full chain verification
-amc verify all --json
+# Full chain verification, against the monitor key fingerprint recorded outside the workspace
+# (without a pin the ledger check reports UNANCHORED and the command exits 1)
+amc verify all --json --expect-monitor <monitor sha256>
 
 # Certificate verification
 amc assurance cert verify --cert ./amc-cert.tar.gz

@@ -1,3 +1,8 @@
+/** `n` limited to [min, max]. */
+export function clamp(n: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, n));
+}
+
 /** A ratio needs a finite numerator and a positive, finite evidence denominator. */
 export function ratioOrNull(numerator: number, denominator: number): number | null {
   if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator <= 0) return null;

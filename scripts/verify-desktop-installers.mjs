@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
+import { assertNoAppleMetadata } from "./lib/tar-metadata.mjs";
 
 const root = resolve(process.cwd());
 const outRoot = resolve(root, process.env.AMC_DESKTOP_PACKAGE_OUT || "dist/installers");
@@ -135,6 +136,7 @@ for (const pkg of manifest.packages ?? []) {
         : [])
     ];
   assertArchiveContains(archivePath, platformEntries);
+  if (!archivePath.endsWith(".zip")) assertNoAppleMetadata(archivePath);
   const packageEntries = [`${base}/agent-maturity-compass-${manifest.packageVersion}.tgz`];
   if (pkg.platform === "macos-universal") {
     // The app carries its own copy so it still starts after it is moved out of the extracted folder.
@@ -162,8 +164,14 @@ for (const pkg of manifest.packages ?? []) {
     ? [`${appResources}/launch-studio.sh`]
     : pkg.kind === "windows" ? [`${base}/Agent Maturity Compass Studio.ps1`] : [];
   for (const entry of launcherEntries) {
-    if (!readArchiveEntry(archivePath, entry).toString("utf8").includes(manifest.npmTarball.sha256)) {
+    const launcher = readArchiveEntry(archivePath, entry).toString("utf8");
+    if (!launcher.includes(manifest.npmTarball.sha256)) {
       fail(`${entry} does not pin the nested npm tarball hash`);
+    }
+    // On upgrade a launcher stops the previous Studio only when that pid's command line is the Studio daemon:
+    // a stale state file's pid may now belong to another program.
+    if (!launcher.includes("_studio-daemon")) {
+      fail(`${entry} does not check the _studio-daemon identity before stopping the previous Studio`);
     }
   }
   if (pkg.platform === "macos-universal" && !pkg.appLaunchers?.some((launcher) => launcher.kind === "macos-app-bundle")) {

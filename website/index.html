@@ -38,7 +38,7 @@
       </div>
     </div>
   </nav>
-  <div class="nav-mobile">
+  <div class="nav-mobile" id="navMobile">
     <a href="#capabilities">how it works</a>
     <a href="#pricing">pricing</a>
     <a href="docs/index.html">docs</a>
@@ -60,12 +60,12 @@
           <h1 style="white-space:nowrap">Download it<span class="accent blink-cursor">_</span></h1>
           <h1 class="hero-h1-gray">Get the full score<span style="color:var(--text)">.</span></h1>
           <h1 class="hero-h1-accent">Fix the gaps<span style="color:var(--text)">.</span></h1>
-          <p class="hero-sub">It's like a report card for your AI agent. Download AMC, open it, and in about a minute you'll see what's strong, what's weak, and exactly what to fix. Then AMC <span class="hl">fixes the gaps for you</span> and writes them into your agent. <span class="hl">No account</span>. <span class="hl">No signup</span>. <span class="hl">No terminal</span>. <span class="hl">Free forever</span>, bring your own AI key.</p>
+          <p class="hero-sub">It's like a report card for your AI agent. Download AMC, open it, and in about a minute you'll see what's strong, what's weak, and exactly what to fix. Then AMC <span class="hl">fixes the gaps for you</span> and writes them into your agent. <span class="hl">No account</span>. <span class="hl">No signup</span>. <span class="hl">No terminal</span>. <span class="hl">Free forever</span>, bring your own AI key. The desktop app opens a local demo workspace; to score your own agent, run <code>amc up</code> in its folder.</p>
         </div>
         <div class="hero-right gs">
           <div class="hero-download">
-            <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases/latest" class="btn btn-primary btn-xl" rel="noopener">Download for macOS →</a>
-            <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases/latest" class="btn btn-primary btn-xl" rel="noopener">Download for Windows →</a>
+            <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases/tag/v1.1.1" class="btn btn-primary btn-xl" rel="noopener">Download 1.1.1 for macOS →</a>
+            <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases/tag/v1.1.1" class="btn btn-primary btn-xl" rel="noopener">Download 1.1.1 for Windows →</a>
           </div>
           <p class="hero-reassure">No Docker · No terminal · No signup · Free forever</p>
           <a href="playground.html" class="btn btn-outline btn-xl hero-browser">Try it in your browser →</a>
@@ -86,10 +86,10 @@
         <div class="stats-row">
           <div class="stat gs"><span class="stat-value">244</span><span class="stat-label">checks in the full score</span></div>
           <div class="stat gs"><span class="stat-value">264</span><span class="stat-label">deep-dive checks</span></div>
-          <div class="stat gs"><span class="stat-value">1,276</span><span class="stat-label">CLI commands</span></div>
+          <div class="stat gs"><span class="stat-value">1,278</span><span class="stat-label">CLI commands</span></div>
           <div class="stat gs"><span class="stat-value"><!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --></span><span class="stat-label">registered assurance packs</span></div>
           <div class="stat gs"><span class="stat-value">41</span><span class="stat-label">industry packs</span></div>
-          <div class="stat gs"><span class="stat-value">2,402</span><span class="stat-label">test source files</span></div>
+          <div class="stat gs"><span class="stat-value">2,479</span><span class="stat-label">test source files</span></div>
         </div>
       </div>
     </section>
@@ -138,8 +138,8 @@
             </div>
           </div>
           <div class="desktop-download" style="grid-column:1/3">
-            <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases/latest" class="btn btn-primary btn-xl" rel="noopener">Download for macOS →</a>
-            <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases/latest" class="btn btn-outline btn-xl" rel="noopener">Download for Windows →</a>
+            <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases/tag/v1.1.1" class="btn btn-primary btn-xl" rel="noopener">Download 1.1.1 for macOS →</a>
+            <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases/tag/v1.1.1" class="btn btn-outline btn-xl" rel="noopener">Download 1.1.1 for Windows →</a>
           </div>
           <div class="product-terminal" style="grid-column:1/3">
             <div class="terminal-bar"><div class="terminal-dot r"></div><div class="terminal-dot y"></div><div class="terminal-dot g"></div><div class="terminal-title">amc up</div></div>
@@ -178,7 +178,7 @@
           <div class="product-info-card"><span>watch + enforce</span><strong>Observed actions, signed decisions</strong><p>Observe Claude Code and Gemini CLI actions by default, or opt into loopback control that reuses AMC policies and binds the exact native response to a signed receipt.</p></div>
           <div class="product-info-card"><span>fleet</span><strong>Overview + trust graph</strong><p>Use fleet overview, graph validation, SLO status, and trust-graph exports before scoring multi-agent systems.</p></div>
           <div class="product-info-card"><span>enforce + shield</span><strong>Policy and safe proof</strong><p>Runtime firewall decisions, resource snapshots, safe confirmation proof, and <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs stay in the free core.</p></div>
-          <div class="product-info-card"><span>docs + API</span><strong>1,276 CLI paths</strong><p>The generated command inventory, API reference, OpenAPI playground, and docs hub expose the same product surface users run locally.</p></div>
+          <div class="product-info-card"><span>docs + API</span><strong>1,278 CLI paths</strong><p>The generated command inventory, API reference, OpenAPI playground, and docs hub expose the same product surface users run locally.</p></div>
         </div>
       </div>
     </section>
@@ -282,7 +282,7 @@
             <span class="tier">try it</span>
             <h3>Turn it on</h3>
             <div class="items install-command"><span class="hl">$</span> AMC_A4_PREVIEW=1 amc up<br><span class="hl">$</span> AMC_A4_PREVIEW=1 amc a4 list<br><span class="hl">$</span> AMC_A4_PREVIEW=1 amc a4 guide &lt;projectId&gt;<br><span class="hl">$</span> AMC_A4_PREVIEW=1 amc a4 verify &lt;projectId&gt; --trust-list &lt;file&gt;</div>
-            <p>A running Studio keeps its environment, so run amc down first. Then sign in to the Compass Console and start a project on its A4 page; creating one needs a signed-in local account with the OWNER or OPERATOR role.</p>
+            <p>A running Studio keeps its environment, so run amc down first. Then create the first console login with <code>amc user init --username &lt;you&gt;</code> (an OWNER account; if the workspace already has logins, use <code>amc user add</code> instead), sign in to the Compass Console and start a project on its A4 page; creating one needs a signed-in local account with the OWNER or OPERATOR role.</p>
             <a href="./docs/#A4_FORGE" class="btn btn-outline btn-xl" aria-label="Read the A4 Forge guide">read the guide →</a>
           </div>
         </div>
@@ -498,10 +498,11 @@
         <div class="footer-col"><h3>Code</h3><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="accessibility.html">Accessibility</a></div>
       </div>
       <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
+      <p class="footer-copy footer-note">This page counts visits with Plausible Analytics, loaded from plausible.io: it sends the page address, the referrer, scroll depth and time on page, and sets no cookies.</p>
     </div>
   </footer>
 
   <script src="particles.js?v=11"></script>
-  <script src="script.js?v=11"></script>
+  <script src="script.js?v=12"></script>
 </body>
 </html>

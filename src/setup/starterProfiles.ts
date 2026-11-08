@@ -19,6 +19,7 @@ import { checkToolsetReadiness, type ToolsetReadiness } from "../agent/agentTool
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL } from "../agent/stubProvider.js";
 import { initApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
 import { initUsersConfig, usersConfigPath } from "../auth/authApi.js";
+import { passwordPolicyProblem } from "../auth/passwordHash.js";
 import { compileCatalogPlan } from "../catalog/catalogCli.js";
 import { signAmcConfig } from "../config/amcConfigSignature.js";
 import { readSecretFromEnvOrFile } from "../config/loadConfig.js";
@@ -158,7 +159,7 @@ export function applyStarterProfile(workspace: string, kind: StarterProfileKind,
 class StarterProfilePublicationError extends Error {
   readonly code = "STARTER_PROFILE_INCOMPLETE";
   constructor(readonly completedPhases: readonly string[], readonly phase: string, cause: unknown) {
-    super("starter profile did not complete; successful earlier phases remain and the failed phase may be partial", { cause });
+    super(`starter profile did not complete (${phase}: ${cause instanceof Error ? cause.message : String(cause)}); successful earlier phases remain and the failed phase may be partial`, { cause });
     this.name = "StarterProfilePublicationError";
   }
 }
@@ -199,9 +200,9 @@ async function applyStarterProfileAsync(workspace: string, kind: StarterProfileK
   } catch (cause) { throw new StarterProfilePublicationError(Object.freeze([...completed]), phase, cause); }
 }
 
-async function promptSecret(message: string): Promise<string> {
+async function promptSecret(message: string, problem: (value: string) => string | null): Promise<string> {
   const ask = async (prompt: string): Promise<string> => (await inquirer.prompt<{ value: string }>([{ type: "password", name: "value",
-    message: prompt, mask: "*", validate: (v: string) => v.length >= MIN_SECRET || `At least ${MIN_SECRET} characters` }])).value;
+    message: prompt, mask: "*", validate: (v: string) => problem(v) ?? true }])).value;
   const first = await ask(message);
   if (first !== await ask(`${message} (again)`)) throw new Error(`${message}: the two entries differ; nothing was written.`);
   return first;
@@ -212,7 +213,7 @@ async function starterSecrets(kind: StarterProfileKind): Promise<StarterOwner> {
   const interactive = process.stdin.isTTY === true;
   if (!process.env.AMC_VAULT_PASSPHRASE) {
     if (!interactive) throw new Error(passphraseRefusal(kind));
-    process.env.AMC_VAULT_PASSPHRASE = await promptSecret("Vault passphrase");
+    process.env.AMC_VAULT_PASSPHRASE = await promptSecret("Vault passphrase", (v) => v.length >= MIN_SECRET ? null : `At least ${MIN_SECRET} characters`);
   }
   let username = readSecretFromEnvOrFile(process.env, "AMC_BOOTSTRAP_OWNER_USERNAME");
   let password = readSecretFromEnvOrFile(process.env, "AMC_BOOTSTRAP_OWNER_PASSWORD");
@@ -223,8 +224,11 @@ async function starterSecrets(kind: StarterProfileKind): Promise<StarterOwner> {
   username ??= (await inquirer.prompt<{ value: string }>([{ type: "input", name: "value", message: "Owner username",
     default: userInfo().username }])).value.trim();
   if (!username) throw new Error("The owner username cannot be empty.");
-  password ??= await promptSecret(`Studio password for ${username}`);
-  if (password.length < MIN_SECRET) throw new Error(`The owner password needs at least ${MIN_SECRET} characters.`);
+  const owner = username;
+  password ??= await promptSecret(`Studio password for ${owner}`, (v) => passwordPolicyProblem(v, owner));
+  // The policy initUsersConfig applies, checked before anything is written (skeptic SK-5).
+  const refused = passwordPolicyProblem(password, owner);
+  if (refused !== null) throw new Error(`The owner's Studio password is refused: ${refused}; nothing was written.`);
   return { username, password };
 }
 

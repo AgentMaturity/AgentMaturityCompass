@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C402-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C479-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -65,6 +65,8 @@ In the current source build `amc start` is another name for `amc up`. In the run
 - Ran a first 8-surface baseline (`amc run`), because the workspace had no earlier run, and printed the result. With no agent connected it graded F, with 4 of 8 surfaces evaluated.
 
 `amc down` stops the background services. A second `amc up` in the same workspace reuses it, prints the latest run and skips the baseline, because the workspace already has a run (in the 2026-10-11 recorded run it did not yet find that run and ran the baseline again). `amc up --no-baseline` skips the baseline; `amc up --demo` starts a no-vault demo instead. The installers give the published 1.1.1 release: its `amc up` starts Studio and the gateway but runs no baseline, and it has no `amc start` (use [From source](#from-source) for the current build).
+
+To sign in to the Compass Console, create the first login with `amc user init --username <you>` (an OWNER account; it asks for a password and signs `.amc/users.yaml` with the workspace vault; after `amc up` the passphrase it remembered is used. If it reports `Vault locked`, set `AMC_VAULT_PASSPHRASE` in that shell and run it again.) `amc user init` refuses when `.amc/users.yaml` already exists: if the workspace already has logins (for example after `amc init --coding`), add yours with `amc user add --username <you> --role OWNER` instead (`amc user init --force` replaces every login). Keep `.amc/` out of version control by default (add it to `.gitignore`): it holds the signing keys, the Studio admin token (`.amc/studio/`), the evidence ledger and, when `amc` generated one, `.amc/local-vault-passphrase`. A new workspace also gets `.amc/.gitignore`, which keeps those secrets and per-machine runtime state out of git. `.amc/users.yaml` (console password hashes) is not ignored by that file; keep it out of git unless the repository is private. If you deliberately commit a workspace for CI ([amc-action](amc-action/README.md)), never commit `.amc/local-vault-passphrase` or `.amc/studio/`, supply `AMC_VAULT_PASSPHRASE` from a CI secret, and keep that repository private: the encrypted vault is offline brute-force material.
 
 **What you get:**
 
@@ -122,6 +124,7 @@ curl -fsSL https://agentmaturity.co/install.sh | sh
 # Start Studio and the gateway (prints the console URL); the current source build also runs a first 8-surface baseline
 cd your-agent-project
 amc up
+amc user init --username <you>   # new workspace only: the first console login (asks for a password)
 
 # Or just print the full score in your terminal
 amc
@@ -400,16 +403,21 @@ A4 Forge takes one agent from a brief to a recorded, customer-controlled deploym
 - **Adapt** (contextualization): compiles and signs the control plan for the agent's markets, sector and data, writes its context plugin and memory policy, and records a conformance statement as counts, never a percentage.
 - **Activate** (commercialization): builds a signed release package and its leases, prepares Compose or Helm files for an operator to run, and records the operator's deployment receipts, AMC's own reachability check, rollback and value claims.
 
-**What the records are, and are not.** Every record A4 writes is signed and `self_reported` (references to stub-model runs are labelled `synthetic_example`); runtime observations enter only by reference to rows the runtime wrote. A signature proves who wrote a record and that it is unchanged, never that its statement is true, and no A4 output says the agent is safe, correct or lawful. A second approver in the same workspace satisfies separation of duties, but two members of one workspace are not two independent reviews. The regulatory records Adapt uses are `experimental`: drafted by an agent, with citations not yet fetched, hashed or legally reviewed, and approved by no named expert. AMC never deploys: it prepares the plan and records what the operator says happened.
+**What the records are, and are not.** Every record A4 writes is signed and `self_reported` (references to stub-model runs are labelled `synthetic_example`); runtime observations enter only by reference to rows the runtime wrote. A signature proves who wrote a record and that it is unchanged, never that its statement is true, and no A4 output says the agent is safe, correct or lawful. Separation of duties keeps a gate's author, requester and builders from approving it, and under the default approval policy the Assemble completion, Adapt and Activate gates need two approvals each, so a full walk needs the owner plus two more approvers with the roles each gate allows, one of them an AUDITOR for Adapt's completion ([who approves which gate](docs/A4_FORGE.md#approvals-and-separation-of-duties)). Two members of one workspace are not two independent reviews. The regulatory records Adapt uses are `experimental`: drafted by an agent, with citations not yet fetched, hashed or legally reviewed, and approved by no named expert. AMC never deploys: it prepares the plan and records what the operator says happened.
 
-**Try it.** A4 Forge is in the current source build only (see [From source](#from-source)); the published 1.1.1 release does not contain it. Set `AMC_A4_PREVIEW=1` in the environment Studio starts in and for each `amc a4` command; a Studio that is already running keeps its environment, so run `amc down` first. Creating a project needs a signed-in local account with the OWNER or OPERATOR role ([RBAC](docs/RBAC.md)).
+**Try it.** A4 Forge is in the current source build only (see [From source](#from-source)); the published 1.1.1 release does not contain it. Set `AMC_A4_PREVIEW=1` in the environment Studio starts in and for each `amc a4` command; a Studio that is already running keeps its environment, so run `amc down` first. Creating a project needs a signed-in local account with the OWNER or OPERATOR role ([RBAC](docs/RBAC.md)). Workspace OWNERs decide gates as implicit project owners; an APPROVER or AUDITOR decides only once added as a project member with the approver role, so add them before requesting a gate, because adding a member supersedes open gates. On a Studio that does not run under Compose or Helm, Activate's release approval is refused (`deployment.same_host`, P2-40), so the walk ends after Adapt.
 
 ```bash
-AMC_A4_PREVIEW=1 amc up                     # then sign in to the Compass Console and start a project on its A4 page
+AMC_A4_PREVIEW=1 amc up                     # starts Studio with the A4 page
+amc user init --username <you>              # first console login (OWNER); with existing logins use amc user add
+                                            # then sign in to the Compass Console and start a project on its A4 page
 AMC_A4_PREVIEW=1 amc a4 list                # the projects this identity may read
-AMC_A4_PREVIEW=1 amc a4 guide <projectId>   # the next action, and the pins each open gate's decision needs
+AMC_A4_PREVIEW=1 amc a4 guide <projectId>   # the next action, the head seq, and the pins each open gate's decision needs
 AMC_A4_PREVIEW=1 amc a4 readiness <projectId>
-AMC_A4_PREVIEW=1 amc a4 verify <projectId> --trust-list <file>   # the record chain under your own trust list
+amc approvals login --username <you> --token-file <file>   # the session file every amc a4 write names
+# before a gate, add each approver who is not a workspace OWNER (<n>: the head seq amc a4 guide printed)
+AMC_A4_PREVIEW=1 amc a4 members <projectId> --member LOCAL_USER:<userId> --project-role approver --session-token-file <file> --expect-head-seq <n>
+AMC_A4_PREVIEW=1 amc a4 verify <projectId> --trust-list <file> --allow-unanchored   # the chain's integrity (exit 2): a project's ledger is unanchored, so it never reads trusted
 ```
 
 **Status: preview.** Without the variable, the `/api/v1/a4` routes answer 404 `A4_PREVIEW_DISABLED`, Studio shows no A4 entry, and every `amc a4` command refuses with exit code 1. `amc mcp serve` started with the variable adds five A4 tools (four reads and a self-reported comment), and the Node SDK's `createA4Client` calls the routes of a Studio that has it. Not available yet: independently reviewed claims (P2-24, P3-21); a real deployment target (P2-40: v1 records a same-host restart of the Studio that built the agent, and AMC's own destination check cannot report `passed`); CI qualification of the Compose and Helm overlays. Details: [docs/A4_FORGE.md](docs/A4_FORGE.md).
@@ -818,7 +826,7 @@ AMC is **free and MIT licensed**, and in the current source build all 41 Industr
 
 | Tier | What you get |
 |---|---|
-| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 41 Industry Packs, all <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, 1,276 registered CLI command paths, browser playground, CI gates |
+| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 41 Industry Packs, all <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, 1,278 registered CLI command paths, browser playground, CI gates |
 | **Enterprise (contact-first; not self-serve)** | Planned priority support, custom pack development, and deployment assistance; not needed for any feature or pack |
 
 > Industry Packs are 41 sector-specific questionnaires (healthcare, finance, education, logistics, government, etc.) that need ongoing regulatory research and expert review; their content stays experimental until a named expert signs it. See [`website/publication-status.json`](website/publication-status.json) for what each distribution channel publishes before making any availability claim.
@@ -852,7 +860,7 @@ AMC is **free and MIT licensed**, and in the current source build all 41 Industr
 | [Community Demo Kit](docs/COMMUNITY_DEMO_KIT.md) | [Why AMC One-Pager](docs/WHY_AMC_ONE_PAGER.md) |
 | [Solo Dev Quickstart](docs/SOLO_DEV_QUICKSTART.md) | [Platform Engineer Quickstart](docs/PLATFORM_ENGINEER_QUICKSTART.md) |
 | [Security & Compliance Quickstart](docs/SECURITY_COMPLIANCE_QUICKSTART.md) | [Troubleshooting](docs/TROUBLESHOOTING.md) |
-| [CLI Reference (1,276 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
+| [CLI Reference (1,278 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
 | [Compatibility Matrix](docs/COMPATIBILITY_MATRIX.md) | [Starter Blueprints](docs/STARTER_BLUEPRINTS.md) |
 | [Install Packages](docs/INSTALL_PACKAGES.md) | [Support Policy](docs/SUPPORT_POLICY.md) |
 | [Release Cadence](docs/RELEASE_CADENCE.md) | [CI Templates](docs/CI_TEMPLATES.md) |
@@ -901,16 +909,28 @@ npm run package:desktop:verify
 
 Run these in a source checkout ([From source](#from-source)); the desktop archives on the published GitHub release are 1.1.1 builds ([publication evidence](website/publication-status.json)). See [docs/DESKTOP_PACKAGES.md](docs/DESKTOP_PACKAGES.md) for archive contents and platform commands.
 
-### Single-binary install (experimental)
+The macOS app is not notarized (the current source build ad-hoc signs it): if macOS says it cannot verify the app, open System Settings > Privacy & Security and choose Open Anyway. An app built from current source carries its own copy of the package, so you can move it, for example to `/Applications`. Studio keeps running after you close the app window or browser tab; stop it with the launcher runtime's own `amc down`, run in its `studio-workspace` folder:
 
-AMC now includes an **experimental Node SEA packaging path** for host-specific single-binary builds:
+```bash
+# macOS
+cd ~/"Library/Application Support/Agent Maturity Compass/studio-workspace" && ../runtime/node_modules/.bin/amc down
+```
+
+```powershell
+# Windows
+cd "$env:LOCALAPPDATA\Agent Maturity Compass\studio-workspace"; ..\runtime\node_modules\.bin\amc.cmd down
+```
+
+### Single-binary build (experimental; does not start yet)
+
+AMC has an **experimental Node SEA build script**. It is a local build for the host that runs it and not a release asset: the release workflow neither builds nor uploads it. (An earlier workflow attached an experimental Linux SEA binary to the 1.1.1 release without starting it first; do not rely on it.)
 
 ```bash
 npm run build
 npm run build:sea
 ```
 
-The build path is wired in and produces SEA artifacts plus a manifest. Runtime verification is still experimental and host-sensitive. See [docs/SINGLE_BINARY.md](docs/SINGLE_BINARY.md) for the honest status and caveats.
+The binary it writes to `dist/sea/` does not start yet (the CLI is an unbundled ES module, which a Node SEA cannot run as its main script), so `npm run build:sea` exits 1 after its startup check. Install with the release installer or [from source](#from-source) instead. See [docs/SINGLE_BINARY.md](docs/SINGLE_BINARY.md) for the status and the remaining work.
 
 ### Nightly compatibility matrix
 
@@ -951,7 +971,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,402<!-- /amc:count --> test source files; Vitest reports run outcomes
+cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,479<!-- /amc:count --> test source files; Vitest reports run outcomes
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
@@ -972,6 +992,6 @@ cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- a
 ---
 
 <p align="center">
-  <strong><!-- amc:count:diagnosticQuestions -->244<!-- /amc:count --> default diagnostic questions + 20 lifecycle expansion questions · <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs · 41 domain packs · <!-- amc:count:adapters -->16<!-- /amc:count --> adapters · 1,276 CLI command paths</strong><br>
+  <strong><!-- amc:count:diagnosticQuestions -->244<!-- /amc:count --> default diagnostic questions + 20 lifecycle expansion questions · <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs · 41 domain packs · <!-- amc:count:adapters -->16<!-- /amc:count --> adapters · 1,278 CLI command paths</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>

@@ -91,7 +91,7 @@
 
       <div class="callout callout-green">
         <strong>By the numbers</strong>
-        The AMC CLI currently registers 1,276 command paths. Every command supports <code>--help</code> for inline documentation.
+        The AMC CLI currently registers 1,278 command paths. Every command supports <code>--help</code> for inline documentation.
       </div>
 
       <!-- Common workflow commands -->
@@ -287,7 +287,7 @@
           <tr><td><code>amc lite-score</code></td><td>Score a non-agent LLM app or chatbot</td></tr>
           <tr><td><code>amc business kpi</code></td><td>Correlate maturity with business risk and audit readiness</td></tr>
             <tr><td><code>amc verify</code></td><td>Verify integrity across AMC artifacts</td></tr>
-            <tr><td><code>amc verify all --json</code></td><td>Full verification in one pass</td></tr>
+            <tr><td><code>amc verify all --json --expect-monitor &lt;sha256&gt;</code></td><td>Full verification in one pass, pinned to your recorded monitor key fingerprint (UNANCHORED without the pin)</td></tr>
             <tr><td><code>amc snapshot --agent &lt;id&gt;</code></td><td>Generate Unified Clarity Snapshot</td></tr>
             <tr><td><code>amc target set</code></td><td>Interactive equalizer wizard</td></tr>
             <tr><td><code>amc target diff</code></td><td>Diff run against target profile</td></tr>

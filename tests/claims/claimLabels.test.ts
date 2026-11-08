@@ -103,7 +103,8 @@ describe("schemas", () => {
     const badge = claimBadge({ ...notEvaluated, claimLabel: renderClaimLabel(notEvaluated).line });
     expect(badge).toContain(`Self-reported · not evaluated (${REASON_TEXT.SELF_REPORTED_NO_POSITIVE_STATUS})`);
     expect(badge).toContain('class="claim-badge pill"');
-    expect(badge).toContain('href="#claim-legend"');
+    // The strip carries the one legend (M3); a badge has no legend link of its own.
+    expect(badge).not.toContain("claim-legend");
     expect(badge).not.toMatch(/>0</);
   });
 });

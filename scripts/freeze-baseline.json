@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "freezeActive": true,
-  "measuredAt": "2026-11-08T04:00:39.568Z",
-  "measuredOn": "241a097b70e1e6127495cc278814aaf303678458",
+  "measuredAt": "2026-11-08T21:19:17.736Z",
+  "measuredOn": "7d157f6dc0b8fc60eb33e9c240bdafb5233056e9",
   "counts": {
-    "cliCommandPaths": 1276,
-    "cliInventoryPaths": 1276,
+    "cliCommandPaths": 1278,
+    "cliInventoryPaths": 1278,
     "stationPacks": 41,
     "stationPackQuestions": 723
   },
@@ -38,6 +38,20 @@
     "P2-25",
     "P2-30",
     "P3-14",
+    "LIVE-VAULT",
+    "LIVE-INTEGRITY",
+    "LIVE-DEPLOY",
+    "LIVE-RUNTIME",
+    "LIVE-UX",
+    "SH-LOOP",
+    "SH-PROVIDERS",
+    "SH-TOOLS",
+    "SH-SANDBOX",
+    "SH-EXT",
+    "SH-ORCH",
+    "SH-UI",
+    "SH-OBS",
+    "SH-TRUST",
     "SH-INTEG"
   ]
 }

@@ -6,7 +6,7 @@
  */
 
 import { EventEmitter } from "node:events";
-import { randomBytes, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import type { DiagnosticReport, TrustTier } from "../types.js";
 import { runDiagnostic } from "../diagnostic/runner.js";
@@ -15,7 +15,8 @@ import { dispatchAlert, loadAlertsConfig, type AlertPayload } from "../drift/ale
 import { detectEvidenceStreamAnomalies, type ObservabilityAnomaly } from "../observability/anomalyDetector.js";
 import { openLedger } from "../ledger/ledger.js";
 import { sha256Hex } from "../utils/hash.js";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { pathExists, readUtf8 } from "../utils/fs.js";
+import { createLocalVaultPassphrase, loadLocalVaultPassphrase, localVaultPassphrasePath } from "../vault/localPassphrase.js";
 import { getAgentPaths } from "../fleet/paths.js";
 import { initWorkspace } from "../workspace.js";
 
@@ -59,29 +60,17 @@ export interface MonitoringEvent {
 }
 
 function ensureLocalMonitorVaultPassphrase(workspace: string): void {
-  if (process.env.AMC_VAULT_PASSPHRASE && process.env.AMC_VAULT_PASSPHRASE.length > 0) {
+  // LIVE-VAULT-02: the local passphrase file reaches a non-agent process only (src/vault/localPassphrase.ts).
+  const local = loadLocalVaultPassphrase(workspace);
+  if (local.reason !== undefined) {
+    throw new Error("Vault passphrase needed: the monitor does not read .amc/local-vault-passphrase "
+      + `${local.reason === "agent-mode" ? "in agent mode" : `under the agent marker ${local.marker ?? "(unknown)"}`}; export AMC_VAULT_PASSPHRASE.`);
+  }
+  if (local.loaded || (process.env.AMC_VAULT_PASSPHRASE ?? "").length > 0 || pathExists(localVaultPassphrasePath(workspace))
+    || pathExists(join(workspace, ".amc", "vault.amcvault"))) {
     return;
   }
-
-  const amcDir = join(workspace, ".amc");
-  const localPassphrasePath = join(amcDir, "local-vault-passphrase");
-  if (pathExists(localPassphrasePath)) {
-    const localPassphrase = readUtf8(localPassphrasePath).trim();
-    if (localPassphrase.length >= 8) {
-      process.env.AMC_VAULT_PASSPHRASE = localPassphrase;
-    }
-    return;
-  }
-
-  const vaultFile = join(amcDir, "vault.amcvault");
-  if (pathExists(vaultFile)) {
-    return;
-  }
-
-  ensureDir(amcDir);
-  const generated = `amc-monitor-${randomBytes(32).toString("base64url")}`;
-  writeFileAtomic(localPassphrasePath, `${generated}\n`, 0o600);
-  process.env.AMC_VAULT_PASSPHRASE = generated;
+  createLocalVaultPassphrase(workspace, "amc-monitor-");
 }
 
 export class ContinuousMonitor extends EventEmitter {

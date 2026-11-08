@@ -9,7 +9,7 @@ import { A4_STEPS } from "../../contracts/v1/a4Project.js";
 import { ACTION_CLASSES } from "../../governor/actionCatalog.js";
 import { leaseScopeSchema, type LeaseScope } from "../../leases/leaseSchema.js";
 import type { ActionClass } from "../../types.js";
-import { isRegulated, latestGate, readinessItemBuilders, redoneStages, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState } from "../a4Readiness.js";
+import { isRegulated, latestGate, proposeNextAction, readinessItemBuilders, redoneStages, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState } from "../a4Readiness.js";
 import { bridgeControls } from "../a4Lifecycle.js";
 import type { A4Producer } from "../a4RouterStages.js";
 import { flatSlots, type A4Answer, type A4ChainLink, type A4Question, type A4Step } from "../a4Schema.js";
@@ -563,7 +563,7 @@ export function activateItems(state: A4ReadinessState, query: A4ReadinessQuery):
         ? waiting("understanding_confirmed", ["UNDERSTANDING_STALE"], { section: "recommendation", nextAction: { label: "Answers changed: run Understand again, then confirm it" } })
         : item("understanding_confirmed", "READY", { section: "recommendation" }),
     proposed ? item("release_proposed", "READY", { section: "recommendation" })
-      : waiting("release_proposed", [spec.schema === ACTIVATE_SPEC_SCHEMA ? "PROPOSAL_STALE" : "NOT_PROPOSED"], { section: "recommendation", nextAction: { label: "Propose the release" } }),
+      : waiting("release_proposed", [spec.schema === ACTIVATE_SPEC_SCHEMA ? "PROPOSAL_STALE" : "NOT_PROPOSED"], { section: "recommendation", nextAction: proposeNextAction(state, "activate", "Propose the release") }),
     packageInputsItem(state, spec, proposed),
     transparencyItem(state.project.project_id, release, query.live.packageTransparency),
     sameHostItem(facts, target),
