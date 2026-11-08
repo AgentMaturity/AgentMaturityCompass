@@ -4,7 +4,9 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const prompt = vi.hoisted(() => vi.fn());
-vi.mock("inquirer", () => ({ default: { prompt } }));
+/** The streams each prompt module was created with (the governance question must go to stderr). */
+const promptModules = vi.hoisted(() => [] as unknown[]);
+vi.mock("inquirer", () => ({ default: { prompt, createPromptModule: (options: unknown) => { promptModules.push(options); return prompt; } } }));
 
 import { setMode } from "../src/mode/mode.js";
 import { initWorkspace } from "../src/workspace.js";
@@ -190,6 +192,7 @@ describe("governance signing from the remembered store asks first", () => {
     await fresh.confirmRememberedUnlock(workspace, "policy sign");
     expect(prompt).toHaveBeenCalledTimes(1);
     expect(JSON.stringify(prompt.mock.calls[0])).toContain("Sign policy sign with the vault passphrase remembered in");
+    expect(promptModules.at(-1), "asked on stderr, never in the command's stdout (skeptic SK-6)").toMatchObject({ output: process.stderr });
     expect(fresh.vaultStatus(workspace).unlocked).toBe(false);
     expect(fresh.rememberedUnlockLocation(workspace)).toBeNull();
     expect(fresh.rememberedStoreDeclined()).toBe(true);
@@ -212,8 +215,9 @@ describe("governance signing from the remembered store asks first", () => {
     setTTY(process.stdin, true);
     unlockWithRememberedPassphrase(workspace, env);
     prompt.mockResolvedValue({ sign: true });
-    for (const path of ["score", "vault status", "user list", "verify"]) await confirmRememberedUnlock(workspace, path);
-    expect(prompt).not.toHaveBeenCalled();
+    for (const path of ["score", "vault status", "user list", "verify", "keys list", "firewall status", "firewall events", "tools list",
+      "gateway status", "policy controls", "policy test", "connect hooks health", "down"]) await confirmRememberedUnlock(workspace, path);
+    expect(prompt, "governance reads that sign nothing (skeptic SK-6)").not.toHaveBeenCalled();
     for (const path of ["policy sign", "lease issue", "studio lan enable", "connect hooks install"]) await confirmRememberedUnlock(workspace, path);
     expect(prompt).toHaveBeenCalledTimes(4);
     expect(vaultStatus(workspace).unlocked).toBe(true);

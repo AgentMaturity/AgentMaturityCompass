@@ -74,18 +74,25 @@ export function isGovernancePath(path: string): boolean {
   return GOVERNANCE_SIGNING_PATHS.some((entry) => path === entry || path.startsWith(`${entry} `));
 }
 
-const READS = new Set(["vault status", "vault lock", "vault forget", "user list", "user verify"]);
+/** Governance paths that sign nothing (reads, checks, `down`): they run without the question (skeptic SK-6). */
+const READS = new Set(["vault status", "vault lock", "vault forget", "user list", "user verify", "keys list", "down", "connect hooks health",
+  "firewall status", "firewall events", "tools list", "tools verify", "gateway status", "trust status", "identity verify",
+  "identity workload-trust show", "identity workload-trust verify", "policy controls", "policy simulate", "policy test", "policy pack list",
+  "policy pack describe", "policy pack diff", "policy scope list", "policy action verify", "policy action logic show", "policy approval verify",
+  "workorder list", "workorder show", "workorder verify"]);
 
 /**
  * D4: a governance command whose vault was opened from the remembered store (not from AMC_VAULT_PASSPHRASE or a prompt)
  * runs only after a y/N answer, default N. N locks the vault, clears the remembered-unlock mark and declines the store for
  * the rest of the process, so a command that unlocks itself when it finds the vault locked reaches its normal refusal or
- * prompt instead. Without a terminal on stdin the question cannot be asked; that counts as N.
+ * prompt instead. Without a terminal on stdin the question cannot be asked; that counts as N. The question goes to stderr,
+ * so it reaches the operator when stdout is piped and never lands in a command's output.
  */
 export async function confirmRememberedUnlock(workspace: string, path: string): Promise<void> {
   const location = rememberedUnlockLocation(workspace);
   if (location === null || !isGovernancePath(path) || READS.has(path)) return;
-  const confirmed = process.stdin.isTTY === true && (await inquirer.prompt<{ sign: boolean }>([{
+  const ask = inquirer.createPromptModule({ input: process.stdin, output: process.stderr });
+  const confirmed = process.stdin.isTTY === true && (await ask<{ sign: boolean }>([{
     type: "confirm", name: "sign", default: false,
     message: `Sign ${path} with the vault passphrase remembered in ${location}? (export AMC_VAULT_PASSPHRASE for this shell to skip this question)`
   }])).sign === true;
