@@ -14,6 +14,8 @@
  * Studio serves a workspace from several processes.
  */
 const MAX_ENTRIES = 50_000;
+const LOGIN_THROTTLED_ERROR = "too many failed logins for this account from this address";
+const LOGIN_THROTTLED_ACCOUNT_ERROR = "too many failed logins for this account";
 
 interface Window {
   count: number;
@@ -111,5 +113,3 @@ export async function admitLoginAttempt(throttle: LoginThrottle, input: {
   return true;
 }
 
-export const LOGIN_THROTTLED_ERROR = "too many failed logins for this account from this address";
-export const LOGIN_THROTTLED_ACCOUNT_ERROR = "too many failed logins for this account";
