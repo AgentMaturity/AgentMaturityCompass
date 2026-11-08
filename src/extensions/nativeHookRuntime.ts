@@ -18,7 +18,7 @@ export interface NativeHookRuntime {
 }
 
 /** Fan out to every part: any denial denies, reports concatenate. One part is returned as itself. */
-export function composeNativeHooks(parts: readonly (NativeHookRuntime | undefined)[]): NativeHookRuntime | undefined {
+function composeNativeHooks(parts: readonly (NativeHookRuntime | undefined)[]): NativeHookRuntime | undefined {
   const present = parts.filter((part): part is NativeHookRuntime => part !== undefined);
   if (present.length <= 1) return present[0];
   return {

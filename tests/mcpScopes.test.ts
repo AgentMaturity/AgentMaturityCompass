@@ -74,7 +74,7 @@ describe("--mcp resolution", () => {
     expect(() => resolveScopedMcpSelection(workspace, ["both"], dirs)).toThrow(/exists in both scopes/);
     expect(() => resolveScopedMcpSelection(workspace, ["project:both"], dirs)).toThrow(/needs a valid BUNDLE signature/);
     expect(resolveScopedMcpSelection(workspace, ["user:both"], dirs)).toMatchObject({ paths: [user.path], pins: [user.sha256] });
-    const merged = mergeScopedMcpSelection({ mcp: ["user:both"], mcpConfig: [user.path] }, workspace);
+    const merged = mergeScopedMcpSelection<{ mcp: string[]; mcpConfig: string[]; mcpConfigSha256?: string[] }>({ mcp: ["user:both"], mcpConfig: [user.path] }, workspace);
     expect(merged.mcpConfig).toEqual([user.path, user.path]);
     expect(merged.mcpConfigSha256).toEqual([user.sha256, user.sha256]);
     expect(mergeScopedMcpSelection({ mcpConfig: ["x"] }, workspace)).toEqual({ mcpConfig: ["x"] });

@@ -118,7 +118,7 @@ function parseSkill(expected: string, sourcePath: string, raw: string, kind: Ski
 }
 
 /** Where a layer's command files live: the `commands` directory beside its `skills` directory. */
-export function commandsRootFor(skillRoot: string): string {
+function commandsRootFor(skillRoot: string): string {
   return join(dirname(resolve(skillRoot)), "commands");
 }
 

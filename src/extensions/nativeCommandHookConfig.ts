@@ -48,7 +48,7 @@ export class NativeCommandHookError extends Error {
 
 /** Exact names, `|` lists and a trailing `*` prefix glob; nothing else, so there is no regular-expression surface. */
 const MATCHER_TOKEN = /^[A-Za-z0-9_.-]{1,64}\*?$/;
-export function parseCommandHookMatcher(matcher: string): readonly string[] | "*" {
+function parseCommandHookMatcher(matcher: string): readonly string[] | "*" {
   const trimmed = matcher.trim();
   if (trimmed === "" || trimmed === "*") return "*";
   if (Buffer.byteLength(trimmed) > NATIVE_COMMAND_HOOK_LIMITS.matcherBytes) throw new NativeCommandHookError("MATCHER_INVALID", "A hook matcher exceeds 256 bytes.");
@@ -128,7 +128,7 @@ function workspaceRelative(root: string, item: string): string | null {
 }
 
 /** Every regular workspace file the handlers' argv name, with its digest. A symlink or an over-cap file throws: it cannot be bound. */
-export function commandHookReferences(workspace: string, handlers: readonly NativeCommandHookHandler[]): readonly NativeCommandHookReference[] {
+function commandHookReferences(workspace: string, handlers: readonly NativeCommandHookHandler[]): readonly NativeCommandHookReference[] {
   const root = resolve(workspace), refs = new Map<string, string>();
   for (const handler of handlers) {
     for (const item of handler.argv) {
@@ -144,7 +144,7 @@ export function commandHookReferences(workspace: string, handlers: readonly Nati
 }
 
 /** What the high-water store records: the file digest bound to the digests of the workspace files its argv names. */
-export function commandHookTrustMark(sha256: string, references: readonly NativeCommandHookReference[]): string {
+function commandHookTrustMark(sha256: string, references: readonly NativeCommandHookReference[]): string {
   return sha256Hex(JSON.stringify([sha256, references.map(reference => [reference.rel, reference.sha256])]));
 }
 
@@ -170,7 +170,7 @@ export function resolveHookProgram(program: string, workspace: string, env: Node
   throw new NativeCommandHookError("HOOK_PROGRAM_NOT_FOUND", `hook program ${program} was not found in PATH`);
 }
 
-export const NATIVE_COMMAND_HOOKS_REL = ".amc/hooks.json";
+const NATIVE_COMMAND_HOOKS_REL = ".amc/hooks.json";
 export type NativeCommandHookLoad =
   | { readonly status: "absent"; readonly path: string }
   | { readonly status: "trusted"; readonly path: string; readonly sha256: string; readonly handlers: readonly NativeCommandHookHandler[];
@@ -181,7 +181,7 @@ export type NativeCommandHookLoad =
 const trustKey = (workspace: string) => highWaterKey("hooks-trusted", workspaceScope(workspace));
 
 /** The trust mark this machine accepted for the workspace's hooks.json (file digest bound to its references), or null. */
-export function trustedCommandHooksMark(workspace: string, opts: HighWaterOptions = {}): string | null {
+function trustedCommandHooksMark(workspace: string, opts: HighWaterOptions = {}): string | null {
   return readHighWater(trustKey(workspace), opts)?.sha256 ?? null;
 }
 

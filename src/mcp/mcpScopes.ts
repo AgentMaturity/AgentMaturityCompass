@@ -23,7 +23,7 @@ import { writeFileAtomic } from "../utils/fs.js";
 
 export type McpScope = "user" | "project";
 export const MCP_SCOPES: readonly McpScope[] = Object.freeze(["user", "project"]);
-export const MCP_SCOPED_ID = /^[a-zA-Z0-9_-]{1,32}$/;
+const MCP_SCOPED_ID = /^[a-zA-Z0-9_-]{1,32}$/;
 
 export interface McpScopeDirs { readonly user: string; readonly project: string }
 export function scopedMcpDirs(workspace: string, credentialsHome?: string): McpScopeDirs {

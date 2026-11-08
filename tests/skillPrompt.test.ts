@@ -26,6 +26,7 @@ const skill = (over: Partial<Skill> = {}): Skill => ({
   description: "run the linter",
   body: "Run the linter and fix what it reports.",
   sourcePath: "/ws/.amc/skills/lint/SKILL.md",
+  kind: "skill",
   digest: "a".repeat(64),
   ...over
 });
