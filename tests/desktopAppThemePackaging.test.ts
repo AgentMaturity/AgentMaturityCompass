@@ -99,6 +99,11 @@ describe("desktop app packaging and visual identity", () => {
     expect(verifier).toContain("${appResources}/agent-maturity-compass-${manifest.packageVersion}.tgz");
     expect(verifier).toContain("[`${base}/Agent Maturity Compass Studio.ps1`]");
     expect(verifier).toContain("does not pin the nested npm tarball hash`);");
+    // An upgrade stops the previous Studio only when that pid's command line is the Studio daemon (round 2).
+    expect(verifier).toMatch(/if \(!launcher\.includes\("_studio-daemon"\)\)/);
+    const packager = read("scripts/package-desktop-installers.mjs");
+    expect(packager).toContain("grep -q '_studio-daemon'");
+    expect(packager).toContain('$OldCommandLine.Contains("_studio-daemon")');
   });
 
   test("Studio dashboard uses the shared website-aligned console shell", () => {
