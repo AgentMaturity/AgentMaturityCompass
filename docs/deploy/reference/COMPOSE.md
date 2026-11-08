@@ -72,7 +72,7 @@ docker compose -f docker/docker-compose.yml run --rm --no-deps -T -w /data/amc -
 6. Verify:
     - `curl --cacert ./amc-local-ca.crt https://<AMC_TLS_HOST>:<AMC_TLS_PORT>/readyz` answers 200.
     - `docker compose -f docker-compose.tls.yml exec -w /data/amc amc-studio sh -c 'AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")" amc doctor --strict --json'`.
-    - `amc verify all --json --expect-monitor <sha256>` in the same way. While Studio runs, its own gateway session is open, so the verdict is a verified prefix that names that session; a complete-ledger verdict needs Studio stopped.
+    - `amc verify all --json --expect-monitor <sha256>` in the same way. While Studio runs, the ledger check passes and names Studio's own gateway session as open (`1 session open: <id> (gateway; last signed activity … min ago)`); that is not an error. A run without the vault passphrase reports the payloads as not evaluated and exits 1, so keep the `AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")"` prefix.
     - One governed turn: `NODE_EXTRA_CA_CERTS=./amc-local-ca.crt node ../../scripts/deploy/governed-turn-probe.mjs --base-url https://<AMC_TLS_HOST>:<AMC_TLS_PORT> --username-file secrets/amc_owner_username.txt --password-file secrets/amc_owner_password.txt --pairing-code-file <file with a fresh pairing code> --ready-timeout-ms 60000`. It exits 0 on `verified` or `verified-prefix`.
 
 ## Upgrade from 1.1.1

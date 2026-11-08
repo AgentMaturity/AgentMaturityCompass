@@ -146,6 +146,13 @@ describe("one documented way to run AMC for live users (LIVE-DEPLOY-17)", () => 
     expect(compose).not.toMatch(/docker compose[^`\n]* cp amc-studio:\/tmp\//);
   });
 
+  it("says what amc verify all prints while Studio runs: PASS naming the open gateway session, no verified prefix (final review)", () => {
+    const step = read("docs/deploy/reference/COMPOSE.md").split("\n").find((line) => line.includes("`amc verify all --json --expect-monitor <sha256>`"));
+    expect(step).toContain("the ledger check passes and names Studio's own gateway session as open");
+    expect(step).toContain("reports the payloads as not evaluated and exits 1");
+    expect(step).not.toMatch(/verified prefix|needs Studio stopped/);
+  });
+
   it("starts the Upgrading section with the backup", () => {
     expect(section(read("docs/INSTALL.md"), "## Upgrading").trimStart().startsWith("Back up first")).toBe(true);
   });
