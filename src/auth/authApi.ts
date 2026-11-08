@@ -20,6 +20,8 @@ import { capturePurposePublication, assertPurposePublicationCurrent } from "../k
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { KeyProviderError, KEY_PROVIDER_ERRORS } from "../keys/provider.js";
 import { KeyRevokedError } from "../keys/keyRevocations.js";
+import { recordUserChange, type UserChange, type UserChangeActor } from "./userAudit.js";
+export { sessionActor } from "./userAudit.js";
 
 interface UsersSignature {
   digestSha256: string;
@@ -291,8 +293,15 @@ function withUsersConfigLock<T>(workspace: string, operation: () => T): T {
 }
 const sameUsersBytes = (left: Buffer | null, right: Buffer | null) => left === null ? right === null : right !== null && left.equals(right);
 
-/** A maintained caller rechecks its existing authorization after the provider wait, before any users-file write. */
-export interface UsersMutationOptions { assertAuthorized?: () => void }
+/**
+ * A maintained caller rechecks its existing authorization after the provider wait, before any users-file write. A caller
+ * that names the actor gets the change recorded in the audit trail after the signed write (LIVE-VAULT-09).
+ */
+export interface UsersMutationOptions { assertAuthorized?: () => void; actor?: UserChangeActor }
+async function recorded<T extends UserRecord>(workspace: string, action: UserChange["action"], opts: UsersMutationOptions, record: T): Promise<T> {
+  if (opts.actor) await recordUserChange(workspace, { action, username: record.username, userId: record.userId, roles: record.roles, actor: opts.actor });
+  return record;
+}
 class UsersAuthorizationChangedError extends Error {
   constructor() { super("user mutation authority changed while signing"); this.name = "UsersAuthorizationChangedError"; }
 }
@@ -387,41 +396,43 @@ async function mutateUsersConfigAsync<T>(workspace: string, change: (current: Us
 
 export async function initUsersConfigAsync(input: Parameters<typeof initUsersConfig>[0], opts: UsersMutationOptions = {}): Promise<ReturnType<typeof initUsersConfig>> {
   const params = { ...input };
-  return mutateUsersConfigAsync(params.workspace, () => {
+  const created = await mutateUsersConfigAsync(params.workspace, () => {
     const owner = createUserRecord({ username: params.username, roles: ["OWNER"], passwordHash: hashPassword(params.password) });
     return { config: { v: 1, updatedTs: Date.now(), users: [owner] },
       result: { path: usersPath(params.workspace), sigPath: usersSigPath(params.workspace), owner } };
   }, opts, true);
+  await recorded(params.workspace, "init", opts, created.owner);
+  return created;
 }
 
 export async function addUserAsync(input: Parameters<typeof addUser>[0], opts: UsersMutationOptions = {}): Promise<UserRecord> {
   const params = { ...input, roles: [...input.roles] };
-  return mutateUsersConfigAsync(params.workspace, current => {
+  return recorded(params.workspace, "add", opts, await mutateUsersConfigAsync(params.workspace, current => {
     const config = current!;
     if (config.users.some(user => user.username.toLowerCase() === params.username.toLowerCase())) throw new Error(`user already exists: ${params.username}`);
     const record = createUserRecord({ username: params.username, roles: params.roles, passwordHash: hashPassword(params.password) });
     return { config: { ...config, updatedTs: Date.now(), users: [...config.users, record] }, result: record };
-  }, opts);
+  }, opts));
 }
 
 export async function revokeUserAsync(input: Parameters<typeof revokeUser>[0], opts: UsersMutationOptions = {}): Promise<UserRecord> {
   const params = { ...input };
-  return mutateUsersConfigAsync(params.workspace, current => {
+  return recorded(params.workspace, "revoke", opts, await mutateUsersConfigAsync(params.workspace, current => {
     const config = current!, index = config.users.findIndex(user => user.username.toLowerCase() === params.username.toLowerCase());
     if (index < 0) throw new Error(`user not found: ${params.username}`);
     const updated = { ...config.users[index]!, status: "REVOKED" as const }, users = config.users.slice(); users[index] = updated;
     return { config: { ...config, updatedTs: Date.now(), users }, result: updated };
-  }, opts);
+  }, opts));
 }
 
 export async function setUserRolesAsync(input: Parameters<typeof setUserRoles>[0], opts: UsersMutationOptions = {}): Promise<UserRecord> {
   const params = { ...input, roles: [...input.roles] };
-  return mutateUsersConfigAsync(params.workspace, current => {
+  return recorded(params.workspace, "roles", opts, await mutateUsersConfigAsync(params.workspace, current => {
     const config = current!, index = config.users.findIndex(user => user.username.toLowerCase() === params.username.toLowerCase());
     if (index < 0) throw new Error(`user not found: ${params.username}`);
     const updated = { ...config.users[index]!, roles: params.roles }, users = config.users.slice(); users[index] = updated;
     return { config: { ...config, updatedTs: Date.now(), users }, result: updated };
-  }, opts);
+  }, opts));
 }
 
 /**
@@ -437,7 +448,7 @@ export async function setUserPasswordAsync(input: { workspace: string; username:
     return { config: { ...config, updatedTs: Date.now(), users }, result: record };
   }, opts);
   forEachSessionRecord(params.workspace, (path, parsed) => { if (parsed.userId === updated.userId && !parsed.revoked) markSessionRevoked(path, parsed); });
-  return updated;
+  return recorded(params.workspace, "password", opts, updated);
 }
 
 let cachedDummyHash: string | null = null;
