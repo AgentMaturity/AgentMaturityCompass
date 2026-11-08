@@ -930,7 +930,7 @@ residency or retention.
   trust list admits them. An export carries the rows as stored, so an Adapt row's derived parts are there as their sha256
   ref; the report warns `DERIVED_BOUND_BY_DIGEST` with the count (the files stay under the workspace's
   `a4-projects/<projectId>/derived/`, which `verifyA4Chain` checks in place). Run it with `amc a4 verify <file> --trust-list <file>` (exit 0 trusted, 1 failed, 2
-  integrity-only under `--allow-unpinned` or `--allow-unanchored`). With no trust list the report states integrity only. In a bundle, a record whose `CREATED` body or signed
+  integrity-only under `--allow-unpinned` or `--allow-unanchored`). With no trust list the report states integrity only. A bundle exported while Studio ran carries the gateway's open session: export prints `open sessions: <n>`, and when the manifest verifies under an admitted signer the bundle's ledger is verified as of its signed export time, so the report lists the session as open under `warnings`, never as a missing seal (otherwise the real time applies). In a bundle, a record whose `CREATED` body or signed
   seq-0 receipt names another agent than the manifest's fails scope (`A4_SCOPE_AGENT`). Seven normative fixtures,
   with their expected verdicts, are in `tests/fixtures/contracts/a4-record/`.
 - **Binder slice.** `buildA4BinderSlice` (`src/a4/a4Binder.ts`) writes a project's revisions, gates, transitions,

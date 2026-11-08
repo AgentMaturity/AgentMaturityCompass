@@ -14,7 +14,11 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { getSigningKey, getSigningPublicKeyPem, signHexDigest, verifyHexDigest } from "../crypto/keys.js";
-import { verifyKeyHistoryEnvelope, type KeyHistoryEnvelope } from "../crypto/keyHistoryEnvelope.js";
+import { openSessionsAt, verifyInstantFor } from "../ledger/verifyAsOf.js";
+import {
+  authenticatedHistoryFromBundle as authenticatedHistoryFromCert, bundleKeyHistory as certKeyHistory,
+  collectRoleKeysFromBundle as getPublicKeyHistoryFromCert
+} from "../bundles/bundleKeys.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { computeFailureRiskIndices } from "./indices.js";
 import { latestAssuranceReports } from "./assuranceRunner.js";
@@ -589,11 +593,15 @@ export async function verifyCertificate(params: {
     try {
       const monitor = admitKey({ publicKeyPem: readUtf8(join(extracted, "public-keys", "monitor.pub")), purpose: "ledger-row",
         signature: "public-keys/monitor.pub", context: params.trust, keyHistory: certKeyHistory(extracted, "monitor") });
+      // D-INT-7: the carried ledger is verified as of the signed issuedTs, iff the certificate's own signer is admitted.
+      const now = verifyInstantFor({ signedTs: cert.issuedTs, admitted: issuer?.status === "admitted" && certSha === certSig.certSha256 });
       const ledgerResult = await verifyLedgerIntegrity(verifyWorkspace,
-        monitor.status === "admitted" && monitor.keyId ? { expectedMonitorFingerprint: monitor.keyId } : {});
+        { now, ...(monitor.status === "admitted" && monitor.keyId ? { expectedMonitorFingerprint: monitor.keyId } : {}) });
       if (!ledgerResult.ok) {
         errors.push(...ledgerResult.errors.map((error) => `ledger verify failed: ${error}`));
       }
+      const open = openSessionsAt(ledgerResult, now);
+      if (open) warnings.push(open);
       anchoring = carriedLedgerAnchoring(monitor, ledgerResult.trustRoot.anchored, signatures);
     } finally {
       rmSync(verifyWorkspace, { recursive: true, force: true });
@@ -629,27 +637,6 @@ export async function verifyCertificate(params: {
   } finally {
     rmSync(extracted, { recursive: true, force: true });
   }
-}
-
-/** The key-history envelope a certificate carries for a role, unverified: admitKey checks it against a pinned anchor. */
-function certKeyHistory(root: string, kind: "monitor" | "auditor"): unknown {
-  try {
-    const parsed: unknown = JSON.parse(readUtf8(join(root, "public-keys", "key-history.json")));
-    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? (parsed as Record<string, unknown>)[kind] : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-function authenticatedHistoryFromCert(root: string, kind: "monitor" | "auditor"): KeyHistoryEnvelope | null {
-  const result = verifyKeyHistoryEnvelope(certKeyHistory(root, kind), kind, readUtf8(join(root, "public-keys", `${kind}.pub`)));
-  return result.valid ? result.envelope : null;
-}
-
-function getPublicKeyHistoryFromCert(root: string, kind: "monitor" | "auditor"): string[] {
-  const direct = readUtf8(join(root, "public-keys", `${kind}.pub`));
-  const history = authenticatedHistoryFromCert(root, kind);
-  return [...new Set([direct, ...(history?.entries.map((entry) => entry.publicKeyPem) ?? [])])];
 }
 
 export function revokeCertificate(params: {

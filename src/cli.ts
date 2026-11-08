@@ -9302,8 +9302,8 @@ withTrustFlags(backup
       trust: trustFromFlags(opts, ["artifact-seal"])
     });
     console.log(chalk.green(`Backup restored to ${restored.restoredTo}`) + (restored.replacedTo ? `\nThe replaced workspace files are kept in ${restored.replacedTo}` : ""));
-    if (!restored.trusted) {
-      console.log(chalk.yellow("Restore completed with warnings:"));
+    if (restored.warnings.length > 0) {
+      console.log(chalk.yellow(restored.trusted ? "Restore notes:" : "Restore completed with warnings:"));
       for (const warning of restored.warnings) {
         console.log(`- ${warning}`);
       }
@@ -10334,7 +10334,7 @@ bundle
     console.log(chalk.green(`Bundle exported: ${result.outFile}`));
     if (opts.attest) console.log("Attested: attestations/aibom.cdx.json and attestations/control-results.sigstore.json (DSSE, workspace artifact-seal key: a local audit trail until a trust list pins that key)");
     printClaimResult(runIdClaim(opts.run, opts.agent ?? activeAgent(program)), {});
-    console.log(`Files: ${result.fileCount}, Events: ${result.eventCount}, Sessions: ${result.sessionCount}`);
+    console.log(`Files: ${result.fileCount}, Events: ${result.eventCount}, Sessions: ${result.sessionCount}${result.openSessions.length ? `, open sessions: ${result.openSessions.length} (${result.openSessions.join(", ")}; the export verifies as of its export time)` : ""}`);
   });
 
 withTrustFlags(bundle

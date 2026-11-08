@@ -84,7 +84,6 @@
     {"id":"11e56141a0866dd45fd5a1081614f131e19bc01ae68f793792cc5a1f0bb2083e","paths":["assurance/packs/emergentMultiAgentRiskPack.ts","assurance/packs/inputFaultResiliencePack.ts"],"format":"typescript"},
     {"id":"1206ee2c1c6dda61f341de153eee029835fbf91a6715c459e84a1834c4db31b8","paths":["eval/evalImporters.ts","value/valueCollector.ts"],"format":"typescript"},
     {"id":"12a149f89da666c8a15cef1b93346592be468f6508151328f196fef383fe0b30","paths":["domainProof/domainProofArtifact.ts","domainProof/sourceRuleManifestSchema.ts"],"format":"typescript"},
-    {"id":"12af0c051f8a3a94a735b4bd06e06a5a03cc0f5ac63903e9e9bb9081dd4663fe","paths":["assurance/certificate.ts","bundles/bundle.ts"],"format":"typescript"},
     {"id":"12c36e0ce28a01d0b91c36a9cb386972c42f1781767637d49a44e7bf8ce72488","paths":["agents/customerSupportBot.ts","agents/metricTemplates.ts"],"format":"typescript"},
     {"id":"12dba9590449e2f9f2769a38e134562ac97635ed2e6ddaaaf68403b98d62148f","paths":["dataflow/processorRegistry.ts","lifecycle/artifactSignature.ts"],"format":"typescript"},
     {"id":"131fdde8d80ab3be1989df70835ef206e8bc0924db27251214e9c8d007abb03b","paths":["workspaces/workspaceRouter.ts","workspaces/workspaceRouter.ts"],"format":"typescript"},
