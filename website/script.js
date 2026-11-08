@@ -235,7 +235,18 @@ function initMobileNav(){
   var btn=document.querySelector('.nav-hamburger');
   var mob=document.querySelector('.nav-mobile');
   if(!btn||!mob) return;
-  btn.addEventListener('click',function(){ mob.classList.toggle('open'); });
+  if(!mob.id) mob.id='navMobile';
+  btn.setAttribute('aria-controls',mob.id);
+  btn.setAttribute('aria-expanded','false');
+  function setOpen(open){
+    mob.classList.toggle('open',open);
+    btn.setAttribute('aria-expanded',open?'true':'false');
+  }
+  btn.addEventListener('click',function(){ setOpen(!mob.classList.contains('open')); });
+  mob.addEventListener('click',function(e){ if(e.target.closest('a')) setOpen(false); });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'&&mob.classList.contains('open')){ setOpen(false); btn.focus(); }
+  });
 }
 
 function initTheme(){

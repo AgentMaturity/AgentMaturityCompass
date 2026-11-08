@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
+import { runInNewContext } from "node:vm";
 import { describe, expect, test } from "vitest";
 
 function htmlFiles(dir: string): string[] {
@@ -245,5 +246,77 @@ describe("website accessibility", () => {
     });
 
     expect(failures).toEqual([]);
+  });
+});
+
+// LIVE-UX-11: the phone menu never opened (.nav-mobile stayed display:none), plain pages that hide .nav-links on a
+// phone had no menu at all, and verify.html scrolled sideways on its unbroken fingerprint.
+describe("website phone navigation", () => {
+  const website = join(process.cwd(), "website");
+  const pages = readdirSync(website).filter((file) => file.endsWith(".html"));
+  const plain = pages.filter((file) => readFileSync(join(website, file), "utf8").includes('class="nav-links"'));
+
+  test("every page with the plain nav links has the menu button, the menu and script.js", () => {
+    expect(plain.length).toBeGreaterThanOrEqual(11);
+    for (const file of plain) {
+      const html = readFileSync(join(website, file), "utf8");
+      expect(html, file).toContain('class="nav-hamburger"');
+      expect(html, file).toMatch(/<div class="nav-mobile" id="navMobile"[^>]*>/);
+      expect(html, file).toMatch(/<script src="script\.js(?:\?v=[\w.]+)?"><\/script>/);
+      const desktop = new Set([...html.slice(html.indexOf('class="nav-links"'), html.indexOf("</ul>", html.indexOf('class="nav-links"'))).matchAll(/href="([^"]+)"/g)].map((match) => match[1]));
+      const menu = html.slice(html.indexOf('class="nav-mobile"'), html.indexOf("</div>", html.indexOf('class="nav-mobile"')));
+      for (const href of desktop) expect(menu, `${file} menu lacks ${href}`).toContain(`href="${href}"`);
+    }
+  });
+
+  test("the menu opens: .open changes display, and script.js announces and closes it", () => {
+    const style = readFileSync(join(website, "style.css"), "utf8");
+    expect(style).toMatch(/\.nav-mobile\.open\{[^}]*display:flex/);
+    const script = readFileSync(join(website, "script.js"), "utf8");
+    const nav = script.slice(script.indexOf("function initMobileNav()"), script.indexOf("function initTheme()"));
+    expect(nav).toContain("setAttribute('aria-expanded'");
+    expect(nav).toContain("setAttribute('aria-controls'");
+    expect(nav).toMatch(/key===?'Escape'/);
+  });
+
+  test("script.js drives the menu: closed and announced at load, opens, closes on Escape and on a link", () => {
+    type Stub = ReturnType<typeof element>;
+    function element() {
+      const attributes = new Map<string, string>(), classes = new Set<string>(), handlers: Record<string, Array<(event: unknown) => void>> = {};
+      return {
+        id: "", focused: false, attributes,
+        getAttribute: (name: string) => attributes.get(name) ?? null,
+        setAttribute: (name: string, value: string) => { attributes.set(name, String(value)); },
+        classList: { contains: (name: string) => classes.has(name), add: (name: string) => { classes.add(name); }, remove: (name: string) => { classes.delete(name); },
+          toggle: (name: string, force?: boolean) => { const on = force ?? !classes.has(name); if (on) classes.add(name); else classes.delete(name); return on; } },
+        addEventListener: (type: string, handler: (event: unknown) => void) => { (handlers[type] ??= []).push(handler); },
+        fire: (type: string, event: unknown = {}) => { for (const handler of handlers[type] ?? []) handler(event); },
+        focus() { this.focused = true; }
+      };
+    }
+    const button: Stub = element(), menu: Stub = element(), page: Stub = element();
+    const document = { readyState: "complete", body: page, querySelector: (selector: string) => selector === ".nav-hamburger" ? button : selector === ".nav-mobile" ? menu : null,
+      querySelectorAll: () => [], getElementById: () => null, addEventListener: page.addEventListener };
+    runInNewContext(readFileSync(join(website, "script.js"), "utf8"), { document, window: {} });
+    expect(menu.id).toBe("navMobile");
+    expect(button.getAttribute("aria-controls")).toBe("navMobile");
+    expect(button.getAttribute("aria-expanded")).toBe("false");
+    button.fire("click");
+    expect(menu.classList.contains("open")).toBe(true);
+    expect(button.getAttribute("aria-expanded")).toBe("true");
+    page.fire("keydown", { key: "Escape" });
+    expect(menu.classList.contains("open")).toBe(false);
+    expect(button.getAttribute("aria-expanded")).toBe("false");
+    expect(button.focused).toBe(true);
+    button.fire("click");
+    menu.fire("click", { target: { closest: (selector: string) => (selector === "a" ? {} : null) } });
+    expect(menu.classList.contains("open")).toBe(false);
+    expect(button.getAttribute("aria-expanded")).toBe("false");
+  });
+
+  test("verify.html wraps inline code, so its fingerprint cannot widen the page", () => {
+    const verify = readFileSync(join(website, "verify.html"), "utf8");
+    expect(verify).toContain(".plain-page code{font-size:.9rem;overflow-wrap:anywhere}");
+    expect(verify).toContain(".plain-page pre code{overflow-wrap:normal}");
   });
 });
