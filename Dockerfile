@@ -30,7 +30,9 @@ COPY qualification/2026-10-18-P1-23/claude-code-conformance.json qualification/2
 COPY catalog/ catalog/
 COPY deploy/apparmor/ deploy/apparmor/
 COPY docs/NATIVE_SANDBOX_UBUNTU.md docs/
-RUN pnpm run build
+# V8 sizes its default heap from the builder's memory; below 16 GB that is too small for tsc here (a 6 GB builder
+# aborted with "heap out of memory"). 4096 MB is the default a 16 GB+ host gets; the builder needs that much free.
+RUN NODE_OPTIONS=--max-old-space-size=4096 pnpm run build
 # The separate release/prepack gate is NOT exercised by this source image build.
 # This packs the actual publish file set, including bundled kernel + notices.
 RUN mkdir /out \

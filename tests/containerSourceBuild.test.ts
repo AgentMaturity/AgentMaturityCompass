@@ -42,6 +42,15 @@ describe("container source build and runtime contracts", () => {
     expect(existsSync("deploy/compose/Dockerfile")).toBe(false);
   });
 
+  it("gives the build's tsc a heap limit that does not depend on the builder's memory (LIVE-DEPLOY-16)", () => {
+    // V8 sizes its default heap from physical memory: in a 6 GB builder (the colima VM) tsc aborted with "heap out of
+    // memory" (exit 134). 4096 MB is the default a 16 GB+ build host gets. Only the build step carries it.
+    const file = read("Dockerfile");
+    const stage = file.split(/^FROM /m).find((block) => / AS build\n/.test(block))!;
+    expect(stage).toMatch(/^RUN NODE_OPTIONS=--max-old-space-size=4096 pnpm run build$/m);
+    expect(file.match(/max-old-space-size/g)).toHaveLength(1);
+  });
+
   it("copies every path the build and npm pack read into the build stage (P2-06-D1)", () => {
     const stage = read("Dockerfile").split(/^FROM /m).find((block) => / AS build\n/.test(block))!;
     const sources = [...stage.matchAll(/^COPY (?!--from)(.+)$/gm)].flatMap((match) => match[1]!.split(/\s+/).filter((token) => !token.startsWith("--")).slice(0, -1));
@@ -167,6 +176,7 @@ describe("container source build and runtime contracts", () => {
     // image is used. Qualification passes so only cleanup can change the verdict.
     writeFileSync(preload, `
 import child from "node:child_process";
+import { EventEmitter } from "node:events";
 import { syncBuiltinESMExports } from "node:module";
 import { appendFileSync } from "node:fs";
 const sessionId="11111111-1111-4111-8111-111111111111";
@@ -191,6 +201,9 @@ child.spawnSync=(command,args)=>{
   else if(args[0]==="run"&&args.includes("node"))output=JSON.stringify({uid:10001,bundledPackages:1,version:"1.0.0"});
   else if(args.includes("--version"))output="1.0.0";
   else if(args.includes("--help"))output="Usage: amc\\namc evidence verify\\namc --help --all";
+  else if(args.includes("firewall")&&args.includes("enable"))output=JSON.stringify({changed:true,revision:1,checkpointPath:"/workspace/control-checkpoints/scope/runtime-firewall/000000000001.json"});
+  else if(args.includes("firewall")&&args.includes("status"))output=JSON.stringify({enabled:true,mode:"observe",integrity:"trusted",policyRevision:1,policyCheckpointPath:"/workspace/control-checkpoints/scope/runtime-firewall/000000000001.json"});
+  else if(args[0]==="stats")output="512MiB / 2GiB 4.20%";
   else if(args.includes("agent-loop")&&args[args.indexOf("agent-loop")+1]==="run")output=JSON.stringify({sessionId,driverStatus:"idle",unsignedRows:0,events:5,turns:1,requests:1,toolCalls:1,endings:[{turn:1,reason:"complete",interrupted:false}]});
   else if(args.includes("verify")){
     const interrupted=killed&&!args.includes(runnerImage);
@@ -201,6 +214,13 @@ child.spawnSync=(command,args)=>{
       :{ok:!interrupted,chain:{ok:!interrupted,errors},errors,sessions:{closed:[sessionId]}});
   }
   return {status,stdout:output,stderr:""};
+};
+// The firewall publish runs asynchronously so a resource sample can be taken while it runs.
+child.spawn=(command,args)=>{
+  const result=child.spawnSync(command,args),proc=new EventEmitter();
+  proc.stdout=new EventEmitter();proc.stderr=new EventEmitter();
+  setImmediate(()=>{proc.stdout.emit("data",result.stdout);proc.stderr.emit("data",result.stderr);proc.emit("close",result.status);});
+  return proc;
 };
 syncBuiltinESMExports();
 `);
@@ -222,11 +242,19 @@ syncBuiltinESMExports();
     }
     const coldVerifiers = runs.filter((args) => args.includes("--network") && args.includes("verify"));
     expect(coldVerifiers).toHaveLength(6);
-    const studioDataMount = runs.find((args) => args.includes("-d"))!.find((arg) => arg.startsWith("type=volume,"))!;
+    const studioRun = runs.find((args) => args.includes("-d"))!;
+    const studioDataMount = studioRun.find((arg) => arg.startsWith("type=volume,"))!;
+    // LIVE-DEPLOY-16: the shipped layout, with no tmpfs home for the state volume to nest under.
+    const layoutMounts = studioRun.filter((arg) => /^type=volume,.*dst=(\/home\/amc\/\.config\/amc\/state|\/workspace)$/.test(arg));
+    expect(layoutMounts).toHaveLength(2);
+    expect(studioRun.some((arg) => arg.startsWith("/home/amc:"))).toBe(false);
+    expect(studioRun.join(" ")).toContain("--stop-timeout 40");
+    expect(studioRun).toContain("AMC_CONTROL_CHECKPOINT_DIR=/workspace/control-checkpoints");
     for (const args of coldVerifiers) {
       expect(args[args.indexOf("--network") + 1]).toBe("none");
       expect(args).toContain(receipt.studioImage);
       expect(args).toContain(studioDataMount);
+      for (const mount of layoutMounts) expect(args).toContain(mount);
       expect(args.filter((arg) => arg.startsWith("type=bind,"))).toEqual([expect.stringMatching(/dst=\/run\/secrets\/vault,readonly$/)]);
       expect(args.some((arg) => /AMC_BOOTSTRAP|owner-user|owner-pass/.test(arg))).toBe(false);
     }
@@ -240,9 +268,13 @@ syncBuiltinESMExports();
     const secretMount = calls.flat().find((arg) => arg.startsWith("type=bind,src=") && arg.includes("dst=/run/secrets/vault"))!;
     expect(existsSync(secretMount.split("src=")[1]!.split(",dst=")[0]!)).toBe(false);
     expect(receipt.checks.find((check: { name: string }) => check.name === "studio: interrupted gateway is refused by both cold verifiers")).toMatchObject({ passed: true });
+    for (const name of ["studio: signed firewall control published to the checkpoint volume", "studio: anti-rollback marks persist on the state volume across restart",
+      "studio: signed firewall control survives restart"]) expect(receipt.checks.find((check: { name: string }) => check.name === name)).toMatchObject({ passed: true });
+    expect(receipt.resourceSamples.map((sample: { label: string }) => sample.label)).toEqual(["after readiness", "after the stub turn", "during the firewall publish"]);
     expect(result.status, result.stderr).toBe(mode === "success" ? 0 : 1);
     expect(receipt.ok).toBe(mode === "success");
-    expect(receipt.cleanupResults.map((entry: { resource: string }) => entry.resource)).toEqual(["container", "volume", "volume", "secret files"]);
+    // Studio's data, state and checkpoint volumes, then the runner's data volume.
+    expect(receipt.cleanupResults.map((entry: { resource: string }) => entry.resource)).toEqual(["container", "volume", "volume", "volume", "volume", "secret files"]);
     if (mode !== "success") {
       expect(receipt.cleanupResults.some((entry: { ok: boolean }) => entry.ok === false)).toBe(true);
       expect(JSON.stringify(receipt)).toContain(mode === "container-removal-fails" ? "synthetic container removal failure" : "synthetic volume removal failure");
