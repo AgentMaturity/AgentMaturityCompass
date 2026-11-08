@@ -54,7 +54,7 @@ export function loadVerifiedSourcePolicy(workspace: string): LoadedSourcePolicy 
   return { ok: true, policy: parsed.data, digest, path };
 }
 
-/** Strict parse of the file as it is on disk, before signing it: an invalid policy is never signed. */
+/** Strict parse of the captured bytes before signing them: an invalid policy is never signed. */
 function parseSourcePolicyFile(bytes: Buffer): SourcePolicy {
   return sourcePolicySchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
 }
@@ -76,8 +76,9 @@ function writeSignedAudit(workspace: string, agentIds: string[], digest: string,
 async function publishSourcePolicy(workspace: string, bytes: Buffer | undefined, kind: "init" | "sign"): Promise<{ path: string; sigPath: string; digest: string }> {
   assertOwnerMode(workspace, `integrations source ${kind}`);
   const path = sourcePolicyPath(workspace);
-  const policy = parseSourcePolicyFile(bytes ?? readFileSync(path));
+  // Capture first, then strict-parse the captured bytes: the bytes parsed are the bytes signed and audited (one read).
   const pair = captureRawConfigPairForAsync(workspace, path, bytes);
+  const policy = parseSourcePolicyFile(pair.bytes);
   const prepared = await pair.prepare();
   const result = prepared.publish();
   prepared.assertCurrent();
@@ -93,7 +94,7 @@ export async function initSourcePolicy(workspace: string): Promise<{ path: strin
   return publishSourcePolicy(workspace, Buffer.from(YAML.stringify(defaultSourcePolicy())), "init");
 }
 
-/** Signs the policy the operator edited, after a strict parse of the bytes on disk. */
+/** Signs the policy the operator edited, after a strict parse of the captured bytes. */
 export async function signSourcePolicy(workspace: string): Promise<{ path: string; sigPath: string; digest: string }> {
   if (!pathExists(sourcePolicyPath(workspace))) throw new Error(`source policy missing: run \`amc integrations source init\` first`);
   return publishSourcePolicy(workspace, undefined, "sign");

@@ -6,12 +6,12 @@
  * is refused at parse time: a bot is never an explicit requester. `admission: off` (the default) admits nothing.
  */
 import { z } from "zod";
-import { githubLoginSchema, sourceRepositorySchema } from "./sourceObservationSchema.js";
+import { GITHUB_HANDLE_PATTERN, githubLoginSchema, sourceRepositorySchema } from "./sourceObservationSchema.js";
 
 const SOURCE_POLICY_VERSION = 1;
 const DEFAULT_MENTION = "@amc";
 
-const mentionSchema = z.string().regex(/^@[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/, "a mention is `@` plus a GitHub-style handle");
+const mentionSchema = z.string().regex(new RegExp(`^@${GITHUB_HANDLE_PATTERN}$`), "a mention is `@` plus a GitHub-style handle");
 
 const sourcePolicySourceSchema = z.strictObject({
   id: z.string().regex(/^[a-z0-9][a-z0-9._-]{0,127}$/),

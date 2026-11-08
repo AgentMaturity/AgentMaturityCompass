@@ -18,8 +18,13 @@ export const MAX_RETAINED_BODY_BYTES = 65_536;
 export const SOURCE_REPLY_MARKER = "<!-- amc-reply";
 
 const hex64 = z.string().regex(/^[0-9a-f]{64}$/);
-/** A GitHub login: 1-39 alphanumerics or hyphens, as GitHub constrains it; bot logins end in `[bot]`. */
-export const githubLoginSchema = z.string().regex(/^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?(?:\[bot\])?$/);
+/**
+ * A GitHub handle: 1-39 alphanumerics or hyphens, as GitHub constrains it, plus the Enterprise Managed User suffix
+ * (`handle_shortcode`). One pattern for logins, the policy's mention and mention detection, so they agree on `_`.
+ */
+export const GITHUB_HANDLE_PATTERN = "[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?(?:_[A-Za-z0-9]+)?";
+/** A GitHub login; bot logins end in `[bot]`. */
+export const githubLoginSchema = z.string().regex(new RegExp(`^${GITHUB_HANDLE_PATTERN}(?:\\[bot\\])?$`));
 
 export const sourceRepositorySchema = z.strictObject({
   id: z.number().int().positive(),

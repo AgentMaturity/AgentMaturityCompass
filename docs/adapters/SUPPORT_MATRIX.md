@@ -72,7 +72,7 @@ Not covered:
 
 Not covered:
 
-- every Gemini CLI tool call: `amc connect hooks install --provider gemini-cli` installs a BeforeTool command hook that answers allow or deny from the signed policy (run_shell_command is parsed into a command plan), but the Bridge registers no Gemini session and binds no authorization record for it, so the answer is advisory: AMC claims no enforcement at BeforeTool
+- every Gemini CLI tool call: `amc connect hooks install --provider gemini-cli` installs a BeforeTool command hook that forwards an observation and returns no decision by default; with `--mode control` it answers allow or deny from the signed policy (run_shell_command is parsed into a command plan), but the Bridge registers no Gemini session and binds no authorization record for it, so the answer is advisory: AMC claims no enforcement at BeforeTool
 - no Gemini CLI version is qualified: neither hook has a recorded run of a pinned Gemini CLI binary, and there is no qualification record
 - what Gemini CLI does when the BeforeTool hook fails or times out (not verified by AMC)
 - calls Gemini CLI does not report at AfterTool, and sessions where the project hooks file was not loaded

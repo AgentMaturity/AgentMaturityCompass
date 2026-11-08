@@ -5,8 +5,11 @@
  *
  * The proposals row is the dedup and the crash fence for filing: it is reserved before `createApprovalForIntent`
  * (which mints a fresh request id on every call) and completed after, so two concurrent `admit` runs file one request.
+ * A reservation carries a random token; only its holder can settle or release it, so a slow filer whose reservation
+ * was taken over after the TTL cannot overwrite the taker's row (it learns it lost and cancels its own request).
  */
 import Database from "better-sqlite3";
+import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { ensureDir } from "../../utils/fs.js";
 import { sourceObservationSchema, type SourceObservation } from "./sourceObservationSchema.js";
@@ -19,6 +22,8 @@ type ProposalState = "reserved" | "proposed" | "not_admitted";
 export interface ProposalRow {
   observationId: string;
   state: ProposalState;
+  /** The current reservation's token, null once settled. */
+  token: string | null;
   approvalRequestId: string | null;
   reason: string | null;
   createdAt: number;
@@ -46,10 +51,13 @@ export function openSourceIntakeDb(workspace: string): Database.Database {
       state TEXT NOT NULL,
       approval_request_id TEXT,
       reason TEXT,
+      token TEXT,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
     );
   `);
+  const columns = (db.pragma("table_info(proposals)") as Array<{ name: string }>).map((column) => column.name);
+  if (!columns.includes("token")) db.exec("ALTER TABLE proposals ADD COLUMN token TEXT");
   return db;
 }
 
@@ -73,16 +81,28 @@ export function getSourceObservation(db: Database.Database, observationId: strin
   }
 }
 
-export function listSourceObservationIds(db: Database.Database, filter: { sourceId?: string; pendingOnly?: boolean; limit?: number } = {}): string[] {
+type ObservationFilter = { sourceId?: string; pendingOnly?: boolean };
+/** Pending means no proposals row: not yet decided (a refusal recorded from workspace state, not the policy, is never stored). */
+function observationWhere(filter: ObservationFilter): string {
   const where = [filter.sourceId === undefined ? null : "o.source_id = @sourceId", filter.pendingOnly ? "p.observation_id IS NULL" : null].filter((w) => w !== null);
-  const sql = `SELECT o.observation_id AS id FROM observations o LEFT JOIN proposals p ON p.observation_id = o.observation_id`
-    + (where.length > 0 ? ` WHERE ${where.join(" AND ")}` : "") + " ORDER BY o.received_at ASC, o.observation_id ASC LIMIT @limit";
-  return (db.prepare(sql).all({ sourceId: filter.sourceId ?? null, limit: filter.limit ?? 1000 }) as Array<{ id: string }>).map((row) => row.id);
+  return "FROM observations o LEFT JOIN proposals p ON p.observation_id = o.observation_id" + (where.length > 0 ? ` WHERE ${where.join(" AND ")}` : "");
+}
+
+export const SOURCE_LIST_LIMIT = 1000;
+
+/** Oldest first, capped at SOURCE_LIST_LIMIT: a batch. `countSourceObservations` gives the exact count. */
+export function listSourceObservationIds(db: Database.Database, filter: ObservationFilter & { limit?: number } = {}): string[] {
+  const sql = `SELECT o.observation_id AS id ${observationWhere(filter)} ORDER BY o.received_at ASC, o.observation_id ASC LIMIT @limit`;
+  return (db.prepare(sql).all({ sourceId: filter.sourceId ?? null, limit: filter.limit ?? SOURCE_LIST_LIMIT }) as Array<{ id: string }>).map((row) => row.id);
+}
+
+export function countSourceObservations(db: Database.Database, filter: ObservationFilter = {}): number {
+  return Number((db.prepare(`SELECT COUNT(*) AS n ${observationWhere(filter)}`).get({ sourceId: filter.sourceId ?? null }) as { n: number }).n);
 }
 
 function toProposal(row: Record<string, unknown>): ProposalRow {
   return {
-    observationId: String(row.observation_id), state: String(row.state) as ProposalState,
+    observationId: String(row.observation_id), state: String(row.state) as ProposalState, token: row.token === null ? null : String(row.token),
     approvalRequestId: row.approval_request_id === null ? null : String(row.approval_request_id),
     reason: row.reason === null ? null : String(row.reason), createdAt: Number(row.created_at), updatedAt: Number(row.updated_at)
   };
@@ -93,38 +113,45 @@ function getProposal(db: Database.Database, observationId: string): ProposalRow 
   return row ? toProposal(row) : null;
 }
 
-export function listProposals(db: Database.Database, limit = 1000): ProposalRow[] {
-  return (db.prepare("SELECT * FROM proposals ORDER BY created_at ASC, observation_id ASC LIMIT ?").all(limit) as Array<Record<string, unknown>>).map(toProposal);
+/** Newest decisions first, capped at SOURCE_LIST_LIMIT; `countProposals` gives the exact count. */
+export function listProposals(db: Database.Database, limit = SOURCE_LIST_LIMIT): ProposalRow[] {
+  return (db.prepare("SELECT * FROM proposals ORDER BY updated_at DESC, observation_id ASC LIMIT ?").all(limit) as Array<Record<string, unknown>>).map(toProposal);
+}
+
+export function countProposals(db: Database.Database): number {
+  return Number((db.prepare("SELECT COUNT(*) AS n FROM proposals").get() as { n: number }).n);
 }
 
 /**
- * Claims the right to decide this observation. `reserved` means this caller decides; `held` means another live filer
- * owns the reservation; `existing` returns the filed proposal. A stale reservation (crashed filer) and a recorded
- * refusal are taken over.
+ * Claims the right to decide this observation. `reserved` means this caller decides and holds `token`; `held` means
+ * another live filer owns the reservation; `existing` returns the filed proposal. A stale reservation (crashed filer)
+ * and a recorded refusal are taken over.
  */
-export function reserveProposal(db: Database.Database, observationId: string, now: number): { outcome: "reserved" } | { outcome: "held" } | { outcome: "existing"; row: ProposalRow } {
+export function reserveProposal(db: Database.Database, observationId: string, now: number): { outcome: "reserved"; token: string } | { outcome: "held" } | { outcome: "existing"; row: ProposalRow } {
   return db.transaction(() => {
     const current = getProposal(db, observationId);
+    const token = randomUUID();
     if (current === null) {
-      db.prepare("INSERT INTO proposals (observation_id, state, approval_request_id, reason, created_at, updated_at) VALUES (?, 'reserved', NULL, NULL, ?, ?)").run(observationId, now, now);
-      return { outcome: "reserved" as const };
+      db.prepare("INSERT INTO proposals (observation_id, state, approval_request_id, reason, token, created_at, updated_at) VALUES (?, 'reserved', NULL, NULL, ?, ?, ?)").run(observationId, token, now, now);
+      return { outcome: "reserved" as const, token };
     }
     if (current.state === "proposed") return { outcome: "existing" as const, row: current };
     // A refusal is informational: a policy edit (a new sender, admission turned on) may admit the observation later.
     if (current.state === "reserved" && now - current.updatedAt < PROPOSAL_RESERVATION_TTL_MS) return { outcome: "held" as const };
-    db.prepare("UPDATE proposals SET state = 'reserved', approval_request_id = NULL, reason = NULL, updated_at = ? WHERE observation_id = ? AND updated_at = ?").run(now, observationId, current.updatedAt);
-    return { outcome: "reserved" as const };
+    db.prepare("UPDATE proposals SET state = 'reserved', approval_request_id = NULL, reason = NULL, token = ?, updated_at = ? WHERE observation_id = ? AND updated_at = ?").run(token, now, observationId, current.updatedAt);
+    return { outcome: "reserved" as const, token };
   })();
 }
 
-export function settleProposal(db: Database.Database, observationId: string, settled: { state: "proposed"; approvalRequestId: string } | { state: "not_admitted"; reason: string }, now: number): void {
+/** Settles the reservation `token` holds; false when another filer took it over (the caller then owns nothing). */
+export function settleProposal(db: Database.Database, observationId: string, token: string, settled: { state: "proposed"; approvalRequestId: string } | { state: "not_admitted"; reason: string }, now: number): boolean {
   const result = settled.state === "proposed"
-    ? db.prepare("UPDATE proposals SET state = 'proposed', approval_request_id = ?, reason = NULL, updated_at = ? WHERE observation_id = ? AND state = 'reserved'").run(settled.approvalRequestId, now, observationId)
-    : db.prepare("UPDATE proposals SET state = 'not_admitted', approval_request_id = NULL, reason = ?, updated_at = ? WHERE observation_id = ? AND state = 'reserved'").run(settled.reason, now, observationId);
-  if (result.changes !== 1) throw new Error(`proposal for ${observationId} is not reserved by this filer`);
+    ? db.prepare("UPDATE proposals SET state = 'proposed', approval_request_id = ?, reason = NULL, token = NULL, updated_at = ? WHERE observation_id = ? AND state = 'reserved' AND token = ?").run(settled.approvalRequestId, now, observationId, token)
+    : db.prepare("UPDATE proposals SET state = 'not_admitted', approval_request_id = NULL, reason = ?, token = NULL, updated_at = ? WHERE observation_id = ? AND state = 'reserved' AND token = ?").run(settled.reason, now, observationId, token);
+  return result.changes === 1;
 }
 
-/** Releases a reservation that filed nothing (the filer refused before creating a request). */
-export function releaseProposal(db: Database.Database, observationId: string): void {
-  db.prepare("DELETE FROM proposals WHERE observation_id = ? AND state = 'reserved'").run(observationId);
+/** Releases the reservation `token` holds when it filed nothing (the filer refused before creating a request). */
+export function releaseProposal(db: Database.Database, observationId: string, token: string): void {
+  db.prepare("DELETE FROM proposals WHERE observation_id = ? AND state = 'reserved' AND token = ?").run(observationId, token);
 }

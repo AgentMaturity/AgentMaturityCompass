@@ -4,6 +4,10 @@
  * any other shape or action is refused with a reason, never guessed. A REST list item is a different shape (no
  * `repository`, no issue number) and is parsed by the polling adapter, not here.
  *
+ * The actor is the payload's `sender` (whoever caused the event), never the item's author alone: a maintainer, admin or
+ * app that edits an allowed sender's comment is not that sender. An event whose sender is not the author is refused
+ * (`editor_not_author`), so an edit is admitted only when the author made it (S7).
+ *
  * No network and no model: the parser reads bytes it is given. The retained body is redacted first (secrets never
  * reach the store) and capped; the digest covers the original bytes so a later re-read can be matched.
  */
@@ -12,7 +16,7 @@ import { redactSecrets } from "../../shield/redaction/redactSecrets.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
 import {
-  MAX_RETAINED_BODY_BYTES, SOURCE_OBSERVATION_ADAPTER_VERSION, SOURCE_OBSERVATION_VERSION, githubLoginSchema, issueThreadKey,
+  GITHUB_HANDLE_PATTERN, MAX_RETAINED_BODY_BYTES, SOURCE_OBSERVATION_ADAPTER_VERSION, SOURCE_OBSERVATION_VERSION, githubLoginSchema, issueThreadKey,
   sourceObservationId, sourceObservationSchema, type SourceObservation
 } from "./sourceObservationSchema.js";
 
@@ -43,7 +47,8 @@ const eventSchema = z.object({
   action: z.string(),
   issue: issueSchema,
   comment: commentSchema.optional(),
-  repository: repositorySchema
+  repository: repositorySchema,
+  sender: userSchema
 }).passthrough();
 
 const SUPPORTED_EVENT_ACTIONS: Readonly<Record<"issue_comment" | "issues", readonly string[]>> = {
@@ -51,7 +56,7 @@ const SUPPORTED_EVENT_ACTIONS: Readonly<Record<"issue_comment" | "issues", reado
   issues: ["opened", "edited"]
 };
 
-type ParseRefusal = "event_shape_invalid" | "event_action_unsupported" | "event_time_invalid";
+type ParseRefusal = "event_shape_invalid" | "event_action_unsupported" | "event_time_invalid" | "editor_not_author";
 export type ParsedObservation = { ok: true; observation: SourceObservation } | { ok: false; reason: ParseRefusal; detail: string };
 
 function actorClass(user: { login: string; type?: string | undefined }): SourceObservation["actor"]["class"] {
@@ -59,20 +64,41 @@ function actorClass(user: { login: string; type?: string | undefined }): SourceO
   return user.type === "User" ? "human" : "unknown";
 }
 
-/** The text a reader is addressed by: fenced and inline code, HTML comments and quoted lines removed. */
+/**
+ * The text a reader is addressed by, as GitHub renders it: HTML comments and fenced code (an unterminated comment or
+ * fence hides the rest of the body on GitHub and is stripped to the end here), code spans of any backtick-run length,
+ * `<code>`/`<pre>`
+ * elements, HTML tags with their attributes, indented code (a line starting with four spaces or a tab) and quoted
+ * lines (`> ...` and the lazy continuation lines that follow one until a blank line). Where GitHub's rendering is
+ * ambiguous this strips more, never less: a mention lost here fails closed as `not_mentioned`.
+ */
 function addressableText(markdown: string): string {
-  return markdown
-    .replace(/<!--[\s\S]*?-->/g, " ")
-    .replace(/```[\s\S]*?```/g, " ")
-    .replace(/~~~[\s\S]*?~~~/g, " ")
-    .replace(/`[^`\n]*`/g, " ")
-    .split("\n").filter((line) => !/^\s*>/.test(line)).join("\n");
+  const unquoted = markdown
+    .replace(/<!--[\s\S]*?(?:-->|$)/g, " ")
+    .replace(/(```+|~~~+)[\s\S]*?(?:\1|$)/g, " ")
+    .replace(/(`+)[\s\S]*?\1/g, " ")
+    .replace(/<(code|pre)\b[^>]*>[\s\S]*?(?:<\/\1\s*>|$)/gi, " ")
+    .replace(/<\/?[A-Za-z][^>]*>/g, " ");
+  const kept: string[] = [];
+  let quoting = false;
+  for (const line of unquoted.split("\n")) {
+    if (/^\s*$/.test(line)) { quoting = false; continue; }
+    if (/^\s*>/.test(line)) { quoting = true; continue; }
+    if (quoting || /^(?: {4}|\t)/.test(line)) continue;
+    kept.push(line);
+  }
+  return kept.join("\n");
 }
 
-/** Lower-cased handles mentioned in the addressable text: `@name` bounded on both sides, so `a@b.c` is none. */
+const MENTION_PATTERN = new RegExp(`(^|[^A-Za-z0-9@/.-])@(${GITHUB_HANDLE_PATTERN})(?![A-Za-z0-9/-]|\\.[A-Za-z0-9])`, "g");
+
+/**
+ * Lower-cased handles mentioned in the addressable text: `@name` bounded on both sides, so `a@b.c` is none, while a
+ * sentence-final `@name.` and an emphasised `_@name_` are mentions, as GitHub renders them.
+ */
 export function findMentions(markdown: string): string[] {
   const found = new Set<string>();
-  for (const match of addressableText(markdown).matchAll(/(^|[^\w@/.-])@([A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?)(?![\w/.-])/g)) {
+  for (const match of addressableText(markdown).matchAll(MENTION_PATTERN)) {
     found.add(match[2]!.toLowerCase());
     if (found.size >= 64) break;
   }
@@ -99,6 +125,7 @@ export function observationFromGitHubEvent(payload: unknown, context: { sourceId
   const kind = event.comment ? "issue_comment" : "issues";
   if (!SUPPORTED_EVENT_ACTIONS[kind].includes(event.action)) return { ok: false, reason: "event_action_unsupported", detail: `${kind}.${event.action}` };
   const item = event.comment ?? event.issue;
+  if (event.sender.id !== item.user.id) return { ok: false, reason: "editor_not_author", detail: `${kind}.${event.action} by ${event.sender.login} (${event.sender.id}) on an item authored by ${item.user.login} (${item.user.id})` };
   const body = item.body ?? "";
   const sourceAt = parseTime(item.updated_at, item.created_at);
   if (sourceAt === null) return { ok: false, reason: "event_time_invalid", detail: String(item.updated_at ?? item.created_at) };
@@ -111,7 +138,7 @@ export function observationFromGitHubEvent(payload: unknown, context: { sourceId
     repository,
     nativeEventId: event.comment ? `issue_comment:${event.comment.id}` : `issue:${event.issue.id}`,
     revisionDigest: sha256Hex(canonicalize(event.comment ? { body } : { title: event.issue.title, body })),
-    actor: { id: item.user.id, login: item.user.login, class: actorClass(item.user) },
+    actor: { id: event.sender.id, login: event.sender.login, class: actorClass(event.sender) },
     mentions: findMentions(body),
     primaryThreadKey,
     correlatedThreadKeys: event.issue.pull_request ? [`github:${repository.id}:pull:${event.issue.number}`] : [],

@@ -65,10 +65,11 @@ amc adapters run --agent vision-agent --adapter gemini-cli -- \
 
 ## Hooks (what AMC claims)
 
-`amc connect hooks install --provider gemini-cli` writes two command hooks into the project's `.gemini/settings.json`:
-`BeforeTool` (AMC answers `{"decision":"allow"}` or `{"decision":"deny","reason":...}` from the signed policy; a
-`run_shell_command` call is parsed into a command plan first) and `AfterTool` (observed; AMC records the call's
-digests). The hooks follow decision D55: a hook can deny or observe, never allow past the policy or rewrite arguments.
+`amc connect hooks install --provider gemini-cli` writes two command hooks into the project's `.gemini/settings.json`.
+The default (`--mode observe`) forwards `BeforeTool` and `AfterTool` as observations only and returns no decision; AMC
+records the call's digests. With `--mode control`, `BeforeTool` answers `{"decision":"allow"}` or
+`{"decision":"deny","reason":...}` from the signed policy (a `run_shell_command` call is parsed into a command plan
+first). The hooks follow decision D55: a hook can deny or observe, never allow past the policy or rewrite arguments.
 
 What AMC claims, from `docs/adapters/manifests/gemini-cli.json` (rendered in [SUPPORT_MATRIX.md](SUPPORT_MATRIX.md)):
 
