@@ -103,6 +103,21 @@ export function rehashPassword(password: string): string {
   return derive(password);
 }
 
+/** Half a current verifier's work: the unit padFailedVerify runs it in (a pre-LIVE-VAULT-13 N=2^14 verifier costs one). */
+const PAD = { n: DEFAULT_PARAMS.n / 2, r: DEFAULT_PARAMS.r };
+
+/**
+ * LIVE-VAULT-05: a wrong password against a verifier made with less work than a current one (or one that does not parse)
+ * is refused sooner than an unknown username, whose dummy check costs a current verify, so timing would tell a caller the
+ * account exists. Run after such a refusal, this does the missing work, so every refused login costs about one current verify.
+ */
+export function padFailedVerify(encodedHash: string): void {
+  let done = 0;
+  try { const parsed = parsePasswordHash(encodedHash); done = parsed.n * parsed.r * parsed.p; } catch { /* the check refused before any scrypt work */ }
+  const p = Math.round((DEFAULT_PARAMS.n * DEFAULT_PARAMS.r * DEFAULT_PARAMS.p - done) / (PAD.n * PAD.r));
+  if (p > 0) scryptSync("amc-timing-pad", "amc-timing-pad", 16, scryptOptions({ n: PAD.n, r: PAD.r, p }));
+}
+
 export function verifyPassword(password: string, encodedHash: string): boolean {
   try {
     const parsed = parsePasswordHash(encodedHash);

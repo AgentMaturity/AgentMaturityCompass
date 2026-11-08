@@ -1,9 +1,13 @@
-import { mkdtempSync, rmSync } from "node:fs";
+import { randomBytes, scryptSync } from "node:crypto";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { performance } from "node:perf_hooks";
+import YAML from "yaml";
 import { afterEach, expect, test } from "vitest";
-import { addUser, authenticateUser, initUsersConfig, revokeUser } from "../src/auth/authApi.js";
+import { addUser, authenticateUser, initUsersConfig, listUsers, revokeUser, usersConfigPath, usersConfigSigPath } from "../src/auth/authApi.js";
+import { getSigningKey, signHexDigest } from "../src/crypto/keys.js";
+import { sha256Hex } from "../src/utils/hash.js";
 import { lockVault } from "../src/vault/vault.js";
 import { initWorkspace } from "../src/workspace.js";
 
@@ -48,5 +52,35 @@ test("an unknown or revoked username takes the wrong-password time and is still 
   const revokedUser = medianMs(attempt("gone", "gone-timing-pass-123"));
   expect(unknownUser, `unknown ${unknownUser}ms vs wrong password ${wrongPassword}ms`).toBeGreaterThanOrEqual(wrongPassword * 0.5);
   expect(revokedUser, `revoked ${revokedUser}ms vs wrong password ${wrongPassword}ms`).toBeGreaterThanOrEqual(wrongPassword * 0.5);
+  expect(authenticateUser({ workspace, username: "owner", password: "owner-timing-pass-123" }).ok).toBe(true);
+});
+
+/** The owner's verifier replaced by one in the pre-LIVE-VAULT-13 form (N=2^14), re-signed the way users.yaml always is. */
+function legacyOwner(workspace: string, password: string): void {
+  const salt = randomBytes(16), config = YAML.parse(readFileSync(usersConfigPath(workspace), "utf8"));
+  config.users[0].passwordHash = ["scrypt", 16384, 8, 1, 64, salt.toString("base64"), scryptSync(password, salt, 64, { N: 16384, r: 8, p: 1 }).toString("base64")].join("$");
+  const bytes = Buffer.from(YAML.stringify(config), "utf8"), digest = sha256Hex(bytes);
+  writeFileSync(usersConfigPath(workspace), bytes);
+  writeFileSync(usersConfigSigPath(workspace), JSON.stringify({ digestSha256: digest, signature: signHexDigest(digest, getSigningKey(workspace, "config-signature")), signedTs: Date.now(), signer: "auditor" }));
+}
+
+test("a wrong password for an account whose verifier predates the N=2^15 cost takes the unknown-username time (skeptic SK-4)", () => {
+  const workspace = mkdtempSync(join(tmpdir(), "amc-login-timing-legacy-"));
+  roots.push(workspace);
+  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  initUsersConfig({ workspace, username: "owner", password: "owner-timing-pass-123" });
+  legacyOwner(workspace, "owner-timing-pass-123");
+  lockVault(workspace); // as for every account not re-hashed yet: no unlocked vault re-hashes it
+  const attempt = (username: string) => () => authenticateUser({ workspace, username, password: "x-wrong-pass-123" });
+  const legacyWrong: number[] = [], unknownUser: number[] = [];
+  for (let index = 0; index < 21; index += 1) { // interleaved, so a change in machine load hits both
+    legacyWrong.push(medianMs(attempt("owner"), 1));
+    unknownUser.push(medianMs(attempt("nobody"), 1));
+  }
+  const median = (values: number[]) => values.sort((a, b) => a - b)[Math.floor(values.length / 2)]!;
+  const ratio = median(unknownUser) / median(legacyWrong);
+  expect(listUsers(workspace)[0]!.passwordHash.split("$")[1]).toBe("16384");
+  expect(ratio, `unknown ${median(unknownUser)}ms vs legacy wrong password ${median(legacyWrong)}ms`).toBeGreaterThan(0.6);
+  expect(ratio, `unknown ${median(unknownUser)}ms vs legacy wrong password ${median(legacyWrong)}ms`).toBeLessThan(1.5);
   expect(authenticateUser({ workspace, username: "owner", password: "owner-timing-pass-123" }).ok).toBe(true);
 });

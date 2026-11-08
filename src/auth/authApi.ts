@@ -8,7 +8,7 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { isA4CommentScopeRoute } from "../studio/nativeAdmission.js";
 import { parseCookieHeader, issueSessionToken, issueSessionTokenAsync, verifySessionToken, type SessionPayload } from "./sessionTokens.js";
-import { hashPassword, passwordHashNeedsUpgrade, PasswordPolicyError, rehashPassword, verifyPassword } from "./passwordHash.js";
+import { hashPassword, padFailedVerify, passwordHashNeedsUpgrade, PasswordPolicyError, rehashPassword, verifyPassword } from "./passwordHash.js";
 import { vaultStatus } from "../vault/vault.js";
 import { createUserRecord, usersFileSchema, type UserRecord, type UsersFile } from "./userSchema.js";
 import type { UserRole } from "./roles.js";
@@ -482,6 +482,7 @@ export function authenticateUser(params: {
     };
   }
   if (!verifyPassword(params.password, user.passwordHash)) {
+    padFailedVerify(user.passwordHash); // LIVE-VAULT-05: an older, cheaper verifier still takes the unknown-username time
     return {
       ok: false,
       user: null,
