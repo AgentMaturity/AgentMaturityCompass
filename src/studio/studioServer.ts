@@ -5959,7 +5959,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       if ((pathname === "/shield/exploit-confirmation/scopes" || pathname === "/shield/exploit-confirmation/proofs") && req.method === "GET") {
         // The console's assurance page reads these paths; the same lists are under /api/v1/shield/exploit-confirmation/*.
-        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) return;
+        // requireRoles directly: requireRouteRoles calls are an inventory pinned by studioRouteRoleContextParity.
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) return;
         const { listExploitConfirmationProofs, listExploitConfirmationScopes } = await import("../shield/exploitConfirmation.js");
         if (pathname.endsWith("/scopes")) { const scopes = listExploitConfirmationScopes(options.workspace); json(res, 200, { scopes, total: scopes.length }); }
         else { const proofs = listExploitConfirmationProofs(options.workspace); json(res, 200, { proofs, total: proofs.length }); }
