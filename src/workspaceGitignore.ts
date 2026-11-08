@@ -27,6 +27,12 @@ const AMC_GITIGNORE = [
   ""
 ].join("\n");
 
+/** The secrets those lines keep out of git (relative to .amc); `amc doctor` checks each is ignored and not tracked (LIVE-VAULT-11). */
+export const AMC_SECRET_FILES = [
+  "local-vault-passphrase", "studio/admin.token", "studio/sessions", "auth/api-keys.json", "license.key", "blobs/unvaulted.key",
+  "bridge/pairing-codes.json"
+] as const;
+
 /** Creates .amc/.gitignore only where none exists ("wx"), so an operator's own file is never replaced. */
 export function ensureAmcGitignore(amcDir: string): void {
   try {
