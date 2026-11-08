@@ -23,7 +23,7 @@ export const AGENT_ENV_MARKERS: readonly string[] = [
   "CODEX_SANDBOX_NETWORK_DISABLED", "CODEX_CI", "CODEX_THREAD_ID", "CODEX_TOOL_CALL_ID", "GEMINI_CLI", "PI_CODING_AGENT"
 ];
 
-export type OperatorRefusal = { ok: false; reason: "no-tty" | "agent-mode" | "agent-marker" | "declined"; marker?: string };
+type OperatorRefusal = { ok: false; reason: "no-tty" | "agent-mode" | "agent-marker" | "declined"; marker?: string };
 
 /** The first agent marker set to a non-empty value, else null. */
 export function agentMarker(env: NodeJS.ProcessEnv = process.env): string | null {

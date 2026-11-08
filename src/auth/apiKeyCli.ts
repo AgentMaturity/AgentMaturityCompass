@@ -52,7 +52,7 @@ function saveApiKeyManager(workspace: string, manager: ApiKeyManager): string {
 }
 
 /** LIVE-VAULT-07: said after every new key until a Studio route accepts these keys. */
-export const API_KEY_HTTP_NOTE = "Note: Studio HTTP routes do not accept API keys yet (docs/API_SURFACES.md).";
+const API_KEY_HTTP_NOTE = "Note: Studio HTTP routes do not accept API keys yet (docs/API_SURFACES.md).";
 
 export function createApiKeyForCli(params: {
   workspace: string;

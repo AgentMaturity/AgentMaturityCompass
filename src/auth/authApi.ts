@@ -230,31 +230,36 @@ export function addUser(params: {
   });
 }
 
+/**
+ * The config with `username`'s record (case-insensitive) replaced by `change(record)`. A change that can drop an OWNER
+ * (revoke, roles) must leave one ACTIVE OWNER (LIVE-VAULT-17).
+ */
+function withChangedUser(config: UsersFile, username: string, change: (user: UserRecord) => UserRecord, ownerCheck = true): { config: UsersFile; result: UserRecord } {
+  const index = config.users.findIndex((user) => user.username.toLowerCase() === username.toLowerCase());
+  if (index < 0) {
+    throw new Error(`user not found: ${username}`);
+  }
+  const updated = change(config.users[index]!), users = config.users.slice();
+  users[index] = updated;
+  if (ownerCheck) assertOwnerRemains(users);
+  return { config: { ...config, updatedTs: Date.now(), users }, result: updated };
+}
+
+/** The synchronous compatibility writers' change: under the users lock, signed with the vault key. */
+function changeUserSync(workspace: string, username: string, change: (user: UserRecord) => UserRecord): UserRecord {
+  return withUsersConfigLock(workspace, () => {
+    const changed = withChangedUser(loadUsersConfig(workspace), username, change);
+    saveUsersConfig(workspace, changed.config);
+    signUsersConfig(workspace);
+    return changed.result;
+  });
+}
+
 export function revokeUser(params: {
   workspace: string;
   username: string;
 }): UserRecord {
-  return withUsersConfigLock(params.workspace, () => {
-  const config = loadUsersConfig(params.workspace);
-  const index = config.users.findIndex((user) => user.username.toLowerCase() === params.username.toLowerCase());
-  if (index < 0) {
-    throw new Error(`user not found: ${params.username}`);
-  }
-  const updated = {
-    ...config.users[index]!,
-    status: "REVOKED" as const
-  };
-  const users = config.users.slice();
-  users[index] = updated;
-  assertOwnerRemains(users);
-  saveUsersConfig(params.workspace, {
-    ...config,
-    updatedTs: Date.now(),
-    users
-  });
-  signUsersConfig(params.workspace);
-  return updated;
-  });
+  return changeUserSync(params.workspace, params.username, (user) => ({ ...user, status: "REVOKED" as const }));
 }
 
 export function setUserRoles(params: {
@@ -262,27 +267,7 @@ export function setUserRoles(params: {
   username: string;
   roles: UserRole[];
 }): UserRecord {
-  return withUsersConfigLock(params.workspace, () => {
-  const config = loadUsersConfig(params.workspace);
-  const index = config.users.findIndex((user) => user.username.toLowerCase() === params.username.toLowerCase());
-  if (index < 0) {
-    throw new Error(`user not found: ${params.username}`);
-  }
-  const updated = {
-    ...config.users[index]!,
-    roles: params.roles
-  };
-  const users = config.users.slice();
-  users[index] = updated;
-  assertOwnerRemains(users);
-  saveUsersConfig(params.workspace, {
-    ...config,
-    updatedTs: Date.now(),
-    users
-  });
-  signUsersConfig(params.workspace);
-  return updated;
-  });
+  return changeUserSync(params.workspace, params.username, (user) => ({ ...user, roles: params.roles }));
 }
 
 interface UsersPublicationSnapshot { bytes: Buffer | null; signature: Buffer | null }
@@ -434,24 +419,14 @@ export async function addUserAsync(input: Parameters<typeof addUser>[0], opts: U
 
 export async function revokeUserAsync(input: Parameters<typeof revokeUser>[0], opts: UsersMutationOptions = {}): Promise<UserRecord> {
   const params = { ...input };
-  return recorded(params.workspace, "revoke", opts, await mutateUsersConfigAsync(params.workspace, current => {
-    const config = current!, index = config.users.findIndex(user => user.username.toLowerCase() === params.username.toLowerCase());
-    if (index < 0) throw new Error(`user not found: ${params.username}`);
-    const updated = { ...config.users[index]!, status: "REVOKED" as const }, users = config.users.slice(); users[index] = updated;
-    assertOwnerRemains(users);
-    return { config: { ...config, updatedTs: Date.now(), users }, result: updated };
-  }, opts));
+  return recorded(params.workspace, "revoke", opts, await mutateUsersConfigAsync(params.workspace,
+    current => withChangedUser(current!, params.username, (user) => ({ ...user, status: "REVOKED" as const })), opts));
 }
 
 export async function setUserRolesAsync(input: Parameters<typeof setUserRoles>[0], opts: UsersMutationOptions = {}): Promise<UserRecord> {
   const params = { ...input, roles: [...input.roles] };
-  return recorded(params.workspace, "roles", opts, await mutateUsersConfigAsync(params.workspace, current => {
-    const config = current!, index = config.users.findIndex(user => user.username.toLowerCase() === params.username.toLowerCase());
-    if (index < 0) throw new Error(`user not found: ${params.username}`);
-    const updated = { ...config.users[index]!, roles: params.roles }, users = config.users.slice(); users[index] = updated;
-    assertOwnerRemains(users);
-    return { config: { ...config, updatedTs: Date.now(), users }, result: updated };
-  }, opts));
+  return recorded(params.workspace, "roles", opts, await mutateUsersConfigAsync(params.workspace,
+    current => withChangedUser(current!, params.username, (user) => ({ ...user, roles: params.roles })), opts));
 }
 
 /**
@@ -460,12 +435,8 @@ export async function setUserRolesAsync(input: Parameters<typeof setUserRoles>[0
  */
 export async function setUserPasswordAsync(input: { workspace: string; username: string; password: string }, opts: UsersMutationOptions = {}): Promise<UserRecord> {
   const params = { ...input };
-  const updated = await mutateUsersConfigAsync(params.workspace, current => {
-    const config = current!, index = config.users.findIndex(user => user.username.toLowerCase() === params.username.toLowerCase());
-    if (index < 0) throw new Error(`user not found: ${params.username}`);
-    const record = { ...config.users[index]!, passwordHash: hashPassword(params.password, { username: config.users[index]!.username }) }, users = config.users.slice(); users[index] = record;
-    return { config: { ...config, updatedTs: Date.now(), users }, result: record };
-  }, opts);
+  const updated = await mutateUsersConfigAsync(params.workspace,
+    current => withChangedUser(current!, params.username, (user) => ({ ...user, passwordHash: hashPassword(params.password, { username: user.username }) }), false), opts);
   forEachSessionRecord(params.workspace, (path, parsed) => { if (parsed.userId === updated.userId && !parsed.revoked) markSessionRevoked(path, parsed); });
   return recorded(params.workspace, "password", opts, updated);
 }
