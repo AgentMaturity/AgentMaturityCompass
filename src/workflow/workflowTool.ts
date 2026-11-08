@@ -1,6 +1,6 @@
 import { defineTool } from "../tools/toolRegistry.js";
 import { MAX_PLAN_NODES, parseWorkflowPlan } from "./workflowPlan.js";
-import { runWorkflowPlan } from "./workflowRunner.js";
+import { parallelWithin, runWorkflowPlan } from "./workflowRunner.js";
 import type { SubagentCapability } from "../agent/delegateTool.js";
 import type { ToolDefinition, ToolExecution } from "../tools/toolTypes.js";
 
@@ -87,7 +87,7 @@ export function workflowTool(capability: SubagentCapability): ToolDefinition {
         runner: capability.runner,
         mintSessionId: capability.mintSessionId ?? (() => `child-${crypto.randomUUID().slice(0, 12)}`),
         ...(capability.maxDepth === undefined ? {} : { maxDepth: capability.maxDepth }),
-        ...(maxActiveChildren === undefined ? {} : { maxActiveChildren }),
+        ...(maxActiveChildren === undefined ? {} : { maxActiveChildren, maxParallelAgents: parallelWithin(maxActiveChildren) }),
         ...(capability.delegationScope === undefined ? {} : { delegationScope: capability.delegationScope }),
         ...(capability.stopConditions === undefined ? {} : { stopConditions: capability.stopConditions }),
         ...(capability.definitions === undefined ? {} : { definitions: capability.definitions }),

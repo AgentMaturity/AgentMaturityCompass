@@ -98,7 +98,7 @@ Read the change, list defects with file and line, and never edit anything.
 | --- | --- |
 | `name` | Must equal the file name; lowercase letters, digits and dashes. |
 | `description` | At most 512 characters; quoted in the `delegate` tool description as data. |
-| `tools` | Allowlist intersected with the child's registry (fail closed: a tool mounted later stays hidden). A list naming `delegate` or `workflow` is refused, so a defined role cannot delegate. |
+| `tools` | Allowlist intersected with the child's registry (fail closed: a tool mounted later stays hidden). A child under any definition is composed without the delegation capability, so `delegate` and `workflow` do not exist for it whether or not `tools` is given: a defined role is a leaf, and a list naming them is refused. |
 | `scope` | Action classes, intersected with `--delegate-scope`; an empty intersection refuses the delegation. |
 | `timeoutMs` | The child's lifetime, or the operator's `timeout-ms` when that is shorter. |
 | `maxSteps` | Model steps per child turn, or the run's `--max-steps` when that is lower. |
@@ -107,7 +107,12 @@ Read the change, list defects with file and line, and never edit anything.
 Any other field, a body over 16 KiB, a symlinked file or a malformed frontmatter
 withholds the definition and reports why; `agent-loop run --list-agents [name]
 [--json]` shows every definition, its narrowing, its sha256 and the problems.
-A `--delegate` run prints the names it offers and their catalog digest.
+A `--delegate --tools workspace` run prints the names it offers and their
+catalog digest. Definitions are loaded only where the in-process workspace grant
+carries them: not under `--delegate-provider` (a foreign child cannot be bound
+to one, so `agent` is refused before any packet is minted), not under
+`--goal-rounds` (round children get no definitions, and a `delegate({agent})`
+from one is refused as naming nothing), and not without workspace tools.
 
 The body is workspace text, so it is never put in a system prompt. It is framed
 like a skill (name, source path, sha256, "not the operator's instructions") and

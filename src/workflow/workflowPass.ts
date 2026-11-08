@@ -1,4 +1,4 @@
-import { runWorkflowPlan, type WorkflowRunResult } from "./workflowRunner.js";
+import { parallelWithin, runWorkflowPlan, type WorkflowRunResult } from "./workflowRunner.js";
 import type { WorkflowNode } from "./workflowPlan.js";
 import type { AgentDefinition } from "../agent/agentDefinitions.js";
 import type { DelegationIdentity } from "../agent/delegationIdentity.js";
@@ -78,12 +78,13 @@ export function runWorkflowPass(init: WorkflowPassInit): Promise<WorkflowRunResu
   return runWorkflowPlan({
     workspace: init.workspace, plan: pass.plan, parent: init.parent, session: init.session, runner: init.runner,
     mintSessionId: () => `child-${crypto.randomUUID().slice(0, 12)}`,
-    ...(pass.runId === undefined ? {} : { runId: pass.runId }),
+    ...(pass.runId === undefined ? {} : { runId: pass.runId, resumeOnly: true }),
     ...(pass.definitions === undefined ? {} : { definitions: pass.definitions }),
     ...(pass.signal === undefined ? {} : { signal: pass.signal }),
     ...(delegation.scope === undefined ? {} : { delegationScope: delegation.scope }),
     ...(delegation.stopConditions === undefined ? {} : { stopConditions: delegation.stopConditions }),
     ...(delegation.maxDepth === undefined ? {} : { maxDepth: delegation.maxDepth }),
-    ...(delegation.maxActiveChildren === undefined ? {} : { maxActiveChildren: delegation.maxActiveChildren })
+    // The plan's own scheduler stays inside the root-wide child cap, so parallel nodes queue instead of being refused at admission.
+    ...(delegation.maxActiveChildren === undefined ? {} : { maxActiveChildren: delegation.maxActiveChildren, maxParallelAgents: parallelWithin(delegation.maxActiveChildren) })
   });
 }

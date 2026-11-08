@@ -18,8 +18,11 @@ import { sha256Hex } from "../utils/hash.js";
  * run, so a file in a cloned repository can take capability away from a child
  * and never add any. It cannot pick a model, a provider or a route (`model:
  * inherit` is the only accepted value), and it cannot delegate further: a
- * `tools` list naming `delegate` or `workflow` is refused, because a child's
- * allowlist does not reach its own children.
+ * child under a definition is composed without the delegation capability
+ * (subagentRunner.ts), so `delegate` and `workflow` do not exist for it whether
+ * or not `tools` is given, and a `tools` list naming them is refused as a
+ * contradiction. A role is therefore a leaf, and its step ceiling bounds
+ * every step run under it.
  *
  * THE BODY IS NOT A SYSTEM PROMPT. It is workspace-authored instruction text,
  * which the prompt spine already decided enters only as attributed material
@@ -96,7 +99,7 @@ function validate(entry: Skill): AgentDefinition | SkillProblem {
     const bad = tools.find(name => !TOOL_NAME.test(name));
     if (bad !== undefined) return refuse(`tool name ${JSON.stringify(bad)} is not a tool name`);
     if (tools.some(name => name === "delegate" || name === "workflow")) {
-      return refuse("tools may not name delegate or workflow: a definition's allowlist does not reach its own children, so a defined role cannot delegate");
+      return refuse("tools may not name delegate or workflow: a defined role is a leaf composed without the delegation capability, so it cannot delegate");
     }
     tools = Object.freeze([...new Set(tools)]);
   }

@@ -19,6 +19,8 @@ export interface WorkflowRunInit {
   readonly mintSessionId: () => string;
   /** Reuse this identity only to resume this exact plan in its original owned session. */
   readonly runId?: string;
+  /** With `runId`: refuse (before any dispatch) unless that run's creation checkpoint is in the session; never start a new run under it. */
+  readonly resumeOnly?: boolean;
   readonly maxParallelAgents?: number;
   readonly maxDepth?: number;
   readonly maxActiveChildren?: number;
@@ -143,7 +145,9 @@ async function runAgent(node: Leaf, carried: string | null, init: WorkflowRunIni
       // Judged BEFORE the final checkpoint, so the log never says "succeeded" for a node the run reports as failed.
       const verdict = readVerdict(outcome.childText, nonce);
       if (verdict !== "pass") {
-        const reason = `verify ${verdict === "fail" ? "verdict: fail" : `verdict ${verdict}`}: ${outcome.childText.slice(0, 2000)}`;
+        // The RUNTIME's account only: the verifier's words stay in its child session (named here), never in a plaintext
+        // progress row, and never where the workflow tool reads failure reasons for its effect classification.
+        const reason = `verify ${verdict === "fail" ? "verdict: fail" : `verdict ${verdict}`} (the verifier's text is in child session ${checkpoint.childSessionId}, not in this row)`;
         state.progress.record(node.id, { ...checkpoint, status: "failed", reason }, "", outcome.packetId);
         return fail(state, node.id, reason);
       }
@@ -183,6 +187,11 @@ async function runNode(node: WorkflowNode, input: string | null, init: WorkflowR
     carried = outcome.text;
   }
   return { ok: true, text: carried ?? "" };
+}
+
+/** The plan scheduler's bound under a root-wide active-child cap: 1 through 8 (a cap of 0 still refuses every child at the spawn). */
+export function parallelWithin(maxActiveChildren: number): number {
+  return Math.max(1, Math.min(8, maxActiveChildren));
 }
 
 export async function runWorkflowPlan(init: WorkflowRunInit): Promise<WorkflowRunResult> {

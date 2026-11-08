@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, rmSync, realpathSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, realpathSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Command } from "commander";
@@ -98,6 +98,97 @@ describe("agent-loop run --workflow-plan", () => {
     expect(Object.keys(resumed.workflow.outputs)).toEqual(["a"]);
   });
 
+  it("refuses a --workflow-run-id the session never created instead of starting a new run under it, and needs --session", async () => {
+    const file = planFile("resume-typo.json", { kind: "pipeline", id: "p", stages: [agent("a", "draft"), agent("b", "polish")] });
+    const first = programWith();
+    await run(first.program, [...base, "--delegate", "--workflow-plan", file, "--keep-open"]);
+    expect(first.captured.failures, first.captured.errors.join("\n")).toEqual([]);
+    const summary = lastJson(first.captured) as { sessionId: string; workflow: { runId: string } };
+
+    const typo = programWith();
+    await run(typo.program, [...base, "--delegate", "--workflow-plan", file, "--session", summary.sessionId, "--workflow-run-id", `${summary.workflow.runId}-typo`, "--keep-open"]);
+    expect(typo.captured.failures).toEqual([1]);
+    const refused = lastJson(typo.captured) as { workflow: { ok: boolean; agentsRun: number; failed: Array<{ reason: string }> } };
+    expect(refused.workflow.ok).toBe(false);
+    expect(refused.workflow.agentsRun, "no node was dispatched again").toBe(0);
+    expect(refused.workflow.failed[0]?.reason).toMatch(/has no creation checkpoint in this session; nothing to resume/);
+
+    const unsessioned = programWith();
+    await run(unsessioned.program, [...base, "--delegate", "--workflow-plan", file, "--workflow-run-id", summary.workflow.runId]);
+    expect(unsessioned.captured.failures).toEqual([1]);
+    expect(unsessioned.captured.errors.at(-1)).toMatch(/add --session <id>/);
+  });
+
+  it("pins the reviewed plan bytes with --workflow-plan-sha256 and refuses any other bytes", async () => {
+    const file = planFile("pinned.json", agent("a", "draft"));
+    const probe = programWith();
+    await run(probe.program, [...base, "--delegate", "--workflow-plan", file, "--workflow-plan-sha256", "0".repeat(64)]);
+    expect(probe.captured.failures).toEqual([1]);
+    const refusal = probe.captured.errors.at(-1) ?? "";
+    expect(refusal).toMatch(/--workflow-plan-sha256 does not match .*pinned\.json: the file's sha256 is [a-f0-9]{64}/);
+    expect(probe.captured.out, "no session was composed").toEqual([]);
+    const digest = /sha256 is ([a-f0-9]{64})/.exec(refusal)![1]!;
+
+    const pinned = programWith();
+    await run(pinned.program, [...base, "--delegate", "--workflow-plan", file, "--workflow-plan-sha256", digest.toUpperCase()]);
+    expect(pinned.captured.failures, pinned.captured.errors.join("\n")).toEqual([]);
+    expect((lastJson(pinned.captured) as { workflow: { ok: boolean } }).workflow.ok).toBe(true);
+    expect(pinned.captured.errors.some(line => line.includes("pinned)"))).toBe(true);
+
+    const alone = programWith();
+    await run(alone.program, [...base, "hello", "--delegate", "--workflow-plan-sha256", digest]);
+    expect(alone.captured.failures).toEqual([1]);
+    expect(alone.captured.errors.at(-1)).toMatch(/need --workflow-plan/);
+  });
+
+  it("accepts any in-workspace file name and a path through a symlinked directory prefix", async () => {
+    const spaced = planFile("my plan (reviewed).json", agent("a", "draft"));
+    const first = programWith();
+    await run(first.program, [...base, "--delegate", "--workflow-plan", spaced]);
+    expect(first.captured.failures, first.captured.errors.join("\n")).toEqual([]);
+    expect((lastJson(first.captured) as { workflow: { ok: boolean } }).workflow.ok).toBe(true);
+
+    mkdirSync(join(dir, "plans"));
+    writeFileSync(join(dir, "plans", "p.json"), JSON.stringify(agent("a", "draft")), "utf8");
+    symlinkSync(dir, join(home, "linked-workspace"));
+    const linked = programWith();
+    await run(linked.program, [...base, "--delegate", "--workflow-plan", join(home, "linked-workspace", "plans", "p.json")]);
+    expect(linked.captured.failures, linked.captured.errors.join("\n")).toEqual([]);
+    expect(linked.captured.errors.some(line => line.includes(`workflow plan ${join(dir, "plans", "p.json")}`))).toBe(true);
+
+    // The file itself is never followed: a symlink inside the workspace to a plan outside it is refused.
+    writeFileSync(join(home, "outside.json"), JSON.stringify(agent("a", "x")), "utf8");
+    symlinkSync(join(home, "outside.json"), join(dir, "link.json"));
+    const viaLink = programWith();
+    await run(viaLink.program, [...base, "--delegate", "--workflow-plan", "link.json"]);
+    expect(viaLink.captured.failures).toEqual([1]);
+    expect(viaLink.captured.errors.at(-1)).toMatch(/not a regular file/);
+  });
+
+  it("runs a parallel node wider than --max-active-children within that bound instead of refusing nodes at admission", async () => {
+    const file = planFile("par.json", { kind: "parallel", id: "p", children: [agent("a", "one"), agent("b", "two"), agent("c", "three")] });
+    const { program, captured } = programWith();
+    await run(program, [...base, "--delegate", "--workflow-plan", file, "--max-active-children", "1", "--think-ms", "300"]);
+    expect(captured.failures, captured.errors.join("\n")).toEqual([]);
+    const summary = lastJson(captured) as { workflow: { ok: boolean; agentsRun: number; outputs: Record<string, string> } };
+    expect(summary.workflow.ok).toBe(true);
+    expect(summary.workflow.agentsRun).toBe(3);
+    expect(Object.keys(summary.workflow.outputs).sort()).toEqual(["a", "b", "c"]);
+  }, 30_000);
+
+  it("cancels the pass at --cancel-after", async () => {
+    const file = planFile("slow.json", agent("a", "think"));
+    const { program, captured } = programWith();
+    const started = Date.now();
+    await run(program, [...base, "--delegate", "--workflow-plan", file, "--think-ms", "4000", "--cancel-after", "300"]);
+    expect(captured.failures).toEqual([1]);
+    expect(Date.now() - started, "the pass did not wait out the child's thinking").toBeLessThan(3500);
+    const summary = lastJson(captured) as { workflow: { ok: boolean; cancelled: boolean } };
+    expect(summary.workflow.ok).toBe(false);
+    expect(summary.workflow.cancelled).toBe(true);
+    expect(captured.errors.some(line => line.includes("cancelling the workflow pass (cause: --cancel-after)"))).toBe(true);
+  }, 30_000);
+
   it("refuses without --delegate, with a plan outside the workspace, with an unparseable plan and with a prompt", async () => {
     const file = planFile("p.json", agent("a", "draft"));
     const without = programWith();
@@ -147,5 +238,20 @@ describe("agent-loop run --list-agents", () => {
     await run(program, [...base, "hello", "--delegate"]);
     expect(captured.failures, captured.errors.join("\n")).toEqual([]);
     expect(captured.errors.some(line => line.includes("agent definitions offered to delegates: reviewer"))).toBe(true);
+  });
+
+  it("does not load or announce definitions where no in-process workspace delegate can use them", async () => {
+    mkdirSync(join(dir, ".amc", "agents"), { recursive: true });
+    writeFileSync(join(dir, ".amc", "agents", "reviewer.md"), "---\nname: reviewer\ndescription: reviews\n---\nBe strict.\n", "utf8");
+    const offered = (captured: Captured) => captured.errors.some(line => line.includes("agent definitions offered"));
+    const echo = programWith();
+    await run(echo.program, ["agent-loop", "run", "--credentials-home", home, "--json", "hello", "--delegate"]);
+    expect(echo.captured.failures, echo.captured.errors.join("\n")).toEqual([]);
+    expect(offered(echo.captured), "echo tools carry no delegate tool").toBe(false);
+
+    const rounds = programWith();
+    await run(rounds.program, [...base, "hello", "--delegate", "--goal-rounds", "1"]);
+    expect(rounds.captured.failures, rounds.captured.errors.join("\n")).toEqual([]);
+    expect(offered(rounds.captured), "goal-round children get no definitions").toBe(false);
   });
 });

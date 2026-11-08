@@ -445,8 +445,11 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       // echo tool exists precisely to make a multi-step turn observable.
       const toolMode = opts.tools ?? preset?.tools ?? (providerId === STUB_PROVIDER_ID ? "echo" : "none");
       const wantsDelegation = opts.delegate === true;
-      const definitions = wantsDelegation ? loadAgentDefinitionsForRun(opts, line => (opts.json ? io.error : io.log)(chalk.dim(line))) : undefined;
-      const breadth = resolveBreadthRun(io, opts, { toolMode, wantsDelegation, ...(definitions === undefined ? {} : { definitions }) });
+      // Loaded and announced only where the in-process workspace grant carries them: a foreign runner cannot enforce one,
+      // goal-round children get none, and a run without workspace tools has no delegate at all.
+      const offersDefinitions = wantsDelegation && toolMode === "workspace" && opts.delegateProvider === undefined && opts.goalRounds === undefined;
+      const definitions = offersDefinitions ? loadAgentDefinitionsForRun(opts, line => (opts.json ? io.error : io.log)(chalk.dim(line))) : undefined;
+      const breadth = resolveBreadthRun(io, opts, { toolMode, wantsDelegation, ...(definitions === undefined ? {} : { definitions }), cancelAfterMs: cancelAfter });
       if (breadth === null) return;
       const maxActiveChildren = activeChildLimitOption(io, opts.maxActiveChildren, wantsDelegation && toolMode === "workspace"); if (maxActiveChildren === null) return;
       if (!wantsDelegation && opts.delegateStop !== undefined) {

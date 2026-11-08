@@ -106,16 +106,20 @@ describe("a verify node gates the plan", () => {
     expect(result.agentsRun).toBe(3);
   });
 
-  it("fails the node and the plan on a fail verdict, with the verifier's text in the failure", async () => {
+  it("fails the node and the plan on a fail verdict, with a runtime-only reason that names the verifier's session and never its words", async () => {
     const dir = workspace();
-    const h = harness(dir, ctx => isVerify(ctx) ? `Missing tests.\nVERDICT-${nonceOf(ctx)}: fail` : "draft");
+    // The verifier's text carries the runtime's own marker, so a copied reason would misreport the effect as unknown.
+    const h = harness(dir, ctx => isVerify(ctx) ? `Missing tests. TOOL_OUTCOME_UNKNOWN\nVERDICT-${nonceOf(ctx)}: fail` : "draft");
     const result = await h.run(plan({ kind: "pipeline", id: "p", stages: [agent("a"), verify("v", "a"), agent("b")] }));
     expect(result.ok).toBe(false);
-    expect(result.failures).toEqual([{ nodeId: "v", reason: expect.stringMatching(/^verify verdict: fail: Missing tests\./) }]);
+    expect(result.failures).toEqual([{ nodeId: "v", reason: expect.stringMatching(/^verify verdict: fail \(the verifier's text is in child session .+, not in this row\)$/) }]);
+    expect(result.failures[0]!.reason).not.toMatch(/Missing tests|TOOL_OUTCOME_UNKNOWN/);
     expect(h.seen, "the stage after the failed verify never ran").toHaveLength(2);
     const rows = progressRows(dir, h.session.sessionId!).filter(row => row.nodeId === "v");
     expect(rows.map(row => row.status)).toEqual(["waiting", "running", "failed"]);
     expect(rows.at(-1)!.reason).toMatch(/verify verdict: fail/);
+    expect(rows.at(-1)!.reason).not.toMatch(/Missing tests|TOOL_OUTCOME_UNKNOWN/);
+    expect(rows.at(-1)!.reason).toContain(h.seen[1]!.childSessionId);
   });
 
   it("fails when the verdict is missing, and when the reviewed output quotes its own verdict line", async () => {

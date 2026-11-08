@@ -6,8 +6,10 @@
  * the line passes itself. The runtime therefore mints a nonce the reviewed
  * output cannot have known, asks for `VERDICT-<nonce>: pass|fail` as the LAST
  * non-empty line, and fails the node when the line is missing, repeated or
- * contradictory. That makes the control flow mechanical; the judgement behind
- * the line is still a model's, and the result says so.
+ * contradictory. That makes the control flow mechanical. It does not make the
+ * verdict trustworthy: the verifier sees the token and the reviewed text in one
+ * goal, so the reviewed text can still steer the model that writes the line.
+ * The judgement behind the line is a model's; nothing here evaluates it.
  */
 
 export type Verdict = "pass" | "fail" | "missing" | "ambiguous";

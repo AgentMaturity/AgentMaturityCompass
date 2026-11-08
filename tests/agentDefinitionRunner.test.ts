@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import Database from "better-sqlite3";
 import { initWorkspace } from "../src/workspace.js";
+import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { SessionService } from "../src/session/sessionService.js";
@@ -11,7 +12,8 @@ import { AdapterRegistry } from "../src/llm/adapter/adapterRegistry.js";
 import { LlmRuntime } from "../src/llm/adapter/llmRuntime.js";
 import { rootIdentity } from "../src/agent/delegationIdentity.js";
 import { spawnSubagent } from "../src/agent/subagentSpawn.js";
-import { createDriverRunner } from "../src/agent/subagentRunner.js";
+import { createDriverRunner, type DriverRunnerInit } from "../src/agent/subagentRunner.js";
+import type { SubagentRunner } from "../src/agent/subagentSpawn.js";
 import { applyAgentDefinition, type AgentDefinition } from "../src/agent/agentDefinitions.js";
 import { createForeignRunner } from "../src/agent/foreignSubagentRunner.js";
 import { credentialRef } from "../src/credentials/credentialRef.js";
@@ -20,8 +22,10 @@ import { FixedCredentials, LOOP_MODEL, LOOP_PROVIDER, scriptedAdapter, silentTra
 /**
  * A real child under a definition (SH-ORCH-01): the tool allowlist is applied
  * to the child's registry (fail closed), the step ceiling only lowers the
- * parent's, and the child's own signed session records which definition bound
- * it. A foreign child refuses a definition, because nothing in another process
+ * parent's (and falls back to the loop default, never to the definition's own
+ * value), a role is a leaf that cannot delegate whether or not it lists tools,
+ * and the child's own signed session records which definition bound it. A
+ * foreign child refuses a definition, because nothing in another process
  * enforces it.
  */
 const PASS = "agent-definition-runner-test-passphrase";
@@ -40,10 +44,14 @@ function workspace(): string {
   initWorkspace({ workspacePath: dir, agentId: "payments-agent", trustBoundaryMode: "isolated" });
   initBudgets(dir, "payments-agent");
   writeRuntimeFirewallPolicy({ workspace: dir, mode: "observe" });
+  // The signed allowlist names `delegate`, as a real --delegate run's does: a role that could delegate would be allowed to.
+  const config = loadToolsConfig(dir);
+  initToolsConfig(dir, { ...config, tools: { ...config.tools, allowedTools: [...config.tools.allowedTools, { name: "delegate", actionClass: "READ_ONLY" }] } });
   return dir;
 }
 
-function runnerFor(dir: string, scripts: ReturnType<typeof textStep>[], maxStepsPerTurn = 8) {
+/** `maxStepsPerTurn: undefined` composes the runner with no config at all, as a host calling createDriverRunner directly may. */
+function runnerFor(dir: string, scripts: ReturnType<typeof textStep>[], maxStepsPerTurn: number | undefined = 8, extra: Partial<DriverRunnerInit> = {}) {
   const registry = new AdapterRegistry();
   registry.register({ providerId: LOOP_PROVIDER, adapter: scriptedAdapter(scripts), baseUrl: "https://api.anthropic.invalid",
     credentialRef: credentialRef("AMC_LOOP_TEST_KEY"), models: [LOOP_MODEL] });
@@ -54,8 +62,16 @@ function runnerFor(dir: string, scripts: ReturnType<typeof textStep>[], maxSteps
       now: () => { clock += 5; return clock; } }),
     route: { providerId: LOOP_PROVIDER, model: LOOP_MODEL, params: { max_tokens: 256 } },
     systemPrompt: "You are a careful delegate.", harnessVersion: "3.2.0", compositionDigest: "composition-digest", policyDigest: "policy-digest",
-    config: { maxStepsPerTurn }
+    ...(maxStepsPerTurn === undefined ? {} : { config: { maxStepsPerTurn } }), ...extra
   });
+}
+
+/** A runner whose children may delegate further through the runner itself, as the kernel's `runNative` closure grants. */
+function delegatingRunnerFor(dir: string, scripts: ReturnType<typeof textStep>[], maxStepsPerTurn: number) {
+  let runner!: SubagentRunner;
+  const runNative: SubagentRunner = (child) => runner(child);
+  runner = runnerFor(dir, scripts, maxStepsPerTurn, { grantDelegation: { runner: runNative, maxDepth: 3 } });
+  return runner;
 }
 
 function rows(dir: string, sessionId: string): Array<Record<string, unknown>> {
@@ -107,6 +123,57 @@ describe("a real child under a definition", () => {
     expect(!outcome.ok && outcome.reason).toMatch(/child turn did not complete/);
     const control = rows(dir, "child-one-step").find(meta => meta["kind"] === "delegation/hook-control")!;
     expect((control["agentDefinition"] as { maxSteps: number }).maxSteps).toBe(1);
+    session.disposeWithoutClosing();
+  });
+
+  it("never lifts the child above the parent's ceiling, however large the definition's maxSteps", async () => {
+    const dir = workspace();
+    const applied = applyAgentDefinition({ runAs: "researcher", goal: "read the ledger" }, { ...reviewer, tools: undefined as never, maxSteps: 256 });
+    if (!applied.ok) throw new Error(applied.reason);
+    const session = parentSession(dir);
+    const outcome = await spawnSubagent({ workspace: dir, parent: rootIdentity("payments-agent"), request: applied.request, session,
+      runner: runnerFor(dir, [toolStep("t1", "glob", JSON.stringify({ pattern: "*.md" })), toolStep("t2", "glob", JSON.stringify({ pattern: "*.md" })),
+        textStep("three steps were needed.")], 2),
+      mintSessionId: () => "child-parent-ceiling" });
+    expect(outcome.ok).toBe(false);
+    expect(!outcome.ok && outcome.reason).toMatch(/child turn did not complete/);
+    session.disposeWithoutClosing();
+  });
+
+  it("bounds the child by the loop default when the parent composed no ceiling, never by the definition's own value", async () => {
+    const dir = workspace();
+    const applied = applyAgentDefinition({ runAs: "researcher", goal: "read the ledger" }, { ...reviewer, tools: undefined as never, maxSteps: 100 });
+    if (!applied.ok) throw new Error(applied.reason);
+    const session = parentSession(dir);
+    const steps = Array.from({ length: 70 }, (_, index) => toolStep(`t${index}`, "glob", JSON.stringify({ pattern: "*.md" })));
+    const outcome = await spawnSubagent({ workspace: dir, parent: rootIdentity("payments-agent"), request: applied.request, session,
+      runner: runnerFor(dir, [...steps, textStep("seventy steps were needed.")], undefined),
+      mintSessionId: () => "child-default-ceiling" });
+    expect(outcome.ok).toBe(false);
+    expect(!outcome.ok && outcome.reason).toMatch(/child turn did not complete/);
+    session.disposeWithoutClosing();
+  }, 60_000);
+
+  it("is a leaf: a role without a tools list has no delegate tool, so its step ceiling bounds everything run under it", async () => {
+    const dir = workspace();
+    const applied = applyAgentDefinition({ runAs: "terse", goal: "do it" }, { ...reviewer, name: "terse", tools: undefined as never, maxSteps: 2 });
+    if (!applied.ok) throw new Error(applied.reason);
+    const session = parentSession(dir);
+    const outcome = await spawnSubagent({ workspace: dir, parent: rootIdentity("payments-agent"), request: applied.request, session,
+      runner: delegatingRunnerFor(dir, [toolStep("t0", "delegate", JSON.stringify({ runAs: "grandchild-1", goal: "run five steps" })),
+        textStep("I could not delegate.")], 8),
+      mintSessionId: () => "child-leaf-role" });
+    expect(outcome.ok, outcome.ok ? "" : outcome.reason).toBe(true);
+    const child = rows(dir, "child-leaf-role");
+    const denials = child.filter(meta => meta["auditType"] === "TOOL_CALL_DENIED").map(meta => ({ stage: meta["denialStage"], reason: meta["denialReason"] }));
+    expect(denials).toEqual([{ stage: "visibility", reason: expect.stringMatching(/unknown tool "delegate"/) }]);
+    expect(child.some(meta => meta["kind"] === "delegation/hook-control")).toBe(true);
+    // No grandchild: nothing under the role started or settled a delegation.
+    const db = new Database(join(dir, ".amc", "evidence.sqlite"), { readonly: true });
+    try {
+      const delegations = db.prepare("SELECT COUNT(*) AS n FROM evidence_events WHERE event_type IN ('agent_delegation_started', 'agent_delegation_completed') AND session_id = ?").get("child-leaf-role") as { n: number };
+      expect(delegations.n).toBe(0);
+    } finally { db.close(); }
     session.disposeWithoutClosing();
   });
 

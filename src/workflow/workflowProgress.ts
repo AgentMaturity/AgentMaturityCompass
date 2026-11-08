@@ -22,7 +22,7 @@ export interface WorkflowNodeProgress {
 /** A projection of authenticated session events. No checkpoint files or independent writer. */
 export function workflowProgress(init: {
   workspace: string; session: DelegationRecorder; runId: string; plan: WorkflowNode;
-  parent: DelegationIdentity; controls: Record<string, unknown>;
+  parent: DelegationIdentity; controls: Record<string, unknown>; resumeOnly?: boolean;
 }) {
   if (!("sessionId" in init.session) || typeof init.session.sessionId !== "string"
     || !("workspace" in init.session) || typeof init.session.workspace !== "string"
@@ -123,6 +123,9 @@ export function workflowProgress(init: {
       || committed === undefined || committed.event_hash !== ref.eventHash || committed.id !== ref.eventId
       || committed.payload_sha256 !== sha256Hex(payload)) throw new Error("workflow checkpoint was not committed by the owning session writer");
   };
+  if (!created && init.resumeOnly === true) {
+    throw new Error(`workflow run ${init.runId} has no creation checkpoint in this session; nothing to resume (a resume never starts a new run under a given id)`);
+  }
   if (!created) append({ status: "created" }, canonicalize(init.plan));
   return {
     sessionKey: canonicalize([history.workspace, session.sessionId]),

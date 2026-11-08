@@ -5,7 +5,7 @@ import { deniedToolNamesForScope, intersectDelegationScopes, parseDelegationScop
 import { parseSubagentStopConditions } from "./subagentStopConditions.js";
 import { ApprovalSeam, type ApprovalSeamInit } from "../approvals/seam/approvalSeam.js";
 import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "./approvalGate.js";
-import { NO_HOOKS, type AgentLoopConfig, type LoopHookControl, type LoopHooks } from "./loopTypes.js";
+import { DEFAULT_AGENT_LOOP_CONFIG, NO_HOOKS, type AgentLoopConfig, type LoopHookControl, type LoopHooks } from "./loopTypes.js";
 import type { ActionClass } from "../types.js";
 import { agentToolset } from "./agentToolset.js";
 import type { NativeShellReadiness } from "../sandbox/nativeShellGate.js";
@@ -244,9 +244,10 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
     }
     const descendantScope = intersectDelegationScopes(scope, grant?.delegationScope);
     // A definition's step ceiling only lowers the parent's; a child never gets more steps than the run it belongs to.
+    // A parent without an explicit ceiling runs under the driver default, so that is the bound here too (never the definition's own).
     const steps = ctx.agentDefinition?.maxSteps;
     const childConfig = steps === undefined ? config
-      : { ...config, maxStepsPerTurn: Math.min(steps, config?.maxStepsPerTurn ?? steps) };
+      : { ...config, maxStepsPerTurn: Math.min(steps, config?.maxStepsPerTurn ?? DEFAULT_AGENT_LOOP_CONFIG.maxStepsPerTurn) };
     let descendantStops: readonly string[] | undefined;
     try { descendantStops = descendantStopConditions(ctx.stopConditions, grant?.stopConditions); }
     catch (error) { return { ok: false, text: "", reason: `child stop conditions: ${error instanceof Error ? error.message : String(error)}` }; }
@@ -373,7 +374,9 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
               ...(childLease === undefined ? {} : { leaseToken: childLease }),
               delegation: { runAs: ctx.identity.runAs, depth: ctx.identity.depth, parentExecutionId: ctx.packetId ?? null,
                 ...(scope === undefined ? {} : { allowedActionClasses: scope }) },
-              ...(grant === undefined ? {} : { subagents: {
+              // A defined role is a leaf: composed without the delegation capability, so neither `delegate` nor `workflow`
+              // exists in its registry whatever its `tools` list says, and its step ceiling and binding bound every step it runs.
+              ...(grant === undefined || ctx.agentDefinition !== undefined ? {} : { subagents: {
                 identity: ctx.identity, runner: grant.runner, session,
                 ...(childLease === undefined ? {} : { parentLeaseToken: childLease }),
                 ...(grant.maxDepth === undefined ? {} : { maxDepth: grant.maxDepth }),

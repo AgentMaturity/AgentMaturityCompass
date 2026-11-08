@@ -106,6 +106,7 @@ export interface RunOptions {
   goalRounds?: string;
   /** SH-ORCH-03: a reviewed plan file to run headless, and the durable run to resume in a resumed session. */
   workflowPlan?: string;
+  workflowPlanSha256?: string;
   workflowRunId?: string;
   listAgents?: boolean | string;
   json?: boolean;

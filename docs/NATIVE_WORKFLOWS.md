@@ -41,13 +41,17 @@ that line is present once, is the last non-empty line, and says `pass`. A
 missing, repeated or contradictory line fails the node; so does a verifier that
 only quotes the reviewed text, because the reviewed text cannot contain a token
 minted after it was written. A failed verify node is recorded as `failed` in the
-`workflow/progress` rows with the verifier's text (bounded) as the reason, and
-the pipeline stops there.
+`workflow/progress` rows with a runtime-written reason (the verdict read and the
+verifier's child session id, never the verifier's words), and the pipeline stops
+there.
 
 On pass, the **reviewed output** carries forward to the next stage; the
 verifier's own words stay in its child session. The control flow is mechanical.
-The judgement behind the verdict is a model's, and nothing here evaluates
-whether it was right.
+It is not a defence against the reviewed text: the verifier sees the token and
+the reviewed output in the same goal, so text under review can still instruct
+the verifier to write `pass`. The judgement behind the verdict is a model's,
+nothing here evaluates whether it was right, and neither the run summary nor the
+`workflow` tool result labels it otherwise.
 
 Because `verify` is part of the plan grammar, an A4 Build that declares a
 workflow may now declare one; the Assemble stage's readiness wording for
@@ -59,8 +63,14 @@ declared workflows is unchanged.
 amc agent-loop run --delegate --tools workspace --workflow-plan plan.json --json
 ```
 
-- The plan file must be a regular file inside the workspace (no symlink, no
-  traversal), at most 256 KiB. Its sha256 is printed before the run.
+- The plan file must be a regular file inside the workspace (the file is never
+  followed as a symlink; its directory is resolved through symlinks, so a
+  `/var` or linked-checkout prefix is fine; any file name), at most 256 KiB.
+  Its sha256 is printed before the run. `--workflow-plan-sha256 <hex>` pins
+  it: the run is refused when the bytes read differ from the pinned digest.
+  The workspace is writable by earlier agent runs, so an unattended (CI, cron)
+  run should always pass the pin; without it the plan is whatever the file
+  holds at run time.
 - `--delegate` and `--tools workspace` are required, `--delegate-provider` is
   refused (every node is an in-process child), and no prompt, image or audio
   may be given: a workflow pass runs no model turn in the root session. The
@@ -68,18 +78,26 @@ amc agent-loop run --delegate --tools workspace --workflow-plan plan.json --json
 - The root session is composed as for `--goal-rounds`: the same principal,
   second-writer and stop-condition checks, the same composed child runner, the
   same `--delegate-scope`, `--delegate-stop`, `--max-delegation-depth` and
-  `--max-active-children` bounds.
+  `--max-active-children` bounds. `--max-active-children N` also bounds the
+  plan's own scheduler to `min(N, 8)` live nodes, so a wider `parallel` node
+  queues instead of being refused at admission.
 - The result is reported in the run summary as `workflow` (`runId`, `ok`,
   `outputs` keyed by node id, `failed`, `cancelled`, `agentsRun`). The command
-  fails when the plan did not succeed. Ctrl-C cancels the pass; a node whose
-  child was running when the run was interrupted is parked as
-  `TOOL_OUTCOME_UNKNOWN` and needs operator reconciliation before a retry.
+  fails when the plan did not succeed. Ctrl-C and `--cancel-after <ms>` cancel
+  the pass; a node whose child was running when the run was interrupted is
+  parked as `TOOL_OUTCOME_UNKNOWN` and needs operator reconciliation before a
+  retry.
 - `--keep-open` leaves the session unsealed. A later
-  `--session <id> --workflow-run-id <runId> --workflow-plan <same file>`
+  `--session <id> --workflow-run-id <runId> --workflow-plan <same file> --keep-open`
   resumes that run in that session: succeeded nodes are reused without a new
   dispatch, and a plan whose canonical content differs from the recorded one is
-  refused by the existing checkpoint fence. Without `--keep-open` (or a crash
-  that left the session unsealed) there is nothing to resume.
+  refused by the existing checkpoint fence. A `--workflow-run-id` the session
+  never created is refused before any dispatch (a resume never starts a new run
+  under a given id, so a typo cannot re-run finished nodes). Without
+  `--keep-open` (or a crash that left the session unsealed) there is nothing to
+  resume. Repeat `--keep-open` on the resume itself: a resume that the fence
+  refuses still seals the session without it, and a sealed session can only be
+  forked, not resumed.
 
 The `workflow` tool is now also registered for the root `--delegate` run, beside
 `delegate`; it stays hidden and denied until the signed allowlist names

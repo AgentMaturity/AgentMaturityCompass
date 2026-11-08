@@ -38,7 +38,8 @@ export function withBreadthRunOptions(command: Command): Command {
     .option("--web-search-searxng <origin>", WEB_SEARCH_SEARXNG_HELP)
     .option("--goal-rounds <n>", "run the prompt as a goal for up to N rounds of in-process delegated children (requires --delegate and --tools workspace)")
     .option("--workflow-plan <file>", "run this reviewed workflow plan (JSON, inside the workspace) headless as in-process delegated children, with no model turn; requires --delegate and --tools workspace, takes no prompt")
-    .option("--workflow-run-id <id>", "with --workflow-plan and --session: resume that durable workflow run in the session a --keep-open run left unsealed");
+    .option("--workflow-plan-sha256 <hex>", "pin the exact reviewed plan bytes: refuse when the file's sha256 differs (use it for every unattended --workflow-plan run)")
+    .option("--workflow-run-id <id>", "with --workflow-plan and --session: resume that durable workflow run in the session a --keep-open run left unsealed; an id the session never created is refused");
 }
 
 export interface BreadthRun {
@@ -58,7 +59,7 @@ export interface BreadthRun {
 
 /** Validates the breadth flags against the composed tool mode; null after a reported refusal. */
 export function resolveBreadthRun(io: AgentLoopCliIo, opts: RunOptions, context: { readonly toolMode: string; readonly wantsDelegation: boolean;
-  readonly definitions?: ReadonlyMap<string, AgentDefinition> }): BreadthRun | null {
+  readonly definitions?: ReadonlyMap<string, AgentDefinition>; readonly cancelAfterMs?: number }): BreadthRun | null {
   const refuse = (message: string): null => { io.error(chalk.red(message)); io.fail(); return null; };
   if (opts.interactiveAskUser && (typeof process.send !== "function" || !process.connected)) {
     return refuse("--interactive-ask-user requires an AMC parent with a dedicated IPC channel. Use native chat.");
@@ -84,20 +85,31 @@ export function resolveBreadthRun(io: AgentLoopCliIo, opts: RunOptions, context:
     if (opts.workflowRunId !== undefined && opts.session === undefined) return refuse("--workflow-run-id resumes a durable run in its own session: add --session <id>.");
     const file = readWorkflowPlanFile(process.cwd(), opts.workflowPlan);
     if (!file.ok) return refuse(file.reason);
-    (opts.json ? io.error : io.log)(chalk.dim(`workflow plan ${file.path} (sha256 ${file.sha256})`));
+    // The pin is compared with the digest of the very buffer that was parsed; a workspace writer cannot swap the plan after review.
+    if (opts.workflowPlanSha256 !== undefined && opts.workflowPlanSha256.trim().toLowerCase() !== file.sha256) {
+      return refuse(`--workflow-plan-sha256 does not match ${file.path}: the file's sha256 is ${file.sha256}; review it again before running it.`);
+    }
+    (opts.json ? io.error : io.log)(chalk.dim(`workflow plan ${file.path} (sha256 ${file.sha256}${opts.workflowPlanSha256 === undefined ? ", unpinned" : ", pinned"})`));
     workflowPass = { plan: file.plan, ...(opts.workflowRunId === undefined ? {} : { runId: opts.workflowRunId }),
       ...(context.definitions === undefined ? {} : { definitions: context.definitions }) };
-  } else if (opts.workflowRunId !== undefined) return refuse("--workflow-run-id needs --workflow-plan.");
+  } else if (opts.workflowRunId !== undefined || opts.workflowPlanSha256 !== undefined) return refuse("--workflow-run-id and --workflow-plan-sha256 need --workflow-plan.");
   const abort = new AbortController();
   const passName = workflowPass === undefined ? "goal rounds" : "workflow pass";
-  const cancel = (): void => { io.error(chalk.yellow(`\ncancelling the ${passName} (cause: user)…`)); abort.abort(); };
+  const cancel = (cause = "user"): void => { io.error(chalk.yellow(`\ncancelling the ${passName} (cause: ${cause})…`)); abort.abort(); };
+  const onSigint = (): void => cancel();
+  // A non-model pass never reaches the turn's onReady, so --cancel-after is armed against the pass itself.
+  let cancelTimer: NodeJS.Timeout | undefined;
   return {
     toolset: { ...(opts.interactiveAskUser ? { askUser: ipcAskUserAnswerer() } : {}), ...(webSearchProvider === undefined ? {} : { webSearchProvider }),
       skillRoots: workspaceSkillRoots(process.cwd(), opts.credentialsHome) },
     turn: workflowPass !== undefined ? { workflowPass: { ...workflowPass, signal: abort.signal } }
       : maxRounds === undefined ? {} : { goalRounds: { maxRounds, signal: abort.signal } },
-    armCancel: () => { if (maxRounds !== undefined || workflowPass !== undefined) process.on("SIGINT", cancel); },
-    dispose: () => { process.removeListener("SIGINT", cancel); },
+    armCancel: () => {
+      if (maxRounds === undefined && workflowPass === undefined) return;
+      process.on("SIGINT", onSigint);
+      if ((context.cancelAfterMs ?? 0) > 0) cancelTimer = setTimeout(() => cancel("--cancel-after"), context.cancelAfterMs);
+    },
+    dispose: () => { process.removeListener("SIGINT", onSigint); if (cancelTimer !== undefined) clearTimeout(cancelTimer); },
     reportRun: (outcome, priorTurnEndings, validationRequested) => {
       const summary = readAgentRunSummary(process.cwd(), outcome.sessionId, outcome.status);
       const ending = summary.endings.length > priorTurnEndings ? summary.endings.at(-1) : undefined;
