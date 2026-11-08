@@ -88,8 +88,8 @@ with slice D.
 | Tool pipeline, authorization stage (every class) | `killSwitchDenial` | `kill_switch_active`, `TOOL_CALL_DENIED` row |
 | P1-02 recheck (journaled calls) | `recheckAuthorization` | `recheck_failed:kill_switch_active` receipt |
 | Toolhub | `activeFreezeStatus` (the incident-freeze path) | `EXECUTE_FROZEN_ACTIVE` |
-| Gateway, before model calls | lease verification | 403, `KILL_SWITCH_DENIED` |
-| Gateway HTTP proxy and CONNECT | lease verification, host mapped to a configured upstream | 403, `KILL_SWITCH_DENIED` |
+| Gateway, before model calls | lease verification, once the lease verifies | 403, `KILL_SWITCH_DENIED` (an unleased request gets its 401) |
+| Gateway HTTP proxy and CONNECT | lease verification, once the lease verifies; host mapped to a configured upstream | 403, `KILL_SWITCH_DENIED` |
 | `checkEgress` (native provider calls, MCP over HTTP, bridge, network tools) | `assertEgressNotKilled` | `KillSwitchDenied` |
 
 - Attacker-writable workspace state cannot block activation: each kill and

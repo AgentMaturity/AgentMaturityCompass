@@ -37,8 +37,8 @@ The chart renders:
 - `Deployment` with non-root containers, read-only root filesystem, one replica and `strategy: Recreate`.
 - `Service` for Studio, Gateway, and proxy ports.
 - `Ingress` when enabled.
-- `PersistentVolumeClaim` for the AMC workspace.
-- `PersistentVolumeClaim` `<release>-state` for `<AMC home>/state` (`amcHomeState`, mounted at `/home/amc/.config/amc/state`). It keeps this machine's anti-rollback marks, key-set recovery copies and applied trust-root rotations across restarts; on an `emptyDir` every restart forgets them ([KEY_LIFECYCLE.md](KEY_LIFECYCLE.md#anti-rollback)). It is never mounted into the workspace.
+- `PersistentVolumeClaim` `<release>-amc` for the AMC workspace (`amc-amc` for release `amc`).
+- `PersistentVolumeClaim` `<release>-amc-state` (`amc-amc-state` for release `amc`) for `<AMC home>/state` (`amcHomeState`, mounted at `/home/amc/.config/amc/state`). It keeps this machine's anti-rollback marks, key-set recovery copies and applied trust-root rotations across restarts; on an `emptyDir` every restart forgets them ([KEY_LIFECYCLE.md](KEY_LIFECYCLE.md#anti-rollback)). It is never mounted into the workspace.
 - `NetworkPolicy`, `PodDisruptionBudget`, `ServiceAccount` and `ConfigMap`.
 - No `Secret` by default. The chart references the bootstrap secret you create. `bootstrap.createSecret=true` renders it from `bootstrap.values`, and then every value is required and any value starting with `change-me` is refused, by the template and by `values.schema.json`. No default passphrase can reach the cluster.
 - A `helm test` pod (`templates/tests/governed-turn.yaml`), created only by `helm test`.
@@ -79,7 +79,7 @@ With `notary.enabled=true`, add `--from-file=notaryPassphrase=...` and `--from-f
 Alternatively, let the chart create the Secret. Values passed this way are stored in the Helm release record, so prefer the out-of-band Secret above or an external secret manager:
 
 ```bash
-helm upgrade --install amc deploy/helm/amc --namespace amc-system --create-namespace \
+helm upgrade --install amc deploy/helm/amc --namespace amc-system --create-namespace --reuse-values \
   --set bootstrap.createSecret=true \
   --set-file bootstrap.values.vaultPassphrase=./vault-passphrase.txt \
   --set-file bootstrap.values.ownerUsername=./owner-username.txt \
@@ -92,29 +92,26 @@ All five values are required even with the notary disabled, so enabling it later
 
 ## Install With Helm
 
+Build the image from this checkout and deploy it by digest, so the cluster runs exactly the image you tested. On kind, load the image into the node and resolve the digest containerd records for it (`scripts/deploy/kind-image-digest.mjs` prints `amc-studio@sha256:<digest>` and tags the image by that digest on the node):
+
 ```bash
+docker build --target studio -t amc-studio:<sha> .
+kind load docker-image amc-studio:<sha> --name <cluster>
+node scripts/deploy/kind-image-digest.mjs --cluster <cluster> --image amc-studio:<sha>
 helm upgrade --install amc deploy/helm/amc \
   --namespace amc-system \
   --create-namespace \
   --atomic \
   --wait \
-  --set image.repository=ghcr.io/agentmaturity/amc-studio \
-  --set image.tag=latest
-```
-
-Deploy by digest so the cluster runs exactly the image you tested. `image.digest` wins over `image.tag`; `image.requireDigest=true` refuses to render without one:
-
-```bash
-helm upgrade --install amc deploy/helm/amc \
-  --namespace amc-system \
-  --atomic \
-  --wait \
-  --set image.repository=ghcr.io/agentmaturity/amc-studio \
-  --set image.digest=sha256:<64 hex> \
+  --reuse-values \
+  --set image.repository=amc-studio \
+  --set image.digest=sha256:<digest> \
   --set image.requireDigest=true
 ```
 
-Record the digest you deployed (`docker image inspect --format '{{.Id}} {{.RepoDigests}}' <image>`) so a rollback can name it. Terraform (`image_digest`) and Pulumi (`imageDigest`) pass the same value through.
+With a registry, push the image and take its registry digest with `docker image inspect --format '{{index .RepoDigests 0}}' <registry>/amc-studio:<sha>`, then run the same `helm upgrade --install … --reuse-values` with `--set image.repository=<registry>/amc-studio --set image.digest=sha256:<digest>`. Never use the local image id (`.Id`): no registry or containerd resolves it. `image.digest` wins over `image.tag`; `image.requireDigest=true` refuses to render without one. Record the digest you deployed so a rollback can name it. Terraform (`image_digest`) and Pulumi (`imageDigest`) pass the same value through.
+
+Once registry publication is verified (`website/publication-status.json`), the published repository is `ghcr.io/agentmaturity/amc-studio`; until then do not pull it: an unpublished tag puts the pod in `ImagePullBackOff`.
 
 Internal-only profile:
 
@@ -130,15 +127,22 @@ helm upgrade --install amc deploy/helm/amc \
 Ingress and TLS profile:
 
 ```bash
+# The ingress controller pods' addresses; escape commas as \, for several.
+kubectl -n ingress-nginx get pods -o wide
+INGRESS_POD_CIDRS=10.244.1.17/32
 helm upgrade --install amc deploy/helm/amc \
   --namespace amc-system \
   --create-namespace \
   --atomic \
   --wait \
   -f deploy/helm/amc/examples/values-ingress-tls.yaml \
-  --set image.repository=ghcr.io/agentmaturity/amc-studio \
-  --set image.tag=latest
+  --set env.AMC_TRUSTED_PROXY_CIDRS="$INGRESS_POD_CIDRS" \
+  --set image.repository=amc-studio \
+  --set image.digest=sha256:<digest> \
+  --set image.requireDigest=true
 ```
+
+Studio believes `X-Forwarded-For` and `X-Forwarded-Proto` (the client address for limits and the login throttle, and the `Secure` cookie flag) only from the addresses in `env.AMC_TRUSTED_PROXY_CIDRS` (SR-10). By default the chart trusts no proxy (`AMC_TRUSTED_PROXY_HOPS: "0"`, empty CIDRs), and it refuses to render with `ingress.enabled` or hops above 0 until both are set. The example file leaves the CIDRs empty, so the chart refuses it as shipped. The chart and Studio both refuse documentation ranges (RFC 5737/3849), so a copied placeholder cannot leave the real proxy untrusted. Name the controller pods' own addresses, or their node's pod range if they move. Never name a whole private range: any pod inside it could name its own client address. Studio warns at start about a trusted range of /12 or wider, one that overlaps `AMC_ALLOWED_CIDRS`, or a list that misses every private range `AMC_ALLOWED_CIDRS` admits. On a CNI that allocates pods from one large pool, the controller's range may be wide; the NetworkPolicy, which admits only the ingress controller pods, then limits who can send forwarded headers.
 
 ### KeyProvider and ledger encryption
 
@@ -158,12 +162,12 @@ With `ledgerEncryption.enabled=true` the start step refuses unless the signed op
 
 ```bash
 # File provider on kind or a single node (INS-1 uses this):
-helm upgrade --install amc deploy/helm/amc ... \
+helm upgrade --install amc deploy/helm/amc ... --reuse-values \
   --set keyProvider.provider=file --set ledgerEncryption.enabled=true
 
 # PKCS#11: PIN from a Secret, module path as a setting (needs an image with the wrapper and pkcs11js):
 kubectl -n amc-system create secret generic amc-hsm-pin --from-file=pin=./pin.txt
-helm upgrade --install amc deploy/helm/amc ... \
+helm upgrade --install amc deploy/helm/amc ... --reuse-values \
   --set keyProvider.provider=pkcs11 \
   --set keyProvider.credentialSecret.name=amc-hsm-pin --set keyProvider.credentialSecret.key=pin \
   --set keyProvider.env.AMC_PKCS11_MODULE=/usr/lib/softhsm/libsofthsm2.so \
@@ -215,13 +219,13 @@ A code is spent by one test run; mint a new one for each `helm test`. Without th
 The test pod claims the pairing code, logs in as the bootstrap owner (credentials mounted read-only from the bootstrap Secret, never printed), submits one native task with provider `stub` and tools `none` through `/api/v1/native-tasks`, waits for the turn to finish and calls `/verify`. The probe is `scripts/deploy/governed-turn-probe.mjs`, shipped in the chart as `files/governed-turn-probe.mjs` and run from the ConfigMap mount. It exits 0 on two verdicts, and its JSON log says which:
 
 - `externally-anchored` gives probe status `verified`: the complete workspace ledger verified and the monitor key is the pinned one.
-- `anchored-prefix` gives probe status `verified-prefix`. The gateway that Studio runs keeps its own ledger session open while it serves, so a complete-ledger verdict is impossible in a running deployment. Studio then verifies a prefix: the task's own session must be closed and sealed, every recorded row and every sealed session must verify, and each unended, unsealed legacy session (the gateway's) is named in `verificationScope.unfinalizedSessions` instead of failing. Nothing is claimed about how those sessions end, and the state is never reported as `externally-anchored`.
+- `anchored-prefix` gives probe status `verified-prefix`. The gateway that Studio runs keeps its own ledger session open while it serves. The ledger verifies while Studio runs; the running gateway's own session is named as open; a container replaced without a graceful stop leaves an interrupted session that the next start seals with a marker within about 10 minutes. Studio's task verdict then verifies a prefix: the task's own session must be closed and sealed, every recorded row and every sealed session must verify, and each unended, unsealed legacy session (the gateway's) is named in `verificationScope.unfinalizedSessions` instead of failing. Nothing is claimed about how those sessions end, and the state is never reported as `externally-anchored`.
 
 Anything else, including an unpinned key (`UNTRUSTED`), fails. A server that answers `/healthz` and `/readyz` but cannot run a governed turn fails.
 
 The docker compose example runs the same probe with `docker compose -f docker/docker-compose.yml --profile verify run --rm amc-verify`. Its `amc-verify` service passes no pairing code, so against the LAN-mode image it fails at `login`; that profile was not run on 2026-10-11.
 
-Studio admits native requests (`/api/v1/native-tasks/*`) only when the request's `Host` matches an origin in `AMC_CORS_ALLOWED_ORIGINS` or the bind host (`src/studio/nativeAdmission.ts`). With `--bind 0.0.0.0` the bind host alone is `http://0.0.0.0:3212`, so the chart ConfigMap always sets `AMC_CORS_ALLOWED_ORIGINS` to the Service origin the test pod calls, `http://<release>-amc:<service.port>` (`http://amc-amc:3212` for release `amc`), and appends `env.AMC_CORS_ALLOWED_ORIGINS` from values. Add your Ingress host there, for example `--set env.AMC_CORS_ALLOWED_ORIGINS=https://amc.example.internal`, or browser sessions through the Ingress are refused with `NATIVE_HOST_DENIED`. `helm --set` splits values on commas, so escape them for more than one origin (`--set 'env.AMC_CORS_ALLOWED_ORIGINS=https://a.example\,https://b.example'`) or put the list in a values file. In `docker/docker-compose.yml` the `amc-studio` service sets `AMC_CORS_ALLOWED_ORIGINS=http://amc-studio:3212`, so Studio admits the `amc-verify` probe that calls that origin.
+Studio admits native requests (`/api/v1/native-tasks/*`) only when the request's `Host` matches an origin in `AMC_CORS_ALLOWED_ORIGINS` or the bind host (`src/studio/nativeAdmission.ts`). With `--bind 0.0.0.0` the bind host alone is `http://0.0.0.0:3212`, so the chart ConfigMap always sets `AMC_CORS_ALLOWED_ORIGINS` to the Service origin the test pod calls, `http://<release>-amc:<service.port>` (`http://amc-amc:3212` for release `amc`), and appends `env.AMC_CORS_ALLOWED_ORIGINS` from values. Add your Ingress host there, for example `--set env.AMC_CORS_ALLOWED_ORIGINS=https://amc.example.internal`, or browser sessions through the Ingress are refused with `NATIVE_HOST_DENIED`. `helm --set` splits values on commas, so escape them for more than one origin (`--set 'env.AMC_CORS_ALLOWED_ORIGINS=https://a.example\,https://b.example'`) or put the list in a values file. In `docker/docker-compose.yml` the `amc-studio` service lists `http://amc-studio:3212` first in `AMC_CORS_ALLOWED_ORIGINS`, so Studio admits the `amc-verify` probe that calls that origin, then the published `http://localhost:<AMC_STUDIO_PORT>` and `http://127.0.0.1:<AMC_STUDIO_PORT>` origins and anything in `AMC_EXTRA_ORIGINS`; the `deploy/compose` stacks append `AMC_EXTRA_ORIGINS` to their defaults the same way (`deploy/compose/README.md`, Phone/LAN Access). An origin is `scheme://host[:port]` with no path: Studio does not validate the list at startup, and an entry with a path turns native routes into errors at request time.
 
 Two post-deploy checks exist, and they prove different things:
 
@@ -312,13 +316,23 @@ node scripts/deploy/rollback-drill.mjs --image-a amc-studio:s1-a --image-b amc-s
   --secrets-dir ./drill-secrets --out ./rollback-receipt.json
 ```
 
+### Upgrading to chart 0.4.1
+
+Chart 0.4.1 sets `AMC_CONTROL_CHECKPOINT_DIR` to `<amcHomeState.mountPath>/control-checkpoints` (by default `/home/amc/.config/amc/state/control-checkpoints`), on the `<release>-amc-state` claim and outside the workspace. Signed control journals (firewall, guardrails, legal holds, compiled-control activation) keep their checkpoints and trust pins there. On chart 0.4.0 the root defaulted to `$HOME/.amc/control-checkpoints`, on the read-only root filesystem, where those journals cannot write. Existing releases need this upgrade before a firewall, guardrail, legal-hold or compiled-control change can be published:
+
+```bash
+helm upgrade amc deploy/helm/amc --namespace amc-system --reuse-values --atomic --wait --timeout 10m
+```
+
+With `amcHomeState.persistence.enabled=false` the checkpoints live in an `emptyDir` and are lost with the pod, as the anti-rollback marks are.
+
 ### Upgrading to chart 0.4.0
 
 Chart 0.4.0 (P2-06) changes the `PodDisruptionBudget` default from `minAvailable: 1` to `maxUnavailable: 1`, so node drains no longer block on the single pod. To keep the old behaviour, set `podDisruptionBudget.minAvailable=1` and `podDisruptionBudget.maxUnavailable=null`; setting both, or neither, fails the render. It also adds `metrics.*` values, off by default: `metrics.enabled=true` exposes Prometheus metrics on port 9464 inside the cluster, admitted by the NetworkPolicy from the monitoring namespace only, with optional ServiceMonitor and PrometheusRule objects ([deploy/reference/MONITORING.md](deploy/reference/MONITORING.md)). It adds `keyProvider.*` and `ledgerEncryption.*` values whose defaults render nothing new ([KeyProvider and ledger encryption](#keyprovider-and-ledger-encryption)). The reference deployment runbooks are in [deploy/reference/](deploy/reference/TOPOLOGY.md).
 
 ### Upgrading to chart 0.3.0
 
-Chart 0.3.0 adds the `<release>-state` claim for `<AMC home>/state` (P1-08). A plain upgrade creates it empty, so this machine's anti-rollback marks start again from the workspace transparency log; nothing else changes. Set `amcHomeState.persistence.enabled=false` only for a disposable install.
+Chart 0.3.0 adds the `<release>-amc-state` claim (`amc-amc-state` for release `amc`) for `<AMC home>/state` (P1-08). A plain upgrade creates it empty, so this machine's anti-rollback marks start again from the workspace transparency log; nothing else changes. Set `amcHomeState.persistence.enabled=false` only for a disposable install.
 
 ### Upgrading from chart 0.1.0
 
@@ -358,7 +372,7 @@ On 2026-10-11 the slice C checks ran locally on macOS 26.6.2 (Darwin 25.6.0, arm
 - `deploy-pack-check.mjs --json --require-tools` passed (helm lint, renders, kubeconform). The four negative renders were refused, each naming its reason, and the default render held no `kind: Secret`; the same checks against chart 0.1.0 fail.
 - Kind: `helm install --wait`, the monitor-key pin (`helm upgrade`, revision 2), `helm upgrade`, and `helm rollback amc 2 --wait` succeeded. Both `helm test` runs claimed a pairing code, logged in, ran the stub-provider turn and passed with status `verified-prefix` (Studio verdict `anchored-prefix`): the task's session sealed, the monitor key pinned, and the running gateway's session named as the only unfinalized session.
 - `deploy-verify.mjs` passed all five checks against the kind release: a lease minted inside the pod, the monitor key read through the cluster API, and a loopback stub upstream on the `/local` route, so no real model was called.
-- The container rollback drill with image A built from `origin/main` failed `probe-a` at `verify`: main's Studio still runs the complete-ledger check, which the live gateway session fails. With image A built from a commit that has the verify fix (the branch before its merge with `main`) and image B from the merged head, all six steps passed with two `sha256` image ids and `verified-prefix` on every probe. The drill waits for A's first bootstrap to finish before it pins the key and restarts A. Each replaced container leaves its gateway session unsealed (`docker rm -f` stops it without a graceful shutdown), and every later verdict names those sessions.
+- The container rollback drill with image A built from `origin/main` failed `probe-a` at `verify`: main's Studio still runs the complete-ledger check, which the live gateway session fails. With image A built from a commit that has the verify fix (the branch before its merge with `main`) and image B from the merged head, all six steps passed with two `sha256` image ids and `verified-prefix` on every probe. The drill waits for A's first bootstrap to finish before it pins the key and restarts A. Each replaced container leaves its gateway session unsealed (`docker rm -f` stops it without a graceful shutdown); the ledger verifies while Studio runs, the running gateway's own session is named as open, and the next start seals such an interrupted session with a marker within about 10 minutes. A routine stop seals it at once: the chart's 30-second default grace and `deploy/k8s/deployment.yaml` (40 seconds) outlast Studio's 10-second API drain.
 
 The first kind install failed until the pods stopped automounting the service-account token. An earlier `helm test` pass was void: the probe, started through the ConfigMap's symlink, ran nothing. Before the verify fix both `helm test` runs failed at `verify`. All are fixed. These are local runs on one architecture, not a production deployment.
 

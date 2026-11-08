@@ -49,6 +49,7 @@ body {
 
 a { color: var(--green); text-decoration: none; transition: color 0.15s; }
 a:hover { color: var(--green2); text-decoration: none; }
+.content p a, .content li a, .callout a { text-decoration: underline; text-underline-offset: 2px; }
 
 :where(a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])):focus-visible {
   outline: 2px solid var(--green);

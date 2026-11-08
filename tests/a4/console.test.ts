@@ -5,6 +5,7 @@
 import { readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
 import { describe, expect, test } from "vitest";
+import * as a4View from "../../src/console/assets/a4View.js";
 import { mergeOnTop, renderMissing, validateA4Poll } from "../../src/console/assets/a4View.js";
 
 const page = (over: Record<string, unknown> = {}) => ({ events: [{ cursor: 5 }, { cursor: 6 }], presence: [], nextCursor: 7, firstCursor: 0,
@@ -51,6 +52,21 @@ describe("nextAction route allowlist (renderMissing)", () => {
       expect(out).not.toContain("href=");
       expect(out).toContain("<strong>Go</strong>");
     });
+});
+
+// LIVE-UX-04: the notice named no way forward, and the home nav link stays hidden while the preview is off.
+describe("previewNoticeHtml", () => {
+  const html = () => (a4View as { previewNoticeHtml?: () => string }).previewNoticeHtml?.() ?? "";
+  test("names how to enable the preview on POSIX shells and PowerShell, commands in <code>", () => {
+    expect(html()).toContain("A4 preview is not enabled in this workspace.");
+    for (const command of ["amc down", "AMC_A4_PREVIEW=1 amc up", "$env:AMC_A4_PREVIEW"]) expect(html()).toContain(command);
+    expect(html()).toContain("<code>AMC_A4_PREVIEW=1 amc up</code>");
+    expect(html()).toContain("A running Studio keeps the environment it started with.");
+    expect(html()).not.toMatch(/\son[a-z]+\s*=|javascript:/i);
+  });
+  test("the A4 page renders it", () => {
+    expect(readFileSync("src/console/assets/a4.js", "utf8")).toContain("view.previewNoticeHtml()");
+  });
 });
 
 test("sw.js precaches both A4 pages", () => {

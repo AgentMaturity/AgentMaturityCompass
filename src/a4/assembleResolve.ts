@@ -42,7 +42,8 @@ const base = { expectedHeadSeq: z.number().int().min(0), clientRequestId: z.stri
 const requestSchema = z.strictObject({ ...base, effect: z.enum(["applied", "not_applied"]), externalRef: z.string().trim().min(1).max(512).nullable(),
   note: z.string().trim().min(1).max(4000) });
 const resolveSchema = z.strictObject(base);
-const decideSchema = z.strictObject({ reason: z.string().trim().min(1).max(1000), expectedRequestDigestSha256: z.string().regex(/^[0-9a-f]{64}$/) });
+const decideSchema = z.strictObject({ reason: z.string().trim().min(1).max(1000), expectedRequestDigestSha256: z.string().regex(/^[0-9a-f]{64}$/),
+  clientRequestId: base.clientRequestId.optional() });
 /** The engine's business refusals (src/actions/reconcile.ts): fixed texts that name no path. */
 const BUSINESS_REFUSAL = /^(dual_control|resolution_not_approved|nothing to resolve)\b|^\S+ already records effect (applied|not_applied); /;
 
@@ -221,7 +222,10 @@ async function resolveResolution(route: A4Route, projectId: string, executionId:
 async function decideEngineRequest(route: A4Route, projectId: string, approvalRequestId: string, verb: "approve" | "deny"): Promise<true> {
   const call = callOf(route);
   const principal = livePrincipal(route.store, call);
-  const { body } = await readJson(route, decideSchema);
+  const { body, request } = await readJson(route, decideSchema);
+  // fix3 A-12: the same idempotency as every other A4 mutation; a retried request answers its stored response.
+  const replay = priorReplay(route.store, request, projectId);
+  if (replay) return (apiSuccess(route.res, replay, 201), true);
   assertOwnerMode(route.workspace, verb === "approve" ? "a4 approve" : "a4 deny");
   const now = Date.now();
   const state = loadA4State(route.store, projectId, now);
@@ -267,7 +271,9 @@ async function decideEngineRequest(route: A4Route, projectId: string, approvalRe
     if (error instanceof ApprovalStudioError) throw a4Fail(error.statusCode, "APPROVAL_REFUSED", error.message);
     throw error;
   }
-  apiSuccess(route.res, { approvalRequestId, status: decided.approval.status, event: decided.approvalEvent }, 201);
+  const response = { approvalRequestId, status: decided.approval.status, event: decided.approvalEvent };
+  if (request) route.store.rememberRequest(request, projectId, response);
+  apiSuccess(route.res, response, 201);
   return true;
 }
 

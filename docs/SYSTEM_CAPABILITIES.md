@@ -8,7 +8,7 @@ This is the go-live contract for AMC integration state.
 |---|---|---|
 | Guided setup + lifecycle | `amc setup`, `amc up`, `amc down`, `amc status` | Signed bootstrap, running control plane, readiness report |
 | Bootstrap + config trust | `amc bootstrap`, `amc config print`, `amc config explain` | Deterministic config with source attribution and risk warnings |
-| Studio + runtime checks | `amc doctor --json`, `amc verify all --json` | Pass/fail matrix for runtime, signatures, integrity, readiness |
+| Studio + runtime checks | `amc doctor --json`, `amc verify all --json --expect-monitor <monitor sha256>` | Pass/fail matrix for runtime, signatures, integrity, readiness; without the monitor pin the ledger check fails as UNANCHORED |
 | Gateway + lease controls | `amc gateway *`, `amc lease issue|verify|revoke` | Zero-key, lease-scoped routing with receipts |
 | ToolHub governance | `amc tools *`, `amc workorder *`, `amc ticket *`, `amc approvals *` | Intent/execute boundaries, dual-control, signed approvals |
 | Adapters (SimpleClaw-style) | `amc adapters detect|configure|run|env|init-project` | One-liner agent execution with lease-as-api-key compatibility |
@@ -22,7 +22,7 @@ This is the go-live contract for AMC integration state.
 | Trust boundary / Notary | `amc trust *`, `amc notary *` | Fail-closed signing boundary and runtime attestations |
 | Multi-workspace host mode | `amc host *`, `amc host workspace *` | Tenant isolation, host portfolio, workspace-scoped ops |
 | Enterprise identity | `amc identity *`, `amc scim *` | Signed IdP config, OIDC/SAML login, SCIM provisioning |
-| End-to-end smoke | `amc e2e smoke --mode local|docker|helm-template --json` | Full-system go-live validation summary |
+| End-to-end smoke | `amc e2e smoke --mode local|docker|helm-template --json` | Full-system go-live validation summary; runs from a built source checkout (`dist/cli.js`, `deploy/compose`, `deploy/helm/amc` under `--repo-root`, default the current directory), not from an installed package |
 
 ## Console Capability Matrix
 
@@ -68,12 +68,16 @@ This is the go-live contract for AMC integration state.
 
 ## Go-Live Validation Commands
 
+Run these at the root of a source checkout: `amc e2e smoke` starts that checkout's `dist/cli.js`, so it fails from an installed package.
+
 ```bash
-npm ci
+pnpm install --frozen-lockfile
 npm test
 npm run build
 amc setup --demo
 amc up
 amc e2e smoke --mode local --json
-amc verify all --json
+amc verify all --json --expect-monitor <monitor sha256>   # sha256 of .amc/keys/monitor_ed25519.pub, recorded outside the workspace
 ```
+
+Without `--expect-monitor` (or `AMC_EXPECTED_MONITOR_FINGERPRINT`, or a trust list), `amc verify all` reports the ledger UNANCHORED and exits 1.

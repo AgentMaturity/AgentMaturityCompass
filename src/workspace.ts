@@ -57,6 +57,7 @@ import { signAmcConfig } from "./config/amcConfigSignature.js";
 import { saveSignedAmcConfig } from "./config/amcConfigSigning.js";
 import { withAmcConfigPublicationLock } from "./config/configPublicationLock.js";
 import { assertNoPendingKeyset } from "./keys/keyset.js";
+import { ensureAmcGitignore } from "./workspaceGitignore.js";
 
 export interface WorkspacePaths {
   agentId: string;
@@ -297,7 +298,7 @@ export function initWorkspace(opts: InitWorkspaceOptions = {}): { workspacePath:
   // Only a new workspace starts the WITNESSING_ENABLED pair (decided before init writes anything).
   const isNew = workspaceIsNew(workspace);
 
-  ensureDir(paths.amcDir);
+  ensureDir(paths.amcDir); ensureAmcGitignore(paths.amcDir); // H1: secrets and runtime state never reach git
   ensureDir(paths.keysDir);
   ensureDir(paths.blobsDir);
   ensureDir(paths.targetsDir);

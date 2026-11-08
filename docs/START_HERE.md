@@ -8,6 +8,8 @@ Choose what you want to do first. AMC can run a native task, assess evidence, or
 | Assess existing evidence | `amc` | Creates or updates an evidence baseline; a valid report can still have insufficient evidence. |
 | Connect an existing agent | `amc connect --help` | Shows capture and connection options for your existing runtime. |
 
+The native task commands on this page (`amc agent-loop` and the keyless turn below) need the current source build, which is unreleased (the next release is 2.0.0); follow [the source installation](INSTALL.md#option-b-from-github-development) first. The hosted installers and npm give the published 1.1.1, which does not contain them.
+
 The native guide does not contact a model, open a session or change configuration. Choose OpenAI Chat Completions (`openai`), OpenAI Responses (`openai-responses`), or Anthropic with a model you can access for a real task. Choose `--provider stub` explicitly for a local recording demonstration; it does not produce a real model answer. Native commands pin the selected agent: explicit `--agent`, then `AMC_AGENT_ID`, the workspace's current agent, and finally `default`.
 
 See [the native task quickstart](QUICKSTART.md#run-a-native-task) for the commands and separate evidence verification step.
@@ -22,9 +24,12 @@ recording and verification, and the workspace tools are what the policy then gat
 export AMC_VAULT_PASSPHRASE='<a passphrase you keep>'   # signing commands read it from the shell
 amc init --minimal
 amc firewall enable                                       # creates + signs the policy; idempotent; explains what it wrote
+shasum -a 256 .amc/keys/monitor_ed25519.pub              # record the monitor fingerprint outside the workspace
 amc --agent default agent-loop run "Check recording with a local demonstration." --provider stub --model amc-stub-1 --tools echo --max-steps 2 --max-tokens 512
-amc agent-loop verify <session-id>                        # the run prints the session id
+amc agent-loop verify <session-id> --expect-monitor <monitor sha256>   # the run prints the session id
 ```
+
+Without the pinned fingerprint the verdict is UNANCHORED and the command exits 1: the monitor key is read from the workspace being verified, so the check proves internal consistency, not authorship.
 
 `amc doctor` names each missing precondition and the exact command that fixes it
 (`runtime-firewall-policy` and `vault` are the two a fresh init leaves open); plain
@@ -53,8 +58,8 @@ Native run output, chat replies and `amc session show <session-id>` display
 **cumulative recorded-session usage**, not counters remembered by the process.
 Inspection follows the workspace's recorded SQLite or JSONL backend and does not
 take a session writer. A missing or unreadable selected history is not replaced
-with a different backend. Use `amc agent-loop verify <session-id>` separately for
-evidence verification; inspection alone does not authenticate the rows.
+with a different backend. Use `amc agent-loop verify <session-id> --expect-monitor <monitor sha256>`
+separately for evidence verification; inspection alone does not authenticate the rows.
 
 Token totals are labelled **observed subtotals**. Missing reports, partial failed
 streams, pending requests and local stub demonstrations remain visible. Retry
@@ -140,7 +145,7 @@ curl -fsSL https://agentmaturity.co/install.sh | sh
 amc
 ```
 
-On Windows PowerShell, install with `irm https://agentmaturity.co/install.ps1 | iex`, then run `amc`.
+On Windows PowerShell, install with `irm https://agentmaturity.co/install.ps1 | iex`, then run `amc`. The installers give the published 1.1.1 release; for the current build, use [the source installation](INSTALL.md#option-b-from-github-development).
 
 The first run is an honest baseline. A signed `VALID` artifact can still be `INSUFFICIENT_EVIDENCE`; capture a real agent run and rerun before making external claims. Only evidence readiness `READY` is claim-eligible.
 
@@ -255,7 +260,7 @@ If you are new, start with:
 
 - The browser path is a real playground, not a fake full browser execution runtime.
 - The CLI is the serious path for execution evidence, traces, datasets, and CI.
-- Single-binary packaging exists as an experimental path and should be treated honestly.
+- The single-binary (Node SEA) build is a local experimental build: the binary it produces does not start yet, and it is not a release asset (see `docs/SINGLE_BINARY.md`).
 - SDKs, editor integrations, and CI shells are useful, but most of them wrap the same TypeScript runtime rather than replacing it.
 - If you want that distinction spelled out, read `docs/IMPLEMENTATION_REALITY_MAP.md`.
 

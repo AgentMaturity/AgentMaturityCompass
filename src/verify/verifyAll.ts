@@ -8,6 +8,8 @@ import { A4_PROJECT_CREATED, FORECAST_SCHEDULER_CONFIGURED, PASSPORT_POLICY_WITN
 import { verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { LEDGER_UNANCHORED_MESSAGE } from "../ledger/ledgerVerification.js";
+import { describeOpenSessions } from "../ledger/sessionLiveness.js";
+import { describePayloadsNotEvaluated } from "./payloadsNotEvaluated.js";
 import { withPins, workspaceSelfTrust, type TrustContext } from "../trust/trustContext.js";
 import { untrustedReasons } from "../trust/verifierReport.js";
 import { isKeyRefused } from "../trust/signatureCheck.js";
@@ -165,7 +167,8 @@ export async function verifyAll(params: {
   try {
     // The witness rows come from the rows this verification checked, on its one ledger handle; the file is never reopened.
     // The A4 projects are read on that same verified handle before it closes (a4-projects below).
-    ledger = await verifyLedgerIntegrity(workspace, { trust: params.trust, auditTypes: WITNESS_GROUPS.flat(), onVerifiedLedger: (handle) => {
+    // B1: a payload a locked vault keeps closed is reported as not evaluated (the ledger check below), never as tampering.
+    ledger = await verifyLedgerIntegrity(workspace, { trust: params.trust, auditTypes: WITNESS_GROUPS.flat(), blobKeyOptional: true, onVerifiedLedger: (handle) => {
       try {
         a4.rows = verifyA4Projects(handle, params.trust);
       } catch (error) {
@@ -437,10 +440,14 @@ export async function verifyAll(params: {
   if (ledger === null) {
     checks.push(fail("ledger-hash-chain", true, [ledgerError ?? "ledger unreadable"]));
   } else {
+    // Open sessions (a running Studio's gateway, an in-flight request) are named, never failed (sessionLiveness.ts).
+    const live = ledger.sessions.liveLegacy, open = live.length ? [describeOpenSessions(live, Date.now())] : [];
+    const notEvaluated = ledger.payloadsNotEvaluated ?? [];
     checks.push(
-      ledger.ok
-        ? pass("ledger-hash-chain", true, ["event hash-chain and signatures verified"])
-        : fail("ledger-hash-chain", true, ledger.errors)
+      !ledger.ok ? fail("ledger-hash-chain", true, ledger.errors)
+        // B1: not performed in full, so SKIP (the headline becomes INCOMPLETE), worded apart from a failure.
+        : notEvaluated.length > 0 ? skip("ledger-hash-chain", true, [describePayloadsNotEvaluated(notEvaluated), ...open])
+        : pass("ledger-hash-chain", true, ["event hash-chain and signatures verified", ...open])
     );
     const monitor = ledger.trustRoot.monitorAdmission;
     checks.push(ledger.trustRoot.anchored

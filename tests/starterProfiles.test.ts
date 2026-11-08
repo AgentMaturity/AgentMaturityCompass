@@ -251,6 +251,23 @@ describe("runStarterInit (P1-40)", () => {
     expect(existsSync(join(dir, ".amc", "keep")), "a refused --force leaves the workspace alone").toBe(true);
   });
 
+  it("refuses an owner password the account policy refuses before anything is written (skeptic SK-5)", async () => {
+    const dir = emptyDir();
+    vi.stubEnv("AMC_BOOTSTRAP_OWNER_USERNAME", OWNER.username);
+    vi.stubEnv("AMC_BOOTSTRAP_OWNER_PASSWORD", "elevenchar1");
+    await expect(runStarterInit(dir, "coding")).rejects.toThrow("The owner's Studio password is refused: password must be at least 12 characters; nothing was written.");
+    vi.stubEnv("AMC_BOOTSTRAP_OWNER_PASSWORD", OWNER.username.toUpperCase());
+    await expect(runStarterInit(dir, "coding")).rejects.toThrow("password must not be the username");
+    expect(existsSync(join(dir, ".amc"))).toBe(false);
+  });
+
+  it("names the cause when a phase fails after the workspace was initialized (skeptic SK-5)", async () => {
+    const dir = emptyDir();
+    vi.stubEnv("AMC_BOOTSTRAP_OWNER_USERNAME", OWNER.username);
+    vi.stubEnv("AMC_BOOTSTRAP_OWNER_PASSWORD", OWNER.password);
+    await expect(runStarterInit(dir, "regulated", false, ["example.com"])).rejects.toThrow("starter profile did not complete (starter-init: --regulated keeps web_fetch and web_search off.)");
+  });
+
   it("initializes a ready workspace and prints no secret", async () => {
     const dir = emptyDir();
     vi.stubEnv("AMC_BOOTSTRAP_OWNER_USERNAME", OWNER.username);

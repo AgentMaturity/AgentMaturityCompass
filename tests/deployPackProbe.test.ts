@@ -172,6 +172,7 @@ describe("governed-turn probe", () => {
     const verifyBaseUrl = /amc-verify:[\s\S]*?- --base-url\n\s+- (\S+)\n/.exec(compose)?.[1];
     expect(verifyBaseUrl).toBe("http://amc-studio:3212");
     const studioEnv = /amc-studio:\n[\s\S]*?environment:\n((?:\s+(?:- |# ).*\n)+)/.exec(compose)?.[1] ?? "";
-    expect(studioEnv).toContain(`- AMC_CORS_ALLOWED_ORIGINS=${verifyBaseUrl}\n`);
+    const origins = /- AMC_CORS_ALLOWED_ORIGINS=(\S+)\n/.exec(studioEnv)?.[1]?.split(",") ?? [];
+    expect(origins).toContain(verifyBaseUrl);
   });
 });

@@ -12,7 +12,8 @@ import type { CatalogLockfile } from "../../catalog/lockfile.js";
 import { A4_STEPS } from "../../contracts/v1/a4Project.js";
 import { STATIONS } from "../../domains/stations.js";
 import {
-  gateStatus, isRegulated, latestGate, LIFECYCLE_BRIDGE, pendingReviews, PLAN_ACTIVATION_DEFERRED, readinessItemBuilders, type A4ReadinessItem, type A4ReadinessQuery,
+  gateStatus, isRegulated, latestGate, LIFECYCLE_BRIDGE, pendingReviews, PLAN_ACTIVATION_DEFERRED, proposeNextAction, readinessItemBuilders, type A4ReadinessItem,
+  type A4ReadinessQuery,
   type A4ReadinessState
 } from "../a4Readiness.js";
 import type { A4Producer } from "../a4RouterStages.js";
@@ -598,7 +599,7 @@ export function adaptItems(state: A4ReadinessState, query: A4ReadinessQuery): A4
       : waiting("profile_facts_complete", unknownFacts.map((fact) => `FACT_UNKNOWN:${fact}`), { mandatory: false,
         nextAction: { label: "Unknown facts stay unknown (null) and leave the requirements they decide unresolved" } }),
     proposed ? item("plan_proposed", "READY")
-      : waiting("plan_proposed", [spec.schema === ADAPT_SPEC_SCHEMA ? "PLAN_STALE" : "NOT_PROPOSED"], { nextAction: { label: "Propose the plan" } }),
+      : waiting("plan_proposed", [spec.schema === ADAPT_SPEC_SCHEMA ? "PLAN_STALE" : "NOT_PROPOSED"], { nextAction: proposeNextAction(state, "adapt", "Propose the plan") }),
     ...planItems(state, query, spec, answers, regulated),
     ...signingItems(state, query, spec, answers, revisionNo, regulated),
     lockoutItem(state, query, regulated),

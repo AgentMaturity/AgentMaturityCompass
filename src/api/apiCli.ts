@@ -132,6 +132,7 @@ export function registerApiCommands(program: Command): void {
       console.log(chalk.yellow("  API key (shown once):"));
       console.log(`  ${result.apiKey}`);
       console.log("");
+      console.log(chalk.gray(`  ${result.note}`));
     });
 
   keyCmd

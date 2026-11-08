@@ -14,9 +14,9 @@ test.describe('Homepage', () => {
 
   test('desktop and mobile navigation point to existing sections', async ({ page }) => {
     const desktop = page.locator('nav .nav-links a[href^="#"]');
-    expect(await desktop.evaluateAll(links => links.map(link => link.getAttribute('href')))).toEqual(['#capabilities', '#pricing']);
+    expect(await desktop.evaluateAll(links => links.map(link => link.getAttribute('href')))).toEqual(['#capabilities', '#a4-forge', '#pricing']);
     const mobile = page.locator('.nav-mobile a[href^="#"]');
-    expect(await mobile.evaluateAll(links => links.map(link => link.getAttribute('href')))).toEqual(['#capabilities', '#pricing', '#install', '#desktop', '#domains']);
+    expect(await mobile.evaluateAll(links => links.map(link => link.getAttribute('href')))).toEqual(['#capabilities', '#pricing', '#install', '#desktop', '#domains', '#a4-forge']);
     const navLinks = page.locator('nav a[href^="#"], .nav-mobile a[href^="#"]');
     const count = await navLinks.count();
 
