@@ -424,6 +424,13 @@ export async function setUserRolesAsync(input: Parameters<typeof setUserRoles>[0
   }, opts);
 }
 
+let cachedDummyHash: string | null = null;
+/** LIVE-VAULT-05: a verifier to run scrypt against for an unknown or revoked username. Lazy: every amc start imports this module. */
+function dummyHash(): string {
+  cachedDummyHash ??= hashPassword("amc-dummy-timing-pad");
+  return cachedDummyHash;
+}
+
 export function authenticateUser(params: {
   workspace: string;
   username: string;
@@ -440,6 +447,8 @@ export function authenticateUser(params: {
     };
   }
   const user = config.users.find((row) => row.username === params.username);
+  // LIVE-VAULT-05: these paths take the wrong-password time, so response time does not reveal which accounts exist.
+  if (!user || user.status !== "ACTIVE") verifyPassword(params.password, dummyHash());
   if (!user) {
     return {
       ok: false,
