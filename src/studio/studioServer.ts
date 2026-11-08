@@ -8393,6 +8393,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/onboarding/run" && method === "POST") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: [...CLI_BRIDGE_ROLES] })) return;
         const result = await onboardingRunForApi({
           workspace: options.workspace,
           authAgentId: auth.agentId
@@ -8419,12 +8420,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/cli/commands" && method === "GET") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: [...CLI_BRIDGE_ROLES] })) return;
         const commands = await cliBridgeList(options.workspace);
         json(res, 200, { commands });
         return;
       }
 
       if (pathname === "/cli/validate" && method === "POST") {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: [...CLI_BRIDGE_ROLES] })) return;
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = JSON.parse(body);
         const err = cliBridgeValidate(parsed);
