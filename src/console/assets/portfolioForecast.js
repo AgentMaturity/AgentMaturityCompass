@@ -1,3 +1,5 @@
+import { hostRouterPath } from "./hostPortfolio.js";
+
 function htmlEscape(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -8,8 +10,8 @@ function htmlEscape(value) {
 }
 
 export async function renderPortfolioForecastPage(params) {
-  const { root, card, apiGet } = params;
-  const data = await apiGet("/api/portfolio/forecast").catch(async () => {
+  const { root, card, apiGet, pathname } = params;
+  const workspaceForecast = async () => {
     const latest = await apiGet("/forecast/latest?scope=workspace");
     return {
       workspaceCount: 1,
@@ -32,7 +34,9 @@ export async function renderPortfolioForecastPage(params) {
         }
       ]
     };
-  });
+  };
+  const hostPath = hostRouterPath("/api/portfolio/forecast", pathname);
+  const data = hostPath === null ? await workspaceForecast() : await apiGet(hostPath).catch(workspaceForecast);
   const rows = Array.isArray(data.rows) ? data.rows : [];
   root.innerHTML = `
     ${card("Portfolio Forecast", `
