@@ -9,6 +9,11 @@
  * 
  * Development: pnpm api:start; production: pnpm build && pnpm api:start:production
  * Or deploy to Vercel/Railway/Fly.io
+ *
+ * POST routes are rate limited per client, 120 a minute (LIVE-RUNTIME-16). Behind a platform proxy (Vercel, Railway)
+ * every request arrives from the proxy, so set AMC_API_TRUSTED_CLIENT_IP_HEADER to the header that proxy writes the
+ * client address into (for example x-vercel-forwarded-for or x-forwarded-for); without it the limiter protects direct
+ * runs only. The limiter is in memory, so on serverless platforms it counts per instance.
  */
 
 import http from 'node:http';
@@ -20,6 +25,7 @@ import { amcVersion } from '../src/version.js';
 import { secretEquals } from '../src/utils/secretEquals.js';
 import { applySecurityHeaders } from '../src/studio/securityHeaders.js';
 import { applyServerTimeouts } from '../src/studio/serverTimeouts.js';
+import { makeRateLimiter } from '../src/studio/rateLimiter.js';
 import { questionBank } from '../src/diagnostic/questionBank.js';
 import { listAssurancePacks } from '../src/assurance/packs/index.js';
 import { listIndustryPacks } from '../src/domains/industryPacks.js';
@@ -172,6 +178,16 @@ function computeQuickScore(req: QuickScoreRequest): ScoreResult {
   };
 }
 
+const postLimiter = makeRateLimiter(120, 60_000);
+
+/** The client a POST is counted against: the configured proxy header's first value, else the socket address. */
+function clientKey(req: http.IncomingMessage): string {
+  const header = process.env.AMC_API_TRUSTED_CLIENT_IP_HEADER?.trim().toLowerCase();
+  const value = header ? req.headers[header] : undefined;
+  const first = (Array.isArray(value) ? value[0] : value)?.split(',', 1)[0]?.trim();
+  return first || req.socket.remoteAddress || 'unknown';
+}
+
 function sendJson(res: http.ServerResponse, status: number, payload: unknown) {
   res.writeHead(status, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify(payload, null, 2));
@@ -291,6 +307,10 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
     res.end();
     return;
   }
+  if (method === 'POST' && !postLimiter(clientKey(req))) {
+    sendJson(res, 429, { error: 'rate limited' });
+    return;
+  }
   
   // Routes
   if (path === '/api/health' && method === 'GET') {
@@ -340,8 +360,10 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
         activationCommand: 'amc domain pack activate --key <license-key>',
       });
     } catch (e) {
+      // LIVE-RUNTIME-16: a fixed answer; the reason (it can quote a key parse failure) goes to the server log only.
+      console.error(`industry packs: licence issue failed: ${e instanceof Error ? e.message : String(e)}`);
       sendJson(res, 503, {
-        error: e instanceof Error ? e.message : 'license issue failed',
+        error: 'licence issuing is not configured',
         requiredEnv: ['AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY', 'AMC_INDUSTRY_PACKS_ADMIN_TOKEN'],
       });
     }

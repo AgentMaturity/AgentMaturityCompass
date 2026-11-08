@@ -170,3 +170,43 @@ describe("payment webhook: Stripe-Signature over the raw body, idempotent", () =
     }
   });
 });
+
+// LIVE-RUNTIME-16: a fixed licence-issue error, and a per-client POST limiter that can read the platform proxy's header.
+// The socket-keyed case runs last: it uses up 127.0.0.1's bucket for the rest of the minute.
+describe("hosted API error text and rate limit", () => {
+  it("a broken issuing key answers the fixed 503 and never echoes the key", async () => {
+    const { adminToken } = configureIssuing();
+    vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY", "-----BEGIN PRIVATE KEY-----\nNOT-A-REAL-KEY-7F3A\n-----END PRIVATE KEY-----");
+    const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const response = await fetch(`${origin}/api/industry-packs/license/issue`, { method: "POST", headers: { "x-amc-admin-token": adminToken },
+      body: JSON.stringify({ subscriptionId: "sub_1", expiresAt: "2099-01-01T00:00:00.000Z" }) });
+    const text = await response.text();
+    expect(response.status).toBe(503);
+    expect(JSON.parse(text)).toEqual({ error: "licence issuing is not configured",
+      requiredEnv: ["AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY", "AMC_INDUSTRY_PACKS_ADMIN_TOKEN"] });
+    expect(text).not.toContain("NOT-A-REAL-KEY");
+    expect(logged).toHaveBeenCalled();
+  });
+
+  const quickscores = async (count: number, headerFor: (index: number) => Record<string, string>): Promise<number[]> => {
+    const statuses: number[] = [];
+    for (let index = 0; index < count; index += 1) {
+      statuses.push((await fetch(`${origin}/api/quickscore`, { method: "POST", headers: headerFor(index),
+        body: JSON.stringify({ agentId: "a", responses: {} }) })).status);
+    }
+    return statuses;
+  };
+
+  it("with AMC_API_TRUSTED_CLIENT_IP_HEADER set, clients are told apart by that header", async () => {
+    vi.stubEnv("AMC_API_TRUSTED_CLIENT_IP_HEADER", "x-test-client-ip");
+    expect(await quickscores(121, (index) => ({ "x-test-client-ip": index % 2 === 0 ? "198.51.100.1" : "198.51.100.2" }))).not.toContain(429);
+    const one = await quickscores(121, () => ({ "x-test-client-ip": "198.51.100.3" }));
+    expect(one.at(-1)).toBe(429);
+    expect(one.filter((status) => status === 429)).toHaveLength(1);
+  }, 120_000);
+
+  it("without it, one socket address is one client: the 121st POST in a minute is refused", async () => {
+    const statuses = await quickscores(121, () => ({}));
+    expect(statuses.at(-1)).toBe(429);
+  }, 120_000);
+});
