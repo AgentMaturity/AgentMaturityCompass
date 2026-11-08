@@ -12,11 +12,12 @@
  */
 
 import http from 'node:http';
-import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 import { readdirSync, realpathSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { amcVersion } from '../src/version.js';
+import { secretEquals } from '../src/utils/secretEquals.js';
 import { questionBank } from '../src/diagnostic/questionBank.js';
 import { listAssurancePacks } from '../src/assurance/packs/index.js';
 import { listIndustryPacks } from '../src/domains/industryPacks.js';
@@ -193,12 +194,6 @@ async function readJsonBody<T>(req: http.IncomingMessage, maxBytes = 1_048_576):
   return (raw ? JSON.parse(raw) : {}) as T;
 }
 
-/** Equal-length digests, so the compare takes the same time whatever was sent and leaks no length. */
-function sameSecret(provided: string, expected: string): boolean {
-  const digest = (value: string) => createHash('sha256').update(value, 'utf8').digest();
-  return timingSafeEqual(digest(provided), digest(expected));
-}
-
 function hasAdminToken(req: http.IncomingMessage): boolean {
   const expected = process.env.AMC_INDUSTRY_PACKS_ADMIN_TOKEN;
   if (!expected) {
@@ -209,7 +204,7 @@ function hasAdminToken(req: http.IncomingMessage): boolean {
     : null;
   const header = req.headers['x-amc-admin-token'];
   const provided = bearer ?? (Array.isArray(header) ? header[0] : header);
-  return typeof provided === 'string' && sameSecret(provided, expected);
+  return secretEquals(provided, expected);
 }
 
 const WEBHOOK_TOLERANCE_SECONDS = 300;

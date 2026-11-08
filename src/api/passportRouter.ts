@@ -3,6 +3,7 @@ import { z } from "zod";
 import { apiError, apiRequestError, apiSuccess, bodyJsonSchema, isRequestBodyError, pathParam } from "./apiHelpers.js";
 import { requestTrustOverride } from "../trust/requestTrust.js";
 import { sha256Hex } from "../utils/hash.js";
+import { secretEquals } from "../utils/secretEquals.js";
 import {
   passportPublicForApi,
   passportRegistryForApi,
@@ -80,12 +81,10 @@ export async function handlePassportRoute(
 
   const revokeParams = pathParam(pathname, "/api/v1/passport/:id/revoke");
   if (revokeParams && method === "POST") {
-    if ((apiToken ?? "").trim().length > 0) {
-      const provided = firstHeader(req.headers["x-amc-admin-token"]);
-      if (provided !== apiToken) {
-        apiError(res, 401, "Missing or invalid admin token");
-        return true;
-      }
+    // LIVE-RUNTIME-08: constant time, and a missing configured token refuses instead of skipping the check.
+    if (!secretEquals(firstHeader(req.headers["x-amc-admin-token"]), apiToken)) {
+      apiError(res, 401, "Missing or invalid admin token");
+      return true;
     }
     let body: z.infer<typeof passportRevokeBodySchema> = {};
     try {
