@@ -44,12 +44,15 @@ Best for:
 - local development on the repo itself
 
 ```bash
+corepack enable
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
-npm ci
-npm run build
+pnpm install --frozen-lockfile
+pnpm run build
 npm link
 ```
+
+AMC is a pnpm workspace: `npm ci` cannot resolve the vendored packages' `workspace:*` protocol, so it fails here by design ([INSTALL.md](INSTALL.md#option-b-from-github-development)).
 
 ## OS notes
 
@@ -81,7 +84,7 @@ See also:
 Use the path you installed with:
 - macOS/Linux release installer -> rerun `curl -fsSL https://agentmaturity.co/install.sh | sh`
 - Windows release installer -> rerun `irm https://agentmaturity.co/install.ps1 | iex`
-- source → `git pull && npm ci && npm run build`
+- source → `git pull && pnpm install --frozen-lockfile && pnpm run build`
 - Docker → pull/update image or compose stack
 
 ## Packaging roadmap

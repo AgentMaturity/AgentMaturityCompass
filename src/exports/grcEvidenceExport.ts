@@ -14,6 +14,7 @@ import {
   type ClaimEnvelope,
   type DiagnosticReportClaimInput
 } from "../claims/eligibility/index.js";
+import { distrustUnsealedReport } from "../claims/eligibility/adapters/results.js";
 import { evaluateDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -86,14 +87,6 @@ const DISCLAIMER =
 
 const LOW_COVERAGE_BELOW = 0.75;
 
-/**
- * A run file whose seal does not verify vouches for nothing: its own VALID status cannot sign for it,
- * and its observed coverage cannot raise the claim kind.
- */
-function trustedFields(report: DiagnosticReportClaimInput, sealVerified: boolean): DiagnosticReportClaimInput {
-  return sealVerified || report.status !== "VALID" ? report : { ...report, status: "INVALID" };
-}
-
 function runClaim(report: DiagnosticReportClaimInput, sealVerified: boolean, now: number): ClaimEnvelope {
   const envelope = envelopeForDiagnosticReport(report, now);
   return sealVerified ? envelope : { ...envelope, claimKind: "self_reported" };
@@ -129,7 +122,8 @@ function finiteOrNull(value: unknown): number | null {
 export function buildGrcEvidenceManifest(framework: GrcFramework, input: DiagnosticReportClaimInput,
   options: { sealVerified: boolean; now: number }): GrcEvidenceManifestV2 {
   const { sealVerified, now } = options;
-  const report = trustedFields(input, sealVerified);
+  // A run file whose seal does not verify vouches for nothing: one gate strips what it says about itself (S2).
+  const report = sealVerified ? input : distrustUnsealedReport(input);
   const claim = runClaim(report, sealVerified, now);
   const runLabel = renderClaimLabel(claim);
   const signal = (name: GrcRunSignal["name"], value: GrcRunSignal["value"]): GrcRunSignal =>

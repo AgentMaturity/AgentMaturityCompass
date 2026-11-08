@@ -83,7 +83,7 @@ variable "storage_class_name" {
 
 variable "ingress_enabled" {
   type        = bool
-  description = "Enable Kubernetes Ingress."
+  description = "Enable Kubernetes Ingress. A values file must then set env.AMC_TRUSTED_PROXY_HOPS and env.AMC_TRUSTED_PROXY_CIDRS (the ingress controller pods' addresses), or the chart refuses to render."
   default     = false
 }
 

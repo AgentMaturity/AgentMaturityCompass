@@ -230,6 +230,7 @@ describe("L0-IDN-01 unique agent identity under an active compiled plan (compile
     for (const key of [null, `WORKSPACE_ROUTER:${owner.userId}`, "LOCAL_USER:user-not-in-users-yaml", "bootstrap-admin"]) {
       expect(() => lease(key), String(key)).toThrow(LeasePrincipalRefused);
     }
+    addUser({ workspace: ws, username: "layer0-backup-owner", password: "layer0-backup-password", roles: ["OWNER"] }); // LIVE-VAULT-17: one OWNER remains
     revokeUser({ workspace: ws, username: "layer0-owner" });
     expect(() => lease(`LOCAL_USER:${owner.userId}`), "a deactivated user").toThrow(/PRINCIPAL_UNRESOLVED/);
   });

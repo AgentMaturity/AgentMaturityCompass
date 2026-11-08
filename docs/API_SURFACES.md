@@ -37,7 +37,7 @@ Response envelope:
 - most `/api/v1` routes return errors as `{ "ok": false, "error": "...", "requestId": "..." }`
 - exception: `GET /api/v1/health` returns the raw health payload
 - every `/api/v1` response from Studio and the dashboard carries an `X-Request-Id` header; an error body's `requestId` is the same value
-- the id is a fresh random UUID. Studio uses an inbound `X-Request-Id` only behind a trusted proxy (`AMC_TRUSTED_PROXY_HOPS` above 0 and an allowed peer) and only when it matches `^[A-Za-z0-9._:-]{8,128}$`; the dashboard and every other caller ignore it. The id is a correlation hint, never an authorization, deduplication or idempotency key
+- the id is a fresh random UUID. Studio uses an inbound `X-Request-Id` only on a request a trusted proxy forwarded (`AMC_TRUSTED_PROXY_HOPS` above 0 and a peer in `AMC_TRUSTED_PROXY_CIDRS` that sent `X-Forwarded-For`) and only when it matches `^[A-Za-z0-9._:-]{8,128}$`; the dashboard and every other caller ignore it. The id is a correlation hint, never an authorization, deduplication or idempotency key
 - each error response writes one JSON line to stderr: `ts`, `level` (`warn` for 4xx, `error` for 5xx), `requestId`, `method`, `path` (the pathname, never the query string), `status`, `durationMs` and `error`. A 500 line adds `detail` (name, message capped at 2,000 characters, stack capped at 10 lines), with secrets redacted by the shared redaction table. Headers, bodies, tokens and cookies are never logged
 - a 500 body is always `{ "ok": false, "error": "Internal server error", "requestId": "..." }`: it never contains exception text, file paths or storage errors. Look the id up in the log line for the detail. Deliberate 503 texts keep their message
 - a request body over 1,048,576 bytes is 413 `JSON body exceeds 1048576 bytes` on every route: a declared `Content-Length` over the limit is refused before the route runs, and a streamed body without a length is cut off at the limit (413) when the route reads it
@@ -575,7 +575,7 @@ This is the largest API surface today and should be treated as internal operatio
 
 Claim labels (P0-23):
 - the Studio routes that feed result pages, listed in `src/studio/studioClaimOutput.ts`, add `claimKind`, `statusDimensions` and `claimLabel` to every 2xx body, or a `claim` on each item of `/assurance/runs` and `/industry-packs/list`
-- the console shows those claims in a strip on each result page, with the kind and result in a pill, the five dimensions in its tooltip and a link to the legend; "not evaluated" is a neutral state with its reason, never 0
+- the console shows those claims in a strip on each result page, with the kind and result in a pill, the five dimensions in its tooltip and a collapsed legend below the pills; "not evaluated" is a neutral state with its reason, never 0
 - Studio's `/industry-packs/*` success responses add `entitlementNote`: Industry Packs are free, and access never changes a result, a trust tier or a verification outcome. Claim fields never depend on a licence
 - `/industry-packs/:id` refuses inherited names such as `__proto__` and `constructor` as pack ids
 

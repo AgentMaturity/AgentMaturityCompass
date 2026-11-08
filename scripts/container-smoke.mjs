@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 /** Linux Docker acceptance for already-built local images; never builds or publishes. */
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { verifyPackedRun } from "./packed-evidence-verification.mjs";
+import { STUDIO_HTTP_PROBE } from "./lib/studio-http-probe.mjs";
 
 const args = process.argv.slice(2);
 const value = (flag) => { const i = args.indexOf(flag); return i >= 0 ? args[i + 1] : null; };
@@ -16,7 +17,7 @@ const receiptPath = resolve(value("--out") ?? "tmp/container-smoke.json");
 const id = `amc-smoke-${randomUUID()}`;
 const dir = mkdtempSync(join(tmpdir(), "amc-container-secrets-"));
 const containers = []; const volumes = []; const secrets = [];
-const receipt = { schemaVersion: "2026-09-08", startedAt: new Date().toISOString(), targetPlatform: "linux", hostPlatform: process.platform, dockerEngine: null, requestedStudioImage, requestedRunnerImage, studioImage: null, runnerImage: null, checks: [], verificationResults: [], cleanupResults: [], ok: false };
+const receipt = { schemaVersion: "2026-09-08", startedAt: new Date().toISOString(), targetPlatform: "linux", hostPlatform: process.platform, dockerEngine: null, requestedStudioImage, requestedRunnerImage, studioImage: null, runnerImage: null, checks: [], verificationResults: [], cleanupResults: [], resourceSamples: [], ok: false };
 const redact = (text) => secrets.reduce((value, secret) => value.replaceAll(secret, "[REDACTED]"), text);
 function docker(command, { checked = true, timeout = 120000 } = {}) {
   const result = spawnSync("docker", command, { encoding: "utf8", timeout, maxBuffer: 8 * 1024 * 1024 });
@@ -34,7 +35,25 @@ function secret(name, content) {
   return ["--mount", `type=bind,src=${path},dst=/run/secrets/${name},readonly`];
 }
 function volume(name) { const v = `${id}-${name}`; docker(["volume", "create", v]); volumes.push(v); return v; }
-const sandbox = ["--read-only", "--cap-drop=ALL", "--security-opt=no-new-privileges", "--tmpfs", "/tmp", "--tmpfs", "/home/amc:uid=10001,gid=10001,mode=0700"];
+const sandbox = ["--read-only", "--cap-drop=ALL", "--security-opt=no-new-privileges", "--tmpfs", "/tmp"];
+// The runner target mounts nothing beneath its home, so a tmpfs home is harmless there. Studio must not get one: its state
+// volume nests beneath the home, and Docker would create that mount point root:root 0755, which Studio refuses.
+const runnerSandbox = [...sandbox, "--tmpfs", "/home/amc:uid=10001,gid=10001,mode=0700"];
+/** The shipped Studio layout (deploy/compose, docker/README.md): state and signed-control checkpoint volumes, no tmpfs home. */
+const studioLayout = (state, checkpoints) => ["--mount", `type=volume,src=${state},dst=/home/amc/.config/amc/state`,
+  "--mount", `type=volume,src=${checkpoints},dst=/workspace`, "-e", "AMC_CONTROL_CHECKPOINT_DIR=/workspace/control-checkpoints"];
+function dockerAsync(command, timeout = 120000) {
+  return new Promise((done) => {
+    const child = spawn("docker", command, { timeout }); let stdout = ""; let stderr = "";
+    child.stdout.on("data", (chunk) => { stdout += chunk; }); child.stderr.on("data", (chunk) => { stderr += chunk; });
+    child.on("close", (code) => done({ ok: code === 0, exitCode: code, stdout, stderr }));
+  });
+}
+/** One `docker stats` sample of a container, labelled; recorded only (LIVE-DEPLOY-14). */
+function sampleResources(label, container) {
+  const result = docker(["stats", "--no-stream", "--format", "{{.MemUsage}} {{.CPUPerc}}", container], { checked: false, timeout: 30000 });
+  receipt.resourceSamples.push({ label, container, at: new Date().toISOString(), stats: result.ok ? result.stdout.trim() : null });
+}
 const cliWithSecret = ["sh", "-c", 'export AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")"; exec amc "$@"', "sh"];
 /** Node one-liner printing the workspace's monitor-key fingerprint, recorded before any turn so it can anchor the ledger (P0-09). */
 const monitorFingerprint = (workspace) => `process.stdout.write(require('node:crypto').createHash('sha256')`
@@ -58,10 +77,12 @@ if(!manifest.packages.length || !manifest.packages.every(p=>notices.includes('##
 console.log(JSON.stringify({uid:process.getuid(),bundledPackages:manifest.packages.length,version:r("./package.json").version}));`;
 async function studio() {
   const name = `${id}-studio`; const data = volume("studio-data");
+  const layout = studioLayout(volume("studio-state"), volume("studio-checkpoints"));
   const vaultMount = secret("vault", randomUUID() + randomUUID());
   const mounts = [...vaultMount, ...secret("owner-user", "container-owner"), ...secret("owner-pass", randomUUID() + randomUUID())];
   containers.push(name);
-  docker(["run", "-d", "--name", name, "-p", "127.0.0.1::3212", ...sandbox, "--mount", `type=volume,src=${data},dst=/data/amc`, ...mounts,
+  docker(["run", "-d", "--name", name, "-p", "127.0.0.1::3212", "--stop-timeout", "40", ...sandbox,
+    "--mount", `type=volume,src=${data},dst=/data/amc`, ...layout, ...mounts,
     "-e", "AMC_BOOTSTRAP=1", "-e", "AMC_BIND=0.0.0.0", "-e", "AMC_LAN_MODE=true", "-e", "AMC_ENABLE_NOTARY=0",
     "-e", "AMC_ALLOWED_CIDRS=127.0.0.1/32,::1/128,172.16.0.0/12,10.0.0.0/8,192.168.0.0/16",
     "-e", "AMC_VAULT_PASSPHRASE_FILE=/run/secrets/vault", "-e", "AMC_BOOTSTRAP_OWNER_USERNAME_FILE=/run/secrets/owner-user",
@@ -69,7 +90,8 @@ async function studio() {
   async function ready() {
     const deadline = Date.now() + 180000;
     while (Date.now() < deadline) {
-      if (docker(["exec", name, "amc", "studio", "healthcheck"], { checked: false, timeout: 15000 }).ok) return;
+      // The image HEALTHCHECK script: it bounds its own requests, so nothing is left running in the container.
+      if (docker(["exec", name, "node", "-e", STUDIO_HTTP_PROBE], { checked: false, timeout: 15000 }).ok) return;
       const state = docker(["inspect", "--format", "{{.State.Running}}", name]).stdout.trim();
       if (state !== "true") throw new Error("Studio exited before readiness");
       await new Promise((done) => setTimeout(done, 1000));
@@ -84,6 +106,7 @@ const auth=await fetch(base+'/agents',{headers:{'x-amc-admin-token':token},signa
 if(unauth.status!==401||auth.status!==200)throw Error('authorization verdict '+unauth.status+'/'+auth.status);
 console.log(JSON.stringify({unauthenticated:unauth.status,authenticated:auth.status}));})().catch(e=>{console.error(e.message);process.exit(1)});`;
   await ready(); check("studio: default entrypoint reaches readiness", true);
+  sampleResources("after readiness", name);
   async function publishedRoutes(label) {
     const state = JSON.parse(docker(["inspect", name]).stdout)[0];
     const port = state.NetworkSettings.Ports["3212/tcp"][0].HostPort;
@@ -99,10 +122,20 @@ console.log(JSON.stringify({unauthenticated:unauth.status,authenticated:auth.sta
   const invoke = (args) => docker(["exec", "-w", "/data/amc", name, ...cliWithSecret, ...args]);
   const expectMonitor = docker(["exec", name, "node", "-e", monitorFingerprint("/data/amc")]).stdout.trim();
   const summary = JSON.parse(invoke(["agent-loop", "run", "--provider", "stub", "--json", "say hello"]).stdout);
+  sampleResources("after the stub turn", name);
+  // A signed control (firewall policy) checkpoints under AMC_CONTROL_CHECKPOINT_DIR on the checkpoint volume; the same
+  // CLI run inside Studio is what an operator does. The sample is taken while the CLI runs in Studio's cgroup.
+  const publishing = dockerAsync(["exec", "-w", "/data/amc", name, ...cliWithSecret, "firewall", "enable", "--mode", "observe", "--json"]);
+  sampleResources("during the firewall publish", name);
+  const published = await publishing;
+  let firewall = null;
+  try { firewall = JSON.parse(published.stdout); } catch { firewall = null; }
+  check("studio: signed firewall control published to the checkpoint volume", published.ok && firewall?.changed === true
+    && String(firewall?.checkpointPath).startsWith("/workspace/control-checkpoints/"), { revision: firewall?.revision ?? null, stderr: redact(published.stderr.slice(-1500)) });
   // The live legacy gateway seals only during shutdown. Verify completeness after
   // graceful stop, in fresh CLI containers that cannot reuse the Studio process's keys.
   const coldBase = ["run", "--rm", "--network", "none", ...sandbox, "-w", "/data/amc",
-    "--mount", `type=volume,src=${data},dst=/data/amc`, ...vaultMount, "-e", "AMC_VAULT_PASSPHRASE_FILE=/run/secrets/vault"];
+    "--mount", `type=volume,src=${data},dst=/data/amc`, ...layout, ...vaultMount, "-e", "AMC_VAULT_PASSPHRASE_FILE=/run/secrets/vault"];
   function coldInvoke(phase, args) {
     const result = docker([...coldBase, "--entrypoint", "sh", studioImage, ...cliWithSecret.slice(1), ...args], { checked: false });
     let report;
@@ -115,6 +148,12 @@ console.log(JSON.stringify({unauthenticated:unauth.status,authenticated:auth.sta
   check("studio: keyless turn and cold signed verification after graceful shutdown", verifyCold("first shutdown"));
   docker(["start", name]); await ready();
   await publishedRoutes("studio after restart");
+  check("studio: anti-rollback marks persist on the state volume across restart",
+    docker(["exec", name, "test", "-f", "/home/amc/.config/amc/state/high-water.json"], { checked: false }).ok);
+  const status = JSON.parse(invoke(["firewall", "status", "--json"]).stdout);
+  check("studio: signed firewall control survives restart", status.enabled === true && status.mode === "observe"
+    && status.integrity === "trusted" && String(status.policyCheckpointPath).startsWith("/workspace/control-checkpoints/"),
+    { integrity: status.integrity, revision: status.policyRevision });
   docker(["exec", name, "node", "-e", auth]);
   check("studio: restart preserves authenticated access", true);
   docker(["stop", "--time", "30", name]);
@@ -138,7 +177,7 @@ console.log(JSON.stringify({unauthenticated:unauth.status,authenticated:auth.sta
 function runner() {
   const data = volume("runner-data");
   const mount = secret("runner-vault", randomUUID() + randomUUID());
-  const base = ["run", "--rm", ...sandbox, "--mount", `type=volume,src=${data},dst=/workspace`, ...mount,
+  const base = ["run", "--rm", ...runnerSandbox, "--mount", `type=volume,src=${data},dst=/workspace`, ...mount,
     "-e", "AMC_VAULT_PASSPHRASE_FILE=/run/secrets/runner-vault"];
   const installed = JSON.parse(docker([...base, "--entrypoint", "node", runnerImage, "-e", installedCheck]).stdout);
   check("runner: non-root installed artifact, SQLite and bundle notices", true, installed);

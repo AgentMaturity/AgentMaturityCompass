@@ -98,7 +98,8 @@ export function loadSessionEventHistory(options: SessionEventHistoryOptions): Se
   for (const flag of [options.requireSealed, options.verifyPayloads]) {
     if (flag !== undefined && typeof flag !== "boolean") historyRefuse("INVALID_INPUT", "Verification switches must be booleans.");
   }
-  const expectedMonitorFingerprint = options.expectedMonitorFingerprint ?? process.env.AMC_EXPECTED_MONITOR_FINGERPRINT;
+  // An empty AMC_EXPECTED_MONITOR_FINGERPRINT (a chart or .env with no pin yet) is no pin; an empty explicit option is refused.
+  const expectedMonitorFingerprint = options.expectedMonitorFingerprint ?? (process.env.AMC_EXPECTED_MONITOR_FINGERPRINT || undefined);
   for (const digest of [expectedMonitorFingerprint, options.expectedHeadEventHash]) {
     if (digest !== undefined && (typeof digest !== "string" || !/^[a-f0-9]{64}$/.test(digest))) {
       historyRefuse("INVALID_INPUT", "Expected fingerprints and heads must be complete lowercase SHA-256 values obtained independently.");

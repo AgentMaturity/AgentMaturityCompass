@@ -14,7 +14,7 @@ import { getPublicKeyHistory, verifyHexDigestAny } from "../../src/crypto/keys.j
 import { transitionConfigSignatureProvider } from "../../src/keys/configProviderTransition.js";
 import { revokeKey, rotatePurposeKeys } from "../../src/keys/purposeKeys.js";
 import { signingKeyId, verifyCanonical } from "../../src/keys/algorithmPolicy.js";
-import { activeUserRecord, initUsersConfigAsync, createSession, revokeSessionByToken, setUserRolesAsync, verifyTrackedSessionToken, verifyUsersConfigSignature } from "../../src/auth/authApi.js";
+import { activeUserRecord, addUserAsync, initUsersConfigAsync, createSession, revokeSessionByToken, setUserRolesAsync, verifyTrackedSessionToken, verifyUsersConfigSignature } from "../../src/auth/authApi.js";
 import { verifySessionToken } from "../../src/auth/sessionTokens.js";
 import { startStudioApiServer } from "../../src/studio/studioServer.js";
 import { lockVault } from "../../src/vault/vault.js";
@@ -272,6 +272,7 @@ describe("actual config-purpose execution-ticket producers and callers", () => {
     const paused = f.pause(), pending = runtime.issue(headers);
     try {
       expect(await Promise.race([paused.entered.promise.then(() => "signed"), pending.then(() => "returned", () => "rejected")])).toBe("signed");
+      await addUserAsync({ workspace: f.workspace, username: "backup-owner", password: "backup-owner-pass-123", roles: ["OWNER"] }); // LIVE-VAULT-17: one OWNER remains
       await setUserRolesAsync({ workspace: f.workspace, username: "ticket-owner", roles: ["VIEWER"] });
       expect(verifyUsersConfigSignature(f.workspace).valid).toBe(true);
       expect(activeUserRecord(f.workspace, runtime.session.payload.userId)?.roles).toEqual(["VIEWER"]);

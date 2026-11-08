@@ -86,6 +86,8 @@ describe("committed plan-edits manifest (D-15)", () => {
     expect(validatePlanEdits(manifest([axe]))).toEqual([axe]);
     const gap = entry({ issue: "GAP-WP38", archivePath: "unused-code/plan-edits/GAP-WP38/src/a.ts.landed" });
     expect(validatePlanEdits(manifest([gap]))).toEqual([gap]);
+    const live = entry({ issue: "LIVE-VAULT-07", archivePath: "unused-code/plan-edits/LIVE-VAULT-07/src/a.ts.landed" });
+    expect(validatePlanEdits(manifest([live]))).toEqual([live]);
     const bad: Array<[unknown, string]> = [
       [{ ...manifest([]), schemaVersion: 2 }, "header"],
       [{ ...manifest([]), decision: "D-14" }, "header"],
@@ -99,6 +101,8 @@ describe("committed plan-edits manifest (D-15)", () => {
       [manifest([entry({ issue: "P9-01", archivePath: "unused-code/plan-edits/P9-01/src/a.ts.landed" })]), "issue"],
       [manifest([entry({ issue: "AXE-22", archivePath: "unused-code/plan-edits/AXE-22/src/a.ts.landed" })]), "issue"],
       [manifest([entry({ issue: "GAP-WP3", archivePath: "unused-code/plan-edits/GAP-WP3/src/a.ts.landed" })]), "issue"],
+      [manifest([entry({ issue: "LIVE-VAULT-7", archivePath: "unused-code/plan-edits/LIVE-VAULT-7/src/a.ts.landed" })]), "issue"],
+      [manifest([entry({ issue: "LIVE-OTHER-01", archivePath: "unused-code/plan-edits/LIVE-OTHER-01/src/a.ts.landed" })]), "issue"],
       [manifest([entry({ path: "../outside.ts", archivePath: "unused-code/plan-edits/P0-06/../outside.ts.landed" })]), "path"],
       [manifest([entry({ path: "src\\a.ts", archivePath: "unused-code/plan-edits/P0-06/src\\a.ts.landed" })]), "path"],
     ];
@@ -171,7 +175,7 @@ describe("scripts/snapshot-plan-edit.mjs", () => {
     expect(landedSourceAt(root).landedText("src/a.ts")).toBe("a at base\n");
   });
 
-  it.each(["AXE-23", "AXE-27"])("archives %s base bytes without changing the existing plan-issue contract", (issue) => {
+  it.each(["AXE-23", "AXE-27", "LIVE-VAULT-07"])("archives %s base bytes without changing the existing plan-issue contract", (issue) => {
     const { root, base } = repo();
     const result = snapshot(root, "--issue", issue, "--base", "HEAD", "src/a.ts");
     expect(result.stderr).toBe("");
@@ -201,6 +205,7 @@ describe("scripts/snapshot-plan-edit.mjs", () => {
       [["--issue", "P4-01", "--base", "HEAD", "src/a.ts"], "Issue key"],
       [["--issue", "AXE-22", "--base", "HEAD", "src/a.ts"], "Issue key"],
       [["--issue", "GAP-38", "--base", "HEAD", "src/a.ts"], "Issue key"],
+      [["--issue", "LIVE-VAULT", "--base", "HEAD", "src/a.ts"], "Issue key"],
       [["--issue", "P0-06", "--base", "HEAD", "../outside.ts"], "outside the repository"],
       [["--issue", "P0-06", "--base", "HEAD", "src/missing.ts"], "not present at HEAD"],
       [["--issue", "P0-06", "--base", "HEAD", "src"], "not present at HEAD"],

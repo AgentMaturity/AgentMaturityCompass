@@ -123,9 +123,9 @@ export function renderUnifiedResult(result: UnifiedRunResult, opts?: { ci?: bool
   if (opts?.firstRun) {
     lines.push("");
     lines.push(`  ${BOLD}${WHITE}What to do next${RESET}`);
-    lines.push(`  ${GREEN}1.${RESET} Open the Compass Console shown above and follow the steps.`);
+    lines.push(`  ${GREEN}1.${RESET} Open the Compass Console shown above and sign in (first time: amc user init --username <you>).`);
     lines.push(`  ${GREEN}2.${RESET} Let AMC watch your agent work: ${WHITE}amc connect --status${RESET}`);
-    lines.push(`  ${GREEN}3.${RESET} Re-run anytime with one command: ${WHITE}amc start${RESET}`);
+    lines.push(`  ${GREEN}3.${RESET} Re-run the score anytime: ${WHITE}amc run${RESET}`);
   } else {
     lines.push(`  ${DIM}CI gate:${RESET}    ${WHITE}amc run --fail-below B${RESET}`);
     lines.push(`  ${DIM}Badge:${RESET}      ${WHITE}amc badge${RESET}`);

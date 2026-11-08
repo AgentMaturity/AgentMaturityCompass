@@ -256,8 +256,9 @@ export async function runAssurance(input: RunAssuranceInput, options: RunHashPub
         attests: { sandboxBackend: "process-confinement", confinementReceiptSha256: sha256Hex(canonicalize(confinement)), confinement }
       });
     } else if (confinement !== null) {
-      process.stderr.write(`[assurance] --mode sandbox was requested, but this assurance run is unconfined (${processConfinementReason(confinement)}); `
-        + "no SANDBOX_EXECUTION_ENABLED evidence is written\n");
+      // Once per run; `amc up` and `amc` request sandbox mode themselves, so the notice names the mode, not a flag.
+      process.stderr.write("[assurance] Sandbox mode was requested, but this assurance run is unconfined, so no SANDBOX_EXECUTION_ENABLED "
+        + `evidence is written. Reason: ${processConfinementReason(confinement)}.\n`);
     }
 
     let responderPromise: Promise<AgentResponder> | undefined;

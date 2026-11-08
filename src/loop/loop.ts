@@ -3,7 +3,7 @@ import { resolveAgentId, getAgentPaths } from "../fleet/paths.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { runDiagnostic } from "../diagnostic/runner.js";
 import { runAssurance } from "../assurance/assuranceRunner.js";
-import { buildDashboard } from "../dashboard/build.js";
+import { agentDashboardDir, buildDashboard } from "../dashboard/build.js";
 import { createUnifiedClaritySnapshot } from "../snapshot/snapshot.js";
 import { createTransformPlanAsync } from "../transformation/transformPlanner.js";
 import { runTransformTrackerAsync } from "../transformation/transformTracker.js";
@@ -170,7 +170,7 @@ export async function loopRun(params: {
   });
 
   const paths = getAgentPaths(params.workspace, agentId);
-  const dashboardDir = join(paths.rootDir, "dashboard");
+  const dashboardDir = agentDashboardDir(params.workspace, agentId);
   buildDashboard({
     workspace: params.workspace,
     agentId,

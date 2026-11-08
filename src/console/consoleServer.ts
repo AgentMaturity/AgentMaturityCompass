@@ -3,6 +3,20 @@ import { fileURLToPath } from "node:url";
 import type { ServerResponse } from "node:http";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 
+/**
+ * Console pages load their scripts, styles, manifest and service worker from /console and call only this server. Style
+ * attributes in rendered markup need inline styles; scripts get no inline allowance. Referrer-Policy is same-origin, not
+ * no-referrer: under no-referrer a browser sends `Origin: null` on form posts, which Studio's CORS check refuses.
+ */
+export const CONSOLE_CONTENT_SECURITY_POLICY = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; "
+  + "base-uri 'none'; form-action 'self'; frame-ancestors 'none'";
+const CONSOLE_SECURITY_HEADERS: Readonly<Record<string, string>> = {
+  "Content-Security-Policy": CONSOLE_CONTENT_SECURITY_POLICY,
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Referrer-Policy": "same-origin"
+};
+
 function moduleDir(): string {
   return dirname(fileURLToPath(import.meta.url));
 }
@@ -53,6 +67,9 @@ export function serveConsolePath(pathname: string, res: ServerResponse): boolean
   // /console/snapshot is handled by the auth-protected API handler
   if (pathname === "/console/snapshot") {
     return false;
+  }
+  for (const [name, value] of Object.entries(CONSOLE_SECURITY_HEADERS)) {
+    res.setHeader(name, value);
   }
   const file = resolveConsolePath(pathname);
   if (!file || !pathExists(file)) {

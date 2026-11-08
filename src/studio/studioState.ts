@@ -72,6 +72,25 @@ export function writeStudioState(workspace: string, state: StudioState): void {
   writeFileAtomic(studioStatePath(workspace), JSON.stringify(state, null, 2), 0o644);
 }
 
+/**
+ * Where a local probe reaches the running Studio (`amc studio healthcheck`, coordinator section 9): the address state.json
+ * records, so a default-port fallback or the signed LAN port is probed where Studio really listens; the configured
+ * address when there is no state. A wildcard bind is probed on loopback. state.json is unsigned: it picks a probe target,
+ * nothing more.
+ */
+export function studioProbeBase(workspace: string, configured: { host: string; port: number }): string {
+  let state: StudioState | null = null;
+  try {
+    state = readStudioState(workspace);
+  } catch {
+    state = null; // an unreadable state file: probe the configured address, which fails truthfully if Studio is elsewhere
+  }
+  const host = typeof state?.host === "string" && state.host.length > 0 ? state.host : configured.host;
+  const port = Number.isInteger(state?.apiPort) && state!.apiPort > 0 ? state!.apiPort : configured.port;
+  const probeHost = host === "0.0.0.0" || host === "::" ? "127.0.0.1" : host;
+  return `http://${probeHost.includes(":") ? `[${probeHost}]` : probeHost}:${port}`;
+}
+
 export function readStudioState(workspace: string): StudioState | null {
   const file = studioStatePath(workspace);
   if (!pathExists(file)) {
@@ -107,7 +126,10 @@ export function ensureAdminToken(workspace: string): string {
   const tokenFile = studioTokenPath(workspace);
   ensureDir(studioDir(workspace));
   if (pathExists(tokenFile)) {
-    return readFileSync(tokenFile, "utf8").trim();
+    const existing = readFileSync(tokenFile, "utf8").trim();
+    // LIVE-VAULT-12: only a 64-hex token is valid (an empty file matched an empty header); anything else is replaced.
+    if (/^[0-9a-f]{64}$/.test(existing)) return existing;
+    process.stderr.write("Replaced a malformed .amc/studio/admin.token\n");
   }
   const token = randomBytes(32).toString("hex");
   writeFileAtomic(tokenFile, `${token}\n`, 0o600);

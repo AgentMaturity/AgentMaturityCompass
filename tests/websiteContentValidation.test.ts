@@ -81,3 +81,13 @@ describe("website content validation", () => {
     expect(read("website/compliance.html")).toContain("Evidence Mapping, Not Certification");
   });
 });
+
+// LIVE-UX-15: the hero promised a score of your agent with no terminal, but the desktop app opens the demo workspace
+// (scripts/package-desktop-installers.mjs opens /w/demo/console/).
+describe("website hero truth", () => {
+  test("the hero says the desktop app opens a demo workspace and how to score your own agent", () => {
+    const hero = read("website/index.html").match(/<p class="hero-sub">[\s\S]*?<\/p>/)?.[0] ?? "";
+    expect(hero).toContain("The desktop app opens a local demo workspace; to score your own agent, run <code>amc up</code> in its folder.");
+    expect(read("scripts/package-desktop-installers.mjs")).toContain("/w/demo/console/");
+  });
+});

@@ -3,8 +3,9 @@ import { createReadStream } from "node:fs";
 import { createServer, type IncomingMessage, type Server } from "node:http";
 import { extname, join, normalize, resolve } from "node:path";
 import { handleApiRoute } from "../api/index.js";
-import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
+import { resolveAgentId } from "../fleet/paths.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
+import { agentDashboardDir } from "./build.js";
 
 export interface ServeDashboardInput {
   workspace: string;
@@ -131,8 +132,7 @@ function isAuthorizedDashboardMutation(input: {
 
 export async function serveDashboard(input: ServeDashboardInput): Promise<DashboardServerHandle> {
   const agentId = resolveAgentId(input.workspace, input.agentId);
-  const paths = getAgentPaths(input.workspace, agentId);
-  const rootDir = input.outDir ? resolve(input.workspace, input.outDir) : join(paths.rootDir, "dashboard");
+  const rootDir = resolve(input.workspace, input.outDir ?? agentDashboardDir(input.workspace, agentId));
 
   if (!pathExists(join(rootDir, "index.html"))) {
     throw new Error(`Dashboard not built at ${rootDir}. Run 'amc dashboard build' first.`);

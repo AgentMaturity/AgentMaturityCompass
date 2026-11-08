@@ -54,11 +54,18 @@ function directoryChain(root: string, parts: readonly string[], create: boolean)
   return current;
 }
 
+/** An atomic replace (a rename over the file) landed while it was read: the inode read is no longer the path's. */
+class ReplacedWhileRead extends Error {}
+
 function checkedFile(path: string, stat: Stats): void {
   if (stat.isSymbolicLink()) throw new Error(`${path} is a symlink; refusing to follow it`);
   if (!stat.isFile()) throw new Error(`${path} is not a regular file`);
+  if (stat.nlink === 0) throw new ReplacedWhileRead(`${path} was replaced while it was read`);
   if (stat.nlink !== 1) throw new Error(`${path} has a link count of ${stat.nlink}; refusing a hard link`);
 }
+
+const REPLACE_RETRIES = 3;
+const pause = (ms: number): void => { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms); };
 
 /** The absolute path of `rel` under `root` and its lstat (null when absent), after every check above. */
 function resolveContained(root: string, rel: string, create: boolean): { path: string; dir: string | null; parts: string[]; stat: Stats | null } {
@@ -75,8 +82,23 @@ export function containedExists(root: string, rel: string): boolean {
   return resolveContained(root, rel, false).stat !== null;
 }
 
-/** The contained file's bytes, or null when it does not exist. */
+/**
+ * The contained file's bytes, or null when it does not exist. A concurrent atomic replace (fix3 P-2: Studio and the CLI
+ * sharing AMC_HOME) shows the old inode unlinked (link count 0) or a new inode at the path; the read is retried on the
+ * path up to three times, 5 ms apart, and still refused after that. A hard link (count above 1) is always refused.
+ */
 export function readContainedOrNull(root: string, rel: string, maxBytes: number): Buffer | null {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return readContainedOnce(root, rel, maxBytes);
+    } catch (error) {
+      if (!(error instanceof ReplacedWhileRead) || attempt >= REPLACE_RETRIES) throw error;
+      pause(5);
+    }
+  }
+}
+
+function readContainedOnce(root: string, rel: string, maxBytes: number): Buffer | null {
   const { path, parts, stat } = resolveContained(root, rel, false);
   if (stat === null) return null;
   const fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
@@ -84,8 +106,8 @@ export function readContainedOrNull(root: string, rel: string, maxBytes: number)
     const opened = fstatSync(fd);
     checkedFile(path, opened);
     if (opened.size > maxBytes) throw new Error(`${path} exceeds ${maxBytes} bytes`);
-    const now = lstatSync(path);
-    if (now.dev !== opened.dev || now.ino !== opened.ino) throw new Error(`${path} changed while it was opened`);
+    const now = lstatOrNull(path);
+    if (now === null || now.dev !== opened.dev || now.ino !== opened.ino) throw new ReplacedWhileRead(`${path} changed while it was opened`);
     directoryChain(root, parts.slice(0, -1), false);
     const bytes = Buffer.alloc(opened.size);
     return bytes.subarray(0, readSync(fd, bytes, 0, bytes.length, 0));

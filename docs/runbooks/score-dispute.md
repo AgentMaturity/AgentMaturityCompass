@@ -2,6 +2,8 @@
 
 Use this when an assessor, operator, or stakeholder disputes an AMC score/result.
 
+`<monitor sha256>` below is the fingerprint of `.amc/keys/monitor_ed25519.pub` (`shasum -a 256`), recorded outside the workspace when it was created. Without that pin (or `AMC_EXPECTED_MONITOR_FINGERPRINT`, or a trust list), `amc verify all` reports the ledger UNANCHORED and exits 1; that alone is not evidence of corruption.
+
 ## Intake Checklist
 
 - disputed `runId`
@@ -15,7 +17,7 @@ Use this when an assessor, operator, or stakeholder disputes an AMC score/result
 ```bash
 amc history
 amc report <runId>
-amc verify all --json
+amc verify all --json --expect-monitor <monitor sha256>
 amc transparency verify
 ```
 2. Do not edit policy/evidence files until triage is complete.
