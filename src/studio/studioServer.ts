@@ -117,7 +117,7 @@ import { publishConsoleSnapshotAsync, consoleSnapshotErrorStatus, CONSOLE_SNAPSH
 import { bindStudioResultRoute, ENTITLEMENT_NOTE, studioStoredRunReport, withClaimBody } from "./studioClaimOutput.js";
 import { respondReportSigningError } from "./reportSigningError.js";
 import { allowStudioCors as allowCors } from "./studioCors.js";
-import { makeRateLimiter, makeRateLimiterDetailed, setRateLimitHeaders } from "./rateLimiter.js";
+import { createClientCap, makeRateLimiter, makeRateLimiterDetailed, setRateLimitHeaders } from "./rateLimiter.js";
 import { admitLoginAttempt, createLoginThrottle, LOGIN_THROTTLED_ERROR } from "./loginThrottle.js";
 import { ipAllowedByCidrs, LOOPBACK_CIDRS, requestUsesHttps, resolveClientAddress } from "./clientAddress.js";
 import { allowedHostnamesFrom, hostAllowed } from "./hostAllow.js";
@@ -1090,6 +1090,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
   const toolhub = new ToolHubService(options.workspace);
   const nativeTaskService = createNativeTaskService({ workspace: options.workspace });
   const orgSse = new OrgSseHub();
+  const orgStreams = createClientCap(64); // LIVE-RUNTIME-13: per hub, counted at the route (src/org is not edited)
   const allowedCidrs = options.allowedCidrs ?? LOOPBACK_CIDRS;
   const allowByIp = (ip: string): boolean => ipAllowedByCidrs(ip, allowedCidrs);
   const allowedHostnames = allowedHostnamesFrom([...(options.corsAllowedOrigins ?? []), ...(options.nativeAllowedOrigins ?? []), options.host, process.env.AMC_HOST_PUBLIC_BASEURL]);
@@ -1390,6 +1391,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
           return;
         }
+        if (!orgStreams.acquire()) { json(res, 503, { error: "too many event streams" }); return; }
+        res.once("close", () => orgStreams.release());
         orgSse.addClient(res);
         return;
       }
