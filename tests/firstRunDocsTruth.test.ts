@@ -42,9 +42,12 @@ describe("the sign-in paragraphs stay true", () => {
     expect(text).toContain("amc user add");
   });
 
-  test("the replace warning is kept verbatim", () => {
-    expect(readme).toContain("`amc user init` replaces `.amc/users.yaml`: if the workspace already has logins (for example after `amc init --coding`), add yours with `amc user add --username <you> --role OWNER` instead.");
-    expect(gettingStarted).toContain("`amc user init` replaces `.amc/users.yaml`, so on a workspace that already has\nlogins (for example after `amc init --coding`) use `amc user add` instead.");
+  // LIVE-VAULT-06 made `amc user init` refuse an existing users.yaml without --force; the docs said it replaced the file.
+  test("the existing-logins sentence says amc user init refuses, as the command does, and names amc user add and --force", () => {
+    expect(read("src/cli-user-commands.ts")).toContain("users.yaml already exists; pass --force to replace every account, or use amc user add");
+    expect(readme).toContain("`amc user init` refuses when `.amc/users.yaml` already exists: if the workspace already has logins (for example after `amc init --coding`), add yours with `amc user add --username <you> --role OWNER` instead (`amc user init --force` replaces every login).");
+    expect(gettingStarted).toContain("`amc user init` refuses when `.amc/users.yaml` already exists, so on a workspace that already has\nlogins (for example after `amc init --coding`) use `amc user add` instead (`--force` replaces every login).");
+    for (const text of [readme, gettingStarted]) expect(text).not.toMatch(/`amc user init` replaces/);
   });
 
   test("the README says users.yaml is not covered by the workspace .gitignore", () => {
