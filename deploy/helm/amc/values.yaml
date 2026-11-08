@@ -122,14 +122,21 @@ env:
   # which is always set so the helm test pod is admitted.
   AMC_CORS_ALLOWED_ORIGINS: ""
   AMC_QUERY_LEASE_CARRIER_ENABLED: "false"
-  AMC_TRUSTED_PROXY_HOPS: "1"
+  # Reverse proxies in front of Studio, and which of them to believe (SR-10). Off by default: no proxy is trusted, so a
+  # client cannot name its own address in X-Forwarded-For. Behind an Ingress, set the hops to 1 and the CIDRs to the
+  # ingress controller pods' addresses (kubectl -n ingress-nginx get pods -o wide), never a whole private range. The
+  # chart refuses to render with ingress.enabled or hops above 0 while the CIDRs are empty, and refuses documentation
+  # ranges (RFC 5737/3849) at any time.
+  AMC_TRUSTED_PROXY_HOPS: "0"
+  AMC_TRUSTED_PROXY_CIDRS: ""
   AMC_DATA_RETENTION_DAYS: "30"
   AMC_ENABLE_NOTARY: "false"
   AMC_NOTARY_BASE_URL: "http://127.0.0.1:4343"
   AMC_NOTARY_REQUIRED_ATTESTATION: "SOFTWARE"
   # The monitor key's sha256 fingerprint, pinned by the operator after the first
-  # bootstrap (docs/KUBERNETES_HELM_DEPLOYMENT.md "Pin the monitor key"). Empty:
-  # Studio anchors no verdict, so native verification answers "failed" (untrusted).
+  # bootstrap (docs/KUBERNETES_HELM_DEPLOYMENT.md "Pin the monitor key"). Empty: the
+  # chart does not set the variable (an empty pin is invalid), so Studio anchors no
+  # verdict and native verification answers "failed" (untrusted).
   AMC_EXPECTED_MONITOR_FINGERPRINT: ""
 
 resources:

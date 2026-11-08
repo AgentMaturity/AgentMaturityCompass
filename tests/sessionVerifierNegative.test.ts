@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
+import { GATEWAY_SESSION_STALE_AFTER_MS } from "../src/ledger/sessionLiveness.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { SESSION_ENVELOPE_META_KEY } from "../src/session/sessionTypes.js";
 
@@ -266,13 +267,19 @@ describe("session lifecycle — the three-way verdict is real in both directions
       ledger.appendEvidence({ sessionId: "legacy", runtime: "unknown", eventType: "stdout", payload: "x", inline: true });
       ledger.close();
 
-      const v = await verifyLedgerIntegrity(workspace);
+      // LIVE-INTEGRITY-01 (D-INT-1): an unsealed legacy session is live only while its last signed row is within the
+      // window; this assertion used to run at a fresh tail, which the liveness rule now names open (liveLegacy).
+      const v = await verifyLedgerIntegrity(workspace, { now: Date.now() + GATEWAY_SESSION_STALE_AFTER_MS + 1 });
       expect(v.chain.ok).toBe(false);
       expect(v.chain.errors.join(" ")).toMatch(/Session legacy missing seal/);
+      expect(v.sessions.liveLegacy).toEqual([]);
       // And it is NOT quietly bucketed as open/interrupted — those are for agent
       // sessions only.
       expect(v.sessions.open).not.toContain("legacy");
       expect(v.sessions.interrupted).not.toContain("legacy");
+      const fresh = await verifyLedgerIntegrity(workspace);
+      expect(fresh.sessions.liveLegacy.map((session) => session.sessionId)).toEqual(["legacy"]);
+      expect([...fresh.sessions.open, ...fresh.sessions.interrupted]).not.toContain("legacy");
     } finally {
       rmSync(workspace, { recursive: true, force: true });
       if (prior === undefined) delete process.env["AMC_VAULT_PASSPHRASE"];

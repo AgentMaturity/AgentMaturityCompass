@@ -123,6 +123,11 @@ nav a {
   border-left: 2px solid transparent;
 }
 
+/* LIVE-UX-06: `nav a` and `nav.mobile-nav-open a` set display, which beats the browser's [hidden] rule (the A4 link). */
+nav a[hidden] {
+  display: none !important;
+}
+
 nav a:hover,
 nav a.active {
   background: linear-gradient(90deg, rgba(74,239,121,0.10), transparent 80%);
@@ -1054,6 +1059,15 @@ button.danger {
 
 .row.wrap {
   flex-wrap: wrap;
+}
+
+#loginForm label {
+  display: block;
+  margin: 10px 0 4px;
+}
+
+#loginForm button {
+  margin-top: 12px;
 }
 
 .spaced {

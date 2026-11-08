@@ -129,10 +129,11 @@ amc up
 ## Verify Integrity
 
 ```bash
-amc verify all --json
+shasum -a 256 .amc/keys/monitor_ed25519.pub   # once, when you create the workspace: record it outside .amc/
+amc verify all --json --expect-monitor <monitor sha256>
 ```
 
-This confirms your scores aren't tampered with — the same anti-gaming protections enterprises use.
+This checks that your recorded evidence and signed files are unchanged since they were signed, against the monitor key you pinned. Without the pin the ledger check reports UNANCHORED and the command exits 1: the key would be read from the workspace being checked. A pass shows integrity, not that the scores are right.
 
 ## What L3 vs L5 Looks Like
 

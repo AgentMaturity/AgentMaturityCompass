@@ -16,6 +16,9 @@ data:
   AMC_ALLOWED_CIDRS: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,127.0.0.1/32,::1/128"
   AMC_QUERY_LEASE_CARRIER_ENABLED: "false"
   AMC_TRUSTED_PROXY_HOPS: "1"
+  # Required (SR-10): the ingress controller pods' addresses (kubectl -n ingress-nginx get pods -o wide), never a whole
+  # private range. Studio refuses to start while this is empty and the hops above are set.
+  AMC_TRUSTED_PROXY_CIDRS: ""
   AMC_DATA_RETENTION_DAYS: "30"
   AMC_METRICS_BIND: "127.0.0.1"
   AMC_METRICS_PORT: "9464"

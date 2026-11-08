@@ -4,7 +4,7 @@ import {
   renderClaimLegend, type ClaimEligibilityInput
 } from "../src/claims/eligibility/index.js";
 import { REASON_TEXT } from "../src/claims/eligibility/render.js";
-import { claimBadge, claimLegend, claimLegendHtml, LEGEND_PAGES } from "../src/console/assets/components/claimBadge.js";
+import { CLAIM_PAGES, claimBadge, claimLegend, claimLegendHtml } from "../src/console/assets/components/claimBadge.js";
 
 const now = Date.UTC(2026, 9, 14, 12);
 const observed: ClaimEligibilityInput = {
@@ -23,7 +23,7 @@ const fixtures = [
 ] as const;
 
 describe("Studio badge contracts using the actual console renderer", () => {
-  test.each(fixtures)("prints the canonical %s label, all dimensions and legend link", (kind, envelope, words) => {
+  test.each(fixtures)("prints the canonical %s label and all dimensions", (kind, envelope, words) => {
     const fields = claimFields(envelope);
     expect(fields.claimKind).toBe(kind);
     const html = claimBadge(fields);
@@ -33,7 +33,8 @@ describe("Studio badge contracts using the actual console renderer", () => {
     for (const dimension of ["Result:", "Evidence:", "Enforcement:", "Review:", "Applicability:"]) {
       expect(html).toContain(dimension);
     }
-    expect(html).toContain('href="#claim-legend"');
+    // M3 (2026-11-07): one legend per strip, not a "Claim kinds" link after every badge.
+    expect(html).not.toContain("claim-legend");
     expect(html).not.toMatch(/Certified/);
   });
 
@@ -66,12 +67,12 @@ describe("Studio badge contracts using the actual console renderer", () => {
     expect(html).not.toContain(' onfocus="');
   });
 
-  test("shares the full canonical legend and retains every required legend page", () => {
+  test("shares the full canonical legend, collapsed, and retains every required legend page", () => {
     expect(claimLegendHtml()).toBe(renderClaimLegend("html"));
-    expect(claimLegend(true)).toContain('id="claim-legend"');
-    expect(claimLegend(true)).toContain('class="claim-legend" open');
-    for (const page of ["home", "transparency", "compliance", "assurance", "passport", "industrypacks"]) {
-      expect(LEGEND_PAGES.has(page), page).toBe(true);
+    // M3 (2026-11-07): collapsed on every page, so the strip does not push the page's content below the fold.
+    expect(claimLegend()).toMatch(/^<details id="claim-legend" class="claim-legend"><summary>How to read claim kinds<\/summary>/);
+    for (const page of ["home", "transparency", "compliance", "assurance", "passport", "industrypacks", "a4", "a4Project"]) {
+      expect(CLAIM_PAGES.has(page), page).toBe(true);
     }
   });
 });

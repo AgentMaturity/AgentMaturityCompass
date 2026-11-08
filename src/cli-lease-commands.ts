@@ -10,6 +10,7 @@ import type { Command } from "commander";
 import { ensureLeaseRevocationStore, issueLeaseForCli, revokeLeaseForCliAsync, verifyLeaseForCli } from "./leases/leaseCli.js";
 import { workspaceIdFromDirectory } from "./workspaces/workspaceId.js";
 import { assertOwnerMode } from "./mode/mode.js";
+import { resolveSecretOption } from "./cli/argvSecret.js";
 
 // The workload trust commands (P2-25) are registered beside `amc identity`; re-exported here so cli.ts stays in budget.
 export { registerWorkloadTrustCommands } from "./cli-workload-trust-commands.js";
@@ -103,11 +104,13 @@ export function registerLeaseCliCommands(program: Command): void {
     .command("revoke")
     .requiredOption("--lease-id <id>", "lease ID to revoke")
     .requiredOption("--reason <reason>", "revocation reason")
-    .option("--token <lease>", "the lease token, so the revocation records its expiry and is pruned once it lapses")
-    .action(async (opts: { leaseId: string; reason: string; token?: string }) => {
-      const workspace = process.cwd(), leaseId = opts.leaseId, reason = opts.reason, token = opts.token;
+    .option("--token <lease>", "the lease token, so the revocation records its expiry and is pruned once it lapses (visible in ps; prefer --token-file)")
+    .option("--token-file <path>", "read the lease token from this private file")
+    .action(async (opts: { leaseId: string; reason: string; token?: string; tokenFile?: string }) => {
+      const workspace = process.cwd(), leaseId = opts.leaseId, reason = opts.reason, inlineToken = opts.token, tokenFile = opts.tokenFile;
+      const token = resolveSecretOption({ inline: inlineToken, file: tokenFile }, null, { option: "--token", alternatives: "--token-file <path>" }) ?? undefined;
       const assertInputs = () => {
-        if (process.cwd() !== workspace || opts.leaseId !== leaseId || opts.reason !== reason || opts.token !== token)
+        if (process.cwd() !== workspace || opts.leaseId !== leaseId || opts.reason !== reason || opts.token !== inlineToken || opts.tokenFile !== tokenFile)
           throw new Error("original lease revoke CLI inputs changed");
         assertOwnerMode(workspace, "lease revoke");
       };

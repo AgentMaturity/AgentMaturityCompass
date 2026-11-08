@@ -22,6 +22,10 @@ const commandStep = (job: Job | undefined, command: string) => job?.steps.find(s
 });
 const uploadStep = (job: Job, path: string) => job.steps.find(step => step.uses?.startsWith("actions/upload-artifact@")
   && String(step.with?.path ?? "").split(/\r?\n/).includes(path));
+const PYTEST_INSTALL = "python3 -m pip install --require-hashes -r sdk/python/requirements-ci.txt";
+/** tests/executionApiParity.test.ts drives pytest, so every job that runs the suite sets up Python and installs it. */
+const installsPytest = (job: Job) => job.steps.some(step => step.uses?.startsWith("actions/setup-python@"))
+  && required(commandStep(job, PYTEST_INSTALL));
 
 /** Parse the actual CI workflow; missing or conditional mandatory checks cannot satisfy the contract. */
 function ciWorkflowFailures(workflow: Workflow): string[] {
@@ -75,8 +79,7 @@ function ciWorkflowFailures(workflow: Workflow): string[] {
   // Both jobs run tests/executionApiParity.test.ts, which drives pytest.
   for (const id of ["test-shard", "release-gate"]) {
     const job = workflow.jobs[id];
-    if (job && !(job.steps.some(step => step.uses?.startsWith("actions/setup-python@"))
-      && required(commandStep(job, 'python3 -m pip install --require-hashes -r sdk/python/requirements-ci.txt')))) failures.push(`${id} does not install pytest`);
+    if (job && !installsPytest(job)) failures.push(`${id} does not install pytest`);
   }
   const gate = workflow.jobs["release-gate"];
   if (gate) {
@@ -100,6 +103,22 @@ function ciWorkflowFailures(workflow: Workflow): string[] {
     const upload = uploadStep(playwright, "playwright-report/");
     if (!upload || !["failure()", "${{ failure() }}"].includes(upload.if ?? "")) failures.push("Playwright does not retain failure reports");
   }
+  return failures;
+}
+
+const npmPublishText = readFileSync(join(root, ".github/workflows/npm-publish.yml"), "utf8");
+const parseNpmPublish = () => YAML.parse(npmPublishText) as Workflow;
+
+/** npm-publish's test-build runs `npm test` on every push to main and the Tuesday cron; version-pr needs it (LIVE-DEPLOY-04). */
+function npmPublishFailures(workflow: Workflow): string[] {
+  const job = workflow.jobs["test-build"];
+  if (!job) return ["Missing test-build job"];
+  const failures: string[] = [];
+  const testAt = job.steps.findIndex(step => /(?:^|\n)\s*npm test(?:\s|$)/.test(step.run ?? ""));
+  const installAt = job.steps.indexOf(commandStep(job, PYTEST_INSTALL)!);
+  if (!installsPytest(job) || installAt < 0 || installAt > testAt) failures.push("test-build does not install pytest");
+  const pinned = (text: Job | undefined) => text?.steps.find(step => step.uses?.startsWith("actions/setup-python@"))?.uses;
+  if (pinned(job) !== pinned(parse().jobs["test-shard"])) failures.push("test-build does not pin setup-python as ci.yml test-shard does");
   return failures;
 }
 
@@ -142,6 +161,16 @@ describe("CI workflow contract (P0-33)", () => {
     expect(ciWorkflowFailures(workflow)).toContain("e2e-playwright can ignore failures");
     expect(ciWorkflowFailures(workflow)).toContain("release-gate does not execute the full native corpus on Darwin");
     expect(ciWorkflowFailures(workflow)).toContain("release-gate does not retain measured coverage");
+  });
+
+  test("npm-publish test-build installs pytest before npm test, pinned as ci.yml pins it", () => {
+    expect(npmPublishFailures(parseNpmPublish())).toEqual([]);
+  });
+
+  test("npm-publish test-build without pytest fails the contract", () => {
+    const workflow = parseNpmPublish();
+    workflow.jobs["test-build"]!.steps = workflow.jobs["test-build"]!.steps.filter(step => !/requirements-ci\.txt/.test(step.run ?? ""));
+    expect(npmPublishFailures(workflow)).toEqual(["test-build does not install pytest"]);
   });
 
   test("a suite job without pytest fails the contract", () => {

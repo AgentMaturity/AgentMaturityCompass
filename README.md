@@ -66,6 +66,8 @@ In the current source build `amc start` is another name for `amc up`. In the run
 
 `amc down` stops the background services. A second `amc up` in the same workspace reuses it, prints the latest run and skips the baseline, because the workspace already has a run (in the 2026-10-11 recorded run it did not yet find that run and ran the baseline again). `amc up --no-baseline` skips the baseline; `amc up --demo` starts a no-vault demo instead. The installers give the published 1.1.1 release: its `amc up` starts Studio and the gateway but runs no baseline, and it has no `amc start` (use [From source](#from-source) for the current build).
 
+To sign in to the Compass Console, create the first login with `amc user init --username <you>` (an OWNER account; it asks for a password and signs `.amc/users.yaml` with the workspace vault; after `amc up` the passphrase it remembered is used. If it reports `Vault locked`, set `AMC_VAULT_PASSPHRASE` in that shell and run it again.) `amc user init` refuses when `.amc/users.yaml` already exists: if the workspace already has logins (for example after `amc init --coding`), add yours with `amc user add --username <you> --role OWNER` instead (`amc user init --force` replaces every login). Keep `.amc/` out of version control by default (add it to `.gitignore`): it holds the signing keys, the Studio admin token (`.amc/studio/`), the evidence ledger and, when `amc` generated one, `.amc/local-vault-passphrase`. A new workspace also gets `.amc/.gitignore`, which keeps those secrets and per-machine runtime state out of git. `.amc/users.yaml` (console password hashes) is not ignored by that file; keep it out of git unless the repository is private. If you deliberately commit a workspace for CI ([amc-action](amc-action/README.md)), never commit `.amc/local-vault-passphrase` or `.amc/studio/`, supply `AMC_VAULT_PASSPHRASE` from a CI secret, and keep that repository private: the encrypted vault is offline brute-force material.
+
 **What you get:**
 
 1. **An evidence-backed assessment.** L0 to L5 with traceable sources. Signatures expose changes to the signed report; the assessment still depends on the underlying evidence.
@@ -122,6 +124,7 @@ curl -fsSL https://agentmaturity.co/install.sh | sh
 # Start Studio and the gateway (prints the console URL); the current source build also runs a first 8-surface baseline
 cd your-agent-project
 amc up
+amc user init --username <you>   # new workspace only: the first console login (asks for a password)
 
 # Or just print the full score in your terminal
 amc
@@ -400,16 +403,21 @@ A4 Forge takes one agent from a brief to a recorded, customer-controlled deploym
 - **Adapt** (contextualization): compiles and signs the control plan for the agent's markets, sector and data, writes its context plugin and memory policy, and records a conformance statement as counts, never a percentage.
 - **Activate** (commercialization): builds a signed release package and its leases, prepares Compose or Helm files for an operator to run, and records the operator's deployment receipts, AMC's own reachability check, rollback and value claims.
 
-**What the records are, and are not.** Every record A4 writes is signed and `self_reported` (references to stub-model runs are labelled `synthetic_example`); runtime observations enter only by reference to rows the runtime wrote. A signature proves who wrote a record and that it is unchanged, never that its statement is true, and no A4 output says the agent is safe, correct or lawful. A second approver in the same workspace satisfies separation of duties, but two members of one workspace are not two independent reviews. The regulatory records Adapt uses are `experimental`: drafted by an agent, with citations not yet fetched, hashed or legally reviewed, and approved by no named expert. AMC never deploys: it prepares the plan and records what the operator says happened.
+**What the records are, and are not.** Every record A4 writes is signed and `self_reported` (references to stub-model runs are labelled `synthetic_example`); runtime observations enter only by reference to rows the runtime wrote. A signature proves who wrote a record and that it is unchanged, never that its statement is true, and no A4 output says the agent is safe, correct or lawful. Separation of duties keeps a gate's author, requester and builders from approving it, and under the default approval policy the Assemble completion, Adapt and Activate gates need two approvals each, so a full walk needs the owner plus two more approvers with the roles each gate allows, one of them an AUDITOR for Adapt's completion ([who approves which gate](docs/A4_FORGE.md#approvals-and-separation-of-duties)). Two members of one workspace are not two independent reviews. The regulatory records Adapt uses are `experimental`: drafted by an agent, with citations not yet fetched, hashed or legally reviewed, and approved by no named expert. AMC never deploys: it prepares the plan and records what the operator says happened.
 
-**Try it.** A4 Forge is in the current source build only (see [From source](#from-source)); the published 1.1.1 release does not contain it. Set `AMC_A4_PREVIEW=1` in the environment Studio starts in and for each `amc a4` command; a Studio that is already running keeps its environment, so run `amc down` first. Creating a project needs a signed-in local account with the OWNER or OPERATOR role ([RBAC](docs/RBAC.md)).
+**Try it.** A4 Forge is in the current source build only (see [From source](#from-source)); the published 1.1.1 release does not contain it. Set `AMC_A4_PREVIEW=1` in the environment Studio starts in and for each `amc a4` command; a Studio that is already running keeps its environment, so run `amc down` first. Creating a project needs a signed-in local account with the OWNER or OPERATOR role ([RBAC](docs/RBAC.md)). Workspace OWNERs decide gates as implicit project owners; an APPROVER or AUDITOR decides only once added as a project member with the approver role, so add them before requesting a gate, because adding a member supersedes open gates. On a Studio that does not run under Compose or Helm, Activate's release approval is refused (`deployment.same_host`, P2-40), so the walk ends after Adapt.
 
 ```bash
-AMC_A4_PREVIEW=1 amc up                     # then sign in to the Compass Console and start a project on its A4 page
+AMC_A4_PREVIEW=1 amc up                     # starts Studio with the A4 page
+amc user init --username <you>              # first console login (OWNER); with existing logins use amc user add
+                                            # then sign in to the Compass Console and start a project on its A4 page
 AMC_A4_PREVIEW=1 amc a4 list                # the projects this identity may read
-AMC_A4_PREVIEW=1 amc a4 guide <projectId>   # the next action, and the pins each open gate's decision needs
+AMC_A4_PREVIEW=1 amc a4 guide <projectId>   # the next action, the head seq, and the pins each open gate's decision needs
 AMC_A4_PREVIEW=1 amc a4 readiness <projectId>
-AMC_A4_PREVIEW=1 amc a4 verify <projectId> --trust-list <file>   # the record chain under your own trust list
+amc approvals login --username <you> --token-file <file>   # the session file every amc a4 write names
+# before a gate, add each approver who is not a workspace OWNER (<n>: the head seq amc a4 guide printed)
+AMC_A4_PREVIEW=1 amc a4 members <projectId> --member LOCAL_USER:<userId> --project-role approver --session-token-file <file> --expect-head-seq <n>
+AMC_A4_PREVIEW=1 amc a4 verify <projectId> --trust-list <file> --allow-unanchored   # the chain's integrity (exit 2): a project's ledger is unanchored, so it never reads trusted
 ```
 
 **Status: preview.** Without the variable, the `/api/v1/a4` routes answer 404 `A4_PREVIEW_DISABLED`, Studio shows no A4 entry, and every `amc a4` command refuses with exit code 1. `amc mcp serve` started with the variable adds five A4 tools (four reads and a self-reported comment), and the Node SDK's `createA4Client` calls the routes of a Studio that has it. Not available yet: independently reviewed claims (P2-24, P3-21); a real deployment target (P2-40: v1 records a same-host restart of the Studio that built the agent, and AMC's own destination check cannot report `passed`); CI qualification of the Compose and Helm overlays. Details: [docs/A4_FORGE.md](docs/A4_FORGE.md).
@@ -901,16 +909,28 @@ npm run package:desktop:verify
 
 Run these in a source checkout ([From source](#from-source)); the desktop archives on the published GitHub release are 1.1.1 builds ([publication evidence](website/publication-status.json)). See [docs/DESKTOP_PACKAGES.md](docs/DESKTOP_PACKAGES.md) for archive contents and platform commands.
 
-### Single-binary install (experimental)
+The macOS app is not notarized (the current source build ad-hoc signs it): if macOS says it cannot verify the app, open System Settings > Privacy & Security and choose Open Anyway. An app built from current source carries its own copy of the package, so you can move it, for example to `/Applications`. Studio keeps running after you close the app window or browser tab; stop it with the launcher runtime's own `amc down`, run in its `studio-workspace` folder:
 
-AMC now includes an **experimental Node SEA packaging path** for host-specific single-binary builds:
+```bash
+# macOS
+cd ~/"Library/Application Support/Agent Maturity Compass/studio-workspace" && ../runtime/node_modules/.bin/amc down
+```
+
+```powershell
+# Windows
+cd "$env:LOCALAPPDATA\Agent Maturity Compass\studio-workspace"; ..\runtime\node_modules\.bin\amc.cmd down
+```
+
+### Single-binary build (experimental; does not start yet)
+
+AMC has an **experimental Node SEA build script**. It is a local build for the host that runs it and not a release asset: the release workflow neither builds nor uploads it. (An earlier workflow attached an experimental Linux SEA binary to the 1.1.1 release without starting it first; do not rely on it.)
 
 ```bash
 npm run build
 npm run build:sea
 ```
 
-The build path is wired in and produces SEA artifacts plus a manifest. Runtime verification is still experimental and host-sensitive. See [docs/SINGLE_BINARY.md](docs/SINGLE_BINARY.md) for the honest status and caveats.
+The binary it writes to `dist/sea/` does not start yet (the CLI is an unbundled ES module, which a Node SEA cannot run as its main script), so `npm run build:sea` exits 1 after its startup check. Install with the release installer or [from source](#from-source) instead. See [docs/SINGLE_BINARY.md](docs/SINGLE_BINARY.md) for the status and the remaining work.
 
 ### Nightly compatibility matrix
 

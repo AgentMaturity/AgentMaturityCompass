@@ -665,7 +665,7 @@ async function main() {
   status.textContent = `Signed in as ${me.username}`;
   const options = await previewOptions();
   if (!options) {
-    root.innerHTML = `<section class="card"><p>${view.PREVIEW_NOTICE}.</p></section>`;
+    root.innerHTML = `<section class="card"><p>${view.previewNoticeHtml()}</p></section>`;
     return;
   }
   document.getElementById("a4NavLink")?.removeAttribute("hidden");

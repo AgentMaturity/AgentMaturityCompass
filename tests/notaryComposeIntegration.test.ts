@@ -227,7 +227,7 @@ describe("optional Compose notary listener and policy signing", () => {
     expect(caddyfile).not.toMatch(/^\s*auto_https off$/m);
     // Matched handlers must precede the fallback in Caddy's mutually exclusive
     // handle group; a top-level reverse_proxy otherwise loses to the fallback.
-    expect(caddyfile).toMatch(/handle @console\s*\{\s*reverse_proxy amc-studio:3212\s*\}/);
-    expect(caddyfile).toMatch(/handle @gateway\s*\{\s*reverse_proxy amc-studio:3210\s*\}/);
+    expect(caddyfile).toMatch(/handle @console\s*\{\s*reverse_proxy amc-studio:3212(?:\s*\{[^{}]*\{[^{}]*\}\s*\})?\s*\}/);
+    expect(caddyfile).toMatch(/handle @gateway\s*\{\s*reverse_proxy amc-studio:3210(?:\s*\{[^{}]*\{[^{}]*\}\s*\})?\s*\}/);
   });
 });

@@ -6,7 +6,7 @@ D-03 was decided on 2026-10-11 as option C: Helm, Compose, Railway and Vercel al
 
 | Part | Reference value | Where it is set |
 |---|---|---|
-| Chart | `deploy/helm/amc`, chart version 0.4.0, appVersion 1.2.0 | `deploy/helm/amc/Chart.yaml` |
+| Chart | `deploy/helm/amc`, chart version 0.4.1, appVersion 1.2.0 | `deploy/helm/amc/Chart.yaml` |
 | Image | `ghcr.io/agentmaturity/amc-studio@sha256:<release digest>` with `image.requireDigest=true` | Sid pins the digest at release (P0-35, P2-15). Kind runs use the containerd import digest from `scripts/deploy/kind-image-digest.mjs`. |
 | Kubernetes | kind node `kindest/node` v1.37.0 for kind runs; Sid records the D-03 cluster's version in its receipt | `qualification/<date>-P2-06/cluster/receipt.json` |
 | Replicas and strategy | 1 replica, `Recreate` (one SQLite writer on a `ReadWriteOnce` volume) | `templates/deployment.yaml` |
@@ -23,7 +23,7 @@ D-03 was decided on 2026-10-11 as option C: Helm, Compose, Railway and Vercel al
 
 The claim vocabulary is D-03's: a deployment is "qualified within scope S, versions V, window W", or it is not qualified. Until every check in `qualification/reference-deployment/matrix.json` passes on kind and on Sid's D-03 cluster, and the recovery targets are agreed, the statement is:
 
-- Scope S: Helm chart 0.4.0 on Kubernetes, one release per namespace, SQLite workspace volume, file KeyProvider.
+- Scope S: Helm chart 0.4.1 on Kubernetes, one release per namespace, SQLite workspace volume, file KeyProvider.
 - Versions V: the image digests and commit recorded in the latest `qualification/<date>-P2-06/` receipt.
 - Window W: none. The reference deployment is **not qualified**; the receipts list which checks failed or did not run.
 

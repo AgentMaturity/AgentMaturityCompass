@@ -1,8 +1,8 @@
 import { randomBytes } from "node:crypto";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { existsSync, openSync, readFileSync, readdirSync, statSync, unlinkSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { verifyGatewayConfigSignature } from "../gateway/config.js";
+import { loadGatewayConfig, verifyGatewayConfigSignature } from "../gateway/config.js";
 import { initActionPolicyAsync, verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
 import { initToolsConfigAsync, verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
 import { initApprovalPolicy, verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
@@ -13,7 +13,7 @@ import { adaptersConfigPath, initAdaptersConfigAsync } from "../adapters/adapter
 import { resolveAgentId } from "../fleet/paths.js";
 import { ensureSigningKeys } from "../crypto/keys.js";
 import { vaultExists, unlockVault, vaultStatus } from "../vault/vault.js";
-import { buildDashboard } from "../dashboard/build.js";
+import { agentDashboardDir, buildDashboard } from "../dashboard/build.js";
 import { serveDashboard } from "../dashboard/serve.js";
 import { startGateway } from "../gateway/server.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
@@ -51,6 +51,9 @@ import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { startWorkspaceRouter } from "../workspaces/workspaceRouter.js";
 import { createWorkspaceRecord, getWorkspaceRecord, initHostDb } from "../workspaces/hostDb.js";
 import { hostWorkspaceDir } from "../workspaces/workspacePaths.js";
+import { isPublicBind } from "../config/loadConfig.js";
+import { assertProxyTrustNamed, assertPublicBindAcknowledged, resolveListenPolicy } from "./listenPolicy.js";
+import { assertPortFree, closeStartedThenThrow, listenOnPolicyPort } from "./studioLifecycle.js";
 
 export interface StudioRuntime {
   stop: () => Promise<void>;
@@ -305,12 +308,19 @@ export async function runStudioForeground(params: {
   allowedCidrs?: string[];
   trustedProxyHops?: number;
   maxRequestBytes?: number;
+  /** The gateway's request body cap (AMC_GATEWAY_MAX_REQUEST_BYTES); the gateway's 8 MiB default when absent. */
+  gatewayMaxRequestBytes?: number;
   corsAllowedOrigins?: string[];
   dataRetentionDays?: number;
   queryLeaseCarrierEnabled?: boolean;
+  /** The raw environment for the listen policy (the CLI passes process.env); absent, only the options and LAN config count. */
+  env?: NodeJS.ProcessEnv;
 }): Promise<StudioRuntime> {
   if (params.hostDir) {
     const hostDir = params.hostDir;
+    const listen = resolveListenPolicy({ env: params.env ?? {}, hostMode: true, flags: { bind: params.apiHost, port: params.apiPort, allowedCidrs: params.allowedCidrs } });
+    assertPublicBindAcknowledged(listen);
+    assertProxyTrustNamed(params.trustedProxyHops, listen);
     if (params.allowLocalDemoWorkspace === true) {
       process.env.AMC_VAULT_PASSPHRASE = ensureDemoVaultPassphrase(hostDir);
     }
@@ -331,16 +341,15 @@ export async function runStudioForeground(params: {
         trustBoundaryMode: "isolated"
       });
     }
-    const apiHost = params.apiHost ?? "127.0.0.1";
-    const apiPort = params.apiPort ?? 3212;
     const router = await startWorkspaceRouter({
       hostDir,
-      host: apiHost,
-      port: apiPort,
+      host: listen.apiHost,
+      port: listen.apiPort,
       defaultWorkspaceId,
       allowLocalDemoWorkspace: params.allowLocalDemoWorkspace,
-      allowedCidrs: params.allowedCidrs,
+      allowedCidrs: listen.allowedCidrs,
       trustedProxyHops: params.trustedProxyHops,
+      trustedProxyCidrs: listen.trustedProxyCidrs,
       maxRequestBytes: params.maxRequestBytes,
       corsAllowedOrigins: params.corsAllowedOrigins
     });
@@ -351,8 +360,8 @@ export async function runStudioForeground(params: {
       gatewayPort: 0,
       proxyPort: 0,
       dashboardPort: 0,
-      metricsPort: params.metricsPort ?? 9464,
-      metricsHost: params.metricsHost ?? "127.0.0.1",
+      metricsPort: listen.metricsPort,
+      metricsHost: params.metricsHost ?? listen.metricsHost,
       host: router.host,
       lanEnabled: params.allowPublicBind === true,
       pairingRequired: false,
@@ -404,15 +413,38 @@ export async function runStudioForeground(params: {
   }
   const lan = loadLanMode(workspace);
   const lanSig = verifyLanModeSignature(workspace);
+  // LIVE-RUNTIME-03/-10: where to listen and whom to admit is decided, and refused, before anything listens or opens a session.
+  const listen = resolveListenPolicy({ env: params.env ?? {}, hostMode: false, lan: { ...lan, valid: lanSig.valid },
+    flags: { bind: params.apiHost, port: params.apiPort, metricsPort: params.metricsPort, allowedCidrs: params.allowedCidrs } });
+  const metricsHost = params.metricsHost ?? listen.metricsHost;
+  const metricsPublicBind = isPublicBind(metricsHost);
+  assertPublicBindAcknowledged(listen);
+  assertProxyTrustNamed(params.trustedProxyHops, listen);
+  if (metricsPublicBind && !(lan.enabled && lanSig.valid)) {
+    throw new Error("Refusing to bind metrics publicly without signed LAN mode.");
+  }
+  if (listen.publicBind && !params.allowPublicBind && !(lan.enabled && lanSig.valid)) {
+    throw new Error("Refusing to bind Studio API publicly. Enable LAN mode or set explicit public bind allowance.");
+  }
+  await assertPortFree(listen.apiHost, listen.apiPort, listen.apiPortSource);
+  await assertPortFree(metricsHost, listen.metricsPort, listen.metricsPortSource);
+  // The gateway never falls back and opens its session before it listens, so its busy ports are refused first (skeptic D4).
+  const gatewayHost = params.gatewayHost ?? listen.apiHost, gatewayConfig = loadGatewayConfig(workspace);
+  await assertPortFree(gatewayHost, params.gatewayPort ?? gatewayConfig.listen.port, params.gatewayPort === undefined ? "the gateway config" : "AMC_GATEWAY_PORT");
+  if (gatewayConfig.proxy.enabled) await assertPortFree(gatewayHost, params.proxyPort ?? gatewayConfig.proxy.port, params.proxyPort === undefined ? "the gateway config" : "AMC_PROXY_PORT");
   const gateway = await startGateway({
     workspace,
     workspaceId: workspaceIdFromDirectory(workspace),
-    listenHost: params.gatewayHost,
+    listenHost: gatewayHost,
     listenPort: params.gatewayPort,
     proxyPort: params.proxyPort,
-    allowedCidrs: params.allowedCidrs,
+    allowedCidrs: listen.allowedCidrs,
+    maxRequestBytes: params.gatewayMaxRequestBytes,
     allowQueryCarrierOverride: params.queryLeaseCarrierEnabled
   });
+  // Anything that fails from here closes what already started, newest first, so a refused start leaves no open session.
+  const started: Array<() => Promise<void>> = [() => gateway.close()];
+  const guard = async <T>(step: () => Promise<T>): Promise<T> => step().catch((error: unknown) => closeStartedThenThrow(started, error));
 
   ensureMetricsBaseline();
   try {
@@ -423,112 +455,37 @@ export async function runStudioForeground(params: {
   } catch {
     // Metrics baselining must remain best-effort.
   }
-  const metricsHost = params.metricsHost ?? "127.0.0.1";
-  const requestedMetricsPort = params.metricsPort ?? 9464;
-  const metricsPublicBind = metricsHost === "0.0.0.0" || metricsHost === "::";
-  if (metricsPublicBind && !(lan.enabled && lanSig.valid)) {
-    throw new Error("Refusing to bind metrics publicly without signed LAN mode.");
-  }
-  let metrics: Awaited<ReturnType<typeof startMetricsServer>>;
-  try {
-    metrics = await startMetricsServer({
-      workspace,
-      host: metricsHost,
-      port: requestedMetricsPort,
-      allowRemote: metricsPublicBind,
-      allowedCidrs: params.allowedCidrs
-    });
-  } catch (error) {
-    const message = String(error);
-    if (message.includes("EADDRINUSE")) {
-      metrics = await startMetricsServer({
-        workspace,
-        host: metricsHost,
-        port: 0,
-        allowRemote: metricsPublicBind,
-        allowedCidrs: params.allowedCidrs
-      });
-    } else {
-      throw error;
-    }
-  }
+  const metrics = await guard(() => listenOnPolicyPort({ label: "Metrics", port: listen.metricsPort, source: listen.metricsPortSource,
+    start: (port) => startMetricsServer({ workspace, host: metricsHost, port, allowRemote: metricsPublicBind, allowedCidrs: listen.allowedCidrs }) }));
+  started.push(() => metrics.close());
 
-  const dashboardOut = `.amc/agents/${agentId}/dashboard`;
+  const dashboardOut = agentDashboardDir(workspace, agentId);
   try {
     buildDashboard({
       workspace,
       agentId,
       outDir: dashboardOut
     });
-  } catch {
-    // Fresh workspaces may not have runs yet; serve a bootstrap page and build later on demand.
-    const root = join(workspace, dashboardOut);
-    ensureDir(root);
+  } catch (error) {
+    // A fresh workspace has no run yet: serve a page naming why until `amc up`'s baseline or `amc dashboard build` replaces it.
+    const reason = (error instanceof Error ? error.message : String(error)).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    ensureDir(dashboardOut);
     writeFileAtomic(
-      join(root, "index.html"),
-      "<!doctype html><html><body><h1>AMC Studio</h1><p>No diagnostic runs yet. Run `amc run` then rebuild dashboard.</p></body></html>",
+      join(dashboardOut, "index.html"),
+      "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+        + `<title>AMC Dashboard</title></head><body><h1>AMC Studio</h1><p>${reason}</p><p>Then run <code>amc dashboard build</code> to show it here.</p></body></html>`,
       0o644
     );
   }
-  const requestedDashboardPort = params.dashboardPort ?? 4173;
-  let dashboard: Awaited<ReturnType<typeof serveDashboard>>;
-  try {
-    dashboard = await serveDashboard({
-      workspace,
-      agentId,
-      port: requestedDashboardPort,
-      outDir: dashboardOut
-    });
-  } catch (error) {
-    const message = String(error);
-    if (!message.includes("EADDRINUSE")) {
-      throw error;
-    }
-    dashboard = await serveDashboard({
-      workspace,
-      agentId,
-      port: 0,
-      outDir: dashboardOut
-    });
-  }
+  // The dashboard is loopback-only and always falls back to a free port (its port is a convenience, not a probe target).
+  const dashboard = await guard(() => listenOnPolicyPort({ label: "Dashboard", port: params.dashboardPort ?? 4173, source: null, log: () => undefined,
+    start: (port) => serveDashboard({ workspace, agentId, port, outDir: dashboardOut }) }));
+  started.push(() => dashboard.close());
 
-  const defaultApiHost = lan.enabled && lanSig.valid ? lan.bind : "127.0.0.1";
-  const defaultApiPort = params.apiPort ?? (lan.enabled && lanSig.valid ? lan.port : 3212);
-  const apiHost = params.apiHost ?? defaultApiHost;
-  const apiPort = params.apiPort ?? defaultApiPort;
-  const publicBind = apiHost === "0.0.0.0" || apiHost === "::";
-  if (publicBind && !params.allowPublicBind && !(lan.enabled && lanSig.valid)) {
-    throw new Error("Refusing to bind Studio API publicly. Enable LAN mode or set explicit public bind allowance.");
-  }
-
-  let api: Awaited<ReturnType<typeof startStudioApiServer>>;
-  try {
-    api = await startStudioApiServer({
-      workspace,
-      host: apiHost,
-      port: apiPort,
-      token,
-      allowedCidrs: params.allowedCidrs,
-      trustedProxyHops: params.trustedProxyHops,
-      maxRequestBytes: params.maxRequestBytes,
-      corsAllowedOrigins: params.corsAllowedOrigins
-    });
-  } catch (error) {
-    const message = String(error);
-    if (!message.includes("EADDRINUSE")) {
-      throw error;
-    }
-    api = await startStudioApiServer({
-      workspace,
-      host: apiHost,
-      port: 0,
-      token,
-      allowedCidrs: params.allowedCidrs,
-      trustedProxyHops: params.trustedProxyHops,
-      maxRequestBytes: params.maxRequestBytes,
-      corsAllowedOrigins: params.corsAllowedOrigins
-    });
-  }
+  const api = await guard(() => listenOnPolicyPort({ label: "Studio API", port: listen.apiPort, source: listen.apiPortSource,
+    start: (port) => startStudioApiServer({ workspace, host: listen.apiHost, port, token, allowedCidrs: listen.allowedCidrs,
+      trustedProxyHops: params.trustedProxyHops, trustedProxyCidrs: listen.trustedProxyCidrs, maxRequestBytes: params.maxRequestBytes, corsAllowedOrigins: params.corsAllowedOrigins }) }));
+  started.push(() => api.close());
 
   const gatewaySig = verifyGatewayConfigSignature(workspace);
   const actionPolicySig = verifyActionPolicySignature(workspace);
@@ -555,7 +512,7 @@ export async function runStudioForeground(params: {
     !lanSig.valid ||
     !plugins.ok;
   if (untrustedConfig) {
-    writeConfigSignatureAudit(workspace, agentId);
+    await guard(async () => writeConfigSignatureAudit(workspace, agentId));
   }
 
   const logFile = join(studioLogsDir(workspace), "studio.log");
@@ -578,7 +535,7 @@ export async function runStudioForeground(params: {
     untrustedConfig,
     logFile
   };
-  writeStudioState(workspace, state);
+  await guard(async () => writeStudioState(workspace, state));
   try {
     writeStudioLifecycleAudit(workspace, agentId, "STUDIO_RUNTIME_STARTED");
   } catch {
@@ -596,11 +553,11 @@ export async function runStudioForeground(params: {
       } catch {
         // Lifecycle audit is best-effort and must not block shutdown.
       }
-      await apiClosed;
-      await dashboard.close();
-      await gateway.close();
-      await metrics.close();
+      // LIVE-RUNTIME-02: every server closes at once, so the API's drain no longer holds the gateway's seal behind it.
+      const closed = await Promise.allSettled([apiClosed, gateway.close(), dashboard.close(), metrics.close()]);
       clearStudioState(workspace);
+      const failures = closed.flatMap((result) => (result.status === "rejected" ? [result.reason as unknown] : []));
+      if (failures.length > 0) throw new AggregateError(failures, "Studio did not stop cleanly");
     }
   };
 }
@@ -670,13 +627,45 @@ export async function startStudioDaemon(workspace: string, options: StartStudioD
   throw new Error(`Studio daemon did not start within ${STUDIO_DAEMON_START_MS / 1000} s. See ${logFile}.`);
 }
 
+/** The pid's command line, or null when it cannot be read: /proc on Linux, ps on other POSIX hosts, CIM on Windows. */
+function processCommandLine(pid: number): string | null {
+  try {
+    if (process.platform === "win32") {
+      const out = spawnSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command",
+        `(Get-CimInstance Win32_Process -Filter 'ProcessId=${pid}').CommandLine`], { encoding: "utf8", timeout: 15_000, windowsHide: true });
+      return out.status === 0 && out.stdout.trim() ? out.stdout.trim() : null;
+    }
+    if (existsSync(`/proc/${pid}/cmdline`)) return readFileSync(`/proc/${pid}/cmdline`, "utf8").replace(/\0/g, " ").trim() || null;
+    const out = spawnSync("ps", ["-ww", "-o", "command=", "-p", String(pid)], { encoding: "utf8", timeout: 5_000 });
+    return out.status === 0 && out.stdout.trim() ? out.stdout.trim() : null;
+  } catch {
+    return null;
+  }
+}
+
 export function stopStudioDaemon(workspace: string): { stopped: boolean; message: string } {
   const state = readStudioState(workspace);
   if (!state || !state.pid) {
     return { stopped: false, message: "Studio is not running." };
   }
+  // state.json is unsigned and outlives a crashed Studio, so its pid can be invalid or reused by another program:
+  // only a pid whose command line carries the daemon entry (`amc up` spawns `cli.js _studio-daemon`) is signalled.
+  if (!Number.isSafeInteger(state.pid) || state.pid < 1) {
+    return { stopped: false, message: `Studio state names an invalid pid (${String(state.pid)}); nothing was signalled.` };
+  }
   if (!processRunning(state.pid)) {
     return { stopped: false, message: "Studio state exists but process is not running." };
+  }
+  const commandLine = processCommandLine(state.pid);
+  if (commandLine === null) {
+    return { stopped: false, message: `Could not read the command line of pid ${state.pid}, so it is not confirmed as the AMC Studio daemon; nothing was signalled. If it is Studio, stop it yourself.` };
+  }
+  if (!commandLine.split(/[\s"']+/).includes("_studio-daemon")) {
+    return {
+      stopped: false,
+      message: `pid ${state.pid} in .amc/studio/state.json is not the AMC Studio daemon; nothing was signalled. `
+        + "A foreground Studio (amc studio start) stops with Ctrl+C; if Studio is not running, the state file is stale and can be removed."
+    };
   }
   try {
     process.kill(state.pid, "SIGTERM");

@@ -228,7 +228,7 @@ function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, appr
   const createdTs = state.chain.find((link) => link.kind === "CREATED")?.body.ts;
   const blocking = stage === "assemble" ? blockingExecutionsOf(store, state.project.agent_id) : null;
   return {
-    activeLocal: live.activeLocal, hostPrincipals: live.hostPrincipals, hostedRouter: live.hostedRouter, hostMode: call.hostMode === true,
+    activeLocal: live.activeLocal, localOwners: live.localOwners, hostPrincipals: live.hostPrincipals, hostedRouter: live.hostedRouter, hostMode: call.hostMode === true,
     freeze: live.freeze ? { active: live.freeze.active, incidentIds: live.freeze.incidentIds } : null, readOnly: live.readOnly,
     approvalPolicy,
     vaultUnlocked: availability(workspace), signingRoute: route,
@@ -299,7 +299,9 @@ export function assertAllowed(readiness: A4ReadinessV1, action: A4Action, ignore
     throw fail(403, code, `refused: ${codes.join(", ")}`, codes);
   }
   if (codes.includes("FREEZE_ACTIVE")) throw fail(409, "FREEZE_ACTIVE", "An incident freeze is active for this agent.", codes);
-  const named = { reasonCodes: codes, items: readiness.items.filter((entry) => codes.includes(entry.id)) };
+  // Named, not dumped (LIVE-RUNTIME-23, fix3 A-8): the refusal names each item; reports, evidence refs and counters stay server-side.
+  const named = { reasonCodes: codes, items: readiness.items.filter((entry) => codes.includes(entry.id))
+    .map(({ id, section, status, kind, nextAction }) => ({ id, section, status, kind, nextAction })) };
   if (codes.includes("ON_HOLD")) throw fail(409, "A4_ON_HOLD", "The project is on hold; an owner resumes it.", named);
   if (codes.includes("A4_STEP_ORDER")) throw fail(409, "A4_STEP_ORDER", "The project is not at that stage; reload it.", { reasonCodes: codes });
   if (codes.includes("PRINCIPAL_UNRESOLVED")) throw fail(409, "PRINCIPAL_UNRESOLVED", "The active plan requires a principal: an active local users.yaml user runs this effect. Nothing was consumed.", { reasonCodes: codes });

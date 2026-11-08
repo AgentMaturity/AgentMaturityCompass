@@ -1,3 +1,8 @@
+// The console's page scripts all import this module, so the shared shell (nav, status, banner) and the focusable-scroll
+// fix reach their pages from here.
+import "./shell.js";
+import "./focusableScroll.js";
+
 const state = {
   adminToken: null,
   me: null

@@ -36,6 +36,7 @@ import { openLedger, targetsDir, type Ledger, type EvidenceLedgerReader } from "
 import { extractEnvelope } from "../session/sessionTypes.js";
 import { readSessionWriter } from "../session/sessionOwnership.js";
 import { verifySessionChains } from "./sessionVerification.js";
+import { verifyOutcomeEvents } from "./outcomeVerification.js";
 import { verifyAlternateBackendEvidence } from "./alternateBackendVerification.js";
 import { readSessionStoreMarker } from "../persistence/openSessionEventStore.js";
 import type { EvidenceEvent } from "../types.js";
@@ -45,6 +46,8 @@ import { legacyLedgerRowKeys, operationalLedgerProblems } from "../keys/operatio
 import { boundProviderKey } from "../keys/keyset.js";
 import { getPurposeKeyHistory } from "../keys/signingKeys.js";
 import { receiptLedgerProblems } from "../keys/receiptSqlAuthority.js";
+import { GATEWAY_SESSION_STALE_AFTER_MS, isLiveLegacySession, type LiveLegacySession } from "./sessionLiveness.js";
+import { gatewaySealWitnesses } from "./interruptedSessions.js";
 
 /**
  * Default heartbeat window for the OPEN vs INTERRUPTED verdict on an unsealed,
@@ -102,8 +105,7 @@ export interface VerifyResult {
    * `chain.errors`: a running or crashed agent must not make its own workspace
    * fail verification, yet an interrupted session must never be laundered into a
    * clean seal — the two are reported distinctly. Legacy (non-agent) sessions
-   * keep the strict must-be-sealed rule and are not listed here; an unsealed one
-   * is a `chain` error exactly as before.
+   * must carry a valid row seal unless they are live (`liveLegacy`).
    */
   sessions: {
     /** Unclosed agent sessions without an accepted handoff, within the staleness window. Not an error. */
@@ -114,10 +116,19 @@ export interface VerifyResult {
     interrupted: readonly string[];
     /** Agent sessions closed by a `session/close` event and carrying a valid row seal. */
     closed: readonly string[];
+    /**
+     * Unended, unsealed legacy (non-agent) sessions whose last signed event is within `legacyStaleAfterMs` of `now`: a
+     * running writer's own session (the gateway's, an in-flight bridge request, a tool run). Not an error; nothing is
+     * claimed about how it ends. Any other unended or unsealed legacy session is a `chain` error (missing seal), and so
+     * is every unsealed legacy session when any row failed verification. `lastSignedTs` is the last signed event's
+     * time, or null for a session with no signed event yet (open only briefly after its unsigned recorded start).
+     */
+    liveLegacy: readonly LiveLegacySession[];
   };
   /**
    * P2-09: encrypted inline payloads this verifier could not check because the ledger key was out of reach (provider
-   * unreachable or vault locked). Not errors, and not verified: the chain over their ciphertext was still checked.
+   * unreachable or vault locked), and with blobKeyOptional encrypted blobs whose key a locked vault holds. Not errors,
+   * and not verified: the chain over their ciphertext was still checked, so a caller must never report them as a pass.
    */
   payloadsNotEvaluated?: readonly string[];
   /** With options.auditTypes: each requested audit type found among the verified rows, with the meta subjectId (else agentId) of its rows. */
@@ -154,12 +165,22 @@ export interface LedgerVerifyOptions {
    * instead of depending on wall-clock timing.
    */
   sessionStaleAfterMs?: number;
+  /** The verification instant for legacy-session liveness only (a copy is verified as of its signed time); default Date.now(). */
+  now?: number;
+  /** The liveness window for unsealed legacy sessions; default GATEWAY_SESSION_STALE_AFTER_MS. */
+  legacyStaleAfterMs?: number;
   /** P0-09: when given, trustRoot.anchored means the monitor key is admitted for ledger-row by this context. */
   trust?: TrustContext;
   /** Audit types to report (result.audits), read from the very rows this verification checked, never a second read. */
   auditTypes?: readonly string[];
   /** Runs on the verified read-only handle after its checks, before it closes, so a caller's own reads see the rows verified. */
   onVerifiedLedger?: (ledger: Ledger) => void;
+  /**
+   * B1: an encrypted blob payload whose vaulted key a locked vault holds is listed in payloadsNotEvaluated instead of
+   * failing (verifyEvidencePayload). Only for a caller that reports payloadsNotEvaluated as not verified (the CLI verify
+   * commands); every other caller still fails such a row.
+   */
+  blobKeyOptional?: boolean;
 }
 type AuditCollector = { wanted: ReadonlySet<string>; found: Map<string, Set<string>>; first?: string };
 
@@ -272,7 +293,7 @@ function chainOnlyResult(errors: string[]): VerifyResult {
     trustRoot: { anchored: false, monitorFingerprint: null, expectedFingerprint: null },
     // This check inspects a single event, not the whole session population, so it
     // makes no lifecycle claim about any session.
-    sessions: { open: [], released: [], interrupted: [], closed: [] }
+    sessions: { open: [], released: [], interrupted: [], closed: [], liveLegacy: [] }
   };
 }
 
@@ -282,7 +303,8 @@ function verifyEvents(
   errors: string[],
   externallyAuthenticatedPayloads?: ReadonlyMap<string, string>,
   notEvaluated?: string[],
-  audits?: AuditCollector
+  audits?: AuditCollector,
+  blobKeyOptional = false
 ): void {
   const events = ledger.getAllEvents();
   const retentionProofs = events.some((event) => event.archived === 1 || event.payload_pruned === 1)
@@ -297,7 +319,7 @@ function verifyEvents(
 
   let previous = "GENESIS";
   for (const event of events) {
-    verifyEvidencePayload(event, workspace, errors, externallyAuthenticatedPayloads, retentionProofs, notEvaluated);
+    verifyEvidencePayload(event, workspace, errors, externallyAuthenticatedPayloads, retentionProofs, notEvaluated, blobKeyOptional);
 
     if (event.prev_event_hash !== previous) {
       errors.push(`Event ${event.id} previous hash mismatch`);
@@ -364,28 +386,27 @@ function verifyEvents(
 
 /**
  * The verdict verifySessions reaches for each agent session, surfaced on
- * VerifyResult without weakening chain.ok. Legacy (non-agent) sessions never
- * appear here — they keep the strict must-be-sealed rule enforced via `errors`.
+ * VerifyResult without weakening chain.ok, plus the live legacy sessions
+ * (sessionLiveness.ts). Any other unsealed legacy session is an `errors` entry.
  */
 interface SessionLifecycle {
   open: string[];
   released: string[];
   interrupted: string[];
   closed: string[];
+  liveLegacy: LiveLegacySession[];
 }
 
-interface NativeContinuationScope {
-  readonly targetSessionId: string;
-  readonly incompleteLegacySessions: string[];
-}
-
+/** P0-14: the native session a continuation resumes; every recorded row and every present seal is still checked. */
+interface LiveScope { readonly targetSessionId: string }
 
 function verifySessions(
   ledger: Ledger,
   workspace: string,
   errors: string[],
   staleAfterMs: number,
-  continuation?: NativeContinuationScope
+  liveness: { readonly now: number; readonly legacyStaleAfterMs: number },
+  continuation?: LiveScope
 ): SessionLifecycle {
   const monitorKeys = legacyLedgerRowKeys(workspace);
   const sessions = ledger.getAllSessions();
@@ -426,7 +447,7 @@ function verifySessions(
     }
   }
 
-  const lifecycle: SessionLifecycle = { open: [], released: [], interrupted: [], closed: [] };
+  const lifecycle: SessionLifecycle = { open: [], released: [], interrupted: [], closed: [], liveLegacy: [] };
   // verifyEvents and verifySessionChains ran first. Never accept a handoff
   // from unauthenticated evidence; lifecycle labels do not suppress their errors.
   const authenticatedEvidence = errors.length === 0;
@@ -473,12 +494,13 @@ function verifySessions(
       continue;
     }
 
-    // Everything else keeps today's strict rule verbatim — a closed agent session
-    // and every legacy (non-agent) session must carry a valid row seal.
+    // A closed agent session and every legacy (non-agent) session must carry a valid row seal, except a legacy
+    // session that is live by its signed tail (sessionLiveness.ts): named in liveLegacy, never an error. A tail is
+    // evidence only when every row verified; otherwise nothing is live and the missing seal stands (fail closed).
     if (!session.session_final_event_hash || !session.session_seal_sig) {
-      if (continuation && session.session_id !== continuation.targetSessionId && !isAgentSession
-        && session.ended_ts === null && session.session_final_event_hash === null && session.session_seal_sig === null) {
-        continuation.incompleteLegacySessions.push(session.session_id);
+      const lastSignedTs = lastEventTsBySession.get(session.session_id) ?? null;
+      if (!isAgentSession && authenticatedEvidence && isLiveLegacySession(session, lastSignedTs, liveness.now, liveness.legacyStaleAfterMs)) {
+        lifecycle.liveLegacy.push({ sessionId: session.session_id, runtime: session.runtime, lastSignedTs });
         continue;
       }
       errors.push(`Session ${session.session_id} missing seal`);
@@ -496,6 +518,15 @@ function verifySessions(
     if (isAgentSession && isClosed && sealOk) lifecycle.closed.push(session.session_id);
   }
 
+  // LIVE-INTEGRITY-07: a gateway session a signed start row witnessed as sealed keeps exactly that seal. A copied slice
+  // may lack the session row; in a workspace ledger a removed session row is caught by the missing-session checks.
+  const sessionById = new Map(sessions.map((session) => [session.session_id, session]));
+  for (const [id, witness] of gatewaySealWitnesses(events)) {
+    const row = sessionById.get(id);
+    const seal = !row ? null : !row.session_final_event_hash || !row.session_seal_sig ? "missing"
+      : row.session_final_event_hash !== witness.finalHash ? "changed" : null;
+    if (seal) errors.push(`Session ${id} was sealed (witnessed by gateway start ${witness.eventId}) but its seal is ${seal}`);
+  }
   return lifecycle;
 }
 
@@ -513,61 +544,6 @@ function verifyRuns(ledger: Ledger, workspace: string, errors: string[]): void {
     if (!verifyHexDigestAny(run.report_json_sha256, run.run_seal_sig, auditorKeys)) {
       errors.push(`Assurance run ${run.assurance_run_id} seal signature invalid`);
     }
-  }
-}
-
-function verifyOutcomeEvents(ledger: Ledger, workspace: string, errors: string[]): void {
-  const monitorKeys = legacyLedgerRowKeys(workspace);
-  const rows = ledger.getAllOutcomeEvents();
-  let previous = "GENESIS_OUTCOME";
-  for (const row of rows) {
-    if (row.prev_event_hash !== previous) {
-      errors.push(`Outcome event ${row.outcome_event_id} previous hash mismatch`);
-    }
-    const metaJson = row.meta_json;
-    let parsedValue: unknown = row.value;
-    try {
-      parsedValue = JSON.parse(row.value);
-    } catch {
-      parsedValue = row.value;
-    }
-    const recalculated = sha256Hex(
-      `${row.prev_event_hash}${canonicalize({
-        outcome_event_id: row.outcome_event_id,
-        ts: row.ts,
-        agent_id: row.agent_id,
-        work_order_id: row.work_order_id,
-        category: row.category,
-        metric_id: row.metric_id,
-        value: parsedValue,
-        unit: row.unit,
-        trust_tier: row.trust_tier,
-        source: row.source,
-        meta_json: metaJson,
-        payload_sha256: row.payload_sha256
-      })}`
-    );
-    if (recalculated !== row.event_hash) {
-      errors.push(`Outcome event ${row.outcome_event_id} event_hash mismatch`);
-    }
-    if (!verifyHexDigestAny(row.event_hash, row.signature, monitorKeys)) {
-      errors.push(`Outcome event ${row.outcome_event_id} signature invalid`);
-    }
-    const verifiedReceipt = verifyReceipt(row.receipt, getPurposeKeyHistory(workspace, "receipt"));
-    if (!verifiedReceipt.ok || !verifiedReceipt.payload) {
-      errors.push(`Outcome event ${row.outcome_event_id} receipt invalid`);
-    } else {
-      if (verifiedReceipt.payload.event_hash !== row.event_hash) {
-        errors.push(`Outcome event ${row.outcome_event_id} receipt event hash mismatch`);
-      }
-      if (verifiedReceipt.payload.body_sha256 !== row.payload_sha256) {
-        errors.push(`Outcome event ${row.outcome_event_id} receipt payload hash mismatch`);
-      }
-      if (verifiedReceipt.payload.receipt_id !== row.receipt_id) {
-        errors.push(`Outcome event ${row.outcome_event_id} receipt id mismatch`);
-      }
-    }
-    previous = row.event_hash;
   }
 }
 
@@ -652,28 +628,27 @@ export function verifyLedgerIntegrity(
 }
 
 /** A verified recorded prefix for native takeover, never a complete-ledger verdict.
- * Unended unrelated legacy sessions may lack both final-seal fields; their
- * recorded rows still undergo every integrity check and their IDs are explicit.
- * Every present seal is checked. The native caller must separately enforce the
- * selected opening/owner and atomically claim its verified exact head.
+ * Live legacy sessions (sessionLiveness.ts) are named in incompleteLegacySessions;
+ * every recorded row and every present seal is checked. The native caller must
+ * separately enforce the selected opening/owner and atomically claim its verified exact head.
  */
 export function verifyNativeSessionContinuation(workspacePath: string, targetSessionId: string, options: LedgerVerifyOptions = {}): {
   scope: "verified-prefix"; targetSessionId: string; chain: VerifyResult["chain"];
   trustRoot: VerifyResult["trustRoot"]; sessions: VerifyResult["sessions"]; incompleteLegacySessions: readonly string[];
 } {
-  const continuation: NativeContinuationScope = { targetSessionId, incompleteLegacySessions: [] };
-  const result = verifyLedger(workspacePath, options, continuation);
+  const result = verifyLedger(workspacePath, options, { targetSessionId });
   return { scope: "verified-prefix", targetSessionId, chain: result.chain, trustRoot: result.trustRoot, sessions: result.sessions,
-    incompleteLegacySessions: continuation.incompleteLegacySessions };
+    incompleteLegacySessions: result.sessions.liveLegacy.map((session) => session.sessionId) };
 }
 
-function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, continuation?: NativeContinuationScope): VerifyResult {
+function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, continuation?: LiveScope): VerifyResult {
   let ledger: Ledger | null = null;
   const chainErrors: string[] = [];
   const payloadsNotEvaluated: string[] = [];
   const governanceErrors: string[] = [];
   const staleAfterMs = options.sessionStaleAfterMs ?? SESSION_STALE_AFTER_MS;
-  let sessionLifecycle: SessionLifecycle = { open: [], released: [], interrupted: [], closed: [] };
+  const liveness = { now: options.now ?? Date.now(), legacyStaleAfterMs: options.legacyStaleAfterMs ?? GATEWAY_SESSION_STALE_AFTER_MS };
+  let sessionLifecycle: SessionLifecycle = { open: [], released: [], interrupted: [], closed: [], liveLegacy: [] };
   const audits: AuditCollector | undefined = options.auditTypes ? { wanted: new Set(options.auditTypes), found: new Map() } : undefined;
   let auditsRead = false;
 
@@ -721,15 +696,17 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
     } else if (!jsonlBackend) {
       chainErrors.push("Evidence ledger is missing; verification does not initialize a workspace");
     }
-    if (continuation && (!ledger || jsonlBackend)) chainErrors.push("Native continuation requires the SQLite native session store");
+    if (continuation && (!ledger || jsonlBackend)) {
+      chainErrors.push("Native continuation requires the SQLite native session store");
+    }
     chainErrors.push(...verifyAlternateBackendEvidence(workspacePath, expectedFingerprint, options.trust));
     if (ledger) {
       chainErrors.push(...operationalLedgerProblems(workspacePath, ledger, options.trust));
       chainErrors.push(...receiptLedgerProblems(ledger, options.trust));
-      verifyEvents(ledger, workspacePath, chainErrors, options.externallyAuthenticatedPayloads, payloadsNotEvaluated, audits);
+      verifyEvents(ledger, workspacePath, chainErrors, options.externallyAuthenticatedPayloads, payloadsNotEvaluated, audits, options.blobKeyOptional);
       auditsRead = audits !== undefined;
       verifySessionChains(ledger, chainErrors, { trust: options.trust });
-      sessionLifecycle = verifySessions(ledger, workspacePath, chainErrors, staleAfterMs, continuation);
+      sessionLifecycle = verifySessions(ledger, workspacePath, chainErrors, staleAfterMs, liveness, continuation);
       verifyRuns(ledger, workspacePath, chainErrors);
       verifyOutcomeEvents(ledger, workspacePath, chainErrors);
       options.onVerifiedLedger?.(ledger);
@@ -773,7 +750,8 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
       open: sessionLifecycle.open,
       released: sessionLifecycle.released,
       interrupted: sessionLifecycle.interrupted,
-      closed: sessionLifecycle.closed
+      closed: sessionLifecycle.closed,
+      liveLegacy: sessionLifecycle.liveLegacy
     },
     ...(payloadsNotEvaluated.length ? { payloadsNotEvaluated } : {}),
     ...(auditsRead && audits ? { audits: audits.found, ...(audits.first ? { firstAudit: audits.first } : {}) } : {})

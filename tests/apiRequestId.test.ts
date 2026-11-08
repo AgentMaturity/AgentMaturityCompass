@@ -160,7 +160,7 @@ describe("Studio honours an inbound id only from a trusted forwarder (P1-55)", (
   async function studioIds(trustedProxyHops: number, headers: Record<string, string>[]): Promise<(string | null)[]> {
     const dir = mkdtempSync(join(tmpdir(), "amc-studio-request-id-"));
     initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" });
-    const api = await startStudioApiServer({ workspace: dir, host: "127.0.0.1", port: 0, token: "test-token", trustedProxyHops });
+    const api = await startStudioApiServer({ workspace: dir, host: "127.0.0.1", port: 0, token: "test-token", trustedProxyHops, trustedProxyCidrs: ["127.0.0.1/32", "::1/128"] });
     try {
       const ids: (string | null)[] = [];
       for (const header of headers) ids.push((await fetch(`${api.url}/api/v1/health`, { headers: header })).headers.get("x-request-id"));
@@ -175,7 +175,8 @@ describe("Studio honours an inbound id only from a trusted forwarder (P1-55)", (
   }
 
   test("behind a trusted proxy a valid id is echoed and an invalid one replaced", async () => {
-    const [valid, invalid, studioOwn] = await studioIds(1, [{ "x-request-id": "trace-0001-abcd" }, { "x-request-id": "short" }]);
+    const forwarded = { "x-forwarded-for": "127.0.0.1" }; // the trusted proxy forwarded these requests
+    const [valid, invalid, studioOwn] = await studioIds(1, [{ ...forwarded, "x-request-id": "trace-0001-abcd" }, { ...forwarded, "x-request-id": "short" }]);
     expect(valid).toBe("trace-0001-abcd");
     expect(invalid).toMatch(UUID);
     expect(studioOwn).toMatch(UUID);

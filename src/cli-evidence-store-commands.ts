@@ -9,9 +9,10 @@
 import type { Command } from "commander";
 import chalk from "chalk";
 import { join } from "node:path";
-import { LEDGER_UNANCHORED_MESSAGE } from "./ledger/ledgerVerification.js";
-import type { IssuerAdmission } from "./trust/admission.js";
+import { LEDGER_UNANCHORED_MESSAGE, type VerifyResult } from "./ledger/ledgerVerification.js";
+import { describeOpenSessions } from "./ledger/sessionLiveness.js";
 import { isKeyRefused } from "./trust/signatureCheck.js";
+import { describePayloadsNotEvaluated } from "./verify/payloadsNotEvaluated.js";
 
 export function registerEvidenceStoreCommands(program: Command): void {
   program
@@ -229,18 +230,25 @@ export function registerEvidenceStoreCommands(program: Command): void {
  * Every signature is checked against `.amc/keys/monitor_ed25519.pub`, which lives inside the workspace, so someone
  * who can rewrite the evidence can replace that key and re-sign everything (tests/ledgerTrustRootAnchor.test.ts does
  * exactly that). Since P0-09 an unanchored verdict is a failure, not a pass with a note: only a monitor key pinned
- * outside the workspace turns it into evidence, and --allow-unanchored gives an integrity-only result.
+ * outside the workspace turns it into evidence, and --allow-unanchored gives an integrity-only result. A verdict that
+ * held names the open sessions it found (a running Studio's gateway, an in-flight request): observed facts, not errors.
+ * Payloads this process could not open (B1: a locked vault) make it NOT EVALUATED: never PASSED, never FAILED.
  */
-export function renderLedgerVerdict(result: {
-  ok: boolean;
-  trustRoot: { anchored: boolean; monitorFingerprint: string | null; expectedFingerprint: string | null; monitorAdmission?: IssuerAdmission };
-}, allowUnanchored = false): string {
-  const fingerprint = result.trustRoot.monitorFingerprint;
+export function renderLedgerVerdict(result: Pick<VerifyResult, "ok" | "trustRoot" | "sessions" | "payloadsNotEvaluated">, allowUnanchored = false): string {
   if (!result.ok) return chalk.red("Ledger verification FAILED");
-  if (result.trustRoot.anchored) {
+  const open = result.sessions.liveLegacy, notEvaluated = result.payloadsNotEvaluated ?? [];
+  return (notEvaluated.length > 0
+    ? `${chalk.yellow("Ledger verification NOT EVALUATED")}\n${chalk.gray(`  ${describePayloadsNotEvaluated(notEvaluated)}`)}`
+    : renderHeldVerdict(result.trustRoot, allowUnanchored))
+    + (open.length > 0 ? `\n${chalk.gray(`  ${describeOpenSessions(open, Date.now())}`)}` : "");
+}
+
+function renderHeldVerdict(trustRoot: VerifyResult["trustRoot"], allowUnanchored: boolean): string {
+  const fingerprint = trustRoot.monitorFingerprint;
+  if (trustRoot.anchored) {
     return `${chalk.green("Ledger verification PASSED")}\n${chalk.gray(`  Anchored to the pinned monitor key ${fingerprint ?? ""}`)}`;
   }
-  const admission = result.trustRoot.monitorAdmission;
+  const admission = trustRoot.monitorAdmission;
   if (admission && isKeyRefused(admission)) {
     return chalk.red(`Ledger verification FAILED: monitor key ${admission.status}. ${admission.detail ?? ""}`);
   }

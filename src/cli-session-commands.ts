@@ -36,8 +36,9 @@ export function registerSessionCommands(program: Command): void {
       const { verifyLedgerIntegrity } = await import("./ledger/ledger.js");
       const { renderLedgerVerdict } = await import("./cli-evidence-store-commands.js");
       const trust = trustFromFlags(opts, ["ledger-row"]);
+      // B1: payloads a locked vault keeps closed are NOT EVALUATED (renderLedgerVerdict, exit 1), never tampering.
       const result = await verifyLedgerIntegrity(process.cwd(), {
-        trust, ...(opts.expectMonitor ? { expectedMonitorFingerprint: opts.expectMonitor } : {})
+        trust, blobKeyOptional: true, ...(opts.expectMonitor ? { expectedMonitorFingerprint: opts.expectMonitor } : {})
       });
       // An intact ledger proves its rows are unchanged, not that what they record is true: self-reported.
       const { open: openIds, released: releasedIds, interrupted: interruptedIds, closed: closedIds } = result.sessions;
