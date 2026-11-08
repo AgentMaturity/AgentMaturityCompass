@@ -79,7 +79,7 @@ import { admitSessionAtOpen } from "../runtime/changeEnvelope.js";
 import { nativeSessionManifest } from "../lifecycle/versionManifest.js";
 import { runDueSchedules, type ScheduleRunResult } from "../autonomy/scheduleRunner.js";
 import { runGoalRounds, type GoalRoundsResult } from "../autonomy/goalRounds.js";
-import { assertNonModelPassAdmission, runWorkflowPass, type WorkflowPassOptions } from "../workflow/workflowPass.js";
+import { assertNonModelPassAdmission, leavesResumeAsFound, runWorkflowPass, type WorkflowPassOptions } from "../workflow/workflowPass.js";
 import type { WorkflowRunResult } from "../workflow/workflowRunner.js";
 import { assertNativeScheduleAdmission } from "../autonomy/scheduleService.js";
 import type { SubagentCapability } from "../agent/delegateTool.js";
@@ -520,7 +520,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
   let steerTimer: NodeJS.Timeout | null = null;
   /** Set once the loop (or schedule pass) is ready; until then a throw is a failed composition, never a completion. */
   let composed = false;
-  let hostShutdown = false;
+  let hostShutdown = false, untouchedResume = false;
   let loopOwner: AgentLoopSeamService | undefined;
 
   try {
@@ -679,6 +679,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
         composed = true; // as for goal rounds: a non-model pass whose composition succeeded is not composition_failed
         const workflow = await runWorkflowPass({ workspace: options.workspace, parent: rootIdentity(options.agentId), session, runner,
           delegation: options.delegation!, pass: options.workflowPass });
+        untouchedResume = leavesResumeAsFound(options.resume !== undefined, workflow); // refused before dispatch: unsealed
         return { sessionId, status: "idle", workflow, validation: projectNativeValidation(options.workspace, session.readEvents()),
           systemPromptEventId: systemPromptRef.eventId, promptSections: prompt.assemble().sections.map(section => section.name) };
       }
@@ -788,7 +789,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     try { resourcesConfirmed = await (options.tools?.shutdown?.() ?? Promise.resolve(true)); }
     catch (error) { disposalError ??= error; }
     sealComposedSession(session, { stopped: driverConfirmed && loopOwner?.status !== "failed", resourcesConfirmed,
-      keepOpen: options.keepOpen === true, composed, hostShutdown, schedulePass: options.schedulePass !== undefined });
+      keepOpen: options.keepOpen === true || untouchedResume, composed, hostShutdown, schedulePass: options.schedulePass !== undefined });
     // oxlint-disable-next-line no-unsafe-finally -- Report failed disposal after attempting every schedule owner.
     if (disposalError !== undefined) throw new Error("TOOL_OUTCOME_UNKNOWN: native service cleanup failed.", { cause: disposalError });
     // oxlint-disable-next-line no-unsafe-finally -- A cleanup timeout cannot be reported as successful shutdown.

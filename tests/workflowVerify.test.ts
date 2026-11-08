@@ -9,6 +9,7 @@ import { rootIdentity } from "../src/agent/delegationIdentity.js";
 import { runWorkflowPlan } from "../src/workflow/workflowRunner.js";
 import { parseWorkflowPlan, planAgentCount, type WorkflowNode } from "../src/workflow/workflowPlan.js";
 import { readVerdict } from "../src/workflow/workflowVerdict.js";
+import { leavesResumeAsFound } from "../src/workflow/workflowPass.js";
 import type { SubagentRunContext } from "../src/agent/subagentSpawn.js";
 
 /**
@@ -147,5 +148,14 @@ describe("a verify node gates the plan", () => {
     expect(again.ok).toBe(true);
     expect(again.agentsRun).toBe(0);
     expect(again.outputs.get("v")).toBe("draft");
+  });
+});
+
+describe("a resumed headless pass that changed nothing", () => {
+  it("is left unsealed only when it resumed a session, dispatched nothing and did not succeed", () => {
+    expect(leavesResumeAsFound(true, { agentsRun: 0, ok: false }), "refused before any dispatch").toBe(true);
+    expect(leavesResumeAsFound(true, { agentsRun: 0, ok: true }), "finished from reused results: it seals").toBe(false);
+    expect(leavesResumeAsFound(true, { agentsRun: 1, ok: false }), "it dispatched: the usual rule").toBe(false);
+    expect(leavesResumeAsFound(false, { agentsRun: 0, ok: false }), "a fresh session: the usual rule").toBe(false);
   });
 });

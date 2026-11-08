@@ -119,6 +119,35 @@ describe("agent-loop run --workflow-plan", () => {
     expect(unsessioned.captured.errors.at(-1)).toMatch(/add --session <id>/);
   });
 
+  it("leaves a resumed session as it found it when the resume is refused before any dispatch, even without --keep-open", async () => {
+    const file = planFile("resume-refused.json", { kind: "pipeline", id: "p", stages: [agent("a", "draft"), agent("b", "polish")] });
+    const first = programWith();
+    await run(first.program, [...base, "--delegate", "--workflow-plan", file, "--keep-open"]);
+    expect(first.captured.failures, first.captured.errors.join("\n")).toEqual([]);
+    const { sessionId, workflow: { runId } } = lastJson(first.captured) as { sessionId: string; workflow: { runId: string } };
+    const resume = async (plan: string, id: string) => {
+      const attempt = programWith();
+      // A sealed session is refused by the resume itself, which throws out of the command.
+      try { await run(attempt.program, [...base, "--delegate", "--workflow-plan", plan, "--session", sessionId, "--workflow-run-id", id]); }
+      catch (error) { attempt.captured.errors.push(String(error)); attempt.captured.failures.push(1); }
+      return attempt.captured;
+    };
+    // A mistyped run id, then a plan the checkpoint fence refuses: neither dispatches, and neither seals the session.
+    const typo = await resume(file, `${runId}-typo`);
+    expect((lastJson(typo) as { workflow: { agentsRun: number } }).workflow.agentsRun).toBe(0);
+    const changed = await resume(planFile("resume-changed.json", { kind: "pipeline", id: "p", stages: [agent("a", "draft"), agent("b", "rewrite")] }), runId);
+    expect(changed.failures).toEqual([1]);
+    expect((lastJson(changed) as { workflow: { agentsRun: number; failed: Array<{ reason: string }> } }).workflow).toMatchObject({ agentsRun: 0,
+      failed: [{ reason: expect.stringMatching(/checkpoint/) }] });
+    // So the reviewed plan still resumes in place: both nodes reused, nothing dispatched again, and that resume seals.
+    const resumed = await resume(file, runId);
+    expect(resumed.failures, resumed.errors.join("\n")).toEqual([]);
+    expect((lastJson(resumed) as { workflow: { ok: boolean; agentsRun: number } }).workflow).toMatchObject({ ok: true, agentsRun: 0 });
+    const afterSeal = await resume(file, runId);
+    expect(afterSeal.failures).toEqual([1]);
+    expect(afterSeal.errors.join("\n")).toMatch(/sealed/i);
+  });
+
   it("pins the reviewed plan bytes with --workflow-plan-sha256 and refuses any other bytes", async () => {
     const file = planFile("pinned.json", agent("a", "draft"));
     const probe = programWith();

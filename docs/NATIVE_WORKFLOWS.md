@@ -88,16 +88,19 @@ amc agent-loop run --delegate --tools workspace --workflow-plan plan.json --json
   parked as `TOOL_OUTCOME_UNKNOWN` and needs operator reconciliation before a
   retry.
 - `--keep-open` leaves the session unsealed. A later
-  `--session <id> --workflow-run-id <runId> --workflow-plan <same file> --keep-open`
+  `--session <id> --workflow-run-id <runId> --workflow-plan <same file>`
   resumes that run in that session: succeeded nodes are reused without a new
   dispatch, and a plan whose canonical content differs from the recorded one is
   refused by the existing checkpoint fence. A `--workflow-run-id` the session
   never created is refused before any dispatch (a resume never starts a new run
   under a given id, so a typo cannot re-run finished nodes). Without
   `--keep-open` (or a crash that left the session unsealed) there is nothing to
-  resume. Repeat `--keep-open` on the resume itself: a resume that the fence
-  refuses still seals the session without it, and a sealed session can only be
-  forked, not resumed.
+  resume. A resume that dispatches nothing and does not succeed (a mistyped run
+  id, a checkpoint the fence refuses, a node parked as `TOOL_OUTCOME_UNKNOWN`)
+  leaves the session as it found it, unsealed, so the same resume works once
+  the cause is fixed. A resume that dispatches a node, or finishes from reused
+  results, seals the session unless it repeats `--keep-open`; a sealed session
+  can only be forked, not resumed.
 
 The `workflow` tool is now also registered for the root `--delegate` run, beside
 `delegate`; it stays hidden and denied until the signed allowlist names

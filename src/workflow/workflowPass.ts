@@ -72,6 +72,15 @@ export interface WorkflowPassInit {
   readonly pass: WorkflowPassOptions;
 }
 
+/**
+ * A resumed session whose pass dispatched nothing and did not succeed (a mistyped run id, a checkpoint the fence
+ * refused, a parked unknown node) is left as it was found: unsealed and still resumable once the cause is fixed,
+ * whether or not the resume repeated `--keep-open`. Any dispatch, any success and any fresh session keep the usual rule.
+ */
+export function leavesResumeAsFound(resumed: boolean, result: Pick<WorkflowRunResult, "agentsRun" | "ok">): boolean {
+  return resumed && result.agentsRun === 0 && !result.ok;
+}
+
 /** Run the plan under the composed runner; every node is still a `spawnSubagent` with the operator's bounds. */
 export function runWorkflowPass(init: WorkflowPassInit): Promise<WorkflowRunResult> {
   const { delegation, pass } = init;
