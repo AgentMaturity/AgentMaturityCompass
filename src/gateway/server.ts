@@ -655,7 +655,7 @@ function createProxyServer(params: {
   workspaceId?: string;
   config: GatewayConfig;
   gatewaySessionId: () => string;
-  fence: Pick<CloseFence, "admit" | "signal">;
+  fence: Pick<CloseFence, "admit" | "admitTunnel" | "signal">;
   allowedCidrs?: string[];
   fieldGuard: FieldGuard;
   logger: Pick<Console, "error">;
@@ -889,6 +889,7 @@ function createProxyServer(params: {
   });
 
   const onConnect = async (req: IncomingMessage, clientSocket: Duplex, head: Buffer): Promise<void> => {
+    if (!params.fence.admitTunnel(clientSocket)) return;
     const requestId = randomUUID();
     const clientIp = normalizeRemoteIp(req.socket.remoteAddress);
     if (!ipAllowedByCidrs(clientIp, params.allowedCidrs ?? [])) {

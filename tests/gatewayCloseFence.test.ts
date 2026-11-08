@@ -1,6 +1,8 @@
 import { EventEmitter } from "node:events";
 import { createServer, request as httpRequest, type Server, type ServerResponse } from "node:http";
 import { mkdtempSync, rmSync } from "node:fs";
+import { createServer as createTcpServer, type Server as TcpServer } from "node:net";
+import type { Duplex } from "node:stream";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
@@ -138,4 +140,79 @@ test("the drain is bounded: a request that never ends is aborted after drainMs",
   await fence.close(parts([]));
   expect(fence.signal.aborted).toBe(true);
   expect(Date.now() - started).toBeLessThan(1_000);
+});
+
+/** A socket stand-in: records what admitTunnel() writes; destroy() emits "close" once, later, as a net.Socket does. */
+class FakeSocket extends EventEmitter {
+  written = "";
+  destroyed = false;
+  end(chunk = "", done?: () => void): this { this.written += chunk; done?.(); return this; }
+  destroy(): this { if (!this.destroyed) { this.destroyed = true; queueMicrotask(() => this.emit("close")); } return this; }
+}
+const fakeSocket = () => new FakeSocket();
+
+test("CONNECT tunnels: an admitted one holds the drain and is destroyed when it ends, before the seal; one opened while closing gets 503", async () => {
+  const fence = createCloseFence({ drainMs: 50, settleMs: 50 });
+  const tunnel = fakeSocket();
+  expect(fence.admitTunnel(tunnel as unknown as Duplex)).toBe(true);
+  const order: string[] = [];
+  fence.signal.addEventListener("abort", () => order.push("abort"));
+  tunnel.on("close", () => order.push("tunnel closed"));
+  const closing = fence.close(parts(order));
+  const late = fakeSocket();
+  expect(fence.admitTunnel(late as unknown as Duplex)).toBe(false);
+  expect(late.written).toMatch(/^HTTP\/1\.1 503 Service Unavailable\r\n[\s\S]*\r\n\r\n\{"error":"gateway shutting down"\}$/);
+  expect(late.destroyed).toBe(true);
+  await delay(20);
+  expect(order).toEqual([]); // still draining the admitted tunnel
+  await closing;
+  expect(order).toEqual(["abort", "tunnel closed", "seal", "ledger", "credentials"]);
+});
+
+test("close() ends an open CONNECT tunnel within the bound and records it before the seal (skeptic: tunnels were outside the fence)", { timeout: 60_000 }, async () => {
+  vi.stubEnv("AMC_VAULT_PASSPHRASE", "synthetic-gateway-close-fence-connect");
+  const root = mkdtempSync(join(tmpdir(), "amc-gateway-close-connect-"));
+  cleanups.push(() => { lockVault(root); rmSync(root, { recursive: true, force: true }); });
+  initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
+  const echoSockets = new Set<Duplex>();
+  const echo: TcpServer = createTcpServer((socket) => { echoSockets.add(socket); socket.on("error", () => socket.destroy()); socket.pipe(socket); });
+  await new Promise<void>((resolve) => echo.listen(0, "127.0.0.1", resolve));
+  cleanups.push(() => new Promise<void>((resolve) => { echoSockets.forEach((socket) => socket.destroy()); echo.close(() => resolve()); }));
+  const echoPort = (echo.address() as { port: number }).port;
+  initGatewayConfig(root, { ...gatewayConfig(echoPort), proxy: { enabled: true, port: 3299, allowlistHosts: ["127.0.0.1"], denyByDefault: true } } as GatewayConfig); // proxyPort: 0 below overrides the port
+  const gateway = await startGateway({ workspace: root, listenPort: 0, proxyPort: 0, logger: { log() {}, error() {} } });
+  const lease = issueLeaseForCli({ workspace: root, agentId: "default", ttl: "60m", scopes: "gateway:llm,proxy:connect", routes: "/test", models: "*",
+    rpm: 1000, tpm: 1_000_000, maxCostUsdPerDay: null }).token;
+  const tunnel = await new Promise<Duplex>((resolve, reject) => {
+    const req = httpRequest({ host: gateway.host, port: gateway.proxyPort!, method: "CONNECT", path: `127.0.0.1:${echoPort}`, agent: false,
+      headers: { "x-amc-agent-id": "default", "x-amc-lease": lease } });
+    req.on("connect", (res, socket) => res.statusCode === 200 ? resolve(socket) : reject(new Error(`CONNECT answered ${res.statusCode}`)));
+    req.on("error", reject);
+    req.end();
+  });
+  cleanups.push(() => { tunnel.destroy(); });
+  const echoed = new Promise<string>((resolve) => tunnel.once("data", (chunk: Buffer) => resolve(chunk.toString())));
+  tunnel.write("ping");
+  expect(await echoed).toBe("ping");
+  let tunnelClosed = false;
+  tunnel.on("close", () => { tunnelClosed = true; });
+  tunnel.on("error", () => {});
+
+  const started = Date.now();
+  await gateway.close();
+  expect(Date.now() - started).toBeLessThan(5_000);
+  await delay(200);
+  expect(tunnelClosed).toBe(true); // close() destroyed the tunnel instead of leaving it relaying traffic
+
+  const ledger = openLedger(root, { readonly: true });
+  try {
+    const rows = ledger.getAllEvents().filter((event) => event.session_id === gateway.gatewaySessionId)
+      .map((event) => ({ hash: event.event_hash, meta: JSON.parse(event.meta_json) as Record<string, unknown> }));
+    const tunnelRow = rows.findIndex((row) => row.meta.proxyMode === true && row.meta.destinationPort === echoPort && "connectedAddress" in row.meta);
+    const stopRow = rows.findIndex((row) => row.meta.stage === "stop");
+    expect(tunnelRow).toBeGreaterThan(-1);
+    expect(tunnelRow).toBeLessThan(stopRow);
+    const session = ledger.getAllSessions().find((row) => row.session_id === gateway.gatewaySessionId)!;
+    expect(session.session_final_event_hash).toBe(rows.at(-1)!.hash);
+  } finally { ledger.close(); }
 });
