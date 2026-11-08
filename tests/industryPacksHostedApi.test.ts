@@ -251,10 +251,30 @@ describe("hosted API error text and rate limit", () => {
     expect(issued.status).toBe(200);
   }, 120_000);
 
-  it("on a platform proxy with no client named, the limiter stays off and says so once", async () => {
+  // SR-12: with no client named behind a platform proxy the limiter switched off, which failed open. Now every client there
+  // shares one bucket per route with a higher ceiling, and the admin licence route is limited like the rest.
+  it("on a platform proxy with no client named, every client shares one bucket per route at 1,200 a minute, said once", async () => {
     vi.stubEnv("VERCEL", "1");
     const warned = vi.spyOn(console, "warn").mockImplementation(() => undefined);
-    expect(await posts("/api/industry-packs/checkout", 125, () => ({}))).not.toContain(429);
+    const checkout = await posts("/api/industry-packs/checkout", 1_201, (index) => ({ "x-forwarded-for": `198.51.100.${index % 250}` }));
+    expect(checkout.filter((status) => status === 429)).toEqual([429]);
+    expect(checkout.at(-1)).toBe(429);
+    const issue = await posts("/api/industry-packs/license/issue", 1_201, () => ({}));
+    expect(issue.slice(0, -1).every((status) => status === 401)).toBe(true);
+    expect(issue.at(-1), "the admin licence route is always limited").toBe(429);
     expect(warned).toHaveBeenCalledTimes(1);
+  }, 120_000);
+
+  // SR-13: the bucket key embedded the raw path, so every distinct path was a fresh bucket and a new key in the store.
+  it("1,000 distinct unknown POST paths from one client share one bucket, apart from the known routes", async () => {
+    vi.stubEnv("AMC_API_TRUSTED_CLIENT_IP_HEADER", "x-test-client-ip");
+    const client = { "x-test-client-ip": "198.51.100.40" };
+    const statuses: number[] = [];
+    for (let index = 0; index < 1_000; index += 1) {
+      statuses.push((await fetch(`${origin}/api/unknown-${index}`, { method: "POST", headers: client, body: "{}" })).status);
+    }
+    expect(statuses.filter((status) => status === 404)).toHaveLength(120);
+    expect(statuses.filter((status) => status === 429)).toHaveLength(880);
+    expect((await fetch(`${origin}/api/quickscore`, { method: "POST", headers: client, body: JSON.stringify({ agentId: "a", responses: {} }) })).status).toBe(200);
   }, 120_000);
 });
