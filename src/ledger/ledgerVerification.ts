@@ -47,6 +47,7 @@ import { boundProviderKey } from "../keys/keyset.js";
 import { getPurposeKeyHistory } from "../keys/signingKeys.js";
 import { receiptLedgerProblems } from "../keys/receiptSqlAuthority.js";
 import { GATEWAY_SESSION_STALE_AFTER_MS, isLiveLegacySession, type LiveLegacySession } from "./sessionLiveness.js";
+import { gatewaySealWitnesses } from "./interruptedSessions.js";
 
 /**
  * Default heartbeat window for the OPEN vs INTERRUPTED verdict on an unsealed,
@@ -509,7 +510,15 @@ function verifySessions(
     if (isAgentSession && isClosed && sealOk) lifecycle.closed.push(session.session_id);
   }
 
-
+  // LIVE-INTEGRITY-07: a gateway session a signed start row witnessed as sealed keeps exactly that seal. A copied slice
+  // may lack the session row; in a workspace ledger a removed session row is caught by the missing-session checks.
+  const sessionById = new Map(sessions.map((session) => [session.session_id, session]));
+  for (const [id, witness] of gatewaySealWitnesses(events)) {
+    const row = sessionById.get(id);
+    const seal = !row ? null : !row.session_final_event_hash || !row.session_seal_sig ? "missing"
+      : row.session_final_event_hash !== witness.finalHash ? "changed" : null;
+    if (seal) errors.push(`Session ${id} was sealed (witnessed by gateway start ${witness.eventId}) but its seal is ${seal}`);
+  }
   return lifecycle;
 }
 

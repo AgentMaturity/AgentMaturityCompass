@@ -1,6 +1,6 @@
 /**
- * The gateway's own ledger session (LIVE-INTEGRITY-02, D-INT-2/6). It opens with a signed start event, stays live
- * through a payload-less signed heartbeat written only
+ * The gateway's own ledger session (LIVE-INTEGRITY-02, D-INT-2/6/7). It opens with a signed start event that witnesses
+ * the gateway sessions sealed since the last start (-07), stays live through a payload-less signed heartbeat written only
  * when it has been idle for `afterMs`, and seals on close(). Every check also sweeps for interrupted gateway sessions
  * (interruptedSessions.ts) that cannot belong to a live gateway (tail >= recoverAfterMs) nor to this process (started
  * before it). Every append goes through one guard: after close() nothing is written, so a late request handler drops its
@@ -12,7 +12,7 @@ import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { hashBinaryOrPath, type AppendEvidenceWithReceiptInput, type Ledger } from "../ledger/ledger.js";
 import { runImmediateTransaction } from "../ledger/ledgerSessionTransactions.js";
-import { sealInterruptedSession } from "../ledger/interruptedSessions.js";
+import { sealedGatewaySessionsToWitness, sealInterruptedSession, witnessedGatewaySeals } from "../ledger/interruptedSessions.js";
 import {
   GATEWAY_HEARTBEAT_AFTER_MS, GATEWAY_HEARTBEAT_CHECK_MS, GATEWAY_RECOVER_AFTER_MS, HEARTBEAT_STAGE
 } from "../ledger/sessionLiveness.js";
@@ -33,7 +33,7 @@ export interface GatewaySession {
 export function openGatewaySession(ledger: Ledger, input: {
   workspace: string;
   logger: { log(message: string): void; error(message: string): void };
-  /** The start event the gateway writes today; the session adds `resumedFrom` on a re-open. */
+  /** The start event the gateway writes today; the session adds the -07 witness list (and `resumedFrom` on a re-open). */
   start: GatewayEvent;
   now?: () => number;
   heartbeat?: { checkEveryMs?: number; afterMs?: number };
@@ -59,7 +59,8 @@ export function openGatewaySession(ledger: Ledger, input: {
     const sessionId = randomUUID();
     ledger.startSession({ sessionId, runtime: "gateway", binaryPath: join(input.workspace, "dist", "cli.js"),
       binarySha256: hashBinaryOrPath("amc-gateway", "1") });
-    write(sessionId, { ...input.start, meta: { ...input.start.meta, ...(resumedFrom ? { stage: "start", resumedFrom } : {}) } });
+    write(sessionId, { ...input.start, meta: { ...input.start.meta, ...(resumedFrom ? { stage: "start", resumedFrom } : {}),
+      sealedGatewaySessions: sealedGatewaySessionsToWitness(ledger) } });
     return sessionId;
   });
   let current = open();
@@ -71,10 +72,12 @@ export function openGatewaySession(ledger: Ledger, input: {
     const candidates = ledger.db.prepare(`SELECT session_id FROM sessions WHERE runtime = 'gateway' AND ended_ts IS NULL
       AND session_final_event_hash IS NULL AND session_seal_sig IS NULL AND session_id != ? AND started_ts < ?`)
       .all(current, processStartTs) as Array<{ session_id: string }>;
+    if (candidates.length === 0) return [];
+    const witnessed = witnessedGatewaySeals(ledger);
     const sealed: string[] = [];
     for (const { session_id: sessionId } of candidates) {
       try {
-        if (sealInterruptedSession(ledger, sessionId, { now: now(), minAgeMs: recoverAfterMs, recoveredBy: current })) {
+        if (sealInterruptedSession(ledger, sessionId, { now: now(), minAgeMs: recoverAfterMs, recoveredBy: current, witnessed })) {
           sealed.push(sessionId);
           input.logger.log(`gateway: sealed interrupted gateway session ${sessionId}`);
         }

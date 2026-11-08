@@ -174,7 +174,7 @@ test("(h) a foreign seal: beat() continues in a new session that names the old o
   handle().sealSession(first);
   expect(session.beat()).toBe(true);
   expect(session.sessionId).not.toBe(first);
-  expect(rows(session.sessionId)[0]!.meta).toMatchObject({ stage: "start", resumedFrom: first });
+  expect(rows(session.sessionId)[0]!.meta).toMatchObject({ stage: "start", resumedFrom: first, sealedGatewaySessions: [{ sessionId: first }] });
   session.appendEvidence({ eventType: "gateway", payload: "{}", meta: { stage: "request_error" } });
   expect(rows(session.sessionId).at(-1)!.meta.stage).toBe("request_error");
   expect(rows(first).at(-1)!.meta.stage).toBe("start");
