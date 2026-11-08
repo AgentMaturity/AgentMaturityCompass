@@ -142,6 +142,10 @@ afterAll(async () => {
   } finally { if (fixture) rmSync(fixture, { recursive: true, force: true }); vi.unstubAllEnvs(); vi.useRealTimers(); vi.restoreAllMocks(); }
 });
 
+// LIVE-RUNTIME-07 adds these exact transport headers to every response the current side writes; the archived side
+// predates them, so they are compared apart, as Date and the request id are.
+const SECURITY_HEADER_VALUES: Record<string, string> = { "x-content-type-options": "nosniff", "x-frame-options": "DENY",
+  "referrer-policy": "same-origin", "cache-control": "no-store" };
 type Wire = { status: number; statusMessage: string; rawHeaders: string[]; body: Buffer; requestId?: string };
 async function call(port: number, path: string, method: string, payload?: unknown, headers: IncomingHttpHeaders = { cookie }): Promise<Wire> {
   const data = typeof payload === "string" ? payload : payload === undefined ? "" : JSON.stringify(payload);
@@ -158,7 +162,7 @@ async function call(port: number, path: string, method: string, payload?: unknow
         for (let i = 0; i < res.rawHeaders.length; i += 2) {
           const name = res.rawHeaders[i].toLowerCase();
           if (name === "x-request-id") requestId = res.rawHeaders[i + 1];
-          else if (name !== "date") rawHeaders.push(res.rawHeaders[i], res.rawHeaders[i + 1]);
+          else if (name !== "date" && SECURITY_HEADER_VALUES[name] !== res.rawHeaders[i + 1]) rawHeaders.push(res.rawHeaders[i], res.rawHeaders[i + 1]);
         }
         const raw = Buffer.concat(chunks), idField = `,"requestId":"${requestId}"}`;
         const body = requestId !== undefined && raw.toString("utf8").endsWith(idField)

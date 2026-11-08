@@ -1,4 +1,5 @@
 import { request as httpRequest, type IncomingMessage, type ServerResponse } from "node:http";
+import { socketIp } from "../studio/clientAddress.js";
 import { isNativeProtectedPath } from "../studio/nativeAdmission.js";
 
 /** Native callers must first pass the router's browser proof and current membership checks. */
@@ -7,7 +8,8 @@ export async function proxyStudioWorkspaceRequest(
   res: ServerResponse,
   runtime: { readonly host: string; readonly port: number },
   targetPath: string,
-  forwarded: { readonly clientIp: string; readonly trustedHttps: boolean }
+  // Absent (an older caller), the client is the socket peer and nothing is https: never the client's own claim.
+  forwarded: { readonly clientIp: string; readonly trustedHttps: boolean } = { clientIp: socketIp(req.socket.remoteAddress), trustedHttps: false }
 ): Promise<void> {
   const method = (req.method ?? "GET").toUpperCase();
   const { origin, host, "x-amc-admin-token": _clientAdminToken, forwarded: _forwarded, ...clientHeaders } = req.headers;
