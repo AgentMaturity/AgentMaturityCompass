@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# An empty monitor pin is not "unpinned": Studio and the CLI refuse it as an invalid fingerprint and read no native-task
+# history. Unset it, so an empty AMC_EXPECTED_MONITOR_FINGERPRINT= in .env or `docker run -e` leaves verdicts unanchored.
+if [[ -z "${AMC_EXPECTED_MONITOR_FINGERPRINT:-}" ]]; then
+  unset AMC_EXPECTED_MONITOR_FINGERPRINT
+fi
+
 # Explicit commands preserve the image's CLI interface without bootstrapping.
 if [[ "$#" -gt 0 ]]; then
   exec amc "$@"

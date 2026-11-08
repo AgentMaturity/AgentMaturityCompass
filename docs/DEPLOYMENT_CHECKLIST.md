@@ -4,7 +4,7 @@ Complete these checks before going live. Every item is a real `amc` command.
 
 ## Infrastructure
 
-- [ ] Node.js ≥ 20 installed — `node --version`
+- [ ] Node.js 22 or 24 LTS — `node --version`
 - [ ] AMC installed and built — `amc --version`
 - [ ] Strict workspace health check passes — `amc doctor --strict`
 

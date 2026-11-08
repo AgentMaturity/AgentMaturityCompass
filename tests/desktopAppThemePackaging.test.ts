@@ -48,7 +48,14 @@ describe("desktop app packaging and visual identity", () => {
     expect(script).not.toContain("open \\\"http://127.0.0.1:3212/w/demo/console/\\\"");
     expect(script).toContain("writeWindowsStudioApp");
     expect(script).toContain("Agent Maturity Compass Studio.cmd");
-    expect(script).toContain("Start-Process \"http://127.0.0.1:3212/w/demo/console/\"");
+    // The launchers open the console on the port Studio bound (state.json apiPort), not an assumed 3212.
+    expect(script).not.toContain("Start-Process \"http://127.0.0.1:3212/w/demo/console/\"");
+    expect(script).toContain("Start-Process \"http://127.0.0.1:$StudioPort/w/demo/console/\"");
+    expect(script).toContain("(Get-Content -LiteralPath $StateFile -Raw | ConvertFrom-Json).apiPort");
+    expect(script).toContain('[task setStandardOutput:pipe];');
+    expect(script).toContain('[line hasPrefix:@"AMC_STUDIO_URL=http://127.0.0.1:"]');
+    expect(script).toContain('[candidate hasSuffix:@"/w/demo/console/"]');
+    expect(script).toContain("sed -n 's/^AMC_STUDIO_URL=//p'");
     expect(script).toContain("appLaunchers");
   });
 
@@ -99,6 +106,11 @@ describe("desktop app packaging and visual identity", () => {
     expect(verifier).toContain("${appResources}/agent-maturity-compass-${manifest.packageVersion}.tgz");
     expect(verifier).toContain("[`${base}/Agent Maturity Compass Studio.ps1`]");
     expect(verifier).toContain("does not pin the nested npm tarball hash`);");
+    // An upgrade stops the previous Studio only when that pid's command line is the Studio daemon (round 2).
+    expect(verifier).toMatch(/if \(!launcher\.includes\("_studio-daemon"\)\)/);
+    const packager = read("scripts/package-desktop-installers.mjs");
+    expect(packager).toContain("grep -q '_studio-daemon'");
+    expect(packager).toContain('$OldCommandLine.Contains("_studio-daemon")');
   });
 
   test("Studio dashboard uses the shared website-aligned console shell", () => {

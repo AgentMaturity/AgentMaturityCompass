@@ -37,6 +37,9 @@ if ($env:AMC_INSTALL_TEST_MODE -ne "1") {
   if ($NodeMajor -lt 20) {
     Fail-AmcInstall "Node.js 20 or newer is required; found $(& node --version)"
   }
+  if ($NodeMajor -eq 20) {
+    Write-Warning "Node 20 reached end of life on 2026-04-30; use Node 22 or 24 LTS."
+  }
 }
 
 if ($env:AMC_INSTALL_TEST_MODE -eq "1" -and -not [string]::IsNullOrWhiteSpace($env:AMC_INSTALL_PLATFORM)) {

@@ -10,12 +10,24 @@
 
   @console path /console* /auth* /org* /transform* /approvals* /benchmarks* /integrations* /status /healthz /readyz
   handle @console {
-    reverse_proxy amc-studio:3212
+    reverse_proxy amc-studio:3212 {
+      # Below the shortest idle keep-alive Studio may use (Node's default, 5 s): Caddy must drop an idle upstream connection
+      # before Studio closes it, or a request goes out on a closed connection and fails with a 502.
+      transport http {
+        keepalive 4s
+      }
+    }
   }
 
   @gateway path /openai* /anthropic* /gemini* /grok* /openrouter* /local* /__amc/health
   handle @gateway {
-    reverse_proxy amc-studio:3210
+    reverse_proxy amc-studio:3210 {
+      # Below the shortest idle keep-alive Studio may use (Node's default, 5 s): Caddy must drop an idle upstream connection
+      # before Studio closes it, or a request goes out on a closed connection and fails with a 502.
+      transport http {
+        keepalive 4s
+      }
+    }
   }
 
   @proxyHealth path /__amc/proxy-health
@@ -25,6 +37,12 @@
 
   # Studio owns /api/v1/* and its other authenticated/native routes.
   handle {
-    reverse_proxy amc-studio:3212
+    reverse_proxy amc-studio:3212 {
+      # Below the shortest idle keep-alive Studio may use (Node's default, 5 s): Caddy must drop an idle upstream connection
+      # before Studio closes it, or a request goes out on a closed connection and fails with a 502.
+      transport http {
+        keepalive 4s
+      }
+    }
   }
 }

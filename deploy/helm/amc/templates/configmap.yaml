@@ -6,6 +6,8 @@ metadata:
     {{- include "amc.labels" . | nindent 4 }}
 data:
   AMC_WORKSPACE_DIR: {{ .Values.workspace.mountPath | quote }}
+  # Signed control journals checkpoint outside the workspace; the state claim is the one persistent writable path (P1-08).
+  AMC_CONTROL_CHECKPOINT_DIR: {{ printf "%s/control-checkpoints" .Values.amcHomeState.mountPath | quote }}
   AMC_BIND: {{ .Values.env.AMC_BIND | quote }}
   AMC_STUDIO_PORT: {{ .Values.env.AMC_STUDIO_PORT | quote }}
   AMC_GATEWAY_PORT: {{ .Values.env.AMC_GATEWAY_PORT | quote }}

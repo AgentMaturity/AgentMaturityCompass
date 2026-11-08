@@ -6,7 +6,7 @@ services:
       context: ../..
       dockerfile: Dockerfile
       target: studio
-    image: amc-studio:local
+    image: ${AMC_STUDIO_IMAGE:-amc-studio:local}
     container_name: amc-notary
     restart: unless-stopped
     healthcheck:
@@ -40,12 +40,16 @@ services:
       context: ../..
       dockerfile: Dockerfile
       target: studio
-    image: amc-studio:local
+    # Set AMC_STUDIO_IMAGE in .env to an image id or tag you built and recorded; change it there for an upgrade or rollback.
+    image: ${AMC_STUDIO_IMAGE:-amc-studio:local}
     container_name: amc-studio
     restart: unless-stopped
+    # Studio drains up to 10 s, then seals its session; the default 10 s can kill it before the seal.
+    stop_grace_period: 40s
     environment:
       AMC_BOOTSTRAP: ${AMC_BOOTSTRAP:-1}
       AMC_WORKSPACE_DIR: /data/amc
+      AMC_CONTROL_CHECKPOINT_DIR: /workspace/control-checkpoints
       AMC_BIND: 0.0.0.0
       AMC_STUDIO_PORT: 3212
       AMC_GATEWAY_PORT: 3210
@@ -54,6 +58,10 @@ services:
       AMC_LAN_MODE: "true"
       AMC_TRUSTED_PROXY_HOPS: 1
       AMC_ALLOWED_CIDRS: ${AMC_ALLOWED_CIDRS:-127.0.0.1/32,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,::1/128}
+      # Native and A4 routes admit only the bind host or these browser origins (src/studio/nativeAdmission.ts). Append LAN/phone origins through AMC_EXTRA_ORIGINS; an origin is scheme://host[:port] with no path.
+      AMC_CORS_ALLOWED_ORIGINS: "https://${AMC_TLS_HOST:-localhost}:${AMC_TLS_PORT:-8443},${AMC_EXTRA_ORIGINS:-}"
+      # Pin the workspace monitor key out of band: sha256 of /data/amc/.amc/keys/monitor_ed25519.pub, recorded at install, set in .env. Unset, native-task verdicts are unanchored and do not count as verified (P0-51). Passed only when set: an empty value is an invalid pin, and Studio and the CLI then refuse to read native-task history.
+      AMC_EXPECTED_MONITOR_FINGERPRINT:
       AMC_ENABLE_NOTARY: ${AMC_ENABLE_NOTARY:-0}
       AMC_NOTARY_BASE_URL: ${AMC_NOTARY_BASE_URL:-http://amc-notary:4343}
       AMC_NOTARY_REQUIRED_ATTESTATION: ${AMC_NOTARY_REQUIRED_ATTESTATION:-SOFTWARE}
@@ -61,9 +69,18 @@ services:
       AMC_VAULT_PASSPHRASE_FILE: /run/secrets/amc_vault_passphrase
       AMC_BOOTSTRAP_OWNER_USERNAME_FILE: /run/secrets/amc_owner_username
       AMC_BOOTSTRAP_OWNER_PASSWORD_FILE: /run/secrets/amc_owner_password
+      # Encrypts `amc backup create` bundles made inside this container (docs/deploy/reference/COMPOSE.md, Backup).
+      AMC_BACKUP_PASSPHRASE_FILE: /run/secrets/amc_backup_passphrase
     depends_on:
       amc-notary:
         condition: service_healthy
+    healthcheck:
+      # HTTP probe of /healthz and /readyz bounded at 8 s in-process; the same script as the Dockerfile HEALTHCHECK (scripts/lib/studio-http-probe.mjs).
+      test: ["CMD", "node", "-e", "const h=['0.0.0.0','::',''].includes(process.env.AMC_BIND||'')?'127.0.0.1':process.env.AMC_BIND;const b='http://'+(h.includes(':')?'['+h+']':h)+':'+(process.env.AMC_STUDIO_PORT||3212);Promise.all(['/healthz','/readyz'].map(p=>fetch(b+p,{signal:AbortSignal.timeout(8000)}))).then(r=>process.exit(r.every(x=>x.ok)?0:1),()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
     expose:
       - "3210"
       - "3211"
@@ -72,20 +89,33 @@ services:
       - amc_data:/data/amc
       # P1-08: anti-rollback marks and key-set recovery copies (<AMC home>/state) must survive a restart.
       - amc_state:/home/amc/.config/amc/state
+      # Signed control journals (firewall, guardrails, legal holds, compiled controls) checkpoint here; must persist and stay outside /data/amc (src/lifecycle/signedControlJournalRecords.ts).
+      - amc_control_checkpoints:/workspace
     secrets:
       - amc_vault_passphrase
       - amc_owner_username
       - amc_owner_password
       - amc_notary_auth_secret
+      - amc_backup_passphrase
+    # One host, no scheduler: 2 CPUs leave room for the in-container backup and verify runs that share this cgroup; the chart's 1-CPU limit is a cluster value.
+    # Docker refuses to create a container whose CPU limit exceeds the host's CPUs: on a 1-vCPU host set AMC_STUDIO_CPUS=1 in .env.
+    deploy:
+      resources:
+        limits:
+          cpus: "${AMC_STUDIO_CPUS:-2}"
+          memory: 2g
+        reservations:
+          memory: 512m
+    # The image owns the 0700 home; the state and checkpoint volumes are its only writable paths besides /data/amc and /tmp.
     read_only: true
     tmpfs:
       - /tmp
-      - /home/amc:uid=10001,gid=10001,mode=0700
     cap_drop:
       - ALL
 
   caddy:
-    image: caddy:2.8
+    # The caddy:2.8 manifest list (linux/amd64 and linux/arm64), pinned by digest from an anonymous pull on 2026-11-08.
+    image: caddy:2.8@sha256:226d1f059b75399fe19182893c7184591c07b97afc8dfcf44eeb80c9a77a530f
     container_name: amc-caddy
     restart: unless-stopped
     depends_on:
@@ -114,6 +144,8 @@ volumes:
     name: amc_notary_data
   amc_state:
     name: amc_state
+  amc_control_checkpoints:
+    name: amc_control_checkpoints
   caddy_data:
   caddy_config:
 
@@ -128,3 +160,5 @@ secrets:
     file: ./secrets/amc_notary_passphrase.txt
   amc_notary_auth_secret:
     file: ./secrets/amc_notary_auth_secret.txt
+  amc_backup_passphrase:
+    file: ./secrets/amc_backup_passphrase.txt

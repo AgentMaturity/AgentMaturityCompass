@@ -15,6 +15,8 @@ env:
   AMC_BIND: "0.0.0.0"
   AMC_TRUSTED_PROXY_HOPS: "1"
   AMC_LAN_MODE: "true"
+  # The Ingress origin, appended to the Service origin (docs/KUBERNETES_HELM_DEPLOYMENT.md, Verify Runtime: native admission).
+  AMC_CORS_ALLOWED_ORIGINS: "https://amc.example.internal"
 
 networkPolicy:
   enabled: true
