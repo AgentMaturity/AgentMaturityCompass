@@ -22,9 +22,9 @@ This page clarifies the deployment and usage paths for AMC.
 
 ## Self-hosted cloud starting points
 
-The Helm chart on EKS, GKE or AKS is the documented cluster path; like every deployment path it is documented, not qualified (`docs/deploy/reference/TOPOLOGY.md`). The workspace ledger is SQLite in WAL mode (`src/ledger/ledgerConnection.ts`), so the workspace volume must be a block or local filesystem (EBS, Persistent Disk, Azure Disk); EFS, Azure Files and other network filesystems are not usable for it. Studio is a single writer, so autoscaled or multi-instance services (Cloud Run scale-out, multi-task ECS services) are not Studio targets.
+The Helm chart on EKS, GKE or AKS is the documented cluster path; like every deployment path it is documented, not qualified (`docs/deploy/reference/TOPOLOGY.md`). The workspace ledger is SQLite in WAL mode (`src/ledger/ledgerConnection.ts`), so the workspace volume must be a block or local filesystem (EBS, Persistent Disk, Azure Disk); EFS, Azure Files and other network filesystems are not usable for it. Studio is a single writer, so autoscaled or multi-instance services (Cloud Run scale-out, multi-task ECS services) are not Studio targets, and neither is ECS at all: a task's EBS volume does not outlive the task.
 
-- **AWS:** EKS with the Helm chart and an EBS-backed claim. ECS on Fargate only as one task (desired count 1) with an EBS volume for the workspace.
+- **AWS:** EKS with the Helm chart and an EBS-backed claim (EBS CSI driver), or the Compose TLS stack on one EC2 instance whose Docker data directory is on an EBS volume that outlives the instance. ECS on Fargate is not a Studio target: ECS attaches a new EBS volume to each task and deletes a service-managed task's volume when the task stops, so every redeploy would delete the workspace; use it only for the standalone API.
 - **GCP:** Google Kubernetes Engine with the Helm chart and a Persistent Disk claim. Cloud Run is not a Studio target: it scales out and gives the workspace no block storage.
 - **Azure:** AKS with the Helm chart and an Azure Disk claim. Azure Container Apps can mount only Azure Files or ephemeral storage, which the workspace cannot use.
 - **OpenAPI clients:** use `https://{host}/api` for your own DNS name and keep `http://localhost:3000/api` for local development.

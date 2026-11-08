@@ -3,7 +3,7 @@
 Every upgrade has an outage: the chart uses `strategy: Recreate`, so the old pod stops before the new one is Ready. The harness records it as `downtimeMs` instead of hiding it.
 
 1. Run the workload fixture and record the ledger head hash, event count and receipt ids. (check UPG-1)
-2. Take a backup before upgrading: `amc backup create --out <file>` in the Studio pod with `AMC_BACKUP_PASSPHRASE_FILE` set; copy the file off the volume. RB-2 restores it. (check UPG-1)
+2. Take a backup before upgrading: `amc backup create --out <file>` in the Studio pod with `AMC_BACKUP_PASSPHRASE_FILE` set; copy the file off the volume, and archive the signed-control checkpoints with it as [BACKUP_RESTORE.md](BACKUP_RESTORE.md) step 1 does. RB-2 restores both. (check UPG-1)
 3. Upgrade by digest: `helm upgrade amc-rd deploy/helm/amc --reuse-values --set image.digest=sha256:<N> --wait`. (check UPG-1)
 4. Confirm the pre-upgrade chain is a byte-identical prefix of the new chain, every migration version appears once, and `PRAGMA integrity_check` returns `ok`. (check UPG-1)
 5. Run `helm test` and `scripts/deploy-verify.mjs` again. (check UPG-1)

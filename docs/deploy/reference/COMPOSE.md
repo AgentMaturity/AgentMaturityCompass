@@ -20,42 +20,44 @@ Every command below runs in `deploy/compose` and is written for the TLS stack (`
     - `AMC_EXTRA_ORIGINS`: any further browser origins (`scheme://host[:port]`, no path), for example a LAN address. The stack's own origin is always admitted.
     - `AMC_PUBLISH_ADDRESS` (HTTP stack): keep `127.0.0.1` unless clients on other machines must reach it; the CIDR gate is not a bind restriction.
 2. Create the secret files under `secrets/` from the `.example` templates, each with your own value, readable by uid 10001 and nobody else you do not trust: `amc_vault_passphrase.txt`, `amc_owner_username.txt`, `amc_owner_password.txt`, `amc_backup_passphrase.txt`, and for the TLS stack `amc_notary_passphrase.txt` and `amc_notary_auth_secret.txt`. Compose refuses to start while one is missing.
-3. Build and start: `docker compose -f docker-compose.tls.yml up -d --build` (HTTP: `docker compose up -d --build`). The image's build step needs about 4 GB of free memory for `tsc`. Record the image you run: `docker image inspect --format '{{.Id}}' amc-studio:local`.
+3. Build and start: `docker compose -f docker-compose.tls.yml up -d --build` (HTTP: `docker compose up -d --build`). The image's build step needs about 4 GB of free memory for `tsc`. Record the image you run: `docker image inspect --format '{{.Id}}' amc-studio:local`. `--build` is for this first build only: Compose tags the image it builds with the `AMC_STUDIO_IMAGE` name, so once `.env` names a release tag or an image id, never run `docker compose up --build`. A newer checkout's code would take the recorded tag, and the image you would roll back to would lose it (`docker image prune` then deletes it). Build each release with `docker build -t` and start it with `up -d --no-build`, as under [Upgrade](#upgrade-n-1-to-n).
 4. Wait for `docker inspect --format '{{.State.Health.Status}}' amc-studio` to read `healthy` (HTTP: `docker compose ps studio`). The healthcheck probes `/healthz` and `/readyz` every 30 s after a 120 s start period.
 5. TLS: export only the public CA certificate and trust it in each client: `docker compose -f docker-compose.tls.yml cp caddy:/data/caddy/pki/authorities/local/root.crt ./amc-local-ca.crt`, then `curl --cacert ./amc-local-ca.crt https://<AMC_TLS_HOST>:<AMC_TLS_PORT>/readyz`.
-6. Pin the monitor key before anyone relies on a verdict: `docker compose -f docker-compose.tls.yml exec amc-studio sha256sum /data/amc/.amc/keys/monitor_ed25519.pub`, keep the value outside the host, put it in `.env` as `AMC_EXPECTED_MONITOR_FINGERPRINT=<sha256>` and run `up -d --no-build` again. Until it is set, native-task verdicts are unanchored and do not count as verified.
+6. Pin the monitor key before anyone relies on a verdict: `docker compose -f docker-compose.tls.yml exec amc-studio sha256sum /data/amc/.amc/keys/monitor_ed25519.pub`, keep the value outside the host, put it in `.env` as `AMC_EXPECTED_MONITOR_FINGERPRINT=<sha256>` (uncomment the line `.env.example` ships) and run `up -d --no-build` again. Until it is set, native-task verdicts are unanchored and do not count as verified. Keep the line commented until you have the value: `AMC_EXPECTED_MONITOR_FINGERPRINT=` with nothing after it is an invalid pin, not an unset one, and `amc` commands run through `docker compose exec` then refuse to read native-task history (Studio's entrypoint unsets an empty value; the Compose files pass the variable only when it is set).
 7. Pair and sign in: the containers run in LAN mode, so `/auth/login` answers 403 until the browser claims a one-time pairing code. Mint one with `docker compose -f docker-compose.tls.yml exec -w /data/amc amc-studio sh -c 'AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")" amc pair create --ttl 10m'`, enter it on the pairing page, then sign in as the owner. Every device pairs once.
 
-Sizing: the two `deploy/compose` Studio services are limited to 2 CPUs and 2 GB of memory with a 512 MB reservation, because the backup and verify commands you run inside the container share its cgroup. The Helm chart's values (1 CPU, 2 Gi limit, 200m and 512 Mi requests) are a cluster value with a scheduler. Measured values are listed under [What was run](#what-was-run).
+Sizing: the two `deploy/compose` Studio services are limited to `AMC_STUDIO_CPUS` CPUs (default 2) and 2 GB of memory with a 512 MB reservation, because the backup and verify commands you run inside the container share its cgroup. Docker refuses to create a container whose CPU limit exceeds the host's CPU count, so on a 1-vCPU host set `AMC_STUDIO_CPUS=1` in `.env`. The Helm chart's values (1 CPU, 2 Gi limit, 200m and 512 Mi requests) are a cluster value with a scheduler. Measured values are listed under [What was run](#what-was-run).
 
 ## Backup
 
-`amc backup create` writes a signed bundle encrypted with `AMC_BACKUP_PASSPHRASE_FILE` (the `amc_backup_passphrase` secret). It runs inside the Studio container, in the workspace, with the vault passphrase exported from its file inside `sh -c`, and writes to `/tmp`, a tmpfs, so a bundle never lands inside the next bundle and never stays on the volume it protects. `docker compose cp` cannot read a tmpfs, so the same command streams the bundle to your machine and deletes it:
+A backup is two files taken at one moment with Studio stopped: the signed bundle of the workspace, and an archive of the state and checkpoint volumes, which the bundle does not contain. The signed-control journals (firewall, guardrails, legal holds, compiled controls) live in the workspace and their checkpoints in the checkpoint volume. A control published between the two copies would leave that control failing closed after a restore, so neither copy is taken while Studio runs; Studio is down for the length of the two commands. A running Studio also changes files while `tar` reads them (GNU tar then exits 1).
+
+`amc backup create` writes a signed bundle encrypted with `AMC_BACKUP_PASSPHRASE_FILE` (the `amc_backup_passphrase` secret). It runs in a one-off container of the Studio service, in the workspace, with the vault passphrase exported from its file inside `sh -c`, and writes to `/tmp`, the service's tmpfs, which goes away with the container: a bundle never lands inside the next bundle and never stays on the volume it protects. `docker compose cp` cannot read a tmpfs, so the command streams the bundle to your machine.
 
 TLS stack:
 
-1. Create the bundle, stream it out and remove it, in one command (the CLI's own messages go to stderr):
+1. Stop Studio, and name the pair once: `docker compose -f docker-compose.tls.yml stop amc-studio`, then `ts=$(date -u +%Y%m%dT%H%M%SZ)`.
+2. Create the bundle and stream it out (the CLI's own messages go to stderr):
 
     ```bash
-    docker compose -f docker-compose.tls.yml exec -T -w /data/amc amc-studio sh -c 'AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")" amc backup create --out /tmp/amc-backup.amcbackup >&2 && cat /tmp/amc-backup.amcbackup; status=$?; rm -f /tmp/amc-backup.amcbackup; exit $status' > ./amc-$(date -u +%Y%m%dT%H%M%SZ).amcbackup
+    docker compose -f docker-compose.tls.yml run --rm --no-deps -T -w /data/amc --entrypoint sh amc-studio -c 'AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")" amc backup create --out /tmp/amc-backup.amcbackup >&2 && cat /tmp/amc-backup.amcbackup' > ./amc-$ts.amcbackup
     ```
 
     A non-zero exit means no usable bundle: delete the output file and read the message.
-2. On the operator's machine, with `AMC_BACKUP_PASSPHRASE_FILE` pointing at a copy of the backup passphrase: `amc backup verify ./amc-<ts>.amcbackup --pubkey <recorded artifact-seal.pub>`. Record `/data/amc/.amc/keys/artifact-seal.pub` (the key that signs the bundle; `auditor_ed25519.pub` holds the same key) once, at install, from a source other than a backup.
+3. Archive the state and checkpoint volumes through the same service, which uses each stack's real volume names:
 
-HTTP stack: the same commands with `-f docker-compose.yml` and service `studio`. The source stack mounts no backup secret, so feed the backup passphrase on stdin there (its `/tmp` holds 64 MB):
+    ```bash
+    docker compose -f docker-compose.tls.yml run --rm --no-deps -T --entrypoint tar amc-studio \
+      -czf - -C / home/amc/.config/amc/state workspace/control-checkpoints > ./amc-volumes-$ts.tgz
+    ```
+
+4. Start Studio: `docker compose -f docker-compose.tls.yml start amc-studio`. Keep `amc-$ts.amcbackup` and `amc-volumes-$ts.tgz` together: a restore needs both.
+5. On the operator's machine, with `AMC_BACKUP_PASSPHRASE_FILE` pointing at a copy of the backup passphrase: `amc backup verify ./amc-<ts>.amcbackup --pubkey <recorded artifact-seal.pub>`. Record `/data/amc/.amc/keys/artifact-seal.pub` (the key that signs the bundle; `auditor_ed25519.pub` holds the same key) once, at install, from a source other than a backup.
+
+HTTP stack: the same commands with `-f docker-compose.yml` and service `studio`. The source stack mounts no backup secret, so its step 2 feeds the backup passphrase on stdin (its `/tmp` holds 64 MB):
 
 ```bash
-docker compose -f docker/docker-compose.yml exec -T -w /data/amc amc-studio sh -c 'read -r AMC_BACKUP_PASSPHRASE; export AMC_BACKUP_PASSPHRASE; AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")" amc backup create --out /tmp/amc-backup.amcbackup >&2 && cat /tmp/amc-backup.amcbackup; status=$?; rm -f /tmp/amc-backup.amcbackup; exit $status' < ./backup-passphrase.txt > ./amc-$(date -u +%Y%m%dT%H%M%SZ).amcbackup
-```
-
-The state and checkpoint volumes are not in the bundle. Archive them through the same service, which uses each stack's real volume names, and keep the archive with the bundle. Stop Studio for it, so the copy is exact: on a running Studio GNU tar exits 1 when a file changes while it is read.
-
-```bash
-docker compose -f docker-compose.tls.yml stop amc-studio
-docker compose -f docker-compose.tls.yml run --rm --no-deps -T --entrypoint tar amc-studio \
-  -czf - -C / home/amc/.config/amc/state workspace/control-checkpoints > ./amc-volumes-$(date -u +%Y%m%dT%H%M%SZ).tgz
-docker compose -f docker-compose.tls.yml start amc-studio
+docker compose -f docker/docker-compose.yml run --rm --no-deps -T -w /data/amc --entrypoint sh amc-studio -c 'read -r AMC_BACKUP_PASSPHRASE; export AMC_BACKUP_PASSPHRASE; AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")" amc backup create --out /tmp/amc-backup.amcbackup >&2 && cat /tmp/amc-backup.amcbackup' < ./backup-passphrase.txt > ./amc-$ts.amcbackup
 ```
 
 `/tmp` is a tmpfs: without a size it may grow to half the host's memory, and its pages count against the Studio container's 2 GB memory limit; the source stack sets `size=64m`. For a workspace whose bundle does not fit, an owner-signed ops-policy change that adds `.amc/backups` to `backups.excludePaths`, followed by `--out /data/amc/.amc/backups/<file>`, is the alternative; copy the bundle off the host the same way.
@@ -63,7 +65,7 @@ docker compose -f docker-compose.tls.yml start amc-studio
 ## Upgrade (N-1 to N)
 
 1. Record the current image: `grep AMC_STUDIO_IMAGE .env` and `docker image inspect --format '{{.Id}}' <that value>`. Keep that image: `docker image prune` deletes an untagged rollback image.
-2. Back up as above, and archive the two volumes.
+2. Back up as above: the bundle and the volume archive, with Studio stopped.
 3. Build the new image from the new checkout: `docker build --target studio -t amc-studio:<git sha> .` (repository root), then `docker image inspect --format '{{.Id}}' amc-studio:<git sha>`.
 4. Set `AMC_STUDIO_IMAGE=amc-studio:<git sha>` (or the image id) in `.env`. Change it there, never as a one-shot prefix on the command line: the next `up -d` would revert it.
 5. `docker compose -f docker-compose.tls.yml up -d --no-build`. The volumes stay; only the containers are replaced. Studio has 40 s (`stop_grace_period`) to drain and seal its session.
@@ -107,12 +109,18 @@ These steps are documented and were not run: no 1.1.1 Compose stack was availabl
         On the source stack, which mounts no backup secret, send the passphrase line first: `{ cat ./backup-passphrase.txt; cat ./amc-<ts>.amcbackup; } | docker compose -f docker/docker-compose.yml run ...` with `read -r AMC_BACKUP_PASSPHRASE; export AMC_BACKUP_PASSPHRASE;` at the start of the `sh -c` script (documented; not run).
 
     3. Swap the workspace's `.amc` for the restored one, as [ROLLBACK.md](ROLLBACK.md) step 3 does: `docker compose -f docker-compose.tls.yml run --rm --no-deps --entrypoint sh amc-studio -c 'cd /data/amc && mv .amc .amc.rolled-back && mv .restore/.amc .amc'`.
-    4. Restore the two volumes from their archive: `docker compose -f docker-compose.tls.yml run --rm --no-deps -T --entrypoint tar amc-studio -xzf - -C / < ./amc-volumes-<ts>.tgz`.
-    5. `docker compose -f docker-compose.tls.yml up -d --no-build`, then verify as in [Upgrade](#upgrade-n-1-to-n) step 6.
+    4. Replace the two volumes with their archive. Empty them first: `tar` alone keeps every file written after the backup, and a checkpoint newer than the restored journal keeps that control failing closed (`journal was truncated behind checkpoint revision <n>`). The kill-switch mirror (`control-checkpoints/<workspace hash>/kill-switch`) is the one part kept: its records only add stops, so a kill issued after the backup stays in force until an owner releases it.
 
-Restoring the state volume rolls this machine's anti-rollback marks back to the backup time: re-apply every revocation and key set accepted after the backup ([docs/KEY_LIFECYCLE.md](../../KEY_LIFECYCLE.md)). A rollback never restores what the newer version wrote: ledger rows written after the backup are gone, and a vault that a 2.0.0 unlock converted to version 2 stays version 2 ([docs/releases/2.0.0.md](../../releases/2.0.0.md)).
+        ```bash
+        docker compose -f docker-compose.tls.yml run --rm --no-deps -T --entrypoint sh amc-studio \
+          -c 'find /home/amc/.config/amc/state -mindepth 1 -delete && mkdir -p /workspace/control-checkpoints && find /workspace/control-checkpoints -mindepth 2 -maxdepth 2 ! -name kill-switch -exec rm -rf {} + && tar -xzf - -C /' < ./amc-volumes-<ts>.tgz
+        ```
 
-The rehearsal for this procedure is `scripts/deploy/compose-rehearsal.mjs`: it runs image A, then B, then A again on one Compose project through `AMC_STUDIO_IMAGE`, with READY, a pairing code and one governed turn per phase, and records a stop at the downgrade guard as the documented outcome. It never runs `down -v`; `--cleanup` removes only the volumes of the project it created.
+    5. `docker compose -f docker-compose.tls.yml up -d --no-build`, then verify as in [Upgrade](#upgrade-n-1-to-n) step 6, and check the signed controls: `docker compose -f docker-compose.tls.yml exec -w /data/amc amc-studio amc firewall status --json` must not report `"integrity": "invalid"` or `"controlIntegrity": "invalid"` (`trusted`, or `uninitialized` for a control the workspace never published).
+
+Restoring the state volume rolls this machine's anti-rollback marks back to the backup time: re-apply every revocation and key set accepted after the backup ([docs/KEY_LIFECYCLE.md](../../KEY_LIFECYCLE.md)). Restoring the checkpoint volume with the workspace does the same for signed controls: re-apply every firewall, guardrail, legal-hold and compiled-control change made after the backup. A rollback never restores what the newer version wrote: ledger rows written after the backup are gone, and a vault that a 2.0.0 unlock converted to version 2 stays version 2 ([docs/releases/2.0.0.md](../../releases/2.0.0.md)).
+
+The rehearsal for this procedure is `scripts/deploy/compose-rehearsal.mjs`: it runs image A, then B, then A again on one Compose project through `AMC_STUDIO_IMAGE`, with READY, a pairing code and one governed turn per phase. A stop at the downgrade guard when A comes back after B is recorded as the documented outcome; a guard on the first deploy or on B fails the rehearsal. It refuses a project that already has containers or volumes, so it never touches a running deployment, and it never runs `down -v`; `--cleanup` then removes only the volumes the run created.
 
 ## TLS for a public hostname
 

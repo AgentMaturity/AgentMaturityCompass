@@ -69,6 +69,20 @@ describe("cloud docs recommend only what the runtime can do (LIVE-DEPLOY-18)", (
     for (const sentence of sentences(cloud).filter((s) => s.includes("Azure Files"))) expect(sentence).toMatch(/not usable|cannot use/);
     expect(cloud).not.toMatch(/EFS or another managed persistent storage option/);
   });
+
+  it("names no ECS task volume as Studio's workspace: ECS deletes a service task's EBS volume when it stops (skeptic 2026-11-08)", () => {
+    // AWS ECS developer guide, "Amazon EBS volumes": each task gets a new volume, and a service-managed task's volume is
+    // deleted on termination, so a redeploy or health replacement would delete the vault, ledger and keys.
+    for (const file of ["docs/CLOUD_REFERENCE_ARCHITECTURES.md", "docs/DEPLOYMENT_OPTIONS.md"]) {
+      for (const sentence of sentences(read(file)).filter((s) => /\bEBS\b/.test(s) && /\b(?:ECS|Fargate|task)\b/.test(s))) {
+        expect(sentence, file).toMatch(/\bdelete[sd]?\b|does not outlive/);
+      }
+    }
+    const aws = section(read("docs/CLOUD_REFERENCE_ARCHITECTURES.md"), "## AWS reference architecture");
+    const start = sentences(aws).map((sentence) => sentence.trim()).find((sentence) => sentence.startsWith("Recommended starting point:")) ?? "";
+    expect(start).toContain("EKS");
+    expect(start).not.toMatch(/Fargate|\bECS\b/);
+  });
 });
 
 describe("receipt-based platform status where users install (LIVE-DEPLOY-10)", () => {
@@ -134,5 +148,28 @@ describe("one documented way to run AMC for live users (LIVE-DEPLOY-17)", () => 
 
   it("starts the Upgrading section with the backup", () => {
     expect(section(read("docs/INSTALL.md"), "## Upgrading").trimStart().startsWith("Back up first")).toBe(true);
+  });
+
+  it("tells a 1-vCPU host how to lower Studio's CPU limit, which Docker refuses above the host's CPU count (skeptic 2026-11-08)", () => {
+    for (const doc of ["docs/INSTALL.md", "docs/deploy/reference/COMPOSE.md"]) expect(read(doc), doc).toContain("set `AMC_STUDIO_CPUS=1`");
+  });
+
+  it("forbids up --build once AMC_STUDIO_IMAGE names a release, which would retag new code (skeptic 2026-11-08)", () => {
+    for (const file of ["docs/deploy/reference/COMPOSE.md", "deploy/compose/README.md"]) {
+      expect(read(file), file).toMatch(/once `?(?:\.env`? names a release tag or an image id|`AMC_STUDIO_IMAGE` names a release tag or an image id), never run `docker compose up --build`/i);
+    }
+    expect(read("docs/INSTALL.md")).toContain("never run `docker compose up --build` once that pin names a release");
+  });
+
+  it("carries the signed-control checkpoints with every Helm backup, restore and rollback (skeptic 2026-11-08)", () => {
+    // Chart 0.4.1 keeps them on the state claim; a bundle restored without them leaves every published signed control failing closed.
+    const backup = read("docs/deploy/reference/BACKUP_RESTORE.md");
+    expect(backup).toContain("tar -czf - -C /home/amc/.config/amc/state control-checkpoints > ./amc-control-checkpoints-<ts>.tgz");
+    expect(backup).toContain("tar -xzf - -C /home/amc/.config/amc/state < ./amc-control-checkpoints-<ts>.tgz");
+    expect(backup).toMatch(/without its checkpoint archive leaves every signed control[^.]*failing closed/);
+    const rollback = read("docs/deploy/reference/ROLLBACK.md");
+    expect(rollback).toContain("! -name kill-switch -exec rm -rf {} + && tar -xzf - -C /home/amc/.config/amc/state' < ./amc-control-checkpoints-<ts>.tgz");
+    expect(rollback).toContain("Start a tool pod on the same workspace and state claims");
+    expect(read("docs/deploy/reference/UPGRADE.md")).toContain("archive the signed-control checkpoints with it");
   });
 });

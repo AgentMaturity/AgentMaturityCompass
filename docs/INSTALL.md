@@ -6,6 +6,7 @@
 |-----------|---------|
 | Node.js | 22 or 24 LTS for production; package engine floor remains ≥ 20 |
 | RAM | 512 MB |
+| CPU (Compose stacks) | 2 vCPUs by default: Docker refuses a container whose CPU limit exceeds the host's CPUs, so on a 1-vCPU host set `AMC_STUDIO_CPUS=1` in `deploy/compose/.env` |
 | Disk | 100 MB + evidence storage |
 | OS | One line per platform, from run receipts: [Platform status](#platform-status) |
 
@@ -230,7 +231,7 @@ irm https://agentmaturity.co/install.ps1 | iex
 cd AgentMaturityCompass && git pull && pnpm install --frozen-lockfile && pnpm run build
 ```
 
-- Docker Compose: pin the new image in `.env` (`AMC_STUDIO_IMAGE`), keep the previous one for rollback, and follow [docs/deploy/reference/COMPOSE.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/deploy/reference/COMPOSE.md) (backup, upgrade, upgrade from 1.1.1, rollback).
+- Docker Compose: pin the new image in `.env` (`AMC_STUDIO_IMAGE`), keep the previous one for rollback, never run `docker compose up --build` once that pin names a release (Compose would tag the newly built code with it), and follow [docs/deploy/reference/COMPOSE.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/deploy/reference/COMPOSE.md) (backup, upgrade, upgrade from 1.1.1, rollback).
 - Helm: upgrade by digest with `--reuse-values`, as [docs/deploy/reference/UPGRADE.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/deploy/reference/UPGRADE.md) describes.
 
 ## Uninstalling

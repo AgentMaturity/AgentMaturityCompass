@@ -42,20 +42,20 @@ All provider designs should satisfy the same AMC runtime contract:
 
 | Provider path | Best fit | AMC deployment asset |
 |---|---|---|
-| AWS ECS on AWS Fargate | Lower Kubernetes overhead, simple team service | Docker image plus ECS task and service definitions |
+| AWS ECS on AWS Fargate | The standalone API only; not a Studio target (a task's EBS volume does not outlive the task) | Docker image plus ECS task and service definitions |
 | AWS EKS | Existing Kubernetes platform teams | `deploy/helm/amc/` or `deploy/k8s/` |
-| Google Cloud Run | Lower-ops HTTPS service when workspace persistence is externalized | Docker image with mounted or external storage design |
+| Google Cloud Run | The standalone API only; not a Studio target (it scales out and has no block storage) | Docker image |
 | Google Kubernetes Engine | Existing GKE platform teams | `deploy/helm/amc/` or `deploy/k8s/` |
-| Azure Container Apps | Lower Kubernetes overhead, managed HTTPS ingress | Docker image plus Container App configuration |
+| Azure Container Apps | The standalone API only; not a Studio target (its only persistent storage, Azure Files, is not usable for the workspace) | Docker image plus Container App configuration |
 | Azure Kubernetes Service | Existing AKS platform teams | `deploy/helm/amc/` or `deploy/k8s/` |
 
 For IaC-driven Kubernetes installs, use the Terraform example at `deploy/terraform/helm-release/` or the Pulumi example at `deploy/pulumi/helm-release/`. Both manage the AMC Helm release and expect production bootstrap secrets to be created through a separate secret workflow.
 
 ## AWS reference architecture
 
-Recommended starting point: AWS Fargate with Amazon ECS, an Application Load Balancer, AWS Secrets Manager, CloudWatch Logs, and an Amazon EBS volume attached to a single task (desired count 1) for the AMC workspace. EFS and other network filesystems are not usable for the workspace: its ledger is SQLite in WAL mode (`src/ledger/ledgerConnection.ts`), and Studio is a single writer, so a multi-task or autoscaled ECS service is not a Studio target. EKS with the Helm chart is the documented cluster path.
+Recommended starting point: Amazon EKS with the Helm chart and an EBS-backed claim (EBS CSI driver) for the AMC workspace, with the AWS Load Balancer Controller, AWS Secrets Manager and CloudWatch Logs; this is the documented cluster path, documented and not qualified. ECS on Fargate is not a Studio target: ECS attaches a new EBS volume to each task and deletes a service-managed task's volume when the task stops, so a redeploy, a health replacement or a Fargate retirement would delete the vault, the signed ledger, the keys and the transparency log. EFS and other network filesystems are not usable for the workspace: its ledger is SQLite in WAL mode (`src/ledger/ledgerConnection.ts`), and Studio is a single writer. On a single EC2 instance, the Compose TLS stack (`docs/deploy/reference/COMPOSE.md`, documented and not qualified) keeps its volumes when Docker's data directory is on an EBS volume that is not deleted with the instance.
 
-Traffic flow:
+ECS on Fargate path:
 
 1. Route `https://amc.example.com` to an Application Load Balancer.
 2. Forward `/` and `/api/*` to an ECS service running the AMC container.
@@ -63,7 +63,7 @@ Traffic flow:
 4. Store `AMC_VAULT_PASSPHRASE`, bootstrap owner credentials, notary secrets, and webhook secrets in AWS Secrets Manager.
 5. Inject secrets through ECS task definition `secrets` entries or mount them as files through your internal secret projection pattern.
 6. Attach IAM roles with least privilege for logging, secret reads, image pulls, and storage access.
-7. Persist `/data/amc` on the task's EBS volume; task-local scratch storage loses production evidence, and EFS is not usable (SQLite WAL).
+7. Do not place `/data/amc` on ECS: ECS deletes a service-managed task's EBS volume when the task stops, task-local storage is ephemeral, and EFS is not usable (SQLite WAL). Use these steps for the standalone API and EKS for Studio.
 
 EKS alternative:
 

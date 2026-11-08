@@ -98,7 +98,9 @@ The stacks name their image through `AMC_STUDIO_IMAGE` in `.env` (the API overla
 AMC_STUDIO_IMAGE=amc-studio:<git sha>   # previous: amc-studio:<old sha>
 ```
 
-Backups run inside the Studio container to `/tmp` and are copied out; the state and checkpoint volumes are archived beside them. The full procedures (install, backup, upgrade from N-1 and from 1.1.1, rollback, TLS for a public hostname) are in [docs/deploy/reference/COMPOSE.md](../../docs/deploy/reference/COMPOSE.md), and `scripts/deploy/compose-rehearsal.mjs` rehearses the upgrade and rollback.
+Once `AMC_STUDIO_IMAGE` names a release tag or an image id, never run `docker compose up --build`: Compose tags the image it builds with that name, so a newer checkout's code would take the recorded tag and the image you would roll back to would lose it (`docker image prune` then deletes it). Build each release with `docker build -t` and start it with `up -d --no-build`.
+
+Backups run with Studio stopped: the bundle is created in a one-off container of the Studio service and streamed out, and the state and checkpoint volumes are archived at the same moment, because a signed control published between the two copies would fail closed after a restore. The full procedures (install, backup, upgrade from N-1 and from 1.1.1, rollback, TLS for a public hostname) are in [docs/deploy/reference/COMPOSE.md](../../docs/deploy/reference/COMPOSE.md), and `scripts/deploy/compose-rehearsal.mjs` rehearses the upgrade and rollback.
 
 ## Optional standalone API alongside Studio
 
