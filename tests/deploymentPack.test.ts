@@ -108,6 +108,14 @@ describe("compose image pins, limits and the backup secret (LIVE-DEPLOY-08)", ()
     expect(read("deploy/compose/.env.example")).toMatch(/^AMC_API_IMAGE=amc-api:local$/m);
   });
 
+  it("pins every other TLS-stack image by digest", () => {
+    // caddy:2.8 was pulled once, anonymously, on 2026-11-08; the manifest-list digest resolves on amd64 and arm64.
+    for (const [name, service] of Object.entries(composeServices("deploy/compose/docker-compose.tls.yml"))) {
+      if (service.image?.startsWith("${")) continue;
+      expect(service.image, name).toMatch(/@sha256:[a-f0-9]{64}$/);
+    }
+  });
+
   it("limits the deploy/compose Studio services and hands them the backup passphrase secret", () => {
     for (const [file, name] of STUDIO_SERVICES.filter(([path]) => path.startsWith("deploy/compose/"))) {
       const service = composeServices(file)[name]!;

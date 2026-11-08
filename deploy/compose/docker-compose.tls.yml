@@ -113,7 +113,8 @@ services:
       - ALL
 
   caddy:
-    image: caddy:2.8
+    # The caddy:2.8 manifest list (linux/amd64 and linux/arm64), pinned by digest from an anonymous pull on 2026-11-08.
+    image: caddy:2.8@sha256:226d1f059b75399fe19182893c7184591c07b97afc8dfcf44eeb80c9a77a530f
     container_name: amc-caddy
     restart: unless-stopped
     depends_on:
