@@ -264,7 +264,7 @@ export interface ComposedTurnOptions {
    * caller builds its toolset, so the caller cannot construct the capability and
    * this function cannot know what to do with it. So the kernel builds it and
    * hands it over; the caller decides where it goes — in practice
-   * `toolset.registry.define(delegateTool(capability))`, which works after
+   * `toolset.grantSubagents(capability)` (the delegation tools), which works after
    * construction because `seam.schemas()` re-reads the registry each step.
    */
   readonly delegation?: {

@@ -45,7 +45,9 @@ export const NATIVE_BUILTIN_CAPABILITIES: readonly NativeToolCapability[] = Obje
 /** These become executable only when a caller also supplies the delegation capability. */
 export const NATIVE_DELEGATION_CAPABILITIES: readonly NativeToolCapability[] = Object.freeze([
   Object.freeze({ name: "delegate", actionClass: "READ_ONLY" as const }),
-  Object.freeze({ name: "workflow", actionClass: "READ_ONLY" as const })
+  Object.freeze({ name: "workflow", actionClass: "READ_ONLY" as const }),
+  // SH-ORCH-05: no weaker than `delegate`; each continuation is one more governed turn of a child `delegate` admitted.
+  Object.freeze({ name: "delegate_continue", actionClass: "READ_ONLY" as const })
 ]);
 
 function nativeToolMatchesCapability(tool: ToolDefinition, capability: NativeToolCapability): boolean {

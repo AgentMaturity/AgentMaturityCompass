@@ -167,6 +167,8 @@ export interface SubagentHandle {
   continue(text: string): Promise<SubagentRunResult>;
   /** Account for the delegation and release the child. Safe to call twice. */
   close(settledAs: DelegationSettlement, reason: string): void | Promise<void>;
+  /** True once the delegation settled (released, stopped, failed or at its ceiling); a settled handle takes no work. */
+  readonly settled?: boolean;
 }
 
 /** How the runtime saw a delegation end. */
@@ -622,6 +624,7 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
   if (closed) return { ok: true, identity, packetId, childSessionId, childText: first.text };
   const handle: SubagentHandle = {
     identity, childSessionId, packetId,
+    get settled() { return closed; },
     continue: text => execute(() => continuation!.continue(text)),
     close: (settledAs, reason) => {
       if (closing) return closing;

@@ -1,6 +1,5 @@
 import { showSkillCatalogSelection } from "./cli/skillCatalogOptions.js";
 import { loadAgentDefinitionsForRun, showAgentDefinitionSelection } from "./cli/agentDefinitionOptions.js";
-import { workflowTool } from "./workflow/workflowTool.js";
 import { randomUUID } from "node:crypto";
 import { hostname } from "node:os";
 /**
@@ -43,11 +42,10 @@ import { MAX_ACTIVE_CHILDREN_HELP, NO_DELEGATE_STOP_HELP, VALIDATION_REPAIR_HELP
 import { leaseFileToken, withLeaseFileOption } from "./cli/agentLoopLeaseFile.js";
 import { agentToolset, type AgentToolset } from "./agent/agentToolset.js";
 import { runLease } from "./leases/runLease.js";
-import { selectSupportedNativeTools } from "./agent/nativeToolCapabilities.js";
+import { NATIVE_DELEGATION_CAPABILITIES, selectSupportedNativeTools } from "./agent/nativeToolCapabilities.js";
 import type { MountedNativeMcpServer } from "./mcp/nativeMcpClient.js";
 import { resolveNativeValidationSelection } from "./setup/nativeValidationConfig.js";
 import { NativeMcpConfigError, reviewedNativeMcpApprovalOptions, type ReviewedNativeMcpServer } from "./setup/nativeMcpConfig.js";
-import { delegateTool } from "./agent/delegateTool.js";
 import { DEFAULT_MAX_DELEGATION_DEPTH } from "./agent/delegationIdentity.js";
 import { parseDelegationScope } from "./agent/delegationScope.js";
 import { parseSubagentStopConditions } from "./agent/subagentStopConditions.js";
@@ -499,7 +497,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         const toolset = workspaceToolset = agentToolset({
           workspace: process.cwd(), extensionHooks: extensionTurn.hooks,
           agentId,
-          additionalCapabilities: [...mcpServers.flatMap(entry => entry.review.capabilities), ...(wantsDelegation ? [{ name: "delegate", actionClass: "READ_ONLY" as const }, { name: "workflow", actionClass: "READ_ONLY" as const }] : [])],
+          additionalCapabilities: [...mcpServers.flatMap(entry => entry.review.capabilities), ...(wantsDelegation ? NATIVE_DELEGATION_CAPABILITIES : [])],
           // Fork chooses a different ID; resume chooses the existing writer.
           get sessionId() { return actualSession().sessionId; },
           recorder: { recordProjectedEvidence: (row) => actualSession().recordProjectedEvidence(row), assertWritable: () => actualSession().assertWritable() },
@@ -591,9 +589,10 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
               ? "delegates run in-process, under this run's own driver"
               : `delegates run out-of-process: ${foreignRunnerDescription}`
           ));
-          // Both tools, as a child's toolset gets them; `workflow` stays hidden and denied unless the signed allowlist names it too.
-          grantDelegation = (capability) => { const granted = { ...capability, ...(definitions === undefined ? {} : { definitions }) };
-            toolset.registry.define(delegateTool(granted)); toolset.registry.define(workflowTool(granted)); };
+          // The tools a child's toolset gets, from the same place; `workflow` and `delegate_continue` stay hidden and denied
+          // unless the signed allowlist names them too, and only an in-process runner can keep a delegate open.
+          grantDelegation = (capability) => toolset.grantSubagents({ ...capability, ...(definitions === undefined ? {} : { definitions }),
+            continuable: foreignRunner === null });
           // Beside the write-scope line, and for the same reason: a bound the
           // operator cannot see is one they cannot check. It is also the only
           // place the parsed depth becomes observable, so a build that dropped

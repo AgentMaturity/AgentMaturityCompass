@@ -381,7 +381,8 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
               // A defined role is a leaf: composed without the delegation capability, so neither `delegate` nor `workflow`
               // exists in its registry whatever its `tools` list says, and its step ceiling and binding bound every step it runs.
               ...(grant === undefined || ctx.agentDefinition !== undefined ? {} : { subagents: {
-                identity: ctx.identity, runner: grant.runner, session,
+                // In-process, so a kept-open grandchild can be continued; this child's shutdown releases it first.
+                identity: ctx.identity, runner: grant.runner, session, continuable: true,
                 ...(childLease === undefined ? {} : { parentLeaseToken: childLease }),
                 ...(grant.maxDepth === undefined ? {} : { maxDepth: grant.maxDepth }),
                 ...(grant.maxActiveChildren === undefined ? {} : { maxActiveChildren: grant.maxActiveChildren }),
