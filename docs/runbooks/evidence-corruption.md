@@ -26,7 +26,7 @@ amc trust status
 
 ## Scope the Damage
 
-1. Determine which subsystems failed (ledger, transparency, policies, artifacts). After a crash, `amc verify` may name `Session <id> missing seal`. If the session is the gateway's (runtime `gateway`), a running Studio seals it within about 10 minutes; nothing to do. For any other runtime, or on a copy you will not run Studio on: confirm the writer is dead (`amc status`, the tool's process), then `amc verify --repair` shows `seal_interrupted_sessions` and `--apply` seals it with a signed marker. If `--repair` proposes `archive_evidence_store` instead, something other than an open session failed; follow the rest of this runbook.
+1. Determine which subsystems failed (ledger, transparency, policies, artifacts). After a crash, `amc verify` may name `Session <id> missing seal`. If the session is the gateway's (runtime `gateway`), a running Studio seals it within about 10 minutes; nothing to do. For any other runtime, or on a copy you will not run Studio on: confirm the writer is dead (`amc status`, the tool's process), then `amc verify --repair` shows `seal_interrupted_sessions` and `--apply` seals it with a signed marker after you type `seal` (`--yes` in scripts). An erased seal plus deleted newest rows looks exactly the same, so seal only a session you know was interrupted. If `--repair` proposes `archive_evidence_store` instead, something other than an open session failed, or a signed ledger checkpoint forbids the seal (`Not sealing: …`); follow the rest of this runbook.
 2. Check latest backup integrity before restore.
 ```bash
 amc backup verify .amc/backups/latest.amcbackup --pubkey <recorded-auditor.pub>

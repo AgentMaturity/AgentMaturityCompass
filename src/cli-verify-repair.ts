@@ -2,8 +2,9 @@
  * `amc verify --repair [--apply [--yes]]` (P0-45). Plan mode diagnoses and changes nothing. --apply moves a failing
  * evidence store into .amc/quarantine/ after a confirmation, a legal-hold check and a signing pre-flight, and writes a
  * receipt signed as REPAIR_RECEIPT; when every failure is an interrupted legacy session's missing seal it seals those
- * sessions with a signed marker instead (D-INT-8, no confirmation: nothing moves). Exit codes: 0 verified, nothing to
- * do, or the repair done and verified; 1 verification failed and nothing changed; 2 refused.
+ * sessions with a signed marker instead (D-INT-8), after a typed confirmation: a stripped seal plus a deleted tail reads
+ * the same, so sealing records the operator's word (SR-I1). Exit codes: 0 verified, nothing to do, or the repair done and
+ * verified; 1 verification failed and nothing changed; 2 refused.
  */
 import { createInterface } from "node:readline/promises";
 import chalk from "chalk";
@@ -49,9 +50,12 @@ function printPlan(plan: RepairPlan): void {
     for (const session of plan.sessions ?? []) {
       console.log(`  ${session.sessionId} (${session.runtime}; last signed activity ${Math.floor(session.tailAgeMs / 60_000)} min ago)`);
     }
+    console.log(chalk.yellow("  Nothing signed here tells an interrupted session from a sealed one whose seal was erased and newest rows deleted:"
+      + " no signed ledger checkpoint covers these sessions. Seal only sessions you know were interrupted; each marker records that amc verify --repair sealed it."));
     console.log(chalk.gray("  Confirm each writer is dead first (amc status, the tool's process): a session written to after its seal fails verification."));
     return;
   }
+  for (const reason of plan.sealRefused ?? []) console.log(chalk.yellow(`Not sealing: ${reason}. A missing seal there cannot be told apart from an erased seal and deleted rows.`));
   if (plan.action === "none") {
     console.log(plan.chainOk
       ? "The evidence chain verified; only configuration signatures failed. Re-sign those configs; the evidence needs no repair."
@@ -68,12 +72,12 @@ function printPlan(plan: RepairPlan): void {
   console.log(chalk.gray("  A ledger with holes cannot verify, so the whole store moves. Every original byte stays in the quarantine folder."));
 }
 
-async function confirmArchive(yes: boolean): Promise<boolean> {
+async function confirmTyped(word: "archive" | "seal", question: string, yes: boolean): Promise<boolean> {
   if (yes) return true;
   if (!process.stdin.isTTY) return false;
   const prompt = createInterface({ input: process.stdin, output: process.stdout });
   try {
-    return (await prompt.question("Type archive to move these files into quarantine: ")).trim() === "archive";
+    return (await prompt.question(`Type ${word} to ${question}: `)).trim() === word;
   } finally {
     prompt.close();
   }
@@ -81,8 +85,12 @@ async function confirmArchive(yes: boolean): Promise<boolean> {
 
 const VAULT_LOCKED = "Refused: the vault is locked; run `amc vault unlock` (or set AMC_VAULT_PASSPHRASE) and retry. Nothing was changed.";
 
-/** seal_interrupted_sessions --apply: seals every planned session or none, then verifies again and prints the verdict. */
-function applySeal(workspace: string, plan: RepairPlan, expectedMonitorFingerprint?: string): number {
+/** seal_interrupted_sessions --apply: after the typed confirmation, seals every planned session or none, then verifies again. */
+async function applySeal(workspace: string, plan: RepairPlan, yes: boolean, expectedMonitorFingerprint?: string): Promise<number> {
+  if (!await confirmTyped("seal", "append a signed interrupted-sealed marker to each session and seal it", yes)) {
+    console.log(chalk.red("Refused: --apply needs the typed confirmation seal on a terminal, or --yes. Nothing has been changed."));
+    return 2;
+  }
   try {
     const sealed = sealPlannedSessions(workspace, plan);
     console.log(chalk.green(`Sealed ${sealed.length} interrupted session(s), each with a signed interrupted-sealed marker: ${sealed.join(", ")}`));
@@ -99,7 +107,7 @@ function applySeal(workspace: string, plan: RepairPlan, expectedMonitorFingerpri
 }
 
 async function applyPlan(workspace: string, plan: RepairPlan, yes: boolean): Promise<number> {
-  if (!await confirmArchive(yes)) {
+  if (!await confirmTyped("archive", "move these files into quarantine", yes)) {
     console.log(chalk.red("Refused: --apply needs a typed confirmation on a terminal, or --yes. Nothing has been changed."));
     return 2;
   }
@@ -136,15 +144,15 @@ export async function runVerifyRepair(opts: { apply: boolean; yes: boolean; expe
       case "archive_evidence_store":
         code = await applyPlan(workspace, plan, opts.yes);
         break;
-      case "seal_interrupted_sessions": // --yes is accepted and ignored: nothing moves
-        code = applySeal(workspace, plan, opts.expectedMonitorFingerprint);
+      case "seal_interrupted_sessions":
+        code = await applySeal(workspace, plan, opts.yes, opts.expectedMonitorFingerprint);
         break;
       default:
         console.log("Nothing has been changed.");
         if (plan.action === "archive_evidence_store") {
           console.log(chalk.gray("Run amc verify --repair --apply to archive the store (asks to type archive; --yes in scripts)."));
         } else if (plan.action === "seal_interrupted_sessions") {
-          console.log(chalk.gray("Run amc verify --repair --apply to seal them."));
+          console.log(chalk.gray("Run amc verify --repair --apply to seal them (asks to type seal; --yes in scripts)."));
         }
         code = 1;
     }
