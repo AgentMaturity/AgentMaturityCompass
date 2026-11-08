@@ -352,8 +352,8 @@ export type RouteOptions = Pick<RunOptions, "baseUrl" | "credential" | "cacheRet
 export function withReasoningAndRouteOptions(command: Command, thinkingHelp: string): Command {
   return command
     .option("--thinking <mode>", thinkingHelp)
-    .option("--reasoning-effort <effort>", "sent verbatim: DeepSeek low|high|max, Gemini MINIMAL|LOW|MEDIUM|HIGH (thinkingLevel), Ollama low|medium|high|max (think)")
-    .option("--thinking-budget <tokens>", "Anthropic budget_tokens (>= 1024, below --max-tokens) or Gemini thinkingBudget")
+    .option("--reasoning-effort <effort>", "sent verbatim: DeepSeek low|high|max, Anthropic low|medium|high|xhigh|max (output_config.effort), Gemini MINIMAL|LOW|MEDIUM|HIGH (thinkingLevel), Ollama low|medium|high|max (think)")
+    .option("--thinking-budget <tokens>", "Anthropic manual budget_tokens (Claude 4.5/4.6; >= 1024, below --max-tokens) or Gemini thinkingBudget")
     .option("--cache-retention <mode>", "short or long prompt-cache retention on anthropic, openai and openai-responses routes (refused elsewhere)")
     .option("--max-retries <n>", "model-request retries after the first attempt (default 5; 0 gives up on the first failure)")
     .option("--retry-max-delay <ms>", "local backoff ceiling in milliseconds (500 to 2147483647, default 10000)")

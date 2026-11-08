@@ -192,7 +192,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--mcp-config <path>", "reviewed MCP JSON; repeat to mount more servers under the same signed allowlist; each grant keeps its reviewed action class; requires --tools workspace and --approve-tools", collectOption)
     .option("--mcp-config-sha256 <digest>", "refuse an MCP config changed from these exact reviewed bytes; one per --mcp-config, in the same order", collectOption)
     .option("--max-tokens <n>", "provider max_tokens for each request"),
-    "enabled or disabled: DeepSeek, Anthropic (tools-free, with --thinking-budget), Gemini (includeThoughts) and Ollama (think)")
+    "enabled or disabled: DeepSeek, Anthropic (tools-free: adaptive, or manual with --thinking-budget), Gemini (includeThoughts) and Ollama (think)")
     .option("--max-steps <n>", "how many model steps one turn may take")
     .option("--context-window <tokens>", "override the reviewed model context window for automatic compaction")
     .option("--compact-threshold <fraction>", "use ratio trigger instead of the catalog token reserve (0.5-0.95; requires --context-window)")

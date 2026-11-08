@@ -7,9 +7,11 @@
  *
  *   - OpenAI Chat / Responses and every OpenAI-compatible route: `reasoning_effort` would be sent, but both decoders
  *     refuse reasoning output and admission marks `thinking-output` unsupported (deferred, D-05).
- *   - Anthropic: thinking blocks are recorded but `anthropic-messages@4` cannot replay them with a signature, so thinking
- *     is admitted only for a tools-free, single-turn run. A resumed or multi-turn session is refused at prepare by
- *     capability admission (`thinking-replay`), before spend (deferred signed replay, D-01).
+ *   - Anthropic: thinking blocks are recorded but `anthropic-messages@4` cannot replay them with a signature, so a
+ *     thinking request (`adaptive`, or manual `enabled` with `budget_tokens`) is admitted only for a tools-free,
+ *     single-turn run. A resumed or multi-turn session is refused at prepare by capability admission
+ *     (`thinking-replay`), before spend (deferred signed replay, D-01). `--reasoning-effort` alone is
+ *     `output_config.effort`, which asks for no thinking block, so it is admitted beside tools.
  *
  * The caller validates the result through the provider contract (`deepseekParams`, `geminiParams`, `ollamaParams`).
  */
@@ -29,6 +31,8 @@ export interface ReasoningContext {
 }
 
 const ANTHROPIC_MIN_BUDGET = 1024;
+/** `output_config.effort` as Anthropic documents it; sent verbatim, never mapped from another provider's levels. */
+const ANTHROPIC_EFFORTS = ["low", "medium", "high", "xhigh", "max"] as const;
 const GEMINI_LEVELS = ["MINIMAL", "LOW", "MEDIUM", "HIGH"] as const;
 const OLLAMA_LEVELS = ["low", "medium", "high", "max"] as const;
 
@@ -64,21 +68,26 @@ export function reasoningParamsFor(providerId: string, options: ReasoningOptions
       return params;
     }
     case "anthropic": {
-      if (options.reasoningEffort !== undefined) throw new Error("--reasoning-effort is not an Anthropic wire option; use --thinking enabled --thinking-budget <tokens>.");
+      const effort = options.reasoningEffort;
+      if (effort !== undefined && !(ANTHROPIC_EFFORTS as readonly string[]).includes(effort)) {
+        throw new Error(`--reasoning-effort for Anthropic must be one of ${ANTHROPIC_EFFORTS.join(", ")} (sent verbatim as output_config.effort).`);
+      }
+      const outputConfig = effort === undefined ? {} : { output_config: { effort } };
       const on = mode(options);
       const tokens = budget(options);
       if (on === "disabled") {
         if (tokens !== undefined) throw new Error("--thinking disabled takes no --thinking-budget.");
-        return { thinking: { type: "disabled" } };
+        return { thinking: { type: "disabled" }, ...outputConfig };
       }
-      if (tokens === undefined) throw new Error("Anthropic thinking requires --thinking-budget <tokens> (at least 1024, below --max-tokens).");
-      if (tokens < ANTHROPIC_MIN_BUDGET || tokens >= context.maxTokens) {
+      if (on === undefined && tokens === undefined) return outputConfig;
+      // A budget asks for manual thinking (Claude 4.5/4.6); none asks for adaptive thinking (Claude 4.6 and later).
+      if (tokens !== undefined && (tokens < ANTHROPIC_MIN_BUDGET || tokens >= context.maxTokens)) {
         throw new Error(`--thinking-budget must be at least ${ANTHROPIC_MIN_BUDGET} and below --max-tokens (${context.maxTokens}).`);
       }
       if (context.tools !== "none") {
         throw new Error("Anthropic thinking is admitted only with --tools none: anthropic-messages@4 cannot replay a signed thinking block beside tool calls (signed replay is deferred, D-01). A resumed session is refused at prepare for the same reason.");
       }
-      return { thinking: { type: "enabled", budget_tokens: tokens } };
+      return { thinking: tokens === undefined ? { type: "adaptive" } : { type: "enabled", budget_tokens: tokens }, ...outputConfig };
     }
     case "gemini": case "gemini-audio": {
       const on = mode(options);

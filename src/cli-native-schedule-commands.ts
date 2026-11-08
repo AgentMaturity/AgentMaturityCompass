@@ -124,7 +124,7 @@ export function registerNativeScheduleCommands(program: Command, io: AgentLoopCl
       .option("--approve-risk <tier>", "signed approval risk tier, default high")
       .option("--max-tokens <n>", "positive per-request output ceiling", "1024")
       .option("--thinking <mode>", "enabled or disabled: DeepSeek, Gemini and Ollama (Anthropic thinking needs tools-free runs, which schedules are not)")
-      .option("--reasoning-effort <effort>", "sent verbatim: DeepSeek low|high|max, Gemini MINIMAL|LOW|MEDIUM|HIGH, Ollama low|medium|high|max")
+      .option("--reasoning-effort <effort>", "sent verbatim: DeepSeek low|high|max, Anthropic low|medium|high|xhigh|max (output_config.effort), Gemini MINIMAL|LOW|MEDIUM|HIGH, Ollama low|medium|high|max")
       .option("--thinking-budget <tokens>", "Gemini thinkingBudget")
       .option("--cache-retention <mode>", "short or long prompt-cache retention on anthropic, openai and openai-responses routes")
       .option("--max-retries <n>", "model-request retries after the first attempt (default 5)")
