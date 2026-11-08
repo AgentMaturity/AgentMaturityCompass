@@ -65,12 +65,16 @@ describe("durable workflow admission", () => {
     f.session.recordProjectedEvidence = record;
     const second = await f.run(agent("a"), runner);
     expect(first.ok).toBe(false);
+    expect(first.failures[0]?.unknown, "the result commit failed after the dispatch").toBe(true);
     expect(second.ok).toBe(false);
     expect(effects).toBe(1);
     expect(second.failures[0]?.reason).toContain("TOOL_OUTCOME_UNKNOWN");
+    // The parked node's status, not its reason text, marks the effect unknown (what the workflow tool reports).
+    expect(second.failures[0]?.unknown).toBe(true);
     expect(second.outputs.size).toBe(0);
     const renamed = await f.run(agent("a"), runner, { runId: "new-name" });
     expect(renamed.ok).toBe(false);
+    expect(renamed.failures[0]?.unknown, "a new run id cannot retry an unresolved effect").toBe(true);
     expect(effects).toBe(1);
   });
 
@@ -223,6 +227,8 @@ describe("durable workflow admission", () => {
     expect(result.ok).toBe(false);
     expect(effects).toBe(1);
     expect(result.failures.some(row => row.reason.includes("TOOL_OUTCOME_UNKNOWN"))).toBe(true);
+    // The abandoned child and the node its unsettled runner blocked are both unknown, from status, not text.
+    expect(result.failures.map(row => [row.nodeId, row.unknown])).toEqual([["a", true], ["b", true]]);
     release();
     await late;
   });
@@ -377,6 +383,7 @@ describe("durable workflow admission", () => {
     const result = await f.run(agent("a"), async () => { effects++; return { ok: true, text: "wrong" }; });
     expect(result.ok).toBe(false);
     expect(effects).toBe(0);
+    expect(result.failures.some(failure => failure.unknown === true), "nothing was dispatched, so nothing is unknown").toBe(false);
   });
 
   it("does not replay a child that threw after applying an effect", async () => {
@@ -386,7 +393,10 @@ describe("durable workflow admission", () => {
     const first = await f.run(agent("a"), runner);
     expect(first.ok).toBe(false);
     expect(first.failures[0]?.reason).toContain("TOOL_OUTCOME_UNKNOWN");
-    expect((await f.run(agent("a"), runner)).ok).toBe(false);
+    expect(first.failures[0]?.unknown).toBe(true);
+    const again = await f.run(agent("a"), runner);
+    expect(again.ok).toBe(false);
+    expect(again.failures[0]?.unknown).toBe(true);
     expect(effects).toBe(1);
   });
 

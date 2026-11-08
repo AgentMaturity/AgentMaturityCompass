@@ -98,7 +98,8 @@ export function workflowTool(capability: SubagentCapability): ToolDefinition {
       return {
         // A plan with a failed or cancelled node did not do what was asked.
         ok: result.ok,
-        ...(result.failures.some(failure => failure.reason.includes("TOOL_OUTCOME_UNKNOWN")) ? { effect: "unknown" as const } : {}),
+        // From each failed node's status, never from reason text: a reason can quote model-chosen labels (a runAs chain).
+        ...(result.failures.some(failure => failure.unknown === true) ? { effect: "unknown" as const } : {}),
         output: JSON.stringify({
           runId: result.runId,
           outputs: Object.fromEntries(result.outputs),
