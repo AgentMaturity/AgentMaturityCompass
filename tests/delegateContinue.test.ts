@@ -167,7 +167,7 @@ describe("delegate({keepOpen}) and delegate_continue", () => {
     expect(t.open.names()).toEqual([]);
   });
 
-  it("releases every open delegate at shutdown, including one kept open after shutdown began", async () => {
+  it("releases every open delegate at shutdown, and waits for one still being kept when shutdown began (S23)", async () => {
     const dir = workspace(), released: string[] = [];
     let finish!: () => void;
     const late = new Promise<void>(resolve => { finish = resolve; });
@@ -179,9 +179,11 @@ describe("delegate({keepOpen}) and delegate_continue", () => {
     expect(t.open.hasOwnedWork()).toBe(true);
     const closing = t.open.closeAll();
     finish();
-    expect((await pending).ok).toBe(true);
+    // Shutdown resolves only after the in-flight reservation settled and its late release wrote its row, so a caller
+    // that seals its session as soon as shutdown resolves seals after both completion rows.
     expect(await closing).toBe(true);
-    await vi.waitFor(() => expect(t.session.completed()).toHaveLength(2));
+    expect(t.session.completed().map(row => row.childRunAs).sort()).toEqual(["early", "late"]);
+    expect((await pending).ok).toBe(true);
     expect(t.session.completed().map(row => [row.childRunAs, row.settledAs, row.reason]).sort()).toEqual([
       ["early", "reported", "the caller's run ended; the open delegate was released"],
       ["late", "reported", "the caller's run ended; the open delegate was released"]]);
@@ -202,16 +204,16 @@ describe("delegate({keepOpen}) and delegate_continue", () => {
 });
 
 /** The root composition path: the toolset defines the tools, the signed pipeline admits them, shutdown releases. */
-function rootToolset(allowed: PolicyTool[], continuableRunner = true) {
+function rootToolset(allowed: PolicyTool[], continuableRunner = true, wrap: (runner: ReturnType<typeof continuable>) => ReturnType<typeof continuable> = runner => runner) {
   const dir = workspace(allowed);
   const session = new SessionService(dir);
   session.open({ agentId: "default", harnessVersion: "continue-fixture", compositionDigest: "fixture", policyDigest: "fixture" });
   session.startTurn({ trigger: "user" }); session.startStep();
   const toolset = agentToolset({ workspace: dir, agentId: "default", sessionId: session.sessionId, recorder: session });
-  cleanups.push(() => { void toolset.close(); session.disposeWithoutClosing(); });
+  cleanups.push(() => { void toolset.close(); try { session.disposeWithoutClosing(); } catch { /* already closed by the test */ } });
   const released: string[] = [];
   let n = 0;
-  toolset.grantSubagents({ identity: rootIdentity("default"), runner: continuable(released), session, continuable: continuableRunner, mintSessionId: () => `kept-${++n}` });
+  toolset.grantSubagents({ identity: rootIdentity("default"), runner: wrap(continuable(released)), session, continuable: continuableRunner, mintSessionId: () => `kept-${++n}` });
   let sequence = 0;
   const run = (name: string, args: object) => toolset.seam.execute({ callId: `continue-${++sequence}`, toolName: name,
     rawArguments: JSON.stringify(args), sessionId: session.sessionId, turn: 1, step: 1, parentToken: null,
@@ -232,6 +234,28 @@ describe("a toolset granted delegation", () => {
     expect(f.toolset.hasOwnedWork()).toBe(false);
     const completed = f.session.readEvents().filter(row => row.event_type === "agent_delegation_completed").map(row => JSON.parse(row.meta_json) as Record<string, unknown>);
     expect(completed).toEqual([expect.objectContaining({ childRunAs: "helper", settledAs: "reported", reason: "the caller's run ended; the open delegate was released" })]);
+  });
+
+  it("shuts down only after a delegate still being kept is released, so its row precedes the seal (S23)", async () => {
+    let finish!: () => void;
+    const held = new Promise<void>(resolve => { finish = resolve; });
+    const f = rootToolset([DELEGATE, CONTINUE], true, runner => vi.fn(async (ctx: SubagentRunContext) => { await held; return runner(ctx); }) as unknown as typeof runner);
+    const pending = f.run("delegate", { runAs: "late", goal: "stay", keepOpen: true });
+    await vi.waitFor(() => expect(f.toolset.hasOwnedWork()).toBe(true));
+    const shutdown = f.toolset.seam.shutdown!();
+    finish();
+    expect(await shutdown).toBe(true);
+    f.session.endStep({ stopReason: "end_turn", usage: null }); f.session.endTurn({ reason: "complete" }); f.session.sealTurn();
+    const sessionId = f.session.sessionId;
+    f.session.close({ reason: "completed" });
+    expect((await pending).outcome).toBe("OK");
+    const db = new Database(join(f.dir, ".amc", "evidence.sqlite"), { readonly: true });
+    const types = (() => { try {
+      return (db.prepare("SELECT event_type FROM evidence_events WHERE session_id = ? ORDER BY rowid").all(sessionId) as Array<{ event_type: string }>).map(row => row.event_type);
+    } finally { db.close(); } })();
+    expect(types.indexOf("agent_delegation_completed")).toBeGreaterThan(-1);
+    expect(types.indexOf("agent_delegation_completed")).toBeLessThan(types.indexOf("session/close"));
+    expect(f.released).toEqual(["late"]);
   });
 
   it("refuses keepOpen and denies delegate_continue when the signed allowlist does not list it", async () => {

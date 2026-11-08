@@ -47,9 +47,16 @@ const RUN_ENDED = "the caller's run ended; the open delegate was released";
 export function openDelegates(offered: () => boolean): OpenDelegates {
   const handles = new Map<string, SubagentHandle>();
   const reserved = new Set<string>();
+  // Every release in flight, whoever started it: shutdown resolves only after each one has written its rows (S23).
+  const releasing = new Set<Promise<string | undefined>>();
+  const drained: Array<() => void> = [];
   let closing: Promise<boolean> | undefined;
-  const close = (handle: SubagentHandle, settledAs: DelegationSettlement, reason: string): Promise<string | undefined> =>
-    Promise.resolve().then(() => handle.close(settledAs, reason)).then(() => undefined, (error: unknown) => String(error));
+  const close = (handle: SubagentHandle, settledAs: DelegationSettlement, reason: string): Promise<string | undefined> => {
+    const done = Promise.resolve().then(() => handle.close(settledAs, reason)).then(() => undefined, (error: unknown) => String(error));
+    releasing.add(done);
+    void done.then(() => releasing.delete(done));
+    return done;
+  };
   const live = (runAs: string): SubagentHandle | undefined => {
     const handle = handles.get(runAs);
     // A delegation that settled on its own (ceiling, deadline, failure) is no longer open under its name.
@@ -64,10 +71,11 @@ export function openDelegates(offered: () => boolean): OpenDelegates {
       return true;
     },
     settle: (runAs, handle) => {
+      // Kept after shutdown began: released at once, and shutdown waits for that release like any other.
+      if (handle !== undefined && closing !== undefined) void close(handle, "reported", RUN_ENDED);
+      else if (handle !== undefined) handles.set(runAs, handle);
       reserved.delete(runAs);
-      if (handle === undefined) return;
-      if (closing !== undefined) { void close(handle, "reported", RUN_ENDED); return; }
-      handles.set(runAs, handle);
+      if (reserved.size === 0) for (const resume of drained.splice(0)) resume();
     },
     open: live,
     release: (runAs, settledAs, reason) => {
@@ -78,10 +86,15 @@ export function openDelegates(offered: () => boolean): OpenDelegates {
     names: () => [...handles.keys()].filter(runAs => live(runAs) !== undefined).sort(),
     hasOwnedWork: () => reserved.size > 0 || [...handles.keys()].some(runAs => live(runAs) !== undefined),
     closeAll: () => {
-      closing ??= Promise.all([...handles.entries()].map(([runAs, handle]) => {
-        handles.delete(runAs);
-        return close(handle, "reported", RUN_ENDED);
-      })).then(failures => failures.every(failure => failure === undefined));
+      closing ??= (async () => {
+        for (const [runAs, handle] of [...handles.entries()]) { handles.delete(runAs); void close(handle, "reported", RUN_ENDED); }
+        // A delegate still being kept settles through `settle`, which releases it; a spawn in flight is bounded by
+        // its own cancellation grace, because the caller's driver is disposed (its turn signal aborted) first.
+        while (reserved.size > 0) await new Promise<void>(resume => drained.push(resume));
+        const failures: Array<string | undefined> = [];
+        while (releasing.size > 0) failures.push(...await Promise.all([...releasing]));
+        return failures.every(failure => failure === undefined);
+      })();
       return closing;
     }
   };
