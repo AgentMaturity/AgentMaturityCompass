@@ -22,7 +22,7 @@ export const TRUTH = {
   twoUsers: "Two local users are not evidence of two people"
 };
 // LIVE-UX-04: the notice says how to enable the preview (D-20: AMC_A4_PREVIEW=1 in the Studio process environment).
-export const PREVIEW_NOTICE = "A4 preview is not enabled in this workspace. In the workspace folder, stop Studio with `amc down`, set "
+const PREVIEW_NOTICE = "A4 preview is not enabled in this workspace. In the workspace folder, stop Studio with `amc down`, set "
   + "`AMC_A4_PREVIEW=1` in the environment (macOS/Linux: `AMC_A4_PREVIEW=1 amc up`; PowerShell: `$env:AMC_A4_PREVIEW=\"1\"; amc up`), "
   + "then start it again. A running Studio keeps the environment it started with.";
 /** PREVIEW_NOTICE with each `command` in <code>. */
