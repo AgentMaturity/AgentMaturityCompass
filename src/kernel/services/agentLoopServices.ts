@@ -38,25 +38,22 @@ import type { Context } from "../amcRuntime.js";
 import { AgentDriver, type AgentDriverInit, type AgentShutdownResult } from "../../agent/agentDriver.js";
 import type { NativeImageInput } from "../../attachments/nativeImageInput.js";
 import type {
-  AgentLoopConfig,
   AgentStatus,
   CancelOptions,
   InboxReceipt,
-  InboxTarget,
-  LoopHooks,
-  LoopRetryRuntime
+  InboxTarget
 } from "../../agent/loopTypes.js";
-import type { LoopLlm, LoopRoute } from "../../agent/stepRunner.js";
-import type { AgentToolSeam } from "../../agent/toolSeam.js";
-import type { NativeValidationPlan } from "../../agent/nativeValidation.js";
-import type { SessionService } from "../../session/sessionService.js";
+import type { LoopLlm } from "../../agent/stepRunner.js";
 import type { TurnCancelCause } from "../../session/sessionTypes.js";
 
 export const AGENT_LOOP_SEAM = defineSeam("amcAgentLoop");
 
-export interface AgentLoopServiceConfig {
-  /** The session this driver writes into. Single writer — see the module header. */
-  readonly session: SessionService;
+/**
+ * What the seam hands the driver: {@link AgentDriverInit} minus the two fields whose meaning the composition
+ * narrows, re-declared here with that meaning. Everything else (tools, validation, hooks, config, retry runtime,
+ * run limits) passes through unchanged.
+ */
+export interface AgentLoopServiceConfig extends Omit<AgentDriverInit, "llm" | "systemPromptEventId"> {
   /**
    * The model seam this loop dispatches through.
    *
@@ -66,7 +63,6 @@ export interface AgentLoopServiceConfig {
    * composed tree.
    */
   readonly llm: LoopLlm;
-  readonly route: LoopRoute;
   /**
    * The `system/prompt` row this run's requests cite.
    *
@@ -77,14 +73,6 @@ export interface AgentLoopServiceConfig {
    * records it, and the loop is handed the receipt.
    */
   readonly systemPromptEventId: string;
-  readonly tools?: AgentToolSeam;
-  readonly validation?: NativeValidationPlan;
-  readonly hooks?: LoopHooks;
-  readonly config?: Partial<AgentLoopConfig>;
-  /** Injected so a test can pin the retry wait and jitter. */
-  readonly retryRuntime?: LoopRetryRuntime;
-  /** Operator run limits (SH-LOOP-06), handed to the driver unchanged. */
-  readonly runLimits?: AgentDriverInit["runLimits"];
 }
 
 /**

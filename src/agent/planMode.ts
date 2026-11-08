@@ -36,7 +36,7 @@ import { deniedToolNamesForScope } from "./delegationScope.js";
 
 const PLAN_MODE_CONTEXT = "context:plan-mode";
 /** After instructions (100) and mission (125), before the clock (900). */
-export const PLAN_MODE_CONTEXT_ORDER = 150;
+const PLAN_MODE_CONTEXT_ORDER = 150;
 
 /** READ_ONLY by class, denied by name: they cause effects through another seam. */
 const PLAN_MODE_DENIED_TOOLS: readonly string[] = Object.freeze(["delegate", "workflow", "job_kill"]);
