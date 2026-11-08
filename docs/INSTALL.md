@@ -151,7 +151,7 @@ kubectl -n amc-system create secret generic amc-bootstrap \
   --from-file=vaultPassphrase=./vault-passphrase.txt \
   --from-file=ownerUsername=./owner-username.txt \
   --from-file=ownerPassword=./owner-password.txt
-helm upgrade --install amc deploy/helm/amc --namespace amc-system --atomic --wait \
+helm upgrade --install amc deploy/helm/amc --namespace amc-system --atomic --wait --reuse-values \
   --set workspace.persistence.size=10Gi \
   --set ingress.enabled=true \
   --set env.AMC_CORS_ALLOWED_ORIGINS=https://amc.local

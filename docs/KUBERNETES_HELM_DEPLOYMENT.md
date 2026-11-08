@@ -37,8 +37,8 @@ The chart renders:
 - `Deployment` with non-root containers, read-only root filesystem, one replica and `strategy: Recreate`.
 - `Service` for Studio, Gateway, and proxy ports.
 - `Ingress` when enabled.
-- `PersistentVolumeClaim` for the AMC workspace.
-- `PersistentVolumeClaim` `<release>-state` for `<AMC home>/state` (`amcHomeState`, mounted at `/home/amc/.config/amc/state`). It keeps this machine's anti-rollback marks, key-set recovery copies and applied trust-root rotations across restarts; on an `emptyDir` every restart forgets them ([KEY_LIFECYCLE.md](KEY_LIFECYCLE.md#anti-rollback)). It is never mounted into the workspace.
+- `PersistentVolumeClaim` `<release>-amc` for the AMC workspace (`amc-amc` for release `amc`).
+- `PersistentVolumeClaim` `<release>-amc-state` (`amc-amc-state` for release `amc`) for `<AMC home>/state` (`amcHomeState`, mounted at `/home/amc/.config/amc/state`). It keeps this machine's anti-rollback marks, key-set recovery copies and applied trust-root rotations across restarts; on an `emptyDir` every restart forgets them ([KEY_LIFECYCLE.md](KEY_LIFECYCLE.md#anti-rollback)). It is never mounted into the workspace.
 - `NetworkPolicy`, `PodDisruptionBudget`, `ServiceAccount` and `ConfigMap`.
 - No `Secret` by default. The chart references the bootstrap secret you create. `bootstrap.createSecret=true` renders it from `bootstrap.values`, and then every value is required and any value starting with `change-me` is refused, by the template and by `values.schema.json`. No default passphrase can reach the cluster.
 - A `helm test` pod (`templates/tests/governed-turn.yaml`), created only by `helm test`.
@@ -79,7 +79,7 @@ With `notary.enabled=true`, add `--from-file=notaryPassphrase=...` and `--from-f
 Alternatively, let the chart create the Secret. Values passed this way are stored in the Helm release record, so prefer the out-of-band Secret above or an external secret manager:
 
 ```bash
-helm upgrade --install amc deploy/helm/amc --namespace amc-system --create-namespace \
+helm upgrade --install amc deploy/helm/amc --namespace amc-system --create-namespace --reuse-values \
   --set bootstrap.createSecret=true \
   --set-file bootstrap.values.vaultPassphrase=./vault-passphrase.txt \
   --set-file bootstrap.values.ownerUsername=./owner-username.txt \
@@ -92,29 +92,26 @@ All five values are required even with the notary disabled, so enabling it later
 
 ## Install With Helm
 
+Build the image from this checkout and deploy it by digest, so the cluster runs exactly the image you tested. On kind, load the image into the node and resolve the digest containerd records for it (`scripts/deploy/kind-image-digest.mjs` prints `amc-studio@sha256:<digest>` and tags the image by that digest on the node):
+
 ```bash
+docker build --target studio -t amc-studio:<sha> .
+kind load docker-image amc-studio:<sha> --name <cluster>
+node scripts/deploy/kind-image-digest.mjs --cluster <cluster> --image amc-studio:<sha>
 helm upgrade --install amc deploy/helm/amc \
   --namespace amc-system \
   --create-namespace \
   --atomic \
   --wait \
-  --set image.repository=ghcr.io/agentmaturity/amc-studio \
-  --set image.tag=latest
-```
-
-Deploy by digest so the cluster runs exactly the image you tested. `image.digest` wins over `image.tag`; `image.requireDigest=true` refuses to render without one:
-
-```bash
-helm upgrade --install amc deploy/helm/amc \
-  --namespace amc-system \
-  --atomic \
-  --wait \
-  --set image.repository=ghcr.io/agentmaturity/amc-studio \
-  --set image.digest=sha256:<64 hex> \
+  --reuse-values \
+  --set image.repository=amc-studio \
+  --set image.digest=sha256:<digest> \
   --set image.requireDigest=true
 ```
 
-Record the digest you deployed (`docker image inspect --format '{{.Id}} {{.RepoDigests}}' <image>`) so a rollback can name it. Terraform (`image_digest`) and Pulumi (`imageDigest`) pass the same value through.
+With a registry, push the image and take its registry digest with `docker image inspect --format '{{index .RepoDigests 0}}' <registry>/amc-studio:<sha>`, then run the same `helm upgrade --install … --reuse-values` with `--set image.repository=<registry>/amc-studio --set image.digest=sha256:<digest>`. Never use the local image id (`.Id`): no registry or containerd resolves it. `image.digest` wins over `image.tag`; `image.requireDigest=true` refuses to render without one. Record the digest you deployed so a rollback can name it. Terraform (`image_digest`) and Pulumi (`imageDigest`) pass the same value through.
+
+Once registry publication is verified (`website/publication-status.json`), the published repository is `ghcr.io/agentmaturity/amc-studio`; until then do not pull it: an unpublished tag puts the pod in `ImagePullBackOff`.
 
 Internal-only profile:
 
@@ -136,8 +133,9 @@ helm upgrade --install amc deploy/helm/amc \
   --atomic \
   --wait \
   -f deploy/helm/amc/examples/values-ingress-tls.yaml \
-  --set image.repository=ghcr.io/agentmaturity/amc-studio \
-  --set image.tag=latest
+  --set image.repository=amc-studio \
+  --set image.digest=sha256:<digest> \
+  --set image.requireDigest=true
 ```
 
 ### KeyProvider and ledger encryption
@@ -158,12 +156,12 @@ With `ledgerEncryption.enabled=true` the start step refuses unless the signed op
 
 ```bash
 # File provider on kind or a single node (INS-1 uses this):
-helm upgrade --install amc deploy/helm/amc ... \
+helm upgrade --install amc deploy/helm/amc ... --reuse-values \
   --set keyProvider.provider=file --set ledgerEncryption.enabled=true
 
 # PKCS#11: PIN from a Secret, module path as a setting (needs an image with the wrapper and pkcs11js):
 kubectl -n amc-system create secret generic amc-hsm-pin --from-file=pin=./pin.txt
-helm upgrade --install amc deploy/helm/amc ... \
+helm upgrade --install amc deploy/helm/amc ... --reuse-values \
   --set keyProvider.provider=pkcs11 \
   --set keyProvider.credentialSecret.name=amc-hsm-pin --set keyProvider.credentialSecret.key=pin \
   --set keyProvider.env.AMC_PKCS11_MODULE=/usr/lib/softhsm/libsofthsm2.so \
@@ -328,7 +326,7 @@ Chart 0.4.0 (P2-06) changes the `PodDisruptionBudget` default from `minAvailable
 
 ### Upgrading to chart 0.3.0
 
-Chart 0.3.0 adds the `<release>-state` claim for `<AMC home>/state` (P1-08). A plain upgrade creates it empty, so this machine's anti-rollback marks start again from the workspace transparency log; nothing else changes. Set `amcHomeState.persistence.enabled=false` only for a disposable install.
+Chart 0.3.0 adds the `<release>-amc-state` claim (`amc-amc-state` for release `amc`) for `<AMC home>/state` (P1-08). A plain upgrade creates it empty, so this machine's anti-rollback marks start again from the workspace transparency log; nothing else changes. Set `amcHomeState.persistence.enabled=false` only for a disposable install.
 
 ### Upgrading from chart 0.1.0
 

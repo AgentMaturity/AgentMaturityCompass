@@ -52,7 +52,7 @@ kubectl -n amc-system create secret generic amc-bootstrap \
   --from-file=vaultPassphrase=./vault-passphrase.txt \
   --from-file=ownerUsername=./owner-username.txt \
   --from-file=ownerPassword=./owner-password.txt
-helm upgrade --install amc deploy/helm/amc --namespace amc-system --atomic --wait \
+helm upgrade --install amc deploy/helm/amc --namespace amc-system --atomic --wait --reuse-values \
   --set image.repository=<registry>/amc-studio --set image.digest=sha256:<64 hex> --set image.requireDigest=true
 ```
 

@@ -16,24 +16,18 @@ helm lint ./deploy/helm/amc
 
 Create the `amc-bootstrap` secret first (see `docs/KUBERNETES_HELM_DEPLOYMENT.md`). The chart references it and never renders a default. `bootstrap.createSecret=true` renders it from `bootstrap.values` instead; every value is then required and a `change-me` value is refused.
 
-```bash
-helm install amc ./deploy/helm/amc \
-  --set image.repository=ghcr.io/agentmaturity/amc-studio \
-  --set image.tag=latest
-```
-
-Pin the image with `--set image.digest=sha256:<64 hex>` (wins over the tag; `image.requireDigest=true` refuses a render without it). After install, `helm test amc --logs` runs one governed native turn and verifies its evidence.
-
-Deploy by digest in production:
+Registry publication is not yet verified (`website/publication-status.json`): do not pull `ghcr.io/agentmaturity/amc-studio` until it is, because an unpublished tag puts the pod in `ImagePullBackOff`. Build the image locally (`docker/README.md`) and deploy it by digest, from your own registry or, on kind, through `scripts/deploy/kind-image-digest.mjs` (`docs/KUBERNETES_HELM_DEPLOYMENT.md`, "Install With Helm"):
 
 ```bash
 helm install amc ./deploy/helm/amc \
-  --set image.repository=ghcr.io/agentmaturity/amc-studio \
+  --set image.repository=<registry>/amc-studio \
   --set image.digest=sha256:<64 hex> \
   --set image.requireDigest=true
 ```
 
-The release workflow is prepared to publish `ghcr.io/agentmaturity/amc-studio` as one multi-platform tag (linux/amd64 and linux/arm64) and to attach `image-digests.json` to the GitHub release; use its `indexDigest`, or a per-platform `digest` to pin one architecture. Registry publication is not yet verified (`website/publication-status.json`); until it is, build the image locally (`docker/README.md`) and deploy that image's digest from your own registry.
+`image.digest` wins over the tag; `image.requireDigest=true` refuses a render without it. Take the digest from `docker image inspect --format '{{index .RepoDigests 0}}'` after the push, never the local `.Id`. After install, `helm test amc --logs` runs one governed native turn and verifies its evidence. Later `helm upgrade` runs that set values keep the others with `--reuse-values`.
+
+The release workflow is prepared to publish `ghcr.io/agentmaturity/amc-studio` as one multi-platform tag (linux/amd64 and linux/arm64) and to attach `image-digests.json` to the GitHub release; once publication is verified, use its `indexDigest`, or a per-platform `digest` to pin one architecture. The reference deployment's scope and status are in `docs/deploy/reference/TOPOLOGY.md`.
 
 Production guide: `docs/KUBERNETES_HELM_DEPLOYMENT.md`.
 
@@ -96,6 +90,8 @@ helm upgrade --install amc deploy/helm/amc -f values.a4-<releaseId>.yaml --atomi
 kubectl set env deploy/amc-amc -c amc-studio AMC_A4_PREVIEW=1
 helm history amc
 ```
+
+Add `--reuse-values` to the overlay's `helm upgrade` line when you run it: with `-f` alone Helm starts again from the chart defaults plus the overlay, so the release loses values set earlier, such as `image.digest` and `env.AMC_EXPECTED_MONITOR_FINGERPRINT`. The generated plan omits the flag (an A4 follow-up).
 
 Known gaps, each a WAITING item or a note in the plan, never a blocker:
 
