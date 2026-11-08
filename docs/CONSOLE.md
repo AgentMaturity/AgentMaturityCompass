@@ -27,6 +27,10 @@ amc status
 
 ## Main Views
 
+Every page shows the same navigation; a page's own links appear under **This section**; the A4 link shows on Home and
+the A4 pages when the preview is on. On pages that do not load the A4 script the A4 link stays hidden even when the
+preview is on; A4 is reached from Home. On a phone, the menu button at the top opens the navigation.
+
 - `Home`: service health, fleet summary, trust/integrity tiles.
 - `Login`: credential sign-in + optional pairing workflow.
 - `Agent`: score, radar, heatmap, provider/model last-seen, evidence coverage.

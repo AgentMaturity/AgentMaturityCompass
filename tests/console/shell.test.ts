@@ -5,6 +5,7 @@
  */
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
+import * as shell from "../../src/console/assets/shell.js";
 import { decorateNav, initShell } from "../../src/console/assets/shell.js";
 import { FakeDocument, type FakeElement } from "./fakeDom.js";
 
@@ -135,5 +136,94 @@ describe("app.js shows the Unified Clarity banner only with content", () => {
     expect(app).toContain('from "./shell.js"');
     expect(app).not.toContain("mobile-nav-toggle");
     expect(app).toMatch(/decorateNav\(/);
+  });
+});
+
+// LIVE-UX-06: 38 different menus across the console's pages; one canonical menu now, each page's own links kept.
+describe("canonical navigation", () => {
+  type NavLink = { href: string; label: string; id?: string; hidden?: boolean; group?: string };
+  const api = shell as unknown as { CANONICAL_NAV?: NavLink[]; canonicalNavHtml?: (extra: NavLink[]) => string;
+    renderCanonicalNav?: (nav: FakeElement) => void };
+  const hrefs = (html: string) => [...html.matchAll(/href="([^"]+)"/g)].map((match) => match[1]!);
+
+  test("canonicalNavHtml lists Home first, the hidden A4 link and the All features group, Login renamed", () => {
+    const html = api.canonicalNavHtml?.([]) ?? "";
+    expect(hrefs(html)[0]).toBe("./home");
+    expect(html).toContain('<a href="./a4" id="a4NavLink" hidden>A4</a>');
+    expect(html).toContain('<details class="nav-features"><summary>All features</summary>');
+    expect(html).toContain(">Login / account</a>");
+    expect(html).not.toContain("This section");
+    expect(hrefs(html)).toHaveLength(31);
+    expect(html).not.toMatch(/\son[a-z]+\s*=|javascript:/i);
+  });
+
+  test("a page's own links go under This section, once each, never duplicating a canonical link", () => {
+    const html = api.canonicalNavHtml?.([{ href: "./home", label: "Home" }, { href: "./assuranceRun", label: "Run Detail" },
+      { href: "./assuranceRun.html", label: "Run Detail again" }, { href: "./evidence?agent=x", label: "Evidence" }]) ?? "";
+    expect(html).toContain('<details class="nav-features" open><summary>This section</summary><a href="./assuranceRun">Run Detail</a></details>');
+    expect(hrefs(html).filter((href) => href === "./home")).toHaveLength(1);
+    expect(hrefs(html).filter((href) => href.startsWith("./assuranceRun"))).toHaveLength(1);
+    expect(hrefs(html).filter((href) => href.startsWith("./evidence"))).toHaveLength(1);
+  });
+
+  test("renderCanonicalNav renders once, keeps the heading, and decorateNav still finds one toggle", () => {
+    const doc = new FakeDocument();
+    const nav = pageWithNav(doc, ["./home", "./assurance", "./assuranceRun"], "assuranceRun");
+    api.renderCanonicalNav?.(nav);
+    const first = nav.querySelectorAll("a").length;
+    expect(nav.dataset.canonical).toBe("1");
+    expect(nav.children[0]!.tagName).toBe("H1");
+    // a4.js unhides the A4 link when the preview answers; a second render must not hide it again.
+    nav.querySelector("#a4NavLink")!.removeAttribute("hidden");
+    api.renderCanonicalNav?.(nav);
+    expect(nav.querySelector("#a4NavLink")!.hasAttribute("hidden")).toBe(false);
+    expect(nav.querySelectorAll("a")).toHaveLength(first);
+    expect(first).toBe(33);
+    initShell(doc);
+    expect(nav.querySelectorAll("a")).toHaveLength(first);
+    expect(nav.querySelectorAll(".mobile-nav-toggle")).toHaveLength(1);
+    expect(nav.querySelector("a.active")!.getAttribute("href")).toBe("./assuranceRun");
+  });
+
+  test("initShell gives a page with its own short menu the canonical one, its links under This section", () => {
+    const doc = new FakeDocument();
+    const nav = pageWithNav(doc, ["./home", "./assurance", "./assuranceRun"], "assuranceRun");
+    initShell(doc);
+    expect(nav.dataset.canonical).toBe("1");
+    expect(nav.querySelectorAll("a")).toHaveLength(33);
+    const section = nav.querySelectorAll("details").find((details) => details.textContent.startsWith("This section"))!;
+    expect(section.querySelectorAll("a").map((anchor) => anchor.getAttribute("href"))).toEqual(["./assurance", "./assuranceRun"]);
+    expect(section.open).toBe(true);
+  });
+
+  test("every canonical link names an existing console page", () => {
+    expect(api.CANONICAL_NAV?.length).toBe(31);
+    for (const link of api.CANONICAL_NAV ?? []) {
+      expect(existsSync(`src/console/pages/${link.href.replace(/^\.\//, "")}.html`), link.href).toBe(true);
+    }
+  });
+
+  test("no page loses a link of its static menu", () => {
+    const navPages = readdirSync("src/console/pages").filter((file) => readFileSync(`src/console/pages/${file}`, "utf8").includes("<nav"));
+    let missing = 0;
+    for (const file of navPages) {
+      const markup = readFileSync(`src/console/pages/${file}`, "utf8").match(/<nav[\s\S]*?<\/nav>/)![0];
+      const doc = new FakeDocument();
+      doc.body.insertAdjacentHTML("beforeend", markup);
+      const nav = doc.querySelector("nav")!;
+      const before = nav.querySelectorAll("a").map((anchor) => anchor.getAttribute("href")!.replace(/\.html$/, ""));
+      api.renderCanonicalNav?.(nav);
+      const after = new Set(nav.querySelectorAll("a").map((anchor) => anchor.getAttribute("href")!));
+      const lost = before.filter((href) => !after.has(href));
+      missing += lost.length;
+      expect(lost, file).toEqual([]);
+    }
+    expect(navPages.length).toBeGreaterThan(60);
+    expect(missing).toBe(0);
+  });
+
+  test("styles.css hides a hidden nav link even where nav a sets display", () => {
+    const styles = readFileSync("src/console/assets/styles.css", "utf8");
+    expect(styles).toMatch(/nav a\[hidden\]\s*\{\s*display:\s*none !important;\s*\}/);
   });
 });

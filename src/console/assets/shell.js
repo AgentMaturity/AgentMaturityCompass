@@ -1,9 +1,57 @@
-// The console's shared page shell (LIVE-UX-02, LIVE-UX-03). api.js imports this module first, and every console page
-// script imports api.js, so every page with a <nav> gets the phone menu toggle and its active link marked, #status is
-// announced to screen readers, and the Unified Clarity placeholder stays hidden until app.js writes real content into it.
-// The pages' static markup stays as the no-JavaScript fallback.
+// The console's shared page shell (LIVE-UX-02, LIVE-UX-03, LIVE-UX-06). api.js imports this module first, and every
+// console page script imports api.js, so every page with a <nav> gets the one canonical menu (its own extra links under
+// "This section"), the phone menu toggle and its active link marked, #status is announced to screen readers, and the
+// Unified Clarity placeholder stays hidden until app.js writes real content into it. The pages' static markup stays as
+// the no-JavaScript fallback.
 
 const normalizeHref = (href) => String(href || "").replace(/^\.\//, "").replace(/\.html$/, "");
+const esc = (value) => String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+  .replaceAll('"', "&quot;").replaceAll("'", "&#39;");
+
+/**
+ * Home's menu, in Home's order: the primary links, the A4 link (hidden until a4.js finds the preview on), then "All
+ * features". Every href names a page in src/console/pages (tests/console/shell.test.ts).
+ */
+export const CANONICAL_NAV = [
+  { href: "./home", label: "Home" },
+  { href: "./native-tasks", label: "Native Tasks" },
+  { href: "./a4", label: "A4", id: "a4NavLink", hidden: true },
+  { href: "./agent", label: "Agent" },
+  { href: "./evidence", label: "Evidence" },
+  { href: "./runtime", label: "Runtime" },
+  { href: "./login", label: "Login / account" },
+  ...[["./org", "Org"], ["./compare", "Compare"], ["./systemic", "Systemic"], ["./commitments-org", "Org Commitments"],
+    ["./fleet", "Fleet"], ["./firewall", "Firewall"], ["./equalizer", "Equalizer"], ["./governor", "Governor"],
+    ["./toolhub", "ToolHub"], ["./approvals", "Approvals"], ["./operator-inbox", "Operator"], ["./users", "Users"],
+    ["./leases", "Leases"], ["./budgets", "Budgets"], ["./drift", "Drift"], ["./benchmarks", "Benchmarks"],
+    ["./compliance", "Compliance"], ["./outcomes", "Outcomes"], ["./experiments", "Experiments"],
+    ["./integrations", "Integrations"], ["./transparency", "Transparency"], ["./policypacks", "Policy Packs"],
+    ["./industrypacks", "Industry Packs"], ["./workorders", "Work Orders"]].map(([href, label]) => ({ href, label, group: "features" }))
+];
+
+const pathOf = (href) => normalizeHref(String(href || "").split(/[?#]/)[0]);
+const navLink = ({ href, label, id, hidden }) => `<a href="${esc(href)}"${id ? ` id="${esc(id)}"` : ""}${hidden ? " hidden" : ""}>${esc(label)}</a>`;
+
+/** The canonical menu, then the page's own links that it lacks (first occurrence of each page) under "This section". */
+export function canonicalNavHtml(extra = []) {
+  const seen = new Set(CANONICAL_NAV.map((link) => pathOf(link.href)));
+  const own = extra.filter((link) => !seen.has(pathOf(link.href)) && seen.add(pathOf(link.href)));
+  const group = (links, summary, open = "") => `<details class="nav-features"${open}><summary>${summary}</summary>${links.map(navLink).join("")}</details>`;
+  return CANONICAL_NAV.filter((link) => !link.group).map(navLink).join("")
+    + group(CANONICAL_NAV.filter((link) => link.group === "features"), "All features")
+    + (own.length ? group(own, "This section", " open") : "");
+}
+
+/** Replaces the static menu (every child but the <h1> and the phone toggle) with the canonical one, once per page. */
+export function renderCanonicalNav(nav) {
+  if (!nav || nav.dataset.canonical === "1") return;
+  const extra = [...nav.querySelectorAll("a")].map((anchor) => ({ href: anchor.getAttribute("href") || "", label: anchor.textContent.trim() }));
+  for (const child of [...nav.children]) {
+    if (child.tagName !== "H1" && !child.classList.contains("mobile-nav-toggle")) child.remove();
+  }
+  nav.insertAdjacentHTML("beforeend", canonicalNavHtml(extra));
+  nav.dataset.canonical = "1";
+}
 
 function currentPage(doc) {
   return doc.body?.dataset?.page || String(doc.location?.pathname || "").split("/").filter(Boolean).pop() || "home";
@@ -47,7 +95,9 @@ export function initShell(doc) {
   // app.js unhides the banner when it writes content (refreshUnifiedBanner); pages that never load it keep it hidden.
   const banner = doc.getElementById("ucBanner");
   if (banner) banner.hidden = true;
-  decorateNav(doc.querySelector("nav"), currentPage(doc));
+  const nav = doc.querySelector("nav");
+  renderCanonicalNav(nav);
+  decorateNav(nav, currentPage(doc));
 }
 
 if (typeof document !== "undefined") {
