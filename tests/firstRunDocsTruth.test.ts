@@ -64,10 +64,12 @@ describe("round-2 features are documented as the code behaves", () => {
   });
 
   test("STUDIO.md says which commands use the remembered passphrase, that the environment overrides it, and that agents never get it", () => {
-    expect(read("src/cli.ts")).toMatch(/if \(!\/\^\(up\|mcp\|connect hooks forward\)\( \|\$\)\/\.test\(path\)\) unlockWithRememberedPassphrase\(process\.cwd\(\)\);/);
+    // The CLI preAction unlocks from the remembered store, then asks y/N on governance paths (LIVE-VAULT-01).
+    expect(read("src/cli.ts")).toMatch(/if \(!\/\^\(up\|mcp\|connect hooks forward\)\( \|\$\)\/\.test\(path\)\) \{ unlockWithRememberedPassphrase\(process\.cwd\(\)\); await confirmRememberedUnlock\(process\.cwd\(\), path\); \}/);
     const store = read("src/vault/passphraseStore.ts");
     expect(store).toContain('if ((env.AMC_VAULT_PASSPHRASE ?? "").length > 0');
-    expect(store).toContain('getMode(workspace) === "agent" || env.AMC_LEASE || env.AMC_TOKEN ? null');
-    expect(read("docs/STUDIO.md")).toContain("After `amc up` remembers the vault passphrase, owner-mode commands in that workspace (`amc`, `amc verify`, `amc user init`, `amc user add`) use it; `AMC_VAULT_PASSPHRASE` in the environment overrides it; agents started by AMC never receive it. See [VAULT.md](VAULT.md).");
+    // Only an interactive operator gets the remembered passphrase: terminal, not agent mode, no agent marker.
+    expect(store).toContain("return interactiveOperator({ workspace, env }).ok ? getRememberedVaultPassphrase(workspace, env) : null;");
+    expect(read("docs/STUDIO.md")).toContain("After `amc up` remembers the vault passphrase, owner-mode commands in that workspace (`amc`, `amc verify`, `amc user init`, `amc user add`) use it only when an interactive operator runs them: stdin is a terminal, the workspace is not in agent mode and no agent marker is set; governance commands ask y/N first. `AMC_VAULT_PASSPHRASE` in the environment overrides it; agents started by AMC never receive it. See [VAULT.md](VAULT.md) for the full rule and its limits.");
   });
 });

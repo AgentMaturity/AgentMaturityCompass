@@ -24,7 +24,7 @@ Logs:
 - `.amc/studio/logs/*.log`
 
 Vault passphrase:
-- After `amc up` remembers the vault passphrase, owner-mode commands in that workspace (`amc`, `amc verify`, `amc user init`, `amc user add`) use it; `AMC_VAULT_PASSPHRASE` in the environment overrides it; agents started by AMC never receive it. See [VAULT.md](VAULT.md).
+- After `amc up` remembers the vault passphrase, owner-mode commands in that workspace (`amc`, `amc verify`, `amc user init`, `amc user add`) use it only when an interactive operator runs them: stdin is a terminal, the workspace is not in agent mode and no agent marker is set; governance commands ask y/N first. `AMC_VAULT_PASSPHRASE` in the environment overrides it; agents started by AMC never receive it. See [VAULT.md](VAULT.md) for the full rule and its limits.
 
 ## Local API
 
