@@ -53,3 +53,21 @@ describe("the sign-in paragraphs stay true", () => {
     expect(readme).toContain("A new workspace also gets `.amc/.gitignore`, which keeps those secrets and per-machine runtime state out of git. `.amc/users.yaml` (console password hashes) is not ignored by that file; keep it out of git unless the repository is private.");
   });
 });
+
+// LIVE-UX-16: two round-2 features had no user-facing line; document only what the tree has.
+describe("round-2 features are documented as the code behaves", () => {
+  test("GETTING_STARTED names AMC_DASHBOARD_PORT and the busy-port fallback the supervisor has", () => {
+    expect(read("src/config/envSchema.ts")).toContain("AMC_DASHBOARD_PORT: portish.default(4173)");
+    const supervisor = read("src/studio/studioSupervisor.ts");
+    expect(supervisor).toContain('if (!message.includes("EADDRINUSE"))');
+    expect(gettingStarted).toContain("The dashboard port is `AMC_DASHBOARD_PORT`, default 4173; when that port is busy, `amc up` falls back to a free port and prints the dashboard URL.");
+  });
+
+  test("STUDIO.md says which commands use the remembered passphrase, that the environment overrides it, and that agents never get it", () => {
+    expect(read("src/cli.ts")).toMatch(/if \(!\/\^\(up\|mcp\|connect hooks forward\)\( \|\$\)\/\.test\(path\)\) unlockWithRememberedPassphrase\(process\.cwd\(\)\);/);
+    const store = read("src/vault/passphraseStore.ts");
+    expect(store).toContain('if ((env.AMC_VAULT_PASSPHRASE ?? "").length > 0');
+    expect(store).toContain('getMode(workspace) === "agent" || env.AMC_LEASE || env.AMC_TOKEN ? null');
+    expect(read("docs/STUDIO.md")).toContain("After `amc up` remembers the vault passphrase, owner-mode commands in that workspace (`amc`, `amc verify`, `amc user init`, `amc user add`) use it; `AMC_VAULT_PASSPHRASE` in the environment overrides it; agents started by AMC never receive it. See [VAULT.md](VAULT.md).");
+  });
+});

@@ -342,6 +342,8 @@ Studio gives you:
 - Policy editor
 - Audit log viewer
 
+The dashboard port is `AMC_DASHBOARD_PORT`, default 4173; when that port is busy, `amc up` falls back to a free port and prints the dashboard URL.
+
 Desktop package users can launch Studio without typing the CLI command:
 
 ```bash
