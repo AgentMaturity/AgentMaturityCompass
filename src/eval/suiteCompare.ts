@@ -12,11 +12,11 @@ import { sha256Hex } from "../utils/hash.js";
 import { wilsonInterval } from "../experiments/stats.js";
 import { EVAL_RESULTS_SCHEMA, EVAL_SUITE_RUN_AUDIT } from "./suiteRunner.js";
 
-export const EVAL_BASELINE_SCHEMA = "amc.eval-baseline/v1";
-export const EVAL_SUITE_BASELINE_AUDIT = "EVAL_SUITE_BASELINE";
+const EVAL_BASELINE_SCHEMA = "amc.eval-baseline/v1";
+const EVAL_SUITE_BASELINE_AUDIT = "EVAL_SUITE_BASELINE";
 
 const counts = z.object({ attempts: z.number().int().min(0), passes: z.number().int().min(0), errors: z.number().int().min(0) }).strict();
-export const baselineSchema = z.object({
+const baselineSchema = z.object({
   schema: z.literal(EVAL_BASELINE_SCHEMA), suiteId: z.string(), suiteSha256: z.string(), fromRunId: z.string(), resultsSha256: z.string(),
   tasks: z.record(z.string(), counts), cost: z.object({ attributedUsd: z.number().nullable(), complete: z.boolean() }).strict()
 }).strict();
@@ -36,7 +36,7 @@ export const gateSchema = z.object({
   requireSameSuite: z.boolean().default(true),
   maxCostIncreaseRatio: z.number().positive().optional()
 }).strict();
-export type EvalGate = z.infer<typeof gateSchema>;
+type EvalGate = z.infer<typeof gateSchema>;
 
 export function baselineFromResults(resultsJson: string): EvalBaseline {
   const results = resultsShape.parse(JSON.parse(resultsJson));
@@ -66,7 +66,7 @@ export function recordedDigests(workspace: string, resultsSha256: string, baseli
   return { results: has(EVAL_SUITE_RUN_AUDIT, "resultsSha256", resultsSha256), baseline: has(EVAL_SUITE_BASELINE_AUDIT, "baselineSha256", baselineSha256) };
 }
 
-export interface CompareVerdict {
+interface CompareVerdict {
   readonly status: "pass" | "fail" | "inconclusive";
   readonly reasons: readonly string[];
   readonly regressedTasks: readonly string[];

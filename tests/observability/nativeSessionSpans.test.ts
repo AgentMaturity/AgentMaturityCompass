@@ -50,7 +50,7 @@ describe("native session span folder", () => {
     expect(rows.some((row) => row.event_type === "tool/call")).toBe(true);
     const folder = new NativeSpanFolder();
     const spans: Span[] = [], metrics: Array<{ name: string; kind: string; value: number }> = [];
-    for (const row of rows) { const out = folder.ingest(row); if (out) { spans.push(...(out.spans as Span[])); metrics.push(...out.metrics); } }
+    for (const row of rows) { const out = folder.ingest(row); if (out) { spans.push(...(out.spans as unknown as Span[])); metrics.push(...out.metrics); } }
     expect(folder.size(), "session/close leaves nothing open").toBe(0);
     const agent = spans.find((span) => span.name.startsWith("invoke_agent"))!;
     const turn = spans.find((span) => span.name === "turn 1")!;

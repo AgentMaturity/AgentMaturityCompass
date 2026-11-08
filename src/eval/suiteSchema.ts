@@ -12,7 +12,7 @@ const relativePath = z.string().min(1).refine((value) => !value.startsWith("/") 
 const command = z.array(z.string().min(1)).min(1).max(64);
 const timeoutMs = z.number().int().min(1_000).max(3_600_000);
 
-export const graderSchema = z.union([
+const graderSchema = z.union([
   z.object({ type: z.literal("exact"), expected: z.string(), normalize: z.enum(["none", "trim", "whitespace"]).default("trim") }).strict(),
   z.object({ type: z.literal("contains"), expected: z.string().min(1), caseSensitive: z.boolean().default(false) }).strict(),
   z.object({ type: z.literal("not_contains"), expected: z.string().min(1), caseSensitive: z.boolean().default(false) }).strict(),
@@ -23,7 +23,7 @@ export const graderSchema = z.union([
   z.object({ type: z.literal("llm_judge") }).passthrough()
 ]);
 
-export const taskSchema = z.object({
+const taskSchema = z.object({
   id,
   prompt: z.string().min(1),
   systemPrompt: z.string().optional(),
@@ -47,7 +47,7 @@ export const suiteSchema = z.object({
     maxSteps: z.number().int().min(1).max(64).default(8),
     allowedActionClasses: z.array(z.enum(["READ_ONLY", "WRITE_LOW", "WRITE_HIGH"])).min(1).default(["READ_ONLY", "WRITE_LOW"]),
     timeoutMs: timeoutMs.default(300_000)
-  }).strict().default({}),
+  }).strict().prefault({}),
   tasks: z.array(taskSchema).min(1).max(200)
 }).strict().superRefine((suite, ctx) => {
   const ids = new Set<string>();
@@ -64,5 +64,4 @@ export const suiteSchema = z.object({
 });
 
 export type EvalSuite = z.infer<typeof suiteSchema>;
-export type EvalTask = EvalSuite["tasks"][number];
 export type EvalGrader = z.infer<typeof graderSchema>;

@@ -9,7 +9,7 @@
  */
 import type { ObservabilityExporterTarget, ObservabilityOTELConfig, ObservabilitySignal } from "./otelExporter.js";
 
-export interface ResolvedOtelEnv {
+interface ResolvedOtelEnv {
   readonly config: ObservabilityOTELConfig;
   /** Why export is off although something asked for it; null when enabled or simply not requested. */
   readonly disabledReason: string | null;
@@ -28,7 +28,7 @@ function positiveInt(value: string | undefined, fallback: number): number {
 }
 
 /** `k=v,k2=v2` with percent-encoded values (OTel spec); malformed entries are skipped, never guessed. */
-export function parseKeyValueList(raw: string | undefined): Record<string, string> {
+function parseKeyValueList(raw: string | undefined): Record<string, string> {
   const out: Record<string, string> = {};
   for (const entry of (raw ?? "").split(",")) {
     const at = entry.indexOf("=");

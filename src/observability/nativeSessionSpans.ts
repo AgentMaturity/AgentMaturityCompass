@@ -213,7 +213,7 @@ interface ClassifiedRequest {
 }
 
 /** The same verdict `amc session show` gives this request, computed on its header + outcome pair only. */
-export function classifyRequest(header: EvidenceEvent, outcome: EvidenceEvent): ClassifiedRequest {
+function classifyRequest(header: EvidenceEvent, outcome: EvidenceEvent): ClassifiedRequest {
   const empty = Object.fromEntries(TOKEN_METRICS.map(([field]) => [field, null])) as ClassifiedRequest["tokens"];
   try {
     const usage = projectNativeRunUsage([header, outcome], header.session_id);

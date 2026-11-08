@@ -48,7 +48,7 @@ export interface TrialRunInput {
   readonly signal: AbortSignal;
 }
 
-export type TrialRunResult = { readonly ok: true } | { readonly ok: false; readonly reason: string };
+type TrialRunResult = { readonly ok: true } | { readonly ok: false; readonly reason: string };
 export type TrialRunner = (input: TrialRunInput) => Promise<TrialRunResult>;
 
 export interface TrialLimits {

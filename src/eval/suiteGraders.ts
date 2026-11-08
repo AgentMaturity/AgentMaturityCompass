@@ -52,7 +52,7 @@ export function gradeText(grader: EvalGrader, text: string | null): GraderResult
   }
 }
 
-export interface CommandGradingInput {
+interface CommandGradingInput {
   readonly fixture: readonly FixtureFile[];
   readonly attemptDir: string;
   readonly outputs: readonly string[];

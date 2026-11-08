@@ -15,11 +15,11 @@ import { verifyMonitorTrustRoot } from "../persistence/sessionStoreVerification.
 import { parseRequestHeaderMeta } from "../session/requestHeaderMeta.js";
 import type { EvidenceEvent } from "../types.js";
 
-export type UsageBucketKey = "day" | "session" | "model" | "provider" | "agent";
+type UsageBucketKey = "day" | "session" | "model" | "provider" | "agent";
 const TOKEN_FIELDS = ["inputTokens", "outputTokens", "cacheReadTokens", "cacheWriteTokens", "reasoningTokens"] as const;
 type TokenField = typeof TOKEN_FIELDS[number];
 
-export interface UsageReportOptions {
+interface UsageReportOptions {
   readonly workspace: string;
   readonly since: number;
   readonly until: number;
@@ -30,7 +30,7 @@ export interface UsageReportOptions {
   readonly expectedMonitorFingerprint?: string;
 }
 
-export interface UsageBucket {
+interface UsageBucket {
   readonly key: string;
   readonly requests: number;
   readonly syntheticRequests: number;

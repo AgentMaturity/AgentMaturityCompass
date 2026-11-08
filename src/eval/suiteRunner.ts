@@ -26,11 +26,11 @@ import { scoreTask, summarizeSuite, type SuiteSummary, type TaskScore } from "./
 
 export const EVAL_RESULTS_SCHEMA = "amc.eval-results/v1";
 export const EVAL_SUITE_RUN_AUDIT = "EVAL_SUITE_RUN";
-export const DEFAULT_EVAL_AGENT_ID = "eval-suite";
+const DEFAULT_EVAL_AGENT_ID = "eval-suite";
 const ATTEMPT_GUARD = "eval-attempt-scope";
 const MAX_ATTEMPTS = 10;
 
-export interface EvalAttemptRecord {
+interface EvalAttemptRecord {
   readonly attempt: number;
   readonly sessionId: string | null;
   readonly outcome: "completed" | "unavailable";
@@ -60,7 +60,7 @@ export interface EvalResults {
   readonly summary: SuiteSummary & { readonly cost: { readonly attributedUsd: number | null; readonly complete: boolean; readonly unknownRequests: number } };
 }
 
-export interface RunEvalSuiteOptions {
+interface RunEvalSuiteOptions {
   readonly workspace: string;
   readonly loaded: LoadedSuite;
   readonly provider: TrialProviderSelection;
