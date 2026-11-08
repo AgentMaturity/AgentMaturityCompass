@@ -10,7 +10,7 @@ const XATTR = /(?:^|\n)\d+ ((?:LIBARCHIVE|SCHILY)\.xattr\.[^=\n]+)=/g;
  * not to. Walks the 512-byte headers itself (name 0..100, size 124..136, type 156, ustar prefix 345..500, pax `path=`),
  * so no host tar decides what is in the archive. Returns one problem per offending entry.
  */
-export function appleMetadataProblems(tar) {
+function appleMetadataProblems(tar) {
   const problems = [];
   let offset = 0;
   let paxPath = null;

@@ -35,7 +35,7 @@ export const DOWNGRADE_GUARD = /ledger schema version \d+ is newer than this AMC
 const PROBE_PASSES = new Set(["verified", "verified-prefix"]);
 
 /** Runner: docker CLI calls, compose through AMC_COMPOSE_PREFIX when set. Returns {status, stdout, stderr}. */
-export function dockerCli(args, { env = {} } = {}) {
+function dockerCli(args, { env = {} } = {}) {
   const prefix = args[0] === "compose" ? (process.env.AMC_COMPOSE_PREFIX ?? "").trim().split(/\s+/).filter(Boolean) : [];
   const argv = prefix.length > 0 ? [...prefix, "env", ...Object.entries(env).map(([key, value]) => `${key}=${value}`), "docker", ...args] : ["docker", ...args];
   const run = spawnSync(argv[0], argv.slice(1), { encoding: "utf8", env: { ...process.env, ...env }, maxBuffer: 16 * 1024 * 1024 });
