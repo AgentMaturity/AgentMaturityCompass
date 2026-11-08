@@ -143,8 +143,8 @@ describe("envelope adapters", () => {
     expect(renderClaimLabel(unreliable).line).toContain(`Result: not evaluated (${REASON_TEXT.EVIDENCE_NOT_CLAIM_READY})`);
   });
 
-  // LIVE-INTEGRITY-03 removed r2-c's two "H3" tests here: they pinned the removed ledgerPrefix field and its
-  // LEDGER_NOT_FINALIZED reason, which let an INVALID run read "incomplete" instead of "untrusted".
+  // LIVE-INTEGRITY-03 removed r2-c's two "H3" tests here: they pinned the removed open-ledger field and its reason
+  // code, which let an INVALID run read "incomplete" instead of "untrusted".
   test("S2: distrustUnsealedReport turns VALID into INVALID and leaves every other status as it is", () => {
     expect(distrustUnsealedReport({ ...report, status: "VALID" as const }).status).toBe("INVALID");
     for (const status of ["INVALID", "UNSIGNED"] as const) {

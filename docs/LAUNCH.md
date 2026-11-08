@@ -130,6 +130,7 @@ Minimum operational telemetry:
 - Enable backup schedule + metrics scraping
 
 ### Day 7
+- Scheduled `amc verify all --json --expect-monitor <monitor sha256>` running and alerting on a non-zero exit ([Scheduled verification](DEPLOYMENT_CHECKLIST.md#scheduled-verification))
 - Retention/maintenance run
 - Verify backup freshness + restore drill sample
 - Review forecast/advisory deltas and outstanding risks
