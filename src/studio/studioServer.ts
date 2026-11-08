@@ -122,6 +122,7 @@ import { admitLoginAttempt, createLoginThrottle, LOGIN_THROTTLED_ERROR } from ".
 import { ipAllowedByCidrs, LOOPBACK_CIDRS, requestUsesHttps, resolveClientAddress } from "./clientAddress.js";
 import { allowedHostnamesFrom, hostAllowed } from "./hostAllow.js";
 import { applySecurityHeaders, isConsoleStaticAsset } from "./securityHeaders.js";
+import { missingOutcomeContract, missingStandardSchema, missingValueInput, type EmptyState } from "./emptyStates.js";
 import { createNativeTaskService } from "./nativeTaskService.js";
 import { isNativeApprovalMutationPath, isNativeStudioPath, nativeAllowedBrowserOrigins, nativeCsrfTokenForSession } from "./nativeAdmission.js";
 import { admitStudioApproval } from "./studioApprovalAdmission.js";
@@ -1851,6 +1852,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       const initiator = auth.userId ?? (auth.agentId ? `agent:${auth.agentId}` : "unknown");
       const requireRouteRoles = (roles: UserRole[]): boolean =>
         requireRoles({ auth, res, workspace: options.workspace, roles });
+      const answerEmpty = (state: EmptyState | null): boolean => (state ? (json(res, state.status, state.body), true) : false);
       const signingAuthority = (roles: UserRole[]) => currentSigningAuthority(req, res, options.workspace, options.token, auth, roles);
       const assurancePublication = (roles: UserRole[], readOnly = false, vault = false) => { const actor = signingAuthority(roles); return { beforePublish() { actor(); if (readOnly && requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } if (vault && !requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); } }; };
       const auditPublication = (roles: UserRole[], vault = true) => { const actor = signingAuthority(roles); return { beforePublish() { actor(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } if (vault && !requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); } }; }; let policyMapReadiness: ReturnType<typeof captureAuditPolicyMapReadiness> | null = null;
@@ -4459,6 +4461,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const scopeRaw = (url.searchParams.get("scope") ?? "workspace").toLowerCase();
         const scope = scopeRaw === "agent" || scopeRaw === "node" ? scopeRaw : "workspace";
         const scopeId = url.searchParams.get("id") ?? "workspace";
+        if (answerEmpty(missingValueInput(options.workspace, scope.toUpperCase(), scopeId, false))) return;
         json(
           res,
           200,
@@ -4568,6 +4571,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const scope = scopeRaw === "agent" || scopeRaw === "node" ? scopeRaw : "workspace";
         const scopeId = url.searchParams.get("id") ?? "workspace";
         const windowDays = Number(url.searchParams.get("windowDays") ?? "");
+        if (answerEmpty(missingValueInput(options.workspace, scope.toUpperCase(), scopeId, true))) return;
         const out = await valueSnapshotLatestForApi({
           workspace: options.workspace,
           scopeType: scope.toUpperCase(),
@@ -4595,6 +4599,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const scope = scopeRaw === "agent" || scopeRaw === "node" ? scopeRaw : "workspace";
         const scopeId = url.searchParams.get("id") ?? "workspace";
         const windowDays = Number(url.searchParams.get("windowDays") ?? "");
+        if (answerEmpty(missingValueInput(options.workspace, scope.toUpperCase(), scopeId, true))) return;
         const out = await valueReportForApi({
           workspace: options.workspace,
           scopeType: scope.toUpperCase(),
@@ -5010,6 +5015,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const name = decodeURIComponent(standardSchemaMatch[1] ?? "");
+        if (answerEmpty(missingStandardSchema(options.workspace, name))) return;
         json(res, 200, standardSchemaReadForApi(options.workspace, name));
         return;
       }
@@ -5938,6 +5944,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         return;
       }
 
+      if ((pathname === "/shield/exploit-confirmation/scopes" || pathname === "/shield/exploit-confirmation/proofs") && req.method === "GET") {
+        // The console's assurance page reads these paths; the same lists are under /api/v1/shield/exploit-confirmation/*.
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) return;
+        const { listExploitConfirmationProofs, listExploitConfirmationScopes } = await import("../shield/exploitConfirmation.js");
+        if (pathname.endsWith("/scopes")) { const scopes = listExploitConfirmationScopes(options.workspace); json(res, 200, { scopes, total: scopes.length }); }
+        else { const proofs = listExploitConfirmationProofs(options.workspace); json(res, 200, { proofs, total: proofs.length }); }
+        return;
+      }
+
       const governorCheck = pathname.match(/^\/governor\/check$/);
       if (governorCheck && req.method === "POST") {
         if (!hasScope(auth, "governor:check") && !hasAnyRole([...auth.roles], ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
@@ -5952,7 +5967,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           mode?: "SIMULATE" | "EXECUTE";
         };
         const agentId = resolveAgentId(options.workspace, parsed.agentId ?? auth.agentId ?? "default");
-        if (!auth.isAdmin && auth.agentId !== agentId) {
+        // A signed-in human (no agent identity) checks any workspace agent, as the role gate above admits; an agent only itself.
+        if (!auth.isAdmin && auth.agentId !== null && auth.agentId !== agentId) {
           json(res, 403, { error: "scope does not include this agent" });
           return;
         }
@@ -7436,6 +7452,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(roles)) return;
         const beforePublish = signingAuthority(roles);
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default"), window = url.searchParams.get("window") ?? "14d";
+        if (answerEmpty(missingOutcomeContract(options.workspace, agentId))) return;
         const result = await outcomesReportCliAsync({ workspace: options.workspace, agentId, window }, { beforePublish })
           .catch(error => { if (res.headersSent) return null; throw error; });
         if (result) json(res, 200, { ...result, report: JSON.parse(readUtf8(result.jsonPath)) });
