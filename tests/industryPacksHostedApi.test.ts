@@ -209,4 +209,52 @@ describe("hosted API error text and rate limit", () => {
     const statuses = await quickscores(121, () => ({}));
     expect(statuses.at(-1)).toBe(429);
   }, 120_000);
+
+  // Each case posts to its own route: buckets are per route and client (SR-7), so the cases do not share one.
+  const posts = async (path: string, count: number, headerFor: (index: number) => Record<string, string>): Promise<number[]> => {
+    const statuses: number[] = [];
+    for (let index = 0; index < count; index += 1) {
+      statuses.push((await fetch(`${origin}${path}`, { method: "POST", headers: headerFor(index), body: "{}" })).status);
+    }
+    return statuses;
+  };
+
+  // SR-6: the key was the left-most X-Forwarded-For entry (or the header's first value), which the client writes.
+  it("spoofed left-most X-Forwarded-For entries share the bucket of the client the platform appended", async () => {
+    vi.stubEnv("AMC_API_TRUSTED_PROXY_HOPS", "1");
+    const statuses = await posts("/api/industry-packs/checkout", 121, (index) => ({ "x-forwarded-for": `10.66.${index % 250}.1, 198.51.100.21` }));
+    expect(statuses.at(-1)).toBe(429);
+    expect(statuses.filter((status) => status === 429)).toHaveLength(1);
+  }, 120_000);
+
+  it("a trusted header whose value is not one IP address is not believed: rotating it buys no fresh bucket", async () => {
+    vi.stubEnv("AMC_API_TRUSTED_CLIENT_IP_HEADER", "x-test-client-ip");
+    const statuses = await posts("/api/industry-packs/license/verify", 121, (index) => ({ "x-test-client-ip": `10.67.${index % 250}.1, 198.51.100.22` }));
+    expect(statuses.at(-1)).toBe(429);
+  }, 120_000);
+
+  // SR-7: one anonymous bucket covered every POST, so a flood on a public route starved the signed webhook and admin issue.
+  it("a public-route flood does not 429 a valid signed webhook or the admin route", async () => {
+    expect((await quickscores(121, () => ({}))).at(-1), "this client's quickscore bucket is spent").toBe(429);
+    const secret = `whsec_${randomBytes(16).toString("hex")}`;
+    vi.stubEnv("AMC_INDUSTRY_PACKS_WEBHOOK_SECRET", secret);
+    const raw = '{"id":"evt_flood","type":"checkout.session.completed","data":{"object":{"payment_status":"unpaid"}}}';
+    const unsigned = await posts("/api/industry-packs/webhook", 121, () => ({ "content-type": "application/json" }));
+    expect(unsigned.every((status) => status === 400), "a flood of unsigned deliveries is refused by the signature check").toBe(true);
+    const t = Math.floor(Date.now() / 1000);
+    const signature = `t=${t},v1=${createHmac("sha256", secret).update(`${t}.${raw}`).digest("hex")}`;
+    const webhook = await fetch(`${origin}/api/industry-packs/webhook`, { method: "POST", headers: { "content-type": "application/json", "stripe-signature": signature }, body: raw });
+    expect(webhook.status).toBe(200);
+    const { adminToken } = configureIssuing();
+    const issued = await fetch(`${origin}/api/industry-packs/license/issue`, { method: "POST", headers: { "x-amc-admin-token": adminToken },
+      body: JSON.stringify({ subscriptionId: "sub_flood", expiresAt: "2099-01-01T00:00:00.000Z" }) });
+    expect(issued.status).toBe(200);
+  }, 120_000);
+
+  it("on a platform proxy with no client named, the limiter stays off and says so once", async () => {
+    vi.stubEnv("VERCEL", "1");
+    const warned = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    expect(await posts("/api/industry-packs/checkout", 125, () => ({}))).not.toContain(429);
+    expect(warned).toHaveBeenCalledTimes(1);
+  }, 120_000);
 });

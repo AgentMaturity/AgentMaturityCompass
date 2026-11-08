@@ -10,14 +10,19 @@
  * Development: pnpm api:start; production: pnpm build && pnpm api:start:production
  * Or deploy to Vercel/Railway/Fly.io
  *
- * POST routes are rate limited per client, 120 a minute (LIVE-RUNTIME-16). Behind a platform proxy (Vercel, Railway)
- * every request arrives from the proxy, so set AMC_API_TRUSTED_CLIENT_IP_HEADER to the header that proxy writes the
- * client address into (for example x-vercel-forwarded-for or x-forwarded-for); without it the limiter protects direct
- * runs only. The limiter is in memory, so on serverless platforms it counts per instance.
+ * POST routes are rate limited per route and client, 120 a minute (LIVE-RUNTIME-16, SR-6, SR-7). Behind a platform proxy
+ * every request arrives from the proxy, so name the client one of two ways: AMC_API_TRUSTED_CLIENT_IP_HEADER, a
+ * single-value header the platform overwrites with the client address (x-vercel-forwarded-for, cf-connecting-ip,
+ * fly-client-ip), or AMC_API_TRUSTED_PROXY_HOPS=N, the X-Forwarded-For entry N from the right. Never the left-most
+ * X-Forwarded-For entry: the client writes it. A value that is not one IP address counts for nothing and the socket
+ * address stands in. On Vercel, Railway or Fly with neither set, every client would share the proxy's bucket, so the
+ * limiter stays off and logs that once. The Stripe webhook is never limited here (its signature is its gate), and the
+ * admin route has its own bucket. In memory, so on serverless platforms it counts per instance.
  */
 
 import http from 'node:http';
 import { createHmac, timingSafeEqual } from 'node:crypto';
+import { isIP } from 'node:net';
 import { readdirSync, realpathSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -26,6 +31,7 @@ import { secretEquals } from '../src/utils/secretEquals.js';
 import { applySecurityHeaders } from '../src/studio/securityHeaders.js';
 import { applyServerTimeouts } from '../src/studio/serverTimeouts.js';
 import { makeRateLimiter } from '../src/studio/rateLimiter.js';
+import { forwardedClientIp } from '../src/studio/clientAddress.js';
 import { questionBank } from '../src/diagnostic/questionBank.js';
 import { listAssurancePacks } from '../src/assurance/packs/index.js';
 import { listIndustryPacks } from '../src/domains/industryPacks.js';
@@ -179,13 +185,28 @@ function computeQuickScore(req: QuickScoreRequest): ScoreResult {
 }
 
 const postLimiter = makeRateLimiter(120, 60_000);
+const PLATFORM_PROXY_ENV = ['VERCEL', 'RAILWAY_ENVIRONMENT', 'FLY_APP_NAME'];
+let limiterOffLogged = false;
 
-/** The client a POST is counted against: the configured proxy header's first value, else the socket address. */
-function clientKey(req: http.IncomingMessage): string {
+/** The client address the platform vouches for (see the top of this file), or null: then the socket address counts. */
+function platformClientIp(req: http.IncomingMessage): string | null {
   const header = process.env.AMC_API_TRUSTED_CLIENT_IP_HEADER?.trim().toLowerCase();
-  const value = header ? req.headers[header] : undefined;
-  const first = (Array.isArray(value) ? value[0] : value)?.split(',', 1)[0]?.trim();
-  return first || req.socket.remoteAddress || 'unknown';
+  const hops = Number(process.env.AMC_API_TRUSTED_PROXY_HOPS ?? 0);
+  const value = header ? req.headers[header] : Number.isInteger(hops) && hops > 0 ? forwardedClientIp(req, hops) : null;
+  const ip = (typeof value === 'string' ? value : null)?.trim() ?? '';
+  return isIP(ip) !== 0 ? ip : null;
+}
+
+/** The bucket a POST is counted in (route plus client), or null when the limiter is off behind an unnamed proxy. */
+function postBucket(req: http.IncomingMessage, path: string): string | null {
+  const named = Boolean(process.env.AMC_API_TRUSTED_CLIENT_IP_HEADER?.trim()) || Number(process.env.AMC_API_TRUSTED_PROXY_HOPS ?? 0) > 0;
+  if (!named && PLATFORM_PROXY_ENV.some((name) => process.env[name])) {
+    if (!limiterOffLogged) console.warn('hosted API: POST rate limiting is off: behind the platform proxy every client would share one bucket. '
+      + 'Set AMC_API_TRUSTED_CLIENT_IP_HEADER or AMC_API_TRUSTED_PROXY_HOPS.');
+    limiterOffLogged = true;
+    return null;
+  }
+  return `${path} ${platformClientIp(req) ?? req.socket.remoteAddress ?? 'unknown'}`;
 }
 
 function sendJson(res: http.ServerResponse, status: number, payload: unknown) {
@@ -307,7 +328,9 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
     res.end();
     return;
   }
-  if (method === 'POST' && !postLimiter(clientKey(req))) {
+  // SR-7: the webhook's gate is its signature, so a flood elsewhere never starves it; each other route has its own bucket.
+  const bucket = method === 'POST' && path !== '/api/industry-packs/webhook' ? postBucket(req, path) : null;
+  if (bucket !== null && !postLimiter(bucket)) {
     sendJson(res, 429, { error: 'rate limited' });
     return;
   }
