@@ -129,6 +129,9 @@ describe("amc up names the console sign-in step (B2)", () => {
     printConsoleSignInStep(workspace, "http://127.0.0.1:3212/console");
     expect(lines.join("\n")).toContain("amc user init --username <you>");
     expect(lines.join("\n")).toContain("http://127.0.0.1:3212/console");
+    // Without a terminal the remembered passphrase is not used, so a password file alone meets a locked vault (final review).
+    expect(lines.join("\n")).toContain("Without a terminal, export AMC_VAULT_PASSPHRASE (or set AMC_VAULT_PASSPHRASE_FILE) first, "
+      + "then run amc user init --username <you> --password-file <file>.");
     lines.length = 0;
     mkdirSync(join(workspace, ".amc"));
     writeFileSync(join(workspace, ".amc", "users.yaml"), "users: []\n");

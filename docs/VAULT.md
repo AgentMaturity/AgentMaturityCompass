@@ -86,7 +86,7 @@ A workspace created by `amc up`, `amc init` or bare `amc` gets `.amc/.gitignore`
 
 ## Console accounts
 
-Console accounts live in the signed `.amc/users.yaml`. Create the first owner with `amc user init --username <owner>` (or `amc bootstrap` in a container), add people with `amc user add`, and reset a password with `amc user password <name>`; without a terminal pass `--password-file <path>`. `amc user init` refuses to replace an existing `users.yaml` unless `--force` is given. A password can be reset only from the command line on the Studio host (a container or Helm owner needs exec access and the vault passphrase); the console has no "change my password" form yet. Password hashing is scrypt at N=2^15 (about 60 ms per sign-in) and stays there until the sign-in path is asynchronous.
+Console accounts live in the signed `.amc/users.yaml`. Create the first owner with `amc user init --username <owner>` (or `amc bootstrap` in a container), add people with `amc user add`, and reset a password with `amc user password <name>`; without a terminal pass `--password-file <path>`, and export `AMC_VAULT_PASSPHRASE` (or set `AMC_VAULT_PASSPHRASE_FILE`) first: these commands sign `users.yaml`, and a shell without a terminal does not use the remembered passphrase. `amc user init` refuses to replace an existing `users.yaml` unless `--force` is given. A password can be reset only from the command line on the Studio host (a container or Helm owner needs exec access and the vault passphrase); the console has no "change my password" form yet. Password hashing is scrypt at N=2^15 (about 60 ms per sign-in) and stays there until the sign-in path is asynchronous.
 
 ## When unlock refuses
 

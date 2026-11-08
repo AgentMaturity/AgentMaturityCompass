@@ -7,10 +7,11 @@
  * AMC_VAULT_PASSPHRASE, so the remembered-store operator gate does not apply; while it is set the store is not read.
  */
 import { spawnSync } from "node:child_process";
-import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
+import { usersConfigPath } from "../src/auth/authApi.js";
 import { startGateway } from "../src/gateway/server.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { AGENT_ENV_MARKERS } from "../src/vault/operatorContext.js";
@@ -125,17 +126,22 @@ describe("unlockWithPassphraseFile", () => {
   });
 });
 
+/** Runs the built CLI as cron or `docker exec` would: no terminal, no passphrase, no agent marker, a private HOME, no store. */
+function cli(root: string, workspace: string) {
+  mkdirSync(join(root, "home"), { mode: 0o700 });
+  const env: NodeJS.ProcessEnv = { ...process.env, HOME: join(root, "home"), NO_COLOR: "1", AMC_VAULT_REMEMBER: "0" };
+  for (const name of ["AMC_VAULT_PASSPHRASE", "AMC_VAULT_PASSPHRASE_FILE", ...AGENT_ENV_MARKERS]) delete env[name];
+  return (extra: NodeJS.ProcessEnv, ...args: string[]) => spawnSync(process.execPath, [resolve(process.cwd(), "dist/cli.js"), ...args],
+    { cwd: workspace, env: { ...env, ...extra }, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 120_000 });
+}
+
 describe("the built CLI without a terminal (run `npm run build` first)", () => {
   test("amc verify with only AMC_VAULT_PASSPHRASE_FILE passes beside a running gateway; a refused or missing file is NOT EVALUATED", { timeout: 180_000 }, async () => {
     const { root, workspace, secret } = fixture();
     vi.stubEnv("AMC_VAULT_PASSPHRASE", PASSPHRASE); // the in-process gateway signs with the vault
     const monitor = sha256Hex(readFileSync(join(workspace, ".amc", "keys", "monitor_ed25519.pub")));
-    mkdirSync(join(root, "home"), { mode: 0o700 });
-    // As cron or `docker exec` runs it: no terminal, no passphrase, no agent marker, a private HOME, no remembered store.
-    const env: NodeJS.ProcessEnv = { ...process.env, HOME: join(root, "home"), NO_COLOR: "1", AMC_VAULT_REMEMBER: "0" };
-    for (const name of ["AMC_VAULT_PASSPHRASE", "AMC_VAULT_PASSPHRASE_FILE", ...AGENT_ENV_MARKERS]) delete env[name];
-    const verify = (extra: NodeJS.ProcessEnv) => spawnSync(process.execPath, [resolve(process.cwd(), "dist/cli.js"), "verify", "--expect-monitor", monitor],
-      { cwd: workspace, env: { ...env, ...extra }, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 120_000 });
+    const amc = cli(root, workspace);
+    const verify = (extra: NodeJS.ProcessEnv) => amc(extra, "verify", "--expect-monitor", monitor);
     const gateway = await startGateway({ workspace, listenPort: 0, proxyPort: 0, logger: { log() {}, error() {} } });
     try {
       const open = `1 session open: ${gateway.gatewaySessionId} (gateway;`;
@@ -159,5 +165,19 @@ describe("the built CLI without a terminal (run `npm run build` first)", () => {
     } finally {
       await gateway.close();
     }
+  });
+
+  // The hint `amc up` prints for a shell without a terminal: a password file alone meets a locked vault (final review).
+  test("amc user init --password-file signs users.yaml with only AMC_VAULT_PASSPHRASE_FILE, and not without it", { timeout: 120_000 }, () => {
+    const { root, workspace, secret } = fixture();
+    const amc = cli(root, workspace);
+    const password = secret("owner-cli-password-123", 0o600, "owner.pw");
+    const locked = amc({}, "user", "init", "--username", "owner", "--password-file", password);
+    expect(locked.status).not.toBe(0);
+    expect(existsSync(usersConfigPath(workspace))).toBe(false);
+    const signed = amc({ AMC_VAULT_PASSPHRASE_FILE: secret(PASSPHRASE, 0o600) }, "user", "init", "--username", "owner", "--password-file", password);
+    expect(signed.status, signed.stdout + signed.stderr).toBe(0);
+    expect(signed.stdout).toContain("Users config created");
+    expect(signed.stdout + signed.stderr).not.toContain(PASSPHRASE);
   });
 });

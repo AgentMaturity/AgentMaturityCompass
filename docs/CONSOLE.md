@@ -24,7 +24,7 @@ amc user add --username <name> --role <roles> [--password-file <path>]
 amc user password <name> [--password-file <path>]
 ```
 
-Without a terminal, pass `--password-file` (a private file holding the password); AMC never takes a password as an argument. `amc user init` refuses when `.amc/users.yaml` exists unless `--force` is given, which replaces every account. `amc user password` sets a new password and revokes that user's signed-in sessions. A new password needs at least 12 characters and must not be the username; existing passwords keep working, and their stored hashes move to the current scrypt cost at the next sign-in.
+Without a terminal, pass `--password-file` (a private file holding the password), and export `AMC_VAULT_PASSPHRASE` (or set `AMC_VAULT_PASSPHRASE_FILE`) first: these commands sign `.amc/users.yaml` with the vault, and a shell without a terminal does not use the remembered passphrase. AMC never takes a password as an argument. `amc user init` refuses when `.amc/users.yaml` exists unless `--force` is given, which replaces every account. `amc user password` sets a new password and revokes that user's signed-in sessions. A new password needs at least 12 characters and must not be the username; existing passwords keep working, and their stored hashes move to the current scrypt cost at the next sign-in.
 
 ## Security Model
 

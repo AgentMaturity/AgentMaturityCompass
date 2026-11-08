@@ -119,11 +119,15 @@ function nonInteractivePassphraseError(lead?: string): Error {
   ].join("\n"));
 }
 
-/** The Compass Console signs people in with users.yaml accounts; until the first exists, `amc up` ends by saying how to make it. */
+/**
+ * The Compass Console signs people in with users.yaml accounts; until the first exists, `amc up` ends by saying how to make
+ * it. Without a terminal the remembered passphrase is not used (operatorContext.ts), so that shell needs the passphrase too.
+ */
 export function printConsoleSignInStep(workspace: string, consoleUrl: string): void {
   if (existsSync(usersConfigPath(workspace))) return;
   console.log(`\n  ${chalk.bold("Sign in to the Compass Console")} (${consoleUrl}): create your owner account once with `
-    + `${chalk.bold("amc user init --username <you>")}; it asks for the password you will sign in with (without a terminal, pass --password-file <path>).`);
+    + `${chalk.bold("amc user init --username <you>")}; it asks for the password you will sign in with. Without a terminal, export `
+    + "AMC_VAULT_PASSPHRASE (or set AMC_VAULT_PASSPHRASE_FILE) first, then run amc user init --username <you> --password-file <file>.");
 }
 
 export interface BaselineWorkspaceState {
