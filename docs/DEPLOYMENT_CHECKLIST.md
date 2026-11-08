@@ -67,7 +67,7 @@ Complete these checks before going live. Every item is a real `amc` command.
 
 ### Scheduled verification
 
-Run the pinned check on a schedule, **inside** the deployment: on the host that runs Studio, with `docker exec <container>`, or with `kubectl exec deploy/<amc deployment> -- …`. The container's working directory is the workspace.
+Run the pinned check on a schedule, **inside** the deployment: on the host that runs Studio, with `docker exec <container>`, or with `kubectl exec deploy/<amc deployment> -- …`. `amc verify all` checks the current directory, and the image's working directory is `/workspace`, not the workspace: run it in `/data/amc` (the image's `AMC_WORKSPACE_DIR`, and the Helm chart's `workspace.mountPath`).
 
 ```bash
 amc verify all --json --expect-monitor <monitor sha256>
@@ -75,9 +75,9 @@ amc verify all --json --expect-monitor <monitor sha256>
 
 - Host or Docker: a cron line, every 30 minutes, that alerts on failure:
   ```cron
-  */30 * * * * docker exec amc-studio amc verify all --json --expect-monitor <monitor sha256> > /var/log/amc-verify.json 2>&1 || <your alert command>
+  */30 * * * * docker exec -w /data/amc amc-studio amc verify all --json --expect-monitor <monitor sha256> > /var/log/amc-verify.json 2>&1 || <your alert command>
   ```
-  On a plain host, replace `docker exec amc-studio` with `cd <workspace> &&`.
+  On a plain host, replace `docker exec -w /data/amc amc-studio` with `cd <workspace> &&`.
 - Kubernetes: a `CronJob` that runs `kubectl exec` against the running pod, under a Role that may only read pods and deployments and exec into pods:
   ```yaml
   apiVersion: batch/v1
@@ -96,8 +96,8 @@ amc verify all --json --expect-monitor <monitor sha256>
             containers:
               - name: verify
                 image: bitnami/kubectl:<pinned tag>
-                command: ["kubectl", "exec", "-n", "amc-system", "deploy/<amc deployment>", "--",
-                          "amc", "verify", "all", "--json", "--expect-monitor", "<monitor sha256>"]
+                command: ["kubectl", "exec", "-n", "amc-system", "deploy/<amc deployment>", "--", "sh", "-c",
+                          "cd /data/amc && amc verify all --json --expect-monitor <monitor sha256>"]
   ---
   apiVersion: rbac.authorization.k8s.io/v1
   kind: Role
@@ -120,12 +120,13 @@ amc verify all --json --expect-monitor <monitor sha256>
 
 #### Open sessions and what verification cannot see
 
-- **The liveness rule.** A session is sealed when its writer finishes. An unended, unsealed session is open only while its last signed row is between 0 and 15 minutes old at the verification time; a row dated in the future does not count. Any other unended or unsealed session is a `missing seal`, and when any row fails verification no session counts as open. A copy is judged at its signed time when that is trusted: a bundle at its export time when its manifest and files verify under an admitted signer, a certificate at its issue time when its signer is admitted, a restored backup at its creation time when the backup verified as trusted; otherwise at the real time.
+- **The liveness rule.** A session is sealed when its writer finishes. An unended, unsealed session is open only while its last signed row is between 0 and 15 minutes old at the verification time; a row dated in the future does not count. A session with no signed row yet is open only in the first minute after its recorded start, which is not signed (the moment between a writer opening a session and writing its first row), and is named `no signed row yet`. Any other unended or unsealed session is a `missing seal`, and when any row fails verification no session counts as open. A copy is judged at its signed time when that is trusted: a bundle at its export time when its manifest and files verify under an admitted signer; a certificate at its issue time when its signer is admitted and its signature covers the carried ledger and blobs (a certificate issued before this release does not, and is judged at the real time); a restored backup at its creation time when the backup verified as trusted; otherwise at the real time.
 - **The heartbeat.** When the gateway's session has been idle for 5 minutes (checked every minute) the gateway signs one payload-less heartbeat row, so a running gateway's session never ages past about 6 minutes. Heartbeat rows and crash-recovery markers never count toward scores.
 - **Rows of an open session** can be removed by anyone who can write the workspace until the session is sealed: an unsealed session has no seal to contradict its newest rows.
 - **The remembered passphrase.** On a local install any process of the same OS user can unlock the vault from the remembered passphrase, so the heartbeat, like every signed row, is unforgeable only by a writer without the passphrase.
 - **An erased seal.** A session whose end and seal were erased reads as open until its last signed row is older than 15 minutes, and is named in the verdict meanwhile. A gateway session that a later gateway start witnessed as sealed fails at once: `Session <id> was sealed (witnessed by gateway start <event>) but its seal is missing`.
 - **An erased seal with deleted rows.** A sealed gateway session whose seal was erased and whose newest rows were deleted (with the database triggers dropped) before the next gateway start reads as a crash and is re-sealed as interrupted by the next sweep, with a visible `interrupted-sealed` marker. The start event that follows witnesses it, so the same tampering after that restart is caught. Bridge request sessions are not witnessed: an erased bridge seal is re-sealed with a marker.
+- **`amc verify --repair` and a missing seal.** A sealed session whose seal was erased and whose newest rows were deleted (possible only while they end the ledger) reads exactly like a crashed one, and nothing signed in the ledger tells the two apart. `--repair` therefore states that limit, seals only after a typed confirmation, and records each seal with a signed `interrupted-sealed` marker. A signed ledger checkpoint (`time.tsa` in `.amc/amc.config.yaml`) is the only evidence: a session that started before the latest checkpoint is never sealed by `--repair`, nor is any session when the ledger no longer holds that checkpoint's head or records a timestamped checkpoint whose file is gone; the plan proposes archiving instead. Without checkpoints only the typed confirmation stands before the seal. Checkpoint files live in the workspace too: deleting the newest ones together with every row after them leaves nothing to refuse, so anchor them externally (`transparency.anchors`) to keep a record outside it.
 - **A whole-workspace rollback** is detected only by the transparency log (`amc verify all`) and by external anchoring (`amc session anchor`, `amc transparency merkle …`), not by `amc verify` alone.
 - **A stop without grace.** A container stopped without a graceful shutdown (`docker rm -f`, or a stop shorter than Studio's 10-second API drain) leaves an interrupted gateway session that the next start seals with a visible marker. The Compose file gives Studio `stop_grace_period: 40s`; the Helm chart's 30-second default and `deploy/k8s/deployment.yaml` (40 seconds) also outlast the drain.
 
