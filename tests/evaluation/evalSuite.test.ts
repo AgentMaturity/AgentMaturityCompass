@@ -1,22 +1,26 @@
 /** SH-OBS-04: eval suites against the native agent: graders, pass@k, confinement, isolation, baselines and gates. */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Command } from "commander";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { passAtK, scoreTask } from "../../src/eval/suiteScoring.js";
-import { gradeText, stageGradingDir } from "../../src/eval/suiteGraders.js";
+import { gradeCommand, gradeText, stageGradingDir } from "../../src/eval/suiteGraders.js";
 import { loadEvalSuite } from "../../src/eval/suiteLoader.js";
 import { suiteSchema } from "../../src/eval/suiteSchema.js";
 import { baselineFromResults, compareResults, type EvalBaseline } from "../../src/eval/suiteCompare.js";
 import { runEvalSuite, type EvalResults } from "../../src/eval/suiteRunner.js";
 import { registerEvalSuiteCommands } from "../../src/cli-eval-suite-commands.js";
-import { SandboxRunner } from "../../src/sandbox/sandboxRunner.js";
 import { allEvents, removeWorkspace, stubWorkspace } from "../observability/helpers/stubSessionWorkspace.js";
 
 vi.setConfig({ testTimeout: 300_000 });
 const SUITE = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "examples", "eval-suites", "stub-smoke", "suite.yaml");
-const confined = new SandboxRunner().select() !== null;
+// The same question the graders ask: can a backend here enforce the grader policy (writes, network, reads, processes)?
+// A selected-but-partial backend (the write-only Seatbelt profile) refuses, so `select() !== null` would overstate it.
+const probeDir = mkdtempSync(join(tmpdir(), "amc-eval-probe-"));
+const confined = (await gradeCommand({ type: "script", command: [process.execPath, "-e", "process.exit(0)"], timeoutMs: 60_000, passExitCode: 0 },
+  { fixture: [], attemptDir: probeDir, outputs: [], allowUnconfined: false, workspace: probeDir })).status === "pass";
 let ws: string;
 const cwd = process.cwd();
 beforeEach(() => { ws = stubWorkspace("amc-eval-"); });
@@ -132,7 +136,7 @@ describe("end to end through the CLI with the stub provider", () => {
     // under the OS sandbox, or was refused when no backend exists here.
     const repo = byTask["answer-file"]!;
     const first = repo.attempts[0]!;
-    const attemptDir = join(ws, ".amc-eval", results.runId, "answer-file", "1");
+    const attemptDir = join(ws, "workspace", "output", "amc-eval", results.runId, "answer-file", "1");
     expect(existsSync(join(attemptDir, "answer.txt"))).toBe(true);
     expect(existsSync(join(ws, "answer.txt"))).toBe(false);
     const grader = first.graders[0]!;
@@ -162,15 +166,29 @@ describe("end to end through the CLI with the stub provider", () => {
     expect(logs[logs.length - 1]).toContain("not recorded in the verified ledger");
   });
 
+  it("under the default signed Action Policy a governed write runs SIMULATE, and the attempt is an error naming it, not a fail", async () => {
+    const policyWs = stubWorkspace("amc-eval-policy-", { defaultActionPolicy: true });
+    try {
+      const loaded = loadEvalSuite(SUITE);
+      const { results } = await runEvalSuite({ workspace: policyWs, loaded, attempts: 1, taskIds: ["answer-file"], provider: { providerId: "stub", maxSteps: 4 }, keepDirs: true });
+      const attempt = results.tasks[0]!.attempts[0]!;
+      expect(attempt.outcome).toBe("completed");
+      expect(attempt.verdict).toBe("error");
+      expect(attempt.reason).toContain("SIMULATE");
+      expect(existsSync(join(policyWs, "workspace", "output", "amc-eval", results.runId, "answer-file", "1", "answer.txt")), "a simulated write leaves no file").toBe(false);
+    } finally { removeWorkspace(policyWs); }
+  });
+
   it("the attempt guard denies a governed write outside the attempt directory, and runs refuse no-sign mode", async () => {
     const dir = join(ws, "suite");
     mkdirSync(dir, { recursive: true });
     const escape = join(dir, "escape.yaml");
     writeFileSync(escape, ["version: 1", "suiteId: escape", "defaults: { tools: workspace }", "tasks:", "  - id: out",
-      `    prompt: '{"tool":"fs.write","arguments":{"path":"workspace/escaped.txt","content":"x"}}'`, "    graders: [{ type: contains, expected: 'wrote' }]"].join("\n"));
+      // Inside the shipped write allowlist (workspace/output/**) but outside the attempt directory: only the eval guard can refuse it.
+      `    prompt: '{"tool":"fs.write","arguments":{"path":"workspace/output/escaped.txt","content":"x"}}'`, "    graders: [{ type: contains, expected: 'wrote' }]"].join("\n"));
     const loaded = loadEvalSuite(escape);
     const { results } = await runEvalSuite({ workspace: ws, loaded, attempts: 1, provider: { providerId: "stub", maxSteps: 4 } });
-    expect(existsSync(join(ws, "workspace", "escaped.txt")), "the deny-only guard refused the path").toBe(false);
+    expect(existsSync(join(ws, "workspace", "output", "escaped.txt")), "the deny-only guard refused the path").toBe(false);
     expect(results.tasks[0]!.attempts[0]!.verdict).not.toBe("pass");
     const denied = allEvents(ws).filter((row) => row.event_type === "audit" && (JSON.parse(row.meta_json) as { auditType?: string }).auditType === "TOOL_CALL_DENIED");
     expect(denied.length).toBeGreaterThan(0);

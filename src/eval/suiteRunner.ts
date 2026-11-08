@@ -34,6 +34,7 @@ interface EvalAttemptRecord {
   readonly attempt: number;
   readonly sessionId: string | null;
   readonly outcome: "completed" | "unavailable";
+  /** Why the attempt is unavailable, or why a completed attempt is an `error` before grading (simulated writes). */
   readonly reason: string | null;
   readonly verdict: "pass" | "fail" | "error";
   readonly graders: readonly GraderResult[];
@@ -102,18 +103,21 @@ function finalAssistantText(workspace: string, rows: readonly EvidenceEvent[]): 
   return { text: payload.bytes.toString("utf8"), turnEndReason };
 }
 
-function recordRun(workspace: string, results: EvalResults, resultsSha256: string): void {
+/** One sealed bookkeeping session holding a single signed `audit` row: how eval runs and baselines are recorded. */
+export function appendSealedEvalAudit(workspace: string, sessionId: string, suiteSha256: string, meta: Record<string, unknown>): void {
   const ledger = openLedger(workspace);
-  const sessionId = `eval-suite-${results.runId}`;
   try {
-    ledger.startSession({ sessionId, runtime: "amc", binaryPath: "amc-eval-suite", binarySha256: results.suiteSha256 });
-    const meta = { trustTier: "OBSERVED", auditType: EVAL_SUITE_RUN_AUDIT, runId: results.runId, suiteId: results.suiteId, suiteSha256: results.suiteSha256, resultsSha256,
-      agentId: results.agentId, attempts: results.summary.attempts, passes: results.summary.passes, errors: results.summary.errors };
+    ledger.startSession({ sessionId, runtime: "amc", binaryPath: "amc-eval-suite", binarySha256: suiteSha256 });
     ledger.appendEvidence({ sessionId, runtime: "amc", eventType: "audit", payload: JSON.stringify(meta), payloadExt: "json", inline: true, meta });
     ledger.sealSession(sessionId);
   } finally {
     ledger.close();
   }
+}
+
+function recordRun(workspace: string, results: EvalResults, resultsSha256: string): void {
+  appendSealedEvalAudit(workspace, `eval-suite-${results.runId}`, results.suiteSha256, { trustTier: "OBSERVED", auditType: EVAL_SUITE_RUN_AUDIT, runId: results.runId,
+    suiteId: results.suiteId, suiteSha256: results.suiteSha256, resultsSha256, agentId: results.agentId, attempts: results.summary.attempts, passes: results.summary.passes, errors: results.summary.errors });
 }
 
 export async function runEvalSuite(options: RunEvalSuiteOptions): Promise<{ results: EvalResults; resultsSha256: string; json: string }> {
@@ -125,7 +129,10 @@ export async function runEvalSuite(options: RunEvalSuiteOptions): Promise<{ resu
   if (options.taskIds !== undefined) for (const id of options.taskIds) if (!suite.tasks.some((task) => task.id === id)) throw new Error(`unknown task ${id}`);
   const agentId = options.agentId ?? DEFAULT_EVAL_AGENT_ID;
   const runId = randomUUID().replace(/-/g, "").slice(0, 16);
-  const runRoot = join(options.workspace, ".amc-eval", runId);
+  // Attempts live inside `workspace/output/`, the only area the shipped `fs.write` / `fs.edit` allowlist permits; the
+  // attempt-scope guard then confines each attempt to its own directory. Anywhere else, every governed write is denied
+  // by the allowlist before the eval guard is reached, and no task could ever write its answer.
+  const runRoot = join(options.workspace, "workspace", "output", "amc-eval", runId);
   const startedAt = Date.now();
   const tasks: Array<{ taskId: string; attempts: EvalAttemptRecord[]; score: TaskScore }> = [];
   const durations: number[] = [];
@@ -168,13 +175,17 @@ export async function runEvalSuite(options: RunEvalSuiteOptions): Promise<{ resu
           graders.push(await gradeCommand(grader, { fixture: options.loaded.fixtures.get(task.id) ?? [], attemptDir, outputs: task.outputs, allowUnconfined: options.allowUnconfinedGraders === true, workspace: options.workspace }));
         } else graders.push(gradeText(grader, result.ok ? text : null));
       }
-      const verdict: EvalAttemptRecord["verdict"] = !result.ok ? "fail" : graders.some((g) => g.status === "error") ? "error" : graders.every((g) => g.status === "pass") ? "pass" : "fail";
+      // A governed write the Action Policy downgraded to SIMULATE left no output: the attempt cannot be graded, and saying
+      // `fail` would blame the agent for what the workspace's policy decided (docs/GOVERNOR.md "Reaching EXECUTE").
+      const simulatedWrites = rows.filter((row) => { const meta = budgetMeta(row); return row.event_type === "audit" && meta.auditType === "TOOL_CALL_ALLOWED" && meta.effectiveMode === "SIMULATE" && meta.actionClass !== "READ_ONLY"; }).length;
+      const simulatedReason = simulatedWrites > 0 ? `${simulatedWrites} governed write call(s) ran in SIMULATE under the workspace Action Policy, so the attempt produced no gradable output; grant EXECUTE for the task's action classes (docs/GOVERNOR.md "Reaching EXECUTE")` : null;
+      const verdict: EvalAttemptRecord["verdict"] = !result.ok ? "fail" : simulatedReason !== null || graders.some((g) => g.status === "error") ? "error" : graders.every((g) => g.status === "pass") ? "pass" : "fail";
       const cost = session?.cost ?? null;
       if (cost === null || cost.status !== "complete" || cost.attributedSubtotalUsd === null) costComplete = false; else costUsd += cost.attributedSubtotalUsd;
       unknownCostRequests += cost?.unknownRequests ?? 0;
-      records.push({ attempt, sessionId: sessionId ?? session?.sessionId ?? null, outcome: result.ok ? "completed" : "unavailable", reason: result.ok ? null : result.reason, verdict, graders, durationMs,
+      records.push({ attempt, sessionId: sessionId ?? session?.sessionId ?? null, outcome: result.ok ? "completed" : "unavailable", reason: result.ok ? simulatedReason : result.reason, verdict, graders, durationMs,
         usage: session?.usage ?? null, cost: cost === null ? null : { status: cost.status, attributedUsd: cost.attributedSubtotalUsd, unknownRequests: cost.unknownRequests } });
-      options.onProgress?.(`${label} ${verdict}${result.ok ? "" : ` (${result.reason})`}`);
+      options.onProgress?.(`${label} ${verdict}${result.ok ? (simulatedReason === null ? "" : " (simulated)") : ` (${result.reason})`}`);
       if (!options.keepDirs) rmSync(attemptDir, { recursive: true, force: true });
     }
     tasks.push({ taskId: task.id, attempts: records, score: scoreTask(task.id, records.map((record) => record.verdict)) });

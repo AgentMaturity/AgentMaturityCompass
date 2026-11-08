@@ -11,12 +11,15 @@ import { providerTrialRunner, type NativeTrialRunnerOptions } from "../../../src
 import { runBounded } from "../../../src/experiments/trialExecutor.js";
 import type { EvidenceEvent } from "../../../src/types.js";
 
-export const TEST_PASSPHRASE = "sh-obs-test-passphrase";
+const TEST_PASSPHRASE = "sh-obs-test-passphrase";
 
-export function stubWorkspace(prefix = "amc-sh-obs-"): string {
+/** `defaultActionPolicy`: keep the signed default Action Policy (governed writes then run SIMULATE in a fresh workspace). */
+export function stubWorkspace(prefix = "amc-sh-obs-", options: { defaultActionPolicy?: boolean } = {}): string {
   process.env.AMC_VAULT_PASSPHRASE ??= TEST_PASSPHRASE;
   const ws = realpathSync(mkdtempSync(join(tmpdir(), prefix)));
-  initWorkspace({ workspacePath: ws, agentId: "default", trustBoundaryMode: "isolated" });
+  // The AXR-02 "not configured" fixture state: without it the default signed Action Policy downgrades every governed
+  // write to SIMULATE until the workspace has a trusted sealed run (docs/GOVERNOR.md "Reaching EXECUTE").
+  initWorkspace({ workspacePath: ws, agentId: "default", trustBoundaryMode: "isolated", ...(options.defaultActionPolicy === true ? {} : { actionPolicy: false as const }) });
   initBudgets(ws, "default");
   writeRuntimeFirewallPolicy({ workspace: ws, mode: "observe" });
   initApprovalPolicy(ws);

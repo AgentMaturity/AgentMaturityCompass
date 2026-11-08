@@ -30,7 +30,7 @@ export function registerEvalSuiteCommands(program: Command): void {
     .option("--agent <agentId>", "agent id the eval sessions run under", "eval-suite")
     .option("--max-steps <n>", "max loop steps per attempt (default: the suite's)")
     .option("--unsafe-unconfined-graders", "run script/tests graders WITHOUT an OS sandbox when none is available (recorded as confined:false)")
-    .option("--keep-dirs", "keep attempt directories under .amc-eval/<runId>")
+    .option("--keep-dirs", "keep attempt directories under workspace/output/amc-eval/<runId>")
     .option("--json", "print the results JSON")
     .action(async (suitePath: string, opts: RunOptions) => {
       const { loadEvalSuite } = await import("./eval/suiteLoader.js");
