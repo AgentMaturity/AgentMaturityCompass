@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { PUBLIC_BIND_REFUSAL, assertPublicBindAcknowledged, resolveListenPolicy, standaloneGatewayAllowList } from "../src/studio/listenPolicy.js";
+import { PUBLIC_BIND_REFUSAL, assertPublicBindAcknowledged, resolveListenPolicy, standaloneGatewayAllowList, weakCidrs } from "../src/studio/listenPolicy.js";
 
 // LIVE-RUNTIME-03 (D-R4): flag, else a SET variable, else the signed LAN value, else the default; loopback always admitted.
 const lan = { enabled: true, valid: true, bind: "0.0.0.0", port: 3300, allowedCIDRs: ["10.9.0.0/16"] };
@@ -28,6 +28,21 @@ describe("listen policy", () => {
     expect(() => assertPublicBindAcknowledged(acknowledged)).not.toThrow();
     expect(() => assertPublicBindAcknowledged(resolveListenPolicy({ env: { AMC_BIND: "0.0.0.0", AMC_ALLOWED_CIDRS: "10.0.0.0/8" }, hostMode: false })))
       .not.toThrow();
+  });
+
+  // Skeptic D6: the refusal matched the literal strings 0.0.0.0/0 and ::/0 only, while the matcher admits everyone for
+  // any IPv4 prefix 0 and for entries that together cover the whole space.
+  test("an allow list that admits every address is refused however it is spelled", () => {
+    for (const list of ["10.0.0.0/0", "0.0.0.0/00", "192.168.0.0/16,1.1.1.1/0", "0.0.0.0/1,128.0.0.0/1", "::/0", "2001:db8::/00",
+      "0.0.0.0/2,64.0.0.0/2,128.0.0.0/2,192.0.0.0/3,224.0.0.0/3"]) {
+      const policy = resolveListenPolicy({ env: { AMC_BIND: "0.0.0.0", AMC_ALLOWED_CIDRS: list }, hostMode: false });
+      expect(() => assertPublicBindAcknowledged(policy), list).toThrow(PUBLIC_BIND_REFUSAL);
+    }
+    // The shipped lists, one half of the space, and a set with a gap between its ranges are not "every address".
+    for (const list of [["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "127.0.0.1/32", "::1/128"], ["0.0.0.0/1"],
+      ["0.0.0.0/1", "128.0.0.0/2", "192.0.0.0/3", "224.0.0.0/4", "240.0.0.0/5", "248.0.0.0/6", "252.0.0.0/7", "254.0.0.0/8"], ["2001:db8::/32"]]) {
+      expect(weakCidrs(list), list.join(",")).toBe(false);
+    }
   });
 
   test("host mode ignores the LAN values and reads the host variables", () => {

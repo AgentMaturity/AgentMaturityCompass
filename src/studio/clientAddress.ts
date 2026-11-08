@@ -36,6 +36,14 @@ function parseCidr(cidr: string): { base: number; mask: number } | null {
   return { base: Number(base >>> 0), mask };
 }
 
+/** The first and last IPv4 address an entry admits as the matcher reads it (so `10.0.0.0/0` is every address), or null. */
+export function ipv4CidrRange(cidr: string): [number, number] | null {
+  const parsed = parseCidr(cidr);
+  if (!parsed) return null;
+  const first = (parsed.base & parsed.mask) >>> 0;
+  return [first, first + (~parsed.mask >>> 0)];
+}
+
 /** IPv4 CIDRs and `::1` match; any other IPv6 entry matches nothing (fail closed). An empty list admits nobody. */
 export function ipAllowedByCidrs(ip: string, cidrs: readonly string[]): boolean {
   if (ip === "::1") {

@@ -1,5 +1,6 @@
 import { isPublicBind } from "../config/loadConfig.js";
-import { cidrSyntaxValid, LOOPBACK_CIDRS, withLoopbackCidrs } from "./clientAddress.js";
+import { isIP } from "node:net";
+import { cidrSyntaxValid, ipv4CidrRange, LOOPBACK_CIDRS, withLoopbackCidrs } from "./clientAddress.js";
 
 /**
  * Where Studio listens and whom it admits (LIVE-RUNTIME-03, D-R4), decided once from the raw environment, the CLI flags
@@ -38,10 +39,19 @@ export interface ListenPolicy {
 
 const TRUE_VALUES = new Set(["1", "true", "yes", "on"]);
 
-/** True when the list admits every address (also used by `amc config explain`). */
+/**
+ * True when the list admits every address (also used by `amc config explain`), decided on parsed values rather than
+ * spellings (skeptic D6): any IPv6 entry with prefix 0, or IPv4 entries whose ranges together cover 0.0.0.0/0, such as
+ * `10.0.0.0/0`, `0.0.0.0/00` or `0.0.0.0/1,128.0.0.0/1`.
+ */
 export function weakCidrs(cidrs: readonly string[]): boolean {
-  const normalized = new Set(cidrs.map((item) => item.trim()));
-  return normalized.has("0.0.0.0/0") || normalized.has("::/0");
+  if (cidrs.some((cidr) => { const [ip, bits] = cidr.trim().split("/"); return isIP(ip ?? "") === 6 && bits !== undefined && Number(bits) === 0; })) return true;
+  let next = 0; // the lowest IPv4 address no entry covers yet
+  for (const [first, last] of cidrs.map(ipv4CidrRange).filter((range): range is [number, number] => range !== null).sort((a, b) => a[0] - b[0])) {
+    if (first > next) return false;
+    next = Math.max(next, last + 1);
+  }
+  return next > 0xffffffff;
 }
 
 function setValue(env: NodeJS.ProcessEnv, key: string): string | undefined {
