@@ -22,6 +22,8 @@ const acpOptions = (extra: Partial<AcpStdioInit> = {}): AcpStdioInit => ({
   workspace: "/batch1-no-workspace-created", agentId: "default", providerId: "ollama", model: MODEL,
   systemPrompt: "Selector regression only.", ...extra
 });
+/** The one deliberate difference: `amc acp` bounds provider waits by the local ceiling (its clients' deadlines are invisible to it). */
+const viaAcp = <T extends object>(cli: T) => ({ ...cli, retry: { mode: "normal", backoff: { maxProviderDelayMs: 10_000 } } });
 function commands(positionalOptions = false) {
   const output = io(), program = new Command("amc").enablePositionalOptions(positionalOptions).exitOverride();
   registerAgentCommands(program, output);
@@ -39,7 +41,7 @@ describe("P01 native CLI/ACP selectors", () => {
     const cli = routeFor(output, providerId, extra, model);
     const acp = acpRouteFor(acpOptions({ providerId, model, ...extra }));
     expect(cli).not.toBeNull();
-    expect(acp).toEqual(cli);
+    expect(acp).toEqual(cli === null ? cli : viaAcp(cli));
     if (cli === null || "error" in acp) throw new Error("Expected a native route");
     const registry = new AdapterRegistry(); registry.register(cli);
     const described = discoverNativeProviders(providerId).providers[0]!;
@@ -61,7 +63,7 @@ describe("P01 native CLI/ACP selectors", () => {
     const route = nativeRouteFor("ollama", {}, MODEL);
     expect(route).toMatchObject({ providerId: "ollama", adapter: ollamaAdapter,
       baseUrl: "http://127.0.0.1:11434", credentialRef: null, models: [MODEL] });
-    expect(acpRouteFor(acpOptions())).toEqual(route);
+    expect(acpRouteFor(acpOptions())).toEqual(viaAcp(route));
     expect(network).not.toHaveBeenCalled();
   });
 
@@ -69,7 +71,7 @@ describe("P01 native CLI/ACP selectors", () => {
     const options = { baseUrl: "https://batch1-operator.invalid/", credential: "BATCH1_OLLAMA_REF" };
     const cli = nativeRouteFor("ollama", options, MODEL);
     expect(cli).toMatchObject({ baseUrl: "https://batch1-operator.invalid", credentialRef: "BATCH1_OLLAMA_REF" });
-    expect(acpRouteFor(acpOptions(options))).toEqual(cli);
+    expect(acpRouteFor(acpOptions(options))).toEqual(viaAcp(cli));
     expect(cli.adapter).toBe(ollamaAdapter);
   });
 

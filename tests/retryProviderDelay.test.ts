@@ -8,6 +8,7 @@
  */
 import { rmSync } from "node:fs";
 import { afterEach, describe, expect, test } from "vitest";
+import { acpRouteFor, type AcpStdioInit } from "../src/acp/acpStdioMain.js";
 import { decideRetry } from "../src/agent/requestRetry.js";
 import { nativeRouteFor } from "../src/cli-agent-options.js";
 import { classifyResponseFailure } from "../src/llm/adapter/responseFailure.js";
@@ -129,5 +130,23 @@ describe("SH-PROVIDERS-04 provider-driven retry delays", () => {
     const clamped = decideRetry(policy, { message: "x", code: "RATE_LIMIT", providerRetryAfterMs: 30_000, providerDelayHeader: "retry-after" }, 1, () => 0.5);
     expect(clamped).toMatchObject({ decision: "retry", delayMs: 10_000, delaySource: "provider" });
     expect(clamped.reason).toMatch(/asked for 30000ms \(retry-after\), clamped to the route's 10000ms provider ceiling/);
+  });
+
+  // Opus fix: every ACP client has a prompt deadline the child cannot see (the TypeScript and Python SDKs and Studio time
+  // out at 120 s), so `amc acp` keeps the local ceiling for provider waits unless the client raises it; the Python SDK
+  // forwards no ceiling, and 5 x 60 s outlived its deadline. Mutation: drop the default in acpRouteFor → (7) fails.
+  test("(7) amc acp bounds provider waits by the local ceiling unless raised; agent-loop run keeps 60 s", () => {
+    const acp = (extra: Partial<AcpStdioInit>) => {
+      const route = acpRouteFor({ workspace: "/unused", agentId: "default", providerId: "stub", systemPrompt: "x", ...extra });
+      if ("error" in route) throw new Error(route.error);
+      return resolveRetryPolicy(route.retry, "t");
+    };
+    expect(acp({})).toMatchObject({ maxDelayMs: 10_000, maxProviderDelayMs: 10_000, maxRetries: 5 });
+    expect(acp({ retryMaxDelay: "20000" }).maxProviderDelayMs).toBe(20_000);
+    expect(acp({ retryMaxProviderDelay: "45000" }).maxProviderDelayMs).toBe(45_000);
+    expect(acp({ maxRetries: "0" })).toMatchObject({ maxRetries: 0, maxProviderDelayMs: 10_000 });
+    expect(acpRouteFor({ workspace: "/unused", agentId: "default", providerId: "stub", systemPrompt: "x", retryMaxDelay: "100" }))
+      .toEqual({ error: expect.stringContaining("--retry-max-delay must be an integer") });
+    expect(resolveRetryPolicy(nativeRouteFor("stub", {}, undefined).retry, "t").maxProviderDelayMs).toBe(60_000);
   });
 });

@@ -68,7 +68,7 @@ export function registerAcpCommands(program: Command): void {
     .option("--cache-retention <mode>", "short or long prompt-cache retention on anthropic, openai and openai-responses routes")
     .option("--max-retries <n>", "Model-request retries after the first attempt (default 5; 0 gives up on the first failure)")
     .option("--retry-max-delay <ms>", "Local backoff ceiling in milliseconds (500 to 2147483647, default 10000)")
-    .option("--retry-max-provider-delay <ms>", "Ceiling on a provider-requested wait, default 60000; never below --retry-max-delay")
+    .option("--retry-max-provider-delay <ms>", "Ceiling on a provider-requested wait; defaults to --retry-max-delay (10000) because a client's prompt deadline is invisible here; never below it")
     .option("--max-steps <n>", "Positive model-step bound per turn (default 8, stub 2)")
     .option("--context-window <tokens>", "Override the reviewed model context window for automatic compaction")
     .option("--compact-threshold <fraction>", "Use ratio trigger instead of the catalog token reserve (0.5-0.95; requires --context-window)")
