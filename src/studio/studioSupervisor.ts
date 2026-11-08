@@ -546,11 +546,11 @@ export async function runStudioForeground(params: {
       } catch {
         // Lifecycle audit is best-effort and must not block shutdown.
       }
-      await apiClosed;
-      await dashboard.close();
-      await gateway.close();
-      await metrics.close();
+      // LIVE-RUNTIME-02: every server closes at once, so the API's drain no longer holds the gateway's seal behind it.
+      const closed = await Promise.allSettled([apiClosed, gateway.close(), dashboard.close(), metrics.close()]);
       clearStudioState(workspace);
+      const failures = closed.flatMap((result) => (result.status === "rejected" ? [result.reason as unknown] : []));
+      if (failures.length > 0) throw new AggregateError(failures, "Studio did not stop cleanly");
     }
   };
 }

@@ -297,6 +297,7 @@ import { buildConnectInstructions } from "./studio/connectWizard.js";
 import { registerHookIntegrationCommands } from "./adapters/hookIntegrationCli.js";
 import { runStudioForeground, startStudioDaemon, stopStudioDaemon, studioStatus } from "./studio/studioSupervisor.js";
 import { standaloneGatewayAllowList } from "./studio/listenPolicy.js";
+import { installStudioShutdown } from "./studio/studioShutdown.js";
 import { readAdminToken, readStudioState, studioLogsDir } from "./studio/studioState.js";
 import { fixSignaturesAsync, FixSignaturesPublicationError, inspectSignatures } from "./studio/signatures.js";
 import {
@@ -4225,8 +4226,8 @@ studio
       allowPublicBind: runtimeConfig.allowPublicBind || runtimeConfig.lanMode,
       trustedProxyHops: runtimeConfig.trustedProxyHops,
       maxRequestBytes: runtimeConfig.maxRequestBytes,
-      corsAllowedOrigins: runtimeConfig.corsAllowedOrigins,
       gatewayMaxRequestBytes: runtimeConfig.gatewayMaxRequestBytes,
+      corsAllowedOrigins: runtimeConfig.corsAllowedOrigins,
       dataRetentionDays: runtimeConfig.dataRetentionDays,
       queryLeaseCarrierEnabled: queryCarrierAllowed
     });
@@ -4247,16 +4248,7 @@ studio
       `Metrics: http://${studioRuntime.state.metricsHost ?? runtimeConfig.metricsBind}:${studioRuntime.state.metricsPort ?? runtimeConfig.metricsPort}/metrics`
     );
 
-    await new Promise<void>((resolvePromise) => {
-      const shutdown = async () => {
-        process.off("SIGINT", shutdown);
-        process.off("SIGTERM", shutdown);
-        await studioRuntime.stop();
-        resolvePromise();
-      };
-      process.on("SIGINT", shutdown);
-      process.on("SIGTERM", shutdown);
-    });
+    await new Promise<never>(() => installStudioShutdown({ stop: () => studioRuntime.stop() })); // LIVE-RUNTIME-02: one stop, signal-safe, bounded
   });
 
 studio
@@ -10243,16 +10235,7 @@ gateway
       console.log(`- ${route.prefix} -> ${route.upstream} openaiCompatible=${route.openaiCompatible ? "yes" : "no"} agent=${route.agentId ?? "unbound"}`);
     }
 
-    await new Promise<void>((resolvePromise) => {
-      const shutdown = async () => {
-        process.off("SIGINT", shutdown);
-        process.off("SIGTERM", shutdown);
-        await handle.close();
-        resolvePromise();
-      };
-      process.on("SIGINT", shutdown);
-      process.on("SIGTERM", shutdown);
-    });
+    await new Promise<never>(() => installStudioShutdown({ stop: () => handle.close() })); // LIVE-RUNTIME-02: one stop, signal-safe, bounded
   });
 
 gateway
@@ -18593,7 +18576,6 @@ program
       studioPort: explicitApiPort,
       hostDir: opts.hostDir ? resolve(opts.hostDir) : undefined,
       defaultWorkspaceId: opts.defaultWorkspaceId
-      gatewayMaxRequestBytes: runtimeConfig.gatewayMaxRequestBytes,
     });
     const lan = loadLanMode(runtimeConfig.workspaceDir);
     const lanSig = verifyLanModeSignature(runtimeConfig.workspaceDir);
@@ -18611,21 +18593,13 @@ program
       allowPublicBind: runtimeConfig.allowPublicBind || runtimeConfig.lanMode,
       trustedProxyHops: runtimeConfig.trustedProxyHops,
       maxRequestBytes: runtimeConfig.maxRequestBytes,
+      gatewayMaxRequestBytes: runtimeConfig.gatewayMaxRequestBytes,
       corsAllowedOrigins: runtimeConfig.corsAllowedOrigins,
       dataRetentionDays: runtimeConfig.dataRetentionDays,
       queryLeaseCarrierEnabled: runtimeConfig.queryLeaseCarrierEnabled && lan.enabled && lanSig.valid
     });
 
-    await new Promise<void>((resolvePromise) => {
-      const shutdown = async () => {
-        process.off("SIGINT", shutdown);
-        process.off("SIGTERM", shutdown);
-        await runtime.stop();
-        resolvePromise();
-      };
-      process.on("SIGINT", shutdown);
-      process.on("SIGTERM", shutdown);
-    });
+    await new Promise<never>(() => installStudioShutdown({ stop: () => runtime.stop() })); // LIVE-RUNTIME-02: one stop, signal-safe, bounded
   });
 
 // ── Model Cognition Lab CLI ──────────────────────────────────────────

@@ -83,7 +83,18 @@ export function writeFatalDiagnostic(kind: FatalKind, error: unknown, cwd = proc
   }
 }
 
-/** Replace message-only fatal handlers: report, leave the diagnostic, exit 1. */
+let shutdownHook: { run: () => Promise<void>; capMs: number } | null = null;
+let shutdownStarted = false;
+
+/**
+ * A bounded stop to run once before the fatal exit (LIVE-RUNTIME-02). Studio registers its own stop, so a crash closes the
+ * servers and seals what it can instead of exiting with them open. Without a hook a fatal event exits at once, as before.
+ */
+export function setFatalShutdownHook(run: () => Promise<void>, capMs: number): void {
+  shutdownHook = { run, capMs };
+}
+
+/** Replace message-only fatal handlers: report, leave the diagnostic, run the registered stop once (bounded), exit 1. */
 export function installFatalHandlers(report: (line: string) => void = (line) => process.stderr.write(`${line}\n`)): void {
   const fatal = (kind: FatalKind, error: unknown): void => {
     const path = writeFatalDiagnostic(kind, error);
@@ -92,7 +103,15 @@ export function installFatalHandlers(report: (line: string) => void = (line) => 
       report(`[AMC] ${kind === "unhandledRejection" ? "Unhandled rejection" : "Uncaught exception"}: ${message.slice(0, 2_000)}`);
       report(path === null ? "[AMC] the fatal diagnostic could not be written" : `[AMC] diagnostic: ${path}`);
     } finally {
-      process.exit(1);
+      const hook = shutdownHook;
+      if (hook === null) process.exit(1);
+      // A second fatal event while the stop runs leaves its diagnostic and waits for the same exit.
+      else if (!shutdownStarted) {
+        shutdownStarted = true;
+        const cap = new Promise<void>((done) => setTimeout(done, hook.capMs)); // kept referenced: the process waits for it
+        void Promise.race([hook.run().catch((stopError: unknown) => report(`[AMC] stop after the fatal error failed: ${String(stopError)}`)), cap])
+          .finally(() => process.exit(1));
+      }
     }
   };
   process.on("unhandledRejection", (reason) => fatal("unhandledRejection", reason));
