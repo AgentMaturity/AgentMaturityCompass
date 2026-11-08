@@ -38,6 +38,7 @@ import { boundProviderKey } from "../keys/keyset.js";
 import { verifySessionRecords } from "./sessionRecordVerification.js";
 import { admitKey } from "../trust/admission.js";
 import type { TrustContext } from "../trust/trustContext.js";
+import { monitorPinFromEnv } from "../trust/monitorPinEnv.js";
 
 const GLOBAL_GENESIS = "GENESIS";
 
@@ -254,7 +255,7 @@ export function verifyStoredSessionEvents(
 ): StoredSessionVerifyResult {
   const errors: string[] = [];
   const expected =
-    options.expectedMonitorFingerprint ?? process.env["AMC_EXPECTED_MONITOR_FINGERPRINT"] ?? null;
+    options.expectedMonitorFingerprint ?? monitorPinFromEnv() ?? null;
   const trustRoot = verifyMonitorTrustRoot(workspace, expected, errors, options.trust);
   errors.push(...operationalSessionProblems(workspace, rows, options.trust));
   verifyGlobalChainAndSignatures(rows, workspace, errors);
@@ -278,7 +279,7 @@ export function verifyStoredSessionEventMetadata(
   options: StoredSessionVerifyOptions = {}
 ): StoredSessionVerifyResult {
   const errors: string[] = [];
-  const expected = options.expectedMonitorFingerprint ?? process.env.AMC_EXPECTED_MONITOR_FINGERPRINT ?? null;
+  const expected = options.expectedMonitorFingerprint ?? monitorPinFromEnv() ?? null;
   const trustRoot = verifyMonitorTrustRoot(workspace, expected, errors, options.trust);
   errors.push(...operationalSessionProblems(workspace, rows, options.trust));
   verifyGlobalChainAndSignatures(rows, workspace, errors, false);

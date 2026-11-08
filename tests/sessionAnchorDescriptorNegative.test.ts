@@ -283,6 +283,23 @@ describe("session root descriptor — what may not be anchored", () => {
     expect(findSessionAnchorEntries(workspace, sessionId)).toHaveLength(1);
   });
 
+  // Follow-up 4: `amc session anchor` (anchorSessionRoot with no explicit option) reads the environment; an empty
+  // AMC_EXPECTED_MONITOR_FINGERPRINT (a chart or .env with no pin yet) is no pin, as the session readers read it.
+  test("an empty AMC_EXPECTED_MONITOR_FINGERPRINT is no pin: the session anchors unpinned", () => {
+    const workspace = newWorkspace();
+    const sessionId = runSession(workspace, true);
+    const previous = process.env.AMC_EXPECTED_MONITOR_FINGERPRINT;
+    process.env.AMC_EXPECTED_MONITOR_FINGERPRINT = "";
+    try {
+      const result = anchorSessionRoot({ workspace, sessionId });
+      expect(result.descriptor.monitorKeyFingerprint).toBe(sha256Hex(Buffer.from(getPublicKeyPem(workspace, "monitor"), "utf8")));
+      expect(findSessionAnchorEntries(workspace, sessionId)).toHaveLength(1);
+    } finally {
+      if (previous === undefined) delete process.env.AMC_EXPECTED_MONITOR_FINGERPRINT;
+      else process.env.AMC_EXPECTED_MONITOR_FINGERPRINT = previous;
+    }
+  });
+
   test("a canonical uppercase monitor fingerprint publishes the actual pinned session anchor", () => {
     const workspace = newWorkspace();
     const fingerprint = sha256Hex(Buffer.from(getPublicKeyPem(workspace, "monitor"), "utf8"));

@@ -201,6 +201,12 @@ describe.each(["sqlite", "jsonl"] as const)("native spill commands over %s histo
     expect((await invoke(path, "inventory", ["--expect-monitor", "0".repeat(64)])).report.error?.code).toBe("monitor-trust-unavailable-or-mismatched");
     vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", pin);
     expect((await invoke(path, "inventory")).report.inspection!.monitorTrust.anchored).toBe(true);
+    // Follow-up 4: an empty AMC_EXPECTED_MONITOR_FINGERPRINT (a chart or .env with no pin yet) is no pin, as the session
+    // readers read it; an explicit empty --expect-monitor stays refused.
+    vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", "");
+    const unpinned = await invoke(path, "inventory");
+    expect(unpinned.report).toMatchObject({ ok: true, inspection: { monitorTrust: { anchored: false, assurance: "workspace-consistency-only" } } });
+    expect((await invoke(path, "inventory", ["--expect-monitor", ""])).report.error?.code).toBe("invalid-option");
   });
 
   it("refuses a conflicting explicit backend before opening the unrelated store", async () => {

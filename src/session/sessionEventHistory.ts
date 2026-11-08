@@ -5,6 +5,7 @@ import { admitSessionEnvelope, extractEnvelope } from "./sessionTypes.js";
 import { exactHistoryId, historyRefuse, openHistoryReader, SessionHistoryRefused } from "./sessionHistoryReader.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { monitorPinFromEnv } from "../trust/monitorPinEnv.js";
 
 export { SessionHistoryRefused, type SessionHistoryRefusal } from "./sessionHistoryReader.js";
 export interface SessionEventHistoryOptions {
@@ -99,7 +100,7 @@ export function loadSessionEventHistory(options: SessionEventHistoryOptions): Se
     if (flag !== undefined && typeof flag !== "boolean") historyRefuse("INVALID_INPUT", "Verification switches must be booleans.");
   }
   // An empty AMC_EXPECTED_MONITOR_FINGERPRINT (a chart or .env with no pin yet) is no pin; an empty explicit option is refused.
-  const expectedMonitorFingerprint = options.expectedMonitorFingerprint ?? (process.env.AMC_EXPECTED_MONITOR_FINGERPRINT || undefined);
+  const expectedMonitorFingerprint = options.expectedMonitorFingerprint ?? monitorPinFromEnv();
   for (const digest of [expectedMonitorFingerprint, options.expectedHeadEventHash]) {
     if (digest !== undefined && (typeof digest !== "string" || !/^[a-f0-9]{64}$/.test(digest))) {
       historyRefuse("INVALID_INPUT", "Expected fingerprints and heads must be complete lowercase SHA-256 values obtained independently.");
