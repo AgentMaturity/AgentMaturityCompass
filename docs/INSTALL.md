@@ -12,7 +12,7 @@
 ### Platform status
 
 - macOS arm64: qualified (`docs/PLATFORM_MATRIX.md`).
-- Linux arm64: the npm package and the desktop archive were installed and run on `node:22-bookworm` (aarch64) on 2026-11-07, in a maintainer verification run that recorded install defects; no platform-matrix receipt.
+- Linux arm64: the npm package and the desktop archive were installed and run on `node:22-bookworm` (aarch64) on 2026-11-07, in a maintainer verification run that recorded install defects; on 2026-11-08 the hosted installer installed the pinned 1.1.1 archive on `node:22-bookworm` and `node:22-bookworm-slim` (aarch64, prebuilt `better-sqlite3`), so it maps Linux aarch64 to the architecture-neutral `linux-x64` archive; no platform-matrix receipt.
 - Linux x64, macOS x64, Windows x64: packages built and checksum-verified by the release scripts; no run receipt.
 - Container images: built for amd64 and arm64. The container smoke passed on arm64, and on amd64 only under emulation on an arm64 host (2026-10-11, `qualification/2026-10-11-P0-35/`); no native amd64 run.
 
@@ -124,15 +124,16 @@ cp .env.example .env    # edit ports and deployment settings
 cp secrets/amc_vault_passphrase.txt.example secrets/amc_vault_passphrase.txt
 cp secrets/amc_owner_username.txt.example secrets/amc_owner_username.txt
 cp secrets/amc_owner_password.txt.example secrets/amc_owner_password.txt
+cp secrets/amc_backup_passphrase.txt.example secrets/amc_backup_passphrase.txt
 ```
 
-Replace all three template values with your own vault passphrase, owner username and owner password before starting. These are untracked runtime files, not `.env` settings. Keep them private on the host and readable by container UID 10001, as described in [the container guide](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docker/README.md#studio-with-persistent-state). Then run:
+Replace all four template values with your own vault passphrase, owner username, owner password and backup passphrase before starting; Compose refuses to start while one of the files is missing. These are untracked runtime files, not `.env` settings. Keep them private on the host and readable by container UID 10001, as described in [the container guide](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docker/README.md#studio-with-persistent-state). Then run:
 
 ```bash
 docker compose up -d --build
 ```
 
-Studio available at `http://localhost:3212`. Gateway at `http://localhost:3210`.
+Studio available at `http://localhost:3212` (published on `127.0.0.1` unless `AMC_PUBLISH_ADDRESS` says otherwise). Gateway at `http://localhost:3210`. Running AMC for live users, and the Compose runbooks: [docs/DEPLOYMENT.md](DEPLOYMENT.md#running-amc-for-live-users) and [docs/deploy/reference/COMPOSE.md](deploy/reference/COMPOSE.md).
 
 For TLS termination (production):
 
@@ -216,6 +217,8 @@ In a new directory, default doctor exits zero when the CLI is healthy and tells 
 
 ## Upgrading
 
+Back up first: a signed `amc backup create` bundle, copied off the machine, before any new version touches the workspace. From 1.1.1, read [docs/releases/2.0.0.md](releases/2.0.0.md), "Migration from 1.1.1", and [docs/MIGRATION_RUNBOOK.md](MIGRATION_RUNBOOK.md) first.
+
 ```bash
 # Verified release channel
 curl -fsSL https://agentmaturity.co/install.sh | sh
@@ -225,13 +228,10 @@ irm https://agentmaturity.co/install.ps1 | iex
 
 # GitHub
 cd AgentMaturityCompass && git pull && pnpm install --frozen-lockfile && pnpm run build
-
-# Docker
-cd deploy/compose && docker compose pull && docker compose up -d --build
-
-# Helm
-helm upgrade amc deploy/helm/amc
 ```
+
+- Docker Compose: pin the new image in `.env` (`AMC_STUDIO_IMAGE`), keep the previous one for rollback, and follow [docs/deploy/reference/COMPOSE.md](deploy/reference/COMPOSE.md) (backup, upgrade, upgrade from 1.1.1, rollback).
+- Helm: upgrade by digest with `--reuse-values`, as [docs/deploy/reference/UPGRADE.md](deploy/reference/UPGRADE.md) describes.
 
 ## Uninstalling
 

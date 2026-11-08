@@ -33,9 +33,10 @@ function sha256(path: string): string {
   return createHash("sha256").update(readFileSync(path)).digest("hex");
 }
 
-async function withFixtureServer<T>(directory: string, run: (baseUrl: string) => Promise<T>): Promise<T> {
+async function withFixtureServer<T>(directory: string, run: (baseUrl: string) => Promise<T>, log: string[] = []): Promise<T> {
   const server = createServer((request, response) => {
     const requested = basename(new URL(request.url ?? "/", "http://127.0.0.1").pathname);
+    log.push(requested);
     const path = join(directory, requested);
     if (!existsSync(path)) {
       response.writeHead(404).end("not found");
@@ -328,13 +329,15 @@ describe("truthful public distribution and brand contract", () => {
     expect(readFileSync(fixture.marker, "utf8")).toBe("installed");
   });
 
-  test("detects Linux aarch64 from uname and refuses it until an arm64 install of the archive has run (LIVE-DEPLOY-07)", async () => {
+  test("installs the architecture-neutral linux-x64 archive on Linux aarch64, detected from uname (LIVE-DEPLOY-07)", async () => {
+    // The pinned archive installed on node:22-bookworm and node:22-bookworm-slim aarch64 on 2026-11-08.
     const directory = temporaryDirectory();
     const version = "9.9.7";
     const fixture = writeUnixFixture(directory, version);
     const bin = join(directory, "bin");
     mkdirSync(bin);
     writeFileSync(join(bin, "uname"), "#!/bin/sh\ncase \"$1\" in -s) echo Linux ;; -m) echo aarch64 ;; esac\n", { mode: 0o755 });
+    const requested: string[] = [];
 
     const result = await withFixtureServer(directory, async (baseUrl) => await runInstaller({
       AMC_INSTALL_TEST_MODE: "1",
@@ -343,11 +346,16 @@ describe("truthful public distribution and brand contract", () => {
       AMC_INSTALL_PLATFORM: "",
       AMC_TEST_MARKER: fixture.marker,
       PATH: `${bin}:${process.env.PATH}`
-    }));
+    }), requested);
 
-    expect(result.code).not.toBe(0);
-    expect(result.stderr).toContain("Linux architecture aarch64 is not packaged yet");
-    expect(existsSync(fixture.marker)).toBe(false);
+    expect(result.code, result.stderr).toBe(0);
+    expect(requested).toContain(`amc-${version}-linux-x64.tar.gz`);
+    expect(readFileSync(fixture.marker, "utf8")).toBe("installed");
+    writeFileSync(join(bin, "uname"), "#!/bin/sh\ncase \"$1\" in -s) echo Linux ;; -m) echo riscv64 ;; esac\n", { mode: 0o755 });
+    const other = await withFixtureServer(directory, async (baseUrl) => await runInstaller({ AMC_INSTALL_TEST_MODE: "1", AMC_RELEASE_BASE_URL: baseUrl,
+      AMC_RELEASE_VERSION: version, AMC_INSTALL_PLATFORM: "", AMC_TEST_MARKER: fixture.marker, PATH: `${bin}:${process.env.PATH}` }));
+    expect(other.code).not.toBe(0);
+    expect(other.stderr).toContain("Linux architecture riscv64 is not packaged yet");
   });
 
   test("fails closed before execution when the release checksum is invalid", async () => {

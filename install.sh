@@ -51,7 +51,9 @@ detect_platform() {
   arch=$(uname -m)
   case "$os:$arch" in
     Darwin:arm64|Darwin:x86_64) printf '%s\n' "macos-universal" ;;
-    Linux:x86_64|Linux:amd64) printf '%s\n' "linux-x64" ;;
+    # The linux-x64 archive is an npm tarball and an sh installer, so it is architecture-neutral: the pinned archive
+    # installed and ran on node:22-bookworm and node:22-bookworm-slim aarch64 on 2026-11-08 (prebuilt better-sqlite3).
+    Linux:x86_64|Linux:amd64|Linux:aarch64|Linux:arm64) printf '%s\n' "linux-x64" ;;
     Linux:*) fail "Linux architecture $arch is not packaged yet; use the source install documented at https://agentmaturity.co/docs/" ;;
     *) fail "unsupported platform $os/$arch; use https://agentmaturity.co/docs/" ;;
   esac

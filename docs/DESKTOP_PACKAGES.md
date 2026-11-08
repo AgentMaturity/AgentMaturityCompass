@@ -82,7 +82,7 @@ amc doctor
 
 `install.cmd` runs `install.ps1` with `-ExecutionPolicy Bypass`, because the default execution policy on Windows clients refuses to run `.ps1` files directly.
 
-Platform status, from run receipts: macOS arm64 is qualified (`docs/PLATFORM_MATRIX.md`). The Linux archive was installed and run on `node:22-bookworm` (aarch64) on 2026-11-07, with no platform-matrix receipt. The Linux x64, macOS x64 and Windows x64 packages are built and checksum-verified by the release scripts, with no run receipt: no maintainer-run Windows receipt exists, and the CLI natively and Studio under WSL2 are both untested. The Linux archive ships no Studio launcher; after `sh ./install.sh`, `amc up` starts Studio.
+Platform status, from run receipts: macOS arm64 is qualified (`docs/PLATFORM_MATRIX.md`). The Linux archive was installed and run on `node:22-bookworm` (aarch64) on 2026-11-07, and through the hosted installer on `node:22-bookworm` and `node:22-bookworm-slim` (aarch64) on 2026-11-08, with no platform-matrix receipt. The Linux x64, macOS x64 and Windows x64 packages are built and checksum-verified by the release scripts, with no run receipt: no maintainer-run Windows receipt exists, and the CLI natively and Studio under WSL2 are both untested. The Linux archive ships no Studio launcher; after `sh ./install.sh`, `amc up` starts Studio.
 
 Launch the Studio app by double-clicking `Agent Maturity Compass Studio.cmd`, or from PowerShell:
 
