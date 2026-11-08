@@ -296,6 +296,10 @@ export interface UsersMutationOptions { assertAuthorized?: () => void }
 class UsersAuthorizationChangedError extends Error {
   constructor() { super("user mutation authority changed while signing"); this.name = "UsersAuthorizationChangedError"; }
 }
+/** LIVE-VAULT-16 (D13): the admin token is a bearer file inside the workspace, so it never mints, revokes or promotes an account. */
+class UsersAdminTokenRefusedError extends Error {
+  constructor() { super("the admin token cannot change console accounts; sign in as an OWNER"); this.name = "UsersAdminTokenRefusedError"; }
+}
 
 const usersVaultLockedMessages = new Set([
   "🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup.",
@@ -307,8 +311,8 @@ export function respondUsersMutationError(request: Pick<IncomingMessage, "method
   let path: string;
   try { path = new URL(request.url ?? "/", "http://local.invalid").pathname; } catch { return false; }
   if (!["/users/add", "/users/revoke", "/users/roles"].includes(path)) return false;
-  if (error instanceof UsersAuthorizationChangedError) {
-    send(403, { error: "user mutation authority changed while signing" }); return true;
+  if (error instanceof UsersAuthorizationChangedError || error instanceof UsersAdminTokenRefusedError) {
+    send(403, { error: error.message }); return true;
   }
   if (error instanceof KeyProviderError && Object.hasOwn(KEY_PROVIDER_ERRORS, error.code)) {
     send(KEY_PROVIDER_ERRORS[error.code], { error: `${error.code}: user mutation signing refused`, code: error.code }); return true;
@@ -331,6 +335,7 @@ export function createUsersMutationGuard<Actor extends UsersMutationActor>(input
   const { workspace, authenticate, access, readOnly } = input;
   const expected = { isAdmin: input.expected.isAdmin, userId: input.expected.userId };
   return () => {
+    if (expected.isAdmin) throw new UsersAdminTokenRefusedError();
     const current = authenticate();
     if (current === null || current.isAdmin !== expected.isAdmin || current.userId !== expected.userId
       || !enforceRoleOrAdmin({ access: access(current), requiredAny: ["OWNER"],

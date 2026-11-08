@@ -30,6 +30,7 @@ Studio host/port come from runtime config (`AMC_BIND`, `AMC_STUDIO_PORT`). The d
 
 Token file:
 - `.amc/studio/admin.token`
+- The admin token cannot create, revoke or re-role console accounts: `/users/add`, `/users/revoke` and `/users/roles` answer 403 to it. Sign in as an OWNER for those.
 
 Header required for protected endpoints:
 - `x-amc-admin-token: <token>`
