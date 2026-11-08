@@ -201,7 +201,7 @@ describe("signed red-team runs are ledgered and sealed", () => {
   test("`amc ci redteam` runs unsigned without a vault, and `--sign` without one is refused", async () => {
     const ws = workspace();
     const cli = resolve(process.cwd(), "dist/cli.js");
-    const env = { ...process.env, NO_COLOR: "1" };
+    const env: NodeJS.ProcessEnv = { ...process.env, NO_COLOR: "1" };
     delete env.AMC_VAULT_PASSPHRASE;
     const args = ["ci", "redteam", "--plugins", "injection", "--strategies", "direct", "--no-gaming-resistance", "--json",
       "--min-score", "0", "--max-vulnerabilities", "999", "--max-critical", "999", "--max-high", "999"];

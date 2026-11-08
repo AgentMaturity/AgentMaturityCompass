@@ -1,4 +1,4 @@
-import { generateKeyPairSync } from "node:crypto";
+import { generateKeyPairSync, type KeyObject } from "node:crypto";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -44,8 +44,8 @@ function workspace(): string {
   return dir;
 }
 
-const pem = (key: ReturnType<typeof generateKeyPairSync>["publicKey"]) => key.export({ type: "spki", format: "pem" }).toString();
-const privatePem = (key: ReturnType<typeof generateKeyPairSync>["privateKey"]) => key.export({ type: "pkcs8", format: "pem" }).toString();
+const pem = (key: KeyObject) => key.export({ type: "spki", format: "pem" }).toString();
+const privatePem = (key: KeyObject) => key.export({ type: "pkcs8", format: "pem" }).toString();
 type Kind = "llm_request" | "llm_response";
 function mint(privateKeyPem: string, kind: Kind, body: string, over: { agentId?: string; ts?: number; sessionId?: string } = {}): string {
   return mintReceipt({ kind, ts: over.ts ?? Date.now(), agentId: over.agentId ?? "default", providerId: "gateway", model: "fake-model",

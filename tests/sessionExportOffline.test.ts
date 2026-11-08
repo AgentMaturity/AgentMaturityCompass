@@ -152,7 +152,7 @@ describe("session export verifies offline", () => {
     const holder = newDir("amc-session-export-holder-");
     const out = join(holder, "session.amcsession.json");
     const cli = resolve(process.cwd(), "dist/cli.js");
-    const env = { ...process.env, NO_COLOR: "1", AMC_VAULT_PASSPHRASE: PASS };
+    const env: NodeJS.ProcessEnv = { ...process.env, NO_COLOR: "1", AMC_VAULT_PASSPHRASE: PASS };
     const exported = spawnSync(process.execPath, [cli, "session", "export", sessionId, "--out", out, "--json"], { cwd: workspace, env, encoding: "utf8" });
     expect(exported.status, exported.stderr).toBe(0);
     const { monitorKeyFingerprint } = JSON.parse(exported.stdout) as { monitorKeyFingerprint: string };
