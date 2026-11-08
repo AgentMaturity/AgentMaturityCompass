@@ -648,7 +648,9 @@ function createArchive(platform, packageDir) {
     return archivePath;
   }
   const archivePath = join(archivesRoot, `${archiveBase}.tar.gz`);
-  run("tar", ["-czf", archivePath, "-C", stagingRoot, basename(packageDir)], { timeoutMs: 120_000 });
+  // bsdtar on macOS (the release runner) adds AppleDouble ._* entries and com.apple.* xattr pax headers unless told not to.
+  run("tar", [...(process.platform === "darwin" ? ["--no-mac-metadata", "--no-xattrs"] : []), "-czf", archivePath, "-C", stagingRoot, basename(packageDir)],
+    { timeoutMs: 120_000, env: { COPYFILE_DISABLE: "1" } });
   return archivePath;
 }
 

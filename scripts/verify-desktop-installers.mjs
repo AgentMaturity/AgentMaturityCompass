@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
+import { assertNoAppleMetadata } from "./lib/tar-metadata.mjs";
 
 const root = resolve(process.cwd());
 const outRoot = resolve(root, process.env.AMC_DESKTOP_PACKAGE_OUT || "dist/installers");
@@ -135,6 +136,7 @@ for (const pkg of manifest.packages ?? []) {
         : [])
     ];
   assertArchiveContains(archivePath, platformEntries);
+  if (!archivePath.endsWith(".zip")) assertNoAppleMetadata(archivePath);
   const packageEntries = [`${base}/agent-maturity-compass-${manifest.packageVersion}.tgz`];
   if (pkg.platform === "macos-universal") {
     // The app carries its own copy so it still starts after it is moved out of the extracted folder.
