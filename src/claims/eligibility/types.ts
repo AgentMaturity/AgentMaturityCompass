@@ -43,8 +43,7 @@ export type ClaimReasonCode =
   | "NOT_APPLICABLE"
   | "APPLICABILITY_UNRESOLVED"
   | "EVIDENCE_NOT_CLAIM_READY"
-  | "RESULT_NOT_BOUND"
-  | "LEDGER_NOT_FINALIZED";
+  | "RESULT_NOT_BOUND";
 
 export interface ClaimProvenance {
   producer: string;

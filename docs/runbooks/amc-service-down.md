@@ -45,6 +45,7 @@ Recover AMC when Studio/API is unavailable or readiness fails.
    amc transparency verify
    amc verify all --json --expect-monitor <monitor sha256>
    ```
+   After a crash, `amc verify` may name `Session <id> missing seal`. If the session is the gateway's (runtime `gateway`), a running Studio seals it within about 10 minutes; nothing to do. For any other runtime, or on a copy you will not run Studio on: confirm the writer is dead (`amc status`, the tool's process), then `amc verify --repair` shows `seal_interrupted_sessions` and `--apply` seals it with a signed marker after you type `seal` (`--yes` in scripts). An erased seal plus deleted newest rows looks exactly the same, so seal only a session you know was interrupted. If `--repair` proposes `archive_evidence_store` instead, something other than an open session failed, or a signed ledger checkpoint forbids the seal (`Not sealing: …`); follow the rest of this runbook.
 
 ## If Restart Fails
 

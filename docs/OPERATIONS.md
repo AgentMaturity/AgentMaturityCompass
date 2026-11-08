@@ -20,6 +20,7 @@ This runbook is for post-launch AMC operation with verifiable controls.
    `<monitor sha256>` is `shasum -a 256 .amc/keys/monitor_ed25519.pub`, recorded outside the workspace when it was
    created. Without that pin (or `AMC_EXPECTED_MONITOR_FINGERPRINT`, or a trust list), the ledger check reports
    UNANCHORED and `verify all` exits 1.
+   To run it on a schedule, with the exit codes to alert on and what it cannot see, follow [Scheduled verification](DEPLOYMENT_CHECKLIST.md#scheduled-verification).
 4. Verify trust and transparency state:
    ```bash
    amc trust status

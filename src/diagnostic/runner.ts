@@ -8,7 +8,8 @@ import { join, resolve } from "node:path";
 import inquirer from "inquirer";
 import { z } from "zod";
 import { loadContextGraph, summarizeContextGraphForPrompt } from "../context/contextGraph.js";
-import { detectTrustBoundaryViolation, openLedger, verifiedLedgerPrefix, verifyLedgerIntegrity } from "../ledger/ledger.js";
+import { detectTrustBoundaryViolation, openLedger, verifyLedgerIntegrity } from "../ledger/ledger.js";
+import { isLivenessRow } from "../ledger/sessionLiveness.js";
 import { runHarnessWithRetries } from "../runtimes/common.js";
 import { loadGatewayConfig, verifyGatewayConfigSignature } from "../gateway/config.js";
 import {
@@ -534,7 +535,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
   try {
     if (unsignedStore && pathExists(join(workspace, ".amc", "evidence.sqlite"))) signedEvidence = openLedger(workspace, { readonly: true });
     // P0-55: verify the signed rows an unsigned run reads; its own unverified rows read UNSIGNED, never a ledger failure.
-    const verification = unsignedStore && !signedEvidence ? { ok: true } : await verifyLedgerIntegrity(workspace), ledgerPrefix = verifiedLedgerPrefix(workspace, verification);
+    const verification = unsignedStore && !signedEvidence ? { ok: true } : await verifyLedgerIntegrity(workspace);
     instant?.assertCurrent();
     const now = Date.now();
     const windowMs = parseWindowToMs(input.window || "14d");
@@ -566,7 +567,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
     let _cachedAllEvents: ParsedEvidenceEvent[] | null = null;
     const reader = readerTrustFor(workspace); // P0-18: trust lists and own keys load once per run
     function getCachedEvents(): ParsedEvidenceEvent[] { // P0-18: no synthetic rows; an attested event once, in its window
-      return (_cachedAllEvents ??= countAttestedOnce([...(signedEvidence?.getEventsBetween(windowStartTs, now) ?? []), ...ledger.getEventsBetween(windowStartTs, now)].filter((event) => evidenceProducer(event) !== "synthetic")
+      return (_cachedAllEvents ??= countAttestedOnce([...(signedEvidence?.getEventsBetween(windowStartTs, now) ?? []), ...ledger.getEventsBetween(windowStartTs, now)].filter((event) => evidenceProducer(event) !== "synthetic" && !isLivenessRow(event))
         .map((event) => parseEventForRunner(workspace, event, reader)), (event) => event.trustTier, { startTs: windowStartTs, endTs: now }));
     }
 
@@ -1330,7 +1331,6 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
       windowEndTs: now,
       status,
       verificationPassed: verification.ok && !unsignedStore, // unsigned rows: NOT CRYPTOGRAPHICALLY VERIFIED
-      ...(ledgerPrefix && status === "INVALID" && !trustBoundary.violated && targetSignatureValid ? { ledgerPrefix: { unfinalizedSessions: ledgerPrefix.unfinalizedSessions.map((session) => session.sessionId) } } : {}), // H3: open ledger sessions are the sole failure
       trustBoundaryViolated: trustBoundary.violated,
       trustBoundaryMessage: trustBoundary.message,
       integrityIndex: Number(integrityIndex.toFixed(4)),

@@ -76,7 +76,7 @@ helm upgrade --install amc deploy/helm/amc --namespace amc-system --atomic --wai
   --set image.repository=<registry>/amc-studio --set image.digest=sha256:<64 hex> --set image.requireDigest=true
 ```
 
-Then pin the monitor key and run `helm test` as [Verify Runtime](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/KUBERNETES_HELM_DEPLOYMENT.md#verify-runtime) describes: the test needs a one-time pairing code, and in a running deployment its verdict is a verified prefix (`verified-prefix`), never a complete-ledger verification.
+Then pin the monitor key and run `helm test` as [Verify Runtime](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/KUBERNETES_HELM_DEPLOYMENT.md#verify-runtime) describes: the test needs a one-time pairing code, and in a running deployment its verdict is a verified prefix (`verified-prefix`): the ledger verifies while Studio runs, the running gateway's own session is named as open, and a container replaced without a graceful stop leaves an interrupted session that the next start seals with a marker within about 10 minutes.
 
 Full operator guide, including the notary keys, the chart-created Secret option and upgrading from chart 0.1.0: [`docs/KUBERNETES_HELM_DEPLOYMENT.md`](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/KUBERNETES_HELM_DEPLOYMENT.md).
 

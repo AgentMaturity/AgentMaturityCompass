@@ -10,8 +10,8 @@ import {
   verifyFleetConfigSignature,
 } from "../fleet/registry.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
-import { verifiedLedgerPrefix, verifyLedgerIntegrity } from "../ledger/ledger.js";
-import { describeLedgerPrefix, type LedgerPrefixVerdict } from "../ledger/ledgerVerification.js";
+import { verifyLedgerIntegrity } from "../ledger/ledger.js";
+import { describeOpenSessions } from "../ledger/sessionLiveness.js";
 import { listObservabilityLaneRecords } from "../lifecycle/observabilityLane.js";
 import {
   listPassportExportFiles,
@@ -125,19 +125,18 @@ async function inspectVault(workspace: string): Promise<UnifiedSurfaceModuleResu
   const ledgerExists = pathExists(ledgerPath);
   let ledgerValid = false;
   let ledgerErrors: string[] = [];
-  let prefix: LedgerPrefixVerdict | null = null;
+  let openSessions = "";
   if (ledgerExists) {
     try {
       const verified = await verifyLedgerIntegrity(workspace);
       ledgerValid = verified.ok;
-      // H3: a running Studio's gateway session is open, not broken. Pending over a verified prefix, never verified.
-      prefix = verifiedLedgerPrefix(workspace, verified);
-      ledgerErrors = prefix ? [] : verified.errors;
+      ledgerErrors = verified.errors;
+      // A running Studio's gateway session is open, not broken: named, never an issue (sessionLiveness.ts).
+      if (verified.ok && verified.sessions.liveLegacy.length > 0) openSessions = ` (${describeOpenSessions(verified.sessions.liveLegacy, Date.now())})`;
     } catch (error) {
       ledgerErrors = [String(error)];
     }
   }
-  const pending = status.exists && prefix !== null;
   const score = (status.exists ? 25 : 0)
     + (pathExists(status.metaPath) ? 15 : 0)
     + (ledgerExists ? 15 : 0)
@@ -145,16 +144,14 @@ async function inspectVault(workspace: string): Promise<UnifiedSurfaceModuleResu
   const issues = [
     ...(!status.exists ? ["encrypted vault is missing"] : []),
     ...(!ledgerExists ? ["evidence ledger is missing"] : []),
-    ...(prefix ? [`ledger verified as a prefix only: ${describeLedgerPrefix(prefix)}`] : []),
     ...ledgerErrors.map((error) => `ledger integrity: ${error}`),
   ];
   return result({
     name: "Vault",
-    status: status.exists && ledgerValid ? "success" : pending ? "skipped" : "failed",
+    status: status.exists && ledgerValid ? "success" : "failed",
     score,
     summary: status.exists && ledgerValid
-      ? `Encrypted vault present; evidence ledger verified${status.unlocked ? " with an active local session" : " while locked"}.`
-      : pending ? "Encrypted vault present; the complete ledger verdict waits for an open session to end."
+      ? `Encrypted vault present; evidence ledger verified${status.unlocked ? " with an active local session" : " while locked"}.${openSessions}`
       : "Vault or ledger proof is incomplete.",
     issues,
     upgradePath: "Run `amc vault status` and `amc verify`, and repair every integrity error before using proof externally.",

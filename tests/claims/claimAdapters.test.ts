@@ -14,7 +14,7 @@ import {
   renderClaimLabel,
   type DiagnosticReportClaimInput
 } from "../../src/claims/eligibility/index.js";
-import { envelopeForStoredRun } from "../../src/claims/eligibility/adapters/results.js";
+import { distrustUnsealedReport, envelopeForStoredRun } from "../../src/claims/eligibility/adapters/results.js";
 import type { DiagnosticReport, TrustTier } from "../../src/types.js";
 import type { TrustTier as IngestTrustTier } from "../../src/score/evidenceIngestion.js";
 import type { ClaimTier } from "../../src/score/claimProvenance.js";
@@ -143,33 +143,29 @@ describe("envelope adapters", () => {
     expect(renderClaimLabel(unreliable).line).toContain(`Result: not evaluated (${REASON_TEXT.EVIDENCE_NOT_CLAIM_READY})`);
   });
 
-  test("H3: a run whose only failure is an open ledger session says so: incomplete evidence, never a pass", () => {
-    const run = { ...report, status: "INVALID" as const, verificationPassed: false, integrityIndex: 0,
-      trustLabel: "UNRELIABLE — DO NOT USE FOR CLAIMS" as const, ledgerPrefix: { unfinalizedSessions: ["gw-1"] } };
-    const open = envelopeForDiagnosticReport(run, NOW);
-    expect(open.claimKind).toBe("self_reported");
-    expect(open.statusDimensions).toMatchObject({ result: "not_evaluated", evidence: "incomplete" });
-    expect(open.reasons).toEqual(["LEDGER_NOT_FINALIZED", "EVIDENCE_NOT_CLAIM_READY"]);
-    expect(renderClaimLabel(open).line).toContain(`Result: not evaluated (${REASON_TEXT.LEDGER_NOT_FINALIZED}) · Evidence: incomplete`);
-    expect(claimEnvelopeSchema.safeParse(open).success).toBe(true);
-    // Any other cause, or no named session, keeps the untrusted verdict and its signature reason.
-    for (const other of [{ ...run, trustBoundaryViolated: true }, { ...run, ledgerPrefix: { unfinalizedSessions: [] } }]) {
-      const envelope = envelopeForDiagnosticReport(other, NOW);
-      expect(envelope.statusDimensions.evidence).toBe("untrusted");
-      expect(envelope.reasons).not.toContain("LEDGER_NOT_FINALIZED");
+  // LIVE-INTEGRITY-03 removed r2-c's two "H3" tests here: they pinned the removed open-ledger field and its reason
+  // code, which let an INVALID run read "incomplete" instead of "untrusted".
+  test("S2: distrustUnsealedReport turns VALID into INVALID and leaves every other status as it is", () => {
+    expect(distrustUnsealedReport({ ...report, status: "VALID" as const }).status).toBe("INVALID");
+    for (const status of ["INVALID", "UNSIGNED"] as const) {
+      const unchanged = { ...report, status };
+      expect(distrustUnsealedReport(unchanged)).toBe(unchanged);
     }
-    // A VALID run never reads the field.
-    expect(envelopeForDiagnosticReport({ ...report, ledgerPrefix: { unfinalizedSessions: ["gw-1"] } }, NOW).reasons).toEqual([]);
   });
 
-  test("H3: a stored run whose seal does not verify cannot vouch for an open session", () => {
-    const stored = { ...report, status: "INVALID", verificationPassed: false, methodology: { amcVersion: "1.2.0" },
-      ledgerPrefix: { unfinalizedSessions: ["gw-1"] } } as unknown as DiagnosticReport;
-    expect(envelopeForStoredRun(stored, { sealVerified: true, now: NOW }).reasons).toContain("LEDGER_NOT_FINALIZED");
+  test("S2: a stored VALID run whose seal does not verify is self-reported with SIGNATURE_INVALID", () => {
+    const stored = { ...report, status: "VALID", verificationPassed: true, methodology: { amcVersion: "1.2.0" } } as unknown as DiagnosticReport;
+    expect(envelopeForStoredRun(stored, { sealVerified: true, now: NOW }).reasons).not.toContain("SIGNATURE_INVALID");
     const unsealed = envelopeForStoredRun(stored, { sealVerified: false, now: NOW });
+    expect(unsealed.claimKind).toBe("self_reported");
     expect(unsealed.reasons).toContain("SIGNATURE_INVALID");
-    expect(unsealed.reasons).not.toContain("LEDGER_NOT_FINALIZED");
     expect(unsealed.statusDimensions.evidence).toBe("untrusted");
+  });
+
+  test("the removed LEDGER_NOT_FINALIZED reason no longer parses", () => {
+    const envelope = envelopeForDiagnosticReport({ ...report, status: "INVALID" }, NOW);
+    expect(claimEnvelopeSchema.safeParse(envelope).success).toBe(true);
+    expect(claimEnvelopeSchema.safeParse({ ...envelope, reasons: [...envelope.reasons, "LEDGER_NOT_FINALIZED"] }).success).toBe(false);
   });
 
   test("a diagnostic with no observed coverage is self-reported", () => {
