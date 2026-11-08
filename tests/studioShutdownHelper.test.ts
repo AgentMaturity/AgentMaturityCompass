@@ -8,7 +8,7 @@ vi.mock("../src/runtime/fatalDiagnostic.js", () => ({
 }));
 const { installStudioShutdown } = await import("../src/studio/studioShutdown.js");
 
-const wait = (ms: number) => new Promise((resolvePromise) => setTimeout(resolvePromise, ms));
+const wait = (ms: number) => new Promise<void>((resolvePromise) => setTimeout(resolvePromise, ms));
 
 // LIVE-RUNTIME-02 (D-R2): one stop per process, a second signal absorbed, a bounded wait, a fatal error joining the stop.
 describe("installStudioShutdown", () => {
