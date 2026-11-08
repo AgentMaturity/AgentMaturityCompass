@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, writeFileSync, mkdirSync, symlinkSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync, mkdirSync, symlinkSync, utimesSync } from "node:fs";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
@@ -532,5 +532,83 @@ describe("scoped search roots", () => {
       expect(outcome.ok, path).toBe(false);
       expect(outcome.output, path).not.toContain("private.ts");
     }
+  });
+});
+
+/** SH-TOOLS-04: ripgrep's everyday options over the JavaScript engine, through the real worker; every cap still speaks. */
+describe("grep options", () => {
+  it("matches a pattern literally with fixedStrings", async () => {
+    const h = harness();
+    write(h.workspace, "f.txt", "a.b\naXb\n");
+    const literal = await h.run("grep", { pattern: "a.b", fixedStrings: true });
+    expect(literal.output).toBe("f.txt:1:a.b");
+    expect((await h.run("grep", { pattern: "a.b" })).output.split("\n")).toEqual(["f.txt:1:a.b", "f.txt:2:aXb"]);
+    // A literal that is not a valid regex still searches, as text.
+    expect((await h.run("grep", { pattern: "(unbalanced", fixedStrings: true })).output).toBe("[amc: no matches for (unbalanced]");
+  });
+
+  it("prints context lines as path-line-text with -- between groups, never a line twice", async () => {
+    const h = harness();
+    write(h.workspace, "c.txt", ["l1", "l2", "HIT", "l4", "l5", "l6", "l7", "HIT", "HIT", "l10"].join("\n"));
+    const outcome = await h.run("grep", { pattern: "HIT", context: 1 });
+    expect(outcome.output.split("\n")).toEqual([
+      "c.txt-2-l2", "c.txt:3:HIT", "c.txt-4-l4", "--", "c.txt-7-l7", "c.txt:8:HIT", "c.txt:9:HIT", "c.txt-10-l10"
+    ]);
+  });
+
+  it("counts context lines against the byte cap", async () => {
+    const h = harness();
+    write(h.workspace, "wide.txt", `${"x".repeat(300)}\nHIT\n${"y".repeat(300)}\n`.repeat(10));
+    const outcome = await h.run("grep", { pattern: "HIT", context: 1, maxBytes: 1_500 });
+    expect(outcome.output).toContain("stopped at 1500 bytes");
+    expect(Buffer.byteLength(outcome.output, "utf8")).toBeLessThan(1_700);
+  });
+
+  it("lists unique paths in files mode and path:count with a total in count mode", async () => {
+    const h = harness();
+    write(h.workspace, "a.txt", "HIT\nHIT\nHIT\n");
+    write(h.workspace, "b.txt", "x\nHIT\n");
+    write(h.workspace, "c.txt", "none\n");
+    expect((await h.run("grep", { pattern: "HIT", mode: "files" })).output.split("\n")).toEqual(["a.txt", "b.txt"]);
+    expect((await h.run("grep", { pattern: "HIT", mode: "count" })).output.split("\n")).toEqual(["a.txt:3", "b.txt:1", "[amc: 4 matches in 2 files]"]);
+    expect((await h.run("grep", { pattern: "HIT", mode: "files", maxResults: 1 })).output).toContain("stopped at 1 files; more exist — pass offset 1");
+  });
+
+  it("pages with offset and names the next page, and says when a page is past the end", async () => {
+    const h = harness();
+    write(h.workspace, "many.txt", Array.from({ length: 12 }, (_, index) => `hit ${index + 1}`).join("\n"));
+    const first = await h.run("grep", { pattern: "hit", maxResults: 5 });
+    expect(first.output).toContain("many.txt:5:hit 5");
+    expect(first.output).toContain("pass offset 5 for the next page");
+    const second = await h.run("grep", { pattern: "hit", maxResults: 5, offset: 5 });
+    expect(second.output.split("\n").slice(0, 5)).toEqual([6, 7, 8, 9, 10].map((line) => `many.txt:${line}:hit ${line}`));
+    expect(second.output).toContain("after offset 5; more exist — pass offset 10");
+    const last = await h.run("grep", { pattern: "hit", maxResults: 5, offset: 10 });
+    expect(last.output.split("\n")).toEqual(["many.txt:11:hit 11", "many.txt:12:hit 12"]);
+    expect((await h.run("grep", { pattern: "hit", offset: 40 })).output).toBe("[amc: no entries at offset 40; 12 matches in total]");
+  });
+
+  it("tests a multiline pattern against the whole file and reports each match at its first line", async () => {
+    const h = harness();
+    write(h.workspace, "m.txt", "intro\nfoo\nbar\nmid\nfoo\nbaz\n");
+    expect((await h.run("grep", { pattern: "foo\\nbar" })).output).toContain("no matches");
+    const outcome = await h.run("grep", { pattern: "foo\\nbar", multiline: true });
+    expect(outcome.output).toBe("m.txt:2:foo");
+    expect((await h.run("grep", { pattern: "foo.*?baz", multiline: true, mode: "count" })).output).toContain("m.txt:1");
+  });
+});
+
+describe("glob sortBy", () => {
+  it("lists newest first with mtime and keeps the walk order by default", async () => {
+    const h = harness();
+    write(h.workspace, "a.ts", "a");
+    write(h.workspace, "b.ts", "b");
+    write(h.workspace, "c.ts", "c");
+    const at = (seconds: number) => new Date(2026, 0, 1, 0, 0, seconds);
+    utimesSync(join(h.workspace, "a.ts"), at(20), at(20));
+    utimesSync(join(h.workspace, "b.ts"), at(30), at(30));
+    utimesSync(join(h.workspace, "c.ts"), at(10), at(10));
+    expect((await h.run("glob", { pattern: "*.ts" })).output.split("\n")).toEqual(["a.ts", "b.ts", "c.ts"]);
+    expect((await h.run("glob", { pattern: "*.ts", sortBy: "mtime" })).output.split("\n")).toEqual(["b.ts", "a.ts", "c.ts"]);
   });
 });

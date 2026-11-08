@@ -252,3 +252,66 @@ export function globToRegExp(pattern: string): RegExp {
 export function forMatching(path: string): string {
   return sep === "/" ? path : path.split(sep).join("/");
 }
+
+export interface DirectoryEntry {
+  readonly name: string;
+  readonly kind: "file" | "directory" | "symlink" | "other";
+  /** Bytes for a file; null otherwise. */
+  readonly size: number | null;
+}
+
+export interface DirectoryListing {
+  readonly entries: readonly DirectoryEntry[];
+  /** Entries beyond `maxEntries`, dropped after sorting by name. */
+  readonly dropped: number;
+  /** Entries the repository ignore rules hid (0 with `includeIgnored`). */
+  readonly ignored: number;
+}
+
+/**
+ * One directory level (SH-TOOLS-02 `ls`), under the same ignore rules the walk applies: every ancestor's `.gitignore`
+ * and `.ignore` are inherited, so `ls` hides what `glob` hides. The caller has already resolved `directory` inside the
+ * workspace and refused the protected directories; `.git`/`.amc` entries inside it are left out by identity.
+ *
+ * ponytail: one `readdirSync` sorted in memory, so a directory of a million entries costs a million names before the
+ * cap applies; move it to the search worker with a deadline if that ever matters.
+ */
+export function listDirectory(workspace: string, directory: string, limits: { readonly includeIgnored?: boolean; readonly maxEntries: number }): DirectoryListing {
+  const root = realpathSync.native(workspace);
+  const protectedIds = protectedDirectoryIdentities(root);
+  const relativeDir = relative(root, directory);
+  const rules: IgnoreRule[] = [];
+  if (!limits.includeIgnored) {
+    let ancestor = root;
+    rules.push(...ignoreRules(root, ancestor));
+    for (const segment of relativeDir === "" ? [] : relativeDir.split(sep)) {
+      ancestor = join(ancestor, segment);
+      rules.push(...ignoreRules(root, ancestor));
+    }
+  }
+  let ignoredCount = 0;
+  const entries: DirectoryEntry[] = [];
+  for (const entry of readdirSync(directory, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+    const full = join(directory, entry.name);
+    const isDirectory = entry.isDirectory();
+    if (isDirectory && (aliasedSegmentReason(entry.name) !== null || (protectedIds.size > 0 && protectedIds.has(fileIdentity(full) ?? "")))) continue;
+    if (ignored(forMatching(relative(root, full)), isDirectory, rules)) { ignoredCount++; continue; }
+    const kind = entry.isSymbolicLink() ? "symlink" : isDirectory ? "directory" : entry.isFile() ? "file" : "other";
+    let size: number | null = null;
+    if (kind === "file") {
+      try { size = lstatSync(full).size; } catch { size = null; }
+    }
+    entries.push({ name: entry.name, kind, size });
+  }
+  const shown = entries.slice(0, limits.maxEntries);
+  return { entries: shown, dropped: entries.length - shown.length, ignored: ignoredCount };
+}
+
+/** Modification times for sorting glob results newest first; a file that vanished sorts last. */
+export function modifiedAt(workspace: string, paths: readonly string[]): Map<string, number> {
+  const times = new Map<string, number>();
+  for (const path of paths) {
+    try { times.set(path, lstatSync(join(workspace, path)).mtimeMs); } catch { times.set(path, -1); }
+  }
+  return times;
+}

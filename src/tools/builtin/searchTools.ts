@@ -27,6 +27,7 @@ const globArgs = z.object({
   pattern: z.string().min(1),
   path: z.string().min(1).optional(),
   includeIgnored: z.boolean().default(false),
+  sortBy: z.enum(["name", "mtime"]).default("name"),
   timeoutMs: z.number().int().positive().max(10_000).default(10_000),
   maxResults: z.number().int().positive().max(5_000).default(200)
 });
@@ -38,6 +39,11 @@ const grepArgs = z.object({
   include: z.string().optional(),
   includeIgnored: z.boolean().default(false),
   caseInsensitive: z.boolean().default(false),
+  fixedStrings: z.boolean().default(false),
+  multiline: z.boolean().default(false),
+  context: z.number().int().min(0).max(10).default(0),
+  mode: z.enum(["content", "files", "count"]).default("content"),
+  offset: z.number().int().min(0).max(100_000).default(0),
   timeoutMs: z.number().int().positive().max(10_000).default(10_000),
   maxScannedBytes: z.number().int().positive().max(100_000_000).default(20_000_000),
   maxResults: z.number().int().positive().max(2_000).default(100),
@@ -82,7 +88,7 @@ export function searchTools(): readonly ToolDefinition[] {
     defineTool({
       name: "glob",
       actionClass: "READ_ONLY",
-      description: "List workspace files matching a glob pattern (* within a segment, ** across segments).",
+      description: "List workspace files matching a glob pattern (* within a segment, ** across segments), by name or newest first.",
       parameters: {
         type: "object",
         properties: {
@@ -90,6 +96,7 @@ export function searchTools(): readonly ToolDefinition[] {
           path: { type: "string", description: "workspace-relative directory to search (default workspace root); results remain workspace-relative" },
           maxResults: { type: "integer" },
           includeIgnored: { type: "boolean", description: "include files excluded by repository ignore rules" },
+          sortBy: { type: "string", enum: ["name", "mtime"], description: "name (default, deterministic walk order) or mtime (newest first)" },
           timeoutMs: { type: "integer", minimum: 1, maximum: 10000, description: "deadline for the entire search, in milliseconds" }
         },
         required: ["pattern"]
@@ -104,15 +111,22 @@ export function searchTools(): readonly ToolDefinition[] {
     defineTool({
       name: "grep",
       actionClass: "READ_ONLY",
-      description: "Search workspace file contents for a regular expression. Results are capped and say so.",
+      description: "Search workspace file contents for a regular expression. Output modes content (path:line:text, with optional " +
+        "context lines as path-line-text and -- between groups), files (paths only) or count (path:count). Results are capped, " +
+        "paged with offset, and say so.",
       parameters: {
         type: "object",
         properties: {
-          pattern: { type: "string", description: "JavaScript regular expression" },
+          pattern: { type: "string", description: "JavaScript (ECMAScript) regular expression, not ripgrep syntax; a literal string with fixedStrings" },
           path: { type: "string", description: "workspace-relative directory to search (default workspace root); results remain workspace-relative" },
           include: { type: "string", description: "glob narrowing which files are searched" },
           includeIgnored: { type: "boolean", description: "include files excluded by repository ignore rules" },
           caseInsensitive: { type: "boolean" },
+          fixedStrings: { type: "boolean", description: "match the pattern literally" },
+          multiline: { type: "boolean", description: "test the pattern against the whole file (dot matches newlines); each match is reported at its first line" },
+          context: { type: "integer", minimum: 0, maximum: 10, description: "lines of context before and after each match" },
+          mode: { type: "string", enum: ["content", "files", "count"], description: "content (default), files (unique paths) or count (path:count)" },
+          offset: { type: "integer", minimum: 0, description: "skip this many matches (files in files mode) before returning up to maxResults" },
           timeoutMs: { type: "integer", minimum: 1, maximum: 10000, description: "deadline for the entire search, in milliseconds" },
           maxScannedBytes: { type: "integer", minimum: 1, maximum: 100000000, description: "maximum file-content bytes scanned, excluding bounded ignore metadata" },
           maxResults: { type: "integer" },
