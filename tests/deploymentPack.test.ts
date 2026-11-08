@@ -59,14 +59,18 @@ describe("compose runtime layout (LIVE-DEPLOY-01)", () => {
     expect(dockerRun).not.toContain("--tmpfs /home/amc");
   });
 
-  it("passes the operator's monitor-key pin to Studio, empty (unanchored) by default (LIVE-DEPLOY-16)", () => {
-    // Native-task verdicts count only when anchored to a pinned monitor key (P0-51); the chart passes the same key.
+  it("passes the operator's monitor-key pin to Studio only when it is set: unset by default, never empty (skeptic 2026-11-08)", () => {
+    // Native-task verdicts count only when anchored to a pinned monitor key (P0-51). An empty value is not "unpinned":
+    // loadSessionEventHistory refuses it as an invalid fingerprint, so Studio would show no task history and archive nothing.
     for (const [file, name] of STUDIO_SERVICES) {
-      const pin = serviceEnv(composeServices(file)[name]!).AMC_EXPECTED_MONITOR_FINGERPRINT;
-      expect(pin, `${file} ${name}`).toBe("${AMC_EXPECTED_MONITOR_FINGERPRINT:-}");
-      expect(interpolate(pin!, { AMC_EXPECTED_MONITOR_FINGERPRINT: "ab".repeat(32) })).toBe("ab".repeat(32));
+      // A bare key (list) or a null value (mapping): Compose takes the value from .env or the shell and drops the variable when unset.
+      const env = composeServices(file)[name]!.environment!;
+      if (Array.isArray(env)) expect(env.filter((entry) => entry.startsWith("AMC_EXPECTED_MONITOR_FINGERPRINT")), `${file} ${name}`).toEqual(["AMC_EXPECTED_MONITOR_FINGERPRINT"]);
+      else expect(env, `${file} ${name}`).toHaveProperty("AMC_EXPECTED_MONITOR_FINGERPRINT", null);
     }
-    expect(read("deploy/compose/.env.example")).toMatch(/^AMC_EXPECTED_MONITOR_FINGERPRINT=$/m);
+    const example = read("deploy/compose/.env.example");
+    expect(example).not.toMatch(/^AMC_EXPECTED_MONITOR_FINGERPRINT=/m);
+    expect(example).toMatch(/^# AMC_EXPECTED_MONITOR_FINGERPRINT=<sha256/m);
   });
 
   it("gives Studio a stop grace period and a restart policy", () => {
@@ -119,24 +123,29 @@ describe("compose image pins, limits and the backup secret (LIVE-DEPLOY-08)", ()
   it("limits the deploy/compose Studio services and hands them the backup passphrase secret", () => {
     for (const [file, name] of STUDIO_SERVICES.filter(([path]) => path.startsWith("deploy/compose/"))) {
       const service = composeServices(file)[name]!;
-      expect(service.deploy?.resources, `${file} ${name}`).toEqual({ limits: { cpus: "2", memory: "2g" }, reservations: { memory: "512m" } });
+      expect(service.deploy?.resources, `${file} ${name}`).toEqual({ limits: { cpus: "${AMC_STUDIO_CPUS:-2}", memory: "2g" }, reservations: { memory: "512m" } });
+      // Docker refuses a CPU limit above the host's CPU count, so a 1-vCPU host lowers it from .env (skeptic 2026-11-08).
+      expect(interpolate(service.deploy!.resources!.limits!.cpus!, {}), `${file} ${name}`).toBe("2");
+      expect(interpolate(service.deploy!.resources!.limits!.cpus!, { AMC_STUDIO_CPUS: "1" }), `${file} ${name}`).toBe("1");
       expect(service.secrets, `${file} ${name}`).toContain("amc_backup_passphrase");
       expect(serviceEnv(service).AMC_BACKUP_PASSPHRASE_FILE, `${file} ${name}`).toBe("/run/secrets/amc_backup_passphrase");
       expect(YAML.parse(read(file)).secrets.amc_backup_passphrase).toEqual({ file: "./secrets/amc_backup_passphrase.txt" });
     }
+    expect(read("deploy/compose/.env.example")).toMatch(/^AMC_STUDIO_CPUS=2$/m);
     expect(existsSync(resolve(workspace, "deploy/compose/secrets/amc_backup_passphrase.txt.example"))).toBe(true);
     expect(read("deploy/compose/README.md")).toContain("`amc_backup_passphrase.txt`");
   });
 });
 
 describe("Caddy upstream keep-alive (coordinator P2)", () => {
-  it("closes idle upstream connections to Studio before Studio does", () => {
-    // Studio keeps idle connections 65 s (runtime); Caddy's default 2 min would reuse one Studio already closed (a 502).
+  it("closes idle upstream connections before the Node server behind them does", () => {
+    // Node's default keep-alive is 5 s (65 s only once the runtime lane sets it), and Caddy's default 2 min would reuse a
+    // connection the server already closed (a 502), so every upstream closes first (skeptic 2026-11-08).
     for (const file of ["deploy/compose/Caddyfile", "deploy/compose/Caddyfile.studio-api"]) {
       const text = read(file);
-      const proxies = [...text.matchAll(/reverse_proxy (amc-studio:\d+)(?: \{[^{}]*?transport http \{\s*keepalive (\d+)s\s*\}\s*\})?/g)];
-      expect(proxies.length, file).toBeGreaterThan(0);
-      for (const [, upstream, seconds] of proxies) expect(Number(seconds ?? Infinity), `${file} ${upstream}`).toBeLessThan(65);
+      const proxies = [...text.matchAll(/reverse_proxy ([\w-]+:\d+)(?: \{[^{}]*?transport http \{\s*keepalive (\d+)s\s*\}\s*\})?/g)];
+      expect(proxies.length, file).toBe((text.match(/reverse_proxy /g) ?? []).length);
+      for (const [, upstream, seconds] of proxies) expect(Number(seconds ?? Infinity), `${file} ${upstream}`).toBeLessThan(5);
     }
   });
 });

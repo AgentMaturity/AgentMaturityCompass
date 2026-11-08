@@ -64,4 +64,14 @@ describe("compose browser origins are appended, never replaced (LIVE-DEPLOY-02)"
     const ingress = YAML.parse(read("deploy/helm/amc/examples/values-ingress-tls.yaml"));
     expect(ingress.env.AMC_CORS_ALLOWED_ORIGINS).toBe("https://amc.example.internal");
   });
+
+  it("the docker run example admits the console origin it documents (skeptic 2026-11-08)", () => {
+    const block = /```bash\ndocker run --rm \\\n([\s\S]*?)```/.exec(read("docker/README.md"))?.[1] ?? "";
+    const env = Object.fromEntries([...block.matchAll(/-e (AMC_[A-Z_]+)=(\S+)/g)].map(([, key, value]) => [key, value]));
+    const config = loadStudioRuntimeConfig({ AMC_WORKSPACE_DIR: "/data/amc", AMC_BIND: env.AMC_BIND, AMC_STUDIO_PORT: env.AMC_STUDIO_PORT,
+      AMC_CORS_ALLOWED_ORIGINS: env.AMC_CORS_ALLOWED_ORIGINS });
+    expect(config.bind).toBe("0.0.0.0");
+    const allowed = nativeAllowedBrowserOrigins(config.bind, config.studioPort, config.corsAllowedOrigins);
+    for (const origin of ["http://localhost:3212", "http://127.0.0.1:3212"]) expect(() => admitGet(allowed, origin), origin).not.toThrow();
+  });
 });

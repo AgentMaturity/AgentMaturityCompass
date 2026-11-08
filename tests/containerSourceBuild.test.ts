@@ -9,20 +9,22 @@ const read = (path: string) => readFileSync(resolve(path), "utf8");
 const dirs: string[] = [];
 afterEach(() => dirs.splice(0).forEach((dir) => rmSync(dir, { recursive: true, force: true })));
 
-function entrypoint(args: string[], options: { bootstrap?: boolean; failBootstrap?: boolean; missingSecret?: boolean } = {}) {
+function entrypoint(args: string[], options: { bootstrap?: boolean; failBootstrap?: boolean; missingSecret?: boolean; pin?: string } = {}) {
   const dir = mkdtempSync(join(tmpdir(), "amc-container-entrypoint-")); dirs.push(dir);
   const fake = join(dir, "amc"); const calls = join(dir, "calls.jsonl");
-  writeFileSync(fake, `#!/usr/bin/env node\nconst fs=require('node:fs');fs.appendFileSync(process.env.AMC_TEST_CALLS,JSON.stringify(process.argv.slice(2))+'\\n');if(process.argv[2]==='bootstrap'&&process.env.AMC_TEST_FAIL==='1')process.exit(17);\n`);
+  writeFileSync(fake, `#!/usr/bin/env node\nconst fs=require('node:fs');fs.appendFileSync(process.env.AMC_TEST_CALLS,JSON.stringify(process.argv.slice(2))+'\\n');fs.appendFileSync(process.env.AMC_TEST_CALLS+'.pin',JSON.stringify(process.env.AMC_EXPECTED_MONITOR_FINGERPRINT??null)+'\\n');if(process.argv[2]==='bootstrap'&&process.env.AMC_TEST_FAIL==='1')process.exit(17);\n`);
   chmodSync(fake, 0o755);
   const env: NodeJS.ProcessEnv = { PATH: `${dir}:${process.env.PATH}`, HOME: dir, AMC_TEST_CALLS: calls, AMC_WORKSPACE_DIR: join(dir, "workspace with spaces"), AMC_TEST_FAIL: options.failBootstrap ? "1" : "0" };
   if (options.bootstrap === false) env.AMC_BOOTSTRAP = "0";
+  if (options.pin !== undefined) env.AMC_EXPECTED_MONITOR_FINGERPRINT = options.pin;
   if (!options.missingSecret) {
     for (const key of ["AMC_VAULT_PASSPHRASE_FILE", "AMC_BOOTSTRAP_OWNER_USERNAME_FILE", "AMC_BOOTSTRAP_OWNER_PASSWORD_FILE"]) {
       const file = join(dir, key); writeFileSync(file, "runtime-secret"); env[key] = file;
     }
   }
   const result = spawnSync("bash", [resolve("docker/entrypoint.sh"), ...args], { env, encoding: "utf8" });
-  return { ...result, calls: existsSync(calls) ? readFileSync(calls, "utf8").trim().split("\n").map((line) => JSON.parse(line)) : [], dir };
+  const lines = (path: string) => existsSync(path) ? readFileSync(path, "utf8").trim().split("\n").map((line) => JSON.parse(line)) : [];
+  return { ...result, calls: lines(calls), pins: lines(`${calls}.pin`), dir };
 }
 
 describe("container source build and runtime contracts", () => {
@@ -164,6 +166,15 @@ describe("container source build and runtime contracts", () => {
     expect(result.status).not.toBe(0);
     expect(result.stderr).toContain("AMC_VAULT_PASSPHRASE_FILE");
     expect(result.calls).toEqual([]);
+  });
+
+  it("unsets an empty monitor pin before Studio or an explicit command starts (skeptic 2026-11-08)", () => {
+    // An empty AMC_EXPECTED_MONITOR_FINGERPRINT= (.env, docker run -e) is an invalid fingerprint, not an unset one: Studio and
+    // the CLI would refuse to read native-task history. Unset, verdicts are unanchored; a real pin passes through.
+    expect(entrypoint([], { bootstrap: false, pin: "" }).pins).toEqual([null]);
+    expect(entrypoint([], { pin: "" }).pins).toEqual([null, null]);
+    expect(entrypoint(["doctor"], { pin: "" }).pins).toEqual([null]);
+    expect(entrypoint([], { bootstrap: false, pin: "ab".repeat(32) }).pins).toEqual(["ab".repeat(32)]);
   });
 
   it("allows an initialized workspace to start with bootstrap disabled", () => {

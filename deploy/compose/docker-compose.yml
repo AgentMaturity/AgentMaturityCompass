@@ -41,8 +41,8 @@ services:
       # Native and A4 routes admit only the bind host or these browser origins (src/studio/nativeAdmission.ts). Append LAN/phone origins through AMC_EXTRA_ORIGINS; an origin is scheme://host[:port] with no path.
       - AMC_CORS_ALLOWED_ORIGINS=http://localhost:${AMC_STUDIO_PORT:-3212},http://127.0.0.1:${AMC_STUDIO_PORT:-3212},${AMC_EXTRA_ORIGINS:-}
       - AMC_QUERY_LEASE_CARRIER_ENABLED=${AMC_QUERY_LEASE_CARRIER_ENABLED:-false}
-      # Pin the workspace monitor key out of band: sha256 of /data/amc/.amc/keys/monitor_ed25519.pub, recorded at install. Empty leaves native-task verdicts unanchored, and they do not count as verified (P0-51).
-      - AMC_EXPECTED_MONITOR_FINGERPRINT=${AMC_EXPECTED_MONITOR_FINGERPRINT:-}
+      # Pin the workspace monitor key out of band: sha256 of /data/amc/.amc/keys/monitor_ed25519.pub, recorded at install, set in .env. Unset, native-task verdicts are unanchored and do not count as verified (P0-51). Passed only when set: an empty value is an invalid pin, and Studio and the CLI then refuse to read native-task history.
+      - AMC_EXPECTED_MONITOR_FINGERPRINT
       - AMC_VAULT_PASSPHRASE_FILE=/run/secrets/amc_vault_passphrase
       - AMC_BOOTSTRAP_OWNER_USERNAME_FILE=/run/secrets/amc_owner_username
       - AMC_BOOTSTRAP_OWNER_PASSWORD_FILE=/run/secrets/amc_owner_password
@@ -60,10 +60,11 @@ services:
     security_opt:
       - no-new-privileges:true
     # One host, no scheduler: 2 CPUs leave room for the in-container backup and verify runs that share this cgroup; the chart's 1-CPU limit is a cluster value.
+    # Docker refuses to create a container whose CPU limit exceeds the host's CPUs: on a 1-vCPU host set AMC_STUDIO_CPUS=1 in .env.
     deploy:
       resources:
         limits:
-          cpus: "2"
+          cpus: "${AMC_STUDIO_CPUS:-2}"
           memory: 2g
         reservations:
           memory: 512m

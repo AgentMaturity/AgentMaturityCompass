@@ -24,7 +24,7 @@ describe("combined Studio/API deployment contracts", () => {
     expect(base).toMatch(/handle\s*\{\s*reverse_proxy amc-studio:3212(?:\s*\{[^{}]*\{[^{}]*\}\s*\})?\s*\}/);
     expect(base).toContain("/__amc/proxy-health");
     expect(combined).toContain("not path /api/v1 /api/v1/*");
-    expect(combined).toMatch(/handle @standaloneApi\s*\{\s*reverse_proxy amc-api:3220\s*\}/);
+    expect(combined).toMatch(/handle @standaloneApi\s*\{\s*reverse_proxy amc-api:3220(?:\s*\{[^{}]*\{[^{}]*\}\s*\})?\s*\}/);
     expect(combined).toMatch(/handle @gateway\s*\{\s*reverse_proxy amc-studio:3210(?:\s*\{[^{}]*\{[^{}]*\}\s*\})?\s*\}/);
     // Actual Caddy execution requires its binary or a Docker daemon; this is a source contract.
   });
