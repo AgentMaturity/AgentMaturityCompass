@@ -292,6 +292,7 @@ import { installFatalHandlers } from "./runtime/fatalDiagnostic.js";
 import { initVaultInteractive, lockVaultNow, promptPassphrase, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
 import { forgetVaultPassphrase, unlockWithRememberedPassphrase } from "./vault/passphraseStore.js";
 import { confirmRememberedUnlock } from "./vault/operatorContext.js";
+import { ensureInstantVaultMode, type InstantVaultMode } from "./cli/instantVaultMode.js";
 import { ensureUpVaultPassphrase, printConsoleSignInStep, runFirstBaselineIfNeeded } from "./studio/oneCommandUp.js";
 import { agentRunFiles, latestRunSummary } from "./diagnostic/runReportResolution.js";
 import { buildConnectInstructions } from "./studio/connectWizard.js";
@@ -1413,56 +1414,10 @@ function ensureWorkspaceReadyForAgent(workspace: string, agentId?: string): void
   }
 }
 
-interface InstantVaultMode {
-  noSign: boolean;
-  createdLocalPassphrase: boolean;
-  localPassphrasePath: string | null;
-  reason: string | null;
-}
-
 interface InstantWorkspaceState {
   createdWorkspace: boolean;
   createdAgentContext: boolean;
   vault: InstantVaultMode;
-}
-
-function localVaultPassphrasePath(workspace: string): string {
-  return join(workspace, ".amc", "local-vault-passphrase");
-}
-
-function ensureInstantVaultMode(workspace: string): InstantVaultMode {
-  if ((process.env.AMC_VAULT_PASSPHRASE ?? "").length > 0 || vaultStatusNow(workspace).unlocked) { // unlocked: a remembered passphrase (B2)
-    return { noSign: false, createdLocalPassphrase: false, localPassphrasePath: null, reason: null };
-  }
-
-  const localPassphrase = localVaultPassphrasePath(workspace);
-  if (pathExists(localPassphrase)) {
-    const value = readUtf8(localPassphrase).trim();
-    if (value.length >= 8) {
-      process.env.AMC_VAULT_PASSPHRASE = value;
-      return { noSign: false, createdLocalPassphrase: false, localPassphrasePath: localPassphrase, reason: null };
-    }
-  }
-
-  const existingVault = join(workspace, ".amc", "vault.amcvault");
-  if (pathExists(existingVault)) {
-    return {
-      noSign: true,
-      createdLocalPassphrase: false,
-      localPassphrasePath: null,
-      reason: "Existing vault is locked and no passphrase is available; generated an unsigned full score."
-    };
-  }
-
-  const generated = `amc-local-${randomBytes(32).toString("base64url")}`;
-  writeFileAtomic(localPassphrase, `${generated}\n`, 0o600);
-  process.env.AMC_VAULT_PASSPHRASE = generated;
-  return {
-    noSign: false,
-    createdLocalPassphrase: true,
-    localPassphrasePath: localPassphrase,
-    reason: null
-  };
 }
 
 function ensureInstantWorkspace(workspace: string, agentId: string): InstantWorkspaceState {
