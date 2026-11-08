@@ -73,7 +73,7 @@ Run the pinned check on a schedule, **inside** the deployment: on the host that 
 amc verify all --json --expect-monitor <monitor sha256>
 ```
 
-- Docker: a cron line on the host, every 30 minutes, that alerts on failure. It reads the container's secret file (`AMC_VAULT_PASSPHRASE_FILE`) into the variable for this one command, as [the Compose runbook](deploy/reference/COMPOSE.md) does:
+- Docker: a cron line on the host, every 30 minutes, that alerts on failure. It reads the container's secret file (`AMC_VAULT_PASSPHRASE_FILE`) into the variable for this one command, as [the Compose runbook](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/deploy/reference/COMPOSE.md) does:
   ```cron
   */30 * * * * docker exec -w /data/amc amc-studio sh -c 'AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")" amc verify all --json --expect-monitor <monitor sha256>' > /var/log/amc-verify.json 2>&1 || <your alert command>
   ```

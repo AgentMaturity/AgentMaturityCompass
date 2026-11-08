@@ -106,7 +106,7 @@ Key rotation is supported via `amc vault rotate-keys`, which maintains key histo
 
 - Console accounts are the signed `.amc/users.yaml` (scrypt password hashes). AMC keeps at least one active OWNER: revoking or demoting the last one is refused. A revoked account cannot be reactivated. Passwords are reset with `amc user password` on the Studio host.
 - The Studio admin token (`.amc/studio/admin.token`) authorizes reads and non-account mutations, but it cannot create, revoke or re-role console accounts.
-- OIDC and SAML are host-scope and unqualified: no identity-provider interoperability has been recorded, and SAML accepts only AMC's compact JSON assertion ([SSO_OIDC.md](SSO_OIDC.md), [SSO_SAML.md](SSO_SAML.md)). SCIM is host-scope too ([SCIM.md](SCIM.md)).
+- OIDC and SAML are host-scope and unqualified: no identity-provider interoperability has been recorded, and SAML accepts only AMC's compact JSON assertion ([SSO_OIDC.md](SSO_OIDC.md), [SSO_SAML.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/SSO_SAML.md)). SCIM is host-scope too ([SCIM.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/SCIM.md)).
 - Keys from `amc api key create` are a hashed local store; no Studio HTTP route accepts them today ([API_SURFACES.md](API_SURFACES.md)).
 
 ## Network Security
