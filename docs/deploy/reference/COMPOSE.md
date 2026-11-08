@@ -43,7 +43,11 @@ TLS stack:
     A non-zero exit means no usable bundle: delete the output file and read the message.
 2. On the operator's machine, with `AMC_BACKUP_PASSPHRASE_FILE` pointing at a copy of the backup passphrase: `amc backup verify ./amc-<ts>.amcbackup --pubkey <recorded artifact-seal.pub>`. Record `/data/amc/.amc/keys/artifact-seal.pub` (the key that signs the bundle; `auditor_ed25519.pub` holds the same key) once, at install, from a source other than a backup.
 
-HTTP stack: the same commands with `-f docker-compose.yml` and service `studio`. Source stack: `-f docker/docker-compose.yml` and service `amc-studio`.
+HTTP stack: the same commands with `-f docker-compose.yml` and service `studio`. The source stack mounts no backup secret, so feed the backup passphrase on stdin there (its `/tmp` holds 64 MB):
+
+```bash
+docker compose -f docker/docker-compose.yml exec -T -w /data/amc amc-studio sh -c 'read -r AMC_BACKUP_PASSPHRASE; export AMC_BACKUP_PASSPHRASE; AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")" amc backup create --out /tmp/amc-backup.amcbackup >&2 && cat /tmp/amc-backup.amcbackup; status=$?; rm -f /tmp/amc-backup.amcbackup; exit $status' < ./backup-passphrase.txt > ./amc-$(date -u +%Y%m%dT%H%M%SZ).amcbackup
+```
 
 The state and checkpoint volumes are not in the bundle. Archive them through the same service, which uses each stack's real volume names, and keep the archive with the bundle. Stop Studio for it, so the copy is exact: on a running Studio GNU tar exits 1 when a file changes while it is read.
 
@@ -99,6 +103,8 @@ These steps are documented and were not run: no 1.1.1 Compose stack was availabl
         docker compose -f docker-compose.tls.yml run --rm --no-deps -T -v "$PWD/artifact-seal.pub":/in/artifact-seal.pub:ro --entrypoint sh amc-studio \
           -c 'cat > /tmp/restore.amcbackup && cd /data/amc && AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")" amc backup restore /tmp/restore.amcbackup --to /data/amc/.restore --pubkey /in/artifact-seal.pub' < ./amc-<ts>.amcbackup
         ```
+
+        On the source stack, which mounts no backup secret, send the passphrase line first: `{ cat ./backup-passphrase.txt; cat ./amc-<ts>.amcbackup; } | docker compose -f docker/docker-compose.yml run ...` with `read -r AMC_BACKUP_PASSPHRASE; export AMC_BACKUP_PASSPHRASE;` at the start of the `sh -c` script (documented; not run).
 
     3. Swap the workspace's `.amc` for the restored one, as [ROLLBACK.md](ROLLBACK.md) step 3 does: `docker compose -f docker-compose.tls.yml run --rm --no-deps --entrypoint sh amc-studio -c 'cd /data/amc && mv .amc .amc.rolled-back && mv .restore/.amc .amc'`.
     4. Restore the two volumes from their archive: `docker compose -f docker-compose.tls.yml run --rm --no-deps -T --entrypoint tar amc-studio -xzf - -C / < ./amc-volumes-<ts>.tgz`.
