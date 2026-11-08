@@ -86,7 +86,7 @@ describe("gateway pre-auth audit rows", () => {
 
   const listen = (server: Server) => new Promise<number>((done) => server.listen(0, "127.0.0.1", () => done((server.address() as { port: number }).port)));
 
-  async function start(options: { proxy?: boolean; queryCarrier?: boolean } = {}) {
+  async function start(options: { proxy?: boolean; queryCarrier?: boolean; queryCarrierOverride?: boolean } = {}) {
     const workspace = mkdtempSync(join(tmpdir(), "amc-gateway-preauth-"));
     roots.push(workspace);
     initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
@@ -104,7 +104,7 @@ describe("gateway pre-auth audit rows", () => {
       ...(options.proxy ? { proxy: { enabled: true, port: proxyPort, allowlistHosts: ["127.0.0.1"], denyByDefault: true } } : {}),
       ...(options.queryCarrier ? { lease: { allowQueryCarrier: true } } : {})
     }));
-    return { workspace, gateway: await startGateway({ workspace }), upstreamPort: port };
+    return { workspace, gateway: await startGateway({ workspace, ...(options.queryCarrierOverride === undefined ? {} : { allowQueryCarrierOverride: options.queryCarrierOverride }) }), upstreamPort: port };
   }
 
   function connectStatus(port: number, headers: Record<string, string>, authority: string): Promise<number> {
@@ -171,6 +171,23 @@ describe("gateway pre-auth audit rows", () => {
     const summaries = metas.filter((meta) => meta.suppressed !== undefined);
     expect(summaries.map((meta) => [meta.auditType, meta.suppressed])).toEqual(expect.arrayContaining([["LEASE_INVALID_OR_MISSING", 25], ["AGENT_PROVIDED_KEY_IGNORED", 15]]));
     expect(summaries).toHaveLength(2);
+  }, 60_000);
+
+  // Follow-up 7: Studio passes AMC_QUERY_LEASE_CARRIER_ENABLED (with signed LAN mode) as allowQueryCarrierOverride. The
+  // forward proxy honoured it and the main handler read the raw config instead, both ways round.
+  test.each([
+    { config: false, override: true, status: 200 },
+    { config: true, override: false, status: 401 }
+  ])("the main handler follows the query-carrier override (config $config, override $override)", async ({ config, override, status }) => {
+    const { workspace, gateway } = await start({ queryCarrier: config, queryCarrierOverride: override });
+    try {
+      const lease = issueLeaseForCli({ workspace, agentId: "default", ttl: "60m", scopes: "gateway:llm", routes: "/test",
+        models: "*", rpm: 1000, tpm: 1_000_000, maxCostUsdPerDay: null }).token;
+      expect(await call(gateway.port, { "x-amc-agent-id": "default" }, `/test/v1/x?amc_lease=${lease}`)).toBe(status);
+      expect(await call(gateway.port, { "x-amc-agent-id": "default", "x-amc-lease": lease })).toBe(200);
+    } finally {
+      await gateway.close();
+    }
   }, 60_000);
 
   // SR-3: a request that fails before its lease is checked (here an unparsable Host) used to write a request_error row.

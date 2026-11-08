@@ -1130,7 +1130,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       const leaseCarrier = extractLeaseCarrier({
         headers: req.headers,
         url: incomingUrl,
-        allowQueryCarrier: config.lease.allowQueryCarrier
+        allowQueryCarrier: resolvedConfig.lease.allowQueryCarrier // with the override, as the forward proxy reads it
       });
       const verifyLease = (model?: string | null) => verifyLeaseAndMapError({ workspace: options.workspace, expectedWorkspaceId: options.workspaceId,
         leaseToken: leaseCarrier.leaseToken ?? undefined, expectedAgentId: attributedAgentId, requiredScope: "gateway:llm", routePath: incomingUrl.pathname, model, upstreamId: route.upstream });
