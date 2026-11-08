@@ -4,6 +4,7 @@ import { startAcpStdio } from "./acpStdioMain.js";
 import { serveAcpStartupRefusal } from "./acpStartupRefusal.js";
 import { NATIVE_TASK_INITIATOR_ENV, NATIVE_TASK_LEASE_FD, NATIVE_TASK_LEASE_FD_ENV, NATIVE_TASK_SYSTEM_PROMPT_ENV } from "./acpRuntimeContracts.js";
 import { compactionFromFlags } from "../agent/compaction/promptPressure.js";
+import type { RunOptions } from "../cli-agent-options.js";
 
 /**
  * `amc acp` (plan P7.1a).
@@ -74,7 +75,7 @@ export function registerAcpCommands(program: Command): void {
     .option("--no-auto-compact", "Turn automatic compaction off (on by default for a reviewed model context window)")
     .option("--agent-id <id>", "Agent identity recorded in the ledger", "default")
     .option("--system-prompt <text>", "System prompt for each session", "You are a careful assistant.")
-    .action((opts: {
+    .action((opts: Pick<RunOptions, "thinking" | "reasoningEffort" | "thinkingBudget" | "cacheRetention" | "maxRetries" | "retryMaxDelay" | "maxSteps" | "contextWindow" | "compactThreshold" | "autoSummary" | "autoCompact"> & {
       provider: string;
       model?: string;
       baseUrl?: string;
@@ -96,17 +97,6 @@ export function registerAcpCommands(program: Command): void {
       mcpConfig?: string[];
       mcpConfigSha256?: string[];
       maxTokens: string;
-      thinking?: string;
-      reasoningEffort?: string;
-      thinkingBudget?: string;
-      cacheRetention?: string;
-      maxRetries?: string;
-      retryMaxDelay?: string;
-      maxSteps?: string;
-      contextWindow?: string;
-      compactThreshold?: string;
-      autoSummary?: boolean;
-      autoCompact?: boolean;
       agentId: string;
       systemPrompt: string;
     }) => {

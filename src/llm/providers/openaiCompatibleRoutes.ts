@@ -20,8 +20,8 @@ import { OPENAI_COMPATIBLE_CAPABILITIES } from "../adapter/providerCapabilities.
 import { isLoopbackHttp } from "../modelEnumeration.js";
 import { openaiAdapter } from "./openaiAdapter.js";
 
-export const OPENAI_COMPATIBLE_ADAPTER_ID = "openai-compatible-chat";
-export const AZURE_OPENAI_ADAPTER_ID = "azure-openai-chat";
+const OPENAI_COMPATIBLE_ADAPTER_ID = "openai-compatible-chat";
+const AZURE_OPENAI_ADAPTER_ID = "azure-openai-chat";
 
 export interface OpenaiCompatibleRoute {
   readonly providerId: string;
