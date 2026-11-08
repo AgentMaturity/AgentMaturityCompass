@@ -4,7 +4,7 @@
  */
 import { sha256Hex } from "../utils/hash.js";
 
-export interface OTelAnyValue {
+interface OTelAnyValue {
   stringValue?: string;
   intValue?: number;
   doubleValue?: number;

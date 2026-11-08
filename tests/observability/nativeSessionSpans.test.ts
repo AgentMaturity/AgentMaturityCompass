@@ -149,7 +149,13 @@ describe("end to end: a stub run exports a GenAI trace to a loopback OTLP collec
     expect(names).toContain("turn 1");
     expect(names).toContain("chat amc-stub-1");
     expect(names.some((name) => name.startsWith("execute_tool"))).toBe(true);
-    expect(names.some((name) => name.startsWith("amc.evidence.")), "native rows are folded, not emitted as 1 ms evidence spans").toBe(false);
+    // Native session rows are folded, never emitted as 1 ms evidence spans. Rows without a session envelope (here the
+    // budgets module's own `native-budget-*` audit rows) are not native session rows and keep today's evidence span.
+    const strayNative = spans.filter((span) => span.name.startsWith("amc.evidence.")
+      && (span as unknown as { attributes: Array<{ key: string; value: { stringValue?: string } }> }).attributes.some((a) => a.key === "amc.session.id" && a.value.stringValue === sessionId));
+    expect(strayNative.map((span) => span.name), "native rows are folded, not emitted as 1 ms evidence spans").toEqual([]);
+    expect(spans.filter((span) => span.name.startsWith("amc.evidence.")).every((span) => (span as unknown as { attributes: Array<{ key: string; value: { stringValue?: string } }> }).attributes
+      .some((a) => a.key === "amc.session.id" && a.value.stringValue?.startsWith("native-budget-"))), "only budget bookkeeping rows keep evidence spans").toBe(true);
     const json = JSON.stringify(received);
     expect(json).not.toContain("hello"); // no prompt content leaves the process
     const metricsBodies = received.filter((r) => r.path === "/v1/metrics");
@@ -169,7 +175,8 @@ describe("end to end: a stub run exports a GenAI trace to a loopback OTLP collec
     const preview = JSON.parse(logs.join("\n")) as { export: string; requests: Array<{ signal: string; endpoint: string; payload: any }> };
     expect(preview.export).toBe("enabled");
     const previewNames = preview.requests.find((r) => r.signal === "traces")!.payload.resourceSpans[0].scopeSpans[0].spans.map((span: Span) => span.name).sort();
-    expect(previewNames).toEqual(names.sort());
+    // The preview folds the session alone; the collector also saw the non-native evidence spans checked above.
+    expect(previewNames).toEqual(names.filter((name) => !name.startsWith("amc.evidence.")).sort());
     expect(logs.join("\n")).not.toContain("top-secret-token");
     expect(preview.requests[0]!.endpoint).toBe(base);
   });

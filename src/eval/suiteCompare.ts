@@ -7,10 +7,9 @@
  */
 import { z } from "zod";
 import { budgetMeta, readBudgetEvents } from "../budgets/nativeBudgetUsage.js";
-import { openLedger } from "../ledger/ledger.js";
 import { sha256Hex } from "../utils/hash.js";
 import { wilsonInterval } from "../experiments/stats.js";
-import { EVAL_RESULTS_SCHEMA, EVAL_SUITE_RUN_AUDIT } from "./suiteRunner.js";
+import { appendSealedEvalAudit, EVAL_RESULTS_SCHEMA, EVAL_SUITE_RUN_AUDIT } from "./suiteRunner.js";
 
 const EVAL_BASELINE_SCHEMA = "amc.eval-baseline/v1";
 const EVAL_SUITE_BASELINE_AUDIT = "EVAL_SUITE_BASELINE";
@@ -47,16 +46,8 @@ export function baselineFromResults(resultsJson: string): EvalBaseline {
 
 /** Signed record that this baseline (by digest) was derived from that run, so `compare` can refuse an edited baseline. */
 export function recordBaseline(workspace: string, baseline: EvalBaseline, baselineSha256: string): void {
-  const ledger = openLedger(workspace);
-  const sessionId = `eval-baseline-${baselineSha256.slice(0, 16)}`;
-  try {
-    ledger.startSession({ sessionId, runtime: "amc", binaryPath: "amc-eval-suite", binarySha256: baseline.suiteSha256 });
-    const meta = { trustTier: "OBSERVED", auditType: EVAL_SUITE_BASELINE_AUDIT, suiteId: baseline.suiteId, suiteSha256: baseline.suiteSha256, fromRunId: baseline.fromRunId, resultsSha256: baseline.resultsSha256, baselineSha256 };
-    ledger.appendEvidence({ sessionId, runtime: "amc", eventType: "audit", payload: JSON.stringify(meta), payloadExt: "json", inline: true, meta });
-    ledger.sealSession(sessionId);
-  } finally {
-    ledger.close();
-  }
+  appendSealedEvalAudit(workspace, `eval-baseline-${baselineSha256.slice(0, 16)}`, baseline.suiteSha256, { trustTier: "OBSERVED", auditType: EVAL_SUITE_BASELINE_AUDIT,
+    suiteId: baseline.suiteId, suiteSha256: baseline.suiteSha256, fromRunId: baseline.fromRunId, resultsSha256: baseline.resultsSha256, baselineSha256 });
 }
 
 /** Which of the two file digests the verified ledger vouches for. Verification failures surface as thrown errors. */

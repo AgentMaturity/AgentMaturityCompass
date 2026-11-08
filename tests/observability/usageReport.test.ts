@@ -20,8 +20,10 @@ function withReportedUsage(rows: readonly EvidenceEvent[], headerId: string, ts:
   return rows.map((row) => {
     const meta = JSON.parse(row.meta_json) as Record<string, unknown>;
     if (row.id === headerId) {
-      const route = meta.physicalRoute && typeof meta.physicalRoute === "object" ? { physicalRoute: { ...(meta.physicalRoute as Record<string, unknown>), providerId: "anthropic", model } } : {};
-      return { ...row, ts, meta_json: JSON.stringify({ ...meta, providerId: "anthropic", model, ...route }) };
+      // The route identity fields (physical route, model metadata snapshot, identity digest) are signed over their own
+      // provider and model; a fixture cannot recompute them, and the header parser accepts their absence.
+      const { physicalRoute: _route, routingDecision: _decision, modelMetadata: _snapshot, requestIdentityDigest: _identity, ...rest } = meta;
+      return { ...row, ts, meta_json: JSON.stringify({ ...rest, providerId: "anthropic", model }) };
     }
     if ((row.event_type === "request/response") && meta.headerEventId === headerId) {
       return { ...row, meta_json: JSON.stringify({ ...meta, providerId: "anthropic", dispatchAttempted: true, durationMs: 120,
@@ -94,11 +96,14 @@ describe("usage report", () => {
     const report = JSON.parse(logs.join("\n")) as { schema: string; verification: string; buckets: Array<{ key: string; syntheticRequests: number }> };
     expect(report.schema).toBe("amc.usage-report/v1");
     expect(report.verification).toBe("signed-rows (unanchored)");
-    expect(report.buckets).toEqual([expect.objectContaining({ key: "stub", syntheticRequests: 2 })]);
+    // One tool-less stub session is one request: the stub answers the prompt and the turn ends.
+    expect(report.buckets).toEqual([expect.objectContaining({ key: "stub", requests: 1, syntheticRequests: 1 })]);
     expect(process.exitCode).toBeUndefined();
 
     const target = allEvents(ws).find((row) => row.event_type === "request/header")!;
     const db = new Database(join(ws, ".amc", "evidence.sqlite"));
+    // The schema's own triggers refuse the edit; an attacker with the file drops them first, so the test does too.
+    for (const trigger of ["protect_evidence_immutable", "no_delete_evidence", "no_update_evidence"]) db.exec(`DROP TRIGGER IF EXISTS ${trigger}`);
     db.prepare("UPDATE evidence_events SET writer_sig = 'forged' WHERE id = ?").run(target.id);
     db.close();
     logs.length = 0;
