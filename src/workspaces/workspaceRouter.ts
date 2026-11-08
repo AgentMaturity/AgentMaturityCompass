@@ -14,6 +14,7 @@ import { admitLoginAttempt, createLoginThrottle, LOGIN_THROTTLED_ERROR } from ".
 import { ipAllowedByCidrs, requestUsesHttps, resolveClientAddress, withLoopbackCidrs } from "../studio/clientAddress.js";
 import { allowedHostnamesFrom, hostAllowed } from "../studio/hostAllow.js";
 import { applySecurityHeaders, SECURITY_HEADER_NAMES } from "../studio/securityHeaders.js";
+import { applyServerTimeouts } from "../studio/serverTimeouts.js";
 import { WorkspaceManager } from "./workspaceManager.js";
 import { proxyStudioWorkspaceRequest } from "./workspaceStudioProxy.js";
 import { WorkspaceRuntimeRegistry, WorkspaceRuntimeClosingError } from "./workspaceRuntimeRegistry.js";
@@ -71,6 +72,7 @@ interface WorkspaceApiRuntime {
 interface HostRuntime {
   host: string;
   port: number;
+  server: Server;
   close: () => Promise<void>;
 }
 
@@ -1742,6 +1744,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
     }
   });
 
+  applyServerTimeouts(server, { requestTimeout: 120_000 }); // LIVE-RUNTIME-12
   await new Promise<void>((resolvePromise, rejectPromise) => {
     server.once("error", rejectPromise);
     server.listen(options.port, options.host, () => resolvePromise());
@@ -1751,6 +1754,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
   return {
     host: options.host,
     port: typeof bound === "object" && bound ? bound.port : options.port,
+    server,
     close: () => {
       if (shutdown) return shutdown;
       hostEvents.closeAll();

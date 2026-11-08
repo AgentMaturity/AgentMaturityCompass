@@ -41,6 +41,7 @@ import { checkEgress, EgressBlocked } from "../residency/checkEgress.js";
 import { parseConnectAuthority } from "./connectResidency.js";
 import { ipAllowedByCidrs as ipAllowedByList, LOOPBACK_CIDRS, requestUsesHttps, socketIp } from "../studio/clientAddress.js";
 import { applySecurityHeaders } from "../studio/securityHeaders.js";
+import { applyServerTimeouts } from "../studio/serverTimeouts.js";
 import { DEFAULT_GATEWAY_MAX_REQUEST_BYTES, readAll, readBoundedBody, refuseOversizedRequest } from "./requestBody.js";
 import { withoutUrlQueries } from "./logSafe.js";
 import { createPreAuthAuditLimiter, type PreAuthAuditLimiter } from "./preAuthAudit.js";
@@ -73,6 +74,7 @@ export interface GatewayHandle {
   signatureExists: boolean;
   proxyEnabled: boolean;
   proxyPort: number | null;
+  server: Server;
   close: () => Promise<void>;
 }
 interface ParsedJsonInfo {
@@ -1005,6 +1007,7 @@ function createProxyServer(params: {
   };
   proxy.on("connect", (req: IncomingMessage, clientSocket: Duplex, head: Buffer) => { onConnect(req, clientSocket, head).catch(contain(() => clientSocket.destroy())); });
 
+  applyServerTimeouts(proxy); // LIVE-RUNTIME-12
   return proxy;
 }
 
@@ -1629,6 +1632,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
     }
   });
 
+  applyServerTimeouts(server); // LIVE-RUNTIME-12: keep-alive above the proxy's idle timeout; requestTimeout stays Node's (long uploads)
   await new Promise<void>((resolvePromise, rejectPromise) => {
     server.once("error", rejectPromise);
     server.listen(runtimeListenPort, runtimeListenHost, () => resolvePromise());
@@ -1677,6 +1681,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
     signatureExists: signature.signatureExists,
     proxyEnabled: config.proxy.enabled,
     proxyPort,
+    server,
     close: async () => {
       await new Promise<void>((resolvePromise) => {
         server.close(() => resolvePromise());

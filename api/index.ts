@@ -19,6 +19,7 @@ import { fileURLToPath } from 'node:url';
 import { amcVersion } from '../src/version.js';
 import { secretEquals } from '../src/utils/secretEquals.js';
 import { applySecurityHeaders } from '../src/studio/securityHeaders.js';
+import { applyServerTimeouts } from '../src/studio/serverTimeouts.js';
 import { questionBank } from '../src/diagnostic/questionBank.js';
 import { listAssurancePacks } from '../src/assurance/packs/index.js';
 import { listIndustryPacks } from '../src/domains/industryPacks.js';
@@ -459,8 +460,15 @@ try {
   // Embedders may supply an argv entry that is not a local file.
 }
 
-if (invokedFile === currentFile) {
+/** The hosted API server, with keep-alive above a platform proxy's idle timeout (LIVE-RUNTIME-12). */
+function createApiServer(): http.Server {
   const server = http.createServer(handleRequest);
+  applyServerTimeouts(server, { requestTimeout: 120_000 });
+  return server;
+}
+
+if (invokedFile === currentFile) {
+  const server = createApiServer();
   server.listen(PORT, () => {
     const address = server.address();
     const actualPort = address && typeof address === 'object' ? address.port : PORT;
@@ -472,4 +480,4 @@ if (invokedFile === currentFile) {
 }
 
 export default handleRequest;
-export { handleRequest, computeQuickScore, generateBadgeSvg };
+export { handleRequest, computeQuickScore, generateBadgeSvg, createApiServer };

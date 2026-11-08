@@ -3,7 +3,7 @@ import http, { createServer, request as httpRequest, type IncomingHttpHeaders } 
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { handleRequest } from "../api/index.js";
+import { createApiServer, handleRequest } from "../api/index.js";
 import { initUsersConfig } from "../src/auth/authApi.js";
 import { gatewayConfigSchema, initGatewayConfig } from "../src/gateway/config.js";
 import { startGateway } from "../src/gateway/server.js";
@@ -126,3 +126,37 @@ describe("host router, gateway and hosted API", () => {
     expectJsonHeaders((await send(port, "/api/health")).headers, "/api/health");
   }, 60_000);
 });
+
+// LIVE-RUNTIME-12 (D-R9): keep-alive above a reverse proxy's idle timeout, headers timeout above it, a request timeout
+// on every server but the gateway (long uploads).
+describe("server timeouts", () => {
+  const expectTimeouts = (server: http.Server, requestTimeout: number | null, label: string): void => {
+    expect(server.keepAliveTimeout, label).toBe(65_000);
+    expect(server.headersTimeout, label).toBe(70_000);
+    if (requestTimeout !== null) expect(server.requestTimeout, label).toBe(requestTimeout);
+  };
+
+  test("Studio, the router, the gateway and the hosted API", async () => {
+    const api = await studio();
+    expectTimeouts(api.server, 120_000, "studio");
+    const hostDir = dir("amc-timeouts-host-");
+    initHostDb(hostDir);
+    const router = await startWorkspaceRouter({ hostDir, host: "127.0.0.1", port: 0 });
+    closers.push(() => router.close());
+    expectTimeouts(router.server, 120_000, "router");
+    const workspace = dir("amc-timeouts-gateway-");
+    initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+    initGatewayConfig(workspace, gatewayConfigSchema.parse({
+      listen: { host: "127.0.0.1", port: 0 },
+      redaction: { headerKeysDenylist: ["authorization"], jsonPathsDenylist: [], textRegexDenylist: [] },
+      upstreams: { test: { baseUrl: "http://127.0.0.1:9", auth: { type: "none" }, allowLocalhost: true } },
+      routes: [{ prefix: "/test", upstream: "test", stripPrefix: true, openaiCompatible: false }]
+    }));
+    const gateway = await startGateway({ workspace });
+    closers.push(() => gateway.close());
+    expectTimeouts(gateway.server, null, "gateway");
+    expect(gateway.server.requestTimeout, "the gateway keeps Node's request timeout").toBe(createServer().requestTimeout);
+    expectTimeouts(createApiServer(), 120_000, "hosted API");
+  }, 60_000);
+});
+

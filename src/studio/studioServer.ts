@@ -123,6 +123,7 @@ import { ipAllowedByCidrs, LOOPBACK_CIDRS, requestUsesHttps, resolveClientAddres
 import { allowedHostnamesFrom, hostAllowed } from "./hostAllow.js";
 import { applySecurityHeaders, isConsoleStaticAsset } from "./securityHeaders.js";
 import { missingOutcomeContract, missingStandardSchema, missingValueInput, type EmptyState } from "./emptyStates.js";
+import { applyServerTimeouts } from "./serverTimeouts.js";
 import { createNativeTaskService } from "./nativeTaskService.js";
 import { isNativeApprovalMutationPath, isNativeStudioPath, nativeAllowedBrowserOrigins, nativeCsrfTokenForSession } from "./nativeAdmission.js";
 import { admitStudioApproval } from "./studioApprovalAdmission.js";
@@ -8485,6 +8486,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
     }
   });
 
+  applyServerTimeouts(server, { requestTimeout: 120_000 }); // LIVE-RUNTIME-12
   server.on("connection", (socket: Socket) => {
     openSockets.add(socket);
     socket.on("close", () => {
