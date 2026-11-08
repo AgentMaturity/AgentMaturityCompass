@@ -9,6 +9,7 @@ import { lockVault } from "../src/vault/vault.js";
 import { startGateway, type GatewayHandle } from "../src/gateway/server.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { verifyLedgerIntegrity, verifyNativeSessionContinuation } from "../src/ledger/ledgerVerification.js";
+import { GATEWAY_SESSION_STALE_AFTER_MS } from "../src/ledger/sessionLiveness.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { resumeSession } from "../src/session/sessionResume.js";
 import { recoverSession } from "../src/session/sessionRecovery.js";
@@ -22,7 +23,7 @@ beforeEach(async () => {
   prior = process.env.AMC_VAULT_PASSPHRASE; process.env.AMC_VAULT_PASSPHRASE = "synthetic-continuation-vault";
   root = mkdtempSync(join(tmpdir(), "amc-native-continuation-"));
   initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
-  gateway = await startGateway({ workspace: root, listenPort: 0, logger: { log() {}, error() {} } });
+  gateway = await startGateway({ workspace: root, listenPort: 0, proxyPort: 0, logger: { log() {}, error() {} } });
 });
 afterEach(async () => {
   for (const owner of owners.splice(0)) await owner.kill();
@@ -58,10 +59,12 @@ function resumeAsRecorded(sessionId: string) {
     compositionDigest: meta.compositionDigest, policyDigest: meta.policyDigest });
 }
 
-test("a real live gateway permits verified native handoff without becoming a cold complete-ledger success", async () => {
+// LIVE-INTEGRITY-01 rewrote the cold-verdict assertions below: they pinned D9 (a live gateway session was a chain error).
+// A live legacy session is now named in liveLegacy and the complete verdict holds; the continuation shape is unchanged.
+test("a real live gateway permits verified native handoff, and the cold complete verdict names it as open", async () => {
   const sessionId = released(), before = rows(), gatewayId = before.find(row => row.runtime === "gateway")!.session_id;
   const cold = verifyLedgerIntegrity(root);
-  expect(cold.chain.ok).toBe(false); expect(cold.chain.errors).toContain(`Session ${gatewayId} missing seal`);
+  expect(cold).toMatchObject({ ok: true, errors: [] }); expect(cold.sessions.liveLegacy.map(open => open.sessionId)).toEqual([gatewayId]);
   const prefix = verifyNativeSessionContinuation(root, sessionId);
   expect(prefix.scope).toBe("verified-prefix"); expect(prefix.chain).toEqual({ ok: true, errors: [] });
   expect(prefix.incompleteLegacySessions).toEqual([gatewayId]); expect(prefix).not.toHaveProperty("ok");
@@ -69,7 +72,7 @@ test("a real live gateway permits verified native handoff without becoming a col
   try { expect(resumed.report.verdict).toBe("RESUMED"); expect(resumed.service.sessionId).toBe(sessionId); resumed.service.releaseWithoutClosing(); }
   finally { resumed.service.disposeWithoutClosing(); }
   expect(rows().slice(0, before.length)).toEqual(before);
-  expect(verifyLedgerIntegrity(root).chain.ok).toBe(false);
+  expect(verifyLedgerIntegrity(root).chain).toEqual({ ok: true, errors: [] });
   await gateway!.close(); gateway = undefined;
   expect(verifyLedgerIntegrity(root).chain).toEqual({ ok: true, errors: [] });
 });
@@ -80,7 +83,7 @@ test("direct recovery claims a genuinely dead native writer while the gateway st
   const recovered = recoverSession({ workspace: root, sessionId, claimant, force: true, staleAfterMs: 0 });
   expect(recovered.verdict).toBe("RECOVERED"); expect(recovered.unknownToolOutcomes).toBe(1);
   expect(verifyNativeSessionContinuation(root, sessionId).chain).toEqual({ ok: true, errors: [] });
-  expect(verifyLedgerIntegrity(root).chain.ok).toBe(false);
+  expect(verifyLedgerIntegrity(root).chain).toEqual({ ok: true, errors: [] });
   expect(() => resume(sessionId)).toThrow(/original execution settings and signed policy/);
   const resumed = resumeAsRecorded(sessionId);
   try { resumed.service.releaseWithoutClosing(); } finally { resumed.service.disposeWithoutClosing(); }
@@ -121,10 +124,44 @@ test("a present malformed seal on the open native target is refused, and a legac
   expect(() => resume(sessionId)).toThrow();
 });
 
+test("a live gateway session verifies and is named open; a wrong pin still fails; a sealed one is no longer named", async () => {
+  const gatewayId = rows().find(row => row.runtime === "gateway")!.session_id;
+  const complete = verifyLedgerIntegrity(root);
+  expect(complete).toMatchObject({ ok: true, errors: [] });
+  expect(complete.sessions.liveLegacy).toEqual([expect.objectContaining({ sessionId: gatewayId, runtime: "gateway" })]);
+  expect(verifyLedgerIntegrity(root, { expectedMonitorFingerprint: "0".repeat(64) }).ok).toBe(false);
+  await gateway!.close(); gateway = undefined;
+  const sealed = verifyLedgerIntegrity(root);
+  expect(sealed.ok).toBe(true);
+  expect(sealed.sessions.liveLegacy).toEqual([]);
+});
+
+test.each(["unrelated-signature", "ended-unsealed"] as const)("%s is never explained away as an open session", async (kind) => {
+  const gatewayRow = rows().find(row => row.runtime === "gateway")!;
+  if (kind === "ended-unsealed") { await gateway!.close(); gateway = undefined; }
+  raw(db => {
+    const result = kind === "ended-unsealed"
+      ? db.prepare("UPDATE sessions SET session_final_event_hash = NULL, session_seal_sig = NULL WHERE session_id = ?").run(gatewayRow.session_id)
+      : db.prepare("UPDATE evidence_events SET writer_sig = ? WHERE id = ?").run("invalid-fixture-signature", gatewayRow.id);
+    expect(result.changes).toBe(1);
+  });
+  const complete = verifyLedgerIntegrity(root);
+  expect(complete.ok).toBe(false);
+  expect(complete.sessions.liveLegacy.map(open => open.sessionId)).not.toContain(gatewayRow.session_id);
+});
+
 test("an ended unrelated legacy session with its seal removed remains a continuation failure", async () => {
   const sessionId = released(), gatewayId = rows().find(row => row.runtime === "gateway")!.session_id;
   await gateway!.close(); gateway = undefined;
   raw(db => { expect(db.prepare("UPDATE sessions SET session_final_event_hash = NULL, session_seal_sig = NULL WHERE session_id = ?").run(gatewayId).changes).toBe(1); });
   expect(verifyNativeSessionContinuation(root, sessionId).chain.ok).toBe(false);
   expect(() => resume(sessionId)).toThrow("TAMPERED");
+});
+
+test("an unended stale legacy session is a continuation failure", () => {
+  const sessionId = released(), gatewayId = rows().find(row => row.runtime === "gateway")!.session_id;
+  const stale = verifyNativeSessionContinuation(root, sessionId, { now: Date.now() + GATEWAY_SESSION_STALE_AFTER_MS + 60_000 });
+  expect(stale.chain.ok).toBe(false);
+  expect(stale.chain.errors).toContain(`Session ${gatewayId} missing seal`);
+  expect(stale.incompleteLegacySessions).toEqual([]);
 });

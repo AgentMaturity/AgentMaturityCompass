@@ -17,6 +17,7 @@ function humanTypeFor(auditType: string): string | null {
     if (auditType === "CONSOLE_TARGET_DRAFT_APPLIED") return "HUMAN_TARGET_APPLY";
     if (auditType === "POLICY_PACK_APPLIED" || auditType === "HUMAN_POLICY_PACK_APPLY") return "HUMAN_POLICY_PACK_APPLY";
     if (auditType === "HUMAN_FREEZE_LIFT") return "HUMAN_FREEZE_LIFT";
+    if (auditType === "USER_CHANGE") return "HUMAN_USER_CHANGE";
     if (auditType.startsWith("OPS_")) return "HUMAN_OPS_ACTION";
     if (auditType.startsWith("ORG_")) return "HUMAN_ORG_ACTION";
     return null;

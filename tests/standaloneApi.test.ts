@@ -1,7 +1,6 @@
 import http from "node:http";
-import { generateKeyPairSync } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { handleRequest, computeQuickScore } from "../api/index.js";
 import { questionBank } from "../src/diagnostic/questionBank.js";
 import { listAssurancePacks } from "../src/assurance/packs/index.js";
@@ -87,20 +86,10 @@ describe("standalone API compatibility and readiness", () => {
     expect(JSON.parse(response.body).status).toBe("ok");
   });
   it("preserves catalog access, badge, discovery and unknown-route behavior", async () => {
-    vi.stubEnv("AMC_INDUSTRY_PACKS_CHECKOUT_URL", "");
-    try {
-      const access = await fetch(`${origin}/api/industry-packs/access`, { signal: AbortSignal.timeout(5000) });
-      expect(access.status).toBe(200);
-      expect(await access.json()).toMatchObject({ checkoutUrl: null, checkoutAvailable: false });
-      vi.stubEnv("AMC_INDUSTRY_PACKS_CHECKOUT_URL", "https://checkout.example.invalid/amc");
-      // P1-51: checkout is live only when a payment could become a licence (issuing key and admin path configured).
-      vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY", generateKeyPairSync("ed25519").privateKey.export({ type: "pkcs8", format: "pem" }).toString());
-      vi.stubEnv("AMC_INDUSTRY_PACKS_ADMIN_TOKEN", "local-test-admin-token");
-      const configured = await fetch(`${origin}/api/industry-packs/access`);
-      const body = await configured.json();
-      expect(body.checkoutAvailable).toBe(true);
-      expect(body.checkoutUrl).toMatch(/^https:\/\/checkout\.example\.invalid\/amc\?/);
-    } finally { vi.unstubAllEnvs(); }
+    // Industry Packs are free: access answers with no price and no checkout (tests/industryPacksHostedApi.test.ts).
+    const access = await fetch(`${origin}/api/industry-packs/access`, { signal: AbortSignal.timeout(5000) });
+    expect(access.status).toBe(200);
+    expect(await access.json()).toMatchObject({ priceUsdMonthly: "0.00", checkoutUrl: null, checkoutAvailable: false });
     const badge = await fetch(`${origin}/api/badge/legacy`);
     expect(badge.status).toBe(200);
     expect(badge.headers.get("X-AMC-Score-Basis")).toBe("placeholder-not-measured");

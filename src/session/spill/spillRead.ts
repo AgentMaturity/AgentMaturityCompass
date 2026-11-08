@@ -45,7 +45,7 @@ export function readSessionSpillRange(input: {
     throw new Error(`Spill limit must be an integer from 1 to ${MAX_SPILL_READ_BYTES} bytes.`);
   }
   if (input.events.length === 0) throw new Error("No signed session history is available; restore the matching evidence before reading retained output.");
-  const expectedMonitorFingerprint = input.options?.expectedMonitorFingerprint ?? process.env.AMC_EXPECTED_MONITOR_FINGERPRINT ?? null;
+  const expectedMonitorFingerprint = input.options?.expectedMonitorFingerprint ?? (process.env.AMC_EXPECTED_MONITOR_FINGERPRINT || null); // empty env: no pin
   if (expectedMonitorFingerprint !== null && !/^[a-f0-9]{64}$/.test(expectedMonitorFingerprint)) {
     throw new Error("Expected monitor fingerprint must be a complete lowercase SHA-256 obtained independently; omit it for an explicitly unanchored read.");
   }

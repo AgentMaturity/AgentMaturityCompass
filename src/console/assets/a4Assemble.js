@@ -198,7 +198,7 @@ function renderReview(ctx) {
         esc(row.reason)]), "None.")}
       <h4>Limitations</h4>${bullets(review.limitations)}
       <p class="muted">Lifecycle stage, as Review read it: <code>${esc(review.lifecycle?.stage)}</code>${review.lifecycle?.reason ? ` (${esc(review.lifecycle.reason)})` : ""};
-        unit_tests_passing <code>${esc(review.lifecycle?.unitTestsPassing)}</code>. Assemble does not advance it yet (the A4 lifecycle wrapper is not built).</p>` : ""}
+        unit_tests_passing <code>${esc(review.lifecycle?.unitTestsPassing)}</code>. Assemble does not advance it: A4 moves development → testing after Activate's release.</p>` : ""}
     ${["manifest_active", "build_sessions_integrity", "lifecycle_bridge", "composition_bound"].map((id) => status(ctx, id)).join("")}
     <label>Findings <textarea name="content" rows="3" maxlength="65536"></textarea></label>
     <div class="row wrap">${view.actionButton("Review", "review", view.stepOffer(ctx.allowed.review, ctx, "review"))}</div>`;

@@ -44,7 +44,7 @@ The inbox never reads "all clear" by default. A source that fails adds a `source
 - `attestation/review-packet.dsse.json`: a DSSE in-toto statement (P1-27's control-results predicate) whose subjects are every file above, signed with the workspace's artifact-seal key through its key provider.
 - `verifier/report.json`: the standalone verifier's report (P1-06) when the packet was built, against the builder's trust list. It is not a subject.
 
-To verify, run `amc-verify` on `attestation/review-packet.dsse.json` with your own trust list and root, and supply the packet's other files as evidence. Keys inside a packet only identify the signer; never verify a packet with a key it ships. No private key material is ever written: every file is scanned before signing. Verification and export stay free; the paid industry-pack gate is never consulted.
+To verify, run `amc-verify` on `attestation/review-packet.dsse.json` with your own trust list and root, and supply the packet's other files as evidence. Keys inside a packet only identify the signer; never verify a packet with a key it ships. No private key material is ever written: every file is scanned before signing. Verification and export stay free; there is no Industry Packs gate (Industry Packs are free too).
 
 ## Review timing (opt-in)
 

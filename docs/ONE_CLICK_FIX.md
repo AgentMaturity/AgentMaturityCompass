@@ -102,8 +102,9 @@ open a terminal — the download-first homepage now points here.
 - `amc fix --watch` (or the Studio toggle) re-checks on each change and offers the
   next fix when the score regresses or new gaps appear — the Diagnose → Fix →
   Re-score loop from the whitepaper, made one-click.
-- Industry Pro Packs ($19/user/month) add sector-specific fixes (HIPAA, EU AI
-  Act, etc.) to the same button for regulated teams.
+- Industry Packs, which are free, could later add sector-specific fixes (HIPAA,
+  EU AI Act, etc.) to the same button for regulated teams; `amc fix` does not
+  read pack answers today.
 
 ## 5. Implementation plan (small, low-risk)
 

@@ -45,7 +45,7 @@ A result is regulated when it asserts conformity with a law, regulation, standar
 
 The service reads no clock, file or environment: callers pass `now`. Changing `now` can only change staleness.
 
-Payment unlocks access, never a better result or a higher trust tier. The envelope copies `entitlement` through untouched, and no rule reads it.
+Access never gives a better result or a higher trust tier: Industry Packs are free, the envelope copies an `entitlement` input through untouched, and no rule reads it.
 
 ## Mappings
 
@@ -93,7 +93,7 @@ The industry-pack audit types `INDUSTRY_EVIDENCE_MISSING` and `INDUSTRY_EVIDENCE
 
 ### Diagnostic runs
 
-`envelopeForDiagnosticReport` keeps a run's real level (the mean of its layer levels), so surfaces that show diagnostic levels use it instead of the weak-method cap. A diagnostic run has no pass or fail of its own: it proposes a pass only when AMC's evidence-readiness gate (`evaluateDiagnosticEvidenceReadiness`) marks the run claim-eligible, and otherwise its result is `not_evaluated` with `EVIDENCE_NOT_CLAIM_READY`. A run that is not claim-ready has evidence `untrusted` when the gate finds it unverified (unsigned, invalid, failed verification, a crossed trust boundary, missing metadata or an import) or when it is labelled "UNRELIABLE — DO NOT USE FOR CLAIMS", and `incomplete` otherwise. A run whose status is `INVALID` or `UNSIGNED` also records `SIGNATURE_INVALID`, and a run with contradictions records `CONTRADICTORY_EVIDENCE`; neither can pass. The kind is `observed` only when the run's observed evidence coverage is above zero, otherwise `self_reported`.
+`envelopeForDiagnosticReport` keeps a run's real level (the mean of its layer levels), so surfaces that show diagnostic levels use it instead of the weak-method cap. A diagnostic run has no pass or fail of its own: it proposes a pass only when AMC's evidence-readiness gate (`evaluateDiagnosticEvidenceReadiness`) marks the run claim-eligible, and otherwise its result is `not_evaluated` with `EVIDENCE_NOT_CLAIM_READY`. A run that is not claim-ready has evidence `untrusted` when the gate finds it unverified (unsigned, invalid, failed verification, a crossed trust boundary, missing metadata or an import) or when it is labelled "UNRELIABLE — DO NOT USE FOR CLAIMS", and `incomplete` otherwise. A run whose status is `INVALID` or `UNSIGNED` also records `SIGNATURE_INVALID`, and a run with contradictions records `CONTRADICTORY_EVIDENCE`; neither can pass. A run made while the workspace's gateway is running verifies normally: the gateway's own live session is reported as open, never as a failure (see the verify section of docs/DEPLOYMENT_CHECKLIST.md for the liveness rule). The kind is `observed` only when the run's observed evidence coverage is above zero, otherwise `self_reported`.
 
 ### Other adapters
 
@@ -196,4 +196,4 @@ All fifteen tools in `src/mcp/amcMcpServer.ts` and `src/mcp/industryPackTools.ts
 
 ### Studio
 
-`src/studio/studioClaimOutput.ts` lists the Studio routes that feed result pages; Studio's JSON helper adds the claim fields to their 2xx bodies. The console shows each claim in a strip above the page (`src/console/assets/components/claimBadge.js`): the kind and result in a pill, the five dimensions in its tooltip, and a link to the legend, which the dashboard, transparency, compliance, assurance, passport and industry-packs pages show open. "Not evaluated" is a neutral pill with its reason, never 0 and never a failure. Pack-gate responses add `entitlementNote`, and claim fields are the same with or without entitlement.
+`src/studio/studioClaimOutput.ts` lists the Studio routes that feed result pages; Studio's JSON helper adds the claim fields to their 2xx bodies. The console shows each claim in a strip above the page (`src/console/assets/components/claimBadge.js`): the kind and result in a pill, the five dimensions in its tooltip, and one collapsed "How to read claim kinds" legend below the pills on every result page. "Not evaluated" is a neutral pill with its reason, never 0 and never a failure. Industry Packs responses add `entitlementNote` (Industry Packs are free; access never changes a result), and claim fields never depend on a licence.

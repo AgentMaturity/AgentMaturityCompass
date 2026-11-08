@@ -18,7 +18,7 @@ macOS/Linux: curl -fsSL https://agentmaturity.co/install.sh | sh
 Windows PowerShell: irm https://agentmaturity.co/install.ps1 | iex
 
 Verify a real signed evidence bundle yourself: https://agentmaturity.co/verify.html
-The installers pin a GitHub release and verify SHA-256 before execution. The npm registry and Homebrew tap are not public channels yet.
+The installers pin a GitHub release and verify SHA-256 before execution. npm also publishes the older 1.1.1 release; the Homebrew tap is not public yet.
 
 ## Full Score
 amc
@@ -27,11 +27,17 @@ amc
 - L0-L5 maturity scale based on execution evidence
 - Ed25519 + Merkle tree cryptographic proof chains
 - 244 default diagnostic questions across 5 trust dimensions, plus a 264-question lifecycle-expanded set
-- 14 framework adapters (LangChain, CrewAI, AutoGen, etc.)
+- 16 framework adapters (LangChain, CrewAI, AutoGen, etc.)
 - Signed adapter capability receipts separate declared/effective events and controls, runtime/version proof, hook mode, and lossiness; metadata-only adapters fail closed
-- 1,171 public CLI command paths
+- 1,268 public CLI command paths
 - Domain Proof Lane with amcproof artifacts for source-to-rule correctness checks
 - Evidence trust tiers: SELF_REPORTED (0.4x), OBSERVED (1.0x), CRYPTOGRAPHIC (1.0x)
+- 41 Industry Packs, free in the current source build with no licence, account or payment (the published 1.1.1 release still locks them): self-reported questionnaires whose content is experimental, AI-drafted until a named expert signs it; access never changes a result
+
+## A4 Forge (preview)
+- One agent from a brief to a recorded deployment in four stages: Aspire (conceptualization), Assemble (creation), Adapt (contextualization), Activate (commercialization); current source build only, off unless AMC_A4_PREVIEW=1
+- Every A4 record is signed and self-reported; no A4 output says the agent is safe, correct or lawful, and approvals inside one workspace are not independent review
+- [A4 Forge guide](https://agentmaturity.co/docs/#A4_FORGE)
 
 ## Links
 - [Website](https://agentmaturity.co/)

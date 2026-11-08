@@ -11,8 +11,8 @@ import { join } from "node:path";
  * Nothing imported it, so it enforced nothing; the hazard was that it sat there
  * looking wired, ready for someone to connect and quietly break the published
  * promise. Its sibling packRegistry.ts hardcoded every Industry Pack to
- * ENTERPRISE, contradicting the $9.99/month model in the README, and duplicated
- * the wired src/domains/industryPackEntitlement.ts.
+ * ENTERPRISE, contradicting the published pricing (Industry Packs are free since
+ * 2026-11-07, ADR 019), and duplicated src/domains/industryPackEntitlement.ts.
  *
  * Both are removed. This test keeps the published model and the code aligned.
  */

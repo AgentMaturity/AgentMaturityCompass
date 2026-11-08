@@ -18,6 +18,9 @@ import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { sha256Hex } from "../utils/hash.js";
 import { amcVersion } from "../version.js";
 import { verifyLedgerIntegrity } from "./ledgerVerification.js";
+import { openLedger } from "./ledger.js";
+import { sealableInterruptedSessions, sealInterruptedSessions, type InterruptedSession } from "./interruptedSessions.js";
+import { checkpointSealRefusals } from "./sealRefusals.js";
 
 export type RepairErrorClass = "missing_blob" | "payload_mismatch" | "signature_invalid"
   | "trust_root" | "ledger_missing" | "other_chain" | "governance";
@@ -29,8 +32,12 @@ export interface RepairPlan {
   errorCounts: Partial<Record<RepairErrorClass, number>>;
   /** The first 200 verifier messages. */
   errors: string[];
-  action: "none" | "archive_evidence_store";
+  action: "none" | "archive_evidence_store" | "seal_interrupted_sessions";
   files: StoreFile[];
+  /** seal_interrupted_sessions (D-INT-8): the sessions --apply seals, each with one signed interrupted-sealed marker. */
+  sessions?: InterruptedSession[];
+  /** SR-I1: why every failure was a missing seal and still none is sealed (a signed ledger checkpoint forbids it). */
+  sealRefused?: string[];
 }
 export interface RepairReceipt {
   v: 1; type: "amc.verify-repair"; id: string; createdAt: string; amcVersion: string;
@@ -96,6 +103,11 @@ export function planVerifyRepair(workspace: string, options: { expectedMonitorFi
     const kind = governance.has(message) ? "governance" : classify(message);
     errorCounts[kind] = (errorCounts[kind] ?? 0) + 1;
   }
+  // Every failure an interrupted legacy session's missing seal: seal those sessions instead of archiving the store.
+  const interrupted = !result.ok && result.governance.ok ? interruptedSessionsIn(workspace, result.chain.errors) : null;
+  if (interrupted && "sessions" in interrupted) {
+    return { verified: false, chainOk: false, errorCounts, errors: result.errors.slice(0, MAX_PLAN_ERRORS), action: "seal_interrupted_sessions", files: [], sessions: interrupted.sessions };
+  }
   // Nothing to archive when the evidence verified (governance-only failures need configs re-signed) or is already gone.
   const archive = !result.ok && !result.chain.ok && !errorCounts.ledger_missing;
   return {
@@ -104,8 +116,40 @@ export function planVerifyRepair(workspace: string, options: { expectedMonitorFi
     errorCounts,
     errors: result.errors.slice(0, MAX_PLAN_ERRORS),
     action: archive ? "archive_evidence_store" : "none",
-    files: archive ? evidenceStoreFiles(workspace) : []
+    files: archive ? evidenceStoreFiles(workspace) : [],
+    ...(interrupted ? { sealRefused: interrupted.refused } : {})
   };
+}
+
+/** The SQLite ledger only: a JSONL or Postgres session store keeps its session lifecycle elsewhere. */
+function interruptedSessionsIn(workspace: string, chainErrors: readonly string[]): { sessions: InterruptedSession[] } | { refused: string[] } | null {
+  const marker = readSessionStoreMarker(workspace);
+  if (marker === "jsonl" || marker === "postgres" || !fs.existsSync(join(workspace, ".amc", "evidence.sqlite"))) return null;
+  const ledger = openLedger(workspace, { readonly: true });
+  try {
+    const sessions = sealableInterruptedSessions(ledger, chainErrors, Date.now());
+    if (!sessions) return null;
+    const refused = checkpointSealRefusals(workspace, ledger, sessions.map((session) => session.sessionId));
+    return refused.length > 0 ? { refused } : { sessions };
+  } finally { ledger.close(); }
+}
+
+/**
+ * `--apply` for seal_interrupted_sessions (D-INT-8): one signed marker and the seal per planned session, all in one
+ * transaction, re-checked there, checkpoint refusals included (SR-I1). The CLI asks for the typed confirmation first. A
+ * locked vault throws before any write.
+ */
+export function sealPlannedSessions(workspace: string, plan: RepairPlan, now = Date.now()): string[] {
+  if (plan.action !== "seal_interrupted_sessions" || !plan.sessions?.length) throw new RepairRefused("nothing to seal: the plan's action is not seal_interrupted_sessions");
+  const ledger = openLedger(workspace);
+  try {
+    const ids = plan.sessions.map((session) => session.sessionId);
+    const refused = checkpointSealRefusals(workspace, ledger, ids);
+    if (refused.length > 0) throw new RepairRefused(`not sealing: ${refused.join("; ")}`);
+    return sealInterruptedSessions(ledger, { ids, recoveredBy: "amc verify --repair", now });
+  } finally {
+    ledger.close();
+  }
 }
 
 function quarantineId(now: Date): string {

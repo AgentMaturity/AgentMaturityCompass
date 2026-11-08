@@ -2,6 +2,6 @@
 "agent-maturity-compass": patch
 ---
 
-Check residency immediately before the Industry Packs online activation POST, using captured workspace scope and endpoint with manual redirects. Keep unknown scope conservative and capture local persistence inputs before the request.
+Industry Packs online activation, which this change gated on residency before its POST, is gone in this release: `amc domain pack activate` verifies a licence locally and sends no request (`industry-packs-paywall-truthful`), and Industry Packs are free (`industry-packs-free`), so no licence is needed for access.
 
-This is partial, unqualified P2-01 source. The local license shortcut, verifier, pricing and commercial model are unchanged. Injected transport behavior, response/persistence failure and execution qualification remain separate.
+This was partial, unqualified P2-01 source, and no activation request remains for it to gate.

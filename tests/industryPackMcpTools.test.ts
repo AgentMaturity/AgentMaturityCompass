@@ -1,7 +1,4 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { mkdtempSync, rmSync } from "node:fs";
-import { join } from "node:path";
-import { tmpdir } from "node:os";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
@@ -12,46 +9,22 @@ import {
   type IndustryPackId,
 } from "../src/domains/industryPacks.js";
 import { listDomainIds } from "../src/domains/domainRegistry.js";
-import { getIndustryPackEntitlement } from "../src/domains/industryPackEntitlement.js";
 import {
+  INDUSTRY_PACK_TOOL_METADATA,
   INDUSTRY_PACK_TOOL_NAMES,
   registerIndustryPackTools,
   type IndustryPackToolOptions,
 } from "../src/mcp/industryPackTools.js";
-import { testIndustryPackLicence } from "./helpers/industryPackLicence.js";
 
-const dirs: string[] = [];
 const clients: Client[] = [];
 afterEach(async () => {
   for (const c of clients) await c.close();
   clients.length = 0;
-  for (const d of dirs) rmSync(d, { recursive: true, force: true });
-  dirs.length = 0;
   vi.restoreAllMocks();
 });
 
-function workspace(): string {
-  const dir = mkdtempSync(join(tmpdir(), "amc-o17-"));
-  dirs.push(dir);
-  return dir;
-}
-
-/** Locked: the real resolver with an empty workspace and an AMC home that pins no licence key. */
-function lockedOptions(): IndustryPackToolOptions {
-  const ws = workspace();
-  const home = workspace();
-  return { resolveEntitlement: () => getIndustryPackEntitlement(ws, { AMC_HOME: home } as NodeJS.ProcessEnv) };
-}
-
-/** Active: the real resolver with a licence signed by a key pinned in a temp AMC home trust list (P1-51). */
-function activeOptions(): IndustryPackToolOptions {
-  const ws = workspace();
-  const licence = testIndustryPackLicence();
-  dirs.push(licence.amcHome);
-  return { resolveEntitlement: () => getIndustryPackEntitlement(ws, { ...licence.env } as NodeJS.ProcessEnv) };
-}
-
-async function connect(options: IndustryPackToolOptions): Promise<Client> {
+/** Industry Packs are free: the tools take no licence or entitlement. */
+async function connect(options: IndustryPackToolOptions = {}): Promise<Client> {
   const server = new McpServer({ name: "amc-test", version: "0.0.0" });
   registerIndustryPackTools(server, options);
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
@@ -92,7 +65,7 @@ const [LIST, GET, SCORE, SUMMARY] = [
 
 describe("industry pack MCP tools — registration", () => {
   it("registers exactly the four read-only tools", async () => {
-    const client = await connect(lockedOptions());
+    const client = await connect();
     const { tools } = await client.listTools();
     expect(tools.map((t) => t.name).sort()).toEqual([...INDUSTRY_PACK_TOOL_NAMES].sort());
     expect([...INDUSTRY_PACK_TOOL_NAMES].sort()).toEqual([LIST, GET, SCORE, SUMMARY].sort());
@@ -101,11 +74,18 @@ describe("industry pack MCP tools — registration", () => {
       expect(tool.annotations?.openWorldHint).toBe(false);
     }
   });
+
+  it("no tool description or metadata entry says a licence is needed: Industry Packs are free", async () => {
+    const { tools } = await (await connect()).listTools();
+    for (const description of [...tools.map((t) => t.description ?? ""), ...INDUSTRY_PACK_TOOL_METADATA.map((t) => t.description)]) {
+      expect(description).not.toMatch(/(needs|requires) an Industry Packs licence|\blocked\b/i);
+    }
+  });
 });
 
 describe("amc_list_industry_packs", () => {
   it("lists 41 packs across 7 stations", async () => {
-    const client = await connect(lockedOptions());
+    const client = await connect();
     const out = await call(client, LIST, {});
     expect(out.isError).toBe(false);
     const stations = out.body.stations as Array<{ stationId: string; packs: Array<{ packId: string; domain: string }> }>;
@@ -119,7 +99,7 @@ describe("amc_list_industry_packs", () => {
   });
 
   it("filters by station", async () => {
-    const client = await connect(lockedOptions());
+    const client = await connect();
     const out = await call(client, LIST, { station: "health" });
     const stations = out.body.stations as Array<{ stationId: string; packs: unknown[] }>;
     expect(stations).toHaveLength(1);
@@ -129,22 +109,19 @@ describe("amc_list_industry_packs", () => {
     expect(out.body.packCount).toBe(expected);
   });
 
-  it("shows the same public catalog fields with or without a licence; only locked differs (P1-51)", async () => {
-    const locked = await call(await connect(lockedOptions()), LIST, { station: "governance" });
-    const lockedPacks = (locked.body.stations as Array<{ packs: Array<Record<string, unknown>> }>)[0]!.packs;
-    for (const p of lockedPacks) {
-      expect(p.locked).toBe(true);
+  it("lists every pack unlocked, with its public catalog fields: Industry Packs are free", async () => {
+    const out = await call(await connect(), LIST, { station: "governance" });
+    const packs = (out.body.stations as Array<{ packs: Array<Record<string, unknown>> }>)[0]!.packs;
+    expect(packs.length).toBeGreaterThan(0);
+    for (const p of packs) {
+      expect(p.locked).toBe(false);
       expect(p.regulatoryBasis).toEqual(INDUSTRY_PACKS[p.packId as IndustryPackId].regulatoryBasis);
       expect(p.complianceFrameworks).toEqual(INDUSTRY_PACKS[p.packId as IndustryPackId].complianceFrameworks);
     }
-    const active = await call(await connect(activeOptions()), LIST, { station: "governance" });
-    const activePacks = (active.body.stations as Array<{ packs: Array<Record<string, unknown>> }>)[0]!.packs;
-    expect(activePacks.map((p) => ({ ...p, locked: true }))).toEqual(lockedPacks);
-    for (const p of activePacks) expect(p.locked).toBe(false);
   });
 
   it("rejects an unknown station and unknown arguments at the schema", async () => {
-    const client = await connect(lockedOptions());
+    const client = await connect();
     const bad = await call(client, LIST, { station: "mars" });
     expect(bad.isError).toBe(true);
     expect(bad.text).toMatch(/Input validation error/);
@@ -156,7 +133,7 @@ describe("amc_list_industry_packs", () => {
 
 describe("amc_get_industry_pack", () => {
   it("refuses an unknown pack id with a structured error, not a throw", async () => {
-    const client = await connect(activeOptions());
+    const client = await connect();
     const out = await call(client, GET, { packId: "no-such-pack" });
     expect(out.isError).toBe(true);
     expect(out.body.ok).toBe(false);
@@ -167,7 +144,7 @@ describe("amc_get_industry_pack", () => {
   });
 
   it("refuses prototype keys as unknown pack ids", async () => {
-    const client = await connect(activeOptions());
+    const client = await connect();
     for (const packId of ["__proto__", "constructor", "toString"]) {
       const out = await call(client, GET, { packId });
       expect(out.isError).toBe(true);
@@ -175,18 +152,8 @@ describe("amc_get_industry_pack", () => {
     }
   });
 
-  it("refuses with industry_packs_locked when the entitlement is inactive", async () => {
-    const client = await connect(lockedOptions());
-    const out = await call(client, GET, { packId: "clinical-trials" });
-    expect(out.isError).toBe(true);
-    const error = out.body.error as { code: string; message: string };
-    expect(error.code).toBe("industry_packs_locked");
-    expect(error.message).toMatch(/Industry Packs are locked/);
-    expect(out.text).not.toContain(INDUSTRY_PACKS["clinical-trials"].questions[0]!.text);
-  });
-
-  it("returns questions, regulatoryBasis, frameworks and EU AI Act class when active", async () => {
-    const client = await connect(activeOptions());
+  it("returns questions, regulatoryBasis, frameworks and EU AI Act class with no licence", async () => {
+    const client = await connect();
     const out = await call(client, GET, { packId: "clinical-trials" });
     expect(out.isError).toBe(false);
     const pack = INDUSTRY_PACKS["clinical-trials"];
@@ -202,21 +169,14 @@ describe("amc_get_industry_pack", () => {
 
 describe("amc_score_industry_pack", () => {
   it("refuses an unknown pack id with a structured error", async () => {
-    const client = await connect(activeOptions());
+    const client = await connect();
     const out = await call(client, SCORE, { packId: "no-such-pack", responses: {} });
     expect(out.isError).toBe(true);
     expect((out.body.error as { code: string }).code).toBe("unknown_pack_id");
   });
 
-  it("refuses when locked", async () => {
-    const client = await connect(lockedOptions());
-    const out = await call(client, SCORE, { packId: "farm-to-fork", responses: {} });
-    expect(out.isError).toBe(true);
-    expect((out.body.error as { code: string }).code).toBe("industry_packs_locked");
-  });
-
   it("refuses response keys that are not questions of the pack", async () => {
-    const client = await connect(activeOptions());
+    const client = await connect();
     const out = await call(client, SCORE, { packId: "farm-to-fork", responses: { "NOT-A-Q": 3 } });
     expect(out.isError).toBe(true);
     const error = out.body.error as { code: string; questionIds: string[] };
@@ -225,7 +185,7 @@ describe("amc_score_industry_pack", () => {
   });
 
   it("rejects out-of-range and non-integer levels at the schema", async () => {
-    const client = await connect(activeOptions());
+    const client = await connect();
     const qid = INDUSTRY_PACKS["farm-to-fork"].questions[0]!.id;
     for (const level of [0, 6, 2.5]) {
       const out = await call(client, SCORE, { packId: "farm-to-fork", responses: { [qid]: level } });
@@ -235,7 +195,7 @@ describe("amc_score_industry_pack", () => {
   });
 
   it("returns the shared scoreIndustryPack result, which leaves unanswered questions not evaluated", async () => {
-    const client = await connect(activeOptions());
+    const client = await connect();
     const pack = INDUSTRY_PACKS["digital-payments"];
     const all = Object.fromEntries(pack.questions.map((q) => [q.id, 4]));
     const full = await call(client, SCORE, { packId: pack.id, responses: all });
@@ -250,27 +210,19 @@ describe("amc_score_industry_pack", () => {
 });
 
 describe("amc_industry_station_summary", () => {
-  it("matches getStationSummary for all 7 stations when active", async () => {
-    const client = await connect(activeOptions());
+  it("matches getStationSummary, frameworks included, for all 7 stations", async () => {
+    const client = await connect();
     for (const stationId of listDomainIds()) {
       const out = await call(client, SUMMARY, { station: stationId });
       expect(out.isError).toBe(false);
       expect(out.body.summary).toEqual(getStationSummary(stationId));
     }
   });
-
-  it("returns the same summary, frameworks included, without a licence (P1-51)", async () => {
-    const client = await connect(lockedOptions());
-    const out = await call(client, SUMMARY, { station: "wealth" });
-    expect(out.isError).toBe(false);
-    expect(out.body.summary).toEqual(getStationSummary("wealth"));
-  });
 });
 
 describe("guards shared with the host server", () => {
   it("turns a beforeCall refusal into a structured rate_limited error", async () => {
     const client = await connect({
-      ...activeOptions(),
       beforeCall: () => {
         throw new Error("Rate limit exceeded");
       },
@@ -289,7 +241,7 @@ describe("guards shared with the host server", () => {
 
   it("makes no network calls", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("network forbidden"));
-    const client = await connect(activeOptions());
+    const client = await connect();
     await call(client, LIST, {});
     await call(client, GET, { packId: "blockchain" });
     await call(client, SCORE, { packId: "blockchain", responses: {} });

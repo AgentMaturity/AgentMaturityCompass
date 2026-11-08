@@ -1,44 +1,27 @@
-import { afterEach, describe, expect, it } from "vitest";
-import { mkdtempSync, rmSync } from "node:fs";
-import { join } from "node:path";
-import { tmpdir } from "node:os";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { INDUSTRY_PACKS } from "../src/domains/industryPacks.js";
-import { getIndustryPackEntitlement } from "../src/domains/industryPackEntitlement.js";
-import { registerIndustryPackTools, type IndustryPackToolOptions } from "../src/mcp/industryPackTools.js";
-import { testIndustryPackLicence, type TestIndustryPackLicence } from "./helpers/industryPackLicence.js";
+import { registerIndustryPackTools } from "../src/mcp/industryPackTools.js";
+import { testIndustryPackLicence } from "./helpers/industryPackLicence.js";
 
 /**
  * P1-44: every O17 tool result carries a claim kind from the shared service, scoring is self-reported and never
- * `certified`, unanswered questions are not evaluated (no default level), and a licence changes access, never a result.
+ * `certified`, and unanswered questions are not evaluated (no default level). Industry Packs are free: no tool needs a
+ * licence, and a legacy licence changes no result.
  */
 const cleanups: Array<() => void> = [];
 const clients: Client[] = [];
 afterEach(async () => {
   for (const c of clients.splice(0)) await c.close();
   for (const cleanup of cleanups.splice(0)) cleanup();
+  vi.unstubAllEnvs();
 });
 
-function workspace(): string {
-  const dir = mkdtempSync(join(tmpdir(), "amc-p144-"));
-  cleanups.push(() => rmSync(dir, { recursive: true, force: true }));
-  return dir;
-}
-
-/** A licence signed by a key pinned in a temp AMC home trust list (P1-51), or that home with no licence. */
-function options(licensed: boolean): IndustryPackToolOptions {
-  const licence: TestIndustryPackLicence = testIndustryPackLicence();
-  cleanups.push(licence.cleanup);
-  const ws = workspace();
-  const env = licensed ? { ...licence.env } : { AMC_HOME: licence.amcHome };
-  return { resolveEntitlement: () => getIndustryPackEntitlement(ws, env as NodeJS.ProcessEnv) };
-}
-
-async function connect(opts: IndustryPackToolOptions): Promise<Client> {
+async function connect(): Promise<Client> {
   const server = new McpServer({ name: "amc-p144", version: "0.0.0" });
-  registerIndustryPackTools(server, opts);
+  registerIndustryPackTools(server);
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   await server.connect(serverTransport);
   const client = new Client({ name: "p144", version: "0.0.0" });
@@ -82,7 +65,7 @@ const ALL_ANSWERED = Object.fromEntries(PACK.questions.map((q) => [q.id, 5]));
 
 describe("amc_score_industry_pack claims", () => {
   it("all questions answered: self_reported with status dimensions, and no certified key anywhere", async () => {
-    const out = await call(await connect(options(true)), "amc_score_industry_pack", { packId: PACK.id, responses: ALL_ANSWERED });
+    const out = await call(await connect(), "amc_score_industry_pack", { packId: PACK.id, responses: ALL_ANSWERED });
     expect(out.isError).toBe(false);
     expect(out.structured?.claimKind).toBe("self_reported");
     expect(out.structured?.statusDimensions).toMatchObject({ result: "not_evaluated", evidence: "incomplete" });
@@ -99,7 +82,7 @@ describe("amc_score_industry_pack claims", () => {
   it("one question unanswered: listed as not evaluated, and no level or percentage is computed", async () => {
     const [missing, ...answered] = PACK.questions;
     const responses = Object.fromEntries(answered.map((q) => [q.id, 4]));
-    const out = await call(await connect(options(true)), "amc_score_industry_pack", { packId: PACK.id, responses });
+    const out = await call(await connect(), "amc_score_industry_pack", { packId: PACK.id, responses });
     expect(out.isError).toBe(false);
     const result = out.body.result as Record<string, unknown>;
     expect(result.notEvaluatedQuestionIds).toEqual([missing!.id]);
@@ -112,7 +95,7 @@ describe("amc_score_industry_pack claims", () => {
   });
 
   it("the tool description says unanswered questions are not evaluated", async () => {
-    const { tools } = await (await connect(options(false))).listTools();
+    const { tools } = await (await connect()).listTools();
     const score = tools.find((t) => t.name === "amc_score_industry_pack")!;
     expect(score.description).toMatch(/not evaluated/i);
     expect(score.description).not.toMatch(/score as L1/i);
@@ -126,7 +109,7 @@ describe("every O17 result carries a claim kind", () => {
     ["amc_score_industry_pack", { packId: PACK.id, responses: ALL_ANSWERED }],
     ["amc_industry_station_summary", { station: "wealth" }],
   ] as const)("%s", async (name, args) => {
-    const out = await call(await connect(options(true)), name, args);
+    const out = await call(await connect(), name, args);
     expect(out.isError).toBe(false);
     expect(["synthetic_example", "self_reported", "observed", "independently_reviewed"]).toContain(out.structured?.claimKind);
     expect(out.structured?.statusDimensions).toBeDefined();
@@ -137,7 +120,7 @@ describe("every O17 result carries a claim kind", () => {
 
 describe("prototype keys are unknown packs", () => {
   it.each(["__proto__", "constructor", "toString"])("%s", async (packId) => {
-    const client = await connect(options(true));
+    const client = await connect();
     for (const [name, args] of [
       ["amc_get_industry_pack", { packId }],
       ["amc_score_industry_pack", { packId, responses: {} }],
@@ -149,36 +132,32 @@ describe("prototype keys are unknown packs", () => {
   });
 });
 
-describe("a licence changes access, never a result (D-06 = B)", () => {
-  it("list and station summary return the same result with and without a licence, apart from the locked flag", async () => {
-    const on = await connect(options(true));
-    const off = await connect(options(false));
-    const unlock = (body: Record<string, unknown>) => JSON.parse(JSON.stringify(body).replace(/"locked":(true|false)/g, '"locked":null'));
-    for (const [name, args] of [
+describe("Industry Packs are free: no licence is needed, and a legacy licence changes no result", () => {
+  it("every tool answers with no licence, unlocked, and identically, claim included, with a legacy licence", async () => {
+    const calls = [
       ["amc_list_industry_packs", {}],
       ["amc_list_industry_packs", { station: "health" }],
-      ["amc_industry_station_summary", { station: "governance" }],
-    ] as const) {
-      const [a, b] = [await call(on, name, args), await call(off, name, args)];
-      expect(unlock(a.body)).toEqual(unlock(b.body));
-      expect(a.structured?.claimKind).toBe(b.structured?.claimKind);
-    }
-  });
-
-  it("pack content and scoring are refused with the one paywall message while locked", async () => {
-    const off = await connect(options(false));
-    for (const [name, args] of [
       ["amc_get_industry_pack", { packId: PACK.id }],
       ["amc_score_industry_pack", { packId: PACK.id, responses: ALL_ANSWERED }],
-    ] as const) {
-      const out = await call(off, name, args);
-      expect(out.isError, name).toBe(true);
-      const error = out.body.error as { code: string; message: string };
-      expect(error.code).toBe("industry_packs_locked");
-      expect(error.message).toContain("Industry Packs are locked");
-      expect(error.message).toContain(name);
-      expect(error.message).toContain("it never changes a score");
-      expect(out.texts.join("\n")).not.toContain(PACK.questions[0]!.text);
+      ["amc_industry_station_summary", { station: "governance" }],
+    ] as const;
+    const free = await connect();
+    const unlicensed: Outcome[] = [];
+    for (const [name, args] of calls) {
+      const out = await call(free, name, args);
+      expect(out.isError, name).toBe(false);
+      unlicensed.push(out);
     }
+    const listed = (unlicensed[0]!.body.stations as Array<{ packs: Array<{ locked: boolean }> }>).flatMap((s) => s.packs);
+    expect(listed.length).toBeGreaterThan(0);
+    expect(listed.every((pack) => pack.locked === false)).toBe(true);
+    expect((unlicensed[2]!.body.pack as { questions: unknown }).questions).toEqual(PACK.questions);
+    expect(unlicensed[3]!.structured?.claimKind).toBe("self_reported");
+
+    const licence = testIndustryPackLicence();
+    cleanups.push(licence.cleanup);
+    for (const [key, value] of Object.entries(licence.env)) vi.stubEnv(key, value);
+    const licensed = await connect();
+    for (const [i, [name, args]] of calls.entries()) expect(await call(licensed, name, args), name).toEqual(unlicensed[i]);
   });
 });

@@ -2,6 +2,8 @@
 
 _Strategy note — 2026-07-14. Internal._
 
+_Update 2026-11-07: Industry Packs are free (ADR 019, `docs/adr/019-industry-packs-free.md`), so this note's plans to sell them are withdrawn and the lines that described them are updated._
+
 ## The one-sentence position
 
 **AMC is the trust layer for AI agents: the tool that decides whether an agent
@@ -29,9 +31,10 @@ AMC emits receipts. Everything below leans on that.
    fails a PR below a grade. Tools become defaults when they live in CI, not when
    they're run by hand. (AMC already has `amc run --fail-below`; package it as a
    marketplace Action with a 3-line setup.)
-2. **Win the free tier so hard that paid is obvious.** The whole trust stack is
-   MIT and free. The wedge to paid is *proof you can hand to someone else* —
-   which is exactly what the new Industry Pack Audit does (see below).
+2. **Win on free.** The whole product, the trust stack, the Industry Packs and
+   the Industry Pack Audit included, is MIT and free. The wedge is *proof you
+   can hand to someone else* — which is exactly what the Industry Pack Audit
+   does (see below).
 3. **Make the evidence portable and social.** The Passport + signed bundles let
    a vendor hand a buyer an AMC score they can verify offline. Every verified
    bundle is a distribution event. Push "verify anyone's agent" as a first-class
@@ -55,33 +58,34 @@ AMC emits receipts. Everything below leans on that.
   one-copy-paste Action. This is the habit-forming surface.
 
 **Next (deepen the wedge):**
-- **Industry Pack Audit → paid conversion.** Shipped this iteration (below).
-  Wire the checkout (AMC-450) so the paid tier is actually purchasable.
+- **Industry Pack Audit.** Shipped this iteration (below). Industry Packs are
+  free since 2026-11-07, so there is no checkout to wire.
 - **Continuous monitoring, not one-shot scoring.** A scheduled re-audit that
   alerts on drift turns AMC from a checkup into a heartbeat — and into a renewal.
 - **Extend the multi-framework crosswalk from Industry Packs to the core run.**
 
 **Later (widen the moat):**
 - **More sectors** for Industry Packs (insurance/NAIC, energy/NERC CIP,
-  telecom) — breadth sells the subscription.
+  telecom) — breadth widens adoption.
 - **Marketplace network effects** — community packs, ratings, install counts.
 - **Hosted verification endpoint** for teams that want a URL, not a CLI.
 
 ## How the Industry Pack Audit fits (shipped this iteration)
 
-The paid Industry Packs were a questionnaire. They are now an **audit
+The Industry Packs were a questionnaire. They are now an **audit
 deliverable**: for any pack, `amc domain apply --pack <id> --audit` produces a
 signed bundle that scores each control, maps it across EU AI Act / NIST / ISO
 42001 / SOC 2 + the sector regulation, states the expected evidence, and
 generates a concrete fix for every gap — tamper-evident via a recomputable
 receipt. That is the difference between "here's your score" and "here's the
-binder you hand your auditor," which is what a compliance buyer actually pays
-for. It directly advances moves 2, 3, and 4 above.
+binder you hand your auditor," which is what a compliance buyer actually
+needs. Pack answers stay self-reported and the content experimental, so the
+bundle is never a certification or a compliance verdict. It directly advances moves 2, 3, and 4 above.
 
 ## The scoreboard (what "default" looks like)
 
 - `npx agent-maturity-compass` works and trends on npm.
 - AMC runs in CI on real repos (Action installs, PRs gated).
 - Verified bundles circulate between vendors and buyers.
-- The paid Industry Pack Audit has live checkout and renewing subscribers.
+- Regulated teams run the free Industry Pack Audit and share its bundles.
 - "Is your agent AMC-graded?" is a question buyers start asking vendors.

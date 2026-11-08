@@ -271,16 +271,15 @@ names a built CLI.
 `amc_sdk.industry.AmcIndustry` wraps the industry pack and domain commands of the installed CLI. Like the proof helpers these are CLI calls: each method runs one `amc domain ... --json` command as an argv list (never a shell string) in the fixed `workspace`, with stdin closed so the CLI cannot prompt, and returns the CLI's JSON unchanged after checking it against the shapes below. `amc_bin`, `AMC_BIN` and `timeout` (default 120 s) behave as for `AmcAgent`.
 
 ```python
-from amc_sdk.industry import AmcIndustry, AmcIndustryLockedError
+from amc_sdk.industry import AmcIndustry
 
 industry = AmcIndustry(workspace=".")
-for pack in industry.list_packs(domain="health")["packs"]:
-    print(pack["packId"], pack["locked"])
-try:
-    scored = industry.score_pack_baseline("clinical-trials")
-    print(scored["claimKind"], scored["statusDimensions"]["result"])  # self_reported not_evaluated
-except AmcIndustryLockedError as locked:
-    print(locked.message)
+catalog = industry.list_packs(domain="health")
+print(catalog["entitlement"]["source"])  # free
+for pack in catalog["packs"]:
+    print(pack["packId"], pack["questionCount"])
+scored = industry.score_pack_baseline("clinical-trials")
+print(scored["claimKind"], scored["statusDimensions"]["result"])  # self_reported not_evaluated
 ```
 
 | Method | Command | Returns |
@@ -304,7 +303,7 @@ IndustryPackEntitlement {active, checkoutAvailable, licenseVerificationConfigure
                          customerId?, subscriptionId?, licenseStatus?: string}
 IndustryPackCatalogItem {packId, name, domain, riskLevel, description: string,
                          questionCount: number, locked: boolean,
-                         regulatoryBasis, complianceFrameworks: string[]}   (with or without a licence)
+                         regulatoryBasis, complianceFrameworks: string[]}
 IndustryPack            {id, stationId, name, description, riskTier, euAIActClassification,
                          certificationPath: string, certificationThreshold: number,
                          regulatoryBasis, complianceFrameworks, sdgAlignment, keyRisks: string[],
@@ -327,15 +326,16 @@ DomainApplyResult       {agentId, domain: string, packsApplied, guardrailsPropos
                                             consistency: {ok: boolean, violations: string[]}}}
 ```
 
+Industry Packs are free: no method needs a licence, account or payment, and access never changes a score, result, trust tier or verification outcome. Current CLIs print `active: true`, `source: "free"`, `planId: "industry-packs-free"`, `priceUsdMonthly: "0.00"`, `checkoutAvailable: false`, `checkoutUrl` and `expiresAt` `null`, and a `message` saying so. Only `licenseVerificationConfigured` varies: it says whether a key pinned in the operator's trust list could verify a legacy licence. The optional `customerId`, `subscriptionId` and `licenseStatus` came only from older CLIs holding a licence. Every catalog row has `locked: false`; the key stays for compatibility. Pack results are self-reported questionnaires whose content is experimental (AI-drafted, not reviewed by a qualified expert): catalog rows, pack details and score results carry `contentStatus: "experimental"`, which this module passes through unchecked.
+
 Refusals and failures:
 
 - Pack ids must be one of `amc_sdk.industry.PACK_IDS` and domains one of `DOMAIN_IDS` (`health`, `education`, `environment`, `mobility`, `governance`, `technology`, `wealth`); anything else raises `ValueError` before the CLI runs. Domain aliases such as `healthcare` are refused here even though the CLI accepts them; read them from `list_domains()` and pass the canonical id. `agent_id`, `compliance` entries and `file` are passed through unchanged (the CLI normalizes agent ids) and are refused only when empty or containing NUL.
-- Industry Packs licence: `describe_pack`, `score_pack_baseline` and `apply` need a licence that verifies against a key pinned in the operator's AMC trust list (see `docs/PRICING.md`); nothing passed to this module unlocks them, and a licence changes access, never a result. `list_packs` and `list_domains` need none.
-- `describe_pack` and `score_pack_baseline` without an Industry Packs licence: the CLI prints `{"error": "industry_packs_locked", "message": ...}` and exits 1, raised as `AmcIndustryLockedError`. `apply` reports the same lock as text on stderr, raised as `AmcIndustryCommandError` (as is every other nonzero exit, with the CLI's own reason and `returncode`).
+- A nonzero exit raises `AmcIndustryCommandError` with the CLI's own reason and `returncode`. The one exception is kept for older CLIs: they printed `{"error": "industry_packs_locked", "message": ...}` and exited 1 when `describe_pack` or `score_pack_baseline` ran without a licence, raised as `AmcIndustryLockedError` (their `apply` reported the lock on stderr, an `AmcIndustryCommandError`). Current CLIs never print it.
 - Output that is not one JSON document, or does not match its shape, raises `AmcProtocolError`; a CLI timeout raises `AmcTimeoutError`.
 - `score_pack_baseline` answers no question, so nothing is evaluated: `notEvaluatedQuestionIds` lists every question, `percentage`, `level` and `eligibleLevel` are `None`, `questionResults` and `complianceGaps` are empty, and `statusDimensions["result"]` is `not_evaluated`. An unanswered question never gets a default level. No result is a certification. The CLI accepts other responses only interactively, so this module offers no custom-response scoring. `apply` without `dry_run` writes guardrail files into the workspace. The signed audit form of `domain apply` (`--audit`) and the other `domain` subcommands are not wrapped.
 
-`tests/test_industry.py` checks argv, refusals and shapes with a stubbed runner, compares `PACK_IDS`/`DOMAIN_IDS` with the TypeScript source when the checkout is present, and runs the real `dist/cli.js` only when it exists (skipped otherwise). Against the real CLI it checks the locked refusals, or, when the environment carries a licence that verifies against a key pinned in `AMC_HOME`'s trust list, the unlocked describe, score and dry-run apply shapes. Run it against an installed wheel, offline:
+`tests/test_industry.py` checks argv, refusals and shapes with a stubbed runner, compares `PACK_IDS`/`DOMAIN_IDS` with the TypeScript source when the checkout is present, and runs the real `dist/cli.js` only when it exists (skipped otherwise). Against the real CLI, with no licence, it checks that the entitlement matches the stub's free one (every key but `licenseVerificationConfigured`), that no pack is locked, and the describe, score and dry-run apply shapes. Run it against an installed wheel, offline:
 
 ```bash
 python3 -m venv .venv-py

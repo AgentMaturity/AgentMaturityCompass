@@ -33,9 +33,10 @@ function sha256(path: string): string {
   return createHash("sha256").update(readFileSync(path)).digest("hex");
 }
 
-async function withFixtureServer<T>(directory: string, run: (baseUrl: string) => Promise<T>): Promise<T> {
+async function withFixtureServer<T>(directory: string, run: (baseUrl: string) => Promise<T>, log: string[] = []): Promise<T> {
   const server = createServer((request, response) => {
     const requested = basename(new URL(request.url ?? "/", "http://127.0.0.1").pathname);
+    log.push(requested);
     const path = join(directory, requested);
     if (!existsSync(path)) {
       response.writeHead(404).end("not found");
@@ -280,6 +281,9 @@ describe("truthful public distribution and brand contract", () => {
     expect(windows).toContain("SHA256SUMS");
     expect(windows).toContain("Get-FileHash");
     expect(windows).toContain("checksum mismatch");
+    // The default client execution policy refuses a .ps1 file, so the extracted installer runs in a Bypass child.
+    expect(windows).toContain("& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $Installer");
+    expect(windows).not.toMatch(/^\s*& \$Installer\s*$/m);
     expect(workflow).toContain("npm run package:desktop");
     expect(workflow).toContain("npm run package:desktop:verify");
     expect(workflow).toContain("dist/release-assets/SHA256SUMS");
@@ -323,6 +327,35 @@ describe("truthful public distribution and brand contract", () => {
 
     expect(result.code, result.stderr).toBe(0);
     expect(readFileSync(fixture.marker, "utf8")).toBe("installed");
+  });
+
+  test("installs the architecture-neutral linux-x64 archive on Linux aarch64, detected from uname (LIVE-DEPLOY-07)", async () => {
+    // The pinned archive installed on node:22-bookworm and node:22-bookworm-slim aarch64 on 2026-11-08.
+    const directory = temporaryDirectory();
+    const version = "9.9.7";
+    const fixture = writeUnixFixture(directory, version);
+    const bin = join(directory, "bin");
+    mkdirSync(bin);
+    writeFileSync(join(bin, "uname"), "#!/bin/sh\ncase \"$1\" in -s) echo Linux ;; -m) echo aarch64 ;; esac\n", { mode: 0o755 });
+    const requested: string[] = [];
+
+    const result = await withFixtureServer(directory, async (baseUrl) => await runInstaller({
+      AMC_INSTALL_TEST_MODE: "1",
+      AMC_RELEASE_BASE_URL: baseUrl,
+      AMC_RELEASE_VERSION: version,
+      AMC_INSTALL_PLATFORM: "",
+      AMC_TEST_MARKER: fixture.marker,
+      PATH: `${bin}:${process.env.PATH}`
+    }), requested);
+
+    expect(result.code, result.stderr).toBe(0);
+    expect(requested).toContain(`amc-${version}-linux-x64.tar.gz`);
+    expect(readFileSync(fixture.marker, "utf8")).toBe("installed");
+    writeFileSync(join(bin, "uname"), "#!/bin/sh\ncase \"$1\" in -s) echo Linux ;; -m) echo riscv64 ;; esac\n", { mode: 0o755 });
+    const other = await withFixtureServer(directory, async (baseUrl) => await runInstaller({ AMC_INSTALL_TEST_MODE: "1", AMC_RELEASE_BASE_URL: baseUrl,
+      AMC_RELEASE_VERSION: version, AMC_INSTALL_PLATFORM: "", AMC_TEST_MARKER: fixture.marker, PATH: `${bin}:${process.env.PATH}` }));
+    expect(other.code).not.toBe(0);
+    expect(other.stderr).toContain("Linux architecture riscv64 is not packaged yet");
   });
 
   test("fails closed before execution when the release checksum is invalid", async () => {

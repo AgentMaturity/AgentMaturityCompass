@@ -62,8 +62,8 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
         summary: "Readiness probe",
         tags: ["Studio"],
         responses: {
-          "200": okJson("Workspace readiness status", "#/components/schemas/ReadinessResponse", {
-            ok: true,
+          "200": okJson("Workspace readiness status (reason messages and checks for signed-in callers only)", "#/components/schemas/ReadinessResponse", {
+            status: "READY",
             reasons: [],
             checks: { workspace: "ok", db: "ok" },
           }),
@@ -672,11 +672,11 @@ function studioSchemas(): Record<string, unknown> {
     ReadinessResponse: {
       type: "object",
       properties: {
-        ok: { type: "boolean" },
-        reasons: { type: "array", items: { type: "string" } },
-        checks: { type: "object" },
+        status: { type: "string", enum: ["READY", "NOT_READY"] },
+        reasons: { type: "array", items: { type: "string" }, description: "Reason codes; signed-in callers get each code with its message" },
+        checks: { type: "object", description: "Signed-in callers only (LIVE-RUNTIME-14)" },
       },
-      required: ["ok", "reasons", "checks"],
+      required: ["status", "reasons"],
     },
     OnboardingSetupDetail: {
       type: "object",

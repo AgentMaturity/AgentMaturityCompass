@@ -1,5 +1,7 @@
 # Quickstart — choose your first task
 
+> **Install from source to follow this page.** The native task workflow (`amc agent-loop`), `amc init --coding` and the TypeScript SDK path need the current source build, which is unreleased (the next release is 2.0.0). The published npm package and GitHub release, which the hosted installers install, are 1.1.1 and do not contain them; 1.1.1 has most of the evidence-score steps ([2](QUICKSTART.md#2-run-amc-in-your-agent-project) to 5) in an older form; `amc connect hooks` (step 3) is new in the source build.
+
 Run a bounded native task, assess your existing evidence, or connect an agent you already use. Each path has a different result; a recording demonstration and an evidence baseline do not establish a completed real-model task.
 
 | Intent | Command |
@@ -13,10 +15,26 @@ Run a bounded native task, assess your existing evidence, or connect an agent yo
 ## Prerequisites
 
 - **Node.js 22 or 24 LTS** ([download](https://nodejs.org/)). Use a supported LTS release for production; the package's minimum engine declaration is a compatibility floor.
+- **pnpm 10.33.0** for the source build. `corepack enable` selects it from the repository's `packageManager` field; if Corepack is unavailable, run `npm install --global pnpm@10.33.0`.
 
 ---
 
 ## 1. Install AMC
+
+**From source (the current build; this page is written for it):**
+
+```bash
+corepack enable
+git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
+cd AgentMaturityCompass
+pnpm install --frozen-lockfile
+pnpm run build
+npm link            # makes `amc` available globally
+```
+
+Then change to the project you want to work in. [The source installation](INSTALL.md#option-b-from-github-development) has the details.
+
+**The published 1.1.1 release (older):** it has no `amc agent-loop` commands, `amc init --coding` or native SDK, so the native task sections below do not apply to it. Most of steps 2 to 5 apply in their 1.1.1 form; `amc connect hooks` (step 3) is new in the source build.
 
 ```bash
 curl -fsSL https://agentmaturity.co/install.sh | sh
@@ -28,7 +46,7 @@ Windows PowerShell:
 irm https://agentmaturity.co/install.ps1 | iex
 ```
 
-The installer pins the GitHub release and verifies SHA-256 before execution. Use Node.js 22 or 24 LTS with npm.
+The installers pin the 1.1.1 GitHub release and verify SHA-256 before execution. Use Node.js 22 or 24 LTS with npm.
 
 Verify it worked:
 
@@ -131,8 +149,10 @@ OS-confined `bash` without network access, a `warn` firewall, signed budgets and
 in a signed `users.yaml`. It asks for the owner's Studio login (or reads `AMC_BOOTSTRAP_OWNER_USERNAME` and
 `AMC_BOOTSTRAP_OWNER_PASSWORD` in a non-interactive shell) and prints the monitor fingerprint to pin.
 
+Until the next release is published, `npm install agent-maturity-compass` installs 1.1.1, which has neither the native SDK nor `amc init --coding`. Install your source build instead: in the checkout from step 1, after `pnpm run build`, run `npm pack --ignore-scripts` (without that flag `npm pack` first runs the full release gate), then `npm install <the .tgz it wrote>` in your project.
+
 ```bash
-npm install agent-maturity-compass
+npm install <the .tgz that npm pack --ignore-scripts wrote in the checkout>   # not the npm 1.1.1 release
 export AMC_VAULT_PASSPHRASE='<a passphrase you keep>'
 npx amc init --coding
 export AMC_EXPECTED_MONITOR_FINGERPRINT=<the fingerprint init printed>
@@ -238,7 +258,7 @@ amc quickscore --answers answers.json --json
 amc quickscore --rapid --answers '{"AMC-1.1":3,"AMC-2.1":4}' --json
 ```
 
-If `amc quickscore` cannot open terminal prompts, its placeholder L0 output includes the hint "Did you mean to run the interactive score?" so first-run users know to rerun in a terminal or pass answer JSON.
+Without a terminal, `amc quickscore` generates no placeholder score: it exits 1 with the hint "Did you mean to run the interactive score?" so first-run users know to rerun in a terminal or pass answer JSON.
 
 If `amc quickscore --auto --json` cannot find captured execution evidence, it returns `scoreStatus: "AUTO_NO_EVIDENCE"` and no measured score fields. Use `amc adapters run --agent <id> --adapter <id> -- <your-agent-command>` to capture evidence first, or use `amc quickscore --answers answers.json --json` when you want CI-safe survey scoring.
 

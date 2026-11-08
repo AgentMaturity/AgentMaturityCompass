@@ -1,6 +1,6 @@
 # AMC Compose Deployment
 
-Both HTTP and TLS builds use the root Dockerfile `studio` target. Every AMC service mounts a named volume at `/home/amc/.config/amc/state` (`<AMC home>/state`), next to the workspace volume, so this machine's anti-rollback marks and key-set recovery copies survive a restart (P1-08, `docs/KEY_LIFECYCLE.md`). Keep it with the workspace volume when you back up or roll back, and never mount it into the workspace. The old `deploy/compose/Dockerfile` was removed. See the [source container guide](../../docker/README.md) for build, non-root volume ownership, and Linux qualification requirements.
+Both HTTP and TLS builds use the root Dockerfile `studio` target. Every AMC service mounts a named volume at `/home/amc/.config/amc/state` (`<AMC home>/state`), next to the workspace volume, so this machine's anti-rollback marks and key-set recovery copies survive a restart (P1-08, `docs/KEY_LIFECYCLE.md`). Studio also mounts a third volume, `amc_control_checkpoints`, at `/workspace` with `AMC_CONTROL_CHECKPOINT_DIR=/workspace/control-checkpoints`: the signed firewall, guardrail, legal-hold and compiled-control journals checkpoint there, outside the `/data/amc` workspace. The workspace, state and checkpoint volumes are backed up and rolled back together; never mount the state or checkpoint volume into the workspace. The image owns the 0700 home `/home/amc`, so no service mounts a tmpfs there. The old `deploy/compose/Dockerfile` was removed. See the [source container guide](../../docker/README.md) for build, non-root volume ownership, and Linux qualification requirements.
 
 ## Prerequisites
 
@@ -11,6 +11,7 @@ Both HTTP and TLS builds use the root Dockerfile `studio` target. Every AMC serv
   - `amc_owner_password.txt`
   - `amc_notary_passphrase.txt`
   - `amc_notary_auth_secret.txt`
+  - `amc_backup_passphrase.txt` (encrypts `amc backup create` bundles made inside the Studio container; both `deploy/compose` stacks need it)
 - Replace all `change-me-*` placeholder values before first deployment.
 
 ## Local/Private Deployment (HTTP)
@@ -39,6 +40,8 @@ docker compose -f docker-compose.tls.yml up -d --build
 Endpoints:
 - HTTPS console/API: `https://<AMC_TLS_HOST>:8443/console`
 - Notary (internal to this TLS stack): `http://amc-notary:4343`
+
+Caddy and Studio share a dedicated `amc_edge` network (subnet `172.16.250.0/28`), on which Caddy has the fixed address `172.16.250.2`. Studio believes `X-Forwarded-*` headers only from that address (`AMC_TRUSTED_PROXY_CIDRS`, SR-10), so no other container can name its own client address. If the subnet collides with a network on your host, change the subnet, Caddy's `ipv4_address` and the `AMC_TRUSTED_PROXY_CIDRS` default in `docker-compose.tls.yml` together.
 
 Caddy retains only `NET_BIND_SERVICE`, required by the official image's executable and port 443; Studio and notary still drop all capabilities. The proxy creates a private local CA in its persistent `caddy_data` volume. Certificate issuance stays enabled, HTTP redirects are disabled because this stack does not publish port 80, and automatic trust-store installation is disabled.
 
@@ -75,9 +78,11 @@ When `AMC_ENABLE_NOTARY=1`, bootstrap writes and signs `.amc/trust.yaml` in `NOT
 
 ## Phone/LAN Access
 
+0. HTTP stack only: set `AMC_PUBLISH_ADDRESS=0.0.0.0` in `.env`. By default the HTTP stack publishes its ports on `127.0.0.1` only; `AMC_ALLOWED_CIDRS` filters requests but does not restrict which interfaces the ports are published on. The TLS stack already publishes `8443` on every interface.
 1. Ensure host firewall allows inbound to `3212` (or `8443` for TLS).
 2. Keep pairing enabled (`AMC_LAN_MODE=true`).
 3. Open Console URL from phone and pair before login.
+4. Add the origin you open the console from to `AMC_EXTRA_ORIGINS` in `.env` (for example `AMC_EXTRA_ORIGINS=http://192.168.1.20:3212`; comma-separated, `scheme://host[:port]`, no path, no trailing slash) and run `docker compose up -d` again. Otherwise native and A4 routes answer `403 NATIVE_HOST_DENIED`. The defaults (`http://localhost:<AMC_STUDIO_PORT>` and `http://127.0.0.1:<AMC_STUDIO_PORT>` on the HTTP stack, `https://<AMC_TLS_HOST>:<AMC_TLS_PORT>` on the TLS stack) stay admitted. An entry with a path is not validated at startup and turns native routes into errors, so check the value before you restart.
 
 ## Security Notes
 
@@ -86,11 +91,24 @@ When `AMC_ENABLE_NOTARY=1`, bootstrap writes and signs `.amc/trust.yaml` in `NOT
 - Keep notary auth and passphrase in Docker secrets only.
 - Never store secrets directly in compose YAML; use Docker secrets files.
 
+## Upgrade, rollback and backups
+
+The stacks name their image through `AMC_STUDIO_IMAGE` in `.env` (the API overlay through `AMC_API_IMAGE`). An upgrade sets it to the new image and runs `up -d --no-build`; a rollback sets the previous value back. Change it in `.env`, never as a one-shot prefix, and keep the previous image (`docker image prune` deletes an untagged one):
+
+```bash
+# .env
+AMC_STUDIO_IMAGE=amc-studio:<git sha>   # previous: amc-studio:<old sha>
+```
+
+Once `AMC_STUDIO_IMAGE` names a release tag or an image id, never run `docker compose up --build`: Compose tags the image it builds with that name, so a newer checkout's code would take the recorded tag and the image you would roll back to would lose it (`docker image prune` then deletes it). Build each release with `docker build -t` and start it with `up -d --no-build`.
+
+Backups run with Studio stopped: the bundle is created in a one-off container of the Studio service and streamed out, and the state and checkpoint volumes are archived at the same moment, because a signed control published between the two copies would fail closed after a restore. The full procedures (install, backup, upgrade from N-1 and from 1.1.1, rollback, TLS for a public hostname) are in [docs/deploy/reference/COMPOSE.md](../../docs/deploy/reference/COMPOSE.md), and `scripts/deploy/compose-rehearsal.mjs` rehearses the upgrade and rollback.
+
 ## Optional standalone API alongside Studio
 
 Add `-f docker-compose.studio-api.yml` after `-f docker-compose.tls.yml` to both `config` and `up` commands. The overlay retains Studio and notary, adds the production API image, and mounts `Caddyfile.studio-api`. Studio `/api/v1/*` stays on Studio; the legacy `/api/*` namespace goes to the separate API on internal port 3220. No API host port is published.
 
-The API shares the workspace read-only for industry-pack entitlements. License issuance remains refused unless its existing administrator token is explicitly configured by the operator. Quickscore is self-reporting, not signed evidence; the badge is a labelled placeholder. `/__amc/proxy-health` identifies the proxy, `/api/health` checks the standalone API, and `/readyz` checks Studio readiness. Proxy or API health does not prove a governed Studio turn.
+The overlay mounts the workspace read-only; the API reads no workspace state for Industry Packs, which are free (`/api/industry-packs/access` returns the free record). Legacy licence issuance remains refused unless its existing administrator token is explicitly configured by the operator. Quickscore is self-reporting, not signed evidence; the badge is a labelled placeholder. `/__amc/proxy-health` identifies the proxy, `/api/health` checks the standalone API, and `/readyz` checks Studio readiness. Proxy or API health does not prove a governed Studio turn.
 
 The API image target is additive; the default Docker target remains Studio. Use both Compose files consistently for lifecycle and rollback commands. Roll back to previously recorded immutable images while retaining workspace and Caddy volumes; do not use `down -v`. Qualify rollback on a disposable deployment before public use.
 

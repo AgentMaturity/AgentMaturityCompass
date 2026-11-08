@@ -3,7 +3,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readdirSync } from "node:fs";
 import type { DiagnosticReport } from "../types.js";
-import { fleetRoot, getAgentPaths, resolveAgentId } from "../fleet/paths.js";
+import { agentRoot, fleetRoot, getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { listAgents } from "../fleet/registry.js";
 import { listDelegationEdges, type DelegationEdge } from "../fleet/trustComposition.js";
 import { loadTargetProfile } from "../targets/targetProfile.js";
@@ -29,7 +29,8 @@ import { listGuardrailsWithRuntimeStatus } from "../enforce/guardrailRuntimeBind
 export interface DashboardBuildInput {
   workspace: string;
   agentId?: string;
-  outDir: string;
+  /** Defaults to agentDashboardDir, the directory Studio serves. */
+  outDir?: string;
 }
 
 export interface DashboardBuildResult {
@@ -37,6 +38,11 @@ export interface DashboardBuildResult {
   outDir: string;
   latestRunId: string;
   generatedFiles: string[];
+}
+
+/** The agent's dashboard directory: Studio serves it, and `amc dashboard build`/`serve` use it unless --out names another. */
+export function agentDashboardDir(workspace: string, agentId?: string): string {
+  return join(agentRoot(workspace, resolveAgentId(workspace, agentId)), "dashboard");
 }
 
 function moduleDir(): string {
@@ -216,8 +222,8 @@ function getDomainSummaries(): Array<{
   }));
 }
 
-/** Names, descriptions and regulatory basis are public; a licence gates pack questions and runs, never these (P1-51). */
-function getPackSummaries(locked: boolean): Array<{
+/** Every pack's summary; Industry Packs are free, so none is locked. */
+function getPackSummaries(): Array<{
   id: string;
   name: string;
   domain: string;
@@ -225,7 +231,7 @@ function getPackSummaries(locked: boolean): Array<{
   questionCount: number;
   description: string;
   regulatoryBasis: string[];
-  locked: boolean;
+  locked: false;
   contentStatus: IndustryPack["contentStatus"];
 }> {
   return listIndustryPacks().map((pack) => ({
@@ -236,7 +242,7 @@ function getPackSummaries(locked: boolean): Array<{
     questionCount: pack.questions.length,
     description: pack.description,
     regulatoryBasis: pack.regulatoryBasis,
-    locked,
+    locked: false,
     contentStatus: pack.contentStatus
   }));
 }
@@ -364,7 +370,7 @@ export function buildDashboard(input: DashboardBuildInput): DashboardBuildResult
     trends,
     assurance,
     domains: getDomainSummaries(),
-    industryPacks: getPackSummaries(!packAccess.active),
+    industryPacks: getPackSummaries(),
     industryPacksAccess: { active: packAccess.active, message: packAccess.message },
     guardrails: getGuardrailsList(input.workspace),
     trustGraph: dashboardTrustGraph(input.workspace),
@@ -583,7 +589,7 @@ export function buildDashboard(input: DashboardBuildInput): DashboardBuildResult
     ledger.close();
   }
 
-  const outDir = resolve(input.workspace, input.outDir);
+  const outDir = resolve(input.workspace, input.outDir ?? agentDashboardDir(input.workspace, agentId));
   ensureDir(outDir);
   ensureDir(join(outDir, "components"));
   ensureDir(join(outDir, "fonts"));

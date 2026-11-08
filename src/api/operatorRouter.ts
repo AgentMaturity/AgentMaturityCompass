@@ -2,7 +2,7 @@
  * /api/v1/operator (P2-22): the operator workflow over the plan diff, the blocker inbox, review packets and opt-in review
  * timing. Role classes live in src/api/accessPolicy.ts (reads: every human role; activate and the timing export: OWNER;
  * packets: AUDITOR or OWNER). Agent and lease credentials never reach here (src/studio/apiDelegation.ts refuses them).
- * Verification and export are free: nothing here consults the paid industry-pack gate.
+ * Verification and export are free; there is no Industry Packs gate (Industry Packs are free too).
  */
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";

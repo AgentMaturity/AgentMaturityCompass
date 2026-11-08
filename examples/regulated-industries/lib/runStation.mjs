@@ -42,8 +42,9 @@ function stationSteps(station, fixture) {
     { id: "init", args: ["init", "--skip-vault"] },
     { id: "domain-modules", args: ["domain", "modules", "--domain", station, "--json"], stdoutTo: "domain-modules.json" },
     { id: "pack-catalog", args: ["domain", "pack", "list", "--domain", station, "--json"], stdoutTo: "pack-catalog.json" },
-    // Industry pack scoring needs an Industry Packs licence verified against a pinned key; without one the CLI exits 1.
-    { id: "pack-run-gate", args: ["domain", "pack", "run", "--pack", fixture.industryPack, "--baseline", "--json"], stdoutTo: "pack-run-gate.json", expectExit: 1 },
+    // Industry Packs are free, so the pack runs with no licence. --baseline answers no question: a self-reported,
+    // not-evaluated questionnaire result with no score.
+    { id: "pack-run", args: ["domain", "pack", "run", "--pack", fixture.industryPack, "--baseline", "--json"], stdoutTo: "pack-run.json" },
     { id: "risk-classify", args: ["compliance", "risk-classify", "--agent", "default", "--capabilities", JSON.stringify(fixture.capabilities), "--json"], stdoutTo: "risk-classification.json" },
     { id: "assurance-pack", args: ["assurance", "describe", fixture.assurancePack], stdoutTo: "assurance-pack.json" },
     { id: "agent-run", args: ["--agent", "default", "agent-loop", "run", fixture.prompt, "--provider", "stub", "--model", STUB_MODEL, "--tools", "echo", "--max-steps", "2", "--max-tokens", "512", "--json"], stdoutTo: "agent-run.json" },

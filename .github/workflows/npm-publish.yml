@@ -61,6 +61,14 @@ jobs:
       - name: Typecheck tests
         run: npm run typecheck:tests
 
+      # tests/executionApiParity.test.ts drives sdk/python/tests/test_parity.py, which imports pytest (as ci.yml test-shard installs it).
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.12"
+
+      - name: Install the Python SDK's test dependency
+        run: python3 -m pip install --require-hashes -r sdk/python/requirements-ci.txt
+
       - name: Test
         timeout-minutes: 120
         shell: bash

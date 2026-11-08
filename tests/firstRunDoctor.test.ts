@@ -1,10 +1,11 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runDoctorRules } from "../src/doctor/doctorRules.js";
 import { renderDoctorText } from "../src/doctor/doctorReport.js";
-import { firstRunActions, firstRunFixCommands, STUB_FIRST_TURN_COMMAND } from "../src/doctor/firstRunPlan.js";
+import { doctorNextSteps, firstRunActions, firstRunFixCommands, STUB_FIRST_TURN_COMMAND } from "../src/doctor/firstRunPlan.js";
+import { AGENT_ENV_MARKERS } from "../src/vault/operatorContext.js";
 
 /**
  * First-run diagnostic (brief §7 item 4, §7a): `amc doctor` must name each
@@ -26,10 +27,13 @@ const seam = vi.hoisted(() => ({
     revision: null as number | null,
     reason: "No Runtime Firewall policy has been initialized."
   },
-  vaultUnlocked: false
+  vaultUnlocked: false,
+  rememberedAt: null as string | null
 }));
 vi.mock("../src/studio/studioSupervisor.js", () => ({ studioStatus: () => ({ running: false, state: null }) }));
 vi.mock("../src/vault/vaultCli.js", () => ({ vaultStatusNow: () => ({ unlocked: seam.vaultUnlocked }) }));
+vi.mock("../src/vault/passphraseStore.js", () => ({ rememberedStores: () => "the macOS Keychain (service amc-vault) or /fixture/amc-home/vault-credentials.json",
+  rememberedUnlockLocation: () => seam.rememberedAt }));
 vi.mock("../src/governor/actionPolicyEngine.js", () => ({ verifyActionPolicySignature: () => seam.signature }));
 vi.mock("../src/toolhub/toolhubCli.js", () => ({ verifyToolhubConfig: () => seam.signature }));
 vi.mock("../src/budgets/budgets.js", () => ({ verifyBudgetsConfigSignature: () => seam.signature }));
@@ -68,12 +72,14 @@ describe("amc doctor names each first-run precondition and its fix", () => {
     seam.signature = { valid: true, signatureExists: true, reason: null };
     seam.firewall = { integrity: "uninitialized", policy: null, revision: null, reason: "No Runtime Firewall policy has been initialized." };
     seam.vaultUnlocked = false;
+    seam.rememberedAt = null;
     root = mkdtempSync(join(tmpdir(), "amc-first-run-doctor-"));
     mkdirSync(join(root, ".amc"));
     writeFileSync(join(root, ".amc", "amc.config.yaml"), "{}\n");
     writeFileSync(join(root, ".amc", "gateway.yaml"), "{}\n");
   });
   afterEach(() => {
+    vi.unstubAllEnvs();
     rmSync(root, { recursive: true, force: true });
     if (priorPassphrase === undefined) delete process.env[PASSPHRASE_ENV];
     else process.env[PASSPHRASE_ENV] = priorPassphrase;
@@ -146,6 +152,40 @@ describe("amc doctor names each first-run precondition and its fix", () => {
     expect(vault?.message).toContain("amc firewall enable");
     expect(vault?.fixHint).toContain("export AMC_VAULT_PASSPHRASE=");
     expect(vault?.fixHint).toContain("amc vault unlock");
+    // B2: a newcomer whose passphrase `amc up` generated never saw it; the advice names where it is kept.
+    expect(vault?.fixHint).toContain("remembered is kept in the macOS Keychain (service amc-vault) or /fixture/amc-home/vault-credentials.json");
+  });
+
+  it("says why a remembered passphrase is not used in this shell (LIVE-VAULT-01)", async () => {
+    for (const name of AGENT_ENV_MARKERS) vi.stubEnv(name, undefined);
+    vi.stubEnv("CLAUDECODE", "1");
+    const vault = (await runDoctorRules(root)).checks.find((row) => row.id === "vault");
+    expect(vault?.status).toBe("WARN");
+    expect(vault?.fixHint).toContain("remembered is kept in the macOS Keychain (service amc-vault) or /fixture/amc-home/vault-credentials.json; "
+      + "it is not used here because this shell carries the agent marker CLAUDECODE");
+  });
+
+  it("passes the vault check when a remembered passphrase unlocked it, naming where it was kept", async () => {
+    seam.vaultUnlocked = true;
+    seam.rememberedAt = "/fixture/amc-home/vault-credentials.json";
+    const vault = (await runDoctorRules(root)).checks.find((row) => row.id === "vault");
+    expect(vault?.status).toBe("PASS");
+    expect(vault?.message).toContain("remembered in /fixture/amc-home/vault-credentials.json");
+  });
+
+  it("fails when the AMC home is open to group or other, as Studio would refuse to start", async () => {
+    const home = join(root, "amc-home");
+    mkdirSync(home, { mode: 0o755 });
+    chmodSync(home, 0o755);
+    vi.stubEnv("AMC_HOME", home);
+    try {
+      const report = await runDoctorRules(root);
+      const check = report.checks.find((row) => row.id === "amc-home-permissions");
+      if (process.platform === "win32") { expect(check?.status).toBe("INFO"); return; }
+      expect(check?.status).toBe("FAIL");
+      expect(check?.fixHint).toBe(`Run: chmod 700 ${home}`);
+      expect(report.ok).toBe(false);
+    } finally { vi.unstubAllEnvs(); }
   });
 
   it("passes the vault check when AMC_VAULT_PASSPHRASE is set, without echoing it", async () => {
@@ -174,6 +214,17 @@ describe("amc doctor names each first-run precondition and its fix", () => {
     expect(fixes[0]!.checkId).toBe("runtime-firewall-policy");
     expect(firstWarn === -1 || firstFail < firstWarn).toBe(true);
   });
+
+  it("lists optional adapter installs after the closing steps, so the first score is not ranked below them", () => {
+    const steps = doctorNextSteps({ ok: true, mode: "WORKSPACE", workspaceInitialized: true, strict: false, checks: [
+      { id: "adapter-openhands-cli", status: "WARN", message: "openhands-cli: missing commands: openhands", fixHint: "Install/enable openhands-cli CLI or use generic-cli" },
+      { id: "runtime-firewall-policy", status: "WARN", message: "Runtime Firewall policy missing", fixHint: "Run: amc firewall enable" },
+      { id: "sig-tools", status: "FAIL", message: "tools.yaml signature invalid", fixHint: "Run: amc fix-signatures" },
+      { id: "node-version", status: "PASS", message: "Node 22" }
+    ] }, [{ cmd: "amc", desc: "Get your first full maturity score" }]);
+    expect(steps.map((step) => step.cmd)).toEqual(["amc fix-signatures", "amc firewall enable", "amc", "Install/enable openhands-cli CLI or use generic-cli"]);
+    expect(steps[0]?.desc).toBe("[FAIL] sig-tools: tools.yaml signature invalid");
+  });
 });
 
 describe("the first-run action plan `amc init` prints", () => {
@@ -182,7 +233,9 @@ describe("the first-run action plan `amc init` prints", () => {
     expect(actions).toHaveLength(3);
     expect(actions[0]?.cmd).toBe("amc firewall enable");
     expect(actions[1]?.cmd).toBe(STUB_FIRST_TURN_COMMAND);
-    expect(actions[2]?.cmd).toBe("amc agent-loop verify <session-id>");
+    // Without a pinned monitor key the verdict is UNANCHORED (exit 1), so the plan names the pin.
+    expect(actions[2]?.cmd).toBe("amc agent-loop verify <session-id> --expect-monitor <monitor sha256>");
+    expect(actions[2]?.desc).toContain(".amc/keys/monitor_ed25519.pub");
     // The keyless turn must be the stub provider with the stub model and no credential reference.
     expect(STUB_FIRST_TURN_COMMAND).toContain("--provider stub");
     expect(STUB_FIRST_TURN_COMMAND).toContain("--model amc-stub-1");

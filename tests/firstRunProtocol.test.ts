@@ -49,7 +49,8 @@ describe("first-run protocol against the built CLI", () => {
   test("registers the built-CLI cases only when dist/cli.js exists, and the plan names the three actions", () => {
     expect(testWithDist === undefined).toBe(!distPresent);
     const actions = firstRunActions();
-    expect(actions.map((action) => action.cmd)).toEqual(["amc firewall enable", STUB_FIRST_TURN_COMMAND, "amc agent-loop verify <session-id>"]);
+    expect(actions.map((action) => action.cmd)).toEqual(["amc firewall enable", STUB_FIRST_TURN_COMMAND,
+      "amc agent-loop verify <session-id> --expect-monitor <monitor sha256>"]);
     expect(STUB_FIRST_TURN_COMMAND).toContain("--provider stub");
   });
 
@@ -145,5 +146,14 @@ describe("first-run protocol against the built CLI", () => {
     const vault = report.checks.find((row) => row.id === "vault");
     expect(vault?.status).toBe("WARN");
     expect(vault?.fixHint).toContain("export AMC_VAULT_PASSPHRASE=");
+  });
+
+  testWithDist?.("full init prints one What's next list: the three actions first, then the other first steps", () => {
+    const init = amc(freshWorkspace(), ["init"]);
+    expect(init.status, init.text).toBe(0);
+    expect(init.stdout.match(/What's next/g)).toHaveLength(1);
+    const list = init.stdout.slice(init.stdout.indexOf("What's next"));
+    expect(list.indexOf("amc agent-loop verify")).toBeLessThan(list.indexOf("amc up"));
+    expect(list).toContain("amc doctor");
   });
 });

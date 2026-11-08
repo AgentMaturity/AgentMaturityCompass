@@ -286,11 +286,12 @@ describe("P3.2 — the run reconstructs and is signed", () => {
     }
   }
 
-  test("P0-14: beside a live gateway the complete verdict fails; the live scope gives a verified prefix, never ok", async () => {
+  // LIVE-INTEGRITY-01 rewrote the complete-verdict assertions: they pinned D9 (a live gateway session was a chain error).
+  test("P0-14: beside a live gateway the complete verdict holds and names it; the live scope gives a verified prefix, never ok", async () => {
     const harness = await runBesideLiveGateway();
     const complete = await verifyAgentRun(harness.dir, harness.sessionId);
-    expect(complete).toMatchObject({ ok: false, integrityOk: false, prefixVerified: false, scope: "complete-ledger", unfinalizedSessions: [] });
-    expect(complete.ledgerErrors).toEqual(["Session gateway-live missing seal"]);
+    expect(complete).toMatchObject({ ok: true, integrityOk: true, prefixVerified: false, scope: "complete-ledger", unfinalizedSessions: ["gateway-live"] });
+    expect(complete.ledgerErrors).toEqual([]);
 
     const prefix = await live(harness.dir, harness.sessionId);
     // A verified prefix is its own state: ok stays false, so nothing that decides on ok treats it as a full verification.
@@ -382,8 +383,9 @@ describe("P3.2 — the run reconstructs and is signed", () => {
     const unknown = await runBesideLiveGateway();
     writeFileSync(join(unknown.dir, ".amc", "session-store.json"), JSON.stringify({ v: 1, backend: "something-else" }));
     const strict = await live(unknown.dir, unknown.sessionId);
-    expect(strict).toMatchObject({ ok: false, prefixVerified: false, scope: "complete-ledger", unfinalizedSessions: [] });
-    expect(strict.ledgerErrors).toContain("Session gateway-live missing seal");
+    // The strict verifier, not the live scope: complete-ledger scope. Since LIVE-INTEGRITY-01 it names the live gateway
+    // session instead of failing on it (the old assertions pinned D9: ok false, "Session gateway-live missing seal").
+    expect(strict).toMatchObject({ prefixVerified: false, scope: "complete-ledger", unfinalizedSessions: ["gateway-live"], ledgerErrors: [] });
 
     const missing = await runBesideLiveGateway();
     rmSync(join(missing.dir, ".amc", "evidence.sqlite"));

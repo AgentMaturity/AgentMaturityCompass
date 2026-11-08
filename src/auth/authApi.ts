@@ -8,7 +8,8 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { isA4CommentScopeRoute } from "../studio/nativeAdmission.js";
 import { parseCookieHeader, issueSessionToken, issueSessionTokenAsync, verifySessionToken, type SessionPayload } from "./sessionTokens.js";
-import { hashPassword, verifyPassword } from "./passwordHash.js";
+import { hashPassword, padFailedVerify, passwordHashNeedsUpgrade, PasswordPolicyError, rehashPassword, verifyPassword } from "./passwordHash.js";
+import { vaultStatus } from "../vault/vault.js";
 import { createUserRecord, usersFileSchema, type UserRecord, type UsersFile } from "./userSchema.js";
 import type { UserRole } from "./roles.js";
 import { enforceRoleOrAdmin, type AccessContext } from "./rbac.js";
@@ -20,6 +21,9 @@ import { capturePurposePublication, assertPurposePublicationCurrent } from "../k
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { KeyProviderError, KEY_PROVIDER_ERRORS } from "../keys/provider.js";
 import { KeyRevokedError } from "../keys/keyRevocations.js";
+import { recordUserChange, type UserChange, type UserChangeActor } from "./userAudit.js";
+import { pruneSessions } from "./sessionPrune.js";
+export { sessionActor } from "./userAudit.js";
 
 interface UsersSignature {
   digestSha256: string;
@@ -124,7 +128,7 @@ function signUsersConfig(workspace: string): string {
     signer: "auditor"
   };
   const sigPath = usersSigPath(workspace);
-  writeFileAtomic(sigPath, JSON.stringify(payload, null, 2), 0o644);
+  writeFileAtomic(sigPath, JSON.stringify(payload, null, 2), 0o600);
   return sigPath;
 }
 
@@ -148,7 +152,7 @@ function saveUsersConfig(workspace: string, users: UsersFile): void {
   // Compatibility writers must refuse a held/locked key before replacing the authenticated body.
   getSigningKey(workspace, "config-signature");
   ensureDir(join(workspace, ".amc"));
-  writeFileAtomic(usersPath(workspace), YAML.stringify(usersFileSchema.parse(users)), 0o644);
+  writeFileAtomic(usersPath(workspace), YAML.stringify(usersFileSchema.parse(users)), 0o600);
 }
 
 export function initUsersConfig(params: {
@@ -160,7 +164,7 @@ export function initUsersConfig(params: {
   const owner = createUserRecord({
     username: params.username,
     roles: ["OWNER"],
-    passwordHash: hashPassword(params.password)
+    passwordHash: hashPassword(params.password, { username: params.username })
   });
   const config: UsersFile = {
     v: 1,
@@ -213,7 +217,7 @@ export function addUser(params: {
   const record = createUserRecord({
     username: params.username,
     roles: params.roles,
-    passwordHash: hashPassword(params.password)
+    passwordHash: hashPassword(params.password, { username: params.username })
   });
   const next: UsersFile = {
     ...config,
@@ -226,30 +230,36 @@ export function addUser(params: {
   });
 }
 
+/**
+ * The config with `username`'s record (case-insensitive) replaced by `change(record)`. A change that can drop an OWNER
+ * (revoke, roles) must leave one ACTIVE OWNER (LIVE-VAULT-17).
+ */
+function withChangedUser(config: UsersFile, username: string, change: (user: UserRecord) => UserRecord, ownerCheck = true): { config: UsersFile; result: UserRecord } {
+  const index = config.users.findIndex((user) => user.username.toLowerCase() === username.toLowerCase());
+  if (index < 0) {
+    throw new Error(`user not found: ${username}`);
+  }
+  const updated = change(config.users[index]!), users = config.users.slice();
+  users[index] = updated;
+  if (ownerCheck) assertOwnerRemains(users);
+  return { config: { ...config, updatedTs: Date.now(), users }, result: updated };
+}
+
+/** The synchronous compatibility writers' change: under the users lock, signed with the vault key. */
+function changeUserSync(workspace: string, username: string, change: (user: UserRecord) => UserRecord): UserRecord {
+  return withUsersConfigLock(workspace, () => {
+    const changed = withChangedUser(loadUsersConfig(workspace), username, change);
+    saveUsersConfig(workspace, changed.config);
+    signUsersConfig(workspace);
+    return changed.result;
+  });
+}
+
 export function revokeUser(params: {
   workspace: string;
   username: string;
 }): UserRecord {
-  return withUsersConfigLock(params.workspace, () => {
-  const config = loadUsersConfig(params.workspace);
-  const index = config.users.findIndex((user) => user.username.toLowerCase() === params.username.toLowerCase());
-  if (index < 0) {
-    throw new Error(`user not found: ${params.username}`);
-  }
-  const updated = {
-    ...config.users[index]!,
-    status: "REVOKED" as const
-  };
-  const users = config.users.slice();
-  users[index] = updated;
-  saveUsersConfig(params.workspace, {
-    ...config,
-    updatedTs: Date.now(),
-    users
-  });
-  signUsersConfig(params.workspace);
-  return updated;
-  });
+  return changeUserSync(params.workspace, params.username, (user) => ({ ...user, status: "REVOKED" as const }));
 }
 
 export function setUserRoles(params: {
@@ -257,26 +267,7 @@ export function setUserRoles(params: {
   username: string;
   roles: UserRole[];
 }): UserRecord {
-  return withUsersConfigLock(params.workspace, () => {
-  const config = loadUsersConfig(params.workspace);
-  const index = config.users.findIndex((user) => user.username.toLowerCase() === params.username.toLowerCase());
-  if (index < 0) {
-    throw new Error(`user not found: ${params.username}`);
-  }
-  const updated = {
-    ...config.users[index]!,
-    roles: params.roles
-  };
-  const users = config.users.slice();
-  users[index] = updated;
-  saveUsersConfig(params.workspace, {
-    ...config,
-    updatedTs: Date.now(),
-    users
-  });
-  signUsersConfig(params.workspace);
-  return updated;
-  });
+  return changeUserSync(params.workspace, params.username, (user) => ({ ...user, roles: params.roles }));
 }
 
 interface UsersPublicationSnapshot { bytes: Buffer | null; signature: Buffer | null }
@@ -291,10 +282,28 @@ function withUsersConfigLock<T>(workspace: string, operation: () => T): T {
 }
 const sameUsersBytes = (left: Buffer | null, right: Buffer | null) => left === null ? right === null : right !== null && left.equals(right);
 
-/** A maintained caller rechecks its existing authorization after the provider wait, before any users-file write. */
-export interface UsersMutationOptions { assertAuthorized?: () => void }
+/**
+ * A maintained caller rechecks its existing authorization after the provider wait, before any users-file write. A caller
+ * that names the actor gets the change recorded in the audit trail after the signed write (LIVE-VAULT-09).
+ */
+export interface UsersMutationOptions { assertAuthorized?: () => void; actor?: UserChangeActor }
+async function recorded<T extends UserRecord>(workspace: string, action: UserChange["action"], opts: UsersMutationOptions, record: T): Promise<T> {
+  if (opts.actor) await recordUserChange(workspace, { action, username: record.username, userId: record.userId, roles: record.roles, actor: opts.actor });
+  return record;
+}
 class UsersAuthorizationChangedError extends Error {
   constructor() { super("user mutation authority changed while signing"); this.name = "UsersAuthorizationChangedError"; }
+}
+/** LIVE-VAULT-17: a revoke or role change never leaves the workspace without an ACTIVE OWNER (a revoked account is permanent). */
+class UsersLastOwnerError extends Error {
+  constructor() { super("refused: this would leave no active OWNER"); this.name = "UsersLastOwnerError"; }
+}
+function assertOwnerRemains(users: readonly UserRecord[]): void {
+  if (!users.some((user) => user.status === "ACTIVE" && user.roles.includes("OWNER"))) throw new UsersLastOwnerError();
+}
+/** LIVE-VAULT-16 (D13): the admin token is a bearer file inside the workspace, so it never mints, revokes or promotes an account. */
+class UsersAdminTokenRefusedError extends Error {
+  constructor() { super("the admin token cannot change console accounts; sign in as an OWNER"); this.name = "UsersAdminTokenRefusedError"; }
 }
 
 const usersVaultLockedMessages = new Set([
@@ -307,8 +316,14 @@ export function respondUsersMutationError(request: Pick<IncomingMessage, "method
   let path: string;
   try { path = new URL(request.url ?? "/", "http://local.invalid").pathname; } catch { return false; }
   if (!["/users/add", "/users/revoke", "/users/roles"].includes(path)) return false;
-  if (error instanceof UsersAuthorizationChangedError) {
-    send(403, { error: "user mutation authority changed while signing" }); return true;
+  if (error instanceof UsersAuthorizationChangedError || error instanceof UsersAdminTokenRefusedError) {
+    send(403, { error: error.message }); return true;
+  }
+  if (error instanceof UsersLastOwnerError) {
+    send(409, { error: error.message }); return true;
+  }
+  if (error instanceof PasswordPolicyError) {
+    send(400, { error: error.message }); return true;
   }
   if (error instanceof KeyProviderError && Object.hasOwn(KEY_PROVIDER_ERRORS, error.code)) {
     send(KEY_PROVIDER_ERRORS[error.code], { error: `${error.code}: user mutation signing refused`, code: error.code }); return true;
@@ -331,6 +346,7 @@ export function createUsersMutationGuard<Actor extends UsersMutationActor>(input
   const { workspace, authenticate, access, readOnly } = input;
   const expected = { isAdmin: input.expected.isAdmin, userId: input.expected.userId };
   return () => {
+    if (expected.isAdmin) throw new UsersAdminTokenRefusedError();
     const current = authenticate();
     if (current === null || current.isAdmin !== expected.isAdmin || current.userId !== expected.userId
       || !enforceRoleOrAdmin({ access: access(current), requiredAny: ["OWNER"],
@@ -374,49 +390,63 @@ async function mutateUsersConfigAsync<T>(workspace: string, change: (current: Us
     assertPurposePublicationCurrent(workspace, authority, signed);
     assertPredecessorCurrent();
     // Same YAML, digest and sidecar shape as the synchronous APIs; a partial pair still fails closed.
-    writeFileAtomic(usersPath(workspace), prepared.bytes, 0o644);
-    writeFileAtomic(usersSigPath(workspace), signature, 0o644);
+    writeFileAtomic(usersPath(workspace), prepared.bytes, 0o600);
+    writeFileAtomic(usersSigPath(workspace), signature, 0o600);
     return prepared.result;
   });
 }
 
 export async function initUsersConfigAsync(input: Parameters<typeof initUsersConfig>[0], opts: UsersMutationOptions = {}): Promise<ReturnType<typeof initUsersConfig>> {
   const params = { ...input };
-  return mutateUsersConfigAsync(params.workspace, () => {
-    const owner = createUserRecord({ username: params.username, roles: ["OWNER"], passwordHash: hashPassword(params.password) });
+  const created = await mutateUsersConfigAsync(params.workspace, () => {
+    const owner = createUserRecord({ username: params.username, roles: ["OWNER"], passwordHash: hashPassword(params.password, { username: params.username }) });
     return { config: { v: 1, updatedTs: Date.now(), users: [owner] },
       result: { path: usersPath(params.workspace), sigPath: usersSigPath(params.workspace), owner } };
   }, opts, true);
+  await recorded(params.workspace, "init", opts, created.owner);
+  return created;
 }
 
 export async function addUserAsync(input: Parameters<typeof addUser>[0], opts: UsersMutationOptions = {}): Promise<UserRecord> {
   const params = { ...input, roles: [...input.roles] };
-  return mutateUsersConfigAsync(params.workspace, current => {
+  return recorded(params.workspace, "add", opts, await mutateUsersConfigAsync(params.workspace, current => {
     const config = current!;
     if (config.users.some(user => user.username.toLowerCase() === params.username.toLowerCase())) throw new Error(`user already exists: ${params.username}`);
-    const record = createUserRecord({ username: params.username, roles: params.roles, passwordHash: hashPassword(params.password) });
+    const record = createUserRecord({ username: params.username, roles: params.roles, passwordHash: hashPassword(params.password, { username: params.username }) });
     return { config: { ...config, updatedTs: Date.now(), users: [...config.users, record] }, result: record };
-  }, opts);
+  }, opts));
 }
 
 export async function revokeUserAsync(input: Parameters<typeof revokeUser>[0], opts: UsersMutationOptions = {}): Promise<UserRecord> {
   const params = { ...input };
-  return mutateUsersConfigAsync(params.workspace, current => {
-    const config = current!, index = config.users.findIndex(user => user.username.toLowerCase() === params.username.toLowerCase());
-    if (index < 0) throw new Error(`user not found: ${params.username}`);
-    const updated = { ...config.users[index]!, status: "REVOKED" as const }, users = config.users.slice(); users[index] = updated;
-    return { config: { ...config, updatedTs: Date.now(), users }, result: updated };
-  }, opts);
+  return recorded(params.workspace, "revoke", opts, await mutateUsersConfigAsync(params.workspace,
+    current => withChangedUser(current!, params.username, (user) => ({ ...user, status: "REVOKED" as const })), opts));
 }
 
 export async function setUserRolesAsync(input: Parameters<typeof setUserRoles>[0], opts: UsersMutationOptions = {}): Promise<UserRecord> {
   const params = { ...input, roles: [...input.roles] };
-  return mutateUsersConfigAsync(params.workspace, current => {
-    const config = current!, index = config.users.findIndex(user => user.username.toLowerCase() === params.username.toLowerCase());
-    if (index < 0) throw new Error(`user not found: ${params.username}`);
-    const updated = { ...config.users[index]!, roles: params.roles }, users = config.users.slice(); users[index] = updated;
-    return { config: { ...config, updatedTs: Date.now(), users }, result: updated };
-  }, opts);
+  return recorded(params.workspace, "roles", opts, await mutateUsersConfigAsync(params.workspace,
+    current => withChangedUser(current!, params.username, (user) => ({ ...user, roles: params.roles })), opts));
+}
+
+/**
+ * LIVE-VAULT-06: a new password for an existing account (the same userId, status and roles), so a leaked password stops
+ * working everywhere. The new passwordChangedTs makes every session token minted under the old password fail verification,
+ * a login that checked the old password while this ran included, whether or not its record could be marked revoked here.
+ */
+export async function setUserPasswordAsync(input: { workspace: string; username: string; password: string }, opts: UsersMutationOptions = {}): Promise<UserRecord> {
+  const params = { ...input };
+  const updated = await mutateUsersConfigAsync(params.workspace, current => withChangedUser(current!, params.username, (user) => ({ ...user,
+    passwordHash: hashPassword(params.password, { username: user.username }), passwordChangedTs: Math.max(Date.now(), (user.passwordChangedTs ?? 0) + 1) }), false), opts);
+  forEachSessionRecord(params.workspace, (path, parsed) => { if (parsed.userId === updated.userId && !parsed.revoked) markSessionRevoked(path, parsed); });
+  return recorded(params.workspace, "password", opts, updated);
+}
+
+let cachedDummyHash: string | null = null;
+/** LIVE-VAULT-05: a verifier to run scrypt against for an unknown or revoked username. Lazy: every amc start imports this module. */
+function dummyHash(): string {
+  cachedDummyHash ??= hashPassword("amc-dummy-timing-pad");
+  return cachedDummyHash;
 }
 
 export function authenticateUser(params: {
@@ -435,6 +465,8 @@ export function authenticateUser(params: {
     };
   }
   const user = config.users.find((row) => row.username === params.username);
+  // LIVE-VAULT-05: these paths take the wrong-password time, so response time does not reveal which accounts exist.
+  if (!user || user.status !== "ACTIVE") verifyPassword(params.password, dummyHash());
   if (!user) {
     return {
       ok: false,
@@ -450,16 +482,38 @@ export function authenticateUser(params: {
     };
   }
   if (!verifyPassword(params.password, user.passwordHash)) {
+    padFailedVerify(user.passwordHash); // LIVE-VAULT-05: an older, cheaper verifier still takes the unknown-username time
     return {
       ok: false,
       user: null,
       error: "invalid credentials"
     };
   }
+  if (passwordHashNeedsUpgrade(user.passwordHash)) maybeRehashOnLogin(params.workspace, user, params.password);
   return {
     ok: true,
     user
   };
+}
+
+/**
+ * LIVE-VAULT-13: a verifier made at an older scrypt cost is replaced on the next successful login, through the signed
+ * write, when this process holds the unlocked vault (Studio does; a CLI may not). Best effort: on any failure the old
+ * verifier stays, still valid, and the login goes on.
+ */
+function maybeRehashOnLogin(workspace: string, user: UserRecord, password: string): void {
+  if (!vaultStatus(workspace).unlocked) return;
+  try {
+    withUsersConfigLock(workspace, () => {
+      const config = loadUsersConfig(workspace);
+      const index = config.users.findIndex((row) => row.userId === user.userId && row.passwordHash === user.passwordHash);
+      if (index < 0) return;
+      const users = config.users.slice();
+      users[index] = { ...users[index]!, passwordHash: rehashPassword(password) };
+      saveUsersConfig(workspace, { ...config, updatedTs: Date.now(), users });
+      signUsersConfig(workspace);
+    });
+  } catch { /* the old verifier stays */ }
 }
 
 export function createTrackedSession(params: {
@@ -470,6 +524,8 @@ export function createTrackedSession(params: {
   ttlMs?: number;
   authSource: "LOCAL_USER" | "WORKSPACE_ROUTER";
   scope?: SessionPayload["scope"];
+  /** LOCAL_USER: the passwordChangedTs of the user record the password was checked against. */
+  passwordChangedTs?: number;
 }): { token: string; payload: SessionPayload } {
   return storeTrackedSession(params, issueSessionToken(params));
 }
@@ -488,6 +544,7 @@ function storeTrackedSession(params: Parameters<typeof createTrackedSession>[0],
     authSource: params.authSource
   };
   ensureDir(sessionsDir(params.workspace));
+  pruneSessions(sessionsDir(params.workspace));
   writeFileAtomic(sessionStorePath(params.workspace, sessionId), JSON.stringify(store, null, 2), 0o600);
   return issued;
 }
@@ -499,7 +556,7 @@ export async function createTrackedSessionAsync(params: Parameters<typeof create
   // A provider await must not publish the authority of a user revoked or changed while signing was pending.
   if (requested.authSource === "LOCAL_USER") {
     const current = activeUserRecord(requested.workspace, requested.userId);
-    if (current === null || current.username !== requested.username
+    if (current === null || current.username !== requested.username || current.passwordChangedTs !== requested.passwordChangedTs
       || [...current.roles].sort().join("\n") !== [...issued.payload.roles].sort().join("\n")) {
       throw new Error("local session authority changed while signing");
     }
@@ -518,14 +575,15 @@ export function createSession(params: {
     username: params.user.username,
     roles: params.user.roles,
     ttlMs: params.ttlMs,
-    authSource: "LOCAL_USER"
+    authSource: "LOCAL_USER",
+    passwordChangedTs: params.user.passwordChangedTs
   });
 }
 
 /** Runtime local-login counterpart of the synchronous compatibility API. */
 export async function createSessionAsync(params: Parameters<typeof createSession>[0] & { scope?: SessionPayload["scope"] }): Promise<ReturnType<typeof createSession>> {
   return createTrackedSessionAsync({ workspace: params.workspace, userId: params.user.userId, username: params.user.username,
-    roles: params.user.roles, ttlMs: params.ttlMs, authSource: "LOCAL_USER", scope: params.scope });
+    roles: params.user.roles, ttlMs: params.ttlMs, authSource: "LOCAL_USER", scope: params.scope, passwordChangedTs: params.user.passwordChangedTs });
 }
 
 export function revokeSessionByToken(params: {
@@ -539,40 +597,30 @@ export function revokeSessionByToken(params: {
   if (!verified.ok || !verified.payload) {
     return;
   }
-  const dir = sessionsDir(params.workspace);
-  if (!pathExists(dir)) {
-    return;
-  }
-  const files = readdirSync(dir).filter((name) => name.endsWith(".json"));
-  const tokenSha256 = sha256Hex(params.token);
-  for (const file of files) {
+  const tokenSha256 = sha256Hex(params.token), payload = verified.payload;
+  forEachSessionRecord(params.workspace, (path, parsed) => {
+    const matchesToken = parsed.tokenSha256
+      ? parsed.tokenSha256 === tokenSha256
+      : parsed.userId === payload.userId && parsed.expiresTs === payload.expiresTs && parsed.issuedTs === payload.issuedTs;
+    if (!matchesToken) return;
+    try { markSessionRevoked(path, parsed); } catch { /* as before: an unwritable record does not stop the others */ }
+  });
+}
+
+/** Every parseable session record of the workspace; an unreadable one is skipped. */
+function forEachSessionRecord(workspace: string, visit: (path: string, parsed: SessionStoreRecord) => void): void {
+  const dir = sessionsDir(workspace);
+  if (!pathExists(dir)) return;
+  for (const file of readdirSync(dir).filter((name) => name.endsWith(".json"))) {
     const path = join(dir, file);
-    try {
-      const parsed = JSON.parse(readUtf8(path)) as SessionStoreRecord;
-      const matchesToken = parsed.tokenSha256
-        ? parsed.tokenSha256 === tokenSha256
-        : parsed.userId === verified.payload.userId &&
-          parsed.expiresTs === verified.payload.expiresTs &&
-          parsed.issuedTs === verified.payload.issuedTs;
-      if (matchesToken) {
-        writeFileAtomic(
-          path,
-          JSON.stringify(
-            {
-              ...parsed,
-              revoked: true,
-              revokedTs: Date.now()
-            },
-            null,
-            2
-          ),
-          0o600
-        );
-      }
-    } catch {
-      continue;
-    }
+    let parsed: SessionStoreRecord;
+    try { parsed = JSON.parse(readUtf8(path)) as SessionStoreRecord; } catch { continue; }
+    visit(path, parsed);
   }
+}
+
+function markSessionRevoked(path: string, parsed: SessionStoreRecord): void {
+  writeFileAtomic(path, JSON.stringify({ ...parsed, revoked: true, revokedTs: Date.now() }, null, 2), 0o600);
 }
 
 export function verifyTrackedSessionToken(params: {
@@ -654,6 +702,9 @@ export function verifyTrackedSessionToken(params: {
     }
     if (!sameRoles(user.roles, verified.payload.roles)) {
       return { ok: false, payload: null, error: "session roles changed" };
+    }
+    if (user.passwordChangedTs !== verified.payload.passwordChangedTs) {
+      return { ok: false, payload: null, error: "password changed" };
     }
   }
 

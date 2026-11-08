@@ -57,6 +57,10 @@ async function runLocalSmoke(params: SmokeParams): Promise<SmokeReport> {
   const proxyPort = await pickFreePort(host);
   const metricsPort = await pickFreePort(host);
   const dashboardPort = await pickFreePort(host);
+  // The in-process steps unlock the smoke vault through AMC_VAULT_PASSPHRASE, so a passphrase exported for another
+  // workspace must not reach them ("incorrect passphrase" at diagnostic-and-ledger). Restored in finally.
+  const previousVaultPassphrase = process.env.AMC_VAULT_PASSPHRASE;
+  process.env.AMC_VAULT_PASSPHRASE = vaultPassphrase;
 
   try {
     artifacts.workspace = debugWorkspace;
@@ -412,6 +416,8 @@ async function runLocalSmoke(params: SmokeParams): Promise<SmokeReport> {
     if (upstreamHandle) {
       await upstreamHandle.close().catch(() => undefined);
     }
+    if (previousVaultPassphrase === undefined) delete process.env.AMC_VAULT_PASSPHRASE;
+    else process.env.AMC_VAULT_PASSPHRASE = previousVaultPassphrase;
   }
 
   const hasFail = steps.some((step) => step.status === "FAIL");

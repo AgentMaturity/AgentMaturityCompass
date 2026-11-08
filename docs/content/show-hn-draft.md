@@ -20,16 +20,16 @@ What makes it different from eval tools like Promptfoo:
 
 - **244 default diagnostic questions across 5 dimensions** — not pass/fail, but a maturity model (L0-L5) that gives you a concrete improvement path. Teams can opt into the 264-question lifecycle set when they need deeper runtime and proof coverage.
 
-- **142 assurance packs** — adversarial testing for prompt injection, exfiltration, alignment faking, sandbagging, tool misuse, and more.
+- **<!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs** — adversarial testing for prompt injection, exfiltration, alignment faking, sandbagging, tool misuse, and more.
 
 - **Compliance automation** — generates audit binders for EU AI Act, ISO 42001, NIST AI RMF, SOC 2, OWASP. Maps directly to regulatory requirements.
 
-- **14 framework adapters** — LangChain, CrewAI, AutoGen, OpenAI Agents SDK, Claude Code, etc. Zero code changes.
+- **<!-- amc:count:adapters -->16<!-- /amc:count --> framework adapters** — LangChain, CrewAI, AutoGen, OpenAI Agents SDK, Claude Code, etc. Zero code changes.
 
 - **41 industry domain packs** — healthcare/HIPAA, finance/MiFID II, education/FERPA, logistics reliability, and more.
 
-The entire trust stack is MIT licensed and free. Only the industry-specific domain packs are paid.
+The entire product is MIT licensed and free. The industry domain packs are free in the current source build (experimental, self-reported questionnaires; no licence or account); the 1.1.1 release that the install script fetches still asks for a licence for them.
 
-Tech: TypeScript, Commander CLI, Ed25519 crypto, SQLite evidence ledger, 2,399 Vitest test source files, MCP server for AI coding assistants.
+Tech: TypeScript, Commander CLI, Ed25519 crypto, SQLite evidence ledger, 2,478 Vitest test source files, MCP server for AI coding assistants.
 
 I'd love feedback on the scoring model and whether the evidence-weighted approach resonates. Happy to answer any questions about the architecture.

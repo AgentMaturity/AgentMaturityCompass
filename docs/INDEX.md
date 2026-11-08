@@ -47,6 +47,11 @@ Use this page to reach the shortest evidence-backed path for your task. AMC's pu
 | Passport | Carry signed trust identity between environments | [Agent Passport](AGENT_PASSPORT.md) |
 | Comply | Map technical proof to regulatory frameworks | [Compliance](COMPLIANCE.md) |
 
+## Industry Packs And A4 Forge
+
+- [Industry Domain Packs](DOMAIN_PACKS.md): 41 self-reported sector questionnaires whose content is experimental; free in the current source build, while the published 1.1.1 release still asks for a licence ([Pricing](PRICING.md))
+- [A4 Forge](A4_FORGE.md): a preview in the current source build only, off unless the operator sets `AMC_A4_PREVIEW=1`
+
 ## Build And Integrate
 
 - [Compatibility Matrix](COMPATIBILITY_MATRIX.md)

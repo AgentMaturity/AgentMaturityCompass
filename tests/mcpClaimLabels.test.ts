@@ -9,7 +9,6 @@ import { z } from "zod";
 import { claimKindSchema, statusDimensionsSchema } from "../src/claims/eligibility/index.js";
 import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest } from "../src/crypto/keys.js";
 import { sealedRunReportVerifies } from "../src/diagnostic/reportSeal.js";
-import { getIndustryPackEntitlement } from "../src/domains/industryPackEntitlement.js";
 import { getPackById } from "../src/domains/industryPacks.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
 import { buildAgentConfig, scaffoldAgent } from "../src/fleet/registry.js";
@@ -150,12 +149,11 @@ function storedRun(workspace: string, version = "1.1.1", sealed = true): Diagnos
   return stored;
 }
 
-/** A licence signed by a key pinned in a temp AMC home trust list (P1-51), the only key a licence gate accepts. */
-function signedEntitlement(workspace: string): void {
+/** A legacy licence signed by a key pinned in a temp AMC home trust list; not needed, since Industry Packs are free. */
+function legacyLicence(): void {
   const licence = testIndustryPackLicence();
   licences.push(licence);
   for (const [key, value] of Object.entries(licence.env)) vi.stubEnv(key, value);
-  expect(getIndustryPackEntitlement(workspace).active).toBe(true);
 }
 
 function evidenceRows(workspace: string): { manual: string; synthetic: string } {
@@ -261,7 +259,6 @@ describe("AMC MCP claim labels through the SDK", () => {
     const workspace = workspaceFixture();
     storedRun(workspace, "1.2.0");
     const eventIds = evidenceRows(workspace);
-    signedEntitlement(workspace);
     const client = await connectClient(workspace);
     const arguments_ = name === "amc_score_sector_pack" ? allFiveAnswers()
       : { workspace, ...(["amc_list_agents", "amc_list_evidence"].includes(name) ? {} : { agentId: AGENT_ID }),
@@ -312,24 +309,25 @@ describe("AMC MCP claim labels through the SDK", () => {
     expect(structured.claimLabel).not.toContain("Legacy (1.x)");
   });
 
-  test.each(["__proto__", "constructor", "toString", "hasOwnProperty"])("paid fixture refuses inherited pack ID %s", async (packId) => {
-    const workspace = workspaceFixture();
-    signedEntitlement(workspace);
-    const client = await connectClient(workspace);
+  test.each(["__proto__", "constructor", "toString", "hasOwnProperty"])("refuses inherited pack ID %s, with no licence needed", async (packId) => {
+    const client = await connectClient(workspaceFixture());
     const result = await callTool(client, { name: "amc_score_sector_pack", arguments: { packId, responses: {} } });
     expect(result.isError).toBe(true);
     expect(result.structuredContent).toBeUndefined();
     expect(result.content).toContainEqual(expect.objectContaining({ type: "text", text: expect.stringContaining("Unknown sector pack") }));
   });
 
-  test("an unpaid pack request remains an access refusal without an invented result", async () => {
+  test("a pack request needs no licence, and a legacy licence changes neither its result nor its claim", async () => {
     const workspace = workspaceFixture();
-    expect(getIndustryPackEntitlement(workspace).active).toBe(false);
-    const client = await connectClient(workspace);
-    const result = await callTool(client, { name: "amc_score_sector_pack", arguments: allFiveAnswers() });
-    expect(result.isError).toBe(true);
-    expect(result.structuredContent).toBeUndefined();
-    expect(result.content).toContainEqual(expect.objectContaining({ type: "text", text: expect.stringMatching(/locked|requires active/i) }));
+    const score = async () => claimResult(await callTool(await connectClient(workspace), { name: "amc_score_sector_pack", arguments: allFiveAnswers() }));
+    const free = await score();
+    expect(free.kind).toBe("self_reported");
+    expect(free.dimensions.result).toBe("not_evaluated");
+    expect(free.text).toContain("self-reported; not a certification");
+    legacyLicence();
+    const licensed = await score();
+    expect(licensed.text).toBe(free.text);
+    expect(licensed.structured).toEqual(free.structured);
   });
 
   test.each(["amc_list_evidence", "amc_query_diagnostic"])("%s keeps an empty workspace result not evaluated", async (name) => {

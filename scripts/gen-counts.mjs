@@ -226,6 +226,23 @@ function sectorTemplates(rel, text) {
   }
   return out;
 }
+/**
+ * Per-station pack and question counts on station cards, from the registry: the home page's
+ * `<a href="station-<id>.html" class="station-card">` … `9 packs · 161 questions` and the compliance docs page's
+ * `id="domain-<id>">` … `<span>9 packs</span> <span>161 questions</span>`. A card never borrows the next card's counts.
+ */
+function stationCards(rel, text) {
+  const station = (id, whole, render) => {
+    const s = counts.sectorStations?.[id];
+    if (!s) failures.push(`${rel}: no built pack counts for station ${id}; cannot verify its card (run the build).`);
+    return s ? render(s) : whole;
+  };
+  return text
+    .replace(/(href="station-(\w+)\.html" class="station-card">(?:(?!class="station-card")[\s\S])*?class="station-card-meta">)\d+ packs · \d+ questions/g,
+      (whole, lead, id) => station(id, whole, (s) => `${lead}${s.packs} packs · ${s.questions} questions`))
+    .replace(/(id="domain-(\w+)">(?:(?!class="domain-card")[\s\S])*?<span>)\d+ packs<\/span>(\s*<span>)\d+ questions/g,
+      (whole, lead, id, gap) => station(id, whole, (s) => `${lead}${s.packs} packs</span>${gap}${s.questions} questions`));
+}
 const failures = [];
 const updates = new Map();
 const marker = /<!-- amc:count:(\w+) -->(.*?)<!-- \/amc:count -->/g;
@@ -297,6 +314,7 @@ for (const rel of PUBLIC_SURFACES) {
       });
     }
   }
+  updated = stationCards(rel, updated);
   if (SECTOR_COUNT_SURFACES.has(rel)) updated = sectorTemplates(rel, updated);
   if (ADAPTER_COUNT_SURFACES.has(rel)) {
     updated = updated.replace(/\b\d[\d,]*(?= (?:built-in |framework )?adapters\b)/gi, String(counts.adapters));

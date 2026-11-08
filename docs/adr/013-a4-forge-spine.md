@@ -1,6 +1,7 @@
 # ADR 013: A4 Forge spine
 
-Status: proposed. Implemented for the spine behind `AMC_A4_PREVIEW=1` (P0-54, P1-56, P1-57, P1-58, P1-63). Owner: lane S
+Status: proposed. Implemented behind `AMC_A4_PREVIEW=1`: the spine (P0-54, P1-56, P1-57, P1-58, P1-63), the stage
+producers (P1-59 to P1-62), the MCP tools and Node client (P1-64) and the `amc a4` command line (P1-65). Owner: lane S
 of epic E17. Date: 2026-10-11.
 
 ## Context
@@ -57,8 +58,8 @@ envelopes and a verifier report. The question was how much of A4 could be built 
 - A record alone proves a prefix of the chain: a tail cut back together with the mutable head is visible only against
   a later signed statement (a bundle manifest, the workspace ledger).
 - Every gate decision is a vault round trip, and in NOTARY mode a notary call.
-- Stage producers (P1-59 to P1-62) register into the spine; until then stages record human-authored content through a
-  labelled "no producer registered" path.
+- Stage producers (P1-59 to P1-62) register into the spine, and every stage has them now, so the labelled "no producer
+  registered" path for human-authored content serves no stage; Activate's Build is the release effect.
 
 ## Alternatives considered
 

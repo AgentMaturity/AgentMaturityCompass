@@ -73,7 +73,7 @@ Chat runs each turn through the existing governed `agent-loop run` path with `--
 | `/exit` | Leaves chat; a successfully released, unsealed session can be resumed later. |
 | Ctrl-C | Requests cancellation of the active command, or exits at the input prompt. Read the resulting status; cancellation is not successful task completion. |
 
-These built-in slash commands prompt for any needed inputs. Loaded extension commands accept text arguments. Outside chat, use the actual session ID printed by the run with `amc session show SESSION_ID` or `amc agent-loop verify SESSION_ID`. The `session` group is an explicit operator inspection/recovery surface and may be hidden from top-level help.
+These built-in slash commands prompt for any needed inputs. Loaded extension commands accept text arguments. Outside chat, use the actual session ID printed by the run with `amc session show SESSION_ID` or `amc agent-loop verify SESSION_ID --expect-monitor <monitor sha256>` (the sha256 of `.amc/keys/monitor_ed25519.pub`, recorded outside the workspace; without it the verdict is UNANCHORED and the command exits 1). The `session` group is an explicit operator inspection/recovery surface and may be hidden from top-level help.
 
 ## Handoff, verification and limits
 

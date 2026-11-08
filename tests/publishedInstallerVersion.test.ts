@@ -25,6 +25,11 @@ function fixture() {
   writeFileSync(join(root, "install.sh"), 'PINNED_AMC_RELEASE_VERSION="1.1.1"\n');
   writeFileSync(join(root, "website/install.sh"), readFileSync(join(root, "install.sh")));
   writeFileSync(join(root, "website/install.ps1"), '$PinnedAmcReleaseVersion = "1.1.1"\n');
+  writeFileSync(join(root, "website/index.html"), [
+    '<a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases/tag/v1.1.1" class="btn" rel="noopener">Download 1.1.1 for macOS →</a>',
+    '<a class="btn" href="https://github.com/AgentMaturity/AgentMaturityCompass/releases/tag/v1.1.1">Download 1.1.1 for Windows →</a>',
+    '<a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank">GitHub Releases</a>',
+  ].join("\n"));
   return root;
 }
 
@@ -62,6 +67,23 @@ describe("published installer selection", () => {
       channels: { githubRelease: { status: "live", version: "1.0.0" } },
     }));
     expect(() => verifyPublishedInstallerVersion(root)).toThrow(/no matching live GitHub release/);
+  });
+
+  it("checks every homepage download button against the pinned release", () => {
+    expect(verifyPublishedInstallerVersion(fixture()).websiteDownloads).toBe(2);
+    // The real homepage: a regex that silently matched no button would check nothing.
+    expect(verifyPublishedInstallerVersion(resolve(".")).websiteDownloads).toBeGreaterThan(0);
+  });
+
+  it.each([
+    ["names another version", "Download 1.1.1 for macOS", "Download 2.0.0 for macOS", /Published installer version mismatch/],
+    ["links another release tag", "releases/tag/v1.1.1\" class=\"btn\" rel", "releases/tag/v2.0.0\" class=\"btn\" rel", /Published installer version mismatch/],
+    ["links releases/latest", "releases/tag/v1.1.1\" class=\"btn\" rel", "releases/latest\" class=\"btn\" rel", /releases\/latest/],
+  ])("rejects a homepage download button that %s", (_case, from, to, error) => {
+    const root = fixture();
+    const page = join(root, "website/index.html");
+    writeFileSync(page, readFileSync(page, "utf8").replace(from, to));
+    expect(() => verifyPublishedInstallerVersion(root)).toThrow(error);
   });
 
   it("rejects drift between raw and hosted Unix installer copies", () => {

@@ -1,4 +1,3 @@
-import { getIndustryPackEntitlement } from "../src/domains/industryPackEntitlement.js";
 import { testIndustryPackLicence } from "./helpers/industryPackLicence.js";
 import { mkdtempSync } from "node:fs";
 import { join } from "node:path";
@@ -79,27 +78,26 @@ describe("diagnostic question sets", () => {
   test("an industry pack weighting request is a no-op whatever the licence state", () => {
     vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_KEY", undefined);
     vi.stubEnv("AMC_DOMAIN_PACKS_LICENSE_KEY", undefined);
-    const locked = getQuestionSet({
+    const unlicensed = getQuestionSet({
       version: LIFECYCLE_QUESTION_SET_VERSION,
       workspace: workspace(),
       applyIndustryPackWeights: true
     });
-    // A licence signed by a key pinned in the operator trust list, so the licence really is active (P1-51).
+    // A legacy licence signed by a key pinned in the operator trust list; Industry Packs are free, so it unlocks nothing.
     const licence = testIndustryPackLicence();
     vi.stubEnv("AMC_HOME", licence.amcHome);
     vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_KEY", licence.licenseKey);
-    expect(getIndustryPackEntitlement(workspace()).active).toBe(true);
-    const unlocked = getQuestionSet({
+    const licensed = getQuestionSet({
       version: LIFECYCLE_QUESTION_SET_VERSION,
       workspace: workspace(),
       applyIndustryPackWeights: true
     });
 
-    expect(unlocked).toEqual(locked);
-    expect(locked.info.domainPackWeighting?.requested).toBe(true);
-    expect(locked.info.domainPackWeighting?.applied).toBe(false);
-    expect(locked.questions.every((question) => (question.scoringWeight ?? 1) === 1)).toBe(true);
-    expect(unlocked.questions.every((question) => (question.scoringWeight ?? 1) === 1)).toBe(true);
+    expect(licensed).toEqual(unlicensed);
+    expect(unlicensed.info.domainPackWeighting?.requested).toBe(true);
+    expect(unlicensed.info.domainPackWeighting?.applied).toBe(false);
+    expect(unlicensed.questions.every((question) => (question.scoringWeight ?? 1) === 1)).toBe(true);
+    expect(licensed.questions.every((question) => (question.scoringWeight ?? 1) === 1)).toBe(true);
     licence.cleanup();
   });
 

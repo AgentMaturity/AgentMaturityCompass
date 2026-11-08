@@ -1,0 +1,5 @@
+---
+"agent-maturity-compass": patch
+---
+
+`docs/VAULT.md` and `docs/SECURITY.md` now say what AMC actually does with the vault passphrase: where it can be kept (the environment, the remembered Keychain item or `$AMC_HOME/vault-credentials.json`, `.amc/local-vault-passphrase`, and the one export line `amc init --minimal` prints), the opt-outs, exactly who a remembered passphrase unlocks for (the terminal check, agent mode and the agent-marker list, the governance confirmation, and the limit for harnesses that use a pseudo-terminal), when to rotate and why `amc keys rotate` does not answer a passphrase leak, what `.amc/.gitignore` keeps out of git, and an identity and API-key readiness statement. The false lines "AMC never writes the passphrase to disk and never prints it" and "Agent processes never have access to private keys" are gone. `amc api key create` now ends with "Note: Studio HTTP routes do not accept API keys yet (docs/API_SURFACES.md)." (also a `note` field in its `--json` output).

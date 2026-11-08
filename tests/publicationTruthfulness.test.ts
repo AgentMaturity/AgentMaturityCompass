@@ -38,9 +38,10 @@ describe("public distribution and pricing truthfulness", () => {
   });
 
   test.each(["README.md", "docs/PRICING.md", "website/index.html"])(
-    "%s states that paid checkout is not publicly live",
+    "%s says Industry Packs are free and checkout is not available",
     (path) => {
       const content = text(path);
+      expect(content).toMatch(/Industry Packs (?:are free|need no licence)/);
       expect(content).toMatch(/checkout.{0,80}not (yet )?(publicly )?(live|available|configured)/is);
     },
   );
@@ -54,8 +55,8 @@ describe("public distribution and pricing truthfulness", () => {
       text("src/console/assets/app.js"),
     ].join("\n");
     expect(combined).not.toContain("Run `amc domain pack checkout` to open the subscription flow");
-    expect(combined).not.toContain("One $9.99/month subscription unlocks all 41 packs");
-    expect(combined).not.toContain("$9.99/month unlock");
+    // Industry Packs are free (ADR 019): current copy names no price for them.
+    expect(combined).not.toContain("$9.99");
   });
 
   test("current examples and integration guides keep using reviewed source installation", () => {

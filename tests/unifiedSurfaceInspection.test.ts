@@ -9,6 +9,8 @@ import { actionPolicyPath } from "../src/governor/actionPolicyEngine.js";
 import { passportExportsDir } from "../src/passport/passportStore.js";
 import { generateComplianceReport, initComplianceMaps } from "../src/compliance/complianceEngine.js";
 import { openLedger } from "../src/ledger/ledger.js";
+import Database from "better-sqlite3";
+import { startGateway } from "../src/gateway/server.js";
 
 const workspaces: string[] = [];
 
@@ -123,6 +125,39 @@ describe("unified run surface inspection", { timeout: 120_000 }, () => {
     expect(vault?.status).toBe("success");
     expect(vault?.score).toBeGreaterThanOrEqual(80);
     expect(vault?.summary).toMatch(/ledger.*verified|verified.*ledger/i);
+  });
+
+  // LIVE-INTEGRITY-02 rewrote r2-c's "Vault pending over a verified prefix" case: a live gateway session verifies and is named.
+  // Ephemeral ports for both listeners: the default proxy port (3211) collides with any concurrent Studio or test.
+  test("a running gateway's open session leaves Vault verified, with the open session named and no issue", async () => {
+    const root = workspace();
+    const gateway = await startGateway({ workspace: root, listenPort: 0, proxyPort: 0, logger: { log() {}, error() {} } });
+    try {
+      const vault = (await inspectUnifiedConfiguredSurfaces({ workspace: root, agentId: "default" })).find((module) => module.name === "Vault");
+      expect(vault).toMatchObject({ status: "success", issues: [] });
+      expect(vault?.summary).toContain(`1 session open: ${gateway.gatewaySessionId} (gateway;`);
+    } finally {
+      await gateway.close();
+    }
+    const sealed = (await inspectUnifiedConfiguredSurfaces({ workspace: root, agentId: "default" })).find((module) => module.name === "Vault");
+    expect(sealed?.status).toBe("success");
+    expect(sealed?.summary).not.toContain("session open");
+  });
+
+  test("H3: a failed ledger on an initialized vault suggests diagnosing the ledger, never amc vault init", { timeout: 120_000 }, async () => {
+    const root = workspace();
+    const db = new Database(join(root, ".amc", "evidence.sqlite"));
+    try {
+      for (const trigger of ["protect_sessions_seal_consistency", "protect_sessions_sealed_immutable"]) db.exec(`DROP TRIGGER IF EXISTS ${trigger}`);
+      const sealed = db.prepare("SELECT session_id FROM sessions WHERE session_seal_sig IS NOT NULL LIMIT 1").get() as { session_id: string };
+      db.prepare("UPDATE sessions SET session_final_event_hash = NULL, session_seal_sig = NULL WHERE session_id = ?").run(sealed.session_id);
+    } finally {
+      db.close();
+    }
+    const report = await unifiedRun({ workspace: root, agentId: "default", window: "14d" });
+    expect(report.modules.find((module) => module.name === "Vault")?.status).toBe("failed");
+    expect(report.topFixes).toContainEqual(expect.objectContaining({ command: "amc verify --repair" }));
+    expect(report.topFixes.map((fix) => fix.command)).not.toContain("amc vault init");
   });
 
   test("fails Passport closed with a zero score when any portable export is invalid", async () => {

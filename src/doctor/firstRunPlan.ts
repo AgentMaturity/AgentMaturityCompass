@@ -47,8 +47,8 @@ export function firstRunActions(): readonly FirstRunAction[] {
       desc: "Run the first turn keyless: the stub provider records a canned response through the signed session log (no real model answer). Its echo tool is a demonstration seam outside the firewall and allowlist; workspace tools are what the signed policy governs."
     },
     {
-      cmd: "amc agent-loop verify <session-id>",
-      desc: "Verify the recorded evidence of that turn; the run prints the session id. Verification checks integrity, not answer quality."
+      cmd: "amc agent-loop verify <session-id> --expect-monitor <monitor sha256>",
+      desc: "Verify the recorded evidence of that turn; the run prints the session id. Pin the monitor key with the sha256 of .amc/keys/monitor_ed25519.pub, recorded outside the workspace after init; without the pin the verdict is UNANCHORED and exits 1. Verification checks integrity, not answer quality."
     }
   ];
 }
@@ -70,4 +70,17 @@ export function firstRunFixCommands(report: DoctorReport): readonly FirstRunFix[
       desc: check.message
     }))
     .sort((left, right) => rank[left.status] - rank[right.status]);
+}
+
+/** A missing adapter CLI matters only to someone who runs that adapter, so its install hint is optional. */
+const optionalFix = (fix: FirstRunFix): boolean => fix.checkId.startsWith("adapter-");
+
+/**
+ * What `amc doctor` lists under What's next: the needed fixes (FAIL before WARN), then the closing steps the
+ * CLI passes (such as the first score), then the optional adapter installs.
+ */
+export function doctorNextSteps(report: DoctorReport, closing: readonly FirstRunAction[]): FirstRunAction[] {
+  const fixes = firstRunFixCommands(report);
+  const step = (fix: FirstRunFix): FirstRunAction => ({ cmd: fix.cmd, desc: `[${fix.status}] ${fix.checkId}: ${fix.desc}` });
+  return [...fixes.filter((fix) => !optionalFix(fix)).map(step), ...closing, ...fixes.filter(optionalFix).map(step)];
 }

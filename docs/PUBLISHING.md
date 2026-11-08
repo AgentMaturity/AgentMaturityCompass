@@ -9,7 +9,7 @@ AMC has five distribution channels with explicit availability:
 | **Verified GitHub release installer** | Available | `curl -fsSL https://agentmaturity.co/install.sh \| sh` or Windows PowerShell installer |
 | **npm** | Live with 1.1.1; 2.0.0 is prepared, not published | Publishes only from `release.yml` on a `v*.*.*` tag |
 | **Docker / GHCR** | Release workflow ready; public visibility must be verified | local build first; GHCR after anonymous-pull verification |
-| **Single-binary (SEA)** | Experimental | host-built `amc` binary artifact |
+| **Single-binary (SEA)** | Not available: a local experimental build whose binary does not start yet | Not a release asset; see `docs/SINGLE_BINARY.md` |
 | **Homebrew** | Unavailable until the tap exists and formula is verified | Do not advertise a tap command |
 
 ---
@@ -24,7 +24,7 @@ Only the `release` job of `.github/workflows/release.yml` publishes. The workflo
 
 A person approves before anything runs: the first job, `approve`, runs in the protected GitHub environment `release` and fails closed unless that environment has required reviewers and a deployment rule. The `sign`, `release` and (when enabled) `homebrew` jobs run in the same environment too, so re-running any one of them waits for approval again, and every other job that pushes or publishes needs `approve`. Expect three approvals per release: `approve`, `sign` and `release`.
 
-It publishes exactly the bytes that passed the gate. The `gate` job checks out the tag, records the commit it names, builds and packs the npm tarball once into `tmp/npm-release/`, generates the SBOM, licence inventory and SEA binary there, and writes `record.json` with the tag, the commit and every file's SHA-256 (`scripts/release-record.mjs`). The full release gate, the packed-install and install-persona checks, `check-pack-contents` and `npm publish <tarball> --dry-run` then run against that tarball file, and the files are passed on as the `amc-gated-release` artifact. Every later job checks out that commit by SHA, refuses a tag that moved or was re-pointed, and verifies the record before using a file. The desktop archives wrap the gated tarball, the `image-tags` job makes the Studio image tags only from the per-architecture digests the image job qualified, and the `sign` job (which holds only the signing key, in its signing step) builds the signing tool from the frozen lockfile and signs a bundle that embeds the gated tarball, SBOM and licence inventory byte for byte.
+It publishes exactly the bytes that passed the gate. The `gate` job checks out the tag, records the commit it names, builds and packs the npm tarball once into `tmp/npm-release/`, generates the SBOM and licence inventory there (no SEA binary: it does not start yet), and writes `record.json` with the tag, the commit and every file's SHA-256 (`scripts/release-record.mjs`). The full release gate, the packed-install and install-persona checks, `check-pack-contents` and `npm publish <tarball> --dry-run` then run against that tarball file, and the files are passed on as the `amc-gated-release` artifact. Every later job checks out that commit by SHA, refuses a tag that moved or was re-pointed, and verifies the record before using a file. The desktop archives wrap the gated tarball, the `image-tags` job makes the Studio image tags only from the per-architecture digests the image job qualified, and the `sign` job (which holds only the signing key, in its signing step) builds the signing tool from the frozen lockfile and signs a bundle that embeds the gated tarball, SBOM and licence inventory byte for byte.
 
 Secrets appear only in the `env:` of the one step that uses them: `NPM_TOKEN` in the publish step, `AMC_RELEASE_SIGNING_KEY` in the signing step, `HOMEBREW_TAP_TOKEN` in the Homebrew step and `GITHUB_TOKEN` in the GHCR login (piped to `--password-stdin`), the environment check and `gh release create` steps. None is set at workflow or job level, passed to an action input, written into a command line or URL, printed or uploaded.
 
@@ -169,24 +169,15 @@ GitHub → Packages → amc-studio → Package Settings
 
 ---
 
-## 4. Single-binary (experimental SEA)
+## 4. Single-binary (experimental SEA, not released)
 
-AMC now has an **experimental** single-binary path using Node SEA.
+`npm run build:sea` is a local experimental build only. The binary it builds does not start yet on any host tried: Node SEA runs the embedded `dist/cli.js`, an unbundled ES module, as CommonJS, and exits with `SyntaxError: Cannot use import statement outside a module`. The build therefore runs the binary with `--version` and exits 1 when it does not start.
 
-Local build:
-```bash
-npm run build
-npm run build:sea
-./dist/sea/amc doctor --json
-```
+The release workflow neither builds nor uploads a SEA binary, and `tests/releaseWorkflowContract.test.ts` fails if one is added back; change both once the binary starts. Do not advertise a single-binary download. The 1.1.1 GitHub release still carries `amc-linux-x64-sea-1.1.1`, which an earlier workflow attached without starting it first.
 
-Current release direction:
-- release CI is wired to build a host-specific Linux SEA binary artifact
-- the binary and its manifest are uploaded as GitHub release assets when the release workflow runs successfully
-- this is an MVP convenience path, not yet the default install route
-- runtime verification remains experimental and should be checked per host/runner
+The Windows build path was not run and is unlikely to work yet (it spawns `npx` without a shell and extracts the Node zip with `unzip`).
 
-See also: `docs/SINGLE_BINARY.md`
+See `docs/SINGLE_BINARY.md` for the status, the cause and the next steps.
 
 # 5. Homebrew Tap
 

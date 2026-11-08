@@ -8,7 +8,7 @@ export interface TierDefinition {
   readonly features: readonly string[];
 }
 
-const FREE_FEATURES = ["rapid-quickscore"] as const;
+const FREE_FEATURES = ["rapid-quickscore", "industry-packs"] as const;
 
 const PRO_FEATURES = [
   ...FREE_FEATURES,
@@ -25,7 +25,6 @@ const PRO_FEATURES = [
 
 const ENTERPRISE_FEATURES = [
   ...PRO_FEATURES,
-  "industry-packs",
   "org-wide-assessments",
   "custom-scoring-rubrics",
   "api-access",

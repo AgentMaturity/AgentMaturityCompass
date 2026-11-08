@@ -2,9 +2,9 @@
 
 Every test except the last uses a stubbed runner, so no CLI is needed. The last
 test runs the real built CLI (``dist/cli.js``) and is skipped when it is absent.
-It checks the locked paths, or the unlocked shapes when the environment carries
-an Industry Packs licence that verifies against a key pinned in ``AMC_HOME``'s
-trust list; this suite never creates a licence itself.
+Industry Packs are free, so it checks, with no licence, that the CLI prints the
+stub's free entitlement and no locked pack, and the describe, score and dry-run
+apply shapes.
 """
 from __future__ import annotations
 
@@ -32,14 +32,18 @@ from amc_sdk.industry import (
 REPO = Path(__file__).resolve().parents[3]
 BIN = ["amc-test-bin"]
 
+# As `amc domain pack list --json` prints it (Industry Packs are free, 2026-11-07); the real-CLI test compares
+# every key except licenseVerificationConfigured, which depends on the operator's trust list.
 ENTITLEMENT = {
-    "planId": "industry-packs-monthly", "priceUsdMonthly": "9.99", "checkoutAvailable": False,
-    "checkoutUrl": None, "licenseVerificationConfigured": False, "expiresAt": None, "active": False,
-    "source": "none", "message": "locked",
+    "active": True, "source": "free", "planId": "industry-packs-free", "priceUsdMonthly": "0.00",
+    "checkoutAvailable": False, "checkoutUrl": None, "licenseVerificationConfigured": False, "expiresAt": None,
+    "message": "Industry Packs are free: every pack's questions and runs are included, with no licence, account or"
+               " payment. Pack results are self-reported questionnaires; access never changes a score, gap, report"
+               " or other result.",
 }
 CATALOG_ITEM = {"packId": "farm-to-fork", "name": "Farm to Fork", "domain": "environment",
-                "riskLevel": "very-high", "questionCount": 16, "locked": True, "description": "d",
-                "regulatoryBasis": ["r"], "complianceFrameworks": ["f"]}
+                "riskLevel": "very-high", "questionCount": 16, "locked": False, "description": "d",
+                "regulatoryBasis": ["r"], "complianceFrameworks": ["f"], "contentStatus": "experimental"}
 DOMAIN = {"id": "health", "name": "Health", "description": "d", "aliases": ["healthcare"],
           "sectorTags": [], "recommendedIndustryPacks": ["clinical-trials"], "regulatoryBasis": [],
           "riskLevel": "critical", "euAIActCategory": "high-risk", "questionCount": 1,
@@ -187,7 +191,8 @@ def test_default_runner_timeout_and_launch_failure(tmp_path: Path, monkeypatch: 
         AmcIndustry(workspace=str(tmp_path), amc_bin=BIN).list_domains()
 
 
-def test_locked_json_refusal_is_typed(tmp_path: Path) -> None:
+def test_an_older_clis_locked_refusal_is_still_typed(tmp_path: Path) -> None:
+    # Older CLIs refused unlicensed pack commands this way; current CLIs never do (Industry Packs are free).
     runner = Runner(returncode=1, stdout={"error": "industry_packs_locked", "message": "Industry Packs are locked."})
     with pytest.raises(AmcIndustryLockedError) as caught:
         client(tmp_path, runner).describe_pack("clinical-trials")
@@ -236,9 +241,9 @@ def test_contract_drift_fails_closed(tmp_path: Path, method: str, stdout: object
 
 
 def test_optional_keys_are_accepted(tmp_path: Path) -> None:
-    active = {**ENTITLEMENT, "active": True, "source": "env", "licenseStatus": "active", "customerId": "c"}
-    unlocked = {**CATALOG_ITEM, "locked": False}
-    runner = Runner(stdout={"entitlement": active, "packs": [unlocked]})
+    # Only older CLIs holding a licence sent these entitlement keys.
+    licensed = {**ENTITLEMENT, "licenseStatus": "active", "customerId": "c"}
+    runner = Runner(stdout={"entitlement": licensed, "packs": [CATALOG_ITEM]})
     assert client(tmp_path, runner).list_packs()["packs"][0]["regulatoryBasis"] == ["r"]
     scored = {**ANSWERED, "statusDimensions": {**STATUS, "enforcement": {"state": "enforced", "boundary": "b"}}}
     assert client(tmp_path, Runner(stdout=scored)).score_pack_baseline("clinical-trials")["eligibleLevel"] == 1
@@ -284,23 +289,17 @@ def test_installed_cli_contract(tmp_path: Path) -> None:
     assert {item["id"] for item in domains} == set(DOMAIN_IDS)
     catalog = sdk.list_packs()
     assert {item["packId"] for item in catalog["packs"]} == set(PACK_IDS)
+    # Free for everyone: the stub's entitlement is what the real CLI prints, and no pack is locked.
+    free = {key: value for key, value in ENTITLEMENT.items() if key != "licenseVerificationConfigured"}
+    assert {key: catalog["entitlement"][key] for key in free} == free
+    assert not any(item["locked"] for item in catalog["packs"])
     health = sdk.list_packs(domain="health")
     assert {item["domain"] for item in health["packs"]} == {"health"}
-    if catalog["entitlement"]["active"]:
-        # A licence from the environment: the unlocked shapes, against the real CLI.
-        assert sdk.describe_pack("clinical-trials")["id"] == "clinical-trials"
-        scored = sdk.score_pack_baseline("clinical-trials")
-        assert scored["claimKind"] == "self_reported" and scored["statusDimensions"]["result"] == "not_evaluated"
-        assert scored["selfAssessment"]["answered"] == 0 and scored["eligibleLevel"] is None
-        assert scored["percentage"] is None and scored["level"] is None and scored["complianceGaps"] == []
-        assert len(scored["notEvaluatedQuestionIds"]) == scored["selfAssessment"]["total"]
-        assert sdk.apply("probe", pack_id="clinical-trials", dry_run=True)["dryRun"] is True
-        assert sorted(os.listdir(tmp_path)) == []
-        return
-    with pytest.raises(AmcIndustryLockedError):
-        sdk.describe_pack("clinical-trials")
-    with pytest.raises(AmcIndustryLockedError):
-        sdk.score_pack_baseline("clinical-trials")
-    with pytest.raises(AmcIndustryCommandError):
-        sdk.apply("probe", pack_id="clinical-trials", dry_run=True)
+    assert sdk.describe_pack("clinical-trials")["id"] == "clinical-trials"
+    scored = sdk.score_pack_baseline("clinical-trials")
+    assert scored["claimKind"] == "self_reported" and scored["statusDimensions"]["result"] == "not_evaluated"
+    assert scored["selfAssessment"]["answered"] == 0 and scored["eligibleLevel"] is None
+    assert scored["percentage"] is None and scored["level"] is None and scored["complianceGaps"] == []
+    assert len(scored["notEvaluatedQuestionIds"]) == scored["selfAssessment"]["total"]
+    assert sdk.apply("probe", pack_id="clinical-trials", dry_run=True)["dryRun"] is True
     assert sorted(os.listdir(tmp_path)) == []

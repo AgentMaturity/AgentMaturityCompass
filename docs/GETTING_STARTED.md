@@ -85,7 +85,7 @@ For CI, scripted demos, or other non-interactive runs, provide answer JSON expli
 amc quickscore --answers answers.json --json
 ```
 
-If a no-prompt run prints a placeholder L0 score, AMC now shows: "Did you mean to run the interactive score?" Use `amc quickscore` in a terminal for prompted scoring, or keep using `--answers` for CI.
+Without a terminal, `amc quickscore` generates no placeholder score: it exits 1 with the hint "Did you mean to run the interactive score?" Use `amc quickscore` in a terminal for prompted scoring, or keep using `--answers` for CI.
 
 If `amc quickscore --auto --json` has no captured ledger evidence, AMC fails closed with `scoreStatus: "AUTO_NO_EVIDENCE"` and no measured score fields. Capture evidence first with `amc wrap <runtime> -- <your-agent-command>`, or use `amc quickscore --answers answers.json --json` for a CI-safe survey score.
 
@@ -153,7 +153,7 @@ command behind it:
 | Langfuse / Helicone / Lunary | You ran `amc watch connect` for that provider |
 | The pack registry | You ran `amc pack search`, `install`, or `publish` |
 
-Scores, evidence and the ledger stay in your workspace under `.amc/`.
+Scores, evidence and the ledger stay in your workspace under `.amc/`. Keep `.amc/` out of version control by default (add it to `.gitignore`): it holds the signing keys, the Studio admin token (`.amc/studio/`), the evidence ledger and, when `amc` generated one, `.amc/local-vault-passphrase`. A new workspace also gets `.amc/.gitignore`, which keeps those secrets and per-machine runtime state out of git. If you deliberately commit a workspace for CI (the `amc-action` GitHub Action), never commit `.amc/local-vault-passphrase` or `.amc/studio/`, supply `AMC_VAULT_PASSPHRASE` from a CI secret, and keep that repository private: the encrypted vault is offline brute-force material.
 
 ---
 
@@ -311,7 +311,7 @@ amc score transparency-log
 
 ## Studio (Local Control Plane)
 
-Studio is AMC's local web UI for managing agents, viewing scores, and running evaluations. macOS and Windows desktop packages also include the `Agent Maturity Compass Studio` launcher app, which opens this same local console in the system browser.
+Studio is AMC's local web UI for managing agents, viewing scores, and running evaluations. macOS and Windows desktop packages also include the `Agent Maturity Compass Studio` launcher app, which opens this same local console (in a native WebKit window on macOS, in the system browser on Windows).
 
 ```bash
 # Start Studio
@@ -324,12 +324,25 @@ amc status
 amc down
 ```
 
+The Compass Console asks you to sign in. Create the first login, an OWNER:
+
+```bash
+amc user init --username <you>    # asks for a password; signs .amc/users.yaml
+```
+
+It signs with the workspace vault; after `amc up` the passphrase it remembered is used. If it reports `Vault locked`, set `AMC_VAULT_PASSPHRASE` in that shell and run it again.
+`amc user init` refuses when `.amc/users.yaml` already exists, so on a workspace that already has
+logins (for example after `amc init --coding`) use `amc user add` instead (`--force` replaces every login). Add more logins with `amc user add --username <name> --role <roles>`
+(see [RBAC](RBAC.md)).
+
 Studio gives you:
 - Live dashboard with agent scores
 - Lifecycle Evidence page for the 8 surfaces, full-score artifacts, episodes, decisions, and Enforce resource proof
 - Evaluation runner
 - Policy editor
 - Audit log viewer
+
+The dashboard port is `AMC_DASHBOARD_PORT`, default 4173; when that port is busy, `amc up` falls back to a free port and prints the dashboard URL.
 
 Desktop package users can launch Studio without typing the CLI command:
 
@@ -339,9 +352,13 @@ open "Agent Maturity Compass Studio.app"
 ```
 
 ```powershell
-# Windows package
-.\Agent Maturity Compass Studio.cmd
+# Windows package: double-click the .cmd file, or from PowerShell
+& ".\Agent Maturity Compass Studio.cmd"
 ```
+
+The macOS app is not notarized (the current source build ad-hoc signs it): if macOS says it cannot verify it, open
+System Settings > Privacy & Security and choose Open Anyway. Studio keeps running after you close the app window or browser tab;
+[Desktop Packages](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/DESKTOP_PACKAGES.md) has the command that stops it.
 
 ---
 

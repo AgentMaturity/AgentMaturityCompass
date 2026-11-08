@@ -9,6 +9,7 @@ import inquirer from "inquirer";
 import { z } from "zod";
 import { loadContextGraph, summarizeContextGraphForPrompt } from "../context/contextGraph.js";
 import { detectTrustBoundaryViolation, openLedger, verifyLedgerIntegrity } from "../ledger/ledger.js";
+import { isLivenessRow } from "../ledger/sessionLiveness.js";
 import { runHarnessWithRetries } from "../runtimes/common.js";
 import { loadGatewayConfig, verifyGatewayConfigSignature } from "../gateway/config.js";
 import {
@@ -57,6 +58,7 @@ import { pathExists, readUtf8 } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { parseWindowToMs, dayKey } from "../utils/time.js";
+import { clamp } from "../utils/ratio.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { loadAssuranceSummary, type AssuranceSummary } from "./assuranceSummary.js";
 import { sealedRunReportVerifies } from "./reportSeal.js";
@@ -109,10 +111,6 @@ function parseEventForRunner(workspace: string, event: EvidenceEvent, reader: ()
 const claimsSchema = z.object({
   claimedLevels: z.record(z.string(), z.number().int().min(0).max(5))
 });
-
-function clamp(n: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, n));
-}
 
 async function getClaimedLevels(params: {
   mode: "auto" | "owner" | "harness";
@@ -569,7 +567,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
     let _cachedAllEvents: ParsedEvidenceEvent[] | null = null;
     const reader = readerTrustFor(workspace); // P0-18: trust lists and own keys load once per run
     function getCachedEvents(): ParsedEvidenceEvent[] { // P0-18: no synthetic rows; an attested event once, in its window
-      return (_cachedAllEvents ??= countAttestedOnce([...(signedEvidence?.getEventsBetween(windowStartTs, now) ?? []), ...ledger.getEventsBetween(windowStartTs, now)].filter((event) => evidenceProducer(event) !== "synthetic")
+      return (_cachedAllEvents ??= countAttestedOnce([...(signedEvidence?.getEventsBetween(windowStartTs, now) ?? []), ...ledger.getEventsBetween(windowStartTs, now)].filter((event) => evidenceProducer(event) !== "synthetic" && !isLivenessRow(event))
         .map((event) => parseEventForRunner(workspace, event, reader)), (event) => event.trustTier, { startTs: windowStartTs, endTs: now }));
     }
 

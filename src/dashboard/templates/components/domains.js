@@ -211,10 +211,8 @@
 
     const selectedDomain = domains.find((domain) => domain.id === state.selectedDomain) || domains[0];
     const selectedPacks = packs.filter((pack) => (pack.domain || pack.stationId) === selectedDomain.id);
-    const lockedPacks = selectedPacks.some((pack) => pack.locked);
-    // The server's paywall text (src/domains/industryPackEntitlement.ts): one price source, no purchase step it cannot honour.
+    // The server's access text (src/domains/industryPackEntitlement.ts): Industry Packs are free.
     const access = (window.G && window.G.data && window.G.data.industryPacksAccess) || {};
-    const lockedMessage = access.message || 'Industry Packs are locked. Run amc domain pack access for details.';
 
     el.innerHTML = `
       <div class="dim-page-header" style="margin-bottom:14px">
@@ -243,17 +241,13 @@
         <div class="card">
           <div class="ch"><span class="ch-dot"></span>${esc(selectedDomain.name || titleize(selectedDomain.id))} Packs</div>
           <div class="ch-sub">Assess readiness and apply guardrailed domain settings</div>
-          ${lockedPacks ? `
-            <div class="empty">
-              <span class="empty-t" style="white-space:pre-line">${esc(lockedMessage)}</span>
-            </div>
-          ` : ''}
+          ${access.message ? `<div class="ch-sub">${esc(access.message)}</div>` : ''}
           <div class="pack-grid" id="domain-pack-grid">
             ${selectedPacks.map((pack) => `
-              <div class="pack-card ${pack.locked ? 'locked' : ''}">
+              <div class="pack-card">
                 <div class="pack-card-top">
                   <div class="pack-name">${esc(pack.name || titleize(pack.id))}</div>
-                  <span class="risk-badge ${esc(riskClass(pack.riskTier))}">${pack.locked ? 'locked' : esc(pack.riskTier || 'elevated')}</span>
+                  <span class="risk-badge ${esc(riskClass(pack.riskTier))}">${esc(pack.riskTier || 'elevated')}</span>
                 </div>
                 <div class="pack-desc">${esc(pack.description || '')}</div>
                 <div class="pack-meta">
@@ -263,10 +257,8 @@
                   ${(pack.regulatoryBasis || []).slice(0, 4).map((ref) => `<span class="reg-tag">${esc(ref)}</span>`).join('')}
                 </div>
                 <div class="pack-actions">
-                  ${pack.locked
-                    ? `<button class="action-btn" data-pack-action="locked" data-pack-id="${esc(pack.id)}">Locked: how to get access</button>`
-                    : `<button class="action-btn" data-pack-action="assess" data-pack-id="${esc(pack.id)}">Assess</button>
-                  <button class="action-btn ghost" data-pack-action="apply" data-pack-id="${esc(pack.id)}">Apply to Agent</button>`}
+                  <button class="action-btn" data-pack-action="assess" data-pack-id="${esc(pack.id)}">Assess</button>
+                  <button class="action-btn ghost" data-pack-action="apply" data-pack-id="${esc(pack.id)}">Apply to Agent</button>
                 </div>
               </div>
             `).join('') || '<div class="empty"><span class="empty-i">📦</span><span class="empty-t">No packs found for this domain.</span></div>'}
@@ -290,13 +282,6 @@
         const action = btn.getAttribute('data-pack-action');
         const pack = selectedPacks.find((row) => row.id === packId);
         if (!pack) return;
-        if (action === 'locked' || pack.locked) {
-          if (typeof window.showViewToast === 'function') {
-            window.showViewToast(lockedMessage);
-          }
-          return;
-        }
-
         if (action === 'apply') {
           openApplyModal(pack, selectedDomain);
           return;

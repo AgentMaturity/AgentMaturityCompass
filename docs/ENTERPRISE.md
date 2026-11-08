@@ -2,37 +2,28 @@
 
 ## What Enterprise adds
 
-The full AMC trust stack is free and MIT licensed. Enterprise adds:
+The whole AMC product, the trust stack and all 41 Industry Packs, is free and MIT licensed (Industry Packs in the current source build; the published 1.1.1 release still asks for a licence for them). Enterprise is a contact-first plan, not a self-serve product, and adds services only:
 
-1. **All 41 Industry Packs** — sector-specific domain diagnostics for regulated verticals
-2. **Priority support** — faster response times and dedicated channels
-3. **Custom pack development** — bespoke domain packs for your specific regulatory or industry needs
-4. **Deployment assistance** — help with self-hosted, on-prem, or hybrid deployments
+1. **Priority support** — faster response times and dedicated channels
+2. **Custom pack development** — bespoke domain packs for your specific regulatory or industry needs
+3. **Deployment assistance** — help with self-hosted, on-prem, or hybrid deployments
 
 ## What is already free
 
 Everything else:
 - Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport
-- All 14 framework adapters
-- 1,268 CLI command paths
+- All <!-- amc:count:adapters -->16<!-- /amc:count --> framework adapters
+- 1,270 CLI command paths
 - 244 default diagnostic questions plus the free, opt-in 20-question lifecycle expansion
 - <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered adversarial assurance packs
+- All 41 Industry Packs
 - Browser playground
 - CI trust gates
 - GitHub Action
 
-## Industry Packs included in Enterprise
+## Industry Packs are free
 
-All 41 domain-specific packs, including:
-- Healthcare / HIPAA
-- Financial services / SOX / PCI-DSS
-- Education / FERPA
-- Government / FedRAMP
-- Insurance
-- Legal / eDiscovery
-- Mobility / autonomous systems
-- Energy / critical infrastructure
-- And 32 more specialized verticals
+All 41 domain-specific packs are free for everyone in the current source build (unreleased; the next release is 2.0.0), with no licence, account or payment; they are not an Enterprise feature. The published 1.1.1 release still asks for a licence before pack questions and runs, and its checkout never went live. They span seven stations: Health, Wealth, Education, Mobility, Technology, Environment and Governance ([DOMAIN_PACKS.md](DOMAIN_PACKS.md) gives the counts per station; `amc domain pack list` lists every pack). Each is a self-reported questionnaire whose content is experimental, never a certification or a compliance verdict.
 
 ## Deployment options
 
@@ -49,7 +40,7 @@ All deployment options use the same AMC trust stack. No feature differences by d
 
 1. Start with the free open-source tier — it includes the full trust stack
 2. Evaluate whether your industry needs sector-specific diagnostics
-3. If yes, review Industry Packs and contact for Pro or Enterprise access
+3. If yes, run the free Industry Packs; contact us about Enterprise only for priority support, custom pack development or deployment assistance
 4. See `docs/PRICING.md` and `docs/PRODUCT_EDITIONS.md` for the full matrix
 
 ## Read next

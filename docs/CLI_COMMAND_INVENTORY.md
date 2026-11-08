@@ -366,13 +366,13 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc domain list` | List all 7 domains with metadata | `--json` | `sector list` |
 | `amc domain modules` | Show module activation map for domain | `--domain <d>`<br>`--json` | `sector modules` |
 | `amc domain pack` | Industry sector packs — 41 packs across 7 domains | - | `sector pack` |
-| `amc domain pack access` | Show Industry Packs access, licence verification and checkout availability | `--json` | `subscribe`, `sector pack access` |
-| `amc domain pack activate` | Activate Industry Packs with a licence signed by a key pinned in the AMC trust list | `--key <licenseKey>`<br>`--json` | `sector pack activate` |
-| `amc domain pack checkout` | Print the checkout link when this deployment has a checkout and licence verification configured | `--success-url <url>`<br>`--cancel-url <url>`<br>`--email <email>`<br>`--reference <id>`<br>`--json` | `sector pack checkout` |
+| `amc domain pack access` | Show Industry Packs access (free: every pack is included, no licence needed) | `--json` | `subscribe`, `sector pack access` |
+| `amc domain pack activate` | Record a legacy Industry Packs licence (not needed: Industry Packs are free) | `--key <licenseKey>`<br>`--json` | `sector pack activate` |
+| `amc domain pack checkout` | Industry Packs are free; there is nothing to buy (kept for scripts that call it) | `--success-url <url>`<br>`--cancel-url <url>`<br>`--email <email>`<br>`--reference <id>`<br>`--json` | `sector pack checkout` |
 | `amc domain pack describe` | Show details of a specific industry sector pack | `--pack <packId>`<br>`--json` | `sector pack describe` |
 | `amc domain pack list` | List all available industry sector packs | `--station <station>`<br>`--domain <d>`<br>`--json` | `sector pack list` |
 | `amc domain pack run` | Run an industry sector pack — interactive assessment or baseline score | `--pack <packId>`<br>`--baseline`<br>`--json` | `sector pack run` |
-| `amc domain pack verify` | Verify an Industry Packs license key against the licence key pinned in the AMC trust list | `--key <licenseKey>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | `sector pack verify` |
+| `amc domain pack verify` | Verify a legacy Industry Packs license key against the licence key pinned in the AMC trust list | `--key <licenseKey>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | `sector pack verify` |
 | `amc domain report` | Build full domain report and write it to a file (not evaluated without evidence) | `--agent <id>`<br>`--domain <d>`<br>`--output <file>`<br>`--example`<br>`--json` | `sector report` |
 | `amc domain roadmap` | Generate 30/60/90-day roadmap for this domain (not evaluated without evidence) | `--agent <id>`<br>`--domain <d>`<br>`--example`<br>`--json` | `sector roadmap` |
 | `amc down` | Stop AMC Studio local control plane | - | - |
@@ -664,7 +664,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc lease` | Issue/verify/revoke short-lived agent leases | - | - |
 | `amc lease issue` | - | `--agent <agentId>`<br>`--ttl <ttl>`<br>`--scopes <scopes>`<br>`--routes <routes>`<br>`--models <models>`<br>`--rpm <rpm>`<br>`--tpm <tpm>`<br>`--max-cost-usd-per-day <usd>`<br>`--workorder <workOrderId>` | - |
 | `amc lease resign-revocations` | Re-sign the lease revocation store as owner, only if its sha256 is the reviewed digest | `--expect-digest <sha256>` | - |
-| `amc lease revoke` | - | `--lease-id <id>`<br>`--reason <reason>`<br>`--token <lease>` | - |
+| `amc lease revoke` | - | `--lease-id <id>`<br>`--reason <reason>`<br>`--token <lease>`<br>`--token-file <path>` | - |
 | `amc lease verify` | - | - | - |
 | `amc legal-hold` | Issue or manage legal holds | `--issue`<br>`--release <holdId>`<br>`--list`<br>`--init`<br>`--rebind`<br>`--accept-unverified-legacy`<br>`--tenant <id>`<br>`--reason <text>`<br>`--issued-by <name>` | - |
 | `amc lessons-list` | List lessons learned from corrections | `--scope <scope>`<br>`--agent <agentId>` | - |
@@ -768,7 +768,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc monitor` | Continuous production monitoring — real-time scoring, drift detection, and alerting | `--runtime <name>`<br>`--stdin` | - |
 | `amc monitor check` | One-shot trust drift analysis (check for degradation without running continuously) | `--agent <agentId>`<br>`--alert-threshold <n>` | - |
 | `amc monitor events` | Show recent monitoring events | `--limit <n>`<br>`--json` | - |
-| `amc monitor live` | Start real-time monitoring with live assurance checks on incoming traces | `--agent <agentId>`<br>`--provider <provider>`<br>`--endpoint <url>`<br>`--api-key <key>`<br>`--budget <usd>`<br>`--max-latency <ms>`<br>`--alert-severity <level>` | - |
+| `amc monitor live` | Start real-time monitoring with live assurance checks on incoming traces | `--agent <agentId>`<br>`--provider <provider>`<br>`--endpoint <url>`<br>`--api-key <key>`<br>`--api-key-file <path>`<br>`--budget <usd>`<br>`--max-latency <ms>`<br>`--alert-severity <level>` | - |
 | `amc monitor metrics` | Get metrics for a specific agent | `--agent <id>`<br>`--json` | - |
 | `amc monitor start` | Start continuous monitoring: scores agent at intervals, detects drift, sends alerts on degradation | `--agent <id>`<br>`--scoring-interval <ms>`<br>`--drift-interval <ms>`<br>`--score-drop-threshold <n>`<br>`--no-webhooks` | - |
 | `amc monitor status` | Show monitoring status for all agents | `--json` | - |
@@ -1189,9 +1189,10 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc up` | Start AMC control plane in one command (studio + gateway + bridge) | `--demo`<br>`--read-only`<br>`--dry-run`<br>`--no-open`<br>`--no-remember`<br>`--no-baseline` | `start` |
 | `amc upgrade` | Generate upgrade plan | `--to <destination>` | - |
 | `amc user` | Multi-user RBAC account management | - | - |
-| `amc user add` | Add a user with RBAC roles | `--username <name>`<br>`--role <roles>` | - |
-| `amc user init` | Initialize signed users.yaml with first OWNER user | `--username <name>` | - |
+| `amc user add` | Add a user with RBAC roles | `--username <name>`<br>`--role <roles>`<br>`--password-file <path>` | - |
+| `amc user init` | Initialize signed users.yaml with first OWNER user | `--username <name>`<br>`--password-file <path>`<br>`--force` | - |
 | `amc user list` | List RBAC users | - | - |
+| `amc user password` | Set a new password for a console account; its signed-in sessions end | `--password-file <path>` | - |
 | `amc user revoke` | Revoke a user account | - | - |
 | `amc user role` | Set user roles | - | - |
 | `amc user role set` | Replace roles for a user | `--roles <roles>` | - |
@@ -1233,6 +1234,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc vault history migrate` | Authenticate only current and explicitly approved keys; preserve original untrusted bytes | `--role <role>`<br>`--expected-sha256 <hash>`<br>`--approve-fingerprint <fingerprints...>` | - |
 | `amc vault init` | Initialize encrypted vault for signing keys | - | - |
 | `amc vault lock` | Lock vault and clear in-memory private keys | - | - |
+| `amc vault passphrase` | Change the vault passphrase (the keys stay the same); forgets the remembered passphrase | - | - |
 | `amc vault privacy-budget` | Check privacy budget for an agent | `--json` | - |
 | `amc vault rag-guard` | Guard RAG chunks against injection | `--json` | - |
 | `amc vault rotate-keys` | Rotate the monitor key (ledger-row and receipt purposes) with a signed rotation statement; alias of amc keys rotate | - | - |
@@ -1249,7 +1251,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc watch` | Observability, attestation, and safety testing | - | - |
 | `amc watch alerts` | Show recent alerts for a monitored agent | `--agent <id>`<br>`--limit <n>`<br>`--json` | - |
 | `amc watch attest` | Attest an agent output | `--json` | - |
-| `amc watch connect` | Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook) | `--provider <provider>`<br>`--endpoint <url>`<br>`--api-key <key>`<br>`--poll-interval <ms>`<br>`--agent <agentId>` | - |
+| `amc watch connect` | Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook) | `--provider <provider>`<br>`--endpoint <url>`<br>`--api-key <key>`<br>`--api-key-file <path>`<br>`--poll-interval <ms>`<br>`--agent <agentId>` | - |
 | `amc watch explain` | Generate explainability packet for an agent run | `--json` | - |
 | `amc watch host-hardening` | Check host hardening status for this AMC deployment | `--json` | - |
 | `amc watch profiler-anomalies` | List detected behavioral anomalies for an agent | `--agent <id>`<br>`--limit <n>` | - |

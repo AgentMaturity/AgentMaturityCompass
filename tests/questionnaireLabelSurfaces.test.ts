@@ -9,11 +9,10 @@ import { registerDomainProductCliCommands } from "../src/cli-domain-product-comm
 import { assessDomain } from "../src/domains/domainAssessmentEngine.js";
 import { buildDomainReport } from "../src/domains/domainReportBuilder.js";
 import { buildIndustryPackAudit, renderIndustryPackAuditMarkdown } from "../src/domains/industryPackAudit.js";
-import { getIndustryPackEntitlement, toIndustryPackCatalogItem } from "../src/domains/industryPackEntitlement.js";
+import { toIndustryPackCatalogItem } from "../src/domains/industryPackEntitlement.js";
 import { INDUSTRY_PACKS, scoreIndustryPack } from "../src/domains/industryPacks.js";
 import { QUESTIONNAIRE_NOTICE } from "../src/domains/questionnaireLabel.js";
 import { createAmcMcpServer, resetRateLimiter } from "../src/mcp/amcMcpServer.js";
-import { testIndustryPackLicence, type TestIndustryPackLicence } from "./helpers/industryPackLicence.js";
 
 /**
  * P1-42 review: every surface that shows a pack score, level or pack listing says the content is experimental and
@@ -29,8 +28,7 @@ describe("library results carry the content status", () => {
   });
 
   test("the pack catalog item behind pack list, the MCP list and Studio's pack list", () => {
-    const entitlement = getIndustryPackEntitlement(mkdtempSync(join(tmpdir(), "amc-label-")));
-    expect(toIndustryPackCatalogItem(PACK, entitlement).contentStatus).toBe("experimental");
+    expect(toIndustryPackCatalogItem(PACK).contentStatus).toBe("experimental");
   });
 
   test("the pack audit, JSON and Markdown", () => {
@@ -59,19 +57,18 @@ describe("rendered surfaces show it", () => {
   });
 });
 
+// Industry Packs are free: these surfaces run with no licence, under an empty AMC home (no trust list is read).
 describe("CLI and MCP", () => {
-  let licence: TestIndustryPackLicence;
   const roots: string[] = [];
   beforeEach(() => {
-    licence = testIndustryPackLicence();
-    vi.stubEnv("AMC_HOME", licence.amcHome);
-    vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_KEY", licence.licenseKey);
+    const home = mkdtempSync(join(tmpdir(), "amc-label-home-"));
+    roots.push(home);
+    vi.stubEnv("AMC_HOME", home);
     resetRateLimiter();
   });
   afterEach(() => {
     vi.unstubAllEnvs();
     vi.restoreAllMocks();
-    licence.cleanup();
     while (roots.length > 0) rmSync(roots.pop()!, { recursive: true, force: true });
   });
 

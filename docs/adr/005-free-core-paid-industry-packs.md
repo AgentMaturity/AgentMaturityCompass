@@ -1,7 +1,7 @@
 # ADR-005: Free Core + Paid Industry Packs Business Model
 
 ## Status
-Accepted
+Superseded on 2026-11-07 by [ADR 019](019-industry-packs-free.md): Industry Packs are free. This record is kept as history.
 
 ## Date
 2026-03-10
@@ -25,3 +25,4 @@ Industry Packs contain regulatory-grounded assessments (HIPAA, MiFID II, FERPA, 
 ## Notes
 - 2026-10-11 (P0-28): the hand-typed assurance-pack count in the Decision had drifted and was removed; `scripts/gen-counts.mjs` reports the registered count. Nothing else in this record changed.
 - 2026-10-18 (P1-51, D-06 = B): the paid Industry Packs gate stays. A licence gates access to pack questions and runs, never a result; pack answers are self-reported questionnaires; licences verify only against a key pinned in the operator's trust list; and checkout is offered only where it is configured. ADR-008 (P1-31) may supersede this record.
+- 2026-11-07: superseded by [ADR 019](019-industry-packs-free.md). The owner decided that Industry Packs are free for everyone, with no licence, checkout, account or payment; the gate, the price and the checkout are gone, and legacy licence verification stays for existing licence holders. Access never changes a result.

@@ -85,6 +85,20 @@ describe("unified run", () => {
     expect(output).toContain("Surface coverage");
     expect(output).toContain("Top fixes");
     expect(output.length).toBeGreaterThan(200);
+
+    // Escapes follow chalk: none for a pipe, a log file, NO_COLOR or --no-color (level 0), colour in a terminal.
+    const { default: chalk } = await import("chalk");
+    const level = chalk.level;
+    try {
+      chalk.level = 0;
+      const plain = renderUnifiedResult(result);
+      expect(plain).not.toContain("\x1b");
+      expect(plain).toContain("Overall Grade:  B-");
+      chalk.level = 3;
+      expect(renderUnifiedResult(result)).toContain("\x1b[");
+    } finally {
+      chalk.level = level;
+    }
   });
 
   test("renderCIAnnotations produces GitHub-compatible annotations", async () => {

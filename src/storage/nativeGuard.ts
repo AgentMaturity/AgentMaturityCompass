@@ -15,7 +15,6 @@
 import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { delimiter, dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 
 const requireFromHere = createRequire(import.meta.url);
 
@@ -41,9 +40,13 @@ function probe(): "ok" | "abi" | "other" {
   }
 }
 
-function packageRoot(): string {
-  // dist/storage/nativeGuard.js -> package root is two directories up.
-  return resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
+/**
+ * The project whose node_modules holds better-sqlite3, where `npm rebuild` must run. For a global install
+ * that is the AMC package; in the desktop launchers' `npm install --prefix` runtime npm hoists
+ * better-sqlite3 above the AMC package, so it is the runtime folder.
+ */
+function sqliteProjectRoot(): string {
+  return resolve(dirname(requireFromHere.resolve("better-sqlite3/package.json")), "..", "..");
 }
 
 function rebuildForCurrentNode(): void {
@@ -51,8 +54,10 @@ function rebuildForCurrentNode(): void {
   // step) target THIS Node's ABI, not whatever Node npm normally uses.
   const nodeDir = dirname(process.execPath);
   const env = { ...process.env, PATH: `${nodeDir}${delimiter}${process.env.PATH ?? ""}` };
-  const npm = process.platform === "win32" ? "npm.cmd" : "npm";
-  execFileSync(npm, ["rebuild", "better-sqlite3"], { cwd: packageRoot(), env, stdio: "ignore" });
+  const options = { cwd: sqliteProjectRoot(), env, stdio: "ignore" as const };
+  // Windows starts npm.cmd only through a shell (CVE-2024-27980); one command string avoids Node's DEP0190.
+  if (process.platform === "win32") execFileSync("npm rebuild better-sqlite3", { ...options, shell: true });
+  else execFileSync("npm", ["rebuild", "better-sqlite3"], options);
 }
 
 function clearCache(): void {
@@ -159,8 +164,8 @@ function guard(): void {
       `AMC could not load its database engine under Node ${process.version}.`,
       "This happens when amc runs under a different Node than the one it was built with.",
       "Fix it with either:",
-      `  1) cd "${packageRoot()}" && npm rebuild better-sqlite3`,
-      "  2) reinstall with this Node active:  npm install -g agent-maturity-compass",
+      `  1) cd "${sqliteProjectRoot()}" && npm rebuild better-sqlite3`,
+      "  2) reinstall AMC with this Node active, the way you installed it (the desktop app reinstalls after you delete its runtime folder)",
       "",
     ].join("\n") + "\n",
   );

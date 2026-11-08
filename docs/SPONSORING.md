@@ -6,10 +6,10 @@ If it helps you, you can support the project without confusing sponsorship with 
 ## Sponsorship vs pricing
 
 - **Sponsorship** supports the health of the open project.
-- **Pricing** pays for product access, support, services, or enterprise deployment value.
+- **Pricing** pays for support, services, or enterprise deployment value. Product access is free: the whole product, Industry Packs included, is MIT licensed, and the current source build asks for no Industry Packs licence key (the published 1.1.1 release still does).
 
 If you want to back the mission, sponsor.
-If you want product/service value, buy the relevant offering.
+If you want support or service value, ask about the relevant offering.
 
 ## Why sponsor AMC
 Sponsorship helps fund:

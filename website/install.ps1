@@ -37,6 +37,9 @@ if ($env:AMC_INSTALL_TEST_MODE -ne "1") {
   if ($NodeMajor -lt 20) {
     Fail-AmcInstall "Node.js 20 or newer is required; found $(& node --version)"
   }
+  if ($NodeMajor -eq 20) {
+    Write-Warning "Node 20 reached end of life on 2026-04-30; use Node 22 or 24 LTS."
+  }
 }
 
 if ($env:AMC_INSTALL_TEST_MODE -eq "1" -and -not [string]::IsNullOrWhiteSpace($env:AMC_INSTALL_PLATFORM)) {
@@ -99,7 +102,9 @@ try {
   if (-not (Test-Path -PathType Leaf $Installer)) {
     Fail-AmcInstall "release archive is missing install.ps1"
   }
-  & $Installer
+  # A child process with Bypass: the default client execution policy refuses to run a .ps1 file, even though
+  # `irm | iex` can run this text.
+  & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $Installer
   if ($LASTEXITCODE -ne 0) {
     Fail-AmcInstall "packaged installer exited with code $LASTEXITCODE"
   }

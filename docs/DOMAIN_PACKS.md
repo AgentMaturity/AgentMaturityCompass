@@ -162,7 +162,7 @@ amc compliance report --framework SOC2 --station health --json
 
 - `amc domain pack list --station <station>` filters by the pack's `stationId`. `--domain` still works as a deprecated alias and prints `--domain is deprecated; use --station` to stderr; giving both exits 1 with `Use --station or --domain, not both.` An unknown station exits 1.
 - `amc compliance report --station <station>` keeps only the framework's mappings whose `stationsForMapping` includes the station, evaluates them exactly as an unfiltered report would, and adds `"station"` to the JSON report and a `Station:` line to the Markdown report. Coverage is computed over the kept categories only.
-- Studio `GET /industry-packs/list?station=<station>` filters the same way as `pack list`; an unknown value returns 400 `{"error":"unknown station: <value>"}`. Entitlement is unchanged.
+- Studio `GET /industry-packs/list?station=<station>` filters the same way as `pack list`; an unknown value returns 400 `{"error":"unknown station: <value>"}`. Industry Packs are free, so every listed pack is unlocked.
 
 ## Regulatory Currency
 

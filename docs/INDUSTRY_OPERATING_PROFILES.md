@@ -226,7 +226,8 @@ Commands as run on 2026-10-03 in the F1 worktree
 (`/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_fc54d4b0-c89-1`,
 HEAD `8f57ce63` plus this track's commits, Darwin arm64, Node v25.5.0,
 pnpm 10.33.0), each against a fresh `mkdtemp` workspace with a test-only
-Industry Packs licence key in the environment:
+Industry Packs licence key in the environment. That licence was needed then;
+since 2026-11-07 Industry Packs are free and `amc domain apply` needs none:
 
 ```sh
 # 1. Emit the profile (also writes the guardrails block and .amc/guardrails.yaml, as before)

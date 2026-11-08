@@ -17,6 +17,7 @@
 import { createInterface, type Interface as ReadlineInterface } from "node:readline";
 import { spawn, type ChildProcess } from "node:child_process";
 import { existsSync } from "node:fs";
+import { stripVTControlCharacters } from "node:util";
 import chalk from "chalk";
 import { createReplContext, updateContextFromOutput, type ReplContext } from "./replContext.js";
 import { parseInput, getCompletions, fuzzyMatch, type ParsedCommand } from "./replParser.js";
@@ -51,7 +52,9 @@ async function execAmcCommand(command: string, ctx: ReplContext): Promise<{ outp
     let output = "";
     const proc = spawn(process.execPath, [bin, ...args], {
       stdio: ["inherit", "pipe", "pipe"],
-      env: { ...process.env, FORCE_COLOR: "1", AMC_REPL: "1" },
+      // The piped child follows this shell's colour decision (chalk already honours NO_COLOR, --no-color,
+      // FORCE_COLOR=0, TERM=dumb and a non-TTY); FORCE_COLOR beside NO_COLOR would also make Node warn.
+      env: { ...process.env, ...(chalk.level > 0 ? { FORCE_COLOR: String(chalk.level) } : {}), AMC_REPL: "1" },
       cwd: process.cwd(),
     });
 
@@ -71,7 +74,8 @@ async function execAmcCommand(command: string, ctx: ReplContext): Promise<{ outp
 
     proc.on("close", (code) => {
       activeProc = null;
-      resolveP({ output, exitCode: code ?? 0, durationMs: Date.now() - start });
+      // The terminal got the colours; the context parser (score, level, gaps) reads plain text.
+      resolveP({ output: stripVTControlCharacters(output), exitCode: code ?? 0, durationMs: Date.now() - start });
     });
 
     proc.on("error", (err) => {

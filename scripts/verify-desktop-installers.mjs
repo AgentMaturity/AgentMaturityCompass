@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
+import { assertNoAppleMetadata } from "./lib/tar-metadata.mjs";
 
 const root = resolve(process.cwd());
 const outRoot = resolve(root, process.env.AMC_DESKTOP_PACKAGE_OUT || "dist/installers");
@@ -107,6 +108,7 @@ for (const pkg of manifest.packages ?? []) {
     fail(`archive hash mismatch for ${pkg.platform}`);
   }
   const base = `amc-${manifest.packageVersion}-${pkg.platform}`;
+  const appResources = `${base}/Agent Maturity Compass Studio.app/Contents/Resources`;
   const platformEntries = pkg.kind === "windows"
     ? [
       `${base}/install.ps1`,
@@ -128,15 +130,23 @@ for (const pkg of manifest.packages ?? []) {
           `${base}/Agent Maturity Compass Studio.app/Contents/PkgInfo`,
           `${base}/Agent Maturity Compass Studio.app/Contents/MacOS/Agent Maturity Compass Studio`,
           `${base}/Agent Maturity Compass Studio.app/Contents/Resources/README.md`,
-          `${base}/Agent Maturity Compass Studio.app/Contents/Resources/launch-studio.sh`
+          `${base}/Agent Maturity Compass Studio.app/Contents/Resources/launch-studio.sh`,
+          `${appResources}/agent-maturity-compass-${manifest.packageVersion}.tgz`
         ]
         : [])
     ];
   assertArchiveContains(archivePath, platformEntries);
-  const packageEntry = `${base}/agent-maturity-compass-${manifest.packageVersion}.tgz`;
-  const packagedTarball = readArchiveEntry(archivePath, packageEntry);
-  if (createHash("sha256").update(packagedTarball).digest("hex") !== manifest.npmTarball.sha256) {
-    fail(`nested npm tarball hash mismatch for ${pkg.platform}`);
+  if (!archivePath.endsWith(".zip")) assertNoAppleMetadata(archivePath);
+  const packageEntries = [`${base}/agent-maturity-compass-${manifest.packageVersion}.tgz`];
+  if (pkg.platform === "macos-universal") {
+    // The app carries its own copy so it still starts after it is moved out of the extracted folder.
+    packageEntries.push(`${appResources}/agent-maturity-compass-${manifest.packageVersion}.tgz`);
+  }
+  for (const packageEntry of packageEntries) {
+    const packagedTarball = readArchiveEntry(archivePath, packageEntry);
+    if (createHash("sha256").update(packagedTarball).digest("hex") !== manifest.npmTarball.sha256) {
+      fail(`nested npm tarball hash mismatch for ${packageEntry}`);
+    }
   }
   const installerEntry = `${base}/${pkg.kind === "windows" ? "install.ps1" : "install.sh"}`;
   const installer = readArchiveEntry(archivePath, installerEntry).toString("utf8");
@@ -148,6 +158,21 @@ for (const pkg of manifest.packages ?? []) {
   }
   if (pkg.kind !== "windows" && !installer.match(/sha256sum|shasum -a 256/)) {
     fail(`Unix installer must verify the nested npm tarball for ${pkg.platform}`);
+  }
+  // The Studio launchers install the runtime too, so each must pin the same digest.
+  const launcherEntries = pkg.platform === "macos-universal"
+    ? [`${appResources}/launch-studio.sh`]
+    : pkg.kind === "windows" ? [`${base}/Agent Maturity Compass Studio.ps1`] : [];
+  for (const entry of launcherEntries) {
+    const launcher = readArchiveEntry(archivePath, entry).toString("utf8");
+    if (!launcher.includes(manifest.npmTarball.sha256)) {
+      fail(`${entry} does not pin the nested npm tarball hash`);
+    }
+    // On upgrade a launcher stops the previous Studio only when that pid's command line is the Studio daemon:
+    // a stale state file's pid may now belong to another program.
+    if (!launcher.includes("_studio-daemon")) {
+      fail(`${entry} does not check the _studio-daemon identity before stopping the previous Studio`);
+    }
   }
   if (pkg.platform === "macos-universal" && !pkg.appLaunchers?.some((launcher) => launcher.kind === "macos-app-bundle")) {
     fail("macOS package must declare the Studio app launcher in appLaunchers");

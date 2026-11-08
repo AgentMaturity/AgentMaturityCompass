@@ -10,12 +10,37 @@ interface ParsedPasswordHash {
   hashB64: string;
 }
 
+/**
+ * LIVE-VAULT-13: scrypt N=2^15 (32 MiB, about 60 ms): the most the synchronous login path can afford. OWASP's floor of
+ * N=2^17 blocks Studio's event loop for about a quarter of a second per login, so it waits for an asynchronous login path.
+ */
 const DEFAULT_PARAMS = {
-  n: 16384,
+  n: 32768,
   r: 8,
   p: 1,
   keylen: 64
 };
+/**
+ * A stored hash asking for more is refused, so a hostile hash string can make scrypt use at most 64 MiB (128·N·r, twice a
+ * current verifier) and eight times a current verifier's work (p at most 4), about half a second.
+ */
+const MAX_MEMORY = 64 * 1024 * 1024;
+const MAX_P = 4;
+const MAX_KEYLEN = 128;
+export const MIN_PASSWORD_LENGTH = 12;
+
+/** A new password the policy refuses; the console account routes answer it with 400. */
+export class PasswordPolicyError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "PasswordPolicyError";
+  }
+}
+
+/** Node refuses scrypt when 128·N·r exceeds maxmem (32 MiB by default, which N=2^15 with r=8 just reaches); twice that is set explicitly. */
+function scryptOptions(parsed: { n: number; r: number; p: number }): { N: number; r: number; p: number; maxmem: number } {
+  return { N: parsed.n, r: parsed.r, p: parsed.p, maxmem: 256 * parsed.n * parsed.r };
+}
 
 function parsePasswordHash(encoded: string): ParsedPasswordHash {
   const parts = encoded.split("$");
@@ -29,6 +54,9 @@ function parsePasswordHash(encoded: string): ParsedPasswordHash {
   const keylen = parts[4]!;
   const saltB64 = parts[5]!;
   const hashB64 = parts[6]!;
+  if (!(128 * Number(n) * Number(r) <= MAX_MEMORY) || !(Number(p) <= MAX_P) || !(Number(keylen) <= MAX_KEYLEN)) {
+    throw new Error("password hash parameters out of range");
+  }
   return {
     algo: algo as "scrypt",
     n: Number(n),
@@ -40,16 +68,9 @@ function parsePasswordHash(encoded: string): ParsedPasswordHash {
   };
 }
 
-export function hashPassword(password: string): string {
-  if (password.length < 8) {
-    throw new Error("password must be at least 8 characters");
-  }
+function derive(password: string): string {
   const salt = randomBytes(16);
-  const derived = scryptSync(password, salt, DEFAULT_PARAMS.keylen, {
-    N: DEFAULT_PARAMS.n,
-    r: DEFAULT_PARAMS.r,
-    p: DEFAULT_PARAMS.p
-  });
+  const derived = scryptSync(password, salt, DEFAULT_PARAMS.keylen, scryptOptions(DEFAULT_PARAMS));
   return [
     "scrypt",
     String(DEFAULT_PARAMS.n),
@@ -61,16 +82,55 @@ export function hashPassword(password: string): string {
   ].join("$");
 }
 
+/** Why the policy refuses a new password (fewer than MIN_PASSWORD_LENGTH characters, or the account's username), else null. */
+export function passwordPolicyProblem(password: string, username?: string): string | null {
+  if (password.length < MIN_PASSWORD_LENGTH) return `password must be at least ${MIN_PASSWORD_LENGTH} characters`;
+  if (username !== undefined && password.toLowerCase() === username.toLowerCase()) return "password must not be the username";
+  return null;
+}
+
+/** A verifier for a new password the policy accepts (passwordPolicyProblem; the username when the account is named). */
+export function hashPassword(password: string, options: { username?: string } = {}): string {
+  const problem = passwordPolicyProblem(password, options.username);
+  if (problem !== null) throw new PasswordPolicyError(problem);
+  return derive(password);
+}
+
+/** A stored verifier made with less work than new ones; the next successful login replaces it (rehashPassword). */
+export function passwordHashNeedsUpgrade(encodedHash: string): boolean {
+  try {
+    return parsePasswordHash(encodedHash).n < DEFAULT_PARAMS.n;
+  } catch {
+    return false;
+  }
+}
+
+/** The same, already verified password at the current cost; no policy check, since the password is not new. */
+export function rehashPassword(password: string): string {
+  return derive(password);
+}
+
+/** Half a current verifier's work: the unit padFailedVerify runs it in (a pre-LIVE-VAULT-13 N=2^14 verifier costs one). */
+const PAD = { n: DEFAULT_PARAMS.n / 2, r: DEFAULT_PARAMS.r };
+
+/**
+ * LIVE-VAULT-05: a wrong password against a verifier made with less work than a current one (or one that does not parse)
+ * is refused sooner than an unknown username, whose dummy check costs a current verify, so timing would tell a caller the
+ * account exists. Run after such a refusal, this does the missing work, so every refused login costs about one current verify.
+ */
+export function padFailedVerify(encodedHash: string): void {
+  let done = 0;
+  try { const parsed = parsePasswordHash(encodedHash); done = parsed.n * parsed.r * parsed.p; } catch { /* the check refused before any scrypt work */ }
+  const p = Math.round((DEFAULT_PARAMS.n * DEFAULT_PARAMS.r * DEFAULT_PARAMS.p - done) / (PAD.n * PAD.r));
+  if (p > 0) scryptSync("amc-timing-pad", "amc-timing-pad", 16, scryptOptions({ n: PAD.n, r: PAD.r, p }));
+}
+
 export function verifyPassword(password: string, encodedHash: string): boolean {
   try {
     const parsed = parsePasswordHash(encodedHash);
     const salt = Buffer.from(parsed.saltB64, "base64");
     const expected = Buffer.from(parsed.hashB64, "base64");
-    const actual = scryptSync(password, salt, parsed.keylen, {
-      N: parsed.n,
-      r: parsed.r,
-      p: parsed.p
-    });
+    const actual = scryptSync(password, salt, parsed.keylen, scryptOptions(parsed));
     if (actual.length !== expected.length) {
       return false;
     }

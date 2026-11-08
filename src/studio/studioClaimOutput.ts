@@ -24,7 +24,7 @@ export const STUDIO_RESULT_ROUTES: readonly ResultRoute[] = [
     ["GET", "value/report"], ["GET", "standard/verify"], ["GET", "trust/status"], ["GET", "transparency/verify"],
     ["POST", "audit/binder/create"], ["GET", "audit/binders/:id/verify"], ["GET", "compliance/verify"],
     ["GET", "industry-packs/list", { items: "packs" }],
-    // access and checkout are pack-gate routes, not results.
+    // access and checkout describe Industry Packs access (free), not results.
     ["GET", "industry-packs/:id", { except: ["access", "checkout"] }]
   ]),
   ...resultFamily("studio", "/", "executed_test", [
@@ -36,9 +36,9 @@ export const STUDIO_RESULT_ROUTES: readonly ResultRoute[] = [
     [["GET", "compliance/report", { source: "compliance_report" }], ["GET", "compliance/fleet"]], true)
 ];
 
-/** Truth rule 6, on every pack-gate response. */
+/** Truth rule 6, on every Industry Packs access response. */
 export const ENTITLEMENT_NOTE =
-  "Payment unlocks access to pack content; it never changes a result, a trust tier or a verification outcome.";
+  "Industry Packs are free; access never changes a result, a trust tier or a verification outcome.";
 
 const bound = new WeakMap<ServerResponse, { route: ResultRoute; workspace: string; claim?: ClaimFields }>();
 

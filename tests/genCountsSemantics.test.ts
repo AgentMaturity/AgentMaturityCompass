@@ -162,3 +162,35 @@ describe("AMC-1526 — test inventory does not attest execution outcomes", () =>
     expect(readFileSync(join(fixture, "README.md"), "utf8")).toBe(original);
   });
 });
+
+describe("station cards on the home and compliance pages", () => {
+  // A card without counts comes first: its station must not take the next card's counts.
+  const home = '<a href="station-wealth.html" class="station-card"><h3>Wealth</h3></a>'
+    + '<a href="station-health.html" class="station-card"><h3>Health</h3><p class="station-card-meta">9 packs · 151 questions</p></a>';
+  const compliance = '<div class="domain-card" id="domain-wealth"><p>Wealth</p></div>'
+    + '<div class="domain-card" id="domain-health"><span>9 packs</span>\n  <span>151 questions</span></div>';
+
+  test("refreshes each card from its own station in the built registry", () => {
+    write("dist/package.json", '{"type":"module"}');
+    write("dist/domains/industryPacks.js",
+      'export function listIndustryPacks() { return [{ stationId: "health", questions: [1, 2, 3] }, { stationId: "health", questions: [4] }]; }\n');
+    write("website/index.html", home);
+    write("website/docs/compliance.html", compliance);
+
+    expect(run("--check").status).toBe(1);
+    const result = run("--write");
+    expect(result.status, result.stderr).toBe(0);
+    expect(readFileSync(join(fixture, "website/index.html"), "utf8")).toBe(home.replace("9 packs · 151", "2 packs · 4"));
+    expect(readFileSync(join(fixture, "website/docs/compliance.html"), "utf8"))
+      .toBe(compliance.replace("9 packs", "2 packs").replace("151 questions", "4 questions"));
+    expect(run("--check").status).toBe(0);
+  });
+
+  test("refuses a card it cannot verify and leaves it as written", () => {
+    write("website/docs/compliance.html", compliance);
+    const result = run("--write");
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain("no built pack counts for station health");
+    expect(readFileSync(join(fixture, "website/docs/compliance.html"), "utf8")).toBe(compliance);
+  });
+});

@@ -4,7 +4,6 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { toErrorMessage } from "../utils/errors.js";
 import { applyDomainToAgent } from "./domainApply.js";
 import { getPackById } from "./industryPacks.js";
-import { assertIndustryPackAccess } from "./industryPackEntitlement.js";
 import {
   buildIndustryPackAudit,
   industryPackAuditClaim,
@@ -110,7 +109,7 @@ export function registerDomainApplyCommand(domainCmd: Command): void {
     .option("--sign-profile <path>", "Sign a reviewed operating profile with the workspace auditor key (writes <path>.sig; refuses an inconsistent profile)")
     .option("--activate-profile <path>", "Activate a signed operating profile for --agent into the six signed configs under .amc/ (refuses unsigned, edited, foreign-signed, inconsistent or weakening profiles)")
     .option("--allow-widening", "With --activate-profile: accept fragments weaker than the current signed configs, after review", false)
-    .option("--audit", "Produce an auditor-ready Industry Pack audit (self-reported answers) for --pack (paid Industry Packs feature)", false)
+    .option("--audit", "Produce an auditor-ready Industry Pack audit (self-reported answers) for --pack", false)
     .option("--responses <path>", "JSON file of { questionId: level } responses for the audit (default: L1 baseline)")
     .option("--framework <id>", "Limit the audit crosswalk to one framework (eu_ai_act|nist|iso42001|soc2|sector)")
     .option("--audit-bundle <path>", "Write the audit bundle JSON, signed by the workspace auditor key")
@@ -141,8 +140,6 @@ export function registerDomainApplyCommand(domainCmd: Command): void {
             process.exit(1);
             return;
           }
-          // Paid Industry Packs entitlement gate (throws a paywall message if inactive).
-          assertIndustryPackAccess(process.cwd());
           const pack = getPackById(opts.pack);
           if (!pack) {
             console.error(chalk.red(`Unknown industry pack: ${opts.pack}`));
