@@ -229,7 +229,8 @@ framework through a scaffold, connect instructions and a trace import.
   `native_turn`, `workflow`, `human`; `human` is a command for you to run, never run by AMC), the preset, the build session, the
   validation plan and the baseline Enforce manifest, which must be ACTIVE: pending Enforce drift is reviewed in Enforce
   first, never applied unseen by Assemble.
-- **Workflow.** A declared workflow (JSON: `agent`, `parallel` and `pipeline` nodes, at most 64) is checked as data
+- **Workflow.** A declared workflow (JSON: `agent`, `verify`, `parallel` and `pipeline` nodes, at most 64; `verify` is
+  described in `docs/NATIVE_WORKFLOWS.md`) is checked as data
   when you answer and needs autonomy `act_with_approval`. It runs only through the agent's `workflow` tool, each helper
   through `spawnSubagent` (depth limit, signed handoff packet, declared scope, a started/completed pair); AMC never
   starts helper agents on its own. Studio's native build sessions compose no delegation, so the plan lists the workflow

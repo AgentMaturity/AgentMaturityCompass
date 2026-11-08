@@ -180,8 +180,7 @@ at once. `--max-active-children` (default 8) bounds every active, reserved or
 kept-open child under one root session, across `delegate`, `workflow` and their
 descendants. A call over the cap is refused at admission with
 `maxActiveChildren=N reached`; it is not queued. A `workflow` plan queues its
-own parallel nodes within the same cap instead
-([Native workflows](NATIVE_WORKFLOWS.md)).
+own parallel nodes within the same cap instead (`docs/NATIVE_WORKFLOWS.md`).
 
 ## What a stop proves
 

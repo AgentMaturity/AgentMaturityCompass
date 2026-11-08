@@ -54,8 +54,8 @@ Use this page to reach the shortest evidence-backed path for your task. AMC's pu
 
 ## Native Agent Orchestration
 
-- [Native delegation limits and agent definitions](NATIVE_DELEGATION_LIMITS.md): child stop conditions, and `.amc/agents/<name>.md` roles that only narrow a delegate
-- [Native workflows](NATIVE_WORKFLOWS.md): `agent`, `verify`, `parallel` and `pipeline` plans, durable progress, and the headless `agent-loop run --workflow-plan`
+- [Native delegation limits and agent definitions](NATIVE_DELEGATION_LIMITS.md): child stop conditions, `.amc/agents/<name>.md` roles that only narrow a delegate, kept-open delegates (`delegate_continue`) and parallel delegation
+- [Native workflows](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/NATIVE_WORKFLOWS.md): `agent`, `verify`, `parallel` and `pipeline` plans, durable progress, and the headless `agent-loop run --workflow-plan` (in the repository; not yet a site page)
 
 ## Build And Integrate
 
