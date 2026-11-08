@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto";
 import { spawn, spawnSync } from "node:child_process";
 import { existsSync, openSync, readFileSync, readdirSync, statSync, unlinkSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { verifyGatewayConfigSignature } from "../gateway/config.js";
+import { loadGatewayConfig, verifyGatewayConfigSignature } from "../gateway/config.js";
 import { initActionPolicyAsync, verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
 import { initToolsConfigAsync, verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
 import { initApprovalPolicy, verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
@@ -425,10 +425,14 @@ export async function runStudioForeground(params: {
   }
   await assertPortFree(listen.apiHost, listen.apiPort, listen.apiPortSource);
   await assertPortFree(metricsHost, listen.metricsPort, listen.metricsPortSource);
+  // The gateway never falls back and opens its session before it listens, so its busy ports are refused first (skeptic D4).
+  const gatewayHost = params.gatewayHost ?? listen.apiHost, gatewayConfig = loadGatewayConfig(workspace);
+  await assertPortFree(gatewayHost, params.gatewayPort ?? gatewayConfig.listen.port, params.gatewayPort === undefined ? "the gateway config" : "AMC_GATEWAY_PORT");
+  if (gatewayConfig.proxy.enabled) await assertPortFree(gatewayHost, params.proxyPort ?? gatewayConfig.proxy.port, params.proxyPort === undefined ? "the gateway config" : "AMC_PROXY_PORT");
   const gateway = await startGateway({
     workspace,
     workspaceId: workspaceIdFromDirectory(workspace),
-    listenHost: params.gatewayHost ?? listen.apiHost,
+    listenHost: gatewayHost,
     listenPort: params.gatewayPort,
     proxyPort: params.proxyPort,
     allowedCidrs: listen.allowedCidrs,

@@ -80,6 +80,18 @@ describe("single-workspace port policy", () => {
     expect(openSessions(path)).toBe(0);
   }, 120_000);
 
+  // Skeptic D4: startGateway opens its ledger session before it listens, so a busy gateway or proxy port used to fail
+  // after the session opened and leave it open and unsealed.
+  test("a busy gateway or proxy port is refused before the gateway opens its session", async () => {
+    const path = workspace();
+    const busy = (await hold())!;
+    await expect(runStudioForeground({ workspace: path, env: {}, apiPort: 0, metricsPort: 0, dashboardPort: 0, proxyPort: 0, gatewayHost: "127.0.0.1", gatewayPort: busy }))
+      .rejects.toThrow(`Port ${busy} (from AMC_GATEWAY_PORT) is already in use.`);
+    await expect(runStudioForeground({ workspace: path, env: {}, apiPort: 0, metricsPort: 0, dashboardPort: 0, gatewayPort: 0, gatewayHost: "127.0.0.1", proxyPort: busy }))
+      .rejects.toThrow(`Port ${busy} (from AMC_PROXY_PORT) is already in use.`);
+    expect(openSessions(path)).toBe(0);
+  }, 120_000);
+
   test("a busy default port falls back to a free one", async () => {
     const path = workspace();
     await hold(3212); // null when another Studio on this shared machine already holds it: busy either way
