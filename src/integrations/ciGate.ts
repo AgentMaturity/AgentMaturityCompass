@@ -1,7 +1,7 @@
 /**
  * CI/CD Gate & Integration Ecosystem — Gap 10
  *
- * GitHub Actions, generic CI gate and observability platform connectors.
+ * GitHub Actions and generic CI gates, plus the `amc watch connect` steps for observability providers.
  * Notifications are not generated here: they go through the signed
  * .amc/integrations.yaml (integrationStore.ts, `amc integrations init|sign`).
  */
@@ -10,7 +10,6 @@ import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { amcVersion } from "../version.js";
-import type { ObservabilityProvider } from "../watch/observabilityBridge.js";
 import * as fs from 'node:fs';
 
 /* ── Types ───────────────────────────────────────────────────────── */
@@ -285,95 +284,27 @@ amc-gate:
 `;
 }
 
-/* ── Observability Connector Config Generator ────────────────────── */
+/* ── Observability connectors (amc watch connect) ──────────────── */
 
-export interface ObservabilityConnectorConfig {
-  provider: ObservabilityProvider;
-  endpoint: string;
-  apiKey: string;
-  projectId?: string;
-  headers?: Record<string, string>;
-}
+const CONNECTORS = {
+  helicone: { name: "Helicone", endpoint: "https://api.helicone.ai", key: "your Helicone API key" },
+  datadog: { name: "Datadog", endpoint: "https://api.datadoghq.com", key: "your Datadog API key (sent as the DD-API-KEY header)" }
+} as const;
 
-export function generateConnectorConfig(provider: IntegrationType): {
-  envVars: Record<string, string>;
-  configYaml: string;
-  instructions: string;
-} {
-  switch (provider) {
-    case "langfuse":
-      return {
-        envVars: {
-          AMC_LANGFUSE_PUBLIC_KEY: "<your-langfuse-public-key>",
-          AMC_LANGFUSE_SECRET_KEY: "<your-langfuse-secret-key>",
-          AMC_LANGFUSE_HOST: "https://cloud.langfuse.com",
-        },
-        configYaml: `# AMC Observability — Langfuse Connector
-watch:
-  providers:
-    - provider: langfuse
-      endpoint: \${AMC_LANGFUSE_HOST}
-      apiKey: \${AMC_LANGFUSE_PUBLIC_KEY}
-      headers:
-        x-langfuse-secret-key: \${AMC_LANGFUSE_SECRET_KEY}
-      pollIntervalMs: 10000
-`,
-        instructions: `1. Sign up at https://cloud.langfuse.com
-2. Create a project and get your API keys
-3. Set environment variables: AMC_LANGFUSE_PUBLIC_KEY, AMC_LANGFUSE_SECRET_KEY
-4. Run: amc watch connect --provider langfuse --endpoint https://cloud.langfuse.com`,
-      };
-
-    case "helicone":
-      return {
-        envVars: { AMC_HELICONE_API_KEY: "<your-helicone-api-key>" },
-        configYaml: `# AMC Observability — Helicone Connector
-watch:
-  providers:
-    - provider: helicone
-      endpoint: https://api.helicone.ai
-      apiKey: \${AMC_HELICONE_API_KEY}
-      pollIntervalMs: 10000
-`,
-        instructions: `1. Sign up at https://www.helicone.ai
-2. Get your API key from the dashboard
-3. Set: AMC_HELICONE_API_KEY
-4. Run: amc watch connect --provider helicone --endpoint https://api.helicone.ai`,
-      };
-
-    case "datadog":
-      return {
-        envVars: {
-          AMC_DD_API_KEY: "<your-datadog-api-key>",
-          AMC_DD_SITE: "datadoghq.com",
-        },
-        configYaml: `# AMC Observability — Datadog Connector
-watch:
-  providers:
-    - provider: datadog
-      endpoint: https://api.\${AMC_DD_SITE}
-      apiKey: \${AMC_DD_API_KEY}
-      pollIntervalMs: 15000
-`,
-        instructions: `1. Get your Datadog API key from https://app.datadoghq.com/organization-settings/api-keys
-2. Set: AMC_DD_API_KEY, AMC_DD_SITE
-3. Run: amc watch connect --provider datadog --endpoint https://api.datadoghq.com`,
-      };
-
-    default:
-      return {
-        envVars: { AMC_WEBHOOK_URL: "<your-webhook-endpoint>" },
-        configYaml: `# AMC Observability — Generic Webhook
-watch:
-  providers:
-    - provider: webhook
-      endpoint: \${AMC_WEBHOOK_URL}
-`,
-        instructions: `1. Set up an HTTP endpoint that accepts POST requests with trace data
-2. Set: AMC_WEBHOOK_URL
-3. Run: amc watch connect --provider webhook --endpoint <your-url>`,
-      };
-  }
+/**
+ * The `amc watch connect` steps for a provider the CLI can authenticate to. The key goes in a private file or in
+ * AMC_WATCH_API_KEY, never argv, and no file is written, because nothing reads one. Langfuse is not offered: the CLI
+ * sends one key, and Langfuse's API needs the public key and the secret key together.
+ */
+export function generateConnectorConfig(provider: keyof typeof CONNECTORS): { instructions: string } {
+  const connector = CONNECTORS[provider];
+  return {
+    instructions: [
+      `${connector.name} traces are read by \`amc watch connect\`; setup writes no file, because nothing reads one.`,
+      `1. Save ${connector.key} in a file only you can read (chmod 600).`,
+      `2. amc watch connect --provider ${provider} --endpoint ${connector.endpoint} --api-key-file <that file>   (or set AMC_WATCH_API_KEY; --api-key would put the key in argv)`
+    ].join("\n")
+  };
 }
 
 /* ── Setup Command ───────────────────────────────────────────────── */
@@ -432,13 +363,13 @@ export function setupIntegration(
         + "channels of the signed .amc/integrations.yaml; point a webhook channel at a relay you run (amc integrations setup --type webhook).");
 
     case "langfuse":
+      throw new Error("`amc watch connect` cannot authenticate to Langfuse yet: it sends one key, and Langfuse's API needs the public key "
+        + "and the secret key together (HTTP Basic). No file was written.");
+
     case "helicone":
-    case "datadog": {
-      const connector = generateConnectorConfig(type);
-      files.push({ path: join(outputDir, `.amc-${type}-config.yaml`), content: connector.configYaml });
-      instructions = connector.instructions;
+    case "datadog":
+      instructions = generateConnectorConfig(type).instructions;
       break;
-    }
   }
 
   // Write files

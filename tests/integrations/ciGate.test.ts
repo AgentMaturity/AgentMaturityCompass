@@ -168,21 +168,22 @@ describe("generated CI templates: real flags and package, no evidence yet is nev
 });
 
 describe("Connector Config Generator", () => {
-  it("generates Langfuse config", () => {
-    const config = generateConnectorConfig("langfuse");
-    expect(config.envVars).toHaveProperty("AMC_LANGFUSE_PUBLIC_KEY");
-    expect(config.configYaml).toContain("langfuse");
-    expect(config.instructions).toContain("cloud.langfuse.com");
+  // The earlier assertions pinned AMC_LANGFUSE_*/AMC_HELICONE_*/AMC_DD_* variables, which nothing reads: they encoded the defect.
+  it("names the key inputs amc watch connect reads, never argv or variables nothing reads", () => {
+    for (const provider of ["helicone", "datadog"] as const) {
+      const { instructions } = generateConnectorConfig(provider);
+      expect(instructions).toContain(`amc watch connect --provider ${provider} --endpoint https://`);
+      expect(instructions).toContain("--api-key-file");
+      expect(instructions).toContain("AMC_WATCH_API_KEY");
+      expect(instructions).not.toMatch(/AMC_(HELICONE|DD|LANGFUSE)_/);
+    }
   });
 
-  it("generates Helicone config", () => {
-    const config = generateConnectorConfig("helicone");
-    expect(config.envVars).toHaveProperty("AMC_HELICONE_API_KEY");
-    expect(config.configYaml).toContain("helicone");
-  });
-
-  it("generates Datadog config", () => {
-    const config = generateConnectorConfig("datadog");
-    expect(config.envVars).toHaveProperty("AMC_DD_API_KEY");
+  it("setup writes no connector file, and refuses Langfuse, which the CLI cannot authenticate to", () => {
+    const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-setup-connector-")));
+    roots.push(dir);
+    for (const type of ["helicone", "datadog"] as const) expect(setupIntegration(dir, type, { outputDir: dir }).files).toEqual([]);
+    expect(() => setupIntegration(dir, "langfuse", { outputDir: dir })).toThrow(/cannot authenticate to Langfuse/);
+    expect(readdirSync(dir)).toEqual([]);
   });
 });

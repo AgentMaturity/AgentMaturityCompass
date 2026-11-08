@@ -1378,7 +1378,7 @@ export function registerLateStageCliCommands({
   integrations
     .command("setup")
     .description("Generate integration config files")
-    .requiredOption("--type <type>", "Integration: github-action | gitlab-ci | slack | webhook | langfuse | helicone | datadog")
+    .requiredOption("--type <type>", "Integration: github-action | gitlab-ci | slack | webhook | helicone | datadog")
     .option("--min-score <score>", "Minimum passing score for CI gates", "60")
     .option("--agent <agentId>", "Agent ID")
     .option("--output <dir>", "Output directory", ".")
@@ -1405,9 +1405,8 @@ export function registerLateStageCliCommands({
         { name: "gitlab-ci", desc: "GitLab CI pipeline gate" },
         { name: "slack", desc: "Slack notifications: the slack_webhook channel of the signed .amc/integrations.yaml (setup prints the steps)" },
         { name: "webhook", desc: "HMAC-signed webhook notifications: the webhook channel of the signed .amc/integrations.yaml (setup prints the steps)" },
-        { name: "langfuse", desc: "Langfuse observability connector" },
-        { name: "helicone", desc: "Helicone observability connector" },
-        { name: "datadog", desc: "Datadog observability connector" },
+        { name: "helicone", desc: "Helicone traces through amc watch connect (setup prints the steps)" },
+        { name: "datadog", desc: "Datadog traces through amc watch connect (setup prints the steps)" },
       ];
       for (const i of integrations) {
         console.log(`  ${chalk.white(i.name.padEnd(18))} ${chalk.gray(i.desc)}`);
