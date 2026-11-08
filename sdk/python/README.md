@@ -201,6 +201,17 @@ Responses route; it is distinct from `provider="openai"` Chat Completions.
 These values are fixed when the AMC process starts. Session messages cannot
 change the workspace, credentials, provider or permission boundary.
 
+`thinking`, `reasoning_effort` and `thinking_budget` are sent verbatim to the
+providers with a decoded reasoning wire (deepseek, anthropic, gemini and
+ollama) and refused for every other provider before anything is spawned;
+`amc acp` checks each provider's exact values at startup
+(`docs/NATIVE_PROVIDERS.md`). `cache_retention` (`short` or `long`),
+`max_retries`, `retry_max_delay_ms` and `retry_max_provider_delay_ms` set the
+route's prompt-cache retention and retry policy. A provider-requested wait
+stays within the local backoff ceiling (10 s unless `retry_max_delay_ms` is
+set) so retries fit inside `timeout`; raise `retry_max_provider_delay_ms`
+together with `timeout`.
+
 Workspace tools retain AMC's signed allowlist/firewall, budget, sandbox and
 owning-session evidence path. MCP requires workspace tools, an explicit signed
 approval gate, reviewed config/catalog digests and existing matching signed

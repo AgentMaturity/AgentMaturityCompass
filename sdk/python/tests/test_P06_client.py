@@ -437,7 +437,33 @@ def test_launch_parity_for_native_provider_controls_and_signed_approvals(monkeyp
     assert raised.value.options.get("shell", False) is False
 
 
+def test_launch_parity_for_reasoning_and_route_options(monkeypatch, tmp_path):
+    """SH-PROVIDERS: the TypeScript SDK's reasoning, retention and retry options, forwarded verbatim to `amc acp`."""
+    def capture(argv, **options):
+        raise CapturedLaunch(argv, options)
+
+    monkeypatch.setattr(client.subprocess, "Popen", capture)
+    with pytest.raises(CapturedLaunch) as raised:
+        AmcAgent(workspace=str(tmp_path), amc_bin=["selected-amc"], provider="gemini", model="explicit-model",
+                 thinking="enabled", thinking_budget=1024, max_retries=0, retry_max_delay_ms=2000, retry_max_provider_delay_ms=5000)
+    argv = raised.value.argv
+    for flag, value in (("--thinking", "enabled"), ("--thinking-budget", "1024"), ("--max-retries", "0"),
+                        ("--retry-max-delay", "2000"), ("--retry-max-provider-delay", "5000")):
+        assert argv.count(flag) == 1 and argv[argv.index(flag) + 1] == value
+    assert "--cache-retention" not in argv and "--reasoning-effort" not in argv
+    with pytest.raises(CapturedLaunch) as raised:
+        AmcAgent(workspace=str(tmp_path), amc_bin=["selected-amc"], provider="anthropic", model="explicit-model",
+                 reasoning_effort="xhigh", cache_retention="long")
+    argv = raised.value.argv
+    assert argv[argv.index("--reasoning-effort") + 1] == "xhigh" and argv[argv.index("--cache-retention") + 1] == "long"
+
+
 @pytest.mark.parametrize("options", [
+    {"provider": "openai", "thinking": "enabled"}, {"provider": "groq", "reasoning_effort": "high"},
+    {"provider": "anthropic", "thinking_budget": -1}, {"provider": "anthropic", "thinking_budget": True},
+    {"provider": "deepseek", "thinking_budget": 1024}, {"provider": "gemini", "reasoning_effort": ""},
+    {"cache_retention": "24h"}, {"max_retries": -1}, {"max_retries": True}, {"retry_max_delay_ms": 100},
+    {"retry_max_delay_ms": 20000, "retry_max_provider_delay_ms": 15000}, {"retry_max_provider_delay_ms": 9999},
     {"timeout": True}, {"timeout": float("inf")}, {"timeout": "1"},
     {"amc_bin": []}, {"amc_bin": ""}, {"amc_bin": ["amc\0"]}, {"amc_bin": 42},
     {"tools": []}, {"tools": "workspace", "approve_tools": "ALL"},
