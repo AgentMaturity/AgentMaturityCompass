@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { EventEmitter } from "node:events";
-import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readdirSync, realpathSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
@@ -179,6 +179,24 @@ describe("createAcpPermissionHandler", () => {
     expect(answered.cancels).toEqual([]);
     expect(decisions(stale.approvalRequestId).map(row => row.decision)).toEqual(["DENY"]);
   }, 90_000);
+
+  it("keeps an outstanding request open through a read that does not verify yet, and decides nothing from it", async () => {
+    const logs: string[] = [];
+    const handler = createAcpPermissionHandler({ workspace, agentId: "default", cli: { execPath: process.execPath, execArgv: [], entry: CLI }, log: m => logs.push(m) });
+    const raised = raise();
+    const open = event(raised, (signal: AbortSignal) => new Promise((_resolve, reject) => { signal.addEventListener("abort", () => reject(new Error("request cancelled")), { once: true }); }));
+    handler.handle(open.event); await flush();
+    expect(open.requests).toHaveLength(1);
+    // An artifact and its signature land as two writes; a watcher tick between them reads an unsigned request.
+    const sig = (readdirSync(workspace, { recursive: true }) as string[]).find(path => path.endsWith(`${raised.approvalRequestId}.json.sig`))!;
+    renameSync(join(workspace, sig), join(workspace, `${sig}.hidden`));
+    await new Promise(resolve => setTimeout(resolve, 2_500));
+    renameSync(join(workspace, `${sig}.hidden`), join(workspace, sig));
+    expect(logs).toEqual([]);
+    expect(open.cancels).toEqual([]);
+    open.turn.abort(); await flush();
+    expect(logs.join("\n")).toContain("the prompt ended before the client answered; request withdrawn");
+  });
 
   it("never reads its own allow_once decision as one made elsewhere, however long the approve command takes to exit", async () => {
     const tokenFile = reviewerToken();

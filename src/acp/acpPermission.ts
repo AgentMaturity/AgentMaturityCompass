@@ -123,10 +123,12 @@ export function createAcpPermissionHandler(init: AcpPermissionHandlerInit): { re
     const expiry = setTimeout(() => controller.abort(), Math.max(0, Math.min(2_147_483_647, item.request.expiresTs - Date.now())));
     // A decision made elsewhere (`amc approvals approve`/`deny`) withdraws the dialog, so no stale request stays live.
     // Only while the dialog is outstanding: once the client answered, our own decision must not read as someone else's.
-    let decidedElsewhere: string | null = null, unverifiable = false;
+    // A read that does not verify is retried on the next tick (a decision and its signature land as two writes); the
+    // answer path re-verifies and fails closed.
+    let decidedElsewhere: string | null = null;
     const watch = setInterval(() => {
       try { const status = pending(event).status; if (status !== "PENDING") { decidedElsewhere = status; controller.abort(); } }
-      catch { unverifiable = true; controller.abort(); }
+      catch { /* not yet readable as a verified decision */ }
     }, SETTLED_POLL_MS);
     const signal = AbortSignal.any([controller.signal, event.turnEnded]);
     try {
@@ -148,7 +150,6 @@ export function createAcpPermissionHandler(init: AcpPermissionHandlerInit): { re
       } catch (error) {
         clearInterval(watch);
         if (event.turnEnded.aborted) { init.log(`approval ${event.approvalRequestId}: the prompt ended before the client answered; request withdrawn`); return; }
-        if (unverifiable) throw new Error("The queued request no longer verifies; request withdrawn");
         if (decidedElsewhere !== null) { init.log(`approval ${event.approvalRequestId} was decided elsewhere (${decidedElsewhere}) before the client answered; request withdrawn`); return; }
         if (controller.signal.aborted) { init.log(`approval ${event.approvalRequestId} expired before the client answered`); return; }
         throw error;

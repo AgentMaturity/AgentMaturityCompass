@@ -20,6 +20,7 @@ is validated. Outbound frames are checked against the same schema in tests.
 | `session/prompt` | implemented | text, images and audio as the route supports; `stopReason` per the ACP table plus `_meta["dev.agentmaturity.amc"]` with the execution phases |
 | `session/cancel` | implemented | a signed `loop/cancel` with cause `user` |
 | `session/request_permission` (agent → client) | implemented | see below |
+| `$/cancel_request` (agent → client) | sent for a withdrawn permission request | unstable in schema 0.18; a client may ignore it, and the server ignores any later answer either way |
 | `session/set_mode`, `session/set_config_option`, `session/list`, `session/resume`, `session/close` | not implemented | `-32601`. No stub returns success for something the server does not do. `session/list` is deferred until it can be agent-scoped, bounded and honest about truncation |
 | client `fs/*`, `terminal/*` | never called | AMC runs its own governed tools under the signed allowlist and OS sandbox; delegating edits or commands to the editor would bypass the tool pipeline |
 | `_amc/session/release`, `_amc/session/events`, `_amc/session/withdraw`, `_amc/session/mcp`, `_amc/ask_user` | AMC extensions | release a writer, paged authenticated history, withdraw a queued submission, MCP status, `ask_user` to the client (`--ask-user`) |
