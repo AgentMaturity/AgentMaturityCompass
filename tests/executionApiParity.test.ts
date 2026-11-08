@@ -8,6 +8,7 @@ import { afterAll, describe, expect, it, vi } from "vitest";
 import { addUser } from "../src/auth/authApi.js";
 import { initProcessorRegistry } from "../src/dataflow/processorRegistry.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
+import { RUN_EXIT_CODES } from "../src/cli/agentLoopOutputOptions.js";
 import { EXECUTION_SURFACES, EXECUTION_VERBS } from "../src/execution/executionContract.js";
 import * as sdk from "../src/sdk/nativeAgentClient.js";
 import { generateFullOpenApiSpec } from "../src/studio/openapi.js";
@@ -318,7 +319,9 @@ function purposeWorkspace(surface: string): Fixture {
 const purposeLegs: Record<string, (f: Fixture) => Promise<{ turn: StatusRecord; verified: StatusRecord }>> = {
   async cli(f) {
     const run = await cli(f, ["agent-loop", "run", PURPOSE_CALL, "--provider", "stub", "--tools", "workspace", "--json"]).done;
-    expect(run.code, run.stderr).toBe(0);
+    // The turn completed but its one side effect was refused: exit 6 (RUN_EXIT_CODES.sideEffectsUnsettled, SH-UI-01). The
+    // earlier 0 let a script read a refused side effect as success.
+    expect(run.code, run.stderr).toBe(RUN_EXIT_CODES.sideEffectsUnsettled);
     const summary = cliJson(run);
     const verified = await cli(f, ["agent-loop", "verify", summary.sessionId, "--json"]).done;
     expect(verified.code, verified.stderr).toBe(0);
