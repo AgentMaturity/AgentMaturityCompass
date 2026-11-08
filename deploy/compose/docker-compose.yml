@@ -41,7 +41,7 @@ services:
       # Native and A4 routes admit only the bind host or these browser origins (src/studio/nativeAdmission.ts). Append LAN/phone origins through AMC_EXTRA_ORIGINS; an origin is scheme://host[:port] with no path.
       - AMC_CORS_ALLOWED_ORIGINS=http://localhost:${AMC_STUDIO_PORT:-3212},http://127.0.0.1:${AMC_STUDIO_PORT:-3212},${AMC_EXTRA_ORIGINS:-}
       - AMC_QUERY_LEASE_CARRIER_ENABLED=${AMC_QUERY_LEASE_CARRIER_ENABLED:-false}
-      # Pin the workspace monitor key out of band: sha256 of /data/amc/.amc/keys/monitor_ed25519.pub, recorded at install, set in .env. Unset, native-task verdicts are unanchored and do not count as verified (P0-51). Passed only when set: an empty value is an invalid pin, and Studio and the CLI then refuse to read native-task history.
+      # Pin the workspace monitor key out of band: sha256 of /data/amc/.amc/keys/monitor_ed25519.pub, recorded at install, set in .env. Unset, native-task verdicts are unanchored and do not count as verified (P0-51). Passed only when set: an empty value is an invalid pin, which some amc commands (amc spill, amc session anchor) refuse.
       - AMC_EXPECTED_MONITOR_FINGERPRINT
       - AMC_VAULT_PASSPHRASE_FILE=/run/secrets/amc_vault_passphrase
       - AMC_BOOTSTRAP_OWNER_USERNAME_FILE=/run/secrets/amc_owner_username
