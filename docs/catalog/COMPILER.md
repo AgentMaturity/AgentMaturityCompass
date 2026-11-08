@@ -159,7 +159,7 @@ directions (record-keeping and minimization), so the profile's stand. A4 builds 
   `proposedSignedConfigs` start from the defaults and zod schemas F1's operating-profile builders use. The compiler
   writes nothing under `.amc/`; activation is described below.
   The visible tools (P1-10F) are the tools of `signedTools`, or of the built-in default list (`defaultToolsConfig()`,
-  which has no `delegate` or `workflow`) without it, narrowed by any `toolPipeline.visibleTools` parameter the plan's
+  which has no `delegate`, `workflow` or `delegate_continue`) without it, narrowed by any `toolPipeline.visibleTools` parameter the plan's
   controls set. The tools fragment of `proposedSignedConfigs` starts from the same list. With `signedTools` the plan
   also records `toolPipeline.toolsConfigSha256`, the SHA-256 of the tools.yaml bytes it was compiled from.
 - `evidencePlan`: one test entry per control test (run at `activation` and on each `invalidatedBy` trigger; drills

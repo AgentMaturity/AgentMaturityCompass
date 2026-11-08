@@ -39,8 +39,10 @@ goal; AMC does not turn a model's completion claim into a mechanical stop rule.
 
 Omitting all stop conditions adds no extra delegation limit. It does not disable
 the existing per-turn step limits, depth checks, signed budgets, approvals or
-tool scopes. The model-facing `delegate` tool remains one-shot; the turn ceiling
-also governs continuable children used through the native delegation API.
+tool scopes. A model-facing `delegate` call is one-shot unless it asks
+`keepOpen` (see [Continuing a delegate](#continuing-a-delegate)); the turn
+ceiling counts every continuation of a kept-open delegate, as it does for
+continuable children used through the native delegation API.
 
 ## Signed presets and continuation
 
@@ -124,6 +126,62 @@ resume is fenced on the definitions' digest. Foreign (`--delegate-provider`)
 children refuse a definition, because nothing in another process enforces it.
 No signed admission list exists yet: an unsigned definition can take capability
 away from a child and cannot add any.
+
+## Continuing a delegate
+
+`delegate({runAs, goal, keepOpen: true})` keeps an in-process delegate after
+its answer, so the caller can send it more work instead of explaining the task
+again to a fresh one:
+
+```text
+delegate({runAs: "reviewer", goal: "Review src/a.ts and list defects.", keepOpen: true})
+delegate_continue({runAs: "reviewer", text: "Now check the tests for the same defects."})
+delegate_continue({runAs: "reviewer", release: true})
+```
+
+`delegate_continue` returns the delegate's own words, which come from its own
+session; it keeps its earlier turns there and still sees none of the caller's
+conversation. Both tools are granted twice, like `delegate` and `workflow`: the
+run composes them, and the signed allowlist must list `delegate_continue`
+(action class `READ_ONLY`, the same as `delegate`) before the model sees it.
+Under an activated compiled plan, recompile and reactivate after adding it, as
+for any tool (docs/catalog/COMPILER.md). Until both hold, `keepOpen` is refused
+before any packet is signed.
+
+- **Who can be kept open.** Only an in-process delegate. A
+  `--delegate-provider` run offers neither `keepOpen` nor `delegate_continue`,
+  because a foreign child answers once and exits. A child under an agent
+  definition can be kept open; it is still a leaf.
+- **Names.** A delegate is addressed by the `runAs` its caller chose, one open
+  delegate per name per caller. A second `keepOpen` under a name that is open is
+  refused; a delegate that settled on its own frees its name.
+- **Bounds.** Each continuation is one more executor turn: `max-turns:N` counts
+  it, and when the ceiling is reached the delegate reports and is released.
+  `timeout-ms:N` covers the whole lifetime, idle time included. A kept-open
+  delegate holds its `--max-active-children` slot until it is released.
+- **Lifetime.** A kept-open delegate lives no longer than its caller's toolset:
+  at the end of the run (an `agent-loop run`, or one native chat message), and
+  when a delegated caller is released, every delegate it kept open is released
+  before the caller's session is sealed. The caller can release one earlier with
+  `release: true`. Cancelling the caller's turn during a continuation stops the
+  delegate.
+- **Evidence.** `agent_delegation_started` is written when the delegate starts;
+  `agent_delegation_completed` is deferred until it is released, naming why
+  (`the caller released the delegate`, `the caller's run ended; the open
+  delegate was released`, a cancellation, or the `max-turns` ceiling). Each
+  continuation is recorded in the delegate's own signed session.
+
+## Parallel delegation
+
+`delegate` and `delegate_continue` are `READ_ONLY` tools, so several calls in
+one model step run concurrently, up to the loop's `maxParallelToolCalls` (10 by
+default); `tests/delegateParallelDispatch.test.ts` proves two children are live
+at once. `--max-active-children` (default 8) bounds every active, reserved or
+kept-open child under one root session, across `delegate`, `workflow` and their
+descendants. A call over the cap is refused at admission with
+`maxActiveChildren=N reached`; it is not queued. A `workflow` plan queues its
+own parallel nodes within the same cap instead
+([Native workflows](NATIVE_WORKFLOWS.md)).
 
 ## What a stop proves
 
