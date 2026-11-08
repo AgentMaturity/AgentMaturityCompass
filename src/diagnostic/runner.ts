@@ -9,6 +9,7 @@ import inquirer from "inquirer";
 import { z } from "zod";
 import { loadContextGraph, summarizeContextGraphForPrompt } from "../context/contextGraph.js";
 import { detectTrustBoundaryViolation, openLedger, verifyLedgerIntegrity } from "../ledger/ledger.js";
+import { isLivenessRow } from "../ledger/sessionLiveness.js";
 import { runHarnessWithRetries } from "../runtimes/common.js";
 import { loadGatewayConfig, verifyGatewayConfigSignature } from "../gateway/config.js";
 import {
@@ -566,7 +567,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
     let _cachedAllEvents: ParsedEvidenceEvent[] | null = null;
     const reader = readerTrustFor(workspace); // P0-18: trust lists and own keys load once per run
     function getCachedEvents(): ParsedEvidenceEvent[] { // P0-18: no synthetic rows; an attested event once, in its window
-      return (_cachedAllEvents ??= countAttestedOnce([...(signedEvidence?.getEventsBetween(windowStartTs, now) ?? []), ...ledger.getEventsBetween(windowStartTs, now)].filter((event) => evidenceProducer(event) !== "synthetic")
+      return (_cachedAllEvents ??= countAttestedOnce([...(signedEvidence?.getEventsBetween(windowStartTs, now) ?? []), ...ledger.getEventsBetween(windowStartTs, now)].filter((event) => evidenceProducer(event) !== "synthetic" && !isLivenessRow(event))
         .map((event) => parseEventForRunner(workspace, event, reader)), (event) => event.trustTier, { startTs: windowStartTs, endTs: now }));
     }
 

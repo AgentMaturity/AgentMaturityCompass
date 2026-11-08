@@ -10,10 +10,12 @@ import {
 } from "node:http";
 import { request as httpsRequest } from "node:https";
 import { connect as netConnect, isIP, type LookupFunction } from "node:net";
-import { join, resolve } from "node:path";
+import { resolve } from "node:path";
 import type { Duplex } from "node:stream";
 import { URL } from "node:url";
-import { hashBinaryOrPath, openLedger } from "../ledger/ledger.js";
+import { openLedger } from "../ledger/ledger.js";
+import { openGatewaySession } from "./gatewaySession.js";
+import { createCloseFence, type CloseFence } from "./gatewayClose.js";
 import { getPublicKeyPem } from "../crypto/keys.js";
 import { canonicalHost, isNonPublicAddress, resolveAndCheck, type EgressCheck } from "../enforce/egressAllowlist.js";
 import {
@@ -244,6 +246,7 @@ async function requestUpstreamWithResilience(params: {
   retryBaseDelayMs: number;
   retryNonIdempotent: boolean;
   lookup?: LookupFunction;
+  signal?: AbortSignal; // the close fence's: aborting destroys the pending upstream request
 }): Promise<IncomingMessage> {
   const totalAttempts = params.maxRetries + 1;
   const canRetry = isRetryableMethod(params.method, params.retryNonIdempotent);
@@ -251,6 +254,7 @@ async function requestUpstreamWithResilience(params: {
 
   for (let attempt = 1; attempt <= totalAttempts; attempt += 1) {
     // Synchronous per-attempt gate precedes breaker accounting and socket creation.
+    params.signal?.throwIfAborted();
     checkEgress({ workspace: params.workspace, channel: params.channel, url: params.targetUrl.href,
       agentId: params.agentId });
     try {
@@ -262,7 +266,7 @@ async function requestUpstreamWithResilience(params: {
             // A pinned lookup needs a new socket: the keep-alive pool is keyed by name and would reuse a socket to another address.
             const outgoing = impl(
               params.targetUrl,
-              { method: params.method, headers: params.headers, ...(params.lookup ? { lookup: params.lookup, agent: false } : {}) },
+              { method: params.method, headers: params.headers, signal: params.signal, ...(params.lookup ? { lookup: params.lookup, agent: false } : {}) },
               (res) => resolvePromise(res)
             );
             outgoing.setTimeout(params.timeoutMs, () => {
@@ -650,7 +654,8 @@ function createProxyServer(params: {
   workspace: string;
   workspaceId?: string;
   config: GatewayConfig;
-  gatewaySessionId: string;
+  gatewaySessionId: () => string;
+  fence: Pick<CloseFence, "admit" | "signal">;
   allowedCidrs?: string[];
   fieldGuard: FieldGuard;
   logger: Pick<Console, "error">;
@@ -794,7 +799,7 @@ function createProxyServer(params: {
     // A host outside the allowlist is refused before any DNS query; a listed one is resolved now and checked by address.
     const egress = await hostAllowed(params, host);
     if (!egress.decision.allowed) {
-      recordRefusal(requestId, proxyAgentId, host, port, egress, { sessionType: "proxy", sessionId: params.gatewaySessionId });
+      recordRefusal(requestId, proxyAgentId, host, port, egress, { sessionType: "proxy", sessionId: params.gatewaySessionId() });
       res.statusCode = egress.unresolved === true ? 502 : 403;
       res.end(egress.unresolved === true ? "proxy target not checked: a name did not resolve" : "blocked by AMC proxy allowlist");
       return;
@@ -828,7 +833,7 @@ function createProxyServer(params: {
         maxRetries: resilience.upstreamMaxRetries,
         retryBaseDelayMs: resilience.upstreamRetryBaseDelayMs,
         retryNonIdempotent: resilience.retryNonIdempotent,
-        lookup: pinnedLookup(egress.addresses)
+        lookup: pinnedLookup(egress.addresses), signal: params.fence.signal
       });
     } catch (error) {
       const status = gatewayErrorStatusCode(error);
@@ -879,6 +884,7 @@ function createProxyServer(params: {
   // A rejected handler (a client reset during a body read, a ledger write failure) ends its own connection, never the gateway process.
   const contain = (end: () => void) => (error: unknown): void => { params.logger.error(`gateway proxy error: ${String(error)}`); end(); };
   const proxy = createServer((req, res) => {
+    if (!params.fence.admit(res)) return;
     onRequest(req, res).catch(contain(() => { if (res.headersSent || req.destroyed) res.destroy(); else res.writeHead(502).end("gateway proxy failure"); }));
   });
 
@@ -1077,50 +1083,11 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
 
   const ledger = openLedger(options.workspace);
   const monitorPubFingerprint = monitorPublicKeyFingerprint(getPublicKeyPem(options.workspace, "monitor"));
-  const gatewaySessionId = randomUUID();
-
-  const appendEvidence = (input: {
-    eventType: "gateway" | "audit";
-    payload: string;
-    meta: Record<string, unknown>;
-  }): void => {
-    ledger.appendEvidence({
-      sessionId: gatewaySessionId,
-      runtime: "gateway",
-      eventType: input.eventType,
-      payload: input.payload,
-      payloadExt: "json",
-      inline: input.eventType === "audit",
-      meta: {
-        ...input.meta,
-        trustTier: "OBSERVED"
-      }
-    });
-  };
-
-  ledger.startSession({
-    sessionId: gatewaySessionId,
-    runtime: "gateway",
-    binaryPath: join(options.workspace, "dist", "cli.js"),
-    binarySha256: hashBinaryOrPath("amc-gateway", "1")
-  });
-
-  appendEvidence({
-    eventType: "gateway",
-    payload: JSON.stringify({
-      stage: "start",
-      signatureValid: signature.valid,
-      signatureExists: signature.signatureExists,
-      missingEnvVars: missingEnvs,
-      proxyEnabled: config.proxy.enabled
-    }),
-    meta: {
-      stage: "start",
-      signatureValid: signature.valid,
-      signatureExists: signature.signatureExists,
-      proxyEnabled: config.proxy.enabled
-    }
-  });
+  const fence = createCloseFence();
+  const startFacts = { stage: "start", signatureValid: signature.valid, signatureExists: signature.signatureExists, proxyEnabled: config.proxy.enabled };
+  const session = openGatewaySession(ledger, { workspace: options.workspace, logger, start: { eventType: "gateway",
+    payload: JSON.stringify({ ...startFacts, missingEnvVars: missingEnvs }), meta: startFacts } });
+  const appendEvidence = session.appendEvidence;
 
   if (!signature.valid) {
     appendEvidence({
@@ -1152,6 +1119,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
   }
 
   const server = createServer(async (req: IncomingMessage, res: ServerResponse) => {
+    if (!fence.admit(res)) return;
     const requestId = randomUUID();
     const method = (req.method ?? "GET").toUpperCase();
     const clientIp = normalizeRemoteIp(req.socket.remoteAddress);
@@ -1186,7 +1154,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       if (incomingUrl.pathname === "/__amc/health") {
         const body = JSON.stringify({
           ok: true,
-          sessionId: gatewaySessionId,
+          sessionId: session.sessionId,
           routes: routeBaseUrls(config),
           signatureValid: signature.valid,
           listenHost: runtimeListenHost,
@@ -1517,9 +1485,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         llmRequestMeta.localhostApproved = upstreamConfigured.allowLocalhost === true;
       }
 
-      const requestEvent = ledger.appendEvidenceWithReceipt({
-        sessionId: gatewaySessionId,
-        runtime: "gateway",
+      const requestEvent = session.appendWithReceipt({
         eventType: "llm_request",
         payload: JSON.stringify({
           request_id: requestId,
@@ -1553,7 +1519,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         maxRetries: resilience.upstreamMaxRetries,
         retryBaseDelayMs: resilience.upstreamRetryBaseDelayMs,
         retryNonIdempotent: resilience.retryNonIdempotent,
-        lookup: pinnedLookup(upstreamEgress.addresses)
+        lookup: pinnedLookup(upstreamEgress.addresses), signal: fence.signal
       });
 
       const responseHeaders = normalizeResponseHeaders(upstreamResponse.headers);
@@ -1563,7 +1529,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
 
       if (streamPassthrough) {
         responseBody = await relayGatewayResponse(upstreamResponse, res, {
-          requestId, requestReceipt: requestEvent.receipt, monitorPubFingerprint
+          requestId, requestReceipt: requestEvent?.receipt ?? "", monitorPubFingerprint
         });
       } else {
         responseBody = await readAll(upstreamResponse);
@@ -1605,9 +1571,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         llmResponseMeta.localhostApproved = upstreamConfigured.allowLocalhost === true;
       }
 
-      const responseEvent = ledger.appendEvidenceWithReceipt({
-        sessionId: gatewaySessionId,
-        runtime: "gateway",
+      const responseEvent = session.appendWithReceipt({
         eventType: "llm_response",
         payload: JSON.stringify({
           request_id: requestId,
@@ -1628,7 +1592,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
 
       if (streamPassthrough) {
         res.addTrailers({
-          "x-amc-receipt-trailer": responseEvent.receipt
+          "x-amc-receipt-trailer": responseEvent?.receipt ?? ""
         });
         res.end();
       } else {
@@ -1639,8 +1603,8 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
           }
         }
         res.setHeader("x-amc-request-id", requestId);
-        res.setHeader("x-amc-receipt", responseEvent.receipt);
-        res.setHeader("x-amc-request-receipt", requestEvent.receipt);
+        res.setHeader("x-amc-receipt", responseEvent?.receipt ?? ""); // "" only after the seal: no receipt
+        res.setHeader("x-amc-request-receipt", requestEvent?.receipt ?? "");
         res.setHeader("x-amc-monitor-pub-fpr", monitorPubFingerprint);
         res.end(responseBody);
       }
@@ -1672,23 +1636,26 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
     }
   });
 
+  let proxyServer: Server | null = null;
+  const closeGateway = () => fence.close({ servers: [server, proxyServer], session, ledger, credentials });
+  const failStart = async (error: unknown): Promise<never> => { await closeGateway(); throw error; }; // a failed start seals its session
   await new Promise<void>((resolvePromise, rejectPromise) => {
     server.once("error", rejectPromise);
     server.listen(runtimeListenPort, runtimeListenHost, () => resolvePromise());
-  });
+  }).catch(failStart);
   const httpAddress = server.address();
   if (!httpAddress || typeof httpAddress === "string") {
     throw new Error("Failed to start gateway server on TCP address");
   }
 
-  let proxyServer: Server | null = null;
   let proxyPort: number | null = null;
   if (config.proxy.enabled) {
     proxyServer = createProxyServer({
       workspace: options.workspace,
       workspaceId: options.workspaceId,
       config: resolvedConfig,
-      gatewaySessionId,
+      gatewaySessionId: () => session.sessionId,
+      fence,
       allowedCidrs: options.allowedCidrs,
       fieldGuard,
       logger,
@@ -1697,7 +1664,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
     await new Promise<void>((resolvePromise, rejectPromise) => {
       proxyServer!.once("error", rejectPromise);
       proxyServer!.listen(runtimeProxyPort, runtimeListenHost, () => resolvePromise());
-    });
+    }).catch(failStart);
     const proxyAddress = proxyServer.address();
     if (proxyAddress && typeof proxyAddress !== "string") {
       proxyPort = proxyAddress.port;
@@ -1710,7 +1677,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
   }
 
   return {
-    gatewaySessionId,
+    get gatewaySessionId() { return session.sessionId; },
     host: runtimeListenHost,
     port: httpAddress.port,
     routes: routeBaseUrls(config),
@@ -1718,26 +1685,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
     signatureExists: signature.signatureExists,
     proxyEnabled: config.proxy.enabled,
     proxyPort,
-    close: async () => {
-      await new Promise<void>((resolvePromise) => {
-        server.close(() => resolvePromise());
-      });
-      if (proxyServer) {
-        await new Promise<void>((resolvePromise) => {
-          proxyServer!.close(() => resolvePromise());
-        });
-      }
-
-      appendEvidence({
-        eventType: "gateway",
-        payload: JSON.stringify({ stage: "stop" }),
-        meta: { stage: "stop" }
-      });
-      ledger.sealSession(gatewaySessionId);
-      ledger.close();
-      // Releases the file watcher, but only on a store this gateway created.
-      await credentials.close();
-    }
+    close: closeGateway
   };
 }
 
