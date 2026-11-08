@@ -1,11 +1,14 @@
 /**
  * Failed-login throttle shared by Studio's /auth/login and the host router's two login routes (LIVE-RUNTIME-04, D-R5).
  *
- * The hard refusal is keyed on (username, client address): 10 failures in 15 minutes refuse that pair only, so a
- * client at another address can never lock the owner out of their own address. By username alone, 30 failures in the
- * window from any addresses add a fixed delay to every attempt for that username, right or wrong; never a refusal.
- * Behind a proxy whose hops are not trusted (AMC_TRUSTED_PROXY_HOPS=0) every client shares the proxy's address, and
- * the pair key degrades to per-username-per-proxy.
+ * On an address that stands for one client (no proxy declared, or a trusted proxy named the client), the hard refusal
+ * is keyed on (username, client address): 10 failures in 15 minutes refuse that pair only, so a client at another
+ * address can never lock the owner out of their own address, and 30 failures for the username from any addresses add
+ * a fixed delay to every attempt for it, right or wrong. On an address that may be a proxy's own, shared by everyone
+ * behind it (AMC_TRUSTED_PROXY_HOPS set but this peer is not a trusted proxy), the two swap: the pair only delays, so
+ * one client cannot lock out every client behind the proxy (SR-2), and the 30 failures refuse further attempts for
+ * the username from such addresses, so rotating addresses buys no extra guesses (SR-1). Attempts that a trusted proxy
+ * forwards are never refused because of them. Behind an undeclared proxy (hops 0) every client shares its address.
  *
  * ponytail: in-memory and per process, so a restart clears it and replicas do not share it; a shared store when one
  * Studio serves a workspace from several processes.
@@ -20,10 +23,11 @@ interface Window {
 
 type LoginGate =
   | { allowed: true; delayMs: number }
-  | { allowed: false; retryAfterSeconds: number; firstRefusal: boolean };
+  | { allowed: false; retryAfterSeconds: number; firstRefusal: boolean; error: string };
 
 export interface LoginThrottle {
-  check(username: string, clientIp: string): LoginGate;
+  /** `addressTrusted`: the address stands for one client (resolveClientAddress); false when it may be a shared proxy's. */
+  check(username: string, clientIp: string, addressTrusted?: boolean): LoginGate;
   fail(username: string, clientIp: string): void;
   succeed(username: string, clientIp: string): void;
 }
@@ -58,16 +62,20 @@ export function createLoginThrottle(options: {
     map.set(key, { count: 1, resetTs: at + windowMs, refused: false });
   };
   return {
-    check(username, clientIp) {
+    check(username, clientIp, addressTrusted = true) {
       const at = now();
       const pair = live(pairs, pairKey(username, clientIp), at);
-      if (pair && pair.count >= maxPairFailures) {
-        const firstRefusal = !pair.refused;
-        pair.refused = true;
-        return { allowed: false, retryAfterSeconds: Math.max(1, Math.ceil((pair.resetTs - at) / 1000)), firstRefusal };
-      }
       const user = live(users, userKey(username), at);
-      return { allowed: true, delayMs: user && user.count >= delayAfterUserFailures ? delayMs : 0 };
+      const pairOver = pair !== null && pair.count >= maxPairFailures;
+      const userOver = user !== null && user.count >= delayAfterUserFailures;
+      const refusing = addressTrusted ? (pairOver ? pair : null) : (userOver ? user : null);
+      if (refusing) {
+        const firstRefusal = !refusing.refused;
+        refusing.refused = true;
+        return { allowed: false, retryAfterSeconds: Math.max(1, Math.ceil((refusing.resetTs - at) / 1000)), firstRefusal,
+          error: addressTrusted ? LOGIN_THROTTLED_ERROR : LOGIN_THROTTLED_ACCOUNT_ERROR };
+      }
+      return { allowed: true, delayMs: (addressTrusted ? userOver : pairOver) ? delayMs : 0 };
     },
     fail(username, clientIp) {
       const at = now();
@@ -83,18 +91,19 @@ export function createLoginThrottle(options: {
 
 /**
  * One login attempt's admission: false after `refuse` has answered (429 with Retry-After), otherwise true once any
- * per-username delay has passed. `audit` runs on the first refusal of a (username, address) window only.
+ * per-username delay has passed. `audit` runs on the first refusal of a window only.
  */
 export async function admitLoginAttempt(throttle: LoginThrottle, input: {
   username: string;
   clientIp: string;
-  refuse: (retryAfterSeconds: number) => void;
+  addressTrusted: boolean;
+  refuse: (retryAfterSeconds: number, error: string) => void;
   audit: () => unknown;
 }): Promise<boolean> {
-  const gate = throttle.check(input.username, input.clientIp);
+  const gate = throttle.check(input.username, input.clientIp, input.addressTrusted);
   if (!gate.allowed) {
     // The refusal is answered first: an audit write that fails must not turn a throttled attempt into anything else.
-    input.refuse(gate.retryAfterSeconds);
+    input.refuse(gate.retryAfterSeconds, gate.error);
     if (gate.firstRefusal) await input.audit();
     return false;
   }
@@ -103,3 +112,4 @@ export async function admitLoginAttempt(throttle: LoginThrottle, input: {
 }
 
 export const LOGIN_THROTTLED_ERROR = "too many failed logins for this account from this address";
+export const LOGIN_THROTTLED_ACCOUNT_ERROR = "too many failed logins for this account";

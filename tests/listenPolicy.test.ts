@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { PUBLIC_BIND_REFUSAL, assertPublicBindAcknowledged, resolveListenPolicy, standaloneGatewayAllowList, weakCidrs } from "../src/studio/listenPolicy.js";
+import { PROXY_TRUST_REFUSAL, PUBLIC_BIND_REFUSAL, assertProxyTrustNamed, assertPublicBindAcknowledged, resolveListenPolicy, standaloneGatewayAllowList, weakCidrs }
+  from "../src/studio/listenPolicy.js";
 
 // LIVE-RUNTIME-03 (D-R4): flag, else a SET variable, else the signed LAN value, else the default; loopback always admitted.
 const lan = { enabled: true, valid: true, bind: "0.0.0.0", port: 3300, allowedCIDRs: ["10.9.0.0/16"] };
@@ -43,6 +44,18 @@ describe("listen policy", () => {
       ["0.0.0.0/1", "128.0.0.0/2", "192.0.0.0/3", "224.0.0.0/4", "240.0.0.0/5", "248.0.0.0/6", "252.0.0.0/7", "254.0.0.0/8"], ["2001:db8::/32"]]) {
       expect(weakCidrs(list), list.join(",")).toBe(false);
     }
+  });
+
+  // SR-1: forwarded headers count only from AMC_TRUSTED_PROXY_CIDRS, never from the client allow list; declared hops with
+  // no named proxy would let the allow list judge the proxy instead of its clients, so the start is refused.
+  test("AMC_TRUSTED_PROXY_CIDRS names the trusted proxies; proxy hops without one are refused", () => {
+    expect(resolveListenPolicy({ env: { AMC_ALLOWED_CIDRS: "10.0.0.0/8" }, hostMode: false }).trustedProxyCidrs, "the allow list is no proxy list").toEqual([]);
+    const named = resolveListenPolicy({ env: { AMC_TRUSTED_PROXY_CIDRS: " 172.16.0.0/12, ,10.1.2.3/32 " }, hostMode: false });
+    expect(named.trustedProxyCidrs).toEqual(["172.16.0.0/12", "10.1.2.3/32"]);
+    expect(() => resolveListenPolicy({ env: { AMC_TRUSTED_PROXY_CIDRS: "caddy" }, hostMode: false })).toThrow("Invalid CIDR in AMC_TRUSTED_PROXY_CIDRS: caddy");
+    expect(() => assertProxyTrustNamed(1, resolveListenPolicy({ env: {}, hostMode: false }))).toThrow(PROXY_TRUST_REFUSAL);
+    expect(() => assertProxyTrustNamed(1, named)).not.toThrow();
+    expect(() => assertProxyTrustNamed(0, resolveListenPolicy({ env: {}, hostMode: false })), "no hops: nothing to name").not.toThrow();
   });
 
   test("host mode ignores the LAN values and reads the host variables", () => {

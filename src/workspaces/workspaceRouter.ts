@@ -10,8 +10,8 @@ import {
 } from "../studio/nativeAdmission.js";
 import { ensureAdminToken } from "../studio/studioState.js";
 import { createClientCap, makeRateLimiter } from "../studio/rateLimiter.js";
-import { admitLoginAttempt, createLoginThrottle, LOGIN_THROTTLED_ERROR } from "../studio/loginThrottle.js";
-import { ipAllowedByCidrs, requestUsesHttps, resolveClientAddress, withLoopbackCidrs } from "../studio/clientAddress.js";
+import { admitLoginAttempt, createLoginThrottle } from "../studio/loginThrottle.js";
+import { ipAllowedByCidrs, LOOPBACK_CIDRS, requestUsesHttps, resolveClientAddress, withLoopbackCidrs } from "../studio/clientAddress.js";
 import { allowedHostnamesFrom, hostAllowed } from "../studio/hostAllow.js";
 import { applySecurityHeaders, SECURITY_HEADER_NAMES } from "../studio/securityHeaders.js";
 import { applyServerTimeouts } from "../studio/serverTimeouts.js";
@@ -85,6 +85,8 @@ interface StartWorkspaceRouterOptions {
   allowLocalDemoWorkspace?: boolean;
   allowedCidrs?: string[];
   trustedProxyHops?: number;
+  /** The proxies whose forwarding headers count (AMC_TRUSTED_PROXY_CIDRS, SR-1/SR-2); absent or empty, none do. */
+  trustedProxyCidrs?: readonly string[];
   maxRequestBytes?: number;
   corsAllowedOrigins?: string[];
 }
@@ -641,8 +643,9 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
   const loginThrottle = createLoginThrottle(); // host accounts: one throttle for the host and workspace login routes
   const routerCidrs = withLoopbackCidrs(options.allowedCidrs); // LIVE-RUNTIME-20: loopback always admitted
   const allowedHostnames = allowedHostnamesFrom([...(options.corsAllowedOrigins ?? []), options.host, process.env.AMC_HOST_PUBLIC_BASEURL]);
-  const admitHostLogin = (res: ServerResponse, route: string, username: string, clientIp: string): Promise<boolean> => admitLoginAttempt(loginThrottle, { username, clientIp,
-    refuse: (retryAfter) => { res.setHeader("retry-after", String(retryAfter)); writeControlError(res, 429, LOGIN_THROTTLED_ERROR); },
+  // SR-2: the address the router resolved, and whether it stands for one client; a shared proxy address never hard-refuses a pair.
+  const admitHostLogin = (res: ServerResponse, route: string, username: string, clientIp: string, addressTrusted: boolean): Promise<boolean> => admitLoginAttempt(loginThrottle,
+    { username, clientIp, addressTrusted, refuse: (retryAfter, error) => { res.setHeader("retry-after", String(retryAfter)); writeControlError(res, 429, error); },
     audit: () => appendHostAudit(options.hostDir, "HUMAN_LOGIN_THROTTLED", username || null, { route, clientIp }) });
   const publicNativeOrigins = (): readonly string[] => {
     const address = server.address();
@@ -669,7 +672,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         port: 0,
         token: runtime.token,
         allowedCidrs: routerCidrs,
-        trustedProxyHops: 1, // the router is its only peer and sets x-forwarded-for itself (LIVE-RUNTIME-20)
+        trustedProxyHops: 1, trustedProxyCidrs: LOOPBACK_CIDRS, // the router is its only peer and sets x-forwarded-for itself (LIVE-RUNTIME-20)
         maxRequestBytes: options.maxRequestBytes,
         corsAllowedOrigins: options.corsAllowedOrigins,
         nativeAllowedOrigins: publicNativeOrigins(),
@@ -692,7 +695,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       const url = new URL(req.url ?? "/", `http://${options.host}:${options.port}`);
       const pathname = url.pathname;
       // LIVE-RUNTIME-19/-20: the client and whether a trusted hop vouches for it; the host name; the allow list; headers.
-      const { clientIp, trustForwarded } = resolveClientAddress(req, { trustedProxyHops: options.trustedProxyHops ?? 0, allowedCidrs: routerCidrs });
+      const { clientIp, trustForwarded, addressTrusted } = resolveClientAddress(req, { trustedProxyHops: options.trustedProxyHops ?? 0, trustedProxyCidrs: options.trustedProxyCidrs ?? [] });
       if (!trustForwarded && !hostAllowed(req.headers.host, allowedHostnames)) {
         writeControlError(res, 403, "host not allowed");
         return;
@@ -780,7 +783,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         };
         const username = typeof body.username === "string" ? body.username : "";
         const password = typeof body.password === "string" ? body.password : "";
-        if (!await admitHostLogin(res, "/host/api/login", username, clientIp)) return;
+        if (!await admitHostLogin(res, "/host/api/login", username, clientIp, addressTrusted)) return;
         let local:
           | ReturnType<typeof localPasswordLogin>
           | {
@@ -1430,7 +1433,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           const body = JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576)) as { username?: unknown; password?: unknown };
           const inputUsername = typeof body.username === "string" ? body.username : "";
           const inputPassword = typeof body.password === "string" ? body.password : "";
-          if (!await admitHostLogin(res, `/w/${urlWorkspaceId}/login`, inputUsername, clientIp)) return;
+          if (!await admitHostLogin(res, `/w/${urlWorkspaceId}/login`, inputUsername, clientIp, addressTrusted)) return;
           const auth = authenticateHostUser({
             hostDir: options.hostDir,
             username: inputUsername,

@@ -52,7 +52,7 @@ import { startWorkspaceRouter } from "../workspaces/workspaceRouter.js";
 import { createWorkspaceRecord, getWorkspaceRecord, initHostDb } from "../workspaces/hostDb.js";
 import { hostWorkspaceDir } from "../workspaces/workspacePaths.js";
 import { isPublicBind } from "../config/loadConfig.js";
-import { assertPublicBindAcknowledged, resolveListenPolicy } from "./listenPolicy.js";
+import { assertProxyTrustNamed, assertPublicBindAcknowledged, resolveListenPolicy } from "./listenPolicy.js";
 import { assertPortFree, closeStartedThenThrow, listenOnPolicyPort } from "./studioLifecycle.js";
 
 export interface StudioRuntime {
@@ -320,6 +320,7 @@ export async function runStudioForeground(params: {
     const hostDir = params.hostDir;
     const listen = resolveListenPolicy({ env: params.env ?? {}, hostMode: true, flags: { bind: params.apiHost, port: params.apiPort, allowedCidrs: params.allowedCidrs } });
     assertPublicBindAcknowledged(listen);
+    assertProxyTrustNamed(params.trustedProxyHops, listen);
     if (params.allowLocalDemoWorkspace === true) {
       process.env.AMC_VAULT_PASSPHRASE = ensureDemoVaultPassphrase(hostDir);
     }
@@ -348,6 +349,7 @@ export async function runStudioForeground(params: {
       allowLocalDemoWorkspace: params.allowLocalDemoWorkspace,
       allowedCidrs: listen.allowedCidrs,
       trustedProxyHops: params.trustedProxyHops,
+      trustedProxyCidrs: listen.trustedProxyCidrs,
       maxRequestBytes: params.maxRequestBytes,
       corsAllowedOrigins: params.corsAllowedOrigins
     });
@@ -417,6 +419,7 @@ export async function runStudioForeground(params: {
   const metricsHost = params.metricsHost ?? listen.metricsHost;
   const metricsPublicBind = isPublicBind(metricsHost);
   assertPublicBindAcknowledged(listen);
+  assertProxyTrustNamed(params.trustedProxyHops, listen);
   if (metricsPublicBind && !(lan.enabled && lanSig.valid)) {
     throw new Error("Refusing to bind metrics publicly without signed LAN mode.");
   }
@@ -481,7 +484,7 @@ export async function runStudioForeground(params: {
 
   const api = await guard(() => listenOnPolicyPort({ label: "Studio API", port: listen.apiPort, source: listen.apiPortSource,
     start: (port) => startStudioApiServer({ workspace, host: listen.apiHost, port, token, allowedCidrs: listen.allowedCidrs,
-      trustedProxyHops: params.trustedProxyHops, maxRequestBytes: params.maxRequestBytes, corsAllowedOrigins: params.corsAllowedOrigins }) }));
+      trustedProxyHops: params.trustedProxyHops, trustedProxyCidrs: listen.trustedProxyCidrs, maxRequestBytes: params.maxRequestBytes, corsAllowedOrigins: params.corsAllowedOrigins }) }));
   started.push(() => api.close());
 
   const gatewaySig = verifyGatewayConfigSignature(workspace);

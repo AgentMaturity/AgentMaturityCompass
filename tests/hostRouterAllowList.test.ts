@@ -36,7 +36,7 @@ function host(): string {
   return hostDir;
 }
 
-async function router(hostDir: string, options: { allowedCidrs?: string[]; trustedProxyHops?: number } = {}): Promise<number> {
+async function router(hostDir: string, options: { allowedCidrs?: string[]; trustedProxyHops?: number; trustedProxyCidrs?: string[] } = {}): Promise<number> {
   const runtime = await startWorkspaceRouter({ hostDir, host: "127.0.0.1", port: 0, defaultWorkspaceId: "ws-a", ...options });
   closers.push(() => runtime.close());
   return runtime.port;
@@ -102,7 +102,7 @@ describe("host router readiness", () => {
 describe("host router allow list and forwarding", () => {
   test("enforces the allow list on the client a trusted hop names; loopback always passes", async () => {
     const hostDir = host();
-    const trusted = await router(hostDir, { allowedCidrs: ["10.9.0.0/16"], trustedProxyHops: 1 });
+    const trusted = await router(hostDir, { allowedCidrs: ["10.9.0.0/16"], trustedProxyHops: 1, trustedProxyCidrs: ["127.0.0.1/32"] });
     expect((await call(trusted, "/host/healthz")).status).toBe(200);
     expect((await call(trusted, "/host/healthz", { headers: { "x-forwarded-for": "10.9.1.2" } })).status).toBe(200);
     const refused = await call(trusted, "/host/healthz", { headers: { "x-forwarded-for": "198.51.100.9" } });

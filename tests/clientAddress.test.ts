@@ -17,11 +17,19 @@ describe("forwarded client address (LIVE-RUNTIME-18, D-R11)", () => {
     expect(forwardedClientIp(request({ "x-forwarded-for": "10.9.8.7" }), 3)).toBe("10.9.8.7");
   });
 
-  test("a peer outside the allow list is never a trusted hop", () => {
+  // SR-1: the peer must be a named proxy (AMC_TRUSTED_PROXY_CIDRS); being an allowed client used to be enough.
+  test("only a peer in the trusted proxy list is a trusted hop, and only when it forwarded an address", () => {
     const req = request({ "x-forwarded-for": "10.9.8.7" }, "192.0.2.1");
-    expect(resolveClientAddress(req, { trustedProxyHops: 1, allowedCidrs: ["127.0.0.1/32"] })).toEqual({ clientIp: "192.0.2.1", trustForwarded: false });
-    expect(resolveClientAddress(req, { trustedProxyHops: 1, allowedCidrs: ["192.0.2.0/24"] })).toEqual({ clientIp: "10.9.8.7", trustForwarded: true });
-    expect(resolveClientAddress(req, { trustedProxyHops: 0, allowedCidrs: ["192.0.2.0/24"] })).toEqual({ clientIp: "192.0.2.1", trustForwarded: false });
+    expect(resolveClientAddress(req, { trustedProxyHops: 1, trustedProxyCidrs: ["127.0.0.1/32"] }))
+      .toEqual({ clientIp: "192.0.2.1", trustForwarded: false, addressTrusted: false });
+    expect(resolveClientAddress(req, { trustedProxyHops: 1, trustedProxyCidrs: [] }), "no proxy named: nobody is one")
+      .toEqual({ clientIp: "192.0.2.1", trustForwarded: false, addressTrusted: false });
+    expect(resolveClientAddress(req, { trustedProxyHops: 1, trustedProxyCidrs: ["192.0.2.0/24"] }))
+      .toEqual({ clientIp: "10.9.8.7", trustForwarded: true, addressTrusted: true });
+    expect(resolveClientAddress(req, { trustedProxyHops: 0, trustedProxyCidrs: ["192.0.2.0/24"] }), "no hops declared: the peer is the client")
+      .toEqual({ clientIp: "192.0.2.1", trustForwarded: false, addressTrusted: true });
+    expect(resolveClientAddress(request({}, "192.0.2.1"), { trustedProxyHops: 1, trustedProxyCidrs: ["192.0.2.0/24"] }), "the proxy's own request")
+      .toEqual({ clientIp: "192.0.2.1", trustForwarded: false, addressTrusted: false });
   });
 
   test("loopback is always in the effective list, once", () => {

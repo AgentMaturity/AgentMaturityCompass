@@ -118,7 +118,7 @@ import { bindStudioResultRoute, ENTITLEMENT_NOTE, studioStoredRunReport, withCla
 import { respondReportSigningError } from "./reportSigningError.js";
 import { allowStudioCors as allowCors } from "./studioCors.js";
 import { createClientCap, makeRateLimiter, makeRateLimiterDetailed, setRateLimitHeaders } from "./rateLimiter.js";
-import { admitLoginAttempt, createLoginThrottle, LOGIN_THROTTLED_ERROR } from "./loginThrottle.js";
+import { admitLoginAttempt, createLoginThrottle } from "./loginThrottle.js";
 import { ipAllowedByCidrs, LOOPBACK_CIDRS, requestUsesHttps, resolveClientAddress } from "./clientAddress.js";
 import { allowedHostnamesFrom, hostAllowed } from "./hostAllow.js";
 import { applySecurityHeaders, isConsoleStaticAsset } from "./securityHeaders.js";
@@ -425,6 +425,8 @@ interface StudioApiOptions {
   token: string;
   allowedCidrs?: string[];
   trustedProxyHops?: number;
+  /** The proxies whose forwarding headers count (AMC_TRUSTED_PROXY_CIDRS, SR-1); absent or empty, none do. */
+  trustedProxyCidrs?: readonly string[];
   maxRequestBytes?: number;
   corsAllowedOrigins?: string[];
   nativeAllowedOrigins?: readonly string[];
@@ -1279,8 +1281,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       recordHttpRequestMetric(metricRoute, metricMethod, res.statusCode || 0, Date.now() - requestStartedAt);
     });
     try {
-      // LIVE-RUNTIME-19: a request that no trusted hop vouches for must name a host DNS rebinding cannot forge.
-      const { clientIp, trustForwarded } = resolveClientAddress(req, { trustedProxyHops: options.trustedProxyHops ?? 0, allowedCidrs });
+      // LIVE-RUNTIME-19, SR-4: a request no trusted proxy forwarded must name a host DNS rebinding cannot forge.
+      const { clientIp, trustForwarded, addressTrusted } = resolveClientAddress(req, { trustedProxyHops: options.trustedProxyHops ?? 0, trustedProxyCidrs: options.trustedProxyCidrs ?? [] });
       if (!trustForwarded && !hostAllowed(req.headers.host, allowedHostnames)) {
         json(res, 403, { error: "host not allowed" });
         return;
@@ -1629,7 +1631,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "username and password are required" });
           return;
         }
-        if (!await admitLoginAttempt(loginThrottle, { username, clientIp, refuse: (retryAfter) => { res.setHeader("retry-after", String(retryAfter)); json(res, 429, { error: LOGIN_THROTTLED_ERROR }); },
+        if (!await admitLoginAttempt(loginThrottle, { username, clientIp, addressTrusted, refuse: (retryAfter, error) => { res.setHeader("retry-after", String(retryAfter)); json(res, 429, { error }); },
           audit: () => writeStudioAuditEventAsync({ workspace: options.workspace, auditType: "HUMAN_LOGIN_THROTTLED", severity: "MEDIUM", payload: { username, clientIp } }) })) return;
         const authUser = authenticateUser({ workspace: options.workspace, username, password });
         if (!authUser.ok || !authUser.user) {

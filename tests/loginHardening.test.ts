@@ -63,14 +63,14 @@ async function studio(): Promise<{ url: string; workspace: string }> {
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
   initUsersConfig({ workspace, username: "owner", password: "owner-password" });
   addUser({ workspace, username: "viewer", password: "viewer-password", roles: ["VIEWER"] });
-  // One trusted hop (loopback is listed), so a forwarded address is a different client of the same Studio.
+  // One trusted proxy (loopback is named as one), so a forwarded address is a different client of the same Studio.
   const api = await startStudioApiServer({ workspace, host: "127.0.0.1", port: 0, token: "admin-token-login-hardening",
-    allowedCidrs: ["127.0.0.1/32", "::1/128", "10.0.0.0/8"], trustedProxyHops: 1 });
+    allowedCidrs: ["127.0.0.1/32", "::1/128", "10.0.0.0/8"], trustedProxyHops: 1, trustedProxyCidrs: ["127.0.0.1/32"] });
   closers.push(() => api.close());
   return { url: api.url, workspace };
 }
 
-async function hostRouter(trustedProxyHops = 0): Promise<{ url: string; hostDir: string }> {
+async function hostRouter(trustedProxyHops = 0, trustedProxyCidrs: string[] = []): Promise<{ url: string; hostDir: string }> {
   const hostDir = newDir("amc-login-hardening-host-");
   initHostDb(hostDir);
   createHostUser({ hostDir, username: "admin", password: "admin-pass-123", isHostAdmin: true });
@@ -79,7 +79,7 @@ async function hostRouter(trustedProxyHops = 0): Promise<{ url: string; hostDir:
   initWorkspace({ workspacePath: hostWorkspaceDir(hostDir, "ws-a"), trustBoundaryMode: "isolated" });
   grantMembership({ hostDir, username: "member", workspaceId: "ws-a", role: "VIEWER" });
   const port = await freePort();
-  const router = await startWorkspaceRouter({ hostDir, host: "127.0.0.1", port, defaultWorkspaceId: "ws-a", trustedProxyHops });
+  const router = await startWorkspaceRouter({ hostDir, host: "127.0.0.1", port, defaultWorkspaceId: "ws-a", trustedProxyHops, trustedProxyCidrs, allowedCidrs: ["10.0.0.0/8"] });
   closers.push(() => router.close());
   return { url: `http://127.0.0.1:${port}`, hostDir };
 }
@@ -87,10 +87,11 @@ async function hostRouter(trustedProxyHops = 0): Promise<{ url: string; hostDir:
 describe("Studio login throttle per (account, address)", () => {
   test("10 wrong passwords lock that address out of that account; another address and another account are unaffected", async () => {
     const { url } = await studio();
+    const here = { "x-forwarded-for": "10.9.9.8" }; // a client the trusted proxy names
     for (let i = 0; i < 10; i += 1) {
-      expect((await post(`${url}/auth/login`, { username: "owner", password: "wrong" })).status).toBe(401);
+      expect((await post(`${url}/auth/login`, { username: "owner", password: "wrong" }, here)).status).toBe(401);
     }
-    const refused = await post(`${url}/auth/login`, { username: "owner", password: "owner-password" });
+    const refused = await post(`${url}/auth/login`, { username: "owner", password: "owner-password" }, here);
     expect(refused.status, "the right password from the throttled address is refused").toBe(429);
     expect(JSON.parse(refused.body)).toEqual({ error: "too many failed logins for this account from this address" });
     expect(Number(refused.headers["retry-after"])).toBeGreaterThan(800);
@@ -101,7 +102,59 @@ describe("Studio login throttle per (account, address)", () => {
   }, 60_000);
 });
 
+// SR-1: X-Forwarded-For counted whenever the peer was in the client allow list, so any allowed client could rotate it and
+// get a fresh limiter bucket and throttle pair per request. Now only a named proxy's header counts.
+describe("forwarded addresses from a peer that is no named proxy", () => {
+  test("an allowed client rotating X-Forwarded-For keeps one key: the per-address login limiter still trips", async () => {
+    const workspace = newDir("amc-login-spoof-");
+    initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+    initUsersConfig({ workspace, username: "owner", password: "owner-password" });
+    const api = await startStudioApiServer({ workspace, host: "127.0.0.1", port: 0, token: "admin-token-login-spoof",
+      allowedCidrs: ["127.0.0.1/32", "::1/128", "10.0.0.0/8"], trustedProxyHops: 1 });
+    closers.push(() => api.close());
+    for (let i = 0; i < 20; i += 1) {
+      expect((await post(`${api.url}/auth/login`, { username: "owner", password: "owner-password" }, { "x-forwarded-for": `10.7.0.${i + 1}` })).status).toBe(200);
+    }
+    const next = await post(`${api.url}/auth/login`, { username: "owner", password: "owner-password" }, { "x-forwarded-for": "10.7.1.1" });
+    expect(next.status).toBe(429);
+    expect(JSON.parse(next.body)).toEqual({ error: "too many login attempts" });
+  }, 60_000);
+
+  // SR-2: on such an address (proxy hops declared, peer no named proxy) a pair refusal would lock out everyone sharing it.
+  test("on Studio, a shared address's pair is delayed, never refused", async () => {
+    const workspace = newDir("amc-login-shared-");
+    initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+    initUsersConfig({ workspace, username: "owner", password: "owner-password" });
+    const api = await startStudioApiServer({ workspace, host: "127.0.0.1", port: 0, token: "admin-token-login-shared", trustedProxyHops: 1 });
+    closers.push(() => api.close());
+    for (let i = 0; i < 10; i += 1) expect((await post(`${api.url}/auth/login`, { username: "owner", password: "wrong" })).status).toBe(401);
+    const started = Date.now();
+    expect((await post(`${api.url}/auth/login`, { username: "owner", password: "owner-password" })).status).toBe(200);
+    expect(Date.now() - started).toBeGreaterThanOrEqual(1_900);
+  }, 60_000);
+});
+
 describe("host router login throttle", () => {
+  // SR-2, both modes: a named proxy's clients are told apart; without one, the shared address is delayed, not refused.
+  test("behind a named proxy the throttled pair is refused and another forwarded client signs in", async () => {
+    const { url } = await hostRouter(1, ["127.0.0.1/32"]);
+    for (let i = 0; i < 10; i += 1) {
+      expect((await post(`${url}/host/api/login`, { username: "admin", password: "wrong" }, { "x-forwarded-for": "10.5.0.1" })).status).toBe(401);
+    }
+    expect((await post(`${url}/host/api/login`, { username: "admin", password: "admin-pass-123" }, { "x-forwarded-for": "10.5.0.1" })).status).toBe(429);
+    expect((await post(`${url}/host/api/login`, { username: "admin", password: "admin-pass-123" }, { "x-forwarded-for": "10.5.0.2" })).status).toBe(200);
+  }, 60_000);
+
+  test("with proxy hops but no named proxy, the shared address is delayed, never refused", async () => {
+    const { url } = await hostRouter(1);
+    for (let i = 0; i < 10; i += 1) {
+      expect((await post(`${url}/host/api/login`, { username: "admin", password: "wrong" }, { "x-forwarded-for": "10.5.0.1" })).status).toBe(401);
+    }
+    const started = Date.now();
+    expect((await post(`${url}/host/api/login`, { username: "admin", password: "admin-pass-123" }, { "x-forwarded-for": "10.5.0.1" })).status).toBe(200);
+    expect(Date.now() - started).toBeGreaterThanOrEqual(1_900);
+  }, 60_000);
+
   test("/host/api/login refuses the throttled pair and serves another account", async () => {
     const { url } = await hostRouter();
     for (let i = 0; i < 10; i += 1) {

@@ -38,7 +38,7 @@ function get(port: number, path: string, headers: Record<string, string>): Promi
   });
 }
 
-async function studio(options: { trustedProxyHops?: number; corsAllowedOrigins?: string[] } = {}): Promise<number> {
+async function studio(options: { trustedProxyHops?: number; trustedProxyCidrs?: string[]; allowedCidrs?: string[]; corsAllowedOrigins?: string[] } = {}): Promise<number> {
   const workspace = dir("amc-host-allow-");
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
   const api = await startStudioApiServer({ workspace, host: "127.0.0.1", port: 0, token: "admin-token-host-allow", ...options });
@@ -70,9 +70,15 @@ describe("Studio host header check", () => {
     expect(JSON.parse(refused.body)).toEqual({ error: "host not allowed" });
   }, 60_000);
 
-  test("a trusted hop is not checked, and a configured origin's host passes", async () => {
-    const trusted = await studio({ trustedProxyHops: 1 });
-    expect((await get(trusted, "/healthz", { host: `attacker.example:${trusted}` })).status).toBe(200);
+  // SR-4: the check used to be skipped for any allowed peer (loopback included) once AMC_TRUSTED_PROXY_HOPS was set, so a
+  // rebinding page reaching an allowed peer bypassed it. Only a request a named proxy forwarded skips it now.
+  test("only a request a trusted proxy forwarded skips the check; a configured origin's host passes", async () => {
+    const hopsOnly = await studio({ trustedProxyHops: 1, allowedCidrs: ["127.0.0.1/32", "::1/128"] });
+    expect((await get(hopsOnly, "/healthz", { host: `evil.example:${hopsOnly}` })).status, "allowed loopback peer, no forwarding headers").toBe(403);
+    expect((await get(hopsOnly, "/healthz", { host: `evil.example:${hopsOnly}`, "x-forwarded-for": "10.0.0.5" })).status, "a peer that is no named proxy").toBe(403);
+    const proxied = await studio({ trustedProxyHops: 1, trustedProxyCidrs: ["127.0.0.1/32"] });
+    expect((await get(proxied, "/healthz", { host: "studio.example.com", "x-forwarded-for": "127.0.0.1" })).status, "forwarded by a named proxy").toBe(200);
+    expect((await get(proxied, "/healthz", { host: `evil.example:${proxied}` })).status, "the proxy's own request carries no forwarding header").toBe(403);
     const named = await studio({ corsAllowedOrigins: ["https://studio.example.com"] });
     expect((await get(named, "/healthz", { host: "studio.example.com" })).status).toBe(200);
   }, 60_000);
@@ -106,5 +112,19 @@ describe("host router host header check", () => {
     expect(JSON.parse(refused.body)).toEqual({ error: "host not allowed" });
     expect(refused.setCookie).toBeUndefined();
     expect((await get(port, "/host/healthz", { host: `localhost:${port}` })).status).toBe(200);
+  }, 60_000);
+
+  // SR-4: the router trusted loopback as a hop whenever AMC_TRUSTED_PROXY_HOPS was set, so a rebinding page on the
+  // desktop (loopback) skipped the check by adding X-Forwarded-For.
+  test("with proxy hops declared, a loopback page that adds X-Forwarded-For is still checked", async () => {
+    const hostDir = dir("amc-host-allow-router-");
+    initHostDb(hostDir);
+    createWorkspaceRecord({ hostDir, workspaceId: "demo", name: "Demo Workspace" });
+    initWorkspace({ workspacePath: hostWorkspaceDir(hostDir, "demo"), trustBoundaryMode: "isolated" });
+    const router = await startWorkspaceRouter({ hostDir, host: "127.0.0.1", port: 0, defaultWorkspaceId: "demo", allowLocalDemoWorkspace: true, trustedProxyHops: 1 });
+    closers.push(() => router.close());
+    const refused = await get(router.port, "/w/demo/console/", { host: `attacker.example:${router.port}`, "x-forwarded-for": "127.0.0.1" });
+    expect(refused.status).toBe(403);
+    expect(refused.setCookie).toBeUndefined();
   }, 60_000);
 });

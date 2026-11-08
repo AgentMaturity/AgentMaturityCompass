@@ -150,13 +150,15 @@ describe("multi-workspace host mode", () => {
     writeFileSync(join(workspaceA, ".amc", "tenant-marker.txt"), marker);
 
     const port = await pickFreePort();
-    // x-forwarded-proto marks cookies Secure only from a trusted hop (LIVE-RUNTIME-20): one hop, loopback peer.
+    // x-forwarded-proto marks cookies Secure only from a trusted proxy that forwarded the request (LIVE-RUNTIME-20, SR-1):
+    // one hop, loopback named as the proxy.
     const host = await startWorkspaceRouter({
       hostDir,
       host: "127.0.0.1",
       port,
       defaultWorkspaceId: "ws-a",
-      trustedProxyHops: 1
+      trustedProxyHops: 1,
+      trustedProxyCidrs: ["127.0.0.1/32"]
     });
 
     try {
@@ -164,7 +166,7 @@ describe("multi-workspace host mode", () => {
         url: `http://127.0.0.1:${port}/host/api/login`,
         method: "POST",
         body: { username: "admin", password: "admin-pass-123" },
-        headers: { "x-forwarded-proto": "https" }
+        headers: { "x-forwarded-proto": "https", "x-forwarded-for": "127.0.0.1" }
       });
       expect(hostLogin.status).toBe(200);
       const hostCookie = Array.isArray(hostLogin.headers["set-cookie"])
@@ -186,7 +188,7 @@ describe("multi-workspace host mode", () => {
         url: `http://127.0.0.1:${port}/w/ws-b/api/login`,
         method: "POST",
         body: { username: "viewerb", password: "viewer-pass-123" },
-        headers: { "x-forwarded-proto": "https" }
+        headers: { "x-forwarded-proto": "https", "x-forwarded-for": "127.0.0.1" }
       });
       expect(workspaceLogin.status).toBe(200);
       const wsCookie = Array.isArray(workspaceLogin.headers["set-cookie"])

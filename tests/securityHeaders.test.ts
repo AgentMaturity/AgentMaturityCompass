@@ -51,7 +51,7 @@ function expectJsonHeaders(headers: IncomingHttpHeaders, label: string): void {
   expect(headers["cache-control"], label).toBe("no-store");
 }
 
-async function studio(options: { trustedProxyHops?: number; allowedCidrs?: string[] } = {}) {
+async function studio(options: { trustedProxyHops?: number; allowedCidrs?: string[]; trustedProxyCidrs?: string[] } = {}) {
   const workspace = dir("amc-security-headers-");
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
   initUsersConfig({ workspace, username: "owner", password: "owner-password" }); // a signed users file, so login parses its body
@@ -86,13 +86,15 @@ describe("Studio", () => {
   }, 60_000);
 
   test("HSTS only when a trusted hop says https", async () => {
-    const trusted = await studio({ trustedProxyHops: 1, allowedCidrs: ["127.0.0.1/32", "::1/128"] });
-    expect((await send(trusted.port, "/healthz", { headers: { "x-forwarded-proto": "https" } })).headers["strict-transport-security"]).toBe("max-age=31536000");
+    const https = { "x-forwarded-proto": "https", "x-forwarded-for": "127.0.0.1" };
+    const trusted = await studio({ trustedProxyHops: 1, trustedProxyCidrs: ["127.0.0.1/32", "::1/128"] });
+    expect((await send(trusted.port, "/healthz", { headers: https })).headers["strict-transport-security"]).toBe("max-age=31536000");
     expect((await send(trusted.port, "/healthz")).headers["strict-transport-security"]).toBeUndefined();
-    const untrusted = await studio({ trustedProxyHops: 0 });
-    expect((await send(untrusted.port, "/healthz", { headers: { "x-forwarded-proto": "https" } })).headers["strict-transport-security"]).toBeUndefined();
-    const unlisted = await studio({ trustedProxyHops: 1, allowedCidrs: ["10.0.0.0/8"] });
-    expect((await send(unlisted.port, "/healthz", { headers: { "x-forwarded-proto": "https" } })).headers["strict-transport-security"]).toBeUndefined();
+    const untrusted = await studio({ trustedProxyHops: 0, trustedProxyCidrs: ["127.0.0.1/32"] });
+    expect((await send(untrusted.port, "/healthz", { headers: https })).headers["strict-transport-security"]).toBeUndefined();
+    // SR-1: an allowed peer is not a proxy; only AMC_TRUSTED_PROXY_CIDRS names one.
+    const unlisted = await studio({ trustedProxyHops: 1, allowedCidrs: ["127.0.0.1/32", "::1/128"] });
+    expect((await send(unlisted.port, "/healthz", { headers: https })).headers["strict-transport-security"]).toBeUndefined();
   }, 60_000);
 });
 

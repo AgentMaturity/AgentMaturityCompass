@@ -7,7 +7,7 @@ import Database from "better-sqlite3";
 import { afterEach, describe, expect, test } from "vitest";
 import { enableLanMode } from "../src/pairing/lanMode.js";
 import { ipAllowedByCidrs } from "../src/gateway/server.js";
-import { PUBLIC_BIND_REFUSAL } from "../src/studio/listenPolicy.js";
+import { PROXY_TRUST_REFUSAL, PUBLIC_BIND_REFUSAL } from "../src/studio/listenPolicy.js";
 import { runStudioForeground } from "../src/studio/studioSupervisor.js";
 import { initWorkspace } from "../src/workspace.js";
 
@@ -60,7 +60,8 @@ describe("signed LAN allow list", () => {
     const dir = workspace();
     const lanPort = await freePort();
     enableLanMode({ workspace: dir, bind: "127.0.0.1", port: lanPort, allowedCIDRs: ["10.9.0.0/16"] });
-    const runtime = await runStudioForeground({ workspace: dir, env: {}, trustedProxyHops: 1, ...others });
+    // The loopback test client plays the reverse proxy, so it is named as one (SR-1).
+    const runtime = await runStudioForeground({ workspace: dir, env: { AMC_TRUSTED_PROXY_CIDRS: "127.0.0.1/32" }, trustedProxyHops: 1, ...others });
     try {
       expect(runtime.state.apiPort, "the signed port is bound").toBe(lanPort);
       expect(await status(lanPort), "loopback is admitted although the signed list omits it").toBe(200);
@@ -74,10 +75,37 @@ describe("signed LAN allow list", () => {
   test("a set AMC_ALLOWED_CIDRS replaces the signed list", async () => {
     const dir = workspace();
     enableLanMode({ workspace: dir, bind: "127.0.0.1", port: await freePort(), allowedCIDRs: ["10.9.0.0/16"] });
-    const runtime = await runStudioForeground({ workspace: dir, env: { AMC_ALLOWED_CIDRS: "192.0.2.0/24" }, trustedProxyHops: 1, ...others });
+    const runtime = await runStudioForeground({ workspace: dir, env: { AMC_ALLOWED_CIDRS: "192.0.2.0/24", AMC_TRUSTED_PROXY_CIDRS: "127.0.0.1/32" }, trustedProxyHops: 1, ...others });
     try {
       expect(await status(runtime.state.apiPort, { "x-forwarded-for": "10.9.1.2" })).toBe(403);
       expect(await status(runtime.state.apiPort, { "x-forwarded-for": "192.0.2.9" })).toBe(200);
+    } finally {
+      await runtime.stop();
+    }
+  }, 120_000);
+});
+
+describe("proxy hops with no named proxy", () => {
+  // SR-1: the allow list used to vouch for proxies; with it no longer doing so, declared hops need a named proxy, or
+  // every forwarded client would be judged by the proxy's own address.
+  test("are refused before the gateway starts, leaving no open session", async () => {
+    const dir = workspace();
+    await expect(runStudioForeground({ workspace: dir, env: { AMC_ALLOWED_CIDRS: "10.0.0.0/8" }, trustedProxyHops: 1, apiPort: 0, ...others }))
+      .rejects.toThrow(PROXY_TRUST_REFUSAL);
+    expect(openSessions(dir)).toBe(0);
+    const hostDir = mkdtempSync(join(tmpdir(), "amc-lan-allow-host-"));
+    roots.push(hostDir);
+    await expect(runStudioForeground({ workspace: dir, hostDir, env: {}, trustedProxyHops: 1, apiPort: 0 })).rejects.toThrow(PROXY_TRUST_REFUSAL);
+  }, 120_000);
+
+  test("host mode hands the named proxies to the router, which judges the forwarded client", async () => {
+    const hostDir = mkdtempSync(join(tmpdir(), "amc-lan-allow-host-"));
+    roots.push(hostDir);
+    const runtime = await runStudioForeground({ workspace: workspace(), hostDir, trustedProxyHops: 1, apiPort: 0,
+      env: { AMC_TRUSTED_PROXY_CIDRS: "127.0.0.1/32", AMC_ALLOWED_CIDRS: "10.9.0.0/16" } });
+    try {
+      expect(await status(runtime.state.apiPort, { "x-forwarded-for": "10.9.1.2" })).toBe(200);
+      expect(await status(runtime.state.apiPort, { "x-forwarded-for": "192.0.2.9" })).toBe(403);
     } finally {
       await runtime.stop();
     }

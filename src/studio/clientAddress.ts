@@ -2,11 +2,13 @@ import type { IncomingMessage } from "node:http";
 import { isIP } from "node:net";
 
 /**
- * Who sent a request, as Studio, the host router and the gateway decide it (LIVE-RUNTIME-18/-20).
+ * Who sent a request, as Studio, the host router and the gateway decide it (LIVE-RUNTIME-18/-20, SR-1).
  *
- * A forwarded header counts only when the socket peer is a trusted hop: `trustedProxyHops > 0` and the peer is inside
- * the allow list. With `hops` trusted proxies that each append the peer they saw, the client is
- * `chain[chain.length - hops]`, clamped to the first entry (D-R11).
+ * A forwarded header counts only from a trusted proxy: `trustedProxyHops > 0`, the socket peer inside
+ * `trustedProxyCidrs` (AMC_TRUSTED_PROXY_CIDRS; empty trusts no proxy) and an X-Forwarded-For to read. The client allow
+ * list never vouches for a proxy: an allowed client is not a proxy and may not name its own address. With `hops`
+ * trusted proxies that each append the peer they saw, the client is `chain[chain.length - hops]`, clamped to the first
+ * entry (D-R11).
  */
 export const LOOPBACK_CIDRS: readonly string[] = ["127.0.0.1/32", "::1/128"];
 
@@ -103,14 +105,20 @@ export function forwardedClientIp(req: IncomingMessage, trustedProxyHops: number
   return chain[Math.max(0, chain.length - trustedProxyHops)] ?? chain[0] ?? null;
 }
 
-/** The request's client address and whether its peer is a trusted hop, from one hop count and one allow list. */
-export function resolveClientAddress(req: IncomingMessage, trust: { trustedProxyHops: number; allowedCidrs: readonly string[] }): {
+/** The request's client address, from one hop count and the list of proxies whose forwarding headers count. */
+export function resolveClientAddress(req: IncomingMessage, trust: { trustedProxyHops: number; trustedProxyCidrs: readonly string[] }): {
   clientIp: string;
+  /** A trusted proxy forwarded this request and named its client; its other forwarding headers count too. */
   trustForwarded: boolean;
+  /**
+   * The address stands for one client: no proxy is declared (hops 0), or a trusted proxy named the client. Otherwise it
+   * may be a proxy's own address shared by everyone behind it, so the login throttle never hard-refuses on it (SR-2).
+   */
+  addressTrusted: boolean;
 } {
   const peer = socketIp(req.socket.remoteAddress);
-  const trustForwarded = trust.trustedProxyHops > 0 && ipAllowedByCidrs(peer, trust.allowedCidrs);
-  return { clientIp: (trustForwarded ? forwardedClientIp(req, trust.trustedProxyHops) : null) ?? peer, trustForwarded };
+  const forwarded = trust.trustedProxyHops > 0 && ipAllowedByCidrs(peer, trust.trustedProxyCidrs) ? forwardedClientIp(req, trust.trustedProxyHops) : null;
+  return { clientIp: forwarded ?? peer, trustForwarded: forwarded !== null, addressTrusted: trust.trustedProxyHops <= 0 || forwarded !== null };
 }
 
 /**

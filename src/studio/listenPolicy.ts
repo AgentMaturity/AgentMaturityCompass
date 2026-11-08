@@ -11,7 +11,8 @@ import { cidrSyntaxValid, ipv4CidrRange, LOOPBACK_CIDRS, withLoopbackCidrs } fro
  * the signed LAN bind, port and allow list behind values the operator never set. Loopback is always admitted, so the
  * local console, `amc studio healthcheck` and loopback agents keep working under a LAN-only list; an explicitly empty
  * AMC_ALLOWED_CIDRS therefore means loopback only. Only AMC_ALLOW_PUBLIC_BIND acknowledges a public bind whose list
- * admits every address; AMC_LAN_MODE (the container default) does not.
+ * admits every address; AMC_LAN_MODE (the container default) does not. AMC_TRUSTED_PROXY_CIDRS names the reverse
+ * proxies whose forwarding headers count (SR-1): never the allow list, and never loopback unless listed.
  */
 export interface LanListenConfig {
   enabled: boolean;
@@ -32,6 +33,8 @@ export interface ListenPolicy {
   metricsPortConfigured: boolean;
   metricsPortSource: string | null;
   allowedCidrs: string[];
+  /** The proxies whose X-Forwarded-* headers count (AMC_TRUSTED_PROXY_CIDRS); empty trusts none. */
+  trustedProxyCidrs: string[];
   publicBind: boolean;
   publicBindAcknowledged: boolean;
   lanEnabled: boolean;
@@ -90,6 +93,9 @@ export function resolveListenPolicy(input: {
     : [...(lan?.allowedCIDRs ?? LOOPBACK_CIDRS)];
   const invalid = listed.filter((cidr) => !cidrSyntaxValid(cidr));
   if (invalid.length > 0) throw new Error(`Invalid CIDR in ${cidrSource ?? "the allow list"}: ${invalid.join(", ")}`);
+  const proxies = (env.AMC_TRUSTED_PROXY_CIDRS ?? "").split(",").map((cidr) => cidr.trim()).filter((cidr) => cidr.length > 0);
+  const invalidProxies = proxies.filter((cidr) => !cidrSyntaxValid(cidr));
+  if (invalidProxies.length > 0) throw new Error(`Invalid CIDR in AMC_TRUSTED_PROXY_CIDRS: ${invalidProxies.join(", ")}`);
   return {
     apiHost,
     apiPort: api.port,
@@ -100,6 +106,7 @@ export function resolveListenPolicy(input: {
     metricsPortConfigured: metrics.source !== null,
     metricsPortSource: metrics.source,
     allowedCidrs: withLoopbackCidrs(listed),
+    trustedProxyCidrs: proxies,
     publicBind: isPublicBind(apiHost),
     publicBindAcknowledged: TRUE_VALUES.has((env.AMC_ALLOW_PUBLIC_BIND ?? "").trim().toLowerCase()),
     lanEnabled: lan !== null
@@ -112,6 +119,18 @@ export const PUBLIC_BIND_REFUSAL = "Refusing a public bind with an allow list th
 /** Throws PUBLIC_BIND_REFUSAL for a public bind whose allow list admits every address, unless AMC_ALLOW_PUBLIC_BIND is set. */
 export function assertPublicBindAcknowledged(policy: Pick<ListenPolicy, "publicBind" | "allowedCidrs" | "publicBindAcknowledged">): void {
   if (policy.publicBind && weakCidrs(policy.allowedCidrs) && !policy.publicBindAcknowledged) throw new Error(PUBLIC_BIND_REFUSAL);
+}
+
+export const PROXY_TRUST_REFUSAL = "AMC_TRUSTED_PROXY_HOPS is set, but AMC_TRUSTED_PROXY_CIDRS names no proxy. "
+  + "Set it to your reverse proxy's addresses: forwarded headers are believed only from them.";
+
+/**
+ * Throws PROXY_TRUST_REFUSAL when proxy hops are declared but no proxy is named (SR-1). Forwarding headers would then
+ * count from nobody: every client behind the proxy would share its address, and the allow list would judge the proxy
+ * instead of the client, admitting everyone it forwards. Refusing the start is the fail-closed answer.
+ */
+export function assertProxyTrustNamed(trustedProxyHops: number | undefined, policy: Pick<ListenPolicy, "trustedProxyCidrs">): void {
+  if ((trustedProxyHops ?? 0) > 0 && policy.trustedProxyCidrs.length === 0) throw new Error(PROXY_TRUST_REFUSAL);
 }
 
 /** The standalone `amc gateway start` allow list: the environment only (no LAN config), refused like Studio's. */
