@@ -70,3 +70,39 @@ describe("cloud docs recommend only what the runtime can do (LIVE-DEPLOY-18)", (
     expect(cloud).not.toMatch(/EFS or another managed persistent storage option/);
   });
 });
+
+describe("receipt-based platform status where users install (LIVE-DEPLOY-10)", () => {
+  /** Places where "supported" or "qualified" sits within 80 characters of "Windows" without a negation in front of it. */
+  function windowsClaims(text: string): string[] {
+    const claims: string[] = [];
+    for (const match of text.matchAll(/\b(un)?(supported|qualified)\b/gi)) {
+      const at = match.index!;
+      const near = text.slice(Math.max(0, at - 80), at + match[0].length + 80);
+      const negated = match[1] !== undefined || /\b(?:not|no)\s+$/i.test(text.slice(Math.max(0, at - 8), at));
+      if (near.includes("Windows") && !negated) claims.push(near.replace(/\s+/g, " "));
+    }
+    return claims;
+  }
+
+  it("flags a Windows support claim and accepts a negated one (the check itself)", () => {
+    expect(windowsClaims("Windows x64 is supported.")).toHaveLength(1);
+    expect(windowsClaims("macOS arm64 is qualified; see the Windows notes.")).toHaveLength(1);
+    expect(windowsClaims("Windows x64: not qualified. WSL2 is unsupported.")).toEqual([]);
+  });
+
+  it("claims no Windows support or qualification in INSTALL.md or DESKTOP_PACKAGES.md", () => {
+    for (const file of ["docs/INSTALL.md", "docs/DESKTOP_PACKAGES.md"]) expect(windowsClaims(read(file)), file).toEqual([]);
+  });
+
+  it("states one receipt-based line per platform and the untested Windows paths", () => {
+    const install = read("docs/INSTALL.md");
+    const windows = section(install, "### Windows");
+    expect(windows).toContain("PLATFORM_MATRIX.md");
+    expect(windows).toContain("the CLI natively and Studio under WSL2 are both untested");
+    const status = section(install, "### Platform status");
+    for (const line of ["macOS arm64: qualified", "Linux arm64:", "Linux x64, macOS x64, Windows x64:", "Container images:"]) expect(status).toContain(line);
+    const desktop = read("docs/DESKTOP_PACKAGES.md");
+    expect(desktop).toContain("the CLI natively and Studio under WSL2 are both untested");
+    expect(desktop).toMatch(/Linux archive ships no Studio launcher/);
+  });
+});

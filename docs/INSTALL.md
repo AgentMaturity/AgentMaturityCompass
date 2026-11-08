@@ -7,7 +7,14 @@
 | Node.js | 22 or 24 LTS for production; package engine floor remains ≥ 20 |
 | RAM | 512 MB |
 | Disk | 100 MB + evidence storage |
-| OS | macOS, Linux (Ubuntu/Debian, RHEL/CentOS), Windows |
+| OS | One line per platform, from run receipts: [Platform status](#platform-status) |
+
+### Platform status
+
+- macOS arm64: qualified (`docs/PLATFORM_MATRIX.md`).
+- Linux arm64: the npm package and the desktop archive were installed and run on `node:22-bookworm` (aarch64) on 2026-11-07, in a maintainer verification run that recorded install defects; no platform-matrix receipt.
+- Linux x64, macOS x64, Windows x64: packages built and checksum-verified by the release scripts; no run receipt.
+- Container images: built for amd64 and arm64. The container smoke passed on arm64, and on amd64 only under emulation on an arm64 host (2026-10-11, `qualification/2026-10-11-P0-35/`); no native amd64 run.
 
 ## Option A: Verified GitHub Release Install
 
@@ -193,6 +200,8 @@ curl -fsSL https://agentmaturity.co/install.sh | sh
 ### Windows
 
 Run `irm https://agentmaturity.co/install.ps1 | iex` in PowerShell. It downloads and verifies the Windows release archive, which includes `install.ps1` plus the `Agent Maturity Compass Studio.cmd` launcher. You can also install WSL2 with Ubuntu and follow the Ubuntu instructions above.
+
+No maintainer-run Windows receipt exists (`docs/PLATFORM_MATRIX.md` has no Windows run); the CLI natively and Studio under WSL2 are both untested.
 
 ## Post-Install Verification
 
