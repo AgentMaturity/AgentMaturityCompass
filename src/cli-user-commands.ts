@@ -111,7 +111,7 @@ export function registerUserCommands(program: Command): void {
     .option(...PASSWORD_FILE)
     .action(async (username: string, opts: { passwordFile?: string }) => {
       const out = await userPasswordCliAsync({ workspace: process.cwd(), username, password: await accountPassword(username, opts.passwordFile) });
-      console.log(chalk.green(`Password updated: ${out.username} (their signed-in sessions were revoked)`));
+      console.log(chalk.green(`Password updated: ${out.username} (every session signed in with the old password has ended)`));
     });
 
   user

@@ -13,7 +13,9 @@ export const userRecordSchema = z.object({
   createdTs: z.number().int(),
   status: userStatusSchema,
   /** Who created this user, when an authenticated principal did (P1-56). Absent or null means self-provisioned. */
-  createdBy: z.object({ principalKey: z.string().min(1), admission: z.enum(["browser_csrf", "native_login_token"]) }).strict().nullable().optional()
+  createdBy: z.object({ principalKey: z.string().min(1), admission: z.enum(["browser_csrf", "native_login_token"]) }).strict().nullable().optional(),
+  /** Set by `amc user password`: a session token carries the value it was minted under and stops verifying once it changes. */
+  passwordChangedTs: z.number().int().optional()
 });
 
 export const usersFileSchema = z.object({

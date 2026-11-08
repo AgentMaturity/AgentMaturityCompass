@@ -430,13 +430,14 @@ export async function setUserRolesAsync(input: Parameters<typeof setUserRoles>[0
 }
 
 /**
- * LIVE-VAULT-06: a new password for an existing account (the same userId, status and roles); every tracked session of that
- * user is revoked once the signed users.yaml is written, so a leaked password stops working everywhere.
+ * LIVE-VAULT-06: a new password for an existing account (the same userId, status and roles), so a leaked password stops
+ * working everywhere. The new passwordChangedTs makes every session token minted under the old password fail verification,
+ * a login that checked the old password while this ran included, whether or not its record could be marked revoked here.
  */
 export async function setUserPasswordAsync(input: { workspace: string; username: string; password: string }, opts: UsersMutationOptions = {}): Promise<UserRecord> {
   const params = { ...input };
-  const updated = await mutateUsersConfigAsync(params.workspace,
-    current => withChangedUser(current!, params.username, (user) => ({ ...user, passwordHash: hashPassword(params.password, { username: user.username }) }), false), opts);
+  const updated = await mutateUsersConfigAsync(params.workspace, current => withChangedUser(current!, params.username, (user) => ({ ...user,
+    passwordHash: hashPassword(params.password, { username: user.username }), passwordChangedTs: Math.max(Date.now(), (user.passwordChangedTs ?? 0) + 1) }), false), opts);
   forEachSessionRecord(params.workspace, (path, parsed) => { if (parsed.userId === updated.userId && !parsed.revoked) markSessionRevoked(path, parsed); });
   return recorded(params.workspace, "password", opts, updated);
 }
@@ -522,6 +523,8 @@ export function createTrackedSession(params: {
   ttlMs?: number;
   authSource: "LOCAL_USER" | "WORKSPACE_ROUTER";
   scope?: SessionPayload["scope"];
+  /** LOCAL_USER: the passwordChangedTs of the user record the password was checked against. */
+  passwordChangedTs?: number;
 }): { token: string; payload: SessionPayload } {
   return storeTrackedSession(params, issueSessionToken(params));
 }
@@ -552,7 +555,7 @@ export async function createTrackedSessionAsync(params: Parameters<typeof create
   // A provider await must not publish the authority of a user revoked or changed while signing was pending.
   if (requested.authSource === "LOCAL_USER") {
     const current = activeUserRecord(requested.workspace, requested.userId);
-    if (current === null || current.username !== requested.username
+    if (current === null || current.username !== requested.username || current.passwordChangedTs !== requested.passwordChangedTs
       || [...current.roles].sort().join("\n") !== [...issued.payload.roles].sort().join("\n")) {
       throw new Error("local session authority changed while signing");
     }
@@ -571,14 +574,15 @@ export function createSession(params: {
     username: params.user.username,
     roles: params.user.roles,
     ttlMs: params.ttlMs,
-    authSource: "LOCAL_USER"
+    authSource: "LOCAL_USER",
+    passwordChangedTs: params.user.passwordChangedTs
   });
 }
 
 /** Runtime local-login counterpart of the synchronous compatibility API. */
 export async function createSessionAsync(params: Parameters<typeof createSession>[0] & { scope?: SessionPayload["scope"] }): Promise<ReturnType<typeof createSession>> {
   return createTrackedSessionAsync({ workspace: params.workspace, userId: params.user.userId, username: params.user.username,
-    roles: params.user.roles, ttlMs: params.ttlMs, authSource: "LOCAL_USER", scope: params.scope });
+    roles: params.user.roles, ttlMs: params.ttlMs, authSource: "LOCAL_USER", scope: params.scope, passwordChangedTs: params.user.passwordChangedTs });
 }
 
 export function revokeSessionByToken(params: {
@@ -697,6 +701,9 @@ export function verifyTrackedSessionToken(params: {
     }
     if (!sameRoles(user.roles, verified.payload.roles)) {
       return { ok: false, payload: null, error: "session roles changed" };
+    }
+    if (user.passwordChangedTs !== verified.payload.passwordChangedTs) {
+      return { ok: false, payload: null, error: "password changed" };
     }
   }
 

@@ -1,9 +1,9 @@
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { chmodSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import {
-  addUser, addUserAsync, authenticateUser, createSession, initUsersConfig, listUsers, revokeUser, revokeUserAsync, setUserPasswordAsync,
+  addUser, addUserAsync, authenticateUser, createSession, createSessionAsync, initUsersConfig, listUsers, revokeUser, revokeUserAsync, setUserPasswordAsync,
   setUserRoles, setUserRolesAsync, usersConfigPath, usersConfigSigPath, verifyTrackedSessionToken, verifyUsersConfigSignature
 } from "../src/auth/authApi.js";
 import { lockVault } from "../src/vault/vault.js";
@@ -46,6 +46,29 @@ describe("amc user password (LIVE-VAULT-06)", () => {
     const after = user(workspace, "owner");
     expect({ userId: after.userId, status: after.status, roles: after.roles }).toEqual({ userId: before.userId, status: before.status, roles: before.roles });
     expect(after.passwordHash).not.toBe(before.passwordHash);
+  });
+
+  test("a login that checked the old password while the reset ran gets no working session (skeptic SK-3a)", async () => {
+    const workspace = workspaceWithOwner();
+    const login = authenticateUser({ workspace, username: "owner", password: OLD });
+    expect(login.ok).toBe(true);
+    await setUserPasswordAsync({ workspace, username: "owner", password: NEW });
+    await expect(createSessionAsync({ workspace, user: login.user! })).rejects.toThrow("local session authority changed while signing");
+    const minted = createSession({ workspace, user: login.user! }); // the synchronous API has no post-sign re-check
+    expect(verifyTrackedSessionToken({ workspace, token: minted.token })).toMatchObject({ ok: false, error: "password changed" });
+    expect(verifyTrackedSessionToken({ workspace, token: (await createSessionAsync({ workspace, user: user(workspace, "owner") })).token }).ok).toBe(true);
+    expect(verifyTrackedSessionToken({ workspace, token: createSession({ workspace, user: user(workspace, "owner") }).token }).ok).toBe(true);
+  });
+
+  test("a session whose record the reset could not mark revoked still stops verifying (skeptic SK-3b)", async () => {
+    const workspace = workspaceWithOwner();
+    const session = createSession({ workspace, user: user(workspace, "owner") });
+    const dir = join(workspace, ".amc", "studio", "sessions");
+    const record = join(dir, readdirSync(dir).find((name) => name.endsWith(".json"))!);
+    chmodSync(record, 0o000); // a Studio-owned 0600 record a CLI running as another user cannot read
+    try { await setUserPasswordAsync({ workspace, username: "owner", password: NEW }); } finally { chmodSync(record, 0o600); }
+    expect(JSON.parse(readFileSync(record, "utf8")).revoked).toBe(false);
+    expect(verifyTrackedSessionToken({ workspace, token: session.token })).toMatchObject({ ok: false, error: "password changed" });
   });
 
   test("refuses an unknown username without changing users.yaml", async () => {
