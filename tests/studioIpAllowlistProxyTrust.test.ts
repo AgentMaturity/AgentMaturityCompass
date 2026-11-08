@@ -98,4 +98,26 @@ describe("studio API trusted proxy IP handling", () => {
       await api.close();
     }
   });
+
+  // LIVE-RUNTIME-18: behind appending proxies the client is chain[length - hops]; a client-prepended entry is not it.
+  test("selects the hop the trusted proxies appended, never an entry the client prepended", async () => {
+    const workspace = newWorkspace();
+    const one = await startStudioApiServer({ workspace, host: "127.0.0.1", port: 0, token: "test-token",
+      allowedCidrs: ["127.0.0.1/32", "::1/128", "10.9.0.0/16"], trustedProxyHops: 1 });
+    try {
+      expect((await rawGet(`${one.url}/health`, { "x-forwarded-for": "198.51.100.9, 10.9.8.7" })).status).toBe(200);
+      const spoofed = await rawGet(`${one.url}/health`, { "x-forwarded-for": "10.9.8.7, 198.51.100.9" });
+      expect(spoofed.status).toBe(403);
+      expect(JSON.parse(spoofed.body)).toEqual({ error: "client IP not allowed", ip: "198.51.100.9" });
+    } finally {
+      await one.close();
+    }
+    const two = await startStudioApiServer({ workspace, host: "127.0.0.1", port: 0, token: "test-token",
+      allowedCidrs: ["127.0.0.1/32", "::1/128", "10.9.0.0/16"], trustedProxyHops: 2 });
+    try {
+      expect((await rawGet(`${two.url}/health`, { "x-forwarded-for": "10.9.8.7, 203.0.113.1" })).status).toBe(200);
+    } finally {
+      await two.close();
+    }
+  });
 });

@@ -1417,11 +1417,13 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
     const workspace = newWorkspace(false);
     initUsersConfig({ workspace, username: "owner", password: "owner-pass" });
     const token = "amc-1471-cookie-token";
+    // x-forwarded-proto counts only from a trusted hop: one hop, and the loopback peer is in the default allow list.
     const studio = await startStudioApiServer({
       workspace,
       host: "127.0.0.1",
       port: await pickFreePort(),
-      token
+      token,
+      trustedProxyHops: 1
     });
     try {
       const httpsLogin = await postJson(

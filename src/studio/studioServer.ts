@@ -117,6 +117,9 @@ import { publishConsoleSnapshotAsync, consoleSnapshotErrorStatus, CONSOLE_SNAPSH
 import { bindStudioResultRoute, ENTITLEMENT_NOTE, studioStoredRunReport, withClaimBody } from "./studioClaimOutput.js";
 import { respondReportSigningError } from "./reportSigningError.js";
 import { allowStudioCors as allowCors } from "./studioCors.js";
+import { makeRateLimiter, makeRateLimiterDetailed, setRateLimitHeaders } from "./rateLimiter.js";
+import { admitLoginAttempt, createLoginThrottle, LOGIN_THROTTLED_ERROR } from "./loginThrottle.js";
+import { ipAllowedByCidrs, LOOPBACK_CIDRS, requestUsesHttps, resolveClientAddress } from "./clientAddress.js";
 import { createNativeTaskService } from "./nativeTaskService.js";
 import { isNativeApprovalMutationPath, isNativeStudioPath, nativeAllowedBrowserOrigins, nativeCsrfTokenForSession } from "./nativeAdmission.js";
 import { admitStudioApproval } from "./studioApprovalAdmission.js";
@@ -451,91 +454,6 @@ async function readLicenseRequest(req: IncomingMessage, maxBytes = 1_048_576): P
   const parsed = (body ? JSON.parse(body) : {}) as { licenseKey?: unknown; expiresAt?: unknown };
   return { licenseKey: typeof parsed.licenseKey === "string" && parsed.licenseKey.length > 0 ? parsed.licenseKey : null, expiresAt: "expiresAt" in parsed };
 }
-
-function ipToInt(ip: string): number | null {
-  const parts = ip.split(".");
-  if (parts.length !== 4) {
-    return null;
-  }
-  const values = parts.map((part) => Number(part));
-  if (values.some((value) => !Number.isInteger(value) || value < 0 || value > 255)) {
-    return null;
-  }
-  return ((values[0] ?? 0) << 24) + ((values[1] ?? 0) << 16) + ((values[2] ?? 0) << 8) + (values[3] ?? 0);
-}
-
-function parseCidr(cidr: string): { base: number; mask: number } | null {
-  const [ip, bitsRaw] = cidr.split("/");
-  if (!ip || !bitsRaw) {
-    return null;
-  }
-  const base = ipToInt(ip.trim());
-  const bits = Number(bitsRaw);
-  if (base === null || !Number.isInteger(bits) || bits < 0 || bits > 32) {
-    return null;
-  }
-  const mask = bits === 0 ? 0 : Number((0xffffffff << (32 - bits)) >>> 0);
-  return { base: Number(base >>> 0), mask };
-}
-
-function ipAllowedByCidrs(ip: string, cidrs: string[]): boolean {
-  if (ip === "::1") {
-    return cidrs.includes("::1/128") || cidrs.includes("::1");
-  }
-  const value = ipToInt(ip);
-  if (value === null) {
-    return false;
-  }
-  for (const cidr of cidrs) {
-    const parsed = parseCidr(cidr);
-    if (!parsed) {
-      continue;
-    }
-    const network = parsed.base & parsed.mask;
-    if ((Number(value >>> 0) & parsed.mask) === network) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function extractSocketIp(remoteAddress: string | undefined): string {
-  const remote = remoteAddress ?? "127.0.0.1";
-  if (remote.startsWith("::ffff:")) {
-    return remote.slice("::ffff:".length);
-  }
-  return remote;
-}
-
-function extractForwardedClientIp(req: IncomingMessage, trustedProxyHops: number): string | null {
-  if (trustedProxyHops <= 0) {
-    return null;
-  }
-  const forwarded = req.headers["x-forwarded-for"];
-  if (typeof forwarded !== "string" || forwarded.trim().length === 0) {
-    return null;
-  }
-  const chain = forwarded
-    .split(",")
-    .map((value) => value.trim())
-    .filter((value) => value.length > 0);
-  if (chain.length === 0) {
-    return null;
-  }
-  const index = Math.max(0, chain.length - trustedProxyHops - 1);
-  return chain[index] ?? chain[0] ?? null;
-}
-
-function extractClientIp(req: IncomingMessage, trustedProxyHops: number, trustForwarded: boolean): string {
-  if (trustForwarded) {
-    const forwarded = extractForwardedClientIp(req, trustedProxyHops);
-    if (forwarded) {
-      return forwarded;
-    }
-  }
-  return extractSocketIp(req.socket.remoteAddress);
-}
-
 
 function workspaceWritable(workspace: string): boolean {
   try {
@@ -901,90 +819,6 @@ function backupStatusSummary(workspace: string): {
   };
 }
 
-function makeRateLimiter(limit: number, intervalMs: number): (key: string) => boolean {
-  const buckets = new Map<string, { count: number; resetTs: number }>();
-  return (key: string): boolean => {
-    const now = Date.now();
-    const existing = buckets.get(key);
-    if (!existing || existing.resetTs <= now) {
-      buckets.set(key, {
-        count: 1,
-        resetTs: now + intervalMs
-      });
-      return true;
-    }
-    existing.count += 1;
-    if (existing.count > limit) {
-      return false;
-    }
-    return true;
-  };
-}
-
-interface RateLimitDecision {
-  allowed: boolean;
-  limit: number;
-  remaining: number;
-  resetTs: number;
-  retryAfterSeconds: number;
-}
-
-function makeRateLimiterDetailed(limit: number, intervalMs: number): (key: string) => RateLimitDecision {
-  const buckets = new Map<string, { count: number; resetTs: number }>();
-  return (key: string): RateLimitDecision => {
-    const now = Date.now();
-    let bucket = buckets.get(key);
-    if (!bucket || bucket.resetTs <= now) {
-      bucket = {
-        count: 0,
-        resetTs: now + intervalMs
-      };
-      buckets.set(key, bucket);
-    }
-    if (bucket.count >= limit) {
-      return {
-        allowed: false,
-        limit,
-        remaining: 0,
-        resetTs: bucket.resetTs,
-        retryAfterSeconds: Math.max(1, Math.ceil((bucket.resetTs - now) / 1000))
-      };
-    }
-    bucket.count += 1;
-    return {
-      allowed: true,
-      limit,
-      remaining: Math.max(0, limit - bucket.count),
-      resetTs: bucket.resetTs,
-      retryAfterSeconds: 0
-    };
-  };
-}
-
-function setRateLimitHeaders(res: ServerResponse, decision: RateLimitDecision): void {
-  const now = Date.now();
-  const resetAfterSeconds = Math.max(0, Math.ceil((decision.resetTs - now) / 1000));
-  const resetEpochSeconds = Math.max(0, Math.floor(decision.resetTs / 1000));
-  res.setHeader("x-ratelimit-limit", String(decision.limit));
-  res.setHeader("x-ratelimit-remaining", String(decision.remaining));
-  res.setHeader("x-ratelimit-reset", String(resetEpochSeconds));
-  res.setHeader("ratelimit-limit", String(decision.limit));
-  res.setHeader("ratelimit-remaining", String(decision.remaining));
-  res.setHeader("ratelimit-reset", String(resetAfterSeconds));
-  if (!decision.allowed && decision.retryAfterSeconds > 0) {
-    res.setHeader("retry-after", String(decision.retryAfterSeconds));
-  }
-}
-
-function requestUsesHttps(req: IncomingMessage): boolean {
-  const forwarded = req.headers["x-forwarded-proto"];
-  const first = (Array.isArray(forwarded) ? forwarded[0] : forwarded)?.split(",", 1)[0]?.trim().toLowerCase();
-  if (first === "https") {
-    return true;
-  }
-  return (req.socket as Socket & { encrypted?: boolean }).encrypted === true;
-}
-
 function accessContext(auth: AuthContext): AccessContext {
   if (auth.isAdmin) {
     return {
@@ -1252,10 +1086,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
   const toolhub = new ToolHubService(options.workspace);
   const nativeTaskService = createNativeTaskService({ workspace: options.workspace });
   const orgSse = new OrgSseHub();
-  const allowByIp = (ip: string): boolean => {
-    const cidrs = options.allowedCidrs ?? ["127.0.0.1/32", "::1/128"];
-    return ipAllowedByCidrs(ip, cidrs);
-  };
+  const allowedCidrs = options.allowedCidrs ?? LOOPBACK_CIDRS;
+  const allowByIp = (ip: string): boolean => ipAllowedByCidrs(ip, allowedCidrs);
+  const loginThrottle = createLoginThrottle();
   const healthLimiter = makeRateLimiter(120, 60_000);
   const authLimiter = makeRateLimiter(20, 60_000);
   const writeLimiter = makeRateLimiter(180, 60_000);
@@ -1444,9 +1277,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         return;
       }
 
-      const remoteIp = extractSocketIp(req.socket.remoteAddress);
-      const trustForwarded = (options.trustedProxyHops ?? 0) > 0 && allowByIp(remoteIp);
-      const clientIp = extractClientIp(req, options.trustedProxyHops ?? 0, trustForwarded);
+      const { clientIp, trustForwarded } = resolveClientAddress(req, { trustedProxyHops: options.trustedProxyHops ?? 0, allowedCidrs });
       if (!allowByIp(clientIp)) {
         json(res, 403, { error: "client IP not allowed", ip: clientIp });
         return;
@@ -1774,34 +1605,31 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           }
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
-        const parsed = body ? (JSON.parse(body) as { username?: string; password?: string }) : {};
-        if (!parsed.username || !parsed.password) {
+        const parsed = body ? (JSON.parse(body) as { username?: unknown; password?: unknown }) : {};
+        const username = typeof parsed.username === "string" ? parsed.username : "", password = typeof parsed.password === "string" ? parsed.password : "";
+        if (!username || !password) {
           json(res, 400, { error: "username and password are required" });
           return;
         }
-        const authUser = authenticateUser({
-          workspace: options.workspace,
-          username: parsed.username,
-          password: parsed.password
-        });
+        if (!await admitLoginAttempt(loginThrottle, { username, clientIp, refuse: (retryAfter) => { res.setHeader("retry-after", String(retryAfter)); json(res, 429, { error: LOGIN_THROTTLED_ERROR }); },
+          audit: () => writeStudioAuditEventAsync({ workspace: options.workspace, auditType: "HUMAN_LOGIN_THROTTLED", severity: "MEDIUM", payload: { username, clientIp } }) })) return;
+        const authUser = authenticateUser({ workspace: options.workspace, username, password });
         if (!authUser.ok || !authUser.user) {
-          await writeStudioAuditEventAsync({
-            workspace: options.workspace,
-            auditType: "HUMAN_LOGIN_FAILED",
-            severity: "MEDIUM",
-            payload: {
-              username: parsed.username
-            }
-          });
-          json(res, 401, { error: authUser.error ?? "invalid credentials" });
+          // LIVE-RUNTIME-06: one body for every failure; the reason (revoked user, unreadable users config) is audited and logged only.
+          loginThrottle.fail(username, clientIp);
+          const reason = authUser.error ?? "invalid credentials";
+          console.error(`studio: login refused on ${pathname}: ${reason}`);
+          await writeStudioAuditEventAsync({ workspace: options.workspace, auditType: "HUMAN_LOGIN_FAILED", severity: "MEDIUM", payload: { username, reason } });
+          json(res, 401, { error: "invalid credentials" });
           return;
         }
+        loginThrottle.succeed(username, clientIp);
         const session = await createSessionAsync({
           workspace: options.workspace,
           user: authUser.user
         });
         const maxAgeSec = Math.max(60, Math.floor((session.payload.expiresTs - Date.now()) / 1000));
-        setSessionCookie(res, session.token, maxAgeSec, "/", requestUsesHttps(req));
+        setSessionCookie(res, session.token, maxAgeSec, "/", requestUsesHttps(req, trustForwarded));
         await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "HUMAN_LOGIN_SUCCESS",
@@ -1831,7 +1659,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             token
           });
         }
-        clearSessionCookie(res, "/", requestUsesHttps(req));
+        clearSessionCookie(res, "/", requestUsesHttps(req, trustForwarded));
         clearPairingCookie(res);
         json(res, 200, { ok: true });
         return;

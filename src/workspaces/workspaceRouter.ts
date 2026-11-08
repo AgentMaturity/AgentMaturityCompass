@@ -9,6 +9,9 @@ import {
   nativeCsrfTokenForSession, NativeAdmissionError
 } from "../studio/nativeAdmission.js";
 import { ensureAdminToken } from "../studio/studioState.js";
+import { makeRateLimiter } from "../studio/rateLimiter.js";
+import { admitLoginAttempt, createLoginThrottle, LOGIN_THROTTLED_ERROR } from "../studio/loginThrottle.js";
+import { socketIp } from "../studio/clientAddress.js";
 import { WorkspaceManager } from "./workspaceManager.js";
 import { proxyStudioWorkspaceRequest } from "./workspaceStudioProxy.js";
 import { WorkspaceRuntimeRegistry, WorkspaceRuntimeClosingError } from "./workspaceRuntimeRegistry.js";
@@ -158,34 +161,6 @@ async function readBody(req: IncomingMessage, maxBytes = 1_048_576): Promise<str
 
 function json(res: ServerResponse, status: number, payload: unknown): void {
   writeControlJson(res, status, payload);
-}
-
-function extractClientIp(req: IncomingMessage): string {
-  const remote = req.socket.remoteAddress ?? "127.0.0.1";
-  if (remote.startsWith("::ffff:")) {
-    return remote.slice("::ffff:".length);
-  }
-  return remote;
-}
-
-function makeRateLimiter(limit: number, intervalMs: number): (key: string) => boolean {
-  const buckets = new Map<string, { count: number; resetTs: number }>();
-  return (key: string): boolean => {
-    const now = Date.now();
-    const existing = buckets.get(key);
-    if (!existing || existing.resetTs <= now) {
-      buckets.set(key, {
-        count: 1,
-        resetTs: now + intervalMs
-      });
-      return true;
-    }
-    existing.count += 1;
-    if (existing.count > limit) {
-      return false;
-    }
-    return true;
-  };
 }
 
 function hostSessionCookiePath(): string {
@@ -722,6 +697,10 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
   const hostEvents = new HostSseHub();
   const hostLoginLimiter = makeRateLimiter(20, 60_000);
   const workspaceLoginLimiter = makeRateLimiter(20, 60_000);
+  const loginThrottle = createLoginThrottle(); // host accounts: one throttle for the host and workspace login routes
+  const admitHostLogin = (res: ServerResponse, route: string, username: string, clientIp: string): Promise<boolean> => admitLoginAttempt(loginThrottle, { username, clientIp,
+    refuse: (retryAfter) => { res.setHeader("retry-after", String(retryAfter)); writeControlError(res, 429, LOGIN_THROTTLED_ERROR); },
+    audit: () => appendHostAudit(options.hostDir, "HUMAN_LOGIN_THROTTLED", username || null, { route, clientIp }) });
   const publicNativeOrigins = (): readonly string[] => {
     const address = server.address();
     const port = typeof address === "object" && address ? address.port : options.port;
@@ -769,7 +748,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
     try {
       const url = new URL(req.url ?? "/", `http://${options.host}:${options.port}`);
       const pathname = url.pathname;
-      const clientIp = extractClientIp(req);
+      const clientIp = socketIp(req.socket.remoteAddress);
 
       if (pathname === "/host/healthz") {
         json(res, 200, { ok: true, mode: "host" });
@@ -843,7 +822,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         };
         const username = typeof body.username === "string" ? body.username : "";
         const password = typeof body.password === "string" ? body.password : "";
-
+        if (!await admitHostLogin(res, "/host/api/login", username, clientIp)) return;
         let local:
           | ReturnType<typeof localPasswordLogin>
           | {
@@ -876,6 +855,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           };
         }
         if (local.ok && local.user) {
+          loginThrottle.succeed(username, clientIp);
           // Backward-compatible host-only session cookie for legacy clients/tests.
           const issued = issueHostSessionToken({
             hostDir: options.hostDir,
@@ -910,6 +890,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             password
           });
           if (legacyAuth.ok && legacyAuth.user) {
+            loginThrottle.succeed(username, clientIp);
             const issued = issueHostSessionToken({
               hostDir: options.hostDir,
               userId: legacyAuth.user.userId,
@@ -937,14 +918,18 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             });
             return;
           }
+          loginThrottle.fail(username, clientIp);
           appendHostAudit(options.hostDir, "HUMAN_LOGIN_FAILED", username || null, {
             route: "/host/api/login",
-            mode: "legacy_fallback"
+            mode: "legacy_fallback",
+            reason: legacyAuth.error ?? "invalid credentials"
           });
-          writeControlError(res, 401, legacyAuth.error ?? "invalid credentials");
+          writeControlError(res, 401, "invalid credentials");
           return;
         }
-        writeControlError(res, local.status, local.error ?? "login failed");
+        // LIVE-RUNTIME-06: a disabled account answers like a wrong password; a policy refusal (403) keeps its text.
+        if (local.status === 401) loginThrottle.fail(username, clientIp);
+        writeControlError(res, local.status, local.status === 401 ? "invalid credentials" : local.error ?? "login failed");
         return;
       }
 
@@ -1495,15 +1480,19 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           const body = JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576)) as { username?: unknown; password?: unknown };
           const inputUsername = typeof body.username === "string" ? body.username : "";
           const inputPassword = typeof body.password === "string" ? body.password : "";
+          if (!await admitHostLogin(res, `/w/${urlWorkspaceId}/login`, inputUsername, clientIp)) return;
           const auth = authenticateHostUser({
             hostDir: options.hostDir,
             username: inputUsername,
             password: inputPassword
           });
           if (!auth.ok || !auth.user) {
-            writeControlError(res, 401, auth.error ?? "invalid credentials");
+            loginThrottle.fail(inputUsername, clientIp);
+            appendHostAudit(options.hostDir, "HUMAN_LOGIN_FAILED", inputUsername || null, { route: `/w/${urlWorkspaceId}/login`, reason: auth.error ?? "invalid credentials" });
+            writeControlError(res, 401, "invalid credentials");
             return;
           }
+          loginThrottle.succeed(inputUsername, clientIp);
           userId = auth.user.userId;
           username = auth.user.username;
           roles = auth.user.isHostAdmin
