@@ -9,17 +9,19 @@
 //
 // Each phase runs `up -d --no-build` with AMC_STUDIO_IMAGE=<image id>, waits for READY (the image HEALTHCHECK script,
 // run inside the container), mints a pairing code inside the container and runs one governed turn
-// (governed-turn-probe.mjs). Like the drill, A boots once unpinned to create the workspace's monitor key, which is then
-// pinned (AMC_EXPECTED_MONITOR_FINGERPRINT, trust on first use) for every probed phase. An image that refuses a ledger a
-// newer image migrated (the P2-09 downgrade guard, docs/deploy/reference/ROLLBACK.md step 2) is recorded as
-// `downgradeGuard`: the documented outcome, not a failure. The rehearsal ends with `down` and never `down -v`; only
-// --cleanup then removes the volumes this compose project created.
+// (governed-turn-probe.mjs). Like the drill, A boots once unpinned (AMC_EXPECTED_MONITOR_FINGERPRINT unset, never empty)
+// to create the workspace's monitor key, which is then pinned (trust on first use) for every probed phase. A refused
+// after B migrated its ledger (the P2-09 downgrade guard, docs/deploy/reference/ROLLBACK.md step 2) is recorded as
+// `downgradeGuard`: in the rollback-a phase that is the documented outcome; in any other phase nothing was rehearsed and
+// the rehearsal fails. It runs only on a new project: one that already has containers or volumes is refused before
+// anything starts. It ends with `down` and never `down -v`; only --cleanup then removes the volumes the run created.
 //
 // AMC_COMPOSE_PREFIX: optional command prefix for the compose calls when the local docker CLI has no compose plugin,
 // e.g. "colima ssh -p <profile> --". The compose environment is then passed as `env K=V` arguments; plain docker calls
 // (exec, inspect, logs, volume) always use the local docker CLI and its current context.
 //
-// Exit 0: every phase passed, or the rehearsal stopped at the downgrade guard. Exit 1: a phase failed. Exit 2: usage.
+// Exit 0: every phase passed, or A stopped at the downgrade guard after B. Exit 1: a phase failed, or the project was not
+// new. Exit 2: usage.
 import { execFileSync, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync, realpathSync, writeFileSync } from "node:fs";
@@ -37,12 +39,37 @@ const PROBE_PASSES = new Set(["verified", "verified-prefix"]);
 /** Runner: docker CLI calls, compose through AMC_COMPOSE_PREFIX when set. Returns {status, stdout, stderr}. */
 function dockerCli(args, { env = {} } = {}) {
   const prefix = args[0] === "compose" ? (process.env.AMC_COMPOSE_PREFIX ?? "").trim().split(/\s+/).filter(Boolean) : [];
-  const argv = prefix.length > 0 ? [...prefix, "env", ...Object.entries(env).map(([key, value]) => `${key}=${value}`), "docker", ...args] : ["docker", ...args];
+  // An undefined value unsets the variable: spawnSync drops it from the merged environment, and the prefix form omits it.
+  const set = Object.entries(env).filter(([, value]) => value !== undefined).map(([key, value]) => `${key}=${value}`);
+  const argv = prefix.length > 0 ? [...prefix, "env", ...set, "docker", ...args] : ["docker", ...args];
   const run = spawnSync(argv[0], argv.slice(1), { encoding: "utf8", env: { ...process.env, ...env }, maxBuffer: 16 * 1024 * 1024 });
   return { status: run.status ?? 1, stdout: run.stdout ?? "", stderr: run.stderr ?? String(run.error?.message ?? "") };
 }
 
 const delay = (ms) => new Promise((done) => setTimeout(done, ms));
+
+/** A docker call's stdout; a failed call throws, because an unknown project state is not a new project. */
+function output(run, what) {
+  if (run.status !== 0) throw new Error(`${what} failed: ${run.stderr.trim()}`);
+  return run.stdout;
+}
+const lines = (text) => text.split("\n").map((line) => line.trim()).filter(Boolean);
+
+/**
+ * The rehearsal swaps images on its project's volumes and --cleanup deletes every volume carrying the project label, so
+ * it runs only on a project of its own: no container or volume with the project label, and no volume name the compose
+ * files resolve (the TLS stack names its volumes amc_data, ... outside any project) may exist yet.
+ */
+function assertNewProject(docker, project, config) {
+  const label = `label=com.docker.compose.project=${project}`;
+  const existing = new Set(lines(output(docker(["volume", "ls", "-q"]), "docker volume ls")));
+  const taken = new Set([
+    ...lines(output(docker(["ps", "-a", "-q", "--filter", label]), "docker ps")).map((id) => `container ${id}`),
+    ...lines(output(docker(["volume", "ls", "-q", "--filter", label]), "docker volume ls")).map((name) => `volume ${name}`),
+    ...Object.values(config.volumes ?? {}).map((volume) => volume?.name).filter((name) => existing.has(name)).map((name) => `volume ${name}`)
+  ]);
+  if (taken.size > 0) throw new Error(`project ${project} is not new (${[...taken].join(", ")} already exist); rehearse on a project and volumes of its own`);
+}
 
 /**
  * Run the rehearsal with an injected docker runner and probe, so it can be tested without a daemon.
@@ -54,8 +81,9 @@ export async function runComposeRehearsal({ files, imageA, imageB, envFile, proj
   const images = { a: { ref: imageA, id: inspectId(docker, imageA) }, b: { ref: imageB, id: inspectId(docker, imageB) } };
   const base = ["compose", "-p", project, "--env-file", resolve(envFile), ...files.flatMap((file) => ["-f", resolve(file)])];
   const compose = (args, env = {}) => docker([...base, ...args], { env });
-  const services = compose(["config", "--services"]).stdout.split("\n").map((name) => name.trim());
-  const service = services.includes("studio") ? "studio" : "amc-studio";
+  const config = JSON.parse(output(compose(["config", "--format", "json"]), "docker compose config"));
+  const service = config.services?.studio ? "studio" : "amc-studio";
+  assertNewProject(docker, project, config);
   const receipt = {
     kind: "amc.compose-rehearsal/1", sourceCommit, startedAt: new Date().toISOString(),
     environment: { node: process.version, platform: platform(), release: release(), arch: arch() },
@@ -65,7 +93,8 @@ export async function runComposeRehearsal({ files, imageA, imageB, envFile, proj
   };
   let pin = null;
   const up = (image) => {
-    const run = compose(["up", "-d", "--no-build"], { AMC_STUDIO_IMAGE: image, AMC_EXPECTED_MONITOR_FINGERPRINT: pin ?? "" });
+    // Unpinned is unset: an empty pin is not "unanchored", Studio refuses it as invalid and reads no task history.
+    const run = compose(["up", "-d", "--no-build"], { AMC_STUDIO_IMAGE: image, AMC_EXPECTED_MONITOR_FINGERPRINT: pin ?? undefined });
     if (run.status !== 0) throw new Error(`compose up (${image}) failed: ${run.stderr.trim().slice(-1500)}`);
     const container = compose(["ps", "-q", service]).stdout.trim();
     const running = docker(["inspect", "--format", "{{.Image}}", container]).stdout.trim();
@@ -128,7 +157,9 @@ export async function runComposeRehearsal({ files, imageA, imageB, envFile, proj
     receipt.finishedAt = new Date().toISOString();
   }
   const finished = receipt.phases.length === PHASES.length && receipt.phases.every((phase) => phase.status === "passed");
-  const stoppedAtGuard = receipt.downgradeGuard !== null && receipt.phases.slice(0, -1).every((phase) => phase.status === "passed");
+  // Only A refused after B passed is the documented outcome; a guard in deploy-a or upgrade-b rehearsed nothing.
+  const stoppedAtGuard = receipt.downgradeGuard?.phase === PHASES.at(-1)[0] && receipt.phases.length === PHASES.length
+    && receipt.phases.slice(0, -1).every((phase) => phase.status === "passed");
   receipt.status = finished || stoppedAtGuard ? "passed" : "failed";
   return receipt;
 }
