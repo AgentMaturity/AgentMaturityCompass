@@ -131,20 +131,6 @@ class HostSseHub {
   }
 }
 
-async function pickFreeLocalPort(host = "127.0.0.1"): Promise<number> {
-  const probe = createServer();
-  await new Promise<void>((resolvePromise, rejectPromise) => {
-    probe.once("error", rejectPromise);
-    probe.listen(0, host, () => resolvePromise());
-  });
-  const addr = probe.address();
-  await new Promise<void>((resolvePromise) => probe.close(() => resolvePromise()));
-  if (!addr || typeof addr === "string") {
-    throw new Error("failed to allocate local port");
-  }
-  return addr.port;
-}
-
 async function readBody(req: IncomingMessage, maxBytes = 1_048_576): Promise<string> {
   const chunks: Buffer[] = [];
   let total = 0;
@@ -718,12 +704,12 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           token
         };
       });
-      const localPort = await pickFreeLocalPort("127.0.0.1");
       if (workspaceApis.closing) throw new WorkspaceRuntimeClosingError();
+      // Port 0: the kernel picks the port at listen time, so no other process can take it between a probe and the bind.
       const api = await startStudioApiServer({
         workspace: runtime.workspaceDir,
         host: "127.0.0.1",
-        port: localPort,
+        port: 0,
         token: runtime.token,
         allowedCidrs: options.allowedCidrs,
         trustedProxyHops: options.trustedProxyHops,
@@ -735,7 +721,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       const result: WorkspaceApiRuntime = {
         workspaceId: normalized,
         host: "127.0.0.1",
-        port: localPort,
+        port: api.port,
         token: runtime.token,
         close: async () => api.close()
       };
@@ -1745,9 +1731,10 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
     server.listen(options.port, options.host, () => resolvePromise());
   });
 
+  const bound = server.address(); // the bound port, so `port: 0` reports the port the router really listens on
   return {
     host: options.host,
-    port: options.port,
+    port: typeof bound === "object" && bound ? bound.port : options.port,
     close: () => {
       if (shutdown) return shutdown;
       hostEvents.closeAll();

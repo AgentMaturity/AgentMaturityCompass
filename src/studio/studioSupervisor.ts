@@ -51,6 +51,9 @@ import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { startWorkspaceRouter } from "../workspaces/workspaceRouter.js";
 import { createWorkspaceRecord, getWorkspaceRecord, initHostDb } from "../workspaces/hostDb.js";
 import { hostWorkspaceDir } from "../workspaces/workspacePaths.js";
+import { isPublicBind } from "../config/loadConfig.js";
+import { assertPublicBindAcknowledged, resolveListenPolicy } from "./listenPolicy.js";
+import { assertPortFree, closeStartedThenThrow, listenOnPolicyPort } from "./studioLifecycle.js";
 
 export interface StudioRuntime {
   stop: () => Promise<void>;
@@ -308,9 +311,13 @@ export async function runStudioForeground(params: {
   corsAllowedOrigins?: string[];
   dataRetentionDays?: number;
   queryLeaseCarrierEnabled?: boolean;
+  /** The raw environment for the listen policy (the CLI passes process.env); absent, only the options and LAN config count. */
+  env?: NodeJS.ProcessEnv;
 }): Promise<StudioRuntime> {
   if (params.hostDir) {
     const hostDir = params.hostDir;
+    const listen = resolveListenPolicy({ env: params.env ?? {}, hostMode: true, flags: { bind: params.apiHost, port: params.apiPort, allowedCidrs: params.allowedCidrs } });
+    assertPublicBindAcknowledged(listen);
     if (params.allowLocalDemoWorkspace === true) {
       process.env.AMC_VAULT_PASSPHRASE = ensureDemoVaultPassphrase(hostDir);
     }
@@ -331,15 +338,13 @@ export async function runStudioForeground(params: {
         trustBoundaryMode: "isolated"
       });
     }
-    const apiHost = params.apiHost ?? "127.0.0.1";
-    const apiPort = params.apiPort ?? 3212;
     const router = await startWorkspaceRouter({
       hostDir,
-      host: apiHost,
-      port: apiPort,
+      host: listen.apiHost,
+      port: listen.apiPort,
       defaultWorkspaceId,
       allowLocalDemoWorkspace: params.allowLocalDemoWorkspace,
-      allowedCidrs: params.allowedCidrs,
+      allowedCidrs: listen.allowedCidrs,
       trustedProxyHops: params.trustedProxyHops,
       maxRequestBytes: params.maxRequestBytes,
       corsAllowedOrigins: params.corsAllowedOrigins
@@ -404,15 +409,32 @@ export async function runStudioForeground(params: {
   }
   const lan = loadLanMode(workspace);
   const lanSig = verifyLanModeSignature(workspace);
+  // LIVE-RUNTIME-03/-10: where to listen and whom to admit is decided, and refused, before anything listens or opens a session.
+  const listen = resolveListenPolicy({ env: params.env ?? {}, hostMode: false, lan: { ...lan, valid: lanSig.valid },
+    flags: { bind: params.apiHost, port: params.apiPort, metricsPort: params.metricsPort, allowedCidrs: params.allowedCidrs } });
+  const metricsHost = params.metricsHost ?? listen.metricsHost;
+  const metricsPublicBind = isPublicBind(metricsHost);
+  assertPublicBindAcknowledged(listen);
+  if (metricsPublicBind && !(lan.enabled && lanSig.valid)) {
+    throw new Error("Refusing to bind metrics publicly without signed LAN mode.");
+  }
+  if (listen.publicBind && !params.allowPublicBind && !(lan.enabled && lanSig.valid)) {
+    throw new Error("Refusing to bind Studio API publicly. Enable LAN mode or set explicit public bind allowance.");
+  }
+  await assertPortFree(listen.apiHost, listen.apiPort, listen.apiPortSource);
+  await assertPortFree(metricsHost, listen.metricsPort, listen.metricsPortSource);
   const gateway = await startGateway({
     workspace,
     workspaceId: workspaceIdFromDirectory(workspace),
-    listenHost: params.gatewayHost,
+    listenHost: params.gatewayHost ?? listen.apiHost,
     listenPort: params.gatewayPort,
     proxyPort: params.proxyPort,
-    allowedCidrs: params.allowedCidrs,
+    allowedCidrs: listen.allowedCidrs,
     allowQueryCarrierOverride: params.queryLeaseCarrierEnabled
   });
+  // Anything that fails from here closes what already started, newest first, so a refused start leaves no open session.
+  const started: Array<() => Promise<void>> = [() => gateway.close()];
+  const guard = async <T>(step: () => Promise<T>): Promise<T> => step().catch((error: unknown) => closeStartedThenThrow(started, error));
 
   ensureMetricsBaseline();
   try {
@@ -423,35 +445,9 @@ export async function runStudioForeground(params: {
   } catch {
     // Metrics baselining must remain best-effort.
   }
-  const metricsHost = params.metricsHost ?? "127.0.0.1";
-  const requestedMetricsPort = params.metricsPort ?? 9464;
-  const metricsPublicBind = metricsHost === "0.0.0.0" || metricsHost === "::";
-  if (metricsPublicBind && !(lan.enabled && lanSig.valid)) {
-    throw new Error("Refusing to bind metrics publicly without signed LAN mode.");
-  }
-  let metrics: Awaited<ReturnType<typeof startMetricsServer>>;
-  try {
-    metrics = await startMetricsServer({
-      workspace,
-      host: metricsHost,
-      port: requestedMetricsPort,
-      allowRemote: metricsPublicBind,
-      allowedCidrs: params.allowedCidrs
-    });
-  } catch (error) {
-    const message = String(error);
-    if (message.includes("EADDRINUSE")) {
-      metrics = await startMetricsServer({
-        workspace,
-        host: metricsHost,
-        port: 0,
-        allowRemote: metricsPublicBind,
-        allowedCidrs: params.allowedCidrs
-      });
-    } else {
-      throw error;
-    }
-  }
+  const metrics = await guard(() => listenOnPolicyPort({ label: "Metrics", port: listen.metricsPort, source: listen.metricsPortSource,
+    start: (port) => startMetricsServer({ workspace, host: metricsHost, port, allowRemote: metricsPublicBind, allowedCidrs: listen.allowedCidrs }) }));
+  started.push(() => metrics.close());
 
   const dashboardOut = agentDashboardDir(workspace, agentId);
   try {
@@ -471,65 +467,15 @@ export async function runStudioForeground(params: {
       0o644
     );
   }
-  const requestedDashboardPort = params.dashboardPort ?? 4173;
-  let dashboard: Awaited<ReturnType<typeof serveDashboard>>;
-  try {
-    dashboard = await serveDashboard({
-      workspace,
-      agentId,
-      port: requestedDashboardPort,
-      outDir: dashboardOut
-    });
-  } catch (error) {
-    const message = String(error);
-    if (!message.includes("EADDRINUSE")) {
-      throw error;
-    }
-    dashboard = await serveDashboard({
-      workspace,
-      agentId,
-      port: 0,
-      outDir: dashboardOut
-    });
-  }
+  // The dashboard is loopback-only and always falls back to a free port (its port is a convenience, not a probe target).
+  const dashboard = await guard(() => listenOnPolicyPort({ label: "Dashboard", port: params.dashboardPort ?? 4173, source: null, log: () => undefined,
+    start: (port) => serveDashboard({ workspace, agentId, port, outDir: dashboardOut }) }));
+  started.push(() => dashboard.close());
 
-  const defaultApiHost = lan.enabled && lanSig.valid ? lan.bind : "127.0.0.1";
-  const defaultApiPort = params.apiPort ?? (lan.enabled && lanSig.valid ? lan.port : 3212);
-  const apiHost = params.apiHost ?? defaultApiHost;
-  const apiPort = params.apiPort ?? defaultApiPort;
-  const publicBind = apiHost === "0.0.0.0" || apiHost === "::";
-  if (publicBind && !params.allowPublicBind && !(lan.enabled && lanSig.valid)) {
-    throw new Error("Refusing to bind Studio API publicly. Enable LAN mode or set explicit public bind allowance.");
-  }
-
-  let api: Awaited<ReturnType<typeof startStudioApiServer>>;
-  try {
-    api = await startStudioApiServer({
-      workspace,
-      host: apiHost,
-      port: apiPort,
-      token,
-      allowedCidrs: params.allowedCidrs,
-      trustedProxyHops: params.trustedProxyHops,
-      maxRequestBytes: params.maxRequestBytes,
-      corsAllowedOrigins: params.corsAllowedOrigins
-    });
-  } catch (error) {
-    const message = String(error);
-    if (!message.includes("EADDRINUSE")) {
-      throw error;
-    }
-    api = await startStudioApiServer({
-      workspace,
-      host: apiHost,
-      port: 0,
-      token,
-      allowedCidrs: params.allowedCidrs,
-      trustedProxyHops: params.trustedProxyHops,
-      maxRequestBytes: params.maxRequestBytes,
-      corsAllowedOrigins: params.corsAllowedOrigins
-    });
-  }
+  const api = await guard(() => listenOnPolicyPort({ label: "Studio API", port: listen.apiPort, source: listen.apiPortSource,
+    start: (port) => startStudioApiServer({ workspace, host: listen.apiHost, port, token, allowedCidrs: listen.allowedCidrs,
+      trustedProxyHops: params.trustedProxyHops, maxRequestBytes: params.maxRequestBytes, corsAllowedOrigins: params.corsAllowedOrigins }) }));
+  started.push(() => api.close());
 
   const gatewaySig = verifyGatewayConfigSignature(workspace);
   const actionPolicySig = verifyActionPolicySignature(workspace);
@@ -556,7 +502,7 @@ export async function runStudioForeground(params: {
     !lanSig.valid ||
     !plugins.ok;
   if (untrustedConfig) {
-    writeConfigSignatureAudit(workspace, agentId);
+    await guard(async () => writeConfigSignatureAudit(workspace, agentId));
   }
 
   const logFile = join(studioLogsDir(workspace), "studio.log");
@@ -579,7 +525,7 @@ export async function runStudioForeground(params: {
     untrustedConfig,
     logFile
   };
-  writeStudioState(workspace, state);
+  await guard(async () => writeStudioState(workspace, state));
   try {
     writeStudioLifecycleAudit(workspace, agentId, "STUDIO_RUNTIME_STARTED");
   } catch {

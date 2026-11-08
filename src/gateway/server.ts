@@ -39,6 +39,7 @@ import { CircuitOpenError, TimeoutError, withCircuitBreaker } from "../ops/circu
 import { checkUpstreamEgress, pinnedLookup, prepareFieldGuard, requestFieldRefusal, type FieldGuard } from "./requestFieldGuard.js";
 import { checkEgress, EgressBlocked } from "../residency/checkEgress.js";
 import { parseConnectAuthority } from "./connectResidency.js";
+import { ipAllowedByCidrs as ipAllowedByList, LOOPBACK_CIDRS, socketIp } from "../studio/clientAddress.js";
 import { killSwitchDenial, killSwitchEgressDenial } from "../runtime/killSwitch.js";
 export interface StartGatewayOptions {
   workspace: string;
@@ -305,64 +306,11 @@ function firstString(value: string | string[] | undefined): string | undefined {
   return value;
 }
 
-function ipToInt(ip: string): number | null {
-  const parts = ip.split(".");
-  if (parts.length !== 4) {
-    return null;
-  }
-  const values = parts.map((part) => Number(part));
-  if (values.some((value) => !Number.isInteger(value) || value < 0 || value > 255)) {
-    return null;
-  }
-  return ((values[0] ?? 0) << 24) + ((values[1] ?? 0) << 16) + ((values[2] ?? 0) << 8) + (values[3] ?? 0);
-}
-
-function parseCidr(cidr: string): { base: number; mask: number } | null {
-  const [ip, bitsRaw] = cidr.split("/");
-  if (!ip || !bitsRaw) {
-    return null;
-  }
-  const base = ipToInt(ip.trim());
-  const bits = Number(bitsRaw);
-  if (base === null || !Number.isInteger(bits) || bits < 0 || bits > 32) {
-    return null;
-  }
-  const mask = bits === 0 ? 0 : Number((0xffffffff << (32 - bits)) >>> 0);
-  return { base: Number(base >>> 0), mask };
-}
-
-function normalizeRemoteIp(remote: string | undefined): string {
-  if (!remote || remote.length === 0) {
-    return "127.0.0.1";
-  }
-  if (remote.startsWith("::ffff:")) {
-    return remote.slice("::ffff:".length);
-  }
-  return remote;
-}
-
-function ipAllowedByCidrs(ip: string, cidrs: string[]): boolean {
-  if (cidrs.length === 0) {
-    return true;
-  }
-  if (ip === "::1") {
-    return cidrs.includes("::1/128") || cidrs.includes("::1");
-  }
-  const value = ipToInt(ip);
-  if (value === null) {
-    return false;
-  }
-  for (const cidr of cidrs) {
-    const parsed = parseCidr(cidr);
-    if (!parsed) {
-      continue;
-    }
-    const network = parsed.base & parsed.mask;
-    if ((Number(value >>> 0) & parsed.mask) === network) {
-      return true;
-    }
-  }
-  return false;
+// Peer address and CIDR matching are shared with Studio and the host router. An absent or empty allow list is loopback only
+// (LIVE-RUNTIME-03): the gateway no longer admits every address when no list is given.
+const normalizeRemoteIp = socketIp;
+export function ipAllowedByCidrs(ip: string, cidrs: string[]): boolean {
+  return ipAllowedByList(ip, cidrs.length > 0 ? cidrs : LOOPBACK_CIDRS);
 }
 
 function stripAgentProvidedCredentials(

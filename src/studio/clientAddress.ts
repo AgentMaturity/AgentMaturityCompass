@@ -58,8 +58,9 @@ export function ipAllowedByCidrs(ip: string, cidrs: readonly string[]): boolean 
   return false;
 }
 
-/** An `address/bits` entry with a valid IPv4 or IPv6 address and prefix length. */
+/** An `address/bits` entry with a valid IPv4 or IPv6 address and prefix length, or the bare `::1` the matcher accepts. */
 export function cidrSyntaxValid(cidr: string): boolean {
+  if (cidr.trim() === "::1") return true;
   const [ip, bits, extra] = cidr.trim().split("/");
   const family = isIP(ip ?? "");
   const prefix = Number(bits);

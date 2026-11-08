@@ -296,6 +296,7 @@ import { agentRunFiles, latestRunSummary } from "./diagnostic/runReportResolutio
 import { buildConnectInstructions } from "./studio/connectWizard.js";
 import { registerHookIntegrationCommands } from "./adapters/hookIntegrationCli.js";
 import { runStudioForeground, startStudioDaemon, stopStudioDaemon, studioStatus } from "./studio/studioSupervisor.js";
+import { standaloneGatewayAllowList } from "./studio/listenPolicy.js";
 import { readAdminToken, readStudioState, studioLogsDir } from "./studio/studioState.js";
 import { fixSignaturesAsync, FixSignaturesPublicationError, inspectSignatures } from "./studio/signatures.js";
 import {
@@ -4210,24 +4211,22 @@ studio
       );
     }
 
+    // Bind, port and allow list resolve from the flags, the raw environment and the signed LAN config (LIVE-RUNTIME-03).
     const studioRuntime = await runStudioForeground({
       workspace: runtimeConfig.workspaceDir,
       hostDir: runtimeConfig.hostDir ?? undefined,
       defaultWorkspaceId: runtimeConfig.defaultWorkspaceId,
-      apiHost: hostMode ? runtimeConfig.hostBind : runtimeConfig.bind,
-      apiPort: hostMode ? runtimeConfig.hostPort : runtimeConfig.studioPort,
+      env: process.env,
+      apiHost: hostMode ? undefined : opts.bind,
+      apiPort: hostMode || !opts.port ? undefined : Number(opts.port),
       dashboardPort,
-      gatewayHost: hostMode ? runtimeConfig.hostBind : runtimeConfig.bind,
       gatewayPort: runtimeConfig.gatewayPort,
       proxyPort: runtimeConfig.proxyPort,
       allowPublicBind: runtimeConfig.allowPublicBind || runtimeConfig.lanMode,
-      allowedCidrs: runtimeConfig.allowedCidrs,
       trustedProxyHops: runtimeConfig.trustedProxyHops,
       maxRequestBytes: runtimeConfig.maxRequestBytes,
       corsAllowedOrigins: runtimeConfig.corsAllowedOrigins,
       dataRetentionDays: runtimeConfig.dataRetentionDays,
-      metricsHost: runtimeConfig.metricsBind,
-      metricsPort: runtimeConfig.metricsPort,
       queryLeaseCarrierEnabled: queryCarrierAllowed
     });
 
@@ -10227,7 +10226,8 @@ gateway
     const handle = await startGateway({
       workspace: process.cwd(),
       workspaceId: workspaceIdFromDirectory(process.cwd()),
-      configPath: opts.config
+      configPath: opts.config,
+      allowedCidrs: standaloneGatewayAllowList(process.env, loadGatewayConfig(process.cwd(), opts.config).listen.host)
     });
 
     console.log(chalk.hex('#4AEF79')(`Gateway session: ${handle.gatewaySessionId}`));
@@ -18593,30 +18593,24 @@ program
       hostDir: opts.hostDir ? resolve(opts.hostDir) : undefined,
       defaultWorkspaceId: opts.defaultWorkspaceId
     });
-    const hostMode = Boolean(runtimeConfig.hostDir);
     const lan = loadLanMode(runtimeConfig.workspaceDir);
     const lanSig = verifyLanModeSignature(runtimeConfig.workspaceDir);
-    const resolvedApiPort = explicitApiPort ?? (hostMode ? runtimeConfig.hostPort : runtimeConfig.studioPort);
     const resolvedDashboardPort = explicitDashboardPort ?? runtimeConfig.dashboardPort;
     const runtime = await runStudioForeground({
       workspace: runtimeConfig.workspaceDir,
       hostDir: runtimeConfig.hostDir ?? undefined,
       defaultWorkspaceId: runtimeConfig.defaultWorkspaceId,
       allowLocalDemoWorkspace: opts.allowLocalDemoWorkspace === true,
-      apiPort: resolvedApiPort,
+      env: process.env, // bind, port and allow list: the raw environment and the signed LAN config (LIVE-RUNTIME-03)
+      apiPort: explicitApiPort,
       dashboardPort: resolvedDashboardPort,
-      apiHost: hostMode ? runtimeConfig.hostBind : runtimeConfig.bind,
-      gatewayHost: hostMode ? runtimeConfig.hostBind : runtimeConfig.bind,
       gatewayPort: runtimeConfig.gatewayPort,
       proxyPort: runtimeConfig.proxyPort,
       allowPublicBind: runtimeConfig.allowPublicBind || runtimeConfig.lanMode,
-      allowedCidrs: runtimeConfig.allowedCidrs,
       trustedProxyHops: runtimeConfig.trustedProxyHops,
       maxRequestBytes: runtimeConfig.maxRequestBytes,
       corsAllowedOrigins: runtimeConfig.corsAllowedOrigins,
       dataRetentionDays: runtimeConfig.dataRetentionDays,
-      metricsHost: runtimeConfig.metricsBind,
-      metricsPort: runtimeConfig.metricsPort,
       queryLeaseCarrierEnabled: runtimeConfig.queryLeaseCarrierEnabled && lan.enabled && lanSig.valid
     });
 
