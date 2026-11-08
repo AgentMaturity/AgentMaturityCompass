@@ -8,6 +8,7 @@ import { keyPolicy, loadKeysConfig } from "../keys/keysConfig.js";
 import { KeyProviderError } from "../keys/provider.js";
 import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
 import { assertSigningKeyUsable, getSigningKey, getSigningPublicKeyPem, getPurposeKeyHistory, readHistory } from "../keys/signingKeys.js";
+import { VAULT_LOCKED_NO_SIGN_MESSAGE } from "../vault/vaultLockedError.js";
 
 /** Internal maintained-caller choice. Request bodies never select the synchronous compatibility branch. */
 export interface RunHashPublicationOptions { beforePublish?: () => void; synchronousSeal?: boolean }
@@ -32,7 +33,7 @@ export function captureRunHashAuthority(workspace: string, unsigned: boolean): (
       throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "current policy refuses the original run signer");
     assertSigningKeyUsable(workspace, "artifact-seal", publicKeyPem, holder);
     if (holder === "file") {
-      if (!vaultStatus(workspace).unlocked) throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
+      if (!vaultStatus(workspace).unlocked) throw new Error(VAULT_LOCKED_NO_SIGN_MESSAGE);
       if (publicKeyFromPrivate(getSigningKey(workspace, "artifact-seal")) !== publicKeyPem)
         throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original run vault key changed");
     }

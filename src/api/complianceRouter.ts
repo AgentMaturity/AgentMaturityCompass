@@ -13,6 +13,7 @@ import { verifyTrustConfigSignature } from '../trust/trustConfig.js';
 import { KEY_PROVIDER_ERRORS, KeyProviderError } from '../keys/provider.js';
 import { KeyRevokedError } from '../keys/keyRevocations.js';
 import { assertVaultMaySign } from '../keys/signingKeys.js';
+import { isVaultLockedError } from '../vault/vaultLockedError.js';
 
 const SCOPE_TEMPLATE_ERROR_CODES = new Set([
   'TEMPLATE_NOT_FOUND',
@@ -523,8 +524,7 @@ export async function handleComplianceRoute(
         if (res.headersSent) return true;
         if (err instanceof KeyProviderError && Object.hasOwn(KEY_PROVIDER_ERRORS, err.code)) { apiError(res, KEY_PROVIDER_ERRORS[err.code], err.code + ': policy debt signing refused'); return true; }
         if (err instanceof KeyRevokedError) { apiError(res, 409, 'KEY_REVOKED: policy debt signing key was revoked'); return true; }
-        if (err instanceof Error && (err.message === '🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.'
-          || err.message === '🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup.')) { apiError(res, 423, 'VAULT_LOCKED: unlock the vault to sign policy debt'); return true; }
+        if (isVaultLockedError(err)) { apiError(res, 423, 'VAULT_LOCKED: unlock the vault to sign policy debt'); return true; }
         apiError(res, 500, 'Policy debt registration failed');
       }
       return true;

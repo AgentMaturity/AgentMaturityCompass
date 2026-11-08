@@ -16,6 +16,7 @@ import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
 import { vaultStatus } from "../vault/vault.js";
+import { VAULT_LOCKED_MESSAGE } from "../vault/vaultLockedError.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -161,7 +162,7 @@ export async function prepareDebtEntryAsync(workspace: string, params: Parameter
   const debtId = `dbt_${randomUUID().slice(0, 12)}`, now = Date.now(), before = captureDebtState(root, debtId);
   const body = debtBody(input, debtId, now, before.head), captured = capturePurposePublication(root, "artifact-seal");
   const hash = sha256Hex(canonicalize(body)), signed = await signWithPurposeKey(root, "artifact-seal", Buffer.from(hash, "hex"), { beforeSign: beforePublish });
-  const assertVaultCurrent = () => { if (signed.provider === "file" && !vaultStatus(root).unlocked) throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup."); };
+  const assertVaultCurrent = () => { if (signed.provider === "file" && !vaultStatus(root).unlocked) throw new Error(VAULT_LOCKED_MESSAGE); };
   beforePublish?.(); assertVaultCurrent();
   const entry: PolicyDebtEntry = { ...body, debt_hash: hash, signature: signed.signature.toString("base64") }, bytes = JSON.stringify(entry, null, 2);
   return Object.freeze({ publish(): PolicyDebtEntry {

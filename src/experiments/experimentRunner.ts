@@ -28,6 +28,7 @@ import { experimentGateSchema, experimentSchema, type ExperimentFile, type Exper
 import { deterministicSeed, meanDifference, pairedBootstrapCI, pairedStandardizedEffect } from "./stats.js";
 import { DEFAULT_MIN_PAIRED_CASES, evaluateExperimentGate, type ExperimentGateStatus } from "./experimentGatePolicy.js";
 import { listExperimentRunFiles, readExperimentRun } from "./experimentHistory.js";
+import { VAULT_LOCKED_MESSAGE } from "../vault/vaultLockedError.js";
 
 interface SignedDigest {
   digestSha256: string;
@@ -600,7 +601,7 @@ export async function runExperimentAsync(params: Parameters<typeof runExperiment
     // Do not let the inherited file getter reopen an explicitly locked vault through an environment passphrase.
     const assertFileVaultCurrent = () => {
       if (signed.provider === "file" && !vaultStatus(input.workspace).unlocked)
-        throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup.");
+        throw new Error(VAULT_LOCKED_MESSAGE);
     };
     assertFileVaultCurrent(); phase = "members";
     const report: ExperimentReport = { ...prepared.base, reportJsonSha256, reportSealSig: signed.signature.toString("base64") };

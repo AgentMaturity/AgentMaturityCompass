@@ -26,6 +26,7 @@ import { merkleMigrationSchema, merkleRootRowSchema, rootSignatureSchema } from 
 import { prepareMerkle, preparedRootSignature, publishPreparedMerkle, type PreparedMerkleMember } from "./preparedMerkle.js";
 import { assertTransparencyStateCurrent, captureTransparencyState, captureTransparencyAppendPublication, withTransparencyPublicationLock, stateBytes,
   workspaceLogPath, workspaceSealPath, workspaceSealSigPath, type TransparencyState, type TransparencyAppendProgress } from "./workspacePublication.js";
+import { VAULT_LOCKED_NO_SIGN_MESSAGE } from "../vault/vaultLockedError.js";
 
 export interface TransparencyAppendInput {
   workspace: string; type: string; agentId: string;
@@ -111,7 +112,7 @@ function assertSignerCurrent(workspace: string, original: ReturnType<typeof capt
         throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", original.holder, "the current key policy refuses the original transparency signer");
       assertSigningKeyUsable(workspace, "artifact-seal", original.descriptor.publicKeyPem, original.holder);
       if (original.holder === "file") {
-        if (!vaultStatus(workspace).unlocked) throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
+        if (!vaultStatus(workspace).unlocked) throw new Error(VAULT_LOCKED_NO_SIGN_MESSAGE);
         if (publicKeyFromPrivate(getSigningKey(workspace, "artifact-seal")) !== original.descriptor.publicKeyPem)
           throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the original transparency vault purpose key changed while signing was prepared");
       }

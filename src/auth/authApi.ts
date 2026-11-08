@@ -23,6 +23,7 @@ import { KeyProviderError, KEY_PROVIDER_ERRORS } from "../keys/provider.js";
 import { KeyRevokedError } from "../keys/keyRevocations.js";
 import { recordUserChange, type UserChange, type UserChangeActor } from "./userAudit.js";
 import { pruneSessions } from "./sessionPrune.js";
+import { isVaultLockedError } from "../vault/vaultLockedError.js";
 export { sessionActor } from "./userAudit.js";
 
 interface UsersSignature {
@@ -306,10 +307,6 @@ class UsersAdminTokenRefusedError extends Error {
   constructor() { super("the admin token cannot change console accounts; sign in as an OWNER"); this.name = "UsersAdminTokenRefusedError"; }
 }
 
-const usersVaultLockedMessages = new Set([
-  "🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup.",
-  "🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported."
-]);
 /** Only the three existing users-mutation POST routes receive this response mapping. */
 export function respondUsersMutationError(request: Pick<IncomingMessage, "method" | "url">, error: unknown, send: (status: number, body: { error: string; code?: string }) => void): boolean {
   if (request.method !== "POST") return false;
@@ -331,8 +328,8 @@ export function respondUsersMutationError(request: Pick<IncomingMessage, "method
   if (error instanceof KeyRevokedError) {
     send(409, { error: "KEY_REVOKED: the config-signature key was revoked", code: "KEY_REVOKED" }); return true;
   }
-  // The vault compatibility API currently throws Error, not a distinct lock class. Match only its two fixed messages.
-  if (error instanceof Error && usersVaultLockedMessages.has(error.message)) {
+  // The vault compatibility API throws Error, not a distinct lock class. Match only its fixed prefix (vaultLockedError.ts).
+  if (isVaultLockedError(error)) {
     send(423, { error: "VAULT_LOCKED: unlock the vault to change users", code: "VAULT_LOCKED" }); return true;
   }
   return false;

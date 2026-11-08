@@ -13,6 +13,7 @@ import { signWithPurposeKey } from "../keys/purposeProviders.js";
 import { assertSigningKeyUsable, getSigningKey } from "../keys/signingKeys.js";
 import { withAmcConfigPublicationLock } from "./configPublicationLock.js";
 import { assertConfigPublicationCurrent, captureConfigPublication, configPairWrites, configSignatureBytes, MAX_CONFIG_BYTES } from "./configPublication.js";
+import { VAULT_LOCKED_NO_SIGN_MESSAGE } from "../vault/vaultLockedError.js";
 
 /** Current committed purpose authority signs an exact snapshot; a new ref alone never picks the signer. */
 export async function saveSignedAmcConfig(workspace: string, candidate?: Uint8Array): Promise<string> {
@@ -52,7 +53,7 @@ export async function saveSignedAmcConfig(workspace: string, candidate?: Uint8Ar
         throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", signed.provider, "the current or candidate policy refuses this config signer");
       }
     }
-    if (signed.provider === "file" && !vaultStatus(workspace).unlocked) throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
+    if (signed.provider === "file" && !vaultStatus(workspace).unlocked) throw new Error(VAULT_LOCKED_NO_SIGN_MESSAGE);
     if (signed.provider === "file" && publicKeyFromPrivate(getSigningKey(workspace, "config-signature")) !== signed.publicKeyPem) {
       throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the vault config signer changed while signing");
     }

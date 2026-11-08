@@ -37,6 +37,7 @@ import {
   getInvalidOverrides,
   resetCanaryRegisters
 } from "./canaryRegisters.js";
+import { VAULT_LOCKED_MESSAGE } from "../vault/vaultLockedError.js";
 
 export {
   createRollbackPack,
@@ -428,7 +429,7 @@ export async function registerPolicyDebtAsync(params: Parameters<typeof register
   if (!workspace) return registerPolicyDebt(input, workspace);
   const root = resolve(workspace), body = policyDebtBody(input), captured = capturePurposePublication(root, "artifact-seal");
   const signed = await signWithPurposeKey(root, "artifact-seal", Buffer.from(sha256Hex(canonicalize(body)), "hex"), { beforeSign: beforePublish });
-  const original = () => { if (signed.provider === "file" && !vaultStatus(root).unlocked) throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup."); assertPurposePublicationCurrent(root, captured, signed); };
+  const original = () => { if (signed.provider === "file" && !vaultStatus(root).unlocked) throw new Error(VAULT_LOCKED_MESSAGE); assertPurposePublicationCurrent(root, captured, signed); };
   beforePublish?.(); original();
   const entry: PolicyDebtEntry = { ...body, active: true, signature: signed.signature.toString("base64") };
   const prepared = await prepareDebtEntryAsync(root, { type: "waiver", reason: `${input.waivedRequirement}: ${input.justification}`,

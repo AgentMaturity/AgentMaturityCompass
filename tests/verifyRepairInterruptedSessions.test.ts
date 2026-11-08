@@ -122,7 +122,8 @@ test("a locked vault refuses with the unlock step and changes nothing", { timeou
   const before = state(root);
   const result = await repair(root, true, true);
   expect(result.code).toBe(2);
-  expect(result.out).toContain("Refused: the vault is locked; run `amc vault unlock` (or set AMC_VAULT_PASSPHRASE) and retry. Nothing was changed.");
+  // Follow-up 5: the paths named work without a terminal too (`amc vault unlock` alone refuses there).
+  expect(result.out).toContain("Refused: the vault is locked. Export AMC_VAULT_PASSPHRASE, or set AMC_VAULT_PASSPHRASE_FILE, or run `amc vault unlock` from a terminal, then retry. Nothing was changed.");
   expect(state(root)).toEqual(before);
 });
 

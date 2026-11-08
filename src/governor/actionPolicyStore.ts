@@ -18,6 +18,7 @@ import { assertSigningKeyUsable, getSigningPublicKeyPem } from "../keys/signingK
 import { vaultStatus } from "../vault/vault.js";
 import { canonicalize } from "../utils/json.js";
 import { captureOrgFiles, captureOrgPairs, assertOrgPairsCurrent, orgPairBytes, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
+import { VAULT_LOCKED_NO_SIGN_MESSAGE } from "../vault/vaultLockedError.js";
 
 export const ACTION_POLICY_WRITER_LOCK = "action-policy-writer" as const;
 
@@ -339,7 +340,7 @@ function captureActionPolicyAuthority(workspace: string) {
       throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original action-policy config authority changed or is refused");
     assertSigningKeyUsable(workspace, "config-signature", publicKeyPem, holder);
     if (holder === "file" && !vaultStatus(workspace).unlocked)
-      throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
+      throw new Error(VAULT_LOCKED_NO_SIGN_MESSAGE);
   };
   assertCurrent(); return { captured, publicKeyPem, assertCurrent };
 }

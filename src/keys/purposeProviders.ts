@@ -42,6 +42,7 @@ import { captureArtifactBlobAnchorBoundary, type ArtifactBlobAnchorBoundary } fr
 import { captureReceiptOwnerBoundary, type ReceiptOwnerBoundary } from "./receiptOwnerAnchors.js";
 import { captureDelegationScope, publishDelegationBoundary } from "./delegationBoundary.js";
 import { readOperationalDelegationState, delegationArchiveRel, delegationIssuerRel } from "./operationalDelegationState.js";
+import { VAULT_LOCKED_NO_SIGN_MESSAGE } from "../vault/vaultLockedError.js";
 
 /**
  * Ledger rows use a vault delegate; session runtime uses the async purpose signer. Session history is signed by the
@@ -116,7 +117,7 @@ function assertPurposeSignerCurrent(workspace: string, purpose: LocalPurpose, de
   if (expected === null) {
     if (current !== null) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the purpose became provider-held while signing");
     // Entry may unlock normally; an asynchronous continuation must never reopen an explicitly locked session.
-    if (!vaultStatus(workspace).unlocked) throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
+    if (!vaultStatus(workspace).unlocked) throw new Error(VAULT_LOCKED_NO_SIGN_MESSAGE);
     if (publicKeyFromPrivate(getSigningKey(workspace, purpose)) !== description.publicKeyPem) {
       throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the vault purpose key changed while signing");
     }

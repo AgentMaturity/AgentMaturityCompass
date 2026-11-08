@@ -23,6 +23,7 @@ import type { ActionClass } from "../types.js";
 import { projectBudgetUsage, readBudgetEvents, type BudgetUsage } from "./nativeBudgetUsage.js";
 import type { TrustContext } from "../trust/trustContext.js";
 import { nativeUsdUnits } from "./nativeUsdAmount.js";
+import { VAULT_LOCKED_NO_SIGN_MESSAGE } from "../vault/vaultLockedError.js";
 
 const actionClassSchema = z.enum([
   "READ_ONLY",
@@ -155,7 +156,7 @@ function budgetAuthority(workspace: string) {
       throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original budget purpose authority changed or is refused");
     assertSigningKeyUsable(workspace, "config-signature", publicKeyPem, holder);
     if (holder === "file") {
-      if (!vaultStatus(workspace).unlocked) throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
+      if (!vaultStatus(workspace).unlocked) throw new Error(VAULT_LOCKED_NO_SIGN_MESSAGE);
       if (publicKeyFromPrivate(getSigningKey(workspace, "config-signature")) !== publicKeyPem)
         throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the original budget purpose key changed");
     }

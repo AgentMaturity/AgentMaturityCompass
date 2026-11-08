@@ -1,6 +1,7 @@
 import { generateKeyPairSync, sign } from "node:crypto";
 import { setVaultSecret, getVaultSecret, unlockVault, vaultStatus } from "../vault/vault.js";
 import { sha256Hex } from "../utils/hash.js";
+import { VAULT_LOCKED_MESSAGE } from "../vault/vaultLockedError.js";
 
 const FED_PRIVATE_KEY = "federation/publisher/privateKeyPem";
 const FED_PUBLIC_KEY = "federation/publisher/publicKeyPem";
@@ -10,7 +11,7 @@ function ensureVaultUnlocked(workspace: string): void {
   if (!status.unlocked) {
     const passphrase = process.env.AMC_VAULT_PASSPHRASE;
     if (!passphrase || passphrase.length === 0) {
-      throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or set AMC_VAULT_PASSPHRASE env var before federation operations.");
+      throw new Error(VAULT_LOCKED_MESSAGE);
     }
     unlockVault(workspace, passphrase);
   }

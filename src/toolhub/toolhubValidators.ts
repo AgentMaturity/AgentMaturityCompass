@@ -27,6 +27,7 @@ import { assertOwnerMode } from "../mode/mode.js";
 import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { defaultToolsConfig, toolsConfigSchema, type ToolDefinition, type ToolsConfig } from "./toolsSchema.js";
+import { VAULT_LOCKED_NO_SIGN_MESSAGE } from "../vault/vaultLockedError.js";
 
 interface SignedDigest {
   digestSha256: string;
@@ -108,7 +109,7 @@ function captureToolsConfigAuthority(workspace: string) {
       throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original tools config authority changed or is refused");
     assertSigningKeyUsable(workspace, "config-signature", publicKeyPem, holder);
     if (holder === "file" && !vaultStatus(workspace).unlocked)
-      throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
+      throw new Error(VAULT_LOCKED_NO_SIGN_MESSAGE);
   };
   assertCurrent(); return { captured, publicKeyPem, assertCurrent };
 }

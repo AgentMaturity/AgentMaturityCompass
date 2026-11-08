@@ -13,6 +13,7 @@ import { writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { vaultStatus } from "../vault/vault.js";
+import { isVaultLockedError } from "../vault/vaultLockedError.js";
 
 export const CONSOLE_SNAPSHOT_UNAVAILABLE = "CONSOLE_SNAPSHOT_UNAVAILABLE";
 class ConsoleSnapshotPublicationError extends Error {
@@ -31,13 +32,12 @@ export function withConsoleSnapshotLock<T>(workspace: string, operation: () => T
 }
 const bytes = (path: string): Buffer | null => existsSync(path) ? readFileSync(path) : null;
 const same = (a: Buffer | null, b: Buffer | null) => a === null ? b === null : b !== null && a.equals(b);
-const LOCKED = "🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.";
 
 /** Only a genuine unavailable local, unbound preflight is optional. A checked attempt never becomes unsigned. */
 function localUnsignedPreflight(workspace: string): string | null {
   assertVaultMaySign(workspace, "artifact-seal");
   try { getSigningKey(workspace, "artifact-seal"); }
-  catch (error) { if (!(error instanceof Error) || error.message !== LOCKED) throw error; }
+  catch (error) { if (!isVaultLockedError(error)) throw error; }
   if (vaultStatus(workspace).unlocked) return null;
   return canonicalize({ keyset: assertKeysetComplete(workspace), policy: loadKeysConfig(workspace) });
 }
