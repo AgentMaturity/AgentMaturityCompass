@@ -24,6 +24,7 @@ assert.ok([22,24].includes(Number(process.versions.node.split('.')[0])));
 const moduleAt=path=>pathToFileURL(join(root,'dist',path)).href;
 const {initWorkspace}=await import(moduleAt('workspace.js'));
 const {openLedger,verifyLedgerIntegrity,hashBinaryOrPath}=await import(moduleAt('ledger/ledger.js'));
+const {GATEWAY_SESSION_STALE_AFTER_MS}=await import(moduleAt('ledger/sessionLiveness.js'));
 const {runAssurance}=await import(request.runnerModule??moduleAt('assurance/assuranceRunner.js'));
 const {startAssuranceSession,sealAbortedAssuranceSession}=await import(moduleAt('assurance/evidenceWriters.js'));
 const {AgentResponderUnavailableError}=await import(moduleAt('assurance/agentResponder.js'));
@@ -115,8 +116,14 @@ try{
   assert(error.cause instanceof Error);assert.match(error.cause.message,/P0_27_ABORT_SEAL_FAULT/);
   report.originalError=errorValue(error);const found=assertAbortRows(ledger);report.checks.abort=found;
   assert.equal(found.session.ended_ts,null);assert.equal(found.session.session_final_event_hash,null);assert.equal(found.session.session_seal_sig,null);
-  const integrity=verifyLedgerIntegrity(workspace,{expectedMonitorFingerprint:monitorFingerprint,trust});
-  assert.equal(integrity.chain.ok,false);assert(integrity.chain.errors.some(message=>message.includes('missing seal')));report.checks.integrity=integrity;
+  // LIVE-INTEGRITY-01: an unended, unsealed session whose last signed row is fresh is open for the liveness window
+  // (sessionLiveness.ts). Within it the session is named open, never sealed; past it, as sessionVerifierNegative
+  // verifies, the seal the fault kept from being written is a missing seal.
+  const verifyAt=now=>verifyLedgerIntegrity(workspace,{expectedMonitorFingerprint:monitorFingerprint,trust,...(now===undefined?{}:{now})});
+  const liveIntegrity=verifyAt();assert.deepEqual(liveIntegrity.sessions.liveLegacy.map(row=>row.sessionId),[found.session.session_id]);
+  const integrity=verifyAt(Date.now()+GATEWAY_SESSION_STALE_AFTER_MS+1);assert.equal(integrity.chain.ok,false);
+  assert(integrity.chain.errors.some(message=>message.includes('Session '+found.session.session_id+' missing seal')));
+  assert.deepEqual(integrity.sessions.liveLegacy,[]);report.checks.integrity=integrity;report.checks.liveIntegrity=liveIntegrity;
   ledger.db.exec('DROP TRIGGER p0_27_seal_fault');
  }else if(caseName==='store-guard'){
   const beforeRows=rows(ledger),before=mainBytes();assert(!existsSync(join(workspace,'.amc/unsigned/evidence.sqlite')));
