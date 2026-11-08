@@ -304,12 +304,13 @@ export function renderGroupedHelp(program: Command): string {
   if (existing.has("connect")) lines.push(formatHelpRow("connect", "Connect an existing agent"));
   if (existing.has("agent-loop verify")) lines.push(formatHelpRow("agent-loop verify <sessionId>", "Verify recorded native task evidence"));
   // LIVE-UX-07: the README's first-run path. amc user init replaces users.yaml, so its row says "new workspace only".
-  const firstRun = [
+  const rows: Array<[path: string, shown: string, description: string]> = [
     ["up", "up", "Start Studio and the Compass Console; first run scores the workspace"],
     ["user init", "user init --username <you>", "Create the first console account (new workspace only; see amc user add)"],
     ["down", "down", "Stop Studio"],
     ["domain pack list", "domain pack list", "List the free Industry Packs (self-reported questionnaires)"]
-  ].filter(([path]) => existing.has(path));
+  ];
+  const firstRun = rows.filter(([path]) => existing.has(path));
   if (firstRun.length > 0) {
     lines.push("");
     lines.push("Studio and first run:");
