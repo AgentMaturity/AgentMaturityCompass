@@ -197,7 +197,8 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       }
       console.log(chalk.bold(`\n  Questions (${pack.questions.length}):`));
       for (const q of pack.questions) {
-        console.log(`    ${chalk.cyan(q.id)} [${q.dimension}] ${q.text.slice(0, 100)}${q.text.length > 100 ? "..." : ""}`);
+        // Whole texts (LIVE-UX-14): describe is for reading; the terminal wraps.
+        console.log(`    ${chalk.cyan(q.id)} [${q.dimension}] ${q.text}`);
       }
       console.log("");
     });
