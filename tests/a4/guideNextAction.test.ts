@@ -113,7 +113,8 @@ describe("A-4: approvers are project members", () => {
 describe("A-5: a gate whose quorum cannot be reached says so", () => {
   function twoApprovalsForWriteLow(workspace: string): void {
     const policy = defaultApprovalPolicy();
-    policy.approvalPolicy.actionClasses.WRITE_LOW = { ...policy.approvalPolicy.actionClasses.WRITE_LOW, requiredApprovals: 2, requireDistinctUsers: true };
+    const writeLow = policy.approvalPolicy.actionClasses.WRITE_LOW!;
+    policy.approvalPolicy.actionClasses.WRITE_LOW = { ...writeLow, requiredApprovals: 2, requireDistinctUsers: true };
     initApprovalPolicy(workspace, policy);
   }
 
