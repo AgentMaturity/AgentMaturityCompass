@@ -1347,7 +1347,7 @@ async function renderHome() {
     </section>
 
     <section class="quick-action-grid">
-      <a class="quick-action-card" href="./score"><span>01</span><strong>Score</strong><em>run diagnostics</em></a>
+      <a class="quick-action-card" href="./score"><span>01</span><strong>Score</strong><em>scoring commands</em></a>
       <a class="quick-action-card" href="./assurance"><span>02</span><strong>Assure</strong><em>attack packs</em></a>
       <a class="quick-action-card" href="./evidence?agent=${encodeURIComponent(agentId)}"><span>03</span><strong>Evidence</strong><em>prove chain</em></a>
       <a class="quick-action-card" href="./integrations"><span>04</span><strong>API</strong><em>curl-ready flows</em></a>
