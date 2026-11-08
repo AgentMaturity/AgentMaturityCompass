@@ -6,6 +6,7 @@ import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 import * as YAML from "yaml";
 import { loadStudioRuntimeConfig } from "../src/config/loadConfig.js";
+import { vaultPassphraseFromEnv } from "../src/vault/passphraseFile.js";
 import { interpolate, serviceEnv } from "./helpers/composeInterpolate.js";
 import { dockerfileStudioHealthcheck } from "./helpers/deployPackFixtures.js";
 import { ipAllowedByCidrs } from "../src/studio/clientAddress.js";
@@ -402,17 +403,16 @@ describe("deployment pack assets", () => {
     expect(config.lanMode).toBe(true);
   });
 
-  it("prefers vault passphrase file over inherited direct env passphrase", () => {
+  // Follow-up 1 to B1: one reader, in which AMC_VAULT_PASSPHRASE always wins (this case used to assert that the file won
+  // at studio start while every other command let the variable win). The runtime config no longer carries the value.
+  it("lets AMC_VAULT_PASSPHRASE win over the passphrase file, as every command does", () => {
     const tmp = mkdtempSync(join(tmpdir(), "amc-deploy-test-"));
     try {
       const passphraseFile = join(tmp, "vault.txt");
-      writeFileSync(passphraseFile, "file-passphrase-123", "utf8");
-      const config = loadStudioRuntimeConfig({
-        AMC_WORKSPACE_DIR: "/tmp/amc",
-        AMC_VAULT_PASSPHRASE: "inherited-image-default",
-        AMC_VAULT_PASSPHRASE_FILE: passphraseFile
-      });
-      expect(config.vaultPassphrase).toBe("file-passphrase-123");
+      writeFileSync(passphraseFile, "file-passphrase-123", { encoding: "utf8", mode: 0o600 });
+      expect(vaultPassphraseFromEnv({ AMC_VAULT_PASSPHRASE: "explicit-variable", AMC_VAULT_PASSPHRASE_FILE: passphraseFile })).toBe("explicit-variable");
+      expect(vaultPassphraseFromEnv({ AMC_VAULT_PASSPHRASE_FILE: passphraseFile })).toBe("file-passphrase-123");
+      expect(loadStudioRuntimeConfig({ AMC_WORKSPACE_DIR: "/tmp/amc", AMC_VAULT_PASSPHRASE_FILE: passphraseFile })).not.toHaveProperty("vaultPassphrase");
     } finally {
       rmSync(tmp, { recursive: true, force: true });
     }

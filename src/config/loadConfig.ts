@@ -205,7 +205,6 @@ export function loadStudioRuntimeConfig(
     metricsBind: parsed.AMC_METRICS_BIND,
     metricsPort: parsed.AMC_METRICS_PORT,
     bootstrap: parsed.AMC_BOOTSTRAP,
-    vaultPassphrase: readSecretFromEnvOrFile(env, "AMC_VAULT_PASSPHRASE"),
     bootstrapOwnerUsername: readSecretFromEnvOrFile(env, "AMC_BOOTSTRAP_OWNER_USERNAME"),
     bootstrapOwnerPassword: readSecretFromEnvOrFile(env, "AMC_BOOTSTRAP_OWNER_PASSWORD"),
     bootstrapHostAdminUsername: readSecretFromEnvOrFile(env, "AMC_BOOTSTRAP_HOST_ADMIN_USERNAME"),

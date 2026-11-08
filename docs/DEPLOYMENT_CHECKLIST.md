@@ -77,11 +77,11 @@ amc verify all --json --expect-monitor <monitor sha256>
   ```cron
   */30 * * * * docker exec -w /data/amc amc-studio sh -c 'AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")" amc verify all --json --expect-monitor <monitor sha256>' > /var/log/amc-verify.json 2>&1 || <your alert command>
   ```
-- Plain host: point `AMC_VAULT_PASSPHRASE_FILE` at a file the cron user owns, mode 0600 or 0400, holding the vault passphrase. `amc` refuses a symlink or a file the group or others can read, and then reports the payloads as not evaluated:
+- Plain host: point `AMC_VAULT_PASSPHRASE_FILE` at a file the cron user owns, mode 0600 or 0400, holding the vault passphrase (or a root-owned file the cron user cannot change, on a path it cannot write; see [VAULT.md](VAULT.md)). `amc` refuses a group- or world-writable file and a file the cron user could replace, such as a symlink or a readable file in its own directory, and then reports the payloads as not evaluated:
   ```cron
   */30 * * * * cd <workspace> && AMC_VAULT_PASSPHRASE_FILE=<passphrase file> amc verify all --json --expect-monitor <monitor sha256> > /var/log/amc-verify.json 2>&1 || <your alert command>
   ```
-- Kubernetes: a `CronJob` that runs `kubectl exec` against the running pod, under a Role that may only read pods and deployments and exec into pods. The chart mounts the passphrase as a secret volume, whose files `amc` does not accept as `AMC_VAULT_PASSPHRASE_FILE` (they are root-owned symlinks), so the command reads the file into the variable, as on Docker:
+- Kubernetes: a `CronJob` that runs `kubectl exec` against the running pod, under a Role that may only read pods and deployments and exec into pods. The chart mounts the passphrase as a read-only secret volume, which `amc` accepts as `AMC_VAULT_PASSPHRASE_FILE`; the command below still reads the file into the variable, as on Docker, which works on every release:
   ```yaml
   apiVersion: batch/v1
   kind: CronJob

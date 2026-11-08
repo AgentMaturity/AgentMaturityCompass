@@ -81,7 +81,8 @@ export function bootstrapHostFromEnv(params: {
   workspaceName?: string;
   adminUsernameFile?: string;
   adminPasswordFile?: string;
-  vaultPassphraseFile?: string;
+  /** From bootstrapVaultPassphrase (src/vault/passphraseFile.ts): AMC_VAULT_PASSPHRASE_FILE through the one reader. */
+  vaultPassphrase: string;
   lanMode: boolean;
   bind: string;
   studioPort: number;
@@ -93,7 +94,6 @@ export function bootstrapHostFromEnv(params: {
 }): Promise<{ workspaceId: string; workspaceDir: string; reportPath: string }> {
   const adminUsername = readSecretFile(params.adminUsernameFile);
   const adminPassword = readSecretFile(params.adminPasswordFile);
-  const vaultPassphrase = readSecretFile(params.vaultPassphraseFile);
   const notaryAuthSecret = params.notaryAuthSecretFile ? readSecretFile(params.notaryAuthSecretFile) : null;
   return bootstrapHost({
     hostDir: params.hostDir,
@@ -101,7 +101,7 @@ export function bootstrapHostFromEnv(params: {
     workspaceName: params.workspaceName,
     adminUsername,
     adminPassword,
-    vaultPassphrase,
+    vaultPassphrase: params.vaultPassphrase,
     lanMode: params.lanMode,
     bind: params.bind,
     studioPort: params.studioPort,
