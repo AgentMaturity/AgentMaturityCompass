@@ -1763,7 +1763,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       if (pathname === "/auth/login" && req.method === "POST") {
         const usersSig = verifyUsersConfigSignature(options.workspace);
         if (!usersSig.valid) {
-          json(res, 403, { error: "users config signature invalid; login blocked" });
+          json(res, 403, { error: usersSig.reason === "users config missing" ? "users config missing; login blocked" : "users config signature invalid; login blocked" });
           return;
         }
         if (lanMode.enabled && lanMode.requirePairing && lanSig.valid) {

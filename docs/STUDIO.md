@@ -23,6 +23,9 @@ State file:
 Logs:
 - `.amc/studio/logs/*.log`
 
+Vault passphrase:
+- After `amc up` remembers the vault passphrase, owner-mode commands in that workspace (`amc`, `amc verify`, `amc user init`, `amc user add`) use it; `AMC_VAULT_PASSPHRASE` in the environment overrides it; agents started by AMC never receive it. See [VAULT.md](VAULT.md).
+
 ## Local API
 
 Studio host/port come from runtime config (`AMC_BIND`, `AMC_STUDIO_PORT`). The dashboard port is `AMC_DASHBOARD_PORT` (default 4173); `amc dashboard build` writes `.amc/agents/<agent>/dashboard`, the directory Studio serves.

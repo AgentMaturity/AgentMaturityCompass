@@ -56,7 +56,7 @@ section{padding:clamp(5rem,10vw,8rem) 0;position:relative;z-index:1}
 .nav-cta{font-family:var(--mono);font-size:.72rem;color:var(--accent);text-transform:lowercase;letter-spacing:.08em;border:1px solid rgba(74,239,121,.3);padding:.5rem 1.2rem;transition:all .2s}.nav-cta:hover{background:rgba(74,239,121,.1);border-color:var(--accent)}
 .nav-hamburger{display:none;flex-direction:column;gap:4px;padding:4px}.nav-hamburger span{width:18px;height:1.5px;background:var(--text)}
 .nav-mobile{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:99;background:#0a0a0a;flex-direction:column;align-items:center;justify-content:center;gap:2rem;opacity:0;pointer-events:none;transition:opacity .3s}
-.nav-mobile.open{opacity:1;pointer-events:auto}.nav-mobile a{font-family:var(--mono);font-size:1.1rem;color:var(--text-muted);text-transform:lowercase}
+.nav-mobile.open{display:flex;opacity:1;pointer-events:auto}.nav-mobile a{font-family:var(--mono);font-size:1.1rem;color:var(--text-muted);text-transform:lowercase}
 @media(max-width:768px){.nav-links{display:none}.nav-hamburger{display:flex}}
 
 /* ═══ HERO ═══ */
