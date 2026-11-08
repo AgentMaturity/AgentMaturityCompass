@@ -39,7 +39,8 @@ import { CircuitOpenError, TimeoutError, withCircuitBreaker } from "../ops/circu
 import { checkUpstreamEgress, pinnedLookup, prepareFieldGuard, requestFieldRefusal, type FieldGuard } from "./requestFieldGuard.js";
 import { checkEgress, EgressBlocked } from "../residency/checkEgress.js";
 import { parseConnectAuthority } from "./connectResidency.js";
-import { ipAllowedByCidrs as ipAllowedByList, LOOPBACK_CIDRS, socketIp } from "../studio/clientAddress.js";
+import { ipAllowedByCidrs as ipAllowedByList, LOOPBACK_CIDRS, requestUsesHttps, socketIp } from "../studio/clientAddress.js";
+import { applySecurityHeaders } from "../studio/securityHeaders.js";
 import { DEFAULT_GATEWAY_MAX_REQUEST_BYTES, readAll, readBoundedBody, refuseOversizedRequest } from "./requestBody.js";
 import { withoutUrlQueries } from "./logSafe.js";
 import { createPreAuthAuditLimiter, type PreAuthAuditLimiter } from "./preAuthAudit.js";
@@ -624,6 +625,7 @@ function createProxyServer(params: {
     const requestId = randomUUID();
     const method = (req.method ?? "GET").toUpperCase();
     const clientIp = normalizeRemoteIp(req.socket.remoteAddress);
+    applySecurityHeaders(res, { trustedHttps: requestUsesHttps(req, false), noStore: true }); // LIVE-RUNTIME-07; upstream headers override by name
     if (!ipAllowedByCidrs(clientIp, params.allowedCidrs ?? [])) {
       if (params.preAuthAudit.shouldAudit(clientIp, "NETWORK_EGRESS_BLOCKED")) params.appendEvidence({
         eventType: "audit",
@@ -1110,6 +1112,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
     const requestId = randomUUID();
     const method = (req.method ?? "GET").toUpperCase();
     const clientIp = normalizeRemoteIp(req.socket.remoteAddress);
+    applySecurityHeaders(res, { trustedHttps: requestUsesHttps(req, false), noStore: true }); // LIVE-RUNTIME-07; upstream headers override by name
     if (!ipAllowedByCidrs(clientIp, options.allowedCidrs ?? [])) {
       if (preAuthAudit.shouldAudit(clientIp, "NETWORK_EGRESS_BLOCKED")) appendEvidence({
         eventType: "audit",

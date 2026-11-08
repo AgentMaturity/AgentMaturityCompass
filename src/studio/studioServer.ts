@@ -120,6 +120,8 @@ import { allowStudioCors as allowCors } from "./studioCors.js";
 import { makeRateLimiter, makeRateLimiterDetailed, setRateLimitHeaders } from "./rateLimiter.js";
 import { admitLoginAttempt, createLoginThrottle, LOGIN_THROTTLED_ERROR } from "./loginThrottle.js";
 import { ipAllowedByCidrs, LOOPBACK_CIDRS, requestUsesHttps, resolveClientAddress } from "./clientAddress.js";
+import { allowedHostnamesFrom, hostAllowed } from "./hostAllow.js";
+import { applySecurityHeaders, isConsoleStaticAsset } from "./securityHeaders.js";
 import { createNativeTaskService } from "./nativeTaskService.js";
 import { isNativeApprovalMutationPath, isNativeStudioPath, nativeAllowedBrowserOrigins, nativeCsrfTokenForSession } from "./nativeAdmission.js";
 import { admitStudioApproval } from "./studioApprovalAdmission.js";
@@ -1088,6 +1090,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
   const orgSse = new OrgSseHub();
   const allowedCidrs = options.allowedCidrs ?? LOOPBACK_CIDRS;
   const allowByIp = (ip: string): boolean => ipAllowedByCidrs(ip, allowedCidrs);
+  const allowedHostnames = allowedHostnamesFrom([...(options.corsAllowedOrigins ?? []), ...(options.nativeAllowedOrigins ?? []), options.host, process.env.AMC_HOST_PUBLIC_BASEURL]);
   const loginThrottle = createLoginThrottle();
   const healthLimiter = makeRateLimiter(120, 60_000);
   const authLimiter = makeRateLimiter(20, 60_000);
@@ -1273,11 +1276,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       recordHttpRequestMetric(metricRoute, metricMethod, res.statusCode || 0, Date.now() - requestStartedAt);
     });
     try {
+      // LIVE-RUNTIME-19: a request that no trusted hop vouches for must name a host DNS rebinding cannot forge.
+      const { clientIp, trustForwarded } = resolveClientAddress(req, { trustedProxyHops: options.trustedProxyHops ?? 0, allowedCidrs });
+      if (!trustForwarded && !hostAllowed(req.headers.host, allowedHostnames)) {
+        json(res, 403, { error: "host not allowed" });
+        return;
+      }
       if (!allowCors(req, res, options)) {
         return;
       }
-
-      const { clientIp, trustForwarded } = resolveClientAddress(req, { trustedProxyHops: options.trustedProxyHops ?? 0, allowedCidrs });
       if (!allowByIp(clientIp)) {
         json(res, 403, { error: "client IP not allowed", ip: clientIp });
         return;
@@ -1286,6 +1293,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       const url = new URL(req.url ?? "/", `http://${options.host}:${options.port}`);
       const pathname = url.pathname;
       const method = (req.method ?? "GET").toUpperCase();
+      applySecurityHeaders(res, { trustedHttps: requestUsesHttps(req, trustForwarded), noStore: !isConsoleStaticAsset(pathname) }); // LIVE-RUNTIME-07
       metricRoute = normalizeMetricRoute(pathname);
       bindStudioResultRoute(res, method, pathname, options.workspace);
 

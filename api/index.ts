@@ -18,6 +18,7 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { amcVersion } from '../src/version.js';
 import { secretEquals } from '../src/utils/secretEquals.js';
+import { applySecurityHeaders } from '../src/studio/securityHeaders.js';
 import { questionBank } from '../src/diagnostic/questionBank.js';
 import { listAssurancePacks } from '../src/assurance/packs/index.js';
 import { listIndustryPacks } from '../src/domains/industryPacks.js';
@@ -281,6 +282,8 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-AMC-Admin-Token');
+  // LIVE-RUNTIME-07: HSTS only on a TLS socket here; behind the platform proxy it is the platform's setting.
+  applySecurityHeaders(res, { trustedHttps: (req.socket as { encrypted?: boolean }).encrypted === true, noStore: true });
   
   if (method === 'OPTIONS') {
     res.writeHead(204);

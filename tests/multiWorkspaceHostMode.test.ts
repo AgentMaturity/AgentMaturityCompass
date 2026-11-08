@@ -150,11 +150,13 @@ describe("multi-workspace host mode", () => {
     writeFileSync(join(workspaceA, ".amc", "tenant-marker.txt"), marker);
 
     const port = await pickFreePort();
+    // x-forwarded-proto marks cookies Secure only from a trusted hop (LIVE-RUNTIME-20): one hop, loopback peer.
     const host = await startWorkspaceRouter({
       hostDir,
       host: "127.0.0.1",
       port,
-      defaultWorkspaceId: "ws-a"
+      defaultWorkspaceId: "ws-a",
+      trustedProxyHops: 1
     });
 
     try {
@@ -463,17 +465,28 @@ describe("multi-workspace host mode", () => {
     });
 
     try {
+      // Per-workspace readiness needs a signed-in host user (LIVE-RUNTIME-09); anonymous callers get a summary only.
+      const hostLogin = await httpRaw({
+        url: `http://127.0.0.1:${port}/host/api/login`,
+        method: "POST",
+        body: { username: "admin", password: "admin-pass-123" }
+      });
+      const setCookie = hostLogin.headers["set-cookie"];
+      const cookie = String(Array.isArray(setCookie) ? setCookie[0] : setCookie ?? "").split(";", 1)[0];
       const readyA = await httpRaw({
         url: `http://127.0.0.1:${port}/w/ws-a/readyz`,
-        method: "GET"
+        method: "GET",
+        cookie
       });
       const readyB = await httpRaw({
         url: `http://127.0.0.1:${port}/w/ws-b/readyz`,
-        method: "GET"
+        method: "GET",
+        cookie
       });
       const hostReady = await httpRaw({
         url: `http://127.0.0.1:${port}/readyz`,
-        method: "GET"
+        method: "GET",
+        cookie
       });
 
       expect(readyA.status).toBe(200);

@@ -11,7 +11,9 @@ import {
 import { ensureAdminToken } from "../studio/studioState.js";
 import { makeRateLimiter } from "../studio/rateLimiter.js";
 import { admitLoginAttempt, createLoginThrottle, LOGIN_THROTTLED_ERROR } from "../studio/loginThrottle.js";
-import { socketIp } from "../studio/clientAddress.js";
+import { ipAllowedByCidrs, requestUsesHttps, resolveClientAddress, withLoopbackCidrs } from "../studio/clientAddress.js";
+import { allowedHostnamesFrom, hostAllowed } from "../studio/hostAllow.js";
+import { applySecurityHeaders, SECURITY_HEADER_NAMES } from "../studio/securityHeaders.js";
 import { WorkspaceManager } from "./workspaceManager.js";
 import { proxyStudioWorkspaceRequest } from "./workspaceStudioProxy.js";
 import { WorkspaceRuntimeRegistry, WorkspaceRuntimeClosingError } from "./workspaceRuntimeRegistry.js";
@@ -155,15 +157,6 @@ function hostSessionCookiePath(): string {
 
 function hostSessionCookieName(): string {
   return "amc_host_session";
-}
-
-function requestUsesHttps(req: IncomingMessage): boolean {
-  const forwarded = req.headers["x-forwarded-proto"];
-  const first = (Array.isArray(forwarded) ? forwarded[0] : forwarded)?.split(",", 1)[0]?.trim().toLowerCase();
-  if (first === "https") {
-    return true;
-  }
-  return (req.socket as { encrypted?: boolean }).encrypted === true;
 }
 
 function setHostSessionCookie(res: ServerResponse, token: string, maxAgeSeconds: number, secure = false): void {
@@ -684,6 +677,8 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
   const hostLoginLimiter = makeRateLimiter(20, 60_000);
   const workspaceLoginLimiter = makeRateLimiter(20, 60_000);
   const loginThrottle = createLoginThrottle(); // host accounts: one throttle for the host and workspace login routes
+  const routerCidrs = withLoopbackCidrs(options.allowedCidrs); // LIVE-RUNTIME-20: loopback always admitted
+  const allowedHostnames = allowedHostnamesFrom([...(options.corsAllowedOrigins ?? []), options.host, process.env.AMC_HOST_PUBLIC_BASEURL]);
   const admitHostLogin = (res: ServerResponse, route: string, username: string, clientIp: string): Promise<boolean> => admitLoginAttempt(loginThrottle, { username, clientIp,
     refuse: (retryAfter) => { res.setHeader("retry-after", String(retryAfter)); writeControlError(res, 429, LOGIN_THROTTLED_ERROR); },
     audit: () => appendHostAudit(options.hostDir, "HUMAN_LOGIN_THROTTLED", username || null, { route, clientIp }) });
@@ -711,8 +706,8 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         host: "127.0.0.1",
         port: 0,
         token: runtime.token,
-        allowedCidrs: options.allowedCidrs,
-        trustedProxyHops: options.trustedProxyHops,
+        allowedCidrs: routerCidrs,
+        trustedProxyHops: 1, // the router is its only peer and sets x-forwarded-for itself (LIVE-RUNTIME-20)
         maxRequestBytes: options.maxRequestBytes,
         corsAllowedOrigins: options.corsAllowedOrigins,
         nativeAllowedOrigins: publicNativeOrigins(),
@@ -734,19 +729,33 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
     try {
       const url = new URL(req.url ?? "/", `http://${options.host}:${options.port}`);
       const pathname = url.pathname;
-      const clientIp = socketIp(req.socket.remoteAddress);
+      // LIVE-RUNTIME-19/-20: the client and whether a trusted hop vouches for it; the host name; the allow list; headers.
+      const { clientIp, trustForwarded } = resolveClientAddress(req, { trustedProxyHops: options.trustedProxyHops ?? 0, allowedCidrs: routerCidrs });
+      if (!trustForwarded && !hostAllowed(req.headers.host, allowedHostnames)) {
+        writeControlError(res, 403, "host not allowed");
+        return;
+      }
+      if (!ipAllowedByCidrs(clientIp, routerCidrs)) {
+        json(res, 403, { error: "client IP not allowed", ip: clientIp });
+        return;
+      }
+      const trustedHttps = requestUsesHttps(req, trustForwarded);
+      applySecurityHeaders(res, { trustedHttps, noStore: true });
 
-      if (pathname === "/host/healthz") {
+      if (pathname === "/host/healthz" || pathname === "/healthz") { // D-R14: host liveness, never one tenant's readiness
         json(res, 200, { ok: true, mode: "host" });
         return;
       }
 
-      if (pathname === "/host/readyz" || pathname === "/readyz" || pathname === "/healthz") {
+      if (pathname === "/host/readyz" || pathname === "/readyz") {
         const ids = manager.listWorkspaceIds();
         const workspaces = ids.map((workspaceId) => summarizeWorkspaceReadiness(manager, workspaceId));
         const readyCount = workspaces.filter((row) => row.ready).length;
         const notReadyCount = workspaces.length - readyCount;
         const hostReady = notReadyCount === 0;
+        // LIVE-RUNTIME-09: the per-workspace rows only for a signed-in host user (admins all, members their own).
+        const access = resolveHostAccess(req, options.hostDir);
+        const visible = access.ok && !access.isHostAdmin ? new Set(listAccessibleWorkspaces(options.hostDir, access.username ?? "").map((row) => row.workspaceId)) : null;
         json(res, hostReady ? 200 : 503, {
           status: hostReady ? "READY" : "NOT_READY",
           mode: "host",
@@ -755,7 +764,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             ready: readyCount,
             notReady: notReadyCount
           },
-          workspaces
+          ...(access.ok ? { workspaces: visible ? workspaces.filter((row) => visible.has(row.workspaceId)) : workspaces } : {})
         });
         return;
       }
@@ -850,7 +859,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             isHostAdmin: local.user.isHostAdmin
           });
           const existingSetCookie = res.getHeader("set-cookie");
-          const legacy = `${hostSessionCookieName()}=${encodeURIComponent(issued.token)}; HttpOnly${requestUsesHttps(req) ? "; Secure" : ""}; SameSite=Strict; Path=${hostSessionCookiePath()}; Max-Age=${Math.max(
+          const legacy = `${hostSessionCookieName()}=${encodeURIComponent(issued.token)}; HttpOnly${trustedHttps ? "; Secure" : ""}; SameSite=Strict; Path=${hostSessionCookiePath()}; Max-Age=${Math.max(
             60,
             Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000)
           )}`;
@@ -887,7 +896,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
               res,
               issued.token,
               Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000),
-              requestUsesHttps(req)
+              trustedHttps
             );
             appendHostAudit(options.hostDir, "HUMAN_LOGIN_SUCCESS", legacyAuth.user.username, {
               route: "/host/api/login",
@@ -956,7 +965,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       }
 
       if ((pathname === "/host/api/auth/logout" || pathname === "/host/api/logout") && req.method === "POST") {
-        clearHostSessionCookie(res, requestUsesHttps(req));
+        clearHostSessionCookie(res, trustedHttps);
         clearIdentityCookieHeader({
           config: identityConfig,
           setHeader: (name, value) => {
@@ -1439,6 +1448,12 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       }
 
       if (workspacePath === "/readyz") {
+        // LIVE-RUNTIME-09: one answer for every id to an anonymous caller, so readiness is no existence oracle.
+        const sessionOk = (() => { try { return verifyWorkspaceSession(manager, urlWorkspaceId, req.headers.cookie).ok; } catch { return false; } })();
+        if (!sessionOk && !resolveHostAccess(req, options.hostDir).ok) {
+          writeControlError(res, 401, "authentication required");
+          return;
+        }
         const readiness = summarizeWorkspaceReadiness(manager, urlWorkspaceId);
         json(res, readiness.ready ? 200 : 503, {
           status: readiness.ready ? "READY" : "NOT_READY",
@@ -1511,7 +1526,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           urlWorkspaceId,
           issued.token,
           Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000),
-          requestUsesHttps(req)
+          trustedHttps
         );
         json(res, 200, {
           ok: true,
@@ -1531,7 +1546,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           const workspace = manager.withWorkspace(urlWorkspaceId, (context) => context.workspaceDir);
           revokeSessionByToken({ workspace, token });
         }
-        clearWorkspaceSessionCookie(res, urlWorkspaceId, requestUsesHttps(req));
+        clearWorkspaceSessionCookie(res, urlWorkspaceId, trustedHttps);
         json(res, 200, { ok: true });
         return;
       }
@@ -1626,7 +1641,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         if (workspaceSessionValid && workspaceSession.payload) {
           if (workspaceSession.payload.userId === "local-demo") {
             if (!allowLocalDemoAccess) {
-              clearWorkspaceSessionCookie(res, urlWorkspaceId, requestUsesHttps(req));
+              clearWorkspaceSessionCookie(res, urlWorkspaceId, trustedHttps);
               writeControlError(res, 401, "local demo session is not enabled");
               return;
             }
@@ -1634,7 +1649,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             const sessionCurrent = workspaceSessionAuthorityCurrent(options.hostDir, urlWorkspaceId, workspaceSession.payload);
             if (!sessionCurrent) {
               workspaceSessionValid = false;
-              clearWorkspaceSessionCookie(res, urlWorkspaceId, requestUsesHttps(req));
+              clearWorkspaceSessionCookie(res, urlWorkspaceId, trustedHttps);
               writeControlError(res, 401, "workspace session authority changed");
               return;
             }
@@ -1666,7 +1681,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
               urlWorkspaceId,
               issued.token,
               Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000),
-              requestUsesHttps(req)
+              trustedHttps
             );
             res.statusCode = 302;
             res.setHeader("location", workspacePath === "/console" ? `${pathname}/${url.search}` : pathname + url.search);
@@ -1688,7 +1703,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
               urlWorkspaceId,
               issued.token,
               Math.floor((issued.payload.expiresTs - issued.payload.issuedTs) / 1000),
-              requestUsesHttps(req)
+              trustedHttps
             );
             req.headers.cookie = replaceSessionCookie(req.headers.cookie, issued.token);
           }
@@ -1706,7 +1721,8 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       }
 
       const runtime = await ensureWorkspaceApi(urlWorkspaceId);
-      await proxyStudioWorkspaceRequest(req, res, runtime, nativeRequest ? `${workspacePath}${url.search}` : workspacePath);
+      for (const name of SECURITY_HEADER_NAMES) res.removeHeader(name); // the workspace API's own headers apply (LIVE-RUNTIME-07)
+      await proxyStudioWorkspaceRequest(req, res, runtime, nativeRequest ? `${workspacePath}${url.search}` : workspacePath, { clientIp, trustedHttps });
     } catch (error) {
       if (error instanceof WorkspaceRuntimeClosingError) { writeControlError(res, 503, error.message); return; }
       if (error instanceof NativeAdmissionError) {

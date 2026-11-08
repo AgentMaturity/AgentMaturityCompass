@@ -6,10 +6,16 @@ export async function proxyStudioWorkspaceRequest(
   req: IncomingMessage,
   res: ServerResponse,
   runtime: { readonly host: string; readonly port: number },
-  targetPath: string
+  targetPath: string,
+  forwarded: { readonly clientIp: string; readonly trustedHttps: boolean }
 ): Promise<void> {
   const method = (req.method ?? "GET").toUpperCase();
-  const { origin, host, "x-amc-admin-token": _clientAdminToken, ...forwardHeaders } = req.headers;
+  const { origin, host, "x-amc-admin-token": _clientAdminToken, forwarded: _forwarded, ...clientHeaders } = req.headers;
+  // LIVE-RUNTIME-20: the workspace API trusts one hop, this router, so the client's own forwarding headers never reach
+  // it; the router states the client it computed and https only when it trusts that itself.
+  const forwardHeaders = Object.fromEntries(Object.entries(clientHeaders).filter(([name]) => !name.startsWith("x-forwarded-")));
+  forwardHeaders["x-forwarded-for"] = forwarded.clientIp;
+  if (forwarded.trustedHttps) forwardHeaders["x-forwarded-proto"] = "https";
   const targetPathname = new URL(targetPath, "http://workspace.internal").pathname;
   const nativeRequest = isNativeProtectedPath(targetPathname, method);
   let upstreamResponse: IncomingMessage | undefined;
