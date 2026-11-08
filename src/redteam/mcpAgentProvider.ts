@@ -908,8 +908,7 @@ export interface RunMCPAgentRedTeamInput {
   /** The sealed red-team session to write each scenario's prompt, reply and result into (SH-TRUST-03); absent for an unsigned run. */
   rows?: ScenarioEvidenceRows;
 }
-/** The pack id Evil MCP scenario rows carry in the ledger and in the signed report's provenance check. */
-export const EVIL_MCP_PACK_ID = "evil-mcp";
+export const EVIL_MCP_PACK_ID = "evil-mcp"; // the pack id Evil MCP scenario rows carry in the ledger and in the signed report's provenance check
 
 export async function runMCPAgentRedTeam(
   input: RunMCPAgentRedTeamInput

@@ -12,7 +12,7 @@
     "src/cli.ts": 24328,
     "src/score/metricValidity.ts": 16881,
     "src/watch/liveDriftAlerts.ts": 9792,
-    "src/studio/studioServer.ts": 8707,
+    "src/studio/studioServer.ts": 8680,
     "src/watch/liveDriftTypes.ts": 4436,
     "src/diagnostic/questionScoreExplainability.ts": 3946,
     "src/benchmarks/providerDriftBenchmark.ts": 3709,
