@@ -1,6 +1,6 @@
 import { generateKeyPairSync, sign as signDetached } from "node:crypto";
 import { createServer, request as httpRequest } from "node:http";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -10,7 +10,7 @@ import { startStudioApiServer } from "../../src/studio/studioServer.js";
 import { issueLeaseForCli } from "../../src/leases/leaseCli.js";
 import { canonicalize } from "../../src/utils/json.js";
 import { getPrivateKeyPem } from "../../src/crypto/keys.js";
-import { addUser, initUsersConfig } from "../../src/auth/authApi.js";
+import { addUser, initUsersConfig, usersConfigSigPath } from "../../src/auth/authApi.js";
 import { initHostDb, createHostUser, createWorkspaceRecord, grantMembership } from "../../src/workspaces/hostDb.js";
 import { hostWorkspaceDir } from "../../src/workspaces/workspacePaths.js";
 import { startWorkspaceRouter } from "../../src/workspaces/workspaceRouter.js";
@@ -362,6 +362,27 @@ describe("API security hardening", () => {
         }
       });
       expect(admin.status).toBe(200);
+    } finally {
+      await api.close();
+    }
+  });
+
+  // LIVE-UX-01: the console turns "no users.yaml yet" into the first-account step; every other invalid verdict, tamper
+  // reasons included, keeps the one generic refusal.
+  test("console login names a missing users config and keeps every other invalid verdict generic", async () => {
+    const workspace = newWorkspace("amc-api-login-missing-");
+    const api = await startStudioApiServer({ workspace, host: "127.0.0.1", port: await pickFreePort(), token: "login-missing-admin-token" });
+    const attempt = () => httpCall({ method: "POST", url: `${api.url}/auth/login`, body: { username: "owner", password: "owner-pass-123" } });
+    try {
+      const missing = await attempt();
+      expect(missing.status).toBe(403);
+      expect(JSON.parse(missing.body)).toEqual({ error: "users config missing; login blocked" });
+      initUsersConfig({ workspace, username: "owner", password: "owner-pass-123" });
+      writeFileSync(usersConfigSigPath(workspace), JSON.stringify({ digestSha256: "0".repeat(64), signature: "AAAA", signedTs: 1, signer: "auditor" }));
+      const broken = await attempt();
+      expect(broken.status).toBe(403);
+      expect(JSON.parse(broken.body)).toEqual({ error: "users config signature invalid; login blocked" });
+      expect(broken.body).not.toMatch(/mismatch|verification/);
     } finally {
       await api.close();
     }

@@ -5,6 +5,7 @@ import { installClaimStrip } from "./components/claimBadge.js";
 import { industryPackDetailHtml } from "./industryPackView.js";
 import { renderBars, renderLine } from "./charts.js";
 import { decorateNav } from "./shell.js";
+import { loginCardHtml, loginFailureText } from "./loginView.js";
 import { renderQrLike } from "./qr.js";
 import { renderPluginTable } from "./components/pluginTable.js";
 import { renderPluginDetail } from "./components/pluginDetail.js";
@@ -1238,41 +1239,13 @@ function renderAuthScreen() {
   if (!root) {
     return;
   }
-  const demoMode = currentWorkspaceLabel() === "demo";
-  root.innerHTML = `
-    <div class="card auth-card">
-      <div class="studio-kicker">AMC Studio access</div>
-      <h2>AMC Studio Login</h2>
-      ${demoMode ? '<p class="banner">Local demo mode creates a no-login session on loopback only. If this screen remains after startup, refresh once or use the emergency admin token.</p>' : ''}
-      <p class="muted">Login with username/password. Admin token fallback is available for emergency CLI access.</p>
-      <div class="row wrap">
-        <input id="loginUser" placeholder="username" />
-        <input id="loginPass" type="password" placeholder="password" />
-      </div>
-      <div class="row wrap">
-        <input id="pairCode" placeholder="pairing code (LAN mode only)" />
-        <button id="loginBtn">Login</button>
-      </div>
-      <details>
-        <summary>Emergency: use admin token</summary>
-        <div class="row wrap">
-          <input id="adminTokenInput" type="password" placeholder="x-amc-admin-token" />
-          <button id="adminTokenBtn" class="secondary">Use Admin Token</button>
-        </div>
-      </details>
-      <div class="row wrap">
-        <button id="pairCodeCreateBtn" class="secondary">Create Pairing Code</button>
-        <span class="muted">OWNER role required</span>
-      </div>
-      <pre id="authOut" class="muted"></pre>
-      <div id="pairQr" class="card"></div>
-    </div>
-  `;
+  root.innerHTML = loginCardHtml({ demoMode: currentWorkspaceLabel() === "demo", hostMode: window.location.pathname.startsWith("/w/") });
   const qr = document.getElementById("pairQr");
   if (qr) {
     renderQrLike(qr, `${window.location.origin}${withConsolePath("/login")}`);
   }
-  document.getElementById("loginBtn")?.addEventListener("click", async () => {
+  document.getElementById("loginForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
     const username = document.getElementById("loginUser")?.value || "";
     const password = document.getElementById("loginPass")?.value || "";
     const pairingCode = document.getElementById("pairCode")?.value || "";
@@ -1285,7 +1258,7 @@ function renderAuthScreen() {
       setStatus("Login successful.");
       await renderPage();
     } catch (error) {
-      setStatus(`Login failed: ${errText(error)}`, true);
+      setStatus(loginFailureText(errText(error)), true);
     }
   });
   document.getElementById("adminTokenBtn")?.addEventListener("click", async () => {
