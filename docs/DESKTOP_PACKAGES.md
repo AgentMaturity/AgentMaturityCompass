@@ -53,6 +53,15 @@ amc --version
 amc doctor
 ```
 
+Without root: when the global npm folder (`$(npm prefix -g)/lib/node_modules`) is not writable by your user, `install.sh` stops before npm runs and prints the rerun command. Install into a folder you own, then add its `bin` directory to PATH:
+
+```bash
+AMC_INSTALL_PREFIX="$HOME/.local" sh ./install.sh
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+`sudo sh ./install.sh` is the last resort: it runs the package postinstall and the native build as root.
+
 macOS Studio app launch:
 
 ```bash

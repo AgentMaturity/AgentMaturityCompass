@@ -25,6 +25,15 @@ Windows PowerShell:
 irm https://agentmaturity.co/install.ps1 | iex
 ```
 
+Without root: when the global npm folder (`$(npm prefix -g)/lib/node_modules`) is not writable by your user, the macOS and Linux installer stops before it downloads anything and prints the rerun command. Install into a folder you own, then add its `bin` directory to PATH:
+
+```bash
+AMC_INSTALL_PREFIX="$HOME/.local" sh -c "$(curl -fsSL https://agentmaturity.co/install.sh)"
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+Running the installer with `sudo` is the last resort: it runs the package postinstall and the native build as root. On Linux, if prebuilt `better-sqlite3` binaries cannot be downloaded, npm builds the native module and needs `python3`, `make` and `g++`; the installer names any that are missing.
+
 Both hosted installers pin the published 1.1.1 release, fetch the platform archive and `SHA256SUMS` from GitHub Releases, and refuse to execute the packaged installer when integrity verification fails. The downloaded archive then verifies its included package tarball before npm installs that local file. npm also publishes 1.1.1; the Homebrew tap is not publicly available.
 
 After installation:
@@ -94,6 +103,8 @@ npm run package:desktop:verify
 ```
 
 Archives are written to `dist/installers/archives/` and install AMC from the included AMC npm tarball. The macOS and Windows archives also include the `Agent Maturity Compass Studio` launcher app. It verifies the included package digest, installs that exact build into a version-pinned per-user runtime, and starts the loopback-only local demo from a separate persistent `studio-workspace` directory. The native macOS build uses a native WebKit window; Windows uses the system browser. Neither launcher falls back to a global `amc` installation or bundles a browser runtime. npm still needs access to AMC's public runtime dependencies unless they are already cached or mirrored.
+
+Without root, the macOS and Linux archive installer takes the same `AMC_INSTALL_PREFIX`: `AMC_INSTALL_PREFIX="$HOME/.local" sh ./install.sh`, then `export PATH="$HOME/.local/bin:$PATH"`. It stops before npm runs when the global npm folder is not writable; `sudo sh ./install.sh` is the last resort, because it runs the package postinstall and the native build as root.
 
 See `docs/DESKTOP_PACKAGES.md` for user install commands, manifest hashes, and legal/provenance notes.
 

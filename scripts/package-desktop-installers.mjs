@@ -96,10 +96,24 @@ if [ "$ACTUAL_SHA256" != "$PACKAGE_SHA256" ]; then
   exit 1
 fi
 
+if [ -z "\${AMC_INSTALL_PREFIX:-}" ]; then
+  GLOBAL_LIB="$(npm prefix -g)/lib/node_modules"
+  [ -d "$GLOBAL_LIB" ] || GLOBAL_LIB="$(npm prefix -g)/lib"
+  if [ ! -w "$GLOBAL_LIB" ]; then
+    printf 'The global npm folder %s is not writable by %s.\n' "$GLOBAL_LIB" "$(id -un)" >&2
+    printf 'Rerun as: AMC_INSTALL_PREFIX="$HOME/.local" sh ./install.sh   (then add $HOME/.local/bin to PATH)\n' >&2
+    printf 'Last resort: sudo sh ./install.sh. It runs the package postinstall and the native build as root.\n' >&2
+    exit 1
+  fi
+fi
+
 if [ -n "\${AMC_INSTALL_PREFIX:-}" ]; then
   npm install -g --prefix "$AMC_INSTALL_PREFIX" --no-audit --no-fund "$PACKAGE"
 else
   npm install -g --no-audit --no-fund "$PACKAGE"
+fi
+if [ -n "\${AMC_INSTALL_PREFIX:-}" ]; then
+  printf 'Add it to PATH: export PATH="%s/bin:$PATH"\n' "$AMC_INSTALL_PREFIX"
 fi
 echo "AMC installed. Run: amc --version && amc doctor"
 `;
@@ -576,7 +590,18 @@ Mutable demo data is stored in a separate persistent \`studio-workspace\` direct
 ${installCommand}
 \`\`\`
 
-${appCommand ? `## Launch Studio
+${platform.kind === "unix" ? `## Install without root
+
+When the global npm folder is not writable by your user, the installer stops before npm runs. Install into a folder you own, then add its \`bin\` directory to PATH:
+
+\`\`\`sh
+AMC_INSTALL_PREFIX="$HOME/.local" sh ./install.sh
+export PATH="$HOME/.local/bin:$PATH"
+\`\`\`
+
+\`sudo sh ./install.sh\` is the last resort: it runs the package postinstall and the native build as root.
+
+` : ""}${appCommand ? `## Launch Studio
 
 \`\`\`${platform.kind === "windows" ? "powershell" : "sh"}
 ${appCommand}

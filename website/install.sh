@@ -69,6 +69,25 @@ if [ "${AMC_INSTALL_TEST_MODE:-0}" != "1" ]; then
   command -v npm >/dev/null 2>&1 || fail "npm is required"
   node_major=$(node -p 'Number(process.versions.node.split(".")[0])')
   [ "$node_major" -ge 20 ] || fail "Node.js 20 or newer is required; found $(node --version)"
+  [ "$node_major" -ne 20 ] || printf 'Node 20 reached end of life on 2026-04-30; use Node 22 or 24 LTS.\n' >&2
+  # Checked before any download: npm install -g into a folder this user cannot write fails late, with EACCES and no hint.
+  if [ -z "${AMC_INSTALL_PREFIX:-}" ]; then
+    global_lib="$(npm prefix -g)/lib/node_modules"
+    [ -d "$global_lib" ] || global_lib="$(npm prefix -g)/lib"
+    if [ ! -w "$global_lib" ]; then
+      printf 'The global npm folder %s is not writable by %s.\n' "$global_lib" "$(id -un)" >&2
+      printf 'Rerun as: AMC_INSTALL_PREFIX="$HOME/.local" sh -c "$(curl -fsSL https://agentmaturity.co/install.sh)"   (then add $HOME/.local/bin to PATH)\n' >&2
+      printf 'Last resort: rerun it with sudo. That runs the package postinstall and the native build as root.\n' >&2
+      fail "the global npm folder is not writable"
+    fi
+  fi
+  if [ "$(uname -s)" = "Linux" ]; then
+    missing_tools=""
+    for tool in python3 make g++; do
+      command -v "$tool" >/dev/null 2>&1 || missing_tools="${missing_tools:+$missing_tools }$tool"
+    done
+    [ -z "$missing_tools" ] || printf 'Note: if prebuilt native binaries (better-sqlite3) cannot be downloaded, npm builds them and needs python3, make and g++ (missing: %s).\n' "$missing_tools"
+  fi
 fi
 
 platform=$(detect_platform)
@@ -102,5 +121,8 @@ installer="$tmp_dir/unpacked/${package_root}/install.sh"
 sh "$installer"
 
 printf '\nAMC %s installed from a verified GitHub release.\n' "$AMC_RELEASE_VERSION"
+if [ -n "${AMC_INSTALL_PREFIX:-}" ]; then
+  printf 'Add it to PATH: export PATH="%s/bin:$PATH"\n' "$AMC_INSTALL_PREFIX"
+fi
 printf 'Run: amc --version && amc doctor\n'
 printf 'Docs: https://agentmaturity.co/docs/\n'
