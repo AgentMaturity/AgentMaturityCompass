@@ -73,6 +73,8 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
   }
   let profile: ReturnType<typeof resolveNativeChatProfile>;
   let validation: ReturnType<typeof resolveNativeValidationSelection>;
+  // Captured before the preset's values merge in: an explicit --approve-tools/--approve-risk beside a mode is refused, a preset's is replaced.
+  const explicitApproval = { tools: options.approveTools, risk: options.approveRisk };
   try {
     profile = resolveNativeChatProfile(options);
     options = { ...options, ...profile.effectiveOptions };
@@ -252,13 +254,15 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         throw new Error("--thinking and --reasoning-effort require --provider deepseek; unused options are not ignored.");
       }
     } catch (error) { io.error(error instanceof Error ? error.message : "Invalid thinking options."); io.fail(); return; }
-    const approvalClass = options.approveTools?.trim().toUpperCase();
-    const approvalRisk = (options.approveRisk ?? "high").trim().toLowerCase();
     const approvalMode = options.approvalMode === undefined ? undefined : parseApprovalMode(options.approvalMode);
     if (approvalMode !== undefined && !approvalMode.ok) { io.error(approvalMode.reason); io.fail(); return; }
-    if (approvalMode !== undefined && (approvalClass !== undefined || options.approveRisk !== undefined)) {
+    if (approvalMode !== undefined && (explicitApproval.tools !== undefined || explicitApproval.risk !== undefined)) {
       io.error("--approval-mode composes its own gate; it cannot be combined with --approve-tools or --approve-risk."); io.fail(); return;
     }
+    // As `agent-loop run`: an explicit mode replaces a preset's approveTools gate (docs/APPROVALS.md precedence).
+    const approvalClass = approvalMode === undefined ? options.approveTools?.trim().toUpperCase() : undefined;
+    const approvalRisk = (approvalMode === undefined ? options.approveRisk ?? "high" : "high").trim().toLowerCase();
+    if (approvalMode !== undefined && options.approveTools !== undefined) io.log(`Approval mode ${approvalMode.ok ? approvalMode.mode : ""} replaces the preset's approveTools ${options.approveTools}.`);
     // A mode other than plan composes a gate in the child run, so this terminal reviews its requests too.
     const modeGated = approvalMode !== undefined && approvalMode.ok && approvalModeGatedClasses(approvalMode.mode) !== null;
     if ((approvalClass !== undefined && !isActionClass(approvalClass)) ||
@@ -528,7 +532,8 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         ...(approvalClass === undefined && !modeGated ? [] : ["--interactive-approvals"]), ...(tools === "workspace" ? ["--interactive-ask-user"] : []),
         "--keep-open", "--json", "--stream",
         ...(forkFrom !== null ? ["--fork-from", forkFrom] : sessionId === null ? [] : ["--session", sessionId]), "--", prompt],
-        { interactiveApprovals: approvalClass !== undefined, askUser: tools === "workspace", stream: true });
+        // A gating mode raises actual approval IDs over IPC exactly as --approve-tools does; this terminal must be their reviewer.
+        { interactiveApprovals: approvalClass !== undefined || modeGated, askUser: tools === "workspace", stream: true });
       const result = parseNativeChatResult({ stdout: outcome.stdout, truncated: outcome.truncated,
         requestedSessionId: priorSession, forkFrom: pendingFork, previousSummary });
       if (!result.ok) {

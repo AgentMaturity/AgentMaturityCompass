@@ -38,7 +38,7 @@
  * command that finished.
  */
 import { Context } from "./amcRuntime.js";
-import { createHash, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "../agent/approvalGate.js";
 import type { ApprovalMode } from "../approvals/approvalModes.js";
 import type { AgentLoopConfig, AgentStatus, CancelOptions, LoopHooks, LoopNotification } from "../agent/loopTypes.js";
@@ -84,6 +84,7 @@ import { assertNativeScheduleAdmission } from "../autonomy/scheduleService.js";
 import type { SubagentCapability } from "../agent/delegateTool.js";
 import type { TurnCancelCause } from "../session/sessionTypes.js";
 import { amcVersion } from "../version.js";
+import { compositionDigestOf, policyDigestOf } from "./compositionDigest.js";
 import { credentialsServices, CREDENTIALS_SEAM } from "./services/credentialsServices.js";
 import type { CredentialsSeamService, CredentialsServiceConfig } from "./services/credentialsServices.js";
 import { llmServices, LLM_SEAM } from "./services/llmServices.js";
@@ -381,62 +382,6 @@ function promptProfileFor(options: ComposedTurnOptions): AgentPromptProfile {
   };
 }
 
-/**
- * What this run was composed from, as a digest.
- *
- * Recorded on the `session/open` row, so "which build of which composition
- * produced this session" is answerable from the log alone. It commits to the
- * plugin names, the routes registered, the model actually addressed, what the
- * prompt was built out of, and whether a human stood in front of the tools —
- * the facts that decide what the agent could do and what it was told it could do.
- */
-function compositionDigestOf(options: ComposedTurnOptions, profile: AgentPromptProfile): string {
-  const gate = options.approvalGate;
-  const shape = JSON.stringify({
-    plugins: [
-      credentialsServices.name,
-      llmServices.name,
-      promptServices.name,
-      ...(gate === undefined ? [] : [approvalServices.name]),
-      agentLoopServices.name
-    ],
-    providers: options.routes.map((route) => ({
-      providerId: route.providerId,
-      adapterId: route.adapter.id,
-      adapterVersion: route.adapter.version,
-      baseUrl: route.baseUrl,
-      models: route.models
-    })),
-    route: { providerId: options.route.providerId, model: options.route.model },
-    sources: options.compositionSources ?? [],
-    prompt: {
-      sections: profile.sections.map((section) => section.name),
-      contexts: profile.contextPlugins.map((plugin) => plugin.name),
-      variables: Object.keys(profile.variables).sort(),
-      pinned: options.systemPrompt !== undefined
-    },
-    // The answerer NAMES are the point: an ADR-5 exception renders its tracked
-    // id, its approver and its expiry into its name, so composing one changes
-    // this digest and the change is attributable.
-    approval:
-      gate === undefined
-        ? null
-        : {
-            actionClass: gate.actionClass,
-            riskTier: gate.riskTier,
-            toolNames: gate.toolNames ?? null,
-            ...(gate.reviewedActionClasses === undefined ? {} : { reviewedActionClasses: gate.reviewedActionClasses }),
-            answerers: (gate.answerers ?? []).map((answerer) => answerer.name)
-          },
-    version: amcVersion
-  });
-  return createHash("sha256").update(shape).digest("hex");
-}
-
-/** The loop bounds this run enforced, as a digest, for the `session/open` row. */
-function policyDigestOf(options: ComposedTurnOptions): string {
-  return createHash("sha256").update(JSON.stringify(options.config ?? {})).digest("hex");
-}
 
 /**
  * Compose the seams, run ONE turn to completion, and tear the tree down.
@@ -456,7 +401,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     if (options.resume !== undefined || options.forkFrom !== undefined || options.keepOpen
       || options.delegation !== undefined || options.tools !== undefined || options.validation !== undefined
       || options.onSteer !== undefined || options.prompt !== "" || images.length > 0 || options.approvalGate === undefined
-      || (options.approvalGate.answerers?.length ?? 0) > 0 || options.approvalGate.toolNames !== undefined) {
+      || (options.approvalGate.answerers?.length ?? 0) > 0 || options.approvalGate.toolNames !== undefined
+      || options.approvalGate.gatesClasses !== undefined || options.approvalGate.exemptToolNames !== undefined) {
       throw new Error("A native schedule pass requires a fresh owned session, native leaf runners and the actual all-tools signed approval gate. Resume, custom runners/tools, validation, approval exceptions and ordinary prompts are not schedule admission.");
     }
     if (!Number.isSafeInteger(options.schedulePass.now) || options.schedulePass.now < 0) throw new Error("Invalid native schedule clock.");

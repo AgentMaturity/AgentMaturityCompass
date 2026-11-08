@@ -33,7 +33,7 @@ function workspace(): string {
 }
 function environment(root: string): NodeJS.ProcessEnv {
   return { ...process.env, AMC_SESSION_STORE: "sqlite", AMC_VAULT_PASSPHRASE: passphrase,
-    AMC_AGENT_ID: "default", AMC_HOME: join(root, "home"), NO_COLOR: "1", FORCE_COLOR: "0", TERM: "dumb" };
+    AMC_AGENT_ID: "default", AMC_HOME: join(root, "home"), AMC_TRUST_WORKSPACE: "1", NO_COLOR: "1", FORCE_COLOR: "0", TERM: "dumb" };
 }
 function route(root: string): string[] {
   return ["--provider", "stub", "--tools", "echo", "--max-steps", "2", "--max-tokens", "64", "--no-delegate",
@@ -123,6 +123,26 @@ describe.skipIf(process.platform === "win32")("WP30 measured native interactive 
     expect(events.some(row => row.event_type === "turn/seal"), result.output).toBe(true);
     expect(events.at(-1)?.event_type, result.output).toBe("session/release");
     measured("run-inspect-validation-state", result, 3);
+  }, 110_000);
+
+  test("a gating --approval-mode gives the chat turn its IPC reviewer, so the child does not refuse --interactive-approvals", async () => {
+    const root = workspace();
+    // The echo tool is asked about under default, so the proof is the parent's reviewer prompt reaching this terminal; before the
+    // fix the child refused the turn for want of the parent's IPC channel and no request was ever raised. Cancelling the turn is
+    // the one answer that needs no authenticated reviewer session.
+    const result = await terminal(root, [...route(root), "--approval-mode", "default"], [
+      { waitFor: "you> ", send: "SH-SANDBOX-04 gated chat task\r" },
+      { waitFor: "Approval: approve, deny, or cancel this turn \\(no default\\): ", send: "cancel\r" },
+      { waitFor: "you> ", send: "/exit\r" }
+    ]);
+    expect(result.output).toContain("Approval mode: default. This terminal asks you to review");
+    expect(result.output).not.toContain("requires an AMC parent with a dedicated IPC channel");
+    expect(result.output).toContain("Actual signed approval request:");
+    expect(result.output).toContain("\"tool\": \"echo\"");
+    expect(result.output).toContain("cancelling the turn (cause: user)");
+    expect(result.output).toContain("turn 1 ended: cancelled");
+    expect(result.output).toMatch(/echo · DENIED/);
+    measured("gated-approval-mode-chat", result, 3);
   }, 110_000);
 
   test("find and inspect a released session, then explicitly resume without copying its ID", async () => {

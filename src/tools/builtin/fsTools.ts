@@ -381,6 +381,9 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
       body: (execution) => {
         const args = editArgs.parse(execution.arguments);
         const { full, rel } = insideWorkspace(execution.workspace, args.path);
+        // SH-SANDBOX-06: an argument check, so it comes before any policy verdict names another reason.
+        const edits = editsOf(args);
+        for (const edit of edits) refuseRedactionPlaceholder(edit.replace, "fs.edit");
         // Read before the policy check, and write only if the file still holds
         // these bytes: the plan, the diff and the evidence all describe them.
         const raw = readIfExists(full);
@@ -391,8 +394,6 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
         if (before === null) {
           throw new Error(`"${args.path}" is not valid UTF-8; fs.edit would change bytes it was not asked to change`);
         }
-        const edits = editsOf(args);
-        for (const edit of edits) refuseRedactionPlaceholder(edit.replace, "fs.edit");
         const plan = planLiteralEdits(before, edits, args.path);
         const after = Buffer.from(plan.after, "utf8");
         const diff = shownDiff(rel, raw, after);

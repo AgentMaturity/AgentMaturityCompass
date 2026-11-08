@@ -48,7 +48,22 @@ export const MACOS_SECRET_PATHS = [".ssh", ".aws", ".config/gcloud", ".azure", "
 export function amcSecretPaths(env: NodeJS.ProcessEnv = process.env): readonly string[] {
   const paths = resolveCredentialsPaths({ env, projectDir: null });
   const remember = env["AMC_VAULT_REMEMBER_FILE"]?.trim();
-  return [...new Set([resolveAmcHome({ env }), paths.file, paths.userEnvFile, ...(remember ? [resolve(remember)] : [])])];
+  // The default home is denied even when AMC_HOME points elsewhere: the vault passphrase file store (src/vault/passphraseStore.ts)
+  // still defaults to ~/.config/amc/vault-credentials.json there (S5).
+  return [...new Set([resolveAmcHome({ env }), join(homedir(), ".config", "amc"), paths.file, paths.userEnvFile,
+    ...(remember ? [resolve(remember)] : []), ...sessionSecretPaths])];
+}
+
+const sessionSecretPaths = new Set<string>();
+
+/**
+ * Credential stores a session selected by option rather than by environment (`--credentials-home`, `--credentials-file`,
+ * the SDK's `credentialsHome`/`credentialsFile`): nothing in `process.env` names them, so the kernel's credentials
+ * service registers them here when it opens the store, and every later confined shell in this process denies them.
+ * ponytail: process-wide set; a per-session deny list would need the policy to carry the store paths through the toolset.
+ */
+export function denySessionSecretPaths(paths: readonly string[]): void {
+  for (const path of paths) sessionSecretPaths.add(resolve(path));
 }
 
 /** The only Mach services the shell may look up: temp-dir helper, logging, notifications, user and group lookups. */

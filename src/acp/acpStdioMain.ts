@@ -192,7 +192,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   // Preserve existing one-server session identities while binding every server in a composed run.
   const mcpIdentity = mcp.length === 0 ? null : mcp.length === 1 ? mcp[0]!.config.sha256 : mcp.map(entry => entry.config.sha256);
   const shellOptIn = init.unconfinedShell === true ? { unconfinedShell: "cli-flag" as const } : {};
-  const trustOptIn = init.trustWorkspace === true ? { trustWorkspace: true as const } : {};
+  const trustOptIn = init.trustWorkspace === true ? { trustWorkspace: "acp-flag" as const } : {};
   if ((init.askUser === true || init.webSearchSearxng !== undefined) && tools !== "workspace") throw new Error("--ask-user and --web-search-searxng configure workspace tools; add --tools workspace.");
   const webSearchProvider = init.webSearchSearxng === undefined ? undefined : searxngSearchProvider(init.webSearchSearxng);
   let shellRefusal: string | null = null;

@@ -12,9 +12,12 @@ trusted folders.
 
 Every native session entry checks the workspace before it loads anything the
 workspace signed: `amc agent-loop run` (and every turn of `agent-loop chat`),
-`amc native schedule execute`, and `openAgentSession`, which the SDK, ACP,
+`amc native-schedule run-due|watch`, and `openAgentSession`, which the SDK, ACP,
 Studio native tasks, the wire consumer and the trial runner all use. Delegated
-children run inside their parent's session and inherit its verdict.
+children run inside their parent's session and inherit its verdict. Every entry
+checks before the vault is unlocked, so a refused run never migrates a 1.x
+vault (a migration commits a key set on this machine and would then count as
+your own work); only an explicit vault command in that workspace does that.
 
 The verdict (`src/security/workspaceTrust.ts`) builds on the key-set anchoring
 that already exists in `src/keys/keyset.ts`:
@@ -22,10 +25,11 @@ that already exists in `src/keys/keyset.ts`:
 | Workspace | Verdict |
 |---|---|
 | Its key set was committed on this machine (`amc init` or a key rotation ran here) | trusted, no record needed: it is your own |
-| It has no key set | trusted: nothing signed in it can grant anything |
+| It has no signer: no key set and no legacy role key (`.amc/keys/auditor_ed25519.pub`) | trusted: nothing signed in it can verify |
+| A 1.x key layout (role keys, no `keyset.json`) whose signed `tools.yaml` verifies with the legacy auditor key | first use: consent binds that key's fingerprint (recorded as generation 0) |
 | Otherwise, no consent record on this machine | first use: refused until you trust it |
-| A consent record, same key set and same signed `tools.yaml` | trusted |
-| A consent record, but the key set or the signed `tools.yaml` changed | changed: refused until you trust it again |
+| A consent record, same signer and same signed `tools.yaml` | trusted; the consented `tools.yaml` digest is pinned for the session (a re-signed policy under a long-lived session is refused, not applied) |
+| A consent record, but the signer or the signed `tools.yaml` changed | changed: refused until you trust it again |
 | The consent store is unreadable | refused for every workspace, with the repair step named |
 
 The refusal names what the workspace would apply: the key-set generation and
@@ -40,8 +44,14 @@ Consent comes only from the operator, never from a file in the workspace:
 - `amc trust workspace` records it (`--status` shows the verdict, `--revoke`
   removes it, `--repair-store` moves an unreadable store aside, `--json`);
 - `--trust-workspace` on `agent-loop run`, `agent-loop chat`, `amc acp` and
-  `native schedule execute`; `trustWorkspace: true` in the SDK client options;
+  `native-schedule run-due|watch`; `trustWorkspace: true` in the SDK client
+  options (the SDK spawns `amc acp --trust-workspace`, so the record says
+  `acp-flag`; an in-process `openAgentSession({ trustWorkspace: true })` says
+  `sdk-option`);
 - `AMC_TRUST_WORKSPACE=1` for a headless host (Studio, the wire consumer, CI).
+  Studio forwards it to its native-task child, which records the consent in the
+  credentials home Studio runs with (`AMC_HOME` for that child), so `amc trust
+  workspace` must also use that home when run by hand.
 
 The record lives in `<AMC home>/state/workspace-trust.json` (0600, written
 atomically under the control-file lock), keyed by a digest of the workspace's
@@ -51,7 +61,10 @@ the AMC home.
 
 ## Limits
 
-- Consent binds the key set and the signed `tools.yaml`. Signed presets and
+- A workspace that migrated from 1.x on this machine (an explicit vault
+  command unlocked it here) holds a key set this machine committed and reads as
+  your own; that migration is the operator's action in the workspace.
+- Consent binds the signer and the signed `tools.yaml`. Signed presets and
   skills are not part of the digest; a repository that changes only those after
   consent is not re-prompted (skills are prompt text, stamped as data).
 - There is no interactive prompt yet: a TTY run is refused with the message

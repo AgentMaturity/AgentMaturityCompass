@@ -221,5 +221,15 @@ describe("AMC's own authority is on the macOS deny list (SH-SANDBOX-08)", () => 
     expect(overridden).toEqual(expect.arrayContaining(["/synthetic/amc-home", "/synthetic/elsewhere/creds.yaml", "/synthetic/vault/remember.json", join(homedir(), ".env")]));
     // Never the legacy spelling alone: `~/.amc` is not where AMC keeps credentials.
     expect(defaults.some(path => path.endsWith("/.config/amc"))).toBe(true);
+    // S5: with AMC_HOME elsewhere the default home still holds the vault passphrase file store, so it stays denied.
+    expect(overridden).toContain(join(homedir(), ".config", "amc"));
+  });
+
+  test("a credential store the session selected by option is denied once registered, whatever the environment says", async () => {
+    const { amcSecretPaths, denySessionSecretPaths } = await import("../../src/sandbox/seatbeltNativeShell.js");
+    expect(amcSecretPaths({ AMC_HOME: "/synthetic/amc-home" })).not.toContain("/synthetic/session-creds");
+    denySessionSecretPaths(["/synthetic/session-creds", "/synthetic/session-creds/refs.yaml"]);
+    expect(amcSecretPaths({ AMC_HOME: "/synthetic/amc-home" })).toEqual(expect.arrayContaining(["/synthetic/session-creds", "/synthetic/session-creds/refs.yaml"]));
+    expect(amcSecretPaths({})).toContain("/synthetic/session-creds");
   });
 });

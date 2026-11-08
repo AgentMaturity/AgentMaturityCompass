@@ -1,10 +1,12 @@
-import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Command } from "commander";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { ToolRegistry, defineTool } from "../src/tools/toolRegistry.js";
 import { ToolPipeline } from "../src/tools/toolPipeline.js";
+import { fsTools } from "../src/tools/builtin/fsTools.js";
+import { ReadBeforeEditLedger } from "../src/tools/builtin/readBeforeEdit.js";
 import { containsRedactionPlaceholder, redactionCountsFor, secretRedactionFilter } from "../src/shield/redaction/toolOutputRedaction.js";
 import { initWorkspaceWithoutActionPolicy } from "./helpers/actionPolicyFixtures.js";
 import { initBudgets } from "../src/budgets/budgets.js";
@@ -28,6 +30,35 @@ describe("the tool-output secret redaction filter (SH-SANDBOX-06)", () => {
     expect(out).toBe("key=[AMC_REDACTED:aws_key]\ntoken=[AMC_REDACTED:github_token]\nagain=[AMC_REDACTED:aws_key]");
     expect(redactionCountsFor(execution)).toEqual({ aws_key: 2, github_token: 1 });
     expect(containsRedactionPlaceholder(out)).toBe(true);
+  });
+
+  it("keeps a JSON result exact JSON: a key-named credential is redacted inside its string value, not across the member", () => {
+    const json = { name: "fs.read" } as never;
+    const value = "abcdefghijklmnop1234";
+    const out = secretRedactionFilter(JSON.stringify({ api_key: value, apiKey: value, aws_secret_access_key: "A".repeat(40), other: 1, nested: { note: `see ${AWS}` }, list: ["plain-list-entry-16chars"] }), json);
+    expect(out).not.toContain(value);
+    expect(out).not.toContain(AWS);
+    expect(JSON.parse(out)).toEqual({ api_key: "[AMC_REDACTED:generic_api_key]", apiKey: "[AMC_REDACTED:generic_api_key]", aws_secret_access_key: "[AMC_REDACTED:aws_secret]",
+      other: 1, nested: { note: "see [AMC_REDACTED:aws_key]" }, list: ["plain-list-entry-16chars"] });
+    expect(redactionCountsFor(json)).toEqual({ generic_api_key: 2, aws_secret: 1, aws_key: 1 });
+    // A placeholder that already sits inside a string value leaves the flat pass's JSON intact, so the bytes are kept as they were.
+    const intact = { name: "fs.read" } as never;
+    expect(secretRedactionFilter(`{"note": "key ${AWS} here"}`, intact)).toBe('{"note": "key [AMC_REDACTED:aws_key] here"}');
+  });
+
+  it("fs.edit refuses a replacement carrying a redaction placeholder, before any read-before-edit verdict, and leaves the file alone", async () => {
+    const workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-redaction-edit-")));
+    try {
+      const registry = new ToolRegistry();
+      for (const tool of fsTools({ ledger: new ReadBeforeEditLedger() })) registry.define(tool);
+      const pipeline = new ToolPipeline({ registry, workspace });
+      writeFileSync(join(workspace, "f.txt"), "key=real\n");
+      // No prior fs.read: the placeholder check is an argument check and names itself, not the read-before-edit policy.
+      const refused = await pipeline.execute({ name: "fs.edit", agentId: "a", arguments: { path: "f.txt", find: "real", replace: "[AMC_REDACTED:aws_key]" }, requestedMode: "EXECUTE" });
+      expect(refused.ok).toBe(false);
+      expect(refused.output).toMatch(/fs\.edit refused: the content contains an AMC redaction placeholder/);
+      expect(readFileSync(join(workspace, "f.txt"), "utf8")).toBe("key=real\n");
+    } finally { rmSync(workspace, { recursive: true, force: true }); }
   });
 
   it("returns the same string and no counts when nothing matches", () => {
@@ -117,7 +148,7 @@ describe("through amc agent-loop run with workspace tools", () => {
     try {
       // Neither the signed rows nor their metadata hold the key anywhere in this session (payloads are encrypted at
       // rest, so the placeholder text itself is asserted on the pipeline above, not here).
-      const everything = ledger.getAllEvents().filter(row => row.session_id === summary!.sessionId).map(row => `${row.meta_json ?? ""}\n${row.payload ?? ""}`).join("\n");
+      const everything = ledger.getAllEvents().filter(row => row.session_id === summary!.sessionId).map(row => `${row.meta_json ?? ""}\n${row.payload_inline ?? ""}`).join("\n");
       expect(everything).not.toContain(AWS);
     } finally { ledger.close(); }
   });

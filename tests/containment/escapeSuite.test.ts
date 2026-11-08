@@ -1,11 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { lookup } from "node:dns/promises";
-import { existsSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, test, vi } from "vitest";
 import { bwrapBackend, unconsumedFds } from "../../src/sandbox/bwrapBackend.js";
 import { prepareNativePtyLaunch } from "../../src/terminal/nativePtySandbox.js";
-import { seatbeltNativeShell } from "../../src/sandbox/seatbeltNativeShell.js";
+import { denySessionSecretPaths, seatbeltNativeShell } from "../../src/sandbox/seatbeltNativeShell.js";
 import { nativeContainmentFixture, sandboxNode, type NativeCall } from "../helpers/nativeContainment.js";
 
 // Binary prerequisites are not confinement evidence. Every actual call must produce a real applied receipt.
@@ -141,6 +141,20 @@ describe("real native shell escape attempts with owned canaries", () => {
       const canary = `synthetic-not-a-real-secret-${randomUUID()}`;
       const path = join(process.env.AMC_HOME!, ".credentials.yaml");
       writeFileSync(path, canary);
+      const call = await f.run(`let value=null,denied=false,code=null;try{value=require("node:fs").readFileSync(${JSON.stringify(path)},"utf8");}catch(error){denied=true;code=error.code;}${emit('{attempted:true,denied,code}')} `);
+      applied(call); expect(call.receipt.stdout).not.toContain(canary);
+      expect(call.data.denied).toBe(true); expect(readFileSync(path, "utf8")).toBe(canary); passed = true;
+    } finally { await f.finish(passed); }
+  });
+
+  // SH-SANDBOX-08: a credential store chosen by --credentials-home (not by AMC_HOME) is denied once the session registers it.
+  realTest("a session-selected credential store outside AMC_HOME cannot be read", async () => {
+    const f = nativeContainmentFixture({ readDenyHome: false }); let passed = false;
+    try {
+      const store = join(f.root, "session-credentials"); mkdirSync(store, { recursive: true, mode: 0o700 });
+      const canary = `synthetic-not-a-real-secret-${randomUUID()}`;
+      const path = join(store, ".credentials.yaml"); writeFileSync(path, canary);
+      denySessionSecretPaths([store, path]);
       const call = await f.run(`let value=null,denied=false,code=null;try{value=require("node:fs").readFileSync(${JSON.stringify(path)},"utf8");}catch(error){denied=true;code=error.code;}${emit('{attempted:true,denied,code}')} `);
       applied(call); expect(call.receipt.stdout).not.toContain(canary);
       expect(call.data.denied).toBe(true); expect(readFileSync(path, "utf8")).toBe(canary); passed = true;

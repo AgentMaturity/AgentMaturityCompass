@@ -19,8 +19,11 @@ text, and never the offsets.
 Order with protected-data tokenisation (P2-02, `redactingSession`): that pass
 runs when the session commits the row, after this filter, so it sees
 placeholders where credentials were and tokenises only the declared protected
-fields that remain. A placeholder inside a JSON string value keeps a declared
-result exact JSON, so declared-field tokenisation still applies.
+fields that remain. A result that parses as JSON stays JSON: when the flat pass
+would consume a member name's quotes and colon (`{"api_key":"…"}` matches the
+`generic_api_key` pattern from the name through the value), the filter redacts
+inside the string values instead, probing each as `name=value`, so a declared
+result is still exact JSON and declared-field tokenisation still applies.
 
 Write-back protection: a model that copies redacted text back into a file would
 write the placeholder over the real value. `fs.write` and `fs.edit` refuse content

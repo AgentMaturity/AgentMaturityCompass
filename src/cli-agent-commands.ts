@@ -1,5 +1,4 @@
 import { showSkillCatalogSelection } from "./cli/skillCatalogOptions.js";
-import { requireWorkspaceTrust, suppliedTrustConsent } from "./security/workspaceTrust.js";
 import { randomUUID } from "node:crypto";
 import { hostname } from "node:os";
 /**
@@ -56,7 +55,8 @@ import { loadNativeExtensions, type NativeExtensionManager, type NativeExtension
 import { bindNativeMcpResourceStatus, projectNativeResourceStatus, type NativeMcpResourceSource } from "./prompt/context/nativeResourceStatus.js";
 import { explicitPresetCompositionOptions, nativePresetCompositionSources } from "./cli/agentCompositionSources.js";
 import { resolvePreset, type AgentPreset } from "./presets/agentPresets.js";
-import { IN_PROCESS_PROVIDER, delegationTurnOptions, resolveForeignRunner } from "./agent/providers/delegationProviders.js";
+import { delegationTurnOptions } from "./agent/providers/delegationProviders.js";
+import { foreignDelegateRunner } from "./cli/agentLoopForeignDelegate.js";
 import type { SubagentRunner } from "./agent/subagentSpawn.js";
 import { loadVerifiedToolsConfigSnapshot } from "./toolhub/toolhubValidators.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./agent/toolSeam.js";
@@ -76,7 +76,7 @@ import { loadNativeAudioManifest } from "./attachments/nativeAudioFiles.js";
 import type { NativeAudioPart } from "./attachments/nativeAudioInput.js";
 
 import {
-  activeChildLimitOption, approvalGateFor, armTurnSignals, parsedApprovalMode, collectOption, collectDelegateStop, compactionOption, integerOption, liveTextPreviewPrinter, paramsFor, piAiRouteSelection, renderNotification, resetDelegateStops, routeFor,
+  activeChildLimitOption, admitWorkspaceTrust, approvalGateFor, armTurnSignals, parsedApprovalMode, collectOption, collectDelegateStop, compactionOption, integerOption, liveTextPreviewPrinter, paramsFor, piAiRouteSelection, renderNotification, resetDelegateStops, routeFor,
   type AgentLoopCliIo, type RunOptions
 } from "./cli-agent-options.js";
 export type { AgentLoopCliIo, RunOptions } from "./cli-agent-options.js";
@@ -297,9 +297,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         io.error("--audio-input is exclusive with positional text and --image; put every original part in its manifest order."); io.fail(); return;
       }
       // SH-SANDBOX-07: before anything the workspace signed is loaded (extensions, skills, presets, the tools policy).
-      const trust = requireWorkspaceTrust(process.cwd(), suppliedTrustConsent(opts.trustWorkspace ? "cli-flag" : undefined));
-      if (!trust.ok) { io.error(chalk.red(trust.reason)); io.fail(); return; }
-      if (trust.recorded !== null) io.error(chalk.dim(`workspace trusted on this machine (${trust.recorded.by}); revoke with: amc trust workspace --revoke`));
+      const trustedToolsDigest = admitWorkspaceTrust(io, opts, process.cwd());
+      if (trustedToolsDigest === undefined) return;
       let extensionTurn: NativeExtensionTurn;
       let extensions: NativeExtensionManager;
       try {
@@ -475,7 +474,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       }
       const dispatchMode = (opts.toolMode ?? preset?.toolMode) === "code" ? "code" as const : "native" as const;
       const compositionSources = nativePresetCompositionSources(preset, explicitCompositionOptions, opts, { providerId, model, maxTokens, maxSteps, tools: toolMode, toolMode: dispatchMode,
-        approveTools: gate?.actionClass, delegateEnabled: wantsDelegation, delegateScope, maxDelegationDepth, delegateTimeout, delegateStops: delegateStops.conditions });
+        approveTools: approvalMode === undefined ? gate?.actionClass : undefined, approvalMode, delegateEnabled: wantsDelegation, delegateScope, maxDelegationDepth, delegateTimeout, delegateStops: delegateStops.conditions });
       const shellOptIn = opts.unsafeUnconfinedShell === true ? { unconfinedShell: "cli-flag" as const } : {};
       // Resume names its existing session; a fresh run supplies a new ID. Fork
       // selects its own ID inside composition, which binds the actual writer
@@ -512,6 +511,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...lease,
           ...(dispatchMode === "code" ? { mode: dispatchMode } : {}),
           ...(approvalMode === undefined ? {} : { approvalMode }),
+          ...(trustedToolsDigest === null ? {} : { expectedToolsDigest: trustedToolsDigest }),
           ...breadth.toolset,
           ...shellOptIn
         });
@@ -571,23 +571,11 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         // Defining after construction is supported by design — `seam.schemas()`
         // re-reads the registry each step.
         if (wantsDelegation) {
-          const providerId = opts.delegateProvider ?? IN_PROCESS_PROVIDER;
-          if (providerId !== IN_PROCESS_PROVIDER) {
-            const resolved = resolveForeignRunner({
-              providerId,
-              workspace: process.cwd(),
-              agentId,
-              ...(delegateTimeout > 0 ? { timeoutMs: delegateTimeout } : {})
-            });
-            if (!resolved.ok) {
-              io.error(chalk.red(resolved.reason));
-              toolset.close();
-              io.fail();
-              return;
-            }
-            foreignRunner = resolved.runner;
-            foreignRunnerDescription = resolved.describedAs;
-          }
+          const foreign = foreignDelegateRunner(io, { ...(opts.delegateProvider === undefined ? {} : { delegateProvider: opts.delegateProvider }), approvalMode },
+            { workspace: process.cwd(), agentId, timeoutMs: delegateTimeout });
+          if (foreign === null) { toolset.close(); return; }
+          foreignRunner = foreign.runner;
+          foreignRunnerDescription = foreign.describedAs;
           // Reported FROM the value that gets passed, not beside it. Written as
           // two statements, a build could announce an out-of-process delegate
           // and hand the kernel nothing -- mutation testing found exactly that,

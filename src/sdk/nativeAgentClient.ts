@@ -160,16 +160,13 @@ export type AMCNativeMcpStatus = NativeMcpStatus;
     if (this.releasePromise) throw new AMCNativeInputError("Wait for writer release before starting another operation");
   }
   prompt(text: string, options: { readonly signal?: AbortSignal; readonly clientRequestId?: string; readonly images?: readonly NativeImageInput[] } = {}): AMCNativeTurn {
-    this.assertUsable();
-    return this.client.promptSession(this.sessionId, text, options.signal, options.images, options.clientRequestId);
+    this.assertUsable(); return this.client.promptSession(this.sessionId, text, options.signal, options.images, options.clientRequestId);
   }
   /** @experimental Ordered text and image parts (amc-image-input@2). */ promptParts(parts: readonly NativeInputPart[], options: { readonly signal?: AbortSignal; readonly clientRequestId?: string } = {}): AMCNativeTurn {
-    this.assertUsable();
-    return this.client.promptSessionParts(this.sessionId, parts, options.signal, options.clientRequestId);
+    this.assertUsable(); return this.client.promptSessionParts(this.sessionId, parts, options.signal, options.clientRequestId);
   }
   /** @experimental Ordered audio parts (amc-audio-input@1). */ promptAudioParts(parts: readonly NativeAudioPart[], options: { readonly signal?: AbortSignal; readonly clientRequestId?: string } = {}): AMCNativeTurn {
-    this.assertUsable();
-    return this.client.promptSessionAudioParts(this.sessionId, parts, options.signal, options.clientRequestId);
+    this.assertUsable(); return this.client.promptSessionAudioParts(this.sessionId, parts, options.signal, options.clientRequestId);
   }
   /** Withdraw one pending message without cancelling the active turn or clearing a queue. */
   withdraw(messageId: string): Promise<boolean> { this.assertUsable(); return this.client.withdrawSubmission(this.sessionId, messageId); }
@@ -296,8 +293,7 @@ export class AMCNativeClient {
       if (value !== undefined) args.push(flag, String(value));
     }
     args.push(...mcpConfigArgv(options.mcpConfig, options.mcpConfigSha256));
-    if (options.allowUnconfinedShell === true) args.push("--unsafe-unconfined-shell");
-    if (options.trustWorkspace === true) args.push("--trust-workspace");
+    for (const [flag, on] of [["--unsafe-unconfined-shell", options.allowUnconfinedShell], ["--trust-workspace", options.trustWorkspace]] as const) if (on === true) args.push(flag);
     if (options.validate !== undefined) {
       if (!Array.isArray(options.validate) || options.validate.length < 1 || options.validate.length > 8
         || new Set(options.validate).size !== options.validate.length

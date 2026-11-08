@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Command } from "commander";
@@ -7,7 +7,15 @@ import { initWorkspace } from "../src/workspace.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { registerAgentCommands, type AgentLoopCliIo } from "../src/cli-agent-commands.js";
 import { registerSandboxCommands } from "../src/cli-sandbox-commands.js";
-import { requireWorkspaceTrust, revokeWorkspaceTrust, repairWorkspaceTrustStore, suppliedTrustConsent, trustWorkspace, workspaceTrustVerdict } from "../src/security/workspaceTrust.js";
+import { registerNativeScheduleCommands } from "../src/cli-native-schedule-commands.js";
+import { openAgentSession } from "../src/agent/agentSession.js";
+import { keysetAnchoring } from "../src/keys/keyset.js";
+import { lockVault, vaultPaths } from "../src/vault/vault.js";
+import { amcSecretPaths } from "../src/sandbox/seatbeltNativeShell.js";
+import { saveSchedules } from "../src/autonomy/scheduleStore.js";
+import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL } from "../src/agent/stubProvider.js";
+import { v1Workspace } from "./helpers/legacyVault.js";
+import { consentedToolsDigest, requireWorkspaceTrust, revokeWorkspaceTrust, repairWorkspaceTrustStore, suppliedTrustConsent, trustWorkspace, workspaceTrustVerdict } from "../src/security/workspaceTrust.js";
 
 /**
  * SH-SANDBOX-07. A key set `amc init` committed under one AMC home is the operator's own (trusted). The same workspace
@@ -58,10 +66,21 @@ describe("workspace trust verdicts", () => {
     if (verdict.state === "first-use") expect(verdict.surface.toolsSummary).toMatch(/signed tools/);
   });
 
-  it("a workspace with no key set has nothing to trust", () => {
+  it("a workspace with no signing key at all has nothing to trust", () => {
     const bare = mkdtempSync(join(tmpdir(), "amc-wt-bare-"));
-    try { expect(workspaceTrustVerdict(bare)).toMatchObject({ state: "trusted", reason: "no-key-set" }); }
-    finally { rmSync(bare, { recursive: true, force: true }); }
+    try {
+      expect(workspaceTrustVerdict(bare)).toMatchObject({ state: "trusted", reason: "no-signer" });
+      expect(() => trustWorkspace(bare, "command")).toThrow(/nothing to trust/);
+    } finally { rmSync(bare, { recursive: true, force: true }); }
+  });
+
+  it("a consented session pins the consented tools.yaml digest; this machine's own workspace pins nothing", () => {
+    expect(consentedToolsDigest(requireWorkspaceTrust(workspace, null))).toBeNull();
+    asClone();
+    const recorded = requireWorkspaceTrust(workspace, "cli-flag");
+    expect(consentedToolsDigest(recorded)).toMatch(/^[0-9a-f]{64}$/);
+    expect(consentedToolsDigest(requireWorkspaceTrust(workspace, null))).toBe(consentedToolsDigest(recorded));
+    expect(consentedToolsDigest({ ok: false, reason: "x" })).toBeNull();
   });
 
   it("refuses without consent, records consent from a flag or the environment, notices a re-signed tools policy, and revokes", () => {
@@ -133,6 +152,85 @@ describe("through the real surfaces", () => {
     expect(trusted.errors.join("\n")).toContain("workspace trusted on this machine (cli-flag)");
     const again = await runCli([]);
     expect(again.failed, again.errors.join("\n")).toBe(false);
+    // SH-SANDBOX-08: the credential store this run selected by option is on the confined shell's deny list from now on.
+    expect(amcSecretPaths()).toEqual(expect.arrayContaining([credentialsHome, join(credentialsHome, ".credentials.yaml")]));
+  });
+
+  /**
+   * S19: a 1.x key layout (role keys, no keyset.json) has no key set, but its signed tools.yaml still verifies through the
+   * legacy role-key fallback. Such a clone is a first use bound to that key's fingerprint, not "nothing to trust".
+   */
+  function legacyLayoutWorkspace(): string {
+    const v1 = v1Workspace(process.env.AMC_VAULT_PASSPHRASE!);
+    const root = realpathSync(v1.root);
+    // Initialising on top of the 1.x vault unlocks and migrates it under the owner home and signs the default tools.yaml
+    // with the (migrated) auditor key; the 1.x key layout is then restored byte for byte.
+    initWorkspace({ workspacePath: root, agentId: "default", trustBoundaryMode: "isolated" });
+    lockVault(root);
+    const keys = vaultPaths(root).keysDir;
+    for (const name of readdirSync(keys)) {
+      if (!/^(monitor|auditor|lease|session)_(ed25519\.pub|history\.json)$/.test(name)) rmSync(join(keys, name), { recursive: true, force: true });
+    }
+    writeFileSync(vaultPaths(root).vaultFile, v1.envelope, { mode: 0o600 });
+    for (const stray of ["vault.meta.json", "previous-vault.amcvault"]) { try { unlinkSync(join(root, ".amc", stray)); } catch { /* not written */ } }
+    return root;
+  }
+
+  it("a 1.x-layout clone whose signed tools.yaml verifies with the legacy auditor key is a first use, and a refused run does not migrate it", async () => {
+    const legacy = legacyLayoutWorkspace();
+    try {
+      asClone();
+      expect(existsSync(join(legacy, ".amc", "keys", "keyset.json"))).toBe(false);
+      const verdict = workspaceTrustVerdict(legacy);
+      expect(verdict).toMatchObject({ state: "first-use", surface: { signer: { kind: "legacy-role-key", generation: 0 } } });
+      if (verdict.state === "first-use") expect(verdict.surface.toolsSummary).toMatch(/^\d+ signed tools/);
+      const refused = requireWorkspaceTrust(legacy, null);
+      expect(refused.ok).toBe(false);
+      if (!refused.ok) expect(refused.reason).toContain("legacy signing key (no key set)");
+      // The real CLI entry: refused before anything unlocks the vault, so the clone is neither written nor migrated.
+      process.chdir(legacy);
+      const run = await runCli([]);
+      expect(run.failed).toBe(true);
+      expect(run.errors.join("\n")).toContain("has not trusted this workspace");
+      expect(existsSync(join(legacy, ".amc", "keys", "keyset.json"))).toBe(false);
+      expect(keysetAnchoring(legacy)).toEqual({ state: "none", generation: null });
+      expect(workspaceTrustVerdict(legacy).state).toBe("first-use");
+      // With consent the record names the legacy key; the first session then migrates the vault, committing a key set here.
+      const trusted = await runCli(["--trust-workspace"]);
+      expect(trusted.failed, trusted.errors.join("\n")).toBe(false);
+      expect(trusted.errors.join("\n")).toContain("workspace trusted on this machine (cli-flag)");
+      expect(existsSync(join(legacy, ".amc", "keys", "keyset.json"))).toBe(true);
+      expect(workspaceTrustVerdict(legacy)).toMatchObject({ state: "trusted", reason: "committed-keys" });
+      lockVault(legacy);
+    } finally { process.chdir(workspace); rmSync(legacy, { recursive: true, force: true }); }
+  });
+
+  it("openAgentSession (SDK, ACP, Studio, wire) refuses an untrusted workspace and records the ACP flag as its source", async () => {
+    asClone();
+    // Opened and closed only: the composition reads the route from the llm it is given, so an inert one is enough here.
+    const init = { workspace, agentId: "default", tools: "none" as const, systemPrompt: "s", harnessVersion: "trust-test", makeLlm: () => ({} as never),
+      compositionDigest: "composition", policyDigest: "policy", route: { providerId: STUB_PROVIDER_ID, model: STUB_PROVIDER_MODEL, params: {} } };
+    expect(() => openAgentSession(init)).toThrow(/has not trusted this workspace/);
+    expect(existsSync(storePath())).toBe(false);
+    const session = openAgentSession({ ...init, trustWorkspace: "acp-flag" });
+    await session.close();
+    expect(workspaceTrustVerdict(workspace)).toMatchObject({ state: "trusted", record: { by: "acp-flag" } });
+    expect(revokeWorkspaceTrust(workspace)).toBe(true);
+    const viaSdk = openAgentSession({ ...init, trustWorkspace: true });
+    await viaSdk.close();
+    expect(workspaceTrustVerdict(workspace)).toMatchObject({ state: "trusted", record: { by: "sdk-option" } });
+  });
+
+  it("amc native-schedule run-due refuses an untrusted workspace before any pass", async () => {
+    asClone();
+    saveSchedules(workspace, [{ id: "noop", runAs: "writer", goal: "hello", maxRounds: 1, everyMs: 60_000, enabled: true, scope: ["WRITE_LOW"] }]);
+    const errors: string[] = []; let failed = false;
+    const program = new Command().exitOverride();
+    registerNativeScheduleCommands(program, { log: () => {}, error: line => errors.push(line), fail: () => { failed = true; } }, { workspace: () => workspace });
+    await program.parseAsync(["native-schedule", "run-due", "--agent", "default", "--provider", "stub", "--approve-tools", "WRITE_LOW",
+      "--expect-digest", "0".repeat(64), "--expect-tools-digest", "0".repeat(64), "--credentials-home", credentialsHome], { from: "user" });
+    expect(failed).toBe(true);
+    expect(errors.join("\n")).toContain("has not trusted this workspace");
   });
 
   it("amc trust workspace records, reports and revokes the consent", () => {

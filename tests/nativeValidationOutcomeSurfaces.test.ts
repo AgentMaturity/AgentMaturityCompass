@@ -28,7 +28,7 @@ test.runIf(process.platform === "darwin").each(cases)("Darwin $surface public va
   vi.stubEnv("AMC_VAULT_PASSPHRASE", pass); vi.stubEnv("AMC_CONTROL_CHECKPOINT_DIR", join(base, "checkpoints"));
   for (const key of ["AMC_SESSION_STORE", "AMC_EXPECTED_MONITOR_FINGERPRINT", "AMC_NO_SIGN"]) vi.stubEnv(key, undefined);
   const f = validationOperatorFixture(workspace, mode);
-  const env = { HOME: home, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass, AMC_CONTROL_CHECKPOINT_DIR: join(base, "checkpoints"), NO_COLOR: "1" };
+  const env = { HOME: home, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass, AMC_CONTROL_CHECKPOINT_DIR: join(base, "checkpoints"), NO_COLOR: "1", AMC_TRUST_WORKSPACE: "1" };
   const approvals = observeFixtureApprovals(workspace, mode);
   let summary: AgentRunSummary;
   let observerReceipt: ReturnType<typeof approvals.stop>;
@@ -117,7 +117,7 @@ test.runIf(process.platform === "darwin")("Studio refuses a non-private operator
   const f = validationOperatorFixture(workspace, "success");
   const { createNativeTaskService } = await import(pathToFileURL(resolve("dist/studio/nativeTaskService.js")).href) as typeof import("../src/studio/nativeTaskService.js");
   const service = createNativeTaskService({ workspace, validationConfig: f.checks, credentialsHome: home,
-    environment: { HOME: home, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass, AMC_CONTROL_CHECKPOINT_DIR: join(base, "checkpoints") } });
+    environment: { HOME: home, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass, AMC_CONTROL_CHECKPOINT_DIR: join(base, "checkpoints"), AMC_TRUST_WORKSPACE: "1" } });
   const actor = { principalId: "unsafe-home-fixture", agentId: "default", demo: false };
   try {
     await expect(service.configuration(actor)).rejects.toMatchObject({ name: "CredentialsFilePermissionsError", kind: "directory", mode: 0o755 });

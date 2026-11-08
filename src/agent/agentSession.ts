@@ -34,7 +34,7 @@ import type { CompositionSource } from "../prompt/context/compositionProvenance.
 import { prepareSkillTurn, workspaceSkillRoots } from "../skills/skillTurn.js";
 import type { Skill } from "../skills/skillCatalog.js";
 import { renderSkillContext, SKILL_CONTEXT_ORDER } from "../skills/skillPrompt.js";
-import { requireWorkspaceTrust, suppliedTrustConsent } from "../security/workspaceTrust.js";
+import { consentedToolsDigest, requireWorkspaceTrust, suppliedTrustConsent, type TrustConsentSource } from "../security/workspaceTrust.js";
 
 /**
  * One AMC session, many prompts (plan P7.1a).
@@ -93,8 +93,11 @@ export interface AgentSessionInit {
   readonly expectedToolsDigest?: string;
   /** Explicit acceptance of an unconfined macOS shell; see `AgentToolsetOptions.unconfinedShell`. */
   readonly unconfinedShell?: ExplicitShellOptIn;
-  /** SH-SANDBOX-07: the host's consent for this workspace's signed configuration; a headless host may set AMC_TRUST_WORKSPACE=1 instead. */
-  readonly trustWorkspace?: boolean;
+  /**
+   * SH-SANDBOX-07: the host's consent for this workspace's signed configuration, recorded under its source (`true` is
+   * the SDK option; `amc acp --trust-workspace` passes "acp-flag"); a headless host may set AMC_TRUST_WORKSPACE=1 instead.
+   */
+  readonly trustWorkspace?: boolean | TrustConsentSource;
   /**
    * The composer's lease for this runtime; see `AgentToolsetOptions.leaseToken` (P1-67). Absent, a workspace-tools session
    * under a plan that requires a principal mints the run's lease for the OS account's active users.yaml user, or is
@@ -198,10 +201,12 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
   const workspace = resolve(init.workspace);
   return withWorkspaceScope(workspace, (): OrderedAgentSession => {
     // SH-SANDBOX-07: before the toolset, the prompt pack or any signed preset of this workspace is read.
-    const trust = requireWorkspaceTrust(workspace, suppliedTrustConsent(init.trustWorkspace === true ? "sdk-option" : undefined));
+    const trust = requireWorkspaceTrust(workspace, suppliedTrustConsent(init.trustWorkspace === true ? "sdk-option" : init.trustWorkspace || undefined));
     if (!trust.ok) throw new Error(trust.reason);
     if (init.tools !== undefined && init.tools !== "none" && init.tools !== "workspace") throw new Error("Unknown native tool mode.");
     if (init.expectedToolsDigest !== undefined && (init.tools !== "workspace" || !/^[a-f0-9]{64}$/.test(init.expectedToolsDigest))) throw new Error("A native tool policy pin requires explicit workspace tools and a SHA-256 digest.");
+    // A consented tools policy is pinned for the session's life: re-signed mid-session, it is refused, not applied.
+    const expectedToolsDigest = init.expectedToolsDigest ?? (init.tools === "workspace" ? consentedToolsDigest(trust) ?? undefined : undefined);
     if (init.maxSteps !== undefined && (!Number.isSafeInteger(init.maxSteps) || init.maxSteps < 1 || init.maxSteps > 1024)) throw new Error("Native maxSteps must be an integer from 1 through 1024.");
     if (init.compaction !== undefined) resolveCompactionConfig(init.compaction);
     const compaction = init.compaction;
@@ -229,7 +234,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       agentId: init.agentId,
       sessionId,
       ...(init.additionalCapabilities === undefined ? {} : { additionalCapabilities: init.additionalCapabilities }),
-      ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
+      ...(expectedToolsDigest === undefined ? {} : { expectedToolsDigest }),
       ...(init.unconfinedShell === undefined ? {} : { unconfinedShell: init.unconfinedShell }),
       ...(init.askUser === undefined ? {} : { askUser: init.askUser }),
       ...(init.webSearchProvider === undefined ? {} : { webSearchProvider: init.webSearchProvider }),

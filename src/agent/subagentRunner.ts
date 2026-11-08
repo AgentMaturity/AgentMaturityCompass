@@ -199,7 +199,8 @@ function recordHookControl(input: HookControlRecordInput): void {
     source: input.inherited.length === 0 ? "none" : "parent-loop",
     inherited: [...input.inherited],
     approvalGate: gate === undefined ? null
-      : { actionClass: gate.actionClass, riskTier: gate.riskTier, toolNames: gate.toolNames === undefined ? null : [...gate.toolNames] },
+      : { actionClass: gate.actionClass, riskTier: gate.riskTier, toolNames: gate.toolNames === undefined ? null : [...gate.toolNames],
+        gatesClasses: gate.gatesClasses === undefined ? null : [...gate.gatesClasses].sort(), exemptToolNames: gate.exemptToolNames === undefined ? null : [...gate.exemptToolNames].sort() },
     stopConditions: ctx.stopConditions === undefined ? null : [...ctx.stopConditions],
     descendantStopConditions: input.descendantStops === undefined ? null : [...input.descendantStops],
     delegationScope: input.scope === undefined ? null : [...input.scope],

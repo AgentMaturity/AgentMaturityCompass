@@ -56,7 +56,7 @@ test.each(["CLI", "ACP"] as const)("the built native %s uses provider-valid alia
   // The browser/CLI must not require granting either write or bash to review code.
   const policyPath = join(root, ".amc", "tools.yaml"); writeFileSync(policyPath, YAML.stringify(config));
   const originalPolicy = readFileSync(policyPath);
-  const env: NodeJS.ProcessEnv = { HOME: home, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass,
+  const env: NodeJS.ProcessEnv = { HOME: home, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass, AMC_TRUST_WORKSPACE: "1",
     AMC_SUBSET_LOOPBACK_KEY: credential, AMC_CONTROL_CHECKPOINT_DIR: checkpointRoot, NO_COLOR: "1" };
   async function run(args: string[]) {
     return new Promise<{ code: number | null; stdout: string; stderr: string }>((done, reject) => {

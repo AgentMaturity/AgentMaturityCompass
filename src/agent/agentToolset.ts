@@ -34,7 +34,7 @@ import {
   toolhubAllowlistGuard
 } from "../tools/guards/policyGuards.js";
 import { actionPolicyGuard, actionPolicyMode, actionPolicyState, type ActionPolicyState } from "../tools/guards/actionPolicyGuard.js";
-import { approvalModeNarrowing, type ApprovalMode } from "../approvals/approvalModes.js";
+import { approvalModeGatedClasses, approvalModeNarrowing, type ApprovalMode } from "../approvals/approvalModes.js";
 import { redactionCountsFor, secretRedactionFilter } from "../shield/redaction/toolOutputRedaction.js";
 import { compiledApprovalClasses, compiledPolicyFacts, compiledPolicyGuard, compiledPolicyShows, planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
 import { ToolPipeline } from "../tools/toolPipeline.js";
@@ -336,6 +336,16 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     // P0-57: a misplaced checkpoint root is its own refusal; restoring .amc/control-plan/ would not fix it.
     if (error instanceof ControlCheckpointRootInWorkspaceError) throw error;
     throw new Error(`Refusing to start: the active compiled policy cannot be verified (${error instanceof Error ? error.message : String(error)}). Restore .amc/control-plan/ from backup, or recompile and reactivate with amc catalog compile --activate (docs/catalog/COMPILER.md)`);
+  }
+  // SH-SANDBOX-04: under a compiled policy every class in approvalRequiredFor needs a signed approval. A mode that leaves
+  // such a class unasked (accept-edits with WRITE_LOW) could only deny every call in it as approval_missing; refuse by name.
+  if (options.approvalMode !== undefined) {
+    const gated = approvalModeGatedClasses(options.approvalMode);
+    const unasked = gated === null ? [] : [...compiledApprovalClasses(compiled)].filter(actionClass => !gated.has(actionClass as ActionClass)).sort();
+    if (unasked.length > 0) {
+      throw new Error(`--approval-mode ${options.approvalMode} leaves ${unasked.join(", ")} unasked, but the active compiled policy requires a signed approval for `
+        + `${unasked.length === 1 ? "it" : "them"}; use default or untrusted, or --approve-tools`);
+    }
   }
   // P1-67: bound only when the pinned plan's identity-binding requires a lease (L0-IDN-01); otherwise records bind as before.
   const leaseToken = planRequiresAgentLease(compiled) ? options.leaseToken : undefined;

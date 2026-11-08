@@ -400,7 +400,7 @@ describe("P1-03 bound subcall gates must follow durable admission", () => {
     let release!: (answer: null) => void;
     const enteredGate = new Promise<void>(resolve => { entered = resolve; });
     const answer = new Promise<null>(resolve => { release = resolve; });
-    f.pipeline.bindApprovalGate({ gates: name => name === DELETION_TOOL, ask: async () => { entered(); return answer; } });
+    f.pipeline.bindApprovalGate({ gates: call => call.name === DELETION_TOOL, ask: async () => { entered(); return answer; } });
     const { pending, callId } = gatedSubcall(f);
     let result: ToolOutcome;
     try {
@@ -430,7 +430,7 @@ describe("P1-03 bound subcall gates must follow durable admission", () => {
     expect(chain(f, prior.action!.executionId).map(row => row.state)).toEqual(["requested", "authorized", "started", "outcome_unknown"]);
     expect(f.sor.effects).toHaveLength(1);
     let asks = 0;
-    f.pipeline.bindApprovalGate({ gates: name => name === DELETION_TOOL, ask: async () => { asks += 1; return null; } });
+    f.pipeline.bindApprovalGate({ gates: call => call.name === DELETION_TOOL, ask: async () => { asks += 1; return null; } });
     const { pending } = gatedSubcall(f);
     const result = await pending;
     expect(asks, "unreconciled admission must refuse before a bound ask").toBe(0);
@@ -448,7 +448,7 @@ describe("P1-03 bound subcall gates must follow durable admission", () => {
         if (++contexts > 1) throw new Error("owned authority context unavailable");
         return { sessionId: f.sessionId };
       } });
-    pipeline.bindApprovalGate({ gates: name => name === DELETION_TOOL, ask: async () => ({ approvalRequestIds: [] }) });
+    pipeline.bindApprovalGate({ gates: call => call.name === DELETION_TOOL, ask: async () => ({ approvalRequestIds: [] }) });
     const result = await pipeline.execute({ name: DELETION_TOOL, agentId: "default", requestedMode: "EXECUTE",
       arguments: { ...FAULT_ARGUMENTS[DELETION_TOOL] }, callId: `p103-diagnosis-${randomUUID()}`, parentToken: "p103-owned-parent" });
     expect(result.denied?.stage).toBe("authorization");
@@ -462,7 +462,7 @@ describe("P1-03 bound subcall gates must follow durable admission", () => {
     const f = fixture();
     f.journal = failingJournal(f.journal, new Set(["request"]));
     let asks = 0;
-    f.pipeline.bindApprovalGate({ gates: name => name === DELETION_TOOL, ask: async () => { asks += 1; return null; } });
+    f.pipeline.bindApprovalGate({ gates: call => call.name === DELETION_TOOL, ask: async () => { asks += 1; return null; } });
     const before = counts(f);
     const result = await gatedSubcall(f).pending;
     expect(asks, "request-store refusal must precede a bound ask").toBe(0);
@@ -697,7 +697,7 @@ function grantedGateFixture() {
   const entry = new Promise<{ execution: ToolExecution; intent: AuthorizationIntentResult | null }>(resolve => { entered = resolve; });
   const grants: Array<ReturnType<typeof genuineGateGrant>> = [];
   const errors: unknown[] = [];
-  f.pipeline.bindApprovalGate({ gates: name => name === PAYMENT_TOOL, ask: async (execution, intent) => {
+  f.pipeline.bindApprovalGate({ gates: call => call.name === PAYMENT_TOOL, ask: async (execution, intent) => {
     entered({ execution, intent });
     await resumed;
     try {
@@ -852,7 +852,7 @@ test.each(["step end", "new step", "restriction", "guard restriction"] as const)
     const resumed = new Promise<void>(resolve => { resume = resolve; });
     const errors: unknown[] = [];
     let grant: ReturnType<typeof genuineGateGrant> | undefined;
-    pipeline.bindApprovalGate({ gates: name => name === PAYMENT_TOOL, ask: async (_execution, intent) => {
+    pipeline.bindApprovalGate({ gates: call => call.name === PAYMENT_TOOL, ask: async (_execution, intent) => {
       entered();
       await resumed;
       try { grant = genuineGateGrant(f, intent, auditor); return grant.authority; }

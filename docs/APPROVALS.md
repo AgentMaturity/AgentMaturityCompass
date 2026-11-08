@@ -90,10 +90,25 @@ A call that carries an authorization intent is still asked under its own signed 
 a call without one is raised under `WRITE_HIGH`, risk `high`. A tool whose class the composition cannot name is
 gated. `--approval-mode` composes its own gate, so it refuses `--approve-tools`, `--approve-risk` and
 `--approval-exception` beside it; a preset's `approveTools` is replaced by an explicit mode, and the run says so.
+In `agent-loop chat` the same precedence holds: a preset's `approveTools` is replaced by an explicit mode, and
+only an explicit `--approve-tools`/`--approve-risk` beside the mode is refused; a gating mode's requests are
+reviewed in the chat terminal exactly as `--approve-tools` requests are.
 `never`, `bypass`, `yolo`, `dontAsk`, `auto` and `danger-full-access` are refused by name: AMC has no bypass mode
 (omit the flag for no gate outside a regulated profile, or use `plan` to run nothing), and no classifier that can
-allow. `on-failure` is refused until the sandbox denial-to-escalation loop exists. The mode is recorded in the run's
-composition output; the SDK, ACP and Studio native-task options still take the expert `approveTools` form.
+allow. `on-failure` is refused until the sandbox denial-to-escalation loop exists.
+
+Two combinations are refused rather than weakened. An out-of-process delegate (`--delegate-provider <foreign>`,
+from the flag or a signed preset) runs outside this run's gate and SIMULATE narrowing, so any `--approval-mode` with
+one is refused: drop the provider (children then run in-process under the mode) or use `--approve-tools`. Under an
+active compiled policy, a mode that leaves a class the policy's `approvalRequiredFor` names unasked (for example
+`accept-edits` where `WRITE_LOW` needs a signed approval) is refused by name, because every such call could only be
+denied as `approval_missing`; use `default`, `untrusted` or `--approve-tools`.
+
+The mode, its gated classes and its exempt tools are part of the signed composition digest (`session/open`) and of
+each child's `delegation/hook-control` row, so an `accept-edits` run and a `--approve-tools WRITE_HIGH` run sign
+different digests, and a `plan` run differs from an ungated one. With a preset, the mode is recorded as an override
+source and the preset's `approveTools` as replaced. The SDK, ACP and Studio native-task options still take the
+expert `approveTools` form.
 
 ### Native one-shot and interactive review
 

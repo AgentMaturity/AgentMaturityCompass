@@ -1,3 +1,4 @@
+import { TRUST_WORKSPACE_ENV } from "../security/workspaceTrust.js";
 import { assertNativeTaskValidationPin, inspectNativeTaskValidation, nativeTaskValidationView } from "./nativeTaskValidation.js";
 import { assertNativeTaskData, assertNativeTaskInputCapability, dispatchNativeTaskInput, nativeTaskInputCapabilities,
   nativeTaskForkSchema, nativeTaskStartSchema, nativeTaskTurnSchema, prepareNativeTaskInput, type PreparedNativeTaskInput, NATIVE_TASK_MAX_PARTS_BYTES } from "./nativeTaskInput.js";
@@ -343,7 +344,9 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     // inheritEnv SDK launch would otherwise merge them back.
     const env: NodeJS.ProcessEnv = Object.fromEntries(Object.keys(process.env).map(key => [key, undefined]));
     const permitted = ["HOME", "USERPROFILE", "SystemRoot", "WINDIR", "PATH", "TMPDIR", "TEMP", "TMP", "LANG", "LC_ALL",
-      "AMC_VAULT_PASSPHRASE", "AMC_VAULT_PASSPHRASE_FILE", "AMC_EXPECTED_MONITOR_FINGERPRINT", "AMC_CONTROL_CHECKPOINT_DIR"];
+      "AMC_VAULT_PASSPHRASE", "AMC_VAULT_PASSPHRASE_FILE", "AMC_EXPECTED_MONITOR_FINGERPRINT", "AMC_CONTROL_CHECKPOINT_DIR",
+      // SH-SANDBOX-07: the operator's workspace-trust consent at Studio start; the child records it in the credentials home below.
+      TRUST_WORKSPACE_ENV];
     if (credentialed(provider)) permitted.push(REFS[provider]);
     for (const name of permitted) if (environment[name] !== undefined) env[name] = environment[name];
     // The operator's external rollback checkpoints must remain the same across
