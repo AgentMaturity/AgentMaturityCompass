@@ -65,6 +65,7 @@ export function resolveContinuityRun(io: AgentLoopCliIo, opts: ContinuityOptions
   if (opts.continue && (opts.session !== undefined || opts.forkFrom !== undefined)) return refuse("--continue chooses the session itself; it cannot be combined with --session or --fork-from.");
   if (opts.plan && (context.wantsDelegation || opts.goalRounds !== undefined)) return refuse("--plan cannot be combined with --delegate or --goal-rounds: a child's toolset is built after plan mode narrows the root's, so the restriction would not reach it.");
   if (opts.plan && context.toolMode !== "workspace") return refuse("--plan narrows the workspace tools; add --tools workspace.");
+  if (opts.plan && (opts.validate?.length ?? 0) > 0) return refuse("--plan cannot be combined with --validate: public checks run through bash, which plan mode denies, so they could only fail.");
   if (opts.interactiveSteer && (typeof process.send !== "function" || !process.connected)) return refuse("--interactive-steer requires an AMC parent with a dedicated IPC channel (child_process.fork or native chat).");
   const limits = parseRunLimits(opts.stop);
   if (!limits.ok) return refuse(`--stop: ${limits.reason}`);

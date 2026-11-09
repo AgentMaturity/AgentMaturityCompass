@@ -36,7 +36,7 @@ There is no tool that leaves plan mode. The model records its plan with the sign
 Limits, stated:
 
 - `--plan` is refused with `--delegate` and `--goal-rounds` (and the composed runner refuses plan mode with delegation, goal rounds or a schedule pass before any session row): a child's toolset is built after the root's is narrowed, so the restriction would not reach it.
-- `--plan` requires `--tools workspace`; there is nothing to narrow in `echo` or `none`.
+- `--plan` requires `--tools workspace`; there is nothing to narrow in `echo` or `none`. It is refused with `--validate`, whose public checks run through `bash`, which plan mode denies.
 - Native chat has no plan-mode switch in this slice. Plan with `amc agent-loop run --plan --keep-open` and execute with `--session <id>`.
 - A host that pins the system prompt through the runtime API (`runComposedTurn` with `systemPrompt`) gets no runtime context, so such a run is restricted the same way but is not told so in its prompt. `agent-loop run` always assembles its prompt.
 - A tool whose reviewed class is `READ_ONLY` but which mutates something outside the workspace (an MCP tool with a wrong review) is the review's claim, not this mode's.
@@ -56,7 +56,7 @@ With `--interactive-steer`, a parent process that forked the run with `child_pro
 - `{ type: "amc/native-withdraw", v: 1, messageId }` → `{ …, ok: true, frame: "withdraw", messageId, withdrawn }`.
 - A malformed frame (unknown lane, empty text, more than 256 KiB, a bad id) or one that arrives after the driver closed admission (disposed, or ended by a run limit) is answered `ok: false` with `refused` and touches no inbox.
 
-Like `--interactive-approvals`, the flag is refused without an IPC channel, and the listener is removed when the turn ends so the channel never keeps the process alive.
+Like `--interactive-approvals`, the flag is refused without an IPC channel, and the listener is removed when the turn ends so the channel never keeps the process alive. The listener starts when the composed turn is ready: a frame sent before that gets no answer, so a parent waits for its first answer (a malformed probe is answered too) before it relies on delivery.
 
 Limits, stated:
 

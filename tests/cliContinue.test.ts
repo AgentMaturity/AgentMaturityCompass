@@ -119,6 +119,7 @@ describe("amc agent-loop run --stop", () => {
     expect(result.errors.join("\n")).toContain("Run limit reached: timeout-ms:100");
     const ending = readTurnEndMeta(events(result.summary!.sessionId).find(row => row.event_type === "turn/end")!.meta_json);
     expect(ending).toMatchObject({ reason: "cancelled", cancelCause: { kind: "limit", condition: "deadline", bound: 100 } });
+    expect((await verifyAgentRun(workspace, result.summary!.sessionId)).integrityOk).toBe(true);
   });
 
   it("a resumed session already at its turn bound is refused before its prompt runs: runLimit in the JSON, exit 1", async () => {
@@ -133,5 +134,6 @@ describe("amc agent-loop run --stop", () => {
     expect(rows.filter(row => row.event_type === "turn/start")).toHaveLength(1);
     expect(rows.filter(row => row.event_type === "loop/cancel").map(row => JSON.parse(row.meta_json) as Record<string, unknown>))
       .toEqual([expect.objectContaining({ requestedBy: "run-limit", cause: { kind: "limit", condition: "max-turns", bound: 1 } })]);
+    expect((await verifyAgentRun(workspace, first.summary!.sessionId)).integrityOk).toBe(true);
   });
 });

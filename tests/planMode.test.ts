@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, realpathSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Command } from "commander";
@@ -116,7 +116,11 @@ describe("amc agent-loop run --plan", () => {
   });
 
   it("refuses --plan with --delegate, with --goal-rounds and without workspace tools, before any session row", async () => {
-    for (const extra of [["--tools", "workspace", "--delegate"], ["--tools", "workspace", "--delegate", "--goal-rounds", "2"], ["--tools", "echo"]]) {
+    // MUTATION: drop the --validate refusal and a planning turn runs checks plan mode can only deny.
+    const checks = join(credentialsHome, "checks.json");
+    writeFileSync(checks, JSON.stringify({ schemaVersion: 1, checks: [{ id: "unit", title: "Unit", command: "printf never > must-not-run", timeoutMs: 1000 }] }));
+    for (const extra of [["--tools", "workspace", "--delegate"], ["--tools", "workspace", "--delegate", "--goal-rounds", "2"], ["--tools", "echo"],
+      ["--tools", "workspace", "--validation-config", checks, "--validate", "unit"]]) {
       const result = await runCli(["plan something", "--plan", ...extra]);
       expect(result.failed, extra.join(" ")).toBe(true);
       expect(result.errors.join("\n")).toMatch(/--plan/);
