@@ -56,7 +56,8 @@ describe("capability matrix generator (P1-38)", () => {
     expect(renderMatrix(matrix)).toBe(readFileSync(MATRIX_MD, "utf8"));
     expect(matrix.liveProvider).toBe("not run");
     expect(matrix.routes.map((route: { route: string }) => route.route)).toEqual(["anthropic", "openai", "openai-responses", "deepseek",
-      "gemini", "gemini-audio", "ollama", "pi-ai:groq", "pi-ai:huggingface", "pi-ai:together"]);
+      "gemini", "gemini-audio", "ollama", "groq", "mistral", "xai", "openrouter", "together", "fireworks", "lmstudio",
+      "vllm", "llamacpp", "azure-openai", "pi-ai:groq", "pi-ai:huggingface", "pi-ai:together"]);
     for (const route of matrix.routes) {
       for (const cell of Object.values(route.features) as { support: string; tests: { status: string }[] }[]) {
         if (cell.support === "supported" || cell.support === "unsupported") expect(cell.tests.every((t) => t.status === "passed")).toBe(true);
