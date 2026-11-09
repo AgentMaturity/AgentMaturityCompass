@@ -28,7 +28,7 @@
  */
 import type { ToolExecution } from "../../tools/toolTypes.js";
 import { assertNoDuplicateJsonKeys } from "../../utils/json.js";
-import { redactSecrets } from "./redactSecrets.js";
+import { redactSecrets, type SecretFinding } from "./redactSecrets.js";
 
 export const REDACTION_PLACEHOLDER_PREFIX = "[AMC_REDACTED:";
 const placeholderFor = (type: string): string => `${REDACTION_PLACEHOLDER_PREFIX}${type}]`;
@@ -96,24 +96,30 @@ function redactJsonValues(value: unknown, name: string | null, state: JsonRedact
 const coversEveryType = (found: Readonly<Record<string, number>>, floor: Readonly<Record<string, number>>): boolean =>
   Object.entries(floor).every(([type, count]) => (found[type] ?? 0) >= count);
 
-/** Re-read names and decoded values: JSON escapes can hide a match from the serialized text scan. */
-function firstJsonSecret(root: unknown): string | undefined {
-  const pending: { value: unknown; name: string | null }[] = [{ value: root, name: null }];
+const findingIdentity = ({ type, index }: SecretFinding): string => `${type}:${index}`;
+
+/** Scan decoded JSON. In the source scan, retain a secret's original field name before redaction can remove it. */
+function firstJsonSecret(root: unknown, sourceScalars = false): string | undefined {
+  const pending: { value: unknown; name: string | null; inName?: ReadonlySet<string> }[] = [{ value: root, name: null }];
   while (pending.length > 0) {
-    const { value, name } = pending.pop()!;
+    const current = pending.pop()!;
+    const { value, name, inName } = current;
     if (Array.isArray(value)) {
-      for (const item of value) pending.push({ value: item, name });
+      for (const item of value) pending.push({ ...current, value: item });
     } else if (value !== null && typeof value === "object") {
       for (const [key, item] of Object.entries(value)) {
-        const found = redactSecrets(key, placeholderFor).findings[0];
-        if (found !== undefined) return found.type;
-        pending.push({ value: item, name: key });
+        const keyFindings = redactSecrets(key, placeholderFor).findings;
+        if (!sourceScalars && keyFindings.length > 0) return keyFindings[0]!.type;
+        pending.push({ value: item, name: key, ...(keyFindings.length === 0 ? {} : { inName: new Set(keyFindings.map(findingIdentity)) }) });
       }
     } else if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+      // Unchanged string member names remain available to the decoded output scan.
+      if (sourceScalars && (name === null || (typeof value === "string" && inName === undefined))) continue;
       // Exponential formatting must not hide a long integer under a secret-named member.
       const scalar = typeof value === "number" && Number.isInteger(value) && Math.abs(value) >= 1e21
         ? BigInt(value).toString() : String(value);
-      const found = redactSecrets(name === null ? scalar : `${name}=${scalar}`, placeholderFor).findings[0];
+      const found = redactSecrets(name === null ? scalar : `${name}=${scalar}`, placeholderFor).findings
+        .find(finding => !inName?.has(findingIdentity(finding)));
       if (found !== undefined) return found.type;
     }
   }
@@ -138,6 +144,12 @@ export function secretRedactionFilter(output: string, execution: ToolExecution):
 
   const flat = result.findings.length === 0 ? parsed : parseJson(result.redacted);
   const remaining = flat === undefined ? undefined : firstJsonSecret(flat);
+  const sourceSecret = result.findings.length === 0 && remaining === undefined ? undefined : firstJsonSecret(parsed, true);
+  if (sourceSecret !== undefined) {
+    // A flat match can redact a name before another pattern sees its value.
+    findings.set(execution, { ...counts, [sourceSecret]: counts[sourceSecret] ?? 1 });
+    return placeholderFor("output_withheld");
+  }
   if (flat !== undefined && remaining === undefined && (result.findings.length === 0
     || (hasUniqueJsonKeys(result.redacted) && redactSecrets(result.redacted, placeholderFor).findings.length === 0))) {
     if (result.findings.length > 0) findings.set(execution, counts);

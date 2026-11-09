@@ -86,6 +86,14 @@ describe("the tool-output secret redaction filter (SH-SANDBOX-06)", () => {
     expect(secretRedactionFilter(raw, { name: "fs.read" } as never)).toBe("[AMC_REDACTED:output_withheld]");
   });
 
+  it("S22: redacting a member name cannot hide its secret-bearing value", () => {
+    const name = `${GITHUB}apiKey`;
+    for (const value of ['"abcdefghijklmnop1234"', "1234567890123456789"]) {
+      const raw = `{"${name}":${value}}`;
+      expect(secretRedactionFilter(raw, { name: "fs.read" } as never)).toBe("[AMC_REDACTED:output_withheld]");
+    }
+  });
+
   it("S22: 50,000 colliding keys reach a bounded, safe fallback", () => {
     const keys = Array.from({ length: 50_000 }, (_, i) => `"AKIA${i.toString(36).toUpperCase().padStart(16, "0")}":"x"`);
     const raw = `{"api_key":"abcdefghijklmnop1234",${keys.join(",")}}`;
