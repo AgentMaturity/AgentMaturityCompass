@@ -1,0 +1,7 @@
+---
+"agent-maturity-compass": minor
+---
+
+`amc integrations sign` signs an edited `.amc/integrations.yaml`, so a notification channel's url, its enabled flag and the routing can change after `amc integrations init` (which writes only the template); `amc integrations setup --type slack|webhook` now prints those steps instead of writing a file nothing read, and `--type discord|pagerduty` is refused because AMC has no such channel. The signer runs in owner mode and strict-parses the bytes it signs, so an invalid config is never signed. The setup command's notification files were never read by any code: the unreachable notifier behind them (raw HTTP outside the governed delivery queue) is removed, and an unknown `--type` is now an error instead of an empty success. The observability targets change the same way: `--type langfuse|helicone|datadog` writes no file and names the key inputs `amc watch connect` reads (`--api-key-file` or `AMC_WATCH_API_KEY`, not the `AMC_LANGFUSE_*`/`AMC_HELICONE_*`/`AMC_DD_*` variables it printed before, which nothing read). `amc watch connect` and `amc monitor live` take `--secret-key-file` (or `AMC_WATCH_SECRET_KEY`) for Langfuse's secret key, which they could not send before, so the Langfuse adapter authenticates with the public and the secret key together; another provider refuses it.
+
+freeze-exception: SH-INTEG — amc integrations sign (re-sign an edited integrations.yaml; the governed notification config could otherwise never change after init)

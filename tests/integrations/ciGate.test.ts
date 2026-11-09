@@ -1,10 +1,10 @@
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { delimiter, dirname, join, resolve } from "node:path";
 import YAML from "yaml";
 import { afterAll, describe, it, expect } from "vitest";
-import { evaluateCIGate, generateGitHubAction, generateGitLabCI, generateConnectorConfig } from "../../src/integrations/ciGate.js";
+import { evaluateCIGate, generateGitHubAction, generateGitLabCI, generateConnectorConfig, setupIntegration } from "../../src/integrations/ciGate.js";
 import { amcVersion } from "../../src/version.js";
 
 const roots: string[] = [];
@@ -81,6 +81,27 @@ describe("CI Gate", () => {
   });
 });
 
+describe("setup for notification targets writes no file that nothing reads", () => {
+  it("slack and webhook name the signed integrations.yaml steps and write nothing", () => {
+    const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-setup-notify-")));
+    roots.push(dir);
+    for (const type of ["slack", "webhook"] as const) {
+      const result = setupIntegration(dir, type, { outputDir: dir });
+      expect(result.files).toEqual([]);
+      expect(result.instructions).toContain("amc integrations init");
+      expect(result.instructions).toContain("amc integrations sign");
+      expect(result.instructions).toContain(type === "slack" ? "slack_webhook" : "HMAC signature");
+    }
+    expect(readdirSync(dir)).toEqual([]);
+  });
+
+  it("refuses targets AMC has no channel for, and unknown types", () => {
+    expect(() => setupIntegration("/nonexistent", "discord")).toThrow(/no Discord channel/);
+    expect(() => setupIntegration("/nonexistent", "pagerduty")).toThrow(/no PagerDuty channel/);
+    expect(() => setupIntegration("/nonexistent", "bogus" as never)).toThrow(/^unknown integration type: bogus;/);
+  });
+});
+
 describe("GitHub Action Generator", () => {
   it("generates valid YAML with default config", () => {
     const yaml = generateGitHubAction({});
@@ -147,21 +168,24 @@ describe("generated CI templates: real flags and package, no evidence yet is nev
 });
 
 describe("Connector Config Generator", () => {
-  it("generates Langfuse config", () => {
-    const config = generateConnectorConfig("langfuse");
-    expect(config.envVars).toHaveProperty("AMC_LANGFUSE_PUBLIC_KEY");
-    expect(config.configYaml).toContain("langfuse");
-    expect(config.instructions).toContain("cloud.langfuse.com");
+  // The earlier assertions pinned AMC_LANGFUSE_*/AMC_HELICONE_*/AMC_DD_* variables, which nothing reads: they encoded the defect.
+  it("names the key inputs amc watch connect reads, never argv or variables nothing reads", () => {
+    for (const provider of ["langfuse", "helicone", "datadog"] as const) {
+      const { instructions } = generateConnectorConfig(provider);
+      expect(instructions).toContain(`amc watch connect --provider ${provider} --endpoint https://`);
+      expect(instructions).toContain("--api-key-file");
+      expect(instructions).toContain("AMC_WATCH_API_KEY");
+      expect(instructions).not.toMatch(/AMC_(HELICONE|DD|LANGFUSE)_/);
+    }
+    // Langfuse's API takes the public and the secret key together.
+    expect(generateConnectorConfig("langfuse").instructions).toMatch(/--secret-key-file <the secret file>.*AMC_WATCH_SECRET_KEY/s);
+    expect(generateConnectorConfig("helicone").instructions).not.toContain("--secret-key-file");
   });
 
-  it("generates Helicone config", () => {
-    const config = generateConnectorConfig("helicone");
-    expect(config.envVars).toHaveProperty("AMC_HELICONE_API_KEY");
-    expect(config.configYaml).toContain("helicone");
-  });
-
-  it("generates Datadog config", () => {
-    const config = generateConnectorConfig("datadog");
-    expect(config.envVars).toHaveProperty("AMC_DD_API_KEY");
+  it("setup writes no connector file", () => {
+    const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-setup-connector-")));
+    roots.push(dir);
+    for (const type of ["langfuse", "helicone", "datadog"] as const) expect(setupIntegration(dir, type, { outputDir: dir }).files).toEqual([]);
+    expect(readdirSync(dir)).toEqual([]);
   });
 });

@@ -12,6 +12,7 @@ cited qualification record. Everything else is observed or not covered. The supp
 | claude-code | `@anthropic-ai/claude-code` | 2.1.296 | `PreToolUse`, `UserPromptSubmit` | `SessionStart`, `PostToolUse`, `PostToolUseFailure`, `Stop` | enforced at listed hooks | `qualification/2026-10-18-P1-23/claude-code-conformance.json` (2026-10-18, sha256 `7adc12dc0f1b`) |
 | codex | `@openai/codex` | none (source pin `360319d8`) | none | `PostToolUse` | observe only, no qualified version | none |
 | dsh | `@deepseek-ai/dsh` | none (source pin `c389f96b`) | none | `launch (process boundary)`, `gateway (model traffic)` | observe only, no qualified version | none |
+| gemini-cli | `@google/gemini-cli` | none (source pin `f354eeba`) | none | `AfterTool` | observe only, no qualified version | none |
 | pi | `@earendil-works/pi-coding-agent` | 1.0.2, 1.0.4 | `tool_call` | `tool_result` | enforced at listed hooks | `qualification/2026-10-18-P1-22/pi-conformance.json` (2026-10-18, sha256 `d421dee04466`) |
 
 ## Per hook
@@ -62,6 +63,20 @@ Not covered:
 - DSH's own sandbox and approval settings (AMC does not rely on them)
 - custom plugins, changed profiles and direct web requests outside the gateway
 - the exec-by-path window after the last launcher hash
+
+### gemini-cli
+
+| Hook | Role | Tools | On hook failure | Backing cases | Contract |
+|---|---|---|---|---|---|
+| `AfterTool` | observe | every tool Gemini CLI reports at AfterTool | proceeds | none | docs/adapters/gemini.md |
+
+Not covered:
+
+- every Gemini CLI tool call: `amc connect hooks install --provider gemini-cli` installs a BeforeTool command hook that forwards an observation and returns no decision by default; with `--mode control` it answers allow or deny from the signed policy (run_shell_command is parsed into a command plan), but the Bridge registers no Gemini session and binds no authorization record for it, so the answer is advisory: AMC claims no enforcement at BeforeTool
+- no Gemini CLI version is qualified: neither hook has a recorded run of a pinned Gemini CLI binary, and there is no qualification record
+- what Gemini CLI does when the BeforeTool hook fails or times out (not verified by AMC)
+- calls Gemini CLI does not report at AfterTool, and sessions where the project hooks file was not loaded
+- tool input and output contents (AMC records their SHA-256 only)
 
 ### pi
 

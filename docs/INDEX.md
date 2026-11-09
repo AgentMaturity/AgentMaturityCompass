@@ -67,6 +67,7 @@ Use this page to reach the shortest evidence-backed path for your task. AMC's pu
 - [API Reference](API_REFERENCE.md)
 - [OpenAPI Surfaces](API_SURFACES.md)
 - [CI Templates](CI_TEMPLATES.md)
+- [Source Intake (GitHub observations, admission, proposals)](SOURCE_INTAKE.md)
 - [Examples Index](EXAMPLES_INDEX.md)
 
 ## Operate And Deploy

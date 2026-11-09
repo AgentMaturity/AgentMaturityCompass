@@ -1,0 +1,170 @@
+/**
+ * An explicit request becomes a proposal (SH-INTEG-02): one signed approval request in the agent's existing inbox,
+ * decided by a human with `amc approvals approve|deny` or Studio. The request binds the signed work order (the engine
+ * verifies and hashes it), the observation's identity and the policy digest. It is filed under the strictest class the
+ * work order allows, as the signed approval policy rates the classes, with a quorum floor that combines every allowed
+ * class's rule (most approvals, distinct users if any rule asks, only the roles every rule allows) and at least one
+ * approval, so a class the approval policy auto-allows still waits for a person.
+ *
+ * The approvals engine does not deduplicate by intentId, so the proposals table is reserved before the request is
+ * created and completed after; a crashed filer is recovered by intentId, and a filer whose reservation was taken over
+ * cancels the request it filed. Notification reuses the approval lifecycle delivery (APPROVAL_REQUEST_CREATED through
+ * integrations.yaml routing, which may deliver over the network); without a signed integrations.yaml it reports
+ * BLOCKED:INTEGRATIONS_UNTRUSTED, and SKIPPED when the config routes no channel.
+ */
+import type Database from "better-sqlite3";
+import { cancelApprovalRequestForIntent, createApprovalForIntent } from "../../approvals/approvalEngine.js";
+import { listApprovalRequests } from "../../approvals/approvalChainStore.js";
+import { deliverApprovalLifecycle } from "../../approvals/approvalDelivery.js";
+import { approvalRuleForAction, defaultApprovalPolicy, loadVerifiedApprovalPolicy } from "../../approvals/approvalPolicyEngine.js";
+import type { ApprovalClassPolicy } from "../../approvals/approvalPolicySchema.js";
+import { ACTION_CLASSES } from "../../governor/actionCatalog.js";
+import type { UserRole } from "../../auth/roles.js";
+import type { ActionClass } from "../../types.js";
+import { loadWorkOrder } from "../../workorders/workorderEngine.js";
+import { releaseProposal, reserveProposal, settleProposal } from "./sourceIntakeStore.js";
+import type { SourceObservation } from "./sourceObservationSchema.js";
+import type { SourcePolicySource } from "./sourcePolicySchema.js";
+
+const SOURCE_ADMIT_TOOL = "amc.source.admit";
+const SOURCE_REQUEST_INTENT_SCHEMA = "amc.source-request/v1";
+
+export type WorkOrderRefusal = "work_order_unavailable" | "work_order_agent_mismatch";
+export type ProposalOutcome =
+  | { state: "proposed"; approvalRequestId: string; actionClass: ActionClass; notification: string }
+  | { state: "already_proposed"; approvalRequestId: string }
+  | { state: "held" }
+  | { state: "refused"; reason: WorkOrderRefusal | "approval_refused"; detail: string };
+
+export function sourceIntentId(observationId: string): string {
+  return `source:${observationId}`;
+}
+
+/** The source's bound work order, verified as `admit` requires it (signed, unexpired, unrevoked, the source's agent). */
+export function verifyBoundWorkOrder(workspace: string, source: SourcePolicySource): { ok: true; workOrder: ReturnType<typeof loadWorkOrder> } | { ok: false; reason: WorkOrderRefusal; detail: string } {
+  let workOrder: ReturnType<typeof loadWorkOrder>;
+  try {
+    workOrder = loadWorkOrder({ workspace, agentId: source.agentId, workOrderId: source.workOrderId, requireValidSignature: true });
+  } catch (error) {
+    return { ok: false, reason: "work_order_unavailable", detail: String(error) };
+  }
+  if (workOrder.agentId !== source.agentId) return { ok: false, reason: "work_order_agent_mismatch", detail: `work order belongs to ${workOrder.agentId}, source names ${source.agentId}` };
+  return { ok: true, workOrder };
+}
+
+/** Strictness as the policy rates it: assurance packs, then approvals, then fewer roles, then a shorter TTL; the catalogue order breaks ties. */
+function stricter(a: [ActionClass, ApprovalClassPolicy], b: [ActionClass, ApprovalClassPolicy]): number {
+  return Number(Boolean(b[1].requireAssurancePacks)) - Number(Boolean(a[1].requireAssurancePacks))
+    || b[1].requiredApprovals - a[1].requiredApprovals
+    || a[1].rolesAllowed.length - b[1].rolesAllowed.length
+    || a[1].ttlMinutes - b[1].ttlMinutes
+    || ACTION_CLASSES.indexOf(b[0]) - ACTION_CLASSES.indexOf(a[0]);
+}
+
+/**
+ * The class to file under and the floor every allowed class's rule contributes. The ranking reads the signed approval
+ * policy when it verifies; otherwise the defaults, which is what the engine installs when none exists (an unsigned or
+ * tampered policy is refused by the engine itself).
+ */
+export function proposalQuorum(workspace: string, allowed: readonly ActionClass[]): { actionClass: ActionClass; quorumFloor: { requiredApprovals: number; requireDistinctUsers: boolean; rolesAllowed: UserRole[] } } {
+  const policy = loadVerifiedApprovalPolicy(workspace).policy ?? defaultApprovalPolicy();
+  const rules = allowed.map((actionClass): [ActionClass, ApprovalClassPolicy] => [actionClass, approvalRuleForAction(policy, actionClass)]).sort(stricter);
+  const roles = rules.map(([, rule]) => rule.rolesAllowed as UserRole[]);
+  return {
+    actionClass: rules[0]![0],
+    quorumFloor: {
+      requiredApprovals: Math.max(1, ...rules.map(([, rule]) => rule.requiredApprovals)),
+      requireDistinctUsers: rules.some(([, rule]) => rule.requireDistinctUsers),
+      rolesAllowed: roles[0]!.filter((role) => roles.every((set) => set.includes(role)))
+    }
+  };
+}
+
+/** The delivery summary's status, so a caller never reads a missing integrations config as a sent notification. */
+async function notify(workspace: string, agentId: string, approvalRequestId: string): Promise<string> {
+  try {
+    const summary = await deliverApprovalLifecycle({ workspace, agentId, approvalRequestId, trigger: "REQUEST_CREATED" });
+    return summary.reasonCode === null ? summary.status : `${summary.status}:${summary.reasonCode}`;
+  } catch (error) {
+    return `FAILED: ${String(error)}`;
+  }
+}
+
+export async function proposeSourceRequest(params: {
+  workspace: string; db: Database.Database; observation: SourceObservation; source: SourcePolicySource;
+  sender: { id: number; login: string }; policyDigest: string; now?: number;
+  /** Test seam, as `createApprovalForIntentAsync` has: runs between the request's creation and the settle. */
+  beforeSettle?: () => void;
+}): Promise<ProposalOutcome> {
+  const { workspace, db, observation, source } = params;
+  const now = params.now ?? Date.now();
+  const reservation = reserveProposal(db, observation.observationId, now);
+  if (reservation.outcome === "held") return { state: "held" };
+  if (reservation.outcome === "existing") {
+    const row = reservation.row;
+    if (row.state === "proposed" && row.approvalRequestId !== null) return { state: "already_proposed", approvalRequestId: row.approvalRequestId };
+    return { state: "refused", reason: "approval_refused", detail: `observation settled as ${row.state}: ${row.reason ?? "no reason"}` };
+  }
+  const token = reservation.token;
+  const refuse = (reason: Extract<ProposalOutcome, { state: "refused" }>["reason"], detail: string): ProposalOutcome => {
+    releaseProposal(db, observation.observationId, token);
+    return { state: "refused", reason, detail };
+  };
+  // A crashed filer may have created the request before settling the row: recover it by intentId rather than file twice.
+  // Until a request exists, any failure releases the reservation, so one bad read never holds the observation or ends the batch.
+  const intentId = sourceIntentId(observation.observationId);
+  let recovered: ReturnType<typeof listApprovalRequests>[number] | undefined;
+  try {
+    recovered = listApprovalRequests({ workspace, agentId: source.agentId }).find((request) => request.intentId === intentId && request.toolName === SOURCE_ADMIT_TOOL);
+  } catch (error) {
+    return refuse("approval_refused", String(error));
+  }
+  if (recovered) {
+    settleProposal(db, observation.observationId, token, { state: "proposed", approvalRequestId: recovered.approvalRequestId }, now);
+    return { state: "already_proposed", approvalRequestId: recovered.approvalRequestId };
+  }
+  const bound = verifyBoundWorkOrder(workspace, source);
+  if (!bound.ok) return refuse(bound.reason, bound.detail);
+  const { workOrder } = bound;
+  let approvalRequestId: string, actionClass: ActionClass;
+  try {
+    const quorum = proposalQuorum(workspace, workOrder.allowedActionClasses);
+    actionClass = quorum.actionClass;
+    const quorumFloor = quorum.quorumFloor;
+    const created = createApprovalForIntent({
+      workspace, agentId: source.agentId, intentId, toolName: SOURCE_ADMIT_TOOL, actionClass, workOrderId: workOrder.workOrderId,
+      requestedMode: workOrder.requestedMode, effectiveMode: workOrder.requestedMode, riskTier: workOrder.riskTier,
+      quorumFloor,
+      initiator: `github:${params.sender.login}`,
+      intentPayload: {
+        schema: SOURCE_REQUEST_INTENT_SCHEMA, sourceId: source.id, observationId: observation.observationId, nativeEventId: observation.nativeEventId,
+        revisionDigest: observation.revisionDigest, contentSha256: observation.contentSha256, threadKey: observation.primaryThreadKey,
+        repositoryId: observation.repository.id, sender: { id: params.sender.id, login: params.sender.login }, policyDigest: params.policyDigest,
+        workOrderId: workOrder.workOrderId
+      }
+    });
+    approvalRequestId = created.request.approvalRequestId;
+  } catch (error) {
+    return refuse("approval_refused", String(error));
+  }
+  params.beforeSettle?.();
+  if (!settleProposal(db, observation.observationId, token, { state: "proposed", approvalRequestId }, now)) {
+    // Another filer took the reservation over while this one stalled and filed its own request: this one is the orphan.
+    let cancelled = "cancelled";
+    try {
+      cancelApprovalRequestForIntent({ workspace, agentId: source.agentId, approvalId: approvalRequestId });
+    } catch (error) {
+      cancelled = `could not be cancelled: ${String(error)}`;
+    }
+    return { state: "refused", reason: "approval_refused", detail: `reservation taken over by another filer; request ${approvalRequestId} ${cancelled}` };
+  }
+  const notification = await notify(workspace, source.agentId, approvalRequestId);
+  return { state: "proposed", approvalRequestId, actionClass, notification };
+}
+
+/** Records a policy refusal so `admit --all-pending` does not revisit it; the row keeps the reason, never the body. */
+export function recordNotAdmitted(db: Database.Database, observationId: string, reason: string, now = Date.now()): void {
+  const reservation = reserveProposal(db, observationId, now);
+  if (reservation.outcome !== "reserved") return;
+  settleProposal(db, observationId, reservation.token, { state: "not_admitted", reason }, now);
+}

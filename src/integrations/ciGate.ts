@@ -1,17 +1,15 @@
 /**
  * CI/CD Gate & Integration Ecosystem — Gap 10
  *
- * GitHub Actions, generic CI gate, webhook notifiers, and
- * observability platform connectors.
+ * GitHub Actions and generic CI gates, plus the `amc watch connect` steps for observability providers.
+ * Notifications are not generated here: they go through the signed
+ * .amc/integrations.yaml (integrationStore.ts, `amc integrations init|sign`).
  */
 
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
-import { request as httpRequest } from "node:http";
-import { request as httpsRequest } from "node:https";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { amcVersion } from "../version.js";
-import type { ObservabilityProvider } from "../watch/observabilityBridge.js";
 import * as fs from 'node:fs';
 
 /* ── Types ───────────────────────────────────────────────────────── */
@@ -41,14 +39,6 @@ export interface GitHubAnnotation {
   line: number;
   level: "notice" | "warning" | "error";
   message: string;
-}
-
-export interface WebhookNotifierConfig {
-  type: IntegrationType;
-  url: string;
-  token?: string;
-  channel?: string;
-  mentionOn?: "critical" | "warning" | "all";
 }
 
 /* ── CI Gate ──────────────────────────────────────────────────────── */
@@ -294,213 +284,54 @@ amc-gate:
 `;
 }
 
-/* ── Webhook Notifier ────────────────────────────────────────────── */
+/* ── Observability connectors (amc watch connect) ──────────────── */
 
-export async function sendWebhookNotification(
-  config: WebhookNotifierConfig,
-  payload: {
-    title: string;
-    message: string;
-    severity: "info" | "warning" | "critical";
-    score?: number;
-    agentId?: string;
-    details?: Record<string, unknown>;
-  },
-): Promise<boolean> {
-  switch (config.type) {
-    case "slack": return sendSlackNotification(config, payload);
-    case "discord": return sendDiscordNotification(config, payload);
-    case "pagerduty": return sendPagerDutyNotification(config, payload);
-    case "webhook": return sendGenericWebhook(config, payload);
-    default: return sendGenericWebhook(config, payload);
-  }
-}
+const CONNECTORS: Readonly<Record<"langfuse" | "helicone" | "datadog", { name: string; endpoint: string; key: string; secret?: string }>> = {
+  langfuse: { name: "Langfuse", endpoint: "https://cloud.langfuse.com", key: "your Langfuse public key", secret: "your Langfuse secret key" },
+  helicone: { name: "Helicone", endpoint: "https://api.helicone.ai", key: "your Helicone API key" },
+  datadog: { name: "Datadog", endpoint: "https://api.datadoghq.com", key: "your Datadog API key (sent as the DD-API-KEY header)" }
+};
 
-async function sendSlackNotification(
-  config: WebhookNotifierConfig,
-  payload: { title: string; message: string; severity: string; score?: number },
-): Promise<boolean> {
-  const color = payload.severity === "critical" ? "#FF0000" : payload.severity === "warning" ? "#FFA500" : "#36A64F";
-  const emoji = payload.severity === "critical" ? "🚨" : payload.severity === "warning" ? "⚠️" : "✅";
-
-  const slackPayload = {
-    channel: config.channel,
-    attachments: [{
-      color,
-      blocks: [
-        {
-          type: "section",
-          text: { type: "mrkdwn", text: `${emoji} *${payload.title}*\n${payload.message}` },
-        },
-        ...(payload.score !== undefined ? [{
-          type: "section",
-          fields: [
-            { type: "mrkdwn", text: `*Score:* ${payload.score.toFixed(1)}%` },
-            { type: "mrkdwn", text: `*Severity:* ${payload.severity}` },
-          ],
-        }] : []),
-      ],
-    }],
+/**
+ * The `amc watch connect` steps for a provider. Keys go in private files or in AMC_WATCH_API_KEY (and, for Langfuse's
+ * secret key, AMC_WATCH_SECRET_KEY), never argv; no file is written, because nothing reads one.
+ */
+export function generateConnectorConfig(provider: keyof typeof CONNECTORS): { instructions: string } {
+  const connector = CONNECTORS[provider];
+  const secret = connector.secret;
+  return {
+    instructions: [
+      `${connector.name} traces are read by \`amc watch connect\`; setup writes no file, because nothing reads one.`,
+      `1. Save ${connector.key} in a file only you can read (chmod 600)${secret === undefined ? "" : `, and ${secret} in another`}.`,
+      `2. amc watch connect --provider ${provider} --endpoint ${connector.endpoint} --api-key-file <that file>${secret === undefined ? "" : " --secret-key-file <the secret file>"}`
+        + `   (or set AMC_WATCH_API_KEY${secret === undefined ? "" : " and AMC_WATCH_SECRET_KEY"}; --api-key would put the key in argv)`
+    ].join("\n")
   };
-
-  return httpPost(config.url, slackPayload, config.token ? { Authorization: `Bearer ${config.token}` } : {});
-}
-
-async function sendDiscordNotification(
-  config: WebhookNotifierConfig,
-  payload: { title: string; message: string; severity: string; score?: number },
-): Promise<boolean> {
-  const color = payload.severity === "critical" ? 0xFF0000 : payload.severity === "warning" ? 0xFFA500 : 0x36A64F;
-
-  const discordPayload = {
-    embeds: [{
-      title: payload.title,
-      description: payload.message,
-      color,
-      fields: payload.score !== undefined ? [
-        { name: "Score", value: `${payload.score.toFixed(1)}%`, inline: true },
-        { name: "Severity", value: payload.severity, inline: true },
-      ] : [],
-      footer: { text: "AMC (Agent Maturity Compass)" },
-      timestamp: new Date().toISOString(),
-    }],
-  };
-
-  return httpPost(config.url, discordPayload);
-}
-
-async function sendPagerDutyNotification(
-  config: WebhookNotifierConfig,
-  payload: { title: string; message: string; severity: string },
-): Promise<boolean> {
-  const pdPayload = {
-    routing_key: config.token,
-    event_action: payload.severity === "critical" ? "trigger" : "acknowledge",
-    payload: {
-      summary: `${payload.title}: ${payload.message}`,
-      source: "amc",
-      severity: payload.severity === "critical" ? "critical" : payload.severity === "warning" ? "warning" : "info",
-      component: "agent-maturity-compass",
-    },
-  };
-
-  return httpPost(config.url || "https://events.pagerduty.com/v2/enqueue", pdPayload);
-}
-
-async function sendGenericWebhook(
-  config: WebhookNotifierConfig,
-  payload: { title: string; message: string; severity: string; score?: number; agentId?: string; details?: Record<string, unknown> },
-): Promise<boolean> {
-  const webhookPayload = {
-    event: "amc.alert",
-    ts: new Date().toISOString(),
-    ...payload,
-  };
-
-  const headers: Record<string, string> = {};
-  if (config.token) headers["Authorization"] = `Bearer ${config.token}`;
-
-  return httpPost(config.url, webhookPayload, headers);
-}
-
-/* ── Observability Connector Config Generator ────────────────────── */
-
-export interface ObservabilityConnectorConfig {
-  provider: ObservabilityProvider;
-  endpoint: string;
-  apiKey: string;
-  projectId?: string;
-  headers?: Record<string, string>;
-}
-
-export function generateConnectorConfig(provider: IntegrationType): {
-  envVars: Record<string, string>;
-  configYaml: string;
-  instructions: string;
-} {
-  switch (provider) {
-    case "langfuse":
-      return {
-        envVars: {
-          AMC_LANGFUSE_PUBLIC_KEY: "<your-langfuse-public-key>",
-          AMC_LANGFUSE_SECRET_KEY: "<your-langfuse-secret-key>",
-          AMC_LANGFUSE_HOST: "https://cloud.langfuse.com",
-        },
-        configYaml: `# AMC Observability — Langfuse Connector
-watch:
-  providers:
-    - provider: langfuse
-      endpoint: \${AMC_LANGFUSE_HOST}
-      apiKey: \${AMC_LANGFUSE_PUBLIC_KEY}
-      headers:
-        x-langfuse-secret-key: \${AMC_LANGFUSE_SECRET_KEY}
-      pollIntervalMs: 10000
-`,
-        instructions: `1. Sign up at https://cloud.langfuse.com
-2. Create a project and get your API keys
-3. Set environment variables: AMC_LANGFUSE_PUBLIC_KEY, AMC_LANGFUSE_SECRET_KEY
-4. Run: amc watch connect --provider langfuse --endpoint https://cloud.langfuse.com`,
-      };
-
-    case "helicone":
-      return {
-        envVars: { AMC_HELICONE_API_KEY: "<your-helicone-api-key>" },
-        configYaml: `# AMC Observability — Helicone Connector
-watch:
-  providers:
-    - provider: helicone
-      endpoint: https://api.helicone.ai
-      apiKey: \${AMC_HELICONE_API_KEY}
-      pollIntervalMs: 10000
-`,
-        instructions: `1. Sign up at https://www.helicone.ai
-2. Get your API key from the dashboard
-3. Set: AMC_HELICONE_API_KEY
-4. Run: amc watch connect --provider helicone --endpoint https://api.helicone.ai`,
-      };
-
-    case "datadog":
-      return {
-        envVars: {
-          AMC_DD_API_KEY: "<your-datadog-api-key>",
-          AMC_DD_SITE: "datadoghq.com",
-        },
-        configYaml: `# AMC Observability — Datadog Connector
-watch:
-  providers:
-    - provider: datadog
-      endpoint: https://api.\${AMC_DD_SITE}
-      apiKey: \${AMC_DD_API_KEY}
-      pollIntervalMs: 15000
-`,
-        instructions: `1. Get your Datadog API key from https://app.datadoghq.com/organization-settings/api-keys
-2. Set: AMC_DD_API_KEY, AMC_DD_SITE
-3. Run: amc watch connect --provider datadog --endpoint https://api.datadoghq.com`,
-      };
-
-    default:
-      return {
-        envVars: { AMC_WEBHOOK_URL: "<your-webhook-endpoint>" },
-        configYaml: `# AMC Observability — Generic Webhook
-watch:
-  providers:
-    - provider: webhook
-      endpoint: \${AMC_WEBHOOK_URL}
-`,
-        instructions: `1. Set up an HTTP endpoint that accepts POST requests with trace data
-2. Set: AMC_WEBHOOK_URL
-3. Run: amc watch connect --provider webhook --endpoint <your-url>`,
-      };
-  }
 }
 
 /* ── Setup Command ───────────────────────────────────────────────── */
+
+const SETUP_TYPES: readonly IntegrationType[] = ["github-action", "gitlab-ci", "slack", "discord", "pagerduty", "webhook", "datadog", "langfuse", "helicone"];
+
+function notificationInstructions(type: "slack" | "webhook"): string {
+  const channel = type === "slack"
+    ? "2. Store the Slack incoming-webhook URL in the workspace vault as `integrations/ops-slack-webhook` (authenticated Studio API: POST /api/v1/vault/secret/set), set `enabled: true` on the `ops-slack` channel and route events to it in .amc/integrations.yaml."
+    : "2. Set the `url` of the `ops-webhook` channel in .amc/integrations.yaml to your endpoint (each request carries an HMAC signature keyed by the vault secret `integrations/ops-webhook`) and route events to it.";
+  return [
+    `${type === "slack" ? "Slack" : "Webhook"} notifications are a channel of the signed .amc/integrations.yaml; no other file is read for them, so none was written.`,
+    "1. amc integrations init     (writes and signs the template: an `ops-webhook` webhook channel and a disabled `ops-slack` slack_webhook channel; it rewrites an existing file)",
+    channel,
+    "3. amc integrations sign     (owner mode; an invalid config is refused)",
+    "4. amc integrations verify, then amc integrations test --channel <id>"
+  ].join("\n");
+}
 
 export function setupIntegration(
   workspace: string,
   type: IntegrationType,
   options?: { minScore?: number; agentId?: string; outputDir?: string },
 ): { files: Array<{ path: string; content: string }>; instructions: string } {
+  if (!SETUP_TYPES.includes(type)) throw new Error(`unknown integration type: ${String(type)}; one of ${SETUP_TYPES.join(", ")}`);
   const outputDir = options?.outputDir ?? workspace;
   const files: Array<{ path: string; content: string }> = [];
   let instructions = "";
@@ -523,30 +354,21 @@ export function setupIntegration(
     }
 
     case "slack":
+    case "webhook":
+      // No file: notifications are channels of the signed .amc/integrations.yaml, and no other file is read for them.
+      instructions = notificationInstructions(type);
+      break;
+
     case "discord":
     case "pagerduty":
-    case "webhook": {
-      const config = `# AMC Notification — ${type}
-# Add to your .amc/config.yaml
-notifications:
-  - type: ${type}
-    url: \${AMC_${type.toUpperCase()}_WEBHOOK_URL}
-    ${type === "slack" ? "channel: #ai-alerts" : ""}
-    mentionOn: critical
-`;
-      files.push({ path: join(outputDir, `.amc-${type}-config.yaml`), content: config });
-      instructions = `${type} notification config generated.\nSet AMC_${type.toUpperCase()}_WEBHOOK_URL and add to .amc/config.yaml.`;
-      break;
-    }
+      throw new Error(`AMC has no ${type === "discord" ? "Discord" : "PagerDuty"} channel. Notifications go only to the webhook and slack_webhook `
+        + "channels of the signed .amc/integrations.yaml; point a webhook channel at a relay you run (amc integrations setup --type webhook).");
 
     case "langfuse":
     case "helicone":
-    case "datadog": {
-      const connector = generateConnectorConfig(type);
-      files.push({ path: join(outputDir, `.amc-${type}-config.yaml`), content: connector.configYaml });
-      instructions = connector.instructions;
+    case "datadog":
+      instructions = generateConnectorConfig(type).instructions;
       break;
-    }
   }
 
   // Write files
@@ -557,36 +379,4 @@ notifications:
   }
 
   return { files, instructions };
-}
-
-/* ── Helpers ──────────────────────────────────────────────────────── */
-
-function httpPost(url: string, body: unknown, headers?: Record<string, string>): Promise<boolean> {
-  return new Promise((resolve) => {
-    try {
-      const parsed = new URL(url);
-      const reqFn = parsed.protocol === "https:" ? httpsRequest : httpRequest;
-      const payload = JSON.stringify(body);
-
-      const req = reqFn(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Content-Length": Buffer.byteLength(payload).toString(),
-          ...(headers ?? {}),
-        },
-        timeout: 10_000,
-      }, (res) => {
-        res.resume();
-        res.on("end", () => resolve((res.statusCode ?? 500) < 400));
-      });
-
-      req.on("error", () => resolve(false));
-      req.on("timeout", () => { req.destroy(); resolve(false); });
-      req.write(payload);
-      req.end();
-    } catch {
-      resolve(false);
-    }
-  });
 }

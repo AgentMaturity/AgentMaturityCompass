@@ -14,7 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: AgentMaturity/AgentMaturityCompass@main   # pin to a release tag for stability
+      # Replace <release-tag> with a release that ships action.yml (see Notes); never @main.
+      - uses: AgentMaturity/AgentMaturityCompass@<release-tag>
         with:
           fail-below: B      # fail the build if the overall grade drops below B
           fix: "true"        # also generate a signed fix plan for any gaps
@@ -46,8 +47,11 @@ amc run --ci --fail-below B --fix
 
 ## Notes
 
-- The Action installs AMC from the pinned public release via the verified
-  installer (`install.sh` checks archives against the published `SHA256SUMS`),
-  so it works today, before the npm package is live. Once `agent-maturity-compass`
-  is on npm, you can swap the install step for `npx agent-maturity-compass`.
-- Pin `uses:` to a release tag (not `@main`) for reproducible CI.
+- The Action installs the AMC release named by the `VERSION` line in
+  `action.yml`: it downloads that release's package and `SHA256SUMS` from GitHub
+  Releases and refuses a package whose checksum does not match. The release
+  tooling sets `VERSION` when a release is cut, so a release tag installs itself.
+- Pin `uses:` to a release tag that contains `action.yml`, or to a commit you
+  reviewed, never `@main`. Releases up to v1.1.1 predate `action.yml`. A commit
+  between releases names the release being prepared in `VERSION`, and its
+  install step fails until that release is published.

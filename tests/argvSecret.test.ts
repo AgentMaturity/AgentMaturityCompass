@@ -1,5 +1,11 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { resolveSecretOption, warnInlineSecret, watchApiKey } from "../src/cli/argvSecret.js";
+import { spawn } from "node:child_process";
+import { createServer } from "node:http";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve as resolvePath } from "node:path";
+import { resolveSecretOption, warnInlineSecret, watchApiKey, watchSecretHeaders } from "../src/cli/argvSecret.js";
+import { LangfuseAdapter } from "../src/watch/observabilityBridge.js";
 
 /** LIVE-VAULT-14: secrets come from a file or the environment before the command line, and an inline secret is warned about. */
 afterEach(() => vi.restoreAllMocks());
@@ -35,5 +41,67 @@ describe("resolveSecretOption", () => {
     vi.stubEnv("AMC_WATCH_API_KEY", "env-key");
     expect(watchApiKey({ apiKey: "inline-key" })).toBe("env-key");
     vi.unstubAllEnvs();
+  });
+});
+
+describe("watchSecretHeaders (Langfuse's secret key for amc watch connect and amc monitor live)", () => {
+  test("from a file or AMC_WATCH_SECRET_KEY, never argv; another provider refuses one", () => {
+    const dir = mkdtempSync(join(tmpdir(), "amc-watch-secret-"));
+    try {
+      const file = join(dir, "secret");
+      writeFileSync(file, "sk-from-file\n", { mode: 0o600 });
+      expect(watchSecretHeaders({ provider: "langfuse" }, {})).toBeUndefined();
+      expect(watchSecretHeaders({ provider: "langfuse" }, { AMC_WATCH_SECRET_KEY: "sk-env" })).toEqual({ "x-langfuse-secret-key": "sk-env" });
+      expect(watchSecretHeaders({ provider: "langfuse", secretKeyFile: file }, { AMC_WATCH_SECRET_KEY: "sk-env" })).toEqual({ "x-langfuse-secret-key": "sk-from-file" });
+      expect(() => watchSecretHeaders({ provider: "helicone", secretKeyFile: file }, {})).toThrow(/langfuse only/);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  test("the Langfuse adapter then authenticates with the public and the secret key together", async () => {
+    const seen: string[] = [];
+    const server = createServer((req, res) => {
+      seen.push(String(req.headers.authorization));
+      res.setHeader("content-type", "application/json");
+      res.end(JSON.stringify({ data: [] }));
+    });
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", () => resolve()));
+    try {
+      const port = (server.address() as { port: number }).port;
+      const adapter = new LangfuseAdapter();
+      await adapter.connect({ provider: "langfuse", endpoint: `http://127.0.0.1:${port}`, apiKey: "pk-public",
+        headers: watchSecretHeaders({ provider: "langfuse" }, { AMC_WATCH_SECRET_KEY: "sk-secret" }) });
+      await adapter.fetchTraces(0, 10);
+      expect(seen[0]).toBe(`Basic ${Buffer.from("pk-public:sk-secret").toString("base64")}`);
+    } finally {
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+    }
+  });
+
+  test("amc watch connect --secret-key-file sends both keys (through the built CLI)", { timeout: 60_000 }, async () => {
+    const dir = mkdtempSync(join(tmpdir(), "amc-watch-connect-"));
+    const seen: string[] = [];
+    const server = createServer((req, res) => {
+      seen.push(String(req.headers.authorization));
+      res.setHeader("content-type", "application/json");
+      res.end(JSON.stringify({ data: [] }));
+    });
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", () => resolve()));
+    writeFileSync(join(dir, "public"), "pk-public\n", { mode: 0o600 });
+    writeFileSync(join(dir, "secret"), "sk-secret\n", { mode: 0o600 });
+    const port = (server.address() as { port: number }).port;
+    const child = spawn(process.execPath, [resolvePath("dist/cli.js"), "watch", "connect", "--provider", "langfuse", "--endpoint", `http://127.0.0.1:${port}`,
+      "--api-key-file", join(dir, "public"), "--secret-key-file", join(dir, "secret"), "--poll-interval", "60000"],
+      { cwd: dir, stdio: "ignore", env: { ...process.env, AMC_WATCH_API_KEY: "", AMC_WATCH_SECRET_KEY: "" } });
+    try {
+      for (let i = 0; i < 300 && seen.length === 0; i += 1) await new Promise((resolve) => setTimeout(resolve, 100));
+      expect(seen[0]).toBe(`Basic ${Buffer.from("pk-public:sk-secret").toString("base64")}`);
+    } finally {
+      child.kill("SIGKILL");
+      server.closeAllConnections();
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

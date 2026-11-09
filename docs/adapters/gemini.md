@@ -63,6 +63,21 @@ amc adapters run --agent vision-agent --adapter gemini-cli -- \
   gemini --image screenshot.png "Describe this UI"
 ```
 
+## Hooks (what AMC claims)
+
+`amc connect hooks install --provider gemini-cli` writes two command hooks into the project's `.gemini/settings.json`.
+The default (`--mode observe`) forwards `BeforeTool` and `AfterTool` as observations only and returns no decision; AMC
+records the call's digests. With `--mode control`, `BeforeTool` answers `{"decision":"allow"}` or
+`{"decision":"deny","reason":...}` from the signed policy (a `run_shell_command` call is parsed into a command plan
+first). The hooks follow decision D55: a hook can deny or observe, never allow past the policy or rewrite arguments.
+
+What AMC claims, from `docs/adapters/manifests/gemini-cli.json` (rendered in [SUPPORT_MATRIX.md](SUPPORT_MATRIX.md)):
+
+- `AfterTool`: observed. Qualified versions: none.
+- `BeforeTool`: **not claimed as enforcement.** The Bridge registers no Gemini CLI session and binds no authorization
+  record to the answer, so a deny is advisory, and AMC has no recorded run of a pinned Gemini CLI binary. Until a
+  qualification record exists the matrix lists Gemini CLI as "observe only, no qualified version".
+
 ## See Also
 
 - [Claude Code Adapter](claude-code.md)
