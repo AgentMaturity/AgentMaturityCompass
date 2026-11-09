@@ -15,7 +15,7 @@
  * refused lexically here and again by real path in the tool body.
  */
 
-export interface PatchLine {
+interface PatchLine {
   readonly op: " " | "+" | "-";
   readonly text: string;
 }
@@ -32,7 +32,7 @@ export type PatchSection =
   | { readonly kind: "delete"; readonly path: string }
   | { readonly kind: "update"; readonly path: string; readonly moveTo: string | null; readonly hunks: readonly PatchHunk[] };
 
-export class PatchParseError extends Error {
+class PatchParseError extends Error {
   override readonly name = "PatchParseError";
 }
 

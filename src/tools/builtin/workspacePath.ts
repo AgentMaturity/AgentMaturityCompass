@@ -23,7 +23,7 @@ import { aliasedSegmentReason, fileIdentity, protectedDirectoryIdentities } from
  * A file that does not exist yet still has an existing ancestor, and that ancestor is where a link would be. Walking
  * up until something resolves and re-appending the rest is what makes the check work for a write to a new file.
  */
-export function realPathOfNearestExisting(target: string): string {
+function realPathOfNearestExisting(target: string): string {
   const trailing: string[] = [];
   let current = target;
   for (;;) {

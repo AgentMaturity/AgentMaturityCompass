@@ -17,7 +17,7 @@ import { insideWorkspace } from "./workspacePath.js";
 const UTF8 = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
 
 /** The file's bytes, or null when it does not exist. Any other failure (a directory, no permission) is thrown. */
-export function readIfExists(full: string): Buffer | null {
+function readIfExists(full: string): Buffer | null {
   try {
     return readRegularFile(full);
   } catch (error) {
@@ -61,7 +61,7 @@ export function utf8(raw: Buffer): string | null {
 }
 
 /** Text fit to show as lines: valid UTF-8 with no NUL byte, which marks binary content. */
-export const displayText = (raw: Buffer): string | null => (raw.includes(0) ? null : utf8(raw));
+const displayText = (raw: Buffer): string | null => (raw.includes(0) ? null : utf8(raw));
 
 /**
  * The diff a tool result shows, redacted with the shared secret patterns before it reaches the model or the ledger.

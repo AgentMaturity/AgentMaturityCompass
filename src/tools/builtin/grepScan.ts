@@ -12,7 +12,7 @@ import { forMatching, globToRegExp, readWorkspaceFile, walkWorkspace } from "./w
  */
 
 export const MAX_FILES_WALKED = 20_000;
-export const MAX_FILE_BYTES = 2_000_000;
+const MAX_FILE_BYTES = 2_000_000;
 const MAX_LINE_CHARS = 400;
 
 export interface GrepArgs {

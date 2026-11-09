@@ -19,7 +19,7 @@ export interface TextForm {
   readonly finalNewline: boolean;
 }
 
-export class HunkError extends Error {
+class HunkError extends Error {
   override readonly name = "HunkError";
 }
 

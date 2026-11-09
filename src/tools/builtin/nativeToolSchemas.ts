@@ -33,7 +33,7 @@ import { webSearchTool } from "./webSearchTool.js";
  * `tool_search` hands the model and `NATIVE_TOOL_ACTIVATED` receipts carry. The aggregate is a document digest over
  * this listing, not any session's catalog identity (that one also covers exposure and the session's signed subset).
  */
-export interface NativeToolSchema {
+interface NativeToolSchema {
   readonly name: string;
   readonly actionClass: ToolDefinition["actionClass"];
   readonly description: string;
