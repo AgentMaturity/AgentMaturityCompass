@@ -47,7 +47,7 @@
  * weaker importer dropped for budget never takes a stronger file's import with it.
  */
 import { realpathSync } from "node:fs";
-import { posix, relative, resolve, sep } from "node:path";
+import { isAbsolute, posix, relative, resolve, sep } from "node:path";
 import { aliasedSegmentReason, foldName } from "../../toolhub/protectedPaths.js";
 import { escapeTerminalControls } from "../../tools/builtin/askUserTool.js";
 import { sha256Hex } from "../../utils/hash.js";
@@ -159,7 +159,7 @@ export function canonicalImportRefusal(workspace: string, path: string): string 
   try {
     const root = realpathSync.native(workspace);
     const rel = relative(root, realpathSync.native(resolve(root, path)));
-    if (rel === "" || rel.startsWith("..")) return "the import resolves outside the workspace";
+    if (rel === "" || rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel)) return "the import resolves outside the workspace";
     return refusedPathDetail(rel.split(sep));
   } catch {
     return "the import could not be resolved on disk";

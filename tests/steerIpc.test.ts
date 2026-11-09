@@ -124,4 +124,17 @@ describe("amc agent-loop run --interactive-steer", () => {
     expect(steer?.messageIds).toEqual([accepted!.receipt.messageId]);
     expect(rowsOf(rows, "turn/start")).toHaveLength(1);
   }, 40_000);
+
+  it("is refused with --goal-rounds, which runs no root turn to steer, before any session row", async () => {
+    // MUTATION: drop the refusal and the run starts goal rounds whose children no frame can reach.
+    child = fork(CLI, ["agent-loop", "run", "a goal", "--provider", "stub", "--interactive-steer", "--goal-rounds", "2", "--delegate", "--tools", "workspace",
+      "--credentials-home", home], { cwd: workspace, stdio: ["ignore", "pipe", "pipe", "ipc"], env: { ...process.env, NO_COLOR: "1", AMC_VAULT_PASSPHRASE: process.env.AMC_VAULT_PASSPHRASE ?? "amc-test-passphrase" } });
+    const stderr: string[] = [];
+    child.stderr!.on("data", (chunk: Buffer) => stderr.push(chunk.toString("utf8")));
+    const exit = await new Promise<number | null>(done => child!.on("exit", code => done(code)));
+    expect(exit).toBe(1);
+    expect(stderr.join("")).toContain("--goal-rounds runs none");
+    const ledger = openLedger(workspace, { readonly: true });
+    try { expect(ledger.getAllEvents().filter(row => row.event_type === "session/open")).toHaveLength(0); } finally { ledger.close(); }
+  }, 40_000);
 });

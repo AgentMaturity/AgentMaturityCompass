@@ -82,6 +82,9 @@ describe("resolveImportPath", () => {
     expect(canonicalImportRefusal(workspace, ".AMC/notes.md")).not.toBeNull();
     expect(canonicalImportRefusal(workspace, "docs/state/notes.md")).toMatch(/AMC state/);
     expect(canonicalImportRefusal(workspace, "docs/rules.md")).toBeNull();
+    // A name that merely starts with two dots is inside the workspace, not above it.
+    put("..notes.md", "dots\n");
+    expect(canonicalImportRefusal(workspace, "..notes.md")).toBeNull();
   });
   it("reads only exact @ lines", () => {
     expect(importTargets("@a.md\nsee @b.md inline\n  @c.md  \n@ spaced\n@d.md\n")).toEqual(["a.md", "d.md"]);

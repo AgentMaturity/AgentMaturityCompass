@@ -56,7 +56,7 @@ With `--interactive-steer`, a parent process that forked the run with `child_pro
 - `{ type: "amc/native-withdraw", v: 1, messageId }` → `{ …, ok: true, frame: "withdraw", messageId, withdrawn }`.
 - A malformed frame (unknown lane, empty text, more than 256 KiB, a bad id) or one that arrives after the driver closed admission (disposed, or ended by a run limit) is answered `ok: false` with `refused` and touches no inbox.
 
-Like `--interactive-approvals`, the flag is refused without an IPC channel, and the listener is removed when the turn ends so the channel never keeps the process alive. The listener starts when the composed turn is ready: a frame sent before that gets no answer, so a parent waits for its first answer (a malformed probe is answered too) before it relies on delivery.
+Like `--interactive-approvals`, the flag is refused without an IPC channel (and with `--goal-rounds`, which runs no root turn to steer), and the listener is removed when the turn ends so the channel never keeps the process alive. The listener starts when the composed turn is ready: a frame sent before that gets no answer, so a parent waits for its first answer (a malformed probe is answered too) before it relies on delivery.
 
 Limits, stated:
 
@@ -101,8 +101,8 @@ Confinement, stated:
 
 Limits, stated:
 
-- Occupancy is per request, not per turn. The `tokenCounts` block sums a turn's steps for cost; `context` does not, so its ratio never exceeds 1 for a single request.
-- The window is a signed fact only where a row recorded it: an automatic `loop/compact` receipt. A session that never compacted reports `window not recorded` rather than the catalog's number, because an operator `--context-window` override may have changed it.
+- Occupancy is per request, not per turn. The `tokenCounts` block sums a turn's steps for cost; `context` does not, so its ratio is one request's share of the window, never a multiple of the turn's step count.
+- The window is a signed fact only where a row recorded it: an automatic `loop/compact` receipt. A session that never compacted reports `window not recorded` rather than the catalog's number, because an operator `--context-window` override may have changed it. The live `context` line uses the window the run is configured with, and is not evidence.
 - A step whose provider reported nothing is `unmeasured`, never zero.
 
 ## Not in this slice
