@@ -77,6 +77,8 @@ export interface AgentToolSeam {
   hasOwnedWork?(): boolean;
   /** The same selected native extension runtime used by the toolset guard. */
   readonly extensionHooks?: NativeHookRuntime;
+  /** The consented or explicitly reviewed tool policy enforced by this seam. In-process descendants inherit it. */
+  readonly expectedToolsDigest?: string;
   /** The seam enforces ToolCallRequest.beforeEffect after all approval waits, at the actual effect boundary. */
   readonly supportsEffectGuard?: true;
   /** The entered step owns this admission through completion, failure and cancellation. */

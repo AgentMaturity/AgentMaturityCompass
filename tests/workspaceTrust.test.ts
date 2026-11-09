@@ -9,6 +9,7 @@ import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { registerAgentCommands, type AgentLoopCliIo } from "../src/cli-agent-commands.js";
 import { registerSandboxCommands } from "../src/cli-sandbox-commands.js";
 import { registerNativeScheduleCommands } from "../src/cli-native-schedule-commands.js";
+import { openLedger } from "../src/ledger/ledger.js";
 import { openAgentSession } from "../src/agent/agentSession.js";
 import { keysetAnchoring } from "../src/keys/keyset.js";
 import { ensureInstantVaultMode } from "../src/cli/instantVaultMode.js";
@@ -170,12 +171,12 @@ describe("workspace trust verdicts", () => {
 });
 
 describe("through the real surfaces", () => {
-  async function runCli(extra: string[], onError?: (line: string) => void): Promise<{ errors: string[]; failed: boolean }> {
+  async function runCli(extra: string[], onError?: (line: string) => void, prompt: string[] = ["hello"]): Promise<{ errors: string[]; failed: boolean }> {
     const errors: string[] = []; let failed = false;
     const program = new Command().exitOverride();
     const io: AgentLoopCliIo = { log: () => {}, error: line => { errors.push(line); onError?.(line); }, fail: () => { failed = true; } };
     registerAgentCommands(program, io);
-    await program.parseAsync(["agent-loop", "run", "hello", "--provider", "stub", "--tools", "none", "--credentials-home", credentialsHome, "--json", ...extra], { from: "user" });
+    await program.parseAsync(["agent-loop", "run", ...prompt, "--provider", "stub", "--tools", "none", "--credentials-home", credentialsHome, "--json", ...extra], { from: "user" });
     return { errors, failed };
   }
 
@@ -198,6 +199,27 @@ describe("through the real surfaces", () => {
     expect(result.failed).toBe(true);
     expect(result.errors.join("\n")).toContain("after workspace trust admission");
     expect(result.errors.join("\n")).not.toContain("composed from preset");
+  });
+
+  it("a headless workflow refuses a signed policy swapped after root toolset admission", async () => {
+    writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
+    const original = loadToolsConfig(workspace);
+    const tools = { ...original.tools, allowedTools: [...original.tools.allowedTools, { name: "delegate", actionClass: "READ_ONLY" as const }] };
+    initToolsConfig(workspace, { ...original, tools });
+    writeFileSync(join(workspace, "reviewed-plan.json"), JSON.stringify({ kind: "agent", id: "a", runAs: "reviewer", goal: "Draft a response." }));
+    asClone();
+    let swapped = false;
+    const swap = (line: string) => {
+      if (swapped || !line.includes("tool writes are scoped to:")) return;
+      swapped = true;
+      initToolsConfig(workspace, { ...original, tools: { ...tools, denyByDefault: !tools.denyByDefault } });
+    };
+    await expect(runCli(["--tools", "workspace", "--delegate", "--workflow-plan", "reviewed-plan.json", "--trust-workspace"], swap, []))
+      .rejects.toThrow(/signed workspace tool policy changed/);
+    expect(swapped).toBe(true);
+    const ledger = openLedger(workspace, { readonly: true });
+    try { expect(ledger.getAllEvents().some(row => row.event_type === "agent_delegation_started" || row.event_type === "request/header")).toBe(false); }
+    finally { ledger.close(); }
   });
 
   it("amc agent-loop run refuses an untrusted workspace before composing anything, and proceeds with --trust-workspace", async () => {
@@ -309,7 +331,7 @@ describe("through the real surfaces", () => {
    * S19b: consent given while the repository had no verifiable signed tools policy covers "no policy". A policy signed
    * after that (a `git pull` under a long-lived ACP, SDK or Studio session) is refused for the rest of the session.
    */
-  it("a tools policy signed after consent that covered none is refused for the rest of the session", async () => {
+  it.each(["workspace", undefined] as const)("pins the absence of a signed policy for tools=%s", async tools => {
     writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
     const config = loadToolsConfig(workspace);
     rmSync(join(workspace, ".amc", "tools.yaml.sig"));
@@ -319,7 +341,7 @@ describe("through the real surfaces", () => {
     expect(consentedToolsDigest(consent)).toBe(NO_TOOLS_POLICY_PIN);
     expect(consentedToolsDigest(requireWorkspaceTrust(workspace, null))).toBe(NO_TOOLS_POLICY_PIN);
     let toolset: AgentToolset | null = null;
-    const session = openAgentSession({ workspace, agentId: "default", tools: "workspace", systemPrompt: "s", harnessVersion: "trust-test", makeLlm: () => ({} as never),
+    const session = openAgentSession({ workspace, agentId: "default", ...(tools === undefined ? {} : { tools }), systemPrompt: "s", harnessVersion: "trust-test", makeLlm: () => ({} as never),
       compositionDigest: "composition", policyDigest: "policy", route: { providerId: STUB_PROVIDER_ID, model: STUB_PROVIDER_MODEL, params: {} },
       bindTools: ({ toolset: composed }) => { toolset = composed; return composed!.seam; } });
     try {

@@ -150,6 +150,7 @@ export function gateToolCallsOnApproval(
   });
   return {
     ...(inner.extensionHooks === undefined ? {} : { extensionHooks: inner.extensionHooks }),
+    ...(inner.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: inner.expectedToolsDigest }),
     ...(inner.supportsEffectGuard === true ? { supportsEffectGuard: true as const } : {}),
     ...(inner.shutdown === undefined ? {} : { shutdown: () => inner.shutdown!() }),
     ...(inner.hasOwnedWork === undefined ? {} : { hasOwnedWork: () => inner.hasOwnedWork!() }),

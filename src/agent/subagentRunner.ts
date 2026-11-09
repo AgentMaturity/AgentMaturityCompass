@@ -81,6 +81,8 @@ export interface DriverRunnerInit {
   readonly harnessVersion: string;
   readonly compositionDigest: string;
   readonly policyDigest: string;
+  /** The same signed tool-policy pin the parent's seam enforces. */
+  readonly expectedToolsDigest?: string;
   /** Same per-turn ceilings as the parent; no independent child defaults. */
   readonly config?: Partial<AgentLoopConfig>;
   /** Existing policy and answerers, rebound to each actual child session. */
@@ -235,6 +237,7 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
   // Snapshot operator choices once; no child or subsequent caller mutation may
   // widen an already composed run's gate, limits or descendant scope.
   const config = init.config === undefined ? undefined : { ...init.config };
+  const expectedToolsDigest = init.expectedToolsDigest;
   const gate = init.approvalGate === undefined ? undefined : { ...init.approvalGate,
     ...(init.approvalGate.toolNames === undefined ? {} : { toolNames: [...init.approvalGate.toolNames] }),
     ...(init.approvalGate.answerers === undefined ? {} : { answerers: [...init.approvalGate.answerers] }) };
@@ -382,6 +385,7 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
               recorder: session, agentId: ctx.toolsetAgentId,
               ...(ctx.getGoal === undefined ? {} : { getGoal: ctx.getGoal }),
               parentShell: init.parentShell ?? null,
+              ...(expectedToolsDigest === undefined ? {} : { expectedToolsDigest }),
               ...(init.approvalMode === undefined ? {} : { approvalMode: init.approvalMode }),
               ...(childLease === undefined ? {} : { leaseToken: childLease }),
               delegation: { runAs: ctx.identity.runAs, depth: ctx.identity.depth, parentExecutionId: ctx.packetId ?? null,

@@ -698,7 +698,8 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   const hasOwnedWork = (): boolean => background.hasOwnedWork() || delegates.hasOwnedWork();
   const shutdown = (): Promise<boolean> => Promise.all([delegates.closeAll(), background.shutdown()]).then(done => done.every(Boolean));
   return {
-    seam: { ...seam, extensionHooks, shutdown, hasOwnedWork, schemas: () => {
+    seam: { ...seam, extensionHooks, shutdown, hasOwnedWork,
+      ...(options.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: options.expectedToolsDigest }), schemas: () => {
       recordUnconfinedEnabled();
       const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
       admittedCatalog(agentId, snapshot, false);

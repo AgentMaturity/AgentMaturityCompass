@@ -207,7 +207,11 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     if (init.tools !== undefined && init.tools !== "none" && init.tools !== "workspace") throw new Error("Unknown native tool mode.");
     if (init.expectedToolsDigest !== undefined && (init.tools !== "workspace" || !/^[a-f0-9]{64}$/.test(init.expectedToolsDigest))) throw new Error("A native tool policy pin requires explicit workspace tools and a SHA-256 digest.");
     // A consented tools policy is pinned for the session's life: re-signed mid-session, it is refused, not applied.
-    const expectedToolsDigest = init.expectedToolsDigest ?? (init.tools === "workspace" ? consentedToolsDigest(trust) ?? undefined : undefined);
+    const consentedDigest = init.tools === "none" ? null : consentedToolsDigest(trust);
+    if (consentedDigest !== null && init.expectedToolsDigest !== undefined && init.expectedToolsDigest !== consentedDigest) {
+      throw new Error("The native tool policy pin does not match the consented workspace policy.");
+    }
+    const expectedToolsDigest = init.expectedToolsDigest ?? consentedDigest ?? undefined;
     if (init.maxSteps !== undefined && (!Number.isSafeInteger(init.maxSteps) || init.maxSteps < 1 || init.maxSteps > 1024)) throw new Error("Native maxSteps must be an integer from 1 through 1024.");
     if (init.compaction !== undefined) resolveCompactionConfig(init.compaction);
     const compaction = init.compaction;

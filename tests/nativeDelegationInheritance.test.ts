@@ -5,7 +5,7 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
-import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
+import { initToolsConfig, loadToolsConfig, loadVerifiedToolsConfigSnapshot } from "../src/toolhub/toolhubValidators.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { readEventPayload } from "../src/session/eventPayload.js";
@@ -66,6 +66,24 @@ function deferred() {
 }
 
 describe("native child cancellation and inherited governance", () => {
+  test("a delegated child refuses a signed policy changed after its parent pinned it", async () => {
+    const workspace = setup();
+    const { digestSha256 } = loadVerifiedToolsConfigSnapshot(workspace);
+    expect(digestSha256).toMatch(/^[a-f0-9]{64}$/);
+    const transport = vi.fn(silentTransport);
+    const runner = createDriverRunner(init(workspace, { expectedToolsDigest: digestSha256!,
+      makeLlm: session => llmFor(session, [textStep("must not run")], transport) }));
+    const config = loadToolsConfig(workspace);
+    initToolsConfig(workspace, { ...config, tools: { ...config.tools, denyByDefault: !config.tools.denyByDefault } });
+    const changed = loadVerifiedToolsConfigSnapshot(workspace);
+    expect(changed.signatureValid).toBe(true);
+    expect(changed.digestSha256).not.toBe(digestSha256);
+
+    expect(await runner(context())).toMatchObject({ ok: false, text: "" });
+    expect(transport).not.toHaveBeenCalled();
+    expect(rows(workspace, "native-child").some(row => row.event_type === "request/header")).toBe(false);
+  });
+
   test("parent abort reaches the actual request, records parent cause, and removes the listener", async () => {
     const workspace = setup(), controller = new AbortController(), entered = deferred();
     const add = vi.spyOn(controller.signal, "addEventListener"), remove = vi.spyOn(controller.signal, "removeEventListener");

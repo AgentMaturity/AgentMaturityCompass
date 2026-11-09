@@ -562,6 +562,9 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       // inherited scope. The existing spawn boundary enforces the real depth.
       // An explicitly supplied foreign runner keeps its existing contract.
       let runner = options.delegation?.runner;
+      const expectedToolsDigest = tools?.expectedToolsDigest ?? options.schedulePass?.expectedToolsDigest;
+      // Non-model passes bypass root model preparation, which ordinarily rechecks the shared tool policy before dispatch.
+      if (expectedToolsDigest !== undefined && (options.workflowPass !== undefined || options.goalRounds !== undefined)) tools?.schemas();
       if (runner === undefined) {
         const runNative: SubagentRunner = (child) => runner!(child);
         runner = createDriverRunner({
@@ -581,6 +584,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           ...(gate === undefined ? {} : { approvalGate: gate }),
           ...(options.approvalMode === undefined ? {} : { approvalMode: options.approvalMode }),
           ...(options.parentShell === undefined ? {} : { parentShell: options.parentShell }),
+          ...(expectedToolsDigest === undefined ? {} : { expectedToolsDigest }),
           ...(options.leaseToken === undefined ? {} : { leaseToken: options.leaseToken }),
           ...(options.delegation === undefined ? {} : { grantDelegation: { runner: runNative,
             ...(options.delegation.maxDepth === undefined ? {} : { maxDepth: options.delegation.maxDepth }),
