@@ -1,6 +1,6 @@
 import { fork } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, expect, test } from "vitest";
@@ -66,6 +66,8 @@ test("an outcome the system of record cannot answer stays unknown and blocks the
   try {
     const calls = await reconcileInterruptedCalls({ workspace: dir, session: resumed.service, adapters: new Map([[PAYMENT_ADAPTER, unknownAdapter]]) });
     expect(calls).toEqual([expect.objectContaining({ toolCallId: "pay-1", rule: "reconcile-first", result: "unknown" })]);
+    const recorded = resumed.service.readEvents().find(row => row.event_type === "tool/reconciled");
+    expect(recorded?.meta_json).not.toContain("system of record offline");
     expect(blocking(dir)).toEqual([calls[0]!.executionId]);
     const registry = new ToolRegistry();
     for (const definition of faultTools(sor)) registry.define(definition);
@@ -103,4 +105,19 @@ test("an interrupted workspace write repeats only while its file still has the r
     expect(await reconcileInterruptedCalls({ workspace: changed.dir, session: again.service, adapters: new Map() })).toEqual([expect.objectContaining({
       toolCallId: "write-1", rule: "reconcile-first", result: "not-found" })]);
   } finally { again.service.close({ reason: "completed" }); }
+});
+
+test("an unreadable file is reconciled without disclosing its path in event metadata", async () => {
+  const { dir, sessionId } = await crashed("write");
+  rmSync(join(dir, "notes.txt"));
+  mkdirSync(join(dir, "notes.txt"));
+  const resumed = resumeSession({ workspace: dir, sessionId, claimant, staleAfterMs: 0, ...identity });
+  try {
+    const outcomes = await reconcileInterruptedCalls({ workspace: dir, session: resumed.service, adapters: new Map() });
+    expect(outcomes[0]?.rule).toBe("reconcile-first");
+    const row = resumed.service.readEvents().find(event => event.event_type === "tool/reconciled");
+    expect(row?.meta_json).toContain("The recorded file could not be read.");
+    expect(row?.meta_json).not.toContain("notes.txt");
+    expect(row?.meta_json).not.toContain(dir);
+  } finally { resumed.service.close({ reason: "completed" }); }
 });

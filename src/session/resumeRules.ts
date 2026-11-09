@@ -85,15 +85,14 @@ function interruptedCalls(rows: readonly EvidenceEvent[]): Interrupted[] {
 
 const builtinClass = (toolName: string | null): ActionClass | null =>
   NATIVE_BUILTIN_CAPABILITIES.find((capability) => capability.name === toolName)?.actionClass ?? null;
-const message = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 
 /** A recorded file change against the file now. A file that cannot be read safely has no comparison, so it reconciles first. */
 function fileNow(workspace: string, change: FileChange): { readonly file: { beforeSha256: string | null; currentSha256: string | null } | null; readonly note: string } {
   try {
     const bytes = readContainedOrNull(workspace, change.path, MAX_FILE_BYTES);
     return { file: { beforeSha256: change.beforeSha256, currentSha256: bytes === null ? null : sha256Hex(bytes) }, note: "" };
-  } catch (error) {
-    return { file: null, note: `; ${change.path} could not be read: ${message(error)}` };
+  } catch {
+    return { file: null, note: ". The recorded file could not be read." };
   }
 }
 
@@ -138,11 +137,11 @@ async function settleCall(call: Interrupted, journal: () => ActionJournal, input
     try {
       const reconciled = await reconcile(view.executionId, { workspace: input.workspace, adapters: input.adapters,
         ...(input.signal === undefined ? {} : { signal: input.signal }) });
-      if (reconciled.after === "completed") return outcome("completed", reconciled.effect, reconciled.receipt?.reasonCode ?? "reconciled");
-      return outcome("unknown", null, reconciled.observation.kind === "unknown" ? reconciled.observation.reason : `reconciled ${reconciled.observation.kind}`);
+      if (reconciled.after === "completed") return outcome("completed", reconciled.effect, "reconciled");
+      return outcome("unknown", null, reconciled.observation.kind === "unknown" ? "the system of record did not confirm the outcome" : `reconciled ${reconciled.observation.kind}`);
     } catch (error) {
       if (error instanceof ReceiptChainBroken) throw error;
-      return outcome("unknown", null, `reconcile_failed: ${message(error)}`);
+      return outcome("unknown", null, "reconciliation failed");
     }
   }
   if (view.state === "completed") return outcome("completed", view.effect, "the journal records it completed");

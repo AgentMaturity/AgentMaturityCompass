@@ -609,6 +609,9 @@ export function renderNotification(notification: LoopNotification): string | nul
       return chalk.bold(`turn ${notification.turn} ended: ${notification.ending.reason}`);
     case "compaction":
       return chalk.yellow(`  step ${notification.turn}.${notification.step} automatic compaction: ${notification.message}`);
+    case "context":
+      return chalk.dim(`  step ${notification.turn}.${notification.step} context: prompt ${notification.promptTokens ?? "unmeasured"} tokens`
+        + (notification.contextWindowTokens === null ? " (no window configured)" : ` of ${notification.contextWindowTokens} (${notification.ratio === null ? "n/a" : `${Math.round(notification.ratio * 100)}%`})`));
     case "error":
       return chalk.red(`  native error at turn ${notification.turn}, step ${notification.step}: ${renderNativeFailureGuidance(liveNativeFailureGuidance(notification.error))}`);
     default:

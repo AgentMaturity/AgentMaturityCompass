@@ -189,6 +189,19 @@ export type LoopNotification =
       readonly step: number;
       readonly message: string;
       readonly eventIds: readonly string[];
+    }
+  /**
+   * Context occupancy after a step (SH-LOOP-07): the prompt the step sent (inputTokens+cacheRead+cacheWrite) against
+   * the effective window. Null where the provider reported nothing or no window is configured; never a fabricated zero.
+   * Live-only, like every notification; `amc session show` reads the same figures back from the signed rows.
+   */
+  | {
+      readonly kind: "context";
+      readonly turn: number;
+      readonly step: number;
+      readonly promptTokens: number | null;
+      readonly contextWindowTokens: number | null;
+      readonly ratio: number | null;
     };
 
 /**

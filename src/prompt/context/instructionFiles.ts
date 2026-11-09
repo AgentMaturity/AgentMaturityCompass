@@ -54,6 +54,7 @@ import {
   type InstructionCandidateOptions
 } from "./instructionPrecedence.js";
 import { MAX_INSTRUCTION_DIRECTORIES, MAX_INSTRUCTION_DIRECTORY_DEPTH, MAX_INSTRUCTION_TOUCH_PATHS } from "./touchedInstructions.js";
+import { resolveInstructionImports, type LoadedImport } from "./instructionImports.js";
 
 /** One instruction file whose content is in the contribution. */
 export interface LoadedInstruction {
@@ -62,10 +63,12 @@ export interface LoadedInstruction {
   readonly bytes: number;
   /** SHA-256 of the exact, untrimmed UTF-8 content included in context. */
   readonly sha256: string;
+  /** Files this one pulled in through `@path` lines (SH-LOOP-05), each with its own digest. Empty for user-scope files. */
+  readonly imports: readonly LoadedImport[];
 }
 
 /** Why an instruction file or part of discovery is absent from the contribution. */
-export type InstructionOmissionReason = "unreadable" | "oversize" | "over-budget" | "discovery-limit";
+export type InstructionOmissionReason = "unreadable" | "oversize" | "over-budget" | "discovery-limit" | "import-refused" | "import-depth" | "import-limit";
 
 /** A file omission or incomplete discovery, stated safely to the model. */
 export interface InstructionOmission {
@@ -200,36 +203,40 @@ function probe(candidate: InstructionCandidate, workspace: string): Probe {
   }
 }
 
-/** Read one candidate that a probe called present. */
-function readCandidate(
-  candidate: InstructionCandidate,
-  options: InstructionLoadOptions,
-  maxFileBytes: number
-): { readonly content: string; readonly bytes: number } | null {
+/**
+ * Read one bounded UTF-8 workspace file, or null when it cannot be read exactly. Shared with the import reader.
+ * An oversize file returns empty content with its true size so the caller can name the cap. `links` is the hard-link
+ * count of the inode actually read (from its descriptor); an injected test reader reports 1.
+ */
+export function readBoundedInstructionText(root: string, path: string, maxFileBytes: number, readTextFile?: (absolutePath: string) => string): { readonly content: string; readonly bytes: number; readonly links: number } | null {
   try {
-    if (options.readTextFile !== undefined) {
-      const content = options.readTextFile(candidate.absolutePath);
-      return { content, bytes: Buffer.byteLength(content, "utf8") };
+    if (readTextFile !== undefined) {
+      const content = readTextFile(resolve(root, path));
+      return { content, bytes: Buffer.byteLength(content, "utf8"), links: 1 };
     }
-    const result = readWorkspaceFile(
-      candidate.scope === "project" ? options.workspace : dirname(candidate.absolutePath),
-      candidate.scope === "project" ? candidate.displayPath : candidate.fileName,
-      maxFileBytes + 1,
-      maxFileBytes
-    );
+    const result = readWorkspaceFile(root, path, maxFileBytes + 1, maxFileBytes);
     if (result === null) return null;
-    if (result.size > maxFileBytes) return { content: "", bytes: result.size };
+    if (result.size > maxFileBytes) return { content: "", bytes: result.size, links: result.links };
     if (!result.complete) return null;
     const content = result.bytes.toString("utf8");
     // Invalid UTF-8 cannot produce an exact source-content digest after decoding.
     if (!Buffer.from(content, "utf8").equals(result.bytes)) return null;
-    return { content, bytes: result.bytes.length };
+    return { content, bytes: result.bytes.length, links: result.links };
   } catch {
     // A file can disappear or lose permissions between the probe and the read.
     // The caller turns this into an `unreadable` omission rather than dropping
     // it: something was there a moment ago, and the operator should hear so.
     return null;
   }
+}
+
+/** Read one candidate that a probe called present. */
+function readCandidate(candidate: InstructionCandidate, options: InstructionLoadOptions, maxFileBytes: number): { readonly content: string; readonly bytes: number } | null {
+  return readBoundedInstructionText(
+    candidate.scope === "project" ? options.workspace : dirname(candidate.absolutePath),
+    candidate.scope === "project" ? candidate.displayPath : candidate.fileName,
+    maxFileBytes, options.readTextFile
+  );
 }
 
 /**
@@ -312,7 +319,15 @@ export function loadInstructionFiles(options: InstructionLoadOptions): Instructi
       });
       continue;
     }
-    loaded.push({ candidate, content: content.content, bytes: content.bytes, sha256: sha256Hex(content.content) });
+    // Imports follow only from project files, through the same bounded reader; a user-scope `@` line stays text. Each
+    // file resolves its own imports, so budget dropping a weaker importer never removes a stronger file's import.
+    const resolved = candidate.scope === "project"
+      ? resolveInstructionImports({ workspace: identity?.realPath ?? resolve(options.workspace), importedBy: candidate.displayPath,
+        content: content.content, maxFileBytes, maxTotalBytes,
+        ...(options.readTextFile === undefined ? {} : { readTextFile: options.readTextFile }) })
+      : { imports: [], omitted: [] };
+    omitted.push(...resolved.omitted);
+    loaded.push({ candidate, content: content.content, bytes: content.bytes, sha256: sha256Hex(content.content), imports: resolved.imports });
   }
 
   if (identity !== null && !workspaceMatches(identity)) return unverifiedWorkspace();
@@ -348,7 +363,8 @@ function retain(
       duplicates.push({ displayPath: file.candidate.displayPath, duplicateOf: kept });
       continue;
     }
-    if (total + file.bytes > maxTotalBytes) {
+    const withImports = file.bytes + file.imports.reduce((sum, entry) => sum + entry.bytes, 0);
+    if (total + withImports > maxTotalBytes) {
       overBudget.push({
         displayPath: file.candidate.displayPath,
         reason: "over-budget",
@@ -357,7 +373,7 @@ function retain(
       continue;
     }
     keptByDigest.set(digest, file.candidate.displayPath);
-    total += file.bytes;
+    total += withImports;
     included.push(file);
   }
 

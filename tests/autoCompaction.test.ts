@@ -29,6 +29,7 @@ import { validateSurfaceCompactions } from "../src/session/surfaceCompaction.js"
 import { foldSurfaceEntries, surfaceProjection, type SurfaceEntry } from "../src/session/surfaceProjection.js";
 import { applySurfaceCompaction, compactionReceipt, isFencedModelSummary, surfaceCompactionReceiptSchema } from "../src/session/surfaceCompactionValidation.js";
 import { extractEnvelope, type TokenUsage } from "../src/session/sessionTypes.js";
+import { sessionContextAccounting } from "../src/session/sessionContextAccounting.js";
 import { extractSpillRef } from "../src/session/spill/spillTypes.js";
 import { readSpilled, resolveSpillPath } from "../src/session/spill/spillStore.js";
 import { closeSqlitePool } from "../src/storage/sqlitePool.js";
@@ -374,6 +375,9 @@ describe("automatic compaction: synthetic provider usage, real signed loop evide
       expect(measured.event_type).toBe("step/end");
       expect(meta(measured).usage).toMatchObject({ inputTokens: 7000 });
       assertMeasured(f, rows);
+      // SH-LOOP-07: per-turn occupancy takes the window from the signed v2 receipt (null where no receipt recorded one).
+      expect(sessionContextAccounting(rows)).toMatchObject({ contextWindowTokens: WINDOW,
+        turns: [{ turn: 1, lastPromptTokens: 7000, maxPromptTokens: 8500, contextWindowTokens: WINDOW, ratio: 0.7, compactions: 1 }] });
       await verifyRecorded(f, 4);
     });
   });

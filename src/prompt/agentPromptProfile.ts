@@ -35,6 +35,7 @@ import { createInstructionsContextPlugin } from "./context/instructionsContext.j
 import type { InstructionLoad } from "./context/instructionFiles.js";
 import { createTimeContextPlugin } from "./context/timeContext.js";
 import { createMissionContextPlugin } from "./context/missionContext.js";
+import { createPlanModeContextPlugin } from "../agent/planMode.js";
 import { amcVersion } from "../version.js";
 
 /** The harness-authored section describing how this deployment is governed. */
@@ -94,6 +95,8 @@ export interface AgentPromptProfileOptions {
   readonly approvalGated?: boolean;
   /** Opt in to the agent's validated mission, constraints and escalation graph as literal runtime context. */
   readonly missionContext?: boolean;
+  /** This turn runs in plan mode (SH-LOOP-04). The plugin is registered either way; only its text changes. */
+  readonly planMode?: boolean;
   /**
    * Replaces the default plugin set outright.
    *
@@ -168,6 +171,7 @@ function defaultContextPlugins(options: AgentPromptProfileOptions): readonly Con
         : { maxTotalBytes: options.maxInstructionTotalBytes }),
       ...(options.onInstructionLoad === undefined ? {} : { onLoad: options.onInstructionLoad })
     }),
+    createPlanModeContextPlugin(options.planMode === true),
     createTimeContextPlugin({
       ...(options.now === undefined ? {} : { now: options.now }),
       ...(options.timeZone === undefined ? {} : { timeZone: options.timeZone })

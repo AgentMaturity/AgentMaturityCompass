@@ -13,6 +13,7 @@ import { randomUUID } from "node:crypto";
 import chalk from "chalk";
 import { artifactClaim, printClaimResult, withClaimFields } from "./cli/claimOutput.js";
 import { registerSessionCompactionCommands } from "./cli-session-compaction-commands.js";
+import { registerSessionContinuityCommands } from "./cli-session-continuity-commands.js";
 import { registerSessionSpillReadCommand } from "./cli-session-spill-read-command.js";
 import { finishVerify, ledgerExitCode, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
 import { admitKey, buildVerifierReport, withPins } from "./trust/index.js";
@@ -24,6 +25,7 @@ export function registerSessionCommands(program: Command): void {
     .description("Native signed sessions: inspect, compact, verify, replay and recover");
 
   registerSessionCompactionCommands(session);
+  registerSessionContinuityCommands(session);
   registerSessionSpillReadCommand(session);
 
   withTrustFlags(session
@@ -110,14 +112,17 @@ export function registerSessionCommands(program: Command): void {
             surface: envelope?.surface.op ?? "n/a"
           };
         });
+        const { sessionContextAccounting, renderSessionContextAccounting } = await import("./session/sessionContextAccounting.js");
+        const context = sessionContextAccounting(events);
         if (opts.json) {
           const { sessionTokenCounts } = await import("./session/sessionTokenCounts.js");
-          console.log(JSON.stringify({ sessionId: id, spine, history, usage, tokenCounts: sessionTokenCounts(events), diagnostics }, null, 2));
+          console.log(JSON.stringify({ sessionId: id, spine, history, usage, tokenCounts: sessionTokenCounts(events), context, diagnostics }, null, 2));
           return;
         }
         console.log(chalk.bold(`Session ${id}`));
         console.log(chalk.gray(`  ${events.length} events`));
         console.log(renderNativeRunUsage(usage));
+        for (const line of renderSessionContextAccounting(context)) console.log(line);
         console.log(renderNativeRunDiagnostics(diagnostics));
         console.log("");
         console.log(chalk.bold("Projected conversation (model-visible)"));

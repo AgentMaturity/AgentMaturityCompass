@@ -90,7 +90,9 @@ export interface TurnEndMeta {
  * order.
  */
 export function canonicalTurnCancelCause(cause: TurnCancelCause): TurnCancelCause {
-  return cause.kind === "hook" ? { kind: "hook", reason: boundedCancellationText(cause.reason) } : { kind: cause.kind };
+  if (cause.kind === "hook") return { kind: "hook", reason: boundedCancellationText(cause.reason) };
+  if (cause.kind === "limit") return { kind: "limit", condition: cause.condition, bound: cause.bound, ...(cause.unmeasured === true ? { unmeasured: true } : {}) };
+  return { kind: cause.kind };
 }
 
 /** Bound new cancellation metadata without invalidating historical signed rows. */

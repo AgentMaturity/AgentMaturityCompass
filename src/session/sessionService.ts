@@ -176,6 +176,8 @@ export class SessionService extends SessionEventWriter {
     });
   }
 
+  get turnsStarted(): number { return this.turnNo; } // turns opened so far; the next is numbered one higher
+
   startTurn(params: TurnStartParams): TurnRef {
     this.ensureUsable();
     if (this.currentTurn !== null) {

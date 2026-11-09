@@ -65,6 +65,7 @@ Use this page to reach the shortest evidence-backed path for your task. AMC's pu
 - [Provider Configuration](PROVIDERS.md)
 - [Native Provider Routes](NATIVE_PROVIDERS.md): the routes `--provider` accepts, reasoning flags, cache retention, retry delays, and their limits
 - [SDK](SDK.md)
+- [Agent Loop Continuity](AGENT_LOOP_CONTINUITY.md): `--continue`, plan mode, steering over IPC, `--stop` run limits, AMC.md and `@path` imports, per-turn context accounting
 - [API Reference](API_REFERENCE.md)
 - [OpenAPI Surfaces](API_SURFACES.md)
 - [CI Templates](CI_TEMPLATES.md)

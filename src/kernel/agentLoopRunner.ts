@@ -38,9 +38,9 @@
  * command that finished.
  */
 import { Context } from "./amcRuntime.js";
-import { createHash, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "../agent/approvalGate.js";
-import type { AgentLoopConfig, AgentStatus, CancelOptions, LoopHooks, LoopNotification } from "../agent/loopTypes.js";
+import type { AgentLoopConfig, AgentStatus, CancelOptions, InboxReceipt, LoopHooks, LoopNotification } from "../agent/loopTypes.js";
 import type { LoopRoute } from "../agent/stepRunner.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "../agent/toolSeam.js";
 import type { NativeShellReadiness } from "../sandbox/nativeShellGate.js";
@@ -53,8 +53,6 @@ import type { HttpTransport } from "../llm/adapter/transport.js";
 import type { RequestEncoderRegistry } from "../llm/request/requestEncoder.js";
 import type { LiveTextPreviewEvent } from "../llm/adapter/liveTextPreview.js";
 import {
-  agentPromptProfile,
-  type AgentPromptProfile,
   type AgentPromptProfileOptions
 } from "../prompt/agentPromptProfile.js";
 import { SessionService } from "../session/sessionService.js";
@@ -85,6 +83,11 @@ import { assertNativeScheduleAdmission } from "../autonomy/scheduleService.js";
 import type { SubagentCapability } from "../agent/delegateTool.js";
 import type { TurnCancelCause } from "../session/sessionTypes.js";
 import { amcVersion } from "../version.js";
+import { compositionDigestOf, policyDigestOf, promptProfileFor } from "./composedTurnIdentity.js";
+import { serviceOn } from "./approvalSeamRunner.js";
+import { planModePreStep } from "../agent/planMode.js";
+import { priorTokensOf, type RunLimitBreach, type RunLimits } from "../agent/runLimits.js";
+import { sessionTokenCounts } from "../session/sessionTokenCounts.js";
 import { credentialsServices, CREDENTIALS_SEAM } from "./services/credentialsServices.js";
 import type { CredentialsSeamService, CredentialsServiceConfig } from "./services/credentialsServices.js";
 import { llmServices, LLM_SEAM } from "./services/llmServices.js";
@@ -144,6 +147,12 @@ export interface ComposedTurnHandle {
   cancel(cause: TurnCancelCause, options?: CancelOptions): void;
   /** Permanently close admission and bound the active driver drain. */
   shutdown(): Promise<boolean>;
+  /** Steer the nearest step boundary through the durable inbox (SH-LOOP-02). The receipt is the signed `loop/inbox` row. */
+  steer(text: string, clientRequestId?: string): InboxReceipt;
+  /** Queue a follow-up that gets its own turn. */
+  queue(text: string, clientRequestId?: string): InboxReceipt;
+  /** Remove one pending submission; false when it was already claimed or unknown. */
+  withdraw(messageId: string): boolean;
 }
 
 /** Narrow evidence capability for tools, bound to the actual selected session. */
@@ -311,6 +320,14 @@ export interface ComposedTurnOptions {
   readonly goalRounds?: { readonly maxRounds: number; readonly signal?: AbortSignal };
   /** Run a reviewed workflow plan headless under this run's delegation grant (SH-ORCH-03) instead of a model turn. */
   readonly workflowPass?: WorkflowPassOptions;
+  /**
+   * Plan mode (SH-LOOP-04): the caller's toolset was narrowed with `applyPlanMode`, the model is told so through the
+   * always-registered plan-mode context plugin, and a signed NATIVE_PLAN_MODE audit names the turn. Per turn, never in a
+   * digest: the executing turn resumes the same session without it.
+   */
+  readonly planMode?: { readonly withheldTools: readonly string[] };
+  /** Operator run limits (SH-LOOP-06), enforced by the driver and recorded when they fire; not part of the policy digest. */
+  readonly runLimits?: RunLimits;
 }
 
 export interface ComposedTurnOutcome {
@@ -339,105 +356,8 @@ export interface ComposedTurnOutcome {
   readonly parent?: SessionLineage | null;
   /** True when the session was left unsealed for a later process. */
   readonly keptOpen?: boolean;
-}
-
-/** Read a composed service off the tree by the name its seam declares. */
-function serviceOn<T>(ctx: Context, name: string): T {
-  const found = (ctx as unknown as Record<string, T | undefined>)[name];
-  if (found === undefined) {
-    throw new Error(`composition did not provide ${name}; the fiber booted but registered no service`);
-  }
-  return found;
-}
-
-/**
- * The prompt profile this run assembles from.
- *
- * TWO DERIVATIONS HAPPEN HERE AND NEITHER IS CONFIGURABLE, because both are
- * claims the prompt makes about the run and a claim the run cannot honour must
- * not be sayable:
- *
- *   `approvalGated` follows the presence of the gate. The model is told that
- *   approval blocks tool calls only when something really is in front of them.
- *
- *   A pinned prompt with no profile carries NO context plugins. Pinning says
- *   "this exact text is what the model sees"; appending a runtime snapshot to it
- *   would make that false while the log recorded it as true.
- */
-function promptProfileFor(options: ComposedTurnOptions): AgentPromptProfile {
-  const pinned = options.systemPrompt;
-  const profile = agentPromptProfile({
-    workspace: options.workspace,
-    agentId: options.agentId,
-    approvalGated: options.approvalGate !== undefined,
-    ...(pinned !== undefined && options.promptProfile === undefined ? { contextPlugins: [] } : {}),
-    ...(options.promptProfile ?? {})
-  });
-  if (pinned === undefined) return profile;
-  return {
-    ...profile,
-    sections: [
-      ...profile.sections,
-      { name: PINNED_PROMPT_SECTION, order: PINNED_PROMPT_ORDER, text: pinned, complete: true }
-    ]
-  };
-}
-
-/**
- * What this run was composed from, as a digest.
- *
- * Recorded on the `session/open` row, so "which build of which composition
- * produced this session" is answerable from the log alone. It commits to the
- * plugin names, the routes registered, the model actually addressed, what the
- * prompt was built out of, and whether a human stood in front of the tools —
- * the facts that decide what the agent could do and what it was told it could do.
- */
-function compositionDigestOf(options: ComposedTurnOptions, profile: AgentPromptProfile): string {
-  const gate = options.approvalGate;
-  const shape = JSON.stringify({
-    plugins: [
-      credentialsServices.name,
-      llmServices.name,
-      promptServices.name,
-      ...(gate === undefined ? [] : [approvalServices.name]),
-      agentLoopServices.name
-    ],
-    providers: options.routes.map((route) => ({
-      providerId: route.providerId,
-      adapterId: route.adapter.id,
-      adapterVersion: route.adapter.version,
-      baseUrl: route.baseUrl,
-      models: route.models
-    })),
-    route: { providerId: options.route.providerId, model: options.route.model },
-    sources: options.compositionSources ?? [],
-    prompt: {
-      sections: profile.sections.map((section) => section.name),
-      contexts: profile.contextPlugins.map((plugin) => plugin.name),
-      variables: Object.keys(profile.variables).sort(),
-      pinned: options.systemPrompt !== undefined
-    },
-    // The answerer NAMES are the point: an ADR-5 exception renders its tracked
-    // id, its approver and its expiry into its name, so composing one changes
-    // this digest and the change is attributable.
-    approval:
-      gate === undefined
-        ? null
-        : {
-            actionClass: gate.actionClass,
-            riskTier: gate.riskTier,
-            toolNames: gate.toolNames ?? null,
-            ...(gate.reviewedActionClasses === undefined ? {} : { reviewedActionClasses: gate.reviewedActionClasses }),
-            answerers: (gate.answerers ?? []).map((answerer) => answerer.name)
-          },
-    version: amcVersion
-  });
-  return createHash("sha256").update(shape).digest("hex");
-}
-
-/** The loop bounds this run enforced, as a digest, for the `session/open` row. */
-function policyDigestOf(options: ComposedTurnOptions): string {
-  return createHash("sha256").update(JSON.stringify(options.config ?? {})).digest("hex");
+  /** Set when an operator run limit ended this run's work; the signed `loop/cancel` row carries the same cause. */
+  readonly runLimit?: RunLimitBreach;
 }
 
 /**
@@ -451,6 +371,16 @@ function policyDigestOf(options: ComposedTurnOptions): string {
 export async function runComposedTurn(options: ComposedTurnOptions): Promise<ComposedTurnOutcome> {
   if (options.audioParts !== undefined && (options.prompt !== "" || (options.images?.length ?? 0) > 0 || options.schedulePass !== undefined)) {
     throw new Error("Audio input requires its complete ordered sequence, without legacy prompt/images or schedule execution.");
+  }
+  // SH-LOOP-04: plan mode narrows the ROOT toolset only. Children, goal rounds and schedule passes build their toolsets
+  // afresh, so the restriction and its signed per-turn claim would not hold for them: refused before any session row.
+  if (options.planMode !== undefined && (options.delegation !== undefined || options.goalRounds !== undefined || options.schedulePass !== undefined)) {
+    throw new Error("Plan mode narrows the root toolset only; delegation, goal rounds and schedule passes cannot run under it. No session was opened.");
+  }
+  // SH-LOOP-06: run limits bound the root driver, which goal rounds, schedules and workflows never start; a limit that could
+  // not be enforced is refused rather than silently dropped.
+  if (options.runLimits !== undefined && (options.goalRounds !== undefined || options.schedulePass !== undefined || options.workflowPass !== undefined)) {
+    throw new Error("Run limits bound the root driver. Goal rounds, schedule passes and workflow passes run no root turn. No session was opened.");
   }
   const audioParts = options.audioParts === undefined ? undefined : materializeNativeAudioParts(snapshotNativeAudioParts(options.audioParts));
   const images = materializeNativeImages(snapshotNativeImages(options.images));
@@ -606,7 +536,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     // to watch. `notify` is the live mirror and is optional; `preStep` is how the
     // workspace's own instructions get in front of the agent, and is not.
     const hooks: LoopHooks = {
-      preStep: prompt.preStep,
+      // Plan mode records its signed per-turn fact inside each turn the run opens; see planModePreStep.
+      preStep: options.planMode === undefined ? prompt.preStep : planModePreStep(session, options.planMode, prompt.preStep),
       turnStopping: () => Promise.resolve(),
       notify:
         options.notify ??
@@ -723,6 +654,10 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       ...(tools !== undefined ? { tools } : {}),
       ...(options.validation !== undefined ? { validation: options.validation } : {}),
       ...(options.config !== undefined ? { config: options.config } : {}),
+      // A resumed session's earlier steps count toward the token bound; unmeasured ones fail it closed. A fork is a new
+      // session: it records its parent's counts as FORK_TOKEN_COUNTS and starts its own budget at zero.
+      ...(options.runLimits === undefined ? {} : { runLimits: { limits: options.runLimits,
+        ...(resumed === null ? {} : priorTokensOf(sessionTokenCounts(session.readEvents()))) } }),
       hooks
     });
     await loopFiber.await();
@@ -744,7 +679,10 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
         const confirmed = await loop.agent.dispose();
         if (!confirmed) abandon(new Error("TOOL_OUTCOME_UNKNOWN: native driver did not drain within its shutdown grace."));
         return confirmed;
-      }
+      },
+      steer: (text, clientRequestId) => loop.agent.send(text, "next-step", true, undefined, clientRequestId),
+      queue: (text, clientRequestId) => loop.followup(text, undefined, clientRequestId),
+      withdraw: (messageId) => loop.agent.withdraw(messageId)
     });
     if (audioParts !== undefined) loop.agent.followupAudioParts(audioParts);
     else loop.followup(options.prompt, images);
@@ -771,7 +709,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       // replaces the section list, and reporting the registered names there
       // would name sections the prompt does not contain.
       promptSections: prompt.assemble().sections.map((section) => section.name),
-      ...(resumed === null ? {} : { resumed })
+      ...(resumed === null ? {} : { resumed }),
+      ...(loop.agent.runLimitEnding === null ? {} : { runLimit: loop.agent.runLimitEnding })
     };
   } finally {
     if (steerTimer !== null) clearTimeout(steerTimer);

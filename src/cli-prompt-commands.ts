@@ -140,6 +140,7 @@ function renderInstructionReport(load: InstructionLoad, candidates: readonly str
     lines.push(chalk.bold("Included:"));
     for (const file of load.included) {
       lines.push(`  ${file.candidate.displayPath} (${file.candidate.scope}, ${file.bytes} bytes)`);
+      for (const entry of file.imports) lines.push(`    @${entry.displayPath} (imported by ${entry.importedBy}, ${entry.bytes} bytes)`);
     }
   }
   if (load.omitted.length > 0) {
@@ -270,7 +271,7 @@ export function registerPromptCommands(program: Command, io: PromptCliIo = defau
 
   group
     .command("instructions")
-    .description("List the instruction files discovered for this workspace, and which of them apply")
+    .description("List the instruction files a native run loads for this workspace (workspace-only discovery, as the run itself uses), and which of them apply")
     // Deliberately NOT the shared flag set: a persona, a clock and an approval
     // gate change the PROMPT and change nothing about which files are on disk.
     // Accepting a flag that does nothing is how an operator learns to distrust
@@ -279,10 +280,13 @@ export function registerPromptCommands(program: Command, io: PromptCliIo = defau
     .option("--json", "Output as JSON")
     .action((opts: { workspace?: string; json?: boolean }) => {
       const workspace = opts.workspace ?? process.cwd();
-      const candidates = instructionCandidates({ workspace }).map(
+      // The SAME discovery a native run uses (src/prompt/agentPromptProfile.ts): workspace-only, with local overlays
+      // and @imports, and without $AMC_HOME files a run never loads. Listing the legacy default scan here described
+      // files the run did not read.
+      const candidates = instructionCandidates({ workspace, workspaceOnly: true }).map(
         (candidate) => candidate.displayPath
       );
-      const load = loadInstructionFiles({ workspace });
+      const load = loadInstructionFiles({ workspace, workspaceOnly: true });
       if (opts.json === true) {
         io.log(
           JSON.stringify(
@@ -293,7 +297,9 @@ export function registerPromptCommands(program: Command, io: PromptCliIo = defau
                 displayPath: file.candidate.displayPath,
                 scope: file.candidate.scope,
                 precedence: file.candidate.precedence,
-                bytes: file.bytes
+                bytes: file.bytes,
+                sha256: file.sha256,
+                imports: file.imports.map((entry) => ({ displayPath: entry.displayPath, importedBy: entry.importedBy, bytes: entry.bytes, sha256: entry.sha256 }))
               })),
               omitted: load.omitted,
               duplicates: load.duplicates

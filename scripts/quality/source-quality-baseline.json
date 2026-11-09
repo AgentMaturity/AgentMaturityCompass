@@ -4627,14 +4627,6 @@
       "format": "typescript"
     },
     {
-      "id": "90e76462844bd9ff17d0259809c7defc397adf5f387d1d0e8b2131503b288576",
-      "paths": [
-        "agent/agentDriver.ts",
-        "kernel/services/agentLoopServices.ts"
-      ],
-      "format": "typescript"
-    },
-    {
       "id": "915514979ca67d59b0c61dc47d533a73b9065f214c5618de713fc38eb7b98957",
       "paths": [
         "studio/studioServer.ts",
@@ -7303,14 +7295,6 @@
       "paths": [
         "lifecycle/episodeRecord.ts",
         "lifecycle/observabilityLane.ts"
-      ],
-      "format": "typescript"
-    },
-    {
-      "id": "ed9ce69893ec4fe0661bbb333da5d06499dab41dcb21a5d980a6423ba099f094",
-      "paths": [
-        "kernel/agentLoopRunner.ts",
-        "kernel/approvalSeamRunner.ts"
       ],
       "format": "typescript"
     },
@@ -19259,11 +19243,6 @@
       "kind": "types"
     },
     {
-      "id": "e7a1e2d38af12bb560c948ef94bc8ec947eefb88342b63981c41ae32cdfc60e3",
-      "file": "src/prompt/context/instructionPrecedence.ts",
-      "kind": "exports"
-    },
-    {
       "id": "e7a73e515f176c109f93539725ebe28170ca0b8909c2f477e7d0fe9df65a95d8",
       "file": "src/product/index.ts",
       "kind": "types"
@@ -19962,11 +19941,6 @@
       "id": "f644d16edba2cb9c349b14a83a8c07f2b0b4923214e7467bc00d83fd9663a662",
       "file": "src/attachments/nativeOrderedInput.ts",
       "kind": "exports"
-    },
-    {
-      "id": "f644ea22c84c687a3970904750c250908be595a9d78afe43526053f188f198fb",
-      "file": "src/prompt/context/instructionFiles.ts",
-      "kind": "types"
     },
     {
       "id": "f64e87a6b0a2da819e319f4c6da79a4c25abf404d9a7c0a7b306bb16c7f1efaf",
