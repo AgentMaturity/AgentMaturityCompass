@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-11-08
+> Auto-generated from source on 2026-11-09
 
 ## Table of Contents
 

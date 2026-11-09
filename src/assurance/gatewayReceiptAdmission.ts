@@ -38,7 +38,8 @@ export function admitGatewayReceipts(answer: ReceiptAnswer, keys: readonly strin
   const admit = (label: string, receipt: string, kind: ReceiptKind, digests: readonly string[], sessionId: string | null): ReceiptPayload | null => {
     const verified = verifyReceipt(receipt, [...keys]);
     const payload = verified.ok ? verified.payload : null;
-    const problem = payload === null ? `does not verify (${verified.error ?? "no payload"})`
+    // AMC's own words only: a parse error can quote the header's bytes, which the agent under test chose.
+    const problem = payload === null ? "does not verify against this workspace's receipt keys"
       : payload.kind !== kind ? `is a ${payload.kind} receipt`
       : payload.agentId !== agentId ? "names another agent"
       : !digests.includes(payload.body_sha256) ? "does not commit to the bytes of this exchange"

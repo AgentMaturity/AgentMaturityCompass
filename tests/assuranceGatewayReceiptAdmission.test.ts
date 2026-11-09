@@ -72,6 +72,11 @@ describe("gateway receipt admission", () => {
     expect(admit({ receiptId: FORGED, wire }).rejected).toEqual([expect.stringMatching(/^gateway request receipt does not verify/)]);
     expect(admit({ receiptId: mint(privatePem(other.privateKey), "llm_request", "request-body"), wire }).rejected).toEqual([expect.stringMatching(/does not verify/)]);
     expect(admitGatewayReceipts({ receiptId: request, wire }, [], "default", new Set()).rejected).toEqual([expect.stringMatching(/does not verify/)]);
+    // The reason is AMC's own words: nothing the agent under test put in the header is echoed into the audit row.
+    for (const body of ["AGENT-CHOSEN-TEXT is not JSON", JSON.stringify({ v: 1, kind: "AGENT-CHOSEN-TEXT" })]) {
+      const planted = `${Buffer.from(body).toString("base64url")}.c2ln`;
+      expect(admit({ receiptId: planted, wire }).rejected).toEqual(["gateway request receipt does not verify against this workspace's receipt keys"]);
+    }
     // Genuine, but not this exchange's: another agent, another request body (a replay), minted outside the exchange, the wrong kind.
     expect(admit({ receiptId: request, wire }, new Set(), "someone-else").rejected).toEqual(["gateway request receipt names another agent"]);
     expect(admit({ receiptId: mint(key, "llm_request", "an earlier request"), wire }).rejected).toEqual(["gateway request receipt does not commit to the bytes of this exchange"]);
