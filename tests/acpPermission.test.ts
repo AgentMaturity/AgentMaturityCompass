@@ -430,7 +430,7 @@ describe("amc acp against a regulated workspace (real gate, real skills)", () =>
       expect(toolCallId).not.toMatch(/^apr_/);
       expect(request.params!.toolCall).toMatchObject({ title: "fs.read", kind: "read" });
       const announced = acp.frames.findIndex(frame => frame.method === "session/update" && frame.params?.update?.sessionUpdate === "tool_call" && frame.params.update.toolCallId === toolCallId);
-      expect(announced).toBeGreaterThanOrEqual(0);
+      expect(announced, "committed tool_call frame").not.toBe(-1);
       expect(announced).toBeLessThan(acp.frames.indexOf(request));
       acp.send({ id: request.id, result: { outcome: { outcome: "selected", optionId: "reject_once" } } });
       await vi.waitFor(() => expect(acp.settled(promptId)).toBeDefined(), { timeout: 60_000, interval: 20 });
