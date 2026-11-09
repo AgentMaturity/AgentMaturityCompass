@@ -61,7 +61,7 @@ Like `--interactive-approvals`, the flag is refused without an IPC channel (and 
 Limits, stated:
 
 - Native chat does not yet open a steering prompt while a task runs; its `/withdraw` works between tasks as before. The chat half is a UI change (the terminal's single question slot is shared with approvals and `ask_user`) and is handed to the UI owner with this frame contract. Scripts can use `--steer`/`--steer-after` or fork the run with IPC.
-- SDK, ACP and Studio still queue follow-ups only; a steer method on those surfaces is a later item.
+- SDK, ACP and Studio have no steer method: ACP and Studio start a later turn with a new prompt, and the SDK accepts no second prompt while one is active (it can withdraw a queued submission). A steer on those surfaces is a later item.
 
 ## Run limits
 
