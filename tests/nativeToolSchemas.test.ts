@@ -30,7 +30,7 @@ describe("nativeToolSchemas", () => {
     }
     expect(listing.tools.map((tool) => tool.name)).toEqual([...listing.tools.map((tool) => tool.name)].sort((a, b) => a.localeCompare(b)));
     expect(listing.tools.map((tool) => tool.name)).toEqual(expect.arrayContaining(["apply_patch", "ls", "fs.read", "grep", "web_fetch", "job_start"]));
-    expect(listing.unavailable).toEqual(["delegate", "workflow"]);
+    expect(listing.unavailable).toEqual(["delegate", "delegate_continue", "workflow"]);
   });
 
   it("gives the same digests on every call", () => {
@@ -61,7 +61,7 @@ describe("amc tools list --schemas", () => {
     await program.parseAsync(["tools", "list", "--schemas", "--json"], { from: "user" });
     const report = JSON.parse(lines.join("\n")) as { tools: Array<{ name: string; schemaDigestSha256: string }>; documentDigestSha256: string; unavailable: string[] };
     expect(report.tools.map((tool) => tool.name)).toEqual(expect.arrayContaining(["apply_patch", "ls", "fs.edit", "bash"]));
-    expect(report.unavailable).toEqual(["delegate", "workflow"]);
+    expect(report.unavailable).toEqual(["delegate", "delegate_continue", "workflow"]);
     expect(report.documentDigestSha256).toBe(nativeToolSchemas(process.cwd()).documentDigestSha256);
     const before = process.exitCode;
     try {
