@@ -182,7 +182,7 @@ export interface ToolBodyResult {
   readonly effect?: "applied" | "not_applied" | "unknown";
   /** The system of record's reference for the effect, e.g. a payment id. Recorded as given. */
   readonly externalRef?: string;
-  /** Every file this body wrote or deleted, for the audit row and the loop's checkpoints. Digests and sizes only. */
+  /** Every file this body wrote or deleted, for the audit row's payload (and resume, which reads it). Digests and sizes only. */
   readonly fileChanges?: readonly FileChange[];
 }
 

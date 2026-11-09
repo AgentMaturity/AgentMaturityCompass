@@ -20,9 +20,10 @@ session.startTurn({ trigger: "user" }); session.recordUserMessage("settle the in
 if (mode === "write") {
   // fs.write's audit row records the file change (P1-36) before the call's result row; the process dies between them.
   session.recordToolCall({ toolCallId: "write-1", toolName: "fs.write", dispatch: "native", parentToken: null, args: JSON.stringify({ path: "notes.txt" }) });
+  // As toolEvidenceFor writes it: the change in the payload (encrypted at rest), nothing about the file in the plain meta.
   const fileChange = { path: "notes.txt", beforeSha256: sha256Hex("before\n"), afterSha256: sha256Hex("after\n") };
-  session.recordProjectedEvidence({ eventType: "audit", payload: JSON.stringify({ callId: "write-1", fileChange }),
-    meta: { auditType: "TOOL_CALL_ALLOWED", callId: "write-1", fileChange } });
+  session.recordProjectedEvidence({ eventType: "audit", payload: JSON.stringify({ auditType: "TOOL_CALL_ALLOWED", tool: "fs.write", fileChanges: [fileChange] }),
+    meta: { auditType: "TOOL_CALL_ALLOWED", callId: "write-1", toolName: "fs.write" } });
   die();
 }
 if (mode === "read") {

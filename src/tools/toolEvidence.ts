@@ -92,10 +92,10 @@ export type { FileChange } from "./toolTypes.js";
 
 /**
  * The file changes an audit row carries (SH-TOOLS-06c), read back from its parsed `payload`: `fileChanges`, one entry
- * per file the call wrote or deleted (rows from before the carrier carry a single `fileChange` instead). The payload
- * is the encrypted side of the row; the row's `meta` carries only what `resumeRules` needs to recheck the first file,
- * its path and `beforeSha256`, so the digests of file contents never sit in plain metadata. Rows with no change yield
- * an empty list.
+ * per file the call wrote or deleted (rows from before the carrier carry a single `fileChange` instead). Only the
+ * payload carries them, the side of the row encrypted at rest: no path or content digest is copied into the row's
+ * plain `meta`, and `resumeRules` reads the payload, bound to the row's signed digest. Rows with no change yield an
+ * empty list.
  */
 export function fileChangesOf(payload: Readonly<Record<string, unknown>>): readonly FileChange[] {
   const value = payload.fileChanges;
@@ -128,11 +128,9 @@ export function toolEvidenceFor(execution: RecordedToolCall, outcome: ToolOutcom
   const questionIds = projectQuestionIds(execution, outcome);
   const projectionRules = projectMatchingRuleIds(execution, outcome);
   // The body's own declaration, carried on the outcome (never a side channel): digests, sizes and workspace-relative
-  // paths, so a resumed session can tell whether the file still holds its recorded bytes (resumeRules reads meta).
+  // paths, so a resumed session can tell whether the file still holds its recorded bytes. Payload only (see fileChangesOf).
   const changes = outcome.fileChanges ?? [];
   const fileChanges = changes.length === 0 ? {} : { fileChanges: changes };
-  // Meta is plain metadata: only the first file's path and before-digest, which resumeRules compares against the file.
-  const resumeChange = changes.length === 0 ? {} : { fileChange: { path: changes[0]!.path, beforeSha256: changes[0]!.beforeSha256 } };
   const filesystemTouch = nativeFilesystemTouch(execution, outcome);
 
   const call = {
@@ -183,7 +181,6 @@ export function toolEvidenceFor(execution: RecordedToolCall, outcome: ToolOutcom
       ...common,
       auditType,
       ...(filesystemTouch === undefined ? {} : { nativeFilesystemTouch: filesystemTouch }),
-      ...resumeChange,
       ...(outcome.denied
         ? { denialStage: outcome.denied.stage, denialGuard: outcome.denied.guardLabel, denialReason: outcome.denied.reason }
         : {})

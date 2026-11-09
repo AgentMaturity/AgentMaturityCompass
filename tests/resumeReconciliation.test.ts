@@ -92,6 +92,9 @@ test("an interrupted workspace write repeats only while its file still has the r
   const { dir, sessionId } = await crashed("write");
   const resumed = resumeSession({ workspace: dir, sessionId, claimant, staleAfterMs: 0, ...identity });
   try {
+    // The change is read from the audit row's payload; its plain meta names no file.
+    const audit = resumed.service.readEvents().find((row) => row.event_type === "audit" && JSON.parse(row.meta_json).callId === "write-1")!;
+    expect(audit.meta_json).not.toContain("notes.txt");
     expect(await reconcileInterruptedCalls({ workspace: dir, session: resumed.service, adapters: new Map() })).toEqual([expect.objectContaining({
       toolCallId: "write-1", toolName: "fs.write", rule: "repeat-with-same-idempotency-key", result: "not-found" })]);
   } finally { resumed.service.close({ reason: "completed" }); }
@@ -103,4 +106,20 @@ test("an interrupted workspace write repeats only while its file still has the r
     expect(await reconcileInterruptedCalls({ workspace: changed.dir, session: again.service, adapters: new Map() })).toEqual([expect.objectContaining({
       toolCallId: "write-1", rule: "reconcile-first", result: "not-found" })]);
   } finally { again.service.close({ reason: "completed" }); }
+});
+
+test("an audit payload altered after the crash is no recorded change: the write reconciles first", async () => {
+  const { dir, sessionId } = await crashed("write");
+  // The file moved on, and someone rewrote the audit row's blob so its beforeSha256 names the new bytes. A blob that is
+  // not an encrypted envelope reads back as a legacy plain one, so only the signed payload digest can refuse it.
+  writeFileSync(join(dir, "notes.txt"), "after\n");
+  const resumed = resumeSession({ workspace: dir, sessionId, claimant, staleAfterMs: 0, ...identity });
+  try {
+    const audit = resumed.service.readEvents().find((row) => row.event_type === "audit" && JSON.parse(row.meta_json).callId === "write-1")!;
+    expect(audit.payload_path).toBeTruthy();
+    writeFileSync(join(dir, audit.payload_path!), JSON.stringify({ auditType: "TOOL_CALL_ALLOWED", tool: "fs.write",
+      fileChanges: [{ path: "notes.txt", beforeSha256: sha256Hex("after\n"), afterSha256: sha256Hex("later\n") }] }));
+    expect(await reconcileInterruptedCalls({ workspace: dir, session: resumed.service, adapters: new Map() })).toEqual([expect.objectContaining({
+      toolCallId: "write-1", rule: "reconcile-first", result: "not-found" })]);
+  } finally { resumed.service.close({ reason: "completed" }); }
 });
