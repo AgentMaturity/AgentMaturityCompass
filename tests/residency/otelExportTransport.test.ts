@@ -10,7 +10,7 @@ beforeEach(() => {
   blocked = newWorkspace(root, "blocked");
   open = newWorkspace(root, "open");
   blockResidency(blocked);
-});
+}, 60_000); // Real vault and signing-key initialization can exceed the default hook timeout.
 afterEach(async () => { vi.restoreAllMocks(); await closeFixtures(); });
 
 const OPTIONS = { timeoutMs: 5_000, maxRetries: 2, retryBaseDelayMs: 1 };
