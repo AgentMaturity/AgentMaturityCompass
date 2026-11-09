@@ -39,8 +39,9 @@ afterEach(async () => {
 }, 60_000);
 
 function service(): NativeTaskService {
+  // The child has its own credentials home. Give the test workspace explicit operator consent there.
   const value = createService({ workspace: root, credentialsHome: home, credentialsFile: join(home, ".credentials.yaml"),
-    environment: { HOME: home, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass } });
+    environment: { HOME: home, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass, AMC_TRUST_WORKSPACE: "1" } });
   services.push(value); return value;
 }
 const start = (s: NativeTaskService, prompt: string) =>
