@@ -5,6 +5,7 @@ import { Command } from "commander";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
+import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { registerAgentCommands, type AgentLoopCliIo } from "../src/cli-agent-commands.js";
 import { registerSandboxCommands } from "../src/cli-sandbox-commands.js";
 import { registerNativeScheduleCommands } from "../src/cli-native-schedule-commands.js";
@@ -15,7 +16,8 @@ import { amcSecretPaths } from "../src/sandbox/shellSecretPaths.js";
 import { saveSchedules } from "../src/autonomy/scheduleStore.js";
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL } from "../src/agent/stubProvider.js";
 import { v1Workspace } from "./helpers/legacyVault.js";
-import { consentedToolsDigest, requireWorkspaceTrust, revokeWorkspaceTrust, repairWorkspaceTrustStore, suppliedTrustConsent, trustWorkspace, workspaceTrustVerdict } from "../src/security/workspaceTrust.js";
+import { consentedToolsDigest, NO_TOOLS_POLICY_PIN, requireWorkspaceTrust, revokeWorkspaceTrust, repairWorkspaceTrustStore, suppliedTrustConsent, trustWorkspace, workspaceTrustVerdict } from "../src/security/workspaceTrust.js";
+import type { AgentToolset } from "../src/agent/agentToolset.js";
 
 /**
  * SH-SANDBOX-07. A key set `amc init` committed under one AMC home is the operator's own (trusted). The same workspace
@@ -219,6 +221,43 @@ describe("through the real surfaces", () => {
     const viaSdk = openAgentSession({ ...init, trustWorkspace: true });
     await viaSdk.close();
     expect(workspaceTrustVerdict(workspace)).toMatchObject({ state: "trusted", record: { by: "sdk-option" } });
+  });
+
+  /**
+   * S19b: consent given while the repository had no verifiable signed tools policy covers "no policy". A policy signed
+   * after that (a `git pull` under a long-lived ACP, SDK or Studio session) is refused for the rest of the session.
+   */
+  it("a tools policy signed after consent that covered none is refused for the rest of the session", async () => {
+    writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
+    const config = loadToolsConfig(workspace);
+    rmSync(join(workspace, ".amc", "tools.yaml.sig"));
+    asClone();
+    const consent = requireWorkspaceTrust(workspace, "cli-flag");
+    expect(consent).toMatchObject({ ok: true, recorded: { toolsDigestSha256: null } });
+    expect(consentedToolsDigest(consent)).toBe(NO_TOOLS_POLICY_PIN);
+    expect(consentedToolsDigest(requireWorkspaceTrust(workspace, null))).toBe(NO_TOOLS_POLICY_PIN);
+    let toolset: AgentToolset | null = null;
+    const session = openAgentSession({ workspace, agentId: "default", tools: "workspace", systemPrompt: "s", harnessVersion: "trust-test", makeLlm: () => ({} as never),
+      compositionDigest: "composition", policyDigest: "policy", route: { providerId: STUB_PROVIDER_ID, model: STUB_PROVIDER_MODEL, params: {} },
+      bindTools: ({ toolset: composed }) => { toolset = composed; return composed!.seam; } });
+    try {
+      mkdirSync(join(workspace, "workspace"), { recursive: true });
+      writeFileSync(join(workspace, "workspace", "notes.txt"), "readable under the newly signed policy");
+      const read = () => toolset!.pipeline.execute({ name: "fs.read", agentId: "default", requestedMode: "EXECUTE", arguments: { path: "workspace/notes.txt" } });
+      expect((await read()).denied).not.toBeNull(); // nothing verifies yet
+      initToolsConfig(workspace, { tools: config.tools }); // signed mid-session: a verifiable policy whose fs.read allows ./workspace/**
+      expect(workspaceTrustVerdict(workspace)).toMatchObject({ state: "changed", changed: ["tools-policy"] });
+      expect((await read()).denied?.reason).toBe("signed tool policy differs from the native task's reviewed digest");
+    } finally { await session.close(); }
+  });
+
+  it("a workspace with no signer at admission pins no policy either", () => {
+    const bare = mkdtempSync(join(tmpdir(), "amc-wt-bare-"));
+    try {
+      const check = requireWorkspaceTrust(bare, null);
+      expect(check).toMatchObject({ ok: true, verdict: { state: "trusted", reason: "no-signer" } });
+      expect(consentedToolsDigest(check)).toBe(NO_TOOLS_POLICY_PIN);
+    } finally { rmSync(bare, { recursive: true, force: true }); }
   });
 
   it("amc native-schedule run-due refuses an untrusted workspace before any pass", async () => {

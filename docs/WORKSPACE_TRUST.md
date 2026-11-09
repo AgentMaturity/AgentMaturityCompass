@@ -25,10 +25,10 @@ that already exists in `src/keys/keyset.ts`:
 | Workspace | Verdict |
 |---|---|
 | Its key set was committed on this machine (`amc init` or a key rotation ran here) | trusted, no record needed: it is your own |
-| It has no signer: no key set and no legacy role key (`.amc/keys/auditor_ed25519.pub`) | trusted: nothing signed in it can verify |
+| It has no signer: no key set and no legacy role key (`.amc/keys/auditor_ed25519.pub`) | trusted: nothing signed in it can verify; the session is pinned to "no policy", so keys and a tools policy that appear while it is open are refused, not applied |
 | A 1.x key layout (role keys, no `keyset.json`) whose signed `tools.yaml` verifies with the legacy auditor key | first use: consent binds that key's fingerprint (recorded as generation 0) |
 | Otherwise, no consent record on this machine | first use: refused until you trust it |
-| A consent record, same signer and same signed `tools.yaml` | trusted; the consented `tools.yaml` digest is pinned for the session (a re-signed policy under a long-lived session is refused, not applied) |
+| A consent record, same signer and same signed `tools.yaml` | trusted; the consented `tools.yaml` digest is pinned for the session (a re-signed policy under a long-lived session is refused, not applied). Consent given while no signed `tools.yaml` verified pins "no policy" the same way: a policy signed later is refused for the rest of the session |
 | A consent record, but the signer or the signed `tools.yaml` changed | changed: refused until you trust it again |
 | The consent store is unreadable | refused for every workspace, with the repair step named |
 

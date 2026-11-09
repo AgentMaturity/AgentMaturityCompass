@@ -205,15 +205,24 @@ export type WorkspaceTrustCheck =
   { readonly ok: true; readonly verdict: WorkspaceTrustVerdict; readonly recorded: WorkspaceTrustRecord | null } | { readonly ok: false; readonly reason: string };
 
 /**
- * The signed tools.yaml digest the operator's consent covers, when the session rests on a consent record rather than
- * on keys this machine committed: pinned as the session's expected tools digest, so a tools.yaml re-signed while the
- * session is open (a `git pull` under a long-lived ACP, SDK or Studio session) is refused by the allowlist guard instead
- * of taking effect without re-consent. Null when there is nothing to pin.
+ * The pin for a session admitted while no signed tools policy could verify: a digest no file has (finding a preimage of
+ * all zeros is infeasible), so a policy signed later is refused for the rest of the session instead of applying (S19b).
+ */
+export const NO_TOOLS_POLICY_PIN = "0".repeat(64);
+
+/**
+ * The signed tools.yaml digest the session is pinned to when it does not rest on keys this machine committed: the one
+ * the operator's consent covers, so a tools.yaml re-signed while the session is open (a `git pull` under a long-lived
+ * ACP, SDK or Studio session) is refused by the allowlist guard instead of taking effect without re-consent. Consent
+ * given while no signed policy verified, and a workspace with no signer at all, pin NO_TOOLS_POLICY_PIN: "no policy at
+ * admission" stays "no policy" for the session. Null only for this machine's own workspace (and a refused check).
  */
 export function consentedToolsDigest(check: WorkspaceTrustCheck): string | null {
   if (!check.ok) return null;
-  if (check.recorded !== null) return check.recorded.toolsDigestSha256;
-  return check.verdict.state === "trusted" && check.verdict.reason === "consented" ? check.verdict.record?.toolsDigestSha256 ?? null : null;
+  const verdict = check.verdict;
+  const record = check.recorded ?? (verdict.state === "trusted" && verdict.reason === "consented" ? verdict.record : null);
+  if (record !== null) return record.toolsDigestSha256 ?? NO_TOOLS_POLICY_PIN;
+  return verdict.state === "trusted" && verdict.reason === "no-signer" ? NO_TOOLS_POLICY_PIN : null;
 }
 
 export function requireWorkspaceTrust(workspace: string, consent: TrustConsentSource | null, opts: TrustOptions = {}): WorkspaceTrustCheck {
