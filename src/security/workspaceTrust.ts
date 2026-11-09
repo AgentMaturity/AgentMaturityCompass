@@ -219,6 +219,11 @@ export type WorkspaceTrustCheck =
  */
 export const NO_TOOLS_POLICY_PIN = "0".repeat(64);
 
+function consentedRecord(check: Extract<WorkspaceTrustCheck, { ok: true }>): WorkspaceTrustRecord | null {
+  const verdict = check.verdict;
+  return check.recorded ?? (verdict.state === "trusted" && verdict.reason === "consented" ? verdict.record : null);
+}
+
 /**
  * The signed tools.yaml digest the session is pinned to when it does not rest on keys this machine committed: the one
  * the operator's consent covers, so a tools.yaml re-signed while the session is open (a `git pull` under a long-lived
@@ -229,9 +234,15 @@ export const NO_TOOLS_POLICY_PIN = "0".repeat(64);
 export function consentedToolsDigest(check: WorkspaceTrustCheck): string | null {
   if (!check.ok) return null;
   const verdict = check.verdict;
-  const record = check.recorded ?? (verdict.state === "trusted" && verdict.reason === "consented" ? verdict.record : null);
+  const record = consentedRecord(check);
   if (record !== null) return record.toolsDigestSha256 ?? NO_TOOLS_POLICY_PIN;
   return verdict.state === "trusted" && verdict.reason === "no-signer" ? NO_TOOLS_POLICY_PIN : null;
+}
+
+/** Undefined leaves a locally committed workspace unpinned. Null pins the absence of a signed preset file. */
+export function consentedPresetsDigest(check: Extract<WorkspaceTrustCheck, { ok: true }>): string | null | undefined {
+  if (check.verdict.state === "trusted" && check.verdict.reason === "committed-keys") return undefined;
+  return consentedRecord(check)?.presetsDigestSha256 ?? null;
 }
 
 export function requireWorkspaceTrust(workspace: string, consent: TrustConsentSource | null, opts: TrustOptions = {}): WorkspaceTrustCheck {
