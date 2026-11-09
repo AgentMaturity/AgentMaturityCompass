@@ -123,7 +123,7 @@ export function registerNativeScheduleCommands(program: Command, io: AgentLoopCl
       .requiredOption("--expect-tools-digest <digest>", "exact reviewed signed tools policy digest")
       .requiredOption("--approve-tools <actionClass>", "signed approval class; all enabled schedule scopes must match it")
       .option("--approve-risk <tier>", "signed approval risk tier, default high")
-      .option("--trust-workspace", "trust this workspace's signed configuration (key set and tools policy) on this machine, recording the consent in the AMC home; otherwise a workspace this machine never trusted is refused (AMC_TRUST_WORKSPACE=1 for headless hosts)")
+      .option("--trust-workspace", "trust this workspace's signed configuration (key set, tools policy and presets) on this machine, recording the consent in the AMC home; otherwise a workspace this machine never trusted is refused (AMC_TRUST_WORKSPACE=1 for headless hosts)")
       .option("--max-tokens <n>", "positive per-request output ceiling", "1024")
       .option("--thinking <mode>", "DeepSeek only: enabled (default) or disabled")
       .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high (default), or max with enabled thinking")

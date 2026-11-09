@@ -12,7 +12,7 @@ export function registerSandboxCommands(program: Command): void {
   const trust = program.commands.find(command => command.name() === "trust");
   if (trust === undefined) throw new Error("amc trust workspace needs the trust command group registered first");
   trust.command("workspace")
-    .description("Trust this workspace's signed configuration (key set and tools policy) on this machine, or show, revoke or repair that record")
+    .description("Trust this workspace's signed configuration (key set, tools policy and presets) on this machine, or show, revoke or repair that record")
     .option("--workspace <dir>", "workspace directory (default: cwd)")
     .option("--status", "show the verdict without recording anything")
     .option("--revoke", "remove this machine's consent record for the workspace")

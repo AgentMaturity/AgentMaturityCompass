@@ -91,8 +91,10 @@ export function secretRedactionFilter(output: string, execution: ToolExecution):
     // whole. Redact per member instead, and keep that only if it missed nothing the flat pass caught (S22): a secret
     // the structured view cannot see (a numeric value under a key-named member) keeps the flat text.
     const structured: Record<string, number> = {};
-    const value = JSON.stringify(redactJsonValues(parsed, null, structured));
-    if (coversEveryType(structured, counts)) { redacted = value; counts = structured; }
+    let value: string | null = null;
+    // JSON nested deeper than the stack can walk keeps the flat text (still redacted) rather than failing the call.
+    try { value = JSON.stringify(redactJsonValues(parsed, null, structured)); } catch (error) { if (!(error instanceof RangeError)) throw error; }
+    if (value !== null && coversEveryType(structured, counts)) { redacted = value; counts = structured; }
   }
   findings.set(execution, counts);
   return redacted;

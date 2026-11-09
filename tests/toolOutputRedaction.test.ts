@@ -71,6 +71,15 @@ describe("the tool-output secret redaction filter (SH-SANDBOX-06)", () => {
     expect(redactionCountsFor(numeric)).toEqual({ generic_api_key: 1, github_token: 1 });
   });
 
+  it("JSON nested too deep to walk keeps the flat, redacted text instead of failing the call", () => {
+    const deep = { name: "bash" } as never;
+    const depth = 200_000;
+    const out = secretRedactionFilter(`${"[".repeat(depth)}{"api_key":"abcdefghijklmnop1234"}${"]".repeat(depth)}`, deep);
+    expect(out).not.toContain("abcdefghijklmnop1234");
+    expect(out).toContain("[AMC_REDACTED:generic_api_key]");
+    expect(redactionCountsFor(deep)).toEqual({ generic_api_key: 1 });
+  });
+
   it("fs.edit refuses a replacement carrying a redaction placeholder, before any read-before-edit verdict, and leaves the file alone", async () => {
     const workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-redaction-edit-")));
     try {
