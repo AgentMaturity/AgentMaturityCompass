@@ -165,8 +165,11 @@ async function runAgent(node: Leaf, carried: string | null, init: WorkflowRunIni
     state.outputs.set(node.id, output);
     return { ok: true, text: output };
   } catch (error) {
-    // A failed result commit leaves the durable dispatch intact. Never publish its uncommitted answer.
-    state.stopped = { reason: `${dispatched ? "TOOL_OUTCOME_UNKNOWN: " : ""}${error instanceof Error ? error.message : String(error)}`, unknown: dispatched };
+    // A failed result commit or a fence loss leaves the running checkpoint intact. The signed writer
+    // cannot safely record a different status after losing its fence; report the same unknown state as resume.
+    const last = state.progress.nodes.get(node.id)?.status;
+    const unknown = dispatched || last === "running" || last === "TOOL_OUTCOME_UNKNOWN";
+    state.stopped = { reason: `${unknown ? "TOOL_OUTCOME_UNKNOWN: " : ""}${error instanceof Error ? error.message : String(error)}`, unknown };
     return fail(state, node.id, state.stopped.reason, state.stopped.unknown);
   } finally { state.release(); }
 }

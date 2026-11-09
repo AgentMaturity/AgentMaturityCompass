@@ -103,6 +103,34 @@ describe("durable workflow admission", () => {
     expect(resumed.failures[0]).toMatchObject({ nodeId: "a", unknown: true });
   });
 
+  it("reports the committed running checkpoint as unknown if its dispatch fence fails (S24)", async () => {
+    const f = fixture();
+    const assertFence = f.session.assertDispatchFence.bind(f.session);
+    const write = f.session.recordProjectedEvidence.bind(f.session);
+    let checkpointCommitted = false;
+    f.session.recordProjectedEvidence = row => {
+      const result = write(row);
+      if (row.meta.kind === "workflow/progress" && row.meta.status === "running") checkpointCommitted = true;
+      return result;
+    };
+    f.session.assertDispatchFence = () => {
+      if (checkpointCommitted) throw new Error("injected fence refusal after running checkpoint");
+      assertFence();
+    };
+    let effects = 0;
+    const runner: SubagentRunner = async () => { effects++; return { ok: true, text: "acted" }; };
+    const first = await f.run(agent("a"), runner);
+    f.session.assertDispatchFence = assertFence;
+    f.session.recordProjectedEvidence = write;
+    expect(checkpointCommitted).toBe(true);
+    expect(first.ok).toBe(false);
+    expect(first.agentsRun).toBe(0);
+    expect(first.failures[0]).toMatchObject({ nodeId: "a", unknown: true, reason: expect.stringContaining("injected fence refusal") });
+    const resumed = await f.run(agent("a"), runner);
+    expect(resumed.failures[0]).toMatchObject({ nodeId: "a", unknown: true });
+    expect(effects).toBe(0);
+  });
+
   it("blocks an admitted node whose result commit failed instead of repeating its effect", async () => {
     const f = fixture();
     const record = f.session.recordProjectedEvidence.bind(f.session);
