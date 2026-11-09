@@ -194,7 +194,7 @@ describe("every secret-looking AMC_* variable the source reads stays out of mode
   test("the scan finds AMC's secrets, and wrapped agents keep only the agent-facing AMC_TOKEN", () => {
     const names = sourceNames();
     expect(names.length).toBeGreaterThanOrEqual(30);
-    for (const name of ["AMC_VAULT_PASSPHRASE", "AMC_RELEASE_SIGNING_KEY", "AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY", "AMC_DD_API_KEY", "AMC_A4_SESSION_TOKEN_FILE"]) {
+    for (const name of ["AMC_VAULT_PASSPHRASE", "AMC_RELEASE_SIGNING_KEY", "AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY", "AMC_NOTARY_AUTH_SECRET", "AMC_A4_SESSION_TOKEN_FILE"]) {
       expect(names).toContain(name);
     }
     const kept = Object.keys(stripProviderKeys(Object.fromEntries(names.map((name) => [name, "v"]))));
