@@ -42,6 +42,8 @@ export interface WebFetchToolOptions {
   /** Injected for checks; defaults to one DNS lookup returning every address. */
   readonly resolve?: ResolveHost;
   readonly timeoutMs?: number;
+  /** Injected for checks; the renderer's own wall-clock budget (RENDER_DEADLINE_MS) by default. */
+  readonly renderDeadlineMs?: number;
 }
 
 export function webFetchTool(options: WebFetchToolOptions): ToolDefinition {
@@ -77,13 +79,18 @@ export function webFetchTool(options: WebFetchToolOptions): ToolDefinition {
         ...(options.timeoutMs ? { timeoutMs: options.timeoutMs } : {})
       });
       const rendered = isHtml(response.contentType) && args.format !== "html";
-      const raw = !isTextual(response.contentType) && !isHtml(response.contentType)
-        ? `[amc: ${response.contentType} body of ${response.body.byteLength} bytes not rendered as text]`
-        : rendered ? renderHtml(response.body.toString("utf8"), { format: args.format === "text" ? "text" : "markdown", base: response.url })
-          : response.body.toString("utf8");
+      const textual = isTextual(response.contentType) || isHtml(response.contentType);
+      const body = textual ? response.body.toString("utf8") : "";
+      const rendering = rendered ? renderHtml(body, { format: args.format === "text" ? "text" : "markdown", base: response.url,
+        ...(options.renderDeadlineMs === undefined ? {} : { deadlineMs: options.renderDeadlineMs }) }) : null;
+      const raw = !textual ? `[amc: ${response.contentType} body of ${response.body.byteLength} bytes not rendered as text]`
+        : rendering !== null ? rendering.text : body;
       const redacted = redactFetched(raw);
       const ok = response.status >= 200 && response.status < 300;
-      const output = `${ok ? "" : `[amc: HTTP ${response.status}]\n`}${labelUntrusted(response.origin, redacted.text)}`;
+      // Outside the untrusted fence: AMC's statement that the rendering is partial, which the page cannot make for it.
+      const stopped = rendering === null || rendering.stoppedAt === null ? ""
+        : `[amc: HTML rendering stopped at its time budget after ${rendering.stoppedAt} of ${body.length} characters; the page below is partial; pass format html for the raw body]\n`;
+      const output = `${ok ? "" : `[amc: HTTP ${response.status}]\n`}${stopped}${labelUntrusted(response.origin, redacted.text)}`;
       allow({
         url: response.url,
         origin: response.origin,
@@ -94,6 +101,7 @@ export function webFetchTool(options: WebFetchToolOptions): ToolDefinition {
         // What the model was given: the rendering, the raw html, or (`raw`) a non-HTML body as received or described.
         format: rendered ? args.format : isHtml(response.contentType) ? "html" : "raw",
         renderedBytes: Buffer.byteLength(raw, "utf8"),
+        ...(rendering === null ? {} : { renderComplete: rendering.stoppedAt === null }),
         // The body exactly as received, and what the model was given (redacted, labelled). Keyed in a workspace that
         // opted in to protected-data redaction (P2-02): a plain hash of a short body (a bare SSN) can be brute-forced.
         ...digestField("content", outputDigestFor(execution.workspace, sha256Hex(response.body))),

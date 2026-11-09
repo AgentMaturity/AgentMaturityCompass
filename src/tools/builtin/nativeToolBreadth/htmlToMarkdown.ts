@@ -1,18 +1,23 @@
 /**
  * HTML to markdown or plain text for `web_fetch` (SH-TOOLS-03), with no dependency and no DOM.
  *
- * One linear pass over the input with an iterative hand-written tokenizer (tags, comments, CDATA, text), a small
- * element table, and a stack of open inline marks. Linear is a security property, not a nicety: the input is remote
- * and attacker-chosen up to the signed byte cap, and the body runs on the main thread, so every step here consumes
- * input it never revisits (the tag scanner never retries at the next `<`, and trailing newlines are counted, never
- * re-measured). Rendering is lossy by design: `script`, `style`, `noscript`, `template`, `svg`, `iframe`, `object`,
- * `embed`, `title` and comments are dropped with their content (a `<script/>` still drops to its `</script>`, as a
- * browser reads it); every attribute but `href`, `src` and `alt` is ignored; entities are decoded; whitespace collapses
- * as a browser collapses it outside `pre`. `head` is not dropped as an element, because its end tag is optional and a
- * page that omits it would vanish: its children either render nothing or are dropped themselves. Table rows and
- * cells close implicitly at the next row, cell or table end, as in HTML. Links are resolved against the response URL
- * and kept only for `http`, `https` and `mailto`. The `html` format keeps the raw body, and the receipt digests the
- * body as received, so the evidence is never the rendering.
+ * One pass over the input with an iterative hand-written tokenizer (tags, comments, CDATA, text), a small element
+ * table, and a stack of open inline marks. Linear time and linear output are security properties, not niceties: the
+ * input is remote and attacker-chosen up to the signed byte cap (5 MB at most), and the body runs on the main thread.
+ * So every step consumes input it never revisits (the tag scanner never retries inside a span it gave up on; trailing
+ * newlines are counted, never re-measured), a table cell is kept as parts rather than one growing string (reading the
+ * last character of a long rope makes V8 flatten it on every read), rows are not padded to the widest row, and list
+ * indentation stops growing at MAX_LIST_INDENT, so a few input bytes never become megabytes of output. A wall-clock
+ * budget (RENDER_DEADLINE_MS) is the backstop behind all of that: past it, rendering stops and says where.
+ *
+ * Rendering is lossy by design: `script`, `style`, `noscript`, `template`, `svg`, `iframe`, `object`, `embed`, `title`,
+ * `math` and comments are dropped with their content (a `<script/>` still drops to its `</script>`, as a browser reads
+ * it); every attribute but `href`, `src` and `alt` is ignored; entities are decoded; whitespace collapses as a browser
+ * collapses it outside `pre`. `head` is not dropped as an element, because its end tag is optional and a page that
+ * omits it would vanish: its children either render nothing or are dropped themselves. Table rows and cells close
+ * implicitly at the next row, cell or table end, as in HTML. Links are resolved against the response URL and kept only
+ * for `http`, `https` and `mailto`. The `html` format keeps the raw body, and the receipt digests the body as received,
+ * so the evidence is never the rendering.
  */
 
 const DROP = new Set(["script", "style", "noscript", "template", "svg", "iframe", "object", "embed", "title", "math"]);
@@ -25,6 +30,12 @@ const NAMED_ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quo
   hellip: "…", mdash: "—", ndash: "–", lsquo: "‘", rsquo: "’", ldquo: "“", rdquo: "”", laquo: "«", raquo: "»", middot: "·", bull: "•", times: "×", euro: "€", pound: "£", yen: "¥", deg: "°" };
 /** The most input one tag may span; past it the text is text. */
 const MAX_TAG_CHARS = 65_536;
+/** Lists nested deeper than this are indented as this deep: indentation per item would otherwise grow with nesting. */
+const MAX_LIST_INDENT = 8;
+/** The wall-clock backstop for one rendering. Linear rendering of the 5 MB hard cap takes a fraction of it. */
+export const RENDER_DEADLINE_MS = 2_000;
+/** Tokens between clock reads. */
+const CLOCK_EVERY = 1_024;
 
 export function decodeEntities(text: string): string {
   return text.replace(/&(#x[0-9a-f]+|#[0-9]+|[a-z][a-z0-9]*);/gi, (whole, body: string) => {
@@ -74,14 +85,17 @@ function scanTag(html: string, lt: number): { readonly end: number; readonly fou
   return { end: limit, found: false, nameEnd };
 }
 
-/** Iterative: no recursion, so nesting depth never matters; every character is consumed once. */
-export function tokenize(html: string): Token[] {
-  const tokens: Token[] = [];
+/**
+ * The token stream, produced as it is consumed so the renderer's clock covers tokenizing too. Iterative: no recursion,
+ * so nesting depth never matters; every character is consumed once. `cursor.at` is how far into the input it got.
+ */
+function* tokens(html: string, cursor: { at: number }): Generator<Token> {
   let at = 0;
   while (at < html.length) {
+    cursor.at = at;
     const lt = html.indexOf("<", at);
-    if (lt === -1) { tokens.push({ kind: "text", text: html.slice(at) }); break; }
-    if (lt > at) tokens.push({ kind: "text", text: html.slice(at, lt) });
+    if (lt === -1) { yield { kind: "text", text: html.slice(at) }; break; }
+    if (lt > at) yield { kind: "text", text: html.slice(at, lt) };
     if (html.startsWith("<!--", lt)) {
       const end = html.indexOf("-->", lt + 4);
       at = end === -1 ? html.length : end + 3;
@@ -89,8 +103,8 @@ export function tokenize(html: string): Token[] {
     }
     if (html.startsWith("<![CDATA[", lt)) {
       const end = html.indexOf("]]>", lt + 9);
-      tokens.push({ kind: "text", text: html.slice(lt + 9, end === -1 ? html.length : end) });
       at = end === -1 ? html.length : end + 3;
+      yield { kind: "text", text: html.slice(lt + 9, end === -1 ? html.length : end) };
       continue;
     }
     if (html[lt + 1] === "!" || html[lt + 1] === "?") {
@@ -99,27 +113,29 @@ export function tokenize(html: string): Token[] {
       continue;
     }
     const closing = html[lt + 1] === "/";
-    if (!isNameStart(html.charCodeAt(lt + (closing ? 2 : 1)))) { tokens.push({ kind: "text", text: "<" }); at = lt + 1; continue; }
+    if (!isNameStart(html.charCodeAt(lt + (closing ? 2 : 1)))) { at = lt + 1; yield { kind: "text", text: "<" }; continue; }
     const tag = scanTag(html, lt);
-    if (!tag.found) { tokens.push({ kind: "text", text: html.slice(lt, tag.end) }); at = tag.end; continue; }
-    const name = html.slice(lt + (closing ? 2 : 1), tag.nameEnd).toLowerCase();
     at = tag.end;
-    if (closing) { tokens.push({ kind: "close", name }); continue; }
+    if (!tag.found) { yield { kind: "text", text: html.slice(lt, tag.end) }; continue; }
+    const name = html.slice(lt + (closing ? 2 : 1), tag.nameEnd).toLowerCase();
+    if (closing) { yield { kind: "close", name }; continue; }
     const source = html.slice(tag.nameEnd, tag.end - 1);
     const raw = RAW_TEXT.has(name);
-    tokens.push({ kind: "open", name, attrs: name === "a" || name === "img" ? attributes(source) : {}, selfClosing: !raw && (VOID.has(name) || /\/\s*$/.test(source)) });
-    if (raw) {
-      // Raw-text elements: everything to the matching close tag is one text token (left out for script/style, which
-      // the renderer drops anyway), and a self-closing slash does not end them, as in a browser.
-      const close = new RegExp(`</${name}\\s*>`, "ig");
-      close.lastIndex = at;
-      const match = close.exec(html);
-      if (name === "textarea") tokens.push({ kind: "text", text: html.slice(at, match === null ? html.length : match.index) });
-      tokens.push({ kind: "close", name });
-      at = match === null ? html.length : match.index + match[0].length;
-    }
+    const open: Token = { kind: "open", name, attrs: name === "a" || name === "img" ? attributes(source) : {}, selfClosing: !raw && (VOID.has(name) || /\/\s*$/.test(source)) };
+    if (!raw) { yield open; continue; }
+    // Raw-text elements: everything to the matching close tag is one text token (left out for script/style, which the
+    // renderer drops anyway), and a self-closing slash does not end them, as in a browser.
+    const close = new RegExp(`</${name}\\s*>`, "ig");
+    close.lastIndex = at;
+    const match = close.exec(html);
+    const textEnd = match === null ? html.length : match.index;
+    const start = at;
+    at = match === null ? html.length : match.index + match[0].length;
+    yield open;
+    if (name === "textarea") yield { kind: "text", text: html.slice(start, textEnd) };
+    yield { kind: "close", name };
   }
-  return tokens;
+  cursor.at = html.length;
 }
 
 function safeUrl(raw: string | undefined, base: string): string | null {
@@ -136,6 +152,14 @@ export interface RenderOptions {
   readonly format: "markdown" | "text";
   /** The response URL, for resolving relative links. */
   readonly base: string;
+  /** The wall-clock budget in milliseconds; RENDER_DEADLINE_MS by default. */
+  readonly deadlineMs?: number;
+}
+
+export interface RenderedHtml {
+  readonly text: string;
+  /** Input characters consumed when the wall-clock budget stopped rendering; null when the whole document rendered. */
+  readonly stoppedAt: number | null;
 }
 
 const isBlank = (char: string | undefined): boolean => char === " " || char === "\t" || char === "\n" || char === "\r" || char === "\f";
@@ -156,56 +180,59 @@ function tidy(text: string): string {
 }
 
 /** Render an HTML document as markdown or plain text. Never throws on malformed input. */
-export function renderHtml(html: string, options: RenderOptions): string {
+export function renderHtml(html: string, options: RenderOptions): RenderedHtml {
   const md = options.format === "markdown";
+  const deadline = performance.now() + (options.deadlineMs ?? RENDER_DEADLINE_MS);
   const out: string[] = [];
   let trailingNewlines = 0;
   let dropDepth = 0;
   let preDepth = 0;
   const lists: Array<{ ordered: boolean; count: number }> = [];
   const links: Array<string | null> = [];
-  let cell = false;
-  let rowCells: string[] = [];
+  /** The open cell's parts, or null outside a cell. */
+  let cell: string[] | null = null;
+  let rowCells: string[][] = [];
   let tableRows: string[][] = [];
   const push = (text: string): void => {
     if (text === "") return;
     out.push(text);
     let count = 0;
-    while (count < text.length && text[text.length - 1 - count] === "\n") count++;
+    while (count < text.length && text.charCodeAt(text.length - 1 - count) === 10) count++;
     trailingNewlines = count === text.length ? trailingNewlines + count : count;
   };
-  const emit = (text: string): void => { if (cell) rowCells[rowCells.length - 1] = `${rowCells[rowCells.length - 1] ?? ""}${text}`; else push(text); };
+  const emit = (text: string): void => { if (text === "") return; if (cell !== null) cell.push(text); else push(text); };
+  const lastEmitted = (): string => (cell !== null ? cell[cell.length - 1] : out[out.length - 1]) ?? "";
   const newline = (count = 1): void => {
-    if (cell || out.length === 0) return;
+    if (cell !== null || out.length === 0) return;
     if (trailingNewlines < count) push("\n".repeat(count - trailingNewlines));
   };
   const endRow = (): void => {
-    cell = false;
-    if (rowCells.length > 0) tableRows.push(rowCells.map((text) => text.trim().replace(/\|/g, "\\|")));
+    cell = null;
+    if (rowCells.length > 0) tableRows.push(rowCells.map((parts) => parts.join("").trim().replace(/\|/g, "\\|")));
     rowCells = [];
   };
   const flushTable = (): void => {
     endRow();
     if (tableRows.length === 0) return;
-    let width = 0;
-    for (const row of tableRows) width = Math.max(width, row.length);
-    const rows = tableRows.map((row) => [...row, ...Array.from({ length: width - row.length }, () => "")]);
-    if (md) {
-      push(rows.map((row, index) => `| ${row.join(" | ")} |${index === 0 ? `\n| ${row.map(() => "---").join(" | ")} |` : ""}`).join("\n"));
-    } else push(rows.map((row) => row.join("\t")).join("\n"));
+    // Each row keeps its own width: padding every row to the widest would let one wide row multiply the output.
+    push((md
+      ? tableRows.map((row, index) => `| ${row.join(" | ")} |${index === 0 ? `\n| ${row.map(() => "---").join(" | ")} |` : ""}`)
+      : tableRows.map((row) => row.join("\t"))).join("\n"));
     push("\n\n");
     tableRows = [];
   };
-  for (const token of tokenize(html)) {
+  const cursor = { at: 0 };
+  let stoppedAt: number | null = null;
+  let seen = 0;
+  for (const token of tokens(html, cursor)) {
+    if (++seen % CLOCK_EVERY === 0 && performance.now() >= deadline) { stoppedAt = cursor.at; break; }
     if (token.kind === "text") {
       if (dropDepth > 0) continue;
       const text = decodeEntities(token.text);
       if (preDepth > 0) { emit(text); continue; }
       const collapsed = text.replace(/[ \t\r\n\f]+/g, " ");
-      if (collapsed === "") continue;
-      const last = cell ? rowCells[rowCells.length - 1] ?? "" : out[out.length - 1] ?? "";
-      const afterBlank = last === "" || isBlank(last[last.length - 1]);
-      emit(collapsed === " " && afterBlank ? "" : afterBlank ? collapsed.replace(/^ /, "") : collapsed);
+      const last = lastEmitted();
+      emit((last === "" || isBlank(last[last.length - 1])) && collapsed[0] === " " ? collapsed.slice(1) : collapsed);
       continue;
     }
     const { name } = token;
@@ -219,10 +246,10 @@ export function renderHtml(html: string, options: RenderOptions): string {
         newline(1);
         const list = lists[lists.length - 1] ?? { ordered: false, count: 0 };
         list.count++;
-        push(`${"  ".repeat(Math.max(0, lists.length - 1))}${md ? (list.ordered ? `${list.count}. ` : "- ") : (list.ordered ? `${list.count}. ` : "• ")}`);
+        push(`${"  ".repeat(Math.min(Math.max(0, lists.length - 1), MAX_LIST_INDENT))}${md ? (list.ordered ? `${list.count}. ` : "- ") : (list.ordered ? `${list.count}. ` : "• ")}`);
         continue;
       }
-      if (name === "br") { if (cell) emit(" "); else push("\n"); continue; }
+      if (name === "br") { if (cell !== null) emit(" "); else push("\n"); continue; }
       if (name === "hr") { newline(2); push(md ? "---\n\n" : "\n"); continue; }
       if (name === "img") { const src = safeUrl(token.attrs.src, options.base); const alt = token.attrs.alt ?? ""; if (md && src !== null) emit(`![${alt}](${src})`); else if (alt !== "") emit(alt); continue; }
       if (name === "a") { const href = safeUrl(token.attrs.href, options.base); links.push(href); if (md && href !== null) emit("["); continue; }
@@ -231,7 +258,7 @@ export function renderHtml(html: string, options: RenderOptions): string {
       if (md && name === "code" && preDepth === 0) { emit("`"); continue; }
       if (name === "table") { flushTable(); newline(2); continue; }
       if (name === "tr") { endRow(); continue; }
-      if (name === "td" || name === "th") { cell = true; rowCells.push(""); continue; }
+      if (name === "td" || name === "th") { cell = []; rowCells.push(cell); continue; }
       if (name === "blockquote") { newline(2); if (md) push("> "); continue; }
       if (BLOCK.has(name)) { newline(name === "div" || name === "dd" || name === "dt" ? 1 : 2); continue; }
       continue;
@@ -243,11 +270,11 @@ export function renderHtml(html: string, options: RenderOptions): string {
     if (md && (name === "strong" || name === "b")) { emit("**"); continue; }
     if (md && (name === "em" || name === "i")) { emit("_"); continue; }
     if (md && name === "code" && preDepth === 0) { emit("`"); continue; }
-    if (name === "td" || name === "th") { cell = false; continue; }
+    if (name === "td" || name === "th") { cell = null; continue; }
     if (name === "tr") { endRow(); continue; }
     if (name === "table") { flushTable(); continue; }
     if (BLOCK.has(name)) { newline(name === "li" || name === "div" || name === "dd" || name === "dt" ? 1 : 2); continue; }
   }
   flushTable();
-  return tidy(out.join(""));
+  return { text: tidy(out.join("")), stoppedAt };
 }

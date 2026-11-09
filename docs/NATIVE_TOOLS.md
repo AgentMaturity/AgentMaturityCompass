@@ -127,16 +127,23 @@ Sharing one workspace allowlist with other tools is part of P2-13.
   blockquotes, images as `![alt](url)` and links as `[text](url)`, resolved
   against the response URL; only `http`, `https` and `mailto` targets are kept.
   `text` is the same with no markdown syntax. `html` is the raw body. `script`,
-  `style`, `noscript`, `template`, `svg`, `iframe`, `object`, `embed`, `title` and
-  comments are dropped with their content (a self-closing `<script/>` still drops
-  to its `</script>`, as a browser reads it); `head` is not dropped as an element,
-  since its end tag is optional, but its children render nothing. Table rows and
-  cells close implicitly, as in HTML. Every attribute except `href`, `src` and
-  `alt` is ignored. The renderer adds no dependency and builds no DOM, and it is
-  linear in the input: a tag with no `>` within 64 KiB is text, and the scan never
-  retries inside it. It is lossy by design: the receipt's `contentSha256` digests
-  the body as received, and `format` (`markdown`, `text`, `html` for a raw HTML
-  body, `raw` for a non-HTML body) and `renderedBytes` say what the model was given.
+  `style`, `noscript`, `template`, `svg`, `iframe`, `object`, `embed`, `title`,
+  `math` and comments are dropped with their content (a self-closing `<script/>`
+  still drops to its `</script>`, as a browser reads it); `head` is not dropped as
+  an element, since its end tag is optional, but its children render nothing.
+  Table rows and cells close implicitly, as in HTML, and each row keeps its own
+  width (rows are not padded to the widest). Nested lists indent at most eight
+  levels deep. Every attribute except `href`, `src` and `alt` is ignored. The
+  renderer adds no dependency and builds no DOM, and it is linear in the input,
+  in time and in output size, because the page is remote and the body runs on the
+  main thread: a tag with no `>` within 64 KiB is text, and the scan never retries
+  inside it. A two-second wall-clock budget is the backstop: past it the
+  rendering stops, the output says so on a line before the untrusted fence (how
+  many characters were rendered, and that `format: html` gives the raw body), and
+  the receipt's `renderComplete` is false. It is lossy by design: the receipt's
+  `contentSha256` digests the body as received, and `format` (`markdown`, `text`,
+  `html` for a raw HTML body, `raw` for a non-HTML body), `renderedBytes` and, for
+  a rendered body, `renderComplete` say what the model was given.
 - Other content types ignore `format`: textual bodies are returned as text, the
   rest are described rather than rendered.
 - Output passes through `redactSecrets` (the shared P5.3 table). Each match becomes
@@ -163,7 +170,7 @@ rows go through the native session writer when one is bound, else the raw ledger
 
 | Receipt | Written | Allow fields |
 | --- | --- | --- |
-| `NATIVE_WEB_FETCH` | before content is returned | URL, origin, connected address, status, content type, bytes, `format` (`markdown`, `text` or `html`) and `renderedBytes`, `contentSha256` (the body as received), `deliveredSha256` (what the model saw), redaction counts, the signed policy digest |
+| `NATIVE_WEB_FETCH` | before content is returned | URL, origin, connected address, status, content type, bytes, `format` (`markdown`, `text`, `html` or `raw`), `renderedBytes` and `renderComplete` (rendered bodies), `contentSha256` (the body as received), `deliveredSha256` (what the model saw), redaction counts, the signed policy digest |
 | `NATIVE_WEB_SEARCH` | before results are returned | provider id, `querySha256`, each request's origin, address, status, bytes and `contentSha256`, result count, `deliveredSha256`, redaction counts, policy digest |
 | `NATIVE_WEB_EGRESS` | before each connection | host, port, decision, reason, the address to connect to (one row per egress decision, in addition to the call receipt) |
 | `NATIVE_ASK_USER` | before the answer is returned | question id, `questionSha256`, `answerSha256` (never the answer text) |
