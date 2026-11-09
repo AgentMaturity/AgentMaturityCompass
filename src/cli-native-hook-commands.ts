@@ -94,7 +94,7 @@ export function registerNativeHookCommands(extension: Command): void {
         for (const handler of matching) {
           const stale = staleCommandHookReferences(process.cwd(), load); // before every spawn, as the loop does
           if (stale !== undefined) throw new NativeCommandHookError("HOOKS_UNTRUSTED", stale);
-          const run = await runNativeCommandHook(handler, input, process.cwd());
+          const run = await runNativeCommandHook(handler, input, process.cwd(), load.references);
           runs.push({ index: handler.index, matcher: handler.matcher || "*", argv: handler.argv, decision: run.decision, ...(run.reason === undefined ? {} : { reason: run.reason }), exitCode: run.exitCode, terminatedBy: run.terminatedBy, stderr: run.stderr });
         }
         const denied = NATIVE_COMMAND_HOOK_DENY_EVENTS.includes(event) ? runs.find(run => run.decision === "deny") : undefined;

@@ -1,134 +1,75 @@
-import { realpathSync } from "node:fs";
-import { basename, delimiter, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { accessSync, constants, realpathSync, statSync } from "node:fs";
+import { basename, delimiter, isAbsolute, join, normalize, relative, sep } from "node:path";
 
-/**
- * What a command hook's argv may name (S6). Trust binds `.amc/hooks.json` and every file under `.amc/hooks/`; these
- * rules refuse the ways an argv names code trust cannot see, so an accepted command cannot start running different code
- * later without a new acceptance:
- *
- * - CODE-LOADING FLAGS of common interpreters (inline programs, required modules, include paths, an interactive or
- *   stdin program), wherever the interpreter appears in the whitespace-split command (so `env node -e`, `nice python3 -c`
- *   and `env -S "node -e ..."` are refused like `node -e`), in short-flag clusters (`-pe`, `-Bc`, `-xc`) too. Inline
- *   code itself is in the accepted file, but it can load any workspace file by name.
- * - STDIN AS PROGRAM: an interpreter given `-`, `/dev/stdin` or no script at all reads its program from stdin, which is
- *   the hook input and carries model-influenced text (tool arguments, prompts).
- * - PATH CANDIDATES: every argv item, its whitespace-separated words, the parts of `NAME=value` and `--flag=value`
- *   (split on `,` and the PATH delimiter) and an attached short-option value (`-I./lib`) are judged by canonical
- *   location against the workspace by nativeCommandHookConfig.ts.
- *
- * Not a parser for every program: inline programs (awk, sed, jq), and tools that read scripts or configuration from the
- * working directory or its parents on their own (npm scripts, make, test runners, linters, Node and Python package
- * lookup), are not inspected. docs/NATIVE_HOOKS.md says so.
- */
-
-/** `short`: single-letter flags that load code; `valued`: other single-letter flags whose value ends a cluster (`-Wignore`). */
-interface Interpreter { readonly short?: string; readonly valued?: string; readonly long?: readonly string[]; readonly words?: readonly string[]; readonly prefixes?: readonly string[] }
-const NODE_LIKE: Interpreter = { short: "epri", valued: "C", long: ["--eval", "--print", "--require", "--import", "--loader", "--experimental-loader", "--interactive", "--preload"] };
-const SHELL: Interpreter = { short: "csiC", valued: "oO", long: ["--command", "--init-command", "--rcfile", "--init-file"] };
-/** PowerShell accepts any prefix of a parameter name (`-c`, `-com`, `-e`), case-insensitively, plus the aliases `-ec` and `-cwa`. */
-const POWERSHELL: Interpreter = { prefixes: ["-command", "-encodedcommand", "-commandwithargs", "-ec", "-cwa"] };
-const INTERPRETERS = new Map<string, Interpreter>([
-  ...["node", "nodejs", "bun", "tsx", "ts-node", "esno"].map(name => [name, NODE_LIKE] as const),
-  ...["sh", "bash", "zsh", "dash", "ksh", "mksh", "fish", "tcsh", "csh"].map(name => [name, SHELL] as const),
-  ["python", { short: "cmi", valued: "WXQ" }], ["pypy", { short: "cmi", valued: "WXQ" }], ["ruby", { short: "erI" }], ["perl", { short: "eEMmI" }],
-  ["php", { short: "rBREFa" }], ["lua", { short: "eli" }], ["luajit", { short: "eli" }], ["osascript", { short: "e" }], ["rscript", { short: "e" }],
-  ["julia", { short: "eELi" }], ["deno", { words: ["eval", "repl"] }], ["pwsh", POWERSHELL], ["powershell", POWERSHELL],
-  ["cmd", { words: ["/c", "/k", "/r", "/C", "/K", "/R"] }]
+const INTERPRETER = /^(?:node(?:js)?|python|pypy|ruby|perl|sh|bash|zsh|dash|ksh)(?:\d+(?:\.\d+)*)?$/;
+const LAUNCHERS = new Set([
+  "env", "nice", "timeout", "sudo", "doas", "su", "nohup", "setsid", "xargs", "busybox",
+  "bun", "tsx", "ts-node", "esno", "deno", "mksh", "fish", "tcsh", "csh", "php", "lua", "luajit",
+  "osascript", "rscript", "julia", "pwsh", "powershell", "cmd", "awk", "gawk", "mawk", "sed", "jq"
 ]);
-/** `python3.12` → python, `node22` → node, `Rscript.exe` → rscript. */
-function interpreterOf(token: string): Interpreter | undefined {
-  const name = /^([a-z][a-z-]*?)[\d.]*(?:\.(?:exe|cmd|bat))?$/.exec(basename(token).toLowerCase())?.[1];
-  return name === undefined ? undefined : INTERPRETERS.get(name);
-}
+const PROCESS_PATH = /^\/(?:proc(?:\/|$)|dev\/(?:fd(?:\/|$)|std(?:in|out|err)$))/;
+const PLAIN_SEGMENT = /^(?!\.{1,2}$)[A-Za-z0-9._-]{1,255}$/;
+const PLAIN_ARG = /^[A-Za-z0-9_][A-Za-z0-9._-]*$/;
+const nameOf = (program: string): string => basename(program).toLowerCase().replace(/\.exe$/, "");
+const isInterpreter = (program: string): boolean => INTERPRETER.test(nameOf(program));
 
-function loadsCode(spec: Interpreter, token: string): boolean {
-  if (spec.words?.includes(token)) return true;
-  const lower = token.toLowerCase().split(":")[0]!;
-  if (spec.prefixes !== undefined) return lower.length >= 2 && lower.startsWith("-") && spec.prefixes.some(prefix => prefix.startsWith(lower));
-  if (token.startsWith("--")) return spec.long?.some(flag => token === flag || token.startsWith(`${flag}=`)) ?? false;
-  if (!/^-[A-Za-z]/.test(token)) return false;
-  for (const char of token.slice(1)) { // a cluster: flags left to right until one takes the rest of the token as its value
-    if (spec.short?.includes(char)) return true;
-    if (spec.valued?.includes(char)) return false;
-  }
-  return false;
-}
-
-/**
- * The interpreter's own options run up to its script (the first word that is not an option); what follows is the
- * script's arguments. PowerShell, cmd and deno take parameters and subcommands anywhere, so every token counts there.
- */
-function interpreterVerdict(spec: Interpreter, rest: readonly string[]): { readonly flag: string } | "stdin" | "script" {
-  const anywhere = spec.prefixes !== undefined || spec.words !== undefined;
-  for (let at = 0; at < rest.length; at++) {
-    const item = rest[at]!;
-    if (loadsCode(spec, item)) return { flag: item };
-    if (item === "-") return "stdin";
-    if (anywhere) continue;
-    if (!/^[-+]/.test(item)) return "script"; // `+o posix` is a shell option too
-    if (item.length === 2 && spec.valued?.includes(item[1]!)) at++; // `-W ignore`, `-o pipefail`: the value is not the script
-  }
-  return anywhere && rest.length > 0 ? "script" : "stdin";
-}
-
-/** Process-relative and descriptor paths name whatever the process has open, never a reviewable file. */
-const PROCESS_RELATIVE = /^\/(proc\/|dev\/fd\/|dev\/std(in|out|err)$)/;
-
-/**
- * The parse-time refusal for one handler's argv, or undefined. Nothing here touches the filesystem. The first
- * interpreter in the whitespace-split command is the one that runs, whatever wraps it (`env`, `nice`, `sudo`, `timeout`).
- */
+/** The only command shapes: one external executable, or a known interpreter with a bound script and plain arguments. */
 export function hookArgvRefusal(event: string, argv: readonly string[], hooksDir: string): string | undefined {
   const program = argv[0]!;
-  if (!isAbsolute(program) && /[\\/]/.test(program)) return `A ${event} hook names its program by a relative path (${program}); use an absolute path, or a bare name found on PATH.`;
-  const processPath = argvPathCandidates(argv).find(candidate => PROCESS_RELATIVE.test(candidate));
-  if (processPath !== undefined) return `A ${event} hook names ${processPath}; /proc and /dev/fd paths name whatever the process has open, not a reviewable file.`;
-  const tokens = argv.flatMap(item => item.split(/\s+/)).filter(token => token.length > 0);
-  const at = tokens.findIndex(token => interpreterOf(token) !== undefined);
-  if (at < 0) return undefined;
-  const name = basename(tokens[at]!), verdict = interpreterVerdict(interpreterOf(tokens[at]!)!, tokens.slice(at + 1));
-  if (typeof verdict === "object") return `A ${event} hook passes ${verdict.flag} to ${name}, which loads code trust cannot bind; put the code in a file under ${hooksDir}/ and name that file.`;
-  if (verdict === "stdin") return `A ${event} hook runs ${name} with no script file, so it would read its program from stdin, which carries the hook input (model-influenced text); name a script under ${hooksDir}/.`;
+  const refusal = (reason: string): string => `A ${event} hook ${reason}`;
+  if (argv.some(part => part.includes("\0")) || PROCESS_PATH.test(program)) return refusal("contains an unsafe program or argument.");
+  if (LAUNCHERS.has(nameOf(program))) return refusal("cannot run a wrapper or an unsupported interpreter.");
+  if (isInterpreter(program)) {
+    if (!isAbsolute(program) && nameOf(program) !== program.toLowerCase().replace(/\.exe$/, "")) return refusal("must name the interpreter directly, without a relative path.");
+    const script = argv[1];
+    if (script === undefined || !script.startsWith(`${hooksDir}/`) || !script.slice(hooksDir.length + 1).split("/").every(part => PLAIN_SEGMENT.test(part))) {
+      return refusal(`must give the interpreter one exact ${hooksDir}/ file as its first argument, without interpreter flags.`);
+    }
+    if (!argv.slice(2).every(arg => PLAIN_ARG.test(arg))) return refusal("takes plain arguments after the script. Flags, paths and assignments are refused.");
+    return undefined;
+  }
+  if (!isAbsolute(program) || argv.length !== 1) return refusal("must name one absolute external executable without arguments, or a supported interpreter with a bound script.");
   return undefined;
 }
 
-/** Every string in the argv that may name a file: items, their words, `=`-separated value parts, attached short-option values. */
-export function argvPathCandidates(argv: readonly string[]): string[] {
-  const out = new Set<string>();
-  const parts = new RegExp(`[,${delimiter === ";" ? ";" : ":"}]`);
-  for (const item of argv) {
-    for (const token of new Set([item, ...item.split(/\s+/)])) {
-      if (token.length === 0) continue;
-      out.add(token);
-      for (const piece of token.split("=").slice(1)) for (const part of piece.split(parts)) if (part.length > 0) out.add(part);
-      if (/^-[A-Za-z]./.test(token)) out.add(token.slice(2));
-    }
+function inside(root: string, path: string): boolean {
+  const rel = relative(root, path);
+  return rel !== ".." && !rel.startsWith(`..${sep}`) && !isAbsolute(rel);
+}
+
+/** Check both the operator's spelling and its resolved location, then use only the resolved path. */
+export function outsideHookWorkspace(workspace: string, path: string): string | null {
+  if (!isAbsolute(path) || normalize(path) !== path || PROCESS_PATH.test(path)) return null;
+  const root = realpathSync.native(workspace), actual = realpathSync.native(path);
+  return inside(workspace, path) || inside(root, path) || inside(root, actual) || PROCESS_PATH.test(actual) ? null : actual;
+}
+
+/** Bare names are reserved for supported interpreters and looked up only in absolute, external PATH directories. */
+export function resolveHookProgram(program: string, workspace: string): string {
+  const interpreter = isInterpreter(program);
+  const checked = (path: string): string => {
+    const actual = outsideHookWorkspace(workspace, path);
+    if (actual === null) throw new Error("hook program must be an absolute executable outside the workspace");
+    if (interpreter !== isInterpreter(actual) || LAUNCHERS.has(nameOf(actual))) throw new Error("hook program resolves to a different command type, a wrapper or an unsupported interpreter");
+    if (!statSync(actual).isFile()) throw new Error("hook program is not a regular file");
+    accessSync(actual, constants.X_OK);
+    return actual;
+  };
+  if (isAbsolute(program)) return checked(program);
+  for (const dir of hookChildPath(workspace, process.env.PATH).split(delimiter).filter(Boolean)) {
+    const candidate = join(dir, process.platform === "win32" && !program.toLowerCase().endsWith(".exe") ? `${program}.exe` : program);
+    try { return checked(candidate); }
+    catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
   }
-  return [...out];
+  throw new Error(`hook interpreter ${program} was not found on PATH outside the workspace`);
 }
 
-/** The path as the filesystem knows it: symlinks followed and case as stored; a missing leaf is joined to its canonical parent. */
-export function canonicalPath(path: string): string {
-  try { return realpathSync.native(path); }
-  catch {
-    const parent = dirname(path);
-    return parent === path ? path : join(canonicalPath(parent), basename(path));
-  }
-}
-
-/** `item` as a POSIX path relative to the workspace by canonical location: "" for the workspace itself, null outside it. */
-export function workspaceLocation(root: string, item: string): string | null {
-  const rel = relative(canonicalPath(root), canonicalPath(resolve(root, item)));
-  if (rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel)) return null;
-  return rel.split(sep).join("/");
-}
-
-/** A bare program name is found on PATH, never in the working directory, so it names no workspace path as an argument would. */
-export function isBareProgram(argv: readonly string[], candidate: string): boolean {
-  return !/[\\/]/.test(candidate) && candidate !== "." && candidate !== ".." && (candidate === argv[0] || interpreterOf(candidate) !== undefined);
-}
-
-/** The hook child's PATH: absolute entries outside the workspace only, so a hook's own bare commands never resolve into it. */
+/** Canonical absolute PATH directories outside the workspace, for lookup and for the hook child. */
 export function hookChildPath(workspace: string, path: string | undefined): string {
-  return (path ?? "").split(delimiter).filter(entry => entry.length > 0 && isAbsolute(entry) && workspaceLocation(workspace, entry) === null).join(delimiter);
+  return (path ?? "").split(delimiter).flatMap(entry => {
+    try {
+      const actual = outsideHookWorkspace(workspace, entry);
+      return actual !== null && statSync(actual).isDirectory() ? [actual] : [];
+    } catch { return []; }
+  }).join(delimiter);
 }

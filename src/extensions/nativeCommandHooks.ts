@@ -1,15 +1,19 @@
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
 import type { ToolExecution } from "../tools/toolTypes.js";
 import { runProcess } from "../exec/runProcess.js";
 import type { ProcessOutcome } from "../exec/processTypes.js";
 import { redactSecrets } from "../shield/redaction/redactSecrets.js";
+import { readContainedOrNull } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { NativeExtensionHookFailure } from "./nativeExtensionHooks.js";
 import type { NativeExtensionHookEvent } from "./nativeExtensionHookSchema.js";
 import type { NativeHookRuntime } from "./nativeHookRuntime.js";
-import { hookChildPath } from "./nativeCommandHookArgv.js";
+import { hookChildPath, outsideHookWorkspace, resolveHookProgram } from "./nativeCommandHookArgv.js";
 import {
-  commandHookMatches, loadNativeCommandHooks, NATIVE_COMMAND_HOOK_LIMITS, resolveHookProgram, staleCommandHookReferences,
-  type NativeCommandHookEvent, type NativeCommandHookHandler, type NativeCommandHookLoad
+  commandHookMatches, loadNativeCommandHooks, NATIVE_COMMAND_HOOK_LIMITS, staleCommandHookReferences,
+  type NativeCommandHookEvent, type NativeCommandHookHandler, type NativeCommandHookLoad, type NativeCommandHookReference
 } from "./nativeCommandHookConfig.js";
 
 /**
@@ -30,9 +34,8 @@ import {
  * Stdout over the 64 KiB capture is a denial too: the collector keeps head and tail, so a JSON deny written past the
  * cap would otherwise fail to parse and read as an abstention (fail-open on a guard).
  *
- * THE BOUND FILES ARE RE-CHECKED BEFORE EVERY SPAWN, not once per decision: handlers run one after another for up to
- * 60 s each, and an interpreter re-opens its script by path after spawn. ponytail: a concurrent writer can still swap a
- * script between this check and the interpreter's open; executing the verified bytes from a private copy closes that.
+ * THE BOUND FILES ARE RECHECKED BEFORE EVERY SPAWN, then the interpreter opens a private copy of the approved
+ * bytes. The hook's current directory is private, while the input's cwd and AMC_WORKSPACE name the actual workspace.
  */
 
 type Decision = { readonly deny: string } | { readonly abstain: true };
@@ -74,14 +77,35 @@ export interface NativeCommandHookRun {
   readonly stderr: string;
 }
 
-/** Run one handler with one input. Exported for `hooks test`; nothing else calls it directly. */
-export async function runNativeCommandHook(handler: NativeCommandHookHandler, input: Record<string, unknown>, workspace: string, signal?: AbortSignal): Promise<NativeCommandHookRun> {
-  let outcome: ProcessOutcome;
-  let program: string;
-  try { program = resolveHookProgram(handler.argv[0]!, workspace); }
-  catch (error) { return { handler, decision: "deny", reason: error instanceof Error ? error.message : "hook program could not be resolved", exitCode: null, terminatedBy: null, stderr: "" }; }
+/** Copy only the bytes that match the trusted tree, preserving relative paths for local imports. */
+function stageHookFiles(workspace: string, directory: string, references: readonly NativeCommandHookReference[]): void {
+  for (const { rel, sha256 } of references) {
+    const bytes = readContainedOrNull(workspace, rel, NATIVE_COMMAND_HOOK_LIMITS.referenceBytes);
+    if (bytes === null || sha256Hex(bytes) !== sha256) throw new Error(`${rel} changed since this machine trusted it`);
+    const path = join(directory, ...rel.split("/"));
+    mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
+    writeFileSync(path, bytes, { mode: 0o600, flag: "wx" });
+  }
+}
+
+/** Run one trusted handler with one input. The CLI test command uses the same execution path. */
+export async function runNativeCommandHook(handler: NativeCommandHookHandler, input: Record<string, unknown>, workspace: string,
+  references: readonly NativeCommandHookReference[], signal?: AbortSignal): Promise<NativeCommandHookRun> {
+  const denied = (reason: string): NativeCommandHookRun => ({ handler, decision: "deny", reason, exitCode: null, terminatedBy: null, stderr: "" });
+  let outcome: ProcessOutcome | undefined;
+  let directory: string | undefined;
   try {
-    const running = runProcess({ argv: [program, ...handler.argv.slice(1)], cwd: workspace,
+    const program = resolveHookProgram(handler.argv[0]!, workspace);
+    const parent = outsideHookWorkspace(workspace, tmpdir());
+    if (parent === null) return denied("hook temporary directory must be outside the workspace");
+    directory = mkdtempSync(join(parent, "amc-command-hook-"));
+    const script = handler.argv[1];
+    if (script !== undefined) {
+      if (!references.some(reference => reference.rel === script)) return denied("hook script is not bound to the accepted trust value");
+      stageHookFiles(workspace, directory, references);
+    }
+    const argv = script === undefined ? [program] : [program, join(directory, ...script.split("/")), ...handler.argv.slice(2)];
+    const running = runProcess({ argv, cwd: directory,
       env: { PATH: hookChildPath(workspace, process.env.PATH), HOME: process.env.HOME ?? "", AMC_HOOK_EVENT: handler.event, AMC_WORKSPACE: workspace },
       stdin: "pipe", stdout: "capture", stderr: "capture", maxCaptureBytes: NATIVE_COMMAND_HOOK_LIMITS.outputBytes, scrubValues: [],
       graceMs: 500, timeoutMs: handler.timeoutMs, ...(signal === undefined ? {} : { signal }) });
@@ -89,8 +113,14 @@ export async function runNativeCommandHook(handler: NativeCommandHookHandler, in
     running.endStdin();
     outcome = await running.done;
   } catch (error) {
-    return { handler, decision: "deny", reason: `hook could not be started (${error instanceof Error && "code" in error ? String((error as NodeJS.ErrnoException).code) : "spawn failed"})`, exitCode: null, terminatedBy: null, stderr: "" };
+    return denied(`hook could not be started: ${safeText(error instanceof Error ? error.message : "spawn failed")}`);
+  } finally {
+    if (directory !== undefined) {
+      try { rmSync(directory, { recursive: true, force: true, maxRetries: 2 }); }
+      catch { outcome = undefined; }
+    }
   }
+  if (outcome === undefined) return denied("hook temporary files could not be removed");
   const decided = decisionOf(outcome);
   const stderr = safeText(outcome.stderr.text);
   return "deny" in decided ? { handler, decision: "deny", reason: decided.deny, exitCode: outcome.exitCode, terminatedBy: outcome.terminatedBy, stderr }
@@ -151,7 +181,7 @@ export class NativeCommandHooks implements NativeHookRuntime {
     const reports: NativeExtensionHookFailure[] = [];
     for (const handler of this.handlers(mapped, mapped === "PostToolUse" ? event.toolName ?? "" : undefined)) {
       if (staleCommandHookReferences(this.context.workspace, this.load) !== undefined) { reports.push(this.report(event.kind, "HOOKS_UNTRUSTED")); break; }
-      const run = await runNativeCommandHook(handler, nativeCommandHookInput(mapped, this.base(), detail), this.context.workspace, signal);
+      const run = await runNativeCommandHook(handler, nativeCommandHookInput(mapped, this.base(), detail), this.context.workspace, this.load.references, signal);
       if (run.decision === "deny") reports.push(this.report(event.kind, run.terminatedBy === "timeout" ? "HOOK_TIMEOUT" : run.exitCode === null ? "HOOK_SPAWN_FAILED" : "HOOK_FAILED"));
     }
     return reports;
@@ -159,13 +189,14 @@ export class NativeCommandHooks implements NativeHookRuntime {
 
   /** Deny-capable chain: the first denial wins; a handler failure is a denial (fail closed). */
   private async decide(event: NativeCommandHookEvent, toolName: string | undefined, detail: Record<string, unknown>, truncated: boolean, signal?: AbortSignal): Promise<string | undefined> {
+    if (this.load.status !== "trusted") return this.refusal();
     const refused = this.refusal();
     if (refused !== undefined) return refused;
     for (const handler of this.handlers(event, toolName)) {
       if (truncated && !handler.acceptTruncatedInput) return `${this.identity(handler)}: the input exceeds ${NATIVE_COMMAND_HOOK_LIMITS.inputBytes} bytes and the hook did not declare acceptTruncatedInput`;
       const stale = this.refusal(); // immediately before each spawn, not once per decision
       if (stale !== undefined) return stale;
-      const run = await runNativeCommandHook(handler, nativeCommandHookInput(event, this.base(), detail), this.context.workspace, signal);
+      const run = await runNativeCommandHook(handler, nativeCommandHookInput(event, this.base(), detail), this.context.workspace, this.load.references, signal);
       if (run.decision === "deny") return `${this.identity(handler)}: ${run.reason ?? "hook denied"}`;
     }
     return undefined;
