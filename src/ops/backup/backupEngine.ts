@@ -397,11 +397,19 @@ export async function createBackupAsync(input: Parameters<typeof createBackup>[0
     const selectedSources = [...original.keys(), ...[...snapshots.keys()].map(path => join(workspace, path)), ...(passphraseFile?.trim() ? [resolve(passphraseFile.trim())] : [])];
     output.assertNoAlias(selectedSources);
     const selected = new Set(files);
-    const assertStableInputs = (): void => { assertInputsCurrent(true); output.assertNoAlias(selectedSources); };
+    const sqliteIdentity = (path: string) => { const stat = lstatSync(path); return `${stat.dev}:${stat.ino}:${stat.mode}`; };
+    const sqliteSources = [...snapshots.keys()].map(path => join(workspace, path)).map(path => [path, sqliteIdentity(path)] as const);
+    const assertStableInputs = (): void => {
+      assertInputsCurrent(true);
+      if (sqliteSources.some(([path, identity]) => sqliteIdentity(path) !== identity)) throw new Error("backup SQLite source changed while preparing");
+      output.assertNoAlias(selectedSources);
+    };
     const assertInputsCurrent = (allowStudioDrift = false): void => {
       const current = withoutSqliteSidecars(collectFiles(workspace, policy.opsPolicy.backups.includePaths, exclude));
       const currentPaths = new Set(current);
-      if (files.some(path => !currentPaths.has(path))) throw new Error("backup inputs changed while preparing");
+      // Overlapping selections and literal path separators can create duplicate normalized paths.
+      const duplicateDrift = (selected.size !== files.length || currentPaths.size !== current.length) && JSON.stringify(current) !== JSON.stringify(files);
+      if (duplicateDrift || files.some(path => !currentPaths.has(path))) throw new Error("backup inputs changed while preparing");
       const changed = current.filter(path => !selected.has(path));
       for (const [path, before] of original) {
         if (!sameBackupFile(before, backupFileState(path))) changed.push(relative(workspace, path).replaceAll("\\", "/"));
