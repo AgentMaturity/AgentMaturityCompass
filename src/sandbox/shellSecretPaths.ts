@@ -42,8 +42,9 @@ export function shellSecretPaths(env: NodeJS.ProcessEnv = process.env): readonly
 
 /**
  * Credential stores a session selected by option rather than by environment (`--credentials-home`, `--credentials-file`,
- * the SDK's `credentialsHome`/`credentialsFile`): nothing in `process.env` names them, so the kernel's credentials
- * service registers them here when it opens the store, and every later confined shell in this process denies them.
+ * the SDK's and ACP's `credentialsHome`/`credentialsFile`): nothing in `process.env` names them, so every credential store
+ * registers its paths here when it opens (src/credentials/localCredentialsService.ts), and every later confined shell
+ * in this process denies them.
  * ponytail: process-wide set; a per-session deny list would need the policy to carry the store paths through the toolset.
  */
 export function denySessionSecretPaths(paths: readonly string[]): void {

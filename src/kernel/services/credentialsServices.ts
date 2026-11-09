@@ -17,8 +17,6 @@
  * published npm tarball does not contain; the architecture-boundaries gate
  * enforces that placement.
  */
-import { resolveCredentialsPaths } from "../../credentials/credentialsPaths.js";
-import { denySessionSecretPaths } from "../../sandbox/shellSecretPaths.js";
 import { AmcSeam, defineSeam } from "../amcRuntime.js";
 import type { Context } from "../amcRuntime.js";
 import type { CredentialRef } from "../../credentials/credentialRef.js";
@@ -64,10 +62,6 @@ export class CredentialsSeamService extends AmcSeam implements CredentialsServic
     // indistinguishable, to every consumer, from a correctly configured store
     // on a machine where nothing is set.
     this.store = new LocalCredentialsService(config);
-    // SH-SANDBOX-08: a store chosen by option is as secret as one chosen by environment; the confined shell must deny it too.
-    const paths = resolveCredentialsPaths({ ...(config.homeDir === undefined ? {} : { homeDir: config.homeDir }), ...(config.path === undefined ? {} : { path: config.path }),
-      ...(config.env === undefined ? {} : { env: config.env }), projectDir: null });
-    denySessionSecretPaths([paths.homeDir, paths.file]);
     // Async disposer: cordis awaits it, so the fiber does not report itself
     // unloaded while a queued write is still holding the cross-process lock.
     this.ctx.effect(

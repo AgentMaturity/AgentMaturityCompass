@@ -198,7 +198,7 @@ credentials file named by `AMC_CREDENTIALS_FILE`, every AMC secret file a
 files, `AMC_SESSION_SIGNING_KEY_FILE`, `AMC_NOTARY_AUTH_SECRET_FILE`,
 `AMC_POSTGRES_URL_FILE`), the credential store the session selected by option
 (`--credentials-home`, `--credentials-file`, the SDK's `credentialsHome` and
-`credentialsFile`; registered when the kernel opens the store, process-wide),
+`credentialsFile`, `amc acp`'s; registered when AMC opens that store, process-wide),
 the user `~/.env` layer, the workspace's `.amc` and the signed `readDeny`
 paths. All networking is denied, including Unix
 sockets such as an SSH agent; with a signed egress allowlist the only exception

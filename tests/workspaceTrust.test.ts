@@ -13,6 +13,7 @@ import { openAgentSession } from "../src/agent/agentSession.js";
 import { keysetAnchoring } from "../src/keys/keyset.js";
 import { lockVault, vaultPaths } from "../src/vault/vault.js";
 import { amcSecretPaths } from "../src/sandbox/shellSecretPaths.js";
+import { LocalCredentialsService } from "../src/credentials/localCredentialsService.js";
 import { saveSchedules } from "../src/autonomy/scheduleStore.js";
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL } from "../src/agent/stubProvider.js";
 import { v1Workspace } from "./helpers/legacyVault.js";
@@ -156,6 +157,16 @@ describe("through the real surfaces", () => {
     expect(again.failed, again.errors.join("\n")).toBe(false);
     // SH-SANDBOX-08: the credential store this run selected by option is on the confined shell's deny list from now on.
     expect(amcSecretPaths()).toEqual(expect.arrayContaining([credentialsHome, join(credentialsHome, ".credentials.yaml")]));
+  });
+
+  it("a credential store opened by option on any surface (ACP, the SDK's child, wire, trials) is denied to the confined shell from then on", () => {
+    const store = realpathSync(mkdtempSync(join(tmpdir(), "amc-wt-acp-creds-")));
+    try {
+      expect(amcSecretPaths({})).not.toContain(store);
+      // acpStdioMain, wire and the trial runner open the store directly, not through the kernel's credentials service.
+      new LocalCredentialsService({ homeDir: store, projectDir: null, includeDotenv: false, watch: false });
+      expect(amcSecretPaths({})).toEqual(expect.arrayContaining([store, join(store, ".credentials.yaml")]));
+    } finally { rmSync(store, { recursive: true, force: true }); }
   });
 
   /**
