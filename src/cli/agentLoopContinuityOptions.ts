@@ -78,7 +78,7 @@ export function resolveContinuityRun(io: AgentLoopCliIo, opts: ContinuityOptions
     const chosen = continuedSession(io, context);
     if (chosen === null) return null;
     session = chosen;
-    (opts.json ? io.error : io.log)(chalk.dim(`continuing session ${chosen}`));
+    (opts.json ? io.error : io.log)(chalk.dim(escapeTerminalControls(`continuing session ${chosen}`)));
   }
   if (limits.conditions.length > 0) (opts.json ? io.error : io.log)(chalk.dim(`run limits: ${limits.conditions.join(", ")}; a breach ends the run with a signed limit cause`));
   if (opts.plan) (opts.json ? io.error : io.log)(chalk.dim("plan mode: only READ_ONLY tools run in this turn; execute the plan with a later turn without --plan"));
@@ -96,7 +96,7 @@ export function resolveContinuityRun(io: AgentLoopCliIo, opts: ContinuityOptions
  */
 export function reportContinueRefusal(io: AgentLoopCliIo, error: unknown, continued: string | undefined): boolean {
   if (continued === undefined || !(error instanceof SessionResumeRefused) || error.code !== "CONFIGURATION_MISMATCH") return false;
-  io.error(chalk.red(`CONTINUE_CONFIGURATION_MISMATCH: session ${continued} was recorded under different execution settings or signed policy. ${error.message} Restore the original flags (provider, model, tools, approval, max-steps, compaction) or name another session with --session <id>.`));
+  io.error(chalk.red(escapeTerminalControls(`CONTINUE_CONFIGURATION_MISMATCH: session ${continued} was recorded under different execution settings or signed policy. ${error.message} Restore the original flags (provider, model, tools, approval, max-steps, compaction) or name another session with --session <id>.`)));
   io.fail();
   return true;
 }

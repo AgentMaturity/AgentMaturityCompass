@@ -97,8 +97,17 @@ it("prints ledger-sourced ids with terminal controls escaped: amc session latest
   expect(printed).toContain("NO_SESSION_TO_CONTINUE");
   expect(printed).toContain("\\u001b]0;pwned\\u0007");
   expect(printed).not.toContain("\u001b]0;");
-  const { continuedSession } = await import("../src/cli/agentLoopContinuityOptions.js");
+  const { continuedSession, resolveContinuityRun } = await import("../src/cli/agentLoopContinuityOptions.js");
   const errors: string[] = [];
   expect(continuedSession({ log: () => undefined, error: line => errors.push(line), fail: () => undefined }, { workspace, agentId: "default" })).toBeNull();
   expect(errors.join("\n")).not.toContain("\u001b]0;");
+  // The chosen session's id is ledger data too: the "continuing session" line escapes it.
+  // MUTATION: print the chosen id raw and the clear-screen sequence reaches the terminal.
+  session("chosen\u001b[2J", { turns: 1 }).releaseWithoutClosing();
+  const logged: string[] = [];
+  const run = resolveContinuityRun({ log: line => logged.push(line), error: line => logged.push(line), fail: () => undefined },
+    { continue: true }, { workspace, agentId: "default", wantsDelegation: false, toolMode: "none" });
+  expect(run?.session).toBe("chosen\u001b[2J");
+  expect(logged.join("\n")).toContain("continuing session chosen\\u001b[2J");
+  expect(logged.join("\n")).not.toContain("\u001b[2J");
 });
