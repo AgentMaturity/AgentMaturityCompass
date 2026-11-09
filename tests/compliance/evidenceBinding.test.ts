@@ -100,6 +100,9 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   // The Industry Packs entitlement's source (src/domains/industryPackEntitlement.ts IndustryPackEntitlement.source):
   // packs are free on every surface; an access label, never a ledger meta.source.
   "free",
+  // SH-OBS-03: src/observability/sessionExport.ts labels where exported payload bytes were read from.
+  // These labels live in the export's content map and are never written to ledger meta.source.
+  "inline", "spill",
 ]);
 
 function sourceFiles(dir: string): string[] {
