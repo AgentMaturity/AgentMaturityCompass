@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-11-08
+> Auto-generated from source on 2026-11-09
 
 ## Table of Contents
 
@@ -9655,6 +9655,7 @@ Export a session as a self-contained HTML viewer (payload digests only unless --
 |--------|-------------|
 | `--out <path>` | - |
 | `--include-content` | - |
+| `--decrypt-content` | - |
 | `--json-out <path>` | - |
 
 #### `amc session proof`

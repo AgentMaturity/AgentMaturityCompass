@@ -1074,7 +1074,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc session` | Native signed sessions: inspect, compact, verify, replay and recover | - | - |
 | `amc session anchor` | Anchor a closed session's root into the transparency log | `--json` | - |
 | `amc session compact` | List signed history origins, then apply an explicit native summary or drop without rewriting evidence | `--list`<br>`--origins <ids>`<br>`--summary-file <path>`<br>`--expect-head <hash>`<br>`--reason <text>`<br>`--summary-role <role>`<br>`--replace`<br>`--drop`<br>`--json` | - |
-| `amc session export` | Export a session as a self-contained HTML viewer (payload digests only unless --include-content; signed row metadata always), verifiable offline | `--out <path>`<br>`--include-content`<br>`--json-out <path>` | - |
+| `amc session export` | Export a session as a self-contained HTML viewer (payload digests only unless --include-content; signed row metadata always), verifiable offline | `--out <path>`<br>`--include-content`<br>`--decrypt-content`<br>`--json-out <path>` | - |
 | `amc session proof` | Export a session's inclusion proof (verifiable offline, without this workspace) | `--out <path>` | - |
 | `amc session recover` | Recover a crashed session by appending synthetic closers under a fenced claim (append-only) | `--force`<br>`--close`<br>`--stale-after <ms>`<br>`--json` | - |
 | `amc session replay-request` | Rebuild each request this session sent from its signed rows and check it against the recorded digest | `--json`<br>`--out <path>` | - |

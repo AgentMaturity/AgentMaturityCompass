@@ -22,7 +22,7 @@ import { LlmRuntime } from "../../src/llm/adapter/llmRuntime.js";
 import { allEvents, removeWorkspace, runStubSession, sessionEvents, stubWorkspace } from "./helpers/stubSessionWorkspace.js";
 
 vi.setConfig({ testTimeout: 120_000 });
-const ENV = ["AMC_OTEL_ENABLED", "AMC_OTEL_EXPORTERS", "AMC_OTEL_OTLP_ENDPOINT", "OTEL_EXPORTER_OTLP_ENDPOINT", "OTEL_EXPORTER_OTLP_HEADERS", "OTEL_EXPORTER_OTLP_PROTOCOL", "OTEL_SDK_DISABLED", "OTEL_SERVICE_NAME", "OTEL_RESOURCE_ATTRIBUTES", "AMC_OTEL_FLUSH_MAX_RETRIES"];
+const ENV = ["AMC_OTEL_ENABLED", "AMC_OTEL_EXPORTERS", "AMC_OTEL_OTLP_ENDPOINT", "OTEL_EXPORTER_OTLP_ENDPOINT", "OTEL_EXPORTER_OTLP_HEADERS", "OTEL_EXPORTER_OTLP_PROTOCOL", "OTEL_SDK_DISABLED", "OTEL_SERVICE_NAME", "OTEL_RESOURCE_ATTRIBUTES", "AMC_OTEL_FLUSH_MAX_RETRIES", "AMC_OTEL_FLUSH_TIMEOUT_MS"];
 const saved = new Map(ENV.map((name) => [name, process.env[name]]));
 let ws: string;
 const servers: Server[] = [];
@@ -248,6 +248,24 @@ describe("flush and buffers", () => {
     expect(second.exported.traces, "the later span went out under the second flush, not left buffered").toBe(1);
     expect(spanNames(received).sort()).toEqual(["first", "second"]);
     expect(exporter.getBufferStats().traces).toBe(0);
+  });
+
+  it("the exit flush waits for a flush that outlived its budget, so what that flush drops is counted before the exit row", async () => {
+    const { base } = await collector(1_500);
+    process.env.AMC_OTEL_ENABLED = "1";
+    process.env.OTEL_EXPORTER_OTLP_ENDPOINT = base;
+    process.env.AMC_OTEL_FLUSH_TIMEOUT_MS = "600"; // the session/close-style flush gives up at 600 ms; the collector answers at 1.5 s
+    process.env.AMC_OTEL_FLUSH_MAX_RETRIES = "0";
+    resetSharedObservabilityExporterForTests();
+    takeDroppedTelemetry();
+    const exporter = getSharedObservabilityExporter();
+    exporter.recordSpan(testSpan("closing"));
+    const closing = exporter.flush();
+    exporter.recordSpan(testSpan("exit"));
+    await flushSharedObservabilityExporter({ budgetMs: 100 });
+    // Both drops are known when the exit flush returns: its own (no budget left) and the earlier flush's timeout.
+    expect(takeDroppedTelemetry()).toBe(2);
+    await closing;
   });
 
   it("keeps one metric stream per workspace scope, so a point recorded for workspace B never merges into A's stream", () => {

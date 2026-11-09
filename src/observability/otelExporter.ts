@@ -282,6 +282,7 @@ export class ObservabilityOTELExporter {
   private streams = new Map<string, AggregatedStream>();
   private readonly itemScopes = new WeakMap<object, CapturedWorkspace>();
   private inFlightFlush: Promise<ObservabilityFlushResult> | null = null;
+  private readonly flushes = new Set<Promise<ObservabilityFlushResult>>();
 
   constructor(config: Partial<ObservabilityOTELConfig> = {}) {
     this.config = {
@@ -469,13 +470,20 @@ export class ObservabilityOTELExporter {
       return this.flushInternal(options.timeoutMs === undefined ? options : { ...options, timeoutMs: Math.max(1, budgetMs - (Date.now() - started)) });
     })();
     this.inFlightFlush = run;
+    this.flushes.add(run);
     try {
       return await run;
     } finally {
+      this.flushes.delete(run);
       if (this.inFlightFlush === run) {
         this.inFlightFlush = null;
       }
     }
+  }
+
+  /** Resolves once every flush started so far has settled; each is bounded by its own dispatch timeout and retries. */
+  async idle(): Promise<void> {
+    while (this.flushes.size > 0) await Promise.allSettled([...this.flushes]);
   }
 
   private async flushInternal(overrides: Partial<TelemetryDispatchOptions>): Promise<ObservabilityFlushResult> {
@@ -747,15 +755,20 @@ export function queueEvidenceEventSpan(event: EvidenceEvent, workspace?: string)
 }
 
 /**
- * Flush before a short-lived process exits, within a wall-clock budget. Spans still open are emitted unterminated;
- * what cannot be sent in time is counted as dropped, and the CLI's exit hook writes that count as a TELEMETRY_DROPPED row.
+ * Flush before a short-lived process exits, within a wall-clock budget for what this flush sends. Spans still open are
+ * emitted unterminated; what cannot be sent in time is counted as dropped, and the CLI's exit hook writes that count as
+ * a TELEMETRY_DROPPED row once every flush in flight has settled.
  */
 export async function flushSharedObservabilityExporter(options: { budgetMs?: number } = {}): Promise<ObservabilityFlushResult | null> {
   const exporter = sharedExporter;
   if (!exporter || !exporter.isEnabled()) return null;
   const budgetMs = options.budgetMs ?? DEFAULT_EXIT_FLUSH_BUDGET_MS;
   if (sharedFolder) recordFoldOutput(exporter, sharedFolder.drain());
-  return exporter.flush({ timeoutMs: budgetMs, maxRetries: 0 });
+  const result = await exporter.flush({ timeoutMs: budgetMs, maxRetries: 0 });
+  // A flush still in flight past the budget (a session/close flush retrying a down collector) keeps the process alive
+  // until it settles anyway, through its live request and retry timers: waiting here counts what it drops before exit.
+  await exporter.idle();
+  return result;
 }
 
 export function queueScoreComputationMetric(metric: ScoreComputationMetric, workspace?: string): void {
