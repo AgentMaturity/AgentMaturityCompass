@@ -237,7 +237,7 @@ test("the apply_patch and ls schemas are pinned", () => {
   const offered = [applyPatchTool({ ledger: new ReadBeforeEditLedger() }), lsTool()]
     .map(({ name, description, parameters }) => ({ name, description, parameters })).sort((a, b) => a.name.localeCompare(b.name));
   expect(offered.map(schema => schema.name)).toEqual(["apply_patch", "ls"]);
-  expect(offered[0]!.parameters.required).toEqual(["patch"]);
+  expect(offered[0]!.parameters?.required).toEqual(["patch"]);
   expect(sha256Hex(canonicalize(offered))).toBe(APPLY_PATCH_LS_TOOL_SCHEMAS_SHA256);
 });
 
