@@ -8,7 +8,7 @@
  * with no check, and the file won over the variable.
  */
 import { spawnSync } from "node:child_process";
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -60,8 +60,8 @@ describe("readSecretMountFile: the accepted container layouts", () => {
     const asked: string[] = [];
     // A read-only mount: this user can change nothing on the lookup (the stand-in for EROFS and root-owned directories).
     expect(readSecretMountFile(volume.key, "Vault passphrase", (path) => { asked.push(path); return false; })).toBe(VALUE);
-    const real = (path: string) => resolve(path).replace(/^\/var\//, "/private/var/");
-    expect(asked.map(real)).toEqual(expect.arrayContaining([real(volume.target), real(volume.mount), real(volume.dataDir), "/"]));
+    const expected = [volume.target, volume.mount, volume.dataDir, "/"].map(path => realpathSync(path));
+    expect(asked.map(path => realpathSync(path))).toEqual(expect.arrayContaining(expected));
   });
 
   test("a Compose secret (a read-only bind of a host file this user owns, mode 0644) is read", () => {
