@@ -72,7 +72,10 @@ vi.mock("../src/toolhub/toolhubValidators.js", () => ({
   signToolsConfig: mocks.signToolsConfig
 }));
 vi.mock("../src/ledger/ledger.js", () => ({ openLedger: mocks.openLedger }));
-vi.mock("../src/utils/hash.js", () => ({ sha256Hex: mocks.sha256Hex }));
+vi.mock("../src/utils/hash.js", async (importOriginal) => ({
+  ...await importOriginal<typeof import("../src/utils/hash.js")>(),
+  sha256Hex: mocks.sha256Hex
+}));
 vi.mock("node:child_process", async () => {
   const actual = await vi.importActual<any>("node:child_process");
   return { ...actual, spawn: mocks.spawn };
