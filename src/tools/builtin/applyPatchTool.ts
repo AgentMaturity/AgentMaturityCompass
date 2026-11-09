@@ -192,7 +192,12 @@ export function applyPatchTool(deps: { readonly ledger: ReadBeforeEditLedger }):
       // an edit that happened and wedges the session.
       const changes = operations.map(plannedChanges);
       const evidenceBytes = Buffer.byteLength(JSON.stringify({ fileChanges: changes.flat() }), "utf8");
-      const cap = sessionPayloadCap(execution.workspace);
+      let cap: number;
+      try {
+        cap = sessionPayloadCap(execution.workspace);
+      } catch (error) {
+        throw refuseBeforeWrite(`the workspace's per-event payload cap could not be read (${error instanceof Error ? error.message : String(error)}); nothing was written`);
+      }
       if (evidenceBytes + EVIDENCE_HEADROOM_BYTES > cap) {
         throw refuseBeforeWrite(`the patch's ${changes.flat().length} file changes need ${evidenceBytes} bytes of evidence, over this workspace's ${cap}-byte per-event payload cap; split the patch into smaller calls`);
       }

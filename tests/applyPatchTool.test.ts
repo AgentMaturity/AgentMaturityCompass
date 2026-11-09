@@ -77,10 +77,11 @@ describe("apply_patch", () => {
       { path: "b.txt", beforeSha256: sha256Hex("keep\ndrop\n"), afterSha256: null, bytesAfter: 0 },
       { path: "gone.txt", beforeSha256: sha256Hex("bye\n"), afterSha256: null, bytesAfter: 0 }
     ]);
-    // The payload carries the list once; plain metadata carries only the first file's path and before-digest.
+    // The payload carries the list once; the plain metadata names no file and holds no digest.
     expect(audit.fileChange).toBeUndefined();
-    expect(h.lastMeta().fileChange).toEqual({ path: "new/dir/n.txt", beforeSha256: null });
+    expect(h.lastMeta()).not.toHaveProperty("fileChange");
     expect(h.lastMeta()).not.toHaveProperty("fileChanges");
+    expect(JSON.stringify(h.lastMeta())).not.toContain("n.txt");
     // The file the call just produced counts as read: a follow-up edit needs no re-read.
     expect((await h.apply(patch("*** Update File: a.txt\n@@\n-TWO\n+2"))).ok).toBe(true);
   });
@@ -178,6 +179,18 @@ describe("apply_patch", () => {
     const smaller = Array.from({ length: 40 }, (_, index) => `*** Add File: ${long(index)}\n+x`).join("\n");
     expect((await h.apply(patch(smaller))).ok).toBe(true);
     expect(h.lastAudit().fileChanges).toHaveLength(40);
+  });
+
+  it("refuses as a definite failure, writing nothing, when the workspace's payload cap cannot be read", async () => {
+    const h = harness();
+    h.put(".amc/ops-policy.yaml", "retention: [unclosed\n");
+    const exec = { workspace: h.workspace, agentId: "alice", arguments: { patch: patch("*** Add File: n.txt\n+a") }, effectiveMode: "EXECUTE",
+      name: "apply_patch", token: "t", parentToken: null, callId: null, actionClass: "WRITE_LOW", requestedMode: "EXECUTE" } as unknown as ToolExecution;
+    let thrown: unknown;
+    try { await h.bodyOf("apply_patch")(exec); } catch (error) { thrown = error; }
+    expect(thrown).toBeInstanceOf(DefiniteFailureError);
+    expect((thrown as Error).message).toContain("payload cap could not be read");
+    expect(existsSync(h.path("n.txt"))).toBe(false);
   });
 
   it("keeps the source file's permission bits across a move", async () => {
