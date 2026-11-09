@@ -250,6 +250,27 @@ test.skipIf(process.platform === "win32")("a new normalized path collision canno
   expect(boundary.calls).toHaveLength(1);
 });
 
+test("a replacement SQLite file cannot be adopted by a Studio backup retry", async () => {
+  const f = fixture();
+  const dir = join(f.workspace, ".amc", "studio-native-tasks");
+  mkdirSync(dir);
+  const source = join(dir, "a".repeat(64) + ".json");
+  writeFileAtomic(source, "original", 0o600);
+  const policy = loadOpsPolicy(f.workspace);
+  policy.opsPolicy.backups.includePaths = [".amc"];
+  writeFileAtomic(opsPolicyPath(f.workspace), YAML.stringify(policy), 0o644);
+  signOpsPolicy(f.workspace);
+  const database = join(f.workspace, ".amc", "evidence.sqlite");
+  boundary.afterSign = async () => {
+    writeFileAtomic(source, "changed", 0o600);
+    const before = file(database)!;
+    writeFileAtomic(database, before.bytes, before.mode);
+  };
+  await expect(backupCreateCliAsync(f.workspace, f.params.outFile)).rejects.toThrow("backup SQLite source changed while preparing");
+  expect(existsSync(join(f.workspace, f.params.outFile))).toBe(false);
+  expect(boundary.calls).toHaveLength(1);
+});
+
 test("a real preexisting backup copied by a competing writer during Sign is preserved by destination CAS", async () => {
   const f = fixture(), competing = createBackup({ workspace: f.workspace, outFile: "actual-competing.amcbackup" }), validBytes = readFileSync(competing.outFile);
   inspect(f, competing.outFile);
