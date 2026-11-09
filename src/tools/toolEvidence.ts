@@ -91,13 +91,15 @@ export interface ToolEvidenceRecord {
 export type { FileChange } from "./toolTypes.js";
 
 /**
- * The file changes an audit row carries (SH-TOOLS-06c), read back from its `meta`. `fileChanges` lists every file a
- * call wrote or deleted; `fileChange` is its first entry, which `resumeRules` reads. Rows written before the carrier
- * existed carry neither and yield an empty list.
+ * The file changes an audit row carries (SH-TOOLS-06c), read back from its parsed `payload`: `fileChanges`, one entry
+ * per file the call wrote or deleted (rows from before the carrier carry a single `fileChange` instead). The payload
+ * is the encrypted side of the row; the row's `meta` carries only what `resumeRules` needs to recheck the first file,
+ * its path and `beforeSha256`, so the digests of file contents never sit in plain metadata. Rows with no change yield
+ * an empty list.
  */
-export function fileChangesOf(meta: Readonly<Record<string, unknown>>): readonly FileChange[] {
-  const value = meta.fileChanges;
-  const list = Array.isArray(value) ? value : meta.fileChange === undefined ? [] : [meta.fileChange];
+export function fileChangesOf(payload: Readonly<Record<string, unknown>>): readonly FileChange[] {
+  const value = payload.fileChanges;
+  const list = Array.isArray(value) ? value : payload.fileChange === undefined ? [] : [payload.fileChange];
   return list.filter((entry): entry is FileChange => entry !== null && typeof entry === "object"
     && typeof (entry as FileChange).path === "string"
     && ((entry as FileChange).beforeSha256 === null || typeof (entry as FileChange).beforeSha256 === "string")
@@ -128,7 +130,9 @@ export function toolEvidenceFor(execution: RecordedToolCall, outcome: ToolOutcom
   // The body's own declaration, carried on the outcome (never a side channel): digests, sizes and workspace-relative
   // paths, so a resumed session can tell whether the file still holds its recorded bytes (resumeRules reads meta).
   const changes = outcome.fileChanges ?? [];
-  const fileChange = changes.length === 0 ? {} : { fileChange: changes[0], fileChanges: changes };
+  const fileChanges = changes.length === 0 ? {} : { fileChanges: changes };
+  // Meta is plain metadata: only the first file's path and before-digest, which resumeRules compares against the file.
+  const resumeChange = changes.length === 0 ? {} : { fileChange: { path: changes[0]!.path, beforeSha256: changes[0]!.beforeSha256 } };
   const filesystemTouch = nativeFilesystemTouch(execution, outcome);
 
   const call = {
@@ -173,13 +177,13 @@ export function toolEvidenceFor(execution: RecordedToolCall, outcome: ToolOutcom
       // Retain only the bounded directory needed for instruction context, never filenames or arbitrary argument content.
       outcome: outcome.ok ? "ok" : "not-ok",
       ...(filesystemTouch === undefined ? {} : { nativeFilesystemTouch: filesystemTouch }),
-      ...fileChange
+      ...fileChanges
     }),
     meta: {
       ...common,
       auditType,
       ...(filesystemTouch === undefined ? {} : { nativeFilesystemTouch: filesystemTouch }),
-      ...fileChange,
+      ...resumeChange,
       ...(outcome.denied
         ? { denialStage: outcome.denied.stage, denialGuard: outcome.denied.guardLabel, denialReason: outcome.denied.reason }
         : {})

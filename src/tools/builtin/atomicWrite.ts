@@ -22,13 +22,15 @@ import { dirname, join } from "node:path";
  * Callers pass a resolved path: renaming over a symlink replaces the link, not
  * the file it points to.
  */
-export function writeFileAtomicSync(path: string, data: string | Buffer, opts?: { encoding?: BufferEncoding; createOnly?: boolean; beforeCommit?: () => void }): void {
+export function writeFileAtomicSync(path: string, data: string | Buffer, opts?: { encoding?: BufferEncoding; createOnly?: boolean; beforeCommit?: () => void; mode?: number }): void {
   const directory = dirname(path);
   // Absence is a condition of this operation, not permission to replace a late arrival.
   if (opts?.createOnly) {
     opts.beforeCommit?.();
     const fd = openSync(path, "wx");
     try {
+      // `open`'s mode is masked by the umask; a caller carrying a source file's mode (a move) sets it explicitly.
+      if (opts.mode !== undefined) fchmodSync(fd, opts.mode);
       writeFileSync(fd, data, { encoding: opts.encoding ?? "utf8" });
       fsyncSync(fd);
     } catch (error) {

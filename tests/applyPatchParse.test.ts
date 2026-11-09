@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MAX_PATCH_SECTIONS, parsePatch, patchPaths } from "../src/tools/builtin/applyPatchParse.js";
+import { MAX_PATCH_SECTIONS, parsePatch, patchPaths, type PatchHunk } from "../src/tools/builtin/applyPatchParse.js";
 import { applyHunks, joinText, splitText } from "../src/tools/builtin/applyPatchPlan.js";
 
 /** The Codex apply_patch grammar is parsed closed (SH-TOOLS-01): every marker form, and every refusal. */
@@ -97,6 +97,14 @@ describe("applyHunks", () => {
     const text = "fn a() {\n  x\n}\nfn b() {\n  x\n}\n";
     expect(applyHunks(text, [hunk("-  x\n+  y", "fn b() {")], "f").after).toBe("fn a() {\n  x\n}\nfn b() {\n  y\n}\n");
     expect(() => applyHunks(text, [hunk("-  x\n+  y", "fn c() {")], "f")).toThrow(/was not found/);
+  });
+
+  it("refuses a hunk that would cost more than the comparison budget to locate, before it blocks the process", () => {
+    const file = `${"same\n".repeat(20_000)}`;
+    const hunk: PatchHunk = { contextHint: null, eof: false, lines: [...Array.from({ length: 1_000 }, () => ({ op: " " as const, text: "same" })), { op: "-", text: "never" }] };
+    const started = performance.now();
+    expect(() => applyHunks(file, [hunk], "big.txt")).toThrow(/too costly to locate/);
+    expect(performance.now() - started).toBeLessThan(2_000);
   });
 
   it("preserves CRLF, a BOM and a missing final newline", () => {

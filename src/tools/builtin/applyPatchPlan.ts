@@ -42,12 +42,22 @@ export function joinText(lines: readonly string[], form: TextForm): string {
 
 const rstrip = (line: string): string => line.replace(/\s+$/, "");
 
-/** Positions where `old` occurs in `lines` at or after `from`, comparing with `same`. */
-function positions(lines: readonly string[], old: readonly string[], from: number, same: (a: string, b: string) => boolean): number[] {
+/**
+ * Line comparisons one hunk may spend being located, across both passes. Locating is a naive scan, (N - M) x M in
+ * the worst case, run synchronously in the tool body on a model-supplied patch; the budget keeps that bounded
+ * instead of letting a 1 MB file and a near-matching 1,000-line hunk block the process for seconds.
+ * ponytail: a budget, not a faster search; a first-line index or rolling hash if real patches ever hit it.
+ */
+export const MAX_HUNK_COMPARISONS = 5_000_000;
+
+/** Positions where `old` occurs in `lines` at or after `from`, comparing with `same`, within the shared budget. */
+function positions(lines: readonly string[], old: readonly string[], from: number, same: (a: string, b: string) => boolean,
+  budget: { left: number }, overBudget: () => HunkError): number[] {
   const found: number[] = [];
   for (let at = from; at + old.length <= lines.length; at++) {
     let matches = true;
     for (let index = 0; index < old.length; index++) {
+      if (--budget.left < 0) throw overBudget();
       if (!same(lines[at + index]!, old[index]!)) { matches = false; break; }
     }
     if (matches) found.push(at);
@@ -76,8 +86,10 @@ function locate(lines: readonly string[], hunk: PatchHunk, from: number, index: 
     if (eligible.length > 1) throw new HunkError(`${label} of ${path} matches ${eligible.length} places; include more context`);
     return null;
   };
-  return accept(positions(lines, old, start, (a, b) => a === b), null)
-    ?? accept(positions(lines, old, start, (a, b) => rstrip(a) === rstrip(b)), `${label} matched ignoring trailing whitespace`)
+  const budget = { left: MAX_HUNK_COMPARISONS };
+  const overBudget = (): HunkError => new HunkError(`${label} of ${path} is too costly to locate (over ${MAX_HUNK_COMPARISONS} line comparisons); give it less context, or anchor it with an @@ context line`);
+  return accept(positions(lines, old, start, (a, b) => a === b, budget, overBudget), null)
+    ?? accept(positions(lines, old, start, (a, b) => rstrip(a) === rstrip(b), budget, overBudget), `${label} matched ignoring trailing whitespace`)
     ?? (() => { throw new HunkError(`${label} of ${path} does not match the file${hunk.eof ? " at its end" : ""}; read the file again and re-copy the context`); })();
 }
 

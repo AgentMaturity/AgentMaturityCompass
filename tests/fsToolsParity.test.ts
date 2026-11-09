@@ -215,7 +215,7 @@ describe("fs.edit replaceAll and multi-edit", () => {
     expect(outcome.ok).toBe(true);
     expect(h.text("f.txt")).toBe("a\n");
     expect(outcome.output).toBe("SIMULATE fs.edit f.txt (1 replacement)\n--- a/f.txt\n+++ b/f.txt\n@@ -1 +1 @@\n-a\n+b");
-    expect(h.audits()[0]).not.toHaveProperty("fileChange");
+    expect(h.audits()[0]).not.toHaveProperty("fileChanges");
   });
 
   it("refuses to edit a file that is not valid UTF-8, which a text round trip would corrupt", async () => {
@@ -264,7 +264,7 @@ describe("diffs and evidence", () => {
     expect(outcome.output).toBe("edited f.txt (1 replacement)\n--- a/f.txt\n+++ b/f.txt\n@@ -1,2 +1,2 @@\n keep\n-old line\n+new line");
     const after = h.bytes("f.txt");
     const audit = h.audits().find(row => row.tool === "fs.edit")!;
-    expect(audit.fileChange).toEqual({
+    expect(audit.fileChanges).toEqual([{
       path: "f.txt",
       beforeSha256: sha256(before),
       afterSha256: sha256(after),
@@ -273,7 +273,7 @@ describe("diffs and evidence", () => {
       replacements: 1,
       diffSha256: sha256(outcome.output.slice(outcome.output.indexOf("\n") + 1)),
       diffTruncated: false
-    });
+    }]);
     expect(JSON.stringify(h.audits())).not.toContain("old line");
     expect(JSON.stringify(h.audits())).not.toContain("new line");
   });
@@ -282,10 +282,10 @@ describe("diffs and evidence", () => {
     const h = harness();
     const outcome = await h.run("fs.write", { path: "new.txt", content: "fresh\n" });
     expect(outcome.output).toBe("created new.txt");
-    expect(h.audits()[0]!.fileChange).toEqual({
+    expect(h.audits()[0]!.fileChanges).toEqual([{
       path: "new.txt", beforeSha256: null, afterSha256: sha256("fresh\n"), bytesBefore: 0, bytesAfter: 6,
       replacements: null, diffSha256: null, diffTruncated: false
-    });
+    }]);
   });
 
   it("returns a diff when fs.write overwrites a file it read", async () => {
@@ -294,7 +294,7 @@ describe("diffs and evidence", () => {
     await h.run("fs.read", { path: "f.txt" });
     const outcome = await h.run("fs.write", { path: "f.txt", content: "b\n" });
     expect(outcome.output).toBe("wrote f.txt\n--- a/f.txt\n+++ b/f.txt\n@@ -1 +1 @@\n-a\n+b");
-    expect(h.audits().find(row => row.tool === "fs.write")!.fileChange).toMatchObject({ beforeSha256: sha256("a\n"), afterSha256: sha256("b\n") });
+    expect(h.audits().find(row => row.tool === "fs.write")!.fileChanges).toMatchObject([{ beforeSha256: sha256("a\n"), afterSha256: sha256("b\n") }]);
   });
 
   it("shows a binary notice instead of a diff for binary content", async () => {
@@ -321,7 +321,7 @@ describe("diffs and evidence", () => {
   it("records no file change for a refused edit", async () => {
     const { h, outcome } = await editAfterRead("a", { find: "zz", replace: "y" });
     expect(outcome.ok).toBe(false);
-    expect(h.audits().find(row => row.tool === "fs.edit")).not.toHaveProperty("fileChange");
+    expect(h.audits().find(row => row.tool === "fs.edit")).not.toHaveProperty("fileChanges");
   });
 });
 

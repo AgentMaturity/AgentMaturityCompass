@@ -58,8 +58,12 @@ test("a real fs.write's change reaches the audit row meta that resumeRules reads
   expect(await f.call("fs.write", { path: "workspace/note.txt", content: "after\n" })).toMatchObject({ outcome: "OK" });
   const meta = f.audits().find((row) => row.toolName === "fs.write")!;
   expect(meta.callId).toBe("carrier-2");
-  expect(meta.fileChange).toMatchObject({ path: "workspace/note.txt", beforeSha256: sha256Hex("before\n"), afterSha256: sha256Hex("after\n") });
-  expect(fileChangesOf(meta)).toHaveLength(1);
+  // Plain metadata carries only what resumeRules compares: the path and the before-digest. The after-digest, the diff
+  // digest and the full list live in the encrypted payload.
+  expect(meta.fileChange).toEqual({ path: "workspace/note.txt", beforeSha256: sha256Hex("before\n") });
+  expect(meta).not.toHaveProperty("fileChanges");
+  expect(JSON.stringify(meta)).not.toContain(sha256Hex("after\n"));
+  expect(fileChangesOf({ fileChanges: [{ path: "workspace/note.txt", beforeSha256: null, afterSha256: sha256Hex("after\n") }] })).toHaveLength(1);
   expect(fileChangesOf({})).toEqual([]);
   expect(fileChangesOf({ fileChange: { path: 1 } })).toEqual([]);
   expect(JSON.stringify(meta)).not.toContain("after\\n");
@@ -79,7 +83,7 @@ test("apply_patch's paths meet the signed path policy before the body, and the w
   const allowed = await f.call("apply_patch", { patch: "*** Begin Patch\n*** Add File: workspace/out/new.txt\n+hi\n*** End Patch\n" });
   expect(allowed.outcome).toBe("OK");
   const meta = f.audits().find((row) => row.toolName === "apply_patch" && row.auditType === "TOOL_CALL_ALLOWED")!;
-  expect(fileChangesOf(meta)).toMatchObject([{ path: "workspace/out/new.txt", afterSha256: sha256Hex("hi\n") }]);
+  expect(meta.fileChange).toEqual({ path: "workspace/out/new.txt", beforeSha256: null });
   // Denials leave no file change on their rows.
-  expect(f.audits().filter((row) => row.auditType === "TOOL_CALL_DENIED").every((row) => fileChangesOf(row).length === 0)).toBe(true);
+  expect(f.audits().filter((row) => row.auditType === "TOOL_CALL_DENIED").every((row) => row.fileChange === undefined)).toBe(true);
 });

@@ -7,7 +7,7 @@ import type { ToolDefinition, ToolExecution } from "../toolTypes.js";
 import type { ReadBeforeEditLedger } from "./readBeforeEdit.js";
 import { planLiteralEdits, type LiteralEdit } from "./fsEditPlan.js";
 import { scanRegularFile } from "./fsRegularFile.js";
-import { readIfExists, refuseBeforeWrite, shownDiff, utf8, writeIfUnchanged } from "./fsWritePrimitives.js";
+import { readBeforeWrite, refuseBeforeWrite, shownDiff, utf8, writeIfUnchanged, writeTarget } from "./fsWritePrimitives.js";
 import { insideWorkspace } from "./workspacePath.js";
 
 export { insideWorkspace } from "./workspacePath.js";
@@ -189,8 +189,8 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
       },
       body: (execution) => {
         const args = writeArgs.parse(execution.arguments);
-        const { full, rel } = insideWorkspace(execution.workspace, args.path);
-        const before = readIfExists(full);
+        const { full, rel } = writeTarget(execution.workspace, args.path);
+        const before = readBeforeWrite(full, args.path);
         const verdict = ledger.mayWrite(execution.agentId, full, before === null ? undefined : sha256Hex(before));
         if (!verdict.ok) throw refuseBeforeWrite(verdict.reason);
         const after = Buffer.from(args.content, "utf8");
@@ -247,10 +247,10 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
       },
       body: (execution) => {
         const args = editArgs.parse(execution.arguments);
-        const { full, rel } = insideWorkspace(execution.workspace, args.path);
+        const { full, rel } = writeTarget(execution.workspace, args.path);
         // Read before the policy check, and write only if the file still holds
         // these bytes: the plan, the diff and the evidence all describe them.
-        const raw = readIfExists(full);
+        const raw = readBeforeWrite(full, args.path);
         const verdict = ledger.mayEdit(execution.agentId, full, raw === null ? undefined : sha256Hex(raw));
         if (!verdict.ok) throw refuseBeforeWrite(verdict.reason);
         if (raw === null) throw refuseBeforeWrite(`"${args.path}" changed while this call ran — read it again, then retry`);

@@ -26,6 +26,31 @@ export function readIfExists(full: string): Buffer | null {
   }
 }
 
+/**
+ * The workspace target of a write, resolved before anything is written: a path outside the workspace or inside a
+ * protected directory is a definite failure, not an ambiguous one.
+ */
+export function writeTarget(workspace: string, path: string): { readonly full: string; readonly rel: string } {
+  try {
+    return insideWorkspace(workspace, path);
+  } catch (error) {
+    throw refuseBeforeWrite(error instanceof Error ? error.message : String(error));
+  }
+}
+
+/**
+ * The phase-1 read of a write: the bytes there, or null when absent. Any other failure (a directory or FIFO there, no
+ * permission, a path that moved while opening) is a refusal before any byte is written, so a journaled call records a
+ * definite failure; the message names the path the agent gave, never the host path.
+ */
+export function readBeforeWrite(full: string, shown: string): Buffer | null {
+  try {
+    return readIfExists(full);
+  } catch (error) {
+    throw refuseBeforeWrite((error instanceof Error ? error.message : String(error)).split(full).join(shown));
+  }
+}
+
 /** The exact text of `raw`, or null when it is not valid UTF-8: decoding would replace bytes, and writing back would change them. */
 export function utf8(raw: Buffer): string | null {
   try {
@@ -68,15 +93,17 @@ function stillAsPlanned(execution: ToolExecution, ledger: ReadBeforeEditLedger, 
 }
 
 /**
- * Validate the planning snapshot and observation at publication, after staging has finished.
+ * Validate the planning snapshot and observation at publication, after staging has finished. `mode` is the permission
+ * bits a created file takes (a move keeps its source's); a replaced file keeps its own.
  *
  * These synchronous bodies cannot interleave within one JavaScript thread. Portable Node has no digest-CAS against
  * external writers: an uncooperative process can still race the final check and rename.
  */
 export function writeIfUnchanged(execution: ToolExecution, ledger: ReadBeforeEditLedger, full: string, path: string,
-  before: Buffer | null, after: Buffer): void {
+  before: Buffer | null, after: Buffer, mode?: number): void {
   writeFileAtomicSync(full, after, {
     createOnly: before === null,
+    ...(mode === undefined ? {} : { mode }),
     beforeCommit: () => stillAsPlanned(execution, ledger, full, path, before)
   });
 }

@@ -1,11 +1,12 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { ToolRegistry } from "../src/tools/toolRegistry.js";
 import { ToolPipeline } from "../src/tools/toolPipeline.js";
 import { toolEvidenceFor, type ToolEvidenceRecord } from "../src/tools/toolEvidence.js";
-import type { ToolMode } from "../src/tools/toolTypes.js";
+import { DefiniteFailureError, type ToolExecution, type ToolMode } from "../src/tools/toolTypes.js";
+import { sessionPayloadCap } from "../src/session/sessionPayloadCap.js";
 import { applyPatchTool } from "../src/tools/builtin/applyPatchTool.js";
 import { fsTools } from "../src/tools/builtin/fsTools.js";
 import { ReadBeforeEditLedger, type EditVerdict } from "../src/tools/builtin/readBeforeEdit.js";
@@ -38,7 +39,10 @@ function harness(ledger = new ReadBeforeEditLedger()) {
     text: (name: string) => readFileSync(path(name), "utf8"),
     read: async (...names: string[]) => { for (const name of names) expect((await run("fs.read", { path: name })).ok).toBe(true); },
     apply: (text: string, mode: ToolMode = "EXECUTE") => run("apply_patch", { patch: text }, mode),
-    lastAudit: () => JSON.parse(records.filter((row) => row.eventType === "audit").at(-1)!.payload) as { fileChanges?: unknown[]; fileChange?: unknown; auditType: string }
+    lastAudit: () => JSON.parse(records.filter((row) => row.eventType === "audit").at(-1)!.payload) as { fileChanges?: unknown[]; fileChange?: unknown; auditType: string },
+    lastMeta: () => records.filter((row) => row.eventType === "audit").at(-1)!.meta,
+    /** The body called directly, as the journal sees it: a refusal that wrote nothing must be a DefiniteFailureError. */
+    bodyOf: (name: string) => registry.visible().get(name)!.body
   };
 }
 
@@ -73,7 +77,10 @@ describe("apply_patch", () => {
       { path: "b.txt", beforeSha256: sha256Hex("keep\ndrop\n"), afterSha256: null, bytesAfter: 0 },
       { path: "gone.txt", beforeSha256: sha256Hex("bye\n"), afterSha256: null, bytesAfter: 0 }
     ]);
-    expect(audit.fileChange).toEqual(audit.fileChanges![0]);
+    // The payload carries the list once; plain metadata carries only the first file's path and before-digest.
+    expect(audit.fileChange).toBeUndefined();
+    expect(h.lastMeta().fileChange).toEqual({ path: "new/dir/n.txt", beforeSha256: null });
+    expect(h.lastMeta()).not.toHaveProperty("fileChanges");
     // The file the call just produced counts as read: a follow-up edit needs no re-read.
     expect((await h.apply(patch("*** Update File: a.txt\n@@\n-TWO\n+2"))).ok).toBe(true);
   });
@@ -147,6 +154,66 @@ describe("apply_patch", () => {
     expect(h.text("d/a.txt")).toBe("a\n");
   });
 
+  it("refuses two paths that differ only by case or Unicode form as one file, before any write", async () => {
+    const h = harness();
+    for (const body of ["*** Add File: n.txt\n+a\n*** Add File: N.txt\n+b", "*** Add File: caf\u00e9.txt\n+a\n*** Add File: cafe\u0301.txt\n+b"]) {
+      const outcome = await h.apply(patch(body));
+      expect(outcome.ok).toBe(false);
+      expect(outcome.output).toContain("names one file twice");
+    }
+    expect(existsSync(h.path("n.txt"))).toBe(false);
+    expect(existsSync(h.path("N.txt"))).toBe(false);
+  });
+
+  it("refuses a patch whose evidence row would not fit the workspace's payload cap, before any write", async () => {
+    const h = harness();
+    const long = (index: number) => `${"d".repeat(200)}/${"e".repeat(200)}/${"f".repeat(150)}_${index}.txt`;
+    const body = Array.from({ length: 100 }, (_, index) => `*** Add File: ${long(index)}\n+x`).join("\n");
+    const outcome = await h.apply(patch(body));
+    expect(outcome.ok).toBe(false);
+    expect(outcome.output).toContain(`${sessionPayloadCap(h.workspace)}-byte per-event payload cap`);
+    expect(existsSync(h.path("d".repeat(200)))).toBe(false);
+    expect(h.lastAudit().fileChanges).toBeUndefined();
+    // Just inside the cap, the same shape applies and its evidence row holds every entry.
+    const smaller = Array.from({ length: 40 }, (_, index) => `*** Add File: ${long(index)}\n+x`).join("\n");
+    expect((await h.apply(patch(smaller))).ok).toBe(true);
+    expect(h.lastAudit().fileChanges).toHaveLength(40);
+  });
+
+  it("keeps the source file's permission bits across a move", async () => {
+    const h = harness();
+    h.put("deploy.sh", "#!/bin/sh\necho hi\n"); chmodSync(h.path("deploy.sh"), 0o755);
+    h.put("secret.env", "KEY=1\n"); chmodSync(h.path("secret.env"), 0o600);
+    await h.read("deploy.sh", "secret.env");
+    const outcome = await h.apply(patch("*** Update File: deploy.sh\n*** Move to: scripts/deploy.sh\n@@\n-echo hi\n+echo bye\n*** Update File: secret.env\n*** Move to: moved.env\n@@\n KEY=1"));
+    expect(outcome.ok).toBe(true);
+    expect(statSync(h.path("scripts/deploy.sh")).mode & 0o777).toBe(0o755);
+    expect(statSync(h.path("moved.env")).mode & 0o777).toBe(0o600);
+  });
+
+  it("treats a directory in the way, and any other pre-write refusal, as a definite failure in every writing tool", async () => {
+    const h = harness();
+    mkdirSync(h.path("out")); h.put("a.txt", "a\n");
+    const exec = (name: string, args: Record<string, unknown>): ToolExecution =>
+      ({ workspace: h.workspace, agentId: "alice", arguments: args, effectiveMode: "EXECUTE", name, token: "t", parentToken: null, callId: null, actionClass: "WRITE_LOW", requestedMode: "EXECUTE" } as unknown as ToolExecution);
+    const cases: Array<[string, Record<string, unknown>]> = [
+      ["apply_patch", { patch: patch("*** Add File: out\n+y") }],
+      ["apply_patch", { patch: patch("*** Delete File: out") }],
+      ["apply_patch", { patch: patch("*** Add File: a.txt/b.txt\n+y") }],
+      ["fs.write", { path: "out", content: "x" }],
+      ["fs.write", { path: "../escape.txt", content: "x" }],
+      ["fs.edit", { path: "out", find: "a", replace: "b" }],
+      ["fs.edit", { path: ".git/config", find: "a", replace: "b" }]
+    ];
+    for (const [name, args] of cases) {
+      let thrown: unknown;
+      try { await h.bodyOf(name)(exec(name, args)); } catch (error) { thrown = error; }
+      expect(thrown, `${name} ${JSON.stringify(args)}`).toBeInstanceOf(DefiniteFailureError);
+      expect((thrown as Error).message, name).not.toContain(h.workspace);
+    }
+    expect(existsSync(h.path("escape.txt"))).toBe(false);
+  });
+
   it("SIMULATE returns the diffs and writes nothing", async () => {
     const h = harness();
     h.put("a.txt", "a\n");
@@ -212,5 +279,20 @@ describe("apply_patch commit checks", () => {
     const audit = JSON.parse(h.records.filter((row) => row.eventType === "audit").at(-1)!.payload) as { auditType: string; fileChanges: unknown[] };
     expect(audit.auditType).toBe("TOOL_CALL_FAILED");
     expect(audit.fileChanges).toMatchObject([{ path: "first.txt", afterSha256: sha256Hex("first\n") }]);
+  });
+
+  it("reports a move whose target landed before its source delete failed as written, from what landed", async () => {
+    const h = raceHarness("b.txt", "b\n");
+    writeFileSync(join(h.dir, "a.txt"), "a\n");
+    expect((await h.run("fs.read", { path: "a.txt" })).ok).toBe(true);
+    expect((await h.run("fs.read", { path: "b.txt" })).ok).toBe(true);
+    const outcome = await h.run("apply_patch", { patch: patch("*** Update File: a.txt\n@@\n-a\n+A\n*** Update File: b.txt\n*** Move to: moved/b.txt\n@@\n-b\n+B") });
+    expect(outcome.ok).toBe(false);
+    expect(outcome.output).toContain("written: a.txt, moved/b.txt");
+    expect(outcome.output).toContain("not written: b.txt");
+    expect(readFileSync(join(h.dir, "moved/b.txt"), "utf8")).toBe("B\n");
+    expect(readFileSync(h.target, "utf8")).toBe("late change\n");
+    const audit = JSON.parse(h.records.filter((row) => row.eventType === "audit").at(-1)!.payload) as { fileChanges: Array<{ path: string }> };
+    expect(audit.fileChanges.map((entry) => entry.path)).toEqual(["a.txt", "moved/b.txt"]);
   });
 });
