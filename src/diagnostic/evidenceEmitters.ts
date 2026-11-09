@@ -95,6 +95,8 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/enforce/scopeTemplates.ts", why: "policy scope template applied; untagged, so it binds to no question" },
   { module: "src/eoc/flows.ts", why: "education, ownership and commitment bookkeeping" },
   { module: "src/eval/evalImporters.ts", why: "import bookkeeping and imported failures; self-reported by provenance" },
+  { module: "src/eval/suiteRunner.ts", why: "eval suite run records (SH-OBS-04): the results digest a gate checks; eval bookkeeping, untagged, never maturity evidence" },
+  { module: "src/eval/suiteCompare.ts", why: "eval suite baseline records (SH-OBS-04): the baseline digest a gate checks; eval bookkeeping, untagged, never maturity evidence" },
   { module: "src/experiments/trialExecutor.ts", why: "experiment trial start and settle records (GAP-WP04); executor bookkeeping a casebook judge reads, never agent behaviour" },
   { module: "src/governor/decisionLog.ts", why: "AuthZEN authorization decision log (P2-25): one AMC decision per call, allow or deny, untagged and never maturity evidence" },
   { module: "src/gateway/server.ts", why: "gateway refusals and misconfiguration; read only by score caps and penalties" },

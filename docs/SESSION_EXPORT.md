@@ -1,6 +1,8 @@
 # Session Export (offline-verifiable sessions)
 
-`amc session export <id> --out <file>` writes one sealed native session as a self-contained signed bundle (`amc.session-export`, v1); `amc session verify-export <file> --expect-monitor <sha256>` verifies it on another machine with nothing but the file and a monitor-key fingerprint obtained out of band. Neither needs an anchor or a transparency log; `amc session proof` / `verify-proof` remain the anchored path, and `amc bundle export` the per-diagnostic-run bundle.
+`amc session export <id> --out session.json` writes one sealed native session as a self-contained signed bundle (`amc.session-export`, v1); `amc session verify-export <file> --expect-monitor <sha256>` verifies it on another machine with nothing but the file and a monitor-key fingerprint obtained out of band. Neither needs an anchor or a transparency log; `amc session proof` / `verify-proof` remain the anchored path, and `amc bundle export` the per-diagnostic-run bundle.
+
+Use `--json` to print the output path, session ID, row count and monitor fingerprint as JSON. For a readable viewer and its separate canonical JSON format, use an `.html` or `.htm` output path. See [Observability](OBSERVABILITY.md#amc-session-export-a-readable-verifiable-session-file).
 
 ## What the bundle carries
 

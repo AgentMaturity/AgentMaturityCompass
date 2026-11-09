@@ -86,6 +86,8 @@ Use this page to reach the shortest evidence-backed path for your task. AMC's pu
 - [Incident Response Readiness](INCIDENT_RESPONSE_READINESS.md)
 - [AMC Service Down Runbook](runbooks/amc-service-down.md)
 - [Evidence Corruption Runbook](runbooks/evidence-corruption.md)
+- [Observability: OpenTelemetry Export, Usage Reports, Session Export](OBSERVABILITY.md)
+- [Eval Suites Against The Native Agent](EVAL_SUITES.md)
 
 ## Understand The Proof
 

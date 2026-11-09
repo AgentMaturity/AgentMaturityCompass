@@ -68,7 +68,8 @@ export interface SessionRootDescriptorOptions {
 
 /**
  * Per-row integrity for ONE session: the hash pre-image, the writer signature,
- * and the envelope chain. The global `prev_event_hash` chain is deliberately not
+ * and the envelope chain. Exported for `amc session export` (SH-OBS-03), which
+ * verifies the same rules against the one key an export embeds. The global `prev_event_hash` chain is deliberately not
  * checked here (a session slice cannot be) — `verifyLedgerIntegrity` and
  * `verifyStoredSessionEvents` remain the authority for that.
  */

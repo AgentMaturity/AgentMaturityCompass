@@ -146,21 +146,36 @@ describe("session export verifies offline", () => {
     expect(() => exportSessionBundle({ workspace, sessionId })).toThrow(/SESSION_NOT_SEALED/);
   });
 
-  test("the CLI round-trips: export, then verify-export elsewhere with --expect-monitor, and fails on tamper", () => {
+  test("the CLI verifies a sealed bundle, viewer and canonical viewer JSON offline and refuses tampering", () => {
     const workspace = newWorkspace();
     const sessionId = runSession(workspace);
     const holder = newDir("amc-session-export-holder-");
     const out = join(holder, "session.amcsession.json");
+    const viewer = join(holder, "session.htm"), viewerJson = join(holder, "session.viewer.json");
     const cli = resolve(process.cwd(), "dist/cli.js");
     const env: NodeJS.ProcessEnv = { ...process.env, NO_COLOR: "1", AMC_VAULT_PASSPHRASE: PASS };
     const exported = spawnSync(process.execPath, [cli, "session", "export", sessionId, "--out", out, "--json"], { cwd: workspace, env, encoding: "utf8" });
     expect(exported.status, exported.stderr).toBe(0);
     const { monitorKeyFingerprint } = JSON.parse(exported.stdout) as { monitorKeyFingerprint: string };
+    const exportedViewer = spawnSync(process.execPath, [cli, "session", "export", sessionId, "--out", viewer, "--json-out", viewerJson, "--json"], { cwd: workspace, env, encoding: "utf8" });
+    expect(exportedViewer.status, exportedViewer.stderr).toBe(0);
+    expect(JSON.parse(exportedViewer.stdout)).toMatchObject({ sessionId, monitorKeyFingerprint });
     rmSync(workspace, { recursive: true, force: true });
     delete env.AMC_VAULT_PASSPHRASE;
-    const verified = spawnSync(process.execPath, [cli, "session", "verify-export", out, "--expect-monitor", monitorKeyFingerprint, "--json"], { cwd: holder, env, encoding: "utf8" });
-    expect(verified.status, verified.stderr + verified.stdout).toBe(0);
-    expect((JSON.parse(verified.stdout) as { ok: boolean }).ok).toBe(true);
+    const verifyFile = (path: string) => spawnSync(process.execPath, [cli, "session", "verify-export", path, "--expect-monitor", monitorKeyFingerprint, "--json"], { cwd: holder, env, encoding: "utf8" });
+    for (const [path, proof] of [[out, { sessionId, descriptorSha256: expect.any(String) }], [viewer, { tail: "sealed" }], [viewerJson, { tail: "sealed" }]] as const) {
+      const verified = verifyFile(path);
+      expect(verified.status, verified.stderr + verified.stdout).toBe(0);
+      expect(JSON.parse(verified.stdout)).toMatchObject({ ...proof, ok: true, report: { artifact: { sha256: sha256Hex(readFileSync(path)) } } });
+    }
+    // Legacy bundles may be reformatted. Viewer JSON must retain its exact canonical bytes, and HTML never falls back to JSON.
+    const compactBundle = JSON.stringify(JSON.parse(readFileSync(out, "utf8")));
+    writeFileSync(out, compactBundle);
+    expect(verifyFile(out).status).toBe(0);
+    writeFileSync(viewer, compactBundle);
+    expect(verifyFile(viewer).status).toBe(1);
+    writeFileSync(viewerJson, JSON.stringify(JSON.parse(readFileSync(viewerJson, "utf8"))));
+    expect(verifyFile(viewerJson).status).toBe(1);
     const wrongPin = spawnSync(process.execPath, [cli, "session", "verify-export", out, "--expect-monitor", "b".repeat(64)], { cwd: holder, env, encoding: "utf8" });
     expect(wrongPin.status).not.toBe(0);
     const bundle = JSON.parse(readFileSync(out, "utf8")) as SessionExport;

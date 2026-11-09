@@ -1,8 +1,9 @@
 /**
  * library-only, not enforced by production telemetry: this compatibility exporter
  * has no production caller. Canonical export lives in src/observability/otelExporter.ts.
- * WP26 should reuse the W3C trace-context and conversion helpers through that path
- * before treating this module as an active telemetry integration.
+ * Superseded for native sessions by src/observability/nativeSessionSpans.ts (SH-OBS-01),
+ * which emits the GenAI span tree and metrics; the W3C trace-context helpers here remain
+ * library-only until traceparent propagation into provider requests is decided (D-03).
  *
  * otelExporter.ts — Native OpenTelemetry Protocol (OTLP) exporter for AMC traces.
  *

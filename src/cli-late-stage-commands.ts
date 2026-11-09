@@ -1229,7 +1229,7 @@ export function registerLateStageCliCommands({
       await new Promise(() => {});
     });
 
-  const costsCmd = program.command("costs").description("Track and analyze actual agent costs from observability data");
+  const costsCmd = program.command("costs").description("Track and analyze agent costs from imported observability traces (for native sessions use `amc usage`)");
 
   costsCmd
     .command("show")

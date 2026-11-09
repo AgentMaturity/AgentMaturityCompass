@@ -10,6 +10,11 @@ export function noteTelemetryDropped(count: number): void {
   dropped += count;
 }
 
+/** The count without taking it: lets an exit path decide whether a row is worth opening the ledger for. */
+export function peekDroppedTelemetry(): number {
+  return dropped;
+}
+
 export function takeDroppedTelemetry(): number {
   const count = dropped;
   dropped = 0;

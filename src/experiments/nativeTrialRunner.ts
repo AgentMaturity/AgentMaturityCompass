@@ -8,6 +8,7 @@ import { amcVersion } from "../version.js";
 import { EMPTY_TOOL_SEAM } from "../agent/toolSeam.js";
 import { RUN_CODE_TOOL } from "../tools/toolPipeline.js";
 import type { LoopLlm, LoopRoute } from "../agent/stepRunner.js";
+import type { ToolGuard } from "../tools/toolTypes.js";
 import type { SessionService } from "../session/sessionService.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -27,6 +28,12 @@ export interface NativeTrialRunnerOptions {
   readonly maxSteps?: number;
   /** The requester's lease (Studio), so trial tool calls are authorized as them rather than the process's OS user. */
   readonly leaseToken?: string;
+  /** Send the case prompt exactly (eval suites, SH-OBS-04); the default appends the context and allowed action classes. */
+  readonly verbatimPrompt?: boolean;
+  /** One more deny-only guard composed after the case-scope guard (D55: it can refuse a call, never allow one). */
+  readonly extraGuard?: { readonly label: string; readonly guard: ToolGuard };
+  /** Told the session id as soon as the session opens, so a caller can find its signed rows. */
+  readonly onSession?: (sessionId: string) => void;
 }
 
 /** The task the agent is given: the case prompt, then its declared context and allowed action classes. */
@@ -71,14 +78,16 @@ export function nativeTrialRunner(options: NativeTrialRunnerOptions): TrialRunne
         toolset.registry.restrict({ deny: new Set(outside.map((tool) => tool.name)) });
         toolset.registry.guard(CASE_SCOPE_GUARD, (execution) => allowed.has(execution.actionClass) ? undefined
           : `experiment case ${view.caseId} allows only ${[...allowed].join(", ")}; ${execution.actionClass} is outside its scope`);
+        if (options.extraGuard !== undefined) toolset.registry.guard(options.extraGuard.label, options.extraGuard.guard);
         return toolset.seam;
       }
     });
+    options.onSession?.(session.sessionId);
     const cancel = (): void => { session.cancel({ kind: "hook", reason: "experiment trial aborted" }, "experiment-executor"); };
     signal.addEventListener("abort", cancel, { once: true });
     let outcome: { ok: true } | { ok: false; reason: string };
     try {
-      outcome = signal.aborted ? { ok: false, reason: "trial aborted before its prompt" } : outcomeOf(await session.prompt(taskText(view)));
+      outcome = signal.aborted ? { ok: false, reason: "trial aborted before its prompt" } : outcomeOf(await session.prompt(options.verbatimPrompt ? view.prompt : taskText(view)));
     } catch (error) {
       outcome = { ok: false, reason: `trial crashed: ${error instanceof Error ? error.message : String(error)}` };
     } finally {
@@ -106,7 +115,8 @@ export interface TrialProviderSelection {
 }
 
 /** A native trial runner on one configured provider route, with the workspace's own credentials; and its executor identity. */
-export function providerTrialRunner(workspace: string, agentId: string, selection: TrialProviderSelection): { runTrial: TrialRunner; executorIdentity: string } {
+export function providerTrialRunner(workspace: string, agentId: string, selection: TrialProviderSelection,
+  extra: Pick<NativeTrialRunnerOptions, "verbatimPrompt" | "extraGuard" | "onSession" | "tools"> = {}): { runTrial: TrialRunner; executorIdentity: string } {
   const route = nativeRouteFor(selection.providerId, { ...(selection.baseUrl === undefined ? {} : { baseUrl: selection.baseUrl }),
     ...(selection.credential === undefined ? {} : { credential: selection.credential }) }, selection.model);
   const registry = new AdapterRegistry();
@@ -120,6 +130,6 @@ export function providerTrialRunner(workspace: string, agentId: string, selectio
       makeLlm: (session) => new LlmRuntime({ session, credentials, registry, ...(transport === undefined ? {} : { transport }) }),
       route: { providerId: route.providerId, model, params: paramsFor(route.providerId, selection.maxTokens ?? 1024) },
       ...(selection.maxSteps === undefined ? {} : { maxSteps: selection.maxSteps }),
-      ...(selection.leaseToken === undefined ? {} : { leaseToken: selection.leaseToken }) })
+      ...(selection.leaseToken === undefined ? {} : { leaseToken: selection.leaseToken }), ...extra })
   };
 }

@@ -1,0 +1,28 @@
+# amc.eval-suite/v1 — a smoke suite for the stub provider. It proves the grading path, not model quality:
+# the stub echoes the prompt as text, or performs the one tool call a JSON directive asks for.
+version: 1
+suiteId: stub-smoke
+description: Three tasks that the keyless stub route can pass, exercising text graders and a test-graded repository task.
+defaults:
+  tools: none
+  maxSteps: 4
+  allowedActionClasses: [READ_ONLY, WRITE_LOW]
+  timeoutMs: 120000
+tasks:
+  - id: echo-exact
+    prompt: "The answer is 42."
+    graders:
+      - { type: contains, expected: "42" }
+      - { type: not_contains, expected: "error" }
+  - id: echo-regex
+    prompt: "Reply with the word PASSWORD-FREE."
+    graders:
+      - { type: regex, pattern: "PASSWORD-FREE" }
+  - id: answer-file
+    # {{taskDir}} is replaced with the attempt directory, relative to the workspace, so the governed fs.write lands there.
+    prompt: '{"tool":"fs.write","arguments":{"path":"{{taskDir}}/answer.txt","content":"42\n"}}'
+    tools: workspace
+    fixture: { dir: fixtures/answer-file }
+    outputs: [answer.txt]
+    graders:
+      - { type: tests, command: ["node", "check.mjs"], timeoutMs: 30000 }

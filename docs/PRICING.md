@@ -20,7 +20,7 @@ Everything:
 - **Passport** — portable identity, credentials, trust portability artifacts
 - **Industry Packs** — all 41 sector questionnaire packs, with their CLI commands, Studio routes, MCP tools, dashboard and console views
 - **All 16 framework adapters** — AutoGen, Claude Code, CrewAI, DeepSeek Harness, Gemini CLI, Generic CLI, Hermes Agent, LangChain for Node and Python, LangGraph, LlamaIndex, OpenAI Agents SDK, OpenClaw, OpenHands, Python AMC SDK, and Semantic Kernel. OpenAI-compatible endpoints use Generic CLI. The optional DeepSeek Harness adapter requires a reviewed, signed launcher; process capture does not prove internal tool or provider coverage.
-- **1,293 CLI command paths**
+- **1,299 CLI command paths**
 - **244 default diagnostic questions** plus the free, opt-in 20-question lifecycle expansion
 - **Browser playground**
 - **CI trust gates**

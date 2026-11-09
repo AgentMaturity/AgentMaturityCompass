@@ -1491,14 +1491,6 @@
       "format": "typescript"
     },
     {
-      "id": "2f15161f7aea96751ee39b9e0cd0d3536a4603ee8976cb7f97487a58d7d532fd",
-      "paths": [
-        "observability/otelExporter.ts",
-        "observability/otelExporter.ts"
-      ],
-      "format": "typescript"
-    },
-    {
       "id": "2f213eaaf25e28ed33c43379b3443ae5077a49200cc9f7622f1ff53351639bf9",
       "paths": [
         "api/benchmarkRouter.ts",
@@ -3199,14 +3191,6 @@
       "paths": [
         "benchmarks/helmProviderDrift.ts",
         "benchmarks/patronusProviderDrift.ts"
-      ],
-      "format": "typescript"
-    },
-    {
-      "id": "66fb6c0902a82b4a89a09582d00ba934e0d7a08e731b5e7d14ad9153db9869a4",
-      "paths": [
-        "observability/otelExporter.ts",
-        "observability/otelExporter.ts"
       ],
       "format": "typescript"
     },
@@ -7719,14 +7703,6 @@
       "paths": [
         "api/securityRouter.ts",
         "api/securityRouter.ts"
-      ],
-      "format": "typescript"
-    },
-    {
-      "id": "fe38145d90e59cc73c7630c4227428abb1a4f9eff424c591388dff7e15acd13c",
-      "paths": [
-        "observability/otelExporter.ts",
-        "observability/otelExporter.ts"
       ],
       "format": "typescript"
     },
@@ -20763,6 +20739,13 @@
       "date": "2026-10-27"
     },
     {
+      "id": "29c4c6bf1f61c7f22c62d9cb1a6f4758f822daec1cd363d5bd592e1eb6326584",
+      "scan": "duplicates",
+      "reason": "Pre-existing mirror of the store verifier's per-row hash and signature loop in the session root descriptor (both at base 97dd749c8); SH-OBS only changed its key-source parameter so amc session export can reuse it. Merging the two verifiers is the trust domain's call.",
+      "acceptedBy": "AgentMaturity",
+      "date": "2026-11-08"
+    },
+    {
       "id": "2b972bc0d93f1ac824f3f9d06f3390cc2be2e94b3e9be820769dc4186062328e",
       "scan": "dead-code",
       "reason": "AXE-23: intentional standalone CLI generator for the thirteen ADR-0025 live-drift characterization pins; run node scripts/gen-live-drift-characterization.mjs --check or --write after build.",
@@ -22616,6 +22599,13 @@
       "reason": "P2-08 (Codex) async publication producer: per-store prepare, verify and publish steps are written inline under each store's own authority checks; extracting shared signing or publication helpers is a reviewed follow-up, not part of landing",
       "acceptedBy": "AgentMaturity",
       "date": "2026-10-27"
+    },
+    {
+      "id": "f3fc0cf686a08e92fb6375a940e17339c6e213749362e2fee962d20c2b8db903",
+      "scan": "duplicates",
+      "reason": "Pre-existing lenient meta_json parsers in requestSources and the session root descriptor (both at base 97dd749c8, already a baseline pair under an older id); SH-OBS touched neither function. budgetMeta throws instead, so it is not a drop-in.",
+      "acceptedBy": "AgentMaturity",
+      "date": "2026-11-08"
     },
     {
       "id": "f440dcea03126cf9a64cc912aa85022e47e37d0cff73916f1e7a0f864eb0e705",
