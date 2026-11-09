@@ -173,6 +173,19 @@ describe("Industry Pack CLI with no licence", () => {
   });
 });
 
+// LIVE-UX-14: describe cut every question at 100 characters; describe is for reading.
+describe("describe prints whole questions", () => {
+  test("the longest farm-to-fork question appears whole", async () => {
+    const longest = [...getPackById("farm-to-fork")!.questions].sort((a, b) => b.text.length - a.text.length)[0]!;
+    expect(longest.text.length).toBeGreaterThan(100);
+    const result = await invoke("describe-whole-questions", ["domain", "pack", "describe", "--pack", "farm-to-fork"]);
+    completed(result);
+    expect(result.status, result.stderr).toBe(0);
+    expect(result.stdout).toContain(longest.text);
+    expect(result.stdout).not.toContain(`${longest.text.slice(0, 100)}...`);
+  });
+});
+
 describe("colour switches on pack text output", () => {
   test("forced colour reaches the output; --no-color and NO_COLOR keep it plain", async () => {
     // A `false` default on the global --no-color once switched colour off for every command (shell children included).

@@ -15,6 +15,7 @@ import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { hasAnyRole } from "../auth/rbac.js";
 import { canonicalize } from "../utils/json.js";
 import { inCheckPass } from "../utils/checkPass.js";
+import { secretEquals } from "../utils/secretEquals.js";
 
 export interface AuthContext {
   isAdmin: boolean;
@@ -36,8 +37,8 @@ function leaseQueryCarrierEnabled(workspace: string): boolean {
 }
 
 export function authenticate(req: IncomingMessage, workspace: string, adminToken: string): AuthContext | null {
-  const suppliedAdmin = req.headers["x-amc-admin-token"];
-  if (typeof suppliedAdmin === "string" && suppliedAdmin === adminToken) {
+  // LIVE-RUNTIME-08: constant time, and an empty header or an empty configured token never authenticates.
+  if (secretEquals(req.headers["x-amc-admin-token"], adminToken)) {
     return {
       isAdmin: true,
       agentId: null,

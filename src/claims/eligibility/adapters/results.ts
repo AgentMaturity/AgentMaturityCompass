@@ -26,6 +26,15 @@ function meanLevel(report: Pick<DiagnosticReport, "layerScores">): number | null
 }
 
 /**
+ * S2: the only place an unsealed report's self-asserted fields are stripped. A report whose seal does not verify cannot
+ * sign for itself, so its own VALID reads INVALID; any other status already vouches for nothing. Every reader of an
+ * unsealed report (envelopeForStoredRun, the GRC export) goes through this one gate.
+ */
+export function distrustUnsealedReport<T extends { status: DiagnosticReport["status"] }>(report: T): T {
+  return report.status !== "VALID" ? report : { ...report, status: "INVALID" };
+}
+
+/**
  * A diagnostic run read back from disk. A 1.x run is "Legacy (1.x), self-reported". A run whose seal does not
  * verify vouches for nothing: its own VALID status cannot sign for it, and it is never more than self-reported.
  */
@@ -44,8 +53,7 @@ export function envelopeForStoredRun(report: DiagnosticReport, options: { sealVe
   if (!report.evidenceTrustCoverage || !Array.isArray(report.layerScores)) {
     return envelopeForUnverifiedResult({ producer: `diagnostic:${report.agentId}`, recordCount: 0, evidenceRefs: [report.runId], now: options.now });
   }
-  const trusted = options.sealVerified || report.status !== "VALID" ? report : { ...report, status: "INVALID" as const };
-  const envelope = envelopeForDiagnosticReport(trusted, options.now);
+  const envelope = envelopeForDiagnosticReport(options.sealVerified ? report : distrustUnsealedReport(report), options.now);
   return options.sealVerified ? envelope : { ...envelope, claimKind: "self_reported" };
 }
 

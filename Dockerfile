@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 FROM native-tools AS build
 WORKDIR /build/amc
 ENV CI=1
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json README.md LICENSE THIRD_PARTY_NOTICES ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json tsconfig.base.json README.md LICENSE THIRD_PARTY_NOTICES ./
 RUN npm install --global "$(node -p 'require("./package.json").packageManager')"
 # All workspace members and lifecycle/build scripts are required by the frozen install.
 COPY vendor/ vendor/
@@ -30,7 +30,9 @@ COPY qualification/2026-10-18-P1-23/claude-code-conformance.json qualification/2
 COPY catalog/ catalog/
 COPY deploy/apparmor/ deploy/apparmor/
 COPY docs/NATIVE_SANDBOX_UBUNTU.md docs/
-RUN pnpm run build
+# V8 sizes its default heap from the builder's memory; below 16 GB that is too small for tsc here (a 6 GB builder
+# aborted with "heap out of memory"). 4096 MB is the default a 16 GB+ host gets; the builder needs that much free.
+RUN NODE_OPTIONS=--max-old-space-size=4096 pnpm run build
 # The separate release/prepack gate is NOT exercised by this source image build.
 # This packs the actual publish file set, including bundled kernel + notices.
 RUN mkdir /out \
@@ -94,7 +96,11 @@ FROM runtime AS studio
 COPY --chmod=755 docker/entrypoint.sh /usr/local/bin/amc-entrypoint
 ENV AMC_WORKSPACE_DIR=/data/amc
 EXPOSE 3210 3211 3212 3213 4173
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD ["amc", "studio", "healthcheck"]
+# HTTP probe of /healthz and /readyz, each bounded at 8 s in-process (scripts/lib/studio-http-probe.mjs; tests pin this copy
+# to it). `amc studio healthcheck` loaded the whole CLI and timed out under load. It covers the entrypoint's
+# single-workspace `amc studio start`, not `amc host`. The start period covers a cold bootstrap (34-52 s measured on a
+# loaded 4-vCPU VM).
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
+  CMD ["node","-e","const h=['0.0.0.0','::',''].includes(process.env.AMC_BIND||'')?'127.0.0.1':process.env.AMC_BIND;const b='http://'+(h.includes(':')?'['+h+']':h)+':'+(process.env.AMC_STUDIO_PORT||3212);Promise.all(['/healthz','/readyz'].map(p=>fetch(b+p,{signal:AbortSignal.timeout(8000)}))).then(r=>process.exit(r.every(x=>x.ok)?0:1),()=>process.exit(1))"]
 ENTRYPOINT ["/usr/local/bin/amc-entrypoint"]
 CMD []

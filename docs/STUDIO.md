@@ -23,13 +23,19 @@ State file:
 Logs:
 - `.amc/studio/logs/*.log`
 
+Vault passphrase:
+- After `amc up` remembers the vault passphrase, owner-mode commands in that workspace (`amc`, `amc verify`, `amc user init`, `amc user add`) use it only when an interactive operator runs them: stdin is a terminal, the workspace is not in agent mode and no agent marker is set; governance commands ask y/N first. `AMC_VAULT_PASSPHRASE` in the environment overrides it; agents started by AMC never receive it. See [VAULT.md](VAULT.md) for the full rule and its limits.
+
 ## Local API
 
-Studio host/port come from runtime config (`AMC_BIND`, `AMC_STUDIO_PORT`).
+Studio host/port come from runtime config (`AMC_BIND`, `AMC_STUDIO_PORT`). The dashboard port is `AMC_DASHBOARD_PORT` (default 4173); `amc dashboard build` writes `.amc/agents/<agent>/dashboard`, the directory Studio serves.
 `amc up` defaults to localhost in local workflows.
 
 Token file:
 - `.amc/studio/admin.token`
+- The admin token cannot create, revoke or re-role console accounts: `/users/add`, `/users/revoke` and `/users/roles` answer 403 to it. Sign in as an OWNER for those.
+
+The first `amc up` creates the token file: mode 0600, 64 hexadecimal characters. AMC replaces a file that holds anything else (and says so on stderr), and never prints the token. `amc studio ping` and SDK clients send it as `x-amc-admin-token`; on A4 routes it reads only. `amc doctor` checks the file's mode and shape (`studio-admin-token`). To rotate it: `amc down`, delete the file, `amc up`. Every client holding the old value stops working at once.
 
 Header required for protected endpoints:
 - `x-amc-admin-token: <token>`

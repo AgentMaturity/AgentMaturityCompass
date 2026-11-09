@@ -2,7 +2,10 @@ import { renderNeutralImportReview } from "./neutralImportReview.js";
 import { renderNativeTasksPage } from "./nativeTasks.js";
 import { apiGet, apiPost, getAdminToken, getCurrentUser, login, logout, onClaims, setAdminToken, whoami } from "./api.js";
 import { installClaimStrip } from "./components/claimBadge.js";
+import { industryPackDetailHtml } from "./industryPackView.js";
 import { renderBars, renderLine } from "./charts.js";
+import { decorateNav, topbarHtml } from "./shell.js";
+import { loginCardHtml, loginFailureText } from "./loginView.js";
 import { renderQrLike } from "./qr.js";
 import { renderPluginTable } from "./components/pluginTable.js";
 import { renderPluginDetail } from "./components/pluginDetail.js";
@@ -249,51 +252,17 @@ function currentWorkspaceLabel() {
 }
 
 function decorateShell() {
-  const nav = document.querySelector("nav");
-  if (nav && !nav.querySelector(".mobile-nav-toggle")) {
-    nav.id = nav.id || "amc-main-navigation";
-    const toggle = document.createElement("button");
-    toggle.type = "button";
-    toggle.className = "mobile-nav-toggle";
-    toggle.setAttribute("aria-label", "Toggle navigation");
-    toggle.setAttribute("aria-controls", nav.id);
-    toggle.setAttribute("aria-expanded", "false");
-    toggle.title = "Toggle navigation";
-    toggle.innerHTML = '<span class="mobile-nav-icon" aria-hidden="true"></span>';
-    toggle.addEventListener("click", () => {
-      const open = nav.classList.toggle("mobile-nav-open");
-      toggle.setAttribute("aria-expanded", String(open));
-    });
-    nav.insertBefore(toggle, nav.querySelector("a"));
-  }
-
-  document.querySelectorAll("nav a").forEach((anchor) => {
-    const href = anchor.getAttribute("href") || "";
-    const normalizedHref = href.replace(/^\.\//, "").replace(/\.html$/, "");
-    anchor.classList.toggle("active", normalizedHref === page);
-  });
+  decorateNav(document.querySelector("nav"), page);
 
   const main = document.querySelector("main");
-  if (!main || main.querySelector(".topbar")) {
+  if (!main) {
     return;
   }
+  const topbar = main.querySelector(".topbar") || main.insertBefore(Object.assign(document.createElement("section"), { className: "topbar" }), main.firstChild);
   const workspace = currentWorkspaceLabel();
-  const demoMode = workspace === "demo";
-  const topbar = document.createElement("section");
-  topbar.className = "topbar";
-  topbar.innerHTML = `
-    <div>
-      <div class="topbar-kicker">Agent Maturity Compass</div>
-      <strong>Compass Console</strong>
-      <span class="muted">/ ${htmlEscape(workspace)} workspace</span>
-    </div>
-    <div class="topbar-actions">
-      ${demoMode ? '<span class="pill ok">local demo session</span>' : '<span class="pill muted">session protected</span>'}
-      <a class="button secondary" href="./evidence">Evidence</a>
-      <a class="button secondary" href="./standard">Open Standard</a>
-    </div>
-  `;
-  main.insertBefore(topbar, main.firstChild);
+  topbar.innerHTML = topbarHtml({ workspace, demoMode: workspace === "demo", me: getCurrentUser() });
+  topbar.querySelector("#signOutBtn")?.addEventListener("click", () => logout()
+    .then(() => window.location.assign("./login"), (error) => setStatus(`Sign out failed: ${errText(error)}`, true)));
 }
 
 const FALLBACK_SURFACES = [
@@ -1219,6 +1188,7 @@ async function refreshUnifiedBanner() {
         <span><strong>Transparency:</strong> ${transparency.ok ? "OK" : "BROKEN"}</span>
       </div>
     `;
+    bannerEl.hidden = false;
   } catch {
     try {
       const snapshot = await fetch(withConsolePath("/snapshot")).then((res) => res.json());
@@ -1229,8 +1199,10 @@ async function refreshUnifiedBanner() {
           <span><strong>Current agent:</strong> ${htmlEscape(snapshot?.studio?.currentAgent || "default")}</span>
         </div>
       `;
+      bannerEl.hidden = false;
     } catch {
       bannerEl.innerHTML = `<strong>Unified Clarity</strong> <span class="muted">Unavailable.</span>`;
+      bannerEl.hidden = false;
     }
   }
 }
@@ -1255,41 +1227,13 @@ function renderAuthScreen() {
   if (!root) {
     return;
   }
-  const demoMode = currentWorkspaceLabel() === "demo";
-  root.innerHTML = `
-    <div class="card auth-card">
-      <div class="studio-kicker">AMC Studio access</div>
-      <h2>AMC Studio Login</h2>
-      ${demoMode ? '<p class="banner">Local demo mode creates a no-login session on loopback only. If this screen remains after startup, refresh once or use the emergency admin token.</p>' : ''}
-      <p class="muted">Login with username/password. Admin token fallback is available for emergency CLI access.</p>
-      <div class="row wrap">
-        <input id="loginUser" placeholder="username" />
-        <input id="loginPass" type="password" placeholder="password" />
-      </div>
-      <div class="row wrap">
-        <input id="pairCode" placeholder="pairing code (LAN mode only)" />
-        <button id="loginBtn">Login</button>
-      </div>
-      <details>
-        <summary>Emergency: use admin token</summary>
-        <div class="row wrap">
-          <input id="adminTokenInput" type="password" placeholder="x-amc-admin-token" />
-          <button id="adminTokenBtn" class="secondary">Use Admin Token</button>
-        </div>
-      </details>
-      <div class="row wrap">
-        <button id="pairCodeCreateBtn" class="secondary">Create Pairing Code</button>
-        <span class="muted">OWNER role required</span>
-      </div>
-      <pre id="authOut" class="muted"></pre>
-      <div id="pairQr" class="card"></div>
-    </div>
-  `;
+  root.innerHTML = loginCardHtml({ demoMode: currentWorkspaceLabel() === "demo", hostMode: window.location.pathname.startsWith("/w/") });
   const qr = document.getElementById("pairQr");
   if (qr) {
     renderQrLike(qr, `${window.location.origin}${withConsolePath("/login")}`);
   }
-  document.getElementById("loginBtn")?.addEventListener("click", async () => {
+  document.getElementById("loginForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
     const username = document.getElementById("loginUser")?.value || "";
     const password = document.getElementById("loginPass")?.value || "";
     const pairingCode = document.getElementById("pairCode")?.value || "";
@@ -1302,7 +1246,7 @@ function renderAuthScreen() {
       setStatus("Login successful.");
       await renderPage();
     } catch (error) {
-      setStatus(`Login failed: ${errText(error)}`, true);
+      setStatus(loginFailureText(errText(error)), true);
     }
   });
   document.getElementById("adminTokenBtn")?.addEventListener("click", async () => {
@@ -1331,6 +1275,9 @@ function renderAuthScreen() {
   });
 }
 
+// The vault unlocks per process: Studio's state, not the state a separate `amc status` shell reports.
+const STUDIO_VAULT_NOTE = "Vault state of the running Studio process; each CLI process unlocks the vault on its own.";
+
 async function renderHome() {
   const status = await apiGet("/status");
   const agentsResp = await apiGet("/agents");
@@ -1349,7 +1296,7 @@ async function renderHome() {
     : "operate through the workspace-authenticated trust boundary.";
   const modeMeta = demoMode
     ? '<span class="pill ok">loopback-only demo</span><span class="pill muted">mutable local data</span><span class="pill muted">unsigned outputs</span>'
-    : `<span class="pill ok">workspace authenticated</span><span class="pill muted">vault ${vaultState.toLowerCase()}</span><span class="pill muted">evidence-first runtime</span>`;
+    : `<span class="pill ok">workspace authenticated</span><span class="pill muted" title="${STUDIO_VAULT_NOTE}">Studio vault ${vaultState.toLowerCase()}</span><span class="pill muted">evidence-first runtime</span>`;
   const launchCommand = demoMode ? "$ amc up --demo --no-open" : "$ amc up";
   root.innerHTML = `
     ${firstUseCard(agentId)}
@@ -1381,14 +1328,14 @@ async function renderHome() {
           <div class="studio-terminal-line"><strong>Agent</strong><span>${htmlEscape(agentId)}</span></div>
           <div class="studio-terminal-line"><strong>Gateway</strong><span>${htmlEscape(status.studio?.gatewayPort || "-")}</span></div>
           <div class="studio-terminal-line"><strong>ToolHub/API</strong><span>${htmlEscape(status.studio?.apiPort || "-")}</span></div>
-          <div class="studio-terminal-line"><strong>Vault</strong><span>${htmlEscape(vaultState)}</span></div>
+          <div class="studio-terminal-line" title="${STUDIO_VAULT_NOTE}"><strong>Vault (Studio)</strong><span>${htmlEscape(vaultState)}</span></div>
           <div class="studio-terminal-line"><strong>Industry Packs</strong><span>free · all packs included</span></div>
         </div>
       </div>
     </section>
 
     <section class="quick-action-grid">
-      <a class="quick-action-card" href="./score"><span>01</span><strong>Score</strong><em>run diagnostics</em></a>
+      <a class="quick-action-card" href="./score"><span>01</span><strong>Score</strong><em>scoring commands</em></a>
       <a class="quick-action-card" href="./assurance"><span>02</span><strong>Assure</strong><em>attack packs</em></a>
       <a class="quick-action-card" href="./evidence?agent=${encodeURIComponent(agentId)}"><span>03</span><strong>Evidence</strong><em>prove chain</em></a>
       <a class="quick-action-card" href="./integrations"><span>04</span><strong>API</strong><em>curl-ready flows</em></a>
@@ -1399,7 +1346,7 @@ async function renderHome() {
         <div class="studio-kicker">Desktop app</div>
         <h3>Native macOS shell, same AMC evidence-first surface.</h3>
         <p class="muted">
-          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs, 41 Industry Packs, and 1,269 CLI paths.
+          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs, 41 Industry Packs, and 1,271 CLI paths.
         </p>
       </div>
       <div class="row wrap">
@@ -2313,7 +2260,8 @@ async function renderIndustryPacks() {
       </div>
       <p class="status-ok">${htmlEscape(entitlement.message || "Industry Packs are free. Access never changes a result.")}</p>
     `)}
-    ${card("Pack Catalog", `<div id="industryPackRows" class="scroll"></div><pre id="industryPackOut" class="muted"></pre>`)}
+    <section id="industryPackDetail" class="card" tabindex="-1" hidden></section>
+    ${card("Pack Catalog", `<div id="industryPackRows" class="scroll"></div>`)}
   `;
   const rows = document.getElementById("industryPackRows");
   rows.innerHTML = packs
@@ -2326,17 +2274,22 @@ async function renderIndustryPacks() {
         <p class="muted">${htmlEscape(pack.description || "")}</p>
         <div class="row spaced">
           <span class="muted">${htmlEscape(pack.domain || "")} · ${Number(pack.questionCount || 0)} questions${pack.contentStatus ? ` · ${htmlEscape(pack.contentStatus)}, self-reported` : ""}</span>
-          <button class="secondary" data-industry-pack="${htmlEscape(pack.packId)}">Open</button>
+          <button class="secondary" data-industry-pack="${htmlEscape(pack.packId)}" aria-label="Open ${htmlEscape(pack.name || pack.packId)}">Open</button>
         </div>
       </div>
     `)
     .join("");
-  const out = document.getElementById("industryPackOut");
+  const detail = document.getElementById("industryPackDetail");
   rows.querySelectorAll("button[data-industry-pack]").forEach((button) => {
     button.addEventListener("click", async () => {
       const id = button.getAttribute("data-industry-pack");
-      const detail = await apiGet(`/industry-packs/${encodeURIComponent(id)}`);
-      out.textContent = JSON.stringify(detail, null, 2);
+      try {
+        detail.innerHTML = industryPackDetailHtml((await apiGet(`/industry-packs/${encodeURIComponent(id)}`)).pack);
+      } catch (error) {
+        detail.innerHTML = `<p class="status-bad">${htmlEscape(errText(error))}</p>`;
+      }
+      detail.hidden = false;
+      detail.focus();
     });
   });
 }
@@ -3569,6 +3522,7 @@ async function renderPage() {
     renderAuthScreen();
     return;
   }
+  decorateShell();
 
   const me = getCurrentUser();
   if (me) {

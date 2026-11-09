@@ -186,16 +186,20 @@ export function memberCandidates(workspace: string, hostMode: boolean, now = Dat
   return { candidates: [...local, ...hosted.values()], limited: hostMode || sessions === null || localUnreadable };
 }
 
-/** Distinct live host principals and the ACTIVE local user ids, the inputs `deriveSelfApprovalAllowed` reads; null when unreadable. */
-export function principalPopulation(workspace: string, now = Date.now()): { activeLocal: string[] | null; hostPrincipals: number | null } {
-  let activeLocal: string[] | null;
+/**
+ * Distinct live host principals and the ACTIVE local user ids, the inputs `deriveSelfApprovalAllowed` reads, and those
+ * holding the workspace role OWNER (implicit project owners, as assertMember admits them); null when unreadable.
+ */
+export function principalPopulation(workspace: string, now = Date.now()): { activeLocal: string[] | null; localOwners: string[] | null; hostPrincipals: number | null } {
+  let active: ReturnType<typeof listUsers> | null;
   try {
-    activeLocal = listUsers(workspace).filter((user) => user.status === "ACTIVE").map((user) => user.userId);
+    active = listUsers(workspace).filter((user) => user.status === "ACTIVE");
   } catch {
-    activeLocal = null;
+    active = null;
   }
   const sessions = liveRouterSessions(workspace, now);
-  return { activeLocal, hostPrincipals: sessions === null ? null : new Set(sessions.map((record) => record.userId)).size };
+  return { activeLocal: active?.map((user) => user.userId) ?? null, localOwners: active?.filter((user) => user.roles.includes("OWNER")).map((user) => user.userId) ?? null,
+    hostPrincipals: sessions === null ? null : new Set(sessions.map((record) => record.userId)).size };
 }
 
 /**

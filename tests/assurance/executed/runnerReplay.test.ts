@@ -29,6 +29,7 @@ import { activateControlPlan, loadActiveCompiledPolicy, activeControlPlan } from
 import { initDestinationRegistry } from "../../../src/residency/destinationRegistry.js";
 import { initGatewayConfig, type GatewayConfig } from "../../../src/gateway/config.js";
 import { startGateway, type GatewayHandle } from "../../../src/gateway/server.js";
+import { GATEWAY_SESSION_STALE_AFTER_MS } from "../../../src/ledger/sessionLiveness.js";
 import { workspaceIdFromDirectory } from "../../../src/workspaces/workspaceId.js";
 import { openLedger, verifyLedgerIntegrity, type Ledger } from "../../../src/ledger/ledger.js";
 import { startAssuranceSession, writeScenarioPrompt, writeScenarioResponse } from "../../../src/assurance/evidenceWriters.js";
@@ -236,6 +237,21 @@ describe.sequential("P2-27 native runner and stored replay", () => {
       expect(native.getSessionById(report.sessionId!)?.session_seal_sig).toBeTruthy();
       expect(native.getAllEvents().filter(event => JSON.parse(event.meta_json).testType === "ASSURANCE_EXECUTED_CAPTURE")).toEqual([]);
     } finally { native.close(); lockVault(isolated); }
+  });
+
+  test("a stale unsealed gateway session (rows older than the liveness window) still makes the run INVALID", async () => {
+    const isolated = workspaceAt(root, "stale-gateway");
+    vi.spyOn(responders, "resolveAgentResponder").mockImplementation(async () => { throw new Error("STALE_GATEWAY_RESOLVED_TARGET"); });
+    const fixture = openLedger(isolated);
+    try {
+      fixture.startSession({ sessionId: "gw-stale", runtime: "gateway", binaryPath: join(isolated, "dist", "cli.js"), binarySha256: "fixture" });
+      fixture.appendEvidence({ sessionId: "gw-stale", runtime: "gateway", eventType: "gateway", payload: '{"stage":"start"}', inline: true,
+        ts: Date.now() - GATEWAY_SESSION_STALE_AFTER_MS - 60_000 });
+    } finally { fixture.close(); }
+    const report = await runAssurance({ workspace: isolated, agentId: "default", packId: "safetyCriticalSIL", mode: "sandbox", window: "1d", executedAttempts: 1 });
+    expect(report).toMatchObject({ status: "INVALID", verificationPassed: false });
+    expect(verifyLedgerIntegrity(isolated, { trust: workspaceSelfTrust(isolated) }).chain.errors).toEqual(["Session gw-stale missing seal"]);
+    lockVault(isolated);
   });
 
   test("missing trusted scope refuses compiled rows before responder resolution", async () => {
@@ -453,13 +469,14 @@ describe.sequential("P2-27 native runner and stored replay", () => {
       let sessions;
       try { sessions = diagnostic.db.prepare("SELECT session_id, binary_path, ended_ts, session_final_event_hash FROM sessions WHERE ended_ts IS NULL OR session_final_event_hash IS NULL").all(); }
       finally { diagnostic.close(); }
-      // A live legacy gateway session is deliberately unsealed. Do not promote this signed report to VALID.
+      // The live gateway session is open, not a chain error (LIVE-INTEGRITY-01), so this signed report is VALID. The old
+      // assertions pinned D9 (INVALID, verification failed on "missing seal"); a stale unsealed one still fails (below).
       expect(sessions).toHaveLength(1);
       expect(sessions).toEqual([expect.objectContaining({ binary_path: join(isolated, "dist", "cli.js"), ended_ts: null, session_final_event_hash: null })]);
-      expect(verifyLedgerIntegrity(isolated, { trust: workspaceSelfTrust(isolated) }).chain.errors).toEqual([
-        `Session ${(sessions as Array<{ session_id: string }>)[0]!.session_id} missing seal`
-      ]);
-      expect(report).toMatchObject({ status: "INVALID", verificationPassed: false, overallScore0to100: 0, evidenceStatus: "INSUFFICIENT_EVIDENCE" });
+      const liveVerdict = verifyLedgerIntegrity(isolated, { trust: workspaceSelfTrust(isolated) });
+      expect(liveVerdict.chain.errors).toEqual([]);
+      expect(liveVerdict.sessions.liveLegacy.map(open => open.sessionId)).toEqual([(sessions as Array<{ session_id: string }>)[0]!.session_id]);
+      expect(report).toMatchObject({ status: "VALID", verificationPassed: true, overallScore0to100: 0, evidenceStatus: "INSUFFICIENT_EVIDENCE" });
       const executed = report.packResults[0]!.scenarioResults.filter(row => row.executed !== undefined);
       expect(executed.map(row => row.scenarioId).sort()).toEqual(["edu-record-isolation", SCENARIO]);
       for (const row of executed) {
@@ -472,7 +489,7 @@ describe.sequential("P2-27 native runner and stored replay", () => {
         const captureRows = native.getAllEvents().filter(row => JSON.parse(row.meta_json).testType === "ASSURANCE_EXECUTED_CAPTURE");
         expect(captureRows).toHaveLength(4);
         expect(captureRows.every(row => JSON.parse(row.meta_json).amcKeyDelegation?.sha256 === binding.delegationSha256)).toBe(true);
-        expect(native.getAssuranceRun(report.assuranceRunId)).toMatchObject({ report_json_sha256: report.reportJsonSha256, run_seal_sig: report.runSealSig, status: "INVALID" });
+        expect(native.getAssuranceRun(report.assuranceRunId)).toMatchObject({ report_json_sha256: report.reportJsonSha256, run_seal_sig: report.runSealSig, status: "VALID" });
       } finally { native.close(); }
       await localGateway.close(); stopped = true; // Verification consumes stored signed captures, without reaching a responder.
       const grade = vi.spyOn(grading, "gradeScenarioReply"), resolve = vi.spyOn(responders, "resolveAgentResponder");

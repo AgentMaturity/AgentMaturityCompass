@@ -581,7 +581,7 @@ function registerReleases(a4: Command): void {
       }
       console.log(`Bundle exported: ${result.outFile}`);
       printClaimResult(claim, {});
-      console.log(`Agent ${agentId}; files: ${result.fileCount}, events: ${result.eventCount}, sessions: ${result.sessionCount}. Verify it: amc a4 verify ${opts.out} --trust-list <file>`);
+      console.log(`Agent ${agentId}; files: ${result.fileCount}, events: ${result.eventCount}, sessions: ${result.sessionCount}${result.openSessions.length ? `, open sessions: ${result.openSessions.length} (${result.openSessions.join(", ")}; the export verifies as of its export time)` : ""}. Verify it: amc a4 verify ${opts.out} --trust-list <file>`);
     }));
 }
 

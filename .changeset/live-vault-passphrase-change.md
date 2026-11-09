@@ -1,0 +1,7 @@
+---
+"agent-maturity-compass": minor
+---
+
+New `amc vault passphrase` changes the vault passphrase without changing a key: every key id and signature stays as it is. It asks for the current passphrase (or uses `AMC_VAULT_PASSPHRASE`, or the remembered passphrase for an interactive operator) and for the new one twice, never on the command line, and refuses without a terminal. It re-seals the vault in one key-set generation with the same keys (a machine that adopted the key set accepts it with `amc keys rotate --accept`, as after a rotation), together with the child vaults a provider-held key uses, and then re-seals every copy of the vault AMC keeps in AMC home for `amc keys rotate --restore`, so the old passphrase opens none of them. It waits (up to 5 seconds) for a key rotation, revocation or vault secret write in progress and refuses, changing nothing, when one changed the vault after the passphrase was checked; a rotation prepared before the change refuses to commit. It locks the vault in the current process, forgets the remembered entry and removes `.amc/local-vault-passphrase`, which held the old passphrase. It is an owner command (refused in agent mode) and asks for confirmation when the vault was opened from the remembered store. A copy of the vault made before the change (a backup, a git commit) still opens with the old passphrase: after a leak, rotate keys too (`docs/VAULT.md`, "When to rotate").
+
+freeze-exception: LIVE-VAULT — a leaked passphrase must be replaceable without discarding the key set

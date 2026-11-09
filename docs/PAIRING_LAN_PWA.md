@@ -8,6 +8,8 @@ Commands:
 - `amc studio lan disable`
 - `amc pair create --ttl 10m`
 
+The signed `--bind`, `--port` and `--cidr` values take effect when `AMC_BIND`, `AMC_STUDIO_PORT` and `AMC_ALLOWED_CIDRS` are unset; a set variable or a `studio start` flag wins. Loopback (`127.0.0.1/32`, `::1/128`) is always admitted, so the local console, `amc studio healthcheck` and local agents keep working under a LAN-only list. A public bind (`0.0.0.0` or `::`) whose allow list admits every address (`0.0.0.0/0` or `::/0`) is refused at start unless `AMC_ALLOW_PUBLIC_BIND=1` is set; `AMC_LAN_MODE` alone does not acknowledge it.
+
 LAN config is signed at `/.amc/studio/lan.yaml(.sig)`.
 
 ## Pairing

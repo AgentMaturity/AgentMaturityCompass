@@ -71,3 +71,16 @@ export function firstRunFixCommands(report: DoctorReport): readonly FirstRunFix[
     }))
     .sort((left, right) => rank[left.status] - rank[right.status]);
 }
+
+/** A missing adapter CLI matters only to someone who runs that adapter, so its install hint is optional. */
+const optionalFix = (fix: FirstRunFix): boolean => fix.checkId.startsWith("adapter-");
+
+/**
+ * What `amc doctor` lists under What's next: the needed fixes (FAIL before WARN), then the closing steps the
+ * CLI passes (such as the first score), then the optional adapter installs.
+ */
+export function doctorNextSteps(report: DoctorReport, closing: readonly FirstRunAction[]): FirstRunAction[] {
+  const fixes = firstRunFixCommands(report);
+  const step = (fix: FirstRunFix): FirstRunAction => ({ cmd: fix.cmd, desc: `[${fix.status}] ${fix.checkId}: ${fix.desc}` });
+  return [...fixes.filter((fix) => !optionalFix(fix)).map(step), ...closing, ...fixes.filter(optionalFix).map(step)];
+}

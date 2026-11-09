@@ -112,7 +112,7 @@ async function proxyFixture() {
         res.statusCode = error.statusCode; res.end(JSON.stringify({ code: error.code })); return;
       }
     }
-    void proxyStudioWorkspaceRequest(req, res, { host: "127.0.0.1", port: upstreamPort }, target);
+    void proxyStudioWorkspaceRequest(req, res, { host: "127.0.0.1", port: upstreamPort }, target, { clientIp: "127.0.0.1", trustedHttps: false });
   });
   const outerPort = await listen(outer); origin = `http://127.0.0.1:${outerPort}`;
   return { origin, upstreamPort, seen, upstreamClosed: upstreamClosed.promise,

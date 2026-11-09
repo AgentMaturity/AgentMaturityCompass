@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { startStudioApiServer } from "../../src/studio/studioServer.js";
-import { initUsersConfig, createSession, revokeSessionByToken, setUserRoles, verifyTrackedSessionToken } from "../../src/auth/authApi.js";
+import { addUser, initUsersConfig, createSession, revokeSessionByToken, setUserRoles, verifyTrackedSessionToken } from "../../src/auth/authApi.js";
 import { getSigningPublicKeyPem } from "../../src/keys/signingKeys.js";
 import { openLedger } from "../../src/ledger/ledger.js";
 import { readTransparencyEntries } from "../../src/transparency/logChain.js";
@@ -56,7 +56,7 @@ describe("actual Studio console snapshot and completed-primary semantics",()=>{
   });
   test.each(["revoke","roles"] as const)("actual GET refuses current %s loss after real Sign without publication or a second response",async change=>{
     const f=await studio(),p=pause(),pending=f.request("/console/snapshot");try{await entered(p,pending);
-      if(change==="revoke")revokeSessionByToken({workspace:f.workspace,token:f.session.token});else setUserRoles({workspace:f.workspace,username:f.owner.username,roles:["VIEWER"]});
+      if(change==="revoke")revokeSessionByToken({workspace:f.workspace,token:f.session.token});else{addUser({workspace:f.workspace,username:"backup-owner",password:"backup-owner-pass-123",roles:["OWNER"]});setUserRoles({workspace:f.workspace,username:f.owner.username,roles:["VIEWER"]});}
       expect(verifyTrackedSessionToken({workspace:f.workspace,token:f.session.token}).ok).toBe(false);p.gate.resolve();const res=await pending,text=await res.text();expect(res.status).toBe(401);expect(text).toContain("authenticated authority changed while signing");expect(text).not.toContain("snapshotPath");expect(existsSync(join(f.workspace,".amc/studio/console-snapshot.json"))).toBe(false);
     }finally{p.gate.resolve();await Promise.allSettled([pending]);}
     await restoredGet(f);

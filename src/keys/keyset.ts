@@ -22,7 +22,7 @@ import { assertOwnerMode } from "../mode/mode.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { withAmcConfigPublicationLock } from "../config/configPublicationLock.js";
 import {
-  containedExists, ensureContainedDir, readContained, readContainedOrNull, removeContained, renameContained, statStamp, writeContained
+  containedExists, ensureContainedDir, listContainedDir, readContained, readContainedOrNull, removeContained, renameContained, statStamp, writeContained
 } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize, parseCanonicalJson } from "../utils/json.js";
@@ -652,6 +652,38 @@ function restoreCommittedKeysetLocked(workspace: string, opts: { vaultKeyIds: Va
     const vault = restoreVaultHolding(workspace, keyset, mark.sequence, copyOf, opts.vaultKeyIds);
     if (vault === "restored") restored.push("vault.amcvault");
     return { generation: mark.sequence, restored, missing, vault };
+  } });
+}
+
+/** A sealed envelope's name among the recovery files: committed copies, pre-images, discarded and restore copies, the v1 vault. */
+const SEALED_COPY = /\.amcvault(?:\.keyset-staged)?(?:\.\d+)?$/;
+
+/**
+ * LIVE-VAULT-19 (`amc vault passphrase`): every sealed envelope this machine keeps for the workspace in AMC home, rewritten
+ * with `reseal`'s bytes, so a retired passphrase opens none of them and `--restore` keeps working with the new one. The
+ * copies `generation` committed (the passphrase change's own, already under the new passphrase) are left as they are; a
+ * copy `reseal` cannot open (null: sealed under another passphrase) is left too, and listed.
+ */
+export function resealRecoveryVaults(workspace: string, generation: number, reseal: (envelope: Buffer) => string | null): { resealed: number; unopened: string[] } {
+  ensureContainedDir(workspace, ".amc/keys");
+  return withControlFileLock({ root: amcDir(workspace), name: "keyset", operation: () => {
+    const home = amcHome();
+    const out = { resealed: 0, unopened: [] as string[] };
+    const visit = (rel: string): void => {
+      for (const name of listContainedDir(home, rel)) {
+        const child = `${rel}/${name}`;
+        if (child === `${recoveryRel(workspace, generation)}/committed`) continue;
+        if (lstatSync(join(home, child)).isDirectory()) { visit(child); continue; }
+        if (!SEALED_COPY.test(name)) continue;
+        let sealed: string | null = null;
+        try { sealed = reseal(readContained(home, child, MAX_KEY_FILE)); } catch { /* a link or an unreadable file: listed as not re-sealed */ }
+        if (sealed === null) { out.unopened.push(join(home, child)); continue; }
+        writeContained(home, child, sealed, 0o600);
+        out.resealed += 1;
+      }
+    };
+    visit(`state/keyset-recovery/${workspaceScope(workspace)}`);
+    return out;
   } });
 }
 

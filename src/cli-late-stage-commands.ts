@@ -1139,11 +1139,11 @@ export function registerLateStageCliCommands({
     .description("Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook)")
     .requiredOption("--provider <provider>", "Provider type: otlp | langfuse | helicone | datadog | webhook")
     .requiredOption("--endpoint <url>", "Provider API endpoint URL")
-    .option("--api-key <key>", "API key for authentication")
+    .option("--api-key <key>", "API key for authentication (visible in ps; prefer --api-key-file)").option("--api-key-file <path>", "read the API key from this private file (or set AMC_WATCH_API_KEY)")
     .option("--poll-interval <ms>", "Poll interval in milliseconds", "10000")
     .option("--agent <agentId>", "Agent ID to associate traces with")
-    .action(async (opts: { provider: string; endpoint: string; apiKey?: string; pollInterval: string; agent?: string }) => {
-      const { createObservabilityBridge} = await import("./watch/observabilityBridge.js");
+    .action(async (opts: { provider: string; endpoint: string; apiKey?: string; apiKeyFile?: string; pollInterval: string; agent?: string }) => {
+      const [{ createObservabilityBridge }, { watchApiKey }] = await Promise.all([import("./watch/observabilityBridge.js"), import("./cli/argvSecret.js")]);
       const agentId = opts.agent ?? resolveAgentId(process.cwd());
       const bridge = createObservabilityBridge({
         workspace: process.cwd(),
@@ -1151,7 +1151,7 @@ export function registerLateStageCliCommands({
         providers: [{
           provider: opts.provider as any,
           endpoint: opts.endpoint,
-          apiKey: opts.apiKey,
+          apiKey: watchApiKey(opts),
           pollIntervalMs: parseInt(opts.pollInterval, 10),
         }],
         pollIntervalMs: parseInt(opts.pollInterval, 10),
@@ -1184,12 +1184,12 @@ export function registerLateStageCliCommands({
     .option("--agent <agentId>", "Agent ID")
     .option("--provider <provider>", "Observability provider", "otlp")
     .option("--endpoint <url>", "Provider endpoint")
-    .option("--api-key <key>", "Provider API key")
+    .option("--api-key <key>", "Provider API key (visible in ps; prefer --api-key-file)").option("--api-key-file <path>", "read the API key from this private file (or set AMC_WATCH_API_KEY)")
     .option("--budget <usd>", "Cost budget in USD", "100")
     .option("--max-latency <ms>", "Max acceptable latency in ms", "30000")
     .option("--alert-severity <level>", "Alert on this severity and above", "warning")
-    .action(async (opts: { agent?: string; provider?: string; endpoint?: string; apiKey?: string; budget: string; maxLatency: string; alertSeverity?: string }) => {
-      const { createObservabilityBridge} = await import("./watch/observabilityBridge.js");
+    .action(async (opts: { agent?: string; provider?: string; endpoint?: string; apiKey?: string; apiKeyFile?: string; budget: string; maxLatency: string; alertSeverity?: string }) => {
+      const [{ createObservabilityBridge }, { watchApiKey }] = await Promise.all([import("./watch/observabilityBridge.js"), import("./cli/argvSecret.js")]);
       const { createRealtimeAssuranceEngine} = await import("./watch/realtimeAssurance.js");
       const agentId = opts.agent ?? resolveAgentId(process.cwd());
 
@@ -1199,7 +1199,7 @@ export function registerLateStageCliCommands({
         providers: opts.endpoint ? [{
           provider: (opts.provider ?? "otlp") as any,
           endpoint: opts.endpoint,
-          apiKey: opts.apiKey,
+          apiKey: watchApiKey(opts),
         }] : [],
       });
 

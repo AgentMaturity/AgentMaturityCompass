@@ -6,7 +6,7 @@ AMC has an **experimental** build script for a single binary using **Node SEA (S
 - the binary it builds **does not start yet**, on any host tried;
 - it is **not a release asset**: the release workflow neither builds nor uploads it.
 
-Install AMC with npm or the verified release installer instead ([INSTALL_PACKAGES.md](INSTALL_PACKAGES.md)).
+Install AMC with npm or the verified release installer instead ([INSTALL.md](INSTALL.md)).
 
 ## Why it does not start
 

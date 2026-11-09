@@ -121,4 +121,51 @@ describe("the running gateway", () => {
       ledger.close();
     }
   });
+
+  // SR-9: the kill switch was checked before the lease, so its rows went through the pre-auth bound and one budget per
+  // client: an unleased flood silenced a leased agent's kill-switch refusals. Now the lease is verified first. An unleased
+  // request gets the bounded lease refusal (and learns nothing of the kill), and every leased refusal is recorded.
+  test("after an unleased flood within the pre-auth bound, every kill-switch refusal of a leased agent is recorded", async () => {
+    initGatewayConfig(workspace, gatewayConfigSchema.parse({ ...config, lease: { ...config.lease, allowQueryCarrier: true } }));
+    const gateway = await startGateway({ workspace });
+    const post = (headers: Record<string, string>, query = "") => new Promise<number>((done, fail) => {
+      const req = httpRequest({ host: gateway.host, port: gateway.port, method: "POST", path: `/openai/v1/chat/completions${query}`, headers });
+      req.on("response", (res) => { done(res.statusCode ?? 0); res.resume(); });
+      req.on("error", fail);
+      req.end("{}");
+    });
+    try {
+      await kill({ kind: "provider", id: "openai" });
+      for (let i = 0; i < 15; i += 1) expect(await post({ "x-amc-agent-id": "default" })).toBe(401);
+      const lease = issueLeaseForCli({ workspace, agentId: "default", ttl: "60m", scopes: "gateway:llm,proxy:connect", routes: "/openai",
+        models: "*", rpm: 500, tpm: 1000000, maxCostUsdPerDay: null }).token;
+      for (let i = 0; i < 12; i += 1) expect(await post({ "x-amc-agent-id": "default", "x-amc-lease": lease })).toBe(403);
+      // The same lease in the query, here and through the HTTP proxy: its carrier row is a verified request's row too.
+      for (let i = 0; i < 12; i += 1) expect(await post({ "x-amc-agent-id": "default" }, `?amc_lease=${lease}`)).toBe(403);
+      const viaProxy = (path: string) => new Promise<number>((done, fail) => {
+        const req = httpRequest({ host: gateway.host, port: gateway.proxyPort!, method: "GET", path, headers: { "x-amc-agent-id": "default" } });
+        req.on("response", (res) => { done(res.statusCode ?? 0); res.resume(); });
+        req.on("error", fail);
+        req.end();
+      });
+      for (let i = 0; i < 12; i += 1) expect(await viaProxy(`http://127.0.0.1:${upstreamPort}/?amc_lease=${lease}`)).toBe(403);
+    } finally {
+      await gateway.close();
+    }
+    const ledger = openLedger(workspace);
+    try {
+      const metas = ledger.getAllEvents().filter((e) => e.event_type === "audit").map((e) => JSON.parse(e.meta_json ?? "{}") as Record<string, unknown>);
+      const denied = metas.filter((meta) => meta.auditType === "KILL_SWITCH_DENIED");
+      expect(denied).toHaveLength(36);
+      expect(denied.every((meta) => meta.suppressed === undefined && meta.agentId === "default")).toBe(true);
+      const carried = metas.filter((meta) => meta.auditType === "LEASE_QUERY_CARRIER_USED");
+      expect(carried).toHaveLength(24);
+      expect(carried.every((meta) => meta.suppressed === undefined)).toBe(true);
+      const refused = metas.filter((meta) => meta.auditType === "LEASE_INVALID_OR_MISSING");
+      expect(refused.filter((meta) => meta.suppressed === undefined)).toHaveLength(10);
+      expect(refused.filter((meta) => meta.suppressed !== undefined)).toEqual([expect.objectContaining({ suppressed: 5, severity: "HIGH" })]);
+    } finally {
+      ledger.close();
+    }
+  });
 });
