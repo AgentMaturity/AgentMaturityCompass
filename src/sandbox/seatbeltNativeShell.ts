@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { runProcess } from "../exec/runProcess.js";
 import { admitWritableDirectory, within } from "./bwrapBackend.js";
 import { startShellEgressProxy, type ShellEgressProxy } from "./egress/shellEgressProxy.js";
@@ -68,13 +68,25 @@ export interface SeatbeltShellProfileInput {
 
 export function buildSeatbeltShellProfile(input: SeatbeltShellProfileInput): string {
   const subpaths = (paths: readonly string[]): string => paths.map(path => `(subpath "${sbplString(path)}")`).join(" ");
+  const denied = [join(input.workspace, ".amc"), ...input.denied];
+  const protectedParents = new Set<string>();
+  for (const path of denied) {
+    for (let parent = dirname(path); input.writableRoots.some(root => within(root, parent)); parent = dirname(parent)) {
+      protectedParents.add(parent);
+      if (parent === dirname(parent)) break;
+    }
+  }
   return [
     "(version 1)",
     ";; Reads stay open except the deny-list below.",
     "(allow default)",
     "(deny file-write*)",
     `(allow file-write* ${subpaths([...input.writableRoots, input.privateTmp])} (literal "/dev/null"))`,
-    `(deny file-read* file-write* ${subpaths([join(input.workspace, ".amc"), ...input.denied])})`,
+    `(deny file-read* file-write* ${subpaths(denied)})`,
+    // Denied paths are name-based. Renaming a writable parent would otherwise move the secret out of the deny-list.
+    ...(protectedParents.size === 0 ? [] : [
+      `(deny file-write-unlink ${[...protectedParents].map(path => `(literal "${sbplString(path)}")`).join(" ")})`
+    ]),
     ";; A hard link in a writable root to an outside file would write through to it.",
     "(deny file-link)",
     "(deny network*)",

@@ -179,6 +179,33 @@ describe("real native shell escape attempts with owned canaries", () => {
     } finally { await f.finish(passed); }
   });
 
+  (process.platform === "darwin" ? realTest : test.skip)("S5: Seatbelt prevents renaming any writable ancestor of a secret", async () => {
+    const f = nativeContainmentFixture({ readDenyHome: false }); let passed = false;
+    try {
+      const outer = join(f.allowed, "outer"), inner = join(outer, "inner");
+      const secret = join(inner, "vault-passphrase"), canary = `synthetic-${randomUUID()}`;
+      const moved = join(f.allowed, "moved"), sibling = join(inner, "ordinary.txt");
+      mkdirSync(inner, { recursive: true });
+      writeFileSync(secret, canary, { mode: 0o600 });
+      process.env.AMC_VAULT_PASSPHRASE_FILE = secret;
+      const moves = [[inner, join(moved, "vault-passphrase")], [outer, join(moved, "inner", "vault-passphrase")]];
+      const call = await f.run(`const fs=require("node:fs"),attempts=[];
+        fs.writeFileSync(${JSON.stringify(sibling)},"ordinary write");
+        for(const [source,alias] of ${JSON.stringify(moves)}) {
+          try { fs.renameSync(source,${JSON.stringify(moved)}); }
+          catch(error) { attempts.push({denied:true,code:error.code}); continue; }
+          attempts.push({denied:false,value:fs.readFileSync(alias,"utf8")});
+        }
+        ${emit("{attempted:true,attempts}")}`);
+      applied(call);
+      expect(call.receipt.stdout).not.toContain(canary);
+      expect(call.data.attempts).toEqual([{ denied: true, code: "EPERM" }, { denied: true, code: "EPERM" }]);
+      expect(readFileSync(secret, "utf8")).toBe(canary);
+      expect(readFileSync(sibling, "utf8")).toBe("ordinary write");
+      passed = true;
+    } finally { await f.finish(passed); }
+  });
+
   // Linux only: macOS reports Node's own kqueue descriptors as directories, and Seatbelt passes no extra fd.
   (process.platform === "linux" ? realTest : test.skip)("the command inherits no launcher descriptor and cannot write the read-only workspace", async () => {
     const f = nativeContainmentFixture(); let passed = false;

@@ -200,7 +200,9 @@ files, `AMC_SESSION_SIGNING_KEY_FILE`, `AMC_NOTARY_AUTH_SECRET_FILE`,
 (`--credentials-home`, `--credentials-file`, the SDK's `credentialsHome` and
 `credentialsFile`, `amc acp`'s; registered when AMC opens that store, process-wide),
 the user `~/.env` layer, the workspace's `.amc` and the signed `readDeny`
-paths. All networking is denied, including Unix
+paths. Seatbelt also prevents renaming or removing a protected path's writable
+ancestors, so a shell cannot move a denied path out of the deny-list. Other
+writes inside those directories still follow the signed write grants. All networking is denied, including Unix
 sockets such as an SSH agent; with a signed egress allowlist the only exception
 is AMC's proxy port on localhost. Every path is resolved first, because Seatbelt
 matches real paths only (`/var` is `/private/var`). Write grants that contain
