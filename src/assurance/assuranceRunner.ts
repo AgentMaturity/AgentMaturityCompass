@@ -186,10 +186,16 @@ function scoreIntegrity(packResults: AssurancePackResult[]): number {
 }
 
 function assuranceReportsDir(workspace: string, agentId: string): string {
-  const paths = getAgentPaths(workspace, agentId);
-  const dir = join(paths.reportsDir, "assurance");
-  ensureDir(dir);
-  return dir;
+  return join(getAgentPaths(workspace, agentId).reportsDir, "assurance");
+}
+
+function assuranceReportFiles(workspace: string, agentId: string): string[] {
+  const dir = assuranceReportsDir(workspace, agentId);
+  try { return readdirSync(dir).filter(name => name.endsWith(".json")).map(name => join(dir, name)); }
+  catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return [];
+    throw error;
+  }
 }
 
 async function hasProxyDenyByDefault(workspace: string): Promise<boolean> {
@@ -221,6 +227,7 @@ export async function runAssurance(input: RunAssuranceInput, options: RunHashPub
   const packIds = packIdsForRun(input);
   const allPackIds = input.stationQuestionIds?.length ? [...packIds, STATION_QUESTION_ASPECT_PACK] : packIds;
   const reportsDir = assuranceReportsDir(workspace, agentId);
+  ensureDir(reportsDir);
   const ledger = openLedger(workspace, unsignedStore ? { store: "unsigned" } : {});
 
   const proxyDenyByDefault = await hasProxyDenyByDefault(workspace);
@@ -406,10 +413,11 @@ export function loadAssuranceReport(params: {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const reportsDir = assuranceReportsDir(params.workspace, agentId);
   const file = join(reportsDir, `${params.assuranceRunId}.json`);
-  if (!pathExists(file)) {
-    throw new Error(`Assurance report not found: ${file}`);
+  try { return JSON.parse(readUtf8(file)) as AssuranceReport; }
+  catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") throw new Error(`Assurance report not found: ${file}`);
+    throw error;
   }
-  return JSON.parse(readUtf8(file)) as AssuranceReport;
 }
 
 export async function verifyAssuranceRun(params: {
@@ -489,11 +497,8 @@ export function scanVerifiedAssuranceByPack(params: {
   windowEndTs: number;
 }): { byPack: Map<string, AssurancePackResult>; unverifiedReports: string[] } {
   const agentId = resolveAgentId(params.workspace, params.agentId);
-  const reportsDir = assuranceReportsDir(params.workspace, agentId);
-  const files = readdirSync(reportsDir)
-    .filter((file) => file.endsWith(".json"))
-    .map((file) => join(reportsDir, file))
-    .sort((a, b) => a.localeCompare(b));
+  const files = assuranceReportFiles(params.workspace, agentId).sort((a, b) => a.localeCompare(b));
+  if (files.length === 0) return { byPack: new Map(), unverifiedReports: [] };
   const map = new Map<string, { ts: number; pack: AssurancePackResult }>();
   const unverifiedReports: string[] = [];
   const provenance = new ProvenanceChecker(params.workspace);
@@ -728,11 +733,12 @@ export function latestAssuranceReports(params: {
   windowEndTs: number;
 }): AssuranceReport[] {
   const agentId = resolveAgentId(params.workspace, params.agentId);
-  const reportsDir = assuranceReportsDir(params.workspace, agentId);
+  const files = assuranceReportFiles(params.workspace, agentId);
+  if (files.length === 0) return [];
   const reports: AssuranceReport[] = [], refused: RefusedRun[] = [];
   const provenance = new ProvenanceChecker(params.workspace);
   try {
-  for (const file of readdirSync(reportsDir).filter((name) => name.endsWith(".json")).map((name) => join(reportsDir, name))) {
+  for (const file of files) {
     let parsed: Record<string, unknown> | null;
     try {
       parsed = JSON.parse(readUtf8(file)) as Record<string, unknown> | null;

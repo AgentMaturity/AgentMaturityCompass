@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
@@ -6,7 +6,7 @@ import { initWorkspace } from "../src/workspace.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { verifiedAssuranceByPack } from "../src/compliance/evidenceBinding.js";
-import { latestAssuranceByPack, scanVerifiedAssuranceByPack, verifiedGovernorAssuranceSummary } from "../src/assurance/assuranceRunner.js";
+import { latestAssuranceByPack, latestAssuranceReports, loadAssuranceReport, scanVerifiedAssuranceByPack, verifiedGovernorAssuranceSummary } from "../src/assurance/assuranceRunner.js";
 import { assuranceReportProvenance } from "../src/assurance/reportProvenance.js";
 import { startAssuranceSession } from "../src/assurance/evidenceWriters.js";
 import { writeProvenancedAssuranceReport } from "./helpers/provenancedAssurance.js";
@@ -29,6 +29,21 @@ describe("assurance report provenance gate", () => {
   }
   const window = (ws: string) => ({ workspace: ws, agentId: "default", windowStartTs: 0, windowEndTs: Date.now() + 10_000 });
   const reportsDir = (ws: string) => join(getAgentPaths(ws, "default").reportsDir, "assurance");
+
+  test("looking up missing assurance history does not create an agent and invalid history still fails closed", () => {
+    const ws = workspace(), agentId = "missing-agent";
+    const selected = getAgentPaths(ws, agentId);
+    const query = { ...window(ws), agentId };
+    expect(latestAssuranceReports(query)).toEqual([]);
+    expect(scanVerifiedAssuranceByPack(query)).toEqual({ byPack: new Map(), unverifiedReports: [] });
+    expect(() => loadAssuranceReport({ workspace: ws, agentId, assuranceRunId: "missing" })).toThrow(/Assurance report not found/);
+    expect(existsSync(selected.rootDir)).toBe(false);
+
+    mkdirSync(selected.reportsDir, { recursive: true });
+    writeFileSync(join(selected.reportsDir, "assurance"), "not a directory");
+    expect(() => latestAssuranceReports(query)).toThrow(/ENOTDIR/);
+    expect(() => scanVerifiedAssuranceByPack(query)).toThrow(/ENOTDIR/);
+  });
 
   test("a report whose graded rows resolve in its sealed runner session counts in every reader", () => {
     const ws = workspace();
