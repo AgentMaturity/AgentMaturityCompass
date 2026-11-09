@@ -11251,11 +11251,6 @@
       "kind": "types"
     },
     {
-      "id": "4658056f5b4c91659a3b8117aaa5dee0f2c7461ecd9c8ef8d14f602120eaf87b",
-      "file": "src/shield/redaction/redactSecrets.ts",
-      "kind": "types"
-    },
-    {
       "id": "466b4d4d21007dc1c6678eb98a7f1487eeef451b2902999b682b4deedc368e01",
       "file": "src/watch/traceFailureIndex.ts",
       "kind": "types"
@@ -20739,13 +20734,6 @@
       "date": "2026-10-27"
     },
     {
-      "id": "29c4c6bf1f61c7f22c62d9cb1a6f4758f822daec1cd363d5bd592e1eb6326584",
-      "scan": "duplicates",
-      "reason": "Pre-existing mirror of the store verifier's per-row hash and signature loop in the session root descriptor (both at base 97dd749c8); SH-OBS only changed its key-source parameter so amc session export can reuse it. Merging the two verifiers is the trust domain's call.",
-      "acceptedBy": "AgentMaturity",
-      "date": "2026-11-08"
-    },
-    {
       "id": "2b972bc0d93f1ac824f3f9d06f3390cc2be2e94b3e9be820769dc4186062328e",
       "scan": "dead-code",
       "reason": "AXE-23: intentional standalone CLI generator for the thirteen ADR-0025 live-drift characterization pins; run node scripts/gen-live-drift-characterization.mjs --check or --write after build.",
@@ -22606,13 +22594,6 @@
       "reason": "P2-08 (Codex) async publication producer: per-store prepare, verify and publish steps are written inline under each store's own authority checks; extracting shared signing or publication helpers is a reviewed follow-up, not part of landing",
       "acceptedBy": "AgentMaturity",
       "date": "2026-10-27"
-    },
-    {
-      "id": "f3fc0cf686a08e92fb6375a940e17339c6e213749362e2fee962d20c2b8db903",
-      "scan": "duplicates",
-      "reason": "Pre-existing lenient meta_json parsers in requestSources and the session root descriptor (both at base 97dd749c8, already a baseline pair under an older id); SH-OBS touched neither function. budgetMeta throws instead, so it is not a drop-in.",
-      "acceptedBy": "AgentMaturity",
-      "date": "2026-11-08"
     },
     {
       "id": "f440dcea03126cf9a64cc912aa85022e47e37d0cff73916f1e7a0f864eb0e705",

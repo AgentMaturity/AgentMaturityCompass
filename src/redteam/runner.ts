@@ -549,9 +549,7 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
         const receipt = admitReceipts(answer, agentId);
         if (rows !== null && receipt.rejected.length > 0) writeAssuranceAudit({ ...rows, ...scenarioRow, auditType: "ASSURANCE_RECEIPT_REJECTED", severity: "HIGH", message: `Gateway receipt rejected: ${receipt.rejected.join(" | ")}` });
         const correlatedRequestIds = receipt.request === null ? [] : [receipt.request.receiptId];
-        const responseEventId = rows === null ? null : writeScenarioResponse({ ...rows, ...scenarioRow, response, toolCalls: answer.toolCalls,
-          ...(receipt.request === null ? {} : { requestReceipt: receipt.request.receipt }), ...(receipt.response === null ? {} : { responseReceipt: receipt.response }),
-          ...(receipt.requestSeenOnly === null ? {} : { requestSeenOnly: receipt.requestSeenOnly }) });
+        const responseEventId = rows === null ? null : writeScenarioResponse({ ...rows, ...scenarioRow, response, toolCalls: answer.toolCalls, gatewayReceipt: receipt });
         const exchangeIds = promptEventId === null || responseEventId === null ? [] : [promptEventId, responseEventId];
         const grade = gradeScenarioReply(scenario, answer, attackPrompt, context);
         if (grade.kind === "inconclusive") {

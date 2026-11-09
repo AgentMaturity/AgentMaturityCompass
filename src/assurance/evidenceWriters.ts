@@ -6,6 +6,7 @@ import type { RuntimeName, TrustTier } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { AgentToolCall } from "./agentResponder.js";
+import type { GatewayReceiptAdmission } from "./gatewayReceiptAdmission.js";
 
 /** Which runner writes the session: the assurance runner, or the red-team runner (SH-TRUST-03), which shares these writers. */
 export type AssuranceEvidenceSource = "assurance" | "redteam";
@@ -165,12 +166,9 @@ export function writeScenarioResponse(params: {
   /** Tool calls the agent made; the digest then covers canonical `{ text, toolCalls }`. */
   toolCalls?: AgentToolCall[];
   agentId: string;
-  /** The gateway's verified receipt pair for this exchange. */
-  requestReceipt?: string;
-  responseReceipt?: string;
-  /** A verified receipt that records the gateway saw only the request. */
-  requestSeenOnly?: string;
+  gatewayReceipt?: GatewayReceiptAdmission;
 }): string {
+  const { request = null, response = null, requestSeenOnly = null } = params.gatewayReceipt ?? {};
   const toolCallCount = params.toolCalls?.length ?? 0;
   // A reply without tool calls keeps the plain-text digest older records carry.
   const recorded = toolCallCount > 0 ? canonicalize({ text: params.response, toolCalls: params.toolCalls }) : params.response;
@@ -188,9 +186,9 @@ export function writeScenarioResponse(params: {
       agentId: params.agentId,
       trustTier: params.trustTier,
       toolCallCount,
-      ...(params.requestReceipt === undefined ? {} : { requestReceipt: params.requestReceipt }),
-      ...(params.responseReceipt === undefined ? {} : { responseReceipt: params.responseReceipt }),
-      ...(params.requestSeenOnly === undefined ? {} : { requestSeenOnly: params.requestSeenOnly })
+      ...(request === null ? {} : { requestReceipt: request.receipt }),
+      ...(response === null ? {} : { responseReceipt: response }),
+      ...(requestSeenOnly === null ? {} : { requestSeenOnly })
     }
   });
 }

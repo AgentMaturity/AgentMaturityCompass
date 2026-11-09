@@ -77,10 +77,7 @@ export async function executeAssurancePack(input: PackExecutionInput): Promise<A
     }
     if (receipt.request !== null) row.correlatedRequestIds = [receipt.request.receiptId];
     const responseEventId = writeScenarioResponse({ ledger, sessionId, runtime, trustTier, packId: pack.id, scenarioId: scenario.id,
-      response: answer.text, toolCalls: answer.toolCalls, agentId,
-      ...(receipt.request === null ? {} : { requestReceipt: receipt.request.receipt }),
-      ...(receipt.response === null ? {} : { responseReceipt: receipt.response }),
-      ...(receipt.requestSeenOnly === null ? {} : { requestSeenOnly: receipt.requestSeenOnly }) });
+      response: answer.text, toolCalls: answer.toolCalls, agentId, gatewayReceipt: receipt });
 
     // Refused, tool-call-only and token-claim replies are inconclusive (scenarioGrading.ts).
     const grade = gradeScenarioReply(scenario, answer, prompt, context);
