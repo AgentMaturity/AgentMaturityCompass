@@ -5,9 +5,10 @@ import { forMatching, globToRegExp, readWorkspaceFile, walkWorkspace } from "./w
  * with every cap named in the output. Only the parent owns the deadline: it can terminate even a blocked RegExp.test.
  *
  * Paging: `offset` units (matches in `content` mode, files in `files` and `count` mode) are skipped without being
- * rendered, then up to `maxResults` are returned; the notice names the next offset. A page past the end says so and how many matches there were. The scan caps (`maxScannedBytes`,
- * the walk's file cap, the deadline) bound the skipped matches too, so a page cannot be claimed complete when the
- * scan was not.
+ * rendered, then up to `maxResults` are returned; the notice names the next offset. A page past the end says so and
+ * how many there were. The scan caps (`maxScannedBytes`, the walk's file cap, the deadline) bound the skipped matches
+ * too, so a page cannot be claimed complete when the scan was not. When the output byte cap cuts a page, no next
+ * offset is named: the page's count would include matches that were never printed.
  */
 
 export const MAX_FILES_WALKED = 20_000;
@@ -132,9 +133,9 @@ export function scanGrep(workspace: string, args: GrepArgs): ScanResult {
       total += 1;
       if (skipped < args.offset) { skipped++; continue; }
       if (shown >= args.maxResults) { hitResultCap = true; break; }
+      if (!emit([`${relativePath}:${hits.length}`])) break;
       shown++;
       pageMatches += hits.length;
-      if (!emit([`${relativePath}:${hits.length}`])) break;
       continue;
     }
     total += args.mode === "files" ? 1 : hits.length;
@@ -154,11 +155,12 @@ export function scanGrep(workspace: string, args: GrepArgs): ScanResult {
     if (!emit(rendered.rows)) break;
   }
   const next = args.offset + shown;
-  if (hitResultCap) out.push(`[amc: stopped at ${args.maxResults} ${args.mode === "count" ? "files" : args.mode === "files" ? "files" : "matches"}${args.offset > 0 ? ` after offset ${args.offset}` : ""}; more exist — pass offset ${next} for the next page, or narrow the pattern]`);
+  if (hitResultCap && !hitByteCap) out.push(`[amc: stopped at ${args.maxResults} ${args.mode === "count" ? "files" : args.mode === "files" ? "files" : "matches"}${args.offset > 0 ? ` after offset ${args.offset}` : ""}; more exist — pass offset ${next} for the next page, or narrow the pattern]`);
   if (hitByteCap) out.push(`[amc: stopped at ${args.maxBytes} bytes of output; more matches exist]`);
   if (hitScanCap) out.push(`[amc: stopped at ${args.maxScannedBytes} bytes scanned; results incomplete]`);
   if (walked.truncated) out.push(`[amc: the walk stopped at ${MAX_FILES_WALKED} files; results are incomplete]`);
-  if (args.mode === "count" && shown > 0) out.push(`[amc: ${pageMatches} matches in ${shown} files${hitResultCap ? " on this page" : ""}${hitScanCap || walked.truncated ? " (scan incomplete)" : ""}]`);
+  const partialPage = hitResultCap || hitByteCap || args.offset > 0;
+  if (args.mode === "count" && shown > 0) out.push(`[amc: ${pageMatches} matches in ${shown} files${partialPage ? " on this page" : ""}${hitScanCap || walked.truncated ? " (scan incomplete)" : ""}]`);
   if (shown === 0 && args.offset > 0 && !hitScanCap && !walked.truncated && !hitByteCap) {
     out.push(`[amc: no entries at offset ${args.offset}; ${total} ${args.mode === "content" ? "matches" : "files"} in total]`);
   }

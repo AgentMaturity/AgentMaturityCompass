@@ -72,6 +72,17 @@ describe("ls", () => {
     expect(outcome.output.split("\n")).toEqual(["f a.txt  1"]);
   });
 
+  it("lists ordinary files whose names only look alias-prone; directories so named are left out, as the walk skips them", async () => {
+    const h = harness();
+    writeFileSync(join(h.workspace, "src/notes~2.md"), "n");
+    writeFileSync(join(h.workspace, "src/draft."), "d");
+    mkdirSync(join(h.workspace, "src/old~1"));
+    const lines = (await h.run({ path: "src" })).output.split("\n");
+    expect(lines).toContain("f notes~2.md  1");
+    expect(lines).toContain("f draft.  1");
+    expect(lines).not.toContain("d old~1/");
+  });
+
   it("refuses .git, a path outside the workspace, and a file path", async () => {
     const h = harness();
     expect((await h.run({ path: ".git" })).output).toMatch(/protected|\.git/);

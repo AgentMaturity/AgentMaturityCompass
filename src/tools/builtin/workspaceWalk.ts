@@ -1,6 +1,6 @@
 import { closeSync, constants, fstatSync, lstatSync, openSync, readSync, readdirSync, realpathSync, statSync } from "node:fs";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
-import { aliasedSegmentReason, fileIdentity, foldName, protectedDirectoryIdentities } from "../../toolhub/protectedPaths.js";
+import { aliasedSegmentReason, fileIdentity, foldName, isProtectedDirectoryName, protectedDirectoryIdentities } from "../../toolhub/protectedPaths.js";
 
 /**
  * A bounded workspace walker (P4.3).
@@ -299,9 +299,12 @@ export function listDirectory(workspace: string, directory: string, limits: { re
   for (const entry of readdirSync(directory, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
     const full = join(directory, entry.name);
     const isDirectory = entry.isDirectory();
-    if (aliasedSegmentReason(entry.name) !== null) continue;
-    // A link's identity is its target's, and ls never follows links; the name check above covers a link so named.
-    if (!entry.isSymbolicLink() && protectedIds.size > 0 && protectedIds.has(fileIdentity(full) ?? "")) continue;
+    // A protected name is left out whatever the entry is (a `.git` file, a link named `.amc`). The wider alias shapes
+    // (trailing dot or space, `name:stream`, `NAME~1`) are left out for directories only, as the walk skips them; a file
+    // so named is an ordinary file glob and grep still see. Identity is checked for real directories: a link's identity is
+    // its target's, and ls never follows links.
+    if (isDirectory ? aliasedSegmentReason(entry.name) !== null : isProtectedDirectoryName(entry.name)) continue;
+    if (isDirectory && protectedIds.size > 0 && protectedIds.has(fileIdentity(full) ?? "")) continue;
     if (ignored(forMatching(relative(root, full)), isDirectory, rules)) { ignoredCount++; continue; }
     const kind = entry.isSymbolicLink() ? "symlink" : isDirectory ? "directory" : entry.isFile() ? "file" : "other";
     let size: number | null = null;

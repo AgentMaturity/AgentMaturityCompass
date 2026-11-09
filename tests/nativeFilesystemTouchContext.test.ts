@@ -110,8 +110,8 @@ describe("signed filesystem observations for native and CodeMode calls", () => {
 
   it("covers supported filesystem tools and missing write suffixes with bounded normalized relative paths", () => {
     const f = fixture();
-    for (const name of ["fs.read", "fs.write", "fs.edit", "glob", "grep"]) {
-      const directory = name === "glob" || name === "grep";
+    for (const name of ["fs.read", "fs.write", "fs.edit", "glob", "grep", "ls"]) {
+      const directory = name === "glob" || name === "grep" || name === "ls";
       const path = directory ? "nested" : name === "fs.write" ? "new-directory/new-file.ts" : "nested/file.ts";
       const observedPath = name === "fs.write" ? "new-directory" : "nested";
       const call = f.execution({ name, arguments: { path }, actionClass: name === "fs.write" || name === "fs.edit" ? "WRITE_LOW" : "READ_ONLY" });
@@ -123,6 +123,10 @@ describe("signed filesystem observations for native and CodeMode calls", () => {
     const search = f.execution({ name: "grep", arguments: {} });
     expect(f.emit(search).audit?.meta.nativeFilesystemTouch).toEqual({ version: 1, path: ".", directory: true,
       toolToken: search.token, parentToken: search.parentToken });
+    // ls with no path lists the workspace root, and observes it.
+    const listing = f.execution({ name: "ls", arguments: {} });
+    expect(f.emit(listing).audit?.meta.nativeFilesystemTouch).toEqual({ version: 1, path: ".", directory: true,
+      toolToken: listing.token, parentToken: listing.parentToken });
   });
 
   it("keeps distinct subcall tokens even when model call IDs collide and ignores repeated observations", () => {

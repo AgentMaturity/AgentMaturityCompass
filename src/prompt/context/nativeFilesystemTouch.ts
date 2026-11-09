@@ -11,7 +11,8 @@ export interface NativeFilesystemTouch {
   readonly parentToken: string | null;
 }
 
-const FILESYSTEM_TOOLS: ReadonlySet<string> = new Set(["fs.read", "fs.write", "fs.edit", "glob", "grep"]);
+// `ls` (SH-TOOLS-02) observes the directory it lists, as glob and grep observe theirs.
+const FILESYSTEM_TOOLS: ReadonlySet<string> = new Set(["fs.read", "fs.write", "fs.edit", "glob", "grep", "ls"]);
 const MAX_PATH_BYTES = 4_096;
 
 /**
@@ -22,7 +23,7 @@ const MAX_PATH_BYTES = 4_096;
  */
 export function nativeFilesystemTouch(execution: RecordedToolCall, outcome: ToolOutcome): NativeFilesystemTouch | undefined {
   if (!outcome.ok || outcome.denied !== null || execution.effectiveMode !== "EXECUTE" || !FILESYSTEM_TOOLS.has(execution.name)) return undefined;
-  const directory = execution.name === "glob" || execution.name === "grep";
+  const directory = execution.name === "glob" || execution.name === "grep" || execution.name === "ls";
   const raw = execution.arguments.path === undefined && directory ? "." : execution.arguments.path;
   if (typeof raw !== "string" || raw.length === 0 || raw.includes("\0")) return undefined;
   const path = normalizeInstructionTouchPath(execution.workspace, raw);

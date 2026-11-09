@@ -587,8 +587,23 @@ describe("grep options", () => {
     const second = await page(1);
     expect(second[0]).toBe("b.txt:3");
     expect(second[1]).toContain("pass offset 2");
-    expect(await page(2)).toEqual(["c.txt:1", "[amc: 1 matches in 1 files]"]);
+    // A later page totals only itself, and says so: the workspace holds 6 matches in 3 files.
+    expect(await page(2)).toEqual(["c.txt:1", "[amc: 1 matches in 1 files on this page]"]);
     expect(await page(3)).toEqual(["[amc: no entries at offset 3; 3 files in total]"]);
+    expect((await h.run("grep", { pattern: "HIT", mode: "count" })).output.split("\n").at(-1)).toBe("[amc: 6 matches in 3 files]");
+  });
+
+  it("never counts or pages past what the output byte cap let through", async () => {
+    const h = harness();
+    write(h.workspace, "a.txt", "HIT\nHIT\nHIT\n");
+    write(h.workspace, "b.txt", "HIT\nHIT\n");
+    // Count mode: b.txt's row does not fit, so it is neither counted nor totalled.
+    const counted = (await h.run("grep", { pattern: "HIT", mode: "count", maxBytes: 10 })).output.split("\n");
+    expect(counted).toEqual(["a.txt:3", "[amc: stopped at 10 bytes of output; more matches exist]", "[amc: 3 matches in 1 files on this page]"]);
+    // Content mode with both caps in one file: a.txt fills the two-match page, but only its first row fits the bytes.
+    // "pass offset 2" would skip the match never printed, so no offset is named.
+    const content = (await h.run("grep", { pattern: "HIT", maxResults: 2, maxBytes: 12 })).output.split("\n");
+    expect(content).toEqual(["a.txt:1:HIT", "[amc: stopped at 12 bytes of output; more matches exist]"]);
   });
 
   it("pages with offset and names the next page, and says when a page is past the end", async () => {

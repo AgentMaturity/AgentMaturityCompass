@@ -109,6 +109,11 @@ export function foldName(name: string): string {
   return name.normalize("NFKC").toLowerCase().normalize("NFKC");
 }
 
+/** Whether one directory entry's name is `.amc` or `.git` under case and compatibility folding, whatever kind of entry it is. */
+export function isProtectedDirectoryName(name: string): boolean {
+  return PROTECTED_DIRECTORY_NAMES.has(foldName(name));
+}
+
 /** Whether two path segments name the same entry on a case-insensitive volume: NFC and case only, never compatibility forms. */
 function sameSegment(left: string, right: string): boolean {
   return left.normalize("NFC").toLowerCase() === right.normalize("NFC").toLowerCase();
