@@ -46,8 +46,40 @@ function contextDeclaration(source: string): string {
 }
 function currentGuardCalls(source: string): string[] {
   const ast = sourceAst(source), rows: string[] = [];
+  const valueReadRoutes = new Set([
+    'pathname === "/value/snapshot/latest" && req.method === "GET"',
+    'pathname === "/value/report" && req.method === "GET"'
+  ]);
+  let valueReadGuard: ts.CallExpression | undefined;
   function walk(node: ts.Node) {
-    if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === "requireRouteRoles") {
+    // Follow-up 9 shares these two routes' lease and role check in valueReadQuery.
+    // Count the actual role guard at each guarded route instead of at its definition.
+    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.name.text === "valueReadQuery") {
+      const helper = node.initializer;
+      const first = helper && ts.isArrowFunction(helper) && ts.isBlock(helper.body) ? helper.body.statements[0] : undefined;
+      const condition = first && ts.isIfStatement(first) ? first.expression : undefined;
+      const gate = condition && ts.isBinaryExpression(condition) ? condition.right : undefined;
+      if (valueReadGuard || !first || !ts.isIfStatement(first) || first.thenStatement.getText(ast) !== "return null;"
+        || !condition || !ts.isBinaryExpression(condition) || condition.operatorToken.kind !== ts.SyntaxKind.BarBarToken
+        || condition.left.getText(ast) !== "denyValueLeaseAccess()" || !gate || !ts.isPrefixUnaryExpression(gate)
+        || gate.operator !== ts.SyntaxKind.ExclamationToken || !ts.isCallExpression(gate.operand)
+        || gate.operand.getText(ast) !== 'requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])') {
+        throw new Error("Actual Studio shared value-read role guard changed");
+      }
+      valueReadGuard = gate.operand;
+    }
+    if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === "valueReadQuery") {
+      let branch: ts.Node | undefined = node.parent;
+      while (branch && !ts.isIfStatement(branch)) branch = branch.parent;
+      if (!valueReadGuard || !branch || !ts.isIfStatement(branch) || !ts.isBlock(branch.thenStatement)
+        || !valueReadRoutes.delete(branch.expression.getText(ast))
+        || branch.thenStatement.statements[0]?.getText(ast) !== "const query = valueReadQuery();"
+        || branch.thenStatement.statements[1]?.getText(ast) !== "if (query === null) return;") {
+        throw new Error("Actual Studio value-read route guard usage changed");
+      }
+      rows.push(valueReadGuard.getText(ast));
+    }
+    if (ts.isCallExpression(node) && node !== valueReadGuard && ts.isIdentifier(node.expression) && node.expression.text === "requireRouteRoles") {
       let call = node.getText(ast);
       const argument = node.arguments[0];
       if (argument && ts.isIdentifier(argument)) {
@@ -78,7 +110,7 @@ function currentGuardCalls(source: string): string[] {
     ts.forEachChild(node, walk);
   }
   walk(ast);
-  if (rows.length !== map.calls.length) throw new Error("Actual Studio guard call inventory changed");
+  if (valueReadRoutes.size > 0 || rows.length !== map.calls.length) throw new Error("Actual Studio guard call inventory changed");
   return rows;
 }
 
