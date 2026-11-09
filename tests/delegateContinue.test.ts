@@ -191,6 +191,43 @@ describe("delegate({keepOpen}) and delegate_continue", () => {
     expect(t.open.hasOwnedWork()).toBe(false);
   });
 
+  it("retains a release failure while shutdown is waiting for another delegate to start (S23)", async () => {
+    const open = openDelegates(() => true);
+    expect(open.reserve("early")).toBe(true);
+    open.settle("early", {
+      identity: rootIdentity("early"), childSessionId: "early", packetId: "early",
+      continue: async () => ({ ok: true, text: "" }),
+      close: async () => { throw new Error("cleanup did not confirm"); }
+    });
+    expect(open.reserve("late")).toBe(true);
+    const release = open.release("early", "reported", "caller released it");
+    const closing = open.closeAll();
+    expect(await release).toContain("cleanup did not confirm");
+    open.settle("late", undefined);
+    expect(await closing).toBe(false);
+    expect(open.hasOwnedWork()).toBe(true); // The session must take the asynchronous, unconfirmed shutdown path.
+  });
+
+  it("tracks a self-settled delegate until its asynchronous accounting finishes (S23)", async () => {
+    const open = openDelegates(() => true);
+    let finish!: () => void;
+    const accounting = new Promise<void>(resolve => { finish = resolve; });
+    expect(open.reserve("helper")).toBe(true);
+    open.settle("helper", {
+      identity: rootIdentity("helper"), childSessionId: "helper", packetId: "helper",
+      continue: async () => ({ ok: true, text: "" }), close: () => accounting, settled: true
+    });
+    expect(open.open("helper")).toBeUndefined();
+    const owned = open.hasOwnedWork();
+    const closing = open.closeAll();
+    const first = await Promise.race([closing.then(() => "closed"), new Promise<string>(resolve => setImmediate(() => resolve("accounting")))]);
+    finish();
+    expect(owned).toBe(true);
+    expect(first).toBe("accounting");
+    expect(await closing).toBe(true);
+    expect(open.hasOwnedWork()).toBe(false);
+  });
+
   it("refuses malformed continuation arguments and unknown names with the runtime's account", async () => {
     const dir = workspace();
     const t = tools(dir, continuable());

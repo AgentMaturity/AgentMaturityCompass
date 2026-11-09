@@ -167,7 +167,7 @@ export interface SubagentHandle {
   continue(text: string): Promise<SubagentRunResult>;
   /** Account for the delegation and release the child. Safe to call twice. */
   close(settledAs: DelegationSettlement, reason: string): void | Promise<void>;
-  /** True once the delegation settled (released, stopped, failed or at its ceiling); a settled handle takes no work. */
+  /** True once the delegation stops taking work; close still waits for cleanup and lineage. */
   readonly settled?: boolean;
 }
 
@@ -532,7 +532,7 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
     if (cleanupUnknown) throw new Error(releaseFailure ?? "TOOL_OUTCOME_UNKNOWN: child execution stop remains unconfirmed");
   };
   const awaitLineage = (after = Promise.resolve()): Promise<void> => {
-    const published = after.then(() => lineagePending).then(() => { if (accountingError !== undefined) throw accountingError; });
+    const published = after.then(() => lineagePending).then(assertReleased);
     void published.catch(() => {}); // Ignored legacy close calls must not create an unhandled rejection.
     return published;
   };
@@ -638,11 +638,11 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
       if (closed) return awaitLineage(accounting);
       if (active) {
         requestStop(`child release requested during an active turn: ${reason}`);
-        closing = awaitLineage(activeSettled).then(assertReleased);
+        closing = awaitLineage(activeSettled);
         return closing;
       }
       const done = account(settledAs, reason);
-      if (done) { closing = awaitLineage(done).then(assertReleased); return closing; }
+      if (done) { closing = awaitLineage(done); return closing; }
       assertReleased();
       return awaitLineage();
     }

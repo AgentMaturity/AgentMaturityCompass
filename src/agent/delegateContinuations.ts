@@ -51,17 +51,24 @@ export function openDelegates(offered: () => boolean): OpenDelegates {
   const releasing = new Set<Promise<string | undefined>>();
   const drained: Array<() => void> = [];
   let closing: Promise<boolean> | undefined;
+  let releaseFailed = false;
   const close = (handle: SubagentHandle, settledAs: DelegationSettlement, reason: string): Promise<string | undefined> => {
-    const done = Promise.resolve().then(() => handle.close(settledAs, reason)).then(() => undefined, (error: unknown) => String(error));
+    const done = Promise.resolve().then(() => handle.close(settledAs, reason)).then(() => undefined, (error: unknown) => {
+      // A release can finish before shutdown has drained its reservations. Retain any failure after removing the promise.
+      releaseFailed = true;
+      return String(error);
+    });
     releasing.add(done);
     void done.then(() => releasing.delete(done));
     return done;
   };
   const live = (runAs: string): SubagentHandle | undefined => {
     const handle = handles.get(runAs);
-    // A delegation that settled on its own (ceiling, deadline, failure) is no longer open under its name.
-    if (handle?.settled === true) handles.delete(runAs);
-    return handle?.settled === true ? undefined : handle;
+    if (handle?.settled !== true) return handle;
+    // No more work is accepted, but asynchronous cleanup or lineage can still be running.
+    handles.delete(runAs);
+    void close(handle, "reported", "the delegate already settled");
+    return undefined;
   };
   return {
     offered,
@@ -84,16 +91,15 @@ export function openDelegates(offered: () => boolean): OpenDelegates {
       return handle === undefined ? Promise.resolve(undefined) : close(handle, settledAs, reason);
     },
     names: () => [...handles.keys()].filter(runAs => live(runAs) !== undefined).sort(),
-    hasOwnedWork: () => reserved.size > 0 || [...handles.keys()].some(runAs => live(runAs) !== undefined),
+    hasOwnedWork: () => reserved.size > 0 || handles.size > 0 || releasing.size > 0 || releaseFailed,
     closeAll: () => {
       closing ??= (async () => {
         for (const [runAs, handle] of [...handles.entries()]) { handles.delete(runAs); void close(handle, "reported", RUN_ENDED); }
         // A delegate still being kept settles through `settle`, which releases it; a spawn in flight is bounded by
         // its own cancellation grace, because the caller's driver is disposed (its turn signal aborted) first.
         while (reserved.size > 0) await new Promise<void>(resume => drained.push(resume));
-        const failures: Array<string | undefined> = [];
-        while (releasing.size > 0) failures.push(...await Promise.all([...releasing]));
-        return failures.every(failure => failure === undefined);
+        while (releasing.size > 0) await Promise.all([...releasing]);
+        return !releaseFailed;
       })();
       return closing;
     }

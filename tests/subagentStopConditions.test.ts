@@ -261,7 +261,7 @@ describe("one nonresetting lifetime timeout and bounded cancellation", () => {
     expect(await running).toMatchObject({ ok: false, reason: expect.stringContaining("abandoned") });
     expect(child.close).not.toHaveBeenCalled();
     expect(await outcome.handle.continue("forbidden")).toMatchObject({ ok: false });
-    outcome.handle.close("reported", "duplicate");
+    await expect(outcome.handle.close("reported", "duplicate")).rejects.toThrow(/execution stop remains unconfirmed/);
     pending.resolve({ ok: true, text: "late answer", continuation: lateChild }); await pending.promise; await Promise.resolve(); await Promise.resolve();
     expect(child.close).toHaveBeenCalledTimes(1); expect(lateChild.close).toHaveBeenCalledTimes(1);
     expect(child.continue).toHaveBeenCalledTimes(1); expect(completion(session)).toHaveLength(1); expect(vi.getTimerCount()).toBe(0);
