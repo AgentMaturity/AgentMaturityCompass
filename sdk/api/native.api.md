@@ -84,7 +84,12 @@ export interface AMCNativeClientOptions {
     readonly credentialsMode?: "layered" | "operator-only";
     readonly maxTokens?: number;
     readonly thinking?: "enabled" | "disabled";
-    readonly reasoningEffort?: "low" | "high" | "max";
+    readonly reasoningEffort?: string;
+    readonly thinkingBudget?: number;
+    readonly cacheRetention?: "short" | "long";
+    readonly maxRetries?: number;
+    readonly retryMaxDelayMs?: number;
+    readonly retryMaxProviderDelayMs?: number;
     readonly maxSteps?: number;
     readonly command?: readonly [
         string,
