@@ -209,6 +209,7 @@ export const RESULT_COMMANDS: readonly ResultCommand[] = [
   self("transparency verify-bundle", "transparency:log"),
   self("verify all", "verify:workspace"),
   self("session verify", "ledger:sessions"),
+  self("session verify-export", "session:verify-export"),
 
   // A4 Forge (P1-65): the API's own claim (readiness's, or the route's unbound one); a verify is integrity only.
   self("a4 list", "a4:list"),

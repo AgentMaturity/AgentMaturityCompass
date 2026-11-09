@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { extname, resolve } from "node:path";
 import chalk from "chalk";
 import { finishVerify, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
+import { artifactClaim } from "./cli/claimOutput.js";
 import { extractSessionExportJson, type ExtractedSessionExport } from "./observability/sessionExportHtml.js";
 import { admitKey, buildVerifierReport } from "./trust/index.js";
 import { sha256Hex } from "./utils/hash.js";
@@ -153,6 +154,7 @@ export function registerSessionExportCommands(session: Command): void {
       const report = buildVerifierReport({ artifact: { kind: "session-export", path, sha256: sha256Hex(bytes) }, context,
         integrityErrors: verdict.errors, anchoring: { status: "not-applicable", detail: null }, warnings,
         signatures: [admitKey({ publicKeyPem: pem, purpose: "ledger-row", signature: "session rows and seal", context })] });
-      finishVerify("Session export", report, { json: opts.json, result: { ...verdict, ok: report.trusted, report }, details });
+      finishVerify("Session export", report, { json: opts.json, result: { ...verdict, ok: report.trusted, report }, details,
+        claim: artifactClaim("session:verify-export") });
     });
 }

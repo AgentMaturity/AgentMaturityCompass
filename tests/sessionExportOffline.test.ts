@@ -153,7 +153,7 @@ describe("session export verifies offline", () => {
     const out = join(holder, "session.amcsession.json");
     const viewer = join(holder, "session.htm"), viewerJson = join(holder, "session.viewer.json");
     const cli = resolve(process.cwd(), "dist/cli.js");
-    const env: NodeJS.ProcessEnv = { ...process.env, NO_COLOR: "1", AMC_VAULT_PASSPHRASE: PASS };
+    const env: NodeJS.ProcessEnv = { ...process.env, NO_COLOR: "1", AMC_VAULT_PASSPHRASE: PASS, AMC_CLAIM_LABELS_STRICT: "1" };
     const exported = spawnSync(process.execPath, [cli, "session", "export", sessionId, "--out", out, "--json"], { cwd: workspace, env, encoding: "utf8" });
     expect(exported.status, exported.stderr).toBe(0);
     const { monitorKeyFingerprint } = JSON.parse(exported.stdout) as { monitorKeyFingerprint: string };
@@ -166,8 +166,14 @@ describe("session export verifies offline", () => {
     for (const [path, proof] of [[out, { sessionId, descriptorSha256: expect.any(String) }], [viewer, { tail: "sealed" }], [viewerJson, { tail: "sealed" }]] as const) {
       const verified = verifyFile(path);
       expect(verified.status, verified.stderr + verified.stdout).toBe(0);
-      expect(JSON.parse(verified.stdout)).toMatchObject({ ...proof, ok: true, report: { artifact: { sha256: sha256Hex(readFileSync(path)) } } });
+      expect(JSON.parse(verified.stdout)).toMatchObject({ ...proof, ok: true, report: { artifact: { sha256: sha256Hex(readFileSync(path)) } },
+        claimKind: "self_reported", statusDimensions: { result: "not_evaluated" }, claimLabel: expect.stringMatching(/^Claim: Self-reported/) });
     }
+    const verifiedText = spawnSync(process.execPath, [cli, "session", "verify-export", out, "--expect-monitor", monitorKeyFingerprint], { cwd: holder, env, encoding: "utf8" });
+    expect(verifiedText.status, verifiedText.stderr).toBe(0);
+    expect(verifiedText.stdout.split("\n").slice(0, 2)).toEqual([
+      "Session export verification PASSED", expect.stringMatching(/^Claim: Self-reported · Result: not evaluated/)
+    ]);
     // Legacy bundles may be reformatted. Viewer JSON must retain its exact canonical bytes, and HTML never falls back to JSON.
     const compactBundle = JSON.stringify(JSON.parse(readFileSync(out, "utf8")));
     writeFileSync(out, compactBundle);
