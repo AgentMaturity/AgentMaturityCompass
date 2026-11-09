@@ -73,8 +73,11 @@ export interface AcpConnection {
   ingest(chunk: Buffer): void;
   /** Send a notification to the client. */
   notify(method: string, params: unknown): void;
-  /** Ask the client; resolves with its result, rejects with its error, on abort, or when the stream fails. */
-  request(method: string, params: unknown, signal?: AbortSignal): Promise<unknown>;
+  /**
+   * Ask the client; resolves with its result, rejects with its error, on abort, or when the stream fails. With
+   * `announceCancel`, an abort also sends `$/cancel_request` for it, so the client can close its own dialog.
+   */
+  request(method: string, params: unknown, signal?: AbortSignal, options?: { readonly announceCancel?: boolean }): Promise<unknown>;
   /** Abort the in-flight request with this id, if there is one. */
   abortInbound(id: AcpId): boolean;
   /** Whether a request with this id is still running. */
@@ -165,13 +168,18 @@ export function createAcpConnection(init: AcpConnectionInit): AcpConnection {
       } catch { unusable("ACP inbound dispatch failed; the stream cannot safely continue"); }
     },
 
-    request(method: string, params: unknown, signal?: AbortSignal): Promise<unknown> {
+    request(method: string, params: unknown, signal?: AbortSignal, options?: { readonly announceCancel?: boolean }): Promise<unknown> {
       return new Promise((resolve, reject) => {
         if (!usable) { reject(new Error("the ACP connection is unusable")); return; }
         if (signal?.aborted) { reject(new Error("the request was cancelled")); return; }
         const id = `amc-${(nextOutbound += 1)}`;
         const done = (): void => { outbound.delete(key(id)); signal?.removeEventListener("abort", onAbort); };
-        const onAbort = (): void => { done(); reject(new Error("the request was cancelled")); };
+        const onAbort = (): void => {
+          done();
+          // A late answer is ignored either way; the notice only lets a client that implements it close the dialog.
+          if (options?.announceCancel && usable) { try { write(acpNotification("$/cancel_request", { requestId: id })); } catch { /* the stream failed; nothing is waiting */ } }
+          reject(new Error("the request was cancelled"));
+        };
         outbound.set(key(id), { resolve: (value) => { done(); resolve(value); }, reject: (error) => { done(); reject(error); } });
         signal?.addEventListener("abort", onAbort, { once: true });
         try { write(acpRequest(id, method, params)); } catch (error) { done(); reject(error instanceof Error ? error : new Error(String(error))); }

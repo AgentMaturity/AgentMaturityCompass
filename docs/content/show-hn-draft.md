@@ -30,6 +30,6 @@ What makes it different from eval tools like Promptfoo:
 
 The entire product is MIT licensed and free. The industry domain packs are free in the current source build (experimental, self-reported questionnaires; no licence or account); the 1.1.1 release that the install script fetches still asks for a licence for them.
 
-Tech: TypeScript, Commander CLI, Ed25519 crypto, SQLite evidence ledger, 2,503 Vitest test source files, MCP server for AI coding assistants.
+Tech: TypeScript, Commander CLI, Ed25519 crypto, SQLite evidence ledger, 2,508 Vitest test source files, MCP server for AI coding assistants.
 
 I'd love feedback on the scoring model and whether the evidence-weighted approach resonates. Happy to answer any questions about the architecture.

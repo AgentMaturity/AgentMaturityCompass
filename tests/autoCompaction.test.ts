@@ -17,6 +17,7 @@ import { LlmRuntime } from "../src/llm/adapter/llmRuntime.js";
 import { credentialRef } from "../src/credentials/credentialRef.js";
 import { LlmStreamProtocolError } from "../src/llm/streamProtocol.js";
 import { DataFlowRefused } from "../src/dataflow/purposePolicy.js";
+import { LlmError } from "../src/llm/llmFailure.js";
 import { compactionFromFlags, measurePromptPressure, resolveCompactionConfig } from "../src/agent/compaction/promptPressure.js";
 import { verifyAgentRun, type AgentRunVerification } from "../src/agent/runReport.js";
 import type { CompactionConfig, LoopNotification } from "../src/agent/loopTypes.js";
@@ -644,6 +645,31 @@ describe("automatic compaction: synthetic provider usage, real signed loop evide
       expect(f.notifications.some(item => item.kind === "compaction"
         && item.message === "summary step did not complete (Protected model request refused: baa_required); the turn continues uncompacted")).toBe(true);
       expect(f.sent, "the refused summary request is never sent").toHaveLength(6);
+    });
+  });
+
+  it("S9: a provider failure of the summary step is reported by code and status, never by the provider's text", async () => {
+    const longAnswer = "Synthetic prior work, long enough to be worth summarizing. ".repeat(150);
+    const outputs = { old: "a".repeat(5000), middle: "b".repeat(6000), "new-1": "c".repeat(8000), "new-2": "d".repeat(8000) };
+    const body = '{"error":"invalid x-api-key sk-ant-FAKE-SECRET-123"}';
+    await withFixture({ scripts: [toolStep("old", "fixture", "{}", { inputTokens: 7000 }), toolStep("middle", "fixture", "{}", { inputTokens: 7000 }),
+      textStep(longAnswer, { inputTokens: 7000 }), toolStep("new-1", "fixture", "{}", { inputTokens: 8500 }),
+      toolStep("new-2", "fixture", "{}", { inputTokens: 8500 }), textStep("Final answer after the failed summary.", { inputTokens: 3000 })],
+      tools: syntheticTools(outputs), config: { compaction: compaction({ summarize: true }) } }, async f => {
+      await turn(f, "First turn.");
+      const prepare = f.h.llm.prepare.bind(f.h.llm);
+      let prepares = 0;
+      f.h.llm.prepare = spec => {
+        prepares += 1;
+        // The summary request fails at the provider with a body that quotes the request's credential.
+        if (prepares === 3) throw new LlmError(`anthropic request failed with HTTP 401: ${body}`, "AUTH", { status: 401 });
+        return prepare(spec);
+      };
+      await turn(f, "Second turn.");
+      const notices = f.notifications.filter(item => item.kind === "compaction").map(item => item.message);
+      expect(notices).toContain("summary step did not complete (AUTH HTTP 401); the turn continues uncompacted");
+      expect(JSON.stringify(f.notifications)).not.toContain("FAKE-SECRET");
+      expect(f.h.events().some(row => row.event_type === "turn/end")).toBe(true);
     });
   });
 

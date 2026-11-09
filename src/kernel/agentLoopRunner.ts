@@ -100,6 +100,7 @@ import { agentLoopServices, AGENT_LOOP_SEAM } from "./services/agentLoopServices
 import type { AgentLoopSeamService } from "./services/agentLoopServices.js";
 import { assertSecondSessionWriter } from "../persistence/openSessionEventStore.js";
 import { redactingSessionFor } from "../dataflow/redactingSession.js";
+import type { EvidenceEvent } from "../types.js";
 import { recordNativeComposition } from "../prompt/context/nativeCompositionContext.js";
 import type { NativeResourceStatus } from "../prompt/context/nativeResourceStatus.js";
 import type { CompositionSource } from "../prompt/context/compositionProvenance.js";
@@ -153,6 +154,8 @@ export interface ComposedTurnHandle {
   queue(text: string, clientRequestId?: string): InboxReceipt;
   /** Remove one pending submission; false when it was already claimed or unknown. */
   withdraw(messageId: string): boolean;
+  /** The session's committed rows so far, for a live consumer that authenticates them itself (SH-UI-01). */
+  readEvents(): readonly EvidenceEvent[];
 }
 
 /** Narrow evidence capability for tools, bound to the actual selected session. */
@@ -682,7 +685,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       },
       steer: (text, clientRequestId) => loop.agent.send(text, "next-step", true, undefined, clientRequestId),
       queue: (text, clientRequestId) => loop.followup(text, undefined, clientRequestId),
-      withdraw: (messageId) => loop.agent.withdraw(messageId)
+      withdraw: (messageId) => loop.agent.withdraw(messageId),
+      readEvents: () => session.readEvents()
     });
     if (audioParts !== undefined) loop.agent.followupAudioParts(audioParts);
     else loop.followup(options.prompt, images);

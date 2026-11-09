@@ -169,7 +169,8 @@ describe.skipIf(process.platform === "win32")("WP30 measured native interactive 
       { waitFor: "step 1\\.1 [^\\n]*model", send: "\u0003" },
       { waitFor: "turn 1 ended: cancelled" }
     ], { nativeCommand: "run", captureJson: true });
-    expect(result.code, result.output).toBe(0);
+    // A cancelled turn exits 3 (SH-UI-01 exit-code table); the old 0 encoded the defect that scripts could not tell.
+    expect(result.code, result.output).toBe(3);
     expect(result.output).toContain("cancelling the turn (cause: user)");
     // The PTY combines stdout and stderr; the driver returns the exact JSON
     // frame and preserves its trailing diagnostic text separately. Strict

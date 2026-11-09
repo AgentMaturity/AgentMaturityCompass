@@ -36,7 +36,9 @@ export const ACP_INBOUND_SHAPES = [
   "LoadSessionRequest",
   "ForkSessionRequest",
   "PromptRequest",
-  "CancelNotification"
+  "CancelNotification",
+  /** The client's reply to our `session/request_permission` (SH-UI-04). */
+  "RequestPermissionResponse"
 ] as const;
 
 export type AcpInboundShape = (typeof ACP_INBOUND_SHAPES)[number];

@@ -39,9 +39,9 @@ afterEach(() => {
 });
 
 interface Captured { readonly out: string[]; readonly errors: string[]; readonly failures: number[] }
-function programWith(): { program: Command; captured: Captured } {
+function programWith(readStdin?: AgentLoopCliIo["readStdin"]): { program: Command; captured: Captured } {
   const out: string[] = [], errors: string[] = [], failures: number[] = [];
-  const io: AgentLoopCliIo = { log: line => out.push(line), error: line => errors.push(line), fail: () => failures.push(1) };
+  const io: AgentLoopCliIo = { log: line => out.push(line), error: line => errors.push(line), fail: () => failures.push(1), ...(readStdin === undefined ? {} : { readStdin }) };
   const program = new Command();
   program.exitOverride();
   registerAgentCommands(program, io);
@@ -60,7 +60,7 @@ function planFile(name: string, plan: unknown): string {
 describe("agent-loop run --workflow-plan", () => {
   it("runs a reviewed pipeline headless and reports every node's output", async () => {
     const file = planFile("plan.json", { kind: "pipeline", id: "p", stages: [agent("a", "draft"), agent("b", "polish")] });
-    const { program, captured } = programWith();
+    const { program, captured } = programWith(async () => "unrelated piped input");
     await run(program, [...base, "--delegate", "--workflow-plan", file]);
     expect(captured.failures, captured.errors.join("\n")).toEqual([]);
     const summary = lastJson(captured) as { workflow?: { ok: boolean; outputs: Record<string, string>; agentsRun: number; runId: string } };

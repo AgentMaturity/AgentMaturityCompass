@@ -22,6 +22,7 @@ import { fenceModelSummary, MODEL_SUMMARY_ROLE, PROMPT_TOKENS_FORMULA, SUMMARY_C
 import { foldSurfaceEntries } from "../../session/surfaceProjection.js";
 import type { EvidenceEvent } from "../../types.js";
 import type { CompactionConfig } from "../loopTypes.js";
+import { liveNativeFailureGuidance } from "../nativeFailureGuidance.js";
 import { dispatchStepRequest } from "../requestRetry.js";
 import { stepUsage, type StepRunnerInit } from "../stepRunner.js";
 import { measurePromptPressure } from "./promptPressure.js";
@@ -93,6 +94,17 @@ function summaryText(settled: SettledStream | null): string | null {
  */
 function isRefusal(error: unknown): boolean {
   return (isLlmError(error) && !error.code.startsWith("AMC_")) || error instanceof RequestEncodingError || error instanceof DataFlowRefused;
+}
+
+/**
+ * How a refused summary step is named in the compaction notice: a protected-data refusal by its reason, anything
+ * else by its failure code and HTTP status. Never the exception's own text (S9): a provider error quotes the
+ * response body, which can carry request details or credentials, and the notice reaches stdout under stream-json.
+ */
+function summaryFailureLabel(failure: unknown): string {
+  if (failure instanceof DataFlowRefused) return `Protected model request refused: ${failure.reason}`;
+  const guidance = liveNativeFailureGuidance(failure);
+  return guidance.httpStatus === null ? guidance.code : `${guidance.code} HTTP ${guidance.httpStatus}`;
 }
 
 export class AutoCompactor {
@@ -206,7 +218,7 @@ export class AutoCompactor {
     const header = after.filter(row => row.event_type === "request/header" && inStep(row.id)).at(-1);
     const text = summaryText(settled);
     const eventIds: string[] = [];
-    if (failure !== null) notify(`summary step did not complete (${failure instanceof Error ? failure.message : "refused"}); the turn continues uncompacted`);
+    if (failure !== null) notify(`summary step did not complete (${summaryFailureLabel(failure)}); the turn continues uncompacted`);
     else if (header === undefined || text === null) notify("summary step returned no complete text-only answer; the turn continues uncompacted");
     // Sized with a same-length placeholder fence: the session layer adds the real random fence.
     else if (Buffer.byteLength(fenceModelSummary(text, "0".repeat(12)), "utf8") >= targetBytes) {

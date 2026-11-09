@@ -44,6 +44,9 @@ Never put the value in a command argument. `describe` reports configuration meta
 
 ## Run and continue a task
 
+For scripts and CI (the prompt from stdin, `--output-format stream-json`, exit codes 0/1/3/4/5/6), see
+[Headless native runs](NATIVE_HEADLESS.md); for editors, [Agent Client Protocol](ACP.md).
+
 For an interactive real task, select the route and let chat ask for your model ID:
 
 ```sh

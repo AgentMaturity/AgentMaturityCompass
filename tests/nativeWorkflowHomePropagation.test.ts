@@ -16,8 +16,9 @@ vi.mock("../src/setup/nativeInteractiveCommandAudit.js", () => ({
 
 const seam = vi.hoisted(() => ({
   answers: [] as string[],
-  commands: [] as { executable: string; argv: string[]; cwd: string; shell: boolean }[],
-  onCommand: null as null | ((argv: string[], cwd: string) => { code: number; stdout: string }),
+  commands: [] as { executable: string; argv: string[]; cwd: string; shell: boolean; stdin: string | null }[],
+  /** `stdin` is what chat piped to the child (the turn prompt, `run -`), or null when the child's stdin was not piped. */
+  onCommand: null as null | ((argv: string[], cwd: string, stdin: string | null) => { code: number; stdout: string }),
   killed: [] as unknown[]
 }));
 
@@ -40,20 +41,26 @@ vi.mock("node:child_process", async importOriginal => {
   const actual = await importOriginal<typeof import("node:child_process")>();
   const { EventEmitter } = await import("node:events");
   const { PassThrough } = await import("node:stream");
-  return { ...actual, spawn: (executable: string, argv: string[], options: { cwd: string; shell: boolean }) => {
+  return { ...actual, spawn: (executable: string, argv: string[], options: { cwd: string; shell: boolean; stdio?: unknown[] }) => {
+    // As a real child: a piped stdin exists and is read to EOF before the turn runs; otherwise there is none.
+    const stdin = Array.isArray(options.stdio) && options.stdio[0] === "pipe" ? new PassThrough() : null;
     const child = Object.assign(new EventEmitter(), {
-      stdout: new PassThrough(), stderr: new PassThrough(),
+      stdin, stdout: new PassThrough(), stderr: new PassThrough(),
       kill: (signal: unknown) => { seam.killed.push(signal); return true; }
     });
-    seam.commands.push({ executable, argv: [...argv], cwd: options.cwd, shell: options.shell });
-    queueMicrotask(() => {
+    const command = { executable, argv: [...argv], cwd: options.cwd, shell: options.shell, stdin: null as string | null };
+    seam.commands.push(command);
+    const settle = (input: string | null): void => {
+      command.stdin = input;
       let result: { code: number; stdout: string };
-      try { result = seam.onCommand?.(argv, options.cwd) ?? { code: 1, stdout: "{}" }; }
+      try { result = seam.onCommand?.(argv, options.cwd, input) ?? { code: 1, stdout: "{}" }; }
       catch { result = { code: 1, stdout: "{}" }; }
       child.stdout.end(result.stdout);
       child.stderr.end();
       queueMicrotask(() => child.emit("close", result.code));
-    });
+    };
+    if (stdin === null) queueMicrotask(() => settle(null));
+    else { let input = ""; stdin.on("data", (chunk: Buffer) => { input += chunk.toString("utf8"); }); stdin.on("end", () => settle(input)); }
     return child;
   } };
 });
@@ -104,8 +111,9 @@ describe("AMC-1512 native home propagation through the chat composition seam", (
     Object.defineProperty(process.stdout, "isTTY", { configurable: true, value: true });
     seam.answers = []; seam.commands = []; seam.killed = [];
     logs = []; errors = []; loaded = []; fail.mockReset();
-    seam.onCommand = (argv, cwd) => {
-      const prompt = argv[argv.indexOf("--") + 1]!;
+    seam.onCommand = (argv, cwd, stdin) => {
+      // `run -`: the turn prompt arrives on stdin, never as an argv word (SH-UI-01).
+      const prompt = argv[argv.indexOf("--") + 1] === "-" ? stdin ?? "" : argv[argv.indexOf("--") + 1]!;
       const result = prepareSkillTurn({ workspace: cwd, amcHome: option(argv, "--credentials-home"), prompt });
       loaded.push({ ok: result.ok, sourcePath: result.ok ? result.loaded?.sourcePath ?? null : null,
         body: result.ok ? result.loaded?.body ?? null : null });
@@ -143,7 +151,9 @@ describe("AMC-1512 native home propagation through the chat composition seam", (
       expect(command.cwd).toBe(workspace);
       expect(option(command.argv, "--credentials-home")).toBe(home);
       expect(option(command.argv, "--credentials-file")).toBe(file);
-      expect(command.argv.at(-1)).toMatch(/^\/home-only /);
+      // The prompt travels on stdin (`run -`); the old argv-word prompt let a bare "-" read an empty stdin (SH-UI-01).
+      expect(command.argv.at(-1)).toBe("-");
+      expect(command.stdin).toMatch(/^\/home-only /);
     }
     expect(option(seam.commands[1]!.argv, "--session")).toBe("simulated-child-session");
     const resume = logs.find(line => line.startsWith("Resume in this workspace:"));

@@ -1,0 +1,188 @@
+import { spawn } from "node:child_process";
+import { resolve } from "node:path";
+import { getApprovalInboxItem, type ApprovalInboxItem } from "../approvals/approvalInbox.js";
+import { readNativeApprovalActor } from "../setup/nativeApprovalIdentity.js";
+import { checkAcpShape } from "./acpSchema.js";
+import { ACP_RUNTIME_META_KEY } from "./acpRuntimeContracts.js";
+import { acpToolKind } from "./acpToolCallView.js";
+
+/**
+ * `session/request_permission` over ACP (SH-UI-04).
+ *
+ * The approvals ENGINE decides; the client only chooses between the options this process offers. The request is sent
+ * from the gate's `onRaised` hook, AFTER the engine has raised a signed request, so there is no answerer running ahead
+ * of it and no client text can grant authority on its own:
+ *   - `reject_once` is always offered and cancels the turn (cause `user`, by `acp-client`);
+ *   - `allow_once` is offered only when the operator pinned an authenticated tracked login at launch
+ *     (`amc acp --reviewer-session-token-file`). Selecting it records the decision through the same digest-bound
+ *     `amc approvals approve` path native chat uses, under that login's own roles. The approval gate continues as soon
+ *     as its own engine poll sees that recorded decision; the read-back here only confirms, after the fact, that a
+ *     decision by the pinned login with the shown digest exists, and cancels the turn when none does. The reason is
+ *     never invented: the client supplies one in `_meta["dev.agentmaturity.amc"].reason` on its response, or the
+ *     operator fixed one with `--reviewer-reason`.
+ * Anything short of a confirmed signed decision cancels the turn; the request stays in the inbox for the approvals CLI.
+ * The request names the gated `tool_call` by its committed id (the server flushes that row first), and it is bound to
+ * the prompt that raised it: a late answer cancels that prompt or nothing. The request is withdrawn (the server sends
+ * `$/cancel_request`) when the prompt ends, the approval expires or the approval is decided elsewhere; an `allow_once`
+ * that lands after an out-of-band decision records nothing and cancels nothing.
+ *
+ * A client that identifies itself as an AMC SDK (it sends `clientCapabilities._meta["dev.agentmaturity.amc"]`) receives
+ * this request only when it negotiated `permissionRequests: "amc-permission-v1"`; the current SDK clients did not, so
+ * they keep today's behaviour (the request waits in the inbox for `approve()`).
+ */
+
+export const ACP_PERMISSION_CONTRACT = "amc-permission-v1";
+
+export interface AcpApprovalRaised {
+  readonly sessionId: string;
+  readonly approvalId: string;
+  readonly approvalRequestId: string;
+  /** The committed `tool/call` row the approval gates; the permission request names this tool call. */
+  readonly toolCallId: string;
+  /** Whether the connected client negotiated permission requests (or is a generic ACP client). */
+  readonly negotiated: boolean;
+  readonly request: (method: string, params: unknown, signal: AbortSignal) => Promise<unknown>;
+  /** Aborted when the prompt that raised the approval has settled; the outbound request is withdrawn with it. */
+  readonly turnEnded: AbortSignal;
+  /** Cancels the prompt that raised the approval; a no-op once that prompt has ended. */
+  readonly cancelTurn: (by: string) => void;
+}
+
+interface AcpPermissionReviewer {
+  /** A private (0600) file holding an active tracked workspace login; read at each decision, never logged. */
+  readonly tokenFile: string;
+  /** The fixed decision reason, used when the client's response carries none. */
+  readonly reason?: string;
+}
+
+export interface AcpPermissionHandlerInit {
+  readonly workspace: string;
+  readonly agentId: string;
+  /** How to run `amc approvals approve`: this same CLI, never a shell. */
+  readonly cli: { readonly execPath: string; readonly execArgv: readonly string[]; readonly entry: string };
+  readonly reviewer?: AcpPermissionReviewer;
+  readonly log: (message: string) => void;
+}
+
+const MAX_REASON = 1000;
+/** How often an outstanding dialog re-reads its request, to withdraw it once the approval was decided elsewhere. */
+const SETTLED_POLL_MS = 1000;
+
+/** The decision reason: the client's, else the launch default; null when neither is usable. */
+export function permissionReason(result: unknown, fallback: string | undefined): string | null {
+  const meta = result !== null && typeof result === "object" ? (result as { _meta?: unknown })._meta : undefined;
+  const extension = meta !== null && typeof meta === "object" ? (meta as Record<string, unknown>)[ACP_RUNTIME_META_KEY] : undefined;
+  const supplied = extension !== null && typeof extension === "object" ? (extension as { reason?: unknown }).reason : undefined;
+  const candidate = typeof supplied === "string" ? supplied : fallback;
+  if (typeof candidate !== "string") return null;
+  const reason = candidate.trim();
+  return reason.length === 0 || reason.length > MAX_REASON || reason.includes("\0") ? null : reason;
+}
+
+export function createAcpPermissionHandler(init: AcpPermissionHandlerInit): { readonly capability: "signed-reviewer" | "reject-only"; handle(event: AcpApprovalRaised): void } {
+  const workspace = resolve(init.workspace);
+  const pending = (event: AcpApprovalRaised): ApprovalInboxItem => {
+    const item = getApprovalInboxItem({ workspace, agentId: init.agentId, approvalRequestId: event.approvalRequestId });
+    if (item.request.approvalRequestId !== event.approvalRequestId || item.request.agentId !== init.agentId || item.request.intentId !== event.approvalId
+      || !item.requestIntegrity.valid || !item.chainIntegrity.valid || !item.contextIntegrity.valid) throw new Error("The queued request does not match this session's approval event or does not verify");
+    return item;
+  };
+  const approve = (args: readonly string[], signal: AbortSignal): Promise<boolean> => new Promise(done => {
+    let settled = false;
+    const finish = (ok: boolean): void => { if (!settled) { settled = true; signal.removeEventListener("abort", onAbort); done(ok); } };
+    let child: ReturnType<typeof spawn>;
+    try {
+      child = spawn(init.cli.execPath, [...init.cli.execArgv, init.cli.entry, ...args], { cwd: workspace, env: process.env, shell: false, stdio: ["ignore", "ignore", "pipe"] });
+    } catch { finish(false); return; }
+    const onAbort = (): void => { try { child.kill("SIGTERM"); } catch { /* reported by close */ } };
+    signal.addEventListener("abort", onAbort, { once: true });
+    let stderr = "";
+    child.stderr?.setEncoding("utf8");
+    child.stderr?.on("data", (text: string) => { if (stderr.length < 4000) stderr += text; });
+    child.once("error", () => finish(false));
+    child.once("close", code => {
+      if (code !== 0) init.log(`approval engine refused the decision: ${stderr.trim().split("\n").at(-1) ?? ""}`);
+      finish(code === 0);
+    });
+  });
+  return {
+    capability: init.reviewer ? "signed-reviewer" : "reject-only",
+    handle(event) {
+      if (!event.negotiated) { init.log(`signed approval pending: ${event.approvalRequestId}`); return; }
+      void decide(event).catch(error => {
+        init.log(`permission request failed: ${error instanceof Error ? error.message : String(error)}; cancelling the turn`);
+        event.cancelTurn("acp-permission-failed");
+      });
+    }
+  };
+
+  async function decide(event: AcpApprovalRaised): Promise<void> {
+    const item = pending(event);
+    if (item.status !== "PENDING") { init.log(`approval ${event.approvalRequestId} is already ${item.status}; no permission requested`); return; }
+    const controller = new AbortController();
+    const expiry = setTimeout(() => controller.abort(), Math.max(0, Math.min(2_147_483_647, item.request.expiresTs - Date.now())));
+    // A decision made elsewhere (`amc approvals approve`/`deny`) withdraws the dialog, so no stale request stays live.
+    // Only while the dialog is outstanding: once the client answered, our own decision must not read as someone else's.
+    // A read that does not verify is retried on the next tick (a decision and its signature land as two writes); the
+    // answer path re-verifies and fails closed.
+    let decidedElsewhere: string | null = null;
+    const watch = setInterval(() => {
+      try { const status = pending(event).status; if (status !== "PENDING") { decidedElsewhere = status; controller.abort(); } }
+      catch { /* not yet readable as a verified decision */ }
+    }, SETTLED_POLL_MS);
+    const signal = AbortSignal.any([controller.signal, event.turnEnded]);
+    try {
+      const request = item.request;
+      const options = [
+        ...(init.reviewer ? [{ optionId: "allow_once", name: `Approve ${request.toolName} once (signed by the pinned reviewer)`, kind: "allow_once" }] : []),
+        { optionId: "reject_once", name: "Reject and cancel this turn", kind: "reject_once" }
+      ];
+      let result: unknown;
+      try {
+        result = await event.request("session/request_permission", {
+          sessionId: event.sessionId,
+          toolCall: { toolCallId: event.toolCallId, title: request.toolName, kind: acpToolKind(request.toolName), status: "pending" },
+          options,
+          _meta: { [ACP_RUNTIME_META_KEY]: { approvalRequestId: request.approvalRequestId, requestDigestSha256: item.requestDigestSha256,
+            actionClass: request.actionClass, riskTier: request.riskTier, effectiveMode: request.effectiveMode, boundHashes: request.boundHashes,
+            expiresAt: new Date(request.expiresTs).toISOString(), decision: init.reviewer ? "signed-reviewer" : "reject-only" } }
+        }, signal);
+      } catch (error) {
+        clearInterval(watch);
+        if (event.turnEnded.aborted) { init.log(`approval ${event.approvalRequestId}: the prompt ended before the client answered; request withdrawn`); return; }
+        if (decidedElsewhere !== null) { init.log(`approval ${event.approvalRequestId} was decided elsewhere (${decidedElsewhere}) before the client answered; request withdrawn`); return; }
+        if (controller.signal.aborted) { init.log(`approval ${event.approvalRequestId} expired before the client answered`); return; }
+        throw error;
+      }
+      clearInterval(watch);
+      if (event.turnEnded.aborted) { init.log(`approval ${event.approvalRequestId} was answered after its prompt ended; nothing decided`); return; }
+      const shape = await checkAcpShape("RequestPermissionResponse", result);
+      if (!shape.ok) throw new Error(`malformed permission response: ${shape.reason}`);
+      const outcome = (result as { outcome: { outcome: string; optionId?: string } }).outcome;
+      if (outcome.outcome === "cancelled") return; // The client cancelled the turn itself; nothing to decide.
+      // `reject_once` cancels the raising prompt even when the approval was decided elsewhere meanwhile: cancelling is the safe side.
+      if (outcome.optionId !== "allow_once" || !init.reviewer) { event.cancelTurn("acp-client"); return; }
+      const current = pending(event);
+      // Decided elsewhere while the answer was in flight: allow_once has nothing left to record, and the gate acts on that decision.
+      if (current.status !== "PENDING") { init.log(`approval ${event.approvalRequestId} was already ${current.status} when the client chose allow_once; nothing decided`); return; }
+      if (current.requestDigestSha256 !== item.requestDigestSha256) throw new Error("The approval changed while the client was deciding; no decision sent");
+      const reason = permissionReason(result, init.reviewer.reason);
+      if (reason === null) { init.log("allow_once without a decision reason (client _meta or --reviewer-reason); cancelling the turn"); event.cancelTurn("acp-permission-no-reason"); return; }
+      const actor = readNativeApprovalActor(workspace, init.reviewer.tokenFile);
+      if (!actor.roles.some(role => request.rolesAllowed.includes(role))) throw new Error("The pinned reviewer's authenticated roles are not allowed to decide this request");
+      const completed = await approve(["approvals", "approve", "--agent", request.agentId, "--mode", request.effectiveMode.toLowerCase(),
+        "--reason", reason, "--username", actor.username, "--roles", actor.roles.join(","), "--user-id", actor.userId,
+        "--session-token-file", init.reviewer.tokenFile, "--expect-request-digest", item.requestDigestSha256, "--", request.approvalRequestId], signal);
+      const after = pending(event);
+      const kind = request.effectiveMode === "EXECUTE" ? "APPROVE_EXECUTE" : "APPROVE_SIMULATE";
+      const signed = after.decisions.find(row => !item.decisions.some(old => old.approvalDecisionId === row.approvalDecisionId)
+        && row.userId === actor.userId && row.username === actor.username && row.decision === kind && row.requestDigestSha256 === item.requestDigestSha256);
+      if (!completed || !signed) {
+        init.log(signed ? `the decision ${signed.approvalDecisionId} is recorded, but its approve command did not complete cleanly; no retry was sent, inspect approval delivery; cancelling the turn`
+          : "no matching signed decision was confirmed; cancelling the turn");
+        event.cancelTurn("acp-permission-unconfirmed"); return;
+      }
+      init.log(`signed approve decision ${signed.approvalDecisionId}; request status ${after.status}, quorum ${after.quorum.received}/${after.quorum.required}`);
+    } finally { clearTimeout(expiry); clearInterval(watch); controller.abort(); }
+  }
+}

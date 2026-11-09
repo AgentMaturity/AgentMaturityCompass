@@ -69,14 +69,14 @@ Limits, stated:
 amc agent-loop run --stop max-turns:2 --stop max-tokens:20000 --stop timeout-ms:60000 "…"
 ```
 
-`--stop` is repeatable. A breach ends the run with a signed `loop/cancel` row whose cause is `{ kind: "limit", condition, bound }` and requester `run-limit`; a limit that fires inside a turn is also the `cancelCause` inside the hashed `turn/end` (`reason: "cancelled"`). The run then refuses new work at admission, prints `Run limit reached: <condition>:<bound>`, carries the same cause as `runLimit` in `--json`, and exits 1, because its prompt or a queued turn did not run to completion. ACP clients see such an ending as `cancelled`; the cause is in the signed log.
+`--stop` is repeatable. A breach ends the run with a signed `loop/cancel` row whose cause is `{ kind: "limit", condition, bound }` and requester `run-limit`; a limit that fires inside a turn is also the `cancelCause` inside the hashed `turn/end` (`reason: "cancelled"`). The run then refuses new work at admission, prints `Run limit reached: <condition>:<bound>`, carries the same cause as `runLimit` in JSON output, and exits 4, because its prompt or a queued turn did not run to completion. ACP clients see such an ending as `cancelled`; the cause is in the signed log.
 
 Units, stated:
 
 - `max-turns:N` is a session turn number: no turn numbered above N opens. A queued follow-up or a steer that would open turn N+1 is refused with the cancel row and dropped. Because turn numbers continue across resumes, a resumed session that already ran N turns refuses its next one under the same limit.
 - `max-tokens:N` counts provider-reported input, output and cache tokens over the session: the steps this run makes plus, on resume, what the session's earlier steps reported (read from its `step/end` rows). A forked child is a new session and starts its own count; its parent's counts are recorded beside it as `FORK_TOKEN_COUNTS`. A step that reported no usage (a cancelled or failed step included), or an earlier step in a resumed history that did, fails the limit closed (`unmeasured: true`): the budget cannot see an unmeasured step, so it is never counted as zero. The stub provider reports zero tokens, so `max-tokens` never fires on a stub run.
 - `timeout-ms:N` is wall clock from the driver's construction, idle time included.
-- Limits bound this driver only. In-process delegated children run under their own drivers and are not counted; bound them with `--delegate-stop`, which still accepts only `max-turns` and `timeout-ms`. `--goal-rounds` runs no root turn, so `--stop` is refused with it; the rounds are bounded by their own ceiling and `--delegate-stop`.
+- Limits bound this driver only. In-process delegated children run under their own drivers and are not counted; bound them with `--delegate-stop`, which still accepts only `max-turns` and `timeout-ms`. `--stop` requires a root turn, so it is refused with `--goal-rounds` and `--workflow-plan`. Goal rounds keep their own ceiling, and `--delegate-stop` can bound children in both modes.
 - Limits are per invocation and are not in the policy digest: resuming with a different `--stop` is allowed, and the limit is attributable from the cancel row it writes rather than from `session/open`.
 
 ## Memory files: AMC.md, local overlays, `@path` imports

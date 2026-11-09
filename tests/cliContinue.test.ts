@@ -26,14 +26,14 @@ beforeEach(() => {
 });
 afterEach(() => { process.chdir(originalCwd); rmSync(workspace, { recursive: true, force: true }); rmSync(home, { recursive: true, force: true }); });
 
-async function run(args: string[]): Promise<{ summary: (AgentRunSummary & { runLimit?: unknown }) | null; errors: string[]; failed: boolean }> {
-  const output: string[] = []; const errors: string[] = []; let failed = false;
+async function run(args: string[]): Promise<{ summary: (AgentRunSummary & { runLimit?: unknown }) | null; errors: string[]; failed: boolean; exitCode: number }> {
+  const output: string[] = []; const errors: string[] = []; let exitCode = 0;
   const program = new Command().exitOverride();
-  registerAgentCommands(program, { log: line => output.push(line), error: line => errors.push(line), fail: () => { failed = true; } });
+  registerAgentCommands(program, { log: line => output.push(line), error: line => errors.push(line), fail: () => { exitCode = 1; }, exit: code => { exitCode = code; } });
   await program.parseAsync(["agent-loop", "run", ...args, "--provider", "stub", "--credentials-home", home, "--json"], { from: "user" });
   // A run that reported and then failed (a run limit) still printed its summary; a refusal before any session printed none.
   const last = output.at(-1);
-  return { summary: last === undefined ? null : JSON.parse(last) as AgentRunSummary & { runLimit?: unknown }, errors, failed };
+  return { summary: last === undefined ? null : JSON.parse(last) as AgentRunSummary & { runLimit?: unknown }, errors, failed: exitCode !== 0, exitCode };
 }
 function events(sessionId: string) {
   const ledger = openLedger(workspace, { readonly: true });
@@ -108,7 +108,7 @@ describe("amc agent-loop run --stop", () => {
     expect(flagged.errors.join("\n")).toContain("run limits: max-turns:1");
   });
 
-  it("timeout-ms ends a slow turn with cause deadline and exits 1, and a malformed condition is refused before any session row", async () => {
+  it("timeout-ms ends a slow turn with cause deadline and exits 4, and a malformed condition is refused before any session row", async () => {
     const bad = await run(["x", "--stop", "max-turns:zero"]);
     expect(bad.failed).toBe(true);
     expect(bad.errors.join("\n")).toContain("--stop:");
@@ -118,7 +118,7 @@ describe("amc agent-loop run --stop", () => {
     expect(rounds.errors.join("\n")).toContain("--stop bounds the root driver");
     // The old assertion (exit 0) encoded the defect: a run a limit cut short reported success.
     const result = await run(["slow", "--stop", "timeout-ms:100", "--think-ms", "1500", "--tools", "none"]);
-    expect(result.failed).toBe(true);
+    expect(result.exitCode).toBe(4);
     expect(result.summary?.runLimit).toMatchObject({ kind: "limit", condition: "deadline", bound: 100 });
     expect(result.errors.join("\n")).toContain("Run limit reached: timeout-ms:100");
     const ending = readTurnEndMeta(events(result.summary!.sessionId).find(row => row.event_type === "turn/end")!.meta_json);
@@ -126,12 +126,12 @@ describe("amc agent-loop run --stop", () => {
     expect((await verifyAgentRun(workspace, result.summary!.sessionId)).integrityOk).toBe(true);
   });
 
-  it("a resumed session already at its turn bound is refused before its prompt runs: runLimit in the JSON, exit 1", async () => {
+  it("a resumed session already at its turn bound is refused before its prompt runs: runLimit in the JSON, exit 4", async () => {
     // MUTATION: drop the runLimit failure in reportRun and this run exits 0 with turn: null and no reason.
     const first = await run(["first", "--keep-open"]);
     expect(first.failed, first.errors.join("\n")).toBe(false);
     const bounded = await run(["second", "--session", first.summary!.sessionId, "--stop", "max-turns:1", "--keep-open"]);
-    expect(bounded.failed).toBe(true);
+    expect(bounded.exitCode).toBe(4);
     expect(bounded.summary?.runLimit).toMatchObject({ kind: "limit", condition: "max-turns", bound: 1 });
     expect(bounded.errors.join("\n")).toContain("Run limit reached: max-turns:1");
     const rows = events(first.summary!.sessionId);
