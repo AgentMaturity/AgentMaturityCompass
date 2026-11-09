@@ -88,6 +88,8 @@ describe("committed plan-edits manifest (D-15)", () => {
     expect(validatePlanEdits(manifest([gap]))).toEqual([gap]);
     const live = entry({ issue: "LIVE-VAULT-07", archivePath: "unused-code/plan-edits/LIVE-VAULT-07/src/a.ts.landed" });
     expect(validatePlanEdits(manifest([live]))).toEqual([live]);
+    const followup = entry({ issue: "FU1109-01", archivePath: "unused-code/plan-edits/FU1109-01/src/a.ts.landed" });
+    expect(validatePlanEdits(manifest([followup]))).toEqual([followup]);
     const bad: Array<[unknown, string]> = [
       [{ ...manifest([]), schemaVersion: 2 }, "header"],
       [{ ...manifest([]), decision: "D-14" }, "header"],

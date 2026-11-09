@@ -1081,6 +1081,13 @@
       "sha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661"
     },
     {
+      "path": "src/workspaces/hostBootstrap.ts",
+      "issue": "FU1109-01",
+      "baseCommit": "bd5bf64991a9388dff082564236cba6afb354d2a",
+      "archivePath": "unused-code/plan-edits/FU1109-01/src/workspaces/hostBootstrap.ts.landed",
+      "sha256": "5e4aa5be3d52c833ec3472e8974d2d0e3832b1e6141ad9749d32ff3fcded7d4f"
+    },
+    {
       "path": "src/workspaces/workspaceRouter.ts",
       "issue": "P0-30",
       "baseCommit": "a1aef9d69c8cf7a362f158b95e5b0568e564f1b1",
