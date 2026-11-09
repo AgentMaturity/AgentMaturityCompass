@@ -187,7 +187,7 @@ describe("real surfaces", () => {
       expect(scopedProjectSignatureValid(workspace, loadNativeMcpConfiguration(path))).toBe(true);
       // A FIFO in place of the .sig cannot hang admission: the bounded non-blocking reader refuses it.
       const sig = readFileSync(`${path}.sig`); rmSync(`${path}.sig`);
-      if (spawnSync("mkfifo", [`${path}.sig`]).status === 0) {
+      if (spawnSync("/usr/bin/mkfifo", [`${path}.sig`]).status === 0) { // absolute: the host utility, not a package binary (Node has no mkfifo API)
         expect(scopedProjectSignatureValid(workspace, loadNativeMcpConfiguration(path))).toBe(false);
         rmSync(`${path}.sig`);
       }
