@@ -712,7 +712,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc mcp list-tools` | List all tools exposed by the AMC MCP server | `--json` | - |
 | `amc mcp remove` | Delete a scoped MCP server config and its signature | `--scope <scope>`<br>`--credentials-home <dir>`<br>`--json` | - |
 | `amc mcp serve` | Start the AMC MCP server (stdio transport for IDE integration) | `--workspace <path>` | - |
-| `amc mcp sign` | Sign a project-scope config's exact bytes with the workspace BUNDLE signing policy (writes <file>.sig) | `--scope <scope>`<br>`--json` | - |
+| `amc mcp sign` | Sign a project-scope config's exact bytes with the workspace BUNDLE signing policy (writes <file>.sig); the bytes must have the digest you reviewed | `--scope <scope>`<br>`--expect-digest <sha256>`<br>`--json` | - |
 | `amc mechanic` | Mechanic Workbench (targets, plans, simulation) | - | - |
 | `amc mechanic export` | Export latest gap analysis as reward functions, DSPy targets, or fine-tune recipes | `--gap-file <path>`<br>`--format <format>`<br>`--out <path>`<br>`--json` | - |
 | `amc mechanic gap` | - | `--scope <scope>`<br>`--id <id>`<br>`--out <path>` | - |
@@ -782,7 +782,8 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc native-extension hooks` | Operator command hooks in .amc/hooks.json: inspect, trust this machine to run them, test one event | - | - |
 | `amc native-extension hooks inspect` | Show the workspace hooks file, its digest, trust state and resolved handlers without running anything | `--json` | - |
 | `amc native-extension hooks test` | Run the trusted handlers for one event with a synthetic input: PreToolUse, PostToolUse, UserPromptSubmit, Stop, SessionStart, SessionEnd, SubagentStop, PreCompact, Notification | `--tool <name>`<br>`--json` | - |
-| `amc native-extension hooks trust` | Accept the workspace hooks file's exact bytes on this machine; required again after any change | `--sha256 <digest>`<br>`--json` | - |
+| `amc native-extension hooks trust` | Accept the workspace hooks file's trust value (its digest bound to every file under .amc/hooks/) on this machine; required again after any change | `--sha256 <value>`<br>`--json` | - |
+| `amc native-extension hooks untrust` | Retire this machine's acceptance of the workspace hooks file; a present file is untrusted again and a missing one no longer fails closed | `--json` | - |
 | `amc native-extension inspect` | Read manifest/content hashes and workspace signature status without loading or writing | `--expect-digest <sha256>`<br>`--preview-command <name>`<br>`--arguments <text>`<br>`--json` | - |
 | `amc native-extension install` | Copy an already signed extension into the local plugin store without activation | `--expect-digest <sha256>`<br>`--json` | - |
 | `amc native-extension sign` | Sign the exact reviewed manifest with existing AMC workspace BUNDLE signing policy | `--expect-digest <sha256>`<br>`--json` | - |
