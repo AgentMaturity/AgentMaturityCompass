@@ -170,12 +170,27 @@ export function defaultToolsConfig(): ToolsConfig {
           deny: { paths: PROTECTED_DENY_GLOBS },
           requireExecTicket: false
         },
+        // SH-TOOLS: `apply_patch` takes `fs.edit`'s scope. It can also delete and move files, inside that scope only;
+        // widening it is the same deliberate decision as widening `fs.edit`.
+        {
+          name: "apply_patch",
+          actionClass: "WRITE_LOW",
+          allow: { paths: ["./workspace/output/**"] },
+          deny: { paths: PROTECTED_DENY_GLOBS },
+          requireExecTicket: false
+        },
         {
           name: "glob",
           actionClass: "READ_ONLY"
         },
         {
           name: "grep",
+          actionClass: "READ_ONLY"
+        },
+        // `ls` lists one directory level; like glob and grep it declares no path policy and is bounded by the
+        // workspace root and the protected directories.
+        {
+          name: "ls",
           actionClass: "READ_ONLY"
         },
         {

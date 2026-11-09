@@ -528,6 +528,7 @@ export class ToolPipeline {
       denied: null,
       output,
       ...(result.effect === undefined ? {} : { effect: result.effect }),
+      ...(result.fileChanges === undefined || result.fileChanges.length === 0 ? {} : { fileChanges: result.fileChanges }),
       bytes: result.bytes ?? Buffer.byteLength(output, "utf8")
     };
   }

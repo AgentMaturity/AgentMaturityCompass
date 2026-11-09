@@ -9,7 +9,9 @@ import { createNativeSandboxBash } from "../sandbox/nativeSandboxBinding.js";
 import { childShellReadiness, nativeShellReadiness, type ExplicitShellOptIn, type NativeShellReadiness } from "../sandbox/nativeShellGate.js";
 import { measureProcessConfinement, processConfinementReason, processIsConfined, type ConfinementMeasurement } from "../sandbox/processConfinement.js";
 import { bashDescription, bashTool } from "../tools/builtin/bashTool.js";
+import { applyPatchTool } from "../tools/builtin/applyPatchTool.js";
 import { fsTools } from "../tools/builtin/fsTools.js";
+import { lsTool } from "../tools/builtin/lsTool.js";
 import { ReadBeforeEditLedger } from "../tools/builtin/readBeforeEdit.js";
 import { searchTools } from "../tools/builtin/searchTools.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -28,6 +30,7 @@ import type { NativeReceiptRecorder } from "../tools/builtin/nativeToolBreadth/n
 import type { ToolExecution } from "../tools/toolTypes.js";
 import {
   budgetGuard,
+  governedToolArguments,
   networkEgressGuard,
   promptInjectionGuard,
   runtimeFirewallGuard,
@@ -256,8 +259,10 @@ export function checkToolsetReadiness(workspace: string, options: {
       : "the Action Policy was removed after signing, so every governed call is denied — restore it from backup or run: amc policy action init");
   }
 
-  const writeScope = [...new Set(selected.filter(tool => tool.name === "fs.write" || tool.name === "fs.edit")
-    .flatMap(tool => tool.allow?.paths ?? []))];
+  // Every writing tool the policy scopes by path (fs.write, fs.edit, apply_patch, and any later one), not two names:
+  // an operator told "writes are scoped to: (nothing)" while apply_patch can delete has been told something false.
+  const writeScope = [...new Set(selected.filter(tool => (tool.actionClass === "WRITE_LOW" || tool.actionClass === "WRITE_HIGH")
+    && (tool.allow?.paths?.length ?? 0) > 0).flatMap(tool => tool.allow?.paths ?? []))];
 
   const sandbox = new SandboxRunner();
   const backend = sandbox.select();
@@ -356,6 +361,8 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
 
   const ledger = new ReadBeforeEditLedger();
   for (const tool of fsTools({ ledger })) registry.define(tool);
+  registry.define(applyPatchTool({ ledger }));
+  registry.define(lsTool());
   for (const tool of searchTools()) registry.define(tool);
   const admittedCatalog = (scope: string, snapshot = loadVerifiedToolsConfigSnapshot(workspace), strict = true) => {
     if (scope !== agentId) throw new ToolLoadoutError("UNAUTHORIZED");
@@ -578,7 +585,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   // a url the model passes; both host checks read that. Unconfigured, it names
   // no url and network-egress denies it.
   const governedArguments = (execution: ToolExecution): Readonly<Record<string, unknown>> =>
-    execution.name === "web_search" ? { ...execution.arguments, url: options.webSearchProvider?.origin } : execution.arguments;
+    execution.name === "web_search" ? { ...execution.arguments, url: options.webSearchProvider?.origin } : governedToolArguments(execution);
   registry.guard("network-egress", networkEgressGuard(workspace, governedArguments, toolsThisPass));
   registry.guard("tool-allowlist", toolhubAllowlistGuard(workspace, execution => registry.visible(execution.agentId).get(execution.name),
     options.expectedToolsDigest, governedArguments, toolsThisPass));

@@ -1,6 +1,6 @@
 import { closeSync, constants, fstatSync, lstatSync, openSync, readSync, readdirSync, realpathSync, statSync } from "node:fs";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
-import { aliasedSegmentReason, fileIdentity, foldName, protectedDirectoryIdentities } from "../../toolhub/protectedPaths.js";
+import { aliasedSegmentReason, fileIdentity, foldName, isProtectedDirectoryName, protectedDirectoryIdentities } from "../../toolhub/protectedPaths.js";
 
 /**
  * A bounded workspace walker (P4.3).
@@ -254,4 +254,77 @@ export function globToRegExp(pattern: string): RegExp {
 /** Normalise a walked path for matching on any platform. */
 export function forMatching(path: string): string {
   return sep === "/" ? path : path.split(sep).join("/");
+}
+
+export interface DirectoryEntry {
+  readonly name: string;
+  readonly kind: "file" | "directory" | "symlink" | "other";
+  /** Bytes for a file; null otherwise. */
+  readonly size: number | null;
+}
+
+export interface DirectoryListing {
+  readonly entries: readonly DirectoryEntry[];
+  /** Entries beyond `maxEntries`, dropped after sorting by name. */
+  readonly dropped: number;
+  /** Entries the repository ignore rules hid (0 with `includeIgnored`). */
+  readonly ignored: number;
+  /** True when the directory itself, or an ancestor, is ignored: nothing is listed, as the walk lists nothing there. */
+  readonly directoryIgnored: boolean;
+}
+
+/**
+ * One directory level (SH-TOOLS-02 `ls`), under the same ignore rules the walk applies: every ancestor's `.gitignore`
+ * and `.ignore` are inherited, and an ignored directory (or one below an ignored ancestor) lists nothing, so `ls`
+ * hides what `glob` hides. The caller has already resolved `directory` inside the workspace and refused the protected
+ * directories; `.git`/`.amc` entries inside it, whatever their kind (a `.git` file, a link named `.amc`), are left out
+ * by name and, for real entries, by identity.
+ *
+ * ponytail: one `readdirSync` sorted in memory, so a directory of a million entries costs a million names before the
+ * cap applies; move it to the search worker with a deadline if that ever matters.
+ */
+export function listDirectory(workspace: string, directory: string, limits: { readonly includeIgnored?: boolean; readonly maxEntries: number }): DirectoryListing {
+  const root = realpathSync.native(workspace);
+  const protectedIds = protectedDirectoryIdentities(root);
+  const relativeDir = relative(root, directory);
+  const rules: IgnoreRule[] = [];
+  if (!limits.includeIgnored) {
+    let ancestor = root;
+    rules.push(...ignoreRules(root, ancestor));
+    for (const segment of relativeDir === "" ? [] : relativeDir.split(sep)) {
+      ancestor = join(ancestor, segment);
+      if (ignored(forMatching(relative(root, ancestor)), true, rules)) return { entries: [], dropped: 0, ignored: 0, directoryIgnored: true };
+      rules.push(...ignoreRules(root, ancestor));
+    }
+  }
+  let ignoredCount = 0;
+  const entries: DirectoryEntry[] = [];
+  for (const entry of readdirSync(directory, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+    const full = join(directory, entry.name);
+    const isDirectory = entry.isDirectory();
+    // A protected name is left out whatever the entry is (a `.git` file, a link named `.amc`). The wider alias shapes
+    // (trailing dot or space, `name:stream`, `NAME~1`) are left out for directories only, as the walk skips them; a file
+    // so named is an ordinary file glob and grep still see. Identity is checked for real directories: a link's identity is
+    // its target's, and ls never follows links.
+    if (isDirectory ? aliasedSegmentReason(entry.name) !== null : isProtectedDirectoryName(entry.name)) continue;
+    if (isDirectory && protectedIds.size > 0 && protectedIds.has(fileIdentity(full) ?? "")) continue;
+    if (ignored(forMatching(relative(root, full)), isDirectory, rules)) { ignoredCount++; continue; }
+    const kind = entry.isSymbolicLink() ? "symlink" : isDirectory ? "directory" : entry.isFile() ? "file" : "other";
+    let size: number | null = null;
+    if (kind === "file") {
+      try { size = lstatSync(full).size; } catch { size = null; }
+    }
+    entries.push({ name: entry.name, kind, size });
+  }
+  const shown = entries.slice(0, limits.maxEntries);
+  return { entries: shown, dropped: entries.length - shown.length, ignored: ignoredCount, directoryIgnored: false };
+}
+
+/** Modification times for sorting glob results newest first; a file that vanished sorts last. */
+export function modifiedAt(workspace: string, paths: readonly string[]): Map<string, number> {
+  const times = new Map<string, number>();
+  for (const path of paths) {
+    try { times.set(path, lstatSync(join(workspace, path)).mtimeMs); } catch { times.set(path, -1); }
+  }
+  return times;
 }

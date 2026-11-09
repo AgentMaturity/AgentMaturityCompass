@@ -89,7 +89,9 @@ describe("fs.read line ranges", () => {
     expect(outcome.output).toBe("     2\tl2\n\n[amc: truncated at 10 bytes; 19 more]\n[amc: lines 2-4 of 10]");
   });
 
-  it("refuses binary and non-UTF-8 files deterministically, and leaves the raw read as it was", async () => {
+  // SH-TOOLS-02 (R5): the raw read used to decode NUL bytes into the model's context (`"a\u0000b"`); that assertion
+  // encoded the defect. Binary content is now described; NUL-free non-UTF-8 text is shown lossily and labelled.
+  it("refuses binary and non-UTF-8 files on the ranged path, describes binaries and labels lossy text on the raw read", async () => {
     const h = harness();
     h.put("nul.bin", Buffer.from([0x61, 0x00, 0x62]));
     h.put("latin1.txt", Buffer.from([0x63, 0x61, 0x66, 0xe9]));
@@ -98,7 +100,29 @@ describe("fs.read line ranges", () => {
       expect(outcome.ok).toBe(false);
       expect(outcome.output).toContain("is not UTF-8 text");
     }
-    expect((await h.run("fs.read", { path: "nul.bin" })).output).toBe("a\u0000b");
+    const binary = await h.run("fs.read", { path: "nul.bin" });
+    expect(binary.ok).toBe(true);
+    expect(binary.output).toBe(`[amc: "nul.bin" is binary (application/octet-stream, 3 bytes, sha256 ${sha256(Buffer.from([0x61, 0x00, 0x62]))}); fs.read shows UTF-8 text only]`);
+    expect(binary.output).not.toContain("\u0000");
+    const lossy = await h.run("fs.read", { path: "latin1.txt" });
+    expect(lossy.output).toBe("caf\uFFFD\n[amc: not valid UTF-8; shown with replacement characters]");
+    // The read still records the digest, so an edit is refused as non-UTF-8, not as unread.
+    expect((await h.run("fs.edit", { path: "latin1.txt", find: "caf", replace: "x" })).output).toContain("not valid UTF-8");
+  });
+
+  it("names common binary types from their header on the raw read (SH-TOOLS-02)", async () => {
+    const h = harness();
+    const big = Buffer.alloc(600, 0);
+    h.put("i.png", Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), big]));
+    h.put("i.jpg", Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), big]));
+    h.put("i.gif", Buffer.concat([Buffer.from("GIF89a", "latin1"), big]));
+    h.put("i.webp", Buffer.concat([Buffer.from("RIFF\0\0\0\0WEBPVP8 ", "latin1"), big]));
+    h.put("d.pdf", Buffer.concat([Buffer.from("%PDF-1.7\n", "latin1"), big]));
+    for (const [name, type] of [["i.png", "image/png"], ["i.jpg", "image/jpeg"], ["i.gif", "image/gif"], ["i.webp", "image/webp"], ["d.pdf", "application/pdf"]]) {
+      // maxBytes below the file size: the header alone names the type, as a prefix read must.
+      const outcome = await h.run("fs.read", { path: name, maxBytes: 16 });
+      expect(outcome.output).toContain(`is binary (${type}, ${600 + (name === "i.png" ? 8 : name === "i.jpg" ? 4 : name === "i.gif" ? 6 : name === "i.webp" ? 16 : 9)} bytes`);
+    }
   });
 
   it("lets a slice read satisfy read-before-edit for the whole file", async () => {
@@ -191,7 +215,7 @@ describe("fs.edit replaceAll and multi-edit", () => {
     expect(outcome.ok).toBe(true);
     expect(h.text("f.txt")).toBe("a\n");
     expect(outcome.output).toBe("SIMULATE fs.edit f.txt (1 replacement)\n--- a/f.txt\n+++ b/f.txt\n@@ -1 +1 @@\n-a\n+b");
-    expect(h.audits()[0]).not.toHaveProperty("fileChange");
+    expect(h.audits()[0]).not.toHaveProperty("fileChanges");
   });
 
   it("refuses to edit a file that is not valid UTF-8, which a text round trip would corrupt", async () => {
@@ -240,7 +264,7 @@ describe("diffs and evidence", () => {
     expect(outcome.output).toBe("edited f.txt (1 replacement)\n--- a/f.txt\n+++ b/f.txt\n@@ -1,2 +1,2 @@\n keep\n-old line\n+new line");
     const after = h.bytes("f.txt");
     const audit = h.audits().find(row => row.tool === "fs.edit")!;
-    expect(audit.fileChange).toEqual({
+    expect(audit.fileChanges).toEqual([{
       path: "f.txt",
       beforeSha256: sha256(before),
       afterSha256: sha256(after),
@@ -249,7 +273,7 @@ describe("diffs and evidence", () => {
       replacements: 1,
       diffSha256: sha256(outcome.output.slice(outcome.output.indexOf("\n") + 1)),
       diffTruncated: false
-    });
+    }]);
     expect(JSON.stringify(h.audits())).not.toContain("old line");
     expect(JSON.stringify(h.audits())).not.toContain("new line");
   });
@@ -258,10 +282,10 @@ describe("diffs and evidence", () => {
     const h = harness();
     const outcome = await h.run("fs.write", { path: "new.txt", content: "fresh\n" });
     expect(outcome.output).toBe("created new.txt");
-    expect(h.audits()[0]!.fileChange).toEqual({
+    expect(h.audits()[0]!.fileChanges).toEqual([{
       path: "new.txt", beforeSha256: null, afterSha256: sha256("fresh\n"), bytesBefore: 0, bytesAfter: 6,
       replacements: null, diffSha256: null, diffTruncated: false
-    });
+    }]);
   });
 
   it("returns a diff when fs.write overwrites a file it read", async () => {
@@ -270,7 +294,7 @@ describe("diffs and evidence", () => {
     await h.run("fs.read", { path: "f.txt" });
     const outcome = await h.run("fs.write", { path: "f.txt", content: "b\n" });
     expect(outcome.output).toBe("wrote f.txt\n--- a/f.txt\n+++ b/f.txt\n@@ -1 +1 @@\n-a\n+b");
-    expect(h.audits().find(row => row.tool === "fs.write")!.fileChange).toMatchObject({ beforeSha256: sha256("a\n"), afterSha256: sha256("b\n") });
+    expect(h.audits().find(row => row.tool === "fs.write")!.fileChanges).toMatchObject([{ beforeSha256: sha256("a\n"), afterSha256: sha256("b\n") }]);
   });
 
   it("shows a binary notice instead of a diff for binary content", async () => {
@@ -297,7 +321,7 @@ describe("diffs and evidence", () => {
   it("records no file change for a refused edit", async () => {
     const { h, outcome } = await editAfterRead("a", { find: "zz", replace: "y" });
     expect(outcome.ok).toBe(false);
-    expect(h.audits().find(row => row.tool === "fs.edit")).not.toHaveProperty("fileChange");
+    expect(h.audits().find(row => row.tool === "fs.edit")).not.toHaveProperty("fileChanges");
   });
 });
 

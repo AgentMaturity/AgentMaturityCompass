@@ -6,7 +6,7 @@ import {
   projectMatchingRuleIds,
   projectQuestionIds
 } from "../diagnostic/liveEvidenceProjection.js";
-import type { RecordedToolCall, ToolOutcome } from "./toolTypes.js";
+import type { FileChange, RecordedToolCall, ToolOutcome } from "./toolTypes.js";
 import { nativeFilesystemTouch } from "../prompt/context/nativeFilesystemTouch.js";
 
 /**
@@ -88,42 +88,22 @@ export interface ToolEvidenceRecord {
   readonly meta: Record<string, unknown>;
 }
 
-/**
- * What an fs.write or fs.edit call changed (P1-36): hashes and sizes of the bytes it read and wrote, and the digest of
- * the redacted diff it returned. Never the content. `beforeSha256` is null for a created file; `replacements` is null
- * for a write; `diffSha256` is null when no diff was shown.
- */
-export interface FileChange {
-  readonly path: string;
-  readonly beforeSha256: string | null;
-  readonly afterSha256: string;
-  readonly bytesBefore: number;
-  readonly bytesAfter: number;
-  readonly replacements: number | null;
-  readonly diffSha256: string | null;
-  readonly diffTruncated: boolean;
-}
-
-const FILE_CHANGE_TOOLS: ReadonlySet<string> = new Set(["fs.write", "fs.edit"]);
-const fileChanges = new Map<string, FileChange>();
+export type { FileChange } from "./toolTypes.js";
 
 /**
- * Hand a call's file change to its audit row, keyed by the call's token.
- *
- * ponytail: a side channel because `ToolPipeline.bodyOutcome` copies only the outcome fields it knows and that file is
- * not this change's to edit. Bounded so a composition with no recorder cannot grow it. Upgrade: carry `fileChange` on
- * `ToolBodyResult`/`ToolOutcome` through `bodyOutcome` and delete this map.
+ * The file changes an audit row carries (SH-TOOLS-06c), read back from its parsed `payload`: `fileChanges`, one entry
+ * per file the call wrote or deleted (rows from before the carrier carry a single `fileChange` instead). Only the
+ * payload carries them, the side of the row encrypted at rest: no path or content digest is copied into the row's
+ * plain `meta`, and `resumeRules` reads the payload, bound to the row's signed digest. Rows with no change yield an
+ * empty list.
  */
-export function noteFileChange(token: string, change: FileChange): void {
-  fileChanges.set(token, change);
-  if (fileChanges.size > 256) fileChanges.delete(fileChanges.keys().next().value!);
-}
-
-function takeFileChange(execution: RecordedToolCall): FileChange | undefined {
-  if (!FILE_CHANGE_TOOLS.has(execution.name)) return undefined;
-  const change = fileChanges.get(execution.token);
-  fileChanges.delete(execution.token);
-  return change;
+export function fileChangesOf(payload: Readonly<Record<string, unknown>>): readonly FileChange[] {
+  const value = payload.fileChanges;
+  const list = Array.isArray(value) ? value : payload.fileChange === undefined ? [] : [payload.fileChange];
+  return list.filter((entry): entry is FileChange => entry !== null && typeof entry === "object"
+    && typeof (entry as FileChange).path === "string"
+    && ((entry as FileChange).beforeSha256 === null || typeof (entry as FileChange).beforeSha256 === "string")
+    && ((entry as FileChange).afterSha256 === null || typeof (entry as FileChange).afterSha256 === "string"));
 }
 
 /**
@@ -147,7 +127,10 @@ export function toolEvidenceFor(execution: RecordedToolCall, outcome: ToolOutcom
   // borrowing a question it did not earn.
   const questionIds = projectQuestionIds(execution, outcome);
   const projectionRules = projectMatchingRuleIds(execution, outcome);
-  const fileChange = takeFileChange(execution);
+  // The body's own declaration, carried on the outcome (never a side channel): digests, sizes and workspace-relative
+  // paths, so a resumed session can tell whether the file still holds its recorded bytes. Payload only (see fileChangesOf).
+  const changes = outcome.fileChanges ?? [];
+  const fileChanges = changes.length === 0 ? {} : { fileChanges: changes };
   const filesystemTouch = nativeFilesystemTouch(execution, outcome);
 
   const call = {
@@ -192,7 +175,7 @@ export function toolEvidenceFor(execution: RecordedToolCall, outcome: ToolOutcom
       // Retain only the bounded directory needed for instruction context, never filenames or arbitrary argument content.
       outcome: outcome.ok ? "ok" : "not-ok",
       ...(filesystemTouch === undefined ? {} : { nativeFilesystemTouch: filesystemTouch }),
-      ...(fileChange === undefined ? {} : { fileChange })
+      ...fileChanges
     }),
     meta: {
       ...common,

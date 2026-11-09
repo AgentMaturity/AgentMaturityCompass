@@ -18,6 +18,7 @@ import { NATIVE_BUILTIN_CAPABILITIES } from "../agent/nativeToolCapabilities.js"
 import type { ActionClass, EvidenceEvent } from "../types.js";
 import { readContainedOrNull } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { readEventPayload } from "./eventPayload.js";
 import type { SessionService } from "./sessionService.js";
 
 export type ResumeRule = "may-repeat" | "repeat-with-same-idempotency-key" | "reconcile-first";
@@ -26,6 +27,7 @@ type ReconciledResult = "completed" | "denied" | "not-found" | "unknown";
 
 const WORKSPACE_FILE_TOOLS: ReadonlySet<string> = new Set(["fs.write", "fs.edit"]);
 const SETTLED: ReadonlySet<unknown> = new Set(["completed", "denied", "not-found"]);
+const FILE_CHANGE_AUDITS: ReadonlySet<unknown> = new Set(["TOOL_CALL_ALLOWED", "TOOL_CALL_FAILED"]);
 const MAX_FILE_BYTES = 64 * 1024 * 1024;
 
 export function resumeRuleFor(call: {
@@ -60,18 +62,33 @@ function metaOf(row: EvidenceEvent): Record<string, unknown> {
   try { return JSON.parse(row.meta_json) as Record<string, unknown>; } catch { return {}; }
 }
 
+/**
+ * The first file change a call's audit row recorded (P1-36, SH-TOOLS-06c), from the row's payload: the side encrypted at
+ * rest, so no path or content digest sits in plain metadata. Read only while the bytes still hash to the digest the
+ * signed row commits to; pruned, unreadable, altered or malformed is no recorded change, and the call reconciles first.
+ */
+function recordedChange(workspace: string, row: EvidenceEvent): FileChange | null {
+  const read = readEventPayload(workspace, row);
+  if (read.status !== "ok" || sha256Hex(read.bytes) !== row.payload_sha256) return null;
+  let payload: unknown;
+  try { payload = JSON.parse(read.bytes.toString("utf8")); } catch { return null; }
+  if (payload === null || typeof payload !== "object") return null;
+  const { fileChanges, fileChange } = payload as { fileChanges?: unknown; fileChange?: unknown };
+  const change = (Array.isArray(fileChanges) ? fileChanges[0] : fileChange) as Partial<FileChange> | null | undefined;
+  return change !== null && typeof change === "object" && typeof change.path === "string"
+    && (change.beforeSha256 === null || typeof change.beforeSha256 === "string") ? { path: change.path, beforeSha256: change.beforeSha256 } : null;
+}
+
 /** Calls a recovery answered with an unknown outcome and no later pass settled, from the session's signed rows. */
-function interruptedCalls(rows: readonly EvidenceEvent[]): Interrupted[] {
+function interruptedCalls(workspace: string, rows: readonly EvidenceEvent[]): Interrupted[] {
   const names = new Map<string, string | null>();
-  const changes = new Map<string, FileChange>();
+  const audits = new Map<string, EvidenceEvent>();
   const settled = new Set<unknown>();
   const unknown: Array<{ toolCallId: string; executionId: string | null }> = [];
   for (const row of rows) {
     const meta = metaOf(row);
     // P1-36: a file tool's audit row records the change before the call's result row; a crash can fall between them.
-    const change = meta.fileChange as Partial<FileChange> | undefined;
-    if (row.event_type === "audit" && typeof meta.callId === "string" && typeof change?.path === "string"
-      && (change.beforeSha256 === null || typeof change.beforeSha256 === "string")) changes.set(meta.callId, { path: change.path, beforeSha256: change.beforeSha256 });
+    if (row.event_type === "audit" && typeof meta.callId === "string" && FILE_CHANGE_AUDITS.has(meta.auditType)) audits.set(meta.callId, row);
     if (typeof meta.toolCallId !== "string") continue;
     if (row.event_type === "tool/call") names.set(meta.toolCallId, typeof meta.toolName === "string" ? meta.toolName : null);
     if (row.event_type === "tool/reconciled" && SETTLED.has(meta.result)) settled.add(meta.toolCallId);
@@ -79,8 +96,12 @@ function interruptedCalls(rows: readonly EvidenceEvent[]): Interrupted[] {
       unknown.push({ toolCallId: meta.toolCallId, executionId: typeof meta.executionId === "string" ? meta.executionId : null });
     }
   }
-  return unknown.filter((call) => !settled.has(call.toolCallId))
-    .map((call) => ({ ...call, toolName: names.get(call.toolCallId) ?? null, fileChange: changes.get(call.toolCallId) ?? null }));
+  return unknown.filter((call) => !settled.has(call.toolCallId)).map((call) => {
+    const toolName = names.get(call.toolCallId) ?? null;
+    // Only the workspace file tools' rule reads the file, so only their payloads are opened.
+    const audit = toolName !== null && WORKSPACE_FILE_TOOLS.has(toolName) ? audits.get(call.toolCallId) : undefined;
+    return { ...call, toolName, fileChange: audit === undefined ? null : recordedChange(workspace, audit) };
+  });
 }
 
 const builtinClass = (toolName: string | null): ActionClass | null =>
@@ -105,7 +126,7 @@ function fileNow(workspace: string, change: FileChange): { readonly file: { befo
  */
 export async function reconcileInterruptedCalls(input: { readonly workspace: string; readonly session: SessionService;
   readonly adapters: ReadonlyMap<string, ReconcileAdapter>; readonly signal?: AbortSignal }): Promise<InterruptedCallOutcome[]> {
-  const pending = interruptedCalls(input.session.readEvents());
+  const pending = interruptedCalls(input.workspace, input.session.readEvents());
   if (pending.length === 0) return [];
   let journal: ActionJournal | null = null;
   const outcomes: InterruptedCallOutcome[] = [];

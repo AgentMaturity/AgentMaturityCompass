@@ -7,7 +7,7 @@ import { freezeToolArguments } from "../toolArguments.js";
 import type { LabelledToolGuard, ToolExecution, ToolMode } from "../toolTypes.js";
 import { actionPolicyGuard } from "./actionPolicyGuard.js";
 import { compiledPolicyDenial } from "./compiledPolicyGuard.js";
-import { networkEgressGuard, promptInjectionGuard, runtimeFirewallGuard, toolhubAllowlistGuard } from "./policyGuards.js";
+import { governedToolArguments, networkEgressGuard, promptInjectionGuard, runtimeFirewallGuard, toolhubAllowlistGuard } from "./policyGuards.js";
 
 /**
  * One deny-only decision for a governed call, whichever plane dispatches it (AXR-01).
@@ -57,7 +57,7 @@ function sharedGuards(workspace: string, readTools: () => VerifiedToolsConfigSna
     { label: "runtime-firewall", guard: runtimeFirewallGuard(workspace) },
     { label: "action-policy", guard: actionPolicyGuard(workspace) },
     { label: "network-egress", guard: networkEgressGuard(workspace, (execution) => execution.arguments, readTools) },
-    { label: "tool-allowlist", guard: toolhubAllowlistGuard(workspace, undefined, undefined, (execution) => execution.arguments, readTools) },
+    { label: "tool-allowlist", guard: toolhubAllowlistGuard(workspace, undefined, undefined, governedToolArguments, readTools) },
     { label: "freeze", guard: freezeDenial }
   ];
 }

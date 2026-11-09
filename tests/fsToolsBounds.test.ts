@@ -92,7 +92,10 @@ describe("fs.read UTF-8 byte bounds", () => {
       console.log(JSON.stringify({ ok: result.ok, bytes: result.bytes,
         retainedGrowthKiB: process.resourceUsage().maxRSS - before, observed: ledger.hasObserved("alice", target) }));
     `));
-    expect(result).toMatchObject({ ok: true, bytes: 1024, observed: true });
+    // SH-TOOLS-02: a sparse file is all NUL bytes, so the read now describes it (retaining 0 bytes) instead of
+    // decoding 1024 NULs into the output; the earlier `bytes: 1024` encoded that defect. The streamed digest and the
+    // ledger observation are unchanged.
+    expect(result).toMatchObject({ ok: true, bytes: 0, observed: true });
     expect(result.retainedGrowthKiB).toBeLessThan(64 * 1024);
   });
 
