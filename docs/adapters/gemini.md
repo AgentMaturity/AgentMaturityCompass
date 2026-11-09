@@ -71,7 +71,7 @@ records the call's digests. With `--mode control`, `BeforeTool` answers `{"decis
 `{"decision":"deny","reason":...}` from the signed policy (a `run_shell_command` call is parsed into a command plan
 first). The hooks follow decision D55: a hook can deny or observe, never allow past the policy or rewrite arguments.
 
-What AMC claims, from `docs/adapters/manifests/gemini-cli.json` (rendered in [SUPPORT_MATRIX.md](SUPPORT_MATRIX.md)):
+What AMC claims, from `docs/adapters/manifests/gemini-cli.json` (rendered in [SUPPORT_MATRIX.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/adapters/SUPPORT_MATRIX.md)):
 
 - `AfterTool`: observed. Qualified versions: none.
 - `BeforeTool`: **not claimed as enforcement.** The Bridge registers no Gemini CLI session and binds no authorization

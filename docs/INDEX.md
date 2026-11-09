@@ -63,27 +63,27 @@ Use this page to reach the shortest evidence-backed path for your task. AMC's pu
 - [Starter Blueprints](STARTER_BLUEPRINTS.md)
 - [Framework Adapters](ADAPTERS.md)
 - [Provider Configuration](PROVIDERS.md)
-- [Native Provider Routes](NATIVE_PROVIDERS.md): the routes `--provider` accepts, reasoning flags, cache retention, retry delays, and their limits
+- [Native Provider Routes](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/NATIVE_PROVIDERS.md): the routes `--provider` accepts, reasoning flags, cache retention, retry delays, and their limits
 - [SDK](SDK.md)
-- [Agent Loop Continuity](AGENT_LOOP_CONTINUITY.md): `--continue`, plan mode, steering over IPC, `--stop` run limits, AMC.md and `@path` imports, per-turn context accounting
-- [Headless native runs](NATIVE_HEADLESS.md): stdin prompt, `--output-format text|json|stream-json`, exit codes
-- [Agent Client Protocol](ACP.md): `amc acp` for Zed and JetBrains, permission requests, tool kinds, negotiation with the SDKs
-- [Native Command Hooks](NATIVE_HOOKS.md)
-- [Declarative Config Layers And Provenance](DECLARATIVE_CONFIG.md)
+- [Agent Loop Continuity](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/AGENT_LOOP_CONTINUITY.md): `--continue`, plan mode, steering over IPC, `--stop` run limits, AMC.md and `@path` imports, per-turn context accounting
+- [Headless native runs](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/NATIVE_HEADLESS.md): stdin prompt, `--output-format text|json|stream-json`, exit codes
+- [Agent Client Protocol](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/ACP.md): `amc acp` for Zed and JetBrains, permission requests, tool kinds, negotiation with the SDKs
+- [Native Command Hooks](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/NATIVE_HOOKS.md)
+- [Declarative Config Layers And Provenance](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/DECLARATIVE_CONFIG.md)
 - [Native Agent Workflow](NATIVE_AGENT_WORKFLOW.md): the built-in tools (`fs.read`, `fs.write`, `fs.edit`, `apply_patch`, `ls`, `glob`, `grep`, `bash`), their bounds, and how the signed policy grants them
-- [Native Tools: web, ask-user, todo, plan](NATIVE_TOOLS.md): `web_fetch` rendering and egress, `web_search`, signed session records, and `amc tools list --schemas`
+- [Native Tools: web, ask-user, todo, plan](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/NATIVE_TOOLS.md): `web_fetch` rendering and egress, `web_search`, signed session records, and `amc tools list --schemas`
 - [API Reference](API_REFERENCE.md)
 - [OpenAPI Surfaces](API_SURFACES.md)
 - [CI Templates](CI_TEMPLATES.md)
-- [Source Intake (GitHub observations, admission, proposals)](SOURCE_INTAKE.md)
+- [Source Intake (GitHub observations, admission, proposals)](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/SOURCE_INTAKE.md)
 - [Examples Index](EXAMPLES_INDEX.md)
 
 ## Native Harness Controls
 
-- [Sandbox](SANDBOX.md): the confined native shell (Bubblewrap on Linux, Seatbelt on macOS), what each boundary enforces and what it does not
+- [Sandbox](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/SANDBOX.md): the confined native shell (Bubblewrap on Linux, Seatbelt on macOS), what each boundary enforces and what it does not
 - [Approvals](APPROVALS.md): the signed approval engine, the tool approval gate and `--approval-mode plan|default|accept-edits|untrusted`
-- [Tool Output Redaction](TOOL_OUTPUT_REDACTION.md): secrets in tool output replaced before the model, the session and evidence see them
-- [Workspace Trust](WORKSPACE_TRUST.md): a cloned workspace's signed configuration applies only after the operator trusts it on this machine
+- [Tool Output Redaction](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/TOOL_OUTPUT_REDACTION.md): secrets in tool output replaced before the model, the session and evidence see them
+- [Workspace Trust](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/WORKSPACE_TRUST.md): a cloned workspace's signed configuration applies only after the operator trusts it on this machine
 
 ## Operate And Deploy
 
@@ -95,14 +95,14 @@ Use this page to reach the shortest evidence-backed path for your task. AMC's pu
 - [Incident Response Readiness](INCIDENT_RESPONSE_READINESS.md)
 - [AMC Service Down Runbook](runbooks/amc-service-down.md)
 - [Evidence Corruption Runbook](runbooks/evidence-corruption.md)
-- [Observability: OpenTelemetry Export, Usage Reports, Session Export](OBSERVABILITY.md)
-- [Eval Suites Against The Native Agent](EVAL_SUITES.md)
+- [Observability: OpenTelemetry Export, Usage Reports, Session Export](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/OBSERVABILITY.md)
+- [Eval Suites Against The Native Agent](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/EVAL_SUITES.md)
 
 ## Understand The Proof
 
 - [Evidence Trust](EVIDENCE_TRUST.md)
 - [Receipts](RECEIPTS.md)
-- [Session Export](SESSION_EXPORT.md): one sealed native session verified offline with a pinned monitor fingerprint
+- [Session Export](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/SESSION_EXPORT.md): one sealed native session verified offline with a pinned monitor fingerprint
 - [Assurance Lab](ASSURANCE_LAB.md): packs, sealed reports and the provenance gate
 - [Compliance Frameworks](COMPLIANCE_FRAMEWORKS.md): framework ids, aliases and evidence bindings
 - [Claim Provenance](CLAIM_PROVENANCE.md)
