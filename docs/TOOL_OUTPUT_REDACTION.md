@@ -22,8 +22,15 @@ placeholders where credentials were and tokenises only the declared protected
 fields that remain. A result that parses as JSON stays JSON: when the flat pass
 would consume a member name's quotes and colon (`{"api_key":"…"}` matches the
 `generic_api_key` pattern from the name through the value), the filter redacts
-inside the string values instead, probing each as `name=value`, so a declared
-result is still exact JSON and declared-field tokenisation still applies.
+inside the JSON instead: every member name on its own (a secret can be a key;
+two names that redact alike become `[AMC_REDACTED:<type>]` and
+`[AMC_REDACTED:<type>]#2`) and every string value probed as `name=value`, so a
+declared result is still exact JSON and declared-field tokenisation still
+applies. That structured result is used only when it found at least as many
+secrets of every type as the flat pass. Otherwise (for example a number under a
+key-named member, which the flat pass reads as a key and the structured pass
+leaves alone) the flat text stands, and P2-02 withholds a declared result that
+no longer parses: the secret is never kept to keep the JSON.
 
 Write-back protection: a model that copies redacted text back into a file would
 write the placeholder over the real value. `fs.write` and `fs.edit` refuse content

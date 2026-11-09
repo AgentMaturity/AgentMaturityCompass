@@ -46,6 +46,31 @@ describe("the tool-output secret redaction filter (SH-SANDBOX-06)", () => {
     expect(secretRedactionFilter(`{"note": "key ${AWS} here"}`, intact)).toBe('{"note": "key [AMC_REDACTED:aws_key] here"}');
   });
 
+  it("S22: a secret used as a JSON member name is redacted too, and two names that redact alike stay two members", () => {
+    const keyed = { name: "fs.read" } as never;
+    const other = "AKIA" + "SYNTHETICKEY0002";
+    const out = secretRedactionFilter(`{"${AWS}":{"api_key":"abcdefghijklmnop1234"},"${other}":"second","__proto__":"kept"}`, keyed);
+    expect(out).not.toContain(AWS);
+    expect(out).not.toContain(other);
+    const parsed = JSON.parse(out) as Record<string, unknown>;
+    expect(Object.keys(parsed)).toEqual(["[AMC_REDACTED:aws_key]", "[AMC_REDACTED:aws_key]#2", "__proto__"]);
+    expect(parsed["[AMC_REDACTED:aws_key]"]).toEqual({ api_key: "[AMC_REDACTED:generic_api_key]" });
+    expect(parsed["[AMC_REDACTED:aws_key]#2"]).toBe("second");
+    expect(Object.getOwnPropertyDescriptor(parsed, "__proto__")?.value).toBe("kept");
+    expect(redactionCountsFor(keyed)).toEqual({ aws_key: 2, generic_api_key: 1 });
+  });
+
+  it("S22: a structured pass that finds fewer secrets of a type than the flat pass falls back to the flat text", () => {
+    const numeric = { name: "fs.read" } as never;
+    // The flat pass reads the number under a key-named member as a key and breaks the JSON; the structured pass leaves
+    // numbers alone, so it would miss that one while still finding the token.
+    const out = secretRedactionFilter(`{"api_key": 1234567890123456789, "token": "${GITHUB}"}`, numeric);
+    expect(out).not.toContain("1234567890123456789");
+    expect(out).not.toContain(GITHUB);
+    expect(out).toBe('{"[AMC_REDACTED:generic_api_key], "token": "[AMC_REDACTED:github_token]"}');
+    expect(redactionCountsFor(numeric)).toEqual({ generic_api_key: 1, github_token: 1 });
+  });
+
   it("fs.edit refuses a replacement carrying a redaction placeholder, before any read-before-edit verdict, and leaves the file alone", async () => {
     const workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-redaction-edit-")));
     try {
