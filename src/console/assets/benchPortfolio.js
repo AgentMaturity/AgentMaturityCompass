@@ -1,4 +1,5 @@
 import { apiGet, whoami, onClaims } from "./api.js";
+import { loadBenchPortfolio } from "./hostPortfolio.js";
 import { installClaimStrip } from "./components/claimBadge.js";
 
 function esc(value) {
@@ -37,8 +38,8 @@ async function main() {
     return;
   }
   status.textContent = `Signed in as ${me.username ?? me.userId ?? "user"}`;
-  const portfolio = await apiGet("/api/bench/portfolio").catch(() => ({ workspaces: [] }));
-  const rows = (portfolio.workspaces || []).map((item) => row(item)).join("");
+  const portfolio = await loadBenchPortfolio(apiGet);
+  const rows = (portfolio.rows || []).map((item) => row(item)).join("");
   app.innerHTML = `
     ${card(
       "Bench Portfolio",

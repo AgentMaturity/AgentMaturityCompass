@@ -30,6 +30,7 @@ import { sessionRootDescriptorSchema, type SessionRootDescriptor } from "./sessi
 import { operationalEvidenceProblems } from "../keys/operationalLedgerReader.js";
 import { verifyMonitorTrustRoot } from "../persistence/sessionStoreVerification.js";
 import type { TrustContext } from "../trust/trustContext.js";
+import { monitorPinFromEnv } from "../trust/monitorPinEnv.js";
 
 /**
  * Thrown when a session cannot honestly be anchored.
@@ -211,7 +212,7 @@ export function buildSessionRootDescriptor(params: {
   const { workspace, sessionId, rows, record } = params;
   const errors: string[] = [];
   const expected =
-    params.options?.expectedMonitorFingerprint ?? process.env["AMC_EXPECTED_MONITOR_FINGERPRINT"] ?? null;
+    params.options?.expectedMonitorFingerprint ?? monitorPinFromEnv() ?? null;
   if (expected === "") errors.push("trust root: expected monitor fingerprint must not be empty");
   // Use the provider-aware fingerprint/admission shared with the store verifier.
   const monitorKeyFingerprint = verifyMonitorTrustRoot(workspace, expected, errors, params.options?.trust).monitorFingerprint ?? "";

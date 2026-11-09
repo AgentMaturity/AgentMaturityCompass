@@ -2,6 +2,7 @@ import type { EvidenceEvent } from "../../types.js";
 import { inventorySessionSpillReferences } from "./spillLifecycle.js";
 import { retrieveSpilledContent, type SpillRetrievalOptions } from "./spillEvidence.js";
 import { parseSpillLocator } from "./spillTypes.js";
+import { monitorPinFromEnv } from "../../trust/monitorPinEnv.js";
 
 /** Byte limit for one operator read, independent of a session's preview policy. */
 export const MAX_SPILL_READ_BYTES = 16_384;
@@ -45,7 +46,7 @@ export function readSessionSpillRange(input: {
     throw new Error(`Spill limit must be an integer from 1 to ${MAX_SPILL_READ_BYTES} bytes.`);
   }
   if (input.events.length === 0) throw new Error("No signed session history is available; restore the matching evidence before reading retained output.");
-  const expectedMonitorFingerprint = input.options?.expectedMonitorFingerprint ?? (process.env.AMC_EXPECTED_MONITOR_FINGERPRINT || null); // empty env: no pin
+  const expectedMonitorFingerprint = input.options?.expectedMonitorFingerprint ?? monitorPinFromEnv() ?? null; // empty env: no pin
   if (expectedMonitorFingerprint !== null && !/^[a-f0-9]{64}$/.test(expectedMonitorFingerprint)) {
     throw new Error("Expected monitor fingerprint must be a complete lowercase SHA-256 obtained independently; omit it for an explicitly unanchored read.");
   }

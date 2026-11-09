@@ -15,6 +15,7 @@ import {
   prepareVerifyRepairAsync, archivedStores, planVerifyRepair, QUARANTINE_DIR, RepairRefused, RepairPublicationError, sealPlannedSessions,
   type HoldState, type RepairPlan
 } from "./ledger/verifyRepair.js";
+import { isVaultLockedError, VAULT_UNLOCK_PATHS } from "./vault/vaultLockedError.js";
 
 /** All workspace data kinds and sessions; registry uncertainty remains unknown. */
 function workspaceLegalHolds(workspace: string): HoldState {
@@ -83,7 +84,7 @@ async function confirmTyped(word: "archive" | "seal", question: string, yes: boo
   }
 }
 
-const VAULT_LOCKED = "Refused: the vault is locked; run `amc vault unlock` (or set AMC_VAULT_PASSPHRASE) and retry. Nothing was changed.";
+const VAULT_LOCKED = `Refused: the vault is locked. ${VAULT_UNLOCK_PATHS}, then retry. Nothing was changed.`;
 
 /** seal_interrupted_sessions --apply: after the typed confirmation, seals every planned session or none, then verifies again. */
 async function applySeal(workspace: string, plan: RepairPlan, yes: boolean, expectedMonitorFingerprint?: string): Promise<number> {
@@ -97,7 +98,7 @@ async function applySeal(workspace: string, plan: RepairPlan, yes: boolean, expe
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     // vault.ts throws a plain Error for a locked vault, not a KeyProviderError; the sealing transaction has rolled back.
-    console.log(chalk.red(message.startsWith("🔐 Vault locked") ? VAULT_LOCKED : `Refused: ${message}. Nothing was changed.`));
+    console.log(chalk.red(isVaultLockedError(error) ? VAULT_LOCKED : `Refused: ${message}. Nothing was changed.`));
     return 2;
   }
   const after = planVerifyRepair(workspace, expectedMonitorFingerprint ? { expectedMonitorFingerprint } : {});

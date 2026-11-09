@@ -1,0 +1,5 @@
+---
+"agent-maturity-compass": minor
+---
+
+One reader for the vault passphrase file. `AMC_VAULT_PASSPHRASE` now always wins over `AMC_VAULT_PASSPHRASE_FILE`, in every command (before, `amc studio start`, `amc doctor`, `amc bootstrap` and `amc host bootstrap` let the file win and read it with no permission check). The file is accepted when it is private to its owner (0600 or 0400, not a symlink) or a mounted secret the AMC user cannot change: Docker and Compose secrets under `/run/secrets` and Kubernetes secret volumes (root-owned, behind the `..data` symlinks, on a read-only mount) now work as `AMC_VAULT_PASSPHRASE_FILE` for every command. Group- or world-writable files and files the AMC user could replace are refused. `amc up` now honours the file too, before the remembered store, and never replaces a refused file with a generated passphrase. `amc bootstrap` and `amc host bootstrap` read the file only and refuse when `AMC_VAULT_PASSPHRASE` is also set. The Helm chart's ledger-encryption step lets each `amc` command read the file itself.

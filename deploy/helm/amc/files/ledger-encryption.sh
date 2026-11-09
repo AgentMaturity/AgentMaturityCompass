@@ -12,8 +12,7 @@ workspace=$1
 provider=$2
 ref=$3
 cd "$workspace"
-AMC_VAULT_PASSPHRASE=$(cat "$AMC_VAULT_PASSPHRASE_FILE")
-export AMC_VAULT_PASSPHRASE
+# Every amc command reads AMC_VAULT_PASSPHRASE_FILE itself, through the one reader (src/vault/passphraseFile.ts).
 amc ops verify
 if ! amc ops print | node -e 'process.exit(JSON.parse(require("fs").readFileSync(0, "utf8")).opsPolicy.encryption.ledgerEncryptionEnabled === true ? 0 : 1)'; then
   # JSON is YAML: `amc ops sign` signs these bytes and loadOpsPolicy parses them.

@@ -78,8 +78,8 @@ describe("helm chart bootstrap secret", () => {
 
   it("passes the operator's monitor-key pin to Studio, and a config change rolls the single pod (P0-14)", () => {
     // Studio anchors a native verdict only to a key the operator pinned; the pin is known after the first bootstrap.
-    // Rendered only when set: an empty value is an invalid pin (some amc commands refuse it), and the chart bypasses the
-    // image entrypoint that unsets an empty one (final review).
+    // Rendered only when set, and the chart bypasses the image entrypoint that unsets an empty one (final review); amc
+    // itself reads an empty value as no pin since follow-up 4.
     const configmap = read(`${chartDir}/templates/configmap.yaml`);
     expect(configmap).toContain("  {{- with .Values.env.AMC_EXPECTED_MONITOR_FINGERPRINT }}\n  AMC_EXPECTED_MONITOR_FINGERPRINT: {{ . | quote }}\n  {{- end }}\n");
     expect(configmap.match(/AMC_EXPECTED_MONITOR_FINGERPRINT/g)).toHaveLength(2);

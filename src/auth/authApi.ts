@@ -23,6 +23,7 @@ import { KeyProviderError, KEY_PROVIDER_ERRORS } from "../keys/provider.js";
 import { KeyRevokedError } from "../keys/keyRevocations.js";
 import { recordUserChange, type UserChange, type UserChangeActor } from "./userAudit.js";
 import { pruneSessions } from "./sessionPrune.js";
+import { isVaultLockedError } from "../vault/vaultLockedError.js";
 export { sessionActor } from "./userAudit.js";
 
 interface UsersSignature {
@@ -306,10 +307,6 @@ class UsersAdminTokenRefusedError extends Error {
   constructor() { super("the admin token cannot change console accounts; sign in as an OWNER"); this.name = "UsersAdminTokenRefusedError"; }
 }
 
-const usersVaultLockedMessages = new Set([
-  "🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup.",
-  "🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported."
-]);
 /** Only the three existing users-mutation POST routes receive this response mapping. */
 export function respondUsersMutationError(request: Pick<IncomingMessage, "method" | "url">, error: unknown, send: (status: number, body: { error: string; code?: string }) => void): boolean {
   if (request.method !== "POST") return false;
@@ -331,8 +328,8 @@ export function respondUsersMutationError(request: Pick<IncomingMessage, "method
   if (error instanceof KeyRevokedError) {
     send(409, { error: "KEY_REVOKED: the config-signature key was revoked", code: "KEY_REVOKED" }); return true;
   }
-  // The vault compatibility API currently throws Error, not a distinct lock class. Match only its two fixed messages.
-  if (error instanceof Error && usersVaultLockedMessages.has(error.message)) {
+  // The vault compatibility API throws Error, not a distinct lock class. Match only its fixed prefix (vaultLockedError.ts).
+  if (isVaultLockedError(error)) {
     send(423, { error: "VAULT_LOCKED: unlock the vault to change users", code: "VAULT_LOCKED" }); return true;
   }
   return false;
@@ -453,7 +450,7 @@ export function authenticateUser(params: {
   workspace: string;
   username: string;
   password: string;
-}): { ok: boolean; user: UserRecord | null; error?: string } {
+}): { ok: boolean; user: UserRecord | null; error?: string; rehash?: LoginRehashOutcome } {
   let config: UsersFile;
   try {
     config = loadUsersConfig(params.workspace, { requireValidSignature: true });
@@ -489,31 +486,32 @@ export function authenticateUser(params: {
       error: "invalid credentials"
     };
   }
-  if (passwordHashNeedsUpgrade(user.passwordHash)) maybeRehashOnLogin(params.workspace, user, params.password);
-  return {
-    ok: true,
-    user
-  };
+  const rehash = passwordHashNeedsUpgrade(user.passwordHash) ? maybeRehashOnLogin(params.workspace, user, params.password) : undefined;
+  return { ok: true, user, ...(rehash ? { rehash } : {}) };
 }
+
+/** LIVE-VAULT-13: what a login did with a verifier made at an older scrypt cost; Studio audits it as the login's reason. */
+export type LoginRehashOutcome = "password-rehashed" | "password-rehash-skipped-vault-locked" | "password-rehash-skipped-user-changed" | "password-rehash-failed";
 
 /**
  * LIVE-VAULT-13: a verifier made at an older scrypt cost is replaced on the next successful login, through the signed
  * write, when this process holds the unlocked vault (Studio does; a CLI may not). Best effort: on any failure the old
  * verifier stays, still valid, and the login goes on.
  */
-function maybeRehashOnLogin(workspace: string, user: UserRecord, password: string): void {
-  if (!vaultStatus(workspace).unlocked) return;
+function maybeRehashOnLogin(workspace: string, user: UserRecord, password: string): LoginRehashOutcome {
+  if (!vaultStatus(workspace).unlocked) return "password-rehash-skipped-vault-locked";
   try {
-    withUsersConfigLock(workspace, () => {
+    return withUsersConfigLock(workspace, () => {
       const config = loadUsersConfig(workspace);
       const index = config.users.findIndex((row) => row.userId === user.userId && row.passwordHash === user.passwordHash);
-      if (index < 0) return;
+      if (index < 0) return "password-rehash-skipped-user-changed";
       const users = config.users.slice();
       users[index] = { ...users[index]!, passwordHash: rehashPassword(password) };
       saveUsersConfig(workspace, { ...config, updatedTs: Date.now(), users });
       signUsersConfig(workspace);
+      return "password-rehashed";
     });
-  } catch { /* the old verifier stays */ }
+  } catch { return "password-rehash-failed"; } // the old verifier stays
 }
 
 export function createTrackedSession(params: {

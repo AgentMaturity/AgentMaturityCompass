@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-11-08
+> Auto-generated from source on 2026-11-09
 
 ## Table of Contents
 
@@ -11090,7 +11090,6 @@ export interface StudioRuntimeConfig {
   metricsBind: string;
   metricsPort: number;
   bootstrap: boolean;
-  vaultPassphrase: string | null;
   bootstrapOwnerUsername: string | null;
   bootstrapOwnerPassword: string | null;
   sessionSigningKey: string | null;

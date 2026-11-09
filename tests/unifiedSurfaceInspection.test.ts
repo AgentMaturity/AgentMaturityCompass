@@ -11,6 +11,7 @@ import { generateComplianceReport, initComplianceMaps } from "../src/compliance/
 import { openLedger } from "../src/ledger/ledger.js";
 import Database from "better-sqlite3";
 import { startGateway } from "../src/gateway/server.js";
+import { lockVault, unlockVault } from "../src/vault/vault.js";
 
 const workspaces: string[] = [];
 
@@ -125,6 +126,34 @@ describe("unified run surface inspection", { timeout: 120_000 }, () => {
     expect(vault?.status).toBe("success");
     expect(vault?.score).toBeGreaterThanOrEqual(80);
     expect(vault?.summary).toMatch(/ledger.*verified|verified.*ledger/i);
+  });
+
+  // Follow-up 2: with the vault locked, encrypted blob payloads cannot be opened. The Vault surface says so through the
+  // payloadsNotEvaluated contract: pending (skipped), never "payload authentication failed", never success.
+  test("a locked vault leaves Vault pending (not evaluated), never failed and never success", async () => {
+    const root = workspace();
+    const ledger = openLedger(root);
+    try {
+      ledger.startSession({ sessionId: "blob-session", runtime: "unknown", binaryPath: "vitest", binarySha256: "vitest" });
+      ledger.appendEvidence({ sessionId: "blob-session", runtime: "unknown", eventType: "stdout", payload: "a blob payload the vault's key opens",
+        payloadExt: "txt", inline: false, meta: { trustTier: "OBSERVED", agentId: "default" } });
+      ledger.sealSession("blob-session");
+    } finally {
+      ledger.close();
+    }
+    lockVault(root);
+    delete process.env.AMC_VAULT_PASSPHRASE;
+    const vault = (await inspectUnifiedConfiguredSurfaces({ workspace: root, agentId: "default" })).find((module) => module.name === "Vault");
+    expect(vault?.status).toBe("skipped");
+    expect(vault?.summary).toContain("not evaluated");
+    expect(vault?.issues[0]).toMatch(/^1 payload not evaluated: the key that opens it is out of reach in this process \(vault locked: export AMC_VAULT_PASSPHRASE or set AMC_VAULT_PASSPHRASE_FILE/);
+    expect(JSON.stringify(vault)).not.toMatch(/authentication failed/);
+    const report = await unifiedRun({ workspace: root, agentId: "default", window: "14d" });
+    expect(report.modules.find((module) => module.name === "Vault")?.status).toBe("skipped");
+    expect(report.topFixes.map((fix) => fix.command)).not.toContain("amc verify --repair");
+    process.env.AMC_VAULT_PASSPHRASE = "unified-surface-test-passphrase";
+    unlockVault(root);
+    expect((await inspectUnifiedConfiguredSurfaces({ workspace: root, agentId: "default" })).find((module) => module.name === "Vault")?.status).toBe("success");
   });
 
   // LIVE-INTEGRITY-02 rewrote r2-c's "Vault pending over a verified prefix" case: a live gateway session verifies and is named.

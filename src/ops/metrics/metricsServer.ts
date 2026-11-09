@@ -2,6 +2,7 @@ import { createServer, type IncomingMessage, type Server, type ServerResponse } 
 import { renderPrometheusMetrics } from "./metricsRegistry.js";
 import { appendOpsAuditEvent } from "../audit.js";
 import { recordMetricsEndpointDeniedMetric, recordMetricsEndpointRequestMetric } from "./metricsMiddleware.js";
+import { ipAllowedByCidrs } from "../../studio/clientAddress.js";
 
 export interface MetricsServerOptions {
   workspace: string;
@@ -63,55 +64,6 @@ function isLocal(ip: string): boolean {
   return ip === "127.0.0.1" || ip === "::1";
 }
 
-function ipToInt(ip: string): number | null {
-  const parts = ip.split(".");
-  if (parts.length !== 4) {
-    return null;
-  }
-  const nums = parts.map((part) => Number(part));
-  if (nums.some((row) => !Number.isInteger(row) || row < 0 || row > 255)) {
-    return null;
-  }
-  return ((nums[0] ?? 0) << 24) + ((nums[1] ?? 0) << 16) + ((nums[2] ?? 0) << 8) + (nums[3] ?? 0);
-}
-
-function parseCidr(cidr: string): { base: number; mask: number } | null {
-  const [ip, bitsRaw] = cidr.split("/");
-  if (!ip || !bitsRaw) {
-    return null;
-  }
-  const base = ipToInt(ip.trim());
-  const bits = Number(bitsRaw);
-  if (base === null || !Number.isInteger(bits) || bits < 0 || bits > 32) {
-    return null;
-  }
-  const mask = bits === 0 ? 0 : Number((0xffffffff << (32 - bits)) >>> 0);
-  return {
-    base: Number(base >>> 0),
-    mask
-  };
-}
-
-function ipAllowedByCidrs(ip: string, cidrs: string[]): boolean {
-  if (ip === "::1") {
-    return true;
-  }
-  const value = ipToInt(ip);
-  if (value === null) {
-    return false;
-  }
-  for (const cidr of cidrs) {
-    const parsed = parseCidr(cidr);
-    if (!parsed) {
-      continue;
-    }
-    if (((value >>> 0) & parsed.mask) === (parsed.base & parsed.mask)) {
-      return true;
-    }
-  }
-  return false;
-}
-
 function createDefaultAuditAppender(workspace: string): (event: MetricsAuditEvent) => void {
   return (event: MetricsAuditEvent): void => {
     try {
@@ -144,7 +96,7 @@ export function createMetricsServerRequestHandler(
     });
 
     const ip = normalizeIp(req.socket.remoteAddress);
-    const allowed = options.allowRemote ? ipAllowedByCidrs(ip, options.allowedCidrs) : isLocal(ip);
+    const allowed = options.allowRemote ? ip === "::1" || ipAllowedByCidrs(ip, options.allowedCidrs) : isLocal(ip); // ::1 is always local
     if (!allowed) {
       recordMetricsEndpointDeniedMetric(endpoint, method, "ip_not_allowed");
       const currentTs = now();

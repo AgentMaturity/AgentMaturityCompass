@@ -23,7 +23,7 @@ amc bundle diff <bundleA> <bundleB>
 - `public-keys/monitor.pub`
 - `public-keys/auditor.pub`
 - `public-keys/key-history.json`
-- `evidence/evidence.sqlite` (run-scoped minimized slice)
+- `evidence/evidence.sqlite` (the ledger slice the run needs; see "What the evidence slice holds" below)
 - `evidence/blobs/*` (referenced blobs)
 - `metadata/exportInfo.json`
 
@@ -40,6 +40,23 @@ With `--attest`, the bundle also holds `attestations/aibom.cdx.json` (the agent'
 and `attestations/control-results.sigstore.json` (an in-toto statement about the run, DSSE-signed with the
 `artifact-seal` key in a Sigstore bundle, [ATTESTATIONS.md](ATTESTATIONS.md)). Both are written before the manifest is
 gathered, so `manifest.json` lists them and the manifest signature covers them.
+
+## What the evidence slice holds
+
+The ledger is one hash chain across every session, so the slice is a prefix of it: every row up to the newest row the
+run's evidence names, extended to the newest row of every session that prefix touches, with the blobs of all those rows.
+A session that ran through the window, such as a running Studio's gateway session, therefore brings every row up to its
+newest one, which can be well after the window, and the rows of other sessions in between. Treat a bundle as carrying
+the workspace's evidence up to the export, not only the run window, and share it only with parties who may see that.
+Retention bounds how far back it reaches.
+
+Decision (LIVE-INTEGRITY-09, closed 2026-11-09): the slice is not trimmed further. Each extension is what verification
+needs. A sealed session cut short no longer matches its seal. An unsealed session cut at the window would end long
+before the export, and a bundle verifies as of its admitted export time (so a session that was open at export reads as
+open), so the cut session would read as interrupted (`missing seal`) once the export came more than 15 minutes after
+the window. Verifying as of the newest copied row instead would fail a tool session that paused for more than 15
+minutes before the window ended and wrote again before the export; only the gateway heartbeats every 5 minutes. Keeping
+the export-time rule and the full tails is the safe choice.
 
 ## Verification Checks
 

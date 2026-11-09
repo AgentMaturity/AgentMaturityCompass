@@ -54,6 +54,7 @@ import { hostWorkspaceDir } from "../workspaces/workspacePaths.js";
 import { isPublicBind } from "../config/loadConfig.js";
 import { assertProxyTrustNamed, assertPublicBindAcknowledged, resolveListenPolicy } from "./listenPolicy.js";
 import { assertPortFree, closeStartedThenThrow, listenOnPolicyPort } from "./studioLifecycle.js";
+import { VAULT_LOCKED_MESSAGE } from "../vault/vaultLockedError.js";
 
 export interface StudioRuntime {
   stop: () => Promise<void>;
@@ -392,7 +393,7 @@ export async function runStudioForeground(params: {
   if (!status.unlocked) {
     const passphrase = process.env.AMC_VAULT_PASSPHRASE;
     if (!passphrase) {
-      throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. For CI, set AMC_VAULT_PASSPHRASE env var.");
+      throw new Error(VAULT_LOCKED_MESSAGE);
     }
     unlockVault(workspace, passphrase);
   }

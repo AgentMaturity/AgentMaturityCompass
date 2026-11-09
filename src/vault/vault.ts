@@ -23,6 +23,7 @@ import {
 import { noteCheckPassWrite } from "../utils/checkPass.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { purposeKeyPaths, vaultPaths } from "./vaultPaths.js";
+import { VAULT_LOCKED_MESSAGE, VAULT_LOCKED_NO_SIGN_MESSAGE } from "./vaultLockedError.js";
 
 export { purposeKeyPaths, vaultPaths };
 
@@ -505,7 +506,7 @@ function signingPayload(workspace: string): { payload: VaultPayload; keysetPrese
     // R2/R6: When --no-sign mode is active, use ephemeral (non-persistent) keys so operations
     // can proceed without vault access. Signatures will be valid format but not verifiable later.
     if (process.env.AMC_NO_SIGN === "1") return null;
-    throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
+    throw new Error(VAULT_LOCKED_NO_SIGN_MESSAGE);
   }
   // Unlocking writes a key set (creation and the v1 migration both commit one), so an unlocked vault without one lost it:
   // refuse rather than sign with nothing binding the vault's keys, their revocations or this machine's marks.
@@ -636,7 +637,7 @@ export function ensureVaultAndPublicKeys(workspace: string): void {
 function requireUnlockedPayload(workspace: string): VaultPayload {
   const session = sessionFor(workspace);
   if (!session.unlocked || !session.payload) {
-    throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup.");
+    throw new Error(VAULT_LOCKED_MESSAGE);
   }
   try {
     // Another process may have added a blob key since this session unlocked.

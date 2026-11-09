@@ -1,5 +1,5 @@
 import { randomBytes, scryptSync } from "node:crypto";
-import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { performance } from "node:perf_hooks";
@@ -73,22 +73,39 @@ describe("re-hash on login and the users file", () => {
   }
   const storedN = (workspace: string) => listUsers(workspace)[0]!.passwordHash.split("$")[1];
 
+  // Follow-up 10: each login that met an older verifier says what it did (`rehash`, audited by Studio as the reason).
   test("a successful login with the vault unlocked re-hashes an old hash, signed", () => {
     const workspace = legacyAccount();
     unlockVault(workspace, process.env.AMC_VAULT_PASSPHRASE!);
-    expect(authenticateUser({ workspace, username: "owner", password: "owner-rehash-pass" }).ok).toBe(true);
+    expect(authenticateUser({ workspace, username: "owner", password: "owner-rehash-pass" })).toMatchObject({ ok: true, rehash: "password-rehashed" });
     expect(storedN(workspace)).toBe("32768");
     expect(verifyUsersConfigSignature(workspace).valid).toBe(true);
-    expect(authenticateUser({ workspace, username: "owner", password: "owner-rehash-pass" }).ok).toBe(true);
+    const current = authenticateUser({ workspace, username: "owner", password: "owner-rehash-pass" });
+    expect(current.ok).toBe(true);
+    expect(current).not.toHaveProperty("rehash");
   });
 
   test("with the vault locked the hash stays and the login still succeeds; a failed login never re-hashes", () => {
     const workspace = legacyAccount();
     lockVault(workspace);
-    expect(authenticateUser({ workspace, username: "owner", password: "owner-rehash-pass" }).ok).toBe(true);
+    expect(authenticateUser({ workspace, username: "owner", password: "owner-rehash-pass" })).toMatchObject({ ok: true, rehash: "password-rehash-skipped-vault-locked" });
     expect(storedN(workspace)).toBe("16384");
     unlockVault(workspace, process.env.AMC_VAULT_PASSPHRASE!);
-    expect(authenticateUser({ workspace, username: "owner", password: "not-the-password" }).ok).toBe(false);
+    const failed = authenticateUser({ workspace, username: "owner", password: "not-the-password" });
+    expect(failed.ok).toBe(false);
+    expect(failed).not.toHaveProperty("rehash");
+    expect(storedN(workspace)).toBe("16384");
+  });
+
+  test.skipIf(process.getuid?.() === 0)("a re-hash whose signed write fails keeps the old verifier and says so", () => {
+    const workspace = legacyAccount();
+    unlockVault(workspace, process.env.AMC_VAULT_PASSPHRASE!);
+    chmodSync(join(workspace, ".amc"), 0o500); // the users-config lock and the write cannot be created
+    try {
+      expect(authenticateUser({ workspace, username: "owner", password: "owner-rehash-pass" })).toMatchObject({ ok: true, rehash: "password-rehash-failed" });
+    } finally {
+      chmodSync(join(workspace, ".amc"), 0o700);
+    }
     expect(storedN(workspace)).toBe("16384");
   });
 

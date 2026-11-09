@@ -291,7 +291,7 @@ import { writeRuntimeFirewallPolicyAsync, migrateRuntimeFirewallPolicySignatureA
 import { installFatalHandlers } from "./runtime/fatalDiagnostic.js";
 import { changeVaultPassphraseInteractive, initVaultInteractive, lockVaultNow, printVaultPassphraseChange, promptPassphrase, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
 import { forgetVaultPassphrase, unlockWithRememberedPassphrase } from "./vault/passphraseStore.js";
-import { unlockWithPassphraseFile } from "./vault/passphraseFile.js";
+import { bootstrapVaultPassphrase, unlockWithPassphraseFile, vaultPassphraseFromEnv } from "./vault/passphraseFile.js";
 import { confirmRememberedUnlock } from "./vault/operatorContext.js";
 import { ensureInstantVaultMode, type InstantVaultMode } from "./cli/instantVaultMode.js";
 import { generatedPassphraseForInit, rememberInitPassphrase, skipVaultPassphrase } from "./cli/initPassphrase.js";
@@ -2102,7 +2102,7 @@ program.hook("preAction", async (_thisCommand, actionCommand) => {
   if (path.length > 0) {
     assertOwnerMode(process.cwd(), path);
   }
-  // B1: AMC_VAULT_PASSPHRASE_FILE opens the vault as AMC_VAULT_PASSPHRASE does (that wins); bootstrap, studio start and doctor read it themselves.
+  // B1: AMC_VAULT_PASSPHRASE_FILE opens the vault as AMC_VAULT_PASSPHRASE does (that wins); up, bootstrap, host bootstrap, studio start and doctor read it themselves, through the same reader.
   if (!/^(up|mcp|connect hooks forward|bootstrap|host bootstrap|studio start|doctor)( |$)/.test(path)) unlockWithPassphraseFile(process.cwd());
   // B2: `amc up` reads it itself (--no-remember); the agent host's MCP server and hook forwarder never hold the vault.
   // LIVE-VAULT-01: the unlock is for an interactive operator only, and a governance command then confirms it.
@@ -2281,12 +2281,9 @@ program
   .option("--strict", "require an initialized, healthy AMC workspace", false)
   .option("--live-probes", "explicitly allow notary signing and gateway model requests; provider charges may apply", false)
   .action(async (opts: { json: boolean; strict: boolean; liveProbes: boolean }) => {
-    const runtimeConfig = loadStudioRuntimeConfig(process.env, {
-      workspaceDir: process.cwd()
-    });
-    if (runtimeConfig.vaultPassphrase) {
-      process.env.AMC_VAULT_PASSPHRASE = runtimeConfig.vaultPassphrase;
-    }
+    loadStudioRuntimeConfig(process.env, { workspaceDir: process.cwd() });
+    try { const passphrase = vaultPassphraseFromEnv(); if (passphrase) process.env.AMC_VAULT_PASSPHRASE = passphrase; } // the doctor reports the locked vault
+    catch (error) { process.stderr.write(`AMC: ${error instanceof Error ? error.message : String(error)}\n`); }
     if (opts.liveProbes && !opts.json) console.log("Live probes explicitly requested: configured notary signing and gateway model requests may run and incur provider charges.");
     const result = await runDoctorCli(process.cwd(), { strict: opts.strict, liveProbes: opts.liveProbes });
     if (opts.json) {
@@ -3475,19 +3472,13 @@ program
   .option("--workspace <path>", "workspace directory (defaults to AMC_WORKSPACE_DIR or cwd)")
   .action(async (opts: { workspace?: string }) => {
     assertOwnerMode(process.cwd(), "bootstrap");
-    const passphraseFile = process.env.AMC_VAULT_PASSPHRASE_FILE?.trim();
-    if (!passphraseFile) {
-      throw new Error("Bootstrap requires AMC_VAULT_PASSPHRASE_FILE. Refusing to run with inline passphrase.");
-    }
-    if (!pathExists(resolve(passphraseFile))) {
-      throw new Error(`AMC_VAULT_PASSPHRASE_FILE does not exist: ${resolve(passphraseFile)}`);
-    }
+    const vaultPassphrase = bootstrapVaultPassphrase();
     const runtime = loadStudioRuntimeConfig(process.env, {
       workspaceDir: opts.workspace ? resolve(opts.workspace) : undefined
     });
     const out = await runBootstrap({
       workspace: runtime.workspaceDir,
-      vaultPassphrase: runtime.vaultPassphrase,
+      vaultPassphrase,
       ownerUsername: runtime.bootstrapOwnerUsername,
       ownerPassword: runtime.bootstrapOwnerPassword,
       lanMode: runtime.lanMode,
@@ -3692,7 +3683,7 @@ hostCmd
       workspaceName: runtime.bootstrapDefaultWorkspaceName ?? "Default Workspace",
       adminUsernameFile: process.env.AMC_BOOTSTRAP_HOST_ADMIN_USERNAME_FILE,
       adminPasswordFile: process.env.AMC_BOOTSTRAP_HOST_ADMIN_PASSWORD_FILE,
-      vaultPassphraseFile: process.env.AMC_VAULT_PASSPHRASE_FILE,
+      vaultPassphrase: bootstrapVaultPassphrase(),
       lanMode: runtime.lanMode,
       bind: runtime.bind,
       studioPort: runtime.studioPort,
@@ -4150,9 +4141,8 @@ studio
     const lanSig = verifyLanModeSignature(runtimeConfig.workspaceDir);
     const queryCarrierAllowed = runtimeConfig.queryLeaseCarrierEnabled && lan.enabled && lanSig.valid;
 
-    if (runtimeConfig.vaultPassphrase) {
-      process.env.AMC_VAULT_PASSPHRASE = runtimeConfig.vaultPassphrase;
-    }
+    const vaultPassphrase = vaultPassphraseFromEnv(); // a set file that is refused stops the start (fail closed)
+    if (vaultPassphrase) process.env.AMC_VAULT_PASSPHRASE = vaultPassphrase;
     if (queryCarrierAllowed) {
       process.env.AMC_QUERY_LEASE_CARRIER_ENABLED = "1";
     } else if (runtimeConfig.queryLeaseCarrierEnabled) {

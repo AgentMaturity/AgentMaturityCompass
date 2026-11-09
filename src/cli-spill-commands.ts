@@ -7,6 +7,7 @@ import type { SessionStoreBackendId } from "./persistence/sessionEventStore.js";
 import type { SpillInventory, SpillInventoryEntry, SpillEraseScope } from "./session/spill/spillLifecycle.js";
 import { sha256Hex } from "./utils/hash.js";
 import { canonicalize } from "./utils/json.js";
+import { monitorPinFromEnv } from "./trust/monitorPinEnv.js";
 
 export interface SpillCliIo {
   log(line: string): void;
@@ -75,7 +76,7 @@ function exactIds(values: string[] | undefined, name: string): string[] {
 function validate(kind: Operation, flags: Flags) {
   const workspace = pathOption(flags.workspace ?? process.cwd(), "--workspace", INSPECT);
   const expectedMonitorFingerprint = digestOption(
-    flags.expectMonitor ?? process.env.AMC_EXPECTED_MONITOR_FINGERPRINT, "--expect-monitor / AMC_EXPECTED_MONITOR_FINGERPRINT");
+    flags.expectMonitor ?? monitorPinFromEnv(), "--expect-monitor / AMC_EXPECTED_MONITOR_FINGERPRINT");
   const options = expectedMonitorFingerprint === undefined ? {} : { expectedMonitorFingerprint };
   const scope: SpillEraseScope = { eventIds: exactIds(flags.event, "--event"), sessionIds: exactIds(flags.session, "--session") };
   if (kind === "export") pathOption(flags.out, "--out", `${INSPECT.replace("inventory", "export")} --out /private/parent/new-export`);

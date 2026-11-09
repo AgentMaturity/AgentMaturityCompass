@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { stripVTControlCharacters } from "node:util";
@@ -20,7 +20,7 @@ import { AGENT_ENV_MARKERS } from "../src/vault/operatorContext.js";
 const roots: string[] = [];
 // The vitest worker inherits CLAUDECODE from a Claude Code shell; amc up refuses the store under it (LIVE-VAULT-01). A CI
 // runner sets CI/GITHUB_ACTIONS, under which amc up never generates a passphrase (LIVE-VAULT-03).
-beforeEach(() => { for (const name of [...AGENT_ENV_MARKERS, "CI", "GITHUB_ACTIONS", "AMC_VAULT_REMEMBER"]) vi.stubEnv(name, undefined); });
+beforeEach(() => { for (const name of [...AGENT_ENV_MARKERS, "CI", "GITHUB_ACTIONS", "AMC_VAULT_REMEMBER", "AMC_VAULT_PASSPHRASE_FILE"]) vi.stubEnv(name, undefined); });
 afterEach(() => {
   vi.unstubAllEnvs();
   vi.restoreAllMocks();
@@ -116,6 +116,54 @@ describe("amc up in a non-interactive shell (B1)", () => {
     expect(seam.events).not.toContain("load");
     expect(seam.events).not.toContain("store");
     expect(process.env.AMC_VAULT_PASSPHRASE).toBeUndefined();
+  });
+});
+
+// Follow-up 3: amc up honours AMC_VAULT_PASSPHRASE_FILE through the one reader (src/vault/passphraseFile.ts), before
+// the remembered store, and a file it refuses is never replaced by a remembered, prompted or generated passphrase.
+describe("amc up with AMC_VAULT_PASSPHRASE_FILE", () => {
+  const original = Object.getOwnPropertyDescriptor(process.stdin, "isTTY");
+  beforeEach(() => { Object.defineProperty(process.stdin, "isTTY", { value: false, configurable: true, writable: true }); });
+  afterEach(() => {
+    if (original) Object.defineProperty(process.stdin, "isTTY", original);
+    else delete (process.stdin as { isTTY?: boolean }).isTTY;
+  });
+  const secret = (mode: number): string => {
+    const dir = mkdtempSync(join(tmpdir(), "amc-up-file-"));
+    roots.push(dir);
+    writeFileSync(join(dir, "vault.pass"), "up-file-passphrase-123\n", { mode });
+    chmodSync(join(dir, "vault.pass"), mode);
+    return join(dir, "vault.pass");
+  };
+
+  it("uses a private file and never reads the remembered store", async () => {
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
+    vi.stubEnv("AMC_VAULT_PASSPHRASE_FILE", secret(0o600));
+    seam.remembered = { passphrase: "remembered-up-pass-123", backend: "file" };
+    const lines = logged();
+    await ensureUpVaultPassphrase("/nonexistent/amc-up-ws", true);
+    expect(process.env.AMC_VAULT_PASSPHRASE).toBe("up-file-passphrase-123");
+    expect(seam.events).not.toContain("load");
+    expect(seam.events).not.toContain("store");
+    expect(lines.join("\n")).not.toContain("up-file-passphrase-123");
+  });
+
+  it("refuses a file the reader refuses, generating and storing nothing", async () => {
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
+    vi.stubEnv("AMC_VAULT_PASSPHRASE_FILE", secret(0o666));
+    logged();
+    await expect(ensureUpVaultPassphrase("/nonexistent/amc-up-ws", true)).rejects.toThrow(/^AMC_VAULT_PASSPHRASE_FILE was not used, so the vault stays locked: .*group- or world-writable/);
+    expect(seam.events).not.toContain("load");
+    expect(seam.events).not.toContain("store");
+    expect(process.env.AMC_VAULT_PASSPHRASE).toBeUndefined();
+  });
+
+  it("lets AMC_VAULT_PASSPHRASE win over the file", async () => {
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "explicit-up-pass-123");
+    vi.stubEnv("AMC_VAULT_PASSPHRASE_FILE", "/nonexistent/amc-up-passphrase");
+    logged();
+    await ensureUpVaultPassphrase("/nonexistent/amc-up-ws", true);
+    expect(process.env.AMC_VAULT_PASSPHRASE).toBe("explicit-up-pass-123");
   });
 });
 

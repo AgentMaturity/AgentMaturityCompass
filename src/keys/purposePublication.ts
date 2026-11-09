@@ -7,6 +7,7 @@ import { keyPolicy, loadKeysConfig } from "./keysConfig.js";
 import { KeyProviderError } from "./provider.js";
 import type { PurposeSignature } from "./purposeProviders.js";
 import { assertSigningKeyUsable, getSigningKey } from "./signingKeys.js";
+import { VAULT_LOCKED_NO_SIGN_MESSAGE } from "../vault/vaultLockedError.js";
 
 /** Internal producer snapshot; captures committed authority, never an editable ref as a new signer. */
 export interface PurposePublication { readonly purpose: LocalPurpose; readonly keyset: string }
@@ -29,7 +30,7 @@ export function assertPurposePublicationCurrent(workspace: string, captured: Pur
     throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", signed.provider, "the current key policy refuses the prepared signature");
   }
   assertSigningKeyUsable(workspace, captured.purpose, signed.publicKeyPem, signed.provider);
-  if (signed.provider === "file" && !vaultStatus(workspace).unlocked) throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
+  if (signed.provider === "file" && !vaultStatus(workspace).unlocked) throw new Error(VAULT_LOCKED_NO_SIGN_MESSAGE);
   if (signed.provider === "file" && publicKeyFromPrivate(getSigningKey(workspace, captured.purpose)) !== signed.publicKeyPem) {
     throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the vault purpose key changed while signing was prepared");
   }

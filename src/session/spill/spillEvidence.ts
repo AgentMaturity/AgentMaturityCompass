@@ -35,6 +35,7 @@ import { verifyMonitorTrustRoot } from "../../persistence/sessionStoreVerificati
 import { sha256Hex } from "../../utils/hash.js";
 import { readSpilled, spillRoot, type SpillReadStatus } from "./spillStore.js";
 import { extractSpillRef, parseSpillLocator, SPILL_META_KEY, type SpillRef } from "./spillTypes.js";
+import { monitorPinFromEnv } from "../../trust/monitorPinEnv.js";
 
 export interface SpillRetrievalOptions {
   /** Independently supplied issuer admission; omission uses the ordinary public trust configuration. */
@@ -97,7 +98,7 @@ function rowAuthenticityError(event: EvidenceEvent, monitorKeys: readonly string
 }
 
 function resolveExpectedFingerprint(options: SpillRetrievalOptions): string | null {
-  return options.expectedMonitorFingerprint ?? process.env["AMC_EXPECTED_MONITOR_FINGERPRINT"] ?? null;
+  return options.expectedMonitorFingerprint ?? monitorPinFromEnv() ?? null;
 }
 
 /**

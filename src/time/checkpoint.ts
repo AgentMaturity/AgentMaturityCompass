@@ -48,6 +48,7 @@ import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { evaluateTime, type AttestedTime, type TimeEvidence, type TimeFinding } from "./timeEvidence.js";
 import { loadTimeConfig, timestampDigest, type TimeConfig } from "./tsaClient.js";
 import { TIMESTAMP_TOKEN_MAX_BYTES, verifyTimestampToken } from "./verifyTimestamp.js";
+import { VAULT_LOCKED_NO_SIGN_MESSAGE } from "../vault/vaultLockedError.js";
 
 /**
  * Ledger checkpoints (P1-25). A checkpoint commits to the ledger head and the transparency root, links to the
@@ -222,7 +223,7 @@ export async function checkpointLedger(workspace: string, trust?: TrustContext):
       throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", signed.provider, "the current key policy refuses the checkpoint signer");
     }
     assertSigningKeyUsable(workspace, "ledger-row", signed.publicKeyPem, signed.provider);
-    if (signed.provider === "file" && !vaultStatus(workspace).unlocked) throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
+    if (signed.provider === "file" && !vaultStatus(workspace).unlocked) throw new Error(VAULT_LOCKED_NO_SIGN_MESSAGE);
     if (signed.provider === "file" && publicKeyFromPrivate(getSigningKey(workspace, "ledger-row")) !== signed.publicKeyPem) {
       throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the vault ledger key changed while the checkpoint was signed");
     }

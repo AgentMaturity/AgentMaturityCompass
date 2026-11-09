@@ -12,21 +12,17 @@ import { dirname, isAbsolute, join, normalize, relative, resolve } from "node:pa
 import YAML from "yaml";
 import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { verifyCurrentPurposeCredentialSignature } from "../keys/purposeCredentialSignature.js";
-import { assertKeysetComplete, boundProviderKey } from "../keys/keyset.js";
-import { canonicalSigningKey, verifyWithKey } from "../keys/algorithmPolicy.js";
-import { keyPolicy, loadKeysConfig } from "../keys/keysConfig.js";
-import { KeyProviderError } from "../keys/provider.js";
-import { assertSigningKeyUsable, getSigningPublicKeyPem } from "../keys/signingKeys.js";
-import { vaultStatus } from "../vault/vault.js";
-import { canonicalize } from "../utils/json.js";
+import { assertKeysetComplete } from "../keys/keyset.js";
+import { verifyWithKey } from "../keys/algorithmPolicy.js";
 import { captureOrgFiles, captureOrgPairs, assertOrgPairsCurrent, orgPairBytes, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
-import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
+import { assertPurposePublicationCurrent } from "../keys/purposePublication.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { defaultToolsConfig, toolsConfigSchema, type ToolDefinition, type ToolsConfig } from "./toolsSchema.js";
+import { captureConfigSignatureAuthority } from "../keys/configSignatureAuthority.js";
 
 interface SignedDigest {
   digestSha256: string;
@@ -95,23 +91,6 @@ export interface ToolsConfigPairOptions {
   beforePublish?: () => void; assertInputsCurrent?: () => void;
 }
 
-/** Original committed config holder; no private getter or invented checked signature in resumed gates. */
-function captureToolsConfigAuthority(workspace: string) {
-  const captured = capturePurposePublication(workspace, "config-signature"), bound = boundProviderKey(workspace, "config-signature");
-  const holder = bound?.binding.provider ?? "file", publicKeyPem = bound?.publicKeyPem ?? getSigningPublicKeyPem(workspace, "config-signature");
-  const algorithm = canonicalSigningKey(publicKeyPem)?.algorithm;
-  if (algorithm === undefined) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original tools config signer is unsupported");
-  const assertCurrent = () => {
-    const policy = keyPolicy(loadKeysConfig(workspace));
-    if (canonicalize(assertKeysetComplete(workspace)) !== captured.keyset || !policy.allowed.includes(algorithm)
-      || (holder === "file" && policy.requireNonExportable))
-      throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original tools config authority changed or is refused");
-    assertSigningKeyUsable(workspace, "config-signature", publicKeyPem, holder);
-    if (holder === "file" && !vaultStatus(workspace).unlocked)
-      throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
-  };
-  assertCurrent(); return { captured, publicKeyPem, assertCurrent };
-}
 
 type ToolsConfigPair = { before: OrgPairsSnapshot; config: Buffer | null; signature: Buffer | null };
 function readToolsConfigPair(file: string): ToolsConfigPair {
@@ -129,7 +108,7 @@ function captureToolsConfigPlan(workspace: string, replacement?: Uint8Array, opt
   const bytes = copy ?? previous.config;
   if (bytes === null) throw new Error(`Tools config not found: ${file}`);
   toolsConfigSchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
-  const original = captureToolsConfigAuthority(workspace); // No key initialization under the tools lock.
+  const original = captureConfigSignatureAuthority(workspace, "tools config"); // No key initialization under the tools lock.
   const digest = sha256Hex(bytes);
   const beforeSign = () => { beforePublish?.(); assertInputsCurrent?.(); original.assertCurrent(); assertOrgPairsCurrent(previous.before); };
   beforeSign(); return { workspace, file, bytes, digest, replacement: copy !== undefined, previous, original, beforePublish, assertInputsCurrent, beforeSign };

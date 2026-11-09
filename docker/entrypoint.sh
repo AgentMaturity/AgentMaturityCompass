@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# An empty monitor pin is not "unpinned": some amc commands (amc spill, amc session anchor) refuse it as an invalid
-# fingerprint. Unset it, so an empty AMC_EXPECTED_MONITOR_FINGERPRINT= in .env or `docker run -e` leaves verdicts unanchored.
+# An empty monitor pin (AMC_EXPECTED_MONITOR_FINGERPRINT= in .env or `docker run -e`) is no pin: every amc command reads
+# it as unset (src/trust/monitorPinEnv.ts). Unset it here too, so anything else in the container reads it the same way.
 if [[ -z "${AMC_EXPECTED_MONITOR_FINGERPRINT:-}" ]]; then
   unset AMC_EXPECTED_MONITOR_FINGERPRINT
 fi

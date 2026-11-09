@@ -121,9 +121,10 @@ import { createStreamCap, makeRateLimiter, makeRateLimiterDetailed, setRateLimit
 import { admitLoginAttempt, createLoginThrottle } from "./loginThrottle.js";
 import { ipAllowedByCidrs, LOOPBACK_CIDRS, requestUsesHttps, resolveClientAddress } from "./clientAddress.js";
 import { allowedHostnamesFrom, hostAllowed } from "./hostAllow.js";
+import { routerSecretValid } from "./routerSecret.js";
 import { applySecurityHeaders, isConsoleStaticAsset } from "./securityHeaders.js";
 import { missingOutcomeContract, missingStandardSchema, missingValueInput, type EmptyState } from "./emptyStates.js";
-import { applyServerTimeouts } from "./serverTimeouts.js";
+import { listenWithTimeouts } from "./serverTimeouts.js";
 import { createNativeTaskService } from "./nativeTaskService.js";
 import { isNativeApprovalMutationPath, isNativeStudioPath, nativeAllowedBrowserOrigins, nativeCsrfTokenForSession } from "./nativeAdmission.js";
 import { admitStudioApproval } from "./studioApprovalAdmission.js";
@@ -432,6 +433,18 @@ interface StudioApiOptions {
   nativeAllowedOrigins?: readonly string[];
   minFreeDiskMb?: number;
   publicConsoleBasePath?: string;
+  /** Set by the host router for a workspace API it starts: every request must carry it (routerSecret.ts). */
+  routerSecret?: string;
+}
+
+/** The value routes' scope query: an agent or node by id, else the workspace; windowDays only when positive. */
+function valueScopeQuery(url: URL): { scopeType: string; requestedId: string; scopeId: string; windowDays: number | undefined } {
+  const raw = (url.searchParams.get("scope") ?? "workspace").toLowerCase();
+  const scope = raw === "agent" || raw === "node" ? raw : "workspace";
+  const requestedId = url.searchParams.get("id") ?? "workspace";
+  const windowDays = Number(url.searchParams.get("windowDays") ?? "");
+  return { scopeType: scope.toUpperCase(), requestedId, scopeId: scope === "workspace" ? "workspace" : requestedId,
+    windowDays: Number.isFinite(windowDays) && windowDays > 0 ? Math.trunc(windowDays) : undefined };
 }
 
 async function readBody(req: IncomingMessage, maxBytes = 1_048_576): Promise<string> {
@@ -1281,6 +1294,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       recordHttpRequestMetric(metricRoute, metricMethod, res.statusCode || 0, Date.now() - requestStartedAt);
     });
     try {
+      // Follow-up 11: a workspace API the host router started answers the router only.
+      if (options.routerSecret !== undefined && !routerSecretValid(req, options.routerSecret)) { json(res, 403, { error: "this workspace API answers its host router only" }); return; }
       // LIVE-RUNTIME-19, SR-4: a request no trusted proxy forwarded must name a host DNS rebinding cannot forge.
       const { clientIp, trustForwarded, addressTrusted } = resolveClientAddress(req, { trustedProxyHops: options.trustedProxyHops ?? 0, trustedProxyCidrs: options.trustedProxyCidrs ?? [] });
       if (!trustForwarded && !hostAllowed(req.headers.host, allowedHostnames)) {
@@ -1659,7 +1674,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           payload: {
             userId: authUser.user.userId,
             username: authUser.user.username,
-            roles: authUser.user.roles
+            roles: authUser.user.roles,
+            ...(authUser.rehash ? { reason: authUser.rehash } : {}) // LIVE-VAULT-13: an older verifier's re-hash outcome
           }
         }, () => { if (!verifyTrackedSessionToken({ workspace: options.workspace, token: session.token }).ok) throw new Error("issued login session is no longer current"); });
         json(res, 200, {
@@ -1950,6 +1966,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         return false;
       };
 
+      /** A value read's scope query, once the lease and role checks and the empty-input answer have let it through. */
+      const valueReadQuery = (): ReturnType<typeof valueScopeQuery> | null => {
+        if (denyValueLeaseAccess() || !requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) return null;
+        const query = valueScopeQuery(url);
+        return answerEmpty(missingValueInput(options.workspace, query.scopeType, query.requestedId, true)) ? null : query;
+      };
       const denyValueLeaseAccess = (): boolean => {
         if (!auth.isAdmin && auth.agentId) {
           writeStudioAuditEvent({
@@ -4574,22 +4596,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/value/snapshot/latest" && req.method === "GET") {
-        if (denyValueLeaseAccess()) {
-          return;
-        }
-        if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
-          return;
-        }
-        const scopeRaw = (url.searchParams.get("scope") ?? "workspace").toLowerCase();
-        const scope = scopeRaw === "agent" || scopeRaw === "node" ? scopeRaw : "workspace";
-        const scopeId = url.searchParams.get("id") ?? "workspace";
-        const windowDays = Number(url.searchParams.get("windowDays") ?? "");
-        if (answerEmpty(missingValueInput(options.workspace, scope.toUpperCase(), scopeId, true))) return;
+        const query = valueReadQuery();
+        if (query === null) return;
         const out = await valueSnapshotLatestForApi({
-          workspace: options.workspace,
-          scopeType: scope.toUpperCase(),
-          scopeId: scope === "workspace" ? "workspace" : scopeId,
-          windowDays: Number.isFinite(windowDays) && windowDays > 0 ? Math.trunc(windowDays) : undefined
+          workspace: options.workspace, scopeType: query.scopeType, scopeId: query.scopeId, windowDays: query.windowDays
         }, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         if (out.status === "INSUFFICIENT_EVIDENCE") {
           emitValueSse({
@@ -4602,22 +4612,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/value/report" && req.method === "GET") {
-        if (denyValueLeaseAccess()) {
-          return;
-        }
-        if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
-          return;
-        }
-        const scopeRaw = (url.searchParams.get("scope") ?? "workspace").toLowerCase();
-        const scope = scopeRaw === "agent" || scopeRaw === "node" ? scopeRaw : "workspace";
-        const scopeId = url.searchParams.get("id") ?? "workspace";
-        const windowDays = Number(url.searchParams.get("windowDays") ?? "");
-        if (answerEmpty(missingValueInput(options.workspace, scope.toUpperCase(), scopeId, true))) return;
+        const query = valueReadQuery();
+        if (query === null) return;
         const out = await valueReportForApi({
-          workspace: options.workspace,
-          scopeType: scope.toUpperCase(),
-          scopeId: scope === "workspace" ? "workspace" : scopeId,
-          windowDays: Number.isFinite(windowDays) && windowDays > 0 ? Math.trunc(windowDays) : undefined
+          workspace: options.workspace, scopeType: query.scopeType, scopeId: query.scopeId, windowDays: query.windowDays
         }, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         emitValueSse({
           hub: orgSse,
@@ -8494,7 +8492,6 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
     }
   });
 
-  applyServerTimeouts(server, { requestTimeout: 120_000 }); // LIVE-RUNTIME-12
   server.on("connection", (socket: Socket) => {
     openSockets.add(socket);
     socket.on("close", () => {
@@ -8505,10 +8502,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
     }
   });
 
-  await new Promise<void>((resolvePromise, rejectPromise) => {
-    server.once("error", rejectPromise);
-    server.listen(options.port, options.host, () => resolvePromise());
-  });
+  await listenWithTimeouts(server, options.port, options.host, { requestTimeout: 120_000 }); // LIVE-RUNTIME-12
   const address = server.address();
   const host = typeof address === "object" && address ? address.address : options.host;
   const port = typeof address === "object" && address ? address.port : options.port;

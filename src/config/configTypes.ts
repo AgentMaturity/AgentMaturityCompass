@@ -27,7 +27,6 @@ export interface StudioRuntimeConfig {
   metricsBind: string;
   metricsPort: number;
   bootstrap: boolean;
-  vaultPassphrase: string | null;
   bootstrapOwnerUsername: string | null;
   bootstrapOwnerPassword: string | null;
   sessionSigningKey: string | null;

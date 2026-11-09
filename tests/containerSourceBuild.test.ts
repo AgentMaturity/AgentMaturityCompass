@@ -169,8 +169,8 @@ describe("container source build and runtime contracts", () => {
   });
 
   it("unsets an empty monitor pin before Studio or an explicit command starts (skeptic 2026-11-08)", () => {
-    // An empty AMC_EXPECTED_MONITOR_FINGERPRINT= (.env, docker run -e) is an invalid fingerprint, not an unset one: some amc
-    // commands (amc spill, amc session anchor) refuse it. Unset, verdicts are unanchored; a real pin passes through.
+    // An empty AMC_EXPECTED_MONITOR_FINGERPRINT= (.env, docker run -e) is no pin: amc reads it as unset (follow-up 4), and
+    // the entrypoint unsets it too, so verdicts are unanchored; a real pin passes through.
     expect(entrypoint([], { bootstrap: false, pin: "" }).pins).toEqual([null]);
     expect(entrypoint([], { pin: "" }).pins).toEqual([null, null]);
     expect(entrypoint(["doctor"], { pin: "" }).pins).toEqual([null]);

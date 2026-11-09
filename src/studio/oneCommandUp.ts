@@ -12,6 +12,7 @@ import inquirer from "inquirer";
 import { usersConfigPath } from "../auth/authApi.js";
 import { buildDashboard } from "../dashboard/build.js";
 import { agentMarker } from "../vault/operatorContext.js";
+import { vaultPassphraseFromEnv } from "../vault/passphraseFile.js";
 import { getRememberedVaultPassphrase, rememberEnabled, rememberedLocation, rememberedStores, rememberVaultPassphrase } from "../vault/passphraseStore.js";
 import { vaultExists } from "../vault/vault.js";
 
@@ -19,6 +20,13 @@ export async function ensureUpVaultPassphrase(workspace: string, rememberRequest
   // LIVE-VAULT-03: AMC_VAULT_REMEMBER=0 turns the stores off, so nothing below reads, offers or writes one.
   const envOptOut = !rememberEnabled();
   const remember = rememberRequested && !envOptOut;
+  // The one reader (AMC_VAULT_PASSPHRASE wins): a set file is used, or refused with its reason, and is never replaced by a
+  // remembered, prompted or generated passphrase.
+  if (!process.env.AMC_VAULT_PASSPHRASE && (process.env.AMC_VAULT_PASSPHRASE_FILE ?? "").trim()) {
+    const fromFile = vaultPassphraseFromEnv(); // throws VaultPassphraseFileError when the file is refused or unreadable
+    if (fromFile) process.env.AMC_VAULT_PASSPHRASE = fromFile;
+    return;
+  }
   if (!process.env.AMC_VAULT_PASSPHRASE && remember) {
     // LIVE-VAULT-01 (D3): an agent harness's shell never starts a Studio daemon holding the remembered passphrase.
     const marker = agentMarker();

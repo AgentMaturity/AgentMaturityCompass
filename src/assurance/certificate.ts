@@ -42,6 +42,7 @@ import { KeyProviderError } from "../keys/provider.js";
 import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import type { VerifierReportInput } from "../trust/verifierReport.js";
+import { VAULT_LOCKED_NO_SIGN_MESSAGE } from "../vault/vaultLockedError.js";
 
 /**
  * Extraction limits for AMC archives.
@@ -738,7 +739,7 @@ export async function revokeCertificateAsync(params: Parameters<typeof revokeCer
     }
     assertSigningKeyUsable(params.workspace, "revocation-list", signed.publicKeyPem, signed.provider);
     if (signed.provider === "file") {
-      if (!vaultStatus(params.workspace).unlocked) throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
+      if (!vaultStatus(params.workspace).unlocked) throw new Error(VAULT_LOCKED_NO_SIGN_MESSAGE);
       assertVaultMaySign(params.workspace, "revocation-list");
       if (publicKeyFromPrivate(getSigningKey(params.workspace, "revocation-list")) !== auditorPub) {
         throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the vault revocation key changed while signing");
