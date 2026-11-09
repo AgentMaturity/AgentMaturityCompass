@@ -14,7 +14,7 @@ import { testIndustryPackLicence, type TestIndustryPackLicence } from "./helpers
  * Every registry path has an explicit recipe below. Named missing fixtures may refuse; parser errors,
  * timeouts, signals and strict exit 70 always fail. Literal empty arrays remain acceptance failures.
  */
-interface Recipe { path: string; args: string[]; json?: boolean; output?: "markdown" | "info-badge" | "badge-url"; refusal?: { reason: string; pattern: string };
+interface Recipe { path: string; args: string[]; json?: boolean; output?: "markdown" | "info-badge" | "badge-url"; refusal?: { reason: string; pattern: string }; fixture?: "native-results";
   /** Sid's open P0-22 decision: a successful empty JSON array carries no claim fields. Held as RED evidence in the receipt. */
   emptyArrayHeld?: string }
 const recipes: Recipe[] = [
@@ -27,6 +27,8 @@ const recipes: Recipe[] = [
   {"path": "eval import", "args": ["--format", "openai", "--file", "@MISSING@", "--json"], "json": true, "refusal": {"reason": "This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.", "pattern": "ENOENT|not found|No .*found|missing|unavailable|unknown.*run|does not exist"}},
   {"path": "eval status", "args": ["--json"], "json": true},
   {"path": "eval run", "args": ["--format", "json"], "json": true},
+  {"path": "eval suite run", "args": ["@EVAL_SUITE@", "--provider", "stub", "--tasks", "echo-exact", "--json"], "json": true, "fixture": "native-results"},
+  {"path": "eval suite compare", "args": ["@EVAL_BASELINE@", "@EVAL_RESULTS@", "--json"], "json": true, "fixture": "native-results"},
   {"path": "bundle export", "args": ["--run", "@RUN@", "--out", "@OUT@"]},
   {"path": "bundle verify", "args": ["@MISSING@", "--json"], "json": true, "refusal": {"reason": "This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.", "pattern": "ENOENT|not found|No .*found|missing|unavailable|unknown.*run|does not exist"}},
   {"path": "bundle inspect", "args": ["@MISSING@"], "refusal": {"reason": "This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.", "pattern": "ENOENT|not found|No .*found|missing|unavailable|unknown.*run|does not exist"}},
@@ -202,11 +204,19 @@ const recipes: Recipe[] = [
   {"path": "mirofish compare", "args": ["@SCENARIO@", "@SCENARIO@", "--iterations", "2", "--seed", "7"]},
   {"path": "mirofish stress", "args": ["@SCENARIO@", "--seed", "7"]},
   {"path": "session verify", "args": ["--json"], "json": true, "refusal": {"reason": "The private monitor key is not independently pinned; local chain integrity cannot imply anchoring.", "pattern": "not-pinned|not pinned"}},
+  {"path": "session verify-export", "args": ["@SESSION_EXPORT@", "--expect-monitor", "@SESSION_MONITOR@", "--json"], "json": true, "fixture": "native-results"},
 ];
 
 const cli = resolve(process.cwd(), "dist/cli.js");
+const evalSuite = resolve(process.cwd(), "examples/eval-suites/stub-smoke/suite.yaml");
 const root = mkdtempSync(join(tmpdir(), "amc-p022-cli-labels-"));
 const workspace = join(root, "workspace");
+const nativeWorkspace = join(root, "native-workspace");
+const evalResults = join(root, "eval-results.json");
+const evalBaseline = join(root, "eval-baseline.json");
+const sessionExport = join(root, "session-export.json");
+let sessionMonitor = "";
+let nativeFixture: Promise<void> | undefined;
 const home = join(root, "home");
 const logs = resolve(process.cwd(), "tmp", `p0-22-claim-labels-${Date.now()}-${process.pid}`);
 const guard = join(root, "offline.mjs");
@@ -233,14 +243,16 @@ function materialize(value: string, path: string): string {
   const tag = path.replaceAll(" ", "-");
   return ({ "@RUN@": runId, "@EXPERIMENT@": experimentId, "@LAB_BASELINE@": labBaselineId, "@LAB_CANDIDATE@": labCandidateId, "@WORKSPACE@": workspace,
     "@NOTARY@": join(root, "uninitialized-notary"), "@SCENARIO@": join(root, "scenario.yaml"),
+    "@EVAL_SUITE@": evalSuite, "@EVAL_RESULTS@": evalResults, "@EVAL_BASELINE@": evalBaseline,
+    "@SESSION_EXPORT@": sessionExport, "@SESSION_MONITOR@": sessionMonitor,
     "@MISSING@": join(root, "deliberately-absent-fixture.json"), "@OUT@": join(root, "outputs", `${tag}.json`) } as Record<string, string>)[value] ?? value;
 }
 
-async function invoke(name: string, args: string[]) {
+async function invoke(name: string, args: string[], cwd = workspace) {
   const started = Date.now();
   const result = await new Promise<{ status: number | null; signal: string | null; error?: string; stdout: string; stderr: string }>((done) => {
     execFile(process.execPath, ["--import", guard, cli, ...args], {
-      cwd: workspace, env: environment, encoding: "utf8", timeout: 60_000, maxBuffer: 16 * 1024 * 1024
+      cwd, env: environment, encoding: "utf8", timeout: 60_000, maxBuffer: 16 * 1024 * 1024
     }, (error, stdout, stderr) => {
       const failure = error as (Error & { code?: string | number; signal?: string; killed?: boolean }) | null;
       done({ status: !failure ? 0 : typeof failure.code === "number" ? failure.code : null,
@@ -364,6 +376,26 @@ async function createSimulatedLab(name: string, kind: string): Promise<string> {
   return id;
 }
 
+async function seedNativeResults(): Promise<void> {
+  // Native eval sessions must not change the diagnostic and fleet evidence in the shared workspace.
+  mkdirSync(nativeWorkspace, { recursive: true });
+  const seed = async (name: string, args: string[]) => {
+    const result = await invoke(name, args, nativeWorkspace);
+    completed(result);
+    expect(result.status, `${result.stderr}\n${result.stdout}`).toBe(0);
+    return result;
+  };
+  await seed("seed-native-init", ["init", "--trust-boundary", "isolated", "--profile", "ci"]);
+  const run = await seed("seed-eval-suite-run", ["eval", "suite", "run", evalSuite, "--provider", "stub", "--tasks", "echo-exact", "--attempts", "4", "--out", evalResults, "--json"]);
+  const { tasks } = jsonDocument(run.stdout) as { tasks: Array<{ attempts: Array<{ sessionId: string }> }> };
+  const sessionId = tasks[0]?.attempts[0]?.sessionId;
+  expect(sessionId).toBeTypeOf("string");
+  await seed("seed-eval-suite-baseline", ["eval", "suite", "baseline", evalResults, "--out", evalBaseline]);
+  const exported = await seed("seed-native-session-export", ["session", "export", sessionId!, "--out", sessionExport, "--json"]);
+  sessionMonitor = (jsonDocument(exported.stdout) as { monitorKeyFingerprint: string }).monitorKeyFingerprint;
+  expect(sessionMonitor).toMatch(/^[0-9a-f]{64}$/);
+}
+
 afterAll(() => {
   if (existsSync(logs)) writeFileSync(join(logs, "qualification-summary.json"), JSON.stringify({ registryPaths: RESULT_COMMANDS.map(({ path }) => path),
     attempted: records, fixture: root, concurrency: 1, strict: true, credentialsInherited: false, transport: "denied",
@@ -385,8 +417,9 @@ describe.concurrent("actual strict CLI result labels in a signed, keyless privat
   for (const recipe of recipes) {
     test(`amc ${recipe.path}${recipe.refusal ? ` — fixture refusal permitted: ${recipe.refusal.reason}` : " — actual result required"}`, async () => {
       await withWorkspacePermit(async () => {
+        if (recipe.fixture === "native-results") await (nativeFixture ??= seedNativeResults());
         const args = [...recipe.path.split(" "), ...recipe.args.map((arg) => materialize(arg, recipe.path))];
-        const result = await invoke(recipe.path, args);
+        const result = await invoke(recipe.path, args, recipe.fixture === "native-results" ? nativeWorkspace : workspace);
         completed(result);
         if (result.status !== 0) {
           expect(recipe.refusal, `${recipe.path} unexpectedly failed: ${result.stderr}\n${result.stdout}`).toBeDefined();
