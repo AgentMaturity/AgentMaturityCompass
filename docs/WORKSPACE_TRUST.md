@@ -37,8 +37,9 @@ digest, how many signed tools, how many shell write grants, egress hosts and
 binaries, and how many signed presets. Presets are bound because they choose a
 run's approval gate and delegate provider: a preset re-signed after consent (a
 dropped `approveTools`, a foreign `delegate.provider`) is a changed surface.
-`agent-loop run` checks trust before it reads a preset. A later key-set fork or rollback is still refused by the key-set
-anchoring itself (`FORK_DETECTED`, `ROLLBACK_DETECTED`).
+`agent-loop run` checks trust before it reads a preset. A later key-set fork or
+rollback is still refused by the key-set anchoring itself (`FORK_DETECTED`,
+`ROLLBACK_DETECTED`).
 
 ## Giving consent
 
@@ -59,8 +60,8 @@ Consent comes only from the operator, never from a file in the workspace:
 The record lives in `<AMC home>/state/workspace-trust.json` (0600, written
 atomically under the control-file lock), keyed by a digest of the workspace's
 real path, and holds the key-set generation and digest, the signed `tools.yaml`
-digest, the signed presets digest, the time and the source of consent. `AMC_HOME` moves it with the rest of
-the AMC home.
+digest, the signed presets digest, the time and the source of consent.
+`AMC_HOME` moves it with the rest of the AMC home.
 
 ## Limits
 
@@ -72,9 +73,11 @@ the AMC home.
   `amc`, `amc run`, `amc init` and `amc monitor start` never open, migrate or
   commit a cloned vault with a passphrase the clone supplies.
 - Consent binds the signer, the signed `tools.yaml` and the signed presets.
-  Skills are not part of the digest (they are prompt text, stamped as data), and
-  neither are the narrowing layers a repository can only tighten against its own
-  signed tools policy (the Action Policy, budgets).
+  Skills are not part of the digest (they are prompt text, stamped as data).
+  Neither are the Action Policy and budgets: they can only narrow what the
+  consented tools policy grants, so a repository that relaxes them after consent
+  cannot exceed that policy, though calls they had narrowed (to `SIMULATE`, or
+  under a budget) can then run.
 - Consent is never asked interactively, by design: a TTY run is refused with the
   message above, and the operator re-runs with the flag or `amc trust workspace`.
   A prompt that any terminal can answer would give an agent driving a terminal on
