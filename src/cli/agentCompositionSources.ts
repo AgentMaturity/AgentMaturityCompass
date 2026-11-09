@@ -7,7 +7,7 @@ import { presetCompositionSources, type CompositionSource } from "../prompt/cont
 /** Capture explicit flags before approval and delegation fill options from a verified preset. */
 export function explicitPresetCompositionOptions(command: Pick<Command, "getOptionValueSource">): ReadonlySet<string> {
   return new Set([
-    "provider", "model", "persona", "maxTokens", "maxSteps", "tools", "toolMode", "approveTools",
+    "provider", "model", "persona", "maxTokens", "maxSteps", "tools", "toolMode", "approveTools", "approvalMode",
     "delegate", "delegateScope", "maxDelegationDepth", "delegateProvider", "delegateTimeout", "delegateStop"
   ].filter(name => command.getOptionValueSource(name) === "cli"));
 }
@@ -20,6 +20,8 @@ interface NativePresetCompositionValues {
   readonly tools: string;
   readonly toolMode: string;
   readonly approveTools?: string;
+  /** SH-SANDBOX-04: an explicit mode replaces the preset's approveTools; both are recorded as overrides. */
+  readonly approvalMode?: string;
   readonly delegateEnabled: boolean;
   readonly delegateScope?: readonly string[];
   readonly maxDelegationDepth: number;
@@ -40,11 +42,12 @@ export function nativePresetCompositionSources(preset: AgentPreset | undefined, 
     { option: "tools", field: "tools", presetValue: preset.tools, effectiveValue: effective.tools },
     { option: "toolMode", field: "toolMode", presetValue: preset.toolMode, effectiveValue: effective.toolMode },
     { option: "approveTools", field: "approveTools", presetValue: preset.approveTools, effectiveValue: effective.approveTools },
+    { option: "approvalMode", field: "approvalMode", presetValue: undefined, effectiveValue: effective.approvalMode },
     { option: "delegate", field: "delegate.enabled", presetValue: preset.delegate?.enabled, effectiveValue: effective.delegateEnabled },
     { option: "delegateScope", field: "delegate.scope", presetValue: preset.delegate?.scope, effectiveValue: effective.delegateScope },
     { option: "maxDelegationDepth", field: "delegate.maxDepth", presetValue: preset.delegate?.maxDepth, effectiveValue: effective.maxDelegationDepth },
     { option: "delegateProvider", field: "delegate.provider", presetValue: preset.delegate?.provider, effectiveValue: options.delegateProvider ?? IN_PROCESS_PROVIDER },
     { option: "delegateTimeout", field: "delegate.timeoutMs", presetValue: preset.delegate?.timeoutMs, effectiveValue: effective.delegateTimeout },
     { option: "delegateStop", field: "delegate.stopConditions", presetValue: preset.delegate?.stopConditions, effectiveValue: effective.delegateStops }
-  ].filter(override => explicitOptions.has(override.option)));
+  ].filter(override => explicitOptions.has(override.option) || (override.option === "approveTools" && explicitOptions.has("approvalMode"))));
 }

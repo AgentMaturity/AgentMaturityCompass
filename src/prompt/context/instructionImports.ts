@@ -61,11 +61,11 @@ const MAX_SHOWN_TARGET = 160;
 const IMPORT_LINE = /^@(\S+)$/;
 /**
  * Directories an import may never name, at any depth, however the path is written (lower-case; compared folded).
- * Covers AMC's state and every home-relative secret directory the macOS shell sandbox denies (MACOS_SECRET_PATHS in
- * src/sandbox/seatbeltNativeShell.ts; a test keeps the two in step), since a workspace can be a home directory.
+ * Covers AMC's state and the fixed home-relative secret paths shared by the shell sandboxes. A workspace can be a home
+ * directory, so the instruction-import test checks these paths against HOME_SECRET_PATHS and the default AMC home.
  */
 const REFUSED_SEGMENTS: readonly string[] = Object.freeze([".amc", ".git", "node_modules", ".ssh", ".aws", ".azure", ".gnupg", ".kube", ".docker", ".netrc", ".npmrc"]);
-const REFUSED_SEGMENT_PATHS: readonly (readonly string[])[] = Object.freeze([[".config", "gcloud"], ["library", "keychains"]]);
+const REFUSED_SEGMENT_PATHS: readonly (readonly string[])[] = Object.freeze([[".config", "gcloud"], [".config", "amc"], ["library", "keychains"]]);
 /** Credential carriers by name: exactly, or the same name with anything after a dot (`.npmrc.txt`, `credentials.md`). */
 const REFUSED_FILE_STEMS: readonly string[] = Object.freeze([".npmrc", ".netrc", ".pypirc", ".git-credentials", "credentials"]);
 /**

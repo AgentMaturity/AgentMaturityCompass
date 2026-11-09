@@ -33,6 +33,7 @@ export function registerAcpCommands(program: Command): void {
     .option("--credentials-mode <mode>", "layered or operator-only (exclude project/user dotenv)", "layered")
     .option("--tools <mode>", "none or explicitly enabled workspace tools", "none")
     .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")
+    .option("--trust-workspace", "trust this workspace's signed configuration (key set, tools policy and presets) on this machine, recording the consent in the AMC home; otherwise a workspace this machine never trusted is refused (AMC_TRUST_WORKSPACE=1 for headless hosts)")
     .option("--ask-user", "Send ask_user to the client as _amc/ask_user and sign its answer host-side; requires workspace tools")
     .option("--web-search-searxng <origin>", "Opt-in web_search provider: a SearXNG JSON origin, also granted under web_search in the signed tools policy")
     .option("--expected-tools-digest <sha256>", "Refuse any workspace tool call after its signed policy digest changes")
@@ -83,6 +84,7 @@ export function registerAcpCommands(program: Command): void {
       approveRisk?: string;
       reviewerSessionTokenFile?: string;
       reviewerReason?: string;
+      trustWorkspace?: boolean;
       mcpConfig?: string[];
       mcpConfigSha256?: string[];
       mcp?: string[];
@@ -111,6 +113,7 @@ export function registerAcpCommands(program: Command): void {
           systemPrompt: composedPrompt ? composedPrompt : opts.systemPrompt,
           tools: opts.tools as "none" | "workspace",
           ...(opts.unsafeUnconfinedShell === true ? { unconfinedShell: true } : {}),
+          ...(opts.trustWorkspace === true ? { trustWorkspace: true } : {}),
           ...(opts.askUser === true ? { askUser: true } : {}),
           ...(opts.webSearchSearxng === undefined ? {} : { webSearchSearxng: opts.webSearchSearxng }),
           ...(opts.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: opts.expectedToolsDigest }),

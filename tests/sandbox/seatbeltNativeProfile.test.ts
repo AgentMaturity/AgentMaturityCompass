@@ -1,11 +1,12 @@
 /** P1-05 profile/source contracts only. No sandbox-exec or kernel execution is claimed. */
 import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, type Stats } from "node:fs";
-import { tmpdir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { within } from "../../src/sandbox/bwrapBackend.js";
 import { realOrLiteral } from "../../src/sandbox/seatbeltBackend.js";
-import { buildSeatbeltShellProfile, MACOS_SECRET_PATHS, seatbeltNativeShell, seatbeltPrerequisites, type SeatbeltShellProfileInput } from "../../src/sandbox/seatbeltNativeShell.js";
+import { buildSeatbeltShellProfile, seatbeltNativeShell, seatbeltPrerequisites, type SeatbeltShellProfileInput } from "../../src/sandbox/seatbeltNativeShell.js";
+import { HOME_SECRET_PATHS } from "../../src/sandbox/shellSecretPaths.js";
 import type { SandboxPolicy } from "../../src/sandbox/sandboxTypes.js";
 
 type BinaryMetadata = Pick<Stats, "uid" | "mode" | "isFile">;
@@ -47,7 +48,7 @@ const input = (changes: Partial<SeatbeltShellProfileInput> = {}): SeatbeltShellP
   workspace: "/synthetic/workspace",
   writableRoots: ["/synthetic/workspace/build", "/synthetic/workspace/cache"],
   privateTmp: "/synthetic/launcher/tmp",
-  denied: [...MACOS_SECRET_PATHS.map(path => `/synthetic/operator/${path}`), "/synthetic/custom-deny"],
+  denied: [...HOME_SECRET_PATHS.map(path => `/synthetic/operator/${path}`), "/synthetic/custom-deny"],
   proxyPort: null,
   ...changes
 });
@@ -207,5 +208,46 @@ describe("native backend prelaunch refusals with a synthetic prerequisite and a 
       ...policy(), signal: controller.signal
     })).toEqual(declined("The shell was cancelled before launch.", true));
     expect(synthetic.launch).not.toHaveBeenCalled();
+  });
+});
+
+describe("AMC's own authority is on the macOS deny list (SH-SANDBOX-08)", () => {
+  test("denies the AMC home, the credentials file, the user .env layer and the vault remember file, honouring the overrides", async () => {
+    const { amcSecretPaths } = await import("../../src/sandbox/shellSecretPaths.js");
+    const defaults = amcSecretPaths({});
+    expect(defaults).toContain(join(homedir(), ".config", "amc"));
+    expect(defaults).toContain(join(homedir(), ".config", "amc", ".credentials.yaml"));
+    expect(defaults).toContain(join(homedir(), ".env"));
+    const overridden = amcSecretPaths({ AMC_HOME: "/synthetic/amc-home", AMC_CREDENTIALS_FILE: "/synthetic/elsewhere/creds.yaml", AMC_VAULT_REMEMBER_FILE: "/synthetic/vault/remember.json" });
+    expect(overridden).toEqual(expect.arrayContaining(["/synthetic/amc-home", "/synthetic/elsewhere/creds.yaml", "/synthetic/vault/remember.json", join(homedir(), ".env")]));
+    // Never the legacy spelling alone: `~/.amc` is not where AMC keeps credentials.
+    expect(defaults.some(path => path.endsWith("/.config/amc"))).toBe(true);
+    // S5: with AMC_HOME elsewhere the default home still holds the vault passphrase file store, so it stays denied.
+    expect(overridden).toContain(join(homedir(), ".config", "amc"));
+  });
+
+  test("S5: the remembered vault passphrase file is denied where the vault itself resolves it, and so is every AMC secret a _FILE variable names", async () => {
+    const { amcSecretPaths } = await import("../../src/sandbox/shellSecretPaths.js");
+    const { credentialsFile, legacyCredentialsFile } = await import("../../src/vault/passphraseStore.js");
+    const env = { HOME: "/synthetic/user", AMC_HOME: "/synthetic/amc-home", AMC_VAULT_PASSPHRASE_FILE: "/synthetic/run/secrets/amc_vault_passphrase",
+      AMC_BOOTSTRAP_OWNER_PASSWORD_FILE: "/synthetic/run/secrets/owner_password", AMC_SESSION_SIGNING_KEY_FILE: "/synthetic/keys/session.pem",
+      AMC_BOOTSTRAP_OWNER_USERNAME_FILE: "/synthetic/run/secrets/owner_username" };
+    const denied = amcSecretPaths(env);
+    // The vault's own resolver, not a copy of its rule: the file store under AMC_HOME and its pre-AMC_HOME location.
+    expect(credentialsFile(env)).toBe("/synthetic/amc-home/vault-credentials.json");
+    expect(legacyCredentialsFile(env)).toBe("/synthetic/user/.config/amc/vault-credentials.json");
+    expect(denied).toEqual(expect.arrayContaining([credentialsFile(env), legacyCredentialsFile(env)!, join(homedir(), ".config", "amc"),
+      "/synthetic/run/secrets/amc_vault_passphrase", "/synthetic/run/secrets/owner_password", "/synthetic/keys/session.pem"]));
+    // A username file is not a secret the shared classifier names, so it stays readable.
+    expect(denied).not.toContain("/synthetic/run/secrets/owner_username");
+    expect(amcSecretPaths({ AMC_VAULT_REMEMBER_FILE: "/synthetic/elsewhere/remember.json" })).toContain("/synthetic/elsewhere/remember.json");
+  });
+
+  test("a credential store the session selected by option is denied once registered, whatever the environment says", async () => {
+    const { amcSecretPaths, denySessionSecretPaths } = await import("../../src/sandbox/shellSecretPaths.js");
+    expect(amcSecretPaths({ AMC_HOME: "/synthetic/amc-home" })).not.toContain("/synthetic/session-creds");
+    denySessionSecretPaths(["/synthetic/session-creds", "/synthetic/session-creds/refs.yaml"]);
+    expect(amcSecretPaths({ AMC_HOME: "/synthetic/amc-home" })).toEqual(expect.arrayContaining(["/synthetic/session-creds", "/synthetic/session-creds/refs.yaml"]));
+    expect(amcSecretPaths({})).toContain("/synthetic/session-creds");
   });
 });

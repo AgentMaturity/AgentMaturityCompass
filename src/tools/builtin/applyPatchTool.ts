@@ -7,7 +7,7 @@ import { defineTool } from "../toolRegistry.js";
 import type { FileChange, ToolBodyResult, ToolDefinition, ToolExecution } from "../toolTypes.js";
 import { MAX_PATCH_BYTES, parsePatch, type PatchSection } from "./applyPatchParse.js";
 import { applyHunks, locateBudget, type LocateBudget } from "./applyPatchPlan.js";
-import { deleteIfUnchanged, readBeforeWrite, refuseBeforeWrite, shownDiff, utf8, writeIfUnchanged } from "./fsWritePrimitives.js";
+import { deleteIfUnchanged, readBeforeWrite, refuseBeforeWrite, refuseRedactionPlaceholder, shownDiff, utf8, writeIfUnchanged } from "./fsWritePrimitives.js";
 import type { ReadBeforeEditLedger } from "./readBeforeEdit.js";
 import { insideWorkspaceNoLinks } from "./workspacePath.js";
 
@@ -56,6 +56,7 @@ function planSection(execution: ToolExecution, ledger: ReadBeforeEditLedger, sec
   const target = resolveTarget(execution, section.path);
   const agent = execution.agentId;
   if (section.kind === "add") {
+    for (const line of section.lines) refuseRedactionPlaceholder(line, "apply_patch");
     if (readBeforeWrite(target.full, section.path) !== null) throw refuseBeforeWrite(`"${section.path}" already exists; use Update File to change it`);
     const verdict = ledger.mayWrite(agent, target.full);
     if (!verdict.ok) throw refuseBeforeWrite(verdict.reason);
@@ -67,6 +68,11 @@ function planSection(execution: ToolExecution, ledger: ReadBeforeEditLedger, sec
   if (!verdict.ok) throw refuseBeforeWrite(verdict.reason);
   if (section.kind === "delete") {
     return { kind: "delete", target, before, diff: shownDiff(target.rel, before, Buffer.alloc(0)).text };
+  }
+  for (const hunk of section.hunks) {
+    for (const line of hunk.lines) {
+      if (line.op === "+") refuseRedactionPlaceholder(line.text, "apply_patch");
+    }
   }
   const text = utf8(before);
   if (text === null) throw refuseBeforeWrite(`"${section.path}" is not valid UTF-8; apply_patch would change bytes it was not asked to change`);

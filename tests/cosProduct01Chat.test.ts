@@ -24,7 +24,8 @@ const seam = vi.hoisted(() => ({
   signals: [] as unknown[], cancelWhileApproving: false, abortedAtKill: false,
   questionSignal: undefined as AbortSignal | undefined,
   cancelApproval: vi.fn(), closeApproval: vi.fn(), preview: "", selectionChecks: 0, changedSelectionAt: 0,
-  withdrawCalls: [] as string[], withdrawStatus: "withdrawn"
+  withdrawCalls: [] as string[], withdrawStatus: "withdrawn",
+  presetOptions: {} as Record<string, unknown>, reviewers: 0
 }));
 
 vi.mock("node:readline", async importOriginal => {
@@ -53,9 +54,10 @@ vi.mock("node:child_process", async importOriginal => {
     const result = seam.results.shift() ?? { code: 1, body: {} };
     let closed = false;
     const stdin = new PassThrough();
+    const stdins = seam.stdins;
     let written = "";
     stdin.on("data", (chunk: Buffer) => { written += chunk.toString("utf8"); });
-    stdin.on("end", () => { seam.stdins.push(written); });
+    stdin.on("end", () => { stdins.push(written); });
     const child = Object.assign(new EventEmitter(), {
       stdin, stdout: new PassThrough(), stderr: new PassThrough(), exitCode: null as number | null, signalCode: null,
       kill: (signal: unknown) => {
@@ -80,6 +82,7 @@ vi.mock("../src/setup/nativeInteractiveApprovals.js", () => ({ createNativeInter
   child: ChildProcess; question: (prompt: string, signal?: AbortSignal) => Promise<string | null>
 }) => {
   const controller = new AbortController();
+  seam.reviewers++;
   if (seam.cancelWhileApproving) void options.question("Approval: ", controller.signal);
   return {
     cancel: () => { seam.cancelApproval(); controller.abort(); options.child.kill("SIGINT"); },
@@ -87,7 +90,7 @@ vi.mock("../src/setup/nativeInteractiveApprovals.js", () => ({ createNativeInter
   };
 } }));
 vi.mock("../src/setup/nativeChatProfile.js", () => ({
-  resolveNativeChatProfile: () => ({ effectiveOptions: {}, presetId: null }),
+  resolveNativeChatProfile: () => ({ effectiveOptions: seam.presetOptions, presetId: Object.keys(seam.presetOptions).length === 0 ? null : "reviewer" }),
   nativeChatProfileArgv: () => [], assertNativeChatProfileCurrent: () => {}
 }));
 vi.mock("../src/setup/nativeValidationConfig.js", () => ({ resolveNativeValidationSelection: () => undefined }));
@@ -187,7 +190,7 @@ describe("P01 connected native chat behavior", () => {
     seam.answers = []; seam.commands = []; seam.results = []; seam.signals = []; seam.stdins = [];
     seam.cancelWhileApproving = false; seam.abortedAtKill = false; seam.questionSignal = undefined;
     seam.preview = ""; seam.selectionChecks = 0; seam.changedSelectionAt = 0; seam.cancelApproval.mockClear(); seam.closeApproval.mockClear();
-    seam.withdrawCalls = []; seam.withdrawStatus = "withdrawn";
+    seam.withdrawCalls = []; seam.withdrawStatus = "withdrawn"; seam.presetOptions = {}; seam.reviewers = 0;
     logs = []; errors = []; streams = []; sequence = []; fail.mockReset();
     vi.spyOn(process.stderr, "write").mockImplementation(chunk => {
       streams.push(String(chunk)); sequence.push(`stream:${String(chunk)}`); return true;
@@ -204,6 +207,33 @@ describe("P01 connected native chat behavior", () => {
       log: line => { logs.push(line); sequence.push(`log:${line}`); }, error: line => errors.push(line), fail
     });
   }
+
+  // SH-SANDBOX-04 in chat: an explicit --approval-mode replaces a preset's approveTools, as agent-loop run does; only
+  // an explicit --approve-tools or --approve-risk beside the mode is refused. A gating mode's requests are reviewed here.
+  it("an explicit --approval-mode replaces the preset's approveTools gate and this terminal reviews the mode's requests", async () => {
+    seam.presetOptions = { approveTools: "WRITE_HIGH" };
+    seam.answers = ["task", "/exit"];
+    seam.results = [{ code: 0, body: summary() }];
+    await run({ approvalMode: "default" });
+    expect(fail).not.toHaveBeenCalled();
+    expect(logs.join("\n")).toContain("Approval mode default replaces the preset's approveTools WRITE_HIGH.");
+    expect(seam.commands).toHaveLength(1);
+    expect(option(seam.commands[0]!, "--approval-mode")).toBe("default");
+    expect(seam.commands[0]).not.toContain("--approve-tools");
+    expect(seam.commands[0]).toContain("--interactive-approvals");
+    expect(seam.reviewers).toBe(1);
+  });
+
+  it("refuses an explicit --approve-tools or --approve-risk beside --approval-mode, with or without a preset", async () => {
+    for (const extra of [{ approveTools: "WRITE_HIGH" }, { approveRisk: "low" }]) {
+      fail.mockReset(); errors = []; seam.commands = [];
+      seam.presetOptions = { approveTools: "WRITE_LOW" };
+      await run({ approvalMode: "default", ...extra });
+      expect(fail).toHaveBeenCalledTimes(1);
+      expect(errors.join("\n")).toContain("--approval-mode composes its own gate");
+      expect(seam.commands).toEqual([]);
+    }
+  });
 
   it("rechecks selected history before task dispatch and refuses a newly stale session", async () => {
     seam.answers = ["/resume", "1", "resume", "explicit task", "/exit"];

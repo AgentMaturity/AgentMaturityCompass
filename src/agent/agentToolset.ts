@@ -37,6 +37,8 @@ import {
   toolhubAllowlistGuard
 } from "../tools/guards/policyGuards.js";
 import { actionPolicyGuard, actionPolicyMode, actionPolicyState, type ActionPolicyState } from "../tools/guards/actionPolicyGuard.js";
+import { approvalModeGatedClasses, approvalModeNarrowing, type ApprovalMode } from "../approvals/approvalModes.js";
+import { redactionCountsFor, secretRedactionFilter } from "../shield/redaction/toolOutputRedaction.js";
 import { compiledApprovalClasses, compiledPolicyFacts, compiledPolicyGuard, compiledPolicyShows, planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
 import { ToolPipeline } from "../tools/toolPipeline.js";
 import type { ActionClass } from "../types.js";
@@ -69,6 +71,14 @@ import { NATIVE_BUILTIN_CAPABILITIES, NATIVE_DELEGATION_CAPABILITIES, selectSupp
  * is how one of them eventually gets left out.
  */
 
+/** SIMULATE when either narrowing says so: a mode composes with the Action Policy and neither can widen the other. */
+function composeNarrowing(policy: ReturnType<typeof actionPolicyMode>, mode: ReturnType<typeof approvalModeNarrowing> | null): ReturnType<typeof actionPolicyMode> {
+  return call => {
+    const narrowed = policy(call);
+    return narrowed === "SIMULATE" || mode === null ? narrowed : mode({ actionClass: call.actionClass, requestedMode: narrowed });
+  };
+}
+
 export interface AgentToolsetOptions {
   /** Explicit interactive authority; an argv-bound bash approval cannot supply this grant. */
   readonly nativeTerminal?: NativeTerminalHostOptions;
@@ -93,6 +103,12 @@ export interface AgentToolsetOptions {
   readonly unconfinedShell?: ExplicitShellOptIn;
   /** Set only for a delegated child: the parent's decision (null when unknown), which the child can never widen. */
   readonly parentShell?: NativeShellReadiness | null;
+  /**
+   * The operator's approval mode (SH-SANDBOX-04). Only `plan` changes the toolset: every EXECUTE outside READ_ONLY
+   * enters as SIMULATE, composed with the signed Action Policy's own narrowing (never wider than either). A delegated
+   * child is composed under its parent's mode.
+   */
+  readonly approvalMode?: ApprovalMode;
   /**
    * Enables the `delegate` tool (P6.1a).
    *
@@ -339,6 +355,16 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     // P0-57: a misplaced checkpoint root is its own refusal; restoring .amc/control-plan/ would not fix it.
     if (error instanceof ControlCheckpointRootInWorkspaceError) throw error;
     throw new Error(`Refusing to start: the active compiled policy cannot be verified (${error instanceof Error ? error.message : String(error)}). Restore .amc/control-plan/ from backup, or recompile and reactivate with amc catalog compile --activate (docs/catalog/COMPILER.md)`);
+  }
+  // SH-SANDBOX-04: under a compiled policy every class in approvalRequiredFor needs a signed approval. A mode that leaves
+  // such a class unasked (accept-edits with WRITE_LOW) could only deny every call in it as approval_missing; refuse by name.
+  if (options.approvalMode !== undefined) {
+    const gated = approvalModeGatedClasses(options.approvalMode);
+    const unasked = gated === null ? [] : [...compiledApprovalClasses(compiled)].filter(actionClass => !gated.has(actionClass as ActionClass)).sort();
+    if (unasked.length > 0) {
+      throw new Error(`--approval-mode ${options.approvalMode} leaves ${unasked.join(", ")} unasked, but the active compiled policy requires a signed approval for `
+        + `${unasked.length === 1 ? "it" : "them"}; use default or untrusted, or --approve-tools`);
+    }
   }
   // P1-67: bound only when the pinned plan's identity-binding requires a lease (L0-IDN-01); otherwise records bind as before.
   const leaseToken = planRequiresAgentLease(compiled) ? options.leaseToken : undefined;
@@ -604,7 +630,9 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     workspace,
     ...(options.mode ? { mode: options.mode } : {}),
     journal: () => (journal ??= openActionJournal(workspace)),
-    narrowMode: actionPolicyMode(workspace),
+    // SH-SANDBOX-06: every tool's output (and a thrown body's message) has its secrets replaced before the outcome exists.
+    filters: [secretRedactionFilter],
+    narrowMode: composeNarrowing(actionPolicyMode(workspace), options.approvalMode === undefined ? null : approvalModeNarrowing(options.approvalMode)),
     // Under a compiled policy every call is bound to a record, and its approval classes need a signed approval.
     ...(compiled ? { authorizeClasses: new Set<string>(ACTION_CLASSES), boundApprovalRequiredFor: compiledApprovalClasses(compiled) } : {}),
     // Read per call: the CLI binds its session writer after composing.
@@ -645,6 +673,12 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
         rawLedger().appendEvidenceBatch(evidence.map((row) => ({ sessionId: options.sessionId, runtime: "amc" as const,
           eventType: row.eventType, payload: row.payload, payloadExt: "json" as const, meta: row.meta })));
       });
+      // Counts by type only, never the text; written through the same latching path as the call's own rows.
+      const redacted = redactionCountsFor(execution);
+      if (redacted !== null) {
+        recordAudit({ schemaVersion: "2026-11-07", auditType: "TOOL_OUTPUT_REDACTED", tool: execution.name, actionClass: execution.actionClass,
+          counts: redacted, sessionId: options.sessionId, agentId: execution.agentId, callId: execution.callId, rootCallId: execution.rootCallId, token: execution.token });
+      }
     }
   });
 

@@ -22,7 +22,7 @@ test.each(["CLI", "SDK"] as const)("actual built %s distinguishes completed turn
   initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" }); initBudgets(workspace, "default");
   writeFileSync(checks, JSON.stringify({ schemaVersion: 1, checks: [{ id: "public", title: "Public check", command: "printf unexpected > must-not-run", timeoutMs: 1000 }] }));
   const config = loadNativeValidationConfiguration(checks);
-  const env = { HOME: home, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass, AMC_CONTROL_CHECKPOINT_DIR: join(scratch, "checkpoints"), NO_COLOR: "1" };
+  const env = { HOME: home, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass, AMC_CONTROL_CHECKPOINT_DIR: join(scratch, "checkpoints"), NO_COLOR: "1", AMC_TRUST_WORKSPACE: "1" };
   const cli = resolve("dist/cli.js");
   expect(existsSync(cli), "Build the coordinated candidate first.").toBe(true);
   let summary: AgentRunSummary;

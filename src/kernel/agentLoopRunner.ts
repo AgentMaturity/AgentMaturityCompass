@@ -40,6 +40,7 @@
 import { Context } from "./amcRuntime.js";
 import { randomUUID } from "node:crypto";
 import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "../agent/approvalGate.js";
+import type { ApprovalMode } from "../approvals/approvalModes.js";
 import type { AgentLoopConfig, AgentStatus, CancelOptions, InboxReceipt, LoopHooks, LoopNotification } from "../agent/loopTypes.js";
 import type { LoopRoute } from "../agent/stepRunner.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "../agent/toolSeam.js";
@@ -234,6 +235,8 @@ export interface ComposedTurnOptions {
    * row, so the claim is derived from the gate rather than configured beside it.
    */
   readonly approvalGate?: ComposedApprovalGate;
+  /** The operator's approval mode (SH-SANDBOX-04), inherited by every delegated child this turn composes. */
+  readonly approvalMode?: ApprovalMode;
   /** The prompt that opens the turn. Enters the durable inbox like any other message. */
   readonly prompt: string;
   /** Original image bytes, captured before asynchronous composition and queued durably. */
@@ -391,7 +394,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     if (options.resume !== undefined || options.forkFrom !== undefined || options.keepOpen
       || options.delegation !== undefined || options.tools !== undefined || options.validation !== undefined
       || options.onSteer !== undefined || options.prompt !== "" || images.length > 0 || options.approvalGate === undefined
-      || (options.approvalGate.answerers?.length ?? 0) > 0 || options.approvalGate.toolNames !== undefined) {
+      || (options.approvalGate.answerers?.length ?? 0) > 0 || options.approvalGate.toolNames !== undefined
+      || options.approvalGate.gatesClasses !== undefined || options.approvalGate.exemptToolNames !== undefined) {
       throw new Error("A native schedule pass requires a fresh owned session, native leaf runners and the actual all-tools signed approval gate. Resume, custom runners/tools, validation, approval exceptions and ordinary prompts are not schedule admission.");
     }
     if (!Number.isSafeInteger(options.schedulePass.now) || options.schedulePass.now < 0) throw new Error("Invalid native schedule clock.");
@@ -575,6 +579,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           policyDigest: policyDigestOf(options),
           ...(options.config === undefined ? {} : { config: options.config }),
           ...(gate === undefined ? {} : { approvalGate: gate }),
+          ...(options.approvalMode === undefined ? {} : { approvalMode: options.approvalMode }),
           ...(options.parentShell === undefined ? {} : { parentShell: options.parentShell }),
           ...(options.leaseToken === undefined ? {} : { leaseToken: options.leaseToken }),
           ...(options.delegation === undefined ? {} : { grantDelegation: { runner: runNative,

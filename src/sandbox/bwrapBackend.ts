@@ -5,6 +5,7 @@ import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { runProcess } from "../exec/runProcess.js";
 import { PROCESS_LIMIT_LIMITATION, ROOT_PROCESS_LIMIT_LIMITATION, processLimit, withProcessLimit } from "./processCap.js";
 import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTypes.js";
+import { shellSecretPaths } from "./shellSecretPaths.js";
 
 const BWRAP = "/usr/bin/bwrap";
 const RUNTIME_ROOTS = ["/usr", "/bin", "/lib", "/lib64"] as const;
@@ -132,6 +133,26 @@ export function linuxSocketDenyFilter(arch: "x64" | "arm64"): Buffer {
   return bytes;
 }
 
+/**
+ * Masks for what the Linux shell must not read: the signed `readDeny` and the secret paths every confined shell is
+ * denied (src/sandbox/shellSecretPaths.ts: home credential stores, AMC's own home and secret files). Host paths outside
+ * the workspace are not mounted at all; one inside it (a workspace in the home directory, an AMC home or a passphrase
+ * file kept in the project) is masked, a directory by a read-only tmpfs and a file by /dev/null. A path under the
+ * runtime roots is refused rather than masked: /bin and /lib can alias /usr.
+ */
+export function bwrapReadMasks(workspace: string, readDeny: readonly string[], env: NodeJS.ProcessEnv = process.env): { ok: true; args: string[] } | { ok: false; reason: string } {
+  const masked = new Map<string, boolean>(); // real path -> is a directory
+  for (const literal of new Set([...readDeny, ...shellSecretPaths(env)])) {
+    const path = existsSync(literal) ? realpathSync(literal) : literal;
+    if ([...RUNTIME_ROOTS, ...RUNTIME_FILES].some(root => within(root, path))) return { ok: false, reason: "Linux shell readDeny and AMC's secret paths cannot be under system runtime paths." };
+    if (within(workspace, path) && existsSync(path)) masked.set(path, statSync(path).isDirectory());
+  }
+  // A path under a masked directory is hidden with it. Masking it as well would ask Bubblewrap for a mount point inside
+  // the read-only tmpfs, which fails the launch (measured: an AMC home and its credentials file both inside the workspace).
+  const outer = [...masked].filter(([path]) => ![...masked].some(([other, directory]) => directory && other !== path && within(other, path)));
+  return { ok: true, args: outer.flatMap(([path, directory]) => directory ? ["--tmpfs", path, "--remount-ro", path] : ["--ro-bind", "/dev/null", path]) };
+}
+
 /** Only the launcher's separate status descriptor can establish successful setup. */
 export function bwrapCommandExit(status: string): number | null {
   let child: number | null = null;
@@ -218,13 +239,9 @@ export function bwrapBackend(): SandboxBackend {
         bind(workspace, workspace, false);
         // Nested writable binds are applied from outermost to innermost.
         for (const root of writableRoots.sort((a, b) => a.length - b.length)) bind(root, root, true);
-        // Mask signed readDeny paths in the workspace; other host paths are not mounted at all.
-        // Runtime roots are refused rather than masked: /bin and /lib can alias /usr.
-        for (const path of policy.readDeny ?? []) {
-          if ([...RUNTIME_ROOTS, ...RUNTIME_FILES].some(root => within(root, path))) return declined("Linux shell readDeny cannot name system runtime paths.");
-          if (!within(workspace, path) || !existsSync(path)) continue;
-          args.push(...(statSync(path).isDirectory() ? ["--tmpfs", path, "--remount-ro", path] : ["--ro-bind", "/dev/null", path]));
-        }
+        const masks = bwrapReadMasks(workspace, policy.readDeny ?? []);
+        if (!masks.ok) return declined(masks.reason);
+        args.push(...masks.args);
         const limit = policy.maxProcesses === undefined ? null : processLimit(policy.maxProcesses);
         const capped = limit !== null && process.geteuid?.() !== 0 ? limit : null; // the kernel exempts root from RLIMIT_NPROC
         args.push("--tmpfs", join(workspace, ".amc"), "--chmod", "000", join(workspace, ".amc"), "--remount-ro", join(workspace, ".amc"),

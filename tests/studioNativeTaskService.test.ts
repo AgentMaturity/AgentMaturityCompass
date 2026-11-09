@@ -49,7 +49,8 @@ afterEach(async () => {
 });
 function service(workspace = root, extraEnvironment: Record<string, string> = {}): NativeTaskService {
   const value = createService({ workspace, credentialsHome: credentialHome, credentialsFile: join(credentialHome, ".credentials.yaml"),
-    environment: { HOME: credentialHome, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass, ...extraEnvironment } });
+    // The workspace was initialised under the test runner's AMC home; Studio's credentials home never committed its keys, so the operator consents (SH-SANDBOX-07).
+    environment: { HOME: credentialHome, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass, AMC_TRUST_WORKSPACE: "1", ...extraEnvironment } });
   services.push(value); return value;
 }
 function input(prompt = "Record this synthetic native Studio turn."): NativeTaskStart {
@@ -421,7 +422,7 @@ test("a physical workspace alias runs the same native session, while a different
   const unrelated = join(root, "different-workspace"); mkdirSync(unrelated);
   const child = spawn(process.execPath, [resolve("dist/cli.js"), "acp", "--provider", "stub", "--credentials-mode", "operator-only",
     "--credentials-home", credentialHome, "--credentials-file", join(credentialHome, ".credentials.yaml")], {
-    cwd: root, env: { HOME: credentialHome, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass }, stdio: "pipe"
+    cwd: root, env: { HOME: credentialHome, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass, AMC_TRUST_WORKSPACE: "1" }, stdio: "pipe"
   });
   child.stderr.resume(); let buffer = "";
   const frames: Array<{ id?: number; error?: { code?: number }; result?: unknown }> = [];

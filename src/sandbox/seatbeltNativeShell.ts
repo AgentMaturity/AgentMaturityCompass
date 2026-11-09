@@ -1,11 +1,12 @@
 import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { homedir, tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { tmpdir } from "node:os";
+import { dirname, join, resolve } from "node:path";
 import { runProcess } from "../exec/runProcess.js";
 import { admitWritableDirectory, within } from "./bwrapBackend.js";
 import { startShellEgressProxy, type ShellEgressProxy } from "./egress/shellEgressProxy.js";
 import { PROCESS_LIMIT_LIMITATION, ROOT_PROCESS_LIMIT_LIMITATION, processLimit, withProcessLimit } from "./processCap.js";
 import { realOrLiteral, sbplString } from "./seatbeltBackend.js";
+import { shellSecretPaths } from "./shellSecretPaths.js";
 import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTypes.js";
 
 /**
@@ -33,10 +34,6 @@ import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTyp
  * and the outcome is not confined.
  */
 const SANDBOX_EXEC = "/usr/bin/sandbox-exec";
-
-/** Home-relative secrets every macOS shell is denied, before the signed `readDeny`. */
-export const MACOS_SECRET_PATHS = [".ssh", ".aws", ".config/gcloud", ".azure", ".gnupg", ".kube", ".docker",
-  ".netrc", ".npmrc", "Library/Keychains", ".amc"] as const;
 
 /** The only Mach services the shell may look up: temp-dir helper, logging, notifications, user and group lookups. */
 export const MACOS_MACH_SERVICES = ["com.apple.bsd.dirhelper", "com.apple.logd", "com.apple.system.notification_center",
@@ -71,13 +68,25 @@ export interface SeatbeltShellProfileInput {
 
 export function buildSeatbeltShellProfile(input: SeatbeltShellProfileInput): string {
   const subpaths = (paths: readonly string[]): string => paths.map(path => `(subpath "${sbplString(path)}")`).join(" ");
+  const denied = [join(input.workspace, ".amc"), ...input.denied];
+  const protectedParents = new Set<string>();
+  for (const path of denied) {
+    for (let parent = dirname(path); input.writableRoots.some(root => within(root, parent)); parent = dirname(parent)) {
+      protectedParents.add(parent);
+      if (parent === dirname(parent)) break;
+    }
+  }
   return [
     "(version 1)",
     ";; Reads stay open except the deny-list below.",
     "(allow default)",
     "(deny file-write*)",
     `(allow file-write* ${subpaths([...input.writableRoots, input.privateTmp])} (literal "/dev/null"))`,
-    `(deny file-read* file-write* ${subpaths([join(input.workspace, ".amc"), ...input.denied])})`,
+    `(deny file-read* file-write* ${subpaths(denied)})`,
+    // Denied paths are name-based. Renaming a writable parent would otherwise move the secret out of the deny-list.
+    ...(protectedParents.size === 0 ? [] : [
+      `(deny file-write-unlink ${[...protectedParents].map(path => `(literal "${sbplString(path)}")`).join(" ")})`
+    ]),
     ";; A hard link in a writable root to an outside file would write through to it.",
     "(deny file-link)",
     "(deny network*)",
@@ -148,8 +157,7 @@ export function seatbeltNativeShell(): SandboxBackend {
         launcher = mkdtempSync(join(taskParent, "amc-seatbelt-"));
         const privateTmp = join(launcher, "tmp");
         mkdirSync(privateTmp, { mode: 0o700 });
-        const home = realOrLiteral(homedir());
-        const denied = [...MACOS_SECRET_PATHS.map(path => realOrLiteral(join(home, path))), ...(policy.readDeny ?? []).map(realOrLiteral)];
+        const denied = [...shellSecretPaths(), ...(policy.readDeny ?? [])].map(realOrLiteral);
         const env: Record<string, string> = { PATH: process.env["PATH"] ?? "/usr/bin:/bin", HOME: privateTmp, TMPDIR: privateTmp, LANG: "en_US.UTF-8" };
         if (policy.allowHosts && policy.onEgress && policy.egressScope) {
           proxy = await startShellEgressProxy({ allowHosts: policy.allowHosts, record: policy.onEgress, ...policy.egressScope });

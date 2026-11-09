@@ -330,6 +330,7 @@ import {
 } from "./governor/actionPolicyEngine.js";
 import { initToolhubConfig } from "./toolhub/toolhubCli.js";
 import { registerToolsCommands } from "./cli-tools-commands.js";
+import { registerSandboxCommands } from "./cli-sandbox-commands.js";
 import { parseActionClasses, parseRiskTier } from "./workorders/workorderCli.js";
 import {
   createWorkOrderAsync,
@@ -6852,6 +6853,7 @@ registerVaultHistoryCommands(vault);
 const dlp = program.command("dlp").description("DLP scanner for PII and secrets");
 const notary = program.command("notary").description("AMC Notary signing boundary operations");
 const trust = program.command("trust").description("Trust mode and Notary enforcement configuration");
+registerSandboxCommands(program);
 const canon = program.command("canon").description("Compass Canon signed content operations");
 const cgx = program.command("cgx").description("Context Graph (CGX) build and verify operations");
 const diagnostic = program.command("diagnostic").description("Diagnostic bank/render operations");

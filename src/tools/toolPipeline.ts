@@ -117,7 +117,8 @@ export interface ToolAuthority {
  * asked on its own instead of riding on the `run_code` approval.
  */
 export interface BoundApprovalGate {
-  gates(toolName: string): boolean;
+  /** Whether the gate asks about this call, by name and signed class (SH-SANDBOX-04 modes gate by class). */
+  gates(call: { readonly name: string; readonly actionClass: ActionClass }): boolean;
   /** Asks about one sub-call. Resolves to the signed requests that granted it, or null when it was not granted. */
   ask(execution: ToolExecution, intent: AuthorizationIntentResult | null): Promise<ToolAuthority | null>;
 }
@@ -315,7 +316,7 @@ export class ToolPipeline {
       const invalid = argumentSchemaError(definition.parameters, draft.arguments);
       if (invalid !== null) return this.recordUnresolved(input, definition.actionClass, thrownOutcome(invalid));
 
-      const gate = [...this.gates].reverse().find((candidate) => candidate.gates(draft.name));
+      const gate = [...this.gates].reverse().find((candidate) => candidate.gates({ name: draft.name, actionClass: definition.actionClass }));
       // A journaled sub-call must be admitted before its bound gate can ask. Other paths keep their existing entry order.
       const deferEntry = this.init.journal !== undefined && this.authorizes(definition.actionClass)
         && draft.parentToken !== null && gate !== undefined;
@@ -516,6 +517,13 @@ export class ToolPipeline {
     return recheck.ok ? null : recheck.failures.join(", ");
   }
 
+  /** A thrown body's message after the same output filters: an error that quotes a secret (a confined shell's stderr) is redacted too. */
+  private thrown(execution: ToolExecution, error: unknown): ToolOutcome {
+    const raw = thrownOutcome(error);
+    const output = (this.init.filters ?? []).reduce((text, filter) => filter(text, execution), raw.output);
+    return output === raw.output ? raw : { ...raw, output };
+  }
+
   /** The body's result after the output filters. A filter may rewrite output and nothing else. */
   private bodyOutcome(execution: ToolExecution, result: ToolBodyResult): ToolOutcome {
     // A body that states no result is a failed call, never a success by default (DXC-02).
@@ -559,7 +567,7 @@ export class ToolPipeline {
     try {
       return this.bodyOutcome(execution, await body(execution));
     } catch (error: unknown) {
-      return thrownOutcome(error);
+      return this.thrown(execution, error);
     }
   }
 
@@ -698,9 +706,9 @@ export class ToolPipeline {
     }
     let outcome: ToolOutcome;
     try {
-      outcome = "result" in settled ? this.bodyOutcome(execution, settled.result) : thrownOutcome(settled.error);
+      outcome = "result" in settled ? this.bodyOutcome(execution, settled.result) : this.thrown(execution, settled.error);
     } catch (error: unknown) {
-      outcome = thrownOutcome(error);
+      outcome = this.thrown(execution, error);
     }
     const verdict = effectVerdict(execution.actionClass, settled);
     try {

@@ -13,6 +13,7 @@
  */
 import { readFileSync } from "node:fs";
 import { withControlFileLock, withControlFileLockAsync } from "../lifecycle/controlFileLock.js";
+import { denySessionSecretPaths } from "../sandbox/shellSecretPaths.js";
 import { type CredentialRef, credentialRef, credentialRefName } from "./credentialRef.js";
 import { describeCredentialLayers, resolveCredentialLayers } from "./credentialResolution.js";
 import type { CredentialDescription, CredentialSource } from "./credentialSources.js";
@@ -118,6 +119,9 @@ export class LocalCredentialsService implements CredentialsService {
   constructor(options: LocalCredentialsOptions = {}) {
     this.includeDotenv = options.includeDotenv !== false;
     this.paths = resolveCredentialsPaths(options);
+    // SH-SANDBOX-08: a store chosen by option (`--credentials-home`, `--credentials-file`, the SDK's and ACP's) is as
+    // secret as one chosen by environment, and nothing in process.env names it: every confined shell denies it from now on.
+    denySessionSecretPaths([this.paths.homeDir, this.paths.file]);
     this.env = options.env ?? process.env;
     this.lockTimeoutMs = options.lockTimeoutMs ?? DEFAULT_LOCK_TIMEOUT_MS;
     this.onUpdate = options.onUpdate ?? null;

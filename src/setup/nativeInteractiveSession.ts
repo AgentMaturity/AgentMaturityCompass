@@ -1,10 +1,13 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { createInterface } from "node:readline";
 import { resolve } from "node:path";
+import { admitWorkspaceTrust } from "../cli-agent-options.js";
+import { TRUST_WORKSPACE_ENV } from "../security/workspaceTrust.js";
 import { renderNativeRunUsage } from "../agent/nativeRunUsage.js";
 import { renderNativeRunDiagnostics } from "../agent/nativeFailureGuidance.js";
 import { parseNativeChatResult, type NativeChatChildSummary } from "./nativeChatResult.js";
 import { isActionClass } from "../governor/actionCatalog.js";
+import { approvalModeGatedClasses, parseApprovalMode } from "../approvals/approvalModes.js";
 import { reviewNativeMcpConfigurations, NativeMcpConfigError } from "./nativeMcpConfig.js";
 import { mergeScopedMcpSelection } from "../mcp/mcpScopes.js";
 import { inspectNativeFirstUse, NATIVE_FIRST_USE_PROVIDER_LIST, renderNativeFirstUseGuide, renderNativeGuideCommand } from "./nativeFirstUseGuide.js";
@@ -40,8 +43,11 @@ export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly mcp?: readonly string[];
   readonly approveTools?: string;
   readonly approveRisk?: string;
+  /** SH-SANDBOX-04: forwarded verbatim to every turn's child run, which validates and composes it. */
+  readonly approvalMode?: string;
   readonly tools?: string;
   readonly unsafeUnconfinedShell?: boolean;
+  readonly trustWorkspace?: boolean;
   readonly webSearchSearxng?: string;
   readonly maxTokens?: string;
   readonly thinking?: string;
@@ -75,10 +81,14 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
   if (options.session !== undefined && options.forkFrom !== undefined) {
     io.error("Choose --session or --fork-from, not both."); io.fail(); return;
   }
+  const trust = admitWorkspaceTrust(io, options, options.workspace);
+  if (trust === undefined) return;
   let profile: ReturnType<typeof resolveNativeChatProfile>;
   let validation: ReturnType<typeof resolveNativeValidationSelection>;
+  // Captured before the preset's values merge in: an explicit --approve-tools/--approve-risk beside a mode is refused, a preset's is replaced.
+  const explicitApproval = { tools: options.approveTools, risk: options.approveRisk };
   try {
-    profile = resolveNativeChatProfile(options);
+    profile = resolveNativeChatProfile(options, trust.presetsDigest);
     options = { ...options, ...profile.effectiveOptions };
     validation = resolveNativeValidationSelection(options);
   } catch (error) {
@@ -154,8 +164,11 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     const ipc = interactiveApprovals || display.askUser === true;
     let running: ChildProcess;
     try {
+      // Consent is recorded at chat admission. Later turns must never approve a changed workspace themselves.
+      const env = { ...process.env };
+      if (args[0] === "agent-loop" && args[1] === "run") delete env[TRUST_WORKSPACE_ENV];
       running = spawn(process.execPath, [...process.execArgv, resolve(entry), ...(selectedAgentId === null ? [] : ["--agent", selectedAgentId]), ...args], {
-        cwd, env: process.env, shell: false,
+        cwd, env, shell: false,
         stdio: [display.stdin === undefined ? "ignore" : "pipe", "pipe", "pipe", ...(ipc ? ["ipc" as const] : [])]
       });
     } catch { io.error("Could not start the AMC command."); resolveResult({ code: 1, stdout, truncated, cancelRequested }); return; }
@@ -263,8 +276,17 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         throw new Error("Anthropic thinking cannot continue a chat: anthropic-messages@4 cannot replay a signed thinking block, so the second turn would be refused before spend (D-01). Use agent-loop run --tools none for one thinking turn.");
       }
     } catch (error) { io.error(error instanceof Error ? error.message : "Invalid reasoning or route options."); io.fail(); return; }
-    const approvalClass = options.approveTools?.trim().toUpperCase();
-    const approvalRisk = (options.approveRisk ?? "high").trim().toLowerCase();
+    const approvalMode = options.approvalMode === undefined ? undefined : parseApprovalMode(options.approvalMode);
+    if (approvalMode !== undefined && !approvalMode.ok) { io.error(approvalMode.reason); io.fail(); return; }
+    if (approvalMode !== undefined && (explicitApproval.tools !== undefined || explicitApproval.risk !== undefined)) {
+      io.error("--approval-mode composes its own gate; it cannot be combined with --approve-tools or --approve-risk."); io.fail(); return;
+    }
+    // As `agent-loop run`: an explicit mode replaces a preset's approveTools gate (docs/APPROVALS.md precedence).
+    const approvalClass = approvalMode === undefined ? options.approveTools?.trim().toUpperCase() : undefined;
+    const approvalRisk = (approvalMode === undefined ? options.approveRisk ?? "high" : "high").trim().toLowerCase();
+    if (approvalMode !== undefined && options.approveTools !== undefined) io.log(`Approval mode ${approvalMode.ok ? approvalMode.mode : ""} replaces the preset's approveTools ${options.approveTools}.`);
+    // A mode other than plan composes a gate in the child run, so this terminal reviews its requests too.
+    const modeGated = approvalMode !== undefined && approvalMode.ok && approvalModeGatedClasses(approvalMode.mode) !== null;
     if ((approvalClass !== undefined && !isActionClass(approvalClass)) ||
         !["low", "medium", "high", "critical"].includes(approvalRisk) ||
         (options.approveRisk !== undefined && approvalClass === undefined)) {
@@ -303,11 +325,13 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       ...(options.contextWindow === undefined ? [] : ["--context-window", options.contextWindow]),
       ...(options.compactThreshold === undefined ? [] : ["--compact-threshold", options.compactThreshold]),
       ...(options.autoSummary === false ? ["--no-auto-summary"] : []), ...(options.autoCompact === false ? ["--no-auto-compact"] : []),
-      ...(approvalClass === undefined ? [] : ["--approve-tools", approvalClass, "--approve-risk", approvalRisk]), ...mcpArgs,
+      ...(approvalClass === undefined ? [] : ["--approve-tools", approvalClass, "--approve-risk", approvalRisk]),
+      ...(approvalMode === undefined || !approvalMode.ok ? [] : ["--approval-mode", approvalMode.mode]), ...mcpArgs,
       ...(validation === undefined ? [] : ["--validation-config", resolve(options.validationConfig!), "--validation-config-sha256", validation.configSha256,
         ...validation.checks.flatMap(check => ["--validate", check.id]),
         ...(validation.repair === undefined ? [] : ["--validation-repair", JSON.stringify(validation.repair)])])];
     const routeArgs = [...routeBaseArgs, ...nativeChatProfileArgv(profile)];
+    const chatProfileArgs = [...(options.trustWorkspace === true ? ["--trust-workspace"] : []), ...nativeChatProfileArgv(profile, "chat")];
     const showScope = () => {
       io.log(`Native chat · agent ${guide.agentId} · provider ${provider} · model ${guide.model}`);
       if (guide.baseUrl !== null) io.log(`Provider origin: ${guide.baseUrl}`);
@@ -319,6 +343,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         ? "Workspace tools enabled explicitly. The existing signed allowlist and governor still control access; no approval or policy bypass is added."
         : tools === "echo" ? "Echo demonstration tool only; no workspace editing tool is offered."
           : "No tools offered; model replies cannot edit workspace files through this session.");
+      if (approvalMode !== undefined && approvalMode.ok) io.log(`Approval mode: ${approvalMode.mode}${modeGated ? ". This terminal asks you to review actual queued requests using an existing authenticated reviewer session; quorum still applies." : " (nothing executes: every call outside READ_ONLY is simulated)."}`);
       if (approvalClass !== undefined) io.log(`Tool approval gate: ${approvalClass}, risk ${approvalRisk}. This terminal asks you to review actual queued requests using an existing authenticated reviewer session; quorum still applies.`);
       if (mcpArgs.length > 0) io.log("MCP tools use each reviewed catalog and pinned config. Each turn starts and disposes its own configured servers; a changed catalog or config refuses the run. /mcp shows each mount.");
       if (extensions.list().length > 0) io.log(`Signed native extensions: ${extensions.list().map(item => item.id).join(", ")}. /extensions lists their commands and reviewed digests.`);
@@ -529,10 +554,10 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       const priorSession = sessionId;
       const pendingFork = forkFrom;
       const outcome = await execute(["agent-loop", "run", ...routeArgs, ...nativeExtensionRunArgv(extensions),
-        ...(approvalClass === undefined ? [] : ["--interactive-approvals"]), ...(tools === "workspace" ? ["--interactive-ask-user"] : []),
+        ...(approvalClass === undefined && !modeGated ? [] : ["--interactive-approvals"]), ...(tools === "workspace" ? ["--interactive-ask-user"] : []),
         "--keep-open", "--json", "--stream",
         ...(forkFrom !== null ? ["--fork-from", forkFrom] : sessionId === null ? [] : ["--session", sessionId]), "--", "-"],
-        { interactiveApprovals: approvalClass !== undefined, askUser: tools === "workspace", stream: true, stdin: prompt });
+        { interactiveApprovals: approvalClass !== undefined || modeGated, askUser: tools === "workspace", stream: true, stdin: prompt });
       const result = parseNativeChatResult({ stdout: outcome.stdout, truncated: outcome.truncated,
         requestedSessionId: priorSession, forkFrom: pendingFork, previousSummary });
       if (!result.ok) {
@@ -571,12 +596,12 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     if (forkFrom !== null) {
       if (unresolvedOutcome) io.error("The attempted fork has no admitted child result. Do not repeat it blindly; inspect the parent's recorded lineage before choosing a continuation.");
       else {
-        io.log("The fork remains queued, not created. To continue that selection in this workspace:\n  " + renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "chat", ...routeBaseArgs, ...nativeChatProfileArgv(profile, "chat"), ...nativeExtensionRunArgv(extensions), "--fork-from", forkFrom] }));
+        io.log("The fork remains queued, not created. To continue that selection in this workspace:\n  " + renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "chat", ...routeBaseArgs, ...chatProfileArgs, ...nativeExtensionRunArgv(extensions), "--fork-from", forkFrom] }));
       }
     }
     if (sessionId !== null) {
       io.log(`Known session reference: ${sessionId}. A resume attempt will verify the evidence before acquiring its writer.`);
-      io.log("Resume in this workspace:\n  " + renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "chat", ...routeBaseArgs, ...nativeChatProfileArgv(profile, "chat"), ...nativeExtensionRunArgv(extensions), "--session", sessionId] }));
+      io.log("Resume in this workspace:\n  " + renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "chat", ...routeBaseArgs, ...chatProfileArgs, ...nativeExtensionRunArgv(extensions), "--session", sessionId] }));
       io.log("Verify recorded evidence:\n  " + renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "verify", sessionId] }));
     }
   } finally {

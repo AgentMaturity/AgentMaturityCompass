@@ -114,6 +114,17 @@ describe("apply_patch", () => {
     if (existsSync(h.path("u.txt"))) expect(h.text("u.txt")).toBe("x\n");
   });
 
+  it("refuses a redaction placeholder in added patch content before writing any file", async () => {
+    const h = harness();
+    h.put("a.txt", "original\n");
+    await h.read("a.txt");
+    const outcome = await h.apply(patch("*** Add File: b.txt\n+normal\n*** Update File: a.txt\n@@\n-original\n+[AMC_REDACTED:api-key]"));
+    expect(outcome.ok).toBe(false);
+    expect(outcome.output).toContain("redaction placeholder");
+    expect(h.text("a.txt")).toBe("original\n");
+    expect(existsSync(h.path("b.txt"))).toBe(false);
+  });
+
   it("refuses a file changed after it was read, before any write", async () => {
     const h = harness();
     h.put("a.txt", "a\n"); h.put("b.txt", "b\n");

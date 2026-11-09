@@ -73,11 +73,20 @@ export interface ToolApprovalGateOptions {
    * the operator's deliberate NARROWING, and it is visible in the composition.
    */
   readonly toolNames?: readonly string[];
+  /**
+   * Which action classes are gated (SH-SANDBOX-04 approval modes). OMITTED MEANS ALL OF THEM, like `toolNames`. A tool
+   * whose class the seam cannot name is gated: an unknown class is never the ungated one.
+   */
+  readonly gatesClasses?: ReadonlySet<ActionClass>;
+  /** Tools never asked about even when their class is gated (a mode's `ask_user`). */
+  readonly exemptToolNames?: readonly string[];
 }
 
-/** Whether this call must be approved. Omitting the list gates everything. */
-function isGated(options: ToolApprovalGateOptions, toolName: string): boolean {
-  return options.toolNames === undefined || options.toolNames.includes(toolName);
+/** Whether this call must be approved. Omitting both lists gates everything; a class nobody can name is gated. */
+export function isGated(options: ToolApprovalGateOptions, toolName: string, actionClass: ActionClass | null): boolean {
+  if (options.exemptToolNames?.includes(toolName)) return false;
+  if (options.toolNames !== undefined && !options.toolNames.includes(toolName)) return false;
+  return options.gatesClasses === undefined || actionClass === null || options.gatesClasses.has(actionClass);
 }
 
 /** What the model is told when permission was not granted. */
@@ -126,8 +135,12 @@ export function gateToolCallsOnApproval(
   approval: ToolApprovalSeam,
   options: ToolApprovalGateOptions
 ): AgentToolSeam {
+  const classOf = (toolName: string): ActionClass | null => {
+    const reviewed = options.reviewedActionClasses;
+    return reviewed && Object.hasOwn(reviewed, toolName) ? reviewed[toolName]! : inner.actionClassOf?.(toolName) ?? null;
+  };
   inner.bindApprovalGate?.({
-    gates: (toolName) => isGated(options, toolName),
+    gates: (call) => isGated(options, call.name, call.actionClass),
     ask: async (execution, intent) => {
       const decision = await ask(approval, options, { callId: execution.callId, toolName: execution.name, intent,
         where: `from inside the program of call ${execution.rootCallId}`, signal: execution.signal,
@@ -140,11 +153,12 @@ export function gateToolCallsOnApproval(
     ...(inner.supportsEffectGuard === true ? { supportsEffectGuard: true as const } : {}),
     ...(inner.shutdown === undefined ? {} : { shutdown: () => inner.shutdown!() }),
     ...(inner.hasOwnedWork === undefined ? {} : { hasOwnedWork: () => inner.hasOwnedWork!() }),
+    ...(inner.actionClassOf === undefined ? {} : { actionClassOf: (toolName: string) => inner.actionClassOf!(toolName) }),
     schemas: (): readonly ToolSchema[] | null => inner.schemas(),
     executionMode: (request: ToolCallRequest): "parallel" | "exclusive" =>
       inner.executionMode(request),
     execute: async (request: ToolCallRequest): Promise<ToolCallOutcome> => {
-      if (!isGated(options, request.toolName)) return inner.execute(request);
+      if (!isGated(options, request.toolName, classOf(request.toolName))) return inner.execute(request);
 
       const intent = inner.authorizationIntent?.(request) ?? null;
       // A call whose intent cannot bind is not put to a human: the pipeline denies it with the reason.

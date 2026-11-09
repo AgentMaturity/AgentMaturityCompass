@@ -69,6 +69,7 @@ export interface AMCNativeClientOptions {
     readonly agentId?: string;
     readonly tools?: "none" | "workspace";
     readonly allowUnconfinedShell?: boolean;
+    readonly trustWorkspace?: boolean;
     readonly expectedToolsDigest?: string;
     readonly validationConfig?: string;
     readonly validationConfigSha256?: string;
@@ -385,6 +386,7 @@ export interface AgentSessionInit {
     readonly tools?: "none" | "workspace";
     readonly expectedToolsDigest?: string;
     readonly unconfinedShell?: ExplicitShellOptIn;
+    readonly trustWorkspace?: boolean | TrustConsentSource;
     readonly leaseToken?: string;
     readonly additionalCapabilities?: readonly NativeToolCapability[];
     readonly askUser?: AgentToolsetOptions["askUser"];

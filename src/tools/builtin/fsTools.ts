@@ -7,7 +7,7 @@ import type { ToolDefinition, ToolExecution } from "../toolTypes.js";
 import type { ReadBeforeEditLedger } from "./readBeforeEdit.js";
 import { planLiteralEdits, type LiteralEdit } from "./fsEditPlan.js";
 import { scanRegularFile } from "./fsRegularFile.js";
-import { readBeforeWrite, refuseBeforeWrite, shownDiff, utf8, writeIfUnchanged, writeTarget } from "./fsWritePrimitives.js";
+import { readBeforeWrite, refuseBeforeWrite, refuseRedactionPlaceholder, shownDiff, utf8, writeIfUnchanged, writeTarget } from "./fsWritePrimitives.js";
 import { insideWorkspace } from "./workspacePath.js";
 
 export { insideWorkspace } from "./workspacePath.js";
@@ -189,6 +189,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
       },
       body: (execution) => {
         const args = writeArgs.parse(execution.arguments);
+        refuseRedactionPlaceholder(args.content, "fs.write");
         const { full, rel } = writeTarget(execution.workspace, args.path);
         const before = readBeforeWrite(full, args.path);
         const verdict = ledger.mayWrite(execution.agentId, full, before === null ? undefined : sha256Hex(before));
@@ -247,6 +248,9 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
       },
       body: (execution) => {
         const args = editArgs.parse(execution.arguments);
+        // SH-SANDBOX-06: an argument check, so it comes before any policy verdict names another reason.
+        const edits = editsOf(args);
+        for (const edit of edits) refuseRedactionPlaceholder(edit.replace, "fs.edit");
         const { full, rel } = writeTarget(execution.workspace, args.path);
         // Read before the policy check, and write only if the file still holds
         // these bytes: the plan, the diff and the evidence all describe them.
@@ -260,7 +264,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
         }
         let plan;
         try {
-          plan = planLiteralEdits(before, editsOf(args), args.path);
+          plan = planLiteralEdits(before, edits, args.path);
         } catch (error) {
           throw refuseBeforeWrite(error instanceof Error ? error.message : String(error));
         }

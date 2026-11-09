@@ -1,5 +1,6 @@
 import { unlinkSync } from "node:fs";
 import { redactSecrets } from "../../shield/redaction/redactSecrets.js";
+import { containsRedactionPlaceholder, REDACTION_PLACEHOLDER_PREFIX } from "../../shield/redaction/toolOutputRedaction.js";
 import { sha256Hex } from "../../utils/hash.js";
 import type { ToolExecution } from "../toolTypes.js";
 import { DefiniteFailureError } from "../toolTypes.js";
@@ -79,6 +80,16 @@ export function shownDiff(rel: string, before: Buffer, after: Buffer): { readonl
 /** A refusal before any byte was written: provably no effect, so a journaled call records a definite failure. */
 export function refuseBeforeWrite(message: string): DefiniteFailureError {
   return new DefiniteFailureError(message);
+}
+
+/**
+ * SH-SANDBOX-06: tool output has its secrets replaced by `[AMC_REDACTED:<type>]`. Content carrying that placeholder was
+ * copied from a redacted read; writing it would put the placeholder over the real value on disk, silently.
+ */
+export function refuseRedactionPlaceholder(content: string, tool: string): void {
+  if (containsRedactionPlaceholder(content)) {
+    throw refuseBeforeWrite(`${tool} refused: the content contains an AMC redaction placeholder (${REDACTION_PLACEHOLDER_PREFIX}…]) copied from redacted tool output; writing it would replace a real value on disk. Edit around the redacted span instead.`);
+  }
 }
 
 /** The commit-time check both publication and deletion make: same location, same bytes the plan described. */

@@ -13,7 +13,7 @@
 
 ## CLI Commands
 
-AMC provides 1,299 public CLI command paths in the live command inventory.
+AMC provides 1,300 public CLI command paths in the live command inventory.
 
 | # | Command | Description |
 |---|---------|-------------|
@@ -1223,99 +1223,100 @@ AMC provides 1,299 public CLI command paths in the live command inventory.
 | 1204 | `amc trust init` | Create and sign .amc/trust.yaml — sets up the trust mode (SELF/NOTARY) that governs artifact signing |
 | 1205 | `amc trust resign` | Re-sign the current .amc/trust.yaml in place with the current artifact-seal key, keeping NOTARY settings |
 | 1206 | `amc trust status` | Show trust mode, signature status, and notary health |
-| 1207 | `amc truthguard` | Deterministic output truth-constraint validator |
-| 1208 | `amc truthguard validate` | Validate structured agent output claims against deterministic truth constraints |
-| 1209 | `amc tune` | Mechanic mode tuning wizard |
-| 1210 | `amc unknowns` | List known unknowns for an agent's latest diagnostic run |
-| 1211 | `amc up` | Start AMC control plane in one command (studio + gateway + bridge) |
-| 1212 | `amc upgrade` | Generate upgrade plan |
-| 1213 | `amc usage` | Usage and cost across native sessions from verified signed rows (tokens, cost, latency; unknowns stay unknown) |
-| 1214 | `amc user` | Multi-user RBAC account management |
-| 1215 | `amc user add` | Add a user with RBAC roles |
-| 1216 | `amc user init` | Initialize signed users.yaml with first OWNER user |
-| 1217 | `amc user list` | List RBAC users |
-| 1218 | `amc user password` | Set a new password for a console account; its signed-in sessions end |
-| 1219 | `amc user revoke` | Revoke a user account |
-| 1220 | `amc user role` | Set user roles |
-| 1221 | `amc user role set` | Replace roles for a user |
-| 1222 | `amc user verify` | Verify users.yaml signature |
-| 1223 | `amc value` | Value realization engine (contracts, scoring, ROI) |
-| 1224 | `amc value contract` | Value contract operations |
-| 1225 | `amc value contract apply` | Apply value contract from YAML/JSON file |
-| 1226 | `amc value contract init` | Create and sign value contract template |
-| 1227 | `amc value contract print` | Print value contract and signature status |
-| 1228 | `amc value contract verify` | Verify value contract signature |
-| 1229 | `amc value import` | Import numeric KPI points from CSV (ts,value) |
-| 1230 | `amc value ingest` | Ingest value webhook payload JSON |
-| 1231 | `amc value init` | Initialize signed value policy, default contract, and scheduler |
-| 1232 | `amc value policy` | Value policy operations |
-| 1233 | `amc value policy apply` | Apply signed value policy from YAML/JSON file |
-| 1234 | `amc value policy default` | Print default value policy JSON |
-| 1235 | `amc value policy print` | Print effective value policy JSON |
-| 1236 | `amc value report` | Generate signed value report |
-| 1237 | `amc value scheduler` | Value scheduler controls |
-| 1238 | `amc value scheduler disable` | Disable value scheduler |
-| 1239 | `amc value scheduler enable` | Enable value scheduler |
-| 1240 | `amc value scheduler run-now` | Run value scheduler now |
-| 1241 | `amc value scheduler status` | Show value scheduler status |
-| 1242 | `amc value snapshot` | Generate/load latest signed value snapshot |
-| 1243 | `amc value verify` | Verify value workspace signatures/artifacts |
-| 1244 | `amc value verify-policy` | Verify signed value policy |
-| 1245 | `amc vault` | Encrypted key vault operations |
-| 1246 | `amc vault classify` | Classify data sensitivity level |
-| 1247 | `amc vault dlp` | DLP scanner for PII and secrets |
-| 1248 | `amc vault dlp scan` | Scan text for PII and secrets |
-| 1249 | `amc vault dsar` | Persistent DSAR (Data Subject Access Request) workflow |
-| 1250 | `amc vault dsar complete` | Mark a DSAR request complete and append an audit event |
-| 1251 | `amc vault dsar list` | List persistent DSAR requests |
-| 1252 | `amc vault dsar status` | Show a persistent DSAR request |
-| 1253 | `amc vault dsar submit` | Submit a persistent DSAR request |
-| 1254 | `amc vault dsar-status` | Show DSAR (Data Subject Access Request) status |
-| 1255 | `amc vault forget` | Remove the remembered vault passphrase for this workspace (Keychain or credentials file) |
-| 1256 | `amc vault history` | Review and explicitly migrate signing-key history |
-| 1257 | `amc vault history migrate` | Authenticate only current and explicitly approved keys; preserve original untrusted bytes |
-| 1258 | `amc vault init` | Initialize encrypted vault for signing keys |
-| 1259 | `amc vault lock` | Lock vault and clear in-memory private keys |
-| 1260 | `amc vault passphrase` | Change the vault passphrase (the keys stay the same); forgets the remembered passphrase |
-| 1261 | `amc vault privacy-budget` | Check privacy budget for an agent |
-| 1262 | `amc vault rag-guard` | Guard RAG chunks against injection |
-| 1263 | `amc vault rotate-keys` | Rotate the monitor key (ledger-row and receipt purposes) with a signed rotation statement; alias of amc keys rotate |
-| 1264 | `amc vault scrub` | Scrub metadata from a file |
-| 1265 | `amc vault secret-share` | Split a secret into shares using Shamir's Secret Sharing |
-| 1266 | `amc vault status` | Show vault status |
-| 1267 | `amc vault unlock` | Unlock vault into memory for signing operations |
-| 1268 | `amc vault zk-commit` | Create a Pedersen commitment to a value |
-| 1269 | `amc vault zk-range-proof` | Create a range commitment for an AMC score threshold (NOT a zero-knowledge proof; unsound, does not verify) |
-| 1270 | `amc vault zk-verify` | Check a range commitment (NOT a zero-knowledge verification; unsound) |
-| 1271 | `amc verify` | Verify integrity across AMC artifacts |
-| 1272 | `amc verify all` | Verify trust/policies/plugins/logs/ledger/artifacts in one pass |
-| 1273 | `amc vibe-audit` | Run static safety checks for AI-generated code |
-| 1274 | `amc watch` | Observability, attestation, and safety testing |
-| 1275 | `amc watch alerts` | Show recent alerts for a monitored agent |
-| 1276 | `amc watch attest` | Attest an agent output |
-| 1277 | `amc watch connect` | Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook) |
-| 1278 | `amc watch explain` | Generate explainability packet for an agent run |
-| 1279 | `amc watch host-hardening` | Check host hardening status for this AMC deployment |
-| 1280 | `amc watch profiler-anomalies` | List detected behavioral anomalies for an agent |
-| 1281 | `amc watch profiler-start` | Start behavioral profiling for an agent |
-| 1282 | `amc watch profiler-status` | Show behavioral profiler status and any recent anomalies |
-| 1283 | `amc watch providers` | Show connected observability providers and trace stats |
-| 1284 | `amc watch safety-test` | Run safety tests for an agent |
-| 1285 | `amc watch start` | Start continuous production monitoring for an agent |
-| 1286 | `amc watch status` | Show all monitored agents and their current state |
-| 1287 | `amc whatif` | Equalizer what-if simulator |
-| 1288 | `amc whatif equalizer` | - |
-| 1289 | `amc whatif targets` | - |
-| 1290 | `amc why-capped` | Show why each question is capped at its current level |
-| 1291 | `amc wire` | Serve the NDJSON JSON-RPC wire; optionally execute accepted work through an owner-configured native route |
-| 1292 | `amc wiring-status` | Show in-process production wiring counters (cannot observe other processes) |
-| 1293 | `amc workorder` | Signed work order operations |
-| 1294 | `amc workorder create` | Create and sign a work order |
-| 1295 | `amc workorder expire` | Expire/revoke a work order |
-| 1296 | `amc workorder list` | List work orders for agent |
-| 1297 | `amc workorder show` | Show signed work order JSON |
-| 1298 | `amc workorder verify` | Verify work order signature |
-| 1299 | `amc wrap` | DEPRECATED — use 'amc adapters run', which also mints a lease and routes through the gateway. Wraps a runtime and captures tamper-evident evidence. |
+| 1207 | `amc trust workspace` | Trust this workspace's signed configuration (key set, tools policy and presets) on this machine, or show, revoke or repair that record |
+| 1208 | `amc truthguard` | Deterministic output truth-constraint validator |
+| 1209 | `amc truthguard validate` | Validate structured agent output claims against deterministic truth constraints |
+| 1210 | `amc tune` | Mechanic mode tuning wizard |
+| 1211 | `amc unknowns` | List known unknowns for an agent's latest diagnostic run |
+| 1212 | `amc up` | Start AMC control plane in one command (studio + gateway + bridge) |
+| 1213 | `amc upgrade` | Generate upgrade plan |
+| 1214 | `amc usage` | Usage and cost across native sessions from verified signed rows (tokens, cost, latency; unknowns stay unknown) |
+| 1215 | `amc user` | Multi-user RBAC account management |
+| 1216 | `amc user add` | Add a user with RBAC roles |
+| 1217 | `amc user init` | Initialize signed users.yaml with first OWNER user |
+| 1218 | `amc user list` | List RBAC users |
+| 1219 | `amc user password` | Set a new password for a console account; its signed-in sessions end |
+| 1220 | `amc user revoke` | Revoke a user account |
+| 1221 | `amc user role` | Set user roles |
+| 1222 | `amc user role set` | Replace roles for a user |
+| 1223 | `amc user verify` | Verify users.yaml signature |
+| 1224 | `amc value` | Value realization engine (contracts, scoring, ROI) |
+| 1225 | `amc value contract` | Value contract operations |
+| 1226 | `amc value contract apply` | Apply value contract from YAML/JSON file |
+| 1227 | `amc value contract init` | Create and sign value contract template |
+| 1228 | `amc value contract print` | Print value contract and signature status |
+| 1229 | `amc value contract verify` | Verify value contract signature |
+| 1230 | `amc value import` | Import numeric KPI points from CSV (ts,value) |
+| 1231 | `amc value ingest` | Ingest value webhook payload JSON |
+| 1232 | `amc value init` | Initialize signed value policy, default contract, and scheduler |
+| 1233 | `amc value policy` | Value policy operations |
+| 1234 | `amc value policy apply` | Apply signed value policy from YAML/JSON file |
+| 1235 | `amc value policy default` | Print default value policy JSON |
+| 1236 | `amc value policy print` | Print effective value policy JSON |
+| 1237 | `amc value report` | Generate signed value report |
+| 1238 | `amc value scheduler` | Value scheduler controls |
+| 1239 | `amc value scheduler disable` | Disable value scheduler |
+| 1240 | `amc value scheduler enable` | Enable value scheduler |
+| 1241 | `amc value scheduler run-now` | Run value scheduler now |
+| 1242 | `amc value scheduler status` | Show value scheduler status |
+| 1243 | `amc value snapshot` | Generate/load latest signed value snapshot |
+| 1244 | `amc value verify` | Verify value workspace signatures/artifacts |
+| 1245 | `amc value verify-policy` | Verify signed value policy |
+| 1246 | `amc vault` | Encrypted key vault operations |
+| 1247 | `amc vault classify` | Classify data sensitivity level |
+| 1248 | `amc vault dlp` | DLP scanner for PII and secrets |
+| 1249 | `amc vault dlp scan` | Scan text for PII and secrets |
+| 1250 | `amc vault dsar` | Persistent DSAR (Data Subject Access Request) workflow |
+| 1251 | `amc vault dsar complete` | Mark a DSAR request complete and append an audit event |
+| 1252 | `amc vault dsar list` | List persistent DSAR requests |
+| 1253 | `amc vault dsar status` | Show a persistent DSAR request |
+| 1254 | `amc vault dsar submit` | Submit a persistent DSAR request |
+| 1255 | `amc vault dsar-status` | Show DSAR (Data Subject Access Request) status |
+| 1256 | `amc vault forget` | Remove the remembered vault passphrase for this workspace (Keychain or credentials file) |
+| 1257 | `amc vault history` | Review and explicitly migrate signing-key history |
+| 1258 | `amc vault history migrate` | Authenticate only current and explicitly approved keys; preserve original untrusted bytes |
+| 1259 | `amc vault init` | Initialize encrypted vault for signing keys |
+| 1260 | `amc vault lock` | Lock vault and clear in-memory private keys |
+| 1261 | `amc vault passphrase` | Change the vault passphrase (the keys stay the same); forgets the remembered passphrase |
+| 1262 | `amc vault privacy-budget` | Check privacy budget for an agent |
+| 1263 | `amc vault rag-guard` | Guard RAG chunks against injection |
+| 1264 | `amc vault rotate-keys` | Rotate the monitor key (ledger-row and receipt purposes) with a signed rotation statement; alias of amc keys rotate |
+| 1265 | `amc vault scrub` | Scrub metadata from a file |
+| 1266 | `amc vault secret-share` | Split a secret into shares using Shamir's Secret Sharing |
+| 1267 | `amc vault status` | Show vault status |
+| 1268 | `amc vault unlock` | Unlock vault into memory for signing operations |
+| 1269 | `amc vault zk-commit` | Create a Pedersen commitment to a value |
+| 1270 | `amc vault zk-range-proof` | Create a range commitment for an AMC score threshold (NOT a zero-knowledge proof; unsound, does not verify) |
+| 1271 | `amc vault zk-verify` | Check a range commitment (NOT a zero-knowledge verification; unsound) |
+| 1272 | `amc verify` | Verify integrity across AMC artifacts |
+| 1273 | `amc verify all` | Verify trust/policies/plugins/logs/ledger/artifacts in one pass |
+| 1274 | `amc vibe-audit` | Run static safety checks for AI-generated code |
+| 1275 | `amc watch` | Observability, attestation, and safety testing |
+| 1276 | `amc watch alerts` | Show recent alerts for a monitored agent |
+| 1277 | `amc watch attest` | Attest an agent output |
+| 1278 | `amc watch connect` | Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook) |
+| 1279 | `amc watch explain` | Generate explainability packet for an agent run |
+| 1280 | `amc watch host-hardening` | Check host hardening status for this AMC deployment |
+| 1281 | `amc watch profiler-anomalies` | List detected behavioral anomalies for an agent |
+| 1282 | `amc watch profiler-start` | Start behavioral profiling for an agent |
+| 1283 | `amc watch profiler-status` | Show behavioral profiler status and any recent anomalies |
+| 1284 | `amc watch providers` | Show connected observability providers and trace stats |
+| 1285 | `amc watch safety-test` | Run safety tests for an agent |
+| 1286 | `amc watch start` | Start continuous production monitoring for an agent |
+| 1287 | `amc watch status` | Show all monitored agents and their current state |
+| 1288 | `amc whatif` | Equalizer what-if simulator |
+| 1289 | `amc whatif equalizer` | - |
+| 1290 | `amc whatif targets` | - |
+| 1291 | `amc why-capped` | Show why each question is capped at its current level |
+| 1292 | `amc wire` | Serve the NDJSON JSON-RPC wire; optionally execute accepted work through an owner-configured native route |
+| 1293 | `amc wiring-status` | Show in-process production wiring counters (cannot observe other processes) |
+| 1294 | `amc workorder` | Signed work order operations |
+| 1295 | `amc workorder create` | Create and sign a work order |
+| 1296 | `amc workorder expire` | Expire/revoke a work order |
+| 1297 | `amc workorder list` | List work orders for agent |
+| 1298 | `amc workorder show` | Show signed work order JSON |
+| 1299 | `amc workorder verify` | Verify work order signature |
+| 1300 | `amc wrap` | DEPRECATED — use 'amc adapters run', which also mints a lease and routes through the gateway. Wraps a runtime and captures tamper-evident evidence. |
 
 ### Command Details
 
@@ -1626,6 +1627,7 @@ Serve the Agent Client Protocol on stdio (for editors; prints nothing but frames
 | `--credentials-mode <mode>` | - |
 | `--tools <mode>` | - |
 | `--unsafe-unconfined-shell` | - |
+| `--trust-workspace` | - |
 | `--ask-user` | - |
 | `--web-search-searxng <origin>` | - |
 | `--expected-tools-digest <sha256>` | - |
@@ -1832,8 +1834,10 @@ Interactive native tasks over the existing governed run/resume path for the sele
 | `--mcp <id>` | - |
 | `--approve-tools <actionClass>` | - |
 | `--approve-risk <tier>` | - |
+| `--approval-mode <mode>` | - |
 | `--tools <mode>` | - |
 | `--unsafe-unconfined-shell` | - |
+| `--trust-workspace` | - |
 | `--web-search-searxng <origin>` | - |
 | `--max-tokens <n>` | - |
 | `--thinking <mode>` | - |
@@ -1934,6 +1938,7 @@ Run one agent turn and report what the signed log recorded
 | `--tools <mode>` | - |
 | `--tool-mode <mode>` | - |
 | `--unsafe-unconfined-shell` | - |
+| `--trust-workspace` | - |
 | `--session <id>` | - |
 | `--takeover-expired-writer <reason>` | - |
 | `--fork-from <id>` | - |
@@ -1957,6 +1962,7 @@ Run one agent turn and report what the signed log recorded
 | `--mission-context` | - |
 | `--approve-tools <actionClass>` | - |
 | `--approve-risk <tier>` | - |
+| `--approval-mode <mode>` | - |
 | `--interactive-approvals` | - |
 | `--output-format <format>` | - |
 | `--validation-repair <json>` | - |
@@ -10721,6 +10727,19 @@ Re-sign the current .amc/trust.yaml in place with the current artifact-seal key,
 |--------|-------------|
 | `--confirm <sha256>` | - |
 | `--accept-compromised-signer` | - |
+
+#### `amc trust workspace`
+
+Trust this workspace's signed configuration (key set, tools policy and presets) on this machine, or show, revoke or repair that record
+
+
+| Option | Description |
+|--------|-------------|
+| `--workspace <dir>` | - |
+| `--status` | - |
+| `--revoke` | - |
+| `--repair-store` | - |
+| `--json` | - |
 
 #### `amc truthguard validate`
 

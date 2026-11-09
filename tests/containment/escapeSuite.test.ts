@@ -1,11 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { lookup } from "node:dns/promises";
-import { existsSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, test, vi } from "vitest";
 import { bwrapBackend, unconsumedFds } from "../../src/sandbox/bwrapBackend.js";
 import { prepareNativePtyLaunch } from "../../src/terminal/nativePtySandbox.js";
 import { seatbeltNativeShell } from "../../src/sandbox/seatbeltNativeShell.js";
+import { denySessionSecretPaths } from "../../src/sandbox/shellSecretPaths.js";
 import { nativeContainmentFixture, sandboxNode, type NativeCall } from "../helpers/nativeContainment.js";
 
 // Binary prerequisites are not confinement evidence. Every actual call must produce a real applied receipt.
@@ -131,6 +132,77 @@ describe("real native shell escape attempts with owned canaries", () => {
       applied(call); expect(call.receipt.stdout).not.toContain(canary); expect(call.receipt.stderr).not.toContain(canary);
       expect(call.data.reads).toHaveLength(2); expect(call.data.reads.every((row: { denied?: boolean }) => row.denied === true)).toBe(true);
       expect(paths.every(path => readFileSync(path, "utf8") === canary)).toBe(true); passed = true;
+    } finally { await f.finish(passed); }
+  });
+
+  // SH-SANDBOX-08: AMC's own home (AMC_HOME, where provider credentials live) is denied by the backend itself, not only by a signed readDeny.
+  realTest("the AMC home's credentials file cannot be read even when no signed readDeny names it", async () => {
+    const f = nativeContainmentFixture({ readDenyHome: false }); let passed = false;
+    try {
+      const canary = `synthetic-not-a-real-secret-${randomUUID()}`;
+      const path = join(process.env.AMC_HOME!, ".credentials.yaml");
+      writeFileSync(path, canary);
+      const call = await f.run(`let value=null,denied=false,code=null;try{value=require("node:fs").readFileSync(${JSON.stringify(path)},"utf8");}catch(error){denied=true;code=error.code;}${emit('{attempted:true,denied,code}')} `);
+      applied(call); expect(call.receipt.stdout).not.toContain(canary);
+      expect(call.data.denied).toBe(true); expect(readFileSync(path, "utf8")).toBe(canary); passed = true;
+    } finally { await f.finish(passed); }
+  });
+
+  // SH-SANDBOX-08: a credential store chosen by --credentials-home (not by AMC_HOME) is denied once the session registers it.
+  realTest("a session-selected credential store outside AMC_HOME cannot be read", async () => {
+    const f = nativeContainmentFixture({ readDenyHome: false }); let passed = false;
+    try {
+      const store = join(f.root, "session-credentials"); mkdirSync(store, { recursive: true, mode: 0o700 });
+      const canary = `synthetic-not-a-real-secret-${randomUUID()}`;
+      const path = join(store, ".credentials.yaml"); writeFileSync(path, canary);
+      denySessionSecretPaths([store, path]);
+      const call = await f.run(`let value=null,denied=false,code=null;try{value=require("node:fs").readFileSync(${JSON.stringify(path)},"utf8");}catch(error){denied=true;code=error.code;}${emit('{attempted:true,denied,code}')} `);
+      applied(call); expect(call.receipt.stdout).not.toContain(canary);
+      expect(call.data.denied).toBe(true); expect(readFileSync(path, "utf8")).toBe(canary); passed = true;
+    } finally { await f.finish(passed); }
+  });
+
+  // S5: an AMC secret a _FILE variable names is denied by the backend itself, here the vault passphrase file kept in the
+  // project: Seatbelt denies it outright, and Bubblewrap masks it because it lies inside the mounted workspace.
+  realTest("the vault passphrase file AMC_VAULT_PASSPHRASE_FILE names cannot be read, even inside the workspace", async () => {
+    const f = nativeContainmentFixture({ readDenyHome: false }); let passed = false;
+    try {
+      const canary = `synthetic-not-a-real-secret-${randomUUID()}`;
+      const secrets = join(f.workspace, "secrets"); mkdirSync(secrets, { recursive: true, mode: 0o700 });
+      const path = join(secrets, "vault-passphrase"); writeFileSync(path, canary, { mode: 0o600 });
+      process.env.AMC_VAULT_PASSPHRASE_FILE = path; // restored by the fixture's finish
+      const call = await f.run(`let value=null,denied=false,code=null;try{value=require("node:fs").readFileSync(${JSON.stringify(path)},"utf8");}catch(error){denied=true;code=error.code;}${emit('{attempted:true,denied,code,value}')} `);
+      applied(call); expect(call.receipt.stdout).not.toContain(canary);
+      // Seatbelt refuses the read; the Linux mask is /dev/null, which reads as empty.
+      expect(call.data.denied === true || call.data.value === "").toBe(true);
+      expect(readFileSync(path, "utf8")).toBe(canary); passed = true;
+    } finally { await f.finish(passed); }
+  });
+
+  (process.platform === "darwin" ? realTest : test.skip)("S5: Seatbelt prevents renaming any writable ancestor of a secret", async () => {
+    const f = nativeContainmentFixture({ readDenyHome: false }); let passed = false;
+    try {
+      const outer = join(f.allowed, "outer"), inner = join(outer, "inner");
+      const secret = join(inner, "vault-passphrase"), canary = `synthetic-${randomUUID()}`;
+      const moved = join(f.allowed, "moved"), sibling = join(inner, "ordinary.txt");
+      mkdirSync(inner, { recursive: true });
+      writeFileSync(secret, canary, { mode: 0o600 });
+      process.env.AMC_VAULT_PASSPHRASE_FILE = secret;
+      const moves = [[inner, join(moved, "vault-passphrase")], [outer, join(moved, "inner", "vault-passphrase")]];
+      const call = await f.run(`const fs=require("node:fs"),attempts=[];
+        fs.writeFileSync(${JSON.stringify(sibling)},"ordinary write");
+        for(const [source,alias] of ${JSON.stringify(moves)}) {
+          try { fs.renameSync(source,${JSON.stringify(moved)}); }
+          catch(error) { attempts.push({denied:true,code:error.code}); continue; }
+          attempts.push({denied:false,value:fs.readFileSync(alias,"utf8")});
+        }
+        ${emit("{attempted:true,attempts}")}`);
+      applied(call);
+      expect(call.receipt.stdout).not.toContain(canary);
+      expect(call.data.attempts).toEqual([{ denied: true, code: "EPERM" }, { denied: true, code: "EPERM" }]);
+      expect(readFileSync(secret, "utf8")).toBe(canary);
+      expect(readFileSync(sibling, "utf8")).toBe("ordinary write");
+      passed = true;
     } finally { await f.finish(passed); }
   });
 

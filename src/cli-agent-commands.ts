@@ -28,7 +28,7 @@ import { hostname } from "node:os";
  * SIGTERM names a parent stop requested by `signal:SIGTERM`. Each writes a
  * signed `loop/cancel` and closes the turn `cancelled` with its cause in the hashed `turn/end`.
  */
-import type { Command } from "commander";
+import { Option, type Command } from "commander";
 import { resolveAgentId } from "./fleet/paths.js";
 import chalk from "chalk";
 import {
@@ -57,8 +57,9 @@ import { denyPromptByCommandHooks } from "./extensions/nativeCommandHooks.js";
 import { mergeScopedMcpSelection } from "./mcp/mcpScopes.js";
 import { bindNativeMcpResourceStatus, projectNativeResourceStatus, type NativeMcpResourceSource } from "./prompt/context/nativeResourceStatus.js";
 import { explicitPresetCompositionOptions, nativePresetCompositionSources } from "./cli/agentCompositionSources.js";
-import { resolvePreset, type AgentPreset } from "./presets/agentPresets.js";
-import { IN_PROCESS_PROVIDER, delegationTurnOptions, resolveForeignRunner } from "./agent/providers/delegationProviders.js";
+import { presetCompositionDigest, resolvePreset, type AgentPreset } from "./presets/agentPresets.js";
+import { delegationTurnOptions } from "./agent/providers/delegationProviders.js";
+import { foreignDelegateRunner } from "./cli/agentLoopForeignDelegate.js";
 import type { SubagentRunner } from "./agent/subagentSpawn.js";
 import { loadVerifiedToolsConfigSnapshot } from "./toolhub/toolhubValidators.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./agent/toolSeam.js";
@@ -78,8 +79,8 @@ import { loadNativeAudioManifest } from "./attachments/nativeAudioFiles.js";
 import type { NativeAudioPart } from "./attachments/nativeAudioInput.js";
 
 import {
-  activeChildLimitOption, approvalGateFor, armTurnSignals, collectDelegateStop, collectOption, compactionOption, defaultAgentLoopIo, importRunner, integerOption, liveTextPreviewPrinter, paramsFor, piAiRouteSelection, renderNotification, resetDelegateStops, routeFor, withReasoningAndRouteOptions,
-  type AgentLoopCliIo
+  activeChildLimitOption, admitWorkspaceTrust, approvalGateFor, armTurnSignals, collectDelegateStop, collectOption, compactionOption, defaultAgentLoopIo, importRunner, integerOption, liveTextPreviewPrinter, paramsFor, parsedApprovalMode, piAiRouteSelection, renderNotification, resetDelegateStops, routeFor, withReasoningAndRouteOptions,
+  type AgentLoopCliIo, type RunOptions
 } from "./cli-agent-options.js";
 import { readHeadlessPrompt, runWithOutput, type RunOutput } from "./cli/agentLoopOutputOptions.js";
 export type { AgentLoopCliIo, RunOptions } from "./cli-agent-options.js";
@@ -124,8 +125,10 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--mcp <id>", "mount a scoped server by id (project:<id> or user:<id> when both exist); repeatable; reviewed exactly like --mcp-config", collectOption)
     .option("--approve-tools <actionClass>", "require the signed approval gate before each tool call")
     .option("--approve-risk <tier>", "approval risk tier (default high)")
+    .option("--approval-mode <mode>", "plan, default, accept-edits or untrusted: which calls a human is asked about, on top of every signed policy; plan runs nothing (SIMULATE); not with --approve-tools")
     .option("--tools <mode>", "none, echo, or explicitly enabled workspace tools; existing policy still applies")
     .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")
+    .option("--trust-workspace", "trust this workspace's signed configuration (key set, tools policy and presets) on this machine, recording the consent in the AMC home; otherwise a workspace this machine never trusted is refused (AMC_TRUST_WORKSPACE=1 for headless hosts)")
     .option("--web-search-searxng <origin>", WEB_SEARCH_SEARXNG_HELP)
     .option("--max-tokens <n>", "output-token limit per request (default 512)"),
     "enabled or disabled: DeepSeek (tools-free chat requires disabled), Gemini (includeThoughts) and Ollama (think); Anthropic thinking cannot continue a chat")
@@ -179,6 +182,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--tools <mode>", 'tool seam: "workspace" (the governed built-ins), "echo", or "none"')
     .option("--tool-mode <mode>", '"native" (one call per step) or "code" (dispatch from a program)')
     .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")
+    .option("--trust-workspace", "trust this workspace's signed configuration (key set, tools policy and presets) on this machine, recording the consent in the AMC home; otherwise a workspace this machine never trusted is refused (AMC_TRUST_WORKSPACE=1 for headless hosts)")
     .option("--session <id>", "resume this existing, unsealed session as its next writer (verified before dispatch)")
     .option("--takeover-expired-writer <reason>", "with --session: claim a remote or unresponsive writer whose lease lapsed one lease ago; the reason is recorded")
     .option("--fork-from <id>", "copy this verified parent conversation into a new signed session")
@@ -203,6 +207,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       "--preset <id>",
       "compose this run from a signed preset in .amc/agents.yaml. Explicit flags override it."
     )
+    .addOption(new Option("--preset-composition-sha256 <digest>", "pin the selected signed preset composition for a chat turn").hideHelp())
     .option(
       "--delegate-scope <classes>",
       "comma-separated action classes a delegate may invoke, e.g. READ_ONLY,WRITE_LOW. "
@@ -220,6 +225,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       "require a signed human approval before every tool call, decided under this action class"
     )
     .option("--approve-risk <tier>", "risk tier the approval is raised at (default high)")
+    .option("--approval-mode <mode>", "plan, default, accept-edits or untrusted: which calls a human is asked about, on top of every signed policy; plan runs nothing (SIMULATE); not with --approve-tools")
     .option("--interactive-approvals", "send actual queued approval IDs to the native chat parent over dedicated Node IPC"))))
     .option(
       "--approval-exception <file>",
@@ -243,20 +249,32 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       if (opts.interactiveApprovals && opts.approvalException !== undefined) {
         io.error("Interactive approvals require the signed approval engine; approval exceptions cannot be combined with this mode."); io.fail(); return;
       }
+      // SH-SANDBOX-07: before anything the workspace signed is read (presets, extensions, skills, the tools policy).
+      const trust = admitWorkspaceTrust(io, opts, process.cwd());
+      if (trust === undefined) return;
       // Verify the signed preset before applying invocation flags.
       const explicitCompositionOptions = explicitPresetCompositionOptions(command);
       let preset: AgentPreset | undefined;
+      if (opts.presetCompositionSha256 !== undefined && opts.preset === undefined) {
+        io.error("A preset composition pin requires --preset."); io.fail(); return;
+      }
       if (opts.preset !== undefined) {
-        const resolved = resolvePreset(process.cwd(), opts.preset);
+        const resolved = resolvePreset(process.cwd(), opts.preset, trust.presetsDigest);
         if (!resolved.ok) {
           io.error(chalk.red(resolved.reason));
           io.fail();
           return;
         }
         preset = resolved.preset;
+        if (opts.presetCompositionSha256 !== undefined && presetCompositionDigest(preset) !== opts.presetCompositionSha256) {
+          io.error("The selected signed preset changed before this turn. Start a new chat after reviewing its current composition."); io.fail(); return;
+        }
         (opts.json ? io.error : io.log)(chalk.dim(`composed from preset "${preset.id}": ${preset.description}`));
         // Apply preset approval before constructing policy controls.
-        opts = { ...opts, approveTools: opts.approveTools ?? preset.approveTools };
+        // An explicit --approval-mode replaces the preset's approveTools gate (the mode composes its own); the two flags together are refused below.
+        if (opts.approvalMode !== undefined && opts.approveTools === undefined && preset.approveTools !== undefined) {
+          io.error(chalk.dim(`--approval-mode ${opts.approvalMode} replaces the preset's approveTools ${preset.approveTools}`));
+        } else opts = { ...opts, approveTools: opts.approveTools ?? preset.approveTools };
       }
       try { opts = applyNativeDelegationPreset(opts, preset?.delegate); }
       catch {
@@ -391,9 +409,10 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         io.error("MCP tools require the actual signed approval gate; approval exceptions are not accepted."); io.fail(); return;
       }
       const gate = approvalGateFor(io, opts, { workspace: process.cwd(), agentId });
+      const approvalMode = gate === null ? undefined : gate?.mode ?? parsedApprovalMode(opts);
       if (gate === null) return;
       if (opts.interactiveApprovals && gate === undefined) {
-        io.error("--interactive-approvals requires --approve-tools to raise actual signed requests."); io.fail(); return;
+        io.error("--interactive-approvals requires --approve-tools or a gating --approval-mode to raise actual signed requests."); io.fail(); return;
       }
       let mcpServers: readonly ReviewedNativeMcpServer[] = [];
       if (opts.mcpConfig !== undefined) {
@@ -450,7 +469,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       }
       const dispatchMode = (opts.toolMode ?? preset?.toolMode) === "code" ? "code" as const : "native" as const;
       const compositionSources = nativePresetCompositionSources(preset, explicitCompositionOptions, opts, { providerId, model, maxTokens, maxSteps, tools: toolMode, toolMode: dispatchMode,
-        approveTools: gate?.actionClass, delegateEnabled: wantsDelegation, delegateScope, maxDelegationDepth, delegateTimeout, delegateStops: delegateStops.conditions });
+        approveTools: approvalMode === undefined ? gate?.actionClass : undefined, approvalMode, delegateEnabled: wantsDelegation, delegateScope, maxDelegationDepth, delegateTimeout, delegateStops: delegateStops.conditions });
       const shellOptIn = opts.unsafeUnconfinedShell === true ? { unconfinedShell: "cli-flag" as const } : {};
       // Resume names its existing session; a fresh run supplies a new ID. Fork
       // selects its own ID inside composition, which binds the actual writer
@@ -487,6 +506,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...lease,
           ...(dispatchMode === "code" ? { mode: dispatchMode } : {}),
           ...(continuity.planMode ? { planMode: true } : {}),
+          ...(approvalMode === undefined ? {} : { approvalMode }),
+          ...(trust.toolsDigest === null ? {} : { expectedToolsDigest: trust.toolsDigest }),
           ...breadth.toolset,
           ...shellOptIn
         });
@@ -549,23 +570,11 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         // Defining after construction is supported by design — `seam.schemas()`
         // re-reads the registry each step.
         if (wantsDelegation) {
-          const providerId = opts.delegateProvider ?? IN_PROCESS_PROVIDER;
-          if (providerId !== IN_PROCESS_PROVIDER) {
-            const resolved = resolveForeignRunner({
-              providerId,
-              workspace: process.cwd(),
-              agentId,
-              ...(delegateTimeout > 0 ? { timeoutMs: delegateTimeout } : {})
-            });
-            if (!resolved.ok) {
-              io.error(chalk.red(resolved.reason));
-              toolset.close();
-              io.fail();
-              return;
-            }
-            foreignRunner = resolved.runner;
-            foreignRunnerDescription = resolved.describedAs;
-          }
+          const foreign = foreignDelegateRunner(io, { ...(opts.delegateProvider === undefined ? {} : { delegateProvider: opts.delegateProvider }), approvalMode },
+            { workspace: process.cwd(), agentId, timeoutMs: delegateTimeout });
+          if (foreign === null) { toolset.close(); return; }
+          foreignRunner = foreign.runner;
+          foreignRunnerDescription = foreign.describedAs;
           // Reported FROM the value that gets passed, not beside it. Written as
           // two statements, a build could announce an out-of-process delegate
           // and hand the kernel nothing -- mutation testing found exactly that,
@@ -639,6 +648,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           workspace: process.cwd(),
           agentId,
           ...(compositionSources === undefined ? {} : { compositionSources }),
+          ...(approvalMode === undefined ? {} : { approvalMode }),
           resourceStatus: () => projectNativeResourceStatus({ extensions, mcp: mcpStatus,
             skillRoots: workspaceSkillRoots(extensions.workspace, opts.credentialsHome) }),
           ...(output.sink ? { onLiveText: event => output.sink!.liveText(event) } : opts.stream ? { onLiveText: liveTextPreviewPrinter() } : {}),
@@ -669,6 +679,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                 approvalGate: { ...reviewedNativeMcpApprovalOptions(mcpServers),
                   actionClass: gate.actionClass,
                   riskTier: gate.riskTier,
+                  ...(gate.gatesClasses === undefined ? {} : { gatesClasses: gate.gatesClasses }),
+                  ...(gate.exemptToolNames === undefined ? {} : { exemptToolNames: gate.exemptToolNames }),
                   answerers: gate.answerers,
                   onRaised: (event) => {
                     if (opts.interactiveApprovals) {

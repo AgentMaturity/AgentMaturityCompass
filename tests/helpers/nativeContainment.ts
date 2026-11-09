@@ -33,7 +33,7 @@ export function sandboxNode(): string | null {
 }
 
 /** Real signed tools, default P1-02 binding and private native permit; no injected backend or body. */
-export function nativeContainmentFixture(options: { allowHosts?: string[]; maxProcesses?: number } = {}) {
+export function nativeContainmentFixture(options: { allowHosts?: string[]; maxProcesses?: number; /** false: the AMC home is not on the signed readDeny, so only the backend's own deny list protects it. */ readDenyHome?: boolean } = {}) {
   const root = realpathSync(mkdtempSync(join(tmpdir(), "amc-p105-escape-")));
   chmodSync(root, 0o700);
   const workspace = join(root, "workspaces", randomUUID());
@@ -62,7 +62,7 @@ export function nativeContainmentFixture(options: { allowHosts?: string[]; maxPr
     const node = sandboxNode() ?? realpathSync(process.execPath);
     const shell: SignedTool = {
       name: "bash", actionClass: "WRITE_HIGH", allow: { binariesAllowlist: [node] }, deny: { argvRegexDenylist: [] },
-      nativeSandbox: { kind: "os-native", writableDirectories: ["workspace/allowed"], readDeny: [home],
+      nativeSandbox: { kind: "os-native", writableDirectories: ["workspace/allowed"], readDeny: options.readDenyHome === false ? [] : [home],
         maxProcesses: options.maxProcesses ?? 32, ...(options.allowHosts ? { egress: { allowHosts: options.allowHosts } } : {}) }
     };
     initToolsConfig(workspace, { tools: { version: 1, denyByDefault: true, allowedTools: [shell] } });

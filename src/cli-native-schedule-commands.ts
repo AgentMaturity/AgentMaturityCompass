@@ -10,6 +10,7 @@ import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL, stubProviderTransport } from "./
 import { nativeApprovalInstructions } from "./setup/nativeApprovalInstructions.js";
 import { loadVerifiedToolsConfigSnapshot } from "./toolhub/toolhubValidators.js";
 import { runLease } from "./leases/runLease.js";
+import { requireWorkspaceTrust, suppliedTrustConsent } from "./security/workspaceTrust.js";
 
 const defaultIo: AgentLoopCliIo = {
   log: line => console.log(line), error: line => console.error(line), fail: () => { process.exitCode = 1; }
@@ -122,6 +123,7 @@ export function registerNativeScheduleCommands(program: Command, io: AgentLoopCl
       .requiredOption("--expect-tools-digest <digest>", "exact reviewed signed tools policy digest")
       .requiredOption("--approve-tools <actionClass>", "signed approval class; all enabled schedule scopes must match it")
       .option("--approve-risk <tier>", "signed approval risk tier, default high")
+      .option("--trust-workspace", "trust this workspace's signed configuration (key set, tools policy and presets) on this machine, recording the consent in the AMC home; otherwise a workspace this machine never trusted is refused (AMC_TRUST_WORKSPACE=1 for headless hosts)")
       .option("--max-tokens <n>", "positive per-request output ceiling", "1024")
       .option("--thinking <mode>", "enabled or disabled: DeepSeek, Gemini and Ollama (Anthropic thinking needs tools-free runs, which schedules are not)")
       .option("--reasoning-effort <effort>", "sent verbatim: DeepSeek low|high|max, Anthropic low|medium|high|xhigh|max (output_config.effort), Gemini MINIMAL|LOW|MEDIUM|HIGH, Ollama low|medium|high|max")
@@ -142,6 +144,8 @@ export function registerNativeScheduleCommands(program: Command, io: AgentLoopCl
       try {
         const root = workspace();
         assertScheduleOwner(root);
+        const trust = requireWorkspaceTrust(root, suppliedTrustConsent(opts.trustWorkspace ? "cli-flag" : undefined));
+        if (!trust.ok) throw new Error(trust.reason);
         if (opts.agent.trim().length === 0) throw new Error("--agent must identify the governing root agent.");
         const gate = approvalGateFor(io, opts, { workspace: root, agentId: opts.agent });
         if (gate == null) return;

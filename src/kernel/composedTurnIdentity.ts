@@ -92,9 +92,14 @@ export function compositionDigestOf(options: ComposedTurnOptions, profile: Agent
             actionClass: gate.actionClass,
             riskTier: gate.riskTier,
             toolNames: gate.toolNames ?? null,
+            // SH-SANDBOX-04: a mode's class narrowing is composition too; without it accept-edits signed the same digest as --approve-tools.
+            ...(gate.gatesClasses === undefined ? {} : { gatesClasses: [...gate.gatesClasses].sort() }),
+            ...(gate.exemptToolNames === undefined ? {} : { exemptToolNames: [...gate.exemptToolNames].sort() }),
             ...(gate.reviewedActionClasses === undefined ? {} : { reviewedActionClasses: gate.reviewedActionClasses }),
             answerers: (gate.answerers ?? []).map((answerer) => answerer.name)
           },
+    // `plan` composes no gate, so the mode itself is in the shape: a plan run is not an ungated run.
+    ...(options.approvalMode === undefined ? {} : { approvalMode: options.approvalMode }),
     version: amcVersion
   });
   return createHash("sha256").update(shape).digest("hex");

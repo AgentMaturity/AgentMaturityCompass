@@ -72,6 +72,18 @@ describe("ensureInstantVaultMode signs only with the operator's passphrase", () 
     expect(process.env.AMC_VAULT_PASSPHRASE).toBeUndefined();
   });
 
+  it("does not open a vault this machine did not create (a clone shipping its passphrase file), and scores unsigned saying why", () => {
+    const workspace = vaultWorkspace();
+    writeFileSync(localVaultPassphrasePath(workspace), `${PASS}\n`, { mode: 0o600 });
+    // Another AMC home: this machine never committed that key set, exactly as for a freshly cloned repository.
+    vi.stubEnv("AMC_HOME", mkdtempSync(join(tmpdir(), "amc-instant-vault-clone-home-")));
+    expect(loadLocalVaultPassphrase(workspace, {})).toEqual({ loaded: false, reason: "unanchored" });
+    const result = ensureInstantVaultMode(workspace);
+    expect(result).toMatchObject({ noSign: true, createdLocalPassphrase: false, localPassphrasePath: null });
+    expect(result.reason).toBe(".amc/local-vault-passphrase is not read beside a vault whose key set this machine did not create (a clone or a copy); generated an unsigned full score.");
+    expect(process.env.AMC_VAULT_PASSPHRASE).toBeUndefined();
+  });
+
   it("loads it for a non-agent process", () => {
     const workspace = vaultWorkspace();
     writeFileSync(localVaultPassphrasePath(workspace), `${PASS}\n`, { mode: 0o600 });

@@ -229,7 +229,7 @@ describe("approval waits do not consume the execution budget (DXB-20)", () => {
       pipeline: { approvalRequiredFor: new Set(["WRITE_LOW"]), approve: async () => { await sleep(800); return "allow"; } }
     });
     h.pipeline.bindApprovalGate({
-      gates: (name) => name === "write",
+      gates: (call) => call.name === "write",
       ask: (execution) => new Promise((resolve) => {
         execution.signal?.addEventListener("abort", () => { gateSawAbort = true; resolve({ approvalRequestIds: ["late-grant"] }); });
       })

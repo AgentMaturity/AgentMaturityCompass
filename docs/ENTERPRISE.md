@@ -13,7 +13,7 @@ The whole AMC product, the trust stack and all 41 Industry Packs, is free and MI
 Everything else:
 - Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport
 - All <!-- amc:count:adapters -->16<!-- /amc:count --> framework adapters
-- 1,299 CLI command paths
+- 1,300 CLI command paths
 - 244 default diagnostic questions plus the free, opt-in 20-question lifecycle expansion
 - <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered adversarial assurance packs
 - All 41 Industry Packs

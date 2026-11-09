@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { pathExists } from "../utils/fs.js";
-import { createLocalVaultPassphrase, loadLocalVaultPassphrase, localVaultPassphrasePath } from "../vault/localPassphrase.js";
+import { createLocalVaultPassphrase, loadLocalVaultPassphrase, localPassphraseRefusal, localVaultPassphrasePath } from "../vault/localPassphrase.js";
 import { rememberedUnlockLocation } from "../vault/passphraseStore.js";
 
 export interface InstantVaultMode {
@@ -25,7 +25,7 @@ export function ensureInstantVaultMode(workspace: string): InstantVaultMode {
     return { noSign: false, createdLocalPassphrase: false, localPassphrasePath: localVaultPassphrasePath(workspace), reason: null };
   }
   if (local.reason !== undefined) {
-    const where = local.reason === "agent-mode" ? "in agent mode" : `under the agent marker ${local.marker ?? "(unknown)"}`;
+    const where = localPassphraseRefusal(local);
     return {
       noSign: true,
       createdLocalPassphrase: false,

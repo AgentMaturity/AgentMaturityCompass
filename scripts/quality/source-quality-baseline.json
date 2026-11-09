@@ -22573,6 +22573,13 @@
       "date": "2026-10-27"
     },
     {
+      "id": "f0b0a0467887737d92e0f7ad4bf6698ab0869e477f60a2b9cba4d48b60593c62",
+      "scan": "dead-code",
+      "reason": "WorkspaceTrustSurface is the type of the exported verdict's surface field; the declaration file needs it exported although no other module names it",
+      "acceptedBy": "AgentMaturity",
+      "date": "2026-11-08"
+    },
+    {
       "id": "f1551a1b1a80d9fe2b06331927dec474729768db7ff10048e52958c8b318c5d2",
       "scan": "dead-code",
       "reason": "Root explicitly preserves this additive async counterpart to the existing synchronous outcomesResignCli export. It forwards to the real supported async sign API and retains the same result shape. There is currently no maintained CLI command or local caller for this wrapper; retention is API symmetry/compatibility, not runtime integration qualification.",

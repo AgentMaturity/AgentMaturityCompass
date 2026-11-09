@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { Command } from "commander";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { canonicalImportRefusal, importTargets, MAX_IMPORT_DEPTH, MAX_IMPORTS_PER_FILE, resolveImportPath, resolveInstructionImports } from "../src/prompt/context/instructionImports.js";
-import { MACOS_SECRET_PATHS } from "../src/sandbox/seatbeltNativeShell.js";
+import { HOME_SECRET_PATHS } from "../src/sandbox/shellSecretPaths.js";
 import { loadInstructionFiles } from "../src/prompt/context/instructionFiles.js";
 import { INSTRUCTION_FILE_NAMES, instructionCandidates, STRONGEST_INSTRUCTION_FILE } from "../src/prompt/context/instructionPrecedence.js";
 import { renderInstructionContext } from "../src/prompt/context/instructionsContext.js";
@@ -72,7 +72,7 @@ describe("resolveImportPath", () => {
       expect(resolveImportPath(target, "AMC.md").ok, target).toBe(true);
     }
     // The macOS shell sandbox's home-relative secret list and the import denylist stay in step (a workspace can be a home directory).
-    for (const secret of MACOS_SECRET_PATHS) expect(resolveImportPath(`${secret}/notes.md`, "AMC.md").ok, secret).toBe(false);
+    for (const secret of [...HOME_SECRET_PATHS, ".config/amc"]) expect(resolveImportPath(`${secret}/notes.md`, "AMC.md").ok, secret).toBe(false);
   });
   it("judges the canonical on-disk path: a spelling or a directory link that lands on a refused name is refused", () => {
     // MUTATION: make canonicalImportRefusal return null and both refused spellings pass.

@@ -16,7 +16,7 @@ vi.mock("../src/setup/nativeInteractiveCommandAudit.js", () => ({
 
 const seam = vi.hoisted(() => ({
   answers: [] as string[],
-  commands: [] as { executable: string; argv: string[]; cwd: string; shell: boolean; stdin: string | null }[],
+  commands: [] as { executable: string; argv: string[]; cwd: string; shell: boolean; stdin: string | null; trustEnv: string | undefined }[],
   /** `stdin` is what chat piped to the child (the turn prompt, `run -`), or null when the child's stdin was not piped. */
   onCommand: null as null | ((argv: string[], cwd: string, stdin: string | null) => { code: number; stdout: string }),
   killed: [] as unknown[]
@@ -41,14 +41,14 @@ vi.mock("node:child_process", async importOriginal => {
   const actual = await importOriginal<typeof import("node:child_process")>();
   const { EventEmitter } = await import("node:events");
   const { PassThrough } = await import("node:stream");
-  return { ...actual, spawn: (executable: string, argv: string[], options: { cwd: string; shell: boolean; stdio?: unknown[] }) => {
+  return { ...actual, spawn: (executable: string, argv: string[], options: { cwd: string; shell: boolean; env: NodeJS.ProcessEnv; stdio?: unknown[] }) => {
     // As a real child: a piped stdin exists and is read to EOF before the turn runs; otherwise there is none.
     const stdin = Array.isArray(options.stdio) && options.stdio[0] === "pipe" ? new PassThrough() : null;
     const child = Object.assign(new EventEmitter(), {
       stdin, stdout: new PassThrough(), stderr: new PassThrough(),
       kill: (signal: unknown) => { seam.killed.push(signal); return true; }
     });
-    const command = { executable, argv: [...argv], cwd: options.cwd, shell: options.shell, stdin: null as string | null };
+    const command = { executable, argv: [...argv], cwd: options.cwd, shell: options.shell, stdin: null as string | null, trustEnv: options.env.AMC_TRUST_WORKSPACE };
     seam.commands.push(command);
     const settle = (input: string | null): void => {
       command.stdin = input;
@@ -133,13 +133,15 @@ describe("AMC-1512 native home propagation through the chat composition seam", (
     else Reflect.deleteProperty(process.stdout, "isTTY");
     seam.onCommand = null;
     vi.restoreAllMocks();
+    vi.unstubAllEnvs();
     rmSync(root, { recursive: true, force: true });
   });
 
   it("keeps a home-only skill resolvable on the first child, follow-up and printed resume", async () => {
     const path = skill(home, "home-only", "Shared instructions selected by the operator.");
     seam.answers = ["/home-only first", "/home-only second", "/exit"];
-    await runNativeInteractiveSession(options(), { log: line => logs.push(line), error: line => errors.push(line), fail });
+    vi.stubEnv("AMC_TRUST_WORKSPACE", "1");
+    await runNativeInteractiveSession(options({ trustWorkspace: true }), { log: line => logs.push(line), error: line => errors.push(line), fail });
     expect(fail).not.toHaveBeenCalled();
     expect(seam.commands).toHaveLength(2);
     expect(loaded).toEqual([
@@ -149,6 +151,8 @@ describe("AMC-1512 native home propagation through the chat composition seam", (
     for (const command of seam.commands) {
       expect(command.shell).toBe(false);
       expect(command.cwd).toBe(workspace);
+      expect(command.argv).not.toContain("--trust-workspace");
+      expect(command.trustEnv).toBeUndefined();
       expect(option(command.argv, "--credentials-home")).toBe(home);
       expect(option(command.argv, "--credentials-file")).toBe(file);
       // The prompt travels on stdin (`run -`); the old argv-word prompt let a bare "-" read an empty stdin (SH-UI-01).
@@ -157,6 +161,7 @@ describe("AMC-1512 native home propagation through the chat composition seam", (
     }
     expect(option(seam.commands[1]!.argv, "--session")).toBe("simulated-child-session");
     const resume = logs.find(line => line.startsWith("Resume in this workspace:"));
+    expect(resume).toContain("--trust-workspace");
     expect(resume).toContain(renderNativeGuideCommand({ cwd: workspace, argv: ["--credentials-home", home] }));
     expect(resume).toContain(renderNativeGuideCommand({ cwd: workspace, argv: ["--credentials-file", file] }));
     expect(resume).toContain("--session simulated-child-session");
