@@ -12,6 +12,7 @@ import { suiteSchema } from "../../src/eval/suiteSchema.js";
 import { baselineFromResults, canDetectTotalRegression, compareResults, gateSchema, type EvalBaseline } from "../../src/eval/suiteCompare.js";
 import { attemptGuard, runEvalSuite, type EvalResults } from "../../src/eval/suiteRunner.js";
 import { registerEvalSuiteCommands } from "../../src/cli-eval-suite-commands.js";
+import { installClaimLabelHooks } from "../../src/cli/claimLabelHooks.js";
 import { SandboxRunner } from "../../src/sandbox/sandboxRunner.js";
 import type { SandboxBackend } from "../../src/sandbox/sandboxTypes.js";
 import type { ToolExecution } from "../../src/tools/toolTypes.js";
@@ -28,7 +29,7 @@ const confined = (await gradeCommand({ type: "script", command: [process.execPat
 let ws: string;
 const cwd = process.cwd();
 beforeEach(() => { ws = stubWorkspace("amc-eval-"); });
-afterEach(() => { process.chdir(cwd); process.exitCode = undefined; vi.restoreAllMocks(); removeWorkspace(ws); });
+afterEach(() => { process.chdir(cwd); process.exitCode = undefined; vi.restoreAllMocks(); vi.unstubAllEnvs(); removeWorkspace(ws); });
 
 describe("scoring and graders (pure)", () => {
   it("pass@k is the unbiased estimator, refuses k > n, and pass^k is not used", () => {
@@ -209,6 +210,8 @@ describe("end to end through the CLI with the stub provider", () => {
     const program = new Command();
     program.command("eval");
     registerEvalSuiteCommands(program);
+    installClaimLabelHooks(program);
+    vi.stubEnv("AMC_CLAIM_LABELS_STRICT", "1");
     const logs: string[] = [];
     vi.spyOn(console, "log").mockImplementation((...args: unknown[]) => { logs.push(args.join(" ")); });
     vi.spyOn(console, "error").mockImplementation((...args: unknown[]) => { logs.push(args.join(" ")); });
@@ -216,6 +219,9 @@ describe("end to end through the CLI with the stub provider", () => {
     const out = join(ws, "r.json"), baseline = join(ws, "b.json");
     await program.parseAsync(["eval", "suite", "run", SUITE, "--provider", "stub", "--attempts", "2", "--out", out, "--keep-dirs"], { from: "user" });
     expect(process.exitCode, logs.join("\n")).toBeUndefined();
+    const title = logs.findIndex(line => line.includes("Eval suite stub-smoke run"));
+    expect(title, "suite run title").not.toBe(-1);
+    expect(logs[title + 1]).toContain("Claim: Synthetic example (not evidence) · Result: not evaluated");
     const results = JSON.parse(readFileSync(out, "utf8")) as EvalResults;
     expect(results.schema).toBe("amc.eval-results/v1");
     expect(results.attemptsPerTask).toBe(2);
@@ -245,7 +251,7 @@ describe("end to end through the CLI with the stub provider", () => {
     const rows = allEvents(ws);
     const audit = rows.filter((row) => row.event_type === "audit" && (JSON.parse(row.meta_json) as { auditType?: string }).auditType === "EVAL_SUITE_RUN");
     expect(audit).toHaveLength(1);
-    expect((JSON.parse(audit[0]!.meta_json) as { resultsSha256: string }).resultsSha256).toMatch(/^[0-9a-f]{64}$/);
+    expect((JSON.parse(audit[0]!.meta_json) as { resultsSha256: string }).resultsSha256).toBe(sha256Hex(readFileSync(out)));
     const stamped = rows.filter((row) => row.event_type === "session/open" && String((JSON.parse(row.meta_json) as { caseExecution?: { casebookId?: string } }).caseExecution?.casebookId) === "eval-suite:stub-smoke");
     expect(stamped).toHaveLength(6);
     expect((JSON.parse(stamped[0]!.meta_json) as { agentId: string }).agentId).toBe("eval-suite");
@@ -261,10 +267,18 @@ describe("end to end through the CLI with the stub provider", () => {
     expect(logs.join("\n")).toContain("digest already recorded");
     await program.parseAsync(["eval", "suite", "compare", baseline, out, "--json"], { from: "user" });
     const verdict = JSON.parse(logs[logs.length - 1]!) as { status: string; reasons: string[] };
+    expect(verdict).toMatchObject({ claimKind: "synthetic_example", statusDimensions: { result: "not_evaluated" },
+      claimLabel: expect.stringMatching(/^Claim: Synthetic example/) });
     // Two attempts per side cannot separate even a total regression: the gate says so instead of passing (and names the refused graders where there is no backend).
     expect(verdict.status, verdict.reasons.join("; ")).toBe("inconclusive");
     expect(verdict.reasons.join("; ")).toContain("cannot separate even a total regression");
     if (!confined) expect(verdict.reasons.join("; ")).toContain("grader error");
+    expect(process.exitCode).toBe(2);
+    logs.length = 0;
+    process.exitCode = undefined;
+    await program.parseAsync(["eval", "suite", "compare", baseline, out], { from: "user" });
+    expect(logs[0]).toContain("Eval gate INCONCLUSIVE");
+    expect(logs[1]).toContain("Claim: Synthetic example (not evidence) · Result: not evaluated");
     expect(process.exitCode).toBe(2);
     // Mutation: an edited results file is no longer recorded in the ledger, so the gate is inconclusive (exit 2), never a pass.
     process.exitCode = undefined;
@@ -273,6 +287,7 @@ describe("end to end through the CLI with the stub provider", () => {
     await program.parseAsync(["eval", "suite", "compare", baseline, edited, "--json"], { from: "user" });
     expect(process.exitCode).toBe(2);
     expect(logs[logs.length - 1]).toContain("not recorded in the verified ledger");
+    expect(JSON.parse(logs.at(-1)!)).toMatchObject({ claimKind: "self_reported", statusDimensions: { result: "not_evaluated" } });
     // Nor can the edited file be laundered through `baseline`: only a recorded run becomes a baseline.
     process.exitCode = undefined;
     logs.length = 0;
@@ -289,6 +304,20 @@ describe("end to end through the CLI with the stub provider", () => {
       expect(logs.join("\n")).toContain(`${args[0]} must be an integer`);
     }
     expect(allEvents(ws).filter((row) => row.event_type === "audit" && (JSON.parse(row.meta_json) as { auditType?: string }).auditType === "EVAL_SUITE_RUN"), "no run was recorded for the refused flags").toHaveLength(1);
+
+    process.exitCode = undefined;
+    logs.length = 0;
+    const jsonOut = join(ws, "r-json.json");
+    await program.parseAsync(["eval", "suite", "run", SUITE, "--tasks", "echo-exact", "--out", jsonOut, "--json"], { from: "user" });
+    expect(process.exitCode, logs.join("\n")).toBeUndefined();
+    const { claimKind, statusDimensions, claimLabel, ...output } = JSON.parse(logs.at(-1)!);
+    expect({ claimKind, statusDimensions, claimLabel }).toMatchObject({ claimKind: "synthetic_example",
+      statusDimensions: { result: "not_evaluated" }, claimLabel: expect.stringMatching(/^Claim: Synthetic example/) });
+    const artifact = readFileSync(jsonOut, "utf8");
+    expect(output).toEqual(JSON.parse(artifact));
+    const jsonAudit = allEvents(ws).filter(row => row.event_type === "audit").map(row => JSON.parse(row.meta_json))
+      .find(meta => meta.auditType === "EVAL_SUITE_RUN" && meta.runId === output.runId);
+    expect(jsonAudit?.resultsSha256).toBe(sha256Hex(artifact));
   });
 
   it("an attempt that never started its turn is an error, not a fail; --unsafe-unconfined-graders grades the shipped repository task", async () => {

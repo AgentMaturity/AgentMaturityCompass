@@ -50,6 +50,8 @@ Command graders run through `SandboxRunner` with the grading directory as the on
 
 Eval sessions are OBSERVED native rows like any other session; they run under the `eval-suite` agent so they do not feed another agent's evidence unless `--agent` says so.
 
+Use the results file from `run --out` for baseline and comparison. The `--json` command output adds the claim label and status dimensions outside the recorded artifact.
+
 ## Baselines and gates
 
 `baseline` reduces a results file to per-task counts plus its fixture digests and records the baseline digest in a signed `EVAL_SUITE_BASELINE` row. It refuses a results file whose digest is not a recorded `EVAL_SUITE_RUN` of this workspace, so an edited results file cannot be laundered into a baseline every later run is gated against. Running it again on the same results file is idempotent. `compare` returns `pass` (exit 0), `fail` (1) or `inconclusive` (2). It is inconclusive, never a pass, when:

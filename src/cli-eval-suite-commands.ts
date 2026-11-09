@@ -6,6 +6,8 @@ import type { Command } from "commander";
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import chalk from "chalk";
+import { envelopeForSyntheticExample, envelopeForUnboundResult } from "./claims/eligibility/adapters.js";
+import { emitClaimResult } from "./cli/claimOutput.js";
 import { sha256Hex } from "./utils/hash.js";
 
 interface RunOptions { provider?: string; model?: string; baseUrl?: string; credential?: string; attempts?: string; out?: string; tasks?: string;
@@ -16,6 +18,12 @@ function parseBounded(flag: string, raw: string, min: number, max: number): numb
   const value = /^\d+$/.test(raw.trim()) ? Number(raw.trim()) : Number.NaN;
   if (!Number.isSafeInteger(value) || value < min || value > max) throw new Error(`${flag} must be an integer from ${min} to ${max}, got ${JSON.stringify(raw)}`);
   return value;
+}
+
+function suiteClaim(producer: string, providerId: unknown) {
+  const now = Date.now();
+  return providerId === "stub" ? envelopeForSyntheticExample({ producer, now })
+    : envelopeForUnboundResult({ producer, method: "executed_test", now });
 }
 
 export function registerEvalSuiteCommands(program: Command): void {
@@ -52,8 +60,8 @@ export function registerEvalSuiteCommands(program: Command): void {
           ...(opts.agent === undefined ? {} : { agentId: opts.agent }), ...(opts.tasks === undefined ? {} : { taskIds: opts.tasks.split(",").map((id) => id.trim()).filter(Boolean) }),
           allowUnconfinedGraders: opts.unsafeUnconfinedGraders === true, keepDirs: opts.keepDirs === true, onProgress: (line) => { if (!opts.json) console.error(chalk.gray(line)); } });
         if (opts.out !== undefined) writeFileSync(resolve(opts.out), json);
-        if (opts.json) { console.log(json); return; }
-        console.log(chalk.bold(`Eval suite ${results.suiteId} run ${results.runId} (${results.provider.providerId}${results.provider.model ? `/${results.provider.model}` : ""}, ${attempts} attempt(s) per task)`));
+        const title = chalk.bold(`Eval suite ${results.suiteId} run ${results.runId} (${results.provider.providerId}${results.provider.model ? `/${results.provider.model}` : ""}, ${attempts} attempt(s) per task)`);
+        if (emitClaimResult(title, results, suiteClaim("eval-suite:run", results.provider.providerId), opts)) return;
         for (const task of results.tasks) {
           const atK = Object.entries(task.score.passAtK).map(([k, v]) => `${k} ${v.toFixed(2)}`).join("  ");
           console.log(`  ${task.taskId.padEnd(24)} ${String(task.score.passes).padStart(2)}/${task.score.attempts} pass${task.score.errors ? `, ${task.score.errors} error` : ""}  ${atK}`);
@@ -113,10 +121,12 @@ export function registerEvalSuiteCommands(program: Command): void {
         const recorded = recordedDigests(process.cwd());
         const verdict = compareResults({ baselineJson, resultsJson, gate, recorded });
         const code = verdict.status === "pass" ? 0 : verdict.status === "fail" ? 1 : 2;
-        if (opts.json) console.log(JSON.stringify({ ...verdict, gate, recorded: { results: recorded.runs.has(sha256Hex(resultsJson)), baseline: recorded.baselines.has(sha256Hex(baselineJson)) } }, null, 2));
-        else {
-          const colour = verdict.status === "pass" ? chalk.green : verdict.status === "fail" ? chalk.red : chalk.yellow;
-          console.log(colour(`Eval gate ${verdict.status.toUpperCase()}`));
+        const resultsRecorded = recorded.runs.has(sha256Hex(resultsJson));
+        const providerId = resultsRecorded ? (JSON.parse(resultsJson) as { provider?: { providerId?: unknown } }).provider?.providerId : undefined;
+        const claim = suiteClaim("eval-suite:compare", providerId);
+        const result = { ...verdict, gate, recorded: { results: resultsRecorded, baseline: recorded.baselines.has(sha256Hex(baselineJson)) } };
+        const colour = verdict.status === "pass" ? chalk.green : verdict.status === "fail" ? chalk.red : chalk.yellow;
+        if (!emitClaimResult(colour(`Eval gate ${verdict.status.toUpperCase()}`), result, claim, opts)) {
           console.log(`  pass rate baseline ${verdict.passRate.baseline === null ? "n/a" : (verdict.passRate.baseline * 100).toFixed(1) + "%"} -> current ${verdict.passRate.current === null ? "n/a" : (verdict.passRate.current * 100).toFixed(1) + "%"}; regressed ${verdict.regressedTasks.length}, improved ${verdict.improvedTasks.length}${verdict.costRatio === null ? "" : `; cost ratio ${verdict.costRatio.toFixed(3)}`}`);
           for (const reason of verdict.reasons) console.log(`  - ${reason}`);
         }

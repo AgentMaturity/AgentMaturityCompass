@@ -40,6 +40,8 @@ export const RESULT_COMMANDS: readonly ResultCommand[] = [
   self("agent diagnose", "studio:diagnostic-self-run"),
   self("eval run", "diagnostic"),
   self("eval status", "eval:status"),
+  self("eval suite run", "eval-suite:run"),
+  self("eval suite compare", "eval-suite:compare"),
   self("executive brief", "diagnostic"),
   self("memory assess", "score:memoryMaturity"),
   self("ci check", "diagnostic"),
