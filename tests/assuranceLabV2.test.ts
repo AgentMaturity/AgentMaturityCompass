@@ -102,7 +102,7 @@ afterEach(() => {
   } else {
     delete process.env.AMC_VAULT_PASSPHRASE;
   }
-});
+}, 60_000); // Removing a full assurance run's evidence tree can exceed the default hook timeout.
 
 // Assurance scans invoke the real agent under test. These suites point that
 // target at a genuine local HTTP endpoint so the network + parsing path is
