@@ -165,9 +165,11 @@ export function writeScenarioResponse(params: {
   /** Tool calls the agent made; the digest then covers canonical `{ text, toolCalls }`. */
   toolCalls?: AgentToolCall[];
   agentId: string;
-  /** The gateway's signed receipts for this exchange, when it captured it; the provenance gate verifies the request receipt. */
+  /** The gateway's verified receipt pair for this exchange. */
   requestReceipt?: string;
   responseReceipt?: string;
+  /** A verified receipt that records the gateway saw only the request. */
+  requestSeenOnly?: string;
 }): string {
   const toolCallCount = params.toolCalls?.length ?? 0;
   // A reply without tool calls keeps the plain-text digest older records carry.
@@ -187,7 +189,8 @@ export function writeScenarioResponse(params: {
       trustTier: params.trustTier,
       toolCallCount,
       ...(params.requestReceipt === undefined ? {} : { requestReceipt: params.requestReceipt }),
-      ...(params.responseReceipt === undefined ? {} : { responseReceipt: params.responseReceipt })
+      ...(params.responseReceipt === undefined ? {} : { responseReceipt: params.responseReceipt }),
+      ...(params.requestSeenOnly === undefined ? {} : { requestSeenOnly: params.requestSeenOnly })
     }
   });
 }

@@ -24,7 +24,7 @@ export interface PackExecutionInput {
   getResponder: () => Promise<AgentResponder>;
   getExecutedScope: () => ExecutedRunScope | null;
   getCatalog: () => LoadedCatalog;
-  /** The run's gateway receipt admission (`gatewayReceiptAdmitter`): only a receipt bound to its exchange is stored (fix3 S12, S12c). */
+  /** The run's gateway receipt admission (`gatewayReceiptAdmitter`). */
   admitReceipts: (answer: AgentResponse, agentId: string) => GatewayReceiptAdmission;
   executedAttempts?: 1 | 25;
   now: string;
@@ -69,8 +69,7 @@ export async function executeAssurancePack(input: PackExecutionInput): Promise<A
       continue;
     }
     const toolCalls = answer.toolCalls.length > 0 ? { toolCalls: answer.toolCalls } : {};
-    // A gateway receipt bound to this exchange is its own provenance; its id fills the field that was always empty
-    // (SH-TRUST-02). A forged or replayed one is audited and dropped; the row is graded all the same (S12, S12c).
+    // Only a verified pair can supply a correlation id. Refused receipts are audited without affecting grading.
     const receipt = input.admitReceipts(answer, agentId);
     if (receipt.rejected.length > 0) {
       writeAssuranceAudit({ ledger, sessionId, runtime, trustTier, agentId, packId: pack.id, scenarioId: scenario.id,
@@ -80,7 +79,8 @@ export async function executeAssurancePack(input: PackExecutionInput): Promise<A
     const responseEventId = writeScenarioResponse({ ledger, sessionId, runtime, trustTier, packId: pack.id, scenarioId: scenario.id,
       response: answer.text, toolCalls: answer.toolCalls, agentId,
       ...(receipt.request === null ? {} : { requestReceipt: receipt.request.receipt }),
-      ...(receipt.response === null ? {} : { responseReceipt: receipt.response }) });
+      ...(receipt.response === null ? {} : { responseReceipt: receipt.response }),
+      ...(receipt.requestSeenOnly === null ? {} : { requestSeenOnly: receipt.requestSeenOnly }) });
 
     // Refused, tool-call-only and token-claim replies are inconclusive (scenarioGrading.ts).
     const grade = gradeScenarioReply(scenario, answer, prompt, context);

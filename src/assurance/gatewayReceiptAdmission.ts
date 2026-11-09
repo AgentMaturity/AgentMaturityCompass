@@ -3,14 +3,14 @@ import { verifyReceipt, type ReceiptKind, type ReceiptPayload } from "../receipt
 import type { AgentResponse } from "./agentResponder.js";
 
 /**
- * Gateway receipts on an assurance or red-team reply (fix3 S12, S12c). The agent under test controls its own response
+ * Gateway receipts on an assurance or red-team reply (fix3 S12, S12c, S12d). The agent under test controls its own response
  * headers (on the direct transport it IS the endpoint), so a receipt header proves nothing until it is bound to the
  * exchange AMC itself sent and received: it verifies against this workspace's receipt keys, is the right kind
  * (`llm_request` / `llm_response`), names the agent under test, commits to the exact bytes on the wire (`body_sha256`),
  * was minted while the exchange was in flight, and was not already bound to another exchange of the run; the response
- * receipt must come from the request receipt's gateway session. Anything else is a forgery or a replay: dropped,
- * recorded as one `ASSURANCE_RECEIPT_REJECTED` row, and never a reason to refuse the graded row, so the system under
- * test can neither suppress its own evidence nor dress a direct exchange up as gateway-captured.
+ * receipt must come from the request receipt's gateway session. Only the pair proves the graded exchange. A valid
+ * request on its own records that the gateway saw the request. Refused receipts are dropped and audited in one
+ * `ASSURANCE_RECEIPT_REJECTED` row. The run still grades the reply.
  */
 
 /** How far a receipt's mint time may fall outside this process's view of the exchange (the gateway runs locally). */
@@ -22,10 +22,12 @@ function workspaceReceiptKeys(workspace: string): string[] {
 }
 
 export interface GatewayReceiptAdmission {
-  /** The admitted request receipt and its verified id, or null when absent or refused. */
+  /** The verified request receipt and id when both receipts prove this exchange. */
   request: { receipt: string; receiptId: string } | null;
-  /** The admitted response receipt, or null when absent or refused. */
+  /** The verified response receipt when both receipts prove this exchange. */
   response: string | null;
+  /** A verified request receipt without a matching response. This never proves a graded exchange. */
+  requestSeenOnly: string | null;
   /** Why each present receipt was refused. */
   rejected: string[];
 }
@@ -58,7 +60,12 @@ export function admitGatewayReceipts(answer: ReceiptAnswer, keys: readonly strin
     if (request === null) rejected.push("gateway response receipt has no admitted request receipt");
     else if (admit("response", answer.responseReceipt, "llm_response", wire?.responseSha256 ?? [], request.session_id) !== null) response = answer.responseReceipt;
   }
-  return { request: request === null ? null : { receipt: answer.receiptId!, receiptId: request.receipt_id }, response, rejected };
+  return {
+    request: request !== null && response !== null ? { receipt: answer.receiptId!, receiptId: request.receipt_id } : null,
+    response,
+    requestSeenOnly: request !== null && response === null ? answer.receiptId! : null,
+    rejected
+  };
 }
 
 /** One run's admission: the workspace's receipt keys, read once, and the receipt ids already bound to an exchange of the run. */

@@ -545,13 +545,13 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
         }
         const response = answer.text;
         const toolCalls = answer.toolCalls.length > 0 ? { toolCalls: answer.toolCalls } : {};
-        // Gateway receipts are admitted as the reply arrives, only when bound to this exchange; the agent under test can send
-        // any header it likes, so a forged or replayed one is audited and dropped, never a reason to refuse the run (S12, S12c).
+        // Only a verified pair can supply a correlation id. Refused receipts are audited without affecting grading.
         const receipt = admitReceipts(answer, agentId);
         if (rows !== null && receipt.rejected.length > 0) writeAssuranceAudit({ ...rows, ...scenarioRow, auditType: "ASSURANCE_RECEIPT_REJECTED", severity: "HIGH", message: `Gateway receipt rejected: ${receipt.rejected.join(" | ")}` });
         const correlatedRequestIds = receipt.request === null ? [] : [receipt.request.receiptId];
         const responseEventId = rows === null ? null : writeScenarioResponse({ ...rows, ...scenarioRow, response, toolCalls: answer.toolCalls,
-          ...(receipt.request === null ? {} : { requestReceipt: receipt.request.receipt }), ...(receipt.response === null ? {} : { responseReceipt: receipt.response }) });
+          ...(receipt.request === null ? {} : { requestReceipt: receipt.request.receipt }), ...(receipt.response === null ? {} : { responseReceipt: receipt.response }),
+          ...(receipt.requestSeenOnly === null ? {} : { requestSeenOnly: receipt.requestSeenOnly }) });
         const exchangeIds = promptEventId === null || responseEventId === null ? [] : [promptEventId, responseEventId];
         const grade = gradeScenarioReply(scenario, answer, attackPrompt, context);
         if (grade.kind === "inconclusive") {
