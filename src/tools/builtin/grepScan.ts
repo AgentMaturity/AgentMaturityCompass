@@ -4,8 +4,8 @@ import { forMatching, globToRegExp, readWorkspaceFile, walkWorkspace } from "./w
  * The grep scan (SH-TOOLS-04), run inside the search worker: ripgrep's everyday options over the JavaScript engine,
  * with every cap named in the output. Only the parent owns the deadline: it can terminate even a blocked RegExp.test.
  *
- * Paging: `offset` matches are skipped without being rendered, then up to `maxResults` are returned; the notice names
- * the next offset. A page past the end says so and how many matches there were. The scan caps (`maxScannedBytes`,
+ * Paging: `offset` units (matches in `content` mode, files in `files` and `count` mode) are skipped without being
+ * rendered, then up to `maxResults` are returned; the notice names the next offset. A page past the end says so and how many matches there were. The scan caps (`maxScannedBytes`,
  * the walk's file cap, the deadline) bound the skipped matches too, so a page cannot be claimed complete when the
  * scan was not.
  */
@@ -68,6 +68,7 @@ const clip = (line: string): string => (line.length > MAX_LINE_CHARS ? `${line.s
 /** A file's rendered page lines: matches as `path:line:text`, context as `path-line-text`, `--` between groups. */
 function renderFile(path: string, lines: readonly string[], hits: readonly number[], context: number, previousGroup: boolean): { rows: string[]; grouped: boolean } {
   const rows: string[] = [];
+  const hitSet = new Set(hits);
   let lastShown = -1;
   let grouped = previousGroup;
   for (const hit of hits) {
@@ -76,7 +77,8 @@ function renderFile(path: string, lines: readonly string[], hits: readonly numbe
     if (context > 0 && grouped && from > lastShown + 1) rows.push("--");
     for (let index = from; index <= to; index++) {
       if (index <= lastShown) continue;
-      rows.push(index === hit ? `${path}:${index + 1}:${clip(lines[index] ?? "")}` : `${path}-${index + 1}-${clip(lines[index] ?? "")}`);
+      // A match inside the previous match's trailing context is still a match.
+      rows.push(hitSet.has(index) ? `${path}:${index + 1}:${clip(lines[index] ?? "")}` : `${path}-${index + 1}-${clip(lines[index] ?? "")}`);
       lastShown = index;
     }
     grouped = true;
@@ -95,6 +97,7 @@ export function scanGrep(workspace: string, args: GrepArgs): ScanResult {
   let skipped = 0;
   let shown = 0;
   let total = 0;
+  let pageMatches = 0;
   let hitResultCap = false;
   let hitByteCap = false;
   let hitScanCap = false;
@@ -123,13 +126,18 @@ export function scanGrep(workspace: string, args: GrepArgs): ScanResult {
     const lines = text.split("\n");
     const hits = matchingLines(pattern, lines, text, args.multiline);
     if (hits.length === 0) continue;
-    total += args.mode === "files" ? 1 : hits.length;
     if (args.mode === "count") {
+      // Files are the unit: `offset` skips whole files, and the total counts only the files on this page, so a capped
+      // page never claims matches it did not show (the skipped files are counted for the past-the-end notice).
+      total += 1;
+      if (skipped < args.offset) { skipped++; continue; }
       if (shown >= args.maxResults) { hitResultCap = true; break; }
       shown++;
+      pageMatches += hits.length;
       if (!emit([`${relativePath}:${hits.length}`])) break;
       continue;
     }
+    total += args.mode === "files" ? 1 : hits.length;
     // Paging in units of the mode: files in `files` mode, matches otherwise.
     const units = args.mode === "files" ? [hits[0]!] : hits;
     const page: number[] = [];
@@ -150,9 +158,9 @@ export function scanGrep(workspace: string, args: GrepArgs): ScanResult {
   if (hitByteCap) out.push(`[amc: stopped at ${args.maxBytes} bytes of output; more matches exist]`);
   if (hitScanCap) out.push(`[amc: stopped at ${args.maxScannedBytes} bytes scanned; results incomplete]`);
   if (walked.truncated) out.push(`[amc: the walk stopped at ${MAX_FILES_WALKED} files; results are incomplete]`);
-  if (args.mode === "count" && out.length > 0) out.push(`[amc: ${total} matches in ${shown} files${hitScanCap || walked.truncated ? " (scan incomplete)" : ""}]`);
+  if (args.mode === "count" && shown > 0) out.push(`[amc: ${pageMatches} matches in ${shown} files${hitResultCap ? " on this page" : ""}${hitScanCap || walked.truncated ? " (scan incomplete)" : ""}]`);
   if (shown === 0 && args.offset > 0 && !hitScanCap && !walked.truncated && !hitByteCap) {
-    out.push(`[amc: no entries at offset ${args.offset}; ${total} ${args.mode === "files" ? "files" : "matches"} in total]`);
+    out.push(`[amc: no entries at offset ${args.offset}; ${total} ${args.mode === "content" ? "matches" : "files"} in total]`);
   }
   if (out.length === 0) out.push(`[amc: no matches for ${args.pattern}]`);
   return { ok: true, output: out.join("\n") };

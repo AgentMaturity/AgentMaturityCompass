@@ -574,6 +574,23 @@ describe("grep options", () => {
     expect((await h.run("grep", { pattern: "HIT", mode: "files", maxResults: 1 })).output).toContain("stopped at 1 files; more exist — pass offset 1");
   });
 
+  it("pages count mode by files, totals only the page shown, and says when a page is past the end", async () => {
+    const h = harness();
+    write(h.workspace, "a.txt", "HIT\nHIT\n");
+    write(h.workspace, "b.txt", "HIT\nHIT\nHIT\n");
+    write(h.workspace, "c.txt", "HIT\n");
+    const page = async (offset: number) => (await h.run("grep", { pattern: "HIT", mode: "count", maxResults: 1, offset })).output.split("\n");
+    const first = await page(0);
+    expect(first[0]).toBe("a.txt:2");
+    expect(first[1]).toContain("pass offset 1");
+    expect(first[2]).toBe("[amc: 2 matches in 1 files on this page]");
+    const second = await page(1);
+    expect(second[0]).toBe("b.txt:3");
+    expect(second[1]).toContain("pass offset 2");
+    expect(await page(2)).toEqual(["c.txt:1", "[amc: 1 matches in 1 files]"]);
+    expect(await page(3)).toEqual(["[amc: no entries at offset 3; 3 files in total]"]);
+  });
+
   it("pages with offset and names the next page, and says when a page is past the end", async () => {
     const h = harness();
     write(h.workspace, "many.txt", Array.from({ length: 12 }, (_, index) => `hit ${index + 1}`).join("\n"));
