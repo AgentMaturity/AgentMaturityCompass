@@ -75,7 +75,7 @@ import { loadNativeAudioManifest } from "./attachments/nativeAudioFiles.js";
 import type { NativeAudioPart } from "./attachments/nativeAudioInput.js";
 
 import {
-  activeChildLimitOption, approvalGateFor, armTurnSignals, collectOption, collectDelegateStop, compactionOption, integerOption, liveTextPreviewPrinter, paramsFor, piAiRouteSelection, renderNotification, resetDelegateStops, routeFor,
+  activeChildLimitOption, approvalGateFor, armTurnSignals, collectOption, collectDelegateStop, compactionOption, integerOption, liveTextPreviewPrinter, paramsFor, piAiRouteSelection, renderNotification, resetDelegateStops, routeFor, withReasoningAndRouteOptions,
   type AgentLoopCliIo, type RunOptions
 } from "./cli-agent-options.js";
 export type { AgentLoopCliIo, RunOptions } from "./cli-agent-options.js";
@@ -128,7 +128,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
 
   registerAgentGuideCommands(group, io);
 
-  withLeaseFileOption(group
+  withLeaseFileOption(withReasoningAndRouteOptions(group
     .command("chat")
     .option("--agent <id>", "agent identity; defaults to AMC_AGENT_ID, the current agent, then default")
     .description("Interactive native tasks over the existing governed run/resume path for the selected agent")
@@ -156,9 +156,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--tools <mode>", "none, echo, or explicitly enabled workspace tools; existing policy still applies")
     .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")
     .option("--web-search-searxng <origin>", WEB_SEARCH_SEARXNG_HELP)
-    .option("--max-tokens <n>", "output-token limit per request (default 512)")
-    .option("--thinking <mode>", "DeepSeek only: enabled or disabled; tools-free chat requires explicit disabled")
-    .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high, or max with enabled thinking")
+    .option("--max-tokens <n>", "output-token limit per request (default 512)"),
+    "enabled or disabled: DeepSeek (tools-free chat requires disabled), Gemini (includeThoughts) and Ollama (think); Anthropic thinking cannot continue a chat")
     .option("--max-steps <n>", "model steps per turn (default 8, or 2 for stub)")
     .option("--context-window <tokens>", "override the reviewed model context window for automatic compaction")
     .option("--compact-threshold <fraction>", "use ratio trigger instead of the catalog token reserve (0.5-0.95; requires --context-window)")
@@ -171,7 +170,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       await runNativeInteractiveSession({ ...opts, agentId: selectedAgentOption(command), workspace: process.cwd() }, io);
     }));
 
-  withLeaseFileOption(withBreadthRunOptions(group
+  withLeaseFileOption(withBreadthRunOptions(withReasoningAndRouteOptions(group
     .command("run")
     .option("--agent <id>", "agent identity; defaults to AMC_AGENT_ID, the current agent, then default")
     .description("Run one agent turn and report what the signed log recorded")
@@ -192,9 +191,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--credentials-file <path>", "explicit credentials file, overriding the home layout")
     .option("--mcp-config <path>", "reviewed MCP JSON; repeat to mount more servers under the same signed allowlist; each grant keeps its reviewed action class; requires --tools workspace and --approve-tools", collectOption)
     .option("--mcp-config-sha256 <digest>", "refuse an MCP config changed from these exact reviewed bytes; one per --mcp-config, in the same order", collectOption)
-    .option("--max-tokens <n>", "provider max_tokens for each request")
-    .option("--thinking <mode>", "DeepSeek only: enabled (default) or disabled")
-    .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high (default), or max with enabled thinking")
+    .option("--max-tokens <n>", "provider max_tokens for each request"),
+    "enabled or disabled: DeepSeek, Anthropic (tools-free: adaptive, or manual with --thinking-budget), Gemini (includeThoughts) and Ollama (think)")
     .option("--max-steps <n>", "how many model steps one turn may take")
     .option("--context-window <tokens>", "override the reviewed model context window for automatic compaction")
     .option("--compact-threshold <fraction>", "use ratio trigger instead of the catalog token reserve (0.5-0.95; requires --context-window)")

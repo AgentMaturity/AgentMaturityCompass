@@ -55,12 +55,16 @@ function modelsPath(providerId: string, protocol: string): string {
   throw new Error("Remote model enumeration is unsupported for this provider/protocol");
 }
 
+/** Plain http is loopback only: literal 127.x or [::1]; `localhost` can resolve elsewhere and is not accepted. */
+export function isLoopbackHttp(url: URL): boolean {
+  return url.protocol === "http:" && (url.hostname === "[::1]" || /^127(?:\.\d{1,3}){3}$/.test(url.hostname));
+}
+
 function endpoint(baseUrl: string, path: string): string {
   try {
     const url = new URL(baseUrl);
     if (baseUrl.length > 4096 || !/^https?:\/\/[^/?#\\]+\/?$/i.test(baseUrl) || url.username || url.password
-      || !["http:", "https:"].includes(url.protocol)
-      || (url.protocol === "http:" && url.hostname !== "[::1]" && !/^127(?:\.\d{1,3}){3}$/.test(url.hostname))) throw new Error();
+      || !["http:", "https:"].includes(url.protocol) || (url.protocol === "http:" && !isLoopbackHttp(url))) throw new Error();
     return `${url.origin}${path}`;
   } catch { throw new Error("Model enumeration requires a credential-free HTTP(S) origin"); }
 }

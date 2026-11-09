@@ -4,6 +4,7 @@ import { serveAcpStartupRefusal } from "./acpStartupRefusal.js";
 import { NATIVE_TASK_INITIATOR_ENV, NATIVE_TASK_SYSTEM_PROMPT_ENV } from "./acpRuntimeContracts.js";
 import { takeNativeTaskLease } from "./nativeTaskLease.js";
 import { compactionFromFlags } from "../agent/compaction/promptPressure.js";
+import type { RunOptions } from "../cli-agent-options.js";
 
 /**
  * `amc acp` (plan P7.1a).
@@ -44,8 +45,13 @@ export function registerAcpCommands(program: Command): void {
     .option("--mcp-config <path>", "Reviewed native MCP config; repeat for more servers; requires workspace tools and signed approvals", (path: string, previous: string[] = []) => [...previous, path])
     .option("--mcp-config-sha256 <digest>", "Pin exact reviewed MCP configuration bytes; one per --mcp-config in the same order", (digest: string, previous: string[] = []) => [...previous, digest])
     .option("--max-tokens <n>", "Positive output-token bound per model request", "512")
-    .option("--thinking <mode>", "DeepSeek only: enabled (default) or disabled")
-    .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high (default), or max with enabled thinking")
+    .option("--thinking <mode>", "enabled or disabled: DeepSeek, Anthropic (tools-free: adaptive, or manual with --thinking-budget), Gemini and Ollama")
+    .option("--reasoning-effort <effort>", "Sent verbatim: DeepSeek low|high|max, Anthropic low|medium|high|xhigh|max (output_config.effort), Gemini MINIMAL|LOW|MEDIUM|HIGH, Ollama low|medium|high|max")
+    .option("--thinking-budget <tokens>", "Anthropic manual budget_tokens (Claude 4.5/4.6; >= 1024, below --max-tokens) or Gemini thinkingBudget")
+    .option("--cache-retention <mode>", "short or long prompt-cache retention on anthropic, openai and openai-responses routes")
+    .option("--max-retries <n>", "Model-request retries after the first attempt (default 5; 0 gives up on the first failure)")
+    .option("--retry-max-delay <ms>", "Local backoff ceiling in milliseconds (500 to 2147483647, default 10000)")
+    .option("--retry-max-provider-delay <ms>", "Ceiling on a provider-requested wait; defaults to --retry-max-delay (10000) because a client's prompt deadline is invisible here; never below it")
     .option("--max-steps <n>", "Positive model-step bound per turn (default 8, stub 2)")
     .option("--context-window <tokens>", "Override the reviewed model context window for automatic compaction")
     .option("--compact-threshold <fraction>", "Use ratio trigger instead of the catalog token reserve (0.5-0.95; requires --context-window)")
@@ -53,7 +59,7 @@ export function registerAcpCommands(program: Command): void {
     .option("--no-auto-compact", "Turn automatic compaction off (on by default for a reviewed model context window)")
     .option("--agent-id <id>", "Agent identity recorded in the ledger", "default")
     .option("--system-prompt <text>", "System prompt for each session", "You are a careful assistant.")
-    .action((opts: {
+    .action((opts: Pick<RunOptions, "thinking" | "reasoningEffort" | "thinkingBudget" | "cacheRetention" | "maxRetries" | "retryMaxDelay" | "retryMaxProviderDelay" | "maxSteps" | "contextWindow" | "compactThreshold" | "autoSummary" | "autoCompact"> & {
       provider: string;
       model?: string;
       baseUrl?: string;
@@ -75,13 +81,6 @@ export function registerAcpCommands(program: Command): void {
       mcpConfig?: string[];
       mcpConfigSha256?: string[];
       maxTokens: string;
-      thinking?: string;
-      reasoningEffort?: string;
-      maxSteps?: string;
-      contextWindow?: string;
-      compactThreshold?: string;
-      autoSummary?: boolean;
-      autoCompact?: boolean;
       agentId: string;
       systemPrompt: string;
     }) => {
@@ -116,6 +115,11 @@ export function registerAcpCommands(program: Command): void {
           maxTokens: Number(opts.maxTokens),
           ...(opts.thinking === undefined ? {} : { thinking: opts.thinking }),
           ...(opts.reasoningEffort === undefined ? {} : { reasoningEffort: opts.reasoningEffort }),
+          ...(opts.thinkingBudget === undefined ? {} : { thinkingBudget: opts.thinkingBudget }),
+          ...(opts.cacheRetention === undefined ? {} : { cacheRetention: opts.cacheRetention }),
+          ...(opts.maxRetries === undefined ? {} : { maxRetries: opts.maxRetries }),
+          ...(opts.retryMaxDelay === undefined ? {} : { retryMaxDelay: opts.retryMaxDelay }),
+          ...(opts.retryMaxProviderDelay === undefined ? {} : { retryMaxProviderDelay: opts.retryMaxProviderDelay }),
           ...(opts.maxSteps === undefined ? {} : { maxSteps: Number(opts.maxSteps) }),
           ...(opts.credentialsHome === undefined ? {} : { credentialsHome: opts.credentialsHome }),
           ...(opts.credentialsFile === undefined ? {} : { credentialsFile: opts.credentialsFile }),

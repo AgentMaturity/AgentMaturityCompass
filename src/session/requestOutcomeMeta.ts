@@ -59,6 +59,8 @@ export interface RecordedFailure {
   readonly status: number | null;
   /** Provider-advertised wait before retrying, in ms, or null. */
   readonly providerRetryAfterMs: number | null;
+  /** SH-PROVIDERS-04: the header that wait was read from (`retry-after` or a rate-limit reset header); absent on older rows. */
+  readonly providerDelayHeader?: string;
   /** Provider-side request id for support escalation, or null. */
   readonly requestId: string | null;
 }

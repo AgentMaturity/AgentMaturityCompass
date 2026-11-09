@@ -123,8 +123,13 @@ export function registerNativeScheduleCommands(program: Command, io: AgentLoopCl
       .requiredOption("--approve-tools <actionClass>", "signed approval class; all enabled schedule scopes must match it")
       .option("--approve-risk <tier>", "signed approval risk tier, default high")
       .option("--max-tokens <n>", "positive per-request output ceiling", "1024")
-      .option("--thinking <mode>", "DeepSeek only: enabled (default) or disabled")
-      .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high (default), or max with enabled thinking")
+      .option("--thinking <mode>", "enabled or disabled: DeepSeek, Gemini and Ollama (Anthropic thinking needs tools-free runs, which schedules are not)")
+      .option("--reasoning-effort <effort>", "sent verbatim: DeepSeek low|high|max, Anthropic low|medium|high|xhigh|max (output_config.effort), Gemini MINIMAL|LOW|MEDIUM|HIGH, Ollama low|medium|high|max")
+      .option("--thinking-budget <tokens>", "Gemini thinkingBudget")
+      .option("--cache-retention <mode>", "short or long prompt-cache retention on anthropic, openai and openai-responses routes")
+      .option("--max-retries <n>", "model-request retries after the first attempt (default 5)")
+      .option("--retry-max-delay <ms>", "local backoff ceiling in milliseconds (500 to 2147483647, default 10000)")
+      .option("--retry-max-provider-delay <ms>", "ceiling on a provider-requested wait, default 60000; never below --retry-max-delay")
       .option("--max-steps <n>", "positive native model steps per round", "8");
     if (commandName === "watch") command.option("--poll-ms <ms>", "delay after a pass settles, never an overlapping interval", "30000");
     command.action(async (opts: ExecuteOptions) => {

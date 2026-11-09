@@ -62,7 +62,7 @@ function harness(protocol: typeof protocols[number], cacheRetention: "short" | "
 describe("PXA-15 route cache retention uses reconstructable encoder versions", () => {
   test.each(protocols)("$id registers a retention version, keeps the adapter's default and every historical version", protocol => {
     expect(protocol.adapter.encoderVersion).toBe(protocol.previous);
-    expect(cacheRetentionEncoderVersion(protocol.id, protocol.previous)).toBe(protocol.version);
+    expect(cacheRetentionEncoderVersion(protocol.adapter.id, protocol.id, protocol.previous)).toBe(protocol.version);
     const plain = new AdapterRegistry(); plain.register(route(protocol));
     expect(plain.pin({ providerId: "fixture", model: REQUEST.model })).toMatchObject({ encoderVersion: protocol.previous });
     expect(plain.pin({ providerId: "fixture", model: REQUEST.model }).cacheRetention).toBeUndefined();

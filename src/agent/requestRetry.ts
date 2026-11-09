@@ -148,11 +148,14 @@ export function decideRetry(
   }
 
   const wait = retryDelay(policy, failure, attempt, random);
+  const header = failure.providerDelayHeader === undefined ? "" : ` (${failure.providerDelayHeader})`;
   return {
     decision: "retry",
     reason:
       wait.source === "provider"
-        ? `retryable ${failure.code}; the provider asked for ${wait.ms}ms`
+        ? wait.clampedFromMs === undefined
+          ? `retryable ${failure.code}; the provider asked for ${wait.ms}ms${header}`
+          : `retryable ${failure.code}; the provider asked for ${wait.clampedFromMs}ms${header}, clamped to the route's ${wait.ms}ms provider ceiling`
         : `retryable ${failure.code}; local backoff of ${wait.ms}ms`,
     delayMs: wait.ms,
     delaySource: wait.source,
@@ -164,8 +167,11 @@ export function decideRetry(
  * How long to wait before asking again.
  *
  * A provider that named a delay gets that delay VERBATIM (clamped to the
- * policy's ceiling, because an unbounded remote-controlled sleep is a remote
- * denial of service). No jitter is added to it: `Retry-After: 2` means the
+ * policy's PROVIDER ceiling, `maxProviderDelayMs`, which is separate from and
+ * never below the local backoff ceiling: a `Retry-After: 30` is honoured where
+ * a 10 s backoff cap would have retried early and failed again, while an
+ * unbounded remote-controlled sleep stays a remote denial of service). A clamp
+ * is reported, so the signed `loop/retry` reason never hides it. No jitter is added to it: `Retry-After: 2` means the
  * provider will not serve this caller for two seconds, and jittering downward
  * would produce a second refusal that the operator then pays for twice.
  *
@@ -177,10 +183,12 @@ function retryDelay(
   failure: LlmFailure,
   attempt: number,
   random: () => number
-): { readonly ms: number; readonly source: "provider" | "backoff" } {
+): { readonly ms: number; readonly source: "provider" | "backoff"; readonly clampedFromMs?: number } {
   const asked = failure.providerRetryAfterMs;
   if (asked !== undefined) {
-    return { ms: Math.min(Math.round(asked), policy.maxDelayMs), source: "provider" };
+    const rounded = Math.round(asked);
+    const ms = Math.min(rounded, policy.maxProviderDelayMs);
+    return { ms, source: "provider", ...(ms === rounded ? {} : { clampedFromMs: rounded }) };
   }
   // Exponent capped before the multiply: `initialDelayMs * 2 ** 40` overflows to
   // Infinity, and `setTimeout(Infinity)` fires immediately — a backoff that

@@ -1620,6 +1620,11 @@ Serve the Agent Client Protocol on stdio (for editors; prints nothing but frames
 | `--max-tokens <n>` | - |
 | `--thinking <mode>` | - |
 | `--reasoning-effort <effort>` | - |
+| `--thinking-budget <tokens>` | - |
+| `--cache-retention <mode>` | - |
+| `--max-retries <n>` | - |
+| `--retry-max-delay <ms>` | - |
+| `--retry-max-provider-delay <ms>` | - |
 | `--max-steps <n>` | - |
 | `--context-window <tokens>` | - |
 | `--compact-threshold <fraction>` | - |
@@ -1809,6 +1814,11 @@ Interactive native tasks over the existing governed run/resume path for the sele
 | `--max-tokens <n>` | - |
 | `--thinking <mode>` | - |
 | `--reasoning-effort <effort>` | - |
+| `--thinking-budget <tokens>` | - |
+| `--cache-retention <mode>` | - |
+| `--max-retries <n>` | - |
+| `--retry-max-delay <ms>` | - |
+| `--retry-max-provider-delay <ms>` | - |
 | `--max-steps <n>` | - |
 | `--context-window <tokens>` | - |
 | `--compact-threshold <fraction>` | - |
@@ -1885,6 +1895,11 @@ Run one agent turn and report what the signed log recorded
 | `--max-tokens <n>` | - |
 | `--thinking <mode>` | - |
 | `--reasoning-effort <effort>` | - |
+| `--thinking-budget <tokens>` | - |
+| `--cache-retention <mode>` | - |
+| `--max-retries <n>` | - |
+| `--retry-max-delay <ms>` | - |
+| `--retry-max-provider-delay <ms>` | - |
 | `--max-steps <n>` | - |
 | `--context-window <tokens>` | - |
 | `--compact-threshold <fraction>` | - |

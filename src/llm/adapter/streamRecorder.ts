@@ -234,6 +234,7 @@ export class StreamRecorder {
       code: failure.code,
       status: failure.status ?? null,
       providerRetryAfterMs: failure.providerRetryAfterMs ?? null,
+      ...(failure.providerDelayHeader === undefined ? {} : { providerDelayHeader: failure.providerDelayHeader }),
       requestId: failure.requestId ?? null
     };
   }

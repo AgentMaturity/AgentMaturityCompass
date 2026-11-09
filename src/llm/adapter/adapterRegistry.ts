@@ -167,9 +167,9 @@ function routeCacheRetention(config: LlmRouteConfig): Registration["cacheRetenti
   const value: unknown = config.cacheRetention;
   if (value === undefined) return undefined;
   if (!isCacheRetention(value)) throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", `route ${config.providerId}: cacheRetention must be short or long`);
-  const encoderVersion = cacheRetentionEncoderVersion(config.adapter.encoderId, config.adapter.encoderVersion);
+  const encoderVersion = cacheRetentionEncoderVersion(config.adapter.id, config.adapter.encoderId, config.adapter.encoderVersion);
   if (encoderVersion === null) {
-    throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", `route ${config.providerId}: cacheRetention is unsupported by encoder ${config.adapter.encoderId}@${config.adapter.encoderVersion}`);
+    throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", `route ${config.providerId}: cacheRetention is unsupported by adapter ${config.adapter.id} (encoder ${config.adapter.encoderId}@${config.adapter.encoderVersion})`);
   }
   return Object.freeze({ value, encoderVersion });
 }

@@ -27,12 +27,33 @@ function contract(protocol: string, supported: readonly ProviderCapability[], de
   return Object.freeze({ schemaVersion: 1, protocol, features: Object.freeze(features), ...details,
     toolReplay: "provider-call-id-and-text-result", modelSupport: "not-probed" });
 }
+/**
+ * A contract whose features are UNKNOWN unless proven: for bytes or servers AMC did not write (pi-ai, the OpenAI-compatible
+ * family). Unknown is refused at prepare when required, never assumed supported.
+ */
+export function provenContract(protocol: string, proven: Partial<Record<ProviderCapability, CapabilitySupport>>,
+  details: Pick<ProviderCapabilities, "usage" | "cache" | "thinking" | "toolErrorRepresentation">): ProviderCapabilities {
+  const features = Object.fromEntries(CAPABILITY_NAMES.map(name => [name, proven[name] ?? "unknown"])) as Record<ProviderCapability, CapabilitySupport>;
+  return Object.freeze({ schemaVersion: 1, protocol, features: Object.freeze(features), ...details,
+    toolReplay: "provider-call-id-and-text-result", modelSupport: "not-probed" });
+}
 const BASE: readonly ProviderCapability[] = ["text-input", "text-output", "tool-calls", "tool-replay", "usage"];
 /** Historical openai-chat@2/@3 admission must not inherit new modalities. */
 export const OPENAI_CHAT_TEXT_CAPABILITIES = contract("openai-chat-completions", [...BASE, "tool-result-error-text", "cache-read-usage"],
   { usage: "reported-required", cache: "automatic", thinking: "unsupported", toolErrorRepresentation: "amc-text-envelope-v1" });
 export const OPENAI_CHAT_CAPABILITIES = contract("openai-chat-completions", [...BASE, "image-input", "tool-result-error-text", "cache-read-usage"],
   { usage: "reported-required", cache: "automatic", thinking: "unsupported", toolErrorRepresentation: "amc-text-envelope-v1" });
+/**
+ * SH-PROVIDERS-01: a third-party server speaking the Chat Completions dialect. Only what the shared decoder proves on
+ * any such server is supported; image input and the cache counters stay unknown until a route-specific test proves them;
+ * thinking, audio, image output, video input, prompt-cache control and the tool-result error flag are unsupported
+ * (the shared decoder refuses or never emits them).
+ */
+export const OPENAI_COMPATIBLE_CAPABILITIES = provenContract("openai-chat-completions",
+  { "text-input": "supported", "text-output": "supported", "tool-calls": "supported", "tool-replay": "supported", usage: "supported",
+    "tool-result-error-text": "supported", "tool-result-error-flag": "unsupported", "thinking-output": "unsupported", "thinking-replay": "unsupported",
+    "audio-input": "unsupported", "audio-output": "unsupported", "image-output": "unsupported", "video-input": "unsupported", "prompt-cache-control": "unsupported" },
+  { usage: "reported-required", cache: "none", thinking: "unsupported", toolErrorRepresentation: "amc-text-envelope-v1" });
 export const ANTHROPIC_CAPABILITIES = contract("anthropic-messages", [...BASE, "image-input", "thinking-output", "tool-result-error-flag", "cache-read-usage", "cache-write-usage", "prompt-cache-control"],
   { usage: "reported-required", cache: "explicit-breakpoints", thinking: "output-text-only-no-replay", toolErrorRepresentation: "wire-error-flag" });
 /** Historical openai-responses@1/@2 admission must not inherit new modalities. */

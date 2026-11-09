@@ -4,7 +4,7 @@
  * which sits at the 800-line new-file cap; behaviour is unchanged.
  */
 import type { Command } from "commander";
-import { inspectNativeFirstUse, renderNativeFirstUseGuide, type NativeFirstUseOptions } from "./setup/nativeFirstUseGuide.js";
+import { inspectNativeFirstUse, NATIVE_FIRST_USE_PROVIDER_LIST, renderNativeFirstUseGuide, type NativeFirstUseOptions } from "./setup/nativeFirstUseGuide.js";
 import { NativeMcpConfigError } from "./setup/nativeMcpConfig.js";
 import type { AgentLoopCliIo } from "./cli-agent-options.js";
 
@@ -17,9 +17,9 @@ export function registerAgentGuideCommands(group: Command, io: AgentLoopCliIo): 
     .command("guide")
     .option("--agent <id>", "agent identity; defaults to AMC_AGENT_ID, the current agent, then default")
     .description("Inspect local setup without writes or provider calls and show the next native task command")
-    .option("--provider <id>", "choose openai (Chat Completions), openai-responses, anthropic, deepseek, gemini, gemini-audio, ollama (local model server), or stub (local demonstration)")
+    .option("--provider <id>", `choose ${NATIVE_FIRST_USE_PROVIDER_LIST} (local demonstration)`)
     .option("--model <model>", "your model ID; required for a real provider")
-    .option("--base-url <origin>", "explicit HTTP(S) provider origin; no path or embedded credentials")
+    .option("--base-url <origin>", "explicit HTTP(S) provider origin; no embedded credentials, and a path only for the OpenAI-compatible routes")
     .option("--credential <ref>", "credential reference name, never a key value")
     .option("--credentials-home <dir>", "same credential home as agent-loop run")
     .option("--credentials-file <path>", "same explicit credential file as agent-loop run")

@@ -44,6 +44,11 @@ export interface LlmFailure {
   readonly status?: number;
   /** Provider-requested delay in milliseconds, when valid and available. */
   readonly providerRetryAfterMs?: number;
+  /**
+   * Which response header `providerRetryAfterMs` was read from (`retry-after`, or a rate-limit reset header such as
+   * `x-ratelimit-reset-requests`). A fact about provenance: a reset-derived delay is never presented as a `Retry-After`.
+   */
+  readonly providerDelayHeader?: string;
   /** Opaque provider-issued request identifier, for diagnostics only. */
   readonly requestId?: string;
 }
@@ -122,6 +127,8 @@ export interface LlmErrorOptions extends ErrorOptions {
   readonly status?: number;
   /** Positive finite provider-requested delay in milliseconds. */
   readonly providerRetryAfterMs?: number;
+  /** Lowercase name of the header the delay came from; requires providerRetryAfterMs. */
+  readonly providerDelayHeader?: string;
   /** Non-empty opaque provider request id. */
   readonly requestId?: string;
 }
@@ -169,6 +176,9 @@ export class LlmError extends Error {
     ) {
       throw new Error("LlmError requestId must be a non-empty string");
     }
+    if (options?.providerDelayHeader !== undefined && !validDelayHeader(options.providerDelayHeader, options.providerRetryAfterMs)) {
+      throw new Error("LlmError providerDelayHeader must be a lowercase header name beside providerRetryAfterMs");
+    }
     super(message, options);
     this.name = "LlmError";
     this.code = code;
@@ -179,9 +189,58 @@ export class LlmError extends Error {
       ...(options?.providerRetryAfterMs === undefined
         ? {}
         : { providerRetryAfterMs: options.providerRetryAfterMs }),
+      ...(options?.providerDelayHeader === undefined ? {} : { providerDelayHeader: options.providerDelayHeader }),
       ...(options?.requestId === undefined ? {} : { requestId: options.requestId })
     });
   }
+}
+
+function validDelayHeader(header: unknown, delayMs: unknown): header is string {
+  return typeof header === "string" && /^[a-z0-9-]{1,64}$/.test(header) && delayMs !== undefined;
+}
+
+/** Header pairs: when a provider says the named counter has 0 remaining, its reset header names the wait. */
+const RATE_LIMIT_RESETS: readonly { readonly remaining: string; readonly reset: string; readonly form: "duration" | "date" }[] = Object.freeze([
+  { remaining: "x-ratelimit-remaining-requests", reset: "x-ratelimit-reset-requests", form: "duration" },
+  { remaining: "x-ratelimit-remaining-tokens", reset: "x-ratelimit-reset-tokens", form: "duration" },
+  { remaining: "anthropic-ratelimit-requests-remaining", reset: "anthropic-ratelimit-requests-reset", form: "date" },
+  { remaining: "anthropic-ratelimit-input-tokens-remaining", reset: "anthropic-ratelimit-input-tokens-reset", form: "date" },
+  { remaining: "anthropic-ratelimit-output-tokens-remaining", reset: "anthropic-ratelimit-output-tokens-reset", form: "date" }
+]);
+
+/** OpenAI/Groq duration strings such as `6m0s`, `1.5s`, `20ms`, `2h1m`; undefined for anything else. */
+function parseDurationMs(value: string): number | undefined {
+  const trimmed = value.trim();
+  if (!/^(?:\d+(?:\.\d+)?(?:ms|h|m|s))+$/.test(trimmed)) return undefined;
+  let ms = 0;
+  for (const match of trimmed.matchAll(/(\d+(?:\.\d+)?)(ms|h|m|s)/g)) {
+    const amount = Number(match[1]);
+    ms += match[2] === "ms" ? amount : match[2] === "s" ? amount * 1000 : match[2] === "m" ? amount * 60_000 : amount * 3_600_000;
+  }
+  return Number.isFinite(ms) && ms > 0 ? ms : undefined;
+}
+
+/**
+ * SH-PROVIDERS-04: a rate-limit reset when no `Retry-After` was sent, read ONLY from the reset header whose remaining
+ * counter the provider reports as 0 (OpenAI `x-ratelimit-reset-*` durations, Anthropic `anthropic-ratelimit-*-reset`
+ * RFC 3339 instants). When no counter is exhausted the wait is not inferred. Several exhausted counters give the longest.
+ *
+ * @returns the delay and the header it was read from, or undefined.
+ */
+export function parseRateLimitResetMs(
+  headers: Readonly<Record<string, string | undefined>>,
+  now: number = Date.now()
+): { readonly ms: number; readonly header: string } | undefined {
+  let best: { readonly ms: number; readonly header: string } | undefined;
+  for (const pair of RATE_LIMIT_RESETS) {
+    if (headers[pair.remaining]?.trim() !== "0") continue;
+    const raw = headers[pair.reset];
+    if (typeof raw !== "string") continue;
+    const ms = pair.form === "duration" ? parseDurationMs(raw) : Date.parse(raw.trim()) - now;
+    if (ms === undefined || !Number.isFinite(ms) || ms <= 0) continue;
+    if (best === undefined || ms > best.ms) best = { ms, header: pair.reset };
+  }
+  return best;
 }
 
 /** Narrow a caught value to {@link LlmError}. Duck-typed copies do not narrow. */
@@ -354,7 +413,7 @@ function failureSnapshot(value: unknown): LlmFailure | undefined {
   if (typeof value !== "object" || value === null) return undefined;
   try {
     const candidate = value as Partial<LlmFailure>;
-    const { message, code, status, providerRetryAfterMs, requestId } = candidate;
+    const { message, code, status, providerRetryAfterMs, providerDelayHeader, requestId } = candidate;
     if (
       typeof message !== "string" ||
       message.length === 0 ||
@@ -363,7 +422,8 @@ function failureSnapshot(value: unknown): LlmFailure | undefined {
       (status !== undefined && (!Number.isInteger(status) || status < 100 || status > 599)) ||
       (providerRetryAfterMs !== undefined &&
         (!Number.isFinite(providerRetryAfterMs) || providerRetryAfterMs <= 0)) ||
-      (requestId !== undefined && (typeof requestId !== "string" || requestId.length === 0))
+      (requestId !== undefined && (typeof requestId !== "string" || requestId.length === 0)) ||
+      (providerDelayHeader !== undefined && !validDelayHeader(providerDelayHeader, providerRetryAfterMs))
     ) {
       return undefined;
     }
@@ -372,6 +432,7 @@ function failureSnapshot(value: unknown): LlmFailure | undefined {
       code,
       ...(status === undefined ? {} : { status }),
       ...(providerRetryAfterMs === undefined ? {} : { providerRetryAfterMs }),
+      ...(providerDelayHeader === undefined ? {} : { providerDelayHeader }),
       ...(requestId === undefined ? {} : { requestId })
     });
   } catch {

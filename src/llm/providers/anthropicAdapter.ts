@@ -219,9 +219,14 @@ async function* decodeAnthropic(response: HttpResponse): AsyncIterable<StreamChu
       const index = integer(frame.index);
       const block = record(frame.content_block);
       if (index === undefined || block === null) throw protocolFailure("malformed content_block_start");
-      const blockType = text(block.type);
+      const wireType = text(block.type);
+      // A `redacted_thinking` block is a valid thinking-enabled response whose content the provider encrypted. It
+      // opens as a thinking block with no text: the assembler records it as a dropped (`empty`) thinking row, its
+      // `data` is never recorded, and thinking replay is unsupported on this adapter, so nothing is lost downstream.
+      const blockType = wireType === "redacted_thinking" ? "thinking" : wireType;
       if (blockType !== "text" && blockType !== "thinking" && blockType !== "tool_use") {
-        throw protocolFailure(`unsupported content block type "${blockType}"`);
+        // Deterministic for this request and model, so not retried (a malformed frame stays a retryable TRANSPORT failure).
+        throw new LlmError(`${ANTHROPIC_ADAPTER_ID} stream: unsupported content block type "${blockType}"`, LLM_FAILURE_CODE.INVALID_REQUEST);
       }
       if (blockType === "tool_use" && text(block.id).length === 0) {
         // Refused rather than synthesized. The id keys the durable `tool/call`

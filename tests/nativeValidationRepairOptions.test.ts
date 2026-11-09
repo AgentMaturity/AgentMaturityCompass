@@ -41,6 +41,7 @@ vi.mock("node:child_process", async importOriginal => {
   } };
 });
 vi.mock("../src/setup/nativeFirstUseGuide.js", () => ({
+  NATIVE_FIRST_USE_PROVIDER_LIST: "openai, stub",
   inspectNativeFirstUse: async () => ({ status: "ready", agentId: "default", model: "synthetic-model", baseUrl: null, credential: null,
     nextAction: { argv: ["amc", "agent-loop", "run", "--credentials-file", "/synthetic/refs.yaml"] } }),
   renderNativeFirstUseGuide: () => "Synthetic setup only",

@@ -36,8 +36,10 @@ import { LLM_FAILURE_CODE } from "./llmFailure.js";
 export const MAX_RETRY_DELAY_MS = 2_147_483_647;
 
 const DEFAULT_MAX_RETRIES = 5;
-const DEFAULT_INITIAL_DELAY_MS = 500;
-const DEFAULT_MAX_DELAY_MS = 10_000;
+export const DEFAULT_INITIAL_DELAY_MS = 500;
+export const DEFAULT_MAX_DELAY_MS = 10_000;
+/** SH-PROVIDERS-04: a provider's own `Retry-After` may exceed the local backoff ceiling, up to this one. */
+const DEFAULT_MAX_PROVIDER_DELAY_MS = 60_000;
 const DEFAULT_JITTER_RATIO = 0.1;
 
 /**
@@ -65,8 +67,10 @@ export const DEFAULT_RETRYABLE_CODES: readonly string[] = Object.freeze([
 export interface BackoffConfig {
   /** Initial local exponential-backoff delay in milliseconds (default 500). */
   readonly initialDelayMs?: number;
-  /** Maximum locally scheduled or accepted provider delay in milliseconds (default 10000). */
+  /** Maximum locally scheduled backoff delay in milliseconds (default 10000). */
   readonly maxDelayMs?: number;
+  /** Maximum accepted provider-requested delay in milliseconds (default max(60000, maxDelayMs)); longer hints are clamped and the clamp recorded. */
+  readonly maxProviderDelayMs?: number;
   /** Symmetric random multiplier range around one (default 0.1). */
   readonly jitterRatio?: number;
 }
@@ -100,6 +104,7 @@ export type RetryPolicyConfig = NormalRetryPolicyConfig | AlwaysRetryPolicyConfi
 export interface ResolvedRetryBackoff {
   readonly initialDelayMs: number;
   readonly maxDelayMs: number;
+  readonly maxProviderDelayMs: number;
   readonly jitterRatio: number;
 }
 
@@ -132,6 +137,7 @@ const ALWAYS_POLICY_KEYS: ReadonlySet<string> = NORMAL_POLICY_KEYS;
 const BACKOFF_KEYS: ReadonlySet<string> = new Set([
   "initialDelayMs",
   "maxDelayMs",
+  "maxProviderDelayMs",
   "jitterRatio"
 ]);
 
@@ -158,6 +164,7 @@ function resolveBackoff(config: BackoffConfig | undefined, path: string): Resolv
   const initialDelayMs = config?.initialDelayMs ?? DEFAULT_INITIAL_DELAY_MS;
   const maxDelayMs = config?.maxDelayMs ?? DEFAULT_MAX_DELAY_MS;
   const jitterRatio = config?.jitterRatio ?? DEFAULT_JITTER_RATIO;
+  const maxProviderDelayMs = config?.maxProviderDelayMs ?? Math.max(DEFAULT_MAX_PROVIDER_DELAY_MS, maxDelayMs);
 
   if (!Number.isFinite(initialDelayMs) || initialDelayMs <= 0 || initialDelayMs > MAX_RETRY_DELAY_MS) {
     throw new RetryPolicyConfigError(
@@ -175,8 +182,11 @@ function resolveBackoff(config: BackoffConfig | undefined, path: string): Resolv
   if (!Number.isFinite(jitterRatio) || jitterRatio < 0 || jitterRatio > 1) {
     throw new RetryPolicyConfigError(`${path}.jitterRatio must be between 0 and 1`);
   }
+  if (!Number.isFinite(maxProviderDelayMs) || maxProviderDelayMs < maxDelayMs || maxProviderDelayMs > MAX_RETRY_DELAY_MS) {
+    throw new RetryPolicyConfigError(`${path}.maxProviderDelayMs must be a finite number from maxDelayMs through ${MAX_RETRY_DELAY_MS}`);
+  }
 
-  return Object.freeze({ initialDelayMs, maxDelayMs, jitterRatio });
+  return Object.freeze({ initialDelayMs, maxDelayMs, maxProviderDelayMs, jitterRatio });
 }
 
 /**

@@ -951,6 +951,28 @@ class Turn:
                 pass
 
 
+_REASONING_PROVIDERS = ("deepseek", "anthropic", "gemini", "gemini-audio", "ollama")
+_MAX_RETRY_DELAY_MS = 2_147_483_647
+
+
+def _route_flag_argv(cache_retention: Optional[str], max_retries: Optional[int], retry_max_delay_ms: Optional[int],
+                     retry_max_provider_delay_ms: Optional[int]) -> list[str]:
+    """The route flags `amc acp` takes, bounded here as the CLI bounds them; the child admits retention per provider."""
+    if cache_retention is not None and cache_retention not in ("short", "long"):
+        raise ValueError("cache_retention must be short or long")
+    if max_retries is not None and (type(max_retries) is not int or max_retries < 0):
+        raise ValueError("max_retries must be an integer of 0 or more")
+    if retry_max_delay_ms is not None and (type(retry_max_delay_ms) is not int or not 500 <= retry_max_delay_ms <= _MAX_RETRY_DELAY_MS):
+        raise ValueError("retry_max_delay_ms must be an integer from 500 through 2147483647")
+    local = 10_000 if retry_max_delay_ms is None else retry_max_delay_ms
+    if retry_max_provider_delay_ms is not None and (type(retry_max_provider_delay_ms) is not int
+                                                    or not local <= retry_max_provider_delay_ms <= _MAX_RETRY_DELAY_MS):
+        raise ValueError("retry_max_provider_delay_ms must be an integer from the local ceiling (retry_max_delay_ms, default 10000) through 2147483647")
+    pairs = (("--cache-retention", cache_retention), ("--max-retries", max_retries),
+             ("--retry-max-delay", retry_max_delay_ms), ("--retry-max-provider-delay", retry_max_provider_delay_ms))
+    return [item for flag, value in pairs if value is not None for item in (flag, str(value))]
+
+
 class AmcAgent:
     """Own one ``amc acp`` child. Workspace, provider and credentials are fixed at launch.
 
@@ -967,7 +989,9 @@ class AmcAgent:
                  credentials_home: Optional[str] = None, credentials_file: Optional[str] = None,
                  credentials_mode: Optional[Literal["layered", "operator-only"]] = None,
                  thinking: Optional[Literal["enabled", "disabled"]] = None,
-                 reasoning_effort: Optional[Literal["low", "high", "max"]] = None,
+                 reasoning_effort: Optional[str] = None, thinking_budget: Optional[int] = None,
+                 cache_retention: Optional[Literal["short", "long"]] = None, max_retries: Optional[int] = None,
+                 retry_max_delay_ms: Optional[int] = None, retry_max_provider_delay_ms: Optional[int] = None,
                  max_tokens: int = 512, max_steps: Optional[int] = None,
                  amc_bin: Optional[str | list[str]] = None, env: Optional[dict[str, str]] = None,
                  timeout: float = DEFAULT_TIMEOUT_SECONDS, resync_on_overflow: bool = False,
@@ -1019,13 +1043,20 @@ class AmcAgent:
                 raise ValueError("public validation requires an explicit operator config file")
         if credentials_mode is not None and credentials_mode not in ("layered", "operator-only"):
             raise ValueError("credentials_mode must be layered or operator-only")
-        if thinking is not None or reasoning_effort is not None:
-            if provider != "deepseek":
-                raise ValueError("thinking and reasoning_effort require provider='deepseek'; unused options are not ignored")
+        # The same provider gate as the CLI and the TypeScript SDK (src/llm/reasoningParams.ts); `amc acp` re-checks each
+        # provider's exact vocabulary and bounds at startup, before any model request.
+        if thinking is not None or reasoning_effort is not None or thinking_budget is not None:
+            if provider not in _REASONING_PROVIDERS:
+                raise ValueError("thinking, reasoning_effort and thinking_budget reach deepseek, anthropic, gemini and ollama; unused options are not ignored")
             if thinking is not None and thinking not in ("enabled", "disabled"):
                 raise ValueError("thinking must be enabled or disabled")
-            if reasoning_effort is not None and (thinking == "disabled" or reasoning_effort not in ("low", "high", "max")):
-                raise ValueError("reasoning_effort requires enabled thinking and exact low/high/max")
+            if reasoning_effort is not None and (not isinstance(reasoning_effort, str) or not reasoning_effort or "\0" in reasoning_effort):
+                raise ValueError("reasoning_effort must be a nonempty provider value, sent verbatim")
+            if thinking_budget is not None and (type(thinking_budget) is not int or thinking_budget < 0):
+                raise ValueError("thinking_budget must be a non-negative integer token count")
+            if provider == "deepseek" and (thinking_budget is not None or (reasoning_effort is not None and (thinking == "disabled" or reasoning_effort not in ("low", "high", "max")))):
+                raise ValueError("deepseek takes no thinking_budget, and reasoning_effort requires enabled thinking and exact low/high/max")
+        route_argv = _route_flag_argv(cache_retention, max_retries, retry_max_delay_ms, retry_max_provider_delay_ms)
         for value in (provider, agent_id):
             if not isinstance(value, str) or not value or "\0" in value:
                 raise ValueError("provider and agent_id must be nonempty strings without NUL bytes")
@@ -1053,12 +1084,14 @@ class AmcAgent:
                             ("--credentials-home", credentials_home), ("--credentials-file", credentials_file),
                             ("--credentials-mode", credentials_mode), ("--thinking", thinking),
                             ("--reasoning-effort", reasoning_effort),
+                            ("--thinking-budget", None if thinking_budget is None else str(thinking_budget)),
                             ("--max-steps", None if max_steps is None else str(max_steps))]:
             if value is not None:
                 if not isinstance(value, str) or not value or "\0" in value:
                     raise ValueError("native launch options must be nonempty strings without NUL bytes")
                 argv.extend([flag, value])
         argv.extend(mcp_argv)
+        argv.extend(route_argv)
         for check_id in validate or []:
             argv.extend(["--validate", check_id])
         self._lock = threading.RLock()

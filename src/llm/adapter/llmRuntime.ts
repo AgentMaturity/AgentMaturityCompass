@@ -317,6 +317,7 @@ export class LlmRuntime {
         ...(failure.providerRetryAfterMs === undefined
           ? {}
           : { providerRetryAfterMs: failure.providerRetryAfterMs }),
+        ...(failure.providerDelayHeader === undefined ? {} : { providerDelayHeader: failure.providerDelayHeader }),
         ...(failure.requestId === undefined ? {} : { requestId: failure.requestId })
       });
     };

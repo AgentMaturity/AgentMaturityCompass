@@ -18,6 +18,8 @@ import {
 } from "../src/llm/index.js";
 import type { LlmAdapter, StreamChunk, ToolSchema } from "../src/llm/index.js";
 import { anthropicTextStream, errorResponse, okStream } from "./helpers/llmStubUpstream.js";
+import { decideRetry } from "../src/agent/requestRetry.js";
+import { resolveRetryPolicy } from "../src/llm/retryPolicy.js";
 
 /**
  * P3.1 stage 3 — the three providers, at the level where they differ.
@@ -161,6 +163,18 @@ describe("the OpenAI adapter synthesizes the block boundaries its wire format la
   });
 });
 
+describe("the OpenAI Chat decoder's refusals are deterministic, so they are not retried", () => {
+  // Opus fix: a reasoning model behind a compat route (xai grok-3-mini, a local reasoning model) streams reasoning_content
+  // on every attempt; coded TRANSPORT it was retried five times, each a billed request. The Responses adapter already codes
+  // its unsupported output INVALID_REQUEST. Mutation: code it TRANSPORT again → the code and give-up assertions fail.
+  test.each([{ reasoning_content: "thinking" }, { refusal: "no" }, { audio: { id: "a" } }])("%j is refused as INVALID_REQUEST and gives up at once", async (delta) => {
+    const failure = await decode(openaiAdapter, openaiFrames([{ choices: [{ index: 0, delta }] }])).then(() => null, (error: unknown) => error);
+    expect(isLlmError(failure) && failure.code).toBe(LLM_FAILURE_CODE.INVALID_REQUEST);
+    if (!isLlmError(failure)) throw new Error("expected an LlmError");
+    expect(decideRetry(resolveRetryPolicy(undefined, "t"), failure.failure, 1, () => 0.5).decision).toBe("give-up");
+  });
+});
+
 describe("the Anthropic adapter refuses what it cannot describe honestly", () => {
   test("NEGATIVE: an unmapped stop_reason is an error, never a signed clean stop", async () => {
     const frames = anthropicTextStream({ text: ["x"], inputTokens: 1, outputTokens: 1, stopReason: "pause_turn" });
@@ -187,6 +201,27 @@ describe("the Anthropic adapter refuses what it cannot describe honestly", () =>
       type: "finish",
       reason: { kind: "error", failure: { message: "Overloaded", code: LLM_FAILURE_CODE.SERVER } }
     });
+  });
+
+  test("a redacted_thinking block opens and closes as a thinking block with no text; its encrypted data is not surfaced (skeptic fix)", async () => {
+    const frame = (event: string, data: Record<string, unknown>) => ({ event, data: JSON.stringify({ type: event, ...data }) });
+    const chunks = await decode(anthropicAdapter, [
+      frame("message_start", { message: { usage: { input_tokens: 4, output_tokens: 0 } } }),
+      frame("content_block_start", { index: 0, content_block: { type: "redacted_thinking", data: "EqQBCgIYAhIM" } }),
+      frame("content_block_stop", { index: 0 }),
+      frame("content_block_start", { index: 1, content_block: { type: "text", text: "" } }),
+      frame("content_block_delta", { index: 1, delta: { type: "text_delta", text: "answer" } }),
+      frame("content_block_stop", { index: 1 }),
+      frame("message_delta", { delta: { stop_reason: "end_turn" }, usage: { output_tokens: 3 } }),
+      frame("message_stop", {})
+    ]);
+    expect(chunks.slice(0, 2)).toEqual([{ type: "block-start", index: 0, blockKind: "thinking" }, { type: "block-end", index: 0, block: { kind: "thinking", text: "" } }]);
+    expect(JSON.stringify(chunks)).not.toContain("EqQBCgIYAhIM");
+    expect(chunks.at(-1)).toMatchObject({ type: "finish", reason: { kind: "stop" } });
+    const error = await decode(anthropicAdapter, [frame("content_block_start", { index: 0, content_block: { type: "server_tool_use", id: "x" } })]).catch((caught: unknown) => caught);
+    expect((error as Error).message).toContain('unsupported content block type "server_tool_use"');
+    // Deterministic for the request, so not retried (as the Chat and Responses decoders refuse their unsupported output).
+    expect(isLlmError(error) && error.code).toBe(LLM_FAILURE_CODE.INVALID_REQUEST);
   });
 
   test("NEGATIVE: a tool_use block opened without a call id is refused", async () => {

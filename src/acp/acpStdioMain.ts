@@ -5,6 +5,7 @@ import { randomUUID } from "node:crypto";
 import { LocalCredentialsService } from "../credentials/localCredentialsService.js";
 import { AdapterRegistry, type LlmRouteConfig } from "../llm/adapter/adapterRegistry.js";
 import { LlmRuntime } from "../llm/adapter/llmRuntime.js";
+import { DEFAULT_MAX_DELAY_MS } from "../llm/retryPolicy.js";
 import { stubProviderTransport, STUB_PROVIDER_ID } from "../agent/stubProvider.js";
 import type { AgentSessionInit } from "../agent/agentSession.js";
 import { resolveCompactionConfig } from "../agent/compaction/promptPressure.js";
@@ -130,6 +131,12 @@ export interface AcpStdioInit {
   readonly maxTokens?: number;
   readonly thinking?: string;
   readonly reasoningEffort?: string;
+  /** SH-PROVIDERS-02/04/06: the same route and reasoning flags `agent-loop run` takes, as typed. */
+  readonly thinkingBudget?: string;
+  readonly cacheRetention?: string;
+  readonly maxRetries?: string;
+  readonly retryMaxDelay?: string;
+  readonly retryMaxProviderDelay?: string;
   readonly maxSteps?: number;
   /** Operator-declared automatic compaction, fixed at startup like the step bound. */
   readonly compaction?: Partial<CompactionConfig>;
@@ -153,9 +160,15 @@ export interface AcpStdioHandle {
  * provider or a model -- there is no ACP capability for it in this slice, and
  * letting `session/new` pick would mean a peer selecting which credentials this
  * process spends.
+ *
+ * A provider-requested wait is bounded by the local backoff ceiling unless the
+ * client raises it with `--retry-max-provider-delay`: every ACP client has a
+ * prompt deadline this process cannot see (the TypeScript and Python SDKs and
+ * Studio give up after 120 s), and 5 retries of the CLI's 60 s ceiling outlive it.
  */
 export function acpRouteFor(init: AcpStdioInit): LlmRouteConfig | { readonly error: string } {
-  try { return nativeRouteFor(init.providerId, init, init.model); }
+  const retryMaxProviderDelay = init.retryMaxProviderDelay ?? init.retryMaxDelay ?? String(DEFAULT_MAX_DELAY_MS);
+  try { return nativeRouteFor(init.providerId, { ...init, retryMaxProviderDelay }, init.model); }
   catch (error) {
     return { error: error instanceof Error ? error.message : "Native provider selection failed." };
   }

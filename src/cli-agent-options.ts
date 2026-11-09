@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 import type { LlmRouteConfig, ProviderDescription } from "./llm/adapter/adapterRegistry.js";
 import type { LlmAdapter } from "./llm/adapter/adapterTypes.js";
 import { snapshotCapabilities } from "./llm/adapter/providerCapabilities.js";
-import { lookupProviderCatalog } from "./llm/providerCatalog.js";
+import { defaultCredentialRefFor, nativeRouteDefaults } from "./llm/nativeRouteDefaults.js";
 import { listModelMetadata, type ModelMetadataSnapshot } from "./llm/modelCatalog.js";
 import { anthropicAdapter } from "./llm/providers/anthropicAdapter.js";
 import { openaiAdapter } from "./llm/providers/openaiAdapter.js";
@@ -18,6 +18,10 @@ import { geminiParams } from "./llm/providers/geminiContract.js";
 import { ollamaAdapter } from "./llm/providers/ollamaAdapter.js";
 import { createOllamaRoute } from "./llm/providers/ollamaRoute.js";
 import { ollamaParams } from "./llm/providers/ollamaContract.js";
+import { credentialOptionalOrigin, OPENAI_COMPATIBLE_ROUTES, openaiCompatibleRouteFor } from "./llm/providers/openaiCompatibleRoutes.js";
+import { reasoningParamsFor } from "./llm/reasoningParams.js";
+import { isCacheRetention } from "./llm/request/cacheRetentionEncoders.js";
+import { DEFAULT_INITIAL_DELAY_MS, DEFAULT_MAX_DELAY_MS, MAX_RETRY_DELAY_MS, type RetryPolicyConfig } from "./llm/retryPolicy.js";
 import { credentialRef } from "./credentials/credentialRef.js";
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL, stubProviderAdapter, stubProviderRoute } from "./agent/stubProvider.js";
 import type { CompactionConfig, LoopNotification } from "./agent/loopTypes.js";
@@ -74,6 +78,15 @@ export interface RunOptions {
   maxTokens?: string;
   thinking?: string;
   reasoningEffort?: string;
+  /** SH-PROVIDERS-02: provider thinking token budget (Anthropic budget_tokens, Gemini thinkingBudget). */
+  thinkingBudget?: string;
+  /** SH-PROVIDERS-06: route prompt-cache retention, short or long; refused where the adapter has no retention wire. */
+  cacheRetention?: string;
+  /** SH-PROVIDERS-04: route retry policy from the command line; 0 retries means give up on the first failure. */
+  maxRetries?: string;
+  retryMaxDelay?: string;
+  /** Ceiling on a provider-requested wait (Retry-After, reset headers); a surface with a turn deadline sets it to fit. */
+  retryMaxProviderDelay?: string;
   maxSteps?: string;
   contextWindow?: string;
   compactThreshold?: string;
@@ -274,25 +287,29 @@ export function compactionOption(io: AgentLoopCliIo, options: Pick<RunOptions, "
   }
 }
 
+/** The flags paramsFor reads; `tools` decides whether Anthropic thinking (tools-free only) may be admitted. */
+export type ParamsOptions = Pick<RunOptions, "thinking" | "reasoningEffort" | "thinkingBudget" | "tools">;
+
 /** The default wire params for each supported adapter, and why each one is there. */
-export function paramsFor(providerId: string, maxTokens: number, options: Pick<RunOptions, "thinking" | "reasoningEffort"> = {}): Record<string, unknown> {
-  if (providerId !== "deepseek" && (options.thinking !== undefined || options.reasoningEffort !== undefined)) {
-    throw new Error("--thinking and --reasoning-effort on this surface require --provider deepseek; unused options are not ignored.");
-  }
+export function paramsFor(providerId: string, maxTokens: number, options: ParamsOptions = {}): Record<string, unknown> {
+  // SH-PROVIDERS-02: one provider-honest mapping; unused reasoning options are refused, never ignored.
+  const reasoning = reasoningParamsFor(providerId, options, { maxTokens, ...(options.tools === undefined ? {} : { tools: options.tools }) });
   // P1-38: pi-ai encoders own stream and stream_options; only the output bound is passed.
   if (providerId.startsWith(PI_AI_ROUTE_PREFIX)) return { max_tokens: maxTokens };
+  if (openaiCompatibleRouteFor(providerId) !== null) return { max_tokens: maxTokens };
   switch (providerId) {
     case "ollama":
       // The native contract validates the bound and maps it to options.num_predict.
       // No OpenAI compatibility params or fabricated usage/cache options are sent.
-      return ollamaParams({ max_tokens: maxTokens });
-    case "gemini": case "gemini-audio": return geminiParams({ generationConfig: { maxOutputTokens: maxTokens } });
+      return ollamaParams({ max_tokens: maxTokens, ...reasoning });
+    case "gemini": case "gemini-audio": {
+      const config = reasoning.generationConfig as Record<string, unknown> | undefined;
+      return geminiParams({ generationConfig: { maxOutputTokens: maxTokens, ...config } });
+    }
     case "deepseek":
       // The native encoder owns stream/include_usage. Emit explicit documented
       // defaults, not SDK extra_body or silently remapped effort aliases.
-      return deepseekParams({ max_tokens: maxTokens,
-        ...(options.thinking === undefined ? {} : { thinking: { type: options.thinking } }),
-        ...(options.reasoningEffort === undefined ? {} : { reasoning_effort: options.reasoningEffort }) });
+      return deepseekParams({ max_tokens: maxTokens, ...reasoning });
     case "openai-responses":
       // The Responses encoder owns stream; its output bound has a different name.
       return { max_output_tokens: maxTokens };
@@ -303,7 +320,7 @@ export function paramsFor(providerId: string, maxTokens: number, options: Pick<R
     default:
       // `anthropic-messages@1` does not own `stream`, so the caller supplies it;
       // the stub route shares the encoder and is happy with the same shape.
-      return { max_tokens: maxTokens, stream: true };
+      return { max_tokens: maxTokens, stream: true, ...reasoning };
   }
 }
 
@@ -319,7 +336,9 @@ const NATIVE_ADAPTERS: readonly { readonly providerId: string; readonly adapter:
   { providerId: "deepseek", adapter: deepseekAdapter },
   { providerId: "gemini", adapter: geminiAdapter },
   { providerId: "gemini-audio", adapter: geminiAudioAdapter },
-  { providerId: "ollama", adapter: ollamaAdapter }
+  { providerId: "ollama", adapter: ollamaAdapter },
+  // SH-PROVIDERS-01: the OpenAI-compatible family and Azure, each under its own honest adapter identity.
+  ...OPENAI_COMPATIBLE_ROUTES.map(({ providerId, adapter }) => ({ providerId, adapter }))
 ]);
 
 function nativeAdapterFor(providerId: string): LlmAdapter {
@@ -331,36 +350,89 @@ function nativeAdapterFor(providerId: string): LlmAdapter {
   return entry.adapter;
 }
 
+/** Route-level options every native route accepts from the command line: retry policy and cache retention. */
+export type RouteOptions = Pick<RunOptions, "baseUrl" | "credential" | "cacheRetention" | "maxRetries" | "retryMaxDelay" | "retryMaxProviderDelay">;
+
+/** The reasoning and route flags `agent-loop run` and `chat` share; chat forwards them verbatim to each turn's run. */
+export function withReasoningAndRouteOptions(command: Command, thinkingHelp: string): Command {
+  return command
+    .option("--thinking <mode>", thinkingHelp)
+    .option("--reasoning-effort <effort>", "sent verbatim: DeepSeek low|high|max, Anthropic low|medium|high|xhigh|max (output_config.effort), Gemini MINIMAL|LOW|MEDIUM|HIGH (thinkingLevel), Ollama low|medium|high|max (think)")
+    .option("--thinking-budget <tokens>", "Anthropic manual budget_tokens (Claude 4.5/4.6; >= 1024, below --max-tokens) or Gemini thinkingBudget")
+    .option("--cache-retention <mode>", "short or long prompt-cache retention on anthropic, openai and openai-responses routes (refused elsewhere)")
+    .option("--max-retries <n>", "model-request retries after the first attempt (default 5; 0 gives up on the first failure)")
+    .option("--retry-max-delay <ms>", "local backoff ceiling in milliseconds (500 to 2147483647, default 10000)")
+    .option("--retry-max-provider-delay <ms>", "ceiling on a provider-requested wait (Retry-After, reset headers), default 60000; never below --retry-max-delay");
+}
+
+/** A flag's integer, or a refusal naming the flag; the bounds are the ones resolveRetryPolicy enforces, checked here so the operator reads the flag's name, not a config path. */
+function flagInteger(flag: string, raw: string | undefined, min: number, max: number, bound: string): number | undefined {
+  if (raw === undefined) return undefined;
+  const value = Number(raw);
+  if (!Number.isSafeInteger(value) || value < min || value > max) throw new Error(`${flag} must be an integer ${bound}.`);
+  return value;
+}
+
+function retryFromFlags(options: RouteOptions): RetryPolicyConfig | undefined {
+  if (options.maxRetries === undefined && options.retryMaxDelay === undefined && options.retryMaxProviderDelay === undefined) return undefined;
+  const maxRetries = flagInteger("--max-retries", options.maxRetries, 0, Number.MAX_SAFE_INTEGER, "of 0 or more");
+  const maxDelayMs = flagInteger("--retry-max-delay", options.retryMaxDelay, DEFAULT_INITIAL_DELAY_MS, MAX_RETRY_DELAY_MS,
+    `of milliseconds from ${DEFAULT_INITIAL_DELAY_MS} (the initial delay) through ${MAX_RETRY_DELAY_MS}`);
+  // Never below the local ceiling, which is the default when --retry-max-delay is absent.
+  const localCeiling = maxDelayMs ?? DEFAULT_MAX_DELAY_MS;
+  const maxProviderDelayMs = flagInteger("--retry-max-provider-delay", options.retryMaxProviderDelay, localCeiling, MAX_RETRY_DELAY_MS,
+    `of milliseconds from the local ceiling (${localCeiling}, --retry-max-delay) through ${MAX_RETRY_DELAY_MS}`);
+  const backoff = { ...(maxDelayMs === undefined ? {} : { maxDelayMs }), ...(maxProviderDelayMs === undefined ? {} : { maxProviderDelayMs }) };
+  return { mode: "normal", ...(maxRetries === undefined ? {} : { maxRetries }), ...(Object.keys(backoff).length === 0 ? {} : { backoff }) };
+}
+
+/** Providers whose adapter has a reviewed retention wire (the registry enforces the same set by adapter id). */
+const RETENTION_PROVIDERS: readonly string[] = ["anthropic", "openai", "openai-responses"];
+
+function routeExtras(providerId: string, options: RouteOptions): Pick<LlmRouteConfig, "retry" | "cacheRetention"> {
+  const retry = retryFromFlags(options);
+  if (options.cacheRetention !== undefined && !isCacheRetention(options.cacheRetention)) throw new Error("--cache-retention must be short or long.");
+  if (options.cacheRetention !== undefined && !RETENTION_PROVIDERS.includes(providerId)) {
+    throw new Error(`--cache-retention is not admitted for provider ${providerId}: only ${RETENTION_PROVIDERS.join(", ")} have a reviewed retention wire.`);
+  }
+  return { ...(retry === undefined ? {} : { retry }), ...(options.cacheRetention === undefined ? {} : { cacheRetention: options.cacheRetention }) };
+}
+
 /** Pure operator selection shared with ACP. It never resolves a credential,
  * probes a server, pulls a model or falls back to a different protocol.
  */
 export function nativeRouteFor(
   providerId: string,
-  options: Pick<RunOptions, "baseUrl" | "credential">,
+  options: RouteOptions,
   model: string | undefined
 ): LlmRouteConfig {
   const adapter = nativeAdapterFor(providerId);
-  if (providerId === STUB_PROVIDER_ID) return stubProviderRoute();
+  const extras = routeExtras(providerId, options);
+  if (providerId === STUB_PROVIDER_ID) return { ...stubProviderRoute(), ...extras };
   if (model === undefined || model.trim().length === 0) {
     throw new Error(`--model is required for provider ${providerId}`);
   }
   if (providerId === "ollama") {
-    return createOllamaRoute({ model,
+    return { ...createOllamaRoute({ model,
       ...(options.baseUrl === undefined ? {} : { baseUrl: options.baseUrl }),
       // Local Ollama needs no credential by default. An explicit reference is
       // retained for an operator-configured authenticated origin, never guessed.
-      ...(options.credential === undefined ? {} : { credentialRef: credentialRef(options.credential) }) });
+      ...(options.credential === undefined ? {} : { credentialRef: credentialRef(options.credential) }) }), ...extras };
   }
-  const defaults = lookupProviderCatalog(providerId);
-  const baseUrl = options.baseUrl ?? defaults?.defaultBaseUrl;
+  // SH-PROVIDERS-01: the native inventory is the one source of compat defaults; gateway templates serve the rest.
+  const compat = openaiCompatibleRouteFor(providerId);
+  const baseUrl = options.baseUrl ?? nativeRouteDefaults(providerId)?.defaultBaseUrl;
   if (baseUrl === undefined || baseUrl === null) throw new Error(`--base-url is required for provider ${providerId}`);
   // The default credential goes only to the provider's own origin, as model enumeration rules (modelEnumeration.ts).
-  const ownOrigin = defaults?.defaultBaseUrl != null && new URL(baseUrl).origin === new URL(defaults.defaultBaseUrl).origin;
-  const credential = options.credential ?? (ownOrigin ? defaults?.defaultCredentialRef : undefined);
-  if (credential === undefined || credential === null) throw new Error(`--credential is required for provider ${providerId}`);
+  const credential = options.credential ?? defaultCredentialRefFor(providerId, options.baseUrl);
+  if (credential === undefined || credential === null) {
+    // A local OpenAI-compatible server on a loopback origin needs no credential; anything else is refused, never guessed.
+    if (compat !== null && credentialOptionalOrigin(baseUrl)) return { providerId, adapter, baseUrl, credentialRef: null, models: [model], ...extras };
+    throw new Error(`--credential is required for provider ${providerId}`);
+  }
   return { providerId, adapter, baseUrl,
     credentialRef: credentialRef(credential),
-    models: [model] };
+    models: [model], ...extras };
 }
 
 /** These are reporting rules, not measurements supplied by discovery. The actual
@@ -464,7 +536,8 @@ export function registerNativeProviderCommands(program: Command, io: AgentLoopCl
   }
   const help = "\nNative provider routes: " + NATIVE_ADAPTERS.map(entry => entry.providerId).join(", ")
     + ".\nUse amc agent-loop providers --json for adapter contracts, not model availability. "
-    + "Ollama requires an explicit model and defaults to its native local origin without a credential.";
+    + "Ollama, lmstudio, vllm and llamacpp default to a loopback origin without a credential; azure-openai needs --base-url https://<resource>.openai.azure.com/openai and --credential (no default reference). "
+    + "See docs/NATIVE_PROVIDERS.md for origins, reasoning flags, --cache-retention, --max-retries and the retry ceilings.";
   agentLoop.commands.find(command => command.name() === "run")?.addHelpText("after", help + PI_AI_ROUTES_HELP);
   acp.addHelpText("after", help);
 }
@@ -479,12 +552,16 @@ export const PI_AI_ROUTES_HELP = "\nThird-party library routes (agent-loop run o
  * A pi-ai route and the encoder registry its runtime must use; undefined for any other provider, null after a refusal
  * was reported. The pi modules, and the optional peer they load, are imported only here and only for a pi route.
  */
-export async function piAiRouteSelection(io: AgentLoopCliIo, providerId: string, options: Pick<RunOptions, "baseUrl" | "credential">,
+export async function piAiRouteSelection(io: AgentLoopCliIo, providerId: string, options: RouteOptions,
   model: string | undefined): Promise<Awaited<ReturnType<typeof import("./llm/providers/piAi/piAiAdapter.js").piAiRouteFor>> | null | undefined> {
   if (!providerId.startsWith(PI_AI_ROUTE_PREFIX)) return undefined;
   try {
+    // The same route flags every native route takes, refused or applied here before the pi modules load: a pi route
+    // has no retention wire (its encoder pins retention to none), and its retry policy is the operator's, not the default.
+    const extras = routeExtras(providerId, options);
     const { piAiRouteFor } = await import("./llm/providers/piAi/piAiAdapter.js");
-    return await piAiRouteFor(providerId, options, model);
+    const selection = await piAiRouteFor(providerId, options, model);
+    return Object.freeze({ ...selection, route: { ...selection.route, ...extras } });
   } catch (error) {
     io.error(chalk.red(error instanceof Error ? error.message : "pi-ai route selection failed."));
     io.fail();

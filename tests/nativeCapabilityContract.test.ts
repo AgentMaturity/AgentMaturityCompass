@@ -19,6 +19,7 @@ import { geminiParams } from "../src/llm/providers/geminiContract.js";
 import { createOllamaRoute } from "../src/llm/providers/ollamaRoute.js";
 import { ollamaAdapter } from "../src/llm/providers/ollamaAdapter.js";
 import { ollamaParams } from "../src/llm/providers/ollamaContract.js";
+import { OPENAI_COMPATIBLE_ROUTES } from "../src/llm/providers/openaiCompatibleRoutes.js";
 import { providerToolWireName } from "../src/llm/request/providerToolNames.js";
 import type { ToolSchema } from "../src/llm/request/requestSpec.js";
 import { CapabilityRecorder, capabilityRoute } from "./helpers/capabilityResults.js";
@@ -93,7 +94,11 @@ const PROBES: Readonly<Record<string, NativeProbe>> = {
     tool: (wire) => geminiSse([geminiFrame([geminiCallPart(wire, "call_fixture", ARGS)])]).toString("utf8") },
   ollama: { adapter: ollamaAdapter, route: (origin) => createOllamaRoute({ model: MODEL, baseUrl: origin }), params: ollamaParams({ max_tokens: 64 }),
     contentType: "application/x-ndjson", text: () => ollamaNdjson({ content: TEXT }),
-    tool: (wire) => ollamaNdjson({ content: "", tool_calls: [{ function: { index: 0, name: wire, arguments: JSON.parse(ARGS) as unknown }, id: "call_fixture" }] }) }
+    tool: (wire) => ollamaNdjson({ content: "", tool_calls: [{ function: { index: 0, name: wire, arguments: JSON.parse(ARGS) as unknown }, id: "call_fixture" }] }) },
+  // SH-PROVIDERS-01: the OpenAI-compatible routes and Azure send the Chat bytes through the shared decoder under their own
+  // adapter ids; the fixture plays the Chat wire each of them documents.
+  ...Object.fromEntries(OPENAI_COMPATIBLE_ROUTES.map(({ providerId, adapter }): [string, NativeProbe] => [providerId, { adapter, route: plain(providerId, adapter),
+    params: { max_tokens: 64 }, text: () => chatSse({ text: TEXT }), tool: (wire) => chatSse({ tool: { id: "call_fixture", name: wire, args: ARGS } }) }]))
 };
 const ROUTES = Object.keys(PROBES);
 

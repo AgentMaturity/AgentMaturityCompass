@@ -397,7 +397,9 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     assertToolPin(d);
     const config = await configuration(actor);
     if (d.tools === "workspace" && !config.scope.ready) throw new NativeTaskServiceError("TOOLS_NOT_READY", 409, config.scope.message);
-    if (d.provider !== "stub" && !config.providers.find(p => p.id === d.provider)?.credential?.configured)
+    // Refuse a provider Studio does not offer, or one whose operator reference is unset; a local server is offered with none.
+    const offered = config.providers.find(p => p.id === d.provider);
+    if (offered === undefined || offered.credential?.configured === false)
       throw new NativeTaskServiceError("CREDENTIAL_MISSING", 409, "The selected provider's operator credential reference is not configured.");
     if (shuttingDown || entry.startupCancelled) throw new NativeTaskServiceError("START_CANCELLED", 409, "Native startup was cancelled before dispatch.");
     const previousLeases = new Set([d.leaseId, entry.leaseId].filter((id): id is string => id !== undefined));

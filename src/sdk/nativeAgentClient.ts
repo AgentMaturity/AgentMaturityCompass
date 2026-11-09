@@ -5,7 +5,7 @@ import { resolve } from "node:path";
 import { TextDecoder } from "node:util";
 import type { AgentRunVerification } from "../agent/runReport.js";
 import type { NativeValidationResult } from "../agent/nativeValidation.js";
-import { deepseekParams } from "../llm/providers/deepseekContract.js";
+import { reasoningParamsFor } from "../llm/reasoningParams.js";
 import { materializeAcpImages, nativeImagesToAcp, nativePartsToAcp, type AcpPromptBlock } from "../acp/acpPromptInput.js";
 import { NATIVE_ORDERED_INPUT_FORMAT, type NativeInputPart } from "../attachments/nativeOrderedInput.js";
 import type { NativeImageInput } from "../attachments/nativeImageInput.js";
@@ -86,9 +86,14 @@ export type AMCNativeMcpStatus = NativeMcpStatus;
   /** Exclude project and user dotenv fallback in operator-owned server integrations. */
   readonly credentialsMode?: "layered" | "operator-only";
   readonly maxTokens?: number;
-  /** DeepSeek-only explicit wire options; omitted thinking defaults to enabled. */
+  /** Reasoning controls, provider-honest (src/llm/reasoningParams.ts): refused for a provider that has no decoded reasoning wire. */
   readonly thinking?: "enabled" | "disabled";
-  readonly reasoningEffort?: "low" | "high" | "max";
+  readonly reasoningEffort?: string;
+  readonly thinkingBudget?: number;
+  readonly cacheRetention?: "short" | "long";
+  readonly maxRetries?: number;
+  readonly retryMaxDelayMs?: number;
+  /** Ceiling on a provider-requested wait. Defaults to the local ceiling here (not the CLI's 60 s): this client's prompt deadline is `timeoutMs`, and the child cannot see it. */ readonly retryMaxProviderDelayMs?: number;
   readonly maxSteps?: number;
   /** Defaults to the CLI shipped in this same installed package. Never resolves another AMC from PATH. */
   readonly command?: readonly [string, ...string[]];
@@ -250,13 +255,8 @@ export class AMCNativeClient {
       || (options.provider !== "stub" && !options.model)) {
       throw new AMCNativeInputError("Choose an explicit provider and an accessible model; stub is a local demonstration.");
     }
-    if (options.provider === "deepseek") {
-      deepseekParams({ max_tokens: options.maxTokens ?? 512,
-        ...(options.thinking === undefined ? {} : { thinking: { type: options.thinking } }),
-        ...(options.reasoningEffort === undefined ? {} : { reasoning_effort: options.reasoningEffort }) });
-    } else if (options.thinking !== undefined || options.reasoningEffort !== undefined) {
-      throw new Error("Native thinking/reasoningEffort options require provider deepseek; unused options are not ignored.");
-    }
+    // Refused here, before a child exists, with the same provider-honest rule the child applies (its contract re-validates).
+    reasoningParamsFor(options.provider, options, { maxTokens: options.maxTokens ?? 512, ...(options.tools === undefined ? {} : { tools: options.tools }) });
     // The child reports its physical process.cwd(). Pin that same directory,
     // so an authorized symlink alias is not mistaken for a second root.
     this.workspace = realpathSync(resolve(options.workspace));
@@ -287,9 +287,9 @@ export class AMCNativeClient {
       ["--validation-config", options.validationConfig], ["--validation-config-sha256", options.validationConfigSha256],
       ["--validation-repair", options.validationRepair],
       ["--approve-tools", options.approveTools], ["--approve-risk", options.approveRisk],
-      ["--credentials-home", options.credentialsHome], ["--credentials-file", options.credentialsFile],
-      ["--credentials-mode", options.credentialsMode],
-      ["--thinking", options.thinking], ["--reasoning-effort", options.reasoningEffort],
+      ["--credentials-home", options.credentialsHome], ["--credentials-file", options.credentialsFile], ["--credentials-mode", options.credentialsMode],
+      ["--thinking", options.thinking], ["--reasoning-effort", options.reasoningEffort], ["--thinking-budget", options.thinkingBudget],
+      ["--cache-retention", options.cacheRetention], ["--max-retries", options.maxRetries], ["--retry-max-delay", options.retryMaxDelayMs], ["--retry-max-provider-delay", options.retryMaxProviderDelayMs ?? options.retryMaxDelayMs ?? 10_000],
       ["--max-tokens", options.maxTokens], ["--max-steps", options.maxSteps]] as const) {
       if (value !== undefined) args.push(flag, String(value));
     }

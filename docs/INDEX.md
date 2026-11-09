@@ -63,6 +63,7 @@ Use this page to reach the shortest evidence-backed path for your task. AMC's pu
 - [Starter Blueprints](STARTER_BLUEPRINTS.md)
 - [Framework Adapters](ADAPTERS.md)
 - [Provider Configuration](PROVIDERS.md)
+- [Native Provider Routes](NATIVE_PROVIDERS.md): the routes `--provider` accepts, reasoning flags, cache retention, retry delays, and their limits
 - [SDK](SDK.md)
 - [API Reference](API_REFERENCE.md)
 - [OpenAPI Surfaces](API_SURFACES.md)

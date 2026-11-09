@@ -7,23 +7,32 @@ import { CredentialsFileParseError, CredentialsFilePermissionsError } from "../c
 import { LocalCredentialsService } from "../credentials/localCredentialsService.js";
 import { STUB_PROVIDER_MODEL } from "../agent/stubProvider.js";
 import { OLLAMA_DEFAULT_BASE_URL } from "../llm/providers/ollamaContract.js";
+import { credentialOptionalOrigin, OPENAI_COMPATIBLE_ROUTES, openaiCompatibleRouteFor } from "../llm/providers/openaiCompatibleRoutes.js";
+import { defaultCredentialRefFor, nativeRouteDefaults } from "../llm/nativeRouteDefaults.js";
 
+const COMPATIBLE = OPENAI_COMPATIBLE_ROUTES.map(route => route.providerId);
 /** Every provider the native CLI/ACP route inventory admits (see cli-agent-options.ts), in the order the guide offers them. */
-export const NATIVE_FIRST_USE_PROVIDERS = ["openai", "openai-responses", "anthropic", "deepseek", "gemini", "gemini-audio", "ollama", "stub"] as const;
-export type NativeFirstUseProvider = typeof NATIVE_FIRST_USE_PROVIDERS[number];
-const PROVIDER_LIST = "openai (Chat Completions), openai-responses, anthropic, deepseek, gemini, gemini-audio, ollama (local model server), or stub";
-/** The default credential reference per provider; ollama and stub need none. */
-function defaultCredentialRef(provider: NativeFirstUseProvider): string | null {
-  switch (provider) {
-    case "anthropic": return "ANTHROPIC_API_KEY";
-    case "deepseek": return "DEEPSEEK_API_KEY";
-    case "gemini": case "gemini-audio": return "GEMINI_API_KEY";
-    case "openai": case "openai-responses": return "OPENAI_API_KEY";
-    case "ollama": case "stub": return null;
-  }
-}
+export const NATIVE_FIRST_USE_PROVIDERS: readonly string[] = Object.freeze(["openai", "openai-responses", "anthropic", "deepseek", "gemini", "gemini-audio", "ollama", ...COMPATIBLE, "stub"]);
+export type NativeFirstUseProvider = string;
+export const NATIVE_FIRST_USE_PROVIDER_LIST = `openai (Chat Completions), openai-responses, anthropic, deepseek, gemini, gemini-audio, ollama (local model server), ${COMPATIBLE.join(", ")} (OpenAI-compatible), or stub`;
 function isNativeFirstUseProvider(value: string): value is NativeFirstUseProvider {
-  return (NATIVE_FIRST_USE_PROVIDERS as readonly string[]).includes(value);
+  return NATIVE_FIRST_USE_PROVIDERS.includes(value);
+}
+/** The origin a route will call: the override, else the provider's documented default (null: the operator must name one). */
+function effectiveOrigin(provider: string, baseUrl: string | null): string | null {
+  return baseUrl ?? (provider === "ollama" ? OLLAMA_DEFAULT_BASE_URL : nativeRouteDefaults(provider)?.defaultBaseUrl ?? null);
+}
+/** Ollama, and an OpenAI-compatible local server on a plain-http loopback origin, need no credential reference. */
+function credentialOptional(provider: string, origin: string | null): boolean {
+  return provider === "stub" || provider === "ollama" || (openaiCompatibleRouteFor(provider) !== null && origin !== null && credentialOptionalOrigin(origin));
+}
+function choiceLabel(provider: string): string {
+  if (provider === "stub") return "Local recording demonstration (no model answer)";
+  if (provider === "ollama") return "ollama: real task with a local model server (no credential reference; supply --credential only for an authenticated origin)";
+  const compat = openaiCompatibleRouteFor(provider);
+  if (compat !== null && compat.defaultBaseUrl === null) return `${provider}: real task on your ${compat.displayName} resource (--base-url and --credential required)`;
+  if (compat !== null && credentialOptionalOrigin(compat.defaultBaseUrl ?? "")) return `${provider}: real task with a local ${compat.displayName.replace(/ \(local\)$/, "")} server (no credential reference on loopback)`;
+  return `${provider === "openai" ? "openai (Chat Completions)" : provider}: real task with your model and credential reference`;
 }
 export interface NativeFirstUseOptions {
   readonly workspace: string;
@@ -83,11 +92,13 @@ export async function inspectNativeFirstUse(options: NativeFirstUseOptions): Pro
   const cwd = resolve(options.workspace);
   let baseUrl: string | null = null;
   let endpointError = false;
+  // OpenAI-compatible bases may carry a path (Groq `/openai`, Azure `/openai`): the adapter appends `/v1/chat/completions`.
+  const pathAllowed = options.provider !== undefined && openaiCompatibleRouteFor(options.provider) !== null;
   if (options.baseUrl !== undefined) {
     try {
       const url = new URL(options.baseUrl);
-      if (/[\x00-\x20\x7f]/.test(options.baseUrl) || !["http:", "https:"].includes(url.protocol) || url.username || url.password || url.search || url.hash || url.pathname !== "/") throw new Error("invalid origin");
-      baseUrl = url.origin;
+      if (/[\x00-\x20\x7f]/.test(options.baseUrl) || !["http:", "https:"].includes(url.protocol) || url.username || url.password || url.search || url.hash || (!pathAllowed && url.pathname !== "/")) throw new Error("invalid origin");
+      baseUrl = `${url.origin}${url.pathname}`.replace(/\/+$/, "");
     } catch { endpointError = true; }
   }
   const endpointArgs = baseUrl === null ? [] : ["--base-url", baseUrl];
@@ -113,7 +124,7 @@ export async function inspectNativeFirstUse(options: NativeFirstUseOptions): Pro
   if (endpointError) return finish("blocked", "PROVIDER_ORIGIN_INVALID", "Use an HTTP(S) server origin without a path, query, fragment or embedded credentials. Set secrets through a credential reference.");
   if (identityError) return finish("blocked", "AGENT_SELECTION_INVALID", "Could not read a valid selected agent. Inspect --agent, AMC_AGENT_ID and .amc/current-agent before continuing.");
   if (options.provider !== undefined && !isNativeFirstUseProvider(options.provider)) {
-    return finish("blocked", "PROVIDER_UNSUPPORTED", `Choose ${PROVIDER_LIST} with --provider.`);
+    return finish("blocked", "PROVIDER_UNSUPPORTED", `Choose ${NATIVE_FIRST_USE_PROVIDER_LIST} with --provider.`);
   }
   // Terminal control characters cannot form useful copyable model/path inputs.
   if ([options.model, options.credentialsHome, options.credentialsFile, cwd].some(value => value !== undefined && /[\x00-\x1f\x7f]/.test(value))) {
@@ -129,9 +140,7 @@ export async function inspectNativeFirstUse(options: NativeFirstUseOptions): Pro
     ...result,
     choices: NATIVE_FIRST_USE_PROVIDERS.map(provider => ({
       provider,
-      label: provider === "stub" ? "Local recording demonstration (no model answer)"
-        : provider === "ollama" ? "ollama: real task with a local model server (no credential reference; supply --credential only for an authenticated origin)"
-        : `${provider === "openai" ? "openai (Chat Completions)" : provider}: real task with your model and credential reference`,
+      label: choiceLabel(provider),
       // Choosing a provider must not discard setup already supplied. A deliberate
       // stub choice keeps local paths but does not inherit unused live-route data.
       action: nativeAction("guide", "--provider", provider, ...(provider === "stub" ? [] : [
@@ -141,8 +150,9 @@ export async function inspectNativeFirstUse(options: NativeFirstUseOptions): Pro
     }))
   };
   const provider = options.provider as NativeFirstUseProvider;
-  const defaultRef = defaultCredentialRef(provider);
+  // The run's own rule: a default reference goes only to the provider's own origin, never to an --base-url override.
   // ollama keeps an explicit reference only for an operator-configured authenticated origin; it is never assumed.
+  const defaultRef = defaultCredentialRefFor(provider, baseUrl ?? undefined);
   const ref = provider === "stub" ? null : requestedRef ?? (defaultRef === null ? null : credentialRef(defaultRef));
   if (provider === "stub" && (options.baseUrl !== undefined || options.credential !== undefined || (options.model !== undefined && options.model !== STUB_PROVIDER_MODEL))) {
     return finish("blocked", "STUB_OPTIONS_UNUSED", `The local demonstration uses ${STUB_PROVIDER_MODEL} without a credential reference. Omit --base-url, --credential and --model.`);
@@ -150,6 +160,16 @@ export async function inspectNativeFirstUse(options: NativeFirstUseOptions): Pro
   const model = provider === "stub" ? STUB_PROVIDER_MODEL : options.model?.trim() ? options.model : null;
   result = { ...result, provider, model, choices: [], recheck: nativeAction("guide", "--provider", provider, ...endpointArgs,
     ...(model === null ? [] : ["--model", model]), ...(ref === null ? [] : ["--credential", ref]), ...overrides) };
+  const origin = effectiveOrigin(provider, baseUrl);
+  if (provider !== "stub" && origin === null) {
+    return finish("blocked", "PROVIDER_ORIGIN_REQUIRED", `${provider} has no default origin: rerun with --base-url (Azure OpenAI: https://<resource>.openai.azure.com/openai) and --credential <reference>.`);
+  }
+  if (ref === null && !credentialOptional(provider, origin)) {
+    const own = nativeRouteDefaults(provider);
+    return finish("blocked", "CREDENTIAL_REF_REQUIRED", own?.defaultCredentialRef && own.defaultBaseUrl
+      ? `${provider} uses its default reference ${own.defaultCredentialRef} only against its own origin (${own.defaultBaseUrl}). Name the reference for ${origin} explicitly with --credential.`
+      : `${provider} has no default credential reference for ${origin}; rerun with --credential <reference>.`);
+  }
   let store: LocalCredentialsService | undefined;
   try {
     const directory = pathKind(join(cwd, ".amc"));
@@ -173,8 +193,8 @@ export async function inspectNativeFirstUse(options: NativeFirstUseOptions): Pro
     if (result.credential?.configured === false) return finish("needs-credential", "CREDENTIAL_MISSING", "Set the reference using the masked terminal prompt (or stdin), then rerun the guide. Never add the key value to the command.", action("amc", "credentials", "set", ref!, ...home, "--file", file, "--project-dir", cwd));
     return finish("ready", "LOCAL_CONFIGURATION_PRESENT", provider === "stub"
       ? "Run a local recording demonstration. Its canned response is not a real model answer."
-      : provider === "ollama"
-        ? `Local setup markers are present. Run this bounded task against your local model server (${baseUrl ?? OLLAMA_DEFAULT_BASE_URL}); the server must be running with the model pulled, and no credential is used${ref === null ? "" : " beyond the supplied reference"}. Provider errors remain possible.`
+      : provider === "ollama" || ref === null
+        ? `Local setup markers are present. Run this bounded task against your local model server (${origin}); the server must be running with the model ${provider === "ollama" ? "pulled" : "loaded"}, and no credential is used${ref === null ? "" : " beyond the supplied reference"}. Provider errors remain possible.`
         : "Local setup markers and credential metadata are present. Run this bounded task to request a real model answer; provider errors remain possible.",
     nativeAction("run", provider === "stub" ? "Check recording with a local demonstration." : TASK,
       "--provider", provider, ...endpointArgs, "--model", model, ...(ref === null ? [] : ["--credential", ref]),
