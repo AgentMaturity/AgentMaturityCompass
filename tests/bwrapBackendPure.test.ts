@@ -113,6 +113,18 @@ describe("bwrapReadMasks: what the Linux shell must not read inside its workspac
     } finally { rmSync(root, { recursive: true, force: true }); }
   });
 
+  test("a path under a masked directory is not masked again (Bubblewrap cannot make a mount point in the read-only tmpfs)", () => {
+    const root = realpathSync(mkdtempSync(join(tmpdir(), "amc-bwrap-nested-")));
+    try {
+      const workspace = join(root, "workspace"), amcHome = join(workspace, "amc-home"), credentials = join(amcHome, ".credentials.yaml");
+      mkdirSync(join(amcHome, "state"), { recursive: true });
+      writeFileSync(credentials, "synthetic");
+      // AMC_HOME and the credentials file under it are both AMC secret paths; so is a signed readDeny of a directory inside.
+      const masks = bwrapReadMasks(workspace, [join(amcHome, "state")], { AMC_HOME: amcHome });
+      expect(masks).toEqual({ ok: true, args: ["--tmpfs", amcHome, "--remount-ro", amcHome] });
+    } finally { rmSync(root, { recursive: true, force: true }); }
+  });
+
   test("a path under the runtime roots is refused rather than masked, whether signed or an AMC secret", () => {
     expect(bwrapReadMasks("/synthetic/workspace", ["/usr/share/synthetic-deny"], {})).toMatchObject({ ok: false });
     expect(bwrapReadMasks("/synthetic/workspace", [], { AMC_VAULT_PASSPHRASE_FILE: "/usr/local/etc/synthetic-passphrase" })).toMatchObject({ ok: false });

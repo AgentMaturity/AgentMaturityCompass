@@ -141,14 +141,16 @@ export function linuxSocketDenyFilter(arch: "x64" | "arm64"): Buffer {
  * runtime roots is refused rather than masked: /bin and /lib can alias /usr.
  */
 export function bwrapReadMasks(workspace: string, readDeny: readonly string[], env: NodeJS.ProcessEnv = process.env): { ok: true; args: string[] } | { ok: false; reason: string } {
-  const args: string[] = [];
+  const masked = new Map<string, boolean>(); // real path -> is a directory
   for (const literal of new Set([...readDeny, ...shellSecretPaths(env)])) {
     const path = existsSync(literal) ? realpathSync(literal) : literal;
     if ([...RUNTIME_ROOTS, ...RUNTIME_FILES].some(root => within(root, path))) return { ok: false, reason: "Linux shell readDeny and AMC's secret paths cannot be under system runtime paths." };
-    if (!within(workspace, path) || !existsSync(path)) continue;
-    args.push(...(statSync(path).isDirectory() ? ["--tmpfs", path, "--remount-ro", path] : ["--ro-bind", "/dev/null", path]));
+    if (within(workspace, path) && existsSync(path)) masked.set(path, statSync(path).isDirectory());
   }
-  return { ok: true, args };
+  // A path under a masked directory is hidden with it. Masking it as well would ask Bubblewrap for a mount point inside
+  // the read-only tmpfs, which fails the launch (measured: an AMC home and its credentials file both inside the workspace).
+  const outer = [...masked].filter(([path]) => ![...masked].some(([other, directory]) => directory && other !== path && within(other, path)));
+  return { ok: true, args: outer.flatMap(([path, directory]) => directory ? ["--tmpfs", path, "--remount-ro", path] : ["--ro-bind", "/dev/null", path]) };
 }
 
 /** Only the launcher's separate status descriptor can establish successful setup. */
