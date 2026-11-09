@@ -91,7 +91,8 @@ export function webFetchTool(options: WebFetchToolOptions): ToolDefinition {
         status: response.status,
         contentType: response.contentType,
         bytes: response.body.byteLength,
-        format: rendered ? args.format : "html",
+        // What the model was given: the rendering, the raw html, or (`raw`) a non-HTML body as received or described.
+        format: rendered ? args.format : isHtml(response.contentType) ? "html" : "raw",
         renderedBytes: Buffer.byteLength(raw, "utf8"),
         // The body exactly as received, and what the model was given (redacted, labelled). Keyed in a workspace that
         // opted in to protected-data redaction (P2-02): a plain hash of a short body (a bare SSN) can be brute-forced.

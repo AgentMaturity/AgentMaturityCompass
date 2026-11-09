@@ -127,11 +127,16 @@ Sharing one workspace allowlist with other tools is part of P2-13.
   blockquotes, images as `![alt](url)` and links as `[text](url)`, resolved
   against the response URL; only `http`, `https` and `mailto` targets are kept.
   `text` is the same with no markdown syntax. `html` is the raw body. `script`,
-  `style`, `noscript`, `template`, `svg`, `iframe`, `object`, `embed`, `head` and
-  comments are dropped with their content, and every attribute except `href`,
-  `src` and `alt` is ignored. The renderer adds no dependency and builds no DOM.
-  It is lossy by design: the receipt's `contentSha256` digests the body as
-  received, and `format` and `renderedBytes` say what the model was given.
+  `style`, `noscript`, `template`, `svg`, `iframe`, `object`, `embed`, `title` and
+  comments are dropped with their content (a self-closing `<script/>` still drops
+  to its `</script>`, as a browser reads it); `head` is not dropped as an element,
+  since its end tag is optional, but its children render nothing. Table rows and
+  cells close implicitly, as in HTML. Every attribute except `href`, `src` and
+  `alt` is ignored. The renderer adds no dependency and builds no DOM, and it is
+  linear in the input: a tag with no `>` within 64 KiB is text, and the scan never
+  retries inside it. It is lossy by design: the receipt's `contentSha256` digests
+  the body as received, and `format` (`markdown`, `text`, `html` for a raw HTML
+  body, `raw` for a non-HTML body) and `renderedBytes` say what the model was given.
 - Other content types ignore `format`: textual bodies are returned as text, the
   rest are described rather than rendered.
 - Output passes through `redactSecrets` (the shared P5.3 table). Each match becomes
