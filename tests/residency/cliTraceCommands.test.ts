@@ -29,7 +29,7 @@ beforeEach(async () => {
   vi.spyOn(process, "exit").mockImplementation(((code?: number) => { throw new Error(`exit ${code}`); }) as never);
   vi.spyOn(globalThis, "setInterval").mockImplementation((() => 0) as never);
   timeline.onBuild = () => undefined;
-});
+}, 60_000); // Three real vault and signing-key initializations can exceed the default hook timeout.
 afterEach(async () => { process.chdir(cwd); process.exitCode = undefined; vi.restoreAllMocks(); await closeFixtures(); });
 
 const destinations = (workspace: string, config: Record<string, string>) => {
