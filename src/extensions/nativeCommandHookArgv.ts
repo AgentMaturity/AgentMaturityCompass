@@ -24,9 +24,9 @@ import { basename, delimiter, dirname, isAbsolute, join, relative, resolve, sep 
 /** `short`: single-letter flags that load code; `valued`: other single-letter flags whose value ends a cluster (`-Wignore`). */
 interface Interpreter { readonly short?: string; readonly valued?: string; readonly long?: readonly string[]; readonly words?: readonly string[]; readonly prefixes?: readonly string[] }
 const NODE_LIKE: Interpreter = { short: "epri", valued: "C", long: ["--eval", "--print", "--require", "--import", "--loader", "--experimental-loader", "--interactive", "--preload"] };
-const SHELL: Interpreter = { short: "csiC", long: ["--command", "--init-command", "--rcfile", "--init-file"] };
-/** PowerShell accepts any prefix of a parameter name (`-c`, `-com`, `-e`), case-insensitively. */
-const POWERSHELL: Interpreter = { prefixes: ["-command", "-encodedcommand", "-commandwithargs"] };
+const SHELL: Interpreter = { short: "csiC", valued: "oO", long: ["--command", "--init-command", "--rcfile", "--init-file"] };
+/** PowerShell accepts any prefix of a parameter name (`-c`, `-com`, `-e`), case-insensitively, plus the aliases `-ec` and `-cwa`. */
+const POWERSHELL: Interpreter = { prefixes: ["-command", "-encodedcommand", "-commandwithargs", "-ec", "-cwa"] };
 const INTERPRETERS = new Map<string, Interpreter>([
   ...["node", "nodejs", "bun", "tsx", "ts-node", "esno"].map(name => [name, NODE_LIKE] as const),
   ...["sh", "bash", "zsh", "dash", "ksh", "mksh", "fish", "tcsh", "csh"].map(name => [name, SHELL] as const),
@@ -65,8 +65,8 @@ function interpreterVerdict(spec: Interpreter, rest: readonly string[]): { reado
     if (loadsCode(spec, item)) return { flag: item };
     if (item === "-") return "stdin";
     if (anywhere) continue;
-    if (!item.startsWith("-")) return "script";
-    if (item.length === 2 && spec.valued?.includes(item[1]!)) at++; // `-W ignore`: the value is not the script
+    if (!/^[-+]/.test(item)) return "script"; // `+o posix` is a shell option too
+    if (item.length === 2 && spec.valued?.includes(item[1]!)) at++; // `-W ignore`, `-o pipefail`: the value is not the script
   }
   return anywhere && rest.length > 0 ? "script" : "stdin";
 }

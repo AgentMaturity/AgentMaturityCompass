@@ -1,9 +1,10 @@
 import { lstatSync, statSync } from "node:fs";
-import { delimiter, isAbsolute, join, resolve } from "node:path";
+import { delimiter, dirname, isAbsolute, join, resolve } from "node:path";
 import { z } from "zod";
 import { listContainedDir, readContainedOrNull } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { highWaterKey, readHighWater, recordHighWater, workspaceScope, type HighWaterOptions } from "../keys/highWater.js";
+import { highWaterKey, highWaterPath, readHighWater, recordHighWater, workspaceScope, type HighWaterOptions } from "../keys/highWater.js";
+import { writeFileAtomic } from "../utils/fs.js";
 import { argvPathCandidates, canonicalPath, hookArgvRefusal, isBareProgram, workspaceLocation } from "./nativeCommandHookArgv.js";
 
 /**
@@ -226,6 +227,24 @@ function trustedCommandHooksMark(workspace: string, opts: HighWaterOptions = {})
   return mark === RETIRED_MARK ? null : mark;
 }
 
+/**
+ * What the operator accepted, kept beside the trust store (`<AMC home>/state/hooks-trusted/`) so that a process starting
+ * after a change can name the files that changed. Advisory only: the mark in the high-water store alone decides trust,
+ * and a missing, unreadable or different record leaves the refusal unspecific, never more permissive.
+ */
+const acceptedRel = (workspace: string) => `hooks-trusted/${sha256Hex(workspaceScope(workspace))}.json`;
+const stateDir = (opts: HighWaterOptions) => dirname(highWaterPath(opts));
+function changedSinceAcceptance(workspace: string, trusted: string, sha256: string, references: readonly NativeCommandHookReference[], opts: HighWaterOptions): readonly string[] {
+  let accepted: { mark?: unknown; sha256?: unknown; references?: unknown } | null;
+  try { const bytes = readContainedOrNull(stateDir(opts), acceptedRel(workspace), 1_048_576); accepted = bytes === null ? null : JSON.parse(bytes.toString("utf8")); }
+  catch { return []; } // advisory: an unreadable record only leaves the refusal unspecific
+  if (accepted === null || accepted.mark !== trusted || typeof accepted.sha256 !== "string" || !Array.isArray(accepted.references)) return [];
+  const was = new Map((accepted.references as NativeCommandHookReference[]).map(reference => [reference.rel, reference.sha256]));
+  return [...(accepted.sha256 === sha256 ? [] : [NATIVE_COMMAND_HOOKS_REL]),
+    ...references.filter(reference => was.get(reference.rel) !== reference.sha256).map(reference => reference.rel),
+    ...[...was.keys()].filter(rel => !references.some(reference => reference.rel === rel))];
+}
+
 function record(workspace: string, mark: string, opts: HighWaterOptions): void {
   const previous = readHighWater(trustKey(workspace), opts);
   if (previous?.sha256 === mark) return;
@@ -249,6 +268,9 @@ export function trustNativeCommandHooks(workspace: string, expected: string, opt
   if (!/^[0-9a-f]{64}$/.test(expected) || expected !== mark) {
     throw new NativeCommandHookError("HOOKS_DIGEST_MISMATCH", `${path} has trust value ${mark} (file sha256 ${sha256}${references.length === 0 ? "" : `, bound to ${references.length} file(s) under ${NATIVE_COMMAND_HOOKS_DIR}/`}); review the file and its bound files with hooks inspect, then pass exactly that value to --sha256.`);
   }
+  // The parts first: a recorded mark then always has them beside it (a part without its mark is never read).
+  try { writeFileAtomic(join(stateDir(opts), acceptedRel(workspace)), `${JSON.stringify({ mark, sha256, references })}\n`, 0o600); }
+  catch (error) { throw new NativeCommandHookError("HOOKS_TRUST_NOT_RECORDED", `The trust mark could not be recorded (${error instanceof Error ? error.message : "write failed"}), so nothing was accepted.`); }
   record(workspace, mark, opts);
   return { path, sha256, mark, handlers: handlers.length, references };
 }
@@ -282,7 +304,9 @@ export function loadNativeCommandHooks(workspace: string, opts: HighWaterOptions
   const accept = `review it and its bound files (amc native-extension hooks inspect), then run: amc native-extension hooks trust --sha256 ${parsed.mark}`;
   if (trusted === null) return { status: "untrusted", path, sha256, ...parsed, reason: `${path} (sha256 ${sha256}) is not trusted on this machine; ${accept}` };
   if (parsed.mark !== trusted) {
-    return { status: "untrusted", path, sha256, ...parsed, reason: `${path} (sha256 ${sha256}) or a file under ${NATIVE_COMMAND_HOOKS_DIR}/ changed since this machine trusted it; ${accept}` };
+    const changed = changedSinceAcceptance(workspace, trusted, sha256, parsed.references, opts);
+    const what = changed.length === 0 ? `${path} (sha256 ${sha256}) or a file under ${NATIVE_COMMAND_HOOKS_DIR}/` : changed.join(", ");
+    return { status: "untrusted", path, sha256, ...parsed, reason: `${what} changed since this machine trusted it; ${accept}` };
   }
   return { status: "trusted", path, sha256, ...parsed };
 }

@@ -96,7 +96,7 @@ describe("hooks.json parsing and matchers", () => {
     expect(parseNativeCommandHooks(hooksFile({ Stop: [{ hooks: [{ type: "command", command: ["/usr/bin/some-tool", "-e", "--require"] }] }] }))).toHaveLength(1); // not an interpreter
     // The same flags reached through a wrapper, a short-flag cluster, an attached value or a split string, and the
     // interpreter's other ways to run code it was not given as a file.
-    for (const argv of [["/usr/bin/env", "node", "-e", "require('./x')"], ["/usr/bin/env", "-S", "node -e 1"], ["nice", "python3", "-c", "1"], ["sudo", "-u", "bob", "ruby", "-rjson", "a.rb"],
+    for (const argv of [["bash", "-o", "pipefail", "-c", "ls"], ["bash", "+o", "posix", "-c", "ls"], ["pwsh", "-ec", "ZQBjAGgAbwA="], ["pwsh", "-cwa", "x"], ["/usr/bin/env", "node", "-e", "require('./x')"], ["/usr/bin/env", "-S", "node -e 1"], ["nice", "python3", "-c", "1"], ["sudo", "-u", "bob", "ruby", "-rjson", "a.rb"],
       ["node", "-pe", "1"], ["python3", "-Bc", "1"], ["bash", "-xc", "ls"], ["python3", "-W", "ignore", "-c", "1"], ["perl", "-I./lib", "a.pl"], ["pwsh", "-Com", "x"], ["cmd", "/c", "x"], ["deno", "eval", "1"]]) {
       expect(() => parseNativeCommandHooks(hooksFile({ Stop: [{ hooks: [{ type: "command", command: argv }] }] })), argv.join(" ")).toThrow(/loads code trust cannot bind/);
     }
@@ -131,6 +131,8 @@ describe("trust on this machine", () => {
     const changed = loadNativeCommandHooks(root);
     expect(changed.status).toBe("untrusted");
     expect(changed.status === "untrusted" && changed.reason).toContain("changed since this machine trusted it");
+    // A process that starts after the change names it, from the acceptance record kept beside the trust store.
+    expect(changed.status === "untrusted" && changed.reason).toContain(".amc/hooks.json changed since this machine trusted it");
   });
   it("binds the whole .amc/hooks/ tree: an edited script or one of its local imports is refused, by name, until the new value is accepted (S6)", async () => {
     const root = workspace();
@@ -156,7 +158,7 @@ describe("trust on this machine", () => {
     await hooks.prepare(second); // the same runtime instance re-checks the tree before every spawn
     expect(hooks.guard(second)).toContain(".amc/hooks/lib/policy.js changed since this machine trusted");
     expect(await hooks.observe({ kind: "turn-end", turn: 1 })).toMatchObject([{ code: "HOOKS_UNTRUSTED" }]);
-    expect(loadNativeCommandHooks(root)).toMatchObject({ status: "untrusted", sha256 });
+    expect(loadNativeCommandHooks(root)).toMatchObject({ status: "untrusted", sha256, reason: expect.stringContaining(".amc/hooks/lib/policy.js changed since this machine trusted it") });
     expect(trustNativeCommandHooks(root, markOf(root)).references[1]?.sha256).toBe(sha256Hex(Buffer.from("process.exit(2) // the import, not the named script, changed")));
     expect(loadNativeCommandHooks(root).status).toBe("trusted");
   });
@@ -263,6 +265,10 @@ describe("trust on this machine", () => {
     chmodSync(home, 0o500);
     try { expect(() => trustNativeCommandHooks(root, sha256)).toThrow(/could not be recorded/); }
     finally { chmodSync(home, 0o700); }
+    expect(loadNativeCommandHooks(root).status).toBe("untrusted");
+    // The acceptance record is written before the mark: when only it cannot be written, nothing is accepted either.
+    mkdirSync(join(home, "state"), { recursive: true }); writeFileSync(join(home, "state", "hooks-trusted"), "not a directory");
+    expect(() => trustNativeCommandHooks(root, sha256)).toThrow(/could not be recorded/);
     expect(loadNativeCommandHooks(root).status).toBe("untrusted");
   });
   it("never trusts bytes that do not parse", () => {
