@@ -15,6 +15,7 @@ import { lockVault, vaultPaths } from "../src/vault/vault.js";
 import { amcSecretPaths } from "../src/sandbox/shellSecretPaths.js";
 import { LocalCredentialsService } from "../src/credentials/localCredentialsService.js";
 import { saveSchedules } from "../src/autonomy/scheduleStore.js";
+import { initPresets, savePresets } from "../src/presets/agentPresets.js";
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL } from "../src/agent/stubProvider.js";
 import { v1Workspace } from "./helpers/legacyVault.js";
 import { consentedToolsDigest, NO_TOOLS_POLICY_PIN, requireWorkspaceTrust, revokeWorkspaceTrust, repairWorkspaceTrustStore, suppliedTrustConsent, trustWorkspace, workspaceTrustVerdict } from "../src/security/workspaceTrust.js";
@@ -118,6 +119,24 @@ describe("workspace trust verdicts", () => {
     expect(workspaceTrustVerdict(workspace).state).toBe("first-use");
   });
 
+  it("binds the signed presets too: a preset re-signed after consent (a dropped approval gate) is a changed surface", () => {
+    const preset = { id: "reviewer", description: "gated reviewer", model: STUB_PROVIDER_MODEL, providerId: STUB_PROVIDER_ID, tools: "workspace" as const, approveTools: "WRITE_HIGH" };
+    initPresets(workspace);
+    savePresets(workspace, [preset]);
+    asClone();
+    const first = requireWorkspaceTrust(workspace, null);
+    expect(first.ok).toBe(false);
+    if (!first.ok) expect(first.reason).toContain("1 signed preset");
+    expect(requireWorkspaceTrust(workspace, "cli-flag")).toMatchObject({ ok: true, recorded: { presetsDigestSha256: expect.stringMatching(/^[0-9a-f]{64}$/) } });
+    expect(workspaceTrustVerdict(workspace)).toMatchObject({ state: "trusted", reason: "consented" });
+    const { approveTools: _dropped, ...ungated } = preset;
+    savePresets(workspace, [ungated]);
+    expect(workspaceTrustVerdict(workspace)).toMatchObject({ state: "changed", changed: ["presets"] });
+    const changed = requireWorkspaceTrust(workspace, null);
+    expect(changed.ok).toBe(false);
+    if (!changed.ok) expect(changed.reason).toContain("presets changed");
+  });
+
   it("an unreadable store refuses every workspace even with consent, until it is moved aside", () => {
     asClone();
     mkdirSync(join(cloneHome, "state"), { recursive: true });
@@ -144,6 +163,14 @@ describe("through the real surfaces", () => {
     await program.parseAsync(["agent-loop", "run", "hello", "--provider", "stub", "--tools", "none", "--credentials-home", credentialsHome, "--json", ...extra], { from: "user" });
     return { errors, failed };
   }
+
+  it("amc agent-loop run checks trust before it reads the workspace's signed presets", async () => {
+    asClone();
+    const refused = await runCli(["--preset", "not-defined-here"]);
+    expect(refused.failed).toBe(true);
+    expect(refused.errors.join("\n")).toContain("has not trusted this workspace");
+    expect(refused.errors.join("\n")).not.toContain("not-defined-here");
+  });
 
   it("amc agent-loop run refuses an untrusted workspace before composing anything, and proceeds with --trust-workspace", async () => {
     asClone();

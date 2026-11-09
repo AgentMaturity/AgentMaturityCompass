@@ -268,6 +268,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       if (opts.interactiveApprovals && opts.approvalException !== undefined) {
         io.error("Interactive approvals require the signed approval engine; approval exceptions cannot be combined with this mode."); io.fail(); return;
       }
+      // SH-SANDBOX-07: before anything the workspace signed is read (presets, extensions, skills, the tools policy).
+      const trustedToolsDigest = admitWorkspaceTrust(io, opts, process.cwd());
+      if (trustedToolsDigest === undefined) return;
       // Verify the signed preset before applying invocation flags.
       const explicitCompositionOptions = explicitPresetCompositionOptions(command);
       let preset: AgentPreset | undefined;
@@ -296,9 +299,6 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       if (opts.audioInput !== undefined && (promptParts.length > 0 || opts.image !== undefined)) {
         io.error("--audio-input is exclusive with positional text and --image; put every original part in its manifest order."); io.fail(); return;
       }
-      // SH-SANDBOX-07: before anything the workspace signed is loaded (extensions, skills, presets, the tools policy).
-      const trustedToolsDigest = admitWorkspaceTrust(io, opts, process.cwd());
-      if (trustedToolsDigest === undefined) return;
       let extensionTurn: NativeExtensionTurn;
       let extensions: NativeExtensionManager;
       try {

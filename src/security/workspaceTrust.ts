@@ -13,8 +13,9 @@
  *   nothing signed that could verify, so there is nothing to trust;
  * - otherwise a consent record in `<AMC home>/state/workspace-trust.json` must name this workspace (by the digest of
  *   its real path, never an id read from its files), its signer (the key-set digest, or the fingerprint of the legacy
- *   config-signature key a 1.x-layout workspace verifies with) and its signed `tools.yaml` digest. A changed signer or
- *   tools policy is a changed surface: the session is refused until the operator trusts it again.
+ *   config-signature key a 1.x-layout workspace verifies with), its signed `tools.yaml` digest and its signed presets
+ *   (`agents.yaml`, which choose approval gates and delegate providers). A changed signer, tools policy or preset file
+ *   is a changed surface: the session is refused until the operator trusts it again.
  *
  * Every entry checks before the vault is unlocked, so a refused run never migrates a 1.x vault (which would commit a
  * key set here and count as the operator's own); only an explicit vault command in that workspace does.
@@ -34,6 +35,7 @@ import { workspaceScope } from "../keys/highWater.js";
 import { getSigningPublicKeyPem } from "../keys/signingKeys.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
+import { readPresets } from "../presets/agentPresets.js";
 import { ensureContainedDir, readContainedOrNull, writeContained } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize, parseCanonicalJson } from "../utils/json.js";
@@ -51,6 +53,8 @@ const recordSchema = z.strictObject({
   keysetGeneration: z.number().int().nonnegative(),
   /** null: the workspace had no verifiable signed tools policy when trusted. */
   toolsDigestSha256: z.string().regex(/^[0-9a-f]{64}$/).nullable(),
+  /** The verified `.amc/agents.yaml` (presets choose gates and delegate providers); null when none verified. Absent in a record written before presets were bound, which then reads as changed. */
+  presetsDigestSha256: z.string().regex(/^[0-9a-f]{64}$/).nullable().optional(),
   trustedAt: z.iso.datetime(),
   by: z.enum(["command", "cli-flag", "acp-flag", "sdk-option", "env"])
 });
@@ -71,12 +75,14 @@ export interface WorkspaceTrustSurface {
   readonly signer: { readonly kind: "key-set" | "legacy-role-key"; readonly generation: number; readonly sha256: string } | null;
   readonly toolsDigestSha256: string | null;
   readonly toolsSummary: string;
+  /** The signed agent presets (`.amc/agents.yaml`): the verified file's digest and how many it defines; null when none verifies. */
+  readonly presets: { readonly sha256: string; readonly count: number } | null;
 }
 
 export type WorkspaceTrustVerdict =
   | { readonly state: "trusted"; readonly reason: "committed-keys" | "no-signer" | "consented"; readonly record: WorkspaceTrustRecord | null }
   | { readonly state: "first-use"; readonly surface: WorkspaceTrustSurface }
-  | { readonly state: "changed"; readonly changed: readonly ("key-set" | "tools-policy")[]; readonly record: WorkspaceTrustRecord; readonly surface: WorkspaceTrustSurface }
+  | { readonly state: "changed"; readonly changed: readonly ("key-set" | "tools-policy" | "presets")[]; readonly record: WorkspaceTrustRecord; readonly surface: WorkspaceTrustSurface }
   | { readonly state: "refused"; readonly reason: string };
 
 function readStore(opts: TrustOptions): Store | null | "corrupt" {
@@ -122,8 +128,10 @@ function workspaceTrustSurface(workspace: string): WorkspaceTrustSurface {
     if (grants.egress?.allowHosts.length) parts.push(`shell egress hosts: ${grants.egress.allowHosts.length}`);
   }
   if (shell?.allow?.binariesAllowlist?.length) parts.push(`shell binaries: ${shell.allow.binariesAllowlist.length}`);
+  const read = readPresets(workspace);
   return { signer, toolsDigestSha256: snapshot.signatureValid ? snapshot.digestSha256 : null,
-    toolsSummary: snapshot.signatureValid ? parts.join(", ") : "no verifiable signed tools policy (every tool denied)" };
+    toolsSummary: snapshot.signatureValid ? parts.join(", ") : "no verifiable signed tools policy (every tool denied)",
+    presets: read.ok && read.sha256 !== null ? { sha256: read.sha256, count: read.presets.length } : null };
 }
 
 /** How this machine holds the workspace's configuration. Never throws on a bad store: that is the `refused` verdict. */
@@ -140,9 +148,10 @@ export function workspaceTrustVerdict(workspace: string, opts: TrustOptions = {}
   if (store === "corrupt") return { state: "refused", reason: `the workspace trust store at ${homeOf(opts)}/${STORE_REL} is unreadable; run \`amc trust workspace --repair-store\` to move it aside, then trust the workspace again` };
   const record = store?.workspaces[workspaceScope(workspace)] ?? null;
   if (record === null) return { state: "first-use", surface };
-  const changed: ("key-set" | "tools-policy")[] = [];
+  const changed: ("key-set" | "tools-policy" | "presets")[] = [];
   if (record.keysetSha256 !== surface.signer.sha256 || record.keysetGeneration !== surface.signer.generation || record.realpath !== realWorkspace(workspace)) changed.push("key-set");
   if (record.toolsDigestSha256 !== surface.toolsDigestSha256) changed.push("tools-policy");
+  if (record.presetsDigestSha256 !== (surface.presets?.sha256 ?? null)) changed.push("presets");
   return changed.length === 0 ? { state: "trusted", reason: "consented", record } : { state: "changed", changed, record, surface };
 }
 
@@ -164,7 +173,7 @@ export function trustWorkspace(workspace: string, by: TrustConsentSource, opts: 
   const surface = workspaceTrustSurface(workspace);
   if (surface.signer === null) throw new Error("this workspace has no signing key, so nothing signed in it can verify; there is nothing to trust");
   const record: WorkspaceTrustRecord = { realpath: realWorkspace(workspace), keysetSha256: surface.signer.sha256, keysetGeneration: surface.signer.generation,
-    toolsDigestSha256: surface.toolsDigestSha256, trustedAt: new Date().toISOString(), by };
+    toolsDigestSha256: surface.toolsDigestSha256, presetsDigestSha256: surface.presets?.sha256 ?? null, trustedAt: new Date().toISOString(), by };
   writeStore(opts, store => ({ ...store, workspaces: { ...store.workspaces, [workspaceScope(workspace)]: record } }));
   return record;
 }
@@ -240,7 +249,8 @@ export function requireWorkspaceTrust(workspace: string, consent: TrustConsentSo
     : `This workspace's ${verdict.changed.join(" and ")} changed since this machine trusted it (${verdict.record.trustedAt}).`;
   const signer = verdict.surface.signer!;
   const who = signer.kind === "key-set" ? `key set generation ${signer.generation}` : "legacy signing key (no key set)";
+  const presets = verdict.surface.presets === null ? "" : `, ${verdict.surface.presets.count} signed preset${verdict.surface.presets.count === 1 ? "" : "s"}`;
   return { ok: false, reason: `${what} Its signed configuration would apply with your rights: ${who} (${signer.sha256.slice(0, 16)}…), `
-    + `${verdict.surface.toolsSummary}. Review .amc/tools.yaml and .amc/agents.yaml, then trust it with \`amc trust workspace\` (or pass --trust-workspace; `
+    + `${verdict.surface.toolsSummary}${presets}. Review .amc/tools.yaml and .amc/agents.yaml, then trust it with \`amc trust workspace\` (or pass --trust-workspace; `
     + `headless hosts set ${TRUST_WORKSPACE_ENV}=1). A workspace file can never grant this.` };
 }
