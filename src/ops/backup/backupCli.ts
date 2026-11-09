@@ -1,7 +1,7 @@
 import { createBackup, createBackupAsync, printBackup, restoreBackup, verifyBackup } from "./backupEngine.js";
 
 export async function backupCreateCliAsync(workspace: string, outFile: string): Promise<ReturnType<typeof createBackup>> {
-  return createBackupAsync({ workspace, outFile });
+  return createBackupAsync({ workspace, outFile }, { retryInputDrift: true });
 }
 
 export function backupVerifyCli(params: Parameters<typeof verifyBackup>[0]): ReturnType<typeof verifyBackup> {

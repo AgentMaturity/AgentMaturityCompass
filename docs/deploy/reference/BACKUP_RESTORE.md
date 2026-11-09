@@ -1,6 +1,6 @@
 # Back up and restore the reference deployment
 
-Backups are signed by the workspace auditor key and encrypted with `AMC_BACKUP_PASSPHRASE_FILE`. SQLite files are captured as consistent snapshots, so a backup can run while Studio writes (P2-09).
+Backups are signed by the workspace auditor key and encrypted with `AMC_BACKUP_PASSPHRASE_FILE`. SQLite files use consistent online snapshots (P2-09). If a Studio turn advances its task descriptor, blob records, human audit, or pairing records while a backup is being prepared, the CLI takes a fresh snapshot, with up to four attempts in total. Each attempt checks the original authority and destination. File removals, changes outside those Studio records, and failures after publication begins are terminal. If writes exhaust the attempts, run the backup again during a quiet interval.
 
 1. Create a backup while the workload runs: `amc backup create --out <file>` in the Studio pod. Copy it off the volume. (check BR-1) The chart has no values key for the backup passphrase: feed it on stdin into a file in `/tmp` and delete it in the same command, so it never reaches argv, a values file or the volume:
 

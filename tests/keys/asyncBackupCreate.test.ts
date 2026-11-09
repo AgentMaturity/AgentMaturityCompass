@@ -3,7 +3,7 @@ import { sign, verify } from "node:crypto";
 import { chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
-import { basename, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import YAML from "yaml";
 import { afterEach, expect, test, vi } from "vitest";
@@ -192,6 +192,44 @@ test.each(["file", "membership", "ops-body", "ops-sidecar", "merkle-root", "seal
     expect(existsSync(join(f.workspace, f.params.outFile))).toBe(false); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(log);
   } finally { p.release.resolve(); await Promise.allSettled([pending]); restore(path, original); }
   inspect(f, (await createBackupAsync({ ...f.params, outFile: "fresh.amcbackup" })).outFile);
+});
+
+test.each(["settles", "output changes", "control changes", "keeps changing"] as const)("CLI backup retries a snapshot conflict only when it can publish safely (%s)", async (scenario) => {
+  const f = fixture();
+  const source = join(f.workspace, ".amc", "studio-native-tasks", "a".repeat(64) + ".json");
+  mkdirSync(dirname(source), { recursive: true });
+  writeFileAtomic(source, "first snapshot", 0o600);
+  const policy = loadOpsPolicy(f.workspace);
+  policy.opsPolicy.backups.includePaths = [".amc/studio-native-tasks"];
+  writeFileAtomic(opsPolicyPath(f.workspace), YAML.stringify(policy), 0o644);
+  signOpsPolicy(f.workspace);
+
+  const output = join(f.workspace, f.params.outFile);
+  const originalLog = readFileSync(transparencyLogPath(f.workspace));
+  const competing = Buffer.from("competing destination bytes");
+  let changes = 0;
+  const changeDuringSign = async () => {
+    writeFileAtomic(source, `changed snapshot ${++changes}`, 0o600);
+    if (scenario === "output changes") writeFileAtomic(output, competing, 0o600);
+    if (scenario === "control changes") writeFileAtomic(join(f.workspace, "package.json"), "{}", 0o600);
+    if (scenario === "keeps changing") boundary.afterSign = changeDuringSign;
+  };
+  boundary.afterSign = changeDuringSign;
+  const pending = backupCreateCliAsync(f.workspace, f.params.outFile);
+  if (scenario === "settles") {
+    const published = await pending, actual = inspect(f, published.outFile);
+    expect(readFileSync(join(actual.extracted, ".amc", "studio-native-tasks", "a".repeat(64) + ".json"), "utf8")).toBe("changed snapshot 1");
+    expect(boundary.calls).toHaveLength(4); // Two manifest signatures and one seal/root pair.
+    const appended = readFileSync(transparencyLogPath(f.workspace)).subarray(originalLog.length).toString().trim().split("\n");
+    expect(appended).toHaveLength(1);
+    expect(JSON.parse(appended[0]!)).toMatchObject({ type: "BACKUP_CREATED" });
+  } else {
+    await expect(pending).rejects.toThrow(scenario === "output changes" ? "backup output changed while preparing" : "backup inputs changed while preparing");
+    if (scenario === "output changes") expect(readFileSync(output)).toEqual(competing);
+    else expect(existsSync(output)).toBe(false);
+    expect(boundary.calls).toHaveLength(scenario === "keeps changing" ? 4 : 1);
+    expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(originalLog);
+  }
 });
 
 test("a real preexisting backup copied by a competing writer during Sign is preserved by destination CAS", async () => {
