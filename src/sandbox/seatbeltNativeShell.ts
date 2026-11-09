@@ -1,12 +1,12 @@
 import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { homedir, tmpdir } from "node:os";
+import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { resolveAmcHome, resolveCredentialsPaths } from "../credentials/credentialsPaths.js";
 import { runProcess } from "../exec/runProcess.js";
 import { admitWritableDirectory, within } from "./bwrapBackend.js";
 import { startShellEgressProxy, type ShellEgressProxy } from "./egress/shellEgressProxy.js";
 import { PROCESS_LIMIT_LIMITATION, ROOT_PROCESS_LIMIT_LIMITATION, processLimit, withProcessLimit } from "./processCap.js";
 import { realOrLiteral, sbplString } from "./seatbeltBackend.js";
+import { shellSecretPaths } from "./shellSecretPaths.js";
 import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTypes.js";
 
 /**
@@ -34,37 +34,6 @@ import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTyp
  * and the outcome is not confined.
  */
 const SANDBOX_EXEC = "/usr/bin/sandbox-exec";
-
-/** Home-relative secrets every macOS shell is denied, before the signed `readDeny`. */
-export const MACOS_SECRET_PATHS = [".ssh", ".aws", ".config/gcloud", ".azure", ".gnupg", ".kube", ".docker",
-  ".netrc", ".npmrc", "Library/Keychains", ".amc"] as const;
-
-/**
- * AMC's own authority on this machine, denied as absolute paths: the AMC home (`~/.config/amc`, or `AMC_HOME`: provider
- * credentials, the vault passphrase store, high-water marks, workspace trust), the credentials file wherever
- * `AMC_CREDENTIALS_FILE` keeps it, the user `.env` layer, and `AMC_VAULT_REMEMBER_FILE`. `.amc` under the home is only
- * the legacy spelling; without these a confined shell could `cat ~/.config/amc/.credentials.yaml` (SH-SANDBOX-08).
- */
-export function amcSecretPaths(env: NodeJS.ProcessEnv = process.env): readonly string[] {
-  const paths = resolveCredentialsPaths({ env, projectDir: null });
-  const remember = env["AMC_VAULT_REMEMBER_FILE"]?.trim();
-  // The default home is denied even when AMC_HOME points elsewhere: the vault passphrase file store (src/vault/passphraseStore.ts)
-  // still defaults to ~/.config/amc/vault-credentials.json there (S5).
-  return [...new Set([resolveAmcHome({ env }), join(homedir(), ".config", "amc"), paths.file, paths.userEnvFile,
-    ...(remember ? [resolve(remember)] : []), ...sessionSecretPaths])];
-}
-
-const sessionSecretPaths = new Set<string>();
-
-/**
- * Credential stores a session selected by option rather than by environment (`--credentials-home`, `--credentials-file`,
- * the SDK's `credentialsHome`/`credentialsFile`): nothing in `process.env` names them, so the kernel's credentials
- * service registers them here when it opens the store, and every later confined shell in this process denies them.
- * ponytail: process-wide set; a per-session deny list would need the policy to carry the store paths through the toolset.
- */
-export function denySessionSecretPaths(paths: readonly string[]): void {
-  for (const path of paths) sessionSecretPaths.add(resolve(path));
-}
 
 /** The only Mach services the shell may look up: temp-dir helper, logging, notifications, user and group lookups. */
 export const MACOS_MACH_SERVICES = ["com.apple.bsd.dirhelper", "com.apple.logd", "com.apple.system.notification_center",
@@ -176,9 +145,7 @@ export function seatbeltNativeShell(): SandboxBackend {
         launcher = mkdtempSync(join(taskParent, "amc-seatbelt-"));
         const privateTmp = join(launcher, "tmp");
         mkdirSync(privateTmp, { mode: 0o700 });
-        const home = realOrLiteral(homedir());
-        const denied = [...MACOS_SECRET_PATHS.map(path => realOrLiteral(join(home, path))), ...amcSecretPaths().map(realOrLiteral),
-          ...(policy.readDeny ?? []).map(realOrLiteral)];
+        const denied = [...shellSecretPaths(), ...(policy.readDeny ?? [])].map(realOrLiteral);
         const env: Record<string, string> = { PATH: process.env["PATH"] ?? "/usr/bin:/bin", HOME: privateTmp, TMPDIR: privateTmp, LANG: "en_US.UTF-8" };
         if (policy.allowHosts && policy.onEgress && policy.egressScope) {
           proxy = await startShellEgressProxy({ allowHosts: policy.allowHosts, record: policy.onEgress, ...policy.egressScope });

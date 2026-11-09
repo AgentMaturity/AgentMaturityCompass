@@ -76,7 +76,7 @@ records `boundary`, `hostWrites`, `reads`, `network` (`denied` or
 | | Linux (`linux-bwrap`) | macOS (`macos-seatbelt`) |
 |---|---|---|
 | Writes | Signed `writableDirectories`; private `/tmp` and `/dev` | Signed `writableDirectories`, a private per-call `TMPDIR` (also `HOME`), `/dev/null` |
-| Reads (`reads`) | Runtime roots and the workspace, read-only; `.amc` and workspace `readDeny` paths masked (`workspace-ro-and-runtime`) | Everything your user can read, except the deny-list below (`open-except-denylist`) |
+| Reads (`reads`) | Runtime roots and the workspace, read-only; `.amc`, workspace `readDeny` paths and the deny-list's paths inside the workspace masked (`workspace-ro-and-runtime`) | Everything your user can read, except the deny-list below (`open-except-denylist`) |
 | Network | Denied: separate network namespace and a seccomp socket filter | Denied, Unix sockets included; with a signed egress allowlist, only AMC's per-call proxy |
 | Processes | RLIMIT_NPROC of your process count at launch plus `maxProcesses` (default 256) | Same |
 | Escape | Process-group kill at the deadline or on cancel | Same |
@@ -141,7 +141,11 @@ network tools for those operations. A signed `nativeSandbox.egress` is refused
 on Linux: its in-namespace relay needs a seccomp change that waits for review of
 [ADR-008](adr/008-native-shell-containment.md). `readDeny` paths inside the
 workspace are masked; other host paths are not mounted at all, and a `readDeny`
-path under the system runtime roots is refused.
+path under the system runtime roots is refused. The paths the macOS profile
+below denies (the home credential stores, AMC's own home and secret files) are
+not mounted either, and any of them that lies inside the workspace (a workspace
+in your home directory, an AMC home or a passphrase file kept in the project) is
+masked the same way; one under the runtime roots refuses the launch.
 
 Procfs is intentionally absent so the command cannot reopen launcher-owned
 status descriptors. Programs that depend on process introspection, `/dev/fd`,
@@ -185,14 +189,18 @@ profile AMC writes per call. Writes are allowed only to the signed
 `TMPDIR` and `HOME`) and `/dev/null`. Reads and writes are denied for `~/.ssh`,
 `~/.aws`, `~/.config/gcloud`, `~/.azure`, `~/.gnupg`, `~/.kube`, `~/.docker`,
 `~/.netrc`, `~/.npmrc`, `~/Library/Keychains`, `~/.amc`, AMC's own home
-(`AMC_HOME`, and always `~/.config/amc`, where the vault passphrase file store
-defaults even when `AMC_HOME` points elsewhere: provider credentials, the vault
-passphrase store, high-water marks), the credentials file named by
-`AMC_CREDENTIALS_FILE`, the credential store the session selected by option
+(`AMC_HOME`: provider credentials, high-water marks, workspace trust; and always
+`~/.config/amc`, where the vault passphrase file store kept its entries before
+it moved under `AMC_HOME`), the remembered vault passphrase file wherever the
+vault resolves it (`AMC_VAULT_REMEMBER_FILE`, else the AMC home), the
+credentials file named by `AMC_CREDENTIALS_FILE`, every AMC secret file a
+`_FILE` variable names (`AMC_VAULT_PASSPHRASE_FILE`, the bootstrap password
+files, `AMC_SESSION_SIGNING_KEY_FILE`, `AMC_NOTARY_AUTH_SECRET_FILE`,
+`AMC_POSTGRES_URL_FILE`), the credential store the session selected by option
 (`--credentials-home`, `--credentials-file`, the SDK's `credentialsHome` and
 `credentialsFile`; registered when the kernel opens the store, process-wide),
-the user `~/.env` layer, `AMC_VAULT_REMEMBER_FILE`, the workspace's `.amc`
-and the signed `readDeny` paths. All networking is denied, including Unix
+the user `~/.env` layer, the workspace's `.amc` and the signed `readDeny`
+paths. All networking is denied, including Unix
 sockets such as an SSH agent; with a signed egress allowlist the only exception
 is AMC's proxy port on localhost. Every path is resolved first, because Seatbelt
 matches real paths only (`/var` is `/private/var`). Write grants that contain

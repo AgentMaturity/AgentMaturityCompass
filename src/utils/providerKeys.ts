@@ -31,7 +31,7 @@ const AMC_SECRET_ENV_PATTERN =
 const AGENT_FACING_AMC_ENV: readonly string[] = ["AMC_TOKEN"];
 
 /** Whether `name` is one of AMC's secret variables (AMC_TOKEN included: only a wrapped agent is meant to hold it). */
-function isAmcSecretEnv(name: string): boolean {
+export function isAmcSecretEnv(name: string): boolean {
   return AMC_SECRET_ENV_PATTERN.test(name);
 }
 

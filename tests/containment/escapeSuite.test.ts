@@ -5,7 +5,8 @@ import { join } from "node:path";
 import { describe, expect, test, vi } from "vitest";
 import { bwrapBackend, unconsumedFds } from "../../src/sandbox/bwrapBackend.js";
 import { prepareNativePtyLaunch } from "../../src/terminal/nativePtySandbox.js";
-import { denySessionSecretPaths, seatbeltNativeShell } from "../../src/sandbox/seatbeltNativeShell.js";
+import { seatbeltNativeShell } from "../../src/sandbox/seatbeltNativeShell.js";
+import { denySessionSecretPaths } from "../../src/sandbox/shellSecretPaths.js";
 import { nativeContainmentFixture, sandboxNode, type NativeCall } from "../helpers/nativeContainment.js";
 
 // Binary prerequisites are not confinement evidence. Every actual call must produce a real applied receipt.
@@ -158,6 +159,23 @@ describe("real native shell escape attempts with owned canaries", () => {
       const call = await f.run(`let value=null,denied=false,code=null;try{value=require("node:fs").readFileSync(${JSON.stringify(path)},"utf8");}catch(error){denied=true;code=error.code;}${emit('{attempted:true,denied,code}')} `);
       applied(call); expect(call.receipt.stdout).not.toContain(canary);
       expect(call.data.denied).toBe(true); expect(readFileSync(path, "utf8")).toBe(canary); passed = true;
+    } finally { await f.finish(passed); }
+  });
+
+  // S5: an AMC secret a _FILE variable names is denied by the backend itself, here the vault passphrase file kept in the
+  // project: Seatbelt denies it outright, and Bubblewrap masks it because it lies inside the mounted workspace.
+  realTest("the vault passphrase file AMC_VAULT_PASSPHRASE_FILE names cannot be read, even inside the workspace", async () => {
+    const f = nativeContainmentFixture({ readDenyHome: false }); let passed = false;
+    try {
+      const canary = `synthetic-not-a-real-secret-${randomUUID()}`;
+      const secrets = join(f.workspace, "secrets"); mkdirSync(secrets, { recursive: true, mode: 0o700 });
+      const path = join(secrets, "vault-passphrase"); writeFileSync(path, canary, { mode: 0o600 });
+      process.env.AMC_VAULT_PASSPHRASE_FILE = path; // restored by the fixture's finish
+      const call = await f.run(`let value=null,denied=false,code=null;try{value=require("node:fs").readFileSync(${JSON.stringify(path)},"utf8");}catch(error){denied=true;code=error.code;}${emit('{attempted:true,denied,code,value}')} `);
+      applied(call); expect(call.receipt.stdout).not.toContain(canary);
+      // Seatbelt refuses the read; the Linux mask is /dev/null, which reads as empty.
+      expect(call.data.denied === true || call.data.value === "").toBe(true);
+      expect(readFileSync(path, "utf8")).toBe(canary); passed = true;
     } finally { await f.finish(passed); }
   });
 

@@ -11,7 +11,7 @@ import { registerNativeScheduleCommands } from "../src/cli-native-schedule-comma
 import { openAgentSession } from "../src/agent/agentSession.js";
 import { keysetAnchoring } from "../src/keys/keyset.js";
 import { lockVault, vaultPaths } from "../src/vault/vault.js";
-import { amcSecretPaths } from "../src/sandbox/seatbeltNativeShell.js";
+import { amcSecretPaths } from "../src/sandbox/shellSecretPaths.js";
 import { saveSchedules } from "../src/autonomy/scheduleStore.js";
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL } from "../src/agent/stubProvider.js";
 import { v1Workspace } from "./helpers/legacyVault.js";

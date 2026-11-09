@@ -1,8 +1,11 @@
 // AMC-1513: the two platform-independent decisions inside the Linux shell
 // backend. These run on any host; they do not launch Bubblewrap or load the
 // filter into a kernel, so they are not Linux confinement qualification.
+import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, test } from "vitest";
-import { bwrapCommandExit, linuxSocketDenyFilter, unconsumedFds } from "../src/sandbox/bwrapBackend.js";
+import { bwrapCommandExit, bwrapReadMasks, linuxSocketDenyFilter, unconsumedFds } from "../src/sandbox/bwrapBackend.js";
 
 const KILL = 0x80000000, EPERM = 0x00050001, ALLOW = 0x7fff0000;
 const AUDIT_X64 = 0xc000003e, AUDIT_ARM64 = 0xc00000b7, AUDIT_I386 = 0x40000003;
@@ -87,5 +90,31 @@ describe("unconsumedFds: the confined command inherits no launcher descriptor", 
   });
   test("an fd number after -- is the command's argument, not a consumed fd", () => {
     expect(unconsumedFds([...head, "--", "/bin/echo", "--ro-bind-fd", "5"], 3)).toEqual([5]);
+  });
+});
+
+describe("bwrapReadMasks: what the Linux shell must not read inside its workspace", () => {
+  test("masks the signed readDeny and AMC's own secret paths that lie inside the workspace; host paths outside it stay unmounted", () => {
+    const root = realpathSync(mkdtempSync(join(tmpdir(), "amc-bwrap-masks-")));
+    try {
+      const workspace = join(root, "workspace"), outside = join(root, "outside");
+      const amcHome = join(workspace, "amc-home"), passphrase = join(workspace, "secrets", "vault-passphrase"), denied = join(workspace, "denied.txt");
+      for (const dir of [amcHome, join(workspace, "secrets"), outside]) mkdirSync(dir, { recursive: true });
+      writeFileSync(passphrase, "synthetic"); writeFileSync(denied, "synthetic"); writeFileSync(join(outside, "creds.yaml"), "synthetic");
+      // An AMC home and a passphrase file kept in the project (a workspace in the home directory has the same shape).
+      const env = { AMC_HOME: amcHome, AMC_VAULT_PASSPHRASE_FILE: passphrase, AMC_CREDENTIALS_FILE: join(outside, "creds.yaml") };
+      const masks = bwrapReadMasks(workspace, [denied], env);
+      expect(masks.ok).toBe(true);
+      const plan = masks.ok ? masks.args.join(" ") : "";
+      expect(plan).toContain(`--ro-bind /dev/null ${denied}`);
+      expect(plan).toContain(`--tmpfs ${amcHome} --remount-ro ${amcHome}`);
+      expect(plan).toContain(`--ro-bind /dev/null ${passphrase}`);
+      expect(plan).not.toContain(outside);
+    } finally { rmSync(root, { recursive: true, force: true }); }
+  });
+
+  test("a path under the runtime roots is refused rather than masked, whether signed or an AMC secret", () => {
+    expect(bwrapReadMasks("/synthetic/workspace", ["/usr/share/synthetic-deny"], {})).toMatchObject({ ok: false });
+    expect(bwrapReadMasks("/synthetic/workspace", [], { AMC_VAULT_PASSPHRASE_FILE: "/usr/local/etc/synthetic-passphrase" })).toMatchObject({ ok: false });
   });
 });

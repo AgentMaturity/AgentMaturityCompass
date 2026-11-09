@@ -18,7 +18,7 @@
  * enforces that placement.
  */
 import { resolveCredentialsPaths } from "../../credentials/credentialsPaths.js";
-import { denySessionSecretPaths } from "../../sandbox/seatbeltNativeShell.js";
+import { denySessionSecretPaths } from "../../sandbox/shellSecretPaths.js";
 import { AmcSeam, defineSeam } from "../amcRuntime.js";
 import type { Context } from "../amcRuntime.js";
 import type { CredentialRef } from "../../credentials/credentialRef.js";
