@@ -10,7 +10,7 @@ npm run package:desktop:verify
 The command writes:
 
 - `dist/installers/archives/amc-<version>-macos-universal.tar.gz`
-- `dist/installers/archives/amc-<version>-linux-x64.tar.gz`
+- `dist/installers/archives/amc-<version>-linux-x64.tar.gz` (Linux x64 and arm64: the archive is architecture-neutral, so the `linux-x64` name covers both)
 - `dist/installers/archives/amc-<version>-windows-x64.zip`
 - `dist/installers/manifest.json`
 
@@ -53,6 +53,15 @@ amc --version
 amc doctor
 ```
 
+Without root: when the global npm folder (`$(npm prefix -g)/lib/node_modules`) is not writable by your user, `install.sh` stops before npm runs and prints the rerun command. Install into a folder you own, then add its `bin` directory to PATH:
+
+```bash
+AMC_INSTALL_PREFIX="$HOME/.local" sh ./install.sh
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+`sudo sh ./install.sh` is the last resort: it runs the package postinstall and the native build as root.
+
 macOS Studio app launch:
 
 ```bash
@@ -73,6 +82,8 @@ amc doctor
 
 `install.cmd` runs `install.ps1` with `-ExecutionPolicy Bypass`, because the default execution policy on Windows clients refuses to run `.ps1` files directly.
 
+Platform status, from run receipts: macOS arm64 is qualified (`docs/PLATFORM_MATRIX.md`). The Linux archive was installed and run on `node:22-bookworm` (aarch64) on 2026-11-07, and through the hosted installer on `node:22-bookworm` and `node:22-bookworm-slim` (aarch64) on 2026-11-08, with no platform-matrix receipt. The Linux x64, macOS x64 and Windows x64 packages are built and checksum-verified by the release scripts, with no run receipt: no maintainer-run Windows receipt exists, and the CLI natively and Studio under WSL2 are both untested. The Linux archive ships no Studio launcher; after `sh ./install.sh`, `amc up` starts Studio.
+
 Launch the Studio app by double-clicking `Agent Maturity Compass Studio.cmd`, or from PowerShell:
 
 ```powershell
@@ -83,6 +94,7 @@ Launch the Studio app by double-clicking `Agent Maturity Compass Studio.cmd`, or
 
 - Node.js 22 or 24 LTS
 - npm available on PATH
+- Linux: the archive is architecture-neutral (npm tarball + sh installer). On arm64, or whenever prebuilt `better-sqlite3` binaries cannot be downloaded, npm builds the native module and needs `python3`, `make` and `g++`.
 
 These packages intentionally install AMC from a local npm tarball, so they work before the public AMC registry package is available. npm still needs access to AMC's public runtime dependencies unless they are already present in the user's npm cache or installed by an enterprise package mirror.
 

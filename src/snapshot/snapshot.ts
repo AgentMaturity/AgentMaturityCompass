@@ -1,5 +1,6 @@
 import { dirname, join, resolve } from "node:path";
 import { readdirSync } from "node:fs";
+import { agentDashboardDir } from "../dashboard/build.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { loadRunReport } from "../diagnostic/runner.js";
 import { loadTargetProfile } from "../targets/targetProfile.js";
@@ -70,7 +71,7 @@ export function createUnifiedClaritySnapshot(params: {
     .map((pack) => `- ${pack.packId}: ${pack.score0to100.toFixed(1)} (${pack.passCount}/${pack.scenarioCount} pass)`)
     .join("\n") || "- none";
 
-  const dashboardPath = join(paths.rootDir, "dashboard", "index.html");
+  const dashboardPath = join(agentDashboardDir(params.workspace, agentId), "index.html");
   const bundlePath = latestFileIfAny(paths.bundlesDir, ".amcbundle") ?? "none";
   const certPath = latestFileIfAny(paths.bundlesDir, ".amccert") ?? "none";
 

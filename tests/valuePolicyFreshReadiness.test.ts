@@ -26,9 +26,9 @@ afterEach(() => {
   while (roots.length > 0) rmSync(roots.pop()!, { recursive: true, force: true });
 });
 
-function get(url: string): Promise<{ status: number; body: string }> {
+function get(url: string, headers: Record<string, string> = {}): Promise<{ status: number; body: string }> {
   return new Promise((resolvePromise, rejectPromise) => {
-    const req = httpRequest(url, { method: "GET" }, (res) => {
+    const req = httpRequest(url, { method: "GET", headers }, (res) => {
       const chunks: Buffer[] = [];
       res.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
       res.on("end", () => resolvePromise({ status: res.statusCode ?? 0, body: Buffer.concat(chunks).toString("utf8") }));
@@ -43,7 +43,8 @@ async function readyz(workspace: string): Promise<{ status: number; body: string
   try {
     const address = server.server.address();
     if (!address || typeof address === "string") throw new Error("failed to bind studio test server");
-    return await get(`http://127.0.0.1:${address.port}/readyz`);
+    // The messages after each reason code go to signed-in callers only (LIVE-RUNTIME-14): ask as the admin token.
+    return await get(`http://127.0.0.1:${address.port}/readyz`, { "x-amc-admin-token": "value-ready-token" });
   } finally {
     await server.close();
   }

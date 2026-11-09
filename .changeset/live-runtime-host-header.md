@@ -1,0 +1,7 @@
+---
+"agent-maturity-compass": patch
+---
+
+Studio and the host router now refuse a request whose `Host` header names a host they were not configured for, with 403 `{"error":"host not allowed"}` (LIVE-RUNTIME-19). This closes DNS rebinding: a web page on a name that later resolves to 127.0.0.1 could otherwise drive a local Studio, and the desktop demo workspace minted a full-role session for any request that reached its port. An IP address, `localhost` and `*.localhost` always pass, and so does any host named in `AMC_CORS_ALLOWED_ORIGINS` (and `AMC_HOST_PUBLIC_BASEURL` in host mode). Only a request that a trusted reverse proxy forwarded (`AMC_TRUSTED_PROXY_HOPS` set, the peer in `AMC_TRUSTED_PROXY_CIDRS`, and an `X-Forwarded-For` header) is not checked, because the proxy serves its own configured name; a loopback or allowed peer without that is checked like any other (SR-4). If you reach Studio directly by a DNS name, without a proxy, add that origin to `AMC_CORS_ALLOWED_ORIGINS`, for example `AMC_CORS_ALLOWED_ORIGINS=http://studio.lan:3212`.
+
+The host router now enforces `AMC_ALLOWED_CIDRS` on its own routes too (LIVE-RUNTIME-20); loopback is always admitted. It takes the client address from `X-Forwarded-For` only from a proxy named in `AMC_TRUSTED_PROXY_CIDRS`, and it replaces any `X-Forwarded-*` or `Forwarded` header a client sent with the address it computed before it forwards a request to a workspace, so a client can no longer choose its own address there. Its session cookies carry `Secure` for `X-Forwarded-Proto: https` only from a trusted hop.

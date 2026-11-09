@@ -81,11 +81,13 @@ export async function resolve(specifier, context, nextResolve) {
   };
   await run("keys", "rotate", "--purpose", "config-signature", "--config-candidate", candidate);
   expect(boundProviderKey(workspace, "config-signature")!.binding.id).toBe(id);
+  // LIVE-VAULT-06: a shell without a terminal hands the password over in a private file, never on argv or through a prompt.
+  const passwordFile = join(root, "owner.pw"); writeFileSync(passwordFile, `${PASSWORD}\n`, { mode: 0o600 });
   let before = calls().length;
-  await run("user", "init", "--username", "owner"); assertPair(); expect(calls().length).toBe(before + 1);
+  await run("user", "init", "--username", "owner", "--password-file", passwordFile); assertPair(); expect(calls().length).toBe(before + 1);
   expect(authenticateUser({ workspace, username: "owner", password: PASSWORD }).ok).toBe(true);
   before = calls().length;
-  await run("user", "add", "--username", "added", "--role", "APPROVER"); assertPair(); expect(calls().length).toBe(before + 1);
+  await run("user", "add", "--username", "added", "--role", "APPROVER", "--password-file", passwordFile); assertPair(); expect(calls().length).toBe(before + 1);
   expect(authenticateUser({ workspace, username: "added", password: PASSWORD }).ok).toBe(true);
   before = calls().length;
   await run("user", "role", "set", "added", "--roles", "VIEWER"); assertPair(); expect(calls().length).toBe(before + 1);

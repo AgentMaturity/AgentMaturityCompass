@@ -113,6 +113,29 @@ test("rendered guide links stay in the Docs router and unknown targets fail clos
   expect(fetchedDocs.some(url => url.endsWith("GETTING_STARTED.md"))).toBe(true);
 });
 
+// LIVE-UX-08: an in-page `#anchor` link was taken for a doc route and showed the welcome page.
+test("an in-page anchor link stays on the guide and focuses its heading", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await configureDocsTransport(page, {
+    markedScript: `window.marked = {
+      setOptions() {},
+      parse() {
+        return '<h1>Quickstart</h1><p>Steps <a id="in-page-link" href="#2-run-amc-in-your-agent-project">2</a> to 5.</p><p>${"filler ".repeat(400)}</p><h2 id="2-run-amc-in-your-agent-project">2. Run AMC in your agent project</h2>';
+      }
+    };`,
+    bodyForDoc: () => "QUICKSTART_FIXTURE",
+  });
+
+  await page.goto(`${docsUrl}#QUICKSTART`);
+  await expect(page.locator('.doc-article[data-doc="QUICKSTART"]')).toBeVisible();
+  await expect(page.locator("#in-page-link")).toHaveAttribute("href", "#QUICKSTART::2-run-amc-in-your-agent-project");
+  await page.locator("#in-page-link").click();
+  await expect.poll(() => page.evaluate(() => window.location.hash)).toBe("#QUICKSTART::2-run-amc-in-your-agent-project");
+  await expect(page.locator('.doc-article[data-doc="QUICKSTART"]')).toBeVisible();
+  await expect(page.locator('[id="2-run-amc-in-your-agent-project"]')).toBeFocused();
+  await expect(page.locator(".welcome")).toHaveCount(0);
+});
+
 test("rendered code controls preserve the AMC identity and announce copy outcomes", async ({ page }) => {
   const codeText = "printf 'Copy this exact payload'\nsecond line\n";
   const browserErrors: string[] = [];

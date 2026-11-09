@@ -21,6 +21,7 @@ import {
   type LocalPurpose, type VaultPayloadV2
 } from "./vaultPayload.js";
 import { noteCheckPassWrite } from "../utils/checkPass.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { purposeKeyPaths, vaultPaths } from "./vaultPaths.js";
 
 export { purposeKeyPaths, vaultPaths };
@@ -140,6 +141,15 @@ export function vaultMetaBytes(payload: VaultPayload): string {
     sessionFingerprint: fingerprint("session"),
     purposeKeyIds: Object.fromEntries(LOCAL_PURPOSES.flatMap(purpose => payload.keys[purpose] ? [[purpose, payload.keys[purpose]!.keyId]] : []))
   }, null, 2);
+}
+
+/**
+ * LIVE-VAULT-19 (SR-V1): one writer at a time for a rewrite that keeps the vault's keys (a secret write, `amc vault
+ * passphrase`), so a passphrase change never loses a secret written meanwhile and a secret write never re-seals the vault
+ * under the old passphrase.
+ */
+export function withVaultEnvelopeLock<T>(workspace: string, operation: () => T): T {
+  return withControlFileLock({ root: vaultPaths(workspace).keysDir, name: "vault-envelope", operation });
 }
 
 /** The key ids a vault envelope holds under `passphrase`, or null when it does not open with it (`amc keys rotate --restore`). */
@@ -669,21 +679,25 @@ function rewriteUnlockedVault(workspace: string, payload: VaultPayload): void {
 
 export function setVaultSecret(workspace: string, secretKey: string, value: string): void {
   assertSafeSecretKey(secretKey);
-  const payload = requireUnlockedPayload(workspace);
-  const next = { ...payload, secrets: safeSecrets({ ...payload.secrets, [secretKey]: value }) };
-  rewriteUnlockedVault(workspace, next);
-  const current = sessionFor(workspace); current.payload = next; purposeContinuity.set(current, {});
+  withVaultEnvelopeLock(workspace, () => {
+    const payload = requireUnlockedPayload(workspace);
+    const next = { ...payload, secrets: safeSecrets({ ...payload.secrets, [secretKey]: value }) };
+    rewriteUnlockedVault(workspace, next);
+    const current = sessionFor(workspace); current.payload = next; purposeContinuity.set(current, {});
+  });
 }
 
 /** Rewrites the vault envelope without `secretKey`; refuses when the vault is locked. True when a secret was removed. */
 export function deleteVaultSecret(workspace: string, secretKey: string): boolean {
   assertSafeSecretKey(secretKey);
-  const payload = requireUnlockedPayload(workspace);
-  if (!Object.hasOwn(payload.secrets, secretKey)) return false;
-  const next = { ...payload, secrets: safeSecrets(Object.fromEntries(Object.entries(payload.secrets).filter(([key]) => key !== secretKey))) };
-  rewriteUnlockedVault(workspace, next);
-  const current = sessionFor(workspace); current.payload = next; purposeContinuity.set(current, {});
-  return true;
+  return withVaultEnvelopeLock(workspace, () => {
+    const payload = requireUnlockedPayload(workspace);
+    if (!Object.hasOwn(payload.secrets, secretKey)) return false;
+    const next = { ...payload, secrets: safeSecrets(Object.fromEntries(Object.entries(payload.secrets).filter(([key]) => key !== secretKey))) };
+    rewriteUnlockedVault(workspace, next);
+    const current = sessionFor(workspace); current.payload = next; purposeContinuity.set(current, {});
+    return true;
+  });
 }
 
 export function getVaultSecret(workspace: string, secretKey: string): string | null {

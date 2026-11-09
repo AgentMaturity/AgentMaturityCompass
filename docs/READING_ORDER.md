@@ -13,12 +13,12 @@ Six reads, four commands. Every command below is registered at 505a28ce (`init` 
 |---|---|---|
 | 1 | `README.md` — "Run a native agent task" (README.md:40-49) | First screen already names `amc agent-loop guide` and links the native workflow; nothing else on the first screen is needed. |
 | 2 | `docs/INSTALL.md` | The verified install paths; the README's `curl … install.sh \| sh` is one of them. |
-| 3 | `docs/QUICKSTART.md#first-governed-turn-in-three-actions-keyless` (QUICKSTART.md:65-105) | The keyless path itself: `export AMC_VAULT_PASSPHRASE=…`, `amc init --minimal`, `amc firewall enable`, `amc --agent default agent-loop run "…" --provider stub --model amc-stub-1 --tools echo --max-steps 2 --max-tokens 512`, `amc agent-loop verify <session-id>`. Timing is quoted there from a dated run (2026-09-14, commit d635a5e2; the record is not in the repository) — **not re-measured in this run**. |
+| 3 | `docs/QUICKSTART.md#first-governed-turn-in-three-actions-keyless` (QUICKSTART.md:83-123) | The keyless path itself: `export AMC_VAULT_PASSPHRASE=…`, `amc init --minimal`, `amc firewall enable`, `shasum -a 256 .amc/keys/monitor_ed25519.pub` (recorded outside the workspace), `amc --agent default agent-loop run "…" --provider stub --model amc-stub-1 --tools echo --max-steps 2 --max-tokens 512`, `amc agent-loop verify <session-id> --expect-monitor <monitor sha256>` (without the pin the verdict is UNANCHORED and it exits 1). It needs the current source build; the published 1.1.1 has no `agent-loop` commands. Timing is quoted there from a dated run (2026-09-14, commit d635a5e2; the record is not in the repository) — **not re-measured in this run**. |
 | 4 | `docs/DOCTOR.md` | Only if a step refuses: `amc doctor` names the missing precondition (`runtime-firewall-policy`, `vault`) and the fixing command. |
 | 5 | `docs/NATIVE_AGENT_WORKFLOW.md` | What the stub turn does and does not demonstrate; what `--tools workspace`, credentials and approvals require before a real provider turn. |
 | 6 | `docs/EVIDENCE_TRUST.md` | What `VERIFIED` with trust root `UNANCHORED` means (internal consistency, not authorship) before anyone quotes the verify output. |
 
-`docs/START_HERE.md` duplicates step 3's command block (START_HERE.md:16-24); keep it as the role hub (section 1), not as a second copy of the path.
+`docs/START_HERE.md` duplicates step 3's command block (START_HERE.md:17-30); keep it as the role hub (section 1), not as a second copy of the path.
 
 ### 1. Everyone, after the first turn (hub and orientation)
 
@@ -75,7 +75,7 @@ Start: `PLATFORM_ENGINEER_QUICKSTART`, then `PLATFORM_PATH`.
 | DEPLOYMENT_OPTIONS, DEPLOYMENT, DEPLOYMENT_CHECKLIST, CLOUD_REFERENCE_ARCHITECTURES | Where and how to run it; checklist before production. |
 | OPERATIONS, BACKUPS, MIGRATION_RUNBOOK | Day-2 operations and data/config safety. |
 | CI_TEMPLATES, integrations/ci-cd | CI gates and pipelines. |
-| SINGLE_BINARY | Experimental SEA path; the doc itself says "not yet the default install method". |
+| SINGLE_BINARY | Experimental local SEA build: the binary it builds does not start yet, and it is not a release asset. |
 | CONTINUOUS_MONITORING, DRIFT_ALERTS, INCIDENT_RESPONSE_READINESS | Watch surface and incident posture. |
 | runbooks/amc-service-down, runbooks/evidence-corruption, runbooks/score-dispute | The three operator runbooks. |
 | REALTIME, API_REFERENCE, API_SURFACES, PACKAGE_API_REFERENCE | HTTP/SSE and package APIs. |

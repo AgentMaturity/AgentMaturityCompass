@@ -230,7 +230,7 @@ export interface AgentRunVerification {
  * "no, lawfully" rather than a green tick.
  */
 export interface AgentRunVerifyOptions {
-  /** A running Studio's own gateway session is never sealed while it serves: name such sessions instead of failing (SQLite only). */
+  /** P0-14's native continuation scope (SQLite only): the target must be finalized, and the verdict reads verified-prefix while any session is open. */
   readonly allowLiveLegacySessions?: boolean;
 }
 
@@ -239,9 +239,10 @@ export async function verifyAgentRun(workspace: string, sessionId: string, trust
   const live = options.allowLiveLegacySessions === true && readSessionStoreMarker(workspace) === "sqlite"
     ? verifyNativeSessionContinuation(workspace, sessionId, trust ? { trust } : {}) : null;
   const result = live ?? verifyLedgerIntegrity(workspace, trust ? { trust } : {});
-  // Another native session that is open or interrupted is unfinalized too: a cut session/close leaves that shape.
+  // Another native session that is open or interrupted is unfinalized too: a cut session/close leaves that shape. A live
+  // legacy session (a running Studio's gateway, sessionLiveness.ts) is named in both scopes and is never a chain error.
   const otherLive = [...result.sessions.open, ...result.sessions.interrupted].filter((id) => id !== sessionId);
-  const unfinalizedSessions = [...new Set([...(live?.incompleteLegacySessions ?? []), ...otherLive])];
+  const unfinalizedSessions = [...new Set([...result.sessions.liveLegacy.map((open) => open.sessionId), ...otherLive])];
   const sessionChainErrors: string[] = [];
   if (!live) {
     for (const id of otherLive) sessionChainErrors.push(`Session ${id} is not finalized; a complete-ledger verdict needs every other session closed and sealed`);

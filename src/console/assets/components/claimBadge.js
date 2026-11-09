@@ -23,8 +23,8 @@ const LEGEND = [
   ]]
 ];
 
-export const LEGEND_PAGES = new Set(["home", "transparency", "compliance", "assurance", "passport", "industrypacks", "a4", "a4Project"]);
-export const CLAIM_PAGES = new Set([...LEGEND_PAGES, "agent", "compass", "diagnosticView", "evidenceDrilldown", "trust",
+export const CLAIM_PAGES = new Set(["home", "transparency", "compliance", "assurance", "passport", "industrypacks", "a4",
+  "a4Project", "agent", "compass", "diagnosticView", "evidenceDrilldown", "trust",
   "assuranceRun", "assuranceCert", "standard", "benchmarks", "benchCompare", "benchPortfolio", "benchRegistry", "compare",
   "forecast", "forecastAgent", "forecastNode", "portfolioForecast", "org", "outcomes", "value", "valueAgent", "valueKpis",
   "audit", "auditBinder", "fleet", "systemic"]);
@@ -38,7 +38,7 @@ function segment(label, name) {
   return String(label ?? "").split(" · ").find((part) => part.startsWith(prefix))?.slice(prefix.length);
 }
 
-/** The kind and result, with all five dimensions in the tooltip and a link to the legend. */
+/** The kind and result, with all five dimensions in the tooltip; the strip's one legend explains the words. */
 export function claimBadge(claim) {
   if (!claim || typeof claim.claimKind !== "string") return "";
   const result = claim.statusDimensions?.result;
@@ -46,7 +46,7 @@ export function claimBadge(claim) {
   const kind = segment(claim.claimLabel, "Claim") ?? claim.claimKind;
   const outcome = segment(claim.claimLabel, "Result") ?? "not evaluated";
   return `<span class="claim-badge ${tone}" data-claim-kind="${esc(claim.claimKind)}" title="${esc(claim.claimLabel)}">`
-    + `${esc(kind)} · ${esc(outcome)}</span> <a class="claim-legend-link" href="#claim-legend">Claim kinds</a>`;
+    + `${esc(kind)} · ${esc(outcome)}</span>`;
 }
 
 export function claimLegendHtml() {
@@ -54,9 +54,9 @@ export function claimLegendHtml() {
     .map(([term, text]) => `<li><strong>${esc(term)}</strong>: ${esc(text)}</li>`).join("")}</ul>`).join("\n");
 }
 
-export function claimLegend(open) {
-  return `<details id="claim-legend" class="claim-legend"${open ? " open" : ""}>`
-    + `<summary>How to read claim kinds</summary>${claimLegendHtml()}</details>`;
+/** Collapsed, so the strip stays a few lines above the page's own content. */
+export function claimLegend() {
+  return `<details id="claim-legend" class="claim-legend"><summary>How to read claim kinds</summary>${claimLegendHtml()}</details>`;
 }
 
 /**
@@ -70,11 +70,13 @@ export function installClaimStrip(page, onClaims) {
   strip.id = "claimStrip";
   strip.className = "card claim-strip";
   app.before(strip);
+  // The legend renders once, so a reader who opened it keeps it open while more claims arrive.
+  strip.innerHTML = `<h3>Claims on this page</h3><p></p>${claimLegend()}`;
+  const badgeLine = strip.querySelector("p");
   const seen = new Map();
   const render = () => {
-    const badges = seen.size > 0 ? [...seen.values()].map(claimBadge).join(" ")
+    badgeLine.innerHTML = seen.size > 0 ? [...seen.values()].map(claimBadge).join(" ")
       : `<span class="muted">No labelled result loaded yet.</span>`;
-    strip.innerHTML = `<h3>Claims on this page</h3><p>${badges}</p>${claimLegend(LEGEND_PAGES.has(page))}`;
   };
   render();
   onClaims((claims) => {

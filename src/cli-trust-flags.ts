@@ -102,25 +102,31 @@ export function exitIfUntrusted(report: VerifierReportV1): void {
 /**
  * Step 9: a ledger verdict is 0 only when it verified and its monitor key is admitted; unanchored is 1, or 2 when
  * allowed. A distrusted or revoked monitor key is 1 whatever the flags: distrust beats every pin and allow flag.
+ * Payloads not evaluated (B1: a locked vault) are 1 whatever the flags: integrity was not verified.
  */
-export function ledgerExitCode(result: { ok: boolean; trustRoot: { anchored: boolean; monitorAdmission?: IssuerAdmission } },
-  trust: TrustContext): 0 | 1 | 2 {
-  if (!result.ok) return 1;
+export function ledgerExitCode(result: { ok: boolean; trustRoot: { anchored: boolean; monitorAdmission?: IssuerAdmission };
+  payloadsNotEvaluated?: readonly string[] }, trust: TrustContext): 0 | 1 | 2 {
+  if (!result.ok || (result.payloadsNotEvaluated?.length ?? 0) > 0) return 1;
   if (result.trustRoot.anchored) return 0;
   if (!trust.allowUnanchored || (result.trustRoot.monitorAdmission && isKeyRefused(result.trustRoot.monitorAdmission))) return 1;
   untrusted(["ledger UNANCHORED: the monitor key was read from the workspace being verified (internal consistency only)"], ["allow-unanchored"]);
   return 2;
 }
 
-/** verify all and evidence verify, after no FAIL: exit 2 when the ledger was only allowed unanchored, 1 when INCOMPLETE. */
+/**
+ * verify all and evidence verify, after no FAIL: exit 2 when the ledger was only allowed unanchored, 1 when INCOMPLETE.
+ * A skipped ledger hash chain (B1: payloads not evaluated) is 1 before --allow-unanchored can make it 2.
+ */
 export function verifyAllExit(out: { status?: string; skippedCritical?: readonly string[]; checks: ReadonlyArray<{ id: string; status: string }> },
   trust: TrustContext): void {
+  const incomplete = () => {
+    console.error(`INCOMPLETE: critical checks not performed: ${(out.skippedCritical ?? []).join(", ")}`);
+    process.exit(1);
+  };
+  if (out.checks.some((check) => check.id === "ledger-hash-chain" && check.status === "SKIP")) incomplete();
   const anchored = out.checks.some((check) => check.id === "ledger-trust-root" && check.status === "PASS");
   const code = ledgerExitCode({ ok: true, trustRoot: { anchored } }, trust);
   if (code !== 0) process.exit(code);
   // A skipped critical check was never performed: withhold PASS rather than exit 0 on it (WP37).
-  if (out.status === "INCOMPLETE") {
-    console.error(`INCOMPLETE: critical checks not performed: ${(out.skippedCritical ?? []).join(", ")}`);
-    process.exit(1);
-  }
+  if (out.status === "INCOMPLETE") incomplete();
 }

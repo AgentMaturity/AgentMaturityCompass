@@ -30,7 +30,7 @@ export function dockerCli(args) {
   return { status: run.status ?? 1, stdout: run.stdout ?? "", stderr: run.stderr ?? String(run.error?.message ?? "") };
 }
 
-function inspectId(docker, ref) {
+export function inspectId(docker, ref) {
   const run = docker(["image", "inspect", "--format", "{{.Id}}", ref]);
   const id = run.stdout.trim();
   if (run.status !== 0) throw new Error(`docker image inspect ${ref} failed: ${run.stderr.trim()}`);

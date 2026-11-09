@@ -92,6 +92,8 @@ async function server(f: ReturnType<typeof fixture>) {
   const started = await startStudioApiServer({ workspace: f.workspace, host: "127.0.0.1", port: 0, token: "owned-bootstrap-admin" });
   closers.push(started.close); return started;
 }
+// LIVE-VAULT-16: the admin token never changes console accounts, so the users routes run as the fixture's OWNER session.
+const ownerSession = (f: ReturnType<typeof fixture>) => ({ cookie: `amc_session=${auth.createSession({ workspace: f.workspace, user: f.owner }).token}` });
 async function request(url: string, path: string, body: unknown, headers: Record<string, string> = { "x-amc-admin-token": "owned-bootstrap-admin" }) {
   const response = await fetch(url + path, { method: "POST", headers: { "content-type": "application/json", ...headers }, body: JSON.stringify(body) });
   return { status: response.status, body: await response.json() as Record<string, any> };
@@ -199,24 +201,25 @@ describe("actual users config authoring under owner-bound config-signature", () 
     const promptPolicy = readFileSync(join(f.workspace, ".amc", "prompt", "policy.yaml"));
     expect(existsSync(join(f.workspace, ".amc", "prompt", "scheduler.json"))).toBe(false);
     expect(existsSync(join(f.workspace, ".amc", "passport", "policy.yaml"))).toBe(false);
-    const started = await server(f);
+    const started = await server(f), owner = ownerSession(f);
     expect(readFileSync(join(f.workspace, ".amc", "prompt", "policy.yaml"))).toEqual(promptPolicy);
     expect(existsSync(join(f.workspace, ".amc", "prompt", "scheduler.json.sig"))).toBe(true);
-    const added = await request(started.url, "/users/add", { username: "http-added", password: PASSWORD, roles: ["VIEWER"] });
+    expect((await request(started.url, "/users/add", { username: "http-admin", password: PASSWORD, roles: ["OWNER"] })).status).toBe(403);
+    const added = await request(started.url, "/users/add", { username: "http-added", password: PASSWORD, roles: ["VIEWER"] }, owner);
     expect(added.status).toBe(200); expect(added.body.user).not.toHaveProperty("passwordHash"); f.signedByProvider();
     const login = await request(started.url, "/auth/login", { username: "http-added", password: PASSWORD }, {});
     expect(login.status).toBe(200); expect(login.body.user.username).toBe("http-added"); expect(login.body.user).not.toHaveProperty("passwordHash");
-    const roles = await request(started.url, "/users/roles", { username: "http-added", roles: ["AUDITOR"] });
+    const roles = await request(started.url, "/users/roles", { username: "http-added", roles: ["AUDITOR"] }, owner);
     expect(roles.status).toBe(200); expect(roles.body.user.roles).toEqual(["AUDITOR"]); expect(roles.body.user).not.toHaveProperty("passwordHash"); f.signedByProvider();
-    const revoked = await request(started.url, "/users/revoke", { username: "http-added" });
+    const revoked = await request(started.url, "/users/revoke", { username: "http-added" }, owner);
     expect(revoked.status).toBe(200); expect(revoked.body.user.status).toBe("REVOKED"); expect(revoked.body.user).not.toHaveProperty("passwordHash"); f.signedByProvider();
     expect((await request(started.url, "/auth/login", { username: "http-added", password: PASSWORD }, {})).status).toBe(401);
   });
 
   test.each(["unavailable", "bad-crypto"] as const)("HTTP %s uses the typed provider status and fixed diagnostic before either file changes", async failure => {
-    const f = fixture(); await f.bind(); const started = await server(f), before = f.snapshot();
+    const f = fixture(); await f.bind(); const started = await server(f), before = f.snapshot(), owner = ownerSession(f);
     f.control.fail = failure === "unavailable"; f.control.corrupt = failure === "bad-crypto";
-    const refused = await request(started.url, "/users/add", { username: "http-refused", password: PASSWORD, roles: ["VIEWER"] });
+    const refused = await request(started.url, "/users/add", { username: "http-refused", password: PASSWORD, roles: ["VIEWER"] }, owner);
     const code = failure === "unavailable" ? "KEY_PROVIDER_UNAVAILABLE" : "KEY_PROVIDER_KEY_REFUSED";
     expect(refused.status).toBe(failure === "unavailable" ? 503 : 409);
     expect(refused.body).toEqual({ error: `${code}: user mutation signing refused`, code });
@@ -225,9 +228,9 @@ describe("actual users config authoring under owner-bound config-signature", () 
   });
 
   test("HTTP genuine locked vault is 423 and does not replace users or sidecar", async () => {
-    const f = fixture(), started = await server(f), before = f.snapshot();
+    const f = fixture(), started = await server(f), owner = ownerSession(f), before = f.snapshot();
     lockVault(f.workspace); vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
-    const refused = await request(started.url, "/users/add", { username: "http-locked", password: PASSWORD, roles: ["VIEWER"] });
+    const refused = await request(started.url, "/users/add", { username: "http-locked", password: PASSWORD, roles: ["VIEWER"] }, owner);
     expect(refused.status).toBe(423); expect(refused.body).toEqual({ error: "VAULT_LOCKED: unlock the vault to change users", code: "VAULT_LOCKED" });
     expect(f.snapshot()).toEqual(before);
   });

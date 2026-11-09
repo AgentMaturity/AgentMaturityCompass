@@ -44,7 +44,7 @@ AMC surfaces in this repo fit into four buckets:
 | Surface | Why this bucket | User-facing implication |
 | --- | --- | --- |
 | Browser playground documented in `docs/BROWSER_SANDBOX.md` and related website assets | It is a real exploration path, but it does not represent the full evidence-capture or governance runtime | Good for product understanding and demos, not for evaluating full operational depth |
-| Single-binary packaging path documented in `docs/SINGLE_BINARY.md` | The repo treats this path honestly as narrower and not the default serious operator route | Use it carefully and do not assume parity with the main CLI and service path |
+| Single-binary (Node SEA) build documented in `docs/SINGLE_BINARY.md` | A local experimental build: the binary it produces does not start yet, and it is not a release asset | Do not install AMC this way; use the release installer or the source build |
 | Thin visual or onboarding shells that sit ahead of the CLI and Studio runtime | These surfaces help discovery and adoption, but they are not where the core system logic lives | Judge AMC's implementation maturity by the underlying runtime, not by the thinnest shell in front of it |
 
 ## Legacy Lineage or Preserved Parallel Implementation
