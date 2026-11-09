@@ -4,6 +4,7 @@ import { parseRunLimits, type RunLimits } from "../agent/runLimits.js";
 import { listenForSteerFrames, type SteerTarget } from "../agent/steerIpc.js";
 import { resolveLatestSession } from "../session/latestSession.js";
 import { SessionResumeRefused } from "../session/sessionResume.js";
+import { escapeTerminalControls } from "../tools/builtin/askUserTool.js";
 import type { AgentLoopCliIo, RunOptions } from "../cli-agent-options.js";
 
 /**
@@ -51,8 +52,9 @@ export interface ContinuityRun {
 export function continuedSession(io: AgentLoopCliIo, context: { readonly workspace: string; readonly agentId: string }): string | null {
   const latest = resolveLatestSession(context);
   if (latest.ok) return latest.session.sessionId;
-  io.error(chalk.red(`${latest.code}: ${latest.reason}`));
-  for (const row of latest.skipped) io.error(chalk.dim(`  skipped ${row.sessionId}: ${row.reason}`));
+  // Session and agent ids come from the ledger (imported sessions included): escaped like the chat picker's rows.
+  io.error(chalk.red(escapeTerminalControls(`${latest.code}: ${latest.reason}`)));
+  for (const row of latest.skipped) io.error(chalk.dim(escapeTerminalControls(`  skipped ${row.sessionId}: ${row.reason}`)));
   io.fail();
   return null;
 }

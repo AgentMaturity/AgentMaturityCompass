@@ -139,6 +139,20 @@ describe("resolveInstructionImports", () => {
     expect(squeezed.omitted).toEqual(expect.arrayContaining([expect.objectContaining({ displayPath: "AMC.md", reason: "over-budget" })]));
   });
 
+  it("never follows an @ line in a user-scope file: it stays text", () => {
+    // MUTATION: resolve imports for user-scope candidates too and the workspace file is pulled in under $AMC_HOME/AGENTS.md.
+    const home = realpathSync(mkdtempSync(join(tmpdir(), "amc-import-home-")));
+    try {
+      writeFileSync(join(home, "AGENTS.md"), "user rules\n@/docs/x.md\n");
+      put("docs/x.md", "workspace doc\n");
+      const load = loadInstructionFiles({ workspace, amcHome: home });
+      const user = load.included.find(file => file.candidate.scope === "user");
+      expect(user?.content).toContain("@/docs/x.md");
+      expect(user?.imports).toEqual([]);
+      expect(load.omitted).toEqual([]);
+    } finally { rmSync(home, { recursive: true, force: true }); }
+  });
+
   it("refuses a hard link: the file has a name nobody judged (an .amc file linked as docs/notes.md)", () => {
     // MUTATION: drop the `links !== 1` refusal and the .amc bytes are quoted to the provider.
     put(".amc/vault-notes.md", "operator vault state\n"); put("docs/rules.md", "rules\n");

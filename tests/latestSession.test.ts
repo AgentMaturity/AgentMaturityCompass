@@ -9,6 +9,8 @@ import { sha256Hex } from "../src/utils/hash.js";
 import { lockVault } from "../src/vault/vault.js";
 import { resolveLatestSession, summarizeNativeSessions } from "../src/session/latestSession.js";
 import { listNativeInteractiveSessions } from "../src/setup/nativeInteractiveNavigation.js";
+import { Command } from "commander";
+import { registerSessionCommands } from "../src/cli-session-commands.js";
 
 /**
  * SH-LOOP-01: "the latest session I can continue" is ONE selector, shared by `--continue`, `amc session latest`
@@ -79,4 +81,24 @@ it("passes over a session that resume's continuation controls would refuse (a pa
   const latest = resolveLatestSession({ workspace, agentId: "default" });
   if (!latest.ok) throw new Error(latest.reason);
   expect(latest.session.sessionId).toBe("plain");
+});
+
+it("prints ledger-sourced ids with terminal controls escaped: amc session latest and the --continue refusal", async () => {
+  // MUTATION: print the skipped rows raw and the OSC title sequence from the recorded agent id reaches the terminal.
+  session("hostile", { agentId: "evil\u001b]0;pwned\u0007" }).releaseWithoutClosing();
+  const lines: string[] = []; const original = { log: console.log, error: console.error }; const cwd = process.cwd();
+  console.log = (line: string) => { lines.push(line); }; console.error = (line: string) => { lines.push(line); };
+  try {
+    process.chdir(workspace);
+    const program = new Command().exitOverride(); registerSessionCommands(program);
+    await program.parseAsync(["session", "latest", "--agent", "default"], { from: "user" });
+  } finally { console.log = original.log; console.error = original.error; process.chdir(cwd); process.exitCode = 0; }
+  const printed = lines.join("\n");
+  expect(printed).toContain("NO_SESSION_TO_CONTINUE");
+  expect(printed).toContain("\\u001b]0;pwned\\u0007");
+  expect(printed).not.toContain("\u001b]0;");
+  const { continuedSession } = await import("../src/cli/agentLoopContinuityOptions.js");
+  const errors: string[] = [];
+  expect(continuedSession({ log: () => undefined, error: line => errors.push(line), fail: () => undefined }, { workspace, agentId: "default" })).toBeNull();
+  expect(errors.join("\n")).not.toContain("\u001b]0;");
 });
