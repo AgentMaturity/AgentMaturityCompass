@@ -179,6 +179,7 @@ interface HookControlRecordInput {
   readonly scope: readonly ActionClass[] | undefined;
   readonly descendantScope: readonly ActionClass[] | undefined;
   readonly descendantStops: readonly string[] | undefined;
+  readonly approvalMode: ApprovalMode | undefined;
 }
 
 /**
@@ -201,6 +202,8 @@ function recordHookControl(input: HookControlRecordInput): void {
     approvalGate: gate === undefined ? null
       : { actionClass: gate.actionClass, riskTier: gate.riskTier, toolNames: gate.toolNames === undefined ? null : [...gate.toolNames],
         gatesClasses: gate.gatesClasses === undefined ? null : [...gate.gatesClasses].sort(), exemptToolNames: gate.exemptToolNames === undefined ? null : [...gate.exemptToolNames].sort() },
+    // SH-SANDBOX-04: `plan` composes no gate, so the mode itself is what tells this child's row from an ungated child's.
+    approvalMode: input.approvalMode ?? null,
     stopConditions: ctx.stopConditions === undefined ? null : [...ctx.stopConditions],
     descendantStopConditions: input.descendantStops === undefined ? null : [...input.descendantStops],
     delegationScope: input.scope === undefined ? null : [...input.scope],
@@ -386,7 +389,7 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
           },
           cleanup: () => toolset?.shutdown() ?? Promise.resolve(true),
           hasOwnedWork: () => toolset?.hasOwnedWork() ?? false,
-          admit: () => recordHookControl({ session, ctx, inherited, gate, scope, descendantScope, descendantStops }),
+          admit: () => recordHookControl({ session, ctx, inherited, gate, scope, descendantScope, descendantStops, approvalMode: init.approvalMode }),
           ...(config === undefined ? {} : { driver: { config } })
         });
       } catch (error) {

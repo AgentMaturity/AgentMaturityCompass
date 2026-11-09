@@ -112,6 +112,24 @@ describe("amc agent-loop run --approval-mode", () => {
     for (const row of childWrite) expect(row).toMatchObject({ effectiveMode: "SIMULATE" });
   });
 
+  it("each delegated child's signed hook-control row names the mode, and the gate's classes and exempt tools", async () => {
+    const config = loadToolsConfig(workspace);
+    initToolsConfig(workspace, { tools: { ...config.tools, allowedTools: [...config.tools.allowedTools, { name: "delegate", actionClass: "READ_ONLY" }] } });
+    for (const mode of ["plan", "default"]) {
+      const { captured } = await runCli(scripted("delegate", { runAs: `child-${mode}`, goal: "hello" }), ["--tools", "workspace", "--approval-mode", mode, "--delegate"]);
+      expect(captured.failed, captured.errors.join("\n")).toBe(false);
+    }
+    const ledger = openLedger(workspace, { readonly: true });
+    let rows: Array<Record<string, unknown>>;
+    try {
+      rows = ledger.getAllEvents().filter(row => row.event_type === "audit").map(row => JSON.parse(row.meta_json ?? "{}") as Record<string, unknown>)
+        .filter(meta => meta["kind"] === "delegation/hook-control");
+    } finally { ledger.close(); }
+    expect(rows.find(meta => meta["runAs"] === "child-plan")).toMatchObject({ approvalMode: "plan", approvalGate: null });
+    expect(rows.find(meta => meta["runAs"] === "child-default")).toMatchObject({ approvalMode: "default",
+      approvalGate: { gatesClasses: [...approvalModeGatedClasses("default")!].sort(), exemptToolNames: [] } });
+  });
+
   it("refuses every mode with an out-of-process delegate provider, from the flag and from a signed preset", async () => {
     const config = loadToolsConfig(workspace);
     initToolsConfig(workspace, { tools: { ...config.tools, allowedTools: [...config.tools.allowedTools, { name: "delegate", actionClass: "READ_ONLY" }] } });
