@@ -274,6 +274,7 @@
   "runtimePolicy": {
     "toolPipeline": {
       "visibleTools": [
+        "apply_patch",
         "bash",
         "fs.edit",
         "fs.read",
@@ -284,6 +285,7 @@
         "glob",
         "grep",
         "http.fetch",
+        "ls",
         "process.spawn"
       ],
       "approvalRequiredFor": [
@@ -545,6 +547,23 @@
               "requireExecTicket": false
             },
             {
+              "name": "apply_patch",
+              "actionClass": "WRITE_LOW",
+              "allow": {
+                "paths": [
+                  "./workspace/output/**"
+                ]
+              },
+              "deny": {
+                "paths": [
+                  "**/.amc/**",
+                  ".amc/**",
+                  "**/.git/**"
+                ]
+              },
+              "requireExecTicket": false
+            },
+            {
               "name": "glob",
               "actionClass": "READ_ONLY",
               "allow": {},
@@ -552,6 +571,12 @@
             },
             {
               "name": "grep",
+              "actionClass": "READ_ONLY",
+              "allow": {},
+              "deny": {}
+            },
+            {
+              "name": "ls",
               "actionClass": "READ_ONLY",
               "allow": {},
               "deny": {}
@@ -889,7 +914,7 @@
         }
       }
     },
-    "policyDigest": "sha256:04efab5bef4d2a1478259209aa75a5b7cebed90d54a67504cce1ec4a0ba5b3c7"
+    "policyDigest": "sha256:f9b495fc2b21606676443067a0e0ebe46d0589dbdf3131ff8128ef3dca158373"
   },
   "evidencePlan": {
     "tests": [
@@ -1032,5 +1057,5 @@
       }
     ]
   },
-  "digest": "sha256:10647b6d69a99e5a1062f7e04b63a1b7862e572e2a6003da74ea1e11b5ebb15a"
+  "digest": "sha256:7fd1a0e382749a4789ed2a285eee54aa29c3d8c670f1a0aacdc1c838e28cd912"
 }
