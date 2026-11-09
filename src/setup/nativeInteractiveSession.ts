@@ -1,6 +1,8 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { createInterface } from "node:readline";
 import { resolve } from "node:path";
+import { admitWorkspaceTrust } from "../cli-agent-options.js";
+import { TRUST_WORKSPACE_ENV } from "../security/workspaceTrust.js";
 import { renderNativeRunUsage } from "../agent/nativeRunUsage.js";
 import { renderNativeRunDiagnostics } from "../agent/nativeFailureGuidance.js";
 import { parseNativeChatResult, type NativeChatChildSummary } from "./nativeChatResult.js";
@@ -71,12 +73,14 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
   if (options.session !== undefined && options.forkFrom !== undefined) {
     io.error("Choose --session or --fork-from, not both."); io.fail(); return;
   }
+  const trust = admitWorkspaceTrust(io, options, options.workspace);
+  if (trust === undefined) return;
   let profile: ReturnType<typeof resolveNativeChatProfile>;
   let validation: ReturnType<typeof resolveNativeValidationSelection>;
   // Captured before the preset's values merge in: an explicit --approve-tools/--approve-risk beside a mode is refused, a preset's is replaced.
   const explicitApproval = { tools: options.approveTools, risk: options.approveRisk };
   try {
-    profile = resolveNativeChatProfile(options);
+    profile = resolveNativeChatProfile(options, trust.presetsDigest);
     options = { ...options, ...profile.effectiveOptions };
     validation = resolveNativeValidationSelection(options);
   } catch (error) {
@@ -150,8 +154,11 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     const ipc = interactiveApprovals || display.askUser === true;
     let running: ChildProcess;
     try {
+      // Consent is recorded at chat admission. Later turns must never approve a changed workspace themselves.
+      const env = { ...process.env };
+      if (args[0] === "agent-loop" && args[1] === "run") delete env[TRUST_WORKSPACE_ENV];
       running = spawn(process.execPath, [...process.execArgv, resolve(entry), ...(selectedAgentId === null ? [] : ["--agent", selectedAgentId]), ...args], {
-        cwd, env: process.env, shell: false,
+        cwd, env, shell: false,
         stdio: ipc ? ["ignore", "pipe", "pipe", "ipc"] : ["ignore", "pipe", "pipe"]
       });
     } catch { io.error("Could not start the AMC command."); resolveResult({ code: 1, stdout, truncated, cancelRequested }); return; }
@@ -293,7 +300,6 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       ...(options.credentialsHome === undefined ? [] : ["--credentials-home", options.credentialsHome]), "--credentials-file", credentialFile,
       ...(guide.credential === null ? [] : ["--credential", guide.credential.ref]),
       "--tools", tools, "--max-steps", maxSteps, "--max-tokens", maxTokens, ...(options.unsafeUnconfinedShell === true ? ["--unsafe-unconfined-shell"] : []),
-      ...(options.trustWorkspace === true ? ["--trust-workspace"] : []),
       ...(options.webSearchSearxng === undefined ? [] : ["--web-search-searxng", options.webSearchSearxng]),
       ...(options.thinking === undefined ? [] : ["--thinking", options.thinking]),
       ...(options.reasoningEffort === undefined ? [] : ["--reasoning-effort", options.reasoningEffort]),
@@ -307,6 +313,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         ...validation.checks.flatMap(check => ["--validate", check.id]),
         ...(validation.repair === undefined ? [] : ["--validation-repair", JSON.stringify(validation.repair)])])];
     const routeArgs = [...routeBaseArgs, ...nativeChatProfileArgv(profile)];
+    const chatProfileArgs = [...(options.trustWorkspace === true ? ["--trust-workspace"] : []), ...nativeChatProfileArgv(profile, "chat")];
     const showScope = () => {
       io.log(`Native chat · agent ${guide.agentId} · provider ${provider} · model ${guide.model}`);
       if (guide.baseUrl !== null) io.log(`Provider origin: ${guide.baseUrl}`);
@@ -567,12 +574,12 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     if (forkFrom !== null) {
       if (unresolvedOutcome) io.error("The attempted fork has no admitted child result. Do not repeat it blindly; inspect the parent's recorded lineage before choosing a continuation.");
       else {
-        io.log("The fork remains queued, not created. To continue that selection in this workspace:\n  " + renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "chat", ...routeBaseArgs, ...nativeChatProfileArgv(profile, "chat"), ...nativeExtensionRunArgv(extensions), "--fork-from", forkFrom] }));
+        io.log("The fork remains queued, not created. To continue that selection in this workspace:\n  " + renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "chat", ...routeBaseArgs, ...chatProfileArgs, ...nativeExtensionRunArgv(extensions), "--fork-from", forkFrom] }));
       }
     }
     if (sessionId !== null) {
       io.log(`Known session reference: ${sessionId}. A resume attempt will verify the evidence before acquiring its writer.`);
-      io.log("Resume in this workspace:\n  " + renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "chat", ...routeBaseArgs, ...nativeChatProfileArgv(profile, "chat"), ...nativeExtensionRunArgv(extensions), "--session", sessionId] }));
+      io.log("Resume in this workspace:\n  " + renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "chat", ...routeBaseArgs, ...chatProfileArgs, ...nativeExtensionRunArgv(extensions), "--session", sessionId] }));
       io.log("Verify recorded evidence:\n  " + renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "verify", sessionId] }));
     }
   } finally {

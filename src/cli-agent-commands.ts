@@ -27,7 +27,7 @@ import { hostname } from "node:os";
  * SIGTERM names a parent stop requested by `signal:SIGTERM`. Each writes a
  * signed `loop/cancel` and closes the turn `cancelled` with its cause in the hashed `turn/end`.
  */
-import type { Command } from "commander";
+import { Option, type Command } from "commander";
 import { resolveAgentId } from "./fleet/paths.js";
 import chalk from "chalk";
 import {
@@ -54,7 +54,7 @@ import { buildSkillCatalog } from "./skills/skillCatalog.js";
 import { loadNativeExtensions, type NativeExtensionManager, type NativeExtensionTurn } from "./extensions/nativeExtensionRuntime.js";
 import { bindNativeMcpResourceStatus, projectNativeResourceStatus, type NativeMcpResourceSource } from "./prompt/context/nativeResourceStatus.js";
 import { explicitPresetCompositionOptions, nativePresetCompositionSources } from "./cli/agentCompositionSources.js";
-import { resolvePreset, type AgentPreset } from "./presets/agentPresets.js";
+import { presetCompositionDigest, resolvePreset, type AgentPreset } from "./presets/agentPresets.js";
 import { delegationTurnOptions } from "./agent/providers/delegationProviders.js";
 import { foreignDelegateRunner } from "./cli/agentLoopForeignDelegate.js";
 import type { SubagentRunner } from "./agent/subagentSpawn.js";
@@ -231,6 +231,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       "--preset <id>",
       "compose this run from a signed preset in .amc/agents.yaml. Explicit flags override it."
     )
+    .addOption(new Option("--preset-composition-sha256 <digest>", "pin the selected signed preset composition for a chat turn").hideHelp())
     .option(
       "--delegate-scope <classes>",
       "comma-separated action classes a delegate may invoke, e.g. READ_ONLY,WRITE_LOW. "
@@ -269,19 +270,25 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         io.error("Interactive approvals require the signed approval engine; approval exceptions cannot be combined with this mode."); io.fail(); return;
       }
       // SH-SANDBOX-07: before anything the workspace signed is read (presets, extensions, skills, the tools policy).
-      const trustedToolsDigest = admitWorkspaceTrust(io, opts, process.cwd());
-      if (trustedToolsDigest === undefined) return;
+      const trust = admitWorkspaceTrust(io, opts, process.cwd());
+      if (trust === undefined) return;
       // Verify the signed preset before applying invocation flags.
       const explicitCompositionOptions = explicitPresetCompositionOptions(command);
       let preset: AgentPreset | undefined;
+      if (opts.presetCompositionSha256 !== undefined && opts.preset === undefined) {
+        io.error("A preset composition pin requires --preset."); io.fail(); return;
+      }
       if (opts.preset !== undefined) {
-        const resolved = resolvePreset(process.cwd(), opts.preset);
+        const resolved = resolvePreset(process.cwd(), opts.preset, trust.presetsDigest);
         if (!resolved.ok) {
           io.error(chalk.red(resolved.reason));
           io.fail();
           return;
         }
         preset = resolved.preset;
+        if (opts.presetCompositionSha256 !== undefined && presetCompositionDigest(preset) !== opts.presetCompositionSha256) {
+          io.error("The selected signed preset changed before this turn. Start a new chat after reviewing its current composition."); io.fail(); return;
+        }
         (opts.json ? io.error : io.log)(chalk.dim(`composed from preset "${preset.id}": ${preset.description}`));
         // Apply preset approval before constructing policy controls.
         // An explicit --approval-mode replaces the preset's approveTools gate (the mode composes its own); the two flags together are refused below.
@@ -511,7 +518,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...lease,
           ...(dispatchMode === "code" ? { mode: dispatchMode } : {}),
           ...(approvalMode === undefined ? {} : { approvalMode }),
-          ...(trustedToolsDigest === null ? {} : { expectedToolsDigest: trustedToolsDigest }),
+          ...(trust.toolsDigest === null ? {} : { expectedToolsDigest: trust.toolsDigest }),
           ...breadth.toolset,
           ...shellOptIn
         });

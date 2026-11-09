@@ -2,7 +2,7 @@ import { parseDelegationScope } from "../agent/delegationScope.js";
 import { parseSubagentStopConditions } from "../agent/subagentStopConditions.js";
 import { credentialRef } from "../credentials/credentialRef.js";
 import { isActionClass } from "../governor/actionCatalog.js";
-import { resolvePreset, type AgentPreset } from "../presets/agentPresets.js";
+import { presetCompositionDigest, resolvePreset, type AgentPreset } from "../presets/agentPresets.js";
 import type { NativeFirstUseOptions } from "./nativeFirstUseGuide.js";
 
 export interface NativeChatProfileOptions extends NativeFirstUseOptions {
@@ -50,17 +50,17 @@ function integerOption(name: string, explicit: string | undefined, fromPreset: n
 }
 
 /** Reads signed preset metadata only. No credential values, watches, sessions or providers. */
-export function resolveNativeChatProfile(options: NativeChatProfileOptions): NativeChatProfile {
+export function resolveNativeChatProfile(options: NativeChatProfileOptions, expectedPresetsDigest?: string | null): NativeChatProfile {
   let preset: AgentPreset | null = null;
   if (options.preset !== undefined) {
     if (!options.preset.trim() || /[\x00-\x1f\x7f]/.test(options.preset)) {
       throw new NativeChatProfileError("Choose a nonempty preset ID without control characters.");
     }
-    const selected = resolvePreset(options.workspace, options.preset);
+    const selected = resolvePreset(options.workspace, options.preset, expectedPresetsDigest);
     if (!selected.ok) {
       // Parser diagnostics can contain literal file values. Keep them out of a
       // terminal which is only asking to select a native composition.
-      throw new NativeChatProfileError("The selected preset is missing, invalid or has an unverifiable signature. Review .amc/agents.yaml and its signature before starting chat.");
+      throw new NativeChatProfileError("The selected preset is missing, invalid, changed since workspace trust or has an unverifiable signature. Review .amc/agents.yaml and its signature before starting chat.");
     }
     preset = selected.preset;
   }
@@ -164,6 +164,7 @@ export function nativeChatProfileArgv(profile: NativeChatProfile, surface: "run"
   const options = profile.effectiveOptions;
   return [
     ...(profile.presetId === null ? [] : [`--preset=${profile.presetId}`]),
+    ...(surface === "run" && profile.presetSnapshot !== null ? [`--preset-composition-sha256=${presetCompositionDigest(profile.presetSnapshot)}`] : []),
     ...(options.persona === undefined ? [] : [`--persona=${options.persona}`]),
     ...(surface === "run" ? ["--tool-mode=native"] : []),
     ...(options.leaseFile === undefined ? [] : [`--lease-file=${options.leaseFile}`]),

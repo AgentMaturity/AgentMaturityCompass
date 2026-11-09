@@ -16,10 +16,10 @@ import { lockVault, vaultPaths } from "../src/vault/vault.js";
 import { amcSecretPaths } from "../src/sandbox/shellSecretPaths.js";
 import { LocalCredentialsService } from "../src/credentials/localCredentialsService.js";
 import { saveSchedules } from "../src/autonomy/scheduleStore.js";
-import { initPresets, savePresets } from "../src/presets/agentPresets.js";
+import { initPresets, presetsPath, resolvePreset, savePresets } from "../src/presets/agentPresets.js";
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL } from "../src/agent/stubProvider.js";
 import { v1Workspace } from "./helpers/legacyVault.js";
-import { consentedToolsDigest, NO_TOOLS_POLICY_PIN, requireWorkspaceTrust, revokeWorkspaceTrust, repairWorkspaceTrustStore, suppliedTrustConsent, trustWorkspace, workspaceTrustVerdict } from "../src/security/workspaceTrust.js";
+import { consentedPresetsDigest, consentedToolsDigest, NO_TOOLS_POLICY_PIN, requireWorkspaceTrust, revokeWorkspaceTrust, repairWorkspaceTrustStore, suppliedTrustConsent, trustWorkspace, workspaceTrustVerdict } from "../src/security/workspaceTrust.js";
 import type { AgentToolset } from "../src/agent/agentToolset.js";
 
 /**
@@ -86,6 +86,20 @@ describe("workspace trust verdicts", () => {
     expect(consentedToolsDigest(recorded)).toMatch(/^[0-9a-f]{64}$/);
     expect(consentedToolsDigest(requireWorkspaceTrust(workspace, null))).toBe(consentedToolsDigest(recorded));
     expect(consentedToolsDigest({ ok: false, reason: "x" })).toBeNull();
+  });
+
+  it("a signed preset that appears after consent to no presets is refused", () => {
+    const owned = requireWorkspaceTrust(workspace, null);
+    expect(owned.ok && consentedPresetsDigest(owned)).toBeUndefined();
+    rmSync(presetsPath(workspace), { force: true });
+    asClone();
+    const consent = requireWorkspaceTrust(workspace, "cli-flag");
+    if (!consent.ok) throw new Error(consent.reason);
+    const pin = consentedPresetsDigest(consent);
+    expect(pin).toBeNull();
+    savePresets(workspace, [{ id: "reviewer", description: "new preset", model: STUB_PROVIDER_MODEL, providerId: STUB_PROVIDER_ID }]);
+    expect(resolvePreset(workspace, "reviewer").ok).toBe(true);
+    expect(resolvePreset(workspace, "reviewer", pin)).toMatchObject({ ok: false, reason: expect.stringContaining("after workspace trust admission") });
   });
 
   it("refuses without consent, records consent from a flag or the environment, notices a re-signed tools policy, and revokes", () => {
@@ -156,10 +170,10 @@ describe("workspace trust verdicts", () => {
 });
 
 describe("through the real surfaces", () => {
-  async function runCli(extra: string[]): Promise<{ errors: string[]; failed: boolean }> {
+  async function runCli(extra: string[], onError?: (line: string) => void): Promise<{ errors: string[]; failed: boolean }> {
     const errors: string[] = []; let failed = false;
     const program = new Command().exitOverride();
-    const io: AgentLoopCliIo = { log: () => {}, error: line => errors.push(line), fail: () => { failed = true; } };
+    const io: AgentLoopCliIo = { log: () => {}, error: line => { errors.push(line); onError?.(line); }, fail: () => { failed = true; } };
     registerAgentCommands(program, io);
     await program.parseAsync(["agent-loop", "run", "hello", "--provider", "stub", "--tools", "none", "--credentials-home", credentialsHome, "--json", ...extra], { from: "user" });
     return { errors, failed };
@@ -171,6 +185,19 @@ describe("through the real surfaces", () => {
     expect(refused.failed).toBe(true);
     expect(refused.errors.join("\n")).toContain("has not trusted this workspace");
     expect(refused.errors.join("\n")).not.toContain("not-defined-here");
+  });
+
+  it("amc agent-loop run refuses signed presets swapped just after consent", async () => {
+    const preset = { id: "reviewer", description: "approved preset", model: STUB_PROVIDER_MODEL, providerId: STUB_PROVIDER_ID };
+    savePresets(workspace, [preset]);
+    asClone();
+    const swap = (line: string) => {
+      if (line.includes("workspace trusted on this machine")) savePresets(workspace, [{ ...preset, description: "unapproved replacement" }]);
+    };
+    const result = await runCli(["--preset", preset.id, "--trust-workspace"], swap);
+    expect(result.failed).toBe(true);
+    expect(result.errors.join("\n")).toContain("after workspace trust admission");
+    expect(result.errors.join("\n")).not.toContain("composed from preset");
   });
 
   it("amc agent-loop run refuses an untrusted workspace before composing anything, and proceeds with --trust-workspace", async () => {
@@ -312,6 +339,7 @@ describe("through the real surfaces", () => {
       const check = requireWorkspaceTrust(bare, null);
       expect(check).toMatchObject({ ok: true, verdict: { state: "trusted", reason: "no-signer" } });
       expect(consentedToolsDigest(check)).toBe(NO_TOOLS_POLICY_PIN);
+      expect(check.ok && consentedPresetsDigest(check)).toBeNull();
     } finally { rmSync(bare, { recursive: true, force: true }); }
   });
 

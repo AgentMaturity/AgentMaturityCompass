@@ -16,7 +16,7 @@ vi.mock("../src/setup/nativeInteractiveCommandAudit.js", () => ({
 
 const seam = vi.hoisted(() => ({
   answers: [] as string[],
-  commands: [] as { executable: string; argv: string[]; cwd: string; shell: boolean }[],
+  commands: [] as { executable: string; argv: string[]; cwd: string; shell: boolean; trustEnv: string | undefined }[],
   onCommand: null as null | ((argv: string[], cwd: string) => { code: number; stdout: string }),
   killed: [] as unknown[]
 }));
@@ -40,12 +40,12 @@ vi.mock("node:child_process", async importOriginal => {
   const actual = await importOriginal<typeof import("node:child_process")>();
   const { EventEmitter } = await import("node:events");
   const { PassThrough } = await import("node:stream");
-  return { ...actual, spawn: (executable: string, argv: string[], options: { cwd: string; shell: boolean }) => {
+  return { ...actual, spawn: (executable: string, argv: string[], options: { cwd: string; shell: boolean; env: NodeJS.ProcessEnv }) => {
     const child = Object.assign(new EventEmitter(), {
       stdout: new PassThrough(), stderr: new PassThrough(),
       kill: (signal: unknown) => { seam.killed.push(signal); return true; }
     });
-    seam.commands.push({ executable, argv: [...argv], cwd: options.cwd, shell: options.shell });
+    seam.commands.push({ executable, argv: [...argv], cwd: options.cwd, shell: options.shell, trustEnv: options.env.AMC_TRUST_WORKSPACE });
     queueMicrotask(() => {
       let result: { code: number; stdout: string };
       try { result = seam.onCommand?.(argv, options.cwd) ?? { code: 1, stdout: "{}" }; }
@@ -125,13 +125,15 @@ describe("AMC-1512 native home propagation through the chat composition seam", (
     else Reflect.deleteProperty(process.stdout, "isTTY");
     seam.onCommand = null;
     vi.restoreAllMocks();
+    vi.unstubAllEnvs();
     rmSync(root, { recursive: true, force: true });
   });
 
   it("keeps a home-only skill resolvable on the first child, follow-up and printed resume", async () => {
     const path = skill(home, "home-only", "Shared instructions selected by the operator.");
     seam.answers = ["/home-only first", "/home-only second", "/exit"];
-    await runNativeInteractiveSession(options(), { log: line => logs.push(line), error: line => errors.push(line), fail });
+    vi.stubEnv("AMC_TRUST_WORKSPACE", "1");
+    await runNativeInteractiveSession(options({ trustWorkspace: true }), { log: line => logs.push(line), error: line => errors.push(line), fail });
     expect(fail).not.toHaveBeenCalled();
     expect(seam.commands).toHaveLength(2);
     expect(loaded).toEqual([
@@ -141,12 +143,15 @@ describe("AMC-1512 native home propagation through the chat composition seam", (
     for (const command of seam.commands) {
       expect(command.shell).toBe(false);
       expect(command.cwd).toBe(workspace);
+      expect(command.argv).not.toContain("--trust-workspace");
+      expect(command.trustEnv).toBeUndefined();
       expect(option(command.argv, "--credentials-home")).toBe(home);
       expect(option(command.argv, "--credentials-file")).toBe(file);
       expect(command.argv.at(-1)).toMatch(/^\/home-only /);
     }
     expect(option(seam.commands[1]!.argv, "--session")).toBe("simulated-child-session");
     const resume = logs.find(line => line.startsWith("Resume in this workspace:"));
+    expect(resume).toContain("--trust-workspace");
     expect(resume).toContain(renderNativeGuideCommand({ cwd: workspace, argv: ["--credentials-home", home] }));
     expect(resume).toContain(renderNativeGuideCommand({ cwd: workspace, argv: ["--credentials-file", file] }));
     expect(resume).toContain("--session simulated-child-session");

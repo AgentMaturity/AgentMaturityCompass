@@ -29,7 +29,7 @@ import type { LiveTextPreviewEvent } from "./llm/adapter/liveTextPreview.js";
 import type { ComposedTurnHandle } from "./kernel/agentLoopRunner.js";
 import type { ApprovalAnswerer, ApprovalRiskTier } from "./approvals/seam/approvalSeamTypes.js";
 import { approvalModeExemptTools, approvalModeGatedClasses, parseApprovalMode, type ApprovalMode } from "./approvals/approvalModes.js";
-import { consentedToolsDigest, requireWorkspaceTrust, suppliedTrustConsent } from "./security/workspaceTrust.js";
+import { consentedPresetsDigest, consentedToolsDigest, requireWorkspaceTrust, suppliedTrustConsent } from "./security/workspaceTrust.js";
 import {
   createApprovalExceptionAnswerer,
   describeApprovalException,
@@ -65,6 +65,7 @@ export interface RunOptions {
   /** False is the explicit operator --no-delegate-stop reset, never a model argument. */
   delegateStop?: string[] | false;
   preset?: string;
+  presetCompositionSha256?: string;
   delegateProvider?: string;
   delegateTimeout?: string;
   provider?: string;
@@ -131,15 +132,15 @@ export function resetDelegateStops(_value: string, previous: string[] | false | 
 }
 
 /**
- * SH-SANDBOX-07: the one trust check `agent-loop run` makes before anything the workspace signed is loaded. Prints and
- * fails on refusal (undefined); otherwise the consented tools.yaml digest to pin for the run, or null when the workspace
- * is this machine's own and nothing is pinned.
+ * SH-SANDBOX-07: admit the workspace's signed configuration before composing native runs or chats. Returns the
+ * consented digests on admission and reports the error on refusal.
  */
-export function admitWorkspaceTrust(io: AgentLoopCliIo, opts: Pick<RunOptions, "trustWorkspace">, workspace: string): string | null | undefined {
+export function admitWorkspaceTrust(io: AgentLoopCliIo, opts: Pick<RunOptions, "trustWorkspace">, workspace: string):
+  { readonly toolsDigest: string | null; readonly presetsDigest: string | null | undefined } | undefined {
   const trust = requireWorkspaceTrust(workspace, suppliedTrustConsent(opts.trustWorkspace ? "cli-flag" : undefined));
   if (!trust.ok) { io.error(chalk.red(trust.reason)); io.fail(); return undefined; }
   if (trust.recorded !== null) io.error(chalk.dim(`workspace trusted on this machine (${trust.recorded.by}); revoke with: amc trust workspace --revoke`));
-  return consentedToolsDigest(trust);
+  return { toolsDigest: consentedToolsDigest(trust), presetsDigest: consentedPresetsDigest(trust) };
 }
 
 /** What the run's tool calls need before they may run, or `null` when nothing does. */

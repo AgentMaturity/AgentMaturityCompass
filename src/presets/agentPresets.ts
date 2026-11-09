@@ -4,6 +4,7 @@ import YAML from "yaml";
 import { z } from "zod";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 import { signSerializedPayloadWithAuditor } from "../org/orgSigner.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
@@ -79,6 +80,11 @@ const presetSchema = z
   .strict();
 
 export type AgentPreset = z.infer<typeof presetSchema>;
+
+/** The selected composition's identity across the chat and its separate run process. */
+export function presetCompositionDigest(preset: AgentPreset): string {
+  return sha256Hex(canonicalize(preset));
+}
 
 /**
  * Parse one preset, or throw an error naming what was wrong AND what was written.
@@ -190,9 +196,12 @@ export type ResolvedPreset =
   | { readonly ok: false; readonly reason: string };
 
 /** Look one up by id, or explain why not — naming what the workspace does have. */
-export function resolvePreset(workspace: string, id: string): ResolvedPreset {
+export function resolvePreset(workspace: string, id: string, expectedDigest?: string | null): ResolvedPreset {
   const read = readPresets(workspace);
   if (!read.ok) return { ok: false, reason: read.reason };
+  if (expectedDigest !== undefined && read.sha256 !== expectedDigest) {
+    return { ok: false, reason: "The signed presets changed after workspace trust admission. Review .amc/agents.yaml and trust the workspace again." };
+  }
 
   const preset = read.presets.find((one) => one.id === id);
   if (preset) return { ok: true, preset };

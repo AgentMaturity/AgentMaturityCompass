@@ -57,12 +57,12 @@ function reviewer(overrides: Partial<AgentPreset> = {}): AgentPreset {
     ...overrides
   };
 }
-function registry(root: string) {
+function registry(root: string, onError?: (line: string) => void) {
   vi.spyOn(process, "cwd").mockReturnValue(root);
   const output: string[] = [];
   const fail = vi.fn();
   const program = new Command().exitOverride().configureOutput({ writeErr: () => {} });
-  registerAgentCommands(program, { log: line => output.push(line), error: line => output.push(line), fail });
+  registerAgentCommands(program, { log: line => output.push(line), error: line => { output.push(line); onError?.(line); }, fail });
   return { program, output, fail };
 }
 function tty(value: boolean): void {
@@ -78,6 +78,36 @@ function chatResumeArguments(profile: NativeChatProfile, sessionId: string): str
 }
 
 describe("signed native chat composition admission", () => {
+  it("refuses signed presets swapped after chat admits workspace trust", async () => {
+    const root = workspace();
+    savePresets(root, [reviewer()]);
+    const cloneHome = mkdtempSync(join(tmpdir(), "amc-chat-clone-home-"));
+    directories.push(cloneHome);
+    vi.stubEnv("AMC_HOME", cloneHome);
+    tty(true);
+    const { program, output, fail } = registry(root, line => {
+      if (line.includes("workspace trusted on this machine")) savePresets(root, [reviewer({ approveTools: "WRITE_HIGH" })]);
+    });
+    await program.parseAsync(["agent-loop", "chat", "--preset", "reviewer", "--trust-workspace"], { from: "user" });
+    expect(fail).toHaveBeenCalledOnce();
+    expect(output.join("\n")).toContain("changed since workspace trust");
+    expect(ioEdges.createInterface).not.toHaveBeenCalled();
+    expect(ioEdges.spawn).not.toHaveBeenCalled();
+  });
+
+  it("refuses a different signed composition in the run child after chat preflight", async () => {
+    const root = workspace();
+    savePresets(root, [reviewer()]);
+    const profile = resolveNativeChatProfile({ workspace: root, preset: "reviewer" });
+    expect(() => assertNativeChatProfileCurrent(profile)).not.toThrow();
+    savePresets(root, [reviewer({ approveTools: "WRITE_HIGH" })]);
+    const { program, output, fail } = registry(root);
+    await program.parseAsync(["agent-loop", "run", ...nativeChatProfileArgv(profile), "hello"], { from: "user" });
+    expect(fail).toHaveBeenCalledOnce();
+    expect(output.join("\n")).toContain("The selected signed preset changed before this turn");
+    expect(fetchBoundary).not.toHaveBeenCalled();
+  });
+
   it("forwards --lease-file unchanged to child runs and printed chat resume commands", async () => {
     const root = workspace();
     const leaseFile = join(root, "private lease.token");
