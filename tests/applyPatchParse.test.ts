@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { MAX_PATCH_SECTIONS, parsePatch, patchPaths, type PatchHunk } from "../src/tools/builtin/applyPatchParse.js";
-import { applyHunks, joinText, splitText } from "../src/tools/builtin/applyPatchPlan.js";
+import { applyHunks, joinText, locateBudget, MAX_LOCATE_WORK, splitText } from "../src/tools/builtin/applyPatchPlan.js";
 
 /** The Codex apply_patch grammar is parsed closed (SH-TOOLS-01): every marker form, and every refusal. */
 const patch = (body: string): string => `*** Begin Patch\n${body}\n*** End Patch\n`;
@@ -99,12 +99,44 @@ describe("applyHunks", () => {
     expect(() => applyHunks(text, [hunk("-  x\n+  y", "fn c() {")], "f")).toThrow(/was not found/);
   });
 
+  // Locating runs synchronously on a model-supplied patch. Each case below blocked the process for 15 to 30 seconds
+  // before the budget was shared by the whole call and trailing whitespace was stripped in one pass.
   it("refuses a hunk that would cost more than the comparison budget to locate, before it blocks the process", () => {
-    const file = `${"same\n".repeat(20_000)}`;
+    const file = `${"same\n".repeat(40_000)}`;
     const hunk: PatchHunk = { contextHint: null, eof: false, lines: [...Array.from({ length: 1_000 }, () => ({ op: " " as const, text: "same" })), { op: "-", text: "never" }] };
     const started = performance.now();
-    expect(() => applyHunks(file, [hunk], "big.txt")).toThrow(/too costly to locate/);
+    expect(() => applyHunks(file, [hunk], "big.txt")).toThrow(new RegExp(`hunk 1 of big.txt would pass this patch's budget of ${MAX_LOCATE_WORK}`));
     expect(performance.now() - started).toBeLessThan(2_000);
+  });
+
+  it("spends one budget across all of a patch's hunks, so many cheap hunks over a large file are refused quickly", () => {
+    const file = Array.from({ length: 100_000 }, (_, at) => `line ${at}`).join("\n");
+    const hunks: PatchHunk[] = Array.from({ length: 5_000 }, (_, k) => ({ contextHint: null, eof: false, lines: [{ op: "-", text: `line ${k * 20}` }, { op: "+", text: `LINE ${k * 20}` }] }));
+    const started = performance.now();
+    expect(() => applyHunks(file, hunks, "big.txt")).toThrow(/would pass this patch's budget/);
+    expect(performance.now() - started).toBeLessThan(2_000);
+    // The same budget object spans calls: what one section spent, the next cannot spend again.
+    const budget = locateBudget();
+    expect(applyHunks(file, hunks.slice(0, 100), "big.txt", budget).removed).toBe(100);
+    expect(budget.left).toBeLessThan(MAX_LOCATE_WORK - 100 * 90_000);
+  });
+
+  it("charges a comparison of two long lines of equal length by their length", () => {
+    // 2.5 million comparisons of 1 KiB lines per pass is memcmp work no line count shows; charged by length it is over budget.
+    const long = "a".repeat(1_024);
+    const file = `${`${long}\n`.repeat(3_500)}`;
+    const hunk: PatchHunk = { contextHint: null, eof: false, lines: [...Array.from({ length: 1_000 }, () => ({ op: " " as const, text: long })), { op: "-", text: "never" }] };
+    expect(() => applyHunks(file, [hunk], "long.txt")).toThrow(/would pass this patch's budget/);
+  });
+
+  it("strips trailing whitespace in linear time, whatever blank runs a line holds", () => {
+    const wide = `a${" ".repeat(30_000)}b`;
+    const file = `${wide}\n${"x\n".repeat(10)}`;
+    const started = performance.now();
+    expect(() => applyHunks(file, [{ contextHint: null, eof: false, lines: [{ op: "-", text: `${wide}!` }] }], "w.txt")).toThrow(/does not match/);
+    expect(() => applyHunks(file, [{ contextHint: wide, eof: false, lines: [{ op: "-", text: "x" }] }], "w.txt")).toThrow(/matches 10 places/);
+    expect(applyHunks(file, [{ contextHint: null, eof: false, lines: [{ op: "-", text: `${wide}   ` }, { op: "+", text: "c" }] }], "w.txt").after).toBe(`c\n${"x\n".repeat(10)}`);
+    expect(performance.now() - started).toBeLessThan(1_000);
   });
 
   it("preserves CRLF, a BOM and a missing final newline", () => {

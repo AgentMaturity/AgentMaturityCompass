@@ -6,7 +6,7 @@ import { sha256Hex } from "../../utils/hash.js";
 import { defineTool } from "../toolRegistry.js";
 import type { FileChange, ToolBodyResult, ToolDefinition, ToolExecution } from "../toolTypes.js";
 import { MAX_PATCH_BYTES, parsePatch, type PatchSection } from "./applyPatchParse.js";
-import { applyHunks } from "./applyPatchPlan.js";
+import { applyHunks, locateBudget, type LocateBudget } from "./applyPatchPlan.js";
 import { deleteIfUnchanged, readBeforeWrite, refuseBeforeWrite, shownDiff, utf8, writeIfUnchanged } from "./fsWritePrimitives.js";
 import type { ReadBeforeEditLedger } from "./readBeforeEdit.js";
 import { insideWorkspaceNoLinks } from "./workspacePath.js";
@@ -52,7 +52,7 @@ function resolveTarget(execution: ToolExecution, path: string): Target {
 }
 
 /** Phase 1: every section checked and planned, nothing written. */
-function planSection(execution: ToolExecution, ledger: ReadBeforeEditLedger, section: PatchSection): Operation {
+function planSection(execution: ToolExecution, ledger: ReadBeforeEditLedger, section: PatchSection, budget: LocateBudget): Operation {
   const target = resolveTarget(execution, section.path);
   const agent = execution.agentId;
   if (section.kind === "add") {
@@ -72,7 +72,7 @@ function planSection(execution: ToolExecution, ledger: ReadBeforeEditLedger, sec
   if (text === null) throw refuseBeforeWrite(`"${section.path}" is not valid UTF-8; apply_patch would change bytes it was not asked to change`);
   let plan;
   try {
-    plan = applyHunks(text, section.hunks, section.path);
+    plan = applyHunks(text, section.hunks, section.path, budget);
   } catch (error) {
     throw refuseBeforeWrite(error instanceof Error ? error.message : String(error));
   }
@@ -175,7 +175,9 @@ export function applyPatchTool(deps: { readonly ledger: ReadBeforeEditLedger }):
       } catch (error) {
         throw refuseBeforeWrite(error instanceof Error ? error.message : String(error));
       }
-      const operations = sections.map((section) => planSection(execution, ledger, section));
+      // One locate budget for the whole call: many cheap hunks across sections must not add up to minutes.
+      const budget = locateBudget();
+      const operations = sections.map((section) => planSection(execution, ledger, section, budget));
       // Lexical duplicates were refused by the parser; two spellings of one real file (a link-free path resolved two
       // ways, or a case or normalization variant) are refused here.
       const touched = new Set<string>();

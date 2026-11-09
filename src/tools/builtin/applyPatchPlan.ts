@@ -40,44 +40,59 @@ export function joinText(lines: readonly string[], form: TextForm): string {
   return `${form.bom ? "﻿" : ""}${lines.join(form.eol)}${form.finalNewline ? form.eol : ""}`;
 }
 
-const rstrip = (line: string): string => line.replace(/\s+$/, "");
-
 /**
- * Line comparisons one hunk may spend being located, across both passes. Locating is a naive scan, (N - M) x M in
- * the worst case, run synchronously in the tool body on a model-supplied patch; the budget keeps that bounded
- * instead of letting a 1 MB file and a near-matching 1,000-line hunk block the process for seconds.
- * ponytail: a budget, not a faster search; a first-line index or rolling hash if real patches ever hit it.
+ * Work one patch may spend locating its hunks, across every section, every hunk and both passes, in units of one line
+ * comparison (two lines of equal length cost one more unit per 64 characters, since only they are compared character by
+ * character). A hunk's match must be proved unique, so locating it scans the rest of its file: about one unit per line
+ * for real code. This runs synchronously on a model-supplied patch; the budget keeps a call to a fraction of a second
+ * instead of letting many hunks over a large file, or a near-matching long hunk, block the process for minutes.
+ * ponytail: a budget, not a faster search; a first-line index if honest patches ever reach it.
  */
-export const MAX_HUNK_COMPARISONS = 5_000_000;
+export const MAX_LOCATE_WORK = 50_000_000;
 
-/** Positions where `old` occurs in `lines` at or after `from`, comparing with `same`, within the shared budget. */
-function positions(lines: readonly string[], old: readonly string[], from: number, same: (a: string, b: string) => boolean,
-  budget: { left: number }, overBudget: () => HunkError): number[] {
+/** The locate budget one `apply_patch` call shares across all of its sections. */
+export interface LocateBudget { left: number }
+export const locateBudget = (): LocateBudget => ({ left: MAX_LOCATE_WORK });
+
+/** A file's lines, and the same lines without trailing whitespace, computed once and only when a fallback needs them. */
+interface FileLines { readonly lines: readonly string[]; stripped: readonly string[] | null }
+const strippedOf = (file: FileLines): readonly string[] => (file.stripped ??= file.lines.map((line) => line.trimEnd()));
+
+/** One line comparison, charged to the budget before it runs. */
+function same(a: string, b: string, budget: LocateBudget, spent: () => HunkError): boolean {
+  budget.left -= a.length === b.length ? 1 + (a.length >>> 6) : 1;
+  if (budget.left < 0) throw spent();
+  return a === b;
+}
+
+/** Positions where `old` occurs in `lines` at or after `from`. */
+function positions(lines: readonly string[], old: readonly string[], from: number, budget: LocateBudget, spent: () => HunkError): number[] {
   const found: number[] = [];
   for (let at = from; at + old.length <= lines.length; at++) {
-    let matches = true;
-    for (let index = 0; index < old.length; index++) {
-      if (--budget.left < 0) throw overBudget();
-      if (!same(lines[at + index]!, old[index]!)) { matches = false; break; }
-    }
-    if (matches) found.push(at);
+    let index = 0;
+    while (index < old.length && same(lines[at + index]!, old[index]!, budget, spent)) index++;
+    if (index === old.length) found.push(at);
   }
   return found;
 }
 
-function locate(lines: readonly string[], hunk: PatchHunk, from: number, index: number, path: string): { at: number; note: string | null } {
+function locate(file: FileLines, hunk: PatchHunk, from: number, index: number, path: string, budget: LocateBudget): { at: number; note: string | null } {
+  const { lines } = file;
   const old = hunk.lines.filter((line) => line.op !== "+").map((line) => line.text);
   const label = `hunk ${index + 1}`;
   if (old.length === 0) {
     if (hunk.eof || lines.length === from) return { at: lines.length, note: null };
     throw new HunkError(`${label} of ${path} has no context or removed lines; add context, or mark it "*** End of File"`);
   }
+  const spent = (): HunkError => new HunkError(`locating ${label} of ${path} would pass this patch's budget of ${MAX_LOCATE_WORK} line comparisons; give the hunks more distinctive context or an @@ line, or split the patch`);
   let start = from;
   if (hunk.contextHint !== null) {
-    const hint = hunk.contextHint;
-    const hints = lines.map((line, at) => (at >= from && rstrip(line) === rstrip(hint) ? at : -1)).filter((at) => at !== -1);
-    if (hints.length === 0) throw new HunkError(`${label} of ${path}: its @@ context "${hint}" was not found after line ${from}`);
-    if (hints.length > 1) throw new HunkError(`${label} of ${path}: its @@ context "${hint}" appears ${hints.length} times; add more context`);
+    const hint = hunk.contextHint.trimEnd();
+    const stripped = strippedOf(file);
+    const hints: number[] = [];
+    for (let at = from; at < lines.length; at++) if (same(stripped[at]!, hint, budget, spent)) hints.push(at);
+    if (hints.length === 0) throw new HunkError(`${label} of ${path}: its @@ context "${hunk.contextHint}" was not found after line ${from}`);
+    if (hints.length > 1) throw new HunkError(`${label} of ${path}: its @@ context "${hunk.contextHint}" appears ${hints.length} times; add more context`);
     start = hints[0]!;
   }
   const accept = (candidates: number[], note: string | null): { at: number; note: string | null } | null => {
@@ -86,10 +101,8 @@ function locate(lines: readonly string[], hunk: PatchHunk, from: number, index: 
     if (eligible.length > 1) throw new HunkError(`${label} of ${path} matches ${eligible.length} places; include more context`);
     return null;
   };
-  const budget = { left: MAX_HUNK_COMPARISONS };
-  const overBudget = (): HunkError => new HunkError(`${label} of ${path} is too costly to locate (over ${MAX_HUNK_COMPARISONS} line comparisons); give it less context, or anchor it with an @@ context line`);
-  return accept(positions(lines, old, start, (a, b) => a === b, budget, overBudget), null)
-    ?? accept(positions(lines, old, start, (a, b) => rstrip(a) === rstrip(b), budget, overBudget), `${label} matched ignoring trailing whitespace`)
+  return accept(positions(lines, old, start, budget, spent), null)
+    ?? accept(positions(strippedOf(file), old.map((line) => line.trimEnd()), start, budget, spent), `${label} matched ignoring trailing whitespace`)
     ?? (() => { throw new HunkError(`${label} of ${path} does not match the file${hunk.eof ? " at its end" : ""}; read the file again and re-copy the context`); })();
 }
 
@@ -100,29 +113,33 @@ export interface HunkPlan {
   readonly added: number;
 }
 
-export function applyHunks(before: string, hunks: readonly PatchHunk[], path: string): HunkPlan {
+/**
+ * Hunks are located in the original lines, each after the previous hunk's old lines: the same places as locating each in
+ * the text edited so far, because the text after the last hunk is still the original. The result is built once, never
+ * copied per hunk. `budget` is shared by every section of one call.
+ */
+export function applyHunks(before: string, hunks: readonly PatchHunk[], path: string, budget: LocateBudget = locateBudget()): HunkPlan {
   const { lines, form } = splitText(before);
-  let text = [...lines];
+  const file: FileLines = { lines, stripped: null };
+  const after: string[] = [];
   let cursor = 0;
   const notes: string[] = [];
   let removed = 0;
   let added = 0;
   hunks.forEach((hunk, index) => {
-    const { at, note } = locate(text, hunk, cursor, index, path);
+    const { at, note } = locate(file, hunk, cursor, index, path, budget);
     if (note !== null) notes.push(note);
-    const old = hunk.lines.filter((line) => line.op !== "+");
+    for (let line = cursor; line < at; line++) after.push(lines[line]!);
     // Context lines keep the file's own text (a fallback match may differ in trailing whitespace); only `+` lines are new.
-    const replacement: string[] = [];
     let offset = 0;
     for (const line of hunk.lines) {
-      if (line.op === "+") replacement.push(line.text);
-      else if (line.op === " ") replacement.push(text[at + offset++]!);
-      else offset++;
+      if (line.op === "+") { after.push(line.text); added++; continue; }
+      if (line.op === " ") after.push(lines[at + offset]!);
+      else removed++;
+      offset++;
     }
-    removed += hunk.lines.filter((line) => line.op === "-").length;
-    added += hunk.lines.filter((line) => line.op === "+").length;
-    text = [...text.slice(0, at), ...replacement, ...text.slice(at + old.length)];
-    cursor = at + replacement.length;
+    cursor = at + offset;
   });
-  return { after: joinText(text, form), notes, removed, added };
+  for (let line = cursor; line < lines.length; line++) after.push(lines[line]!);
+  return { after: joinText(after, form), notes, removed, added };
 }

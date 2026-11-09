@@ -214,6 +214,22 @@ describe("apply_patch", () => {
     expect(existsSync(h.path("escape.txt"))).toBe(false);
   });
 
+  it("shares one locate budget across the patch's sections", async () => {
+    // Each section alone costs about 15 million line comparisons to prove its match unique; four together pass the
+    // call's budget, so the patch is refused before any file is written.
+    const h = harness();
+    const names = ["s1.txt", "s2.txt", "s3.txt", "s4.txt"];
+    for (const [index, name] of names.entries()) h.put(name, `${"same\n".repeat(30_000)}end-${index}\n`);
+    await h.read(...names);
+    const section = (name: string, index: number) => `*** Update File: ${name}\n@@\n${" same\n".repeat(500)}-end-${index}\n+END-${index}`;
+    const outcome = await h.apply(patch(names.map(section).join("\n")));
+    expect(outcome.ok).toBe(false);
+    expect(outcome.output).toMatch(/hunk 1 of s4\.txt would pass this patch's budget/);
+    for (const [index, name] of names.entries()) expect(h.text(name).endsWith(`end-${index}\n`)).toBe(true);
+    // Three of the same sections fit in one call.
+    expect((await h.apply(patch(names.slice(0, 3).map(section).join("\n")))).ok).toBe(true);
+  });
+
   it("SIMULATE returns the diffs and writes nothing", async () => {
     const h = harness();
     h.put("a.txt", "a\n");
