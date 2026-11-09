@@ -453,15 +453,23 @@ describe("bounded native public validation repair", () => {
 
   test("a local repair deadline abandons an uncooperative tool and stops later work", async () => {
     const f = fixture();
+    const timeoutMs = 12_345;
+    const timers = vi.spyOn(globalThis, "setTimeout");
     const observed: { signal?: AbortSignal } = {};
     const calls: ToolCallRequest[] = [];
     const tools: AgentToolSeam = { ...f.tools, execute(request) {
       calls.push(request);
       if (request.toolName !== "fs.read") return f.tools.execute(request);
       observed.signal = request.signal;
+      const expire = timers.mock.calls.find(([, delay]) => delay === timeoutMs)?.[0];
+      if (expire === undefined) throw new Error("repair did not schedule its deadline");
+      // Fire the real repair timer callback after this tool returns its stalled promise, regardless of startup time.
+      queueMicrotask(() => expire());
       return new Promise<ToolCallOutcome>(() => {});
     } };
-    const d = await run(f, plan(policy({ timeoutMs: 200 })), tools);
+    let d: AgentDriver;
+    try { d = await run(f, plan(policy({ timeoutMs })), tools); }
+    finally { timers.mockRestore(); }
     const summary = readAgentRunSummary(f.harness.dir, f.harness.sessionId, d.status);
     expect(observed.signal?.aborted).toBe(true);
     expect(summary.endings.map(ending => ending.reason)).toEqual(["complete"]);
@@ -469,7 +477,7 @@ describe("bounded native public validation repair", () => {
     expect(starts(f)).toHaveLength(1);
     expect(calls.map(call => call.toolName)).toEqual(["bash", "fs.read"]);
     expect(summary.validation.status).not.toBe("passed");
-    expect(repairRows(f).some(row => meta(row).phase === "stopped")).toBe(true);
+    expect(repairRows(f).some(row => meta(row).phase === "stopped" && meta(row).reason === "deadline-exceeded")).toBe(true);
     expect(readFileSync(join(f.harness.dir, "calculation.txt"), "utf8")).toBe("broken\n");
   });
 
