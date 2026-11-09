@@ -60,23 +60,46 @@ describe("the tool-output secret redaction filter (SH-SANDBOX-06)", () => {
     expect(redactionCountsFor(keyed)).toEqual({ aws_key: 2, generic_api_key: 1 });
   });
 
-  it("S22: a structured pass that finds fewer secrets of a type than the flat pass falls back to the flat text", () => {
+  it("S22: withholds JSON when the structured pass leaves a numeric secret and the flat result is invalid", () => {
     const numeric = { name: "fs.read" } as never;
     // The flat pass reads the number under a key-named member as a key and breaks the JSON; the structured pass leaves
     // numbers alone, so it would miss that one while still finding the token.
     const out = secretRedactionFilter(`{"api_key": 1234567890123456789, "token": "${GITHUB}"}`, numeric);
     expect(out).not.toContain("1234567890123456789");
     expect(out).not.toContain(GITHUB);
-    expect(out).toBe('{"[AMC_REDACTED:generic_api_key], "token": "[AMC_REDACTED:github_token]"}');
+    expect(out).toBe("[AMC_REDACTED:output_withheld]");
     expect(redactionCountsFor(numeric)).toEqual({ generic_api_key: 1, github_token: 1 });
   });
 
-  it("JSON nested too deep to walk keeps the flat, redacted text instead of failing the call", () => {
+  it("S22: a different secret of the same type cannot cover a numeric secret", () => {
+    const raw = '{"api_key":1234567890123456789,"nested":{"\\u0061pi_key":"abcdefghijklmnop1234"}}';
+    expect(secretRedactionFilter(raw, { name: "fs.read" } as never)).toBe("[AMC_REDACTED:output_withheld]");
+  });
+
+  it("S22: the JSON verification decodes escaped names and checks scientific notation", () => {
+    const raw = '{"\\u0061pi_key":1e21}';
+    expect(secretRedactionFilter(raw, { name: "fs.read" } as never)).toBe("[AMC_REDACTED:output_withheld]");
+  });
+
+  it("S22: a duplicate decoded member cannot hide a credential from the verification pass", () => {
+    const raw = '{"\\u0061pi_key":1e21,"api_key":null}';
+    expect(secretRedactionFilter(raw, { name: "fs.read" } as never)).toBe("[AMC_REDACTED:output_withheld]");
+  });
+
+  it("S22: 50,000 colliding keys reach a bounded, safe fallback", () => {
+    const keys = Array.from({ length: 50_000 }, (_, i) => `"AKIA${i.toString(36).toUpperCase().padStart(16, "0")}":"x"`);
+    const raw = `{"api_key":"abcdefghijklmnop1234",${keys.join(",")}}`;
+    const start = performance.now();
+    expect(secretRedactionFilter(raw, { name: "fs.read" } as never)).toBe("[AMC_REDACTED:output_withheld]");
+    expect(performance.now() - start).toBeLessThan(8_000);
+  }, 10_000);
+
+  it("JSON nested too deep to walk is withheld instead of failing the call", () => {
     const deep = { name: "bash" } as never;
     const depth = 200_000;
     const out = secretRedactionFilter(`${"[".repeat(depth)}{"api_key":"abcdefghijklmnop1234"}${"]".repeat(depth)}`, deep);
     expect(out).not.toContain("abcdefghijklmnop1234");
-    expect(out).toContain("[AMC_REDACTED:generic_api_key]");
+    expect(out).toBe("[AMC_REDACTED:output_withheld]");
     expect(redactionCountsFor(deep)).toEqual({ generic_api_key: 1 });
   });
 
