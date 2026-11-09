@@ -12,6 +12,7 @@ import { loadOpsPolicy, opsPolicyPath, opsPolicySigPath, opsPolicySchema, verify
 import { currentTransparencyMerkleRoot, verifyTransparencyMerkle } from "../../transparency/merkleIndexStore.js";
 import { transparencySealSigPath, verifyTransparencyLog, appendTransparencyEntry, appendTransparencyEntryAsync } from "../../transparency/logChain.js";
 import { verifyLedgerIntegrity } from "../../ledger/ledger.js";
+import { openSessionsAt, verifyInstantFor } from "../../ledger/verifyAsOf.js";
 import { commitRestore } from "./restoreCommit.js";
 import { snapshotSqliteFiles, withoutSqliteSidecars } from "./sqliteSnapshot.js";
 import { backupManifestSchema, backupManifestSigSchema, type BackupManifest, type BackupManifestSig } from "./backupSchema.js";
@@ -728,7 +729,7 @@ export async function restoreBackup(params: {
         tarExtract(payloadTar, stage);
         const warnings = await sealRestore(stage, target, verify.report, verify.manifest, params.backupFile);
         const replacedTo = commitRestore(stage, target, existed);
-        return { restoredTo: target, replacedTo, trusted: warnings.length === 0, warnings, report: verify.report };
+        return { restoredTo: target, replacedTo, trusted: warnings.every(isInfo), warnings, report: verify.report };
       } finally {
         rmSync(stage, { recursive: true, force: true });
       }
@@ -739,6 +740,9 @@ export async function restoreBackup(params: {
     cleanup();
   }
 }
+
+/** An informational restore note (an open session in the copy): kept in the warnings, never a reason to distrust the restore. */
+const isInfo = (warning: string): boolean => warning.startsWith("INFO: ");
 
 /** Verifies the staged workspace and writes its restore warning, audit row and transparency entry, all inside `stage`. */
 async function sealRestore(stage: string, target: string, report: VerifierReportV1, manifest: BackupManifest, source: string): Promise<string[]> {
@@ -755,11 +759,16 @@ async function sealRestore(stage: string, target: string, report: VerifierReport
   if (!merkle.ok) {
     warnings.push(...merkle.errors.map((row) => `merkle: ${row}`));
   }
-  const ledger = await verifyLedgerIntegrity(stage);
+  // D-INT-7: the restored ledger is verified as of the backup's createdTs, iff the backup verified as trusted.
+  const now = verifyInstantFor({ signedTs: manifest.createdTs, admitted: report.trusted });
+  const ledger = await verifyLedgerIntegrity(stage, { now });
   if (!ledger.ok) {
     warnings.push(...ledger.errors.map((row) => `ledger: ${row}`));
   }
-  if (warnings.length > 0) {
+  const open = openSessionsAt(ledger, now);
+  if (open) warnings.push(`INFO: ${open}`);
+  const problems = warnings.filter((warning) => !isInfo(warning));
+  if (problems.length > 0) {
     writeFileAtomic(
       join(stage, ".amc", "RESTORE_WARNING.txt"),
       ["Workspace restored but verification warnings were found:", ...warnings].join("\n"),
@@ -769,8 +778,8 @@ async function sealRestore(stage: string, target: string, report: VerifierReport
   appendOpsAuditEvent({
     workspace: stage,
     auditType: "BACKUP_RESTORED",
-    payload: { backupId: manifest.backupId, source, target, warnings: warnings.length },
-    severity: warnings.length > 0 ? "HIGH" : "LOW"
+    payload: { backupId: manifest.backupId, source, target, warnings: problems.length },
+    severity: problems.length > 0 ? "HIGH" : "LOW"
   });
   appendTransparencyEntry({
     workspace: stage,

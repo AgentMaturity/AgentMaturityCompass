@@ -72,7 +72,8 @@ describe("studio API trusted proxy IP handling", () => {
     }
   });
 
-  test("uses x-forwarded-for only when remote peer is in allowlist", async () => {
+  // SR-1: the peer must be a named proxy (trustedProxyCidrs); being in the client allow list is not enough.
+  test("uses x-forwarded-for only when the remote peer is a named trusted proxy", async () => {
     const workspace = newWorkspace();
     const port = await pickFreePort();
     const api = await startStudioApiServer({
@@ -81,7 +82,8 @@ describe("studio API trusted proxy IP handling", () => {
       port,
       token: "test-token",
       allowedCidrs: ["127.0.0.1/32", "10.0.0.0/8"],
-      trustedProxyHops: 1
+      trustedProxyHops: 1,
+      trustedProxyCidrs: ["127.0.0.1/32"]
     });
     try {
       const ok = await rawGet(`${api.url}/health`, {
@@ -96,6 +98,28 @@ describe("studio API trusted proxy IP handling", () => {
       expect(denied.body).toContain("192.168.44.2");
     } finally {
       await api.close();
+    }
+  });
+
+  // LIVE-RUNTIME-18: behind appending proxies the client is chain[length - hops]; a client-prepended entry is not it.
+  test("selects the hop the trusted proxies appended, never an entry the client prepended", async () => {
+    const workspace = newWorkspace();
+    const one = await startStudioApiServer({ workspace, host: "127.0.0.1", port: 0, token: "test-token",
+      allowedCidrs: ["127.0.0.1/32", "::1/128", "10.9.0.0/16"], trustedProxyHops: 1, trustedProxyCidrs: ["127.0.0.1/32"] });
+    try {
+      expect((await rawGet(`${one.url}/health`, { "x-forwarded-for": "198.51.100.9, 10.9.8.7" })).status).toBe(200);
+      const spoofed = await rawGet(`${one.url}/health`, { "x-forwarded-for": "10.9.8.7, 198.51.100.9" });
+      expect(spoofed.status).toBe(403);
+      expect(JSON.parse(spoofed.body)).toEqual({ error: "client IP not allowed", ip: "198.51.100.9" });
+    } finally {
+      await one.close();
+    }
+    const two = await startStudioApiServer({ workspace, host: "127.0.0.1", port: 0, token: "test-token",
+      allowedCidrs: ["127.0.0.1/32", "::1/128", "10.9.0.0/16"], trustedProxyHops: 2, trustedProxyCidrs: ["127.0.0.1/32"] });
+    try {
+      expect((await rawGet(`${two.url}/health`, { "x-forwarded-for": "10.9.8.7, 203.0.113.1" })).status).toBe(200);
+    } finally {
+      await two.close();
     }
   });
 });

@@ -71,3 +71,13 @@ export function decryptVaultPayload(envelope: VaultEnvelope, passphrase: string)
     decipher.final()
   ]);
 }
+
+/**
+ * LIVE-VAULT-19: an envelope (the vault, a child vault or a recovery copy) re-sealed under `next` with the same plaintext,
+ * or null when `current` does not open it.
+ */
+export function resealVaultEnvelope(raw: string | Buffer, current: string, next: string): string | null {
+  let plaintext: Buffer;
+  try { plaintext = decryptVaultPayload(JSON.parse(raw.toString()) as VaultEnvelope, current); } catch { return null; } // "does not open" is the answer
+  return JSON.stringify(encryptVaultPayload(plaintext, next), null, 2);
+}

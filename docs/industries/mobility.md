@@ -152,7 +152,7 @@ Promotion requires D-14's three named experts, independent human domain/legal/ri
 | C8 | The registry stamps every pack experimental | `src/domains/industryPacks.ts` | `contentStatus: QUESTIONNAIRE_CONTENT_STATUS` |
 | C9 | Sector pack run command | `src/cli-domain-product-commands.ts` | `Run an industry sector pack` |
 | C10 | Every workspace's Industry Packs access is free | `src/domains/industryPackEntitlement.ts` | `export function getIndustryPackEntitlement` … `source: "free"` |
-| C11 | Interactive runs offer L1, L3 and L5 | `src/cli-domain-product-commands.ts` | `{ name: "L3 — " + q.l3.slice(0, 80), value: 3 }` |
+| C11 | Interactive runs offer L1, L3 and L5 | `src/cli-domain-product-commands.ts` | `short: "L3", value: 3` |
 | C12 | Baseline answers nothing | `src/cli-domain-product-commands.ts` | `every question is not evaluated and no score is computed` |
 | C13 | Self-reported answers cap at L1 | `src/cli-domain-product-commands.ts` | `self-reported answers cap at L1` |
 | C14 | Station regulatoryBasis | `src/domains/domainRegistry.ts` | `  mobility: {` … `regulatoryBasis:` |

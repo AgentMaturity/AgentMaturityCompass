@@ -212,7 +212,9 @@ function checkHelmRender(root) {
   if (!helmAvailable()) return { errors: [], note: "helm: not on PATH; chart template rendering NOT exercised (static checks only)" };
   const errors = [];
   const chartDir = resolve(root, "deploy/helm/amc");
-  const variants = [[], ...readdirSync(join(chartDir, "examples")).map((f) => ["-f", join(chartDir, "examples", f)])];
+  // The ingress example leaves AMC_TRUSTED_PROXY_CIDRS to the operator and the chart refuses it empty (SR-10): render it with one.
+  const exampleArgs = { "values-ingress-tls.yaml": ["--set", "env.AMC_TRUSTED_PROXY_CIDRS=10.244.1.17/32"] };
+  const variants = [[], ...readdirSync(join(chartDir, "examples")).map((f) => ["-f", join(chartDir, "examples", f), ...(exampleArgs[f] ?? [])])];
   for (const args of variants) {
     try {
       const docs = helmRender(chartDir, args);
@@ -227,7 +229,9 @@ function checkHelmRender(root) {
     ["--set", "replicaCount=2"],
     ["--set", "bootstrap.createSecret=true"],
     ["--set", "bootstrap.createSecret=true", "--set", "bootstrap.values.vaultPassphrase=change-me-x"],
-    ["--set", "image.requireDigest=true"]
+    ["--set", "image.requireDigest=true"],
+    ["-f", join(chartDir, "examples", "values-ingress-tls.yaml")],
+    ["-f", join(chartDir, "examples", "values-ingress-tls.yaml"), "--set", "env.AMC_TRUSTED_PROXY_CIDRS=198.51.100.0/24"]
   ];
   for (const args of mustRefuse) {
     if (spawnSync("helm", ["template", "amc", chartDir, ...args], { encoding: "utf8" }).status === 0) errors.push(`helm template ${args.join(" ")} rendered; it must refuse`);

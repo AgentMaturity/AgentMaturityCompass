@@ -10,6 +10,7 @@ import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import type { DoctorCheck } from "./doctorRules.js";
 import { runDoctorRules } from "./doctorRules.js";
+import { ensureAmcGitignore } from "../workspaceGitignore.js";
 import { withDeletionGate, DeletionDenied } from "../residency/deletionGate.js";
 
 // ---------------------------------------------------------------------------
@@ -83,6 +84,7 @@ function fixRules(): FixRule[] {
             created.push(dir);
           }
         }
+        if (!existsSync(join(workspace, ".amc", ".gitignore"))) { ensureAmcGitignore(join(workspace, ".amc")); created.push(".amc/.gitignore"); } // LIVE-VAULT-11
         return {
           before: `Missing directories: ${created.length > 0 ? created.join(", ") : "none"}`,
           after: created.length > 0 ? `Created: ${created.join(", ")}` : "All directories exist",

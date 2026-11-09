@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import "./storage/nativeGuard.js";
 import { withWorkspaceScope } from "./enforce/evidenceEmitter.js";
-import { randomBytes, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { spawn } from "node:child_process";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { stdin } from "node:process";
@@ -39,7 +39,7 @@ import { applyAMCConfigProfile, initWorkspace, loadAMCConfig, quickstartWizard, 
 import { initWorkspaceAsync } from "./workspaceInitializationAsync.js";
 import { captureInstantWorkspaceDiagnostic } from "./cli/instantWorkspaceDiagnostic.js";
 import { runDoctorCli } from "./doctor/doctorCli.js";
-import { firstRunActions, firstRunFixCommands } from "./doctor/firstRunPlan.js";
+import { doctorNextSteps, firstRunActions, firstRunFixCommands } from "./doctor/firstRunPlan.js";
 import {
   buildCommandInventory,
   cliDiscoverabilityFooter,
@@ -289,14 +289,20 @@ import inquirer from "inquirer";
 import { assertOwnerMode, getMode, leaveAgentMode, setMode, type AMCMode } from "./mode/mode.js";
 import { writeRuntimeFirewallPolicyAsync, migrateRuntimeFirewallPolicySignatureAsync } from "./runtime/firewallPolicyAsync.js";
 import { installFatalHandlers } from "./runtime/fatalDiagnostic.js";
-import { initVaultInteractive, lockVaultNow, promptPassphrase, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
-import { forgetVaultPassphrase } from "./vault/passphraseStore.js";
-import { ensureUpVaultPassphrase, runFirstBaselineIfNeeded } from "./studio/oneCommandUp.js";
+import { changeVaultPassphraseInteractive, initVaultInteractive, lockVaultNow, printVaultPassphraseChange, promptPassphrase, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
+import { forgetVaultPassphrase, unlockWithRememberedPassphrase } from "./vault/passphraseStore.js";
+import { unlockWithPassphraseFile } from "./vault/passphraseFile.js";
+import { confirmRememberedUnlock } from "./vault/operatorContext.js";
+import { ensureInstantVaultMode, type InstantVaultMode } from "./cli/instantVaultMode.js";
+import { generatedPassphraseForInit, rememberInitPassphrase, skipVaultPassphrase } from "./cli/initPassphrase.js";
+import { ensureUpVaultPassphrase, printConsoleSignInStep, runFirstBaselineIfNeeded } from "./studio/oneCommandUp.js";
 import { agentRunFiles, latestRunSummary } from "./diagnostic/runReportResolution.js";
 import { buildConnectInstructions } from "./studio/connectWizard.js";
 import { registerHookIntegrationCommands } from "./adapters/hookIntegrationCli.js";
 import { runStudioForeground, startStudioDaemon, stopStudioDaemon, studioStatus } from "./studio/studioSupervisor.js";
-import { readAdminToken, readStudioState, studioLogsDir } from "./studio/studioState.js";
+import { standaloneGatewayAllowList } from "./studio/listenPolicy.js";
+import { installStudioShutdown } from "./studio/studioShutdown.js";
+import { readAdminToken, readStudioState, studioLogsDir, studioProbeBase } from "./studio/studioState.js";
 import { fixSignaturesAsync, FixSignaturesPublicationError, inspectSignatures } from "./studio/signatures.js";
 import {
   completeOnboarding,
@@ -421,15 +427,7 @@ import {
   packRegistryInitCli
 } from "./packs/packCli.js";
 import { request as httpRequest } from "node:http";
-import {
-  parseRolesCsv,
-  userAddCliAsync as userAddCli,
-  userInitCliAsync as userInitCli,
-  userListCli,
-  userRevokeCliAsync as userRevokeCli,
-  userRoleSetCliAsync as userRoleSetCli,
-  userVerifyCli
-} from "./auth/authCli.js";
+import { registerUserCommands } from "./cli-user-commands.js";
 import { verifyUsersConfigSignature } from "./auth/authApi.js";
 import {
   identityInitCli,
@@ -1413,56 +1411,10 @@ function ensureWorkspaceReadyForAgent(workspace: string, agentId?: string): void
   }
 }
 
-interface InstantVaultMode {
-  noSign: boolean;
-  createdLocalPassphrase: boolean;
-  localPassphrasePath: string | null;
-  reason: string | null;
-}
-
 interface InstantWorkspaceState {
   createdWorkspace: boolean;
   createdAgentContext: boolean;
   vault: InstantVaultMode;
-}
-
-function localVaultPassphrasePath(workspace: string): string {
-  return join(workspace, ".amc", "local-vault-passphrase");
-}
-
-function ensureInstantVaultMode(workspace: string): InstantVaultMode {
-  if (process.env.AMC_VAULT_PASSPHRASE && process.env.AMC_VAULT_PASSPHRASE.length > 0) {
-    return { noSign: false, createdLocalPassphrase: false, localPassphrasePath: null, reason: null };
-  }
-
-  const localPassphrase = localVaultPassphrasePath(workspace);
-  if (pathExists(localPassphrase)) {
-    const value = readUtf8(localPassphrase).trim();
-    if (value.length >= 8) {
-      process.env.AMC_VAULT_PASSPHRASE = value;
-      return { noSign: false, createdLocalPassphrase: false, localPassphrasePath: localPassphrase, reason: null };
-    }
-  }
-
-  const existingVault = join(workspace, ".amc", "vault.amcvault");
-  if (pathExists(existingVault)) {
-    return {
-      noSign: true,
-      createdLocalPassphrase: false,
-      localPassphrasePath: null,
-      reason: "Existing vault is locked and no passphrase is available; generated an unsigned full score."
-    };
-  }
-
-  const generated = `amc-local-${randomBytes(32).toString("base64url")}`;
-  writeFileAtomic(localPassphrase, `${generated}\n`, 0o600);
-  process.env.AMC_VAULT_PASSPHRASE = generated;
-  return {
-    noSign: false,
-    createdLocalPassphrase: true,
-    localPassphrasePath: localPassphrase,
-    reason: null
-  };
 }
 
 function ensureInstantWorkspace(workspace: string, agentId: string): InstantWorkspaceState {
@@ -2138,7 +2090,7 @@ program
     }
     process.stdout.write(body.endsWith("\n") ? body : `${body}\n`);
   });
-program.hook("preAction", (_thisCommand, actionCommand) => {
+program.hook("preAction", async (_thisCommand, actionCommand) => {
   const opts = actionCommand.optsWithGlobals<{ agent?: string; color?: boolean }>();
   if (opts.agent && opts.agent.trim().length > 0) {
     process.env.AMC_AGENT_ID = opts.agent.trim();
@@ -2151,6 +2103,11 @@ program.hook("preAction", (_thisCommand, actionCommand) => {
   if (path.length > 0) {
     assertOwnerMode(process.cwd(), path);
   }
+  // B1: AMC_VAULT_PASSPHRASE_FILE opens the vault as AMC_VAULT_PASSPHRASE does (that wins); bootstrap, studio start and doctor read it themselves.
+  if (!/^(up|mcp|connect hooks forward|bootstrap|host bootstrap|studio start|doctor)( |$)/.test(path)) unlockWithPassphraseFile(process.cwd());
+  // B2: `amc up` reads it itself (--no-remember); the agent host's MCP server and hook forwarder never hold the vault.
+  // LIVE-VAULT-01: the unlock is for an interactive operator only, and a governance command then confirms it.
+  if (!/^(up|mcp|connect hooks forward)( |$)/.test(path)) { unlockWithRememberedPassphrase(process.cwd()); await confirmRememberedUnlock(process.cwd(), path); }
 });
 installClaimLabelHooks(program);
 
@@ -2164,7 +2121,7 @@ async function initializeMinimalStartupWorkspace(opts: {
   // command can unlock, so it is shown once, below, with the export to run.
   let generatedPassphrase: string | null = null;
   if (!process.env.AMC_VAULT_PASSPHRASE) {
-    generatedPassphrase = `amc-local-${randomBytes(18).toString("base64url")}`;
+    generatedPassphrase = generatedPassphraseForInit();
     process.env.AMC_VAULT_PASSPHRASE = generatedPassphrase;
   }
 
@@ -2192,6 +2149,7 @@ async function initializeMinimalStartupWorkspace(opts: {
   console.log(fmt.info(`Profile: ${opts.profile}`));
   if (generatedPassphrase !== null) {
     console.log(fmt.warn("No AMC_VAULT_PASSPHRASE was set, so one was generated for this vault. Save it; signing commands need it in the shell:"));
+    if (process.env.GITHUB_ACTIONS) console.log(`::add-mask::${generatedPassphrase}`); // LIVE-VAULT-04: GitHub masks it in the job log
     console.log(`    export AMC_VAULT_PASSPHRASE='${generatedPassphrase}'`);
   }
   printFirstRunActions(fmt);
@@ -2200,10 +2158,10 @@ async function initializeMinimalStartupWorkspace(opts: {
   console.log("");
 }
 
-/** The three operator actions from an initialized workspace to a first governed, verified, keyless turn. */
-function printFirstRunActions(fmt: typeof import("./cliFormat.js")): void {
-  console.log(fmt.info("Three actions reach a first governed, verified turn without any provider key:"));
-  console.log(fmt.nextSteps(firstRunActions().map((action) => ({ cmd: action.cmd, desc: action.desc }))));
+/** One What's next list: the three actions to a first governed, verified, keyless turn, then any further steps. */
+function printFirstRunActions(fmt: typeof import("./cliFormat.js"), more: Array<{ cmd: string; desc: string }> = []): void {
+  console.log(fmt.info("The first three steps reach a first governed, verified turn without any provider key:"));
+  console.log(fmt.nextSteps([...firstRunActions().map((action) => ({ cmd: action.cmd, desc: action.desc })), ...more]));
 }
 
 program
@@ -2212,7 +2170,7 @@ program
   .option("--trust-boundary <mode>", "isolated|shared")
   .option("--profile <name>", "workspace config profile: dev|ci|prod", "dev")
   .option("--force", "Force re-initialization, overwrite existing .amc directory", false)
-  .option("--skip-vault", "Skip vault setup (useful for CI/headless init)", false)
+  .option("--skip-vault", "Skip the vault prompt: a random passphrase is generated and remembered for your user (CI/headless init)", false)
   .option("--minimal", "Startup-friendly setup without vault prompt or immediate full score", false)
   .option("--coding", "Starter profile: signed coding tools, a contained shell without network, firewall warn (P1-40)")
   .option("--regulated", "Starter profile: deny-by-default egress, firewall block, approvals on, a signed Layer 0 plan (P1-40)")
@@ -2223,6 +2181,8 @@ program
       const starter = starterProfileFlag(opts);
       if (starter) { await runStarterInit(process.cwd(), starter, opts.force, opts.webAllowHost); return; }
     } catch (error) { console.error(chalk.red(toErrorMessage(error))); process.exit(1); }
+    const skip = opts.skipVault && !opts.minimal ? skipVaultPassphrase() : { generated: null }; // LIVE-VAULT-04: refused before any write
+    if ("refused" in skip) { console.error(chalk.red(skip.refused)); process.exit(1); }
     // Force mode: delete existing .amc directory before re-init
     if (opts.force) {
       const { rmSync, existsSync } = await import("fs");
@@ -2241,12 +2201,6 @@ program
       return;
     }
     // Ensure vault passphrase is available before init (it creates crypto keys)
-    if (opts.skipVault) {
-      // Skip vault entirely — workspace will work without signing
-      if (!process.env.AMC_VAULT_PASSPHRASE) {
-        process.env.AMC_VAULT_PASSPHRASE = "skip-vault-" + Date.now();
-      }
-    }
     if (!process.env.AMC_VAULT_PASSPHRASE) {
       if (process.stdin.isTTY) {
         const crypto = await import("node:crypto");
@@ -2295,14 +2249,14 @@ program
     console.log(fmt.logo());
     console.log(fmt.pass("Workspace initialized"));
     console.log(fmt.info(`Location: ${init.workspacePath}`));
-    printFirstRunActions(fmt);
-    console.log(fmt.nextSteps([
+    if (skip.generated) console.log(fmt.info(rememberInitPassphrase(init.workspacePath, skip.generated)));
+    printFirstRunActions(fmt, [
       { cmd: "amc", desc: "Generate the full evidence score immediately" },
-      { cmd: `amc config profile ${opts.profile}`, desc: "Re-apply the selected workspace config profile" },
-      { cmd: "amc setup --demo", desc: "Load demo data and explore all features" },
-      { cmd: "amc doctor", desc: "Check what's available in your environment" },
       { cmd: "amc up", desc: "Start Studio (web dashboard)" },
-    ]));
+      { cmd: "amc doctor", desc: "Check what's available in your environment" },
+      { cmd: "amc setup --demo", desc: "Load demo data and explore all features" },
+      { cmd: `amc config profile ${opts.profile}`, desc: "Re-apply the selected workspace config profile" },
+    ]);
     console.log(fmt.colors.dim("  Full guide: https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md"));
     console.log("");
 
@@ -2360,22 +2314,18 @@ program
     // Every failing or warning check names its own fix; print those verbatim,
     // blocking ones first, so the operator copies rather than hunts. A warning
     // with a fix is still a missing precondition even when the exit code is 0.
-    const fixes = firstRunFixCommands({ ok: result.ok, checks: result.checks, mode: result.mode, workspaceInitialized: result.workspaceInitialized, strict: result.strict, liveProbes: result.liveProbes })
-      .map((fix) => ({ cmd: fix.cmd, desc: `[${fix.status}] ${fix.checkId}: ${fix.desc}` }));
+    // Optional adapter installs follow the closing steps (doctorNextSteps).
+    const fixCount = firstRunFixCommands(result).length;
     if (!result.ok) {
-      console.log(fmt.nextSteps([
-        ...fixes,
-        ...(result.workspaceInitialized
-          ? [{ cmd: "amc doctor-fix", desc: "Auto-repair common workspace issues" }]
-          : [{ cmd: "amc", desc: "Initialize this workspace and generate its first evidence result" }]),
+      console.log(fmt.nextSteps(doctorNextSteps(result, [
+        result.workspaceInitialized
+          ? { cmd: "amc doctor-fix", desc: "Auto-repair common workspace issues" }
+          : { cmd: "amc", desc: "Initialize this workspace and generate its first evidence result" },
         { cmd: "amc help", desc: "All available commands" },
-      ]));
-    } else if (fixes.length > 0) {
-      console.log(fmt.warn(`${fixes.length} precondition(s) still missing; each names its fix:`));
-      console.log(fmt.nextSteps([
-        ...fixes,
-        { cmd: "amc", desc: "Get your first full maturity score" },
-      ]));
+      ])));
+    } else if (fixCount > 0) {
+      console.log(fmt.warn(`${fixCount} precondition(s) still missing; each names its fix:`));
+      console.log(fmt.nextSteps(doctorNextSteps(result, [{ cmd: "amc", desc: "Get your first full maturity score" }])));
     } else {
       console.log(fmt.pass(result.workspaceInitialized ? "The listed diagnostic checks passed; this does not qualify a governed task or a release." : "CLI install checks passed."));
       console.log(fmt.nextSteps([
@@ -3715,6 +3665,7 @@ program
     if (state.untrustedConfig) {
       console.log(chalk.yellow("UNTRUSTED CONFIG: one or more signed config files are invalid."));
     }
+    printConsoleSignInStep(workspace, `http://${state.host}:${state.apiPort}/console`);
   });
 
 const hostCmd = program.command("host").description("Multi-workspace host mode operations");
@@ -4195,7 +4146,7 @@ studio
       studioPort: opts.port ? Number(opts.port) : undefined
     });
     const hostMode = Boolean(runtimeConfig.hostDir);
-    const dashboardPort = opts.dashboardPort ? Number(opts.dashboardPort) : 4173;
+    const dashboardPort = opts.dashboardPort ? Number(opts.dashboardPort) : runtimeConfig.dashboardPort;
     const lan = loadLanMode(runtimeConfig.workspaceDir);
     const lanSig = verifyLanModeSignature(runtimeConfig.workspaceDir);
     const queryCarrierAllowed = runtimeConfig.queryLeaseCarrierEnabled && lan.enabled && lanSig.valid;
@@ -4213,24 +4164,23 @@ studio
       );
     }
 
+    // Bind, port and allow list resolve from the flags, the raw environment and the signed LAN config (LIVE-RUNTIME-03).
     const studioRuntime = await runStudioForeground({
       workspace: runtimeConfig.workspaceDir,
       hostDir: runtimeConfig.hostDir ?? undefined,
       defaultWorkspaceId: runtimeConfig.defaultWorkspaceId,
-      apiHost: hostMode ? runtimeConfig.hostBind : runtimeConfig.bind,
-      apiPort: hostMode ? runtimeConfig.hostPort : runtimeConfig.studioPort,
+      env: process.env,
+      apiHost: hostMode ? undefined : opts.bind,
+      apiPort: hostMode || !opts.port ? undefined : Number(opts.port),
       dashboardPort,
-      gatewayHost: hostMode ? runtimeConfig.hostBind : runtimeConfig.bind,
       gatewayPort: runtimeConfig.gatewayPort,
       proxyPort: runtimeConfig.proxyPort,
       allowPublicBind: runtimeConfig.allowPublicBind || runtimeConfig.lanMode,
-      allowedCidrs: runtimeConfig.allowedCidrs,
       trustedProxyHops: runtimeConfig.trustedProxyHops,
       maxRequestBytes: runtimeConfig.maxRequestBytes,
+      gatewayMaxRequestBytes: runtimeConfig.gatewayMaxRequestBytes,
       corsAllowedOrigins: runtimeConfig.corsAllowedOrigins,
       dataRetentionDays: runtimeConfig.dataRetentionDays,
-      metricsHost: runtimeConfig.metricsBind,
-      metricsPort: runtimeConfig.metricsPort,
       queryLeaseCarrierEnabled: queryCarrierAllowed
     });
 
@@ -4250,16 +4200,7 @@ studio
       `Metrics: http://${studioRuntime.state.metricsHost ?? runtimeConfig.metricsBind}:${studioRuntime.state.metricsPort ?? runtimeConfig.metricsPort}/metrics`
     );
 
-    await new Promise<void>((resolvePromise) => {
-      const shutdown = async () => {
-        process.off("SIGINT", shutdown);
-        process.off("SIGTERM", shutdown);
-        await studioRuntime.stop();
-        resolvePromise();
-      };
-      process.on("SIGINT", shutdown);
-      process.on("SIGTERM", shutdown);
-    });
+    await new Promise<never>(() => installStudioShutdown({ stop: () => studioRuntime.stop() })); // LIVE-RUNTIME-02: one stop, signal-safe, bounded
   });
 
 studio
@@ -4270,11 +4211,10 @@ studio
     const runtime = loadStudioRuntimeConfig(process.env, {
       workspaceDir: opts.workspace ? resolve(opts.workspace) : undefined
     });
-    const modeHost = runtime.hostDir ? runtime.hostBind : runtime.bind;
-    const modePort = runtime.hostDir ? runtime.hostPort : runtime.studioPort;
-    const host = modeHost === "0.0.0.0" || modeHost === "::" ? "127.0.0.1" : modeHost;
-    const health = await httpGetJson(`http://${host}:${modePort}/healthz`);
-    const ready = await httpGetJson(`http://${host}:${modePort}/readyz`);
+    // The running Studio's bound address from state.json; the configured one when Studio wrote none.
+    const base = studioProbeBase(runtime.workspaceDir, runtime.hostDir ? { host: runtime.hostBind, port: runtime.hostPort } : { host: runtime.bind, port: runtime.studioPort });
+    const health = await httpGetJson(`${base}/healthz`);
+    const ready = await httpGetJson(`${base}/readyz`);
     if (health.status >= 200 && health.status < 300 && ready.status >= 200 && ready.status < 300) {
       console.log(`OK ${health.status}/${ready.status}`);
       return;
@@ -6222,7 +6162,8 @@ withTrustFlags(verifyCmd, { expectMonitor: true, ledgerOnly: true })
     }
     if (opts.apply || opts.yes) { console.error("--apply and --yes only work with --repair"); process.exit(2); }
     const trust = trustFromFlags(opts, ["ledger-row"]);
-    const result = await verifyLedgerIntegrity(process.cwd(), { trust, ...(opts.expectMonitor ? { expectedMonitorFingerprint: opts.expectMonitor } : {}) });
+    // B1: payloads a locked vault keeps closed are NOT EVALUATED (exit 1), never "authentication failed".
+    const result = await verifyLedgerIntegrity(process.cwd(), { trust, blobKeyOptional: true, ...(opts.expectMonitor ? { expectedMonitorFingerprint: opts.expectMonitor } : {}) });
     if (result.ok) {
       console.log(renderLedgerVerdict(result, trust.allowUnanchored));
       printArchivedStoreNote(process.cwd());
@@ -6914,10 +6855,13 @@ vault
   .command("forget")
   .description("Remove the remembered vault passphrase for this workspace (Keychain or credentials file)")
   .action(() => {
-    const removed = forgetVaultPassphrase(process.cwd());
-    console.log(removed
-      ? chalk.green("Remembered vault passphrase removed.")
-      : "No remembered vault passphrase found for this workspace.");
+    console.log(forgetVaultPassphrase(process.cwd()) ? chalk.green("Remembered vault passphrase removed.") : "No remembered vault passphrase found for this workspace.");
+  });
+vault
+  .command("passphrase")
+  .description("Change the vault passphrase (the keys stay the same); forgets the remembered passphrase")
+  .action(async () => {
+    printVaultPassphraseChange(await changeVaultPassphraseInteractive(process.cwd()));
   });
 registerVaultHistoryCommands(vault);
 const dlp = program.command("dlp").description("DLP scanner for PII and secrets");
@@ -6931,7 +6875,7 @@ const truthguard = program.command("truthguard").description("Deterministic outp
 const proof = program.command("proof").description("Domain Proof Lane source-to-rule proof checks");
 const mode = program.command("mode").description("Switch CLI role mode");
 const loop = program.command("loop").description("Continuous self-serve maturity loop");
-const user = program.command("user").description("Multi-user RBAC account management");
+registerUserCommands(program);
 const identity = program.command("identity").description("Enterprise identity (OIDC/SAML) configuration");
 registerWorkloadTrustCommands(identity);
 const sso = program.command("sso").description("SSO setup shortcuts for OIDC and SAML providers");
@@ -9306,8 +9250,8 @@ withTrustFlags(backup
       trust: trustFromFlags(opts, ["artifact-seal"])
     });
     console.log(chalk.green(`Backup restored to ${restored.restoredTo}`) + (restored.replacedTo ? `\nThe replaced workspace files are kept in ${restored.replacedTo}` : ""));
-    if (!restored.trusted) {
-      console.log(chalk.yellow("Restore completed with warnings:"));
+    if (restored.warnings.length > 0) {
+      console.log(chalk.yellow(restored.trusted ? "Restore notes:" : "Restore completed with warnings:"));
       for (const warning of restored.warnings) {
         console.log(`- ${warning}`);
       }
@@ -10230,7 +10174,8 @@ gateway
     const handle = await startGateway({
       workspace: process.cwd(),
       workspaceId: workspaceIdFromDirectory(process.cwd()),
-      configPath: opts.config
+      configPath: opts.config,
+      allowedCidrs: standaloneGatewayAllowList(process.env, loadGatewayConfig(process.cwd(), opts.config).listen.host)
     });
 
     console.log(chalk.hex('#4AEF79')(`Gateway session: ${handle.gatewaySessionId}`));
@@ -10245,16 +10190,7 @@ gateway
       console.log(`- ${route.prefix} -> ${route.upstream} openaiCompatible=${route.openaiCompatible ? "yes" : "no"} agent=${route.agentId ?? "unbound"}`);
     }
 
-    await new Promise<void>((resolvePromise) => {
-      const shutdown = async () => {
-        process.off("SIGINT", shutdown);
-        process.off("SIGTERM", shutdown);
-        await handle.close();
-        resolvePromise();
-      };
-      process.on("SIGINT", shutdown);
-      process.on("SIGTERM", shutdown);
-    });
+    await new Promise<never>(() => installStudioShutdown({ stop: () => handle.close() })); // LIVE-RUNTIME-02: one stop, signal-safe, bounded
   });
 
 gateway
@@ -10338,7 +10274,7 @@ bundle
     console.log(chalk.green(`Bundle exported: ${result.outFile}`));
     if (opts.attest) console.log("Attested: attestations/aibom.cdx.json and attestations/control-results.sigstore.json (DSSE, workspace artifact-seal key: a local audit trail until a trust list pins that key)");
     printClaimResult(runIdClaim(opts.run, opts.agent ?? activeAgent(program)), {});
-    console.log(`Files: ${result.fileCount}, Events: ${result.eventCount}, Sessions: ${result.sessionCount}`);
+    console.log(`Files: ${result.fileCount}, Events: ${result.eventCount}, Sessions: ${result.sessionCount}${result.openSessions.length ? `, open sessions: ${result.openSessions.length} (${result.openSessions.join(", ")}; the export verifies as of its export time)` : ""}`);
   });
 
 withTrustFlags(bundle
@@ -10854,12 +10790,10 @@ dashboard
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .option("--out <dir>", "output dashboard directory")
   .action((opts: { agent?: string; out?: string }) => {
-    const resolvedAgent = opts.agent ?? activeAgent(program);
-    const defaultOut = resolvedAgent ? `.amc/agents/${resolvedAgent}/dashboard` : ".amc/dashboard";
     const built = buildDashboard({
       workspace: process.cwd(),
-      agentId: resolvedAgent,
-      outDir: opts.out ?? defaultOut
+      agentId: opts.agent ?? activeAgent(program),
+      outDir: opts.out
     });
     console.log(chalk.green(`Dashboard built: ${built.outDir}`));
     console.log(`Agent: ${built.agentId}`);
@@ -10875,13 +10809,12 @@ dashboard
   .option("--no-open", "don't automatically open browser")
   .action(async (opts: { agent?: string; port: string; out?: string; open: boolean }) => {
     const resolvedAgent = opts.agent ?? activeAgent(program);
-    const defaultOut = resolvedAgent ? `.amc/agents/${resolvedAgent}/dashboard` : ".amc/dashboard";
     
     // Build dashboard first
     const built = buildDashboard({
       workspace: process.cwd(),
       agentId: resolvedAgent,
-      outDir: opts.out ?? defaultOut
+      outDir: opts.out
     });
     
     // Start server
@@ -10889,7 +10822,7 @@ dashboard
       workspace: process.cwd(),
       agentId: resolvedAgent,
       port: Number(opts.port),
-      outDir: opts.out ?? defaultOut
+      outDir: opts.out
     });
     
     console.log(chalk.green(`AMC Web UI running: ${handle.url}`));
@@ -11593,10 +11526,7 @@ vault
   .command("unlock")
   .description("Unlock vault into memory for signing operations")
   .action(async () => {
-    const passphrase = await unlockVaultInteractive(process.cwd());
-    if (!process.env.AMC_VAULT_PASSPHRASE) {
-      process.env.AMC_VAULT_PASSPHRASE = passphrase;
-    }
+    await unlockVaultInteractive(process.cwd()); // the unlock lives in this process only; the environment is left as it was
     const status = vaultStatusNow(process.cwd());
     console.log(chalk.green(`Vault unlocked: ${status.unlocked ? "yes" : "no"}`));
   });
@@ -11920,109 +11850,6 @@ mode.action(() => {
   const current: AMCMode = getMode(process.cwd());
   console.log(`Current mode: ${current}`);
 });
-
-user
-  .command("init")
-  .description("Initialize signed users.yaml with first OWNER user")
-  .requiredOption("--username <name>", "owner username")
-  .action(async (opts: { username: string }) => {
-    const passwordAnswer = await inquirer.prompt([
-      {
-        type: "password",
-        name: "password",
-        message: `Password for ${opts.username}`,
-        mask: "*"
-      }
-    ]);
-    const created = await userInitCli({
-      workspace: process.cwd(),
-      username: opts.username,
-      password: passwordAnswer.password
-    });
-    console.log(chalk.green(`Users config created: ${created.path}`));
-    console.log(`Signature: ${created.sigPath}`);
-    console.log(`Owner: ${created.username} roles=${created.roles.join(",")}`);
-  });
-
-user
-  .command("add")
-  .description("Add a user with RBAC roles")
-  .requiredOption("--username <name>", "username")
-  .requiredOption("--role <roles>", "comma-separated roles, e.g. APPROVER or OWNER,APPROVER")
-  .action(async (opts: { username: string; role: string }) => {
-    const passwordAnswer = await inquirer.prompt([
-      {
-        type: "password",
-        name: "password",
-        message: `Password for ${opts.username}`,
-        mask: "*"
-      }
-    ]);
-    const created = await userAddCli({
-      workspace: process.cwd(),
-      username: opts.username,
-      roles: parseRolesCsv(opts.role),
-      password: passwordAnswer.password
-    });
-    console.log(chalk.green(`User added: ${created.username}`));
-    console.log(`Roles: ${created.roles.join(",")}`);
-  });
-
-user
-  .command("list")
-  .description("List RBAC users")
-  .action(() => {
-    const rows = userListCli(process.cwd());
-    if (rows.length === 0) {
-      console.log("No users configured.");
-      return;
-    }
-    for (const row of rows) {
-      console.log(`${row.username} | roles=${row.roles.join(",")} | status=${row.status} | created=${new Date(row.createdTs).toISOString()}`);
-    }
-  });
-
-user
-  .command("revoke")
-  .description("Revoke a user account")
-  .argument("<username>")
-  .action(async (username: string) => {
-    const out = await userRevokeCli({
-      workspace: process.cwd(),
-      username
-    });
-    console.log(chalk.green(`User updated: ${out.username} status=${out.status}`));
-  });
-
-user
-  .command("role")
-  .description("Set user roles")
-  .command("set")
-  .description("Replace roles for a user")
-  .argument("<username>")
-  .requiredOption("--roles <roles>", "comma-separated roles")
-  .action(async (username: string, opts: { roles: string }) => {
-    const out = await userRoleSetCli({
-      workspace: process.cwd(),
-      username,
-      roles: parseRolesCsv(opts.roles)
-    });
-    console.log(chalk.green(`User roles updated: ${out.username}`));
-    console.log(`Roles: ${out.roles.join(",")}`);
-  });
-
-user
-  .command("verify")
-  .description("Verify users.yaml signature")
-  .action(() => {
-    const verify = userVerifyCli(process.cwd());
-    if (verify.valid) {
-      console.log(chalk.green(`Users signature valid: ${verify.sigPath}`));
-      return;
-    }
-    console.log(chalk.red(`Users signature invalid: ${verify.reason ?? "unknown reason"}`));
-    process.exit(1);
-  });
 
 identity
   .command("init")
@@ -18602,43 +18429,29 @@ program
       hostDir: opts.hostDir ? resolve(opts.hostDir) : undefined,
       defaultWorkspaceId: opts.defaultWorkspaceId
     });
-    const hostMode = Boolean(runtimeConfig.hostDir);
     const lan = loadLanMode(runtimeConfig.workspaceDir);
     const lanSig = verifyLanModeSignature(runtimeConfig.workspaceDir);
-    const resolvedApiPort = explicitApiPort ?? (hostMode ? runtimeConfig.hostPort : runtimeConfig.studioPort);
-    const resolvedDashboardPort = explicitDashboardPort ?? 4173;
+    const resolvedDashboardPort = explicitDashboardPort ?? runtimeConfig.dashboardPort;
     const runtime = await runStudioForeground({
       workspace: runtimeConfig.workspaceDir,
       hostDir: runtimeConfig.hostDir ?? undefined,
       defaultWorkspaceId: runtimeConfig.defaultWorkspaceId,
       allowLocalDemoWorkspace: opts.allowLocalDemoWorkspace === true,
-      apiPort: resolvedApiPort,
+      env: process.env, // bind, port and allow list: the raw environment and the signed LAN config (LIVE-RUNTIME-03)
+      apiPort: explicitApiPort,
       dashboardPort: resolvedDashboardPort,
-      apiHost: hostMode ? runtimeConfig.hostBind : runtimeConfig.bind,
-      gatewayHost: hostMode ? runtimeConfig.hostBind : runtimeConfig.bind,
       gatewayPort: runtimeConfig.gatewayPort,
       proxyPort: runtimeConfig.proxyPort,
       allowPublicBind: runtimeConfig.allowPublicBind || runtimeConfig.lanMode,
-      allowedCidrs: runtimeConfig.allowedCidrs,
       trustedProxyHops: runtimeConfig.trustedProxyHops,
       maxRequestBytes: runtimeConfig.maxRequestBytes,
+      gatewayMaxRequestBytes: runtimeConfig.gatewayMaxRequestBytes,
       corsAllowedOrigins: runtimeConfig.corsAllowedOrigins,
       dataRetentionDays: runtimeConfig.dataRetentionDays,
-      metricsHost: runtimeConfig.metricsBind,
-      metricsPort: runtimeConfig.metricsPort,
       queryLeaseCarrierEnabled: runtimeConfig.queryLeaseCarrierEnabled && lan.enabled && lanSig.valid
     });
 
-    await new Promise<void>((resolvePromise) => {
-      const shutdown = async () => {
-        process.off("SIGINT", shutdown);
-        process.off("SIGTERM", shutdown);
-        await runtime.stop();
-        resolvePromise();
-      };
-      process.on("SIGINT", shutdown);
-      process.on("SIGTERM", shutdown);
-    });
+    await new Promise<never>(() => installStudioShutdown({ stop: () => runtime.stop() })); // LIVE-RUNTIME-02: one stop, signal-safe, bounded
   });
 
 // ── Model Cognition Lab CLI ──────────────────────────────────────────
@@ -23970,9 +23783,8 @@ dashboard
   .option("--no-open", "do not automatically open the browser")
   .action(async (opts: { agent?: string; port: string; view?: string; open?: boolean }) => {
     const resolvedAgent = opts.agent ?? activeAgent(program);
-    const outDir = resolvedAgent ? `.amc/agents/${resolvedAgent}/dashboard` : ".amc/dashboard";
     try {
-      buildDashboard({ workspace: process.cwd(), agentId: resolvedAgent, outDir });
+      buildDashboard({ workspace: process.cwd(), agentId: resolvedAgent });
     } catch (e: unknown) {
       console.log(chalk.yellow(`Note: ${toErrorMessage(e)}`));
       console.log(chalk.gray("Dashboard will serve with available data."));
@@ -23981,7 +23793,6 @@ dashboard
       workspace: process.cwd(),
       agentId: resolvedAgent,
       port: Number(opts.port),
-      outDir,
     });
     console.log(chalk.green(`\n🌐  Dashboard serving at ${handle.url}`));
     console.log(chalk.gray(`View: ${opts.view || "engineer"}`));

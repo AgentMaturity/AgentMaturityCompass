@@ -1206,6 +1206,7 @@ AMC provides 1,269 public CLI command paths in the live command inventory.
 | 1187 | `amc user add` | Add a user with RBAC roles |
 | 1188 | `amc user init` | Initialize signed users.yaml with first OWNER user |
 | 1189 | `amc user list` | List RBAC users |
+| 1189 | `amc user password` | Set a new password for a console account; its signed-in sessions end |
 | 1190 | `amc user revoke` | Revoke a user account |
 | 1191 | `amc user role` | Set user roles |
 | 1192 | `amc user role set` | Replace roles for a user |
@@ -1247,6 +1248,7 @@ AMC provides 1,269 public CLI command paths in the live command inventory.
 | 1228 | `amc vault history migrate` | Authenticate only current and explicitly approved keys; preserve original untrusted bytes |
 | 1229 | `amc vault init` | Initialize encrypted vault for signing keys |
 | 1230 | `amc vault lock` | Lock vault and clear in-memory private keys |
+| 1231 | `amc vault passphrase` | Change the vault passphrase (the keys stay the same); forgets the remembered passphrase |
 | 1231 | `amc vault privacy-budget` | Check privacy budget for an agent |
 | 1232 | `amc vault rag-guard` | Guard RAG chunks against injection |
 | 1233 | `amc vault rotate-keys` | Rotate the monitor key (ledger-row and receipt purposes) with a signed rotation statement; alias of amc keys rotate |
@@ -6590,6 +6592,7 @@ Re-sign the lease revocation store as owner, only if its sha256 is the reviewed 
 | `--lease-id <id>` | - |
 | `--reason <reason>` | - |
 | `--token <lease>` | - |
+| `--token-file <path>` | - |
 
 #### `amc legal-hold`
 
@@ -7248,6 +7251,7 @@ Start real-time monitoring with live assurance checks on incoming traces
 | `--provider <provider>` | - |
 | `--endpoint <url>` | - |
 | `--api-key <key>` | - |
+| `--api-key-file <path>` | - |
 | `--budget <usd>` | - |
 | `--max-latency <ms>` | - |
 | `--alert-severity <level>` | - |
@@ -10509,6 +10513,7 @@ Add a user with RBAC roles
 |--------|-------------|
 | `--username <name>` | - |
 | `--role <roles>` | - |
+| `--password-file <path>` | - |
 
 #### `amc user init`
 
@@ -10518,6 +10523,17 @@ Initialize signed users.yaml with first OWNER user
 | Option | Description |
 |--------|-------------|
 | `--username <name>` | - |
+| `--password-file <path>` | - |
+| `--force` | - |
+
+#### `amc user password`
+
+Set a new password for a console account; its signed-in sessions end
+
+
+| Option | Description |
+|--------|-------------|
+| `--password-file <path>` | - |
 
 #### `amc user role set`
 
@@ -10843,6 +10859,7 @@ Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook
 | `--provider <provider>` | - |
 | `--endpoint <url>` | - |
 | `--api-key <key>` | - |
+| `--api-key-file <path>` | - |
 | `--poll-interval <ms>` | - |
 | `--agent <agentId>` | - |
 
@@ -11077,6 +11094,7 @@ export interface StudioRuntimeConfig {
   gatewayPort: number;
   proxyPort: number;
   toolhubPort: number;
+  dashboardPort: number;
   logLevel: LogLevel;
   lanMode: boolean;
   allowedCidrs: string[];
@@ -11085,6 +11103,7 @@ export interface StudioRuntimeConfig {
   dataRetentionDays: number;
   minFreeDiskMb: number;
   maxRequestBytes: number;
+  gatewayMaxRequestBytes: number;
   corsAllowedOrigins: string[];
   allowPublicBind: boolean;
   metricsBind: string;

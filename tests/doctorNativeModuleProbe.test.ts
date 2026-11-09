@@ -29,13 +29,31 @@ describe("doctor native SQLite execution probe", () => {
       close() {}
     }
     const load = vi.fn(() => BrokenDatabase);
-    const check = nativeModuleCheck(load);
+    const check = nativeModuleCheck(load, () => "/opt/amc runtime");
     expect(load).toHaveBeenCalledOnce();
     expect(check.status).toBe("FAIL");
     expect(check.message).toContain("different Node version");
     expect(check.fixHint).toContain("npm rebuild better-sqlite3");
     expect(JSON.stringify(check)).not.toContain("secret-fixture");
     expect(JSON.stringify(check)).not.toContain("/private/");
+  });
+  // The desktop runtime (`npm install --prefix <runtime>`) hoists better-sqlite3 above the AMC package, so a rebuild in the
+  // package directory finds nothing to rebuild: the hint names the folder whose node_modules holds it.
+  it("names the folder whose node_modules holds better-sqlite3 as the place to rebuild", () => {
+    class BrokenDatabase { constructor(_path: string) { throw new Error("NODE_MODULE_VERSION 127"); } prepare() { return { get: () => null }; } close() {} }
+    const runtime = "/Users/someone/Library/Application Support/Agent Maturity Compass/runtime";
+    expect(nativeModuleCheck(() => BrokenDatabase, () => runtime).fixHint).toBe(`Run: cd "${runtime}" && npm rebuild better-sqlite3, or reinstall AMC with this Node version active`);
+    const unknown = nativeModuleCheck(() => { throw new Error("Cannot find module"); }, () => null);
+    expect(unknown.fixHint).toContain("in the folder whose node_modules holds better-sqlite3");
+    expect(unknown.fixHint).toContain("the runtime folder for the desktop app");
+    expect(unknown.fixHint).not.toContain("AMC package directory");
+  });
+  it("locates better-sqlite3 for real: the folder holds node_modules/better-sqlite3", async () => {
+    const { existsSync } = await import("node:fs");
+    class BrokenDatabase { constructor(_path: string) { throw new Error("NODE_MODULE_VERSION 127"); } prepare() { return { get: () => null }; } close() {} }
+    const folder = /cd "(.+)" && npm rebuild/.exec(nativeModuleCheck(() => BrokenDatabase).fixHint ?? "")?.[1];
+    expect(folder).toBeDefined();
+    expect(existsSync(`${folder}/node_modules/better-sqlite3/package.json`)).toBe(true);
   });
   it.each([null, {}, { amc_probe: 0 }, { amc_probe: "1" }])("rejects a wrong query result and still closes: %j", result => {
     const close = vi.fn();

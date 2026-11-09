@@ -138,6 +138,9 @@ describe("authenticated bounded retained-output reading", () => {
         options: { expectedMonitorFingerprint } })).toThrow(/fingerprint|refused/);
     }
     expect(readSessionSpillRange({ workspace, events: f.events, locator: f.locator }).verification.expectedMonitorFingerprint).toBeNull();
+    // An empty AMC_EXPECTED_MONITOR_FINGERPRINT in the environment is no pin (an unanchored read), not a refusal.
+    process.env.AMC_EXPECTED_MONITOR_FINGERPRINT = "";
+    expect(readSessionSpillRange({ workspace, events: f.events, locator: f.locator }).verification.expectedMonitorFingerprint).toBeNull();
   });
 
   it("escapes terminal control bytes while JSON retains exact bytes", async () => {

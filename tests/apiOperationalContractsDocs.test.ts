@@ -7,8 +7,10 @@ const readProjectFile = (path: string): string => readFileSync(join(process.cwd(
 describe("API operational contract documentation", () => {
   test("documents Studio rate-limit headers and retry semantics", () => {
     const docs = readProjectFile("docs/API_SURFACES.md");
-    const studio = readProjectFile("src/studio/studioServer.ts");
+    // LIVE-RUNTIME-04 moved the header writer out of studioServer.ts into the shared limiter module, which Studio calls.
+    const studio = readProjectFile("src/studio/rateLimiter.ts");
 
+    expect(readProjectFile("src/studio/studioServer.ts")).toContain("setRateLimitHeaders");
     expect(studio).toContain("x-ratelimit-limit");
     expect(studio).toContain("ratelimit-limit");
     expect(studio).toContain("retry-after");

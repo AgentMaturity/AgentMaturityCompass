@@ -66,4 +66,5 @@ amc forecast refresh --scope agent --target-id <agentId>
 - Every cycle should end with:
   - signed artifacts updated
   - transparency/merkle roots advanced
-  - `amc verify all --json` green.
+  - `amc verify all --json --expect-monitor <monitor sha256>` green (without the monitor pin the ledger check
+    reports UNANCHORED and the command exits 1).

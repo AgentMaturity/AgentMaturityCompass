@@ -14,7 +14,7 @@ import { A4_STEPS } from "../../contracts/v1/a4Project.js";
 import { parseStation, STATIONS } from "../../domains/stations.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
-import { readinessItemBuilders, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState } from "../a4Readiness.js";
+import { proposeNextAction, readinessItemBuilders, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState } from "../a4Readiness.js";
 import type { A4Producer } from "../a4RouterStages.js";
 import { a4AnswerSchema, a4HypothesisSchema, type A4Answer, type A4Hypothesis, type A4Question, type A4Stage, type A4Step } from "../a4Schema.js";
 
@@ -222,10 +222,11 @@ function reached(state: A4ReadinessState, step: A4Step): boolean {
 }
 
 /** The proposal items (design §10.1 Readiness): each reads the brief Propose recorded, and only while its answers still stand. */
-function proposalItems(spec: Record<string, unknown>, answers: readonly A4Answer[]): A4ReadinessItem[] {
+function proposalItems(state: A4ReadinessState, spec: Record<string, unknown>, answers: readonly A4Answer[]): A4ReadinessItem[] {
   const ids = ["alternatives_present", "hypotheses_present", "learning_plan_present", "quality_spec_complete", "risk_section_present", "brief_valid"];
-  if (spec.schema !== ASPIRE_SPEC_SCHEMA) return ids.map((id) => waiting(id, ["NOT_PROPOSED"], { nextAction: { label: "Propose the brief" } }));
-  if (spec.answersDigest !== answersDigestOf(answers)) return ids.map((id) => waiting(id, ["BRIEF_STALE"], { nextAction: { label: "Answers changed: propose again" } }));
+  const propose = proposeNextAction(state, "aspire", "Propose the brief");
+  if (spec.schema !== ASPIRE_SPEC_SCHEMA) return ids.map((id) => waiting(id, ["NOT_PROPOSED"], { nextAction: propose }));
+  if (spec.answersDigest !== answersDigestOf(answers)) return ids.map((id) => waiting(id, ["BRIEF_STALE"], { nextAction: propose }));
   const brief = (spec.brief ?? {}) as Record<string, unknown>;
   const quality = a4QualitySpecSchema.safeParse(spec.quality);
   const unmeasured = quality.success ? unmeasuredTargets(quality.data) : [];
@@ -335,14 +336,15 @@ function hypothesisItems(state: A4ReadinessState, spec: Record<string, unknown>,
 export function aspireItems(state: A4ReadinessState, query: A4ReadinessQuery): A4ReadinessItem[] {
   const { spec, answers, revisionNo } = aspireSpecOf(state);
   const askCodes = askGapCodes(answerGaps(answers));
+  // Ask before Understand (A-3): Understand needs the required answers, so a new project's next action is answering them.
   return [
+    askCodes.length === 0 ? item("ask_complete", "READY") : waiting("ask_complete", askCodes, { nextAction: { label: "Answer or confirm the listed questions" } }),
     !reached(state, "understood") ? waiting("understanding_confirmed", ["UNDERSTANDING_NOT_CONFIRMED"], { nextAction: { label: "Run Understand, then confirm it" } })
       // Answers do not change after Aspire; at Aspire a confirmation counts only for an understanding of the current answers.
       : state.project.stage === "aspire" && !understandingCurrent(spec, answers)
         ? waiting("understanding_confirmed", ["UNDERSTANDING_STALE"], { nextAction: { label: "Answers changed: run Understand again, then confirm it" } })
         : item("understanding_confirmed", "READY"),
-    askCodes.length === 0 ? item("ask_complete", "READY") : waiting("ask_complete", askCodes, { nextAction: { label: "Answer or confirm the listed questions" } }),
-    ...proposalItems(spec, answers),
+    ...proposalItems(state, spec, answers),
     ...buildItems(state, spec, revisionNo, query.live.driftedSlots),
     ...hypothesisItems(state, spec, query.now)
   ];

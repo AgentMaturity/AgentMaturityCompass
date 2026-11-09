@@ -11,6 +11,7 @@ import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine
 import { verifyPluginWorkspace } from "../plugins/pluginApi.js";
 import { verifyIdentityConfigSignature, loadIdentityConfig } from "../identity/identityConfig.js";
 import { pathExists } from "../utils/fs.js";
+import { weakCidrs } from "../studio/listenPolicy.js";
 
 type SourceKind = "default" | "env" | "env_file";
 
@@ -37,6 +38,7 @@ const trackedEnvKeys = [
   "AMC_GATEWAY_PORT",
   "AMC_PROXY_PORT",
   "AMC_TOOLHUB_PORT",
+  "AMC_DASHBOARD_PORT",
   "AMC_LOG_LEVEL",
   "AMC_LAN_MODE",
   "AMC_ALLOWED_CIDRS",
@@ -45,6 +47,7 @@ const trackedEnvKeys = [
   "AMC_DATA_RETENTION_DAYS",
   "AMC_MIN_FREE_DISK_MB",
   "AMC_MAX_REQUEST_BYTES",
+  "AMC_GATEWAY_MAX_REQUEST_BYTES",
   "AMC_CORS_ALLOWED_ORIGINS",
   "AMC_ALLOW_PUBLIC_BIND",
   "AMC_METRICS_BIND",
@@ -68,6 +71,7 @@ function formatConfig(config: StudioRuntimeConfig): Record<string, unknown> {
     gatewayPort: config.gatewayPort,
     proxyPort: config.proxyPort,
     toolhubPort: config.toolhubPort,
+    dashboardPort: config.dashboardPort,
     logLevel: config.logLevel,
     lanMode: config.lanMode,
     allowedCidrs: config.allowedCidrs,
@@ -76,6 +80,7 @@ function formatConfig(config: StudioRuntimeConfig): Record<string, unknown> {
     dataRetentionDays: config.dataRetentionDays,
     minFreeDiskMb: config.minFreeDiskMb,
     maxRequestBytes: config.maxRequestBytes,
+    gatewayMaxRequestBytes: config.gatewayMaxRequestBytes,
     corsAllowedOrigins: config.corsAllowedOrigins,
     allowPublicBind: config.allowPublicBind,
     metricsBind: config.metricsBind,
@@ -106,11 +111,6 @@ export function configPrintCli(params: {
       source: sourceForEnv(env, key)
     }))
   };
-}
-
-function weakCidrs(cidrs: string[]): boolean {
-  const normalized = new Set(cidrs.map((item) => item.trim()));
-  return normalized.has("0.0.0.0/0") || normalized.has("::/0");
 }
 
 export async function configExplainCli(params: {

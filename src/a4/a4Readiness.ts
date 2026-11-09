@@ -17,10 +17,11 @@ import type { ClaimEnvelope, ClaimEvidenceTier, ClaimMethod } from "../claims/el
 import type { VerifierReportV1 } from "../trust/verifierReport.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { A4_STEPS } from "../contracts/v1/a4Project.js";
 import type { A4ResolvedRef } from "./a4Evidence.js";
 import {
   A4_BOUND_ITEMS, A4_STAGES, deriveSelfApprovalAllowed, storedBoundItems, gatePolicyFloorViolations, gatePolicyOf, gateSupersededBy, ratchetedFromChain, type A4_BLOCKER_KINDS,
-  type A4ChainLink, type A4GatePolicyV1, type A4Member, type A4Principal, type A4ProjectRow, type A4ReadinessV1, type A4Stage,
+  type A4ChainLink, type A4GatePolicyV1, type A4Member, type A4Principal, type A4ProjectRow, type A4ReadinessV1, type A4Stage, type A4Step,
   type a4DecisionRowSchema, type a4EffectRowSchema, type a4GateRowSchema, type a4ReadinessItemSchema, type a4RevisionRowSchema
 } from "./a4Schema.js";
 import { SOD_SENTENCE } from "./a4SoD.js";
@@ -92,6 +93,8 @@ export interface A4ReadinessState {
 /** Live facts the caller gathered (a4Gates.collectFacts); null = could not be read. */
 export interface A4LiveFacts {
   readonly activeLocal: string[] | null;
+  /** The ACTIVE local users holding the workspace role OWNER, by user id (implicit project owners); null when unreadable, absent when not read. */
+  readonly localOwners?: readonly string[] | null;
   readonly hostPrincipals: number | null;
   readonly hostedRouter: boolean;
   readonly hostMode: boolean;
@@ -366,6 +369,42 @@ export function readinessItemBuilders(section: A4ReadinessItem["section"]) {
   return { item, waiting };
 }
 const { item } = readinessItemBuilders("governance");
+
+/** The way back to Propose once a stage is past Explain: Propose runs only at step explained (A4_STEP_ORDER). */
+const REDO_PROPOSAL = "Answer again (a new revision returns this stage to Ask), then understand, confirm, explain and propose";
+/**
+ * A-3: a Propose item's next action. Before Explain the step's own action leads (the evaluator's fallback), so the guide
+ * never names a Propose the routes refuse; past it a new proposal needs a new revision.
+ */
+export function proposeNextAction(state: A4ReadinessState, stage: A4Stage, label: string): A4ReadinessItem["nextAction"] {
+  if (state.project.stage !== stage) return null;
+  const at = A4_STEPS.indexOf(state.project.step), explained = A4_STEPS.indexOf("explained");
+  return at === explained ? { label } : at > explained ? { label: REDO_PROPOSAL } : null;
+}
+/**
+ * A-4/A-5: who may decide a gate as roleRefusals and assertMember admit them, by key: approver or owner members (any workspace
+ * role: generous) and the ACTIVE local workspace OWNERs (implicit owners). Null when unread, or with a host session live (a hosted
+ * call has one): host roles are unread. ponytail: an OWNER of the host who is not signed in is not seen; read host memberships then.
+ */
+function localDeciders(state: A4ReadinessState, live: A4LiveFacts): Set<string> | null {
+  if (live.localOwners == null || live.hostPrincipals !== 0) return null;
+  return new Set([...state.members.filter((member) => member.roles.includes("approver") || member.roles.includes("owner")).map((member) => member.principalKey),
+    ...live.localOwners.map((userId) => `LOCAL_USER:${userId}`)]);
+}
+/**
+ * Whether the one ACTIVE local user self-approves (design §5.3; a stage gate's exclusions then do not bar them), regulated status
+ * aside: a regulated project (an unstated risk tier too) has SOD_VIOLATION, and adding a user before the tier is stated ends self-approval.
+ */
+function soloSelfApproval(state: A4ReadinessState, query: A4ReadinessQuery): boolean {
+  const { activeLocal, hostPrincipals, hostedRouter } = query.live;
+  const only = activeLocal?.length === 1 ? { authSource: "LOCAL_USER", userId: activeLocal[0]! } as A4Principal : null;
+  return only !== null && deriveSelfApprovalAllowed({ activeLocal, hostPrincipals, hostedRouter, regulated: false, workspaceFloor: query.floor.allowSelfApproval,
+    ratcheted: selfApprovalFacts(state, query, only).ratcheted, decidingPrincipal: only });
+}
+/** `amc a4 members` as it runs: a writer names its `amc approvals login` token and the head it read (`amc a4 guide` prints it). */
+const addApprovers = (projectId: string, label: string): NonNullable<A4ReadinessItem["nextAction"]> => ({ label,
+  command: `amc a4 members ${projectId} --member LOCAL_USER:<userId> --project-role approver --session-token-file <file> --expect-head-seq <n>` });
+const QUORUM_UNREACHABLE = "QUORUM_UNREACHABLE"; // A-5's warning: progress never refuses on it (allowedFor)
 const unread = (id: string, reason: string, mandatory = true): A4ReadinessItem =>
   item(id, "NOT_EVALUATED", { kind: "source_unavailable", reasonCodes: [reason], mandatory });
 
@@ -381,10 +420,14 @@ function governanceItems(state: A4ReadinessState, query: A4ReadinessQuery, gates
   const { live, now } = query;
   const owners = state.members.filter((member) => member.roles.includes("owner"));
   const approvers = state.members.filter((member) => member.roles.includes("approver") || member.roles.includes("owner"));
+  const deciders = localDeciders(state, live), solo = soloSelfApproval(state, query);
   const items: A4ReadinessItem[] = [
     owners.length > 0 ? item("members.present", "READY") : item("members.present", "BLOCKED", { kind: "evidence_missing", reasonCodes: ["NO_OWNER"] }),
     live.activeLocal === null || live.hostPrincipals === null ? unread("members.candidates", "MEMBER_CANDIDATES_LIMITED", false)
-      : item("members.candidates", "READY", { reasonCodes: live.hostMode ? ["MEMBER_CANDIDATES_LIMITED"] : [], mandatory: false }),
+      : deciders !== null && deciders.size < 2 && !solo ? item("members.candidates", "WAITING", { kind: "evidence_missing", mandatory: false,
+        nextAction: addApprovers(state.project.project_id, "Add approvers as project members before requesting a gate (adding a member supersedes open gates, which are then requested again)"),
+        reasonCodes: ["NO_SECOND_APPROVER"] })
+        : item("members.candidates", "READY", { reasonCodes: live.hostMode ? ["MEMBER_CANDIDATES_LIMITED"] : [], mandatory: false }),
     live.vaultUnlocked === null ? unread("signing.available", "VAULT_LOCKED")
       : item("signing.available", live.vaultUnlocked ? "READY" : "WAITING", live.vaultUnlocked ? {} : { kind: "source_unavailable", reasonCodes: ["VAULT_LOCKED"] }),
     // At Activate the route of each kind A4 signs is named: A4_RECORD (every record) and A4_PACKAGE (the package manifest).
@@ -432,7 +475,7 @@ function governanceItems(state: A4ReadinessState, query: A4ReadinessQuery, gates
     nextAction: { label: `Required on this gate: ${pending.map((entry) => entry.label).join("; ")}` } }) : item("gate.required_reviews", "READY"));
   const stale = open.some((gate) => gate.counted.length < state.decisions.filter((decision) => decision.gate_id === gate.row.gate_id).length);
   items.push(stale ? item("approvals.fresh", "WAITING", { kind: "evidence_stale", reasonCodes: ["GATE_STALE"], mandatory: false }) : item("approvals.fresh", "READY", { mandatory: false }));
-  items.push(sodItem(state, open, regulated));
+  items.push(sodItem(state, open, regulated, deciders, solo));
   if (query.stage === "activate") items.push(lineageItem(state, query, regulated));
   return items;
 }
@@ -502,8 +545,12 @@ function effectsItem(state: A4ReadinessState, lost: readonly string[]): A4Readin
   return item("effects.failed", "READY");
 }
 
-/** The gate-derived SoD view: a regulated gate that the member set cannot satisfy waits with SOD_VIOLATION (design §5.3). */
-function sodItem(state: A4ReadinessState, open: readonly A4GateStatus[], regulated: boolean): A4ReadinessItem {
+/**
+ * The gate-derived SoD view: a regulated gate that the member set cannot satisfy waits with SOD_VIOLATION (design §5.3). A-5:
+ * elsewhere a PENDING gate its deciders (localDeciders less its requester, authors and builders; one self-approving user counts
+ * once) cannot bring to quorum waits with QUORUM_UNREACHABLE, a warning progress never refuses on (allowedFor).
+ */
+function sodItem(state: A4ReadinessState, open: readonly A4GateStatus[], regulated: boolean, deciders: ReadonlySet<string> | null, solo: boolean): A4ReadinessItem {
   const selfApproved = open.some((gate) => gate.counted.some((decision) => decision.self_approved === 1));
   for (const gate of open) {
     const excluded = new Set<string>(parseJson(gate.row.excluded_keys_json) as string[] ?? []);
@@ -511,6 +558,12 @@ function sodItem(state: A4ReadinessState, open: readonly A4GateStatus[], regulat
     if (regulated && new Set(eligible.map((member) => member.principalKey)).size < gate.required) {
       return item("sod", "WAITING", { kind: "sod_violation", reasonCodes: ["SOD_VIOLATION"],
         nextAction: { label: "Add a second member (`amc user add` or a host membership), then re-request the gate", command: "amc user add" } });
+    }
+    const reachable = deciders === null ? null : solo ? deciders.size : [...deciders].filter((key) => !excluded.has(key)).length;
+    if (!regulated && gate.status === "PENDING" && reachable !== null && reachable < gate.required) {
+      return item("sod", "WAITING", { kind: "sod_violation", reasonCodes: [QUORUM_UNREACHABLE, `ELIGIBLE:${reachable}`, `REQUIRED:${gate.required}`],
+        nextAction: addApprovers(state.project.project_id, `This gate can reach ${reachable} of the ${gate.required} approvals it needs: add approvers as project `
+          + "members (a new user first needs `amc user add`); adding one supersedes the gate, so request it again") });
     }
   }
   return item("sod", "READY", { kind: selfApproved ? "self_approved" : null,
@@ -612,8 +665,9 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
     progress: [
       ...principalUnresolved,
       ...(gateList.some((gate) => gate?.status === "QUORUM_MET") ? [] : ["GATE_PENDING"]),
-      ...ids((candidate) => (nonGate(candidate) || candidate.id === "sod" || candidate.id === "gate.required_reviews") && candidate.status !== "READY"
-        && candidate.status !== "COMPLETE" && candidate.acknowledged === null)
+      // sod's A-5 quorum warning is advice: it never refuses (SOD_VIOLATION, the regulated view, does).
+      ...ids((candidate) => (nonGate(candidate) || (candidate.id === "sod" && !candidate.reasonCodes.includes(QUORUM_UNREACHABLE))
+        || candidate.id === "gate.required_reviews") && candidate.status !== "READY" && candidate.status !== "COMPLETE" && candidate.acknowledged === null)
     ]
   };
   return Object.fromEntries(A4_ACTIONS.map((action) => {
@@ -649,6 +703,40 @@ function acknowledgements(state: A4ReadinessState, now: number): Map<string, { a
   return out;
 }
 
+const STEP_NEXT: Partial<Record<A4Step, string>> = { asked: "Run Understand, then confirm it", understood: "Run Explain", explained: "Run Propose",
+  proposed: "Request the direction gate", direction_approved: "Run Build", built: "Run Review", reviewed: "Request the completion gate" };
+
+/**
+ * A stage's status and next action from its items (A-3). A mandatory BLOCKED integrity item counts like any other blocker
+ * (allowedFor already refuses requestGate on it); when no item names an action the current stage's own next step is
+ * named, so the guide never says "nothing is waiting" while work is, nor names a step the routes refuse.
+ */
+export function readinessHeadline(state: Pick<A4ReadinessState, "project">, query: Pick<A4ReadinessQuery, "stage" | "live">, items: readonly A4ReadinessItem[],
+  gates: { direction: A4GateStatus | null; completion: A4GateStatus | null }): Pick<A4ReadinessV1, "status" | "nextAction"> {
+  const mandatory = items.filter((candidate) => candidate.mandatory && (candidate.section !== "integrity" || candidate.status === "BLOCKED"));
+  const blocked = mandatory.filter((candidate) => candidate.status === "BLOCKED");
+  // A mandatory BLOCKED item (a failed or lost effect, a freeze, an unsigned policy) outranks COMPLETE; once both gates are
+  // consumed only a running effect or an unread freeze keeps the stage WAITING, so a past stage is not held by other waits.
+  const status: A4ReadinessV1["status"] = !query.live.integrity.valid ? "BLOCKED" : state.project.hold === 1 ? "ON_HOLD"
+    : blocked.length > 0 ? "BLOCKED"
+      : gates.direction?.status === "CONSUMED" && gates.completion?.status === "CONSUMED"
+        ? (mandatory.some((candidate) => (candidate.id === "effects.failed" && candidate.status === "WAITING")
+          || (candidate.id === "hold.none" && candidate.status === "NOT_EVALUATED")) ? "WAITING" : "COMPLETE")
+        : mandatory.some((candidate) => (candidate.status === "WAITING" || candidate.status === "NOT_EVALUATED") && candidate.acknowledged === null) ? "WAITING" : "READY";
+  const named = mandatory.find((candidate) => candidate.status !== "READY" && candidate.status !== "COMPLETE" && candidate.nextAction !== null)?.nextAction ?? null;
+  if (named !== null || state.project.stage !== query.stage || status === "COMPLETE") return { status, nextAction: named };
+  if (status === "ON_HOLD") return { status, nextAction: { label: "On hold: an owner resumes the project" } };
+  const gateName = state.project.step === "proposed" ? "direction" : state.project.step === "reviewed" ? "completion" : null;
+  const gate = gateName === null ? null : gates[gateName];
+  // A denied gate blocks through its own item (GATE_DENIED); unless another item blocks too, the way back is a new revision.
+  if (gate?.status === "DENIED" && blocked.every((candidate) => GATE_DERIVED.has(candidate.id))) return { status, nextAction: { label: `The ${gateName} gate was denied on this revision. ${REDO_PROPOSAL}` } };
+  if (status === "BLOCKED") return { status, nextAction: { label: `Blocked by ${blocked.map((candidate) => candidate.id).join(", ") || "store.integrity"}: see each item's reason codes` } };
+  if (gate?.status === "QUORUM_MET") return { status, nextAction: { label: `Complete the ${gateName} gate` } };
+  if (gate?.status === "PENDING") return { status, nextAction: { label: `Approvers decide on the ${gateName} gate (${gate.approvals} of ${gate.required} approvals)` } };
+  const label = STEP_NEXT[state.project.step];
+  return { status, nextAction: label === undefined ? null : { label } };
+}
+
 /** The one readiness evaluator (design §7). */
 export function evaluateA4Readiness(state: A4ReadinessState, query: A4ReadinessQuery): A4ReadinessV1 {
   const { stage, now, live } = query;
@@ -675,15 +763,7 @@ export function evaluateA4Readiness(state: A4ReadinessState, query: A4ReadinessQ
   const staleIfMoved = (gate: A4GateStatus | null): A4GateStatus | null => gate !== null && readinessMoved(first, gate) ? { ...gate, status: "STALE" } : gate;
   const gates = { direction: staleIfMoved(opened.direction), completion: staleIfMoved(opened.completion) };
   const items = gates.direction === opened.direction && gates.completion === opened.completion ? first : itemsFor(gates);
-  const mandatory = items.filter((candidate) => candidate.mandatory && candidate.section !== "integrity");
-  // A mandatory BLOCKED item (a failed or lost effect, a freeze, an unsigned policy) outranks COMPLETE; once both gates are
-  // consumed only a running effect or an unread freeze keeps the stage WAITING, so a past stage is not held by other waits.
-  const status: A4ReadinessV1["status"] = !live.integrity.valid ? "BLOCKED" : state.project.hold === 1 ? "ON_HOLD"
-    : mandatory.some((candidate) => candidate.status === "BLOCKED") ? "BLOCKED"
-      : gates.direction?.status === "CONSUMED" && gates.completion?.status === "CONSUMED"
-        ? (mandatory.some((candidate) => (candidate.id === "effects.failed" && candidate.status === "WAITING")
-          || (candidate.id === "hold.none" && candidate.status === "NOT_EVALUATED")) ? "WAITING" : "COMPLETE")
-        : mandatory.some((candidate) => (candidate.status === "WAITING" || candidate.status === "NOT_EVALUATED") && candidate.acknowledged === null) ? "WAITING" : "READY";
+  const { status, nextAction } = readinessHeadline(state, query, items, gates);
   const stageDecisions = state.decisions.filter((decision) => decision.gate_id === direction?.gate_id || decision.gate_id === completion?.gate_id);
   const members = [...state.refs.filter((ref) => ref.revisionNo === state.project.revision_no).map((ref) => refEnvelope(ref, regulated, now)),
     ...stageDecisions.map((decision) => decisionEnvelope(decision, regulated, now))];
@@ -701,7 +781,7 @@ export function evaluateA4Readiness(state: A4ReadinessState, query: A4ReadinessQ
   const facts = selfApprovalFacts(state, query, query.principal);
   const body = {
     schema: "amc.a4-readiness/v1" as const, status, items,
-    nextAction: mandatory.find((candidate) => candidate.status !== "READY" && candidate.status !== "COMPLETE" && candidate.nextAction !== null)?.nextAction ?? null,
+    nextAction,
     gates: { direction: view(gates.direction), completion: view(gates.completion) }, staleApprovals,
     integrity: { valid: live.integrity.valid, reasonCodes: live.integrity.valid ? [] : ["A4_INTEGRITY_FAILED"] }, claim,
     claimBoundary: `Readiness of A4 records. Gate decisions are self-reported acknowledgements, never independent reviews; ${SOD_SENTENCE}. Integrity items are about bytes, not evidence about the agent.`,

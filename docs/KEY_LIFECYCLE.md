@@ -32,7 +32,7 @@ That role view is legacy compatibility, not new provider authority. Provider tra
 
 ## The key set: atomic key changes
 
-Creating a vault, the v1 migration and every rotation are one key-set generation. AMC writes every file under a staged name, then `.amc/keys/keyset.pending.json`, renames the staged files into place, and commits by renaming the pending file to `.amc/keys/keyset.json`:
+Creating a vault, the v1 migration, every rotation and a passphrase change (`amc vault passphrase`, which keeps every key) are each one key-set generation. AMC writes every file under a staged name, then `.amc/keys/keyset.pending.json`, renames the staged files into place, and commits by renaming the pending file to `.amc/keys/keyset.json`:
 
 ```json
 { "type": "amc.keyset", "version": 1, "generation": 12,

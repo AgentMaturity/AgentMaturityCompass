@@ -1024,7 +1024,8 @@ function renderNextActions(d) {
   const layers = d.latestRun?.layerScores || [];
   const weakest = layers.reduce((min, l) => l.avgFinalLevel < (min?.avgFinalLevel ?? 99) ? l : min, null);
 
-  if (!score || !d.latestRun?.questionScores?.length) {
+  /* A first run of 0.0/5 is a score, so only a missing run asks for one. */
+  if (!d.latestRun?.questionScores?.length) {
     actions.push({
       title: 'Run your first full score',
       body: 'Kick off a live trust score from Studio with no setup.',
