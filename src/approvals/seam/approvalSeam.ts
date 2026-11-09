@@ -66,8 +66,8 @@ export interface ApprovalSeamInit {
   readonly poll?: ApprovalPollSchedule;
   /** Injected so a test can pin the audit id. */
   readonly newApprovalId?: () => string;
-  /** Reports the engine request id the moment it exists, so a UI can render the prompt. */
-  readonly onRaised?: (event: { readonly approvalId: string; readonly approvalRequestId: string }) => void;
+  /** Reports the engine request id the moment it exists, so a UI can render the prompt against the gated tool call. */
+  readonly onRaised?: (event: { readonly approvalId: string; readonly approvalRequestId: string; readonly toolCallId: string }) => void;
   /** Who started the session whose calls this seam asks about (P1-78), recorded on every engine request it raises. */
   readonly initiator?: string;
 }
@@ -236,7 +236,7 @@ export class ApprovalSeam {
         ? {}
         : {
             onRaised: (approvalRequestId: string): void => {
-              this.onRaised?.({ approvalId, approvalRequestId });
+              this.onRaised?.({ approvalId, approvalRequestId, toolCallId: ask.toolCallId });
             }
           })
     });

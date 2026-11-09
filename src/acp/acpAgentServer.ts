@@ -7,16 +7,16 @@ import { assertSecondSessionWriter, SessionStoreSingleWriterError } from "../per
 import { amcVersion } from "../version.js";
 import { createAcpConnection, type AcpConnection, type AcpSink } from "./acpConnection.js";
 import { ACP_ERROR, AcpFailure } from "./acpErrors.js";
-import { projectSessionUpdates } from "./acpProjection.js";
 import { acpProtocolVersion, checkAcpShape, checkInitializedAcpShape } from "./acpSchema.js";
 import { ACP_STOP_REASONS, acpStopReasonFor, stopReasonIsLossy } from "./acpStopReason.js";
-import { ACP_MAX_TURN_UPDATE_BYTES, validateAcpCommittedTail } from "./acpCommittedUpdates.js";
+import { ACP_PERMISSION_CONTRACT, type AcpApprovalRaised } from "./acpPermission.js";
+import { chargeUpdateBudget, projectCommittedTail } from "./acpCommittedStream.js";
 import { projectNativeValidation } from "../agent/nativeValidationProjection.js";
 import { acpSupportsImageInput, assertAcpRouteContent, flattenPrompt, orderedPrompt, requiresOrderedPrompt, type AcpPromptBlock, type AcpPromptRoute } from "./acpPromptInput.js";
 import { NATIVE_ORDERED_INPUT_FORMAT } from "../attachments/nativeOrderedInput.js";
 import { NATIVE_AUDIO_INPUT_FORMAT } from "../attachments/nativeAudioInput.js";
 import { acpSupportsAudioInput, audioPrompt } from "./acpAudioInput.js";
-import { ACP_MAX_UPDATE_PARAMS_BYTES, acpPromptInputFormat, acpPromptClientRequestId, assertAcpPromptFields, nativeAcpCapabilities, type AcpForkSessionFactory } from "./acpRuntimeContracts.js";
+import { ACP_AVAILABLE_COMMANDS_CONTRACT, ACP_RUNTIME_META_KEY, ACP_THOUGHT_UPDATES_CONTRACT, acpPromptInputFormat, acpPromptClientRequestId, assertAcpPromptFields, nativeAcpCapabilities, type AcpApprovalRaisedHook, type AcpAvailableCommand, type AcpForkSessionFactory } from "./acpRuntimeContracts.js";
 import { prepareAcpHistory, assertAcpForkLineage } from "./acpHistoryContinuity.js";
 import { readAcpSessionUpdatePage } from "./acpSessionUpdatePage.js";
 import { SessionHistoryRefused } from "../session/sessionHistoryReader.js";
@@ -58,6 +58,8 @@ import type { TurnEndReason } from "../session/sessionTypes.js";
  * dropped quietly -- whoever can spawn this process already has the workspace.
  */
 
+export type { AcpApprovalRaisedHook } from "./acpRuntimeContracts.js";
+
 /** What the launcher fixes, and a client cannot change. */
 export interface AcpAgentInit {
   readonly workspace: string;
@@ -69,7 +71,13 @@ export interface AcpAgentInit {
     readonly workspace: string;
     readonly agentId: string;
     readonly signal: AbortSignal;
+    /** Wire this as the approval gate's `onRaised`; the server turns it into `session/request_permission` when negotiated. */
+    readonly approvalRaised: AcpApprovalRaisedHook;
   }) => AgentSession | Promise<AgentSession>;
+  /** The launcher's permission protocol (src/acp/acpPermission.ts); absent means approvals only wait in the inbox. */
+  readonly onApprovalRaised?: (event: AcpApprovalRaised) => void;
+  /** The slash commands a client may offer (skills only); announced after session/new, load and fork when negotiated. */
+  readonly availableCommands?: () => readonly AcpAvailableCommand[];
   readonly resumeSessionFactory?: AcpAgentInit["sessionFactory"];
   /** Must inherit authenticated context; a lineage-only factory is not a fork. */
   readonly forkSessionFactory?: AcpForkSessionFactory;
@@ -90,6 +98,8 @@ interface PromptSlot {
   started: boolean;
   cancelled: boolean;
   cancelFailed: boolean;
+  /** Aborted when this prompt settles, so a permission dialog raised under it never outlives it. */
+  readonly ended: AbortController;
 }
 
 interface Registered {
@@ -125,6 +135,8 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
   const cleanupPending = new Set<AgentSession>();
   let initialized = false;
   let currentPlanUpdates = false;
+  // Generic ACP clients get the standard set; a client that identifies itself as an AMC SDK/Studio gets each only when it opted in.
+  let thoughtUpdates = false, availableCommands = false, permissionRequests = false;
   let initializing = false;
   let closing = false;
   let closePromise: Promise<void> | undefined;
@@ -266,9 +278,13 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
     let protocolVersion: number;
     try {
       await require_("InitializeRequest", params);
-      const extension = (params as { clientCapabilities?: { _meta?: Record<string, unknown> } }).clientCapabilities?._meta?.["dev.agentmaturity.amc"];
-      currentPlanUpdates = extension !== null && typeof extension === "object" && !Array.isArray(extension)
-        && (extension as { currentPlanUpdates?: unknown }).currentPlanUpdates === "amc-current-plan-v1";
+      const extension = (params as { clientCapabilities?: { _meta?: Record<string, unknown> } }).clientCapabilities?._meta?.[ACP_RUNTIME_META_KEY];
+      const amcClient = extension !== null && typeof extension === "object" && !Array.isArray(extension) ? extension as Record<string, unknown> : null;
+      currentPlanUpdates = amcClient?.currentPlanUpdates === "amc-current-plan-v1";
+      thoughtUpdates = amcClient === null || amcClient.thoughtUpdates === ACP_THOUGHT_UPDATES_CONTRACT;
+      availableCommands = init.availableCommands !== undefined && (amcClient === null || amcClient.availableCommands === ACP_AVAILABLE_COMMANDS_CONTRACT);
+      // An AMC-identified client (SDKs, Studio) treats an agent-to-client request as a protocol error unless it opted in.
+      permissionRequests = init.onApprovalRaised !== undefined && (amcClient === null || amcClient.permissionRequests === ACP_PERMISSION_CONTRACT);
       protocolVersion = await acpProtocolVersion();
       if (closing) throw new AcpFailure(ACP_ERROR.internal, "the agent is shutting down");
       initialized = true;
@@ -281,7 +297,8 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       authMethods: [],
       agentCapabilities: nativeAcpCapabilities({ route: init.promptRoute, orderedImageInput, audioInput,
         loadSession: init.resumeSessionFactory !== undefined, forkSession: init.forkSessionFactory !== undefined,
-        lineageFork: init.lineageForkFactory !== undefined, nativeExecution: init.nativeExecution })
+        lineageFork: init.lineageForkFactory !== undefined, nativeExecution: init.nativeExecution,
+        availableCommands: init.availableCommands !== undefined, permissionRequests: init.onApprovalRaised !== undefined })
     };
   }
 
@@ -299,7 +316,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
     if (closing || signal.aborted) throw new AcpFailure(ACP_ERROR.internal, "session creation was cancelled or the agent is shutting down");
     admitAnotherWriter("A second ACP session");
     const sessionId = randomUUID();
-    const session = await init.sessionFactory({ sessionId, workspace: init.workspace, agentId: init.agentId, signal: AbortSignal.any([signal, shutdown.signal]) });
+    const session = await init.sessionFactory({ sessionId, workspace: init.workspace, agentId: init.agentId, signal: AbortSignal.any([signal, shutdown.signal]), approvalRaised });
     if (closing || signal.aborted || session.sessionId !== sessionId || sessionIdentityReserved(sessionId)) {
       if (!sessionIdentityReserved(session.sessionId)) {
         try { await session.close(); } catch { cleanupPending.add(session); }
@@ -307,6 +324,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       throw new AcpFailure(ACP_ERROR.internal, "session creation was cancelled or returned an incompatible identity");
     }
     sessions.set(sessionId, { session, projected: 0, projectedHash: null, updateBytes: 0, projectionFailed: false, running: false, releasing: false });
+    announceCommands(sessionId);
     return { sessionId };
   }
 
@@ -349,7 +367,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
     loading.add(request.sessionId);
     let session: AgentSession;
     try {
-      session = await init.resumeSessionFactory({ sessionId: request.sessionId, workspace: init.workspace, agentId: init.agentId, signal: AbortSignal.any([signal, shutdown.signal]) });
+      session = await init.resumeSessionFactory({ sessionId: request.sessionId, workspace: init.workspace, agentId: init.agentId, signal: AbortSignal.any([signal, shutdown.signal]), approvalRaised });
     } catch (error) {
       loading.delete(request.sessionId);
       if (error instanceof SessionResumeRefused) throw new AcpFailure(ACP_ERROR.invalidParams, "verified session resume was refused", { reason: error.code });
@@ -368,6 +386,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       // ACP loading replays historical updates before its response. These are
       // history, not output attributed to a newly submitted prompt.
       for (const update of history.updates) sendUpdate(entry, request.sessionId, update);
+      announceCommands(request.sessionId);
       return {};
     } catch (error) {
       if (loadedEntry && sessions.get(request.sessionId) === loadedEntry) sessions.delete(request.sessionId);
@@ -417,7 +436,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
           || [...cleanupPending].some(session => session.sessionId === request.sessionId)) throw new AcpFailure(ACP_ERROR.invalidParams, "fork was cancelled or its source is still loading or awaiting cleanup");
       admitAnotherWriter("An ACP session fork");
       child = await factory({ parentSessionId: request.sessionId, workspace: init.workspace,
-        agentId: init.agentId, signal: AbortSignal.any([signal, shutdown.signal]) });
+        agentId: init.agentId, signal: AbortSignal.any([signal, shutdown.signal]), approvalRaised });
       if (closing || signal.aborted || child.sessionId === request.sessionId || sessionIdentityReserved(child.sessionId)) {
         throw new AcpFailure(ACP_ERROR.internal, "fork returned an incompatible, already owned or cancelled session");
       }
@@ -432,6 +451,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
         route: init.promptRoute, orderedImageInput, audioInput });
       sessions.set(child.sessionId, { session: child, projected: rows.length, projectedHash: history.head,
         updateBytes: 0, projectionFailed: false, running: false, releasing: false });
+      announceCommands(child.sessionId);
       return { sessionId: child.sessionId, _meta: { "dev.agentmaturity.amc": { parentSession: lineage.parent,
         ...(lineageOnly ? { forkContext: "lineage-only" } : {}) } } };
     } catch (error) {
@@ -463,7 +483,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
     // Reserve protocol ownership BEFORE any await, but commit no native inbox
     // work until the whole prompt is validated. Same-read cancellation can now
     // target this slot without ever cancelling the next prompt on this session.
-    const slot: PromptSlot = { started: false, cancelled: signal.aborted, cancelFailed: false };
+    const slot: PromptSlot = { started: false, cancelled: signal.aborted, cancelFailed: false, ended: new AbortController() };
     entry.active = slot;
     entry.running = true;
     const onAbort = (): void => requestCancel(entry, slot, "acp-request-abort");
@@ -578,12 +598,49 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       signal.removeEventListener("abort", onAbort);
       entry.running = false;
       entry.active = undefined;
+      slot.ended.abort();
     }
   }
 
   /** The execution phases (P2-13) after a settled prompt; the native runtime only. Evidence verification stays pending here. */
   function executionOf(sessionId: string, turn: TurnEndReason): { execution: ReturnType<typeof executionStatusFor> } | undefined {
     return init.nativeExecution ? { execution: executionStatusFor(init.workspace, { sessionId, admission: "admitted", turn, verified: null }) } : undefined;
+  }
+
+  /**
+   * The launcher's gate hook, resolved per raised request against the live negotiation and the prompt slot that is
+   * active NOW: a late or stale answer cancels that prompt or nothing, never whichever prompt is active when it
+   * arrives. The committed tail is flushed first, so the `tool_call` the permission names reaches the client before
+   * the request that asks about it. When that flush fails the session is unusable and its prompt's poll disposes the
+   * turn; no request naming a tool call the client never received is sent.
+   */
+  function approvalRaised(sessionId: string, event: { readonly approvalId: string; readonly approvalRequestId: string; readonly toolCallId: string }): void {
+    if (init.onApprovalRaised === undefined) return;
+    const entry = sessions.get(sessionId), slot = entry?.active;
+    if (entry && permissionRequests) {
+      try { flush(entry, sessionId); }
+      catch (error) { log(`no permission request sent for ${event.approvalRequestId}: committed updates could not be flushed (${error instanceof Error ? error.message : String(error)})`); return; }
+    }
+    init.onApprovalRaised({ sessionId, ...event, negotiated: permissionRequests,
+      // Withdrawn (prompt ended, approval expired or decided elsewhere): the client is told with `$/cancel_request`.
+      request: (method, params, signal) => connection.request(method, params, signal, { announceCancel: true }),
+      turnEnded: slot?.ended.signal ?? AbortSignal.abort(),
+      cancelTurn: by => { if (entry && slot) requestCancel(entry, slot, by); } });
+  }
+
+  /**
+   * `available_commands_update` after the reply that registered the session has been written, never before it (a
+   * client cannot own an update for a session it has not been told about). A failure poisons the session like any
+   * other undeliverable committed update.
+   */
+  function announceCommands(sessionId: string): void {
+    if (!availableCommands) return;
+    setImmediate(() => {
+      const entry = sessions.get(sessionId);
+      if (closing || !entry || entry.projectionFailed) return;
+      try { sendUpdate(entry, sessionId, { sessionUpdate: "available_commands_update", availableCommands: init.availableCommands!() }); }
+      catch (error) { entry.projectionFailed = true; log(`available commands could not be announced: ${error instanceof Error ? error.message : String(error)}`); }
+    });
   }
 
   function entryFor(params: unknown): Registered | undefined {
@@ -623,19 +680,17 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
     if (entry.projectionFailed) throw new Error("ACP committed projection is unusable.");
     try {
       const events = entry.session.readEvents();
-      const head = validateAcpCommittedTail(init.workspace, sessionId, events, entry.projected, entry.projectedHash);
+      // Withheld output never reaches a client, so it needs no payload rendering.
+      // Its row signatures, ownership and sequence still must authenticate.
+      const tail = projectCommittedTail({ workspace: init.workspace, sessionId, events, emit,
+        cursor: { projected: entry.projected, projectedHash: entry.projectedHash },
+        includeCurrentPlans: currentPlanUpdates, includeThoughts: thoughtUpdates });
       const turn = projectAcpTurnState(events);
       if (turn.lastSeal === null) entry.committedTurn = null;
       else if (turn.lastSeal.seq >= entry.projected) entry.committedTurn = turn.lastSeal;
-      // Withheld output never reaches a client, so it needs no payload rendering.
-      // Its row signatures, ownership and sequence still must authenticate.
-      const projected = emit ? projectSessionUpdates(init.workspace, events, entry.projected, { includeCurrentPlans: currentPlanUpdates }) : null;
-      if (projected && projected.unsigned > 0) throw new Error("ACP refused an unsigned committed update.");
-      entry.projected = events.length;
-      entry.projectedHash = head;
-      for (const update of projected?.updates ?? []) {
-        sendUpdate(entry, sessionId, update);
-      }
+      entry.projected = tail.cursor.projected;
+      entry.projectedHash = tail.cursor.projectedHash;
+      for (const { update } of tail.updates) sendUpdate(entry, sessionId, update);
     } catch (error) {
       // In particular, an output-limit failure must not reset with updateBytes
       // on a new prompt, nor can a bad tail be silently skipped before spending.
@@ -646,9 +701,9 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
 
   function sendUpdate(entry: Registered, sessionId: string, update: unknown): void {
     const params = { sessionId, update };
-    const bytes = Buffer.byteLength(JSON.stringify(params), "utf8");
-    if (bytes > ACP_MAX_UPDATE_PARAMS_BYTES || entry.updateBytes + bytes > ACP_MAX_TURN_UPDATE_BYTES) throw new Error("ACP committed output exceeds its frame or turn bound.");
-    entry.updateBytes += bytes;
+    const budget = { bytes: entry.updateBytes };
+    chargeUpdateBudget(budget, params);
+    entry.updateBytes = budget.bytes;
     connection.notify("session/update", params);
   }
 

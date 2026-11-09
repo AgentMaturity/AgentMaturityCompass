@@ -140,7 +140,9 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
 
   // The child sees exactly the same installed/source CLI, environment and cwd.
   // No shell, alternate runner, approval bypass, or background session writer.
-  const execute = (args: readonly string[], display: { interactiveApprovals?: boolean; askUser?: boolean; stream?: boolean } = {}): Promise<{ code: number | null; stdout: string; truncated: boolean; cancelRequested: boolean }> => new Promise(resolveResult => {
+  // `display.stdin` is written to the child's stdin and closed (the turn prompt: `run -` reads it, so the entered text
+  // is never an argv word and a bare "-" is a prompt, not a flag); without it the child's stdin is closed from the start.
+  const execute = (args: readonly string[], display: { interactiveApprovals?: boolean; askUser?: boolean; stream?: boolean; stdin?: string } = {}): Promise<{ code: number | null; stdout: string; truncated: boolean; cancelRequested: boolean }> => new Promise(resolveResult => {
     let stdout = "";
     let truncated = false;
     let cancelRequested = false;
@@ -151,10 +153,15 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     try {
       running = spawn(process.execPath, [...process.execArgv, resolve(entry), ...(selectedAgentId === null ? [] : ["--agent", selectedAgentId]), ...args], {
         cwd, env: process.env, shell: false,
-        stdio: ipc ? ["ignore", "pipe", "pipe", "ipc"] : ["ignore", "pipe", "pipe"]
+        stdio: [display.stdin === undefined ? "ignore" : "pipe", "pipe", "pipe", ...(ipc ? ["ipc" as const] : [])]
       });
     } catch { io.error("Could not start the AMC command."); resolveResult({ code: 1, stdout, truncated, cancelRequested }); return; }
     child = running;
+    if (display.stdin !== undefined) {
+      // A child that exits before reading (a refused flag) closes the pipe; that EPIPE is not this turn's outcome.
+      running.stdin!.on("error", () => {});
+      running.stdin!.end(display.stdin);
+    }
     if (display.stream) mcpView = createNativeInteractiveMcpView();
     const currentMcpView = mcpView;
     const onMcpReceipt = (value: unknown) => currentMcpView.accept(value);
@@ -519,8 +526,8 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       const outcome = await execute(["agent-loop", "run", ...routeArgs, ...nativeExtensionRunArgv(extensions),
         ...(approvalClass === undefined ? [] : ["--interactive-approvals"]), ...(tools === "workspace" ? ["--interactive-ask-user"] : []),
         "--keep-open", "--json", "--stream",
-        ...(forkFrom !== null ? ["--fork-from", forkFrom] : sessionId === null ? [] : ["--session", sessionId]), "--", prompt],
-        { interactiveApprovals: approvalClass !== undefined, askUser: tools === "workspace", stream: true });
+        ...(forkFrom !== null ? ["--fork-from", forkFrom] : sessionId === null ? [] : ["--session", sessionId]), "--", "-"],
+        { interactiveApprovals: approvalClass !== undefined, askUser: tools === "workspace", stream: true, stdin: prompt });
       const result = parseNativeChatResult({ stdout: outcome.stdout, truncated: outcome.truncated,
         requestedSessionId: priorSession, forkFrom: pendingFork, previousSummary });
       if (!result.ok) {
@@ -544,11 +551,16 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       io.log(renderNativeRunDiagnostics(summary.diagnostics));
       io.log(`Public task validation: ${summary.validation?.status ?? "unavailable"}. Passing selected checks does not guarantee correctness.`);
       if (tools === "workspace") for (const line of renderSessionLists(cwd, sessionId)) io.log(line);
-      if (outcome.code !== 0 || outcome.truncated || summary.driverStatus === "failed") {
+      // Exit codes 3-6 (cancelled, bounded, blocked, side effects unsettled; src/cli/agentLoopOutputOptions.ts) are
+      // recorded outcomes, not failed turns. 3-5 show in the recorded ending below; 6 is a `complete` ending whose
+      // session side effects did not settle, so it is named here from the code itself.
+      const sideEffectsUnsettled = outcome.code === 6;
+      if ((outcome.code !== 0 && !(outcome.code !== null && outcome.code >= 3 && outcome.code <= 6)) || outcome.truncated || summary.driverStatus === "failed") {
         io.error("The turn failed or was interrupted. No successful task completion is claimed; /inspect and /verify show what was recorded.");
         io.fail();
-      } else if (outcome.cancelRequested || ending?.reason !== "complete") {
-        io.log(`Task completion is not established: ${ending?.reason ?? "no recorded turn ending"}${outcome.cancelRequested ? "; cancellation was requested" : ""}. Driver idle only means it can accept another explicit task; no retry was sent.`);
+      } else if (outcome.cancelRequested || ending?.reason !== "complete" || sideEffectsUnsettled) {
+        const why = sideEffectsUnsettled && ending?.reason === "complete" ? "the session's side effects did not all settle (a refused, unknown or still-open receipt; exit code 6)" : ending?.reason ?? "no recorded turn ending";
+        io.log(`Task completion is not established: ${why}${outcome.cancelRequested ? "; cancellation was requested" : ""}. Driver idle only means it can accept another explicit task; no retry was sent.`);
       }
     }
     if (forkFrom !== null) {

@@ -1615,6 +1615,8 @@ Serve the Agent Client Protocol on stdio (for editors; prints nothing but frames
 | `--validate <id>` | - |
 | `--approve-tools <actionClass>` | - |
 | `--approve-risk <tier>` | - |
+| `--reviewer-session-token-file <path>` | - |
+| `--reviewer-reason <text>` | - |
 | `--mcp-config <path>` | - |
 | `--mcp-config-sha256 <digest>` | - |
 | `--max-tokens <n>` | - |
@@ -1932,6 +1934,7 @@ Run one agent turn and report what the signed log recorded
 | `--approve-tools <actionClass>` | - |
 | `--approve-risk <tier>` | - |
 | `--interactive-approvals` | - |
+| `--output-format <format>` | - |
 | `--validation-repair <json>` | - |
 | `--interactive-ask-user` | - |
 | `--web-search-searxng <origin>` | - |

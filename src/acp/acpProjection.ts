@@ -5,6 +5,7 @@ import { isContextSnapshot } from "../prompt/assembly/interpolate.js";
 import type { EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { projectAcpAttachment } from "./acpImageHistory.js";
+import { acpToolCallView } from "./acpToolCallView.js";
 import { ACP_MAX_TURN_UPDATE_BYTES } from "./acpCommittedUpdates.js";
 import { ACP_ERROR, AcpFailure } from "./acpErrors.js";
 import { extractEnvelope } from "../session/sessionTypes.js";
@@ -71,6 +72,8 @@ export function projectSessionUpdates(
   events: readonly EvidenceEvent[],
   from: number,
   options: { readonly includeUser?: boolean; readonly to?: number; readonly includeEventIdentity?: boolean; readonly includeCurrentPlans?: boolean;
+    /** Committed `thinking` blocks as `agent_thought_chunk` (only for clients that negotiated it; SH-UI-04). */
+    readonly includeThoughts?: boolean;
     /** Local bounded collection only: no replay array is retained. Discard collected state if projection throws or returns unsigned rows. */
     readonly collectUpdate?: (update: AcpSessionUpdate) => void } = {}
 ): ProjectedUpdates {
@@ -113,7 +116,7 @@ export function projectSessionUpdates(
     const update = currentPlan ?? (options.includeUser && event.event_type === "user/attachment"
       ? projectAcpAttachment(workspace, event, events)
       : options.includeUser && event.event_type === "user/message"
-        ? userUpdate(workspace, event) : updateFor(workspace, event));
+        ? userUpdate(workspace, event) : updateFor(workspace, event, options.includeThoughts === true));
     if (update) {
       if (options.includeUser) {
         // The replay array is preflighted before session/load emits ANY prefix.
@@ -144,30 +147,35 @@ function userUpdate(workspace: string, event: EvidenceEvent): AcpSessionUpdate |
   return text === null || isContextSnapshot(text) ? null : { sessionUpdate: "user_message_chunk", content: { type: "text", text } };
 }
 
-function updateFor(workspace: string, event: EvidenceEvent): AcpSessionUpdate | null {
+function updateFor(workspace: string, event: EvidenceEvent, includeThoughts: boolean): AcpSessionUpdate | null {
   const meta = metaOf(event);
 
   if (event.event_type === "assistant/block") {
-    // Only text blocks become message chunks. A tool_use block is reported
-    // through `tool/call` below, and emitting both would show the same action
-    // twice.
-    if (meta["blockKind"] !== "text") return null;
+    // Text blocks become message chunks and, when the client asked for them,
+    // recorded thinking blocks become thought chunks. A tool_use block is
+    // reported through `tool/call` below, and emitting both would show the
+    // same action twice.
+    const kind = meta["blockKind"];
+    if (kind !== "text" && !(includeThoughts && kind === "thinking")) return null;
     const text = payloadText(workspace, event);
     if (text === null) return null;
-    return { sessionUpdate: "agent_message_chunk", content: { type: "text", text } };
+    return { sessionUpdate: kind === "text" ? "agent_message_chunk" : "agent_thought_chunk", content: { type: "text", text } };
   }
 
   if (event.event_type === "tool/call") {
     const toolCallId = meta["toolCallId"];
     if (typeof toolCallId !== "string") return null;
+    const toolName = typeof meta["toolName"] === "string" ? meta["toolName"] : "tool";
     return {
       sessionUpdate: "tool_call",
       toolCallId,
-      title: typeof meta["toolName"] === "string" ? meta["toolName"] : "tool",
+      // Standard kind/title/locations from the signed row's name and frozen
+      // arguments (src/acp/acpToolCallView.ts); the arguments themselves are
+      // not sent.
+      ...acpToolCallView(workspace, toolName, payloadJson(workspace, event)),
       // `pending` rather than `in_progress`: the row records that the call was
       // decided on, and the ledger has no separate "started" moment to read.
-      status: "pending",
-      kind: "other"
+      status: "pending"
     };
   }
 
@@ -185,6 +193,15 @@ function updateFor(workspace: string, event: EvidenceEvent): AcpSessionUpdate | 
   }
 
   return null;
+}
+
+/** The row's committed JSON payload, or null when it is not a JSON object (never a thrown refusal: locations are optional). */
+function payloadJson(workspace: string, event: EvidenceEvent): unknown {
+  try {
+    const text = payloadText(workspace, event);
+    const value: unknown = text === null ? null : JSON.parse(text);
+    return value !== null && typeof value === "object" && !Array.isArray(value) ? value : null;
+  } catch { return null; }
 }
 
 function metaOf(event: EvidenceEvent): Record<string, unknown> {

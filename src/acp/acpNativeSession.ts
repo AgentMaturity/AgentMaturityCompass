@@ -20,7 +20,7 @@ export async function prepareAcpNativeSession(options: {
   readonly credentialsHome?: string;
   readonly credentialsFile?: string;
   readonly signal: AbortSignal;
-  readonly onApprovalRaised: (event: { readonly approvalId: string; readonly approvalRequestId: string }) => void;
+  readonly onApprovalRaised: (event: { readonly approvalId: string; readonly approvalRequestId: string; readonly toolCallId: string }) => void;
   /** Recorded on every approval request this session raises (P1-78). */
   readonly initiator: string;
 }): Promise<AgentSession> {

@@ -20,7 +20,7 @@ vi.mock("../src/setup/nativeInteractiveCommandAudit.js", () => ({
 }));
 
 const seam = vi.hoisted(() => ({
-  answers: [] as string[], commands: [] as string[][], results: [] as { body: unknown; code: number }[],
+  answers: [] as string[], commands: [] as string[][], results: [] as { body: unknown; code: number }[], stdins: [] as string[],
   signals: [] as unknown[], cancelWhileApproving: false, abortedAtKill: false,
   questionSignal: undefined as AbortSignal | undefined,
   cancelApproval: vi.fn(), closeApproval: vi.fn(), preview: "", selectionChecks: 0, changedSelectionAt: 0,
@@ -52,8 +52,12 @@ vi.mock("node:child_process", async importOriginal => {
     seam.commands.push([...argv]);
     const result = seam.results.shift() ?? { code: 1, body: {} };
     let closed = false;
+    const stdin = new PassThrough();
+    let written = "";
+    stdin.on("data", (chunk: Buffer) => { written += chunk.toString("utf8"); });
+    stdin.on("end", () => { seam.stdins.push(written); });
     const child = Object.assign(new EventEmitter(), {
-      stdout: new PassThrough(), stderr: new PassThrough(), exitCode: null as number | null, signalCode: null,
+      stdin, stdout: new PassThrough(), stderr: new PassThrough(), exitCode: null as number | null, signalCode: null,
       kill: (signal: unknown) => {
         seam.signals.push(signal); seam.abortedAtKill = seam.questionSignal?.aborted === true;
         queueMicrotask(finish); return true;
@@ -180,7 +184,7 @@ describe("P01 connected native chat behavior", () => {
     outputTTY = Object.getOwnPropertyDescriptor(process.stdout, "isTTY");
     Object.defineProperty(process.stdin, "isTTY", { configurable: true, value: true });
     Object.defineProperty(process.stdout, "isTTY", { configurable: true, value: true });
-    seam.answers = []; seam.commands = []; seam.results = []; seam.signals = [];
+    seam.answers = []; seam.commands = []; seam.results = []; seam.signals = []; seam.stdins = [];
     seam.cancelWhileApproving = false; seam.abortedAtKill = false; seam.questionSignal = undefined;
     seam.preview = ""; seam.selectionChecks = 0; seam.changedSelectionAt = 0; seam.cancelApproval.mockClear(); seam.closeApproval.mockClear();
     seam.withdrawCalls = []; seam.withdrawStatus = "withdrawn";
@@ -269,9 +273,42 @@ describe("P01 connected native chat behavior", () => {
     expect(fail).toHaveBeenCalledTimes(1);
   });
 
+  it("sends the entered prompt to the turn child over stdin, so a bare - is a prompt and never an argv word", async () => {
+    seam.answers = ["-", "/exit"];
+    seam.results = [{ code: 0, body: summary() }];
+    await run();
+    expect(seam.commands).toHaveLength(1);
+    expect(seam.commands[0]!.slice(-2)).toEqual(["--", "-"]);
+    await vi.waitFor(() => expect(seam.stdins).toEqual(["-"]));
+    expect(fail).not.toHaveBeenCalled();
+    expect(logs.join("\n")).toContain("Recorded reply:");
+  });
+
+  it("keeps an ordinary prompt out of the turn child's argv as well: it travels on stdin only", async () => {
+    seam.answers = ["summarise the private notes", "/exit"];
+    seam.results = [{ code: 0, body: summary() }];
+    await run();
+    expect(seam.commands).toHaveLength(1);
+    expect(seam.commands[0]!.slice(-2)).toEqual(["--", "-"]);
+    expect(seam.commands[0]!.join(" ")).not.toContain("summarise the private notes");
+    await vi.waitFor(() => expect(seam.stdins).toEqual(["summarise the private notes"]));
+    expect(fail).not.toHaveBeenCalled();
+  });
+
+  it("reads child exit code 6 as completion not established, named from the code, not as a successful turn", async () => {
+    seam.answers = ["task", "/exit"];
+    // The turn completed but the session's side effects did not all settle (SH-UI-01 exit 6): chat must say so.
+    seam.results = [{ code: 6, body: summary() }];
+    await run();
+    expect(fail).not.toHaveBeenCalled();
+    expect(errors.join("\n")).not.toContain("The turn failed");
+    expect(logs.join("\n")).toContain("Task completion is not established: the session's side effects did not all settle");
+  });
+
   it("stops approval input before the cancellation signal, drains the reply and does not retry", async () => {
     seam.cancelWhileApproving = true; seam.answers = ["task", "/exit"];
-    seam.results = [{ code: 0, body: summary({ endings: [{ reason: "cancelled", turn: 1 }] }) }];
+    // A cancelled turn exits 3 (SH-UI-01), which chat reports as "not established", not as a failure.
+    seam.results = [{ code: 3, body: summary({ endings: [{ reason: "cancelled", turn: 1 }] }) }];
     await run({ approveTools: "WRITE_LOW" });
     expect(seam.commands).toHaveLength(1);
     expect(seam.signals).toEqual(["SIGINT"]);

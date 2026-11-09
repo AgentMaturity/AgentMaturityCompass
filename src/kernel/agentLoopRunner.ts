@@ -97,6 +97,7 @@ import { agentLoopServices, AGENT_LOOP_SEAM } from "./services/agentLoopServices
 import type { AgentLoopSeamService } from "./services/agentLoopServices.js";
 import { assertSecondSessionWriter } from "../persistence/openSessionEventStore.js";
 import { redactingSessionFor } from "../dataflow/redactingSession.js";
+import type { EvidenceEvent } from "../types.js";
 import { recordNativeComposition } from "../prompt/context/nativeCompositionContext.js";
 import type { NativeResourceStatus } from "../prompt/context/nativeResourceStatus.js";
 import type { CompositionSource } from "../prompt/context/compositionProvenance.js";
@@ -144,6 +145,8 @@ export interface ComposedTurnHandle {
   cancel(cause: TurnCancelCause, options?: CancelOptions): void;
   /** Permanently close admission and bound the active driver drain. */
   shutdown(): Promise<boolean>;
+  /** The session's committed rows so far, for a live consumer that authenticates them itself (SH-UI-01). */
+  readEvents(): readonly EvidenceEvent[];
 }
 
 /** Narrow evidence capability for tools, bound to the actual selected session. */
@@ -744,7 +747,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
         const confirmed = await loop.agent.dispose();
         if (!confirmed) abandon(new Error("TOOL_OUTCOME_UNKNOWN: native driver did not drain within its shutdown grace."));
         return confirmed;
-      }
+      },
+      readEvents: () => session.readEvents()
     });
     if (audioParts !== undefined) loop.agent.followupAudioParts(audioParts);
     else loop.followup(options.prompt, images);

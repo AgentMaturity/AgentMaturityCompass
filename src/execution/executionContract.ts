@@ -45,7 +45,7 @@ export const INTEGRITY_FAILED = "integrity_failed";
 /** Where each verb lives on each surface. Documentation and the parity test read this one table. */
 export const EXECUTION_SURFACES = {
   cli: {
-    start: "amc agent-loop run", stream: "amc agent-loop run --stream", approve: "amc approvals approve",
+    start: "amc agent-loop run", stream: "amc agent-loop run --output-format stream-json", approve: "amc approvals approve",
     cancel: "amc agent-loop run --cancel-after", resume: "amc agent-loop run --session", fork: "amc agent-loop run --fork-from",
     dispose: "amc agent-loop run --keep-open", verify: "amc agent-loop verify"
   },

@@ -22,7 +22,11 @@ import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
 import { runLease } from "../leases/runLease.js";
 import { resolveNativeValidationSelection } from "../setup/nativeValidationConfig.js";
 import { amcVersion } from "../version.js";
-import { createAcpAgent, type AcpAgent } from "./acpAgentServer.js";
+import { createAcpAgent, type AcpAgent, type AcpApprovalRaisedHook } from "./acpAgentServer.js";
+import { createAcpPermissionHandler } from "./acpPermission.js";
+import { readNativeApprovalActor } from "../setup/nativeApprovalIdentity.js";
+import { buildSkillCatalog } from "../skills/skillCatalog.js";
+import { workspaceSkillRoots } from "../skills/skillTurn.js";
 import type { AcpForkSessionFactory, AcpForkSessionParams } from "./acpRuntimeContracts.js";
 import { forkSession } from "../session/sessionResume.js";
 import { redactingSessionFor } from "../dataflow/redactingSession.js";
@@ -105,6 +109,12 @@ export interface AcpStdioInit {
   readonly baseUrl?: string;
   readonly credential?: string;
   readonly systemPrompt: string;
+  /** `--reviewer-session-token-file`: offer `allow_once` on `session/request_permission`, decided under this tracked login (SH-UI-04). */
+  readonly reviewerSessionTokenFile?: string;
+  /** `--reviewer-reason`: the decision reason when the client's response carries none. */
+  readonly reviewerReason?: string;
+  /** The CLI entry this process runs (for `amc approvals approve`); defaults to `process.argv[1]`. */
+  readonly cliEntry?: string;
   readonly tools?: "none" | "workspace";
   /** `--unsafe-unconfined-shell`: macOS only, see `AgentToolsetOptions.unconfinedShell`. */
   readonly unconfinedShell?: boolean;
@@ -277,14 +287,24 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
       ...(webSearchProvider === undefined ? {} : { webSearchProvider })
     });
 
+  if (init.reviewerSessionTokenFile !== undefined && !approval) throw new Error("--reviewer-session-token-file requires --approve-tools; without a gate nothing is raised to decide.");
+  if (init.reviewerReason !== undefined && init.reviewerSessionTokenFile === undefined) throw new Error("--reviewer-reason requires --reviewer-session-token-file.");
+  if (init.reviewerSessionTokenFile !== undefined) readNativeApprovalActor(init.workspace, init.reviewerSessionTokenFile); // Refuse a dead login at launch, not at the first approval.
+  const permission = approval === undefined ? undefined : createAcpPermissionHandler({ workspace: init.workspace, agentId: init.agentId,
+    cli: { execPath: process.execPath, execArgv: process.execArgv, entry: init.cliEntry ?? process.argv[1] ?? "" },
+    ...(init.reviewerSessionTokenFile === undefined ? {} : { reviewer: { tokenFile: init.reviewerSessionTokenFile, ...(init.reviewerReason === undefined ? {} : { reason: init.reviewerReason }) } }),
+    log: message => stderr.write(`amc acp: ${message}\n`) });
   const claimant = { pid: process.pid, hostId: hostname(), bootId: randomUUID(), startedAt: Date.now() };
-  const nativeSession = (session: AgentSessionInit & { sessionId: string }, signal: AbortSignal, resumed: boolean) => prepareAcpNativeSession({
+  const nativeSession = (session: AgentSessionInit & { sessionId: string }, signal: AbortSignal, resumed: boolean, approvalRaised?: AcpApprovalRaisedHook) => prepareAcpNativeSession({
     session, signal, ...(resumed ? { claimant } : {}),
     ...(approval ? { approval } : {}), ...(mcp.length ? { mcp: mcp.map(entry => entry.config) } : {}),
     ...(init.credentialsHome === undefined ? {} : { credentialsHome: init.credentialsHome }),
     ...(init.credentialsFile === undefined ? {} : { credentialsFile: init.credentialsFile }),
     initiator: init.initiator ?? cliInitiator(),
-    onApprovalRaised: event => { stderr.write(`amc acp: signed approval pending: ${event.approvalRequestId}\n`); } });
+    onApprovalRaised: event => {
+      if (approvalRaised) approvalRaised(session.sessionId, event);
+      else stderr.write(`amc acp: signed approval pending: ${event.approvalRequestId}\n`);
+    } });
   /**
    * Both fork operations acquire the lease before opening a child. Standard fork
    * inherits supported verified context; the explicit legacy operation records
@@ -298,7 +318,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
       harnessVersion: identity.harnessVersion, compositionDigest: identity.compositionDigest, policyDigest: identity.policyDigest });
     const forked = redactingSessionFor(service);
     try { forked.releaseWithoutClosing(); } catch (error) { forked.disposeWithoutClosing(); throw error; }
-    return nativeSession(sessionOptions({ ...params, sessionId: service.sessionId }, lease), params.signal, true);
+    return nativeSession(sessionOptions({ ...params, sessionId: service.sessionId }, lease), params.signal, true, params.approvalRaised);
   };
 
   const agent = createAcpAgent({
@@ -312,8 +332,13 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
       ? forkNative(params, true) : init.forkSessionFactory({ ...params, ...sessionLease() }),
     lineageForkFactory: params => forkNative(params, false),
     write: createAcpStdioSink(stdout),
-    sessionFactory: params => nativeSession(sessionOptions(params), params.signal, false),
-    resumeSessionFactory: params => nativeSession(sessionOptions(params), params.signal, true),
+    sessionFactory: params => nativeSession(sessionOptions(params), params.signal, false, params.approvalRaised),
+    resumeSessionFactory: params => nativeSession(sessionOptions(params), params.signal, true, params.approvalRaised),
+    ...(permission === undefined ? {} : { onApprovalRaised: event => permission.handle(event) }),
+    // Skills only: `amc acp` loads no native extensions, so nothing else is runnable here. The same roots an ACP prompt
+    // resolves (`prepareSkillTurn` in agentSession takes no home): a command offered here is one the session can run.
+    availableCommands: () => buildSkillCatalog(workspaceSkillRoots(init.workspace)).skills
+      .map(skill => ({ name: skill.name, description: skill.description, input: { hint: "text after the command name" } })),
     onUnusable: () => { void close().catch(reportShutdownFailure); },
     // stderr, never stdout. See the module note.
     log: (message) => { stderr.write(`amc acp: ${message}\n`); }

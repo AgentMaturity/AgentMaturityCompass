@@ -14,6 +14,11 @@ import { NATIVE_MCP_STATUS_FORMAT } from "../mcp/nativeMcpStatus.js";
 export const ACP_RUNTIME_META_KEY = "dev.agentmaturity.amc";
 export const ACP_RUNTIME_FORMAT = "amc-acp-runtime@1";
 export const ACP_MAX_UPDATE_PARAMS_BYTES = 900_000;
+/** SH-UI-04 opt-ins for clients that identify themselves as AMC SDKs; generic ACP clients get these without negotiation. */
+export const ACP_THOUGHT_UPDATES_CONTRACT = "amc-thought-updates-v1";
+export const ACP_AVAILABLE_COMMANDS_CONTRACT = "amc-available-commands-v1";
+/** One `AvailableCommand` as the vendored schema shapes it: a workspace skill, offered as `/name`. */
+export interface AcpAvailableCommand { readonly name: string; readonly description: string; readonly input: { readonly hint: string } | null }
 /**
  * A spawning composer (Studio native tasks, P1-67) hands `amc acp` the lease it minted for that process over an inherited
  * pipe on fd NATIVE_TASK_LEASE_FD, and names that fd in this variable; the token itself never enters the environment.
@@ -35,11 +40,16 @@ export const ACP_RUNTIME_LIMITS = Object.freeze({
  * The server authenticates the returned child's signed parent head before exposing its ID.
  * Factories must clean up partial construction on rejection, just like the native new/load seams.
  */
+/** The gate's `onRaised` event, bound by the launcher to the session that raised it (SH-UI-04). */
+export type AcpApprovalRaisedHook = (sessionId: string, event: { readonly approvalId: string; readonly approvalRequestId: string; readonly toolCallId: string }) => void;
+
 export interface AcpForkSessionParams {
   readonly parentSessionId: string;
   readonly workspace: string;
   readonly agentId: string;
   readonly signal: AbortSignal;
+  /** Wire as the child's approval gate `onRaised`; the server turns it into `session/request_permission` when negotiated. */
+  readonly approvalRaised?: AcpApprovalRaisedHook;
   /** The child's own lease (P1-79), minted before the factory runs; compose the child with it (`AgentSessionInit.leaseToken`). */
   readonly leaseToken?: string;
 }
@@ -57,6 +67,8 @@ export function nativeAcpCapabilities(options: {
   readonly lineageFork?: boolean;
   readonly nativeExecution?: { readonly tools: "none" | "workspace"; readonly signedApprovalGate: boolean;
     readonly reviewedMcpConfigured: boolean; readonly taskValidation?: boolean };
+  readonly availableCommands?: boolean;
+  readonly permissionRequests?: boolean;
 }) {
   const image = acpSupportsImageInput(options.route);
   const audio = acpSupportsAudioInput(options.route) && options.audioInput === true;
@@ -72,6 +84,9 @@ export function nativeAcpCapabilities(options: {
       committedUpdates: "live-completed-blocks" as const,
       committedTurn: "amc-committed-turn-v1" as const,
       currentPlanUpdates: "amc-current-plan-v1" as const,
+      thoughtUpdates: ACP_THOUGHT_UPDATES_CONTRACT,
+      ...(options.availableCommands ? { availableCommands: ACP_AVAILABLE_COMMANDS_CONTRACT } : {}),
+      ...(options.permissionRequests ? { permissionRequests: "amc-permission-v1" as const } : {}),
       sessionEventPage: "amc-session-event-page-v1" as const,
       ...(options.nativeExecution ? { clientRequestIds: true, withdrawSubmission: true, mcpStatus: NATIVE_MCP_STATUS_FORMAT } : {}),
       verification: "not-verified" as const,

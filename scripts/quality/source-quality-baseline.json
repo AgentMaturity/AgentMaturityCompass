@@ -5227,14 +5227,6 @@
       "format": "typescript"
     },
     {
-      "id": "a4ea6a9f3dfd5a5ed52615beeb8d1844104f9cdb397f9ba45a57d983d9411ae4",
-      "paths": [
-        "cli-agent-commands.ts",
-        "cli-prompt-commands.ts"
-      ],
-      "format": "typescript"
-    },
-    {
       "id": "a5738f2c2e8a30399be16bf824d0fc5cc5684b698462770ec1be1a55be06de4a",
       "paths": [
         "score/capabilityGovernance.ts",
@@ -18906,11 +18898,6 @@
     {
       "id": "e1380982d3ead0bf105768b9e313d6dd2dc546e4b3e0dbbde1418106501d258b",
       "file": "src/enforce/resourceManifest.ts",
-      "kind": "types"
-    },
-    {
-      "id": "e1620b799ae497357ea25a498eb8f959a70a790e0ee51f76f43ce003b2563621",
-      "file": "src/autonomy/goalRounds.ts",
       "kind": "types"
     },
     {

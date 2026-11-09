@@ -75,46 +75,13 @@ import { loadNativeAudioManifest } from "./attachments/nativeAudioFiles.js";
 import type { NativeAudioPart } from "./attachments/nativeAudioInput.js";
 
 import {
-  activeChildLimitOption, approvalGateFor, armTurnSignals, collectOption, collectDelegateStop, compactionOption, integerOption, liveTextPreviewPrinter, paramsFor, piAiRouteSelection, renderNotification, resetDelegateStops, routeFor, withReasoningAndRouteOptions,
+  activeChildLimitOption, approvalGateFor, armTurnSignals, collectDelegateStop, collectOption, compactionOption, defaultAgentLoopIo, importRunner, integerOption, liveTextPreviewPrinter, paramsFor, piAiRouteSelection, renderNotification, resetDelegateStops, routeFor, withReasoningAndRouteOptions,
   type AgentLoopCliIo, type RunOptions
 } from "./cli-agent-options.js";
+import { readHeadlessPrompt, runWithOutput, type RunOutput } from "./cli/agentLoopOutputOptions.js";
 export type { AgentLoopCliIo, RunOptions } from "./cli-agent-options.js";
 
-const defaultIo: AgentLoopCliIo = {
-  log: (line: string) => {
-    console.log(line);
-  },
-  error: (line: string) => {
-    console.error(line);
-  },
-  fail: () => {
-    process.exitCode = 1;
-  }
-};
-
-/** Import the composed runner, or explain that the kernel is not installed. */
-async function importRunner(
-  io: AgentLoopCliIo
-): Promise<typeof import("./kernel/agentLoopRunner.js") | null> {
-  try {
-    return await import("./kernel/agentLoopRunner.js");
-  } catch (error: unknown) {
-    if ((error as { code?: string } | null)?.code === "ERR_MODULE_NOT_FOUND") {
-      io.error(
-        chalk.yellow(
-          "The packaged native runtime could not be loaded. Reinstall AMC from a complete package.\n" +
-            "For a source checkout, install workspace dependencies and rebuild before running."
-        )
-      );
-      io.fail();
-      return null;
-    }
-    throw error;
-  }
-}
-
-
-export function registerAgentCommands(program: Command, io: AgentLoopCliIo = defaultIo): void {
+export function registerAgentCommands(program: Command, io: AgentLoopCliIo = defaultAgentLoopIo): void {
   // The system-prompt group is registered from here rather than from cli.ts
   // because cli.ts sits at its line-ratchet floor, and because the assembled
   // prompt is the IDENTITY half of the same native-agent surface `agent-loop`
@@ -250,7 +217,10 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--json", "Output as JSON")
     .option("--list-skills [name]", "list skill discovery, sources and digests; pass a name to inspect its literal body")
     .option("--list-agents [name]", "list agent definitions (.amc/agents/<name>.md), their narrowing and digests; pass a name to inspect its body")
-    .action(async (promptParts: string[], opts: RunOptions, command: Command) => {
+    // The output format decides which IO the body sees (SH-UI-01): under stream-json every refusal also ends the stream.
+    .action((promptParts: string[], opts: RunOptions, command: Command) => runWithOutput(io, process.cwd(), opts, (runIo, output) => runAction(runIo, output, promptParts, opts, command)));
+
+  const runAction = async (io: AgentLoopCliIo, output: RunOutput, promptParts: string[], opts: RunOptions, command: Command): Promise<void> => {
       if (showSkillCatalogSelection(opts, io) || showAgentDefinitionSelection(opts, io)) return;
       const agentId = resolveAgentId(process.cwd(), selectedAgentOption(command));
       let validation: ReturnType<typeof resolveNativeValidationSelection>;
@@ -283,7 +253,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         io.fail(); return;
       }
 
-      let rawPrompt = promptParts.join(" ").trim();
+      const headlessPrompt = await readHeadlessPrompt(io, { promptParts, ...(opts.audioInput === undefined ? {} : { audioInput: opts.audioInput }) });
+      if (headlessPrompt === null) return;
+      let rawPrompt = headlessPrompt;
       if (opts.audioInput !== undefined && (promptParts.length > 0 || opts.image !== undefined)) {
         io.error("--audio-input is exclusive with positional text and --image; put every original part in its manifest order."); io.fail(); return;
       }
@@ -445,7 +417,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       // goal-round children get none, and a run without workspace tools has no delegate at all.
       const offersDefinitions = wantsDelegation && toolMode === "workspace" && opts.delegateProvider === undefined && opts.goalRounds === undefined;
       const definitions = offersDefinitions ? loadAgentDefinitionsForRun(opts, line => (opts.json ? io.error : io.log)(chalk.dim(line))) : undefined;
-      const breadth = resolveBreadthRun(io, opts, { toolMode, wantsDelegation, ...(definitions === undefined ? {} : { definitions }), cancelAfterMs: cancelAfter });
+      const breadth = resolveBreadthRun(io, opts, { toolMode, wantsDelegation, ...(definitions === undefined ? {} : { definitions }), cancelAfterMs: cancelAfter, output });
       if (breadth === null) return;
       const maxActiveChildren = activeChildLimitOption(io, opts.maxActiveChildren, wantsDelegation && toolMode === "workspace"); if (maxActiveChildren === null) return;
       if (!wantsDelegation && opts.delegateStop !== undefined) {
@@ -649,7 +621,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...(compositionSources === undefined ? {} : { compositionSources }),
           resourceStatus: () => projectNativeResourceStatus({ extensions, mcp: mcpStatus,
             skillRoots: workspaceSkillRoots(extensions.workspace, opts.credentialsHome) }),
-          ...(opts.stream ? { onLiveText: liveTextPreviewPrinter() } : {}),
+          ...(output.sink ? { onLiveText: event => output.sink!.liveText(event) } : opts.stream ? { onLiveText: liveTextPreviewPrinter() } : {}),
           // No pinned `systemPrompt`: the prompt is ASSEMBLED, which is what
           // gives the run its identity and pulls the workspace's own AGENTS.md /
           // CLAUDE.md in as runtime context. A hardcoded string here — what this
@@ -732,13 +704,14 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             ...(opts.credentialsHome === undefined ? {} : { homeDir: opts.credentialsHome }),
             ...(opts.credentialsFile === undefined ? {} : { path: opts.credentialsFile })
           },
-          notify: opts.json && !opts.stream
+          notify: output.sink ? (notification: LoopNotification) => output.sink!.notification(notification) : opts.json && !opts.stream
             ? undefined
             : (notification: LoopNotification) => {
                 const line = renderNotification(notification);
                 if (line !== null) (opts.json ? io.error : io.log)(line);
               },
           onReady: (handle) => {
+            output.sink?.ready(handle, { agentId, provider: providerId, model, tools: toolMode, approvals: gate?.actionClass ?? null });
             // A resumed session may contain an earlier failed turn. This CLI
             // invocation reports only its newly recorded ending as its exit
             // outcome; the driver's idle state means it can accept more work.
@@ -770,7 +743,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           workspaceToolset?.close();
         }
       }
-    });
+  };
 
   withTrustFlags(group
     .command("verify")

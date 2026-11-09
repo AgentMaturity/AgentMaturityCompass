@@ -14,7 +14,7 @@ real-model results.
 | Verb | CLI | TypeScript SDK | Python `amc_sdk` | Studio |
 |---|---|---|---|---|
 | start | `amc agent-loop run` (also `chat`) | `AMCNativeClient.start`, then `newSession` | `AmcAgent(...)`, then `new_session` | `POST /api/v1/native-tasks` (admits the first turn) |
-| stream | `--stream` (live text and progress on stderr) | iterate `AMCNativeTurn` | `Turn.iter_updates` | `GET /api/v1/native-tasks/{taskId}?cursor={n}` |
+| stream | `--output-format stream-json` (one JSON event per line on stdout; `--stream` is live text on stderr) | iterate `AMCNativeTurn` | `Turn.iter_updates` | `GET /api/v1/native-tasks/{taskId}?cursor={n}` |
 | approve | `amc approvals approve` (find IDs with `amc approvals list --status pending`) | `AMCNativeClient.approve`, `pendingApprovals` | `AmcAgent.approve`, `pending_approvals` | `POST /approvals/requests/{approvalRequestId}/decide` (IDs in the task view's `approvals`) |
 | cancel | `--cancel-after <ms>` or Ctrl-C | `AMCNativeTurn.cancel` or an `AbortSignal` | `Turn.cancel`, `Session.cancel` | `POST /api/v1/native-tasks/{taskId}/cancel` |
 | resume | `--session <id>` | `AMCNativeClient.resumeSession` | `AmcAgent.resume_session` | `POST /api/v1/native-tasks/{taskId}/resume` |
@@ -26,8 +26,9 @@ What each verb means on every surface:
 
 - **start** opens a session under the governed runtime: the signed tool policy, the run lease when the active plan
   requires a principal (`PRINCIPAL_UNRESOLVED` is refused before any session row), and the session writer.
-- **stream** delivers committed updates while a turn runs. The CLI's stream is provisional live text and progress
-  lines; the recorded result is the outcome.
+- **stream** delivers committed updates while a turn runs. The CLI's `--output-format stream-json` carries the same
+  authenticated committed updates ACP sends, plus provisional `text_delta` events that say so, and ends with the
+  recorded `result` (docs/NATIVE_HEADLESS.md); the recorded result is the outcome.
 - **approve** records a reviewer's decision on a tool call's signed approval request through the signed approval
   engine, the same records every surface reads. The engine refuses the run's initiator where the action class needs
   distinct users, a request that is no longer pending, and a changed request when the decision binds its digest. The

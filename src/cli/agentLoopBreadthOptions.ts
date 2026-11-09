@@ -11,6 +11,7 @@ import type { WorkflowPassOptions } from "../workflow/workflowPass.js";
 import { readWorkflowPlanFile } from "../workflow/workflowPlanFile.js";
 import type { AgentDefinition } from "../agent/agentDefinitions.js";
 import { integerOption, type AgentLoopCliIo, type RunOptions } from "../cli-agent-options.js";
+import { goalRunReceiptStates, reportExitCode, runExitCode, withOutputFormatOption, type RunOutput } from "./agentLoopOutputOptions.js";
 import { ipcAskUserAnswerer } from "../setup/nativeInteractiveAskUser.js";
 import { workspaceSkillRoots } from "../skills/skillTurn.js";
 import { renderSessionLists } from "../tools/builtin/todoTool.js";
@@ -32,7 +33,7 @@ export const NO_DELEGATE_STOP_HELP = "explicitly clear extra child stops from a 
 export const VALIDATION_REPAIR_HELP = "explicit bounded repair policy for selected public checks, including allowed edit paths";
 
 export function withBreadthRunOptions(command: Command): Command {
-  return command
+  return withOutputFormatOption(command)
     .option("--validation-repair <json>", VALIDATION_REPAIR_HELP)
     .option("--interactive-ask-user", "answer ask_user through the native chat parent over dedicated Node IPC; answers are auditor-signed")
     .option("--web-search-searxng <origin>", WEB_SEARCH_SEARXNG_HELP)
@@ -51,15 +52,15 @@ export interface BreadthRun {
   armCancel(): void;
   dispose(): void;
   /**
-   * Report the run from its signed log: the summary (JSON or text), goal rounds, the verified todo/plan and the verify
-   * command; fails the command on a failed driver, an error ending, unpassed requested validation or a failed goal run.
+   * Report the run from its signed log: the summary (text, JSON, or the stream's `result` event), goal rounds, the
+   * verified todo/plan and the verify command; then the exit code of the run table (src/cli/agentLoopOutputOptions.ts).
    */
   reportRun(outcome: RunOutcome, priorTurnEndings: number, validationRequested: boolean): void;
 }
 
 /** Validates the breadth flags against the composed tool mode; null after a reported refusal. */
 export function resolveBreadthRun(io: AgentLoopCliIo, opts: RunOptions, context: { readonly toolMode: string; readonly wantsDelegation: boolean;
-  readonly definitions?: ReadonlyMap<string, AgentDefinition>; readonly cancelAfterMs?: number }): BreadthRun | null {
+  readonly definitions?: ReadonlyMap<string, AgentDefinition>; readonly cancelAfterMs?: number; readonly output?: RunOutput }): BreadthRun | null {
   const refuse = (message: string): null => { io.error(chalk.red(message)); io.fail(); return null; };
   if (opts.interactiveAskUser && (typeof process.send !== "function" || !process.connected)) {
     return refuse("--interactive-ask-user requires an AMC parent with a dedicated IPC channel. Use native chat.");
@@ -117,9 +118,13 @@ export function resolveBreadthRun(io: AgentLoopCliIo, opts: RunOptions, context:
       const workflow = outcome.workflow === undefined ? undefined : { runId: outcome.workflow.runId, ok: outcome.workflow.ok,
         outputs: Object.fromEntries(outcome.workflow.outputs), failed: outcome.workflow.failures, cancelled: outcome.workflow.cancelled, agentsRun: outcome.workflow.agentsRun };
       // P2-13: the four execution phases; evidence verification stays pending until `agent-loop verify`.
-      io.log(opts.json ? JSON.stringify({ ...summary, ...(goal === undefined ? {} : { goalRounds: goal }), ...(workflow === undefined ? {} : { workflow }),
-        execution: executionStatusFor(process.cwd(), { sessionId: summary.sessionId, admission: "admitted",
-          turn: ending?.reason ?? (summary.driverStatus === "failed" ? "error" : null), verified: null }) }, null, 2) : renderRunSummary(summary));
+      const execution = executionStatusFor(process.cwd(), { sessionId: summary.sessionId, admission: "admitted",
+        turn: ending?.reason ?? (summary.driverStatus === "failed" ? "error" : null), verified: null });
+      const report = { summary, execution, ending, validationRequested, ...(workflow === undefined ? {} : { workflow }),
+        ...(goal === undefined ? {} : { goalStop: goal.stoppedBy, goalReceiptStates: goalRunReceiptStates(process.cwd(), summary.sessionId) }) };
+      const exitCode = runExitCode(report);
+      if (context.output?.sink) context.output.sink.result({ ...report, exitCode, ...(goal === undefined ? {} : { goalRounds: goal }) });
+      else io.log(opts.json ? JSON.stringify({ ...summary, ...(goal === undefined ? {} : { goalRounds: goal, goalReceiptStates: report.goalReceiptStates }), ...(workflow === undefined ? {} : { workflow }), execution, exitCode }, null, 2) : renderRunSummary(summary));
       if (!opts.json) {
         if (goal !== undefined) {
           io.log(`Goal rounds: ${goal.rounds} run, stopped by ${goal.stoppedBy} (${goal.reason}). Each round is a delegated child session in this session's log.`);
@@ -133,8 +138,7 @@ export function resolveBreadthRun(io: AgentLoopCliIo, opts: RunOptions, context:
         io.log("Verify the recorded evidence (this does not evaluate answer quality):\n  " +
           renderNativeGuideCommand({ cwd: process.cwd(), argv: ["amc", "agent-loop", "verify", summary.sessionId] }));
       }
-      if (summary.driverStatus === "failed" || ending?.reason === "error" || (validationRequested && summary.validation.status !== "passed")
-        || (goal !== undefined && ["failed", "refused", "cancelled"].includes(goal.stoppedBy)) || (workflow !== undefined && !workflow.ok)) io.fail();
+      reportExitCode(io, exitCode);
     }
   };
 }
