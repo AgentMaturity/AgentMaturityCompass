@@ -72,6 +72,11 @@ describe("Compose volume backup and restore as COMPOSE.md writes them (skeptic 2
     expect(at(/-czf - -C \//)).toBeLessThan(at(/docker compose -f docker-compose\.tls\.yml start amc-studio/));
     expect(backup).not.toMatch(/ exec -T -w \/data\/amc amc-studio sh -c '[^']*amc backup create/);
     const rollback = doc.slice(doc.indexOf("## Rollback\n"), doc.indexOf("## TLS for a public hostname\n"));
+    const offlineVerify = rollback.search(/run --rm --no-deps -T -w \/data\/amc --entrypoint sh amc-studio\s+-c '[^']*amc verify all --json --expect-monitor "\$1"' sh "\$pin"/);
+    expect(offlineVerify).toBeGreaterThan(rollback.indexOf("tar -xzf - -C /"));
+    expect(offlineVerify).toBeLessThan(rollback.lastIndexOf("up -d --no-build"));
+    expect(rollback).toMatch(/exit 0 and PASS for both `ledger-hash-chain` and `ledger-trust-root`/);
+    expect(rollback).toContain("The turn must verify against the pinned monitor.");
     expect(rollback).toMatch(/amc firewall status --json` must not report `"integrity": "invalid"`/);
   });
 });

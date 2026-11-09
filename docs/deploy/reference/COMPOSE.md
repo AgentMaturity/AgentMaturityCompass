@@ -116,11 +116,19 @@ These steps are documented and were not run: no 1.1.1 Compose stack was availabl
           -c 'find /home/amc/.config/amc/state -mindepth 1 -delete && mkdir -p /workspace/control-checkpoints && find /workspace/control-checkpoints -mindepth 2 -maxdepth 2 ! -name kill-switch -exec rm -rf {} + && tar -xzf - -C /' < ./amc-volumes-<ts>.tgz
         ```
 
-    5. `docker compose -f docker-compose.tls.yml up -d --no-build`, then verify as in [Upgrade](#upgrade-n-1-to-n) step 6, and check the signed controls: `docker compose -f docker-compose.tls.yml exec -w /data/amc amc-studio amc firewall status --json` must not report `"integrity": "invalid"` or `"controlIntegrity": "invalid"` (`trusted`, or `uninitialized` for a control the workspace never published).
+    5. Keep Studio stopped for the complete-ledger check. Set the shell variable `pin` from the monitor fingerprint recorded before the upgrade. Run the previous image as a one-off container on the restored workspace.
+
+        ```bash
+        docker compose -f docker-compose.tls.yml run --rm --no-deps -T -w /data/amc --entrypoint sh amc-studio \
+          -c 'AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")" amc verify all --json --expect-monitor "$1"' sh "$pin"
+        ```
+
+        Continue only after exit 0 and PASS for both `ledger-hash-chain` and `ledger-trust-root`. The check runs before Studio can open a new gateway session, which older images require for complete verification.
+    6. `docker compose -f docker-compose.tls.yml up -d --no-build`. Check TLS readiness, run `amc doctor --strict`, and run a governed turn as in [Upgrade](#upgrade-n-1-to-n) step 6. The turn must verify against the pinned monitor. When you check the signed controls, `docker compose -f docker-compose.tls.yml exec -w /data/amc amc-studio amc firewall status --json` must not report `"integrity": "invalid"` or `"controlIntegrity": "invalid"` (`trusted`, or `uninitialized` for a control the workspace never published).
 
 Restoring the state volume rolls this machine's anti-rollback marks back to the backup time: re-apply every revocation and key set accepted after the backup ([docs/KEY_LIFECYCLE.md](../../KEY_LIFECYCLE.md)). Restoring the checkpoint volume with the workspace does the same for signed controls: re-apply every firewall, guardrail, legal-hold and compiled-control change made after the backup. A rollback never restores what the newer version wrote: ledger rows written after the backup are gone, and a vault that a 2.0.0 unlock converted to version 2 stays version 2 ([docs/releases/2.0.0.md](../../releases/2.0.0.md)).
 
-The rehearsal for this procedure is `scripts/deploy/compose-rehearsal.mjs`: it runs image A, then B, then A again on one Compose project through `AMC_STUDIO_IMAGE`, with READY, a pairing code and one governed turn per phase. A stop at the downgrade guard when A comes back after B is recorded as the documented outcome; a guard on the first deploy or on B fails the rehearsal. It refuses a project that already has containers or volumes, so it never touches a running deployment, and it never runs `down -v`; `--cleanup` then removes only the volumes the run created.
+The image-switch rehearsal in `scripts/deploy/compose-rehearsal.mjs` runs image A, then B, then A again on one Compose project through `AMC_STUDIO_IMAGE`, with READY, a pairing code and one governed turn per phase. Use the steps above for the backup restore and complete-ledger check. A stop at the downgrade guard when A comes back after B is recorded as the documented outcome; a guard on the first deploy or on B fails the rehearsal. It refuses a project that already has containers or volumes, so it never touches a running deployment, and it never runs `down -v`; `--cleanup` then removes only the volumes the run created.
 
 ## TLS for a public hostname
 
