@@ -266,12 +266,16 @@ export interface DirectoryListing {
   readonly dropped: number;
   /** Entries the repository ignore rules hid (0 with `includeIgnored`). */
   readonly ignored: number;
+  /** True when the directory itself, or an ancestor, is ignored: nothing is listed, as the walk lists nothing there. */
+  readonly directoryIgnored: boolean;
 }
 
 /**
  * One directory level (SH-TOOLS-02 `ls`), under the same ignore rules the walk applies: every ancestor's `.gitignore`
- * and `.ignore` are inherited, so `ls` hides what `glob` hides. The caller has already resolved `directory` inside the
- * workspace and refused the protected directories; `.git`/`.amc` entries inside it are left out by identity.
+ * and `.ignore` are inherited, and an ignored directory (or one below an ignored ancestor) lists nothing, so `ls`
+ * hides what `glob` hides. The caller has already resolved `directory` inside the workspace and refused the protected
+ * directories; `.git`/`.amc` entries inside it, whatever their kind (a `.git` file, a link named `.amc`), are left out
+ * by name and, for real entries, by identity.
  *
  * ponytail: one `readdirSync` sorted in memory, so a directory of a million entries costs a million names before the
  * cap applies; move it to the search worker with a deadline if that ever matters.
@@ -286,6 +290,7 @@ export function listDirectory(workspace: string, directory: string, limits: { re
     rules.push(...ignoreRules(root, ancestor));
     for (const segment of relativeDir === "" ? [] : relativeDir.split(sep)) {
       ancestor = join(ancestor, segment);
+      if (ignored(forMatching(relative(root, ancestor)), true, rules)) return { entries: [], dropped: 0, ignored: 0, directoryIgnored: true };
       rules.push(...ignoreRules(root, ancestor));
     }
   }
@@ -294,7 +299,9 @@ export function listDirectory(workspace: string, directory: string, limits: { re
   for (const entry of readdirSync(directory, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
     const full = join(directory, entry.name);
     const isDirectory = entry.isDirectory();
-    if (isDirectory && (aliasedSegmentReason(entry.name) !== null || (protectedIds.size > 0 && protectedIds.has(fileIdentity(full) ?? "")))) continue;
+    if (aliasedSegmentReason(entry.name) !== null) continue;
+    // A link's identity is its target's, and ls never follows links; the name check above covers a link so named.
+    if (!entry.isSymbolicLink() && protectedIds.size > 0 && protectedIds.has(fileIdentity(full) ?? "")) continue;
     if (ignored(forMatching(relative(root, full)), isDirectory, rules)) { ignoredCount++; continue; }
     const kind = entry.isSymbolicLink() ? "symlink" : isDirectory ? "directory" : entry.isFile() ? "file" : "other";
     let size: number | null = null;
@@ -304,7 +311,7 @@ export function listDirectory(workspace: string, directory: string, limits: { re
     entries.push({ name: entry.name, kind, size });
   }
   const shown = entries.slice(0, limits.maxEntries);
-  return { entries: shown, dropped: entries.length - shown.length, ignored: ignoredCount };
+  return { entries: shown, dropped: entries.length - shown.length, ignored: ignoredCount, directoryIgnored: false };
 }
 
 /** Modification times for sorting glob results newest first; a file that vanished sorts last. */

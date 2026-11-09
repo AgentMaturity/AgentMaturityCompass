@@ -47,6 +47,31 @@ describe("ls", () => {
     expect(outcome.output.split("\n")).toEqual(["f a.ts  2", "f b.ts  1", "[amc: 3 more entries not shown; raise maxEntries or list a subdirectory]"]);
   });
 
+  it("lists nothing inside an ignored directory, as glob and grep do, unless includeIgnored is set", async () => {
+    const h = harness();
+    mkdirSync(join(h.workspace, "build/sub"), { recursive: true });
+    writeFileSync(join(h.workspace, "build/out.js"), "1");
+    for (const path of ["build", "build/sub"]) {
+      const outcome = await h.run({ path });
+      expect(outcome.ok).toBe(true);
+      expect(outcome.output).toBe(`[amc: ${path} is hidden by ignore rules, as glob and grep hide it; pass includeIgnored to list it]`);
+    }
+    expect((await h.run({ path: "build", includeIgnored: true })).output.split("\n")).toEqual(["f out.js  1", "d sub/"]);
+  });
+
+  it("leaves out a .git file and a link named .amc, not only protected directories", async () => {
+    const workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-ls-worktree-")));
+    dirs.push(workspace);
+    writeFileSync(join(workspace, ".git"), "gitdir: /elsewhere/.git/worktrees/x\n");
+    writeFileSync(join(workspace, "a.txt"), "a");
+    // A link so named is left out by name; its target's identity (here outside the workspace) is beside the point.
+    symlinkSync(tmpdir(), join(workspace, ".amc"));
+    const registry = new ToolRegistry();
+    registry.define(lsTool());
+    const outcome = await new ToolPipeline({ registry, workspace }).execute({ name: "ls", agentId: "a", arguments: { includeIgnored: true }, requestedMode: "EXECUTE" });
+    expect(outcome.output.split("\n")).toEqual(["f a.txt  1"]);
+  });
+
   it("refuses .git, a path outside the workspace, and a file path", async () => {
     const h = harness();
     expect((await h.run({ path: ".git" })).output).toMatch(/protected|\.git/);

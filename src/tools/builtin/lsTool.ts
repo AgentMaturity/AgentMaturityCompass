@@ -10,7 +10,8 @@ import { listDirectory } from "./workspaceWalk.js";
  *
  * READ_ONLY with no path policy, like `glob` and `grep`: the workspace bound and the protected-directory identities
  * are the limits, and they are checked in the body (`insideWorkspace`), not only by a guard. Symlinks are listed as
- * links and never followed. Repository ignore rules apply as `glob` applies them unless `includeIgnored` is set;
+ * links and never followed. Repository ignore rules apply as `glob` applies them unless `includeIgnored` is set, and
+ * an ignored directory lists nothing but the notice saying so;
  * `node_modules` and `dist` are listed when present, since they exist, although `glob` and `grep` do not descend into
  * them.
  */
@@ -43,7 +44,8 @@ export function lsTool(): ToolDefinition {
       const lines = listing.entries.map((entry) => entry.kind === "directory" ? `d ${entry.name}/`
         : entry.kind === "symlink" ? `l ${entry.name}`
           : entry.kind === "file" ? `f ${entry.name}  ${entry.size ?? "?"}` : `? ${entry.name}`);
-      if (lines.length === 0) lines.push(`[amc: ${rel === "" ? "the workspace root" : rel} has no entries to show]`);
+      if (listing.directoryIgnored) lines.push(`[amc: ${rel} is hidden by ignore rules, as glob and grep hide it; pass includeIgnored to list it]`);
+      else if (lines.length === 0) lines.push(`[amc: ${rel === "" ? "the workspace root" : rel} has no entries to show]`);
       if (listing.dropped > 0) lines.push(`[amc: ${listing.dropped} more entries not shown; raise maxEntries or list a subdirectory]`);
       if (listing.ignored > 0) lines.push(`[amc: ${listing.ignored} entries hidden by ignore rules; pass includeIgnored to see them]`);
       const output = lines.join("\n");
