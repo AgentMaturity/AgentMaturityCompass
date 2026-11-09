@@ -20,8 +20,10 @@
  * the next turn without `--plan` (`--session <id>` continues the same session).
  * Plan mode is therefore a PER-TURN fact: it is not in the composition or policy
  * digest, so a planning turn and the executing turn that follows it share a
- * session. Each planning turn records a signed NATIVE_PLAN_MODE audit row, and
- * the session's native-composition row lists the tools the model was offered.
+ * session. Every turn a plan-mode run opens (a queued follow-up included)
+ * records a signed NATIVE_PLAN_MODE audit row INSIDE that turn, naming it, at its
+ * first step boundary; a run that fails before its first turn records none. The
+ * session's native-composition row lists the tools the model was offered.
  *
  * WHAT IT DOES NOT COVER. A tool whose reviewed class is READ_ONLY but which
  * mutates something outside the workspace (an MCP tool with a wrong review) is
@@ -33,6 +35,7 @@ import type { ToolRegistry } from "../tools/toolRegistry.js";
 import type { ContextPlugin } from "../prompt/context/contextTypes.js";
 import type { SessionService } from "../session/sessionService.js";
 import { deniedToolNamesForScope } from "./delegationScope.js";
+import type { LoopHooks } from "./loopTypes.js";
 
 const PLAN_MODE_CONTEXT = "context:plan-mode";
 /** After instructions (100) and mission (125), before the clock (900). */
@@ -71,18 +74,31 @@ export function createPlanModeContextPlugin(enabled: boolean): ContextPlugin {
   return {
     name: PLAN_MODE_CONTEXT,
     order: PLAN_MODE_CONTEXT_ORDER,
+    // A tool mounted after composition (an MCP server) can still be offered; the guard denies it unless it is READ_ONLY.
     collect: () => Promise.resolve(enabled
-      ? "This turn runs in plan mode. Only read-only tools are offered or allowed; the workspace is not changed in this turn. "
-        + "Investigate, then record the plan with the plan tool. There is no tool that leaves plan mode: the operator executes the plan "
-        + "in a later turn started without plan mode."
+      ? "This turn runs in plan mode. Only read-only tools run: any other tool call is denied, so this turn's tools do not change "
+        + "the workspace. Investigate, then record the plan with the plan tool. There is no tool that leaves plan mode: the operator "
+        + "executes the plan in a later turn started without plan mode."
       : "")
   };
 }
 
-/** The signed per-turn fact that this turn ran in plan mode. */
-export function recordPlanMode(session: Pick<SessionService, "recordProjectedEvidence">, options: { readonly withheldTools: readonly string[] }): void {
+/** The signed fact that `turn` ran in plan mode. */
+function recordPlanMode(session: Pick<SessionService, "recordProjectedEvidence">, options: { readonly withheldTools: readonly string[]; readonly turn: number }): void {
   session.recordProjectedEvidence({ eventType: "audit", payload: "", meta: {
-    auditType: "NATIVE_PLAN_MODE", v: 1, scope: ["READ_ONLY"], deniedByName: [...PLAN_MODE_DENIED_TOOLS],
+    auditType: "NATIVE_PLAN_MODE", v: 1, turn: options.turn, scope: ["READ_ONLY"], deniedByName: [...PLAN_MODE_DENIED_TOOLS],
     withheldTools: [...options.withheldTools], guard: PLAN_MODE_GUARD
   } });
+}
+
+/**
+ * The root driver's pre-step in plan mode: at the first step boundary of every turn, the NATIVE_PLAN_MODE row is
+ * recorded inside that turn before the step's request. A row that cannot be written stops the step (fail closed).
+ */
+export function planModePreStep(session: Pick<SessionService, "recordProjectedEvidence">, options: { readonly withheldTools: readonly string[] },
+  inner: LoopHooks["preStep"]): LoopHooks["preStep"] {
+  return (input, next) => {
+    if (input.step === 1) recordPlanMode(session, { withheldTools: options.withheldTools, turn: input.turn });
+    return inner(input, next);
+  };
 }

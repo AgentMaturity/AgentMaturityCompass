@@ -132,6 +132,8 @@ export class AgentDriver {
   /** Null when the run carries no limit. */
   private readonly limits: RunLimitTracker | null;
   private deadline: NodeJS.Timeout | null = null;
+  /** The limit whose signed `loop/cancel` ended this run's work; once set, new work is refused at admission. */
+  private limitEnding: RunLimitBreach | null = null;
 
   private phase: Phase = { kind: "idle", lastTurn: 0 };
 
@@ -207,9 +209,18 @@ export class AgentDriver {
   private limitReached(breach: RunLimitBreach): void {
     if (this.admissionClosed || this.shutdownPromise || this.phase.kind === "failed") return;
     if (this.phase.kind === "running" ? this.phase.abort.signal.aborted : !this.inbox.hasPending) return;
-    try { this.cancel(breach, { by: "run-limit" }); }
+    try { this.limitCancel(breach); }
     catch (error) { this.notifyError(error); }
   }
+
+  /** Every limit ending goes through here: the signed cancel, and admission closed to new work with the reason. */
+  private limitCancel(breach: RunLimitBreach): void {
+    this.limitEnding ??= breach;
+    this.cancel(breach, { by: "run-limit" });
+  }
+
+  /** The limit that ended this run's work, or null: what a host reports instead of a silent stop. */
+  get runLimitEnding(): RunLimitBreach | null { return this.limitEnding; }
 
   private async observeExtensions(event: NativeExtensionHookEvent, signal?: AbortSignal): Promise<void> {
     // Observer failures, including reporting failures, cannot veto the signed turn or its seal.
@@ -426,6 +437,7 @@ export class AgentDriver {
   private assertUsable(): void {
     if (this.admissionClosed) throw new Error("AgentDriver is disposed: new work is refused");
     if (this.shutdownPromise) throw new Error("AgentDriver is shut down; admission is stopped.");
+    if (this.limitEnding !== null) throw new Error(`AgentDriver run limit reached (${this.limitEnding.condition}:${this.limitEnding.bound}); new work is refused.`);
     if (this.phase.kind === "failed") {
       throw new Error(
         "AgentDriver is in a terminal failed state: session evidence or pending context requires operator recovery"
@@ -515,7 +527,7 @@ export class AgentDriver {
     // same signed `loop/cancel` a live breach writes, with the queued work it dropped.
     const refused = this.limits?.turnAllowed(this.session.turnsStarted + 1) ?? null;
     if (refused !== null) {
-      this.cancel(refused, { by: "run-limit" });
+      this.limitCancel(refused);
       return false;
     }
 
@@ -620,7 +632,7 @@ export class AgentDriver {
         // The token budget was checked against what `step/end` just committed; a breach cancels the
         // turn here with the limit as its cause, before any further request.
         const exhausted = this.limits?.breach ?? null;
-        if (exhausted !== null && !signal.aborted) this.cancel(exhausted, { by: "run-limit" });
+        if (exhausted !== null && !signal.aborted) this.limitCancel(exhausted);
         signal.throwIfAborted();
         // Between steps only, after `step/end` committed the usage it measures. A
         // summary step it runs takes the next step number, so keep ours in line.

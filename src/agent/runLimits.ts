@@ -13,8 +13,9 @@
  * UNITS, STATED. `max-turns:N` is a SESSION turn number: no turn numbered above
  * N opens, so a resumed session that already ran N turns refuses its next one.
  * `max-tokens:N` counts provider-reported input, output and cache tokens over the
- * steps THIS driver ran, plus the tokens the session's earlier steps reported
- * (seeded by the caller from `sessionTokenCounts`). `timeout-ms:N` is wall clock
+ * steps THIS driver ran, plus the tokens a RESUMED session's earlier steps
+ * reported (seeded by the caller from `sessionTokenCounts`; a fork starts at
+ * zero, its parent's counts recorded beside it). `timeout-ms:N` is wall clock
  * from the driver's construction. In-process delegated children run under their
  * own driver and are not counted; a run that needs a child bound uses
  * `--delegate-stop`.
@@ -73,6 +74,12 @@ export function parseRunLimits(conditions: readonly string[] | undefined): RunLi
     limits[key] = value;
   }
   return { ok: true, limits: Object.freeze({ ...limits }), conditions: Object.freeze(snapshot) };
+}
+
+/** A breach in the `--stop` syntax the operator gave it, for the run report. */
+export function describeRunLimit(breach: RunLimitBreach): string {
+  const condition = breach.condition === "deadline" ? "timeout-ms" : breach.condition;
+  return `${condition}:${breach.bound}${breach.unmeasured === true ? " (a step reported no usage, so the token budget could not see it)" : ""}`;
 }
 
 /** What a session's earlier steps reported, for seeding a resumed run's token budget. */

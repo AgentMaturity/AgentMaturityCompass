@@ -83,8 +83,8 @@ import type { TurnCancelCause } from "../session/sessionTypes.js";
 import { amcVersion } from "../version.js";
 import { compositionDigestOf, policyDigestOf, promptProfileFor } from "./composedTurnIdentity.js";
 import { serviceOn } from "./approvalSeamRunner.js";
-import { recordPlanMode } from "../agent/planMode.js";
-import { priorTokensOf, type RunLimits } from "../agent/runLimits.js";
+import { planModePreStep } from "../agent/planMode.js";
+import { priorTokensOf, type RunLimitBreach, type RunLimits } from "../agent/runLimits.js";
 import { sessionTokenCounts } from "../session/sessionTokenCounts.js";
 import { credentialsServices, CREDENTIALS_SEAM } from "./services/credentialsServices.js";
 import type { CredentialsSeamService, CredentialsServiceConfig } from "./services/credentialsServices.js";
@@ -351,6 +351,8 @@ export interface ComposedTurnOutcome {
   readonly parent?: SessionLineage | null;
   /** True when the session was left unsealed for a later process. */
   readonly keptOpen?: boolean;
+  /** Set when an operator run limit ended this run's work; the signed `loop/cancel` row carries the same cause. */
+  readonly runLimit?: RunLimitBreach;
 }
 
 /**
@@ -364,6 +366,11 @@ export interface ComposedTurnOutcome {
 export async function runComposedTurn(options: ComposedTurnOptions): Promise<ComposedTurnOutcome> {
   if (options.audioParts !== undefined && (options.prompt !== "" || (options.images?.length ?? 0) > 0 || options.schedulePass !== undefined)) {
     throw new Error("Audio input requires its complete ordered sequence, without legacy prompt/images or schedule execution.");
+  }
+  // SH-LOOP-04: plan mode narrows the ROOT toolset only. Children, goal rounds and schedule passes build their toolsets
+  // afresh, so the restriction and its signed per-turn claim would not hold for them: refused before any session row.
+  if (options.planMode !== undefined && (options.delegation !== undefined || options.goalRounds !== undefined || options.schedulePass !== undefined)) {
+    throw new Error("Plan mode narrows the root toolset only; delegation, goal rounds and schedule passes cannot run under it. No session was opened.");
   }
   const audioParts = options.audioParts === undefined ? undefined : materializeNativeAudioParts(snapshotNativeAudioParts(options.audioParts));
   const images = materializeNativeImages(snapshotNativeImages(options.images));
@@ -457,7 +464,6 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       recordProjectedEvidence: (row) => session.recordProjectedEvidence(row),
       assertWritable: () => session.assertWritable()
     });
-    if (options.planMode !== undefined) recordPlanMode(session, options.planMode);
     const credentialsFiber = ctx.plugin(credentialsServices, options.credentials ?? {});
     await credentialsFiber.await();
     fibers.push(credentialsFiber);
@@ -530,7 +536,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     // to watch. `notify` is the live mirror and is optional; `preStep` is how the
     // workspace's own instructions get in front of the agent, and is not.
     const hooks: LoopHooks = {
-      preStep: prompt.preStep,
+      // Plan mode records its signed per-turn fact inside each turn the run opens; see planModePreStep.
+      preStep: options.planMode === undefined ? prompt.preStep : planModePreStep(session, options.planMode, prompt.preStep),
       turnStopping: () => Promise.resolve(),
       notify:
         options.notify ??
@@ -639,9 +646,10 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       ...(tools !== undefined ? { tools } : {}),
       ...(options.validation !== undefined ? { validation: options.validation } : {}),
       ...(options.config !== undefined ? { config: options.config } : {}),
-      // A resumed or forked session's earlier steps count toward the token bound; unmeasured ones fail it closed.
+      // A resumed session's earlier steps count toward the token bound; unmeasured ones fail it closed. A fork is a new
+      // session: it records its parent's counts as FORK_TOKEN_COUNTS and starts its own budget at zero.
       ...(options.runLimits === undefined ? {} : { runLimits: { limits: options.runLimits,
-        ...(resumed === null && parent === null ? {} : priorTokensOf(sessionTokenCounts(session.readEvents()))) } }),
+        ...(resumed === null ? {} : priorTokensOf(sessionTokenCounts(session.readEvents()))) } }),
       hooks
     });
     await loopFiber.await();
@@ -693,7 +701,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       // replaces the section list, and reporting the registered names there
       // would name sections the prompt does not contain.
       promptSections: prompt.assemble().sections.map((section) => section.name),
-      ...(resumed === null ? {} : { resumed })
+      ...(resumed === null ? {} : { resumed }),
+      ...(loop.agent.runLimitEnding === null ? {} : { runLimit: loop.agent.runLimitEnding })
     };
   } finally {
     if (steerTimer !== null) clearTimeout(steerTimer);

@@ -3,6 +3,7 @@ import type { Command } from "commander";
 import type { AgentToolsetOptions } from "../agent/agentToolset.js";
 import type { AgentStatus } from "../agent/loopTypes.js";
 import { readAgentRunSummary, renderRunSummary } from "../agent/runReport.js";
+import { describeRunLimit, type RunLimitBreach } from "../agent/runLimits.js";
 import { executionStatusFor } from "../execution/executionStatus.js";
 import { renderNativeGuideCommand } from "../setup/nativeFirstUseGuide.js";
 import type { GoalRoundsResult } from "../autonomy/goalRounds.js";
@@ -19,7 +20,7 @@ import type { WebSearchProvider } from "../tools/builtin/webSearchTool.js";
  * them. Kept here so the run command composes them without carrying their rules.
  */
 
-interface RunOutcome { readonly sessionId: string; readonly status: AgentStatus; readonly goalRounds?: GoalRoundsResult }
+interface RunOutcome { readonly sessionId: string; readonly status: AgentStatus; readonly goalRounds?: GoalRoundsResult; readonly runLimit?: RunLimitBreach }
 
 export const WEB_SEARCH_SEARXNG_HELP = "opt-in web_search provider for workspace tools: a SearXNG JSON origin, also granted under web_search in the signed tools policy";
 
@@ -45,7 +46,8 @@ export interface BreadthRun {
   dispose(): void;
   /**
    * Report the run from its signed log: the summary (JSON or text), goal rounds, the verified todo/plan and the verify
-   * command; fails the command on a failed driver, an error ending, unpassed requested validation or a failed goal run.
+   * command; fails the command on a failed driver, an error ending, unpassed requested validation, a failed goal run,
+   * or an operator run limit that ended the run's work (its prompt or a queued turn did not run to completion).
    */
   reportRun(outcome: RunOutcome, priorTurnEndings: number, validationRequested: boolean): void;
 }
@@ -81,7 +83,7 @@ export function resolveBreadthRun(io: AgentLoopCliIo, opts: RunOptions, context:
       const ending = summary.endings.length > priorTurnEndings ? summary.endings.at(-1) : undefined;
       const goal = outcome.goalRounds;
       // P2-13: the four execution phases; evidence verification stays pending until `agent-loop verify`.
-      io.log(opts.json ? JSON.stringify({ ...summary, ...(goal === undefined ? {} : { goalRounds: goal }),
+      io.log(opts.json ? JSON.stringify({ ...summary, ...(goal === undefined ? {} : { goalRounds: goal }), ...(outcome.runLimit === undefined ? {} : { runLimit: outcome.runLimit }),
         execution: executionStatusFor(process.cwd(), { sessionId: summary.sessionId, admission: "admitted",
           turn: ending?.reason ?? (summary.driverStatus === "failed" ? "error" : null), verified: null }) }, null, 2) : renderRunSummary(summary));
       if (!opts.json) {
@@ -93,8 +95,9 @@ export function resolveBreadthRun(io: AgentLoopCliIo, opts: RunOptions, context:
         io.log("Verify the recorded evidence (this does not evaluate answer quality):\n  " +
           renderNativeGuideCommand({ cwd: process.cwd(), argv: ["amc", "agent-loop", "verify", summary.sessionId] }));
       }
+      if (outcome.runLimit !== undefined) io.error(chalk.yellow(`Run limit reached: ${describeRunLimit(outcome.runLimit)}. The signed loop/cancel row names it; queued work was dropped and no more is admitted.`));
       if (summary.driverStatus === "failed" || ending?.reason === "error" || (validationRequested && summary.validation.status !== "passed")
-        || (goal !== undefined && ["failed", "refused", "cancelled"].includes(goal.stoppedBy))) io.fail();
+        || (goal !== undefined && ["failed", "refused", "cancelled"].includes(goal.stoppedBy)) || outcome.runLimit !== undefined) io.fail();
     }
   };
 }

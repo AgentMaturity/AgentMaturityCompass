@@ -1,6 +1,6 @@
 import { rmSync } from "node:fs";
 import { afterEach, describe, expect, it } from "vitest";
-import { parseRunLimits, priorTokensOf, RunLimitTracker } from "../src/agent/runLimits.js";
+import { describeRunLimit, parseRunLimits, priorTokensOf, RunLimitTracker } from "../src/agent/runLimits.js";
 import { readTurnEndMeta } from "../src/session/turnLifecycleMeta.js";
 import { isTurnCancelCause } from "../src/session/sessionTypes.js";
 import { bodyFromChunks } from "../src/llm/adapter/transport.js";
@@ -109,6 +109,22 @@ describe("the driver under run limits", () => {
     expect(rows(events, "step/end").map(row => (JSON.parse(row.meta_json) as { usage: unknown }).usage)).toEqual([null]);
     expect(rows(events, "turn/start")).toHaveLength(1);
     expect(cancels(events)[0]).toMatchObject({ requestedBy: "run-limit", cause: { kind: "limit", condition: "max-tokens", unmeasured: true } });
+  });
+
+  it("a limit that ended the run refuses new work at admission: one signed cancel, not one per later attempt", async () => {
+    // MUTATION: drop the limitEnding check in assertUsable and the third follow-up is admitted, then cancelled by a second row.
+    const harness = loopHarness({ scripts: [textStep("one", { inputTokens: 1, outputTokens: 1 })], runLimits: { limits: { maxTurns: 1 } } });
+    open.push(harness);
+    harness.driver.followup("First.");
+    await harness.driver.whenIdle();
+    expect(harness.driver.runLimitEnding).toBeNull();
+    harness.driver.followup("Second.");
+    await harness.driver.whenIdle();
+    expect(harness.driver.runLimitEnding).toMatchObject({ kind: "limit", condition: "max-turns", bound: 1 });
+    expect(() => harness.driver.followup("Third.")).toThrow(/run limit reached \(max-turns:1\)/);
+    expect(cancels(harness.events())).toHaveLength(1);
+    expect(describeRunLimit({ kind: "limit", condition: "deadline", bound: 100 })).toBe("timeout-ms:100");
+    expect(describeRunLimit({ kind: "limit", condition: "max-tokens", bound: 5, unmeasured: true })).toMatch(/^max-tokens:5 \(a step reported no usage/);
   });
 
   it("timeout-ms: the deadline cancels a live turn with cause deadline", async () => {

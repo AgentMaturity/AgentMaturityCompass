@@ -12,6 +12,10 @@ import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { verifyAgentRun, type AgentRunSummary } from "../src/agent/runReport.js";
+import { runComposedTurn, type ComposedTurnOptions } from "../src/kernel/agentLoopRunner.js";
+import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL, stubProviderRoute, stubProviderTransport } from "../src/agent/stubProvider.js";
+import { extractEnvelope } from "../src/session/sessionTypes.js";
+import type { EvidenceEvent } from "../src/types.js";
 
 /**
  * SH-LOOP-04: plan mode is a READ_ONLY action-class budget on the root registry (the same mechanism as a
@@ -93,7 +97,8 @@ describe("amc agent-loop run --plan", () => {
     expect(toolCalls(plannedRows, 1)).not.toContain("fs.write");
     const audit = plannedRows.find(row => row.event_type === "audit" && (JSON.parse(row.meta_json) as { auditType?: string }).auditType === "NATIVE_PLAN_MODE");
     expect(audit, "a signed per-turn NATIVE_PLAN_MODE row").toBeDefined();
-    expect((JSON.parse(audit!.meta_json) as { withheldTools: string[] }).withheldTools).toContain("fs.write");
+    expect(JSON.parse(audit!.meta_json) as { withheldTools: string[]; turn: number }).toMatchObject({ turn: 1, withheldTools: expect.arrayContaining(["fs.write"]) });
+    expect(extractEnvelope(audit!.meta_json)?.turn).toBe(1);
     // The native-composition row names what the model was offered: no fs.write in plan mode.
     const offered = plannedRows.filter(row => row.event_type === "audit" && row.meta_json.includes("offered-tools")).map(row => row.meta_json).join("\n");
     expect(offered).not.toContain("\"fs.write\"");
@@ -118,5 +123,43 @@ describe("amc agent-loop run --plan", () => {
     }
     const ledger = openLedger(workspace, { readonly: true });
     try { expect(ledger.getAllEvents().filter(row => row.event_type === "session/open")).toHaveLength(0); } finally { ledger.close(); }
+  });
+});
+
+describe("the per-turn NATIVE_PLAN_MODE fact through the composed runner", () => {
+  let workspace: string; let home: string;
+  beforeEach(() => {
+    workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-plan-turns-")));
+    home = realpathSync(mkdtempSync(join(tmpdir(), "amc-plan-turns-home-")));
+    initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
+  });
+  afterEach(() => { rmSync(workspace, { recursive: true, force: true }); rmSync(home, { recursive: true, force: true }); });
+  const base = (): ComposedTurnOptions => ({
+    workspace, agentId: "default", systemPrompt: "You are an AMC-governed agent.", prompt: "plan it", planMode: { withheldTools: ["fs.write"] },
+    route: { providerId: STUB_PROVIDER_ID, model: STUB_PROVIDER_MODEL, params: { max_tokens: 256, stream: true } },
+    routes: [stubProviderRoute()], transport: stubProviderTransport(), credentials: { homeDir: home, env: {}, watch: false, projectDir: null }
+  });
+  const all = (): EvidenceEvent[] => { const ledger = openLedger(workspace, { readonly: true }); try { return ledger.getAllEvents(); } finally { ledger.close(); } };
+  const planRows = (rows: readonly EvidenceEvent[]) => rows.filter(row => row.event_type === "audit" && (JSON.parse(row.meta_json) as { auditType?: string }).auditType === "NATIVE_PLAN_MODE");
+
+  it("records one row inside every turn the run opens, a queued follow-up included", async () => {
+    // MUTATION: record once at session open (the old placement) and turn 2 has no row, while turn 1's row precedes its turn/start.
+    const outcome = await runComposedTurn({ ...base(), onReady: handle => { handle.queue("and the second turn"); } });
+    const rows = all().filter(row => row.session_id === outcome.sessionId);
+    expect(rows.filter(row => row.event_type === "turn/start")).toHaveLength(2);
+    const recorded = planRows(rows);
+    expect(recorded.map(row => [extractEnvelope(row.meta_json)?.turn, (JSON.parse(row.meta_json) as { turn: number }).turn])).toEqual([[1, 1], [2, 2]]);
+    for (const row of recorded) {
+      const turn = extractEnvelope(row.meta_json)!.turn;
+      const start = rows.findIndex(other => other.event_type === "turn/start" && extractEnvelope(other.meta_json)?.turn === turn);
+      expect(rows.indexOf(row)).toBeGreaterThan(start);
+    }
+  });
+
+  it("leaves no plan-mode claim when composition fails before a turn, and refuses goal rounds before any session row", async () => {
+    await expect(runComposedTurn({ ...base(), route: { providerId: "no-such-provider", model: "x", params: { max_tokens: 16, stream: true } } })).rejects.toThrow();
+    expect(planRows(all())).toHaveLength(0);
+    // MUTATION: drop the plan-mode refusal at the top of runComposedTurn and this reaches the goal-rounds checks instead.
+    await expect(runComposedTurn({ ...base(), goalRounds: { maxRounds: 1 } })).rejects.toThrow(/Plan mode narrows the root toolset only/);
   });
 });
