@@ -47,6 +47,20 @@ describe("definitions are discovered as flat <name>.md files", () => {
     expect(reviewer.sha256).toMatch(/^[a-f0-9]{64}$/);
   });
 
+  it("keeps sibling command files out of the agent definition catalog", () => {
+    const root = layer({});
+    const agents = join(root, "agents"), commands = join(root, "commands");
+    mkdirSync(agents);
+    mkdirSync(commands);
+    writeFileSync(join(agents, "reviewer.md"), definition("reviewer", { tools: "fs.read" }));
+    writeFileSync(join(commands, "reviewer.md"), definition("reviewer", {}, "Unscoped command."));
+    writeFileSync(join(commands, "helper.md"), definition("helper"));
+    const catalog = readAgentDefinitions([agents]);
+    expect(catalog.problems).toEqual([]);
+    expect([...catalog.definitions.keys()]).toEqual(["reviewer"]);
+    expect(catalog.definitions.get("reviewer")?.tools).toEqual(["fs.read"]);
+  });
+
   it("lets a later layer (the project) win over an earlier one (the user) by name", () => {
     const user = layer({ reviewer: definition("reviewer", {}, "user body") });
     const project = layer({ reviewer: definition("reviewer", {}, "project body") });

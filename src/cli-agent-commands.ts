@@ -50,9 +50,11 @@ import { NativeMcpConfigError, reviewedNativeMcpApprovalOptions, type ReviewedNa
 import { DEFAULT_MAX_DELEGATION_DEPTH } from "./agent/delegationIdentity.js";
 import { parseDelegationScope } from "./agent/delegationScope.js";
 import { parseSubagentStopConditions } from "./agent/subagentStopConditions.js";
-import { prepareSkillTurn, workspaceSkillRoots } from "./skills/skillTurn.js";
+import { applySkillToolRestriction, prepareSkillTurn, workspaceSkillRoots } from "./skills/skillTurn.js";
 import { buildSkillCatalog } from "./skills/skillCatalog.js";
 import { loadNativeExtensions, type NativeExtensionManager, type NativeExtensionTurn } from "./extensions/nativeExtensionRuntime.js";
+import { denyPromptByCommandHooks } from "./extensions/nativeCommandHooks.js";
+import { mergeScopedMcpSelection } from "./mcp/mcpScopes.js";
 import { bindNativeMcpResourceStatus, projectNativeResourceStatus, type NativeMcpResourceSource } from "./prompt/context/nativeResourceStatus.js";
 import { explicitPresetCompositionOptions, nativePresetCompositionSources } from "./cli/agentCompositionSources.js";
 import { resolvePreset, type AgentPreset } from "./presets/agentPresets.js";
@@ -119,6 +121,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--credentials-home <dir>", "same credential home as agent-loop run").option("--credentials-file <path>", "same explicit credential file as agent-loop run")
     .option("--mcp-config <path>", "reviewed MCP JSON; repeat to mount more servers, each grant keeping its reviewed action class; requires --tools workspace and --approve-tools", collectOption)
     .option("--mcp-config-sha256 <digest>", "require these exact reviewed MCP config bytes; one per --mcp-config, in the same order", collectOption)
+    .option("--mcp <id>", "mount a scoped server by id (project:<id> or user:<id> when both exist); repeatable; reviewed exactly like --mcp-config", collectOption)
     .option("--approve-tools <actionClass>", "require the signed approval gate before each tool call")
     .option("--approve-risk <tier>", "approval risk tier (default high)")
     .option("--tools <mode>", "none, echo, or explicitly enabled workspace tools; existing policy still applies")
@@ -165,6 +168,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--credentials-file <path>", "explicit credentials file, overriding the home layout")
     .option("--mcp-config <path>", "reviewed MCP JSON; repeat to mount more servers under the same signed allowlist; each grant keeps its reviewed action class; requires --tools workspace and --approve-tools", collectOption)
     .option("--mcp-config-sha256 <digest>", "refuse an MCP config changed from these exact reviewed bytes; one per --mcp-config, in the same order", collectOption)
+    .option("--mcp <id>", "mount a scoped server from .amc/mcp or <AMC home>/mcp by id (project:<id> or user:<id> when both exist); repeatable", collectOption)
     .option("--max-tokens <n>", "provider max_tokens for each request"),
     "enabled or disabled: DeepSeek, Anthropic (tools-free: adaptive, or manual with --thinking-budget), Gemini (includeThoughts) and Ollama (think)")
     .option("--max-steps <n>", "how many model steps one turn may take")
@@ -294,6 +298,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         return;
       }
       const prompt = skillTurn.prompt;
+      // SH-EXT-01 UserPromptSubmit: a trusted hooks.json may stop the turn here, before any session row exists. It sees the line as typed.
+      const promptDenied = await denyPromptByCommandHooks({ workspace: process.cwd(), prompt: rawPrompt, ...(skillTurn.loaded === undefined ? {} : { skill: skillTurn.loaded.name }) });
+      if (promptDenied !== undefined) { io.error(chalk.red(`prompt refused by hook: ${promptDenied}`)); io.fail(); return; }
       if (prompt.length === 0 && opts.audioInput === undefined && opts.workflowPlan === undefined) {
         io.error(chalk.red("a prompt is required: amc agent-loop run \"...\""));
         io.fail();
@@ -374,6 +381,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       let requestParams: Record<string, unknown>;
       try { requestParams = paramsFor(providerId, maxTokens, opts); }
       catch (error) { io.error(error instanceof Error ? error.message : "Invalid provider parameters."); io.fail(); return; }
+      // SH-EXT-02: scoped ids become explicit paths plus exact-bytes pins before the unchanged review below.
+      try { opts = mergeScopedMcpSelection(opts, process.cwd()); }
+      catch (error) { io.error(chalk.red(error instanceof Error ? error.message : "MCP scope resolution refused.")); io.fail(); return; }
       if (opts.mcpConfigSha256 !== undefined && opts.mcpConfig === undefined) {
         io.error("--mcp-config-sha256 requires --mcp-config."); io.fail(); return;
       }
@@ -480,6 +490,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...breadth.toolset,
           ...shellOptIn
         });
+        // SH-EXT-05: a loaded skill's disallowed-tools narrows this run; an unregistered name is refused, never ignored.
+        const restricted = applySkillToolRestriction(toolset.registry, skillTurn, agentId);
+        if (restricted !== undefined) { toolset.close(); io.error(chalk.red(restricted)); io.fail(); return; }
         bindToolSession = (session) => { boundSession = session; };
         if (wantsDelegation) {
           // Said up front, not discovered mid-run. The capability and the signed
@@ -687,7 +700,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...(providerId === STUB_PROVIDER_ID
             ? { transport: stubProviderTransport({ failFirst, thinkMs, retryAfterSeconds: 1 }) }
             : {}),
-          ...(toolSeam === null && !extensionTurn.hooks ? {} : { tools: { ...(toolSeam ?? EMPTY_TOOL_SEAM), extensionHooks: extensionTurn.hooks } }),
+          ...(toolSeam === null && !extensionTurn.hooks ? {} : { tools: { ...(toolSeam ?? EMPTY_TOOL_SEAM), ...(toolSeam?.extensionHooks ? {} : { extensionHooks: extensionTurn.hooks }) } }),
           ...(bindToolSession === undefined ? {} : { bindToolSession }),
           ...(grantDelegation === null
             ? {}

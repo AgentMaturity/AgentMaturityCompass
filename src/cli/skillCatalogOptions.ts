@@ -19,12 +19,16 @@ export function showSkillCatalogSelection(opts: RunOptions, io: AgentLoopCliIo):
     ? `No admitted skill named "${opts.listSkills}". Review discovery problems and the available names.` : undefined;
   const result = { ok: reason === undefined && catalog.observation.complete, ...(reason === undefined ? {} : { reason }),
     observation: catalog.observation, problems: catalog.problems,
-    ...(selected === undefined ? { skills: catalog.skills.map(skill => ({ name: skill.name, description: skill.description,
-      sourcePath: skill.sourcePath, digest: skill.digest, modelInvocation: skill.disableModelInvocation !== true })) } : { skill: selected }) };
+    ...(selected === undefined ? { skills: catalog.skills.map(skill => ({ name: skill.name, kind: skill.kind, description: skill.description,
+      sourcePath: skill.sourcePath, digest: skill.digest, modelInvocation: skill.disableModelInvocation !== true,
+      ...(skill.argumentHint === undefined ? {} : { argumentHint: skill.argumentHint }),
+      ...(skill.disallowedTools === undefined ? {} : { disallowedTools: skill.disallowedTools }),
+      ...(skill.allowedTools === undefined ? {} : { allowedToolsReportedOnly: skill.allowedTools }),
+      ...(skill.model === undefined ? {} : { modelReportedOnly: skill.model }) })) } : { skill: selected }) };
   if (opts.json) io.log(JSON.stringify(result, null, 2));
   else {
     io.log(`Skill discovery: ${catalog.observation.complete ? "complete" : "incomplete"}; observation ${catalog.observation.digest}`);
-    for (const skill of catalog.skills) io.log(`${skill.name}: ${skill.description} (${skill.sourcePath}; sha256 ${skill.digest})`);
+    for (const skill of catalog.skills) io.log(`${skill.name}${skill.argumentHint === undefined ? "" : ` ${skill.argumentHint}`}: ${skill.description} (${skill.kind}; ${skill.sourcePath}; sha256 ${skill.digest})`);
     for (const problem of catalog.problems) io.error(`${problem.sourcePath}: ${problem.reason}`);
     if (selected !== undefined) io.log(selected.body);
     if (reason !== undefined) io.error(reason);

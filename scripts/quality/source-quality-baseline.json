@@ -22576,13 +22576,6 @@
       "date": "2026-10-20"
     },
     {
-      "id": "ecdedd498d80020871be726f7335e2767461c8c5f7a26729cc957de69f5cea6a",
-      "scan": "duplicates",
-      "reason": "WP21c: the public SDK option type and the ACP startup init both carry the same repeatable MCP config/pin fields; sharing one type would couple the published SDK surface to ACP internals",
-      "acceptedBy": "AgentMaturity",
-      "date": "2026-10-30"
-    },
-    {
       "id": "ecfa71e9a1452f14167a3d572ed8b098cb43bbacb34bd7bc6a4ac0cbea8dfb62",
       "scan": "duplicates",
       "reason": "POST signing authenticates actual body bytes; log-tail authenticates an empty body and audits pathname/reason. Keep explicit per-route awaited log/401 behavior instead of a generic auth flow with hidden effects.",

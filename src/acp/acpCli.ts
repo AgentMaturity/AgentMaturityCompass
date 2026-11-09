@@ -46,6 +46,7 @@ export function registerAcpCommands(program: Command): void {
     .option("--reviewer-reason <text>", "Decision reason for allow_once when the client's response carries none; requires --reviewer-session-token-file")
     .option("--mcp-config <path>", "Reviewed native MCP config; repeat for more servers; requires workspace tools and signed approvals", (path: string, previous: string[] = []) => [...previous, path])
     .option("--mcp-config-sha256 <digest>", "Pin exact reviewed MCP configuration bytes; one per --mcp-config in the same order", (digest: string, previous: string[] = []) => [...previous, digest])
+    .option("--mcp <id>", "Mount a scoped MCP server by id (project:<id> or user:<id> when both exist); repeatable", (id: string, previous: string[] = []) => [...previous, id])
     .option("--max-tokens <n>", "Positive output-token bound per model request", "512")
     .option("--thinking <mode>", "enabled or disabled: DeepSeek, Anthropic (tools-free: adaptive, or manual with --thinking-budget), Gemini and Ollama")
     .option("--reasoning-effort <effort>", "Sent verbatim: DeepSeek low|high|max, Anthropic low|medium|high|xhigh|max (output_config.effort), Gemini MINIMAL|LOW|MEDIUM|HIGH, Ollama low|medium|high|max")
@@ -84,6 +85,7 @@ export function registerAcpCommands(program: Command): void {
       reviewerReason?: string;
       mcpConfig?: string[];
       mcpConfigSha256?: string[];
+      mcp?: string[];
       maxTokens: string;
       agentId: string;
       systemPrompt: string;
@@ -134,6 +136,7 @@ export function registerAcpCommands(program: Command): void {
           ...(opts.reviewerReason === undefined ? {} : { reviewerReason: opts.reviewerReason }),
           ...(opts.mcpConfig === undefined ? {} : { mcpConfig: opts.mcpConfig }),
           ...(opts.mcpConfigSha256 === undefined ? {} : { mcpConfigSha256: opts.mcpConfigSha256 }),
+          ...(opts.mcp === undefined ? {} : { mcp: opts.mcp }),
           ...(opts.model === undefined ? {} : { model: opts.model }),
           ...(opts.baseUrl === undefined ? {} : { baseUrl: opts.baseUrl }),
           ...(opts.credential === undefined ? {} : { credential: opts.credential })

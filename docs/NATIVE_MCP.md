@@ -66,6 +66,27 @@ Pass the reviewed file to `agent-loop run` or `agent-loop chat` with `--mcp-conf
 
 The stdio path was qualified on installed candidate `90855cf7` through native CLI and the public SDK/ACP on macOS ARM64: real authenticated approvals, exact tool effects, catalog/grant refusal, process cleanup and cold verification. The dated receipt is an internal record that is not published. This is local protocol conformance with a scripted provider, not a vendor or model-quality evaluation.
 
+## Scopes: `amc mcp add|remove|list|get|sign` and `--mcp <id>`
+
+Instead of a path on every run, a reviewed file can live in a scope: the user scope `<AMC home>/mcp/<id>.json` (`~/.config/amc/mcp`, or `$AMC_HOME/mcp`, the same home as the OAuth token store; `--credentials-home` selects another) or the project scope `<workspace>/.amc/mcp/<id>.json`. The file format is exactly the one above, and `--mcp <id>` on `agent-loop run`, `agent-loop chat` and `amc acp` resolves the id to that file and its current sha256 and hands both to the unchanged `--mcp-config` review. A scoped mount therefore needs everything an explicit one needs: `expectedCatalogDigest`, `grants`, and the generated names in the signed tool allowlist.
+
+```sh
+amc mcp add github --scope project -- /absolute/path/to/server --flag        # stdio; or --transport streamable-http --url … --origin …
+amc agent-loop mcp-catalog --mcp-config .amc/mcp/github.json                 # review; then write expectedCatalogDigest and grants into the file
+amc mcp sign github --scope project --expect-digest <sha256 from amc mcp list> # project scope only: BUNDLE signature over exactly the reviewed bytes
+amc mcp list --json                                                          # scope, path, sha256, transport, reviewed, signatureValid, mountable; never secrets
+amc agent-loop run --mcp github --tools workspace --approve-tools READ_ONLY "…"
+```
+
+Rules, each one deliberate:
+
+- No merge and no silent shadowing. An id present in both scopes is refused until you write `--mcp project:<id>` or `--mcp user:<id>`; `amc mcp add` refuses to create such a collision without `--force`. A cloned repository cannot replace your server of the same id.
+- A project file must carry a valid `<file>.sig` BUNDLE signature (`amc mcp sign`), verified over the exact bytes that were parsed and pinned (never a second read of the path) against the workspace keyset, which is adopted on first use like every other workspace signature; a changed file loses both its pin and its signature. A user file must be your own private file: owned by you, not group- or world-writable, in a directory with the same properties.
+- `server.id` must equal the file name. Ids are 1 to 32 of `[A-Za-z0-9_-]`; on a case-insensitive filesystem choose ids that differ in more than case.
+- No `${VAR}` expansion: `envRefs` and `headerRefs` already keep credential values out of the file.
+- `amc mcp add` validates the file before it lands (a rejected add leaves nothing behind, and `--force` never replaces a valid file with an invalid one) and creates the user-scope directory owner-only whatever your umask. `amc mcp sign` signs only bytes whose sha256 equals `--expect-digest`, and the `.sig` is read through the same bounded non-blocking reader as the config, so a FIFO or an oversize sidecar cannot hang admission. `amc mcp add` writes an unreviewed file and prints the review steps. `mountable` in `amc mcp list` means reviewed and (for the project scope) signed; the allowlist is checked at mount, not here. `amc mcp list` shows an OAuth server's `auth.kind` and scopes from the file, not token state.
+- The SDK's `AMCNativeClient` does not expose the ids yet; pass `mcpConfig` paths and pins as before (`amc acp --mcp <id>` works when you start the ACP server yourself).
+
 ## Streamable HTTP configuration
 
 Choose the endpoint and its exact origin explicitly. Existing stdio files continue to work without a `transport` field.

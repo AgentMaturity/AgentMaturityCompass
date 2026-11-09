@@ -72,7 +72,8 @@ import {
   type TurnEnding
 } from "./loopTypes.js";
 import { runStep, type LoopLlm, type LoopRoute, type StepRunnerInit } from "./stepRunner.js";
-import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./toolSeam.js";
+import { EMPTY_TOOL_SEAM, type AgentToolSeam, type ToolCallOutcome } from "./toolSeam.js";
+import { sha256Hex } from "../utils/hash.js";
 import { freezeNativeValidationPlan, NativeValidationTurn, type NativeValidationPlan } from "./nativeValidation.js";
 import { NativeValidationRepair, NativeValidationRepairStop } from "./nativeValidationRepair.js";
 import { AutoCompactor } from "./compaction/autoCompact.js";
@@ -80,6 +81,12 @@ import { RunLimitTracker, type RunLimitBreach, type RunLimits } from "./runLimit
 import { resolveRouteCompaction } from "./compaction/promptPressure.js";
 import { shutdownTimeoutMs, shutdownToolResults, type AgentShutdownResult } from "./agentShutdown.js";
 export type { AgentShutdownResult } from "./agentShutdown.js";
+
+/** A settled tool call for observers: outcome, digest and size, never the content (SH-EXT-01). */
+function describeToolOutcome(outcome: ToolCallOutcome): { ok: boolean; outputSha256: string; outputBytes: number } {
+  const content = typeof outcome.content === "string" ? Buffer.from(outcome.content, "utf8") : outcome.content;
+  return { ok: outcome.outcome === "OK" && !outcome.denied, outputSha256: sha256Hex(content), outputBytes: content.length };
+}
 
 export interface AgentDriverInit {
   readonly session: SessionService;
@@ -172,8 +179,10 @@ export class AgentDriver {
         bindApprovalGate: tools.bindApprovalGate?.bind(tools),
         execute: async request => {
           await this.observeExtensions({ kind: "tool-start", turn: request.turn, step: request.step, toolName: request.toolName }, request.signal);
-          try { return await tools.execute(request); }
-          finally { await this.observeExtensions({ kind: "tool-end", turn: request.turn, step: request.step, toolName: request.toolName }, request.signal); }
+          // The result's digest and size name what settled (SH-EXT-01 PostToolUse); its text never crosses.
+          let settled: { ok: boolean; outputSha256: string; outputBytes: number } | undefined;
+          try { const outcome = await tools.execute(request); settled = describeToolOutcome(outcome); return outcome; }
+          finally { await this.observeExtensions({ kind: "tool-end", turn: request.turn, step: request.step, toolName: request.toolName, callId: request.callId, ...settled }, request.signal); }
         }
       } : tools,
       route: selected === undefined ? init.route : { ...init.route, pinned: selected },

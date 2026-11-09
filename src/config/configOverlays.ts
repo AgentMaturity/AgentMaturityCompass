@@ -11,6 +11,8 @@ interface ConfigSource {
   sha256: string | null;
 }
 export type ConfigProvenance = Record<string, ConfigSource>;
+/** Every value a leaf was given, in layer order; the last entry is the winner and the others were shadowed (SH-EXT-07). */
+export type ConfigHistory = Record<string, ReadonlyArray<ConfigSource & { readonly value: unknown }>>;
 export interface ConfigOverlayOptions {
   /** Opt-in user layer: true reads ~/.amc/amcconfig.yaml, a string names a file; absent or false reads none. */
   userConfig?: string | boolean;
@@ -26,8 +28,10 @@ const isObject = (value: unknown): value is Record<string, unknown> => value !==
 export function resolveConfigOverlays(workspace: string,
   files: Array<{ layer: "workspace" | "user" | "explicit"; path: string }>,
   overrides?: Record<string, unknown>,
-): { config: AMCDeclarativeConfig; provenance: ConfigProvenance } {
+): { config: AMCDeclarativeConfig; provenance: ConfigProvenance; history: ConfigHistory } {
   const origins = new Map<string, ConfigSource>();
+  const history: Record<string, Array<ConfigSource & { value: unknown }>> = Object.create(null) as Record<string, Array<ConfigSource & { value: unknown }>>;
+  const remember = (at: string, source: ConfigSource, value: unknown) => { (history[at] ??= []).push({ ...source, value }); };
   function merge(previous: unknown, value: unknown, source: ConfigSource, at = ""): unknown {
     // Replacement removes stale origins, including defaults subsequently inserted by Zod.
     if (!isObject(value) || !isObject(previous)) {
@@ -35,15 +39,16 @@ export function resolveConfigOverlays(workspace: string,
     }
     if (isObject(value)) {
       const result = Object.assign(Object.create(null) as Record<string, unknown>, isObject(previous) ? previous : {});
-      if (Object.keys(value).length === 0 && Object.keys(result).length === 0) origins.set(at, source);
+      if (Object.keys(value).length === 0 && Object.keys(result).length === 0) { origins.set(at, source); remember(at, source, {}); }
       for (const [key, child] of Object.entries(value)) result[key] = merge(Object.hasOwn(result, key) ? result[key] : undefined, child, source, pointer(at, key));
       return result;
     }
     if (Array.isArray(value)) {
-      if (value.length === 0) origins.set(at, source);
+      if (value.length === 0) { origins.set(at, source); remember(at, source, []); }
+      else if (previous !== undefined) remember(at, source, value); // a whole-array replacement shadows the earlier array
       return value.map((child, index) => merge(undefined, child, source, pointer(at, String(index))));
     }
-    origins.set(at, source);
+    origins.set(at, source); remember(at, source, value);
     return value;
   }
   // Built-in defaults come from the schema exactly as before overlays existed; they are only attributed here.
@@ -87,5 +92,5 @@ export function resolveConfigOverlays(workspace: string,
     else for (const [key, child] of entries) collect(child, pointer(at, key));
   }
   collect(config);
-  return { config, provenance };
+  return { config, provenance, history };
 }

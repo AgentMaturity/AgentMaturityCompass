@@ -1,14 +1,18 @@
 import { lstatSync, opendirSync, realpathSync, type Stats } from "node:fs";
-import { join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { readContainedOrNull } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { parseSkillFrontmatter, type SkillFields } from "./skillFrontmatter.js";
 
 /**
  * A layered, digest-driven skill catalog (plan P6.2).
  *
  * A skill is a `SKILL.md` under a layer root: frontmatter naming it, and a body
- * of instructions the model is given when the skill loads.
+ * of instructions the model is given when the skill loads. A COMMAND (SH-EXT-05)
+ * is the same thing without a directory: `<name>.md` or `<ns>/<name>.md` in the
+ * `commands` directory beside a skill root (`.amc/commands` beside `.amc/skills`),
+ * invoked as `/name` or `/ns:name`.
  *
  * THE SECURITY QUESTION, and why this file does not answer it. A SKILL.md is a
  * file in a workspace — untrusted content that becomes INSTRUCTIONS. The prompt
@@ -31,7 +35,7 @@ import { canonicalize } from "../utils/json.js";
  * was given, and moving a layer does not read as a change.
  */
 
-export interface Skill {
+export interface Skill extends SkillFields {
   readonly name: string;
   readonly description: string;
   readonly body: string;
@@ -43,6 +47,12 @@ export interface Skill {
   readonly disableModelInvocation?: true;
   /** Every frontmatter field as written, for a layout whose validator reads more than name and description. */
   readonly fields?: Readonly<Record<string, string>>;
+  /** A directory skill, or a command file. */
+  readonly kind: "skill" | "command";
+  /** The skill's directory; a command file has none. */
+  readonly directory?: string;
+  /** Regular files beside SKILL.md (names and sizes only, at most 64), so the model knows what `fs.read` can reach. */
+  readonly siblings?: readonly { readonly name: string; readonly bytes: number }[];
 }
 
 /**
@@ -80,7 +90,12 @@ export interface SkillCatalog {
 }
 
 const SKILL_CATALOG_LIMITS = Object.freeze({ fileBytes: 64 * 1024, totalBytes: 1024 * 1024,
-  entries: 2048, roots: 64, problems: 64 });
+  entries: 2048, roots: 64, problems: 64, siblings: 64 });
+
+/** One name grammar for skills and commands: a segment, or `ns:name` for a command in a subdirectory. */
+const SEGMENT = "[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}";
+const SKILL_NAME = /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$/;
+const COMMAND_NAME = new RegExp(`^${SEGMENT}(?::${SEGMENT})?$`);
 
 function sameSource(a: Stats, b: Stats): boolean {
   return a.dev === b.dev && a.ino === b.ino && a.mode === b.mode && a.nlink === b.nlink
@@ -89,7 +104,32 @@ function sameSource(a: Stats, b: Stats): boolean {
 
 const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/;
 
-function parseSkill(dirName: string, sourcePath: string, raw: string, where = "directory"): Skill | SkillProblem {
+function parseSkill(expected: string, sourcePath: string, raw: string, kind: Skill["kind"]): Skill | SkillProblem {
+  const matched = FRONTMATTER.exec(raw);
+  if (!matched) return { name: expected, sourcePath, reason: "no --- frontmatter block at the top of the file" };
+  const [, front = "", body = ""] = matched;
+  const parsed = parseSkillFrontmatter(front);
+  if ("reason" in parsed) return { name: expected, sourcePath, reason: parsed.reason };
+  const { fields } = parsed;
+  const name = fields.name ?? (kind === "command" ? expected : "");
+  if (name.length === 0) return { name: expected, sourcePath, reason: "frontmatter has no name" };
+  if (name !== expected) {
+    // The directory (or file name) is what `/name` resolves against; the
+    // frontmatter is what a reader believes. Two answers to "what is this skill
+    // called" is one too many, and the mismatch is how a skill gets loaded under
+    // a name nobody reviewed.
+    return { name: expected, sourcePath, reason: `frontmatter name ${JSON.stringify(name)} does not match its ${kind === "skill" ? "directory" : "file"} ${JSON.stringify(expected)}` };
+  }
+  // A command file may leave the description to its first line, as Claude Code's do.
+  const description = fields.description ?? (kind === "command" ? (body.split(/\r?\n/).find(line => line.trim().length > 0)?.trim().slice(0, 200) ?? "") : "");
+  if (description.length === 0) return { name: expected, sourcePath, reason: "frontmatter has no description" };
+  if (!(kind === "skill" ? SKILL_NAME : COMMAND_NAME).test(name))
+    return { name: expected, sourcePath, reason: kind === "skill" ? "skill name must be a slash-command name of at most 128 characters" : "command name must be a slash-command segment, or ns:name, of at most 64 characters each" };
+  return { ...fields, name, description, body, sourcePath, digest: sha256Hex(raw), kind };
+}
+
+/** Agent definitions use their own flat frontmatter vocabulary and validate every authored field. */
+function parseLayoutEntry(dirName: string, sourcePath: string, raw: string, where = "directory"): Skill | SkillProblem {
   const matched = FRONTMATTER.exec(raw);
   if (!matched) {
     return { name: dirName, sourcePath, reason: "no --- frontmatter block at the top of the file" };
@@ -129,9 +169,16 @@ function parseSkill(dirName: string, sourcePath: string, raw: string, where = "d
   if (!/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$/.test(name))
     return { name: dirName, sourcePath, reason: "skill name must be a slash-command name of at most 128 characters" };
 
-  return { name, description, body, sourcePath, digest: sha256Hex(raw), fields: Object.freeze(Object.fromEntries(fields)),
+  return { name, description, body, sourcePath, digest: sha256Hex(raw), kind: "skill", fields: Object.freeze(Object.fromEntries(fields)),
     ...(fields.get("disable-model-invocation") === "true" ? { disableModelInvocation: true as const } : {}) };
 }
+
+/** Where a layer's command files live: the `commands` directory beside its `skills` directory. */
+function commandsRootFor(skillRoot: string): string {
+  return join(dirname(resolve(skillRoot)), "commands");
+}
+
+interface Candidate { readonly name: string; readonly rel: string; readonly sourcePath: string; readonly kind: Skill["kind"]; readonly directory?: string }
 
 /**
  * Read every layer in order, later layers overriding earlier ones by name.
@@ -157,78 +204,121 @@ export function buildSkillCatalog(roots: readonly string[], layout: CatalogLayou
     witnesses.set(path, stat);
     return stat;
   };
+  /** Names in a directory, through the same entry limit every listing shares. */
+  const listDirectory = (path: string): string[] => {
+    const names: string[] = [];
+    const directory = opendirSync(path);
+    try {
+      let entry;
+      while ((entry = directory.readSync()) !== null) {
+        if (++entriesSeen > SKILL_CATALOG_LIMITS.entries) throw new Error("entry limit");
+        names.push(entry.name);
+      }
+    } finally { directory.closeSync(); }
+    return names.sort();
+  };
+  const readCandidate = (root: string, candidate: Candidate, observation: { status: "absent" | "read" | "incomplete" }, layerNames: Set<string>) => {
+    try {
+      let before: Stats;
+      try { before = witness(candidate.sourcePath); }
+      catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return; throw error; }
+      // Reuse the contained, nonblocking, no-follow reader. Recheck its exact
+      // source witness after reading and once more before publishing a catalog.
+      const bytes = readContainedOrNull(root, candidate.rel, SKILL_CATALOG_LIMITS.fileBytes);
+      const after = lstatSync(candidate.sourcePath);
+      if (bytes === null || !sameSource(before, after) || bytes.length !== after.size)
+        throw new Error("skill changed during discovery");
+      if ((totalBytes += bytes.length) > SKILL_CATALOG_LIMITS.totalBytes) throw new Error("aggregate byte limit");
+      const raw = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes);
+      const parsed = layout === SKILL_LAYOUT ? parseSkill(candidate.name, candidate.sourcePath, raw, candidate.kind)
+        : parseLayoutEntry(candidate.name, candidate.sourcePath, raw, layout.kind === "flat" ? "file name" : "directory");
+      if (!("digest" in parsed)) { observation.status = "incomplete"; report(candidate.name, candidate.sourcePath, parsed.reason); return; }
+      if (layerNames.has(candidate.name)) { observation.status = "incomplete"; report(candidate.name, candidate.sourcePath, "command name collides with a skill in the same layer"); return; }
+      layerNames.add(candidate.name);
+      const siblings = candidate.directory === undefined ? {} : { siblings: listDirectory(candidate.directory)
+        .filter(name => name !== "SKILL.md").map(name => ({ name, stat: lstatSync(join(candidate.directory!, name)) }))
+        .filter(({ stat }) => stat.isFile()).slice(0, SKILL_CATALOG_LIMITS.siblings).map(({ name, stat }) => ({ name, bytes: stat.size })) };
+      winners.set(candidate.name, { ...parsed, ...(candidate.directory === undefined ? {} : { directory: candidate.directory }), ...siblings });
+      problems.delete(candidate.name);
+    } catch (error) {
+      observation.status = "incomplete";
+      const message = error instanceof Error ? error.message : "";
+      const reason = /symlink|symbolic-link/.test(message) ? "symbolic-link skill source refused"
+        : /bytes|limit/.test(message) ? "skill exceeds a file or aggregate byte limit"
+        : /changed/.test(message) ? "skill source changed during discovery; retry after review"
+        : "skill source could not be examined or read as a regular UTF-8 file";
+      report(candidate.name, candidate.sourcePath, reason);
+    }
+  };
+  /** Skill directories under a skills root, or `.md` files (one namespace level deep) under a commands root. */
+  const candidates = (root: string, kind: Skill["kind"], observation: { status: "absent" | "read" | "incomplete" }): Candidate[] => {
+    const out: Candidate[] = [];
+    for (const name of listDirectory(root)) {
+      if (layout.kind === "flat" && !/^[^.][^/\\]*\.md$/.test(name)) continue;
+      const path = join(root, name);
+      const stat = witness(path);
+      if (stat.isSymbolicLink()) {
+        if (layout === SKILL_LAYOUT) throw new Error(kind === "skill" ? "symbolic-link skill directory" : "symbolic-link command entry");
+        observation.status = "incomplete";
+        report(layout.kind === "flat" ? basename(name, ".md") : name, path, "symbolic-link skill source refused");
+        continue;
+      }
+      if (kind === "skill") {
+        if (layout.kind === "flat") {
+          if (stat.isFile()) out.push({ name: basename(name, ".md"), rel: name, sourcePath: path, kind });
+        } else if (stat.isDirectory()) {
+          out.push({ name, rel: `${name}/${layout.fileName}`, sourcePath: join(path, layout.fileName), kind,
+            ...(layout === SKILL_LAYOUT ? { directory: path } : {}) });
+        }
+      } else if (stat.isFile() && name.endsWith(".md")) {
+        out.push({ name: basename(name, ".md"), rel: name, sourcePath: path, kind });
+      } else if (stat.isDirectory()) {
+        for (const inner of listDirectory(path)) {
+          const innerPath = join(path, inner), innerStat = witness(innerPath);
+          if (innerStat.isSymbolicLink()) throw new Error("symbolic-link command entry");
+          if (innerStat.isFile() && inner.endsWith(".md")) out.push({ name: `${name}:${basename(inner, ".md")}`, rel: `${name}/${inner}`, sourcePath: innerPath, kind });
+        }
+      }
+    }
+    return out;
+  };
 
   if (roots.length > SKILL_CATALOG_LIMITS.roots)
     report("*roots", "", `Skill roots exceed the ${SKILL_CATALOG_LIMITS.roots} root limit.`);
   for (const input of roots.slice(0, SKILL_CATALOG_LIMITS.roots)) {
-    const root = resolve(input);
-    const observation = { sourcePath: root, status: "read" as "absent" | "read" | "incomplete" };
-    observations.push(observation);
-    let entries: string[] = [];
-    try {
-      let rootStat: Stats;
-      try { rootStat = witness(root); }
-      catch (error) {
-        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
-        witnesses.set(root, null); observation.status = "absent"; continue;
-      }
-      if (rootStat.isSymbolicLink() || realpathSync(root) !== root) throw new Error("symbolic-link root");
-      if (!rootStat.isDirectory()) throw new Error("root is not a directory");
-      const directory = opendirSync(root);
+    const layerNames = new Set<string>();
+    const layer: ReadonlyArray<readonly [string, Skill["kind"]]> = layout === SKILL_LAYOUT
+      ? [[resolve(input), "skill"], [commandsRootFor(input), "command"]] : [[resolve(input), "skill"]];
+    for (const [root, kind] of layer) {
+      const observation = { sourcePath: root, status: "read" as "absent" | "read" | "incomplete" };
+      observations.push(observation);
+      let found: Candidate[] = [];
       try {
-        let entry;
-        while ((entry = directory.readSync()) !== null) {
-          if (++entriesSeen > SKILL_CATALOG_LIMITS.entries) throw new Error("entry limit");
-          entries.push(entry.name);
+        let rootStat: Stats;
+        try { rootStat = witness(root); }
+        catch (error) {
+          if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+          witnesses.set(root, null); observation.status = "absent"; continue;
         }
-      } finally { directory.closeSync(); }
-    } catch (error) {
-      // Unknown higher-layer contents may shadow ANY lower skill. Never expose
-      // a stale fallback as though the intended override had been examined.
-      winners.clear(); observation.status = "incomplete";
-      const detail = error instanceof Error && /symbolic-link|directory|limit/.test(error.message) ? error.message : "root could not be read or listed";
-      report(`*root:${observations.length}`, root, detail);
-      if (entriesSeen > SKILL_CATALOG_LIMITS.entries) break;
-      continue;
-    }
-
-    for (const entryName of entries.sort()) {
-      // Flat layout: `<root>/<name>.md`, a regular file; anything else in the root is ignored.
-      if (layout.kind === "flat" && !/^[^.][^/\\]*\.md$/.test(entryName)) continue;
-      const dirName = layout.kind === "flat" ? entryName.slice(0, -3) : entryName;
-      const relative = layout.kind === "flat" ? entryName : `${entryName}/${layout.fileName}`;
-      const sourcePath = join(root, relative);
-      try {
-        const entry = witness(join(root, entryName));
-        if (entry.isSymbolicLink()) throw new Error("symbolic-link skill directory");
-        if (layout.kind === "directory" && !entry.isDirectory()) continue;
-        if (layout.kind === "flat" && !entry.isFile()) continue;
-        let before: Stats;
-        try { before = witness(sourcePath); }
-        catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") continue; throw error; }
-        // Reuse the contained, nonblocking, no-follow reader. Recheck its exact
-        // source witness after reading and once more before publishing a catalog.
-        const bytes = readContainedOrNull(root, relative, SKILL_CATALOG_LIMITS.fileBytes);
-        const after = lstatSync(sourcePath);
-        if (bytes === null || !sameSource(before, after) || bytes.length !== after.size)
-          throw new Error("skill changed during discovery");
-        if ((totalBytes += bytes.length) > SKILL_CATALOG_LIMITS.totalBytes) throw new Error("aggregate byte limit");
-        const parsed = parseSkill(dirName, sourcePath, new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes),
-          layout.kind === "flat" ? "file name" : "directory");
-        if ("digest" in parsed) { winners.set(dirName, parsed); problems.delete(dirName); }
-        else { observation.status = "incomplete"; report(dirName, sourcePath, parsed.reason); }
+        if (rootStat.isSymbolicLink() || realpathSync(root) !== root) throw new Error("symbolic-link root");
+        if (!rootStat.isDirectory()) throw new Error("root is not a directory");
+        found = candidates(root, kind, observation);
       } catch (error) {
-        observation.status = "incomplete";
-        const message = error instanceof Error ? error.message : "";
-        const reason = /symlink|symbolic-link/.test(message) ? "symbolic-link skill source refused"
-          : /bytes|limit/.test(message) ? "skill exceeds a file or aggregate byte limit"
-          : /changed/.test(message) ? "skill source changed during discovery; retry after review"
-          : "skill source could not be examined or read as a regular UTF-8 file";
-        report(dirName, sourcePath, reason);
+        // Unknown higher-layer contents may shadow ANY lower skill. Never expose
+        // a stale fallback as though the intended override had been examined.
+        winners.clear(); observation.status = "incomplete";
+        const detail = error instanceof Error && /symbolic-link|directory|limit/.test(error.message) ? error.message : "root could not be read or listed";
+        report(`*root:${observations.length}`, root, detail);
+        if (entriesSeen > SKILL_CATALOG_LIMITS.entries) break;
+        continue;
       }
-      if (totalBytes > SKILL_CATALOG_LIMITS.totalBytes) { winners.clear(); break; }
+      for (const candidate of found) {
+        readCandidate(root, candidate, observation, layerNames);
+        if (totalBytes > SKILL_CATALOG_LIMITS.totalBytes) { winners.clear(); break; }
+      }
+      if (totalBytes > SKILL_CATALOG_LIMITS.totalBytes) break;
     }
-    if (totalBytes > SKILL_CATALOG_LIMITS.totalBytes) break;
+    if (totalBytes > SKILL_CATALOG_LIMITS.totalBytes || entriesSeen > SKILL_CATALOG_LIMITS.entries) break;
   }
   // A later layer can take time to scan. Do not publish an earlier layer that
   // changed, disappeared or appeared during that same observation.
@@ -270,8 +360,8 @@ export type SkillCommand =
   | { readonly kind: "unknown-skill"; readonly name: string; readonly known: readonly string[] }
   | { readonly kind: "message" };
 
-/** A `/name` is a bare word after the slash — `/usr/bin/thing` is a path someone typed. */
-const COMMAND = /^\/([a-zA-Z0-9][a-zA-Z0-9_-]*)(?:\s+([\s\S]*))?$/;
+/** A `/name` or `/ns:name` is a bare word after the slash — `/usr/bin/thing` is a path someone typed. */
+const COMMAND = new RegExp(`^\\/(${SEGMENT}(?::${SEGMENT})?|[a-zA-Z0-9][a-zA-Z0-9_-]*)(?:\\s+([\\s\\S]*))?$`);
 
 /**
  * Read a user's line as a skill invocation, or as an ordinary message.

@@ -7,7 +7,8 @@ import { nativeExtensionHookEventSchema, type NativeExtensionHookEvent, type Nat
 
 export interface NativeExtensionHookFailure {
   readonly extensionId: string;
-  readonly manifestDigest: string;
+  /** Null when the source (a command hooks file) could not be read; never a placeholder digest. */
+  readonly manifestDigest: string | null;
   readonly kind: NativeExtensionHookKind;
   readonly code: string;
 }

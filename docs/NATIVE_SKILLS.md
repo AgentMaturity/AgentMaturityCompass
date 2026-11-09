@@ -22,3 +22,27 @@ Discovery limits are 64 roots, 2,048 entries, 64 KiB per skill, 1 MiB total file
 Filesystem access reuses AMC's contained, nonblocking, no-follow reader and checks source witnesses before publishing. Node has no `openat`; a parent swapped away and restored entirely between checks is outside these checks' observation model. Skills are untrusted prompt data and never executable packages.
 
 Shared native sessions used by ACP, Studio and the SDK also resolve `/name` before enqueueing a turn. In ordered image or audio input, a command in the first text part replaces only that part; every later part retains its position and bytes. Input beginning with media remains literal. The selected skill contributes only during that turn. A later ordinary turn has no active skill context; previously committed snapshots remain signed history.
+
+## Command files, frontmatter fields and `$ARGUMENTS`
+
+Beside every `skills` root, a `commands` directory (`.amc/commands`, `.agents/commands`, `<AMC home>/commands`) holds command files: `<name>.md` invoked as `/name`, and `<ns>/<name>.md` (one level deep) invoked as `/ns:name`. A command file is a skill without a directory: same frontmatter, same catalog, same digests, same layering. `name` may be omitted (the file name is the name; a stated name must match it) and `description` defaults to the body's first line. Names are `[A-Za-z0-9][A-Za-z0-9_-]{0,63}` segments; chat accepts `/ns:name` in lowercase. A command that collides with a skill in the same layer is reported, not silently chosen; a later layer's command overrides an earlier layer's skill of the same name as usual.
+
+Frontmatter is YAML (block lists work) with Claude Code's field names. When YAML cannot read a block, or reads a text field as something other than a string, the field is read as the rest of its line instead, the way the earlier parser did, so `description: Deploy: ships the app`, `*important* tool` and `#1 helper` keep loading; `- item` continuation lines still form a list. A repeated key is a problem under both readers.
+
+| Field | Effect |
+|---|---|
+| `name`, `description` | as before |
+| `disable-model-invocation: true` | `/name` only; never advertised to the model |
+| `user-invocable: false` | model only (`skill.load`); `/name` is refused with the reason |
+| `argument-hint` | shown by `--list-skills` |
+| `arguments: [a, b]` | declared names, fed positionally, for `$a`, `$b` |
+| `disallowed-tools: [fs.write, bash]` | the run's registry is narrowed before the turn; a name that is not registered REFUSES the run rather than restricting nothing. In an ACP session the narrowing lasts for the rest of the session. `delegate` and `workflow` are always denied with it, whether or not `--delegate` later defines them: a delegated child composes its own toolset without the skill and would hand the denied tool back. `run_code` (the Code Mode transport) cannot be listed; the run is refused with the reason, and the tools it dispatches are what to list. |
+| `allowed-tools`, `model`, `effort`, `when_to_use` | parsed and reported only. Workspace text cannot widen a signed tool policy or choose a route. |
+
+A list field that cannot be read is a reported problem, never an empty list.
+
+Arguments after `/name` are substituted into the body in one pass, Claude Code's dialect: `$ARGUMENTS` (the whole text), `$0`, `$1`, `$ARGUMENTS[N]` (0-based, quote-aware words), `$name` for declared arguments, `${AMC_SKILL_DIR}`, `${AMC_WORKSPACE}`, and `\$` for a literal dollar. Values are inserted literally and never expanded again; an undeclared `$word` stays as written. The arguments are also the user prompt of the turn, as before; a bare `/name` still uses the description and leaves the body exactly as written, every placeholder included (an `awk '{print $1}'` example survives; the frame still names a directory skill's directory). The text is tokenized into words only when a `$N` or `$name` placeholder needs them, and quotes that do not balance fall back to whitespace words, so a prompt is never refused for an apostrophe or its length. Limits, applied only to what is substituted: 16 KiB of arguments, 32 words, 1 MiB rendered. Substitution and its digests apply on every surface that resolves `/name`: `agent-loop run`, chat, and the shared ACP/SDK/Studio session.
+
+The attribution frame stays true after substitution: it names the file and its sha256, the operator-supplied arguments and their sha256, and the rendered text's sha256, and states that the substituted text is user data. When arguments were given but only `${AMC_SKILL_DIR}`, `${AMC_WORKSPACE}` or `\$` were replaced, it says no operator argument was inserted and still gives the rendered text's sha256. For a directory skill it also names the directory and lists regular files beside `SKILL.md` (names and sizes, at most 64) so the model knows what `fs.read` can reach; nothing but `SKILL.md` is read into the prompt.
+
+Intentional differences: no `` !`command` `` shell injection in prompt files (prompt text never runs commands), no `context: fork`, no `hooks` or `agent` fields, and `allowed-tools` never grants.

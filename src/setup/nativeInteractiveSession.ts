@@ -6,6 +6,7 @@ import { renderNativeRunDiagnostics } from "../agent/nativeFailureGuidance.js";
 import { parseNativeChatResult, type NativeChatChildSummary } from "./nativeChatResult.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import { reviewNativeMcpConfigurations, NativeMcpConfigError } from "./nativeMcpConfig.js";
+import { mergeScopedMcpSelection } from "../mcp/mcpScopes.js";
 import { inspectNativeFirstUse, NATIVE_FIRST_USE_PROVIDER_LIST, renderNativeFirstUseGuide, renderNativeGuideCommand } from "./nativeFirstUseGuide.js";
 import { resolveNativeChatProfile, nativeChatProfileArgv, assertNativeChatProfileCurrent, type NativeChatProfileOptions } from "./nativeChatProfile.js";
 import { createNativeInteractiveApprovals } from "./nativeInteractiveApprovals.js";
@@ -35,6 +36,8 @@ export interface NativeChatOptions extends NativeChatProfileOptions {
   /** One reviewed config per server; each grant keeps its signed action class. */
   readonly mcpConfig?: readonly string[];
   readonly mcpConfigSha256?: readonly string[];
+  /** Scoped server ids (SH-EXT-02), resolved to paths and pins before the review. */
+  readonly mcp?: readonly string[];
   readonly approveTools?: string;
   readonly approveRisk?: string;
   readonly tools?: string;
@@ -267,6 +270,8 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         (options.approveRisk !== undefined && approvalClass === undefined)) {
       io.error("Choose a valid --approve-tools action class and --approve-risk low, medium, high, or critical."); io.fail(); return;
     }
+    try { options = mergeScopedMcpSelection(options, cwd); }
+    catch (error) { io.error(error instanceof Error ? error.message : "MCP scope resolution refused."); io.fail(); return; }
     if (options.mcpConfigSha256 !== undefined && options.mcpConfig === undefined) {
       io.error("--mcp-config-sha256 requires --mcp-config."); io.fail(); return;
     }
@@ -483,8 +488,8 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       if (entered === null) break;
       const text = entered.trim();
       if (text.length === 0) continue;
-      if (text.startsWith("/") && (entered[0] !== "/" || !/^\/[a-z][a-z0-9_-]{0,63}(?:[ \t]+[\s\S]*)?$/.test(text))) {
-        io.error("Slash commands must start at the first character and use lowercase names. /help lists commands."); continue;
+      if (text.startsWith("/") && (entered[0] !== "/" || !/^\/[a-z][a-z0-9_-]{0,63}(?::[a-z0-9][a-z0-9_-]{0,63})?(?:[ \t]+[\s\S]*)?$/.test(text))) {
+        io.error("Slash commands must start at the first character and use lowercase names (ns:name for a namespaced command). /help lists commands."); continue;
       }
       const name = /^\/([^ \t]+)/.exec(text)?.[1];
       if (NATIVE_INTERACTIVE_COMMANDS.some(command => command.name === name)) {
