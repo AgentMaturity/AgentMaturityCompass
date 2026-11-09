@@ -87,8 +87,9 @@ describe("session export", () => {
     // S15: the embedded usage copy is checked against the usage recomputed from the rows, cost included (S15b: the page prints the cost figures).
     const usageEdit = { ...doc, usage: { ...doc.usage, requests: doc.usage.requests + 1 } };
     expect(verifySessionExport(usageEdit, { expectedFingerprint: fp }).errors.join()).toContain("usage summary (cost included) does not match");
-    expect(doc.usage.cost.status).toBe("unavailable");
-    const costEdit = { ...doc, usage: { ...doc.usage, cost: { ...doc.usage.cost, status: "complete" as const, reportedSubtotalUsd: 1234.5 } } };
+    const cost = doc.usage.cost!;
+    expect(cost.status).toBe("unavailable");
+    const costEdit = { ...doc, usage: { ...doc.usage, cost: { ...cost, status: "complete" as const, reportedSubtotalUsd: 1234.5 } } };
     expect(verifySessionExport(costEdit, { expectedFingerprint: fp }).errors.join()).toContain("usage summary (cost included) does not match");
     // The displayed fingerprint must be the embedded key's, and no field the exporter never writes may ride along (the page would show it unchecked).
     expect(verifySessionExport({ ...doc, monitorKeyFingerprint: "0".repeat(64) }, { expectedFingerprint: fp }).errors.join()).toContain("displayed monitor key fingerprint is not the sha256 of the embedded key");
