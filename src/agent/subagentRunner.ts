@@ -5,7 +5,7 @@ import { deniedToolNamesForScope, intersectDelegationScopes, parseDelegationScop
 import { parseSubagentStopConditions } from "./subagentStopConditions.js";
 import { ApprovalSeam, type ApprovalSeamInit } from "../approvals/seam/approvalSeam.js";
 import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "./approvalGate.js";
-import { NO_HOOKS, type AgentLoopConfig, type LoopHookControl, type LoopHooks } from "./loopTypes.js";
+import { DEFAULT_AGENT_LOOP_CONFIG, NO_HOOKS, type AgentLoopConfig, type LoopHookControl, type LoopHooks } from "./loopTypes.js";
 import type { ActionClass } from "../types.js";
 import { agentToolset } from "./agentToolset.js";
 import type { NativeShellReadiness } from "../sandbox/nativeShellGate.js";
@@ -16,6 +16,7 @@ import { compactionSummaryRows } from "./compaction/summaryPrompt.js";
 import type { LoopLlm, LoopRoute } from "./stepRunner.js";
 import type { SubagentRunContext, SubagentRunResult, SubagentRunner } from "./subagentSpawn.js";
 import { issueChildLease } from "../leases/delegatedLease.js";
+import type { AgentDefinition } from "./agentDefinitions.js";
 
 /**
  * The runner that actually executes a child (P6.1a).
@@ -123,6 +124,8 @@ export interface DriverRunnerInit {
     readonly maxDepth?: number;
     readonly maxActiveChildren?: number;
     readonly mintSessionId?: () => string;
+    /** Operator-admitted agent definitions (SH-ORCH-01), offered to each child's own `delegate`/`workflow`. */
+    readonly definitions?: ReadonlyMap<string, AgentDefinition>;
   };
 }
 
@@ -176,6 +179,8 @@ interface HookControlRecordInput {
   readonly scope: readonly ActionClass[] | undefined;
   readonly descendantScope: readonly ActionClass[] | undefined;
   readonly descendantStops: readonly string[] | undefined;
+  /** The model-step ceiling this child's driver runs under (the driver default when nothing set one). */
+  readonly stepCeiling: number;
 }
 
 /**
@@ -201,6 +206,13 @@ function recordHookControl(input: HookControlRecordInput): void {
     descendantStopConditions: input.descendantStops === undefined ? null : [...input.descendantStops],
     delegationScope: input.scope === undefined ? null : [...input.scope],
     descendantDelegationScope: input.descendantScope === undefined ? null : [...input.descendantScope],
+    // The definition that narrowed this child, as the packet constraints name it; its tool allowlist is what
+    // `registry.restrict({ allow })` applied, so a reader sees the bound and the enforcement from one source.
+    agentDefinition: ctx.agentDefinition === undefined ? null : { name: ctx.agentDefinition.name, sha256: ctx.agentDefinition.sha256,
+      tools: ctx.agentDefinition.tools === undefined ? null : [...ctx.agentDefinition.tools],
+      maxSteps: ctx.agentDefinition.maxSteps ?? null },
+    // The ceiling actually composed, so a reader can check that a definition only ever lowered it.
+    stepCeiling: input.stepCeiling,
     governedAs: ctx.toolsetAgentId, runAs: ctx.identity.runAs, depth: ctx.identity.depth
   } });
 }
@@ -235,6 +247,11 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
       if (!parsed.ok) return { ok: false, text: "", reason: parsed.reason };
     }
     const descendantScope = intersectDelegationScopes(scope, grant?.delegationScope);
+    // A definition's step ceiling only lowers the parent's; a child never gets more steps than the run it belongs to.
+    // A parent without an explicit ceiling runs under the driver default, so that is the bound here too (never the definition's own).
+    const steps = ctx.agentDefinition?.maxSteps;
+    const childConfig = steps === undefined ? config
+      : { ...config, maxStepsPerTurn: Math.min(steps, config?.maxStepsPerTurn ?? DEFAULT_AGENT_LOOP_CONFIG.maxStepsPerTurn) };
     let descendantStops: readonly string[] | undefined;
     try { descendantStops = descendantStopConditions(ctx.stopConditions, grant?.stopConditions); }
     catch (error) { return { ok: false, text: "", reason: `child stop conditions: ${error instanceof Error ? error.message : String(error)}` }; }
@@ -361,17 +378,23 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
               ...(childLease === undefined ? {} : { leaseToken: childLease }),
               delegation: { runAs: ctx.identity.runAs, depth: ctx.identity.depth, parentExecutionId: ctx.packetId ?? null,
                 ...(scope === undefined ? {} : { allowedActionClasses: scope }) },
-              ...(grant === undefined ? {} : { subagents: {
-                identity: ctx.identity, runner: grant.runner, session,
+              // A defined role is a leaf: composed without the delegation capability, so neither `delegate` nor `workflow`
+              // exists in its registry whatever its `tools` list says, and its step ceiling and binding bound every step it runs.
+              ...(grant === undefined || ctx.agentDefinition !== undefined ? {} : { subagents: {
+                // In-process, so a kept-open grandchild can be continued; this child's shutdown releases it first.
+                identity: ctx.identity, runner: grant.runner, session, continuable: true,
                 ...(childLease === undefined ? {} : { parentLeaseToken: childLease }),
                 ...(grant.maxDepth === undefined ? {} : { maxDepth: grant.maxDepth }),
                 ...(grant.maxActiveChildren === undefined ? {} : { maxActiveChildren: grant.maxActiveChildren }),
                 ...(grant.mintSessionId === undefined ? {} : { mintSessionId: grant.mintSessionId }),
+                ...((ctx.definitions ?? grant.definitions) === undefined ? {} : { definitions: ctx.definitions ?? grant.definitions }),
                 ...(descendantScope === undefined ? {} : { delegationScope: descendantScope }),
                 ...(descendantStops === undefined ? {} : { stopConditions: descendantStops })
               } }) });
             toolset = childTools;
             if (scope !== undefined) childTools.registry.restrict({ deny: new Set(deniedToolNamesForScope(childTools.registry, scope)) });
+            // Allow intersects and fails closed: a tool mounted later is hidden too unless the definition names it.
+            if (ctx.agentDefinition?.tools !== undefined) childTools.registry.restrict({ allow: new Set(ctx.agentDefinition.tools) });
             const approval = gate === undefined ? undefined : new ApprovalSeam({ session, workspace: init.workspace,
               agentId: ctx.toolsetAgentId,
               ...(gate.answerers === undefined ? {} : { answerers: gate.answerers }),
@@ -381,8 +404,9 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
           },
           cleanup: () => toolset?.shutdown() ?? Promise.resolve(true),
           hasOwnedWork: () => toolset?.hasOwnedWork() ?? false,
-          admit: () => recordHookControl({ session, ctx, inherited, gate, scope, descendantScope, descendantStops }),
-          ...(config === undefined ? {} : { driver: { config } })
+          admit: () => recordHookControl({ session, ctx, inherited, gate, scope, descendantScope, descendantStops,
+            stepCeiling: childConfig?.maxStepsPerTurn ?? DEFAULT_AGENT_LOOP_CONFIG.maxStepsPerTurn }),
+          ...(childConfig === undefined ? {} : { driver: { config: childConfig } })
         });
       } catch (error) {
         sessionSettled = true; // composeNativeAgent closed it as a failed composition, never `completed`

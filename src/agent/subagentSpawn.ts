@@ -11,6 +11,7 @@ import {
   type DelegationIdentity
 } from "./delegationIdentity.js";
 import type { LoopEventRecord } from "../session/loopEventMeta.js";
+import type { AgentDefinition, AgentDefinitionBinding } from "./agentDefinitions.js";
 
 /**
  * Spawning one in-process child, with the governance that makes it safe (P6.1a).
@@ -78,6 +79,10 @@ export interface SubagentRunContext {
   readonly delegationScope?: readonly ActionClass[];
   /** Validated frozen declarations, also available to descendant composition. */
   readonly stopConditions?: readonly string[];
+  /** The definition this child was narrowed by (SH-ORCH-01); its packet constraints name the same digest. */
+  readonly agentDefinition?: AgentDefinitionBinding;
+  /** The operator's admitted definitions, handed on so a child can name a role for its own children. */
+  readonly definitions?: ReadonlyMap<string, AgentDefinition>;
   /**
    * Aborted when the parent gives up, a lifetime timeout expires, or an active
    * child is released. The same signal covers all continued invocations.
@@ -143,6 +148,8 @@ export interface SubagentRequest {
    * delegation nobody closed — not something to paper over.
    */
   readonly continuable?: boolean;
+  /** Set by `applyAgentDefinition`, never from model text: the request is already narrowed when this is present. */
+  readonly agentDefinition?: AgentDefinitionBinding;
 }
 
 /**
@@ -160,6 +167,8 @@ export interface SubagentHandle {
   continue(text: string): Promise<SubagentRunResult>;
   /** Account for the delegation and release the child. Safe to call twice. */
   close(settledAs: DelegationSettlement, reason: string): void | Promise<void>;
+  /** True once the delegation settled (released, stopped, failed or at its ceiling); a settled handle takes no work. */
+  readonly settled?: boolean;
 }
 
 /** How the runtime saw a delegation end. */
@@ -213,6 +222,8 @@ export interface SpawnSubagentInit {
   readonly cancelGraceMs?: number;
   /** The spawning run's own lease (P2-25); see `SubagentRunContext.parentLeaseToken`. Absent at the root. */
   readonly parentLeaseToken?: string;
+  /** Operator-admitted agent definitions, passed to the child's context for its own delegations. */
+  readonly definitions?: ReadonlyMap<string, AgentDefinition>;
 }
 
 export type SubagentOutcome =
@@ -239,6 +250,11 @@ export type SubagentOutcome =
       readonly childText?: string;
       /** Null when the delegation was refused before it was ever announced. */
       readonly packetId: string | null;
+      /**
+       * The child ran, but its release or its accounting is unconfirmed (cleanup unknown, or the completion or lineage
+       * record failed): it may have acted, so a caller must not treat this as a delegation that did nothing.
+       */
+      readonly unknown?: true;
     };
 
 /**
@@ -381,7 +397,8 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
   let packet: HandoffPacket;
   try {
     packet = await mintDelegationPacketAsync(workspace, { parent, child: identity, goal: request.goal,
-      delegationScope: request.delegationScope, stopConditions: stops.conditions }, { signal: parentSignal });
+      delegationScope: request.delegationScope, stopConditions: stops.conditions,
+      ...(request.agentDefinition === undefined ? {} : { agentDefinition: request.agentDefinition }) }, { signal: parentSignal });
     if (parentSignal?.aborted) {
       removeHandoffPacketIfCurrent(workspace, packet);
       admission.release();
@@ -604,12 +621,16 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
     toolsetAgentId: identity.governedAs, identity, childSessionId, goal: request.goal, packetId,
     ...(init.parentLeaseToken === undefined ? {} : { parentLeaseToken: init.parentLeaseToken }),
     ...(scopeClasses === undefined ? {} : { delegationScope: scopeClasses }),
+    ...(request.agentDefinition === undefined ? {} : { agentDefinition: request.agentDefinition }),
+    ...(init.definitions === undefined ? {} : { definitions: init.definitions }),
     ...(request.stopConditions === undefined ? {} : { stopConditions: stops.conditions }), signal: controller.signal }));
   if (!first.ok) return { ok: false, reason: first.reason ?? closeReason, packetId,
-    ...(first.text.length === 0 ? {} : { childText: first.text }) };
+    ...(first.text.length === 0 ? {} : { childText: first.text }),
+    ...(cleanupUnknown || accountingError !== undefined ? { unknown: true as const } : {}) };
   if (closed) return { ok: true, identity, packetId, childSessionId, childText: first.text };
   const handle: SubagentHandle = {
     identity, childSessionId, packetId,
+    get settled() { return closed; },
     continue: text => execute(() => continuation!.continue(text)),
     close: (settledAs, reason) => {
       if (closing) return closing;

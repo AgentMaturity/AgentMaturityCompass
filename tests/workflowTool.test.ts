@@ -12,6 +12,8 @@ import { OUTCOME_UNKNOWN_NOTICES } from "../src/agent/pipelineToolSeam.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { rootIdentity } from "../src/agent/delegationIdentity.js";
 import { MAX_PLAN_NODES } from "../src/workflow/workflowPlan.js";
+import { workflowTool } from "../src/workflow/workflowTool.js";
+import type { ToolExecution } from "../src/tools/toolTypes.js";
 import type { SubagentRunContext, SubagentRunResult } from "../src/agent/subagentSpawn.js";
 
 /**
@@ -270,5 +272,22 @@ describe("a workflow stops when the turn is cancelled", () => {
     expect(outcome.outcome, "the loop is told the interrupted plan's effect is unknown").toBe("TOOL_OUTCOME_UNKNOWN");
     expect(String(outcome.content)).toContain(OUTCOME_UNKNOWN_NOTICES[0]);
     toolset.close();
+  });
+});
+
+describe("the workflow tool's effect classification", () => {
+  it("comes from each failed node's status, never from a reason that quotes model-chosen labels", async () => {
+    const dir = workspace();
+    let spawned = 0;
+    // A caller at the depth ceiling whose own label, chosen by its parent's model, reads like the unknown marker. The
+    // runtime's depth refusal quotes that chain, so a substring test would call a refusal before any dispatch unknown.
+    const tool = workflowTool({ identity: { governedAs: "payments-agent", runAs: "TOOL_OUTCOME_UNKNOWN", depth: 3, parent: "lead" },
+      session: recorder(dir), runner: async ctx => { spawned += 1; return okRunner(ctx); } });
+    const result = await tool.body({ workspace: dir, token: "depth-label", arguments: { plan: agent("a") } } as unknown as ToolExecution);
+    expect(spawned).toBe(0);
+    expect(result.ok).toBe(false);
+    const failed = (JSON.parse(result.output) as { failed: Array<{ reason: string; unknown?: true }> }).failed;
+    expect(failed).toEqual([{ nodeId: "a", reason: expect.stringContaining("TOOL_OUTCOME_UNKNOWN") }]);
+    expect(result.effect, "a refusal before any dispatch is not an unknown effect").toBeUndefined();
   });
 });

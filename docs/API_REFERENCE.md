@@ -1912,10 +1912,14 @@ Run one agent turn and report what the signed log recorded
 | `--interactive-ask-user` | - |
 | `--web-search-searxng <origin>` | - |
 | `--goal-rounds <n>` | - |
+| `--workflow-plan <file>` | - |
+| `--workflow-plan-sha256 <hex>` | - |
+| `--workflow-run-id <id>` | - |
 | `--lease-file <path>` | - |
 | `--approval-exception <file>` | - |
 | `--json` | - |
 | `--list-skills [name]` | - |
+| `--list-agents [name]` | - |
 
 #### `amc agent-loop verify`
 

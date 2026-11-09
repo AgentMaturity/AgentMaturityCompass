@@ -49,6 +49,7 @@ import { checkLease } from "../actions/authorize.js";
 import { toolEvidenceFor } from "../tools/toolEvidence.js";
 import { delegateTool, type SubagentCapability } from "./delegateTool.js";
 import { workflowTool } from "../workflow/workflowTool.js";
+import { delegateContinueTool, openDelegates } from "./delegateContinuations.js";
 import { pipelineToolSeam } from "./pipelineToolSeam.js";
 import type { AgentToolSeam } from "./toolSeam.js";
 import type { NativeExtensionHooks } from "../extensions/nativeExtensionHooks.js";
@@ -293,6 +294,11 @@ export interface AgentToolset {
   hasOwnedWork(): boolean;
   shutdown(): Promise<boolean>;
   close(): void | Promise<void>;
+  /**
+   * Define the delegation tools over a capability composed after construction (the CLI root gets its capability from
+   * the kernel once the session exists). A child toolset passes `subagents` instead; both define the same tools.
+   */
+  grantSubagents(capability: SubagentCapability): void;
   /** Writes one audit row to this session's evidence; throws when it cannot. MCP stdio restarts record through it. */
   readonly recordAudit?: (receipt: Record<string, unknown>) => string | null;
   /** The composed `ask_user` answerer and the current session; absent when no human is reachable. MCP elicitation asks through it. */
@@ -506,14 +512,26 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   registry.define(skillLoadTool({ roots: options.skillRoots ?? workspaceSkillRoots(workspace), record: recordNative }));
   registry.define(goalTool(options.getGoal));
   for (const tool of background.tools) registry.define(tool);
-  if (options.subagents !== undefined) {
-    // Both tools, from one capability. `delegate` is one child; `workflow` is a
-    // declared plan of them. Each is still gated a second time by the operator's
-    // signed allowlist, and separately -- permitting one does not permit the
-    // other, because their fan-out differs by up to MAX_PLAN_NODES.
-    registry.define(delegateTool(options.subagents));
-    registry.define(workflowTool(options.subagents));
-  }
+  // Kept-open delegates (SH-ORCH-05) belong to this toolset: shutdown releases them before the session is sealed.
+  // `keepOpen` is admitted only while the model is offered `delegate_continue`, by the checks `schemas()` applies.
+  const delegates = openDelegates(() => {
+    const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
+    return (options.expectedToolsDigest === undefined || snapshot.digestSha256 === options.expectedToolsDigest)
+      && (!compiled || compiledPolicyShows(compiled, "delegate_continue"))
+      && selectSupportedNativeTools(snapshot, NATIVE_DELEGATION_CAPABILITIES).some(tool => tool.name === "delegate_continue")
+      && registry.visible(agentId).get("delegate_continue")?.actionClass === nativeIdentities.get("delegate_continue")?.actionClass;
+  });
+  const grantSubagents = (capability: SubagentCapability): void => {
+    // From one capability. `delegate` is one child; `workflow` is a declared
+    // plan of them; `delegate_continue` reaches a child `delegate` kept open.
+    // Each is still gated a second time by the operator's signed allowlist, and
+    // separately -- permitting one does not permit another, because their
+    // fan-out and lifetime differ.
+    registry.define(delegateTool(capability, delegates));
+    registry.define(workflowTool(capability));
+    if (capability.continuable === true) registry.define(delegateContinueTool(delegates));
+  };
+  if (options.subagents !== undefined) grantSubagents(options.subagents);
 
   // Order is a reporting choice, not a semantic one: guards cannot allow, so
   // whichever denies first is simply the one named. Policy engines come before
@@ -627,8 +645,10 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
 
   const seam = pipelineToolSeam({ registry, pipeline, agentId });
   const closeHandles = (): void => { ledgerHandle?.close(); ledgerHandle = null; journal?.close(); journal = null; };
+  const hasOwnedWork = (): boolean => background.hasOwnedWork() || delegates.hasOwnedWork();
+  const shutdown = (): Promise<boolean> => Promise.all([delegates.closeAll(), background.shutdown()]).then(done => done.every(Boolean));
   return {
-    seam: { ...seam, extensionHooks: options.extensionHooks, shutdown: () => background.shutdown(), hasOwnedWork: () => background.hasOwnedWork(), schemas: () => {
+    seam: { ...seam, extensionHooks: options.extensionHooks, shutdown, hasOwnedWork, schemas: () => {
       recordUnconfinedEnabled();
       const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
       admittedCatalog(agentId, snapshot, false);
@@ -652,12 +672,13 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     readiness,
     recordAudit,
     ...(options.askUser ? { humanQuestion: { answerer: options.askUser, sessionId: currentSessionId } } : {}),
-    hasOwnedWork: () => background.hasOwnedWork(),
-    shutdown: () => background.shutdown(),
+    hasOwnedWork,
+    shutdown,
+    grantSubagents,
     close: (): void | Promise<void> => {
       registry.synchronizeLoadout(agentId, "closed");
-      const pending = background.hasOwnedWork();
-      const drain = background.shutdown();
+      const pending = hasOwnedWork();
+      const drain = shutdown();
       if (pending) return drain.then(() => closeHandles(), error => { closeHandles(); throw error; });
       closeHandles();
       void drain.catch(() => undefined);

@@ -39,7 +39,7 @@ export const QUESTIONS: A4Question[] = [
   question("path", `Engineering path: ${INTEGRATION_PATHS.join(", ")}.`, "choice", true),
   question("validation", "Validation checks to run in the build session: check ids from the operator's validation config, one per line; leave empty for none.",
     "list", false, ["autonomy"]),
-  question("workflow", "Optional: a declared workflow of delegated tasks, as JSON: {kind: \"agent\", id, runAs, goal, scope?}, {kind: \"parallel\", id, children} or {kind: \"pipeline\", id, stages}, at most 64 nodes. Leave empty for none.",
+  question("workflow", "Optional: a declared workflow of delegated tasks, as JSON: {kind: \"agent\", id, runAs, goal, scope?}, {kind: \"verify\", id, runAs, goal, of} (a delegate reviews an earlier leaf's output and gates the plan on its verdict), {kind: \"parallel\", id, children} or {kind: \"pipeline\", id, stages}, at most 64 nodes. Leave empty for none.",
     "text", false, ["autonomy"])
 ];
 

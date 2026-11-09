@@ -34,16 +34,37 @@ export const MAX_PLAN_NODES = 64;
 export const MAX_PLAN_DEPTH = 16;
 export const MAX_PLAN_BYTES = 256 * 1024;
 
+interface WorkflowLeaf {
+  readonly id: string;
+  readonly runAs: string;
+  readonly goal: string;
+  readonly scope?: readonly ActionClass[];
+  /** An operator-defined agent role (SH-ORCH-01); resolved against the admitted catalog when the node runs. */
+  readonly agent?: string;
+}
+
+/**
+ * A `verify` node reviews an EARLIER leaf's output (`of`) and gates the plan on
+ * its verdict: the control flow is deterministic, the judgement is a model's.
+ * `of` must name a leaf in an earlier stage of an enclosing pipeline, so the
+ * reviewed output exists before the verifier is admitted and a sibling cannot
+ * review a sibling. On pass the reviewed output, not the verifier's text, is
+ * what the next stage receives.
+ */
 export type WorkflowNode =
-  | {
-      readonly kind: "agent";
-      readonly id: string;
-      readonly runAs: string;
-      readonly goal: string;
-      readonly scope?: readonly ActionClass[];
-    }
+  | (WorkflowLeaf & { readonly kind: "agent" })
+  | (WorkflowLeaf & { readonly kind: "verify"; readonly of: string })
   | { readonly kind: "parallel"; readonly id: string; readonly children: readonly WorkflowNode[] }
   | { readonly kind: "pipeline"; readonly id: string; readonly stages: readonly WorkflowNode[] };
+
+export const isWorkflowLeaf = (node: WorkflowNode): node is Extract<WorkflowNode, { kind: "agent" | "verify" }> =>
+  node.kind === "agent" || node.kind === "verify";
+
+/** Every leaf id under a node; what a later `verify` may name. */
+function leafIds(node: WorkflowNode): string[] {
+  if (isWorkflowLeaf(node)) return [node.id];
+  return (node.kind === "parallel" ? node.children : node.stages).flatMap(leafIds);
+}
 
 export type ParsedPlan =
   | { readonly ok: true; readonly plan: WorkflowNode }
@@ -51,7 +72,7 @@ export type ParsedPlan =
 
 /** How many delegations this plan would spawn. Knowable before any of them run. */
 export function planAgentCount(node: WorkflowNode): number {
-  if (node.kind === "agent") return 1;
+  if (isWorkflowLeaf(node)) return 1;
   const children = node.kind === "parallel" ? node.children : node.stages;
   return children.reduce((total, child) => total + planAgentCount(child), 0);
 }
@@ -79,7 +100,10 @@ function consumeString(budget: ParseBudget, value: string): boolean {
   return true;
 }
 
-function parseNode(raw: unknown, budget: ParseBudget, depth: number): ParsedPlan {
+const AGENT_NAME = /^[a-z0-9][a-z0-9-]{0,63}$/;
+
+/** `visible`: leaf ids of earlier stages in every enclosing pipeline — the only outputs a `verify` may review. */
+function parseNode(raw: unknown, budget: ParseBudget, depth: number, visible: ReadonlySet<string>): ParsedPlan {
   if (depth > MAX_PLAN_DEPTH) return { ok: false, reason: `workflow plan exceeds depth ${MAX_PLAN_DEPTH}` };
   if (budget.nodes >= MAX_PLAN_NODES) return nodeRefusal();
   if (raw === null || typeof raw !== "object" || Array.isArray(raw)) {
@@ -102,7 +126,7 @@ function parseNode(raw: unknown, budget: ParseBudget, depth: number): ParsedPlan
 
   const kind = node["kind"];
   if (typeof kind === "string" && !consumeString(budget, kind)) return byteRefusal();
-  if (kind === "agent") {
+  if (kind === "agent" || kind === "verify") {
     const rawRunAs = node["runAs"], rawGoal = node["goal"];
     if ((typeof rawRunAs === "string" && !consumeString(budget, rawRunAs))
       || (typeof rawGoal === "string" && !consumeString(budget, rawGoal))) return byteRefusal();
@@ -129,7 +153,22 @@ function parseNode(raw: unknown, budget: ParseBudget, depth: number): ParsedPlan
       if (!parsed.ok) return { ok: false, reason: `node ${id}: ${parsed.reason}` };
       scope = parsed.classes;
     }
-    return { ok: true, plan: { kind: "agent", id, runAs, goal, ...(scope === undefined ? {} : { scope }) } };
+    let agent: string | undefined;
+    if (node["agent"] !== undefined) {
+      const rawAgent = node["agent"];
+      if (typeof rawAgent !== "string" || !consumeString(budget, rawAgent)) return { ok: false, reason: `node ${id}: agent must be a string` };
+      if (!AGENT_NAME.test(rawAgent)) return { ok: false, reason: `node ${id}: agent must be a definition name (lowercase letters, digits, dashes)` };
+      agent = rawAgent;
+    }
+    const leaf: WorkflowLeaf = { id, runAs, goal, ...(scope === undefined ? {} : { scope }), ...(agent === undefined ? {} : { agent }) };
+    if (kind === "agent") return { ok: true, plan: { kind: "agent", ...leaf } };
+    const rawOf = node["of"];
+    if (typeof rawOf !== "string" || !consumeString(budget, rawOf)) return { ok: false, reason: `node ${id}: verify needs \`of\`, the id of the node whose output it reviews` };
+    if (!visible.has(rawOf)) {
+      // Forward, sibling and cross-branch references are refused as data: the reviewed output must already exist.
+      return { ok: false, reason: `node ${id}: verify may only review a leaf in an earlier stage of an enclosing pipeline; ${JSON.stringify(rawOf)} is not one` };
+    }
+    return { ok: true, plan: { kind: "verify", ...leaf, of: rawOf } };
   }
 
   if (kind === "parallel" || kind === "pipeline") {
@@ -143,10 +182,12 @@ function parseNode(raw: unknown, budget: ParseBudget, depth: number): ParsedPlan
     }
     if (raws.length > MAX_PLAN_NODES - budget.nodes) return nodeRefusal();
     const parsedChildren: WorkflowNode[] = [];
+    const seen = new Set(visible);
     for (const child of raws) {
-      const parsed = parseNode(child, budget, depth + 1);
+      const parsed = parseNode(child, budget, depth + 1, kind === "pipeline" ? seen : visible);
       if (!parsed.ok) return parsed;
       parsedChildren.push(parsed.plan);
+      if (kind === "pipeline") for (const leaf of leafIds(parsed.plan)) seen.add(leaf);
     }
     return kind === "parallel"
       ? { ok: true, plan: { kind: "parallel", id, children: parsedChildren } }
@@ -155,7 +196,7 @@ function parseNode(raw: unknown, budget: ParseBudget, depth: number): ParsedPlan
 
   return {
     ok: false,
-    reason: `node ${id}: unknown kind ${typeof kind === "string" ? JSON.stringify(kind.slice(0, 100)) : typeof kind}; expected agent, parallel or pipeline`
+    reason: `node ${id}: unknown kind ${typeof kind === "string" ? JSON.stringify(kind.slice(0, 100)) : typeof kind}; expected agent, verify, parallel or pipeline`
   };
 }
 
@@ -169,7 +210,7 @@ function parseNode(raw: unknown, budget: ParseBudget, depth: number): ParsedPlan
  */
 export function parseWorkflowPlan(raw: unknown): ParsedPlan {
   try {
-    return parseNode(raw, { ids: new Set<string>(), nodes: 0, bytes: 0 }, 1);
+    return parseNode(raw, { ids: new Set<string>(), nodes: 0, bytes: 0 }, 1, new Set());
   } catch {
     return { ok: false, reason: "workflow plan could not be read safely" };
   }

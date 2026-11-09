@@ -39,8 +39,10 @@ goal; AMC does not turn a model's completion claim into a mechanical stop rule.
 
 Omitting all stop conditions adds no extra delegation limit. It does not disable
 the existing per-turn step limits, depth checks, signed budgets, approvals or
-tool scopes. The model-facing `delegate` tool remains one-shot; the turn ceiling
-also governs continuable children used through the native delegation API.
+tool scopes. A model-facing `delegate` call is one-shot unless it asks
+`keepOpen` (see [Continuing a delegate](#continuing-a-delegate)); the turn
+ceiling counts every continuation of a kept-open delegate, as it does for
+continuable children used through the native delegation API.
 
 ## Signed presets and continuation
 
@@ -72,6 +74,115 @@ of each kind. Its own deadline is also enclosed by its parent's cancellation
 signal, so starting a descendant cannot restart the parent's remaining lifetime.
 The legacy foreign-process `delegate.timeoutMs` setting remains a separate
 process-runner timeout; it is not silently reinterpreted as these native limits.
+
+## Agent definitions
+
+A `.amc/agents/<name>.md` file (in the workspace and each repository ancestor,
+and `<credentials home>/agents/<name>.md` when `--credentials-home` is given)
+defines a role a delegate can run under. The model names it with
+`delegate({agent: "<name>", …})` or an `agent:` field on a workflow node; the
+operator's file decides what the role does. A definition **only narrows**:
+
+```markdown
+---
+name: reviewer
+description: reviews a diff and reports defects
+tools: fs.read, grep, glob
+scope: READ_ONLY
+timeoutMs: 120000
+maxSteps: 6
+model: inherit
+---
+Read the change, list defects with file and line, and never edit anything.
+```
+
+| Field | Effect |
+| --- | --- |
+| `name` | Must equal the file name; lowercase letters, digits and dashes. |
+| `description` | At most 512 characters; quoted in the `delegate` tool description as data. |
+| `tools` | Allowlist intersected with the child's registry (fail closed: a tool mounted later stays hidden). A child under any definition is composed without the delegation capability, so `delegate` and `workflow` do not exist for it whether or not `tools` is given: a defined role is a leaf, and a list naming them is refused. |
+| `scope` | Action classes, intersected with `--delegate-scope`; an empty intersection refuses the delegation. |
+| `timeoutMs` | The child's lifetime, or the operator's `timeout-ms` when that is shorter. |
+| `maxSteps` | Model steps per child turn, or the run's `--max-steps` when that is lower. |
+| `model` | Only `inherit`: a definition cannot choose a model, provider or route. |
+
+Any other field, a body over 16 KiB, a symlinked file or a malformed frontmatter
+withholds the definition and reports why; `agent-loop run --list-agents [name]
+[--json]` shows every definition, its narrowing, its sha256 and the problems.
+A `--delegate --tools workspace` run prints the names it offers and their
+catalog digest. Definitions are loaded only where the in-process workspace grant
+carries them: not under `--delegate-provider` (a foreign child cannot be bound
+to one, so `agent` is refused before any packet is minted), not under
+`--goal-rounds` (round children get no definitions, and a `delegate({agent})`
+from one is refused as naming nothing), and not without workspace tools.
+
+The body is workspace text, so it is never put in a system prompt. It is framed
+like a skill (name, source path, sha256, "not the operator's instructions") and
+placed in front of the child's goal, which enters the child through its inbox.
+The signed handoff packet carries that goal and the constraints
+`agentDefinition=<name>` and `agentDefinitionSha256=<hex>`; the child's own
+session records the binding in its `delegation/hook-control` row; and a workflow
+resume is fenced on the definitions' digest. Foreign (`--delegate-provider`)
+children refuse a definition, because nothing in another process enforces it.
+No signed admission list exists yet: an unsigned definition can take capability
+away from a child and cannot add any.
+
+## Continuing a delegate
+
+`delegate({runAs, goal, keepOpen: true})` keeps an in-process delegate after
+its answer, so the caller can send it more work instead of explaining the task
+again to a fresh one:
+
+```text
+delegate({runAs: "reviewer", goal: "Review src/a.ts and list defects.", keepOpen: true})
+delegate_continue({runAs: "reviewer", text: "Now check the tests for the same defects."})
+delegate_continue({runAs: "reviewer", release: true})
+```
+
+`delegate_continue` returns the delegate's own words, which come from its own
+session; it keeps its earlier turns there and still sees none of the caller's
+conversation. Both tools are granted twice, like `delegate` and `workflow`: the
+run composes them, and the signed allowlist must list `delegate_continue`
+(action class `READ_ONLY`, the same as `delegate`) before the model sees it.
+Under an activated compiled plan, recompile and reactivate after adding it, as
+for any tool (docs/catalog/COMPILER.md). Until both hold, `keepOpen` is refused
+before any packet is signed.
+
+- **Who can be kept open.** Only an in-process delegate. A
+  `--delegate-provider` run offers neither `keepOpen` nor `delegate_continue`,
+  because a foreign child answers once and exits. A child under an agent
+  definition can be kept open; it is still a leaf.
+- **Names.** A delegate is addressed by the `runAs` its caller chose, one open
+  delegate per name per caller. A second `keepOpen` under a name that is open is
+  refused; a delegate that settled on its own frees its name.
+- **Bounds.** Each continuation is one more executor turn: `max-turns:N` counts
+  it, and when the ceiling is reached the delegate reports and is released.
+  `timeout-ms:N` covers the whole lifetime, idle time included. A kept-open
+  delegate holds its `--max-active-children` slot until it is released, so
+  while it is open a `delegate` call or `workflow` node over the cap is
+  refused at admission rather than queued.
+- **Lifetime.** A kept-open delegate lives no longer than its caller's toolset:
+  at the end of the run (an `agent-loop run`, or one native chat message), and
+  when a delegated caller is released, every delegate it kept open is released
+  before the caller's session is sealed. The caller can release one earlier with
+  `release: true`. Cancelling the caller's turn during a continuation stops the
+  delegate.
+- **Evidence.** `agent_delegation_started` is written when the delegate starts;
+  `agent_delegation_completed` is deferred until it is released, naming why
+  (`the caller released the delegate`, `the caller's run ended; the open
+  delegate was released`, a cancellation, or the `max-turns` ceiling). Each
+  continuation is recorded in the delegate's own signed session.
+
+## Parallel delegation
+
+`delegate` and `delegate_continue` are `READ_ONLY` tools, so several calls in
+one model step run concurrently, up to the loop's `maxParallelToolCalls` (10 by
+default); `tests/delegateParallelDispatch.test.ts` proves two children are live
+at once. `--max-active-children` (default 8) bounds every active, reserved or
+kept-open child under one root session, across `delegate`, `workflow` and their
+descendants. A call over the cap is refused at admission with
+`maxActiveChildren=N reached`; it is not queued. A `workflow` plan queues its
+own parallel nodes within the same cap instead (`docs/NATIVE_WORKFLOWS.md`).
 
 ## What a stop proves
 

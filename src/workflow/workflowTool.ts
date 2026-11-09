@@ -1,6 +1,6 @@
 import { defineTool } from "../tools/toolRegistry.js";
 import { MAX_PLAN_NODES, parseWorkflowPlan } from "./workflowPlan.js";
-import { runWorkflowPlan } from "./workflowRunner.js";
+import { parallelWithin, runWorkflowPlan } from "./workflowRunner.js";
 import type { SubagentCapability } from "../agent/delegateTool.js";
 import type { ToolDefinition, ToolExecution } from "../tools/toolTypes.js";
 
@@ -41,7 +41,9 @@ const WORKFLOW_PARAMETERS = Object.freeze({
     plan: {
       type: "object",
       description:
-        "A workflow plan. One of: {kind:'agent', id, runAs, goal, scope?} to delegate one task; "
+        "A workflow plan. One of: {kind:'agent', id, runAs, goal, scope?, agent?} to delegate one task; "
+        + "{kind:'verify', id, runAs, goal, of:<earlier leaf id>, agent?} to have a delegate review that node's "
+        + "output and gate the plan on its verdict (on pass the reviewed output carries forward); "
         + "{kind:'parallel', id, children:[...]} to run nodes concurrently and wait for all; "
         + "{kind:'pipeline', id, stages:[...]} to run nodes in order, each receiving the previous "
         + "answer. Every id must be unique — answers come back keyed by it. A delegate sees none "
@@ -85,9 +87,10 @@ export function workflowTool(capability: SubagentCapability): ToolDefinition {
         runner: capability.runner,
         mintSessionId: capability.mintSessionId ?? (() => `child-${crypto.randomUUID().slice(0, 12)}`),
         ...(capability.maxDepth === undefined ? {} : { maxDepth: capability.maxDepth }),
-        ...(maxActiveChildren === undefined ? {} : { maxActiveChildren }),
+        ...(maxActiveChildren === undefined ? {} : { maxActiveChildren, maxParallelAgents: parallelWithin(maxActiveChildren) }),
         ...(capability.delegationScope === undefined ? {} : { delegationScope: capability.delegationScope }),
         ...(capability.stopConditions === undefined ? {} : { stopConditions: capability.stopConditions }),
+        ...(capability.definitions === undefined ? {} : { definitions: capability.definitions }),
         ...(capability.parentLeaseToken === undefined ? {} : { parentLeaseToken: capability.parentLeaseToken }),
         ...(execution.signal === undefined ? {} : { signal: execution.signal })
       });
@@ -95,7 +98,8 @@ export function workflowTool(capability: SubagentCapability): ToolDefinition {
       return {
         // A plan with a failed or cancelled node did not do what was asked.
         ok: result.ok,
-        ...(result.failures.some(failure => failure.reason.includes("TOOL_OUTCOME_UNKNOWN")) ? { effect: "unknown" as const } : {}),
+        // From each failed node's status, never from reason text: a reason can quote model-chosen labels (a runAs chain).
+        ...(result.failures.some(failure => failure.unknown === true) ? { effect: "unknown" as const } : {}),
         output: JSON.stringify({
           runId: result.runId,
           outputs: Object.fromEntries(result.outputs),

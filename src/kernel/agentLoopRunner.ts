@@ -79,6 +79,8 @@ import { admitSessionAtOpen } from "../runtime/changeEnvelope.js";
 import { nativeSessionManifest } from "../lifecycle/versionManifest.js";
 import { runDueSchedules, type ScheduleRunResult } from "../autonomy/scheduleRunner.js";
 import { runGoalRounds, type GoalRoundsResult } from "../autonomy/goalRounds.js";
+import { assertNonModelPassAdmission, leavesResumeAsFound, runWorkflowPass, type WorkflowPassOptions } from "../workflow/workflowPass.js";
+import type { WorkflowRunResult } from "../workflow/workflowRunner.js";
 import { assertNativeScheduleAdmission } from "../autonomy/scheduleService.js";
 import type { SubagentCapability } from "../agent/delegateTool.js";
 import type { TurnCancelCause } from "../session/sessionTypes.js";
@@ -262,7 +264,7 @@ export interface ComposedTurnOptions {
    * caller builds its toolset, so the caller cannot construct the capability and
    * this function cannot know what to do with it. So the kernel builds it and
    * hands it over; the caller decides where it goes — in practice
-   * `toolset.registry.define(delegateTool(capability))`, which works after
+   * `toolset.grantSubagents(capability)` (the delegation tools), which works after
    * construction because `seam.schemas()` re-reads the registry each step.
    */
   readonly delegation?: {
@@ -307,6 +309,8 @@ export interface ComposedTurnOptions {
    * delegation; `maxRounds` is the hard ceiling and nothing extends it.
    */
   readonly goalRounds?: { readonly maxRounds: number; readonly signal?: AbortSignal };
+  /** Run a reviewed workflow plan headless under this run's delegation grant (SH-ORCH-03) instead of a model turn. */
+  readonly workflowPass?: WorkflowPassOptions;
 }
 
 export interface ComposedTurnOutcome {
@@ -317,6 +321,7 @@ export interface ComposedTurnOutcome {
   readonly scheduleResults?: readonly ScheduleRunResult[];
   /** How a goal-rounds run stopped; mechanical, never a goal-quality claim. */
   readonly goalRounds?: GoalRoundsResult;
+  readonly workflow?: WorkflowRunResult;
   readonly validation: NativeValidationResult;
   /**
    * The `system/prompt` row every request in this run cites.
@@ -461,17 +466,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     assertNativeScheduleAdmission({ workspace: options.workspace, ...options.schedulePass,
       approvalClass: options.approvalGate.actionClass });
   }
-  if (options.goalRounds !== undefined) {
-    if (options.delegation?.maxActiveChildren !== undefined) {
-      throw new Error("Configured --max-active-children root child limits are not supported for --goal-rounds; no execution occurred.");
-    }
-    const { maxRounds } = options.goalRounds;
-    if (options.delegation === undefined || options.delegation.runner !== undefined || options.schedulePass !== undefined
-      || options.audioParts !== undefined || images.length > 0 || options.prompt.trim() === "") {
-      throw new Error("Goal rounds need a text goal and in-process delegation (--delegate with workspace tools); schedules, audio, images and foreign delegates are not goal rounds.");
-    }
-    if (!Number.isSafeInteger(maxRounds) || maxRounds < 1 || maxRounds > 100) throw new Error("Goal rounds must be an integer from 1 through 100.");
-  }
+  assertNonModelPassAdmission(options, images.length);
   // P1-79: no in-process child may run without the run's principal; refused before any session row, spawn or lease.
   if ((options.schedulePass !== undefined || (options.delegation !== undefined && options.delegation.runner === undefined))
     && options.leaseToken === undefined && planRequiresPrincipal(options.workspace)) {
@@ -525,7 +520,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
   let steerTimer: NodeJS.Timeout | null = null;
   /** Set once the loop (or schedule pass) is ready; until then a throw is a failed composition, never a completion. */
   let composed = false;
-  let hostShutdown = false;
+  let hostShutdown = false, untouchedResume = false;
   let loopOwner: AgentLoopSeamService | undefined;
 
   try {
@@ -680,6 +675,14 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           systemPromptEventId: systemPromptRef.eventId,
           promptSections: prompt.assemble().sections.map(section => section.name) };
       }
+      if (options.workflowPass !== undefined) {
+        composed = true; // as for goal rounds: a non-model pass whose composition succeeded is not composition_failed
+        const workflow = await runWorkflowPass({ workspace: options.workspace, parent: rootIdentity(options.agentId), session, runner,
+          delegation: options.delegation!, pass: options.workflowPass });
+        untouchedResume = leavesResumeAsFound(options.resume !== undefined, workflow); // refused before dispatch: unsealed
+        return { sessionId, status: "idle", workflow, validation: projectNativeValidation(options.workspace, session.readEvents()),
+          systemPromptEventId: systemPromptRef.eventId, promptSections: prompt.assemble().sections.map(section => section.name) };
+      }
       if (options.goalRounds !== undefined) {
         composed = true; // composition succeeded: a goal-rounds parent is not sealed composition_failed
         const goalRounds = await runGoalRounds({
@@ -786,7 +789,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     try { resourcesConfirmed = await (options.tools?.shutdown?.() ?? Promise.resolve(true)); }
     catch (error) { disposalError ??= error; }
     sealComposedSession(session, { stopped: driverConfirmed && loopOwner?.status !== "failed", resourcesConfirmed,
-      keepOpen: options.keepOpen === true, composed, hostShutdown, schedulePass: options.schedulePass !== undefined });
+      keepOpen: options.keepOpen === true || untouchedResume, composed, hostShutdown, schedulePass: options.schedulePass !== undefined });
     // oxlint-disable-next-line no-unsafe-finally -- Report failed disposal after attempting every schedule owner.
     if (disposalError !== undefined) throw new Error("TOOL_OUTCOME_UNKNOWN: native service cleanup failed.", { cause: disposalError });
     // oxlint-disable-next-line no-unsafe-finally -- A cleanup timeout cannot be reported as successful shutdown.

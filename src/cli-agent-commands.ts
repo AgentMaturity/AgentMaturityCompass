@@ -1,4 +1,5 @@
 import { showSkillCatalogSelection } from "./cli/skillCatalogOptions.js";
+import { loadAgentDefinitionsForRun, showAgentDefinitionSelection } from "./cli/agentDefinitionOptions.js";
 import { randomUUID } from "node:crypto";
 import { hostname } from "node:os";
 /**
@@ -41,11 +42,10 @@ import { MAX_ACTIVE_CHILDREN_HELP, NO_DELEGATE_STOP_HELP, VALIDATION_REPAIR_HELP
 import { leaseFileToken, withLeaseFileOption } from "./cli/agentLoopLeaseFile.js";
 import { agentToolset, type AgentToolset } from "./agent/agentToolset.js";
 import { runLease } from "./leases/runLease.js";
-import { selectSupportedNativeTools } from "./agent/nativeToolCapabilities.js";
+import { NATIVE_DELEGATION_CAPABILITIES, selectSupportedNativeTools } from "./agent/nativeToolCapabilities.js";
 import type { MountedNativeMcpServer } from "./mcp/nativeMcpClient.js";
 import { resolveNativeValidationSelection } from "./setup/nativeValidationConfig.js";
 import { NativeMcpConfigError, reviewedNativeMcpApprovalOptions, type ReviewedNativeMcpServer } from "./setup/nativeMcpConfig.js";
-import { delegateTool } from "./agent/delegateTool.js";
 import { DEFAULT_MAX_DELEGATION_DEPTH } from "./agent/delegationIdentity.js";
 import { parseDelegationScope } from "./agent/delegationScope.js";
 import { parseSubagentStopConditions } from "./agent/subagentStopConditions.js";
@@ -251,8 +251,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     )
     .option("--json", "Output as JSON")
     .option("--list-skills [name]", "list skill discovery, sources and digests; pass a name to inspect its literal body")
+    .option("--list-agents [name]", "list agent definitions (.amc/agents/<name>.md), their narrowing and digests; pass a name to inspect its body")
     .action(async (promptParts: string[], opts: RunOptions, command: Command) => {
-      if (showSkillCatalogSelection(opts, io)) return;
+      if (showSkillCatalogSelection(opts, io) || showAgentDefinitionSelection(opts, io)) return;
       const agentId = resolveAgentId(process.cwd(), selectedAgentOption(command));
       let validation: ReturnType<typeof resolveNativeValidationSelection>;
       try { validation = resolveNativeValidationSelection(opts); }
@@ -314,7 +315,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         return;
       }
       const prompt = skillTurn.prompt;
-      if (prompt.length === 0 && opts.audioInput === undefined) {
+      if (prompt.length === 0 && opts.audioInput === undefined && opts.workflowPlan === undefined) {
         io.error(chalk.red("a prompt is required: amc agent-loop run \"...\""));
         io.fail();
         return;
@@ -442,7 +443,11 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       // echo tool exists precisely to make a multi-step turn observable.
       const toolMode = opts.tools ?? preset?.tools ?? (providerId === STUB_PROVIDER_ID ? "echo" : "none");
       const wantsDelegation = opts.delegate === true;
-      const breadth = resolveBreadthRun(io, opts, { toolMode, wantsDelegation });
+      // Loaded and announced only where the in-process workspace grant carries them: a foreign runner cannot enforce one,
+      // goal-round children get none, and a run without workspace tools has no delegate at all.
+      const offersDefinitions = wantsDelegation && toolMode === "workspace" && opts.delegateProvider === undefined && opts.goalRounds === undefined;
+      const definitions = offersDefinitions ? loadAgentDefinitionsForRun(opts, line => (opts.json ? io.error : io.log)(chalk.dim(line))) : undefined;
+      const breadth = resolveBreadthRun(io, opts, { toolMode, wantsDelegation, ...(definitions === undefined ? {} : { definitions }), cancelAfterMs: cancelAfter });
       if (breadth === null) return;
       const maxActiveChildren = activeChildLimitOption(io, opts.maxActiveChildren, wantsDelegation && toolMode === "workspace"); if (maxActiveChildren === null) return;
       if (!wantsDelegation && opts.delegateStop !== undefined) {
@@ -492,7 +497,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         const toolset = workspaceToolset = agentToolset({
           workspace: process.cwd(), extensionHooks: extensionTurn.hooks,
           agentId,
-          additionalCapabilities: [...mcpServers.flatMap(entry => entry.review.capabilities), ...(wantsDelegation ? [{ name: "delegate", actionClass: "READ_ONLY" as const }] : [])],
+          additionalCapabilities: [...mcpServers.flatMap(entry => entry.review.capabilities), ...(wantsDelegation ? NATIVE_DELEGATION_CAPABILITIES : [])],
           // Fork chooses a different ID; resume chooses the existing writer.
           get sessionId() { return actualSession().sessionId; },
           recorder: { recordProjectedEvidence: (row) => actualSession().recordProjectedEvidence(row), assertWritable: () => actualSession().assertWritable() },
@@ -584,7 +589,10 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
               ? "delegates run in-process, under this run's own driver"
               : `delegates run out-of-process: ${foreignRunnerDescription}`
           ));
-          grantDelegation = (capability) => { toolset.registry.define(delegateTool(capability)); };
+          // The tools a child's toolset gets, from the same place; `workflow` and `delegate_continue` stay hidden and denied
+          // unless the signed allowlist names them too, and only an in-process runner can keep a delegate open.
+          grantDelegation = (capability) => toolset.grantSubagents({ ...capability, ...(definitions === undefined ? {} : { definitions }),
+            continuable: foreignRunner === null });
           // Beside the write-scope line, and for the same reason: a bound the
           // operator cannot see is one they cannot check. It is also the only
           // place the parsed depth becomes observable, so a build that dropped

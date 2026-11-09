@@ -120,6 +120,12 @@ export function createForeignRunner(init: ForeignRunnerInit): SubagentRunner {
       );
     }
 
+    // A definition narrows an in-process registry and step ceiling. Neither exists in another process, so a foreign
+    // child under a role would carry a packet naming a bound nothing enforced.
+    if (ctx.agentDefinition !== undefined) {
+      return refuse(`a foreign child cannot run under agent definition ${JSON.stringify(ctx.agentDefinition.name)}: its tool allowlist and step ceiling bind an in-process registry only`);
+    }
+
     const governed = init.governedEnv();
     if (governed.lease.length === 0) {
       return refuse(

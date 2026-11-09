@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto";
-import { spawnSubagent, type DelegationRecorder, type SubagentRunner } from "../agent/subagentSpawn.js";
-import { parseWorkflowPlan, planAgentCount, type WorkflowNode } from "./workflowPlan.js";
+import { spawnSubagent, type DelegationRecorder, type SubagentRequest, type SubagentRunner } from "../agent/subagentSpawn.js";
+import { isWorkflowLeaf, parseWorkflowPlan, planAgentCount, type WorkflowNode } from "./workflowPlan.js";
+import { readVerdict, verdictInstruction } from "./workflowVerdict.js";
+import { agentDefinitionsDigest, applyAgentDefinition, resolveAgentDefinition, type AgentDefinition } from "../agent/agentDefinitions.js";
 import type { DelegationIdentity } from "../agent/delegationIdentity.js";
 import type { ActionClass } from "../types.js";
 import { canonicalize } from "../utils/json.js";
@@ -17,6 +19,8 @@ export interface WorkflowRunInit {
   readonly mintSessionId: () => string;
   /** Reuse this identity only to resume this exact plan in its original owned session. */
   readonly runId?: string;
+  /** With `runId`: refuse (before any dispatch) unless that run's creation checkpoint is in the session; never start a new run under it. */
+  readonly resumeOnly?: boolean;
   readonly maxParallelAgents?: number;
   readonly maxDepth?: number;
   readonly maxActiveChildren?: number;
@@ -26,8 +30,15 @@ export interface WorkflowRunInit {
   /** Operator capability restrictions, intersected with each node's request. */
   readonly delegationScope?: readonly ActionClass[];
   readonly stopConditions?: readonly string[];
+  /** Operator-admitted agent definitions; a node's `agent` resolves here, and their digest fences a resume. */
+  readonly definitions?: ReadonlyMap<string, AgentDefinition>;
 }
-export interface WorkflowFailure { readonly nodeId: string; readonly reason: string }
+export interface WorkflowFailure {
+  readonly nodeId: string;
+  readonly reason: string;
+  /** The node's effect is unknown (an interrupted or unconfirmed dispatch): set from its status, never read from reason text. */
+  readonly unknown?: true;
+}
 export interface WorkflowRunResult {
   readonly runId: string;
   readonly ok: boolean;
@@ -43,21 +54,28 @@ interface RunState {
   readonly progress: ReturnType<typeof workflowProgress>;
   readonly acquire: () => Promise<void>;
   readonly release: () => void;
-  readonly block: (reason: string) => void;
-  readonly blocked: () => string | undefined;
+  readonly block: (reason: string, unknown: boolean) => void;
+  readonly blocked: () => Stop | undefined;
   agentsRun: number;
-  stopped?: string;
+  stopped?: Stop;
 }
 type NodeOutcome = { readonly ok: true; readonly text: string } | { readonly ok: false };
-const activeSessions = new Map<string, { runs: Set<string>; live: number; waiting: Array<() => void>; blocked?: string }>();
+/** Why later nodes stop, and whether that cause left an effect unknown. */
+interface Stop { readonly reason: string; readonly unknown: boolean }
+const activeSessions = new Map<string, { runs: Set<string>; live: number; waiting: Array<() => void>; blocked?: Stop }>();
 
-function fail(state: RunState, nodeId: string, reason: string): NodeOutcome {
-  state.failures.push({ nodeId, reason });
+function fail(state: RunState, nodeId: string, reason: string, unknown = false): NodeOutcome {
+  state.failures.push({ nodeId, reason, ...(unknown ? { unknown: true as const } : {}) });
   return { ok: false };
 }
 
-async function runAgent(node: Extract<WorkflowNode, { kind: "agent" }>, input: string | null,
-  init: WorkflowRunInit, state: RunState): Promise<NodeOutcome> {
+type Leaf = Extract<WorkflowNode, { kind: "agent" | "verify" }>;
+
+async function runAgent(node: Leaf, carried: string | null, init: WorkflowRunInit, state: RunState): Promise<NodeOutcome> {
+  // A verify node's input is the reviewed output, so the checkpoint's input digest covers what was judged.
+  const input = node.kind === "verify" ? state.outputs.get(node.of) ?? null : carried;
+  if (node.kind === "verify" && input === null) return fail(state, node.id, `node ${node.of} produced no output to review`);
+  const nonce = randomUUID();
   const inputDigest = sha256Hex(canonicalize({ input }));
   let prior = state.progress.nodes.get(node.id);
   if (prior !== undefined) {
@@ -70,7 +88,7 @@ async function runAgent(node: Extract<WorkflowNode, { kind: "agent" }>, input: s
       prior = { ...prior, status: "TOOL_OUTCOME_UNKNOWN", reason: "TOOL_OUTCOME_UNKNOWN: interrupted delegation requires explicit operator reconciliation before retry" };
       state.progress.record(node.id, prior);
     }
-    if (prior.status !== "waiting") return fail(state, node.id, prior.reason ?? prior.status);
+    if (prior.status !== "waiting") return fail(state, node.id, prior.reason ?? prior.status, prior.status === "TOOL_OUTCOME_UNKNOWN");
   }
   const checkpoint: WorkflowNodeProgress = prior ?? { status: "waiting", inputDigest,
     operationKey: state.progress.operationKey(node.id), childSessionId: init.mintSessionId() };
@@ -79,11 +97,24 @@ async function runAgent(node: Extract<WorkflowNode, { kind: "agent" }>, input: s
   let dispatched = false;
   try {
     if (init.signal?.aborted) return fail(state, node.id, "workflow cancelled before dispatch");
-    if (state.stopped !== undefined) return fail(state, node.id, state.stopped);
+    if (state.stopped !== undefined) return fail(state, node.id, state.stopped.reason, state.stopped.unknown);
     const blocked = state.blocked();
-    if (blocked !== undefined) return fail(state, node.id, blocked);
+    if (blocked !== undefined) return fail(state, node.id, blocked.reason, blocked.unknown);
     const scope = intersectDelegationScopes(init.delegationScope, node.scope);
     if (scope !== undefined && scope.length === 0) return fail(state, node.id, "workflow node scope has no operator-permitted action class");
+    let request: SubagentRequest = { runAs: node.runAs,
+      goal: node.kind === "verify" ? `${node.goal}\n\n${verdictInstruction(nonce)}\n\nOutput under review (node ${node.of}):\n${input}`
+        : input === null ? node.goal : `${node.goal}\n\nInput from the previous step:\n${input}`,
+      ...(scope === undefined ? {} : { delegationScope: scope }),
+      ...(init.stopConditions === undefined ? {} : { stopConditions: init.stopConditions }) };
+    if (node.agent !== undefined) {
+      // Resolved against the operator's catalog and applied before the spawn, as the delegate tool does.
+      const resolved = resolveAgentDefinition(init.definitions, node.agent);
+      if (!resolved.ok) return fail(state, node.id, resolved.reason);
+      const applied = applyAgentDefinition(request, resolved.definition);
+      if (!applied.ok) return fail(state, node.id, applied.reason);
+      request = applied.request;
+    }
     state.progress.record(node.id, { ...checkpoint, status: "running" }, canonicalize({ input }));
     state.progress.assertDispatchFence();
     dispatched = true;
@@ -99,11 +130,8 @@ async function runAgent(node: Extract<WorkflowNode, { kind: "agent" }>, input: s
       finally { runnerSettled = true; }
     }, init.runner.hookControl === undefined ? {} : { hookControl: init.runner.hookControl });
     const outcome = await spawnSubagent({
-      workspace: init.workspace, parent: init.parent,
-      request: { runAs: node.runAs,
-        goal: input === null ? node.goal : `${node.goal}\n\nInput from the previous step:\n${input}`,
-        ...(scope === undefined ? {} : { delegationScope: scope }),
-        ...(init.stopConditions === undefined ? {} : { stopConditions: init.stopConditions }) },
+      workspace: init.workspace, parent: init.parent, request,
+      ...(init.definitions === undefined ? {} : { definitions: init.definitions }),
       session: init.session, runner, mintSessionId: () => checkpoint.childSessionId,
       ...(init.parentLeaseToken === undefined ? {} : { parentLeaseToken: init.parentLeaseToken }),
       ...(init.maxDepth === undefined ? {} : { maxDepth: init.maxDepth }),
@@ -113,30 +141,47 @@ async function runAgent(node: Extract<WorkflowNode, { kind: "agent" }>, input: s
     });
     if (!outcome.ok) {
       // A settled negative report is a failed node. Throws/cancellation/abandonment cannot prove its outcome.
-      const unknown = outcome.packetId !== null && (runnerThrew || runnerSignal?.aborted === true || !runnerSettled);
+      // Also when the spawn says the child's release or accounting is unconfirmed (S24): the child may have acted.
+      const unknown = outcome.packetId !== null && (runnerThrew || runnerSignal?.aborted === true || !runnerSettled || outcome.unknown === true);
       const reason = unknown ? `TOOL_OUTCOME_UNKNOWN: ${outcome.reason}; explicit operator reconciliation required before retry` : outcome.reason;
-      if (!runnerSettled) state.block(reason);
+      if (!runnerSettled) state.block(reason, unknown);
       state.progress.record(node.id, { ...checkpoint, status: unknown ? "TOOL_OUTCOME_UNKNOWN" : "failed", reason }, "", outcome.packetId ?? undefined);
-      return fail(state, node.id, reason);
+      return fail(state, node.id, reason, unknown);
     }
-    state.progress.record(node.id, { ...checkpoint, status: "succeeded", output: outcome.childText }, canonicalize(outcome.childText), outcome.packetId);
-    state.outputs.set(node.id, outcome.childText);
-    return { ok: true, text: outcome.childText };
+    let output = outcome.childText;
+    if (node.kind === "verify") {
+      // Judged BEFORE the final checkpoint, so the log never says "succeeded" for a node the run reports as failed.
+      const verdict = readVerdict(outcome.childText, nonce);
+      if (verdict !== "pass") {
+        // The RUNTIME's account only: the verifier's words stay in its child session (named here), never in a plaintext
+        // progress row, and never where the workflow tool reads failure reasons for its effect classification.
+        const reason = `verify ${verdict === "fail" ? "verdict: fail" : `verdict ${verdict}`} (the verifier's text is in child session ${checkpoint.childSessionId}, not in this row)`;
+        state.progress.record(node.id, { ...checkpoint, status: "failed", reason }, "", outcome.packetId);
+        return fail(state, node.id, reason);
+      }
+      output = input!; // The reviewed output carries forward; the verifier's own text is in its child session.
+    }
+    state.progress.record(node.id, { ...checkpoint, status: "succeeded", output }, canonicalize(output), outcome.packetId);
+    state.outputs.set(node.id, output);
+    return { ok: true, text: output };
   } catch (error) {
     // A failed result commit leaves the durable dispatch intact. Never publish its uncommitted answer.
-    state.stopped = `${dispatched ? "TOOL_OUTCOME_UNKNOWN: " : ""}${error instanceof Error ? error.message : String(error)}`;
-    return fail(state, node.id, state.stopped);
+    state.stopped = { reason: `${dispatched ? "TOOL_OUTCOME_UNKNOWN: " : ""}${error instanceof Error ? error.message : String(error)}`, unknown: dispatched };
+    return fail(state, node.id, state.stopped.reason, state.stopped.unknown);
   } finally { state.release(); }
 }
 
 async function runNode(node: WorkflowNode, input: string | null, init: WorkflowRunInit, state: RunState): Promise<NodeOutcome> {
   if (init.signal?.aborted) return fail(state, node.id, "workflow cancelled before admission");
-  if (state.stopped !== undefined) return fail(state, node.id, state.stopped);
-  if (node.kind === "agent") {
+  if (state.stopped !== undefined) return fail(state, node.id, state.stopped.reason, state.stopped.unknown);
+  if (isWorkflowLeaf(node)) {
     try { return await runAgent(node, input, init, state); }
     catch (error) {
-      state.stopped = error instanceof Error ? error.message : String(error);
-      return fail(state, node.id, state.stopped);
+      // Thrown before runAgent's own dispatch guard, so nothing new was dispatched. A node whose last checkpoint was
+      // running or parked unknown may still have acted earlier, and stays unknown (S24).
+      const last = state.progress.nodes.get(node.id)?.status;
+      state.stopped = { reason: error instanceof Error ? error.message : String(error), unknown: last === "running" || last === "TOOL_OUTCOME_UNKNOWN" };
+      return fail(state, node.id, state.stopped.reason, state.stopped.unknown);
     }
   }
   if (node.kind === "parallel") {
@@ -155,12 +200,18 @@ async function runNode(node: WorkflowNode, input: string | null, init: WorkflowR
   return { ok: true, text: carried ?? "" };
 }
 
+/** The plan scheduler's bound under a root-wide active-child cap: 1 through 8 (a cap of 0 still refuses every child at the spawn). */
+export function parallelWithin(maxActiveChildren: number): number {
+  return Math.max(1, Math.min(8, maxActiveChildren));
+}
+
 export async function runWorkflowPlan(init: WorkflowRunInit): Promise<WorkflowRunResult> {
   const runId = init.runId ?? randomUUID();
   const outputs = new Map<string, string>();
   const failures: WorkflowFailure[] = [];
-  const refused = (reason: string): WorkflowRunResult => ({ runId, ok: false, outputs,
-    failures: [{ nodeId: init.plan?.id ?? "workflow", reason }], cancelled: init.signal?.aborted === true, agentsRun: 0 });
+  const refused = (reason: string, unknown = false): WorkflowRunResult => ({ runId, ok: false, outputs,
+    failures: [{ nodeId: init.plan?.id ?? "workflow", reason, ...(unknown ? { unknown: true as const } : {}) }],
+    cancelled: init.signal?.aborted === true, agentsRun: 0 });
   const parsed = parseWorkflowPlan(init.plan);
   if (!parsed.ok) return refused(parsed.reason);
   // Caller-owned arrays/identity cannot change between the checkpoint and an awaited admission.
@@ -177,21 +228,22 @@ export async function runWorkflowPlan(init: WorkflowRunInit): Promise<WorkflowRu
     const progress = workflowProgress({ ...init, runId, controls: {
       maxDepth: init.maxDepth ?? null, delegationScope: init.delegationScope ?? null,
       ...(init.maxActiveChildren === undefined ? {} : { maxActiveChildren: init.maxActiveChildren }),
-      stopConditions: init.stopConditions ?? null, hookControl: init.runner.hookControl ?? null
+      stopConditions: init.stopConditions ?? null, hookControl: init.runner.hookControl ?? null,
+      agentDefinitions: init.definitions === undefined ? null : agentDefinitionsDigest(init.definitions)
     } });
     sessionKey = progress.sessionKey;
-    const admission = activeSessions.get(sessionKey) ?? { runs: new Set<string>(), live: 0, waiting: [], blocked: undefined as string | undefined };
+    const admission = activeSessions.get(sessionKey) ?? { runs: new Set<string>(), live: 0, waiting: [], blocked: undefined as Stop | undefined };
     if (admission.runs.has(runId)) { sessionKey = undefined; return refused("workflow run is already active in this owning session"); }
     if (progress.unresolvedRuns.some(id => id !== runId && !admission.runs.has(id))) {
       sessionKey = undefined;
-      return refused("TOOL_OUTCOME_UNKNOWN: an unresolved workflow in this session requires operator reconciliation; a new runId cannot retry it");
+      return refused("TOOL_OUTCOME_UNKNOWN: an unresolved workflow in this session requires operator reconciliation; a new runId cannot retry it", true);
     }
     admission.runs.add(runId);
     activeSessions.set(sessionKey, admission);
     let live = 0;
     const waiting: Array<() => void> = [];
     const state: RunState = { outputs, failures, agentsRun: 0, progress,
-      block: reason => { admission.blocked = reason; }, blocked: () => admission.blocked,
+      block: (reason, unknown) => { admission.blocked = { reason, unknown }; }, blocked: () => admission.blocked,
       acquire: async () => {
         if (live >= maxParallel) await new Promise<void>(resolve => waiting.push(resolve));
         else live++;

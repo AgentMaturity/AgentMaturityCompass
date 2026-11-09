@@ -52,6 +52,11 @@ Use this page to reach the shortest evidence-backed path for your task. AMC's pu
 - [Industry Domain Packs](DOMAIN_PACKS.md): 41 self-reported sector questionnaires whose content is experimental; free in the current source build, while the published 1.1.1 release still asks for a licence ([Pricing](PRICING.md))
 - [A4 Forge](A4_FORGE.md): a preview in the current source build only, off unless the operator sets `AMC_A4_PREVIEW=1`
 
+## Native Agent Orchestration
+
+- [Native delegation limits and agent definitions](NATIVE_DELEGATION_LIMITS.md): child stop conditions, `.amc/agents/<name>.md` roles that only narrow a delegate, kept-open delegates (`delegate_continue`) and parallel delegation
+- [Native workflows](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/NATIVE_WORKFLOWS.md): `agent`, `verify`, `parallel` and `pipeline` plans, durable progress, and the headless `agent-loop run --workflow-plan` (in the repository; not yet a site page)
+
 ## Build And Integrate
 
 - [Compatibility Matrix](COMPATIBILITY_MATRIX.md)
