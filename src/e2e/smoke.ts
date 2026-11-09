@@ -566,9 +566,6 @@ async function runHelmTemplateSmoke(params: SmokeParams): Promise<SmokeReport> {
       if (!rendered.includes("kind: Service")) {
         throw new Error("rendered chart missing Service");
       }
-      if (!rendered.includes("kind: Ingress")) {
-        throw new Error("rendered chart missing Ingress");
-      }
       if (!rendered.includes("kind: PersistentVolumeClaim")) {
         throw new Error("rendered chart missing PersistentVolumeClaim");
       }
@@ -578,7 +575,20 @@ async function runHelmTemplateSmoke(params: SmokeParams): Promise<SmokeReport> {
       if (!rendered.includes("kind: PodDisruptionBudget")) {
         throw new Error("rendered chart missing PodDisruptionBudget");
       }
-      return ["helm template rendered required resources"];
+      const ingressKind = /^kind: Ingress$/m;
+      if (ingressKind.test(rendered)) {
+        throw new Error("default Helm chart unexpectedly exposes an Ingress");
+      }
+      const withIngress = runShell("helm", ["template", "amc", chartDir,
+        "-f", join(chartDir, "examples", "values-ingress-tls.yaml"),
+        "--set", "env.AMC_TRUSTED_PROXY_CIDRS=10.244.1.17/32"], repoRoot);
+      if (!withIngress.ok) {
+        throw new Error(withIngress.stderr || withIngress.stdout || "helm template with ingress enabled failed");
+      }
+      if (!ingressKind.test(withIngress.stdout)) {
+        throw new Error("rendered chart missing Ingress after enabling it");
+      }
+      return ["helm template rendered required resources; Ingress appears only when enabled"];
     })
   );
   if (steps.at(-1)?.status === "FAIL") {

@@ -744,7 +744,8 @@ jobs:
           grep -q "allowPrivilegeEscalation: false" /tmp/amc-helm-rendered.yaml
 
           # Ingress is optional by default; verify it via the shipped example overlay.
-          helm template amc ./deploy/helm/amc -f ./deploy/helm/amc/examples/values-ingress-tls.yaml > /tmp/amc-helm-ingress-rendered.yaml
+          helm template amc ./deploy/helm/amc -f ./deploy/helm/amc/examples/values-ingress-tls.yaml \
+            --set env.AMC_TRUSTED_PROXY_CIDRS=10.244.1.17/32 > /tmp/amc-helm-ingress-rendered.yaml
           grep -q "kind: Ingress" /tmp/amc-helm-ingress-rendered.yaml
 
       - name: Upload helm render artifact
