@@ -21,6 +21,14 @@ describe("parseRunLimits", () => {
     }
   });
 
+  it("is refused where no root driver would enforce it: goal rounds and schedule passes", async () => {
+    // MUTATION: drop the runComposedTurn refusal and the limit is silently dropped on the goal-rounds path.
+    const { runComposedTurn } = await import("../src/kernel/agentLoopRunner.js");
+    await expect(runComposedTurn({ workspace: "/nonexistent-amc-workspace", agentId: "default", prompt: "goal", runLimits: { deadlineMs: 1000 },
+      goalRounds: { maxRounds: 1 }, route: { providerId: "stub", model: "stub", params: { max_tokens: 16, stream: true } }, routes: [] }))
+      .rejects.toThrow(/Run limits bound the root driver/);
+  });
+
   it("is not the child parser: --delegate-stop still refuses max-tokens", async () => {
     const { parseSubagentStopConditions } = await import("../src/agent/subagentStopConditions.js");
     expect(parseSubagentStopConditions(["max-tokens:1"]).ok).toBe(false);

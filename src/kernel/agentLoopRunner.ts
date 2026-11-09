@@ -372,6 +372,11 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
   if (options.planMode !== undefined && (options.delegation !== undefined || options.goalRounds !== undefined || options.schedulePass !== undefined)) {
     throw new Error("Plan mode narrows the root toolset only; delegation, goal rounds and schedule passes cannot run under it. No session was opened.");
   }
+  // SH-LOOP-06: run limits bound the root driver, which goal rounds and schedule passes never start; a limit that could
+  // not be enforced is refused rather than silently dropped.
+  if (options.runLimits !== undefined && (options.goalRounds !== undefined || options.schedulePass !== undefined)) {
+    throw new Error("Run limits bound the root driver, and goal rounds and schedule passes run no root turn. No session was opened.");
+  }
   const audioParts = options.audioParts === undefined ? undefined : materializeNativeAudioParts(snapshotNativeAudioParts(options.audioParts));
   const images = materializeNativeImages(snapshotNativeImages(options.images));
   if (options.schedulePass !== undefined) {

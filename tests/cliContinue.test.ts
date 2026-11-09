@@ -112,6 +112,10 @@ describe("amc agent-loop run --stop", () => {
     const bad = await run(["x", "--stop", "max-turns:zero"]);
     expect(bad.failed).toBe(true);
     expect(bad.errors.join("\n")).toContain("--stop:");
+    // MUTATION: drop the CLI refusal and --stop is silently ignored by a goal-rounds run, which starts no root driver.
+    const rounds = await run(["goal", "--stop", "timeout-ms:1000", "--goal-rounds", "2", "--delegate", "--tools", "workspace"]);
+    expect(rounds.failed).toBe(true);
+    expect(rounds.errors.join("\n")).toContain("--stop bounds the root driver");
     // The old assertion (exit 0) encoded the defect: a run a limit cut short reported success.
     const result = await run(["slow", "--stop", "timeout-ms:100", "--think-ms", "1500", "--tools", "none"]);
     expect(result.failed).toBe(true);

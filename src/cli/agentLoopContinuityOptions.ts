@@ -69,6 +69,7 @@ export function resolveContinuityRun(io: AgentLoopCliIo, opts: ContinuityOptions
   if (opts.interactiveSteer && (typeof process.send !== "function" || !process.connected)) return refuse("--interactive-steer requires an AMC parent with a dedicated IPC channel (child_process.fork or native chat).");
   const limits = parseRunLimits(opts.stop);
   if (!limits.ok) return refuse(`--stop: ${limits.reason}`);
+  if (limits.conditions.length > 0 && opts.goalRounds !== undefined) return refuse("--stop bounds the root driver, and --goal-rounds runs no root turn: each round is a delegated child, bounded by --delegate-stop and the round ceiling.");
   let session = opts.session;
   if (opts.continue) {
     const chosen = continuedSession(io, context);
