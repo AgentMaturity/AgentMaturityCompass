@@ -140,6 +140,7 @@ function renderInstructionReport(load: InstructionLoad, candidates: readonly str
     lines.push(chalk.bold("Included:"));
     for (const file of load.included) {
       lines.push(`  ${file.candidate.displayPath} (${file.candidate.scope}, ${file.bytes} bytes)`);
+      for (const entry of file.imports) lines.push(`    @${entry.displayPath} (imported by ${entry.importedBy}, ${entry.bytes} bytes)`);
     }
   }
   if (load.omitted.length > 0) {

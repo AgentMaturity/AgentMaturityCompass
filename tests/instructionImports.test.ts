@@ -1,12 +1,16 @@
-import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { linkSync, mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Command } from "commander";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { importTargets, MAX_IMPORT_DEPTH, resolveImportPath, resolveInstructionImports } from "../src/prompt/context/instructionImports.js";
+import { canonicalImportRefusal, importTargets, MAX_IMPORT_DEPTH, MAX_IMPORTS_PER_FILE, resolveImportPath, resolveInstructionImports } from "../src/prompt/context/instructionImports.js";
+import { MACOS_SECRET_PATHS } from "../src/sandbox/seatbeltNativeShell.js";
 import { loadInstructionFiles } from "../src/prompt/context/instructionFiles.js";
 import { INSTRUCTION_FILE_NAMES, instructionCandidates, STRONGEST_INSTRUCTION_FILE } from "../src/prompt/context/instructionPrecedence.js";
 import { renderInstructionContext } from "../src/prompt/context/instructionsContext.js";
+
+/** The first words of the precedence statement: everything before it in a rendered context is the omission block. */
+const INSTRUCTION_PRECEDENCE_LEAD = "Workspace instructions follow";
 import { chooseGuardrailsTarget } from "../src/guide/oneClickFix.js";
 import { registerPromptCommands } from "../src/cli-prompt-commands.js";
 
@@ -58,6 +62,27 @@ describe("resolveImportPath", () => {
     for (const target of ["package.json", "scripts/deploy.sh", "notes", "image.png", "docs/rules.MD.bak"]) expect(resolveImportPath(target, "AMC.md").ok, target).toBe(false);
     for (const target of ["docs/rules.MD", "docs/guide.mdx", "notes/plain.txt"]) expect(resolveImportPath(target, "AMC.md").ok, target).toBe(true);
   });
+  it("refuses credential carriers that were renamed into an importable text file, and every directory the shell sandbox denies (S18)", () => {
+    // MUTATION: narrow the .env rule back to /^\.env(\.|$)/ and `.env-prod.txt` resolves; drop the stem suffix rule and `.npmrc.txt` does.
+    const renamed = [".env-prod.txt", ".envsecrets.md", "conf/.ENV_LOCAL.md", ".envrc.txt", ".npmrc.txt", ".netrc.md", ".pypirc.txt", ".git-credentials.md",
+      "credentials.md", "secrets/Credentials.TXT", "keys/id_rsa.txt", "keys/ID_ED25519.md", "keys/id_ecdsa_backup.md", "certs/server.pem.txt", "api.key.md",
+      ".azure/notes.md", ".config/gcloud/notes.md", "Library/Keychains/notes.md", ".npmrc/notes.md"];
+    for (const target of renamed) expect(resolveImportPath(target, "AMC.md").ok, target).toBe(false);
+    for (const target of ["docs/environment.md", "keys.md", "identity/notes.md", "pemberton.md", "docs/id_scheme.md", "my.keynotes.md", "config/gcloud.md", ".config/notes.md"]) {
+      expect(resolveImportPath(target, "AMC.md").ok, target).toBe(true);
+    }
+    // The macOS shell sandbox's home-relative secret list and the import denylist stay in step (a workspace can be a home directory).
+    for (const secret of MACOS_SECRET_PATHS) expect(resolveImportPath(`${secret}/notes.md`, "AMC.md").ok, secret).toBe(false);
+  });
+  it("judges the canonical on-disk path: a spelling or a directory link that lands on a refused name is refused", () => {
+    // MUTATION: make canonicalImportRefusal return null and both refused spellings pass.
+    put(".amc/notes.md", "state\n"); put("docs/rules.md", "rules\n");
+    symlinkSync(join(workspace, ".amc"), join(workspace, "docs", "state"));
+    // Case-insensitive volume: realpath names .amc. Case-sensitive volume: .AMC does not exist. Refused either way.
+    expect(canonicalImportRefusal(workspace, ".AMC/notes.md")).not.toBeNull();
+    expect(canonicalImportRefusal(workspace, "docs/state/notes.md")).toMatch(/AMC state/);
+    expect(canonicalImportRefusal(workspace, "docs/rules.md")).toBeNull();
+  });
   it("reads only exact @ lines", () => {
     expect(importTargets("@a.md\nsee @b.md inline\n  @c.md  \n@ spaced\n@d.md\n")).toEqual(["a.md", "d.md"]);
   });
@@ -69,7 +94,7 @@ describe("resolveInstructionImports", () => {
     put("AMC.md", "root\n@hop1.md\n@hop1.md\n@link.md\n");
     put("hop1.md", "1\n@hop2.md\n"); put("hop2.md", "2\n@hop3.md\n"); put("hop3.md", "3\n@hop4.md\n"); put("hop4.md", "4\n@hop5.md\n"); put("hop5.md", "5\n");
     put("secret.md", "never\n"); symlinkSync(join(workspace, "secret.md"), join(workspace, "link.md"));
-    const resolved = resolveInstructionImports({ workspace, importedBy: "AMC.md", content: "root\n@hop1.md\n@hop1.md\n@link.md\n", maxFileBytes: 4096, alreadyLoaded: new Set() });
+    const resolved = resolveInstructionImports({ workspace, importedBy: "AMC.md", content: "root\n@hop1.md\n@hop1.md\n@link.md\n", maxFileBytes: 4096, maxTotalBytes: 131072 });
     expect(resolved.imports.map(entry => entry.displayPath)).toEqual(["hop1.md", "hop2.md", "hop3.md", "hop4.md"]);
     expect(resolved.imports[3]).toMatchObject({ importedBy: "hop3.md", bytes: 11 });
     expect(MAX_IMPORT_DEPTH).toBe(4);
@@ -86,7 +111,7 @@ describe("resolveInstructionImports", () => {
     const content = "@state.md\n@docs/rules.md\n";
     const linked = join(workspace, "..", "amc-import-link-" + process.pid); symlinkSync(workspace, linked);
     try {
-      const resolved = resolveInstructionImports({ workspace: linked, importedBy: "AMC.md", content, maxFileBytes: 4096, alreadyLoaded: new Set() });
+      const resolved = resolveInstructionImports({ workspace: linked, importedBy: "AMC.md", content, maxFileBytes: 4096, maxTotalBytes: 131072 });
       expect(resolved.imports.map(entry => entry.displayPath)).toEqual(["docs/rules.md"]);
       expect(resolved.omitted).toEqual([expect.objectContaining({ displayPath: "state.md", reason: "unreadable" })]);
       expect(JSON.stringify(resolved)).not.toContain("state\\n");
@@ -109,6 +134,57 @@ describe("resolveInstructionImports", () => {
     const squeezed = loadInstructionFiles({ workspace, workspaceOnly: true, maxTotalBytes: 15 });
     expect(squeezed.included).toHaveLength(0);
     expect(squeezed.omitted).toEqual(expect.arrayContaining([expect.objectContaining({ displayPath: "AMC.md", reason: "over-budget" })]));
+  });
+
+  it("refuses a hard link: the file has a name nobody judged (an .amc file linked as docs/notes.md)", () => {
+    // MUTATION: drop the `links !== 1` refusal and the .amc bytes are quoted to the provider.
+    put(".amc/vault-notes.md", "operator vault state\n"); put("docs/rules.md", "rules\n");
+    linkSync(join(workspace, ".amc", "vault-notes.md"), join(workspace, "docs", "notes.md"));
+    const resolved = resolveInstructionImports({ workspace, importedBy: "AMC.md", content: "@docs/notes.md\n@docs/rules.md\n", maxFileBytes: 4096, maxTotalBytes: 131072 });
+    expect(resolved.imports.map(entry => entry.displayPath)).toEqual(["docs/rules.md"]);
+    expect(resolved.omitted).toEqual([expect.objectContaining({ displayPath: "docs/notes.md", reason: "import-refused", detail: expect.stringContaining("hard links") })]);
+    expect(JSON.stringify(resolved)).not.toContain("vault state");
+  });
+
+  it("is bounded: at most MAX_IMPORTS_PER_FILE lines followed, reading stops at the total budget, and the rest is one omission", () => {
+    // MUTATION: drop the count cap and all 40 files are imported; drop the byte stop and big3.md is read.
+    for (let index = 0; index < 40; index += 1) put(`docs/a${index}.md`, `rule ${index}\n`);
+    const many = Array.from({ length: 40 }, (_, index) => `@docs/a${index}.md`).join("\n");
+    const counted = resolveInstructionImports({ workspace, importedBy: "AMC.md", content: many, maxFileBytes: 4096, maxTotalBytes: 131072 });
+    expect(MAX_IMPORTS_PER_FILE).toBe(32);
+    expect(counted.imports).toHaveLength(32);
+    expect(counted.omitted).toEqual([expect.objectContaining({ reason: "import-limit", detail: expect.stringContaining("8 further") })]);
+    const reads: string[] = [];
+    const reader = (path: string) => { reads.push(path); return "x".repeat(3000); };
+    const budgeted = resolveInstructionImports({ workspace, importedBy: "AMC.md", content: "@big1.md\n@big2.md\n@big3.md\n", maxFileBytes: 4096, maxTotalBytes: 5000, readTextFile: reader });
+    expect(budgeted.imports.map(entry => entry.displayPath)).toEqual(["big1.md"]);
+    expect(reads.map(path => path.slice(-7))).toEqual(["big1.md", "big2.md"]);
+    expect(budgeted.omitted).toEqual([expect.objectContaining({ displayPath: "big2.md", reason: "over-budget" }), expect.objectContaining({ reason: "import-limit", detail: expect.stringContaining("1 further") })]);
+  });
+
+  it("keeps a flood of refused lines and a hostile target out of every step's prompt and the operator's terminal", () => {
+    // MUTATION: quote the raw target and the escape sequence and the 9,000-character name reach the rendered context.
+    const flood = Array.from({ length: 5_000 }, (_, index) => `@~/x${index}`).join("\n");
+    const hostile = `@\u001b]52;c;ZXZpbA==\u0007${"y".repeat(9_000)}.md`;
+    put("AMC.md", `${hostile}\n${flood}\n`);
+    const load = loadInstructionFiles({ workspace, workspaceOnly: true });
+    expect(load.omitted.length).toBeLessThanOrEqual(MAX_IMPORTS_PER_FILE + 1);
+    const rendered = renderInstructionContext(load);
+    const omissionBlock = rendered.slice(0, rendered.indexOf(INSTRUCTION_PRECEDENCE_LEAD));
+    expect(omissionBlock).not.toContain("\u001b");
+    expect(omissionBlock).toContain("\\u001b");
+    expect(omissionBlock.length).toBeLessThan(16_000);
+  });
+
+  it("resolves imports per instruction file: a weaker importer dropped for budget does not take the stronger file's import", () => {
+    // MUTATION: dedupe imports across files again and AGENTS.md loses docs/shared.md when CLAUDE.md is dropped.
+    const shared = `${"s".repeat(99)}\n`;
+    put("docs/shared.md", shared); put("CLAUDE.md", "claude rules\n@docs/shared.md\n"); put("AGENTS.md", "agents rules\n@docs/shared.md\n");
+    const load = loadInstructionFiles({ workspace, workspaceOnly: true, maxTotalBytes: 140 });
+    const agents = load.included.find(file => file.candidate.displayPath === "AGENTS.md");
+    expect(agents?.imports.map(entry => entry.displayPath)).toEqual(["docs/shared.md"]);
+    expect(load.included.map(file => file.candidate.displayPath)).toEqual(["AGENTS.md"]);
+    expect(load.omitted).toEqual(expect.arrayContaining([expect.objectContaining({ displayPath: "CLAUDE.md", reason: "over-budget" })]));
   });
 });
 

@@ -68,7 +68,7 @@ export interface LoadedInstruction {
 }
 
 /** Why an instruction file or part of discovery is absent from the contribution. */
-export type InstructionOmissionReason = "unreadable" | "oversize" | "over-budget" | "discovery-limit" | "import-refused" | "import-depth";
+export type InstructionOmissionReason = "unreadable" | "oversize" | "over-budget" | "discovery-limit" | "import-refused" | "import-depth" | "import-limit";
 
 /** A file omission or incomplete discovery, stated safely to the model. */
 export interface InstructionOmission {
@@ -205,22 +205,23 @@ function probe(candidate: InstructionCandidate, workspace: string): Probe {
 
 /**
  * Read one bounded UTF-8 workspace file, or null when it cannot be read exactly. Shared with the import reader.
- * An oversize file returns empty content with its true size so the caller can name the cap.
+ * An oversize file returns empty content with its true size so the caller can name the cap. `links` is the hard-link
+ * count of the inode actually read (from its descriptor); an injected test reader reports 1.
  */
-export function readBoundedInstructionText(root: string, path: string, maxFileBytes: number, readTextFile?: (absolutePath: string) => string): { readonly content: string; readonly bytes: number } | null {
+export function readBoundedInstructionText(root: string, path: string, maxFileBytes: number, readTextFile?: (absolutePath: string) => string): { readonly content: string; readonly bytes: number; readonly links: number } | null {
   try {
     if (readTextFile !== undefined) {
       const content = readTextFile(resolve(root, path));
-      return { content, bytes: Buffer.byteLength(content, "utf8") };
+      return { content, bytes: Buffer.byteLength(content, "utf8"), links: 1 };
     }
     const result = readWorkspaceFile(root, path, maxFileBytes + 1, maxFileBytes);
     if (result === null) return null;
-    if (result.size > maxFileBytes) return { content: "", bytes: result.size };
+    if (result.size > maxFileBytes) return { content: "", bytes: result.size, links: result.links };
     if (!result.complete) return null;
     const content = result.bytes.toString("utf8");
     // Invalid UTF-8 cannot produce an exact source-content digest after decoding.
     if (!Buffer.from(content, "utf8").equals(result.bytes)) return null;
-    return { content, bytes: result.bytes.length };
+    return { content, bytes: result.bytes.length, links: result.links };
   } catch {
     // A file can disappear or lose permissions between the probe and the read.
     // The caller turns this into an `unreadable` omission rather than dropping
@@ -318,10 +319,11 @@ export function loadInstructionFiles(options: InstructionLoadOptions): Instructi
       });
       continue;
     }
-    // Imports follow only from project files, through the same bounded reader; a user-scope `@` line stays text.
+    // Imports follow only from project files, through the same bounded reader; a user-scope `@` line stays text. Each
+    // file resolves its own imports, so budget dropping a weaker importer never removes a stronger file's import.
     const resolved = candidate.scope === "project"
       ? resolveInstructionImports({ workspace: identity?.realPath ?? resolve(options.workspace), importedBy: candidate.displayPath,
-        content: content.content, maxFileBytes, alreadyLoaded: new Set(loaded.flatMap((file) => [file.candidate.displayPath, ...file.imports.map((entry) => entry.displayPath)])),
+        content: content.content, maxFileBytes, maxTotalBytes,
         ...(options.readTextFile === undefined ? {} : { readTextFile: options.readTextFile }) })
       : { imports: [], omitted: [] };
     omitted.push(...resolved.omitted);

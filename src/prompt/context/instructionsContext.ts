@@ -54,7 +54,8 @@ const OMISSION_PHRASE: Readonly<Record<InstructionOmissionReason, string>> =
     "over-budget": "was left out of this prompt",
     "discovery-limit": "reached its discovery limit",
     "import-refused": "was not imported",
-    "import-depth": "was not imported"
+    "import-depth": "was not imported",
+    "import-limit": "was not followed"
   });
 
 /**

@@ -52,6 +52,8 @@ export interface WorkspaceFile {
   readonly size: number;
   /** False when the input cap or a concurrent size change prevented a full read. */
   readonly complete: boolean;
+  /** Hard links to the inode that was read, from the open descriptor: more than one means the file has other names. */
+  readonly links: number;
 }
 
 /** Read only a regular, non-symlink file, with the byte bound applied before reading. */
@@ -68,7 +70,7 @@ export function readWorkspaceFile(workspace: string, path: string, maxBytes: num
     if (!metadata.isFile() || realpathSync(full) !== full) return null;
     const current = statSync(full);
     if (current.dev !== metadata.dev || current.ino !== metadata.ino) return null;
-    if (metadata.size > maxFileBytes) return { bytes: Buffer.alloc(0), size: metadata.size, complete: false };
+    if (metadata.size > maxFileBytes) return { bytes: Buffer.alloc(0), size: metadata.size, complete: false, links: metadata.nlink };
     const bytes = Buffer.alloc(Math.min(metadata.size, maxBytes));
     let offset = 0;
     while (offset < bytes.length) {
@@ -79,7 +81,8 @@ export function readWorkspaceFile(workspace: string, path: string, maxBytes: num
     return {
       bytes: bytes.subarray(0, offset),
       size: metadata.size,
-      complete: offset === metadata.size && fstatSync(descriptor).size === metadata.size
+      complete: offset === metadata.size && fstatSync(descriptor).size === metadata.size,
+      links: metadata.nlink
     };
   } catch {
     return null;
