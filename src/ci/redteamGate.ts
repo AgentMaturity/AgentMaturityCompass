@@ -1,4 +1,6 @@
+import { join } from "node:path";
 import { runRedTeam, type RedTeamReport, type RunRedTeamInput } from "../redteam/runner.js";
+import { redTeamReportsDir, verifyRedTeamReportFile } from "../redteam/redteamStore.js";
 import { scoreGamingResistance, type GamingResistanceReport } from "../score/gamingResistance.js";
 
 export interface RedTeamCiGateThresholds {
@@ -67,6 +69,13 @@ export async function runRedTeamCiGate(input: RunRedTeamCiGateInput): Promise<Re
   });
   const counts = severityCounts(report);
   const reasons: string[] = [];
+
+  // SH-TRUST-03: a signed run is re-read from disk and must verify (seal and ledger-session provenance) before its
+  // numbers gate anything; the gate names the refusal so CI logs say what broke.
+  if (report.verification.signed) {
+    const verified = verifyRedTeamReportFile(input.workspace, join(redTeamReportsDir(input.workspace, report.agentId), `${report.runId}.json`));
+    if (!verified.ok) reasons.push(`${verified.reason}: the sealed red-team report does not verify (${verified.detail}).`);
+  }
 
   if (report.overallScore0to100 < thresholds.minScore0to100) {
     reasons.push(

@@ -263,7 +263,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc ci check` | One-liner CI gate: quickscore + threshold check (exit 1 if below) | `--min-score <n>`<br>`--min-level <level>`<br>`--agent <agentId>`<br>`--json` | `gate` |
 | `amc ci init` | Generate GitHub workflow and gate policy | `--agent <agentId>`<br>`--no-sign` | - |
 | `amc ci print` | Print suggested CI pipeline steps | `--agent <agentId>` | - |
-| `amc ci redteam` | CI gate: run red-team plugins, optional Evil MCP, and score-gaming resistance checks | `--plugins <ids...>`<br>`--strategies <ids...>`<br>`--min-score <n>`<br>`--max-vulnerabilities <n>`<br>`--max-critical <n>`<br>`--max-high <n>`<br>`--evil-mcp`<br>`--mcp-attacks <categories...>`<br>`--min-mcp-score <n>`<br>`--no-gaming-resistance`<br>`--min-gaming-score <n>`<br>`--no-sign`<br>`--json` | - |
+| `amc ci redteam` | CI gate: run red-team plugins, optional Evil MCP, and score-gaming resistance checks | `--plugins <ids...>`<br>`--strategies <ids...>`<br>`--min-score <n>`<br>`--max-vulnerabilities <n>`<br>`--max-critical <n>`<br>`--max-high <n>`<br>`--evil-mcp`<br>`--mcp-attacks <categories...>`<br>`--min-mcp-score <n>`<br>`--no-gaming-resistance`<br>`--min-gaming-score <n>`<br>`--sign`<br>`--no-sign`<br>`--json` | - |
 | `amc claim-confidence` | Generate per-claim confidence report with citation-backed scoring | `--agent <agentId>` | - |
 | `amc claim-confidence-gate` | Check if claims for given questions pass confidence threshold | `--agent <agentId>`<br>`--questions <ids>` | - |
 | `amc claims` | Evidence claim expiry tracking | - | - |
@@ -280,7 +280,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc compliance` | Evidence-linked compliance map operations | - | `comply` |
 | `amc compliance diff` | Diff two compliance report JSON files | - | `comply diff` |
 | `amc compliance fleet` | Generate fleet compliance summary | `--framework <framework>`<br>`--window <window>`<br>`--out <path>` | `comply fleet` |
-| `amc compliance init` | Create and sign compliance-maps.yaml | - | `comply init` |
+| `amc compliance init` | Create and sign compliance-maps.yaml | `--merge` | `comply init` |
 | `amc compliance matrix` | Generate multi-framework compliance coverage matrix with gap analysis | `--agent <agentId>`<br>`--window <window>`<br>`--frameworks <fws...>`<br>`--out <path>`<br>`--json`<br>`--heatmap` | `comply matrix` |
 | `amc compliance regulatory-check` | Check for regulatory changes from configured feeds | `--framework <name>`<br>`--json` | `comply regulatory-check` |
 | `amc compliance regulatory-feeds` | List all configured regulatory feed sources | `--json` | `comply regulatory-feeds` |
@@ -1061,7 +1061,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc score operational-independence` | Calculate operational independence score | `--window <days>`<br>`--domain <domain>`<br>`--json` | - |
 | `amc score output-attestation` | Score output signing and trust metadata for receiving agents | `--json` | - |
 | `amc score output-integrity` | Score output integrity maturity (OWASP LLM02, confidence calibration, citation) | `--json` | - |
-| `amc score owasp-llm` | OWASP LLM Top 10 coverage (all 10 risks); not evaluated: file presence is not evidence | `--json` | - |
+| `amc score owasp-llm` | OWASP LLM Top 10 (2023 v1.1) coverage; not evaluated: file presence is not evidence. The evidence-bound 2025 list is `amc compliance report --framework owasp-llm` | `--json` | - |
 | `amc score pause-quality` | Score quality of agent-initiated pauses | `--json` | - |
 | `amc score policy-consistency` | Test policy enforcement consistency across repeated trials (pass^k) | `--json` | - |
 | `amc score production-ready` | Run production readiness gate for an agent | `--strict`<br>`--json` | - |
@@ -1078,6 +1078,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc session` | Native signed sessions: inspect, compact, verify, replay and recover | - | - |
 | `amc session anchor` | Anchor a closed session's root into the transparency log | `--json` | - |
 | `amc session compact` | List signed history origins, then apply an explicit native summary or drop without rewriting evidence | `--list`<br>`--origins <ids>`<br>`--summary-file <path>`<br>`--expect-head <hash>`<br>`--reason <text>`<br>`--summary-role <role>`<br>`--replace`<br>`--drop`<br>`--json` | - |
+| `amc session export` | Export one sealed session as a self-contained signed bundle (rows, seal, monitor keys) for offline verification | `--out <path>`<br>`--json` | - |
 | `amc session latest` | Show the most recent session `agent-loop run --continue` would continue for this agent, or why none qualifies | `--agent <id>`<br>`--json` | - |
 | `amc session proof` | Export a session's inclusion proof (verifiable offline, without this workspace) | `--out <path>` | - |
 | `amc session recover` | Recover a crashed session by appending synthetic closers under a fenced claim (append-only) | `--force`<br>`--close`<br>`--stale-after <ms>`<br>`--json` | - |
@@ -1085,6 +1086,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc session show` | Show a session's projected conversation and its event spine | `--json`<br>`--limit <rows>`<br>`--cursor <cursor>` | - |
 | `amc session spill-read` | Read a bounded byte range of retained output against its signed origin | `--workspace <path>`<br>`--offset <bytes>`<br>`--limit <bytes>`<br>`--expect-monitor <sha256>`<br>`--json` | - |
 | `amc session verify` | Verify the ledger and report per-session lifecycle verdicts (open / released / interrupted / closed) | `--json`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unanchored` | - |
+| `amc session verify-export` | Verify an exported session bundle offline: needs only the file and a pinned monitor fingerprint | `--json`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unanchored` | - |
 | `amc session verify-proof` | Verify a session inclusion proof offline — needs only the bundle and a pinned fingerprint | `--expect-auditor-key <sha256>`<br>`--json`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored` | - |
 | `amc sessions` | View and analyze user sessions | - | - |
 | `amc sessions list` | List tracked sessions | `--agent <agentId>`<br>`--limit <n>`<br>`--sort <by>`<br>`--json` | - |

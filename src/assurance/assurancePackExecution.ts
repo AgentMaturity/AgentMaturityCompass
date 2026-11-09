@@ -4,7 +4,8 @@ import { INDUSTRY_ASSURANCE_PACK_IDS } from "../domains/domainRegistry.js";
 import { executeRegulatedPack } from "./executed/packExecution.js";
 import type { AssurancePackResult, AssuranceScenarioResult, TrustTier } from "../types.js";
 import type { Ledger } from "../ledger/ledger.js";
-import { AgentResponderInvocationError, type AgentResponder } from "./agentResponder.js";
+import { AgentResponderInvocationError, type AgentResponder, type AgentResponse } from "./agentResponder.js";
+import type { GatewayReceiptAdmission } from "./gatewayReceiptAdmission.js";
 import { writeAssuranceAudit, writePackScoreTestResult, writeScenarioPrompt, writeScenarioResponse, writeScenarioTestResult } from "./evidenceWriters.js";
 import { getAssurancePack } from "./packs/index.js";
 import { gradeScenarioReply, packGradingMethod } from "./scenarioGrading.js";
@@ -23,6 +24,8 @@ export interface PackExecutionInput {
   getResponder: () => Promise<AgentResponder>;
   getExecutedScope: () => ExecutedRunScope | null;
   getCatalog: () => LoadedCatalog;
+  /** The run's gateway receipt admission (`gatewayReceiptAdmitter`). */
+  admitReceipts: (answer: AgentResponse, agentId: string) => GatewayReceiptAdmission;
   executedAttempts?: 1 | 25;
   now: string;
 }
@@ -66,8 +69,18 @@ export async function executeAssurancePack(input: PackExecutionInput): Promise<A
       continue;
     }
     const toolCalls = answer.toolCalls.length > 0 ? { toolCalls: answer.toolCalls } : {};
+    // Only a verified pair can supply a correlation id. Refused receipts are audited without affecting grading.
+    const receipt = input.admitReceipts(answer, agentId);
+    if (receipt.rejected.length > 0) {
+      writeAssuranceAudit({ ledger, sessionId, runtime, trustTier, agentId, packId: pack.id, scenarioId: scenario.id,
+        auditType: "ASSURANCE_RECEIPT_REJECTED", severity: "HIGH", message: `Gateway receipt rejected: ${receipt.rejected.join(" | ")}` });
+    }
+    if (receipt.request !== null) row.correlatedRequestIds = [receipt.request.receiptId];
     const responseEventId = writeScenarioResponse({ ledger, sessionId, runtime, trustTier, packId: pack.id, scenarioId: scenario.id,
-      response: answer.text, toolCalls: answer.toolCalls, agentId });
+      response: answer.text, toolCalls: answer.toolCalls, agentId,
+      ...(receipt.request === null ? {} : { requestReceipt: receipt.request.receipt }),
+      ...(receipt.response === null ? {} : { responseReceipt: receipt.response }),
+      ...(receipt.requestSeenOnly === null ? {} : { requestSeenOnly: receipt.requestSeenOnly }) });
 
     // Refused, tool-call-only and token-claim replies are inconclusive (scenarioGrading.ts).
     const grade = gradeScenarioReply(scenario, answer, prompt, context);

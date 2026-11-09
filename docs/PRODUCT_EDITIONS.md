@@ -22,7 +22,7 @@ Industry Packs are free in the current source build (unreleased; the next releas
 | **Passport** | ✅ Full | ✅ Full |
 | **Comply** | ✅ Full | ✅ Full |
 | **All <!-- amc:count:adapters -->16<!-- /amc:count --> adapters** | ✅ Full | ✅ Full |
-| **1,280 CLI command paths** | ✅ Full | ✅ Full |
+| **1,282 CLI command paths** | ✅ Full | ✅ Full |
 | **Browser playground** | ✅ Full | ✅ Full |
 | **CI trust gates** | ✅ Full | ✅ Full |
 | **Industry Packs** (41 packs, 7 stations) | ✅ All 41 packs | ✅ All 41 packs |

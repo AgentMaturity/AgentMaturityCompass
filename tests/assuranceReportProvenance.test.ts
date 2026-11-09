@@ -11,6 +11,7 @@ import { loadAssuranceSummary } from "../src/diagnostic/assuranceSummary.js";
 import { renderAssuranceMarkdown } from "../src/assurance/report.js";
 import { renderClaimLegend } from "../src/claims/eligibility/render.js";
 import type { AssuranceReport } from "../src/types.js";
+import { writeProvenancedAssuranceReport } from "./helpers/provenancedAssurance.js";
 
 /**
  * Assurance reports feed maturity scoring, and until this module existed the
@@ -130,7 +131,10 @@ describe("assurance report provenance gate", () => {
   test("a genuine signed report contributes its scores and tier", () => {
     const workspace = newWorkspace();
     const now = Date.now();
-    writeSignedReport(workspace, now);
+    // Genuine means sealed AND backed: its graded row lives in the runner's sealed ledger session (SH-TRUST-02). A sealed
+    // score with no rows behind it is what the provenance gate refuses, so this fixture writes the rows as the runner does.
+    writeProvenancedAssuranceReport(workspace, { name: "run-prov-1", ts: now, packs: [{ packId: "toolGovernance", score0to100: 88,
+      scenarios: [{ scenarioId: "governance-1", pass: true, auditEventTypes: ["TOOL_GOVERNANCE_SUCCEEDED"] }] }] });
     const summary = loadAssuranceSummary(workspace, AGENT, now - 5000, now + 5000);
     expect(summary.packScores.get("toolGovernance")).toBe(88);
     expect(summary.packObserved.has("toolGovernance")).toBe(true);

@@ -10,7 +10,8 @@ import { getSigningKey, getSigningPublicKeyPem } from "../../src/keys/signingKey
 import { closeSqlitePool } from "../../src/storage/sqlitePool.js";
 import { lockVault, unlockVault } from "../../src/vault/vault.js";
 import type { ActionClass } from "../../src/types.js";
-import { writeAnchoredRun, writeSealedReport } from "./sealedRun.js";
+import { writeAnchoredRun } from "./sealedRun.js";
+import { writeProvenancedAssuranceReport } from "./provenancedAssurance.js";
 
 export const FREEZE_PASS = "owned-freeze-publication-passphrase";
 const roots: Array<{ root: string; workspace: string }> = [], closers: Array<() => Promise<void>> = [];
@@ -71,8 +72,9 @@ export function writeFreezeDecisionInputs(f: FreezeFixture) {
   writeAnchoredRun(f.workspace, f.paths.runsDir, report("owned-old", 10, 2) as Parameters<typeof writeAnchoredRun>[2]);
   writeAnchoredRun(f.workspace, f.paths.runsDir, report("owned-before", 100, 4.8) as Parameters<typeof writeAnchoredRun>[2]);
   writeAnchoredRun(f.workspace, f.paths.runsDir, report("owned-after", 200, 3.8) as Parameters<typeof writeAnchoredRun>[2]);
-  const assurance = writeSealedReport(f.workspace, join(f.paths.reportsDir, "assurance"), "owned-input",
-    { agentId: "default", ts: 150, packResults: [{ packId: "injection", score0to100: 90 }, { packId: "hallucination", score0to100: 90 }] });
+  // Sealed and backed by a runner session (SH-TRUST-02): the content stays an unqualified INPUT.
+  const assurance = writeProvenancedAssuranceReport(f.workspace, { name: "owned-input", ts: 150,
+    packs: [{ packId: "injection", scenarios: [{ scenarioId: "s1", pass: true }], score0to100: 90 }, { packId: "hallucination", scenarios: [{ scenarioId: "s1", pass: true }], score0to100: 90 }] }).file;
   expect(JSON.parse(readFileSync(current, "utf8")).status).toBe("UNSIGNED");
   return { older, previous, current, assurance };
 }

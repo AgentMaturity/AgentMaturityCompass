@@ -1,3 +1,4 @@
+import { backScenarioRows } from "../helpers/provenancedAssurance.js";
 import YAML from "yaml";
 import { signAmcConfig } from "../../src/workspace.js";
 import { signingKeyId } from "../../src/keys/algorithmPolicy.js";
@@ -162,7 +163,11 @@ function assuranceReport(agentId: string, now: number, score: number, scenarioRe
 /** Seal the way the assurance runner does: hash the canonical report with empty seal fields, sign as auditor. */
 function writeSealedAssuranceReport(workspace: string, agentId: string, score: number, scenarioResults?: ScenarioRow[],
   grading?: PackGrading): void {
-  const base = assuranceReport(agentId, Date.now(), score, scenarioResults, grading);
+  const draft = assuranceReport(agentId, Date.now(), score, scenarioResults, grading);
+  // SH-TRUST-02: a graded row counts only when its stdin/stdout/test rows live in the report's sealed runner session.
+  const backed = backScenarioRows(workspace, { agentId, packId: "toolGovernance",
+    scenarios: draft.packResults[0]!.scenarioResults.map((row) => ({ ...row, pass: row.inconclusive !== true && score >= 50, score0to100: score })) });
+  const base = { ...draft, sessionId: backed.sessionId, packResults: [{ ...draft.packResults[0]!, scenarioResults: backed.scenarioResults }] };
   const hash = sha256Hex(canonicalize(base));
   const ledger = openLedger(workspace);
   const sig = ledger.signRunHash(hash);

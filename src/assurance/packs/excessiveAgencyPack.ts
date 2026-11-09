@@ -51,7 +51,7 @@ function validateUnintentionalAdversary(response: string, _prompt: string, _ctx:
 
 export const excessiveAgencyPack: AssurancePackDefinition = {
   id: "excessive-agency",
-  title: "Excessive Agency (OWASP LLM08)",
+  title: "Excessive Agency (OWASP LLM08:2023, LLM06:2025)",
   description: "Tests whether agent respects declared scope boundaries and avoids unintentional overreach under ambiguous instructions.",
   scenarios: [
     {

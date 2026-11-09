@@ -7,24 +7,30 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { AgentToolCall } from "./agentResponder.js";
 
+/** Which runner writes the session: the assurance runner, or the red-team runner (SH-TRUST-03), which shares these writers. */
+export type AssuranceEvidenceSource = "assurance" | "redteam";
+export const RUNNER_BINARY_PATH: Readonly<Record<AssuranceEvidenceSource, string>> = Object.freeze({ assurance: "amc-assurance-runner", redteam: "amc-redteam-runner" });
+
 export function startAssuranceSession(params: {
   ledger: Ledger;
   mode: "supervise" | "sandbox";
   agentId: string;
   packIds: string[];
   trustTier: TrustTier;
+  source?: AssuranceEvidenceSource;
 }): string {
   const sessionId = randomUUID();
+  const source = params.source ?? "assurance", binaryPath = RUNNER_BINARY_PATH[source];
   // P0-55: the session and its "run started" row commit together, so a failed first row leaves no unsealed session
   // (the run's own catch seals everything after this).
   runImmediateTransaction(params.ledger.db, () => {
     params.ledger.startSession({
       sessionId,
       runtime: "unknown",
-      binaryPath: "amc-assurance-runner",
-      binarySha256: hashBinaryOrPath("amc-assurance-runner", "1")
+      binaryPath,
+      binarySha256: hashBinaryOrPath(binaryPath, "1")
     });
-    const run = { auditType: "ASSURANCE_RUN_STARTED", severity: "LOW", mode: params.mode, agentId: params.agentId, packIds: params.packIds };
+    const run = { auditType: "ASSURANCE_RUN_STARTED", severity: "LOW", mode: params.mode, agentId: params.agentId, packIds: params.packIds, source };
     params.ledger.appendEvidence({
       sessionId,
       runtime: "unknown",
@@ -74,6 +80,28 @@ export function sealAbortedAssuranceSession(params: {
   return params.error;
 }
 
+/**
+ * Seals the run's session if the process is interrupted (Ctrl-C, a CI timeout's SIGTERM), then dies of the same
+ * signal. Runner sessions are legacy sessions, which whole-ledger verification requires to carry a seal: one
+ * interrupted run would otherwise turn every later signed run in the workspace INVALID, with no CLI path to seal it.
+ * Returns the disposer to call once the run has sealed or aborted the session itself. A SIGKILL or a crash still
+ * leaves the session open: nothing of this process runs then.
+ */
+export function sealAbortedSessionOnSignal(params: { ledger: Ledger; sessionId: string; runId: string; agentId: string }): () => void {
+  const signals: NodeJS.Signals[] = ["SIGINT", "SIGTERM"];
+  const onSignal = (signal: NodeJS.Signals): void => {
+    dispose();
+    sealAbortedAssuranceSession({ ...params, error: Object.assign(new Error(`run interrupted by ${signal}`), { name: "RunInterrupted" }) });
+    process.kill(process.pid, signal);
+  };
+  const dispose = (): void => { for (const signal of signals) process.off(signal, onSignal); };
+  for (const signal of signals) process.once(signal, onSignal);
+  return dispose;
+}
+
+/** What every scenario writer needs beyond the pack and scenario: the session a run writes into. */
+export type ScenarioEvidenceRows = Pick<Parameters<typeof writeScenarioPrompt>[0], "ledger" | "sessionId" | "runtime" | "trustTier" | "agentId" | "source">;
+
 
 /**
  * Renders scenario text for the evidence ledger under the assurance policy.
@@ -100,6 +128,7 @@ function redactedScenarioPayload(text: string): string {
 export function writeScenarioPrompt(params: {
   ledger: Ledger;
   sessionId: string;
+  source?: AssuranceEvidenceSource;
   runtime: RuntimeName;
   trustTier: TrustTier;
   packId: string;
@@ -114,7 +143,7 @@ export function writeScenarioPrompt(params: {
     payload: redactedScenarioPayload(params.prompt),
     payloadExt: "json",
     meta: {
-      source: "assurance",
+      source: params.source ?? "assurance",
       packId: params.packId,
       scenarioId: params.scenarioId,
       direction: "assurance_to_agent",
@@ -127,6 +156,7 @@ export function writeScenarioPrompt(params: {
 export function writeScenarioResponse(params: {
   ledger: Ledger;
   sessionId: string;
+  source?: AssuranceEvidenceSource;
   runtime: RuntimeName;
   trustTier: TrustTier;
   packId: string;
@@ -135,6 +165,11 @@ export function writeScenarioResponse(params: {
   /** Tool calls the agent made; the digest then covers canonical `{ text, toolCalls }`. */
   toolCalls?: AgentToolCall[];
   agentId: string;
+  /** The gateway's verified receipt pair for this exchange. */
+  requestReceipt?: string;
+  responseReceipt?: string;
+  /** A verified receipt that records the gateway saw only the request. */
+  requestSeenOnly?: string;
 }): string {
   const toolCallCount = params.toolCalls?.length ?? 0;
   // A reply without tool calls keeps the plain-text digest older records carry.
@@ -146,13 +181,16 @@ export function writeScenarioResponse(params: {
     payload: redactedScenarioPayload(recorded),
     payloadExt: "json",
     meta: {
-      source: "assurance",
+      source: params.source ?? "assurance",
       packId: params.packId,
       scenarioId: params.scenarioId,
       direction: "agent_to_assurance",
       agentId: params.agentId,
       trustTier: params.trustTier,
-      toolCallCount
+      toolCallCount,
+      ...(params.requestReceipt === undefined ? {} : { requestReceipt: params.requestReceipt }),
+      ...(params.responseReceipt === undefined ? {} : { responseReceipt: params.responseReceipt }),
+      ...(params.requestSeenOnly === undefined ? {} : { requestSeenOnly: params.requestSeenOnly })
     }
   });
 }
@@ -160,6 +198,7 @@ export function writeScenarioResponse(params: {
 export function writeScenarioTestResult(params: {
   ledger: Ledger;
   sessionId: string;
+  source?: AssuranceEvidenceSource;
   runtime: RuntimeName;
   trustTier: TrustTier;
   agentId: string;
@@ -186,7 +225,7 @@ export function writeScenarioTestResult(params: {
     payloadExt: "json",
     inline: true,
     meta: {
-      source: "assurance",
+      source: params.source ?? "assurance",
       testType: "ASSURANCE_SCENARIO_RESULT",
       packId: params.packId,
       scenarioId: params.scenarioId,
@@ -202,6 +241,7 @@ export function writeScenarioTestResult(params: {
 export function writePackScoreTestResult(params: {
   ledger: Ledger;
   sessionId: string;
+  source?: AssuranceEvidenceSource;
   runtime: RuntimeName;
   trustTier: TrustTier;
   agentId: string;
@@ -226,7 +266,7 @@ export function writePackScoreTestResult(params: {
     payloadExt: "json",
     inline: true,
     meta: {
-      source: "assurance",
+      source: params.source ?? "assurance",
       testType: "ASSURANCE_PACK_SCORE",
       assuranceRunId: params.assuranceRunId,
       packId: params.packId,
@@ -242,6 +282,7 @@ export function writePackScoreTestResult(params: {
 export function writeAssuranceAudit(params: {
   ledger: Ledger;
   sessionId: string;
+  source?: AssuranceEvidenceSource;
   runtime: RuntimeName;
   trustTier: TrustTier;
   agentId: string;
@@ -270,7 +311,7 @@ export function writeAssuranceAudit(params: {
     payloadExt: "json" as const,
     inline: true,
     meta: {
-      source: "assurance",
+      source: params.source ?? "assurance",
       auditType: params.auditType,
       severity,
       message: params.message,

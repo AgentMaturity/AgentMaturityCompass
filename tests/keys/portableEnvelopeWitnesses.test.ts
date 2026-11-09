@@ -66,6 +66,9 @@ describe("portable verifiers honor a present signature envelope", () => {
     const signaturePath = join(root, family === "passport" ? "passport.sig" : "log.seal.sig");
     const publicKeyPath = join(root, family === "passport" ? "signer.pub" : "auditor.pub");
     const original = JSON.parse(readFileSync(signaturePath, "utf8"));
+    // An AGENT passport also carries a harness companion (SH-TRUST-05) signed by the workspace key this fixture replaces;
+    // this test re-signs passport.json alone, so it drops the companion rather than ship one signed by an unpinned key.
+    if (family === "passport") rmSync(join(root, "harness"), { recursive: true, force: true });
     let digestHex: string = original.digestSha256;
     if (family === "transparency") {
       const sealPath = join(root, "log.seal.json");

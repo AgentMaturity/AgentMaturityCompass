@@ -1,3 +1,4 @@
+import { buildPassportHarness, preparePassportHarnessSignatureAsync } from "./passportHarness.js";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -77,14 +78,18 @@ function captureArtifactCreation(input: {
       stable();
       phase = "preparation";
       const signed = await preparePassportJsonSignatureAsync(workspace, passport, stable);
-      signatureCurrent = signed.assertCurrent;
+      // SH-TRUST-05: the harness companion is signed by the same auditor path and bound to passport.json by digest.
+      const harness = params.scopeType === "AGENT" ? buildPassportHarness(workspace, passport, scopeId, passport.generatedTs) : null;
+      const harnessSigned = harness === null ? null : await preparePassportHarnessSignatureAsync(workspace, harness, stable);
+      signatureCurrent = () => { signed.assertCurrent(); harnessSigned?.assertCurrent(); };
       const cache = await preparePassportCacheAsync({ workspace, scopeType: params.scopeType, scopeId, passport }, { beforePublish: stable }, cacheBefore);
       const beforeMember = () => { cache.assertCurrent(); collection.assertCurrent(); files.assertCurrent(); directories.assertCurrent(); };
       beforeMember(); assertOrgPairsCurrent(cacheBefore);
       const signerPub = signed.signature.envelope ? Buffer.from(signed.signature.envelope.pubkeyB64, "base64").toString("utf8") : "";
       if (!signerPub) throw new Error("prepared passport signature has no actual signer public key");
       const archiveBytes = privatePassportArchiveBytes([...proofRecipe.files,
-        ...passportArchiveMemberBytes({ passport, signature: signed.signature, piiScan, signerPub, collected: collection.local })]);
+        ...passportArchiveMemberBytes({ passport, signature: signed.signature, piiScan, signerPub, collected: collection.local,
+          ...(harness === null || harnessSigned === null ? {} : { harness: { harness, signature: harnessSigned.signature } }) })]);
       beforeMember(); assertOrgPairsCurrent(cacheBefore);
       const sha256 = sha256Hex(archiveBytes);
       phase = "directories"; directories.create(() => { beforeMember(); assertOrgPairsCurrent(cacheBefore); });

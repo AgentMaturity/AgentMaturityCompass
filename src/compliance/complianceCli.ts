@@ -1,6 +1,7 @@
 import { familyReview, type ComplianceFramework, type FamilyReview } from "./frameworks.js";
 import type { Station } from "../domains/stations.js";
-import { generateComplianceReport, initComplianceMaps, initComplianceMapsAsync, verifyComplianceMapsSignature } from "./complianceEngine.js";
+import { generateComplianceReport, initComplianceMaps, initComplianceMapsAsync, loadVerifiedComplianceMaps, verifyComplianceMapsSignature } from "./complianceEngine.js";
+import { mergeMissingBuiltInFrameworks } from "./complianceMapsUpgrade.js";
 import { writeComplianceReport, diffComplianceReports } from "./complianceReport.js";
 import { listAgents } from "../fleet/registry.js";
 import { envelopeForComplianceReport } from "../claims/eligibility/adapters/results.js";
@@ -10,8 +11,13 @@ export function initComplianceMapsCli(workspace: string): { path: string; sigPat
   return initComplianceMaps(workspace);
 }
 
-export function initComplianceMapsCliAsync(workspace: string): Promise<{ path: string; sigPath: string }> {
-  return initComplianceMapsAsync(workspace);
+/**
+ * `--merge` (SH-TRUST-04): keep the workspace's signed mappings and append the built-in frameworks it does not have yet.
+ * The existing file is merged only from bytes whose signature verified; an unsigned or tampered file is refused
+ * (`ComplianceMapsUntrustedError`) and left untouched (fix3 S11).
+ */
+export async function initComplianceMapsCliAsync(workspace: string, options: { merge?: boolean } = {}): Promise<{ path: string; sigPath: string }> {
+  return initComplianceMapsAsync(workspace, options.merge === true ? mergeMissingBuiltInFrameworks(loadVerifiedComplianceMaps(workspace)) : undefined);
 }
 
 export function verifyComplianceMapsCli(workspace: string): {

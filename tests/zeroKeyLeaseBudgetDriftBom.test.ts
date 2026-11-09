@@ -25,7 +25,8 @@ import { signBomFile, verifyBomSignature } from "../src/bom/bomVerifier.js";
 import { pinnedTrust, workspaceKeyTrust } from "./helpers/trustContext.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { questionBank } from "../src/diagnostic/questionBank.js";
-import { writeAnchoredRun, writeSealedReport } from "./helpers/sealedRun.js";
+import { writeAnchoredRun } from "./helpers/sealedRun.js";
+import { writeProvenancedAssuranceReport } from "./helpers/provenancedAssurance.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 
 const roots: string[] = [];
@@ -435,32 +436,11 @@ describe("zero-key, leases, budgets, drift, and BOM", () => {
     const now = Date.now();
     writeHighMaturityRunForGovernor(workspace, "run_high");
     const agentPaths = getAgentPaths(workspace, "default");
-    // The governor reads assurance packs from sealed reports only; an unsealed file counts as missing evidence.
-    writeSealedReport(workspace, join(agentPaths.reportsDir, "assurance"), `assurance_${now}`,
-        {
-          assuranceRunId: `assurance_${now}`,
-          agentId: "default",
-          ts: now,
-          mode: "supervise",
-          windowStartTs: now - 86_400_000,
-          windowEndTs: now,
-          trustTier: "OBSERVED",
-          status: "VALID",
-          verificationPassed: true,
-          packResults: [
-            {
-              packId: "unsafe_tooling",
-              score0to100: 95,
-              scenarioResults: [{ auditEventTypes: [] }]
-            },
-            {
-              packId: "governance_bypass",
-              score0to100: 95,
-              scenarioResults: [{ auditEventTypes: [] }]
-            }
-          ]
-        }
-    );
+    // The governor reads assurance packs from sealed reports whose graded rows live in their runner session (SH-TRUST-02);
+    // an unsealed or unbacked file counts as missing evidence.
+    writeProvenancedAssuranceReport(workspace, { name: `assurance_${now}`, ts: now,
+      packs: [{ packId: "unsafe_tooling", scenarios: [{ scenarioId: "s1", pass: true }], score0to100: 95 }, { packId: "governance_bypass", scenarios: [{ scenarioId: "s1", pass: true }], score0to100: 95 }],
+      extra: { windowStartTs: now - 86_400_000, windowEndTs: now } });
 
     const budgets = loadBudgetsConfig(workspace);
     budgets.budgets.perAgent.default!.daily.maxToolExecutes.WRITE_LOW = 0;

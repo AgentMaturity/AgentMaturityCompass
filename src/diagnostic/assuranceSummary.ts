@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { getAgentPaths } from "../fleet/paths.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { sealedRunReportVerifies } from "./reportSeal.js";
+import { ProvenanceChecker } from "../assurance/reportProvenance.js";
 
 /**
  * The assurance evidence a diagnostic run may count, and what it refused.
@@ -60,11 +61,10 @@ export function loadAssuranceSummary(
     return summary;
   }
 
-  const files = readdirSync(dir)
-    .filter((file) => file.endsWith(".json"))
-    .map((file) => join(dir, file))
-    .sort((a, b) => a.localeCompare(b));
-  for (const file of files) {
+  // A seal proves who wrote the report; provenance proves its graded rows exist in that writer's sealed session (SH-TRUST-02).
+  const provenance = new ProvenanceChecker(workspace);
+  try {
+  for (const file of readdirSync(dir).filter((name) => name.endsWith(".json")).sort((a, b) => a.localeCompare(b)).map((name) => join(dir, name))) {
     let parsed: ParsedReport;
     try {
       parsed = JSON.parse(readUtf8(file)) as ParsedReport;
@@ -81,7 +81,7 @@ export function loadAssuranceSummary(
 
     // Verified AFTER the window filter: a stale report is merely absent, but an
     // in-window report that fails verification is a finding worth naming.
-    if (!sealedRunReportVerifies(workspace, parsed as Record<string, unknown>)) {
+    if (!sealedRunReportVerifies(workspace, parsed as Record<string, unknown>) || !provenance.check(parsed as Record<string, unknown>).ok) {
       summary.unverifiableReports.push(file);
       continue;
     }
@@ -117,6 +117,9 @@ export function loadAssuranceSummary(
         }
       }
     }
+  }
+  } finally {
+    provenance.close();
   }
   return summary;
 }

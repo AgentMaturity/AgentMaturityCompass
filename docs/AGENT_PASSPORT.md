@@ -79,6 +79,19 @@ Receipt integrity and capability status are deliberately separate. A trusted `pa
 
 The receipt contains no prompt, tool arguments, model/tool output, stdout/stderr content, cwd, transcript path, raw session identifier, lease token, or secret.
 
+## Harness Companion (SH-TRUST-05)
+
+An AGENT-scoped `.amcpass` also carries `harness/harness.json` with `harness/harness.sig`: what the agent runs with and where its scores come from.
+
+- `model`: the provider template, route and upstream from the agent's signed config, and the models declared for it in the signed adapters config; null when the file is missing or its signature does not verify.
+- `tools`: tool names, action classes, MCP server ids and a digest of the signed tools catalogue; null when `tools.yaml` is missing or unverified.
+- `policy.signedFiles`: every signed configuration file read for the agent with its sha256 and signature status (`verified`, `missing`, `invalid: ...`).
+- `scores.assurance` / `scores.redteam`: the newest sealed assurance report that passes the provenance gate and the newest signed, sealed red-team run (run id, report sha256, ledger session id, score; the score is null unless the run MEASURED something).
+- `nativeSessions`: the count of sealed non-runner sessions in the workspace ledger (a workspace count: sessions carry no agent id).
+- `unknown`: everything AMC does not record, named rather than guessed.
+
+The companion is a separate member signed with the auditor path and bound to `passport.json` by `passportSha256`; `passport.json` keeps its `v: 1` shape and digest, so a verifier built before this change still verifies a new passport and never looks at the companion. `amc passport verify` checks the companion's signature and binding when it is present (`HARNESS_SIGNATURE_INVALID`, `HARNESS_BINDING_MISMATCH`, `HARNESS_INVALID`) and returns it as `harness`. Compliance results are not in the passport: a compliance report is not a signed artifact.
+
 ## Schema Compatibility
 
 Passport schema compatibility can be recorded with a passport schema compatibility report using `amc.passport.compatibility.v1`. The report is a signed-evidence companion for `.amcpass` exchange, not a replacement for `amc passport verify`.

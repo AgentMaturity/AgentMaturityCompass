@@ -19,16 +19,15 @@
  * identical so a divergence between the two shows up as different wording rather
  * than as a quietly missing rule.
  */
+import { eventMeta } from "../claims/evidenceProvenance.js";
 import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
-import { canonicalMetadataForHash } from "../ledger/eventHash.js";
 import { openSessionEventStore, resolveSessionStoreBackend } from "../persistence/openSessionEventStore.js";
 import { extractEnvelope, SESSION_GENESIS } from "../session/sessionTypes.js";
 import { merkleRoot } from "../session/sessionMerkle.js";
 import type { EvidenceEvent, SessionRecord } from "../types.js";
-import { sha256Hex } from "../utils/hash.js";
 import { sessionRootDescriptorSchema, type SessionRootDescriptor } from "./sessionAnchorSchema.js";
 import { operationalEvidenceProblems } from "../keys/operationalLedgerReader.js";
-import { verifyMonitorTrustRoot } from "../persistence/sessionStoreVerification.js";
+import { verifyMonitorTrustRoot, verifyRowIntegrity } from "../persistence/sessionStoreVerification.js";
 import type { TrustContext } from "../trust/trustContext.js";
 import { monitorPinFromEnv } from "../trust/monitorPinEnv.js";
 
@@ -67,43 +66,17 @@ export interface SessionRootDescriptorOptions {
   readonly expectedMonitorFingerprint?: string;
 }
 
-/** Parsed `meta_json` of a session event, or an empty object when unreadable. */
-function readMeta(event: EvidenceEvent): Record<string, unknown> {
-  try {
-    const parsed: unknown = JSON.parse(event.meta_json);
-    return typeof parsed === "object" && parsed !== null ? (parsed as Record<string, unknown>) : {};
-  } catch {
-    return {};
-  }
-}
-
 /**
  * Per-row integrity for ONE session: the hash pre-image, the writer signature,
  * and the envelope chain. The global `prev_event_hash` chain is deliberately not
  * checked here (a session slice cannot be) — `verifyLedgerIntegrity` and
  * `verifyStoredSessionEvents` remain the authority for that.
  */
-function verifySessionRows(workspace: string, rows: readonly EvidenceEvent[], errors: string[]): void {
-  const monitorKeys = getPublicKeyHistory(workspace, "monitor");
+export function verifySessionRows(monitorKeys: readonly string[], rows: readonly EvidenceEvent[], errors: string[]): void {
   let expectedSeq = 0;
   let expectedPrevHash = SESSION_GENESIS;
   for (const event of rows) {
-    const canonicalMetadata = canonicalMetadataForHash({
-      id: event.id,
-      ts: event.ts,
-      sessionId: event.session_id,
-      runtime: event.runtime,
-      eventType: event.event_type,
-      payloadPath: event.canonical_payload_path ?? event.payload_path,
-      payloadInline: event.canonical_payload_inline ?? event.payload_inline,
-      metaJson: event.meta_json
-    });
-    if (sha256Hex(`${event.prev_event_hash}${canonicalMetadata}${event.payload_sha256}`) !== event.event_hash) {
-      errors.push(`Event ${event.id} event_hash mismatch`);
-    }
-    if (!verifyHexDigestAny(event.event_hash, event.writer_sig, monitorKeys)) {
-      errors.push(`Event ${event.id} writer signature invalid`);
-    }
+    verifyRowIntegrity(monitorKeys, event, errors);
 
     const envelope = extractEnvelope(event.meta_json);
     if (envelope === null) {
@@ -129,8 +102,8 @@ function verifySessionRows(workspace: string, rows: readonly EvidenceEvent[], er
   }
 }
 
-function verifySeal(
-  workspace: string,
+export function verifySeal(
+  monitorKeys: readonly string[],
   record: SessionRecord | null,
   rows: readonly EvidenceEvent[],
   sessionId: string,
@@ -157,7 +130,7 @@ function verifySeal(
   // session ended here". Same pairing as `verifySessionRecords`.
   if (
     record.session_seal_sig === null ||
-    !verifyHexDigestAny(record.session_final_event_hash, record.session_seal_sig, getPublicKeyHistory(workspace, "monitor"))
+    !verifyHexDigestAny(record.session_final_event_hash, record.session_seal_sig, [...monitorKeys])
   ) {
     errors.push(`Session ${sessionId} seal signature invalid`);
   }
@@ -175,7 +148,7 @@ function verifyCloseClaims(
   recomputed: { turnCount: number; sealCount: number; sessionMerkleRoot: string },
   errors: string[]
 ): void {
-  const meta = readMeta(closeEvent);
+  const meta = eventMeta(closeEvent);
   if (typeof meta.sessionMerkleRoot === "string" && meta.sessionMerkleRoot !== recomputed.sessionMerkleRoot) {
     errors.push(
       `session/close claims merkle root ${meta.sessionMerkleRoot} but the sealed turns hash to ${recomputed.sessionMerkleRoot}`
@@ -191,8 +164,38 @@ function verifyCloseClaims(
 
 /** The agent id a session was opened for, taken from the `session/open` meta. */
 function agentIdFromOpen(openEvent: EvidenceEvent): string {
-  const meta = readMeta(openEvent);
+  const meta = eventMeta(openEvent);
   return typeof meta.agentId === "string" && meta.agentId.length > 0 ? meta.agentId : "unknown";
+}
+
+/**
+ * Every descriptor field from the session's own signed rows, and nothing else (pure): runtime and agent from
+ * `session/open`, the window from the open and close rows' own timestamps (inside their hash pre-images; the session
+ * record's time columns are not signed), the counts, seal leaves and merkle root recomputed. The workspace builder and
+ * the offline export verifier both derive through here, so an export carries the descriptor an anchor commits to and no
+ * field of it can be edited in transit (fix3 S21). Call it only on rows already verified as one closed session.
+ */
+export function describeSessionRows(sessionId: string, rows: readonly EvidenceEvent[], monitorKeyFingerprint: string): SessionRootDescriptor {
+  const openEvent = rows[0]!;
+  const closeEvent = rows[rows.length - 1]!;
+  const sealEventHashes = rows.filter((row) => row.event_type === "turn/seal").map((row) => row.event_hash);
+  return sessionRootDescriptorSchema.parse({
+    v: 1,
+    sessionId,
+    lifecycle: "closed",
+    runtime: openEvent.runtime,
+    agentId: agentIdFromOpen(openEvent),
+    startedTs: openEvent.ts,
+    endedTs: closeEvent.ts,
+    eventCount: rows.length,
+    turnCount: rows.filter((row) => row.event_type === "turn/start").length,
+    sealCount: sealEventHashes.length,
+    sealEventHashes,
+    sessionMerkleRoot: merkleRoot(sealEventHashes),
+    openEventHash: openEvent.event_hash,
+    closeEventHash: closeEvent.event_hash,
+    monitorKeyFingerprint
+  });
 }
 
 /**
@@ -221,8 +224,11 @@ export function buildSessionRootDescriptor(params: {
   if (rows.length === 0) {
     throw new SessionAnchorError(sessionId, [...errors, `session ${sessionId} has no events`]);
   }
-  verifySessionRows(workspace, rows, errors);
-  verifySeal(workspace, record, rows, sessionId, errors);
+  // The per-row and seal checks take the keys as a value so `src/evidence/sessionExport.ts` can run them offline
+  // against the keys an export carries (SH-TRUST-06); here they are the workspace's own monitor key history.
+  const monitorKeys = getPublicKeyHistory(workspace, "monitor");
+  verifySessionRows(monitorKeys, rows, errors);
+  verifySeal(monitorKeys, record, rows, sessionId, errors);
 
   const openEvent = rows[0]!;
   const closeEvent = rows[rows.length - 1]!;
@@ -247,23 +253,7 @@ export function buildSessionRootDescriptor(params: {
     throw new SessionAnchorError(sessionId, errors);
   }
 
-  return sessionRootDescriptorSchema.parse({
-    v: 1,
-    sessionId,
-    lifecycle: "closed",
-    runtime: openEvent.runtime,
-    agentId: agentIdFromOpen(openEvent),
-    startedTs: record?.started_ts ?? openEvent.ts,
-    endedTs: record?.ended_ts ?? closeEvent.ts,
-    eventCount: rows.length,
-    turnCount,
-    sealCount: sealEventHashes.length,
-    sealEventHashes,
-    sessionMerkleRoot,
-    openEventHash: openEvent.event_hash,
-    closeEventHash: closeEvent.event_hash,
-    monitorKeyFingerprint
-  });
+  return describeSessionRows(sessionId, rows, monitorKeyFingerprint);
 }
 
 /**

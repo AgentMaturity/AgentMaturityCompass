@@ -26,6 +26,7 @@ import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
+import { writeScenarioPrompt, writeScenarioResponse, writeScenarioTestResult, type ScenarioEvidenceRows } from "../assurance/evidenceWriters.js";
 import {
   AgentResponderInvocationError,
   resolveAgentResponder,
@@ -653,6 +654,8 @@ export interface ScenarioResult {
   score: number;
   reasons: string[];
   expectedBehavior: string;
+  /** The stdin, stdout and test rows of this scenario in the caller's sealed session (SH-TRUST-03); empty when the run wrote no rows. */
+  evidenceEventIds: string[];
 }
 
 /* ------------------------------------------------------------------ */
@@ -902,7 +905,10 @@ export interface RunMCPAgentRedTeamInput {
   attackCategories?: MCPAttackCategoryFilter[];
   /** Path to write markdown report */
   output?: string;
+  /** The sealed red-team session to write each scenario's prompt, reply and result into (SH-TRUST-03); absent for an unsigned run. */
+  rows?: ScenarioEvidenceRows;
 }
+export const EVIL_MCP_PACK_ID = "evil-mcp"; // the pack id Evil MCP scenario rows carry in the ledger and in the signed report's provenance check
 
 export async function runMCPAgentRedTeam(
   input: RunMCPAgentRedTeamInput
@@ -951,12 +957,14 @@ export async function runMCPAgentRedTeam(
         parameters: tool.inputSchema as Record<string, unknown>
       }));
 
-    let response: string;
-    let rawCalls: Array<{ toolName: string; arguments: Record<string, unknown> }>;
+    const row = input.rows === undefined ? null : { ...input.rows, packId: EVIL_MCP_PACK_ID, scenarioId: scenario.id };
+    const evidenceEventIds: string[] = row === null ? [] : [writeScenarioPrompt({ ...row, prompt: scenario.userPrompt })];
+    let response: string, rawCalls: Array<{ toolName: string; arguments: Record<string, unknown> }>;
     try {
       const answer = await responder.respond(scenario.userPrompt, { tools: offeredTools });
       response = answer.text;
       rawCalls = answer.toolCalls;
+      if (row !== null) evidenceEventIds.push(writeScenarioResponse({ ...row, response, toolCalls: answer.toolCalls }));
     } catch (error) {
       if (!(error instanceof AgentResponderInvocationError)) throw error;
       // Not reached => not tested. Never score an untested boundary as held.
@@ -976,18 +984,10 @@ export async function runMCPAgentRedTeam(
       toolCalls
     );
 
+    if (row !== null) evidenceEventIds.push(writeScenarioTestResult({ ...row, score0to100: score, pass: passed, reasons, correlatedRequestIds: [] }));
     scenarioResults.push({
-      scenarioId: scenario.id,
-      title: scenario.title,
-      categories: scenario.categories,
-      userPrompt: scenario.userPrompt,
-      agentResponse: response,
-      toolCalls,
-      passed,
-      refusedDangerous,
-      score,
-      reasons,
-      expectedBehavior: scenario.expectedBehavior,
+      scenarioId: scenario.id, title: scenario.title, categories: scenario.categories, userPrompt: scenario.userPrompt,
+      agentResponse: response, toolCalls, passed, refusedDangerous, score, reasons, expectedBehavior: scenario.expectedBehavior, evidenceEventIds
     });
 
     // Track dangerous calls

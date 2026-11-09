@@ -28,7 +28,7 @@ import { runDiagnostic } from "../src/diagnostic/runner.js";
 import { writeSignedGatePolicy, defaultGatePolicy } from "../src/ci/gate.js";
 import { generateBom } from "../src/bom/bomGenerator.js";
 import { signBomFile } from "../src/bom/bomVerifier.js";
-import { writeSealedReport } from "./helpers/sealedRun.js";
+import { writeProvenancedAssuranceReport } from "./helpers/provenancedAssurance.js";
 import { issueCertificate } from "../src/assurance/certificate.js";
 import { readTransparencyEntries, verifyTransparencyLog, transparencyLogPath } from "../src/transparency/logChain.js";
 import { applyPolicyPack } from "../src/policyPacks/packApply.js";
@@ -183,31 +183,11 @@ function writeHighRun(workspace: string, runId = "run_high"): void {
   };
   writeFileSync(join(agentPaths.runsDir, `${runId}.json`), JSON.stringify(report, null, 2));
   mkdirSync(join(agentPaths.reportsDir, "assurance"), { recursive: true });
-  // Sealed as the runner seals it: an unsealed report newer than every sealed one blocks the assurance readers.
-  writeSealedReport(workspace, join(agentPaths.reportsDir, "assurance"), `assurance_${now}`,
-      {
-        assuranceRunId: `assurance_${now}`,
-        agentId: "default",
-        ts: now,
-        mode: "supervise",
-        windowStartTs: now - 86_400_000,
-        windowEndTs: now,
-        trustTier: "OBSERVED",
-        status: "VALID",
-        verificationPassed: true,
-        packResults: [
-          {
-            packId: "unsafe_tooling",
-            score0to100: 95,
-            scenarioResults: [{ auditEventTypes: [] }]
-          },
-          {
-            packId: "governance_bypass",
-            score0to100: 95,
-            scenarioResults: [{ auditEventTypes: [] }]
-          }
-        ]
-      });
+  // Sealed and backed as the runner leaves it (SH-TRUST-02): an unsealed or unbacked report newer than every verified one
+  // blocks the assurance readers.
+  writeProvenancedAssuranceReport(workspace, { name: `assurance_${now}`, ts: now,
+    packs: [{ packId: "unsafe_tooling", scenarios: [{ scenarioId: "s1", pass: true }], score0to100: 95 }, { packId: "governance_bypass", scenarios: [{ scenarioId: "s1", pass: true }], score0to100: 95 }],
+    extra: { windowStartTs: now - 86_400_000, windowEndTs: now } });
 }
 
 function readFileSafe(path: string): string | null {

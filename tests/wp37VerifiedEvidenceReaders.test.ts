@@ -18,6 +18,7 @@ import { writeFileAtomic, ensureDir } from "../src/utils/fs.js";
 import { dirname } from "node:path";
 import { questionBank } from "../src/diagnostic/questionBank.js";
 import { tamperReport, writeAnchoredRun, writeSealedReport } from "./helpers/sealedRun.js";
+import { writeProvenancedAssuranceReport } from "./helpers/provenancedAssurance.js";
 
 /** A parsed-but-unverified certificate: the verifier is stubbed only for the certificate-summary test. */
 const certStub = vi.hoisted(() => ({ result: null as null | Record<string, unknown> }));
@@ -225,8 +226,9 @@ describe("WP37 sealed assurance reads", () => {
 
   test("latestAssuranceByPack refuses a newest report whose pack results were edited after sealing", () => {
     const ws = workspace();
-    writeSealedReport(ws, reportsDir(ws), "a1", assuranceReport("a1", 1000, 40));
-    const edited = writeSealedReport(ws, reportsDir(ws), "a2", assuranceReport("a2", 2000, 45));
+    const pack = (score: number) => [{ packId: "injection", scenarios: [{ scenarioId: "s1", pass: true, score0to100: score }], score0to100: score }];
+    writeProvenancedAssuranceReport(ws, { name: "a1", agentId: "agent-x", ts: 1000, packs: pack(40) });
+    const { file: edited } = writeProvenancedAssuranceReport(ws, { name: "a2", agentId: "agent-x", ts: 2000, packs: pack(45) });
     tamperReport(edited, (report) => {
       (report.packResults as Array<{ score0to100: number }>)[0]!.score0to100 = 100;
     });

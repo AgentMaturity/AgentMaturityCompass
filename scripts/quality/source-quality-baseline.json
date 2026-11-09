@@ -1323,14 +1323,6 @@
       "format": "typescript"
     },
     {
-      "id": "286cba78dd666eeba837bebd150360dbba6c8e276906e293feca31f87da30f17",
-      "paths": [
-        "persistence/sessionStoreVerification.ts",
-        "transparency/sessionRootDescriptor.ts"
-      ],
-      "format": "typescript"
-    },
-    {
       "id": "28f2484f22a382201750982de4dbb20c9febfd2bb0ff0d658f05be2cc1ee6be2",
       "paths": [
         "cli-trace-commands.ts",
@@ -1559,14 +1551,6 @@
       "paths": [
         "llm/request/openaiChatEncoderV4.ts",
         "llm/request/openaiResponsesEncoderV3.ts"
-      ],
-      "format": "typescript"
-    },
-    {
-      "id": "30b82ea81244b56623f883eaa8a1d33140d6debdf2e4d98ac27a458d21ae0c44",
-      "paths": [
-        "llm/request/requestSources.ts",
-        "transparency/sessionRootDescriptor.ts"
       ],
       "format": "typescript"
     },
@@ -2535,14 +2519,6 @@
       "paths": [
         "mechanic/mechanicCli.ts",
         "mechanic/mechanicCli.ts"
-      ],
-      "format": "typescript"
-    },
-    {
-      "id": "4e9b5452b0cf8999427fb626eab9ad1ad68c190ba7acfcc8b794a539c5fb8bd2",
-      "paths": [
-        "redteam/mcpAgentProvider.ts",
-        "redteam/runner.ts"
       ],
       "format": "typescript"
     },
@@ -3703,14 +3679,6 @@
       "paths": [
         "benchmarks/helmProviderDrift.ts",
         "benchmarks/tensorZeroProviderDrift.ts"
-      ],
-      "format": "typescript"
-    },
-    {
-      "id": "74f5356ec8d70e997d27702eeea8c6f93bd5193528f2ebbc2e7d7ea17f2f5d1e",
-      "paths": [
-        "session/spill/spillEvidence.ts",
-        "transparency/sessionRootDescriptor.ts"
       ],
       "format": "typescript"
     },
@@ -6535,14 +6503,6 @@
       "paths": [
         "enforce/toolSandboxLimits.ts",
         "observability/costBudgetEvidence.ts"
-      ],
-      "format": "typescript"
-    },
-    {
-      "id": "d55caee02b38ac9374bf7b8334cae93951648987f757ba47a4ff9a0dc75f6a71",
-      "paths": [
-        "diagnostic/assuranceSummary.ts",
-        "domains/conformance/conformanceRun.ts"
       ],
       "format": "typescript"
     },
@@ -17855,11 +17815,6 @@
       "kind": "types"
     },
     {
-      "id": "cbeda59618c958e57199eda5eedc27f13c5412073b6a65609135d2ed0c1f4fe2",
-      "file": "src/diagnostic/evidenceEmitters.ts",
-      "kind": "exports"
-    },
-    {
       "id": "cc05654490fb6981859f3a108bfabf2ea404da69be3f55e6dfcdf2d626c09e47",
       "file": "src/lifecycle/findingProof.ts",
       "kind": "types"
@@ -21186,13 +21141,6 @@
       "date": "2026-10-29"
     },
     {
-      "id": "584c209a49a9582d08218306b12fe0fabc144e5e23348ba1bb9206606c9ae68b",
-      "scan": "duplicates",
-      "reason": "P2-09a: pre-existing sessionStoreVerification/spillEvidence clone re-fingerprinted by jscpd after the shared eventPayload read path changed; neither file was edited",
-      "acceptedBy": "AgentMaturity",
-      "date": "2026-10-27"
-    },
-    {
       "id": "58dd7f6534190f55480c30a4a6d56b112f62d9d1e20e6aa8e74c5c70c3961dce",
       "scan": "duplicates",
       "reason": "P2-08 (Codex) async publication producer: per-store prepare, verify and publish steps are written inline under each store's own authority checks; extracting shared signing or publication helpers is a reviewed follow-up, not part of landing",
@@ -21562,6 +21510,13 @@
       "reason": "The optional real SoftHSM fixture invokes the OS executable to initialize its isolated token. CI explicitly apt-installs softhsm2 at ci.yml326; this is a system test tool, not a missing JavaScript package. No hosted/hardware qualification is inferred.",
       "acceptedBy": "Sid",
       "date": "2026-10-20"
+    },
+    {
+      "id": "786b1662b5b3bd17f30af2e016f4a460684a81634fdaff8299a63fc65e4b0447",
+      "scan": "duplicates",
+      "reason": "Pre-existing clone moved, not added (it replaces accepted 584c209a sessionStoreVerification/spillEvidence and baseline 74f5356e spillEvidence/sessionRootDescriptor): the per-row hash and signature check now lives once, in sessionStoreVerification.verifyRowIntegrity, shared by the store verifier, the session anchor and the provenance gate",
+      "acceptedBy": "AgentMaturity",
+      "date": "2026-11-08"
     },
     {
       "id": "79f6f5e6c45df665db0d0589b0d5d95ca0dbc044c8a74f3f6949c9d90c60e8ec",

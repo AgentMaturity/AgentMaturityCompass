@@ -37,7 +37,9 @@ export const FRAMEWORK_STATIONS: Record<ComplianceFramework, readonly Station[]>
   CO_AI_ACT: STATIONS,
   TX_TRAIGA: ["health", "technology", "governance"],
   CA_AI_LAWS: STATIONS,
-  KR_AI_BASIC_ACT: STATIONS
+  KR_AI_BASIC_ACT: STATIONS,
+  OWASP_LLM: STATIONS,
+  OWASP_AGENTIC: STATIONS
 };
 
 /** One line per framework: why it binds those stations. */
@@ -61,7 +63,9 @@ export const FRAMEWORK_STATION_BASIS: Record<ComplianceFramework, string> = {
   CO_AI_ACT: REGISTER("us-co-sb26-189"),
   TX_TRAIGA: REGISTER("us-tx-traiga"),
   CA_AI_LAWS: "The union of register entries us-ca-sb53, us-ca-ab2013 and us-ca-cppa-admt (src/compliance/regulatory/register.json).",
-  KR_AI_BASIC_ACT: REGISTER("kr-ai-basic-act")
+  KR_AI_BASIC_ACT: REGISTER("kr-ai-basic-act"),
+  OWASP_LLM: LAYER_0,
+  OWASP_AGENTIC: LAYER_0
 };
 
 /**

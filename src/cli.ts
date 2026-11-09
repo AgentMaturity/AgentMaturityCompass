@@ -10532,7 +10532,7 @@ ci
   .option("--min-mcp-score <n>", "minimum Evil MCP score to pass (0-100)", "80")
   .option("--no-gaming-resistance", "disable the currently unmeasured gaming-resistance gate; grants no score-gaming assurance")
   .option("--min-gaming-score <n>", "required gaming-resistance score (0-100); unavailable evidence fails at any threshold", "80")
-  .option("--no-sign", "run red-team evidence as UNSIGNED_VALID local evidence")
+  .option("--sign", "seal and sign the run: ledger rows in a sealed session, report sealed with the artifact-seal key (needs an unlocked vault)").option("--no-sign", "run red-team evidence as UNSIGNED_VALID local evidence (the default)")
   .option("--json", "output JSON result", false)
   .action(async (agentId: string | undefined, opts: {
     plugins?: string[];
@@ -10564,7 +10564,7 @@ ci
         agentId: agentId ?? activeAgent(program),
         plugins: opts.plugins ?? ["injection"],
         strategies: opts.strategies,
-        noSign: opts.sign === false,
+        noSign: opts.sign !== true,
         evilMcp: opts.evilMcp,
         mcpAttackCategories: opts.mcpAttacks,
         includeGamingResistance: opts.gamingResistance !== false,
@@ -12337,8 +12337,10 @@ withTrustFlags(transparencyMerkle
 compliance
   .command("init")
   .description("Create and sign compliance-maps.yaml")
-  .action(async () => {
-    const out = await initComplianceMapsCliAsync(process.cwd());
+  .option("--merge", "keep the workspace's existing mappings and add the built-in frameworks it lacks, then re-sign")
+  .action(async (opts: { merge?: boolean }) => {
+    const out = await initComplianceMapsCliAsync(process.cwd(), { merge: opts.merge === true })
+      .catch((error: unknown) => { console.error(chalk.red(error instanceof Error ? error.message : String(error))); process.exit(1); });
     console.log(chalk.green(`Compliance maps created: ${out.path}`));
     console.log(`Signature: ${out.sigPath}`);
   });
@@ -22169,13 +22171,13 @@ score
 
 score
   .command("owasp-llm")
-  .description("OWASP LLM Top 10 coverage (all 10 risks); not evaluated: file presence is not evidence")
+  .description("OWASP LLM Top 10 (2023 v1.1) coverage; not evaluated: file presence is not evidence. The evidence-bound 2025 list is `amc compliance report --framework owasp-llm`")
   .option("--json", "Output as JSON")
   .action(async (opts: { json?: boolean }) => {
     try {
       const { scoreOWASPLLMCoverage } = await import("./score/owaspLLMCoverage.js");
       const result = scoreOWASPLLMCoverage();
-      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🛡️  OWASP LLM Top 10 Coverage"), result, unverifiedClaim("score:owaspLLMCoverage", 0, { regulated: true }), opts)) return;
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🛡️  OWASP LLM Top 10 (2023 v1.1) Coverage"), result, unverifiedClaim("score:owaspLLMCoverage", 0, { regulated: true }), opts)) return;
       printNotEvaluatedCriteria(result.risks, result.recommendations);
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });

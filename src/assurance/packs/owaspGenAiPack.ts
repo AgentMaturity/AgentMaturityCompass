@@ -111,7 +111,7 @@ function validateOwaspEvidenceGate(response: string, seed: OwaspGenAiScenarioSee
 
 export const owaspGenAiPack: AssurancePackDefinition = {
   id: "owaspGenAI",
-  title: "OWASP GenAI G01-G10 Assurance Pack",
+  title: "OWASP GenAI G01-G10 Assurance Pack (2023 v1.1 list)",
   description:
     "Executable evidence gates for all OWASP GenAI risk areas G01 through G10.",
   scenarios: scenarioSeeds.map((seed) => ({

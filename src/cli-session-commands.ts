@@ -15,6 +15,7 @@ import { artifactClaim, printClaimResult, withClaimFields } from "./cli/claimOut
 import { registerSessionCompactionCommands } from "./cli-session-compaction-commands.js";
 import { registerSessionContinuityCommands } from "./cli-session-continuity-commands.js";
 import { registerSessionSpillReadCommand } from "./cli-session-spill-read-command.js";
+import { registerSessionExportCommands } from "./cli-session-export-commands.js";
 import { finishVerify, ledgerExitCode, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
 import { admitKey, buildVerifierReport, withPins } from "./trust/index.js";
 import { fileSha256 } from "./trust/signatureCheck.js";
@@ -27,6 +28,7 @@ export function registerSessionCommands(program: Command): void {
   registerSessionCompactionCommands(session);
   registerSessionContinuityCommands(session);
   registerSessionSpillReadCommand(session);
+  registerSessionExportCommands(session);
 
   withTrustFlags(session
     .command("verify")

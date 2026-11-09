@@ -1,3 +1,4 @@
+import { buildPassportHarness, passportHarnessMembers, signPassportHarness, type PassportHarness, type PassportHarnessSignature } from "./passportHarness.js";
 import { collectFiles, cleanupDir } from "../utils/archiveFiles.js";
 import { mkdtempSync, readFileSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -178,8 +179,11 @@ export function createPassportArtifact(params: {
       throw new Error("passport pii scan failed after proof binding");
     }
     signature = passportSignatureSchema.parse(signPassportJson(params.workspace, passport));
+    // SH-TRUST-05: the harness companion, signed separately and bound to this passport.json by digest.
+    const harness = params.scopeType === "AGENT" ? buildPassportHarness(params.workspace, passport, scopeId) : null;
+    const companion = harness === null ? {} : { harness: { harness, signature: signPassportHarness(params.workspace, harness) } };
 
-    for (const member of passportArchiveMemberBytes({ passport, signature, piiScan, signerPub, collected }))
+    for (const member of passportArchiveMemberBytes({ passport, signature, piiScan, signerPub, collected, ...companion }))
       writeFileAtomic(join(root, member.path), member.bytes, 0o644);
 
     tarCreateDeterministic(tmp, outFile);
@@ -308,6 +312,8 @@ export function listExportedPassportArtifacts(workspace: string): Array<{
 export function passportArchiveMemberBytes(params: {
   passport: PassportJson; signature: ReturnType<typeof signPassportJson>; piiScan: ReturnType<typeof scanPassportForPii>;
   signerPub: string; collected: ReturnType<typeof collectPassportData>;
+  /** The signed harness companion (SH-TRUST-05), present for AGENT-scoped passports; a separate member, never inside passport.json. */
+  harness?: { harness: PassportHarness; signature: PassportHarnessSignature };
 }) {
   const { passport, signature, piiScan, signerPub, collected } = params;
   const piiBytes = Buffer.from(`${canonicalize(piiScan)}\n`);
@@ -331,6 +337,7 @@ export function passportArchiveMemberBytes(params: {
   const buildBytes = Buffer.from(`${canonicalize(buildMeta)}\n`);
   files.push({ path: "meta/build.json", bytes: buildBytes }, { path: "meta/build.sha256", bytes: Buffer.from(`${sha256Hex(buildBytes)}\n`) },
     { path: "meta/calculation-manifest.json", bytes: Buffer.from(`${canonicalize(collected.calculationManifest)}\n`) });
+  if (params.harness) files.push(...passportHarnessMembers(params.harness.harness, params.harness.signature));
   return files;
 }
 export { createPassportArtifactAsync } from "./passportProducer.js";

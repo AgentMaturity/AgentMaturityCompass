@@ -45,6 +45,7 @@ const NOT_REGISTRY_KINDS: Record<string, string> = {
   verifyPassportProofBundle: "inclusion proofs: checked inside the passport verifier",
   verifyPluginSignedFile: "plugin package members: verified by the plugin store before installation",
   verifyPromptPackFile: "prompt packs: verified by the prompt pack CLI that reads them",
+  verifyRedTeamReportFile: "signed red-team runs (SH-TRUST-03): verified in place by verifiedRedTeamReports and the `amc ci redteam --sign` gate",
   verifyReleaseBundle: "AMC release bundles: `amc release verify` only",
   verifySessionAnchorProofFile: "session anchor proofs: `amc session` verify commands only",
   verifyThirdPartyAttestation: "third-party attestations: checked by ingest as rows are admitted",

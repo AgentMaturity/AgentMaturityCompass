@@ -3,6 +3,8 @@ import { join } from "node:path";
 import type { AssurancePackResult, AssuranceReport, EvidenceEvent } from "../types.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { openLedger } from "../ledger/ledger.js";
+import { ProvenanceChecker } from "../assurance/reportProvenance.js";
+import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
 import { readUtf8 } from "../utils/fs.js";
 
 /** The existing audit selection/count recipe, shared by compatibility and readonly observations. */
@@ -31,9 +33,15 @@ export function latestReadonlyBenchAssuranceByPack(params: { workspace: string; 
   if (lstatSync(reportsDir, { throwIfNoEntry: false }) === undefined) return new Map();
   const files = readdirSync(reportsDir).filter(file => file.endsWith(".json")).map(file => join(reportsDir, file)).sort((a, b) => a.localeCompare(b));
   const map = new Map<string, { ts: number; pack: AssurancePackResult }>();
-  for (const file of files) { const report = JSON.parse(readUtf8(file)) as AssuranceReport;
-    if (report.agentId !== agentId || report.ts < params.windowStartTs || report.ts > params.windowEndTs) continue;
-    for (const pack of report.packResults) { const prior = map.get(pack.packId); if (!prior || report.ts > prior.ts) map.set(pack.packId, { ts: report.ts, pack }); }
-  }
+  // Sealed and provenance-backed only (SH-TRUST-02), over a readonly handle; with no ledger no report can be backed.
+  if (lstatSync(join(params.workspace, ".amc", "evidence.sqlite"), { throwIfNoEntry: false }) === undefined) return new Map();
+  const ledger = openLedger(params.workspace, { readonly: true }), provenance = new ProvenanceChecker(params.workspace, { ledger });
+  try {
+    for (const file of files) { const report = JSON.parse(readUtf8(file)) as AssuranceReport;
+      if (report.agentId !== agentId || report.ts < params.windowStartTs || report.ts > params.windowEndTs) continue;
+      if (!sealedRunReportVerifies(params.workspace, report as unknown as Record<string, unknown>) || !provenance.check(report).ok) continue;
+      for (const pack of report.packResults) { const prior = map.get(pack.packId); if (!prior || report.ts > prior.ts) map.set(pack.packId, { ts: report.ts, pack }); }
+    }
+  } finally { provenance.close(); ledger.close(); }
   return new Map<string, AssurancePackResult>([...map.entries()].map(([packId, row]) => [packId, row.pack]));
 }

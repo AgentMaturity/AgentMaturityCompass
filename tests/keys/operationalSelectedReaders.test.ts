@@ -28,6 +28,8 @@ import { openActionJournal, verifyChainIn } from "../../src/actions/actionJourna
 import { ledgerChainError } from "../../src/catalog/evidence/mappingAdapter.js";
 import { legacyLedgerRowKeys } from "../../src/keys/operationalLedgerReader.js";
 import { startAssuranceSession, writeScenarioPrompt, writeScenarioResponse } from "../../src/assurance/evidenceWriters.js";
+import { assuranceReportProvenance } from "../../src/assurance/reportProvenance.js";
+import { writeProvenancedAssuranceReport } from "../helpers/provenancedAssurance.js";
 import { writeExecutedEvidence, loadExecutedEvidence, type ExecutedCaptureRecord } from "../../src/assurance/executed/evidence.js";
 import { validateExecutedReportRow } from "../../src/assurance/executed/reportValidation.js";
 import { loadCatalog } from "../../src/catalog/loader.js";
@@ -160,6 +162,14 @@ describe("public selected-row readers admit issuer and global authority before p
     const rows = f.ledger.getAllEvents(), keys = legacyLedgerRowKeys(f.workspace);
     expect(ledgerChainError(rows, keys, { workspace: f.workspace, ledger: f.ledger, trust: f.trust })).toBeNull();
     expect(ledgerChainError(rows, keys, { workspace: f.workspace, ledger: f.ledger, trust: f.absent })).toMatch(/issuer.*not-pinned/);
+  });
+
+  test("the assurance provenance gate admits a runner session only under the caller's independent provider pin (fix3 S12b)", async () => {
+    const f = await fixture();
+    const { report } = writeProvenancedAssuranceReport(f.workspace, { name: "owned-provenance", packs: [{ packId: "injection", scenarios: [{ scenarioId: "s1", pass: true }] }] });
+    expect(assuranceReportProvenance(f.workspace, report, { trust: f.trust })).toEqual({ ok: true });
+    expect(assuranceReportProvenance(f.workspace, report, { trust: f.absent })).toMatchObject({ ok: false, reason: "PROVENANCE_LEDGER_INVALID", detail: expect.stringMatching(/issuer.*not-pinned/) });
+    expect(assuranceReportProvenance(f.workspace, report).ok).toBe(false);
   });
 
   test("the actual journal writer uses explicit local trust while public chain verification retains independent pins", async () => {

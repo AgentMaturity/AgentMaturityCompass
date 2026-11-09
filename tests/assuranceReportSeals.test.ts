@@ -13,6 +13,7 @@ import { initWorkspace } from "../src/workspace.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { canonicalize } from "../src/utils/json.js";
 import { writeSealedReport } from "./helpers/sealedRun.js";
+import { writeProvenancedAssuranceReport } from "./helpers/provenancedAssurance.js";
 import { workspaceKeyTrust } from "./helpers/trustContext.js";
 
 /**
@@ -48,7 +49,7 @@ function plantUnsealed(dir: string, id: string, ts: number, overall: number): vo
 describe("assurance readers take sealed reports only, and a refused newer report blocks", () => {
   test("the readiness gate is not passed by a planted unsealed latest report", () => {
     const dir = workspace();
-    writeSealedReport(dir, reportsDir(dir), "sealed-low", report("sealed-low", Date.now() - 60_000, 40));
+    writeProvenancedAssuranceReport(dir, { name: "sealed-low", ts: Date.now() - 60_000, packs: [{ packId: "injection", scenarios: [{ pass: true, score0to100: 40 }], score0to100: 40 }] });
     expect(assuranceReadinessGate(dir)).toMatchObject({ ok: false, reasons: expect.arrayContaining(["ASSURANCE_THRESHOLD_BREACH"]) });
     plantUnsealed(dir, "planted-high", Date.now(), 100);
     const gate = assuranceReadinessGate(dir);
@@ -59,7 +60,7 @@ describe("assurance readers take sealed reports only, and a refused newer report
 
   test("latestAssuranceByPack refuses when the newest report is unsealed instead of falling back to an older one", () => {
     const dir = workspace(), now = Date.now();
-    writeSealedReport(dir, reportsDir(dir), "sealed-old", report("sealed-old", now - 60_000, 20));
+    writeProvenancedAssuranceReport(dir, { name: "sealed-old", ts: now - 60_000, packs: [{ packId: "injection", scenarios: [{ pass: true, score0to100: 20 }], score0to100: 20 }] });
     expect(latestAssuranceByPack({ workspace: dir, agentId: "default", windowStartTs: 0, windowEndTs: now + 1 }).get("injection")?.score0to100).toBe(20);
     plantUnsealed(dir, "planted-new", now, 100);
     expect(() => latestAssuranceByPack({ workspace: dir, agentId: "default", windowStartTs: 0, windowEndTs: now + 1 }))
@@ -69,7 +70,8 @@ describe("assurance readers take sealed reports only, and a refused newer report
   test("the governor's verified assurance summary counts sealed reports only, and an unverified one reads as missing", async () => {
     const { verifiedGovernorAssuranceSummary } = await import("../src/assurance/assuranceRunner.js");
     const dir = workspace(), now = Date.now();
-    writeSealedReport(dir, reportsDir(dir), "sealed", report("sealed", now - 60_000, 20, [pack("injection", 20), pack("unsafe_tooling", 30)]));
+    writeProvenancedAssuranceReport(dir, { name: "sealed", ts: now - 60_000, packs: [
+      { packId: "injection", scenarios: [{ pass: true, score0to100: 20 }], score0to100: 20 }, { packId: "unsafe_tooling", scenarios: [{ pass: true, score0to100: 30 }], score0to100: 30 }] });
     expect(verifiedGovernorAssuranceSummary(dir, "default", 0, now + 1)).toEqual({ packs: {
       injection: { score: 20, succeeded: 0, observed: true }, unsafe_tooling: { score: 30, succeeded: 0, observed: true } } });
     plantUnsealed(dir, "planted", now - 120_000, 100);

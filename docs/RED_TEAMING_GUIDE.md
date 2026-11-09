@@ -177,6 +177,18 @@ Certificate: NOT ISSUED (threshold breach)
 
 ---
 
+## Signed, Ledgered Red-Team Runs (SH-TRUST-03)
+
+`amc redteam run` without `--no-sign` writes every attack prompt, reply and graded result into its own sealed `amc-redteam-runner` ledger session (rows carry `source: "redteam"`), seals the session, verifies the workspace ledger, and seals the report JSON with the artifact-seal key (`reportJsonSha256` + `runSealSig`, the same shape `sealedRunReportVerifies` reads for assurance and diagnostic runs). The report then says `verification: { signed: true, status: "SIGNED_VALID", mode: "vault-signed" }` and names its `sessionId`; a run whose ledger did not verify is `SIGNED_INVALID`. A locked vault refuses a signed run with the same remediation as `amc assurance run`.
+
+`--no-sign` (and the `amc ci redteam` default; `amc ci redteam --sign` opts in to a signed run and then needs an unlocked vault) stays local evidence: under `AMC_NO_SIGN=1` the rows go to the unsigned store (`evidenceStore` is recorded, signed readers never open it); otherwise no ledger rows are written and the report says so (`mode: "unsigned-local"`). `AMC_NO_SIGN=1` makes any red-team run unsigned whatever flag was passed, as it does for `amc assurance run`: no-sign mode never signs and needs no vault.
+
+A signed `--evil-mcp` run writes the Evil MCP scenarios' prompts, replies and verdicts into the same sealed session as rows of pack `evil-mcp`; `evilMcp.scenarioResults` names each verdict's rows and the readers gate them like any pack. An interrupted signed run (Ctrl-C, a CI timeout's SIGTERM) seals its session with an `ASSURANCE_RUN_ABORTED` row before the process dies of the signal, so the workspace ledger keeps verifying; a SIGKILL or a crash leaves the session open, which the ledger reads as live for 15 minutes after its last signed row and then as a missing seal that `amc verify --repair --apply` seals with a signed `interrupted-sealed` marker. Gateway receipts on a reply are stored only when bound to that exchange (the same admission as assurance, see docs/ASSURANCE_LAB.md); a forged or replayed one is audited as `ASSURANCE_RECEIPT_REJECTED` and dropped, and the attack is graded all the same.
+
+Readers (`src/redteam/redteamStore.ts`): `verifiedRedTeamReports` returns only runs that are signed, SIGNED_VALID, whose report seal verifies and whose graded rows resolve to their session (the same provenance predicate as assurance, `REDTEAM_PROVENANCE_*`); unsigned runs are refused as `REDTEAM_UNSIGNED`, a tampered file as `REDTEAM_SEAL_INVALID`. `amc ci redteam --sign` re-reads the signed run it just wrote and fails with the refusal's name when it does not verify. `verifiedRedTeamReports` also returns `blocking`: a tampered or unreadable file, or an honest unsigned run newer than the newest verified one, blocks that run the way `refusedRunsBlocking` does for assurance, so tampering with the newest run never rolls a reader back to an older one. The passport's harness companion (SH-TRUST-05) carries the newest verified run, or names the block in `unknown`. Red-team results do not satisfy compliance `requires_assurance_pack` bindings: their row ids are `scenario::strategy` and they carry no grading eligibility; they are their own evidence.
+
+`amc redteam attack` (the attack-plugin engine) is unchanged and still writes no ledger rows.
+
 ## Assurance Lab: Deterministic Defensive Testing
 
 ### Available Packs
