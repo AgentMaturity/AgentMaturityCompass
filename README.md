@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C405-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C482-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -826,7 +826,7 @@ AMC is **free and MIT licensed**, and in the current source build all 41 Industr
 
 | Tier | What you get |
 |---|---|
-| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 41 Industry Packs, all <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, 1,269 registered CLI command paths, browser playground, CI gates |
+| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 41 Industry Packs, all <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, 1,271 registered CLI command paths, browser playground, CI gates |
 | **Enterprise (contact-first; not self-serve)** | Planned priority support, custom pack development, and deployment assistance; not needed for any feature or pack |
 
 > Industry Packs are 41 sector-specific questionnaires (healthcare, finance, education, logistics, government, etc.) that need ongoing regulatory research and expert review; their content stays experimental until a named expert signs it. See [`website/publication-status.json`](website/publication-status.json) for what each distribution channel publishes before making any availability claim.
@@ -860,7 +860,7 @@ AMC is **free and MIT licensed**, and in the current source build all 41 Industr
 | [Community Demo Kit](docs/COMMUNITY_DEMO_KIT.md) | [Why AMC One-Pager](docs/WHY_AMC_ONE_PAGER.md) |
 | [Solo Dev Quickstart](docs/SOLO_DEV_QUICKSTART.md) | [Platform Engineer Quickstart](docs/PLATFORM_ENGINEER_QUICKSTART.md) |
 | [Security & Compliance Quickstart](docs/SECURITY_COMPLIANCE_QUICKSTART.md) | [Troubleshooting](docs/TROUBLESHOOTING.md) |
-| [CLI Reference (1,269 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
+| [CLI Reference (1,271 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
 | [Compatibility Matrix](docs/COMPATIBILITY_MATRIX.md) | [Starter Blueprints](docs/STARTER_BLUEPRINTS.md) |
 | [Install Packages](docs/INSTALL_PACKAGES.md) | [Support Policy](docs/SUPPORT_POLICY.md) |
 | [Release Cadence](docs/RELEASE_CADENCE.md) | [CI Templates](docs/CI_TEMPLATES.md) |
@@ -971,7 +971,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,405<!-- /amc:count --> test source files; Vitest reports run outcomes
+cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,482<!-- /amc:count --> test source files; Vitest reports run outcomes
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
@@ -992,6 +992,6 @@ cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- a
 ---
 
 <p align="center">
-  <strong><!-- amc:count:diagnosticQuestions -->244<!-- /amc:count --> default diagnostic questions + 20 lifecycle expansion questions · <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs · 41 domain packs · <!-- amc:count:adapters -->16<!-- /amc:count --> adapters · 1,269 CLI command paths</strong><br>
+  <strong><!-- amc:count:diagnosticQuestions -->244<!-- /amc:count --> default diagnostic questions + 20 lifecycle expansion questions · <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs · 41 domain packs · <!-- amc:count:adapters -->16<!-- /amc:count --> adapters · 1,271 CLI command paths</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>

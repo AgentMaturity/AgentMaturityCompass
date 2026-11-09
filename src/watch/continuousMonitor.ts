@@ -16,7 +16,7 @@ import { detectEvidenceStreamAnomalies, type ObservabilityAnomaly } from "../obs
 import { openLedger } from "../ledger/ledger.js";
 import { sha256Hex } from "../utils/hash.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
-import { createLocalVaultPassphrase, loadLocalVaultPassphrase, localVaultPassphrasePath } from "../vault/localPassphrase.js";
+import { createLocalVaultPassphrase, loadLocalVaultPassphrase, localPassphraseRefusal, localVaultPassphrasePath } from "../vault/localPassphrase.js";
 import { getAgentPaths } from "../fleet/paths.js";
 import { initWorkspace } from "../workspace.js";
 
@@ -63,8 +63,7 @@ function ensureLocalMonitorVaultPassphrase(workspace: string): void {
   // LIVE-VAULT-02: the local passphrase file reaches a non-agent process only (src/vault/localPassphrase.ts).
   const local = loadLocalVaultPassphrase(workspace);
   if (local.reason !== undefined) {
-    throw new Error("Vault passphrase needed: the monitor does not read .amc/local-vault-passphrase "
-      + `${local.reason === "agent-mode" ? "in agent mode" : `under the agent marker ${local.marker ?? "(unknown)"}`}; export AMC_VAULT_PASSPHRASE.`);
+    throw new Error(`Vault passphrase needed: the monitor does not read .amc/local-vault-passphrase ${localPassphraseRefusal(local)}; export AMC_VAULT_PASSPHRASE.`);
   }
   if (local.loaded || (process.env.AMC_VAULT_PASSPHRASE ?? "").length > 0 || pathExists(localVaultPassphrasePath(workspace))
     || pathExists(join(workspace, ".amc", "vault.amcvault"))) {

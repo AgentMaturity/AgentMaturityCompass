@@ -66,7 +66,11 @@ the AMC home.
 
 - A workspace that migrated from 1.x on this machine (an explicit vault
   command unlocked it here) holds a key set this machine committed and reads as
-  your own; that migration is the operator's action in the workspace.
+  your own; that migration is the operator's action in the workspace. Nothing a
+  repository ships unlocks it implicitly: `.amc/local-vault-passphrase` is read
+  beside a vault only when this machine committed that vault's key set, so bare
+  `amc`, `amc run`, `amc init` and `amc monitor start` never open, migrate or
+  commit a cloned vault with a passphrase the clone supplies.
 - Consent binds the signer, the signed `tools.yaml` and the signed presets.
   Skills are not part of the digest (they are prompt text, stamped as data), and
   neither are the narrowing layers a repository can only tighten against its own

@@ -11,6 +11,7 @@ import { registerSandboxCommands } from "../src/cli-sandbox-commands.js";
 import { registerNativeScheduleCommands } from "../src/cli-native-schedule-commands.js";
 import { openAgentSession } from "../src/agent/agentSession.js";
 import { keysetAnchoring } from "../src/keys/keyset.js";
+import { ensureInstantVaultMode } from "../src/cli/instantVaultMode.js";
 import { lockVault, vaultPaths } from "../src/vault/vault.js";
 import { amcSecretPaths } from "../src/sandbox/shellSecretPaths.js";
 import { LocalCredentialsService } from "../src/credentials/localCredentialsService.js";
@@ -243,6 +244,22 @@ describe("through the real surfaces", () => {
       expect(workspaceTrustVerdict(legacy)).toMatchObject({ state: "trusted", reason: "committed-keys" });
       lockVault(legacy);
     } finally { process.chdir(workspace); rmSync(legacy, { recursive: true, force: true }); }
+  });
+
+  it("a 1.x-layout clone that ships .amc/local-vault-passphrase is not opened, so not migrated, by bare amc / amc run / amc init", () => {
+    const legacy = legacyLayoutWorkspace();
+    try {
+      writeFileSync(join(legacy, ".amc", "local-vault-passphrase"), `${process.env.AMC_VAULT_PASSPHRASE!}\n`, { mode: 0o600 });
+      asClone();
+      vi.stubEnv("AMC_VAULT_PASSPHRASE", ""); // the operator exported nothing; only the repository's file names a passphrase
+      expect(ensureInstantVaultMode(legacy)).toMatchObject({ noSign: true });
+      expect(process.env.AMC_VAULT_PASSPHRASE).toBe("");
+      // Had it opened the vault, the migration would have committed the repository's key set here and the clone would
+      // read as this machine's own ("committed-keys").
+      expect(existsSync(join(legacy, ".amc", "keys", "keyset.json"))).toBe(false);
+      expect(keysetAnchoring(legacy)).toEqual({ state: "none", generation: null });
+      expect(workspaceTrustVerdict(legacy).state).toBe("first-use");
+    } finally { rmSync(legacy, { recursive: true, force: true }); }
   });
 
   it("openAgentSession (SDK, ACP, Studio, wire) refuses an untrusted workspace and records the ACP flag as its source", async () => {

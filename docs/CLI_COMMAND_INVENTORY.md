@@ -1182,7 +1182,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc trust init` | Create and sign .amc/trust.yaml — sets up the trust mode (SELF/NOTARY) that governs artifact signing | - | - |
 | `amc trust resign` | Re-sign the current .amc/trust.yaml in place with the current artifact-seal key, keeping NOTARY settings | `--confirm <sha256>`<br>`--accept-compromised-signer` | - |
 | `amc trust status` | Show trust mode, signature status, and notary health | - | - |
-| `amc trust workspace` | Trust this workspace's signed configuration (key set and tools policy) on this machine, or show, revoke or repair that record | `--workspace <dir>`<br>`--status`<br>`--revoke`<br>`--repair-store`<br>`--json` | - |
+| `amc trust workspace` | Trust this workspace's signed configuration (key set, tools policy and presets) on this machine, or show, revoke or repair that record | `--workspace <dir>`<br>`--status`<br>`--revoke`<br>`--repair-store`<br>`--json` | - |
 | `amc truthguard` | Deterministic output truth-constraint validator | - | - |
 | `amc truthguard validate` | Validate structured agent output claims against deterministic truth constraints | `--file <json>` | - |
 | `amc tune` | Mechanic mode tuning wizard | `--target <name>` | - |
