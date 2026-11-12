@@ -155,6 +155,8 @@ export function requestAuditEvidenceApproval(params: {
   actorUsername: string;
   actorRoles: UserRole[];
   reason: string;
+  /** H-1: only an authenticated owner's decision is recorded; a self-asserted actor only raises the request. */
+  actorAuthentication: "authenticated" | "self-asserted";
 }) {
   const request = loadEvidenceRequest(params.workspace, params.requestId);
   if (request.status !== "OPEN") {
@@ -199,7 +201,7 @@ export function requestAuditEvidenceApproval(params: {
   });
 
   // Record owner approval decision as the start of the dual-control flow.
-  if (params.actorRoles.includes("OWNER")) {
+  if (params.actorRoles.includes("OWNER") && params.actorAuthentication === "authenticated") {
     decideApprovalForIntent({
       workspace: params.workspace,
       agentId,
@@ -209,7 +211,8 @@ export function requestAuditEvidenceApproval(params: {
       reason: params.reason || "audit evidence request approved by owner",
       userId: params.actorUserId,
       username: params.actorUsername,
-      userRoles: params.actorRoles
+      userRoles: params.actorRoles,
+      reviewerAuthentication: "authenticated"
     });
   }
 

@@ -155,7 +155,7 @@ async function approvedWrite(f: Fixture, agentId = B) {
   expect(intent).toMatchObject({ allowed: true, effectiveMode: "EXECUTE", approvalRequired: true });
   expect(intent.approvalRequestId).toEqual(expect.any(String));
   const approvalId = intent.approvalRequestId!;
-  decideApprovalForIntent({ workspace: f.workspace, agentId, approvalId, decision: "APPROVED", mode: "EXECUTE",
+  decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: f.workspace, agentId, approvalId, decision: "APPROVED", mode: "EXECUTE",
     reason: "Approve the private credential-binding fixture output", userId: f.owner.userId,
     username: f.owner.username, userRoles: f.owner.roles });
   expect(approvalState(f, agentId, approvalId)).toMatchObject({ status: "QUORUM_MET", executionReady: true,

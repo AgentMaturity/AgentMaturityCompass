@@ -397,7 +397,7 @@ describe("proposals for human approval (SH-INTEG-02)", () => {
     releaseProposal(db, second.observationId, (reservation as { token: string }).token);
     expect(listSourceObservationIds(db, { pendingOnly: true })).toEqual([second.observationId]);
     // A human decides with the existing approvals engine (only an EXECUTE approval counts toward quorum); status reflects it.
-    decideApprovalForIntent({ workspace: root, agentId: "default", approvalId: request.approvalRequestId, decision: "APPROVED", mode: "EXECUTE", reason: "ok",
+    decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: root, agentId: "default", approvalId: request.approvalRequestId, decision: "APPROVED", mode: "EXECUTE", reason: "ok",
       username: "owner", userId: "owner", userRoles: ["OWNER"] });
     db.close();
     const status = sourceStatusCli({ workspace: root });
@@ -475,7 +475,7 @@ describe("proposals for human approval (SH-INTEG-02)", () => {
     const request = listApprovalRequests({ workspace: root, agentId: "default" })[0]!;
     expect(request).toMatchObject({ workOrderId, intentId: sourceIntentId(observation.observationId), requiredApprovals: 2, requireDistinctUsers: true, rolesAllowed: ["OWNER"] });
     // Two APPROVER-only users do not count toward quorum (the SECURITY rule allows OWNER/AUDITOR only); two distinct OWNERs do.
-    const decide = (userId: string, userRoles: Array<"APPROVER" | "OWNER">) => decideApprovalForIntent({ workspace: root, agentId: "default", approvalId: request.approvalRequestId,
+    const decide = (userId: string, userRoles: Array<"APPROVER" | "OWNER">) => decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: root, agentId: "default", approvalId: request.approvalRequestId,
       decision: "APPROVED", mode: "EXECUTE", reason: "ok", username: userId, userId, userRoles });
     const quorum = () => approvalStatusPayload({ workspace: root, agentId: "default", approvalId: request.approvalRequestId }).quorum;
     decide("a1", ["APPROVER"]);

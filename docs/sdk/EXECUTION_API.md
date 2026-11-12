@@ -33,7 +33,8 @@ What each verb means on every surface:
   engine, the same records every surface reads. The engine refuses the run's initiator where the action class needs
   distinct users, a request that is no longer pending, and a changed request when the decision binds its digest. The
   SDKs run the same installed CLI the session runs under. `approve` is not the A4 gate decision (P2-37), which has its
-  own route and record.
+  own route and record. An EXECUTE approval needs the reviewer's `amc approvals login` session file and the request
+  digest; self-asserted `username`/`roles` alone are refused.
 - **cancel** requests a signed user cancellation of the turn in flight. A cancelled turn's model phase reads `failed`.
 - **resume** continues the same session, verified before its writer is taken. A sealed session cannot resume; fork it.
 - **fork** opens a new session whose signed `session/open` row names the parent's verified final row. The parent,
@@ -101,8 +102,10 @@ CLI:
 ```bash
 amc agent-loop run "summarise the changelog" --provider stub --tools workspace --approve-tools WRITE_HIGH --keep-open --json
 amc approvals list --agent default --status pending --json
+amc approvals login --username <reviewer> --token-file <private-session-file> --json
 amc approvals approve <approvalRequestId> --agent default --mode execute --reason "<reviewed reason>" \
-  --username <reviewer> --roles APPROVER
+  --user-id <userId> --username <reviewer> --roles APPROVER --session-token-file <private-session-file> \
+  --expect-request-digest <requestDigestSha256>
 amc agent-loop run "continue" --session <sessionId> --provider stub --tools workspace --approve-tools WRITE_HIGH --json
 amc agent-loop run "branch" --fork-from <sessionId> --provider stub --tools workspace --approve-tools WRITE_HIGH --json
 amc agent-loop verify <sessionId> --json
@@ -118,7 +121,8 @@ const client = await AMCNativeClient.start(options);
 const session = await client.newSession();
 const turn = session.prompt("summarise the changelog");
 for (const pending of await client.pendingApprovals()) {
-  await client.approve({ approvalRequestId: pending.approvalRequestId, reason: "<reviewed reason>", username: "<reviewer>", roles: ["APPROVER"] });
+  await client.approve({ approvalRequestId: pending.approvalRequestId, reason: "<reviewed reason>", username: "<reviewer>", roles: ["APPROVER"],
+    userId: "<userId>", sessionTokenFile: "<private-session-file>", expectRequestDigest: pending.requestDigestSha256 });
 }
 console.log((await turn.result).execution?.phases);
 await client.dispose();                                     // release, then stop the process
@@ -140,7 +144,8 @@ agent = AmcAgent(".", **options)
 session = agent.new_session()
 turn = session.start_prompt("summarise the changelog")
 for pending in agent.pending_approvals():
-    agent.approve(pending.approval_request_id, reason="<reviewed reason>", username="<reviewer>", roles=["APPROVER"])
+    agent.approve(pending.approval_request_id, reason="<reviewed reason>", username="<reviewer>", roles=["APPROVER"],
+                  user_id="<userId>", session_token_file="<private-session-file>", expect_request_digest=pending.request_digest_sha256)
 print(turn.result().execution.phases)
 agent.dispose()
 

@@ -117,14 +117,14 @@ describe("P2-24 break-glass", () => {
     // The activator is the authenticated session user, recorded as the request's initiator: the engine refuses their
     // decision under their user id, and under another display name for the same id.
     expect(() => decideBound(f.workspace, own.approval, [{ id: who(f).oncall.userId, role: "OWNER" }])).toThrow(/initiator cannot approve/);
-    expect(() => decideApprovalForIntent({ workspace: f.workspace, agentId: AGENT, approvalId: own.approval.approvalRequestId, decision: "APPROVED",
+    expect(() => decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: f.workspace, agentId: AGENT, approvalId: own.approval.approvalRequestId, decision: "APPROVED",
       mode: "EXECUTE", reason: "alias", userId: who(f).oncall.userId, username: "fixture-oncall-alias", userRoles: ["OWNER"],
       expectedRequestDigestSha256: own.approval.requestBindingDigest })).toThrow(/initiator cannot approve/);
     expect(own.draft.activatedBy).toEqual({ userId: who(f).oncall.userId, roles: ["OPERATOR"] });
     await expect(activateBreakGlass(f.workspace, own.draft.breakGlassId, own.approval)).rejects.toThrow(/approval_missing/);
     const g = governanceFixture();
     const unbound = await request(g);
-    decideApprovalForIntent({ workspace: g.workspace, agentId: AGENT, approvalId: unbound.approval.approvalRequestId, decision: "APPROVED",
+    decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: g.workspace, agentId: AGENT, approvalId: unbound.approval.approvalRequestId, decision: "APPROVED",
       mode: "EXECUTE", reason: "unbound fixture decision", userId: OWNER.id, username: OWNER.id, userRoles: ["OWNER"] });
     await expect(activateBreakGlass(g.workspace, unbound.draft.breakGlassId, unbound.approval)).rejects.toThrow(/approval_missing/);
     decideBound(g.workspace, unbound.approval, [AUDITOR], "DENIED");

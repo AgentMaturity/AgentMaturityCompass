@@ -103,7 +103,7 @@ function activateFixture(workspace: string): void {
   const { signed } = signPlan({ workspace, plan, previous: null, reviewAgentId: "default" });
   const approvalId = signed.review.approvalRequestId!;
   for (const userId of ["p227-fixture-reviewer-1", "p227-fixture-reviewer-2"]) {
-    decideApprovalForIntent({ workspace, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE",
+    decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE",
       reason: "Owned synthetic plan activation contract", userId, username: userId, userRoles: ["OWNER"] });
   }
   activateControlPlan({ workspace, signed, approvalRequestId: approvalId, reviewAgentId: "default" });

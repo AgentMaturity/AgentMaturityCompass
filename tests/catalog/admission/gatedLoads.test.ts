@@ -67,7 +67,7 @@ describe("one gated catalog for compile, activation, the OSCAL export and A4 (P1
     const { signed } = signPlan({ workspace: ws, plan, previous: null, reviewAgentId: "default" });
     const approvalId = signed.review.approvalRequestId!;
     for (const userId of ["owner-1", "owner-2"]) {
-      decideApprovalForIntent({ workspace: ws, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE", reason: "P1-33 gated lock fixture",
+      decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: ws, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE", reason: "P1-33 gated lock fixture",
         userId, username: userId, userRoles: ["OWNER"] });
     }
     activateControlPlan({ workspace: ws, signed, approvalRequestId: approvalId, reviewAgentId: "default" });

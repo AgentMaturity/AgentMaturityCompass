@@ -629,9 +629,16 @@ export function deriveTrustSummaryFromRun(workspace: string, agentId: string, ru
 
 /** Why a sealed run cannot vouch at any threshold: it is not a measurement. Never set for a merely low index. */
 function runHardGap(run: DiagnosticReport): string | null {
-  if (!run.verificationPassed || run.status !== "VALID") return `latest trusted run ${run.runId} failed ledger verification (status ${run.status})`;
+  // A violated boundary also marks the run INVALID, so it is named first: it is the cause, and the fix differs (M-2).
+  if (run.trustBoundaryViolated === true) {
+    return `latest trusted run ${run.runId} violated the trust boundary${run.trustBoundaryMessage ? `: ${run.trustBoundaryMessage}` : ""}. Fix: set `
+      + "security.trustBoundaryMode: isolated in .amc/amc.config.yaml (only when the monitor and auditor keys are isolated from the evaluated agent), "
+      + "re-sign it with amc verify --sign-config, then run a new score run (amc run --score-only)";
+  }
+  if (!run.verificationPassed) return `latest trusted run ${run.runId} failed ledger verification (status ${run.status})`;
+  if (run.status !== "VALID") return `latest trusted run ${run.runId} is not VALID (status ${run.status}) although its ledger verification passed`;
   if (run.trustBoundaryViolated !== false) {
-    return `latest trusted run ${run.runId} ${run.trustBoundaryViolated === true ? "violated the trust boundary" : "records no trust-boundary result"}${run.trustBoundaryMessage ? `: ${run.trustBoundaryMessage}` : ""}`;
+    return `latest trusted run ${run.runId} records no trust-boundary result${run.trustBoundaryMessage ? `: ${run.trustBoundaryMessage}` : ""}`;
   }
   return null;
 }

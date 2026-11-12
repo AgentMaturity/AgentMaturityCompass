@@ -347,7 +347,7 @@ describe("plugin marketplace", () => {
       action: "install"
     });
     expect(requested.approvalRequestId).toMatch(/^apprreq_/);
-    decideApprovalForIntent({
+    decideApprovalForIntent({ reviewerAuthentication: "authenticated",
       workspace: ws,
       agentId: "default",
       approvalId: requested.approvalRequestId,
@@ -365,7 +365,7 @@ describe("plugin marketplace", () => {
       })
     ).toThrow(/approval quorum not met/i);
 
-    decideApprovalForIntent({
+    decideApprovalForIntent({ reviewerAuthentication: "authenticated",
       workspace: ws,
       agentId: "default",
       approvalId: requested.approvalRequestId,
@@ -388,7 +388,7 @@ describe("plugin marketplace", () => {
       initiator: "test-operator", workspace: ws, agentId: "default", pluginId: executed.pluginId
     });
     for (const role of ["OWNER", "AUDITOR"] as const) {
-      decideApprovalForIntent({
+      decideApprovalForIntent({ reviewerAuthentication: "authenticated",
         workspace: ws, agentId: "default", approvalId: removal.approvalRequestId,
         decision: "APPROVED", mode: "EXECUTE", reason: "reviewed removal",
         userId: `${role}-remove`, username: `${role}-remove`, userRoles: [role]
@@ -466,7 +466,7 @@ describe("plugin marketplace", () => {
       action: "install"
     });
 
-    decideApprovalForIntent({
+    decideApprovalForIntent({ reviewerAuthentication: "authenticated",
       workspace: ws,
       agentId: "default",
       approvalId: requested.approvalRequestId,
@@ -477,7 +477,7 @@ describe("plugin marketplace", () => {
       username: "owner-1",
       userRoles: ["OWNER"]
     });
-    decideApprovalForIntent({
+    decideApprovalForIntent({ reviewerAuthentication: "authenticated",
       workspace: ws,
       agentId: "default",
       approvalId: requested.approvalRequestId,
@@ -525,7 +525,7 @@ describe("plugin marketplace", () => {
     const requested = await requestPluginInstall({ initiator: "test-operator", workspace: ws, agentId: "default", registryId: "local",
       pluginRef: "amc.plugin.fixture.install@2.0.0", action: "install" });
     for (const [user, role] of [["owner-1", "OWNER"], ["auditor-1", "AUDITOR"]] as const) {
-      decideApprovalForIntent({ workspace: ws, agentId: "default", approvalId: requested.approvalRequestId, decision: "APPROVED",
+      decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: ws, agentId: "default", approvalId: requested.approvalRequestId, decision: "APPROVED",
         mode: "EXECUTE", reason: "approval", userId: user, username: user, userRoles: [role] });
     }
     const lockPath = join(ws, ".amc", "plugins", "installed.lock.json");

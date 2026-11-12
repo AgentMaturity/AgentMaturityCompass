@@ -89,7 +89,7 @@ const ASK: ApprovalAsk = {
 /** Both approvals the default WRITE_HIGH rule requires, by two distinct people. */
 function reachQuorum(workspace: string, approvalRequestId: string): void {
   for (const who of ["ada", "grace"]) {
-    decideApprovalForIntent({
+    decideApprovalForIntent({ reviewerAuthentication: "authenticated",
       workspace,
       agentId: "default",
       approvalId: approvalRequestId,
@@ -270,7 +270,7 @@ describe("the approval seam on the composed tree", () => {
       const pending = listApprovalRequests({ workspace, agentId: "default" })[0];
       if (pending === undefined) return;
       clearInterval(denier);
-      decideApprovalForIntent({
+      decideApprovalForIntent({ reviewerAuthentication: "authenticated",
         workspace,
         agentId: "default",
         approvalId: pending.approvalRequestId,

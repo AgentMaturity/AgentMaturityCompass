@@ -27,7 +27,9 @@ interface ApprovalReviewerOptions {
 
 function reviewerFor(workspace: string, approvalId: string, opts: ApprovalReviewerOptions) {
   const roles = parseApprovalReviewerRoles(opts.roles);
-  const supplied = { userId: opts.userId ?? opts.username, username: opts.username, roles, boundDigest: undefined as string | undefined };
+  // Without a session token the reviewer fields are self-asserted: the engine refuses them an EXECUTE approval (H-1).
+  const supplied = { userId: opts.userId ?? opts.username, username: opts.username, roles, boundDigest: undefined as string | undefined,
+    authentication: "self-asserted" as "self-asserted" | "authenticated" };
   if (opts.sessionTokenFile === undefined && opts.expectRequestDigest === undefined) return supplied;
   if (!opts.sessionTokenFile || !opts.expectRequestDigest) throw new Error("Authenticated native decisions require both --session-token-file and --expect-request-digest");
   const actor = readNativeApprovalActor(workspace, opts.sessionTokenFile);
@@ -40,7 +42,7 @@ function reviewerFor(workspace: string, approvalId: string, opts: ApprovalReview
   const boundDigest = approvalRequestBindingDigest(inbox.request);
   if (opts.expectRequestDigest !== inbox.requestDigestSha256 && opts.expectRequestDigest !== boundDigest) throw new Error("Approval changed or is no longer trusted and pending; review it again");
   if (!actor.roles.some(role => inbox.request.rolesAllowed.includes(role))) throw new Error("Authenticated reviewer has no role allowed for this request");
-  return { ...actor, boundDigest };
+  return { ...actor, boundDigest, authentication: "authenticated" as const };
 }
 
 export function registerApprovalCliCommands(program: Command): void {
@@ -155,6 +157,7 @@ export function registerApprovalCliCommands(program: Command): void {
         username: reviewer.username,
         userId: reviewer.userId,
         userRoles: reviewer.roles,
+        reviewerAuthentication: reviewer.authentication,
         ...(reviewer.boundDigest === undefined ? {} : { expectedRequestDigestSha256: reviewer.boundDigest })
       });
       const delivery = await deliverApprovalLifecycle({
@@ -189,6 +192,7 @@ export function registerApprovalCliCommands(program: Command): void {
         username: reviewer.username,
         userId: reviewer.userId,
         userRoles: reviewer.roles,
+        reviewerAuthentication: reviewer.authentication,
         ...(reviewer.boundDigest === undefined ? {} : { expectedRequestDigestSha256: reviewer.boundDigest })
       });
       const delivery = await deliverApprovalLifecycle({

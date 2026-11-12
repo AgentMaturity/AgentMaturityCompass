@@ -154,7 +154,7 @@ describe("a governed agent turn: identity, context, and a human in the loop", ()
   /** Both approvals the default WRITE_HIGH rule requires, by two distinct people. */
   function reachQuorum(approvalRequestId: string, decision: "APPROVED" | "DENIED"): void {
     for (const who of ["ada", "grace"]) {
-      decideApprovalForIntent({
+      decideApprovalForIntent({ reviewerAuthentication: "authenticated",
         workspace,
         agentId: "default",
         approvalId: approvalRequestId,

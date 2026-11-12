@@ -306,7 +306,7 @@ describe("public benchmark registry", () => {
     });
     expect(requested.approvalRequestId).toMatch(/^apprreq_/);
 
-    decideApprovalForIntent({
+    decideApprovalForIntent({ reviewerAuthentication: "authenticated",
       workspace: ws,
       agentId: "default",
       approvalId: requested.approvalRequestId,
@@ -324,7 +324,7 @@ describe("public benchmark registry", () => {
       })
     ).toThrow(/quorum/i);
 
-    decideApprovalForIntent({
+    decideApprovalForIntent({ reviewerAuthentication: "authenticated",
       workspace: ws,
       agentId: "default",
       approvalId: requested.approvalRequestId,

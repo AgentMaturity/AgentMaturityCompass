@@ -63,6 +63,27 @@ def _pending(agent: AmcAgent, exclude: set[str]) -> str:
     raise AssertionError("no pending approval was raised")
 
 
+def _reviewer(workspace: str, amc_bin: list[str], env: dict[str, str], username: str) -> dict:
+    """A fixture users.yaml reviewer with a real `amc approvals login` session: EXECUTE approvals need an authenticated reviewer."""
+    secrets = tempfile.mkdtemp(prefix="amc-parity-reviewer-")
+    password, password_file, token_file = f"{username}-parity-password", os.path.join(secrets, "password"), os.path.join(secrets, "session")
+    with open(os.open(password_file, os.O_WRONLY | os.O_CREAT, 0o600), "w", encoding="utf-8") as handle:
+        handle.write(password)
+    full_env = {**os.environ, **env}
+    added = subprocess.run([*amc_bin, "user", "add", "--username", username, "--role", "APPROVER", "--password-file", password_file],
+                           cwd=workspace, env=full_env, capture_output=True, text=True, check=False)
+    assert added.returncode == 0, added.stderr
+    login = subprocess.run([*amc_bin, "approvals", "login", "--username", username, "--token-file", token_file, "--password-stdin", "--json"],
+                           cwd=workspace, env=full_env, input=password, capture_output=True, text=True, check=False)
+    assert login.returncode == 0, login.stderr
+    return {"user_id": json.loads(login.stdout)["userId"], "session_token_file": token_file}
+
+
+def _approve(agent: AmcAgent, approval_request_id: str, reviewer: dict, username: str, reason: str) -> None:
+    digest = next(a.request_digest_sha256 for a in agent.pending_approvals() if a.approval_request_id == approval_request_id)
+    agent.approve(approval_request_id, reason=reason, username=username, roles=["APPROVER"], expect_request_digest=digest, **reviewer)
+
+
 def tamper(workspace: str, session_id: str) -> None:
     """A hostile owner rewriting one of the session's signed rows beneath the storage triggers."""
     db = sqlite3.connect(os.path.join(workspace, ".amc", "evidence.sqlite"))
@@ -86,13 +107,14 @@ def run_scenario(workspace: str, amc_bin: list[str], env: dict[str, str]) -> dic
     verbs.add("start")
     turn = session.start_prompt(READ)
     first = _pending(agent, set())
+    sessions = {name: _reviewer(workspace, amc_bin, env, name) for name in (initiator, *REVIEWERS)}
     try:
-        agent.approve(first, reason="parity: the initiator", username=initiator, roles=["APPROVER"])
+        _approve(agent, first, sessions[initiator], initiator, "parity: the initiator")
         record["initiatorApproval"] = "accepted"
     except AmcRefusedError:
         record["initiatorApproval"] = "refused"
     for reviewer in REVIEWERS:
-        agent.approve(first, reason="parity fixture reviewer, not a human decision", username=reviewer, roles=["APPROVER"])
+        _approve(agent, first, sessions[reviewer], reviewer, "parity fixture reviewer, not a human decision")
     verbs.add("approve")
     approved = turn.result()
     record["streamed"] = any(True for _ in turn.iter_updates())

@@ -35,7 +35,8 @@ export interface ActionPolicyCall {
 }
 
 /** The Action Policy's verdict for one call, or null when it does not apply (not configured, or the Code Mode transport). */
-function actionPolicyVerdict(workspace: string, call: ActionPolicyCall): { readonly denial: string | null; readonly mode: ToolMode } | null {
+function actionPolicyVerdict(workspace: string, call: ActionPolicyCall):
+  { readonly denial: string | null; readonly mode: ToolMode; readonly reasons?: readonly string[] } | null {
   // The transport is not a capability; each call it dispatches meets this verdict on its own name and class.
   if (call.name === RUN_CODE_TOOL) return null;
   const state = actionPolicyState(workspace);
@@ -53,7 +54,7 @@ function actionPolicyVerdict(workspace: string, call: ActionPolicyCall): { reado
     if (decision.conditionResults.some((condition) => condition.passed === false && EXECUTION_STAGE_CONDITIONS.has(condition.conditionId))) {
       return { denial: `Action Policy refused EXECUTE of ${call.actionClass}: ${decision.reasons.join(" ")}`, mode: call.requestedMode };
     }
-    return { denial: null, mode: decision.effectiveMode };
+    return { denial: null, mode: decision.effectiveMode, reasons: decision.reasons };
   } catch (error) {
     return { denial: `Action Policy could not be evaluated: ${error instanceof Error ? error.message : String(error)}`, mode: "SIMULATE" };
   }
@@ -62,6 +63,23 @@ function actionPolicyVerdict(workspace: string, call: ActionPolicyCall): { reado
 /** The mode a call enters with: SIMULATE where the signed policy downgrades it, otherwise as requested. Never widens. */
 export function actionPolicyMode(workspace: string): (call: ActionPolicyCall) => ToolMode {
   return (call) => call.requestedMode === "EXECUTE" && actionPolicyVerdict(workspace, call)?.mode === "SIMULATE" ? "SIMULATE" : call.requestedMode;
+}
+
+/**
+ * Why a call that asked for EXECUTE ran as SIMULATE (H-3), as one line appended to its output, so the model, print mode,
+ * chat and stream-json all say nothing was executed and why. `otherNarrowing` names a narrowing the policy did not make
+ * (an approval mode). A call that ran as requested is returned unchanged.
+ */
+export function simulationNotice(workspace: string, otherNarrowing: string | null): (output: string, call: ActionPolicyCall & { readonly effectiveMode: ToolMode }) => string {
+  return (output, call) => {
+    if (call.requestedMode !== "EXECUTE" || call.effectiveMode !== "SIMULATE") return output;
+    const verdict = actionPolicyVerdict(workspace, call);
+    const reasons = verdict?.mode === "SIMULATE" ? (verdict.reasons ?? []) : [];
+    const why = verdict?.mode === "SIMULATE"
+      ? `the signed Action Policy runs ${call.actionClass} as SIMULATE${reasons.length === 0 ? "" : ` (${reasons.slice(0, 2).join("; ")}${reasons.length > 2 ? `; +${reasons.length - 2} more` : ""})`}`
+      : otherNarrowing ?? `${call.actionClass} was narrowed to SIMULATE`;
+    return `${output}\nsimulated, not executed: ${why}; see \`amc governor check --agent ${call.agentId} --action ${call.actionClass} --risk med --mode execute\``;
+  };
 }
 
 /**

@@ -134,7 +134,7 @@ describe("P2-24 scoped exceptions at the enforcement point", () => {
     // their id or another display name, and it would never count here.
     expect(one.draft.requestedBy).toBe(requesterSession(f.workspace).userId);
     expect(() => decideBound(f.workspace, one.approval, [{ id: requesterSession(f.workspace).userId, role: "OWNER" }])).toThrow(/initiator cannot approve/);
-    expect(() => decideApprovalForIntent({ workspace: f.workspace, agentId: AGENT, approvalId: one.approval.approvalRequestId, decision: "APPROVED",
+    expect(() => decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: f.workspace, agentId: AGENT, approvalId: one.approval.approvalRequestId, decision: "APPROVED",
       mode: "EXECUTE", reason: "alias", userId: requesterSession(f.workspace).userId, username: "requester-alias", userRoles: ["OWNER"],
       expectedRequestDigestSha256: one.approval.requestBindingDigest })).toThrow(/initiator cannot approve/);
     await expect(issueScopedException(f.workspace, one.draft, one.approval)).rejects.toThrow(/approval_missing/);

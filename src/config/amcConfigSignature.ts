@@ -98,3 +98,15 @@ export function createCompositionSignatureVerifier(workspace: string): (input: {
     }
   };
 }
+
+/**
+ * amc.config.yaml's signature, by the check the trust boundary applies (M-3), or null when it verifies. `amc
+ * fix-signatures` does not re-sign it: its signature vouches for the trustBoundaryMode claim, so re-signing is the
+ * deliberate `amc verify --sign-config`, which this names.
+ */
+export function amcConfigSignatureProblem(workspace: string): string | null {
+  const signature = verifyAmcConfigSignature(workspace);
+  if (signature.valid) return null;
+  return `${signature.signatureExists ? `amc.config.yaml signature is not valid (${signature.reason ?? "unknown"})` : `amc.config.yaml is unsigned (${signature.reason ?? "unknown"})`}: `
+    + "review .amc/amc.config.yaml (its trustBoundaryMode claim), then re-sign it with: amc verify --sign-config";
+}

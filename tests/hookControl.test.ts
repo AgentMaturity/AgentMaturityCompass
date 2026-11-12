@@ -666,7 +666,7 @@ describe("AXR-22 signed hook approvals", () => {
     const requests = () => listApprovalRequests({ workspace, agentId });
     const decide = (decision: "APPROVED" | "DENIED" = "APPROVED", userId = "reviewer-one") => {
       const request = requests()[0]!;
-      return decideApprovalForIntent({ workspace, agentId, approvalId: request.approvalRequestId,
+      return decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace, agentId, approvalId: request.approvalRequestId,
         decision, mode: "EXECUTE", reason: "Reviewed exact hook call", username: userId, userId, userRoles: ["APPROVER"] });
     };
     return { workspace, agentId, fields, raw, input, requests, decide };

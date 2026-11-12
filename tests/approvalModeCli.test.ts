@@ -202,7 +202,7 @@ describe("a mode under an active compiled policy", () => {
     const { signed } = signPlan({ workspace, plan, previous: null, reviewAgentId: "default" });
     const approvalId = signed.review.approvalRequestId!;
     for (const userId of ["approver-1", "approver-2"]) {
-      decideApprovalForIntent({ workspace, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE", reason: "approval-mode fixture plan review", userId, username: userId, userRoles: ["OWNER"] });
+      decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE", reason: "approval-mode fixture plan review", userId, username: userId, userRoles: ["OWNER"] });
     }
     activateControlPlan({ workspace, signed, approvalRequestId: approvalId, reviewAgentId: "default" });
   }

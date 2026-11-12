@@ -222,7 +222,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--mission-context", "include the agent's validated mission and constraints as attributed runtime context")
     .option(
       "--approve-tools <actionClass>",
-      "require a signed human approval before every tool call, decided under this action class"
+      "require a signed approval before every tool call, decided under this action class's signed rule (a human is asked unless that rule needs 0 approvals, as READ_ONLY's default does)"
     )
     .option("--approve-risk <tier>", "risk tier the approval is raised at (default high)")
     .option("--approval-mode <mode>", "plan, default, accept-edits or untrusted: which calls a human is asked about, on top of every signed policy; plan runs nothing (SIMULATE); not with --approve-tools")

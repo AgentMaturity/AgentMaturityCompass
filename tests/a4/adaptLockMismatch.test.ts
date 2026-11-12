@@ -40,7 +40,7 @@ function activate(ws: string): void {
   const { signed } = signPlan({ workspace: ws, plan, previous: null, reviewAgentId: "default" });
   const approvalId = signed.review.approvalRequestId!;
   for (const userId of ["owner-1", "owner-2"]) {
-    decideApprovalForIntent({ workspace: ws, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE", reason: "lock fixture plan review",
+    decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: ws, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE", reason: "lock fixture plan review",
       userId, username: userId, userRoles: ["OWNER"] });
   }
   activateControlPlan({ workspace: ws, signed, approvalRequestId: approvalId, reviewAgentId: "default" });

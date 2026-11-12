@@ -510,6 +510,7 @@ export function auditRequestApproveForApi(params: {
   actorUsername: string;
   actorRoles: Array<"OWNER" | "AUDITOR" | "APPROVER" | "OPERATOR" | "VIEWER" | "AGENT">;
   reason: string;
+  actorAuthentication: "authenticated" | "self-asserted";
 }) {
   return requestAuditEvidenceApproval({
     workspace: params.workspace,
@@ -518,7 +519,8 @@ export function auditRequestApproveForApi(params: {
     actorUserId: params.actorUserId,
     actorUsername: params.actorUsername,
     actorRoles: params.actorRoles,
-    reason: params.reason
+    reason: params.reason,
+    actorAuthentication: params.actorAuthentication
   });
 }
 

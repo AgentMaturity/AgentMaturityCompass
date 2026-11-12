@@ -3,6 +3,7 @@ import type { UserRole } from "../auth/roles.js";
 import { recordApprovalDecisionMetric } from "../ops/metrics/metricsMiddleware.js";
 import {
   cancelApprovalRequest,
+  countedApprovalDecisions,
   loadApprovalRequestRecord,
   updateApprovalRequestStatus
 } from "./approvalChainStore.js";
@@ -180,7 +181,7 @@ export async function decideApprovalInStudio(params: {
   if (
     (rule?.requireDistinctUsers ?? false) &&
     decision !== "DENY" &&
-    inbox.decisions.some((row) => row.decision !== "DENY" &&
+    countedApprovalDecisions(inbox.decisions).some((row) => row.decision !== "DENY" &&
       (row.username === params.actor.username || row.userId === (params.actor.userId ?? params.actor.username)))
   ) {
     params.writeAudit({
@@ -244,6 +245,8 @@ export async function decideApprovalInStudio(params: {
       username: params.actor.username,
       userId: params.actor.userId ?? params.actor.username,
       userRoles: bound || params.actor.roles.length > 0 ? params.actor.roles : ["OWNER"],
+      // The route resolved this actor from the signed-in session or the admin token (requireRouteRoles).
+      reviewerAuthentication: "authenticated",
       ...(bound ? { expectedRequestDigestSha256: params.expectedRequestDigestSha256 } : {})
     });
   } catch (error) {
