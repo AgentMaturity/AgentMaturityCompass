@@ -117,7 +117,19 @@ async function drain(stream: AsyncIterable<StreamChunk>, observed: StreamChunk[]
 }
 
 function executableCalls(chunks: readonly StreamChunk[]): ToolUseContentBlock[] {
-  return chunks.flatMap(chunk => chunk.type === "block-end" && chunk.block.kind === "tool_use" ? [chunk.block] : []);
+  return chunks.flatMap(chunk => chunk.type === "block-end" && chunk.block.kind === "tool_use" && chunk.block.unoffered !== true ? [chunk.block] : []);
+}
+/** Smoke M-5: an unoffered name arrives verbatim, marked, unbound — the loop refuses it; the request does not fail. */
+function unofferedCalls(chunks: readonly StreamChunk[]): ToolUseContentBlock[] {
+  const blocks = chunks.flatMap(chunk => chunk.type === "block-end" && chunk.block.kind === "tool_use" && chunk.block.unoffered === true ? [chunk.block] : []);
+  for (const block of blocks) expect(block).not.toHaveProperty("providerWireName");
+  return blocks;
+}
+function refuse(h: ReturnType<typeof harness>, toolCallId: string) {
+  const row = h.session.readEvents().find(event => event.event_type === "tool/call" && JSON.parse(event.meta_json).toolCallId === toolCallId)!;
+  expect(JSON.parse(row.meta_json)).not.toHaveProperty("providerName");
+  expect(h.session.readEvents().some(event => event.event_type === "request/failure")).toBe(false);
+  h.session.recordToolResult({ toolCallId, outcome: "DENIED", exitCode: null, timedOut: false, denied: true, content: "not available" });
 }
 
 function body(request: HttpRequest) {
@@ -159,7 +171,7 @@ describe("native DeepSeek signed runtime integration (authored; not live accepta
       name: "fs.read", providerWireName: wireName, arguments: rawArguments }]);
     const row = h.session.readEvents().find(event => event.event_type === "tool/call")!;
     expect(JSON.parse(row.meta_json)).toMatchObject({ toolName: "fs.read", toolCallId: "call-read",
-      providerName: { version: 1, wireName, headerEventId: first.headerEventId, encoderId: "deepseek-chat", encoderVersion: 1 } });
+      providerName: { version: 1, wireName, headerEventId: first.headerEventId, encoderId: "deepseek-chat", encoderVersion: 2 } });
     const payload = readEventPayload(h.workspace, row);
     expect(payload.status).toBe("ok");
     if (payload.status !== "ok") throw new Error("Tool arguments unavailable");
@@ -216,26 +228,26 @@ describe("native DeepSeek signed runtime integration (authored; not live accepta
     h.finishStep(first); h.session.startStep();
     const second = h.runtime.prepare(h.spec([schema("fs.stat")]));
     const seen: StreamChunk[] = [];
-    await expect(drain(second.stream(), seen)).rejects.toMatchObject({ code: "AMC_LLM_UNOFFERED_TOOL_NAME" });
+    await drain(second.stream(), seen);
+    expect(unofferedCalls(seen).map(block => block.name)).toEqual([wireName]);
     const transmitted = body(h.sent[1]!);
     expect(transmitted.tools?.map(tool => tool.function.name)).toEqual([providerToolWireName("fs.stat")]);
     expect(transmitted.messages.find(message => message.role === "assistant")).toMatchObject({
       reasoning_content: firstReason, tool_calls: [{ id: "old-call", function: { name: wireName, arguments: rawArguments } }] });
     expect(executableCalls(seen)).toEqual([]);
-    expect(h.session.readEvents().filter(row => row.event_type === "tool/call")).toHaveLength(1);
+    expect(h.session.readEvents().filter(row => row.event_type === "tool/call")).toHaveLength(2);
+    refuse(h, "forbidden-repeat");
     h.finishStep(second); h.close(true); assertCold(h, [first, second]);
   });
 
-  test("an unoffered valid alias cannot publish an executable tool block or signed tool/call", async () => {
+  test("an unoffered valid alias cannot publish an executable tool block; its call is recorded unbound", async () => {
     const h = harness([response(firstReason, "", { wireName: "unoffered_alias", id: "bad-call" })]);
     const call = h.runtime.prepare(h.spec([schema("fs.read")]));
     const seen: StreamChunk[] = [];
-    await expect(drain(call.stream(), seen)).rejects.toMatchObject({ code: "AMC_LLM_UNOFFERED_TOOL_NAME" });
+    await drain(call.stream(), seen);
     expect(executableCalls(seen)).toEqual([]);
-    expect(h.session.readEvents().filter(row => row.event_type === "tool/call")).toEqual([]);
-    const failure = h.session.readEvents().find(row => row.event_type === "request/failure")!;
-    expect(JSON.parse(failure.meta_json)).toMatchObject({ headerEventId: call.headerEventId,
-      failure: { code: "AMC_LLM_UNOFFERED_TOOL_NAME" }, policy: { retryable: false } });
+    expect(unofferedCalls(seen).map(block => block.name)).toEqual(["unoffered_alias"]);
+    refuse(h, "bad-call");
     h.finishStep(call); h.close(true); assertCold(h, [call]);
   });
 
@@ -250,9 +262,10 @@ describe("native DeepSeek signed runtime integration (authored; not live accepta
     tools.push({ ...schema(addedName) });
     const seen: StreamChunk[] = [];
     if (added) {
-      await expect(drain(call.stream(), seen)).rejects.toMatchObject({ code: "AMC_LLM_UNOFFERED_TOOL_NAME" });
+      await drain(call.stream(), seen);
       expect(executableCalls(seen)).toEqual([]);
-      expect(h.session.readEvents().filter(row => row.event_type === "tool/call")).toEqual([]);
+      expect(unofferedCalls(seen).map(block => block.name)).toEqual([providerToolWireName(addedName)]);
+      refuse(h, "snapshot-call");
     } else {
       await drain(call.stream(), seen);
       expect(executableCalls(seen).map(block => block.name)).toEqual([original]);

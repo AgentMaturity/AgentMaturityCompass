@@ -8,7 +8,7 @@ import { openSessionEventStore } from "../src/persistence/openSessionEventStore.
 import { loadSessionEventHistory } from "../src/session/sessionEventHistory.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { lockVault } from "../src/vault/vault.js";
-import { listNativeInteractiveSessions, assertNativeInteractiveSelection, renderNativeInteractiveSession } from "../src/setup/nativeInteractiveNavigation.js";
+import { listNativeInteractiveSessions, assertNativeInteractiveSelection, renderNativeInteractiveSession, renderNativeSessionList } from "../src/setup/nativeInteractiveNavigation.js";
 
 let workspace: string;
 const identity = { agentId: "default", harnessVersion: "navigation-test", compositionDigest: sha256Hex("composition"), policyDigest: sha256Hex("policy") };
@@ -73,4 +73,17 @@ it("keeps an active writer explicit while its next turn is still open", () => {
   try {
     expect(listNativeInteractiveSessions(workspace, "default")[0]).toMatchObject({ state: "active", canResume: false });
   } finally { service.endTurn({ reason: "complete" }); service.sealTurn(); service.releaseWithoutClosing(); }
+});
+
+it("smoke M-6: amc sessions list shows this agent's native sessions newest first with how to resume or inspect each", () => {
+  expect(renderNativeSessionList(workspace, "default", 20)).toEqual([]);
+  const sealed = session("old-sealed"); sealed.close({ reason: "completed" }); sealed.disposeWithoutClosing();
+  session("imported", "jsonl", "claude").releaseWithoutClosing();
+  session("new-released").releaseWithoutClosing();
+  const lines = renderNativeSessionList(workspace, "default", 20);
+  expect(lines).toHaveLength(2);
+  expect(lines[0]).toMatch(/^new-released · updated \d{4}-\d\d-\d\dT[^ ]+ · released · 1 turns · resume: amc agent-loop chat --session new-released /);
+  expect(lines[1]).toMatch(/^old-sealed · .* · sealed · 1 turns · inspect: amc session show old-sealed · continue in a fork: amc agent-loop chat --fork-from old-sealed$/);
+  expect(renderNativeSessionList(workspace, "default", 1)).toHaveLength(1);
+  expect(renderNativeSessionList(workspace, "other", 20)).toEqual([]);
 });

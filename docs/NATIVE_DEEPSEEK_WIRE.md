@@ -58,7 +58,8 @@ The adapter carries `DEEPSEEK_CAPABILITIES`, with protocol
 before a request header or transport dispatch, rather than silently omitting
 reasoning or inventing a tool grant.
 
-`deepseek-chat@1` is registered in `builtInEncoders.ts`, hence available to both
+`deepseek-chat@1` and `deepseek-chat@2` (the active version: a user message's text parts
+separated by a blank line instead of concatenated) are registered in `builtInEncoders.ts`, hence available to both
 preparation and the default cold reconstruction registry. Its exact identity is
 also included in `providerToolNames.ts::usesProviderToolNames`. The runtime binds
 provider aliases against the offered schema names captured at preparation, not

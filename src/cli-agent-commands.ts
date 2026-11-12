@@ -37,6 +37,9 @@ import {
   stubProviderTransport
 } from "./agent/stubProvider.js";
 import type { LoopNotification } from "./agent/loopTypes.js";
+import { liveNativeFailureGuidance } from "./agent/nativeFailureGuidance.js";
+import { nativeUnknownUsageNotice } from "./budgets/nativeBudgetAdmission.js";
+import { missingCredentialGuidance } from "./setup/nativeFirstUseGuide.js";
 import { echoToolSeam } from "./agent/echoTool.js";
 import { MAX_ACTIVE_CHILDREN_HELP, NO_DELEGATE_STOP_HELP, VALIDATION_REPAIR_HELP, WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
 import { leaseFileToken, withLeaseFileOption } from "./cli/agentLoopLeaseFile.js";
@@ -439,6 +442,11 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         const { assertSessionResumeAgent } = await import("./session/sessionResume.js");
         assertSessionResumeAgent({ workspace: process.cwd(), sessionId: opts.session, agentId });
       }
+      // Smoke L-1: an unconfigured credential reference is refused after argument checks and before a session opens, with the guide's fix.
+      const missingCredential = route.credentialRef === null ? null : await missingCredentialGuidance({ workspace: process.cwd(), agentId,
+        provider: providerId, model: opts.model ?? preset?.model, baseUrl: opts.baseUrl, credential: opts.credential,
+        credentialsHome: opts.credentialsHome, credentialsFile: opts.credentialsFile });
+      if (missingCredential !== null) { io.error(missingCredential); io.fail(); return; }
       const runner = await importRunner(io);
       if (runner === null) return;
 
@@ -741,6 +749,10 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             : (notification: LoopNotification) => {
                 const line = renderNotification(notification);
                 if (line !== null) (opts.json ? io.error : io.log)(line);
+                // Smoke H-2: say which earlier requests block this agent and how to recover, from verified usage.
+                const usageNotice = notification.kind === "error" && liveNativeFailureGuidance(notification.error).code === "AMC_NATIVE_BUDGET_REFUSED"
+                  ? nativeUnknownUsageNotice(process.cwd(), agentId) : null;
+                if (usageNotice !== null) io.error(`  ${usageNotice}`);
               },
           onReady: (handle) => {
             output.sink?.ready(handle, { agentId, provider: providerId, model, tools: toolMode, approvals: gate?.actionClass ?? null });

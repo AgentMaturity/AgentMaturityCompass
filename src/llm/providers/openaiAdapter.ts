@@ -1,6 +1,7 @@
 /**
  * `openai-chat@4` — native signed user-image requests; unchanged Chat stream
- * decoding below. Wire support is not a probe of any remote model or origin.
+ * decoding below. New requests use encoder `openai-chat@6` (a user message's
+ * text parts separated by a blank line); the adapter decoding is unchanged. Wire support is not a probe of any remote model or origin.
  *
  * THE STRUCTURAL DIFFERENCE FROM ANTHROPIC, and the one thing worth reading
  * before the code: OpenAI's stream has no block boundaries. There is no
@@ -284,7 +285,7 @@ export const openaiAdapter: LlmAdapter = {
   id: OPENAI_ADAPTER_ID,
   version: 4,
   encoderId: OPENAI_CHAT_ENCODER_ID,
-  encoderVersion: 4,
+  encoderVersion: 6,
 
   assertParams(params): void {
     if ((params.n !== undefined && params.n !== 1) || params.functions !== undefined || params.function_call !== undefined

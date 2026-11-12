@@ -21,11 +21,12 @@ import { anthropicMessagesEncoderV4 } from "./anthropicMessagesEncoderV4.js";
 import { openaiResponsesEncoder } from "./openaiResponsesEncoder.js";
 import { openaiResponsesEncoderV2 } from "./openaiResponsesEncoderV2.js";
 import { openaiResponsesEncoderV3 } from "./openaiResponsesEncoderV3.js";
-import { deepseekChatEncoder } from "./deepseekChatEncoder.js";
+import { deepseekChatEncoder, deepseekChatEncoderV2 } from "./deepseekChatEncoder.js";
 import { geminiContentEncoder } from "./geminiContentEncoder.js";
 import { geminiContentEncoderV2 } from "./geminiContentEncoderV2.js";
 import { ollamaChatEncoder } from "./ollamaChatEncoder.js";
-import { anthropicMessagesEncoderV5, openaiChatEncoderV5, openaiResponsesEncoderV4 } from "./cacheRetentionEncoders.js";
+import { anthropicMessagesEncoderV5, openaiChatEncoderV5, openaiChatEncoderV7, openaiResponsesEncoderV4 } from "./cacheRetentionEncoders.js";
+import { openaiChatEncoderV6 } from "./openaiChatEncoderV6.js";
 import type { RequestEncoder } from "./requestEncoder.js";
 
 export const BUILT_IN_REQUEST_ENCODERS: readonly RequestEncoder[] = [
@@ -39,11 +40,14 @@ export const BUILT_IN_REQUEST_ENCODERS: readonly RequestEncoder[] = [
   openaiChatEncoderV3,
   openaiChatEncoderV4,
   openaiChatEncoderV5,
+  openaiChatEncoderV6,
+  openaiChatEncoderV7,
   openaiResponsesEncoder,
   openaiResponsesEncoderV2,
   openaiResponsesEncoderV3,
   openaiResponsesEncoderV4,
   deepseekChatEncoder,
+  deepseekChatEncoderV2,
   geminiContentEncoder,
   geminiContentEncoderV2,
   ollamaChatEncoder

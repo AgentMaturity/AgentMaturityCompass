@@ -3,7 +3,7 @@ import { openLedger } from "../ledger/ledger.js";
 import type { SessionService } from "../session/sessionService.js";
 import type { ToolExecution } from "../tools/toolTypes.js";
 import { sha256Hex } from "../utils/hash.js";
-import { budgetForAgent, loadVerifiedBudgetsConfig } from "./budgets.js";
+import { budgetForAgent, evaluateBudgetStatus, loadVerifiedBudgetsConfig } from "./budgets.js";
 import { budgetSessionAgent, NATIVE_BUDGET_RESERVATION, projectBudgetUsage, readBudgetEvents } from "./nativeBudgetUsage.js";
 import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { nativeUsdReservation, type NativeBudgetDispatch } from "./nativeUsdReservation.js";
@@ -13,6 +13,32 @@ import { nativeUsdUnits } from "./nativeUsdAmount.js";
 export class NativeBudgetRefusal extends Error {
   readonly code = "AMC_NATIVE_BUDGET_REFUSED";
   constructor(message: string) { super(message); this.name = "NativeBudgetRefusal"; }
+}
+
+/**
+ * Why the signed default `unknownTokenUsage: BLOCK` refuses, and the recovery docs/BUDGETS.md ("Missing Usage and
+ * Recovery") documents. Unknown usage clears when its local budget day ends; a pending reservation never expires.
+ */
+function unknownUsageRefusal(agentId: string, unknown: number, pending: number): string {
+  const causes = [
+    ...(unknown > 0 ? [`${unknown} earlier native model request(s) whose token usage is unknown (a cancelled or interrupted call)`] : []),
+    ...(pending > 0 ? [`${pending} reservation(s) still pending without a recorded settlement`] : [])
+  ];
+  return `blocked by ${causes.join(" and ")}; the signed default unknownTokenUsage: BLOCK refuses further model requests for agent ${agentId}`
+    + `${pending > 0 ? "" : " until the local budget day ends"}. To continue now, review and set budgets.perAgent.${agentId}.unknownTokenUsage: ALLOW_WITH_WARNING`
+    + " in .amc/budgets.yaml, then run amc budgets sign (docs/BUDGETS.md, Missing Usage and Recovery).";
+}
+
+/** The unknown-usage block the next native model request of this agent would meet, or null when none applies. */
+export function nativeUnknownUsageNotice(workspace: string, agentId: string): string | null {
+  try {
+    const status = evaluateBudgetStatus(workspace, agentId);
+    if (!status.budgetConfigValid || status.nativeAdmissionPolicy.unknownTokenUsage !== "BLOCK") return null;
+    const { blockingUnknownLlmTokenRequests: unknown, llmPendingRequests: pending } = status.usage.daily;
+    return unknown + pending > 0 ? unknownUsageRefusal(agentId, unknown, pending) : null;
+  } catch {
+    return null; // Unverifiable evidence is reported by budgets verify/status, not guessed here.
+  }
 }
 
 type Spend = { kind: "llm"; nativeSessionId: string; headerEventId: string } |
@@ -54,7 +80,7 @@ function reserve(workspace: string, spend: Spend, agentId?: string, dispatch?: N
           throw new NativeBudgetRefusal("native model request budget exhausted");
         }
         if (budget.unknownTokenUsage !== "ALLOW_WITH_WARNING" && (usage.daily.llmPendingRequests > 0 || usage.daily.blockingUnknownLlmTokenRequests > 0 || usage.minute.blockingUnknownLlmTokenRequests > 0)) {
-          throw new NativeBudgetRefusal("native model token usage is unknown or a prior dispatch remains pending; review budgets.perAgent.<agent>.unknownTokenUsage and explicitly run amc budgets sign to approve ALLOW_WITH_WARNING");
+          throw new NativeBudgetRefusal(unknownUsageRefusal(owner, Math.max(usage.daily.blockingUnknownLlmTokenRequests, usage.minute.blockingUnknownLlmTokenRequests), usage.daily.llmPendingRequests));
         }
         if (usage.daily.llmTokens >= budget.daily.maxLlmTokens || usage.minute.llmTokens >= budget.perMinute.maxLlmTokens) {
           throw new NativeBudgetRefusal("native model token budget exhausted");

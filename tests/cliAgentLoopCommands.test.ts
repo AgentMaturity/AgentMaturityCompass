@@ -365,7 +365,9 @@ describe("amc agent-loop — the operator surface", () => {
       writeFileSync(join(home, ".credentials.yaml"), `AMC_P056_KEY: ${secret}\n`, { mode: 0o600 });
       chmodSync(home, 0o755);
       const { program, captured } = programWith();
-      const failure = await run(program, ["agent-loop", "run", "hello", "--credentials-home", home, "--json"]).then(
+      // A route that names a credential: the keyless stub no longer reads the store at all (smoke L-3).
+      const failure = await run(program, ["agent-loop", "run", "hello", "--provider", "anthropic", "--model", "fixture-model",
+        "--credential", "AMC_P056_KEY", "--credentials-home", home, "--json"]).then(
         () => null, (error: unknown) => error as Error & { kind?: string; mode?: number; fixCommand?: string });
       expect(failure, "the run must still be refused (fail closed)").not.toBeNull();
       expect(failure).toMatchObject({ name: "CredentialsFilePermissionsError", kind: "directory", mode: 0o755, fixCommand: `chmod 700 ${home}` });

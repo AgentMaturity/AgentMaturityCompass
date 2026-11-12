@@ -18,22 +18,22 @@ that run. Do not edit by hand: `npm run check:capability-matrix` runs the tests 
 | Route | Protocol | Adapter | Request encoder | Request bytes built by | Live provider |
 | --- | --- | --- | --- | --- | --- |
 | `anthropic` | anthropic-messages | anthropic-messages@4 | anthropic-messages@4 | AMC | not run |
-| `openai` | openai-chat-completions | openai-chat@4 | openai-chat@4 | AMC | not run |
+| `openai` | openai-chat-completions | openai-chat@4 | openai-chat@6 | AMC | not run |
 | `openai-responses` | openai-responses | openai-responses@3 | openai-responses@3 | AMC | not run |
-| `deepseek` | deepseek-chat-completions | deepseek-chat@1 | deepseek-chat@1 | AMC | not run |
+| `deepseek` | deepseek-chat-completions | deepseek-chat@1 | deepseek-chat@2 | AMC | not run |
 | `gemini` | gemini-generate-content | gemini-generate-content@1 | gemini-generate-content@1 | AMC | not run |
 | `gemini-audio` | gemini-generate-content | gemini-generate-content@2 | gemini-generate-content@2 | AMC | not run |
 | `ollama` | ollama-chat | ollama-chat@1 | ollama-chat@1 | AMC | not run |
-| `groq` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@4 | AMC | not run |
-| `mistral` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@4 | AMC | not run |
-| `xai` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@4 | AMC | not run |
-| `openrouter` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@4 | AMC | not run |
-| `together` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@4 | AMC | not run |
-| `fireworks` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@4 | AMC | not run |
-| `lmstudio` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@4 | AMC | not run |
-| `vllm` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@4 | AMC | not run |
-| `llamacpp` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@4 | AMC | not run |
-| `azure-openai` | openai-chat-completions | azure-openai-chat@1 | openai-chat@4 | AMC | not run |
+| `groq` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@6 | AMC | not run |
+| `mistral` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@6 | AMC | not run |
+| `xai` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@6 | AMC | not run |
+| `openrouter` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@6 | AMC | not run |
+| `together` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@6 | AMC | not run |
+| `fireworks` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@6 | AMC | not run |
+| `lmstudio` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@6 | AMC | not run |
+| `vllm` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@6 | AMC | not run |
+| `llamacpp` | openai-chat-completions | openai-compatible-chat@1 | openai-chat@6 | AMC | not run |
+| `azure-openai` | openai-chat-completions | azure-openai-chat@1 | openai-chat@6 | AMC | not run |
 | `pi-ai:groq` | pi-ai-openai-completions | pi-ai-openai-completions@1 | pi-ai:groq@1 | @earendil-works/pi-ai@1.3.0 (third-party library, pinned) | not run |
 | `pi-ai:huggingface` | pi-ai-openai-completions | pi-ai-openai-completions@1 | pi-ai:huggingface@1 | @earendil-works/pi-ai@1.3.0 (third-party library, pinned) | not run |
 | `pi-ai:together` | pi-ai-openai-completions | pi-ai-openai-completions@1 | pi-ai:together@1 | @earendil-works/pi-ai@1.3.0 (third-party library, pinned) | not run |

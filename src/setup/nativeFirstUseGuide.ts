@@ -77,6 +77,17 @@ export function renderNativeGuideCommand(action: NativeGuideAction): string {
   return action.argv.map(arg => /^[A-Za-z0-9_./:=@+-]+$/.test(arg) ? arg : `'${arg.replace(/'/g, "'\\''")}'`).join(" ");
 }
 
+/**
+ * Smoke L-2: the evidence-verification command in the form that works. Without an operator pin the verdict is
+ * UNANCHORED and exits 1, so unless AMC_EXPECTED_MONITOR_FINGERPRINT is set the hint carries --expect-monitor and the
+ * documented way to obtain it (docs/EVIDENCE_TRUST.md). The fingerprint is never read from the workspace here.
+ */
+export function renderNativeVerifyHint(cwd: string, sessionId: string): string {
+  const command = renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "verify", sessionId] });
+  return process.env.AMC_EXPECTED_MONITOR_FINGERPRINT?.trim() ? command
+    : `${command} --expect-monitor <monitor sha256>\n  (<monitor sha256>: shasum -a 256 .amc/keys/monitor_ed25519.pub, recorded outside this workspace when it was created; or set AMC_EXPECTED_MONITOR_FINGERPRINT or a trust list)`;
+}
+
 function pathKind(path: string): "missing" | "directory" | "file" | "other" {
   try {
     const stats = statSync(path);
@@ -208,6 +219,22 @@ export async function inspectNativeFirstUse(options: NativeFirstUseOptions): Pro
     return finish("blocked", "LOCAL_INSPECTION_FAILED", "Could not read local setup. Check workspace and credential-file access, then rerun the guide.");
   } finally {
     if (store !== undefined) await store.close();
+  }
+}
+
+/**
+ * Smoke L-1: when the selected credential reference is not configured, the guide's own fix (the reference and its masked
+ * `amc credentials set` command) so a run can refuse before opening a session; otherwise null.
+ */
+export async function missingCredentialGuidance(options: NativeFirstUseOptions): Promise<string | null> {
+  try {
+    const guide = await inspectNativeFirstUse(options);
+    if (guide.status !== "needs-credential" || guide.credential === null || guide.nextAction === null) return null;
+    const ref = guide.credential.ref;
+    return `MISSING_CREDENTIAL: credential reference ${ref} for provider ${guide.provider} is not configured; no session was opened. `
+      + `Set ${ref} in the environment, or store it with the masked prompt (POSIX shell, in ${JSON.stringify(guide.nextAction.cwd)}):\n  ${renderNativeGuideCommand(guide.nextAction)}`;
+  } catch {
+    return null; // The runtime still refuses an unresolvable reference with its recorded MISSING_CREDENTIAL.
   }
 }
 

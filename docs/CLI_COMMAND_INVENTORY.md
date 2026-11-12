@@ -1091,7 +1091,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc score task-horizon` | Score task-completion time horizon (METR-inspired) | `--json` | - |
 | `amc score tier` | Run tiered maturity assessment (quick/standard/deep) | `--tier <tier>`<br>`--question-set <version>`<br>`--json` | - |
 | `amc score transparency-log` | Score network transparency log (Merkle tree, inclusion proofs) | `--json` | - |
-| `amc session` | Native signed sessions: inspect, compact, verify, replay and recover | - | - |
+| `amc session` | Native signed sessions: inspect, compact, verify, replay and recover (list them with amc sessions list) | - | - |
 | `amc session anchor` | Anchor a closed session's root into the transparency log | `--json` | - |
 | `amc session compact` | List signed history origins, then apply an explicit native summary or drop without rewriting evidence | `--list`<br>`--origins <ids>`<br>`--summary-file <path>`<br>`--expect-head <hash>`<br>`--reason <text>`<br>`--summary-role <role>`<br>`--replace`<br>`--drop`<br>`--json` | - |
 | `amc session export` | Export a session for offline verification as an HTML viewer or a sealed JSON bundle | `--out <path>`<br>`--json`<br>`--include-content`<br>`--decrypt-content`<br>`--json-out <path>` | - |
@@ -1105,7 +1105,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc session verify-export` | Verify an exported session offline against a pinned monitor key fingerprint | `--accept-unverifiable-content`<br>`--json`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unanchored` | - |
 | `amc session verify-proof` | Verify a session inclusion proof offline — needs only the bundle and a pinned fingerprint | `--expect-auditor-key <sha256>`<br>`--json`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored` | - |
 | `amc sessions` | View and analyze user sessions | - | - |
-| `amc sessions list` | List tracked sessions | `--agent <agentId>`<br>`--limit <n>`<br>`--sort <by>`<br>`--json` | - |
+| `amc sessions list` | List native agent-loop sessions (with resume hints) and observability sessions | `--agent <agentId>`<br>`--limit <n>`<br>`--sort <by>`<br>`--json` | - |
 | `amc setup` | Setup wizard for the full-score path and Studio gateway | `--provider <name>`<br>`--auto`<br>`--non-interactive`<br>`--demo` | - |
 | `amc shell` | Interactive AMC session — natural language + commands | `--agent <id>`<br>`--no-color` | - |
 | `amc shield` | Threat detection and security scanning | - | - |

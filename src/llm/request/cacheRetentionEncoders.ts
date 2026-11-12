@@ -4,6 +4,7 @@ import { ANTHROPIC_MESSAGES_ENCODER_ID } from "./anthropicMessagesEncoder.js";
 import { anthropicMessagesEncoderV4 } from "./anthropicMessagesEncoderV4.js";
 import { OPENAI_CHAT_ENCODER_ID } from "./openaiChatEncoder.js";
 import { openaiChatEncoderV4 } from "./openaiChatEncoderV4.js";
+import { openaiChatEncoderV6 } from "./openaiChatEncoderV6.js";
 import { OPENAI_RESPONSES_ENCODER_ID } from "./openaiResponsesEncoder.js";
 import { openaiResponsesEncoderV3 } from "./openaiResponsesEncoderV3.js";
 import type { RequestEncoder } from "./requestEncoder.js";
@@ -24,7 +25,7 @@ type Body = Record<string, unknown>;
 
 /** The retention version for each active encoder that has one; any other encoder cannot carry the option. */
 const RETENTION_VERSIONS: ReadonlyMap<string, number> = new Map([
-  [`${ANTHROPIC_MESSAGES_ENCODER_ID}@4`, 5], [`${OPENAI_CHAT_ENCODER_ID}@4`, 5], [`${OPENAI_RESPONSES_ENCODER_ID}@3`, 4]
+  [`${ANTHROPIC_MESSAGES_ENCODER_ID}@4`, 5], [`${OPENAI_CHAT_ENCODER_ID}@4`, 5], [`${OPENAI_CHAT_ENCODER_ID}@6`, 7], [`${OPENAI_RESPONSES_ENCODER_ID}@3`, 4]
 ]);
 
 /**
@@ -83,4 +84,5 @@ function openaiRetention(body: Body, retention: CacheRetention, request: Encodab
 const OPENAI_WIRE_KEYS = ["prompt_cache_key", "prompt_cache_retention", "prompt_cache_options"] as const;
 export const anthropicMessagesEncoderV5 = retentionEncoder(anthropicMessagesEncoderV4, 5, ["cache_control"], anthropicTtl);
 export const openaiChatEncoderV5 = retentionEncoder(openaiChatEncoderV4, 5, OPENAI_WIRE_KEYS, openaiRetention);
+export const openaiChatEncoderV7 = retentionEncoder(openaiChatEncoderV6, 7, OPENAI_WIRE_KEYS, openaiRetention);
 export const openaiResponsesEncoderV4 = retentionEncoder(openaiResponsesEncoderV3, 4, OPENAI_WIRE_KEYS, openaiRetention);

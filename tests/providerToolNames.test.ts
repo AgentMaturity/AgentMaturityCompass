@@ -176,14 +176,15 @@ describe("historical bytes and exact new version recognition", () => {
     for (const encoder of CURRENT) expect(usesProviderToolNames(encoder.id, encoder.version)).toBe(true);
     // The named image/audio encoders (openai-chat@4, anthropic-messages@4, openai-responses@3, deepseek-chat@1,
     // ollama-chat@1, gemini-generate-content@1/2) bind provider tool names; versions beyond them are still refused.
-    // PXA-15 retention versions (openai-chat@5, anthropic-messages@5, openai-responses@4) bind them too.
-    for (const [id, version] of [["openai-chat", 4], ["openai-chat", 5], ["anthropic-messages", 4], ["anthropic-messages", 5],
+    // PXA-15 retention versions (openai-chat@5, anthropic-messages@5, openai-responses@4) bind them too, as do the
+    // separated-user-text versions openai-chat@6/@7 and deepseek-chat@2 (smoke M-1).
+    for (const [id, version] of [["openai-chat", 4], ["openai-chat", 5], ["openai-chat", 6], ["openai-chat", 7], ["deepseek-chat", 2], ["anthropic-messages", 4], ["anthropic-messages", 5],
       ["openai-responses", 3], ["openai-responses", 4], ["deepseek-chat", 1],
       ["ollama-chat", 1], ["gemini-generate-content", 1], ["gemini-generate-content", 2]] as const) {
       expect(usesProviderToolNames(id, version)).toBe(true);
     }
-    for (const [id, version] of [["openai-chat", 1], ["openai-chat", 2], ["openai-chat", 6], ["anthropic-messages", 2],
-      ["anthropic-messages", 6], ["openai-responses", 1], ["openai-responses", 5], ["deepseek-chat", 2], ["ollama-chat", 2],
+    for (const [id, version] of [["openai-chat", 1], ["openai-chat", 2], ["openai-chat", 8], ["anthropic-messages", 2],
+      ["anthropic-messages", 6], ["openai-responses", 1], ["openai-responses", 5], ["deepseek-chat", 3], ["ollama-chat", 2],
       ["gemini-generate-content", 3], ["stub", 3], ["OPENAI-CHAT", 3]] as const) {
       expect(usesProviderToolNames(id, version)).toBe(false);
     }

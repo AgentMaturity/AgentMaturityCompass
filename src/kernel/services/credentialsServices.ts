@@ -38,7 +38,13 @@ export const CREDENTIALS_SEAM = defineSeam("amcCredentials");
  * isolated tenants on one host, and inventing a narrower vocabulary here would
  * mean two path-resolution stories instead of one.
  */
-export type CredentialsServiceConfig = LocalCredentialsOptions;
+export type CredentialsServiceConfig = LocalCredentialsOptions & {
+  /**
+   * No composed route names a credential (smoke L-3: the keyless stub), so the store is booted — and its permission
+   * checks run — only if something asks it for a credential. A refusal then surfaces at that call, unchanged.
+   */
+  readonly lazy?: boolean;
+};
 
 /**
  * The layered credential store, on the tree.
@@ -52,24 +58,33 @@ export type CredentialsServiceConfig = LocalCredentialsOptions;
  * exists to provide, and a cache in the facade would silently remove it.
  */
 export class CredentialsSeamService extends AmcSeam implements CredentialsService {
-  private readonly store: LocalCredentialsService;
+  private booted: LocalCredentialsService | null = null;
+  private readonly options: LocalCredentialsOptions;
 
   constructor(ctx: Context, config: CredentialsServiceConfig = {}) {
     super(ctx, CREDENTIALS_SEAM.name);
+    const { lazy, ...options } = config;
+    this.options = options;
     // Constructing the store *is* booting it: a group-readable file or
     // unparsable YAML throws here, which fails the fiber. That is the intent —
     // a provider that registered and then had no credentials would be
     // indistinguishable, to every consumer, from a correctly configured store
-    // on a machine where nothing is set.
-    this.store = new LocalCredentialsService(config);
+    // on a machine where nothing is set. Only a composition that names no
+    // credential defers it (`lazy`).
+    if (lazy !== true) this.booted = new LocalCredentialsService(options);
     // Async disposer: cordis awaits it, so the fiber does not report itself
     // unloaded while a queued write is still holding the cross-process lock.
     this.ctx.effect(
       () => async () => {
-        await this.store.close();
+        await this.booted?.close();
       },
       "amcCredentials store"
     );
+  }
+
+  private get store(): LocalCredentialsService {
+    this.booted ??= new LocalCredentialsService(this.options);
+    return this.booted;
   }
 
   resolve(ref: CredentialRef): string | null {

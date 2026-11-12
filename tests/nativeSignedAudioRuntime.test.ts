@@ -26,7 +26,10 @@ const writers = new Set<SessionService>(), stores: LocalCredentialsService[] = [
 afterEach(async () => { try { for (const writer of writers) writer.disposeWithoutClosing(); writers.clear(); for (const store of stores.splice(0)) await store.close(); } finally { await audioCleanup(); } });
 const schema = (name: string): ToolSchema => ({ name, description: "Fixture function", parameters: { type: "object", properties: { path: { type: "string" }, offset: { type: "number" } } } });
 const drain = async (stream: AsyncIterable<StreamChunk>, seen: StreamChunk[] = []) => { for await (const chunk of stream) seen.push(chunk); return seen; };
-const calls = (chunks: readonly StreamChunk[]): ToolUseContentBlock[] => chunks.flatMap(chunk => chunk.type === "block-end" && chunk.block.kind === "tool_use" ? [chunk.block] : []);
+const calls = (chunks: readonly StreamChunk[]): ToolUseContentBlock[] => chunks.flatMap(chunk => chunk.type === "block-end" && chunk.block.kind === "tool_use" && chunk.block.unoffered !== true ? [chunk.block] : []);
+/** Smoke M-5: an unoffered name arrives verbatim, marked and unbound; the loop refuses it, the request does not fail. */
+const unofferedNames = (chunks: readonly StreamChunk[]): (string | boolean)[][] => chunks.flatMap(chunk => chunk.type === "block-end" && chunk.block.kind === "tool_use" && chunk.block.unoffered === true
+  ? [[chunk.block.name, "providerWireName" in chunk.block]] : []);
 function harness(script: (HttpResponse | HttpTransport)[], backend = "sqlite") {
   const root = audioWorkspace(backend), writer = new SessionService(root); writers.add(writer);
   writer.open({ agentId: "default", harnessVersion: "audio-runtime", compositionDigest: "audio-runtime", policyDigest: "audio-runtime" });
@@ -123,6 +126,13 @@ describe("native audio Gemini2 signed runtime (unexecuted)", () => {
     const usage = attack === "bad-usage" ? { ...AUDIO_USAGE, candidatesTokensDetails: [{ modality: "AUDIO", tokenCount: 4 }] } : AUDIO_USAGE;
     const h = harness([geminiResponse([geminiFrame(parts, "hostile", "STOP", usage)], attack === "trailing-frame" ? "data: {unfinished" : "")]);
     const call = h.runtime.prepare(h.spec([schema("fs.read")])), seen: StreamChunk[] = [];
+    if (attack === "unoffered") {
+      await drain(call.stream(), seen); expect(calls(seen)).toEqual([]); expect(unofferedNames(seen)).toEqual([[wire, false]]);
+      const rows = h.writer.readEvents().filter(row => row.event_type === "tool/call");
+      expect(rows).toHaveLength(1); expect(JSON.parse(rows[0]!.meta_json)).not.toHaveProperty("providerName");
+      h.writer.recordToolResult({ toolCallId: JSON.parse(rows[0]!.meta_json).toolCallId, outcome: "DENIED", exitCode: null, timedOut: false, denied: true, content: "not available" });
+      h.finish(call); h.close(true); return;
+    }
     await expect(drain(call.stream(), seen)).rejects.toBeDefined(); expect(calls(seen)).toEqual([]);
     expect(h.writer.readEvents().filter(row => row.event_type === "tool/call")).toEqual([]); h.finish(call); h.close(true);
   });
@@ -131,8 +141,10 @@ describe("native audio Gemini2 signed runtime (unexecuted)", () => {
       geminiResponse([geminiFrame([geminiCallPart(wire, "new")], "new", "STOP", AUDIO_USAGE)])]);
     const first = h.runtime.prepare(h.spec([schema("fs.read")])); await drain(first.stream()); result(h.writer, "old"); h.finish(first); h.writer.startStep();
     const next = h.runtime.prepare(h.spec([schema("fs.stat")])), seen: StreamChunk[] = [];
-    await expect(drain(next.stream(), seen)).rejects.toMatchObject({ code: "AMC_LLM_UNOFFERED_TOOL_NAME" });
-    expect(calls(seen)).toEqual([]); expect(h.writer.readEvents().filter(row => row.event_type === "tool/call")).toHaveLength(1); h.finish(next); h.close(true);
+    await drain(next.stream(), seen); expect(calls(seen)).toEqual([]); expect(unofferedNames(seen)).toEqual([[wire, false]]);
+    const rows = h.writer.readEvents().filter(row => row.event_type === "tool/call"); expect(rows).toHaveLength(2);
+    h.writer.recordToolResult({ toolCallId: JSON.parse(rows[1]!.meta_json).toolCallId, outcome: "DENIED", exitCode: null, timedOut: false, denied: true, content: "not available" });
+    h.finish(next); h.close(true);
   });
   test("in-flight cancellation retains observations but never promotes an unfinished call", async () => {
     const controller = new AbortController(); let entered!: () => void, released = false;
