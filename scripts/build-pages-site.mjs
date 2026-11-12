@@ -77,6 +77,8 @@ function copyWebsite(output) {
     resolve(websiteRoot, "docs/content"),
     resolve(websiteRoot, "docs/vendor"),
     resolve(websiteRoot, "docs/content-manifest.json"),
+    // Marked "Classification: Internal" and names a maintainer's local path; kept in the repository, never published.
+    resolve(websiteRoot, "docs/competitive-analysis.md"),
     resolve(websiteRoot, "fonts"),
   ];
   cpSync(websiteRoot, output, {
