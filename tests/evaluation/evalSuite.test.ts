@@ -23,8 +23,9 @@ vi.setConfig({ testTimeout: 300_000 });
 const SUITE = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "examples", "eval-suites", "stub-smoke", "suite.yaml");
 // The same question the graders ask: can a backend here enforce the grader policy (writes, network, reads, processes)?
 // A selected-but-partial backend (the write-only Seatbelt profile) refuses, so `select() !== null` would overstate it.
+// It runs `node` as the shipped graders do: process.execPath can sit outside what Bubblewrap mounts (/opt/hostedtoolcache).
 const probeDir = mkdtempSync(join(tmpdir(), "amc-eval-probe-"));
-const confined = (await gradeCommand({ type: "script", command: [process.execPath, "-e", "process.exit(0)"], timeoutMs: 60_000, passExitCode: 0 },
+const confined = (await gradeCommand({ type: "script", command: ["node", "-e", "process.exit(0)"], timeoutMs: 60_000, passExitCode: 0 },
   { fixture: [], attemptDir: probeDir, outputs: [], allowUnconfined: false, workspace: probeDir })).status === "pass";
 let ws: string;
 const cwd = process.cwd();
