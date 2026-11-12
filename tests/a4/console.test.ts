@@ -69,6 +69,25 @@ describe("previewNoticeHtml", () => {
   });
 });
 
+// B1 (go-live smoke): Understand records a revision (r1 -> r2); the page then dropped the statement Confirm binds, so
+// "Yes, that's it" stayed disabled at every stage.
+describe("statementHolds", () => {
+  const statementHolds = (a4View as unknown as { statementHolds: (s: unknown, before: unknown, after: unknown) => boolean }).statementHolds;
+  const before = { stage: "aspire", revisionNo: 1, headSeq: 11 };
+  test("keeps Understand's statement across the revision Understand itself recorded", () => {
+    expect(statementHolds({ headSeq: 12 }, before, { stage: "aspire", revisionNo: 2, headSeq: 12 })).toBe(true);
+  });
+  test("keeps it while nothing records a revision", () => {
+    expect(statementHolds({ headSeq: 12 }, { ...before, revisionNo: 2, headSeq: 12 }, { stage: "aspire", revisionNo: 2, headSeq: 13 })).toBe(true);
+  });
+  test("drops it once a later revision or another stage supersedes it", () => {
+    expect(statementHolds({ headSeq: 12 }, { ...before, revisionNo: 2, headSeq: 12 }, { stage: "aspire", revisionNo: 3, headSeq: 13 })).toBe(false);
+    expect(statementHolds({ headSeq: 12 }, before, { stage: "assemble", revisionNo: 2, headSeq: 12 })).toBe(false);
+    expect(statementHolds({ headSeq: null }, before, { stage: "aspire", revisionNo: 2, headSeq: 12 })).toBe(false);
+    expect(statementHolds(null, before, before)).toBe(false);
+  });
+});
+
 test("sw.js precaches both A4 pages", () => {
   const source = readFileSync("src/console/assets/sw.js", "utf8");
   const self = { registration: { scope: "https://studio.example/console/" }, addEventListener: () => {} };

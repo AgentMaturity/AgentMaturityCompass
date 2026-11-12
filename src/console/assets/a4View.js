@@ -150,6 +150,14 @@ const studioJson = (value) => `<pre class="scroll">${esc(JSON.stringify(value ??
 const recorded = (what, entry) => `<p class="muted">Studio recorded ${entry.text ? what : "this step's output"} as self-reported${Number.isSafeInteger(entry.headSeq)
   ? ` at seq ${esc(entry.headSeq)}` : ""}. ${entry.text ? `What you sent:</p><p>${esc(entry.text)}</p>` : "You sent no statement.</p>"}${studioJson(entry.data)}`;
 
+/**
+ * Whether a statement this page recorded (Understand's or Explain's; `headSeq` is the head Studio answered) still binds the
+ * project after a load moved it from `before` to `after`: kept at the same stage while no revision was recorded since, or
+ * while the only revision recorded is the statement's own (Understand records one: the head has not passed the statement).
+ */
+export const statementHolds = (statement, before, after) => statement != null && after.stage === before.stage
+  && (after.revisionNo === before.revisionNo || (Number.isSafeInteger(statement.headSeq) && after.headSeq <= statement.headSeq));
+
 /** Understand's recorded statement; Confirm and Correct stay disabled until one is shown here. */
 function reflectionHtml(reflection, understand) {
   const bound = Number.isSafeInteger(reflection?.headSeq);

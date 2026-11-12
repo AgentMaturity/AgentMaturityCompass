@@ -246,10 +246,11 @@ function mountProject(projectId, options) {
       claimSink = [];
       const read = await readProject();
       if (view.oneRevision(read.project, read.revision, read.gates, read.readiness) || attempt === 3) {
-        // A statement binds the head it was recorded at: once the stage or revision moves, Confirm could only be refused.
-        if (state.project && (read.project.stage !== state.project.stage || read.project.revisionNo !== state.project.revisionNo)) {
-          reflection = null;
-          explanation = null;
+        // A statement binds the head it was recorded at: once a later revision or another stage supersedes it, Confirm could
+        // only be refused. The revision Understand itself records keeps it (view.statementHolds).
+        if (state.project) {
+          if (!view.statementHolds(reflection, state.project, read.project)) reflection = null;
+          if (!view.statementHolds(explanation, state.project, read.project)) explanation = null;
         }
         Object.assign(state, read);
         stage = read.stage;
