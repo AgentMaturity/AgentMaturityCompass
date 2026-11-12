@@ -5722,9 +5722,10 @@ program
       }
       if (opts.badge) {
         const { generateBadgeSvg, scoreToLevel } = await import("./cert/badgeGenerator.js");
-        const score = Math.max(0, Math.min(100, b.integrityIndex * 100));
-        const level = scoreToLevel(score);
-        const svg = generateBadgeSvg(score, level, `compare:${agentId}`);
+        // Run A's level to run B's; the colour is run B's level.
+        const levelA = diagnosticAverageLevel(a), levelB = diagnosticAverageLevel(b);
+        const score = Math.max(0, Math.min(100, (levelB / 5) * 100));
+        const svg = generateBadgeSvg(score, scoreToLevel(score), `compare:${agentId ?? "default"}`, `L${levelA.toFixed(1)} → L${levelB.toFixed(1)}`);
         const badgePath = opts.output ? opts.output.replace(/\.[^.]+$/, "") + "-badge.svg" : "comparison-badge.svg";
         const fs = await import("fs");
         fs.writeFileSync(badgePath, svg, "utf-8");
@@ -5882,7 +5883,7 @@ program
           if (best) {
             const score = best.overallScore * 20; // 0–5 → 0–100
             const level = scoreToLevel(score);
-            const svg = generateBadgeSvg(score, level, `compare:${agentId}`);
+            const svg = generateBadgeSvg(score, level, `compare:${agentId ?? "default"}`);
             const badgePath = opts.output.replace(/\.[^.]+$/, "") + "-badge.svg";
             const fs = await import("fs");
             fs.writeFileSync(badgePath, svg, "utf-8");
@@ -5966,7 +5967,7 @@ program
         if (best) {
           const score = best.overallScore * 20; // 0–5 scale → 0–100
           const level = scoreToLevel(score);
-          const svg = generateBadgeSvg(score, level, `compare:${agentId}`);
+          const svg = generateBadgeSvg(score, level, `compare:${agentId ?? "default"}`);
           const badgePath = opts.output ? opts.output.replace(/\.[^.]+$/, "") + "-badge.svg" : "comparison-badge.svg";
           const fs = await import("fs");
           fs.writeFileSync(badgePath, svg, "utf-8");

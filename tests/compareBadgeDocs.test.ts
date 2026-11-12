@@ -90,6 +90,10 @@ describe("compare badge DevRel docs", () => {
     expect(result.status, result.stderr || result.stdout).toBe(0);
     expect(existsSync(join(root, "compare.json"))).toBe(true);
     expect(existsSync(join(root, "compare-badge.svg"))).toBe(true);
-    expect(readFileSync(join(root, "compare-badge.svg"), "utf8")).toContain("AMC: L4 (82.0)");
+    const svg = readFileSync(join(root, "compare-badge.svg"), "utf8");
+    // Run A's level to run B's (the mean of each run's layer levels), titled with the agent, never "undefined".
+    expect(svg).toContain("AMC: L2.6 → L3.9");
+    expect(svg).toContain("<title>compare:default");
+    expect(svg).not.toContain("undefined");
   });
 });
