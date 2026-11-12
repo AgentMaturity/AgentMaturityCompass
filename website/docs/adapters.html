@@ -287,7 +287,8 @@ amc adapters run --agent my-openhands --adapter openhands-cli -- openhands</code
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>python-amc-sdk</code></div>
         <h4>Install</h4>
-        <pre><code>pip install agent-maturity-compass</code></pre>
+        <p>The SDK is not on PyPI yet (publication is pending). Install it from source; do not install a similarly named PyPI package, none is published by AMC.</p>
+        <pre><code>pip install &quot;git+https://github.com/AgentMaturity/AgentMaturityCompass.git#subdirectory=sdk/python&quot;</code></pre>
         <h4>Programmatic Integration</h4>
         <pre><code><span class="keyword">from</span> amc <span class="keyword">import</span> wrap_fetch, log_trace
 

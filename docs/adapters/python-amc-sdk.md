@@ -12,14 +12,18 @@ The AMC Python SDK provides direct integration for Python-based agents, offering
 ## Prerequisites
 
 - Python 3.11+
-- `agent-maturity-compass` Python package
+- The `amc-sdk` Python package, installed from source (below)
 - AMC installed (`curl -fsSL https://agentmaturity.co/install.sh | sh`)
 
 ## Installation
 
+The SDK is not on PyPI yet (publication is pending), so install it from this repository's `sdk/python` directory. Do not install a PyPI package with a similar name: none is published by AMC.
+
 ```bash
-pip install agent-maturity-compass
+pip install "git+https://github.com/AgentMaturity/AgentMaturityCompass.git#subdirectory=sdk/python"
 ```
+
+Or, from a clone: `pip install ./sdk/python`.
 
 ## Quick Start
 
