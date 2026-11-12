@@ -253,7 +253,9 @@ export function bwrapBackend(): SandboxBackend {
         // The limit goes on the launcher, before it creates the user namespace: the kernel then holds this user's
         // host-wide count to it. Set inside, a fresh namespace counts from zero and the cap never binds.
         const outcome = await runProcess({ argv: limit === null ? args : withProcessLimit(limit, args), cwd: workspace,
-          env: { PATH: "/usr/bin:/bin", HOME: "/tmp", TMPDIR: "/tmp", LANG: "C.UTF-8" },
+          // /usr/local is already mounted read-only under /usr; without it on PATH a system Node or Python installed
+          // there (official tarballs, the node Docker images, GitHub runners) is not found and the launch has no exit.
+          env: { PATH: "/usr/local/bin:/usr/bin:/bin", HOME: "/tmp", TMPDIR: "/tmp", LANG: "C.UTF-8" },
           stdin: "ignore", stdout: "capture", stderr: "capture", maxCaptureBytes: 64_000,
           scrubValues: policy.scrubValues ?? [], graceMs: 2_000, timeoutMs: policy.timeoutMs,
           ...(policy.onOutput ? { onOutput: policy.onOutput } : {}),
