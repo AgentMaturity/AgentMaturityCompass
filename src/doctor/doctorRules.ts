@@ -30,6 +30,7 @@ import { nativeModuleCheck } from "./nativeModuleProbe.js";
 import { adminTokenCheck, amcGitignoreCheck } from "./secretFileChecks.js";
 import { requestDoctorStatus, doctorCarrierCheck } from "./doctorLiveProbe.js";
 import { adoptWorkspaceRecordHead, type RecordLocation } from "../storage/workspaceRecordStore.js";
+import { amcConfigSignatureProblem, verifyAmcConfigSignature } from "../config/amcConfigSignature.js";
 
 export type DoctorStatus = "PASS" | "FAIL" | "WARN" | "INFO";
 
@@ -311,6 +312,11 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
         fixHint: "Fix .amc/action-policy.yaml, then re-sign: amc fix-signatures" });
     }
   }
+  // M-3: the same check the trust boundary applies to every score run; repaired only by `amc verify --sign-config`.
+  const amcConfigSig = verifyAmcConfigSignature(workspace);
+  checks.push(amcConfigSig.valid ? { id: "sig-amc-config", status: "PASS", message: "amc.config.yaml signature valid" }
+    : { id: "sig-amc-config", status: amcConfigSig.signatureExists ? "FAIL" : "WARN", message: amcConfigSignatureProblem(workspace) ?? "amc.config.yaml signature invalid",
+      fixHint: "Review .amc/amc.config.yaml (its trustBoundaryMode claim), then re-sign it with: amc verify --sign-config" });
   pushSignatureCheck(checks, "sig-tools", "tools.yaml", verifyToolhubConfig(workspace));
   pushSignatureCheck(checks, "sig-budgets", "budgets.yaml", verifyBudgetsConfigSignature(workspace));
   pushSignatureCheck(checks, "sig-approval-policy", "approval-policy.yaml", verifyApprovalPolicySignature(workspace));

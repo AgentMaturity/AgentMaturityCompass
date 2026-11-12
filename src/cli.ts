@@ -36,6 +36,7 @@ import { loadTargetProfile, loadTargetProfileFromFile, setTargetProfileInteracti
 import { runTuneWizard, runUpgradeWizard } from "./tuning/tuneWizard.js";
 import { loadContextGraph } from "./context/contextGraph.js";
 import { applyAMCConfigProfile, initWorkspace, loadAMCConfig, quickstartWizard, saveAMCConfigAsync, signAmcConfigAsync } from "./workspace.js";
+import { amcConfigSignatureProblem } from "./config/amcConfigSignature.js";
 import { initWorkspaceAsync } from "./workspaceInitializationAsync.js";
 import { captureInstantWorkspaceDiagnostic } from "./cli/instantWorkspaceDiagnostic.js";
 import { runDoctorCli } from "./doctor/doctorCli.js";
@@ -13702,8 +13703,10 @@ program
   .action(async (opts: { agent?: string }) => {
     const preview = inspectSignatures(process.cwd(), opts.agent ?? activeAgent(program));
     const invalid = preview.statuses.filter((row) => !row.valid);
+    const amcConfig = amcConfigSignatureProblem(process.cwd()); // M-3: the trust boundary's own check; not re-signed here
+    if (amcConfig !== null) { console.error(chalk.red(amcConfig)); process.exitCode = 1; }
     if (invalid.length === 0) {
-      console.log(chalk.green("All config signatures are valid."));
+      console.log(amcConfig === null ? chalk.green("All config signatures are valid.") : "Every other config signature is valid.");
       return;
     }
     const fixed = await fixSignaturesAsync(process.cwd(), opts.agent ?? activeAgent(program)).catch((error: unknown) => {
