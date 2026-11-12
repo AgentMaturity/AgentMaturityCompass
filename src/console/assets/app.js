@@ -1770,6 +1770,18 @@ async function renderApprovals() {
   });
 }
 
+// L4: the roles a console user can hold (src/auth/roles.ts USER_ROLES without AGENT, which is for agent tokens).
+const CONSOLE_USER_ROLES = ["OWNER", "AUDITOR", "APPROVER", "OPERATOR", "VIEWER"];
+
+function userRolesSelect(id, current) {
+  return `<select id="${htmlEscape(id)}" multiple size="3">${CONSOLE_USER_ROLES.map((role) =>
+    `<option value="${role}" ${current.includes(role) ? "selected" : ""}>${role}</option>`).join("")}</select>`;
+}
+
+function selectedRoles(id) {
+  return [...(document.getElementById(id)?.selectedOptions || [])].map((option) => option.value);
+}
+
 async function renderUsers() {
   const users = await apiGet("/users");
   root.innerHTML = `
@@ -1777,24 +1789,26 @@ async function renderUsers() {
       <div class="scroll"><table><thead><tr><th>Username</th><th>Roles</th><th>Status</th><th>Actions</th></tr></thead><tbody id="userRows"></tbody></table></div>
       <h4>Add User</h4>
       <div class="row wrap">
-        <input id="addUserName" placeholder="username" />
-        <input id="addUserPass" type="password" placeholder="password" />
-        <input id="addUserRoles" placeholder="roles CSV (e.g. APPROVER,VIEWER)" />
+        <label>Username <input id="addUserName" autocomplete="off" /></label>
+        <label>Password <input id="addUserPass" type="password" autocomplete="new-password" /></label>
+        <label for="addUserRoles">Roles</label> ${userRolesSelect("addUserRoles", ["VIEWER"])}
         <button id="addUserBtn" data-roles="OWNER">Add</button>
       </div>
-      <pre id="usersOut" class="muted"></pre>
+      <p id="usersOut" role="status"></p>
     `)}
   `;
   const body = document.getElementById("userRows");
   body.innerHTML = (users.users || []).map((row) => `
     <tr>
-      <td>${row.username}</td>
-      <td>${row.roles.join(",")}</td>
-      <td>${row.status}</td>
+      <td>${htmlEscape(row.username)}</td>
+      <td>${htmlEscape(row.roles.join(","))}</td>
+      <td>${htmlEscape(row.status)}</td>
       <td>
-        <div class="row">
-          <button class="secondary" data-role="${row.username}" data-roles="OWNER">Set Roles</button>
-          <button class="danger" data-revoke="${row.username}" data-roles="OWNER">Revoke</button>
+        <div class="row wrap">
+          <label class="visually-hidden" for="roles-${htmlEscape(row.username)}">Roles for ${htmlEscape(row.username)}</label>
+          ${userRolesSelect(`roles-${row.username}`, row.roles)}
+          <button class="secondary" data-role="${htmlEscape(row.username)}" data-roles="OWNER">Set Roles</button>
+          <button class="danger" data-revoke="${htmlEscape(row.username)}" data-roles="OWNER">Revoke</button>
         </div>
       </td>
     </tr>
@@ -1809,36 +1823,25 @@ async function renderUsers() {
   body.querySelectorAll("button[data-role]").forEach((button) => {
     onAction(button, "click", async () => {
       const username = button.getAttribute("data-role");
-      const roles = window.prompt("Enter roles CSV:", "VIEWER");
-      if (!roles) return;
-      await apiPost("/users/roles", {
-        username,
-        roles: roles
-          .split(",")
-          .map((value) => value.trim())
-          .filter((value) => value.length > 0)
-      });
+      const roles = selectedRoles(`roles-${username}`);
+      if (roles.length === 0) throw new Error("Choose at least one role.");
+      await apiPost("/users/roles", { username, roles });
       await renderUsers();
     });
   });
   onAction(document.getElementById("addUserBtn"), "click", async () => {
     const username = document.getElementById("addUserName")?.value || "";
     const password = document.getElementById("addUserPass")?.value || "";
-    const roles = document.getElementById("addUserRoles")?.value || "";
     const out = document.getElementById("usersOut");
     try {
-      await apiPost("/users/add", {
-        username,
-        password,
-        roles: roles
-          .split(",")
-          .map((value) => value.trim())
-          .filter((value) => value.length > 0)
-      });
-      if (out) out.textContent = "User added.";
+      await apiPost("/users/add", { username, password, roles: selectedRoles("addUserRoles") });
       await renderUsers();
+      setStatus(`User added: ${username}.`);
     } catch (error) {
-      if (out) out.textContent = errText(error);
+      if (out) {
+        out.className = "status-bad";
+        out.textContent = errText(error);
+      }
     }
   });
 }
