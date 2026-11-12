@@ -125,19 +125,41 @@ export function validateCliExec(req: CliExecRequest): string | null {
     return `${UNSAFE_SHELL_FLAG} cannot be passed through the Studio API; run the command in a terminal`;
   }
 
-  // Check dangerous commands
-  const isDangerous = DANGEROUS_PREFIXES.some(p => normalized.startsWith(p));
-  if (isDangerous && !req.confirm) {
-    return `dangerous command "${normalized.split(" ").slice(0, 2).join(" ")}" requires confirm:true`;
+  // An args key is one long option name: `--` or an empty key would hand the value to Commander as a subcommand.
+  const badKey = Object.keys(req.args ?? {}).find(k => !/^(--)?[A-Za-z][A-Za-z0-9-]*$/.test(k));
+  if (badKey !== undefined) return `args key ${JSON.stringify(badKey)} is not an option name`;
+
+  // Both lists are matched on the argv the spawn receives (buildArgv: quotes removed, whitespace collapsed, args
+  // appended) with flags dropped, not on the raw string: `vault  seal`, `"vault" seal`, `--json vault seal` and
+  // `--no-color` with args { json: "down" } all reach the same command.
+  const words = buildArgv(req).filter(word => !word.startsWith("-"));
+  const at = (phrase: string, start: number): boolean => phrase.split(" ").every((word, i) => words[start + i] === word);
+
+  // Check dangerous commands: the phrase as whole tokens anywhere, so a flag's value ahead of it cannot hide it.
+  const dangerous = DANGEROUS_PREFIXES.find(p => words.some((_word, i) => at(p, i)));
+  if (dangerous && !req.confirm) {
+    return `dangerous command "${dangerous}" requires confirm:true`;
   }
 
-  // Check interactive commands
-  const isInteractive = INTERACTIVE_COMMANDS.some(p => normalized === p || normalized.startsWith(p + " "));
-  if (isInteractive) {
-    return `interactive command "${normalized.split(" ")[0]}" cannot run headless via API — use --non-interactive flag or equivalent API endpoint`;
+  // Check interactive commands: first, or after one value of a program-level option (`--agent default quickscore`).
+  // Not anywhere: a refusal has no override, and a later argument may legitimately be the word `setup`.
+  const interactive = INTERACTIVE_COMMANDS.find(p => at(p, 0) || at(p, 1));
+  if (interactive) {
+    return `interactive command "${interactive}" cannot run headless via API — use --non-interactive flag or equivalent API endpoint`;
   }
 
   return null;
+}
+
+/* ── The argv one request spawns: validated and executed from this one function ── */
+function buildArgv(req: CliExecRequest): string[] {
+  const argv = parseArgv(normalizeCliCommand(req.command.trim()));
+  if (req.format === "json" && !argv.includes("--json")) argv.push("--json");
+  for (const [k, v] of Object.entries(req.args ?? {})) {
+    argv.push(k.startsWith("--") ? k : `--${k}`);
+    if (v !== "" && v !== "true") argv.push(String(v));
+  }
+  return argv;
 }
 
 /* ── Parse command string into argv ───────────────── */
@@ -185,21 +207,7 @@ export function execCliCommand(
     });
   }
 
-  const argv = parseArgv(normalizeCliCommand(cmd));
-
-  // Add --json if requested and not already present
-  if (req.format === "json" && !argv.includes("--json")) {
-    argv.push("--json");
-  }
-
-  // Add extra args
-  if (req.args) {
-    for (const [k, v] of Object.entries(req.args)) {
-      const flag = k.startsWith("--") ? k : `--${k}`;
-      argv.push(flag);
-      if (v !== "" && v !== "true") argv.push(String(v));
-    }
-  }
+  const argv = buildArgv(req);
 
   const timeout = req.timeout ?? 120_000;
   const bin = AMC_CLI_ENTRY;

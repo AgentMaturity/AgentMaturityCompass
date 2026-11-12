@@ -15,6 +15,8 @@ docker run --rm amc-runner:local --version
 docker run --rm --entrypoint python amc-runner:local --version
 ```
 
+A container starts with an empty home, so no workspace-trust record survives `amc init` there. An agent turn in a container names its consent on the command with `--trust-workspace` (for example `agent-loop run --provider stub --trust-workspace --json "say hello"` after `init`), as `docs/WORKSPACE_TRUST.md` describes for headless hosts and `scripts/container-smoke.mjs` runs.
+
 The source build uses the package-manager version from `package.json` and `pnpm install --frozen-lockfile`, builds the kernel bundle, then packs the npm artifact. A separate stage installs that exact tarball with production dependencies. Final images contain the installed package and its bundled-runtime notices, without the source checkout, private workspace packages or build tools. The tarball checksum is `/opt/amc/artifact.sha256`; npm's installed lockfile is `/opt/amc/package-lock.json`.
 
 The npm production install resolves external dependency ranges when the image is built. The frozen source lock and tarball checksum do not make the entire runtime dependency tree or operating-system image reproducible. Native dependencies are installed for the builder's target platform; qualify each published platform separately.

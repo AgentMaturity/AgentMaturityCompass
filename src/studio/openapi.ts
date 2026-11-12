@@ -326,7 +326,7 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
                 properties: {
                   decision: { type: "string", enum: ["APPROVE_EXECUTE", "APPROVE_SIMULATE", "DENY"] },
                   mode: { type: "string", enum: ["SIMULATE", "EXECUTE"] },
-                  reason: { type: "string", minLength: 1, maxLength: 1000 },
+                  reason: { type: "string", minLength: 1, maxLength: 1000 }, expectedRequestDigestSha256: { type: "string", pattern: "^[a-f0-9]{64}$" },
                 },
                 required: ["decision"],
               },
@@ -1955,7 +1955,7 @@ function studioSchemas(): Record<string, unknown> {
     ApprovalDetailResponse: {
       type: "object",
       properties: {
-        request: { type: "object" },
+        request: { type: "object" }, requestDigestSha256: { type: "string", pattern: "^[a-f0-9]{64}$" },
         decisions: { type: "array", items: { type: "object" } },
         quorum: { type: "object" },
         status: { type: "string" },
