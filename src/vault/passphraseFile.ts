@@ -17,7 +17,7 @@ const FILE_HINT = "Use a regular file you own with mode 0600 or 0400 (not a syml
 /** A configured passphrase file that was not used: refused, missing or unreadable. The message never holds the value. */
 export class VaultPassphraseFileError extends Error {
   constructor(cause: unknown) {
-    super(`AMC_VAULT_PASSPHRASE_FILE was not used, so the vault stays locked: ${cause instanceof Error ? cause.message : String(cause)}. ${FILE_HINT}`);
+    super(`AMC_VAULT_PASSPHRASE_FILE was not used, so the vault stays locked: ${(cause instanceof Error ? cause.message : String(cause)).replace(/\.+$/, "")}. ${FILE_HINT}`);
     this.name = "VaultPassphraseFileError";
   }
 }

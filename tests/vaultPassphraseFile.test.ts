@@ -105,6 +105,7 @@ describe("unlockWithPassphraseFile", () => {
     const err = stderrOf(() => unlockWithPassphraseFile(workspace, { AMC_VAULT_PASSPHRASE_FILE: secret("not-the-vault-passphrase", 0o600) }));
     expect(vaultStatus(workspace).unlocked).toBe(false);
     expect(err).toContain("incorrect passphrase or corrupted vault");
+    expect(err).not.toContain("..");
     expect(err).not.toContain("not-the-vault-passphrase");
   });
 
