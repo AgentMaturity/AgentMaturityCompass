@@ -508,9 +508,10 @@ function gateChangeBanner({ from, to }) {
  * self-approval is open. Approve is held with that code from the gate's own excludedKeys, under the key Studio derives:
  * a WORKSPACE_ROUTER principal is checked from session records, a LOCAL_USER one from users.yaml.
  */
-function approveOffer(decide, gate, readiness, me) {
+export function approveOffer(decide, gate, readiness, me, effect = false) {
   const key = typeof me?.userId === "string" ? `${readiness.identityCheck === "session_record" ? "WORKSPACE_ROUTER" : "LOCAL_USER"}:${me.userId}` : null;
-  if (key === null || readiness.selfApprovalAllowed === true || !Array.isArray(gate?.excludedKeys) || !gate.excludedKeys.includes(key)) return decide;
+  // An effect's request never takes self-approval (src/a4/a4Effects.ts effectApprovalOf: selfApprovalAllowed false).
+  if (key === null || (readiness.selfApprovalAllowed === true && !effect) || !Array.isArray(gate?.excludedKeys) || !gate.excludedKeys.includes(key)) return decide;
   return refuse(decide, "SOD_VIOLATION");
 }
 

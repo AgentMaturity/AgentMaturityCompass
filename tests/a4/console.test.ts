@@ -142,6 +142,16 @@ describe("go-live A4 console fixes", () => {
   });
 });
 
+test("an effect request's Approve is held for a principal the completion gate excludes, even where self-approval is open", () => {
+  const approveOffer = (a4View as unknown as Record<string, (...args: unknown[]) => { allowed: boolean; reasonCodes?: string[] }>).approveOffer;
+  const gate = { excludedKeys: ["LOCAL_USER:u1"] };
+  const readiness = { identityCheck: "users_yaml", selfApprovalAllowed: true };
+  const offer = { allowed: true, reasonCodes: [] };
+  expect(approveOffer(offer, gate, readiness, { userId: "u1" })).toBe(offer);
+  expect(approveOffer(offer, gate, readiness, { userId: "u1" }, true)).toMatchObject({ allowed: false, reasonCodes: ["SOD_VIOLATION"] });
+  expect(approveOffer(offer, gate, readiness, { userId: "u2" }, true)).toBe(offer);
+});
+
 describe("H5: A4 engine requests in the approvals inbox", async () => {
   const { a4ProjectOf, publishedDigest, engineDecision } = await import("../../src/console/assets/a4Approvals.js");
   const digest = "a".repeat(64);
