@@ -370,6 +370,11 @@ export async function createApprovalForIntentAsync(input: ApprovalRequestInput, 
   }
 }
 
+export const SELF_ASSERTED_EXECUTE_REFUSAL =
+  "An EXECUTE approval needs an authenticated reviewer; --username/--roles alone are self-asserted and are refused. " +
+  "Log in with `amc approvals login --username <reviewer> --token-file <private-file>`, inspect with `amc approvals show`, " +
+  "then approve with --session-token-file <private-file> --expect-request-digest <sha256>. No decision was recorded.";
+
 export function decideApprovalForIntent(params: {
   workspace: string;
   agentId?: string;
@@ -384,6 +389,13 @@ export function decideApprovalForIntent(params: {
   userRoles?: UserRole[];
   /** Native prompt binds its signed decision to the exact reviewed request. */
   expectedRequestDigestSha256?: string;
+  /**
+   * `self-asserted`: the reviewer fields came from the caller unauthenticated (the CLI's `--username/--roles` without
+   * `--session-token-file`). Such a reviewer may deny or approve SIMULATE, never approve EXECUTE: only APPROVE_EXECUTE
+   * counts toward quorum, so a forged name must not be able to satisfy any gate. Callers that pass identity from an
+   * untrusted source must set it; omitted means the caller authenticated the reviewer (Studio session, in-process code).
+   */
+  reviewerAuthentication?: "authenticated" | "self-asserted";
 }): {
   approval: {
     approvalId: string;
@@ -402,6 +414,9 @@ export function decideApprovalForIntent(params: {
 } {
   if (params.expectedRequestDigestSha256 !== undefined && (!params.userId || !params.username || !params.userRoles?.length)) {
     throw new Error("a bound native decision requires explicit authenticated reviewer fields");
+  }
+  if (params.reviewerAuthentication === "self-asserted" && params.decision === "APPROVED" && params.mode === "EXECUTE") {
+    throw new Error(SELF_ASSERTED_EXECUTE_REFUSAL);
   }
   const request = loadApprovalRequestRecord({
     workspace: params.workspace,

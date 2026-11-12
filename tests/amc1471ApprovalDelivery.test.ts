@@ -1262,6 +1262,17 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
     try {
       configureApprovalWebhook({ workspace, url: serverUrl(receiver) });
       const created = createProtectedIntent(workspace);
+      // EXECUTE approvals come from authenticated reviewers (H-1): each logs in and binds the reviewed request digest.
+      initUsersConfig({ workspace, username: "fixture-admin", password: "fixture-admin-password" });
+      const reviewer = (username: string) => {
+        const user = addUser({ workspace, username, roles: ["OWNER"], password: `${username}-password` });
+        const tokenFile = join(workspace, "..", `${username}-${created.approvalRequestId}.token`);
+        writeFileSync(tokenFile, createSession({ workspace, user }).token, { mode: 0o600 });
+        roots.push(tokenFile);
+        return ["--username", username, "--user-id", user.userId, "--session-token-file", tokenFile];
+      };
+      const [ownerA, ownerB] = [reviewer("owner-a"), reviewer("owner-b")];
+      const digest = getApprovalInboxItem({ workspace, agentId: "default", approvalRequestId: created.approvalRequestId }).requestDigestSha256;
       const base = [
         "approvals",
         "approve",
@@ -1271,12 +1282,13 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
         "--mode",
         "execute",
         "--roles",
-        "OWNER"
+        "OWNER",
+        "--expect-request-digest",
+        digest
       ];
       const first = await runBuiltCli(workspace, [
         ...base,
-        "--username",
-        "owner-a",
+        ...ownerA,
         "--reason",
         "first reviewer"
       ]);
@@ -1285,8 +1297,7 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
 
       const duplicate = await runBuiltCli(workspace, [
         ...base,
-        "--username",
-        "owner-a",
+        ...ownerA,
         "--reason",
         "duplicate reviewer"
       ]);
@@ -1295,8 +1306,7 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
 
       const second = await runBuiltCli(workspace, [
         ...base,
-        "--username",
-        "owner-b",
+        ...ownerB,
         "--reason",
         "second reviewer"
       ]);

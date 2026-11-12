@@ -66,9 +66,22 @@ An exception or review is a recorded human decision, never a certification or a 
 amc approvals list --agent <agentId> --status pending
 amc approvals list --agent <agentId> --query <requestId-fragment> --action-class DEPLOY --risk-tier high --effective-mode execute --created-after 2026-07-01T00:00:00Z --created-before 2026-08-01T00:00:00Z --order newest --limit 50 --json
 amc approvals show --agent <agentId> <requestId>
-amc approvals approve --agent <agentId> <requestId> --mode execute --reason "approved by owner" --username <reviewer> --roles OWNER
+amc approvals login --username <reviewer> --token-file <private-session-file> --json
+amc approvals approve --agent <agentId> <requestId> --mode execute --reason "approved by owner" --user-id <userId> --username <reviewer> --roles OWNER \
+  --session-token-file <private-session-file> --expect-request-digest <requestDigestSha256-from-show>
 amc approvals deny --agent <agentId> <requestId> --reason "not approved" --username <reviewer> --roles APPROVER
 ```
+
+An EXECUTE approval needs an authenticated reviewer: `--session-token-file` (an `amc approvals login` session) and
+`--expect-request-digest`, and the reviewer fields must match the session. `--username`/`--roles` without a session are
+self-asserted, so `approve --mode execute` refuses them and records nothing; the refusal names the login command. This is
+enforced in the engine (`decideApprovalForIntent`, `reviewerAuthentication: "self-asserted"`), so every caller that
+records through the CLI is covered: native chat and one-shot prompts, ACP, and the TypeScript and Python SDKs' `approve`.
+Studio's decision routes take the reviewer from the signed-in session and its live roles. Self-asserted reviewers may
+still **deny** and approve **simulate**: neither can satisfy a gate, because only an `APPROVE_EXECUTE` decision counts
+toward quorum (a deny only stops the action). In-process library callers of `decideApprovalForIntent` hold the
+workspace signing key and are trusted to authenticate their reviewer; pass `reviewerAuthentication: "self-asserted"`
+when the identity came from an unauthenticated source.
 
 `--expect-request-digest` accepts the inbox digest or the engine's binding digest of the request (the one P2-24 break-glass prints, which leaves the request's initiator out), and the decision binds the binding digest. `--username` and `--roles` are required for decisions; `--user-id` can bind a stable identity distinct from its display name. Unknown roles and a repeated reviewer on a distinct-user request fail closed. CLI decisions use the same lifecycle delivery path as Studio. `APPROVED` remains an input compatibility alias for canonical `QUORUM_MET`.
 
@@ -116,7 +129,8 @@ The native one-shot approval prompt reads the actual signed pending request and
 prints an inspection command plus the existing authenticated login and decision
 templates. Unlike the legacy examples above, native templates include both
 `--session-token-file` and `--expect-request-digest`. Keep both: omitting them
-selects the legacy supplied-reviewer path, not authenticated native review.
+selects the self-asserted reviewer path, which can deny or approve simulate but
+is refused for an EXECUTE approval, so it can never satisfy a native gate.
 
 `amc approvals login --username '<existing-reviewer>' --token-file '<new-private-file>' --json`
 uses an existing active local user, a masked password prompt and a new private
