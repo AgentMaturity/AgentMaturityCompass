@@ -60,8 +60,21 @@ const loadButton = (ctx) => {
 };
 const releaseOf = (ctx) => views(ctx)?.release ?? null;
 
+/**
+ * v1 releases only by restarting the Compose- or Helm-hosted Studio that built the agent (deployment.same_host, D-18):
+ * on any other Studio the walk ends after Adapt, so the notice comes before the Ask form until that item reads READY.
+ */
+function sameHostNotice(ctx) {
+  const item = list(ctx.readiness?.items).find((entry) => entry.id === "deployment.same_host");
+  if (item?.status === "READY") return "";
+  return `<div class="card banner"><p><strong>Activate needs a Compose- or Helm-hosted Studio.</strong> Version 1 releases an agent only by
+    restarting the Compose- or Helm-hosted Studio that built it. On a Studio started any other way (for example with <code>amc up</code>),
+    the walk ends after Adapt: the release is refused (<code>deployment.same_host</code>). Installing a package into another workspace is
+    planned (P2-40).</p></div>`;
+}
+
 function renderConversation(ctx) {
-  return `${view.renderConversation(ctx).replaceAll(view.NO_PRODUCER, PRODUCED)}
+  return `${sameHostNotice(ctx)}${view.renderConversation(ctx).replaceAll(view.NO_PRODUCER, PRODUCED)}
     <p class="muted">Understand carries <code>deploymentNeeds</code> from Adapt; change it there (reopen Adapt). AMC never asks for a credential: each lease
       token is delivered once by AMC.</p>
     ${["ask_complete", "understanding_confirmed", "release_proposed", "deployment.same_host", "deployment.topology", "deployment.image_pinned", "backup.include_paths"]
