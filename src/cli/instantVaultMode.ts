@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import { pathExists } from "../utils/fs.js";
 import { createLocalVaultPassphrase, loadLocalVaultPassphrase, localPassphraseRefusal, localVaultPassphrasePath } from "../vault/localPassphrase.js";
-import { vaultPassphraseFromEnv } from "../vault/passphraseFile.js";
+import { adoptVaultPassphraseFile } from "../vault/passphraseFile.js";
 import { rememberedUnlockLocation } from "../vault/passphraseStore.js";
 
 export interface InstantVaultMode {
@@ -13,18 +13,17 @@ export interface InstantVaultMode {
 
 /**
  * How bare `amc`, `amc run` and `amc init` sign their first score: with the operator's AMC_VAULT_PASSPHRASE (or
- * AMC_VAULT_PASSPHRASE_FILE, read through vaultPassphraseFromEnv) or the
+ * AMC_VAULT_PASSPHRASE_FILE, adopted through adoptVaultPassphraseFile) or the
  * passphrase the gated remembered-store path unlocked with (LIVE-VAULT-02: an unlock from anywhere else is not operator
  * intent), else `.amc/local-vault-passphrase` for a non-agent process, else a new local vault, else unsigned.
  */
 export function ensureInstantVaultMode(workspace: string): InstantVaultMode {
-  let operatorPassphrase: string | null;
   try {
-    operatorPassphrase = vaultPassphraseFromEnv();
+    adoptVaultPassphraseFile(); // a new workspace's vault is sealed with it, as with the local passphrase file below
   } catch (error) {
     return { noSign: true, createdLocalPassphrase: false, localPassphrasePath: null, reason: `${error instanceof Error ? error.message : String(error)} Generated an unsigned full score.` };
   }
-  if (operatorPassphrase !== null || rememberedUnlockLocation(workspace) !== null) {
+  if ((process.env.AMC_VAULT_PASSPHRASE ?? "").length > 0 || rememberedUnlockLocation(workspace) !== null) {
     return { noSign: false, createdLocalPassphrase: false, localPassphrasePath: null, reason: null };
   }
 
