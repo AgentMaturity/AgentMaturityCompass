@@ -58,7 +58,7 @@ See: `.github/workflows/amc-score.yml`
 | Diagnostic questions | 138 |
 | Assurance packs | 86 |
 | Domain packs | 40 |
-| Framework adapters | 14 |
+| Framework adapters | 16 |
 | Scoring modules | 74+ |
 | CLI command paths | 1,300 |
 
