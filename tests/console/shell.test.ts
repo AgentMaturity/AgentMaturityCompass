@@ -253,7 +253,7 @@ describe("topbarHtml", () => {
     const shellFn = app.slice(app.indexOf("function decorateShell()"), app.indexOf("\n}\n", app.indexOf("function decorateShell()")));
     expect(shellFn).toContain("topbarHtml({");
     expect(shellFn).toContain("me: getCurrentUser()");
-    expect(shellFn).toMatch(/#signOutBtn"\)\?\.addEventListener\("click"[\s\S]*logout\(\)[\s\S]*"\.\/login"/);
+    expect(shellFn).toMatch(/onAction\(topbar\.querySelector\("#signOutBtn"\), "click"[\s\S]*logout\(\)[\s\S]*"\.\/login"/);
     const render = app.slice(app.indexOf("async function renderPage()"));
     expect(render.indexOf("decorateShell();", render.indexOf("ensureAuthenticated()"))).toBeGreaterThan(-1);
     expect(render.indexOf("decorateShell();", render.indexOf("ensureAuthenticated()"))).toBeLessThan(render.indexOf("const me = getCurrentUser();"));
