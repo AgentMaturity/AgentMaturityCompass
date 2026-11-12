@@ -107,6 +107,16 @@ function configuration(value) {
   return value;
 }
 
+/**
+ * A history read can race the turn being committed and answer 409 NATIVE_EVIDENCE_UNAVAILABLE for a moment (H1).
+ * The poller retries that one conflict with backoff and pauses only after repeated failures.
+ * @returns {number | null} the delay before the next read, or null to pause updates
+ */
+export function nativeTaskPollRetryDelay(error, failures) {
+  if (error?.status !== 409 || error?.code !== "NATIVE_EVIDENCE_UNAVAILABLE" || failures >= 4) return null;
+  return 300 * 2 ** failures;
+}
+
 /** One page-owned reader. Disconnecting this view never silently cancels or replays a task. */
 export async function renderNativeTasksPage({ root, initialAgent = "default" }) {
   mounts.get(root)?.();
@@ -114,7 +124,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   let disposed = false, config = null, task = null, tasks = [], cursor = -1, pageCursor = null, historyPending = false, timer = null;
   let polling = false, mutation = false, inspecting = false, pending = null, readGeneration = 0, setupGeneration = 0, readPaused = false;
   let retryReady = false, reconciling = false, stale = false;
-  let pollJob = null, listGeneration = 0, lastObservedAt = null, operationAction = null;
+  let pollJob = null, listGeneration = 0, lastObservedAt = null, operationAction = null, evidenceRetries = 0, retryDelay = null;
   let attachments = [], readingAttachments = false, attachmentGeneration = 0, observedTools = new Map();
   let selectedChecks = [], selectedChecksDigest = null;
   let notice = "", selectedAgent = initialAgent, taskRead = null;
@@ -352,7 +362,8 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   function schedule() {
     clearTimer();
     if (!disposed && !mutation && !inspecting && !reconciling && !readPaused && task && navigator.onLine && (historyPending || !["released","closed"].includes(task.state))) {
-      timer = setTimeout(()=>{ void poll().catch(showError); }, historyPending ? 0 : ACTIVE.has(task.state) ? 1000 : 4000);
+      const delay = retryDelay ?? (historyPending ? 0 : ACTIVE.has(task.state) ? 1000 : 4000); retryDelay = null;
+      timer = setTimeout(()=>{ void poll().catch(showError); }, delay);
     }
   }
   function poll() {
@@ -379,7 +390,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
         for (const event of value.events) { el("nativeTaskEmpty")?.remove(); appendTaskEvent(transcript, event); }
         observedTools = collectNativeTaskTools(observedTools, value.events);
         if (value.page) { cursor = value.page.nextSeq - 1; pageCursor = value.page.nextCursor ?? value.page.resumeCursor; historyPending = value.page.nextCursor !== null; }
-        stale = false; lastObservedAt = Date.now();
+        stale = false; lastObservedAt = Date.now(); evidenceRetries = 0;
         const limit = Math.max(1, Math.min(config?.limits.maxEvents || 500, 500));
         while (transcript.children.length > limit) transcript.firstElementChild.remove();
         receive(view);
@@ -392,6 +403,9 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
         return true;
       } catch (error) {
         if (!isCurrent()) return false;
+        const delay = nativeTaskPollRetryDelay(error, evidenceRetries);
+        if (delay !== null) { evidenceRetries++; retryDelay = delay; return false; }
+        evidenceRetries = 0;
         pauseObservation(); tell("Updates paused. Refresh status to reconnect; no task action will be repeated automatically.");
         throw error;
       } finally {
