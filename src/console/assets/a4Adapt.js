@@ -139,7 +139,12 @@ const factsOf = (ctx) => (isObject(specOf(ctx).understanding?.facts) ? specOf(ct
 /** The context plugin Build wrote and the probe: where it reaches (an in-process run, Studio native tasks since P2-37) and where it does not (a deployed agent). */
 function renderContext(ctx) {
   const context = buildOf(ctx)?.context;
-  const probeOffer = ctx.project.stage === "adapt" && ["built", "reviewed"].includes(ctx.project.step) ? ctx.allowed.build : view.held("The probe runs after Build");
+  // A probe records new evidence on the head revision, which supersedes an open approval request: once it has passed,
+  // running it again while one is open is held.
+  const { open, met } = view.currentGates(ctx.gates, "adapt", ctx.readiness);
+  const passed = itemOf(ctx, "context_reaches_runtime_frame")?.status === "READY";
+  const probeOffer = !(ctx.project.stage === "adapt" && ["built", "reviewed"].includes(ctx.project.step)) ? view.held("The probe runs after Build")
+    : passed && (open ?? met) ? view.held("The probe already passed; running it again would supersede the open approval request.") : ctx.allowed.build;
   return `<p class="muted">Build writes your audience, market, sector, language, accessibility, data-handling and regulatory-note answers as one attributed
       context plugin (order 160), signed. An in-process run loads it, and a Studio native task started after Build loads it into its system prompt
       when its signature checks out (in a regulated workspace a plugin that does not verify refuses the task). A deployed agent does not load it. The probe runs one turn on the stub provider and AMC checks that session's signed user/message row for the
