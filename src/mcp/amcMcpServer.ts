@@ -414,7 +414,8 @@ export function createAmcMcpServer(defaultWorkspace = process.cwd()): McpServer 
             `**Content:** ${result.contentStatus}. ${QUESTIONNAIRE_NOTICE}`,
             result.percentage === null // unanswered questions are not evaluated (packSelfAssessment.ts)
               ? `**Score:** not evaluated: ${result.notEvaluatedQuestionIds.length} of ${result.selfAssessment.total} questions unanswered`
-              : `**Score:** ${result.percentage}% · **Maturity Level:** L${result.level}`,
+              // The CLI's labels (cli-domain-product-commands.ts): the level is self-reported, the eligible level comes from the claim.
+              : `**Score:** ${result.percentage}% (self-reported level L${result.level}) · **Eligible level:** ${result.eligibleLevel === null ? "none" : `L${result.eligibleLevel}`} (self-reported answers cap at L1)`,
             `Self-assessment: ${result.selfAssessment.complete ? "complete" : `incomplete (${result.selfAssessment.answered}/${result.selfAssessment.total} answered)`} (self-reported; not a certification)`,
             `**Risk Tier:** ${result.riskTier}`,
             ``,
