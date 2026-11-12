@@ -135,10 +135,10 @@ function renderHypotheses(ctx) {
         (${esc(lane === "observed" ? "Observed" : lane ?? "unresolved")}) · verdict ${esc(reasons.includes("HYPOTHESIS_REFUTED") ? "refuted" : "observed")}
         by ${esc(String(by).slice("VERDICT_BY:".length))} (self-reported)`;
     }
-    return `Not observed ${codes(reasons)}${item?.nextAction?.route ? `<br><span class="muted">${esc(item.nextAction.label)}: <code>${esc(item.nextAction.route)}</code></span>` : ""}`;
+    return `Not observed ${codes(reasons)}`;
   };
-  return `<p class="muted">Hypotheses (not observed). Each stays proposed until <code>POST …/hypotheses/:id/observe</code> binds a runtime-written row of its
-    evidence source inside its window; the verdict is a person's statement, kept apart from the observed value.</p>
+  return `<p class="muted">Hypotheses (not observed). Each stays proposed until, after Aspire, an observation binds a runtime-written row of its
+    evidence source inside its window (this page does not record observations yet); the verdict is a person's statement, kept apart from the observed value.</p>
     ${table(["Id", "Hypothesis", "Predicted outcome", "Window", "Evidence source", "Status"], list(spec.hypotheses).map((hypothesis) => [`<code>${esc(hypothesis.id)}</code>`,
       esc(hypothesis.statement), esc(hypothesis.predictedOutcome), `${day(hypothesis.window?.from)} to ${day(hypothesis.window?.to)}`,
       `<code>${esc(hypothesis.evidenceSource?.eventType)}</code> <code>${esc(hypothesis.evidenceSource?.metric)}</code>`, observed(hypothesis)]), "No hypotheses.")}

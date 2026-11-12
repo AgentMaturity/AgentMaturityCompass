@@ -447,7 +447,7 @@ function mountProject(projectId, options) {
         // Both Activate gates run an inline effect whose lease token is answered once (the release's staging lease, the
         // deployment approval's production lease; design §10.4); this generic action would drop it.
         if (stage === "activate") throw new Error(`${view.ACTIVATE_COMPLETE}. Nothing was sent.`);
-        return post("Complete stage", stagePath("complete"), { gateId: reviewedFor(met).gateId, ...headBinding() });
+        return post(view.completeLabel(met, stage), stagePath("complete"), { gateId: reviewedFor(met).gateId, ...headBinding() });
       }
       case "hold": return post("Hold", projectPath("/hold"), { reason: reason(), ...headBinding() }, REASON);
       case "resume": return post("Resume", projectPath("/resume"), { reason: reason(), ...headBinding() }, REASON);

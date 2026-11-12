@@ -50,9 +50,42 @@ const list = (rows, empty) => (rows.length ? `<ul class="a4-rows">${rows.join(""
  */
 export function actionButton(label, action, allowed, attributes = "") {
   const ok = allowed?.allowed === true;
-  const why = allowed?.reasonCodes?.length ? allowed.reasonCodes.join(", ") : allowed?.note ?? "Studio did not offer this action";
+  const why = allowed?.reasonCodes?.length ? reasonsText(allowed.reasonCodes) : allowed?.note ?? "Not available at this point.";
   return `<button type="button" data-a4-action="${esc(action)}" ${attributes}${ok ? "" : ` disabled title="${esc(why)}"`}>${esc(label)}</button>`;
 }
+
+/**
+ * What each reason code a disabled action can carry (readiness.allowed and this page's own holds) asks the user to do, in
+ * plain words. A lowercase code is a readiness item's id. The code itself follows in parentheses.
+ */
+const REASON_TEXT = {
+  A4_STEP_ORDER: "Not yet: finish the earlier steps of this stage first.",
+  A4_GATE_OPEN: "An approval request is already open for this step; approvers decide it in the Approvals card.",
+  A4_GATE_DENIED: "This revision was denied: save an answer under Ask to start a new revision.",
+  SOD_VIOLATION: "You cannot approve this yourself (separation of duties): another approver must. You may still deny it.",
+  PRINCIPAL_NOT_MEMBER: "Your project role does not include this action: a project owner can give you the role on the Members card.",
+  PRINCIPAL_ROLE_INSUFFICIENT: "Your workspace role does not allow this action: a workspace owner can change your roles.",
+  PRINCIPAL_UNRESOLVED: "This step issues a lease in your name, so it needs a local user account: sign in as one.",
+  ADMIN_TOKEN_REFUSED: "Sign in as a user: the admin token cannot act on agent projects.",
+  A4_INTEGRITY_FAILED: "The project's record failed its integrity check: see the Integrity panel.",
+  RETIRED: "This project is retired.",
+  READ_ONLY_MODE: "Studio is running read-only.",
+  FREEZE_ACTIVE: "The workspace is frozen: nothing can change until the freeze is lifted.",
+  ON_HOLD: "The project is on hold: an owner resumes it.",
+  NOT_ON_HOLD: "The project is not on hold.",
+  GATE_NOT_OPEN: "There is no open approval request to decide.",
+  GATE_PENDING: "Waiting for approvers: the approval request has not reached its quorum yet.",
+  GATE_ROLE_NOT_ALLOWED: "This approval request does not accept decisions from your role.",
+  GATE_EXPIRING: "This approval request is about to expire: request it again.",
+  A4_DUPLICATE_DECISION: "You have already decided this approval request.",
+  IDENTITY_CHECK_LIMITED: "A regulated project takes decisions only from local user accounts, not host sessions.",
+  "resources.current": "The agent's resources changed since this revision was recorded: save an answer under Ask to record a new revision."
+};
+export function reasonText(code) {
+  return REASON_TEXT[code] ?? (/^[a-z]/.test(String(code)) ? "A requirement under Missing requirements needs attention first."
+    : "Studio does not allow this action right now: see Missing requirements.");
+}
+const reasonsText = (codes) => `${[...new Set(codes.map(reasonText))].join(" ")} (${codes.join(", ")})`;
 
 export const held = (note) => ({ allowed: false, reasonCodes: [], note });
 export const GATE_CHANGED = "The gate changed while you were on this page";
@@ -326,8 +359,11 @@ export function renderDifferences(diff, project) {
 function nextActionHtml(next) {
   if (!isObject(next)) return "";
   const route = typeof next.route === "string" && /^\.?\/(?!\/)[\w\-./?=&%]*$/.test(next.route) ? next.route : null;
-  return ` ${route ? `<a class="button secondary" href="${esc(route)}">${esc(next.label)}</a>` : `<strong>${esc(next.label)}</strong>`}${
-    typeof next.command === "string" ? ` <code>${esc(next.command)}</code> <button type="button" class="secondary" data-a4-copy="${esc(next.command)}">Copy</button>` : ""}`;
+  // A member is added on this page's Members card; the CLI form (`amc a4 members`, with its session token file) is for the terminal.
+  const members = typeof next.command === "string" && next.command.startsWith("amc a4 members ");
+  return ` ${route ? `<a class="button secondary" href="${esc(route)}">${esc(next.label)}</a>` : `<strong>${esc(next.label)}</strong>`}${members
+    ? " <span class=\"muted\">(on the Members card below)</span>" : typeof next.command === "string" ? ` <code>${esc(next.command)}</code> <button type="button"
+      class="secondary" data-a4-copy="${esc(next.command)}" aria-label="Copy the command ${esc(next.command)}">Copy</button>` : ""}`;
 }
 
 /** The items Studio's acknowledgeItem accepts (ACKNOWLEDGEABLE_ITEMS, src/a4/a4Readiness.ts); any other is 400 INPUT_INVALID. */
@@ -496,6 +532,34 @@ function requestOffer(ctx, kind) {
   return unacknowledged.length ? refuse(offer, ...unacknowledged) : offer;
 }
 
+/** A principal key as the members and candidates Studio listed name it; a key no one carries is shown as it is. */
+export function nameOf(ctx, key) {
+  const known = [...(ctx.project?.members ?? []), ...(Array.isArray(ctx.members?.candidates) ? ctx.members.candidates : [])]
+    .find((row) => row.principalKey === key);
+  return known ? `${esc(known.username)}` : `<code>${esc(key)}</code>`;
+}
+
+/**
+ * What consuming the approved gate does: the direction approval moves the stage on to Build, the completion approval
+ * completes the stage.
+ */
+export const completeLabel = (met, stage) => (met?.gate === "direction" ? "Use the direction approval and continue to Build"
+  : `Complete ${stageTitle(stage)}`);
+/**
+ * A completion gate whose stage runs an effect is consumed only once an owner opened the effect gate and project approvers
+ * approved its request (409 EFFECT_GATE_NOT_OPEN / EFFECT_QUORUM_INSUFFICIENT otherwise); the stage's effect item says
+ * which (EFFECT_GATE_NOT_OPEN, or APPROVAL_STATUS: other than QUORUM_MET).
+ */
+export function effectHold(met, readiness) {
+  if (met?.gate !== "completion") return null;
+  const effect = readiness.items.find((item) => item.reasonCodes.includes("EFFECT_GATE_NOT_OPEN") || item.reasonCodes.includes("EFFECT_GATE_OPENED"));
+  if (!effect) return null;
+  if (effect.reasonCodes.includes("EFFECT_GATE_NOT_OPEN")) return held("An owner first opens the effect gate on the stage's effect card; project approvers then approve it there.");
+  const status = effect.reasonCodes.find((code) => String(code).startsWith("APPROVAL_STATUS:"))?.slice("APPROVAL_STATUS:".length);
+  // Adapt's card reads the status itself (REVIEW_STATUS_NOT_READ): with no status named, Studio decides at Complete.
+  return status === undefined || status === "QUORUM_MET" ? null : held(`Project approvers approve the effect gate's request on the stage's effect card first (now ${status}).`);
+}
+
 export function renderApprovalsBar(ctx) {
   const { readiness, gates, stage, allowed, gateChange, specDraft } = ctx;
   const { shown, open, met, earlier, policy } = currentGates(gates, stage, readiness);
@@ -507,7 +571,7 @@ export function renderApprovalsBar(ctx) {
   // Readiness's status verbatim; only the decisions readiness.staleApprovals lists carry codes (decisionRow).
   const gateBlock = (row) => `<p><code>${esc(row.gate)}</code> gate r${esc(row.revisionNo)} · <code>${esc(row.status)}</code> ·
       ${esc(row.approvals)} of ${esc(row.required)} required approvals</p>
-      ${Array.isArray(row.excludedKeys) && row.excludedKeys.length ? `<p>Cannot approve (separation of duties); may still deny: ${codes(row.excludedKeys)}</p>` : ""}
+      ${Array.isArray(row.excludedKeys) && row.excludedKeys.length ? `<p>Cannot approve (separation of duties); may still deny: ${row.excludedKeys.map((key) => nameOf(ctx, key)).join(", ")}</p>` : ""}
       ${list(row.decisions.map((decision) => decisionRow(decision, staleCodes.get(decision.decisionId))), "No decisions yet.")}`;
   const earlierRows = earlier.map((old) => `<li><code>${esc(old.gate)}</code> gate bound to r${esc(old.revisionNo)} · <code>${esc(old.status)}</code>
     ${list(old.decisions.map((decision) => decisionRow(decision)), "No decisions.")}</li>`);
@@ -526,7 +590,8 @@ export function renderApprovalsBar(ctx) {
       ${actionButton("Hold", "hold", allowed.hold)}
       ${actionButton("Request direction approval", "request-direction", requestOffer(ctx, "direction"))}
       ${actionButton("Request completion approval", "request-completion", requestOffer(ctx, "completion"))}
-      ${actionButton("Complete stage", "complete", stage === "activate" && met ? held(ACTIVATE_COMPLETE) : met ? pinned(allowed.progress) : null)}
+      ${actionButton(completeLabel(met, stage), "complete", stage === "activate" && met ? held(ACTIVATE_COMPLETE)
+        : met ? effectHold(met, readiness) ?? pinned(allowed.progress) : null)}
     </div>
     <details data-a4-open="more"><summary>More</summary><div class="row wrap">${actionButton("Deny", "deny", open ? pinned(allowed.decide) : null)}
       ${allowed.resume ? actionButton("Resume", "resume", allowed.resume) : ""}</div></details></section>`;
