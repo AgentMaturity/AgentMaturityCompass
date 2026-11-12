@@ -460,8 +460,12 @@ function mountProject(projectId, options) {
       case "add-member": {
         const row = button.closest("[data-principal]");
         // `projectRoles`: Studio refuses any body naming `roles` as an identity claim.
+        // The add is a project transition: it supersedes an open gate, whose approvals then stop counting (docs/A4_FORGE.md).
+        const { open, met } = view.currentGates(state.gates, stage, state.readiness);
+        const live = open ?? met;
         return post("Add member", projectPath("/members"), { principalKey: row.dataset.principal,
-          projectRoles: [row.querySelector('[name="role"]').value], ...headBinding() }, [`member:${row.dataset.principal}:role`]);
+          projectRoles: [row.querySelector('[name="role"]').value], ...headBinding() }, [`member:${row.dataset.principal}:role`],
+          () => { if (live) tell(`Member added. The open ${live.gate} approval request was superseded by the add: request it again.`); });
       }
       case "comment": {
         const body = value("comment");
