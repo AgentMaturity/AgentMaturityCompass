@@ -20,3 +20,5 @@
 
 /* While one write and the reload after it run (a4.js guarded), actions are dimmed and not clickable. */
 #app[aria-busy="true"] [data-a4-action] { pointer-events: none; opacity: 0.55; }
+/* Digests, reason codes and ids are long unbroken strings: wrap them instead of clipping them at phone width. */
+#app code { overflow-wrap: anywhere; }
