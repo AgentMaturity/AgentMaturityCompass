@@ -95,6 +95,14 @@ async function sectorCounts() {
   return { packs: listIndustryPacks().length, questions, stations };
 }
 
+/** Requirements a station's conformance run evaluates, from the built derivation (no station profile). */
+async function conformanceRequirements(station) {
+  const built = join(root, "dist/domains/conformance/conformanceRequirements.js");
+  if (!existsSync(built)) return null;
+  const { deriveStationRequirements } = await import(built);
+  return deriveStationRequirements(station).length;
+}
+
 export async function collectCounts() {
   const testFiles = walk(join(root, "tests"), (n) => n.endsWith(".test.ts")).length;
   // Retained for inventory consumers: lexical matches, not discovered cases
@@ -127,6 +135,8 @@ export async function collectCounts() {
     sectorPacks: sector?.packs ?? null,
     sectorPackQuestions: sector?.questions ?? null,
     sectorStations: sector?.stations ?? null,
+    conformanceRequirementsHealth: await conformanceRequirements("health"),
+    conformanceRequirementsWealth: await conformanceRequirements("wealth"),
     layer0Controls: layer0?.controls ?? null,
     layer0ExecutedControls: layer0?.executed ?? null,
     layer0AwaitingProducer: layer0?.awaiting ?? null,
