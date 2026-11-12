@@ -19516,6 +19516,7 @@ program.action(async (_opts, command: Command) => {
   if (rootArgs.length > 0) {
     const unknownToken = String(rootArgs[0]);
     console.error(chalk.red(`error: unknown command '${unknownToken}'`));
+    if (unknownToken === "version") console.error(chalk.yellow("Did you mean: amc --version"));
     const suggestions = suggestCommandPaths(unknownToken, flattenCommandPaths(program), 6);
     if (suggestions.length > 0) {
       console.error(chalk.yellow("Closest command paths:"));
@@ -24037,6 +24038,9 @@ if (isTopLevelHelpRequest(process.argv)) {
   process.exit(0);
 }
 
+// The root action reports an unknown command itself; commander's default would refuse its token as "too many
+// arguments" first. Set last, so no subcommand inherits it (commander copies the setting when a command is created).
+program.allowExcessArguments(true);
 program.parseAsync(process.argv).catch((error: unknown) => {
   const message = normalizeCliErrorMessage(error);
   const unknownToken = parseUnknownCommandToken(message);

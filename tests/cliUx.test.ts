@@ -1,3 +1,7 @@
+import { spawnSync } from "node:child_process";
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { Command } from "commander";
 import {
@@ -92,5 +96,24 @@ describe("cliUx", () => {
     expect(buildCommandInventory(program).map((entry) => entry.path)).toEqual(["run"]);
     expect(buildCommandInventory(program, { includeInternal: true }).map((entry) => entry.path))
       .toEqual(["_daemon", "forward", "run"]);
+  });
+});
+
+describe("the built CLI with an unknown top-level command (run `npm run build` first)", () => {
+  const amc = (...args: string[]) => spawnSync(process.execPath, [join(process.cwd(), "dist", "cli.js"), ...args],
+    { cwd: mkdtempSync(join(tmpdir(), "amc-unknown-command-")), encoding: "utf8", env: { ...process.env, NO_COLOR: "1" } });
+
+  it.each([["scor", "score"], ["frobnicate", null]])("amc %s names the unknown command, suggests, and exits non-zero", (token, suggestion) => {
+    const result = amc(token);
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain(`unknown command '${token}'`);
+    expect(result.stderr).not.toContain("too many arguments");
+    if (suggestion) expect(result.stderr).toContain(`amc ${suggestion}`);
+  });
+
+  it("amc version suggests --version", () => {
+    const result = amc("version");
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain("amc --version");
   });
 });
