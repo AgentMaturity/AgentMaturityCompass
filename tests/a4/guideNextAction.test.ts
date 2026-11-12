@@ -327,3 +327,17 @@ describe("A-9: the deploy receipt form's helmRevision is an integer placeholder"
     expect(plan("compose").receiptForm.body.helmRevision).toBeNull();
   });
 });
+
+// H4 (go-live smoke): a stale answer is confirmed by saving its same value again on the new revision.
+describe("H4: re-affirming a stale answer", () => {
+  test("saving the same value clears ANSWER_STALE", async () => {
+    const ws = a4Workspace();
+    const p = await A4Project.create(ws.workspace, ws.alice);
+    await p.ok(ws.alice, "/stages/aspire/answers", { answers: aspireAnswers() });
+    await p.ok(ws.alice, "/stages/aspire/answers", { answers: [{ questionId: "markets", value: ["US"] }] });
+    const codes = async () => itemOf(await readiness(p, ws.alice), "ask_complete")?.reasonCodes ?? [];
+    expect(await codes()).toContain("ANSWER_STALE:stations");
+    await p.ok(ws.alice, "/stages/aspire/answers", { answers: [{ questionId: "stations", value: ["technology"] }] });
+    expect(await codes()).not.toContain("ANSWER_STALE:stations");
+  });
+});
