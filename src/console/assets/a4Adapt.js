@@ -233,11 +233,11 @@ export function register() {
     if (!button.dataset.gate) throw new Error("No approved completion gate is shown. Refresh first. Nothing was sent.");
     return { label: "Open the plan review", path: projectPath(`/stages/adapt/effects/${EFFECT}/open`), body: { gateId: button.dataset.gate, ...headBinding() } };
   });
-  registerStageAction("adapt", "decide-engine", ({ button, value, projectId }) => {
+  registerStageAction("adapt", "decide-engine", ({ button, value, projectId, me }) => {
     const reason = value("engine-reason");
     if (!reason) throw new Error("Write a decision reason first. Nothing was sent.");
     return { label: button.dataset.verb === "deny" ? "Deny" : "Approve",
       ...engineDecision(projectId, button.dataset.approval, button.dataset.verb, reason, button.dataset.digest),
-      got: () => rememberDecided(button.dataset.approval) };
+      got: () => rememberDecided(button.dataset.approval, me?.username) };
   });
 }

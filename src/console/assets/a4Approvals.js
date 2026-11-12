@@ -62,9 +62,19 @@ export async function a4Projects() {
   }
 }
 
-/** Engine requests this page recorded a decision on: readiness names no engine decisions, and a second one is refused (distinct_approvers). */
-const decidedHere = new Set();
-export const rememberDecided = (approvalRequestId) => { decidedHere.add(approvalRequestId); };
+/**
+ * Engine requests this tab recorded a decision on, per username: readiness names no engine decisions, and a second one is refused
+ * (distinct_approvers). Kept in sessionStorage so a reload in the same tab remembers; Studio still refuses any repeat.
+ */
+const DECIDED_KEY = "amc.a4.decidedEngineRequests";
+const decidedHere = (() => {
+  try { return new Set(JSON.parse(sessionStorage.getItem(DECIDED_KEY) ?? "[]")); } catch { return new Set(); }
+})();
+const decidedKey = (username, approvalRequestId) => `${username ?? ""}:${approvalRequestId}`;
+export const rememberDecided = (approvalRequestId, username) => {
+  decidedHere.add(decidedKey(username, approvalRequestId));
+  try { sessionStorage.setItem(DECIDED_KEY, JSON.stringify([...decidedHere].slice(-200))); } catch { /* storage unavailable: this load still remembers */ }
+};
 
 /**
  * Approve and Deny for a stage's effect request. Approve is refused (400 SOD_VIOLATION) to anyone the stage's completion
@@ -72,7 +82,7 @@ export const rememberDecided = (approvalRequestId) => { decidedHere.add(approval
  */
 export function effectDecideButtons(ctx, stage, approvalRequestId, digest) {
   const gate = currentGates(ctx.gates, stage, ctx.readiness).shown.find((row) => row.gate === "completion");
-  const done = decidedHere.has(approvalRequestId) ? held("You have already decided this request.") : null;
+  const done = decidedHere.has(decidedKey(ctx.me?.username, approvalRequestId)) ? held("You have already decided this request.") : null;
   const button = (verb, label, offer) => actionButton(label, "decide-engine", done ?? offer,
     `data-approval="${esc(approvalRequestId)}" data-digest="${esc(digest)}" data-verb="${verb}"`);
   return `${button("approve", "Approve", approveOffer(ctx.allowed.requestChanges, gate, ctx.readiness, ctx.me, true))} ${button("deny", "Deny", ctx.allowed.requestChanges)}`;

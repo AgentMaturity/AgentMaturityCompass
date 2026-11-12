@@ -288,9 +288,9 @@ export function register() {
   });
   registerStageAction("assemble", "resolve-outcome", ({ button, headBinding, projectPath }) => ({ label: "Record the resolution",
     path: projectPath(`/outcome-unknown/${encodeURIComponent(button.dataset.execution)}/resolve`), body: headBinding() }));
-  registerStageAction("assemble", "decide-engine", ({ button, value, projectId }) => ({ label: button.dataset.verb === "deny" ? "Deny" : "Approve",
+  registerStageAction("assemble", "decide-engine", ({ button, value, projectId, me }) => ({ label: button.dataset.verb === "deny" ? "Deny" : "Approve",
     ...engineDecision(projectId, button.dataset.approval, button.dataset.verb, reasonOf(value), button.dataset.digest),
-    got: () => rememberDecided(button.dataset.approval) }));
+    got: () => rememberDecided(button.dataset.approval, me?.username) }));
   registerStageAction("assemble", "open-effect", ({ button, headBinding, projectPath }) => {
     if (!button.dataset.gate) throw new Error("No approved completion gate is shown. Refresh first. Nothing was sent.");
     return { label: "Open the effect gate", path: projectPath("/stages/assemble/effects/a4.assemble.apply/open"), body: { gateId: button.dataset.gate, ...headBinding() } };
