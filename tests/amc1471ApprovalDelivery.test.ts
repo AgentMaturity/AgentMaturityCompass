@@ -715,7 +715,7 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
       )).toBe(false);
 
       const decisionRequest = createProtectedIntent(workspace);
-      decideApprovalForIntent({
+      decideApprovalForIntent({ reviewerAuthentication: "authenticated",
         workspace,
         approvalId: decisionRequest.approvalRequestId,
         decision: "APPROVED",
@@ -756,7 +756,7 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
       const created = createProtectedIntent(workspace);
       const path = join(workspace, ".amc", file);
       writeFileSync(path, `${readFileSync(path, "utf8")}\n# tampered`, "utf8");
-      expect(() => decideApprovalForIntent({
+      expect(() => decideApprovalForIntent({ reviewerAuthentication: "authenticated",
         workspace,
         approvalId: created.approvalRequestId,
         decision: "APPROVED",
@@ -779,7 +779,7 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
     const workspace = newWorkspace(false);
     const created = createProtectedIntent(workspace);
     for (const suffix of ["a", "b"]) {
-      decideApprovalForIntent({
+      decideApprovalForIntent({ reviewerAuthentication: "authenticated",
         workspace,
         approvalId: created.approvalRequestId,
         decision: "APPROVED",
@@ -818,7 +818,7 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
     const source = createProtectedIntent(workspace);
     const target = createProtectedIntent(workspace);
     for (const suffix of ["a", "b"]) {
-      decideApprovalForIntent({
+      decideApprovalForIntent({ reviewerAuthentication: "authenticated",
         workspace,
         approvalId: source.approvalRequestId,
         decision: "APPROVED",
@@ -924,7 +924,7 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
     try {
       configureApprovalWebhook({ workspace, url: serverUrl(receiver) });
       const request = createProtectedIntent(workspace);
-      decideApprovalForIntent({
+      decideApprovalForIntent({ reviewerAuthentication: "authenticated",
         workspace,
         approvalId: request.approvalRequestId,
         decision: "APPROVED",
@@ -943,7 +943,7 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
       expect(partial.eventName).toBe("APPROVAL_DECISION_RECORDED");
       expect(partial.status).toBe("DELIVERED");
 
-      decideApprovalForIntent({
+      decideApprovalForIntent({ reviewerAuthentication: "authenticated",
         workspace,
         approvalId: request.approvalRequestId,
         decision: "APPROVED",
@@ -963,7 +963,7 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
       expect(quorum.status).toBe("DELIVERED");
 
       const deniedRequest = createProtectedIntent(workspace);
-      decideApprovalForIntent({
+      decideApprovalForIntent({ reviewerAuthentication: "authenticated",
         workspace,
         approvalId: deniedRequest.approvalRequestId,
         decision: "DENIED",
@@ -1211,7 +1211,7 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
           approvalRequestId: string;
         };
         for (const suffix of ["a", "b"]) {
-          decideApprovalForIntent({
+          decideApprovalForIntent({ reviewerAuthentication: "authenticated",
             workspace,
             approvalId: intent.approvalRequestId,
             decision: "APPROVED",
@@ -1363,7 +1363,7 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
         agentId: "default",
         approvalRequestId: cancelledRequest.approvalRequestId
       });
-      expect(() => decideApprovalForIntent({
+      expect(() => decideApprovalForIntent({ reviewerAuthentication: "authenticated",
         workspace,
         approvalId: cancelledRequest.approvalRequestId,
         decision: "APPROVED",

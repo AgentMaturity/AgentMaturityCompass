@@ -390,12 +390,12 @@ export function decideApprovalForIntent(params: {
   /** Native prompt binds its signed decision to the exact reviewed request. */
   expectedRequestDigestSha256?: string;
   /**
-   * `self-asserted`: the reviewer fields came from the caller unauthenticated (the CLI's `--username/--roles` without
-   * `--session-token-file`). Such a reviewer may deny or approve SIMULATE, never approve EXECUTE: only APPROVE_EXECUTE
-   * counts toward quorum, so a forged name must not be able to satisfy any gate. Callers that pass identity from an
-   * untrusted source must set it; omitted means the caller authenticated the reviewer (Studio session, in-process code).
+   * Required (H-1). `authenticated` only where the caller verified the reviewer itself: a tracked session token
+   * (`readNativeApprovalActor`), Studio's signed-in session. Anything else is `self-asserted`: such a reviewer may deny
+   * or approve SIMULATE, never approve EXECUTE, and the kind is recorded on the signed row so no consumer counts a
+   * self-asserted approval as an identity or role attestation (countedApprovalDecisions).
    */
-  reviewerAuthentication?: "authenticated" | "self-asserted";
+  reviewerAuthentication: "authenticated" | "self-asserted";
 }): {
   approval: {
     approvalId: string;
@@ -415,7 +415,7 @@ export function decideApprovalForIntent(params: {
   if (params.expectedRequestDigestSha256 !== undefined && (!params.userId || !params.username || !params.userRoles?.length)) {
     throw new Error("a bound native decision requires explicit authenticated reviewer fields");
   }
-  if (params.reviewerAuthentication === "self-asserted" && params.decision === "APPROVED" && params.mode === "EXECUTE") {
+  if (params.reviewerAuthentication !== "authenticated" && params.decision === "APPROVED" && params.mode === "EXECUTE") {
     throw new Error(SELF_ASSERTED_EXECUTE_REFUSAL);
   }
   const request = loadApprovalRequestRecord({
@@ -477,6 +477,7 @@ export function decideApprovalForIntent(params: {
     roles: params.userRoles ?? ["OWNER"],
     decision: modeDecision,
     reason: params.reason,
+    authentication: params.reviewerAuthentication === "authenticated" ? "authenticated" : "self-asserted",
     ...(params.expectedRequestDigestSha256 === undefined ? {} : { expectedRequestDigestSha256: params.expectedRequestDigestSha256 })
   }).decision;
   const policy = loadApprovalPolicy(params.workspace);

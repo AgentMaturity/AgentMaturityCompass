@@ -178,7 +178,7 @@ export function settleByOperator(f: P104Fixture, id: string, effect: "applied" |
   const base = join(getAgentPaths(f.workspace, "default").rootDir, "approvals");
   signedArtifact(join(base, "requests", `${created.approvalRequestId}.json`), f.auditor);
   for (const reviewer of [{ id: "owned-owner", role: "OWNER" as const }, { id: "owned-auditor", role: "AUDITOR" as const }]) {
-    decideApprovalForIntent({ workspace: f.workspace, agentId: "default", approvalId: created.approvalRequestId,
+    decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: f.workspace, agentId: "default", approvalId: created.approvalRequestId,
       decision: "APPROVED", mode: "EXECUTE", reason: "Review only this owned exact-head resolution",
       userId: reviewer.id, username: reviewer.id, userRoles: [reviewer.role], expectedRequestDigestSha256: approvalRequestBindingDigest(request) });
   }

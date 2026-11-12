@@ -123,7 +123,7 @@ try {
         assert.equal(request.requiredApprovals, 2); assert.equal(request.requireDistinctUsers, true);
         for (const actor of op.actors ?? [{ id: "finance-owner", role: "OWNER" }, { id: "finance-auditor", role: "AUDITOR" }]) {
           try {
-            decideApprovalForIntent({ workspace: c.workspace, agentId: "default", approvalId: request.approvalRequestId,
+            decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: c.workspace, agentId: "default", approvalId: request.approvalRequestId,
               decision: "APPROVED", mode: "EXECUTE", userId: actor.id, username: actor.id, userRoles: [actor.role],
               reason: "Review the exact owned synthetic payment", expectedRequestDigestSha256: approvalRequestBindingDigest(request) });
           } catch (error) { if (!op.actors) throw error; refusals.push({ actor: actor.id, message: error.message }); }

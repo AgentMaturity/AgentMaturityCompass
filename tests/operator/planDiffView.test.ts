@@ -111,7 +111,7 @@ describe("operator plan activation", () => {
   const shippedPlan = (profileId?: string) => compilePlan({ profile: profileId ? { ...profile(), profileId } : profile(), catalog, asOf: new Date().toISOString() });
   const approve = (approvalId: string, userId: string, bound = true) => {
     const request = loadApprovalRequestRecord({ workspace, agentId: "default", approvalRequestId: approvalId, requireValidSignature: true });
-    decideApprovalForIntent({ workspace, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE", reason: "P2-22 fixture plan review",
+    decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE", reason: "P2-22 fixture plan review",
       userId, username: userId, userRoles: ["OWNER"], ...(bound ? { expectedRequestDigestSha256: approvalRequestBindingDigest(request) } : {}) });
   };
 

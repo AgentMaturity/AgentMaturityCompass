@@ -124,7 +124,7 @@ function activatePlan(owner: string): string {
   const { signed } = signPlan({ workspace, plan, previous: null, reviewAgentId: "default" });
   const approvalId = signed.review.approvalRequestId!;
   for (const userId of ["approver-1", "approver-2"]) {
-    decideApprovalForIntent({ workspace, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE",
+    decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE",
       reason: "P1-79 fixture plan review", userId, username: userId, userRoles: ["OWNER"] });
   }
   activateControlPlan({ workspace, signed, approvalRequestId: approvalId, reviewAgentId: "default" });
@@ -239,7 +239,7 @@ function signWriteSchedule(): { readonly schedules: string; readonly tools: stri
 
 /** A test approver, as an operator answering the CLI's printed instructions would (WRITE_LOW needs one approval). */
 function approveAsTester(approvalRequestId: string): void {
-  decideApprovalForIntent({ workspace, agentId: "default", approvalId: approvalRequestId, decision: "APPROVED", mode: "EXECUTE",
+  decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace, agentId: "default", approvalId: approvalRequestId, decision: "APPROVED", mode: "EXECUTE",
     reason: "P1-79 fixture schedule review", userId: "approver-1", username: "approver-1", userRoles: ["OWNER"] });
 }
 

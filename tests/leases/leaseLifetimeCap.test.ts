@@ -59,7 +59,7 @@ describe("the plan's lease lifetime cap on sibling verification paths", () => {
     const { signed } = signPlan({ workspace, plan, previous: null, reviewAgentId: "default" });
     const approvalId = signed.review.approvalRequestId!;
     for (const userId of ["owner-1", "owner-2"]) {
-      decideApprovalForIntent({ workspace, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE", reason: "lease cap fixture plan review",
+      decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE", reason: "lease cap fixture plan review",
         userId, username: userId, userRoles: ["OWNER"] });
     }
     activateControlPlan({ workspace, signed, approvalRequestId: approvalId, reviewAgentId: "default" });

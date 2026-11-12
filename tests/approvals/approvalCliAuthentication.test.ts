@@ -8,7 +8,7 @@ import { initActionPolicy } from "../../src/governor/actionPolicyEngine.js";
 import { initToolsConfig } from "../../src/toolhub/toolhubValidators.js";
 import { initBudgets } from "../../src/budgets/budgets.js";
 import { addUser, createSession, initUsersConfig } from "../../src/auth/authApi.js";
-import { approvalStatusPayload, createApprovalForIntent } from "../../src/approvals/approvalEngine.js";
+import { approvalStatusPayload, createApprovalForIntent, decideApprovalForIntent } from "../../src/approvals/approvalEngine.js";
 import { approvalRequestBindingDigest, listApprovalDecisions } from "../../src/approvals/approvalChainStore.js";
 import { registerApprovalCliCommands } from "../../src/approvals/approvalCliCommands.js";
 
@@ -81,6 +81,29 @@ describe("approval decisions from the CLI", () => {
         "--username", name, "--roles", "APPROVER", "--session-token-file", tokenFile, "--expect-request-digest", f.digest, f.id);
     }
     expect(approvalStatusPayload({ workspace: f.workspace, agentId: "default", approvalId: f.id }).quorum).toMatchObject({ status: "QUORUM_MET", received: 2 });
+  });
+
+  it("refuses an EXECUTE approval whose caller omits reviewerAuthentication (deny by default)", () => {
+    const f = fixture();
+    const omitted = { workspace: f.workspace, agentId: "default", approvalId: f.id, decision: "APPROVED", mode: "EXECUTE", reason: "sdk",
+      username: "sdk-user", userId: "sdk-user", userRoles: ["OWNER"] } as unknown as Parameters<typeof decideApprovalForIntent>[0];
+    expect(() => decideApprovalForIntent(omitted)).toThrow(/authenticated reviewer/);
+    expect(listApprovalDecisions({ workspace: f.workspace, agentId: "default", approvalRequestId: f.id, includeUncounted: true })).toHaveLength(0);
+  });
+
+  it("records a self-asserted SIMULATE approval as such and no consumer counts it", async () => {
+    const f = fixture();
+    await cli("approve", "--agent", "default", "--mode", "simulate", "--reason", "smoke", "--username", "ada", "--roles", "OWNER", f.id);
+    const all = listApprovalDecisions({ workspace: f.workspace, agentId: "default", approvalRequestId: f.id, includeUncounted: true });
+    expect(all.map((row) => [row.decision, row.authentication])).toEqual([["APPROVE_SIMULATE", "self-asserted"]]);
+    // What waiver publication, evidence fulfilment, authorization and the distinct-user check read: nothing.
+    expect(listApprovalDecisions({ workspace: f.workspace, agentId: "default", approvalRequestId: f.id })).toHaveLength(0);
+    // The forged "ada" row does not block the real ada (distinct-user check), and her approval is recorded authenticated.
+    const { user, tokenFile } = f.login("ada");
+    await cli("approve", "--agent", "default", "--mode", "execute", "--reason", "reviewed", "--user-id", user.userId,
+      "--username", "ada", "--roles", "APPROVER", "--session-token-file", tokenFile, "--expect-request-digest", f.digest, f.id);
+    expect(listApprovalDecisions({ workspace: f.workspace, agentId: "default", approvalRequestId: f.id }).map((row) => row.authentication)).toEqual(["authenticated"]);
+    expect(approvalStatusPayload({ workspace: f.workspace, agentId: "default", approvalId: f.id }).quorum).toMatchObject({ status: "PENDING", received: 1 });
   });
 
   it("keeps the self-asserted path for deny (fail-safe, never counts toward quorum)", async () => {

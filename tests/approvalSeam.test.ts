@@ -177,7 +177,7 @@ function decidingRuntime(workspace: string, decide: (approvalRequestId: string) 
 
 /** One genuine signed approval decision by one named reviewer. */
 function approveAs(workspace: string, approvalRequestId: string, who: string): void {
-  decideApprovalForIntent({
+  decideApprovalForIntent({ reviewerAuthentication: "authenticated",
     workspace,
     agentId: "default",
     approvalId: approvalRequestId,
@@ -191,7 +191,7 @@ function approveAs(workspace: string, approvalRequestId: string, who: string): v
 }
 
 function denyAs(workspace: string, approvalRequestId: string, who: string): void {
-  decideApprovalForIntent({
+  decideApprovalForIntent({ reviewerAuthentication: "authenticated",
     workspace,
     agentId: "default",
     approvalId: approvalRequestId,

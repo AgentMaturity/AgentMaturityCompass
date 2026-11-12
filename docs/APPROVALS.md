@@ -74,14 +74,21 @@ amc approvals deny --agent <agentId> <requestId> --reason "not approved" --usern
 
 An EXECUTE approval needs an authenticated reviewer: `--session-token-file` (an `amc approvals login` session) and
 `--expect-request-digest`, and the reviewer fields must match the session. `--username`/`--roles` without a session are
-self-asserted, so `approve --mode execute` refuses them and records nothing; the refusal names the login command. This is
-enforced in the engine (`decideApprovalForIntent`, `reviewerAuthentication: "self-asserted"`), so every caller that
-records through the CLI is covered: native chat and one-shot prompts, ACP, and the TypeScript and Python SDKs' `approve`.
-Studio's decision routes take the reviewer from the signed-in session and its live roles. Self-asserted reviewers may
-still **deny** and approve **simulate**: neither can satisfy a gate, because only an `APPROVE_EXECUTE` decision counts
-toward quorum (a deny only stops the action). In-process library callers of `decideApprovalForIntent` hold the
-workspace signing key and are trusted to authenticate their reviewer; pass `reviewerAuthentication: "self-asserted"`
-when the identity came from an unauthenticated source.
+self-asserted, so `approve --mode execute` refuses them and records nothing; the refusal names the login command.
+
+The engine enforces this for every caller. `decideApprovalForIntent` requires `reviewerAuthentication`, and anything
+other than `"authenticated"` is refused an EXECUTE approval, so a caller that omits it fails closed. Only callers that
+verified the reviewer pass `"authenticated"`: the CLI's session-token path (and through it native chat and one-shot
+prompts, ACP, and the TypeScript and Python SDKs' `approve`), Studio's decision routes (the signed-in session and its
+live roles, or the admin token), and Studio's audit evidence approval. `amc audit request approve --actor <id>` is
+self-asserted: it raises the dual-control request but records no owner decision; signed-in reviewers decide it.
+
+Each signed decision records `authentication: "authenticated" | "self-asserted"`. A self-asserted reviewer may still
+**deny** and approve **simulate**, but only a DENY or an authenticated approval is read by the engine and its consumers
+(`listApprovalDecisions`, `countedApprovalDecisions`): quorum, the distinct-user check, the native gate, assurance
+waiver publication (its OWNER and AUDITOR approvals), audit evidence fulfilment, authorization records and A4 effect
+approvals. A self-asserted approval of either mode, and a legacy row without the field, never attests to an identity
+or role; a deny only ever stops an action. Inbox and Studio displays still list every signed row.
 
 `--expect-request-digest` accepts the inbox digest or the engine's binding digest of the request (the one P2-24 break-glass prints, which leaves the request's initiator out), and the decision binds the binding digest. `--username` and `--roles` are required for decisions; `--user-id` can bind a stable identity distinct from its display name. Unknown roles and a repeated reviewer on a distinct-user request fail closed. CLI decisions use the same lifecycle delivery path as Studio. `APPROVED` remains an input compatibility alias for canonical `QUORUM_MET`.
 

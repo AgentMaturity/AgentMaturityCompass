@@ -123,7 +123,7 @@ export function cleanupGovernanceFixtures(): void {
 /** Record one decision per reviewer, each bound to the exact request digest the approval names. */
 export function decideBound(workspace: string, approval: BoundApproval, reviewers: readonly { id: string; role: "OWNER" | "AUDITOR" }[],
   decision: "APPROVED" | "DENIED" = "APPROVED"): void {
-  for (const reviewer of reviewers) decideApprovalForIntent({ workspace, agentId: approval.agentId, approvalId: approval.approvalRequestId,
+  for (const reviewer of reviewers) decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace, agentId: approval.agentId, approvalId: approval.approvalRequestId,
     decision, mode: "EXECUTE", reason: "P2-24 fixture decision on the exact request", userId: reviewer.id, username: reviewer.id,
     userRoles: [reviewer.role], expectedRequestDigestSha256: approval.requestBindingDigest });
 }

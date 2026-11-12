@@ -63,7 +63,7 @@ export function observeFixtureApprovals(workspace: string, mode: OutcomeCase) {
           throw new Error("Unexpected fixture approval identity or quorum; no decision was granted.");
         }
         for (const user of ["validation-fixture-ada", "validation-fixture-grace"]) {
-          decideApprovalForIntent({ workspace, agentId: "default", approvalId: request.approvalRequestId,
+          decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace, agentId: "default", approvalId: request.approvalRequestId,
             decision: mode === "denied" ? "DENIED" : "APPROVED", mode: "EXECUTE",
             reason: "Automated validation regression fixture decision, not a human trial.", username: user, userId: user, userRoles: ["APPROVER"] });
           decisions++;

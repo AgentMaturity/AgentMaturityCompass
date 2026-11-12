@@ -130,7 +130,7 @@ try {
       const required = c.mode === "weaker-policy" ? 1 : 2;
       assert.equal(grant.request.requiredApprovals, required); assert.equal(grant.request.requireDistinctUsers, true);
       for (const actor of [{ id: "oracle-owner", role: "OWNER" }, { id: "oracle-auditor", role: "AUDITOR" }].slice(0, required)) {
-        decideApprovalForIntent({ workspace: c.workspace, agentId: "default", approvalId: grant.request.approvalRequestId,
+        decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: c.workspace, agentId: "default", approvalId: grant.request.approvalRequestId,
           decision: "APPROVED", mode: "EXECUTE", reason: "Review only the owned exact finance oracle fixture",
           userId: actor.id, username: actor.id, userRoles: [actor.role],
           expectedRequestDigestSha256: approvalRequestBindingDigest(grant.request) });
