@@ -60,6 +60,13 @@ describe("minimal startup setup", () => {
     expect(YAML.parse(readFileSync(join(shared, ".amc", "amc.config.yaml"), "utf8")).security.trustBoundaryMode).toBe("shared");
   });
 
+  test("init without a terminal or passphrase names every way forward", () => {
+    const root = tempRoot();
+    const result = runCli(root, ["init"]);
+    expect(result.status).toBe(1);
+    for (const way of ["AMC_VAULT_PASSPHRASE", "AMC_VAULT_PASSPHRASE_FILE", "--skip-vault", "--minimal"]) expect(result.stderr).toContain(way);
+  });
+
   test("quickstart --minimal uses the same non-interactive startup path", () => {
     const root = tempRoot();
     const result = runCli(root, ["quickstart", "--minimal", "--profile", "ci"]);

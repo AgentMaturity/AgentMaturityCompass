@@ -2229,8 +2229,11 @@ program
         }
         process.env.AMC_VAULT_PASSPHRASE = passphrase;
       } else {
-        console.error(chalk.red("AMC_VAULT_PASSPHRASE environment variable is required in non-interactive mode."));
+        console.error(chalk.red("No terminal to prompt for the vault passphrase. Supply one of:"));
         console.error(chalk.gray("  export AMC_VAULT_PASSPHRASE='your-passphrase'"));
+        console.error(chalk.gray("  export AMC_VAULT_PASSPHRASE_FILE=/path/to/a/0600/file"));
+        console.error(chalk.gray("  amc init --skip-vault   (generates a passphrase and remembers it for your user)"));
+        console.error(chalk.gray("  amc init --minimal      (generates a passphrase and prints it once)"));
         process.exit(1);
       }
     }
