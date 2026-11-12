@@ -91,7 +91,8 @@ function projectApprovalInboxItem(params: {
   const decisions = listApprovalDecisions({
     workspace: params.workspace,
     agentId: params.request.agentId,
-    approvalRequestId: params.request.approvalRequestId
+    approvalRequestId: params.request.approvalRequestId,
+    includeUncounted: true
   });
   const chainIntegrity = inspectApprovalChainIntegrity({
     workspace: params.workspace,

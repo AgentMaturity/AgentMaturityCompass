@@ -80,6 +80,9 @@ export const approvalDecisionSchema = z.object({
   reason: z.string().min(1),
   // Optional for legacy compatibility. Bound decisions cannot move to changed requests.
   requestDigestSha256: z.string().regex(/^[a-f0-9]{64}$/).optional(),
+  // H-1: whether the recorder verified the reviewer (a session) or took the fields as given. Absent on legacy rows, which
+  // count as self-asserted: only an authenticated approval attests to an identity or role (countedApprovalDecisions).
+  authentication: z.enum(["authenticated", "self-asserted"]).optional(),
   decisionTs: z.number().int()
 });
 

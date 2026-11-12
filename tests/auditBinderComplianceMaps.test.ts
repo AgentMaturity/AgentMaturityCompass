@@ -202,10 +202,11 @@ describe("audit binder + compliance maps", () => {
       actorUserId: "owner-1",
       actorUsername: "owner-1",
       actorRoles: ["OWNER"],
-      reason: "owner approved"
+      reason: "owner approved",
+      actorAuthentication: "authenticated"
     });
 
-    decideApprovalForIntent({
+    decideApprovalForIntent({ reviewerAuthentication: "authenticated",
       workspace: ws,
       agentId: "default",
       approvalId: approval.approvalRequestId,

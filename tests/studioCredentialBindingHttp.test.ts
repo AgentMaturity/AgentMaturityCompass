@@ -122,7 +122,7 @@ async function approvedWrite(f: Fixture, agentId: string) {
   const intent = JSON.parse(response.body) as ToolIntentResponse;
   expect(intent).toMatchObject({ allowed: true, effectiveMode: "EXECUTE", approvalRequired: true });
   const approvalId = intent.approvalRequestId!;
-  decideApprovalForIntent({ workspace: f.workspace, agentId, approvalId, decision: "APPROVED", mode: "EXECUTE",
+  decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: f.workspace, agentId, approvalId, decision: "APPROVED", mode: "EXECUTE",
     reason: "Approve the private credential-binding HTTP fixture output", userId: f.owner.userId,
     username: f.owner.username, userRoles: f.owner.roles });
   const sentinel = join(f.workspace, relativePath);

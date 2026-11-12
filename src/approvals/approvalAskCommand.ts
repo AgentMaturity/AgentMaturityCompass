@@ -112,7 +112,8 @@ export function registerApprovalAskCommand(approvals: Command): void {
             console.log(
               chalk.gray(
                 `  answer it with: amc approvals approve --agent ${opts.agent} ` +
-                  `--mode execute --reason "…" --username "…" --roles APPROVER ${event.approvalRequestId}`
+                  `--mode execute --reason "…" --user-id "…" --username "…" --roles APPROVER --session-token-file "…" ` +
+                  `--expect-request-digest "…" ${event.approvalRequestId} (after amc approvals login)`
               )
             );
           },

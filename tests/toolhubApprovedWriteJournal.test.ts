@@ -45,7 +45,7 @@ test("an approved WRITE_LOW call whose write fails is journaled with its approva
       args: { path: "./workspace/output/missing/out.txt", content: "x" }, requestedMode: "EXECUTE" });
     expect(intent.approvalRequestId).toBeTruthy();
     const approvalId = intent.approvalRequestId!;
-    decideApprovalForIntent({ workspace: dir, agentId, approvalId, decision: "APPROVED", mode: "EXECUTE", reason: "fixture review",
+    decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: dir, agentId, approvalId, decision: "APPROVED", mode: "EXECUTE", reason: "fixture review",
       userId: "owner-a", username: "owner-a", userRoles: ["OWNER"] });
     const result = await service.executeIntent({ intentId: intent.intentId, approvalRequestId: approvalId }).catch((error: unknown) => ({ thrown: String(error) }));
     expect(result).not.toHaveProperty("thrown");

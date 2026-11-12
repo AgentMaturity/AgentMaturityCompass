@@ -36,7 +36,7 @@ export function registerActionCliCommands(program: Command): void {
         const restate = `--effect ${opts.effect} --operator ${JSON.stringify(opts.operator)} --note ${JSON.stringify(opts.note)}`
           + (opts.externalRef === undefined ? "" : ` --external-ref ${JSON.stringify(opts.externalRef)}`);
         console.log(`Resolution requested: ${filed.approvalRequestId} (${filed.actionClass}, ${filed.requiredApprovals} approval(s)). Nothing is settled yet.`);
-        console.log(`Someone other than ${opts.operator} approves it: amc approvals approve ${filed.approvalRequestId} --agent ${filed.agentId} --mode execute --reason <why> --username <name> --roles <roles>`);
+        console.log(`Someone other than ${opts.operator} approves it: amc approvals approve ${filed.approvalRequestId} --agent ${filed.agentId} --mode execute --reason <why> --user-id <id> --username <name> --roles <roles> --session-token-file <file> --expect-request-digest <digest> (signed in with amc approvals login)`);
         console.log(`Then record it: amc action resolve ${executionId} ${restate} --approval ${filed.approvalRequestId}`);
         return;
       }

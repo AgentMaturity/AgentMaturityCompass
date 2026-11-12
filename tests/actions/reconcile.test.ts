@@ -336,7 +336,7 @@ function resolutionRequest(f: P104Fixture, id: string, overrides: Partial<Omit<M
 }
 function decide(h: ResolutionRequest, role: "OWNER" | "AUDITOR" | "APPROVER", id = `owned-${role.toLowerCase()}`,
   decision: "APPROVED" | "DENIED" = "APPROVED", mode: "EXECUTE" | "SIMULATE" = "EXECUTE") {
-  return decideApprovalForIntent({ workspace: h.f.workspace, agentId: "default", approvalId: h.created.approvalRequestId,
+  return decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: h.f.workspace, agentId: "default", approvalId: h.created.approvalRequestId,
     decision, mode, reason: "Owned exact-head fixture review; no human authentication claim", userId: id, username: id,
     userRoles: [role], expectedRequestDigestSha256: approvalRequestBindingDigest(h.request) });
 }

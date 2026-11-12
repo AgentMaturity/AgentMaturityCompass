@@ -654,7 +654,7 @@ function genuineGateGrant(f: Fixture, intent: AuthorizationIntentResult | null, 
   signedGateArtifact(f, created.filePath, auditor);
   expect(created.request).toMatchObject({ requiredApprovals: 2, requireDistinctUsers: true });
   const reviewers = [{ id: "owned-owner", role: "OWNER" as const }, { id: "owned-auditor", role: "AUDITOR" as const }];
-  for (const reviewer of reviewers) decideApprovalForIntent({ workspace: f.workspace, agentId: "default", approvalId: created.request.approvalRequestId,
+  for (const reviewer of reviewers) decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: f.workspace, agentId: "default", approvalId: created.request.approvalRequestId,
     decision: "APPROVED", mode: "EXECUTE", reason: "Approve only the exact owned journaled payment",
     userId: reviewer.id, username: reviewer.id, userRoles: [reviewer.role], expectedRequestDigestSha256: approvalRequestBindingDigest(created.request) });
   const decisions = listApprovalDecisions({ workspace: f.workspace, agentId: "default", approvalRequestId: created.request.approvalRequestId });

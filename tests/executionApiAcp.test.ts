@@ -166,7 +166,7 @@ describe("the CLI's --json reports carry the same phases (P2-13)", () => {
       { timeout: 60_000, interval: 50 });
     const osUser = userInfo().username;
     expect(request!.initiator).toBe(osUser);
-    const decide = (user: string) => decideApprovalForIntent({ workspace, agentId: "default", approvalId: request!.approvalRequestId,
+    const decide = (user: string) => decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace, agentId: "default", approvalId: request!.approvalRequestId,
       decision: "APPROVED", mode: "EXECUTE", reason: "P2-13 fixture reviewer", userId: user, username: user, userRoles: ["APPROVER"] });
     expect(() => decide(osUser)).toThrow(/initiator cannot approve their own request/);
     decide("p213-reviewer-1"); decide("p213-reviewer-2");

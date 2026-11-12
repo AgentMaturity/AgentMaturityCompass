@@ -314,7 +314,7 @@ describe("mechanic workbench", () => {
     expect(requested.approvalRequests.length).toBeGreaterThan(0);
 
     for (const req of requested.approvalRequests) {
-      decideApprovalForIntent({
+      decideApprovalForIntent({ reviewerAuthentication: "authenticated",
         workspace,
         agentId: "default",
         approvalId: req.approvalRequestId,
@@ -325,7 +325,7 @@ describe("mechanic workbench", () => {
         username: "owner-1",
         userRoles: ["OWNER"]
       });
-      decideApprovalForIntent({
+      decideApprovalForIntent({ reviewerAuthentication: "authenticated",
         workspace,
         agentId: "default",
         approvalId: req.approvalRequestId,

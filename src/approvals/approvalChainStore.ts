@@ -283,6 +283,8 @@ export function recordApprovalDecision(params: {
   decision: ApprovalDecisionKind;
   reason: string;
   expectedRequestDigestSha256?: string;
+  /** Recorded on the signed row (H-1); see countedApprovalDecisions. */
+  authentication: "authenticated" | "self-asserted";
 }): { decision: ApprovalDecisionRecord; path: string; sigPath: string } {
   const request = loadApprovalRequestRecord({
     workspace: params.workspace,
@@ -307,6 +309,7 @@ export function recordApprovalDecision(params: {
     decision: params.decision,
     reason: params.reason,
     ...(params.expectedRequestDigestSha256 === undefined ? {} : { requestDigestSha256: params.expectedRequestDigestSha256 }),
+    authentication: params.authentication,
     decisionTs: Date.now()
   });
   const path = decisionPath(params.workspace, agentId, decision.approvalDecisionId);
@@ -319,10 +322,21 @@ export function recordApprovalDecision(params: {
   };
 }
 
+/**
+ * The decisions that may attest to a reviewer's identity and roles (H-1): every DENY (a refusal only ever stops an
+ * action), and an approval only when its recorder authenticated the reviewer. A self-asserted or legacy unmarked
+ * approval, of either mode, never counts toward a quorum, a role requirement or a distinct-user check.
+ */
+export function countedApprovalDecisions(rows: readonly ApprovalDecisionRecord[]): ApprovalDecisionRecord[] {
+  return rows.filter((row) => row.decision === "DENY" || row.authentication === "authenticated");
+}
+
+/** Signed decisions in time order, only the counted ones (countedApprovalDecisions) unless `includeUncounted` (displays). */
 export function listApprovalDecisions(params: {
   workspace: string;
   agentId?: string;
   approvalRequestId?: string;
+  includeUncounted?: boolean;
 }): ApprovalDecisionRecord[] {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const dir = decisionsDir(params.workspace, agentId);
@@ -349,7 +363,8 @@ export function listApprovalDecisions(params: {
       continue;
     }
   }
-  return out.sort((a, b) => a.decisionTs - b.decisionTs);
+  out.sort((a, b) => a.decisionTs - b.decisionTs);
+  return params.includeUncounted === true ? out : countedApprovalDecisions(out);
 }
 
 export function markApprovalConsumed(params: {

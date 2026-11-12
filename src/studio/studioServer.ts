@@ -4312,7 +4312,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           actorUserId: auth.username ?? "owner",
           actorUsername: auth.username ?? "owner",
           actorRoles: Array.from(auth.roles) as Array<"OWNER" | "AUDITOR" | "APPROVER" | "OPERATOR" | "VIEWER" | "AGENT">,
-          reason: typeof parsed.reason === "string" && parsed.reason.trim().length > 0 ? parsed.reason.trim() : "owner approved evidence request"
+          reason: typeof parsed.reason === "string" && parsed.reason.trim().length > 0 ? parsed.reason.trim() : "owner approved evidence request",
+          actorAuthentication: "authenticated" // requireRouteRoles resolved the session
         });
         emitAuditSse({
           hub: orgSse,
@@ -8163,7 +8164,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           approvalDecisions: picked ? listApprovalDecisions({
             workspace: options.workspace,
             agentId: picked.agentId,
-            approvalRequestId
+            approvalRequestId,
+            includeUncounted: true
           }) : []
         });
         return;

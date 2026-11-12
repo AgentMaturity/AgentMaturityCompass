@@ -77,7 +77,7 @@ describe("native approvals retain authenticated authority and exact request bind
 
   it("retains a reviewed digest across legitimate status transitions and rejects later changed request content", () => {
     const f = fixture();
-    decideApprovalForIntent({ workspace: f.workspace, agentId: "default", approvalId: f.approvalRequestId,
+    decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: f.workspace, agentId: "default", approvalId: f.approvalRequestId,
       decision: "APPROVED", mode: "EXECUTE", reason: "reviewed exact request", username: "reviewer", userId: "reviewer-id", userRoles: ["OWNER"],
       expectedRequestDigestSha256: f.item.requestDigestSha256 });
     const verify = () => verifyApprovalForExecution({ workspace: f.workspace, approvalId: f.approvalRequestId,
@@ -92,7 +92,7 @@ describe("native approvals retain authenticated authority and exact request bind
 
   it("refuses stale review before writing any decision and never defaults a bound reviewer to owner", () => {
     const f = fixture();
-    const decide = (digest: string, actor = true) => decideApprovalForIntent({ workspace: f.workspace, agentId: "default", approvalId: f.approvalRequestId,
+    const decide = (digest: string, actor = true) => decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: f.workspace, agentId: "default", approvalId: f.approvalRequestId,
       decision: "APPROVED", mode: "EXECUTE", reason: "reviewed", expectedRequestDigestSha256: digest,
       ...(actor ? { username: "reviewer", userId: "reviewer", userRoles: ["OWNER" as const] } : {}) });
     expect(() => decide("0".repeat(64))).toThrow(/changed/);

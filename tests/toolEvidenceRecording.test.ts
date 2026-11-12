@@ -313,7 +313,7 @@ it("keeps a real journaled effect when recording fails, signs the gap and refuse
       const reviewers = [{ id: "owned-owner", role: "OWNER" as const }, { id: "owned-auditor", role: "AUDITOR" as const }];
       expect(created.request.requiredApprovals).toBeGreaterThan(0);
       expect(created.request.requiredApprovals).toBeLessThanOrEqual(reviewers.length);
-      for (const reviewer of reviewers.slice(0, created.request.requiredApprovals)) decideApprovalForIntent({
+      for (const reviewer of reviewers.slice(0, created.request.requiredApprovals)) decideApprovalForIntent({ reviewerAuthentication: "authenticated",
         workspace, agentId: "default", approvalId: created.request.approvalRequestId, decision: "APPROVED", mode: "EXECUTE",
         reason: "Approve only the owned local file effect", userId: reviewer.id, username: reviewer.id, userRoles: [reviewer.role]
       });

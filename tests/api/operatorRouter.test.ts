@@ -107,7 +107,7 @@ describe("operator activation route", () => {
     const approvalId = signed.review.approvalRequestId!;
     const planSources: Record<string, PlanSource> = { fixture: () => [{ plan, signed, previousPlanDigest: null,
       source: { kind: "a4", projectId: "a4p_00000000000000000000000000000001", revisionNo: 1, agentId: "default" } }] };
-    const decide = (userId: string, bound: boolean) => decideApprovalForIntent({ workspace, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE",
+    const decide = (userId: string, bound: boolean) => decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE",
       reason: "P2-22 fixture plan review", userId, username: userId, userRoles: ["OWNER"],
       ...(bound ? { expectedRequestDigestSha256: approvalRequestBindingDigest(loadApprovalRequestRecord({ workspace, agentId: "default", approvalRequestId: approvalId })) } : {}) });
     const activate = async (body: unknown) => {
@@ -148,7 +148,7 @@ describe("operator activation route", () => {
     const approvalId = signed.review.approvalRequestId!;
     const binding = approvalRequestBindingDigest(loadApprovalRequestRecord({ workspace, agentId: "default", approvalRequestId: approvalId }));
     for (const userId of ["approver-1", "approver-2"]) {
-      decideApprovalForIntent({ workspace, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE", reason: "P2-22 fixture plan review",
+      decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE", reason: "P2-22 fixture plan review",
         userId, username: userId, userRoles: ["OWNER"], expectedRequestDigestSha256: binding });
     }
     const reply: Reply = { status: 0, body: "" };
