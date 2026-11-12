@@ -144,6 +144,17 @@ function htmlEscape(text) {
     .replaceAll("'", "&#39;");
 }
 
+/** JSON for display (M11): a host path under the workspace's .amc directory reads as `.amc/...`. */
+function displayJson(value) {
+  return JSON.stringify(value, (_key, item) =>
+    typeof item === "string" && /^(?:\/|[A-Za-z]:\\).*[\\/]\.amc[\\/]/.test(item) ? item.slice(item.search(/[\\/]\.amc[\\/]/) + 1).replaceAll("\\", "/") : item, 2);
+}
+
+/** M11: a one-line plain summary, with the raw JSON collapsed beneath it. */
+function jsonDetails(summary, value) {
+  return `<p>${summary}</p><details><summary>Raw JSON</summary><pre class="scroll">${htmlEscape(displayJson(value))}</pre></details>`;
+}
+
 function card(title, body) {
   return `<section class="card"><h3>${htmlEscape(title)}</h3>${body}</section>`;
 }
@@ -1844,15 +1855,15 @@ async function renderTransparency() {
       <p class="muted">The browser checks below are consistency only: they use the key the server sent with the seal, so they cannot show who signed it.</p>
       <p>Client chain check (consistency only): <strong>${clientVerify.ok ? "OK" : "FAILED"}</strong></p>
       <p>Client seal check (consistency only): <strong>${clientVerify.signatureVerified ? "CONSISTENT" : "FAILED"}</strong></p>
-      <pre class="scroll">${JSON.stringify({ serverVerify, clientVerify }, null, 2)}</pre>
+      ${jsonDetails(`${Number(serverVerify.entryCount || 0)} entries; ${(serverVerify.errors || []).length + (clientVerify.errors || []).length} error(s).`, { serverVerify, clientVerify })}
     `)}
     ${card("Merkle Root", `
       <p>Merkle verify: <strong>${merkleVerify?.ok ? "OK" : "FAILED"}</strong></p>
       <p>Current root: <code>${htmlEscape(merkleRoot?.current?.root || "n/a")}</code></p>
       <p>Leaf count: ${Number(merkleRoot?.current?.leafCount || 0)}</p>
-      <pre class="scroll">${JSON.stringify(merkleRoot?.history || [], null, 2)}</pre>
+      ${jsonDetails(`${(merkleRoot?.history || []).length} earlier root(s).`, merkleRoot?.history || [])}
     `)}
-    ${card("Last 100 Entries", `<pre class="scroll">${JSON.stringify(raw.entries || [], null, 2)}</pre>`)}
+    ${card("Last 100 Entries", jsonDetails(`${(raw.entries || []).length} entries; latest: ${htmlEscape(raw.entries?.at(-1)?.type || "none")}${raw.entries?.at(-1)?.ts ? ` at ${new Date(raw.entries.at(-1).ts).toISOString()}` : ""}.`, raw.entries || []))}
   `;
 }
 
@@ -2142,7 +2153,7 @@ async function renderPolicyPacks() {
         acknowledgeAlternatives: evidenceLogicAcknowledge.checked
       });
       const applied = apiPayload(envelope);
-      evidenceLogicOut.textContent = JSON.stringify(applied, null, 2);
+      evidenceLogicOut.textContent = displayJson(applied);
       setStatus(applied.applied ? "Evidence logic applied." : "Evidence logic unchanged.");
       evidenceLogicPreview = null;
       evidenceLogicRequest = null;
@@ -2221,7 +2232,7 @@ async function renderPolicyPacks() {
         confirmCompileId: scopePreview.compileId
       });
       const applied = apiPayload(envelope);
-      scopeOut.textContent = JSON.stringify(applied, null, 2);
+      scopeOut.textContent = displayJson(applied);
       scopePreview = null;
       scopeConfirm.value = "";
       updateScopeApplyState();
@@ -2267,7 +2278,7 @@ async function renderPolicyPacks() {
       const diff = await apiPost(`/policy-packs/${encodeURIComponent(id)}/diff`, {
         agentId: currentAgent()
       });
-      out.textContent = JSON.stringify(diff, null, 2);
+      out.textContent = displayJson(diff);
     });
   });
   rows.querySelectorAll("button[data-apply]").forEach((button) => {
@@ -2280,7 +2291,7 @@ async function renderPolicyPacks() {
         agentId: currentAgent(),
         confirm: true
       });
-      out.textContent = JSON.stringify(applied, null, 2);
+      out.textContent = displayJson(applied);
       await refreshUnifiedBanner();
     });
   });
@@ -2397,9 +2408,10 @@ async function renderCompliance() {
       <p>Trust coverage (OBS/ATT/SELF): ${((report.trustTierCoverage?.observed || 0) * 100).toFixed(1)}% /
       ${((report.trustTierCoverage?.attested || 0) * 100).toFixed(1)}% /
       ${((report.trustTierCoverage?.selfReported || 0) * 100).toFixed(1)}%</p>
-      <pre class="scroll">${JSON.stringify(report.categories || [], null, 2)}</pre>
+      ${jsonDetails(`${(report.categories || []).length} categories: ${["SATISFIED", "MISSING", "NOT_EVALUATED"].map((status) =>
+        `${(report.categories || []).filter((row) => row.status === status).length} ${status.toLowerCase().replace("_", " ")}`).join(", ")}.`, report.categories || [])}
     `)}
-    ${card("Fleet Compliance Summary", `<pre class="scroll">${JSON.stringify(fleet || {}, null, 2)}</pre>`)}
+    ${card("Fleet Compliance Summary", jsonDetails("Per-agent compliance for this framework over 30 days.", fleet || {}))}
   `;
 }
 
@@ -3361,7 +3373,7 @@ async function renderCompare() {
     const comparison = await apiGet(
       `/org/nodes/${encodeURIComponent(nodeA)}/scorecard?compareTo=${encodeURIComponent(nodeB)}`
     );
-    out.textContent = JSON.stringify(comparison.comparison || comparison, null, 2);
+    out.textContent = displayJson(comparison.comparison || comparison);
   }
   onAction(document.getElementById("cmpRun"), "click", async () => {
     await runCompare();
@@ -3639,7 +3651,11 @@ async function renderPage() {
         }).catch((error) => ({ error: errText(error) }));
         rows.push({ actionClass, decision });
       }
-      root.innerHTML = card("Governor", `<pre>${JSON.stringify(rows, null, 2)}</pre>`);
+      const verdict = ({ decision }) => decision.error ? `error (${htmlEscape(decision.error)})` : `${decision.allowed ? "allowed" : "denied"}${decision.effectiveMode ? ` as ${htmlEscape(decision.effectiveMode)}` : ""}`;
+      root.innerHTML = card("Governor", `
+        <p class="muted">What the Governor decides for ${htmlEscape(currentAgent())} at medium risk in EXECUTE mode.</p>
+        <ul>${rows.map((row) => `<li><strong>${row.actionClass}</strong>: ${verdict(row)}</li>`).join("")}</ul>
+        ${jsonDetails("Full decisions, with every condition and reason:", rows)}`);
       return;
     }
     if (page === "toolhub") {
@@ -3647,14 +3663,14 @@ async function renderPage() {
       const intents = await apiGet("/toolhub/pending-intents").catch(() => ({ intents: [] }));
       root.innerHTML = `
         ${card("Allowed Tools", renderToolContext(toolContext))}
-        ${card("Pending Intents", `<pre>${JSON.stringify(intents, null, 2)}</pre>`)}
+        ${card("Pending Intents", jsonDetails(`${(intents.intents || []).length} pending intent(s).`, intents))}
       `;
       return;
     }
     if (page === "leases") {
       const leaseState = await apiGet("/leases/status");
       root.innerHTML = card("Leases", `
-        <pre>${JSON.stringify(leaseState, null, 2)}</pre>
+        ${jsonDetails(`Revocation list signature: ${leaseState.revocationSignatureValid ? "valid" : `INVALID${leaseState.revocationSignatureReason ? ` (${htmlEscape(leaseState.revocationSignatureReason)})` : ""}`} · ${Number(leaseState.revokedLeaseCount || 0)} revoked lease(s).`, leaseState)}
         <div class="row">
           <button id="issueLeaseBtn" data-roles="OWNER">Issue Lease For ${currentAgent()}</button>
           <button id="logoutBtn" class="secondary">Logout</button>
@@ -3696,7 +3712,7 @@ async function renderPage() {
           throw new Error(`Budgets JSON is invalid, nothing was applied: ${errText(error)}`); // M8: onAction shows it inline
         }
         const out = await apiPost("/budgets/apply", { config: parsed });
-        document.getElementById("budgetOut").textContent = JSON.stringify(out, null, 2);
+        document.getElementById("budgetOut").textContent = displayJson(out);
         await refreshUnifiedBanner();
       });
       return;
