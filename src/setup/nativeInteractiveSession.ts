@@ -10,7 +10,7 @@ import { isActionClass } from "../governor/actionCatalog.js";
 import { approvalModeGatedClasses, parseApprovalMode } from "../approvals/approvalModes.js";
 import { reviewNativeMcpConfigurations, NativeMcpConfigError } from "./nativeMcpConfig.js";
 import { mergeScopedMcpSelection } from "../mcp/mcpScopes.js";
-import { inspectNativeFirstUse, NATIVE_FIRST_USE_PROVIDER_LIST, renderNativeFirstUseGuide, renderNativeGuideCommand } from "./nativeFirstUseGuide.js";
+import { inspectNativeFirstUse, NATIVE_FIRST_USE_PROVIDER_LIST, renderNativeFirstUseGuide, renderNativeGuideCommand, renderNativeVerifyHint } from "./nativeFirstUseGuide.js";
 import { resolveNativeChatProfile, nativeChatProfileArgv, assertNativeChatProfileCurrent, type NativeChatProfileOptions } from "./nativeChatProfile.js";
 import { createNativeInteractiveApprovals } from "./nativeInteractiveApprovals.js";
 import { createNativeInteractiveAskUser } from "./nativeInteractiveAskUser.js";
@@ -606,7 +606,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     if (sessionId !== null) {
       io.log(`Known session reference: ${sessionId}. A resume attempt will verify the evidence before acquiring its writer.`);
       io.log("Resume in this workspace:\n  " + renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "chat", ...routeBaseArgs, ...chatProfileArgs, ...nativeExtensionRunArgv(extensions), "--session", sessionId] }));
-      io.log("Verify recorded evidence:\n  " + renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "verify", sessionId] }));
+      io.log("Verify recorded evidence:\n  " + renderNativeVerifyHint(cwd, sessionId));
     }
   } finally {
     extensions.unloadAll();

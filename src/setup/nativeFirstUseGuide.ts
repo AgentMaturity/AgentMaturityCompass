@@ -77,6 +77,17 @@ export function renderNativeGuideCommand(action: NativeGuideAction): string {
   return action.argv.map(arg => /^[A-Za-z0-9_./:=@+-]+$/.test(arg) ? arg : `'${arg.replace(/'/g, "'\\''")}'`).join(" ");
 }
 
+/**
+ * Smoke L-2: the evidence-verification command in the form that works. Without an operator pin the verdict is
+ * UNANCHORED and exits 1, so unless AMC_EXPECTED_MONITOR_FINGERPRINT is set the hint carries --expect-monitor and the
+ * documented way to obtain it (docs/EVIDENCE_TRUST.md). The fingerprint is never read from the workspace here.
+ */
+export function renderNativeVerifyHint(cwd: string, sessionId: string): string {
+  const command = renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "verify", sessionId] });
+  return process.env.AMC_EXPECTED_MONITOR_FINGERPRINT?.trim() ? command
+    : `${command} --expect-monitor <monitor sha256>\n  (<monitor sha256>: shasum -a 256 .amc/keys/monitor_ed25519.pub, recorded outside this workspace when it was created; or set AMC_EXPECTED_MONITOR_FINGERPRINT or a trust list)`;
+}
+
 function pathKind(path: string): "missing" | "directory" | "file" | "other" {
   try {
     const stats = statSync(path);

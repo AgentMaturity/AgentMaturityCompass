@@ -5,7 +5,7 @@ import type { AgentStatus } from "../agent/loopTypes.js";
 import { readAgentRunSummary, renderRunSummary } from "../agent/runReport.js";
 import { describeRunLimit, type RunLimitBreach } from "../agent/runLimits.js";
 import { executionStatusFor } from "../execution/executionStatus.js";
-import { renderNativeGuideCommand } from "../setup/nativeFirstUseGuide.js";
+import { renderNativeVerifyHint } from "../setup/nativeFirstUseGuide.js";
 import type { GoalRoundsResult } from "../autonomy/goalRounds.js";
 import type { WorkflowRunResult } from "../workflow/workflowRunner.js";
 import type { WorkflowPassOptions } from "../workflow/workflowPass.js";
@@ -137,8 +137,7 @@ export function resolveBreadthRun(io: AgentLoopCliIo, opts: RunOptions, context:
           for (const failure of workflow.failed) io.log(`  ${failure.nodeId}: ${failure.reason}`);
         }
         if (context.toolMode === "workspace") for (const line of renderSessionLists(process.cwd(), summary.sessionId)) io.log(line);
-        io.log("Verify the recorded evidence (this does not evaluate answer quality):\n  " +
-          renderNativeGuideCommand({ cwd: process.cwd(), argv: ["amc", "agent-loop", "verify", summary.sessionId] }));
+        io.log("Verify the recorded evidence (this does not evaluate answer quality):\n  " + renderNativeVerifyHint(process.cwd(), summary.sessionId));
       }
       if (outcome.runLimit !== undefined) io.error(chalk.yellow(`Run limit reached: ${describeRunLimit(outcome.runLimit)}. The signed loop/cancel row names it; queued work was dropped and no more is admitted.`));
       reportExitCode(io, exitCode);
