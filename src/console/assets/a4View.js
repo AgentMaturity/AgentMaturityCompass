@@ -50,9 +50,43 @@ const list = (rows, empty) => (rows.length ? `<ul class="a4-rows">${rows.join(""
  */
 export function actionButton(label, action, allowed, attributes = "") {
   const ok = allowed?.allowed === true;
-  const why = allowed?.reasonCodes?.length ? allowed.reasonCodes.join(", ") : allowed?.note ?? "Studio did not offer this action";
+  const why = allowed?.reasonCodes?.length ? reasonsText(allowed.reasonCodes) : allowed?.note ?? "Not available at this point.";
   return `<button type="button" data-a4-action="${esc(action)}" ${attributes}${ok ? "" : ` disabled title="${esc(why)}"`}>${esc(label)}</button>`;
 }
+
+/**
+ * What each reason code a disabled action can carry (readiness.allowed and this page's own holds) asks the user to do, in
+ * plain words. A lowercase code is a readiness item's id. The code itself follows in parentheses.
+ */
+const REASON_TEXT = {
+  A4_STEP_ORDER: "Not yet: finish the earlier steps of this stage first.",
+  A4_GATE_OPEN: "An approval request is already open for this step; approvers decide it in the Approvals card.",
+  A4_GATE_DENIED: "This revision was denied: save an answer under Ask to start a new revision.",
+  SOD_VIOLATION: "You cannot approve this yourself (separation of duties): another approver must. You may still deny it.",
+  PRINCIPAL_NOT_MEMBER: "Your project role does not include this action: a project owner can give you the role on the Members card.",
+  PRINCIPAL_ROLE_INSUFFICIENT: "Your workspace role does not allow this action: a workspace owner can change your roles.",
+  PRINCIPAL_UNRESOLVED: "This step issues a lease in your name, so it needs a local user account: sign in as one.",
+  ADMIN_TOKEN_REFUSED: "Sign in as a user: the admin token cannot act on agent projects.",
+  A4_INTEGRITY_FAILED: "The project's record failed its integrity check: see the Integrity panel.",
+  RETIRED: "This project is retired.",
+  READ_ONLY_MODE: "Studio is running read-only.",
+  FREEZE_ACTIVE: "The workspace is frozen: nothing can change until the freeze is lifted.",
+  ON_HOLD: "The project is on hold: an owner resumes it.",
+  NOT_ON_HOLD: "The project is not on hold.",
+  GATE_NOT_OPEN: "There is no open approval request to decide.",
+  GATE_PENDING: "Waiting for approvers: the approval request has not reached its quorum yet.",
+  GATE_ROLE_NOT_ALLOWED: "This approval request does not accept decisions from your role.",
+  GATE_EXPIRING: "This approval request is about to expire: request it again.",
+  A4_DUPLICATE_DECISION: "You have already decided this approval request.",
+  IDENTITY_CHECK_LIMITED: "A regulated project takes decisions only from local user accounts, not host sessions.",
+  "resources.current": "The agent's resources changed since this revision was recorded: save an answer under Ask to record a new revision.",
+  plan_unresolved: "Some requirements of the plan depend on facts that are still unknown: answer them under Ask, or an owner acknowledges them (a regulated project cannot)."
+};
+export function reasonText(code) {
+  return REASON_TEXT[code] ?? (/^[a-z]/.test(String(code)) ? "A requirement under Missing requirements needs attention first."
+    : "Studio does not allow this action right now: see Missing requirements.");
+}
+const reasonsText = (codes) => `${[...new Set(codes.map(reasonText))].join(" ")} (${codes.join(", ")})`;
 
 export const held = (note) => ({ allowed: false, reasonCodes: [], note });
 export const GATE_CHANGED = "The gate changed while you were on this page";
@@ -134,8 +168,24 @@ const STEP_FROM = { answers: null, understand: ["asked"], explain: ["understood"
 const refuse = (offer, ...codes) => ({ allowed: false, reasonCodes: [...new Set([...(offer?.reasonCodes ?? []), ...codes])] });
 export function stepOffer(offer, ctx, route) {
   const from = STEP_FROM[route];
-  if (ctx.project.stage === ctx.stage && (from === null || from.includes(ctx.project.step))) return offer;
-  return refuse(offer, "A4_STEP_ORDER");
+  if (ctx.project.stage !== ctx.stage || (from !== null && !from.includes(ctx.project.step))) return refuse(offer, "A4_STEP_ORDER");
+  return (route === "propose" && offer?.allowed === true && askHold(ctx)) || offer;
+}
+/**
+ * The questions ask_complete lists (P1-59 askGapCodes): unanswered, stale (an answer they depend on changed since) and
+ * invalid ones. Studio refuses Propose while any is listed (409 A4_NOT_READY).
+ */
+export function askGaps(readiness) {
+  const codes = (readiness?.items ?? []).find((item) => item.id === "ask_complete")?.reasonCodes ?? [];
+  const of = (prefix) => codes.filter((code) => String(code).startsWith(prefix)).map((code) => String(code).slice(prefix.length));
+  return { missing: of("ANSWER_MISSING:"), stale: of("ANSWER_STALE:"), invalid: of("ANSWER_INVALID:") };
+}
+const STALE_FIRST = "Confirm the answers marked \"needs confirming\" under Ask first";
+function askHold(ctx) {
+  const { missing, stale, invalid } = askGaps(ctx.readiness);
+  const parts = [stale.length ? `confirm or change ${stale.join(", ")} (an answer they depend on changed)` : "",
+    missing.length ? `answer ${missing.join(", ")}` : "", invalid.length ? `correct ${invalid.join(", ")}` : ""].filter(Boolean);
+  return parts.length ? held(`Under Ask, ${parts.join("; ")} before proposing.`) : null;
 }
 /** Studio's content cap on Understand, Explain, Build and Review (P1-57, src/a4/a4RouterStages.ts). */
 const CONTENT_MAX = 65_536;
@@ -149,6 +199,14 @@ const studioJson = (value) => `<pre class="scroll">${esc(JSON.stringify(value ??
  */
 const recorded = (what, entry) => `<p class="muted">Studio recorded ${entry.text ? what : "this step's output"} as self-reported${Number.isSafeInteger(entry.headSeq)
   ? ` at seq ${esc(entry.headSeq)}` : ""}. ${entry.text ? `What you sent:</p><p>${esc(entry.text)}</p>` : "You sent no statement.</p>"}${studioJson(entry.data)}`;
+
+/**
+ * Whether a statement this page recorded (Understand's or Explain's; `headSeq` is the head Studio answered) still binds the
+ * project after a load moved it from `before` to `after`: kept at the same stage while no revision was recorded since, or
+ * while the only revision recorded is the statement's own (Understand records one: the head has not passed the statement).
+ */
+export const statementHolds = (statement, before, after) => statement != null && after.stage === before.stage
+  && (after.revisionNo === before.revisionNo || (Number.isSafeInteger(statement.headSeq) && after.headSeq <= statement.headSeq));
 
 /** Understand's recorded statement; Confirm and Correct stay disabled until one is shown here. */
 function reflectionHtml(reflection, understand) {
@@ -198,7 +256,17 @@ export function renderConversation(ctx) {
     answer.source === "user" ? "" : ` ${actionButton("Confirm", "confirm-answer", ask, `data-question="${esc(answer.questionId)}"`)}`}</li>`;
   const notMine = answers.filter((answer) => answer.source !== "user").length;
   const change = questions.filter((question) => answered.has(question.id));
-  return `<h4>Ask</h4>
+  // An answer goes stale when one it depends on changes (Understand carrying a value from an earlier stage, too). Saving
+  // the same value again is what confirms it: Studio records it on a new revision with the new dependency digest.
+  const stale = askGaps(ctx.readiness).stale.filter((id) => answered.has(id));
+  const prompt = (id) => questions.find((question) => question.id === id)?.prompt ?? id;
+  const staleBanner = stale.length ? `<div class="card banner"><p>${stale.length} answer(s) need confirming because an answer they depend on
+    changed. Confirming records a new revision and returns this stage to Ask, so Understand runs again before you confirm it.</p>
+    <ul class="a4-rows">${stale.map((id) => `<li>${esc(prompt(id))} <code>${esc(id)}</code>: ${esc(answerText(answers, id))}
+      ${actionButton("Still correct — confirm", "confirm-answer", ask, `data-question="${esc(id)}"`)}</li>`).join("")}</ul>
+    <p class="muted">Or change them under "Change my answers".</p></div>` : "";
+  const confirmOffer = stale.length && understand?.allowed === true ? held(`${STALE_FIRST}: confirming them restarts this stage at Ask.`) : understand;
+  return `${staleBanner}<h4>Ask</h4>
     ${answers.length ? `<details data-a4-open="answers"><summary>${answers.length} answered (${notMine} carried or inferred);
       ${open.length} still need an answer</summary>${list(answers.map(answerRow), "")}</details>` : ""}
     <form class="a4-form" data-a4-answers>${open.map(field).join("")}${change.length
@@ -211,11 +279,11 @@ export function renderConversation(ctx) {
     <label>What this stage should achieve, in your words <textarea name="understanding" rows="3" maxlength="${CONTENT_MAX}"></textarea></label>
     <p class="muted">${NO_PRODUCER} ${RETAINED}</p>
     <div class="row wrap">${actionButton("Run Understand", "understand", understand)}</div>
-    ${reflectionHtml(reflection, understand)}
+    ${reflectionHtml(reflection, confirmOffer)}
     <h4>Explain</h4>
     <label>Your explanation <textarea name="explanation" rows="3" maxlength="${CONTENT_MAX}"></textarea></label>
     <p class="muted">${NO_PRODUCER} ${RETAINED}</p>
-    <div class="row wrap"><select name="level">${LEVELS.map((level) => `<option value="${level}">${stageTitle(level)}</option>`).join("")}</select>
+    <div class="row wrap"><select name="level" aria-label="Explanation level">${LEVELS.map((level) => `<option value="${level}">${stageTitle(level)}</option>`).join("")}</select>
       ${actionButton("Explain at this level", "explain", stepOffer(allowed.explain, ctx, "explain"))}</div>
     ${explanation ? recorded(`your explanation at the ${esc(explanation.level)} level`, explanation) : ""}`;
 }
@@ -242,7 +310,7 @@ export function renderSpecEditor(ctx) {
     : `Studio takes a proposal only at step <code>explained</code>; this project is at <code>${esc(project.step)}</code>`}${revision
     ? ` (current r${esc(revision.revisionNo)}, spec <code>${esc(revision.specDigest)}</code>)` : ""}.${seeded}${proposable ? ""
     : " To change the specification from here, save an answer under Ask: that starts this stage's loop again at a new revision."} ${IN_RECORD}</p>
-    <textarea name="spec" rows="14" spellcheck="false">${esc(JSON.stringify(editableSpec(revision?.spec), null, 2))}</textarea>
+    <textarea name="spec" rows="14" spellcheck="false" aria-label="Specification (JSON)">${esc(JSON.stringify(editableSpec(revision?.spec), null, 2))}</textarea>
     <p class="muted">Answers are not edited here: they are recorded through Save answers.</p>
     <div class="row wrap">${actionButton("Propose this specification", "propose", stepOffer(allowed.propose, ctx, "propose"))}${ctx.specDraft
       ? ` <button type="button" class="secondary" data-a4-action="reload">Discard my edits</button>` : ""}</div>`;
@@ -250,13 +318,13 @@ export function renderSpecEditor(ctx) {
 
 export function renderBuildCard(ctx) {
   return `<p class="muted">${TRUTH.admission}. With no producer registered for this stage, what you write here is recorded
-    as a self-reported implementation output. ${RETAINED}</p><textarea name="content" rows="4" maxlength="${CONTENT_MAX}"></textarea>
+    as a self-reported implementation output. ${RETAINED}</p><textarea name="content" rows="4" maxlength="${CONTENT_MAX}" aria-label="Build note"></textarea>
     <div class="row wrap">${actionButton("Build", "build", stepOffer(ctx.allowed.build, ctx, "build"))}</div>`;
 }
 
 export function renderReviewCard(ctx) {
   return `<p class="muted">Human findings are recorded as self-reported; AMC's own checks appear in the Integrity panel. ${RETAINED}</p>
-    <textarea name="content" rows="4" maxlength="${CONTENT_MAX}"></textarea><div class="row wrap">${actionButton("Review", "review",
+    <textarea name="content" rows="4" maxlength="${CONTENT_MAX}" aria-label="Review findings"></textarea><div class="row wrap">${actionButton("Review", "review",
       stepOffer(ctx.allowed.review, ctx, "review"))}</div>`;
 }
 
@@ -272,8 +340,8 @@ function renderComments(cardId, comments, members = []) {
     <span class="muted">${time(comment.ts)}</span><div>${typeof comment.body === "string" ? esc(comment.body)
       : `<span class="muted">Text not returned by Studio</span> ${codes(comment.reasonCode ? [comment.reasonCode] : [])}`}</div></li>`);
   return `<details class="a4-comments" data-a4-open="discussion"${rows.length ? " open data-a4-default-open" : ""}><summary>Discussion (${rows.length})</summary>${list(rows, "No comments yet.")}
-    <textarea name="comment" rows="2" maxlength="${COMMENT_MAX_BYTES}"></textarea>
-    <button type="button" data-a4-action="comment">Comment</button>
+    <textarea name="comment" rows="2" maxlength="${COMMENT_MAX_BYTES}" aria-label="Comment on ${esc(cardLabel(cardId))}"></textarea>
+    <button type="button" data-a4-action="comment" aria-label="Post a comment on ${esc(cardLabel(cardId))}">Comment</button>
     <p class="muted">Discussion, never evidence; up to 8 KiB. ${RETAINED}</p></details>`;
 }
 
@@ -292,8 +360,11 @@ export function renderDifferences(diff, project) {
 function nextActionHtml(next) {
   if (!isObject(next)) return "";
   const route = typeof next.route === "string" && /^\.?\/(?!\/)[\w\-./?=&%]*$/.test(next.route) ? next.route : null;
-  return ` ${route ? `<a class="button secondary" href="${esc(route)}">${esc(next.label)}</a>` : `<strong>${esc(next.label)}</strong>`}${
-    typeof next.command === "string" ? ` <code>${esc(next.command)}</code> <button type="button" class="secondary" data-a4-copy="${esc(next.command)}">Copy</button>` : ""}`;
+  // A member is added on this page's Members card; the CLI form (`amc a4 members`, with its session token file) is for the terminal.
+  const members = typeof next.command === "string" && next.command.startsWith("amc a4 members ");
+  return ` ${route ? `<a class="button secondary" href="${esc(route)}">${esc(next.label)}</a>` : `<strong>${esc(next.label)}</strong>`}${members
+    ? " <span class=\"muted\">(on the Members card below)</span>" : typeof next.command === "string" ? ` <code>${esc(next.command)}</code> <button type="button"
+      class="secondary" data-a4-copy="${esc(next.command)}" aria-label="Copy the command ${esc(next.command)}">Copy</button>` : ""}`;
 }
 
 /** The items Studio's acknowledgeItem accepts (ACKNOWLEDGEABLE_ITEMS, src/a4/a4Readiness.ts); any other is 400 INPUT_INVALID. */
@@ -318,18 +389,19 @@ function retryButton(item, allowed) {
     `data-attempt="${esc(attempt.slice("ATTEMPT:".length))}" data-effect-stage="${esc(route[1])}" data-effect="${esc(route[2])}"`)}` : "";
 }
 
-function itemRow(item, allowed, stage) {
+function itemRow(item, allowed, stage, nameFor) {
   const ack = item.acknowledged;
   return `<li><code>${esc(item.id)}</code> <code>${esc(item.status)}</code>${item.kind ? ` <span class="chip">${esc(item.kind)}</span>` : ""}
-    ${codes(item.reasonCodes)}${ack ? `<div class="muted">Acknowledged by ${esc(ack.by)} until ${time(ack.expiresTs)}: ${esc(ack.reason)};
+    ${codes(item.reasonCodes)}${ack ? `<div class="muted">Acknowledged by ${nameFor(ack.by)} until ${time(ack.expiresTs)}: ${esc(ack.reason)};
       still ${esc(item.status)}</div>` : ""}${nextActionHtml(item.nextAction)}${retryButton(item, allowed)}${
     !ack && item.status === "WAITING" && acknowledgeable(item, stage) && allowed.acknowledge?.allowed === true
       ? ` ${actionButton("Acknowledge", "acknowledge", allowed.acknowledge, `data-item="${esc(item.id)}"`)}` : ""}</li>`;
 }
 
-export function renderMissing(readiness, stage) {
+/** `nameFor(key)` names a principal key as HTML (nameOf); by default the key is shown escaped. */
+export function renderMissing(readiness, stage, nameFor = esc) {
   const open = readiness.items.filter((item) => !["READY", "COMPLETE"].includes(item.status));
-  const group = (mandatory) => list(open.filter((item) => item.mandatory === mandatory).map((item) => itemRow(item, readiness.allowed, stage)), "None.");
+  const group = (mandatory) => list(open.filter((item) => item.mandatory === mandatory).map((item) => itemRow(item, readiness.allowed, stage, nameFor)), "None.");
   return `<p>Readiness <code>${esc(readiness.status)}</code>${nextActionHtml(readiness.nextAction)}</p>
     <h4>Mandatory</h4>${group(true)}<h4>Advisory</h4>${group(false)}`;
 }
@@ -438,9 +510,10 @@ function gateChangeBanner({ from, to }) {
  * self-approval is open. Approve is held with that code from the gate's own excludedKeys, under the key Studio derives:
  * a WORKSPACE_ROUTER principal is checked from session records, a LOCAL_USER one from users.yaml.
  */
-function approveOffer(decide, gate, readiness, me) {
+export function approveOffer(decide, gate, readiness, me, effect = false) {
   const key = typeof me?.userId === "string" ? `${readiness.identityCheck === "session_record" ? "WORKSPACE_ROUTER" : "LOCAL_USER"}:${me.userId}` : null;
-  if (key === null || readiness.selfApprovalAllowed === true || !Array.isArray(gate?.excludedKeys) || !gate.excludedKeys.includes(key)) return decide;
+  // An effect's request never takes self-approval (src/a4/a4Effects.ts effectApprovalOf: selfApprovalAllowed false).
+  if (key === null || (readiness.selfApprovalAllowed === true && !effect) || !Array.isArray(gate?.excludedKeys) || !gate.excludedKeys.includes(key)) return decide;
   return refuse(decide, "SOD_VIOLATION");
 }
 
@@ -462,6 +535,36 @@ function requestOffer(ctx, kind) {
   return unacknowledged.length ? refuse(offer, ...unacknowledged) : offer;
 }
 
+/** A principal key as the members and candidates Studio listed name it; a key no one carries is shown as it is. */
+export function nameOf(ctx, key) {
+  const known = [...(ctx.project?.members ?? []), ...(Array.isArray(ctx.members?.candidates) ? ctx.members.candidates : [])]
+    .find((row) => row.principalKey === key);
+  return known ? `${esc(known.username)}` : `<code>${esc(key)}</code>`;
+}
+
+/**
+ * What consuming the approved gate does: the direction approval moves the stage on to Build, the completion approval
+ * completes the stage.
+ */
+export const completeLabel = (met, stage) => (met?.gate === "direction" ? "Use the direction approval and continue to Build"
+  : `Complete ${stageTitle(stage)}`);
+/**
+ * Assemble's completion runs a required effect: it is consumed only once an owner opened the effect gate and project
+ * approvers approved its request (409 EFFECT_GATE_NOT_OPEN / EFFECT_QUORUM_INSUFFICIENT otherwise); its effect_gate item
+ * says which (EFFECT_GATE_NOT_OPEN, or APPROVAL_STATUS: other than QUORUM_MET). Adapt's plan review is optional.
+ */
+export function effectHold(met, readiness) {
+  if (met?.gate !== "completion") return null;
+  const effect = readiness.items.find((item) => item.id === "effect_gate");
+  if (!effect) return null;
+  if (effect.reasonCodes.includes("EFFECT_GATE_NOT_OPEN")) return held("An owner first opens the effect gate on the stage's effect card; project approvers then approve it there.");
+  const status = effect.reasonCodes.find((code) => String(code).startsWith("APPROVAL_STATUS:"))?.slice("APPROVAL_STATUS:".length);
+  if (status === undefined || status === "QUORUM_MET") return null;
+  return held(["EXPIRED", "DENIED", "CANCELLED"].includes(status)
+    ? `The effect gate's request is ${status}: an owner re-opens the effect gate on the stage's effect card, and project approvers approve the new request.`
+    : `Project approvers approve the effect gate's request on the stage's effect card first (now ${status}).`);
+}
+
 export function renderApprovalsBar(ctx) {
   const { readiness, gates, stage, allowed, gateChange, specDraft } = ctx;
   const { shown, open, met, earlier, policy } = currentGates(gates, stage, readiness);
@@ -473,7 +576,7 @@ export function renderApprovalsBar(ctx) {
   // Readiness's status verbatim; only the decisions readiness.staleApprovals lists carry codes (decisionRow).
   const gateBlock = (row) => `<p><code>${esc(row.gate)}</code> gate r${esc(row.revisionNo)} · <code>${esc(row.status)}</code> ·
       ${esc(row.approvals)} of ${esc(row.required)} required approvals</p>
-      ${Array.isArray(row.excludedKeys) && row.excludedKeys.length ? `<p>Cannot approve (separation of duties); may still deny: ${codes(row.excludedKeys)}</p>` : ""}
+      ${Array.isArray(row.excludedKeys) && row.excludedKeys.length ? `<p>Cannot approve (separation of duties); may still deny: ${row.excludedKeys.map((key) => nameOf(ctx, key)).join(", ")}</p>` : ""}
       ${list(row.decisions.map((decision) => decisionRow(decision, staleCodes.get(decision.decisionId))), "No decisions yet.")}`;
   const earlierRows = earlier.map((old) => `<li><code>${esc(old.gate)}</code> gate bound to r${esc(old.revisionNo)} · <code>${esc(old.status)}</code>
     ${list(old.decisions.map((decision) => decisionRow(decision)), "No decisions.")}</li>`);
@@ -492,7 +595,8 @@ export function renderApprovalsBar(ctx) {
       ${actionButton("Hold", "hold", allowed.hold)}
       ${actionButton("Request direction approval", "request-direction", requestOffer(ctx, "direction"))}
       ${actionButton("Request completion approval", "request-completion", requestOffer(ctx, "completion"))}
-      ${actionButton("Complete stage", "complete", stage === "activate" && met ? held(ACTIVATE_COMPLETE) : met ? pinned(allowed.progress) : null)}
+      ${actionButton(completeLabel(met, stage), "complete", stage === "activate" && met ? held(ACTIVATE_COMPLETE)
+        : met ? effectHold(met, readiness) ?? pinned(allowed.progress) : null)}
     </div>
     <details data-a4-open="more"><summary>More</summary><div class="row wrap">${actionButton("Deny", "deny", open ? pinned(allowed.decide) : null)}
       ${allowed.resume ? actionButton("Resume", "resume", allowed.resume) : ""}</div></details></section>`;
@@ -501,15 +605,21 @@ export function renderApprovalsBar(ctx) {
 export function renderMembers(ctx) {
   const { project, members, readiness } = ctx;
   const roles = ["builder", "reviewer", "approver", "viewer", "owner"];
-  const candidates = Array.isArray(members?.candidates) ? members.candidates : [];
+  // Studio lists every eligible principal; one already on the project is not offered again.
+  const memberKeys = new Set(project.members.map((member) => member.principalKey));
+  const candidates = (Array.isArray(members?.candidates) ? members.candidates : []).filter((candidate) => !memberKeys.has(candidate.principalKey));
+  const { open, met } = currentGates(ctx.gates, ctx.stage, readiness);
+  const live = open ?? met;
   return `<section class="card"><h4>Members</h4>
     ${list(project.members.map((member) => `<li>${esc(member.username)} <code>${esc(member.authSource)}</code> ${codes(member.roles)}</li>`), "No members.")}
     ${readiness.identityCheck === "session_record" ? `<p><code>IDENTITY_CHECK_LIMITED</code> Host-mode roles come from session records, not a live check.</p>` : ""}
     ${members?.candidatesLimited === true ? `<p class="muted">Host mode: candidates come from tracked session records, so this list may be incomplete.</p>` : ""}
     ${members?.error ? `<p class="status-bad">${esc(members.error)}</p>` : ""}
-    ${candidates.length ? `<h4>Candidates</h4>${list(candidates.map((candidate) => `<li data-principal="${esc(candidate.principalKey)}">
-      ${esc(candidate.username)} <select name="role">${roles.map((role) => `<option>${role}</option>`).join("")}</select>
-      ${actionButton("Add", "add-member", ctx.allowed.addMember)}</li>`), "")}` : ""}
+    ${candidates.length ? `<h4>Candidates</h4>${live ? `<p class="status-bad">Adding a member records a new project transition: the open
+      ${esc(live.gate)} approval request (r${esc(live.revisionNo)}) is superseded and its approvals stop counting, so it must be requested again.</p>` : ""}
+      ${list(candidates.map((candidate) => `<li data-principal="${esc(candidate.principalKey)}">
+      ${esc(candidate.username)} <select name="role" aria-label="Project role for ${esc(candidate.username)}">${roles.map((role) => `<option>${role}</option>`).join("")}</select>
+      ${actionButton("Add", "add-member", ctx.allowed.addMember, `aria-label="Add ${esc(candidate.username)} to the project"`)}</li>`), "")}` : ""}
     <p class="muted">${TRUTH.twoUsers}.</p></section>`;
 }
 

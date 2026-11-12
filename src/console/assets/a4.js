@@ -1,7 +1,7 @@
 // A4 Studio page module (P1-58, design §11). a4.html and a4Project.html mount it from their own <script type="module">,
 // and home.html loads it for the "Start an agent project" card; app.js is byte-pinned and never learns about these pages.
 // Every call goes through apiNativeRequest. Studio re-checks every action: a disabled button is a convenience only.
-import { apiNativeRequest, onClaims, whoami } from "./api.js";
+import { apiNativeRequest, logout, onClaims, whoami } from "./api.js";
 import { installClaimStrip } from "./components/claimBadge.js";
 import { renderHandholdingSteps } from "./components/handholdingSteps.js";
 import { renderPlanTimeline } from "./components/planTimeline.js";
@@ -35,10 +35,12 @@ let busy = false; // one write in flight at a time, so a double click cannot min
 async function guarded(work) {
   if (busy) return undefined;
   busy = true;
+  root?.setAttribute("aria-busy", "true"); // a4.css dims the actions until the write and the reload after it end
   try {
     return await work();
   } finally {
     busy = false;
+    root?.removeAttribute("aria-busy");
   }
 }
 
@@ -246,10 +248,11 @@ function mountProject(projectId, options) {
       claimSink = [];
       const read = await readProject();
       if (view.oneRevision(read.project, read.revision, read.gates, read.readiness) || attempt === 3) {
-        // A statement binds the head it was recorded at: once the stage or revision moves, Confirm could only be refused.
-        if (state.project && (read.project.stage !== state.project.stage || read.project.revisionNo !== state.project.revisionNo)) {
-          reflection = null;
-          explanation = null;
+        // A statement binds the head it was recorded at: once a later revision or another stage supersedes it, Confirm could
+        // only be refused. The revision Understand itself records keeps it (view.statementHolds).
+        if (state.project) {
+          if (!view.statementHolds(reflection, state.project, read.project)) reflection = null;
+          if (!view.statementHolds(explanation, state.project, read.project)) explanation = null;
         }
         Object.assign(state, read);
         stage = read.stage;
@@ -313,7 +316,7 @@ function mountProject(projectId, options) {
       <div class="a4-cards">${stageCards(stage).map((card) => view.renderCard(card, ctx, state.comments)).join("")}</div>
       <section class="card"><h4>Differences</h4>${state.diff?.error ? `<p class="status-bad">${view.esc(state.diff.error)}</p>`
         : view.renderDifferences(state.diff, project)}</section>
-      <section class="card"><h4>Missing requirements</h4>${view.renderMissing(readiness, stage)}</section>
+      <section class="card"><h4>Missing requirements</h4>${view.renderMissing(readiness, stage, (key) => view.nameOf(ctx, key))}</section>
       ${view.renderLanes(readiness, state.refs, project.revisionNo)}${view.renderApprovalsBar(ctx)}${view.renderMembers(ctx)}
       <section class="card"><h4>Here now</h4><div id="a4Presence"></div></section>`;
     renderPlanTimeline(root.querySelector("#a4Rail"), view.railPlan(project));
@@ -446,7 +449,7 @@ function mountProject(projectId, options) {
         // Both Activate gates run an inline effect whose lease token is answered once (the release's staging lease, the
         // deployment approval's production lease; design §10.4); this generic action would drop it.
         if (stage === "activate") throw new Error(`${view.ACTIVATE_COMPLETE}. Nothing was sent.`);
-        return post("Complete stage", stagePath("complete"), { gateId: reviewedFor(met).gateId, ...headBinding() });
+        return post(view.completeLabel(met, stage), stagePath("complete"), { gateId: reviewedFor(met).gateId, ...headBinding() });
       }
       case "hold": return post("Hold", projectPath("/hold"), { reason: reason(), ...headBinding() }, REASON);
       case "resume": return post("Resume", projectPath("/resume"), { reason: reason(), ...headBinding() }, REASON);
@@ -459,8 +462,12 @@ function mountProject(projectId, options) {
       case "add-member": {
         const row = button.closest("[data-principal]");
         // `projectRoles`: Studio refuses any body naming `roles` as an identity claim.
+        // The add is a project transition: it supersedes an open gate, whose approvals then stop counting (docs/A4_FORGE.md).
+        const { open, met } = view.currentGates(state.gates, stage, state.readiness);
+        const live = open ?? met;
         return post("Add member", projectPath("/members"), { principalKey: row.dataset.principal,
-          projectRoles: [row.querySelector('[name="role"]').value], ...headBinding() }, [`member:${row.dataset.principal}:role`]);
+          projectRoles: [row.querySelector('[name="role"]').value], ...headBinding() }, [`member:${row.dataset.principal}:role`],
+          () => { if (live) tell(`Member added. The open ${live.gate} approval request was superseded by the add: request it again.`); });
       }
       case "comment": {
         const body = value("comment");
@@ -473,7 +480,7 @@ function mountProject(projectId, options) {
       default: {
         // A stage lane's own action (registerStageAction): only this project's routes or a native task route, or a local
         // one (`local: true`, e.g. a read the card shows) that sends nothing here and re-renders once its `pending` settles.
-        const custom = stageAction(stage, name)?.({ button, value, headBinding, uuid, projectPath });
+        const custom = stageAction(stage, name)?.({ button, value, headBinding, uuid, projectPath, projectId, me });
         if (!custom) throw new Error(`Unknown A4 action ${name}.`);
         if (custom.local === true) return custom;
         if (typeof custom.path !== "string" || !(custom.path.startsWith(`${projectPath("")}/`) || /^\/api\/v1\/native-tasks(?:\/|$)/.test(custom.path))) {
@@ -505,6 +512,8 @@ function mountProject(projectId, options) {
       await load();
     };
     let data;
+    // Build and Review run AMC's producers before Studio answers; the page says it is waiting, then reloads (action.after).
+    tell(`${action.label}: waiting for Studio…`);
     try {
       data = await send(action);
     } catch (error) {
@@ -518,7 +527,10 @@ function mountProject(projectId, options) {
       }
       throw error;
     }
+    const refreshing = `${action.label}: recorded; refreshing…`;
+    tell(refreshing);
     await action.after(data);
+    if (notice?.textContent === refreshing) tell(""); // a `got` that told the user something keeps its message
   }
 
   async function act(name, button) {
@@ -662,7 +674,8 @@ async function main() {
     status.innerHTML = 'Sign in to use agent projects. <a href="./login">Login</a>';
     return;
   }
-  status.textContent = `Signed in as ${me.username}`;
+  status.innerHTML = `Signed in as ${view.esc(me.username)} <button type="button" class="secondary" id="a4SignOut">Sign out</button>`;
+  status.querySelector("#a4SignOut").addEventListener("click", () => void logout().then(() => location.assign("./login"), showError));
   const options = await previewOptions();
   if (!options) {
     root.innerHTML = `<section class="card"><p>${view.previewNoticeHtml()}</p></section>`;
