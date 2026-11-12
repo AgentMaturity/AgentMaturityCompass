@@ -2379,7 +2379,9 @@ async function renderCompliance() {
           .map((item) => `<a class="pill" href="./compliance?agent=${encodeURIComponent(agentId)}&framework=${encodeURIComponent(item)}">${item}</a>`)
           .join("")}
       </div>
-      <p>Config signature: <strong>${verify.valid ? "VALID" : "INVALID"}</strong></p>
+      <p>Config signature: ${verify.valid ? "<strong>VALID</strong>" : verify.reason === "compliance maps missing"
+        ? "<strong>NOT CONFIGURED</strong> <span class='muted'>(no workspace maps file: the built-in maps are used; <code>amc compliance init</code> writes and signs one)</span>"
+        : `<strong>INVALID</strong> <span class="muted">(${htmlEscape(verify.reason || "does not verify")})</span>`}</p>
       <p>Mappings: <strong>${htmlEscape(report.familyReview?.status || "experimental")}</strong>: drafted and refuted by AI agents, not signed off by a named expert (D-08 pending).</p>
       ${(report.familyReview?.flags || []).map((flag) => `<p class="muted">Flag: ${htmlEscape(flag)}</p>`).join("")}
       <p>Coverage score: <strong>${report.coverage?.score == null ? "not evaluated" : Number(report.coverage.score).toFixed(3)}</strong></p>
