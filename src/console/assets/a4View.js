@@ -79,7 +79,8 @@ const REASON_TEXT = {
   GATE_EXPIRING: "This approval request is about to expire: request it again.",
   A4_DUPLICATE_DECISION: "You have already decided this approval request.",
   IDENTITY_CHECK_LIMITED: "A regulated project takes decisions only from local user accounts, not host sessions.",
-  "resources.current": "The agent's resources changed since this revision was recorded: save an answer under Ask to record a new revision."
+  "resources.current": "The agent's resources changed since this revision was recorded: save an answer under Ask to record a new revision.",
+  plan_unresolved: "Some requirements of the plan depend on facts that are still unknown: answer them under Ask, or an owner acknowledges them (a regulated project cannot)."
 };
 export function reasonText(code) {
   return REASON_TEXT[code] ?? (/^[a-z]/.test(String(code)) ? "A requirement under Missing requirements needs attention first."
@@ -558,7 +559,10 @@ export function effectHold(met, readiness) {
   if (!effect) return null;
   if (effect.reasonCodes.includes("EFFECT_GATE_NOT_OPEN")) return held("An owner first opens the effect gate on the stage's effect card; project approvers then approve it there.");
   const status = effect.reasonCodes.find((code) => String(code).startsWith("APPROVAL_STATUS:"))?.slice("APPROVAL_STATUS:".length);
-  return status === undefined || status === "QUORUM_MET" ? null : held(`Project approvers approve the effect gate's request on the stage's effect card first (now ${status}).`);
+  if (status === undefined || status === "QUORUM_MET") return null;
+  return held(["EXPIRED", "DENIED", "CANCELLED"].includes(status)
+    ? `The effect gate's request is ${status}: an owner re-opens the effect gate on the stage's effect card, and project approvers approve the new request.`
+    : `Project approvers approve the effect gate's request on the stage's effect card first (now ${status}).`);
 }
 
 export function renderApprovalsBar(ctx) {
