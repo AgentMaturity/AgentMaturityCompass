@@ -5,7 +5,7 @@ import { installClaimStrip } from "./components/claimBadge.js";
 import { industryPackDetailHtml, industryPackResultHtml } from "./industryPackView.js";
 import { renderBars, renderLine } from "./charts.js";
 import { decorateNav, topbarHtml } from "./shell.js";
-import { loginCardHtml, loginFailureText } from "./loginView.js";
+import { loginCardHtml, loginFailureText, safeNextPage } from "./loginView.js";
 import { renderQrLike } from "./qr.js";
 import { renderPluginTable } from "./components/pluginTable.js";
 import { renderPluginDetail } from "./components/pluginDetail.js";
@@ -1258,6 +1258,15 @@ async function ensureAuthenticated() {
   return false;
 }
 
+/** M9: the login page goes on to the page that sent the user there (?next=), else home; any other page re-renders itself. */
+async function afterSignIn() {
+  if (page === "login") {
+    window.location.assign(`./${safeNextPage(qs("next")) ?? "home"}`);
+    return;
+  }
+  await renderPage();
+}
+
 function renderAuthScreen() {
   if (!root) {
     return;
@@ -1279,7 +1288,7 @@ function renderAuthScreen() {
         pairingCode: pairingCode.trim() || undefined
       });
       setStatus("Login successful.");
-      await renderPage();
+      await afterSignIn();
     } catch (error) {
       setStatus(loginFailureText(errText(error)), true);
     }
@@ -1290,7 +1299,7 @@ function renderAuthScreen() {
     try {
       await apiGet("/status");
       setStatus("Admin token accepted.");
-      await renderPage();
+      await afterSignIn();
     } catch (error) {
       setStatus(`Admin token rejected: ${errText(error)}`, true);
     }

@@ -56,3 +56,9 @@ export function loginCardHtml({ demoMode = false, hostMode = false } = {}) {
 export function loginFailureText(message) {
   return String(message).includes("users config missing") ? NO_ACCOUNT : `Login failed: ${message}`;
 }
+
+/** The page to open after sign-in (M9): a console page name with an optional query, so `./<next>` cannot leave the console. */
+export function safeNextPage(raw) {
+  const value = typeof raw === "string" ? raw : "";
+  return /^[A-Za-z][\w-]*(?:\?[\w%=&.,:+-]*)?$/.test(value) && !/^login(?:\?|$)/.test(value) ? value : null;
+}
