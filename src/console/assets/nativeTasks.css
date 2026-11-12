@@ -6,6 +6,9 @@
 .native-task-layout > *, .native-task-fields > * { min-width:0; }
 .native-task-fields { display:flex; flex-wrap:wrap; align-items:end; gap:12px; }
 .native-task-fields label { display:flex; flex:1 1 165px; flex-direction:column; gap:6px; }
+.native-task-fields label:has(select) { flex-basis:250px; }
+.native-task-check { display:flex; align-items:center; gap:8px; }
+.native-task-check input { flex:none; width:auto; margin:0; }
 .native-task-fields input, .native-task-fields select, #nativeTaskPrompt { width:100%; min-width:0; }
 .native-task-fields button { margin-bottom:0; }
 .native-task-conversation h3 { margin:0; }

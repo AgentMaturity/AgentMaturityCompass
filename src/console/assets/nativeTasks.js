@@ -131,6 +131,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   root.innerHTML = nativeTasksShell(initialAgent);
   const el = id => root.querySelector(`#${id}`);
   const listen = (target, event, fn) => target.addEventListener(event, fn, { signal: lifetime.signal });
+  const transcriptEndInView = () => el("nativeTaskTranscript").getBoundingClientRect().bottom <= window.innerHeight + 180;
   const tell = message => { if (!disposed && notice !== message) { notice = message; el("nativeTaskNotice").textContent = message; } };
   const clearError = () => { el("nativeTaskError").hidden = true; el("nativeTaskError").textContent = ""; };
   const showError = error => {
@@ -386,7 +387,8 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
           receive(view); tell(view.history.message); return false;
         }
         const transcript = el("nativeTaskTranscript");
-        const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 180;
+        // L2: "near the end" is the transcript's end in view, not the page's (the prompt form sits below it).
+        const nearBottom = transcriptEndInView();
         for (const event of value.events) { el("nativeTaskEmpty")?.remove(); appendTaskEvent(transcript, event); }
         observedTools = collectNativeTaskTools(observedTools, value.events);
         if (value.page) { cursor = value.page.nextSeq - 1; pageCursor = value.page.nextCursor ?? value.page.resumeCursor; historyPending = value.page.nextCursor !== null; }
@@ -398,7 +400,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
           : `${taskStateLabel(task)}${!ACTIVE.has(task.state) && task.turnEndReason ? ` · ${task.turnEndReason}` : ""}.`);
         if (value.events.length) {
           if (nearBottom) transcript.lastElementChild?.scrollIntoView({ block: "nearest" });
-          else el("nativeTaskNewMessages").hidden = false;
+          else if (!transcriptEndInView()) el("nativeTaskNewMessages").hidden = false;
         }
         return true;
       } catch (error) {
@@ -600,6 +602,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   listen(el("nativeTaskReconnect"),"click",()=>{void refresh().catch(showError);});
   for(const [id,action] of [["nativeTaskCancel","cancel"],["nativeTaskRelease","release"],["nativeTaskResume","resume"],["nativeTaskVerify","verify"],["nativeTaskArchive","archive"]]) listen(el(id),"click",()=>{void mutate(action);});
   listen(el("nativeTaskIncludeArchived"),"change",()=>{if(!mutation&&!pending&&!inspecting&&!reconciling)void list().catch(showError);});
+  listen(window, "scroll", () => { if (transcriptEndInView()) el("nativeTaskNewMessages").hidden = true; });
   listen(el("nativeTaskNewMessages"),"click",()=>{el("nativeTaskTranscript").lastElementChild?.scrollIntoView({block:"nearest"});el("nativeTaskNewMessages").hidden=true;});
   listen(el("nativeTaskNew"),"click",()=>{
     if(pending||mutation||inspecting||reconciling||stale||readPaused||ACTIVE.has(task?.state))return;
