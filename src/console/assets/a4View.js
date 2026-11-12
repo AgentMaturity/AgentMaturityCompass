@@ -547,17 +547,16 @@ export function nameOf(ctx, key) {
 export const completeLabel = (met, stage) => (met?.gate === "direction" ? "Use the direction approval and continue to Build"
   : `Complete ${stageTitle(stage)}`);
 /**
- * A completion gate whose stage runs an effect is consumed only once an owner opened the effect gate and project approvers
- * approved its request (409 EFFECT_GATE_NOT_OPEN / EFFECT_QUORUM_INSUFFICIENT otherwise); the stage's effect item says
- * which (EFFECT_GATE_NOT_OPEN, or APPROVAL_STATUS: other than QUORUM_MET).
+ * Assemble's completion runs a required effect: it is consumed only once an owner opened the effect gate and project
+ * approvers approved its request (409 EFFECT_GATE_NOT_OPEN / EFFECT_QUORUM_INSUFFICIENT otherwise); its effect_gate item
+ * says which (EFFECT_GATE_NOT_OPEN, or APPROVAL_STATUS: other than QUORUM_MET). Adapt's plan review is optional.
  */
 export function effectHold(met, readiness) {
   if (met?.gate !== "completion") return null;
-  const effect = readiness.items.find((item) => item.reasonCodes.includes("EFFECT_GATE_NOT_OPEN") || item.reasonCodes.includes("EFFECT_GATE_OPENED"));
+  const effect = readiness.items.find((item) => item.id === "effect_gate");
   if (!effect) return null;
   if (effect.reasonCodes.includes("EFFECT_GATE_NOT_OPEN")) return held("An owner first opens the effect gate on the stage's effect card; project approvers then approve it there.");
   const status = effect.reasonCodes.find((code) => String(code).startsWith("APPROVAL_STATUS:"))?.slice("APPROVAL_STATUS:".length);
-  // Adapt's card reads the status itself (REVIEW_STATUS_NOT_READ): with no status named, Studio decides at Complete.
   return status === undefined || status === "QUORUM_MET" ? null : held(`Project approvers approve the effect gate's request on the stage's effect card first (now ${status}).`);
 }
 

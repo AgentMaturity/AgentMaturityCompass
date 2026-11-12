@@ -734,10 +734,11 @@ export function readinessHeadline(state: Pick<A4ReadinessState, "project">, quer
   // A denied gate blocks through its own item (GATE_DENIED); unless another item blocks too, the way back is a new revision.
   if (gate?.status === "DENIED" && blocked.every((candidate) => GATE_DERIVED.has(candidate.id))) return { status, nextAction: { label: `The ${gateName} gate was denied on this revision. ${REDO_PROPOSAL}` } };
   if (status === "BLOCKED") return { status, nextAction: { label: `Blocked by ${blocked.map((candidate) => candidate.id).join(", ") || "store.integrity"}: see each item's reason codes` } };
-  // A completion that runs an effect is consumed only once an owner opened its effect gate and the effect request has its
-  // approvals (complete answers 409 EFFECT_GATE_NOT_OPEN / EFFECT_QUORUM_INSUFFICIENT); the stage's advisory effect item waits until then.
-  const effect = gateName === "completion" && gate?.status === "QUORUM_MET" ? items.find((candidate) => candidate.status === "WAITING"
-    && candidate.reasonCodes.some((code) => code === "EFFECT_GATE_NOT_OPEN" || code.startsWith("APPROVAL_STATUS:"))) : undefined;
+  // Assemble's completion runs a required (non-optional) effect: it is consumed only once an owner opened the effect gate and
+  // its request has its approvals (complete answers 409 EFFECT_GATE_NOT_OPEN / EFFECT_QUORUM_INSUFFICIENT), so its advisory
+  // effect_gate item waits until then. Adapt's plan review is optional (a completion without it leaves the plan signed only).
+  const effect = gateName === "completion" && gate?.status === "QUORUM_MET" ? items.find((candidate) => candidate.id === "effect_gate"
+    && candidate.status === "WAITING") : undefined;
   if (effect !== undefined) return { status: status === "READY" ? "WAITING" : status, nextAction: effect.nextAction ?? { label: `Approve the ${effect.id} request` } };
   if (gate?.status === "QUORUM_MET") return { status, nextAction: { label: `Complete the ${gateName} gate` } };
   if (gate?.status === "PENDING") return { status, nextAction: { label: `Approvers decide on the ${gateName} gate (${gate.approvals} of ${gate.required} approvals)` } };

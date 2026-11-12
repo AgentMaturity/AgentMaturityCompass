@@ -131,6 +131,7 @@ describe("go-live A4 console fixes", () => {
     expect((v.effectHold({ gate: "completion" }, item(["EFFECT_GATE_OPENED", "APPROVAL_STATUS:PENDING"])) as { allowed: boolean }).allowed).toBe(false);
     expect(v.effectHold({ gate: "completion" }, item(["EFFECT_GATE_OPENED", "APPROVAL_STATUS:QUORUM_MET"]))).toBeNull();
     expect(v.effectHold({ gate: "direction" }, item(["EFFECT_GATE_NOT_OPEN"]))).toBeNull();
+    expect(v.effectHold({ gate: "completion" }, { items: [{ id: "plan_review_opened", reasonCodes: ["EFFECT_GATE_NOT_OPEN"] }] })).toBeNull();
   });
   test("L5: members are not offered as candidates again, Add has an accessible name, and an open gate is warned about", () => {
     const html = v.renderMembers({ project: { members: [{ principalKey: "K1", username: "owner1", authSource: "LOCAL_USER", roles: ["owner"] }] },

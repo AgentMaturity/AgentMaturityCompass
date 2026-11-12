@@ -105,6 +105,10 @@ describe("A-3: readinessHeadline", () => {
     const opened = item("effect_gate", "READY", { mandatory: false, reasonCodes: ["EFFECT_GATE_OPENED", "APPROVAL_STATUS:QUORUM_MET"] });
     expect(readinessHeadline(state("reviewed"), query, [opened], { direction: null, completion: met }))
       .toEqual({ status: "READY", nextAction: { label: "Complete the completion gate" } });
+    // Adapt's plan review is optional: its unopened item never holds the completion.
+    const review = item("plan_review_opened", "WAITING", { mandatory: false, reasonCodes: ["EFFECT_GATE_NOT_OPEN"], nextAction: { label: "open it" } });
+    expect(readinessHeadline(state("reviewed"), query, [review], { direction: null, completion: met }))
+      .toEqual({ status: "READY", nextAction: { label: "Complete the completion gate" } });
     const consumed = { status: "CONSUMED" } as A4GateStatus;
     const acked = item("plan_unresolved", "WAITING", { nextAction: { label: "Answer the missing facts" }, acknowledged: { by: "o" } as never });
     expect(readinessHeadline(state("completion_approved"), query, [acked], { direction: consumed, completion: consumed }))
