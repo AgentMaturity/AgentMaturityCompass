@@ -162,24 +162,12 @@ nav a{font-size:.8rem;color:#a0a0a0}nav a:hover{color:#4AEF79}
     <p>No! Use the <a href="playground.html">playground</a> to score your agent by answering 15 questions. No installation needed.</p>
   </details>
 
-  <section id="waitlist" style="margin-top:2.5rem;text-align:center;padding:1.5rem;border:1px solid rgba(0,255,65,.15);border-radius:6px">
-    <h2 style="color:#00ff41;font-size:1.3rem;margin-bottom:.5rem">Get Notified at Launch</h2>
-    <p style="color:#b8d8b8;font-size:.85rem;margin-bottom:1rem">Early access, framework guides, and trust scoring tips. No spam.</p>
-    <form id="waitlist-form-lite" action="https://formspree.io/f/placeholder" method="POST" style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap">
-      <input type="email" name="email" required placeholder="you@company.com" style="background:transparent;border:1px solid rgba(0,255,65,.3);color:#e0ffe0;padding:.5rem .8rem;border-radius:3px;font-size:.85rem;width:240px;outline:none">
-      <button type="submit" style="background:#00ff41;color:#000;border:none;padding:.5rem 1.2rem;border-radius:3px;font-weight:700;font-size:.85rem;cursor:pointer">Join Waitlist</button>
-    </form>
-    <p id="waitlist-success-lite" style="display:none;color:#00ff41;font-size:.9rem;margin-top:.75rem">✓ You're in. We'll be in touch.</p>
+  <section id="get-started" style="margin-top:2.5rem;text-align:center;padding:1.5rem;border:1px solid rgba(0,255,65,.15);border-radius:6px">
+    <h2 style="color:#00ff41;font-size:1.3rem;margin-bottom:.5rem">Get Started</h2>
+    <p style="color:#b8d8b8;font-size:.85rem;margin-bottom:1rem">AMC is available now. Install it with the command above, or follow the quickstart.</p>
+    <p><a href="docs/#QUICKSTART" class="btn">Read the quickstart</a> <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="btn btn-o">GitHub →</a></p>
   </section>
 </main>
-<script>
-document.getElementById('waitlist-form-lite').addEventListener('submit', function(e) {
-  e.preventDefault();
-  fetch(this.action, { method:'POST', body: new FormData(this), headers:{'Accept':'application/json'} })
-    .then(r => { if(r.ok) { this.style.display='none'; document.getElementById('waitlist-success-lite').style.display='block'; } })
-    .catch(() => {});
-});
-</script>
 
 <footer>
   <p>🧭 Agent Maturity Compass · MIT License · Open Source</p>
