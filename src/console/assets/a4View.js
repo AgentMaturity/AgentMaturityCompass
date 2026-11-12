@@ -388,18 +388,19 @@ function retryButton(item, allowed) {
     `data-attempt="${esc(attempt.slice("ATTEMPT:".length))}" data-effect-stage="${esc(route[1])}" data-effect="${esc(route[2])}"`)}` : "";
 }
 
-function itemRow(item, allowed, stage) {
+function itemRow(item, allowed, stage, nameFor) {
   const ack = item.acknowledged;
   return `<li><code>${esc(item.id)}</code> <code>${esc(item.status)}</code>${item.kind ? ` <span class="chip">${esc(item.kind)}</span>` : ""}
-    ${codes(item.reasonCodes)}${ack ? `<div class="muted">Acknowledged by ${esc(ack.by)} until ${time(ack.expiresTs)}: ${esc(ack.reason)};
+    ${codes(item.reasonCodes)}${ack ? `<div class="muted">Acknowledged by ${nameFor(ack.by)} until ${time(ack.expiresTs)}: ${esc(ack.reason)};
       still ${esc(item.status)}</div>` : ""}${nextActionHtml(item.nextAction)}${retryButton(item, allowed)}${
     !ack && item.status === "WAITING" && acknowledgeable(item, stage) && allowed.acknowledge?.allowed === true
       ? ` ${actionButton("Acknowledge", "acknowledge", allowed.acknowledge, `data-item="${esc(item.id)}"`)}` : ""}</li>`;
 }
 
-export function renderMissing(readiness, stage) {
+/** `nameFor(key)` names a principal key as HTML (nameOf); by default the key is shown escaped. */
+export function renderMissing(readiness, stage, nameFor = esc) {
   const open = readiness.items.filter((item) => !["READY", "COMPLETE"].includes(item.status));
-  const group = (mandatory) => list(open.filter((item) => item.mandatory === mandatory).map((item) => itemRow(item, readiness.allowed, stage)), "None.");
+  const group = (mandatory) => list(open.filter((item) => item.mandatory === mandatory).map((item) => itemRow(item, readiness.allowed, stage, nameFor)), "None.");
   return `<p>Readiness <code>${esc(readiness.status)}</code>${nextActionHtml(readiness.nextAction)}</p>
     <h4>Mandatory</h4>${group(true)}<h4>Advisory</h4>${group(false)}`;
 }
