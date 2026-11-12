@@ -74,10 +74,22 @@ describe("amc verify --repair", () => {
   it("changes nothing on a healthy workspace and exits 0", () => {
     const workspace = blobWorkspace();
     const before = snapshot(workspace);
-    const result = amc(workspace, ["verify", "--repair"]);
+    // Pinned, as plain verify needs for exit 0: --repair ends with plain verify's verdict.
+    const monitor = sha256Hex(readFileSync(join(workspace, ".amc", "keys", "monitor_ed25519.pub")));
+    const result = amc(workspace, ["verify", "--repair", "--expect-monitor", monitor]);
     expect(result.status, result.output).toBe(0);
     expect(result.output).not.toContain("Removed");
     expect(snapshot(workspace)).toEqual(before);
+  });
+
+  it("ends with the verdict and exit code plain amc verify gives on the same workspace (UNANCHORED included)", () => {
+    const workspace = blobWorkspace();
+    const plain = amc(workspace, ["verify"]);
+    const repair = amc(workspace, ["verify", "--repair"]);
+    expect(repair.status, repair.output).toBe(plain.status);
+    const verdict = plain.output.split("\n").find((line) => line.startsWith("Ledger verification"))!;
+    expect(repair.output).toContain(verdict);
+    expect(repair.output).not.toContain("Verification passed");
   });
 
   it("prints a plan for a tampered workspace, exits 1 and changes nothing", () => {
@@ -107,7 +119,10 @@ describe("amc verify --repair", () => {
     tamper(workspace);
     const before = snapshot(workspace);
     const result = amc(workspace, ["verify", "--repair", "--apply", "--yes"]);
-    expect(result.status, result.output).toBe(0);
+    // The store is archived, then plain verify's verdict on what is left: no ledger, so FAILED and exit 1.
+    expect(result.status, result.output).toBe(1);
+    expect(result.output).toContain("signed as REPAIR_RECEIPT");
+    expect(result.output).toContain("Evidence ledger is missing");
     expect(result.output).not.toContain("Removed");
 
     const quarantine = join(workspace, ".amc", "quarantine");

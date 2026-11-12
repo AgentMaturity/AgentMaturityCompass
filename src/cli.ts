@@ -6145,9 +6145,8 @@ withTrustFlags(verifyCmd, { expectMonitor: true, ledgerOnly: true })
     if (opts.repair) {
       const code = await runVerifyRepair({ apply: opts.apply, yes: opts.yes, ...(opts.expectMonitor ? { expectedMonitorFingerprint: opts.expectMonitor } : {}) });
       if (code !== 0) process.exit(code);
-      return;
-    }
-    if (opts.apply || opts.yes) { console.error("--apply and --yes only work with --repair"); process.exit(2); }
+      // Repaired what it could (or nothing needed it): end with plain verify's verdict and exit code, UNANCHORED included.
+    } else if (opts.apply || opts.yes) { console.error("--apply and --yes only work with --repair"); process.exit(2); }
     const trust = trustFromFlags(opts, ["ledger-row"]);
     // B1: payloads a locked vault keeps closed are NOT EVALUATED (exit 1), never "authentication failed".
     const result = await verifyLedgerIntegrity(process.cwd(), { trust, blobKeyOptional: true, ...(opts.expectMonitor ? { expectedMonitorFingerprint: opts.expectMonitor } : {}) });

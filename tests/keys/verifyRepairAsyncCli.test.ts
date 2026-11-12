@@ -39,7 +39,8 @@ function fixture() {
   return { root, workspace, run, calls };
 }
 test.skipIf(process.platform === "win32")("actual verify --repair --apply --yes awaits both real signatures and archives under the original signed receipt wire", async () => {
-  const f = fixture(), result = await f.run(["verify", "--repair", "--apply", "--yes"]); expect(result.code, result.stdout + result.stderr).toBe(0); expect(result.signal).toBeNull(); expect(result.error).toBeUndefined();
+  // Archived, then plain verify's verdict on what is left (no ledger): exit 1.
+  const f = fixture(), result = await f.run(["verify", "--repair", "--apply", "--yes"]); expect(result.code, result.stdout + result.stderr).toBe(1); expect(result.signal).toBeNull(); expect(result.error).toBeUndefined();
   expect(result.stdout).toContain("signed as REPAIR_RECEIPT"); const ids = readdirSync(join(f.workspace, ".amc", "quarantine")); expect(ids).toHaveLength(1);
   const dir = join(f.workspace, ".amc", "quarantine", ids[0]!), planBytes = readFileSync(join(dir, "repair-plan.json")), bytes = readFileSync(join(dir, "repair-receipt.json"));
   const receipt = JSON.parse(bytes.toString()), signed = JSON.parse(readFileSync(join(dir, "repair-receipt.json.sig"), "utf8")), digest = sha256Hex(bytes);
