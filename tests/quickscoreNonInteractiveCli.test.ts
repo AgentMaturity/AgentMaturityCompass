@@ -59,6 +59,16 @@ describe("quickscore non-interactive CLI output", () => {
     });
   });
 
+  test.each([[["--rapid"]], [[]]])("compiled quickscore %j --answers rejects unknown question IDs, naming them", (mode) => {
+    const result = spawnSync(process.execPath, [
+      join(process.cwd(), "dist", "cli.js"), "quickscore", ...mode, "--json",
+      "--answers", JSON.stringify({ "AMC-1.1": 3, "NOT-A-QUESTION": 2, "AMC-99.99": 1 })
+    ], { cwd: mkdtempSync(join(tmpdir(), "amc-quickscore-unknown-")), encoding: "utf8", env: { ...process.env, NO_COLOR: "1" } });
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain("unknown question IDs: NOT-A-QUESTION, AMC-99.99");
+    expect(result.stdout).toBe("");
+  });
+
   test("compiled default non-interactive output fails closed before producing a placeholder score", () => {
     const result = spawnSync(process.execPath, [
       join(process.cwd(), "dist", "cli.js"),

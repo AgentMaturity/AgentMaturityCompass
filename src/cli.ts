@@ -18,6 +18,7 @@ import { aliasesForRun, listRunAliases, removeRunAlias, saveRunAlias } from "./d
 import { writeDiagnosticReportShareBundle } from "./diagnostic/reportShare.js";
 import {
   NON_INTERACTIVE_QUICKSCORE_NOTICE,
+  assertKnownQuickscoreQuestions,
   parseQuickscoreAnswers,
   withAutoQuickscoreNoEvidenceNotice,
   withNonInteractiveQuickscoreNotice,
@@ -3139,6 +3140,8 @@ program
       const { getRapidQuestions, scoreRapidAssessment } = await import("./diagnostic/rapidQuickscore.js");
       const questions = getRapidQuestions();
       const answers: Record<string, number> = { ...(providedAnswers?.answers ?? {}) };
+      try { assertKnownQuickscoreQuestions(answers, questions.map((question) => question.id), "quickscore --rapid"); }
+      catch (error: unknown) { console.error(chalk.red(toErrorMessage(error))); process.exit(1); }
 
       if (!providedAnswers && (!process.stdin.isTTY || opts.quiet)) {
         if (opts.json) {
@@ -3282,6 +3285,8 @@ program
     const layers = getQuestionsByLayer();
     const totalQuestions = layers.reduce((sum, l) => sum + l.questions.length, 0);
     const answers: Record<string, number> = { ...(providedAnswers?.answers ?? {}) };
+    try { assertKnownQuickscoreQuestions(answers, layers.flatMap((layer) => layer.questions.map((question) => question.id)), "quickscore"); }
+    catch (error: unknown) { console.error(chalk.red(toErrorMessage(error))); process.exit(1); }
 
     if (!providedAnswers && (!process.stdin.isTTY || opts.quiet)) {
       if (opts.json) {

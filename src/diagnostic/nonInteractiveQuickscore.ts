@@ -77,6 +77,16 @@ export function parseQuickscoreAnswers(input: string, options: { cwd?: string } 
   };
 }
 
+/** Answers for questions this mode does not ask would be ignored silently, so they are refused, naming every one. */
+export function assertKnownQuickscoreQuestions(answers: Record<string, number>, questionIds: readonly string[], mode: string): void {
+  const known = new Set(questionIds);
+  const unknown = Object.keys(answers).filter((id) => !known.has(id));
+  if (unknown.length > 0) {
+    throw new Error(`--answers names unknown question IDs: ${unknown.join(", ")}. ${mode} asks ${questionIds.length} questions; `
+      + "`amc explain <questionId>` shows one.");
+  }
+}
+
 export function withProvidedAnswersQuickscoreMetadata<T extends object>(
   result: T,
   parsed: Pick<ParsedQuickscoreAnswers, "answeredQuestions" | "source">,
