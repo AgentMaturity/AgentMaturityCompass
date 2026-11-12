@@ -81,6 +81,12 @@ Daily and minute model fields use their respective windows. The `ok` field repor
 
 The signed per-agent `unknownTokenUsage` setting defaults to `BLOCK` when omitted. Transport loss, cancellation, a partial usage report or an unresolved reservation can leave token usage unknown; AMC blocks another native model request while such usage remains in the applicable window. Pending reservations do not silently expire. HTTP 401, 403 and 429 refusals consume request allowance and retain unknown reported usage, but do not count as blocking unknown token usage, allowing configured retries without inventing a zero-usage measurement.
 
+In practice the most common cause is one Ctrl-C while a model request is in flight: the provider may already have counted tokens, so that request's usage is unknown and every later model request of the same agent is refused with `AMC_NATIVE_BUDGET_REFUSED` until the block clears. A cancel that lands before budget admission sends nothing and does not count. The refusal names the cause and count ("blocked by N earlier native model request(s) whose token usage is unknown"), `amc agent-loop run` prints the same line under the native error, and `amc agent-loop chat` prints it right after a cancelled turn. Recovery:
+
+- Unknown usage counts only in its local budget day and minute windows, so the block clears when the local day ends. `budgets reset` does not clear it.
+- A pending reservation (`daily.llmPendingRequests`) never expires by waiting.
+- To continue sooner, use the waiver below and run `amc budgets sign`.
+
 An operator can explicitly set `budgets.perAgent.<agent>.unknownTokenUsage` to `ALLOW_WITH_WARNING` and sign the reviewed policy to allow further dispatch with incomplete usage. Request allowances still apply, uncertainty remains visible in status, and this setting does not provide a hard token or cost cap. `nativeAdmissionPolicy` reports the effective choice alongside the token and cost threshold semantics.
 
 Native reservations and their settlement are bound to the session and call identity in verified evidence. Invalid signatures, broken event chains or inconsistent reservation settlement cannot be used as trusted usage. Preserve the ledger and its trusted verification checkpoint when investigating a blocked session.

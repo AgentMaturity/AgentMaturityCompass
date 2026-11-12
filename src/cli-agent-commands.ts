@@ -37,6 +37,8 @@ import {
   stubProviderTransport
 } from "./agent/stubProvider.js";
 import type { LoopNotification } from "./agent/loopTypes.js";
+import { liveNativeFailureGuidance } from "./agent/nativeFailureGuidance.js";
+import { nativeUnknownUsageNotice } from "./budgets/nativeBudgetAdmission.js";
 import { echoToolSeam } from "./agent/echoTool.js";
 import { MAX_ACTIVE_CHILDREN_HELP, NO_DELEGATE_STOP_HELP, VALIDATION_REPAIR_HELP, WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
 import { leaseFileToken, withLeaseFileOption } from "./cli/agentLoopLeaseFile.js";
@@ -741,6 +743,10 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             : (notification: LoopNotification) => {
                 const line = renderNotification(notification);
                 if (line !== null) (opts.json ? io.error : io.log)(line);
+                // Smoke H-2: say which earlier requests block this agent and how to recover, from verified usage.
+                const usageNotice = notification.kind === "error" && liveNativeFailureGuidance(notification.error).code === "AMC_NATIVE_BUDGET_REFUSED"
+                  ? nativeUnknownUsageNotice(process.cwd(), agentId) : null;
+                if (usageNotice !== null) io.error(`  ${usageNotice}`);
               },
           onReady: (handle) => {
             output.sink?.ready(handle, { agentId, provider: providerId, model, tools: toolMode, approvals: gate?.actionClass ?? null });

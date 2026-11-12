@@ -28,6 +28,7 @@ import { createNativeInteractiveMcpView } from "./nativeInteractiveMcp.js";
 import { renderNativeInteractiveToolResults } from "./nativeInteractiveResults.js";
 import { escapeTerminalControls } from "../tools/builtin/askUserTool.js";
 import { listNativeQueuedSubmissions, withdrawNativeQueuedSubmission } from "./nativeInteractiveWithdraw.js";
+import { nativeUnknownUsageNotice } from "../budgets/nativeBudgetAdmission.js";
 
 export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly validationConfig?: string;
@@ -592,6 +593,9 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         const why = sideEffectsUnsettled && ending?.reason === "complete" ? "the session's side effects did not all settle (a refused, unknown or still-open receipt; exit code 6)" : ending?.reason ?? "no recorded turn ending";
         io.log(`Task completion is not established: ${why}${outcome.cancelRequested ? "; cancellation was requested" : ""}. Driver idle only means it can accept another explicit task; no retry was sent.`);
       }
+      // A request cancelled mid-flight leaves unknown token usage, which the signed default policy blocks (smoke H-2).
+      const usageNotice = outcome.cancelRequested ? nativeUnknownUsageNotice(cwd, guide.agentId) : null;
+      if (usageNotice !== null) io.error(`The next model request may be refused: ${usageNotice}`);
     }
     if (forkFrom !== null) {
       if (unresolvedOutcome) io.error("The attempted fork has no admitted child result. Do not repeat it blindly; inspect the parent's recorded lineage before choosing a continuation.");

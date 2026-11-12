@@ -11,6 +11,7 @@ import { openSessionEventStore } from "../src/persistence/openSessionEventStore.
 import { openLedger } from "../src/ledger/ledger.js";
 import { budgetUsageSnapshot, budgetsPath, evaluateBudgetStatus, loadBudgetsConfig, signBudgetsConfig } from "../src/budgets/budgets.js";
 import { measuredUsage, NATIVE_BUDGET_RESERVATION } from "../src/budgets/nativeBudgetUsage.js";
+import { nativeUnknownUsageNotice } from "../src/budgets/nativeBudgetAdmission.js";
 import { AdapterRegistry } from "../src/llm/adapter/adapterRegistry.js";
 import { LlmRuntime } from "../src/llm/adapter/llmRuntime.js";
 import { anthropicAdapter } from "../src/llm/providers/anthropicAdapter.js";
@@ -163,6 +164,18 @@ describe("AMC-1534 native budget admissions and signed accounting", () => {
     expect(upstream.sent).toHaveLength(1);
     const failed = value.readEvents().find(row => row.event_type === "request/failure")!;
     expect(JSON.parse(failed.meta_json).usage).toMatchObject({ reported: false, complete: false });
+  });
+
+  test("smoke H-2: the unknown-usage refusal counts the blocking requests and names the documented recovery", async () => {
+    expect(nativeUnknownUsageNotice(workspace, "default")).toBeNull();
+    const { value, spec } = session(); const llm = runtime(value, refusingUpstream(new Error("socket failed")));
+    await expect(drain(llm.stream(spec))).rejects.toThrow();
+    const refusal = drain(llm.stream(spec));
+    await expect(refusal).rejects.toThrow("blocked by 1 earlier native model request(s) whose token usage is unknown");
+    await expect(refusal).rejects.toThrow("budgets.perAgent.default.unknownTokenUsage: ALLOW_WITH_WARNING in .amc/budgets.yaml, then run amc budgets sign");
+    expect(nativeUnknownUsageNotice(workspace, "default")).toMatch(/^blocked by 1 earlier native model request\(s\) whose token usage is unknown.*until the local budget day ends/);
+    limits(config => { config.budgets.perAgent.default!.unknownTokenUsage = "ALLOW_WITH_WARNING"; });
+    expect(nativeUnknownUsageNotice(workspace, "default")).toBeNull();
   });
 
   test.each([401, 403, 429])("protocol refusal %s consumes a request but does not invent token usage or prevent a bounded retry", async status => {
