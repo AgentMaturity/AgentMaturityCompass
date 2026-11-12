@@ -146,8 +146,11 @@ function htmlEscape(text) {
 
 /** JSON for display (M11): a host path under the workspace's .amc directory reads as `.amc/...`. */
 function displayJson(value) {
-  return JSON.stringify(value, (_key, item) =>
-    typeof item === "string" && /^(?:\/|[A-Za-z]:\\).*[\\/]\.amc[\\/]/.test(item) ? item.slice(item.search(/[\\/]\.amc[\\/]/) + 1).replaceAll("\\", "/") : item, 2);
+  return JSON.stringify(value, (_key, item) => typeof item === "string" ? workspacePath(item) : item, 2);
+}
+
+function workspacePath(text) {
+  return /^(?:\/|[A-Za-z]:\\).*[\\/]\.amc[\\/]/.test(text) ? text.slice(text.search(/[\\/]\.amc[\\/]/) + 1).replaceAll("\\", "/") : text;
 }
 
 /** M11: a one-line plain summary, with the raw JSON collapsed beneath it. */
@@ -3020,7 +3023,7 @@ async function renderFirewall() {
       </div>
       <div class="hero-actions">
         <span class="pill ${status.enabled ? "ok" : "warn"}">${status.enabled ? "enabled" : "disabled"}</span>
-        <span class="pill">${htmlEscape(status.mode || "disabled")}</span>
+        ${status.enabled && status.mode ? `<span class="pill">${htmlEscape(status.mode)}</span>` : ""}
       </div>
     </section>
     <div class="grid two">
@@ -3034,8 +3037,8 @@ async function renderFirewall() {
           <button id="firewallEnable" data-roles="OWNER">Enable</button>
           <button id="firewallDisable" data-roles="OWNER" class="secondary">Disable</button>
         </div>
-        <div class="studio-terminal-line"><strong>Policy journal</strong><span>${status.policyCommitted ? htmlEscape(status.policyJournalPath || "") : "missing"}</span></div>
-        <div class="studio-terminal-line"><strong>Compatibility mirror</strong><span>${status.mirrorExists ? htmlEscape(status.policyPath || "") : "missing"}</span></div>
+        <div class="studio-terminal-line"><strong>Policy journal</strong><span>${status.policyCommitted ? htmlEscape(workspacePath(status.policyJournalPath || "")) : "missing"}</span></div>
+        <div class="studio-terminal-line"><strong>Compatibility mirror</strong><span>${status.mirrorExists ? htmlEscape(workspacePath(status.policyPath || "")) : "missing"}</span></div>
         <div class="studio-terminal-line"><strong>Decisions</strong><span>${Number(status.eventCount || 0)}</span></div>
         <div class="studio-terminal-line"><strong>Latest</strong><span>${latest ? `${htmlEscape(latest.action)} risk ${Number(latest.riskScore || 0)}` : "-"}</span></div>
       `)}

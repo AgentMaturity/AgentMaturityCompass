@@ -610,7 +610,7 @@ main {
 
 .studio-terminal-line {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
   gap: 16px;
   padding: 7px 0;
   border-bottom: 1px solid rgba(255,255,255,.055);
@@ -628,6 +628,7 @@ main {
 .studio-terminal-line span {
   color: var(--muted);
   text-align: right;
+  overflow-wrap: anywhere;
 }
 
 .studio-command {
