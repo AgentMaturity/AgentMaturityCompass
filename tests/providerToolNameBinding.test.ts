@@ -107,7 +107,11 @@ async function drain(stream: AsyncIterable<StreamChunk>, chunks: StreamChunk[] =
   return chunks;
 }
 function calls(chunks: readonly StreamChunk[]) {
-  return chunks.flatMap(chunk => chunk.type === "block-end" && chunk.block.kind === "tool_use" ? [chunk.block] : []);
+  return chunks.flatMap(chunk => chunk.type === "block-end" && chunk.block.kind === "tool_use" && chunk.block.unoffered !== true ? [chunk.block] : []);
+}
+/** Smoke M-5: an unoffered name arrives verbatim, marked and unbound; the loop refuses it and the request succeeds. */
+function unoffered(chunks: readonly StreamChunk[]) {
+  return chunks.flatMap(chunk => chunk.type === "block-end" && chunk.block.kind === "tool_use" && chunk.block.unoffered === true ? [chunk.block] : []);
 }
 
 describe("provider tool names retain signed internal identity", () => {
@@ -241,16 +245,18 @@ describe("provider tool names retain signed internal identity", () => {
     h.session.recordToolResult({ toolCallId: "call_0", outcome: "OK", exitCode: 0, timedOut: false, denied: false, content: "old result" });
     h.session.endStep({ stopReason: "tool_use", usage: null }); h.session.startStep();
     const current: StreamChunk[] = [];
-    await expect(drain(h.runtime.stream(h.spec(null)), current)).rejects.toMatchObject({ code: "AMC_LLM_UNOFFERED_TOOL_NAME" });
+    await drain(h.runtime.stream(h.spec(null)), current);
     expect(calls(current)).toHaveLength(0);
+    expect(unoffered(current).map(block => [block.name, "providerWireName" in block])).toEqual([[originalWire, false]]);
     const second = JSON.parse(sent[1]!.toString());
     const replayed = protocol.id === "chat" ? second.messages.flatMap((row: { tool_calls?: { function: { name: string } }[] }) => row.tool_calls ?? []).map((row: { function: { name: string } }) => row.function.name)
       : protocol.id === "responses" ? second.input.filter((row: { type: string }) => row.type === "function_call").map((row: { name: string }) => row.name)
       : second.messages.flatMap((row: { content: { type: string; name?: string }[] }) => row.content).filter((row: { type: string }) => row.type === "tool_use").map((row: { name: string }) => row.name);
     expect(replayed).toEqual([originalWire]); expect(second.tools).toBeUndefined();
-    expect(h.session.readEvents().filter(row => row.event_type === "tool/call")).toHaveLength(1);
-    const failure = h.session.readEvents().find(row => row.event_type === "request/failure")!;
-    expect(JSON.parse(failure.meta_json)).toMatchObject({ failure: { code: "AMC_LLM_UNOFFERED_TOOL_NAME", message: expect.stringContaining(originalWire) }, policy: { retryable: false } });
+    const rows = h.session.readEvents().filter(row => row.event_type === "tool/call");
+    expect(rows).toHaveLength(2); expect(JSON.parse(rows[1]!.meta_json)).not.toHaveProperty("providerName");
+    expect(h.session.readEvents().some(row => row.event_type === "request/failure")).toBe(false);
+    h.session.recordToolResult({ toolCallId: unoffered(current)[0]!.id, outcome: "DENIED", exitCode: null, timedOut: false, denied: true, content: "not available" });
     h.close(true);
     expect(verifyLedgerIntegrity(h.workspace).chain.ok).toBe(true);
     const derived = deriveSessionRequests({ workspace: h.workspace, sessionId: h.session.sessionId });
@@ -258,13 +264,15 @@ describe("provider tool names retain signed internal identity", () => {
     derived.forEach((row, index) => { expect(row.status).toBe("reconstructed"); expect(row.bytes?.equals(sent[index]!)).toBe(true); });
   });
 
-  test.each(["unknown_alias", "fs.read"])("unoffered wire name %s cannot reach a tool consumer", async returned => {
+  test.each(["unknown_alias", "fs.read"])("unoffered wire name %s is never bound to a tool identity", async returned => {
     const protocol = protocols[0];
     const h = harness(protocol, async () => response(protocol, [returned])); const chunks: StreamChunk[] = [];
-    await expect(drain(h.runtime.stream(h.spec([tool("fs.read")])), chunks)).rejects.toMatchObject({ code: "AMC_LLM_UNOFFERED_TOOL_NAME" });
+    await drain(h.runtime.stream(h.spec([tool("fs.read")])), chunks);
     expect(calls(chunks)).toHaveLength(0);
-    expect(h.session.readEvents().filter(row => row.event_type === "tool/call" || row.event_type === "tool/result")).toHaveLength(0);
-    expect(JSON.parse(h.session.readEvents().find(row => row.event_type === "request/failure")!.meta_json)).toMatchObject({ policy: { retryable: false } });
+    expect(unoffered(chunks).map(block => [block.name, "providerWireName" in block])).toEqual([[returned, false]]);
+    const rows = h.session.readEvents().filter(row => row.event_type === "tool/call");
+    expect(rows.map(row => JSON.parse(row.meta_json))).toEqual([expect.not.objectContaining({ providerName: expect.anything() })]);
+    expect(h.session.readEvents().some(row => row.event_type === "request/failure" || row.event_type === "tool/result")).toBe(false);
   });
 
   test("post-prepare caller mutation cannot change the bound schema authority", async () => {

@@ -344,7 +344,12 @@ describe("DeepSeek SSE, tool and cancellation contract (unexecuted)", () => {
   });
   it("uses exact offered-name binding for unknown and removed function names", async () => {
     const binding = new ProviderToolBinding(bindProviderToolNames([functions[1]!]));
-    await expect((async () => { for await (const chunk of decodeDeepseek(response(toolSequence().map(value => event(value)).join("")))) binding.bind(chunk); })()).rejects.toThrow(/unoffered/);
+    // Smoke M-5: an unoffered name is passed through marked and unbound (the loop refuses it), never bound or thrown.
+    const bound: StreamChunk[] = [];
+    for await (const chunk of decodeDeepseek(response(toolSequence().map(value => event(value)).join("")))) bound.push(binding.bind(chunk));
+    const blocks = bound.flatMap(chunk => chunk.type === "block-end" && chunk.block.kind === "tool_use" ? [chunk.block] : []);
+    expect(blocks.length).toBeGreaterThan(0);
+    for (const block of blocks) { expect(block.unoffered).toBe(true); expect(block).not.toHaveProperty("providerWireName"); }
   });
   it.each(["thinking", "tool"])("consumer cancellation closes the body during %s without completing tools", async kind => {
     let closed = false; const assembler = new BlockAssembler();

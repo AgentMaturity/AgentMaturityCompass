@@ -93,6 +93,11 @@ export interface ToolUseContentBlock {
   readonly name: string;
   /** Decoded provider name before request-scoped binding; not raw HTTP bytes. */
   readonly providerWireName?: string;
+  /**
+   * The provider returned a name this request did not offer. `name` is then the provider's name verbatim, NOT a tool
+   * identity: the loop answers the call with a refusal and never dispatches it (smoke M-5).
+   */
+  readonly unoffered?: true;
   /** Raw JSON string exactly as the model produced it — never re-parsed in transit. */
   readonly arguments: string;
   readonly gemini?: GeminiPartMeta;
@@ -251,6 +256,8 @@ export type StreamChunk =
       /** Arrives once, usually on the first frame of the call. */
       readonly name?: string;
       readonly providerWireName?: string;
+      /** See `ToolUseContentBlock.unoffered`. */
+      readonly unoffered?: true;
       readonly argumentsDelta: string;
       readonly gemini?: GeminiPartMeta;
     }

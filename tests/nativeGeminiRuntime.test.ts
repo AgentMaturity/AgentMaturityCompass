@@ -30,7 +30,10 @@ afterEach(async () => {
 const schema = (name: string): ToolSchema => ({ name, description: "Fixture function", parameters: { type: "object",
   properties: { path: { type: "string" }, offset: { type: "number" } } } });
 const drain = async (stream: AsyncIterable<StreamChunk>, seen: StreamChunk[] = []) => { for await (const chunk of stream) seen.push(chunk); return seen; };
-const calls = (chunks: readonly StreamChunk[]): ToolUseContentBlock[] => chunks.flatMap(chunk => chunk.type === "block-end" && chunk.block.kind === "tool_use" ? [chunk.block] : []);
+const calls = (chunks: readonly StreamChunk[]): ToolUseContentBlock[] => chunks.flatMap(chunk => chunk.type === "block-end" && chunk.block.kind === "tool_use" && chunk.block.unoffered !== true ? [chunk.block] : []);
+/** Smoke M-5: an unoffered name arrives verbatim, marked and unbound; the loop refuses it, the request does not fail. */
+const unofferedNames = (chunks: readonly StreamChunk[]): (string | boolean)[][] => chunks.flatMap(chunk => chunk.type === "block-end" && chunk.block.kind === "tool_use" && chunk.block.unoffered === true
+  ? [[chunk.block.name, "providerWireName" in chunk.block]] : []);
 function harness(script: (HttpResponse | HttpTransport)[], backend = "sqlite") {
   const root = orderedWorkspace(backend), writer = new SessionService(root); writers.add(writer);
   writer.open({ agentId: "default", harnessVersion: "gemini-fixture", compositionDigest: "gemini-fixture", policyDigest: "gemini-fixture" });
@@ -138,9 +141,18 @@ describe("native Gemini signed lifecycle (unexecuted)", () => {
     const h = harness([geminiResponse([geminiFrame(parts)], attack === "trailing-frame" ? "data: {unfinished" : "")]);
     const tools = [schema("fs.read")], first = h.runtime.prepare(h.spec(tools));
     tools.push(schema("fs.write")); const seen: StreamChunk[] = [];
+    if (attack === "unoffered" || attack === "added-after-prepare") {
+      await drain(first.stream(), seen);
+      expect(calls(seen)).toEqual([]); expect(unofferedNames(seen)).toEqual([[foreign, false]]);
+      const rows = h.writer.readEvents().filter(row => row.event_type === "tool/call");
+      expect(rows).toHaveLength(1); expect(JSON.parse(rows[0]!.meta_json)).not.toHaveProperty("providerName");
+      expect(h.writer.readEvents().some(row => row.event_type === "request/failure")).toBe(false);
+      h.writer.recordToolResult({ toolCallId: JSON.parse(rows[0]!.meta_json).toolCallId, outcome: "DENIED", exitCode: null, timedOut: false, denied: true, content: "not available" });
+    } else {
     await expect(drain(first.stream(), seen)).rejects.toBeDefined();
     expect(calls(seen)).toEqual([]); expect(h.writer.readEvents().filter(row => row.event_type === "tool/call")).toEqual([]);
     expect(h.writer.readEvents().some(row => row.event_type === "request/failure")).toBe(true);
+    }
     expect(JSON.parse(h.sent[0]!.body.toString()).tools[0].functionDeclarations.map((tool: { name: string }) => tool.name)).toEqual([original]);
     h.finishStep(first); h.close(true);
     expect(orderedCold(h.root, h.writer.sessionId)[0]!.bytes).toBe(h.sent[0]!.body.toString("base64"));
@@ -151,8 +163,11 @@ describe("native Gemini signed lifecycle (unexecuted)", () => {
       geminiResponse([geminiFrame([geminiCallPart(wire, "new")], "new-response")])]);
     const first = h.runtime.prepare(h.spec([schema("fs.read")])); await drain(first.stream()); result(h.writer, "old"); h.finishStep(first); h.writer.startStep();
     const next = h.runtime.prepare(h.spec([schema("fs.stat")])); const seen: StreamChunk[] = [];
-    await expect(drain(next.stream(), seen)).rejects.toMatchObject({ code: "AMC_LLM_UNOFFERED_TOOL_NAME" });
-    expect(calls(seen)).toEqual([]); expect(h.writer.readEvents().filter(row => row.event_type === "tool/call")).toHaveLength(1);
+    await drain(next.stream(), seen);
+    expect(calls(seen)).toEqual([]); expect(unofferedNames(seen)).toEqual([[wire, false]]);
+    expect(h.writer.readEvents().filter(row => row.event_type === "tool/call")).toHaveLength(2);
+    h.writer.recordToolResult({ toolCallId: JSON.parse(h.writer.readEvents().filter(row => row.event_type === "tool/call")[1]!.meta_json).toolCallId,
+      outcome: "DENIED", exitCode: null, timedOut: false, denied: true, content: "not available" });
     h.finishStep(next); h.close(true);
   });
   test("in-flight cancellation closes the body, retains observed raw provenance and never completes a tool", async () => {
