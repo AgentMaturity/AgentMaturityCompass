@@ -28,18 +28,18 @@ export const engineDecision = (projectId, approvalRequestId, verb, reason, diges
 });
 
 /**
- * For the inbox: the project and digest of an A4 engine request, read from the project's readiness at its current stage.
- * null when the request is not one the project publishes a digest for (a documentary gate, a request it no longer names):
- * those are decided on the project page.
+ * For the inbox: the A4 project among `projectIds` whose readiness (at its current stage) publishes a digest for
+ * `approvalRequestId`, with that digest; null when none does (not an A4 engine request, or one no project names now).
  */
-export async function a4EngineRequest(intentId, approvalRequestId) {
-  const projectId = a4ProjectOf(intentId);
-  if (projectId === null) return null;
-  const project = await apiNativeRequest(`${API}/${encodeURIComponent(projectId)}`);
-  const stage = project?.project?.stage ?? project?.stage;
-  const readiness = await apiNativeRequest(`${API}/${encodeURIComponent(projectId)}/readiness?stage=${encodeURIComponent(stage)}`);
-  const digest = publishedDigest(readiness?.readiness ?? readiness, approvalRequestId);
-  return { projectId, stage, digest };
+export async function a4EngineRequest(projectIds, approvalRequestId) {
+  for (const projectId of projectIds) {
+    const project = await apiNativeRequest(`${API}/${encodeURIComponent(projectId)}`);
+    const stage = project?.project?.stage ?? project?.stage;
+    const readiness = await apiNativeRequest(`${API}/${encodeURIComponent(projectId)}/readiness?stage=${encodeURIComponent(stage)}`);
+    const digest = publishedDigest(readiness?.readiness ?? readiness, approvalRequestId);
+    if (digest !== null) return { projectId, stage, digest };
+  }
+  return null;
 }
 
 /** Records the inbox's decision on an A4 engine request through the project route, bound to the published digest. */
@@ -49,15 +49,13 @@ export async function decideA4EngineRequest(found, approvalRequestId, verb, reas
   return apiNativeRequest(path, { method: "POST", body: { ...body, clientRequestId: crypto.randomUUID() }, nativeCsrfToken: me?.nativeCsrfToken ?? undefined });
 }
 
-/**
- * The agents of the A4 projects this user can see, other than `except`: the inbox lists their requests too, since an A4
- * project's engine requests are filed under its own agent. [] when the A4 preview is off or the list is refused.
- */
-export async function a4InboxAgents(except) {
+/** The A4 projects this user can see ({ projectId, agentId }); [] when the A4 preview is off or the list is refused. */
+export async function a4Projects() {
   try {
     const data = await apiNativeRequest(API);
     const projects = Array.isArray(data) ? data : Array.isArray(data?.projects) ? data.projects : [];
-    return [...new Set(projects.map((project) => project.agentId).filter((id) => typeof id === "string" && id !== except))];
+    return projects.filter((project) => typeof project?.projectId === "string" && typeof project.agentId === "string")
+      .map(({ projectId, agentId }) => ({ projectId, agentId }));
   } catch {
     return [];
   }

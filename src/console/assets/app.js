@@ -1552,7 +1552,9 @@ async function renderApprovals() {
       })();
   const activity = selectedApprovalId ? null : await activityFor(agentId);
   // The default inbox (no agent chosen) also lists the requests of the A4 projects' agents whose inventory verifies.
-  const a4Rows = selectedApprovalId || qs("agent") || activity?.integrity?.valid !== true ? [] : (await Promise.all((await a4.a4InboxAgents(agentId))
+  const a4Projects = await a4.a4Projects();
+  const a4Agents = [...new Set(a4Projects.map((project) => project.agentId))].filter((other) => other !== agentId);
+  const a4Rows = selectedApprovalId || qs("agent") || activity?.integrity?.valid !== true ? [] : (await Promise.all(a4Agents
     .map((other) => activityFor(other).then((found) => (found?.integrity?.valid === true ? (found.requests || []).map((row) => ({ ...row, agentId: other })) : []))
       .catch(() => [])))).flat();
   const rows = selectedApprovalId
@@ -1656,11 +1658,7 @@ async function renderApprovals() {
         ? row.decisions.map((d) => `${htmlEscape(d.username)}:${htmlEscape(d.decision)}`).join(", ") || "-"
         : Number(row.decisionCount || 0)}</td>
       <td>
-        ${canDecide && a4.a4ProjectOf(row.intentId) ? `<div class="row" data-a4-intent="${htmlEscape(row.intentId)}">
-            <button data-approve="${htmlEscape(row.approvalRequestId)}">Approve</button>
-            <button class="danger" data-deny="${htmlEscape(row.approvalRequestId)}">Deny</button>
-          </div><span class="muted">Agent project request: recorded bound to the project's request digest.</span>`
-        : canDecide ? `<div class="row">
+        ${canDecide ? `<div class="row" data-agent="${htmlEscape(row.agentId || agentId)}" data-intent="${htmlEscape(row.intentId || "")}">
             <button data-approve="${htmlEscape(row.approvalRequestId)}">Approve</button>
             <button class="secondary" data-sim="${htmlEscape(row.approvalRequestId)}">Simulate</button>
             <button class="danger" data-deny="${htmlEscape(row.approvalRequestId)}">Deny</button>
@@ -1708,17 +1706,21 @@ async function renderApprovals() {
         if (!reason) return;
         button.disabled = true;
         try {
-          const intentId = button.closest("[data-a4-intent]")?.getAttribute("data-a4-intent");
-          if (intentId) {
-            const found = await a4.a4EngineRequest(intentId, id);
-            const project = `./a4Project?project=${encodeURIComponent(a4.a4ProjectOf(intentId))}`;
-            if (!found?.digest) {
-              setStatus(`This agent project request is decided on its project page (${project}); nothing was recorded here.`, true);
-              button.disabled = false;
-              return;
-            }
+          // An agent project's engine request is decided through its project, bound to the digest it publishes; a
+          // documentary gate (a4gate_…) or a request no project names now is decided on the project page.
+          const holder = button.closest("[data-agent]");
+          const intentProject = a4.a4ProjectOf(holder?.getAttribute("data-intent"));
+          const candidates = intentProject ? [intentProject]
+            : a4Projects.filter((project) => project.agentId === holder?.getAttribute("data-agent")).map((project) => project.projectId);
+          const found = candidates.length > 0 && decision !== "APPROVE_SIMULATE" ? await a4.a4EngineRequest(candidates, id) : null;
+          if (found) {
             await a4.decideA4EngineRequest(found, id, decision === "DENY" ? "deny" : "approve", reason);
             await renderApprovals();
+            return;
+          }
+          if (intentProject || id.startsWith("a4gate_")) {
+            setStatus(`This agent project request is decided on its project page (./a4Project?project=${encodeURIComponent(intentProject ?? candidates[0] ?? "")}); nothing was recorded here.`, true);
+            button.disabled = false;
             return;
           }
           await apiPost(`/approvals/requests/${encodeURIComponent(id)}/decide`, { decision, reason });
