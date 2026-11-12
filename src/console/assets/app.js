@@ -2,7 +2,7 @@ import { renderNeutralImportReview } from "./neutralImportReview.js";
 import { renderNativeTasksPage } from "./nativeTasks.js";
 import { apiGet, apiPost, applyRoleGates, getAdminToken, getCurrentUser, login, logout, onClaims, setAdminToken, whoami } from "./api.js";
 import { installClaimStrip } from "./components/claimBadge.js";
-import { industryPackDetailHtml } from "./industryPackView.js";
+import { industryPackDetailHtml, industryPackResultHtml } from "./industryPackView.js";
 import { renderBars, renderLine } from "./charts.js";
 import { decorateNav, topbarHtml } from "./shell.js";
 import { loginCardHtml, loginFailureText } from "./loginView.js";
@@ -2320,12 +2320,46 @@ async function renderIndustryPacks() {
       const id = button.getAttribute("data-industry-pack");
       try {
         detail.innerHTML = industryPackDetailHtml((await apiGet(`/industry-packs/${encodeURIComponent(id)}`)).pack);
+        bindIndustryPackDetail(detail, button);
       } catch (error) {
         detail.innerHTML = `<p class="status-bad">${htmlEscape(errText(error))}</p>`;
       }
       detail.hidden = false;
-      detail.focus();
+      // M2: start at the pack's heading, wherever in the catalog it was opened from.
+      const heading = document.getElementById("industryPackHeading") || detail;
+      heading.scrollIntoView({ block: "start" });
+      heading.focus({ preventScroll: true });
     });
+  });
+}
+
+function bindIndustryPackDetail(detail, opener) {
+  onAction(document.getElementById("industryPackClose"), "click", () => {
+    detail.hidden = true;
+    detail.replaceChildren();
+    opener.focus();
+  });
+  const form = document.getElementById("industryPackForm");
+  const out = document.getElementById("industryPackResult");
+  form?.addEventListener("reset", () => out.replaceChildren());
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const responses = {};
+    for (const input of form.querySelectorAll("input[type=radio]:checked")) responses[input.dataset.question] = Number(input.value);
+    try {
+      const result = await apiPost(`/industry-packs/${encodeURIComponent(form.dataset.pack)}/score`, { responses });
+      out.innerHTML = industryPackResultHtml(result);
+      out.scrollIntoView({ block: "start" });
+      onAction(document.getElementById("industryPackDownload"), "click", () => {
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(new Blob([JSON.stringify(result, null, 2)], { type: "application/json" }));
+        link.download = `${form.dataset.pack}-self-assessment.json`;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(link.href), 0);
+      });
+    } catch (error) {
+      out.innerHTML = `<p class="status-bad">Not scored: ${htmlEscape(errText(error))}</p>`;
+    }
   });
 }
 

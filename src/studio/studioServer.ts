@@ -8314,6 +8314,39 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         return;
       }
 
+      // M3: the console questionnaire. Scored by scoreIndustryPack, as `amc domain pack run --json` and the MCP tool; nothing is stored.
+      const industryPackScoreMatch = pathname.match(/^\/industry-packs\/([^/]+)\/score$/);
+      if (industryPackScoreMatch && req.method === "POST") {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
+          return;
+        }
+        const { getPackById, scoreIndustryPack } = await import("../domains/industryPacks.js");
+        const { packSelfAssessmentEnvelope } = await import("../domains/packSelfAssessment.js");
+        const { claimFields } = await import("../claims/eligibility/index.js");
+        const pack = getPackById(decodeURIComponent(industryPackScoreMatch[1] ?? ""));
+        if (!pack) {
+          json(res, 404, { error: "industry pack not found" });
+          return;
+        }
+        let responses: unknown;
+        try {
+          responses = (JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576) || "{}") as { responses?: unknown }).responses;
+        } catch {
+          json(res, 400, { error: "Request body must be JSON." });
+          return;
+        }
+        const ids = new Set(pack.questions.map((question) => question.id));
+        if (typeof responses !== "object" || responses === null || Array.isArray(responses)
+          || Object.entries(responses).some(([id, level]) => !ids.has(id) || !Number.isInteger(level) || (level as number) < 1 || (level as number) > 5)) {
+          json(res, 400, { error: "responses must map this pack's question ids to levels 1-5" });
+          return;
+        }
+        const answers = responses as Record<string, number>;
+        const result = scoreIndustryPack(pack.id, answers);
+        json(res, 200, { ...result, ...claimFields(packSelfAssessmentEnvelope(pack, answers, Date.now())) });
+        return;
+      }
+
       const industryPackMatch = pathname.match(/^\/industry-packs\/([^/]+)$/);
       if (industryPackMatch && req.method === "GET") {
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {

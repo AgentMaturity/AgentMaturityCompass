@@ -1228,3 +1228,29 @@ a:hover {
     text-align: left;
   }
 }
+
+/* Industry Pack questionnaire (M3): one labelled radio group per question, readable at 375px. */
+.pack-questions fieldset {
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  min-width: 0;
+}
+
+.pack-questions legend {
+  padding: 0 4px;
+}
+
+.pack-level {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 6px 0;
+  overflow-wrap: anywhere;
+}
+
+.pack-level input {
+  margin-top: 3px;
+  flex: none;
+}
