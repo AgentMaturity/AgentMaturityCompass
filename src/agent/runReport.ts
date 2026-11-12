@@ -72,6 +72,8 @@ export interface AgentRunSummary {
   readonly retried: number;
   readonly retriesAbandoned: number;
   readonly toolCalls: number;
+  /** Allowed tool calls that ran as SIMULATE (H-3): nothing was executed or written. Optional for older summaries. */
+  readonly simulatedToolCalls?: number;
   readonly endings: readonly TurnEndingRow[];
   /** Assistant text, in commit order, exactly as the signed rows carry it. */
   readonly assistantText: readonly string[];
@@ -109,6 +111,20 @@ function assistantTextOf(workspace: string, events: readonly EvidenceEvent[]): s
     );
   }
   return out;
+}
+
+/** The session's allowed tool calls whose signed audit row says they ran as SIMULATE (the ledger keeps audit rows on every backend). */
+function simulatedToolCalls(workspace: string, sessionId: string): number {
+  const ledger = openLedger(workspace, { readonly: true });
+  try {
+    return ledger.getAllEvents().filter((event) => {
+      if (event.session_id !== sessionId || event.event_type !== "audit") return false;
+      const meta = JSON.parse(event.meta_json ?? "{}") as { auditType?: unknown; effectiveMode?: unknown; toolName?: unknown };
+      return meta.auditType === "TOOL_CALL_ALLOWED" && meta.effectiveMode === "SIMULATE" && typeof meta.toolName === "string";
+    }).length;
+  } finally {
+    ledger.close();
+  }
 }
 
 /** Fold one session's rows into what the run actually recorded. */
@@ -152,6 +168,7 @@ export function readAgentRunSummary(
     retried,
     retriesAbandoned,
     toolCalls: count("tool/call"),
+    simulatedToolCalls: simulatedToolCalls(workspace, sessionId),
     endings,
     assistantText: assistantTextOf(workspace, events),
     unsignedRows: events.filter((event) => event.writer_sig === UNSIGNED).length,
@@ -328,6 +345,8 @@ export function renderRunSummary(summary: AgentRunSummary): string {
     `  requests   ${summary.requests}${summary.requests > summary.steps ? " (a step was retried)" : ""}`,
     `  retries    ${summary.retried} taken, ${summary.retriesAbandoned} abandoned`,
     `  tool calls ${summary.toolCalls}`,
+    ...((summary.simulatedToolCalls ?? 0) > 0
+      ? [`  simulated  ${summary.simulatedToolCalls} tool call(s) ran as SIMULATE: nothing was executed or written (each tool result says why)`] : []),
     `  events     ${summary.events}`,
     `  unsigned   ${summary.unsignedRows}`
   ];
