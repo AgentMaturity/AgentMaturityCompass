@@ -1,7 +1,7 @@
 // A4 Studio page module (P1-58, design §11). a4.html and a4Project.html mount it from their own <script type="module">,
 // and home.html loads it for the "Start an agent project" card; app.js is byte-pinned and never learns about these pages.
 // Every call goes through apiNativeRequest. Studio re-checks every action: a disabled button is a convenience only.
-import { apiNativeRequest, onClaims, whoami } from "./api.js";
+import { apiNativeRequest, logout, onClaims, whoami } from "./api.js";
 import { installClaimStrip } from "./components/claimBadge.js";
 import { renderHandholdingSteps } from "./components/handholdingSteps.js";
 import { renderPlanTimeline } from "./components/planTimeline.js";
@@ -663,7 +663,8 @@ async function main() {
     status.innerHTML = 'Sign in to use agent projects. <a href="./login">Login</a>';
     return;
   }
-  status.textContent = `Signed in as ${me.username}`;
+  status.innerHTML = `Signed in as ${view.esc(me.username)} <button type="button" class="secondary" id="a4SignOut">Sign out</button>`;
+  status.querySelector("#a4SignOut").addEventListener("click", () => void logout().then(() => location.assign("./login"), showError));
   const options = await previewOptions();
   if (!options) {
     root.innerHTML = `<section class="card"><p>${view.previewNoticeHtml()}</p></section>`;

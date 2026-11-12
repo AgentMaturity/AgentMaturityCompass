@@ -282,7 +282,7 @@ export function renderConversation(ctx) {
     <h4>Explain</h4>
     <label>Your explanation <textarea name="explanation" rows="3" maxlength="${CONTENT_MAX}"></textarea></label>
     <p class="muted">${NO_PRODUCER} ${RETAINED}</p>
-    <div class="row wrap"><select name="level">${LEVELS.map((level) => `<option value="${level}">${stageTitle(level)}</option>`).join("")}</select>
+    <div class="row wrap"><select name="level" aria-label="Explanation level">${LEVELS.map((level) => `<option value="${level}">${stageTitle(level)}</option>`).join("")}</select>
       ${actionButton("Explain at this level", "explain", stepOffer(allowed.explain, ctx, "explain"))}</div>
     ${explanation ? recorded(`your explanation at the ${esc(explanation.level)} level`, explanation) : ""}`;
 }
@@ -309,7 +309,7 @@ export function renderSpecEditor(ctx) {
     : `Studio takes a proposal only at step <code>explained</code>; this project is at <code>${esc(project.step)}</code>`}${revision
     ? ` (current r${esc(revision.revisionNo)}, spec <code>${esc(revision.specDigest)}</code>)` : ""}.${seeded}${proposable ? ""
     : " To change the specification from here, save an answer under Ask: that starts this stage's loop again at a new revision."} ${IN_RECORD}</p>
-    <textarea name="spec" rows="14" spellcheck="false">${esc(JSON.stringify(editableSpec(revision?.spec), null, 2))}</textarea>
+    <textarea name="spec" rows="14" spellcheck="false" aria-label="Specification (JSON)">${esc(JSON.stringify(editableSpec(revision?.spec), null, 2))}</textarea>
     <p class="muted">Answers are not edited here: they are recorded through Save answers.</p>
     <div class="row wrap">${actionButton("Propose this specification", "propose", stepOffer(allowed.propose, ctx, "propose"))}${ctx.specDraft
       ? ` <button type="button" class="secondary" data-a4-action="reload">Discard my edits</button>` : ""}</div>`;
@@ -317,13 +317,13 @@ export function renderSpecEditor(ctx) {
 
 export function renderBuildCard(ctx) {
   return `<p class="muted">${TRUTH.admission}. With no producer registered for this stage, what you write here is recorded
-    as a self-reported implementation output. ${RETAINED}</p><textarea name="content" rows="4" maxlength="${CONTENT_MAX}"></textarea>
+    as a self-reported implementation output. ${RETAINED}</p><textarea name="content" rows="4" maxlength="${CONTENT_MAX}" aria-label="Build note"></textarea>
     <div class="row wrap">${actionButton("Build", "build", stepOffer(ctx.allowed.build, ctx, "build"))}</div>`;
 }
 
 export function renderReviewCard(ctx) {
   return `<p class="muted">Human findings are recorded as self-reported; AMC's own checks appear in the Integrity panel. ${RETAINED}</p>
-    <textarea name="content" rows="4" maxlength="${CONTENT_MAX}"></textarea><div class="row wrap">${actionButton("Review", "review",
+    <textarea name="content" rows="4" maxlength="${CONTENT_MAX}" aria-label="Review findings"></textarea><div class="row wrap">${actionButton("Review", "review",
       stepOffer(ctx.allowed.review, ctx, "review"))}</div>`;
 }
 
@@ -339,8 +339,8 @@ function renderComments(cardId, comments, members = []) {
     <span class="muted">${time(comment.ts)}</span><div>${typeof comment.body === "string" ? esc(comment.body)
       : `<span class="muted">Text not returned by Studio</span> ${codes(comment.reasonCode ? [comment.reasonCode] : [])}`}</div></li>`);
   return `<details class="a4-comments" data-a4-open="discussion"${rows.length ? " open data-a4-default-open" : ""}><summary>Discussion (${rows.length})</summary>${list(rows, "No comments yet.")}
-    <textarea name="comment" rows="2" maxlength="${COMMENT_MAX_BYTES}"></textarea>
-    <button type="button" data-a4-action="comment">Comment</button>
+    <textarea name="comment" rows="2" maxlength="${COMMENT_MAX_BYTES}" aria-label="Comment on ${esc(cardLabel(cardId))}"></textarea>
+    <button type="button" data-a4-action="comment" aria-label="Post a comment on ${esc(cardLabel(cardId))}">Comment</button>
     <p class="muted">Discussion, never evidence; up to 8 KiB. ${RETAINED}</p></details>`;
 }
 
@@ -600,15 +600,21 @@ export function renderApprovalsBar(ctx) {
 export function renderMembers(ctx) {
   const { project, members, readiness } = ctx;
   const roles = ["builder", "reviewer", "approver", "viewer", "owner"];
-  const candidates = Array.isArray(members?.candidates) ? members.candidates : [];
+  // Studio lists every eligible principal; one already on the project is not offered again.
+  const memberKeys = new Set(project.members.map((member) => member.principalKey));
+  const candidates = (Array.isArray(members?.candidates) ? members.candidates : []).filter((candidate) => !memberKeys.has(candidate.principalKey));
+  const { open, met } = currentGates(ctx.gates, ctx.stage, readiness);
+  const live = open ?? met;
   return `<section class="card"><h4>Members</h4>
     ${list(project.members.map((member) => `<li>${esc(member.username)} <code>${esc(member.authSource)}</code> ${codes(member.roles)}</li>`), "No members.")}
     ${readiness.identityCheck === "session_record" ? `<p><code>IDENTITY_CHECK_LIMITED</code> Host-mode roles come from session records, not a live check.</p>` : ""}
     ${members?.candidatesLimited === true ? `<p class="muted">Host mode: candidates come from tracked session records, so this list may be incomplete.</p>` : ""}
     ${members?.error ? `<p class="status-bad">${esc(members.error)}</p>` : ""}
-    ${candidates.length ? `<h4>Candidates</h4>${list(candidates.map((candidate) => `<li data-principal="${esc(candidate.principalKey)}">
-      ${esc(candidate.username)} <select name="role">${roles.map((role) => `<option>${role}</option>`).join("")}</select>
-      ${actionButton("Add", "add-member", ctx.allowed.addMember)}</li>`), "")}` : ""}
+    ${candidates.length ? `<h4>Candidates</h4>${live ? `<p class="status-bad">Adding a member records a new project transition: the open
+      ${esc(live.gate)} approval request (r${esc(live.revisionNo)}) is superseded and its approvals stop counting, so it must be requested again.</p>` : ""}
+      ${list(candidates.map((candidate) => `<li data-principal="${esc(candidate.principalKey)}">
+      ${esc(candidate.username)} <select name="role" aria-label="Project role for ${esc(candidate.username)}">${roles.map((role) => `<option>${role}</option>`).join("")}</select>
+      ${actionButton("Add", "add-member", ctx.allowed.addMember, `aria-label="Add ${esc(candidate.username)} to the project"`)}</li>`), "")}` : ""}
     <p class="muted">${TRUTH.twoUsers}.</p></section>`;
 }
 
