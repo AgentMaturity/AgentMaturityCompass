@@ -177,7 +177,7 @@ import {
 } from "../bench/benchApi.js";
 import { loadBenchPolicy, verifyBenchPolicySignature } from "../bench/benchPolicyStore.js";
 import { emitBenchSse } from "../bench/benchSse.js";
-import { loadBudgetsConfig, captureBudgetsPublication, BudgetsPublicationError } from "../budgets/budgets.js";
+import { budgetsSchema, loadBudgetsConfig, captureBudgetsPublication, BudgetsPublicationError } from "../budgets/budgets.js";
 import { driftCheckForStudio } from "../drift/studioDriftCheck.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import YAML from "yaml";
@@ -5275,6 +5275,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { config?: unknown }) : {};
         if (!parsed.config || typeof parsed.config !== "object") { json(res, 400, { error: "config object is required" }); return; }
+        const checked = budgetsSchema.safeParse(parsed.config); // M8: the console shows this; publication would refuse it as a 500
+        if (!checked.success) {
+          json(res, 400, { error: `budgets config is invalid: ${checked.error.issues.map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`).join("; ")}` });
+          return;
+        }
         const prepared = await writer.prepareAsync(Buffer.from(YAML.stringify(parsed.config as Record<string, unknown>)));
         const saved = prepared.publish(), path = saved.configPath;
         try { prepared.assertCurrent(); writeStudioAuditEvent({

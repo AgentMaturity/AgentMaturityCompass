@@ -3680,7 +3680,12 @@ async function renderPage() {
       `);
       onAction(document.getElementById("applyBudgets"), "click", async () => {
         const raw = document.getElementById("budgetsDraft").value;
-        const parsed = JSON.parse(raw);
+        let parsed;
+        try {
+          parsed = JSON.parse(raw);
+        } catch (error) {
+          throw new Error(`Budgets JSON is invalid, nothing was applied: ${errText(error)}`); // M8: onAction shows it inline
+        }
         const out = await apiPost("/budgets/apply", { config: parsed });
         document.getElementById("budgetOut").textContent = JSON.stringify(out, null, 2);
         await refreshUnifiedBanner();
