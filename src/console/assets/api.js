@@ -20,6 +20,27 @@ export function getCurrentUser() {
   return state.me;
 }
 
+/** Write controls carry data-roles; a signed-in user without one of them sees them disabled (H3). */
+export function applyRoleGates(scope = document) {
+  const roles = state.me?.roles;
+  if (!Array.isArray(roles)) return; // admin-token session: the server decides
+  for (const control of scope.querySelectorAll("[data-roles]")) {
+    const needed = control.dataset.roles.split(",");
+    if (needed.some((role) => roles.includes(role))) continue;
+    control.disabled = true;
+    control.title = `Requires role: ${needed.join(" or ")}`;
+  }
+}
+
+/** A signed-out page links to sign-in, which returns here afterwards (M9). */
+export function showSignIn(statusEl) {
+  if (!statusEl) return;
+  const link = document.createElement("a");
+  link.href = `./login?next=${encodeURIComponent(`${window.location.pathname.split("/").pop() || "home"}${window.location.search}`)}`;
+  link.textContent = "Sign in";
+  statusEl.replaceChildren("Authentication required. ", link);
+}
+
 function buildHeaders(extraHeaders) {
   const headers = { ...(extraHeaders || {}) };
   if (state.adminToken) {

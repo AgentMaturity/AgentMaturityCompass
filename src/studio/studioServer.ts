@@ -177,7 +177,7 @@ import {
 } from "../bench/benchApi.js";
 import { loadBenchPolicy, verifyBenchPolicySignature } from "../bench/benchPolicyStore.js";
 import { emitBenchSse } from "../bench/benchSse.js";
-import { loadBudgetsConfig, captureBudgetsPublication, BudgetsPublicationError } from "../budgets/budgets.js";
+import { budgetsSchema, loadBudgetsConfig, captureBudgetsPublication, BudgetsPublicationError } from "../budgets/budgets.js";
 import { driftCheckForStudio } from "../drift/studioDriftCheck.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import YAML from "yaml";
@@ -415,7 +415,7 @@ import {
   standardGenerateForApiAsync as standardGenerateForApi,
   standardSchemaReadForApi,
   standardSchemasForApi,
-  standardValidateForApi,
+  standardValidateWorkspaceFileForApi,
   standardVerifyForApiAsync as standardVerifyForApi
 } from "../standard/standardApi.js";
 
@@ -5040,17 +5040,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
-        const parsed = body ? (JSON.parse(body) as { schemaId?: unknown; file?: unknown }) : {};
-        if (typeof parsed.schemaId !== "string" || typeof parsed.file !== "string") {
-          json(res, 400, { error: "schemaId and file are required" });
+        let parsed: { schemaId?: unknown; file?: unknown } = {};
+        try {
+          parsed = body ? (JSON.parse(body) as typeof parsed) ?? {} : {};
+        } catch {
+          json(res, 400, { error: "Request body must be JSON." });
           return;
         }
-        const out = standardValidateForApi({
-          workspace: options.workspace,
-          schemaId: parsed.schemaId,
-          file: parsed.file
-        });
-        json(res, out.ok ? 200 : 422, out);
+        const out = standardValidateWorkspaceFileForApi({ workspace: options.workspace, schemaId: parsed.schemaId, file: parsed.file });
+        json(res, out.status, out.body);
         return;
       }
 
@@ -5278,6 +5276,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { config?: unknown }) : {};
         if (!parsed.config || typeof parsed.config !== "object") { json(res, 400, { error: "config object is required" }); return; }
+        const checked = budgetsSchema.safeParse(parsed.config); // M8: the console shows this; publication would refuse it as a 500
+        if (!checked.success) {
+          json(res, 400, { error: `budgets config is invalid: ${checked.error.issues.map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`).join("; ")}` });
+          return;
+        }
         const prepared = await writer.prepareAsync(Buffer.from(YAML.stringify(parsed.config as Record<string, unknown>)));
         const saved = prepared.publish(), path = saved.configPath;
         try { prepared.assertCurrent(); writeStudioAuditEvent({
@@ -8315,6 +8318,39 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           packs: listIndustryPacks().filter((pack) => station === null || pack.stationId === station)
             .map((pack) => toIndustryPackCatalogItem(pack))
         });
+        return;
+      }
+
+      // M3: the console questionnaire. Scored by scoreIndustryPack, as `amc domain pack run --json` and the MCP tool; nothing is stored.
+      const industryPackScoreMatch = pathname.match(/^\/industry-packs\/([^/]+)\/score$/);
+      if (industryPackScoreMatch && req.method === "POST") {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
+          return;
+        }
+        const { getPackById, scoreIndustryPack } = await import("../domains/industryPacks.js");
+        const { packSelfAssessmentEnvelope } = await import("../domains/packSelfAssessment.js");
+        const { claimFields } = await import("../claims/eligibility/index.js");
+        const pack = getPackById(decodeURIComponent(industryPackScoreMatch[1] ?? ""));
+        if (!pack) {
+          json(res, 404, { error: "industry pack not found" });
+          return;
+        }
+        let responses: unknown;
+        try {
+          responses = (JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576) || "{}") as { responses?: unknown }).responses;
+        } catch {
+          json(res, 400, { error: "Request body must be JSON." });
+          return;
+        }
+        const ids = new Set(pack.questions.map((question) => question.id));
+        if (typeof responses !== "object" || responses === null || Array.isArray(responses)
+          || Object.entries(responses).some(([id, level]) => !ids.has(id) || !Number.isInteger(level) || (level as number) < 1 || (level as number) > 5)) {
+          json(res, 400, { error: "responses must map this pack's question ids to levels 1-5" });
+          return;
+        }
+        const answers = responses as Record<string, number>;
+        const result = scoreIndustryPack(pack.id, answers);
+        json(res, 200, { ...result, ...claimFields(packSelfAssessmentEnvelope(pack, answers, Date.now())) });
         return;
       }
 

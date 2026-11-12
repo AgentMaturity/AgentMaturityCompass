@@ -1,4 +1,4 @@
-import { apiGet, apiPost, whoami, onClaims } from "./api.js";
+import { apiGet, apiPost, onClaims, showSignIn, whoami } from "./api.js";
 import { installClaimStrip } from "./components/claimBadge.js";
 
 function esc(value) {
@@ -96,7 +96,7 @@ async function main() {
   const app = document.getElementById("app");
   const me = await whoami().catch(() => null);
   if (!me) {
-    status.textContent = "Authentication required.";
+    showSignIn(status);
     return;
   }
   status.textContent = `Signed in as ${me.username ?? me.userId ?? "user"}`;
