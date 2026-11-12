@@ -22,7 +22,8 @@ import type { Context } from "../amcRuntime.js";
 import type { CredentialRef } from "../../credentials/credentialRef.js";
 import type { CredentialDescription } from "../../credentials/credentialSources.js";
 import type { CredentialsService } from "../../credentials/credentialsService.js";
-import type { CredentialsPaths } from "../../credentials/credentialsPaths.js";
+import { resolveCredentialsPaths, type CredentialsPaths } from "../../credentials/credentialsPaths.js";
+import { denySessionSecretPaths } from "../../sandbox/shellSecretPaths.js";
 import {
   LocalCredentialsService,
   type LocalCredentialsOptions
@@ -72,6 +73,8 @@ export class CredentialsSeamService extends AmcSeam implements CredentialsServic
     // on a machine where nothing is set. Only a composition that names no
     // credential defers it (`lazy`).
     if (lazy !== true) this.booted = new LocalCredentialsService(options);
+    // SH-SANDBOX-08 holds for a deferred store too: the store this run selected is on every confined shell's deny list now.
+    else denySessionSecretPaths([resolveCredentialsPaths(options).homeDir, resolveCredentialsPaths(options).file]);
     // Async disposer: cordis awaits it, so the fiber does not report itself
     // unloaded while a queued write is still holding the cross-process lock.
     this.ctx.effect(
