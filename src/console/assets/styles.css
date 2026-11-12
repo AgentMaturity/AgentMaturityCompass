@@ -143,13 +143,32 @@ nav .nav-features > summary {
   font-size: 12px;
 }
 
-nav .nav-features > summary:focus-visible,
-.first-use button:focus-visible,
-.first-use code:focus-visible,
-nav a:focus-visible,
-.mobile-nav-toggle:focus-visible {
+/* M10: every focusable control shows keyboard focus (inputs set outline: none for the mouse). */
+:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
+}
+
+.skip-link {
+  position: absolute;
+  left: 8px;
+  top: -48px;
+  z-index: 1000;
+  padding: 8px 12px;
+  background: var(--accent);
+  color: #0a0a0a;
+  border-radius: 6px;
+}
+
+.skip-link:focus {
+  top: 8px;
+}
+
+main:focus {
+  outline: none;
 }
 
 .first-use-intents {

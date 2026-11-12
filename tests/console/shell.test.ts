@@ -79,6 +79,19 @@ describe("initShell", () => {
     expect(other.getElementById("status")!.getAttribute("role")).toBe("alert");
   });
 
+  test("puts one skip link to the page's main content first in the body (M10, L7)", () => {
+    const doc = new FakeDocument();
+    pageWithNav(doc, ["./home"], "home");
+    initShell(doc);
+    initShell(doc);
+    const links = doc.querySelectorAll("a.skip-link");
+    expect(links).toHaveLength(1);
+    expect(doc.body.children[0]).toBe(links[0]);
+    const target = links[0]!.getAttribute("href")!.slice(1);
+    expect(doc.querySelector("main")!.getAttribute("id")).toBe(target);
+    expect(doc.querySelector("main")!.getAttribute("tabindex")).toBe("-1");
+  });
+
   test("falls back to the last path segment when the body names no page, and skips a page without a nav", () => {
     const doc = new FakeDocument();
     doc.location.pathname = "/w/acme/console/upgradeWizard";
