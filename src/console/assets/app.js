@@ -96,6 +96,12 @@ function errText(error) {
   return typeof error.message === "string" ? error.message : String(error);
 }
 
+/** /cli/exec failures carry the command's output, not an `error`; show its last line instead of "HTTP 422" (H2). */
+function cliFailureText(error) {
+  const output = `${error?.data?.stderr || ""}\n${error?.data?.stdout || ""}`.split("\n").map((line) => line.trim()).filter(Boolean);
+  return output.find((line) => /error|fail|refus|not found|cannot/i.test(line)) || output[0] || errText(error);
+}
+
 function apiPayload(envelope) {
   return envelope && envelope.ok === true && Object.prototype.hasOwnProperty.call(envelope, "data")
     ? envelope.data
@@ -852,7 +858,7 @@ async function renderEvidence() {
       setStatus("Full score generated.");
       await renderEvidence();
     } catch (error) {
-      setStatus(`Full score failed: ${errText(error)}`, true);
+      setStatus(`Full score failed: ${cliFailureText(error)}`, true);
     } finally {
       button.disabled = false;
       button.textContent = original;
@@ -1409,7 +1415,7 @@ async function renderHome() {
       setStatus("Full score generated.");
       await renderHome();
     } catch (error) {
-      setStatus(`Full score failed: ${errText(error)}`, true);
+      setStatus(`Full score failed: ${cliFailureText(error)}`, true);
     } finally {
       button.disabled = false;
       button.textContent = original;

@@ -39,7 +39,8 @@ import { spawn } from "node:child_process";
  * caller supplies `confirm`.
  */
 export const CLI_BRIDGE_ROLES = ["OPERATOR", "OWNER"] as const;
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 /* ── Types ────────────────────────────────────────── */
 export interface CliExecRequest {
@@ -164,17 +165,8 @@ function parseArgv(cmd: string): string[] {
 }
 
 /* ── Find the amc binary ──────────────────────────── */
-let amcBin: string | null = null;
-
-function findAmcBin(workspace: string): string {
-  if (amcBin) return amcBin;
-  // Try the dist/cli.js in the workspace first
-  const local = resolve(workspace, "node_modules/.bin/amc");
-  // Fallback to the cli.js directly
-  const direct = resolve(workspace, "dist/cli.js");
-  amcBin = direct;
-  return amcBin;
-}
+/** The running package's own dist/cli.js (src/studio or dist/studio → <package>/dist/cli.js), never the workspace's (H2). */
+const AMC_CLI_ENTRY = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "dist", "cli.js");
 
 /* ── Execute a single CLI command ─────────────────── */
 export function execCliCommand(
@@ -210,7 +202,7 @@ export function execCliCommand(
   }
 
   const timeout = req.timeout ?? 120_000;
-  const bin = findAmcBin(workspace);
+  const bin = AMC_CLI_ENTRY;
 
   return new Promise((resolve) => {
     const stdoutChunks: Buffer[] = [];
