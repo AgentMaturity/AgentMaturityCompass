@@ -1,6 +1,7 @@
 import { createServer, request as httpRequest } from "node:http";
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { spawn, spawnSync, type ChildProcess } from "node:child_process";
 import type { SmokeStep } from "./smokeSchema.js";
 
@@ -130,7 +131,10 @@ export async function startFakeOpenAiServer(host = "127.0.0.1"): Promise<{
   };
 }
 
-function cliEntrypointFromRepoRoot(repoRoot: string): string {
+/** The CLI of the package this module runs from (dist/e2e or src/e2e → <package>/dist/cli.js), else the one under repoRoot. */
+export function smokeCliEntrypoint(repoRoot: string): string {
+  const running = fileURLToPath(new URL("../../dist/cli.js", import.meta.url));
+  if (existsSync(running)) return running;
   const distCli = join(repoRoot, "dist", "cli.js");
   if (!existsSync(distCli)) {
     throw new Error("dist/cli.js not found. Run `npm run build` before `amc e2e smoke --mode local`.");
@@ -152,7 +156,7 @@ export async function startStudioChildProcess(params: {
   child: ChildProcess;
   close: () => Promise<void>;
 }> {
-  const cliPath = cliEntrypointFromRepoRoot(params.repoRoot);
+  const cliPath = smokeCliEntrypoint(params.repoRoot);
   const child = spawn(
     process.execPath,
     [
