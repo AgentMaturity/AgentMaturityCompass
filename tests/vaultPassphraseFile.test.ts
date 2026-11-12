@@ -18,6 +18,7 @@ import { AGENT_ENV_MARKERS } from "../src/vault/operatorContext.js";
 import { unlockWithPassphraseFile } from "../src/vault/passphraseFile.js";
 import { rememberVaultPassphrase, unlockWithRememberedPassphrase } from "../src/vault/passphraseStore.js";
 import { lockVault, vaultStatus } from "../src/vault/vault.js";
+import { unlockVaultInteractive } from "../src/vault/vaultCli.js";
 import { initWorkspace } from "../src/workspace.js";
 
 const PASSPHRASE = "synthetic-passphrase-file-vault";
@@ -126,6 +127,15 @@ describe("unlockWithPassphraseFile", () => {
   });
 });
 
+describe("unlockVaultInteractive (amc vault unlock)", () => {
+  test("reads AMC_VAULT_PASSPHRASE_FILE when AMC_VAULT_PASSPHRASE is unset, without a terminal", async () => {
+    const { workspace, secret } = fixture();
+    vi.stubEnv("AMC_VAULT_PASSPHRASE_FILE", secret(PASSPHRASE, 0o600));
+    await unlockVaultInteractive(workspace);
+    expect(vaultStatus(workspace).unlocked).toBe(true);
+  });
+});
+
 /** Runs the built CLI as cron or `docker exec` would: no terminal, no passphrase, no agent marker, a private HOME, no store. */
 function cli(root: string, workspace: string) {
   mkdirSync(join(root, "home"), { mode: 0o700 });
@@ -178,6 +188,17 @@ describe("the built CLI without a terminal (run `npm run build` first)", () => {
     } finally {
       await gateway.close();
     }
+  });
+
+  test("amc init without a terminal creates a signed vault from only AMC_VAULT_PASSPHRASE_FILE", { timeout: 120_000 }, () => {
+    const { root, secret } = fixture();
+    const fresh = join(root, "fresh");
+    mkdirSync(fresh);
+    const amc = cli(root, fresh);
+    const init = amc({ AMC_VAULT_PASSPHRASE_FILE: secret(PASSPHRASE, 0o600) }, "init");
+    expect(init.status, init.stdout + init.stderr).toBe(0);
+    expect(existsSync(join(fresh, ".amc", "vault.amcvault"))).toBe(true);
+    expect(init.stdout + init.stderr).not.toContain(PASSPHRASE);
   });
 
   // The hint `amc up` prints for a shell without a terminal: a password file alone meets a locked vault (final review).

@@ -292,7 +292,7 @@ import { writeRuntimeFirewallPolicyAsync, migrateRuntimeFirewallPolicySignatureA
 import { installFatalHandlers } from "./runtime/fatalDiagnostic.js";
 import { changeVaultPassphraseInteractive, initVaultInteractive, lockVaultNow, printVaultPassphraseChange, promptPassphrase, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
 import { forgetVaultPassphrase, unlockWithRememberedPassphrase } from "./vault/passphraseStore.js";
-import { bootstrapVaultPassphrase, unlockWithPassphraseFile, vaultPassphraseFromEnv } from "./vault/passphraseFile.js";
+import { adoptVaultPassphraseFile, bootstrapVaultPassphrase, unlockWithPassphraseFile, vaultPassphraseFromEnv } from "./vault/passphraseFile.js";
 import { confirmRememberedUnlock } from "./vault/operatorContext.js";
 import { ensureInstantVaultMode, type InstantVaultMode } from "./cli/instantVaultMode.js";
 import { generatedPassphraseForInit, rememberInitPassphrase, skipVaultPassphrase } from "./cli/initPassphrase.js";
@@ -2173,6 +2173,7 @@ program
   .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod"; force: boolean; skipVault: boolean; minimal: boolean; coding?: boolean; regulated?: boolean; webAllowHost?: string[] }) => {
     const { starterProfileFlag, runStarterInit } = await import("./setup/starterProfiles.js");
     try {
+      adoptVaultPassphraseFile(); // AMC_VAULT_PASSPHRASE_FILE seals the new vault as AMC_VAULT_PASSPHRASE does
       const starter = starterProfileFlag(opts);
       if (starter) { await runStarterInit(process.cwd(), starter, opts.force, opts.webAllowHost); return; }
     } catch (error) { console.error(chalk.red(toErrorMessage(error))); process.exit(1); }
@@ -7214,10 +7215,10 @@ Use --dry-run to preview the exact capture command and next score step.
       console.log(`Runtime: ${runtime}`);
       console.log(`Command: ${commandText}`);
       console.log(`Replay: ${replayCommand}`);
-      const shouldUseUnsignedFirstRun = process.env.AMC_NO_SIGN === "1" || !process.env.AMC_VAULT_PASSPHRASE;
+      const shouldUseUnsignedFirstRun = process.env.AMC_NO_SIGN === "1" || (!process.env.AMC_VAULT_PASSPHRASE && !vaultStatusNow(process.cwd()).unlocked); // the preAction opened it from AMC_VAULT_PASSPHRASE_FILE
       console.log(`Signing: ${shouldUseUnsignedFirstRun ? "UNSIGNED first-run capture" : "vault-backed signed capture"}`);
       if (shouldUseUnsignedFirstRun) {
-        console.log(chalk.gray("Set AMC_VAULT_PASSPHRASE and rerun when you need verifier-ready signed evidence."));
+        console.log(chalk.gray("Set AMC_VAULT_PASSPHRASE (or AMC_VAULT_PASSPHRASE_FILE) and rerun when you need verifier-ready signed evidence."));
       }
 
       if (opts.dryRun) {

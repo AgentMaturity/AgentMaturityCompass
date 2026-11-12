@@ -17,6 +17,7 @@ import { transitionConfigSignatureProvider } from "./configProviderTransition.js
 import { resumeArtifactBlobAnchors } from "./artifactBlobAnchors.js";
 import { CONFIG_REL } from "./keysConfig.js";
 import { join } from "node:path";
+import { vaultPassphraseFromEnv } from "../vault/passphraseFile.js";
 
 function purposeOption(value: string | undefined): LocalPurpose {
   if (value === undefined || !isLocalPurpose(value)) {
@@ -39,7 +40,7 @@ export async function rotateKeysForCli(workspace: string, opts: RotateOptions): 
     }
     assertOwnerMode(workspace, "keys rotate (key-set repair)");
     // Every repair opens the workspace vault with the owner's passphrase.
-    const passphrase = process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Vault passphrase (owner):"));
+    const passphrase = vaultPassphraseFromEnv() ?? (await promptPassphrase("Vault passphrase (owner):"));
     const vaultKeyIds = (bytes: Buffer) => vaultEnvelopeKeyIds(bytes.toString("utf8"), passphrase);
     if (opts.quarantineUnboundPub) return quarantineUnboundPurposeFiles(workspace, { vaultKeyIds });
     if (opts.accept !== undefined) {
@@ -50,7 +51,7 @@ export async function rotateKeysForCli(workspace: string, opts: RotateOptions): 
   }
   if (opts.resume) {
     if (opts.purpose !== undefined || opts.reason !== undefined || opts.rootKey !== undefined || opts.configCandidate !== undefined) throw new Error("--resume takes no other options");
-    const passphrase = process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Vault passphrase (owner):"));
+    const passphrase = vaultPassphraseFromEnv() ?? (await promptPassphrase("Vault passphrase (owner):"));
     const result = resumeKeyRotation(workspace, passphrase);
     if (boundProviderKey(workspace, "artifact-seal")?.binding.blobIndexAuthoritySha256 !== undefined) unlockVault(workspace, passphrase);
     const artifactAnchors = await resumeArtifactBlobAnchors(workspace);
@@ -64,18 +65,18 @@ export async function rotateKeysForCli(workspace: string, opts: RotateOptions): 
     if (opts.reason !== undefined && !(ROTATION_REASONS as readonly string[]).includes(opts.reason)) throw new Error(`--reason must be one of ${ROTATION_REASONS.join(", ")}`);
     const candidate = readFileSync(opts.configCandidate ?? join(workspace, CONFIG_REL));
     return transitionConfigSignatureProvider(workspace, candidate, {
-      passphrase: process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Vault passphrase (owner):")),
+      passphrase: vaultPassphraseFromEnv() ?? (await promptPassphrase("Vault passphrase (owner):")),
       reason: opts.reason as RotationReason | undefined, overlapDays: opts.overlapDays === undefined ? undefined : Number(opts.overlapDays)
     });
   }
   // P2-08: a purpose whose keys.refs names a provider key is bound to that key (and, for ledger-row, its delegation renewed).
   if (configuredRef(loadKeysConfig(workspace), purpose) !== null) {
     if (opts.reason !== undefined || opts.overlapDays !== undefined || opts.rootKey !== undefined) throw new Error("--reason, --overlap-days and --root-key do not apply to a provider key (keys.refs); it is bound, not generated");
-    return bindPurposeProviderKey(workspace, purpose, { passphrase: process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Vault passphrase (owner):")) });
+    return bindPurposeProviderKey(workspace, purpose, { passphrase: vaultPassphraseFromEnv() ?? (await promptPassphrase("Vault passphrase (owner):")) });
   }
   if (opts.reason !== undefined && !(ROTATION_REASONS as readonly string[]).includes(opts.reason)) throw new Error(`--reason must be one of ${ROTATION_REASONS.join(", ")}`);
   const overlapDays = opts.overlapDays === undefined ? undefined : Number(opts.overlapDays);
-  const passphrase = process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Passphrase for key rotation:"));
+  const passphrase = vaultPassphraseFromEnv() ?? (await promptPassphrase("Passphrase for key rotation:"));
   return rotatePurposeKeys({
     workspace, purposes: [purpose], reason: opts.reason as RotationReason | undefined, overlapDays, passphrase,
     rootPrivateKeyPems: (opts.rootKey ?? []).map(path => readFileSync(path, "utf8"))
@@ -118,7 +119,7 @@ export function registerKeysCommands(program: Command): void {
     .requiredOption("--key-id <id>", "64 hex key id")
     .requiredOption("--reason <reason>", "key-compromise, superseded or unspecified")
     .action(async (opts: { purpose: string; keyId: string; reason: string }) => {
-      const passphrase = process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Vault passphrase (owner):"));
+      const passphrase = vaultPassphraseFromEnv() ?? (await promptPassphrase("Vault passphrase (owner):"));
       const revoked = await revokeKeyAsync(process.cwd(), purposeOption(opts.purpose), opts.keyId, opts.reason as KeyRevocationReason, passphrase);
       console.log(JSON.stringify(revoked, null, 2));
       if (revoked.trustConfig.status === "refused") {

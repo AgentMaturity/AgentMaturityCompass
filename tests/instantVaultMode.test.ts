@@ -84,6 +84,24 @@ describe("ensureInstantVaultMode signs only with the operator's passphrase", () 
     expect(process.env.AMC_VAULT_PASSPHRASE).toBeUndefined();
   });
 
+  it("signs with only AMC_VAULT_PASSPHRASE_FILE, the form Compose and Helm set", () => {
+    const workspace = vaultWorkspace();
+    const file = join(workspace, "..", "vault.pass");
+    writeFileSync(file, `${PASS}\n`, { mode: 0o600 });
+    vi.stubEnv("AMC_VAULT_PASSPHRASE_FILE", file);
+    expect(ensureInstantVaultMode(workspace)).toEqual({ noSign: false, createdLocalPassphrase: false, localPassphrasePath: null, reason: null });
+  });
+
+  it("a refused AMC_VAULT_PASSPHRASE_FILE scores unsigned and says why", () => {
+    const workspace = vaultWorkspace();
+    const file = join(workspace, "..", "vault.pass");
+    writeFileSync(file, `${PASS}\n`, { mode: 0o644 });
+    vi.stubEnv("AMC_VAULT_PASSPHRASE_FILE", file);
+    const result = ensureInstantVaultMode(workspace);
+    expect(result.noSign).toBe(true);
+    expect(result.reason).toContain("AMC_VAULT_PASSPHRASE_FILE was not used");
+  });
+
   it("loads it for a non-agent process", () => {
     const workspace = vaultWorkspace();
     writeFileSync(localVaultPassphrasePath(workspace), `${PASS}\n`, { mode: 0o600 });

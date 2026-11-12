@@ -50,6 +50,17 @@ export function bootstrapVaultPassphrase(env: NodeJS.ProcessEnv = process.env): 
   return vaultPassphraseFromEnv(env)!;
 }
 
+/**
+ * Commands that create a vault (init, setup) seal it with the passphrase in AMC_VAULT_PASSPHRASE, so before creating
+ * one they adopt the file's value into this process's environment, as `amc up`, studio start and doctor do. Throws
+ * VaultPassphraseFileError when the file is set but refused.
+ */
+export function adoptVaultPassphraseFile(env: NodeJS.ProcessEnv = process.env): void {
+  if (inlineSet(env)) return;
+  const fromFile = vaultPassphraseFromEnv(env);
+  if (fromFile !== null) env.AMC_VAULT_PASSPHRASE = fromFile;
+}
+
 export function unlockWithPassphraseFile(workspace: string, env: NodeJS.ProcessEnv = process.env): void {
   if (fileSet(env).length === 0 || inlineSet(env) || !vaultExists(workspace) || vaultStatus(workspace).unlocked) return;
   try {
