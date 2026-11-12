@@ -27,7 +27,8 @@ export function renderEqualizerSliders(container, rows) {
           <label>Target <output data-target-out="${esc(row.qId)}">${Number(row.desired || 0).toFixed(2)}</output></label>
           <label>Coverage <strong>${coveragePct}%</strong></label>
         </div>
-        <input type="range" min="0" max="5" step="1" value="${Math.max(0, Math.min(5, Number(row.desired || 0)))}" data-qid="${esc(row.qId)}" />
+        <input type="range" min="0" max="5" step="1" value="${Math.max(0, Math.min(5, Number(row.desired || 0)))}" data-qid="${esc(row.qId)}"
+          aria-label="Target level for ${esc(row.qId)}${row.title ? `: ${esc(row.title)}` : ""}" />
         ${reasons.length > 0 ? `<div class="muted">${esc(reasons.join("; "))}</div>` : ""}
       </div>
     `;

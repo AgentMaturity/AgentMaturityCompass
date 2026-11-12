@@ -1542,7 +1542,7 @@ async function renderEqualizer() {
     <div class="card">
       <div class="row spaced"><strong>${row.questionId}</strong><span>${row.title}</span></div>
       <div class="row">
-        <input type="range" min="0" max="5" step="1" value="${row.target}" data-qid="${row.questionId}" />
+        <input type="range" min="0" max="5" step="1" value="${row.target}" data-qid="${row.questionId}" aria-label="Target level for ${htmlEscape(row.questionId)}: ${htmlEscape(row.title || "")}" />
         <span>${row.target}</span>
       </div>
       <small class="muted">Current: ${row.current} | Effective: ${row.effective}</small>
