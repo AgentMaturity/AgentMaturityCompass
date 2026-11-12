@@ -131,6 +131,17 @@ describe("envelope adapters", () => {
     expect(envelope.statusDimensions.result).toBe("not_evaluated");
   });
 
+  test("a run INVALID only because of the trust boundary says so, not that the signature does not verify", () => {
+    const envelope = envelopeForDiagnosticReport({ ...report, status: "INVALID", verificationPassed: true, trustBoundaryViolated: true }, NOW);
+    expect(envelope.claimKind).toBe("self_reported");
+    expect(envelope.statusDimensions.result).toBe("not_evaluated");
+    expect(envelope.statusDimensions.evidence).toBe("untrusted");
+    expect(envelope.reasons).toContain("TRUST_BOUNDARY_VIOLATED");
+    expect(envelope.reasons).not.toContain("SIGNATURE_INVALID");
+    expect(renderClaimLabel(envelope).line).toContain(`Result: not evaluated (${REASON_TEXT.TRUST_BOUNDARY_VIOLATED})`);
+    expect(REASON_TEXT.TRUST_BOUNDARY_VIOLATED).toContain("amc verify --sign-config");
+  });
+
   test("INVALID and UNRELIABLE runs are untrusted", () => {
     const invalid = envelopeForDiagnosticReport({ ...report, status: "INVALID" }, NOW);
     expect(invalid.statusDimensions.evidence).toBe("untrusted");

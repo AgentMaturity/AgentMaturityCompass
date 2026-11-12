@@ -27,9 +27,10 @@ function escapeXml(input: string): string {
  * @param level  L0–L5 maturity level
  * @param agentId  agent identifier (used in title / accessibility)
  */
-export function generateBadgeSvg(score: number, level: number, agentId: string): string {
+/** `valueText` replaces the "L<level> (<score>)" value, as a comparison badge does ("L2.6 → L3.9"); the colour stays the level's. */
+export function generateBadgeSvg(score: number, level: number, agentId: string, valueText?: string): string {
   const label = "AMC";
-  const value = `L${level} (${score.toFixed(1)})`;
+  const value = valueText ?? `L${level} (${score.toFixed(1)})`;
   const color = levelToColor(level);
 
   // Approximate character widths for Verdana/DejaVu at 11px

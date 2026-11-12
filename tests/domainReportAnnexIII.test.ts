@@ -1,7 +1,8 @@
 import { describe, expect, test } from "vitest";
 import { getDomainPackQuestions } from "../src/score/domainPacks.js";
 import { assessDomain, parseAnnexIIIPoints } from "../src/domains/domainAssessmentEngine.js";
-import { buildDomainReport, renderDomainReportMarkdown } from "../src/domains/domainReportBuilder.js";
+import { buildDomainReport, renderDomainReportMarkdown, renderNotEvaluatedDomainReport } from "../src/domains/domainReportBuilder.js";
+import { envelopeForSelfAssessment } from "../src/claims/eligibility/index.js";
 import { getIndustryPacksByStation } from "../src/domains/industryPacks.js";
 import { DOMAIN_REGISTRY, type Domain } from "../src/domains/domainRegistry.js";
 import { level, likert, type Level0to5, type Likert1to5 } from "../src/score/units.js";
@@ -103,5 +104,14 @@ describe("domain report — EU AI Act classification", () => {
     expect(a.markdown).toContain(`Generated: ${new Date(NOW).toISOString()}`);
     expect(a.euAIActClassification).toEqual(result.euAIActClassification);
     expect(a).not.toHaveProperty("certification");
+  });
+});
+
+describe("a domain report that is not evaluated", () => {
+  test("its next step names the command that scores from observed evidence, not the self-reported questionnaire", () => {
+    const text = renderNotEvaluatedDomainReport("Health", ["no diagnostic run for this agent"],
+      envelopeForSelfAssessment({ producer: "domain:test", answers: [], now: NOW }));
+    expect(text).toContain("Next step: run `amc quickscore --auto`");
+    expect(text).not.toMatch(/run `amc quickscore` to evaluate/);
   });
 });

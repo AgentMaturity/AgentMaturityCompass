@@ -18,6 +18,7 @@ import { aliasesForRun, listRunAliases, removeRunAlias, saveRunAlias } from "./d
 import { writeDiagnosticReportShareBundle } from "./diagnostic/reportShare.js";
 import {
   NON_INTERACTIVE_QUICKSCORE_NOTICE,
+  assertKnownQuickscoreQuestions,
   parseQuickscoreAnswers,
   withAutoQuickscoreNoEvidenceNotice,
   withNonInteractiveQuickscoreNotice,
@@ -293,7 +294,7 @@ import { writeRuntimeFirewallPolicyAsync, migrateRuntimeFirewallPolicySignatureA
 import { installFatalHandlers } from "./runtime/fatalDiagnostic.js";
 import { changeVaultPassphraseInteractive, initVaultInteractive, lockVaultNow, printVaultPassphraseChange, promptPassphrase, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
 import { forgetVaultPassphrase, unlockWithRememberedPassphrase } from "./vault/passphraseStore.js";
-import { bootstrapVaultPassphrase, unlockWithPassphraseFile, vaultPassphraseFromEnv } from "./vault/passphraseFile.js";
+import { adoptVaultPassphraseFile, bootstrapVaultPassphrase, unlockWithPassphraseFile, vaultPassphraseFromEnv } from "./vault/passphraseFile.js";
 import { confirmRememberedUnlock } from "./vault/operatorContext.js";
 import { ensureInstantVaultMode, type InstantVaultMode } from "./cli/instantVaultMode.js";
 import { generatedPassphraseForInit, rememberInitPassphrase, skipVaultPassphrase } from "./cli/initPassphrase.js";
@@ -2096,6 +2097,11 @@ program.hook("preAction", async (_thisCommand, actionCommand) => {
     chalk.level = 0;
   }
   const path = commandPath(actionCommand);
+  // Commands that read a workspace and would otherwise report its missing files as failures, or ask for a passphrase.
+  if (/^(evidence verify|verify all|vault unlock)$/.test(path) && !isWorkspaceInitialized(process.cwd())) {
+    console.error(chalk.red(workspaceInitHint(process.cwd(), "No AMC workspace here (no .amc directory).")));
+    process.exit(1);
+  }
   if (path.length > 0) {
     assertOwnerMode(process.cwd(), path);
   }
@@ -2121,8 +2127,10 @@ async function initializeMinimalStartupWorkspace(opts: {
     process.env.AMC_VAULT_PASSPHRASE = generatedPassphrase;
   }
 
+  // H2: the same local vault-backed workspace `amc up` and bare `amc` create, so the same trust boundary they write.
+  const trustBoundaryMode = opts.trustBoundary ?? "isolated";
   const init = await initWorkspaceAsync({
-    trustBoundaryMode: opts.trustBoundary,
+    trustBoundaryMode,
     agentName: "Startup Agent",
     role: "assistant",
     domain: "general",
@@ -2133,9 +2141,7 @@ async function initializeMinimalStartupWorkspace(opts: {
     tools: ["filesystem", "http"]
   });
   const profiled = applyAMCConfigProfile(opts.profile, loadAMCConfig(process.cwd()));
-  if (opts.trustBoundary) {
-    profiled.security.trustBoundaryMode = opts.trustBoundary;
-  }
+  profiled.security.trustBoundaryMode = trustBoundaryMode;
   await saveAMCConfigAsync(process.cwd(), profiled);
 
   const fmt = await import("./cliFormat.js");
@@ -2163,7 +2169,7 @@ function printFirstRunActions(fmt: typeof import("./cliFormat.js"), more: Array<
 program
   .command("init")
   .description("Initialize .amc workspace")
-  .option("--trust-boundary <mode>", "isolated|shared")
+  .option("--trust-boundary <mode>", "isolated|shared (default isolated, as amc up writes; shared marks every run INVALID)")
   .option("--profile <name>", "workspace config profile: dev|ci|prod", "dev")
   .option("--force", "Force re-initialization, overwrite existing .amc directory", false)
   .option("--skip-vault", "Skip the vault prompt: a random passphrase is generated and remembered for your user (CI/headless init)", false)
@@ -2174,6 +2180,7 @@ program
   .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod"; force: boolean; skipVault: boolean; minimal: boolean; coding?: boolean; regulated?: boolean; webAllowHost?: string[] }) => {
     const { starterProfileFlag, runStarterInit } = await import("./setup/starterProfiles.js");
     try {
+      adoptVaultPassphraseFile(); // AMC_VAULT_PASSPHRASE_FILE seals the new vault as AMC_VAULT_PASSPHRASE does
       const starter = starterProfileFlag(opts);
       if (starter) { await runStarterInit(process.cwd(), starter, opts.force, opts.webAllowHost); return; }
     } catch (error) { console.error(chalk.red(toErrorMessage(error))); process.exit(1); }
@@ -2229,17 +2236,20 @@ program
         }
         process.env.AMC_VAULT_PASSPHRASE = passphrase;
       } else {
-        console.error(chalk.red("AMC_VAULT_PASSPHRASE environment variable is required in non-interactive mode."));
+        console.error(chalk.red("No terminal to prompt for the vault passphrase. Supply one of:"));
         console.error(chalk.gray("  export AMC_VAULT_PASSPHRASE='your-passphrase'"));
+        console.error(chalk.gray("  export AMC_VAULT_PASSPHRASE_FILE=/path/to/a/0600/file"));
+        console.error(chalk.gray("  amc init --skip-vault   (generates a passphrase and remembers it for your user)"));
+        console.error(chalk.gray("  amc init --minimal      (generates a passphrase and prints it once)"));
         process.exit(1);
       }
     }
 
-    const init = await initWorkspaceAsync({ trustBoundaryMode: opts.trustBoundary });
+    // H2: the vault this creates holds the monitor and auditor keys under .amc, as `amc up` and bare `amc` do, so the same trust boundary.
+    const trustBoundaryMode = opts.trustBoundary ?? "isolated";
+    const init = await initWorkspaceAsync({ trustBoundaryMode });
     const profiled = applyAMCConfigProfile(opts.profile, loadAMCConfig(process.cwd()));
-    if (opts.trustBoundary) {
-      profiled.security.trustBoundaryMode = opts.trustBoundary;
-    }
+    profiled.security.trustBoundaryMode = trustBoundaryMode;
     await saveAMCConfigAsync(process.cwd(), profiled);
     const fmt = await import("./cliFormat.js");
     console.log(fmt.logo());
@@ -3120,7 +3130,7 @@ program
         console.log(chalk.yellow("\n  Auto-score unavailable — no measured maturity score was produced."));
         console.log(chalk.gray("\n  No evidence found. Run your agent through AMC first:"));
         console.log(chalk.gray("    amc adapters run --agent <id> -- <command>"));
-        console.log(chalk.gray("    amc wrap <runtime> -- <command>"));
+        console.log(chalk.gray("    amc adapters run --agent <id> --adapter generic-cli -- <command>"));
         console.log(chalk.gray("\n  Or use interactive mode: amc quickscore (without --auto)"));
         process.exit(1);
       }
@@ -3131,6 +3141,8 @@ program
       const { getRapidQuestions, scoreRapidAssessment } = await import("./diagnostic/rapidQuickscore.js");
       const questions = getRapidQuestions();
       const answers: Record<string, number> = { ...(providedAnswers?.answers ?? {}) };
+      try { assertKnownQuickscoreQuestions(answers, questions.map((question) => question.id), "quickscore --rapid"); }
+      catch (error: unknown) { console.error(chalk.red(toErrorMessage(error))); process.exit(1); }
 
       if (!providedAnswers && (!process.stdin.isTTY || opts.quiet)) {
         if (opts.json) {
@@ -3217,7 +3229,7 @@ program
         console.log("");
         console.log(chalk.yellow("💡 No evidence collected yet. Your score reflects default (L0) state."));
         console.log(chalk.gray("  To score a real agent, capture evidence first:"));
-        console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc wrap <runtime> -- <your-agent-command>"), chalk.gray("  # Capture agent behavior"));
+        console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc adapters run --agent <id> --adapter generic-cli -- <your-agent-command>"), chalk.gray("  # Capture agent behavior"));
         console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc evidence collect"), chalk.gray("               # Guided wizard to connect and capture evidence"));
         console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc quickscore"), chalk.gray("  # Then re-score"));
       }
@@ -3274,6 +3286,8 @@ program
     const layers = getQuestionsByLayer();
     const totalQuestions = layers.reduce((sum, l) => sum + l.questions.length, 0);
     const answers: Record<string, number> = { ...(providedAnswers?.answers ?? {}) };
+    try { assertKnownQuickscoreQuestions(answers, layers.flatMap((layer) => layer.questions.map((question) => question.id)), "quickscore"); }
+    catch (error: unknown) { console.error(chalk.red(toErrorMessage(error))); process.exit(1); }
 
     if (!providedAnswers && (!process.stdin.isTTY || opts.quiet)) {
       if (opts.json) {
@@ -5722,9 +5736,10 @@ program
       }
       if (opts.badge) {
         const { generateBadgeSvg, scoreToLevel } = await import("./cert/badgeGenerator.js");
-        const score = Math.max(0, Math.min(100, b.integrityIndex * 100));
-        const level = scoreToLevel(score);
-        const svg = generateBadgeSvg(score, level, `compare:${agentId}`);
+        // Run A's level to run B's; the colour is run B's level.
+        const levelA = diagnosticAverageLevel(a), levelB = diagnosticAverageLevel(b);
+        const score = Math.max(0, Math.min(100, (levelB / 5) * 100));
+        const svg = generateBadgeSvg(score, scoreToLevel(score), `compare:${agentId ?? "default"}`, `L${levelA.toFixed(1)} → L${levelB.toFixed(1)}`);
         const badgePath = opts.output ? opts.output.replace(/\.[^.]+$/, "") + "-badge.svg" : "comparison-badge.svg";
         const fs = await import("fs");
         fs.writeFileSync(badgePath, svg, "utf-8");
@@ -5882,7 +5897,7 @@ program
           if (best) {
             const score = best.overallScore * 20; // 0–5 → 0–100
             const level = scoreToLevel(score);
-            const svg = generateBadgeSvg(score, level, `compare:${agentId}`);
+            const svg = generateBadgeSvg(score, level, `compare:${agentId ?? "default"}`);
             const badgePath = opts.output.replace(/\.[^.]+$/, "") + "-badge.svg";
             const fs = await import("fs");
             fs.writeFileSync(badgePath, svg, "utf-8");
@@ -5966,7 +5981,7 @@ program
         if (best) {
           const score = best.overallScore * 20; // 0–5 scale → 0–100
           const level = scoreToLevel(score);
-          const svg = generateBadgeSvg(score, level, `compare:${agentId}`);
+          const svg = generateBadgeSvg(score, level, `compare:${agentId ?? "default"}`);
           const badgePath = opts.output ? opts.output.replace(/\.[^.]+$/, "") + "-badge.svg" : "comparison-badge.svg";
           const fs = await import("fs");
           fs.writeFileSync(badgePath, svg, "utf-8");
@@ -6145,9 +6160,8 @@ withTrustFlags(verifyCmd, { expectMonitor: true, ledgerOnly: true })
     if (opts.repair) {
       const code = await runVerifyRepair({ apply: opts.apply, yes: opts.yes, ...(opts.expectMonitor ? { expectedMonitorFingerprint: opts.expectMonitor } : {}) });
       if (code !== 0) process.exit(code);
-      return;
-    }
-    if (opts.apply || opts.yes) { console.error("--apply and --yes only work with --repair"); process.exit(2); }
+      // Repaired what it could (or nothing needed it): end with plain verify's verdict and exit code, UNANCHORED included.
+    } else if (opts.apply || opts.yes) { console.error("--apply and --yes only work with --repair"); process.exit(2); }
     const trust = trustFromFlags(opts, ["ledger-row"]);
     // B1: payloads a locked vault keeps closed are NOT EVALUATED (exit 1), never "authentication failed".
     const result = await verifyLedgerIntegrity(process.cwd(), { trust, blobKeyOptional: true, ...(opts.expectMonitor ? { expectedMonitorFingerprint: opts.expectMonitor } : {}) });
@@ -7215,10 +7229,10 @@ Use --dry-run to preview the exact capture command and next score step.
       console.log(`Runtime: ${runtime}`);
       console.log(`Command: ${commandText}`);
       console.log(`Replay: ${replayCommand}`);
-      const shouldUseUnsignedFirstRun = process.env.AMC_NO_SIGN === "1" || !process.env.AMC_VAULT_PASSPHRASE;
+      const shouldUseUnsignedFirstRun = process.env.AMC_NO_SIGN === "1" || (!process.env.AMC_VAULT_PASSPHRASE && !vaultStatusNow(process.cwd()).unlocked); // the preAction opened it from AMC_VAULT_PASSPHRASE_FILE
       console.log(`Signing: ${shouldUseUnsignedFirstRun ? "UNSIGNED first-run capture" : "vault-backed signed capture"}`);
       if (shouldUseUnsignedFirstRun) {
-        console.log(chalk.gray("Set AMC_VAULT_PASSPHRASE and rerun when you need verifier-ready signed evidence."));
+        console.log(chalk.gray("Set AMC_VAULT_PASSPHRASE (or AMC_VAULT_PASSPHRASE_FILE) and rerun when you need verifier-ready signed evidence."));
       }
 
       if (opts.dryRun) {
@@ -7255,7 +7269,7 @@ Use --dry-run to preview the exact capture command and next score step.
     if (!process.stdin.isTTY) {
       console.error(chalk.red("Evidence collection wizard requires an interactive terminal."));
       console.error(chalk.gray("For first-run capture, use: amc evidence collect --first-run --runtime any -- <agent command>"));
-      console.error(chalk.gray("For CI/CD wrappers, use: amc wrap any -- <command>"));
+      console.error(chalk.gray("For CI/CD wrappers, use: amc adapters run --agent <id> --adapter generic-cli -- <command>"));
       process.exit(1);
     }
     console.log(chalk.bold("\n🔬 AMC Evidence Collection Wizard"));
@@ -7342,11 +7356,12 @@ Use --dry-run to preview the exact capture command and next score step.
         name: "runtime",
         message: "What runtime/framework?",
         choices: [
-          { name: "Python (generic)", value: "python" },
-          { name: "Node.js (generic)", value: "node" },
-          { name: "LangChain", value: "langchain" },
-          { name: "CrewAI", value: "crewai" },
-          { name: "AutoGen", value: "autogen" },
+          // Values are `amc adapters run` adapter IDs.
+          { name: "Python (generic)", value: "generic-cli" },
+          { name: "Node.js (generic)", value: "generic-cli" },
+          { name: "LangChain", value: "langchain-python" },
+          { name: "CrewAI", value: "crewai-cli" },
+          { name: "AutoGen", value: "autogen-cli" },
           { name: "Claude CLI", value: "claude-cli" },
           { name: "Other CLI", value: "generic-cli" },
         ]
@@ -7359,7 +7374,7 @@ Use --dry-run to preview the exact capture command and next score step.
       }]);
       console.log(chalk.bold.green("\n  ✓ Ready to capture evidence!\n"));
       console.log(chalk.white("  Run this command to start capturing:"));
-      console.log(chalk.hex('#4AEF79')(`    amc wrap ${runtime} -- ${command}\n`));
+      console.log(chalk.hex('#4AEF79')(`    amc adapters run --agent ${activeAgent(program) ?? "default"} --adapter ${runtime} -- ${command}\n`));
       console.log(chalk.gray("  AMC will intercept all LLM calls, tool invocations, and agent decisions."));
       console.log(chalk.gray("  Stop the agent with Ctrl+C when done, then run:"));
       console.log(chalk.hex('#4AEF79')("    amc score\n"));
@@ -12449,7 +12464,7 @@ compliance
       console.log(chalk.gray(`  💡 Categories need control-bound AMC runtime evidence (meta.controlIds) in the window;`));
       console.log(chalk.gray(`     a pass also needs a compiled plan recording that the control applies.`));
       console.log(chalk.gray(`     Absence of violations is not a pass. Capture evidence first:`));
-      console.log(chalk.gray(`     amc wrap <runtime> -- <your-agent-command>`));
+      console.log(chalk.gray(`     amc adapters run --agent <id> --adapter generic-cli -- <your-agent-command>`));
       console.log(chalk.gray(`     amc evidence collect`));
     }
     if (defaultToMarkdown) {
@@ -19518,6 +19533,7 @@ program.action(async (_opts, command: Command) => {
   if (rootArgs.length > 0) {
     const unknownToken = String(rootArgs[0]);
     console.error(chalk.red(`error: unknown command '${unknownToken}'`));
+    if (unknownToken === "version") console.error(chalk.yellow("Did you mean: amc --version"));
     const suggestions = suggestCommandPaths(unknownToken, flattenCommandPaths(program), 6);
     if (suggestions.length > 0) {
       console.error(chalk.yellow("Closest command paths:"));
@@ -21888,7 +21904,7 @@ const score = program.command("score").description("Maturity scoring, adversaria
     console.log(renderAsciiRadar(result.layerScores));
     if (result.totalScore === 0) {
       console.log(chalk.yellow("\n💡 No evidence collected yet. Capture agent behavior first:"));
-      console.log(chalk.gray("  amc wrap <runtime> -- <command>    # Capture evidence"));
+      console.log(chalk.gray("  amc adapters run --agent <id> --adapter generic-cli -- <command>    # Capture evidence"));
       console.log(chalk.gray("  amc evidence collect               # Guided capture/import wizard"));
       console.log(chalk.gray("  amc ingest <fileOrDir> --type generic_json --agent <agentId>  # Import existing logs"));
     }
@@ -21912,7 +21928,7 @@ score
       if (opts.json) {
         const output: any = withClaimFields({ ...result }, claim);
         if ((result.overallScore ?? 0) === 0) {
-          output.hint = "Score is 0 because no evidence has been collected yet. Run: amc evidence collect, amc wrap <runtime> -- <command>, or amc quickscore";
+          output.hint = "Score is 0 because no evidence has been collected yet. Run: amc evidence collect, amc adapters run --agent <id> --adapter generic-cli -- <command>, or amc quickscore";
         }
         console.log(JSON.stringify(output, null, 2));
         return;
@@ -21925,7 +21941,7 @@ score
       if ((result.overallScore ?? 0) === 0) {
         console.log(chalk.yellow("\n💡 Score is 0 — no evidence collected yet."));
         console.log(chalk.gray("  amc evidence collect              # Auto-collect from workspace"));
-        console.log(chalk.gray("  amc wrap <runtime> -- <command>    # Capture live evidence"));
+        console.log(chalk.gray("  amc adapters run --agent <id> --adapter generic-cli -- <command>    # Capture live evidence"));
       }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
@@ -23672,14 +23688,14 @@ playground
     const session = createPlaygroundSession();
     const results = runAllScenarios(session);
     if (opts.json) {
-      const output = { scenarios: results, hint: "These are static demo scenarios. For real agent testing, use: amc wrap <runtime> -- <command>, or amc assurance run --all" };
+      const output = { scenarios: results, hint: "These are static demo scenarios. For real agent testing, use: amc adapters run --agent <id> --adapter generic-cli -- <command>, or amc assurance run --all" };
       console.log(JSON.stringify(output, null, 2));
       return;
     }
     console.log(formatPlaygroundReport(session));
     console.log(chalk.gray("\n💡 These are static demo scenarios for quick evaluation."));
     console.log(chalk.gray("  For real agent testing:"));
-    console.log(chalk.gray("    amc wrap <runtime> -- <command>    # Capture live evidence"));
+    console.log(chalk.gray("    amc adapters run --agent <id> --adapter generic-cli -- <command>    # Capture live evidence"));
     console.log(chalk.gray("    amc assurance run --all            # Run full red-team packs"));
     console.log(chalk.gray("    amc redteam run                    # Targeted attack simulation"));
   });
@@ -24039,6 +24055,9 @@ if (isTopLevelHelpRequest(process.argv)) {
   process.exit(0);
 }
 
+// The root action reports an unknown command itself; commander's default would refuse its token as "too many
+// arguments" first. Set last, so no subcommand inherits it (commander copies the setting when a command is created).
+program.allowExcessArguments(true);
 program.parseAsync(process.argv).catch((error: unknown) => {
   const message = normalizeCliErrorMessage(error);
   const unknownToken = parseUnknownCommandToken(message);

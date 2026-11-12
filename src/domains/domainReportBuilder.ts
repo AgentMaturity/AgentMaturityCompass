@@ -223,7 +223,7 @@ export function renderNotEvaluatedDomainReport(domainName: string, reasons: read
     "## Result: Not evaluated",
     ...reasons.map((reason) => `- ${reason}`),
     "",
-    "Next step: run `amc quickscore` to evaluate the base part from observed evidence.",
+    "Next step: run `amc quickscore --auto` to evaluate the base part from observed evidence (plain `amc quickscore` is the self-reported questionnaire).",
     "",
     LEGEND
   ].join("\n");

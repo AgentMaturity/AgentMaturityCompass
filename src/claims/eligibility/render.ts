@@ -28,6 +28,9 @@ export const REASON_TEXT: Record<ClaimReasonCode, string> = {
   CONTRADICTORY_EVIDENCE: "the evidence contradicts itself",
   CROSS_SCOPE_EVIDENCE: "the evidence belongs to another tenant or scope",
   SIGNATURE_INVALID: "the signature does not verify",
+  TRUST_BOUNDARY_VIOLATED: "the run crossed its trust boundary: runtime and signing keys are not marked isolated, or "
+    + "amc.config.yaml is unsigned; set security.trustBoundaryMode: isolated in .amc/amc.config.yaml only when the agent "
+    + "cannot write AMC's keys, then run `amc verify --sign-config` and score again",
   ISSUER_NOT_PINNED: "the reviewer's key is not pinned",
   REVIEW_NOT_INDEPENDENT: "the review is not independent of the producer",
   LEGACY_1X_UNVERIFIED: "results stored by AMC 1.x were never verified",

@@ -17,7 +17,7 @@ const FILE_HINT = "Use a regular file you own with mode 0600 or 0400 (not a syml
 /** A configured passphrase file that was not used: refused, missing or unreadable. The message never holds the value. */
 export class VaultPassphraseFileError extends Error {
   constructor(cause: unknown) {
-    super(`AMC_VAULT_PASSPHRASE_FILE was not used, so the vault stays locked: ${cause instanceof Error ? cause.message : String(cause)}. ${FILE_HINT}`);
+    super(`AMC_VAULT_PASSPHRASE_FILE was not used, so the vault stays locked: ${(cause instanceof Error ? cause.message : String(cause)).replace(/\.+$/, "")}. ${FILE_HINT}`);
     this.name = "VaultPassphraseFileError";
   }
 }
@@ -48,6 +48,17 @@ export function bootstrapVaultPassphrase(env: NodeJS.ProcessEnv = process.env): 
       + "AMC_VAULT_PASSPHRASE wins over the file everywhere, so unset it and run bootstrap again.");
   }
   return vaultPassphraseFromEnv(env)!;
+}
+
+/**
+ * Commands that create a vault (init, setup) seal it with the passphrase in AMC_VAULT_PASSPHRASE, so before creating
+ * one they adopt the file's value into this process's environment, as `amc up`, studio start and doctor do. Throws
+ * VaultPassphraseFileError when the file is set but refused.
+ */
+export function adoptVaultPassphraseFile(env: NodeJS.ProcessEnv = process.env): void {
+  if (inlineSet(env)) return;
+  const fromFile = vaultPassphraseFromEnv(env);
+  if (fromFile !== null) env.AMC_VAULT_PASSPHRASE = fromFile;
 }
 
 export function unlockWithPassphraseFile(workspace: string, env: NodeJS.ProcessEnv = process.env): void {

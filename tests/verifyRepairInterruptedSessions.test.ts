@@ -87,7 +87,7 @@ test("stale gateway and tool sessions: the plan lists both; --apply seals each w
   const applied = await repair(root, true, true);
   expect(applied.code).toBe(0);
   expect(applied.out).toContain("Sealed 2 interrupted session(s), each with a signed interrupted-sealed marker: gw-crashed, tool-crashed");
-  expect(applied.out).toContain("Verification passed.");
+  expect(applied.out).toContain("Integrity check passed after sealing.");
   const ledger = openLedger(root, { readonly: true });
   try {
     for (const id of ["gw-crashed", "tool-crashed"]) {

@@ -13,13 +13,13 @@ function tempRoot(): string {
   return root;
 }
 
-function runCli(cwd: string, args: string[]) {
+function runCli(cwd: string, args: string[], vaultPassphrase = "") {
   return spawnSync(process.execPath, [join(process.cwd(), "dist", "cli.js"), ...args], {
     cwd,
     encoding: "utf8",
     env: {
       ...process.env,
-      AMC_VAULT_PASSPHRASE: ""
+      AMC_VAULT_PASSPHRASE: vaultPassphrase
     }
   });
 }
@@ -45,6 +45,26 @@ describe("minimal startup setup", () => {
     const config = YAML.parse(readFileSync(join(root, ".amc", "amc.config.yaml"), "utf8"));
     expect(config.profile).toBe("dev");
     expect(config.supervise.extraEnv.AMC_ENV).toBe("dev");
+    // The same local vault-backed workspace `amc up` and bare `amc` create, so the same trust boundary: the first score is not INVALID.
+    expect(config.security.trustBoundaryMode).toBe("isolated");
+  });
+
+  test("init writes the isolated trust boundary; --trust-boundary shared is honoured", () => {
+    const isolated = tempRoot();
+    const plain = runCli(isolated, ["init"], "synthetic-init-trust-boundary");
+    expect(plain.status, plain.stderr || plain.stdout).toBe(0);
+    expect(YAML.parse(readFileSync(join(isolated, ".amc", "amc.config.yaml"), "utf8")).security.trustBoundaryMode).toBe("isolated");
+    const shared = tempRoot();
+    const asked = runCli(shared, ["init", "--minimal", "--trust-boundary", "shared"]);
+    expect(asked.status, asked.stderr || asked.stdout).toBe(0);
+    expect(YAML.parse(readFileSync(join(shared, ".amc", "amc.config.yaml"), "utf8")).security.trustBoundaryMode).toBe("shared");
+  });
+
+  test("init without a terminal or passphrase names every way forward", () => {
+    const root = tempRoot();
+    const result = runCli(root, ["init"]);
+    expect(result.status).toBe(1);
+    for (const way of ["AMC_VAULT_PASSPHRASE", "AMC_VAULT_PASSPHRASE_FILE", "--skip-vault", "--minimal"]) expect(result.stderr).toContain(way);
   });
 
   test("quickstart --minimal uses the same non-interactive startup path", () => {

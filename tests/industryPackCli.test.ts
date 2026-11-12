@@ -238,6 +238,12 @@ describe("legacy Industry Packs licences", () => {
     expect(activate.stdout).toContain("Industry Packs are free, so it changes nothing.");
     expect(existsSync(join(workspace, ".amc", "industry-packs-access.json"))).toBe(true);
 
+    // A refused key under --json is a JSON error, not plain text.
+    const refused = await invoke("legacy-activate-refused", ["domain", "pack", "activate", "--key", "not-a-licence", "--json"], pinned);
+    completed(refused);
+    expect(refused.status).toBe(1);
+    expect(JSON.parse(refused.stdout)).toMatchObject({ ok: false, error: expect.any(String) });
+
     const access = await invoke("legacy-access", ["domain", "pack", "access", "--json"], pinned);
     completed(access);
     expect(access.status, access.stderr).toBe(0);

@@ -135,7 +135,7 @@ describe("the remembered passphrase unlocks for an interactive operator only", (
     setTTY(process.stdin, false);
     prompt.mockRejectedValue(new Error("must not prompt"));
     await expect(unlockVaultInteractive(workspace)).rejects.toThrow(
-      "Vault passphrase needed: export AMC_VAULT_PASSPHRASE for this shell, or re-run this command from your terminal.");
+      "Vault passphrase needed: export AMC_VAULT_PASSPHRASE (or AMC_VAULT_PASSPHRASE_FILE) for this shell, or re-run this command from your terminal.");
     expect(prompt).not.toHaveBeenCalled();
     expect(vaultStatus(workspace).unlocked).toBe(false);
   });

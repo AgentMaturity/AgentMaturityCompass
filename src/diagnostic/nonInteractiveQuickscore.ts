@@ -18,7 +18,7 @@ export const NON_INTERACTIVE_QUICKSCORE_NOTICE = {
     "amc quickscore",
     "amc quickscore --answers answers.json --json",
     "amc quickscore --auto",
-    "amc wrap <runtime> -- <your-agent-command>"
+    "amc adapters run --agent <id> --adapter generic-cli -- <your-agent-command>"
   ]
 } as const;
 
@@ -26,9 +26,9 @@ export const AUTO_QUICKSCORE_NO_EVIDENCE_NOTICE = {
   nonInteractive: true,
   scoreStatus: "AUTO_NO_EVIDENCE",
   warning: "Auto-score could not find execution evidence. No measured maturity score was produced.",
-  firstRunHint: "Capture evidence with `amc wrap <runtime> -- <your-agent-command>` or use `amc quickscore --answers answers.json --json` for CI-safe survey scoring.",
+  firstRunHint: "Capture evidence with `amc adapters run --agent <id> --adapter generic-cli -- <your-agent-command>` or use `amc quickscore --answers answers.json --json` for CI-safe survey scoring.",
   suggestedCommands: [
-    "amc wrap <runtime> -- <your-agent-command>",
+    "amc adapters run --agent <id> --adapter generic-cli -- <your-agent-command>",
     "amc adapters run --agent <id> --workorder <workOrderId>",
     "amc quickscore --answers answers.json --json",
     "amc quickscore"
@@ -75,6 +75,16 @@ export function parseQuickscoreAnswers(input: string, options: { cwd?: string } 
     answeredQuestions: Object.keys(answers).length,
     source
   };
+}
+
+/** Answers for questions this mode does not ask would be ignored silently, so they are refused, naming every one. */
+export function assertKnownQuickscoreQuestions(answers: Record<string, number>, questionIds: readonly string[], mode: string): void {
+  const known = new Set(questionIds);
+  const unknown = Object.keys(answers).filter((id) => !known.has(id));
+  if (unknown.length > 0) {
+    throw new Error(`--answers names unknown question IDs: ${unknown.join(", ")}. ${mode} asks ${questionIds.length} questions; `
+      + "`amc explain <questionId>` shows one.");
+  }
 }
 
 export function withProvidedAnswersQuickscoreMetadata<T extends object>(
