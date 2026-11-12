@@ -25,6 +25,12 @@ The CLI, Dashboard, diagnostics, and Studio all read this chain. There is no sep
 
 For a native agent run with `--approve-tools`, a call in an authorized class (every class except `READ_ONLY` and `WRITE_LOW`) is approved under the tool's own signed action class, not the `--approve-tools` class, and the question names the amount and recipient first. The approval binds the call's authorization intent: the tool, its adapter and class, a digest of the normalized arguments, the amount, recipient, destination and resource, the deployment digest of the signed policy files, and the workspace id. The intent is kept with the signed request.
 
+`--approve-tools <class>` decides each call under that class's signed rule. The default `READ_ONLY` rule has
+`requiredApprovals: 0`, so `--approve-tools READ_ONLY` (the usual gate for `--mcp` mounts and `native-schedule
+run-due`) records a signed request per call that settles `QUORUM_MET 0/0` and asks no human; the run says "needs no
+human decision" for it. Use `WRITE_LOW` or higher, or raise the class's `requiredApprovals` in the signed approval
+policy, to have a human asked before each call.
+
 The tool pipeline binds an authorization record (`amc.authorization-record/v1`, ADR 009) when the call enters and rechecks it as the last step before the tool runs. The call is denied, and the tool never runs, when:
 
 - the amount, recipient, destination or resource differs from what was approved (`binding_changed:amount` and so on), or the tool differs (`tool_changed`);

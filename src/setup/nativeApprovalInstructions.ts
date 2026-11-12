@@ -2,7 +2,7 @@ import { getApprovalInboxItem } from "../approvals/approvalInbox.js";
 import { renderNativeGuideCommand, type NativeGuideAction } from "./nativeFirstUseGuide.js";
 
 export interface NativeApprovalInstructions {
-  readonly status: "ready-for-review" | "inspection-only";
+  readonly status: "ready-for-review" | "inspection-only" | "no-review-needed";
   readonly inspect: NativeGuideAction | null;
   readonly login: NativeGuideAction | null;
   readonly approve: NativeGuideAction | null;
@@ -33,6 +33,15 @@ export function nativeApprovalInstructions(options: {
   try {
     const inbox = getApprovalInboxItem({ workspace: options.workspace, agentId: options.agentId, approvalRequestId: options.approvalRequestId });
     const request = inbox.request;
+    // M-4: a class whose signed rule needs 0 approvals (READ_ONLY by default) settles QUORUM_MET at once. That is the
+    // signed policy allowing the call, not an unconfirmed request, so say so instead of printing a refusal.
+    if (inbox.requestIntegrity.valid && inbox.chainIntegrity.valid && inbox.contextIntegrity.valid && inbox.status === "QUORUM_MET"
+        && request.requiredApprovals === 0 && request.approvalRequestId === options.approvalRequestId && request.agentId === options.agentId) {
+      return { status: "no-review-needed", inspect, login: null, approve: null, deny: null,
+        text: `Approval ${options.approvalRequestId} needs no human decision: the signed approval policy's ${request.actionClass} rule requires 0 approvals, `
+          + "so the gate records this signed request and the call proceeds under that rule. Raise requiredApprovals for the class in the signed approval policy to have a human asked."
+          + (inspect === null ? "" : `\nInspect in the same workspace: ${renderNativeGuideCommand(inspect)}`) };
+    }
     if (!inbox.requestIntegrity.valid || !inbox.chainIntegrity.valid || !inbox.contextIntegrity.valid || inbox.status !== "PENDING"
         || request.approvalRequestId !== options.approvalRequestId || request.agentId !== options.agentId || request.intentId !== options.approvalId
         || !Number.isSafeInteger(request.expiresTs) || request.expiresTs <= Date.now()

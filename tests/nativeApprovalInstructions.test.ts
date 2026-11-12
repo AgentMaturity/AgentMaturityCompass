@@ -33,6 +33,18 @@ describe("native one-shot authenticated approval instructions", () => {
     expect(result.text).not.toContain("secret-arguments-never-in-guidance");
     expect(result.text).not.toContain("sensitive-tool-fixture");
   });
+  it("says a request the signed rule settles with zero approvals needs no human, instead of a refusal (M-4)", () => {
+    const item = { ...fixture(), status: "QUORUM_MET", request: { ...fixture().request, actionClass: "READ_ONLY", requiredApprovals: 0 } };
+    seam.read.mockReturnValue(item);
+    const result = nativeApprovalInstructions(options);
+    expect(result).toMatchObject({ status: "no-review-needed", login: null, approve: null, deny: null });
+    expect(result.text).toContain(`Approval ${requestId} needs no human decision: the signed approval policy's READ_ONLY rule requires 0 approvals`);
+    expect(result.text).not.toContain("could not be confirmed");
+    expect(result.text).not.toContain("no action is authorized");
+    const needed = { ...item, request: { ...item.request, requiredApprovals: 2 } };
+    seam.read.mockReturnValue(needed);
+    expect(nativeApprovalInstructions(options).status).toBe("inspection-only");
+  });
   it("offers the actual simulate mode instead of silently requesting execute", () => {
     const item = fixture(); item.request.effectiveMode = "SIMULATE"; seam.read.mockReturnValue(item);
     const result = nativeApprovalInstructions(options);
