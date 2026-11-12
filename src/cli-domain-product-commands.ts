@@ -82,10 +82,12 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
     .addOption(new Option("--expires-at <isoDate>").hideHelp())
     .option("--json", "Output as JSON")
     .action(async (opts: { key: string; expiresAt?: string; json?: boolean }) => {
-      if (opts.expiresAt !== undefined) {
-        console.error(chalk.red(EXPIRES_AT_REFUSED));
-        process.exit(1); return;
-      }
+      const refuse = (message: string): void => {
+        if (opts.json) console.log(JSON.stringify({ ok: false, error: message }, null, 2));
+        else console.error(chalk.red(message));
+        process.exit(1);
+      };
+      if (opts.expiresAt !== undefined) { refuse(EXPIRES_AT_REFUSED); return; }
       try {
         const { activateIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
         const recorded = activateIndustryPackAccess({ workspace: process.cwd(), licenseKey: opts.key });
@@ -95,7 +97,7 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
         }
         console.log(chalk.green("Licence recorded: it verified against a pinned licence key. Industry Packs are free, so it changes nothing."));
         if (recorded.licence.expiresAt) console.log(chalk.gray(`Licence expires: ${recorded.licence.expiresAt}`));
-      } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+      } catch (e: unknown) { refuse(toErrorMessage(e)); }
     });
 
   withTrustFlags(sectorPack
