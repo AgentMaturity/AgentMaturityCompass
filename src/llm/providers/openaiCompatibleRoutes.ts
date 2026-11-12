@@ -1,7 +1,7 @@
 /**
  * SH-PROVIDERS-01: named native routes for servers that speak the OpenAI Chat Completions dialect, plus Azure OpenAI.
  *
- * Each route reuses the `openai-chat@4` encoder bytes and the shared Chat decoder UNCHANGED, so `deriveRecordedRequest`
+ * Each route reuses the `openai-chat@6` encoder bytes and the shared Chat decoder UNCHANGED, so `deriveRecordedRequest`
  * needs no new encoder. What differs is honest identity: the signed `request/header` names the real provider id and an
  * adapter whose capability contract declares what is NOT proven for a generic endpoint (`OPENAI_COMPATIBLE_CAPABILITIES`).
  * No catalog pricing attaches to these routes: `canonicalProvider` never maps them to OpenAI, so cost stays unknown

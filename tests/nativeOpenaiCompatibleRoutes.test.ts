@@ -99,7 +99,7 @@ describe("SH-PROVIDERS-01 native OpenAI-compatible routes", () => {
     // The real OpenAI route keeps its retention version.
     const openai = new AdapterRegistry();
     openai.register({ ...nativeRouteFor("openai", { credential: "K" }, "m"), cacheRetention: "long" });
-    expect(openai.pin({ providerId: "openai", model: "m" }).encoderVersion).toBe(5);
+    expect(openai.pin({ providerId: "openai", model: "m" }).encoderVersion).toBe(7);
   });
 
   test("(7) paramsFor emits the Chat shape for every compat id, and the real encoder accepts it (mutation: fall into the stream:true default → encode fails)", async () => {

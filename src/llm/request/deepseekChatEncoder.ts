@@ -69,9 +69,11 @@ function validateRequest(request: EncodableRequest): void {
   }
 }
 
-export const deepseekChatEncoder: RequestEncoder = {
+/** deepseek-chat@1 concatenated a user message's text parts; @2 separates them with a blank line (smoke M-1). */
+function deepseekChat(version: number, userTextSeparator: string): RequestEncoder {
+  return {
   id: DEEPSEEK_CHAT_ID,
-  version: DEEPSEEK_CHAT_VERSION,
+  version,
   encode(request: EncodableRequest): Buffer {
     validateRequest(request);
     const params = deepseekParams(request.params);
@@ -95,12 +97,12 @@ export const deepseekChatEncoder: RequestEncoder = {
         continue;
       }
       if (message.role === "user") {
-        let content = "";
+        const texts: string[] = [];
         for (const part of message.parts) {
           if (part.kind !== "text") fail("user history supports text only");
-          content += string(part.text, "user text");
+          texts.push(string(part.text, "user text"));
         }
-        messages.push({ role: "user", content });
+        messages.push({ role: "user", content: texts.filter(text => userTextSeparator === "" || text.length > 0).join(userTextSeparator) });
         continue;
       }
       let content = "", reasoning = "", hasReasoning = false, phase = 0;
@@ -143,4 +145,8 @@ export const deepseekChatEncoder: RequestEncoder = {
         function: { name: tool.name, description: tool.description, parameters: tool.parameters } })) }) };
     return Buffer.from(canonicalize(body), "utf8");
   }
-};
+  };
+}
+
+export const deepseekChatEncoder: RequestEncoder = deepseekChat(DEEPSEEK_CHAT_VERSION, "");
+export const deepseekChatEncoderV2: RequestEncoder = deepseekChat(2, "\n\n");

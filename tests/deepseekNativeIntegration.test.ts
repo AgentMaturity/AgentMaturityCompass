@@ -159,7 +159,7 @@ describe("native DeepSeek signed runtime integration (authored; not live accepta
       name: "fs.read", providerWireName: wireName, arguments: rawArguments }]);
     const row = h.session.readEvents().find(event => event.event_type === "tool/call")!;
     expect(JSON.parse(row.meta_json)).toMatchObject({ toolName: "fs.read", toolCallId: "call-read",
-      providerName: { version: 1, wireName, headerEventId: first.headerEventId, encoderId: "deepseek-chat", encoderVersion: 1 } });
+      providerName: { version: 1, wireName, headerEventId: first.headerEventId, encoderId: "deepseek-chat", encoderVersion: 2 } });
     const payload = readEventPayload(h.workspace, row);
     expect(payload.status).toBe("ok");
     if (payload.status !== "ok") throw new Error("Tool arguments unavailable");

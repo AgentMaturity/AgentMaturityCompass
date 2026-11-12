@@ -36,7 +36,8 @@ existing `/v1/chat/completions` envelope, with `stream:true` and
 
 ## Versioned native integration
 
-The actual `openaiAdapter` now selects **`openai-chat@4`**. The new encoder is in
+The actual `openaiAdapter` now selects **`openai-chat@6`**: version4 with a text-only user message's text parts
+separated by a blank line; image messages encode exactly as version4. Version4 is in
 the live built-in registry and the same default registry used by cold derivation.
 The public LLM barrel exports `openaiChatEncoderV4`; existing root and native SDK
 barrels continue through that public LLM surface. The exact version4 tool-binding

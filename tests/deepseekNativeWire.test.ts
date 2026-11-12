@@ -401,7 +401,8 @@ describe("DeepSeek integration boundary (unexecuted)", () => {
     expect(() => assertRequiredCapabilities(route.capabilities, ["text-input", "thinking-replay", "tool-replay"])).not.toThrow();
     expect(new RequestEncoderRegistry(BUILT_IN_REQUEST_ENCODERS).get("deepseek-chat", 1)).toBe(deepseekChatEncoder);
     expect(usesProviderToolNames("deepseek-chat", 1)).toBe(true);
-    for (const version of [0, 2, 100]) {
+    expect(usesProviderToolNames("deepseek-chat", 2)).toBe(true);
+    for (const version of [0, 3, 100]) {
       expect(usesProviderToolNames("deepseek-chat", version)).toBe(false);
       expect(new RequestEncoderRegistry(BUILT_IN_REQUEST_ENCODERS).get("deepseek-chat", version)).toBeNull();
     }

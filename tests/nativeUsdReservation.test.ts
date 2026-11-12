@@ -182,7 +182,7 @@ describe("signed native prospective USD admission", () => {
     expect(() => reserve(request())).toThrow(/USD.*unknown/i);
   });
   it("passes the actual dispatch through the runtime and retains token-only response reservations", async () => {
-    policy([{ ...bound(), encoderVersion: 4 }]);
+    policy([{ ...bound(), encoderVersion: 6 }]);
     const prompt = session.recordSystemPrompt("USD test");
     session.startTurn({ trigger: "user" }); session.recordUserMessage("hi"); session.startStep();
     const upstream = stubUpstream([() => okStream([

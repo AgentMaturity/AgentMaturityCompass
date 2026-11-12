@@ -17,7 +17,7 @@ import type { CredentialsService } from "../src/credentials/credentialsService.j
 
 const protocols = [
   { id: "anthropic-messages", adapter: anthropicAdapter, previous: 4, version: 5, params: { max_tokens: 64, stream: true } },
-  { id: "openai-chat", adapter: openaiAdapter, previous: 4, version: 5, params: { max_tokens: 64 } },
+  { id: "openai-chat", adapter: openaiAdapter, previous: 6, version: 7, params: { max_tokens: 64 } },
   { id: "openai-responses", adapter: openaiResponsesAdapter, previous: 3, version: 4, params: { max_output_tokens: 64 } }
 ] as const;
 const REQUEST: EncodableRequest = {
