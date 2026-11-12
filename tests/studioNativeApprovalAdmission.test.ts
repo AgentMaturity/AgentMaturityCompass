@@ -7,7 +7,7 @@ import { initWorkspace } from "../src/workspace.js";
 import { addUser, createSession, createTrackedSession, initUsersConfig } from "../src/auth/authApi.js";
 import { createApprovalForIntent } from "../src/approvals/approvalEngine.js";
 import { getApprovalInboxItem } from "../src/approvals/approvalInbox.js";
-import { listApprovalDecisions } from "../src/approvals/approvalChainStore.js";
+import { approvalRequestBindingDigest, listApprovalDecisions, loadApprovalRequestRecord } from "../src/approvals/approvalChainStore.js";
 import { decideApprovalInStudio } from "../src/approvals/approvalStudioService.js";
 import { startStudioApiServer } from "../src/studio/studioServer.js";
 import { nativeCsrfTokenForSession, NATIVE_CSRF_HEADER, NATIVE_INTENT_HEADER, NATIVE_INTENT_VALUE } from "../src/studio/nativeAdmission.js";
@@ -115,6 +115,24 @@ describe("actual Studio approval signing requires authenticated browser authorit
     expect(writeAudit.mock.calls.every(([entry]) => entry.auditType === "APPROVAL_QUORUM_FAILED")).toBe(true);
     expect(listApprovalDecisions(p.selection)).toHaveLength(1);
     expect(getApprovalInboxItem(p.selection).quorum.received).toBe(1);
+  });
+
+  it("binds an inbox decision to the digest the reviewer was shown; a stale digest records nothing; the admin token stays unbound", async () => {
+    const p = pending();
+    const shown = getApprovalInboxItem(p.selection).requestDigestSha256;
+    const stale = await post(`/approvals/requests/${p.approvalRequestId}/decide`, owner, {}, { decision: "APPROVE_EXECUTE", reason: "Reviewed.", expectedRequestDigestSha256: "0".repeat(64) });
+    expect(stale.status).toBe(409); expect(listApprovalDecisions(p.selection)).toEqual([]);
+    const bound = await post(`/approvals/requests/${p.approvalRequestId}/decide`, owner, {}, { decision: "APPROVE_EXECUTE", reason: "Reviewed.", expectedRequestDigestSha256: shown });
+    expect(bound.status).toBe(200);
+    expect(listApprovalDecisions(p.selection)[0]?.requestDigestSha256).toBe(approvalRequestBindingDigest(loadApprovalRequestRecord({ ...p.selection, requireValidSignature: true })));
+    expect(getApprovalInboxItem(p.selection).chainIntegrity.valid).toBe(true);
+
+    const q = pending();
+    const admin = await fetch(`${origin}/approvals/requests/${q.approvalRequestId}/decide`, { method: "POST",
+      headers: { "content-type": "application/json", "x-amc-admin-token": "approval-fixture-admin", [NATIVE_INTENT_HEADER]: NATIVE_INTENT_VALUE },
+      body: JSON.stringify({ decision: "APPROVE_EXECUTE", reason: "Reviewed.", expectedRequestDigestSha256: getApprovalInboxItem(q.selection).requestDigestSha256 }) });
+    expect(admin.status).toBe(200);
+    expect(listApprovalDecisions(q.selection)[0]?.requestDigestSha256).toBeUndefined();
   });
 
   it("denies approval signing in read-only mode even to an explicit bootstrap admin", async () => {

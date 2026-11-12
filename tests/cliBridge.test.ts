@@ -25,6 +25,26 @@ describe("CLI Bridge", () => {
       expect(validateCliExec({ command: "down" })).toContain("confirm:true");
     });
 
+    it("matches dangerous and interactive commands on the argv that runs, not the raw string", () => {
+      for (const command of ["vault  seal", "vault\tseal", '"vault" seal', "'vault' 'seal'", "--json vault seal", "vault --json seal", "amc  vault   seal"]) {
+        expect(validateCliExec({ command }), command).toContain("confirm:true");
+        expect(validateCliExec({ command, confirm: true }), command).toBeNull();
+      }
+      expect(validateCliExec({ command: '"quickscore"' })).toContain("cannot run headless");
+      expect(validateCliExec({ command: "--json  host   init" })).toContain("cannot run headless");
+      expect(validateCliExec({ command: "download-report" })).toBeNull();
+      expect(validateCliExec({ command: 'agent-loop run "improve the setup"' })).toBeNull();
+      expect(validateCliExec({ command: "--agent default quickscore" })).toContain("cannot run headless");
+    });
+
+    it("applies both lists to args too, and refuses an args key that is not an option name", () => {
+      expect(validateCliExec({ command: "--no-color", args: { json: "down" } })).toContain("confirm:true");
+      expect(validateCliExec({ command: "--no-color", args: { json: "quickscore" } })).toContain("cannot run headless");
+      expect(validateCliExec({ command: "--json", args: { "--": "down" } })).toContain("not an option name");
+      expect(validateCliExec({ command: "status", args: { "": "down" } })).toContain("not an option name");
+      expect(validateCliExec({ command: "score", args: { agent: "default", "--tier": "quick" } })).toBeNull();
+    });
+
     it("allows dangerous commands with confirm", () => {
       expect(validateCliExec({ command: "vault seal", confirm: true })).toBeNull();
       expect(validateCliExec({ command: "down", confirm: true })).toBeNull();

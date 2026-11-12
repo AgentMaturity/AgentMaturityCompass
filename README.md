@@ -955,7 +955,7 @@ amc config profile prod
 ```
 
 Current MVP behavior:
-- `dev` → shared trust boundary, proxy env enabled
+- `dev` → isolated trust boundary, proxy env enabled
 - `ci` → isolated trust boundary, proxy env enabled
 - `prod` → isolated trust boundary, proxy env disabled
 - explicit `--trust-boundary` still overrides the profile when you need it

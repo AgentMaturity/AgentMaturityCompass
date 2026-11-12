@@ -7,7 +7,10 @@ import {
   createScopedExceptionAnswerer, issueScopedException, requestScopedException, revokeScopedException, scopedExceptionStatus
 } from "../../src/governor/scopedExceptions.js";
 import { decideApprovalForIntent } from "../../src/approvals/approvalEngine.js";
-import { AGENT, AUDITOR, cleanupGovernanceFixtures, CONTROL, decideBound, governanceFixture, issueRefundException, OWNER, planWithControl, REFUND, requesterSession } from "./governanceFixture.js";
+import { getApprovalInboxItem } from "../../src/approvals/approvalInbox.js";
+import { decideApprovalInStudio } from "../../src/approvals/approvalStudioService.js";
+import { AGENT, AUDITOR, cleanupGovernanceFixtures, CONTROL, decideBound, governanceFixture, issueRefundException, loginAs, OWNER, planWithControl, REFUND, requesterSession } from "./governanceFixture.js";
+import { listApprovalDecisions } from "../../src/approvals/approvalChainStore.js";
 
 /**
  * P2-24 scoped exceptions on real signed records, real approval requests with bound decisions, and the real tool
@@ -178,5 +181,53 @@ describe("P2-24 regulated --approval-exception answerer", () => {
     expect(await ask("150")).toBeNull();
     await revokeScopedException(f.workspace, exception.exceptionId, "ended", OWNER.id);
     expect(await ask("80")).toBeNull();
+  });
+});
+
+describe("a scoped exception approved in the Studio inbox", () => {
+  async function requested(workspace: string) {
+    const now = Date.now();
+    return requestScopedException(workspace, { control: { controlId: CONTROL, controlVersion: "1.0.0" },
+      scope: { agentIds: [AGENT], toolNames: [REFUND], actionClasses: ["FINANCIAL"], resourceIds: null, maxAmount: { value: "100.00", currency: "USD" } },
+      window: { notBefore: new Date(now - 1000).toISOString(), notAfter: new Date(now + 3600_000).toISOString() },
+      reason: "Refunds under 100 USD during the fixture", compensatingControls: ["daily refund reconciliation"],
+      sessionTokenFile: requesterSession(workspace).tokenFile });
+  }
+  // Reviewers are real users.yaml users, as a Studio session's are.
+  const reviewers = (workspace: string) => [loginAs(workspace, "inbox-owner", ["OWNER"]), loginAs(workspace, "inbox-auditor", ["AUDITOR"])]
+    .map((user, i) => ({ id: user.userId, name: user.username, role: (["OWNER", "AUDITOR"] as const)[i]! }));
+  const decide = (workspace: string, approvalRequestId: string, reviewer: { id: string; name: string; role: "OWNER" | "AUDITOR" }, digest?: string,
+    authSource: "LOCAL_USER" | "WORKSPACE_ROUTER" = "LOCAL_USER") =>
+    decideApprovalInStudio({ workspace, agentId: AGENT, approvalRequestId, actor: { isAdmin: false, username: reviewer.name, userId: reviewer.id, roles: [reviewer.role], authSource },
+      input: { decision: "APPROVE_EXECUTE", reason: "Reviewed the exact request", ...(digest ? { expectedRequestDigestSha256: digest } : {}) },
+      requireExplicitDecision: true, writeAudit: () => ({ eventId: "fixture-audit", receiptId: "fixture-receipt" }) });
+
+  test("decisions carrying the digest the inbox row showed are bound and the exception issues", async () => {
+    const f = governanceFixture();
+    const { draft, approval } = await requested(f.workspace);
+    for (const reviewer of reviewers(f.workspace)) {
+      const shown = getApprovalInboxItem({ workspace: f.workspace, agentId: AGENT, approvalRequestId: approval.approvalRequestId }).requestDigestSha256;
+      await decide(f.workspace, approval.approvalRequestId, reviewer, shown);
+    }
+    await issueScopedException(f.workspace, draft, approval);
+    expect((await f.execute()).denied).toBeNull();
+  });
+
+  test("decisions without a digest stay unbound and the exception does not issue", async () => {
+    const f = governanceFixture();
+    const { draft, approval } = await requested(f.workspace);
+    for (const reviewer of reviewers(f.workspace)) await decide(f.workspace, approval.approvalRequestId, reviewer);
+    await expect(issueScopedException(f.workspace, draft, approval)).rejects.toThrow(/approval_(missing|unbound)/);
+  });
+
+  test("a workspace-router session, or a user id users.yaml does not hold, is not bound even with the digest", async () => {
+    const f = governanceFixture();
+    const { draft, approval } = await requested(f.workspace);
+    const shown = () => getApprovalInboxItem({ workspace: f.workspace, agentId: AGENT, approvalRequestId: approval.approvalRequestId }).requestDigestSha256;
+    const [owner] = reviewers(f.workspace);
+    await decide(f.workspace, approval.approvalRequestId, owner!, shown(), "WORKSPACE_ROUTER");
+    await decide(f.workspace, approval.approvalRequestId, { id: "host-user-1", name: "host-auditor", role: "AUDITOR" }, shown());
+    expect(listApprovalDecisions({ workspace: f.workspace, agentId: AGENT, approvalRequestId: approval.approvalRequestId }).map((row) => row.requestDigestSha256)).toEqual([undefined, undefined]);
+    await expect(issueScopedException(f.workspace, draft, approval)).rejects.toThrow(/approval_(missing|unbound)/);
   });
 });

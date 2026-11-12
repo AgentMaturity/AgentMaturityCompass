@@ -1618,6 +1618,7 @@ async function renderApprovals() {
   const rows = selectedApprovalId
     ? await apiGet(`/approvals/requests/${encodeURIComponent(selectedApprovalId)}`).then((data) => [{
         ...data.request,
+        requestDigestSha256: data.requestDigestSha256,
         status: data.status,
         quorum: data.quorum,
         decisions: data.decisions || [],
@@ -1716,7 +1717,7 @@ async function renderApprovals() {
         ? row.decisions.map((d) => `${htmlEscape(d.username)}:${htmlEscape(d.decision)}`).join(", ") || "-"
         : Number(row.decisionCount || 0)}</td>
       <td>
-        ${canDecide ? `<div class="row" data-agent="${htmlEscape(row.agentId || agentId)}" data-intent="${htmlEscape(row.intentId || "")}">
+        ${canDecide ? `<div class="row" data-agent="${htmlEscape(row.agentId || agentId)}" data-intent="${htmlEscape(row.intentId || "")}" data-digest="${htmlEscape(row.requestDigestSha256 || "")}">
             <button data-approve="${htmlEscape(row.approvalRequestId)}">Approve</button>
             <button class="secondary" data-sim="${htmlEscape(row.approvalRequestId)}">Simulate</button>
             <button class="danger" data-deny="${htmlEscape(row.approvalRequestId)}">Deny</button>
@@ -1781,7 +1782,10 @@ async function renderApprovals() {
             button.disabled = false;
             return;
           }
-          await apiPost(`/approvals/requests/${encodeURIComponent(id)}/decide`, { decision, reason });
+          // Bound to the digest this row showed: a request that changed since refuses, and a signed-in decision counts
+          // wherever only bound decisions do (governance records).
+          const reviewedDigest = holder?.getAttribute("data-digest");
+          await apiPost(`/approvals/requests/${encodeURIComponent(id)}/decide`, { decision, reason, ...(reviewedDigest ? { expectedRequestDigestSha256: reviewedDigest } : {}) });
           await renderApprovals();
         } catch (error) {
           setStatus(`${errText(error)} Refresh the approval before another decision; nothing was retried automatically.`, true);
@@ -1810,6 +1814,11 @@ function selectedRoles(id) {
 }
 
 async function renderUsers() {
+  const roles = getCurrentUser()?.roles;
+  if (Array.isArray(roles) && !roles.includes("OWNER")) {
+    root.innerHTML = card("Users", `<p class="muted">The user list is visible to the OWNER role. You are signed in as ${htmlEscape(roles.join(", ") || "no role")}.</p>`);
+    return;
+  }
   const users = await apiGet("/users");
   root.innerHTML = `
     ${card("Users", `

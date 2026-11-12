@@ -6289,7 +6289,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           approvalRequestId: approvalId
         });
         json(res, 200, {
-          request: inbox.request,
+          request: inbox.request, requestDigestSha256: inbox.requestDigestSha256,
           decisions: inbox.decisions,
           quorum: inbox.quorum,
           status: inbox.status,
@@ -6337,7 +6337,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
               isAdmin: auth.isAdmin,
               username: auth.username ?? "admin-token",
               userId: auth.userId ?? "bootstrap-admin",
-              roles: [...auth.roles]
+              roles: [...auth.roles], authSource: auth.sessionAuthSource
             },
             input: parsedResult.data,
             requireExplicitDecision: Boolean(approvalRequestDecideMatch),

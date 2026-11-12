@@ -1,7 +1,9 @@
 import { z } from "zod";
+import { activeUserRecord } from "../auth/authApi.js";
 import type { UserRole } from "../auth/roles.js";
 import { recordApprovalDecisionMetric } from "../ops/metrics/metricsMiddleware.js";
 import {
+  approvalRequestBindingDigest,
   cancelApprovalRequest,
   countedApprovalDecisions,
   loadApprovalRequestRecord,
@@ -11,11 +13,15 @@ import { deliverApprovalLifecycle, type ApprovalDeliverySummary } from "./approv
 import { approvalStatusPayload, decideApprovalForIntent } from "./approvalEngine.js";
 import { getApprovalInboxItem } from "./approvalInbox.js";
 import { loadApprovalPolicy } from "./approvalPolicyEngine.js";
+import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 
 export const studioApprovalDecisionInputSchema = z.object({
   mode: z.enum(["SIMULATE", "EXECUTE"]).optional(),
   decision: z.enum(["APPROVE_EXECUTE", "APPROVE_SIMULATE", "DENY"]).optional(),
-  reason: z.string().trim().min(1).max(1_000).optional()
+  reason: z.string().trim().min(1).max(1_000).optional(),
+  /** The digest the reviewer was shown (the inbox row's requestDigestSha256, or the engine's binding digest). */
+  expectedRequestDigestSha256: z.string().regex(/^[a-f0-9]{64}$/).optional()
 }).strict();
 
 export const studioApprovalDenyInputSchema = z.object({
@@ -139,6 +145,8 @@ export async function decideApprovalInStudio(params: {
     /** Verified caller identity; older trusted local callers retain their username fallback. */
     userId?: string;
     roles: UserRole[];
+    /** How the session signed in; only a LOCAL_USER decision is bound to a reviewed inbox digest. */
+    authSource?: "LOCAL_USER" | "WORKSPACE_ROUTER";
   };
   input: StudioApprovalDecisionInput;
   requireExplicitDecision: boolean;
@@ -154,7 +162,20 @@ export async function decideApprovalInStudio(params: {
   approvalDelivery: ApprovalDeliverySummary;
   approvalEvent: "APPROVAL_DECISION_RECORDED" | "APPROVAL_QUORUM_MET" | "APPROVAL_DENIED";
 }> {
-  const bound = params.expectedRequestDigestSha256 !== undefined;
+  // The inbox path: a reviewed digest that no longer names this request refuses. The decision of a signed-in, active
+  // users.yaml user then binds the engine's digest, so consumers that count only bound decisions (governance records,
+  // src/governor/boundRecords.ts) count it, as they count `amc approvals decide --session-token-file`. The admin token
+  // names no person and a workspace-router session is not checked against users.yaml: both stay unbound, as before.
+  let boundDigest = params.expectedRequestDigestSha256;
+  const reviewed = params.input.expectedRequestDigestSha256;
+  if (boundDigest === undefined && reviewed !== undefined) {
+    const request = loadApprovalRequestRecord({ workspace: params.workspace, agentId: params.agentId, approvalRequestId: params.approvalRequestId, requireValidSignature: true });
+    const binding = approvalRequestBindingDigest(request);
+    if (reviewed !== binding && reviewed !== sha256Hex(canonicalize(request))) throw new ApprovalStudioError(409, "approval request changed after review");
+    if (!params.actor.isAdmin && params.actor.authSource === "LOCAL_USER" && params.actor.userId
+      && activeUserRecord(params.workspace, params.actor.userId) !== null) boundDigest = binding;
+  }
+  const bound = boundDigest !== undefined;
   if (bound && (!params.actor.userId || params.actor.roles.length === 0)) {
     throw new ApprovalStudioError(403, "a bound decision needs the reviewer's verified user id and live roles");
   }
@@ -247,7 +268,7 @@ export async function decideApprovalInStudio(params: {
       userRoles: bound || params.actor.roles.length > 0 ? params.actor.roles : ["OWNER"],
       // The route resolved this actor from the signed-in session or the admin token (requireRouteRoles).
       reviewerAuthentication: "authenticated",
-      ...(bound ? { expectedRequestDigestSha256: params.expectedRequestDigestSha256 } : {})
+      ...(bound ? { expectedRequestDigestSha256: boundDigest } : {})
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

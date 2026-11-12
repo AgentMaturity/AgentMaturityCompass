@@ -140,7 +140,7 @@ export function applyAMCConfigProfile(profile: AMCConfigProfileName, baseConfig?
   };
 
   if (profile === "dev") {
-    next.security.trustBoundaryMode = "shared";
+    next.security.trustBoundaryMode = "isolated"; // as amc init and amc up write; shared marks every run INVALID
     next.supervise.includeProxyEnv = true;
     next.supervise.extraEnv.AMC_ENV = "dev";
   } else if (profile === "ci") {
