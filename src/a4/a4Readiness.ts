@@ -723,14 +723,22 @@ export function readinessHeadline(state: Pick<A4ReadinessState, "project">, quer
         ? (mandatory.some((candidate) => (candidate.id === "effects.failed" && candidate.status === "WAITING")
           || (candidate.id === "hold.none" && candidate.status === "NOT_EVALUATED")) ? "WAITING" : "COMPLETE")
         : mandatory.some((candidate) => (candidate.status === "WAITING" || candidate.status === "NOT_EVALUATED") && candidate.acknowledged === null) ? "WAITING" : "READY";
-  const named = mandatory.find((candidate) => candidate.status !== "READY" && candidate.status !== "COMPLETE" && candidate.nextAction !== null)?.nextAction ?? null;
-  if (named !== null || state.project.stage !== query.stage || status === "COMPLETE") return { status, nextAction: named };
+  if (status === "COMPLETE") return { status, nextAction: null };
+  // An acknowledged item no longer holds the stage (allowedFor), so its own action is not the next one.
+  const named = mandatory.find((candidate) => candidate.status !== "READY" && candidate.status !== "COMPLETE" && candidate.acknowledged === null
+    && candidate.nextAction !== null)?.nextAction ?? null;
+  if (named !== null || state.project.stage !== query.stage) return { status, nextAction: named };
   if (status === "ON_HOLD") return { status, nextAction: { label: "On hold: an owner resumes the project" } };
   const gateName = state.project.step === "proposed" ? "direction" : state.project.step === "reviewed" ? "completion" : null;
   const gate = gateName === null ? null : gates[gateName];
   // A denied gate blocks through its own item (GATE_DENIED); unless another item blocks too, the way back is a new revision.
   if (gate?.status === "DENIED" && blocked.every((candidate) => GATE_DERIVED.has(candidate.id))) return { status, nextAction: { label: `The ${gateName} gate was denied on this revision. ${REDO_PROPOSAL}` } };
   if (status === "BLOCKED") return { status, nextAction: { label: `Blocked by ${blocked.map((candidate) => candidate.id).join(", ") || "store.integrity"}: see each item's reason codes` } };
+  // A completion that runs an effect is consumed only once an owner opened its effect gate and the effect request has its
+  // approvals (complete answers 409 EFFECT_GATE_NOT_OPEN / EFFECT_QUORUM_INSUFFICIENT); the stage's advisory effect item waits until then.
+  const effect = gateName === "completion" && gate?.status === "QUORUM_MET" ? items.find((candidate) => candidate.status === "WAITING"
+    && candidate.reasonCodes.some((code) => code === "EFFECT_GATE_NOT_OPEN" || code.startsWith("APPROVAL_STATUS:"))) : undefined;
+  if (effect !== undefined) return { status: status === "READY" ? "WAITING" : status, nextAction: effect.nextAction ?? { label: `Approve the ${effect.id} request` } };
   if (gate?.status === "QUORUM_MET") return { status, nextAction: { label: `Complete the ${gateName} gate` } };
   if (gate?.status === "PENDING") return { status, nextAction: { label: `Approvers decide on the ${gateName} gate (${gate.approvals} of ${gate.required} approvals)` } };
   const label = STEP_NEXT[state.project.step];

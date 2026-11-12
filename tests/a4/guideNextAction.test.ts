@@ -95,6 +95,23 @@ describe("A-3: readinessHeadline", () => {
       .toEqual({ status: "COMPLETE", nextAction: null });
   });
 
+  // M6 (go-live smoke): readiness read READY and named "Complete the completion gate" while complete refused 409
+  // EFFECT_GATE_NOT_OPEN; a complete stage named an acknowledged item's action beside COMPLETE.
+  test("a completion gate with quorum waits on its stage's effect gate; a complete stage names nothing", () => {
+    const met = { status: "QUORUM_MET", approvals: 1, required: 1 } as unknown as A4GateStatus;
+    const effect = item("effect_gate", "WAITING", { mandatory: false, reasonCodes: ["EFFECT_GATE_NOT_OPEN"], nextAction: { label: "An owner opens the effect gate" } });
+    expect(readinessHeadline(state("reviewed"), query, [item("members.present", "READY"), effect], { direction: null, completion: met }))
+      .toEqual({ status: "WAITING", nextAction: { label: "An owner opens the effect gate" } });
+    const opened = item("effect_gate", "READY", { mandatory: false, reasonCodes: ["EFFECT_GATE_OPENED", "APPROVAL_STATUS:QUORUM_MET"] });
+    expect(readinessHeadline(state("reviewed"), query, [opened], { direction: null, completion: met }))
+      .toEqual({ status: "READY", nextAction: { label: "Complete the completion gate" } });
+    const consumed = { status: "CONSUMED" } as A4GateStatus;
+    const acked = item("plan_unresolved", "WAITING", { nextAction: { label: "Answer the missing facts" }, acknowledged: { by: "o" } as never });
+    expect(readinessHeadline(state("completion_approved"), query, [acked], { direction: consumed, completion: consumed }))
+      .toEqual({ status: "COMPLETE", nextAction: null });
+    expect(readinessHeadline(state("reviewed"), query, [acked], noGates).nextAction).toEqual({ label: "Request the completion gate" });
+  });
+
   test("a held project says who resumes it; a denied gate says a new revision is needed unless another item blocks", () => {
     const held = { project: { stage: "assemble", step: "built", hold: 1 } } as Parameters<typeof readinessHeadline>[0];
     expect(readinessHeadline(held, query, [], noGates).nextAction).toEqual({ label: "On hold: an owner resumes the project" });
