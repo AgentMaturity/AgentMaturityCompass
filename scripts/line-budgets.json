@@ -54,6 +54,7 @@
     "src/api/scoreRouter.ts": 893,
     "src/observability/otelExporter.ts": 893,
     "src/bridge/hookIngress.ts": 884,
-    "src/score/predictiveValidity.ts": 854
+    "src/score/predictiveValidity.ts": 854,
+    "src/cli-agent-commands.ts": 809
   }
 }

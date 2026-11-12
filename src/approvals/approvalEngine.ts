@@ -370,7 +370,7 @@ export async function createApprovalForIntentAsync(input: ApprovalRequestInput, 
   }
 }
 
-export const SELF_ASSERTED_EXECUTE_REFUSAL =
+const SELF_ASSERTED_EXECUTE_REFUSAL =
   "An EXECUTE approval needs an authenticated reviewer; --username/--roles alone are self-asserted and are refused. " +
   "Log in with `amc approvals login --username <reviewer> --token-file <private-file>`, inspect with `amc approvals show`, " +
   "then approve with --session-token-file <private-file> --expect-request-digest <sha256>. No decision was recorded.";

@@ -4,7 +4,7 @@ import type { RequestEncoder } from "./requestEncoder.js";
 import type { EncodableMessage } from "./requestSpec.js";
 
 /** The separator between a text-only user message's text parts in new Chat-style requests. */
-export const USER_TEXT_PART_SEPARATOR = "\n\n";
+const USER_TEXT_PART_SEPARATOR = "\n\n";
 
 /**
  * Collapse a text-only user message's nonempty text parts into one, joined by a blank line. A user turn carries the
@@ -12,7 +12,7 @@ export const USER_TEXT_PART_SEPARATOR = "\n\n";
  * (not a content-part array) is kept because several OpenAI-compatible servers accept only string user content.
  * Image messages already encode each part as its own content element and are left untouched.
  */
-export function separateUserTextParts(message: EncodableMessage): EncodableMessage {
+function separateUserTextParts(message: EncodableMessage): EncodableMessage {
   if (message.role !== "user" || message.parts.some(part => part.kind !== "text")) return message;
   const texts = message.parts.filter(part => part.kind === "text" && part.text.length > 0);
   if (texts.length < 2) return message;
