@@ -1,6 +1,7 @@
 /** AUTHORED UNEXECUTED / UNQUALIFIED. Actual selected Chat runtime and signed
  * sources, with only HTTP scripted. Never an installed-package or model claim.
  */
+import type { StreamChunk } from "../src/llm/streamChunk.js";
 import { spawn, spawnSync } from "node:child_process";
 import { mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
@@ -237,9 +238,14 @@ describe("native Chat signed-image encoder and runtime (not executed)", () => {
     const h = harness(openaiAdapter, [chatImageStream({ toolName: providerToolWireName("fs.write") })]);
     const tools = [{ name: "fs.read", description: "read", parameters: { type: "object" } }];
     const call = h.runtime.prepare({ ...h.spec, tools }); tools[0]!.name = "fs.write";
-    await expect(drain(call.stream())).rejects.toThrow();
+    // Smoke M-5: the unoffered alias arrives marked and unbound (the loop refuses it); it never binds to fs.write.
+    const seen: StreamChunk[] = []; for await (const chunk of call.stream()) seen.push(chunk);
+    const blocks = seen.flatMap(chunk => chunk.type === "block-end" && chunk.block.kind === "tool_use" ? [chunk.block] : []);
+    expect(blocks).toEqual([expect.objectContaining({ name: providerToolWireName("fs.write"), unoffered: true })]);
+    expect(blocks[0]).not.toHaveProperty("providerWireName");
     expect(JSON.parse(h.sent[0]!.body.toString("utf8")).tools[0].function.name).toBe(providerToolWireName("fs.read"));
-    expect(h.session.readEvents().some(row => row.event_type === "tool/call")).toBe(false); h.close("error");
+    const rows = h.session.readEvents().filter(row => row.event_type === "tool/call");
+    expect(rows.map(row => JSON.parse(row.meta_json).providerName)).toEqual([undefined]); h.close("error");
   });
   test.each([1, 2, 3])("historical Chat v%s refuses image source before header and HTTP", encoderVersion => {
     const h = harness({ ...openaiAdapter, encoderVersion });
