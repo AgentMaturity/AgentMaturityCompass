@@ -27,15 +27,8 @@ const table = (head, rows, empty) => (rows.length ? `<div class="scroll"><table>
   <tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>`).join("")}</tbody></table></div>` : `<p class="muted">${esc(empty)}</p>`);
 const day = (iso) => esc(String(iso ?? "").slice(0, 10));
 
-/** Ask, Understand and Explain: the generic card with Aspire's copy, the answers to confirm, and what AMC understood. */
+/** Ask, Understand and Explain: the generic card (with the stale answers to confirm) in Aspire's copy, and what AMC understood. */
 function renderConversation(ctx) {
-  const ask = itemOf(ctx, "ask_complete");
-  const stale = list(ask?.reasonCodes).filter((code) => String(code).startsWith("ANSWER_STALE:")).map((code) => String(code).slice("ANSWER_STALE:".length));
-  const offer = view.stepOffer(ctx.allowed.ask, ctx, "answers");
-  const banner = stale.length ? `<div class="card banner"><p>${stale.length} answer(s) need confirming because an answer they depend on changed:</p>
-    <ul class="a4-rows">${stale.map((id) => `<li><code>${esc(id)}</code>: ${esc(view.answerText(ctx.answers, id))}
-      ${view.actionButton("Confirm", "confirm-answer", offer, `data-question="${esc(id)}"`)}</li>`).join("")}</ul>
-    <p class="muted">Or change them under "Change my answers".</p></div>` : "";
   const spec = specOf(ctx);
   const reflection = isObject(spec.understanding?.reflection) ? spec.understanding.reflection : null;
   const understood = reflection ? `<h4>What AMC understood (r${esc(ctx.stageRevision?.revisionNo)})</h4>
@@ -49,7 +42,13 @@ function renderConversation(ctx) {
   const explained = facts.length ? `<h4>Explanation</h4>${["novice", "practitioner", "expert"].map((name) => `<details data-a4-open="explain-${name}"${
     name === level ? " open data-a4-default-open" : ""}><summary>${esc(name)}</summary><ul class="a4-rows">${facts.map((fact) => `<li>${esc(fact[name])}${
     fact.dataStatus ? ` <code>${esc(fact.dataStatus)}</code>` : ""} <span class="muted">(${list(fact.sources).map(esc).join(", ")})</span></li>`).join("")}</ul></details>`).join("")}` : "";
-  return `${banner}${view.renderConversation(ctx).replaceAll(view.NO_PRODUCER, PRODUCED)}${understood}${explained}`;
+  // The expertise was chosen on the create form: Understand fills it in from the project's creation profile (source
+  // "inferred"), so Ask does not ask for it a second time while it is unanswered.
+  const answered = new Set(list(ctx.answers).map((answer) => answer.questionId));
+  const questions = ctx.questions.filter((question) => question.id !== "expertise" || answered.has("expertise"));
+  const note = questions.length < ctx.questions.length
+    ? "<p class=\"muted\">Your expertise comes from the project's create form: Understand fills it in for you to confirm or change.</p>" : "";
+  return `${view.renderConversation({ ...ctx, questions }).replaceAll(view.NO_PRODUCER, PRODUCED)}${note}${understood}${explained}`;
 }
 
 function renderBuild(ctx) {

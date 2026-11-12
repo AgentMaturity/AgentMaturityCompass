@@ -134,8 +134,24 @@ const STEP_FROM = { answers: null, understand: ["asked"], explain: ["understood"
 const refuse = (offer, ...codes) => ({ allowed: false, reasonCodes: [...new Set([...(offer?.reasonCodes ?? []), ...codes])] });
 export function stepOffer(offer, ctx, route) {
   const from = STEP_FROM[route];
-  if (ctx.project.stage === ctx.stage && (from === null || from.includes(ctx.project.step))) return offer;
-  return refuse(offer, "A4_STEP_ORDER");
+  if (ctx.project.stage !== ctx.stage || (from !== null && !from.includes(ctx.project.step))) return refuse(offer, "A4_STEP_ORDER");
+  return (route === "propose" && offer?.allowed === true && askHold(ctx)) || offer;
+}
+/**
+ * The questions ask_complete lists (P1-59 askGapCodes): unanswered, stale (an answer they depend on changed since) and
+ * invalid ones. Studio refuses Propose while any is listed (409 A4_NOT_READY).
+ */
+export function askGaps(readiness) {
+  const codes = (readiness?.items ?? []).find((item) => item.id === "ask_complete")?.reasonCodes ?? [];
+  const of = (prefix) => codes.filter((code) => String(code).startsWith(prefix)).map((code) => String(code).slice(prefix.length));
+  return { missing: of("ANSWER_MISSING:"), stale: of("ANSWER_STALE:"), invalid: of("ANSWER_INVALID:") };
+}
+const STALE_FIRST = "Confirm the answers marked \"needs confirming\" under Ask first";
+function askHold(ctx) {
+  const { missing, stale, invalid } = askGaps(ctx.readiness);
+  const parts = [stale.length ? `confirm or change ${stale.join(", ")} (an answer they depend on changed)` : "",
+    missing.length ? `answer ${missing.join(", ")}` : "", invalid.length ? `correct ${invalid.join(", ")}` : ""].filter(Boolean);
+  return parts.length ? held(`Under Ask, ${parts.join("; ")} before proposing.`) : null;
 }
 /** Studio's content cap on Understand, Explain, Build and Review (P1-57, src/a4/a4RouterStages.ts). */
 const CONTENT_MAX = 65_536;
@@ -206,7 +222,17 @@ export function renderConversation(ctx) {
     answer.source === "user" ? "" : ` ${actionButton("Confirm", "confirm-answer", ask, `data-question="${esc(answer.questionId)}"`)}`}</li>`;
   const notMine = answers.filter((answer) => answer.source !== "user").length;
   const change = questions.filter((question) => answered.has(question.id));
-  return `<h4>Ask</h4>
+  // An answer goes stale when one it depends on changes (Understand carrying a value from an earlier stage, too). Saving
+  // the same value again is what confirms it: Studio records it on a new revision with the new dependency digest.
+  const stale = askGaps(ctx.readiness).stale.filter((id) => answered.has(id));
+  const prompt = (id) => questions.find((question) => question.id === id)?.prompt ?? id;
+  const staleBanner = stale.length ? `<div class="card banner"><p>${stale.length} answer(s) need confirming because an answer they depend on
+    changed. Confirming records a new revision and returns this stage to Ask, so Understand runs again before you confirm it.</p>
+    <ul class="a4-rows">${stale.map((id) => `<li>${esc(prompt(id))} <code>${esc(id)}</code>: ${esc(answerText(answers, id))}
+      ${actionButton("Still correct — confirm", "confirm-answer", ask, `data-question="${esc(id)}"`)}</li>`).join("")}</ul>
+    <p class="muted">Or change them under "Change my answers".</p></div>` : "";
+  const confirmOffer = stale.length && understand?.allowed === true ? held(`${STALE_FIRST}: confirming them restarts this stage at Ask.`) : understand;
+  return `${staleBanner}<h4>Ask</h4>
     ${answers.length ? `<details data-a4-open="answers"><summary>${answers.length} answered (${notMine} carried or inferred);
       ${open.length} still need an answer</summary>${list(answers.map(answerRow), "")}</details>` : ""}
     <form class="a4-form" data-a4-answers>${open.map(field).join("")}${change.length
@@ -219,7 +245,7 @@ export function renderConversation(ctx) {
     <label>What this stage should achieve, in your words <textarea name="understanding" rows="3" maxlength="${CONTENT_MAX}"></textarea></label>
     <p class="muted">${NO_PRODUCER} ${RETAINED}</p>
     <div class="row wrap">${actionButton("Run Understand", "understand", understand)}</div>
-    ${reflectionHtml(reflection, understand)}
+    ${reflectionHtml(reflection, confirmOffer)}
     <h4>Explain</h4>
     <label>Your explanation <textarea name="explanation" rows="3" maxlength="${CONTENT_MAX}"></textarea></label>
     <p class="muted">${NO_PRODUCER} ${RETAINED}</p>
