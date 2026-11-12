@@ -39,7 +39,7 @@ export async function renderStandardPage(params) {
       "Open Compass Standard",
       `
       <div class="row wrap">
-        <button id="standardGenerateBtn">Generate Schemas</button>
+        <button id="standardGenerateBtn" data-roles="OWNER">Generate Schemas</button>
         <button id="standardVerifyBtn" class="secondary">Verify Bundle</button>
       </div>
       <div class="muted">bundle ok=${esc(String(Boolean(schemas?.verify?.ok)))} schemas=${esc(String(rows.length))}</div>
@@ -58,17 +58,29 @@ export async function renderStandardPage(params) {
     renderVerifyPanel()
   ].join("");
 
-  document.getElementById("standardGenerateBtn")?.addEventListener("click", async () => {
-    const out = await params.apiPost("/standard/generate", {});
+  const show = (out, bad = false) => {
     const node = document.getElementById("standardOut");
-    if (node) node.textContent = JSON.stringify(out, null, 2);
-    await renderStandardPage(params);
+    if (!node) return;
+    node.className = `scroll ${bad ? "status-bad" : "muted"}`;
+    node.textContent = typeof out === "string" ? out : JSON.stringify(out, null, 2);
+  };
+  const failure = (error) => `${error?.status === 403 ? "Not permitted: " : ""}${String(error?.message || error)}`;
+
+  document.getElementById("standardGenerateBtn")?.addEventListener("click", async () => {
+    try {
+      await params.apiPost("/standard/generate", {});
+      await renderStandardPage(params);
+    } catch (error) {
+      show(failure(error), true);
+    }
   });
 
   document.getElementById("standardVerifyBtn")?.addEventListener("click", async () => {
-    const out = await params.apiGet("/standard/verify");
-    const node = document.getElementById("standardOut");
-    if (node) node.textContent = JSON.stringify(out, null, 2);
+    try {
+      show(await params.apiGet("/standard/verify"));
+    } catch (error) {
+      show(failure(error), true);
+    }
   });
 
   document.getElementById("standardValidateBtn")?.addEventListener("click", async () => {

@@ -1,4 +1,4 @@
-import { apiGet, apiPost, whoami } from "./api.js";
+import { apiGet, apiPost, applyRoleGates, whoami } from "./api.js";
 import { renderEqualizerSliders, collectEqualizerTargets } from "./components/equalizerSliders.js";
 
 function esc(value) {
@@ -58,7 +58,7 @@ async function main() {
       </p>
       <div class="row wrap">
         <input id="targetsReason" placeholder="Reason for target update" />
-        <button id="targetsApplyBtn">Apply Targets</button>
+        <button id="targetsApplyBtn" data-roles="OWNER">Apply Targets</button>
         <button id="targetsExcellenceBtn" class="secondary">Set Excellence (All 5)</button>
       </div>
       <div id="equalizerRows" class="scroll" style="max-height:520px;"></div>
@@ -78,6 +78,7 @@ async function main() {
     });
   });
 
+  applyRoleGates(root);
   document.getElementById("targetsApplyBtn")?.addEventListener("click", async () => {
     const reason = document.getElementById("targetsReason")?.value?.trim() || "";
     if (!reason) {
@@ -98,7 +99,7 @@ async function main() {
       });
       out.textContent = JSON.stringify(applied, null, 2);
     } catch (error) {
-      out.textContent = String(error);
+      out.textContent = `${error?.status === 403 ? "Not permitted: " : ""}${error?.message || error}`;
     }
   });
 }

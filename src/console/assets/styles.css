@@ -1050,6 +1050,11 @@ button.danger {
   color: var(--danger);
 }
 
+.action-error {
+  flex-basis: 100%;
+  margin: 6px 0 0;
+}
+
 .row {
   display: flex;
   gap: 8px;
