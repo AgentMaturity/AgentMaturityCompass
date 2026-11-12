@@ -3676,7 +3676,6 @@ async function renderPage() {
         ${jsonDetails(`Revocation list signature: ${leaseState.revocationSignatureValid ? "valid" : `INVALID${leaseState.revocationSignatureReason ? ` (${htmlEscape(leaseState.revocationSignatureReason)})` : ""}`} · ${Number(leaseState.revokedLeaseCount || 0)} revoked lease(s).`, leaseState)}
         <div class="row">
           <button id="issueLeaseBtn" data-roles="OWNER">Issue Lease For ${currentAgent()}</button>
-          <button id="logoutBtn" class="secondary">Logout</button>
         </div>
         <pre id="leaseOut" class="muted"></pre>
       `);
@@ -3690,11 +3689,6 @@ async function renderPage() {
           tpm: 200000
         });
         document.getElementById("leaseOut").textContent = `Lease token (copy once): ${issued.lease}`;
-      });
-      onAction(document.getElementById("logoutBtn"), "click", async () => {
-        await logout();
-        setAdminToken(null);
-        await renderPage();
       });
       return;
     }
