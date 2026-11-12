@@ -23,7 +23,7 @@ import { fileSha256 } from "./trust/signatureCheck.js";
 export function registerSessionCommands(program: Command): void {
   const session = program
     .command("session")
-    .description("Native signed sessions: inspect, compact, verify, replay and recover");
+    .description("Native signed sessions: inspect, compact, verify, replay and recover (list them with amc sessions list)");
 
   registerSessionCompactionCommands(session);
   registerSessionContinuityCommands(session);

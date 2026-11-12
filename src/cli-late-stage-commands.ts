@@ -1353,7 +1353,7 @@ export function registerLateStageCliCommands({
 
   sessionsViewCmd
     .command("list")
-    .description("List tracked sessions")
+    .description("List native agent-loop sessions (with resume hints) and observability sessions")
     .option("--agent <agentId>", "Agent ID")
     .option("--limit <n>", "Number of sessions", "20")
     .option("--sort <by>", "Sort: recent | quality | cost", "recent")
@@ -1367,8 +1367,14 @@ export function registerLateStageCliCommands({
         console.log(JSON.stringify(sessions, null, 2));
       } else {
         console.log(chalk.cyan(`\n📊 Sessions — ${agentId}\n`));
+        // Smoke M-6: native agent-loop sessions live in the session ledger, not the observability correlator.
+        const { renderNativeSessionList } = await import("./setup/nativeInteractiveNavigation.js");
+        const native = renderNativeSessionList(process.cwd(), agentId, parseInt(opts.limit, 10));
+        console.log(chalk.bold(`Native agent-loop sessions (${native.length === 0 ? "none" : "newest first"}):`));
+        for (const line of native) console.log(`  ${line}`);
+        console.log(chalk.bold("\nObservability sessions:"));
         if (sessions.length === 0) {
-          console.log(chalk.gray("No sessions tracked yet. Connect an observability provider with `amc watch connect`."));
+          console.log(chalk.gray("No observability sessions tracked yet. Connect an observability provider with `amc watch connect`."));
         }
         for (const s of sessions) {
           const icon = s.qualityScore >= 80 ? "✅" : s.qualityScore >= 50 ? "⚠️" : "❌";

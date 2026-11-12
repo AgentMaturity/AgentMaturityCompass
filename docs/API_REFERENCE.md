@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-11-09
+> Auto-generated from source on 2026-11-12
 
 ## Table of Contents
 
@@ -1104,7 +1104,7 @@ AMC provides 1,300 public CLI command paths in the live command inventory.
 | 1085 | `amc score task-horizon` | Score task-completion time horizon (METR-inspired) |
 | 1086 | `amc score tier` | Run tiered maturity assessment (quick/standard/deep) |
 | 1087 | `amc score transparency-log` | Score network transparency log (Merkle tree, inclusion proofs) |
-| 1088 | `amc session` | Native signed sessions: inspect, compact, verify, replay and recover |
+| 1088 | `amc session` | Native signed sessions: inspect, compact, verify, replay and recover (list them with amc sessions list) |
 | 1089 | `amc session anchor` | Anchor a closed session's root into the transparency log |
 | 1090 | `amc session compact` | List signed history origins, then apply an explicit native summary or drop without rewriting evidence |
 | 1091 | `amc session export` | Export a session for offline verification as an HTML viewer or a sealed JSON bundle |
@@ -1118,7 +1118,7 @@ AMC provides 1,300 public CLI command paths in the live command inventory.
 | 1099 | `amc session verify-export` | Verify an exported session offline against a pinned monitor key fingerprint |
 | 1100 | `amc session verify-proof` | Verify a session inclusion proof offline — needs only the bundle and a pinned fingerprint |
 | 1101 | `amc sessions` | View and analyze user sessions |
-| 1102 | `amc sessions list` | List tracked sessions |
+| 1102 | `amc sessions list` | List native agent-loop sessions (with resume hints) and observability sessions |
 | 1103 | `amc setup` | Setup wizard for the full-score path and Studio gateway |
 | 1104 | `amc shell` | Interactive AMC session — natural language + commands |
 | 1105 | `amc shield` | Threat detection and security scanning |
@@ -9965,7 +9965,7 @@ Verify a session inclusion proof offline — needs only the bundle and a pinned 
 
 #### `amc sessions list`
 
-List tracked sessions
+List native agent-loop sessions (with resume hints) and observability sessions
 
 
 | Option | Description |
