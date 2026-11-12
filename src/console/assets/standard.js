@@ -22,8 +22,12 @@ export async function renderStandardPage(params) {
     params.apiGet("/standard/schemas").catch(() => ({ schemas: [], verify: { ok: false, errors: ["standard schemas unavailable"] } })),
     params.apiGet("/status").catch(() => null)
   ]);
-  const selected = pickSchema(schemas?.schemas);
-  const selectedSchema = await params.apiGet(`/standard/schemas/${encodeURIComponent(selected)}`).catch(() => null);
+  // L3: ask for a schema only once one exists, and show the one picked from the list (?schema=).
+  const listed = Array.isArray(schemas?.schemas) ? schemas.schemas : [];
+  const requested = new URL(window.location.href).searchParams.get("schema");
+  const selected = listed.some((row) => row?.name === requested) ? requested : pickSchema(listed);
+  const selectedSchema = listed.length === 0 ? null
+    : await params.apiGet(`/standard/schemas/${encodeURIComponent(selected)}`).catch(() => null);
   const warnings = [];
   if (status?.passport?.policySignatureValid === false) {
     warnings.push("<div class='card status-bad'><strong>PASSPORT POLICY UNTRUSTED</strong></div>");
@@ -50,11 +54,12 @@ export async function renderStandardPage(params) {
       "Schema List",
       rows.length > 0
         ? `<table><thead><tr><th>Name</th><th>SHA256</th></tr></thead><tbody>${
-          rows.map((row) => `<tr><td><code>${esc(row.name)}</code></td><td><code>${esc(row.sha256)}</code></td></tr>`).join("")
+          rows.map((row) => `<tr><td><a href="?schema=${encodeURIComponent(row.name)}"${row.name === selected ? ' aria-current="true"' : ""}><code>${esc(row.name)}</code></a></td><td><code>${esc(row.sha256)}</code></td></tr>`).join("")
         }</tbody></table>`
         : "<div class='muted'>No schemas generated yet.</div>"
     ),
-    selectedSchema ? renderSchemaViewer(selectedSchema) : "<div class='card muted'>No schema selected.</div>",
+    selectedSchema ? renderSchemaViewer(selectedSchema)
+      : `<div class='card muted'>${rows.length === 0 ? "Generate the schemas to view one." : "Choose a schema from the list."}</div>`,
     renderVerifyPanel()
   ].join("");
 
