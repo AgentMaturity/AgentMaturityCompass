@@ -23,7 +23,7 @@ export function renderNativeSessionList(workspace: string, agentId: string, limi
   return summarizeNativeSessions(workspace, agentId).filter(row => row.source === "native" && row.agentId === agentId).slice(0, limit)
     .map(row => escapeTerminalControls(`${row.sessionId} · updated ${new Date(row.updatedAt).toISOString()} · ${row.state} · ${row.turns} turns · `
       + (row.canResume ? `resume: amc agent-loop chat --session ${row.sessionId} (with the original --provider/--model)`
-        : `inspect: amc session show ${row.sessionId}`)));
+        : `inspect: amc session show ${row.sessionId} · continue in a fork: amc agent-loop chat --fork-from ${row.sessionId}`)));
 }
 
 /** Re-read authenticated metadata after inspection/confirmation and again before dispatch. */

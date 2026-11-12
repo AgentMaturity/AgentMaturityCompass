@@ -83,7 +83,7 @@ it("smoke M-6: amc sessions list shows this agent's native sessions newest first
   const lines = renderNativeSessionList(workspace, "default", 20);
   expect(lines).toHaveLength(2);
   expect(lines[0]).toMatch(/^new-released · updated \d{4}-\d\d-\d\dT[^ ]+ · released · 1 turns · resume: amc agent-loop chat --session new-released /);
-  expect(lines[1]).toMatch(/^old-sealed · .* · sealed · 1 turns · inspect: amc session show old-sealed/);
+  expect(lines[1]).toMatch(/^old-sealed · .* · sealed · 1 turns · inspect: amc session show old-sealed · continue in a fork: amc agent-loop chat --fork-from old-sealed$/);
   expect(renderNativeSessionList(workspace, "default", 1)).toHaveLength(1);
   expect(renderNativeSessionList(workspace, "other", 20)).toEqual([]);
 });
