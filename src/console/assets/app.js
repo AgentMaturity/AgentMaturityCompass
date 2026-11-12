@@ -1121,7 +1121,8 @@ async function verifySealSignatureClientSide(raw) {
     return { ok: false, reason: "WebCrypto unavailable" };
   }
   try {
-    const sealText = JSON.stringify(raw.seal);
+    // The server signs the seal file's exact bytes, JSON.stringify(seal, null, 2) (logChain sealBytes); key order survives JSON.parse.
+    const sealText = JSON.stringify(raw.seal, null, 2);
     const digestHex = await sha256Hex(sealText);
     if (digestHex !== raw.sig.digestSha256) {
       return { ok: false, reason: "seal digest mismatch" };
@@ -1141,7 +1142,8 @@ async function verifySealSignatureClientSide(raw) {
 
 async function verifyTransparencyClientSide(raw) {
   const errors = [];
-  let prev = "";
+  // /transparency/raw returns the log's tail: the first entry links to one this page was not sent.
+  let prev = raw.entries?.[0]?.prev ?? "";
   for (const entry of raw.entries || []) {
     if (entry.prev !== prev) {
       errors.push(`chain mismatch at ${entry.hash}`);
