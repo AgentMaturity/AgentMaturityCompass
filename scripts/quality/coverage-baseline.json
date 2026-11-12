@@ -10,7 +10,7 @@
     "statements": 64
   },
   "platformFloorsSource": {
-    "linux": "GitHub Actions ubuntu-latest Node 22, CI run 37483109284 on main 8d78504d (the first build-test to complete since 2026-09-16); extended from CI run 41736923846 (PR #76 at e61ee9c13, Node 22 and 24, the lower of the two) for tracked files that measure lower on Linux"
+    "linux": "GitHub Actions ubuntu-latest Node 22, CI run 37483109284 on main 8d78504d (the first build-test to complete since 2026-09-16); extended from CI run 41736923846 (PR #76 at e61ee9c13, Node 22 and 24, the lower of the two) for tracked files that measure lower on Linux; lowered again from CI run 43196410032 (main 07632e898, Node 22 and 24, the lower of the two) for the go-live line"
   },
   "platformFloors": {
     "linux": {
@@ -118,8 +118,8 @@
           "covered": 18
         },
         "functions": {
-          "total": 11,
-          "covered": 8
+          "total": 13,
+          "covered": 9
         },
         "branches": {
           "total": 39,
@@ -492,12 +492,16 @@
       },
       "src/assurance/evidenceWriters.ts": {
         "lines": {
-          "total": 29,
-          "covered": 28
+          "total": 40,
+          "covered": 36
         },
         "statements": {
-          "total": 32,
-          "covered": 31
+          "total": 47,
+          "covered": 43
+        },
+        "functions": {
+          "total": 12,
+          "covered": 11
         }
       },
       "src/assurance/falsePositiveTracker.ts": {
@@ -718,16 +722,20 @@
       },
       "src/benchmarks/benchExport.ts": {
         "lines": {
-          "total": 135,
-          "covered": 122
+          "total": 139,
+          "covered": 125
         },
         "functions": {
           "total": 33,
           "covered": 29
         },
         "statements": {
-          "total": 205,
-          "covered": 172
+          "total": 210,
+          "covered": 175
+        },
+        "branches": {
+          "total": 110,
+          "covered": 61
         }
       },
       "src/benchmarks/consortium.ts": {
@@ -956,12 +964,12 @@
       },
       "src/cli-agent-options.ts": {
         "lines": {
-          "total": 170,
-          "covered": 144
+          "total": 228,
+          "covered": 193
         },
         "functions": {
-          "total": 38,
-          "covered": 31
+          "total": 53,
+          "covered": 42
         },
         "branches": {
           "total": 166,
@@ -1208,20 +1216,20 @@
       },
       "src/diagnostic/runner.ts": {
         "lines": {
-          "total": 747,
-          "covered": 549
+          "total": 746,
+          "covered": 548
         },
         "functions": {
-          "total": 134,
-          "covered": 104
+          "total": 133,
+          "covered": 103
         },
         "branches": {
           "total": 832,
           "covered": 526
         },
         "statements": {
-          "total": 799,
-          "covered": 592
+          "total": 798,
+          "covered": 591
         }
       },
       "src/doctor/doctorLiveProbe.ts": {
@@ -1748,8 +1756,8 @@
       },
       "src/kernel/agentLoopRunner.ts": {
         "functions": {
-          "total": 25,
-          "covered": 23
+          "total": 23,
+          "covered": 21
         }
       },
       "src/kernel/services/agentLoopServices.ts": {
@@ -2690,8 +2698,8 @@
       },
       "src/sdk/nativeAgentClient.ts": {
         "lines": {
-          "total": 395,
-          "covered": 372
+          "total": 389,
+          "covered": 366
         }
       },
       "src/session/approvalEventMeta.ts": {
@@ -2782,8 +2790,8 @@
       },
       "src/setup/nativeInteractiveSession.ts": {
         "functions": {
-          "total": 35,
-          "covered": 25
+          "total": 37,
+          "covered": 26
         }
       },
       "src/setup/nativeMcpConfig.ts": {
@@ -2866,8 +2874,8 @@
       },
       "src/skills/skillTurn.ts": {
         "lines": {
-          "total": 32,
-          "covered": 29
+          "total": 47,
+          "covered": 42
         },
         "functions": {
           "total": 5,
@@ -2878,8 +2886,8 @@
           "covered": 21
         },
         "statements": {
-          "total": 51,
-          "covered": 45
+          "total": 73,
+          "covered": 64
         }
       },
       "src/standard/standardApi.ts": {
@@ -3068,8 +3076,8 @@
       },
       "src/studio/studioServer.ts": {
         "functions": {
-          "total": 319,
-          "covered": 124
+          "total": 311,
+          "covered": 118
         }
       },
       "src/studio/studioState.ts": {
@@ -3620,8 +3628,8 @@
           "covered": 107
         },
         "statements": {
-          "total": 144,
-          "covered": 141
+          "total": 169,
+          "covered": 164
         }
       },
       "src/workspaces/workspaceManager.ts": {
@@ -3636,6 +3644,160 @@
         "statements": {
           "total": 121,
           "covered": 76
+        }
+      },
+      "src/cli-a4-commands.ts": {
+        "branches": {
+          "total": 258,
+          "covered": 68
+        }
+      },
+      "src/cli-prompt-commands.ts": {
+        "lines": {
+          "total": 103,
+          "covered": 54
+        },
+        "statements": {
+          "total": 108,
+          "covered": 55
+        }
+      },
+      "src/agent/toolCalls.ts": {
+        "branches": {
+          "total": 57,
+          "covered": 50
+        }
+      },
+      "src/budgets/nativeBudgetAdmission.ts": {
+        "branches": {
+          "total": 77,
+          "covered": 65
+        }
+      },
+      "src/config/envSchema.ts": {
+        "lines": {
+          "total": 28,
+          "covered": 20
+        },
+        "functions": {
+          "total": 9,
+          "covered": 6
+        },
+        "statements": {
+          "total": 29,
+          "covered": 21
+        }
+      },
+      "src/diagnostic/nonInteractiveQuickscore.ts": {
+        "lines": {
+          "total": 49,
+          "covered": 39
+        },
+        "functions": {
+          "total": 11,
+          "covered": 9
+        },
+        "branches": {
+          "total": 42,
+          "covered": 32
+        },
+        "statements": {
+          "total": 50,
+          "covered": 39
+        }
+      },
+      "src/doctor/nativeModuleProbe.ts": {
+        "statements": {
+          "total": 20,
+          "covered": 19
+        }
+      },
+      "src/llm/llmFailure.ts": {
+        "branches": {
+          "total": 157,
+          "covered": 143
+        }
+      },
+      "src/llm/adapter/providerToolBinding.ts": {
+        "lines": {
+          "total": 21,
+          "covered": 20
+        },
+        "statements": {
+          "total": 23,
+          "covered": 22
+        }
+      },
+      "src/llm/adapter/streamRecorder.ts": {
+        "branches": {
+          "total": 85,
+          "covered": 69
+        }
+      },
+      "src/runtime/fatalDiagnostic.ts": {
+        "lines": {
+          "total": 58,
+          "covered": 37
+        },
+        "functions": {
+          "total": 18,
+          "covered": 7
+        },
+        "branches": {
+          "total": 50,
+          "covered": 30
+        },
+        "statements": {
+          "total": 71,
+          "covered": 42
+        }
+      },
+      "src/sandbox/seatbeltNativeShell.ts": {
+        "branches": {
+          "total": 100,
+          "covered": 33
+        }
+      },
+      "src/setup/nativeApprovalInstructions.ts": {
+        "branches": {
+          "total": 34,
+          "covered": 33
+        }
+      },
+      "src/setup/nativeFirstUseGuide.ts": {
+        "lines": {
+          "total": 99,
+          "covered": 95
+        },
+        "statements": {
+          "total": 131,
+          "covered": 127
+        }
+      },
+      "src/skills/skillPrompt.ts": {
+        "branches": {
+          "total": 17,
+          "covered": 16
+        }
+      },
+      "src/tools/guards/governedCallDecision.ts": {
+        "lines": {
+          "total": 21,
+          "covered": 17
+        },
+        "functions": {
+          "total": 7,
+          "covered": 6
+        },
+        "statements": {
+          "total": 24,
+          "covered": 20
+        }
+      },
+      "src/vault/vaultCrypto.ts": {
+        "statements": {
+          "total": 19,
+          "covered": 17
         }
       }
     }
@@ -41079,6 +41241,384 @@
       "statements": {
         "total": 176,
         "covered": 69
+      }
+    },
+    "src/cli-config-commands.ts": {
+      "lines": {
+        "total": 26,
+        "covered": 18
+      },
+      "functions": {
+        "total": 4,
+        "covered": 4
+      },
+      "branches": {
+        "total": 46,
+        "covered": 16
+      },
+      "statements": {
+        "total": 38,
+        "covered": 24
+      }
+    },
+    "src/cli-integrations-commands.ts": {
+      "lines": {
+        "total": 55,
+        "covered": 0
+      },
+      "functions": {
+        "total": 16,
+        "covered": 0
+      },
+      "branches": {
+        "total": 10,
+        "covered": 0
+      },
+      "statements": {
+        "total": 57,
+        "covered": 0
+      }
+    },
+    "src/cli-native-hook-commands.ts": {
+      "lines": {
+        "total": 56,
+        "covered": 6
+      },
+      "functions": {
+        "total": 14,
+        "covered": 2
+      },
+      "branches": {
+        "total": 88,
+        "covered": 0
+      },
+      "statements": {
+        "total": 77,
+        "covered": 7
+      }
+    },
+    "src/cli-usage-commands.ts": {
+      "lines": {
+        "total": 27,
+        "covered": 25
+      },
+      "functions": {
+        "total": 3,
+        "covered": 3
+      },
+      "branches": {
+        "total": 24,
+        "covered": 14
+      },
+      "statements": {
+        "total": 30,
+        "covered": 26
+      }
+    },
+    "src/cli-user-commands.ts": {
+      "lines": {
+        "total": 47,
+        "covered": 0
+      },
+      "functions": {
+        "total": 10,
+        "covered": 0
+      },
+      "branches": {
+        "total": 20,
+        "covered": 0
+      },
+      "statements": {
+        "total": 50,
+        "covered": 0
+      }
+    },
+    "src/workspaceGitignore.ts": {
+      "lines": {
+        "total": 5,
+        "covered": 5
+      },
+      "functions": {
+        "total": 1,
+        "covered": 1
+      },
+      "branches": {
+        "total": 2,
+        "covered": 1
+      },
+      "statements": {
+        "total": 6,
+        "covered": 5
+      }
+    },
+    "src/acp/nativeTaskLease.ts": {
+      "lines": {
+        "total": 7,
+        "covered": 3
+      },
+      "functions": {
+        "total": 1,
+        "covered": 1
+      },
+      "branches": {
+        "total": 6,
+        "covered": 1
+      },
+      "statements": {
+        "total": 10,
+        "covered": 4
+      }
+    },
+    "src/auth/userAudit.ts": {
+      "lines": {
+        "total": 6,
+        "covered": 6
+      },
+      "functions": {
+        "total": 3,
+        "covered": 3
+      },
+      "branches": {
+        "total": 8,
+        "covered": 4
+      },
+      "statements": {
+        "total": 8,
+        "covered": 8
+      }
+    },
+    "src/cli/agentDefinitionOptions.ts": {
+      "lines": {
+        "total": 23,
+        "covered": 13
+      },
+      "functions": {
+        "total": 3,
+        "covered": 3
+      },
+      "branches": {
+        "total": 43,
+        "covered": 24
+      },
+      "statements": {
+        "total": 35,
+        "covered": 19
+      }
+    },
+    "src/cli/initPassphrase.ts": {
+      "lines": {
+        "total": 8,
+        "covered": 1
+      },
+      "functions": {
+        "total": 3,
+        "covered": 1
+      },
+      "branches": {
+        "total": 7,
+        "covered": 0
+      },
+      "statements": {
+        "total": 10,
+        "covered": 1
+      }
+    },
+    "src/eval/suiteLoader.ts": {
+      "lines": {
+        "total": 30,
+        "covered": 30
+      },
+      "functions": {
+        "total": 8,
+        "covered": 7
+      },
+      "branches": {
+        "total": 20,
+        "covered": 11
+      },
+      "statements": {
+        "total": 45,
+        "covered": 36
+      }
+    },
+    "src/extensions/nativeHookRuntime.ts": {
+      "lines": {
+        "total": 13,
+        "covered": 5
+      },
+      "functions": {
+        "total": 10,
+        "covered": 3
+      },
+      "branches": {
+        "total": 6,
+        "covered": 3
+      },
+      "statements": {
+        "total": 24,
+        "covered": 8
+      }
+    },
+    "src/ledger/outcomeVerification.ts": {
+      "lines": {
+        "total": 26,
+        "covered": 18
+      },
+      "functions": {
+        "total": 1,
+        "covered": 1
+      },
+      "branches": {
+        "total": 16,
+        "covered": 9
+      },
+      "statements": {
+        "total": 26,
+        "covered": 18
+      }
+    },
+    "src/mcp/mcpScopesCli.ts": {
+      "lines": {
+        "total": 64,
+        "covered": 7
+      },
+      "functions": {
+        "total": 17,
+        "covered": 1
+      },
+      "branches": {
+        "total": 86,
+        "covered": 0
+      },
+      "statements": {
+        "total": 96,
+        "covered": 7
+      }
+    },
+    "src/observability/nativeSessionSpans.ts": {
+      "lines": {
+        "total": 108,
+        "covered": 97
+      },
+      "functions": {
+        "total": 15,
+        "covered": 14
+      },
+      "branches": {
+        "total": 146,
+        "covered": 78
+      },
+      "statements": {
+        "total": 130,
+        "covered": 109
+      }
+    },
+    "src/observability/otelZipkin.ts": {
+      "lines": {
+        "total": 12,
+        "covered": 12
+      },
+      "functions": {
+        "total": 3,
+        "covered": 3
+      },
+      "branches": {
+        "total": 6,
+        "covered": 2
+      },
+      "statements": {
+        "total": 13,
+        "covered": 13
+      }
+    },
+    "src/observability/usageReport.ts": {
+      "lines": {
+        "total": 64,
+        "covered": 51
+      },
+      "functions": {
+        "total": 14,
+        "covered": 10
+      },
+      "branches": {
+        "total": 83,
+        "covered": 52
+      },
+      "statements": {
+        "total": 92,
+        "covered": 72
+      }
+    },
+    "src/passport/passportHarness.ts": {
+      "lines": {
+        "total": 33,
+        "covered": 30
+      },
+      "functions": {
+        "total": 11,
+        "covered": 9
+      },
+      "branches": {
+        "total": 35,
+        "covered": 11
+      },
+      "statements": {
+        "total": 40,
+        "covered": 33
+      }
+    },
+    "src/tools/builtin/grepScan.ts": {
+      "lines": {
+        "total": 102,
+        "covered": 0
+      },
+      "functions": {
+        "total": 8,
+        "covered": 0
+      },
+      "branches": {
+        "total": 123,
+        "covered": 0
+      },
+      "statements": {
+        "total": 146,
+        "covered": 0
+      }
+    },
+    "src/tools/builtin/nativeToolSchemas.ts": {
+      "lines": {
+        "total": 19,
+        "covered": 16
+      },
+      "functions": {
+        "total": 13,
+        "covered": 7
+      },
+      "branches": {
+        "total": 8,
+        "covered": 3
+      },
+      "statements": {
+        "total": 27,
+        "covered": 19
+      }
+    },
+    "src/verify/payloadsNotEvaluated.ts": {
+      "lines": {
+        "total": 2,
+        "covered": 2
+      },
+      "functions": {
+        "total": 1,
+        "covered": 1
+      },
+      "branches": {
+        "total": 4,
+        "covered": 2
+      },
+      "statements": {
+        "total": 2,
+        "covered": 2
       }
     }
   }
