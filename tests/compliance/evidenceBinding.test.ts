@@ -207,7 +207,7 @@ describe("verifiedAssuranceByPack", () => {
     write(ws, "stale", { ts: now - 10 * 86_400_000 }, true);
     write(ws, "other-agent", { agentId: "someone-else" }, true);
     writeFileSync(join(getAgentPaths(ws, "default").reportsDir, "assurance", "broken.json"), "{not json");
-    const out = verifiedAssuranceByPack({ workspace: ws, agentId: "default", windowStartTs: now - 86_400_000, windowEndTs: now + 1000 });
+    const out = verifiedAssuranceByPack({ workspace: ws, agentId: "default", windowStartTs: now - 86_400_000, windowEndTs: Date.now() + 1000 });
     expect([...out.packs.keys()]).toEqual(["sealed"]);
     expect(out.packs.get("sealed")?.score0to100).toBe(90);
     expect(out.unverifiable.map((row) => row.packIds)).toEqual([[], ["unsealed"]]);
@@ -219,7 +219,7 @@ describe("verifiedAssuranceByPack", () => {
     write(ws, "invalid", { status: "INVALID", verificationPassed: false }, true);
     write(ws, "unverified", { verificationPassed: false }, true);
     write(ws, "no-status", { status: undefined, verificationPassed: undefined }, true);
-    const out = verifiedAssuranceByPack({ workspace: ws, agentId: "default", windowStartTs: now - 86_400_000, windowEndTs: now + 1000 });
+    const out = verifiedAssuranceByPack({ workspace: ws, agentId: "default", windowStartTs: now - 86_400_000, windowEndTs: Date.now() + 1000 });
     expect(out.packs.size).toBe(0);
     expect(out.unverifiable.map((row) => row.packIds)).toEqual([["invalid"], ["no-status"], ["unverified"]]);
   });
@@ -230,7 +230,7 @@ describe("verifiedAssuranceByPack", () => {
     write(ws, "measured", {}, true);
     write(ws, "no-evidence-status", { evidenceStatus: undefined }, true);
     write(ws, "future-status", { evidenceStatus: "PARTIALLY_MEASURED" }, true);
-    const out = verifiedAssuranceByPack({ workspace: ws, agentId: "default", windowStartTs: now - 86_400_000, windowEndTs: now + 1000 });
+    const out = verifiedAssuranceByPack({ workspace: ws, agentId: "default", windowStartTs: now - 86_400_000, windowEndTs: Date.now() + 1000 });
     expect([...out.packs.keys()]).toEqual(["measured"]);
   });
 
