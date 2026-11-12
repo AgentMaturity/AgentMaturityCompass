@@ -140,6 +140,12 @@ ${body}\n`);
     await expect(failure).rejects.not.toThrow(/stale line/);
   });
 
+  test("a reason that ends in a full stop is not followed by a second one", async () => {
+    const dir = workspace();
+    const failure = start(fakeDaemon(dir, `console.error("Port 3210 is already in use. Stop the other process or change the port."); process.exit(1);`), dir);
+    await expect(failure).rejects.toThrow(/change the port\. See .*studio\.log/);
+  });
+
   test("keeps waiting for a live daemon that is slow to write its state, as under host load", async () => {
     const dir = workspace();
     const state = await start(fakeDaemon(dir, "setTimeout(ready, 7_000);"), dir);

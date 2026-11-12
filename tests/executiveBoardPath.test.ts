@@ -52,7 +52,7 @@ describe("executive and board-facing path", () => {
     expect(memo).toContain("NIST AI Risk Management Framework");
     expect(memo).toContain("EU AI Act");
     expect(overview).toContain("Board L3 business-risk memo");
-    expect(page).toContain("BOARD_RISK_L3_MEMO.md");
+    expect(page).toContain('href="docs/#BOARD_RISK_L3_MEMO"');
     expect(readme).toContain("Board L3 Risk Memo");
     expect(audit).toContain("L3 business-risk memo — ✅ Resolved 2026-06-16");
     expect(audit).not.toContain("deeper \"what does L3 mean for business risk?\" long-form memo remains future work");

@@ -1,3 +1,4 @@
+import { adoptVaultPassphraseFile } from "../vault/passphraseFile.js";
 import { join, resolve } from "node:path";
 import inquirer from "inquirer";
 import { presetGatewayConfigForProvider, saveGatewayConfig, signGatewayConfig, type GatewayConfig } from "../gateway/config.js";
@@ -215,6 +216,7 @@ export async function runQuickSetup(options: QuickSetupOptions): Promise<QuickSe
   if (!pathExists(join(workspace, ".amc"))) {
     // LIVE-VAULT-15: a generated passphrase is remembered (never printed), so the vault opens after this process exits.
     let generated: string | null = null;
+    adoptVaultPassphraseFile(); // AMC_VAULT_PASSPHRASE_FILE seals the new vault as AMC_VAULT_PASSPHRASE does
     if (!process.env.AMC_VAULT_PASSPHRASE) {
       if (!rememberEnabled()) throw new Error("amc setup needs a passphrase to remember: export AMC_VAULT_PASSPHRASE, or unset AMC_VAULT_REMEMBER.");
       generated = generatedPassphraseForInit();

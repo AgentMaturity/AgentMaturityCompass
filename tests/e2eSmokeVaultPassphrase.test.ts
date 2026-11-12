@@ -1,5 +1,8 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { runSmoke } from "../src/e2e/smoke.js";
+import { existsSync } from "node:fs";
+import { join, resolve } from "node:path";
+import { smokeCliEntrypoint } from "../src/e2e/smokeSteps.js";
 
 // The first step stops the smoke right after recording what it saw, so no Studio or vault is started.
 const seen = vi.hoisted(() => [] as { env?: string; sealedWith?: string }[]);
@@ -33,5 +36,13 @@ describe("amc e2e smoke --mode local vault passphrase", () => {
     await runSmoke({ mode: "local" });
     expect(seen[0]!.env).toBe(seen[0]!.sealedWith);
     expect("AMC_VAULT_PASSPHRASE" in process.env).toBe(false);
+  });
+});
+
+describe("amc e2e smoke finds the CLI it runs from (run `npm run build` first)", () => {
+  test("outside the repository root, it resolves the running package's dist/cli.js, not one under the cwd", () => {
+    const cli = smokeCliEntrypoint("/nonexistent-repo-root");
+    expect(cli).toBe(join(resolve("."), "dist", "cli.js"));
+    expect(existsSync(cli)).toBe(true);
   });
 });

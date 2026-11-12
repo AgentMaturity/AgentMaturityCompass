@@ -122,7 +122,7 @@ describe("GAP-1635 Viper consent blast-radius boundary", () => {
     });
     expect(intent.approvalId).toBeTruthy();
 
-    decideApprovalForIntent({
+    decideApprovalForIntent({ reviewerAuthentication: "authenticated",
       workspace,
       approvalId: intent.approvalId!,
       decision: "APPROVED",
@@ -132,7 +132,7 @@ describe("GAP-1635 Viper consent blast-radius boundary", () => {
       username: "owner-a",
       userRoles: ["OWNER"]
     });
-    decideApprovalForIntent({
+    decideApprovalForIntent({ reviewerAuthentication: "authenticated",
       workspace,
       approvalId: intent.approvalId!,
       decision: "APPROVED",

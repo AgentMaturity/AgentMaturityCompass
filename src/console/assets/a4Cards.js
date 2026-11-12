@@ -20,7 +20,7 @@ export function stageCards(stage) {
 
 const actions = new Map();
 /**
- * A stage's own button action (P1-60): `build({ button, value, headBinding, uuid, projectPath })` returns
+ * A stage's own button action (P1-60): `build({ button, value, headBinding, uuid, projectPath, projectId, me })` returns
  * `{ label, path, body }` for a `data-a4-action` name a4.js does not know. The path is this project's
  * (`projectPath("/…")`) or a native task route; Studio re-checks every action.
  */

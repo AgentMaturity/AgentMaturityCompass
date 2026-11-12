@@ -124,7 +124,7 @@
       "route": "openai",
       "protocol": "openai-chat-completions",
       "adapter": "openai-chat@4",
-      "encoder": "openai-chat@4",
+      "encoder": "openai-chat@6",
       "bytesBuiltBy": "AMC",
       "features": {
         "text-input": {
@@ -352,7 +352,7 @@
       "route": "deepseek",
       "protocol": "deepseek-chat-completions",
       "adapter": "deepseek-chat@1",
-      "encoder": "deepseek-chat@1",
+      "encoder": "deepseek-chat@2",
       "bytesBuiltBy": "AMC",
       "features": {
         "text-input": {
@@ -808,7 +808,7 @@
       "route": "groq",
       "protocol": "openai-chat-completions",
       "adapter": "openai-compatible-chat@1",
-      "encoder": "openai-chat@4",
+      "encoder": "openai-chat@6",
       "bytesBuiltBy": "AMC",
       "features": {
         "text-input": {
@@ -922,7 +922,7 @@
       "route": "mistral",
       "protocol": "openai-chat-completions",
       "adapter": "openai-compatible-chat@1",
-      "encoder": "openai-chat@4",
+      "encoder": "openai-chat@6",
       "bytesBuiltBy": "AMC",
       "features": {
         "text-input": {
@@ -1036,7 +1036,7 @@
       "route": "xai",
       "protocol": "openai-chat-completions",
       "adapter": "openai-compatible-chat@1",
-      "encoder": "openai-chat@4",
+      "encoder": "openai-chat@6",
       "bytesBuiltBy": "AMC",
       "features": {
         "text-input": {
@@ -1150,7 +1150,7 @@
       "route": "openrouter",
       "protocol": "openai-chat-completions",
       "adapter": "openai-compatible-chat@1",
-      "encoder": "openai-chat@4",
+      "encoder": "openai-chat@6",
       "bytesBuiltBy": "AMC",
       "features": {
         "text-input": {
@@ -1264,7 +1264,7 @@
       "route": "together",
       "protocol": "openai-chat-completions",
       "adapter": "openai-compatible-chat@1",
-      "encoder": "openai-chat@4",
+      "encoder": "openai-chat@6",
       "bytesBuiltBy": "AMC",
       "features": {
         "text-input": {
@@ -1378,7 +1378,7 @@
       "route": "fireworks",
       "protocol": "openai-chat-completions",
       "adapter": "openai-compatible-chat@1",
-      "encoder": "openai-chat@4",
+      "encoder": "openai-chat@6",
       "bytesBuiltBy": "AMC",
       "features": {
         "text-input": {
@@ -1492,7 +1492,7 @@
       "route": "lmstudio",
       "protocol": "openai-chat-completions",
       "adapter": "openai-compatible-chat@1",
-      "encoder": "openai-chat@4",
+      "encoder": "openai-chat@6",
       "bytesBuiltBy": "AMC",
       "features": {
         "text-input": {
@@ -1606,7 +1606,7 @@
       "route": "vllm",
       "protocol": "openai-chat-completions",
       "adapter": "openai-compatible-chat@1",
-      "encoder": "openai-chat@4",
+      "encoder": "openai-chat@6",
       "bytesBuiltBy": "AMC",
       "features": {
         "text-input": {
@@ -1720,7 +1720,7 @@
       "route": "llamacpp",
       "protocol": "openai-chat-completions",
       "adapter": "openai-compatible-chat@1",
-      "encoder": "openai-chat@4",
+      "encoder": "openai-chat@6",
       "bytesBuiltBy": "AMC",
       "features": {
         "text-input": {
@@ -1834,7 +1834,7 @@
       "route": "azure-openai",
       "protocol": "openai-chat-completions",
       "adapter": "azure-openai-chat@1",
-      "encoder": "openai-chat@4",
+      "encoder": "openai-chat@6",
       "bytesBuiltBy": "AMC",
       "features": {
         "text-input": {

@@ -115,6 +115,20 @@ export function initShell(doc) {
   const nav = doc.querySelector("nav");
   renderCanonicalNav(nav);
   decorateNav(nav, currentPage(doc));
+  addSkipLink(doc);
+}
+
+/** M10/L7: the first Tab stop skips the menu to the page's main content (styles.css shows it only while focused). */
+function addSkipLink(doc) {
+  const main = doc.querySelector("main");
+  if (!main || doc.querySelector("a.skip-link")) return;
+  if (!main.getAttribute("id")) main.setAttribute("id", "main-content");
+  main.setAttribute("tabindex", "-1");
+  const link = doc.createElement("a");
+  link.setAttribute("class", "skip-link");
+  link.setAttribute("href", `#${main.getAttribute("id")}`);
+  link.textContent = "Skip to main content";
+  doc.body.insertBefore(link, doc.body.children[0] ?? null);
 }
 
 if (typeof document !== "undefined") {

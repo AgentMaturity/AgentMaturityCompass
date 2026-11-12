@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { validateNativeTaskPoll } from "../src/console/assets/nativeTasks.js";
+import { nativeTaskPollRetryDelay, validateNativeTaskPoll } from "../src/console/assets/nativeTasks.js";
 
 const task = { taskId: "task_12345678", sessionId: "session-page-id", agentId: "default", revision: 1, state: "released", provider: "stub",
   nextCursor: 2, firstCursor: 1, droppedEvents: 0, canResume: false, resumeBlockedReason: null, archived: false,
@@ -35,4 +35,15 @@ test("browser admits only authenticated current-record list snapshots alongside 
   for (const change of [{ evidence: "provisional" }, { scope: "durable-history" }, { recordSha256: "draft" }, { revision: 0 }, { text: {} }, { kind: "authority" }]) {
     expect(() => validateNativeTaskPoll({ ...withPlan, task: { ...task, plans: [{ ...plan, ...change }] } }, task, -1)).toThrow();
   }
+});
+
+test("a transient evidence conflict while a turn is written is retried with bounded backoff before updates pause (H1)", () => {
+  const busy = { status: 409, code: "NATIVE_EVIDENCE_UNAVAILABLE" };
+  const delays = [0, 1, 2, 3, 4].map(failures => nativeTaskPollRetryDelay(busy, failures));
+  expect(delays.slice(0, 4).every(delay => typeof delay === "number" && delay > 0)).toBe(true);
+  expect(delays[1]!).toBeGreaterThan(delays[0]!);
+  expect(delays[4]).toBeNull();
+  expect(nativeTaskPollRetryDelay({ status: 409, code: "NATIVE_CURSOR_AHEAD" }, 0)).toBeNull();
+  expect(nativeTaskPollRetryDelay({ status: 400, code: "NATIVE_CURSOR_INVALID" }, 0)).toBeNull();
+  expect(nativeTaskPollRetryDelay(new Error("Unsupported task event response."), 0)).toBeNull();
 });

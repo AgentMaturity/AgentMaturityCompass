@@ -65,3 +65,21 @@ describe("CLI Bridge", () => {
     });
   });
 });
+
+describe("CLI entry (H2)", () => {
+  it("runs the running package's own dist/cli.js, not <workspace>/dist/cli.js", async () => {
+    const { mkdtempSync, rmSync } = await import("node:fs");
+    const { tmpdir } = await import("node:os");
+    const { join, resolve } = await import("node:path");
+    const { execCliCommand } = await import("../src/studio/cliBridge.js");
+    const workspace = mkdtempSync(join(tmpdir(), "amc-clibridge-"));
+    try {
+      const result = await execCliCommand(workspace, { command: "amc --version", format: "text", timeout: 60_000 });
+      expect(result.stderr).not.toContain(resolve(workspace, "dist/cli.js"));
+      expect(result.ok, result.stderr).toBe(true);
+      expect(result.stdout.trim()).toMatch(/^\d+\.\d+\.\d+/);
+    } finally {
+      rmSync(workspace, { recursive: true, force: true });
+    }
+  }, 90_000);
+});

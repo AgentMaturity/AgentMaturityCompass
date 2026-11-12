@@ -1,4 +1,4 @@
-import { apiGet, apiPost, whoami } from "./api.js";
+import { apiGet, apiPost, showSignIn, whoami } from "./api.js";
 import { renderPlanTimeline } from "./components/planTimeline.js";
 import { renderHandholdingSteps } from "./components/handholdingSteps.js";
 
@@ -32,7 +32,7 @@ async function main() {
   const root = document.getElementById("app");
   const user = await whoami().catch(() => null);
   if (!user) {
-    status.textContent = "Authentication required.";
+    showSignIn(status);
     return;
   }
   status.textContent = `Signed in as ${user.username ?? user.userId ?? "user"}`;

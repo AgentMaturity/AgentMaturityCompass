@@ -1,6 +1,7 @@
 /** AUTHORED UNEXECUTED / UNQUALIFIED. Actual selected Chat runtime and signed
  * sources, with only HTTP scripted. Never an installed-package or model claim.
  */
+import type { StreamChunk } from "../src/llm/streamChunk.js";
 import { spawn, spawnSync } from "node:child_process";
 import { mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
@@ -134,7 +135,7 @@ describe("native Chat signed-image encoder and runtime (not executed)", () => {
     expect(readEventPayload(h.root, attachment)).toEqual({ status: "ok", bytes: PNG });
     expect(JSON.parse(attachment.meta_json)).toMatchObject({ mimeType: "image/png", bytes: PNG.length });
     const header = h.session.readEvents().find(row => row.event_type === "request/header")!;
-    expect(JSON.parse(header.meta_json)).toMatchObject({ encoderId: "openai-chat", encoderVersion: 4 });
+    expect(JSON.parse(header.meta_json)).toMatchObject({ encoderId: "openai-chat", encoderVersion: 6 });
     h.close(); expect(cold(h)).toEqual([expect.objectContaining({ status: "reconstructed", bytes: transmitted.body.toString("base64"),
       recordedDigest: sha256Hex(transmitted.body), derivedDigest: call.requestDigest })]);
     const integrity = verifyLedgerIntegrity(h.root); expect(integrity.chain.ok, integrity.chain.errors.join("\n")).toBe(true);
@@ -215,7 +216,7 @@ describe("native Chat signed-image encoder and runtime (not executed)", () => {
     const tools = [{ name: "fs.read", description: "read", parameters: { type: "object", properties: {} } }];
     await drain(h.runtime.prepare({ ...h.spec, tools }).stream());
     const called = h.session.readEvents().find(row => row.event_type === "tool/call")!;
-    expect(JSON.parse(called.meta_json)).toMatchObject({ toolName: "fs.read", providerName: { encoderVersion: 4, wireName: providerToolWireName("fs.read") } });
+    expect(JSON.parse(called.meta_json)).toMatchObject({ toolName: "fs.read", providerName: { encoderVersion: 6, wireName: providerToolWireName("fs.read") } });
     expect(readEventPayload(h.root, called)).toEqual({ status: "ok", bytes: Buffer.from(raw) });
     h.session.recordToolResult({ toolCallId: "image-read", outcome: "ERROR", exitCode: 1, timedOut: false, denied: false, content: "Fixture policy refused reading" });
     h.session.endStep({ stopReason: "tool_calls", usage: null }); h.session.startStep();
@@ -237,9 +238,14 @@ describe("native Chat signed-image encoder and runtime (not executed)", () => {
     const h = harness(openaiAdapter, [chatImageStream({ toolName: providerToolWireName("fs.write") })]);
     const tools = [{ name: "fs.read", description: "read", parameters: { type: "object" } }];
     const call = h.runtime.prepare({ ...h.spec, tools }); tools[0]!.name = "fs.write";
-    await expect(drain(call.stream())).rejects.toThrow();
+    // Smoke M-5: the unoffered alias arrives marked and unbound (the loop refuses it); it never binds to fs.write.
+    const seen: StreamChunk[] = []; for await (const chunk of call.stream()) seen.push(chunk);
+    const blocks = seen.flatMap(chunk => chunk.type === "block-end" && chunk.block.kind === "tool_use" ? [chunk.block] : []);
+    expect(blocks).toEqual([expect.objectContaining({ name: providerToolWireName("fs.write"), unoffered: true })]);
+    expect(blocks[0]).not.toHaveProperty("providerWireName");
     expect(JSON.parse(h.sent[0]!.body.toString("utf8")).tools[0].function.name).toBe(providerToolWireName("fs.read"));
-    expect(h.session.readEvents().some(row => row.event_type === "tool/call")).toBe(false); h.close("error");
+    const rows = h.session.readEvents().filter(row => row.event_type === "tool/call");
+    expect(rows.map(row => JSON.parse(row.meta_json).providerName)).toEqual([undefined]); h.close("error");
   });
   test.each([1, 2, 3])("historical Chat v%s refuses image source before header and HTTP", encoderVersion => {
     const h = harness({ ...openaiAdapter, encoderVersion });
@@ -266,7 +272,9 @@ describe("native Chat signed-image encoder and runtime (not executed)", () => {
       expect(surface.DEFAULT_REQUEST_ENCODERS.get("openai-chat", 4)).toBe(openaiChatEncoderV4);
     }
     expect(publicLlm.OPENAI_CHAT_TEXT_CAPABILITIES.features["image-input"]).toBe("unsupported");
-    expect(usesProviderToolNames("openai-chat", 4)).toBe(true); expect(usesProviderToolNames("openai-chat", 5)).toBe(true); expect(usesProviderToolNames("openai-chat", 6)).toBe(false);
+    expect(usesProviderToolNames("openai-chat", 4)).toBe(true); expect(usesProviderToolNames("openai-chat", 5)).toBe(true); expect(usesProviderToolNames("openai-chat", 6)).toBe(true); expect(usesProviderToolNames("openai-chat", 8)).toBe(false);
+    // openai-chat@6 separates a user message's text parts (smoke M-1); every historical version keeps "onetwo".
+    expect(registry.get("openai-chat", 6)!.encode(plain).toString("utf8")).toBe(golden.replace("onetwo", "one\\n\\ntwo"));
   });
   test("image-only and ordered signed content cannot shift adjacent empty, assistant or multiple keyed-result messages", () => {
     const request: EncodableRequest = { ...input(), messages: [
@@ -285,14 +293,14 @@ describe("native Chat signed-image encoder and runtime (not executed)", () => {
     expect(JSON.parse(openaiChatEncoderV4.encode({ ...request, system: null }).toString("utf8")).messages).toEqual(messages.slice(1));
     // This is encoder-level signed order, NOT acceptance of public ACP interleaving.
   });
-  test("actual CLI route and public capability select exactly Chat4, without a DeepSeek/model-support inference", () => {
+  test("actual CLI route and public capability select exactly Chat6, without a DeepSeek/model-support inference", () => {
     const fail = vi.fn(), route = routeFor({ log: () => {}, error: () => {}, fail }, "openai", {}, "fixture-model")!;
     expect(route.adapter).toBe(openaiAdapter); expect(fail).not.toHaveBeenCalled();
     const registry = new AdapterRegistry(); registry.register(route);
     const pinned = registry.pin({ providerId: "openai", model: "fixture-model" });
-    expect(pinned).toMatchObject({ encoderId: "openai-chat", encoderVersion: 4, capabilities: { modelSupport: "not-probed" } });
+    expect(pinned).toMatchObject({ encoderId: "openai-chat", encoderVersion: 6, capabilities: { modelSupport: "not-probed" } });
     expect(acpSupportsImageInput(pinned)).toBe(true);
-    for (const version of [0, 1, 2, 3, 6]) expect(acpSupportsImageInput({ ...pinned, encoderVersion: version })).toBe(false);
+    for (const version of [0, 1, 2, 3, 8]) expect(acpSupportsImageInput({ ...pinned, encoderVersion: version })).toBe(false);
     expect(acpSupportsImageInput({ ...pinned, capabilities: null })).toBe(false);
     expect(acpSupportsImageInput({ ...pinned, encoderId: "unknown" })).toBe(false);
     expect(acpSupportsImageInput({ ...pinned, capabilities: { ...pinned.capabilities!, protocol: "deepseek-chat-completions" } })).toBe(false);

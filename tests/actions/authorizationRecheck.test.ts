@@ -207,7 +207,7 @@ function approve(f: Fixture, options: { name?: string; arguments?: Record<string
     const reviewers = [{ id: "owned-owner", role: "OWNER" as const }, { id: "owned-auditor", role: "AUDITOR" as const }];
     expect(created.request.requiredApprovals).toBeGreaterThan(0);
     expect(created.request.requiredApprovals).toBeLessThanOrEqual(reviewers.length);
-    for (const reviewer of reviewers.slice(0, created.request.requiredApprovals)) decideApprovalForIntent({
+    for (const reviewer of reviewers.slice(0, created.request.requiredApprovals)) decideApprovalForIntent({ reviewerAuthentication: "authenticated",
       workspace: f.workspace, agentId: AGENT, approvalId: created.request.approvalRequestId, decision: "APPROVED", mode: "EXECUTE",
       reason: "Reviewed the exact owned financial fixture", userId: reviewer.id, username: reviewer.id, userRoles: [reviewer.role]
     });

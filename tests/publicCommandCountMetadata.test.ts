@@ -15,6 +15,7 @@ const CURRENT_COMMAND_COUNT_FILES = [
   "src/console/assets/app.js",
   "website/index.html",
   "website/i18n.js",
+  "website/docs/docs.js",
 ];
 
 const HISTORICAL_COMMAND_COUNT_RECEIPTS = [

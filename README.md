@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C537-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C542-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -213,7 +213,7 @@ Exit code 0 means trusted, 1 failed (including an unpinned issuer or an unanchor
 
 Repair never deletes evidence. A failed signature looks the same whether a vault was re-initialized or the evidence was altered, so keep the files.
 
-- `amc verify --repair` reruns verification, counts the errors by kind and prints a plan: the files `--apply` would move and their total size. It changes nothing. Exit 0 when the workspace verifies, 1 when it does not. When only configuration signatures fail, or no ledger exists, there is nothing to archive. Blob payloads also fail authentication while the vault is locked, so unlock it before you archive.
+- `amc verify --repair` reruns verification, counts the errors by kind and prints a plan: the files `--apply` would move and their total size. It changes nothing. It ends with the verdict and exit code plain `amc verify` gives (UNANCHORED included), after `--apply` has repaired what it can. When only configuration signatures fail, or no ledger exists, there is nothing to archive. Blob payloads also fail authentication while the vault is locked, so unlock it before you archive.
 - `amc verify --repair --apply` asks you to type `archive` (use `--yes` in scripts; without a terminal and without `--yes` it refuses). It moves the evidence store, and nothing else, by rename into `.amc/quarantine/<YYYYMMDDTHHMMSSZ>-<8 hex>/`: `.amc/evidence.sqlite` with its `-wal` and `-shm` files go to `evidence.sqlite*`, `.amc/blobs/**` goes to `blobs/**` and, for a JSONL workspace, `.amc/jsonl/*.jsonl` goes to `jsonl/`. `.amc/reports` and every other file stay where they are.
 - The folder holds `repair-plan.json` (written first, as the intent record), `repair-receipt.json` (every move with its size and SHA-256, the errors that triggered it and the legal-hold check) and `repair-receipt.json.sig`, signed by the auditor key as `REPAIR_RECEIPT`. A signature shows who wrote the receipt and that it is unchanged.
 - Apply refuses with exit 2 and moves nothing when the legal-hold state is unknown or any hold is active, when the monitor key does not match `--expect-monitor` or `AMC_EXPECTED_MONITOR_FINGERPRINT`, when a planned file changed since the plan, or when signing is unavailable. If a rename fails part way (for example `EXDEV` or `EPERM`), it puts back what it moved and refuses.
@@ -440,7 +440,7 @@ Need a CI-safe score without terminal prompts? Use `amc quickscore --answers ans
 
 Without a terminal, `amc quickscore` generates no placeholder score: it exits 1 with the hint "Did you mean to run the interactive score?" Run it in a terminal, or pass answers explicitly for CI.
 
-If `amc quickscore --auto --json` cannot find captured execution evidence, it fails closed with `scoreStatus: "AUTO_NO_EVIDENCE"` and does not emit a measured zero score. Capture evidence with `amc wrap <runtime> -- <your-agent-command>`, or use `amc quickscore --answers answers.json --json` for CI-safe survey scoring.
+If `amc quickscore --auto --json` cannot find captured execution evidence, it fails closed with `scoreStatus: "AUTO_NO_EVIDENCE"` and does not emit a measured zero score. Capture evidence with `amc adapters run --agent <id> --adapter generic-cli -- <your-agent-command>`, or use `amc quickscore --answers answers.json --json` for CI-safe survey scoring.
 
 Advanced proof check:
 
@@ -533,22 +533,22 @@ For a source-of-truth command map generated from the live CLI registry, run `amc
 
 ```bash
 # LangChain
-amc wrap langchain -- python my_agent.py
+amc adapters run --agent default --adapter langchain-python -- python my_agent.py
 
 # CrewAI
-amc wrap crewai -- python crew.py
+amc adapters run --agent default --adapter crewai-cli -- python crew.py
 
 # AutoGen
-amc wrap autogen -- python autogen_app.py
+amc adapters run --agent default --adapter autogen-cli -- python autogen_app.py
 
 # OpenClaw
-amc wrap openclaw-cli -- openclaw run
+amc adapters run --agent default --adapter openclaw-cli -- openclaw run
 
 # Claude Code
-amc wrap claude-code -- claude "analyze this code"
+amc adapters run --agent default --adapter claude-cli -- claude "analyze this code"
 
 # Any CLI agent
-amc wrap generic-cli -- python my_bot.py
+amc adapters run --agent default --adapter generic-cli -- python my_bot.py
 ```
 
 ### Observe or control native provider actions
@@ -693,7 +693,7 @@ amc domain conformance --station health --agent default --max-evidence-age 30d  
 amc domain conformance --station wealth --agent default --max-evidence-age 30d
 ```
 
-On the new workspace recorded above, with no agent evidence, the compliance report said `Result: not evaluated (no evidence events were recorded)`, and the health and wealth conformance runs reported `PASS 0, FAIL 0` with every requirement (163 and 92) `NOT_EVALUATED`. These are evidence of conformity, never a compliance verdict. `amc domain assess --agent default --domain health` needs no licence, because Industry Packs are free in the current source build. Outside `--example` its result is always `not evaluated`, because the domain-rubric questions have no evidence source: in a new `amc init` workspace it exited 0 with `Result: not evaluated`, naming that reason and the missing diagnostic run. `--example` prints labelled synthetic output, which is never evidence.
+On the new workspace recorded above, with no agent evidence, the compliance report said `Result: not evaluated (no evidence events were recorded)`, and the health and wealth conformance runs reported `PASS 0, FAIL 0` with every requirement (<!-- amc:count:conformanceRequirementsHealth -->173<!-- /amc:count --> and <!-- amc:count:conformanceRequirementsWealth -->106<!-- /amc:count -->) `NOT_EVALUATED`. These are evidence of conformity, never a compliance verdict. `amc domain assess --agent default --domain health` needs no licence, because Industry Packs are free in the current source build. Outside `--example` its result is always `not evaluated`, because the domain-rubric questions have no evidence source: in a new `amc init` workspace it exited 0 with `Result: not evaluated`, naming that reason and the missing diagnostic run. `--example` prints labelled synthetic output, which is never evidence.
 
 ### GitHub Actions — preview boundary
 
@@ -971,7 +971,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,537<!-- /amc:count --> test source files; Vitest reports run outcomes
+cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,542<!-- /amc:count --> test source files; Vitest reports run outcomes
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.

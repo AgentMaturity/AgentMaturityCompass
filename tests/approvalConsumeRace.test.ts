@@ -71,7 +71,7 @@ async function main() {
     const requestDigest = chain.approvalRequestBindingDigest(created.request);
     const decisions = [];
     for (const [userId, role] of [["race-owner", "OWNER"], ["race-auditor", "AUDITOR"]]) {
-      const decision = engine.decideApprovalForIntent({
+      const decision = engine.decideApprovalForIntent({ reviewerAuthentication: "authenticated",
         workspace, agentId: "default", approvalId: created.approval.approvalId,
         decision: "APPROVED", mode: "EXECUTE", reason: role + " reviewed the exact fixture intent",
         userId, username: userId, userRoles: [role], expectedRequestDigestSha256: requestDigest

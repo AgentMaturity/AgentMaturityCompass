@@ -105,7 +105,11 @@ describe("surfaces report the shared result", () => {
       expect(text).not.toMatch(/\*\*Score:\*\* \d|\*\*Maturity Level:\*\* L\d/);
       expect(text).not.toContain(`${ALL_IDS[1]} (`);
       const full = await client.callTool({ name: "amc_score_sector_pack", arguments: { packId: PACK.id, responses: ALL } });
-      expect((full.content as Array<{ text: string }>)[0]!.text).toContain("**Score:** 75%");
+      const fullText = (full.content as Array<{ text: string }>)[0]!.text;
+      expect(fullText).toContain("**Score:** 75%");
+      // The CLI's cap and label: self-reported answers support L1 at most.
+      expect(fullText).toContain("**Eligible level:** L1 (self-reported answers cap at L1)");
+      expect(fullText).not.toContain("**Maturity Level:**");
     } finally {
       await close();
     }

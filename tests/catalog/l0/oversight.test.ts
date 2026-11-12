@@ -25,7 +25,7 @@ type BoundSetup = { tool: string; actionClass: ActionClass; approved: Record<str
 type QuorumSetup = { actionClass: ActionClass; decisions: Approver[]; initiator?: string; writePath?: "store" };
 
 function decide(ws: string, approvalId: string, a: Approver) {
-  return decideApprovalForIntent({ workspace: ws, agentId: "default", approvalId, decision: a.decision ?? "APPROVED", mode: "EXECUTE",
+  return decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: ws, agentId: "default", approvalId, decision: a.decision ?? "APPROVED", mode: "EXECUTE",
     reason: "layer0 fixture decision", userId: a.userId, username: a.userId, userRoles: a.roles });
 }
 
@@ -107,7 +107,7 @@ function quorumVerdict(ws: string, f: L0Fixture): { result: "pass" | "fail"; cod
       // "store" writes the decision past the engine's refusals, as a tampering or foreign writer would: only the quorum stands.
       if (s.writePath === "store") {
         recordApprovalDecision({ workspace: ws, agentId: "default", approvalRequestId: approval.approvalRequestId, userId: d.userId, username: d.userId,
-          roles: d.roles, decision: "APPROVE_EXECUTE", reason: "layer0 fixture decision" });
+          roles: d.roles, decision: "APPROVE_EXECUTE", reason: "layer0 fixture decision", authentication: "authenticated" });
       } else decide(ws, approval.approvalRequestId, d);
     } catch (error) {
       if (/distinct approver required/.test(String(error))) return { result: "fail", code: "distinct_approver_required" };
@@ -141,7 +141,7 @@ describe("L0-OVS-03: the initiator check reads only the signed request (P1-78)",
       initiator: "LOCAL_USER:approver-1" });
     for (const userId of ["approver-1", "approver-2"]) {
       recordApprovalDecision({ workspace: ws, agentId: "default", approvalRequestId: approval.approvalRequestId, userId, username: userId,
-        roles: ["OWNER"], decision: "APPROVE_EXECUTE", reason: "layer0 fixture decision" });
+        roles: ["OWNER"], decision: "APPROVE_EXECUTE", reason: "layer0 fixture decision", authentication: "authenticated" });
     }
     const verify = () => verifyApprovalForExecution({ workspace: ws, approvalId: approval.approvalRequestId, expectedAgentId: "default",
       expectedIntentId: "intent-tamper", expectedToolName: "fixture.deploy", expectedActionClass: "WRITE_HIGH" });

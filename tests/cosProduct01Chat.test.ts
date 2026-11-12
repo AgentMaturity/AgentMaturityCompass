@@ -100,7 +100,8 @@ vi.mock("../src/setup/nativeFirstUseGuide.js", () => ({
     model: "synthetic-model", baseUrl: null, credential: null,
     nextAction: { argv: ["amc", "agent-loop", "run", "--credentials-file", "/synthetic/refs.yaml"] } }),
   renderNativeFirstUseGuide: () => "Synthetic setup only",
-  renderNativeGuideCommand: (command: { argv: readonly string[] }) => command.argv.join(" ")
+  renderNativeGuideCommand: (command: { argv: readonly string[] }) => command.argv.join(" "),
+  renderNativeVerifyHint: (_cwd: string, sessionId: string) => `amc agent-loop verify ${sessionId}`
 }));
 vi.mock("../src/extensions/nativeExtensionRuntime.js", () => ({
   loadNativeExtensions: () => ({ list: () => [], prepareTurn: () => ({ commands: [] }), unloadAll: () => {} }),

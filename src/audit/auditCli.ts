@@ -191,7 +191,9 @@ export function auditRequestApproveCli(params: {
     actorUserId: params.actorUserId,
     actorUsername: params.actorUsername,
     actorRoles: ["OWNER"],
-    reason: params.reason
+    reason: params.reason,
+    // `--actor` is self-asserted: the request is raised, and its approvals come from signed-in reviewers (H-1).
+    actorAuthentication: "self-asserted"
   });
 }
 

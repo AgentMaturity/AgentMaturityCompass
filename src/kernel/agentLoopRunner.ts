@@ -471,7 +471,9 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       recordProjectedEvidence: (row) => session.recordProjectedEvidence(row),
       assertWritable: () => session.assertWritable()
     });
-    const credentialsFiber = ctx.plugin(credentialsServices, options.credentials ?? {});
+    // Smoke L-3: a keyless composition (no route names a credential) never reads, or permission-checks, the store.
+    const credentialsFiber = ctx.plugin(credentialsServices, { ...options.credentials,
+      ...(options.routes.every(route => route.credentialRef === null) ? { lazy: true } : {}) });
     await credentialsFiber.await();
     fibers.push(credentialsFiber);
 

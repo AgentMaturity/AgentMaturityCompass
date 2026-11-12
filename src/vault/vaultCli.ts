@@ -10,6 +10,7 @@ import { createVault, encryptedVaultBytes, ensureVaultAndPublicKeys, keyIdsOf, l
   vaultPaths, vaultStatus, withVaultEnvelopeLock } from "./vault.js";
 import { resealVaultEnvelope } from "./vaultCrypto.js";
 import { localVaultPassphrasePath } from "./localPassphrase.js";
+import { vaultPassphraseFromEnv } from "./passphraseFile.js";
 import { forgetVaultPassphrase, operatorRememberedPassphrase } from "./passphraseStore.js";
 import { generateKeyPairSync } from "node:crypto";
 
@@ -35,7 +36,7 @@ export async function initVaultInteractive(workspace: string): Promise<{ vaultFi
     };
   }
 
-  const passphrase = process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Vault passphrase:"));
+  const passphrase = vaultPassphraseFromEnv() ?? (await promptPassphrase("Vault passphrase:"));
   if (!passphrase || passphrase.length < 8) {
     throw new Error("Vault passphrase must be at least 8 characters.");
   }
@@ -60,11 +61,11 @@ export async function initVaultInteractive(workspace: string): Promise<{ vaultFi
 }
 
 /**
- * AMC_VAULT_PASSPHRASE, else the passphrase `amc up` remembered for this workspace (an interactive operator only:
+ * AMC_VAULT_PASSPHRASE (or AMC_VAULT_PASSPHRASE_FILE), else the passphrase `amc up` remembered for this workspace (an interactive operator only:
  * operatorRememberedPassphrase), else a prompt. Without a terminal there is nobody to prompt, so it refuses with the fix.
  */
 export async function unlockVaultInteractive(workspace: string): Promise<string> {
-  const passphrase = process.env.AMC_VAULT_PASSPHRASE ?? operatorRememberedPassphrase(workspace)?.passphrase
+  const passphrase = vaultPassphraseFromEnv() ?? operatorRememberedPassphrase(workspace)?.passphrase
     ?? (await promptUnlockPassphrase());
   unlockVault(workspace, passphrase);
   return passphrase;
@@ -72,7 +73,7 @@ export async function unlockVaultInteractive(workspace: string): Promise<string>
 
 function promptUnlockPassphrase(): Promise<string> {
   if (process.stdin.isTTY !== true) {
-    throw new Error("Vault passphrase needed: export AMC_VAULT_PASSPHRASE for this shell, or re-run this command from your terminal.");
+    throw new Error("Vault passphrase needed: export AMC_VAULT_PASSPHRASE (or AMC_VAULT_PASSPHRASE_FILE) for this shell, or re-run this command from your terminal.");
   }
   return promptPassphrase("Unlock vault passphrase:");
 }
@@ -135,7 +136,7 @@ export function changeVaultPassphrase(workspace: string, current: string, next: 
 /** `amc vault passphrase`: the current passphrase from AMC_VAULT_PASSPHRASE, the operator-gated remembered store or a prompt; the new one typed twice, never argv. */
 export async function changeVaultPassphraseInteractive(workspace: string): Promise<VaultPassphraseChange> {
   if (process.stdin.isTTY !== true) throw new Error("A new vault passphrase is typed at a prompt, never passed on the command line: re-run this command from your terminal.");
-  const current = process.env.AMC_VAULT_PASSPHRASE || operatorRememberedPassphrase(workspace)?.passphrase || (await promptPassphrase("Current vault passphrase:"));
+  const current = vaultPassphraseFromEnv() || operatorRememberedPassphrase(workspace)?.passphrase || (await promptPassphrase("Current vault passphrase:"));
   const next = await promptPassphrase("New vault passphrase (at least 8 characters):");
   if ((await promptPassphrase("Repeat the new vault passphrase:")) !== next) throw new Error("The new passphrases do not match; nothing changed.");
   return changeVaultPassphrase(workspace, current, next);
@@ -160,6 +161,6 @@ export function vaultStatusNow(workspace: string): ReturnType<typeof vaultStatus
 }
 
 export async function rotateVaultKeysInteractive(workspace: string): Promise<ReturnType<typeof rotateMonitorKeyInVault>> {
-  const passphrase = process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Passphrase for key rotation:"));
+  const passphrase = vaultPassphraseFromEnv() ?? (await promptPassphrase("Passphrase for key rotation:"));
   return rotateMonitorKeyInVault(workspace, passphrase);
 }

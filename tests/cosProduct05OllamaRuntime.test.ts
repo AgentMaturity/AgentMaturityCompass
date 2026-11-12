@@ -91,8 +91,12 @@ async function drain(stream: AsyncIterable<StreamChunk>, seen: StreamChunk[] = [
   for await (const chunk of stream) seen.push(chunk); return seen;
 }
 function calls(chunks: readonly StreamChunk[]): ToolUseContentBlock[] {
-  return chunks.flatMap(chunk => chunk.type === "block-end" && chunk.block.kind === "tool_use" ? [chunk.block] : []);
+  return chunks.flatMap(chunk => chunk.type === "block-end" && chunk.block.kind === "tool_use" && chunk.block.unoffered !== true ? [chunk.block] : []);
 }
+/** Smoke M-5: an unoffered name arrives verbatim, marked and unbound; the loop refuses it, the request does not fail. */
+const unofferedNames = (chunks: readonly StreamChunk[]): (string | boolean)[][] => chunks.flatMap(chunk => chunk.type === "block-end" && chunk.block.kind === "tool_use" && chunk.block.unoffered === true
+  ? [[chunk.block.name, "providerWireName" in chunk.block]] : []);
+
 function result(writer: SessionService, call: ToolUseContentBlock, error = false): void {
   writer.recordToolResult({ toolCallId: call.id, outcome: error ? "ERROR" : "OK", exitCode: error ? 1 : 0,
     timedOut: false, denied: false, content: error ? '{"isError":false,"output":"actual scripted failure"}' : "scripted result" });
@@ -163,15 +167,25 @@ describe("P05 Ollama signed lifecycle (unexecuted)", () => {
     expect(second.settled?.assembly.usage).toEqual({ inputTokens: 7, cacheReadTokens: 5, outputTokens: 4 });
     h.close(); assertCold(h, [first, second, third]);
   });
-  test.each(["unoffered", "added-after-prepare", "malformed-trailer"])("%s produces a signed failure, not native tool authority", async attack => {
+  test.each(["unoffered", "added-after-prepare", "malformed-trailer"])("%s produces no native tool authority", async attack => {
     const original = "fs.read", foreign = "fs.write";
     const h = harness([response([nativeCall(providerToolWireName(attack === "malformed-trailer" ? original : foreign), 0)],
       { trailing: attack === "malformed-trailer" ? '{"unfinished":' : "" })]);
     const tools = [schema(original)], call = h.runtime.prepare(h.spec(tools));
     if (attack === "added-after-prepare") tools.push(schema(foreign));
-    const seen: StreamChunk[] = []; await expect(drain(call.stream(), seen)).rejects.toBeDefined();
+    const seen: StreamChunk[] = [];
+    if (attack !== "malformed-trailer") {
+      await drain(call.stream(), seen);
+      expect(calls(seen)).toEqual([]); expect(unofferedNames(seen)).toEqual([[providerToolWireName(foreign), false]]);
+      const rows = h.writer.readEvents().filter(row => row.event_type === "tool/call");
+      expect(rows).toHaveLength(1); expect(JSON.parse(rows[0]!.meta_json)).not.toHaveProperty("providerName");
+      expect(h.writer.readEvents().filter(row => row.event_type === "request/failure")).toHaveLength(0);
+      h.writer.recordToolResult({ toolCallId: JSON.parse(rows[0]!.meta_json).toolCallId, outcome: "DENIED", exitCode: null, timedOut: false, denied: true, content: "not available" });
+    } else {
+    await expect(drain(call.stream(), seen)).rejects.toBeDefined();
     expect(calls(seen)).toEqual([]); expect(h.writer.readEvents().filter(row => row.event_type === "tool/call")).toEqual([]);
     expect(h.writer.readEvents().filter(row => row.event_type === "request/failure")).toHaveLength(1);
+    }
     expect(JSON.parse(h.sent[0]!.body.toString()).tools.map((tool: { function: { name: string } }) => tool.function.name)).toEqual([providerToolWireName(original)]);
     h.finishStep(call); h.close(true); assertCold(h, [call]);
   });
@@ -180,8 +194,10 @@ describe("P05 Ollama signed lifecycle (unexecuted)", () => {
     const first = h.runtime.prepare(h.spec([schema("fs.read")])), old = calls(await drain(first.stream()))[0]!;
     result(h.writer, old); h.finishStep(first); h.writer.startStep();
     const second = h.runtime.prepare(h.spec([schema("fs.stat")])), seen: StreamChunk[] = [];
-    await expect(drain(second.stream(), seen)).rejects.toMatchObject({ code: "AMC_LLM_UNOFFERED_TOOL_NAME" });
-    expect(calls(seen)).toEqual([]); expect(h.writer.readEvents().filter(row => row.event_type === "tool/call")).toHaveLength(1);
+    await drain(second.stream(), seen);
+    expect(calls(seen)).toEqual([]); expect(unofferedNames(seen)).toEqual([[alias, false]]);
+    const rows = h.writer.readEvents().filter(row => row.event_type === "tool/call"); expect(rows).toHaveLength(2);
+    h.writer.recordToolResult({ toolCallId: JSON.parse(rows[1]!.meta_json).toolCallId, outcome: "DENIED", exitCode: null, timedOut: false, denied: true, content: "not available" });
     expect(h.sent[1]!.body.toString()).toContain(RAW);
     h.finishStep(second); h.close(true); assertCold(h, [first, second]);
   });

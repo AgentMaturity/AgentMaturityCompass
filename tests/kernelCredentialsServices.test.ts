@@ -162,6 +162,19 @@ describe("credentials service on the composed tree", () => {
     expect(applied, "a consumer must not run against an untrusted store").toEqual([]);
   });
 
+  it("smoke L-3: a composition whose routes name no credential does not boot (or permission-check) the store until asked", async () => {
+    const home = newHome({ [REF_NAME]: FIXTURE });
+    chmodSync(home, 0o755);
+    const ctx = new Context();
+    const fiber = ctx.plugin(credentialsServices, { homeDir: home, env: {}, watch: false, lazy: true });
+    await fiber.await();
+    const service = (ctx as unknown as Record<string, CredentialsSeamService>)[CREDENTIALS_SEAM.name];
+    expect(service).toBeTruthy();
+    // Something that does ask still meets the unchanged permission refusal.
+    expect(() => service!.resolve(REF)).toThrow(/mode 0755/);
+    await fiber.dispose();
+  });
+
   it("releases the file watcher when the fiber unloads", async () => {
     const ctx = new Context();
     const home = newHome({ [REF_NAME]: FIXTURE });

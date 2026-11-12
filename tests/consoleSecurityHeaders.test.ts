@@ -34,3 +34,11 @@ test("no console page has an inline script or handler that script-src 'self' wou
     expect(html, file).not.toMatch(/\son[a-z]+\s*=|javascript:/i);
   }
 });
+
+// 2026-11-12 go-live smoke: `amc up` prints `/console`; the page's `./assets/...` links then resolved to
+// `/assets/...` (401 JSON), so the console rendered unstyled and without its scripts.
+test("/console redirects to /console/ so the pages' relative asset links resolve", () => {
+  const { status, headers } = serve("/console");
+  expect(status).toBe(308);
+  expect(headers.location).toBe("console/");
+});

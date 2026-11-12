@@ -15,6 +15,17 @@ export function renderNativeInteractiveSession(row: NativeInteractiveSessionSumm
     + ` · ${row.canResume ? "inspect, verify, resume or fork" : "inspect/verify; resume blocked (requires released native history for this agent)"}`);
 }
 
+/**
+ * `amc sessions list` (smoke M-6): this agent's native agent-loop sessions, newest first, each with how to resume or
+ * inspect it. Read-only derived navigation, like the chat picker.
+ */
+export function renderNativeSessionList(workspace: string, agentId: string, limit: number): string[] {
+  return summarizeNativeSessions(workspace, agentId).filter(row => row.source === "native" && row.agentId === agentId).slice(0, limit)
+    .map(row => escapeTerminalControls(`${row.sessionId} · updated ${new Date(row.updatedAt).toISOString()} · ${row.state} · ${row.turns} turns · `
+      + (row.canResume ? `resume: amc agent-loop chat --session ${row.sessionId} (with the original --provider/--model)`
+        : `inspect: amc session show ${row.sessionId} · continue in a fork: amc agent-loop chat --fork-from ${row.sessionId}`)));
+}
+
 /** Re-read authenticated metadata after inspection/confirmation and again before dispatch. */
 export function assertNativeInteractiveSelection(workspace: string, agentId: string, selected: NativeInteractiveSessionSummary): NativeInteractiveSessionSummary {
   const current = listNativeInteractiveSessions(workspace, agentId).find(row => row.sessionId === selected.sessionId);

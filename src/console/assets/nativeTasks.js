@@ -107,6 +107,16 @@ function configuration(value) {
   return value;
 }
 
+/**
+ * A history read can race the turn being committed and answer 409 NATIVE_EVIDENCE_UNAVAILABLE for a moment (H1).
+ * The poller retries that one conflict with backoff and pauses only after repeated failures.
+ * @returns {number | null} the delay before the next read, or null to pause updates
+ */
+export function nativeTaskPollRetryDelay(error, failures) {
+  if (error?.status !== 409 || error?.code !== "NATIVE_EVIDENCE_UNAVAILABLE" || failures >= 4) return null;
+  return 300 * 2 ** failures;
+}
+
 /** One page-owned reader. Disconnecting this view never silently cancels or replays a task. */
 export async function renderNativeTasksPage({ root, initialAgent = "default" }) {
   mounts.get(root)?.();
@@ -114,13 +124,14 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   let disposed = false, config = null, task = null, tasks = [], cursor = -1, pageCursor = null, historyPending = false, timer = null;
   let polling = false, mutation = false, inspecting = false, pending = null, readGeneration = 0, setupGeneration = 0, readPaused = false;
   let retryReady = false, reconciling = false, stale = false;
-  let pollJob = null, listGeneration = 0, lastObservedAt = null, operationAction = null;
+  let pollJob = null, listGeneration = 0, lastObservedAt = null, operationAction = null, evidenceRetries = 0, retryDelay = null;
   let attachments = [], readingAttachments = false, attachmentGeneration = 0, observedTools = new Map();
   let selectedChecks = [], selectedChecksDigest = null;
   let notice = "", selectedAgent = initialAgent, taskRead = null;
   root.innerHTML = nativeTasksShell(initialAgent);
   const el = id => root.querySelector(`#${id}`);
   const listen = (target, event, fn) => target.addEventListener(event, fn, { signal: lifetime.signal });
+  const transcriptEndInView = () => el("nativeTaskTranscript").getBoundingClientRect().bottom <= window.innerHeight + 180;
   const tell = message => { if (!disposed && notice !== message) { notice = message; el("nativeTaskNotice").textContent = message; } };
   const clearError = () => { el("nativeTaskError").hidden = true; el("nativeTaskError").textContent = ""; };
   const showError = error => {
@@ -352,7 +363,8 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   function schedule() {
     clearTimer();
     if (!disposed && !mutation && !inspecting && !reconciling && !readPaused && task && navigator.onLine && (historyPending || !["released","closed"].includes(task.state))) {
-      timer = setTimeout(()=>{ void poll().catch(showError); }, historyPending ? 0 : ACTIVE.has(task.state) ? 1000 : 4000);
+      const delay = retryDelay ?? (historyPending ? 0 : ACTIVE.has(task.state) ? 1000 : 4000); retryDelay = null;
+      timer = setTimeout(()=>{ void poll().catch(showError); }, delay);
     }
   }
   function poll() {
@@ -375,11 +387,12 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
           receive(view); tell(view.history.message); return false;
         }
         const transcript = el("nativeTaskTranscript");
-        const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 180;
+        // L2: "near the end" is the transcript's end in view, not the page's (the prompt form sits below it).
+        const nearBottom = transcriptEndInView();
         for (const event of value.events) { el("nativeTaskEmpty")?.remove(); appendTaskEvent(transcript, event); }
         observedTools = collectNativeTaskTools(observedTools, value.events);
         if (value.page) { cursor = value.page.nextSeq - 1; pageCursor = value.page.nextCursor ?? value.page.resumeCursor; historyPending = value.page.nextCursor !== null; }
-        stale = false; lastObservedAt = Date.now();
+        stale = false; lastObservedAt = Date.now(); evidenceRetries = 0;
         const limit = Math.max(1, Math.min(config?.limits.maxEvents || 500, 500));
         while (transcript.children.length > limit) transcript.firstElementChild.remove();
         receive(view);
@@ -387,11 +400,14 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
           : `${taskStateLabel(task)}${!ACTIVE.has(task.state) && task.turnEndReason ? ` · ${task.turnEndReason}` : ""}.`);
         if (value.events.length) {
           if (nearBottom) transcript.lastElementChild?.scrollIntoView({ block: "nearest" });
-          else el("nativeTaskNewMessages").hidden = false;
+          else if (!transcriptEndInView()) el("nativeTaskNewMessages").hidden = false;
         }
         return true;
       } catch (error) {
         if (!isCurrent()) return false;
+        const delay = nativeTaskPollRetryDelay(error, evidenceRetries);
+        if (delay !== null) { evidenceRetries++; retryDelay = delay; return false; }
+        evidenceRetries = 0;
         pauseObservation(); tell("Updates paused. Refresh status to reconnect; no task action will be repeated automatically.");
         throw error;
       } finally {
@@ -586,6 +602,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   listen(el("nativeTaskReconnect"),"click",()=>{void refresh().catch(showError);});
   for(const [id,action] of [["nativeTaskCancel","cancel"],["nativeTaskRelease","release"],["nativeTaskResume","resume"],["nativeTaskVerify","verify"],["nativeTaskArchive","archive"]]) listen(el(id),"click",()=>{void mutate(action);});
   listen(el("nativeTaskIncludeArchived"),"change",()=>{if(!mutation&&!pending&&!inspecting&&!reconciling)void list().catch(showError);});
+  listen(window, "scroll", () => { if (transcriptEndInView()) el("nativeTaskNewMessages").hidden = true; });
   listen(el("nativeTaskNewMessages"),"click",()=>{el("nativeTaskTranscript").lastElementChild?.scrollIntoView({block:"nearest"});el("nativeTaskNewMessages").hidden=true;});
   listen(el("nativeTaskNew"),"click",()=>{
     if(pending||mutation||inspecting||reconciling||stale||readPaused||ACTIVE.has(task?.state))return;

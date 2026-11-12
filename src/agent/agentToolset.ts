@@ -36,7 +36,7 @@ import {
   runtimeFirewallGuard,
   toolhubAllowlistGuard
 } from "../tools/guards/policyGuards.js";
-import { actionPolicyGuard, actionPolicyMode, actionPolicyState, type ActionPolicyState } from "../tools/guards/actionPolicyGuard.js";
+import { actionPolicyGuard, actionPolicyMode, actionPolicyState, simulationNotice, type ActionPolicyState } from "../tools/guards/actionPolicyGuard.js";
 import { approvalModeGatedClasses, approvalModeNarrowing, type ApprovalMode } from "../approvals/approvalModes.js";
 import { redactionCountsFor, secretRedactionFilter } from "../shield/redaction/toolOutputRedaction.js";
 import { compiledApprovalClasses, compiledPolicyFacts, compiledPolicyGuard, compiledPolicyShows, planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
@@ -631,7 +631,8 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     ...(options.mode ? { mode: options.mode } : {}),
     journal: () => (journal ??= openActionJournal(workspace)),
     // SH-SANDBOX-06: every tool's output (and a thrown body's message) has its secrets replaced before the outcome exists.
-    filters: [secretRedactionFilter],
+    // H-3: a call that asked for EXECUTE and ran as SIMULATE says so, and why, in its own output.
+    filters: [secretRedactionFilter, simulationNotice(workspace, options.approvalMode === undefined ? null : `approval mode ${options.approvalMode} runs it as SIMULATE`)],
     narrowMode: composeNarrowing(actionPolicyMode(workspace), options.approvalMode === undefined ? null : approvalModeNarrowing(options.approvalMode)),
     // Under a compiled policy every call is bound to a record, and its approval classes need a signed approval.
     ...(compiled ? { authorizeClasses: new Set<string>(ACTION_CLASSES), boundApprovalRequiredFor: compiledApprovalClasses(compiled) } : {}),

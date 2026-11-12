@@ -25,6 +25,12 @@ The CLI, Dashboard, diagnostics, and Studio all read this chain. There is no sep
 
 For a native agent run with `--approve-tools`, a call in an authorized class (every class except `READ_ONLY` and `WRITE_LOW`) is approved under the tool's own signed action class, not the `--approve-tools` class, and the question names the amount and recipient first. The approval binds the call's authorization intent: the tool, its adapter and class, a digest of the normalized arguments, the amount, recipient, destination and resource, the deployment digest of the signed policy files, and the workspace id. The intent is kept with the signed request.
 
+`--approve-tools <class>` decides each call under that class's signed rule. The default `READ_ONLY` rule has
+`requiredApprovals: 0`, so `--approve-tools READ_ONLY` (the usual gate for `--mcp` mounts and `native-schedule
+run-due`) records a signed request per call that settles `QUORUM_MET 0/0` and asks no human; the run says "needs no
+human decision" for it. Use `WRITE_LOW` or higher, or raise the class's `requiredApprovals` in the signed approval
+policy, to have a human asked before each call.
+
 The tool pipeline binds an authorization record (`amc.authorization-record/v1`, ADR 009) when the call enters and rechecks it as the last step before the tool runs. The call is denied, and the tool never runs, when:
 
 - the amount, recipient, destination or resource differs from what was approved (`binding_changed:amount` and so on), or the tool differs (`tool_changed`);
@@ -66,9 +72,29 @@ An exception or review is a recorded human decision, never a certification or a 
 amc approvals list --agent <agentId> --status pending
 amc approvals list --agent <agentId> --query <requestId-fragment> --action-class DEPLOY --risk-tier high --effective-mode execute --created-after 2026-07-01T00:00:00Z --created-before 2026-08-01T00:00:00Z --order newest --limit 50 --json
 amc approvals show --agent <agentId> <requestId>
-amc approvals approve --agent <agentId> <requestId> --mode execute --reason "approved by owner" --username <reviewer> --roles OWNER
+amc approvals login --username <reviewer> --token-file <private-session-file> --json
+amc approvals approve --agent <agentId> <requestId> --mode execute --reason "approved by owner" --user-id <userId> --username <reviewer> --roles OWNER \
+  --session-token-file <private-session-file> --expect-request-digest <requestDigestSha256-from-show>
 amc approvals deny --agent <agentId> <requestId> --reason "not approved" --username <reviewer> --roles APPROVER
 ```
+
+An EXECUTE approval needs an authenticated reviewer: `--session-token-file` (an `amc approvals login` session) and
+`--expect-request-digest`, and the reviewer fields must match the session. `--username`/`--roles` without a session are
+self-asserted, so `approve --mode execute` refuses them and records nothing; the refusal names the login command.
+
+The engine enforces this for every caller. `decideApprovalForIntent` requires `reviewerAuthentication`, and anything
+other than `"authenticated"` is refused an EXECUTE approval, so a caller that omits it fails closed. Only callers that
+verified the reviewer pass `"authenticated"`: the CLI's session-token path (and through it native chat and one-shot
+prompts, ACP, and the TypeScript and Python SDKs' `approve`), Studio's decision routes (the signed-in session and its
+live roles, or the admin token), and Studio's audit evidence approval. `amc audit request approve --actor <id>` is
+self-asserted: it raises the dual-control request but records no owner decision; signed-in reviewers decide it.
+
+Each signed decision records `authentication: "authenticated" | "self-asserted"`. A self-asserted reviewer may still
+**deny** and approve **simulate**, but only a DENY or an authenticated approval is read by the engine and its consumers
+(`listApprovalDecisions`, `countedApprovalDecisions`): quorum, the distinct-user check, the native gate, assurance
+waiver publication (its OWNER and AUDITOR approvals), audit evidence fulfilment, authorization records and A4 effect
+approvals. A self-asserted approval of either mode, and a legacy row without the field, never attests to an identity
+or role; a deny only ever stops an action. Inbox and Studio displays still list every signed row.
 
 `--expect-request-digest` accepts the inbox digest or the engine's binding digest of the request (the one P2-24 break-glass prints, which leaves the request's initiator out), and the decision binds the binding digest. `--username` and `--roles` are required for decisions; `--user-id` can bind a stable identity distinct from its display name. Unknown roles and a repeated reviewer on a distinct-user request fail closed. CLI decisions use the same lifecycle delivery path as Studio. `APPROVED` remains an input compatibility alias for canonical `QUORUM_MET`.
 
@@ -116,7 +142,8 @@ The native one-shot approval prompt reads the actual signed pending request and
 prints an inspection command plus the existing authenticated login and decision
 templates. Unlike the legacy examples above, native templates include both
 `--session-token-file` and `--expect-request-digest`. Keep both: omitting them
-selects the legacy supplied-reviewer path, not authenticated native review.
+selects the self-asserted reviewer path, which can deny or approve simulate but
+is refused for an EXECUTE approval, so it can never satisfy a native gate.
 
 `amc approvals login --username '<existing-reviewer>' --token-file '<new-private-file>' --json`
 uses an existing active local user, a masked password prompt and a new private

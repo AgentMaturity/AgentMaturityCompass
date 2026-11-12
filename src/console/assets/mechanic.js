@@ -1,4 +1,4 @@
-import { apiGet, whoami } from "./api.js";
+import { apiGet, showSignIn, whoami } from "./api.js";
 import { renderGapTable } from "./components/gapTable.js";
 import { renderHandholdingSteps } from "./components/handholdingSteps.js";
 
@@ -41,7 +41,7 @@ async function main() {
   const root = document.getElementById("app");
   const user = await whoami().catch(() => null);
   if (!user) {
-    status.textContent = "Authentication required.";
+    showSignIn(status);
     return;
   }
   status.textContent = `Signed in as ${user.username ?? user.userId ?? "user"}`;

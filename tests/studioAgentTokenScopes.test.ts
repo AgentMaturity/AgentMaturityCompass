@@ -143,7 +143,7 @@ async function approvedWriteLow(f: Fixture, leaseToken: string) {
   const intent = JSON.parse(response.body) as ToolIntentResponse;
   expect(intent).toMatchObject({ allowed: true, effectiveMode: "EXECUTE", approvalRequired: true });
   const approvalId = intent.approvalRequestId!;
-  decideApprovalForIntent({ workspace: f.workspace, agentId: A, approvalId, decision: "APPROVED", mode: "EXECUTE",
+  decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: f.workspace, agentId: A, approvalId, decision: "APPROVED", mode: "EXECUTE",
     reason: "Approve the private token-scope fixture output", userId: f.owner.userId, username: f.owner.username,
     userRoles: f.owner.roles });
   expect(existsSync(sentinel)).toBe(false);

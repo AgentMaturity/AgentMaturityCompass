@@ -1,0 +1,89 @@
+// A4 engine requests (an effect gate's request, an outcome_unknown resolution) are decided through the project's own route,
+// bound to the request digest the project published (src/a4/assembleResolve.ts decideEngineRequest). The Assemble card and
+// the general approvals inbox (app.js) both decide them here: Studio's generic /approvals decide carries no digest, and
+// A4 counts only decisions bound to it (src/a4/a4Effects.ts verifyAndConsumeEffect).
+import { apiNativeRequest, whoami } from "./api.js";
+import { actionButton, approveOffer, currentGates, esc, held } from "./a4View.js";
+
+const API = "/api/v1/a4/projects";
+
+/** The A4 project an approval request names in its intent id (`a4-<projectId>-…`, src/a4), else null. */
+export const a4ProjectOf = (intentId) => /^a4-(a4p_[0-9a-f]{32})-/.exec(String(intentId ?? ""))?.[1] ?? null;
+
+/** The digest the project's readiness publishes for `approvalRequestId` (APPROVAL_REQUEST:/RESOLUTION_REQUESTED: codes), else null. */
+export function publishedDigest(readiness, approvalRequestId) {
+  for (const item of readiness?.items ?? []) {
+    for (const code of item.reasonCodes ?? []) {
+      const parts = String(code).split(":");
+      const at = parts.indexOf(approvalRequestId);
+      if (at > 0 && /^[0-9a-f]{64}$/.test(parts[at + 1] ?? "")) return parts[at + 1];
+    }
+  }
+  return null;
+}
+
+/** The project route and body that decide one engine request bound to `digest`. */
+export const engineDecision = (projectId, approvalRequestId, verb, reason, digest) => ({
+  path: `${API}/${encodeURIComponent(projectId)}/approvals/${encodeURIComponent(approvalRequestId)}/${verb === "deny" ? "deny" : "approve"}`,
+  body: { reason, expectedRequestDigestSha256: digest }
+});
+
+/**
+ * For the inbox: the A4 project among `projectIds` whose readiness (at its current stage) publishes a digest for
+ * `approvalRequestId`, with that digest; null when none does (not an A4 engine request, or one no project names now).
+ */
+export async function a4EngineRequest(projectIds, approvalRequestId) {
+  for (const projectId of projectIds) {
+    const project = await apiNativeRequest(`${API}/${encodeURIComponent(projectId)}`);
+    const stage = project?.project?.stage ?? project?.stage;
+    const readiness = await apiNativeRequest(`${API}/${encodeURIComponent(projectId)}/readiness?stage=${encodeURIComponent(stage)}`);
+    const digest = publishedDigest(readiness?.readiness ?? readiness, approvalRequestId);
+    if (digest !== null) return { projectId, stage, digest };
+  }
+  return null;
+}
+
+/** Records the inbox's decision on an A4 engine request through the project route, bound to the published digest. */
+export async function decideA4EngineRequest(found, approvalRequestId, verb, reason) {
+  const { path, body } = engineDecision(found.projectId, approvalRequestId, verb, reason, found.digest);
+  const me = await whoami();
+  return apiNativeRequest(path, { method: "POST", body: { ...body, clientRequestId: crypto.randomUUID() }, nativeCsrfToken: me?.nativeCsrfToken ?? undefined });
+}
+
+/** The A4 projects this user can see ({ projectId, agentId }); [] when the A4 preview is off or the list is refused. */
+export async function a4Projects() {
+  try {
+    const data = await apiNativeRequest(API);
+    const projects = Array.isArray(data) ? data : Array.isArray(data?.projects) ? data.projects : [];
+    return projects.filter((project) => typeof project?.projectId === "string" && typeof project.agentId === "string")
+      .map(({ projectId, agentId }) => ({ projectId, agentId }));
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Engine requests this tab recorded a decision on, per username: readiness names no engine decisions, and a second one is refused
+ * (distinct_approvers). Kept in sessionStorage so a reload in the same tab remembers; Studio still refuses any repeat.
+ */
+const DECIDED_KEY = "amc.a4.decidedEngineRequests";
+const decidedHere = (() => {
+  try { return new Set(JSON.parse(sessionStorage.getItem(DECIDED_KEY) ?? "[]")); } catch { return new Set(); }
+})();
+const decidedKey = (username, approvalRequestId) => `${username ?? ""}:${approvalRequestId}`;
+export const rememberDecided = (approvalRequestId, username) => {
+  decidedHere.add(decidedKey(username, approvalRequestId));
+  try { sessionStorage.setItem(DECIDED_KEY, JSON.stringify([...decidedHere].slice(-200))); } catch { /* storage unavailable: this load still remembers */ }
+};
+
+/**
+ * Approve and Deny for a stage's effect request. Approve is refused (400 SOD_VIOLATION) to anyone the stage's completion
+ * gate excludes (its requester, the revision's authors and builders), self-approval included; they may still deny.
+ */
+export function effectDecideButtons(ctx, stage, approvalRequestId, digest) {
+  const gate = currentGates(ctx.gates, stage, ctx.readiness).shown.find((row) => row.gate === "completion");
+  const done = decidedHere.has(decidedKey(ctx.me?.username, approvalRequestId)) ? held("You have already decided this request.") : null;
+  const button = (verb, label, offer) => actionButton(label, "decide-engine", done ?? offer,
+    `data-approval="${esc(approvalRequestId)}" data-digest="${esc(digest)}" data-verb="${verb}"`);
+  return `${button("approve", "Approve", approveOffer(ctx.allowed.requestChanges, gate, ctx.readiness, ctx.me, true))} ${button("deny", "Deny", ctx.allowed.requestChanges)}`;
+}

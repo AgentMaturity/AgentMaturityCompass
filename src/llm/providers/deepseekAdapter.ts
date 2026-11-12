@@ -213,7 +213,7 @@ export function deepseekFailure(input: AdapterFailureInput): AdapterFailureHint 
  * canonical offered-tool binder; endpoint/model behavior remains unprobed. */
 export const deepseekAdapter: LlmAdapter = {
   id: DEEPSEEK_CHAT_ID, version: DEEPSEEK_CHAT_VERSION,
-  encoderId: DEEPSEEK_CHAT_ID, encoderVersion: DEEPSEEK_CHAT_VERSION,
+  encoderId: DEEPSEEK_CHAT_ID, encoderVersion: 2,
   capabilities: DEEPSEEK_CAPABILITIES,
   assertParams: params => { deepseekParams(params); },
   envelope: deepseekEnvelope, decode: decodeDeepseek, describeFailure: deepseekFailure

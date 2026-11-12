@@ -160,6 +160,7 @@ interface PartialBlockState {
   toolCallId: ToolCallId | null;
   toolName: string | null;
   providerWireName?: string;
+  unoffered?: true;
   toolArguments: string;
   closedBlock: ContentBlock | null;
   gemini?: GeminiPartMeta;
@@ -229,6 +230,7 @@ export class BlockAssembler {
         // later frames carry an empty name that must not erase it.
         if (chunk.name !== undefined && chunk.name.length > 0) partial.toolName = chunk.name;
         if (chunk.providerWireName !== undefined) partial.providerWireName = chunk.providerWireName;
+        if (chunk.unoffered === true) partial.unoffered = true;
         partial.toolArguments += chunk.argumentsDelta;
         if (chunk.gemini !== undefined) partial.gemini = Object.freeze({ ...chunk.gemini });
         return;
@@ -370,6 +372,7 @@ function assembleOpen(partial: PartialBlockState): ContentBlock | null {
             id: partial.toolCallId,
             name: partial.toolName ?? "",
             ...(partial.providerWireName === undefined ? {} : { providerWireName: partial.providerWireName }),
+            ...(partial.unoffered === true ? { unoffered: true as const } : {}),
             arguments: partial.toolArguments,
             ...(partial.gemini === undefined ? {} : { gemini: partial.gemini })
           };

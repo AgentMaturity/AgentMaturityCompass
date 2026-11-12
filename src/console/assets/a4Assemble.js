@@ -5,6 +5,7 @@
 // session through Studio's native task route with its cursor contract (validateNativeTaskPoll); turns, cancel and resume stay on the
 // native task page. A connect lease token is shown from the one response that carried it and is kept nowhere else.
 import { apiNativeRequest } from "./api.js";
+import { effectDecideButtons, engineDecision, rememberDecided } from "./a4Approvals.js";
 import { registerStageAction, registerStageCard } from "./a4Cards.js";
 import * as view from "./a4View.js";
 import { validateNativeTaskPoll } from "./nativeTasks.js";
@@ -157,7 +158,9 @@ function renderBuild(ctx) {
   const spec = specOf(ctx);
   const build = isObject(spec.build) ? spec.build : null;
   // Only the owner's session starts the same task again (the task id is the owner's principal and the recorded request id).
-  const sessions = list(build?.sessions).map((session) => [`<code>${esc(session.taskId)}</code>`, esc(session.ownerUsername), `<code>${esc(session.start?.provider)}</code>`,
+  // Review needs each session closed: its owner closes it with "Close and verify" on the native tasks page.
+  const taskLink = (session) => `<a href="./native-tasks?agent=${encodeURIComponent(session.start?.agentId ?? ctx.project.agentId)}&task=${encodeURIComponent(session.taskId)}">Open on Native Tasks</a>`;
+  const sessions = list(build?.sessions).map((session) => [`<code>${esc(session.taskId)}</code> ${taskLink(session)}`, esc(session.ownerUsername), `<code>${esc(session.start?.provider)}</code>`,
     ctx.me?.username === session.ownerUsername && isObject(session.start)
       ? view.actionButton("Start it again", "start-session", ctx.allowed.build, `data-start="${esc(JSON.stringify(session.start))}"`) : ""]);
   return `<p class="muted">${esc(view.TRUTH.admission)}. Build, an owner's action, checks the signing key, the agent's signed Enforce
@@ -183,8 +186,10 @@ function renderReview(ctx) {
     `<code>${esc(session.effectivePolicy?.status)}</code> ${codes(session.effectivePolicy?.downgrades)}`]);
   const phases = list(review?.sessions).flatMap((session) => list(session.phases).map((phase) => [`<code>${esc(session.sessionId)}</code>`, esc(phase.phase),
     `<code>${esc(phase.status)}</code>`, phase.detail ? `<code>${esc(phase.detail)}</code>` : "", esc(phase.source)]));
-  return `<p class="muted">Review reads each build session through its owner and refuses while one runs, has failed or is still open: verify
-    the session on the native tasks page first, which closes it, so it takes no turn after what is reviewed. AMC's verifyAgentRun
+  const open = list(specOf(ctx).build?.sessions).map((session) => `<a href="./native-tasks?agent=${encodeURIComponent(session.start?.agentId ?? ctx.project.agentId)}&task=${
+    encodeURIComponent(session.taskId)}">${esc(session.taskId.slice(0, 12))}…</a>`).join(", ");
+  return `<p class="muted">Review reads each build session through its owner and refuses while one runs, has failed or is still open: its owner
+    opens it on the native tasks page${open ? ` (${open})` : ""} and presses Close and verify first, which closes it, so it takes no turn after what is reviewed. AMC's verifyAgentRun
     is an integrity self-check under this workspace's keys (the Integrity panel), never a claim about the agent.</p>
     ${review?.wording ? `<p><strong>${esc(review.wording)}</strong></p>` : ""}
     ${table(["Session", "Provider", "Validation", "Action evidence", "Integrity", "Effective policy (downgrades)"], sessions, "Not reviewed yet.")}
@@ -256,7 +261,7 @@ function renderEffect(ctx) {
       `data-gate="${esc(completion?.gateId ?? "")}"`)}</div>
     ${request ? `<p class="muted">Engine request <code>${esc(request[0])}</code> (<code>${esc(requestState ?? "unknown")}</code>)</p>${requestState === "PENDING" || requestState === "QUORUM_MET"
       ? `<label>Decision reason <textarea name="engine-reason" rows="2" maxlength="1000"></textarea></label>
-      <div class="row wrap">${decideButtons(ctx, request[0], request[1])}</div>` : ""}` : ""}
+      <div class="row wrap">${effectDecideButtons(ctx, "assemble", request[0], request[1])}</div>` : ""}` : ""}
     ${status(ctx, "effects.failed")}`;
 }
 
@@ -283,9 +288,9 @@ export function register() {
   });
   registerStageAction("assemble", "resolve-outcome", ({ button, headBinding, projectPath }) => ({ label: "Record the resolution",
     path: projectPath(`/outcome-unknown/${encodeURIComponent(button.dataset.execution)}/resolve`), body: headBinding() }));
-  registerStageAction("assemble", "decide-engine", ({ button, value, projectPath }) => ({ label: button.dataset.verb === "deny" ? "Deny" : "Approve",
-    path: projectPath(`/approvals/${encodeURIComponent(button.dataset.approval)}/${button.dataset.verb === "deny" ? "deny" : "approve"}`),
-    body: { reason: reasonOf(value), expectedRequestDigestSha256: button.dataset.digest } }));
+  registerStageAction("assemble", "decide-engine", ({ button, value, projectId, me }) => ({ label: button.dataset.verb === "deny" ? "Deny" : "Approve",
+    ...engineDecision(projectId, button.dataset.approval, button.dataset.verb, reasonOf(value), button.dataset.digest),
+    got: () => rememberDecided(button.dataset.approval, me?.username) }));
   registerStageAction("assemble", "open-effect", ({ button, headBinding, projectPath }) => {
     if (!button.dataset.gate) throw new Error("No approved completion gate is shown. Refresh first. Nothing was sent.");
     return { label: "Open the effect gate", path: projectPath("/stages/assemble/effects/a4.assemble.apply/open"), body: { gateId: button.dataset.gate, ...headBinding() } };

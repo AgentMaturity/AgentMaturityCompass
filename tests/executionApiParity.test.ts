@@ -5,7 +5,7 @@ import { tmpdir, userInfo } from "node:os";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { afterAll, describe, expect, it, vi } from "vitest";
-import { addUser } from "../src/auth/authApi.js";
+import { addUser, createSession } from "../src/auth/authApi.js";
 import { initProcessorRegistry } from "../src/dataflow/processorRegistry.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { RUN_EXIT_CODES } from "../src/cli/agentLoopOutputOptions.js";
@@ -101,6 +101,19 @@ function cli(f: Fixture, args: readonly string[]): { child: ChildProcess; done: 
 const cliJson = (output: { stdout: string }) => JSON.parse(output.stdout) as { sessionId: string; toolCalls: number;
   execution: { phases: unknown; receiptStates: string[]; recheckFailures: string[] } };
 
+/** EXECUTE approvals need an authenticated reviewer (H-1): users.yaml fixture identities with real tracked sessions. */
+function reviewerSessions(f: Fixture): Map<string, { userId: string; tokenFile: string }> {
+  for (const [key, value] of Object.entries(f.env)) vi.stubEnv(key, value);
+  try {
+    return new Map([OS_USER, ...REVIEWERS].map((name) => {
+      const user = addUser({ workspace: f.workspace, username: name, password: `${name}-password`, roles: ["APPROVER"] });
+      const tokenFile = join(f.root, `${name}.token`);
+      writeFileSync(tokenFile, createSession({ workspace: f.workspace, user }).token, { mode: 0o600 });
+      return [name, { userId: user.userId, tokenFile }] as const;
+    }));
+  } finally { lockVault(f.workspace); vi.unstubAllEnvs(); }
+}
+
 async function cliLeg(f: Fixture): Promise<Leg> {
   const verbs = new Set<string>(), record: Record<string, unknown> = {};
   const flags = ["--provider", "stub", "--tools", "workspace", "--approve-tools", "WRITE_HIGH", "--json"];
@@ -108,8 +121,13 @@ async function cliLeg(f: Fixture): Promise<Leg> {
     const listed = JSON.parse((await cli(f, ["approvals", "list", "--agent=default", "--status=pending", "--json"]).done).stdout) as { requests: { approvalRequestId: string }[] };
     return listed.requests.map((r) => r.approvalRequestId).find((id) => !exclude.includes(id));
   }, "a CLI approval");
-  const approve = (id: string, username: string) => cli(f, ["approvals", "approve", id, "--agent=default", "--mode=execute",
-    "--reason=parity fixture reviewer, not a human decision", `--username=${username}`, "--roles=APPROVER"]).done;
+  const sessions = reviewerSessions(f);
+  const approve = async (id: string, username: string) => {
+    const digest = (JSON.parse((await cli(f, ["approvals", "show", "--agent=default", id]).done).stdout) as { requestDigestSha256: string }).requestDigestSha256;
+    const who = sessions.get(username)!;
+    return cli(f, ["approvals", "approve", id, "--agent=default", "--mode=execute", "--reason=parity fixture reviewer, not a human decision",
+      `--username=${username}`, `--user-id=${who.userId}`, "--roles=APPROVER", `--session-token-file=${who.tokenFile}`, `--expect-request-digest=${digest}`]).done;
+  };
   const first = cli(f, ["agent-loop", "run", READ, ...flags, "--stream", "--keep-open"]);
   verbs.add("start");
   const approval = await pending([]);
@@ -149,8 +167,13 @@ async function typescriptLeg(f: Fixture): Promise<Leg> {
     command: [process.execPath, CLI], env: f.env, timeoutMs: 120_000 };
   const pending = (client: AMCNativeClient, exclude: string[]) =>
     until(async () => (await client.pendingApprovals()).map((a) => a.approvalRequestId).find((id) => !exclude.includes(id)), "an SDK approval");
-  const approve = (client: AMCNativeClient, id: string, username: string) =>
-    client.approve({ approvalRequestId: id, reason: "parity fixture reviewer, not a human decision", username, roles: ["APPROVER"] });
+  const sessions = reviewerSessions(f);
+  const approve = async (client: AMCNativeClient, id: string, username: string) => {
+    const digest = (await client.pendingApprovals()).find((a) => a.approvalRequestId === id)!.requestDigestSha256;
+    const who = sessions.get(username)!;
+    return client.approve({ approvalRequestId: id, reason: "parity fixture reviewer, not a human decision", username, roles: ["APPROVER"],
+      userId: who.userId, sessionTokenFile: who.tokenFile, expectRequestDigest: digest });
+  };
   const first = await AMCNativeClient.start(options);
   const session = await first.newSession(), parent = session.sessionId;
   verbs.add("start");

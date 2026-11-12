@@ -431,8 +431,10 @@ export async function runStudioForeground(params: {
   await assertPortFree(metricsHost, listen.metricsPort, listen.metricsPortSource);
   // The gateway never falls back and opens its session before it listens, so its busy ports are refused first (skeptic D4).
   const gatewayHost = params.gatewayHost ?? listen.apiHost, gatewayConfig = loadGatewayConfig(workspace);
-  await assertPortFree(gatewayHost, params.gatewayPort ?? gatewayConfig.listen.port, params.gatewayPort === undefined ? "the gateway config" : "AMC_GATEWAY_PORT");
-  if (gatewayConfig.proxy.enabled) await assertPortFree(gatewayHost, params.proxyPort ?? gatewayConfig.proxy.port, params.proxyPort === undefined ? "the gateway config" : "AMC_PROXY_PORT");
+  await assertPortFree(gatewayHost, params.gatewayPort ?? gatewayConfig.listen.port, params.gatewayPort === undefined ? "the gateway config"
+    : (params.env ?? {}).AMC_GATEWAY_PORT ? "AMC_GATEWAY_PORT" : "the default gateway port; set AMC_GATEWAY_PORT to change it");
+  if (gatewayConfig.proxy.enabled) await assertPortFree(gatewayHost, params.proxyPort ?? gatewayConfig.proxy.port, params.proxyPort === undefined ? "the gateway config"
+    : (params.env ?? {}).AMC_PROXY_PORT ? "AMC_PROXY_PORT" : "the default proxy port; set AMC_PROXY_PORT to change it");
   const gateway = await startGateway({
     workspace,
     workspaceId: workspaceIdFromDirectory(workspace),
@@ -619,7 +621,7 @@ export async function startStudioDaemon(workspace: string, options: StartStudioD
     }
     if (exited !== null) {
       // Name the daemon's own reason (often its fix), not only the log path; earlier runs' lines are left out.
-      const reason = readFileSync(logFile).subarray(logStart).toString("utf8").trim().slice(-600);
+      const reason = readFileSync(logFile).subarray(logStart).toString("utf8").trim().slice(-600).replace(/\.+$/, "");
       throw new Error(`Studio daemon exited during startup (${exited})${reason ? `: ${reason}` : ""}. See ${logFile}.`);
     }
     await new Promise((resolvePromise) => setTimeout(resolvePromise, 100));

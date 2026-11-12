@@ -71,6 +71,14 @@ export function serveConsolePath(pathname: string, res: ServerResponse): boolean
   for (const [name, value] of Object.entries(CONSOLE_SECURITY_HEADERS)) {
     res.setHeader(name, value);
   }
+  if (pathname === "/console") {
+    // Pages link assets as "./assets/..."; without the trailing slash those resolve outside /console.
+    // The Location is relative so a workspace-prefixed mount (/w/<id>/console) redirects within its prefix.
+    res.statusCode = 308;
+    res.setHeader("location", "console/");
+    res.end();
+    return true;
+  }
   const file = resolveConsolePath(pathname);
   if (!file || !pathExists(file)) {
     res.statusCode = 404;

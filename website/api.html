@@ -7,7 +7,7 @@
 <meta name="description" content="Interactive API explorer for the Agent Maturity Compass REST API. Test endpoints, explore schemas, and integrate with your AMC instance.">
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="brand.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.34.0/swagger-ui.css" integrity="sha384-4c3vsE5f+trhFyHrFrLM1fFGUn531NIaC7dcqEWIJdoRQJ5CkJbSuSCwXLpaS1KF" crossorigin="anonymous">
 <style>
   :root {
     --bg: #050505;
@@ -53,8 +53,11 @@
   }
   .base-url-form {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 0.5rem;
+    max-width: 100%;
+    min-width: 0;
   }
   .base-url-form label {
     font-size: 0.75rem;
@@ -69,6 +72,9 @@
     padding: 0.4rem 0.8rem;
     border-radius: 3px;
     width: 280px;
+    max-width: 100%;
+    min-width: 0;
+    flex: 1 1 180px;
   }
   .base-url-form button {
     background: var(--green);
@@ -82,6 +88,11 @@
     cursor: pointer;
   }
   .base-url-form button:hover { opacity: 0.9; }
+  .api-version-note { margin: 1rem 2rem 0; color: var(--text2); font-size: 0.8rem; }
+  @media (max-width: 600px) {
+    .top-bar { padding: 1rem; }
+    .api-version-note { margin: 1rem 1rem 0; }
+  }
 
   /* Swagger UI overrides for hacker theme */
   .swagger-ui {
@@ -225,9 +236,10 @@
       <button onclick="updateBaseUrl()">Apply</button>
     </div>
   </div>
+  <p class="api-version-note">The version shown below is the REST API document's own version, not an AMC release. The published AMC release is 1.1.1.</p>
   <div id="swagger-ui"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.34.0/swagger-ui-bundle.js" integrity="sha384-9Td7MKiIr2S83E1kZyyVi8KdJw/S8CpAvu0llLyMeg0xq/hDGiZJfVn0fV4llCmK" crossorigin="anonymous"></script>
   <script>
     let ui;
     function initSwagger(baseUrl) {

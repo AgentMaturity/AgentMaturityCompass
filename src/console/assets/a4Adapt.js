@@ -5,6 +5,7 @@
 // declared-versus-enforced table (slice B). Read from the newest Adapt revision and the readiness Studio returns. Renderers
 // are pure: every server string goes through esc(), statuses, reason codes and the catalog's notice are printed as Studio
 // returned them, and no card names a maturity level or a percentage.
+import { effectDecideButtons, engineDecision, rememberDecided } from "./a4Approvals.js";
 import { registerStageAction, registerStageCard } from "./a4Cards.js";
 import * as view from "./a4View.js";
 
@@ -79,9 +80,7 @@ function renderBlockers(ctx) {
       ${codes(item.reasonCodes)}${item.nextAction?.label ? `<br><span class="muted">${esc(item.nextAction.label)}</span>` : ""}</li>`).join("")}</ul>`).join("");
 }
 
-const decideButtons = (ctx, approvalRequestId, digest) => `${view.actionButton("Approve", "decide-engine", ctx.allowed.requestChanges,
-  `data-approval="${esc(approvalRequestId)}" data-digest="${esc(digest)}" data-verb="approve"`)} ${view.actionButton("Deny", "decide-engine",
-  ctx.allowed.requestChanges, `data-approval="${esc(approvalRequestId)}" data-digest="${esc(digest)}" data-verb="deny"`)}`;
+const decideButtons = (ctx, approvalRequestId, digest) => effectDecideButtons(ctx, "adapt", approvalRequestId, digest);
 
 /** The plan's signing and activation: the effect gate, its engine request, the lockout notice and the lifecycle-bridge rows. */
 function renderActivation(ctx) {
@@ -140,7 +139,12 @@ const factsOf = (ctx) => (isObject(specOf(ctx).understanding?.facts) ? specOf(ct
 /** The context plugin Build wrote and the probe: where it reaches (an in-process run, Studio native tasks since P2-37) and where it does not (a deployed agent). */
 function renderContext(ctx) {
   const context = buildOf(ctx)?.context;
-  const probeOffer = ctx.project.stage === "adapt" && ["built", "reviewed"].includes(ctx.project.step) ? ctx.allowed.build : view.held("The probe runs after Build");
+  // A probe records new evidence on the head revision, which supersedes an open approval request: once it has passed,
+  // running it again while one is open is held.
+  const { open, met } = view.currentGates(ctx.gates, "adapt", ctx.readiness);
+  const passed = itemOf(ctx, "context_reaches_runtime_frame")?.status === "READY";
+  const probeOffer = !(ctx.project.stage === "adapt" && ["built", "reviewed"].includes(ctx.project.step)) ? view.held("The probe runs after Build")
+    : passed && (open ?? met) ? view.held("The probe already passed; running it again would supersede the open approval request.") : ctx.allowed.build;
   return `<p class="muted">Build writes your audience, market, sector, language, accessibility, data-handling and regulatory-note answers as one attributed
       context plugin (order 160), signed. An in-process run loads it, and a Studio native task started after Build loads it into its system prompt
       when its signature checks out (in a regulated workspace a plugin that does not verify refuses the task). A deployed agent does not load it. The probe runs one turn on the stub provider and AMC checks that session's signed user/message row for the
@@ -229,11 +233,11 @@ export function register() {
     if (!button.dataset.gate) throw new Error("No approved completion gate is shown. Refresh first. Nothing was sent.");
     return { label: "Open the plan review", path: projectPath(`/stages/adapt/effects/${EFFECT}/open`), body: { gateId: button.dataset.gate, ...headBinding() } };
   });
-  registerStageAction("adapt", "decide-engine", ({ button, value, projectPath }) => {
+  registerStageAction("adapt", "decide-engine", ({ button, value, projectId, me }) => {
     const reason = value("engine-reason");
     if (!reason) throw new Error("Write a decision reason first. Nothing was sent.");
     return { label: button.dataset.verb === "deny" ? "Deny" : "Approve",
-      path: projectPath(`/approvals/${encodeURIComponent(button.dataset.approval)}/${button.dataset.verb === "deny" ? "deny" : "approve"}`),
-      body: { reason, expectedRequestDigestSha256: button.dataset.digest } };
+      ...engineDecision(projectId, button.dataset.approval, button.dataset.verb, reason, button.dataset.digest),
+      got: () => rememberDecided(button.dataset.approval, me?.username) };
   });
 }

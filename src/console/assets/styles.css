@@ -143,13 +143,32 @@ nav .nav-features > summary {
   font-size: 12px;
 }
 
-nav .nav-features > summary:focus-visible,
-.first-use button:focus-visible,
-.first-use code:focus-visible,
-nav a:focus-visible,
-.mobile-nav-toggle:focus-visible {
+/* M10: every focusable control shows keyboard focus (inputs set outline: none for the mouse). */
+:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
+}
+
+.skip-link {
+  position: absolute;
+  left: 8px;
+  top: -48px;
+  z-index: 1000;
+  padding: 8px 12px;
+  background: var(--accent);
+  color: #0a0a0a;
+  border-radius: 6px;
+}
+
+.skip-link:focus {
+  top: 8px;
+}
+
+main:focus {
+  outline: none;
 }
 
 .first-use-intents {
@@ -591,7 +610,7 @@ main {
 
 .studio-terminal-line {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
   gap: 16px;
   padding: 7px 0;
   border-bottom: 1px solid rgba(255,255,255,.055);
@@ -609,6 +628,7 @@ main {
 .studio-terminal-line span {
   color: var(--muted);
   text-align: right;
+  overflow-wrap: anywhere;
 }
 
 .studio-command {
@@ -1050,6 +1070,11 @@ button.danger {
   color: var(--danger);
 }
 
+.action-error {
+  flex-basis: 100%;
+  margin: 6px 0 0;
+}
+
 .row {
   display: flex;
   gap: 8px;
@@ -1222,4 +1247,39 @@ a:hover {
   .studio-terminal-line span {
     text-align: left;
   }
+}
+
+/* Industry Pack questionnaire (M3): one labelled radio group per question, readable at 375px. */
+.pack-questions fieldset {
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  min-width: 0;
+}
+
+.pack-questions legend {
+  padding: 0 4px;
+}
+
+.pack-level {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 6px 0;
+  overflow-wrap: anywhere;
+}
+
+.pack-level input {
+  margin-top: 3px;
+  flex: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }

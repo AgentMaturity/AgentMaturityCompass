@@ -95,6 +95,14 @@ async function sectorCounts() {
   return { packs: listIndustryPacks().length, questions, stations };
 }
 
+/** Requirements a station's conformance run evaluates, from the built derivation (no station profile). */
+async function conformanceRequirements(station) {
+  const built = join(root, "dist/domains/conformance/conformanceRequirements.js");
+  if (!existsSync(built)) return null;
+  const { deriveStationRequirements } = await import(built);
+  return deriveStationRequirements(station).length;
+}
+
 export async function collectCounts() {
   const testFiles = walk(join(root, "tests"), (n) => n.endsWith(".test.ts")).length;
   // Retained for inventory consumers: lexical matches, not discovered cases
@@ -127,6 +135,8 @@ export async function collectCounts() {
     sectorPacks: sector?.packs ?? null,
     sectorPackQuestions: sector?.questions ?? null,
     sectorStations: sector?.stations ?? null,
+    conformanceRequirementsHealth: await conformanceRequirements("health"),
+    conformanceRequirementsWealth: await conformanceRequirements("wealth"),
     layer0Controls: layer0?.controls ?? null,
     layer0ExecutedControls: layer0?.executed ?? null,
     layer0AwaitingProducer: layer0?.awaiting ?? null,
@@ -157,10 +167,14 @@ const CLI_COUNT_SURFACES = new Set([
   "website/i18n.js",
   "website/docs/cli.html",
   "website/docs/competitive-analysis.md",
+  "website/docs/index.html",
+  "website/docs/docs.js",
   "src/console/assets/app.js"
 ]);
 const ADAPTER_COUNT_SURFACES = new Set([
-  "README.md", "website/index.html", "docs/PRICING.md", "docs/PRICING_FAQ.md"
+  "README.md", "website/index.html", "docs/PRICING.md", "docs/PRICING_FAQ.md", "docs/BENCHMARK_GALLERY.md",
+  "website/llms.txt", "website/vs-promptfoo.html", "website/blog.html", "website/blog/the-84-point-gap.html",
+  "website/docs/adapters.html", "website/docs/docs.js"
 ]);
 // P1-42 review: sector-pack question counts, always stated with what the questions are.
 const SECTOR_LABEL = "experimental, self-reported";
@@ -194,6 +208,7 @@ const PUBLIC_SURFACES = new Set([
   // P1-14: the Layer 0 baseline's control totals.
   "docs/catalog/LAYER0.md",
   ...CLI_COUNT_SURFACES,
+  ...ADAPTER_COUNT_SURFACES,
   ...SECTOR_COUNT_SURFACES
 ]);
 
@@ -302,7 +317,8 @@ for (const rel of PUBLIC_SURFACES) {
       /(?<=CLI Reference \()[\d,]+(?= command paths\))/g,
       /(?<=AMC CLI currently registers )[\d,]+(?= command paths\b)/g,
       /(?<=stat-value">)[\d,]+(?=<\/span><span class="stat-label">CLI commands)/g,
-      /(?<=\| CLI command paths \| )[\d,]+(?= \|)/g
+      /(?<=\| CLI command paths \| )[\d,]+(?= \|)/g,
+      /(?<=<div class="num">)[\d,]+(?=<\/div><div class="label">CLI Paths<)/g
     ];
     for (const template of templates) {
       updated = updated.replace(template, (current) => {
@@ -317,7 +333,10 @@ for (const rel of PUBLIC_SURFACES) {
   updated = stationCards(rel, updated);
   if (SECTOR_COUNT_SURFACES.has(rel)) updated = sectorTemplates(rel, updated);
   if (ADAPTER_COUNT_SURFACES.has(rel)) {
-    updated = updated.replace(/\b\d[\d,]*(?= (?:built-in |framework )?adapters\b)/gi, String(counts.adapters));
+    updated = updated
+      .replace(/\b\d[\d,]*(?= (?:built-in |framework )?adapters\b)/gi, String(counts.adapters))
+      .replace(/(?<=<div class="num">)\d+(?=<\/div><div class="label">Framework Adapters<)/g, String(counts.adapters))
+      .replace(/(?<=\| Framework adapters \| )\d+(?= \|)/g, String(counts.adapters));
   }
 
   if (updated !== original) {

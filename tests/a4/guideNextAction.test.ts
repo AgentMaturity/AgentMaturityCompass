@@ -95,6 +95,27 @@ describe("A-3: readinessHeadline", () => {
       .toEqual({ status: "COMPLETE", nextAction: null });
   });
 
+  // M6 (go-live smoke): readiness read READY and named "Complete the completion gate" while complete refused 409
+  // EFFECT_GATE_NOT_OPEN; a complete stage named an acknowledged item's action beside COMPLETE.
+  test("a completion gate with quorum waits on its stage's effect gate; a complete stage names nothing", () => {
+    const met = { status: "QUORUM_MET", approvals: 1, required: 1 } as unknown as A4GateStatus;
+    const effect = item("effect_gate", "WAITING", { mandatory: false, reasonCodes: ["EFFECT_GATE_NOT_OPEN"], nextAction: { label: "An owner opens the effect gate" } });
+    expect(readinessHeadline(state("reviewed"), query, [item("members.present", "READY"), effect], { direction: null, completion: met }))
+      .toEqual({ status: "WAITING", nextAction: { label: "An owner opens the effect gate" } });
+    const opened = item("effect_gate", "READY", { mandatory: false, reasonCodes: ["EFFECT_GATE_OPENED", "APPROVAL_STATUS:QUORUM_MET"] });
+    expect(readinessHeadline(state("reviewed"), query, [opened], { direction: null, completion: met }))
+      .toEqual({ status: "READY", nextAction: { label: "Complete the completion gate" } });
+    // Adapt's plan review is optional: its unopened item never holds the completion.
+    const review = item("plan_review_opened", "WAITING", { mandatory: false, reasonCodes: ["EFFECT_GATE_NOT_OPEN"], nextAction: { label: "open it" } });
+    expect(readinessHeadline(state("reviewed"), query, [review], { direction: null, completion: met }))
+      .toEqual({ status: "READY", nextAction: { label: "Complete the completion gate" } });
+    const consumed = { status: "CONSUMED" } as A4GateStatus;
+    const acked = item("plan_unresolved", "WAITING", { nextAction: { label: "Answer the missing facts" }, acknowledged: { by: "o" } as never });
+    expect(readinessHeadline(state("completion_approved"), query, [acked], { direction: consumed, completion: consumed }))
+      .toEqual({ status: "COMPLETE", nextAction: null });
+    expect(readinessHeadline(state("reviewed"), query, [acked], noGates).nextAction).toEqual({ label: "Request the completion gate" });
+  });
+
   test("a held project says who resumes it; a denied gate says a new revision is needed unless another item blocks", () => {
     const held = { project: { stage: "assemble", step: "built", hold: 1 } } as Parameters<typeof readinessHeadline>[0];
     expect(readinessHeadline(held, query, [], noGates).nextAction).toEqual({ label: "On hold: an owner resumes the project" });
@@ -304,5 +325,19 @@ describe("A-9: the deploy receipt form's helmRevision is an integer placeholder"
     expect(helm.receiptForm.body.helmRevision).toBe(0);
     expect(helm.steps.find((step) => step.command?.endsWith("history amc"))!.note).toContain("an integer from helm history");
     expect(plan("compose").receiptForm.body.helmRevision).toBeNull();
+  });
+});
+
+// H4 (go-live smoke): a stale answer is confirmed by saving its same value again on the new revision.
+describe("H4: re-affirming a stale answer", () => {
+  test("saving the same value clears ANSWER_STALE", async () => {
+    const ws = a4Workspace();
+    const p = await A4Project.create(ws.workspace, ws.alice);
+    await p.ok(ws.alice, "/stages/aspire/answers", { answers: aspireAnswers() });
+    await p.ok(ws.alice, "/stages/aspire/answers", { answers: [{ questionId: "markets", value: ["US"] }] });
+    const codes = async () => itemOf(await readiness(p, ws.alice), "ask_complete")?.reasonCodes ?? [];
+    expect(await codes()).toContain("ANSWER_STALE:stations");
+    await p.ok(ws.alice, "/stages/aspire/answers", { answers: [{ questionId: "stations", value: ["technology"] }] });
+    expect(await codes()).not.toContain("ANSWER_STALE:stations");
   });
 });

@@ -40,7 +40,7 @@ async function plugin(f:ReturnType<typeof fixture>){
   publishPluginToRegistry({dir,pluginFile:file,registryKeyPath:join(dir,"registry.key")});savePluginRegistriesConfig(f.workspace,{pluginRegistries:{version:1,registries:[{id:"local",type:"file",base:dir,pinnedRegistryPubkeyFingerprint:registry.fingerprint,
     allowPluginPublishers:[packed.manifest.signing.pubkeyFingerprint],allowRiskCategories:["LOW","MEDIUM","HIGH","CRITICAL"],autoUpdate:false}]}});
   const pending=await requestPluginInstall({workspace:f.workspace,agentId:"default",initiator:"snapshot-owner",registryId:"local",pluginRef:"amc.plugin.fixture.snapshot@2.0.0",action:"install"});
-  for(const [id,roles] of [["owner-fixture",["OWNER"]],["auditor-fixture",["AUDITOR"]]] as const)decideApprovalForIntent({workspace:f.workspace,agentId:"default",approvalId:pending.approvalRequestId,decision:"APPROVED",mode:"EXECUTE",reason:"owned dual approval",userId:id,username:id,userRoles:[...roles]});
+  for(const [id,roles] of [["owner-fixture",["OWNER"]],["auditor-fixture",["AUDITOR"]]] as const)decideApprovalForIntent({ reviewerAuthentication: "authenticated",workspace:f.workspace,agentId:"default",approvalId:pending.approvalRequestId,decision:"APPROVED",mode:"EXECUTE",reason:"owned dual approval",userId:id,username:id,userRoles:[...roles]});
   return{path:"/plugins/execute",body:{approvalRequestId:pending.approvalRequestId},audit:"PLUGIN_INSTALLED"};
 }
 async function primary(f:ReturnType<typeof fixture>,family:"plugin"|"policy"){return family==="plugin"?plugin(f):{path:"/policy-packs/code-agent.low/apply",body:{agentId:"default"},audit:"HUMAN_POLICY_PACK_APPLY"};}

@@ -247,10 +247,12 @@ const PUBLIC_DOC_IDS = new Set([
   'MIGRATION_FROM_PROMPTFOO_DEEPEVAL'
 ]);
 const PUBLIC_DOCS = ALL_DOCS.filter(doc => PUBLIC_DOC_IDS.has(doc) && !INTERNAL_DOCS.has(doc));
+// Number the published categories in order, so a category with no public guide leaves no gap.
 const PUBLIC_CATEGORIES = CATEGORIES.map(category => ({
   ...category,
   docs: category.docs.filter(doc => PUBLIC_DOCS.includes(doc))
-})).filter(category => category.docs.length > 0);
+})).filter(category => category.docs.length > 0)
+  .map((category, index) => ({ ...category, icon: String(index + 1).padStart(2, '0') }));
 
 globalThis.AMC_DOCS_BUILD_MANIFEST = Object.freeze({
   publicDocs: Object.freeze([...PUBLIC_DOCS].sort()),
@@ -689,9 +691,9 @@ function showWelcome() {
         <div class="stat-card"><div class="num">${PUBLIC_DOCS.length}</div><div class="label">Public Guides</div></div>
         <div class="stat-card"><div class="num">${PUBLIC_CATEGORIES.length}</div><div class="label">Categories</div></div>
         <div class="stat-card"><div class="num">244</div><div class="label">Default Questions</div></div>
-        <div class="stat-card"><div class="num">1,171</div><div class="label">CLI Paths</div></div>
+        <div class="stat-card"><div class="num">1,300</div><div class="label">CLI Paths</div></div>
         <div class="stat-card"><div class="num">41</div><div class="label">Industry Packs</div></div>
-        <div class="stat-card"><div class="num">14</div><div class="label">Framework Adapters</div></div>
+        <div class="stat-card"><div class="num">16</div><div class="label">Framework Adapters</div></div>
       </div>
 
       <h2>Start Here</h2>

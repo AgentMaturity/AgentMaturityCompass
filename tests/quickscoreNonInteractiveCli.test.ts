@@ -33,7 +33,7 @@ describe("quickscore non-interactive CLI output", () => {
         "amc quickscore",
         "amc quickscore --answers answers.json --json",
         "amc quickscore --auto",
-        "amc wrap <runtime> -- <your-agent-command>"
+        "amc adapters run --agent <id> --adapter generic-cli -- <your-agent-command>"
       ]
     });
   });
@@ -43,9 +43,9 @@ describe("quickscore non-interactive CLI output", () => {
       nonInteractive: true,
       scoreStatus: "AUTO_NO_EVIDENCE",
       warning: "Auto-score could not find execution evidence. No measured maturity score was produced.",
-      firstRunHint: "Capture evidence with `amc wrap <runtime> -- <your-agent-command>` or use `amc quickscore --answers answers.json --json` for CI-safe survey scoring.",
+      firstRunHint: "Capture evidence with `amc adapters run --agent <id> --adapter generic-cli -- <your-agent-command>` or use `amc quickscore --answers answers.json --json` for CI-safe survey scoring.",
       suggestedCommands: [
-        "amc wrap <runtime> -- <your-agent-command>",
+        "amc adapters run --agent <id> --adapter generic-cli -- <your-agent-command>",
         "amc adapters run --agent <id> --workorder <workOrderId>",
         "amc quickscore --answers answers.json --json",
         "amc quickscore"
@@ -57,6 +57,16 @@ describe("quickscore non-interactive CLI output", () => {
       error: "missing context",
       ...AUTO_QUICKSCORE_NO_EVIDENCE_NOTICE
     });
+  });
+
+  test.each([[["--rapid"]], [[]]])("compiled quickscore %j --answers rejects unknown question IDs, naming them", (mode) => {
+    const result = spawnSync(process.execPath, [
+      join(process.cwd(), "dist", "cli.js"), "quickscore", ...mode, "--json",
+      "--answers", JSON.stringify({ "AMC-1.1": 3, "NOT-A-QUESTION": 2, "AMC-99.99": 1 })
+    ], { cwd: mkdtempSync(join(tmpdir(), "amc-quickscore-unknown-")), encoding: "utf8", env: { ...process.env, NO_COLOR: "1" } });
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain("unknown question IDs: NOT-A-QUESTION, AMC-99.99");
+    expect(result.stdout).toBe("");
   });
 
   test("compiled default non-interactive output fails closed before producing a placeholder score", () => {

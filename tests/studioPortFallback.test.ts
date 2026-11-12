@@ -85,9 +85,12 @@ describe("single-workspace port policy", () => {
   test("a busy gateway or proxy port is refused before the gateway opens its session", async () => {
     const path = workspace();
     const busy = (await hold())!;
-    await expect(runStudioForeground({ workspace: path, env: {}, apiPort: 0, metricsPort: 0, dashboardPort: 0, proxyPort: 0, gatewayHost: "127.0.0.1", gatewayPort: busy }))
+    await expect(runStudioForeground({ workspace: path, env: { AMC_GATEWAY_PORT: String(busy) }, apiPort: 0, metricsPort: 0, dashboardPort: 0, proxyPort: 0, gatewayHost: "127.0.0.1", gatewayPort: busy }))
       .rejects.toThrow(`Port ${busy} (from AMC_GATEWAY_PORT) is already in use.`);
-    await expect(runStudioForeground({ workspace: path, env: {}, apiPort: 0, metricsPort: 0, dashboardPort: 0, gatewayPort: 0, gatewayHost: "127.0.0.1", proxyPort: busy }))
+    // AMC_GATEWAY_PORT unset: the port is the default, and the message does not blame a variable nobody set.
+    await expect(runStudioForeground({ workspace: path, env: {}, apiPort: 0, metricsPort: 0, dashboardPort: 0, proxyPort: 0, gatewayHost: "127.0.0.1", gatewayPort: busy }))
+      .rejects.toThrow(`Port ${busy} (from the default gateway port; set AMC_GATEWAY_PORT to change it) is already in use.`);
+    await expect(runStudioForeground({ workspace: path, env: { AMC_PROXY_PORT: String(busy) }, apiPort: 0, metricsPort: 0, dashboardPort: 0, gatewayPort: 0, gatewayHost: "127.0.0.1", proxyPort: busy }))
       .rejects.toThrow(`Port ${busy} (from AMC_PROXY_PORT) is already in use.`);
     expect(openSessions(path)).toBe(0);
   }, 120_000);

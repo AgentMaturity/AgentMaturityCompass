@@ -101,7 +101,7 @@ const compile = (ws: string, flags: { requestReview?: boolean; activate?: string
 function activate(ws: string, allowWeakening = false, agentId = "default") {
   const approvalId = compile(ws, { requestReview: true }).signed.review.approvalRequestId!;
   for (const userId of ["owner-1", "owner-2"]) {
-    decideApprovalForIntent({ workspace: ws, agentId, approvalId, decision: "APPROVED", mode: "EXECUTE",
+    decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: ws, agentId, approvalId, decision: "APPROVED", mode: "EXECUTE",
       reason: "P1-10F fixture plan review", userId, username: userId, userRoles: ["OWNER"] });
   }
   const result = compile(ws, { activate: approvalId, allowWeakening });

@@ -58,10 +58,26 @@ const loadButton = (ctx) => {
     `data-project="${esc(ctx.project.projectId)}"`)}</div>${data?.error ? `<p class="status-bad">${esc(data.error)}</p>` : ""}${data?.at
     ? `<p class="muted">Read at ${esc(data.at)}; actions on this page do not refresh it.</p>` : ""}`;
 };
+/** The other cards point at the Release card's one load button rather than repeating it. */
+const loadNote = (ctx) => (views(ctx)?.at ? `<p class="muted">Read at ${esc(views(ctx).at)} (Release card); actions on this page do not refresh it.</p>`
+  : "<p class=\"muted\">Load these views with the button on the Release card.</p>");
 const releaseOf = (ctx) => views(ctx)?.release ?? null;
 
+/**
+ * v1 releases only by restarting the Compose- or Helm-hosted Studio that built the agent (deployment.same_host, D-18):
+ * on any other Studio the walk ends after Adapt, so the notice comes before the Ask form until that item reads READY.
+ */
+function sameHostNotice(ctx) {
+  const item = list(ctx.readiness?.items).find((entry) => entry.id === "deployment.same_host");
+  if (item?.status === "READY") return "";
+  return `<div class="card banner"><p><strong>Activate needs a Compose- or Helm-hosted Studio.</strong> Version 1 releases an agent only by
+    restarting the Compose- or Helm-hosted Studio that built it. On a Studio started any other way (for example with <code>amc up</code>),
+    the walk ends after Adapt: the release is refused (<code>deployment.same_host</code>). Installing a package into another workspace is
+    planned (P2-40).</p></div>`;
+}
+
 function renderConversation(ctx) {
-  return `${view.renderConversation(ctx).replaceAll(view.NO_PRODUCER, PRODUCED)}
+  return `${sameHostNotice(ctx)}${view.renderConversation(ctx).replaceAll(view.NO_PRODUCER, PRODUCED)}
     <p class="muted">Understand carries <code>deploymentNeeds</code> from Adapt; change it there (reopen Adapt). AMC never asks for a credential: each lease
       token is delivered once by AMC.</p>
     ${["ask_complete", "understanding_confirmed", "release_proposed", "deployment.same_host", "deployment.topology", "deployment.image_pinned", "backup.include_paths"]
@@ -205,7 +221,7 @@ function receiptForm(ctx, release) {
 
 function renderDeploy(ctx) {
   const release = releaseOf(ctx);
-  if (!release) return `<p class="muted">Load the release to see its prepared deployment.</p>${loadButton(ctx)}`;
+  if (!release) return `<p class="muted">Load the release to see its prepared deployment.</p>${loadNote(ctx)}`;
   const plan = release.deployPlan;
   const check = checks.get(ctx.project.projectId);
   return `<p class="muted">Prepared by AMC; AMC never runs these commands. Instructions are not evidence of an executed deployment. Plan signature
@@ -219,12 +235,12 @@ function renderDeploy(ctx) {
     <div class="row wrap"><select name="verify-environment"><option value="staging">staging</option><option value="production">production</option></select>
       ${view.actionButton("Run AMC's check", "verify", ctx.allowed.verifyDeployment, `data-release="${esc(release.releaseId)}" data-project="${esc(ctx.project.projectId)}"`)}</div>
     ${check ? `<p>AMC check <code>${esc(check.checkId)}</code>: <code>${esc(check.amcCheckStatus)}</code> · ${esc(check.statusText)}</p>` : ""}
-    ${status(ctx, "deployment.amc_check")}${loadButton(ctx)}`;
+    ${status(ctx, "deployment.amc_check")}${loadNote(ctx)}`;
 }
 
 function renderRollback(ctx) {
   const release = releaseOf(ctx);
-  if (!release) return `<p class="muted">Load the release to roll it back.</p>${loadButton(ctx)}`;
+  if (!release) return `<p class="muted">Load the release to roll it back.</p>${loadNote(ctx)}`;
   const opened = previews.get(ctx.project.projectId);
   const preview = opened?.releaseId === release.releaseId ? opened.preview : null;
   const [request] = coded(itemOf(ctx, "rollback_effect"), "APPROVAL_REQUEST");
@@ -276,7 +292,7 @@ function renderMonitor(ctx) {
       overall <code>${esc(doc.claim?.claimKind)}</code> <code>${esc(doc.claim?.statusDimensions?.evidence)}</code></p>${tiles}
       ${table(["Source", "Read", "Claim kind", "Evidence", "Reasons"], envelopes, "No source.")}
       <p class="muted">Alert rules (proposals): ${list(doc.alertRules).map((rule) => esc(rule.rule)).join("; ")}.</p>` : ""}
-    <p class="muted">Kill switch: ${esc(monitor?.killSwitch ?? "an active kill switch holds the project until it is released and an owner resumes")}.</p>${loadButton(ctx)}`;
+    <p class="muted">Kill switch: ${esc(monitor?.killSwitch ?? "an active kill switch holds the project until it is released and an owner resumes")}.</p>${loadNote(ctx)}`;
 }
 
 const observedCell = (observed) => {
@@ -304,7 +320,7 @@ function hypothesesHtml(ctx, hypotheses) {
 
 function renderValue(ctx) {
   const value = views(ctx)?.value;
-  if (!value) return `<p class="muted">Review runs the value report once and records one value claim per value-contract KPI. Load to see them.</p>${loadButton(ctx)}`;
+  if (!value) return `<p class="muted">Review runs the value report once and records one value claim per value-contract KPI. Load to see them.</p>${loadNote(ctx)}`;
   const rows = list(value.claims).map((row) => row.integrity?.status === "integrity_failed" && !row.label
     ? [`<code>${esc(row.kpiId)}</code>`, "", "", `<span class="status-bad">${codes(row.integrity.reasonCodes)}</span>`, ""]
     : [`<code>${esc(row.kpiId)}</code> ${esc(row.label)} (${esc(row.unit)})${row.integrity?.envelopeValid ? "" : " <span class=\"status-bad\">record envelope does not verify</span>"}`,
@@ -317,7 +333,7 @@ function renderValue(ctx) {
     ${table(["Kind", "Statement"], list(value.objectives).map((row) => [`<code>${esc(row.kind)}</code>`, esc(row.statement)]), "None stated.")}
     <p class="muted">ROI worksheet (${esc(value.roiWorksheet?.formula)}): <code>${esc(value.roiWorksheet?.status)}</code> · <code>${esc(value.roiWorksheet?.claimKind)}</code>
       ${value.roiWorksheet?.value ? `V ${esc(value.roiWorksheet.value.low)} to ${esc(value.roiWorksheet.value.high)} USD per year ` : ""}${codes(value.roiWorksheet?.reasonCodes)} ${codes(value.roiWorksheet?.claim?.reasons)}</p>
-    ${hypothesesHtml(ctx, list(value.hypotheses))}${loadButton(ctx)}`;
+    ${hypothesesHtml(ctx, list(value.hypotheses))}${loadNote(ctx)}`;
 }
 
 const stepCard = (note) => (ctx) => `<p class="muted">${esc(note)}</p><label>Your note <textarea name="content" rows="3" maxlength="65536"></textarea></label>

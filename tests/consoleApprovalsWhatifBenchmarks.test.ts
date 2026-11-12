@@ -728,7 +728,7 @@ describe("console + approvals + what-if + benchmarks", () => {
     });
     try {
       const page = await httpRequestJson({
-        url: `http://127.0.0.1:${port}/console`,
+        url: `http://127.0.0.1:${port}/console/`,
         method: "GET"
       });
       const app = await httpRequestJson({

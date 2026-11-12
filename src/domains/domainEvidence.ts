@@ -21,7 +21,7 @@ export function loadDomainEvidence(workspace: string, agentId: string, now = Dat
     resolved = resolveRunReport(workspace, runId, agentId);
   } catch {
     return { runId: null, baseScores: null, envelope: null,
-      reasons: ["no diagnostic run for this agent; run `amc quickscore` to evaluate the base part"] };
+      reasons: ["no diagnostic run for this agent; run `amc quickscore --auto` to evaluate the base part from observed evidence"] };
   }
   const report = resolved.report;
   if (!sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>)) {

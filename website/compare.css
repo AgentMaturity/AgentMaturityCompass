@@ -253,7 +253,9 @@ h1 {
 }
 
 .comparison-visual img {
+  display: block;
   width: 100%;
+  height: auto;
   aspect-ratio: 1200 / 630;
   border: 1px solid var(--compare-border);
   border-radius: 6px;

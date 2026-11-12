@@ -102,7 +102,7 @@ async function applySeal(workspace: string, plan: RepairPlan, yes: boolean, expe
     return 2;
   }
   const after = planVerifyRepair(workspace, expectedMonitorFingerprint ? { expectedMonitorFingerprint } : {});
-  if (after.verified) console.log(chalk.green("Verification passed."));
+  if (after.verified) console.log(chalk.green("Integrity check passed after sealing."));
   else console.log(chalk.red(`Verification FAILED after sealing: ${after.errors.slice(0, 5).join("; ")}`));
   return after.verified ? 0 : 1;
 }
@@ -137,7 +137,7 @@ export async function runVerifyRepair(opts: { apply: boolean; yes: boolean; expe
   const plan = planVerifyRepair(workspace, opts.expectedMonitorFingerprint ? { expectedMonitorFingerprint: opts.expectedMonitorFingerprint } : {});
   let code: number;
   if (plan.verified) {
-    console.log(chalk.green("Verification passed; nothing to repair. Nothing has been changed."));
+    console.log(chalk.green("Integrity check passed; nothing to repair. Nothing has been changed."));
     code = 0;
   } else {
     printPlan(plan);
@@ -158,6 +158,6 @@ export async function runVerifyRepair(opts: { apply: boolean; yes: boolean; expe
         code = 1;
     }
   }
-  printArchivedStoreNote(workspace);
+  if (code !== 0) printArchivedStoreNote(workspace); // on success the verify verdict that follows prints it
   return code;
 }

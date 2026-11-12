@@ -113,7 +113,7 @@ describe("static agent tokens", () => {
     const { signed } = signPlan({ workspace: ws, plan, previous: null, reviewAgentId: "default" });
     const approvalId = signed.review.approvalRequestId!;
     for (const userId of ["owner-1", "owner-2"]) {
-      decideApprovalForIntent({ workspace: ws, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE", reason: "lease v2 fixture plan review",
+      decideApprovalForIntent({ reviewerAuthentication: "authenticated", workspace: ws, agentId: "default", approvalId, decision: "APPROVED", mode: "EXECUTE", reason: "lease v2 fixture plan review",
         userId, username: userId, userRoles: ["OWNER"] });
     }
     activateControlPlan({ workspace: ws, signed, approvalRequestId: approvalId, reviewAgentId: "default" });

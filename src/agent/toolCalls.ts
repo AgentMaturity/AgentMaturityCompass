@@ -45,6 +45,7 @@ import type { SessionService } from "../session/sessionService.js";
 import type { ToolOutcome } from "../session/sessionTypes.js";
 import type { ToolUseContentBlock } from "../llm/streamChunk.js";
 import type { AgentToolSeam, ToolCallOutcome, ToolCallRequest } from "./toolSeam.js";
+import { providerToolWireName } from "../llm/request/providerToolNames.js";
 
 export interface ToolCallsInput {
   readonly session: SessionService;
@@ -80,6 +81,21 @@ const ABANDONED_UNKNOWN =
   "returned when the grace window expired, so the loop stopped waiting for it. It may still be " +
   "running. The side effect may or may not have happened; retry only if the operation is " +
   "read-only or idempotent.";
+
+/** The most offered names an unoffered-call refusal lists before summarising the rest. */
+const MAX_LISTED_TOOLS = 40;
+
+/**
+ * The answer to a call whose name the request never offered (smoke M-5). The loop answers it itself: it reaches no
+ * seam, approval or guard, so nothing runs. Names are the ones the model was shown, so it can correct the call.
+ */
+function unofferedOutcome(tools: AgentToolSeam, name: string): ToolCallOutcome {
+  const names = (tools.schemas() ?? []).map(schema => providerToolWireName(schema.name, schema.modelAlias));
+  const listed = names.length === 0 ? "none"
+    : names.slice(0, MAX_LISTED_TOOLS).join(", ") + (names.length > MAX_LISTED_TOOLS ? `, and ${names.length - MAX_LISTED_TOOLS} more` : "");
+  return { outcome: "DENIED", denied: true, exitCode: null, timedOut: false,
+    content: `[amc] tool ${JSON.stringify(name)} is not available in this session; available: ${listed}. Nothing was executed.` };
+}
 
 /**
  * The sentinel a race resolves to when the pool gives up waiting.
@@ -315,7 +331,8 @@ class RunState {
     this.started = Math.max(this.started, index + 1);
     this.inFlight.set(
       index,
-      this.input.tools.execute(requestFor(this.input, call)).then(
+      (call.unoffered === true ? Promise.resolve(unofferedOutcome(this.input.tools, call.name))
+        : this.input.tools.execute(requestFor(this.input, call))).then(
         (outcome) => {
           this.slots[index] = outcome;
           return index;

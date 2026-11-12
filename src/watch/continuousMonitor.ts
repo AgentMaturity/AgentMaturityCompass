@@ -5,6 +5,7 @@
  * detects drift, and alerts on regressions — closing the LangSmith/LangFuse gap.
  */
 
+import { vaultPassphraseFromEnv } from "../vault/passphraseFile.js";
 import { EventEmitter } from "node:events";
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
@@ -65,7 +66,7 @@ function ensureLocalMonitorVaultPassphrase(workspace: string): void {
   if (local.reason !== undefined) {
     throw new Error(`Vault passphrase needed: the monitor does not read .amc/local-vault-passphrase ${localPassphraseRefusal(local)}; export AMC_VAULT_PASSPHRASE.`);
   }
-  if (local.loaded || (process.env.AMC_VAULT_PASSPHRASE ?? "").length > 0 || pathExists(localVaultPassphrasePath(workspace))
+  if (local.loaded || vaultPassphraseFromEnv() !== null || pathExists(localVaultPassphrasePath(workspace))
     || pathExists(join(workspace, ".amc", "vault.amcvault"))) {
     return;
   }

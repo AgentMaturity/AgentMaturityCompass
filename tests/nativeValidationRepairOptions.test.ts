@@ -46,7 +46,9 @@ vi.mock("../src/setup/nativeFirstUseGuide.js", () => ({
   inspectNativeFirstUse: async () => ({ status: "ready", agentId: "default", model: "synthetic-model", baseUrl: null, credential: null,
     nextAction: { argv: ["amc", "agent-loop", "run", "--credentials-file", "/synthetic/refs.yaml"] } }),
   renderNativeFirstUseGuide: () => "Synthetic setup only",
-  renderNativeGuideCommand: (command: { argv: readonly string[] }) => JSON.stringify(command.argv)
+  renderNativeGuideCommand: (command: { argv: readonly string[] }) => JSON.stringify(command.argv),
+  renderNativeVerifyHint: (_cwd: string, sessionId: string) => JSON.stringify(["amc", "agent-loop", "verify", sessionId]),
+  missingCredentialGuidance: async () => null
 }));
 vi.mock("../src/extensions/nativeExtensionRuntime.js", () => ({
   loadNativeExtensions: () => ({ list: () => [], prepareTurn: () => ({ commands: [] }), unloadAll: () => {} }),

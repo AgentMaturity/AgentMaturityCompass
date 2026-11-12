@@ -288,7 +288,9 @@ function buildItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Reco
   items.push(opened === undefined || typeof opened.body.requestDigestSha256 !== "string"
     ? item("effect_gate", "WAITING", { kind: "review_pending", mandatory: false, reasonCodes: ["EFFECT_GATE_NOT_OPEN"],
       nextAction: { label: "Once the completion gate has its quorum, an owner opens the effect gate (a4.assemble.apply); a second, separately decided request" } })
-    : item("effect_gate", "READY", { section: "governance", mandatory: false,
+    : item("effect_gate", requestStatus === "QUORUM_MET" || requestStatus === "CONSUMED" ? "READY" : "WAITING", { section: "governance", mandatory: false,
+      ...(requestStatus === "QUORUM_MET" || requestStatus === "CONSUMED" ? {} : { kind: "review_pending" as const,
+        nextAction: { label: "Project approvers approve the effect gate's request (a4.assemble.apply); then an owner completes Assemble" } }),
       reasonCodes: ["EFFECT_GATE_OPENED", `APPROVAL_REQUEST:${String(opened.body.approvalRequestId)}:${opened.body.requestDigestSha256}`, `GATE:${String(opened.body.gateId)}`,
         `APPROVAL_STATUS:${requestStatus}`] }));
   // Design §10.2 binds every build session's compositionDigest and policyDigest: no recomputer can read them per session

@@ -1,6 +1,6 @@
 const esc = value => String(value ?? "unknown").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
 const labels = { starting: "Starting", idle: "Ready for another turn", running: "Running", "cancel-requested": "Stop requested", releasing: "Releasing writer…", released: "Released", failed: "Task failed", verifying: "Verifying recorded evidence…", closed: "Closed" };
-export const providerLabel = id => ({ stub: "Local demonstration", openai: "OpenAI · Chat", "openai-responses": "OpenAI · Responses", anthropic: "Anthropic", deepseek: "DeepSeek · Chat", gemini: "Gemini", "gemini-audio": "Gemini · Audio", ollama: "Ollama · local model server" })[id] || id;
+export const providerLabel = id => ({ stub: "Local recording demonstration", openai: "OpenAI · Chat", "openai-responses": "OpenAI · Responses", anthropic: "Anthropic", deepseek: "DeepSeek · Chat", gemini: "Gemini", "gemini-audio": "Gemini · Audio", ollama: "Ollama · local model server" })[id] || id;
 const time = value => Number.isFinite(value) ? new Date(value).toLocaleString() : "unknown";
 
 export function nativeTasksShell(agentId) {
@@ -40,7 +40,7 @@ export function nativeTasksShell(agentId) {
       <section class="card"><h3>Public validation</h3><div id="nativeTaskValidation"><p class="muted">No checks requested.</p></div></section>
       <section class="card"><h3>Evidence</h3><div id="nativeTaskVerification"><p class="muted">No verification has been requested.</p></div></section>
       <section class="card"><h3>Recorded usage</h3><div id="nativeTaskUsage"><p class="muted">Usage unavailable until reported by Studio.</p></div></section>
-      <section class="card"><h3>Your tasks</h3><label><input id="nativeTaskIncludeArchived" type="checkbox">Show archived tasks</label><div id="nativeTaskList"><p class="muted">Loading…</p></div></section>
+      <section class="card"><h3>Your tasks</h3><label class="native-task-check"><input id="nativeTaskIncludeArchived" type="checkbox">Show archived tasks</label><div id="nativeTaskList"><p class="muted">Loading…</p></div></section>
     </aside></div></section>`;
 }
 

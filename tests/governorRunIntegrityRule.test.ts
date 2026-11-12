@@ -162,10 +162,14 @@ describe("per-rule run-integrity threshold", () => {
   });
 
   it("no threshold admits a run that failed ledger verification, is not VALID or violated the trust boundary", () => {
+    const BOUNDARY_FIX = "Fix: set security.trustBoundaryMode: isolated in .amc/amc.config.yaml (only when the monitor and auditor keys are isolated from the evaluated agent), re-sign it with amc verify --sign-config, then run a new score run (amc run --score-only)";
     const cases: Array<[Partial<DiagnosticReport>, string]> = [
       [{ runId: "run_unverified", verificationPassed: false }, "UNTRUSTED RUN: latest trusted run run_unverified failed ledger verification (status VALID)."],
-      [{ runId: "run_invalid", status: "INVALID" }, "UNTRUSTED RUN: latest trusted run run_invalid failed ledger verification (status INVALID)."],
-      [{ runId: "run_boundary", trustBoundaryViolated: true, trustBoundaryMessage: "x" }, "UNTRUSTED RUN: latest trusted run run_boundary violated the trust boundary: x."],
+      [{ runId: "run_invalid", status: "INVALID" }, "UNTRUSTED RUN: latest trusted run run_invalid is not VALID (status INVALID) although its ledger verification passed."],
+      [{ runId: "run_boundary", trustBoundaryViolated: true, trustBoundaryMessage: "x" }, `UNTRUSTED RUN: latest trusted run run_boundary violated the trust boundary: x. ${BOUNDARY_FIX}.`],
+      // M-2: the boundary marks the run INVALID while its ledger verification passed; the boundary is the cause, not the ledger.
+      [{ runId: "run_boundary_invalid", status: "INVALID", verificationPassed: true, trustBoundaryViolated: true, trustBoundaryMessage: "runtime and signing keys are not marked isolated" },
+        `UNTRUSTED RUN: latest trusted run run_boundary_invalid violated the trust boundary: runtime and signing keys are not marked isolated. ${BOUNDARY_FIX}.`],
       // A run that does not record the boundary result is not read as within it.
       [{ runId: "run_unbounded", trustBoundaryViolated: undefined }, "UNTRUSTED RUN: latest trusted run run_unbounded records no trust-boundary result."],
     ];
