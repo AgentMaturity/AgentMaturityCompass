@@ -2095,6 +2095,11 @@ program.hook("preAction", async (_thisCommand, actionCommand) => {
     chalk.level = 0;
   }
   const path = commandPath(actionCommand);
+  // Commands that read a workspace and would otherwise report its missing files as failures, or ask for a passphrase.
+  if (/^(evidence verify|verify all|vault unlock)$/.test(path) && !isWorkspaceInitialized(process.cwd())) {
+    console.error(chalk.red(workspaceInitHint(process.cwd(), "No AMC workspace here (no .amc directory).")));
+    process.exit(1);
+  }
   if (path.length > 0) {
     assertOwnerMode(process.cwd(), path);
   }

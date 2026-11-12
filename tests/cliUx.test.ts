@@ -111,6 +111,13 @@ describe("the built CLI with an unknown top-level command (run `npm run build` f
     if (suggestion) expect(result.stderr).toContain(`amc ${suggestion}`);
   });
 
+  it.each([["evidence", "verify"], ["verify", "all"], ["vault", "unlock"]])("amc %s %s in a directory with no workspace says so and names amc init", (...args) => {
+    const result = amc(...args);
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain("No AMC workspace here");
+    expect(result.stderr).toContain("amc init");
+  });
+
   it("amc version suggests --version", () => {
     const result = amc("version");
     expect(result.status).not.toBe(0);
