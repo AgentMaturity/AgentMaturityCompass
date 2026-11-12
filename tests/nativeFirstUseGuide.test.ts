@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { LocalCredentialsService } from "../src/credentials/localCredentialsService.js";
 import * as credentialWatcher from "../src/credentials/credentialsWatcher.js";
-import { inspectNativeFirstUse, renderNativeFirstUseGuide, renderNativeGuideCommand, type NativeFirstUseOptions } from "../src/setup/nativeFirstUseGuide.js";
+import { inspectNativeFirstUse, missingCredentialGuidance, renderNativeFirstUseGuide, renderNativeGuideCommand, type NativeFirstUseOptions } from "../src/setup/nativeFirstUseGuide.js";
 
 const SECRET = "synthetic-guide-value-never-render";
 function snapshot(root: string): unknown {
@@ -185,6 +185,15 @@ describe("native first-use local inspection", () => {
     const result = await inspect();
     expect(result.status).toBe("needs-credential");
     expect(result.nextAction?.argv).toEqual(["amc", "credentials", "set", "OPENAI_API_KEY", "--home", home, "--file", join(home, ".credentials.yaml"), "--project-dir", workspace]);
+  });
+  it("smoke L-1: a run's missing credential names the reference and the guide's masked set command", async () => {
+    workspaceMarker();
+    const message = await missingCredentialGuidance(input({ provider: "anthropic" }));
+    expect(message).toContain("MISSING_CREDENTIAL: credential reference ANTHROPIC_API_KEY for provider anthropic is not configured; no session was opened.");
+    expect(message).toContain("Set ANTHROPIC_API_KEY in the environment");
+    expect(message).toContain(renderNativeGuideCommand({ cwd: workspace, argv: ["amc", "credentials", "set", "ANTHROPIC_API_KEY", "--home", home, "--file", join(home, ".credentials.yaml"), "--project-dir", workspace] }));
+    expect(await missingCredentialGuidance(input({ provider: "anthropic", env: { ANTHROPIC_API_KEY: SECRET } }))).toBeNull();
+    expect(await missingCredentialGuidance(input({ provider: "stub", model: undefined }))).toBeNull();
   });
   it.each(["file", "env", "project-env", "user-env"] as const)("honors the native %s credential layer without revealing its value", async layer => {
     workspaceMarker();

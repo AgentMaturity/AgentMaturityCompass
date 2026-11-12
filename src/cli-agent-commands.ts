@@ -39,6 +39,7 @@ import {
 import type { LoopNotification } from "./agent/loopTypes.js";
 import { liveNativeFailureGuidance } from "./agent/nativeFailureGuidance.js";
 import { nativeUnknownUsageNotice } from "./budgets/nativeBudgetAdmission.js";
+import { missingCredentialGuidance } from "./setup/nativeFirstUseGuide.js";
 import { echoToolSeam } from "./agent/echoTool.js";
 import { MAX_ACTIVE_CHILDREN_HELP, NO_DELEGATE_STOP_HELP, VALIDATION_REPAIR_HELP, WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
 import { leaseFileToken, withLeaseFileOption } from "./cli/agentLoopLeaseFile.js";
@@ -383,6 +384,11 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       if (piRoute === null) return;
       const route = piRoute?.route ?? routeFor(io, providerId, opts, opts.model ?? preset?.model);
       if (route === null) return;
+      // Smoke L-1: an unconfigured credential reference is refused here with the guide's fix, before a session opens.
+      const missingCredential = route.credentialRef === null ? null : await missingCredentialGuidance({ workspace: process.cwd(), agentId,
+        provider: providerId, model: opts.model ?? preset?.model, baseUrl: opts.baseUrl, credential: opts.credential,
+        credentialsHome: opts.credentialsHome, credentialsFile: opts.credentialsFile });
+      if (missingCredential !== null) { io.error(missingCredential); io.fail(); return; }
       let images: ReturnType<typeof loadNativeImageFiles>;
       let audioParts: readonly NativeAudioPart[] | undefined;
       try {

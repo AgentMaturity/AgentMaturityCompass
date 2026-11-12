@@ -211,6 +211,22 @@ export async function inspectNativeFirstUse(options: NativeFirstUseOptions): Pro
   }
 }
 
+/**
+ * Smoke L-1: when the selected credential reference is not configured, the guide's own fix (the reference and its masked
+ * `amc credentials set` command) so a run can refuse before opening a session; otherwise null.
+ */
+export async function missingCredentialGuidance(options: NativeFirstUseOptions): Promise<string | null> {
+  try {
+    const guide = await inspectNativeFirstUse(options);
+    if (guide.status !== "needs-credential" || guide.credential === null || guide.nextAction === null) return null;
+    const ref = guide.credential.ref;
+    return `MISSING_CREDENTIAL: credential reference ${ref} for provider ${guide.provider} is not configured; no session was opened. `
+      + `Set ${ref} in the environment, or store it with the masked prompt (POSIX shell, in ${JSON.stringify(guide.nextAction.cwd)}):\n  ${renderNativeGuideCommand(guide.nextAction)}`;
+  } catch {
+    return null; // The runtime still refuses an unresolvable reference with its recorded MISSING_CREDENTIAL.
+  }
+}
+
 export function renderNativeFirstUseGuide(guide: NativeFirstUseGuide): string {
   const lines = [`Native first task · agent ${guide.agentId}`, "", guide.message, "", guide.boundary];
   if (guide.baseUrl !== null) lines.push(`Provider origin: ${guide.baseUrl} (not contacted by this guide).`);
