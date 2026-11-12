@@ -175,7 +175,7 @@ export function stepOffer(offer, ctx, route) {
  * The questions ask_complete lists (P1-59 askGapCodes): unanswered, stale (an answer they depend on changed since) and
  * invalid ones. Studio refuses Propose while any is listed (409 A4_NOT_READY).
  */
-export function askGaps(readiness) {
+function askGaps(readiness) {
   const codes = (readiness?.items ?? []).find((item) => item.id === "ask_complete")?.reasonCodes ?? [];
   const of = (prefix) => codes.filter((code) => String(code).startsWith(prefix)).map((code) => String(code).slice(prefix.length));
   return { missing: of("ANSWER_MISSING:"), stale: of("ANSWER_STALE:"), invalid: of("ANSWER_INVALID:") };

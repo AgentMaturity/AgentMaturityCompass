@@ -72,7 +72,9 @@ export function actionPolicyMode(workspace: string): (call: ActionPolicyCall) =>
  */
 export function simulationNotice(workspace: string, otherNarrowing: string | null): (output: string, call: ActionPolicyCall & { readonly effectiveMode: ToolMode }) => string {
   return (output, call) => {
-    if (call.requestedMode !== "EXECUTE" || call.effectiveMode !== "SIMULATE") return output;
+    // A READ_ONLY body has no effect to withhold: fs.read, glob and grep return real results under SIMULATE, and the
+    // few that do hold back (ask_user, tool search) say so in their own output.
+    if (call.requestedMode !== "EXECUTE" || call.effectiveMode !== "SIMULATE" || call.actionClass === "READ_ONLY") return output;
     const verdict = actionPolicyVerdict(workspace, call);
     const reasons = verdict?.mode === "SIMULATE" ? (verdict.reasons ?? []) : [];
     const why = verdict?.mode === "SIMULATE"

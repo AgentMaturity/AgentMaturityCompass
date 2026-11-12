@@ -4,7 +4,8 @@
  * read through readSecretMountFile (private to its owner, or a mounted secret this user cannot change); with neither,
  * nothing. The CLI's preAction unlock, bootstrap, host bootstrap, studio start, doctor and `amc up` all read it here.
  * The preAction value opens the vault in this process only: it never enters the environment, so no child process
- * inherits it, and it is never printed. It is an explicit operator secret like AMC_VAULT_PASSPHRASE, so the
+ * inherits it, and it is never printed. adoptVaultPassphraseFile is the exception: `init`, `setup` and the instant-score
+ * paths copy the file's value into this process's AMC_VAULT_PASSPHRASE, because their vault code reads only that. It is an explicit operator secret like AMC_VAULT_PASSPHRASE, so the
  * remembered-store operator gate (operatorContext.ts) does not apply, and while it is set the remembered store is not
  * read (passphraseStore.ts).
  */
