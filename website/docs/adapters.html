@@ -34,8 +34,9 @@
       <a href="#setup">Quick Setup</a>
     </div>
     <div class="sidebar-section">
-      <h4>14 Frameworks</h4>
-      <a href="#langchain" class="sub">LangChain</a>
+      <h4>16 Adapters</h4>
+      <a href="#langchain" class="sub">LangChain (Python)</a>
+      <a href="#langchain-node" class="sub">LangChain (Node)</a>
       <a href="#langgraph" class="sub">LangGraph</a>
       <a href="#crewai" class="sub">CrewAI</a>
       <a href="#autogen" class="sub">AutoGen</a>
@@ -46,6 +47,8 @@
       <a href="#gemini" class="sub">Gemini</a>
       <a href="#openclaw" class="sub">OpenClaw</a>
       <a href="#openhands" class="sub">OpenHands</a>
+      <a href="#deepseek-harness" class="sub">DeepSeek Harness</a>
+      <a href="#hermes" class="sub">Hermes Agent</a>
       <a href="#python-sdk" class="sub">Python AMC SDK</a>
       <a href="#cli-agent" class="sub">Generic CLI Agent</a>
       <a href="#openai-compatible" class="sub">OpenAI-Compatible</a>
@@ -144,19 +147,35 @@ amc adapters capabilities --agent my-agent --adapter generic-cli --json</code></
 
       <hr>
 
-      <!-- ═══ LANGCHAIN ═══ -->
-      <h2 id="langchain">LangChain</h2>
+      <!-- ═══ LANGCHAIN (PYTHON) ═══ -->
+      <h2 id="langchain">LangChain (Python)</h2>
       <div class="adapter-card">
-        <div class="meta"><span class="badge badge-teal">Python / Node.js</span> &nbsp; Adapters: <code>langchain-python</code>, <code>langchain-node</code></div>
+        <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>langchain-python</code></div>
         <h4>Install</h4>
         <pre><code>pip install langchain langchain-openai</code></pre>
         <h4>Configure &amp; Run</h4>
         <pre><code><span class="comment"># Set your agent's adapter</span>
 amc adapters configure --agent my-langchain --adapter langchain-python --route /openai --model gpt-4o --mode SUPERVISE
 
+<span class="comment"># Optional: generate a runnable local sample</span>
+amc adapters init-project --agent my-langchain --adapter langchain-python
+
 <span class="comment"># Run with evidence capture</span>
 amc adapters run --agent my-langchain --adapter langchain-python -- python my_chain.py</code></pre>
-        <p>AMC injects <code>OPENAI_API_BASE</code> to route LangChain's OpenAI calls through the gateway. Works with any LangChain chain, agent, or tool.</p>
+        <p>AMC sets <code>OPENAI_BASE_URL</code>, <code>OPENAI_API_BASE</code> and <code>AMC_LLM_BASE_URL</code> to the gateway route and puts a short-lived lease in <code>OPENAI_API_KEY</code>, so LangChain's OpenAI-compatible clients route through the gateway without code changes. Detection uses the host <code>python3</code>/<code>python</code> version. Print the variables without minting a lease with <code>amc adapters env --agent my-langchain --adapter langchain-python</code>.</p>
+      </div>
+
+      <!-- ═══ LANGCHAIN (NODE) ═══ -->
+      <h2 id="langchain-node">LangChain (Node)</h2>
+      <div class="adapter-card">
+        <div class="meta"><span class="badge badge-teal">Node.js</span> &nbsp; Adapter: <code>langchain-node</code></div>
+        <h4>Install</h4>
+        <pre><code>npm install langchain @langchain/openai</code></pre>
+        <h4>Configure &amp; Run</h4>
+        <pre><code>amc adapters configure --agent my-langchain-js --adapter langchain-node --route /openai --model gpt-4o --mode SUPERVISE
+amc adapters init-project --agent my-langchain-js --adapter langchain-node
+amc adapters run --agent my-langchain-js --adapter langchain-node -- node my_agent.mjs</code></pre>
+        <p>The same environment as the Python adapter (<code>OPENAI_BASE_URL</code>, <code>OPENAI_API_BASE</code>, <code>AMC_LLM_BASE_URL</code> and the lease in <code>OPENAI_API_KEY</code>), detected through the host <code>node</code> version. LangChain.js clients that read these variables are routed through the gateway.</p>
       </div>
 
       <!-- ═══ LANGGRAPH ═══ -->
@@ -282,28 +301,49 @@ amc adapters run --agent my-openhands --adapter openhands-cli -- openhands</code
         <p>The base adapter path records process evidence and conditionally routed model traffic. It does not claim provider-native file/tool lifecycle coverage.</p>
       </div>
 
+      <!-- ═══ DEEPSEEK HARNESS ═══ -->
+      <h2 id="deepseek-harness">DeepSeek Harness</h2>
+      <div class="adapter-card">
+        <div class="meta"><span class="badge badge-teal">CLI</span> &nbsp; Adapter: <code>deepseek-harness</code></div>
+        <h4>Configure &amp; Run</h4>
+        <pre><code><span class="comment"># dsh-launch.json pins the reviewed DSH executable (and optional entrypoint) by path and SHA-256</span>
+amc adapters configure --agent default --adapter deepseek-harness --route /deepseek --model deepseek-v4-flash --launch-config ./dsh-launch.json
+amc adapters run --agent default --adapter deepseek-harness -- <span class="string">"Summarize the README and explain the main entry point."</span></code></pre>
+        <p>Launches an operator-installed DSH CLI with <code>--profile headless</code>. AMC does not install DSH, and detecting <code>dsh</code> on PATH never approves it: each run re-checks the signed launch configuration and file hashes. DSH receives the gateway URL in <code>DEEPSEEK_BASE_URL</code> and a lease in <code>DEEPSEEK_API_KEY</code>. <code>SUPERVISE</code> only. Process capture does not govern or prove DSH's internal tools, and provider coverage stays unverified until the gateway actually records requests. The task is one quoted argument; extra DSH options are refused. Details: <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/adapters/deepseek-harness.md" target="_blank" rel="noopener">DeepSeek Harness guide</a>.</p>
+      </div>
+
+      <!-- ═══ HERMES ═══ -->
+      <h2 id="hermes">Hermes Agent</h2>
+      <div class="adapter-card">
+        <div class="meta"><span class="badge badge-teal">CLI</span> &nbsp; Adapter: <code>hermes-cli</code></div>
+        <h4>Configure &amp; Run</h4>
+        <pre><code>amc adapters configure --agent my-hermes --adapter hermes-cli --route /openai --model gpt-4o --mode SUPERVISE
+amc adapters run --agent my-hermes --adapter hermes-cli -- hermes</code></pre>
+        <p>Detection runs <code>hermes --version</code>. AMC sets <code>OPENAI_BASE_URL</code>, <code>OPENAI_API_BASE</code>, <code>OPENAI_API_HOST</code> and <code>AMC_LLM_BASE_URL</code> to the gateway route and passes a lease, not a provider key, in <code>OPENAI_API_KEY</code>. Check what is effective for your agent with <code>amc adapters capabilities --agent my-hermes --adapter hermes-cli --json</code>.</p>
+      </div>
+
       <!-- ═══ PYTHON SDK ═══ -->
       <h2 id="python-sdk">Python AMC SDK</h2>
       <div class="adapter-card">
-        <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>python-amc-sdk</code></div>
+        <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>python-amc-sdk</code> &nbsp; Package: <code>amc-sdk</code> (import <code>amc_sdk</code>)</div>
         <h4>Install</h4>
         <p>The SDK is not on PyPI yet (publication is pending). Install it from source; do not install a similarly named PyPI package, none is published by AMC.</p>
         <pre><code>pip install &quot;git+https://github.com/AgentMaturity/AgentMaturityCompass.git#subdirectory=sdk/python&quot;</code></pre>
+        <p>The SDK drives AMC's native agent through <code>amc acp</code> and requires an AMC 1.2.x runtime, which is the current source build: it refuses the published 1.1.1 release. Initialize the workspace with <code>amc init</code> first.</p>
         <h4>Programmatic Integration</h4>
-        <pre><code><span class="keyword">from</span> amc <span class="keyword">import</span> wrap_fetch, log_trace
+        <pre><code><span class="keyword">from</span> amc_sdk <span class="keyword">import</span> AmcAgent, export_proof
 
-<span class="comment"># Option 1: Wrap fetch for automatic capture</span>
-fetch = wrap_fetch(original_fetch, {
-    <span class="string">"agent_id"</span>: <span class="string">"my-agent"</span>,
-    <span class="string">"gateway_base_url"</span>: <span class="string">"http://localhost:3210/openai"</span>,
-})
+<span class="comment"># "stub" is a local demonstration; choose a real provider, model and credential reference for model work</span>
+<span class="keyword">with</span> AmcAgent(workspace=<span class="string">"."</span>, provider=<span class="string">"stub"</span>) <span class="keyword">as</span> agent:
+    session = agent.new_session()
+    result = session.prompt(<span class="string">"Summarise the changelog."</span>)
+    print(result.stop_reason, result.text)
+    session_id = session.session_id
 
-<span class="comment"># Option 2: Manual trace logging</span>
-log_trace({
-    <span class="string">"agent_id"</span>: <span class="string">"my-agent"</span>,
-    <span class="string">"type"</span>: <span class="string">"tool_call"</span>,
-    <span class="string">"data"</span>: {<span class="string">"tool"</span>: <span class="string">"read_file"</span>}
-})</code></pre>
+<span class="comment"># After the agent closes and seals the session, export a proof another party can verify</span>
+proof = export_proof(session_id, <span class="string">"run.amcproof.json"</span>, workspace=<span class="string">"."</span>)
+print(proof.auditor_key_fingerprint)</code></pre>
+        <p>The <code>python-amc-sdk</code> adapter itself launches a Python process with the gateway URL in <code>OPENAI_BASE_URL</code> and a lease in <code>OPENAI_API_KEY</code>: <code>amc adapters run --agent my-python-agent --adapter python-amc-sdk -- python3 my_agent.py</code>.</p>
       </div>
 
       <!-- ═══ CLI AGENT ═══ -->
