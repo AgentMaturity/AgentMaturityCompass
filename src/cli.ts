@@ -2120,8 +2120,10 @@ async function initializeMinimalStartupWorkspace(opts: {
     process.env.AMC_VAULT_PASSPHRASE = generatedPassphrase;
   }
 
+  // H2: the same local vault-backed workspace `amc up` and bare `amc` create, so the same trust boundary they write.
+  const trustBoundaryMode = opts.trustBoundary ?? "isolated";
   const init = await initWorkspaceAsync({
-    trustBoundaryMode: opts.trustBoundary,
+    trustBoundaryMode,
     agentName: "Startup Agent",
     role: "assistant",
     domain: "general",
@@ -2132,9 +2134,7 @@ async function initializeMinimalStartupWorkspace(opts: {
     tools: ["filesystem", "http"]
   });
   const profiled = applyAMCConfigProfile(opts.profile, loadAMCConfig(process.cwd()));
-  if (opts.trustBoundary) {
-    profiled.security.trustBoundaryMode = opts.trustBoundary;
-  }
+  profiled.security.trustBoundaryMode = trustBoundaryMode;
   await saveAMCConfigAsync(process.cwd(), profiled);
 
   const fmt = await import("./cliFormat.js");
@@ -2162,7 +2162,7 @@ function printFirstRunActions(fmt: typeof import("./cliFormat.js"), more: Array<
 program
   .command("init")
   .description("Initialize .amc workspace")
-  .option("--trust-boundary <mode>", "isolated|shared")
+  .option("--trust-boundary <mode>", "isolated|shared (default isolated, as amc up writes; shared marks every run INVALID)")
   .option("--profile <name>", "workspace config profile: dev|ci|prod", "dev")
   .option("--force", "Force re-initialization, overwrite existing .amc directory", false)
   .option("--skip-vault", "Skip the vault prompt: a random passphrase is generated and remembered for your user (CI/headless init)", false)
@@ -2235,11 +2235,11 @@ program
       }
     }
 
-    const init = await initWorkspaceAsync({ trustBoundaryMode: opts.trustBoundary });
+    // H2: the vault this creates holds the monitor and auditor keys under .amc, as `amc up` and bare `amc` do, so the same trust boundary.
+    const trustBoundaryMode = opts.trustBoundary ?? "isolated";
+    const init = await initWorkspaceAsync({ trustBoundaryMode });
     const profiled = applyAMCConfigProfile(opts.profile, loadAMCConfig(process.cwd()));
-    if (opts.trustBoundary) {
-      profiled.security.trustBoundaryMode = opts.trustBoundary;
-    }
+    profiled.security.trustBoundaryMode = trustBoundaryMode;
     await saveAMCConfigAsync(process.cwd(), profiled);
     const fmt = await import("./cliFormat.js");
     console.log(fmt.logo());

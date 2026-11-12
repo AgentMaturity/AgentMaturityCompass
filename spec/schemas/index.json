@@ -3,7 +3,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-conformance-statement.schema.json",
       "name": "a4-conformance-statement.schema.json",
-      "sha256": "89aeccae2375d6be7ceaf24760c93c5c8e1a14cc23c5358f4836d4019b720c2d"
+      "sha256": "aa581f91008910afe981a388d0bf454bf9d0380950b9c0cd1cc24df898445d34"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-decision.schema.json",
@@ -48,7 +48,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-readiness.schema.json",
       "name": "a4-readiness.schema.json",
-      "sha256": "6be38136a5f353568336e790a3fc3f1c4082aeb1e5d4a9abbc41d082e5f4c438"
+      "sha256": "cbdaa841ba879bbf73af55fa481b9160d8c1b6a53c291c39732d090d52563890"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-record.schema.json",
@@ -58,7 +58,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-release.schema.json",
       "name": "a4-release.schema.json",
-      "sha256": "94cd28aa3d6ec32229eab78e749770909d32bba031d68f705b551c542ae8ec41"
+      "sha256": "682bfbf77c60f1e024828f82ef80fed5fdfa87a8d541e77a0b30a2cdb9a6e635"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-revision.schema.json",
@@ -78,7 +78,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-value-claim.schema.json",
       "name": "a4-value-claim.schema.json",
-      "sha256": "b52cda84299f6ccf0ca13e9fd7b75c25b7054baafdeed6ce01b51b447949b422"
+      "sha256": "c2d7a72216c999eed5d3d691767448e4456174ec99027105ca9bf1a59bfaad9b"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/amcaudit.schema.json",
@@ -128,7 +128,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/claim-envelope.schema.json",
       "name": "claim-envelope.schema.json",
-      "sha256": "93f504675b8119538a5cec38f532ca545938f6426f82a056fd43e0ec24927379"
+      "sha256": "b0e803ebc2ad8e4a41eb29bdc0444c2c3a1d5da046be69ceeed211acb5b149f1"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/conformance-results.schema.json",

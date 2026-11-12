@@ -134,6 +134,7 @@
               "CONTRADICTORY_EVIDENCE",
               "CROSS_SCOPE_EVIDENCE",
               "SIGNATURE_INVALID",
+              "TRUST_BOUNDARY_VIOLATED",
               "ISSUER_NOT_PINNED",
               "REVIEW_NOT_INDEPENDENT",
               "LEGACY_1X_UNVERIFIED",

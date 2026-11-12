@@ -1265,7 +1265,7 @@ export function detectTrustBoundaryViolation(workspace: string, config: AMCConfi
     return {
       violated: true,
       message:
-        "trust boundary violated: runtime and signing keys are not marked isolated (set security.trustBoundaryMode=isolated only when monitor/auditor keys are isolated from evaluated agent)"
+        "trust boundary violated: runtime and signing keys are not marked isolated (set security.trustBoundaryMode=isolated in .amc/amc.config.yaml only when monitor/auditor keys are isolated from the evaluated agent, then run `amc verify --sign-config`)"
     };
   }
 

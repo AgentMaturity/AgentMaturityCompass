@@ -98,18 +98,23 @@ export function envelopeForDiagnosticReport(report: DiagnosticReportClaimInput, 
         // An INVALID or UNSIGNED run vouches for nothing it recorded: its rows cannot make the claim observed.
         report.status === "VALID" && coverage.observed > 0 ? ["OBSERVED"] : ["SELF_REPORTED"], report.windowEndTs),
       contradictory: report.contradictionCount > 0,
-      signatureValid: report.status === "VALID"
+      // A sealed run that is INVALID only because it crossed its trust boundary is not a bad signature: it says so below.
+      signatureValid: report.status === "VALID" || (sealedButOutsideBoundary(report) ? null : false)
     },
     evidenceRefs: [report.runId],
     now
   });
   if (readiness.claimEligible) return envelope;
+  const boundary: ClaimReasonCode[] = sealedButOutsideBoundary(report) ? ["TRUST_BOUNDARY_VIOLATED"] : [];
   const untrusted = readiness.status === "UNVERIFIED" || report.trustLabel === "UNRELIABLE — DO NOT USE FOR CLAIMS";
   const current = envelope.statusDimensions.evidence;
   const evidenceState = untrusted ? "untrusted" : current === "sufficient" ? "incomplete" : current;
   return { ...envelope, statusDimensions: { ...envelope.statusDimensions, evidence: evidenceState },
-    reasons: [...envelope.reasons, "EVIDENCE_NOT_CLAIM_READY"] };
+    reasons: [...boundary, ...envelope.reasons, "EVIDENCE_NOT_CLAIM_READY"] };
 }
+
+const sealedButOutsideBoundary = (report: DiagnosticReportClaimInput): boolean =>
+  report.status === "INVALID" && report.trustBoundaryViolated && report.verificationPassed;
 
 interface AdapterBase { producer: string; regulated?: boolean; applicability?: Applicability;
   evidenceRefs?: readonly string[]; now: number }
