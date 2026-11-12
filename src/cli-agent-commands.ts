@@ -384,11 +384,6 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       if (piRoute === null) return;
       const route = piRoute?.route ?? routeFor(io, providerId, opts, opts.model ?? preset?.model);
       if (route === null) return;
-      // Smoke L-1: an unconfigured credential reference is refused here with the guide's fix, before a session opens.
-      const missingCredential = route.credentialRef === null ? null : await missingCredentialGuidance({ workspace: process.cwd(), agentId,
-        provider: providerId, model: opts.model ?? preset?.model, baseUrl: opts.baseUrl, credential: opts.credential,
-        credentialsHome: opts.credentialsHome, credentialsFile: opts.credentialsFile });
-      if (missingCredential !== null) { io.error(missingCredential); io.fail(); return; }
       let images: ReturnType<typeof loadNativeImageFiles>;
       let audioParts: readonly NativeAudioPart[] | undefined;
       try {
@@ -447,6 +442,11 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         const { assertSessionResumeAgent } = await import("./session/sessionResume.js");
         assertSessionResumeAgent({ workspace: process.cwd(), sessionId: opts.session, agentId });
       }
+      // Smoke L-1: an unconfigured credential reference is refused after argument checks and before a session opens, with the guide's fix.
+      const missingCredential = route.credentialRef === null ? null : await missingCredentialGuidance({ workspace: process.cwd(), agentId,
+        provider: providerId, model: opts.model ?? preset?.model, baseUrl: opts.baseUrl, credential: opts.credential,
+        credentialsHome: opts.credentialsHome, credentialsFile: opts.credentialsFile });
+      if (missingCredential !== null) { io.error(missingCredential); io.fail(); return; }
       const runner = await importRunner(io);
       if (runner === null) return;
 
