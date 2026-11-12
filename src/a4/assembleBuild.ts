@@ -368,13 +368,13 @@ function settledView(ctx: A4ProducerContext, planned: PlannedSession): NativeTas
   }
   if (RUNNING.has(view.state)) throw fail(409, "A4_NOT_READY", "A build session is still running; review once it settles.", { reasonCodes: ["BUILD_RUNNING", `TASK:${planned.taskId}`] });
   if (view.state === "failed" || view.sessionId === null) {
-    throw fail(409, "A4_NOT_READY", view.canResume ? `The build session failed; resume it (POST /api/v1/native-tasks/${planned.taskId}/resume) and review once it settles.`
+    throw fail(409, "A4_NOT_READY", view.canResume ? `The build session failed; resume task ${planned.taskId} on Studio's Native Tasks page and review once it settles.`
       : "The build session failed and cannot be resumed; request changes and build again.", { reasonCodes: ["BUILD_FAILED", `TASK:${planned.taskId}`] });
   }
   // An idle or released session can still take turns (a released one is resumed first), and nothing re-reads its head
   // after Review: only a closed session (no turn, no resume) is the state approvers approve.
   if (view.state !== "closed") {
-    throw fail(409, "A4_NOT_READY", `Close the build session before Review: verify it (POST /api/v1/native-tasks/${planned.taskId}/verify; resume a released one first), `
+    throw fail(409, "A4_NOT_READY", `Close the build session before Review: on Studio's Native Tasks page, open task ${planned.taskId} and press Close and verify (resume a released one first), `
       + "which closes it, so it takes no turn after what is reviewed.", { reasonCodes: ["BUILD_SESSION_OPEN", `TASK:${planned.taskId}`, `STATE:${view.state}`] });
   }
   return view;
