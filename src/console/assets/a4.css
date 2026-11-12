@@ -17,3 +17,6 @@
   .a4-lane-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 640px) { .a4-lanes, .a4-lane-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* While one write and the reload after it run (a4.js guarded), actions are dimmed and not clickable. */
+#app[aria-busy="true"] [data-a4-action] { pointer-events: none; opacity: 0.55; }

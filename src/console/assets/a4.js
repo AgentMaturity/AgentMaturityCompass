@@ -35,10 +35,12 @@ let busy = false; // one write in flight at a time, so a double click cannot min
 async function guarded(work) {
   if (busy) return undefined;
   busy = true;
+  root?.setAttribute("aria-busy", "true"); // a4.css dims the actions until the write and the reload after it end
   try {
     return await work();
   } finally {
     busy = false;
+    root?.removeAttribute("aria-busy");
   }
 }
 
