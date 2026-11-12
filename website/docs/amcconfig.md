@@ -231,7 +231,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: npm install -g @amc/cli
+      - run: npm install -g agent-maturity-compass
       - run: amc eval run --config amcconfig.yaml
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

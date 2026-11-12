@@ -247,10 +247,12 @@ const PUBLIC_DOC_IDS = new Set([
   'MIGRATION_FROM_PROMPTFOO_DEEPEVAL'
 ]);
 const PUBLIC_DOCS = ALL_DOCS.filter(doc => PUBLIC_DOC_IDS.has(doc) && !INTERNAL_DOCS.has(doc));
+// Number the published categories in order, so a category with no public guide leaves no gap.
 const PUBLIC_CATEGORIES = CATEGORIES.map(category => ({
   ...category,
   docs: category.docs.filter(doc => PUBLIC_DOCS.includes(doc))
-})).filter(category => category.docs.length > 0);
+})).filter(category => category.docs.length > 0)
+  .map((category, index) => ({ ...category, icon: String(index + 1).padStart(2, '0') }));
 
 globalThis.AMC_DOCS_BUILD_MANIFEST = Object.freeze({
   publicDocs: Object.freeze([...PUBLIC_DOCS].sort()),
