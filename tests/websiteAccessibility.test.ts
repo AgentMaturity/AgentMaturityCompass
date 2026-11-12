@@ -85,12 +85,15 @@ describe("website accessibility", () => {
     expect(failures).toEqual([]);
   });
 
-  test("404 page uses domain-agnostic navigation links", () => {
+  // Pages serves 404.html at whatever nested path was missed, so its links are root-absolute (the site is the domain root).
+  test("404 page uses root-absolute, domain-agnostic links", () => {
     const html = readFileSync(join(process.cwd(), "website", "404.html"), "utf8");
 
     expect(html).not.toContain('href="/AgentMaturityCompass/');
-    expect(html).toContain('href="./"');
-    expect(html).toContain('href="./playground.html"');
+    expect(html).not.toMatch(/(?:href|src)="(?!\/|#|https:)/);
+    expect(html).toContain('href="/brand.css"');
+    expect(html).toContain('href="/"');
+    expect(html).toContain('href="/playground.html"');
   });
 
   test("every static HTML page has keyboard focus-visible coverage", () => {
