@@ -34,7 +34,8 @@ function linkedLocalCss(html: string, file: string): string[] {
   return links
     .map(([, href]) => href.split("?")[0])
     .filter((href) => href && !href.startsWith("http") && !href.startsWith("//") && !href.startsWith("data:"))
-    .map((href) => resolve(dirname(file), href));
+    // A root-absolute href (the 404 page's) is served from the website root.
+    .map((href) => href.startsWith("/") ? join(process.cwd(), "website", href) : resolve(dirname(file), href));
 }
 
 function hexToRgb(hex: string): [number, number, number] {
