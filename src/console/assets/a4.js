@@ -474,7 +474,7 @@ function mountProject(projectId, options) {
       default: {
         // A stage lane's own action (registerStageAction): only this project's routes or a native task route, or a local
         // one (`local: true`, e.g. a read the card shows) that sends nothing here and re-renders once its `pending` settles.
-        const custom = stageAction(stage, name)?.({ button, value, headBinding, uuid, projectPath });
+        const custom = stageAction(stage, name)?.({ button, value, headBinding, uuid, projectPath, projectId });
         if (!custom) throw new Error(`Unknown A4 action ${name}.`);
         if (custom.local === true) return custom;
         if (typeof custom.path !== "string" || !(custom.path.startsWith(`${projectPath("")}/`) || /^\/api\/v1\/native-tasks(?:\/|$)/.test(custom.path))) {
