@@ -5,7 +5,7 @@
 // session through Studio's native task route with its cursor contract (validateNativeTaskPoll); turns, cancel and resume stay on the
 // native task page. A connect lease token is shown from the one response that carried it and is kept nowhere else.
 import { apiNativeRequest } from "./api.js";
-import { engineDecision } from "./a4Approvals.js";
+import { effectDecideButtons, engineDecision, rememberDecided } from "./a4Approvals.js";
 import { registerStageAction, registerStageCard } from "./a4Cards.js";
 import * as view from "./a4View.js";
 import { validateNativeTaskPoll } from "./nativeTasks.js";
@@ -209,14 +209,9 @@ function renderReview(ctx) {
     <div class="row wrap">${view.actionButton("Review", "review", view.stepOffer(ctx.allowed.review, ctx, "review"))}</div>`;
 }
 
-/** Engine requests this page recorded a decision on: readiness names no engine decisions, and a second one is refused (distinct_approvers). */
-const decidedHere = new Set();
-const decideButtons = (ctx, approvalRequestId, digest, offer = ctx.allowed.requestChanges) => {
-  const approve = decidedHere.has(approvalRequestId) ? view.held("You have already decided this request.") : offer;
-  return `${view.actionButton("Approve", "decide-engine", approve,
+const decideButtons = (ctx, approvalRequestId, digest) => `${view.actionButton("Approve", "decide-engine", ctx.allowed.requestChanges,
   `data-approval="${esc(approvalRequestId)}" data-digest="${esc(digest)}" data-verb="approve"`)} ${view.actionButton("Deny", "decide-engine",
-  decidedHere.has(approvalRequestId) ? approve : ctx.allowed.requestChanges, `data-approval="${esc(approvalRequestId)}" data-digest="${esc(digest)}" data-verb="deny"`)}`;
-};
+  ctx.allowed.requestChanges, `data-approval="${esc(approvalRequestId)}" data-digest="${esc(digest)}" data-verb="deny"`)}`;
 
 /** Engine statuses a resolution request can still be decided or recorded in; any other one is requested again. */
 const LIVE_REQUEST = new Set(["PENDING", "QUORUM_MET", "CONSUMED"]);
@@ -252,15 +247,6 @@ function renderOutcomeUnknown(ctx) {
     ${rows.length ? `<label>Decision reason <textarea name="engine-reason" rows="2" maxlength="1000"></textarea></label><ul class="a4-rows">${rows.join("")}</ul>` : ""}`;
 }
 
-/**
- * Approve on the effect request is refused (400 SOD_VIOLATION) to anyone the completion gate excludes (its requester and
- * the revision's authors and builders), self-approval included; they may still deny.
- */
-function effectApproveOffer(ctx) {
-  const gate = view.currentGates(ctx.gates, "assemble", ctx.readiness).shown.find((row) => row.gate === "completion");
-  return view.approveOffer(ctx.allowed.requestChanges, gate, ctx.readiness, ctx.me, true);
-}
-
 /** The completion effect a4.assemble.apply: the owner opens it once the completion gate has its quorum; approvers decide it here. */
 function renderEffect(ctx) {
   const item = itemOf(ctx, "effect_gate");
@@ -275,7 +261,7 @@ function renderEffect(ctx) {
       `data-gate="${esc(completion?.gateId ?? "")}"`)}</div>
     ${request ? `<p class="muted">Engine request <code>${esc(request[0])}</code> (<code>${esc(requestState ?? "unknown")}</code>)</p>${requestState === "PENDING" || requestState === "QUORUM_MET"
       ? `<label>Decision reason <textarea name="engine-reason" rows="2" maxlength="1000"></textarea></label>
-      <div class="row wrap">${decideButtons(ctx, request[0], request[1], effectApproveOffer(ctx))}</div>` : ""}` : ""}
+      <div class="row wrap">${effectDecideButtons(ctx, "assemble", request[0], request[1])}</div>` : ""}` : ""}
     ${status(ctx, "effects.failed")}`;
 }
 
@@ -304,7 +290,7 @@ export function register() {
     path: projectPath(`/outcome-unknown/${encodeURIComponent(button.dataset.execution)}/resolve`), body: headBinding() }));
   registerStageAction("assemble", "decide-engine", ({ button, value, projectId }) => ({ label: button.dataset.verb === "deny" ? "Deny" : "Approve",
     ...engineDecision(projectId, button.dataset.approval, button.dataset.verb, reasonOf(value), button.dataset.digest),
-    got: () => { decidedHere.add(button.dataset.approval); } }));
+    got: () => rememberDecided(button.dataset.approval) }));
   registerStageAction("assemble", "open-effect", ({ button, headBinding, projectPath }) => {
     if (!button.dataset.gate) throw new Error("No approved completion gate is shown. Refresh first. Nothing was sent.");
     return { label: "Open the effect gate", path: projectPath("/stages/assemble/effects/a4.assemble.apply/open"), body: { gateId: button.dataset.gate, ...headBinding() } };

@@ -3,6 +3,7 @@
 // the general approvals inbox (app.js) both decide them here: Studio's generic /approvals decide carries no digest, and
 // A4 counts only decisions bound to it (src/a4/a4Effects.ts verifyAndConsumeEffect).
 import { apiNativeRequest, whoami } from "./api.js";
+import { actionButton, approveOffer, currentGates, esc, held } from "./a4View.js";
 
 const API = "/api/v1/a4/projects";
 
@@ -59,4 +60,20 @@ export async function a4Projects() {
   } catch {
     return [];
   }
+}
+
+/** Engine requests this page recorded a decision on: readiness names no engine decisions, and a second one is refused (distinct_approvers). */
+const decidedHere = new Set();
+export const rememberDecided = (approvalRequestId) => { decidedHere.add(approvalRequestId); };
+
+/**
+ * Approve and Deny for a stage's effect request. Approve is refused (400 SOD_VIOLATION) to anyone the stage's completion
+ * gate excludes (its requester, the revision's authors and builders), self-approval included; they may still deny.
+ */
+export function effectDecideButtons(ctx, stage, approvalRequestId, digest) {
+  const gate = currentGates(ctx.gates, stage, ctx.readiness).shown.find((row) => row.gate === "completion");
+  const done = decidedHere.has(approvalRequestId) ? held("You have already decided this request.") : null;
+  const button = (verb, label, offer) => actionButton(label, "decide-engine", done ?? offer,
+    `data-approval="${esc(approvalRequestId)}" data-digest="${esc(digest)}" data-verb="${verb}"`);
+  return `${button("approve", "Approve", approveOffer(ctx.allowed.requestChanges, gate, ctx.readiness, ctx.me, true))} ${button("deny", "Deny", ctx.allowed.requestChanges)}`;
 }

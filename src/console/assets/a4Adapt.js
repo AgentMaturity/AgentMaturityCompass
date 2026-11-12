@@ -5,6 +5,7 @@
 // declared-versus-enforced table (slice B). Read from the newest Adapt revision and the readiness Studio returns. Renderers
 // are pure: every server string goes through esc(), statuses, reason codes and the catalog's notice are printed as Studio
 // returned them, and no card names a maturity level or a percentage.
+import { effectDecideButtons, engineDecision, rememberDecided } from "./a4Approvals.js";
 import { registerStageAction, registerStageCard } from "./a4Cards.js";
 import * as view from "./a4View.js";
 
@@ -79,9 +80,7 @@ function renderBlockers(ctx) {
       ${codes(item.reasonCodes)}${item.nextAction?.label ? `<br><span class="muted">${esc(item.nextAction.label)}</span>` : ""}</li>`).join("")}</ul>`).join("");
 }
 
-const decideButtons = (ctx, approvalRequestId, digest) => `${view.actionButton("Approve", "decide-engine", ctx.allowed.requestChanges,
-  `data-approval="${esc(approvalRequestId)}" data-digest="${esc(digest)}" data-verb="approve"`)} ${view.actionButton("Deny", "decide-engine",
-  ctx.allowed.requestChanges, `data-approval="${esc(approvalRequestId)}" data-digest="${esc(digest)}" data-verb="deny"`)}`;
+const decideButtons = (ctx, approvalRequestId, digest) => effectDecideButtons(ctx, "adapt", approvalRequestId, digest);
 
 /** The plan's signing and activation: the effect gate, its engine request, the lockout notice and the lifecycle-bridge rows. */
 function renderActivation(ctx) {
@@ -229,11 +228,11 @@ export function register() {
     if (!button.dataset.gate) throw new Error("No approved completion gate is shown. Refresh first. Nothing was sent.");
     return { label: "Open the plan review", path: projectPath(`/stages/adapt/effects/${EFFECT}/open`), body: { gateId: button.dataset.gate, ...headBinding() } };
   });
-  registerStageAction("adapt", "decide-engine", ({ button, value, projectPath }) => {
+  registerStageAction("adapt", "decide-engine", ({ button, value, projectId }) => {
     const reason = value("engine-reason");
     if (!reason) throw new Error("Write a decision reason first. Nothing was sent.");
     return { label: button.dataset.verb === "deny" ? "Deny" : "Approve",
-      path: projectPath(`/approvals/${encodeURIComponent(button.dataset.approval)}/${button.dataset.verb === "deny" ? "deny" : "approve"}`),
-      body: { reason, expectedRequestDigestSha256: button.dataset.digest } };
+      ...engineDecision(projectId, button.dataset.approval, button.dataset.verb, reason, button.dataset.digest),
+      got: () => rememberDecided(button.dataset.approval) };
   });
 }
