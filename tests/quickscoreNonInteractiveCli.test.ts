@@ -33,7 +33,7 @@ describe("quickscore non-interactive CLI output", () => {
         "amc quickscore",
         "amc quickscore --answers answers.json --json",
         "amc quickscore --auto",
-        "amc wrap <runtime> -- <your-agent-command>"
+        "amc adapters run --agent <id> --adapter generic-cli -- <your-agent-command>"
       ]
     });
   });
@@ -43,9 +43,9 @@ describe("quickscore non-interactive CLI output", () => {
       nonInteractive: true,
       scoreStatus: "AUTO_NO_EVIDENCE",
       warning: "Auto-score could not find execution evidence. No measured maturity score was produced.",
-      firstRunHint: "Capture evidence with `amc wrap <runtime> -- <your-agent-command>` or use `amc quickscore --answers answers.json --json` for CI-safe survey scoring.",
+      firstRunHint: "Capture evidence with `amc adapters run --agent <id> --adapter generic-cli -- <your-agent-command>` or use `amc quickscore --answers answers.json --json` for CI-safe survey scoring.",
       suggestedCommands: [
-        "amc wrap <runtime> -- <your-agent-command>",
+        "amc adapters run --agent <id> --adapter generic-cli -- <your-agent-command>",
         "amc adapters run --agent <id> --workorder <workOrderId>",
         "amc quickscore --answers answers.json --json",
         "amc quickscore"

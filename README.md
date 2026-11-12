@@ -440,7 +440,7 @@ Need a CI-safe score without terminal prompts? Use `amc quickscore --answers ans
 
 Without a terminal, `amc quickscore` generates no placeholder score: it exits 1 with the hint "Did you mean to run the interactive score?" Run it in a terminal, or pass answers explicitly for CI.
 
-If `amc quickscore --auto --json` cannot find captured execution evidence, it fails closed with `scoreStatus: "AUTO_NO_EVIDENCE"` and does not emit a measured zero score. Capture evidence with `amc wrap <runtime> -- <your-agent-command>`, or use `amc quickscore --answers answers.json --json` for CI-safe survey scoring.
+If `amc quickscore --auto --json` cannot find captured execution evidence, it fails closed with `scoreStatus: "AUTO_NO_EVIDENCE"` and does not emit a measured zero score. Capture evidence with `amc adapters run --agent <id> --adapter generic-cli -- <your-agent-command>`, or use `amc quickscore --answers answers.json --json` for CI-safe survey scoring.
 
 Advanced proof check:
 
@@ -533,22 +533,22 @@ For a source-of-truth command map generated from the live CLI registry, run `amc
 
 ```bash
 # LangChain
-amc wrap langchain -- python my_agent.py
+amc adapters run --agent default --adapter langchain-python -- python my_agent.py
 
 # CrewAI
-amc wrap crewai -- python crew.py
+amc adapters run --agent default --adapter crewai-cli -- python crew.py
 
 # AutoGen
-amc wrap autogen -- python autogen_app.py
+amc adapters run --agent default --adapter autogen-cli -- python autogen_app.py
 
 # OpenClaw
-amc wrap openclaw-cli -- openclaw run
+amc adapters run --agent default --adapter openclaw-cli -- openclaw run
 
 # Claude Code
-amc wrap claude-code -- claude "analyze this code"
+amc adapters run --agent default --adapter claude-cli -- claude "analyze this code"
 
 # Any CLI agent
-amc wrap generic-cli -- python my_bot.py
+amc adapters run --agent default --adapter generic-cli -- python my_bot.py
 ```
 
 ### Observe or control native provider actions

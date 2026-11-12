@@ -3129,7 +3129,7 @@ program
         console.log(chalk.yellow("\n  Auto-score unavailable — no measured maturity score was produced."));
         console.log(chalk.gray("\n  No evidence found. Run your agent through AMC first:"));
         console.log(chalk.gray("    amc adapters run --agent <id> -- <command>"));
-        console.log(chalk.gray("    amc wrap <runtime> -- <command>"));
+        console.log(chalk.gray("    amc adapters run --agent <id> --adapter generic-cli -- <command>"));
         console.log(chalk.gray("\n  Or use interactive mode: amc quickscore (without --auto)"));
         process.exit(1);
       }
@@ -3228,7 +3228,7 @@ program
         console.log("");
         console.log(chalk.yellow("💡 No evidence collected yet. Your score reflects default (L0) state."));
         console.log(chalk.gray("  To score a real agent, capture evidence first:"));
-        console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc wrap <runtime> -- <your-agent-command>"), chalk.gray("  # Capture agent behavior"));
+        console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc adapters run --agent <id> --adapter generic-cli -- <your-agent-command>"), chalk.gray("  # Capture agent behavior"));
         console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc evidence collect"), chalk.gray("               # Guided wizard to connect and capture evidence"));
         console.log(chalk.white("  $"), chalk.hex('#4AEF79')("amc quickscore"), chalk.gray("  # Then re-score"));
       }
@@ -7268,7 +7268,7 @@ Use --dry-run to preview the exact capture command and next score step.
     if (!process.stdin.isTTY) {
       console.error(chalk.red("Evidence collection wizard requires an interactive terminal."));
       console.error(chalk.gray("For first-run capture, use: amc evidence collect --first-run --runtime any -- <agent command>"));
-      console.error(chalk.gray("For CI/CD wrappers, use: amc wrap any -- <command>"));
+      console.error(chalk.gray("For CI/CD wrappers, use: amc adapters run --agent <id> --adapter generic-cli -- <command>"));
       process.exit(1);
     }
     console.log(chalk.bold("\n🔬 AMC Evidence Collection Wizard"));
@@ -7355,11 +7355,12 @@ Use --dry-run to preview the exact capture command and next score step.
         name: "runtime",
         message: "What runtime/framework?",
         choices: [
-          { name: "Python (generic)", value: "python" },
-          { name: "Node.js (generic)", value: "node" },
-          { name: "LangChain", value: "langchain" },
-          { name: "CrewAI", value: "crewai" },
-          { name: "AutoGen", value: "autogen" },
+          // Values are `amc adapters run` adapter IDs.
+          { name: "Python (generic)", value: "generic-cli" },
+          { name: "Node.js (generic)", value: "generic-cli" },
+          { name: "LangChain", value: "langchain-python" },
+          { name: "CrewAI", value: "crewai-cli" },
+          { name: "AutoGen", value: "autogen-cli" },
           { name: "Claude CLI", value: "claude-cli" },
           { name: "Other CLI", value: "generic-cli" },
         ]
@@ -7372,7 +7373,7 @@ Use --dry-run to preview the exact capture command and next score step.
       }]);
       console.log(chalk.bold.green("\n  ✓ Ready to capture evidence!\n"));
       console.log(chalk.white("  Run this command to start capturing:"));
-      console.log(chalk.hex('#4AEF79')(`    amc wrap ${runtime} -- ${command}\n`));
+      console.log(chalk.hex('#4AEF79')(`    amc adapters run --agent ${activeAgent(program) ?? "default"} --adapter ${runtime} -- ${command}\n`));
       console.log(chalk.gray("  AMC will intercept all LLM calls, tool invocations, and agent decisions."));
       console.log(chalk.gray("  Stop the agent with Ctrl+C when done, then run:"));
       console.log(chalk.hex('#4AEF79')("    amc score\n"));
@@ -12462,7 +12463,7 @@ compliance
       console.log(chalk.gray(`  💡 Categories need control-bound AMC runtime evidence (meta.controlIds) in the window;`));
       console.log(chalk.gray(`     a pass also needs a compiled plan recording that the control applies.`));
       console.log(chalk.gray(`     Absence of violations is not a pass. Capture evidence first:`));
-      console.log(chalk.gray(`     amc wrap <runtime> -- <your-agent-command>`));
+      console.log(chalk.gray(`     amc adapters run --agent <id> --adapter generic-cli -- <your-agent-command>`));
       console.log(chalk.gray(`     amc evidence collect`));
     }
     if (defaultToMarkdown) {
@@ -21900,7 +21901,7 @@ const score = program.command("score").description("Maturity scoring, adversaria
     console.log(renderAsciiRadar(result.layerScores));
     if (result.totalScore === 0) {
       console.log(chalk.yellow("\n💡 No evidence collected yet. Capture agent behavior first:"));
-      console.log(chalk.gray("  amc wrap <runtime> -- <command>    # Capture evidence"));
+      console.log(chalk.gray("  amc adapters run --agent <id> --adapter generic-cli -- <command>    # Capture evidence"));
       console.log(chalk.gray("  amc evidence collect               # Guided capture/import wizard"));
       console.log(chalk.gray("  amc ingest <fileOrDir> --type generic_json --agent <agentId>  # Import existing logs"));
     }
@@ -21924,7 +21925,7 @@ score
       if (opts.json) {
         const output: any = withClaimFields({ ...result }, claim);
         if ((result.overallScore ?? 0) === 0) {
-          output.hint = "Score is 0 because no evidence has been collected yet. Run: amc evidence collect, amc wrap <runtime> -- <command>, or amc quickscore";
+          output.hint = "Score is 0 because no evidence has been collected yet. Run: amc evidence collect, amc adapters run --agent <id> --adapter generic-cli -- <command>, or amc quickscore";
         }
         console.log(JSON.stringify(output, null, 2));
         return;
@@ -21937,7 +21938,7 @@ score
       if ((result.overallScore ?? 0) === 0) {
         console.log(chalk.yellow("\n💡 Score is 0 — no evidence collected yet."));
         console.log(chalk.gray("  amc evidence collect              # Auto-collect from workspace"));
-        console.log(chalk.gray("  amc wrap <runtime> -- <command>    # Capture live evidence"));
+        console.log(chalk.gray("  amc adapters run --agent <id> --adapter generic-cli -- <command>    # Capture live evidence"));
       }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
@@ -23684,14 +23685,14 @@ playground
     const session = createPlaygroundSession();
     const results = runAllScenarios(session);
     if (opts.json) {
-      const output = { scenarios: results, hint: "These are static demo scenarios. For real agent testing, use: amc wrap <runtime> -- <command>, or amc assurance run --all" };
+      const output = { scenarios: results, hint: "These are static demo scenarios. For real agent testing, use: amc adapters run --agent <id> --adapter generic-cli -- <command>, or amc assurance run --all" };
       console.log(JSON.stringify(output, null, 2));
       return;
     }
     console.log(formatPlaygroundReport(session));
     console.log(chalk.gray("\n💡 These are static demo scenarios for quick evaluation."));
     console.log(chalk.gray("  For real agent testing:"));
-    console.log(chalk.gray("    amc wrap <runtime> -- <command>    # Capture live evidence"));
+    console.log(chalk.gray("    amc adapters run --agent <id> --adapter generic-cli -- <command>    # Capture live evidence"));
     console.log(chalk.gray("    amc assurance run --all            # Run full red-team packs"));
     console.log(chalk.gray("    amc redteam run                    # Targeted attack simulation"));
   });
