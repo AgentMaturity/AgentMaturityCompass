@@ -8324,7 +8324,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       // M3: the console questionnaire. Scored by scoreIndustryPack, as `amc domain pack run --json` and the MCP tool; nothing is stored.
       const industryPackScoreMatch = pathname.match(/^\/industry-packs\/([^/]+)\/score$/);
       if (industryPackScoreMatch && req.method === "POST") {
-        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
+        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
           return;
         }
         const { getPackById, scoreIndustryPack } = await import("../domains/industryPacks.js");

@@ -100,21 +100,24 @@ describe("applyHunks", () => {
   });
 
   // Locating runs synchronously on a model-supplied patch. Each case below blocked the process for 15 to 30 seconds
-  // before the budget was shared by the whole call and trailing whitespace was stripped in one pass.
+  // before the budget was shared by the whole call and trailing whitespace was stripped in one pass. Each comparison is
+  // charged before it runs, so a refusal leaves the budget exactly one unit over (these lines are under 64 characters):
+  // the work is bounded by MAX_LOCATE_WORK, not by a wall clock that a loaded CI runner cannot hold.
   it("refuses a hunk that would cost more than the comparison budget to locate, before it blocks the process", () => {
     const file = `${"same\n".repeat(40_000)}`;
     const hunk: PatchHunk = { contextHint: null, eof: false, lines: [...Array.from({ length: 1_000 }, () => ({ op: " " as const, text: "same" })), { op: "-", text: "never" }] };
-    const started = performance.now();
-    expect(() => applyHunks(file, [hunk], "big.txt")).toThrow(new RegExp(`hunk 1 of big.txt would pass this patch's budget of ${MAX_LOCATE_WORK}`));
-    expect(performance.now() - started).toBeLessThan(2_000);
+    const budget = locateBudget();
+    expect(() => applyHunks(file, [hunk], "big.txt", budget)).toThrow(new RegExp(`hunk 1 of big.txt would pass this patch's budget of ${MAX_LOCATE_WORK}`));
+    expect(budget.left).toBe(-1);
   });
 
   it("spends one budget across all of a patch's hunks, so many cheap hunks over a large file are refused quickly", () => {
     const file = Array.from({ length: 100_000 }, (_, at) => `line ${at}`).join("\n");
     const hunks: PatchHunk[] = Array.from({ length: 5_000 }, (_, k) => ({ contextHint: null, eof: false, lines: [{ op: "-", text: `line ${k * 20}` }, { op: "+", text: `LINE ${k * 20}` }] }));
-    const started = performance.now();
-    expect(() => applyHunks(file, hunks, "big.txt")).toThrow(/would pass this patch's budget/);
-    expect(performance.now() - started).toBeLessThan(2_000);
+    const shared = locateBudget();
+    // Refused at a later hunk than the first: what earlier hunks spent counted against the one budget.
+    expect(() => applyHunks(file, hunks, "big.txt", shared)).toThrow(/hunk (?!1 )\d+ of big.txt would pass this patch's budget/);
+    expect(shared.left).toBe(-1);
     // The same budget object spans calls: what one section spent, the next cannot spend again.
     const budget = locateBudget();
     expect(applyHunks(file, hunks.slice(0, 100), "big.txt", budget).removed).toBe(100);

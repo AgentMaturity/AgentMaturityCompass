@@ -59,7 +59,9 @@ const cliWithSecret = ["sh", "-c", 'export AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAU
 const monitorFingerprint = (workspace) => `process.stdout.write(require('node:crypto').createHash('sha256')`
   + `.update(require('node:fs').readFileSync('${workspace}/.amc/keys/monitor_ed25519.pub')).digest('hex'))`;
 function qualifyRun(label, invoke, expectMonitor) {
-  const result = invoke(["agent-loop", "run", "--provider", "stub", "--json", "say hello"]);
+  // Each runner container gets a fresh tmpfs home, so no machine trust record survives `amc init`: consent is explicit
+  // per turn, as docs/WORKSPACE_TRUST.md documents for headless hosts.
+  const result = invoke(["agent-loop", "run", "--provider", "stub", "--trust-workspace", "--json", "say hello"]);
   const summary = JSON.parse(result.stdout);
   check(`${label}: keyless turn and cold signed verification`, verifyPackedRun({ summary, expectMonitor, runCommand: (_label, args) => invoke(args) }));
   return summary;
@@ -159,20 +161,22 @@ console.log(JSON.stringify({unauthenticated:unauth.status,authenticated:auth.sta
   docker(["stop", "--time", "30", name]);
   check("studio: both cold verifiers preserve the signed session after restart", verifyCold("restart shutdown"));
 
-  // A killed gateway leaves an unsealed legacy session. Completeness must still
-  // fail; passing this negative control would hide interrupted or corrupted evidence.
+  // A killed gateway leaves an unsealed legacy session. Inside the liveness window (src/ledger/sessionLiveness.ts,
+  // LIVE-INTEGRITY-01) a cold verifier cannot tell it from a running writer, so both must name it open, never closed
+  // or sealed, while the run's own session stays closed; past the window it reads as a missing seal until Studio seals it.
   docker(["start", name]); await ready();
   docker(["kill", "--signal", "KILL", name]);
   const ledgerResult = coldInvoke("abrupt shutdown", ["session", "verify", "--json", "--expect-monitor", expectMonitor]);
   const runResult = coldInvoke("abrupt shutdown", ["agent-loop", "verify", summary.sessionId, "--json", "--expect-monitor", expectMonitor]);
   const ledgerReport = JSON.parse(ledgerResult.stdout); const runReport = JSON.parse(runResult.stdout);
-  const sealError = ledgerReport.errors?.length === 1 ? ledgerReport.errors[0] : null;
-  const missingSession = typeof sealError === "string" ? /^Session ([0-9a-f-]+) missing seal$/.exec(sealError)?.[1] : null;
-  check("studio: interrupted gateway is refused by both cold verifiers",
-    ledgerResult.exitCode === 1 && runResult.exitCode === 1 && !ledgerResult.ok && !runResult.ok
-    && ledgerReport.ok === false && ledgerReport.chain?.ok === false && missingSession && missingSession !== summary.sessionId
-    && ledgerReport.sessions?.closed?.includes(summary.sessionId) && runReport.ok === false && runReport.ledgerOk === false
-    && runReport.sessionId === summary.sessionId && runReport.ledgerErrors?.length === 1 && runReport.ledgerErrors[0] === sealError);
+  const open = ledgerReport.sessions?.liveLegacy ?? [];
+  const gatewaySession = open.length === 1 && open[0].runtime === "gateway" ? open[0].sessionId : null;
+  check("studio: interrupted gateway session is named open, never sealed, by both cold verifiers",
+    ledgerResult.ok && runResult.ok && ledgerReport.ok === true && typeof gatewaySession === "string" && gatewaySession !== summary.sessionId
+    && !ledgerReport.sessions.closed?.includes(gatewaySession) && ledgerReport.sessions.closed?.includes(summary.sessionId)
+    && runReport.ok === true && runReport.sessionId === summary.sessionId
+    && JSON.stringify(runReport.unfinalizedSessions) === JSON.stringify([gatewaySession]),
+    { openSessions: open, unfinalizedSessions: runReport.unfinalizedSessions ?? null });
 }
 function runner() {
   const data = volume("runner-data");

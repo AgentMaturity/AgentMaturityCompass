@@ -102,13 +102,18 @@ def test_refused_startup_raises_the_runtime_reason(tmp_path, reason, write):
 
 @pytest.fixture()
 def reviewed(tmp_path):
-    """The TypeScript e2e's two reviewed servers, built with the dist modules beside AMC_BIN."""
-    env = {**os.environ, "AMC_VAULT_PASSPHRASE": "wp21d-python-mcp", "AMC_CONTROL_CHECKPOINT_DIR": str(tmp_path / "controls")}
+    """The TypeScript e2e's two reviewed servers, built with the dist modules beside AMC_BIN.
+
+    One AMC_HOME for the builder and the CLI (vitest's guardWorkspace setup gives the TypeScript twin one): the key set
+    the builder commits is marked there, and a CLI under any other home rightly sees a first-use workspace and refuses.
+    """
+    env = {**os.environ, "AMC_VAULT_PASSPHRASE": "wp21d-python-mcp", "AMC_CONTROL_CHECKPOINT_DIR": str(tmp_path / "controls"),
+           "AMC_HOME": str(tmp_path / "amc-home")}
     built = subprocess.run(["node", os.path.join(os.path.dirname(__file__), "mcp_workspace_fixture.mjs"),
                             os.path.dirname(os.path.abspath(AMC_BIN)), str(tmp_path)], env=env, capture_output=True, text=True, check=True)
     fixture = json.loads(built.stdout)
     fixture["env"] = {"HOME": fixture["home"], "AMC_VAULT_PASSPHRASE": env["AMC_VAULT_PASSPHRASE"],
-                      "AMC_CONTROL_CHECKPOINT_DIR": env["AMC_CONTROL_CHECKPOINT_DIR"]}
+                      "AMC_CONTROL_CHECKPOINT_DIR": env["AMC_CONTROL_CHECKPOINT_DIR"], "AMC_HOME": env["AMC_HOME"]}
     return fixture
 
 

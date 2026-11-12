@@ -223,12 +223,11 @@ child.spawnSync=(command,args)=>{
   else if(args[0]==="stats")output="512MiB / 2GiB 4.20%";
   else if(args.includes("agent-loop")&&args[args.indexOf("agent-loop")+1]==="run")output=JSON.stringify({sessionId,driverStatus:"idle",unsignedRows:0,events:5,turns:1,requests:1,toolCalls:1,endings:[{turn:1,reason:"complete",interrupted:false}]});
   else if(args.includes("verify")){
-    const interrupted=killed&&!args.includes(runnerImage);
-    const errors=interrupted?["Session "+otherSessionId+" missing seal"]:[];
-    status=interrupted?1:0;
+    // A killed gateway's session is open (liveLegacy) inside the liveness window: named by both verifiers, never an error.
+    const open=killed&&!args.includes(runnerImage)?[otherSessionId]:[];
     output=JSON.stringify(args.includes("agent-loop")
-      ?{ok:!interrupted,sessionId,ledgerOk:!interrupted,ledgerErrors:errors,sessionChainErrors:[],unsignedRowIds:[],requests:[{status:"reconstructed",headerEventId:"header1"}]}
-      :{ok:!interrupted,chain:{ok:!interrupted,errors},errors,sessions:{closed:[sessionId]}});
+      ?{ok:true,sessionId,ledgerOk:true,ledgerErrors:[],sessionChainErrors:[],unsignedRowIds:[],unfinalizedSessions:open,requests:[{status:"reconstructed",headerEventId:"header1"}]}
+      :{ok:true,chain:{ok:true,errors:[]},errors:[],sessions:{closed:[sessionId],liveLegacy:open.map(id=>({sessionId:id,runtime:"gateway",lastSignedTs:1}))}});
   }
   return {status,stdout:output,stderr:""};
 };
@@ -284,7 +283,7 @@ syncBuiltinESMExports();
     expect(volumeRemoval).toBeGreaterThan(containerRemoval);
     const secretMount = calls.flat().find((arg) => arg.startsWith("type=bind,src=") && arg.includes("dst=/run/secrets/vault"))!;
     expect(existsSync(secretMount.split("src=")[1]!.split(",dst=")[0]!)).toBe(false);
-    expect(receipt.checks.find((check: { name: string }) => check.name === "studio: interrupted gateway is refused by both cold verifiers")).toMatchObject({ passed: true });
+    expect(receipt.checks.find((check: { name: string }) => check.name === "studio: interrupted gateway session is named open, never sealed, by both cold verifiers")).toMatchObject({ passed: true });
     for (const name of ["studio: signed firewall control published to the checkpoint volume", "studio: anti-rollback marks persist on the state volume across restart",
       "studio: signed firewall control survives restart"]) expect(receipt.checks.find((check: { name: string }) => check.name === name)).toMatchObject({ passed: true });
     expect(receipt.resourceSamples.map((sample: { label: string }) => sample.label)).toEqual(["after readiness", "after the stub turn", "during the firewall publish"]);
