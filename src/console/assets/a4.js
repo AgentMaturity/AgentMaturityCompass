@@ -510,6 +510,8 @@ function mountProject(projectId, options) {
       await load();
     };
     let data;
+    // Build and Review run AMC's producers before Studio answers; the page says it is waiting, then reloads (action.after).
+    tell(`${action.label}: waiting for Studio…`);
     try {
       data = await send(action);
     } catch (error) {
@@ -523,7 +525,10 @@ function mountProject(projectId, options) {
       }
       throw error;
     }
+    const refreshing = `${action.label}: recorded; refreshing…`;
+    tell(refreshing);
     await action.after(data);
+    if (notice?.textContent === refreshing) tell(""); // a `got` that told the user something keeps its message
   }
 
   async function act(name, button) {
