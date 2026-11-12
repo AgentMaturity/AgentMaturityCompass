@@ -125,6 +125,13 @@ describe("public Docs Pages artifact", () => {
     expect(deployedMarkdown).not.toContain("FULL_MODULE_ROADMAP.md");
     expect(deployedMarkdown).not.toContain("IMPLEMENTATION_REALITY_MAP.md");
     expect(deployedMarkdown).not.toContain("OSS_ADOPTION_ROADMAP.md");
+    expect(existsSync(resolve(first, "docs/competitive-analysis.md"))).toBe(false);
+    // Nothing internal reaches the public site: no internal classification marker, no maintainer-local path.
+    for (const file of filesUnder(first).filter(path => /\.(?:html|md|js|json|txt|xml|yaml|css)$/.test(path))) {
+      const text = readFileSync(resolve(first, file), "utf8");
+      expect(text, file).not.toMatch(/\/Users\/[A-Za-z]/);
+      expect(text, file).not.toMatch(/Classification:\**\s*Internal/i);
+    }
     expect(existsSync(resolve(root, "website/docs/content"))).toBe(false);
     expect(existsSync(resolve(root, "website/docs/vendor"))).toBe(false);
 

@@ -27,6 +27,26 @@ const pagePath = join(root, "website", "changelog.html");
 const page = readFileSync(pagePath, "utf8");
 
 const version = pkg.version;
+// The published release, not package.json, decides which entry is "Current release": a source version that has
+// not been released yet is labelled as the unreleased source build.
+const published = JSON.parse(readFileSync(join(root, "website", "publication-status.json"), "utf8")).channels?.githubRelease?.version;
+if (typeof published !== "string") {
+  console.error("changelog page: website/publication-status.json has no channels.githubRelease.version");
+  process.exit(1);
+}
+const semver = (v) => v.split(".").map(Number);
+const newer = (a, b) => {
+  const [x, y] = [semver(a), semver(b)];
+  for (let i = 0; i < 3; i += 1) if (x[i] !== y[i]) return x[i] > y[i];
+  return false;
+};
+const kickerFor = (v) => (v === published ? "Current release" : newer(v, published) ? "Unreleased source build" : "Previous release");
+/** Every release entry's kicker follows its version's publication state. */
+const relabel = (html) =>
+  html.replace(
+    /<p class="release-kicker">[^<]*<\/p>(\s*<h2 id="release-[\d-]+">(\d+\.\d+\.\d+)<\/h2>)/g,
+    (_whole, rest, v) => `<p class="release-kicker">${kickerFor(v)}</p>${rest}`
+  );
 const slug = version.replaceAll(".", "-");
 const anchor = version.replaceAll(".", "");
 
@@ -73,7 +93,7 @@ const summary =
 const entry = `    <article class="release-entry" aria-labelledby="release-${slug}">
       <header class="release-header">
         <div>
-          <p class="release-kicker">Current release</p>
+          <p class="release-kicker">${kickerFor(version)}</p>
           <h2 id="release-${slug}">${version}</h2>
         </div>
         <a class="release-source-link" href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/CHANGELOG.md#${anchor}" target="_blank" rel="noopener">Verify source entry</a>
@@ -93,25 +113,22 @@ ${group.bullets.map((b) => `          <li>${renderInline(b)}</li>`).join("\n")}
   .join("\n")}
     </article>`;
 
-// Demote whatever currently claims to be the current release, then prepend.
+// Prepend the new entry; relabel() then sets every entry's kicker from the published version.
 const alreadyPublished = page.includes(`<h2 id="release-${slug}">`);
-const demoted = page.replace(
-  /<p class="release-kicker">Current release<\/p>/,
-  '<p class="release-kicker">Previous release</p>'
-);
 const marker = '    <article class="release-entry"';
-const at = demoted.indexOf(marker);
+const at = page.indexOf(marker);
 if (at === -1) {
   console.error("changelog page: could not find the first <article class=\"release-entry\"> to insert before.");
   process.exit(1);
 }
-const updated = alreadyPublished ? page : `${demoted.slice(0, at)}${entry}\n\n${demoted.slice(at)}`;
+const updated = relabel(alreadyPublished ? page : `${page.slice(0, at)}${entry}\n\n${page.slice(at)}`);
 
 if (check) {
   const missing = [];
   if (!page.includes(`<h2 id="release-${slug}">${version}</h2>`)) {
     missing.push(`no <h2 id="release-${slug}"> section`);
   }
+  if (relabel(page) !== page) missing.push(`a release kicker does not match publication-status.json (published ${published})`);
   // Compare what a reader sees: tags collapse to a space, entities decode, and
   // trailing punctuation rejoins the word before it. Checking the raw HTML
   // reported bullets containing `<controlId>` as missing when they render fine.
@@ -147,7 +164,7 @@ if (check) {
 
 writeFileSync(pagePath, updated);
 console.log(
-  alreadyPublished
+  alreadyPublished && updated === page
     ? `website/changelog.html already carries ${version}.`
     : `website/changelog.html updated for ${version}.`
 );

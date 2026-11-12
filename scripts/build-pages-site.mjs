@@ -77,6 +77,8 @@ function copyWebsite(output) {
     resolve(websiteRoot, "docs/content"),
     resolve(websiteRoot, "docs/vendor"),
     resolve(websiteRoot, "docs/content-manifest.json"),
+    // Marked "Classification: Internal" and names a maintainer's local path; kept in the repository, never published.
+    resolve(websiteRoot, "docs/competitive-analysis.md"),
     resolve(websiteRoot, "fonts"),
   ];
   cpSync(websiteRoot, output, {
@@ -164,16 +166,73 @@ export async function copySpec(output) {
   for (const [source, target] of pages) {
     const markdown = readFileSync(resolve(specRoot, source), "utf8");
     const title = escapeHtml(/^# (.+)$/m.exec(markdown)?.[1] ?? "AMC specification");
-    const depth = target.split("/").length - 1;
     const html = rewriteSpecLinks(marked.parse(markdown), source, pages);
     const file = resolve(output, "spec", target);
     mkdirSync(dirname(file), { recursive: true });
-    writeFileSync(file, `<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${title}</title><link rel="stylesheet" href="${"../".repeat(depth + 1)}brand.css"></head><body><main>\n${html}</main></body></html>\n`, "utf8");
+    writeFileSync(file, renderSpecPage(html, title, target), "utf8");
   }
   return index.schemas.map(row => row.$id);
 }
 
 const escapeHtml = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+const specStyle = `body{margin:0;background:var(--amc-bg);color:var(--amc-text);font:16px/1.65 var(--amc-font-sans)}
+.spec-header{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--amc-border);font-size:.9rem}
+.spec-header a{color:var(--amc-accent);text-decoration:none}.spec-header a:first-child{color:var(--amc-text);font-weight:700}
+main{max-width:880px;margin:0 auto;padding:24px 16px 64px}
+a{color:var(--amc-accent)}a:focus-visible{outline:2px solid var(--amc-accent);outline-offset:2px}
+h1,h2,h3,h4{line-height:1.25;margin:1.6em 0 .6em}h1{font-size:2rem;margin-top:.4em}
+code,pre{font-family:var(--amc-font-mono);font-size:.85em}
+:not(pre)>code{background:var(--amc-card);padding:.1em .3em;border-radius:4px;overflow-wrap:anywhere}
+p,li{overflow-wrap:anywhere}
+.spec-scroll{overflow-x:auto;margin:1em 0}
+pre{margin:0;padding:12px 14px;background:var(--amc-panel);border:1px solid var(--amc-border);border-radius:6px}
+table{border-collapse:collapse;font-size:.9rem}th,td{padding:6px 10px;border:1px solid var(--amc-border);text-align:left;vertical-align:top}th{background:var(--amc-panel)}
+blockquote{margin:1em 0;padding:.2em 1em;border-left:3px solid var(--amc-accent-deep);color:var(--amc-muted)}`;
+
+const decodeEntities = (text) => text.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, "&");
+
+/** GitHub-style heading anchors (lowercase, punctuation dropped, spaces to hyphens, -1/-2 for repeats), so links like README.md#licence resolve. */
+export function addHeadingIds(html) {
+  const seen = new Map();
+  return html.replace(/<h([1-6])>([\s\S]*?)<\/h\1>/g, (_whole, level, inner) => {
+    const base = decodeEntities(inner.replace(/<[^>]+>/g, "")).trim().toLowerCase().replace(/[^\p{L}\p{N}\p{M}\- _]/gu, "").replace(/ /g, "-");
+    const count = seen.get(base) ?? 0;
+    seen.set(base, count + 1);
+    const id = count === 0 ? base : `${base}-${count}`;
+    return `<h${level} id="${escapeHtml(id).replace(/"/g, "&quot;")}">${inner}</h${level}>`;
+  });
+}
+
+/** One spec page in the site's shell: brand fonts and colours, a way back to the site and the spec index, scrollable code and tables. */
+export function renderSpecPage(bodyHtml, title, target) {
+  const depth = target.split("/").length - 1;
+  const root = "../".repeat(depth + 1);
+  const specIndex = `${"../".repeat(depth)}index.html`;
+  // The first prose paragraph, skipping short status lines such as "Status: normative.".
+  const paragraphs = Array.from(bodyHtml.matchAll(/<p>([\s\S]*?)<\/p>/g),
+    (match) => decodeEntities(match[1].replace(/<[^>]+>/g, "")).replace(/\s+/g, " ").trim());
+  const plain = paragraphs.find((text) => text.length >= 40) ?? `${decodeEntities(title)}, from the AMC specification (draft).`;
+  const description = plain.length > 160 ? `${plain.slice(0, 157).trimEnd()}...` : plain;
+  const attr = (text) => escapeHtml(text).replace(/"/g, "&quot;");
+  const url = `https://agentmaturity.co/spec/${target === "index.html" ? "" : target}`;
+  const body = addHeadingIds(bodyHtml)
+    .replace(/<pre>[\s\S]*?<\/pre>/g, (block) => `<div class="spec-scroll">${block}</div>`)
+    .replace(/<table>[\s\S]*?<\/table>/g, (block) => `<div class="spec-scroll">${block}</div>`);
+  return `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${title} | AMC specification</title>
+<meta name="description" content="${attr(description)}">
+<link rel="canonical" href="${url}">
+<meta property="og:type" content="article"><meta property="og:title" content="${title.replace(/"/g, "&quot;")}"><meta property="og:description" content="${attr(description)}">
+<meta property="og:url" content="${url}"><meta property="og:image" content="https://agentmaturity.co/og-card.png">
+<link rel="icon" href="${root}amc-logo.png" type="image/png">
+<link rel="stylesheet" href="${root}brand.css"><style>${specStyle}</style></head>
+<body><header class="spec-header"><a href="${root}">Agent Maturity Compass</a><a href="${specIndex}">Specification</a><a href="${root}docs/">Docs</a></header>
+<main>
+${body}</main></body></html>
+`;
+}
 
 /** P1-30: every spec page rendered under /spec/: [source under spec/, target under <out>/spec/]. */
 export function specPages(specRoot) {

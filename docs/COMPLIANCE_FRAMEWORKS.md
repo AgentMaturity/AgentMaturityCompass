@@ -102,6 +102,8 @@ Reports read the workspace's signed `.amc/compliance-maps.yaml`; built-in mappin
 
 ### Python
 
+These modules belong to the `amc-platform` Python package in this repository's `platform/python` directory, not to the `amc-sdk` client. It is not on PyPI; install it from a clone with `pip install ./platform/python`.
+
 ```python
 from amc.watch.prebuilt_policy_packs import (
     nist_ai_rmf_policy_pack,

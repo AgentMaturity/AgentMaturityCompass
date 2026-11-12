@@ -367,7 +367,6 @@ python -m evil_mcp_server --verbose --attacks all
 
 ```python
 from evil_mcp_server import EvilMCPServer, AttackConfig
-from amc.assurance import run_assurance_pack
 
 # Configure attack simulation
 config = AttackConfig(

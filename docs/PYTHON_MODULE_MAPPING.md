@@ -132,7 +132,7 @@ Every Python module from `platform/python/amc/` is mapped to its TypeScript AMC 
 
 The 81 product modules in `platform/python/amc/product/` remain in the Python SDK. They are:
 - Accessible via the `python-amc-sdk` adapter registered in TypeScript AMC
-- Available as `pip install agent-maturity-compass` (Python)
+- Installable from source with `pip install ./sdk/python` (the `amc-sdk` package; PyPI publication is pending)
 - Called via `platform/python/` in this repo
 
 | Key modules | TypeScript AMC bridge | Status |
