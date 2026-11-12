@@ -115,6 +115,24 @@ describe("AMC Core Spec sync (P1-30)", () => {
       '<a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/spec/conformance/v1/README.md">c</a> <a href="https://e.test/a.md">d</a>');
   });
 
+  test("spec pages get the site shell, GitHub-style heading ids and scrollable code and tables", async () => {
+    const pagesModule = (await import("../../scripts/build-pages-site.mjs")) as {
+      addHeadingIds(html: string): string;
+      renderSpecPage(html: string, title: string, target: string): string;
+    };
+    expect(pagesModule.addHeadingIds("<h3>Licence</h3><h2>AMC Core Spec 1.0 (draft)</h2><h2>Licence</h2><h2><code>a_b</code> &amp; c</h2>")).toBe(
+      '<h3 id="licence">Licence</h3><h2 id="amc-core-spec-10-draft">AMC Core Spec 1.0 (draft)</h2>' +
+      '<h2 id="licence-1">Licence</h2><h2 id="a_b--c"><code>a_b</code> &amp; c</h2>');
+    const page = pagesModule.renderSpecPage("<h1>Ten</h1><p>Status: normative.</p><pre><code>x</code></pre><table><tr><td>1</td></tr></table>",
+      "Ten", "core/10-versioning.html");
+    expect(page).toContain('<meta name="description" content="Ten, from the AMC specification (draft).">');
+    expect(page).toContain('<link rel="stylesheet" href="../../brand.css">');
+    expect(page).toContain('<a href="../../">Agent Maturity Compass</a><a href="../index.html">Specification</a>');
+    expect(page).toContain('<div class="spec-scroll"><pre><code>x</code></pre></div>');
+    expect(page).toContain('<div class="spec-scroll"><table>');
+    expect(page).toContain('<h1 id="ten">Ten</h1>');
+  });
+
   test("every region name is generated somewhere in the spec", async () => {
     const sync = await load();
     const text = sync.specFiles(root).map((file) => readFileSync(file, "utf8")).join("\n");
