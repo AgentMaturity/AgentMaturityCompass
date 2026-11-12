@@ -74,12 +74,21 @@ export async function renderStandardPage(params) {
   document.getElementById("standardValidateBtn")?.addEventListener("click", async () => {
     const schemaId = document.getElementById("standardValidateSchema")?.value || "";
     const file = document.getElementById("standardValidateFile")?.value || "";
-    const out = await params.apiPost("/standard/validate", {
-      schemaId: schemaId.trim(),
-      file: file.trim()
-    });
     const node = document.getElementById("standardValidateOut");
-    if (node) node.textContent = JSON.stringify(out, null, 2);
+    let out;
+    try {
+      out = await params.apiPost("/standard/validate", { schemaId: schemaId.trim(), file: file.trim() });
+    } catch (error) {
+      // 422 carries the validation result; 400/403 carry only an error message.
+      out = error?.data && Array.isArray(error.data.errors) ? error.data : { error: String(error?.message || error) };
+    }
+    if (!node) return;
+    node.className = `scroll ${out.ok ? "status-ok" : "status-bad"}`;
+    node.textContent = out.ok
+      ? `Valid: ${out.file} matches ${out.schemaName}.`
+      : out.error
+        ? `Not validated: ${out.error}`
+        : `Invalid: ${out.file} does not match ${out.schemaName}.\n${(out.errors || []).join("\n")}`;
   });
 }
 

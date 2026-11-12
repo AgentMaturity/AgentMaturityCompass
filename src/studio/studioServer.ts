@@ -415,7 +415,7 @@ import {
   standardGenerateForApiAsync as standardGenerateForApi,
   standardSchemaReadForApi,
   standardSchemasForApi,
-  standardValidateForApi,
+  standardValidateWorkspaceFileForApi,
   standardVerifyForApiAsync as standardVerifyForApi
 } from "../standard/standardApi.js";
 
@@ -5039,17 +5039,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
-        const parsed = body ? (JSON.parse(body) as { schemaId?: unknown; file?: unknown }) : {};
-        if (typeof parsed.schemaId !== "string" || typeof parsed.file !== "string") {
-          json(res, 400, { error: "schemaId and file are required" });
+        let parsed: { schemaId?: unknown; file?: unknown } = {};
+        try {
+          parsed = body ? (JSON.parse(body) as typeof parsed) ?? {} : {};
+        } catch {
+          json(res, 400, { error: "Request body must be JSON." });
           return;
         }
-        const out = standardValidateForApi({
-          workspace: options.workspace,
-          schemaId: parsed.schemaId,
-          file: parsed.file
-        });
-        json(res, out.ok ? 200 : 422, out);
+        const out = standardValidateWorkspaceFileForApi({ workspace: options.workspace, schemaId: parsed.schemaId, file: parsed.file });
+        json(res, out.status, out.body);
         return;
       }
 
