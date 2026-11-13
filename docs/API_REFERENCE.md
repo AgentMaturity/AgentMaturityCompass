@@ -4348,6 +4348,7 @@ Alias: `amc sector pack run`
 |--------|-------------|
 | `--pack <packId>` | - |
 | `--baseline` | - |
+| `--responses <file.json>` | - |
 | `--json` | - |
 
 #### `amc domain pack verify`

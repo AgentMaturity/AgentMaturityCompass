@@ -372,7 +372,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc domain pack checkout` | Industry Packs are free; there is nothing to buy (kept for scripts that call it) | `--success-url <url>`<br>`--cancel-url <url>`<br>`--email <email>`<br>`--reference <id>`<br>`--json` | `sector pack checkout` |
 | `amc domain pack describe` | Show details of a specific industry sector pack | `--pack <packId>`<br>`--json` | `sector pack describe` |
 | `amc domain pack list` | List all available industry sector packs | `--station <station>`<br>`--domain <d>`<br>`--json` | `sector pack list` |
-| `amc domain pack run` | Run an industry sector pack — interactive assessment or baseline score | `--pack <packId>`<br>`--baseline`<br>`--json` | `sector pack run` |
+| `amc domain pack run` | Run an industry sector pack — interactive assessment or baseline score | `--pack <packId>`<br>`--baseline`<br>`--responses <file.json>`<br>`--json` | `sector pack run` |
 | `amc domain pack verify` | Verify a legacy Industry Packs license key against the licence key pinned in the AMC trust list | `--key <licenseKey>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | `sector pack verify` |
 | `amc domain report` | Build full domain report and write it to a file (not evaluated without evidence) | `--agent <id>`<br>`--domain <d>`<br>`--output <file>`<br>`--example`<br>`--json` | `sector report` |
 | `amc domain roadmap` | Generate 30/60/90-day roadmap for this domain (not evaluated without evidence) | `--agent <id>`<br>`--domain <d>`<br>`--example`<br>`--json` | `sector roadmap` |
