@@ -20,17 +20,36 @@ export const CANONICAL_NAV = [
   { href: "./evidence", label: "Evidence" },
   { href: "./runtime", label: "Runtime" },
   { href: "./login", label: "Login / account" },
-  ...[["./org", "Org"], ["./compare", "Compare"], ["./systemic", "Systemic"], ["./commitments-org", "Org Commitments"],
-    ["./fleet", "Fleet"], ["./firewall", "Firewall"], ["./equalizer", "Equalizer"], ["./governor", "Governor"],
-    ["./toolhub", "ToolHub"], ["./approvals", "Approvals"], ["./operator-inbox", "Operator"], ["./users", "Users"],
-    ["./leases", "Leases"], ["./budgets", "Budgets"], ["./drift", "Drift"], ["./benchmarks", "Benchmarks"],
-    ["./compliance", "Compliance"], ["./outcomes", "Outcomes"], ["./experiments", "Experiments"],
-    ["./integrations", "Integrations"], ["./transparency", "Transparency"], ["./policypacks", "Policy Packs"],
-    ["./industrypacks", "Industry Packs"], ["./workorders", "Work Orders"]].map(([href, label]) => ({ href, label, group: "features" }))
+  // Each "All features" link carries one plain line on what its page is for (shown under the label).
+  ...[["./org", "Org", "Scores rolled up across teams."],
+    ["./compare", "Compare", "Two teams or groups side by side."],
+    ["./systemic", "Systemic", "Risks that touch many agents at once."],
+    ["./commitments-org", "Org Commitments", "Plan what each team commits to improve."],
+    ["./fleet", "Fleet", "Many agents and how they work together."],
+    ["./firewall", "Firewall", "Checks risky actions and can stop them."],
+    ["./equalizer", "Equalizer", "Set the target level you want, per area."],
+    ["./governor", "Governor", "What your agent may do on its own, by action type."],
+    ["./toolhub", "ToolHub", "The tools your agent is allowed to use."],
+    ["./approvals", "Approvals", "Actions waiting for a person to say yes."],
+    ["./operator-inbox", "Operator", "Things blocking your agents, in one inbox."],
+    ["./users", "Users", "Who can sign in, and their roles."],
+    ["./leases", "Leases", "Short-lived permission slips for tools."],
+    ["./budgets", "Budgets", "Limits on spend and activity."],
+    ["./drift", "Drift", "Alerts when behaviour changes over time."],
+    ["./benchmarks", "Benchmarks", "Compare scores with other runs."],
+    ["./compliance", "Compliance", "Evidence lined up against frameworks (self-assessed)."],
+    ["./outcomes", "Outcomes", "Whether the agent delivers the value it should."],
+    ["./experiments", "Experiments", "Compare a new version with the current one."],
+    ["./integrations", "Integrations", "Connect AMC to the tools you already use."],
+    ["./transparency", "Transparency", "Check AMC's public log of signed records."],
+    ["./policypacks", "Policy Packs", "Ready-made rule sets for guardrails."],
+    ["./industrypacks", "Industry Packs", "Extra question sets for your sector."],
+    ["./workorders", "Work Orders", "Signed work orders for your agent."]].map(([href, label, desc]) => ({ href, label, desc, group: "features" }))
 ];
 
 const pathOf = (href) => normalizeHref(String(href || "").split(/[?#]/)[0]);
-const navLink = ({ href, label, id, hidden }) => `<a href="${esc(href)}"${id ? ` id="${esc(id)}"` : ""}${hidden ? " hidden" : ""}>${esc(label)}</a>`;
+const navLink = ({ href, label, id, hidden, desc }) => `<a href="${esc(href)}"${id ? ` id="${esc(id)}"` : ""}${hidden ? " hidden" : ""}`
+  + `${desc ? ` title="${esc(desc)}"` : ""}>${esc(label)}${desc ? `<small class="nav-desc">${esc(desc)}</small>` : ""}</a>`;
 
 /** The canonical menu, then the page's own links that it lacks (first occurrence of each page) under "This section". */
 export function canonicalNavHtml(extra = []) {
@@ -98,6 +117,7 @@ export function topbarHtml({ workspace = "local", demoMode = false, me = null } 
     </div>
     <div class="topbar-actions">
       ${demoMode ? '<span class="pill ok">local demo session</span>' : '<span class="pill muted">session protected</span>'}
+      <a class="button secondary" id="guideOpenLink" href="./home?guide=1">How AMC works</a>
       <a class="button secondary" href="./evidence">Evidence</a>
       <a class="button secondary" href="./standard">Open Standard</a>
       ${me ? '<button id="signOutBtn" type="button" class="secondary">Sign out</button>' : ""}
