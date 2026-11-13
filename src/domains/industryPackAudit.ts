@@ -34,14 +34,19 @@ import {
 import type { IndustryPack, IndustryPackQuestion } from "./industryPacks.js";
 import { selfAssessPack, type PackSelfAssessment } from "./packSelfAssessment.js";
 import { QUESTIONNAIRE_CONTENT_STATUS, QUESTIONNAIRE_NOTICE } from "./questionnaireLabel.js";
+import { controlDetail, deepQuestionsByControl, evidenceForQuestion, generateRemediation, type AuditDeepQuestion, type AuditRemediation } from "./industryPackAuditControls.js";
+import { packRiskCoverage, type PackRiskCoverage } from "./packInsights.js";
 
 /**
  * /2 (P0-21): the overall pass flag and its threshold gave way to the self-assessment fields.
  * /3 (P0-20): a `signature` field; `receiptHash` now excludes it, so a /2 reader recomputing over
  * everything but `receiptHash` would fail on a /3 file, and a no-answer baseline is `synthetic_example`.
  * /5 (P1-42, S4): a `currency` section inside the hashed body.
+ * /6 (packs engine upgrade): remediation targets the next level above the answer (L4 when unanswered), questions'
+ * own evidence/remediation/failureMode win over the dimension templates, the `--compliance` flag comes from the
+ * pack's frameworks, controls may carry keyRisk/failureMode/deepQuestions, and the body carries keyRisks/riskCoverage.
  */
-export const INDUSTRY_PACK_AUDIT_SCHEMA_VERSION = "amc.industry-pack-audit/5";
+export const INDUSTRY_PACK_AUDIT_SCHEMA_VERSION = "amc.industry-pack-audit/6";
 
 export const AUDIT_FRAMEWORKS = ["EU AI Act", "NIST AI RMF", "ISO 42001", "SOC 2", "Sector"] as const;
 export type AuditFramework = (typeof AUDIT_FRAMEWORKS)[number];
@@ -59,16 +64,7 @@ export interface CrosswalkEntry {
   control: string;
 }
 
-export interface AuditRemediation {
-  title: string;
-  artifactType: "policy" | "guardrail" | "evidence-recipe";
-  summary: string;
-  targetLevel: number;
-  acceptanceCriterion: string;
-  generatedArtifact: string;
-  command: string;
-  evidenceExpected: string[];
-}
+export type { AuditRemediation, AuditDeepQuestion } from "./industryPackAuditControls.js";
 
 export interface AuditControl {
   id: string;
@@ -82,6 +78,12 @@ export interface AuditControl {
   crosswalk: CrosswalkEntry[];
   evidenceExpected: string[];
   remediation: AuditRemediation | null;
+  /** /6: the agent-specific failure this control prevents, when the question names one. */
+  failureMode?: string;
+  /** /6: the pack key risk this control mitigates, when the question names one. */
+  keyRisk?: { index: number; risk: string };
+  /** /6: deep questions citing the same catalogued instrument, with their evidence types and criteria. */
+  deepQuestions?: AuditDeepQuestion[];
 }
 
 /* ── Regulatory currency ───────────────────────────────────────────────────
@@ -209,6 +211,11 @@ export interface IndustryPackAudit {
   currency: AuditCurrency;
   /** /5 (P1-42): the pack's questions are AI-drafted, experimental content; absent from older receipts. */
   contentStatus?: typeof QUESTIONNAIRE_CONTENT_STATUS;
+  /** /6: the pack's key risks; absent from older receipts. */
+  keyRisks?: string[];
+  /** /6: per-risk coverage when questions carry keyRisk (empty when none does); absent from older receipts. */
+  riskCoverage?: PackRiskCoverage[];
+  weakestRisk?: PackRiskCoverage | null;
   controls: AuditControl[];
   /** Unkeyed sha256 over the canonical audit without `receiptHash` and `signature`: a checksum, not a signature. */
   receiptHash: string;
@@ -235,11 +242,11 @@ export interface FrameworkAnchors {
 const DIMENSION_ANCHORS: Array<{ match: RegExp; anchors: FrameworkAnchors }> = [
   { match: /privacy|data protection|pii|phi|confidential|consent/i, anchors: { euAiAct: "Art. 10 — Data & data governance", nist: "MAP 2.3 — data provenance & privacy", iso: "A.7 — Data for AI systems", soc2: "P / C — Privacy & Confidentiality criteria" } },
   { match: /security|encryption|access|threat|cyber|vulnerab|breach/i, anchors: { euAiAct: "Art. 15 — Accuracy, robustness & cybersecurity", nist: "MANAGE 2.2 — risk treatment controls", iso: "A.8 — Operational controls", soc2: "CC6 — Logical & physical access controls" } },
-  { match: /governance|policy|oversight role|accountab|management|risk|control map/i, anchors: { euAiAct: "Art. 9 — Risk management system", nist: "GOVERN 1.1 — legal and regulatory requirements involving AI are understood, managed, and documented", iso: "A.5 — Internal organization & AI policy", soc2: "CC1 / CC3 — Control environment & risk assessment" } },
+  { match: /governance|policy|oversight role|accountab|management|risk|control map|compliance|regulat|legal/i, anchors: { euAiAct: "Art. 9 — Risk management system", nist: "GOVERN 1.1 — legal and regulatory requirements involving AI are understood, managed, and documented", iso: "A.5 — Internal organization & AI policy", soc2: "CC1 / CC3 — Control environment & risk assessment" } },
   { match: /transparen|explainab|disclos|report|documentation|notice/i, anchors: { euAiAct: "Art. 13 — Transparency & information provision", nist: "MAP 3.4 — documentation & transparency", iso: "A.9 — Information for interested parties", soc2: "CC2 — Communication & information" } },
   { match: /audit|log|record|monitor|trace|observab|surveillance/i, anchors: { euAiAct: "Art. 12 — Record-keeping (automatic logs)", nist: "MEASURE 2.7 — monitoring & logging", iso: "A.6 — AI system lifecycle & operation", soc2: "CC7 — System operations & monitoring" } },
   { match: /human|review|approval|escalat|intervention|override/i, anchors: { euAiAct: "Art. 14 — Human oversight", nist: "MANAGE 4.1 — human roles & intervention", iso: "A.6.2 — AI system operation controls", soc2: "CC5 — Control activities" } },
-  { match: /fairness|bias|discriminat|equit|inclusion/i, anchors: { euAiAct: "Art. 10(2)(f) — bias examination in data", nist: "MEASURE 2.11 — fairness & bias evaluation", iso: "A.6.1 — responsible-AI objectives", soc2: "PI — Processing integrity criteria" } },
+  { match: /fairness|bias|discriminat|equit|inclusion|ethic|rights/i, anchors: { euAiAct: "Art. 10(2)(f) — bias examination in data", nist: "MEASURE 2.11 — fairness & bias evaluation", iso: "A.6.1 — responsible-AI objectives", soc2: "PI — Processing integrity criteria" } },
   { match: /reliab|robust|accuracy|quality|performance|safety|valid/i, anchors: { euAiAct: "Art. 15 — Accuracy & robustness", nist: "MEASURE 2.5 — validity & reliability", iso: "A.6.2 — verification & validation", soc2: "PI / A — Processing integrity & availability" } },
 ];
 
@@ -279,66 +286,6 @@ function crosswalkForQuestion(q: IndustryPackQuestion): CrosswalkEntry[] {
   return entries;
 }
 
-const DIMENSION_EVIDENCE: Array<{ match: RegExp; evidence: string[] }> = [
-  { match: /privacy|data|pii|phi|consent/i, evidence: ["access_log", "data_inventory", "retention_policy"] },
-  { match: /security|encryption|access|cyber|breach/i, evidence: ["config_scan", "access_review", "key_management_log"] },
-  { match: /governance|policy|risk|oversight|control map/i, evidence: ["signed_policy", "risk_register", "approval_record"] },
-  { match: /transparen|disclos|report|documentation|notice/i, evidence: ["model_card", "disclosure_record", "user_notice"] },
-  { match: /audit|log|monitor|trace|surveillance/i, evidence: ["event_log", "monitoring_dashboard", "alert_record"] },
-  { match: /human|review|approval|escalat|override/i, evidence: ["approval_event", "reviewer_signoff", "incident_review"] },
-  { match: /fairness|bias|equit/i, evidence: ["bias_evaluation", "dataset_statistics", "fairness_report"] },
-  { match: /reliab|robust|accuracy|safety|quality|valid/i, evidence: ["validation_report", "test_result", "benchmark_run"] },
-];
-
-function evidenceForDimension(dimension: string): string[] {
-  for (const entry of DIMENSION_EVIDENCE) {
-    if (entry.match.test(dimension)) {
-      return entry.evidence;
-    }
-  }
-  return ["signed_policy", "audit_trail", "config_scan"];
-}
-
-/* ── Remediation generation ────────────────────────────────────────────────
- * For any control short of PASS, generate a concrete, dropped-in fix: a signed
- * policy stub, a guardrail, or an evidence-collection recipe, with the pack's
- * own L3 descriptor as the acceptance criterion the agent must meet.
- */
-function generateRemediation(q: IndustryPackQuestion, level: number | null, packId: string): AuditRemediation {
-  const evidence = evidenceForDimension(q.dimension);
-  const targetLevel = 3;
-  const acceptance = (q.l3 || "").replace(/\s+/g, " ").trim();
-  const artifactType: AuditRemediation["artifactType"] =
-    /audit|log|monitor|evidence|record|trace/i.test(q.dimension) ? "evidence-recipe"
-      : /security|access|encryption|guard|enforce|safety|breach/i.test(q.dimension) ? "guardrail"
-        : "policy";
-  const generatedArtifact = [
-    `# amc industry-pack remediation — ${q.id} (${packId})`,
-    `control: "${q.dimension}"`,
-    `regulation: "${q.regulatoryRef}"`,
-    `current_level: ${level ?? "not_evaluated"}`,
-    `target_level: ${targetLevel}`,
-    `acceptance_criterion: >`,
-    `  ${acceptance || `Meet the L${targetLevel} bar for ${q.dimension}.`}`,
-    `required_evidence:`,
-    ...evidence.map((item) => `  - ${item}`),
-    `enforcement:`,
-    `  fail_below_level: ${targetLevel}`,
-  ].join("\n");
-  return {
-    title: `Close ${q.dimension} gap for ${q.regulatoryRef}`,
-    artifactType,
-    summary: level === null
-      ? `Answer and evidence control ${q.id} (not evaluated) to reach L${targetLevel} (${q.regulatoryRef}).`
-      : `Raise control ${q.id} from L${level} to L${targetLevel} (${q.regulatoryRef}).`,
-    targetLevel,
-    acceptanceCriterion: acceptance,
-    generatedArtifact,
-    command: `amc domain apply --agent <agentId> --pack ${packId} --compliance EU_AI_ACT,ISO_42001`,
-    evidenceExpected: evidence,
-  };
-}
-
 function levelStatus(level: number | null): ControlStatus {
   if (level === null) return "NOT_EVALUATED";
   if (level >= 4) return "PASS";
@@ -373,6 +320,7 @@ export function buildIndustryPackAudit(input: BuildIndustryPackAuditInput): Indu
   const currency = computePackCurrency(pack, now, { staleAfterDays: input.staleAfterDays });
   const controls: AuditControl[] = [];
   const { answers, ...assessed } = selfAssessPack(pack, responses, now);
+  const deep = deepQuestionsByControl(pack);
   let passCount = 0;
   let adequateCount = 0;
   let gapCount = 0;
@@ -398,8 +346,9 @@ export function buildIndustryPackAudit(input: BuildIndustryPackAuditInput): Indu
       level,
       status,
       crosswalk,
-      evidenceExpected: evidenceForDimension(q.dimension),
-      remediation: status === "PASS" ? null : generateRemediation(q, level, pack.id),
+      evidenceExpected: evidenceForQuestion(q),
+      remediation: status === "PASS" ? null : generateRemediation(q, level, pack),
+      ...controlDetail(pack, q, deep),
     });
   }
 
@@ -434,6 +383,8 @@ export function buildIndustryPackAudit(input: BuildIndustryPackAuditInput): Indu
     frameworkCoverage,
     currency,
     contentStatus: QUESTIONNAIRE_CONTENT_STATUS,
+    keyRisks: [...pack.keyRisks],
+    ...packRiskCoverage(pack, answers),
     controls,
   };
   const receiptHash = sha256Hex(canonicalize(body));
@@ -615,6 +566,7 @@ export function renderIndustryPackAuditMarkdown(audit: IndustryPackAudit): strin
   // A receipt older than /5 has no currency section; it still renders (P1-42 review).
   lines.push(...(audit.currency ? renderCurrencyMarkdown(audit.currency)
     : ["## Regulatory currency", "", "- not recorded: this audit predates the currency section (schema /5)", ""]));
+  lines.push(...renderKeyRisksMarkdown(audit));
   lines.push("## Controls");
   for (const c of audit.controls) {
     lines.push("");
@@ -625,6 +577,11 @@ export function renderIndustryPackAuditMarkdown(audit: IndustryPackAudit): strin
     lines.push(`- Regulation: ${c.regulatoryRef}`);
     lines.push(`- Crosswalk: ${c.crosswalk.map((x) => `${x.framework} ${x.control}`).join(" · ")}`);
     lines.push(`- Expected evidence: ${c.evidenceExpected.join(", ")}`);
+    if (c.failureMode) lines.push(`- Prevents: ${c.failureMode}`);
+    if (c.keyRisk) lines.push(`- Key risk ${c.keyRisk.index + 1}: ${c.keyRisk.risk}`);
+    for (const d of c.deepQuestions ?? []) {
+      lines.push(`- Related deep question ${d.id} (${d.regulation} ${d.section}): evidence ${d.evidenceTypes.join(", ")}; criteria: ${d.evaluationCriteria.join("; ")}`);
+    }
     if (c.remediation) {
       lines.push(`- Remediation (${c.remediation.artifactType}): ${c.remediation.summary}`);
       lines.push("");
@@ -635,6 +592,23 @@ export function renderIndustryPackAuditMarkdown(audit: IndustryPackAudit): strin
   }
   lines.push("", "## How to read claim kinds", "", renderClaimLegend("markdown"), "");
   return lines.join("\n");
+}
+
+/** The pack's key risks with per-risk coverage when mapped; a receipt older than /6 says they were not recorded. */
+function renderKeyRisksMarkdown(audit: IndustryPackAudit): string[] {
+  if (!audit.keyRisks) return ["## Key risks", "", "- not recorded: this audit predates the key-risk section (schema /6)", ""];
+  const coverage = audit.riskCoverage ?? [];
+  const lines = ["## Key risks", ""];
+  audit.keyRisks.forEach((risk, index) => {
+    const row = coverage[index];
+    const detail = !row ? "" : row.questionIds.length === 0 ? " — no control mapped"
+      : ` — ${row.questionIds.length} control(s); ${row.averageLevel === null ? "not evaluated" : `mean self-reported L${row.averageLevel}`}`;
+    lines.push(`${index + 1}. ${risk}${detail}`);
+  });
+  if (coverage.length === 0) lines.push("", "- Controls are not mapped to these risks yet, so per-risk coverage is unknown.");
+  else if (audit.weakestRisk) lines.push("", `- Weakest risk (self-reported): ${audit.weakestRisk.index + 1}. ${audit.weakestRisk.risk} (mean L${audit.weakestRisk.averageLevel})`);
+  lines.push("");
+  return lines;
 }
 
 function renderCurrencyMarkdown(c: AuditCurrency): string[] {

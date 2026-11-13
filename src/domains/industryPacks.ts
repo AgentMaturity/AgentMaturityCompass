@@ -7,6 +7,7 @@
 import { likertToPercent } from "../score/units.js";
 import type { Domain } from "./domainRegistry.js";
 import { selfAssessPack, type SelfAssessedPack } from "./packSelfAssessment.js";
+import { PACK_SCALE_NOTE, packRiskCoverage, packTopGaps, type PackGap, type PackRiskCoverage } from "./packInsights.js";
 import { QUESTIONNAIRE_CONTENT_STATUS } from "./questionnaireLabel.js";
 import { withRegulatoryCurrency, type ComplianceFrameworkRef, type RegulatoryReference } from "./packs/regulatorySchema.js";
 import { farmToFork, weaveToWear, materialToMachines, sourceToSustenance, ubiquityToUtility, sipToSanitation } from "./packs/stations/environment.js";
@@ -64,7 +65,26 @@ export type IndustryPackId =
   | "citizen-services"
   | "public-private-collaboration";
 
-export interface IndustryPackQuestion {
+/**
+ * Optional per-question detail (the trailing argument of `q()` in packs/stations/shared.ts). Every field is optional;
+ * a question without them scores and audits as before. validatePackQuestionDetail (packInsights.ts) checks them.
+ */
+export interface IndustryPackQuestionDetail {
+  /** What L2 looks like on this control (between l1 and l3). Absent: surfaces show "between L1 and L3". */
+  l2?: string;
+  /** What L4 looks like on this control (between l3 and l5). Absent: surfaces show "between L3 and L5". */
+  l4?: string;
+  /** Artifacts an auditor could inspect that show the level reached; the audit prefers them over its dimension template. */
+  evidence?: readonly string[];
+  /** The concrete next step that raises an agent one level on this control; the audit and top gaps show it. */
+  remediation?: string;
+  /** The agent-specific failure this control prevents, in one sentence. */
+  failureMode?: string;
+  /** 0-based index into the pack's keyRisks that this control mitigates; drives per-risk coverage. */
+  keyRisk?: number;
+}
+
+export interface IndustryPackQuestion extends IndustryPackQuestionDetail {
   id: string;
   dimension: string;
   text: string;
@@ -208,9 +228,21 @@ export interface IndustryPackScoreResult extends Omit<SelfAssessedPack, "answers
     score: number;
     weight: number;
     percentage: number;
+    /** The self-declared level (1-5) for this question; the pack percentage averages these on a 0-100 scale. */
+    level: number;
   }>;
   complianceGaps: string[];
   riskTier: string;
+  /** How the pack percentage relates to the per-question levels (an all-L3 answer set reads 50%, band L2). */
+  scaleNote: string;
+  /** The pack's key risks, in order; questions point at them by index (keyRisk). */
+  keyRisks: string[];
+  /** Per-risk coverage when questions carry keyRisk; empty when none does. */
+  riskCoverage: PackRiskCoverage[];
+  /** The mapped risk with the lowest mean answered level; null when unmapped or unanswered. */
+  weakestRisk: PackRiskCoverage | null;
+  /** Answered questions below L4, highest (gap to L4) x weight first, with their own remediation detail when present. */
+  topGaps: PackGap[];
   /** AI-drafted questions no expert has reviewed (P1-42): the result is an experimental, self-reported questionnaire. */
   contentStatus: typeof QUESTIONNAIRE_CONTENT_STATUS;
 }
@@ -234,6 +266,7 @@ export function scoreIndustryPack(
       score: Math.round(q.weight * levelPct / 10) / 10,
       weight: q.weight,
       percentage: Math.round(levelPct),
+      level,
     });
     if (level < 3) {
       complianceGaps.push(`${q.id} (${q.dimension}): L${level} — below minimum. Ref: ${q.regulatoryRef}`);
@@ -248,6 +281,10 @@ export function scoreIndustryPack(
     questionResults,
     complianceGaps,
     riskTier: pack.riskTier,
+    scaleNote: PACK_SCALE_NOTE,
+    keyRisks: [...pack.keyRisks],
+    ...packRiskCoverage(pack, answers),
+    topGaps: packTopGaps(pack, answers),
     contentStatus: QUESTIONNAIRE_CONTENT_STATUS,
   };
 }

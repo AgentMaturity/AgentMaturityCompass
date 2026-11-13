@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-11-12
+> Auto-generated from source on 2026-11-13
 
 ## Table of Contents
 
@@ -4344,6 +4344,7 @@ Alias: `amc sector pack run`
 |--------|-------------|
 | `--pack <packId>` | - |
 | `--baseline` | - |
+| `--responses <file.json>` | - |
 | `--json` | - |
 
 #### `amc domain pack verify`

@@ -193,14 +193,18 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
         console.log(chalk.bold("\n  Compliance frameworks:"));
         for (const f of pack.complianceFrameworks) console.log(`    • ${f}`);
       }
+      // The field keeps its name (snapshots pin it); the label says what it is: a maturity path, not a certification.
       if (pack.certificationPath) {
-        console.log(chalk.bold("\n  Certification path:"));
+        console.log(chalk.bold("\n  Maturity path:"));
         console.log(`    ${pack.certificationPath}`);
       }
+      const { describeKeyRiskLines, describeQuestionDetailLines } = await import("./domains/packRunCli.js");
+      for (const line of describeKeyRiskLines(pack)) console.log(line);
       console.log(chalk.bold(`\n  Questions (${pack.questions.length}):`));
       for (const q of pack.questions) {
         // Whole texts (LIVE-UX-14): describe is for reading; the terminal wraps.
         console.log(`    ${chalk.cyan(q.id)} [${q.dimension}] ${q.text}`);
+        for (const line of describeQuestionDetailLines(pack, q)) console.log(line);
       }
       console.log("");
     });
@@ -210,10 +214,12 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
     .description("Run an industry sector pack — interactive assessment or baseline score")
     .requiredOption("--pack <packId>", "Pack ID")
     .option("--baseline", "Run with no answers: every question is not evaluated and no score is computed (no interaction needed)", false)
+    .option("--responses <file.json>", "Score a JSON file of { questionId: level } self-reported answers (1-5) instead of asking; unanswered questions are not evaluated")
     .option("--json", "Output as JSON")
-    .action(async (opts: { pack: string; baseline: boolean; json?: boolean }) => {
+    .action(async (opts: { pack: string; baseline: boolean; responses?: string; json?: boolean }) => {
       const { scoreIndustryPack } = await import("./domains/industryPacks.js");
       const { packSelfAssessmentEnvelope } = await import("./domains/packSelfAssessment.js");
+      const packRun = await import("./domains/packRunCli.js");
       type PackIdType = Parameters<typeof scoreIndustryPack>[0];
       const pack = await packOrExit(opts.pack);
       if (!opts.json) {
@@ -223,11 +229,19 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
 
       // Baseline and non-interactive runs answer nothing: every question is not evaluated, so no
       // score or level is computed (packSelfAssessment.ts), and the self-assessment reads incomplete.
-      const responses: Record<string, number> = {};
+      let responses: Record<string, number> = {};
+      if (opts.responses) {
+        try {
+          const { loadResponses } = await import("./domains/packResponses.js");
+          responses = loadResponses(opts.responses);
+        } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); return; }
+        const unknown = packRun.unknownResponseIds(pack, responses);
+        if (unknown.length > 0) { console.error(chalk.red(`Response keys are not questions of ${pack.id}: ${unknown.join(", ")}`)); process.exit(1); return; }
+      }
 
-      const interactive = !opts.baseline && process.stdin.isTTY;
+      const interactive = !opts.baseline && !opts.responses && process.stdin.isTTY;
       // stderr only: exit codes and --json stdout stay as they were (follow-up 6).
-      if (!opts.baseline && !interactive) console.error("Interactive mode needs a terminal; showing the baseline (no answers, no score). Pass --baseline to run it on purpose.");
+      if (!opts.baseline && !opts.responses && !interactive) console.error("Interactive mode needs a terminal; showing the baseline (no answers, no score). Pass --baseline to run it on purpose.");
       if (interactive) {
         // Interactive assessment. Under --json, stdout carries only the JSON (LIVE-UX-10): the question lines and the
         // prompts go to stderr. inquirer takes its output stream from createPromptModule, not from prompt().
@@ -242,17 +256,15 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
             message: `Level for ${q.id}`,
             // Inquirer wraps long choices; its default page of 7 rows would cut wrapped level texts off.
             pageSize: 30,
-            choices: [
-              { name: `L1 — ${q.l1}`, short: "L1", value: 1 },
-              { name: `L3 — ${q.l3}`, short: "L3", value: 3 },
-              { name: `L5 — ${q.l5}`, short: "L5", value: 5 },
-            ]
+            choices: packRun.packLevelChoices(q)
           }]);
           responses[q.id] = level;
         }
       }
 
-      const result = scoreIndustryPack(opts.pack as PackIdType, responses);
+      let result: ReturnType<typeof scoreIndustryPack>;
+      try { result = scoreIndustryPack(opts.pack as PackIdType, responses); }
+      catch (e: unknown) { console.error(chalk.red(`Invalid --responses: ${toErrorMessage(e)}`)); process.exit(1); return; }
       // The same envelope scoreIndustryPack derives its claimKind and eligibleLevel from.
       const claim = packSelfAssessmentEnvelope(pack, responses, Date.now());
       if (opts.json) { console.log(JSON.stringify(withClaimFields(result, claim), null, 2)); return; }
@@ -269,6 +281,7 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       console.log(`    Self-assessment:     ${complete ? "complete" : "incomplete"} (${answered}/${total} answered; self-reported; not a certification)`);
       console.log(`    Eligible level:      ${result.eligibleLevel === null ? "none" : `L${result.eligibleLevel}`} (self-reported answers cap at L1)`);
       console.log(`    Evaluated:           ${result.questionResults.length} of ${pack.questions.length} questions`);
+      for (const line of [...packRun.questionLevelLines(result), ...packRun.topGapLines(result), ...packRun.scoreKeyRiskLines(result)]) console.log(line);
       const lowScoring = result.questionResults.filter(q => q.percentage < 50);
       if (lowScoring.length > 0) {
         console.log(chalk.yellow(`\n  Gaps (${lowScoring.length} below 50%):`));

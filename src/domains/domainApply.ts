@@ -12,6 +12,7 @@ import {
   type IndustryPackQuestion,
   INDUSTRY_PACKS
 } from "./industryPacks.js";
+import { PACK_PASS_LEVEL } from "./packInsights.js";
 import { emitOperatingProfile, resolveOperatingProfilePath } from "./operatingProfiles/operatingProfileEmit.js";
 import type { OperatingProfileConsistency, ProfileRiskTier } from "./operatingProfiles/operatingProfileTypes.js";
 
@@ -25,6 +26,8 @@ export interface DomainApplyOptions {
   workspacePath?: string;
   /** Where to write the station operating profile; defaults to amc-operating-profiles/<agent>/<station>.operating-profile.json. Never under .amc/. */
   profileOut?: string;
+  /** Self-reported `{ questionId: level }` answers: each pack proposes its lowest-answered questions instead of its first. */
+  responses?: Record<string, number>;
 }
 
 export interface DomainApplyOperatingProfileSummary {
@@ -52,9 +55,21 @@ export interface DomainApplyResult {
   operatingProfile: DomainApplyOperatingProfileSummary;
 }
 
-/** No assessed gap can steer rule selection (P0-15), so each pack contributes its first three questions. */
-function selectPackQuestions(pack: IndustryPack): IndustryPackQuestion[] {
-  return pack.questions.slice(0, 3);
+const PROPOSALS_PER_PACK = 3;
+
+/**
+ * Each pack contributes three questions. With self-reported answers, those answered below L4 come first, lowest first (ties: higher
+ * weight, then pack order), filled up from the pack's first questions; without answers, its first three (P0-15:
+ * no assessed gap exists to steer selection). The answers only order proposals; they evaluate nothing.
+ */
+function selectPackQuestions(pack: IndustryPack, responses: Record<string, number> = {}): IndustryPackQuestion[] {
+  const answered = pack.questions
+    .map((question, order) => ({ question, order, level: responses[question.id] }))
+    .filter((row): row is { question: IndustryPackQuestion; order: number; level: number } =>
+      Number.isInteger(row.level) && row.level! >= 1 && row.level! < PACK_PASS_LEVEL)
+    .sort((a, b) => a.level - b.level || b.question.weight - a.question.weight || a.order - b.order)
+    .map((row) => row.question);
+  return [...new Set([...answered, ...pack.questions])].slice(0, PROPOSALS_PER_PACK);
 }
 
 function toDomainLabel(domain: Domain): string {
@@ -90,6 +105,7 @@ function buildGuardrailsContent(params: {
   agentId: string;
   packs: IndustryPack[];
   complianceFrameworks: string[];
+  responses?: Record<string, number>;
 }): { content: string; proposedRules: string[] } {
   const lines: string[] = [];
   const proposedRules: string[] = [];
@@ -108,7 +124,7 @@ function buildGuardrailsContent(params: {
   lines.push("");
 
   for (const pack of params.packs) {
-    const selectedQuestions = selectPackQuestions(pack);
+    const selectedQuestions = selectPackQuestions(pack, params.responses);
     lines.push(`## Pack: ${pack.id} (${pack.name})`);
     lines.push("");
     lines.push(`Regulatory Basis: ${pack.regulatoryBasis.join("; ")}`);
@@ -199,7 +215,8 @@ export async function applyDomainToAgent(opts: DomainApplyOptions): Promise<Doma
     domain,
     agentId,
     packs,
-    complianceFrameworks
+    complianceFrameworks,
+    responses: opts.responses
   });
 
   const targetFile = resolveTargetFile(workspacePath, opts.targetFile);

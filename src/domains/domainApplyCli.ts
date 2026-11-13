@@ -1,9 +1,10 @@
 import chalk from "chalk";
 import { Command } from "commander";
-import { readFileSync, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 import { toErrorMessage } from "../utils/errors.js";
 import { applyDomainToAgent } from "./domainApply.js";
 import { getPackById } from "./industryPacks.js";
+import { loadResponses } from "./packResponses.js";
 import {
   buildIndustryPackAudit,
   industryPackAuditClaim,
@@ -33,19 +34,6 @@ function signedBundleLines(path: string, signature: IndustryPackAuditSignature):
     "  Answers: self-reported. The signature proves who produced this file and that it is unchanged, not that the answers are true.",
     `  Verify: amc audit binder verify ${path} --pubkey <recorded-auditor.pub>`
   ];
-}
-
-function loadResponses(path: string): Record<string, number> {
-  const parsed = JSON.parse(readFileSync(path, "utf8")) as unknown;
-  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-    throw new Error("--responses file must be a JSON object of { questionId: level }");
-  }
-  const out: Record<string, number> = {};
-  for (const [key, value] of Object.entries(parsed as Record<string, unknown>)) {
-    const level = typeof value === "number" ? value : Number(value);
-    if (Number.isFinite(level)) out[key] = level;
-  }
-  return out;
 }
 
 interface OperatingProfileFlags {
@@ -110,7 +98,7 @@ export function registerDomainApplyCommand(domainCmd: Command): void {
     .option("--activate-profile <path>", "Activate a signed operating profile for --agent into the six signed configs under .amc/ (refuses unsigned, edited, foreign-signed, inconsistent or weakening profiles)")
     .option("--allow-widening", "With --activate-profile: accept fragments weaker than the current signed configs, after review", false)
     .option("--audit", "Produce an auditor-ready Industry Pack audit (self-reported answers) for --pack", false)
-    .option("--responses <path>", "JSON file of { questionId: level } responses for the audit (default: L1 baseline)")
+    .option("--responses <path>", "JSON file of { questionId: level } self-reported answers (1-5): scores --audit, and without --audit proposes each pack's lowest-answered questions (default: no answers; every question is not evaluated)")
     .option("--framework <id>", "Limit the audit crosswalk to one framework (eu_ai_act|nist|iso42001|soc2|sector)")
     .option("--audit-bundle <path>", "Write the audit bundle JSON, signed by the workspace auditor key")
     .option("--no-sign", "Write --audit-bundle as checksum only, not signed")
@@ -197,6 +185,7 @@ export function registerDomainApplyCommand(domainCmd: Command): void {
           dryRun: opts.dryRun,
           compliance: opts.compliance.length > 0 ? opts.compliance : undefined,
           targetFile: opts.file,
+          responses: opts.responses ? loadResponses(opts.responses) : undefined,
           workspacePath: process.cwd(),
           profileOut: opts.profileOut
         });
