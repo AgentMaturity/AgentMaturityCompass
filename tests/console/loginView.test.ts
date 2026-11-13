@@ -78,6 +78,21 @@ describe("loginCardHtml", () => {
     }
   });
 
+  // Onboarding: a first-time visitor reads what AMC is and sees a plain form; the account steps and LAN-only fields fold away.
+  test("leads with what AMC is, then the form; account steps and the pairing code sit in collapsed details", () => {
+    const lead = local.indexOf("AMC checks how far you can trust an AI agent");
+    expect(lead).toBeGreaterThan(-1);
+    expect(lead).toBeLessThan(local.indexOf("<form"));
+    const help = local.indexOf("<summary>No account yet? How to get one</summary>");
+    expect(help).toBeGreaterThan(local.indexOf("</form>"));
+    expect(local.indexOf("amc user add --username")).toBeGreaterThan(help);
+    expect(local.slice(help)).toContain("<ol>");
+    const form = formOf(local);
+    expect(form.indexOf("<summary>Advanced: pairing code</summary>")).toBeLessThan(form.indexOf('<label for="pairCode">'));
+    expect(local).not.toMatch(/<details[^>]*\sopen/);
+    expect(local).not.toContain("Admin token fallback");
+  });
+
   test("demo mode keeps the demo banner and names neither command", () => {
     const demo = loginCardHtml({ demoMode: true, hostMode: false });
     expect(demo).toContain("Local demo mode creates a no-login session");

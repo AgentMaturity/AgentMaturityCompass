@@ -28,7 +28,7 @@ describe("F5 drop reconciliation (P1-42)", () => {
     expect(restored.map((r) => r.question.id).sort()).toEqual(decisions.map((d) => d.id).sort());
     for (const { packId, question } of restored) {
       if (decisions.find((d) => d.id === question.id)!.decision === "drop") continue;
-      expect(getPackById(packId)?.questions.find((q) => q.id === question.id), question.id).toEqual(question);
+      expect(getPackById(packId)?.questions.find((q) => q.id === question.id), question.id).toMatchObject(question); // authored detail (packs/detail) is additive
     }
   });
 });

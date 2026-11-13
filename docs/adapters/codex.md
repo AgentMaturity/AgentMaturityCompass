@@ -17,7 +17,9 @@ amc connect hooks remove --provider codex
 
 The install writes `.codex/hooks.json` with one PostToolUse command hook that runs AMC's forwarder. It also writes a
 signed manifest and a dedicated observe lease under `.amc/hooks/`. It never edits a `.codex/hooks.json` it did not
-write. Codex runs a project hook only after you trust it in Codex, so nothing is observed until then.
+write. Codex runs a project hook only after you trust the folder and the hook in Codex (start `codex` there, accept
+the folder, then run `/hooks` and trust the AMC hook), so nothing is observed until then. `amc connect hooks install`
+and `status` print these steps. `amc login codex` runs Codex's own sign-in.
 
 ## What AMC claims
 

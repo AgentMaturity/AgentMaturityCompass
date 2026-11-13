@@ -99,7 +99,7 @@ export function registerIndustryPackTools(server: McpServer, options: IndustryPa
   server.registerTool(
     "amc_get_industry_pack",
     {
-      description: "Get one industry pack: questions, regulatory basis, compliance frameworks and EU AI Act classification, as stored. Free; no licence needed. (read-only)",
+      description: "Get one industry pack: questions (with optional l2/l4, evidence, remediation, failureMode and keyRisk detail), key risks, regulatory basis, compliance frameworks and EU AI Act classification, as stored. Free; no licence needed. (read-only)",
       inputSchema: z.object({ packId: packIdSchema }).strict(),
       annotations: READ_ONLY,
     },
@@ -113,7 +113,7 @@ export function registerIndustryPackTools(server: McpServer, options: IndustryPa
   server.registerTool(
     "amc_score_industry_pack",
     {
-      description: "Score self-reported question levels (1-5) against an industry pack. The result is self-reported, never a certification. Unanswered questions are not evaluated: the result lists them in notEvaluatedQuestionIds, and its percentage and level are null until every question is answered. Free; no licence needed. (read-only)",
+      description: "Score self-reported question levels (1-5) against an industry pack. The result is self-reported, never a certification. Unanswered questions are not evaluated: the result lists them in notEvaluatedQuestionIds, and its percentage and level are null until every question is answered. Each questionResult carries its level; scaleNote explains the percentage bands (all-L3 answers score 50%, band L2); topGaps lists answered questions below L4 by gap x weight with any failureMode/remediation/evidence; keyRisks, riskCoverage and weakestRisk cover the pack's key risks. Free; no licence needed. (read-only)",
       inputSchema: z
         .object({
           packId: packIdSchema,

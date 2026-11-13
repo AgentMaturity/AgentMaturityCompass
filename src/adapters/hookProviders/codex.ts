@@ -23,6 +23,18 @@ import {
 } from "./installFiles.js";
 
 /** Codex 0.165.0 (tag rust-v0.165.0, commit 360319d8), whose hooks contract AMC reviewed. */
+/**
+ * What a person must do in Codex before anything is observed. Measured against codex-cli 0.167.0 signed in with
+ * ChatGPT (2026-11-13): `codex exec` did not load a project `.codex/hooks.json` until the folder and the hook were
+ * trusted in Codex; once Codex ran the hook, AMC recorded the call.
+ */
+export const CODEX_NEXT_STEPS: readonly string[] = Object.freeze([
+  "sign in to Codex if you have not: codex login (AMC never sees or stores the sign-in)",
+  "start codex in this folder and trust the folder when Codex asks",
+  "in Codex, run /hooks and trust the hook labelled \"AMC records this tool call\"",
+  "run a task in Codex; each tool call it reports is then recorded by AMC as observed"
+]);
+
 export const CODEX_HOOK_SOURCE = {
   provider: "codex",
   contract: "Codex lifecycle hooks: PostToolUse command handler (observe only; PreToolUse fails open)",

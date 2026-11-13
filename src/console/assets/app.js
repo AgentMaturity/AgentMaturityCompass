@@ -6,6 +6,7 @@ import { industryPackDetailHtml, industryPackResultHtml } from "./industryPackVi
 import { renderBars, renderLine } from "./charts.js";
 import { decorateNav, topbarHtml } from "./shell.js";
 import { loginCardHtml, loginFailureText, safeNextPage } from "./loginView.js";
+import { BANNER_TIPS, activationHelpHtml, bannerHelpHtml, installWelcomeGuide, welcomeCardHtml } from "./welcomeGuide.js";
 import { renderQrLike } from "./qr.js";
 import { renderPluginTable } from "./components/pluginTable.js";
 import { renderPluginDetail } from "./components/pluginDetail.js";
@@ -464,7 +465,7 @@ function renderOnboardingSteps(state) {
   `;
 }
 
-function renderOnboardingActivation(activation) {
+function renderOnboardingActivation(activation, agentId) {
   const milestones = Array.isArray(activation?.milestones) ? activation.milestones : [];
   if (milestones.length === 0) {
     return "<p class='muted'>No verified activation outcomes yet.</p>";
@@ -476,6 +477,7 @@ function renderOnboardingActivation(activation) {
           <span class="activation-index">0${index + 1}</span>
           <div class="activation-copy">
             <strong>${htmlEscape(row.label || row.id || "Outcome")}</strong>
+            ${activationHelpHtml(row, agentId)}
             <p class="muted">${htmlEscape(row.summary || "")}</p>
             ${row.evidence?.studioPath ? `<a href="${htmlEscape(row.evidence.studioPath.replace(/^\/console\//, "./"))}">View signed proof</a>` : ""}
           </div>
@@ -486,6 +488,7 @@ function renderOnboardingActivation(activation) {
     ${activation.nextAction ? `
       <div class="activation-next">
         <span>Next</span>
+        <span>${htmlEscape(activation.nextAction.label || "")}. Run this in your terminal:</span>
         <code>${htmlEscape(activation.nextAction.command || "")}</code>
       </div>
     ` : ""}
@@ -1226,16 +1229,17 @@ async function refreshUnifiedBanner() {
     bannerEl.innerHTML = `${killLine}
       <strong>Unified Clarity</strong>
       <div class="row wrap">
-        <span><strong>Agent:</strong> ${htmlEscape(agentId)}</span>
-        <span><strong>Trust:</strong> ${htmlEscape(trustLabel)}</span>
-        <span><strong>Integrity:</strong> ${integrity === null ? "N/A" : integrity.toFixed(3)}</span>
-        <span><strong>Evidence:</strong> ${htmlEscape(evidenceStatus)}</span>
-        <span><strong>Claims:</strong> ${claimEligible ? "ELIGIBLE" : "BLOCKED"}</span>
-        <span><strong>Active freezes:</strong> ${freezes}</span>
-        <span><strong>Config:</strong> ${status.readOnlyMode ? "UNTRUSTED CONFIG (READ-ONLY)" : "SIGNED"}</span>
-        <span><strong>Trust mode:</strong> ${htmlEscape(`${trustMode}${trustMode === "NOTARY" ? trustOk ? " (OK)" : " (BROKEN)" : ""}`)}</span>
-        <span><strong>Transparency:</strong> ${transparency.ok ? "OK" : "BROKEN"}</span>
+        <span title="${htmlEscape(BANNER_TIPS.agent)}"><strong>Agent:</strong> ${htmlEscape(agentId)}</span>
+        <span title="${htmlEscape(BANNER_TIPS.trust)}"><strong>Trust:</strong> ${htmlEscape(trustLabel)}</span>
+        <span title="${htmlEscape(BANNER_TIPS.integrity)}"><strong>Integrity:</strong> ${integrity === null ? "N/A" : integrity.toFixed(3)}</span>
+        <span title="${htmlEscape(BANNER_TIPS.evidence)}"><strong>Evidence:</strong> ${htmlEscape(evidenceStatus)}</span>
+        <span title="${htmlEscape(BANNER_TIPS.claims)}"><strong>Claims:</strong> ${claimEligible ? "ELIGIBLE" : "BLOCKED"}</span>
+        <span title="${htmlEscape(BANNER_TIPS.freezes)}"><strong>Active freezes:</strong> ${freezes}</span>
+        <span title="${htmlEscape(BANNER_TIPS.config)}"><strong>Config:</strong> ${status.readOnlyMode ? "UNTRUSTED CONFIG (READ-ONLY)" : "SIGNED"}</span>
+        <span title="${htmlEscape(BANNER_TIPS.trustMode)}"><strong>Trust mode:</strong> ${htmlEscape(`${trustMode}${trustMode === "NOTARY" ? trustOk ? " (OK)" : " (BROKEN)" : ""}`)}</span>
+        <span title="${htmlEscape(BANNER_TIPS.transparency)}"><strong>Transparency:</strong> ${transparency.ok ? "OK" : "BROKEN"}</span>
       </div>
+      ${bannerHelpHtml()}
     `;
     bannerEl.hidden = false;
   } catch {
@@ -1285,6 +1289,8 @@ function renderAuthScreen() {
   if (!root) {
     return;
   }
+  // A signed-out visitor has no results to label: the claim strip returns once renderPage signs them in.
+  document.getElementById("claimStrip")?.setAttribute("hidden", "");
   root.innerHTML = loginCardHtml({ demoMode: currentWorkspaceLabel() === "demo", hostMode: window.location.pathname.startsWith("/w/") });
   const qr = document.getElementById("pairQr");
   if (qr) {
@@ -1357,7 +1363,53 @@ async function renderHome() {
     : `<span class="pill ok">workspace authenticated</span><span class="pill muted" title="${STUDIO_VAULT_NOTE}">Studio vault ${vaultState.toLowerCase()}</span><span class="pill muted">evidence-first runtime</span>`;
   const launchCommand = demoMode ? "$ amc up --demo --no-open" : "$ amc up";
   root.innerHTML = `
+    ${welcomeCardHtml()}
     ${firstUseCard(agentId)}
+    ${card("Activation path", `
+      <div class="row spaced wrap">
+        <div>
+          <div class="muted">Verified outcomes</div>
+          <div class="tile-value">${htmlEscape(`${onboarding?.activation?.progress?.completed || 0}/4`)}</div>
+        </div>
+        <div class="row wrap">
+          <button id="studioRefreshActivation" class="icon-button" aria-label="refresh activation" title="Refresh activation">&#8635;</button>
+          <a class="button secondary" href="./evidence?agent=${encodeURIComponent(agentId)}">Evidence</a>
+        </div>
+      </div>
+      ${renderOnboardingActivation(onboarding?.activation, agentId)}
+      <details class="activation-setup">
+        <summary>Workspace setup</summary>
+        ${renderOnboardingSteps(onboarding?.state)}
+        <div class="row wrap activation-setup-actions">
+          <button id="studioRunOnboarding" data-roles="OWNER,OPERATOR">run baseline</button>
+        </div>
+        <pre id="onboardingOut" class="scroll muted"></pre>
+      </details>
+    `)}
+
+    <section class="quick-action-grid">
+      <a class="quick-action-card" href="./score"><span>01</span><strong>Score</strong><em>scoring commands</em></a>
+      <a class="quick-action-card" href="./assurance"><span>02</span><strong>Assure</strong><em>test your agent</em></a>
+      <a class="quick-action-card" href="./evidence?agent=${encodeURIComponent(agentId)}"><span>03</span><strong>Evidence</strong><em>what your agent did</em></a>
+      <a class="quick-action-card" href="./integrations"><span>04</span><strong>API</strong><em>connect your tools</em></a>
+    </section>
+
+    <div class="studio-kpi-grid">
+      <section class="card studio-kpi"><div class="muted">Agents</div><div class="tile-value">${agents.length}</div></section>
+      <section class="card studio-kpi"><div class="muted">Active Freezes</div><div class="tile-value">${activeFreezes}</div></section>
+      <section class="card studio-kpi"><div class="muted">Benchmarks</div><div class="tile-value">${benchmarkStats.count || 0}</div></section>
+      <section class="card studio-kpi"><div class="muted">Current Agent</div><div class="tile-value">${htmlEscape(agentId)}</div></section>
+    </div>
+
+    <div class="studio-section-label">runtime telemetry</div>
+    <div class="studio-chart-grid">
+      ${card("Overall Trend", `<canvas id="overallTrend" width="360" height="140" role="img" aria-label="Overall maturity trend chart for the selected agent."></canvas>`)}
+      ${card("Integrity Trend", `<canvas id="integrityTrend" width="360" height="140" role="img" aria-label="Integrity index trend chart for the selected agent."></canvas>`)}
+    </div>
+
+    <div class="studio-section-label">advanced and developer details</div>
+    <details class="advanced-section">
+      <summary>Advanced: local command center (for developers)</summary>
     <section class="card studio-hero studio-hero-polished">
       <div>
         <div class="studio-kicker">local command center</div>
@@ -1391,20 +1443,15 @@ async function renderHome() {
         </div>
       </div>
     </section>
-
-    <section class="quick-action-grid">
-      <a class="quick-action-card" href="./score"><span>01</span><strong>Score</strong><em>scoring commands</em></a>
-      <a class="quick-action-card" href="./assurance"><span>02</span><strong>Assure</strong><em>attack packs</em></a>
-      <a class="quick-action-card" href="./evidence?agent=${encodeURIComponent(agentId)}"><span>03</span><strong>Evidence</strong><em>prove chain</em></a>
-      <a class="quick-action-card" href="./integrations"><span>04</span><strong>API</strong><em>curl-ready flows</em></a>
-    </section>
-
+    </details>
+    <details class="advanced-section">
+      <summary>Advanced: desktop app details</summary>
     <section class="card studio-desktop-note">
       <div>
         <div class="studio-kicker">Desktop app</div>
         <h3>Native macOS shell, same AMC evidence-first surface.</h3>
         <p class="muted">
-          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs, 41 Industry Packs, and 1,300 CLI paths.
+          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs, 41 Industry Packs, and 1,304 CLI paths.
         </p>
       </div>
       <div class="row wrap">
@@ -1414,45 +1461,14 @@ async function renderHome() {
         <span class="pill muted">no Electron</span>
       </div>
     </section>
-
-    ${card("Activation path", `
-      <div class="row spaced wrap">
-        <div>
-          <div class="muted">Verified outcomes</div>
-          <div class="tile-value">${htmlEscape(`${onboarding?.activation?.progress?.completed || 0}/4`)}</div>
-        </div>
-        <div class="row wrap">
-          <button id="studioRefreshActivation" class="icon-button" aria-label="refresh activation" title="Refresh activation">&#8635;</button>
-          <a class="button secondary" href="./evidence?agent=${encodeURIComponent(agentId)}">Evidence</a>
-        </div>
-      </div>
-      ${renderOnboardingActivation(onboarding?.activation)}
-      <details class="activation-setup">
-        <summary>Workspace setup</summary>
-        ${renderOnboardingSteps(onboarding?.state)}
-        <div class="row wrap activation-setup-actions">
-          <button id="studioRunOnboarding" data-roles="OWNER,OPERATOR">run baseline</button>
-        </div>
-        <pre id="onboardingOut" class="scroll muted"></pre>
-      </details>
-    `)}
-
+    </details>
+    <details class="advanced-section">
+      <summary>Developer: API quickstart (curl examples)</summary>
     ${renderApiQuickstart(status, agentId)}
-
-    <div class="studio-kpi-grid">
-      <section class="card studio-kpi"><div class="muted">Agents</div><div class="tile-value">${agents.length}</div></section>
-      <section class="card studio-kpi"><div class="muted">Active Freezes</div><div class="tile-value">${activeFreezes}</div></section>
-      <section class="card studio-kpi"><div class="muted">Benchmarks</div><div class="tile-value">${benchmarkStats.count || 0}</div></section>
-      <section class="card studio-kpi"><div class="muted">Current Agent</div><div class="tile-value">${htmlEscape(agentId)}</div></section>
-    </div>
-
-    <div class="studio-section-label">runtime telemetry</div>
-    <div class="studio-chart-grid">
-      ${card("Overall Trend", `<canvas id="overallTrend" width="360" height="140" role="img" aria-label="Overall maturity trend chart for the selected agent."></canvas>`)}
-      ${card("Integrity Trend", `<canvas id="integrityTrend" width="360" height="140" role="img" aria-label="Integrity index trend chart for the selected agent."></canvas>`)}
-    </div>
+    </details>
   `;
   bindFirstUse();
+  installWelcomeGuide(document, window);
   const agentStatus = await apiGet(`/agents/${encodeURIComponent(agentId)}/status`).catch(() => ({ latestRun: null }));
   const latestRun = agentStatus.latestRun;
   renderLine(document.getElementById("overallTrend"), latestRun ? [latestRun.integrityIndex, latestRun.integrityIndex] : [0]);
@@ -3654,6 +3670,7 @@ async function renderPage() {
     return;
   }
   decorateShell();
+  document.getElementById("claimStrip")?.removeAttribute("hidden");
 
   const me = getCurrentUser();
   if (me) {

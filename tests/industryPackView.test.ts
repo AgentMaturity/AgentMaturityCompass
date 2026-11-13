@@ -42,7 +42,7 @@ test("the Industry Packs page opens a pack into the readable view, not a JSON du
 
 test("the questionnaire offers the CLI's levels with labelled inputs, and the result reads as the CLI words it (M3)", () => {
   const html = industryPackDetailHtml(JSON.parse(JSON.stringify(pack)));
-  expect(html.match(/type="radio"/g)).toHaveLength(pack.questions.length * 3);
+  expect(html.match(/type="radio"/g)).toHaveLength(pack.questions.length * 5);
   expect(html.match(/<fieldset>/g)).toHaveLength(pack.questions.length);
   expect(html).toContain('id="industryPackClose"');
   expect(html).toContain('id="industryPackHeading" tabindex="-1"');

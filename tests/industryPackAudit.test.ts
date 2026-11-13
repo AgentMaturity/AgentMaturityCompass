@@ -77,7 +77,8 @@ describe("industry pack audit", () => {
     for (const c of gaps.controls) {
       expect(c.status).toBe("GAP");
       expect(c.remediation).not.toBeNull();
-      expect(c.remediation?.generatedArtifact).toContain("target_level: 3");
+      // /6: the next level above the answer (L1 -> L2), not a fixed L3.
+      expect(c.remediation?.generatedArtifact).toContain("target_level: 2");
       expect(c.remediation?.evidenceExpected.length).toBeGreaterThan(0);
     }
 
@@ -229,8 +230,8 @@ describe("industry pack audit — regulatory currency", () => {
 
   test("currency is inside the signed receipt and rendered for the auditor", () => {
     const audit = buildIndustryPackAudit({ pack: headShapePack(), responses: responsesAll(3), now: NOW });
-    expect(INDUSTRY_PACK_AUDIT_SCHEMA_VERSION).toBe("amc.industry-pack-audit/5");
-    expect(audit.schemaVersion).toBe("amc.industry-pack-audit/5");
+    expect(INDUSTRY_PACK_AUDIT_SCHEMA_VERSION).toBe("amc.industry-pack-audit/6");
+    expect(audit.schemaVersion).toBe("amc.industry-pack-audit/6");
     expect(audit.currency.status).toBe("undated");
     expect(verifyIndustryPackAuditChecksum(audit)).toBe(true);
     expect(verifyIndustryPackAuditChecksum({ ...audit, currency: { ...audit.currency, status: "current" } })).toBe(false);

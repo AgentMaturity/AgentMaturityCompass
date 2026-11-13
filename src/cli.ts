@@ -234,6 +234,7 @@ import { registerNativeProviderCommands } from "./cli-agent-options.js";
 import { registerNativeExtensionCommands } from "./cli-native-extension-commands.js";
 import { registerConfigProvenanceCommand } from "./cli-config-commands.js";
 import { registerCredentialsCommands } from "./cli-credentials-commands.js";
+import { registerLoginCommands } from "./setup/agentSignIn.js";
 import { issueCertificate, inspectCertificate, revokeCertificateAsync, verifyCertificate, verifyRevocation } from "./assurance/certificate.js";
 import { generateTrustCertificateAsync } from "./cert/trustCertificate.js";
 import { renderFailureRiskMarkdown, runFleetIndices, runIndicesForAgent } from "./assurance/indices.js";
@@ -24037,6 +24038,7 @@ registerAgentCommands(program);
 registerNativeProviderCommands(program);
 registerNativeExtensionCommands(program);
 registerCredentialsCommands(program);
+registerLoginCommands(program);
 registerA4Commands(program);
 function isTopLevelHelpRequest(argv: string[]): boolean {
   const args = argv.slice(2);
