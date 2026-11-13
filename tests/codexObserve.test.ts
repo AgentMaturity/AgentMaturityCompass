@@ -5,9 +5,11 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { afterEach, describe, expect, test } from "vitest";
+import { Command } from "commander";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { CODEX_FORWARD_PATH, forwardCodexObservation } from "../src/adapters/codex/codexObserveForwarder.js";
 import { codexActionId } from "../src/adapters/codex/codexIdentity.js";
+import { registerHookIntegrationCommands } from "../src/adapters/hookIntegrationCli.js";
 import { getHookIntegrationStatus, installHookIntegration, removeHookIntegration } from "../src/adapters/hookIntegration.js";
 import { startBridgeServer } from "../src/bridge/bridgeServer.js";
 import { recordCodexPostToolUse } from "../src/bridge/codexObservations.js";
@@ -36,6 +38,36 @@ function ledgerRow(workspace: string, id: string): Record<string, unknown> | nul
     ledger.close();
   }
 }
+
+describe("Codex hook CLI output", () => {
+  test("install and status print the trust steps Codex requires before anything is observed", async () => {
+    const workspace = controlledWorkspace(agentId);
+    const cwd = vi.spyOn(process, "cwd").mockReturnValue(workspace);
+    const lines: string[] = [];
+    const log = vi.spyOn(console, "log").mockImplementation((line?: unknown) => { lines.push(String(line)); });
+    try {
+      const run = async (...args: string[]) => {
+        const connect = new Command("connect").exitOverride();
+        registerHookIntegrationCommands(connect, () => agentId);
+        await connect.parseAsync(["node", "connect", "hooks", ...args]);
+      };
+      await run("install", "--provider", "codex", "--agent", agentId, "--mode", "observe");
+      const installed = lines.splice(0).join("\n");
+      expect(installed).toContain("AMC hook installed");
+      expect(installed).toContain("Limit: Codex runs this project hook only after you trust it in Codex");
+      expect(installed).toMatch(/Next \(in Codex, not in AMC\):\n {2}1\. sign in to Codex[\s\S]*trust the folder[\s\S]*\/hooks/);
+      await run("status", "--provider", "codex");
+      const status = lines.splice(0).join("\n");
+      expect(status).toContain("AMC hook: installed");
+      expect(status).toContain("Next (in Codex, not in AMC):");
+      await run("install", "--provider", "codex", "--agent", agentId, "--mode", "observe", "--dry-run");
+      expect(lines.join("\n")).not.toContain("Next (in Codex");
+    } finally {
+      log.mockRestore();
+      cwd.mockRestore();
+    }
+  });
+});
 
 describe("Codex observe installation", () => {
   test("install writes one PostToolUse command hook running AMC's forwarder, with single-quoted paths", () => {
