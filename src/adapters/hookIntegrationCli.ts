@@ -18,6 +18,7 @@ import { isHookProvider } from "../bridge/hookProviders.js";
 import { findPiPackage } from "./pi/piInstall.js";
 import { findDshPackage } from "./dsh/dshInstall.js";
 import { findClaudeCode } from "./hookProviders/claudeCode.js";
+import { CODEX_NEXT_STEPS } from "./hookProviders/codex.js";
 import { claudeHookSchemasFor } from "./hookProviders/claudeCodePayloads.js";
 import { normalizeBridgeBase } from "./hookProviders/installFiles.js";
 import { verifyClaudeControl, type ClaudeControlVerification } from "./claudeHookProbe.js";
@@ -50,6 +51,12 @@ function claudeControlWarnings(workspace: string, agentId: string, bridgeUrl: st
   }
   if (claudeHookSchemasFor(version)) return [];
   return [`${version ? `Claude Code ${version} is not a release AMC qualified` : "no Claude Code was on PATH"}, so the installation binds no qualified release and the hook denies every action; reinstall with a qualified Claude Code on PATH`];
+}
+
+/** Codex runs a project hook only after the person trusts the folder and the hook in Codex; say so every time. */
+function printCodexNextSteps(): void {
+  console.log("Next (in Codex, not in AMC):");
+  CODEX_NEXT_STEPS.forEach((step, index) => console.log(`  ${index + 1}. ${step}`));
 }
 
 function printFileChanges(files: HookFileChange[]): void {
@@ -122,7 +129,8 @@ export function registerHookIntegrationCommands(
       console.log(result.mode === "control"
         ? "Boundary: control is loopback-only and raw provider input is never retained."
         : "Boundary: observation only; provider control decisions are unchanged.");
-      if (result.provider === "pi" || result.mode === "control") for (const limit of result.limitations) console.log(chalk.yellow(`Limit: ${limit}`));
+      if (result.provider === "pi" || result.provider === "codex" || result.mode === "control") for (const limit of result.limitations) console.log(chalk.yellow(`Limit: ${limit}`));
+      if (result.provider === "codex" && !opts.dryRun) printCodexNextSteps();
     });
 
   hooks
@@ -149,6 +157,7 @@ export function registerHookIntegrationCommands(
         if (status.expiresTs) console.log(`Expires: ${new Date(status.expiresTs).toISOString()}`);
         for (const issue of status.issues) console.log(chalk.yellow(`Issue: ${issue}`));
         if (control) printControlVerification(control);
+        if (status.provider === "codex" && status.state === "installed") printCodexNextSteps();
       }
       if (!["installed", "not-installed"].includes(status.state) || control?.verified === false) process.exitCode = 1;
     });

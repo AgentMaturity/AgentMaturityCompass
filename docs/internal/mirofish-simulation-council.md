@@ -3,7 +3,7 @@
 ## Council Roles Simulated
 
 ### 🎯 Product Manager
-**Assessment**: AMC has a broad source inventory (94 score modules, 142 assurance packs, 2,549 Vitest test source files) but the first-touch experience needs simplification. 0 CLI command paths is powerful but intimidating. The task-first `amc` entry point should remain the default front door.
+**Assessment**: AMC has a broad source inventory (94 score modules, 142 assurance packs, 2,550 Vitest test source files) but the first-touch experience needs simplification. 0 CLI command paths is powerful but intimidating. The task-first `amc` entry point should remain the default front door.
 **Score**: 7/10 — depth is there, onboarding needs work.
 
 ### 🔒 Security Researcher  

@@ -695,6 +695,10 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc lint` | Lint agent configuration files for schema compliance, anti-patterns, and best practices | `--fix`<br>`--format <fmt>`<br>`--rules <ids...>`<br>`--workspace <path>` | - |
 | `amc lint rules` | List all available lint rules | `--json` | - |
 | `amc lite-score` | Lite scoring mode for non-agent LLMs / chatbots — simplified assessment without agentic features | `--agent <agentId>`<br>`--json`<br>`--eu-ai-act` | - |
+| `amc login` | Sign in to Claude Code or Codex with the vendor's own command, or show which are signed in | - | - |
+| `amc login claude` | Run Claude Code's own sign-in (claude auth login) | - | - |
+| `amc login codex` | Run Codex's own sign-in (codex login) | - | - |
+| `amc login status` | Show whether Claude Code and Codex are installed and signed in (reads the vendor's own status) | `--json` | - |
 | `amc logs` | Print latest AMC Studio logs | `--lines <n>` | - |
 | `amc loop` | Continuous self-serve maturity loop | - | - |
 | `amc loop init` | Initialize recurring loop config | - | - |
