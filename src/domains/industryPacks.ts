@@ -9,6 +9,7 @@ import type { Domain } from "./domainRegistry.js";
 import { selfAssessPack, type SelfAssessedPack } from "./packSelfAssessment.js";
 import { PACK_SCALE_NOTE, packRiskCoverage, packTopGaps, type PackGap, type PackRiskCoverage } from "./packInsights.js";
 import { QUESTIONNAIRE_CONTENT_STATUS } from "./questionnaireLabel.js";
+import { PACK_QUESTION_DETAIL } from "./packs/detail/index.js";
 import { withRegulatoryCurrency, type ComplianceFrameworkRef, type RegulatoryReference } from "./packs/regulatorySchema.js";
 import { farmToFork, weaveToWear, materialToMachines, sourceToSustenance, ubiquityToUtility, sipToSanitation } from "./packs/stations/environment.js";
 import { digitalHealthRecord, wellnessManagement, patientLifecycle, clinicalLifecycle, professionalPractice, lifeTechnology, drugDiscovery, clinicalTrials, specializedMedicine } from "./packs/stations/health.js";
@@ -188,9 +189,16 @@ const PACK_CONTENT: Record<IndustryPackId, IndustryPack> = {
   "public-private-collaboration": publicPrivateCollaboration,
 };
 
+/** Detail authored per pack in packs/detail/<pack id>.ts, keyed by question id; a question's inline detail is kept under it. */
+export type PackQuestionDetail = Readonly<Record<string, IndustryPackQuestionDetail>>;
+
+function withQuestionDetail<T extends { questions: readonly IndustryPackQuestion[] }>(pack: T, detail: PackQuestionDetail): T {
+  return { ...pack, questions: pack.questions.map((question) => ({ ...question, ...(detail[question.id] ?? {}) })) };
+}
+
 /** Registry with derived regulatory currency (regulatoryReferences, complianceFrameworkRefs) and the content status attached. */
 export const INDUSTRY_PACKS = Object.fromEntries(
-  Object.entries(PACK_CONTENT).map(([id, pack]) => [id, { ...withRegulatoryCurrency(pack), contentStatus: QUESTIONNAIRE_CONTENT_STATUS }])
+  Object.entries(PACK_CONTENT).map(([id, pack]) => [id, { ...withRegulatoryCurrency(withQuestionDetail(pack, PACK_QUESTION_DETAIL[id] ?? {})), contentStatus: QUESTIONNAIRE_CONTENT_STATUS }])
 ) as Record<IndustryPackId, IndustryPack>;
 
 // ---------------------------------------------------------------------------
