@@ -17,7 +17,12 @@ import { q } from "../src/domains/packs/stations/shared.js";
 import { testIndustryPackLicence, type TestIndustryPackLicence } from "./helpers/industryPackLicence.js";
 
 const NOW = Date.parse("2026-11-13T12:00:00Z");
-const base = getPackById("clinical-trials")!;
+const registryPack = getPackById("clinical-trials")!;
+/** The registry pack without its authored per-question detail, so the template fallbacks stay under test. */
+const base: IndustryPack = {
+  ...registryPack,
+  questions: registryPack.questions.map(({ l2: _l2, l4: _l4, evidence: _e, remediation: _r, failureMode: _f, keyRisk: _k, ...question }) => question),
+};
 
 /** A pack built from the registry's clinical-trials pack, its first questions carrying the optional detail. */
 function enrichedPack(): IndustryPack {
@@ -99,7 +104,7 @@ describe("levels, gaps and key risks", () => {
     expect(result.keyRisks).toEqual(base.keyRisks);
     expect(result.topGaps.length).toBeGreaterThan(0);
     expect(result.topGaps[0]!.targetLevel).toBe(4);
-    expect(result.weakestRisk).toBeNull();
+    expect(result.weakestRisk).not.toBeNull(); // the registry pack maps every question to a key risk
   });
 });
 
