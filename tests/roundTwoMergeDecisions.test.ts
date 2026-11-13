@@ -38,7 +38,7 @@ describe("round-2 merge decisions (P1-42 review)", () => {
       const decision = decisions.items.find((i) => i.id === question.id)!.decision;
       const found = getPackById(packId)?.questions.find((q) => q.id === question.id);
       if (decision === "merge") expect(found, question.id).toBeUndefined();
-      else expect(found, question.id).toEqual(question);
+      else expect(found, question.id).toMatchObject(question); // authored detail (packs/detail) is additive
     }
   });
 });
