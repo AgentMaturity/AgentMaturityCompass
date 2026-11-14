@@ -249,7 +249,7 @@ export function renderStartHere(ctx) {
 }
 
 /** The four stages as a horizontal stepper in human words, the A4 name small beneath each. */
-export function introStepperHtml() {
+function introStepperHtml() {
   return `<ol class="a4-stepper a4-stepper-intro" aria-label="The four steps">${STAGES.map((name, index) =>
     `<li><strong>${index + 1}. ${esc(STAGE_PLAIN[name])}</strong><small class="muted">${esc(title(name))}</small></li>`).join("")}</ol>`;
 }
@@ -368,7 +368,7 @@ export async function understandingIsCurrent(spec) {
 }
 
 /** The project Home continues: the most recently changed one that is not retired, else null. */
-export function latestProject(projects) {
+function latestProject(projects) {
   const open = list(projects).filter((project) => isObject(project) && project.stage !== "retired");
   return open.sort((a, b) => String(b.updatedTs ?? "").localeCompare(String(a.updatedTs ?? "")))[0] ?? null;
 }

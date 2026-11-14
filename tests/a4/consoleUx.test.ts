@@ -59,7 +59,7 @@ describe("Home's build card", () => {
   test("with projects: Continue <latest>, what it needs now, one button, Start another as a link", () => {
     const html = start.homeCardHtml({ projects: [
       { projectId: "a4p_old", name: "Old", stage: "assemble", step: "built", updatedTs: "2026-11-01T00:00:00Z" },
-      { projectId: "a4p_new", name: "Claims <helper>", stage: "aspire", step: "proposed", updatedTs: "2026-11-14T00:00:00Z" }] });
+      { projectId: "a4p_new", name: "Claims <helper>", stage: "aspire", step: "proposed", updatedTs: "2026-11-14T00:00:00Z" }] as never });
     expect(html).toContain("Continue Claims &lt;helper&gt;");
     expect(html).toContain("Next: a second person approves the plan before anything is built.");
     expect(html).toContain('<a class="button" href="./a4Project?project=a4p_new">Continue</a>');

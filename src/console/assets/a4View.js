@@ -21,8 +21,6 @@ export const STEP_NEXT = { asked: "Next: answer the questions, then let AMC say 
   proposed: "Next: a second person approves the plan before anything is built.", direction_approved: "Next: build it.",
   built: "Next: review what was built.", reviewed: "Next: a second person gives the final approval for this step.",
   completion_approved: "This step is approved. Next: move on to the next step." };
-/** "Say what it is for · Aspire" style: the plain name, the A4 name small. */
-export const stagePlainHtml = (stage) => `${esc(STAGE_PLAIN[stage] ?? stage)} <small class="muted">${esc(stageTitle(stage))}</small>`;
 const LANES = [["recommendation", "Recommendation"], ["implementation", "Implementation"], ["observed", "Observed"],
   ["verified", "Independently reviewed"]];
 const LEVELS = ["novice", "practitioner", "expert"];
