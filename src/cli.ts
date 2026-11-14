@@ -2110,10 +2110,9 @@ program.hook("preAction", async (_thisCommand, actionCommand) => {
   if (!/^(up|mcp|connect hooks forward|bootstrap|host bootstrap|studio start|doctor)( |$)/.test(path)) unlockWithPassphraseFile(process.cwd());
   // B2: `amc up` reads it itself (--no-remember); the agent host's MCP server and hook forwarder never hold the vault.
   // LIVE-VAULT-01: the unlock is for an interactive operator only, and a governance command then confirms it.
-  if (!/^(up|mcp|connect hooks forward)( |$)/.test(path)) {
-    unlockWithRememberedPassphrase(process.cwd()); await confirmRememberedUnlock(process.cwd(), path);
-    await askToUnlockForSigning(process.cwd(), path); // a signing command asks an interactive operator rather than refusing
-  }
+  if (!/^(up|mcp|connect hooks forward)( |$)/.test(path)) { unlockWithRememberedPassphrase(process.cwd()); await confirmRememberedUnlock(process.cwd(), path); }
+  // A signing command asks an interactive operator for the passphrase rather than refusing (agents and pipes keep the refusal).
+  if (!/^(up|mcp|connect hooks forward)( |$)/.test(path)) await askToUnlockForSigning(process.cwd(), path);
 });
 installClaimLabelHooks(program);
 
