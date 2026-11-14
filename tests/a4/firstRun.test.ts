@@ -8,7 +8,8 @@ import { describe, expect, test } from "vitest";
 import * as start from "../../src/console/assets/a4Start.js";
 import * as view from "../../src/console/assets/a4View.js";
 import type { A4ReadinessItem } from "../../src/a4/a4Readiness.js";
-import { ASSEMBLE_REVIEW, readinessHeadline } from "../../src/a4/a4Readiness.js";
+import { readinessHeadline } from "../../src/a4/a4Readiness.js";
+import { ASSEMBLE_REVIEW } from "../../src/a4/a4StepLabels.js";
 import { answersDigestOf } from "../../src/a4/spec/aspire.js";
 import { GUIDE_START, PREVIEW_OFF, verifyFlagHint } from "../../src/cli-a4-commands.js";
 

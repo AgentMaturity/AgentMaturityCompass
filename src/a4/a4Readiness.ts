@@ -25,6 +25,7 @@ import {
   type a4DecisionRowSchema, type a4EffectRowSchema, type a4GateRowSchema, type a4ReadinessItemSchema, type a4RevisionRowSchema
 } from "./a4Schema.js";
 import { SOD_SENTENCE } from "./a4SoD.js";
+import { ASSEMBLE_REVIEW, REDO_PROPOSAL, STEP_NEXT } from "./a4StepLabels.js";
 
 export { A4_BOUND_ITEMS };
 /** P2-22's blocker vocabulary plus the A4-only kinds; P2-22's blocker inbox imports it from here (design §7 rule 3). */
@@ -370,8 +371,6 @@ export function readinessItemBuilders(section: A4ReadinessItem["section"]) {
 }
 const { item } = readinessItemBuilders("governance");
 
-/** The way back to Propose once a stage is past Explain: Propose runs only at step explained (A4_STEP_ORDER). */
-const REDO_PROPOSAL = "Answer again (a new revision returns this stage to Ask), then understand, confirm, explain and propose";
 /**
  * A-3: a Propose item's next action. Before Explain the step's own action leads (the evaluator's fallback), so the guide
  * never names a Propose the routes refuse; past it a new proposal needs a new revision.
@@ -644,8 +643,7 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
   const principalUnresolved = query.stage === "activate" && live.leasePrincipalRequired === true
     && (principal?.authSource !== "LOCAL_USER" || !(live.activeLocal ?? []).includes(principal.userId)) ? ["PRINCIPAL_UNRESOLVED"] : [];
   const specific: Partial<Record<A4Action, string[]>> = {
-    // An unacknowledged item that holds progress is acknowledged first: approvals given before it would be spent on a gate that
-    // cannot complete, and an acknowledgement recorded after the request supersedes it, so they would be asked for again.
+    // Acknowledge first: an acknowledgement recorded after the request supersedes the gate, so approvals would be asked for again.
     requestGate: [...blocked, ...transient, ...ids((candidate) => candidate.mandatory && candidate.acknowledged === null
       && acknowledgeable(candidate, regulated, query.stage))],
     decide: [
@@ -705,12 +703,6 @@ function acknowledgements(state: A4ReadinessState, now: number): Map<string, { a
   }
   return out;
 }
-
-const STEP_NEXT: Partial<Record<A4Step, string>> = { asked: "Run Understand, then confirm it", understood: "Run Explain", explained: "Run Propose",
-  proposed: "Request the direction gate", direction_approved: "Run Build", built: "Run Review", reviewed: "Request the completion gate" };
-
-export const ASSEMBLE_REVIEW = "Close the build session first: in Studio, on the Assemble page's Build card, choose Open on Native Tasks and "
-  + "press Close and verify. Then run Review";
 
 /**
  * A stage's status and next action from its items (A-3). A mandatory BLOCKED integrity item counts like any other blocker
