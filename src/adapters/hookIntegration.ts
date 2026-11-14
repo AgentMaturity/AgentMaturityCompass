@@ -26,6 +26,7 @@ import { readOnlyCapabilityGovernance, readOnlyCapabilityLeaseStatus } from "./h
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { writeFileAtomic } from "../utils/fs.js";
+import { stableNodePath } from "./hookProviders/nodePath.js";
 import { isSafeProviderActionId, resolveProviderHookRequestIdentity, type HookActionIdentitySource } from "../bridge/hookActionIdentity.js";
 import {
   addManagedIgnoreBlock, assertAllPathsSafe, assertControlBridgeLocal, assertManagedPathSafe, controlApprovalPolicy, managedLeaseStatus,
@@ -372,7 +373,8 @@ function expectedHandler(input: {
     // an invalid answer blocks the action (`onFailure: "block"`, Claude Code 2.1.295 and later).
     return {
       type: "command",
-      command: process.execPath,
+      // Observe names a Node that survives `brew upgrade`; control keeps the exact binary (nodePath.ts says why).
+      command: input.mode === "control" ? process.execPath : stableNodePath(),
       args: [amcCliScriptPath(input.mode, import.meta.url, "forwarder"), ...args.slice(3), ...(input.eventName ? ["--event", input.eventName] : [])],
       timeout: CLAUDE_HOOK_TIMEOUT_SECONDS,
       statusMessage: input.mode === "control" ? CLAUDE_CONTROL_STATUS_MESSAGE : CLAUDE_STATUS_MESSAGE,
