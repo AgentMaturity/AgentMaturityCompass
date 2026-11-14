@@ -36,6 +36,13 @@ amc connect hooks status --provider claude-code
 Install with the `claude` you will run on `PATH`: the installation binds that binary's path, version and SHA-256, and a
 session running any other binary is not registered. Re-install after upgrading AMC, Node or Claude Code.
 
+When your Claude Code settings enable a plugin or hold another hook that can change a tool call, the install prints a
+warning that starts `Claude Code's settings keep AMC from registering sessions`, and every tool call in the session is
+denied with `This Claude Code session has no AMC registration, so it is not governed; AMC denied the call.` To watch
+without blocking, install observe mode instead (`--mode observe`), which the start menu does: run `amc` and choose
+"Watch Claude Code as it works". Observe mode records tool calls and never denies one; this page's claims are for
+control mode only.
+
 The `hooks` block below is the `hooks` field of `--dry-run --json` output. Only two paths are machine-specific and were
 replaced: the absolute Node binary that ran the install (`/usr/local/bin/node`) and AMC's forwarder entry (an install
 under `/usr/local/lib/node_modules/agent-maturity-compass`). Each handler runs in exec form (`args`, no shell).

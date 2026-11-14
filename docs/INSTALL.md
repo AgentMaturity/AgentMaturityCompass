@@ -71,6 +71,8 @@ pnpm run build
 npm link            # makes `amc` available globally
 ```
 
+Then go to your project folder and type `amc`. In a terminal it shows the start menu (watch Claude Code or Codex, chat, open the console, or show the score); [Your first five minutes](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/FIRST_FIVE_MINUTES.md) walks through it.
+
 AMC is a pnpm workspace (`packageManager` pins the version). `npm ci` cannot resolve the `workspace:*`
 protocol the vendored `@amc/*` packages use, so it fails here by design.
 `pnpm run build` compiles the CLI; the vendored packages and `@amc/core` ship

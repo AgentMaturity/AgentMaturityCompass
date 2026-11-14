@@ -14,7 +14,9 @@ amc up
 amc status
 ```
 
-`amc up` prints Studio, gateway, proxy, and dashboard URLs.
+`amc up` prints Studio, gateway, proxy, and dashboard URLs. When port 3212 is busy and no port was configured, Studio listens on a free port, and the printed console URL uses it. In a terminal, "Open the console in my browser" in the `amc` start menu runs `amc up` when AMC is not running, then opens the console.
+
+The first screen after sign-in shows one plain status line (with Details), one card ("See what your AI agent really does.") with **Run a task** (**Try a demo task** in the demo workspace) and **Connect my agent**, a progress line, and everything else under **More**. "How AMC works" in the top bar opens a three-step guide; it does not open by itself. A signed-out page shows `Authentication required.` with a Sign in link; the first account comes from `amc user init` below.
 
 ## Accounts
 
