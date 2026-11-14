@@ -53,7 +53,7 @@ import { createWorkspaceRecord, getWorkspaceRecord, initHostDb } from "../worksp
 import { hostWorkspaceDir } from "../workspaces/workspacePaths.js";
 import { isPublicBind } from "../config/loadConfig.js";
 import { assertProxyTrustNamed, assertPublicBindAcknowledged, resolveListenPolicy } from "./listenPolicy.js";
-import { assertPortFree, closeStartedThenThrow, defaultPortOrFree, listenOnPolicyPort } from "./studioLifecycle.js";
+import { assertPortFree, closeStartedThenThrow, listenOnPolicyPort } from "./studioLifecycle.js";
 import { previousStudioApiPort } from "./studioBridge.js";
 import { VAULT_LOCKED_MESSAGE } from "../vault/vaultLockedError.js";
 
@@ -430,28 +430,18 @@ export async function runStudioForeground(params: {
   }
   await assertPortFree(listen.apiHost, listen.apiPort, listen.apiPortSource);
   await assertPortFree(metricsHost, listen.metricsPort, listen.metricsPortSource);
-  // The gateway opens its session before it listens, so its ports are settled first (skeptic D4). A configured port that
-  // is busy is refused. The default one (3210, set by nobody) moves to a free port and says so: a second AMC folder on
-  // the same machine must still start. `amc connect` reads the port from this Studio's state, never the default.
-  const portNotes: string[] = []; // repeated by `amc up`, whose daemon's console is only the log
-  const note = (line: string): void => { portNotes.push(line); console.log(line); };
+  // The gateway never falls back and opens its session before it listens, so its busy ports are refused first (skeptic D4).
   const gatewayHost = params.gatewayHost ?? listen.apiHost, gatewayConfig = loadGatewayConfig(workspace);
-  const env = params.env ?? {};
-  const settle = async (label: string, port: number | undefined, configured: number, envName: string): Promise<number | undefined> => {
-    if (port === undefined) { await assertPortFree(gatewayHost, configured, "the gateway config"); return undefined; }
-    if (env[envName]) { await assertPortFree(gatewayHost, port, envName); return port; }
-    const chosen = await defaultPortOrFree(gatewayHost, port);
-    if (chosen !== port) note(`${label} port ${port} was busy (another AMC folder may be running); listening on ${chosen}. Set ${envName} to choose one.`);
-    return chosen;
-  };
-  const gatewayPort = await settle("Gateway", params.gatewayPort, gatewayConfig.listen.port, "AMC_GATEWAY_PORT");
-  const proxyPort = gatewayConfig.proxy.enabled ? await settle("Proxy", params.proxyPort, gatewayConfig.proxy.port, "AMC_PROXY_PORT") : params.proxyPort;
+  await assertPortFree(gatewayHost, params.gatewayPort ?? gatewayConfig.listen.port, params.gatewayPort === undefined ? "the gateway config"
+    : (params.env ?? {}).AMC_GATEWAY_PORT ? "AMC_GATEWAY_PORT" : "the default gateway port; set AMC_GATEWAY_PORT to change it");
+  if (gatewayConfig.proxy.enabled) await assertPortFree(gatewayHost, params.proxyPort ?? gatewayConfig.proxy.port, params.proxyPort === undefined ? "the gateway config"
+    : (params.env ?? {}).AMC_PROXY_PORT ? "AMC_PROXY_PORT" : "the default proxy port; set AMC_PROXY_PORT to change it");
   const gateway = await startGateway({
     workspace,
     workspaceId: workspaceIdFromDirectory(workspace),
     listenHost: gatewayHost,
-    listenPort: gatewayPort,
-    proxyPort,
+    listenPort: params.gatewayPort,
+    proxyPort: params.proxyPort,
     allowedCidrs: listen.allowedCidrs,
     maxRequestBytes: params.gatewayMaxRequestBytes,
     allowQueryCarrierOverride: params.queryLeaseCarrierEnabled
@@ -496,8 +486,9 @@ export async function runStudioForeground(params: {
     start: (port) => serveDashboard({ workspace, agentId, port, outDir: dashboardOut }) }));
   started.push(() => dashboard.close());
 
+  const portNotes: string[] = []; // repeated by `amc up`, whose daemon's console is only the log
   const api = await guard(() => listenOnPolicyPort({ label: "Studio API", port: listen.apiPort, source: listen.apiPortSource,
-    preferredPort: previousStudioApiPort(workspace), log: note,
+    preferredPort: previousStudioApiPort(workspace), log: (line) => { portNotes.push(line); console.log(line); },
     start: (port) => startStudioApiServer({ workspace, host: listen.apiHost, port, token, allowedCidrs: listen.allowedCidrs,
       trustedProxyHops: params.trustedProxyHops, trustedProxyCidrs: listen.trustedProxyCidrs, maxRequestBytes: params.maxRequestBytes, corsAllowedOrigins: params.corsAllowedOrigins }) }));
   started.push(() => api.close());

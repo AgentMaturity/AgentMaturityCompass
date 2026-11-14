@@ -13,6 +13,7 @@ import { join } from "node:path";
 import inquirer from "inquirer";
 import { getAgentPaths } from "../fleet/paths.js";
 import { runningStudioBridgeBase } from "../studio/studioBridge.js";
+import { defaultPortOrFree } from "../studio/studioLifecycle.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { inspectSignIn, type SignInReport } from "./agentSignIn.js";
 import { NATIVE_FIRST_USE_PROVIDERS } from "./nativeFirstUseGuide.js";
@@ -102,6 +103,9 @@ export function parseLastChoice(text: string | null): FrontDoorChoice | null {
   }
 }
 
+/** AMC's default gateway and proxy ports (src/config/envSchema.ts, src/gateway/config.ts): one set per machine. */
+const DEFAULT_GATEWAY_PORT = 3210;
+const DEFAULT_PROXY_PORT = 3211;
 const choicePath = (workspace: string): string => join(workspace, ".amc", "front-door.json");
 
 export function readLastChoice(workspace: string): FrontDoorChoice | null {
@@ -124,7 +128,9 @@ export interface FrontDoorIo {
    * own chat, for `amc up` and for the hook install the operator just said yes to: they may inherit the vault passphrase
    * bare amc already resolved for this operator. The vendor sign-in and claude or codex never get it.
    */
-  readonly runAmc: (args: readonly string[], chat?: boolean) => number;
+  readonly runAmc: (args: readonly string[], chat?: boolean, extraEnv?: Readonly<Record<string, string>>) => number;
+  /** Free ports for this folder when another AMC folder holds the default gateway port and none was configured; else null. */
+  readonly portsIfDefaultBusy: () => Promise<{ AMC_GATEWAY_PORT: string; AMC_PROXY_PORT: string } | null>;
   /** Runs claude or codex in this folder with the terminal attached; returns its exit code. */
   readonly runTool: (binary: string) => number;
   readonly openUrl: (url: string) => boolean;
@@ -134,18 +140,32 @@ export interface FrontDoorIo {
   readonly showScore: (nextStep: string) => Promise<void>;
 }
 
-/** The running AMC's origin, starting it with `amc up` (its own prompts and gates) when none runs. */
-function ensureStudio(io: FrontDoorIo): string | null {
+/**
+ * The running AMC's origin, starting it with `amc up` (its own gates) when none runs. AMC's default gateway port is
+ * shared by every folder, and a busy one is refused on purpose (clients that assume it would reach the other folder's
+ * gateway). So when another folder holds it, the operator is asked before this folder starts on ports of its own.
+ */
+async function ensureStudio(io: FrontDoorIo): Promise<string | null> {
   const running = io.studioOrigin();
   if (running !== null) return running;
+  const ownPorts = await io.portsIfDefaultBusy();
+  if (ownPorts !== null) {
+    io.log("Another AMC folder is already running on this Mac and holds AMC's default ports.");
+    if (!(await io.confirm("Start AMC for this folder on its own ports? (Watching Claude Code or Codex and the console work the same.)"))) {
+      io.log("Nothing was started. To use the default ports here, run amc down in the other folder first.");
+      return null;
+    }
+    io.log(`This folder's AMC uses gateway port ${ownPorts.AMC_GATEWAY_PORT}. Commands that send model traffic through AMC's gateway from here need `
+      + `AMC_GATEWAY_PORT=${ownPorts.AMC_GATEWAY_PORT} set; amc connect prints the right address.`);
+  }
   io.log("Starting AMC on this Mac...");
-  const origin = io.runAmc(["up", "--no-baseline"], true) === 0 ? io.studioOrigin() : null;
+  const origin = io.runAmc(["up", "--no-baseline"], true, ownPorts ?? undefined) === 0 ? io.studioOrigin() : null;
   if (origin === null) io.log("AMC did not start; the lines above say why. Fix that, then run amc again.");
   return origin;
 }
 
 async function watchAgent(io: FrontDoorIo, agent: (typeof AGENTS)[keyof typeof AGENTS]): Promise<void> {
-  const origin = ensureStudio(io);
+  const origin = await ensureStudio(io);
   if (origin === null) return;
   if (!(await io.confirm(`Add AMC's watch hook to this project's ${agent.name} settings? It sends what ${agent.name} does to AMC on this Mac (${origin}).`))) {
     io.log(`Nothing was changed. To add it later: amc connect hooks install --provider ${agent.provider} --mode observe --agent default`);
@@ -162,8 +182,8 @@ async function watchAgent(io: FrontDoorIo, agent: (typeof AGENTS)[keyof typeof A
   io.log(`See what AMC recorded in the console: ${origin}/console`);
 }
 
-function openConsole(io: FrontDoorIo): void {
-  const origin = ensureStudio(io);
+async function openConsole(io: FrontDoorIo): Promise<void> {
+  const origin = await ensureStudio(io);
   if (origin === null) return;
   const url = `${origin}/console`;
   io.log(io.openUrl(url) ? `Opening ${url}` : `Open ${url} in your browser.`);
@@ -177,7 +197,7 @@ async function act(io: FrontDoorIo, choice: FrontDoorChoice, state: FrontDoorSta
     case "sign-in-codex": io.runAmc(["login", "codex"]); return "menu";
     case "chat": io.runAmc(chatArgs(state.providerKeys[0] ?? null), true); return "done";
     case "demo-chat": io.runAmc(chatArgs(null), true); return "done";
-    case "console": openConsole(io); return "done";
+    case "console": await openConsole(io); return "done";
     default: await io.showScore(scoreNextStep(state)); return "done";
   }
 }
@@ -236,7 +256,12 @@ export function terminalFrontDoorIo(params: { workspace: string; agentId: string
     select: async (message, options, selected) => (await inquirer.prompt<{ choice: FrontDoorChoice }>([{ type: "select", name: "choice", message,
       choices: options.map((option) => ({ name: option.name, value: option.value })), default: selected }])).choice,
     confirm: async (message) => (await inquirer.prompt<{ yes: boolean }>([{ type: "confirm", name: "yes", message, default: true }])).yes,
-    runAmc: (args, chat) => attached(process.execPath, [entry, ...args], workspace, chat === true ? process.env : operatorEnv),
+    runAmc: (args, chat, extraEnv) => attached(process.execPath, [entry, ...args], workspace, { ...(chat === true ? process.env : operatorEnv), ...extraEnv }),
+    portsIfDefaultBusy: async () => {
+      if ((operatorEnv.AMC_GATEWAY_PORT ?? "").length > 0) return null;
+      const gateway = await defaultPortOrFree("127.0.0.1", DEFAULT_GATEWAY_PORT);
+      return gateway === DEFAULT_GATEWAY_PORT ? null : { AMC_GATEWAY_PORT: String(gateway), AMC_PROXY_PORT: String(await defaultPortOrFree("127.0.0.1", DEFAULT_PROXY_PORT)) };
+    },
     runTool: (binary) => attached(binary, [], workspace, operatorEnv),
     openUrl: params.openUrl,
     studioOrigin: () => studioOrigin(workspace),

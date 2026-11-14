@@ -149,7 +149,8 @@ function fake(picks: FrontDoorChoice[], over: Partial<FrontDoorIo> & { states?: 
     detect: () => states[Math.min(detected++, states.length - 1)]!,
     select: async () => picks.shift()!,
     confirm: async () => answers.shift() ?? true,
-    runAmc: (args, chat) => { f.amc.push(chat === true ? ["(chat env)", ...args] : [...args]); return codes.shift() ?? 0; },
+    runAmc: (args, chat, extraEnv) => { f.amc.push([...(chat === true ? ["(chat env)"] : []), ...args, ...Object.entries(extraEnv ?? {}).map(([name, value]) => `${name}=${value}`)]); return codes.shift() ?? 0; },
+    portsIfDefaultBusy: async () => null,
     runTool: (binary) => { f.tools.push(binary); return 0; },
     openUrl: (url) => { f.opened.push(url); return true; },
     studioOrigin: () => (origins.length > 1 ? origins.shift()! : origins[0]!),
@@ -161,6 +162,22 @@ function fake(picks: FrontDoorChoice[], over: Partial<FrontDoorIo> & { states?: 
 }
 
 describe("runFrontDoor", () => {
+  // 2026-11-14: AMC's default gateway port is one per machine and a busy one is refused, so a second folder could not start.
+  it("when another AMC folder holds the default ports, asks before starting this folder on its own, and names the port", async () => {
+    const ports = { AMC_GATEWAY_PORT: "50001", AMC_PROXY_PORT: "50002" };
+    const yes = fake(["console"], { portsIfDefaultBusy: async () => ports, answers: [true] });
+    await runFrontDoor(yes.io);
+    expect(yes.amc).toEqual([["(chat env)", "up", "--no-baseline", "AMC_GATEWAY_PORT=50001", "AMC_PROXY_PORT=50002"]]);
+    expect(yes.lines.join("\n")).toContain("Another AMC folder is already running");
+    expect(yes.lines.join("\n")).toContain("AMC_GATEWAY_PORT=50001");
+    const no = fake(["console"], { portsIfDefaultBusy: async () => ports, answers: [false] });
+    await runFrontDoor(no.io);
+    expect(no.amc).toEqual([]);
+    expect(no.opened).toEqual([]);
+    expect(no.lines.join("\n")).toContain("run amc down in the other folder");
+  });
+
+
   it("watch Claude Code: starts AMC, asks before writing the hook, installs observe only, then offers to start claude", async () => {
     const f = fake(["watch-claude"], { answers: [true, true] });
     await runFrontDoor(f.io);

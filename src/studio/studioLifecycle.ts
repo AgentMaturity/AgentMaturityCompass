@@ -8,7 +8,8 @@ import { createServer } from "node:net";
 const addressInUse = (error: unknown): boolean => String(error).includes("EADDRINUSE");
 
 function portInUseError(port: number, source: string): Error {
-  return new Error(`Port ${port} (from ${source}) is already in use. Stop the other process or change the port.`);
+  return new Error(`Port ${port} (from ${source}) is already in use. Stop the other process or change the port.${source.startsWith("the default")
+    ? " Another AMC folder may be running: stop it there with amc down, or give this folder its own ports." : ""}`);
 }
 
 /** Bind and close host:port, so a configured port that is busy is refused before anything starts (D-R7). */
@@ -21,12 +22,8 @@ export async function assertPortFree(host: string, port: number, source: string 
   });
 }
 
-/**
- * A default port nobody configured: itself while it is free, else a free one picked by the OS. For a listener that must
- * know its port before it starts (the gateway opens its ledger session first, D4), so the choice is made by probing.
- */
+/** `port` while it is free on `host`, else a free one picked by the OS. A probe: the caller still has to bind it. */
 export async function defaultPortOrFree(host: string, port: number): Promise<number> {
-  if (port === 0) return 0;
   const probe = (candidate: number): Promise<number> => new Promise((resolvePromise, rejectPromise) => {
     const server = createServer();
     server.once("error", rejectPromise);
