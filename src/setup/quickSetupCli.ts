@@ -1,8 +1,23 @@
 import type { Command } from "commander";
+import chalk from "chalk";
 import { runQuickSetup } from "./quickSetup.js";
 import { mkdirSync, writeFileSync, existsSync } from "fs";
 import { join } from "path";
 import { createOnboardingState, saveOnboardingState, setOnboardingStep } from "./onboardingState.js";
+
+/**
+ * CLI-14: what `amc setup --demo` made, said plainly. The note file is not evidence and nothing scores it, so the score
+ * stays L0 until AMC records a run; colour goes through chalk, which prints none without a terminal.
+ */
+export const DEMO_SETUP_SUMMARY: readonly string[] = [
+  "✓ Demo workspace created!",
+  "  Agent ID: demo-agent",
+  "  .amc/amc.config.yaml — workspace config",
+  "  .amc/evidence/demo-evidence.json — a placeholder note; it is not evidence and nothing scores it",
+  "",
+  "  The score for demo-agent stays L0 until AMC records a run it can score.",
+  "  Next: amc --agent demo-agent shows that empty score; run amc in your terminal to pick what to watch."
+];
 
 export function registerQuickSetupCommand(program: Command): void {
   program
@@ -51,11 +66,9 @@ export function registerQuickSetupCommand(program: Command): void {
         onboarding = setOnboardingStep(onboarding, "score", "pending", "Run `amc --agent demo-agent` to generate the full score.");
         onboarding = setOnboardingStep(onboarding, "studio", "pending", "Run `amc up` to open Studio.");
         saveOnboardingState(process.cwd(), onboarding);
-        console.log("\x1b[32m✓ Demo workspace created!\x1b[0m");
-        console.log("  Agent ID: demo-agent");
-        console.log("  .amc/amc.config.yaml — workspace config");
-        console.log("  .amc/evidence/demo-evidence.json — sample evidence");
-        console.log("\n  Next: amc --agent demo-agent");
+        const [head, ...rest] = DEMO_SETUP_SUMMARY;
+        console.log(chalk.green(head));
+        for (const line of rest) console.log(line);
         return;
       }
       await runQuickSetup({

@@ -12,7 +12,7 @@ Private keys are not kept in plaintext key files.
 
 ```bash
 amc vault init
-amc vault unlock
+amc vault unlock       # check the passphrase; the vault stays unlocked only while this command runs
 amc vault lock
 amc vault status
 amc vault rotate-keys

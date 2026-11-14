@@ -347,7 +347,7 @@ export function createVault(params: CreateVaultParams): { vaultFile: string; met
 export function unlockVault(workspace: string, passphrase?: string): void {
   const phrase = passphrase ?? process.env.AMC_VAULT_PASSPHRASE;
   if (!phrase || phrase.length === 0) {
-    throw new Error("Vault unlock requires passphrase (set AMC_VAULT_PASSPHRASE or use `amc vault unlock`).");
+    throw new Error("Vault unlock requires passphrase (export AMC_VAULT_PASSPHRASE, or set AMC_VAULT_PASSPHRASE_FILE, in the shell that runs the command).");
   }
   try {
     openVaultSession(workspace, phrase);

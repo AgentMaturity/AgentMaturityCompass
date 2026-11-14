@@ -141,7 +141,7 @@ amc connect hooks health --provider claude-code
 amc connect hooks lifecycle --agent my-agent --action <action-id>
 ```
 
-Use `--provider gemini-cli` for Gemini CLI. `hooks health` shows `awaiting_first_event` until the signed installation delivers a receipt-verified event, then reports only its privacy-safe event/action/receipt references. Drift, expiry, malformed matching metadata, evidence tamper, or a locked Vault that cannot authenticate encrypted bodies fails closed. Run `amc vault unlock`, or set `AMC_VAULT_PASSPHRASE` for non-interactive use. Last-observed time does not prove that a provider is live now. AMC keeps a narrow observation lease out of provider config and retains no raw tool input, output, error message, cwd, transcript path, or session ID. Requested, completed, and failed receipts share one stable action ID; missing or ambiguous terminal correlation fails closed. Observation does not approve or deny provider actions. Remove it with `amc connect hooks remove --provider claude-code`.
+Use `--provider gemini-cli` for Gemini CLI. `hooks health` shows `awaiting_first_event` until the signed installation delivers a receipt-verified event, then reports only its privacy-safe event/action/receipt references. Drift, expiry, malformed matching metadata, evidence tamper, or a locked Vault that cannot authenticate encrypted bodies fails closed. Export `AMC_VAULT_PASSPHRASE` in the shell that runs `hooks health` (`amc vault unlock` lasts only for its own command). Last-observed time does not prove that a provider is live now. AMC keeps a narrow observation lease out of provider config and retains no raw tool input, output, error message, cwd, transcript path, or session ID. Requested, completed, and failed receipts share one stable action ID; missing or ambiguous terminal correlation fails closed. Observation does not approve or deny provider actions. Remove it with `amc connect hooks remove --provider claude-code`.
 
 For explicit signed control, run the local Studio/Bridge and opt in:
 
@@ -456,7 +456,7 @@ amc evidence collect --first-run --dry-run --runtime any -- node agent.js
 amc evidence verify
 
 # Bundle evidence for sharing
-amc bundle export --out evidence.amcbundle
+amc bundle export --run latest --out evidence.amcbundle
 ```
 
 Without `AMC_VAULT_PASSPHRASE` (or with `AMC_NO_SIGN=1`) the first-run capture is unsigned and goes to `.amc/unsigned/evidence.sqlite`, never to the signed `.amc/evidence.sqlite`; score it with `AMC_NO_SIGN=1 amc quickscore --auto`, and capture again with the vault unlocked when you need verifier-ready evidence.
@@ -641,7 +641,7 @@ amc score calibration-gap --json
 amc doctor --json
 ```
 
-The top-level JSON keeps claim readiness explicit: `status` is the evidence-readiness status, `artifactStatus` is the seal result, and `claimEligible` is `true` only for `READY`. Use `claimBoundary` and `nextEvidenceStep` instead of inferring readiness from `signed: true`.
+The top-level JSON keeps claim readiness explicit: `status` and `artifactStatus` are the seal result (`VALID`, `INVALID` or `UNSIGNED`), `evidenceStatus` is the evidence-readiness status, and `claimEligible` is `true` only for `READY`. Use `claimBoundary` and `nextEvidenceStep` instead of inferring readiness from `signed: true`.
 
 Pipe into `jq` for scripting:
 
@@ -658,7 +658,7 @@ amc score formal-spec my-agent --json | jq '.overallScore'
 ### "Doctor result: FAIL"
 This is normal on first run. The doctor checks for optional components:
 - **Studio not running** → Run `amc up`
-- **Vault locked** → Run `amc vault unlock`
+- **Vault locked** → Export `AMC_VAULT_PASSPHRASE` (or set `AMC_VAULT_PASSPHRASE_FILE`) in the shell that runs the signing command. `amc vault unlock` only checks the passphrase: the vault stays unlocked while that one command runs.
 - **Gateway config missing** → Run `amc gateway init`
 - **Signature issues** → Run `amc doctor-fix`
 

@@ -5,7 +5,7 @@ import { loadGatewayConfig } from "../gateway/config.js";
 import { latestActiveWorkOrder } from "../workorders/workorderEngine.js";
 import { issueLeaseForCli } from "../leases/leaseCli.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
-import { readStudioState } from "./studioState.js";
+import { processRunning, readStudioState } from "./studioState.js";
 import { loadAdaptersConfig } from "../adapters/adapterConfigStore.js";
 import { getBuiltInAdapter } from "../adapters/registry.js";
 
@@ -16,6 +16,8 @@ export interface ConnectOutput {
   envLines: string[];
   command: string;
   mode: "supervise" | "sandbox";
+  /** CLI-12: false when no AMC runs in this folder, so nothing listens on routeUrl until `amc up`. */
+  amcRunning: boolean;
   leaseToken: string;
   workOrderId: string | null;
   leaseCarrierHint: string;
@@ -28,6 +30,19 @@ export interface ConnectOutput {
     statusCommand: string | null;
     controlDecision: false;
   };
+}
+
+/** CLI-13: the two modes, said the same way in the refusal, the prompt and the help. */
+const CONNECT_MODES = {
+  supervise: "AMC starts your agent's command with its model calls routed through AMC's gateway, which records them",
+  sandbox: "the same, inside a hardened Docker container (amc sandbox run; needs Docker)"
+} as const;
+export const CONNECT_MODE_HELP = `supervise: ${CONNECT_MODES.supervise}; sandbox: ${CONNECT_MODES.sandbox}`;
+
+/** The port a later `amc up` here would listen on: the env override (AMC_GATEWAY_PORT, AMC_PROXY_PORT) when valid, else the config. */
+function plannedPort(configured: number, override: string | undefined): number {
+  const fromEnv = Number(override ?? "");
+  return Number.isInteger(fromEnv) && fromEnv >= 1 && fromEnv <= 65535 ? fromEnv : configured;
 }
 
 export async function buildConnectInstructions(params: {
@@ -57,20 +72,28 @@ export async function buildConnectInstructions(params: {
     routePrefix = adapterProfile.preferredProviderRoute;
   }
 
+  if (params.mode !== undefined && !Object.hasOwn(CONNECT_MODES, params.mode)) {
+    throw new Error(`Unknown --mode ${JSON.stringify(params.mode)}. Use --mode supervise (${CONNECT_MODES.supervise}) or --mode sandbox (${CONNECT_MODES.sandbox}).`);
+  }
   // Without a terminal the mode prompt can only abort; say which flag answers it.
-  if (params.mode === undefined && !process.stdin.isTTY) throw new Error("amc connect needs a mode and there is no terminal to ask in. Add --mode supervise or --mode sandbox.");
+  if (params.mode === undefined && !process.stdin.isTTY) {
+    throw new Error(`amc connect needs a mode and there is no terminal to ask in. Add --mode supervise (${CONNECT_MODES.supervise}) or --mode sandbox (${CONNECT_MODES.sandbox}).`);
+  }
+  // CLI-13: a fixed choice; "list" fell back to free text and took any answer.
   const selectedMode = params.mode ?? (await inquirer.prompt<{ mode: "supervise" | "sandbox" }>([
     {
-      type: "list",
+      type: "select",
       name: "mode",
       message: "How should this agent run?",
-      choices: ["supervise", "sandbox"],
+      choices: (["supervise", "sandbox"] as const).map((value) => ({ name: `${value}: ${CONNECT_MODES[value]}`, value })),
       default: "supervise"
     }
   ])).mode;
 
-  const gatewayPort = state?.gatewayPort ?? gateway.listen.port;
-  const proxyPort = state?.proxyPort ?? gateway.proxy.port;
+  // CLI-12: a stale state file or the gateway config alone named port 3210 whatever AMC_GATEWAY_PORT said.
+  const running = state !== null && processRunning(state.pid);
+  const gatewayPort = running ? state.gatewayPort : plannedPort(gateway.listen.port, process.env.AMC_GATEWAY_PORT);
+  const proxyPort = running ? state.proxyPort : plannedPort(gateway.proxy.port, process.env.AMC_PROXY_PORT);
   const routeUrl = `http://127.0.0.1:${gatewayPort}${routePrefix}`;
   const activeWorkOrder = latestActiveWorkOrder(params.workspace, agentId);
   const lease = issueLeaseForCli({
@@ -162,6 +185,7 @@ export async function buildConnectInstructions(params: {
     envLines,
     command,
     mode: selectedMode,
+    amcRunning: running,
     leaseToken: lease.token,
     workOrderId: activeWorkOrder?.workOrderId ?? null,
     leaseCarrierHint,

@@ -1275,7 +1275,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc vault scrub` | Scrub metadata from a file | `--json` | - |
 | `amc vault secret-share` | Split a secret into shares using Shamir's Secret Sharing | `--secret <value>`<br>`--shares <n>`<br>`--threshold <k>` | - |
 | `amc vault status` | Show vault status | - | - |
-| `amc vault unlock` | Unlock vault into memory for signing operations | - | - |
+| `amc vault unlock` | Check the vault passphrase (the vault stays unlocked only while this command runs) | - | - |
 | `amc vault zk-commit` | Create a Pedersen commitment to a value | `--value <n>` | - |
 | `amc vault zk-range-proof` | Create a range commitment for an AMC score threshold (NOT a zero-knowledge proof; unsound, does not verify) | `--value <n>`<br>`--threshold <n>`<br>`--agent <id>` | - |
 | `amc vault zk-verify` | Check a range commitment (NOT a zero-knowledge verification; unsound) | - | - |

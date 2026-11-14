@@ -65,9 +65,12 @@ describe("agent config security scanner", () => {
     expect(r.findings.some((f) => f.category === "UNSAFE_MCP" || f.category === "CONFIGURATION")).toBe(true);
   });
 
-  test("empty directory reports an informational no-config finding, not a crash", () => {
+  // CLI-06: this asserted CLEAN (and the scan said L5 SECURE 100/100) for a folder with nothing in it.
+  test("empty directory is not assessed: no level, no score, not CLEAN", () => {
     const r = scanAgentConfig({ root: dir, now: 1 });
     expect(r.findings.some((f) => f.id === "configuration:none")).toBe(true);
-    expect(r.aggregateRisk).toBe("CLEAN");
+    expect(r.aggregateRisk).toBe("NOT_ASSESSED");
+    expect(r.securityLevel).toBeNull();
+    expect(r.securityScore).toBeNull();
   });
 });
