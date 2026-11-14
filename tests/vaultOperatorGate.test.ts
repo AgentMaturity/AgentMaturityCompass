@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -11,6 +11,7 @@ vi.mock("inquirer", () => ({ default: { prompt, createPromptModule: (options: un
 import { setMode } from "../src/mode/mode.js";
 import { initWorkspace } from "../src/workspace.js";
 import { lockVault, vaultStatus } from "../src/vault/vault.js";
+import { keysetAnchoring } from "../src/keys/keyset.js";
 import { AGENT_ENV_MARKERS, askToUnlockForSigning, confirmRememberedUnlock, GOVERNANCE_SIGNING_PATHS, interactiveOperator, isGovernancePath } from "../src/vault/operatorContext.js";
 import { rememberedUnlockLocation, rememberVaultPassphrase, unlockWithRememberedPassphrase } from "../src/vault/passphraseStore.js";
 import { unlockVaultInteractive } from "../src/vault/vaultCli.js";
@@ -268,6 +269,25 @@ describe("a signing command asks an interactive operator for the passphrase inst
     expect(validate(PASS)).toBe(true);
     expect(validate("")).toBe(true);
     expect(vaultStatus(workspace).unlocked).toBe(false);
+  });
+
+  // 2026-11-14: a folder set up by bare amc asked for a passphrase the person had never seen.
+  it("offers the passphrase bare amc saved, by name and with no as the default, only when it opens a vault this machine created", async () => {
+    const workspace = lockedWorkspace();
+    setTTY(process.stdin, true);
+    writeFileSync(join(workspace, ".amc", "local-vault-passphrase"), `${PASS}\n`, { mode: 0o600 });
+    const anchored = keysetAnchoring(workspace).state === "committed";
+    prompt.mockResolvedValueOnce({ useSaved: true }).mockResolvedValue({ passphrase: "" });
+    await askToUnlockForSigning(workspace, "user init");
+    const first = prompt.mock.calls[0]![0][0] as { type: string; default?: boolean; message: string };
+    if (anchored) {
+      expect(first).toMatchObject({ type: "confirm", default: false });
+      expect(first.message).toContain(".amc/local-vault-passphrase");
+      expect(vaultStatus(workspace).unlocked).toBe(true);
+    } else {
+      expect(first.type, "an unanchored vault's file is never offered").toBe("password");
+    }
+    expect(process.env.AMC_VAULT_PASSPHRASE ?? "").toBe("");
   });
 
   it("keeps the refusal for agents, shells without a terminal, reads and other commands", async () => {

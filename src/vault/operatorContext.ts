@@ -119,6 +119,17 @@ export async function askToUnlockForSigning(workspace: string, path: string, env
   if (!signsWithVault(path) || (env.AMC_VAULT_PASSPHRASE ?? "").length > 0 || (env.AMC_VAULT_PASSPHRASE_FILE ?? "").trim().length > 0) return;
   if (!vaultExists(workspace) || vaultStatus(workspace).unlocked || !interactiveOperator({ workspace, env }).ok) return;
   const ask = inquirer.createPromptModule({ input: process.stdin, output: process.stderr });
+  // A folder set up by bare `amc` keeps its passphrase in .amc/local-vault-passphrase, which the person never saw. It is
+  // offered by name (same gates as loadLocalVaultPassphrase: not an agent, and only a vault this machine created), with
+  // "no" as the default like the remembered-store question, and read into a scratch environment, never this process's.
+  const scratch: NodeJS.ProcessEnv = { ...env, AMC_VAULT_PASSPHRASE: "" };
+  const { loadLocalVaultPassphrase } = await import("./localPassphrase.js");
+  const saved = loadLocalVaultPassphrase(workspace, scratch).loaded ? scratch.AMC_VAULT_PASSPHRASE ?? "" : "";
+  if (saved.length > 0 && vaultOpensWith(workspace, saved)) {
+    const { useSaved } = await ask<{ useSaved: boolean }>([{ type: "confirm", name: "useSaved", default: false,
+      message: `Use the vault passphrase AMC saved in .amc/local-vault-passphrase to sign amc ${path}?` }]);
+    if (useSaved === true) { unlockVault(workspace, saved); return; }
+  }
   const { passphrase } = await ask<{ passphrase: string }>([{
     type: "password", name: "passphrase", mask: "*",
     message: `amc ${path} signs with the vault keys. Vault passphrase (empty to continue without):`,
