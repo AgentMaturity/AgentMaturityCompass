@@ -111,7 +111,7 @@ main :where(p, li, dd) code { overflow-wrap: anywhere; }
 .prose .dots + p { margin-top: 16px; }
 
 /* ── Page not found ──────────────────────────────────────────────────── */
-.nf { min-height: 76vh; display: grid; align-content: center; }
+.nf { min-height: 76vh; display: grid; align-content: center; padding-top: var(--nav-h); }
 .nf h1 { margin: 10px 0 18px; }
 .nf .cta-row { margin-top: 30px; }
 
@@ -128,3 +128,8 @@ main :where(p, li, dd) code { overflow-wrap: anywhere; }
 @media (prefers-reduced-motion: reduce) {
   .qa summary::after { transition: none; }
 }
+
+/* ── Lite page ───────────────────────────────────────────────────────── */
+.lite-prose { max-width: 52em; margin-top: 18px; }
+.lite-prose p + p { margin-top: 12px; }
+.page-hero .stats { max-width: 760px; }
