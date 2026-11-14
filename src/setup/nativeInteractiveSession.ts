@@ -165,9 +165,8 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
   // No shell, alternate runner, approval bypass, or background session writer.
   // `display.stdin` is written to the child's stdin and closed (the turn prompt: `run -` reads it, so the entered text
   // is never an argv word and a bare "-" is a prompt, not a flag); without it the child's stdin is closed from the start.
-  const execute = (args: readonly string[], display: { interactiveApprovals?: boolean; askUser?: boolean; stream?: boolean; stdin?: string } = {}): Promise<{ code: number | null; stdout: string; truncated: boolean; cancelRequested: boolean; vaultLocked: boolean }> => new Promise(resolveSettled => {
+  const execute = (args: readonly string[], display: { interactiveApprovals?: boolean; askUser?: boolean; stream?: boolean; stdin?: string } = {}): Promise<{ code: number | null; stdout: string; truncated: boolean; cancelRequested: boolean; vaultLocked: boolean }> => new Promise(resolveResult => {
     let vaultLocked = false;
-    const resolveResult = (result: { code: number | null; stdout: string; truncated: boolean; cancelRequested: boolean }) => resolveSettled({ ...result, vaultLocked });
     let stdout = "";
     let truncated = false;
     let cancelRequested = false;
@@ -183,7 +182,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         cwd, env, shell: false,
         stdio: [display.stdin === undefined ? "ignore" : "pipe", "pipe", "pipe", ...(ipc ? ["ipc" as const] : [])]
       });
-    } catch { io.error("Could not start the AMC command."); resolveResult({ code: 1, stdout, truncated, cancelRequested }); return; }
+    } catch { io.error("Could not start the AMC command."); resolveResult({ code: 1, stdout, truncated, cancelRequested, vaultLocked }); return; }
     child = running;
     if (display.stdin !== undefined) {
       // A child that exits before reading (a refused flag) closes the pipe; that EPIPE is not this turn's outcome.
@@ -236,7 +235,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
           if (previewOpen) process.stderr.write("\n");
           if (child === running) child = null;
           if (cancelActiveCommand === requestCancel) cancelActiveCommand = null;
-          resolveResult({ code: finalCode, stdout, truncated, cancelRequested });
+          resolveResult({ code: finalCode, stdout, truncated, cancelRequested, vaultLocked });
         }
       })();
     });

@@ -17,7 +17,7 @@ describe("the Node an observation hook names survives brew upgrade", () => {
     expect(stableNodePath(deps())).toBe("/opt/homebrew/opt/node/bin/node");
   });
   it("falls back to a node on PATH that resolves to the same binary, skipping one that resolves elsewhere", () => {
-    const noOpt = { ...links, "/opt/homebrew/opt/node/bin/node": "/elsewhere" };
+    const noOpt: Record<string, string> = { ...links, "/opt/homebrew/opt/node/bin/node": "/elsewhere" };
     expect(stableNodePath(deps({ realpath: (path) => noOpt[path] ?? null }))).toBe("/opt/homebrew/bin/node");
   });
   it("keeps process.execPath when nothing stable resolves to it", () => {
