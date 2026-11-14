@@ -20,7 +20,7 @@ rules are in `spec/ACCEPTANCE_RULES.md` ("A4 project record").
 ## Try it in ten minutes
 
 This walk was run against the current source build on 2026-11-14 in an empty workspace with three local users. The
-published 1.1.1 release does not contain A4: install [from source](../README.md#from-source) first. On a laptop the walk
+published 1.1.1 release does not contain A4: install [from source](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/README.md#from-source) first. On a laptop the walk
 completes Aspire, Assemble and Adapt and stops at Activate's release approval (see step 6).
 
 1. **Start Studio with the flag.** A Studio that is already running keeps the environment it started with, so stop it

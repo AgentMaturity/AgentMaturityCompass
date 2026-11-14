@@ -618,7 +618,7 @@ function limitations(provider: ConfigHookProvider, mode: HookMode): string[] {
     provider === "gemini-cli"
       ? "Gemini CLI does not expose a general provider tool-call ID in the pinned contract, so action identity is derived"
       : "Claude Code tool_use_id is used when present; otherwise action identity is derived",
-    "Codex, Cursor, OpenCode, and other providers remain unsupported until their native contracts are pinned and fixture-tested"
+    "Codex is supported in observe mode only (amc connect hooks install --provider codex); Cursor, OpenCode, and other providers remain unsupported until their native contracts are pinned and fixture-tested"
   ];
 }
 
