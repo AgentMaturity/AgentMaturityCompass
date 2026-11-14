@@ -13,7 +13,9 @@ export function writeFileAtomic(path: string, data: string | Uint8Array, mode?: 
   ensureDir(dir);
   const tmp = join(dir, `.${randomBytes(6).toString("hex")}.tmp`);
   try {
-    writeFileSync(tmp, data, "utf8");
+    // The mode is set when the file is created: a secret written 0644 and tightened afterwards is readable in between.
+    // "wx" refuses a name someone else put there first. chmod then clears any bits a loose umask could not.
+    writeFileSync(tmp, data, { encoding: "utf8", mode: mode ?? 0o666, flag: "wx" });
     if (mode !== undefined) {
       chmodSync(tmp, mode);
     }

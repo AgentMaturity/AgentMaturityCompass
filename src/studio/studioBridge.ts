@@ -20,12 +20,18 @@ export function previousStudioApiPort(workspace: string): number | null {
   return Number.isInteger(port) && port > 0 && port < 65536 ? port : null;
 }
 
+const LOOPBACK_HOSTS: ReadonlySet<string> = new Set(["127.0.0.1", "localhost", "::1"]);
+
 /** The loopback Bridge origin of the Studio running for this workspace, or null when none runs. */
 export function runningStudioBridgeBase(workspace: string, isRunning: (pid: number) => boolean = processRunning): string | null {
   let state: ReturnType<typeof readStudioState>;
   try { state = readStudioState(workspace); } catch { return null; }
-  if (state === null || !Number.isInteger(state.apiPort) || state.apiPort <= 0 || !isRunning(state.pid)) return null;
+  if (state === null || !Number.isInteger(state.apiPort) || state.apiPort <= 0 || state.apiPort > 65535) return null;
+  if (!Number.isInteger(state.pid) || state.pid <= 0 || !isRunning(state.pid)) return null;
+  // state.json is an unsigned file inside the workspace, and a copied or cloned folder can ship one. A hook target is
+  // taken from it only when it is this machine: any other host would send the agent's tool calls to someone else.
   const host = state.host === "0.0.0.0" || state.host === "::" || !state.host ? "127.0.0.1" : state.host;
+  if (!LOOPBACK_HOSTS.has(host)) return null;
   return `http://${host.includes(":") ? `[${host}]` : host}:${state.apiPort}`;
 }
 

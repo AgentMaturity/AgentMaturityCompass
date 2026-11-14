@@ -632,6 +632,14 @@ describe("multi-workspace host mode", () => {
         url: `http://127.0.0.1:${port}/w/ws-b/console`,
         method: "GET"
       });
+      // 2026-11-14: the router forwarded only the path, so every workspace API read lost its query (Policy Packs
+      // answered "actionClass query parameter is required" although the page sent it).
+      const withQuery = await httpRaw({
+        url: `http://127.0.0.1:${port}/w/ws-a/api/v1/policy/action/evidence-logic?actionClass=DEPLOY`,
+        method: "GET",
+        cookie: workspaceCookie
+      });
+      expect(withQuery.body).not.toContain("actionClass query parameter is required");
 
       expect(defaultConsole.status).toBe(200);
       expect(defaultConsole.body).toContain("Compass Console - AMC Studio");

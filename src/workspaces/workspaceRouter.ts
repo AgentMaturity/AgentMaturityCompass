@@ -1657,7 +1657,9 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
 
       const runtime = await ensureWorkspaceApi(urlWorkspaceId);
       for (const name of SECURITY_HEADER_NAMES) res.removeHeader(name); // the workspace API's own headers apply (LIVE-RUNTIME-07)
-      await proxyStudioWorkspaceRequest(req, res, runtime, nativeRequest ? `${workspacePath}${url.search}` : workspacePath, { clientIp, trustedHttps });
+      // The query is part of the request: without it every filter and parameter of a workspace API read is silently dropped
+      // (Policy Packs answered ACTION_RULE_MISSING, Compare ignored compareTo). No inner route authenticates by query.
+      await proxyStudioWorkspaceRequest(req, res, runtime, `${workspacePath}${url.search}`, { clientIp, trustedHttps });
     } catch (error) {
       if (error instanceof WorkspaceRuntimeClosingError) { writeControlError(res, 503, error.message); return; }
       if (error instanceof NativeAdmissionError) {

@@ -48,7 +48,7 @@ export async function proxyStudioWorkspaceRequest(
     res.statusCode = upstreamRes.statusCode ?? 500;
     for (const [key, value] of Object.entries(upstreamRes.headers)) {
       if (value === undefined) continue;
-      if (key.toLowerCase() === "service-worker-allowed" && targetPath === "/console/assets/sw.js") {
+      if (key.toLowerCase() === "service-worker-allowed" && targetPathname === "/console/assets/sw.js") {
         const originalPath = new URL(req.url ?? "/", "http://localhost").pathname;
         const suffix = "/assets/sw.js";
         res.setHeader(key, originalPath.endsWith(suffix) ? `${originalPath.slice(0, -suffix.length)}/` : value);

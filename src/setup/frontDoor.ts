@@ -12,7 +12,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import inquirer from "inquirer";
 import { getAgentPaths } from "../fleet/paths.js";
-import { processRunning, readStudioState } from "../studio/studioState.js";
+import { runningStudioBridgeBase } from "../studio/studioBridge.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { inspectSignIn, type SignInReport } from "./agentSignIn.js";
 import { NATIVE_FIRST_USE_PROVIDERS } from "./nativeFirstUseGuide.js";
@@ -120,8 +120,9 @@ export interface FrontDoorIo {
   /** A yes/no question whose default is yes. */
   readonly confirm: (message: string) => Promise<boolean>;
   /**
-   * Runs this AMC CLI with the terminal attached; returns its exit code. `chat` is true only for `amc agent-loop chat`:
-   * it may inherit the vault passphrase bare amc already resolved for this operator, as chat hands it to its own turns.
+   * Runs this AMC CLI with the terminal attached; returns its exit code. `chat` (the vault environment) is true for AMC's
+   * own chat, for `amc up` and for the hook install the operator just said yes to: they may inherit the vault passphrase
+   * bare amc already resolved for this operator. The vendor sign-in and claude or codex never get it.
    */
   readonly runAmc: (args: readonly string[], chat?: boolean) => number;
   /** Runs claude or codex in this folder with the terminal attached; returns its exit code. */
@@ -138,7 +139,7 @@ function ensureStudio(io: FrontDoorIo): string | null {
   const running = io.studioOrigin();
   if (running !== null) return running;
   io.log("Starting AMC (amc up)...");
-  const origin = io.runAmc(["up"]) === 0 ? io.studioOrigin() : null;
+  const origin = io.runAmc(["up"], true) === 0 ? io.studioOrigin() : null;
   if (origin === null) io.log("AMC did not start; the lines above say why. Fix that, then run amc again.");
   return origin;
 }
@@ -146,12 +147,13 @@ function ensureStudio(io: FrontDoorIo): string | null {
 async function watchAgent(io: FrontDoorIo, agent: (typeof AGENTS)[keyof typeof AGENTS]): Promise<void> {
   const origin = ensureStudio(io);
   if (origin === null) return;
-  if (!(await io.confirm(`Add AMC's watch hook to this project's ${agent.name} settings?`))) {
+  if (!(await io.confirm(`Add AMC's watch hook to this project's ${agent.name} settings? It sends what ${agent.name} does to AMC on this Mac (${origin}).`))) {
     io.log(`Nothing was changed. To add it later: amc connect hooks install --provider ${agent.provider} --mode observe --agent default`);
     return;
   }
   const install = ["connect", "hooks", "install", "--provider", agent.provider, "--mode", "observe", "--agent", "default", "--bridge-url", origin];
-  if (io.runAmc(install) !== 0) {
+  // The yes above is the operator's go-ahead for this one signed change, so the install runs with the vault as this menu holds it.
+  if (io.runAmc(install, true) !== 0) {
     io.log("The watch hook was not installed; the lines above say why.");
     return;
   }
@@ -211,17 +213,17 @@ function hasRun(workspace: string, agentId: string): boolean {
   }
 }
 
+/** Loopback only: the state file is unsigned workspace content, so a host that is not this machine is never a hook target. */
 function studioOrigin(workspace: string): string | null {
-  const studio = readStudioState(workspace);
-  return studio !== null && processRunning(studio.pid) ? `http://${studio.host}:${studio.apiPort}` : null;
+  return runningStudioBridgeBase(workspace);
 }
 
 /**
  * The terminal, process and file I/O runFrontDoor uses in a real terminal. `operatorEnv` is the environment as the
  * operator started amc, taken before the workspace step: that step can put the local vault passphrase into this
  * process's environment (loadLocalVaultPassphrase: an operator, never an agent, and only for a vault this machine
- * created). Only AMC's own chat inherits it, as bare amc signs its score with it; `amc up`, the hook install and the
- * sign-in ask through their own gates, and claude or codex never see it.
+ * created). AMC's own chat, `amc up` and the hook install the operator confirmed inherit it, as bare amc signs its score with it.
+ * The vendor sign-in, claude and codex never see it.
  */
 export function terminalFrontDoorIo(params: { workspace: string; agentId: string; operatorEnv: NodeJS.ProcessEnv;
   openUrl: (url: string) => boolean; showScore: (nextStep: string) => Promise<void> }): FrontDoorIo {

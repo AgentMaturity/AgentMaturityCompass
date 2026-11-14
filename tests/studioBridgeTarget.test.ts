@@ -20,6 +20,8 @@ function workspace(): string {
 const state = (over: Partial<StudioState> = {}): StudioState => ({ pid: process.pid, startedTs: 1, apiPort: 63742, gatewayPort: 3210, proxyPort: 0,
   dashboardPort: 4173, host: "127.0.0.1", currentAgent: "default", vaultUnlocked: true, untrustedConfig: false, logFile: "x", ...over });
 
+const workspaceWith = (ws: string, host: string): string => { writeStudioState(ws, state({ host })); return ws; };
+
 describe("hooks send events to this workspace's own Studio", () => {
   it("reads the Bridge origin of the Studio running here, and nothing when none runs", () => {
     const ws = workspace();
@@ -29,6 +31,19 @@ describe("hooks send events to this workspace's own Studio", () => {
     expect(runningStudioBridgeBase(ws, () => false), "a stale state file is not a running Studio").toBeNull();
     writeStudioState(ws, state({ host: "0.0.0.0" }));
     expect(runningStudioBridgeBase(ws)).toBe("http://127.0.0.1:63742");
+  });
+
+  it("never takes a hook target that is not this machine from the unsigned state file (a copied or cloned folder can ship one)", () => {
+    const ws = workspace();
+    for (const host of ["evil.example", "10.0.0.7", "169.254.169.254", "127.0.0.1.evil.example"]) {
+      writeStudioState(ws, state({ host }));
+      expect(runningStudioBridgeBase(ws), host).toBeNull();
+    }
+    writeStudioState(ws, state({ apiPort: 70000 }));
+    expect(runningStudioBridgeBase(ws)).toBeNull();
+    writeStudioState(ws, state({ host: "::1" }));
+    expect(runningStudioBridgeBase(ws)).toBe("http://[::1]:63742");
+    expect(() => requireStudioBridgeBase(workspaceWith(ws, "evil.example"), undefined)).toThrow("Start AMC here first");
   });
 
   it("uses an explicit --bridge-url, else the running Studio, else refuses with the fix instead of guessing", () => {
