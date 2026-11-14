@@ -17,7 +17,8 @@ import {
 import { isHookProvider } from "../bridge/hookProviders.js";
 import { findPiPackage } from "./pi/piInstall.js";
 import { findDshPackage } from "./dsh/dshInstall.js";
-import { findClaudeCode } from "./hookProviders/claudeCode.js";
+import { CLAUDE_MANAGED_SETTINGS_DIRS, findClaudeCode } from "./hookProviders/claudeCode.js";
+import { claudeSettingsRefusal } from "../agent/providers/claudeCliProvider.js";
 import { CODEX_NEXT_STEPS } from "./hookProviders/codex.js";
 import { claudeHookSchemasFor } from "./hookProviders/claudeCodePayloads.js";
 import { normalizeBridgeBase } from "./hookProviders/installFiles.js";
@@ -49,8 +50,14 @@ function claudeControlWarnings(workspace: string, agentId: string, bridgeUrl: st
   } catch (error) {
     return [`the installation does not verify (${error instanceof Error ? error.message : String(error)}); the hook denies every action`];
   }
-  if (claudeHookSchemasFor(version)) return [];
-  return [`${version ? `Claude Code ${version} is not a release AMC qualified` : "no Claude Code was on PATH"}, so the installation binds no qualified release and the hook denies every action; reinstall with a qualified Claude Code on PATH`];
+  const warnings = claudeHookSchemasFor(version) ? [] : [`${version ? `Claude Code ${version} is not a release AMC qualified` : "no Claude Code was on PATH"}, so the installation binds no qualified release and the hook denies every action; reinstall with a qualified Claude Code on PATH`];
+  // The registration reads the same settings layers at SessionStart; a refusal there denies every tool call in the session.
+  const settings = claudeSettingsRefusal(workspace, getHookIntegrationStatus({ workspace, provider: "claude-code" }).files.manifest, CLAUDE_MANAGED_SETTINGS_DIRS[process.platform] ?? null);
+  if (settings) {
+    warnings.push(`Claude Code's settings keep AMC from registering sessions (${settings}), so control denies every tool call here; `
+      + `to watch without blocking, install with: amc connect hooks install --provider claude-code --mode observe --agent ${agentId}`);
+  }
+  return warnings;
 }
 
 /** Codex runs a project hook only after the person trusts the folder and the hook in Codex; say so every time. */

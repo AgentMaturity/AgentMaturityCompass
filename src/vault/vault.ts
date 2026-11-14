@@ -160,6 +160,11 @@ export function vaultEnvelopeKeyIds(envelopeRaw: string, passphrase: string): Pa
   return keyIdsOf(payload);
 }
 
+/** Whether this workspace's vault opens with `passphrase`. Reads only: no session, no migration, no key set check. */
+export function vaultOpensWith(workspace: string, passphrase: string): boolean {
+  return vaultEnvelopeKeyIds(readEnvelopeRaw(workspace), passphrase) !== null;
+}
+
 export function keyIdsOf(payload: VaultPayload): Partial<Record<LocalPurpose, string>> {
   return Object.fromEntries(LOCAL_PURPOSES.flatMap(purpose => payload.keys[purpose] ? [[purpose, payload.keys[purpose]!.keyId]] : []));
 }

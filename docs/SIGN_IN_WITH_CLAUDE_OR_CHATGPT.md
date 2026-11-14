@@ -29,6 +29,12 @@ amc connect hooks health --provider claude-code
 
 Control is claimed for the qualified Claude Code release only; see [claude-code-hooks.md](adapters/claude-code-hooks.md).
 
+Control needs Claude Code settings with no enabled plugin and no other hook that can change a tool call. With either present, AMC refuses the session registration and the hook denies every tool call; the install command prints a warning that names the setting. To watch Claude Code without blocking, install observe mode instead, which `amc login status` suggests:
+
+```bash
+amc connect hooks install --provider claude-code --mode observe --agent default
+```
+
 ### Codex (observe: AMC records, it does not control)
 
 ```bash

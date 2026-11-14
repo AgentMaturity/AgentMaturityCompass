@@ -30,7 +30,7 @@ function claudePath(root: string, version: string | null = "2.1.296"): string {
   return bin;
 }
 
-function run(cwd: string, args: string[], input?: string, PATH = claudePath(cwd)) {
+function run(cwd: string, args: string[], input?: string, PATH = claudePath(cwd), env: NodeJS.ProcessEnv = {}) {
   return spawnSync(process.execPath, [cliPath, ...args], {
     cwd,
     encoding: "utf8",
@@ -39,7 +39,10 @@ function run(cwd: string, args: string[], input?: string, PATH = claudePath(cwd)
       ...process.env,
       PATH,
       NO_COLOR: "1",
-      AMC_VAULT_PASSPHRASE: "amc-test-passphrase"
+      AMC_VAULT_PASSPHRASE: "amc-test-passphrase",
+      // The control install reads Claude Code's user settings; the developer's own plugins and hooks stay out of the test.
+      CLAUDE_CONFIG_DIR: join(cwd, ".claude-config"),
+      ...env
     },
     timeout: 30_000
   });
@@ -165,6 +168,19 @@ describe("amc connect hooks CLI", () => {
     });
     expect(forwarded.stderr).toContain("AMC hook control unavailable; action denied.");
     expect(forwarded.stdout).not.toContain("never-forwarded");
+  });
+
+  test("control install warns when Claude Code's own settings will refuse the session registration, and names observe mode", () => {
+    const cwd = workspace();
+    const configDir = join(cwd, "plugin-config");
+    mkdirSync(configDir, { recursive: true });
+    writeFileSync(join(configDir, "settings.json"), JSON.stringify({ enabledPlugins: { "some-plugin@market": true } }));
+    const control = ["--provider", "claude-code", "--mode", "control", "--agent", "control-cli-agent"];
+    const clean = run(cwd, ["connect", "hooks", "install", ...control, "--json"]);
+    expect(JSON.parse(clean.stdout).warnings).toEqual([]);
+    const withPlugin = run(cwd, ["connect", "hooks", "install", ...control], undefined, claudePath(cwd), { CLAUDE_CONFIG_DIR: configDir });
+    expect(withPlugin.stdout).toMatch(/Warning: Claude Code's settings keep AMC from registering sessions \(an enabled plugin in .*settings\.json can run hooks AMC did not install\), so control denies every tool call here/);
+    expect(withPlugin.stdout).toContain("amc connect hooks install --provider claude-code --mode observe --agent control-cli-agent");
   });
 
   test("denies as an unusable installation, not invalid input, when control was installed with no Claude Code on PATH", () => {
