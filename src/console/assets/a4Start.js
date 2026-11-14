@@ -2,6 +2,7 @@
 // and one primary action), who must approve a gate, errors in sentences, the preview-off and demo pages, and example
 // answers. Pure: data in, HTML or plain values out; every server string goes through esc(). Studio re-checks every
 // action, so the primary action only points at the page's own buttons and never decides anything itself.
+import { QUESTION_LABELS } from "./a4Questions.js";
 import { reasonsText, STAGES, STAGE_PLAIN, STEP_NEXT, STEP_PLAIN, STEP_TITLES, TRUTH, esc, previewNoticeHtml, renderCreateForm } from "./a4View.js";
 
 const isObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
@@ -111,7 +112,16 @@ function askMove(ctx) {
     act: { label: "Confirm the first answer", focus: `[data-a4-action="confirm-answer"][data-question="${esc(stale[0])}"]` } };
   if (prefixed(codes, "CARRIED_MISSING:").length) return { now: "Run Understand first: it brings in your answers from the earlier stages, then you answer the new questions.",
     act: { label: "Run Understand", press: "understand" } };
-  const missing = [...prefixed(codes, "ANSWER_MISSING:"), ...prefixed(codes, "ANSWER_INVALID:")];
+  // An answer AMC does not accept is named, with what it takes, instead of being counted with the empty ones.
+  const invalid = prefixed(codes, "ANSWER_INVALID:").find((id) => list(ctx.questions).some((question) => question.id === id));
+  if (invalid) {
+    const question = list(ctx.questions).find((entry) => entry.id === invalid);
+    const label = QUESTION_LABELS[invalid]?.[0] ?? question.prompt ?? invalid;
+    return { now: `AMC does not accept your answer to "${label}". ${question.prompt ?? ""}${Array.isArray(question.terms) && question.terms.length
+      ? ` It takes: ${question.terms.join(", ")}.` : ""} Change it under "Change my answers", or empty the field to clear it, then press Save answers.`,
+    act: { label: "Change that answer", focus: `form[data-a4-answers] [name="${esc(invalid)}"]` } };
+  }
+  const missing = prefixed(codes, "ANSWER_MISSING:");
   const fillable = missing.find((id) => list(ctx.questions).some((question) => question.id === id && id !== "expertise"));
   if (fillable) return { now: `Answer the questions marked (required) under Ask, then press Save answers. ${missing.length} still need an answer.`,
     act: { label: "Answer the first question", focus: `form[data-a4-answers] [name="${esc(fillable)}"]` } };

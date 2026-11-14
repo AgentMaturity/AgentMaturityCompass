@@ -39,6 +39,7 @@ import {
 } from "./a4Gates.js";
 import { captureA4RequestActor, gateRequestActor } from "./a4TransitionSigning.js";
 import { memberCandidates, resolveA4Principal } from "./a4Identity.js";
+import { catalogTerms } from "./spec/adapt.js";
 import { approvalsNote, assertPracticeAllowed, inviteMember, startFacts } from "./a4Onboarding.js";
 import { A4_PRESENCE_TTL_MS, presenceOf, touchPresence } from "./a4Presence.js";
 import { gateStatus, isRegulated, type A4Action, type A4ReadinessState } from "./a4Readiness.js";
@@ -320,6 +321,8 @@ function options(route: A4Route): void {
   apiSuccess(route.res, {
     schema: "amc.a4-options/v1", previewEnabled: true, stages: A4_STAGES, steps: A4_STEPS, gates: A4_GATES, projectRoles: A4_PROJECT_ROLES,
     refKinds: A4_REF_KINDS, expertise: ["novice", "practitioner", "expert"], questions: STAGE_QUESTIONS,
+    // The terms each Adapt fact question takes, from the shipped catalog's vocabulary (null when it does not read).
+    catalogTerms: catalogTerms(),
     limits: { eventWindow: A4_EVENT_WINDOW, presenceTtlMs: A4_PRESENCE_TTL_MS, requestWindowMs: A4_REQUEST_WINDOW_MS, bodyBytes: BODY_LIMIT },
     workspace: { signingRoute: route_, readOnly: route.native?.executionAllowed() !== true, start: startFacts(route.workspace, route.principal, route.principal?.authSource === "WORKSPACE_ROUTER") },
     // Supported integration paths arrive with Assemble (P1-60). The running image digest would come from the bootstrap

@@ -420,7 +420,8 @@ function mountProject(projectId, options) {
     const shown = shownReview();
     const gateChange = view.boundReview(shown) && reviewed && !view.sameReview(reviewed, shown) ? { from: reviewed, to: shown } : null;
     const ctx = { ...state, stage, allowed: readiness.allowed, me, gateChange, reflection, explanation, answerDrift: answerDrift(), specDraft: specBase !== null,
-      questions: listOf(state.options?.questions?.[stage], "questions").map((question) => ({ ...question, example: start.placeholderOf(stage, question.id) })),
+      questions: listOf(state.options?.questions?.[stage], "questions").map((question) => ({ ...question, example: start.placeholderOf(stage, question.id),
+        ...(stage === "adapt" && Array.isArray(state.options?.catalogTerms?.[question.id]) ? { terms: state.options.catalogTerms[question.id] } : {}) })),
       answers: shownAnswers(), understandingCurrent: state.understandingCurrent, exampleOffered: start.FILLABLE.has(stage) && stage === state.project.stage };
     root.innerHTML = `${view.holdBanner(project)}${start.renderStartHere(ctx)}${startPack && stage === "aspire" ? packs.packPanelHtml(startPack, state.project.revisionNo === packFilledAt ? packFilled ?? 0 : 0) : ""}${view.stageBanner(stage)}${conflict ? view.renderConflict(conflict) : ""}
       <section class="card"><h3 class="a4-project-name">${view.esc(project.name)}</h3><p class="muted">Agent <code>${view.esc(project.agentId)}</code> ·
@@ -554,12 +555,13 @@ function mountProject(projectId, options) {
     switch (name) {
       case "answers": {
         if (answerDrift()) throw new Error(`${view.ANSWER_CHANGED}. Nothing was sent.`);
-        // Only the fields the user changed: an untouched carried answer is never re-sent as the user's own statement.
+        // Only the fields the user changed: an untouched carried answer is never re-sent as the user's own statement. A field
+        // the user emptied clears its answer (sent as null, which Studio records as no answer).
         const edited = [...scope.querySelectorAll("form[data-a4-answers] textarea[name]")]
-          .filter((field) => field.value.trim() && field.value.trim() !== field.defaultValue.trim());
+          .filter((field) => field.value.trim() !== field.defaultValue.trim());
         if (edited.length === 0) throw new Error("No answer was changed. Nothing was sent.");
         return { ...post("Save answers", stagePath("answers"), { expectedHeadSeq: answerBase ?? state.project.headSeq, clientRequestId: uuid(),
-          answers: edited.map((field) => ({ questionId: field.name, value: answerValue(field) })) }, [], () => dropAnswerDrafts(card)), answers: true };
+          answers: edited.map((field) => ({ questionId: field.name, value: field.value.trim() ? answerValue(field) : null })) }, [], () => dropAnswerDrafts(card)), answers: true };
       }
       case "confirm-answer": {
         const answer = shownAnswers().find((row) => row.questionId === button.dataset.question);

@@ -274,7 +274,11 @@ export function renderConversation(ctx) {
   const field = (question) => {
     const answer = answered.get(question.id);
     const json = answer !== undefined && typeof answer.value !== "string";
-    const display = questionDisplay(question, question.example);
+    const shownDisplay = questionDisplay(question, question.example);
+    // Adapt's fact questions take catalog terms: name them, so nobody has to guess (an unknown term is refused).
+    const termsHelp = !Array.isArray(question.terms) ? "" : question.terms.length
+      ? ` Choose from: ${question.terms.join(", ")}. Or write unknown.` : " The catalog lists no terms for this yet, so leave it empty.";
+    const display = { ...shownDisplay, help: `${shownDisplay.help}${termsHelp}`.trim() };
     const helpId = `a4q-${esc(question.id)}-help`;
     return `<label><span class="a4-q-label">${esc(display.label)}</span>${question.required ? " (required)" : " (optional)"}${json ? " (JSON)" : ""}
       ${display.help ? `<small class="a4-q-help muted" id="${helpId}">${esc(display.help)}</small>` : ""}
