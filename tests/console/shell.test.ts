@@ -255,7 +255,8 @@ describe("topbarHtml", () => {
     const html = topbar({ workspace: "<acme>", demoMode: false, me: { username: "a" } });
     expect(html).toContain("/ &lt;acme&gt; workspace");
     expect(html).toContain('href="./evidence"');
-    expect(html).toContain('href="./standard"');
+    expect(html).toContain('href="./native-tasks?agent=default&amp;sample=1">Run a task</a>');
+    expect(html).not.toContain("Open Standard");
     expect(html).toContain("session protected");
     expect(topbar({ demoMode: true })).toContain("local demo session");
     for (const variant of [html, topbar({ me: null }), topbar({ demoMode: true })]) expect(variant).not.toMatch(/\son[a-z]+\s*=|javascript:/i);

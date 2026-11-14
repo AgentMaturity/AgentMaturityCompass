@@ -1,53 +1,42 @@
 /**
- * The first-run "Welcome to AMC" guide and Home's plain-language help. A first-time user met jargon chips, a dense
- * command-center hero and no word on what AMC does; the guide explains it in five short steps.
+ * The "How AMC works" guide and Home's plain-language help. A first-time user met jargon chips, a dense
+ * command-center hero and no word on what AMC does; the guide explains it in three short steps, opened from the top bar.
  */
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 import {
-  ACTIVATION_HELP, BANNER_TIPS, FEATURE_TOUR, GLOSSARY, GUIDE_STEPS, GUIDE_STORAGE_KEY, activationHelpHtml, bannerHelpHtml,
-  guideDismissed, guideStepHtml, rememberGuideDismissed, welcomeCardHtml
+  ACTIVATION_HELP, BANNER_TIPS, GLOSSARY, GUIDE_STEPS, GUIDE_STORAGE_KEY, activationHelpHtml, bannerHelpHtml,
+  guideDismissed, guideStepHtml, rememberGuideDismissed
 } from "../../src/console/assets/welcomeGuide.js";
 import { CANONICAL_NAV, canonicalNavHtml } from "../../src/console/assets/shell.js";
 
 const allCopy = () => [
-  ...GUIDE_STEPS.map((_, index) => guideStepHtml(index)), welcomeCardHtml(), bannerHelpHtml(),
+  ...GUIDE_STEPS.map((_, index) => guideStepHtml(index)), bannerHelpHtml(),
   ...Object.keys(ACTIVATION_HELP).flatMap((id) => ["WAITING", "READY", "BLOCKED", "COMPLETE"].map((status) => activationHelpHtml({ id, status }, "a")))
 ].join("\n");
 
 describe("welcome guide steps", () => {
-  test("five steps in the agreed order", () => {
-    expect(GUIDE_STEPS.map((step) => step.title)).toEqual([
-      "What AMC is", "How it works, in three moves", "What you can do here", "Pick your first step", "Words you will see"
-    ]);
+  test("three steps in the agreed order", () => {
+    expect(GUIDE_STEPS.map((step) => step.title)).toEqual(["What AMC is", "How it works, in three moves", "Words you will see"]);
   });
 
   test("each step shows its place, Back is disabled on the first, the last says Finish", () => {
     const first = guideStepHtml(0);
     const last = guideStepHtml(GUIDE_STEPS.length - 1);
-    expect(first).toContain("Step 1 of 5");
-    expect(first).toContain('<progress max="5" value="1"');
+    expect(first).toContain("Step 1 of 3");
+    expect(first).toContain('<progress max="3" value="1"');
     expect(first).toMatch(/data-guide="back" disabled/);
     expect(first).toContain(">Next</button>");
-    expect(last).toContain("Step 5 of 5");
+    expect(last).toContain("Step 3 of 3");
     expect(last).toContain('data-guide="close">Finish</button>');
     expect(guideStepHtml(99)).toBe(last);
     expect(guideStepHtml(-3)).toBe(first);
   });
 
-  test("the feature tour links only pages that exist", () => {
-    expect(FEATURE_TOUR.length).toBeGreaterThanOrEqual(7);
-    for (const [href] of FEATURE_TOUR) expect(existsSync(`src/console/pages/${href.slice(2)}.html`), href).toBe(true);
-    const tour = guideStepHtml(2);
-    for (const [href, name] of FEATURE_TOUR) expect(tour).toContain(`<a href="${href}">${name}</a>`);
-    expect(tour).toContain("Free and all included in the current source build");
-  });
-
-  test("the first-step choices open Home's three existing start cards", () => {
-    const choices = [...guideStepHtml(3).matchAll(/data-guide-start="([^"]+)"/g)].map((match) => match[1]);
-    expect(choices).toEqual(["firstUseNativeButton", "firstUseBaselineButton", "firstUseConnectButton"]);
-    const app = readFileSync("src/console/assets/app.js", "utf8");
-    for (const id of choices) expect(app).toContain(`<button id="${id}"`);
+  test("the guide no longer carries start buttons: Home's hero card is the one place to start", () => {
+    const copy = GUIDE_STEPS.map((_, index) => guideStepHtml(index)).join("\n");
+    expect(copy).not.toContain("data-guide-start");
+    expect(guideStepHtml(1)).toContain('"Try a demo task"');
   });
 
   test("the glossary names the seven words", () => {
@@ -107,9 +96,9 @@ describe("Home wiring", () => {
   const app = readFileSync("src/console/assets/app.js", "utf8");
   const home = app.slice(app.indexOf("async function renderHome()"), app.indexOf("\n}\n", app.indexOf("async function renderHome()")));
 
-  test("welcome card first, start cards next, developer material collapsed at the end", () => {
-    expect(home.indexOf("${welcomeCardHtml()}")).toBeLessThan(home.indexOf("${firstUseCard(agentId)}"));
-    expect(home.indexOf("${firstUseCard(agentId)}")).toBeLessThan(home.indexOf('card("Activation path"'));
+  test("hero card first, progress next, developer material collapsed at the end", () => {
+    expect(home.indexOf("${firstUseCard(agentId, demoMode)}")).toBeGreaterThan(-1);
+    expect(home.indexOf("${firstUseCard(agentId, demoMode)}")).toBeLessThan(home.indexOf('card("Activation path"'));
     for (const block of ["studio-hero", "studio-desktop-note", "renderApiQuickstart("]) {
       const at = home.indexOf(block);
       expect(home.lastIndexOf('<details class="advanced-section">', at), block).toBeGreaterThan(home.indexOf('card("Activation path"'));
