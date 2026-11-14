@@ -271,3 +271,16 @@ describe("diagnostic readers", () => {
     expect(parseEvidenceEvent(raw({ ...meta, attestation: attestation(testKey()) })).trustTier).toBe("SELF_REPORTED");
   });
 });
+
+describe("labels fail closed (vault lane, 2026-11-15)", () => {
+  const row = (meta: Record<string, unknown>) => ({ meta_json: JSON.stringify(meta) });
+  test("a row naming a source nobody classified reads SELF_REPORTED, whatever tier it declares", () => {
+    expect(effectiveTrustTier(row({ trustTier: "OBSERVED", source: "some_new_importer" }), { trustList: null })).toBe("SELF_REPORTED");
+    expect(effectiveTrustTier(row({ trustTier: "OBSERVED_HARDENED", source: 7 }), { trustList: null })).toBe("SELF_REPORTED");
+    expect(effectiveTrustTier(row({ trustTier: "OBSERVED", source: "bridge" }), { trustList: null })).toBe("OBSERVED");
+    expect(effectiveTrustTier(row({ trustTier: "OBSERVED" }), { trustList: null })).toBe("OBSERVED");
+  });
+  test("provider-reported content on an AMC row reads SELF_REPORTED", () => {
+    expect(effectiveTrustTier(row({ trustTier: "OBSERVED", provider: "claude-code", contentTier: "SELF_REPORTED" }), { trustList: null })).toBe("SELF_REPORTED");
+  });
+});

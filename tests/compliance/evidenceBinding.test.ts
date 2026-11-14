@@ -7,7 +7,7 @@ import { openLedger } from "../../src/ledger/ledger.js";
 import { getAgentPaths } from "../../src/fleet/paths.js";
 import { canonicalize } from "../../src/utils/json.js";
 import { sha256Hex } from "../../src/utils/hash.js";
-import { evidenceProducer, PRODUCER_BY_SOURCE } from "../../src/claims/evidenceProvenance.js";
+import { AMC_RUNTIME_SOURCES, evidenceProducer, PRODUCER_BY_SOURCE } from "../../src/claims/evidenceProvenance.js";
 import { isBoundToControl, subjectRole, verifiedAssuranceByPack } from "../../src/compliance/evidenceBinding.js";
 import type { ComplianceEvidenceRequirement, ComplianceMapping } from "../../src/compliance/mappingSchema.js";
 import type { EvidenceEvent } from "../../src/types.js";
@@ -42,7 +42,10 @@ describe("evidenceProducer", () => {
       .map((source): [Record<string, unknown>, string] => [{ source }, "manual"]),
     [{ source: "webhook" }, "external-report"],
     [{ source: "stdin_pipe" }, "amc-runtime"],
-    [{ source: "constructor" }, "amc-runtime"],
+    // Fail closed: a source nobody classified is unknown, never AMC runtime (and never an inherited object key).
+    [{ source: "constructor" }, "unknown-source"],
+    [{ source: "some_new_importer" }, "unknown-source"],
+    [{ source: 7 }, "unknown-source"],
     [{}, "amc-runtime"]
   ];
   test.each(rows)("%j -> %s", (meta, producer) => {
@@ -60,18 +63,9 @@ describe("evidenceProducer", () => {
  * A new importer that writes `source: "x_import"` fails this test until someone classifies it.
  */
 const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
-  "", "active", "adapter-observation", "adapters", "agent", "agents", "amc", "amc-registered", "amc.audit", "api",
-  "approvals", "assurance", "audit-logs", "backoff", "backup", "both", "bridge", "budgets", "built-in-mcp-agent-provider",
-  "builtin", "catalog-only", "cli", "compliance", "correlation", "decision", "defaults", "derived", "detector",
-  "diagnostic-eval-replay-corpus-boundary", "env", "eoc", "eval-replay-corpus", "eval.run.layer", "eval.run.question",
-  "events", "failed-evaluation", "file", "filesystem", "firewall", "fleet", "forecast", "gateway", "hook", "hook_control",
-  "host", "identity", "incident-regression", "inference-strategy-comparison", "judge-calibration", "ledger", "leases",
-  "linked-recorded-request-outcomes", "live-score-behavior-drift", "local", "model", "native", "none", "ops", "ops.blobs",
-  "override-near-miss-analytics", "plugin", "plugins", "policy", "project-env", "provider", "provider-drift-benchmark",
-  "redteam", "registry", "release", "replay-benchmark-corpus", "reports", "request-failure", "retention.auto",
-  "risk-cost-latency-slo", "roles", "sdk", "settings", "shield.exploit_confirmation", "stdin_pipe", "studio",
-  "studio-audit", "support-observation", "toolhub", "tools", "trace", "transform", "transparency", "trust", "trust-list",
-  "trust-list-history", "turn-error", "turn-events", "undeclared-runner", "user-env", "users", "validators",
+  // AMC's own runtime labels live in src (AMC_RUNTIME_SOURCES): the reader uses the same list, so a label missing
+  // there reads as an unknown source, which is SELF_REPORTED.
+  "", ...AMC_RUNTIME_SOURCES,
   // Never an evidence event's meta.source (reviewed 2026-10-11): claim-route labels that pick an HTTP result envelope
   // (P0-23, P1-11); catalog applicability exclusion kinds (P1-10); legal-hold registry row kinds, which write no ledger
   // rows (P2-01). The self-report-shaped literals (user, inferred, numeric_self_answer, default) are mapped to manual
