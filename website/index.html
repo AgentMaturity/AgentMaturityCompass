@@ -17,7 +17,7 @@
   <meta property="og:url" content="https://agentmaturity.co/">
   <meta property="og:image" content="https://agentmaturity.co/og-card.png">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="home.css?v=1">
+  <link rel="stylesheet" href="home.css?v=2">
 </head>
 <body class="home">
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -71,24 +71,31 @@
 
         <section class="picker" aria-labelledby="pickerTitle">
           <h2 id="pickerTitle">What will your agent work on?</h2>
-          <div class="chips" id="stationChips" role="group" aria-label="Industry"></div>
-          <label class="picker-field" for="packSelect"><span>Area of work</span>
-            <select id="packSelect" disabled><option>Loading the 41 Industry Packs</option></select>
+          <div class="chips" id="stationChips" role="group" aria-label="Industry">
+            <a class="chip" href="station-health.html">Health</a>
+            <a class="chip" href="station-education.html">Education</a>
+            <a class="chip" href="station-environment.html">Environment</a>
+            <a class="chip" href="station-mobility.html">Mobility</a>
+            <a class="chip" href="station-governance.html">Governance</a>
+            <a class="chip" href="station-technology.html">Technology</a>
+            <a class="chip" href="station-wealth.html">Wealth</a>
+          </div>
+          <label class="picker-field" for="packSelect" hidden><span>Area of work</span>
+            <select id="packSelect"></select>
           </label>
-          <article class="sheet" id="packSheet" aria-live="polite" aria-busy="true">
+          <article class="sheet" id="packSheet" aria-live="polite">
             <header class="sheet-head">
               <p class="sheet-kind">First draft of your project</p>
-              <p class="sheet-title" id="sheetTitle">Pick an industry</p>
-              <p class="sheet-summary" id="sheetSummary">AMC starts your project from the Industry Pack closest to the work, so you are not facing a blank page.</p>
+              <p class="sheet-title" id="sheetTitle">Start from your industry</p>
+              <p class="sheet-summary" id="sheetSummary">AMC starts your project from the Industry Pack closest to the work, so you are not facing a blank page. Choose an industry above to see its packs.</p>
             </header>
             <dl class="sheet-rows">
-              <div><dt>Risk level AMC suggests</dt><dd id="sheetRisk">&nbsp;</dd></div>
-              <div><dt>Rules to check</dt><dd id="sheetRules">&nbsp;</dd></div>
-              <div><dt>Risks to plan for</dt><dd id="sheetRisks">&nbsp;</dd></div>
+              <div><dt>Risk level AMC suggests</dt><dd id="sheetRisk">From the pack, for you to change</dd></div>
+              <div><dt>Rules to check</dt><dd id="sheetRules">The laws and standards the pack names</dd></div>
+              <div><dt>Risks to plan for</dt><dd id="sheetRisks">The pack's key risks for this kind of work</dd></div>
             </dl>
             <footer class="sheet-foot">These are suggestions you edit. Pack content is experimental and AI-drafted, and no lawyer has reviewed it. Starting from a pack does not show the agent meets any rule.</footer>
           </article>
-          <noscript><p class="fine">The picker needs JavaScript. All 41 packs are listed in the <a href="./docs/#INDUSTRY_PACKS">Industry Packs guide</a>.</p></noscript>
         </section>
       </div>
     </section>
@@ -107,20 +114,20 @@
               <h3>Say what the agent is for</h3>
               <p>Answer questions about the problem, who the agent serves, what success looks like and what it must never do. Start from your Industry Pack and AMC fills in the sector, a risk level and the rules to check, for you to correct.</p>
               <p class="who"><strong>Who signs off</strong> One person who did not write the brief.</p>
-              <figure class="shot"><img src="img/a4-start.webp" width="1440" height="900" loading="lazy" alt="The Compass Console form that starts an agent project, with the industry list open and a name field."><figcaption>Starting a project in the Compass Console.</figcaption></figure>
+              <figure class="shot"><img src="img/a4-start.webp" width="1200" height="1522" loading="lazy" decoding="async" alt="The Build an agent for your industry card on the Compass Console home: the Digital Health Record pack chosen as the industry, the question Who approves each step? with A second person selected and Just me, as practice offered, a project name, and a Start building button."><figcaption>Starting a project from the Compass Console home.</figcaption></figure>
             </li>
             <li class="step" data-step="2">
               <p class="step-n"><span class="step-num">2</span> Assemble</p>
               <h3>Build it</h3>
-              <p>Say what the agent may do on its own and what needs a person's yes, and choose its tools. AMC builds it in one closed session and records what ran. On the built-in practice model the record says so: the tools were seen working, the agent's behaviour was not judged.</p>
+              <p>Say what the agent may do on its own and what needs a person's yes, and choose its tools. AMC builds it in one closed session and records what ran. On the built-in stand-in model the record says so: the tools were seen working, the agent's behaviour was not judged.</p>
               <p class="who"><strong>Who signs off</strong> Two people, neither of whom built it.</p>
-              <figure class="shot"><img src="img/a4-project.webp" width="1440" height="900" loading="lazy" alt="An agent project page in the Compass Console: the four stages, the current step and one button for what to do now."><figcaption>The project page shows one thing to do at a time.</figcaption></figure>
+              <figure class="shot"><img src="img/a4-project.webp" width="1200" height="1065" loading="lazy" decoding="async" alt="A practice project page in the Compass Console: a note that the owner may approve their own work, then What to do now with the four stages, the current part, and one button, Answer the first question."><figcaption>A project page shows one thing to do at a time.</figcaption></figure>
             </li>
             <li class="step" data-step="3">
               <p class="step-n"><span class="step-num">3</span> Adapt</p>
               <h3>Fit it to your rules</h3>
               <p>Say where the agent runs, whose data it touches and how long data is kept. AMC drafts the controls for those facts and lists which rules are met and which are still open, as a count and never a percentage. What you do not know stays unknown: AMC never guesses it.</p>
-              <p class="who"><strong>Who signs off</strong> Two people, one of them your workspace auditor.</p>
+              <p class="who"><strong>Who signs off</strong> Two people other than the one who asks. One of them is your workspace auditor.</p>
             </li>
             <li class="step" data-step="4">
               <p class="step-n"><span class="step-num">4</span> Activate</p>
@@ -144,7 +151,7 @@
                 <li data-step="2" class="is-approval"><span>Build approved</span><em>2 approvers</em></li>
                 <li data-step="3"><span>Controls drafted</span><em>AMC</em></li>
                 <li data-step="3"><span>Open rules listed</span><em>AMC</em></li>
-                <li data-step="3" class="is-approval"><span>Controls approved</span><em>approver, auditor</em></li>
+                <li data-step="3" class="is-approval"><span>Controls approved</span><em>2, one auditor</em></li>
                 <li data-step="4"><span>Release package signed</span><em>AMC</em></li>
                 <li data-step="4"><span>Deployed</span><em>operator</em></li>
                 <li data-step="4" class="is-approval"><span>Release approved</span><em>2 approvers</em></li>
@@ -154,7 +161,11 @@
           </aside>
         </div>
 
-        <p class="band-more">A4 Forge is a preview in the current source build only, not in the published 1.1.1 release. In the <code>amc</code> menu, choose Build an agent for my industry. <a href="a4.html">How A4 Forge works</a></p>
+        <div class="alone">
+          <p><strong>Trying it on your own?</strong> Start a practice project. You approve your own steps, and each one is marked self-approved in the record. It stops being practice as soon as a second person can sign in. Do not use a practice project for real work.</p>
+          <p><strong>Starting from an Industry Pack?</strong> Then you need a second person. Every pack is rated high risk or above, so nobody approves their own step. As the workspace owner, choose Add a person in the Compass Console: it creates their account and shows their first password once.</p>
+        </div>
+        <p class="band-more">A4 Forge is a preview, and it is on when you start AMC. It is in the current source build only, not in the published 1.1.1 release. In the <code>amc</code> menu, choose Build an agent for my industry. <a href="a4.html">How A4 Forge works</a></p>
       </div>
     </section>
 
@@ -184,7 +195,7 @@
               <dd>Export a signed bundle and line it up with frameworks such as the EU AI Act, ISO 42001 and NIST AI RMF. Someone without your keys can check that nothing in it was changed.</dd>
             </div>
           </dl>
-          <figure class="shot shot-tall"><img src="img/console-home.webp" width="1440" height="900" loading="lazy" alt="The Compass Console home page after setup, showing the agent, its first recorded actions and the next step."><figcaption>The Compass Console, running on your own machine.</figcaption></figure>
+          <figure class="shot shot-tall"><img src="img/console-home.webp" width="1200" height="925" loading="lazy" decoding="async" alt="The Compass Console home with a project under way: Continue the project, and See what an AI agent really does, with Watch an agent I already use, Try a sample task, and a link to score existing records."><figcaption>The Compass Console home, running on your own machine.</figcaption></figure>
         </div>
 
         <div class="setup-note">
@@ -234,21 +245,21 @@
           <article>
             <h3>Watch Claude Code or Codex</h3>
             <p>You stay signed in to Claude Code or Codex the way you already are. AMC never sees your password, token or plan. After you say yes, AMC adds a small hook to this project's settings and records each action the agent takes.</p>
-            <pre class="cmd"><code>amc login status
-amc connect hooks install --provider claude-code --mode observe --agent default</code></pre>
-            <p class="fine">Observe mode only records. Control mode can also stop a Claude Code action before it runs. Codex is observe only. <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/SIGN_IN_WITH_CLAUDE_OR_CHATGPT.md">Sign-in and watch guide</a></p>
+            <pre class="cmd" tabindex="0"><code>amc
+# then choose: Watch Claude Code as it works</code></pre>
+            <p class="fine">The menu offers this once Claude Code or Codex is installed and signed in; <code>amc login status</code> shows which. Observe mode only records. Control mode can also stop a Claude Code action before it runs. Codex is observe only. <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/SIGN_IN_WITH_CLAUDE_OR_CHATGPT.md">Sign-in and watch guide</a></p>
           </article>
           <article>
             <h3>Chat or run a task</h3>
-            <p>AMC has its own agent. Chat with it in the terminal, or give it a task from the console. It uses only the tools you approve, and every turn is recorded. The demo uses a practice model with canned replies, so it needs no key.</p>
-            <pre class="cmd"><code>amc
+            <p>AMC has its own agent. Chat with it in the terminal, or give it a task from the console. It uses only the tools you approve, and every turn is recorded. The demo uses a stand-in model with canned replies, so it needs no key.</p>
+            <pre class="cmd" tabindex="0"><code>amc
 # then choose: Try a demo chat</code></pre>
             <p class="fine">A recorded session shows what was asked and what ran. It is not proof the answer is correct. <a href="./docs/#NATIVE_AGENT_WORKFLOW">Native task guide</a></p>
           </article>
           <article>
             <h3>Score an agent</h3>
             <p>Just show my score runs the full 244-question score in the terminal. Run it again after AMC has watched your agent work: that is when the score starts to mean something.</p>
-            <pre class="cmd"><code>amc
+            <pre class="cmd" tabindex="0"><code>amc
 # then choose: Just show my score</code></pre>
             <p class="fine">A signed score shows the report has not changed since it was written, not that it is true. Share a score outside your team only when its readiness says READY. <a href="./docs/#GETTING_STARTED">Getting started</a></p>
           </article>
@@ -288,12 +299,13 @@ amc connect hooks install --provider claude-code --mode observe --agent default<
           <p class="fine">The terminal shows example output, to show the shape of each report. Its numbers are illustrative, not a measured result.</p>
         </div>
         <ul class="facts">
-          <li><strong>244</strong> questions in the full score</li>
+          <li><strong><!-- amc:count:diagnosticQuestions -->244<!-- /amc:count --></strong> questions in the full score</li>
           <li><strong>264</strong> questions in the longer set</li>
           <li><strong><!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --></strong> registered assurance packs</li>
           <li><strong><!-- amc:count:adapters -->16<!-- /amc:count --></strong> adapters for agent frameworks</li>
-          <li><strong>41</strong> industry packs</li>
-          <li><strong>1,304</strong> CLI commands</li>
+          <li><strong><!-- amc:count:sectorPacks -->41<!-- /amc:count --></strong> industry packs</li>
+          <li><strong><!-- amc:count:cliCommandPaths -->1,304<!-- /amc:count --></strong> CLI commands</li>
+          <li><strong><!-- amc:count:testFiles -->2,584<!-- /amc:count --></strong> test source files</li>
         </ul>
       </div>
     </section>
@@ -308,7 +320,7 @@ amc connect hooks install --provider claude-code --mode observe --agent default<
           <article class="install-card is-current">
             <p class="install-tag">Current, for macOS and Linux</p>
             <h3>Source build</h3>
-            <pre class="cmd"><code>git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
+            <pre class="cmd" tabindex="0"><code>git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
 pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link
 amc</code></pre>
@@ -318,7 +330,7 @@ amc</code></pre>
           <article class="install-card">
             <p class="install-tag">Published 1.1.1, older</p>
             <h3>Release installer</h3>
-            <pre class="cmd"><code>curl -fsSL https://agentmaturity.co/install.sh | sh
+            <pre class="cmd" tabindex="0"><code>curl -fsSL https://agentmaturity.co/install.sh | sh
 irm https://agentmaturity.co/install.ps1 | iex</code></pre>
             <p>Downloads the published 1.1.1 GitHub release, checks its SHA-256 checksum and installs it. npm also has 1.1.1. In 1.1.1, <code>amc</code> prints the full score. It has no menu, no A4 Forge and no Claude Code or Codex sign-in, and Industry Packs are still behind the earlier licence gate. The Homebrew tap is not public.</p>
             <p class="fine"><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases/tag/v1.1.1">Download 1.1.1 from GitHub Releases</a>. What is published where, with dates and evidence: <a href="publication-status.json">publication-status.json</a>.</p>
@@ -344,7 +356,7 @@ irm https://agentmaturity.co/install.ps1 | iex</code></pre>
           <h2>Free. All of it</h2>
           <p>The core is MIT licensed: the app, the CLI, the full score, the A4 Forge preview, assurance packs, reports and CI gates. Bring your own AI key, or use the built-in practice model to look around.</p>
           <p><span class="hl">All 41 Industry Domain Packs</span> for regulated sectors are free too: every question and every run is included, with no licence, account or payment. Having access never changes a result.</p>
-          <p class="fine">Procurement path: <a href="./docs/#BUYER_PACKAGES">Compare buyer packages</a> to see which parts of AMC each kind of buyer uses. There is nothing to buy, so checkout is not available.</p>
+          <p class="fine pricing-buyer-link">Procurement path: <a href="./docs/#BUYER_PACKAGES">Compare buyer packages</a> to see which parts of AMC each kind of buyer uses. There is nothing to buy, so checkout is not available.</p>
         </div>
         <a href="#install" class="btn btn-primary">Get AMC</a>
       </div>
@@ -355,13 +367,13 @@ irm https://agentmaturity.co/install.ps1 | iex</code></pre>
         <h2>Questions people ask</h2>
         <div class="faq-list">
           <div class="faq-item"><button class="faq-q" aria-expanded="false">Can I use it without a technical team?<span class="faq-icon" aria-hidden="true">+</span></button><div class="faq-a"><p>Someone has to install AMC once, and today that means building it from source. After that the work happens in the Compass Console, in plain language: choose Open the console in my browser in the <code>amc</code> menu. The macOS app opens the same console in its own window.</p></div></div>
-          <div class="faq-item"><button class="faq-q" aria-expanded="false">What is A4 Forge?<span class="faq-icon" aria-hidden="true">+</span></button><div class="faq-a"><p>AMC's guided build for one agent, in four stages: Aspire, Assemble, Adapt and Activate. No stage moves on until the people you name approve it, and every step is written to a signed record. It is a preview in the current source build, off unless AMC starts with <code>AMC_A4_PREVIEW=1</code>; the <code>amc</code> menu line Build an agent for my industry turns it on for you. <a href="a4.html">How A4 Forge works</a>.</p></div></div>
+          <div class="faq-item"><button class="faq-q" aria-expanded="false">What is A4 Forge?<span class="faq-icon" aria-hidden="true">+</span></button><div class="faq-a"><p>AMC's guided build for one agent, in four stages: Aspire, Assemble, Adapt and Activate. No stage moves on until the people you name approve it, and every step is written to a signed record. It is a preview in the current source build and is on by default; starting AMC with <code>AMC_A4_PREVIEW=0</code> turns it off. One person can try it alone with a practice project. A project started from an Industry Pack needs a second person to approve its steps. <a href="a4.html">How A4 Forge works</a>.</p></div></div>
           <div class="faq-item"><button class="faq-q" aria-expanded="false">Do I need an account?<span class="faq-icon" aria-hidden="true">+</span></button><div class="faq-a"><p>No AMC account and no cloud service: AMC runs on your machine and keeps its records there. The demo chat needs no key. To watch Claude Code or Codex you sign in to them with their own sign-in; to chat with a real model you set that provider's key, and your prompts then go to that provider.</p></div></div>
           <div class="faq-item"><button class="faq-q" aria-expanded="false">Is this just a quick score?<span class="faq-icon" aria-hidden="true">+</span></button><div class="faq-a"><p>No. Just show my score in the <code>amc</code> menu generates the full 244-question score. A longer 264-question lifecycle set adds questions on running, proof, memory and several agents working together.</p></div></div>
           <div class="faq-item"><button class="faq-q" aria-expanded="false">My first score was terrible. Is that normal?<span class="faq-icon" aria-hidden="true">+</span></button><div class="faq-a"><p>Yes, and that is the point. A new agent that AMC has not seen do anything starts at L0, the lowest level. The score grows as AMC watches your agent actually work.</p></div></div>
           <div class="faq-item"><button class="faq-q" aria-expanded="false">What does a signed score mean?<span class="faq-icon" aria-hidden="true">+</span></button><div class="faq-a"><p>Every report carries a cryptographic signature. Change one character and verification fails, so someone who has your public key can check that the report is unchanged and who signed it. A signature shows who wrote it, not that it is true: the score is only as good as the evidence behind it. <a href="verify.html">Try it on a real bundle we published</a>.</p></div></div>
           <div class="faq-item"><button class="faq-q" aria-expanded="false">What is the 84-point gap?<span class="faq-icon" aria-hidden="true">+</span></button><div class="faq-a"><p>In one worked example, an agent's documentation scored 100 out of 100, and the same agent scored 16 when AMC looked at what it actually did. The 84 points between them are the gap, sometimes called documentation inflation. These numbers come from one worked example, <a href="blog/the-84-point-gap.html">the 84-point gap</a>, not an average across agents.</p></div></div>
-          <div class="faq-item"><button class="faq-q" aria-expanded="false">How is AMC different from other evaluation tools?<span class="faq-icon" aria-hidden="true">+</span></button><div class="faq-a"><p>Most tools score what you tell them. AMC scores what it sees. What an agent reports about itself counts for at most <span class="hl">0.4x weight</span>; behaviour AMC recorded carries <span class="hl">1.0x weight</span>. AMC then shows the gaps, runs attack tests (assurance packs), and keeps records you can check later.</p></div></div>
+          <div class="faq-item"><button class="faq-q" aria-expanded="false">How is AMC different from other evaluation tools?<span class="faq-icon" aria-hidden="true">+</span></button><div class="faq-a"><p>Most tools score what you tell them. AMC scores what it sees. What an agent reports about itself counts for at most <span class="hl">0.4x weight</span>; behaviour AMC recorded carries <span class="hl">1.0x weight</span>. AMC then shows the gaps, runs attack tests (assurance packs), and keeps records you can check later. The method is set out in the <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md">Agent Maturity Compass whitepaper</a>.</p></div></div>
           <div class="faq-item"><button class="faq-q" aria-expanded="false">Which frameworks does AMC support?<span class="faq-icon" aria-hidden="true">+</span></button><div class="faq-a"><p><span class="hl">16 adapters</span>: AutoGen, Claude Code, CrewAI, DeepSeek Harness, Gemini CLI, Generic CLI, Hermes Agent, LangChain for Node and Python, LangGraph, LlamaIndex, OpenAI Agents SDK, OpenClaw, OpenHands, Python AMC SDK, and Semantic Kernel. OpenAI-compatible endpoints use the Generic CLI adapter with the <code>/openai</code> gateway route. Optional DeepSeek Harness capture requires a reviewed, signed launcher and does not prove internal tool or provider coverage. <code>amc adapters capabilities --agent &lt;id&gt;</code> writes a signed receipt of what an adapter can and cannot capture for that agent.</p></div></div>
           <div class="faq-item"><button class="faq-q" aria-expanded="false">Can I use AMC in CI/CD?<span class="faq-icon" aria-hidden="true">+</span></button><div class="faq-a"><p>Yes. <code>amc gate --bundle &lt;file&gt; --policy &lt;path&gt;</code> checks an exported run bundle against a gate policy you write, and fails the build when the bundle does not pass, so a change cannot quietly lower the result.</p></div></div>
           <div class="faq-item"><button class="faq-q" aria-expanded="false">Do Industry Packs require an account?<span class="faq-icon" aria-hidden="true">+</span></button><div class="faq-a"><p>No. All 41 Industry Packs are free in the current source build, with no account, licence or payment; the published 1.1.1 release still locks them behind the earlier licence gate. Pack results are self-reported questionnaires, and access never changes a result.</p></div></div>
@@ -386,7 +398,7 @@ irm https://agentmaturity.co/install.ps1 | iex</code></pre>
   <footer class="footer">
     <div class="footer-inner wrap">
       <div class="footer-top">
-        <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents.<br>Evidence over claims.</p></div>
+        <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p></div>
         <div class="footer-col"><h3>Product</h3><a href="#a4-forge">Build an agent</a><a href="#capabilities">Run it</a><a href="#paths">Already have an agent?</a><a href="#install">Get AMC</a><a href="#desktop">macOS app</a><a href="#products">Eight tools</a><a href="executive.html">Executives</a><a href="playground.html">Playground</a><a href="docs/index.html">Documentation</a></div>
         <div class="footer-col"><h3>Depth</h3><a href="a4.html">A4 Forge</a><a href="methodology.html">Approach and research</a><a href="compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="#pricing">Price</a><a href="#faq">FAQ</a></div>
         <div class="footer-col"><h3>Industry Packs</h3><a href="#domains">All packs</a><a href="station-environment.html">Environment</a><a href="station-health.html">Health</a><a href="station-wealth.html">Wealth</a><a href="station-education.html">Education</a><a href="station-mobility.html">Mobility</a><a href="station-technology.html">Technology</a><a href="station-governance.html">Governance</a></div>
@@ -398,6 +410,6 @@ irm https://agentmaturity.co/install.ps1 | iex</code></pre>
   </footer>
 
   <script src="script.js?v=12"></script>
-  <script src="home.js?v=1"></script>
+  <script src="home.js?v=2"></script>
 </body>
 </html>

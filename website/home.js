@@ -28,10 +28,13 @@
   }
 
   function initPicker() {
+    // Without JavaScript, or when the list cannot be read, the page keeps its static state: the chips are links to each
+    // industry's own page and the sheet says what a first draft holds.
     var chips = document.getElementById('stationChips');
     var select = document.getElementById('packSelect');
     var sheet = document.getElementById('packSheet');
     if (!chips || !select || !sheet || !window.fetch) return;
+    var field = select.closest('.picker-field');
     var title = document.getElementById('sheetTitle');
     var summary = document.getElementById('sheetSummary');
     var risk = document.getElementById('sheetRisk');
@@ -48,7 +51,7 @@
       var badge = el('span', RISK_WORD[level] || 'Not set', 'risk');
       badge.setAttribute('data-level', level);
       risk.appendChild(badge);
-      risk.appendChild(el('span', level === 'med' ? 'with standard governance' : 'with regulated governance', 'risk-note'));
+      risk.appendChild(el('span', level === 'med' ? 'Standard rules for approvals' : 'Regulated: someone other than you approves each step', 'risk-note'));
       rules.textContent = '';
       rules.appendChild(listOf(pack.rules, RULES_SHOWN, 'in the pack'));
       risks.textContent = '';
@@ -80,11 +83,15 @@
       if (pack) show(pack);
     });
 
+    sheet.setAttribute('aria-busy', 'true');
     fetch('industry-packs.json').then(function (response) {
       if (!response.ok) throw new Error('HTTP ' + response.status);
       return response.json();
     }).then(function (data) {
       stations = data.stations.filter(function (station) { return station.packs.length > 0; });
+      if (!stations.length) throw new Error('no packs');
+      chips.textContent = '';
+      if (field) field.hidden = false;
       stations.forEach(function (station) {
         var chip = el('button', station.name, 'chip');
         chip.type = 'button';
@@ -93,14 +100,11 @@
         chip.addEventListener('click', function () { choose(station); });
         chips.appendChild(chip);
       });
-      if (stations.length) choose(stations[0]);
+      choose(stations[0]);
     }).catch(function () {
-      // The list could not be read: say so, and point at the page that has it.
+      // The list could not be read: keep the static links to each industry's page and say what happened.
       sheet.setAttribute('aria-busy', 'false');
-      title.textContent = 'The industry list did not load';
-      summary.textContent = 'Reload the page to try again. All 41 packs are also listed under Industries below.';
-      select.textContent = '';
-      select.appendChild(el('option', 'Not available'));
+      summary.textContent = 'The pack list did not load here. Choose an industry above to open its page, which lists every pack with its questions.';
     });
   }
 
@@ -131,7 +135,11 @@
       if (next === active) return;
       active = next;
       steps.forEach(function (step, index) { step.classList.toggle('is-active', index + 1 === Math.max(active, 1)); });
-      lines.forEach(function (line) { line.classList.toggle('is-on', Number(line.dataset.step) <= active); });
+      lines.forEach(function (line) {
+        var step = Number(line.dataset.step);
+        line.classList.toggle('is-on', step <= active);
+        line.classList.toggle('is-current', step === active);
+      });
     }
 
     function queue() {
