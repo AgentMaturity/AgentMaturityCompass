@@ -12,6 +12,8 @@ const STEPS = ["asked", "understood", "explained", "proposed", "direction_approv
 
 const WHAT_IS_A_PROJECT = "An agent project takes one agent from a brief to a recorded deployment in four stages. "
   + "Each stage asks you questions, AMC drafts from your answers, and a second person approves before the project moves on.";
+const PRACTICE_IS = "A practice project takes one agent through the four stages so you can learn AMC alone. Each stage asks you questions, "
+  + "AMC drafts from your answers, and you approve your own work; each such approval is recorded as self-approved.";
 const SOD = "The person who wrote, built or requested a stage cannot approve it (separation of duties)";
 const NOT_INDEPENDENT = "A second approver in the same workspace meets separation of duties; it is not an independent review";
 
@@ -249,7 +251,7 @@ export function renderStartHere(ctx) {
   const gate = stage === project.stage && kind ? liveGate(ctx, kind) : null;
   const live = gate && (gate.status === "PENDING" || gate.status === "QUORUM_MET") ? gate : null;
   return `<section class="card a4-start" aria-labelledby="a4StartTitle"><h3 id="a4StartTitle">What to do now</h3>
-    <p class="muted">${esc(WHAT_IS_A_PROJECT)}</p>${renderStepper(project, stage)}
+    <p class="muted">${esc(project.practiceActive === true ? PRACTICE_IS : WHAT_IS_A_PROJECT)}</p>${renderStepper(project, stage)}
     ${stage === project.stage && at >= 0 ? `<p>${esc(STAGE_PLAIN[stage] ?? title(stage))}: part ${at + 1} of ${STEPS.length}, ${esc(STEP_PLAIN[project.step] ?? project.step)}
       <small class="muted">(${esc(title(stage))}, ${esc(STEP_TITLES[project.step] ?? project.step)})</small>.</p>` : ""}
     <p class="a4-now"><strong>${esc(move.now)}</strong></p>${move.why ? `<p class="muted">${esc(move.why)}</p>` : ""}

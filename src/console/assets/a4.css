@@ -56,3 +56,8 @@ body[data-page="a4Project"] #app button:not(.a4-primary):not(.danger) { backgrou
 /* Long project names wrap instead of running past the card (A4-18). */
 .a4-project-name, #a4HomeTitle, .a4-home h2 { overflow-wrap: anywhere; }
 .a4-tech > summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+/* The start form's "Who approves each step?" choice and the Members card's invite checkbox: the control beside its words. */
+.a4-approvers { border: 1px solid var(--border-strong); border-radius: 8px; padding: 8px 12px; }
+.a4-approvers label, .a4-invite label:has(input[type="checkbox"]) { display: flex; gap: 8px; align-items: center; }
+.a4-approvers input[type="radio"], .a4-invite input[type="checkbox"] { width: auto; flex: none; margin: 0; }
+.a4-approvers p { margin: 0 0 8px 26px; }
