@@ -1389,9 +1389,9 @@ function workspaceInitHint(workspace: string, reason: string): string {
   return [
     reason,
     `Workspace: ${workspace}`,
-    "Run one of the following first:",
-    "  amc setup --demo",
-    "  amc init"
+    // CLI-16: bare `amc` is the front door that sets a folder up; the others are for scripts.
+    "Next: run amc in this folder to set it up (scripts: amc init --minimal).",
+    "Or cd to the folder where you already set up AMC."
   ].join("\n");
 }
 
@@ -2085,7 +2085,8 @@ program.hook("preAction", async (_thisCommand, actionCommand) => {
   }
   const path = commandPath(actionCommand);
   // Commands that read a workspace and would otherwise report its missing files as failures, or ask for a passphrase.
-  if (/^(evidence verify|verify all|vault unlock)$/.test(path) && !isWorkspaceInitialized(process.cwd())) {
+  // CLI-16: verify read a missing ledger as "FAILED", user init as "Vault locked", connect threw a raw "Gateway config not found".
+  if (/^(evidence verify|verify all|verify|vault unlock|user init|user add|connect)$/.test(path) && !isWorkspaceInitialized(process.cwd())) {
     console.error(chalk.red(workspaceInitHint(process.cwd(), "No AMC workspace here (no .amc directory).")));
     process.exit(1);
   }

@@ -111,12 +111,15 @@ describe("the built CLI with an unknown top-level command (run `npm run build` f
     if (suggestion) expect(result.stderr).toContain(`amc ${suggestion}`);
   });
 
-  it.each([["evidence", "verify"], ["verify", "all"], ["vault", "unlock"]])("amc %s %s in a directory with no workspace says so and names amc init", (...args) => {
-    const result = amc(...args);
-    expect(result.status).toBe(1);
-    expect(result.stderr).toContain("No AMC workspace here");
-    expect(result.stderr).toContain("amc init");
-  });
+  // CLI-16: verify, user init and connect gave "FAILED", "Vault locked" and a raw "Gateway config not found" here.
+  it.each([["evidence", "verify"], ["verify", "all"], ["vault", "unlock"], ["verify"], ["user", "init"], ["connect", "--mode", "supervise"]])(
+    "amc %s %s in a directory with no workspace says so and names amc", (...args) => {
+      const result = amc(...args);
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain("No AMC workspace here");
+      expect(result.stderr).toContain("run amc in this folder");
+      expect(result.stderr).not.toMatch(/FAILED|Vault locked|Gateway config not found/);
+    });
 
   it("amc version suggests --version", () => {
     const result = amc("version");
