@@ -27,7 +27,7 @@ describe("kept Industry Pack answers", () => {
   test("are shown checked when the pack opens again", () => {
     const pack = listIndustryPacks()[0]!;
     const question = pack.questions[0]!;
-    const html = industryPackDetailHtml(pack, { [question.id]: 4 });
+    const html = industryPackDetailHtml(pack, { [question.id]: 4 } as never);
     expect(html).toMatch(new RegExp(`value="4" data-question="${question.id}" checked`));
     expect(industryPackDetailHtml(pack)).not.toMatch(/" checked \/>/);
   });

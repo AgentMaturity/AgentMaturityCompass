@@ -89,9 +89,7 @@ export interface A4ReadinessState {
   readonly decisions: readonly A4DecisionRow[];
   /** Every chain-named ref, resolved at load: tier recomputed, lane re-derived (src/a4/a4Evidence.ts). */
   readonly refs: readonly (A4ResolvedRef & { readonly revisionNo: number })[];
-  readonly effects: readonly A4EffectRow[];
-  /** a4Schema.practiceNow and the live population still one person (a4Identity.onePersonSince); absent reads false. */
-  readonly practice?: boolean;
+  readonly effects: readonly A4EffectRow[]; readonly practice?: boolean; // a4Schema.practiceNow and still one person (a4Identity.onePersonSince); absent reads false
 }
 /** Live facts the caller gathered (a4Gates.collectFacts); null = could not be read. */
 export interface A4LiveFacts {
@@ -694,18 +692,12 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
  */
 export const acknowledgedRecords = (reasonCodes: readonly string[]): string[] => reasonCodes.filter((code) => /^(RECEIPT|CHECK):/.test(code)).sort();
 
-/**
- * Items whose acknowledgement holds for the whole project until it expires, not only on the revision it was given on: what
- * they acknowledge is a fact of the workspace, not of a revision (every user was created in this one workspace), so asking
- * again before every gate added clicks and no information.
- */
-const PROJECT_WIDE_ACKS: ReadonlySet<string> = new Set(["sod.self_provisioned"]);
-/** The latest unexpired owner acknowledgement per item on the head revision (any revision for PROJECT_WIDE_ACKS), with the records it was recorded against. */
+/** The latest unexpired owner acknowledgement per item on the head revision (sod.self_provisioned, a workspace fact: any revision), with its records. */
 function acknowledgements(state: A4ReadinessState, now: number): Map<string, { ack: NonNullable<A4ReadinessItem["acknowledged"]>; records: string }> {
   const out = new Map<string, { ack: NonNullable<A4ReadinessItem["acknowledged"]>; records: string }>();
   for (const link of state.chain) {
     const { itemId, reason, expiresTs, actorKey, ts, recordCodes } = link.body;
-    if (link.kind !== "ACKNOWLEDGED" || (link.revisionNo !== state.project.revision_no && !PROJECT_WIDE_ACKS.has(String(itemId))) || typeof itemId !== "string" || typeof reason !== "string"
+    if (link.kind !== "ACKNOWLEDGED" || (link.revisionNo !== state.project.revision_no && itemId !== "sod.self_provisioned") || typeof itemId !== "string" || typeof reason !== "string"
       || typeof expiresTs !== "number" || typeof actorKey !== "string" || typeof ts !== "number" || expiresTs <= now) continue;
     out.set(itemId, { ack: { by: actorKey, ts, expiresTs, reason }, records: JSON.stringify(Array.isArray(recordCodes) ? recordCodes : []) });
   }

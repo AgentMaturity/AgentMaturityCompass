@@ -321,8 +321,7 @@ function options(route: A4Route): void {
   apiSuccess(route.res, {
     schema: "amc.a4-options/v1", previewEnabled: true, stages: A4_STAGES, steps: A4_STEPS, gates: A4_GATES, projectRoles: A4_PROJECT_ROLES,
     refKinds: A4_REF_KINDS, expertise: ["novice", "practitioner", "expert"], questions: STAGE_QUESTIONS,
-    // The terms each Adapt fact question takes, from the shipped catalog's vocabulary (null when it does not read).
-    catalogTerms: catalogTerms(),
+    catalogTerms: catalogTerms(), // the terms each Adapt fact question takes (catalog/vocabulary.yaml); null when it does not read
     limits: { eventWindow: A4_EVENT_WINDOW, presenceTtlMs: A4_PRESENCE_TTL_MS, requestWindowMs: A4_REQUEST_WINDOW_MS, bodyBytes: BODY_LIMIT },
     workspace: { signingRoute: route_, readOnly: route.native?.executionAllowed() !== true, start: startFacts(route.workspace, route.principal, route.principal?.authSource === "WORKSPACE_ROUTER") },
     // Supported integration paths arrive with Assemble (P1-60). The running image digest would come from the bootstrap
@@ -536,11 +535,7 @@ const flatSpec = (value: unknown, prefix = ""): Record<string, string> => value 
 
 /** Whether the project is governed as regulated; an unverified approval policy reads regulated (fail closed). */
 function regulatedOrClosed(workspace: string, state: A4ReadinessState): boolean {
-  try {
-    return isRegulated(state, signedA4Floor(workspace));
-  } catch {
-    return true;
-  }
+  try { return isRegulated(state, signedA4Floor(workspace)); } catch { return true; }
 }
 
 /** Project-scoped GETs. Returns false when none matches. */
@@ -729,11 +724,7 @@ async function dispatch(route: A4Route): Promise<void> {
     assertQuery(route.params, []);
     return createProject(route);
   }
-  if (rest === "/people" && route.method === "POST") {
-    assertQuery(route.params, []);
-    await inviteMember(route, null);
-    return;
-  }
+  if (rest === "/people" && route.method === "POST") return (assertQuery(route.params, []), void await inviteMember(route, null));
   const match = PROJECT_PATH.exec(rest);
   if (match !== null) {
     const projectId = match[1]!;

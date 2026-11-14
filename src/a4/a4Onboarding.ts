@@ -16,7 +16,7 @@ import { clientRequestIdSchema, deriveSelfApprovalAllowed, headSeqSchema, type A
 import { A4StoreError } from "./a4Store.js";
 
 /** The fixed sentence beside every "add a second person" step: SoD-distinct is not independent. */
-export const SECOND_PERSON_NOT_INDEPENDENT = "A second person in the same workspace meets separation of duties; it is not an independent review.";
+const SECOND_PERSON_NOT_INDEPENDENT = "A second person in the same workspace meets separation of duties; it is not an independent review.";
 
 export interface A4StartFacts {
   /** People who can sign in now (ACTIVE local users plus live host sessions); null when a source could not be read. */
@@ -88,7 +88,7 @@ const peopleSchema = z.strictObject(inviteFields);
 /** Five groups of four from an alphabet without look-alikes: about 100 bits, easy to read out. Shown once, never stored in clear. */
 function firstPassword(): string {
   const alphabet = "abcdefghjkmnpqrstuvwxyz23456789";
-  return Array.from({ length: 5 }, () => Array.from({ length: 4 }, () => alphabet[randomInt(alphabet.length)]).join("")).join("-");
+  return Array.from({ length: 5 }, () => Array.from({ length: 4 }, () => alphabet[randomInt(alphabet.length)]).join("")).join("-"); // amc-allow-random: id (a one-time sign-in secret, not a result)
 }
 
 /**
