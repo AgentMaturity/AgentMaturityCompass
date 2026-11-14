@@ -48,7 +48,7 @@ vi.mock("../src/gateway/config.js", () => ({
   verifyGatewayConfigSignature: mocks.verifyGatewayConfigSignature,
   signGatewayConfig: mocks.signGatewayConfig
 }));
-vi.mock("../src/studio/studioState.js", () => ({ readStudioState: mocks.readStudioState }));
+vi.mock("../src/studio/studioState.js", () => ({ readStudioState: mocks.readStudioState, processRunning: (pid: number) => pid === process.pid }));
 vi.mock("../src/adapters/adapterConfigStore.js", () => ({ loadAdaptersConfig: mocks.loadAdaptersConfig }));
 vi.mock("../src/fleet/registry.js", () => ({
   loadAgentConfig: mocks.loadAgentConfig,
@@ -100,7 +100,7 @@ beforeEach(() => {
     proxy: { port: 3211 },
     routes: [{ prefix: "/openai" }]
   });
-  mocks.readStudioState.mockReturnValue({ gatewayPort: 3210, proxyPort: 3211 });
+  mocks.readStudioState.mockReturnValue({ pid: process.pid, gatewayPort: 3210, proxyPort: 3211 });
   mocks.loadAdaptersConfig.mockReturnValue({ adapters: { perAgent: {} } });
   mocks.loadAgentConfig.mockReturnValue({ provider: { routePrefix: "/anthropic" } });
   mocks.latestActiveWorkOrder.mockReturnValue({ workOrderId: "wo-1" });
@@ -143,7 +143,7 @@ describe("studio connect wizard", () => {
     });
 
     // Without a terminal the prompt cannot be answered, so the wizard names the flag instead of aborting.
-    await expect(buildConnectInstructions({ workspace: workspace(), agentId: "agent-2" })).rejects.toThrow("Add --mode supervise or --mode sandbox.");
+    await expect(buildConnectInstructions({ workspace: workspace(), agentId: "agent-2" })).rejects.toThrow("Add --mode supervise (");
     const tty = Object.getOwnPropertyDescriptor(process.stdin, "isTTY");
     Object.defineProperty(process.stdin, "isTTY", { value: true, configurable: true });
     const out = await buildConnectInstructions({ workspace: workspace(), agentId: "agent-2" }).finally(() => {
@@ -154,6 +154,23 @@ describe("studio connect wizard", () => {
     expect(out.routeUrl).toBe("http://127.0.0.1:3210/openai");
     expect(out.command).toContain("amc sandbox run --agent agent-2");
     expect(out.leaseCarrierHint).toContain("Authorization Bearer");
+  });
+
+  // CLI-13: --mode bogus was accepted.
+  test("refuses a mode that is neither supervise nor sandbox and says what each does", async () => {
+    await expect(buildConnectInstructions({ workspace: workspace(), agentId: "agent-1", mode: "bogus" as "supervise" }))
+      .rejects.toThrow(/Unknown --mode "bogus"\. Use --mode supervise \(.+\) or --mode sandbox \(.+\)/);
+  });
+
+  // CLI-12: with AMC stopped, the route came from a stale state file or gateway.yaml (3210), ignoring AMC_GATEWAY_PORT.
+  test("with AMC stopped, the route uses AMC_GATEWAY_PORT and says AMC is not running", async () => {
+    mocks.readStudioState.mockReturnValue({ pid: -1, gatewayPort: 3210, proxyPort: 3211 });
+    vi.stubEnv("AMC_GATEWAY_PORT", "3422");
+    try {
+      const out = await buildConnectInstructions({ workspace: workspace(), agentId: "agent-1", mode: "supervise" });
+      expect(out.amcRunning).toBe(false);
+      expect(out.routeUrl).toBe("http://127.0.0.1:3422/anthropic");
+    } finally { vi.unstubAllEnvs(); }
   });
 
   test("recommends the verified native hook installer for Claude and Gemini adapters", async () => {

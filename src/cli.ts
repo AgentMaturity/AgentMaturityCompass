@@ -303,7 +303,7 @@ import { ensureInstantVaultMode, type InstantVaultMode } from "./cli/instantVaul
 import { generatedPassphraseForInit, generatedPassphraseRoute, newVaultPassphraseChoices, promptNewSecret, rememberInitPassphrase, rememberOrShowOnce, shownOncePassphraseLines, skipVaultPassphrase } from "./cli/initPassphrase.js";
 import { ensureUpVaultPassphrase, printConsoleSignInStep, runFirstBaselineIfNeeded } from "./studio/oneCommandUp.js";
 import { agentRunFiles, latestRunSummary } from "./diagnostic/runReportResolution.js";
-import { buildConnectInstructions } from "./studio/connectWizard.js";
+import { buildConnectInstructions, CONNECT_MODE_HELP } from "./studio/connectWizard.js";
 import { registerHookIntegrationCommands } from "./adapters/hookIntegrationCli.js";
 import { runStudioForeground, startStudioDaemon, stopStudioDaemon, studioStatus } from "./studio/studioSupervisor.js";
 import { standaloneGatewayAllowList } from "./studio/listenPolicy.js";
@@ -4265,7 +4265,7 @@ const connect = program
   .option("--adapter <adapterId>", "adapter ID (e.g. claude-cli, gemini-cli, generic-cli)")
   .option("--token-file <path>", "lease token file (pair redeem output)")
   .option("--bridge-url <url>", "bridge base URL (e.g. http://127.0.0.1:3212)")
-  .option("--mode <mode>", "supervise|sandbox")
+  .option("--mode <mode>", `supervise|sandbox (${CONNECT_MODE_HELP})`)
   .option("--status", "show read-only activation outcomes without minting a lease", false)
   .option("--json", "emit activation status as JSON (requires --status)", false)
   .option("--print-env", "print environment export lines", false)
@@ -4369,6 +4369,8 @@ const connect = program
         mode: opts.mode,
         adapterId: opts.adapter
       });
+      // CLI-12: on stderr, so --print-env and --print-cmd output stays clean.
+      if (!output.amcRunning) console.error(chalk.yellow(`AMC is not running in this folder, so nothing listens on ${output.routeUrl} yet. Run amc up here (in a shell with the same AMC_GATEWAY_PORT) before you start the agent.`));
       if (opts.printCmd) {
         console.log(output.command);
         return;
