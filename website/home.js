@@ -91,7 +91,6 @@
       stations = data.stations.filter(function (station) { return station.packs.length > 0; });
       if (!stations.length) throw new Error('no packs');
       chips.textContent = '';
-      if (field) field.hidden = false;
       stations.forEach(function (station) {
         var chip = el('button', station.name, 'chip');
         chip.type = 'button';
@@ -104,6 +103,7 @@
     }).catch(function () {
       // The list could not be read: keep the static links to each industry's page and say what happened.
       sheet.setAttribute('aria-busy', 'false');
+      if (field) field.hidden = true;
       summary.textContent = 'The pack list did not load here. Choose an industry above to open its page, which lists every pack with its questions.';
     });
   }

@@ -17,7 +17,8 @@
   <meta property="og:url" content="https://agentmaturity.co/">
   <meta property="og:image" content="https://agentmaturity.co/og-card.png">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="home.css?v=2">
+  <link rel="stylesheet" href="home.css?v=3">
+  <noscript><style>.picker-field { display: none; }</style></noscript>
 </head>
 <body class="home">
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -74,20 +75,20 @@
           <div class="chips" id="stationChips" role="group" aria-label="Industry">
             <a class="chip" href="station-health.html">Health</a>
             <a class="chip" href="station-education.html">Education</a>
-            <a class="chip" href="station-environment.html">Environment</a>
+            <a class="chip" href="station-environment.html">Environment / Critical Infrastructure</a>
             <a class="chip" href="station-mobility.html">Mobility</a>
-            <a class="chip" href="station-governance.html">Governance</a>
-            <a class="chip" href="station-technology.html">Technology</a>
+            <a class="chip" href="station-governance.html">Governance / Public Sector</a>
+            <a class="chip" href="station-technology.html">Technology / General AI Services</a>
             <a class="chip" href="station-wealth.html">Wealth</a>
           </div>
-          <label class="picker-field" for="packSelect" hidden><span>Area of work</span>
-            <select id="packSelect"></select>
+          <label class="picker-field" for="packSelect"><span>Area of work</span>
+            <select id="packSelect" disabled><option>Loading the Industry Packs</option></select>
           </label>
           <article class="sheet" id="packSheet" aria-live="polite">
             <header class="sheet-head">
               <p class="sheet-kind">First draft of your project</p>
               <p class="sheet-title" id="sheetTitle">Start from your industry</p>
-              <p class="sheet-summary" id="sheetSummary">AMC starts your project from the Industry Pack closest to the work, so you are not facing a blank page. Choose an industry above to see its packs.</p>
+              <p class="sheet-summary" id="sheetSummary">AMC starts your project from the Industry Pack closest to the work, so you never face a blank page. Choose an industry to see its packs.</p>
             </header>
             <dl class="sheet-rows">
               <div><dt>Risk level AMC suggests</dt><dd id="sheetRisk">From the pack, for you to change</dd></div>
@@ -148,13 +149,13 @@
                 <li data-step="1" class="is-approval"><span>Brief approved</span><em>approver</em></li>
                 <li data-step="2"><span>Build plan approved</span><em>approver</em></li>
                 <li data-step="2"><span>Build session closed</span><em>builder</em></li>
-                <li data-step="2" class="is-approval"><span>Build approved</span><em>2 approvers</em></li>
+                <li data-step="2" class="is-approval"><span>Build approved</span><em>2 people</em></li>
                 <li data-step="3"><span>Controls drafted</span><em>AMC</em></li>
                 <li data-step="3"><span>Open rules listed</span><em>AMC</em></li>
-                <li data-step="3" class="is-approval"><span>Controls approved</span><em>2, one auditor</em></li>
+                <li data-step="3" class="is-approval"><span>Controls approved</span><em>2 people</em></li>
                 <li data-step="4"><span>Release package signed</span><em>AMC</em></li>
                 <li data-step="4"><span>Deployed</span><em>operator</em></li>
-                <li data-step="4" class="is-approval"><span>Release approved</span><em>2 approvers</em></li>
+                <li data-step="4" class="is-approval"><span>Release approved</span><em>2 people</em></li>
               </ol>
               <p class="record-foot">A signature shows who wrote an entry and that it has not changed. It does not show that the entry is true.</p>
             </div>
@@ -410,6 +411,6 @@ irm https://agentmaturity.co/install.ps1 | iex</code></pre>
   </footer>
 
   <script src="script.js?v=12"></script>
-  <script src="home.js?v=2"></script>
+  <script src="home.js?v=3"></script>
 </body>
 </html>

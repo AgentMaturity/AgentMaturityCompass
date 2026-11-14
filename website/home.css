@@ -195,15 +195,15 @@ code { font-family: var(--mono); font-size: 0.86em; padding: 0.1em 0.38em; borde
 .record-title { font-family: var(--mono); font-weight: 700; font-size: 1rem; }
 .record-note { font-size: 0.82rem; line-height: 1.45; color: var(--paper-muted); margin: 6px 0 14px; }
 .record-lines { counter-reset: entry; border-top: 1px dashed var(--paper-line); }
-.record-lines li { counter-increment: entry; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding: 8px 6px; margin: 0 -6px; border-bottom: 1px dashed var(--paper-line); font-family: var(--mono); font-size: 0.8rem; line-height: 1.4; }
+.record-lines li { counter-increment: entry; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding: 8px 0; border-bottom: 1px dashed var(--paper-line); font-family: var(--mono); font-size: 0.8rem; line-height: 1.4; }
 .record-lines li::before { content: counter(entry, decimal-leading-zero); color: var(--paper-muted); }
 .record-lines em { font-style: normal; color: var(--paper-muted); text-align: right; }
 .record-lines .is-approval span { font-weight: 700; }
 .record-lines .is-approval span::after { content: "signed off"; margin-left: 8px; padding: 1px 6px; border-radius: 3px; background: #1d7a3c; color: #fff; font-weight: 400; font-size: 0.68rem; white-space: nowrap; }
 .record-foot { margin-top: 14px; font-size: 0.78rem; line-height: 1.5; color: var(--paper-muted); }
-.js-record .record-lines li { opacity: 0; transform: translateY(6px); transition: opacity 0.35s ease, transform 0.35s ease, background-color 0.4s ease; }
+.js-record .record-lines li { opacity: 0; transform: translateY(6px); transition: opacity 0.35s ease, transform 0.35s ease, background-color 0.4s ease, box-shadow 0.4s ease; }
 .js-record .record-lines li.is-on { opacity: 1; transform: none; }
-.js-record .record-lines li.is-current { background: rgba(29, 122, 60, 0.09); }
+.js-record .record-lines li.is-current { --tint: rgba(29, 122, 60, 0.09); background: var(--tint); box-shadow: -8px 0 0 var(--tint), 8px 0 0 var(--tint); }
 /* The stamp lands a beat after its line prints. */
 .js-record .record-lines .is-approval span::after { display: inline-block; opacity: 0; transform: scale(1.35); transition: opacity 0.2s ease 0.5s, transform 0.28s cubic-bezier(0.2, 1.5, 0.4, 1) 0.5s; }
 .js-record .record-lines .is-approval.is-on span::after { opacity: 1; transform: none; }

@@ -16,6 +16,12 @@ describe("the home page's industry picker", () => {
     expect(read("website/industry-packs.json")).toBe(renderWebsitePacks());
   });
 
+  test("without the pack list, the picker's chips are links to every industry page, named and ordered as the registry", () => {
+    const data = JSON.parse(read("website/industry-packs.json")) as { stations: Array<{ id: string; name: string }> };
+    const chips = [...read("website/index.html").matchAll(/<a class="chip" href="station-([a-z]+)\.html">([^<]+)<\/a>/g)].map((m) => ({ id: m[1], name: m[2] }));
+    expect(chips).toEqual(data.stations.map(({ id, name }) => ({ id, name })));
+  });
+
   test("the picker maps a pack's risk tier the same way the console does when a project starts from that pack", () => {
     const site = riskTierOf("website/home.js");
     expect(site).toEqual(riskTierOf("src/console/assets/a4Pack.js"));
