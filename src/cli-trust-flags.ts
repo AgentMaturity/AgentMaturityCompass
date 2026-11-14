@@ -6,7 +6,8 @@
  * never from the environment or a request body.
  */
 import type { Command } from "commander";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { sha256Hex } from "./utils/hash.js";
 import { join, resolve } from "node:path";
 import chalk from "chalk";
 import {
@@ -92,12 +93,25 @@ export function finishVerify(label: string, report: VerifierReportV1,
         : onlyUnpinned ? chalk.yellow(`${label} integrity verified, NOT TRUSTED: the signer's public key is not pinned`) : chalk.red(`${label} verification FAILED`));
     if (claim) printClaimResult(claim, {});
     for (const line of code === 0 ? opts.details ?? [] : reasons.map((reason) => `- ${reason}`)) console.log(line);
-    if (onlyUnpinned && refused.some((signature) => signature.purpose === "artifact-seal") && existsSync(join(process.cwd(), ".amc", "keys", "artifact-seal.pub"))) {
-      console.log(chalk.gray("Next: for a file this workspace signed, pass --pubkey .amc/keys/artifact-seal.pub (it shows this workspace signed it); for someone else's file, pass the public key they gave you."));
-    }
+    if (onlyUnpinned && refused.some((signature) => signature.purpose === "artifact-seal")) for (const line of folderKeyHint(process.cwd())) console.log(chalk.gray(line));
   }
   if (code === 2) untrusted(reasons, report.overrides);
   if (code !== 0) process.exit(code);
+}
+
+/**
+ * CLI-11: how to pin a signer without treating the key stored next to the records as a trust root. A check against that
+ * key shows only that the file matches the key kept in this folder; whoever can change the records can replace the key
+ * too. So the hint gives its sha256 to compare with one recorded outside the folder, and never recommends it alone.
+ */
+export function folderKeyHint(workspace: string): string[] {
+  const path = join(workspace, ".amc", "keys", "artifact-seal.pub");
+  const general = "Next: pass --pubkey with the signer's public key obtained outside this folder (for someone else's file, the key they gave you), or a signed trust list with --trust-list.";
+  if (!existsSync(path)) return [general];
+  return [general,
+    `This folder keeps its own signing key at .amc/keys/artifact-seal.pub (sha256 ${sha256Hex(readFileSync(path))}). Checking against it shows only that the file`
+      + " matches the key kept in this folder, and anyone who can change the records here can replace that key too. Pass it as --pubkey only after comparing"
+      + " that sha256 with one you recorded outside this folder."];
 }
 
 /** After an action that proceeds on an allowed integrity-only verdict (backup restore): "UNTRUSTED:" on stderr, exit 2. */

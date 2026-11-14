@@ -32,7 +32,12 @@ describe("verdicts on intact records whose keys are not pinned", () => {
     const out = lines.join("\n");
     expect(out).not.toContain("verification FAILED");
     expect(out).toContain("NOT TRUSTED");
-    expect(out).toContain("--pubkey .amc/keys/artifact-seal.pub");
+    // Security review: the folder's own key is no trust root; its sha256 is given to compare with an outside record.
+    expect(out).not.toContain("shows this workspace signed it");
+    expect(out).toContain("matches the key kept in this folder");
+    expect(out).toContain("sha256 ");
+    expect(out).toContain("recorded outside this folder");
+    expect(out).not.toMatch(/Next: [^\n]*pass --pubkey \.amc\/keys\/artifact-seal\.pub/);
   });
 
   test("the unanchored ledger verdict does not say FAILED", () => {
