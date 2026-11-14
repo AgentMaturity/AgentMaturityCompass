@@ -17,7 +17,7 @@ AMC provides 1,304 public CLI command paths in the live command inventory.
 
 | # | Command | Description |
 |---|---------|-------------|
-| 1 | `amc a4` | A4 Forge (preview, AMC_A4_PREVIEW=1): projects, gates, releases and deployments, through the API's own routes |
+| 1 | `amc a4` | A4 Forge (preview, on by default; AMC_A4_PREVIEW=0 turns it off): projects, gates, releases and deployments, through the API's own routes |
 | 2 | `amc a4 approve` | Approve an A4 gate you reviewed (bound to its digests) |
 | 3 | `amc a4 complete` | Consume an approved gate and run the effect it starts (the API's complete) |
 | 4 | `amc a4 deny` | Deny an A4 gate you reviewed (bound to its digests) |

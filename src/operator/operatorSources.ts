@@ -1,7 +1,7 @@
 /**
  * The operator workflow's read of A4 Forge (P2-22): every A4 project's verified state, through the same store, loader and
  * readiness evaluator the A4 routes use (P1-61's plan-diff and blocker-inbox panels read the same rows). Nothing here
- * writes. Without `AMC_A4_PREVIEW=1`, or when the store cannot be opened, this throws: callers report the source as
+ * writes. Under `AMC_A4_PREVIEW=0`, or when the store cannot be opened, this throws: callers report the source as
  * unavailable, never as empty.
  */
 import { join } from "node:path";
@@ -59,7 +59,7 @@ export function loadOperatorConfig(workspace: string): OperatorConfig {
 
 /** Runs `read` over every A4 project, verified, in one open store; the store is closed afterwards. */
 export function readA4Projects<T>(workspace: string, now: number, read: (projects: readonly OperatorA4Project[]) => T): T {
-  if (!a4PreviewEnabled()) throw new OperatorSourceError("A4_PREVIEW_DISABLED", "A4 Forge is not enabled in this workspace (AMC_A4_PREVIEW=1)");
+  if (!a4PreviewEnabled()) throw new OperatorSourceError("A4_PREVIEW_DISABLED", "A4 Forge is turned off in this workspace (AMC_A4_PREVIEW=0)");
   const store = openA4Store(workspace);
   try {
     const projects = store.listProjects().map((row): OperatorA4Project => {

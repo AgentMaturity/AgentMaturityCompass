@@ -1329,6 +1329,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
       }
 
+      // Browsers ask for /favicon.ico by themselves: answer with the console's icon instead of a 401 (C-14).
+      if (pathname === "/favicon.ico" && method === "GET" && serveConsolePath("/console/assets/icons/favicon-32.png", res)) {
+        return;
+      }
       if (pathname.startsWith("/console")) {
         if (serveConsolePath(pathname, res)) {
           return;

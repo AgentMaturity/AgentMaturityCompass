@@ -57,8 +57,8 @@ describe("nextAction route allowlist (renderMissing)", () => {
 // LIVE-UX-04: the notice named no way forward, and the home nav link stays hidden while the preview is off.
 describe("previewNoticeHtml", () => {
   const html = () => (a4View as { previewNoticeHtml?: () => string }).previewNoticeHtml?.() ?? "";
-  test("names how to enable the preview on POSIX shells and PowerShell, commands in <code>", () => {
-    expect(html()).toContain("A4 preview is not enabled in this workspace.");
+  test("names how to turn the preview back on, on POSIX shells and PowerShell, commands in <code>", () => {
+    expect(html()).toContain("This Studio was started with <code>AMC_A4_PREVIEW=0</code>, which turns agent projects off.");
     for (const command of ["amc down", "AMC_A4_PREVIEW=1 amc up", "$env:AMC_A4_PREVIEW"]) expect(html()).toContain(command);
     expect(html()).toContain("<code>AMC_A4_PREVIEW=1 amc up</code>");
     expect(html()).toContain("A running Studio keeps the environment it started with.");

@@ -74,9 +74,10 @@ export function installClaimStrip(page, onClaims) {
   strip.innerHTML = `<h3>Claims on this page</h3><p></p>${claimLegend()}`;
   const badgeLine = strip.querySelector("p");
   const seen = new Map();
+  // A page with no labelled result has nothing to explain: the strip is not shown until one arrives (styles.css).
   const render = () => {
-    badgeLine.innerHTML = seen.size > 0 ? [...seen.values()].map(claimBadge).join(" ")
-      : `<span class="muted">No labelled result loaded yet.</span>`;
+    badgeLine.innerHTML = seen.size > 0 ? [...seen.values()].map(claimBadge).join(" ") : "";
+    strip.classList.toggle("claim-strip-empty", seen.size === 0);
   };
   render();
   onClaims((claims) => {

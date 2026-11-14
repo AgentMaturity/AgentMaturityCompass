@@ -1,6 +1,6 @@
 /**
- * OpenAPI for /api/v1/a4 (P1-57; design §12.1), on the native task pattern. Every route is a preview route: without
- * AMC_A4_PREVIEW=1 it answers 404 A4_PREVIEW_DISABLED. Response bodies name their published contract
+ * OpenAPI for /api/v1/a4 (P1-57; design §12.1), on the native task pattern. Every route is a preview route, on by default: under
+ * AMC_A4_PREVIEW=0 it answers 404 A4_PREVIEW_DISABLED. Response bodies name their published contract
  * (spec/schemas/v1/a4-*.schema.json); result routes gain ClaimResult through withClaimResponses.
  */
 import type { OpenApiOperation } from "./openapiTypes.js";
@@ -42,7 +42,7 @@ function operation(summary: string, response: string, options: { write?: boolean
       "400": json("Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or HYPOTHESIS_SOURCE_MISMATCH.", ref("A4Error")),
       "401": json("No authenticated Studio session (A4 routes are served only through native Studio admission).", ref("A4Error")),
       "403": json("DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or project membership refused.", ref("A4Error")),
-      "404": json("A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.", ref("A4Error")),
+      "404": json("A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.", ref("A4Error")),
       "409": json("A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items, RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status: BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems).", ref("A4Error")),
       "423": json("A4_VAULT_LOCKED: unlock the vault to record this.", ref("A4Error")),
       "500": json("The outcome is uncertain; reload the project before retrying.", ref("A4Error"))

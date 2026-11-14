@@ -2,7 +2,7 @@
 // and one primary action), who must approve a gate, errors in sentences, the preview-off and demo pages, and example
 // answers. Pure: data in, HTML or plain values out; every server string goes through esc(). Studio re-checks every
 // action, so the primary action only points at the page's own buttons and never decides anything itself.
-import { STAGES, STEP_TITLES, TRUTH, esc, previewNoticeHtml } from "./a4View.js";
+import { reasonsText, STAGES, STAGE_PLAIN, STEP_NEXT, STEP_PLAIN, STEP_TITLES, TRUTH, esc, previewNoticeHtml, renderCreateForm } from "./a4View.js";
 
 const isObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
 const list = (value) => (Array.isArray(value) ? value : []);
@@ -11,8 +11,6 @@ const STEPS = ["asked", "understood", "explained", "proposed", "direction_approv
 
 const WHAT_IS_A_PROJECT = "An agent project takes one agent from a brief to a recorded deployment in four stages. "
   + "Each stage asks you questions, AMC drafts from your answers, and a second person approves before the project moves on.";
-const STAGE_PURPOSE = { aspire: "what the agent is for", assemble: "build it", adapt: "fit it to your context and rules",
-  activate: "release and deploy it" };
 const SOD = "The person who wrote, built or requested a stage cannot approve it (separation of duties)";
 const NOT_INDEPENDENT = "A second approver in the same workspace meets separation of duties; it is not an independent review";
 
@@ -32,7 +30,7 @@ function renderStepper(project, stage) {
     const state = at < 0 ? "" : index < at ? "done" : index === at ? "current" : "later";
     const words = state === "done" ? "done" : state === "current" ? "current stage" : state === "later" ? "later" : "";
     return `<li class="a4-stepper-${state}"${name === project.stage ? ' aria-current="step"' : ""}><a href="./a4Project?project=${id}&stage=${name}"${
-      name === stage ? ' data-viewing="true"' : ""}><strong>${index + 1}. ${title(name)}</strong> <span class="muted">${esc(STAGE_PURPOSE[name])}</span>
+      name === stage ? ' data-viewing="true"' : ""}><strong>${index + 1}. ${esc(STAGE_PLAIN[name])}</strong> <small class="muted">${title(name)}</small>
       <span class="a4-stepper-state">${esc(words)}${name === stage && name !== project.stage ? " · you are viewing it" : ""}</span></a></li>`;
   }).join("")}</ol>`;
 }
@@ -95,8 +93,9 @@ function rawMove(ctx) {
     return { now: "Build: AMC writes what the approved direction describes. Every file it writes is recorded with its digest.", act: { label: "Build", press: "build" } };
   }
   if (step === "built") {
-    if (stage === "assemble") return { now: "Close the build session, then run Review. On the Build card choose Open on Native Tasks and press Close and verify; Review refuses while a session is open.",
-      act: { label: "Review", press: "review" } };
+    // Review refuses while the build session is open (A4-06): until Studio allows it, the one action is the session's own page.
+    if (stage === "assemble" && ctx.allowed?.review?.allowed !== true) return { now: "Close the build session, then run Review. Open the session on Native Tasks, press Close and verify, then come back to this page (your browser's Back button).",
+      act: { label: "Open the build session", focus: '[data-card="build"] a[href*="native-tasks"]' } };
     return { now: "Review: AMC checks what was built; you can add your own findings.", act: { label: "Review", press: "review" } };
   }
   if (step === "reviewed") return gateMove(ctx, "completion");
@@ -121,6 +120,10 @@ function askMove(ctx) {
   return { now: "Run Understand: AMC reads your answers and says back what it understood.", act: { label: "Run Understand", press: "understand" } };
 }
 
+/** How the person who has to act reaches the decision, and the one action for whoever waits: copy this page's link. */
+const WAITING_HOW = "They sign in to this console, open this link and approve on the Approvals card of this project.";
+const COPY_LINK = { label: "Copy link to this page", copy: true };
+
 /** What acknowledging an item accepts, in a sentence (the item id stays beside it). */
 const ACK_PLAIN = { "sod.self_provisioned": "every user here was created in this one workspace, so AMC cannot show that two approvers are two different people. Acknowledging says you accept that" };
 
@@ -138,10 +141,10 @@ function gateMove(ctx, kind) {
     if (kind === "direction" && stage !== "activate") return { now: "The direction is approved. Use the approval to move on to Build.", act: { label: "Continue to Build", press: "complete" } };
     if (stage === "activate") return { now: "Approved. Activate's release and deployment approval are completed on the Release card.", act: { label: "Open the Release card", focus: '[data-card="release"]' } };
     const effect = codesOf(readiness, "effect_gate");
-    if (effect.includes("EFFECT_GATE_NOT_OPEN")) return { now: "Approved. Completing Assemble applies the reviewed resources, which is a second request: a project owner opens it, then two approvers approve it on the Completion effect card.",
+    if (effect.includes("EFFECT_GATE_NOT_OPEN")) return { effect: true, now: "Approved. Completing Assemble applies the reviewed resources, which is a second request: a project owner opens it, then two approvers approve it on the Completion effect card.",
       act: { label: "Open the effect gate", press: "open-effect" } };
     const effectStatus = prefixed(effect, "APPROVAL_STATUS:")[0];
-    if (effectStatus && effectStatus !== "QUORUM_MET" && effectStatus !== "CONSUMED") return { now: `Waiting for project approvers to approve the effect request on the Completion effect card (now ${effectStatus}).`,
+    if (effectStatus && effectStatus !== "QUORUM_MET" && effectStatus !== "CONSUMED") return { effect: true, now: `Waiting for project approvers to approve the second request, which applies what was built, on the Completion effect card (now ${effectStatus}). The approvals of the completion above do not count for it.`,
       act: { label: "Go to the Completion effect card", focus: '[data-card="effect"] [name="engine-reason"]' } };
     return { now: `Approved. Complete ${title(stage)} to move the project on.`, act: { label: `Complete ${title(stage)}`, press: "complete" } };
   }
@@ -155,14 +158,20 @@ function gateMove(ctx, kind) {
       act: { label: "Go to the Members card", focus: "li[data-principal] select" } };
     }
     const excluded = typeof me?.userId === "string" && list(gate.excludedKeys).some((key) => String(key).endsWith(`:${me.userId}`));
-    if (excluded) return { now: `Waiting for approvers: ${gate.approvals ?? 0} of ${gate.required ?? "?"} approvals so far. ${SOD}, so someone else decides; send them this page.` };
+    if (excluded) return { now: `Waiting for a second person to approve: ${gate.approvals ?? 0} of ${gate.required ?? "?"} approvals so far. ${SOD}, so someone else decides.`,
+      why: WAITING_HOW, act: COPY_LINK };
     const refusals = list(ctx.allowed?.decide?.reasonCodes);
-    if (refusals.includes("A4_DUPLICATE_DECISION")) return { now: `You have decided this one. Waiting for the other approvers: ${gate.approvals ?? 0} of ${gate.required ?? "?"} approvals so far.` };
+    if (refusals.includes("A4_DUPLICATE_DECISION")) return { now: `You have decided this one. Waiting for the other approvers: ${gate.approvals ?? 0} of ${gate.required ?? "?"} approvals so far.`,
+      why: WAITING_HOW, act: COPY_LINK };
     if (refusals.includes("GATE_ROLE_NOT_ALLOWED")) {
       const roles = list(gate.request?.rolesAllowed);
       return { now: `Your workspace role cannot decide this approval: it takes ${roles.join(" or ") || "another role"}. A workspace owner can give you the role in the workspace folder with amc user role set ${me?.username ?? "<username>"} --roles <your roles>,${roleFor(roles)}.` };
     }
-    return { now: "Review the specification and the cards above, write a reason in the Approvals card, then Approve or Request changes.",
+    // Someone who cannot approve reads why here, not only in a disabled button's tooltip (A4-07).
+    if (ctx.allowed?.decide && ctx.allowed.decide.allowed !== true && refusals.length) {
+      return { now: `You cannot approve this one yet. ${reasonsText(refusals)}`, act: { label: "Go to the Members card", focus: ".a4-members" } };
+    }
+    return { now: "Review the specification on this page, write a reason in the Approvals card, then Approve or Request changes.",
       act: { label: "Write your reason", focus: '.a4-approvals [name="reason"]' } };
   }
   if (status === "DENIED") return { now: "This revision was denied. Change an answer under Ask and save it to start a new revision.", act: { label: "Change an answer", focus: "form[data-a4-answers] textarea" } };
@@ -177,6 +186,16 @@ function gateMove(ctx, kind) {
         act: { label: "Choose an approver", focus: "li[data-principal] select" } }
       : { now: `Add a second person before asking for approval. ${SOD}, and you are the only person here. In the workspace folder run ${addUserCommand()}, then reload and add them on the Members card.`, stop: true };
   }
+  // Never offer a request whose approval would then be held (A4-04): a missing second member or an unresolved plan
+  // comes first, because fixing it afterwards cancels the approvals already given.
+  const sodHeld = codesOf(readiness, "sod").some((value) => ["SOD_VIOLATION", "QUORUM_UNREACHABLE"].includes(String(value)));
+  const later = [sodHeld ? itemOf(readiness, "sod") : null, itemOf(readiness, "plan_unresolved")]
+    .find((entry) => entry && entry.mandatory && entry.status !== "READY" && entry.status !== "COMPLETE" && entry.acknowledged == null);
+  if (later) {
+    return { now: `Before asking for approval: ${later.nextAction?.label ?? reasonsText([later.id])}`,
+      why: "Do this first. Fixing it after the approval would cancel the approvals already given.",
+      act: later.id === "sod" ? { label: "Go to the Members card", focus: ".a4-members" } : { label: "Show what is missing", focus: "#a4Missing" } };
+  }
   return { now: `Ask for approval: request the ${kind} approval. ${kind === "direction" ? "Approvers check the proposed specification." : "Approvers check what was built and reviewed."}`,
     act: { label: `Request ${kind} approval`, press: `request-${kind}` } };
 }
@@ -184,6 +203,7 @@ function gateMove(ctx, kind) {
 /** The primary action: one button (or link) per screen; a4.js moves to or presses the page control it names. */
 function primary(act, also) {
   if (!act) return "";
+  if (act.copy) return `<button type="button" class="a4-primary" data-a4-copy-link>${esc(act.label)}</button> <span class="muted" role="status" data-a4-copy-status></span>`;
   if (act.href) return `<a class="button a4-primary" href="${esc(act.href)}">${esc(act.label)}</a>`;
   const target = act.press ? `[data-a4-action="${esc(act.press)}"]` : act.focus;
   return `<button type="button" class="a4-primary" data-a4-go="${esc(target)}"${act.press ? " data-a4-press" : ""}${also ? ` data-a4-also="${esc(also)}"` : ""}>${esc(act.label)}</button>`;
@@ -220,48 +240,75 @@ export function renderStartHere(ctx) {
   const live = gate && (gate.status === "PENDING" || gate.status === "QUORUM_MET") ? gate : null;
   return `<section class="card a4-start" aria-labelledby="a4StartTitle"><h3 id="a4StartTitle">What to do now</h3>
     <p class="muted">${esc(WHAT_IS_A_PROJECT)}</p>${renderStepper(project, stage)}
-    ${stage === project.stage && at >= 0 ? `<p>${esc(title(stage))}: step ${at + 1} of ${STEPS.length}, ${esc(STEP_TITLES[project.step] ?? project.step)}.</p>` : ""}
+    ${stage === project.stage && at >= 0 ? `<p>${esc(STAGE_PLAIN[stage] ?? title(stage))}: part ${at + 1} of ${STEPS.length}, ${esc(STEP_PLAIN[project.step] ?? project.step)}
+      <small class="muted">(${esc(title(stage))}, ${esc(STEP_TITLES[project.step] ?? project.step)})</small>.</p>` : ""}
     <p class="a4-now"><strong>${esc(move.now)}</strong></p>${move.why ? `<p class="muted">${esc(move.why)}</p>` : ""}
-    ${live ? renderWhoApproves(ctx, live) : ""}
+    ${live && !move.effect ? renderWhoApproves(ctx, live) : ""}
     <div class="row wrap">${primary(move.act, move.also)}</div>
     <p class="muted">${esc(TRUTH.signatures)}. Every A4 record is self-reported; nothing here says the agent is safe, correct or lawful.</p></section>`;
 }
 
-/** The list page's introduction: what a project is, the stages, and what a newcomer needs first. */
-export function renderIntro() {
-  return `<section class="card a4-start"><h3>Agent projects (A4 Forge preview)</h3><p>${esc(WHAT_IS_A_PROJECT)}</p>
-    <ol class="a4-stepper">${STAGES.map((name, index) => `<li><strong>${index + 1}. ${title(name)}</strong> <span class="muted">${esc(STAGE_PURPOSE[name])}</span></li>`).join("")}</ol>
-    <p class="muted">You will need a second person to approve: ${esc(SOD)}. Add one in the workspace folder with ${code(addUserCommand())};
-    later stages need two approvers, and Adapt needs one of them to hold AUDITOR (${code("--role APPROVER,AUDITOR")}). ${esc(NOT_INDEPENDENT)}.</p></section>`;
+/** The four stages as a horizontal stepper in human words, the A4 name small beneath each. */
+function introStepperHtml() {
+  return `<ol class="a4-stepper a4-stepper-intro" aria-label="The four steps">${STAGES.map((name, index) =>
+    `<li><strong>${index + 1}. ${esc(STAGE_PLAIN[name])}</strong><small class="muted">${esc(title(name))}</small></li>`).join("")}</ol>`;
+}
+
+/**
+ * The list page's introduction: a short heading, one sentence, the stepper, and the approver notice. The terminal commands
+ * sit under "Use the terminal instead"; an OWNER (`canAdd`) gets an inline form that adds a person through Studio.
+ */
+export function renderIntro({ creating = true, canAdd = false } = {}) {
+  return `<section class="card a4-start a4-intro"><h2>Build an agent</h2>
+    <p class="first-use-lead">Say what the agent is for and AMC drafts it with you in four steps. A second person approves each step before it moves on.</p>
+    ${introStepperHtml()}
+    <div class="a4-approver-note"><p><strong>A second person has to approve each step.</strong> Add them now or later.</p>
+      <div class="row wrap">${canAdd ? '<button type="button" class="secondary" data-a4-add-person aria-expanded="false" aria-controls="a4AddPerson">Add a person</button>' : ""}
+        <a class="button secondary" href="./users">Open Users</a>
+        ${creating ? "" : '<button type="button" class="secondary" data-a4-show-create>Start another project</button>'}</div>
+      ${canAdd ? `<form id="a4AddPerson" class="a4-form a4-add-person" hidden novalidate>
+        <label>Their user name <input name="username" autocomplete="off" required maxlength="64" /></label>
+        <label>A first password for them <input name="password" type="password" autocomplete="new-password" required /></label>
+        <label>What they may do <select name="roles"><option value="APPROVER">Approve steps (APPROVER)</option>
+          <option value="APPROVER,AUDITOR">Approve steps and audit (APPROVER, AUDITOR; the Fit it to your rules step needs one)</option></select></label>
+        <p class="a4-form-error status-bad" role="alert" hidden></p>
+        <p class="muted" role="status" data-a4-add-status></p>
+        <button type="submit" class="secondary">Add this person</button></form>` : ""}
+      <details class="a4-terminal"><summary>Use the terminal instead</summary>
+        <p class="muted">In the workspace folder run ${code(addUserCommand())}. Later steps need two approvers, and Fit it to your rules (Adapt)
+        needs one of them to hold AUDITOR (${code("--role APPROVER,AUDITOR")}).</p></details>
+      <p class="muted">${esc(SOD)}. ${esc(NOT_INDEPENDENT)}.</p></div></section>`;
 }
 
 /** The page shown while the preview is off: what A4 is and the exact way to turn it on (the gate itself stays). */
 export function previewOffHtml() {
   return `<section class="card a4-start"><h3>Agent projects are turned off in this workspace</h3><p>${esc(WHAT_IS_A_PROJECT)}</p>
-    <p>A4 Forge is a preview, and previews are off unless the workspace owner turns them on.</p><p>${previewNoticeHtml()}</p></section>`;
+    <p>A4 Forge is a preview. It is on by default, and the workspace owner can turn it off.</p><p>${previewNoticeHtml()}</p></section>`;
 }
 
 /** The demo workspace is view-only: projects need your own workspace. */
 export function demoHtml() {
   return `<section class="card a4-start"><h3>Agent projects need your own workspace</h3><p>${esc(WHAT_IS_A_PROJECT)}</p>
     <p>This is the view-only demo, so it cannot hold agent projects. To start one, use a workspace of your own: in an empty folder run
-    ${code("amc init")}, then ${code("amc user init")} to create your sign-in, then ${code("AMC_A4_PREVIEW=1 amc up")}, and sign in.</p></section>`;
+    ${code("amc init")}, then ${code("amc user init")} to create your sign-in, then ${code("amc up")}, and sign in.</p></section>`;
 }
 
 /** An error as a sentence, the next step, and its code for the small print. */
 const ERROR_TEXT = {
+  INPUT_TOO_LARGE: ["What this step sends is larger than Studio accepts, so nothing was saved.",
+    "Shorten the longest answers and try again. If it keeps happening, it is a limit in AMC itself: report it with this page's address."],
   A4_STALE_HEAD: ["Someone changed the project while you were working, so nothing was saved.", "The page has reloaded: check it, then try again."],
   A4_STEP_ORDER: ["That step is not next yet.", "Follow What to do now at the top of the page."],
   A4_NOT_READY: [null, "See Missing requirements on this page."],
   SOD_VIOLATION: ["You cannot approve your own work (separation of duties).", "Ask another approver to decide it."],
   PRINCIPAL_ROLE_INSUFFICIENT: ["Your workspace role cannot decide this.", "A workspace owner can add the role with amc user role set <username> --roles <roles>."],
   A4_NOT_A_MEMBER: ["You are not an approver on this project.", "A project owner adds you on the Members card with the approver role."],
-  DEMO_REFUSED: ["The demo workspace cannot hold agent projects.", "Use your own workspace: amc init, amc user init, then AMC_A4_PREVIEW=1 amc up."],
+  DEMO_REFUSED: ["The demo workspace cannot hold agent projects.", "Use your own workspace: amc init, amc user init, then amc up."],
   A4_AUTH_REQUIRED: ["Your sign-in has ended.", "Sign in again, then retry."],
   NATIVE_CSRF_REQUIRED: ["Studio needs a fresh page before it accepts changes.", "Reload the page and try again."],
   A4_ON_HOLD: ["The project is on hold.", "A project owner resumes it under Approvals, More."],
   FREEZE_ACTIVE: ["An incident freeze is active for this agent, so nothing can change.", "The freeze must be lifted first."],
-  A4_PREVIEW_DISABLED: ["A4 is a preview and is turned off in this Studio.", "Stop Studio with amc down and start it with AMC_A4_PREVIEW=1 amc up."]
+  A4_PREVIEW_DISABLED: ["A4 is a preview and is turned off in this Studio.", "Stop Studio with amc down and start it again without AMC_A4_PREVIEW=0 (for example AMC_A4_PREVIEW=1 amc up)."]
 };
 export function explainError(error) {
   const raw = String(error?.message ?? error ?? "Something went wrong.");
@@ -318,4 +365,36 @@ export async function answersDigest(answers) {
 export async function understandingIsCurrent(spec) {
   const recorded = isObject(spec) && isObject(spec.understanding) ? spec.understanding.answersDigest : null;
   return typeof recorded === "string" && recorded === await answersDigest(spec.answers);
+}
+
+/** The project Home continues: the most recently changed one that is not retired, else null. */
+function latestProject(projects) {
+  const open = list(projects).filter((project) => isObject(project) && project.stage !== "retired");
+  return open.sort((a, b) => String(b.updatedTs ?? "").localeCompare(String(a.updatedTs ?? "")))[0] ?? null;
+}
+
+/**
+ * Home's first card. With no project: "Build an agent for your industry", one sentence, the industry list, a name and one
+ * button. With projects: "Continue <name>", what it needs now in one sentence, one button, and "Start another" as a link.
+ * In the demo workspace, which cannot hold projects, it says where building works instead.
+ */
+export function homeCardHtml({ projects = [], industryHtml = "", demo = false } = {}) {
+  const lead = "Pick your industry, answer plain questions, and AMC drafts the agent with you. A second person approves each step before it moves on.";
+  if (demo) {
+    return `<h2 id="a4HomeTitle">Build an agent for your industry</h2><p class="first-use-lead">${esc(lead)}</p>
+      <p>This demo workspace is view-only, so it cannot hold agent projects. <a href="./a4">See how building works</a></p>`;
+  }
+  const project = latestProject(projects);
+  if (project) {
+    const at = STAGES.indexOf(project.stage);
+    const where = at >= 0 ? `Step ${at + 1} of 4: ${STAGE_PLAIN[project.stage]} (${title(project.stage)}). Part: ${STEP_PLAIN[project.step] ?? project.step}.` : "";
+    return `<h2 id="a4HomeTitle">Continue ${esc(project.name)}</h2>
+      <p class="first-use-lead">${esc(project.hold ? "This project is on hold until a project owner resumes it." : STEP_NEXT[project.step] ?? "Open it to see what it needs next.")}</p>
+      ${where ? `<p class="muted">${esc(where)}</p>` : ""}
+      <div class="row wrap a4-home-actions"><a class="button" href="./a4Project?project=${encodeURIComponent(project.projectId ?? "")}">Continue</a>
+      <a href="./a4?new=1">Start another</a></div>`;
+  }
+  return `<h2 id="a4HomeTitle">Build an agent for your industry</h2><p class="first-use-lead">${esc(lead)}</p>
+    ${renderCreateForm(true, industryHtml, { home: true })}
+    <p class="muted">A4 Forge preview. ${esc(TRUTH.signatures)}; nothing here says the agent is safe, correct or lawful.</p>`;
 }

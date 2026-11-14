@@ -133,7 +133,7 @@ describe("desktop app packaging and visual identity", () => {
     expect(dashboard).toContain('data-page="home"');
     expect(dashboard).toContain('<script type="module" src="./assets/app.js?v=20260711a"></script>');
     expect(dashboard).not.toContain("<style>body{font-family:system-ui");
-    expect(home).toContain("Compass Console - AMC Studio");
+    expect(home).toContain("<title>Home · Compass Console</title>");
     expect(styles).toContain("--accent: #4AEF79");
     expect(styles).toContain("--bg-terminal: #2a2a2a");
     expect(styles).toContain(".studio-desktop-note");
