@@ -2102,10 +2102,23 @@ program.hook("preAction", async (_thisCommand, actionCommand) => {
 });
 installClaimLabelHooks(program);
 
+/**
+ * CLI-09: a second `amc init` or `amc quickstart --minimal` in a folder that already has a vault generated a new
+ * passphrase for it and failed with "Vault unlock failed". A vault that exists keeps its passphrase: say so and change nothing.
+ */
+function existingVaultLeftAlone(workspace: string): boolean {
+  if (!vaultStatusNow(workspace).exists || (process.env.AMC_VAULT_PASSPHRASE ?? "").length > 0) return false;
+  console.log(chalk.yellow("This folder already has an AMC vault, so it is already set up. Nothing was changed."));
+  console.log(chalk.gray(`  Commands that sign need that vault's passphrase: ${VAULT_UNLOCK_PATHS}.`));
+  console.log(chalk.gray("  To start over instead (this discards the vault and every record in .amc): amc init --force"));
+  return true;
+}
+
 async function initializeMinimalStartupWorkspace(opts: {
   profile: "dev" | "ci" | "prod";
   trustBoundary?: "isolated" | "shared";
 }): Promise<void> {
+  if (existingVaultLeftAlone(process.cwd())) return;
   // The vault keys are created with this passphrase and every later signing
   // command (amc firewall enable, amc agent-loop run) needs it from the shell.
   // A generated value that is neither kept nor shown leaves a vault no command can unlock: an operator in a terminal has
@@ -2194,6 +2207,7 @@ program
       });
       return;
     }
+    if (existingVaultLeftAlone(process.cwd())) return;
     // Ensure vault passphrase is available before init (it creates crypto keys)
     let rememberAfterInit: string | null = null;
     if (!process.env.AMC_VAULT_PASSPHRASE) {
