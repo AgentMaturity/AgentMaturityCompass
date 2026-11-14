@@ -127,6 +127,18 @@ function detectedProviderIdsFromEnv(env: NodeJS.ProcessEnv): Set<ProviderId> {
   return detected;
 }
 
+export interface DetectedProviderKey {
+  readonly id: string;
+  readonly displayName: string;
+  readonly apiKeyEnv: string;
+}
+
+/** The providers whose API key is set in `env`, in quick setup's order; names only, never a key value. */
+export function detectProviderKeys(env: NodeJS.ProcessEnv = process.env): DetectedProviderKey[] {
+  const ids = detectedProviderIdsFromEnv(env);
+  return PROVIDERS.filter((row) => ids.has(row.id)).map(({ id, displayName, apiKeyEnv }) => ({ id, displayName, apiKeyEnv }));
+}
+
 async function selectProvider(params: {
   provider?: string;
   auto: boolean;
@@ -141,7 +153,8 @@ async function selectProvider(params: {
     throw new Error(`Unsupported provider '${params.provider}'. Use --provider openai|anthropic|gemini|groq|mistral|together|openrouter.`);
   }
 
-  if (params.auto || !process.stdin.isTTY) {
+  // No key in the shell: nothing to choose between yet, so the first score is not held up by a provider question.
+  if (params.auto || !process.stdin.isTTY || params.detectedProviderIds.size === 0) {
     const firstDetected = PROVIDERS.find((row) => params.detectedProviderIds.has(row.id));
     return firstDetected ?? PROVIDERS[0]!;
   }

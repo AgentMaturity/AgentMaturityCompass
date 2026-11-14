@@ -5,6 +5,7 @@
  * prices growth in cli.ts, and the group is a self-contained unit in the same shape as cli-lease-commands.ts.
  */
 import { existsSync, readFileSync } from "node:fs";
+import { userInfo } from "node:os";
 import chalk from "chalk";
 import inquirer from "inquirer";
 import type { Command } from "commander";
@@ -38,23 +39,33 @@ async function accountPassword(username: string, passwordFile: string | undefine
   return answer.password;
 }
 
+/** --username, else (in a terminal) the OS user name, said aloud; without a terminal the option stays required. */
+function ownerUsername(given: string | undefined): string {
+  if (given !== undefined) return given;
+  if (process.stdin.isTTY !== true) throw new Error("required option '--username <name>' not specified");
+  const name = userInfo().username;
+  console.log(`Using your OS user name: ${name} (pass --username to choose another).`);
+  return name;
+}
+
 export function registerUserCommands(program: Command): void {
   const user = program.command("user").description("Multi-user RBAC account management");
 
   user
     .command("init")
     .description("Initialize signed users.yaml with first OWNER user")
-    .requiredOption("--username <name>", "owner username")
+    .option("--username <name>", "owner username (in a terminal, defaults to your OS user name)")
     .option(...PASSWORD_FILE)
     .option("--force", "replace an existing users.yaml and every account in it", false)
-    .action(async (opts: { username: string; passwordFile?: string; force: boolean }) => {
+    .action(async (opts: { username?: string; passwordFile?: string; force: boolean }) => {
       if (!opts.force && existsSync(usersConfigPath(process.cwd()))) {
         throw new Error("users.yaml already exists; pass --force to replace every account, or use amc user add");
       }
+      const username = ownerUsername(opts.username);
       const created = await userInitCli({
         workspace: process.cwd(),
-        username: opts.username,
-        password: await accountPassword(opts.username, opts.passwordFile)
+        username,
+        password: await accountPassword(username, opts.passwordFile)
       });
       console.log(chalk.green(`Users config created: ${created.path}`));
       console.log(`Signature: ${created.sigPath}`);

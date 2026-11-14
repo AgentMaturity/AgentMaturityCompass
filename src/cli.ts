@@ -296,7 +296,8 @@ import { installFatalHandlers } from "./runtime/fatalDiagnostic.js";
 import { changeVaultPassphraseInteractive, initVaultInteractive, lockVaultNow, printVaultPassphraseChange, promptPassphrase, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
 import { forgetVaultPassphrase, unlockWithRememberedPassphrase } from "./vault/passphraseStore.js";
 import { adoptVaultPassphraseFile, bootstrapVaultPassphrase, unlockWithPassphraseFile, vaultPassphraseFromEnv } from "./vault/passphraseFile.js";
-import { confirmRememberedUnlock } from "./vault/operatorContext.js";
+import { confirmRememberedUnlock, interactiveOperator } from "./vault/operatorContext.js";
+import { runFrontDoor, scoreNextStep, shouldShowFrontDoor, terminalFrontDoorIo } from "./setup/frontDoor.js";
 import { ensureInstantVaultMode, type InstantVaultMode } from "./cli/instantVaultMode.js";
 import { generatedPassphraseForInit, rememberInitPassphrase, skipVaultPassphrase } from "./cli/initPassphrase.js";
 import { ensureUpVaultPassphrase, printConsoleSignInStep, runFirstBaselineIfNeeded } from "./studio/oneCommandUp.js";
@@ -1482,6 +1483,7 @@ function renderInstantFullScore(
     reportJsonPath?: string;
     reportMarkdownPath?: string;
     studioEvidenceUrl?: string | null;
+    nextStep?: string;
   } = {}
 ): void {
   const avgLevel = diagnosticAverageLevel(report);
@@ -1548,6 +1550,7 @@ function renderInstantFullScore(
   console.log(chalk.gray(`  Artifact seal: ${report.status} | Evidence: ${statusExplanation.evidenceStatus} | Claims: ${statusExplanation.strongClaimsAllowed ? "ELIGIBLE" : "BLOCKED"}`));
   console.log("");
   console.log(chalk.bold(`  Overall: L${avgLevel.toFixed(2)} (${score100}/100) ${report.trustLabel}`));
+  if (report.evidenceCoverage === 0) console.log("  AMC has not seen your agent do anything yet, so this score is empty.");
   console.log(chalk.gray(`  Integrity: ${report.integrityIndex.toFixed(3)} | Evidence coverage: ${(report.evidenceCoverage * 100).toFixed(1)}%`));
   console.log(chalk.gray(`  Claim boundary: ${statusExplanation.claimBoundary}`));
   if (!statusExplanation.strongClaimsAllowed) {
@@ -1573,40 +1576,13 @@ function renderInstantFullScore(
   } else if (state.createdAgentContext) {
     console.log(chalk.green("  Created missing agent context automatically."));
   }
-  if (state.vault.createdLocalPassphrase && state.vault.localPassphrasePath) {
-    console.log(chalk.gray(`  Local signing vault initialized: ${state.vault.localPassphrasePath}`));
-  }
   if (state.vault.reason) {
     console.log(chalk.yellow(`  ${state.vault.reason}`));
   }
-  if (opts.lifecycleArtifactPath) {
-    console.log(chalk.gray(`  Lifecycle artifact: ${opts.lifecycleArtifactPath}`));
-  }
-  if (opts.episodeRecordPath) {
-    console.log(chalk.gray(`  Episode record:     ${opts.episodeRecordPath}`));
-  }
-  if (opts.findingProofsPath) {
-    console.log(chalk.gray(`  Finding proofs:     ${opts.findingProofsPath}`));
-  }
-  if (opts.lifecycleReceiptsPath) {
-    console.log(chalk.gray(`  Change receipts:    ${opts.lifecycleReceiptsPath}`));
-  }
-  if (opts.observabilityPath) {
-    console.log(chalk.gray(`  Observability:      ${opts.observabilityPath}`));
-  }
-  if (opts.reportMarkdownPath) {
-    console.log(chalk.gray(`  Report:             ${opts.reportMarkdownPath}`));
-  } else if (opts.reportJsonPath) {
-    console.log(chalk.gray(`  Report:             ${opts.reportJsonPath}`));
-  }
-  if (opts.studioEvidenceUrl) {
-    console.log(chalk.gray(`  Studio Evidence:    ${opts.studioEvidenceUrl}`));
-  } else {
-    console.log(chalk.gray("  Studio Evidence:    amc up  # then open /console/evidence"));
-  }
-  console.log(chalk.gray("  Next: amc up        # open Studio"));
-  console.log(chalk.gray("        amc evidence lifecycle list"));
-  console.log(chalk.gray("        amc shell     # interactive command shell"));
+  // The artifact paths stay in the JSON output and under .amc/; the person reading this needs one next step.
+  console.log(chalk.gray("  Details saved under .amc/ (amc --help --all lists the report commands)"));
+  if (opts.studioEvidenceUrl) console.log(chalk.gray(`  Evidence in the console: ${opts.studioEvidenceUrl}`));
+  console.log(chalk.bold(`  ${opts.nextStep ?? scoreNextStep(null)}`));
   console.log("");
 }
 
@@ -1722,7 +1698,7 @@ function printEuAiActNotEvaluated(): void {
   console.log(chalk.gray("  Risk class: amc compliance risk-classify · Evidence-linked report: amc compliance report --framework EU_AI_ACT"));
 }
 
-async function runInstantFullScoreForAgent(params: { workspace: string; agentId: string; json?: boolean }): Promise<void> {
+async function runInstantFullScoreForAgent(params: { workspace: string; agentId: string; json?: boolean; nextStep?: string }): Promise<void> {
   params = { ...params };
   const started = Date.now();
   const releaseLock = await acquireInstantScoreLock(params.workspace);
@@ -1826,6 +1802,7 @@ async function runInstantFullScoreForAgent(params: { workspace: string; agentId:
     });
     renderInstantFullScore(report, elapsedMs, state, {
       json: params.json,
+      nextStep: params.nextStep,
       ...refs
     });
   } catch (error: unknown) {
@@ -1930,6 +1907,7 @@ async function runInstantFullScoreForAgent(params: { workspace: string; agentId:
       }
       renderInstantFullScore(report, elapsedMs, unsignedState, {
         json: params.json,
+        nextStep: params.nextStep,
         ...refs
       });
       return;
@@ -1975,6 +1953,7 @@ program.option("--agent <agentId>", "agent ID (defaults to .amc/current-agent)")
 program.option("--json", "emit structured JSON for the top-level full score", false);
 // No default: a `false` default made `color` false on every command, so preAction switched colour off everywhere.
 program.option("--no-color", "disable ANSI color output; equivalent to NO_COLOR=1");
+program.option("--no-menu", "bare amc only: skip the start menu and print the score (or set AMC_NO_MENU=1)");
 program
   .command("help [commandPath...]")
   .description("Show help for a command (for example: amc help run)")
@@ -2161,10 +2140,10 @@ async function initializeMinimalStartupWorkspace(opts: {
   console.log("");
 }
 
-/** One What's next list: the three actions to a first governed, verified, keyless turn, then any further steps. */
-function printFirstRunActions(fmt: typeof import("./cliFormat.js"), more: Array<{ cmd: string; desc: string }> = []): void {
-  console.log(fmt.info("The first three steps reach a first governed, verified turn without any provider key:"));
-  console.log(fmt.nextSteps([...firstRunActions().map((action) => ({ cmd: action.cmd, desc: action.desc })), ...more]));
+/** One What's next list: the plain first steps, the optional monitor-key pin last. */
+function printFirstRunActions(fmt: typeof import("./cliFormat.js")): void {
+  console.log(fmt.info("What to do next (no account or key needed):"));
+  console.log(fmt.nextSteps(firstRunActions().map((action) => ({ cmd: action.cmd, desc: action.desc }))));
 }
 
 program
@@ -2257,13 +2236,7 @@ program
     console.log(fmt.pass("Workspace initialized"));
     console.log(fmt.info(`Location: ${init.workspacePath}`));
     if (skip.generated) console.log(fmt.info(rememberInitPassphrase(init.workspacePath, skip.generated)));
-    printFirstRunActions(fmt, [
-      { cmd: "amc", desc: "Generate the full evidence score immediately" },
-      { cmd: "amc up", desc: "Start Studio (web dashboard)" },
-      { cmd: "amc doctor", desc: "Check what's available in your environment" },
-      { cmd: "amc setup --demo", desc: "Load demo data and explore all features" },
-      { cmd: `amc config profile ${opts.profile}`, desc: "Re-apply the selected workspace config profile" },
-    ]);
+    printFirstRunActions(fmt);
     console.log(fmt.colors.dim("  Full guide: https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md"));
     console.log("");
 
@@ -19549,8 +19522,17 @@ program.action(async (_opts, command: Command) => {
 
   const opts = program.opts<{ agent?: string; json?: boolean }>();
   const agentId = resolveAgentId(process.cwd(), opts.agent ?? activeAgent(program) ?? undefined);
+  const workspace = process.cwd();
   try {
-    await runInstantFullScoreForAgent({ workspace: process.cwd(), agentId, json: Boolean(opts.json) });
+    if (shouldShowFrontDoor({ args: process.argv.slice(2), env: process.env, stdinTTY: process.stdin.isTTY === true,
+      stdoutTTY: process.stdout.isTTY === true, operatorOk: interactiveOperator({ workspace }).ok })) {
+      const operatorEnv = { ...process.env }; // before the workspace step can set AMC_VAULT_PASSPHRASE: children never inherit it
+      if (ensureInstantWorkspace(workspace, agentId).createdWorkspace) console.log(chalk.gray("AMC set up this folder (.amc/)."));
+      await runFrontDoor(terminalFrontDoorIo({ workspace, agentId, operatorEnv, openUrl: openExternalUrl,
+        showScore: (nextStep) => runInstantFullScoreForAgent({ workspace, agentId, nextStep }) }));
+      return;
+    }
+    await runInstantFullScoreForAgent({ workspace, agentId, json: Boolean(opts.json) });
   } catch (error: unknown) {
     console.error(chalk.red(normalizeCliErrorMessage(error)));
     process.exit(1);

@@ -269,7 +269,8 @@ export function selectRelevantEvents(
   if (tagged.length > 0 || events.length === 0) {
     return tagged;
   }
-  if (!warnings.has("strict-binding")) {
+  // A note for whoever writes evidence, not for the person reading a score: shown only with AMC_LOG_LEVEL=debug.
+  if (!warnings.has("strict-binding") && process.env.AMC_LOG_LEVEL === "debug") {
     console.warn(
       `[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: ${questionId}, seen at L${level}).`
     );

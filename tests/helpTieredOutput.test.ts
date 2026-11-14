@@ -24,8 +24,11 @@ describe("tiered top-level help", () => {
 
     expect(result.status).toBe(0);
     expect(result.stderr).toBe("");
-    expect(lineCount(result.stdout)).toBeLessThan(140);
-    expect(result.stdout).toContain("High-signal commands:");
+    // A short task list (about a dozen rows), not the command groups: those are behind --help --all.
+    expect(lineCount(result.stdout)).toBeLessThan(25);
+    expect(result.stdout).toContain("Start here:");
+    expect(result.stdout).toContain("amc login status");
+    expect(result.stdout).not.toContain("High-signal commands:");
     expect(result.stdout).toContain("amc --help --all");
     expect(result.stdout).not.toContain("compliance|comply");
   });

@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runDoctorRules } from "../src/doctor/doctorRules.js";
 import { renderDoctorText } from "../src/doctor/doctorReport.js";
-import { doctorNextSteps, firstRunActions, firstRunFixCommands, STUB_FIRST_TURN_COMMAND } from "../src/doctor/firstRunPlan.js";
+import { doctorNextSteps, firstRunActions, firstRunFixCommands, PINNED_VERIFY_COMMAND, STUB_FIRST_TURN_COMMAND } from "../src/doctor/firstRunPlan.js";
 import { AGENT_ENV_MARKERS } from "../src/vault/operatorContext.js";
 
 /**
@@ -228,15 +228,15 @@ describe("amc doctor names each first-run precondition and its fix", () => {
 });
 
 describe("the first-run action plan `amc init` prints", () => {
-  it("lists exactly three operator actions in order: sign the firewall, run the keyless turn, verify it", () => {
+  it("starts plain (the menu, a keyless demo chat, the firewall policy) and ends with the optional monitor-key pin", () => {
     const actions = firstRunActions();
-    expect(actions).toHaveLength(3);
-    expect(actions[0]?.cmd).toBe("amc firewall enable");
-    expect(actions[1]?.cmd).toBe(STUB_FIRST_TURN_COMMAND);
-    // Without a pinned monitor key the verdict is UNANCHORED (exit 1), so the plan names the pin.
-    expect(actions[2]?.cmd).toBe("amc agent-loop verify <session-id> --expect-monitor <monitor sha256>");
-    expect(actions[2]?.desc).toContain(".amc/keys/monitor_ed25519.pub");
-    // The keyless turn must be the stub provider with the stub model and no credential reference.
+    expect(actions.map((action) => action.cmd)).toEqual(["amc", "amc agent-loop chat --provider stub", "amc firewall enable", PINNED_VERIFY_COMMAND]);
+    // Without a pinned monitor key the verdict is UNANCHORED (exit 1), so the plan still names the pin, as an optional last step.
+    expect(PINNED_VERIFY_COMMAND).toBe("amc agent-loop verify <session-id> --expect-monitor <monitor sha256>");
+    expect(actions[3]?.desc).toContain(".amc/keys/monitor_ed25519.pub");
+    expect(actions[3]?.desc).toMatch(/^Optional/);
+    // The keyless turn (the demo chat and the scripted form doctor keeps) is the stub provider with no credential reference.
+    expect(actions[1]?.cmd).toContain("--provider stub");
     expect(STUB_FIRST_TURN_COMMAND).toContain("--provider stub");
     expect(STUB_FIRST_TURN_COMMAND).toContain("--model amc-stub-1");
     expect(STUB_FIRST_TURN_COMMAND).not.toContain("--credential");
