@@ -123,7 +123,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
   },
   {
     id: 'a4',
-    description: 'A4 Forge projects and gates (preview: 404 A4_PREVIEW_DISABLED unless AMC_A4_PREVIEW=1)',
+    description: 'A4 Forge projects and gates (preview, on by default: 404 A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0)',
     prefixes: ['/api/v1/a4'],
     methods: ['GET', 'POST'],
     auth: 'protected',

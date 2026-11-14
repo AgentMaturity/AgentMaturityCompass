@@ -238,14 +238,14 @@ export function renderIntro() {
 /** The page shown while the preview is off: what A4 is and the exact way to turn it on (the gate itself stays). */
 export function previewOffHtml() {
   return `<section class="card a4-start"><h3>Agent projects are turned off in this workspace</h3><p>${esc(WHAT_IS_A_PROJECT)}</p>
-    <p>A4 Forge is a preview, and previews are off unless the workspace owner turns them on.</p><p>${previewNoticeHtml()}</p></section>`;
+    <p>A4 Forge is a preview. It is on by default, and the workspace owner can turn it off.</p><p>${previewNoticeHtml()}</p></section>`;
 }
 
 /** The demo workspace is view-only: projects need your own workspace. */
 export function demoHtml() {
   return `<section class="card a4-start"><h3>Agent projects need your own workspace</h3><p>${esc(WHAT_IS_A_PROJECT)}</p>
     <p>This is the view-only demo, so it cannot hold agent projects. To start one, use a workspace of your own: in an empty folder run
-    ${code("amc init")}, then ${code("amc user init")} to create your sign-in, then ${code("AMC_A4_PREVIEW=1 amc up")}, and sign in.</p></section>`;
+    ${code("amc init")}, then ${code("amc user init")} to create your sign-in, then ${code("amc up")}, and sign in.</p></section>`;
 }
 
 /** An error as a sentence, the next step, and its code for the small print. */
@@ -256,12 +256,12 @@ const ERROR_TEXT = {
   SOD_VIOLATION: ["You cannot approve your own work (separation of duties).", "Ask another approver to decide it."],
   PRINCIPAL_ROLE_INSUFFICIENT: ["Your workspace role cannot decide this.", "A workspace owner can add the role with amc user role set <username> --roles <roles>."],
   A4_NOT_A_MEMBER: ["You are not an approver on this project.", "A project owner adds you on the Members card with the approver role."],
-  DEMO_REFUSED: ["The demo workspace cannot hold agent projects.", "Use your own workspace: amc init, amc user init, then AMC_A4_PREVIEW=1 amc up."],
+  DEMO_REFUSED: ["The demo workspace cannot hold agent projects.", "Use your own workspace: amc init, amc user init, then amc up."],
   A4_AUTH_REQUIRED: ["Your sign-in has ended.", "Sign in again, then retry."],
   NATIVE_CSRF_REQUIRED: ["Studio needs a fresh page before it accepts changes.", "Reload the page and try again."],
   A4_ON_HOLD: ["The project is on hold.", "A project owner resumes it under Approvals, More."],
   FREEZE_ACTIVE: ["An incident freeze is active for this agent, so nothing can change.", "The freeze must be lifted first."],
-  A4_PREVIEW_DISABLED: ["A4 is a preview and is turned off in this Studio.", "Stop Studio with amc down and start it with AMC_A4_PREVIEW=1 amc up."]
+  A4_PREVIEW_DISABLED: ["A4 is a preview and is turned off in this Studio.", "Stop Studio with amc down and start it again without AMC_A4_PREVIEW=0 (for example AMC_A4_PREVIEW=1 amc up)."]
 };
 export function explainError(error) {
   const raw = String(error?.message ?? error ?? "Something went wrong.");

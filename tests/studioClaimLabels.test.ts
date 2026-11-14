@@ -32,7 +32,7 @@ beforeEach(() => {
   expect([22, 24], "Studio claim fixtures require a qualified Node major").toContain(Number(process.versions.node.split(".")[0]));
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "p0-23-owned-studio-claim-passphrase");
   vi.stubEnv("AMC_VAULT_PASSPHRASE_FILE", undefined);
-  vi.stubEnv("AMC_A4_PREVIEW", undefined);
+  vi.stubEnv("AMC_A4_PREVIEW", "0");
   for (const prefix of ["AMC_INDUSTRY_PACKS", "AMC_DOMAIN_PACKS"]) {
     for (const suffix of ["LICENSE_KEY", "LICENSE_PUBLIC_KEY", "LICENSE_PRIVATE_KEY", "LICENSE_SECRET", "ACTIVE", "CHECKOUT_URL", "VERIFY_URL"]) {
       vi.stubEnv(`${prefix}_${suffix}`, undefined);

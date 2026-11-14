@@ -103,13 +103,13 @@ const recipes: Recipe[] = [
   {"path": "benchmark provider-drift", "args": ["--file", "@MISSING@", "--json"], "json": true, "refusal": {"reason": "This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.", "pattern": "ENOENT|not found|No .*found|missing|unavailable|unknown.*run|does not exist"}},
   {"path": "benchmark replay-corpus", "args": ["--file", "@MISSING@", "--json"], "json": true, "refusal": {"reason": "This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.", "pattern": "ENOENT|not found|No .*found|missing|unavailable|unknown.*run|does not exist"}},
   {"path": "lab-simulate", "args": ["--experiment", "@EXPERIMENT@"]},
-  {"path": "a4 list", "args": ["--json"], "json": true, "refusal": {"reason": "A4 Forge is a preview this fixture does not enable (AMC_A4_PREVIEW unset).", "pattern": "A4_PREVIEW_DISABLED"}},
-  {"path": "a4 show", "args": ["a4p_00000000000000000000000000000000", "--json"], "json": true, "refusal": {"reason": "A4 Forge is a preview this fixture does not enable (AMC_A4_PREVIEW unset).", "pattern": "A4_PREVIEW_DISABLED"}},
-  {"path": "a4 readiness", "args": ["a4p_00000000000000000000000000000000", "--json"], "json": true, "refusal": {"reason": "A4 Forge is a preview this fixture does not enable (AMC_A4_PREVIEW unset).", "pattern": "A4_PREVIEW_DISABLED"}},
-  {"path": "a4 verify", "args": ["a4p_00000000000000000000000000000000", "--json"], "json": true, "refusal": {"reason": "A4 Forge is a preview this fixture does not enable (AMC_A4_PREVIEW unset).", "pattern": "A4_PREVIEW_DISABLED"}},
-  {"path": "a4 release", "args": ["a4p_00000000000000000000000000000000", "--session-token-file", "@MISSING@", "--expect-head-seq", "1", "--gate", "a4gate_00000000000000000000000000000000", "--json"], "json": true, "refusal": {"reason": "A4 Forge is a preview this fixture does not enable (AMC_A4_PREVIEW unset).", "pattern": "A4_PREVIEW_DISABLED"}},
-  {"path": "a4 deploy verify", "args": ["a4p_00000000000000000000000000000000", "a4r_00000000000000000000000000000000", "--session-token-file", "@MISSING@", "--expect-head-seq", "1", "--environment", "staging", "--json"], "json": true, "refusal": {"reason": "A4 Forge is a preview this fixture does not enable (AMC_A4_PREVIEW unset).", "pattern": "A4_PREVIEW_DISABLED"}},
-  {"path": "a4 export", "args": ["a4p_00000000000000000000000000000000", "--run", "@RUN@", "--out", "@OUT@", "--json"], "json": true, "refusal": {"reason": "A4 Forge is a preview this fixture does not enable (AMC_A4_PREVIEW unset).", "pattern": "A4_PREVIEW_DISABLED"}},
+  {"path": "a4 list", "args": ["--json"], "json": true, "refusal": {"reason": "A4 Forge is a preview this fixture turns off (AMC_A4_PREVIEW=0).", "pattern": "A4_PREVIEW_DISABLED"}},
+  {"path": "a4 show", "args": ["a4p_00000000000000000000000000000000", "--json"], "json": true, "refusal": {"reason": "A4 Forge is a preview this fixture turns off (AMC_A4_PREVIEW=0).", "pattern": "A4_PREVIEW_DISABLED"}},
+  {"path": "a4 readiness", "args": ["a4p_00000000000000000000000000000000", "--json"], "json": true, "refusal": {"reason": "A4 Forge is a preview this fixture turns off (AMC_A4_PREVIEW=0).", "pattern": "A4_PREVIEW_DISABLED"}},
+  {"path": "a4 verify", "args": ["a4p_00000000000000000000000000000000", "--json"], "json": true, "refusal": {"reason": "A4 Forge is a preview this fixture turns off (AMC_A4_PREVIEW=0).", "pattern": "A4_PREVIEW_DISABLED"}},
+  {"path": "a4 release", "args": ["a4p_00000000000000000000000000000000", "--session-token-file", "@MISSING@", "--expect-head-seq", "1", "--gate", "a4gate_00000000000000000000000000000000", "--json"], "json": true, "refusal": {"reason": "A4 Forge is a preview this fixture turns off (AMC_A4_PREVIEW=0).", "pattern": "A4_PREVIEW_DISABLED"}},
+  {"path": "a4 deploy verify", "args": ["a4p_00000000000000000000000000000000", "a4r_00000000000000000000000000000000", "--session-token-file", "@MISSING@", "--expect-head-seq", "1", "--environment", "staging", "--json"], "json": true, "refusal": {"reason": "A4 Forge is a preview this fixture turns off (AMC_A4_PREVIEW=0).", "pattern": "A4_PREVIEW_DISABLED"}},
+  {"path": "a4 export", "args": ["a4p_00000000000000000000000000000000", "--run", "@RUN@", "--out", "@OUT@", "--json"], "json": true, "refusal": {"reason": "A4 Forge is a preview this fixture turns off (AMC_A4_PREVIEW=0).", "pattern": "A4_PREVIEW_DISABLED"}},
   {"path": "lab-report", "args": ["--experiment", "@EXPERIMENT@"]},
   {"path": "lab-compare", "args": ["--baseline", "@LAB_BASELINE@", "--candidate", "@LAB_CANDIDATE@"]},
   {"path": "insider-risk-scores", "args": []},
@@ -324,7 +324,7 @@ syncBuiltinESMExports();\n`);
   environment = {
     PATH: `${dirname(process.execPath)}:${process.env.PATH ?? ""}`, HOME: home, NO_COLOR: "1", TERM: "dumb",
     AMC_VAULT_PASSPHRASE: "p0-22-private-fixture-only", AMC_CONTROL_CHECKPOINT_DIR: join(root, "checkpoints"),
-    AMC_CLAIM_LABELS_STRICT: "1", NODE_OPTIONS: `--import=${guard}`,
+    AMC_CLAIM_LABELS_STRICT: "1", AMC_A4_PREVIEW: "0", NODE_OPTIONS: `--import=${guard}`,
     ...licence.env
   };
   expect(Object.keys(environment).some((key) => /OPENAI|ANTHROPIC|GEMINI|API_KEY|TOKEN|SECRET/.test(key))).toBe(false);

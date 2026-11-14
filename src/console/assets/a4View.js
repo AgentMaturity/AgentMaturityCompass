@@ -21,10 +21,10 @@ export const TRUTH = {
   signatures: "Signatures prove who wrote this and that it is unchanged, not that it is true",
   twoUsers: "Two local users are not evidence of two people"
 };
-// LIVE-UX-04: the notice says how to enable the preview (D-20: AMC_A4_PREVIEW=1 in the Studio process environment).
-const PREVIEW_NOTICE = "A4 preview is not enabled in this workspace. In the workspace folder, stop Studio with `amc down`, set "
-  + "`AMC_A4_PREVIEW=1` in the environment (macOS/Linux: `AMC_A4_PREVIEW=1 amc up`; PowerShell: `$env:AMC_A4_PREVIEW=\"1\"; amc up`), "
-  + "then start it again. A running Studio keeps the environment it started with.";
+// LIVE-UX-04: the notice says how to turn the preview back on (D-20 as amended 2026-11-14: on unless AMC_A4_PREVIEW=0).
+const PREVIEW_NOTICE = "This Studio was started with `AMC_A4_PREVIEW=0`, which turns agent projects off. In the workspace folder, stop "
+  + "Studio with `amc down`, then start it without that setting (macOS/Linux: `AMC_A4_PREVIEW=1 amc up`; PowerShell: "
+  + "`$env:AMC_A4_PREVIEW=\"1\"; amc up`). A running Studio keeps the environment it started with.";
 /** PREVIEW_NOTICE with each `command` in <code>. */
 export const previewNoticeHtml = () => esc(PREVIEW_NOTICE).replace(/`([^`]+)`/g, "<code>$1</code>");
 export const COMMENT_MAX_BYTES = 8 * 1024;

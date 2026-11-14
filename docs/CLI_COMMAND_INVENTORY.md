@@ -4,7 +4,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 
 | Command | Description | Options | Aliases |
 |---|---|---|---|
-| `amc a4` | A4 Forge (preview, AMC_A4_PREVIEW=1): projects, gates, releases and deployments, through the API's own routes | - | - |
+| `amc a4` | A4 Forge (preview, on by default; AMC_A4_PREVIEW=0 turns it off): projects, gates, releases and deployments, through the API's own routes | - | - |
 | `amc a4 approve` | Approve an A4 gate you reviewed (bound to its digests) | `--json`<br>`--session-token-file <file>`<br>`--request-id <id>`<br>`--gate <gateId>`<br>`--reason <text>`<br>`--expect-binding-digest <sha256>`<br>`--expect-gate-seq <n>`<br>`--expect-readiness-digest <sha256>` | - |
 | `amc a4 complete` | Consume an approved gate and run the effect it starts (the API's complete) | `--json`<br>`--session-token-file <file>`<br>`--request-id <id>`<br>`--expect-head-seq <n>`<br>`--stage <stage>`<br>`--gate <gateId>` | - |
 | `amc a4 deny` | Deny an A4 gate you reviewed (bound to its digests) | `--json`<br>`--session-token-file <file>`<br>`--request-id <id>`<br>`--gate <gateId>`<br>`--reason <text>`<br>`--expect-binding-digest <sha256>`<br>`--expect-gate-seq <n>`<br>`--expect-readiness-digest <sha256>` | - |

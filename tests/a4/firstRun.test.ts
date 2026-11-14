@@ -143,7 +143,7 @@ test("preview off and the demo say what A4 is and the way forward, keeping the p
   expect(start.previewOffHtml()).toContain("Agent projects are turned off in this workspace");
   expect(start.previewOffHtml()).toContain(view.previewNoticeHtml());
   expect(start.demoHtml()).toContain("view-only demo");
-  expect(start.demoHtml()).toContain("AMC_A4_PREVIEW=1 amc up");
+  expect(start.demoHtml()).toContain("<code>amc up</code>");
   const page = readFileSync("src/console/assets/a4.js", "utf8");
   expect(page).toContain("start.previewOffHtml()");
   expect(page.indexOf('me.userId === "local-demo"')).toBeLessThan(page.lastIndexOf("await previewOptions()"));

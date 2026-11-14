@@ -94,7 +94,7 @@ footer{padding:2rem 0;color:var(--muted);font-size:.85rem;text-align:center}
   <ul class="labels" aria-label="Status">
     <li class="warn">Preview</li>
     <li class="warn">Current source build only, not in the published 1.1.1 release</li>
-    <li class="warn">Off unless AMC_A4_PREVIEW=1</li>
+    <li class="warn">Preview: on by default, AMC_A4_PREVIEW=0 turns it off</li>
     <li>Every record signed and self-reported</li>
   </ul>
 </div>
@@ -226,11 +226,11 @@ footer{padding:2rem 0;color:var(--muted);font-size:.85rem;text-align:center}
 <section aria-labelledby="try">
 <div class="w">
   <h2 id="try">How to try it today</h2>
-  <p>A4 Forge is only in the current source build. Install AMC <a href="https://github.com/AgentMaturity/AgentMaturityCompass#from-source">from source</a>. The published 1.1.1 release (npm, GitHub, the install scripts) does not have it. It is off unless you set <code>AMC_A4_PREVIEW=1</code>; without it the A4 API answers 404 and every <code>amc a4</code> command exits 1.</p>
-  <p>A running Studio keeps the settings it started with, so stop it and start it again with the flag:</p>
+  <p>A4 Forge is only in the current source build. Install AMC <a href="https://github.com/AgentMaturity/AgentMaturityCompass#from-source">from source</a>. The published 1.1.1 release (npm, GitHub, the install scripts) does not have it. It is a preview and on by default. Setting <code>AMC_A4_PREVIEW=0</code> turns it off: then the A4 API answers 404 and every <code>amc a4</code> command exits 1.</p>
+  <p>A running Studio keeps the settings it started with, so if it was started with <code>AMC_A4_PREVIEW=0</code>, stop it and start it again without that setting:</p>
 <pre class="cmd"><span class="c"># in your workspace</span>
 amc down
-AMC_A4_PREVIEW=1 amc up
+amc up
 
 <span class="c"># the first console login is an OWNER; add the people who will approve</span>
 amc user init --username &lt;you&gt;
@@ -239,8 +239,7 @@ amc user add --username &lt;third&gt; --role APPROVER,AUDITOR</pre>
   <p>Sign in to the Compass Console at the address <code>amc up</code> prints. While the workspace has no project, Home shows a card &ldquo;Start an agent project&rdquo;; creating one needs a signed-in OWNER or OPERATOR. Name the project, or press <strong>Use an example</strong> to fill in a sample project. It is marked &ldquo;(sample)&rdquo; so the records show it is sample data.</p>
   <p>Each project page opens with a <strong>What to do now</strong> panel. It shows the four stages, the current step, one sentence on what is needed, and one button that takes you to the right control or presses it (Studio checks every action again). Every empty answer field shows an example, and on Aspire, Assemble and Adapt <strong>Use an example</strong> fills the empty fields with answers marked &ldquo;(sample)&rdquo; that you can change before saving. While an approval is open, a <strong>Who must approve</strong> block shows how many different people must approve, the role they need, who may not approve (because they wrote, asked for or built it), who has approved so far, and the command that adds a person. At Activate on a laptop, the panel has no button and says this is where the preview stops on this Studio.</p>
   <p>You run the stage steps in the console or through the API. The command line can read projects, approve, complete and check them:</p>
-<pre class="cmd">export AMC_A4_PREVIEW=1
-amc approvals login --username &lt;you&gt; --token-file &lt;new file&gt;
+<pre class="cmd">amc approvals login --username &lt;you&gt; --token-file &lt;new file&gt;
 amc a4 list
 amc a4 guide &lt;projectId&gt;      <span class="c"># next action, head seq, and the exact approve command per open gate</span>
 amc a4 members &lt;projectId&gt; --member LOCAL_USER:&lt;userId&gt; --project-role approver \

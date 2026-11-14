@@ -170,7 +170,7 @@ describe("A4 MCP tools keep the signing key out of the agent host", () => {
     }
   });
 
-  it("lists the five A4 tools only under AMC_A4_PREVIEW=1", async () => {
+  it("lists the five A4 tools unless AMC_A4_PREVIEW=0", async () => {
     const f = await fixture();
     const count = async () => {
       const server = createAmcMcpServer(f.workspace);
@@ -182,7 +182,7 @@ describe("A4 MCP tools keep the signing key out of the agent host", () => {
       return names;
     };
     const withPreview = await count();
-    vi.stubEnv("AMC_A4_PREVIEW", "");
+    vi.stubEnv("AMC_A4_PREVIEW", "0");
     const without = await count();
     expect(without.filter((name) => name.startsWith("amc_a4_"))).toEqual([]);
     expect(withPreview.filter((name) => name.startsWith("amc_a4_")).sort()).toEqual(

@@ -358,7 +358,7 @@ a `ledger_event` ref names. It travels as an `a4-record` JSON export (`amc.a4-re
 exactly as stored), or inside an `.amcbundle` as one such record per project (`a4/<projectId>.json`) beside
 `a4/index.json` (`amc.a4-bundle-slice/v1`), which names each project's head (`projects[].headSeq`, `headDigest`) and
 `containsSyntheticExamples`; the signed `manifest.json` lists both with every other file. AMC adds that slice only with
-`AMC_A4_PREVIEW=1`, and only after each project's chain verifies whole in the same read transaction that reads its
+the A4 preview on (the default; `AMC_A4_PREVIEW=0` turns it off), and only after each project's chain verifies whole in the same read transaction that reads its
 rows. A project belongs to the bundle's agent by the receipt a monitor key signed for its seq-0 audit row (session
 `a4-<projectId>-0`), never by the head row's unsigned `agent_id`; every project any A4 row or audit session names is a
 candidate, and one no receipt attributes is verified as well. Only the A4 store writes in the `a4-` session namespace:
