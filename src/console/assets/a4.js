@@ -4,10 +4,10 @@
 import { apiNativeRequest, logout, onClaims, whoami } from "./api.js";
 import { installClaimStrip } from "./components/claimBadge.js";
 import { renderHandholdingSteps } from "./components/handholdingSteps.js";
-import { renderPlanTimeline } from "./components/planTimeline.js";
 import { definiteNativeSubmissionRefusal } from "./nativeTaskSubmission.js";
 import { stageAction, stageCards } from "./a4Cards.js";
 import * as view from "./a4View.js";
+import * as start from "./a4Start.js";
 import { register as registerAspire } from "./a4Aspire.js";
 import { register as registerAssemble } from "./a4Assemble.js";
 import { register as registerAdapt } from "./a4Adapt.js";
@@ -59,7 +59,8 @@ function errorText(error) {
 
 function showError(error) {
   if (!notice || error?.name === "AbortError") return;
-  notice.innerHTML = `<span class="status-bad">${view.esc(errorText(error))}</span>${pending ? ` Studio did not confirm "${view.esc(pending.label)}".
+  // A sentence and the next step first; Studio's code stays, in small print (a4Start.errorHtml).
+  notice.innerHTML = `${start.errorHtml(error)}${pending ? ` Studio did not confirm "${view.esc(pending.label)}".
     Retry repeats the same request id, so Studio returns the recorded result if the first attempt was admitted. A refused
     retry does not show that the first attempt failed: reload the page and check the project, its decisions and its
     comments before doing it again. <button type="button" id="a4Retry">Retry</button>` : ""}`;
@@ -139,15 +140,33 @@ async function renderListPage(options) {
   const projects = listOf(await apiNativeRequest(`${API}/projects`), "projects");
   showClaims(claimSink);
   claimSink = null;
-  root.innerHTML = `${canCreate(me, options) ? view.renderCreateForm(params.has("new") || projects.length === 0)
+  root.innerHTML = `${start.renderIntro()}${canCreate(me, options) ? view.renderCreateForm(params.has("new") || projects.length === 0)
     : `<p class="muted">${view.CREATE_NEEDS}.</p>`}${view.renderProjectList(projects)}`;
-  root.querySelector("#a4CreateForm")?.addEventListener("submit", (event) => {
+  const createForm = root.querySelector("#a4CreateForm");
+  const formError = (text) => {
+    const target = createForm?.querySelector(".a4-form-error");
+    if (target) { target.textContent = text; target.hidden = !text; }
+  };
+  root.querySelector("[data-a4-example-project]")?.addEventListener("click", () => {
+    createForm.elements.name.value = start.SAMPLE_PROJECT.name;
+    createForm.elements.expertise.value = start.SAMPLE_PROJECT.expertise;
+    formError("");
+    createForm.elements.name.focus();
+  });
+  createForm?.addEventListener("submit", (event) => {
     event.preventDefault();
     void guarded(async () => {
       const form = new FormData(event.target);
       const agentId = String(form.get("agentId") ?? "").trim();
       const name = String(form.get("name") ?? "").trim();
-      if (!name) throw new Error("Write a project name. Nothing was sent.");
+      // Inline validation in sentences, before anything is sent.
+      if (!name) { formError("Write a project name, for example Invoice triage helper. Nothing was sent."); createForm.elements.name.focus(); return; }
+      if (agentId && !/^[a-z0-9][a-z0-9_-]{0,127}$/.test(agentId)) {
+        formError("The agent id uses lowercase letters, digits, _ and -, and starts with a letter or digit (for example invoice-helper). Leave it empty for a new agent. Nothing was sent.");
+        createForm.elements.agentId.focus();
+        return;
+      }
+      formError("");
       const action = { label: "Start an agent project", path: `${API}/projects`,
         body: { clientRequestId: uuid(), name, expertise: form.get("expertise"), ...(agentId ? { agentId } : {}) } };
       action.after = (data) => { location.href = `./a4Project?project=${encodeURIComponent(one(data, "project").projectId)}`; };
@@ -295,7 +314,9 @@ function mountProject(projectId, options) {
     const stageNo = atStage.length > 0 ? Math.max(...atStage) : null;
     const stageRevision = stageNo === null ? null : stageNo === revision?.revisionNo ? revision
       : one(await apiNativeRequest(projectPath(`/revisions/${stageNo}/resolved`)), "revision");
-    return { project, readiness, gates, revision, stageRevision, comments, members, diff, refs, stage: viewStage };
+    // Whether Studio's recorded understanding was made for the answers shown: after a reload Confirm binds the head shown then.
+    const understandingCurrent = await start.understandingIsCurrent(stageRevision?.spec).catch(() => false);
+    return { project, readiness, gates, revision, stageRevision, comments, members, diff, refs, stage: viewStage, understandingCurrent };
   }
 
   function render() {
@@ -310,19 +331,19 @@ function mountProject(projectId, options) {
     const shown = shownReview();
     const gateChange = view.boundReview(shown) && reviewed && !view.sameReview(reviewed, shown) ? { from: reviewed, to: shown } : null;
     const ctx = { ...state, stage, allowed: readiness.allowed, me, gateChange, reflection, explanation, answerDrift: answerDrift(), specDraft: specBase !== null,
-      questions: listOf(state.options?.questions?.[stage], "questions"), answers: shownAnswers() };
-    root.innerHTML = `${view.holdBanner(project)}${view.stageBanner(stage)}${conflict ? view.renderConflict(conflict) : ""}
+      questions: listOf(state.options?.questions?.[stage], "questions").map((question) => ({ ...question, example: start.placeholderOf(stage, question.id) })),
+      answers: shownAnswers(), understandingCurrent: state.understandingCurrent, exampleOffered: start.FILLABLE.has(stage) && stage === state.project.stage };
+    root.innerHTML = `${view.holdBanner(project)}${start.renderStartHere(ctx)}${view.stageBanner(stage)}${conflict ? view.renderConflict(conflict) : ""}
       <section class="card"><h3>${view.esc(project.name)}</h3><p class="muted">Agent <code>${view.esc(project.agentId)}</code> ·
         r${view.esc(project.revisionNo)} · head ${view.esc(project.headSeq)}</p>${view.stageLinks(project, stage)}${view.movedNote(project, stage)}
         <p class="muted">${view.esc(readiness.claimBoundary)}</p></section>
-      <div id="a4Rail"></div><section class="card"><h4>Steps</h4><div id="a4Steps"></div></section>
+      <details class="card" data-a4-open="steps"><summary>The eight steps of a stage</summary><div id="a4Steps"></div></details>
       <div class="a4-cards">${stageCards(stage).map((card) => view.renderCard(card, ctx, state.comments)).join("")}</div>
       <section class="card"><h4>Differences</h4>${state.diff?.error ? `<p class="status-bad">${view.esc(state.diff.error)}</p>`
         : view.renderDifferences(state.diff, project)}</section>
-      <section class="card"><h4>Missing requirements</h4>${view.renderMissing(readiness, stage, (key) => view.nameOf(ctx, key))}</section>
+      <section class="card" id="a4Missing" tabindex="-1"><h4>Missing requirements</h4>${view.renderMissing(readiness, stage, (key) => view.nameOf(ctx, key))}</section>
       ${view.renderLanes(readiness, state.refs, project.revisionNo)}${view.renderApprovalsBar(ctx)}${view.renderMembers(ctx)}
       <section class="card"><h4>Here now</h4><div id="a4Presence"></div></section>`;
-    renderPlanTimeline(root.querySelector("#a4Rail"), view.railPlan(project));
     renderHandholdingSteps(root.querySelector("#a4Steps"), view.stepRows(project, stage));
     renderPresenceChips();
     for (const details of root.querySelectorAll("details[data-a4-open]")) {
@@ -378,6 +399,9 @@ function mountProject(projectId, options) {
 
   /** Confirm binds the head of the statement this page shows, so a newer one makes Studio answer 409. */
   function reflectionBinding() {
+    // A reload drops this page's statement; Studio's recorded understanding of the current answers is then confirmed at the
+    // head shown (Studio refuses it if the project moved since, or if the understanding is not of the current answers).
+    if (!reflection && state.understandingCurrent === true && state.project.stage === stage && state.project.step === "asked") return headBinding();
     if (!Number.isSafeInteger(reflection?.headSeq)) throw new Error("No reflection is shown yet. Run Understand first; nothing was sent.");
     return { expectedHeadSeq: reflection.headSeq, clientRequestId: uuid() };
   }
@@ -553,6 +577,7 @@ function mountProject(projectId, options) {
       root.querySelector('[name="understanding"]')?.focus();
       return tell("Change your answers under Ask or your statement under Understand, then run Understand again. Nothing was sent.");
     }
+    if (name === "use-example") return useExample();
     if (name === "discard-answers") {
       dropAnswerDrafts(button.closest("[data-card]")?.dataset.card ?? "page");
       return render();
@@ -589,6 +614,37 @@ function mountProject(projectId, options) {
       return render();
     }
     return run(action);
+  }
+
+  /**
+   * The start panel's primary action: it moves to the page control it names and, for a step button, presses it, so the
+   * step runs through the same handler, bindings and checks as the button itself. A disabled control says why instead.
+   */
+  function goTo(go) {
+    const target = root.querySelector(go.dataset.a4Go);
+    if (!target) return tell("That control is not on this page yet. Reload the page.");
+    target.closest("details")?.setAttribute("open", "");
+    target.scrollIntoView({ block: "center", behavior: "smooth" });
+    if (target.disabled) {
+      target.focus();
+      return tell(target.title || "That action is not available yet.");
+    }
+    target.focus({ preventScroll: true });
+    if (go.hasAttribute("data-a4-press") && target.matches("button[data-a4-action]")) target.click();
+  }
+
+  /** Fills each empty answer with this stage's example, marked "(sample)" where it is free text (a4Start.EXAMPLES). */
+  function useExample() {
+    const sample = start.EXAMPLES[stage] ?? {};
+    let filled = 0;
+    for (const field of root.querySelectorAll("form[data-a4-answers] textarea[name]")) {
+      if (field.value.trim() || typeof sample[field.name] !== "string") continue;
+      field.value = sample[field.name];
+      field.dispatchEvent(new Event("input", { bubbles: true }));
+      filled += 1;
+    }
+    tell(filled ? `Filled ${filled} empty answer(s) with sample text, marked (sample). Check them, change what you like, then press Save answers.`
+      : "Every answer that has an example is already filled. Nothing was changed.");
   }
 
   function focusCard(card) {
@@ -633,6 +689,8 @@ function mountProject(projectId, options) {
   }
 
   root.addEventListener("click", (event) => {
+    const go = event.target.closest?.("[data-a4-go]");
+    if (go) return goTo(go);
     const button = event.target.closest?.("[data-a4-action],[data-a4-copy]");
     if (!button || button.disabled) return;
     if (button.dataset.a4Copy) { void navigator.clipboard?.writeText(button.dataset.a4Copy).catch(showError); return; }
@@ -679,9 +737,14 @@ async function main() {
   }
   status.innerHTML = `Signed in as ${view.esc(me.username)} <button type="button" class="secondary" id="a4SignOut">Sign out</button>`;
   status.querySelector("#a4SignOut").addEventListener("click", () => void logout().then(() => location.assign("./login"), showError));
+  // The demo session is refused every A4 route (DEMO_REFUSED): say why and how to start a workspace of your own instead.
+  if (me.userId === "local-demo") {
+    root.innerHTML = start.demoHtml();
+    return;
+  }
   const options = await previewOptions();
   if (!options) {
-    root.innerHTML = `<section class="card"><p>${view.previewNoticeHtml()}</p></section>`;
+    root.innerHTML = start.previewOffHtml();
     return;
   }
   document.getElementById("a4NavLink")?.removeAttribute("hidden");

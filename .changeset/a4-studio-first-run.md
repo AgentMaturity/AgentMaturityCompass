@@ -1,0 +1,15 @@
+---
+"agent-maturity-compass": patch
+---
+
+A4 Forge in Studio now guides a first-time user through a project, behind the same preview gate (`AMC_A4_PREVIEW=1`). Every gate, role, signature and binding check is unchanged; nothing is turned on by default.
+
+- Each project page opens with "What to do now": one sentence on what a project is, the four stages as a stepper showing where the project is, the current step ("step 3 of 8"), what that step needs from you, and one primary action that goes to (or presses) the page's own control. Every other action button takes the secondary look. The large stage rail is replaced by the stepper; the eight steps stay in a collapsed list.
+- While a gate is open the panel says who must approve it: how many different people, which workspace roles, who cannot approve it (its author, builder and requester: separation of duties), who approved so far, and how to add a person (`amc user add --username <name> --role APPROVER`, or `amc user role set` for a missing role such as AUDITOR). It says that a second approver in the same workspace meets separation of duties and is not an independent review.
+- Every Ask field shows an example as its placeholder. On Aspire, Assemble and Adapt, "Use an example" fills the empty answers with sample text marked `(sample)`, so the records say it is sample data; the create form has the same button and checks its fields in sentences before sending.
+- Errors read as a sentence and the next step, with Studio's code in small print. With the preview off the page explains what A4 is and the exact way to turn it on; the view-only demo explains that projects need your own workspace and how to start one.
+- Fix: after a page reload, "Yes, that's it" stayed disabled until Understand ran again. The page now checks that Studio's recorded understanding was made for the current answers (the same digest Understand records) and confirms it at the head it shows; Studio still refuses a moved head or a stale understanding.
+- Gate requests are refused (409 `A4_NOT_READY`) while an item an owner must acknowledge (for example Adapt's `plan_unresolved`) is still unacknowledged: approvals given first were spent on a gate that could not complete. `A4_NOT_READY` refusals now read "Not ready yet:" with each item's next action.
+- Readiness at Assemble's built step says to close the build session (Native Tasks, Close and verify) before Review; the effect-gate steps name the Studio card that opens and decides them; Activate's same-host stop says in plain words that the preview stops there and what you have.
+- A request body missing a required field is refused with a sentence naming the field. `amc a4 verify` says which allow flag a FAILED verdict on verified bytes is missing (`--allow-unanchored` or `--allow-unpinned`) and why; the checks are unchanged.
+- `amc a4 guide` starts with the next step and explains the stages and how to add a second person; `amc a4 --help` points to it, and the preview refusal names the exact way to turn the preview on.

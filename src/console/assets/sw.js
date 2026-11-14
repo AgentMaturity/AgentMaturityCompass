@@ -46,6 +46,7 @@ function staticAssets() {
     assetPath("assets/industryPackView.js"),
     assetPath("assets/ops.js"),
     assetPath("assets/components/claimBadge.js"),
+    assetPath("assets/a4Start.js"),
     assetPath("assets/nativeTasks.js"),
     assetPath("assets/nativeTasksView.js"),
     assetPath("assets/nativeTaskSubmission.js"),

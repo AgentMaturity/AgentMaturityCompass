@@ -23,6 +23,7 @@ import { A4_PROJECT_ROLES, A4_STAGES, A4_STEPS, a4PreviewEnabled, type A4Princip
 import { A4StoreError, readOnlyNow } from "./a4/a4Store.js";
 import { verifyA4Bundle, verifyA4Chain } from "./a4/a4Verify.js";
 import { exportEvidenceBundle } from "./bundles/bundle.js";
+import type { VerifierReportV1 } from "./trust/verifierReport.js";
 import { envelopeForUnboundResult } from "./claims/eligibility/adapters.js";
 import type { ClaimEnvelope } from "./claims/eligibility/types.js";
 import { finishVerify, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
@@ -40,6 +41,25 @@ const INPUT_FILE_LIMIT = 256 * 1024;
 const TEXT_ROWS = 50;
 const BOUNDARY = "A4 records are self-reported: a gate decision is an acknowledgement, never an independent review, and no A4 output "
   + "states that the agent is safe, correct or lawful.";
+
+/** The preview gate's refusal, in words: what is off and the exact way to turn it on (the gate itself stays). */
+export const PREVIEW_OFF = "A4 Forge is a preview and is turned off here. Run the command with AMC_A4_PREVIEW=1 in front, for example "
+  + "`AMC_A4_PREVIEW=1 amc a4 guide`. Studio needs it too: stop Studio with `amc down`, then start it with `AMC_A4_PREVIEW=1 amc up`.";
+
+/** `amc a4 guide` with no project: the next step first, then the stage model in plain words. */
+export const GUIDE_START = [
+  "Next: open Studio (`AMC_A4_PREVIEW=1 amc up`), sign in, choose A4 in the menu and start an agent project. Projects are created and built in Studio;",
+  "  this command line reads them, decides gates and runs the release steps. Then run `amc a4 list` and `amc a4 guide <projectId>` here.",
+  "",
+  "What a project is: one agent's journey from a brief to a recorded deployment, in four stages:",
+  "  Aspire (what the agent is for) → Assemble (build it) → Adapt (fit it to your context and rules) → Activate (release and deploy).",
+  "Each stage runs the same steps: answer the questions, confirm what AMC understood, explain, propose, get the direction approved,",
+  "  build, review, get the completion approved.",
+  "Approvals need a second person: the person who wrote or built a stage cannot approve it (separation of duties). Add one in the",
+  "  workspace folder with `amc user add --username <name> --role APPROVER`, then add them to the project on its Members card.",
+  "  Later gates need two approvers, and Adapt's completion needs one of them to hold AUDITOR (`--role APPROVER,AUDITOR`).",
+  "  A second person in the same workspace meets separation of duties; it is not an independent review."
+].join("\n");
 
 type Data = Record<string, unknown>;
 interface Base { json?: boolean; sessionTokenFile?: string; username?: string; roles?: string; userId?: string }
@@ -176,7 +196,7 @@ function refused(name: string, error: unknown, json: boolean): void {
 /** Every leaf: the preview gate and the identity-flag refusal first; any refusal exits 1. */
 async function run(name: string, opts: Base, body: () => Promise<void>): Promise<void> {
   try {
-    if (!a4PreviewEnabled()) throw new A4Refusal(404, "A4_PREVIEW_DISABLED", "A4 Forge is not enabled in this workspace; set AMC_A4_PREVIEW=1.");
+    if (!a4PreviewEnabled()) throw new A4Refusal(404, "A4_PREVIEW_DISABLED", PREVIEW_OFF);
     const named = (["username", "roles", "userId"] as const).find((flag) => opts[flag] !== undefined);
     if (named !== undefined) {
       throw new A4Refusal(400, "IDENTITY_FLAG_REFUSED", `--${named === "userId" ? "user-id" : named} is refused: identity comes only from --session-token-file.`);
@@ -293,8 +313,7 @@ function registerReads(a4: Command): void {
       const model = { stages: A4_STAGES, steps: A4_STEPS, boundary: BOUNDARY };
       if (projectId === undefined) {
         if (opts.json) console.log(JSON.stringify({ ...model, project: null, nextAction: null, openGates: [] }, null, 2));
-        else console.log([`A4 Forge stages: ${A4_STAGES.join(" → ")}`, `Steps in each stage: ${A4_STEPS.join(" → ")}`, BOUNDARY,
-          "Next: `amc a4 list`, then `amc a4 guide <projectId>`. Projects are created and built in Studio."].join("\n"));
+        else console.log([GUIDE_START, "", BOUNDARY].join("\n"));
         return;
       }
       const project = await route(opts.sessionTokenFile, "GET", `/projects/${projectId}`);
@@ -306,12 +325,14 @@ function registerReads(a4: Command): void {
           hold: project.hold }, nextAction, openGates }, null, 2));
         return;
       }
-      console.log(`A4 project ${safe(project.name)} (${projectId}): ${String(project.stage)}, step ${String(project.step)}, head seq ${String(project.headSeq)}`
-        + `${project.hold === true ? ", on hold" : ""}`);
-      console.log(`Stages: ${A4_STAGES.join(" → ")}; steps: ${A4_STEPS.join(" → ")}`);
-      console.log(`Next: ${safe((nextAction as { label?: string } | null)?.label ?? "nothing is waiting on this stage")}`);
+      const next = nextAction as { label?: string; command?: string } | null;
+      console.log(`Next: ${safe(next?.label ?? "nothing is waiting on this stage")}${next?.command ? `\n  ${safe(next.command)}` : ""}`);
+      console.log(`Project ${safe(project.name)} (${projectId}) is at ${String(project.stage)}, step ${String(project.step)}`
+        + ` (step ${A4_STEPS.indexOf(project.step as typeof A4_STEPS[number]) + 1} of ${A4_STEPS.length}); head seq ${String(project.headSeq)}`
+        + `${project.hold === true ? "; on hold" : ""}.`);
+      console.log(`Stages: ${A4_STAGES.join(" → ")}; steps in each: ${A4_STEPS.join(" → ")}`);
       for (const gate of openGates) {
-        console.log(`Open ${gate.stage} ${gate.gate} gate ${gate.gateId}. To decide it after reviewing it:\n  amc a4 approve --gate ${gate.gateId}`
+        console.log(`Open ${gate.stage} ${gate.gate} gate ${gate.gateId}: someone other than its author, builder and requester decides it. After reviewing it:\n  amc a4 approve --gate ${gate.gateId}`
           + ` --expect-gate-seq ${gate.expectedGateSeq ?? "<not found>"} --expect-binding-digest ${gate.expectedBindingDigest}`
           + ` --expect-readiness-digest ${gate.expectedReadinessDigest ?? "<not published>"} --reason "…" --session-token-file <file>`);
       }
@@ -367,8 +388,29 @@ function registerReads(a4: Command): void {
       }
       const claim = unboundClaim(PROJECT_ID.test(target) ? target : "record", "verify", false);
       // --json prints the VerifierReportV1 itself with its claim fields: integrity of bytes under the trust you pinned, not evidence about the agent.
+      const hint = verifyFlagHint(report);
+      if (hint !== null && opts.json !== true) process.on("exit", () => console.error(hint));
       finishVerify("A4 record", report, { json: opts.json, claim, details: [`integrity: ${report.integrity.status} (bytes under the trust you pinned; not evidence about the agent)`] });
     }));
+}
+
+/**
+ * Why a verify whose bytes checked out still FAILED, in words: the allow flag a missing pin needs (each check stands; the
+ * flag only turns the verdict into an integrity-only, never-trusted exit 2). Null when integrity failed or nothing is missing.
+ */
+export function verifyFlagHint(report: VerifierReportV1): string | null {
+  if (report.trusted || report.integrity.status !== "pass") return null;
+  const missing: string[] = [];
+  if (report.anchoring.status === "unanchored" && !report.overrides.includes("allow-unanchored")) {
+    missing.push("--allow-unanchored (the ledger is unanchored: its monitor key was read from this workspace; `amc verify all` checks the ledger's anchor)");
+  }
+  if (report.issuerAdmission.signatures.some((signature) => signature.status !== "admitted" && signature.status !== "unpinned-allowed")
+    && !report.overrides.includes("allow-unpinned")) {
+    missing.push("--allow-unpinned (a signing key is not on a trust list you named; pin it with --trust-list <file> instead)");
+  }
+  if (missing.length === 0) return null;
+  return `The bytes verified, but the verdict needs ${missing.length > 1 ? "both flags" : "this flag"}: ${missing.join("; and ")}. `
+    + "With the allow flags the result is integrity only (exit 2), never trusted.";
 }
 
 function registerDecisions(a4: Command): void {
@@ -587,7 +629,9 @@ function registerReleases(a4: Command): void {
 
 /** `amc a4 …`: 22 leaves (src/mode/mode.ts blocks the owner-gated ones in agent mode). */
 export function registerA4Commands(program: Command): void {
-  const a4 = program.command("a4").description("A4 Forge (preview, AMC_A4_PREVIEW=1): projects, gates, releases and deployments, through the API's own routes");
+  const a4 = program.command("a4").description("A4 Forge (preview, AMC_A4_PREVIEW=1): projects, gates, releases and deployments, through the API's own routes")
+    .addHelpText("before", "Next step: `AMC_A4_PREVIEW=1 amc a4 guide` explains A4 and what to do first. Projects are created and built in Studio "
+      + "(`AMC_A4_PREVIEW=1 amc up`, then A4 in the menu); these commands read them, decide gates and run the release steps.\n");
   registerReads(a4);
   registerDecisions(a4);
   registerProjectWrites(a4);
