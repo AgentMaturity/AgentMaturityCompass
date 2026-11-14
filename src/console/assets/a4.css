@@ -22,3 +22,19 @@
 #app[aria-busy="true"] [data-a4-action] { pointer-events: none; opacity: 0.55; }
 /* Digests, reason codes and ids are long unbroken strings: wrap them instead of clipping them at phone width. */
 #app code { overflow-wrap: anywhere; }
+
+/* First-run guidance (a4Start.js): the "What to do now" panel, its stage stepper and its one primary action. */
+.a4-start { border-left: 4px solid var(--accent); }
+.a4-stepper { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 0; margin: 12px 0; list-style: none; }
+.a4-stepper li { border: 1px solid var(--border-strong); border-radius: 6px; padding: 8px; min-width: 0; overflow-wrap: anywhere; }
+.a4-stepper li a { display: block; color: inherit; text-decoration: none; }
+.a4-stepper li a span { display: block; }
+.a4-stepper .a4-stepper-done { opacity: .75; }
+.a4-stepper .a4-stepper-current { border-color: var(--accent); }
+.a4-stepper [data-viewing="true"] strong { text-decoration: underline; }
+.a4-stepper-state { font-size: .8rem; color: var(--muted); }
+.a4-now { font-size: 1.05rem; }
+.a4-who { border-top: 1px solid var(--border); margin-top: 8px; padding-top: 8px; }
+/* One primary action per screen: on a project page every other action button takes the secondary look. */
+body[data-page="a4Project"] #app button:not(.a4-primary):not(.danger) { background: rgba(255,255,255,.035); border: 1px solid var(--border-strong); color: var(--ink); }
+@media (max-width: 640px) { .a4-stepper { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
