@@ -23,6 +23,8 @@ export interface StudioState {
   vaultUnlocked: boolean;
   untrustedConfig: boolean;
   logFile: string;
+  /** What `amc up` should repeat from this start, e.g. a busy default port and the one used instead. */
+  portNotes?: string[];
   lastLease?: {
     agentId: string;
     leaseId: string;
@@ -70,6 +72,8 @@ export function studioAgentTokenMetaPath(workspace: string, agentId: string): st
 export function writeStudioState(workspace: string, state: StudioState): void {
   ensureDir(studioDir(workspace));
   writeFileAtomic(studioStatePath(workspace), JSON.stringify(state, null, 2), 0o644);
+  // Outlives `amc down` (clearStudioState), so the next start can keep the port installed hooks name (studioBridge.ts).
+  writeFileAtomic(join(studioDir(workspace), "last-api-port"), `${state.apiPort}\n`, 0o644);
 }
 
 /**

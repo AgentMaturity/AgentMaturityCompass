@@ -3658,6 +3658,7 @@ program
     console.log(`\n  ${chalk.bold("Open your report card:")}  ${chalk.hex("#4AEF79").bold(`http://${state.host}:${state.apiPort}/console`)}`);
     const advancedEndpoints = [`Gateway :${state.gatewayPort}`, state.proxyPort > 0 ? `Proxy :${state.proxyPort}` : "", `Dashboard :${state.dashboardPort}`, `Studio API :${state.apiPort}`, `Bridge :${state.apiPort}/bridge`].filter(Boolean).join(" · ");
     console.log(chalk.gray(`  Advanced endpoints (optional): ${advancedEndpoints}`));
+    for (const note of state.portNotes ?? []) console.log(chalk.yellow(`  ${note}`));
     console.log(chalk.gray(latest ? `  Latest run: ${latest.runId} | IntegrityIndex ${latest.integrityIndex.toFixed(3)} (${latest.trustLabel})`
       : opts.baseline === false ? "  Latest run: none (baseline skipped with --no-baseline; run `amc run` when ready)" : "  Latest run: none — running your first one below"));
     await runFirstBaselineIfNeeded({

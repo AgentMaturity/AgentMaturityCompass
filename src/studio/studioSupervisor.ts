@@ -54,6 +54,7 @@ import { hostWorkspaceDir } from "../workspaces/workspacePaths.js";
 import { isPublicBind } from "../config/loadConfig.js";
 import { assertProxyTrustNamed, assertPublicBindAcknowledged, resolveListenPolicy } from "./listenPolicy.js";
 import { assertPortFree, closeStartedThenThrow, listenOnPolicyPort } from "./studioLifecycle.js";
+import { previousStudioApiPort } from "./studioBridge.js";
 import { VAULT_LOCKED_MESSAGE } from "../vault/vaultLockedError.js";
 
 export interface StudioRuntime {
@@ -485,7 +486,9 @@ export async function runStudioForeground(params: {
     start: (port) => serveDashboard({ workspace, agentId, port, outDir: dashboardOut }) }));
   started.push(() => dashboard.close());
 
+  const portNotes: string[] = []; // repeated by `amc up`, whose daemon's console is only the log
   const api = await guard(() => listenOnPolicyPort({ label: "Studio API", port: listen.apiPort, source: listen.apiPortSource,
+    preferredPort: previousStudioApiPort(workspace), log: (line) => { portNotes.push(line); console.log(line); },
     start: (port) => startStudioApiServer({ workspace, host: listen.apiHost, port, token, allowedCidrs: listen.allowedCidrs,
       trustedProxyHops: params.trustedProxyHops, trustedProxyCidrs: listen.trustedProxyCidrs, maxRequestBytes: params.maxRequestBytes, corsAllowedOrigins: params.corsAllowedOrigins }) }));
   started.push(() => api.close());
@@ -536,7 +539,8 @@ export async function runStudioForeground(params: {
     currentAgent: agentId,
     vaultUnlocked: vaultStatus(workspace).unlocked,
     untrustedConfig,
-    logFile
+    logFile,
+    ...(portNotes.length > 0 ? { portNotes } : {})
   };
   await guard(async () => writeStudioState(workspace, state));
   try {
