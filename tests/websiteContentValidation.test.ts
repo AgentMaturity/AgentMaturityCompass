@@ -85,9 +85,22 @@ describe("website content validation", () => {
 // LIVE-UX-15: the hero promised a score of your agent with no terminal, but the desktop app opens the demo workspace
 // (scripts/package-desktop-installers.mjs opens /w/demo/console/).
 describe("website hero truth", () => {
-  test("the hero says the desktop app opens a demo workspace and how to score your own agent", () => {
-    const hero = read("website/index.html").match(/<p class="hero-sub">[\s\S]*?<\/p>/)?.[0] ?? "";
-    expect(hero).toContain("The desktop app opens a local demo workspace; to score your own agent, run <code>amc up</code> in its folder.");
+  test("the macOS app section says the app opens a demo workspace and how to score your own agent", () => {
+    const desktop = read("website/index.html").match(/<section id="desktop"[\s\S]*?<\/section>/)?.[0] ?? "";
+    expect(desktop).toContain("It opens a local demo workspace with unsigned demo data; to score your own agent, run <code>amc up</code> in its folder.");
+    expect(desktop).toContain("ad-hoc signed, not notarized");
     expect(read("scripts/package-desktop-installers.mjs")).toContain("/w/demo/console/");
+  });
+
+  test("the hero install route is the README's source build and its menu lines are the real front-door labels", () => {
+    const hero = read("website/index.html").match(/<section class="hero">[\s\S]*?<\/section>/)?.[0] ?? "";
+    expect(hero).not.toMatch(/No terminal|Free forever|Download 1\.1\.1/);
+    expect(read("README.md")).toContain("pnpm install --frozen-lockfile && pnpm run build && npm link");
+    expect(hero).toContain("pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link");
+    const frontDoor = read("src/setup/frontDoor.ts");
+    for (const label of ["What do you want to do?", "as it works (signed in)", "Try a demo chat (no account or key needed)", "Open the console in my browser", "Just show my score"]) {
+      expect(frontDoor, label).toContain(label);
+      expect(hero, label).toContain(label);
+    }
   });
 });

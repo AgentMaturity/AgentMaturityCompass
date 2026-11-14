@@ -292,3 +292,24 @@ section{padding:clamp(5rem,10vw,8rem) 0;position:relative;z-index:1}
   .hero{padding-top:6rem}
   section{padding:clamp(3.5rem,7vw,6rem) 0}
 }
+
+/* ═══ FIRST RUN (hero install, menu, first five minutes, three paths) ═══ */
+.hero-left h1{text-wrap:balance}
+.hero-start{margin-top:2rem;max-width:600px}
+.hero-install-block{display:block;margin:0;white-space:pre-wrap;cursor:text;overflow-x:auto}
+.hero-install-block .hi-prompt{color:var(--accent);user-select:none}
+.hero-note{font-size:.88rem;color:var(--text-muted);margin-top:.8rem;line-height:1.6}
+.hero-note a,.hero-menu-note a,.path-note a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+.hero-menu{min-height:0;width:100%;border:1px solid var(--border)}
+.menu-body{margin:0;white-space:pre-wrap;font-size:.8rem;line-height:1.9;color:var(--text-muted)}
+.menu-q{color:var(--text);font-weight:700}.menu-on{color:var(--accent)}
+.hero-menu-note{font-size:.82rem;color:var(--text-muted);line-height:1.6;width:100%}
+.first-five{padding:clamp(3.5rem,7vw,5.5rem) 0}
+.five-grid{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+.five-grid .product-info-card p{font-size:.86rem}
+.paths-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;max-width:1200px;margin:0 auto}
+.paths-grid .items{margin-bottom:1rem}
+.pricing-card .path-note{font-size:.8rem;color:var(--text-dim);border-left:2px solid var(--border);padding-left:.75rem}
+@media(max-width:1000px){.five-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.paths-grid{grid-template-columns:1fr}}
+@media(max-width:560px){.five-grid{grid-template-columns:1fr}.hero-left h1{font-size:2.2rem}}
+.trust-stack-note{grid-column:1/-1;margin:0 0 .75rem;text-align:left;max-width:none}
