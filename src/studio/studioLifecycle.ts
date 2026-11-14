@@ -22,6 +22,28 @@ export async function assertPortFree(host: string, port: number, source: string 
 }
 
 /**
+ * A default port nobody configured: itself while it is free, else a free one picked by the OS. For a listener that must
+ * know its port before it starts (the gateway opens its ledger session first, D4), so the choice is made by probing.
+ */
+export async function defaultPortOrFree(host: string, port: number): Promise<number> {
+  if (port === 0) return 0;
+  const probe = (candidate: number): Promise<number> => new Promise((resolvePromise, rejectPromise) => {
+    const server = createServer();
+    server.once("error", rejectPromise);
+    server.listen({ host, port: candidate }, () => {
+      const address = server.address();
+      server.close(() => resolvePromise(typeof address === "object" && address ? address.port : candidate));
+    });
+  });
+  try {
+    return await probe(port);
+  } catch (error) {
+    if (!addressInUse(error)) throw error;
+    return probe(0);
+  }
+}
+
+/**
  * Start on the policy's port. A busy configured port is a hard error naming the port and where it came from; a busy
  * default port falls back to a free one and says so, as before.
  */

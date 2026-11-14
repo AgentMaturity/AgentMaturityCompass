@@ -138,8 +138,8 @@ export interface FrontDoorIo {
 function ensureStudio(io: FrontDoorIo): string | null {
   const running = io.studioOrigin();
   if (running !== null) return running;
-  io.log("Starting AMC (amc up)...");
-  const origin = io.runAmc(["up"], true) === 0 ? io.studioOrigin() : null;
+  io.log("Starting AMC on this Mac...");
+  const origin = io.runAmc(["up", "--no-baseline"], true) === 0 ? io.studioOrigin() : null;
   if (origin === null) io.log("AMC did not start; the lines above say why. Fix that, then run amc again.");
   return origin;
 }

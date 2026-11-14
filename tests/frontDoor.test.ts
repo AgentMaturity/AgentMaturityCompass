@@ -164,7 +164,7 @@ describe("runFrontDoor", () => {
   it("watch Claude Code: starts AMC, asks before writing the hook, installs observe only, then offers to start claude", async () => {
     const f = fake(["watch-claude"], { answers: [true, true] });
     await runFrontDoor(f.io);
-    expect(f.amc).toEqual([["(chat env)", "up"], ["(chat env)", "connect", "hooks", "install", "--provider", "claude-code", "--mode", "observe", "--agent", "default", "--bridge-url", "http://127.0.0.1:4000"]]);
+    expect(f.amc).toEqual([["(chat env)", "up", "--no-baseline"], ["(chat env)", "connect", "hooks", "install", "--provider", "claude-code", "--mode", "observe", "--agent", "default", "--bridge-url", "http://127.0.0.1:4000"]]);
     expect(f.tools).toEqual(["claude"]);
     expect(f.saved).toEqual(["watch-claude"]);
     expect(f.lines.at(-1)).toContain("http://127.0.0.1:4000/console");
@@ -186,7 +186,7 @@ describe("runFrontDoor", () => {
   it("stops with a plain message when AMC cannot start or the hook cannot be installed", async () => {
     const down = fake(["watch-claude"], { codes: [1] });
     await runFrontDoor(down.io);
-    expect(down.amc).toEqual([["(chat env)", "up"]]);
+    expect(down.amc).toEqual([["(chat env)", "up", "--no-baseline"]]);
     expect(down.lines.join("\n")).toContain("AMC did not start");
     const refused = fake(["watch-claude"], { codes: [1], origin: ["http://127.0.0.1:4000"] });
     await runFrontDoor(refused.io);
