@@ -2377,7 +2377,7 @@ program
     }
 
     console.log("");
-    console.log(chalk.bold(`  Current: ${result.preliminaryLevel} (${result.totalScore}/${result.maxScore})`));
+    console.log(chalk.bold(`  Current: ${result.preliminaryLevel} (${result.totalScore}/${result.maxScore} points from ${result.maxScore / 5} self-answers, 0-5 each)`));
     printClaimResult(claim, opts);
     console.log("");
     console.log(chalk.bold("  What L3 means for your product:"));
@@ -3179,7 +3179,7 @@ program
       } else {
         console.log("No ledger setup required. This is a preliminary score from 5 high-signal questions.");
       }
-      console.log(`Score: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`);
+      console.log(`Points: ${result.totalScore}/${result.maxScore} (${result.percentage}%), 0-5 per question; the level scale is L0-L5`);
       console.log(`Preliminary maturity: ${result.preliminaryLevel}`);
       console.log(chalk.dim(`Maturity Levels: ${AMC_MATURITY_LEGEND}`));
 
@@ -3328,7 +3328,8 @@ program
     }
 
     const result = scoreFullDiagnostic(answers, durationMs);
-    const claim = selfAnswerClaim("diagnostic:fullDiagnostic", Object.values(answers));
+    // CLI-08: every question's level, unanswered ones at L0 as the score counts them, so the result agrees with the layers.
+    const claim = selfAnswerClaim("diagnostic:fullDiagnostic", result.questionScores.map((row) => row.level));
 
     if (opts.json) {
       const jsonResult = providedAnswers
@@ -3350,8 +3351,9 @@ program
     printClaimResult(claim, opts);
     console.log(chalk.bold.hex('#4AEF79')("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
     console.log("");
-    console.log(chalk.bold(`  Overall: ${result.overallLevel} (${result.percentage}%)`));
-    console.log(chalk.gray(`  ${result.questionCount} questions | ${result.totalScore}/${result.maxScore} points | completed in ${durationDisplay}`));
+    const averageLevel = result.questionCount > 0 ? result.totalScore / result.questionCount : 0;
+    console.log(chalk.bold(`  Overall: ${result.overallLevel} (average level ${averageLevel.toFixed(2)} of 5)`));
+    console.log(chalk.gray(`  ${result.questionCount} questions, ${Object.keys(answers).length} answered (unanswered count as L0) | completed in ${durationDisplay}`));
     console.log(chalk.dim(`  Maturity Levels: ${AMC_MATURITY_LEGEND}`));
     console.log("");
 
@@ -3359,8 +3361,8 @@ program
     console.log(chalk.bold("  Layer Scores:"));
     console.log("");
     for (const layer of result.layerScores) {
-      const lv = Math.round(layer.avgLevel);
-      const filled = Math.round(layer.avgLevel);
+      const lv = Math.floor(layer.avgLevel + 1e-9); // the level reached, as the overall line reads it
+      const filled = lv;
       const bar = chalk.hex('#4AEF79')("█".repeat(filled)) + chalk.gray("░".repeat(5 - filled));
       const avg = layer.avgLevel.toFixed(1);
       console.log(`  ${layer.layerName.padEnd(30)} L${lv} ${bar} (avg ${avg})`);
@@ -21901,7 +21903,7 @@ const score = program.command("score").description("Maturity scoring, adversaria
     console.log(chalk.bold.hex('#4AEF79')("\n📊  Assessment Result"));
     printClaimResult(selfAnswerClaim("score:quickScore", Object.values(answers)), {});
     console.log(chalk.gray(`Tier: ${tier}`));
-    console.log(chalk.gray(`Score: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`));
+    console.log(chalk.gray(`Points: ${result.totalScore}/${result.maxScore} (${result.percentage}%), 0-5 per question; the level scale is L0-L5`));
     console.log(renderAsciiRadar(result.layerScores));
     if (result.totalScore === 0) {
       console.log(chalk.yellow("\n💡 No evidence collected yet. Capture agent behavior first:"));
@@ -22904,7 +22906,7 @@ score
 
     const result = computeQuickScore(answers, tier, opts.questionSet);
     if (emitClaimResult(chalk.bold.hex('#4AEF79')(`\n📊  ${tier.charAt(0).toUpperCase() + tier.slice(1)} Score Assessment`), result, selfAnswerClaim("score:quickScore", Object.values(answers)), opts)) return;
-    console.log(chalk.gray(`Score: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`));
+    console.log(chalk.gray(`Points: ${result.totalScore}/${result.maxScore} (${result.percentage}%), 0-5 per question; the level scale is L0-L5`));
     console.log(renderAsciiRadar(result.layerScores));
     if (result.gaps.length > 0) {
       console.log(chalk.yellow("Top Gaps:"));
