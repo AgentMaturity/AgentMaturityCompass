@@ -14,10 +14,10 @@ test.describe('Homepage', () => {
 
   test('desktop and mobile navigation point to existing sections', async ({ page }) => {
     const desktop = page.locator('nav .nav-links a[href^="#"]');
-    expect(await desktop.evaluateAll(links => links.map(link => link.getAttribute('href')))).toEqual(['#paths', '#pricing']);
+    expect(await desktop.evaluateAll(links => links.map(link => link.getAttribute('href')))).toEqual(['#capabilities', '#pricing']);
     await expect(page.locator('nav .nav-links a[href="a4.html"]')).toHaveCount(1);
     const mobile = page.locator('.nav-mobile a[href^="#"]');
-    expect(await mobile.evaluateAll(links => links.map(link => link.getAttribute('href')))).toEqual(['#paths', '#install', '#capabilities', '#pricing', '#desktop', '#domains']);
+    expect(await mobile.evaluateAll(links => links.map(link => link.getAttribute('href')))).toEqual(['#capabilities', '#pricing', '#install', '#desktop', '#domains']);
     await expect(page.locator('.nav-mobile a[href="a4.html"]')).toHaveCount(1);
     const navLinks = page.locator('nav a[href^="#"], .nav-mobile a[href^="#"]');
     const count = await navLinks.count();
@@ -32,14 +32,12 @@ test.describe('Homepage', () => {
     }
   });
 
-  // 925c34d00: the source build (the only route with the amc menu today) comes first; the one-line installers give 1.1.1.
-  test('install section gives the source build and both one-line release installers', async ({ page }) => {
+  test('install section provides both platform commands', async ({ page }) => {
     const commands = page.locator('#install .install-command');
     await expect(commands).toHaveCount(2);
-    await expect(commands.nth(0)).toContainText('git clone https://github.com/AgentMaturity/AgentMaturityCompass.git');
-    await expect(commands.nth(0)).toContainText('pnpm install --frozen-lockfile && pnpm run build && npm link');
-    await expect(commands.nth(1)).toContainText('curl -fsSL https://agentmaturity.co/install.sh | sh');
+    await expect(commands.nth(0)).toContainText('curl -fsSL https://agentmaturity.co/install.sh | sh');
     await expect(commands.nth(1)).toContainText('irm https://agentmaturity.co/install.ps1 | iex');
+    await expect(page.locator('#install a').filter({ hasText: 'copy command' })).toHaveCount(2);
   });
 
   test('FAQ expands one answer at a time and can close it', async ({ page }) => {
