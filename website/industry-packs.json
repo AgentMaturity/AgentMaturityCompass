@@ -1,0 +1,1025 @@
+{
+ "packCount": 41,
+ "stations": [
+  {
+   "id": "health",
+   "name": "Health",
+   "packs": [
+    {
+     "id": "digital-health-record",
+     "name": "Digital Health Record",
+     "summary": "Individual health data ownership from birth to death — covering hereditary, congenital, and socially acquired health information with emphasis on interoperability, patient consent, data portability, and longitudinal health record integrity.",
+     "riskTier": "critical",
+     "questions": 22,
+     "rules": [
+      "HL7 FHIR R4 (4.0.1)",
+      "IHE XDS.b / XCA",
+      "HIPAA §164.312 Technical Safeguards",
+      "EU MDR 2017/745",
+      "eHealth Network Guidelines",
+      "ISO 27799:2025",
+      "21st Century Cures Act §4004",
+      "EU European Health Data Space (EHDS) Regulation"
+     ],
+     "risks": [
+      "PHI breach through AI-mediated data aggregation across systems",
+      "Health record integrity compromise from automated data reconciliation errors",
+      "Genetic discrimination from AI-accessible hereditary health data",
+      "Patient consent violation through automated data sharing without granular authorization",
+      "Interoperability failures causing clinical decision errors from incomplete records"
+     ]
+    },
+    {
+     "id": "wellness-management",
+     "name": "Wellness Management",
+     "summary": "Physical, emotional, and professional wellness — covering body performance optimization, mental health support, occupational wellness, and preventive health with emphasis on sensitive data protection and evidence-based interventions.",
+     "riskTier": "very-high",
+     "questions": 18,
+     "rules": [
+      "GDPR Article 9 (Special Category Data)",
+      "Americans with Disabilities Act (ADA)",
+      "ISO 45001:2018 (OH&S Management)",
+      "WHO Global Action Plan on Physical Activity",
+      "HIPAA Privacy Rule",
+      "EU AI Act Annex III §5(c)",
+      "SAMHSA National Guidelines"
+     ],
+     "risks": [
+      "Mental health crisis escalation from inappropriate AI wellness advice",
+      "Employer discrimination from leaked occupational wellness data",
+      "Eating disorder triggering through AI body optimization recommendations",
+      "Insurance discrimination from wellness data aggregation",
+      "Addiction to AI wellness coaching creating dependency rather than autonomy"
+     ]
+    },
+    {
+     "id": "patient-lifecycle",
+     "name": "Patient Lifecycle",
+     "summary": "Appointment through investigation, diagnosis, treatment, care, and prognosis — covering the complete patient journey with emphasis on clinical safety, informed consent, care coordination, and outcome measurement.",
+     "riskTier": "critical",
+     "questions": 18,
+     "rules": [
+      "FDA 510(k) Premarket Notification",
+      "EU MDR 2017/745 Annex I",
+      "HIPAA Privacy & Security Rules",
+      "JCI Accreditation Standards (7th ed.)",
+      "ISO 13131:2021 (Telehealth)",
+      "IHE ITI Profiles",
+      "HL7 FHIR R4",
+      "CMS Conditions of Participation 42 CFR §482"
+     ],
+     "risks": [
+      "Misdiagnosis from AI clinical decision support without adequate validation",
+      "Treatment delay from automated triage errors",
+      "Informed consent violations through AI-mediated patient communication",
+      "Care fragmentation from poor AI-managed handoff between providers",
+      "Prognostic model bias leading to disparate care quality across demographics"
+     ]
+    },
+    {
+     "id": "clinical-lifecycle",
+     "name": "Clinical Lifecycle",
+     "summary": "Therapeutic, surgical, psychoanalysis, and alternative medicine — covering clinical practice modalities with emphasis on evidence-based practice, patient safety, clinical governance, and treatment efficacy monitoring.",
+     "riskTier": "critical",
+     "questions": 16,
+     "rules": [
+      "FDA 21 CFR Part 820 (QMSR)",
+      "EU MDR 2017/745",
+      "ICH E6(R3) GCP",
+      "WHO Clinical Practice Guidelines",
+      "ISO 13485:2016",
+      "EMA Scientific Guidelines",
+      "NICE Technology Appraisal Guidance",
+      "JCI Standards"
+     ],
+     "risks": [
+      "Surgical planning errors from AI-generated anatomical analysis",
+      "Therapeutic protocol deviation undetected by automated monitoring",
+      "Alternative medicine interactions with conventional treatments missed by AI",
+      "Clinical governance failure from over-reliance on AI recommendations",
+      "Patient harm from AI-managed treatment titration without adequate safety margins"
+     ]
+    },
+    {
+     "id": "professional-practice",
+     "name": "Professional Practice",
+     "summary": "Healthcare professionals — appointments, transcription, billing, and practice management with emphasis on coding accuracy, documentation integrity, and regulatory compliance for healthcare business operations.",
+     "riskTier": "very-high",
+     "questions": 19,
+     "rules": [
+      "HIPAA Privacy Rule 45 CFR §164.500-534",
+      "HITECH Act §13401-13411",
+      "HL7 FHIR R4",
+      "ONC Health IT Certification Criteria 45 CFR §170",
+      "AMA CPT Coding Standards",
+      "CMS Billing Rules 42 CFR §424",
+      "ISO 27799:2025"
+     ],
+     "risks": [
+      "Upcoding or false claims from AI-automated medical billing",
+      "Clinical documentation errors from AI transcription inaccuracies",
+      "HIPAA breach through AI-processed patient communications",
+      "Provider burnout from poorly designed AI workflow integration",
+      "Fraud and abuse liability from AI-optimized billing patterns"
+     ]
+    },
+    {
+     "id": "life-technology",
+     "name": "Life Technology",
+     "summary": "Digital technology in life, learning, and living — covering disease prevention, health technology assessment, and the integration of AI/digital tools into daily health management with emphasis on safety, efficacy, and equitable access.",
+     "riskTier": "very-high",
+     "questions": 16,
+     "rules": [
+      "EU AI Act 2024/1689",
+      "FDA Software as a Medical Device (SaMD) Guidance",
+      "ISO 14971:2019 (Risk Management)",
+      "IEC 62304:2006/AMD1:2015 (Software Lifecycle)",
+      "GDPR",
+      "FDA 21 CFR Part 11"
+     ],
+     "risks": [
+      "Unregulated health advice from AI apps bypassing SaMD classification",
+      "Digital health divide excluding vulnerable populations",
+      "Over-diagnosis from consumer health AI creating unnecessary anxiety",
+      "Data exploitation through health app data monetization",
+      "Clinical safety incidents from unvalidated AI health predictions"
+     ]
+    },
+    {
+     "id": "drug-discovery",
+     "name": "Drug Discovery",
+     "summary": "Biological research, molecules, drug and therapy production — covering the drug discovery pipeline from target identification through lead optimization, preclinical development, and manufacturing with emphasis on data integrity, reproducibility, and regulatory compliance.",
+     "riskTier": "critical",
+     "questions": 18,
+     "rules": [
+      "ICH Q8(R2)-Q12 Quality Guidelines",
+      "FDA 21 CFR Parts 210/211 (cGMP)",
+      "EU GMP Annex 11 (Computerised Systems)",
+      "EMA IMPD Guideline",
+      "ISO 17511:2020",
+      "FAIR Data Principles",
+      "CDISC Standards (CDASH/SDTM/ADaM)"
+     ],
+     "risks": [
+      "AI-generated molecular candidates with hidden toxicity profiles",
+      "Data integrity failures in AI-managed laboratory information systems",
+      "Irreproducible AI-discovered drug targets due to training data bias",
+      "GMP violations from AI-optimized manufacturing process changes",
+      "Intellectual property disputes over AI-generated molecular structures"
+     ]
+    },
+    {
+     "id": "clinical-trials",
+     "name": "Clinical Trials",
+     "summary": "Drug and therapy testing, efficacy assurance, and participant management — covering the clinical trial lifecycle from protocol design through participant recruitment, data collection, analysis, and reporting with emphasis on participant safety, data integrity, and regulatory compliance.",
+     "riskTier": "critical",
+     "questions": 16,
+     "rules": [
+      "ICH E6(R3) GCP (Principles; Annex 1 §1-4)",
+      "FDA 21 CFR Parts 50/56/312",
+      "EU Clinical Trials Regulation 536/2014",
+      "WHO ICTRP Registration Standards",
+      "CDISC CDASH/SDTM/ADaM",
+      "ISO 14155:2026",
+      "CONSORT 2025 Statement"
+     ],
+     "risks": [
+      "Participant safety compromise from AI-managed dose escalation",
+      "Data integrity failures in AI-processed clinical trial data",
+      "Informed consent violations through AI-mediated participant communication",
+      "Selection bias in AI-driven participant recruitment algorithms",
+      "Regulatory rejection due to AI-generated data quality issues"
+     ]
+    },
+    {
+     "id": "specialized-medicine",
+     "name": "Specialized Medicine Apothecary",
+     "summary": "Prescription delivery, medicine administration, and payor disintermediation — covering pharmacy operations, medication dispensing, specialty drug management, and direct-to-patient pharmaceutical services with emphasis on drug safety, supply chain integrity, and equitable access.",
+     "riskTier": "critical",
+     "questions": 18,
+     "rules": [
+      "USP <797> Sterile Compounding",
+      "USP <800> Hazardous Drugs",
+      "FDA DSCSA (Drug Supply Chain Security Act)",
+      "EU FMD (Falsified Medicines Directive) 2011/62/EU",
+      "ISO 11135:2014",
+      "State Pharmacy Practice Acts",
+      "NABP Standards"
+     ],
+     "risks": [
+      "Medication dispensing errors from AI-managed pharmacy automation",
+      "Counterfeit drug entry through supply chain verification failures",
+      "Sterile compounding contamination from AI-managed environmental controls",
+      "Patient harm from AI-recommended therapeutic substitutions",
+      "Drug diversion undetected by automated inventory management"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "education",
+   "name": "Education",
+   "packs": [
+    {
+     "id": "k12-pm3",
+     "name": "K-12 Education",
+     "summary": "Kindergarten through grade 12 formal education foundation — covering AI in primary and secondary education with emphasis on child safety, age-appropriate content, parental consent, and equitable learning outcomes.",
+     "riskTier": "critical",
+     "questions": 19,
+     "rules": [
+      "FERPA 20 USC §1232g",
+      "COPPA 15 USC §6501-6506",
+      "CIPA",
+      "ESSA",
+      "IDEA",
+      "Section 508",
+      "UN CRC Article 28/29",
+      "GDPR (Children)",
+      "EU AI Act Annex III §3"
+     ],
+     "risks": [
+      "Child data exploitation through AI-mediated educational platforms",
+      "Algorithmic bias reinforcing achievement gaps across demographics",
+      "Age-inappropriate content generation by AI tutoring systems",
+      "Over-surveillance of children through AI behavioral monitoring",
+      "Special education discrimination through AI-driven placement decisions"
+     ]
+    },
+    {
+     "id": "higher-education",
+     "name": "Higher Education",
+     "summary": "Undergraduate and postgraduate professional specialization — covering AI in higher education including admissions, research, assessment, and academic integrity with emphasis on academic freedom, research ethics, and equitable access.",
+     "riskTier": "very-high",
+     "questions": 19,
+     "rules": [
+      "FERPA",
+      "AACSB/Regional Accreditation Standards",
+      "EU AI Act",
+      "UNESCO Higher Education Guidelines",
+      "GDPR",
+      "Title IX",
+      "ADA",
+      "Bologna Process"
+     ],
+     "risks": [
+      "Admissions bias through AI-assisted application screening",
+      "Academic integrity erosion from undetectable AI-generated submissions",
+      "Research misconduct through AI-fabricated data or results",
+      "Student surveillance through AI proctoring and behavioral analytics",
+      "Accreditation risk from unvalidated AI-driven curriculum changes"
+     ]
+    },
+    {
+     "id": "skills-training",
+     "name": "Skills & Vocational Training",
+     "summary": "Occupational skills including trades, crafts, and vocational education — covering AI in skills development, competency assessment, and workforce readiness with emphasis on practical skill validation, industry alignment, and equitable access to training.",
+     "riskTier": "high",
+     "questions": 15,
+     "rules": [
+      "ILO VET Standards",
+      "UNESCO TVET Framework",
+      "EQF (European Qualifications Framework)",
+      "NQF Standards",
+      "ISO 21001",
+      "GDPR",
+      "ADA"
+     ],
+     "risks": [
+      "Skills assessment bias disadvantaging non-traditional learners",
+      "Practical competency gaps from over-reliance on AI simulation",
+      "Industry misalignment from AI-generated curriculum without employer input",
+      "Credential fraud through AI-manipulated competency evidence",
+      "Digital divide excluding trade workers from AI-enhanced training"
+     ]
+    },
+    {
+     "id": "specialized-education",
+     "name": "Specialized Education",
+     "summary": "Music, art, social sciences, and digital-age learning — covering AI in creative and specialized education with emphasis on creative expression protection, cultural sensitivity, and pedagogical innovation.",
+     "riskTier": "high",
+     "questions": 18,
+     "rules": [
+      "UNESCO Arts Education Guidelines",
+      "WHO ICF Framework",
+      "GDPR",
+      "EU AI Act",
+      "Section 508/WCAG 2.1",
+      "Creative Commons Licensing",
+      "ISTE Standards"
+     ],
+     "risks": [
+      "Creative expression suppression through AI standardization of artistic output",
+      "Cultural appropriation through AI-generated content without attribution",
+      "IP infringement in AI-assisted creative works",
+      "Loss of traditional art forms through AI-driven curriculum modernization",
+      "Assessment bias against non-Western artistic traditions"
+     ]
+    },
+    {
+     "id": "differently-abled",
+     "name": "Differently Abled Education",
+     "summary": "Inclusive education, adaptive methods, and mainstream integration — covering AI in special education and disability support with emphasis on universal design, assistive technology, and dignity-preserving adaptive learning.",
+     "riskTier": "very-high",
+     "questions": 16,
+     "rules": [
+      "CRPD (UN Convention on Rights of Persons with Disabilities)",
+      "IDEA",
+      "ADA",
+      "Section 508",
+      "WCAG 2.1 AA",
+      "EU Web Accessibility Directive",
+      "UDL Principles",
+      "UNESCO Salamanca Statement"
+     ],
+     "risks": [
+      "AI reinforcing disability stereotypes through deficit-based modeling",
+      "Assistive technology dependency without skill development",
+      "Privacy violation through disability data over-collection",
+      "Segregation reinforcement through AI-driven separate tracking",
+      "Dignity violation through patronizing AI interaction patterns"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "environment",
+   "name": "Environment / Critical Infrastructure",
+   "packs": [
+    {
+     "id": "farm-to-fork",
+     "name": "Farm to Fork",
+     "summary": "Sustainable farming, food nutrition, and responsible consumption — covering the entire agri-food value chain from primary production through processing, distribution, and consumption with emphasis on food safety, traceability, and environmental sustainability.",
+     "riskTier": "very-high",
+     "questions": 18,
+     "rules": [
+      "EU Farm to Fork Strategy",
+      "EU Organic Regulation 2018/848",
+      "ISO 22000:2018",
+      "FSSC 22000 v6",
+      "Codex Alimentarius",
+      "FAO Voluntary Guidelines",
+      "EU Deforestation Regulation (EUDR) 2023/1115",
+      "GLOBALG.A.P. IFA v6"
+     ],
+     "risks": [
+      "Food fraud and adulteration in AI-managed supply chains",
+      "Pesticide residue misclassification by automated monitoring",
+      "Deforestation-linked sourcing undetected by traceability agents",
+      "Allergen cross-contamination from automated production scheduling",
+      "Loss of smallholder farmer livelihoods through algorithmic procurement bias"
+     ]
+    },
+    {
+     "id": "weave-to-wear",
+     "name": "Weave to Wear",
+     "summary": "Fashion, circular economy, and textile sustainability — addressing the full textile lifecycle from fiber sourcing through manufacturing, retail, use, and end-of-life with emphasis on chemical safety, labor rights, and circularity.",
+     "riskTier": "high",
+     "questions": 16,
+     "rules": [
+      "EU Strategy for Sustainable and Circular Textiles",
+      "Extended Producer Responsibility (EPR) Directive",
+      "REACH Regulation (EC) 1907/2006",
+      "Global Recycled Standard (GRS) 4.0",
+      "Higg Index (SAC)",
+      "ZDHC Manufacturing Restricted Substances List (MRSL) v3.1",
+      "OEKO-TEX Standard 100",
+      "The Fashion Pact"
+     ],
+     "risks": [
+      "Greenwashing through unverified sustainability claims in AI-generated marketing",
+      "Forced labor in supply chains undetected by automated auditing",
+      "REACH-restricted substance usage in AI-optimized material blends",
+      "Microplastic pollution from AI-recommended synthetic material choices",
+      "Digital product passport data integrity failures"
+     ]
+    },
+    {
+     "id": "material-to-machines",
+     "name": "Material to Machines",
+     "summary": "Appliances, quality of life improvement, and manufacturing — covering the lifecycle of consumer and industrial products from raw material extraction through design, manufacturing, use, and end-of-life with emphasis on ecodesign, energy efficiency, and circular economy principles.",
+     "riskTier": "high",
+     "questions": 16,
+     "rules": [
+      "EU Ecodesign Regulation 2024/1781",
+      "RoHS Directive 2011/65/EU",
+      "WEEE Directive 2012/19/EU",
+      "IEC 62430:2019",
+      "ISO 14001:2026",
+      "EU Circular Economy Action Plan",
+      "Energy Efficiency Directive 2023/1791"
+     ],
+     "risks": [
+      "Conflict mineral sourcing undetected in AI-optimized procurement",
+      "Planned obsolescence embedded in AI-driven product design",
+      "Hazardous substance threshold violations in automated material substitution",
+      "Energy efficiency rating manipulation through selective testing conditions",
+      "E-waste export to developing nations through logistics optimization"
+     ]
+    },
+    {
+     "id": "source-to-sustenance",
+     "name": "Source to Sustenance",
+     "summary": "Forests, wildlife, ecology cohabitation — covering biodiversity conservation, ecosystem services, and sustainable natural resource management with emphasis on species protection, habitat preservation, and ecological monitoring.",
+     "riskTier": "critical",
+     "questions": 18,
+     "rules": [
+      "Convention on Biological Diversity (CBD)",
+      "CITES (Convention on International Trade in Endangered Species)",
+      "FSC Standard v5.3 / PEFC ST 1003:2018",
+      "Ramsar Convention on Wetlands",
+      "UN REDD+ Framework",
+      "ISO 14001:2026",
+      "IPBES Assessment Framework",
+      "EU Biodiversity Strategy for 2030",
+      "EU IUU Regulation (EC) 1005/2008",
+      "EU IUU Regulation (EC) 1005/2008 Article 12",
+      "Nagoya Protocol",
+      "Nagoya Protocol Article 5",
+      "FAO Code of Conduct for Responsible Fisheries",
+      "FAO Code of Conduct for Responsible Fisheries Article 7.2"
+     ],
+     "risks": [
+      "Species misidentification leading to illegal trade facilitation",
+      "Habitat destruction undetected by remote sensing AI",
+      "Biodiversity offset fraud through manipulated ecological assessments",
+      "Indigenous community displacement from AI-optimized conservation zones",
+      "Invasive species introduction through AI-managed translocation programs"
+     ]
+    },
+    {
+     "id": "ubiquity-to-utility",
+     "name": "Ubiquity to Utility",
+     "summary": "Sustainable energy generation to consumption — covering the full energy value chain from renewable generation through grid management, storage, distribution, and end-use optimization with emphasis on grid reliability, decarbonization, and energy equity.",
+     "riskTier": "critical",
+     "questions": 18,
+     "rules": [
+      "EU Renewable Energy Directive (RED III) 2023/2413",
+      "IEC 61968/61970 (Common Information Model)",
+      "NERC CIP-002 through CIP-014",
+      "ISO 50001:2018 (Energy Management)",
+      "IEEE 2030-2011",
+      "EU Energy Efficiency Directive 2023/1791",
+      "Paris Agreement Article 6"
+     ],
+     "risks": [
+      "Grid instability from AI-managed renewable intermittency",
+      "Cyberattack on AI-controlled grid infrastructure (NERC CIP violation)",
+      "Energy poverty exacerbation through algorithmic pricing optimization",
+      "Carbon credit fraud in AI-managed offset programs",
+      "Cascading blackout from autonomous load-shedding decisions"
+     ]
+    },
+    {
+     "id": "sip-to-sanitation",
+     "name": "Sip to Sanitation",
+     "summary": "River, ocean, sea, and marine resources — covering water sustainability from source protection through treatment, distribution, consumption, wastewater management, and marine ecosystem preservation.",
+     "riskTier": "critical",
+     "questions": 18,
+     "rules": [
+      "UN SDG 6 — Clean Water and Sanitation",
+      "WHO Guidelines for Drinking-water Quality (4th ed.)",
+      "EU Water Framework Directive 2000/60/EC",
+      "EU Urban Wastewater Treatment Directive (EU) 2024/3019 (recast of 91/271/EEC)",
+      "ISO 24510:2007 / ISO 24512:2007 (Water Services)",
+      "HELCOM Baltic Sea Action Plan",
+      "MARPOL Annex IV"
+     ],
+     "risks": [
+      "Drinking water contamination from AI-managed treatment process failures",
+      "Marine ecosystem damage from undetected wastewater discharge violations",
+      "Water scarcity exacerbation through algorithmic allocation bias",
+      "Microplastic and PFAS contamination undetected by monitoring agents",
+      "Critical infrastructure cyberattack on water treatment SCADA systems"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "mobility",
+   "name": "Mobility",
+   "packs": [
+    {
+     "id": "sustainable-communities",
+     "name": "Sustainable Communities",
+     "summary": "Urban and rural community building with environmental goals — covering smart city AI, urban planning, community services, and sustainable development with emphasis on citizen participation, environmental sustainability, and equitable urban development.",
+     "riskTier": "very-high",
+     "questions": 16,
+     "rules": [
+      "UN SDG 11",
+      "ISO 37120:2018 (City Indicators)",
+      "LEED v4/BREEAM",
+      "EU Urban Agenda",
+      "ISO/IEC JTC 1/SC 41 (Smart Cities)",
+      "Paris Agreement",
+      "C40 Cities Framework"
+     ],
+     "risks": [
+      "Surveillance city through AI-managed urban monitoring",
+      "Gentrification acceleration from AI-optimized urban development",
+      "Digital divide in smart city service access",
+      "Environmental injustice through AI-driven infrastructure placement",
+      "Democratic deficit in AI-managed urban governance"
+     ]
+    },
+    {
+     "id": "sustainable-ports",
+     "name": "Sustainable Ports",
+     "summary": "Transportation infrastructure, ports of entry, and goods/people movement — covering AI in port operations, logistics, customs, and border management with emphasis on supply chain security, environmental compliance, and trade facilitation.",
+     "riskTier": "very-high",
+     "questions": 15,
+     "rules": [
+      "IMO MARPOL",
+      "ISO 28000:2022 (Supply Chain Security)",
+      "ISPS Code",
+      "EU Port Services Regulation 2017/352",
+      "UN TIR Convention",
+      "IMDG Code",
+      "ISO 14001:2026",
+      "C-TPAT"
+     ],
+     "risks": [
+      "Security breach through AI-managed access control failures",
+      "Environmental disaster from AI-optimized cargo handling errors",
+      "Customs fraud facilitation through AI-manipulated documentation",
+      "Supply chain disruption from AI-managed logistics failures",
+      "Worker safety incidents from autonomous port equipment"
+     ]
+    },
+    {
+     "id": "sustainable-real-estate",
+     "name": "Sustainable Real Estate",
+     "summary": "Industrial real estate, manufacturing facilities, travel/leisure, entertainment, and hospital infrastructure — AI agents managing buildings, facilities, and real estate portfolios with focus on energy performance, occupant wellbeing, sustainability certification, and climate resilience.",
+     "riskTier": "high",
+     "questions": 16,
+     "rules": [
+      "LEED v4",
+      "BREEAM In-Use",
+      "WELL Building Standard v2",
+      "ISO 50001:2018",
+      "EU Energy Performance of Buildings Directive (EPBD) 2024",
+      "GRESB Real Estate Assessment",
+      "EU Taxonomy Regulation Art. 10",
+      "UN PRI"
+     ],
+     "risks": [
+      "Greenwashing through unverified sustainability claims",
+      "Privacy violations in occupant monitoring",
+      "Energy performance misreporting under EU EPBD",
+      "Stranded asset risk from inadequate climate transition planning",
+      "Occupant wellbeing deterioration from algorithmic building management"
+     ]
+    },
+    {
+     "id": "virtual-infrastructure",
+     "name": "Sustainable Virtual Infrastructure",
+     "summary": "Cloud, data virtualization, server infrastructure, and glocalization platforms — AI agents managing digital infrastructure enabling borderless commerce, secure global-local operations, and sustainable compute with emphasis on data sovereignty, operational resilience, and green computing.",
+     "riskTier": "critical",
+     "questions": 16,
+     "rules": [
+      "ISO 27001:2022",
+      "SOC 2 Type II",
+      "CSA STAR Level 2",
+      "GDPR Art. 44-49",
+      "FedRAMP Rev. 5",
+      "EU NIS2 Directive 2022/2555",
+      "ISO 22301:2019",
+      "EU Data Act 2023"
+     ],
+     "risks": [
+      "Data sovereignty violation in cross-border transfers",
+      "Single point of failure from AI-managed infrastructure consolidation",
+      "Shadow IT proliferation from autonomous provisioning",
+      "Carbon footprint growth from unoptimized AI compute",
+      "Vendor lock-in through AI-driven architectural decisions"
+     ]
+    },
+    {
+     "id": "privacy-security-mobility",
+     "name": "Privacy & Security",
+     "summary": "Last-mile privacy and security through network and communications — AI agents protecting end-user privacy and security in local and wide-area networks, IoT ecosystems, connected vehicles, and smart infrastructure with emphasis on data protection, cybersecurity resilience, and zero-trust architecture.",
+     "riskTier": "critical",
+     "questions": 15,
+     "rules": [
+      "GDPR Art. 5/25/32",
+      "CCPA/CPRA §1798.100",
+      "UNECE WP.29 R155/R156",
+      "ISO 21434:2021",
+      "ETSI EN 303 645 v2.1.1",
+      "EU NIS2 Directive 2022/2555",
+      "NIST CSF 2.0",
+      "ISO/IEC 27701:2025"
+     ],
+     "risks": [
+      "Mass surveillance enablement through AI-optimized monitoring",
+      "Personal data exfiltration through compromised IoT devices",
+      "Vehicle cybersecurity attack enabling physical harm per UNECE R155",
+      "Privacy erosion from algorithmic profiling without consent",
+      "Security theater through compliance-only approach lacking real protection"
+     ]
+    },
+    {
+     "id": "freight-3pl-warehouse",
+     "name": "Freight, 3PL & Warehouse Operations",
+     "summary": "Operational logistics agents managing freight tenders, carrier scorecards, 3PL execution, warehouse events, delivery exceptions, cold-chain deviations, and traceability evidence across shippers, carriers, warehouses, and customers.",
+     "riskTier": "very-high",
+     "questions": 16,
+     "rules": [
+      "ISO 28000:2022",
+      "NIST SP 800-161r1-upd1",
+      "GS1 EPCIS 2.0",
+      "EU NIS2 Directive 2022/2555",
+      "ISO 9001:2026"
+     ],
+     "risks": [
+      "Late, missed, damaged, or lost shipments hidden by weak carrier scorecards",
+      "Inventory mismatch or pick/pack errors caused by AI-directed warehouse actions",
+      "Delivery exceptions routed without ownership, SLA timers, or customer-safe escalation",
+      "Cold-chain or chain-of-custody breaks accepted without signed evidence",
+      "3PL, EDI, or carrier API outages causing silent fulfillment failure"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "governance",
+   "name": "Governance / Public Sector",
+   "packs": [
+    {
+     "id": "digital-citizens-rights",
+     "name": "Digital Citizens & Rights",
+     "summary": "Citizen data tied with digital identity and tagged with government identities — supporting tax, travel documents, and rights to private and secure data — AI agents managing digital identity ecosystems, citizen data rights, and public trust infrastructure.",
+     "riskTier": "critical",
+     "questions": 18,
+     "rules": [
+      "EU eIDAS 2.0 Regulation 2024/1183",
+      "GDPR Art. 6/9/22",
+      "UN Guiding Principles on Business and Human Rights (UNGPs)",
+      "EU AI Act Art. 5(1)(c), (g), (h); Annex III point 1(a), 5(a)",
+      "Council of Europe AI Convention 2024",
+      "ISO/IEC 29115:2013",
+      "EU Digital Identity Wallet Architecture",
+      "NIST SP 800-63B-4"
+     ],
+     "risks": [
+      "Mass surveillance through digital identity AI integration",
+      "Identity fraud amplification through AI-weakened verification",
+      "Exclusion of vulnerable populations from digital identity systems",
+      "Government data abuse enabled by AI identity correlation",
+      "Loss of anonymous participation rights through identity AI requirements"
+     ]
+    },
+    {
+     "id": "dance-of-democracy",
+     "name": "Dance of Democracy",
+     "summary": "Electing candidates representing constituent aspirations in the process of governing — AI agents supporting democratic processes, voter engagement, electoral integrity, and political communication with strict safeguards against manipulation and disinformation.",
+     "riskTier": "critical",
+     "questions": 20,
+     "rules": [
+      "EU AI Act Art. 5(1)(a)-(b) (manipulation, exploitation of vulnerabilities); Annex III point 8(b) (influencing elections)",
+      "EU Digital Services Act Art. 34 (electoral risk)",
+      "EU Political Advertising Regulation (EU) 2024/900",
+      "OSCE/ODIHR Electoral Standards",
+      "Council of Europe Recommendation CM/Rec(2017)5 (e-voting standards)",
+      "Code of Conduct on Disinformation (DSA framework, 2025)",
+      "GDPR Art. 9(2)(d) (political opinion data)",
+      "52 U.S.C. 30124"
+     ],
+     "risks": [
+      "Electoral manipulation through micro-targeted AI political messaging",
+      "Voter suppression through AI-managed access to electoral information",
+      "Disinformation amplification undermining informed voting",
+      "Foreign interference facilitation through AI communication tools",
+      "Algorithmic political bias affecting democratic representation"
+     ]
+    },
+    {
+     "id": "petition-to-law",
+     "name": "Petition to Law",
+     "summary": "The process from petition through bill, legislation, budgetary provision, to law — AI agents supporting legislative processes, democratic drafting, public consultation, and lawmaking transparency with safeguards for democratic integrity and inclusive participation.",
+     "riskTier": "very-high",
+     "questions": 18,
+     "rules": [
+      "UN E-Government Survey Guidelines",
+      "Interoperable Europe Act (Regulation (EU) 2024/903)",
+      "GDPR Art. 6(1)(e) (public task)",
+      "US FOIA (5 U.S.C. §552)",
+      "EU INSPIRE Directive 2007/2/EC",
+      "ISO/IEC 25000 SQuaRE (ISO/IEC 25012 data quality model)",
+      "EU Open Data Directive 2019/1024",
+      "UN SDG 16.6 (effective institutions)",
+      "EU AI Act Art. 5, Art. 50(4)",
+      "CoE AI Convention Art. 5, 8"
+     ],
+     "risks": [
+      "Exclusion of marginalized voices from AI-mediated legislative processes",
+      "Opaque AI influence on legislative drafting and law formation",
+      "Manipulation of public consultation through AI-generated submissions",
+      "Loss of democratic traceability in AI-assisted lawmaking",
+      "Algorithmic bias in petitions processed determining legislative priority"
+     ]
+    },
+    {
+     "id": "citizen-services",
+     "name": "Citizen Services",
+     "summary": "Citizens engaging in government services to lead law-abiding responsible lives — AI agents delivering public services with equity, accessibility, transparency, and accountability, covering digital service delivery, benefits administration, and public safety services.",
+     "riskTier": "very-high",
+     "questions": 16,
+     "rules": [
+      "EU Single Digital Gateway Regulation 2018/1724",
+      "eIDAS 2.0 Regulation 2024/1183",
+      "GDPR Art. 6(1)(e)",
+      "WCAG 2.1 AA / EU Accessibility Directive 2016/2102",
+      "ISO 9241-210:2019 (Human-Centered Design)",
+      "EU AI Act Annex III point 5(a); Art. 26, 27, 50, 86",
+      "UN E-Government Development Index Standards",
+      "Section 508",
+      "28 CFR Part 35 (ADA Title II web and mobile accessibility)"
+     ],
+     "risks": [
+      "Systemic service denial for vulnerable populations through AI gatekeeping",
+      "Benefits fraud enabled by AI-exploitable verification gaps",
+      "Algorithmic discrimination in eligibility determinations",
+      "Privacy violations from AI-enabled government data aggregation",
+      "Loss of non-digital access channels for elderly/disabled citizens"
+     ]
+    },
+    {
+     "id": "public-private-collaboration",
+     "name": "Public and Private Collaboration",
+     "summary": "Connecting public institutions (national/state governments, WHO, UN) and private institutions in growth-oriented transformations — AI agents orchestrating public-private partnerships for sustainable development with accountability, anti-corruption safeguards, and equitable value distribution.",
+     "riskTier": "very-high",
+     "questions": 19,
+     "rules": [
+      "UN SDG 17 Partnership Framework",
+      "UN Guiding Principles on Business and Human Rights (UNGPs)",
+      "OECD PPP Framework (OECD/LEGAL/0392)",
+      "World Bank PPP Guidelines",
+      "UNCAC (UN Convention Against Corruption)",
+      "ISO 26000:2010 §6.6",
+      "OECD AI Principles",
+      "FATF R1 (AML in PPP)",
+      "EU AMLR (Regulation (EU) 2024/1624)",
+      "EU Data Act (Regulation (EU) 2023/2854)"
+     ],
+     "risks": [
+      "Corruption facilitation through AI-mediated contract procurement",
+      "Value extraction asymmetry benefiting private partners over public interest",
+      "Anti-competitive behavior enabled by AI partnership intelligence",
+      "Human rights violations in PPP projects without adequate due diligence",
+      "AI-enabled revolving door between public regulators and private interests"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "technology",
+   "name": "Technology / General AI Services",
+   "packs": [
+    {
+     "id": "cognition-to-intelligence",
+     "name": "Cognition to Intelligence",
+     "summary": "Contextual data interpretation moving from master data through meta, empirical, analytical, to contextual intelligence — profiled, personalized, and preferentiated — AI agents that transform raw data into actionable, trusted intelligence with explainability and bias controls.",
+     "riskTier": "very-high",
+     "questions": 18,
+     "rules": [
+      "EU AI Act 2024/1689",
+      "GDPR Art. 22",
+      "IEEE 7001:2021 (Transparency)",
+      "ISO/IEC 42001:2023",
+      "NIST AI RMF 1.0",
+      "UNESCO AI Ethics Recommendation 2021",
+      "OECD AI Principles"
+     ],
+     "risks": [
+      "Discriminatory automated decisions affecting rights per GDPR Art. 22",
+      "Context collapse in personalization leading to filter bubbles",
+      "Opaque intelligence surfaces eroding human agency",
+      "Data quality degradation amplified by AI inference chains",
+      "Over-personalization enabling manipulation and behavioral nudging"
+     ]
+    },
+    {
+     "id": "networked-ecosystems",
+     "name": "Connectivity to Networked Ecosystems",
+     "summary": "Data connectivity across customer, enterprise, and industry ecosystems — flipping financial ecosystems to human ecosystems — AI agents orchestrating data flows, API ecosystems, and platform integrations with emphasis on interoperability, data rights, and ecosystem trust.",
+     "riskTier": "high",
+     "questions": 19,
+     "rules": [
+      "GDPR Art. 20 (Data Portability)",
+      "EU Data Act 2023/2854",
+      "EU Data Governance Act 2022/868",
+      "CCPA/CPRA §1798.100(d)",
+      "ISO/IEC 27001:2022",
+      "EU NIS2 Directive 2022/2555",
+      "OWASP API Security Top 10 2023",
+      "OpenID Connect / OAuth 2.1"
+     ],
+     "risks": [
+      "Data sovereignty erosion through ecosystem lock-in",
+      "API abuse enabling unauthorized data aggregation",
+      "Ecosystem monopolization through AI-managed data access",
+      "Privacy violations through ecosystem data correlation",
+      "Critical infrastructure dependency on single ecosystem providers"
+     ]
+    },
+    {
+     "id": "os-sustainable-outcomes",
+     "name": "Operating System for Sustainable Outcomes",
+     "summary": "The transactional system orchestrating strategic movement of people, goods, and money — creating wealth and value while enabling sustainable outcomes — AI agents as the core orchestration layer for economic and social systems with resilience, accountability, and outcome measurement.",
+     "riskTier": "critical",
+     "questions": 21,
+     "rules": [
+      "ISO 27001:2022",
+      "SOC 2 Type II",
+      "EU DORA Art. 9 ICT risk management",
+      "ISO 22301:2019",
+      "EU NIS2 Directive 2022/2555",
+      "ITIL v4",
+      "ISO/IEC 20000-1:2018",
+      "GDPR Art. 32"
+     ],
+     "risks": [
+      "Systemic failure propagation through interconnected orchestration failures",
+      "Accountability gaps in AI-mediated economic transactions",
+      "Inequitable outcome distribution amplified by algorithmic optimization",
+      "Regulatory arbitrage enabled by multi-jurisdiction AI orchestration",
+      "Operational resilience failures in critical transaction pathways"
+     ]
+    },
+    {
+     "id": "infotainment",
+     "name": "Infotainment",
+     "summary": "The combination of information and entertainment shared and consumed by people — physically and digitally available on-demand — AI agents curating, generating, and distributing content with emphasis on accuracy, consumer protection, content moderation, and copyright compliance.",
+     "riskTier": "high",
+     "questions": 19,
+     "rules": [
+      "EU Digital Services Act (DSA) 2022/2065",
+      "EU Digital Markets Act (DMA) 2022/1925",
+      "GDPR Art. 9 (sensitive data)",
+      "COPPA §312",
+      "WCAG 2.1 AA",
+      "EU Copyright Directive 2019/790",
+      "EU Media Freedom Act 2024",
+      "DMCA §512"
+     ],
+     "risks": [
+      "Misinformation amplification through algorithmic recommendation",
+      "Harmful content exposure to minors despite automated moderation",
+      "Synthetic media deception undermining democratic discourse",
+      "Copyright violation through AI-generated derivative content",
+      "Filter bubble reinforcement through over-personalization"
+     ]
+    },
+    {
+     "id": "partnerships-prosperity",
+     "name": "Partnerships for Peace & Prosperity",
+     "summary": "Global collaboration and sharing to create intellectual property in an open shared environment — AI agents facilitating multi-stakeholder partnerships, open innovation ecosystems, and IP co-creation with emphasis on governance, fair access, and prevention of exploitation.",
+     "riskTier": "high",
+     "questions": 20,
+     "rules": [
+      "EU Data Act 2023/2854 Ch. V",
+      "Creative Commons Licensing",
+      "TRIPS Agreement",
+      "WIPO Internet Treaties",
+      "EU FRAND Licensing Guidelines",
+      "WTO IP Framework",
+      "UN SDG 17 Partnership Framework",
+      "ISO 26000:2010"
+     ],
+     "risks": [
+      "IP exploitation by dominant partners through AI-facilitated access",
+      "Open source license violation in AI-generated code",
+      "Partnership value extraction without reciprocal benefit",
+      "Trade secret leakage through AI collaboration tools",
+      "Exclusion of developing economy partners from AI-mediated partnerships"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "wealth",
+   "name": "Wealth",
+   "packs": [
+    {
+     "id": "future-of-work",
+     "name": "Future of Work",
+     "summary": "Income generation, intellectual property, and individual/collective work — covering the evolving labor landscape including gig economy, remote work, algorithmic management, and worker data rights with emphasis on fair labor practices and equitable opportunity.",
+     "riskTier": "very-high",
+     "questions": 17,
+     "rules": [
+      "ILO Conventions C087/C098 (Freedom of Association)",
+      "OECD Guidelines for Multinational Enterprises (2023)",
+      "EU Platform Work Directive 2024/2831",
+      "Gig Economy Regulations (various jurisdictions)",
+      "GDPR (Worker Data)",
+      "EU AI Act Art. 26 (Deployer Obligations)",
+      "WEF Future of Jobs Report Framework"
+     ],
+     "risks": [
+      "Algorithmic wage discrimination across demographics",
+      "Worker misclassification through AI-managed gig platforms",
+      "Surveillance overreach in AI-monitored remote work",
+      "Skill obsolescence acceleration from AI automation without reskilling",
+      "Collective bargaining undermining through algorithmic management"
+     ]
+    },
+    {
+     "id": "digital-payments",
+     "name": "Digital Payments",
+     "summary": "Cross-border payments, borrowing, credit, buying, and selling — covering the digital payment ecosystem including payment processing, credit scoring, lending, and cross-border transactions with emphasis on fraud prevention, consumer protection, and financial inclusion.",
+     "riskTier": "very-high",
+     "questions": 17,
+     "rules": [
+      "PCI DSS v4.0.1",
+      "ISO 20022 Financial Messaging",
+      "PSD2 Directive 2015/2366 / PSD3 Proposal",
+      "EMV Specifications",
+      "SWIFT Customer Security Programme",
+      "FinCEN AML/BSA",
+      "FATF Recommendations",
+      "GDPR",
+      "MiCA Regulation 2023/1114",
+      "Dodd-Frank Act Title X"
+     ],
+     "risks": [
+      "AI-enabled payment fraud at scale through adversarial attacks",
+      "Credit scoring discrimination against protected classes",
+      "Cross-border AML compliance failures from jurisdictional complexity",
+      "Consumer data exploitation through open banking API abuse",
+      "Systemic risk from AI-managed high-frequency payment routing"
+     ]
+    },
+    {
+     "id": "no-poverty",
+     "name": "No Poverty",
+     "summary": "Economic opportunities for socially displaced and disadvantaged populations — covering financial inclusion, microfinance, social protection, and economic empowerment with emphasis on equitable access, dignity preservation, and sustainable poverty reduction.",
+     "riskTier": "very-high",
+     "questions": 19,
+     "rules": [
+      "UN SDG 1 — No Poverty",
+      "World Bank Financial Inclusion Guidelines",
+      "CGAP Microfinance Standards",
+      "GSMA Mobile Money Guidelines",
+      "FATF Recommendation 1 (Risk-Based Approach)",
+      "IFC Performance Standards",
+      "UNHCR Guidelines on Financial Inclusion",
+      "EU Microfinance Reg §3"
+     ],
+     "risks": [
+      "Predatory lending through AI-optimized high-interest microloans",
+      "Financial exclusion reinforcement through biased credit algorithms",
+      "Dignity violation through invasive poverty verification processes",
+      "Data exploitation of vulnerable population financial behavior",
+      "Debt trap creation through AI-managed lending without affordability assessment"
+     ]
+    },
+    {
+     "id": "circular-economy",
+     "name": "Circular Economy Finance",
+     "summary": "Savings, investing, lending, borrowing, securitizing, and wealth growth — covering sustainable finance, ESG integration, green bonds, and circular economy investment with emphasis on greenwashing prevention, fiduciary duty, and sustainable value creation.",
+     "riskTier": "very-high",
+     "questions": 18,
+     "rules": [
+      "SEC ESG Disclosure Rules",
+      "EU Taxonomy Regulation 2020/852",
+      "GRI Standards 201-207",
+      "SASB Standards",
+      "ISO 14044:2006 (LCA)",
+      "Ellen MacArthur Foundation CE Principles",
+      "Basel III Framework"
+     ],
+     "risks": [
+      "Greenwashing through AI-generated sustainability claims without verification",
+      "Stranded asset risk from inadequate climate transition assessment",
+      "ESG rating manipulation through selective data disclosure",
+      "Fiduciary duty breach from ESG integration without financial materiality",
+      "Circular economy investment fraud through inflated recycling metrics"
+     ]
+    },
+    {
+     "id": "blockchain",
+     "name": "Blockchain & DeFi",
+     "summary": "Decentralized finance, tokenization, and DeFi protocols — covering blockchain-based financial services including token issuance, decentralized exchanges, lending protocols, and digital asset custody with emphasis on regulatory compliance, smart contract security, and investor protection.",
+     "riskTier": "very-high",
+     "questions": 18,
+     "rules": [
+      "MiCA Regulation 2023/1114",
+      "FATF VA/VASP Guidelines (2021)",
+      "SEC Howey Test Framework",
+      "ISO/TC 307 Blockchain Standards",
+      "BIS CPMI Guidance on Stablecoins",
+      "IOSCO Policy Recommendations for Crypto",
+      "AML/KYC Requirements (5AMLD/6AMLD)"
+     ],
+     "risks": [
+      "Smart contract exploitation through AI-discovered vulnerabilities",
+      "Regulatory arbitrage through AI-managed cross-jurisdictional token operations",
+      "Market manipulation through AI-powered DeFi trading strategies",
+      "Stablecoin de-pegging from AI-managed reserve management failures",
+      "Privacy violation through blockchain transaction de-anonymization"
+     ]
+    }
+   ]
+  }
+ ]
+}
