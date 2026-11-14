@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C567-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C569-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -113,13 +113,13 @@ amc up
 
 In the current source build `amc start` is another name for `amc up`. In the run recorded for this README (a new workspace and home directory, current source build, 2026-10-11; [record](qualification/2026-10-11-P0-28/README.md)), it:
 
-- Created the workspace under `.amc/`: signing keys, a vault and signed configuration. It needs a vault passphrase: it reads `AMC_VAULT_PASSPHRASE`, uses one it remembered, asks in a terminal, or generates and remembers one in a non-interactive shell. **No account. No provider API key. No cloud.**
+- Created the workspace under `.amc/`: signing keys, a vault and signed configuration. It needs a vault passphrase: it reads `AMC_VAULT_PASSPHRASE`, uses one it remembered, asks in a terminal, or generates and remembers one in a non-interactive shell. In the current source build the terminal question offers "Let AMC create and remember one (recommended)" or "Enter my own"; the first remembers the passphrase on this computer without printing it and says where (`amc vault passphrase` sets one you know; `amc vault forget` removes the remembered copy). It is printed once only where nothing keeps it. **No account. No provider API key. No cloud.**
 - Started Studio (API and Compass Console), the gateway, a proxy, the dashboard and the bridge on `127.0.0.1` in the background, and printed the console URL. It did not open a browser.
 - Ran a first 8-surface baseline (`amc run`), because the workspace had no earlier run, and printed the result. With no agent connected it graded F, with 4 of 8 surfaces evaluated.
 
 `amc down` stops the background services. A second `amc up` in the same workspace reuses it, prints the latest run and skips the baseline, because the workspace already has a run (in the 2026-10-11 recorded run it did not yet find that run and ran the baseline again). `amc up --no-baseline` skips the baseline; `amc up --demo` starts a no-vault demo instead. The installers give the published 1.1.1 release: its `amc up` starts Studio and the gateway but runs no baseline, and it has no `amc start` (use [From source](#from-source) for the current build).
 
-To sign in to the Compass Console, create the first login with `amc user init --username <you>` (an OWNER account; it asks for a password and signs `.amc/users.yaml` with the workspace vault; after `amc up` the passphrase it remembered is used. If it reports `Vault locked`, set `AMC_VAULT_PASSPHRASE` in that shell and run it again.) `amc user init` refuses when `.amc/users.yaml` already exists: if the workspace already has logins (for example after `amc init --coding`), add yours with `amc user add --username <you> --role OWNER` instead (`amc user init --force` replaces every login). Keep `.amc/` out of version control by default (add it to `.gitignore`): it holds the signing keys, the Studio admin token (`.amc/studio/`), the evidence ledger and, when `amc` generated one, `.amc/local-vault-passphrase`. A new workspace also gets `.amc/.gitignore`, which keeps those secrets and per-machine runtime state out of git. `.amc/users.yaml` (console password hashes) is not ignored by that file; keep it out of git unless the repository is private. If you deliberately commit a workspace for CI ([amc-action](amc-action/README.md)), never commit `.amc/local-vault-passphrase` or `.amc/studio/`, supply `AMC_VAULT_PASSPHRASE` from a CI secret, and keep that repository private: the encrypted vault is offline brute-force material.
+To sign in to the Compass Console, create the first login with `amc user init --username <you>` (an OWNER account; it asks for a password and signs `.amc/users.yaml` with the workspace vault. With a remembered passphrase it first asks `Use the vault passphrase saved in <location> to sign amc user init?`, default No; otherwise it asks you to type the passphrase. Without a terminal, set `AMC_VAULT_PASSPHRASE` in that shell and run it again.) `amc user init` refuses when `.amc/users.yaml` already exists: if the workspace already has logins (for example after `amc init --coding`), add yours with `amc user add --username <you> --role OWNER` instead (`amc user init --force` replaces every login). Keep `.amc/` out of version control by default (add it to `.gitignore`): it holds the signing keys, the Studio admin token (`.amc/studio/`), the evidence ledger and, when `amc` generated one, `.amc/local-vault-passphrase`. A new workspace also gets `.amc/.gitignore`, which keeps those secrets and per-machine runtime state out of git. `.amc/users.yaml` (console password hashes) is not ignored by that file; keep it out of git unless the repository is private. If you deliberately commit a workspace for CI ([amc-action](amc-action/README.md)), never commit `.amc/local-vault-passphrase` or `.amc/studio/`, supply `AMC_VAULT_PASSPHRASE` from a CI secret, and keep that repository private: the encrypted vault is offline brute-force material.
 
 **What you get:**
 
@@ -962,7 +962,11 @@ AMC is **free and MIT licensed**, and in the current source build all 41 Industr
 
 ### Desktop Studio apps
 
-AMC desktop packages include `Agent Maturity Compass Studio` launchers for macOS and Windows. Each launcher verifies the included package digest and installs that exact build into a version-pinned per-user runtime, with mutable demo data kept in a separate persistent workspace. An older global CLI cannot start stale Studio code. The native macOS app uses a WebKit window; Windows opens the same loopback-only local Studio in the system browser. Neither bundles Electron or a browser runtime. Studio, CLI, docs, GitHub README, and the website share the same dark terminal identity.
+AMC desktop packages include `Agent Maturity Compass Studio` launchers for macOS and Windows. Each launcher verifies the included package digest and installs that exact build into a version-pinned per-user runtime, with its data kept in separate persistent workspaces. An older global CLI cannot start stale Studio code.
+
+The native macOS app uses a WebKit window. On first launch it asks how to start: Set Up My Workspace, Try the Demo, or Quit. Setting up creates your own workspace in `~/Library/Application Support/Agent Maturity Compass/workspace`, a vault whose passphrase AMC keeps in your macOS Keychain (service `amc-vault`), and an owner account whose password is kept there too (service `amc-console`). The console then opens signed in as that owner, so every control works. The Studio menu has Reload (⌘R), Open in Browser, Try the Demo or Open My Workspace (the view-only demo and your workspace never run at the same time), Stop AMC and Show Logs; quitting offers to stop AMC too. The app runs on its own ports (console 3232, gateway 3230 and 3231), so a terminal `amc up` elsewhere keeps the defaults.
+
+Windows opens the view-only demo in a loopback-only local Studio in the system browser. Neither bundles Electron or a browser runtime. Studio, CLI, docs, GitHub README, and the website share the same dark terminal identity.
 
 ```bash
 npm run package:desktop
@@ -971,11 +975,11 @@ npm run package:desktop:verify
 
 Run these in a source checkout ([From source](#from-source)); the desktop archives on the published GitHub release are 1.1.1 builds ([publication evidence](website/publication-status.json)). See [docs/DESKTOP_PACKAGES.md](docs/DESKTOP_PACKAGES.md) for archive contents and platform commands.
 
-The macOS app is not notarized (the current source build ad-hoc signs it): if macOS says it cannot verify the app, open System Settings > Privacy & Security and choose Open Anyway. An app built from current source carries its own copy of the package, so you can move it, for example to `/Applications`. Studio keeps running after you close the app window or browser tab; stop it with the launcher runtime's own `amc down`, run in its `studio-workspace` folder:
+The macOS app is not notarized (the current source build ad-hoc signs it): if macOS says it cannot verify the app, open System Settings > Privacy & Security and choose Open Anyway. An app built from current source carries its own copy of the package, so you can move it, for example to `/Applications`. In the macOS app, Studio > Stop AMC stops Studio. From Terminal, use the launcher runtime's own `amc down`, run in the workspace folder (on Windows, the demo's `studio-workspace` folder; Studio keeps running there after you close the browser tab):
 
 ```bash
 # macOS
-cd ~/"Library/Application Support/Agent Maturity Compass/studio-workspace" && ../runtime/node_modules/.bin/amc down
+cd ~/"Library/Application Support/Agent Maturity Compass/workspace" && ../runtime/node_modules/.bin/amc down
 ```
 
 ```powershell
@@ -1033,7 +1037,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,567<!-- /amc:count --> test source files; Vitest reports run outcomes
+cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,569<!-- /amc:count --> test source files; Vitest reports run outcomes
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.

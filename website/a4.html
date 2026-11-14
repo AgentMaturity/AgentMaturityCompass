@@ -234,7 +234,9 @@ AMC_A4_PREVIEW=1 amc up
 amc user init --username &lt;you&gt;
 amc user add --username &lt;second&gt; --role OWNER,APPROVER
 amc user add --username &lt;third&gt; --role APPROVER,AUDITOR</pre>
-  <p>Sign in to the Compass Console at the address <code>amc up</code> prints and start a project on its A4 page; creating one needs a signed-in OWNER or OPERATOR. The stage steps run there, or through the same API routes. The command line reads projects and decides, completes and verifies them:</p>
+  <p>Sign in to the Compass Console at the address <code>amc up</code> prints. While the workspace has no project, Home shows a card &ldquo;Start an agent project&rdquo;; creating one needs a signed-in OWNER or OPERATOR. Name the project, or press <strong>Use an example</strong>, which fills a sample project marked &ldquo;(sample)&rdquo; so the records show it is sample data.</p>
+  <p>Each project page opens with a <strong>What to do now</strong> panel: the four stages as a stepper, the current step, one sentence about what is needed now, and one button that moves to or presses the page&rsquo;s own control (Studio checks every action again). Every empty answer field shows an example, and on Aspire, Assemble and Adapt <strong>Use an example</strong> fills the empty fields with answers marked &ldquo;(sample)&rdquo; that you can change before saving. While an approval is open, a <strong>Who must approve</strong> block names how many different people must approve, the role they need, who cannot approve it under separation of duties, who has approved so far, and the command that adds a person. At Activate on a laptop, the panel stops with no button and says plainly that this is where the preview stops on this Studio.</p>
+  <p>The stage steps run in the console, or through the same API routes. The command line reads projects and decides, completes and verifies them:</p>
 <pre class="cmd">export AMC_A4_PREVIEW=1
 amc approvals login --username &lt;you&gt; --token-file &lt;new file&gt;
 amc a4 list
@@ -247,7 +249,7 @@ amc a4 complete &lt;projectId&gt; --stage &lt;stage&gt; --gate &lt;gateId&gt; --
   --session-token-file &lt;file&gt;
 amc a4 verify &lt;projectId&gt; --allow-unpinned --allow-unanchored   <span class="c"># integrity only, exit 2</span>
 amc down</pre>
-  <p class="muted">Each approver runs <code>amc approvals login</code> with their own username and passes their own token file. A workspace APPROVER or AUDITOR decides only once added as a project member with <code>amc a4 members</code>; add them before requesting a gate, because a membership change supersedes open gates. Opening an effect gate and deciding its request is done in Studio or the API; the command line has no command for it yet. Without your own trust list, <code>amc a4 verify</code> reports integrity only and never "trusted".</p>
+  <p class="muted">Each approver runs <code>amc approvals login</code> with their own username and passes their own token file. A workspace APPROVER or AUDITOR decides only once added as a project member with <code>amc a4 members</code>; add them before requesting a gate, because a membership change supersedes open gates. Opening an effect gate and deciding its request is done in Studio or the API; the command line has no command for it yet. Without your own trust list, <code>amc a4 verify</code> reports integrity only and never "trusted". It exits 2 only when every allow flag that applies is given: a fresh workspace needs both <code>--allow-unpinned</code> and <code>--allow-unanchored</code>, and with one missing it exits 1 and names the missing flag.</p>
   <p class="muted">These commands were run against the current source build on 14 November 2026 with three local users. Aspire, Assemble and Adapt completed; Activate stopped at its release approval as described above.</p>
 </div>
 </section>

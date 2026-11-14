@@ -55,12 +55,20 @@ Codex runs a project hook only after you trust the folder and the hook inside Co
 
 ### A port is already in use
 
-AMC's background service uses a few local ports. Only one AMC can hold them at a time on one computer.
+AMC's background service uses a few local ports. The gateway and proxy ports (3210 and 3211 by default) are one set per computer, so only one AMC folder can use the defaults at a time.
 
-- `Studio daemon exited during startup (exit code 1): Port 3210 (from the default gateway port; set AMC_GATEWAY_PORT to change it) is already in use.` Another AMC is running, usually from another folder. Run `amc down` in that folder, then `amc up` here. On macOS or Linux, `lsof -nP -iTCP:3210 -sTCP:LISTEN` shows which process holds the port.
+- `Studio daemon exited during startup (exit code 1): Port 3210 (from the default gateway port; set AMC_GATEWAY_PORT to change it) is already in use. Stop the other process or change the port. Another AMC folder may be running: stop it there with amc down, or give this folder its own ports.` Another AMC is running, usually from another folder. Either run `amc down` in that folder, then `amc up` here, or start this folder on free ports of its own:
+
+  ```bash
+  AMC_GATEWAY_PORT=<free port> AMC_PROXY_PORT=<another free port> amc up
+  ```
+
+  On macOS or Linux, `lsof -nP -iTCP:3210 -sTCP:LISTEN` shows which process holds the port.
+- The `amc` menu does this for you. When another folder holds the default ports, it says `Another AMC folder is already running on this Mac and holds AMC's default ports.` and asks `Start AMC for this folder on its own ports?` On yes it picks free ports and names the gateway port this folder uses. Commands that send model traffic through this folder's gateway then need that `AMC_GATEWAY_PORT` set; `amc connect` prints the right address.
 - `Port 3212 (from AMC_STUDIO_PORT) is already in use. Stop the other process or change the port.` You set that port yourself, and something else holds it. Stop the other process, or unset the variable.
-- When the default console port 3212 is busy and you did not set one, `amc up` picks a free port and prints the console address with that port. `.amc/studio/logs/studio.log` records `Studio API port 3212 was busy; listening on <port>`.
-- The macOS app uses 3212 (unless `AMC_HOST_PORT` is set). If that port is busy it says `AMC Studio could not start because another program is using its port`. Stop the other AMC (`amc down` in its folder) and open the app again.
+- When you did not set a console port, `amc up` uses the port this folder used last time while it is free, otherwise 3212, otherwise any free port, and prints the change, for example `Studio API port 3212 was busy; listening on <port>` or `Studio API listening on <port>, the port this workspace used last time (the default is 3212)`. The console address it prints has the right port.
+- Watch hooks send events to this folder's own AMC at the port it had when you installed them. If the port changed, `amc connect hooks status --provider claude-code` (or `amc connect hooks health`) says `the hook sends events to <old address>, but this workspace's Studio listens on <new address>` and prints the `amc connect hooks install` command that points the hook here again.
+- The macOS app runs its own AMC on its own ports: the console on 3232 and the gateway on 3230 and 3231. If another program holds one of them, the window says `AMC could not start because another program on this Mac uses port <port>, often an AMC Studio started from Terminal.` Stop it (`amc down` in its folder), then click Retry.
 
 ### `AMC: adapting the database engine to Node …` or `NODE_MODULE_VERSION`
 
@@ -77,7 +85,7 @@ You deleted (or replaced) the `.amc/` folder in a folder where AMC ran before. T
 
 ### The console or the app shows `Starting AMC…` for a long time
 
-The page is waiting for its first answer from AMC. In a browser, press ⌘R (Ctrl+R on Windows and Linux) to reload. In the macOS app, quit with ⌘Q and open it again. If it still stays on `Starting AMC…` or blank, run `amc doctor` in the workspace folder and check `.amc/studio/logs/studio.log`. For the macOS app, the workspace folder is `~/Library/Application Support/Agent Maturity Compass/studio-workspace`, and the app's own `amc` is `../runtime/node_modules/.bin/amc` from there ([Desktop Packages](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/DESKTOP_PACKAGES.md)).
+The page is waiting for its first answer from AMC. In a browser, press ⌘R (Ctrl+R on Windows and Linux) to reload. In the macOS app, press ⌘R too (Studio > Reload). If it still stays on `Starting AMC…` or blank, run `amc doctor` in the workspace folder and check `.amc/studio/logs/studio.log`. In the macOS app, Studio > Show Logs opens the launcher log (`~/Library/Logs/Agent Maturity Compass/studio-launcher.log`). The app's own workspace folder is `~/Library/Application Support/Agent Maturity Compass/workspace` (the demo is in `studio-workspace` next to it), and the app's own `amc` is `../runtime/node_modules/.bin/amc` from there ([Desktop Packages](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/DESKTOP_PACKAGES.md)).
 
 ### `Authentication required. Sign in` in the console
 
@@ -87,7 +95,7 @@ Your workspace has no console account yet, or you are signed out. Create the fir
 amc user init --username <you>
 ```
 
-It asks for the password you will sign in with; then sign in at the console address `amc up` printed. If the workspace already has accounts, an owner adds yours with `amc user add --username <you> --role OWNER`. The demo workspace in the desktop app needs no account.
+It asks for the password you will sign in with; then sign in at the console address `amc up` printed. If the workspace already has accounts, an owner adds yours with `amc user add --username <you> --role OWNER`. The macOS app signs you in to its own workspace as the owner, with a password it keeps in the Keychain (service `amc-console`); its demo workspace is view-only and needs no account.
 
 ## Other common problems
 
@@ -115,7 +123,7 @@ If you use Docker, Compose or Helm, see the related deployment docs.
 
 ### Vault is locked
 
-Commands that sign records need the vault passphrase. In a terminal, AMC uses the one it remembered after `amc up`, or asks. In a script, set `AMC_VAULT_PASSPHRASE` first. `amc vault unlock` unlocks only its own process.
+Commands that sign records need the vault passphrase. In a terminal, a signing command such as `amc firewall enable` asks `Use the vault passphrase saved in <location> to sign amc firewall enable?` when one is remembered (the default is No; answer `y`), or asks you to type the passphrase when none is. In a script, set `AMC_VAULT_PASSPHRASE` first. `amc vault unlock` unlocks only its own process. In `amc agent-loop chat`, a locked vault ends the turn with `VAULT_LOCKED` and the words `The vault is locked, so the turn could not be signed.`; run chat from your own terminal, or export `AMC_VAULT_PASSPHRASE`.
 
 ### Full score works, but deeper workflows feel confusing
 

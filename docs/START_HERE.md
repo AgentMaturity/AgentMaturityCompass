@@ -4,7 +4,7 @@ Choose what you want to do first. AMC can run a native task, assess evidence, or
 
 | Your intent | Start here | What happens |
 |---|---|---|
-| Not sure yet | `amc` in a terminal | A start menu: watch Claude Code or Codex, chat, open the console, or show the score. [Your first five minutes](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/FIRST_FIVE_MINUTES.md) walks through it. |
+| Not sure yet | `amc` in a terminal | A start menu: watch Claude Code or Codex, chat, open the console, or show the score. [Your first five minutes](FIRST_FIVE_MINUTES.md) walks through it. |
 | Run a native task | `amc agent-loop guide` | Read-only guidance for an explicit provider, model and credential reference. |
 | Assess existing evidence | `amc --no-menu` (or `amc` in a pipe or CI) | Creates or updates an evidence baseline; a valid report can still have insufficient evidence. |
 | Connect an existing agent | `amc connect --help` | Shows capture and connection options for your existing runtime. |

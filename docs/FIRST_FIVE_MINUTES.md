@@ -6,7 +6,7 @@ AMC records what an AI agent actually does on your computer, and turns that reco
 
 ## Before you start
 
-- You need Node.js 22 or 24 and AMC from the current source build. The [README](../README.md#install) has the six install commands. The hosted installers and npm give the older 1.1.1 release, which has no start menu.
+- You need Node.js 22 or 24 and AMC from the current source build. The [README](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/README.md#install) has the six install commands. The hosted installers and npm give the older 1.1.1 release, which has no start menu.
 - You need a terminal (Terminal on macOS). Everything happens in the terminal and, if you want, in your web browser.
 - Optional: Claude Code or Codex, if you want AMC to watch one of them. AMC uses their own sign-in. It never sees your password or your plan.
 
@@ -46,37 +46,31 @@ Use the up and down arrow keys to move, and press Enter to choose. The menu only
 
 AMC remembers your choice and selects it first next time.
 
-## Step 2: the vault question
+## Step 2: AMC starts
 
-The first time AMC starts its background service (for "Watch" or "Open the console"), it asks about the vault:
+The first time you choose "Watch" or "Open the console", AMC starts its background service on this computer:
 
 ```text
-Starting AMC (amc up)...
-
-🔐 This workspace already has a vault
-  AMC needs that vault's passphrase. A new one cannot open it.
-
-? The passphrase AMC saved in .amc/local-vault-passphrase opens this vault. Use it? (Answer no if this folder was copied or cloned from someone else.) (Y/n)
+Starting AMC on this Mac...
+✓ AMC is running. (agent: default)
+  Open your report card:  http://127.0.0.1:<port>/console
 ```
 
-**Vault.** The vault is a locked file in `.amc/` that holds the keys AMC uses to sign its records. A **passphrase** opens it. When you typed `amc`, AMC made the vault and saved a passphrase for it in `.amc/local-vault-passphrase`.
+**Vault.** The vault is a locked file in `.amc/` that holds the keys AMC uses to sign its records. A **passphrase** opens it. When you typed `amc`, AMC made the vault and kept its passphrase in `.amc/local-vault-passphrase` in this folder, so this step asks you nothing about it.
 
-- If you made this folder yourself, press Enter (Yes).
-- If the folder came from someone else, answer No and type the passphrase they gave you.
+- If the folder came from someone else (copied or cloned), AMC asks for that vault's passphrase instead. Answer No to the saved-file question and type the passphrase they gave you.
+- If another AMC folder is already running on this computer, AMC says so and asks `Start AMC for this folder on its own ports?` Press Enter (Yes). AMC then names the gateway port this folder uses.
 
-Next AMC asks whether to remember the passphrase on this computer. Press Enter (Yes). On macOS it goes into the Keychain; on other systems into `~/.config/amc/vault-credentials.json`. `amc vault forget` removes it again.
-
-AMC then starts and prints `✓ AMC is running.` On a new folder it also runs a first check of all eight areas and prints a report card. **Expect a low grade.** AMC has not seen your agent do anything yet, so there is little to score.
+From the menu, AMC skips the first full check, so no report card is printed yet. Step 5 shows your score.
 
 ## Step 3: watch your coding agent
 
-If you chose "Watch Claude Code as it works", AMC asks three more questions:
+If you chose "Watch Claude Code as it works", AMC asks two more questions:
 
-1. `Add AMC's watch hook to this project's Claude Code settings? (Y/n)` Press Enter. AMC writes the hook into `.claude/settings.local.json` in this folder only, and prints each file it changed.
-2. `Sign connect hooks install with the vault passphrase remembered in the macOS Keychain (service amc-vault)? (y/N)` Type `y` and press Enter. (The default here is No. If you answer No, AMC asks you to type the vault passphrase instead.)
-3. `Start Claude Code here now? (Y/n)` Press Enter to start Claude Code in this folder, and work as you normally would. When you quit Claude Code, AMC prints where to see what it recorded.
+1. `Add AMC's watch hook to this project's Claude Code settings? It sends what Claude Code does to AMC on this Mac (http://127.0.0.1:<port>).` Press Enter (Yes). AMC writes the hook into `.claude/settings.local.json` in this folder only, and prints each file it changed. If you answer No, nothing changes, and AMC prints the command that adds the hook later.
+2. `Start Claude Code here now?` Press Enter to start Claude Code in this folder, and work as you normally would. When you quit Claude Code, AMC prints where to see what it recorded.
 
-To check the hook later: `amc connect hooks status --provider claude-code`.
+So a first run takes three answers: the menu line, the hook, and the start. The hook points at this folder's own AMC, at the port shown in the question. To check the hook later: `amc connect hooks status --provider claude-code`. If AMC later runs on a different port, that command says so and prints the command that points the hook at the new port.
 
 **Observe and control.** The menu installs AMC in *observe* mode: AMC records each tool call the agent makes, and changes nothing. In *control* mode (Claude Code only, set up by hand) AMC can also refuse a tool call. Control mode needs Claude Code settings with no enabled plugin and no other hook that can change a tool call; otherwise it refuses every tool call. Start with observe mode. [Sign in with Claude or ChatGPT](SIGN_IN_WITH_CLAUDE_OR_CHATGPT.md) has both.
 
@@ -96,12 +90,12 @@ The console asks you to sign in. The first time, create your account in the term
 amc user init --username <you>
 ```
 
-If it asks whether to use the remembered vault passphrase, type `y`. Then it asks for a password. That password is for the console only. If the workspace already has accounts, an owner adds yours with `amc user add` instead.
+It signs your account with the vault keys, so it may ask for the vault passphrase first. For a folder that `amc` set up on this computer, the passphrase is in `.amc/local-vault-passphrase`. If it asks instead `Use the vault passphrase saved in … to sign amc user init?`, type `y` (the default is No). Then it asks for a password. That password is for the console only. If the workspace already has accounts, an owner adds yours with `amc user add` instead.
 
 After you sign in, the home page shows:
 
 - one plain status line, with **Details** for the full status;
-- a card titled "See what your AI agent really does.", with **Run a task** (runs a task right here, with no model or tools) and **Connect my agent** (shows the terminal command that connects your agent);
+- a card titled "See what your AI agent really does.", with **Run a task** (runs a task right here, with no model or tools) and **Connect my agent** (shows the terminal command, `amc connect`, that connects your agent; in a terminal it first offers to watch the Claude Code or Codex you are signed in to, and for any other agent it writes the settings to a private file, `.amc/studio/connect/<agent>.env`, and prints one `source` line to run);
 - a progress line, such as "Your progress: 0 of 4.", that names the next step;
 - everything else under **More**.
 
@@ -124,6 +118,10 @@ Choose "Just show my score" in the menu (or type `amc --no-menu`). The first lin
 **Signed.** Each record and report is sealed with a key, so anyone can check later that nobody changed it. "Artifact seal: VALID" means only that. It does not mean the agent is good or that the score is high.
 
 **Claims: BLOCKED** means you should not quote this score to anyone yet. Let AMC watch real work, then score again.
+
+## Using the macOS app instead
+
+If you built the macOS app ([Desktop Packages](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/DESKTOP_PACKAGES.md)), its first launch asks how to start: Set Up My Workspace, Try the Demo, or Quit. Setting up makes your own workspace, keeps its vault passphrase and your console password in the macOS Keychain, and opens the console signed in as you, so you need no terminal for Steps 2 and 4. The Studio menu has Reload (⌘R), Try the Demo or Open My Workspace, Stop AMC and Show Logs. When you quit, the app offers to stop AMC too. The app uses its own ports (the console on 3232), so it does not get in the way of `amc` in a terminal.
 
 ## When you are done
 

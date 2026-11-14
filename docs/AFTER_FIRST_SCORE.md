@@ -95,7 +95,7 @@ Start with:
 
 If you tested AMC on a toy path first, connect the real agent next.
 
-- **Claude Code or Codex:** run `amc` and choose "Watch Claude Code as it works" or "Watch Codex as it works". AMC adds an observe-mode hook to the project and records each tool call the agent reports ([Sign in with Claude or ChatGPT](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/SIGN_IN_WITH_CLAUDE_OR_CHATGPT.md)).
+- **Claude Code or Codex:** run `amc` and choose "Watch Claude Code as it works" or "Watch Codex as it works". AMC adds an observe-mode hook to the project and records each tool call the agent reports ([Sign in with Claude or ChatGPT](SIGN_IN_WITH_CLAUDE_OR_CHATGPT.md)).
 - **Another runtime:** run it through an adapter.
 
 ```bash

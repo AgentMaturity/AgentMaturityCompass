@@ -44,13 +44,31 @@ completes Aspire, Assemble and Adapt and stops at Activate's release approval (s
    amc approvals login --username <you> --token-file <new file>    # each person writes their own token file
    ```
 
-3. **Start a project and run Aspire.** Sign in to the Compass Console at the address `amc up` prints and start a
-   project on its A4 page (a signed-in OWNER or OPERATOR; the API equivalent is `POST /api/v1/a4/projects` with `name`
-   and `expertise`, see [Using the API directly](#using-the-api-directly)). Each stage's steps (answers, understand,
-   confirm understanding, explain, propose, build, review) run there or as `POST …/stages/<stage>/<step>`. The A4
-   page lists Aspire's questions: the problem, audience, goals, success metrics, constraints, forbidden actions, risk
-   tier and markets. A workspace APPROVER or AUDITOR decides only as a project member, so add the third user before
-   requesting any gate (a membership change supersedes open gates):
+3. **Start a project and run Aspire.** Sign in to the Compass Console at the address `amc up` prints. With the flag
+   set and no project yet, Home shows a card "Start an agent project"; it opens the A4 page with the start form (a signed-in OWNER or
+   OPERATOR; the API equivalent is `POST /api/v1/a4/projects` with `name` and `expertise`, see
+   [Using the API directly](#using-the-api-directly)). Give the project a name and choose how much detail you want in
+   explanations, or press **Use an example**, which fills a sample project marked `(sample)` in its name so the records
+   show it is sample data. Then press **Start an agent project**.
+
+   Each project page opens with a **What to do now** panel: what a project is, the four stages as a stepper (done,
+   current, later), the current step ("step 1 of 8"), one sentence that says what is needed now, and one primary button.
+   The button only moves to, or presses, the page's own control for that step; Studio checks every action again. When a
+   step is not yours to take (an approver at Build, say), the panel says so instead. Errors are shown as sentences with
+   the next step, and the code in small print.
+
+   Under Ask, Aspire lists its questions: the problem, audience, goals, success metrics, constraints, forbidden actions,
+   risk tier and markets. Each empty field shows an example. On Aspire, Assemble and Adapt, **Use an example** fills the
+   empty fields with sample answers marked `(sample)`, which you can change before you press Save answers. Each stage's
+   steps (answers, understand, confirm understanding, explain, propose, build, review) run on that page or as
+   `POST …/stages/<stage>/<step>`.
+
+   A workspace APPROVER or AUDITOR decides only as a project member, so add the other two users on the Members card
+   before requesting any gate (a membership change supersedes open gates). While an approval is open, the panel's
+   **Who must approve** block names how many different people must approve, the workspace role they need (and whether
+   one must hold AUDITOR), who cannot approve this one under separation of duties, who has approved so far, and the
+   `amc user add` command for adding a person. A second approver in the same workspace meets separation of duties; it
+   is not an independent review. The command line shows the same state:
 
    ```bash
    amc a4 list
@@ -84,10 +102,13 @@ completes Aspire, Assemble and Adapt and stops at Activate's release approval (s
    non-regulated project completes with its plan signed, not activated.
 
 6. **Where it stops.** Activate asks for the target (`compose` or `helm`), the destination host, lease scopes, routes,
-   models and caps, and Propose records the release draft. Requesting the release approval is then refused with
-   `409 A4_NOT_READY: not ready: deployment.same_host` unless this Studio itself runs under Compose or Helm: v1
-   deploys only by restarting the Studio that built the agent, and installing a package into another workspace is
-   P2-40.
+   models and caps, and Propose records the release draft. Activate has no example to fill (its required answers are
+   all checked values), so its fields show examples only. Unless this Studio itself runs under Compose or Helm, the
+   What to do now panel then stops with no button and says, in plain words, that this is where the A4 preview stops
+   today on this Studio: v1 deploys only by restarting the Compose or Helm-hosted Studio that built the agent, so no
+   release can be requested here. What you have are the signed records of Aspire, Assemble and Adapt, and your Activate
+   answers. Through the API or the command line, requesting the release approval is refused with
+   `409 A4_NOT_READY: not ready: deployment.same_host`. Installing a package into another workspace is P2-40.
 
 7. **Check the record, then stop.** Without your own trust list the result is integrity only (exit 2), never trusted:
 
@@ -1052,7 +1073,9 @@ residency or retention.
   trust list admits them. An export carries the rows as stored, so an Adapt row's derived parts are there as their sha256
   ref; the report warns `DERIVED_BOUND_BY_DIGEST` with the count (the files stay under the workspace's
   `a4-projects/<projectId>/derived/`, which `verifyA4Chain` checks in place). Run it with `amc a4 verify <file> --trust-list <file>` (exit 0 trusted, 1 failed, 2
-  integrity-only under `--allow-unpinned` or `--allow-unanchored`). With no trust list the report states integrity only. A bundle exported while Studio ran carries the gateway's open session: export prints `open sessions: <n>`, and when the manifest verifies under an admitted signer the bundle's ledger is verified as of its signed export time, so the report lists the session as open under `warnings`, never as a missing seal (otherwise the real time applies). In a bundle, a record whose `CREATED` body or signed
+  integrity-only once every allow flag that applies is given: `--allow-unpinned` when a signing key is on no trust list you
+  named, and `--allow-unanchored` when the ledger is unanchored. A fresh workspace needs both; with one missing the exit is 1,
+  and the command names the missing flag). With no trust list the report states integrity only. A bundle exported while Studio ran carries the gateway's open session: export prints `open sessions: <n>`, and when the manifest verifies under an admitted signer the bundle's ledger is verified as of its signed export time, so the report lists the session as open under `warnings`, never as a missing seal (otherwise the real time applies). In a bundle, a record whose `CREATED` body or signed
   seq-0 receipt names another agent than the manifest's fails scope (`A4_SCOPE_AGENT`). Seven normative fixtures,
   with their expected verdicts, are in `tests/fixtures/contracts/a4-record/`.
 - **Binder slice.** `buildA4BinderSlice` (`src/a4/a4Binder.ts`) writes a project's revisions, gates, transitions,

@@ -82,14 +82,17 @@ describe("website content validation", () => {
   });
 });
 
-// LIVE-UX-15: the hero promised a score of your agent with no terminal, but the desktop app opens the demo workspace
-// (scripts/package-desktop-installers.mjs opens /w/demo/console/).
+// LIVE-UX-15: the website must say what the macOS app opens. Since the app work it asks on first launch, sets up the
+// person's own workspace (Keychain-kept vault passphrase, owner sign-in) and keeps the view-only demo one menu item away.
 describe("website hero truth", () => {
-  test("the macOS app section says the app opens a demo workspace and how to score your own agent", () => {
+  test("the macOS app section says the app sets up your own workspace and keeps the demo one menu item away", () => {
     const desktop = read("website/index.html").match(/<section id="desktop"[\s\S]*?<\/section>/)?.[0] ?? "";
-    expect(desktop).toContain("It opens a local demo workspace with unsigned demo data; to score your own agent, run <code>amc up</code> in its folder.");
+    expect(desktop).toContain("On first launch the macOS app asks whether to set up your own workspace or try the demo.");
+    expect(desktop).toContain("Studio &gt; Try the Demo switches to the view-only demo, and Studio &gt; Open My Workspace switches back.");
     expect(desktop).toContain("ad-hoc signed, not notarized");
-    expect(read("scripts/package-desktop-installers.mjs")).toContain("/w/demo/console/");
+    expect(desktop).toContain("No download of the current version is published");
+    const script = read("scripts/package-desktop-installers.mjs");
+    for (const label of ["Set Up My Workspace", "Try the Demo", "Open My Workspace", "/w/demo/console/"]) expect(script).toContain(label);
   });
 
   test("the hero install route is the README's source build and its menu lines are the real front-door labels", () => {

@@ -4,7 +4,7 @@
 
 AMC (Agent Maturity Compass) records what your AI agent actually does and scores how far you can trust it from that record, not from what the agent claims about itself.
 
-The shortest path: install from source (below), go to your project folder, type `amc`, and pick from the menu. [Your first five minutes](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/FIRST_FIVE_MINUTES.md) walks through every screen for a first-time user, and [Troubleshooting](TROUBLESHOOTING.md#first-run-problems) has the fix for each message new users meet most often.
+The shortest path: install from source (below), go to your project folder, type `amc`, and pick from the menu. [Your first five minutes](FIRST_FIVE_MINUTES.md) walks through every screen for a first-time user, and [Troubleshooting](TROUBLESHOOTING.md#first-run-problems) has the fix for each message new users meet most often.
 
 ---
 
@@ -70,7 +70,11 @@ The menu shows only what can work now:
 
 AMC preselects your last choice next time. In a pipe, in CI or in an agent's shell, `amc` prints the full score as before; `amc --no-menu` or `AMC_NO_MENU=1` does the same in a terminal. `amc --help` is a short task list; `amc --help --all` lists every command.
 
-When AMC starts its background service for the first time in a folder that `amc` set up, it asks to use the vault passphrase it saved in `.amc/local-vault-passphrase`, then offers to remember it on this computer (the macOS Keychain, or `~/.config/amc/vault-credentials.json`; `amc vault forget` removes it). Answer yes to both unless the folder came from someone else.
+Watching Claude Code from the menu takes three answers on a first run: the menu line, `Add AMC's watch hook to this project's Claude Code settings? It sends what Claude Code does to AMC on this Mac (http://127.0.0.1:<port>).`, and `Start Claude Code here now?`. Codex is the same. The hook points at this folder's own AMC; `amc connect hooks status` reports when AMC has since moved to another port and prints the command that points the hook there again.
+
+In a folder that `amc` set up, the vault passphrase is kept in `.amc/local-vault-passphrase`, and the menu hands it to the AMC it starts, so starting asks nothing about the vault. If another AMC folder already holds AMC's default gateway and proxy ports on this computer, the menu asks `Start AMC for this folder on its own ports?` and, on yes, starts this folder on free ports and names its gateway port.
+
+`amc up` on its own, in a folder with no vault yet, asks for a vault passphrase with two choices: "Let AMC create and remember one (recommended)" or "Enter my own". The first creates a passphrase, remembers it on this computer (the macOS Keychain, service `amc-vault`, or `~/.config/amc/vault-credentials.json`), and does not print it; it says where it is kept. `amc vault passphrase` sets one you know, and `amc vault forget` removes the remembered copy. `amc init` asks the same question, and `amc init --minimal` creates and remembers one without asking. Where nothing keeps it, the passphrase is printed once instead, and you must save it then, because the vault cannot be opened without it. That happens with `AMC_VAULT_REMEMBER=0` (the `amc up` choice then reads "Let AMC create one (shown once; remembering is off)"), in CI, in an agent's shell, and for `amc init --minimal` without a terminal.
 
 ## Your First Full Score (2 minutes)
 
@@ -124,7 +128,7 @@ If `amc quickscore --auto --json` has no captured ledger evidence, AMC fails clo
 
 ### Observe Claude Code or Gemini CLI actions
 
-The shortest path for Claude Code is the start menu: run `amc` and choose "Watch Claude Code as it works". It installs the same observe-mode hook as the commands below. For Codex, see [Sign in with Claude or ChatGPT](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/SIGN_IN_WITH_CLAUDE_OR_CHATGPT.md) and [codex.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/adapters/codex.md); Codex is observe only.
+The shortest path for Claude Code is the start menu: run `amc` and choose "Watch Claude Code as it works". It installs the same observe-mode hook as the commands below. For Codex, see [Sign in with Claude or ChatGPT](SIGN_IN_WITH_CLAUDE_OR_CHATGPT.md) and [codex.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/adapters/codex.md); Codex is observe only.
 
 To do it by hand, use a dry run to inspect the exact project files, then install the reversible observer:
 
@@ -367,7 +371,7 @@ The Compass Console asks you to sign in. Create the first login, an OWNER:
 amc user init --username <you>    # asks for a password; signs .amc/users.yaml
 ```
 
-It signs with the workspace vault; after `amc up` the passphrase it remembered is used. If it reports `Vault locked`, set `AMC_VAULT_PASSPHRASE` in that shell and run it again.
+It signs with the workspace vault. When a passphrase is remembered, it first asks `Use the vault passphrase saved in <location> to sign amc user init?` (the default is No; answer `y`). When none is, it asks you to type the vault passphrase; for a folder that `amc` set up, it is in `.amc/local-vault-passphrase`. Without a terminal, set `AMC_VAULT_PASSPHRASE` in that shell and run it again.
 `amc user init` refuses when `.amc/users.yaml` already exists, so on a workspace that already has
 logins (for example after `amc init --coding`) use `amc user add` instead (`--force` replaces every login). Add more logins with `amc user add --username <name> --role <roles>`
 (see [RBAC](RBAC.md)).

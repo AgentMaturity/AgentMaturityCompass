@@ -170,12 +170,12 @@
             <div>
               <p class="product-kicker">macOS app</p>
               <h3>Agent Maturity Compass Studio</h3>
-              <p>AMC's desktop packages include macOS and Windows launcher apps. The macOS app starts AMC and shows the Compass Console in a native WebKit window; the Windows launcher opens it in your browser and has not been run on Windows by the maintainers. It opens a local demo workspace with unsigned demo data; to score your own agent, run <code>amc up</code> in its folder. Build the packages from the source checkout with <code>npm run package:desktop</code>. The macOS app is ad-hoc signed, not notarized, so macOS may ask you to allow it in Privacy &amp; Security the first time. No download of the current version is published; the 1.1.1 release archives on GitHub are the older version.</p>
+              <p>AMC's desktop packages include macOS and Windows launcher apps. The macOS app starts AMC and shows the Compass Console in a native WebKit window; the Windows launcher opens it in your browser and has not been run on Windows by the maintainers. On first launch the macOS app asks whether to set up your own workspace or try the demo. Setting up creates a workspace on your Mac with a signing vault whose passphrase is kept in your macOS Keychain, and an owner account the app signs in with for you, so every console control works there. Studio &gt; Try the Demo switches to the view-only demo, and Studio &gt; Open My Workspace switches back. The app runs AMC on its own ports, so a terminal <code>amc up</code> keeps the defaults. Build the packages from the source checkout with <code>npm run package:desktop</code>. The macOS app is ad-hoc signed, not notarized, so macOS may ask you to allow it in Privacy &amp; Security the first time. No download of the current version is published; the 1.1.1 release archives on GitHub are the older version.</p>
             </div>
             <div class="product-badges">
               <span class="product-badge">built from source</span>
               <span class="product-badge">not notarized</span>
-              <span class="product-badge">demo workspace</span>
+              <span class="product-badge">your own workspace</span>
             </div>
           </div>
           <div class="desktop-download" style="grid-column:1/3">
@@ -193,7 +193,7 @@
           <div class="stat gs"><span class="stat-value">1,304</span><span class="stat-label">CLI commands</span></div>
           <div class="stat gs"><span class="stat-value"><!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --></span><span class="stat-label">registered assurance packs</span></div>
           <div class="stat gs"><span class="stat-value">41</span><span class="stat-label">industry packs</span></div>
-          <div class="stat gs"><span class="stat-value">2,567</span><span class="stat-label">test source files</span></div>
+          <div class="stat gs"><span class="stat-value">2,569</span><span class="stat-label">test source files</span></div>
         </div>
       </div>
     </section>

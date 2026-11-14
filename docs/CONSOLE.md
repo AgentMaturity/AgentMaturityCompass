@@ -2,7 +2,7 @@
 
 Compass Console is the interactive owner cockpit served by AMC Studio.
 
-- URL: `http://127.0.0.1:3212/console` (default)
+- URL: `http://127.0.0.1:3212/console` (default; the macOS app runs its own console on `http://127.0.0.1:3232/console`, see [Desktop Packages](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/DESKTOP_PACKAGES.md))
 - Host binding: localhost only by default
 - Auth: username/password login (`/auth/login`) with HttpOnly `amc_session` cookie
 - Fallback auth: bootstrap admin token for CLI/emergency ops
@@ -14,9 +14,9 @@ amc up
 amc status
 ```
 
-`amc up` prints Studio, gateway, proxy, and dashboard URLs. When port 3212 is busy and no port was configured, Studio listens on a free port, and the printed console URL uses it. In a terminal, "Open the console in my browser" in the `amc` start menu runs `amc up` when AMC is not running, then opens the console.
+`amc up` prints Studio, gateway, proxy, and dashboard URLs. When no port was configured, Studio listens on the port this folder used last time while it is free, otherwise 3212, otherwise a free port; it prints the change, and the printed console URL uses the port it bound. In a terminal, "Open the console in my browser" in the `amc` start menu runs `amc up` when AMC is not running, then opens the console.
 
-The first screen after sign-in shows one plain status line (with Details), one card ("See what your AI agent really does.") with **Run a task** (**Try a demo task** in the demo workspace) and **Connect my agent**, a progress line, and everything else under **More**. "How AMC works" in the top bar opens a three-step guide; it does not open by itself. A signed-out page shows `Authentication required.` with a Sign in link; the first account comes from `amc user init` below.
+The first screen after sign-in shows one plain status line (with Details), one card ("See what your AI agent really does.") with **Run a task** (**Try a demo task** in the demo workspace) and **Connect my agent** (it shows the `amc connect --agent=<agent>` command to run in your terminal; see [Connect](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/CONNECT.md)), a progress line, and everything else under **More**. "How AMC works" in the top bar opens a three-step guide; it does not open by itself. A signed-out page shows `Authentication required.` with a Sign in link; the first account comes from `amc user init` below.
 
 ## Accounts
 
