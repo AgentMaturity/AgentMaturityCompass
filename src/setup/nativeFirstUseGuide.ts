@@ -26,12 +26,12 @@ function effectiveOrigin(provider: string, baseUrl: string | null): string | nul
 function credentialOptional(provider: string, origin: string | null): boolean {
   return provider === "stub" || provider === "ollama" || (openaiCompatibleRouteFor(provider) !== null && origin !== null && credentialOptionalOrigin(origin));
 }
-function choiceLabel(provider: string): string {
+export function choiceLabel(provider: string): string {
   if (provider === "stub") return "Local recording demonstration (no model answer)";
   if (provider === "ollama") return "ollama: real task with a local model server (no credential reference; supply --credential only for an authenticated origin)";
   const compat = openaiCompatibleRouteFor(provider);
   if (compat !== null && compat.defaultBaseUrl === null) return `${provider}: real task on your ${compat.displayName} resource (--base-url and --credential required)`;
-  if (compat !== null && credentialOptionalOrigin(compat.defaultBaseUrl ?? "")) return `${provider}: real task with a local ${compat.displayName.replace(/ \(local\)$/, "")} server (no credential reference on loopback)`;
+  if (compat !== null && credentialOptionalOrigin(compat.defaultBaseUrl ?? "")) return `${provider}: real task with a local ${compat.displayName.replace(/ \(local\)$/, "").replace(/ server$/, "")} server (no credential reference on loopback)`;
   return `${provider === "openai" ? "openai (Chat Completions)" : provider}: real task with your model and credential reference`;
 }
 export interface NativeFirstUseOptions {

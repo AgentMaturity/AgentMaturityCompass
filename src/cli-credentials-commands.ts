@@ -63,7 +63,7 @@ interface DescribeRow {
  * deploy script; the prompt branch is what stops an operator at a terminal from
  * reaching for `set REF $KEY` and putting the key in their shell history.
  */
-async function readSecretFromStdinOrPrompt(ref: CredentialRef): Promise<string> {
+export async function readSecretFromStdinOrPrompt(ref: CredentialRef): Promise<string> {
   if (process.stdin.isTTY) {
     const inquirer = (await import("inquirer")).default;
     const answers = await inquirer.prompt<{ value: string }>([
@@ -91,7 +91,7 @@ const defaultIo: CredentialsCliIo = {
 };
 
 /** Opens the layered store for one command. Never watches: this process is about to end. */
-function openStore(options: StoreOptions): LocalCredentialsService {
+export function openStore(options: StoreOptions): LocalCredentialsService {
   const input: CredentialsPathsInput & { watch: boolean } = {
     watch: false,
     projectDir: options.projectDir ?? process.cwd(),

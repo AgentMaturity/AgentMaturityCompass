@@ -10,7 +10,7 @@ import { isActionClass } from "../governor/actionCatalog.js";
 import { approvalModeGatedClasses, parseApprovalMode } from "../approvals/approvalModes.js";
 import { reviewNativeMcpConfigurations, NativeMcpConfigError } from "./nativeMcpConfig.js";
 import { mergeScopedMcpSelection } from "../mcp/mcpScopes.js";
-import { inspectNativeFirstUse, NATIVE_FIRST_USE_PROVIDER_LIST, renderNativeFirstUseGuide, renderNativeGuideCommand, renderNativeVerifyHint } from "./nativeFirstUseGuide.js";
+import { renderNativeFirstUseGuide, renderNativeGuideCommand, renderNativeVerifyHint } from "./nativeFirstUseGuide.js";
 import { resolveNativeChatProfile, nativeChatProfileArgv, assertNativeChatProfileCurrent, type NativeChatProfileOptions } from "./nativeChatProfile.js";
 import { createNativeInteractiveApprovals } from "./nativeInteractiveApprovals.js";
 import { createNativeInteractiveAskUser } from "./nativeInteractiveAskUser.js";
@@ -31,6 +31,8 @@ import { listNativeQueuedSubmissions, withdrawNativeQueuedSubmission } from "./n
 import { nativeUnknownUsageNotice } from "../budgets/nativeBudgetAdmission.js";
 import { VAULT_LOCKED_PREFIX } from "../vault/vaultLockedError.js";
 import { chatVaultPassphrase } from "./nativeChatVault.js";
+import { chatSetupDeps } from "./nativeChatSetupIo.js";
+import { resolveChatSetup } from "./nativeChatSetup.js";
 
 export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly validationConfig?: string;
@@ -105,6 +107,11 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     const catalog = buildSkillCatalog(workspaceSkillRoots(cwd, options.credentialsHome));
     return new Set([...catalog.skills, ...catalog.problems].map(skill => skill.name));
   };
+  // Asked before the line editor exists: a readline left on stdin would also take the keys of a masked question (the
+  // credential, the vault passphrase) into its line and history.
+  const setup = await resolveChatSetup({ ...options, workspace: cwd }, chatSetupDeps(io));
+  if (setup === null) return;
+  const vaultPassphrase = await chatVaultPassphrase(cwd);
   let extensions: NativeExtensionManager;
   try {
     extensions = loadNativeExtensions({ workspace: cwd, manifestPaths: options.extension, expectedDigests: options.extensionPin,
@@ -112,9 +119,6 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
   } catch (error) {
     io.error(error instanceof Error ? error.message : "Native extensions could not be loaded."); io.fail(); return;
   }
-  // Asked before the line editor exists: a readline left on stdin would also take the keys of the masked question into
-  // its line and history.
-  const vaultPassphrase = await chatVaultPassphrase(cwd);
   const terminal = createInterface({ input: process.stdin, output: process.stdout, terminal: true, historySize: 50,
     completer: (line: string) => {
       try { return nativeInteractiveCompleter(line, [...skillNames(), ...extensions.prepareTurn().commands.map(command => command.name)]); }
@@ -244,20 +248,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
   let unresolvedOutcome = false;
   let selectedHistory: NativeInteractiveSessionSummary | null = null;
   try {
-    let provider = options.provider;
-    if (provider === undefined) {
-      io.log(`Choose ${NATIVE_FIRST_USE_PROVIDER_LIST.replace(/, or stub$/, "")} for a real model task; choose stub for a local recording demonstration.`);
-      const choice = await question("Provider (no default): ");
-      if (choice === null) return;
-      provider = choice.trim();
-    }
-    let model = options.model;
-    if (provider !== "stub" && !model?.trim()) {
-      const choice = await question("Model ID you can access (no default): ");
-      if (choice === null) return;
-      model = choice.trim();
-    }
-    const guide = await inspectNativeFirstUse({ ...options, provider, model });
+    const { provider, guide } = setup;
     if (guide.status !== "ready" || guide.nextAction === null) {
       io.log(renderNativeFirstUseGuide(guide));
       io.fail();
