@@ -121,6 +121,9 @@ function askMove(ctx) {
   return { now: "Run Understand: AMC reads your answers and says back what it understood.", act: { label: "Run Understand", press: "understand" } };
 }
 
+/** What acknowledging an item accepts, in a sentence (the item id stays beside it). */
+const ACK_PLAIN = { "sod.self_provisioned": "every user here was created in this one workspace, so AMC cannot show that two approvers are two different people. Acknowledging says you accept that" };
+
 /** The viewed stage's `kind` gate as readiness states it, joined with its /gates record (exclusions, request, decisions). */
 function liveGate(ctx, kind) {
   const view = ctx.readiness?.gates?.[kind];
@@ -164,9 +167,9 @@ function gateMove(ctx, kind) {
   }
   if (status === "DENIED") return { now: "This revision was denied. Change an answer under Ask and save it to start a new revision.", act: { label: "Change an answer", focus: "form[data-a4-answers] textarea" } };
   const ack = toAcknowledge(readiness);
-  if (ack.length) return { now: `Before asking for approval, a project owner acknowledges ${ack.map((item) => item.id).join(", ")}: ${ack[0].nextAction?.label ?? "see Missing requirements"}.`,
-    why: "Write the reason in the Approvals card, then press Acknowledge beside the item under Missing requirements. Acknowledging after the request would cancel it.",
-    act: { label: "Write the reason", focus: '.a4-approvals [name="reason"]' } };
+  if (ack.length) return { now: `Before asking for approval, a project owner acknowledges ${ack.map((item) => item.id).join(", ")}: ${ACK_PLAIN[ack[0].id] ?? ack[0].nextAction?.label ?? "see Missing requirements"}.`,
+    why: "Write a short reason in the Approvals card, then press Acknowledge beside the item under Missing requirements (shown below). Acknowledging after the request would cancel it.",
+    act: { label: "Write the reason", focus: '.a4-approvals [name="reason"]' }, also: "#a4Missing" };
   if (codesOf(readiness, "members.candidates").includes("NO_SECOND_APPROVER")) {
     const candidates = list(ctx.members?.candidates).filter((row) => !list(ctx.project.members).some((member) => member.principalKey === row.principalKey));
     return candidates.length
@@ -179,11 +182,11 @@ function gateMove(ctx, kind) {
 }
 
 /** The primary action: one button (or link) per screen; a4.js moves to or presses the page control it names. */
-function primary(act) {
+function primary(act, also) {
   if (!act) return "";
   if (act.href) return `<a class="button a4-primary" href="${esc(act.href)}">${esc(act.label)}</a>`;
   const target = act.press ? `[data-a4-action="${esc(act.press)}"]` : act.focus;
-  return `<button type="button" class="a4-primary" data-a4-go="${esc(target)}"${act.press ? " data-a4-press" : ""}>${esc(act.label)}</button>`;
+  return `<button type="button" class="a4-primary" data-a4-go="${esc(target)}"${act.press ? " data-a4-press" : ""}${also ? ` data-a4-also="${esc(also)}"` : ""}>${esc(act.label)}</button>`;
 }
 
 /** Who must approve the live gate of the viewed stage, why, and how to add a person; "" when no gate is live. */
@@ -220,7 +223,7 @@ export function renderStartHere(ctx) {
     ${stage === project.stage && at >= 0 ? `<p>${esc(title(stage))}: step ${at + 1} of ${STEPS.length}, ${esc(STEP_TITLES[project.step] ?? project.step)}.</p>` : ""}
     <p class="a4-now"><strong>${esc(move.now)}</strong></p>${move.why ? `<p class="muted">${esc(move.why)}</p>` : ""}
     ${live ? renderWhoApproves(ctx, live) : ""}
-    <div class="row wrap">${primary(move.act)}</div>
+    <div class="row wrap">${primary(move.act, move.also)}</div>
     <p class="muted">${esc(TRUTH.signatures)}. Every A4 record is self-reported; nothing here says the agent is safe, correct or lawful.</p></section>`;
 }
 

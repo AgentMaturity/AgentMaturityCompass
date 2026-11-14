@@ -50,18 +50,18 @@ describe("front door gate", () => {
 describe("menu options", () => {
   it("offers only what can work now when nothing is detected: demo chat first", () => {
     const s = state();
-    expect(values(s)).toEqual(["demo-chat", "console", "score"]);
+    expect(values(s)).toEqual(["demo-chat", "build", "console", "score"]);
     expect(defaultChoice(s)).toBe("demo-chat");
   });
   it("pre-selects watching a signed-in Claude Code, and offers Codex sign-in when Codex is signed out", () => {
     const s = state({ signIn: [report("claude", "signed-in"), report("codex", "signed-out")] });
     expect(menuOptions(s)[0]).toEqual({ value: "watch-claude", name: "Watch Claude Code as it works (signed in)" });
-    expect(values(s)).toEqual(["watch-claude", "sign-in-codex", "demo-chat", "console", "score"]);
+    expect(values(s)).toEqual(["watch-claude", "sign-in-codex", "demo-chat", "build", "console", "score"]);
     expect(defaultChoice(s)).toBe("watch-claude");
   });
   it("pre-selects Codex when only Codex is signed in, and leaves out an agent AMC could not read", () => {
     const s = state({ signIn: [report("claude", "unknown"), report("codex", "signed-in")] });
-    expect(values(s)).toEqual(["watch-codex", "demo-chat", "console", "score"]);
+    expect(values(s)).toEqual(["watch-codex", "demo-chat", "build", "console", "score"]);
     expect(menuOptions(s)[0]!.name).toBe("Watch Codex as it works (signed in)");
     expect(defaultChoice(s)).toBe("watch-codex");
   });
@@ -177,6 +177,18 @@ describe("runFrontDoor", () => {
     expect(no.lines.join("\n")).toContain("run amc down in the other folder");
   });
 
+
+  it("build an agent: starts AMC with the A4 preview on and opens the new-project page; a running AMC is left as it is", async () => {
+    const f = fake(["build"]);
+    await runFrontDoor(f.io);
+    expect(f.amc).toEqual([["(chat env)", "up", "--no-baseline", "AMC_A4_PREVIEW=1"]]);
+    expect(f.opened).toEqual(["http://127.0.0.1:4000/console/a4?new=1"]);
+    expect(f.lines.join("\n")).toContain("pick your industry");
+    const running = fake(["build"], { origin: ["http://127.0.0.1:4000"], states: [state({ studioRunning: true })] });
+    await runFrontDoor(running.io);
+    expect(running.amc).toEqual([]);
+    expect(running.lines.join("\n")).toContain("run amc down, then choose this line again");
+  });
 
   it("watch Claude Code: starts AMC, asks before writing the hook, installs observe only, then offers to start claude", async () => {
     const f = fake(["watch-claude"], { answers: [true, true] });

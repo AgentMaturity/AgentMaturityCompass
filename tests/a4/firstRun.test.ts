@@ -218,3 +218,51 @@ describe("routes: plain refusals", async () => {
     expect(reply.body.error).toContain('The body is missing the required field "gateId": send it in the JSON body and try again.');
   });
 });
+
+describe("starting an agent project from an Industry Pack (2026-11-14)", () => {
+  const pack = { id: "digital-health-record", name: "Digital <Health> Record", stationId: "health", riskTier: "very-high",
+    regulatoryBasis: ["HIPAA Security Rule"], keyRisks: ["PHI breach <script>"], questions: [{}, {}] };
+
+  test("a pack suggests the sector, a risk appetite, the governance that tier takes and one constraint per instrument, and nothing else", async () => {
+    const packs = await import("../../src/console/assets/a4Pack.js");
+    expect(packs.packAnswers(pack)).toEqual({ stations: "health", riskTier: "high", governance: "regulated",
+      constraints: "Check whether it applies, and meet it where it does: HIPAA Security Rule (Industry Pack digital-health-record)" });
+    expect(packs.packAnswers({ ...pack, riskTier: "elevated" })).toMatchObject({ riskTier: "med", governance: "standard" });
+    expect(packs.packAnswers({ id: "x" })).toEqual({ stations: "", riskTier: "", governance: "", constraints: "" });
+    // Every suggested tier and station is a value Aspire accepts.
+    const aspire = readFileSync("src/a4/spec/aspire.ts", "utf8");
+    expect(aspire).toContain('riskTier: ["low", "med", "high", "critical"]');
+    expect(aspire).toContain('governance: ["regulated", "standard"]');
+  });
+
+  test("the pack id from the URL is a plain slug or nothing; pack text is escaped; the panel overstates nothing", async () => {
+    const packs = await import("../../src/console/assets/a4Pack.js");
+    expect(packs.packIdOf("digital-health-record")).toBe("digital-health-record");
+    for (const bad of ["../x", "a b", "<script>", "", null, "A"]) expect(packs.packIdOf(bad)).toBeNull();
+    const select = packs.packSelectHtml([{ packId: "digital-health-record", name: "Digital <Health> Record", domain: "health" }, { packId: "../bad", name: "x", domain: "health" }], "digital-health-record");
+    expect(select).toContain('<optgroup label="Health">');
+    expect(select).toContain('value="digital-health-record" selected');
+    expect(select).not.toContain("../bad");
+    expect(select).not.toContain("<Health>");
+    expect(packs.packSelectHtml([], null)).toBe("");
+    const panel = packs.packPanelHtml(pack, 4);
+    expect(panel).toContain("nothing is saved yet");
+    expect(panel).toContain("./industrypacks?pack=digital-health-record");
+    expect(panel).toContain("does not show the agent meets any rule");
+    expect(panel).not.toContain("<script>");
+    expect(panel).not.toMatch(/certif|compliant|guarantee/i);
+    expect(packs.packPanelHtml(pack, 0)).toContain("already filled or saved");
+  });
+
+  test("the pack links both ways, and the project page keeps one section open at a time", () => {
+    expect(readFileSync("src/console/assets/industryPackView.js", "utf8")).toContain('href="./a4?new=1&amp;pack=${encodeURIComponent(pack.id)}"');
+    const page = readFileSync("src/console/assets/a4.js", "utf8");
+    expect(page).toContain("void startFromPack();");
+    expect(page).toContain('more.dataset.a4Open = "more";');
+    // Acknowledging needs the reason field and the item's button, so that step names the second section to keep open.
+    const m = move(ctx({ project: project({ step: "proposed" }) }, { items: [item("sod.self_provisioned")], allowed: { requestGate: { reasonCodes: ["sod.self_provisioned"] } } })) as { now: string; also?: string };
+    expect(m.now).toContain("cannot show that two approvers are two different people");
+    expect(m.also).toBe("#a4Missing");
+    expect(start.renderStartHere(ctx({ project: project({ step: "proposed" }) }, { items: [item("sod.self_provisioned")], allowed: { requestGate: { reasonCodes: ["sod.self_provisioned"] } } }) as never)).toContain('data-a4-also="#a4Missing"');
+  });
+});

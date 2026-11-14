@@ -2453,6 +2453,9 @@ async function renderIndustryPacks() {
     `)
     .join("");
   const detail = document.getElementById("industryPackDetail");
+  // ?pack=<id> (an agent project's "Answer this pack's questions" link) opens that pack once the catalog is bound.
+  const wanted = new URLSearchParams(location.search).get("pack");
+  queueMicrotask(() => [...rows.querySelectorAll("button[data-industry-pack]")].find((button) => button.getAttribute("data-industry-pack") === wanted)?.click());
   rows.querySelectorAll("button[data-industry-pack]").forEach((button) => {
     onAction(button, "click", async () => {
       const id = button.getAttribute("data-industry-pack");

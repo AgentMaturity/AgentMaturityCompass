@@ -1,13 +1,14 @@
 // A4 Studio page module (P1-58, design §11). a4.html and a4Project.html mount it from their own <script type="module">,
 // and home.html loads it for the "Start an agent project" card; app.js is byte-pinned and never learns about these pages.
 // Every call goes through apiNativeRequest. Studio re-checks every action: a disabled button is a convenience only.
-import { apiNativeRequest, logout, onClaims, whoami } from "./api.js";
+import { apiGet, apiNativeRequest, logout, onClaims, whoami } from "./api.js";
 import { installClaimStrip } from "./components/claimBadge.js";
 import { renderHandholdingSteps } from "./components/handholdingSteps.js";
 import { definiteNativeSubmissionRefusal } from "./nativeTaskSubmission.js";
 import { stageAction, stageCards } from "./a4Cards.js";
 import * as view from "./a4View.js";
 import * as start from "./a4Start.js";
+import * as packs from "./a4Pack.js";
 import { register as registerAspire } from "./a4Aspire.js";
 import { register as registerAssemble } from "./a4Assemble.js";
 import { register as registerAdapt } from "./a4Adapt.js";
@@ -140,7 +141,10 @@ async function renderListPage(options) {
   const projects = listOf(await apiNativeRequest(`${API}/projects`), "projects");
   showClaims(claimSink);
   claimSink = null;
-  root.innerHTML = `${start.renderIntro()}${canCreate(me, options) ? view.renderCreateForm(params.has("new") || projects.length === 0)
+  // The Industry Pack catalog is optional here: without it the form simply has no industry choice.
+  const catalog = canCreate(me, options) ? listOf(await apiGet("/industry-packs/list").catch(() => null), "packs") : [];
+  root.innerHTML = `${start.renderIntro()}${canCreate(me, options) ? view.renderCreateForm(params.has("new") || projects.length === 0,
+    packs.packSelectHtml(catalog, packs.packIdOf(params.get("pack"))))
     : `<p class="muted">${view.CREATE_NEEDS}.</p>`}${view.renderProjectList(projects)}`;
   const createForm = root.querySelector("#a4CreateForm");
   const formError = (text) => {
@@ -169,7 +173,8 @@ async function renderListPage(options) {
       formError("");
       const action = { label: "Start an agent project", path: `${API}/projects`,
         body: { clientRequestId: uuid(), name, expertise: form.get("expertise"), ...(agentId ? { agentId } : {}) } };
-      action.after = (data) => { location.href = `./a4Project?project=${encodeURIComponent(one(data, "project").projectId)}`; };
+      const pack = packs.packIdOf(form.get("pack"));
+      action.after = (data) => { location.href = `./a4Project?project=${encodeURIComponent(one(data, "project").projectId)}${pack ? `&pack=${pack}` : ""}`; };
       action.after(await send(action));
     }).catch(showError);
   });
@@ -188,6 +193,9 @@ function mountProject(projectId, options) {
   // only to the member who ran them, until the page reloads or the project's stage or revision changes (loadOnce).
   let reflection = null, explanation = null;
   const drafts = new Map();
+  // ?pack= starts Aspire from an Industry Pack: its suggestions fill empty answers once, on the page only (a4Pack.js).
+  const startPackId = packs.packIdOf(params.get("pack"));
+  let startPack = null, packFilled = null, packFilledAt = null;
   // Save answers binds the head the first answer edit began on, and each edited answer remembers Studio's value then:
   // a poll that shows another member's change to one of them holds Save instead of overwriting it.
   let answerBase = null;
@@ -286,6 +294,7 @@ function mountProject(projectId, options) {
     const shown = shownReview();
     if (reviewed === null && pinnable(shown)) reviewed = shown;
     render();
+    void startFromPack();
     showClaims(claimSink); // a failed load leaves the previous load's labels beside the previous load's content
   }
 
@@ -333,7 +342,7 @@ function mountProject(projectId, options) {
     const ctx = { ...state, stage, allowed: readiness.allowed, me, gateChange, reflection, explanation, answerDrift: answerDrift(), specDraft: specBase !== null,
       questions: listOf(state.options?.questions?.[stage], "questions").map((question) => ({ ...question, example: start.placeholderOf(stage, question.id) })),
       answers: shownAnswers(), understandingCurrent: state.understandingCurrent, exampleOffered: start.FILLABLE.has(stage) && stage === state.project.stage };
-    root.innerHTML = `${view.holdBanner(project)}${start.renderStartHere(ctx)}${view.stageBanner(stage)}${conflict ? view.renderConflict(conflict) : ""}
+    root.innerHTML = `${view.holdBanner(project)}${start.renderStartHere(ctx)}${startPack && stage === "aspire" ? packs.packPanelHtml(startPack, state.project.revisionNo === packFilledAt ? packFilled ?? 0 : 0) : ""}${view.stageBanner(stage)}${conflict ? view.renderConflict(conflict) : ""}
       <section class="card"><h3>${view.esc(project.name)}</h3><p class="muted">Agent <code>${view.esc(project.agentId)}</code> ·
         r${view.esc(project.revisionNo)} · head ${view.esc(project.headSeq)}</p>${view.stageLinks(project, stage)}${view.movedNote(project, stage)}
         <p class="muted">${view.esc(readiness.claimBoundary)}</p></section>
@@ -346,6 +355,7 @@ function mountProject(projectId, options) {
       <section class="card"><h4>Here now</h4><div id="a4Presence"></div></section>`;
     renderHandholdingSteps(root.querySelector("#a4Steps"), view.stepRows(project, stage));
     renderPresenceChips();
+    foldAway();
     for (const details of root.querySelectorAll("details[data-a4-open]")) {
       if (toggled.has(detailsKey(details))) details.open = toggled.get(detailsKey(details));
     }
@@ -353,6 +363,28 @@ function mountProject(projectId, options) {
       if (drafts.has(key)) field.value = drafts.get(key);
       if (key === focused) { field.focus(); if (caret && typeof field.setSelectionRange === "function") field.setSelectionRange(...caret); }
     }
+  }
+
+  /**
+   * One thing at a time: the section the next action lives in stays on the page, with the approvals bar; every other
+   * section of the stage moves, unchanged, under one closed "Everything else" (What to do now opens it when it points there).
+   */
+  function foldAway() {
+    const go = root.querySelector(".a4-start [data-a4-go]");
+    let target = null;
+    try { target = go ? root.querySelector(go.dataset.a4Go) : null; } catch { target = null; }
+    const sections = [...root.querySelectorAll(":scope > .a4-cards > .a4-card, :scope > .a4-cards ~ :is(section, details, .a4-lanes)")];
+    // A step that needs a second section too (acknowledging an item listed under Missing requirements) names it in data-a4-also.
+    const also = go?.dataset.a4Also ?? null;
+    const rest = sections.filter((section) => !section.contains(target) && !section.matches(".a4-approvals") && !(also && section.matches(also)));
+    if (rest.length === 0) return;
+    const more = document.createElement("details");
+    more.className = "card a4-more";
+    more.dataset.a4Open = "more";
+    more.innerHTML = `<summary>Everything else in this stage (${rest.length} sections: later steps, records, requirements, members)</summary>
+      <p class="muted">Nothing here is needed for the step above. It is all still recorded and readable.</p>`;
+    root.append(more);
+    more.append(...rest);
   }
 
   function renderPresenceChips() {
@@ -633,16 +665,36 @@ function mountProject(projectId, options) {
     if (go.hasAttribute("data-a4-press") && target.matches("button[data-a4-action]")) target.click();
   }
 
-  /** Fills each empty answer with this stage's example, marked "(sample)" where it is free text (a4Start.EXAMPLES). */
-  function useExample() {
-    const sample = start.EXAMPLES[stage] ?? {};
+  /** Fills each empty answer field that `values` has text for; returns how many it filled. */
+  function fillEmptyAnswers(values) {
     let filled = 0;
     for (const field of root.querySelectorAll("form[data-a4-answers] textarea[name]")) {
-      if (field.value.trim() || typeof sample[field.name] !== "string") continue;
-      field.value = sample[field.name];
+      if (field.value.trim() || typeof values[field.name] !== "string" || !values[field.name]) continue;
+      field.value = values[field.name];
       field.dispatchEvent(new Event("input", { bubbles: true }));
       filled += 1;
     }
+    return filled;
+  }
+
+  /** Once per page load, on the project's own Aspire Ask step: the pack named in ?pack= suggests its answers. */
+  async function startFromPack() {
+    if (!startPackId || packFilled !== null || stage !== "aspire" || state.project?.stage !== "aspire" || state.project?.step !== "asked") return;
+    packFilled = 0;
+    try {
+      startPack = one(await apiGet(`/industry-packs/${encodeURIComponent(startPackId)}`), "pack");
+    } catch {
+      return tell("That Industry Pack could not be loaded, so nothing was filled in. The project itself is fine: answer the questions under Ask.");
+    }
+    render();
+    packFilled = fillEmptyAnswers(packs.packAnswers(startPack));
+    packFilledAt = state.project.revisionNo; // Save answers records a new revision; the panel then stops saying "not saved yet"
+    render();
+  }
+
+  /** Fills each empty answer with this stage's example, marked "(sample)" where it is free text (a4Start.EXAMPLES). */
+  function useExample() {
+    const filled = fillEmptyAnswers(start.EXAMPLES[stage] ?? {});
     tell(filled ? `Filled ${filled} empty answer(s) with sample text, marked (sample). Check them, change what you like, then press Save answers.`
       : "Every answer that has an example is already filled. Nothing was changed.");
   }

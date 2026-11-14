@@ -26,6 +26,7 @@ AMC set up this folder (.amc/).
 ❯ Watch Claude Code as it works (signed in)
   Watch Codex as it works (signed in)
   Try a demo chat (no account or key needed)
+  Build an agent for my industry (A4 Forge preview)
   Open the console in my browser
   Just show my score (empty for now)
 ```

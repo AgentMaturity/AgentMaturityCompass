@@ -37,6 +37,8 @@ export function industryPackDetailHtml(pack) {
     <p class="muted">${esc(pack.id)} · station ${esc(pack.stationId)} · risk ${esc(pack.riskTier)} · ${questions.length} questions</p>
     <p><strong>Content:</strong> ${esc(pack.contentStatus ?? "experimental")}, self-reported questionnaire. ${QUESTIONNAIRE_NOTICE}</p>
     ${pack.description ? `<p>${esc(pack.description)}</p>` : ""}
+    <p><a class="button secondary" href="./a4?new=1&amp;pack=${encodeURIComponent(pack.id)}">Build an agent with this pack</a>
+      <span class="muted">Starts an agent project (A4 Forge preview) with this pack's sector, risk level and rules suggested. If the preview is off, that page says how to turn it on.</span></p>
     <h4>Regulatory basis</h4>
     <ul>${(pack.regulatoryBasis ?? []).map((basis) => `<li>${esc(basis)}</li>`).join("")}</ul>
     ${(pack.keyRisks ?? []).length ? `<h4>Key risks</h4><ol>${pack.keyRisks.map((risk) => `<li>${esc(risk)}</li>`).join("")}</ol>` : ""}

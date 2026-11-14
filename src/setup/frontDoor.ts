@@ -19,7 +19,7 @@ import { inspectSignIn, type SignInReport } from "./agentSignIn.js";
 import { NATIVE_FIRST_USE_PROVIDERS } from "./nativeFirstUseGuide.js";
 import { detectProviderKeys, type DetectedProviderKey } from "./quickSetup.js";
 
-const FRONT_DOOR_CHOICES = ["watch-claude", "watch-codex", "sign-in-claude", "sign-in-codex", "chat", "demo-chat", "console", "score"] as const;
+const FRONT_DOOR_CHOICES = ["watch-claude", "watch-codex", "sign-in-claude", "sign-in-codex", "chat", "demo-chat", "build", "console", "score"] as const;
 export type FrontDoorChoice = (typeof FRONT_DOOR_CHOICES)[number];
 
 export interface FrontDoorState {
@@ -59,6 +59,7 @@ export function menuOptions(state: FrontDoorState): MenuOption[] {
     ...state.signIn.map(agentOption).filter((option): option is MenuOption => option !== null),
     ...(key === undefined ? [] : [{ value: "chat" as const, name: `Chat with a model (${key.apiKeyEnv} found)` }]),
     { value: "demo-chat", name: "Try a demo chat (no account or key needed)" },
+    { value: "build", name: "Build an agent for my industry (A4 Forge preview)" },
     { value: "console", name: state.studioRunning ? "Open the console in my browser (AMC is running)" : "Open the console in my browser" },
     { value: "score", name: state.hasRun ? "Just show my score" : "Just show my score (empty for now)" }
   ];
@@ -145,7 +146,7 @@ export interface FrontDoorIo {
  * shared by every folder, and a busy one is refused on purpose (clients that assume it would reach the other folder's
  * gateway). So when another folder holds it, the operator is asked before this folder starts on ports of its own.
  */
-async function ensureStudio(io: FrontDoorIo): Promise<string | null> {
+async function ensureStudio(io: FrontDoorIo, extraEnv: Readonly<Record<string, string>> = {}): Promise<string | null> {
   const running = io.studioOrigin();
   if (running !== null) return running;
   const ownPorts = await io.portsIfDefaultBusy();
@@ -159,7 +160,7 @@ async function ensureStudio(io: FrontDoorIo): Promise<string | null> {
       + `AMC_GATEWAY_PORT=${ownPorts.AMC_GATEWAY_PORT} set; amc connect prints the right address.`);
   }
   io.log("Starting AMC on this Mac...");
-  const origin = io.runAmc(["up", "--no-baseline"], true, ownPorts ?? undefined) === 0 ? io.studioOrigin() : null;
+  const origin = io.runAmc(["up", "--no-baseline"], true, { ...extraEnv, ...ownPorts }) === 0 ? io.studioOrigin() : null;
   if (origin === null) io.log("AMC did not start; the lines above say why. Fix that, then run amc again.");
   return origin;
 }
@@ -189,6 +190,19 @@ async function openConsole(io: FrontDoorIo): Promise<void> {
   io.log(io.openUrl(url) ? `Opening ${url}` : `Open ${url} in your browser.`);
 }
 
+/**
+ * Agent projects (A4 Forge) are a preview that a Studio serves only when started with AMC_A4_PREVIEW=1. Choosing this
+ * line is the operator turning it on for the AMC this menu starts; an AMC that already runs is left as it is.
+ */
+async function buildAgent(io: FrontDoorIo, wasRunning: boolean): Promise<void> {
+  const origin = await ensureStudio(io, { AMC_A4_PREVIEW: "1" });
+  if (origin === null) return;
+  const url = `${origin}/console/a4?new=1`;
+  io.log(io.openUrl(url) ? `Opening ${url}` : `Open ${url} in your browser.`);
+  io.log("Sign in as the workspace owner (create the account once with amc user init), pick your industry, and start an agent project.");
+  if (wasRunning) io.log("AMC was already running. If the page says agent projects are turned off, run amc down, then choose this line again.");
+}
+
 async function act(io: FrontDoorIo, choice: FrontDoorChoice, state: FrontDoorState): Promise<"done" | "menu"> {
   switch (choice) {
     case "watch-claude": await watchAgent(io, AGENTS.claude); return "done";
@@ -197,6 +211,7 @@ async function act(io: FrontDoorIo, choice: FrontDoorChoice, state: FrontDoorSta
     case "sign-in-codex": io.runAmc(["login", "codex"]); return "menu";
     case "chat": io.runAmc(chatArgs(state.providerKeys[0] ?? null), true); return "done";
     case "demo-chat": io.runAmc(chatArgs(null), true); return "done";
+    case "build": await buildAgent(io, state.studioRunning); return "done";
     case "console": await openConsole(io); return "done";
     default: await io.showScore(scoreNextStep(state)); return "done";
   }

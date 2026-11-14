@@ -45,11 +45,25 @@ completes Aspire, Assemble and Adapt and stops at Activate's release approval (s
    ```
 
 3. **Start a project and run Aspire.** Sign in to the Compass Console at the address `amc up` prints. With the flag
-   set and no project yet, Home shows a card "Start an agent project"; it opens the A4 page with the start form (a signed-in OWNER or
+   set and no project yet, Home shows a card "Build an agent for your industry"; its button opens the A4 page with the start form (a signed-in OWNER or
    OPERATOR; the API equivalent is `POST /api/v1/a4/projects` with `name` and `expertise`, see
    [Using the API directly](#using-the-api-directly)). Give the project a name and choose how much detail you want in
    explanations, or press **Use an example**, which fills a sample project marked `(sample)` in its name so the records
    show it is sample data. Then press **Start an agent project**.
+
+   **Starting from an Industry Pack.** The start form has an optional **Your industry** list with every Industry Pack,
+   grouped by station. Pick the pack closest to what the agent will do (or press **Build an agent with this pack** on a
+   pack in the Industry Packs page). When the project opens, AMC fills four empty Aspire answers from the pack: the
+   station, a risk appetite taken from the pack's risk tier (critical stays critical, very-high and high become high,
+   elevated becomes med), the governance that tier takes (regulated for high or critical), and one constraint per
+   instrument in the pack's regulatory basis, worded "Check whether it applies, and meet it where it does". A panel lists
+   the risks the pack names, so you can write what the agent must never do, and links to the pack's questionnaire.
+   Nothing is saved until you press **Save answers**, and every suggestion can be changed. Pack content is experimental
+   and AI-drafted until a named expert signs it, and starting from a pack does not show the agent meets any rule. The
+   `amc` menu's "Build an agent for my industry (A4 Forge preview)" line starts AMC with the flag set and opens this form.
+
+   **One section at a time.** The project page keeps open only the section the next step needs, plus the Approvals card.
+   Every other section of the stage is under "Everything else in this stage", unchanged.
 
    Each project page opens with a **What to do now** panel: what a project is, the four stages as a stepper (done,
    current, later), the current step ("step 1 of 8"), one sentence that says what is needed now, and one primary button.

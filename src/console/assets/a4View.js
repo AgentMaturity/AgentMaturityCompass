@@ -110,11 +110,12 @@ export function stageBanner(stage) {
 /** Studio's role check refuses a create from anyone without OPERATOR or OWNER (accessPolicy), and A4 refuses it in a read-only workspace. */
 export const CREATE_NEEDS = "Starting an agent project needs a workspace OPERATOR or OWNER role in a workspace that is not read-only";
 
-export function renderCreateForm(open) {
+export function renderCreateForm(open, industryHtml = "") {
   return `<details class="card" id="a4Create"${open ? " open" : ""}><summary>Start an agent project</summary>
     <form id="a4CreateForm" class="a4-form" novalidate>
       <label>Project name <input name="name" required maxlength="200" placeholder="For example: Invoice triage helper" aria-describedby="a4NameHint" /></label>
       <p class="muted" id="a4NameHint">A short name your team will recognise. It is stored in the project's record.</p>
+      ${industryHtml}
       <label>Existing agent id (optional) <input name="agentId" maxlength="128" pattern="[a-z0-9][a-z0-9_\\-]{0,127}" placeholder="Leave empty to create a new agent"
         aria-describedby="a4AgentHint" /></label>
       <p class="muted" id="a4AgentHint">Only if this agent already exists in AMC: its id, in lowercase letters, digits, _ and -, for example invoice-helper.
