@@ -644,7 +644,10 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
   const principalUnresolved = query.stage === "activate" && live.leasePrincipalRequired === true
     && (principal?.authSource !== "LOCAL_USER" || !(live.activeLocal ?? []).includes(principal.userId)) ? ["PRINCIPAL_UNRESOLVED"] : [];
   const specific: Partial<Record<A4Action, string[]>> = {
-    requestGate: [...blocked, ...transient],
+    // An unacknowledged item that holds progress is acknowledged first: approvals given before it would be spent on a gate that
+    // cannot complete, and an acknowledgement recorded after the request supersedes it, so they would be asked for again.
+    requestGate: [...blocked, ...transient, ...ids((candidate) => candidate.mandatory && candidate.acknowledged === null
+      && acknowledgeable(candidate, regulated, query.stage))],
     decide: [
       ...(gateList.some((gate) => gate?.status === "PENDING") ? [] : ["GATE_NOT_OPEN"]),
       ...ids((candidate) => candidate.mandatory && candidate.bound && candidate.status === "NOT_EVALUATED"), ...blocked,
@@ -706,6 +709,9 @@ function acknowledgements(state: A4ReadinessState, now: number): Map<string, { a
 const STEP_NEXT: Partial<Record<A4Step, string>> = { asked: "Run Understand, then confirm it", understood: "Run Explain", explained: "Run Propose",
   proposed: "Request the direction gate", direction_approved: "Run Build", built: "Run Review", reviewed: "Request the completion gate" };
 
+export const ASSEMBLE_REVIEW = "Close the build session first: in Studio, on the Assemble page's Build card, choose Open on Native Tasks and "
+  + "press Close and verify. Then run Review";
+
 /**
  * A stage's status and next action from its items (A-3). A mandatory BLOCKED integrity item counts like any other blocker
  * (allowedFor already refuses requestGate on it); when no item names an action the current stage's own next step is
@@ -738,6 +744,8 @@ export function readinessHeadline(state: Pick<A4ReadinessState, "project">, quer
   if (effect !== undefined) return { status: status === "READY" ? "WAITING" : status, nextAction: effect.nextAction ?? { label: `Approve the ${effect.id} request` } };
   if (gate?.status === "QUORUM_MET") return { status, nextAction: { label: `Complete the ${gateName} gate` } };
   if (gate?.status === "PENDING") return { status, nextAction: { label: `Approvers decide on the ${gateName} gate (${gate.approvals} of ${gate.required} approvals)` } };
+  // Review refuses an open build session (BUILD_SESSION_OPEN), which readiness cannot read: the way there is named up front.
+  if (state.project.step === "built" && query.stage === "assemble") return { status, nextAction: { label: ASSEMBLE_REVIEW } };
   const label = STEP_NEXT[state.project.step];
   return { status, nextAction: label === undefined ? null : { label } };
 }

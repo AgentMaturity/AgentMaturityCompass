@@ -24,15 +24,13 @@ describe("scenario: acknowledged blocker", () => {
     const waiting = await j.item("sod.self_provisioned");
     expect(waiting).toMatchObject({ status: "WAITING", reasonCodes: ["SOD_DEGRADED_SELF_PROVISIONED", "REVIEW_NOT_INDEPENDENT"] });
 
-    // Without the acknowledgement the approved gate does not complete.
-    const first = await j.approve("aspire", "direction");
-    const refused = await j.p.post(j.t.alice, "/stages/aspire/complete", { gateId: first.gateId });
-    expect(refusal(refused)).toEqual([409, "A4_NOT_READY"]);
-    expect((refused.body.detail as { reasonCodes: string[] }).reasonCodes).toEqual(["sod.self_provisioned"]);
+    // Without the acknowledgement the gate is not even requested (first-run walk, 2026-11-14): approvals given first would
+    // be spent on a gate that cannot complete, since the acknowledgement supersedes it. The refusal names the item in words.
+    const early = await j.p.post(j.t.alice, "/stages/aspire/gates/direction/request");
+    expect(refusal(early)).toEqual([409, "A4_NOT_READY"]);
+    expect(early.body.error).toMatch(/Not ready yet: sod\.self_provisioned/);
 
-    // Acknowledged while that gate is open: the gate it was not bound into is superseded.
     await j.acknowledge("aspire", "sod.self_provisioned");
-    expect(refusal(await j.p.post(j.t.alice, "/stages/aspire/complete", { gateId: first.gateId }))).toEqual([409, "A4_GATE_STALE"]);
     const acknowledged = await j.item("sod.self_provisioned");
     expect(acknowledged?.status).toBe("WAITING");
     expect(acknowledged?.reasonCodes).toEqual(["SOD_DEGRADED_SELF_PROVISIONED", "REVIEW_NOT_INDEPENDENT", "OWNER_ACKNOWLEDGED"]);

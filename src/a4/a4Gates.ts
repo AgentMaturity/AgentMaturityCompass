@@ -305,7 +305,10 @@ export function assertAllowed(readiness: A4ReadinessV1, action: A4Action, ignore
   if (codes.includes("ON_HOLD")) throw fail(409, "A4_ON_HOLD", "The project is on hold; an owner resumes it.", named);
   if (codes.includes("A4_STEP_ORDER")) throw fail(409, "A4_STEP_ORDER", "The project is not at that stage; reload it.", { reasonCodes: codes });
   if (codes.includes("PRINCIPAL_UNRESOLVED")) throw fail(409, "PRINCIPAL_UNRESOLVED", "The active plan requires a principal: an active local users.yaml user runs this effect. Nothing was consumed.", { reasonCodes: codes });
-  throw fail(409, "A4_NOT_READY", `not ready: ${codes.join(", ")}`, named);
+  // Each item with its own next action, in words; codes without an item (a gate's own state) are listed as they are.
+  const said = named.items.map((entry) => (entry.nextAction?.label ? `${entry.id} (${entry.nextAction.label})` : entry.id));
+  const rest = codes.filter((code) => !named.items.some((entry) => entry.id === code));
+  throw fail(409, "A4_NOT_READY", `Not ready yet: ${[...said, ...rest].join("; ")}.`, named);
 }
 
 /**

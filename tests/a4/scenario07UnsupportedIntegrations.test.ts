@@ -34,15 +34,14 @@ describe("scenario: unsupported integrations", () => {
       reasonCodes: ["UNSUPPORTED_INTEGRATION", "PATH:other", "STATUS:preview", "KEY:no integration path; only what the operator reports"] });
     expect((await j.item("unsupported_acknowledged"))?.reasonCodes).toContain("UNSUPPORTED_INTEGRATION");
 
-    // The gate opens, but complete names the unacknowledged items.
-    const direction = await j.approve("assemble", "direction");
-    const refused = await j.p.post(j.t.alice, "/stages/assemble/complete", { gateId: direction.gateId });
+    // The gate is not requested until they are acknowledged (first-run walk, 2026-11-14): an acknowledgement supersedes an
+    // open gate, so approvals given before it would be asked for again. The refusal names each item with its next action.
+    const refused = await j.p.post(j.t.alice, "/stages/assemble/gates/direction/request");
     expect(refusal(refused)).toEqual([409, "A4_NOT_READY"]);
-    expect((refused.body.detail as { reasonCodes: string[] }).reasonCodes).toEqual(["path_supported", "unsupported_acknowledged"]);
+    expect(refused.body.error).toMatch(/Not ready yet: path_supported \(.*\); unsupported_acknowledged \(/);
 
-    // An acknowledgement on the gate's revision supersedes the open gate: it was not bound into its intent.
     await j.acknowledge("assemble", "path_supported");
-    expect((await j.p.decide(j.t.owner, direction)).body.code).toBe("A4_GATE_STALE");
+    expect(refusal(await j.p.post(j.t.alice, "/stages/assemble/gates/direction/request"))).toEqual([409, "A4_NOT_READY"]);
     await j.acknowledge("assemble", "unsupported_acknowledged");
     for (const id of ["path_supported", "unsupported_acknowledged"]) {
       const item = await j.item(id);
