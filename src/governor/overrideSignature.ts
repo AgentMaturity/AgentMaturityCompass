@@ -44,7 +44,7 @@ export type OverrideSignatureCheck =
 
 const REFUSED =
   "Emergency override refused: no verifiable auditor signature (vault locked or missing, or no-sign mode). " +
-  "Unlock the vault with `amc vault unlock` or set AMC_VAULT_PASSPHRASE, then retry. Unsigned overrides are never recorded.";
+  "Export AMC_VAULT_PASSPHRASE, or set AMC_VAULT_PASSPHRASE_FILE, in the shell that runs the override, then retry. Unsigned overrides are never recorded.";
 
 export class BreakGlassSigningError extends Error {
   readonly code = "BREAK_GLASS_UNSIGNED";

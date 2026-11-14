@@ -297,6 +297,7 @@ import { changeVaultPassphraseInteractive, initVaultInteractive, lockVaultNow, p
 import { forgetVaultPassphrase, unlockWithRememberedPassphrase } from "./vault/passphraseStore.js";
 import { adoptVaultPassphraseFile, bootstrapVaultPassphrase, unlockWithPassphraseFile, vaultPassphraseFromEnv } from "./vault/passphraseFile.js";
 import { askToUnlockForSigning, confirmRememberedUnlock, interactiveOperator } from "./vault/operatorContext.js";
+import { VAULT_UNLOCK_PATHS } from "./vault/vaultLockedError.js";
 import { runFrontDoor, scoreNextStep, shouldShowFrontDoor, terminalFrontDoorIo } from "./setup/frontDoor.js";
 import { ensureInstantVaultMode, type InstantVaultMode } from "./cli/instantVaultMode.js";
 import { generatedPassphraseForInit, generatedPassphraseRoute, newVaultPassphraseChoices, rememberInitPassphrase, rememberOrShowOnce, shownOncePassphraseLines, skipVaultPassphrase } from "./cli/initPassphrase.js";
@@ -11516,11 +11517,15 @@ vault
 
 vault
   .command("unlock")
-  .description("Unlock vault into memory for signing operations")
+  .description("Check the vault passphrase (the vault stays unlocked only while this command runs)")
   .action(async () => {
     await unlockVaultInteractive(process.cwd()); // the unlock lives in this process only; the environment is left as it was
     const status = vaultStatusNow(process.cwd());
-    console.log(chalk.green(`Vault unlocked: ${status.unlocked ? "yes" : "no"}`));
+    if (!status.unlocked) throw new Error("The passphrase did not open this workspace's vault. Nothing was changed.");
+    // CLI-02: AMC keeps no unlock between commands, so this must not read as if the next command will find the vault open.
+    console.log(chalk.green("Passphrase accepted: it opens this workspace's vault."));
+    console.log("The vault was unlocked only while this command ran; AMC keeps no unlock between commands, so `amc vault status` still says unlocked=no.");
+    console.log(`Next: ${VAULT_UNLOCK_PATHS}.`);
   });
 
 vault
