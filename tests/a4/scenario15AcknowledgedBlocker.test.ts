@@ -42,6 +42,13 @@ describe("scenario: acknowledged blocker", () => {
     expect((await j.complete("aspire", second)).status).toBe(200);
     expect((await j.item("sod.self_provisioned"))?.status).not.toBe("READY");
 
+    // A4-15: what it acknowledges is a fact of the workspace, so it holds on the next revision too (Build records one),
+    // and the next gate is not held for it again.
+    const before = (await j.p.get(j.t.alice)).body.data!.revisionNo as number;
+    await j.p.ok(j.t.alice, "/stages/aspire/build");
+    expect((await j.p.get(j.t.alice)).body.data!.revisionNo).toBeGreaterThan(before);
+    expect((await j.item("sod.self_provisioned"))?.reasonCodes).toContain("OWNER_ACKNOWLEDGED");
+
     // Ninety days on, the acknowledgement no longer counts: the item blocks progression again.
     vi.useFakeTimers({ toFake: ["Date"], now: Date.now() + 91 * 86_400_000 });
     const expired = await j.item("sod.self_provisioned");

@@ -694,12 +694,18 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
  */
 export const acknowledgedRecords = (reasonCodes: readonly string[]): string[] => reasonCodes.filter((code) => /^(RECEIPT|CHECK):/.test(code)).sort();
 
-/** The latest unexpired owner acknowledgement per item on the head revision, with the records it was recorded against. */
+/**
+ * Items whose acknowledgement holds for the whole project until it expires, not only on the revision it was given on: what
+ * they acknowledge is a fact of the workspace, not of a revision (every user was created in this one workspace), so asking
+ * again before every gate added clicks and no information.
+ */
+const PROJECT_WIDE_ACKS: ReadonlySet<string> = new Set(["sod.self_provisioned"]);
+/** The latest unexpired owner acknowledgement per item on the head revision (any revision for PROJECT_WIDE_ACKS), with the records it was recorded against. */
 function acknowledgements(state: A4ReadinessState, now: number): Map<string, { ack: NonNullable<A4ReadinessItem["acknowledged"]>; records: string }> {
   const out = new Map<string, { ack: NonNullable<A4ReadinessItem["acknowledged"]>; records: string }>();
   for (const link of state.chain) {
     const { itemId, reason, expiresTs, actorKey, ts, recordCodes } = link.body;
-    if (link.kind !== "ACKNOWLEDGED" || link.revisionNo !== state.project.revision_no || typeof itemId !== "string" || typeof reason !== "string"
+    if (link.kind !== "ACKNOWLEDGED" || (link.revisionNo !== state.project.revision_no && !PROJECT_WIDE_ACKS.has(String(itemId))) || typeof itemId !== "string" || typeof reason !== "string"
       || typeof expiresTs !== "number" || typeof actorKey !== "string" || typeof ts !== "number" || expiresTs <= now) continue;
     out.set(itemId, { ack: { by: actorKey, ts, expiresTs, reason }, records: JSON.stringify(Array.isArray(recordCodes) ? recordCodes : []) });
   }
