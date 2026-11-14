@@ -38,8 +38,9 @@ export interface ResolvedRunReport {
   alias?: string;
   report: DiagnosticReport;
   /**
-   * CLI-04: false when the run claims a seal (status other than UNSIGNED) that does not verify, as after a hand edit. Its
-   * `report` then reads INVALID with verificationPassed false, so no display says VALID or PASSED for it.
+   * CLI-04: false when the run's seal does not verify: a hand edit, a file AMC did not write, an unsigned run, or a 1.x
+   * run. Its `report` then reads INVALID (or UNSIGNED) with verificationPassed false, so no display says VALID or PASSED.
+   * Nothing inside the file decides this: its own status or version could have been edited too.
    */
   sealVerified: boolean;
 }
@@ -82,10 +83,8 @@ function listRunReportCandidates(workspace: string, agentId?: string): Diagnosti
 export function resolveRunReport(workspace: string, runId: string, agentId?: string): ResolvedRunReport {
   const resolved = locateRunReport(workspace, runId, agentId);
   const { report } = resolved;
-  if (report.status === "UNSIGNED" || sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>)) {
-    return { ...resolved, sealVerified: true };
-  }
-  return { ...resolved, sealVerified: false, report: { ...report, status: "INVALID", verificationPassed: false } };
+  if (sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>)) return { ...resolved, sealVerified: true };
+  return { ...resolved, sealVerified: false, report: { ...report, status: report.status === "UNSIGNED" ? "UNSIGNED" : "INVALID", verificationPassed: false } };
 }
 
 function locateRunReport(workspace: string, runId: string, agentId?: string): Omit<ResolvedRunReport, "sealVerified"> {

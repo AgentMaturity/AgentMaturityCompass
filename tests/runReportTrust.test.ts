@@ -44,6 +44,13 @@ describe("run reports read back for display", () => {
     const markdown = generateReport(tampered.report, "md") as string;
     expect(markdown).not.toContain("Artifact Verification: PASSED");
     expect(markdown).not.toContain("Artifact Status: **VALID**");
+
+    // Security review: an edit to status UNSIGNED must not buy back "verified" or a passing verification label.
+    writeFileSync(file, JSON.stringify({ ...edited, status: "UNSIGNED", verificationPassed: true }));
+    const relabelled = resolveRunReport(workspace, run.runId);
+    expect(relabelled.sealVerified).toBe(false);
+    expect(relabelled.report.verificationPassed).toBe(false);
+    expect(generateReport(relabelled.report, "md") as string).not.toContain("PASSED");
   }, 120_000);
 
   // CLI-05: "Latest run" sorted run files by their UUID names, so it named a random run.
@@ -55,4 +62,31 @@ describe("run reports read back for display", () => {
     expect(latestRunId(workspace, "default")).toBe("00000000-new");
     expect(latestRunSummary(workspace, "default")?.runId).toBe("00000000-new");
   });
+});
+
+// CLI-04, security review: an edited current-format run that claims an AMC 1.x version must still fail through amc report.
+describe("amc report on an edited run that claims AMC 1.x", () => {
+  test("exits non-zero and prints no PASSED or VALID", async () => {
+    const { spawnSync } = await import("node:child_process");
+    const { resolve } = await import("node:path");
+    const passphrase = "synthetic-run-report-legacy-claim";
+    const root = mkdtempSync(join(tmpdir(), "amc-run-report-legacy-claim-"));
+    const previous = process.env.AMC_VAULT_PASSPHRASE;
+    process.env.AMC_VAULT_PASSPHRASE = passphrase;
+    try {
+      initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
+      const run = await runDiagnostic({ workspace: root, window: "14d", targetName: "default", claimMode: "auto" });
+      const file = join(getAgentPaths(root, "default").runsDir, `${run.runId}.json`);
+      const edited = JSON.parse(readFileSync(file, "utf8")) as { methodology?: Record<string, unknown> };
+      writeFileSync(file, JSON.stringify({ ...edited, integrityIndex: 0.99, methodology: { ...(edited.methodology ?? {}), amcVersion: "1.1.1" } }));
+      const out = spawnSync(process.execPath, ["--import", resolve("node_modules/tsx/dist/loader.mjs"), resolve("src/cli.ts"), "report", run.runId],
+        { cwd: root, env: { ...process.env, NO_COLOR: "1", HOME: root, AMC_VAULT_PASSPHRASE: passphrase }, encoding: "utf8", timeout: 120_000 });
+      expect(out.status, out.stderr).not.toBe(0);
+      expect(out.stdout).not.toMatch(/Artifact Verification: PASSED|Artifact Status: \*\*VALID\*\*/);
+    } finally {
+      lockVault(root);
+      rmSync(root, { recursive: true, force: true });
+      if (previous === undefined) delete process.env.AMC_VAULT_PASSPHRASE; else process.env.AMC_VAULT_PASSPHRASE = previous;
+    }
+  }, 180_000);
 });

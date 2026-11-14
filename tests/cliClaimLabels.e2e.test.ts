@@ -498,8 +498,11 @@ describe.concurrent("actual strict CLI result labels in a signed, keyless privat
 
   test("a real stored 1.1.1 run fixture prints the legacy self-reported boundary", async () => withWorkspacePermit(async () => {
     const result = await invoke("exact-legacy-run", ["report", "p0-22-legacy-1-1-1"]);
-    completed(result); expect(result.status, result.stderr).toBe(0);
+    // CLI-04 (security review): a 1.x run's seal is not checked here, so it exits 1 like any unverified run; this
+    // asserted exit 0, which an edited current run claiming a 1.x version could reuse to pass.
+    completed(result); expect(result.status, result.stderr).toBe(1);
     expect(result.stdout).toMatch(/^\*\*Claim:\*\* Legacy \(1\.x\), self-reported/m);
+    expect(result.stdout).not.toMatch(/Artifact Verification: PASSED|Artifact Status: \*\*VALID\*\*/);
     expect(result.stdout).not.toContain("Claim: Independently reviewed");
   }), 600_000);
 });
