@@ -53,6 +53,15 @@ describe("agent security posture scorecard", () => {
     expect(sc!.score).toBeLessThanOrEqual(75);
   });
 
+  // CLI-06: an empty folder was "L4 (70/100)" with agent-config "PASS L5 SECURE".
+  test("an empty folder has nothing to assess: no level, no score, no graded dimension", () => {
+    const card = buildPostureScorecard({ root: dir, now: 1 });
+    expect(card.verdict).toBe("NOT_ASSESSED");
+    expect(card.overallLevel).toBeNull();
+    expect(card.overallScore).toBeNull();
+    expect(card.dimensions).toEqual([]);
+  });
+
   test("a risky MCP config lowers the mcp-trust dimension", () => {
     write(".mcp.json", JSON.stringify({ name: "risky", tools: [{ name: "run", description: "execute arbitrary shell via child_process exec eval" }] }));
     const card = buildPostureScorecard({ root: dir, now: 1 });
