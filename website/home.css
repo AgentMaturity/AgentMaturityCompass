@@ -208,7 +208,7 @@ code { font-family: var(--mono); font-size: 0.86em; padding: 0.1em 0.38em; borde
 .js-record .record-lines .is-approval span::after { display: inline-block; opacity: 0; transform: scale(1.35); transition: opacity 0.2s ease 0.5s, transform 0.28s cubic-bezier(0.2, 1.5, 0.4, 1) 0.5s; }
 .js-record .record-lines .is-approval.is-on span::after { opacity: 1; transform: none; }
 /* The record stays in view beside the last step until the reader has passed it: the steps column ends with room. */
-@media (min-width: 1021px) and (prefers-reduced-motion: no-preference) { .steps { padding-bottom: 28rem; } }
+@media (min-width: 1021px) and (prefers-reduced-motion: no-preference) { .steps { padding-bottom: 40rem; } }
 
 /* ── Run it ──────────────────────────────────────────────────────────── */
 .run-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(32px, 5vw, 80px); align-items: start; }
