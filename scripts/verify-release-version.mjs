@@ -43,7 +43,9 @@ for (const [source, version] of Object.entries(versions)) {
   }
 }
 
-const tag = process.env.GITHUB_REF_NAME || process.env.AMC_RELEASE_TAG;
+// GITHUB_REF_NAME is a branch name ("main") in every non-tag Actions run, so it is a release tag only for a tag ref.
+const refTag = process.env.GITHUB_REF_TYPE === "tag" ? process.env.GITHUB_REF_NAME : undefined;
+const tag = refTag || process.env.AMC_RELEASE_TAG;
 if (tag && tag !== `v${expected}`) {
   fail(`release tag mismatch: ${tag} expected=v${expected}`);
 }

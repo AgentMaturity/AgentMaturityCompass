@@ -8,6 +8,7 @@ import {
   buildCommandInventory,
   cliDiscoverabilityFooter,
   flattenCommandPaths,
+  generateCompletionScript,
   parseUnknownCommandToken,
   renderCommandInventoryMarkdown,
   suggestCommandPaths
@@ -122,5 +123,45 @@ describe("the built CLI with an unknown top-level command (run `npm run build` f
     const result = amc("version");
     expect(result.status).not.toBe(0);
     expect(result.stderr).toContain("amc --version");
+  });
+});
+
+describe("shell completion scripts", () => {
+  const paths = ["adapters list", "adapters run", "run", "adapters", "run"];
+
+  it("bash completes top-level commands and the children of the typed parent", () => {
+    const script = generateCompletionScript("bash", paths);
+    expect(script).toContain("complete -F _amc_complete amc");
+    const complete = (...words: string[]) => {
+      const program = `${script}\nCOMP_WORDS=(${words.map((word) => `'${word}'`).join(" ")}); COMP_CWORD=${words.length - 1}; _amc_complete; printf '%s\\n' "\${COMPREPLY[@]}"`;
+      const result = spawnSync("bash", ["-c", program], { encoding: "utf8" });
+      expect(result.status, result.stderr).toBe(0);
+      return result.stdout.split("\n").filter(Boolean).sort();
+    };
+    expect(complete("amc", "")).toEqual(["adapters", "run"]);
+    expect(complete("amc", "adapters", "r")).toEqual(["run"]);
+    expect(complete("amc", "adapters", "")).toEqual(["list", "run"]);
+    expect(complete("amc", "nothing", "")).toEqual([]);
+  });
+
+  it("zsh lists each command path once under compdef", () => {
+    const script = generateCompletionScript("zsh", paths);
+    expect(script.startsWith("#compdef amc")).toBe(true);
+    expect(script).toContain("compdef _amc_complete amc");
+    const listed = script.split("<<'__AMC_COMMANDS__'\n")[1]!.split("\n__AMC_COMMANDS__")[0]!.split("\n");
+    expect(listed).toEqual(["adapters", "adapters list", "adapters run", "run"]);
+  });
+
+  it("fish completes top-level commands and each parent's children", () => {
+    expect(generateCompletionScript("fish", [...paths, "", "adapters run fast"]).split("\n")).toEqual([
+      'complete -c amc -f -a "adapters run"',
+      'complete -c amc -f -n "__fish_seen_subcommand_from adapters" -a "list run"',
+      'complete -c amc -f -n "__fish_seen_subcommand_from adapters run" -a "fast"'
+    ]);
+  });
+
+  it("suggestions handle an empty query and an empty candidate", () => {
+    expect(suggestCommandPaths("  ", ["run"])).toEqual([]);
+    expect(suggestCommandPaths("ru", ["", "run", "rub", "ra"]).slice(0, 3)).toEqual(["rub", "run", "ra"]);
   });
 });
