@@ -50,7 +50,7 @@ tr:hover td{background:rgba(0,255,65,.03)}
 <nav class="nav">
 <a href="index.html" class="logo">AMC</a>
 <a href="index.html">Home</a>
-<a href="compare.html">vs Everything</a>
+<a href="compare.html">Compare</a>
 <a href="methodology.html">Methodology</a>
 <a href="docs/index.html">Docs</a>
 </nav>
@@ -58,67 +58,67 @@ tr:hover td{background:rgba(0,255,65,.03)}
 
 <div class="hero">
 <h1>AMC vs Promptfoo</h1>
-<p>Both tools improve AI safety. They solve different problems. Here's an honest comparison.</p>
+<p>Both tools help you test AI. They solve different problems. Here is how they differ.</p>
 </div>
 
 <div class="container">
 
 <div class="fair">
 <h3>⚖️ Fair comparison policy</h3>
-<p>Promptfoo is an established open-source eval and red-team tool. We respect their work. This page compares architectures and use cases — not marketing claims.</p>
+<p>Promptfoo is an established open-source tool for testing prompts and attacking AI apps. We respect their work. This page compares how the tools are built and what they are for.</p>
 </div>
 
 <div class="section">
 <h2>At a glance</h2>
 <table>
 <tr><th>Dimension</th><th>AMC</th><th>Promptfoo</th></tr>
-<tr><td>Primary purpose</td><td>Trust scorecard for AI agents</td><td>Eval & red-team harness for LLM apps</td></tr>
-<tr><td>Core question</td><td>"Is this agent safe to ship?"</td><td>"Does this prompt/model produce correct output?"</td></tr>
-<tr><td>Evidence model</td><td>Execution-verified, cryptographically signed</td><td>Test pass/fail with LLM-as-judge grading</td></tr>
+<tr><td>Primary purpose</td><td>Watches an AI agent at work, keeps a signed record, and scores it</td><td>Eval & red-team harness for LLM apps</td></tr>
+<tr><td>Core question</td><td>"Does this agent's record support trusting it with this job?"</td><td>"Does this prompt/model produce correct output?"</td></tr>
+<tr><td>Evidence model</td><td>Signed records of what the agent actually did</td><td>Test pass/fail with LLM-as-judge grading</td></tr>
 <tr><td>Maturity model</td><td>L0-L5 across 5 dimensions (244 default questions, 264 with lifecycle expansion)</td><td>No maturity model — binary pass/fail per test</td></tr>
-<tr><td>Red teaming</td><td><!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs + evolutionary attacks</td><td>134 plugins + strategy-based probes</td></tr>
-<tr><td>Compliance</td><td>EU AI Act, ISO 42001, NIST, SOC 2, OWASP + audit binder generation</td><td>OWASP LLM Top 10 coverage</td></tr>
-<tr><td>Framework support</td><td>16 adapters (zero code changes)</td><td>30+ target types (config-driven)</td></tr>
-<tr><td>Governance</td><td>Policy engine, approval workflows, delegation graphs</td><td>Not a focus</td></tr>
-<tr><td>Multi-agent</td><td>Fleet oversight, trust delegation, inventory</td><td>Single-target evaluation</td></tr>
-<tr><td>Evidence integrity</td><td>Ed25519 + Merkle tree proof chains</td><td>JSON/CSV output files</td></tr>
+<tr><td>Red teaming</td><td><!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs (sets of attack tests) + attacks that adapt as they run</td><td>134 plugins + strategy-based probes</td></tr>
+<tr><td>Compliance</td><td>Maps to EU AI Act, ISO 42001, NIST, SOC 2, OWASP + audit files. Does not certify legal compliance</td><td>OWASP LLM Top 10 coverage</td></tr>
+<tr><td>Framework support</td><td>16 adapters (no code changes)</td><td>30+ target types (config-driven)</td></tr>
+<tr><td>Governance</td><td>Rules for actions, approval steps, records of who handed work to whom</td><td>Not a focus</td></tr>
+<tr><td>Multi-agent</td><td>Oversight of several agents, handing trust between them, inventory</td><td>Single-target evaluation</td></tr>
+<tr><td>Evidence integrity</td><td>Ed25519 signatures + Merkle tree hash chains</td><td>JSON/CSV output files</td></tr>
 <tr><td>License</td><td>MIT</td><td>MIT</td></tr>
 <tr><td>Install</td><td><code>curl -fsSL https://agentmaturity.co/install.sh | sh</code></td><td><code>npx promptfoo@latest init</code></td></tr>
 </table>
 </div>
 
 <div class="section">
-<h2>Where Promptfoo wins</h2>
+<h2>Where Promptfoo is stronger</h2>
 <table>
 <tr><th>Capability</th><th>Details</th></tr>
-<tr><td>Prompt-level evaluation</td><td>Purpose-built for testing prompts across models. Golden dataset comparison, A/B testing, model migration. AMC doesn't do prompt-level eval.</td></tr>
+<tr><td>Prompt-level evaluation</td><td>Built for testing prompts across models. Comparison to known-good answers, A/B testing, moving to a new model. AMC does not test single prompts.</td></tr>
 <tr><td>Target variety</td><td>30+ target types including HTTP APIs, browser automation, direct model calls. Broader input surface than AMC's adapter approach.</td></tr>
-<tr><td>Research datasets</td><td>12 built-in adversarial datasets (HarmBench, BeaverTails, ToxicChat, etc.). AMC generates its own scenarios rather than shipping external datasets.</td></tr>
-<tr><td>LLM-as-judge</td><td>Mature grading system using LLMs to evaluate response quality. Useful for subjective quality assessment.</td></tr>
+<tr><td>Research datasets</td><td>12 built-in attack datasets (HarmBench, BeaverTails, ToxicChat, etc.). AMC writes its own test cases instead of shipping outside datasets.</td></tr>
+<tr><td>LLM-as-judge</td><td>A mature system that uses an LLM to grade answers. Useful when quality is a matter of judgment.</td></tr>
 <tr><td>Community size</td><td>A larger ecosystem with more third-party integrations.</td></tr>
 </table>
 </div>
 
 <div class="section">
-<h2>Where AMC wins</h2>
+<h2>Where AMC is stronger</h2>
 <table>
 <tr><th>Capability</th><th>Details</th></tr>
-<tr><td>Maturity model</td><td>L0–L5 scoring across 5 dimensions gives a structured improvement path. Promptfoo gives pass/fail per test — no aggregate maturity picture.</td></tr>
-<tr><td>Evidence integrity</td><td>Cryptographic proof chains (Ed25519 + Merkle trees) make scores tamper-evident. Promptfoo results are JSON files with no signing.</td></tr>
-<tr><td>Compliance automation</td><td>Generates audit binders for EU AI Act, ISO 42001, NIST AI RMF, SOC 2. Maps diagnostic results to regulatory requirements. Promptfoo maps to OWASP only.</td></tr>
-<tr><td>Agent governance</td><td>Policy engine, approval workflows, scoped leases, budget controls, delegation graphs. Promptfoo doesn't model governance.</td></tr>
-<tr><td>Multi-agent fleet</td><td>Compare agents, track trust delegation, inventory discovery. Promptfoo evaluates one target at a time.</td></tr>
-<tr><td>Industry packs</td><td>41 domain-specific packs (healthcare/HIPAA, finance/MiFID II, education/FERPA, logistics/warehouse reliability). Promptfoo has some industry plugins but fewer regulatory mappings.</td></tr>
-<tr><td>Transparent proxy</td><td>Gateway observes agent behavior without code changes — evidence tier is higher than self-reported test results.</td></tr>
+<tr><td>Maturity model</td><td>L0–L5 scores across 5 areas show what to improve next. Promptfoo gives pass/fail per test, with no overall level.</td></tr>
+<tr><td>Evidence integrity</td><td>Signatures and hash chains (Ed25519 + Merkle trees) show if anyone changed a score. They show who signed it and that it is unchanged, not that it is true. Promptfoo results are unsigned JSON files.</td></tr>
+<tr><td>Compliance mapping</td><td>Builds audit files for EU AI Act, ISO 42001, NIST AI RMF, SOC 2, and links results to legal requirements. It does not certify legal compliance. Promptfoo maps to OWASP only.</td></tr>
+<tr><td>Agent governance</td><td>Rules for actions, approval steps, time-limited access, spending limits, records of who handed work to whom. Promptfoo does not cover this.</td></tr>
+<tr><td>Multi-agent fleet</td><td>Compare agents, track trust handed between them, find the agents you run. Promptfoo tests one target at a time.</td></tr>
+<tr><td>Industry packs</td><td>41 industry question sets (healthcare/HIPAA, finance/MiFID II, education/FERPA, logistics/warehouse reliability), experimental and AI-drafted until a named expert signs them. Promptfoo has some industry plugins but fewer legal mappings.</td></tr>
+<tr><td>Transparent proxy</td><td>A gateway sees what the agent does without code changes. Those records count for more than self-reported test results.</td></tr>
 </table>
 </div>
 
 <div class="verdict">
 <h2>When to use which</h2>
 <ul>
-<li><strong>Use Promptfoo</strong> when you're optimizing prompts, comparing model outputs, or building an eval pipeline for an LLM app that isn't an autonomous agent.</li>
-<li><strong>Use AMC</strong> when you need to answer "is this agent safe to ship?" with auditable evidence, compliance documentation, and a structured maturity score.</li>
-<li><strong>Use both</strong> when you want prompt-level quality (Promptfoo) AND agent-level trust scoring (AMC). AMC can import Promptfoo eval results via <code>amc eval import --format promptfoo</code>.</li>
+<li><strong>Use Promptfoo</strong> when you are tuning prompts, comparing model answers, or building tests for an LLM app that does not act on its own.</li>
+<li><strong>Use AMC</strong> when you need a signed record of what an agent did, files for a compliance review, and a level that shows what to fix.</li>
+<li><strong>Use both</strong> when you want prompt quality (Promptfoo) and an agent-level score (AMC). AMC can import Promptfoo eval results via <code>amc eval import --format promptfoo</code>.</li>
 </ul>
 </div>
 

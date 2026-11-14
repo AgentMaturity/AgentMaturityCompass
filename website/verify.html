@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Verify Our Claims - Agent Maturity Compass</title>
-  <meta name="description" content="Don't trust AMC — check it. Download a real signed evidence bundle and verify it yourself with one command.">
+  <meta name="description" content="Don't take our word for it. Download a real signed AMC file and check it yourself with one command.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Verify Our Claims - Agent Maturity Compass">
-  <meta property="og:description" content="Download a real signed AMC evidence bundle and verify it yourself with one command. No account, no trust required.">
+  <meta property="og:description" content="Download a real signed AMC file and check it yourself with one command. No account needed.">
   <meta property="og:url" content="https://agentmaturity.co/verify.html">
   <meta property="og:image" content="https://agentmaturity.co/og-card.png">
   <meta name="twitter:card" content="summary_large_image">
@@ -48,54 +48,54 @@
   <span id="main-content" tabindex="-1"></span>
   <main class="plain-page">
     <div class="container">
-      <p class="label">evidence over claims</p>
+      <p class="label">check it yourself</p>
       <h1>Don't trust us. Check us.</h1>
 
-      <p>Every AMC score ships inside a signed evidence bundle. Anyone can verify a bundle offline — without an account, without our servers, and without trusting the person who sent it. This page lets you try that right now, on a real bundle we generated and published.</p>
+      <p>Every AMC score comes in a bundle: one signed file that holds the score and the records behind it. Anyone can check a bundle offline. You need no account, no AMC server, and no trust in the person who sent it. You can try it now on a real bundle we made and published.</p>
 
-      <h2>Verify a real bundle in two minutes</h2>
+      <h2>Check a real bundle in two minutes</h2>
       <p>1. Install AMC (free, open source):</p>
       <pre><code>curl -fsSL https://agentmaturity.co/install.sh | sh</code></pre>
       <p>2. Download the sample bundle we published:</p>
       <pre><code>curl -fsSLO https://agentmaturity.co/verify/amc-sample-evidence.amcbundle</code></pre>
-      <p>3. Save the sample's auditor public key. We publish it here, outside the bundle, because a bundle's own keys never vouch for it. Its fingerprint (SHA-256 of the key file) is <code>eb6f84cc395175206962b8054442619563ceca075ff38a746739cd6df2031945</code>.</p>
+      <p>3. Save the sample's auditor public key. We publish it here, outside the bundle, because a key packed inside a bundle cannot vouch for that bundle. Its fingerprint (SHA-256 of the key file) is <code>eb6f84cc395175206962b8054442619563ceca075ff38a746739cd6df2031945</code>.</p>
       <pre><code>cat &gt; amc-sample-auditor.pub &lt;&lt;'EOF'
 -----BEGIN PUBLIC KEY-----
 MCowBQYDK2VwAyEAiknpzbSC8obwQGVNQZXdMt3yFExL1xzvEoHCg2WA8+U=
 -----END PUBLIC KEY-----
 EOF</code></pre>
-      <p>4. Verify it, pinning that key and the fingerprint of the sample's monitor (ledger) key:</p>
+      <p>4. Check it. The command pins (names in advance) that key and the fingerprint of the sample's monitor key, the key that signs its log of records:</p>
       <pre><code>amc bundle verify amc-sample-evidence.amcbundle \
   --pubkey amc-sample-auditor.pub \
   --expect-monitor 93a2ad7bebb2e8b93a0de857710f9c39205f3dd29e23c8557291a0c4a470610f</code></pre>
       <p>You should see this, with exit code 0:</p>
       <pre><code>Bundle verification PASSED</code></pre>
-      <p>Without the two pins, the same command prints <code>Bundle verification FAILED</code>, names each signing key as <code>not-pinned</code> with its fingerprint, and exits 1. Anyone can re-sign a forged bundle with a fresh key and ship that key inside it, so AMC trusts only keys you pinned from outside the bundle. Adding <code>--allow-unpinned --allow-unanchored</code> gives an integrity-only result: exit code 2 and an <code>UNTRUSTED:</code> line, never a pass.</p>
+      <p>Without the two pins, the same command prints <code>Bundle verification FAILED</code>, lists each signing key as <code>not-pinned</code> with its fingerprint, and exits 1. Anyone can sign a fake bundle with a new key and put that key inside it. So AMC trusts only keys you got from outside the bundle. With <code>--allow-unpinned --allow-unanchored</code> it only checks that nothing changed: exit code 2 and an <code>UNTRUSTED:</code> line, never a pass.</p>
 
-      <p>AMC checks the bundle's signatures, hash chain, and manifest — fully offline. If a single byte had been edited after signing, verification would fail. Try it: flip one character anywhere in the file and run the command again. We did exactly that while publishing this page, and verification failed as it should.</p>
+      <p>AMC checks the bundle's signatures, the chain of fingerprints that links its records, and its list of contents, all offline. If one byte changed after signing, the check fails. Try it: change one character anywhere in the file and run the command again. We did that while publishing this page, and the check failed as it should.</p>
 
-      <p>The published sample's SHA-256, if you want to checksum the download itself:</p>
+      <p>To check the download itself, here is the sample's SHA-256:</p>
       <pre><code>b5860614cf52ef621693e41241c0c608c455538431263ac58aa1e18bb6029441</code></pre>
 
-      <h2>What this proves — and what it doesn't</h2>
+      <h2>What this shows, and what it does not</h2>
       <ul>
-        <li><strong>It proves integrity.</strong> The bundle you verified is exactly what was signed. Nobody edited the score, the evidence, or the timestamps afterward.</li>
-        <li><strong>It does not prove quality by itself.</strong> A signed bundle of weak evidence is still weak evidence — that's why AMC reports evidence readiness separately from the artifact seal, and marks scores claim-eligible only when readiness is <code>READY</code>. The published sample is a fresh baseline run: valid, signed, and honest about containing no accepted evidence yet.</li>
+        <li><strong>It shows who signed it and that nothing changed.</strong> The bundle you checked is exactly what was signed. Nobody edited the score, the records, or the times afterward. A signature does not show that the records are true.</li>
+        <li><strong>It does not show the agent is good.</strong> A signed bundle of weak records is still weak. So AMC reports whether there are enough records separately from the signature check. A score can back a claim only when that report says <code>READY</code>. The published sample is a first run on a new workspace: valid and signed, and it says it holds no accepted records yet.</li>
       </ul>
 
-      <h2>Verify anyone's agent the same way</h2>
-      <p>When someone hands you an AMC bundle — a vendor, a contractor, a teammate — ask them for their auditor public key and monitor key fingerprint, recorded when their vault was created, through a channel other than the bundle: their website, your contract, or a signed trust list. Then run the same commands. You don't need their infrastructure, only those keys from outside the bundle:</p>
+      <h2>Check anyone's agent the same way</h2>
+      <p>When a vendor, contractor, or teammate sends you an AMC bundle, ask for their auditor public key and monitor key fingerprint. They got these when they set up AMC. Get them some other way than the bundle: their website, your contract, or a signed trust list. Then run the same commands. You need only those two keys, not their systems:</p>
       <pre><code>amc bundle verify their-agent-evidence.amcbundle \
   --pubkey their-auditor.pub \
   --expect-monitor &lt;their monitor key sha256&gt;
 amc bundle inspect their-agent-evidence.amcbundle</code></pre>
-      <p>To pin many issuers at once, use a signed trust list (<code>--trust-list</code> and <code>--trust-root</code>); see <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/TRUST_LIST.md">the trust-list guide</a>.</p>
+      <p>To pin keys for many senders at once, use a signed trust list (<code>--trust-list</code> and <code>--trust-root</code>); see <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/TRUST_LIST.md">the trust-list guide</a>.</p>
 
-      <h2>Verify our releases too</h2>
-      <p>The installer itself is verifiable: it downloads a pinned GitHub Release, checks every archive against the published <code>SHA256SUMS</code>, and refuses anything that doesn't match. Our published test counts are enforced by the test suite itself — the number and the suite are checked against each other, so the badge can't silently drift.</p>
+      <h2>Check our releases too</h2>
+      <p>You can check the installer too. It downloads one fixed GitHub Release, checks every archive against the published <code>SHA256SUMS</code>, and refuses anything that does not match. The test suite checks our published test count against itself, so the number cannot quietly go stale.</p>
 
       <h2>How the scoring works</h2>
-      <p>The full methodology — levels, evidence tiers, decay, gates, and the compliance-framework crosswalk — is public: <a href="methodology.html">methodology</a> · <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/METHODOLOGY_CROSSWALK.md">framework crosswalk</a>.</p>
+      <p>The full scoring method is public: levels, how much each kind of record counts, how old records lose weight, release checks, and how scores map to compliance frameworks: <a href="methodology.html">methodology</a> · <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/METHODOLOGY_CROSSWALK.md">framework crosswalk</a>.</p>
     </div>
   </main>
   <script src="script.js?v=12"></script>

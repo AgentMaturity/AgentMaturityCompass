@@ -46,37 +46,37 @@
   <main class="plain-page">
     <div class="container">
       <p class="label">accessibility</p>
-      <h1>AMC should be usable without relying on color or pointer-only interaction<span class="accent">.</span></h1>
-      <p>Last reviewed: 2026-06-16. This statement covers the public website, browser playground, generated dashboard, local Studio, and CLI output conventions.</p>
+      <h1>You should be able to use AMC without relying on color or a mouse<span class="accent">.</span></h1>
+      <p>Last reviewed: 2026-06-16. This statement covers the website, the browser playground, the dashboard AMC generates, the local Studio, and the command-line output.</p>
 
-      <h2>Standards Target</h2>
+      <h2>What we aim for</h2>
       <ul>
-        <li>Website and generated dashboard: WCAG 2.2 AA-aligned checks for contrast, focus visibility, skip navigation, and chart names.</li>
+        <li>Website and generated dashboard: checks based on WCAG 2.2 AA for contrast, visible keyboard focus, skip links, and chart names.</li>
         <li>Generated dashboard: Settings includes a high-contrast theme, and the onboarding dialog traps keyboard focus while open.</li>
-        <li>Generated dashboard heatmaps expose score, target, gap, and confidence as text plus ARIA grid, gridcell, selected-state, and meter values.</li>
-        <li>CLI: color is supplemental. Use <code>NO_COLOR=1</code> or <code>--no-color</code> for plain output where supported.</li>
-        <li>Evidence: accessibility claims should be backed by tests, not only screenshots.</li>
+        <li>Generated dashboard heatmaps give score, target, gap, and confidence as text, and to screen readers as ARIA grid, gridcell, selected-state, and meter values.</li>
+        <li>Command line: color is never the only signal. Use <code>NO_COLOR=1</code> or <code>--no-color</code> for plain output where supported.</li>
+        <li>Proof: accessibility claims should be backed by tests, not only screenshots.</li>
       </ul>
 
-      <h2>Current Support</h2>
+      <h2>What works today</h2>
       <ul>
-        <li>Static pages include skip links and keyboard focus-visible styling.</li>
+        <li>Static pages have skip links and a visible keyboard focus.</li>
         <li>Decorative canvases are hidden from assistive technology.</li>
-        <li>Playground and generated console chart canvases expose descriptive accessible names.</li>
-        <li>The generated dashboard secondary-text token was raised from the low-contrast value flagged in the audit.</li>
+        <li>Charts in the playground and the generated console have names that screen readers can read.</li>
+        <li>The generated dashboard's secondary text now has more contrast, after an audit flagged it.</li>
         <li>The generated dashboard can switch to a high-contrast theme for low-vision review.</li>
-        <li>The generated dashboard question heatmap includes visible maturity, gap, and confidence labels so color is supplemental.</li>
+        <li>The generated dashboard's question heatmap shows level, gap, and confidence as visible labels, so color is not the only signal.</li>
       </ul>
 
-      <h2>Known Limitations</h2>
+      <h2>Known limits</h2>
       <ul>
         <li>Interactive terminal prompts depend on terminal and screen-reader support.</li>
-        <li>Dense generated reports still need manual screen-reader review with representative data.</li>
-        <li>Automated axe checks do not replace manual keyboard and assistive-technology testing.</li>
+        <li>Dense generated reports still need a person to review them with a screen reader and realistic data.</li>
+        <li>Automated axe checks do not replace testing by hand with a keyboard and assistive technology.</li>
       </ul>
 
       <h2>Feedback</h2>
-      <p>Open an issue with the affected page, command, or artifact path; assistive technology and browser or terminal used; expected result; actual result; and any screenshot, terminal output, or axe report.</p>
+      <p>Open an issue. Tell us the page, command, or file; the assistive technology and browser or terminal you used; what you expected; what happened; and any screenshot, terminal output, or axe report.</p>
       <p><a href="https://github.com/AgentMaturity/AgentMaturityCompass/issues">Report an accessibility issue</a></p>
     </div>
   </main>

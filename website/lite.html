@@ -72,7 +72,7 @@ nav a{font-size:.8rem;color:#a0a0a0}nav a:hover{color:#4AEF79}
       <div class="stat"><b><!-- amc:count:adapters -->16<!-- /amc:count --></b><span>Built-in<br>adapters</span></div>
       <div class="stat"><b>2,569</b><span>Test source<br>files</span></div>
     </div>
-    <p><strong style="color:#fff">First-run trust contract:</strong> a signed, <code>VALID</code> artifact may still be <code>INSUFFICIENT_EVIDENCE</code>. Signing proves integrity, not evidence sufficiency: a signature shows who wrote it, not that it is true.</p>
+    <p><strong style="color:#fff">What to expect on a first run:</strong> a report can be signed and <code>VALID</code> and still say <code>INSUFFICIENT_EVIDENCE</code>. That is normal for a new folder. A signature shows who wrote it and that it has not changed, not that it is true or that there is enough evidence behind it.</p>
   </div>
 
   <h2 id="install">Install, then type amc</h2>
@@ -84,13 +84,13 @@ nav a{font-size:.8rem;color:#a0a0a0}nav a:hover{color:#4AEF79}
     <code>$ amc</code>
   </div>
   <p><code>amc</code> in a terminal shows one menu with what can work on your machine: Watch Claude Code as it works, Watch Codex as it works (each once you are signed in to it), Chat with a model (when a provider key is set), Try a demo chat (no account or key needed), Open the console in my browser, and Just show my score.</p>
-  <p>The source build is not released yet (the next release is 2.0.0). The one-line installers (<code>curl -fsSL https://agentmaturity.co/install.sh | sh</code>, or <code>irm https://agentmaturity.co/install.ps1 | iex</code> on Windows) and npm give the older published 1.1.1 release, which has no menu, no vendor sign-in, and Industry Packs still behind the earlier licence gate.</p>
+  <p>The source build is not released yet (the next release is 2.0.0). The one-line installers (<code>curl -fsSL https://agentmaturity.co/install.sh | sh</code>, or <code>irm https://agentmaturity.co/install.ps1 | iex</code> on Windows) and npm give the older published 1.1.1 release, which has no menu, no Claude Code or Codex sign-in, and Industry Packs still behind the earlier licence gate.</p>
 
   <h2>What you get in the first five minutes</h2>
   <div class="cards">
     <div class="card"><h3>A local workspace</h3><p>The first <code>amc</code> sets up <code>.amc/</code> in your folder with its own signing keys. No AMC account and no cloud service.</p></div>
-    <div class="card"><h3>A demo chat, no key</h3><p>Try a demo chat runs AMC's agent loop against a built-in stub model that gives canned replies, so you see a recorded session before you add a key.</p></div>
-    <div class="card"><h3>The Compass Console</h3><p>Open the console starts AMC on 127.0.0.1 and opens its first screen, with one button that runs a sample task.</p></div>
+    <div class="card"><h3>A demo chat, no key</h3><p>Try a demo chat talks to a built-in practice model that gives canned replies. You see what a recorded session looks like before you add a key.</p></div>
+    <div class="card"><h3>The Compass Console</h3><p>Open the console starts AMC on your own machine (127.0.0.1) and opens its first screen, with one button that runs a sample task.</p></div>
     <div class="card"><h3>An honest first score</h3><p>A new folder scores L0 and says why: AMC has not seen your agent do anything yet.</p></div>
   </div>
 
@@ -114,7 +114,7 @@ nav a{font-size:.8rem;color:#a0a0a0}nav a:hover{color:#4AEF79}
   <div class="cards">
     <div class="card">
       <h3>Business leaders</h3>
-      <p>Your company uses AI and your board asks whether it is safe. AMC gives an evidence-backed maturity result from L0 (Absent) to L5 (Optimizing), with safety and proof shown separately.</p>
+      <p>Your company uses AI and your board asks whether it is safe. AMC gives a maturity level from L0 (Absent) to L5 (Optimizing), based on what the agent was seen to do, with safety and proof shown separately.</p>
     </div>
     <div class="card">
       <h3>No-code users</h3>
@@ -128,11 +128,11 @@ nav a{font-size:.8rem;color:#a0a0a0}nav a:hover{color:#4AEF79}
 
   <h2>Five trust dimensions</h2>
   <div class="cards">
-    <div class="card"><h3>Strategic Agent Ops</h3><p>Mission clarity, scope adherence, decision traceability. 19 default questions.</p></div>
-    <div class="card"><h3>Skills</h3><p>Injection defense, DLP, least-privilege execution. 52 default questions.</p></div>
-    <div class="card"><h3>Resilience</h3><p>Graceful degradation, circuit breakers, error recovery. 55 default questions.</p></div>
-    <div class="card"><h3>Leadership &amp; Autonomy</h3><p>Structured logs, traces, cost tracking, human oversight. 23 default questions.</p></div>
-    <div class="card"><h3>Culture &amp; Alignment</h3><p>Testing, benchmarks, feedback loops, truthfulness. 95 default questions.</p></div>
+    <div class="card"><h3>Strategic Agent Ops</h3><p>Does the agent know its job, stay inside it, and leave a trail for each decision? 19 default questions.</p></div>
+    <div class="card"><h3>Skills</h3><p>Does it resist injected instructions, keep data from leaking, and use only the access it needs? 52 default questions.</p></div>
+    <div class="card"><h3>Resilience</h3><p>Does it fail safely, stop runaway loops, and recover from errors? 55 default questions.</p></div>
+    <div class="card"><h3>Leadership &amp; Autonomy</h3><p>Can you see what it did and what it cost, and can a person step in? 23 default questions.</p></div>
+    <div class="card"><h3>Culture &amp; Alignment</h3><p>Is it tested, measured, corrected from feedback, and truthful? 95 default questions.</p></div>
   </div>
 
   <h2>Maturity scale</h2>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AMC Methodology — Agent Maturity Compass</title>
-<meta name="description" content="How Agent Maturity Compass scores AI agents: evidence-weighted questions across five trust dimensions on the L0-L5 maturity scale.">
+<meta name="description" content="How Agent Maturity Compass scores AI agents: questions in five areas, weighted by how well each answer is backed, on a scale from L0 to L5.">
 <link rel="icon" href="favicon.ico">
 <link rel="stylesheet" href="brand.css">
 <style>
@@ -41,23 +41,23 @@ pre code { display: block; width: max-content; min-width: 100%; }
 </div>
 
 <h1>🧭 AMC Methodology</h1>
-<p>How Agent Maturity Compass evaluates AI agent trustworthiness.</p>
+<p>How Agent Maturity Compass decides how far you can trust an AI agent.</p>
 <p><strong>Current public methodology:</strong> <code>2026.10.08-r226</code> · released <time datetime="2026-10-08">2026-10-08</time></p>
 
-<h2>Core Principle: Evidence Over Claims</h2>
+<h2>Core idea: what the agent did counts more than what it says</h2>
 <div class="card">
-<p>AMC scores agents based on <strong>observed behavior</strong>, not self-reported claims. An agent that says "I'm secure" scores differently from an agent that demonstrates security through tamper-evident evidence.</p>
-<p>The gap between what agents claim and what evidence supports can be large: in one worked example it was <strong>84 points</strong> — the "documentation inflation gap."</p>
+<p>AMC scores agents on <strong>what they were seen doing</strong>, not on what they or their makers say. An agent that says "I'm secure" scores lower than one whose signed records show it acting securely.</p>
+<p>The gap between what an agent claims and what its records support can be large. In one worked example it was <strong>84 points</strong>.</p>
 </div>
 
 <h2>Five Dimensions</h2>
 <table>
-<tr><th>Dimension</th><th>What It Measures</th></tr>
-<tr><td>D1 — Governance</td><td>Charter, permissions, approval workflows, action policies</td></tr>
-<tr><td>D2 — Capability</td><td>Task execution, autonomy duration, tool usage, delegation</td></tr>
+<tr><th>Area</th><th>What it looks at</th></tr>
+<tr><td>D1 — Governance</td><td>Its written purpose, permissions, who must approve what, and rules for actions</td></tr>
+<tr><td>D2 — Capability</td><td>Getting tasks done, how long it works alone, tool use, handing work to others</td></tr>
 <tr><td>D3 — Culture & Alignment</td><td>Safety, honesty, transparency, value coherence</td></tr>
-<tr><td>D4 — Resilience</td><td>Error handling, adversarial robustness, drift detection</td></tr>
-<tr><td>D5 — Skills</td><td>Memory, reasoning, calibration, factuality</td></tr>
+<tr><td>D4 — Resilience</td><td>Handling errors, resisting attacks, noticing when its behavior changes</td></tr>
+<tr><td>D5 — Skills</td><td>Memory, reasoning, knowing how sure it is, getting facts right</td></tr>
 </table>
 
 <h2>Maturity Scale (L0–L5)</h2>
@@ -71,22 +71,22 @@ pre code { display: block; width: max-content; min-width: 100%; }
 <tr><td>L5</td><td>Optimizing</td><td>Predictive, self-improving, externally validated</td></tr>
 </table>
 
-<h2>Evidence Trust Tiers</h2>
+<h2>How much each kind of record counts</h2>
 <table>
-<tr><th>Tier</th><th>Weight</th><th>How</th></tr>
-<tr><td>OBSERVED_HARDENED</td><td>1.1×</td><td>AMC-controlled adversarial scenarios</td></tr>
-<tr><td>OBSERVED</td><td>1.0×</td><td>Captured via gateway proxy</td></tr>
-<tr><td>ATTESTED</td><td>0.8×</td><td>Cryptographic attestation</td></tr>
-<tr><td>SELF_REPORTED</td><td>0.4×</td><td>Agent's own claims (capped)</td></tr>
+<tr><th>Tier</th><th>Weight</th><th>Where it comes from</th></tr>
+<tr><td>OBSERVED_HARDENED</td><td>1.1×</td><td>Attack tests that AMC runs and controls</td></tr>
+<tr><td>OBSERVED</td><td>1.0×</td><td>Seen by AMC as the agent works</td></tr>
+<tr><td>ATTESTED</td><td>0.8×</td><td>A signed statement from someone else (attestation)</td></tr>
+<tr><td>SELF_REPORTED</td><td>0.4×</td><td>The agent's own claims (capped)</td></tr>
 </table>
 
-<h2>Assessment Coverage</h2>
+<h2>What AMC checks</h2>
 <div class="card">
-<p><strong>244 default diagnostic questions</strong> across 5 layers, plus a free opt-in 20-question lifecycle expansion for 264 questions total</p>
-<p><strong><!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs</strong> — red-team attack simulations including alignment faking, sandbagging, and scheming detection</p>
-<p><strong>Research-backed scoring modules</strong> — evidence-weighted algorithms</p>
-<p><strong>8 compliance frameworks</strong> — EU AI Act, GDPR, ISO 42001, SOC2, NIST AI RMF, HIPAA, PCI DSS, ISO 27001</p>
-<p><strong>41 industry domain packs</strong> — health, education, finance, mobility, governance, technology, environment</p>
+<p><strong>244 default diagnostic questions</strong> across 5 layers, plus 20 optional lifecycle questions, free, for 264 questions total</p>
+<p><strong><!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs</strong>: sets of attack tests, including whether an agent fakes good behavior, holds back what it can do, or works against its instructions in secret</p>
+<p><strong>Scoring based on published research</strong>: answers backed by records count for more</p>
+<p><strong>8 compliance frameworks</strong> mapped: EU AI Act, GDPR, ISO 42001, SOC2, NIST AI RMF, HIPAA, PCI DSS, ISO 27001. AMC does not certify legal compliance.</p>
+<p><strong>41 industry domain packs</strong>: health, education, finance, mobility, governance, technology, environment. Their questions are experimental and AI-drafted until a named expert signs them.</p>
 </div>
 
 <h2>Getting Started</h2>

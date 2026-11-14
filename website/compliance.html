@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AMC — EU AI Act Compliance for AI Agents</title>
-<meta name="description" content="Map AI agent evidence to EU AI Act obligations without confusing maturity, artifact validity, or evidence readiness with legal certification.">
+<meta name="description" content="See which EU AI Act duties your AI agent's records can support, and which they cannot. A score or a signature is not legal certification.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%234AEF79' font-family='monospace' font-size='18' font-weight='700'%3Ea%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="brand.css">
 <style>
@@ -85,41 +85,41 @@ footer{padding:2rem 0;text-align:center;color:var(--muted);font-size:.85rem}
 <div class="w">
   <div class="badge">official timeline checked 10 July 2026</div>
   <h1>EU AI Act Compliance <br>for <span>AI Agents</span></h1>
-  <p>AMC maps captured agent evidence to relevant obligations and shows what remains unsupported. It does not turn a maturity level or signed artifact into legal certification.</p>
+  <p>AMC links the records it kept of your agent's work to the EU AI Act duties they relate to, and shows which duties nothing supports yet. A level or a signed file is not legal certification.</p>
 </div>
 </div>
 
 <section>
 <div class="w">
-  <h2>Why Self-Reported Documentation Won't Work</h2>
-  <p>Documentation of intent is not the same as evidence that a control operated. AMC can capture agent behavior through its gateway, sign evidence events, and link mappings back to the underlying receipts.</p>
-  <p style="margin-top:1rem"><strong>Trust contract:</strong> a <code>VALID</code> artifact proves integrity, not evidence sufficiency. Only evidence readiness <code>READY</code> is claim-eligible. AMC does not certify legal compliance; qualified counsel must determine which obligations apply.</p>
+  <h2>Why written promises are not enough</h2>
+  <p>A document that says a control exists does not show that it worked. AMC can watch the agent as it works, sign a record of each action (a receipt), and link each mapping back to those receipts.</p>
+  <p style="margin-top:1rem"><strong>What a result means:</strong> a <code>VALID</code> file shows who signed it and that it has not changed. It does not show there are enough records, or that they are true. Only a readiness result of <code>READY</code> can back a claim. AMC does not certify legal compliance; a qualified lawyer must decide which duties apply.</p>
 </div>
 </section>
 
 <section>
 <div class="w">
-  <h2>Maturity Is Not Legal Status</h2>
+  <h2>A level is not a legal status</h2>
   <div class="level-grid">
     <div class="level-card">
       <div class="level-name">L0–L1</div>
       <div class="level-status fail">EARLY</div>
-      <p style="color:var(--muted);font-size:.8rem;margin-top:.5rem">Major control and evidence gaps remain.</p>
+      <p style="color:var(--muted);font-size:.8rem;margin-top:.5rem">Big gaps in controls and records remain.</p>
     </div>
     <div class="level-card">
       <div class="level-name">L2</div>
       <div class="level-status partial">DEVELOPING</div>
-      <p style="color:var(--muted);font-size:.8rem;margin-top:.5rem">Managed processes exist but evidence gaps remain.</p>
+      <p style="color:var(--muted);font-size:.8rem;margin-top:.5rem">Processes exist, but gaps in the records remain.</p>
     </div>
     <div class="level-card minimum">
       <div class="level-name">L3</div>
       <div class="level-status pass">DEFINED</div>
-      <p style="color:var(--muted);font-size:.8rem;margin-top:.5rem">Repeatable, measurable controls. Still requires READY evidence and obligation-specific review.</p>
+      <p style="color:var(--muted);font-size:.8rem;margin-top:.5rem">Controls are repeatable and measured. It still needs READY records and a review of each duty.</p>
     </div>
     <div class="level-card">
       <div class="level-name">L4–L5</div>
       <div class="level-status pass">MANAGED</div>
-      <p style="color:var(--muted);font-size:.8rem;margin-top:.5rem">Stronger assurance and continuous verification, not automatic compliance.</p>
+      <p style="color:var(--muted);font-size:.8rem;margin-top:.5rem">Stronger checks that keep running. Still not automatic compliance.</p>
     </div>
   </div>
 </div>
@@ -129,11 +129,11 @@ footer{padding:2rem 0;text-align:center;color:var(--muted);font-size:.85rem}
 <div class="w">
   <h2>Evidence Mapping, Not Certification</h2>
   <ul class="checklist">
-    <li><span class="check">✓</span><div><span class="article-ref">Article 9 — Risk Management</span><br>Relevant assurance receipts can support risk identification and mitigation review. Applicability and sufficiency remain system-specific.</div></li>
-    <li><span class="check">✓</span><div><span class="article-ref">Article 12 — Record Keeping</span><br>AMC hash-chains captured or ingested evidence events with Ed25519 signatures. Uncaptured activity is not represented in the ledger.</div></li>
-    <li><span class="check">✓</span><div><span class="article-ref">Article 13 — Transparency</span><br>Reports expose L0–L5 scores, evidence references, and unsupported states. Reviewers can verify AMC artifacts offline with <code>amc verify all --json --expect-monitor &lt;monitor sha256&gt;</code>, pinned to a monitor key fingerprint recorded outside the workspace; without the pin the ledger check reports UNANCHORED.</div></li>
-    <li><span class="check">✓</span><div><span class="article-ref">Article 14 — Human Oversight</span><br>Oversight scoring and signed action policies can provide evidence about approval boundaries; they do not establish legal conformity by themselves.</div></li>
-    <li><span class="check">✓</span><div><span class="article-ref">Article 17 — Quality Management</span><br>Fleet consistency, policy canaries, monitoring, and drift alerts can support an evidence review when those controls are configured and operating.</div></li>
+    <li><span class="check">✓</span><div><span class="article-ref">Article 9 — Risk Management</span><br>Receipts from attack tests can help you find risks and review how you reduce them. Whether they apply, and whether they are enough, depends on your system.</div></li>
+    <li><span class="check">✓</span><div><span class="article-ref">Article 12 — Record Keeping</span><br>AMC links each recorded or imported event to the one before it with a fingerprint (a hash chain) and signs it with Ed25519. Activity AMC did not record is not in its log (the ledger).</div></li>
+    <li><span class="check">✓</span><div><span class="article-ref">Article 13 — Transparency</span><br>Reports show L0–L5 scores, links to the records behind them, and what nothing supports yet. Reviewers can check AMC files offline with <code>amc verify all --json --expect-monitor &lt;monitor sha256&gt;</code>, which names in advance a monitor key fingerprint kept outside the workspace. Without it, the log check reports UNANCHORED.</div></li>
+    <li><span class="check">✓</span><div><span class="article-ref">Article 14 — Human Oversight</span><br>Oversight scores and signed rules for actions can show where a person must approve. On their own, they do not show legal conformity.</div></li>
+    <li><span class="check">✓</span><div><span class="article-ref">Article 17 — Quality Management</span><br>Consistency across several agents, trial runs of new rules beside the current ones, monitoring, and alerts when behavior changes can support a review, if you set them up and they are running.</div></li>
   </ul>
 </div>
 </section>
@@ -155,25 +155,25 @@ footer{padding:2rem 0;text-align:center;color:var(--muted);font-size:.85rem}
 <section>
 <div class="w">
   <h2>Get Started in 5 Minutes</h2>
-  <p style="margin-bottom:1rem">No account needed. No API key. Free and open source.</p>
+  <p style="margin-bottom:1rem">No account. No API key. Free and open source.</p>
   <div class="cmd-box">
     <div><span class="prompt">$</span> curl -fsSL https://agentmaturity.co/install.sh | sh</div>
     <div><span class="prompt">$</span> mkdir my-agent && cd my-agent</div>
     <div><span class="prompt">$</span> amc init</div>
     <div><span class="prompt">$</span> amc compliance report <span class="flag">--framework EU_AI_ACT</span></div>
-    <div style="color:#f59e0b;margin-top:.5rem">→ Result: not evaluated until AMC has recorded agent evidence; never a legal certification</div>
+    <div style="color:#f59e0b;margin-top:.5rem">→ Result: not evaluated until AMC has recorded your agent at work; never a legal certification</div>
     <div style="margin-top:1rem"><span class="prompt">$</span> amc audit binder create <span class="flag">--scope workspace --out binder.amcaudit</span></div>
-    <div style="color:#4ade80">→ Compliance evidence exported to .amc/audit/</div>
+    <div style="color:#4ade80">→ Audit file with your records, exported to .amc/audit/</div>
     <div style="margin-top:1rem"><span class="prompt">$</span> amc compliance report <span class="flag">--framework eu-ai-act</span></div>
-    <div style="color:#4ade80">→ Gap analysis with per-article remediation steps</div>
+    <div style="color:#4ade80">→ List of gaps, with fixes for each article</div>
   </div>
 </div>
 </section>
 
 <div class="cta-section">
 <div class="w">
-  <h2>Build evidence before you need it.</h2>
-  <p style="color:var(--muted)">Start with an honest baseline, capture real execution evidence, and keep legal review separate.</p>
+  <h2>Start keeping records before you need them.</h2>
+  <p style="color:var(--muted)">Take a first score, record what your agent really does, and keep legal review separate.</p>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="cta-btn" target="_blank" rel="noopener">Get Started →</a>
   <p style="color:var(--muted);font-size:.8rem;margin-top:1rem"><a href="index.html">← Back to AMC Home</a> · <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md">Full Documentation</a></p>
 </div>
