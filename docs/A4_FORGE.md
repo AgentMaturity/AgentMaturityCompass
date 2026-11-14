@@ -17,6 +17,87 @@ human-authored content labelled as such, serves no stage now: text a member send
 outputs as their own statement. The decisions behind the design are in `docs/adr/013-a4-forge-spine.md`; the verifier
 rules are in `spec/ACCEPTANCE_RULES.md` ("A4 project record").
 
+## Try it in ten minutes
+
+This walk was run against the current source build on 2026-11-14 in an empty workspace with three local users. The
+published 1.1.1 release does not contain A4: install [from source](../README.md#from-source) first. On a laptop the walk
+completes Aspire, Assemble and Adapt and stops at Activate's release approval (see step 6).
+
+1. **Start Studio with the flag.** A Studio that is already running keeps the environment it started with, so stop it
+   first. Without the flag the A4 API answers `404 A4_PREVIEW_DISABLED` and every `amc a4` command exits 1.
+
+   ```bash
+   amc down
+   AMC_A4_PREVIEW=1 amc up
+   ```
+
+2. **Create the people who will decide.** The author of a revision, the requester of a gate and its builders cannot
+   approve it, and from Assemble's completion on most gates need two distinct approvers, one of them an AUDITOR at
+   Adapt's completion ([who approves which gate](#approvals-and-separation-of-duties)). Three users cover the default
+   policy: you author and request, the other two decide.
+
+   ```bash
+   amc user init --username <you>
+   amc user add --username <second> --role OWNER,APPROVER
+   amc user add --username <third> --role APPROVER,AUDITOR
+   export AMC_A4_PREVIEW=1
+   amc approvals login --username <you> --token-file <new file>    # each person writes their own token file
+   ```
+
+3. **Start a project and run Aspire.** Sign in to the Compass Console at the address `amc up` prints and start a
+   project on its A4 page (a signed-in OWNER or OPERATOR; the API equivalent is `POST /api/v1/a4/projects` with `name`
+   and `expertise`, see [Using the API directly](#using-the-api-directly)). Each stage's steps (answers, understand,
+   confirm understanding, explain, propose, build, review) run there or as `POST …/stages/<stage>/<step>`. The A4
+   page lists Aspire's questions: the problem, audience, goals, success metrics, constraints, forbidden actions, risk
+   tier and markets. A workspace APPROVER or AUDITOR decides only as a project member, so add the third user before
+   requesting any gate (a membership change supersedes open gates):
+
+   ```bash
+   amc a4 list
+   amc a4 guide <projectId>     # stage, step, head seq, next action, and the exact approve command per open gate
+   amc a4 members <projectId> --member LOCAL_USER:<userId> --project-role approver --session-token-file <file> --expect-head-seq <n>
+   ```
+
+4. **Decide and complete each gate.** After the requester opens a gate, `amc a4 guide` prints the approve command
+   with the gate's pins; each approver adds `--reason` and their own token file. The requester then completes it:
+
+   ```bash
+   amc a4 approve --gate <gateId> --expect-gate-seq <n> --expect-binding-digest <sha256> --expect-readiness-digest <sha256> --reason "<why>" --session-token-file <file>
+   amc a4 complete <projectId> --stage <stage> --gate <gateId> --expect-head-seq <n> --session-token-file <file>
+   ```
+
+   Aspire's two gates take one approval each. Its Build writes the brief (the agent's context graph, typed graph sketch,
+   quality specification and value contract draft) through the fleet's own writers; it runs offline with no provider key.
+
+5. **Assemble and Adapt.** Assemble asks for capabilities, autonomy, the build provider (`stub` runs offline) and the
+   path (`native`). Its Build starts one native build session; Review is refused (`409 A4_NOT_READY`,
+   `BUILD_SESSION_OPEN`) until the session's owner presses Close and verify on Studio's Native Tasks page. Its
+   completion needs two approvals and then an effect gate, `a4.assemble.apply`: the owner opens it on the stage's
+   effect card (`POST …/stages/assemble/effects/a4.assemble.apply/open` with the completion `gateId`), two project
+   approvers approve its request on that card (`POST …/approvals/<approvalRequestId>/approve`), and `amc a4 complete`
+   then applies the reviewed resources. The command line has no command to open an effect gate or decide its request.
+   Adapt asks for audiences and languages (the rest may stay unknown) and compiles the control plan. Requirements left
+   unresolved keep `plan_unresolved` WAITING, and `complete` refuses with `A4_NOT_READY: not ready: plan_unresolved`
+   even after two approvals; an owner acknowledges it out of scope with a reason (`POST …/acknowledge`, `itemId`
+   `plan_unresolved`) before requesting the gate, since an acknowledgement supersedes an open gate. Run the context
+   probe after Review (`POST …/stages/adapt/probe`). Adapt's completion needs two approvals, one from an AUDITOR; a
+   non-regulated project completes with its plan signed, not activated.
+
+6. **Where it stops.** Activate asks for the target (`compose` or `helm`), the destination host, lease scopes, routes,
+   models and caps, and Propose records the release draft. Requesting the release approval is then refused with
+   `409 A4_NOT_READY: not ready: deployment.same_host` unless this Studio itself runs under Compose or Helm: v1
+   deploys only by restarting the Studio that built the agent, and installing a package into another workspace is
+   P2-40.
+
+7. **Check the record, then stop.** Without your own trust list the result is integrity only (exit 2), never trusted:
+
+   ```bash
+   amc a4 verify <projectId> --allow-unpinned --allow-unanchored
+   amc down
+   ```
+
+   With `--allow-unpinned` alone a fresh workspace still exits 1: its ledger is not anchored (`ledger UNANCHORED`).
+
 ## The journey
 
 Each stage runs the same eight steps: **asked** (answers to the stage's questions), **understood** (AMC's reading of
