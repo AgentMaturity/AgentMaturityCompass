@@ -83,6 +83,13 @@ describe("menu options", () => {
     expect(defaultChoice(state({ lastChoice: "score" }))).toBe("score");
     expect(defaultChoice(state({ lastChoice: "watch-claude" }))).toBe("demo-chat");
   });
+  // 2026-11-15: after one "Build an agent" pick, Enter alone started AMC's services and opened the system browser.
+  it("never pre-selects a remembered choice that starts services or opens a browser", () => {
+    expect(defaultChoice(state({ lastChoice: "build" }))).toBe("demo-chat");
+    expect(defaultChoice(state({ lastChoice: "console" }))).toBe("demo-chat");
+    expect(defaultChoice(state({ lastChoice: "demo-chat" }))).toBe("demo-chat");
+    expect(defaultChoice(state({ lastChoice: "sign-in-codex", signIn: [report("codex", "signed-out")] }))).toBe("sign-in-codex");
+  });
 });
 
 describe("score next step", () => {
@@ -246,6 +253,16 @@ describe("runFrontDoor", () => {
     const open = fake(["console"], { origin: ["http://127.0.0.1:4000"] });
     await runFrontDoor(open.io);
     expect(open.opened).toEqual(["http://127.0.0.1:4000/console"]);
+  });
+  it("asks before opening a browser, and on a no prints the address and opens nothing", async () => {
+    for (const [pick, path] of [["console", "/console"], ["build", "/console/a4?new=1"]] as const) {
+      const asked: string[] = [];
+      const f = fake([pick], { origin: ["http://127.0.0.1:4000"], confirm: async (message) => { asked.push(message); return false; } });
+      await runFrontDoor(f.io);
+      expect(asked).toEqual([`Open http://127.0.0.1:4000${path} in your browser now?`]);
+      expect(f.opened).toEqual([]);
+      expect(f.lines.join("\n")).toContain(`Open http://127.0.0.1:4000${path} in your browser.`);
+    }
   });
   it("prints the console address when the browser cannot be opened", async () => {
     const f = fake(["console"], { origin: ["http://127.0.0.1:4000"], openUrl: () => false });
