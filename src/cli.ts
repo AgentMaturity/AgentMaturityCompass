@@ -1550,7 +1550,11 @@ function renderInstantFullScore(
   console.log(chalk.gray(`  Artifact seal: ${report.status} | Evidence: ${statusExplanation.evidenceStatus} | Claims: ${statusExplanation.strongClaimsAllowed ? "ELIGIBLE" : "BLOCKED"}`));
   console.log("");
   console.log(chalk.bold(`  Overall: L${avgLevel.toFixed(2)} (${score100}/100) ${report.trustLabel}`));
-  if (report.evidenceCoverage === 0) console.log("  AMC has not seen your agent do anything yet, so this score is empty.");
+  const recorded = report.recordedActivity?.events ?? 0;
+  if (report.evidenceCoverage === 0 && recorded > 0) {
+    const sessions = report.recordedActivity?.sessions ?? 0;
+    console.log(`  AMC recorded ${recorded} event${recorded === 1 ? "" : "s"} from ${sessions} session${sessions === 1 ? "" : "s"} of your agent, but none of them is evidence a question accepts yet.`);
+  } else if (report.evidenceCoverage === 0) console.log("  AMC has not seen your agent do anything yet, so this score is empty.");
   console.log(chalk.gray(`  Integrity: ${report.integrityIndex.toFixed(3)} | Evidence coverage: ${(report.evidenceCoverage * 100).toFixed(1)}%`));
   console.log(chalk.gray(`  Claim boundary: ${statusExplanation.claimBoundary}`));
   if (!statusExplanation.strongClaimsAllowed) {
@@ -1582,7 +1586,9 @@ function renderInstantFullScore(
   // The artifact paths stay in the JSON output and under .amc/; the person reading this needs one next step.
   console.log(chalk.gray("  Details saved under .amc/ (amc --help --all lists the report commands)"));
   if (opts.studioEvidenceUrl) console.log(chalk.gray(`  Evidence in the console: ${opts.studioEvidenceUrl}`));
-  console.log(chalk.bold(`  ${opts.nextStep ?? scoreNextStep(null)}`));
+  // CLI-01: once runs are recorded but none is scored, the menu's "try a demo chat" would be a loop; the readiness step says what counts.
+  const loops = report.evidenceCoverage === 0 && recorded > 0;
+  if (!loops) console.log(chalk.bold(`  ${opts.nextStep ?? scoreNextStep(null)}`));
   console.log("");
 }
 

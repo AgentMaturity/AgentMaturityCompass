@@ -420,6 +420,12 @@ function computeEvidenceTrustCoverage(events: ParsedEvidenceEvent[]): {
   };
 }
 
+/** CLI-01: what the agent did in the window, so an empty score can say it saw the run but accepted none of it. */
+function recordedActivityOf(events: readonly ParsedEvidenceEvent[]): { events: number; sessions: number } {
+  const rows = events.filter((event) => event.event_type !== "audit");
+  return { events: rows.length, sessions: new Set(rows.map((event) => event.session_id)).size };
+}
+
 function isDiagnosticGeneratedAudit(event: ParsedEvidenceEvent): boolean {
   if (event.event_type !== "audit") {
     return false;
@@ -1347,6 +1353,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
       correlationWarnings: correlationNotes,
       evidenceCoverage: Number(evidenceCoverage.toFixed(4)),
       evidenceTrustCoverage: trustCoverage,
+      recordedActivity: recordedActivityOf(events),
       autonomyAllowanceIndex,
       dualityCompliance: {
         executeWithValidTicket,
@@ -1420,7 +1427,7 @@ export function explainDiagnosticReportStatus(
   report: Pick<
     DiagnosticReport,
     "status" | "verificationPassed" | "trustBoundaryViolated" | "trustBoundaryMessage" | "integrityIndex" | "trustLabel" | "evidenceCoverage" | "evidenceTrustCoverage"
-  >
+  > & Partial<Pick<DiagnosticReport, "recordedActivity">>
 ): DiagnosticReportStatusExplanation {
   const evidenceReadiness = evaluateDiagnosticEvidenceReadiness(report);
   const artifactLabel = report.status === "UNSIGNED"
