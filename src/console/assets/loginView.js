@@ -2,7 +2,7 @@
 // account is created for the deployment it is served from, and never invites a non-first user to run `amc user init`,
 // which replaces every login in users.yaml.
 
-const DEMO_BANNER = '<p class="banner">Local demo mode creates a no-login session on loopback only. If this screen remains after startup, refresh once or use the emergency admin token.</p>';
+const DEMO_BANNER = '<p class="banner">Local demo mode creates a no-login session on loopback only. If this screen remains after startup, refresh the page once.</p>';
 // The "no account yet" steps, collapsed under the form so a beginner sees what AMC is and the sign-in fields first.
 const LOCAL_HINT = `<ol>
           <li>Ask an OWNER of this workspace to run <code>amc user add --username &lt;you&gt; --role &lt;role&gt;</code> in its folder.</li>

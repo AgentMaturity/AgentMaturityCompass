@@ -50,9 +50,13 @@ export async function decideA4EngineRequest(found, approvalRequestId, verb, reas
   return apiNativeRequest(path, { method: "POST", body: { ...body, clientRequestId: crypto.randomUUID() }, nativeCsrfToken: me?.nativeCsrfToken ?? undefined });
 }
 
-/** The A4 projects this user can see ({ projectId, agentId }); [] when the A4 preview is off or the list is refused. */
+/**
+ * The A4 projects this user can see ({ projectId, agentId }); [] when the A4 preview is off or the list is refused. The
+ * local demo session is always refused (DEMO_REFUSED), so it is not asked, which keeps a 403 out of its console.
+ */
 export async function a4Projects() {
   try {
+    if ((await whoami())?.userId === "local-demo") return [];
     const data = await apiNativeRequest(API);
     const projects = Array.isArray(data) ? data : Array.isArray(data?.projects) ? data.projects : [];
     return projects.filter((project) => typeof project?.projectId === "string" && typeof project.agentId === "string")

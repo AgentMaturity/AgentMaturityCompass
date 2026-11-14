@@ -72,13 +72,27 @@ async function planPage() {
 }
 
 // ---- Blocker inbox ----
+/**
+ * A source that is switched off holds nothing, so it is no blocker: the A4 source reports the preview being off as an
+ * unreadable source (blockerInbox.ts names the code in nextAction). That one entry is dropped, and the page says A4 is off.
+ */
+const previewOff = (item) => item?.id === "source:a4" && String(item.nextAction ?? "").includes("(A4_PREVIEW_DISABLED)");
+
+export function withoutDisabledPreview(inbox) {
+  const off = list(inbox?.items).some(previewOff);
+  if (!off) return { inbox, a4Off: false };
+  const sources = Object.fromEntries(Object.entries(inbox.sources ?? {}).filter(([name]) => name !== "a4"));
+  return { inbox: { ...inbox, items: list(inbox.items).filter((item) => !previewOff(item)), sources }, a4Off: true };
+}
+
 async function inboxPage() {
-  const inbox = await get("/inbox");
+  const { inbox, a4Off } = withoutDisabledPreview(await get("/inbox"));
   const items = list(inbox.items);
   const empty = Object.values(inbox.sources ?? {}).some((state) => state !== "ok")
     ? "Some sources could not be read, so this list is not complete."
     : `No blocker was found in this evaluation (${inbox.evaluatedAt}). This is not a statement that anything is compliant.`;
   root.innerHTML = `${sourcesLine(inbox.sources)}
+    ${a4Off ? '<p class="muted">A4 agent projects are turned off in this workspace, so they are not checked here.</p>' : ""}
     <p class="muted">Expiry window: ${esc(inbox.expiryWindowDays)} days. Evaluated ${esc(inbox.evaluatedAt)}.</p>
     ${table(["Kind", "Severity", "Control", "Agent", "Due", "Next action"], items.map((item) => [code(item.kind), esc(item.severity),
       item.controlId ? code(item.controlId) : "", esc(item.subject?.agentId ?? ""), item.dueTs ? esc(new Date(item.dueTs).toISOString()) : "",

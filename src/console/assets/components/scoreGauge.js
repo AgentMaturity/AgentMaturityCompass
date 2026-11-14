@@ -27,6 +27,15 @@ export function renderScoreGauge(params) {
       </div>
     `;
   }
+  // An ERROR run's number is not a score: it is shown as the error it is, never as a gauge reading.
+  if (status === "ERROR") {
+    return `
+      <div class="card status-bad">
+        <div><strong>${escapeHtml(label)}</strong></div>
+        <div>Error: this run ended with status ERROR, so its number is not a score.</div>
+      </div>
+    `;
+  }
   const value = Number(score);
   const pct = clampPercent(value);
   const cssClass = value >= 85 ? "status-ok" : value >= 60 ? "status-warn" : "status-bad";

@@ -120,10 +120,13 @@ const canCreate = (who, options) => Array.isArray(who?.roles) && who.roles.some(
 /** Home: the card and the nav link exist only when the preview answers; the card only while no project exists. */
 async function showHomeEntry() {
   try {
+    // Studio refuses every A4 route to the local demo session (DEMO_REFUSED, 403), so Home does not ask on each load.
+    const who = await whoami();
+    if (who?.userId === "local-demo") return;
     const options = await previewOptions();
     if (!options) return;
     document.getElementById("a4NavLink")?.removeAttribute("hidden");
-    if (!canCreate(await whoami(), options)) return;
+    if (!canCreate(who, options)) return;
     const projects = listOf(await apiNativeRequest(`${API}/projects`), "projects");
     document.getElementById("a4HomeCard")?.toggleAttribute("hidden", projects.length > 0);
   } catch {

@@ -24,9 +24,21 @@ describe("the scoring commands page", () => {
     expect(score).toContain("<title>Maturity Score - AMC Studio</title>");
     const main = score.slice(score.indexOf("<main>"));
     expect(main.indexOf('<a href="./home">')).toBeGreaterThan(-1);
-    expect(main.indexOf('<a href="./home">')).toBeLessThan(main.indexOf("<h1>"));
+    expect(main.indexOf('<a href="./home">')).toBeLessThan(main.indexOf("<h2>"));
     expect(main).toContain("Scores run in the terminal; this page lists the commands.");
-    expect(main).toContain('<a href="./dashboard">Dashboard</a>');
+    // The audit found it sending people to dashboard.html (a stale copy of Home); a saved run shows on the Agent page.
+    expect(main).toContain('its result appears on the <a href="./agent">Agent</a> page');
+    expect(score).not.toContain("./dashboard");
+  });
+
+  test("has the shared shell (nav, top bar via app.js), no emoji and no stale app.js query", () => {
+    expect(score).toContain('<body data-page="score">');
+    expect(score).toContain("<nav>");
+    expect(score).toContain('<div id="app">');
+    expect(score).toMatch(/<script type="module" src="\.\/assets\/app\.js\?v=\d{8}[a-z]+"><\/script>/);
+    expect(score).not.toContain("20260711a");
+    expect(score).not.toMatch(/\p{Extended_Pictographic}/u);
+    expect(readFileSync("src/console/assets/app.js", "utf8")).toContain('if (page === "score") return;');
   });
 
   test("Home's quick action calls it scoring commands, not diagnostics", () => {
