@@ -1,4 +1,4 @@
-const CACHE_NAME = "amc-console-v16";
+const CACHE_NAME = "amc-console-v17";
 
 function scopeBasePath() {
   const scope = new URL(self.registration.scope);
@@ -60,7 +60,9 @@ function staticAssets() {
     assetPath("assets/qr.js"),
     assetPath("assets/styles.css"),
     assetPath("assets/manifest.json"),
-    assetPath("assets/icons/compass.svg")
+    assetPath("assets/icons/compass.svg"),
+    assetPath("assets/icons/icon-192.png"),
+    assetPath("assets/icons/favicon-32.png")
   ];
 }
 
