@@ -88,6 +88,7 @@ export async function renderAssurancePage(params) {
     params.card(
       "Assurance Dashboard",
       `
+      <p class="muted">Assurance runs attack-style test packs against your agent's controlled interfaces and scores how well it holds up.</p>
       ${renderScoreGauge({ label: "Risk Assurance Score", score, status: scoreStatus })}
       <div class="grid">
         <div><div class="muted">Latest run</div><div class="tile-value"><code>${escapeHtml(latestRun?.runId || "-")}</code></div></div>
@@ -96,9 +97,9 @@ export async function renderAssurancePage(params) {
         <div><div class="muted">Cert status</div><div class="tile-value">${escapeHtml(certSummary?.status || "MISSING")}</div></div>
       </div>
       <div class="row wrap">
-        <button id="assuranceRunNow">Run Assurance Now</button>
-        <button id="assuranceIssueCert" class="secondary">Issue Certificate</button>
-        <button id="assuranceRequestWaiver" class="secondary">Request Waiver</button>
+        <button id="assuranceRunNow" data-roles="OWNER,OPERATOR">Run Assurance Now</button>
+        <button id="assuranceIssueCert" class="secondary" data-roles="OWNER,OPERATOR">Issue Certificate</button>
+        <button id="assuranceRequestWaiver" class="secondary" data-roles="OWNER">Request Waiver</button>
       </div>
       <div class="row wrap">
         <a href="./assuranceRun${latestRun ? `?runId=${encodeURIComponent(latestRun.runId)}` : ""}">Open Run Detail</a>

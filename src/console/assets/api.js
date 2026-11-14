@@ -20,16 +20,33 @@ export function getCurrentUser() {
   return state.me;
 }
 
-/** Write controls carry data-roles; a signed-in user without one of them sees them disabled (H3). */
+/** The one visible line a page shows when it greys out at least one control; the hover title alone went unseen. */
+export function roleGateNoteText(me) {
+  return me?.userId === "local-demo"
+    ? "View-only demo. To use this, start your own workspace: run amc up in a terminal."
+    : `Your role (${(me?.roles || []).join(", ")}) cannot use the greyed-out controls on this page.`;
+}
+
+/** Write controls carry data-roles; a signed-in user without one of them sees them disabled (H3), and one line above #app says why. */
 export function applyRoleGates(scope = document) {
   const roles = state.me?.roles;
   if (!Array.isArray(roles)) return; // admin-token session: the server decides
+  let gated = 0;
   for (const control of scope.querySelectorAll("[data-roles]")) {
     const needed = control.dataset.roles.split(",");
     if (needed.some((role) => roles.includes(role))) continue;
     control.disabled = true;
     control.title = `Requires role: ${needed.join(" or ")}`;
+    gated += 1;
   }
+  const doc = scope.ownerDocument || scope;
+  const app = doc.getElementById?.("app");
+  if (gated === 0 || !app || doc.getElementById("roleGateNote")) return;
+  const note = doc.createElement("p");
+  note.id = "roleGateNote";
+  note.className = "muted";
+  note.textContent = roleGateNoteText(state.me);
+  app.parentNode.insertBefore(note, app); // outside #app, so a re-render keeps it and the #app observer does not refire
 }
 
 /** A signed-out page links to sign-in, which returns here afterwards (M9). */

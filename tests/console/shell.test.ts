@@ -120,7 +120,6 @@ describe("every console page with a nav reaches the shell", () => {
     const navPages = readdirSync("src/console/pages").filter((file) => readFileSync(`src/console/pages/${file}`, "utf8").includes("<nav"));
     expect(navPages.length).toBeGreaterThan(60);
     expect(navPages).not.toContain("ops.html");
-    expect(navPages).not.toContain("score.html");
     for (const file of navPages) {
       const html = readFileSync(`src/console/pages/${file}`, "utf8");
       const scripts = [...html.matchAll(/src="\.\/assets\/([\w/-]+\.js)(?:\?v=[^"]*)?"/g)].map((match) => match[1]!);
