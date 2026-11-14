@@ -290,67 +290,33 @@ export function renderCommandInventoryMarkdown(entries: CliCommandInventoryEntry
   return lines.join("\n");
 }
 
+/** The short task list `amc --help` and `amc help` print; each row only when its command is registered. */
+const START_ROWS: ReadonlyArray<[path: string, shown: string, description: string]> = [
+  ["", "", "Pick what to do: watch Claude Code or Codex, chat, or open the console"],
+  ["up", "up / amc down", "Start or stop AMC and its console in your browser"],
+  ["login status", "login status", "Show whether Claude Code and Codex are signed in"],
+  ["agent-loop chat", "agent-loop chat", "Chat with a model; every turn is recorded"],
+  ["connect", "connect", "Connect an existing agent"],
+  ["doctor", "doctor", "Check this folder and name each fix"],
+  ["domain pack list", "domain pack list", "List the free Industry Packs (self-reported questionnaires)"],
+  ["user init", "user init", "Create your console account (new workspace only; see amc user add)"]
+];
+
 export function renderGroupedHelp(program: Command): string {
   const existing = commandPathSet(program);
-  const lines: string[] = [];
-  lines.push("Agent Maturity Compass");
-  lines.push("");
-  lines.push("Usage: amc <command> [options]");
-  lines.push("");
-  lines.push("Start with a task:");
-  if (existing.has("agent-loop guide")) lines.push(formatHelpRow("agent-loop guide", "Run a native task with explicit provider setup"));
-  if (existing.has("agent-loop chat")) lines.push(formatHelpRow("agent-loop chat", "Continue native tasks interactively"));
-  lines.push(formatHelpRow("", "Assess existing evidence (baseline/assessment)"));
-  if (existing.has("connect")) lines.push(formatHelpRow("connect", "Connect an existing agent"));
-  if (existing.has("agent-loop verify")) lines.push(formatHelpRow("agent-loop verify <sessionId>", "Verify recorded native task evidence"));
-  // LIVE-UX-07: the README's first-run path. amc user init refuses an existing users.yaml (without --force), so its row says "new workspace only".
-  const rows: Array<[path: string, shown: string, description: string]> = [
-    ["up", "up", "Start Studio and the Compass Console; first run scores the workspace"],
-    ["user init", "user init --username <you>", "Create the first console account (new workspace only; see amc user add)"],
-    ["down", "down", "Stop Studio"],
-    ["domain pack list", "domain pack list", "List the free Industry Packs (self-reported questionnaires)"]
-  ];
-  const firstRun = rows.filter(([path]) => existing.has(path));
-  if (firstRun.length > 0) {
-    lines.push("");
-    lines.push("Studio and first run:");
-    for (const [, shown, description] of firstRun) lines.push(formatHelpRow(shown, description));
-  }
-  lines.push("");
-  lines.push("Primary command groups:");
-  for (const group of CLI_GROUPS) {
-    lines.push(`  ${group.id.padEnd(10)}${group.summary}`);
-  }
-  lines.push("");
-  lines.push("High-signal commands:");
-  for (const group of CLI_GROUPS) {
-    lines.push(`  ${group.id}`);
-    for (const highlight of group.highlights) {
-      if (existing.has(highlight.path)) {
-        lines.push(formatHelpRow(highlight.path, highlight.description));
-      }
-    }
-  }
-  lines.push("");
-  const aliases = CLI_ALIASES.filter((alias) => existing.has(alias.aliasPath) && existing.has(alias.targetPath));
-  if (aliases.length > 0) {
-    lines.push("Aliases:");
-    for (const alias of aliases) {
-      lines.push(formatHelpRow(`${alias.aliasPath} -> ${alias.targetPath}`, alias.description));
-    }
-    lines.push("");
-  }
-  lines.push("Global options:");
-  lines.push("  --agent <agentId>                  Agent ID override");
-  lines.push("  --no-color                         Disable ANSI color output (or set NO_COLOR=1)");
-  lines.push("  -h, --help                         Show command help");
-  lines.push("  -V, --version                      Show CLI version");
-  lines.push("");
-  lines.push("Discoverability:");
-  lines.push("  amc help <command>                 Detailed help for any command path");
-  lines.push("  amc shell                          Interactive REPL session");
-  lines.push("  amc --help --all                   Complete command list");
-  return lines.join("\n");
+  const rows = START_ROWS.filter(([path]) => path === "" || existing.has(path)).map(([, shown, description]) => formatHelpRow(shown, description));
+  return [
+    "Agent Maturity Compass",
+    "",
+    "Usage: amc [command] [options]",
+    "",
+    "Start here:",
+    ...rows,
+    "",
+    "More:",
+    "  amc help <command>               Detailed help for any command",
+    "  amc --help --all                 Every command and option"
+  ].join("\n");
 }
 
 export type CompletionShell = "bash" | "zsh" | "fish";
