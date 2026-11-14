@@ -76,10 +76,16 @@ export interface NativeChatIo {
   readonly fail: () => void;
 }
 
+/** The per-session detail blocks: usage and cost, diagnostics, and the public validation status. */
+function sessionDetailLines(summary: NativeChatChildSummary): string[] {
+  return [renderNativeRunUsage(summary.usage, { requestWindow: "latest" }), renderNativeRunDiagnostics(summary.diagnostics),
+    `Public task validation: ${summary.validation?.status ?? "unavailable"}. Passing selected checks does not guarantee correctness.`];
+}
+
 /** Interactive input only; every turn runs through the existing CLI boundary. */
 export async function runNativeInteractiveSession(options: NativeChatOptions, io: NativeChatIo): Promise<void> {
   if (!process.stdin.isTTY || !process.stdout.isTTY) {
-    io.error("Interactive chat requires a terminal. Use amc agent-loop guide --json for setup or agent-loop run for a scripted turn.");
+    io.error("Interactive chat requires a terminal. Use amc agent-loop guide --json for setup or amc agent-loop run for a scripted turn.");
     io.fail();
     return;
   }
@@ -577,9 +583,10 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       previousSummary = summary;
       const ending = freshEndings.at(-1);
       io.log(`Session ${sessionId} · driver ${summary.driverStatus}${ending?.reason ? ` · recorded turn ending ${ending.reason}` : ""}. This summary is not an evidence-verification result.`);
-      io.log(renderNativeRunUsage(summary.usage, { requestWindow: "latest" }));
-      io.log(renderNativeRunDiagnostics(summary.diagnostics));
-      io.log(`Public task validation: ${summary.validation?.status ?? "unavailable"}. Passing selected checks does not guarantee correctness.`);
+      // An ordinary finished turn shows the reply and one line; the usage, diagnostics and validation blocks print for a
+      // turn that did not finish cleanly, and once for the whole session on exit.
+      if (outcome.code === 0 && ending?.reason === "complete" && summary.driverStatus !== "failed") io.log("Usage, cost and diagnostics for this session print when you exit.");
+      else for (const line of sessionDetailLines(summary)) io.log(line);
       if (tools === "workspace") for (const line of renderSessionLists(cwd, sessionId)) io.log(line);
       // Exit codes 3-6 (cancelled, bounded, blocked, side effects unsettled; src/cli/agentLoopOutputOptions.ts) are
       // recorded outcomes, not failed turns. 3-5 show in the recorded ending below; 6 is a `complete` ending whose
@@ -603,6 +610,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       }
     }
     if (sessionId !== null) {
+      if (previousSummary !== null) for (const line of sessionDetailLines(previousSummary)) io.log(line);
       io.log(`Known session reference: ${sessionId}. A resume attempt will verify the evidence before acquiring its writer.`);
       io.log("Resume in this workspace:\n  " + renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "chat", ...routeBaseArgs, ...chatProfileArgs, ...nativeExtensionRunArgv(extensions), "--session", sessionId] }));
       io.log("Verify recorded evidence:\n  " + renderNativeVerifyHint(cwd, sessionId));

@@ -296,9 +296,9 @@ function generateTopFixes(modules: ModuleResult[], hasVault: boolean): UnifiedRu
 
     if (mod.name === "Shield" && mod.score < 80) {
       fixes.push({
-        action: `Fix ${mod.issues.length} Shield failures`,
+        action: `Fix ${mod.issues.length} Shield failure${mod.issues.length === 1 ? "" : "s"}`,
         impact: `Shield → ${scoreToGrade(Math.min(100, mod.score + 20))} (+${potentialGain.toFixed(1)} overall)`,
-        command: "amc shield analyze",
+        command: "amc shield analyze <skill-file>",
         priority: potentialGain,
       });
     }

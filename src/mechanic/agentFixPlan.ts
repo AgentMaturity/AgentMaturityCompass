@@ -87,7 +87,7 @@ const SURFACE_FIXES: Record<string, SurfaceFixTemplate> = {
   },
   Shield: {
     fix: "Analyze and harden the failing attack surfaces (injection, exfiltration, and friends).",
-    applyCommand: () => "amc shield analyze",
+    applyCommand: () => "amc shield analyze <skill-file>",
     autoApplicable: false,
   },
   Enforce: {

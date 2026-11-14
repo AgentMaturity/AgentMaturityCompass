@@ -3488,7 +3488,7 @@ program
 program
   .command("up")
   .alias("start")
-  .description("Start AMC control plane in one command (studio + gateway + bridge)")
+  .description("Start AMC and its console (Studio, gateway and bridge in one command)")
   .option("--demo", "Start a no-vault local demo workspace for exploration", false)
   .option("--read-only", "Legacy alias for --demo; demo data is local and mutable", false)
   .option("--dry-run", "Print the startup plan without binding ports", false)

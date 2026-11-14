@@ -563,6 +563,9 @@ async function renderEvidence() {
   const resourceProofReady = resourceStatusPreview?.state === "ACTIVE" || resourceStatusPreview?.state === "DRIFTED";
   const resourceVerificationReady = resourceStatusPreview?.state === "ACTIVE";
   const resourceProofError = resourceStatusPreview?.integrity?.reasonCodes?.[0] || "MANIFEST_MISSING";
+  // A section that fails to load shows as empty; count them so the page can say so.
+  let missedSections = 0;
+  const missed = (empty) => () => { missedSections += 1; return empty; };
   const [
     surfaces,
     lifecycleList,
@@ -584,18 +587,18 @@ async function renderEvidence() {
     importsEnvelope,
     strategyEnvelope
   ] = await Promise.all([
-    apiGet("/api/v1/lifecycle/surfaces").catch(() => ({ order: [], surfaces: FALLBACK_SURFACES })),
-    apiGet(`/api/v1/lifecycle/runs?agentId=${encodeURIComponent(agentId)}&limit=8`).catch(() => ({ runs: [] })),
-    apiGet(`/api/v1/lifecycle/latest?agentId=${encodeURIComponent(agentId)}&redacted=true`).catch(() => ({ run: null })),
-    apiGet(`/api/v1/evidence/episodes?agentId=${encodeURIComponent(agentId)}&limit=8`).catch(() => ({ episodes: [] })),
-    apiGet(`/api/v1/evidence/decisions?agentId=${encodeURIComponent(agentId)}&limit=8`).catch(() => ({ receipts: [] })),
-    apiGet(`/api/v1/evidence/observability?agentId=${encodeURIComponent(agentId)}&limit=8`).catch(() => ({ records: [] })),
-    apiGet(`/api/v1/evidence/trace-indexes?agentId=${encodeURIComponent(agentId)}&limit=8`).catch(() => ({ indexes: [] })),
-    apiGet(`/api/v1/evidence/failure-clusters?agentId=${encodeURIComponent(agentId)}&limit=8`).catch(() => ({ clusters: [] })),
-    apiGet(`/api/v1/fixer/rca?agentId=${encodeURIComponent(agentId)}&limit=4`).catch(() => ({ reports: [] })),
-    apiGet(`/api/v1/evidence/finding-proofs?agentId=${encodeURIComponent(agentId)}&limit=12`).catch(() => ({ proofs: [] })),
-    apiGet(`/api/v1/evidence/lifecycle-receipts?agentId=${encodeURIComponent(agentId)}&limit=12`).catch(() => ({ receipts: [] })),
-    apiGet(`/api/v1/memory/reasoning?agentId=${encodeURIComponent(agentId)}&consumer=studio&limit=8`).catch(() => ({ items: [] })),
+    apiGet("/api/v1/lifecycle/surfaces").catch(missed({ order: [], surfaces: FALLBACK_SURFACES })),
+    apiGet(`/api/v1/lifecycle/runs?agentId=${encodeURIComponent(agentId)}&limit=8`).catch(missed({ runs: [] })),
+    apiGet(`/api/v1/lifecycle/latest?agentId=${encodeURIComponent(agentId)}&redacted=true`).catch(missed({ run: null })),
+    apiGet(`/api/v1/evidence/episodes?agentId=${encodeURIComponent(agentId)}&limit=8`).catch(missed({ episodes: [] })),
+    apiGet(`/api/v1/evidence/decisions?agentId=${encodeURIComponent(agentId)}&limit=8`).catch(missed({ receipts: [] })),
+    apiGet(`/api/v1/evidence/observability?agentId=${encodeURIComponent(agentId)}&limit=8`).catch(missed({ records: [] })),
+    apiGet(`/api/v1/evidence/trace-indexes?agentId=${encodeURIComponent(agentId)}&limit=8`).catch(missed({ indexes: [] })),
+    apiGet(`/api/v1/evidence/failure-clusters?agentId=${encodeURIComponent(agentId)}&limit=8`).catch(missed({ clusters: [] })),
+    apiGet(`/api/v1/fixer/rca?agentId=${encodeURIComponent(agentId)}&limit=4`).catch(missed({ reports: [] })),
+    apiGet(`/api/v1/evidence/finding-proofs?agentId=${encodeURIComponent(agentId)}&limit=12`).catch(missed({ proofs: [] })),
+    apiGet(`/api/v1/evidence/lifecycle-receipts?agentId=${encodeURIComponent(agentId)}&limit=12`).catch(missed({ receipts: [] })),
+    apiGet(`/api/v1/memory/reasoning?agentId=${encodeURIComponent(agentId)}&consumer=studio&limit=8`).catch(missed({ items: [] })),
     Promise.resolve(resourceStatusEnvelope),
     resourceVerificationReady
       ? apiGet(`/api/v1/enforce/resources/verify?agentId=${encodeURIComponent(agentId)}`).catch((error) => ({ valid: false, error: errText(error) }))
@@ -603,10 +606,10 @@ async function renderEvidence() {
     resourceProofReady
       ? apiGet(`/api/v1/enforce/resources/validate?agentId=${encodeURIComponent(agentId)}`).catch((error) => ({ status: "blocked", error: errText(error), gates: [] }))
       : Promise.resolve({ status: "blocked", error: resourceProofError, gates: [] }),
-    apiGet(`/api/v1/enforce/resources/history?agentId=${encodeURIComponent(agentId)}`).catch(() => ({ entries: [] })),
-    apiGet("/api/v1/enforce/resources/contract").catch(() => ({ verbs: [], resourceKinds: [], gates: [] })),
-    apiGet("/api/v1/imports?limit=6").catch(() => ({ imports: [] })),
-    apiGet(`/api/v1/strategy/runs?agentId=${encodeURIComponent(agentId)}&limit=6`).catch(() => ({ runs: [] }))
+    apiGet(`/api/v1/enforce/resources/history?agentId=${encodeURIComponent(agentId)}`).catch(missed({ entries: [] })),
+    apiGet("/api/v1/enforce/resources/contract").catch(missed({ verbs: [], resourceKinds: [], gates: [] })),
+    apiGet("/api/v1/imports?limit=6").catch(missed({ imports: [] })),
+    apiGet(`/api/v1/strategy/runs?agentId=${encodeURIComponent(agentId)}&limit=6`).catch(missed({ runs: [] }))
   ]);
   const surfacesData = apiPayload(surfaces) || {};
   const lifecycleData = apiPayload(lifecycleList) || {};
@@ -662,10 +665,11 @@ async function renderEvidence() {
     <section class="card studio-hero evidence-hero">
       <div>
         <div class="studio-kicker">agent lifecycle</div>
-        <h2 class="studio-title">Score<span>Enforce</span><strong>Prove_</strong></h2>
+        <h2 class="studio-title">Recorded<strong>evidence_</strong></h2>
         <p class="studio-sub">
-          One console for the full AMC loop across Score, Shield, Enforce, Vault, Watch, Comply, Fleet, and Passport.
+          What AMC has recorded about this agent. A signature shows who wrote each record and that it has not changed, not that it is true.
         </p>
+        ${missedSections ? `<p class="status-bad">${missedSections} section(s) could not load and show as empty below. Refresh the page to try again.</p>` : ""}
         <div class="studio-actions">
           <button id="evidenceRunScore" data-roles="OWNER,OPERATOR">run full score -&gt;</button>
           <button id="evidenceSnapshot" data-roles="OWNER" class="secondary">snapshot Enforce resources</button>
@@ -737,7 +741,7 @@ async function renderEvidence() {
           decisionChain: (latestObservability.decisionChain || []).slice(0, 8)
         }, null, 2))}</pre>
       ` : "<p class='muted'>No decision observability record yet. Run `amc` to capture component attribution, experience signals, and decision outcomes.</p>")}
-      ${card("Trace Failure Miner", latestTraceIndex ? `
+      ${card("Repeated failures", latestTraceIndex ? `
         <div class="lifecycle-summary">
           <div><span class="muted">Index</span><code>${htmlEscape(shortId(latestTraceIndex.indexId, 18))}</code></div>
           <div><span class="muted">Entries</span><strong>${Number(latestTraceIndex.summary?.entryCount || 0)}</strong></div>
@@ -770,7 +774,7 @@ async function renderEvidence() {
           command: "amc mechanic rca run <run-id>"
         }, null, 2))}</pre>
         <div class="row wrap">
-          <button id="evidenceGenerateRca" data-roles="OWNER,OPERATOR" class="secondary">generate RCA</button>
+          <button id="evidenceGenerateRca" data-roles="OWNER,OPERATOR" class="secondary">find root causes</button>
         </div>
       `)}
       ${card("Reasoning Memory", `
@@ -812,7 +816,7 @@ async function renderEvidence() {
         <div class="row wrap">
           <button id="evidenceVerifyResources" class="secondary">verify now</button>
           <button id="evidenceValidateResources" class="secondary">validate gates</button>
-          <button id="evidenceApplyDryRun" data-roles="OWNER" class="secondary">dry-run apply</button>
+          <button id="evidenceApplyDryRun" data-roles="OWNER" class="secondary">preview apply</button>
           <button id="evidenceRestoreDryRun" data-roles="OWNER" class="secondary">dry-run restore</button>
           <button id="evidenceActivateResources" data-roles="OWNER" ${resourceStatusData?.state === "DRIFTED" ? "" : "disabled"}>activate changes</button>
           <button id="evidenceRollbackResources" data-roles="OWNER" ${resourceStatusData?.rollbackTarget?.manifestId ? "" : "disabled"}>rollback previous</button>
@@ -845,7 +849,7 @@ async function renderEvidence() {
           </tr>
         `).join("") || "<tr><td colspan='5' class='muted'>No neutral imports yet.</td></tr>"}</tbody></table></div>
       `)}
-      ${card("Inference Strategy", `
+      ${card("Model strategy comparison", `
         <pre id="strategyCompareOut" class="scroll">${htmlEscape(JSON.stringify({
           recent: strategyRuns.map((row) => ({
             strategyRunId: row.strategyRunId,
@@ -871,7 +875,7 @@ async function renderEvidence() {
       ${card("Episode Records", `
         <div class="scroll"><table><thead><tr><th>Episode</th><th>Run</th><th>Source</th><th>Created</th></tr></thead><tbody>${renderEvidenceRows(episodes, "episode", agentId)}</tbody></table></div>
       `)}
-      ${card("Decision Receipts", `
+      ${card("Signed decision records", `
         <div class="scroll"><table><thead><tr><th>Receipt</th><th>Run</th><th>Decision</th><th>Created</th></tr></thead><tbody>${renderEvidenceRows(receipts, "decision", agentId)}</tbody></table></div>
       `)}
       ${card("Observability Records", `
@@ -1972,7 +1976,7 @@ async function renderTransparency() {
       ${jsonDetails(`${Number(serverVerify.entryCount || 0)} entries; ${(serverVerify.errors || []).length + (clientVerify.errors || []).length} error(s).`, { serverVerify, clientVerify })}
     `)}
     ${card("Merkle Root", `
-      <p>Merkle verify: <strong>${merkleVerify?.ok ? "OK" : "FAILED"}</strong></p>
+      <p>Merkle verify: <strong>${merkleVerify ? (merkleVerify.ok ? "OK" : "FAILED") : "could not load (refresh to try again)"}</strong></p>
       <p>Current root: <code>${htmlEscape(merkleRoot?.current?.root || "n/a")}</code></p>
       <p>Leaf count: ${Number(merkleRoot?.current?.leafCount || 0)}</p>
       ${jsonDetails(`${(merkleRoot?.history || []).length} earlier root(s).`, merkleRoot?.history || [])}
@@ -2915,9 +2919,9 @@ async function renderRuntimeRuns() {
   root.innerHTML = `
     <section class="hero-panel compact">
       <div>
-        <p class="eyebrow">Watch + Gateway + Fleet</p>
+        <p class="eyebrow">Live runs</p>
         <h2>Runtime Runs</h2>
-        <p>Persist connected-agent run state, event streams, alerts, receipts, and resumable status.</p>
+        <p>Runs of your connected agents as they happen: status, events, alerts and receipts. A run that stopped can be picked up again.</p>
       </div>
       <div class="hero-actions">
         <span class="pill ${Number(status.running || 0) > 0 ? "ok" : "warn"}">${Number(status.running || 0)} running</span>
@@ -2925,7 +2929,7 @@ async function renderRuntimeRuns() {
       </div>
     </section>
     <div class="grid two">
-      ${card("Run Manager", `
+      ${card("Record a run by hand (advanced)", `
         <div class="row wrap">
           <input id="runtimeRunId" placeholder="run id" value="${htmlEscape(latest?.runId || `studio-${Date.now()}`)}" />
           <input id="runtimeStage" placeholder="stage" value="${htmlEscape(latest?.currentStage || "gateway.connected")}" />
@@ -3297,7 +3301,7 @@ async function renderOrg() {
   if (!scorecard) {
     root.innerHTML = `
       ${runnerCard}
-      ${card("Org Compass", "<p class='muted'>No org scorecard available yet.</p>")}
+      ${card("Org Compass", "<p class='muted'>No team scores yet. AMC builds them when an owner or operator opens the Org page. If that is you and this stays empty, the build did not finish: refresh to try again.</p>")}
     `;
     bindOrgRunnerControls();
     return;
@@ -3467,7 +3471,7 @@ async function renderOrg() {
 async function renderCompare() {
   const scorecard = await loadLatestOrgScorecard();
   if (!scorecard) {
-    root.innerHTML = card("Org Compare", "<p class='muted'>No org scorecard available yet.</p>");
+    root.innerHTML = card("Org Compare", "<p class='muted'>No team scores yet. AMC builds them when an owner or operator opens the Org page. If that is you and this stays empty, the build did not finish: refresh to try again.</p>");
     return;
   }
   const nodes = Array.isArray(scorecard.nodes) ? scorecard.nodes : [];
@@ -3520,7 +3524,7 @@ async function renderCompare() {
 async function renderSystemic() {
   const scorecard = await loadLatestOrgScorecard();
   if (!scorecard) {
-    root.innerHTML = card("Systemic Risks", "<p class='muted'>No org scorecard available yet.</p>");
+    root.innerHTML = card("Systemic Risks", "<p class='muted'>No team scores yet. AMC builds them when an owner or operator opens the Org page. If that is you and this stays empty, the build did not finish: refresh to try again.</p>");
     return;
   }
   const enterprise = scorecard.summary?.enterpriseRollup;
@@ -3852,7 +3856,7 @@ async function renderPage() {
       root.innerHTML = card("Leases", `
         ${jsonDetails(`Revocation list signature: ${leaseState.revocationSignatureValid ? "valid" : `INVALID${leaseState.revocationSignatureReason ? ` (${htmlEscape(leaseState.revocationSignatureReason)})` : ""}`} · ${Number(leaseState.revokedLeaseCount || 0)} revoked lease(s).`, leaseState)}
         <div class="row">
-          <button id="issueLeaseBtn" data-roles="OWNER">Issue Lease For ${currentAgent()}</button>
+          <button id="issueLeaseBtn" data-roles="OWNER">Issue Lease For ${htmlEscape(currentAgent())}</button>
         </div>
         <pre id="leaseOut" class="muted"></pre>
       `);

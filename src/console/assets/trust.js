@@ -8,9 +8,9 @@ export async function renderTrustPage(params) {
     ${params.card("Trust Mode", `
       <div class="grid">
         <div><div class="muted">Mode</div><div class="tile-value">${params.htmlEscape(state.mode || "unknown")}</div></div>
-        <div><div class="muted">Trust OK</div><div class="tile-value">${state.ok ? "YES" : "NO"}</div></div>
-        <div><div class="muted">Config Signature</div><div class="tile-value">${signature.valid ? "VALID" : "INVALID"}</div></div>
-        <div><div class="muted">Notary Reachable</div><div class="tile-value">${state.notaryReachable ? "YES" : "NO"}</div></div>
+        <div><div class="muted">Setup checks pass</div><div class="tile-value">${state.ok ? "YES" : "NO"}</div></div>
+        <div><div class="muted">Settings file signature</div><div class="tile-value">${signature.valid ? "VALID" : "INVALID"}</div></div>
+        <div><div class="muted">Signing service reachable</div><div class="tile-value">${state.notaryReachable ? "YES" : "NO"}</div></div>
       </div>
       <pre class="scroll">${params.htmlEscape(JSON.stringify({
         configSignatureReason: signature.reason || null,

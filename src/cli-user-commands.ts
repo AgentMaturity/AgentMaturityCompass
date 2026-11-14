@@ -70,6 +70,7 @@ export function registerUserCommands(program: Command): void {
       console.log(chalk.green(`Users config created: ${created.path}`));
       console.log(`Signature: ${created.sigPath}`);
       console.log(`Owner: ${created.username} roles=${created.roles.join(",")}`);
+      console.log(`Next: sign in to the console as ${created.username} (amc up prints its address).`);
     });
 
   user

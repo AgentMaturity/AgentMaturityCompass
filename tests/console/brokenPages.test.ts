@@ -190,3 +190,19 @@ describe("labels and plain subtitles", () => {
     expect(added).not.toMatch(/certif|compliant|guarantee/i);
   });
 });
+
+describe("load failures and untrusted text (2026-11-14 source audit)", () => {
+  test("Evidence counts sections that failed to load, Transparency does not call a failed request a failed check", () => {
+    expect(app).toContain("const missed = (empty) => () => { missedSections += 1; return empty; };");
+    expect(app).toMatch(/\$\{missedSections\} section\(s\) could not load/);
+    expect(app).toContain('merkleVerify ? (merkleVerify.ok ? "OK" : "FAILED") : "could not load');
+  });
+
+  test("the agent id from the URL and Ops server text are escaped; Run Retention asks first", () => {
+    expect(app).toContain("Issue Lease For ${htmlEscape(currentAgent())}");
+    const ops = readFileSync("src/console/assets/ops.js", "utf8");
+    expect(ops).not.toMatch(/\+ String\(error\) \+/);
+    expect(ops).not.toMatch(/"<pre>" \+ JSON\.stringify/);
+    expect(ops).toMatch(/"retention-run"\)\.addEventListener\("click", async \(\) => \{\n  if \(!window\.confirm\(/);
+  });
+});

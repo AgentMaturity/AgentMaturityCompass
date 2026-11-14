@@ -1232,7 +1232,7 @@ AMC provides 1,304 public CLI command paths in the live command inventory.
 | 1213 | `amc truthguard validate` | Validate structured agent output claims against deterministic truth constraints |
 | 1214 | `amc tune` | Mechanic mode tuning wizard |
 | 1215 | `amc unknowns` | List known unknowns for an agent's latest diagnostic run |
-| 1216 | `amc up` | Start AMC control plane in one command (studio + gateway + bridge) |
+| 1216 | `amc up` | Start AMC and its console (Studio, gateway and bridge in one command) |
 | 1217 | `amc upgrade` | Generate upgrade plan |
 | 1218 | `amc usage` | Usage and cost across native sessions from verified signed rows (tokens, cost, latency; unknowns stay unknown) |
 | 1219 | `amc user` | Multi-user RBAC account management |
@@ -10784,7 +10784,7 @@ List known unknowns for an agent's latest diagnostic run
 
 #### `amc up`
 
-Start AMC control plane in one command (studio + gateway + bridge)
+Start AMC and its console (Studio, gateway and bridge in one command)
 
 Alias: `amc start`
 
