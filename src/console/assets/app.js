@@ -4,9 +4,9 @@ import { apiGet, apiPost, applyRoleGates, getAdminToken, getCurrentUser, login, 
 import { installClaimStrip } from "./components/claimBadge.js";
 import { industryPackDetailHtml, industryPackResultHtml } from "./industryPackView.js";
 import { renderBars, renderLine } from "./charts.js";
-import { decorateNav, topbarHtml } from "./shell.js";
+import { decorateNav, primaryActionHref, primaryActionLabel, topbarHtml } from "./shell.js";
 import { loginCardHtml, loginFailureText, safeNextPage } from "./loginView.js";
-import { BANNER_TIPS, activationHelpHtml, bannerHelpHtml, installWelcomeGuide, welcomeCardHtml } from "./welcomeGuide.js";
+import { BANNER_TIPS, activationHelpHtml, bannerHelpHtml, installWelcomeGuide, progressLineText } from "./welcomeGuide.js";
 import { renderQrLike } from "./qr.js";
 import { renderPluginTable } from "./components/pluginTable.js";
 import { renderPluginDetail } from "./components/pluginDetail.js";
@@ -163,47 +163,42 @@ function card(title, body) {
   return `<section class="card"><h3>${htmlEscape(title)}</h3>${body}</section>`;
 }
 
-function firstUseCard(agentId) {
+/**
+ * Home's one hero card: what AMC does in one sentence, one primary action (a task in Native Tasks, with a sample prompt),
+ * "Connect my agent" revealing the connection command, and a text link for scoring records already held.
+ */
+function firstUseCard(agentId, demoMode) {
   // This is a POSIX terminal handoff, never a browser execution request.
   const quotedAgent = `'${String(agentId).replaceAll("'", "'\\''")}'`;
   const connectCommand = `amc connect --agent=${quotedAgent}`;
   const guideCommand = `amc --agent=${quotedAgent} agent-loop guide`;
+  // The demo workspace's session is view-only, so its baseline button would refuse: name where scoring works instead.
+  const scoreRecords = demoMode
+    ? '<p class="muted first-use-score">Already have records? Available in your own workspace: run <code>amc up</code> in a terminal.</p>'
+    : '<p class="first-use-score"><a href="#activationSteps" id="firstUseBaselineContinue">I already have records: score them</a></p>';
   return `
     <section id="firstUse" class="card first-use" aria-labelledby="firstUseTitle">
-      <div class="studio-kicker">Start here</div>
-      <h2 id="firstUseTitle">What would you like to do?</h2>
-      <div class="first-use-intents">
-        <button id="firstUseNativeButton" data-first-intent="firstUseNative" aria-controls="firstUseNative" aria-expanded="false">
-          <strong>Run a task with AMC</strong><span>Choose a model task or a local recording demonstration.</span>
-        </button>
-        <button id="firstUseBaselineButton" data-first-intent="firstUseBaseline" aria-controls="firstUseBaseline" aria-expanded="false">
-          <strong>Assess existing evidence</strong><span>Create a baseline and see what evidence is missing.</span>
-        </button>
-        <button id="firstUseConnectButton" data-first-intent="firstUseConnect" aria-controls="firstUseConnect" aria-expanded="false">
-          <strong>Connect an existing agent</strong><span>Bring an agent's actions into AMC's evidence trail.</span>
-        </button>
+      <h2 id="firstUseTitle">See what your AI agent really does.</h2>
+      <p class="first-use-lead">AMC records every action your agent takes and turns that record into a trust score and a short list of gaps to fix.</p>
+      <div class="first-use-actions">
+        <div>
+          <a class="button" id="firstUsePrimary" href="${htmlEscape(primaryActionHref(agentId))}">${primaryActionLabel(demoMode)}</a>
+          <p class="muted first-use-sub">No setup. Runs on this computer with no model or tools.</p>
+        </div>
+        <button type="button" id="firstUseConnectButton" class="secondary" data-first-intent="firstUseConnect" aria-controls="firstUseConnect" aria-expanded="false">Connect my agent</button>
       </div>
-      <div id="firstUseNative" class="first-use-panel" hidden>
-        <h3>Run a native task in Studio</h3>
-        <p>Choose a provider, inspect the existing tool scope, and follow recorded activity for <strong>${htmlEscape(agentId)}</strong>.</p>
-        <a class="button" href="./native-tasks?agent=${encodeURIComponent(agentId)}">Open Native Tasks</a>
-        <p class="muted">Prefer your terminal? Run this guide on the machine hosting this workspace. Copying the command makes no changes.</p>
-        <pre><code id="nativeGuideCommand" tabindex="0">${htmlEscape(guideCommand)}</code></pre>
-        <button id="copyNativeGuide" class="secondary">Copy guide command</button>
-        <span id="nativeCopyStatus" class="muted first-use-copy-status" role="status" aria-live="polite"></span>
-      </div>
-      <div id="firstUseBaseline" class="first-use-panel" hidden>
-        <h3>Start an evidence baseline</h3>
-        <p>A baseline reports current evidence and gaps. It does not complete a model task or prove that an agent is connected.</p>
-        <button id="firstUseBaselineContinue" class="secondary">Open baseline setup</button>
-      </div>
+      ${scoreRecords}
       <div id="firstUseConnect" class="first-use-panel" hidden>
         <h3>Connect from your workspace terminal</h3>
         <p>Run this on the machine hosting this workspace to configure a connection for <strong>${htmlEscape(agentId)}</strong>. The CLI may create a connection lease; copying the command makes no changes.</p>
         <pre><code id="connectCommand" tabindex="0">${htmlEscape(connectCommand)}</code></pre>
-        <button id="copyConnectCommand" class="secondary">Copy connection command</button>
+        <button type="button" id="copyConnectCommand" class="secondary">Copy connection command</button>
         <span id="connectCopyStatus" class="muted first-use-copy-status" role="status" aria-live="polite"></span>
-        <p class="muted">Commands use macOS/Linux shell syntax. Check the Activation path below after your agent runs; setup alone does not complete it.</p>
+        <p class="muted">Prefer a step-by-step guide in your terminal? This one walks you through it. Copying it makes no changes.</p>
+        <pre><code id="nativeGuideCommand" tabindex="0">${htmlEscape(guideCommand)}</code></pre>
+        <button type="button" id="copyNativeGuide" class="secondary">Copy guide command</button>
+        <span id="nativeCopyStatus" class="muted first-use-copy-status" role="status" aria-live="polite"></span>
+        <p class="muted">Commands use macOS/Linux shell syntax. Check your progress below after your agent runs; setup alone does not complete it.</p>
       </div>
     </section>
   `;
@@ -214,11 +209,9 @@ function bindFirstUse() {
   if (!firstUse) return;
   firstUse.querySelectorAll("[data-first-intent]").forEach((button) => {
     onAction(button, "click", () => {
-      firstUse.querySelectorAll("[data-first-intent]").forEach((item) => {
-        const selected = item === button;
-        item.setAttribute("aria-expanded", String(selected));
-        document.getElementById(item.dataset.firstIntent).hidden = !selected;
-      });
+      const open = button.getAttribute("aria-expanded") !== "true";
+      button.setAttribute("aria-expanded", String(open));
+      document.getElementById(button.dataset.firstIntent).hidden = !open;
     });
   });
   const bindCopy = (buttonId, commandId, statusId) => {
@@ -241,10 +234,11 @@ function bindFirstUse() {
   };
   bindCopy("copyNativeGuide", "nativeGuideCommand", "nativeCopyStatus");
   bindCopy("copyConnectCommand", "connectCommand", "connectCopyStatus");
-  onAction(document.getElementById("firstUseBaselineContinue"), "click", () => {
+  onAction(document.getElementById("firstUseBaselineContinue"), "click", (event) => {
+    event.preventDefault();
     const button = document.getElementById("studioRunOnboarding");
-    const setup = button?.closest("details");
-    if (setup) setup.open = true;
+    // The baseline button sits in "Workspace setup" inside "Show all steps": open both.
+    for (let details = button?.closest("details"); details; details = details.parentElement?.closest("details")) details.open = true;
     button?.scrollIntoView({ block: "center" });
     button?.focus({ preventScroll: true });
   });
@@ -308,7 +302,7 @@ function decorateShell() {
   }
   const topbar = main.querySelector(".topbar") || main.insertBefore(Object.assign(document.createElement("section"), { className: "topbar" }), main.firstChild);
   const workspace = currentWorkspaceLabel();
-  topbar.innerHTML = topbarHtml({ workspace, demoMode: workspace === "demo", me: getCurrentUser() });
+  topbar.innerHTML = topbarHtml({ workspace, demoMode: workspace === "demo", me: getCurrentUser(), agent: currentAgent() });
   onAction(topbar.querySelector("#signOutBtn"), "click", () => logout()
     .then(() => window.location.assign("./login"), (error) => setStatus(`Sign out failed: ${errText(error)}`, true)));
 }
@@ -1194,6 +1188,22 @@ async function verifyTransparencyClientSide(raw) {
   };
 }
 
+/**
+ * The status strip's one plain line (the nine Unified Clarity fields sit under its Details). The first problem found,
+ * with one link to where it is explained; otherwise the workspace, whether a result exists, and that records check out.
+ */
+function plainStatusLine({ readOnly, notaryBroken, transparencyOk, hasResult }) {
+  const problem = readOnly ? ["AMC settings are not signed, so AMC is read-only.", "./trust", "Why and how to fix it"]
+    : notaryBroken ? ["the separate signing service is not answering.", "./trust", "Check signing"]
+      : !transparencyOk ? ["AMC's log of signed records does not check out.", "./transparency", "See what changed"] : null;
+  if (problem) {
+    return `<p class="uc-line status-bad"><strong>Needs attention:</strong> ${htmlEscape(problem[0])} <a href="${problem[1]}">${htmlEscape(problem[2])}</a></p>`;
+  }
+  const workspace = currentWorkspaceLabel();
+  const where = workspace === "demo" ? "Demo workspace" : workspace === "local" ? "Local workspace" : `Workspace ${workspace}`;
+  return `<p class="uc-line">${htmlEscape(where)} · ${hasResult ? "Results ready" : "No results yet"} · Records check out</p>`;
+}
+
 async function refreshUnifiedBanner() {
   if (!bannerEl) {
     return;
@@ -1226,7 +1236,12 @@ async function refreshUnifiedBanner() {
       : kill.active ? `<div class="danger"><strong>KILL SWITCH ACTIVE:</strong> ${htmlEscape(kill.kills.map((k) => `${k.killId} (${k.scope.kind}:${k.scope.id}, ${k.mode})`).join("; ") || "unverifiable record treated as stop_all")}. Protected effects are refused until an OWNER releases it.</div>` : "";
     const trustMode = status?.trust?.mode || "UNKNOWN";
     const trustOk = status?.trust?.ok === true;
-    bannerEl.innerHTML = `${killLine}
+    // A freeze is a safety state like the kill switch: it stays in sight, outside Details.
+    const freezeLine = freezes > 0 ? `<div class="danger"><strong>Freeze active:</strong> ${freezes} ${freezes === 1 ? "pause is" : "pauses are"} stopping some agent actions until a person lifts ${freezes === 1 ? "it" : "them"}.</div>` : "";
+    bannerEl.innerHTML = `${killLine}${freezeLine}
+      ${plainStatusLine({ readOnly: status.readOnlyMode, notaryBroken: trustMode === "NOTARY" && !trustOk, transparencyOk: transparency.ok, hasResult: evidenceStatus !== "NO RUN" })}
+      <details class="uc-details">
+      <summary>Details</summary>
       <strong>Unified Clarity</strong>
       <div class="row wrap">
         <span title="${htmlEscape(BANNER_TIPS.agent)}"><strong>Agent:</strong> ${htmlEscape(agentId)}</span>
@@ -1239,7 +1254,9 @@ async function refreshUnifiedBanner() {
         <span title="${htmlEscape(BANNER_TIPS.trustMode)}"><strong>Trust mode:</strong> ${htmlEscape(`${trustMode}${trustMode === "NOTARY" ? trustOk ? " (OK)" : " (BROKEN)" : ""}`)}</span>
         <span title="${htmlEscape(BANNER_TIPS.transparency)}"><strong>Transparency:</strong> ${transparency.ok ? "OK" : "BROKEN"}</span>
       </div>
+      ${page === "home" && integrity !== null ? '<p class="muted">The claim labels for these results are under "More" on this page.</p>' : ""}
       ${bannerHelpHtml()}
+      </details>
     `;
     bannerEl.hidden = false;
   } catch {
@@ -1362,9 +1379,17 @@ async function renderHome() {
     ? '<span class="pill ok">loopback-only demo</span><span class="pill muted">mutable local data</span><span class="pill muted">unsigned outputs</span>'
     : `<span class="pill ok">workspace authenticated</span><span class="pill muted" title="${STUDIO_VAULT_NOTE}">Studio vault ${vaultState.toLowerCase()}</span><span class="pill muted">evidence-first runtime</span>`;
   const launchCommand = demoMode ? "$ amc up --demo --no-open" : "$ amc up";
+  const agentStatus = await apiGet(`/agents/${encodeURIComponent(agentId)}/status`).catch(() => ({ latestRun: null }));
+  const latestRun = agentStatus.latestRun;
+  // The claim strip moves under "More" below; take it out of #app first so this re-render does not destroy it.
+  const claimStrip = document.getElementById("claimStrip");
+  if (claimStrip && root.contains(claimStrip)) root.before(claimStrip);
   root.innerHTML = `
-    ${welcomeCardHtml()}
-    ${firstUseCard(agentId)}
+    ${firstUseCard(agentId, demoMode)}
+    <section class="home-progress" aria-label="Your progress">
+      <p>${htmlEscape(progressLineText(onboarding?.activation))}</p>
+      <details id="activationSteps">
+      <summary>Show all steps</summary>
     ${card("Activation path", `
       <div class="row spaced wrap">
         <div>
@@ -1386,6 +1411,11 @@ async function renderHome() {
         <pre id="onboardingOut" class="scroll muted"></pre>
       </details>
     `)}
+      </details>
+    </section>
+
+    <details id="homeMore" class="home-more">
+    <summary>More</summary>
 
     <section class="quick-action-grid">
       <a class="quick-action-card" href="./score"><span>01</span><strong>Score</strong><em>scoring commands</em></a>
@@ -1401,11 +1431,12 @@ async function renderHome() {
       <section class="card studio-kpi"><div class="muted">Current Agent</div><div class="tile-value">${htmlEscape(agentId)}</div></section>
     </div>
 
+    ${latestRun ? `
     <div class="studio-section-label">runtime telemetry</div>
     <div class="studio-chart-grid">
       ${card("Overall Trend", `<canvas id="overallTrend" width="360" height="140" role="img" aria-label="Overall maturity trend chart for the selected agent."></canvas>`)}
       ${card("Integrity Trend", `<canvas id="integrityTrend" width="360" height="140" role="img" aria-label="Integrity index trend chart for the selected agent."></canvas>`)}
-    </div>
+    </div>` : ""}
 
     <div class="studio-section-label">advanced and developer details</div>
     <details class="advanced-section">
@@ -1466,13 +1497,17 @@ async function renderHome() {
       <summary>Developer: API quickstart (curl examples)</summary>
     ${renderApiQuickstart(status, agentId)}
     </details>
+    </details>
   `;
+  // Every claim-bearing number on Home (trends, KPI tiles) sits under "More", so its labels sit there too.
+  if (claimStrip) document.getElementById("homeMore")?.querySelector("summary")?.after(claimStrip);
   bindFirstUse();
   installWelcomeGuide(document, window);
-  const agentStatus = await apiGet(`/agents/${encodeURIComponent(agentId)}/status`).catch(() => ({ latestRun: null }));
-  const latestRun = agentStatus.latestRun;
-  renderLine(document.getElementById("overallTrend"), latestRun ? [latestRun.integrityIndex, latestRun.integrityIndex] : [0]);
-  renderLine(document.getElementById("integrityTrend"), latestRun ? [latestRun.integrityIndex, latestRun.integrityIndex] : [0], "#7c3aed");
+  // No run yet: no charts at all, rather than blank skeletons.
+  if (latestRun) {
+    renderLine(document.getElementById("overallTrend"), [latestRun.integrityIndex, latestRun.integrityIndex]);
+    renderLine(document.getElementById("integrityTrend"), [latestRun.integrityIndex, latestRun.integrityIndex], "#7c3aed");
+  }
   onAction(document.getElementById("studioRunFullScore"), "click", async (event) => {
     const button = event.currentTarget;
     const original = button.textContent;
@@ -3674,7 +3709,8 @@ async function renderPage() {
 
   const me = getCurrentUser();
   if (me) {
-    setStatus(`Logged in as ${me.username} (${(me.roles || []).join(",")})`);
+    const viewOnly = Array.isArray(me.roles) && me.roles.length > 0 && me.roles.every((role) => role === "VIEWER");
+    setStatus(`Signed in as ${me.username}${viewOnly ? " (view only)" : ""}`);
   } else if (getAdminToken()) {
     setStatus("Using admin token session.");
   }
