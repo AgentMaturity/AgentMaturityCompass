@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Re-takes the three Compass Console pictures on the website home page (website/img/*.webp) from a running Studio, so
-// they can be refreshed whenever the console changes.
+// Re-takes the Compass Console pictures on the website (website/img/*.webp: three on the home page, which website/a4.html
+// also shows, and one more on a4.html) from a running Studio, so they can be refreshed whenever the console changes.
 //
 // Needs a scratch workspace with exactly one person in it (an owner) and no agent project yet: the home card shows
 // "Build an agent for your industry" only before the first project, and the practice project this script starts is
@@ -10,8 +10,9 @@
 //   npm run capture:site-shots -- --base http://127.0.0.1:3210 --user owner --password-file <file> [--out website/img]
 // It signs in, captures Home's "Build an agent for your industry" card with a pack chosen (a4-start.webp), starts a
 // practice project from it as a person would and captures that project's "What to do now" panel (a4-project.webp), then
-// captures Home with the project under way (console-home.webp). It prints each picture's size: copy those into the
-// width and height of its <img> in website/index.html. It never prints the password.
+// captures Home with the project under way (console-home.webp), then adds a second person and captures a pack project
+// waiting for its first approval (a4-approval.webp). It prints each picture's size: copy those into the width and height
+// of its <img> in website/index.html and website/a4.html. It never prints a password.
 import { createRequire } from "node:module";
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { resolve } from "node:path";
@@ -116,6 +117,45 @@ await page.goto(`${base}/console/home`);
 await settle();
 await page.waitForSelector("#firstUse");
 await saveWebp(await around("#a4HomeCard, #firstUse"), "console-home.webp");
+
+// 4. A project that needs a second person, waiting for its first approval (a4-approval.webp, on website/a4.html). The
+// owner starts a project from the same pack and follows the "What to do now" button, filling each stage's questions with
+// "Use an example". When the panel asks for a second person, the owner invites one on the Members card (this also ends
+// the practice project above, as any second person does). It stops when the panel says who must approve. The invited
+// person's first password is shown on screen once and is never captured.
+await page.goto(`${base}/console/a4?new=1`);
+await settle();
+const create = page.locator("#a4CreateForm");
+await create.locator("select").first().selectOption(values.pack);
+await create.locator("[name=name]").fill("Claims letter assistant");
+await create.locator("button[type=submit]").click();
+await page.waitForURL(/a4Project/, { timeout: 30_000 });
+const projectUrl = page.url();
+for (let step = 0; step < 12; step++) {
+  await page.goto(projectUrl);
+  await settle();
+  if ((await page.locator(".a4-start").innerText()).includes("Who must approve")) break;
+  const next = page.locator(".a4-start button").first();
+  const label = (await next.textContent()).trim();
+  if (/invite/i.test(label)) {
+    const invite = page.locator(".a4-invite");
+    await invite.locator("[name=inviteUsername]").fill("reviewer");
+    await invite.locator("button", { hasText: "Invite" }).click();
+  } else if (/reason/i.test(label)) {
+    // A pack project's approvers are all local users: the owner acknowledges that with a reason before the request.
+    await page.getByLabel(/^Reason/).first().fill("Both approvers are people on our team.");
+    await page.locator("button:visible", { hasText: /^Acknowledge$/ }).first().click();
+  } else {
+    await next.click();
+    if (/answer/i.test(label)) {
+      await page.locator("button:visible", { hasText: "Use an example" }).first().click();
+      await page.locator("button:visible", { hasText: "Save answers" }).first().click();
+    }
+  }
+  await settle();
+}
+if (!(await page.locator(".a4-start").innerText()).includes("Who must approve")) throw new Error("The project never reached its first approval.");
+await saveWebp(await page.locator(".a4-start").screenshot(), "a4-approval.webp");
 
 await browser.close();
 // Reported, not fatal: look at the pictures before committing them.

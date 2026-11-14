@@ -1,0 +1,130 @@
+/* Pages built on the home design system: A4 Forge, Lite, Executives, Accessibility and 404.
+   Link home.css first, then this file. Only what home.css does not already have lives here. It adds no motion
+   of its own, and home.css turns every shared transition and animation off under prefers-reduced-motion. */
+
+[hidden] { display: none !important; }
+
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+.nav-links a[aria-current="page"] { color: var(--text); }
+
+main :where(p, li, dd) a:not(.btn) { color: var(--text); text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+main :where(p, li, dd) a:not(.btn):hover { color: var(--accent); }
+main :where(p, li, dd) code { overflow-wrap: anywhere; }
+
+/* ── Page hero: the home hero without the picker ─────────────────────── */
+.page-hero { position: relative; padding: calc(var(--nav-h) + clamp(40px, 6vw, 88px)) 0 clamp(48px, 6vw, 88px); }
+.page-hero::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(48% 60% at 85% 12%, rgba(74, 239, 121, 0.1), transparent 72%); }
+.page-hero .wrap { position: relative; }
+.page-hero h1 { max-width: 17em; font-size: clamp(2.2rem, 4vw, 3.4rem); line-height: 1.08; }
+.page-hero .lede { max-width: 38em; }
+.page-hero .fine { margin-top: 22px; max-width: 46em; }
+.hero-split { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: clamp(32px, 5vw, 72px); align-items: center; }
+.hero-split .shot { margin-top: 0; }
+.split-top { align-items: start; }
+.split-top .band-head { margin-bottom: 28px; }
+
+/* Status: the few facts a reader must not miss, set like a label on a file. */
+.status { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0 28px; margin-top: clamp(32px, 4vw, 56px); border-top: 1px solid var(--line); }
+.status > div { padding-top: 16px; }
+.status dt { font-family: var(--mono); font-size: 0.76rem; color: var(--accent); margin-bottom: 4px; }
+.status dd { font-size: 0.95rem; line-height: 1.5; color: var(--text); }
+
+/* ── A4 stages: what you do on the dark side, the sign-off slip on paper ── */
+.stage { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 360px); gap: clamp(24px, 5vw, 80px); align-items: start; padding: clamp(36px, 5vw, 64px) 0; border-top: 1px solid var(--line); }
+.stage:first-of-type { border-top: 0; padding-top: 0; }
+.stage:last-of-type { padding-bottom: 0; }
+.stage h3 { font-size: clamp(1.6rem, 2.6vw, 2.2rem); line-height: 1.12; font-weight: 700; margin-bottom: 14px; }
+.stage-copy > p { max-width: 38em; }
+.stage-copy > p + p { margin-top: 12px; }
+.stage-copy strong { color: var(--text); }
+.slip { position: relative; background: var(--paper); color: var(--paper-ink); border-radius: 4px; padding: 22px 22px 18px; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5); }
+.slip::before { content: ""; position: absolute; left: 0; right: 0; top: -7px; height: 8px; background: radial-gradient(circle at 6px 0, transparent 5px, var(--paper) 5.5px) 0 0 / 12px 8px repeat-x; }
+.slip-title { font-family: var(--mono); font-weight: 700; font-size: 0.95rem; }
+.slip dl { margin-top: 10px; border-top: 1px dashed var(--paper-line); }
+.slip dl > div { padding: 10px 0; border-bottom: 1px dashed var(--paper-line); }
+.slip dt { font-family: var(--mono); font-size: 0.74rem; line-height: 1.45; color: var(--paper-muted); }
+.slip dd { font-size: 0.95rem; line-height: 1.45; font-weight: 600; }
+.slip p { margin-top: 12px; font-size: 0.82rem; line-height: 1.5; color: var(--paper-muted); }
+.paper-band code, .slip code { color: var(--paper-ink); background: rgba(18, 20, 14, 0.08); }
+.paper-band .limits a { color: var(--paper-ink); text-decoration-color: var(--paper-ink); }
+.paper-note { margin-top: clamp(24px, 3vw, 40px); max-width: 52em; font-size: 0.95rem; color: #33372c; }
+
+/* ── Tabs (pages.js) and numbered how-to steps ───────────────────────── */
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+.tab { min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line-strong); font-size: 0.95rem; color: var(--body); }
+.tab:hover { border-color: var(--accent); color: var(--text); }
+.tab[aria-selected="true"] { background: var(--text); border-color: var(--text); color: var(--bg); font-weight: 600; }
+.tab-panel + .tab-panel { margin-top: clamp(40px, 5vw, 64px); }
+.tab-panel > h3 { margin-bottom: 18px; }
+/* With the tabs showing, each panel's heading repeats its tab: keep it for screen readers only. */
+.tabs:not([hidden]) ~ .tab-panel > h3 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.tabs:not([hidden]) ~ .tab-panel + .tab-panel { margin-top: 0; }
+.tab-panel > p { max-width: 46em; margin-top: 14px; }
+.tab-panel .cmd { margin-top: 14px; max-width: 60em; }
+.cmd .c { color: var(--muted); }
+.how { counter-reset: how; display: grid; gap: 18px; max-width: 46em; }
+.how > li { counter-increment: how; position: relative; padding-left: 48px; min-height: 32px; }
+.how > li::before { content: counter(how); position: absolute; left: 0; top: 0; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line-strong); font-family: var(--mono); font-size: 0.85rem; color: var(--text); }
+.how strong { color: var(--text); }
+.shots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(20px, 3vw, 40px); margin-top: clamp(28px, 4vw, 48px); }
+.shots .shot { margin-top: 0; }
+
+/* ── Disclosure: a native details element, styled like the home FAQ ──── */
+.qa { border-top: 1px solid var(--line); }
+.qa:last-of-type { border-bottom: 1px solid var(--line); }
+.qa summary { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px 0; cursor: pointer; list-style: none; font-size: 1.1rem; font-weight: 600; color: var(--text); }
+.qa summary::-webkit-details-marker { display: none; }
+.qa summary::after { content: "+"; flex: none; font-family: var(--mono); font-size: 1.3rem; font-weight: 400; color: var(--accent); transition: transform 0.2s ease; }
+.qa[open] summary::after { transform: rotate(45deg); }
+.qa summary:hover { color: var(--accent); }
+.qa p { max-width: 44em; padding-bottom: 14px; }
+.qa p:last-child { padding-bottom: 22px; }
+
+/* ── Plain lists, cards, numbers and the maturity scale ──────────────── */
+.dots { display: grid; gap: 10px; }
+.dots > li { position: relative; padding-left: 20px; }
+.dots > li::before { content: ""; position: absolute; left: 2px; top: 0.68em; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: clamp(20px, 3vw, 40px); }
+.cards > * { display: flex; flex-direction: column; gap: 10px; padding-top: 20px; border-top: 2px solid var(--line-strong); }
+.cards strong { color: var(--text); }
+.cards-split { margin-top: clamp(40px, 5vw, 64px); }
+.cards-split p + p { margin-top: 0; }
+.result-list { max-width: 52em; gap: 18px; }
+.result-list strong { color: var(--text); }
+.faq-wrap .qa:first-child { border-top: 1px solid var(--line); }
+.paths article strong { color: var(--text); }
+.band-head + .band-sub, .cards + .band-sub, .scale + .band-sub { margin-top: clamp(40px, 5vw, 64px); }
+.band-sub { font-size: 1.3rem; margin-bottom: 20px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0; margin-top: clamp(32px, 4vw, 56px); border-top: 1px solid var(--line); }
+.stat { padding: 18px 16px 0 0; }
+.stat b { display: block; font-size: 2rem; line-height: 1.1; color: var(--text); font-weight: 700; }
+.stat span { font-size: 0.9rem; color: var(--muted); }
+.scale { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.scale li { padding: 14px 12px; border: 1px solid var(--line-strong); border-radius: 10px; font-size: 0.92rem; }
+.scale b { display: block; font-family: var(--mono); font-size: 1.2rem; color: var(--text); }
+
+/* ── Long-form text (the accessibility statement) ────────────────────── */
+.prose { max-width: 46em; }
+.prose h2 { font-size: clamp(1.4rem, 2.2vw, 1.8rem); line-height: 1.2; margin: clamp(36px, 4vw, 56px) 0 16px; }
+.prose p + p { margin-top: 12px; }
+.prose .dots + p { margin-top: 16px; }
+
+/* ── Page not found ──────────────────────────────────────────────────── */
+.nf { min-height: 76vh; display: grid; align-content: center; }
+.nf h1 { margin: 10px 0 18px; }
+.nf .cta-row { margin-top: 30px; }
+
+@media (max-width: 1020px) {
+  .hero-split, .stage, .shots { grid-template-columns: minmax(0, 1fr); }
+  .slip { max-width: 420px; margin-top: 8px; }
+}
+@media (max-width: 640px) {
+  .scale { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tab { flex: 1 1 100%; }
+  .how > li { padding-left: 44px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qa summary::after { transition: none; }
+}
