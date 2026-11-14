@@ -114,5 +114,5 @@ try {
 
 Write-Host ""
 Write-Host "AMC $AmcReleaseVersion installed from a verified GitHub release." -ForegroundColor Green
-Write-Host "Run: amc --version; amc doctor"
+Write-Host "Next step: type amc   (to check this machine first: amc --version; amc doctor)"
 Write-Host "Docs: https://agentmaturity.co/docs/"

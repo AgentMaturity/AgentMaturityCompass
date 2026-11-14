@@ -49,7 +49,7 @@ describe.skipIf(!nonRootPosix)("archive installer without root (LIVE-DEPLOY-05, 
     expect(existsSync(log)).toBe(false);
   });
 
-  it("installs into AMC_INSTALL_PREFIX and prints the PATH line before the Run line", () => {
+  it("installs into AMC_INSTALL_PREFIX and prints the PATH line before the next step", () => {
     const { dir, bin, log } = sandbox();
     const prefix = join(dir, "user-prefix");
     const result = run(archiveInstaller(dir), bin, { AMC_INSTALL_PREFIX: prefix });
@@ -57,7 +57,7 @@ describe.skipIf(!nonRootPosix)("archive installer without root (LIVE-DEPLOY-05, 
     expect(readFileSync(log, "utf8")).toContain(`install -g --prefix ${prefix}`);
     const pathLine = `export PATH="${prefix}/bin:$PATH"`;
     expect(result.stdout).toContain(pathLine);
-    expect(result.stdout.indexOf(pathLine)).toBeLessThan(result.stdout.indexOf("Run: amc --version"));
+    expect(result.stdout.indexOf(pathLine)).toBeLessThan(result.stdout.indexOf("Next step: type amc"));
   });
 });
 

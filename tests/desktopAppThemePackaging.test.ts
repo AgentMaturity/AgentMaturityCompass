@@ -24,8 +24,11 @@ describe("desktop app packaging and visual identity", () => {
     expect(script).toContain("WebKit/WebKit.h");
     expect(script).toContain("WKWebView");
     expect(script).toContain("native-webkit");
-    expect(script).toContain("[task terminationStatus] != 0");
-    expect(script).toContain("Could not start AMC Studio. See the launcher log");
+    // The app shows the launcher's own reason (AMC_ERROR) with Retry and Show Logs, not a fixed "not ready yet".
+    expect(script).toContain("int status = task.terminationStatus;");
+    expect(script).toContain("if (status != 0 || url == nil)");
+    expect(script).toContain('out[@"AMC_ERROR"] ?: [NSString stringWithFormat:@"AMC could not start. Details are in %@.", [self logPath]]');
+    expect(script).not.toContain("AMC Studio is not ready yet");
     expect(script).toContain("/opt/homebrew/bin:/usr/local/bin");
     expect(script).toContain("PACKAGE_DIGEST");
     expect(script).toContain("PACKAGE_SHA256");
@@ -41,7 +44,8 @@ describe("desktop app packaging and visual identity", () => {
     expect(script).toContain("studio-workspace");
     expect(script).toContain('cd "$WORKSPACE_DIR"');
     expect(script).toContain("Set-Location $WorkspaceDir");
-    expect(script).toContain('"$AMC_BIN" up --demo');
+    expect(script).toContain('"$AMC_BIN" up --no-open "$@"');
+    expect(script).toContain('start_studio "$DEMO_DIR" --demo');
     expect(script).toContain("& $AmcBin up --demo");
     expect(script).toContain("Could not start AMC Studio. See $LogFile.");
     expect(script).not.toContain('up --demo --no-open >>"$LOG_FILE" 2>&1 || true');
@@ -52,9 +56,9 @@ describe("desktop app packaging and visual identity", () => {
     expect(script).not.toContain("Start-Process \"http://127.0.0.1:3212/w/demo/console/\"");
     expect(script).toContain("Start-Process \"http://127.0.0.1:$StudioPort/w/demo/console/\"");
     expect(script).toContain("(Get-Content -LiteralPath $StateFile -Raw | ConvertFrom-Json).apiPort");
-    expect(script).toContain('[task setStandardOutput:pipe];');
-    expect(script).toContain('[line hasPrefix:@"AMC_STUDIO_URL=http://127.0.0.1:"]');
-    expect(script).toContain('[candidate hasSuffix:@"/w/demo/console/"]');
+    expect(script).toContain("task.standardOutput = pipe;");
+    // Only a loopback console URL the launcher printed is loaded.
+    expect(script).toContain('@"http://127[.]0[.]0[.]1:[0-9]{1,5}/(w/demo/)?console/"');
     expect(script).toContain("sed -n 's/^AMC_STUDIO_URL=//p'");
     expect(script).toContain("appLaunchers");
   });
@@ -88,7 +92,12 @@ describe("desktop app packaging and visual identity", () => {
     for (const item of ["terminate:", "undo:", "redo:", "cut:", "copy:", "paste:", "selectAll:"]) {
       expect(script).toContain(`@selector(${item})`);
     }
-    expect(script).toContain("[application setMainMenu:mainMenu];");
+    expect(script).toContain("[NSApp setMainMenu:mainMenu];");
+    for (const item of ["reload:", "openInBrowser:", "switchWorkspace:", "stopStudio:", "showLogs:", "showAbout:"]) {
+      expect(script).toContain(`@selector(${item})`);
+    }
+    expect(script).toContain('[self addItem:@"Reload" action:@selector(reload:) key:@"r" to:studioMenu];');
+    expect(script).toContain("- (NSApplicationTerminateReply)applicationShouldTerminate:");
     expect(script).toContain("${appLaunchers.length > 0 ? `The Studio launcher uses the archive's exact package digest");
   });
 
