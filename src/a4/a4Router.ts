@@ -531,6 +531,15 @@ const flatSpec = (value: unknown, prefix = ""): Record<string, string> => value 
   ? { [prefix || "."]: canonicalize(value ?? null) }
   : Object.fromEntries(Object.entries(value as Record<string, unknown>).flatMap(([key, child]) => Object.entries(flatSpec(child, `${prefix}${prefix ? "." : ""}${key}`))));
 
+/** Whether the project is governed as regulated; an unverified approval policy reads regulated (fail closed). */
+function regulatedOrClosed(workspace: string, state: A4ReadinessState): boolean {
+  try {
+    return isRegulated(state, signedA4Floor(workspace));
+  } catch {
+    return true;
+  }
+}
+
 /** Project-scoped GETs. Returns false when none matches. */
 function projectRead(route: A4Route, projectId: string, rest: string): boolean {
   const { store, params } = route;
@@ -544,7 +553,8 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
     const readiness = readinessAt(headStage(state.project));
     const revision = state.revisions.find((row) => row.revision_no === state.project.revision_no) ?? null;
     apiSuccess(route.res, { ...projectView(state.project, state.members, { status: readiness.status, bindingDigest: readiness.bindingDigest }),
-      practice: openedAsPractice(state.chain), selfApprovalAllowed: readiness.selfApprovalAllowed, revision: revision && { revisionNo: revision.revision_no, stage: revision.stage, parentRevisionNo: revision.parent_revision_no,
+      practice: openedAsPractice(state.chain), practiceActive: state.practice === true, regulated: regulatedOrClosed(route.workspace, state),
+      selfApprovalAllowed: readiness.selfApprovalAllowed, revision: revision && { revisionNo: revision.revision_no, stage: revision.stage, parentRevisionNo: revision.parent_revision_no,
         specDigest: revision.spec_digest, resourceDigestsSha256: revision.resource_digests_sha256, createdByKey: revision.created_by_key, ts: revision.ts },
       gates: readiness.gates, claim: readiness.claim });
     return true;
@@ -653,13 +663,7 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
   if (rest === "/value") {
     // Reads only: the value report ran once, at Review; GET never runs it and never appends a value event (C-30).
     assertQuery(params, []);
-    let regulated = true;
-    try {
-      regulated = isRegulated(state, signedA4Floor(route.workspace));
-    } catch {
-      // An unverified approval policy reads regulated (fail closed).
-    }
-    apiSuccess(route.res, valueView(store, state, regulated, now));
+    apiSuccess(route.res, valueView(store, state, regulatedOrClosed(route.workspace, state), now));
     return true;
   }
   if (rest === "/monitor") {

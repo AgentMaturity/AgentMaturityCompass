@@ -4,7 +4,7 @@
  * work (recorded and shown as self-approved) and never loosens a regulated project; inviting a second person is one call.
  */
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { addUser, authenticateUser } from "../../src/auth/authApi.js";
+import { addUser, authenticateUser, revokeUser } from "../../src/auth/authApi.js";
 import { cleanupGovernanceFixtures } from "../governor/governanceFixture.js";
 import { a4, A4Project, a4Workspace, aspireAnswers, refusal, requestId } from "./a4Harness.js";
 
@@ -14,6 +14,13 @@ afterEach(() => cleanupGovernanceFixtures());
 const HIGH = aspireAnswers({ riskTier: "high", governance: "regulated" });
 const create = (workspace: string, who: { userId: string }, body: Record<string, unknown> = {}) =>
   a4(workspace, who, "POST", "/api/v1/a4/projects", { clientRequestId: requestId(), name: "Pack start", expertise: "novice", ...body });
+
+/** A regulated project with nobody else on it: the gate request itself waits on separation of duties. */
+async function soloRefusal(p: A4Project, owner: { userId: string }): Promise<[number, string | undefined]> {
+  const reply = await p.post(owner, "/stages/aspire/gates/direction/request");
+  expect(reply.body.error).toContain("sod.self_provisioned");
+  return refusal(reply);
+}
 
 describe("a person alone and a project that names a high risk tier", () => {
   test("a normal project stops at the first approval, and creation said a second person is needed", async () => {
@@ -26,8 +33,7 @@ describe("a person alone and a project that names a high risk tier", () => {
     const p = new A4Project(workspace, created.body.data!.projectId as string, owner);
     p.head = created.body.data!.seq as number;
     await p.proposeAspire(HIGH);
-    const gate = await p.openGate(owner);
-    expect(refusal(await p.decide(owner, gate))).toEqual([400, "SOD_VIOLATION"]);
+    expect(await soloRefusal(p, owner)).toEqual([409, "A4_NOT_READY"]);
   });
 
   test("a practice project: the one user approves, recorded and shown as self-approved, and the project says it is practice", async () => {
@@ -53,10 +59,23 @@ describe("a person alone and a project that names a high risk tier", () => {
     p.head = created.body.data!.seq as number;
     await p.proposeAspire(HIGH);
     addUser({ workspace, username: "second", roles: ["APPROVER"], password: "practice-second-password" });
-    const gate = await p.openGate(owner);
-    const refused = await p.decide(owner, gate);
-    expect(refusal(refused)).toEqual([400, "SOD_VIOLATION"]);
-    expect((await p.get(owner)).body.data).toMatchObject({ practice: true, selfApprovalAllowed: false });
+    expect(await soloRefusal(p, owner)).toEqual([409, "A4_NOT_READY"]);
+    expect((await p.get(owner)).body.data).toMatchObject({ practice: true, practiceActive: false, regulated: true, selfApprovalAllowed: false });
+  });
+
+  test("a second person who joined and was turned off again, with no A4 write between, still ends practice", async () => {
+    const { workspace, owner } = a4Workspace({ solo: true });
+    const created = await create(workspace, owner, { practice: true });
+    const p = new A4Project(workspace, created.body.data!.projectId as string, owner);
+    p.head = created.body.data!.seq as number;
+    await p.proposeAspire(HIGH);
+    expect((await p.get(owner)).body.data).toMatchObject({ practice: true, practiceActive: true, regulated: false, selfApprovalAllowed: true });
+    addUser({ workspace, username: "second", roles: ["APPROVER"], password: "practice-second-password" });
+    // Read before any transition records the second person: regulated at once.
+    expect((await p.get(owner)).body.data).toMatchObject({ practice: true, practiceActive: false, regulated: true, selfApprovalAllowed: false });
+    revokeUser({ workspace, username: "second" });
+    expect((await p.get(owner)).body.data).toMatchObject({ practiceActive: false, regulated: true, selfApprovalAllowed: false });
+    expect(await soloRefusal(p, owner)).toEqual([409, "A4_NOT_READY"]);
   });
 
   test("a workspace with more than one person is refused a practice project, in words", async () => {

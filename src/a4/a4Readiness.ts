@@ -20,7 +20,7 @@ import { canonicalize } from "../utils/json.js";
 import { A4_STEPS } from "../contracts/v1/a4Project.js";
 import type { A4ResolvedRef } from "./a4Evidence.js";
 import {
-  A4_BOUND_ITEMS, A4_STAGES, deriveSelfApprovalAllowed, storedBoundItems, gatePolicyFloorViolations, gatePolicyOf, gateSupersededBy, practiceNow, ratchetedFromChain, type A4_BLOCKER_KINDS,
+  A4_BOUND_ITEMS, A4_STAGES, deriveSelfApprovalAllowed, storedBoundItems, gatePolicyFloorViolations, gatePolicyOf, gateSupersededBy, ratchetedFromChain, type A4_BLOCKER_KINDS,
   type A4ChainLink, type A4GatePolicyV1, type A4Member, type A4Principal, type A4ProjectRow, type A4ReadinessV1, type A4Stage, type A4Step,
   type a4DecisionRowSchema, type a4EffectRowSchema, type a4GateRowSchema, type a4ReadinessItemSchema, type a4RevisionRowSchema
 } from "./a4Schema.js";
@@ -90,6 +90,8 @@ export interface A4ReadinessState {
   /** Every chain-named ref, resolved at load: tier recomputed, lane re-derived (src/a4/a4Evidence.ts). */
   readonly refs: readonly (A4ResolvedRef & { readonly revisionNo: number })[];
   readonly effects: readonly A4EffectRow[];
+  /** a4Schema.practiceNow and the live population still one person (a4Identity.onePersonSince); absent reads false. */
+  readonly practice?: boolean;
 }
 /** Live facts the caller gathered (a4Gates.collectFacts); null = could not be read. */
 export interface A4LiveFacts {
@@ -279,7 +281,7 @@ const ACTIVATE_PLAN_EFFECT = "a4.adapt.activate_plan";
 export function isRegulated(state: A4ReadinessState, floor: ApprovalA4Floor): boolean {
   if (floor.regulated === true) return true;
   const tier = riskTierOf(state);
-  if (tier !== "low" && tier !== "med" && tier !== "medium" && !practiceNow(state.chain)) return true; // a practice project: a4Schema.practiceNow
+  if (tier !== "low" && tier !== "med" && tier !== "medium" && state.practice !== true) return true; // a practice project, still one person: a4Gates.stateOf
   const brief = latestRevision(state, "aspire");
   const prior = brief ? (parseJson(brief.spec_json) as { brief?: { priorRiskTier?: unknown } } | null)?.brief?.priorRiskTier : undefined;
   if (prior !== undefined && prior !== null && (typeof prior !== "string" || (TIER_RANK[prior] ?? 2) > (TIER_RANK[tier ?? ""] ?? 2))) return true;
