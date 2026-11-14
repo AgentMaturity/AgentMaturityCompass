@@ -83,8 +83,15 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then(async (keys) => {
-      await Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)));
+      const stale = keys.filter((key) => key !== CACHE_NAME);
+      await Promise.all(stale.map((key) => caches.delete(key)));
       await self.clients.claim();
+      // An older worker answered the pages already open from its own cache (the 1.0 worker was cache-first), so they
+      // run old scripts against this server and stay on "Authentication required". Reload them once, under this worker.
+      if (stale.length > 0) {
+        const windows = await self.clients.matchAll({ type: "window" });
+        await Promise.all(windows.map((client) => client.navigate(client.url).catch(() => undefined)));
+      }
     })
   );
 });
