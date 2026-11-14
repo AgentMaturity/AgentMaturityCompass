@@ -18,7 +18,7 @@ import { InvalidArgumentError, Option, type Command } from "commander";
 import { A4_API_PREFIX, serveA4, unboundClaim } from "./a4/a4Router.js";
 import { verifyTrackedSessionToken } from "./auth/authApi.js";
 import { pendingExecutors } from "./a4/a4Gates.js";
-import { NOT_READY_WORDS } from "./a4/a4Words.js";
+import { notReadyWords } from "./a4/a4Words.js";
 import { resolveA4LoginPrincipal } from "./a4/a4Identity.js";
 import { A4_PROJECT_ROLES, A4_STAGES, A4_STEPS, a4PreviewEnabled, type A4Principal } from "./a4/a4Schema.js";
 import { A4StoreError, readOnlyNow } from "./a4/a4Store.js";
@@ -283,7 +283,7 @@ function printOpenItems(readiness: Data): void {
   const open = items.filter((item) => item.mandatory && item.status !== "READY" && item.status !== "COMPLETE");
   // In words first (what it means and what to do), then the item id, its status and its reason codes for reference.
   for (const item of open.slice(0, TEXT_ROWS)) {
-    const words = item.reasonCodes.includes("OWNER_ACKNOWLEDGED") ? "Acknowledged by a project owner; it stays listed." : NOT_READY_WORDS[item.id] ?? item.nextAction?.label;
+    const words = item.reasonCodes.includes("OWNER_ACKNOWLEDGED") ? "Acknowledged by a project owner; it stays listed." : notReadyWords(item) ?? item.nextAction?.label;
     console.log(`- ${words ? `${safe(words)} ` : ""}[${item.id}: ${item.status.toLowerCase()}${item.reasonCodes.length > 0 ? `; ${item.reasonCodes.join(", ")}` : ""}]`);
   }
   if (open.length > TEXT_ROWS) console.log(`… ${open.length - TEXT_ROWS} more (--json prints them all)`);

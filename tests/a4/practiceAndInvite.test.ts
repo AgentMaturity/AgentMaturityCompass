@@ -6,6 +6,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { addUser, authenticateUser, revokeUser } from "../../src/auth/authApi.js";
 import { cleanupGovernanceFixtures } from "../governor/governanceFixture.js";
+import { notReadyWords } from "../../src/a4/a4Words.js";
 import { a4, A4Project, a4Workspace, aspireAnswers, refusal, requestId } from "./a4Harness.js";
 
 vi.setConfig({ testTimeout: 60_000 });
@@ -34,6 +35,10 @@ describe("a person alone and a project that names a high risk tier", () => {
     p.head = created.body.data!.seq as number;
     await p.proposeAspire(HIGH);
     expect(await soloRefusal(p, owner)).toEqual([409, "A4_NOT_READY"]);
+    // Alone, an acknowledgement would only lead to a second refusal: the words name the way out instead.
+    const words = (await p.post(owner, "/stages/aspire/gates/direction/request")).body.error as string;
+    expect(words).toContain("Nobody else on this project can approve it");
+    expect(words).not.toContain("acknowledges this once");
   });
 
   test("a practice project: the one user approves, recorded and shown as self-approved, and the project says it is practice", async () => {
@@ -139,4 +144,11 @@ describe("the start form says which kind of project needs a second person", () =
     expect(refused).toContain("3 people can sign in to this workspace.");
     expect(view.practiceBanner({ practice: true, practiceActive: false })).toContain("This was a practice project");
   });
+});
+
+test("the separation-of-duties words keep the acknowledgement when someone else can approve", () => {
+  const sod = { id: "sod.self_provisioned", reasonCodes: ["SOD_DEGRADED_SELF_PROVISIONED", "REVIEW_NOT_INDEPENDENT"] };
+  expect(notReadyWords({ ...sod, reasonCodes: [...sod.reasonCodes, "NO_SECOND_APPROVER"] })).toContain("Invite someone new");
+  expect(notReadyWords(sod)).toContain("acknowledges this once");
+  expect(notReadyWords({ id: "hold.none", reasonCodes: ["NO_SECOND_APPROVER"] })).toContain("on hold");
 });

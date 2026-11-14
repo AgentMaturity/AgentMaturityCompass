@@ -265,4 +265,12 @@ describe("starting an agent project from an Industry Pack (2026-11-14)", () => {
     expect(m.also).toBe("#a4Missing");
     expect(start.renderStartHere(ctx({ project: project({ step: "proposed" }) }, { items: [item("sod.self_provisioned")], allowed: { requestGate: { reasonCodes: ["sod.self_provisioned"] } } }) as never)).toContain('data-a4-also="#a4Missing"');
   });
+
+  test("alone on a regulated project the guide names inviting a second person, not an acknowledgement that cannot help", () => {
+    const alone = item("sod.self_provisioned", { reasonCodes: ["SOD_DEGRADED_SELF_PROVISIONED", "REVIEW_NOT_INDEPENDENT", "NO_SECOND_APPROVER"] });
+    const m = move(ctx({ project: project({ step: "proposed" }) }, { items: [alone], allowed: { requestGate: { reasonCodes: ["sod.self_provisioned"] } } })) as { now: string; act?: { focus?: string } };
+    expect(m.now).toContain("Nobody else on this project can approve it");
+    expect(m.now).not.toContain("acknowledges");
+    expect(m.act?.focus).toBe(".a4-invite input");
+  });
 });

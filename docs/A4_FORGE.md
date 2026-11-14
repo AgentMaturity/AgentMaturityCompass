@@ -235,6 +235,8 @@ files read unsigned until that verifier admits the pinned notary.
   (`<n>` is the head seq `amc a4 guide` prints). Readiness says so: `members.candidates` reads WAITING with
   `NO_SECOND_APPROVER` while fewer than two people may decide (members with the `approver` or `owner` role and active
   local workspace OWNERs, counted as for `sod` below), except in a single-user workspace, where self-approval counts.
+  On a regulated project a WAITING `sod.self_provisioned` carries the same code in that case, and AMC then tells the
+  person to invite a second person (or start a practice project), since an acknowledgement alone cannot get them past it.
 - **How many people a walk needs.** Each gate's action class decides its quorum under the signed workspace approval
   policy (`amc policy approval init` signs the default). With the default policy:
 

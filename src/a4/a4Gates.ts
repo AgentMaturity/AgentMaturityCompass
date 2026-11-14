@@ -44,7 +44,7 @@ import {
   a4RevisionRowSchema, flatSlots, gatePolicyDigestOf, gatePolicyOf, mapRiskTier, practiceNow, type A4ChainLink, type A4GatePolicyV1, type A4IntentV1, type A4Principal, type A4ReadinessV1, type A4Stage
 } from "./a4Schema.js";
 import { ledgerBackendGap } from "./a4LedgerBackend.js";
-import { NOT_READY_WORDS } from "./a4Words.js";
+import { notReadyWords } from "./a4Words.js";
 import { A4_RUNTIME, holdIncidentIds, retireGovernedAgent, syncRuntimeLifecycle, tuneStage } from "./a4RuntimeLifecycle.js";
 import { authorsOf, buildersOf, evaluateSod } from "./a4SoD.js";
 import { ensureA4Stages } from "./a4Stages.js";
@@ -312,10 +312,10 @@ export function assertAllowed(readiness: A4ReadinessV1, action: A4Action, ignore
   if (codes.includes("ON_HOLD")) throw fail(409, "A4_ON_HOLD", "The project is on hold; an owner resumes it.", named);
   if (codes.includes("A4_STEP_ORDER")) throw fail(409, "A4_STEP_ORDER", "The project is not at that stage; reload it.", { reasonCodes: codes });
   if (codes.includes("PRINCIPAL_UNRESOLVED")) throw fail(409, "PRINCIPAL_UNRESOLVED", "The active plan requires a principal: an active local users.yaml user runs this effect. Nothing was consumed.", { reasonCodes: codes });
-  // Each item in words with what to do (its own next action, or NOT_READY_WORDS), its id after it; codes without an item
+  // Each item in words with what to do (its own next action, or notReadyWords), its id after it; codes without an item
   // (a gate's own state) are listed as they are.
-  const said = named.items.map((entry) => {
-    const words = NOT_READY_WORDS[entry.id] ?? entry.nextAction?.label;
+  const said = readiness.items.filter((entry) => codes.includes(entry.id)).map((entry) => {
+    const words = notReadyWords(entry) ?? entry.nextAction?.label;
     return words ? `${words} (${entry.id})` : entry.id;
   });
   const rest = codes.filter((code) => !named.items.some((entry) => entry.id === code));

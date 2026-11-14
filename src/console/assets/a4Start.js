@@ -187,6 +187,11 @@ function gateMove(ctx, kind) {
       act: { label: "Write your reason", focus: '.a4-approvals [name="reason"]' } };
   }
   if (status === "DENIED") return { now: "This revision was denied. Change an answer under Ask and save it to start a new revision.", act: { label: "Change an answer", focus: "form[data-a4-answers] textarea" } };
+  // Alone, an acknowledgement only meets a second refusal: the words match amc a4 readiness and Studio's refusal (a4Words).
+  if (codesOf(readiness, "sod.self_provisioned").includes("NO_SECOND_APPROVER") && list(readiness?.allowed?.requestGate?.reasonCodes).includes("sod.self_provisioned")) {
+    return { now: "Nobody else on this project can approve it. Invite a second person on the Members card (Invite someone new), or add someone who can "
+      + "already sign in there. To learn AMC alone, start a practice project instead.", act: { label: "Invite someone", focus: ".a4-invite input" } };
+  }
   const ack = toAcknowledge(readiness);
   if (ack.length) return { now: `Before asking for approval, a project owner acknowledges ${ack.map((item) => item.id).join(", ")}: ${ACK_PLAIN[ack[0].id] ?? ack[0].nextAction?.label ?? "see Missing requirements"}.`,
     why: "Write a short reason in the Approvals card, then press Acknowledge beside the item under Missing requirements (shown below). Acknowledging after the request would cancel it.",
