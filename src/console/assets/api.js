@@ -1,6 +1,7 @@
 // The console's page scripts all import this module, so the shared shell (nav, status, banner) and the focusable-scroll
 // fix reach their pages from here.
 import "./shell.js";
+import { showShellNotice } from "./shell.js";
 import "./focusableScroll.js";
 
 const state = {
@@ -106,14 +107,26 @@ export class ConsoleApiError extends Error {
 }
 
 async function request(path, options) {
-  const response = await fetch(withBase(path), {
-    method: options?.method || "GET",
-    credentials: "include",
-    signal: options?.signal,
-    cache: options?.cache,
-    headers: buildHeaders(options?.headers),
-    body: options?.body ? JSON.stringify(options.body) : undefined
-  });
+  let response;
+  try {
+    response = await fetch(withBase(path), {
+      method: options?.method || "GET",
+      credentials: "include",
+      signal: options?.signal,
+      cache: options?.cache,
+      headers: buildHeaders(options?.headers),
+      body: options?.body ? JSON.stringify(options.body) : undefined
+    });
+  } catch (error) {
+    // No answer at all: AMC stopped or the network is gone. One shared notice says so (C-06); the caller still sees the error.
+    if (error?.name !== "AbortError") showShellNotice("offline");
+    throw error;
+  }
+  // A session that ended mid-visit: one sign-in prompt instead of each page's own error (C-11). /auth/me asks on purpose.
+  if (response.status === 401 && !options?.allowAuthErrors && state.me !== null) {
+    state.me = null;
+    showShellNotice("signedOut");
+  }
   const text = await response.text();
   let parsed;
   try { parsed = text ? JSON.parse(text) : {}; }
@@ -187,11 +200,14 @@ export async function whoami() {
   const result = await request("/auth/me", {
     allowAuthErrors: true
   });
+  const body = typeof document === "undefined" ? null : document.body;
   if (!result.ok) {
     state.me = null;
+    if (body && !getAdminToken()) body.dataset.session = "none";
     return null;
   }
   state.me = result.data;
+  if (body) delete body.dataset.session;
   return state.me;
 }
 

@@ -46,11 +46,17 @@ completes Aspire, Assemble and Adapt and stops at Activate's release approval (s
    ```
 
 3. **Start a project and run Aspire.** Sign in to the Compass Console at the address `amc up` prints. With no
-   project yet, Home shows a card "Build an agent for your industry"; its button opens the A4 page with the start form (a signed-in OWNER or
-   OPERATOR; the API equivalent is `POST /api/v1/a4/projects` with `name` and `expertise`, see
-   [Using the API directly](#using-the-api-directly)). Give the project a name and choose how much detail you want in
-   explanations, or press **Use an example**, which fills a sample project marked `(sample)` in its name so the records
-   show it is sample data. Then press **Start an agent project**.
+   project yet, Home's first card is "Build an agent for your industry": pick your industry, write a project name and press
+   **Start building** (a signed-in OWNER or OPERATOR; the API equivalent is `POST /api/v1/a4/projects` with `name` and
+   `expertise`, see [Using the API directly](#using-the-api-directly)). Once a project exists the card becomes "Continue
+   <project name>" with what it needs next, and **Start another** opens the start form on the **Build an agent** page. There,
+   **More options** holds the existing agent id, how much detail you want in explanations and **Use an example**, which
+   fills a sample project marked `(sample)` in its name so the records show it is sample data.
+
+   The console names the four stages in plain words, with the A4 name beside them: 1 Say what it is for (Aspire), 2 Build
+   it (Assemble), 3 Fit it to your rules (Adapt), 4 Release it (Activate). Each question shows a plain label (for example
+   "Which sector is this agent for?" for `stations`), the question bank's own wording as help, and an example; the stored
+   question ids and wording are unchanged.
 
    **Starting from an Industry Pack.** The start form has an optional **Your industry** list with every Industry Pack,
    grouped by station. Pick the pack closest to what the agent will do (or press **Build an agent with this pack** on a

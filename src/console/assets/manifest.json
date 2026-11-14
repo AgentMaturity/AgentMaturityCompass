@@ -1,6 +1,6 @@
 {
-  "name": "AMC Studio",
-  "short_name": "AMC Studio",
+  "name": "Compass Console",
+  "short_name": "Compass",
   "start_url": "../home",
   "scope": "../",
   "display": "standalone",
