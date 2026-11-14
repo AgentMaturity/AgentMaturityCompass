@@ -32,7 +32,7 @@ export const TRUTH = {
   selfApproved: "Approved by the author; not an independent review",
   experimental: "Experimental regulatory content, drafted by AI; no qualified expert has reviewed it yet",
   recorded: "Recorded: what the operator stated. Checked: what AMC's own probe found",
-  signatures: "Signatures prove who wrote this and that it is unchanged, not that it is true",
+  signatures: "A signature shows who wrote this and that it is unchanged, not that it is true",
   twoUsers: "Two local users are not evidence of two people"
 };
 // LIVE-UX-04: the notice says how to turn the preview back on (D-20 as amended 2026-11-14: on unless AMC_A4_PREVIEW=0).

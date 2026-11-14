@@ -195,7 +195,7 @@ never the agent, and are never a lane, a ref or a claim kind.
 
 ## What each record proves
 
-A signature proves who wrote a record and that it is unchanged since, never that its statement is true.
+A signature shows who wrote a record and that it is unchanged since, never that its statement is true.
 
 | Record | Signed by | Proves |
 | --- | --- | --- |
