@@ -496,10 +496,11 @@ function mountProject(projectId, options) {
   }
 
   function specAction(spec, base) {
+    const changed = view.changedParts(spec, base.spec);
     return { label: "Propose this specification", path: stagePath("propose"), spec, base, clears: ["specification:spec"],
       got: () => { specBase = null; },
       // P1-57 takes no parent for a first revision (a null is refused).
-      body: { spec, ...(base.revisionNo > 0 ? { parentRevisionNo: base.revisionNo } : {}), expectedHeadSeq: base.headSeq, clientRequestId: uuid() } };
+      body: { spec: changed, ...(base.revisionNo > 0 ? { parentRevisionNo: base.revisionNo } : {}), expectedHeadSeq: base.headSeq, clientRequestId: uuid() } };
   }
 
   function parseSpec(text) {

@@ -323,6 +323,14 @@ export function renderConversation(ctx) {
 /** The part of a revision's spec a member edits: Studio carries `answers` itself and refuses a proposal naming them. */
 export const editableSpec = (spec) => Object.fromEntries(Object.entries(isObject(spec) ? spec : {}).filter(([key]) => key !== "answers"));
 
+/**
+ * The top-level parts of `spec` that differ from `base`: what Propose sends. Studio builds the rest from the answers, and
+ * an Adapt specification with its compiled plan is larger than the 256 KiB a request may carry, so echoing the whole
+ * specification back failed every Adapt Propose.
+ */
+export const changedParts = (spec, base) => Object.fromEntries(Object.entries(isObject(spec) ? spec : {})
+  .filter(([key, value]) => JSON.stringify(value) !== JSON.stringify(isObject(base) ? base[key] : undefined)));
+
 export function renderSpecEditor(ctx) {
   const { revision, allowed, project, stage } = ctx;
   if (stage !== project.stage) {
