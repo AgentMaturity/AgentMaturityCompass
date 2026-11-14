@@ -7,7 +7,7 @@
 // offered only while one person can sign in. Start one in an empty folder with its own HOME, for example:
 //   amc up --no-baseline --no-open && amc user init --username owner --password-file <file>
 // then run, from the repository root:
-//   node scripts/brand/capture-site-shots.mjs --base http://127.0.0.1:3210 --user owner --password-file <file> [--out website/img]
+//   npm run capture:site-shots -- --base http://127.0.0.1:3210 --user owner --password-file <file> [--out website/img]
 // It signs in, captures Home's "Build an agent for your industry" card with a pack chosen (a4-start.webp), starts a
 // practice project from it as a person would and captures that project's "What to do now" panel (a4-project.webp), then
 // captures Home with the project under way (console-home.webp). It prints each picture's size: copy those into the
