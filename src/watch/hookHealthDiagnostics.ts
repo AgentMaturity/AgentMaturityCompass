@@ -122,7 +122,8 @@ function repairCommands(
       `amc connect hooks status --provider ${provider}`,
       `amc connect hooks install --provider ${provider} --dry-run`,
     ];
-    if (reasons.has("HOOK_EVIDENCE_UNAVAILABLE")) commands.unshift("amc vault unlock");
+    // CLI-02: `amc vault unlock` lasts only for its own process, so the health check needs the passphrase in its own shell.
+    if (reasons.has("HOOK_EVIDENCE_UNAVAILABLE")) commands.unshift(`AMC_VAULT_PASSPHRASE='<your vault passphrase>' amc connect hooks health --provider ${provider}`);
     return commands;
   }
   return [];

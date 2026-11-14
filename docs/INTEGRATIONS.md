@@ -40,7 +40,7 @@ const client = new OpenAI({
 
 **Zero-key agents:** AMC holds the API key in the vault. Agents never see it. Configure with:
 ```bash
-amc vault unlock
+export AMC_VAULT_PASSPHRASE='<your vault passphrase>'
 amc provider add --agent my-openai-agent
 ```
 

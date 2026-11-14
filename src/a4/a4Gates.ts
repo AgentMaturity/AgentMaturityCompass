@@ -33,7 +33,7 @@ import { memoryRetentionFloor } from "./adaptMemoryPolicy.js";
 import { releaseEntries } from "./a4Transparency.js";
 import { blockingExecutionsIn, engineRequestStatusesIn, unrecordedResolutionsIn } from "./assembleLockout.js";
 import { resolveRefs } from "./a4Evidence.js";
-import { hostSessionsSince, leasePrincipalFacts, liveRolesFor, usersCreatedSince } from "./a4Identity.js";
+import { hostSessionsSince, leasePrincipalFacts, liveRolesFor, onePersonSince, usersCreatedSince } from "./a4Identity.js";
 import { verifyA4Chain } from "./a4Verify.js";
 import {
   acknowledgeable, ACKNOWLEDGEABLE_ITEMS, acknowledgedRecords, ACKNOWLEDGEMENT_TTL_MS, evaluateA4Readiness, gateStatus, isRegulated, pendingReviews, PLAN_ACTIVATION_DEFERRED,
@@ -41,9 +41,10 @@ import {
 } from "./a4Readiness.js";
 import {
   A4_STAGES, DEFAULT_A4_GATE_POLICY, a4DecisionRowSchema, a4EvidenceRefRowSchema, a4GatePolicyV1Schema, a4GateRowSchema, a4IntentV1Schema,
-  a4RevisionRowSchema, flatSlots, gatePolicyDigestOf, gatePolicyOf, mapRiskTier, type A4GatePolicyV1, type A4IntentV1, type A4Principal, type A4ReadinessV1, type A4Stage
+  a4RevisionRowSchema, flatSlots, gatePolicyDigestOf, gatePolicyOf, mapRiskTier, practiceNow, type A4ChainLink, type A4GatePolicyV1, type A4IntentV1, type A4Principal, type A4ReadinessV1, type A4Stage
 } from "./a4Schema.js";
 import { ledgerBackendGap } from "./a4LedgerBackend.js";
+import { notReadyWords } from "./a4Words.js";
 import { A4_RUNTIME, holdIncidentIds, retireGovernedAgent, syncRuntimeLifecycle, tuneStage } from "./a4RuntimeLifecycle.js";
 import { authorsOf, buildersOf, evaluateSod } from "./a4SoD.js";
 import { ensureA4Stages } from "./a4Stages.js";
@@ -140,9 +141,15 @@ function stateOf(store: A4Store, snapshot: ReturnType<A4Store["snapshot"]>, now:
       .map((row) => ({ ...row, spec_json: hydrateSpecJson(store.workspace, snapshot.head.project_id, row) })),
     gates: snapshot.rows.a4_gates.map((row) => a4GateRowSchema.parse(row)),
     decisions: snapshot.rows.a4_decisions.map((row) => a4DecisionRowSchema.parse(row)),
-    refs: resolved.map((ref, index) => ({ ...ref, revisionNo: refRows[index]!.revision_no })), effects: snapshot.effects
+    refs: resolved.map((ref, index) => ({ ...ref, revisionNo: refRows[index]!.revision_no })), effects: snapshot.effects,
+    practice: practiceNow(snapshot.links) && onePersonSince(store.workspace, createdTsOf(snapshot.links))
   };
 }
+/** The signed CREATED record's time; 0 when absent, so every user counts as added since (fail closed). */
+const createdTsOf = (chain: readonly A4ChainLink[]): number => {
+  const ts = chain.find((link) => link.kind === "CREATED")?.body.ts;
+  return typeof ts === "number" ? ts : 0;
+};
 /** A revision's spec as its row stores it: state carries Adapt's plans hydrated, so a text that is not its digest's is compacted back (a4Derived). */
 export function storedSpecOf(row: Pick<A4ReadinessState["revisions"][number], "stage" | "spec_json" | "spec_digest">): Record<string, unknown> {
   const spec = JSON.parse(row.spec_json) as Record<string, unknown>;
@@ -305,10 +312,14 @@ export function assertAllowed(readiness: A4ReadinessV1, action: A4Action, ignore
   if (codes.includes("ON_HOLD")) throw fail(409, "A4_ON_HOLD", "The project is on hold; an owner resumes it.", named);
   if (codes.includes("A4_STEP_ORDER")) throw fail(409, "A4_STEP_ORDER", "The project is not at that stage; reload it.", { reasonCodes: codes });
   if (codes.includes("PRINCIPAL_UNRESOLVED")) throw fail(409, "PRINCIPAL_UNRESOLVED", "The active plan requires a principal: an active local users.yaml user runs this effect. Nothing was consumed.", { reasonCodes: codes });
-  // Each item with its own next action, in words; codes without an item (a gate's own state) are listed as they are.
-  const said = named.items.map((entry) => (entry.nextAction?.label ? `${entry.id} (${entry.nextAction.label})` : entry.id));
+  // Each item in words with what to do (its own next action, or notReadyWords), its id after it; codes without an item
+  // (a gate's own state) are listed as they are.
+  const said = readiness.items.filter((entry) => codes.includes(entry.id)).map((entry) => {
+    const words = notReadyWords(entry) ?? entry.nextAction?.label;
+    return words ? `${words} (${entry.id})` : entry.id;
+  });
   const rest = codes.filter((code) => !named.items.some((entry) => entry.id === code));
-  throw fail(409, "A4_NOT_READY", `Not ready yet: ${[...said, ...rest].join("; ")}.`, named);
+  throw fail(409, "A4_NOT_READY", `Not ready yet. ${[...said, ...rest].join(" ")}`, named);
 }
 
 /**

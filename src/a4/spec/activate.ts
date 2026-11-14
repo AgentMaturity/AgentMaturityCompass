@@ -263,6 +263,11 @@ function packageInputsItem(state: A4ReadinessState, spec: Record<string, unknown
  * v1 is a same-host restart (D-18): the overlay restarts the hosted Studio that built the agent, so a release needs this
  * Studio to run under the chosen target (as Understand found it). Anything else has no v1 deployment path (P2-40).
  */
+/** How a laptop user reaches a Studio that can record a deployment, with the steps deploy/compose/README.md gives. */
+export const COMPOSE_STEPS = "To release and deploy, run AMC under Docker Compose and create the project there: in the AMC source folder, "
+  + "`cd deploy/compose`, `cp .env.example .env`, create the secret files its README lists under `deploy/compose/secrets/`, then "
+  + "`docker compose up -d --build` and open http://localhost:3212/console. A project built here does not move there by itself.";
+
 function sameHostItem(facts: Record<string, unknown> | null, target: string | null): A4ReadinessItem {
   const hosting = (facts?.hosting ?? null) as { kind?: unknown; signal?: unknown } | null;
   if (hosting === null) return waiting("deployment.same_host", ["PRODUCED_AT_UNDERSTAND"]);
@@ -270,10 +275,9 @@ function sameHostItem(facts: Record<string, unknown> | null, target: string | nu
   if (hosting.kind === target) return item("deployment.same_host", "READY", { reasonCodes: ["SAME_HOST_RESTART", `HOSTED:${target}`] });
   return item("deployment.same_host", "BLOCKED", { kind: "unsupported_integration", reasonCodes: ["DEPLOYMENT_NOT_SAME_HOST", "KEY:P2-40",
     `HOSTED:${typeof hosting.kind === "string" ? hosting.kind : "none"}`, `TARGET:${target}`],
-  nextAction: { label: "This is where the A4 preview stops today on this Studio. v1 deploys only by restarting the Compose or Helm-hosted Studio that "
-    + "built this agent, and this Studio is not hosted under that target, so no release can be requested here. What you have: the signed records of "
-    + "Aspire, Assemble and Adapt, and your Activate answers. To go on, run this workspace's Studio under the chosen target (Compose or Helm); "
-    + "installing a package into another workspace is P2-40." } });
+  nextAction: { label: "This AMC cannot release this agent: AMC deploys an agent only by restarting the AMC that built it, and that AMC must run "
+    + `under the target you chose (${target === "helm" ? "Helm" : "Docker Compose"}). This one does not. You keep the signed records of the first three `
+    + `steps and your answers here. ${target === "helm" ? "To go on, run this workspace's AMC under Helm and continue there." : COMPOSE_STEPS}` } });
 }
 
 /**

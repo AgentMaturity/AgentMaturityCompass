@@ -3292,6 +3292,8 @@ export interface DiagnosticReport {
     selfReported: number;
   };
   evidenceReadiness?: DiagnosticEvidenceReadiness;
+  /** Non-audit rows this agent recorded in the window, scored or not; absent in reports written before it. */
+  recordedActivity?: { events: number; sessions: number };
   /** Import bookkeeping is not a maturity evaluation or verified source evidence. */
   importProvenance?: {
     evaluationPerformed: false;

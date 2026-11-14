@@ -164,8 +164,10 @@ function card(title, body) {
 }
 
 /**
- * Home's one hero card: what AMC does in one sentence, one primary action (a task in Native Tasks, with a sample prompt),
- * "Connect my agent" revealing the connection command, and a text link for scoring records already held.
+ * Home's second card, under "Build an agent for your industry" (a4.js fills that one): two quieter ways in. "Watch an agent I
+ * already use" reveals the connection command; "Try a sample task" opens Native Tasks with a sample prompt. A text link
+ * scores records already held. When the build card is absent (demo, preview off, no create role) styles.css makes the
+ * sample task the page's primary action.
  */
 function firstUseCard(agentId, demoMode) {
   // This is a POSIX terminal handoff, never a browser execution request.
@@ -178,14 +180,17 @@ function firstUseCard(agentId, demoMode) {
     : '<p class="first-use-score"><a href="#activationSteps" id="firstUseBaselineContinue">I already have records: score them</a></p>';
   return `
     <section id="firstUse" class="card first-use" aria-labelledby="firstUseTitle">
-      <h2 id="firstUseTitle">See what your AI agent really does.</h2>
-      <p class="first-use-lead">AMC records every action your agent takes and turns that record into a trust score and a short list of gaps to fix.</p>
+      <h2 id="firstUseTitle">See what an AI agent really does</h2>
+      <p class="first-use-lead">AMC records every action an agent takes and turns that record into a trust score and a short list of gaps to fix.</p>
       <div class="first-use-actions">
         <div>
-          <a class="button" id="firstUsePrimary" href="${htmlEscape(primaryActionHref(agentId))}">${primaryActionLabel(demoMode)}</a>
+          <button type="button" id="firstUseConnectButton" class="secondary" data-first-intent="firstUseConnect" aria-controls="firstUseConnect" aria-expanded="false">Watch an agent I already use</button>
+          <p class="muted first-use-sub">For Claude Code, Codex or your own agent. You run one command in a terminal.</p>
+        </div>
+        <div>
+          <a class="button secondary" id="firstUsePrimary" href="${htmlEscape(primaryActionHref(agentId))}">${demoMode ? primaryActionLabel(true) : "Try a sample task"}</a>
           <p class="muted first-use-sub">No setup. Runs on this computer with no model or tools.</p>
         </div>
-        <button type="button" id="firstUseConnectButton" class="secondary" data-first-intent="firstUseConnect" aria-controls="firstUseConnect" aria-expanded="false">Connect my agent</button>
       </div>
       ${scoreRecords}
       <div id="firstUseConnect" class="first-use-panel" hidden>
@@ -1352,7 +1357,7 @@ function renderAuthScreen() {
         password,
         pairingCode: pairingCode.trim() || undefined
       });
-      setStatus("Login successful.");
+      setStatus("Signed in.");
       await afterSignIn();
     } catch (error) {
       setStatus(loginFailureText(errText(error)), true);
@@ -2460,7 +2465,8 @@ async function renderIndustryPacks() {
     onAction(button, "click", async () => {
       const id = button.getAttribute("data-industry-pack");
       try {
-        detail.innerHTML = industryPackDetailHtml((await apiGet(`/industry-packs/${encodeURIComponent(id)}`)).pack);
+        const loaded = await apiGet(`/industry-packs/${encodeURIComponent(id)}`);
+        detail.innerHTML = industryPackDetailHtml(loaded.pack, loaded.savedResponses);
         bindIndustryPackDetail(detail, button);
       } catch (error) {
         detail.innerHTML = `<p class="status-bad">${htmlEscape(errText(error))}</p>`;
@@ -3814,7 +3820,14 @@ async function renderPage() {
 
   try {
     if (page === "home") return await renderHome();
-    if (page === "native-tasks") return await renderNativeTasksPage({ root, initialAgent: currentAgent() });
+    if (page === "native-tasks") {
+      // Opened from an agent project's build session (?project=): a way back to it.
+      const project = new URLSearchParams(location.search).get("project");
+      if (/^a4p_[0-9a-f]{32}$/.test(project ?? "") && !document.getElementById("a4BackLink")) {
+        root.insertAdjacentHTML("beforebegin", `<p id="a4BackLink"><a class="button secondary" href="./a4Project?project=${project}&amp;stage=assemble">Back to the agent project</a></p>`);
+      }
+      return await renderNativeTasksPage({ root, initialAgent: currentAgent() });
+    }
     if (page === "agent") return await renderAgent();
     if (page === "evidence") return await renderEvidence();
     if (page === "runtime") return await renderRuntimeRuns();

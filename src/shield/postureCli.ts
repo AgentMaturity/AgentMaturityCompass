@@ -23,6 +23,11 @@ export function runPostureCli(params: { dir?: string; now: number; json?: boolea
   console.log(chalk.bold.cyan("\n🛡️  Agent Security Posture"));
   printClaimResult(claim, params);
   console.log(chalk.gray("Path:"), root);
+  if (card.overallLevel === null) {
+    console.log(chalk.yellow("Nothing to assess: no agent or MCP configuration was found here, so there is no level or score."));
+    console.log(chalk.gray("Next: run this in the folder your agent works in, or pass that folder as the argument."));
+    return;
+  }
   console.log(chalk.gray("Overall:"), chalk.hex(levelColors[card.overallLevel] ?? "#555").bold(`${card.overallLevel} (${card.overallScore}/100)`),
     chalk.gray("| Verdict:"), chalk.hex(verdictColors[card.verdict] ?? "#555").bold(card.verdict));
   console.log("");

@@ -38,3 +38,26 @@
 /* One primary action per screen: on a project page every other action button takes the secondary look. */
 body[data-page="a4Project"] #app button:not(.a4-primary):not(.danger) { background: rgba(255,255,255,.035); border: 1px solid var(--border-strong); color: var(--ink); }
 @media (max-width: 640px) { .a4-stepper { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* The start page (2026-11-14): the four steps in human words with the A4 name small; "More options" and the terminal
+   commands folded; the approver notice above the form. */
+.a4-stepper-intro li { display: flex; flex-direction: column; gap: 2px; }
+.a4-stepper-intro small, .a4-stepper small { display: block; font-size: .8rem; }
+.a4-intro h2 { margin-top: 0; }
+.a4-approver-note { border-top: 1px solid var(--border); margin-top: 12px; padding-top: 12px; }
+.a4-approver-note .row { margin: 8px 0; }
+.a4-add-person { max-width: 520px; margin: 8px 0; }
+.a4-add-person[hidden], #a4Create[hidden] { display: none; }
+.a4-more, .a4-terminal { margin: 10px 0; }
+.a4-more > summary, .a4-terminal > summary { cursor: pointer; color: var(--muted); padding: 6px 0; }
+/* Each question: a plain label, the question bank's own wording as one help line, an example as the placeholder. */
+.a4-q-label { font-weight: 600; }
+.a4-q-help { display: block; margin: 2px 0 6px; font-size: 13px; line-height: 1.45; }
+/* Long project names wrap instead of running past the card (A4-18). */
+.a4-project-name, #a4HomeTitle, .a4-home h2 { overflow-wrap: anywhere; }
+.a4-tech > summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+/* The start form's "Who approves each step?" choice and the Members card's invite checkbox: the control beside its words. */
+.a4-approvers { border: 1px solid var(--border-strong); border-radius: 8px; padding: 8px 12px; }
+.a4-approvers label, .a4-invite label:has(input[type="checkbox"]) { display: flex; gap: 8px; align-items: center; }
+.a4-approvers input[type="radio"], .a4-invite input[type="checkbox"] { width: auto; flex: none; margin: 0; }
+.a4-approvers p { margin: 0 0 8px 26px; }

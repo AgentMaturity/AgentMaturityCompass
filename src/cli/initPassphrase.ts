@@ -3,6 +3,7 @@
  * when AMC_VAULT_PASSPHRASE is empty. Never a guessable value; `--skip-vault` remembers it instead of printing it.
  */
 import { randomBytes } from "node:crypto";
+import inquirer from "inquirer";
 import { agentMarker } from "../vault/operatorContext.js";
 import { rememberEnabled, rememberVaultPassphrase, type RememberBackend } from "../vault/passphraseStore.js";
 
@@ -64,4 +65,20 @@ export function rememberOrShowOnce(workspace: string, passphrase: string, env: N
 /** Only where nothing keeps it: printed once, with the reason to save it now. */
 export function shownOncePassphraseLines(passphrase: string): string[] {
   return ["Save this vault passphrase now. It is not stored anywhere, and the vault cannot be opened without it:", `    ${passphrase}`];
+}
+
+/** A masked prompt that re-asks until `validate` returns true. */
+export type SecretPrompt = (message: string, validate: (value: string) => true | string) => Promise<string>;
+const maskedPrompt: SecretPrompt = async (message, validate) =>
+  (await inquirer.prompt<{ value: string }>([{ type: "password", name: "value", message, mask: "*", validate }])).value;
+
+/**
+ * CLI-07: a new passphrase or password typed in a terminal, asked twice. A typo in a single entry would leave a vault or an
+ * account nobody can open, so a mismatch is refused before anything is created.
+ */
+export async function promptNewSecret(label: string, minLength: number, ask: SecretPrompt = maskedPrompt): Promise<string> {
+  const first = await ask(`${label} (min ${minLength} chars):`, (value) => value.length >= minLength || `Must be at least ${minLength} characters`);
+  const second = await ask(`Repeat the ${label.toLowerCase()}:`, () => true);
+  if (second !== first) throw new Error(`The two ${label.toLowerCase()} entries do not match, so nothing was created. Run the command again.`);
+  return first;
 }

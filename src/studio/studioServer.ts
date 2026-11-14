@@ -15,7 +15,7 @@ import { listAgents } from "../fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { onboardingRunForApi, onboardingStatusForApi } from "./onboardingApi.js";
 import { runDiagnostic, generateReport, loadRunReport } from "../diagnostic/runner.js";
-import { agentRunFiles } from "../diagnostic/runReportResolution.js";
+import { latestRunFile } from "../diagnostic/runReportResolution.js";
 import { summarizeDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
 import { runAutoAnswer } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
 import { runAssurance } from "../assurance/assuranceRunner.js";
@@ -998,7 +998,7 @@ function parseComplianceFramework(raw: string | null): ComplianceFramework | nul
 }
 
 function agentLastStatus(workspace: string, agentId: string): AgentStatusResponse {
-  const latest = agentRunFiles(workspace, agentId).at(-1);
+  const latest = latestRunFile(workspace, agentId);
   if (!latest) {
     return { agentId, latestRun: null };
   }
@@ -1329,6 +1329,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
       }
 
+      // Browsers ask for /favicon.ico by themselves: answer with the console's icon instead of a 401 (C-14).
+      if (pathname === "/favicon.ico" && method === "GET" && serveConsolePath("/console/assets/icons/favicon-32.png", res)) {
+        return;
+      }
       if (pathname.startsWith("/console")) {
         if (serveConsolePath(pathname, res)) {
           return;
@@ -8321,7 +8325,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         return;
       }
 
-      // M3: the console questionnaire. Scored by scoreIndustryPack, as `amc domain pack run --json` and the MCP tool; nothing is stored.
+      // M3: the console questionnaire. Scored by scoreIndustryPack, as `amc domain pack run --json` and the MCP tool; a signed-in person's last scored answers are kept (A4-10).
       const industryPackScoreMatch = pathname.match(/^\/industry-packs\/([^/]+)\/score$/);
       if (industryPackScoreMatch && req.method === "POST") {
         if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
@@ -8350,6 +8354,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const answers = responses as Record<string, number>;
         const result = scoreIndustryPack(pack.id, answers);
+        if (auth?.userId) {
+          const { saveConsoleResponses } = await import("../domains/packResponses.js");
+          saveConsoleResponses(options.workspace, auth.userId, pack.id, answers);
+        }
         json(res, 200, { ...result, ...claimFields(packSelfAssessmentEnvelope(pack, answers, Date.now())) });
         return;
       }
@@ -8368,7 +8376,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 404, { error: "industry pack not found" });
           return;
         }
-        json(res, 200, { pack, entitlement, entitlementNote: ENTITLEMENT_NOTE });
+        const { loadConsoleResponses } = await import("../domains/packResponses.js");
+        json(res, 200, { pack, entitlement, entitlementNote: ENTITLEMENT_NOTE,
+          savedResponses: auth?.userId ? loadConsoleResponses(options.workspace, auth.userId, pack.id) : null });
         return;
       }
 

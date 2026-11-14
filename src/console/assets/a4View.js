@@ -2,11 +2,25 @@
 // codes, reason codes and claim kinds are printed as Studio returned them, and the page adds no status word of its own.
 import { renderEvidenceRefList } from "./components/evidenceRefList.js";
 import { renderPromptDiffViewer } from "./components/promptDiffViewer.js";
+import { QUESTION_LABELS, questionDisplay } from "./a4Questions.js";
 
 export const STAGES = ["aspire", "assemble", "adapt", "activate"];
 const STEPS = ["asked", "understood", "explained", "proposed", "direction_approved", "built", "reviewed", "completion_approved"];
 export const STEP_TITLES = { asked: "Ask", understood: "Understand", explained: "Explain", proposed: "Propose",
   direction_approved: "Direction approved", built: "Build", reviewed: "Review", completion_approved: "Completion approved" };
+/** Where an answer came from, in plain words; the stored source stays in the tooltip. */
+const SOURCE_PLAIN = { user: "your answer", inferred: "suggested by AMC", carried: "from an earlier step" };
+/** The four stages and eight parts in plain words; the A4 name stays beside them in small text. */
+export const STAGE_PLAIN = { aspire: "Say what it is for", assemble: "Build it", adapt: "Fit it to your rules", activate: "Release it" };
+export const STEP_PLAIN = { asked: "Answer the questions", understood: "Check how AMC understood you", explained: "See AMC's choices explained",
+  proposed: "Review the plan", direction_approved: "Get approval to build", built: "Build", reviewed: "Review the result",
+  completion_approved: "Get final approval" };
+/** What a project at each part needs next, in one sentence (Home's "Continue" card). */
+export const STEP_NEXT = { asked: "Next: answer the questions, then let AMC say back what it understood.",
+  understood: "Next: let AMC explain the choices it will make.", explained: "Next: let AMC draft the plan, then review it.",
+  proposed: "Next: a second person approves the plan before anything is built.", direction_approved: "Next: build it.",
+  built: "Next: review what was built.", reviewed: "Next: a second person gives the final approval for this step.",
+  completion_approved: "This step is approved. Next: move on to the next step." };
 const LANES = [["recommendation", "Recommendation"], ["implementation", "Implementation"], ["observed", "Observed"],
   ["verified", "Independently reviewed"]];
 const LEVELS = ["novice", "practitioner", "expert"];
@@ -16,15 +30,15 @@ export const TRUTH = {
   vote: "A recorded vote does not mean the action has run",
   admission: "Admission is not task completion",
   selfApproved: "Approved by the author; not an independent review",
-  experimental: "Experimental regulatory content; expert review pending (D-08)",
+  experimental: "Experimental regulatory content, drafted by AI; no qualified expert has reviewed it yet",
   recorded: "Recorded: what the operator stated. Checked: what AMC's own probe found",
-  signatures: "Signatures prove who wrote this and that it is unchanged, not that it is true",
+  signatures: "A signature shows who wrote this and that it is unchanged, not that it is true",
   twoUsers: "Two local users are not evidence of two people"
 };
-// LIVE-UX-04: the notice says how to enable the preview (D-20: AMC_A4_PREVIEW=1 in the Studio process environment).
-const PREVIEW_NOTICE = "A4 preview is not enabled in this workspace. In the workspace folder, stop Studio with `amc down`, set "
-  + "`AMC_A4_PREVIEW=1` in the environment (macOS/Linux: `AMC_A4_PREVIEW=1 amc up`; PowerShell: `$env:AMC_A4_PREVIEW=\"1\"; amc up`), "
-  + "then start it again. A running Studio keeps the environment it started with.";
+// LIVE-UX-04: the notice says how to turn the preview back on (D-20 as amended 2026-11-14: on unless AMC_A4_PREVIEW=0).
+const PREVIEW_NOTICE = "This Studio was started with `AMC_A4_PREVIEW=0`, which turns agent projects off. In the workspace folder, stop "
+  + "Studio with `amc down`, then start it without that setting (macOS/Linux: `AMC_A4_PREVIEW=1 amc up`; PowerShell: "
+  + "`$env:AMC_A4_PREVIEW=\"1\"; amc up`). A running Studio keeps the environment it started with.";
 /** PREVIEW_NOTICE with each `command` in <code>. */
 export const previewNoticeHtml = () => esc(PREVIEW_NOTICE).replace(/`([^`]+)`/g, "<code>$1</code>");
 export const COMMENT_MAX_BYTES = 8 * 1024;
@@ -63,7 +77,7 @@ const REASON_TEXT = {
   A4_GATE_OPEN: "An approval request is already open for this step; approvers decide it in the Approvals card.",
   A4_GATE_DENIED: "This revision was denied: save an answer under Ask to start a new revision.",
   SOD_VIOLATION: "You cannot approve this yourself (separation of duties): another approver must. You may still deny it.",
-  PRINCIPAL_NOT_MEMBER: "Your project role does not include this action: a project owner can give you the role on the Members card.",
+  PRINCIPAL_NOT_MEMBER: "You are not a member of this project with this role yet: a project owner adds you on the Members card (adding a member cancels an open approval request, which is then asked again).",
   PRINCIPAL_ROLE_INSUFFICIENT: "Your workspace role does not allow this action: a workspace owner can change your roles.",
   PRINCIPAL_UNRESOLVED: "This step issues a lease in your name, so it needs a local user account: sign in as one.",
   ADMIN_TOKEN_REFUSED: "Sign in as a user: the admin token cannot act on agent projects.",
@@ -86,7 +100,7 @@ export function reasonText(code) {
   return REASON_TEXT[code] ?? (/^[a-z]/.test(String(code)) ? "A requirement under Missing requirements needs attention first."
     : "Studio does not allow this action right now: see Missing requirements.");
 }
-const reasonsText = (codes) => `${[...new Set(codes.map(reasonText))].join(" ")} (${codes.join(", ")})`;
+export const reasonsText = (codes) => `${[...new Set(codes.map(reasonText))].join(" ")} (${codes.join(", ")})`;
 
 export const held = (note) => ({ allowed: false, reasonCodes: [], note });
 export const GATE_CHANGED = "The gate changed while you were on this page";
@@ -101,6 +115,34 @@ export function holdBanner(project) {
   return project?.hold ? `<div class="card banner a4-hold">On hold${project.holdReason ? `: ${esc(project.holdReason)}` : ""}</div>` : "";
 }
 
+/** A practice project says so on every page, and says when a second person ended it (Studio's `practiceActive`). */
+export function practiceBanner(project) {
+  if (project?.practice !== true) return "";
+  return project.practiceActive === true
+    ? `<div class="card banner a4-practice"><strong>Practice project.</strong> You may approve your own work here. Each approval you give yourself
+      is recorded and shown as self-approved. Do not use a practice project for real work.</div>`
+    : `<div class="card banner a4-practice"><strong>This was a practice project.</strong> More than one person can sign in to this workspace now,
+      so nobody approves their own work here any more, and the project follows the rules its risk level calls for.</div>`;
+}
+
+/**
+ * The start form's "Who approves?" choice (A4-05). Every Industry Pack is high risk or above, so a project started from
+ * a pack is regulated: a second person approves each step. A practice project is offered when Studio says one person
+ * alone may open one (`start` is GET /options' workspace.start); otherwise its reason is shown.
+ */
+export function approverChoiceHtml(start) {
+  if (!isObject(start)) return "";
+  const practice = start.practiceAvailable === true;
+  return `<fieldset class="a4-approvers"><legend>Who approves each step?</legend>
+    <label><input type="radio" name="practice" value="" checked /> A second person (needed for real work)</label>
+    <p class="muted">Every Industry Pack is high risk or above, so a project started from a pack is governed as regulated: someone other than
+      you approves each step, and nobody approves their own work. Add that person with Add a person, or on the project's Members card.</p>
+    <label><input type="radio" name="practice" value="yes"${practice ? "" : " disabled"} /> Just me, as practice (for learning AMC alone)</label>
+    <p class="muted">${practice ? "You may approve your own work. Each such approval is recorded and shown as self-approved, and a practice project "
+      + "stops being one as soon as a second person can sign in. Do not use it for real work." : esc(start.practiceRefusal ?? "A practice project is not offered here.")}</p>
+    </fieldset>`;
+}
+
 export function stageBanner(stage) {
   if (stage === "adapt") return `<div class="card banner">${TRUTH.experimental}</div>`;
   if (stage === "activate") return `<div class="card banner">${TRUTH.recorded}</div>`;
@@ -110,28 +152,36 @@ export function stageBanner(stage) {
 /** Studio's role check refuses a create from anyone without OPERATOR or OWNER (accessPolicy), and A4 refuses it in a read-only workspace. */
 export const CREATE_NEEDS = "Starting an agent project needs a workspace OPERATOR or OWNER role in a workspace that is not read-only";
 
-export function renderCreateForm(open, industryHtml = "") {
-  return `<details class="card" id="a4Create"${open ? " open" : ""}><summary>Start an agent project</summary>
-    <form id="a4CreateForm" class="a4-form" novalidate>
-      <label>Project name <input name="name" required maxlength="200" placeholder="For example: Invoice triage helper" aria-describedby="a4NameHint" /></label>
-      <p class="muted" id="a4NameHint">A short name your team will recognise. It is stored in the project's record.</p>
+/**
+ * The start form: a name, the industry and one button; every other field under "More options". On Home (`home`) the form
+ * has no disclosure around it and asks for the plainest explanation level.
+ */
+export function renderCreateForm(open, industryHtml = "", { home = false, start = null } = {}) {
+  const form = `<form id="${home ? "a4HomeForm" : "a4CreateForm"}" class="a4-form" novalidate>
       ${industryHtml}
+      ${approverChoiceHtml(start)}
+      <label>Project name <input name="name" required maxlength="200" placeholder="For example: Invoice triage helper" aria-describedby="${home ? "a4HomeNameHint" : "a4NameHint"}" /></label>
+      <p class="muted" id="${home ? "a4HomeNameHint" : "a4NameHint"}">A short name your team will recognise. It is stored in the project's record.</p>
+      ${home ? '<input type="hidden" name="expertise" value="novice" />' : `<details class="a4-more"><summary>More options</summary>
       <label>Existing agent id (optional) <input name="agentId" maxlength="128" pattern="[a-z0-9][a-z0-9_\\-]{0,127}" placeholder="Leave empty to create a new agent"
         aria-describedby="a4AgentHint" /></label>
       <p class="muted" id="a4AgentHint">Only if this agent already exists in AMC: its id, in lowercase letters, digits, _ and -, for example invoice-helper.
         Leave it empty and AMC creates a new agent for the project.</p>
       <label>How much detail do you want in explanations? <select name="expertise">${LEVELS.map((level) => `<option value="${level}">${stageTitle(level)}</option>`).join("")}</select></label>
+      <p><button type="button" class="secondary" data-a4-example-project>Use an example</button></p>
+      <p class="muted">Use an example fills a sample project, marked (sample) in its name, so the records show it is sample data.</p></details>`}
       <p class="a4-form-error status-bad" role="alert" hidden></p>
-      <div class="row wrap"><button type="submit" class="a4-primary">Start an agent project</button>
-        <button type="button" class="secondary" data-a4-example-project>Use an example</button></div>
-      <p class="muted">Use an example fills a sample project, marked (sample) in its name, so the records show it is sample data.</p>
-    </form></details>`;
+      <div class="row wrap"><button type="submit" class="a4-primary">${home ? "Start building" : "Start an agent project"}</button></div>
+    </form>`;
+  return home ? form : `<section class="card" id="a4Create"${open ? "" : " hidden"}><h3>Start an agent project</h3>${form}</section>`;
 }
 
 export function renderProjectList(projects) {
-  return `<section class="card"><h3>Agent projects</h3>${list(projects.map((project) => `<li>
+  if (projects.length === 0) return "";
+  return `<section class="card"><h3>Your agent projects</h3>${list(projects.map((project) => `<li>
     <a href="./a4Project?project=${encodeURIComponent(project.projectId)}"><strong>${esc(project.name)}</strong></a>
-    <span class="chip">${esc(stageTitle(project.stage))}</span> <span class="chip">${esc(STEP_TITLES[project.step] ?? project.step)}</span>
+    <span class="chip" title="${esc(stageTitle(project.stage))}">${esc(STAGE_PLAIN[project.stage] ?? stageTitle(project.stage))}</span>
+    <span class="chip" title="${esc(STEP_TITLES[project.step] ?? project.step)}">${esc(STEP_PLAIN[project.step] ?? project.step)}</span>
     ${project.readiness ? `<code>${esc(project.readiness.status)}</code>` : ""}
     <span class="muted">agent <code>${esc(project.agentId)}</code> · r${esc(project.revisionNo)}</span>${holdBanner(project)}</li>`),
   "No agent projects yet.")}</section>`;
@@ -192,7 +242,8 @@ const CONTENT_MAX = 65_536;
 const NO_REFLECTION = "No statement recorded from this page yet";
 export const RECORDED_CURRENT = "Studio holds AMC's understanding of your current answers (shown on this page). If it is right, confirm it; if not, change your answers and run Understand again.";
 export const NO_PRODUCER = "No producer is registered for this stage yet, so Studio records what you write here as your own self-reported statement, not as AMC's.";
-const studioJson = (value) => `<pre class="scroll">${esc(JSON.stringify(value ?? null, null, 2))}</pre>`;
+// Studio's receipt stays readable but folded under "Technical details", below the plain summary (A4-13).
+const studioJson = (value) => `<details class="a4-tech"><summary>Technical details</summary><pre class="scroll">${esc(JSON.stringify(value ?? null, null, 2))}</pre></details>`;
 /**
  * What the member sent and Studio's receipt for it, verbatim: with no producer registered, nothing here is AMC's. With
  * nothing sent (a stage whose producer ran), the receipt is the step's output, never labelled as the member's statement.
@@ -222,7 +273,7 @@ function reflectionHtml(reflection, understand, recordedCurrent = false) {
     <p class="muted">Correct this sends nothing: change your answers or your statement, then run Understand again.</p>`;
 }
 
-export const ANSWER_CHANGED = "Another member changed an answer you are editing since you began; discard your edits to see theirs";
+export const ANSWER_CHANGED = "An answer you are editing was changed and saved since you began (by another member, or by you in another tab); discard your edits to see the saved answer";
 /** An answer as its field shows it ("" when unanswered); a4.js compares it to see another member's change. */
 export function answerText(answers, questionId) {
   const answer = answers.find((row) => row.questionId === questionId);
@@ -252,17 +303,25 @@ export function renderConversation(ctx) {
   const field = (question) => {
     const answer = answered.get(question.id);
     const json = answer !== undefined && typeof answer.value !== "string";
-    return `<label>${esc(question.prompt)}${question.required ? " (required)" : ""}${json ? " (JSON)" : ""}
-      <textarea name="${esc(question.id)}" rows="2"${json ? " data-json" : ""}${question.example ? ` placeholder="${esc(question.example)}"` : ""}>${esc(answerText(answers, question.id))}</textarea></label>`;
+    const shownDisplay = questionDisplay(question, question.example);
+    // Adapt's fact questions take catalog terms: name them, so nobody has to guess (an unknown term is refused).
+    const termsHelp = !Array.isArray(question.terms) ? "" : question.terms.length
+      ? ` Choose from: ${question.terms.join(", ")}. Or write unknown.` : " The catalog lists no terms for this yet, so leave it empty.";
+    const display = { ...shownDisplay, help: `${shownDisplay.help}${termsHelp}`.trim() };
+    const helpId = `a4q-${esc(question.id)}-help`;
+    return `<label><span class="a4-q-label">${esc(display.label)}</span>${question.required ? " (required)" : " (optional)"}${json ? " (JSON)" : ""}
+      ${display.help ? `<small class="a4-q-help muted" id="${helpId}">${esc(display.help)}</small>` : ""}
+      <textarea name="${esc(question.id)}" rows="2"${display.help ? ` aria-describedby="${helpId}"` : ""}${json ? " data-json" : ""}${display.example ? ` placeholder="${esc(display.example)}"` : ""}>${esc(answerText(answers, question.id))}</textarea></label>`;
   };
-  const answerRow = (answer) => `<li><code>${esc(answer.questionId)}</code> <code>${esc(answer.source)}</code>: ${esc(shown(answer.value))}${
+  const answerRow = (answer) => `<li><span title="${esc(answer.questionId)}">${esc(QUESTION_LABELS[answer.questionId]?.[0] ?? answer.questionId)}</span>
+    <small class="muted" title="${esc(answer.source)}">${esc(SOURCE_PLAIN[answer.source] ?? answer.source)}</small>: ${esc(shown(answer.value))}${
     answer.source === "user" ? "" : ` ${actionButton("Confirm", "confirm-answer", ask, `data-question="${esc(answer.questionId)}"`)}`}</li>`;
   const notMine = answers.filter((answer) => answer.source !== "user").length;
   const change = questions.filter((question) => answered.has(question.id));
   // An answer goes stale when one it depends on changes (Understand carrying a value from an earlier stage, too). Saving
   // the same value again is what confirms it: Studio records it on a new revision with the new dependency digest.
   const stale = askGaps(ctx.readiness).stale.filter((id) => answered.has(id));
-  const prompt = (id) => questions.find((question) => question.id === id)?.prompt ?? id;
+  const prompt = (id) => QUESTION_LABELS[id]?.[0] ?? questions.find((question) => question.id === id)?.prompt ?? id;
   const staleBanner = stale.length ? `<div class="card banner"><p>${stale.length} answer(s) need confirming because an answer they depend on
     changed. Confirming records a new revision and returns this stage to Ask, so Understand runs again before you confirm it.</p>
     <ul class="a4-rows">${stale.map((id) => `<li>${esc(prompt(id))} <code>${esc(id)}</code>: ${esc(answerText(answers, id))}
@@ -296,6 +355,14 @@ export function renderConversation(ctx) {
 
 /** The part of a revision's spec a member edits: Studio carries `answers` itself and refuses a proposal naming them. */
 export const editableSpec = (spec) => Object.fromEntries(Object.entries(isObject(spec) ? spec : {}).filter(([key]) => key !== "answers"));
+
+/**
+ * The top-level parts of `spec` that differ from `base`: what Propose sends. Studio builds the rest from the answers, and
+ * an Adapt specification with its compiled plan is larger than the 256 KiB a request may carry, so echoing the whole
+ * specification back failed every Adapt Propose.
+ */
+export const changedParts = (spec, base) => Object.fromEntries(Object.entries(isObject(spec) ? spec : {})
+  .filter(([key, value]) => JSON.stringify(value) !== JSON.stringify(isObject(base) ? base[key] : undefined)));
 
 export function renderSpecEditor(ctx) {
   const { revision, allowed, project, stage } = ctx;
@@ -616,7 +683,7 @@ export function renderMembers(ctx) {
   const candidates = (Array.isArray(members?.candidates) ? members.candidates : []).filter((candidate) => !memberKeys.has(candidate.principalKey));
   const { open, met } = currentGates(ctx.gates, ctx.stage, readiness);
   const live = open ?? met;
-  return `<section class="card"><h4>Members</h4>
+  return `<section class="card a4-members"><h4>Members</h4>
     ${list(project.members.map((member) => `<li>${esc(member.username)} <code>${esc(member.authSource)}</code> ${codes(member.roles)}</li>`), "No members.")}
     ${readiness.identityCheck === "session_record" ? `<p><code>IDENTITY_CHECK_LIMITED</code> Host-mode roles come from session records, not a live check.</p>` : ""}
     ${members?.candidatesLimited === true ? `<p class="muted">Host mode: candidates come from tracked session records, so this list may be incomplete.</p>` : ""}
@@ -626,6 +693,12 @@ export function renderMembers(ctx) {
       ${list(candidates.map((candidate) => `<li data-principal="${esc(candidate.principalKey)}">
       ${esc(candidate.username)} <select name="role" aria-label="Project role for ${esc(candidate.username)}">${roles.map((role) => `<option>${role}</option>`).join("")}</select>
       ${actionButton("Add", "add-member", ctx.allowed.addMember, `aria-label="Add ${esc(candidate.username)} to the project"`)}</li>`), "")}` : ""}
+    ${Array.isArray(ctx.me?.roles) && ctx.me.roles.includes("OWNER") ? `<div class="a4-invite" data-card="members"><h4>Invite someone new</h4>
+      <p class="muted">AMC creates their account with a first password, shows it to you once, and adds them here as an approver.</p>
+      <label>Their user name <input name="inviteUsername" autocomplete="off" maxlength="64" /></label>
+      <label><input type="checkbox" name="inviteAuditor" /> They may also audit</label>
+      <p class="muted">Fit it to your rules (Adapt) needs two people besides the one who asks, each an auditor or a workspace owner.</p>
+      ${actionButton("Invite", "invite-member", ctx.allowed.addMember)}</div>` : ""}
     <p class="muted">${TRUTH.twoUsers}.</p></section>`;
 }
 

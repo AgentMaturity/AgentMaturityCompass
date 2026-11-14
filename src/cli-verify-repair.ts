@@ -41,6 +41,13 @@ export function printArchivedStoreNote(workspace: string): void {
   }
 }
 
+/** CLI-03: payloads the vault keeps closed cannot be judged, so no plan that moves or seals evidence is offered. */
+function printNotEvaluated(plan: RepairPlan): void {
+  console.log(chalk.yellow(`Not evaluated: ${plan.payloadsNotEvaluated} record payload(s) cannot be opened here because the vault is locked`
+    + " (or the key provider is unreachable). Nothing here says they were altered."));
+  console.log(`No repair is proposed while they cannot be checked. Next: ${VAULT_UNLOCK_PATHS}, then run amc verify --repair again.`);
+}
+
 function printPlan(plan: RepairPlan): void {
   const counts = Object.entries(plan.errorCounts).map(([kind, count]) => `${kind} ${count}`).join(", ");
   console.log(chalk.red(`Verification FAILED (${counts})`));
@@ -57,14 +64,15 @@ function printPlan(plan: RepairPlan): void {
     return;
   }
   for (const reason of plan.sealRefused ?? []) console.log(chalk.yellow(`Not sealing: ${reason}. A missing seal there cannot be told apart from an erased seal and deleted rows.`));
+  if (plan.payloadsNotEvaluated) {
+    printNotEvaluated(plan);
+    return;
+  }
   if (plan.action === "none") {
     console.log(plan.chainOk
       ? "The evidence chain verified; only configuration signatures failed. Re-sign those configs; the evidence needs no repair."
       : "No evidence store is present to archive. Repair cannot recover evidence that is gone.");
     return;
-  }
-  if (plan.errorCounts.payload_mismatch) {
-    console.log(chalk.yellow("Blob payloads also fail authentication while the vault is locked; unlock it (AMC_VAULT_PASSPHRASE) and re-run before archiving."));
   }
   const total = plan.files.reduce((sum, file) => sum + file.bytes, 0);
   console.log("Recovery plan: archive the evidence store. --apply would move these files:");
@@ -136,7 +144,11 @@ export async function runVerifyRepair(opts: { apply: boolean; yes: boolean; expe
   const workspace = process.cwd();
   const plan = planVerifyRepair(workspace, opts.expectedMonitorFingerprint ? { expectedMonitorFingerprint: opts.expectedMonitorFingerprint } : {});
   let code: number;
-  if (plan.verified) {
+  if (plan.verified && plan.payloadsNotEvaluated) {
+    printNotEvaluated(plan);
+    console.log("Nothing has been changed.");
+    code = 0; // the plain verify verdict that follows says NOT EVALUATED with its own exit code
+  } else if (plan.verified) {
     console.log(chalk.green("Integrity check passed; nothing to repair. Nothing has been changed."));
     code = 0;
   } else {

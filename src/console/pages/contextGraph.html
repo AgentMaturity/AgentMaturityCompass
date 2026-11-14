@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AMC Studio</title>
+    <title>Context Graph · Compass Console</title>
     <link rel="manifest" href="./assets/manifest.json" />
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/favicon-32.png" />
     <link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png" />
@@ -14,11 +14,49 @@
       <nav>
         <h1>amc</h1>
         <a href="./home">Home</a>
+        <a href="./a4" id="a4NavLink">Build an agent</a>
+        <a href="./native-tasks">Run a task</a>
+        <a href="./agent">My agent</a>
+        <a href="./evidence">Records</a>
+        <a href="./approvals">Approvals</a>
+        <a href="./industrypacks">Industry Packs</a>
+        <a href="./runtime">Live runs</a>
+        <a href="./login">Sign in</a>
+        <details class="nav-features"><summary>All features</summary>
+        <p class="nav-section">Rules and limits</p>
+        <a href="./firewall" title="Checks risky actions and can stop them.">Firewall<small class="nav-desc">Checks risky actions and can stop them.</small></a>
+        <a href="./governor" title="What your agent may do on its own, by action type.">Governor<small class="nav-desc">What your agent may do on its own, by action type.</small></a>
+        <a href="./toolhub" title="The tools your agent is allowed to use.">Tools (ToolHub)<small class="nav-desc">The tools your agent is allowed to use.</small></a>
+        <a href="./leases" title="Short-lived permission slips for tools.">Leases<small class="nav-desc">Short-lived permission slips for tools.</small></a>
+        <a href="./budgets" title="Limits on spend and activity.">Budgets<small class="nav-desc">Limits on spend and activity.</small></a>
+        <a href="./equalizer" title="Set the target level you want, per area.">Target levels<small class="nav-desc">Set the target level you want, per area.</small></a>
+        <a href="./policypacks" title="Ready-made rule sets for guardrails.">Policy packs<small class="nav-desc">Ready-made rule sets for guardrails.</small></a>
+        <p class="nav-section">Watch and review</p>
+        <a href="./operator-inbox" title="Things blocking your agents, in one inbox.">Operator inbox<small class="nav-desc">Things blocking your agents, in one inbox.</small></a>
+        <a href="./drift" title="Alerts when behaviour changes over time.">Drift<small class="nav-desc">Alerts when behaviour changes over time.</small></a>
+        <a href="./outcomes" title="Whether the agent delivers the value it should.">Outcomes<small class="nav-desc">Whether the agent delivers the value it should.</small></a>
+        <a href="./experiments" title="Compare a new version with the current one.">Experiments<small class="nav-desc">Compare a new version with the current one.</small></a>
+        <a href="./benchmarks" title="Compare scores with other runs.">Benchmarks<small class="nav-desc">Compare scores with other runs.</small></a>
+        <a href="./compliance" title="Evidence lined up against frameworks (self-assessed).">Compliance<small class="nav-desc">Evidence lined up against frameworks (self-assessed).</small></a>
+        <a href="./transparency" title="Check AMC&#39;s public log of signed records.">Transparency log<small class="nav-desc">Check AMC&#39;s public log of signed records.</small></a>
+        <a href="./workorders" title="Signed work orders for your agent.">Work orders<small class="nav-desc">Signed work orders for your agent.</small></a>
+        <p class="nav-section">Teams and many agents</p>
+        <a href="./org" title="Scores rolled up across teams.">Organisation<small class="nav-desc">Scores rolled up across teams.</small></a>
+        <a href="./compare" title="Two teams or groups side by side.">Compare teams<small class="nav-desc">Two teams or groups side by side.</small></a>
+        <a href="./systemic" title="Risks that touch many agents at once.">Shared risks<small class="nav-desc">Risks that touch many agents at once.</small></a>
+        <a href="./commitments-org" title="Plan what each team commits to improve.">Team commitments<small class="nav-desc">Plan what each team commits to improve.</small></a>
+        <a href="./fleet" title="Many agents and how they work together.">Fleet<small class="nav-desc">Many agents and how they work together.</small></a>
+        <p class="nav-section">Workspace</p>
+        <a href="./users" title="Who can sign in, and their roles.">Users<small class="nav-desc">Who can sign in, and their roles.</small></a>
+        <a href="./integrations" title="Connect AMC to the tools you already use.">Connections<small class="nav-desc">Connect AMC to the tools you already use.</small></a>
+        </details>
+        <details class="nav-features" open><summary>More pages</summary>
         <a href="./compass">Compass</a>
         <a href="./contextGraph">Context Graph</a>
         <a href="./diagnosticView">Diagnostic View</a>
         <a href="./forecast">Forecast</a>
         <a href="./plugins">Plugins</a>
+        </details>
       </nav>
       <main>
         <div id="ucBanner" class="card banner muted">Starting AMC…</div>

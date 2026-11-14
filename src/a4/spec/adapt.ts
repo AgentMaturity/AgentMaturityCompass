@@ -8,8 +8,12 @@
  */
 import type { CompiledPlan, PlanDiff } from "../../catalog/compiler/types.js";
 import { digestOf } from "../../catalog/digest.js";
+import { defaultCatalogRoot, parseWith, parseYaml } from "../../catalog/loader.js";
+import { vocabularySchema, type CatalogIssue } from "../../catalog/schema.js";
 import type { CatalogLockfile } from "../../catalog/lockfile.js";
 import { A4_STEPS } from "../../contracts/v1/a4Project.js";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { STATIONS } from "../../domains/stations.js";
 import {
   gateStatus, isRegulated, latestGate, LIFECYCLE_BRIDGE, pendingReviews, PLAN_ACTIVATION_DEFERRED, proposeNextAction, readinessItemBuilders, type A4ReadinessItem,
@@ -98,6 +102,28 @@ export function carriedValues(state: Pick<A4ReadinessState, "revisions">): Map<s
   return carriedValuesOf(state, CARRIED);
 }
 
+/** The catalog vocabulary list each fact asked here takes its terms from (src/catalog/predicate.ts FACT_TERMS). */
+const VOCABULARY_OF = { jurisdictions: "jurisdictions", domains: "domains", roles: "roles", entityTypes: "entityTypes", riskClass: "riskClasses",
+  useCases: "useCases", dataClasses: "dataClasses" } as const;
+let vocabularyCache: Record<keyof typeof VOCABULARY_OF, string[]> | null | undefined;
+/**
+ * The terms the shipped catalog knows for each fact Adapt asks (catalog/vocabulary.yaml), so a member picks from a list
+ * instead of guessing; null when the file does not read (then only the term shape is checked). A term outside the list
+ * matches no catalog record, so it is refused rather than silently compiling to nothing.
+ */
+export function catalogTerms(): Record<keyof typeof VOCABULARY_OF, string[]> | null {
+  if (vocabularyCache !== undefined) return vocabularyCache;
+  try {
+    const issues: CatalogIssue[] = [];
+    const vocabulary = parseWith(vocabularySchema, parseYaml(readFileSync(join(defaultCatalogRoot(), "vocabulary.yaml"), "utf8"), "vocabulary.yaml", issues), "vocabulary.yaml", issues);
+    vocabularyCache = vocabulary === null ? null
+      : Object.fromEntries(Object.entries(VOCABULARY_OF).map(([fact, list]) => [fact, [...vocabulary[list]]])) as Record<keyof typeof VOCABULARY_OF, string[]>;
+  } catch {
+    vocabularyCache = null;
+  }
+  return vocabularyCache;
+}
+
 const TERM = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$/;
 const MAX_TERMS = 64;
 const unknown = (entry: string): boolean => entry.toLowerCase() === "unknown";
@@ -131,6 +157,10 @@ export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<st
     const value = factAnswer(answers, fact)?.value;
     const terms = FACTS[fact] === "list" ? factList(value) ?? [] : [factTerm(value)].filter((term): term is string => term !== null);
     if (terms.length > MAX_TERMS || terms.some((term) => !TERM.test(term))) return true;
+    // A term the member typed for this fact must be one the catalog knows (a jurisdiction carried from Aspire's markets is
+    // not checked here: it is changed at Aspire).
+    const known = fact in VOCABULARY_OF && factAnswer(answers, fact)?.questionId === fact ? catalogTerms()?.[fact as keyof typeof VOCABULARY_OF] : undefined;
+    if (known !== undefined && terms.some((term) => !known.includes(term))) return true;
     if (fact === "stations") return terms.some((term) => !(STATIONS as readonly string[]).includes(term));
     return fact === "primaryStation" && terms.length > 0 && !(factList(values.get("stations")) ?? []).includes(terms[0]!);
   });

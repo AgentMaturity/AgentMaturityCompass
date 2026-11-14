@@ -159,7 +159,7 @@ function renderBuild(ctx) {
   const build = isObject(spec.build) ? spec.build : null;
   // Only the owner's session starts the same task again (the task id is the owner's principal and the recorded request id).
   // Review needs each session closed: its owner closes it with "Close and verify" on the native tasks page.
-  const taskLink = (session) => `<a href="./native-tasks?agent=${encodeURIComponent(session.start?.agentId ?? ctx.project.agentId)}&task=${encodeURIComponent(session.taskId)}">Open on Native Tasks</a>`;
+  const taskLink = (session) => `<a href="./native-tasks?agent=${encodeURIComponent(session.start?.agentId ?? ctx.project.agentId)}&task=${encodeURIComponent(session.taskId)}&project=${encodeURIComponent(ctx.project.projectId)}">Open on Native Tasks</a>`;
   const sessions = list(build?.sessions).map((session) => [`<code>${esc(session.taskId)}</code> ${taskLink(session)}`, esc(session.ownerUsername), `<code>${esc(session.start?.provider)}</code>`,
     ctx.me?.username === session.ownerUsername && isObject(session.start)
       ? view.actionButton("Start it again", "start-session", ctx.allowed.build, `data-start="${esc(JSON.stringify(session.start))}"`) : ""]);
@@ -187,7 +187,7 @@ function renderReview(ctx) {
   const phases = list(review?.sessions).flatMap((session) => list(session.phases).map((phase) => [`<code>${esc(session.sessionId)}</code>`, esc(phase.phase),
     `<code>${esc(phase.status)}</code>`, phase.detail ? `<code>${esc(phase.detail)}</code>` : "", esc(phase.source)]));
   const open = list(specOf(ctx).build?.sessions).map((session) => `<a href="./native-tasks?agent=${encodeURIComponent(session.start?.agentId ?? ctx.project.agentId)}&task=${
-    encodeURIComponent(session.taskId)}">${esc(session.taskId.slice(0, 12))}…</a>`).join(", ");
+    encodeURIComponent(session.taskId)}&project=${encodeURIComponent(ctx.project.projectId)}">${esc(session.taskId.slice(0, 12))}…</a>`).join(", ");
   return `<p class="muted">Review reads each build session through its owner and refuses while one runs, has failed or is still open: its owner
     opens it on the native tasks page${open ? ` (${open})` : ""} and presses Close and verify first, which closes it, so it takes no turn after what is reviewed. AMC's verifyAgentRun
     is an integrity self-check under this workspace's keys (the Integrity panel), never a claim about the agent.</p>

@@ -128,7 +128,7 @@ Everything else that entry exports is experimental: the in-process `openAgentSes
 `llm` namespace, the image and audio input helpers, `AMC_NATIVE_EVENT_LIMITS`, the session-history readers, and the
 `promptParts` and `promptAudioParts` members of `AMCNativeSession`. Members marked `@internal` are not API. The package
 root (`agent-maturity-compass`) and its other subpaths are outside this contract; `createA4Client` there is an A4 Forge
-preview, experimental, whose routes answer 404 unless the server runs with `AMC_A4_PREVIEW=1`. The fields inside
+preview, experimental, whose routes answer 404 when the server runs with `AMC_A4_PREVIEW=0`. The fields inside
 `AMCNativeReceipt.report` follow the verifier's report and are experimental.
 
 | Change | Release |

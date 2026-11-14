@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { validateQualificationDir } from "../scripts/check-qualification-receipts.mjs";
+import { trackedPathProblems, validateQualificationDir, windowsPathProblem } from "../scripts/check-qualification-receipts.mjs";
 
 const folder = "2026-10-05-P0-01";
 let root: string;
@@ -202,5 +202,26 @@ describe("P0-01 qualification receipts", () => {
     writeReceipt(receipt());
     write(`${folder}/.env.local`, "X=1\n");
     expect(errorsFor()).toContain(".env.local");
+  });
+
+  test("a receipt file named after an npm script (check:gates.log) fails: Windows cannot check it out", () => {
+    writeReceipt(receipt());
+    write(`${folder}/check:gates.log`, "ok\n");
+    expect(errorsFor()).toContain("has a character Windows refuses");
+  });
+});
+
+describe("Windows-portable tracked paths", () => {
+  test("names Windows refuses are reported; ordinary names pass", () => {
+    for (const bad of ["q/check:api-ref.log", "a/b?.txt", "dir./x", "x/trailing ", "docs/CON", "docs/aux.md", "lpt1.txt", "a\\b"]) {
+      expect(windowsPathProblem(bad), bad).not.toBeNull();
+    }
+    for (const good of ["qualification/2026-10-29-P2-41/check-gates.txt", ".github/workflows/ci.yml", "console.md", "docs/con-ops.md"]) {
+      expect(windowsPathProblem(good), good).toBeNull();
+    }
+  });
+
+  test("every path tracked in this repository can be checked out on Windows", () => {
+    expect(trackedPathProblems(process.cwd())).toEqual([]);
   });
 });

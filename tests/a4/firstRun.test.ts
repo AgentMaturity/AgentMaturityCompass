@@ -57,7 +57,7 @@ describe("What to do now: one next step per screen", () => {
     const gates = { direction: { gateId: "g1", status: "PENDING", approvals: 0, required: 1 } };
     const author = move(ctx({ project: project({ step: "proposed" }), gates: [{ gateId: "g1", excludedKeys: ["LOCAL_USER:u1"] }] }, { gates }));
     expect(author.now).toContain("separation of duties");
-    expect(author.act).toBeUndefined();
+    expect(author.act).toEqual({ label: "Copy link to this page", copy: true }); // the waiting author sends the approver this page
     expect(move(ctx({ project: project({ step: "proposed" }) }, { gates: { direction: { gateId: "g1", status: "QUORUM_MET" } } })).act?.press).toBe("complete");
   });
   test("a step the viewer's roles cannot take is not their primary action", () => {
@@ -105,7 +105,7 @@ describe("What to do now: one next step per screen", () => {
     const html = start.renderStartHere(ctx({ project: project({ step: "understood" }) }) as never);
     expect(html).toContain("An agent project takes one agent from a brief to a recorded deployment");
     expect(html).toContain('aria-current="step"');
-    expect(html).toContain("step 2 of 8");
+    expect(html).toContain("part 2 of 8, Check how AMC understood you");
     expect(html.match(/a4-primary/g)).toHaveLength(1);
     expect(html).toContain("not that it is true");
     expect(html).toContain("nothing here says the agent is safe, correct or lawful");
@@ -143,7 +143,7 @@ test("preview off and the demo say what A4 is and the way forward, keeping the p
   expect(start.previewOffHtml()).toContain("Agent projects are turned off in this workspace");
   expect(start.previewOffHtml()).toContain(view.previewNoticeHtml());
   expect(start.demoHtml()).toContain("view-only demo");
-  expect(start.demoHtml()).toContain("AMC_A4_PREVIEW=1 amc up");
+  expect(start.demoHtml()).toContain("<code>amc up</code>");
   const page = readFileSync("src/console/assets/a4.js", "utf8");
   expect(page).toContain("start.previewOffHtml()");
   expect(page.indexOf('me.userId === "local-demo"')).toBeLessThan(page.lastIndexOf("await previewOptions()"));
@@ -264,5 +264,13 @@ describe("starting an agent project from an Industry Pack (2026-11-14)", () => {
     expect(m.now).toContain("cannot show that two approvers are two different people");
     expect(m.also).toBe("#a4Missing");
     expect(start.renderStartHere(ctx({ project: project({ step: "proposed" }) }, { items: [item("sod.self_provisioned")], allowed: { requestGate: { reasonCodes: ["sod.self_provisioned"] } } }) as never)).toContain('data-a4-also="#a4Missing"');
+  });
+
+  test("alone on a regulated project the guide names inviting a second person, not an acknowledgement that cannot help", () => {
+    const alone = item("sod.self_provisioned", { reasonCodes: ["SOD_DEGRADED_SELF_PROVISIONED", "REVIEW_NOT_INDEPENDENT", "NO_SECOND_APPROVER"] });
+    const m = move(ctx({ project: project({ step: "proposed" }) }, { items: [alone], allowed: { requestGate: { reasonCodes: ["sod.self_provisioned"] } } })) as { now: string; act?: { focus?: string } };
+    expect(m.now).toContain("Nobody else on this project can approve it");
+    expect(m.now).not.toContain("acknowledges");
+    expect(m.act?.focus).toBe(".a4-invite input");
   });
 });

@@ -28,7 +28,7 @@ export function loginCardHtml({ demoMode = false, hostMode = false } = {}) {
   return `
     <div class="card auth-card">
       <div class="studio-kicker">Agent Maturity Compass</div>
-      <h2>Sign in to AMC</h2>
+      <h2>Sign in to Compass Console</h2>
       <p class="auth-lead">AMC checks how far you can trust an AI agent, using recorded proof of what it did instead of promises.</p>
       ${demoMode ? DEMO_BANNER : ""}
       <form id="loginForm" method="post">
@@ -73,7 +73,7 @@ export function loginCardHtml({ demoMode = false, hostMode = false } = {}) {
 
 /** The status line after a failed sign-in: Studio's "no users.yaml" reply becomes the next step; any other error is shown as is. */
 export function loginFailureText(message) {
-  return String(message).includes("users config missing") ? NO_ACCOUNT : `Login failed: ${message}`;
+  return String(message).includes("users config missing") ? NO_ACCOUNT : `Sign-in failed: ${message}`;
 }
 
 /** The page to open after sign-in (M9): a console page name with an optional query, so `./<next>` cannot leave the console. */

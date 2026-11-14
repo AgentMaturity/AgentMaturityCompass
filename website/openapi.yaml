@@ -11951,7 +11951,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -12014,7 +12014,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -12077,7 +12077,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -12166,7 +12166,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -12237,7 +12237,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -12319,7 +12319,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -12401,7 +12401,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -12470,7 +12470,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -12553,7 +12553,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -12628,7 +12628,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -12703,7 +12703,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -12779,7 +12779,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -12848,7 +12848,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -12917,7 +12917,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -13011,7 +13011,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -13086,7 +13086,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -13180,7 +13180,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -13275,7 +13275,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -13351,7 +13351,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -13446,7 +13446,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -13521,7 +13521,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -13594,7 +13594,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -13681,7 +13681,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -13752,7 +13752,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -13847,7 +13847,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -13944,7 +13944,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -14057,7 +14057,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -14158,7 +14158,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -14271,7 +14271,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -14340,7 +14340,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -14441,7 +14441,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -14523,7 +14523,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -14599,7 +14599,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -14714,7 +14714,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -14820,7 +14820,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -14925,7 +14925,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -15036,7 +15036,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -15149,7 +15149,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -15249,7 +15249,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -15350,7 +15350,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -15453,7 +15453,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -15550,7 +15550,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -15648,7 +15648,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -15745,7 +15745,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -15844,7 +15844,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -15946,7 +15946,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -16048,7 +16048,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -16149,7 +16149,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -16255,7 +16255,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -16365,7 +16365,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -16478,7 +16478,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -16583,7 +16583,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -16688,7 +16688,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -16793,7 +16793,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -16898,7 +16898,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -17003,7 +17003,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -17112,7 +17112,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -17218,7 +17218,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -17313,7 +17313,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -17408,7 +17408,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -17503,7 +17503,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -17598,7 +17598,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -17693,7 +17693,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:
@@ -17790,7 +17790,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "404":
-          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          description: A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.
           content:
             application/json:
               schema:

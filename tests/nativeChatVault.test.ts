@@ -37,3 +37,41 @@ describe("chat vault passphrase resolved in the parent", () => {
     await expect(chatVaultPassphrase("/ws", deps({ remembered: () => null, ask: async () => null }))).resolves.toBeNull();
   });
 });
+
+const defaults = vi.hoisted(() => ({
+  prompt: vi.fn(),
+  opens: vi.fn((_workspace: string, passphrase: string) => passphrase === "typed-pass"),
+  remembered: vi.fn((): { passphrase: string } | null => null),
+  operator: vi.fn(() => ({ ok: true }))
+}));
+vi.mock("inquirer", () => ({ default: { prompt: defaults.prompt } }));
+vi.mock("../src/vault/vault.js", () => ({ vaultExists: () => true, vaultOpensWith: defaults.opens }));
+vi.mock("../src/vault/passphraseStore.js", () => ({ operatorRememberedPassphrase: defaults.remembered }));
+vi.mock("../src/vault/operatorContext.js", () => ({ interactiveOperator: defaults.operator }));
+
+describe("chat vault passphrase with the default operator, store and question", () => {
+  it("asks with a masked question that accepts only a passphrase that opens the vault", async () => {
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
+    vi.stubEnv("AMC_VAULT_PASSPHRASE_FILE", "");
+    let validate: ((value: string) => true | string) | undefined;
+    defaults.prompt.mockImplementationOnce(async (questions: Array<{ type: string; mask: string; validate: (value: string) => true | string }>) => {
+      expect(questions[0]).toMatchObject({ type: "password", mask: "*" });
+      validate = questions[0]!.validate;
+      return { passphrase: "typed-pass" };
+    });
+    await expect(chatVaultPassphrase("/ws")).resolves.toBe("typed-pass");
+    expect(defaults.operator).toHaveBeenCalledWith({ workspace: "/ws" });
+    expect(validate?.("typed-pass")).toBe(true);
+    expect(validate?.("wrong")).toBe("That passphrase does not open this workspace's vault.");
+    vi.unstubAllEnvs();
+  });
+  it("uses the remembered passphrase, and a cancelled question (Ctrl-C) is null", async () => {
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
+    vi.stubEnv("AMC_VAULT_PASSPHRASE_FILE", "");
+    defaults.remembered.mockReturnValueOnce({ passphrase: "typed-pass" });
+    await expect(chatVaultPassphrase("/ws")).resolves.toBe("typed-pass");
+    defaults.prompt.mockRejectedValueOnce(new Error("User force closed the prompt"));
+    await expect(chatVaultPassphrase("/ws")).resolves.toBeNull();
+    vi.unstubAllEnvs();
+  });
+});
