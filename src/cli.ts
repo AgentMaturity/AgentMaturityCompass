@@ -3562,6 +3562,14 @@ program
       console.log("Command: amc up");
       return;
     }
+    // CLI-10: a running AMC needs no passphrase from this command; say so before any vault question.
+    const running = studioStatus(workspace);
+    if (running.running && running.state) {
+      console.log(chalk.green("\u2713 AMC is already running in this folder.") + chalk.gray(` (agent: ${running.state.currentAgent})`));
+      console.log(`\n  ${chalk.bold("Open your report card:")}  ${chalk.hex("#4AEF79").bold(`http://${running.state.host}:${running.state.apiPort}/console`)}`);
+      console.log(chalk.gray("  To restart it: amc down, then amc up."));
+      return;
+    }
     await ensureUpVaultPassphrase(workspace, opts.remember !== false);
     await initWorkspaceAsync({ workspacePath: workspace, trustBoundaryMode: "isolated" });
     const actionPolicyFile = join(workspace, ".amc", "action-policy.yaml");
