@@ -4360,6 +4360,12 @@ const connect = program
         return;
       }
 
+      // A person in a terminal is first offered the Claude Code or Codex they are signed in to (an observe hook, on a yes).
+      if (process.stdin.isTTY && !opts.adapter && !opts.mode && !opts.printEnv && !opts.printCmd) {
+        const { offerWatchSignedIn } = await import("./studio/connectWatch.js");
+        const { connectWatchDeps } = await import("./studio/connectWatchIo.js");
+        if (await offerWatchSignedIn(resolveAgentId(process.cwd(), opts.agent ?? activeAgent(program)), connectWatchDeps(process.cwd())) === "watched") return;
+      }
       const output = await buildConnectInstructions({
         workspace: process.cwd(),
         agentId: opts.agent ?? activeAgent(program),
@@ -4379,10 +4385,10 @@ const connect = program
       console.log(chalk.hex('#4AEF79')(`Agent: ${output.agentId}`));
       console.log(`Gateway route: ${output.routeUrl}`);
       console.log("");
-      console.log(chalk.hex('#4AEF79')("Environment exports:"));
-      for (const line of output.envLines) {
-        console.log(line);
-      }
+      // The exports carry a live gateway lease: kept in a 0600 file, not in scrollback (--print-env prints them).
+      const envFile = (await import("./studio/connectWatch.js")).writeConnectEnvFile(process.cwd(), output.agentId, output.envLines);
+      console.log(chalk.hex('#4AEF79')("Environment exports (with a 60-minute gateway lease), written to a private file (mode 0600):"));
+      console.log(envFile.sourceLine);
       console.log("");
       console.log(chalk.hex('#4AEF79')("Recommended command:"));
       console.log(output.command);
