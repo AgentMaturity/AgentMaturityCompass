@@ -53,6 +53,8 @@ const credentialed = (provider: NativeTaskDescriptor["provider"]): provider is C
 const SWEEP_MS = 10_000;
 /** P0-62: how long reads may keep meeting a moving store (CHANGED) before Studio fails closed and names that cause. */
 const SETTLE_MS = 30_000;
+/** Reads of one history page before a store that keeps moving is reported as such (each read is synchronous). */
+const PAGE_READ_ATTEMPTS = 5;
 const MOVING = "Committed history was changing while it was read, so no authenticated snapshot is shown yet. Nothing was concluded from a partial read; refresh in a moment.";
 const UNSETTLED = "Committed history kept changing while it was read, for 30 s, so no authenticated snapshot could be taken. Nothing was concluded from a partial read; refresh once writers are quiet.";
 const reasonOf = (error: unknown): string => error instanceof Error ? error.message : String(error);
@@ -570,11 +572,24 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         const task = view(entry, true), sessionId = entry.descriptor.sessionId;
         if (!sessionId) return { task, events: [], truncated: false };
         try {
-          const { updates, ...page } = readAcpSessionUpdatePage({ workspace, sessionId, agentId: actor.agentId,
+          // CHANGED means a writer (this task's own turn, a heartbeat) appended while the page was read; nothing failed to
+          // authenticate. Read again a bounded number of times, and name that cause when the store never holds still.
+          const readPage = () => readAcpSessionUpdatePage({ workspace, sessionId, agentId: actor.agentId,
             consumerId: actor.principalId, ...(cursor.cursor === undefined ? {} : { cursor: cursor.cursor }),
             ...(cursor.limit === undefined ? {} : { limit: cursor.limit }) });
-          if (task.history.status !== "authenticated") throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409,
-            "Committed task state could not be authenticated. No partial event page was returned.");
+          let read: ReturnType<typeof readAcpSessionUpdatePage> | undefined;
+          for (let attempt = 1; read === undefined; attempt++) {
+            try { read = readPage(); }
+            catch (error) {
+              if (!(error instanceof SessionHistoryRefused && error.code === "CHANGED")) throw error;
+              if (attempt >= PAGE_READ_ATTEMPTS) throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409,
+                "The task's history kept changing while it was read. No partial event page was returned; read it again.");
+            }
+          }
+          const { updates, ...page } = read;
+          if (task.history.status !== "authenticated") throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409, entry.changedSince !== undefined
+            ? "The task's history kept changing while it was read. No partial event page was returned; read it again."
+            : "Committed task state could not be authenticated. No partial event page was returned.");
           const events = updates.flatMap(item => { const event = projectNativeTaskUpdate(item.update, item.seq); return event ? [event] : []; });
           const response = { task, events, truncated: false, page };
           if (Buffer.byteLength(JSON.stringify({ ok: true, data: response }), "utf8") > LIMITS.maxEventBytes) {

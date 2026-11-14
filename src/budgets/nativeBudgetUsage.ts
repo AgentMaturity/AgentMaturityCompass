@@ -9,6 +9,8 @@ import { operationalEvidenceProblems, type OperationalEvidenceOptions } from "..
 import { nativeUsdUnits } from "./nativeUsdAmount.js";
 
 export const NATIVE_BUDGET_RESERVATION = "NATIVE_BUDGET_RESERVATION";
+/** A signed llm reservation for the local stub route: its dispatch cannot reach a paid provider, so it carries no USD. */
+export const LOCAL_STUB_USD_EXPOSURE = "none-local-stub";
 export const actionClasses: readonly ActionClass[] = ["READ_ONLY", "WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "NETWORK_EXTERNAL", "DATA_EXPORT", "IDENTITY"];
 export const toolCounts = (): Record<ActionClass, number> => Object.fromEntries(actionClasses.map(key => [key, 0])) as Record<ActionClass, number>;
 export function budgetMeta(event: EvidenceEvent): Record<string, unknown> {
@@ -220,6 +222,8 @@ export function projectBudgetUsage(rows: readonly EvidenceEvent[], agentId: stri
         // An incomplete observation cannot release the ceiling. Preserve exposure over day boundaries.
         reservedCostUnits += nativeUsdUnits(Math.max(reserved, measured.cost));
         if (reservation.ts >= dayStart) budgetCostUnits -= nativeUsdUnits(measured.cost);
+      } else if (meta.usdExposure === LOCAL_STUB_USD_EXPOSURE) {
+        if (reserved !== null || budgetMeta(header).providerId !== "stub") throw new Error("Native local-stub reservation does not match a stub request");
       } else if (!completeCost) result.daily.llmUnreservedCostRequests++;
       if (!settled) result.daily.llmPendingRequests++;
       handledHeaders.add(headerId);

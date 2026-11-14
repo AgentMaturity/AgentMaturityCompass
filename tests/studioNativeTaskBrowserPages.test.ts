@@ -47,3 +47,34 @@ test("a transient evidence conflict while a turn is written is retried with boun
   expect(nativeTaskPollRetryDelay({ status: 400, code: "NATIVE_CURSOR_INVALID" }, 0)).toBeNull();
   expect(nativeTaskPollRetryDelay(new Error("Unsupported task event response."), 0)).toBeNull();
 });
+
+test("the first-run layout puts the prompt and Run task directly under the provider and keeps every caveat in closed disclosures", async () => {
+  const { nativeTasksShell } = await import("../src/console/assets/nativeTasksView.js");
+  const html = nativeTasksShell("default");
+  const at = (text: string) => { const index = html.indexOf(text); expect(index, text).toBeGreaterThan(-1); return index; };
+  expect(at('id="nativeTaskProvider"')).toBeLessThan(at('id="nativeTaskPrompt"'));
+  expect(at('id="nativeTaskPrompt"')).toBeLessThan(at('id="nativeTaskSubmit"'));
+  expect(at('id="nativeTaskSubmit"')).toBeLessThan(at('id="nativeTaskAttachmentsDisclosure"'));
+  expect(at('id="nativeTaskSubmit"')).toBeLessThan(at('id="nativeTaskValidationSetup"'));
+  // The truthfulness wording is kept, only folded away: each caveat sits inside a <details> that is closed by default.
+  for (const caveat of ["Submission order: task text and text-file context first", "Up to four text files.", 'id="nativeTaskDraftBytes"',
+    'id="nativeTaskBoundary"', 'id="nativeTaskLimits"', 'id="nativeTaskValidationSetup"']) {
+    const before = html.slice(0, at(caveat));
+    expect(before.lastIndexOf("<details"), caveat).toBeGreaterThan(before.lastIndexOf("</details>"));
+  }
+  expect(html).not.toMatch(/<details[^>]*\sopen/);
+});
+
+test("a permanent status-read failure reads as one plain line with the next step", async () => {
+  const { NATIVE_TASK_READ_FAILED, NATIVE_TASK_SAMPLE_PROMPT } = await import("../src/console/assets/nativeTasks.js");
+  expect(NATIVE_TASK_READ_FAILED).toBe("AMC could not check this task's record, so it cannot show a result. Try again with Refresh status, or run amc doctor in a terminal.");
+  expect(NATIVE_TASK_SAMPLE_PROMPT.length).toBeGreaterThan(0);
+  for (const text of [NATIVE_TASK_READ_FAILED, NATIVE_TASK_SAMPLE_PROMPT]) expect(text).not.toMatch(/certif|compliant|guarantee/i);
+});
+
+test("a signed-in demo viewer is told why public checks are unavailable, not asked to sign in", async () => {
+  const { inspectNativeTaskValidation } = await import("../src/studio/nativeTaskValidation.js");
+  const message = inspectNativeTaskValidation(undefined, true).message;
+  expect(message).not.toMatch(/sign in/i);
+  expect(message).toMatch(/demo tasks run with no tools/);
+});

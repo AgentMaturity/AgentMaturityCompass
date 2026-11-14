@@ -13,6 +13,10 @@ const STATES = new Set(["starting","idle","running","cancel-requested","releasin
 const EVENT_KINDS = new Set(["user","assistant","tool","tool-update","plan"]);
 const VALIDATION_STATES = new Set(["not-requested","pending","passed","failed","unavailable"]);
 const ACTIVE = new Set(["starting","running","cancel-requested","releasing","verifying"]);
+/** Shown when a status read failed for good: what happened and the next step, in one line. */
+export const NATIVE_TASK_READ_FAILED = "AMC could not check this task's record, so it cannot show a result. Try again with Refresh status, or run amc doctor in a terminal.";
+/** A short prompt for ?sample=1 that the local stub answers by echoing it back. */
+export const NATIVE_TASK_SAMPLE_PROMPT = "Say hello and repeat this sentence back to me.";
 const object = value => value !== null && typeof value === "object" && !Array.isArray(value);
 const integer = value => Number.isSafeInteger(value) && value >= 0;
 function taskView(value) {
@@ -123,7 +127,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   const lifetime = new AbortController();
   let disposed = false, config = null, task = null, tasks = [], cursor = -1, pageCursor = null, historyPending = false, timer = null;
   let polling = false, mutation = false, inspecting = false, pending = null, readGeneration = 0, setupGeneration = 0, readPaused = false;
-  let retryReady = false, reconciling = false, stale = false;
+  let retryReady = false, reconciling = false, stale = false, readFailed = false;
   let pollJob = null, listGeneration = 0, lastObservedAt = null, operationAction = null, evidenceRetries = 0, retryDelay = null;
   let attachments = [], readingAttachments = false, attachmentGeneration = 0, observedTools = new Map();
   let selectedChecks = [], selectedChecksDigest = null;
@@ -192,6 +196,8 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     const serialized = payload?.input ? `${new TextEncoder().encode(JSON.stringify(payload.input.parts)).byteLength} / ${capability.maxSerializedPartsBytes} serialized part bytes, including base64. ` : "";
     el("nativeTaskDraftBytes").textContent = error?.message || `${new TextEncoder().encode(combined).byteLength} / ${maximum} UTF-8 text bytes, including text-file context. ${serialized}These are byte limits, not token-usage measurements.`;
     el("nativeTaskDraftBytes").classList.toggle("status-bad", Boolean(error));
+    if (error) el("nativeTaskSizeDisclosure").open = true;
+    if (attachments.length) el("nativeTaskAttachmentsDisclosure").open = true;
     el("nativeTaskPrompt").setAttribute("aria-invalid", String(Boolean(error)));
     el("nativeTaskSubmissionPreview").hidden = attachments.length === 0;
     const sequence = payload?.input ? `\n\nOriginal media follows this text (${payload.input.format}; original bytes are sent, not the descriptions below):\n${attachments.filter(item => item.type === "image" || item.type === "audio").map((item, index) => `${index + 1}. ${item.name} · ${item.mimeType} · ${item.bytes} original bytes`).join("\n")}` : "";
@@ -235,6 +241,8 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
         || el("nativeTaskTools").value !== "workspace" || !config.scope.ready || !config.scope.tools.some(tool => tool.name === "bash");
     }
     el("nativeTaskModel").disabled = Boolean(task) || !chosen || chosen.model === "fixed" || mutation || inspecting || reconciling || Boolean(pending);
+    // The local stub has one fixed model, so its unused Model field is not shown.
+    el("nativeTaskModel").closest("label").hidden = chosen?.model === "fixed";
     el("nativeTaskTools").querySelector('option[value="workspace"]').disabled = config.demo || !config.scope.ready;
   }
   function controls() {
@@ -302,9 +310,27 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
       : task?.state === "closed" ? "This session is closed and read-only. New task starts a separate session."
       : task?.state === "failed" ? "The task did not finish cleanly. Inspect the recorded error and evidence before choosing recovery or a new task."
       : "Stop requests cancellation of the active turn. Release for later preserves an eligible session; Close and verify ends it.";
+    renderOutcome();
     el("nativeTaskSetup").setAttribute("aria-busy", String(inspecting));
     el("nativeTaskPromptForm").setAttribute("aria-busy", String(mutation || readingAttachments));
     if (config) scope();
+  }
+  /** One plain line next to Run task: the result, why it failed, or that the record could not be checked. */
+  function renderOutcome() {
+    const node = el("nativeTaskOutcome");
+    const finished = task && !stale && !readPaused && task.state === "idle" && task.history.status === "authenticated"
+      && task.turnEndReason && !["error","interrupted"].includes(task.turnEndReason);
+    const key = readFailed ? "read-failed" : !task || stale || mutation || pending ? "" : task.state === "failed" ? `failed:${task.error || ""}`
+      : finished ? `finished:${task.taskId}:${task.agentId}` : "";
+    if (node.dataset.key === key) return;
+    node.dataset.key = key; node.replaceChildren(); node.hidden = !key; node.classList.toggle("status-bad", key !== "" && !finished);
+    if (readFailed) node.textContent = NATIVE_TASK_READ_FAILED;
+    else if (key.startsWith("failed:")) node.textContent = `This task did not finish. ${task.error || "Studio recorded no reason."}`;
+    else if (finished) {
+      const link = document.createElement("a");
+      link.href = "#nativeTaskRecord"; link.textContent = "See what AMC recorded";
+      node.append(`Task finished${config?.demo ? " (local demonstration, not a model answer)" : ""}. The answer is in Conversation below. `, link);
+    }
   }
   function project() {
     if (disposed) return;
@@ -392,7 +418,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
         for (const event of value.events) { el("nativeTaskEmpty")?.remove(); appendTaskEvent(transcript, event); }
         observedTools = collectNativeTaskTools(observedTools, value.events);
         if (value.page) { cursor = value.page.nextSeq - 1; pageCursor = value.page.nextCursor ?? value.page.resumeCursor; historyPending = value.page.nextCursor !== null; }
-        stale = false; lastObservedAt = Date.now(); evidenceRetries = 0;
+        stale = false; readFailed = false; lastObservedAt = Date.now(); evidenceRetries = 0;
         const limit = Math.max(1, Math.min(config?.limits.maxEvents || 500, 500));
         while (transcript.children.length > limit) transcript.firstElementChild.remove();
         receive(view);
@@ -407,8 +433,8 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
         if (!isCurrent()) return false;
         const delay = nativeTaskPollRetryDelay(error, evidenceRetries);
         if (delay !== null) { evidenceRetries++; retryDelay = delay; return false; }
-        evidenceRetries = 0;
-        pauseObservation(); tell("Updates paused. Refresh status to reconnect; no task action will be repeated automatically.");
+        evidenceRetries = 0; readFailed = true;
+        pauseObservation(); tell(NATIVE_TASK_READ_FAILED);
         throw error;
       } finally {
         // A superseded response cannot clear a replacement reader's flags or schedule its timer.
@@ -606,7 +632,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   listen(el("nativeTaskNewMessages"),"click",()=>{el("nativeTaskTranscript").lastElementChild?.scrollIntoView({block:"nearest"});el("nativeTaskNewMessages").hidden=true;});
   listen(el("nativeTaskNew"),"click",()=>{
     if(pending||mutation||inspecting||reconciling||stale||readPaused||ACTIVE.has(task?.state))return;
-    abortRead(); task=null; selectedChecks=[]; selectedChecksDigest=config?.validation.configSha256 ?? null;
+    abortRead(); task=null; readFailed=false; selectedChecks=[]; selectedChecksDigest=config?.validation.configSha256 ?? null;
     stale=false;readPaused=false;clearActivity("Your next task will appear here after you choose Run task.");
     updateUrl(null);project();tell("Choose the next task. Your unsent draft is preserved; previous tasks remain available in Your tasks.");
   });
@@ -627,6 +653,10 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
       await selectTask(selected);
     }}
     else { stale=false;project();tell(config.demo?"Demo workspace: run an explicit local demonstration with no tools.":"Choose a provider and task. Setup inspection has not contacted a model."); }
+    if (!task && new URL(window.location.href).searchParams.get("sample") === "1" && !el("nativeTaskPrompt").value && !el("nativeTaskPrompt").disabled) {
+      if (!el("nativeTaskProvider").value && config.providers.some(item => item.id === "stub")) el("nativeTaskProvider").value = "stub";
+      el("nativeTaskPrompt").value = NATIVE_TASK_SAMPLE_PROMPT; controls(); el("nativeTaskPrompt").focus();
+    }
   } catch(error){if(!disposed){pauseObservation();showError(error);tell("Native task setup is unavailable. Correct the reported configuration and choose Check setup.");}}
   return dispose;
 }
