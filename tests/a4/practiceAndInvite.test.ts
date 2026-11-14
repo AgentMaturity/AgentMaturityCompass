@@ -116,4 +116,27 @@ describe("inviting the second approver", () => {
     expect(refusal(refused)).toEqual([403, "PRINCIPAL_ROLE_INSUFFICIENT"]);
     expect(refused.body.error).toContain("Only a workspace owner");
   });
+
+  test("the projects page's Add a person: one call makes the account and shows the first password once", async () => {
+    const { workspace, owner } = a4Workspace({ solo: true });
+    const added = await a4(workspace, owner, "POST", "/api/v1/a4/people", { clientRequestId: requestId(), username: "dev", workspaceRoles: ["APPROVER"] });
+    expect(added.status).toBe(201);
+    const data = added.body.data as { memberAdded: boolean; firstPassword: string; notes: string[] };
+    expect(data.memberAdded).toBe(false);
+    expect(authenticateUser({ workspace, username: "dev", password: data.firstPassword }).ok).toBe(true);
+    expect(data.notes.join(" ")).toContain("Members card");
+  });
+});
+
+describe("the start form says which kind of project needs a second person", () => {
+  test("practice is offered when Studio offers it, and otherwise its reason is shown", async () => {
+    const view = await import("../../src/console/assets/a4View.js");
+    const offered = view.approverChoiceHtml({ practiceAvailable: true, practiceRefusal: null });
+    expect(offered).toContain("Every Industry Pack is high risk or above");
+    expect(offered).toMatch(/value="yes" \/>/);
+    const refused = view.approverChoiceHtml({ practiceAvailable: false, practiceRefusal: "3 people can sign in to this workspace." });
+    expect(refused).toMatch(/value="yes" disabled \/>/);
+    expect(refused).toContain("3 people can sign in to this workspace.");
+    expect(view.practiceBanner({ practice: true, practiceActive: false })).toContain("This was a practice project");
+  });
 });

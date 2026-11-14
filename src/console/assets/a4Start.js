@@ -278,7 +278,7 @@ export function renderIntro({ creating = true, canAdd = false } = {}) {
         ${creating ? "" : '<button type="button" class="secondary" data-a4-show-create>Start another project</button>'}</div>
       ${canAdd ? `<form id="a4AddPerson" class="a4-form a4-add-person" hidden novalidate>
         <label>Their user name <input name="username" autocomplete="off" required maxlength="64" /></label>
-        <label>A first password for them <input name="password" type="password" autocomplete="new-password" required /></label>
+        <p class="muted">AMC makes a first password for them and shows it here once. Give it to them yourself.</p>
         <label>What they may do <select name="roles"><option value="APPROVER">Approve steps (APPROVER)</option>
           <option value="APPROVER,AUDITOR">Approve steps and audit (APPROVER, AUDITOR; the Fit it to your rules step needs one)</option></select></label>
         <p class="a4-form-error status-bad" role="alert" hidden></p>
@@ -288,6 +288,14 @@ export function renderIntro({ creating = true, canAdd = false } = {}) {
         <p class="muted">In the workspace folder run ${code(addUserCommand())}. Later steps need two approvers, and Fit it to your rules (Adapt)
         needs one of them to hold AUDITOR (${code("--role APPROVER,AUDITOR")}).</p></details>
       <p class="muted">${esc(SOD)}. ${esc(NOT_INDEPENDENT)}.</p></div></section>`;
+}
+
+/** What the Add a person form shows after Studio answers: the first password (once) and the notes, in words. */
+export function addedPersonHtml(data) {
+  const user = isObject(data?.user) ? data.user : {};
+  const password = typeof data?.firstPassword === "string" ? data.firstPassword : null;
+  return `<p>${password ? `Added ${esc(user.username)}. Their first password, shown only this once: ${code(password)}` : `${esc(user.username)} already had an account.`}</p>
+    ${list(data?.notes).map((note) => `<p class="muted">${esc(note)}</p>`).join("")}`;
 }
 
 /** The page shown while the preview is off: what A4 is and the exact way to turn it on (the gate itself stays). */
@@ -388,7 +396,7 @@ function latestProject(projects) {
  * button. With projects: "Continue <name>", what it needs now in one sentence, one button, and "Start another" as a link.
  * In the demo workspace, which cannot hold projects, it says where building works instead.
  */
-export function homeCardHtml({ projects = [], industryHtml = "", demo = false } = {}) {
+export function homeCardHtml({ projects = [], industryHtml = "", demo = false, start = null } = {}) {
   const lead = "Pick your industry, answer plain questions, and AMC drafts the agent with you. A second person approves each step before it moves on.";
   if (demo) {
     return `<h2 id="a4HomeTitle">Build an agent for your industry</h2><p class="first-use-lead">${esc(lead)}</p>
@@ -405,6 +413,6 @@ export function homeCardHtml({ projects = [], industryHtml = "", demo = false } 
       <a href="./a4?new=1">Start another</a></div>`;
   }
   return `<h2 id="a4HomeTitle">Build an agent for your industry</h2><p class="first-use-lead">${esc(lead)}</p>
-    ${renderCreateForm(true, industryHtml, { home: true })}
+    ${renderCreateForm(true, industryHtml, { home: true, start })}
     <p class="muted">A4 Forge preview. ${esc(TRUTH.signatures)}; nothing here says the agent is safe, correct or lawful.</p>`;
 }

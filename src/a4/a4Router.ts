@@ -729,6 +729,11 @@ async function dispatch(route: A4Route): Promise<void> {
     assertQuery(route.params, []);
     return createProject(route);
   }
+  if (rest === "/people" && route.method === "POST") {
+    assertQuery(route.params, []);
+    await inviteMember(route, null);
+    return;
+  }
   const match = PROJECT_PATH.exec(rest);
   if (match !== null) {
     const projectId = match[1]!;

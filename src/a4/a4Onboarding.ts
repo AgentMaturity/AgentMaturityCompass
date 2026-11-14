@@ -11,15 +11,12 @@ import { hostingNow } from "./a4Deploy.js";
 import { signedA4Floor } from "./a4Gates.js";
 import { liveRolesFor, principalPopulation } from "./a4Identity.js";
 import { a4Fail, mutationResult, precheck, priorReplay, readJson, requirePrincipal, type A4Route } from "./a4Router.js";
+import { COMPOSE_STEPS } from "./spec/activate.js";
 import { clientRequestIdSchema, deriveSelfApprovalAllowed, headSeqSchema, type A4Principal } from "./a4Schema.js";
 import { A4StoreError } from "./a4Store.js";
 
 /** The fixed sentence beside every "add a second person" step: SoD-distinct is not independent. */
 export const SECOND_PERSON_NOT_INDEPENDENT = "A second person in the same workspace meets separation of duties; it is not an independent review.";
-/** How a laptop user reaches a Studio that can record a deployment, with the steps the Compose guide gives. */
-export const COMPOSE_STEPS = "To release and deploy, run AMC under Docker Compose and create the project there: in the AMC source folder, "
-  + "`cd deploy/compose`, `cp .env.example .env`, create the secret files its README lists under `deploy/compose/secrets/`, then "
-  + "`docker compose up -d --build` and open http://localhost:3212/console. A project built here does not move there by itself.";
 
 export interface A4StartFacts {
   /** People who can sign in now (ACTIVE local users plus live host sessions); null when a source could not be read. */
@@ -79,13 +76,14 @@ export function approvalsNote(facts: A4StartFacts, practice: boolean): { kind: "
     + SECOND_PERSON_NOT_INDEPENDENT };
 }
 
-const inviteSchema = z.strictObject({
+const inviteFields = {
   username: z.string().trim().regex(/^[A-Za-z0-9][A-Za-z0-9._-]{1,63}$/, "A username is 2 to 64 letters, digits, dots, dashes or underscores, starting with a letter or digit."),
   // Never OWNER: an invitation hands out the right to approve (and, for Adapt's completion, the auditor's vote), nothing more.
   workspaceRoles: z.array(z.enum(["APPROVER", "AUDITOR"])).min(1).max(2).default(["APPROVER"]),
-  expectedHeadSeq: headSeqSchema,
   clientRequestId: clientRequestIdSchema
-});
+};
+const inviteSchema = z.strictObject({ ...inviteFields, expectedHeadSeq: headSeqSchema });
+const peopleSchema = z.strictObject(inviteFields);
 
 /** Five groups of four from an alphabet without look-alikes: about 100 bits, easy to read out. Shown once, never stored in clear. */
 function firstPassword(): string {
@@ -94,14 +92,14 @@ function firstPassword(): string {
 }
 
 /**
- * POST …/members/invite: a signed-in workspace OWNER who may add members creates the person's account (the users API's
+ * POST …/members/invite (or POST /people, the account alone, for the workspace-wide form): a signed-in workspace OWNER who may add members creates the person's account (the users API's
  * own writer, audited as a console account change) with a first password AMC shows once, and adds them to the project
  * as an approver. An ACTIVE account of that name is added as it is: its password and workspace roles are left alone.
  * The account stands even when the member step is refused (the answer says so and still carries the password).
  */
-export async function inviteMember(route: A4Route, projectId: string): Promise<true> {
+export async function inviteMember(route: A4Route, projectId: string | null): Promise<true> {
   const principal = requirePrincipal(route);
-  const { body, request } = await readJson(route, inviteSchema);
+  const { body, request } = projectId === null ? await readJson(route, peopleSchema) : await readJson(route, inviteSchema);
   const replay = priorReplay(route.store, request, projectId);
   if (replay) {
     apiSuccess(route.res, { ...replay, firstPassword: null, note: "This request was already answered. AMC showed the first password once and keeps no copy of it." });
@@ -112,7 +110,7 @@ export async function inviteMember(route: A4Route, projectId: string): Promise<t
     throw a4Fail(403, "PRINCIPAL_ROLE_INSUFFICIENT", "Only a workspace owner signed in to this Studio can invite a person. Ask an owner to do it, or to run "
       + "`amc user add --username <name> --role APPROVER` in the workspace folder.", ["PRINCIPAL_ROLE_INSUFFICIENT"]);
   }
-  precheck(route, projectId, "addMember", body.expectedHeadSeq);
+  if (projectId !== null) precheck(route, projectId, "addMember", (body as z.infer<typeof inviteSchema>).expectedHeadSeq);
   const existing = listUsers(route.workspace).find((user) => user.username.toLowerCase() === body.username.toLowerCase());
   if (existing !== undefined && existing.status !== "ACTIVE") {
     throw a4Fail(409, "A4_USER_DISABLED", `The account ${existing.username} was turned off and cannot be used again. Choose another username.`);
@@ -135,9 +133,15 @@ export async function inviteMember(route: A4Route, projectId: string): Promise<t
     "Adding a person ends self-approval on this workspace's projects for good, and open approval requests are asked for again.",
     SECOND_PERSON_NOT_INDEPENDENT
   ];
+  if (projectId === null) {
+    // The workspace-wide form (the projects page's "Add a person"): the account alone; projects add them on their Members card.
+    apiSuccess(route.res, { memberAdded: false, user: account, firstPassword: password,
+      notes: [...notes, `Add ${user.username} to a project on its Members card, or start the project and add them there.`] }, existing === undefined ? 201 : 200);
+    return true;
+  }
   try {
     const result = route.store.recordMember(projectId, { actor: principal, event: "added", principalKey: `LOCAL_USER:${user.userId}`, roles: ["approver"],
-      expectedHeadSeq: body.expectedHeadSeq, request });
+      expectedHeadSeq: (body as z.infer<typeof inviteSchema>).expectedHeadSeq, request });
     apiSuccess(route.res, { ...mutationResult(result), memberAdded: true, user: account, firstPassword: password, notes }, 201);
   } catch (error) {
     if (password === null || !(error instanceof A4StoreError)) throw error;
