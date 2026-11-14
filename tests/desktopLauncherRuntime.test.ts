@@ -49,11 +49,11 @@ test.skipIf(process.platform === "win32")("moved macOS app installs from its own
     const calls = join(directory, "calls.log");
     mkdirSync(stubs);
     writeFileSync(join(stubs, "npm"), `#!/bin/sh\necho "npm $1 $6" >>"${calls}"\nmkdir -p "$3/node_modules/.bin"\ncp "${stubs}/amc-stub" "$3/node_modules/.bin/amc"\n`, { mode: 0o755 });
-    writeFileSync(join(stubs, "osascript"), `#!/bin/sh\necho dialog >>"${calls}"\n`, { mode: 0o755 });
     writeFileSync(join(stubs, "amc-stub"), `#!/bin/sh
 old=gone
 [ -n "\${STUDIO_PID:-}" ] && kill -0 "$STUDIO_PID" 2>/dev/null && old=alive
 echo "amc $1 $old $(basename "$PWD")" >>"${calls}"
+[ "$1" = up ] && [ "\${AMC_UP_STATUS:-0}" != 0 ] && echo "Studio daemon exited during startup"
 [ "$1" = down ] && kill "$STUDIO_PID"
 [ "$1" = up ] && exit "\${AMC_UP_STATUS:-0}"
 exit 0
@@ -61,11 +61,15 @@ exit 0
     const home = join(directory, "home");
     const support = join(home, "Library", "Application Support", "Agent Maturity Compass");
     // Asynchronous, so this process keeps reaping its children and serving its listener while the launcher runs.
+    let stdout = "";
     const launch = (env: Record<string, string> = {}) => new Promise<{ status: number | null; calls: string[] }>((done) => {
       rmSync(calls, { force: true });
-      spawn("/bin/sh", [join(resources, "launch-studio.sh")], {
-        env: { HOME: home, PATH: `${stubs}:${dirname(process.execPath)}:/usr/bin:/bin`, ...env }, stdio: "ignore"
-      }).on("exit", (status) => done({ status, calls: existsSync(calls) ? readFileSync(calls, "utf8").trim().split("\n") : [] }));
+      stdout = "";
+      const child = spawn("/bin/sh", [join(resources, "launch-studio.sh")], {
+        env: { HOME: home, PATH: `${stubs}:${dirname(process.execPath)}:/usr/bin:/bin`, ...env }, stdio: ["ignore", "pipe", "ignore"]
+      });
+      child.stdout.on("data", (chunk) => { stdout += String(chunk); });
+      child.on("close", (status) => done({ status, calls: existsSync(calls) ? readFileSync(calls, "utf8").trim().split("\n") : [] }));
     });
 
     expect(await launch()).toEqual({ status: 0, calls: [`npm install ${join(resources, "amc.tgz")}`, "amc up gone studio-workspace"] });
@@ -96,12 +100,17 @@ exit 0
     ]);
     expect(existsSync(stateFile)).toBe(false);
 
-    // A failed start explains a taken Studio port, and only then.
+    // A failed start names a port of the app that another program holds, in words the app shows, and only then.
     await new Promise<void>((done) => server.listen(0, "127.0.0.1", done));
     const port = String((server.address() as { port: number }).port);
-    expect(await launch({ AMC_UP_STATUS: "1", AMC_HOST_PORT: port })).toEqual({ status: 1, calls: ["amc up gone studio-workspace", "dialog"] });
+    const ports = Object.fromEntries(["AMC_STUDIO_PORT", "AMC_HOST_PORT", "AMC_GATEWAY_PORT", "AMC_PROXY_PORT", "AMC_DASHBOARD_PORT", "AMC_METRICS_PORT"]
+      .map((name) => [name, port]));
+    expect(await launch({ AMC_UP_STATUS: "1", ...ports })).toEqual({ status: 1, calls: ["amc up gone studio-workspace"] });
+    expect(stdout).toContain(`AMC_ERROR=AMC could not start because another program on this Mac uses port ${port}`);
     await new Promise<void>((done) => server.close(() => done()));
-    expect(await launch({ AMC_UP_STATUS: "1", AMC_HOST_PORT: port })).toEqual({ status: 1, calls: ["amc up gone studio-workspace"] });
+    expect(await launch({ AMC_UP_STATUS: "1", ...ports })).toEqual({ status: 1, calls: ["amc up gone studio-workspace"] });
+    expect(stdout).toMatch(/^AMC_ERROR=AMC could not start: .* Details are in .*studio-launcher\.log\.$/m);
+    expect(stdout).not.toContain("uses port");
   } finally {
     if (server.listening) server.close();
     daemon?.kill();
@@ -136,9 +145,9 @@ exit 0
     const bound = launch(JSON.stringify({ pid: 1, apiPort: 47123, host: "127.0.0.1" }));
     expect(bound.status, bound.stderr).toBe(0);
     expect(bound.stdout.trim().split("\n").at(-1)).toBe("AMC_STUDIO_URL=http://127.0.0.1:47123/w/demo/console/");
-    // An unreadable or implausible state falls back to the default port.
+    // An unreadable or implausible state falls back to the app's configured port, away from a terminal amc up's 3212.
     for (const state of ["not json", JSON.stringify({ apiPort: 70000 }), JSON.stringify({ apiPort: "3213" })]) {
-      expect(launch(state).stdout.trim().split("\n").at(-1)).toBe("AMC_STUDIO_URL=http://127.0.0.1:3212/w/demo/console/");
+      expect(launch(state).stdout.trim().split("\n").at(-1)).toBe("AMC_STUDIO_URL=http://127.0.0.1:3232/w/demo/console/");
     }
   } finally {
     rmSync(directory, { recursive: true, force: true });
