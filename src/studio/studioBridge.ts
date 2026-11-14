@@ -9,7 +9,7 @@ import { pathExists } from "../utils/fs.js";
 import { processRunning, readStudioState, studioDir } from "./studioState.js";
 
 /** The file writeStudioState keeps the API port in; `amc down` clears state.json but not this. */
-export function lastApiPortPath(workspace: string): string {
+function lastApiPortPath(workspace: string): string {
   return join(studioDir(workspace), "last-api-port");
 }
 

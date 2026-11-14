@@ -9,7 +9,7 @@ const list = (value) => (Array.isArray(value) ? value : []);
 const title = (stage) => (typeof stage === "string" && stage ? stage[0].toUpperCase() + stage.slice(1) : "");
 const STEPS = ["asked", "understood", "explained", "proposed", "direction_approved", "built", "reviewed", "completion_approved"];
 
-export const WHAT_IS_A_PROJECT = "An agent project takes one agent from a brief to a recorded deployment in four stages. "
+const WHAT_IS_A_PROJECT = "An agent project takes one agent from a brief to a recorded deployment in four stages. "
   + "Each stage asks you questions, AMC drafts from your answers, and a second person approves before the project moves on.";
 const STAGE_PURPOSE = { aspire: "what the agent is for", assemble: "build it", adapt: "fit it to your context and rules",
   activate: "release and deploy it" };
@@ -21,11 +21,11 @@ function roleFor(rolesAllowed) {
   const roles = list(rolesAllowed).filter((role) => role !== "OWNER");
   return roles.includes("APPROVER") ? "APPROVER" : roles[0] ?? "APPROVER";
 }
-export const addUserCommand = (role = "APPROVER") => `amc user add --username <name> --role ${role}`;
+const addUserCommand = (role = "APPROVER") => `amc user add --username <name> --role ${role}`;
 const code = (text) => `<code>${esc(text)}</code>`;
 
 /** The four stages as a stepper: earlier stages done, the project's stage current, the viewed one marked. */
-export function renderStepper(project, stage) {
+function renderStepper(project, stage) {
   const at = STAGES.indexOf(project.stage);
   const id = encodeURIComponent(project.projectId ?? "");
   return `<ol class="a4-stepper" aria-label="Stages">${STAGES.map((name, index) => {
@@ -122,7 +122,7 @@ function askMove(ctx) {
 }
 
 /** The viewed stage's `kind` gate as readiness states it, joined with its /gates record (exclusions, request, decisions). */
-export function liveGate(ctx, kind) {
+function liveGate(ctx, kind) {
   const view = ctx.readiness?.gates?.[kind];
   return isObject(view) ? { ...list(ctx.gates).find((row) => row.gateId === view.gateId), ...view } : null;
 }
@@ -278,7 +278,7 @@ export function errorHtml(error) {
  * "Use an example". Filled text is marked "(sample)" so what gets recorded says so; a choice or a validated list (risk
  * tier, stations, autonomy, provider, path, governance, languages) takes a plain value and the free text beside it carries the mark.
  */
-export const SAMPLE_MARK = "(sample)";
+const SAMPLE_MARK = "(sample)";
 const S = (text) => `${SAMPLE_MARK} ${text}`;
 export const EXAMPLES = {
   aspire: { agent: S("Invoice helper: sorts incoming supplier invoices and flags odd ones"), problem: S("The finance team sorts supplier invoices by hand every week."),
