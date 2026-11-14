@@ -2465,7 +2465,8 @@ async function renderIndustryPacks() {
     onAction(button, "click", async () => {
       const id = button.getAttribute("data-industry-pack");
       try {
-        detail.innerHTML = industryPackDetailHtml((await apiGet(`/industry-packs/${encodeURIComponent(id)}`)).pack);
+        const loaded = await apiGet(`/industry-packs/${encodeURIComponent(id)}`);
+        detail.innerHTML = industryPackDetailHtml(loaded.pack, loaded.savedResponses);
         bindIndustryPackDetail(detail, button);
       } catch (error) {
         detail.innerHTML = `<p class="status-bad">${htmlEscape(errText(error))}</p>`;
@@ -3819,7 +3820,14 @@ async function renderPage() {
 
   try {
     if (page === "home") return await renderHome();
-    if (page === "native-tasks") return await renderNativeTasksPage({ root, initialAgent: currentAgent() });
+    if (page === "native-tasks") {
+      // Opened from an agent project's build session (?project=): a way back to it.
+      const project = new URLSearchParams(location.search).get("project");
+      if (/^a4p_[0-9a-f]{32}$/.test(project ?? "") && !document.getElementById("a4BackLink")) {
+        root.insertAdjacentHTML("beforebegin", `<p id="a4BackLink"><a class="button secondary" href="./a4Project?project=${project}&amp;stage=assemble">Back to the agent project</a></p>`);
+      }
+      return await renderNativeTasksPage({ root, initialAgent: currentAgent() });
+    }
     if (page === "agent") return await renderAgent();
     if (page === "evidence") return await renderEvidence();
     if (page === "runtime") return await renderRuntimeRuns();

@@ -18,6 +18,7 @@ import { InvalidArgumentError, Option, type Command } from "commander";
 import { A4_API_PREFIX, serveA4, unboundClaim } from "./a4/a4Router.js";
 import { verifyTrackedSessionToken } from "./auth/authApi.js";
 import { pendingExecutors } from "./a4/a4Gates.js";
+import { notReadyWords } from "./a4/a4Words.js";
 import { resolveA4LoginPrincipal } from "./a4/a4Identity.js";
 import { A4_PROJECT_ROLES, A4_STAGES, A4_STEPS, a4PreviewEnabled, type A4Principal } from "./a4/a4Schema.js";
 import { A4StoreError, readOnlyNow } from "./a4/a4Store.js";
@@ -278,9 +279,13 @@ async function finishWrite(opts: Write, projectId: string, data: Data, print: ()
 
 /** Readiness items worth reading in text: the mandatory ones not READY or COMPLETE, at most TEXT_ROWS. */
 function printOpenItems(readiness: Data): void {
-  const items = (readiness.items as Array<{ id: string; status: string; mandatory: boolean; reasonCodes: string[] }> | undefined) ?? [];
+  const items = (readiness.items as Array<{ id: string; status: string; mandatory: boolean; reasonCodes: string[]; nextAction?: { label?: string } | null }> | undefined) ?? [];
   const open = items.filter((item) => item.mandatory && item.status !== "READY" && item.status !== "COMPLETE");
-  for (const item of open.slice(0, TEXT_ROWS)) console.log(`- ${item.id}: ${item.status}${item.reasonCodes.length > 0 ? ` (${item.reasonCodes.join(", ")})` : ""}`);
+  // In words first (what it means and what to do), then the item id, its status and its reason codes for reference.
+  for (const item of open.slice(0, TEXT_ROWS)) {
+    const words = item.reasonCodes.includes("OWNER_ACKNOWLEDGED") ? "Acknowledged by a project owner; it stays listed." : notReadyWords(item) ?? item.nextAction?.label;
+    console.log(`- ${words ? `${safe(words)} ` : ""}[${item.id}: ${item.status.toLowerCase()}${item.reasonCodes.length > 0 ? `; ${item.reasonCodes.join(", ")}` : ""}]`);
+  }
   if (open.length > TEXT_ROWS) console.log(`… ${open.length - TEXT_ROWS} more (--json prints them all)`);
   const next = readiness.nextAction as { label?: string } | null | undefined;
   if (next?.label) console.log(`Next: ${safe(next.label)}`);
@@ -358,6 +363,10 @@ function registerReads(a4: Command): void {
       console.log(`Stage ${String(data.stage)}, step ${String(data.step)}; revision ${String(data.revisionNo)}; head seq ${String(data.headSeq)}`
         + `${data.hold === true ? `; on hold (${safe(data.holdReason)})` : ""}`);
       console.log(`Readiness: ${readiness?.status ?? "not_evaluated"}; members: ${(data.members as unknown[]).length}`);
+      console.log(data.practice === true && data.practiceActive === true
+        ? "Who approves: this is a practice project, so you may approve your own work; each such approval is recorded and shown as self-approved."
+        : `Who approves: someone other than the person who wrote, built or asked for each step${data.regulated === true ? " (the project is governed as regulated)" : ""}`
+          + `${data.practice === true ? "; this was a practice project until a second person could sign in" : ""}.`);
       for (const view of Object.values(data.gates as Record<string, Data | null>)) {
         if (view) console.log(`Gate ${String(view.gate)} ${String(view.gateId)}: ${String(view.status)}, ${String(view.approvals)}/${String(view.required)} approvals, requested at seq ${String(view.requestedSeq)}`);
       }

@@ -8325,7 +8325,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         return;
       }
 
-      // M3: the console questionnaire. Scored by scoreIndustryPack, as `amc domain pack run --json` and the MCP tool; nothing is stored.
+      // M3: the console questionnaire. Scored by scoreIndustryPack, as `amc domain pack run --json` and the MCP tool; a signed-in person's last scored answers are kept (A4-10).
       const industryPackScoreMatch = pathname.match(/^\/industry-packs\/([^/]+)\/score$/);
       if (industryPackScoreMatch && req.method === "POST") {
         if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
@@ -8354,6 +8354,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const answers = responses as Record<string, number>;
         const result = scoreIndustryPack(pack.id, answers);
+        if (auth?.userId) {
+          const { saveConsoleResponses } = await import("../domains/packResponses.js");
+          saveConsoleResponses(options.workspace, auth.userId, pack.id, answers);
+        }
         json(res, 200, { ...result, ...claimFields(packSelfAssessmentEnvelope(pack, answers, Date.now())) });
         return;
       }
@@ -8372,7 +8376,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 404, { error: "industry pack not found" });
           return;
         }
-        json(res, 200, { pack, entitlement, entitlementNote: ENTITLEMENT_NOTE });
+        const { loadConsoleResponses } = await import("../domains/packResponses.js");
+        json(res, 200, { pack, entitlement, entitlementNote: ENTITLEMENT_NOTE,
+          savedResponses: auth?.userId ? loadConsoleResponses(options.workspace, auth.userId, pack.id) : null });
         return;
       }
 

@@ -152,7 +152,7 @@ async function showHomeEntry() {
     const projects = listOf(await apiNativeRequest(`${API}/projects`), "projects");
     if (!card || (projects.length === 0 && !canCreate(who, options))) return;
     const catalog = projects.length === 0 ? listOf(await apiGet("/industry-packs/list").catch(() => null), "packs") : [];
-    card.innerHTML = start.homeCardHtml({ projects, industryHtml: packs.packSelectHtml(catalog, null) });
+    card.innerHTML = start.homeCardHtml({ projects, industryHtml: packs.packSelectHtml(catalog, null), start: options.workspace?.start ?? null });
     card.hidden = false;
     bindCreateForm(card.querySelector("#a4HomeForm"));
   } catch {
@@ -191,7 +191,8 @@ function bindCreateForm(createForm) {
       }
       formError("");
       const action = { label: "Start an agent project", path: `${API}/projects`,
-        body: { clientRequestId: uuid(), name, expertise: form.get("expertise") || "novice", ...(agentId ? { agentId } : {}) } };
+        body: { clientRequestId: uuid(), name, expertise: form.get("expertise") || "novice", ...(agentId ? { agentId } : {}),
+          ...(form.get("practice") === "yes" ? { practice: true } : {}) } };
       const pack = packs.packIdOf(form.get("pack"));
       action.after = (data) => {
         const projectId = one(data, "project").projectId;
@@ -206,7 +207,10 @@ function bindCreateForm(createForm) {
   });
 }
 
-/** The intro's inline "Add a person" form (OWNER only; Studio's /users/add checks the role again). */
+/**
+ * The intro's inline "Add a person" form (OWNER only; Studio checks the role again). One call (POST /api/v1/a4/people)
+ * creates the account with a first password AMC makes and shows once, here; the owner hands it over in person.
+ */
 function bindAddPerson(form, toggle) {
   if (!form || !toggle) return;
   toggle.addEventListener("click", () => {
@@ -225,13 +229,14 @@ function bindAddPerson(form, toggle) {
     const error = form.querySelector(".a4-form-error");
     const status = form.querySelector("[data-a4-add-status]");
     const username = String(form.elements.username.value ?? "").trim();
-    const password = String(form.elements.password.value ?? "");
     error.hidden = true;
-    if (!username || !password) { error.textContent = "Write a user name and a first password. Nothing was sent."; error.hidden = false; return; }
+    status.replaceChildren();
+    if (!username) { error.textContent = "Write their user name. Nothing was sent."; error.hidden = false; return; }
     try {
-      await apiPost("/users/add", { username, password, roles: String(form.elements.roles.value).split(",") });
+      const data = await apiNativeRequest(`${API}/people`, { method: "POST", nativeCsrfToken: me?.nativeCsrfToken ?? undefined,
+        body: { clientRequestId: uuid(), username, workspaceRoles: String(form.elements.roles.value).split(",") } });
       form.reset();
-      status.textContent = `Added ${username}. Give them the password and this console's address so they can sign in, then add them to a project on its Members card.`;
+      status.innerHTML = start.addedPersonHtml(data);
     } catch (failure) {
       error.innerHTML = start.errorHtml(failure);
       error.hidden = false;
@@ -248,7 +253,7 @@ async function renderListPage(options) {
   const catalog = canCreate(me, options) ? listOf(await apiGet("/industry-packs/list").catch(() => null), "packs") : [];
   const creating = params.has("new") || projects.length === 0;
   root.innerHTML = `${start.renderIntro({ creating, canAdd: isOwner(me) })}${canCreate(me, options) ? view.renderCreateForm(creating,
-    packs.packSelectHtml(catalog, packs.packIdOf(params.get("pack"))))
+    packs.packSelectHtml(catalog, packs.packIdOf(params.get("pack"))), { start: options?.workspace?.start ?? null })
     : `<p class="muted">${view.CREATE_NEEDS}.</p>`}${view.renderProjectList(projects)}`;
   bindCreateForm(root.querySelector("#a4CreateForm"));
   bindAddPerson(root.querySelector("#a4AddPerson"), root.querySelector("[data-a4-add-person]"));
@@ -420,9 +425,10 @@ function mountProject(projectId, options) {
     const shown = shownReview();
     const gateChange = view.boundReview(shown) && reviewed && !view.sameReview(reviewed, shown) ? { from: reviewed, to: shown } : null;
     const ctx = { ...state, stage, allowed: readiness.allowed, me, gateChange, reflection, explanation, answerDrift: answerDrift(), specDraft: specBase !== null,
-      questions: listOf(state.options?.questions?.[stage], "questions").map((question) => ({ ...question, example: start.placeholderOf(stage, question.id) })),
+      questions: listOf(state.options?.questions?.[stage], "questions").map((question) => ({ ...question, example: start.placeholderOf(stage, question.id),
+        ...(stage === "adapt" && Array.isArray(state.options?.catalogTerms?.[question.id]) ? { terms: state.options.catalogTerms[question.id] } : {}) })),
       answers: shownAnswers(), understandingCurrent: state.understandingCurrent, exampleOffered: start.FILLABLE.has(stage) && stage === state.project.stage };
-    root.innerHTML = `${view.holdBanner(project)}${start.renderStartHere(ctx)}${startPack && stage === "aspire" ? packs.packPanelHtml(startPack, state.project.revisionNo === packFilledAt ? packFilled ?? 0 : 0) : ""}${view.stageBanner(stage)}${conflict ? view.renderConflict(conflict) : ""}
+    root.innerHTML = `${view.holdBanner(project)}${view.practiceBanner(project)}${start.renderStartHere(ctx)}${startPack && stage === "aspire" ? packs.packPanelHtml(startPack, state.project.revisionNo === packFilledAt ? packFilled ?? 0 : 0) : ""}${view.stageBanner(stage)}${conflict ? view.renderConflict(conflict) : ""}
       <section class="card"><h3 class="a4-project-name">${view.esc(project.name)}</h3><p class="muted">Agent <code>${view.esc(project.agentId)}</code> ·
         <span title="revision ${view.esc(project.revisionNo)}, head ${view.esc(project.headSeq)}">version ${view.esc(project.revisionNo)}</span></p>${view.stageLinks(project, stage)}${view.movedNote(project, stage)}
         <p class="muted">${view.esc(readiness.claimBoundary)}</p></section>
@@ -496,10 +502,11 @@ function mountProject(projectId, options) {
   }
 
   function specAction(spec, base) {
+    const changed = view.changedParts(spec, base.spec);
     return { label: "Propose this specification", path: stagePath("propose"), spec, base, clears: ["specification:spec"],
       got: () => { specBase = null; },
       // P1-57 takes no parent for a first revision (a null is refused).
-      body: { spec, ...(base.revisionNo > 0 ? { parentRevisionNo: base.revisionNo } : {}), expectedHeadSeq: base.headSeq, clientRequestId: uuid() } };
+      body: { spec: changed, ...(base.revisionNo > 0 ? { parentRevisionNo: base.revisionNo } : {}), expectedHeadSeq: base.headSeq, clientRequestId: uuid() } };
   }
 
   function parseSpec(text) {
@@ -553,12 +560,13 @@ function mountProject(projectId, options) {
     switch (name) {
       case "answers": {
         if (answerDrift()) throw new Error(`${view.ANSWER_CHANGED}. Nothing was sent.`);
-        // Only the fields the user changed: an untouched carried answer is never re-sent as the user's own statement.
+        // Only the fields the user changed: an untouched carried answer is never re-sent as the user's own statement. A field
+        // the user emptied clears its answer (sent as null, which Studio records as no answer).
         const edited = [...scope.querySelectorAll("form[data-a4-answers] textarea[name]")]
-          .filter((field) => field.value.trim() && field.value.trim() !== field.defaultValue.trim());
+          .filter((field) => field.value.trim() !== field.defaultValue.trim());
         if (edited.length === 0) throw new Error("No answer was changed. Nothing was sent.");
         return { ...post("Save answers", stagePath("answers"), { expectedHeadSeq: answerBase ?? state.project.headSeq, clientRequestId: uuid(),
-          answers: edited.map((field) => ({ questionId: field.name, value: answerValue(field) })) }, [], () => dropAnswerDrafts(card)), answers: true };
+          answers: edited.map((field) => ({ questionId: field.name, value: field.value.trim() ? answerValue(field) : null })) }, [], () => dropAnswerDrafts(card)), answers: true };
       }
       case "confirm-answer": {
         const answer = shownAnswers().find((row) => row.questionId === button.dataset.question);
@@ -614,6 +622,14 @@ function mountProject(projectId, options) {
         return post("Add member", projectPath("/members"), { principalKey: row.dataset.principal,
           projectRoles: [row.querySelector('[name="role"]').value], ...headBinding() }, [`member:${row.dataset.principal}:role`],
           () => { if (live) tell(`Member added. The open ${live.gate} approval request was superseded by the add: request it again.`); });
+      }
+      case "invite-member": {
+        const username = value("inviteUsername");
+        if (!username) throw new Error("Write their user name first. Nothing was sent.");
+        const auditor = scope.querySelector('[name="inviteAuditor"]')?.checked === true;
+        return post("Invite", projectPath("/members/invite"), { username, workspaceRoles: auditor ? ["APPROVER", "AUDITOR"] : ["APPROVER"], ...headBinding() }, [],
+          (data) => tell(`${data?.firstPassword ? `${data.user?.username} was invited. Their first password, shown only this once: ${data.firstPassword}. ` : ""}${
+            (Array.isArray(data?.notes) ? data.notes : []).join(" ")}`));
       }
       case "comment": {
         const body = value("comment");

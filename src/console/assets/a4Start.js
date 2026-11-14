@@ -2,6 +2,7 @@
 // and one primary action), who must approve a gate, errors in sentences, the preview-off and demo pages, and example
 // answers. Pure: data in, HTML or plain values out; every server string goes through esc(). Studio re-checks every
 // action, so the primary action only points at the page's own buttons and never decides anything itself.
+import { QUESTION_LABELS } from "./a4Questions.js";
 import { reasonsText, STAGES, STAGE_PLAIN, STEP_NEXT, STEP_PLAIN, STEP_TITLES, TRUTH, esc, previewNoticeHtml, renderCreateForm } from "./a4View.js";
 
 const isObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
@@ -11,6 +12,8 @@ const STEPS = ["asked", "understood", "explained", "proposed", "direction_approv
 
 const WHAT_IS_A_PROJECT = "An agent project takes one agent from a brief to a recorded deployment in four stages. "
   + "Each stage asks you questions, AMC drafts from your answers, and a second person approves before the project moves on.";
+const PRACTICE_IS = "A practice project takes one agent through the four stages so you can learn AMC alone. Each stage asks you questions, "
+  + "AMC drafts from your answers, and you approve your own work; each such approval is recorded as self-approved.";
 const SOD = "The person who wrote, built or requested a stage cannot approve it (separation of duties)";
 const NOT_INDEPENDENT = "A second approver in the same workspace meets separation of duties; it is not an independent review";
 
@@ -111,7 +114,16 @@ function askMove(ctx) {
     act: { label: "Confirm the first answer", focus: `[data-a4-action="confirm-answer"][data-question="${esc(stale[0])}"]` } };
   if (prefixed(codes, "CARRIED_MISSING:").length) return { now: "Run Understand first: it brings in your answers from the earlier stages, then you answer the new questions.",
     act: { label: "Run Understand", press: "understand" } };
-  const missing = [...prefixed(codes, "ANSWER_MISSING:"), ...prefixed(codes, "ANSWER_INVALID:")];
+  // An answer AMC does not accept is named, with what it takes, instead of being counted with the empty ones.
+  const invalid = prefixed(codes, "ANSWER_INVALID:").find((id) => list(ctx.questions).some((question) => question.id === id));
+  if (invalid) {
+    const question = list(ctx.questions).find((entry) => entry.id === invalid);
+    const label = QUESTION_LABELS[invalid]?.[0] ?? question.prompt ?? invalid;
+    return { now: `AMC does not accept your answer to "${label}". ${question.prompt ?? ""}${Array.isArray(question.terms) && question.terms.length
+      ? ` It takes: ${question.terms.join(", ")}.` : ""} Change it under "Change my answers", or empty the field to clear it, then press Save answers.`,
+    act: { label: "Change that answer", focus: `form[data-a4-answers] [name="${esc(invalid)}"]` } };
+  }
+  const missing = prefixed(codes, "ANSWER_MISSING:");
   const fillable = missing.find((id) => list(ctx.questions).some((question) => question.id === id && id !== "expertise"));
   if (fillable) return { now: `Answer the questions marked (required) under Ask, then press Save answers. ${missing.length} still need an answer.`,
     act: { label: "Answer the first question", focus: `form[data-a4-answers] [name="${esc(fillable)}"]` } };
@@ -175,6 +187,11 @@ function gateMove(ctx, kind) {
       act: { label: "Write your reason", focus: '.a4-approvals [name="reason"]' } };
   }
   if (status === "DENIED") return { now: "This revision was denied. Change an answer under Ask and save it to start a new revision.", act: { label: "Change an answer", focus: "form[data-a4-answers] textarea" } };
+  // Alone, an acknowledgement only meets a second refusal: the words match amc a4 readiness and Studio's refusal (a4Words).
+  if (codesOf(readiness, "sod.self_provisioned").includes("NO_SECOND_APPROVER") && list(readiness?.allowed?.requestGate?.reasonCodes).includes("sod.self_provisioned")) {
+    return { now: "Nobody else on this project can approve it. Invite a second person on the Members card (Invite someone new), or add someone who can "
+      + "already sign in there. To learn AMC alone, start a practice project instead.", act: { label: "Invite someone", focus: ".a4-invite input" } };
+  }
   const ack = toAcknowledge(readiness);
   if (ack.length) return { now: `Before asking for approval, a project owner acknowledges ${ack.map((item) => item.id).join(", ")}: ${ACK_PLAIN[ack[0].id] ?? ack[0].nextAction?.label ?? "see Missing requirements"}.`,
     why: "Write a short reason in the Approvals card, then press Acknowledge beside the item under Missing requirements (shown below). Acknowledging after the request would cancel it.",
@@ -239,7 +256,7 @@ export function renderStartHere(ctx) {
   const gate = stage === project.stage && kind ? liveGate(ctx, kind) : null;
   const live = gate && (gate.status === "PENDING" || gate.status === "QUORUM_MET") ? gate : null;
   return `<section class="card a4-start" aria-labelledby="a4StartTitle"><h3 id="a4StartTitle">What to do now</h3>
-    <p class="muted">${esc(WHAT_IS_A_PROJECT)}</p>${renderStepper(project, stage)}
+    <p class="muted">${esc(project.practiceActive === true ? PRACTICE_IS : WHAT_IS_A_PROJECT)}</p>${renderStepper(project, stage)}
     ${stage === project.stage && at >= 0 ? `<p>${esc(STAGE_PLAIN[stage] ?? title(stage))}: part ${at + 1} of ${STEPS.length}, ${esc(STEP_PLAIN[project.step] ?? project.step)}
       <small class="muted">(${esc(title(stage))}, ${esc(STEP_TITLES[project.step] ?? project.step)})</small>.</p>` : ""}
     <p class="a4-now"><strong>${esc(move.now)}</strong></p>${move.why ? `<p class="muted">${esc(move.why)}</p>` : ""}
@@ -268,16 +285,25 @@ export function renderIntro({ creating = true, canAdd = false } = {}) {
         ${creating ? "" : '<button type="button" class="secondary" data-a4-show-create>Start another project</button>'}</div>
       ${canAdd ? `<form id="a4AddPerson" class="a4-form a4-add-person" hidden novalidate>
         <label>Their user name <input name="username" autocomplete="off" required maxlength="64" /></label>
-        <label>A first password for them <input name="password" type="password" autocomplete="new-password" required /></label>
+        <p class="muted">AMC makes a first password for them and shows it here once. Give it to them yourself.</p>
         <label>What they may do <select name="roles"><option value="APPROVER">Approve steps (APPROVER)</option>
-          <option value="APPROVER,AUDITOR">Approve steps and audit (APPROVER, AUDITOR; the Fit it to your rules step needs one)</option></select></label>
+          <option value="APPROVER,AUDITOR">Approve steps and audit (APPROVER, AUDITOR)</option></select></label>
+        <p class="muted">Fit it to your rules (Adapt) needs two people besides the one who asks, each an auditor or a workspace owner, so give the audit role to at least two people.</p>
         <p class="a4-form-error status-bad" role="alert" hidden></p>
         <p class="muted" role="status" data-a4-add-status></p>
         <button type="submit" class="secondary">Add this person</button></form>` : ""}
       <details class="a4-terminal"><summary>Use the terminal instead</summary>
         <p class="muted">In the workspace folder run ${code(addUserCommand())}. Later steps need two approvers, and Fit it to your rules (Adapt)
-        needs one of them to hold AUDITOR (${code("--role APPROVER,AUDITOR")}).</p></details>
+        needs two besides the one who asks who hold AUDITOR or OWNER (${code("--role APPROVER,AUDITOR")}).</p></details>
       <p class="muted">${esc(SOD)}. ${esc(NOT_INDEPENDENT)}.</p></div></section>`;
+}
+
+/** What the Add a person form shows after Studio answers: the first password (once) and the notes, in words. */
+export function addedPersonHtml(data) {
+  const user = isObject(data?.user) ? data.user : {};
+  const password = typeof data?.firstPassword === "string" ? data.firstPassword : null;
+  return `<p>${password ? `Added ${esc(user.username)}. Their first password, shown only this once: ${code(password)}` : `${esc(user.username)} already had an account.`}</p>
+    ${list(data?.notes).map((note) => `<p class="muted">${esc(note)}</p>`).join("")}`;
 }
 
 /** The page shown while the preview is off: what A4 is and the exact way to turn it on (the gate itself stays). */
@@ -378,7 +404,7 @@ function latestProject(projects) {
  * button. With projects: "Continue <name>", what it needs now in one sentence, one button, and "Start another" as a link.
  * In the demo workspace, which cannot hold projects, it says where building works instead.
  */
-export function homeCardHtml({ projects = [], industryHtml = "", demo = false } = {}) {
+export function homeCardHtml({ projects = [], industryHtml = "", demo = false, start = null } = {}) {
   const lead = "Pick your industry, answer plain questions, and AMC drafts the agent with you. A second person approves each step before it moves on.";
   if (demo) {
     return `<h2 id="a4HomeTitle">Build an agent for your industry</h2><p class="first-use-lead">${esc(lead)}</p>
@@ -395,6 +421,6 @@ export function homeCardHtml({ projects = [], industryHtml = "", demo = false } 
       <a href="./a4?new=1">Start another</a></div>`;
   }
   return `<h2 id="a4HomeTitle">Build an agent for your industry</h2><p class="first-use-lead">${esc(lead)}</p>
-    ${renderCreateForm(true, industryHtml, { home: true })}
+    ${renderCreateForm(true, industryHtml, { home: true, start })}
     <p class="muted">A4 Forge preview. ${esc(TRUTH.signatures)}; nothing here says the agent is safe, correct or lawful.</p>`;
 }

@@ -115,6 +115,34 @@ export function holdBanner(project) {
   return project?.hold ? `<div class="card banner a4-hold">On hold${project.holdReason ? `: ${esc(project.holdReason)}` : ""}</div>` : "";
 }
 
+/** A practice project says so on every page, and says when a second person ended it (Studio's `practiceActive`). */
+export function practiceBanner(project) {
+  if (project?.practice !== true) return "";
+  return project.practiceActive === true
+    ? `<div class="card banner a4-practice"><strong>Practice project.</strong> You may approve your own work here. Each approval you give yourself
+      is recorded and shown as self-approved. Do not use a practice project for real work.</div>`
+    : `<div class="card banner a4-practice"><strong>This was a practice project.</strong> More than one person can sign in to this workspace now,
+      so nobody approves their own work here any more, and the project follows the rules its risk level calls for.</div>`;
+}
+
+/**
+ * The start form's "Who approves?" choice (A4-05). Every Industry Pack is high risk or above, so a project started from
+ * a pack is regulated: a second person approves each step. A practice project is offered when Studio says one person
+ * alone may open one (`start` is GET /options' workspace.start); otherwise its reason is shown.
+ */
+export function approverChoiceHtml(start) {
+  if (!isObject(start)) return "";
+  const practice = start.practiceAvailable === true;
+  return `<fieldset class="a4-approvers"><legend>Who approves each step?</legend>
+    <label><input type="radio" name="practice" value="" checked /> A second person (needed for real work)</label>
+    <p class="muted">Every Industry Pack is high risk or above, so a project started from a pack is governed as regulated: someone other than
+      you approves each step, and nobody approves their own work. Add that person with Add a person, or on the project's Members card.</p>
+    <label><input type="radio" name="practice" value="yes"${practice ? "" : " disabled"} /> Just me, as practice (for learning AMC alone)</label>
+    <p class="muted">${practice ? "You may approve your own work. Each such approval is recorded and shown as self-approved, and a practice project "
+      + "stops being one as soon as a second person can sign in. Do not use it for real work." : esc(start.practiceRefusal ?? "A practice project is not offered here.")}</p>
+    </fieldset>`;
+}
+
 export function stageBanner(stage) {
   if (stage === "adapt") return `<div class="card banner">${TRUTH.experimental}</div>`;
   if (stage === "activate") return `<div class="card banner">${TRUTH.recorded}</div>`;
@@ -128,9 +156,10 @@ export const CREATE_NEEDS = "Starting an agent project needs a workspace OPERATO
  * The start form: a name, the industry and one button; every other field under "More options". On Home (`home`) the form
  * has no disclosure around it and asks for the plainest explanation level.
  */
-export function renderCreateForm(open, industryHtml = "", { home = false } = {}) {
+export function renderCreateForm(open, industryHtml = "", { home = false, start = null } = {}) {
   const form = `<form id="${home ? "a4HomeForm" : "a4CreateForm"}" class="a4-form" novalidate>
       ${industryHtml}
+      ${approverChoiceHtml(start)}
       <label>Project name <input name="name" required maxlength="200" placeholder="For example: Invoice triage helper" aria-describedby="${home ? "a4HomeNameHint" : "a4NameHint"}" /></label>
       <p class="muted" id="${home ? "a4HomeNameHint" : "a4NameHint"}">A short name your team will recognise. It is stored in the project's record.</p>
       ${home ? '<input type="hidden" name="expertise" value="novice" />' : `<details class="a4-more"><summary>More options</summary>
@@ -274,7 +303,11 @@ export function renderConversation(ctx) {
   const field = (question) => {
     const answer = answered.get(question.id);
     const json = answer !== undefined && typeof answer.value !== "string";
-    const display = questionDisplay(question, question.example);
+    const shownDisplay = questionDisplay(question, question.example);
+    // Adapt's fact questions take catalog terms: name them, so nobody has to guess (an unknown term is refused).
+    const termsHelp = !Array.isArray(question.terms) ? "" : question.terms.length
+      ? ` Choose from: ${question.terms.join(", ")}. Or write unknown.` : " The catalog lists no terms for this yet, so leave it empty.";
+    const display = { ...shownDisplay, help: `${shownDisplay.help}${termsHelp}`.trim() };
     const helpId = `a4q-${esc(question.id)}-help`;
     return `<label><span class="a4-q-label">${esc(display.label)}</span>${question.required ? " (required)" : " (optional)"}${json ? " (JSON)" : ""}
       ${display.help ? `<small class="a4-q-help muted" id="${helpId}">${esc(display.help)}</small>` : ""}
@@ -322,6 +355,14 @@ export function renderConversation(ctx) {
 
 /** The part of a revision's spec a member edits: Studio carries `answers` itself and refuses a proposal naming them. */
 export const editableSpec = (spec) => Object.fromEntries(Object.entries(isObject(spec) ? spec : {}).filter(([key]) => key !== "answers"));
+
+/**
+ * The top-level parts of `spec` that differ from `base`: what Propose sends. Studio builds the rest from the answers, and
+ * an Adapt specification with its compiled plan is larger than the 256 KiB a request may carry, so echoing the whole
+ * specification back failed every Adapt Propose.
+ */
+export const changedParts = (spec, base) => Object.fromEntries(Object.entries(isObject(spec) ? spec : {})
+  .filter(([key, value]) => JSON.stringify(value) !== JSON.stringify(isObject(base) ? base[key] : undefined)));
 
 export function renderSpecEditor(ctx) {
   const { revision, allowed, project, stage } = ctx;
@@ -652,6 +693,12 @@ export function renderMembers(ctx) {
       ${list(candidates.map((candidate) => `<li data-principal="${esc(candidate.principalKey)}">
       ${esc(candidate.username)} <select name="role" aria-label="Project role for ${esc(candidate.username)}">${roles.map((role) => `<option>${role}</option>`).join("")}</select>
       ${actionButton("Add", "add-member", ctx.allowed.addMember, `aria-label="Add ${esc(candidate.username)} to the project"`)}</li>`), "")}` : ""}
+    ${Array.isArray(ctx.me?.roles) && ctx.me.roles.includes("OWNER") ? `<div class="a4-invite" data-card="members"><h4>Invite someone new</h4>
+      <p class="muted">AMC creates their account with a first password, shows it to you once, and adds them here as an approver.</p>
+      <label>Their user name <input name="inviteUsername" autocomplete="off" maxlength="64" /></label>
+      <label><input type="checkbox" name="inviteAuditor" /> They may also audit</label>
+      <p class="muted">Fit it to your rules (Adapt) needs two people besides the one who asks, each an auditor or a workspace owner.</p>
+      ${actionButton("Invite", "invite-member", ctx.allowed.addMember)}</div>` : ""}
     <p class="muted">${TRUTH.twoUsers}.</p></section>`;
 }
 

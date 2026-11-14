@@ -31,6 +31,16 @@ describe("validateA4Poll", () => {
   });
 });
 
+// A4-01: Propose echoed the whole specification; an Adapt one with its compiled plan is over the 256 KiB request limit.
+describe("changedParts", () => {
+  test("sends only the parts the member changed, so an unedited proposal is empty whatever the specification's size", () => {
+    const shown = { plan: { big: "x".repeat(300 * 1024) }, hypotheses: [{ statement: "a" }], schema: "s" };
+    expect(a4View.changedParts(JSON.parse(JSON.stringify(shown)), shown)).toEqual({});
+    expect(a4View.changedParts({ ...shown, hypotheses: [{ statement: "b" }] }, shown)).toEqual({ hypotheses: [{ statement: "b" }] });
+    expect(a4View.changedParts({ added: 1 }, null)).toEqual({ added: 1 });
+  });
+});
+
 describe("applyChanges (through mergeOnTop)", () => {
   test.each(["__proto__", "constructor", "prototype"])("refuses the reserved key %s", (key) => {
     expect(() => mergeOnTop({ a: 1 }, [{ path: [key, "polluted"], after: true }], {}, [])).toThrow(/reserved key name/);
