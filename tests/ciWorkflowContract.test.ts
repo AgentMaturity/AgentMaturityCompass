@@ -86,8 +86,17 @@ function ciWorkflowFailures(workflow: Workflow): string[] {
     if (gate["runs-on"] !== "macos-latest") failures.push("release-gate does not execute the full native corpus on Darwin");
     if (gate.if !== "github.event_name != 'pull_request'") failures.push("release-gate is not restricted to non-PR events");
     if (gate["timeout-minutes"] !== 180) failures.push("release-gate does not have its 180-minute budget");
-    const run = commandStep(gate, "npm run release:gate -- --json --out tmp/release-gate/ci.json");
-    if (!required(run)) failures.push("release-gate does not require the actual full gate and receipt");
+    // A hosted macOS runner cannot finish the unsharded instrumented suite in the gate's 2-hour cap, so CI runs the gate's
+    // quick profile there (the full suite, coverage and performance floors run on Linux above) plus the Darwin-only work
+    // quick skips; release.yml runs the full gate before every release.
+    const run = commandStep(gate, "npm run release:gate -- --quick --json --out tmp/release-gate/ci.json");
+    if (!required(run)) failures.push("release-gate does not require the gate and its receipt");
+    const darwin = gate.steps.find(step => /git grep -lzE 'darwin\|sandbox-exec\|\[Ss\]eatbelt\|keychain'/.test(step.run ?? "")
+      && /xargs -0 npx vitest run\b/.test(step.run ?? ""));
+    if (!required(darwin)) failures.push("release-gate does not run the Darwin-specific test files");
+    for (const command of ["node scripts/packed-install-check.mjs --no-build", "npm run qa:install-personas"]) {
+      if (!required(commandStep(gate, command))) failures.push(`release-gate does not require ${command}`);
+    }
     if ((run?.env?.AMC_RELEASE_GATE_LIVE_URL ?? gate.env?.AMC_RELEASE_GATE_LIVE_URL) !== "${{ vars.AMC_RELEASE_GATE_LIVE_URL }}") {
       failures.push("release-gate does not use the repository live-health variable");
     }
@@ -142,6 +151,13 @@ describe("CI workflow contract (P0-33)", () => {
     const unmerged = parse();
     unmerged.jobs["build-test"]!.steps = unmerged.jobs["build-test"]!.steps.filter(step => !/--merge-reports/.test(step.run ?? ""));
     expect(ciWorkflowFailures(unmerged)).toContain("build-test does not require the full test suite");
+  });
+
+  test("dropping the Darwin test files or the packed install from release-gate fails the contract", () => {
+    const workflow = parse();
+    workflow.jobs["release-gate"]!.steps = workflow.jobs["release-gate"]!.steps.filter(step => !/xargs -0 npx vitest run|packed-install-check/.test(step.run ?? ""));
+    expect(ciWorkflowFailures(workflow)).toEqual(expect.arrayContaining(["release-gate does not run the Darwin-specific test files",
+      "release-gate does not require node scripts/packed-install-check.mjs --no-build"]));
   });
 
   test("removing the release-gate job fails the contract", () => {

@@ -160,21 +160,21 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
       return valid;
     },
     () => {
-      // D-20: every A4 surface stays off in the installed package unless the process sets AMC_A4_PREVIEW=1.
+      // D-20 (amended 2026-11-14): every A4 surface is on in the installed package unless the process sets AMC_A4_PREVIEW=0.
       const a4Tools = (env) => {
         const r = run(`amc mcp list-tools --json (AMC_A4_PREVIEW ${env.AMC_A4_PREVIEW ?? "unset"})`, amc, ["mcp", "list-tools", "--json"], { cwd: workspace, env });
         try { return r.ok ? JSON.stringify(JSON.parse(r.stdout)).match(/amc_a4_[a-z_]+/g) ?? [] : null; } catch { return null; }
       };
-      const closed = a4Tools(isolated);
-      const open = a4Tools({ ...isolated, AMC_A4_PREVIEW: "1" });
+      const closed = a4Tools({ ...isolated, AMC_A4_PREVIEW: "0" });
+      const open = a4Tools(isolated);
       const router = pathToFileURL(join(consumer, "node_modules", pkg.name, "dist", "a4", "a4Router.js")).href;
       const script = `const { handleA4Route } = await import(${JSON.stringify(router)}); let status = 0; let body = "";`
         + " const res = { writeHead: (s) => { status = s; }, setHeader() {}, end: (b) => { body = String(b); } };"
         + ` await handleA4Route("/api/v1/a4/projects", "GET", { headers: {} }, res, { workspace: ${JSON.stringify(workspace)}, nativeTasks: { demo: false } });`
         + " if (status !== 404 || JSON.parse(body).code !== \"A4_PREVIEW_DISABLED\") { console.error(status, body); process.exit(1); }";
-      const route = run("installed /api/v1/a4 answers 404 A4_PREVIEW_DISABLED without the preview", "node", ["--input-type=module", "-e", script], { cwd: workspace, env: isolated }).ok;
+      const route = run("installed /api/v1/a4 answers 404 A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0", "node", ["--input-type=module", "-e", script], { cwd: workspace, env: { ...isolated, AMC_A4_PREVIEW: "0" } }).ok;
       const gated = Array.isArray(closed) && closed.length === 0 && Array.isArray(open) && open.length > 0 && route;
-      console.log(`${gated ? "ok  " : "FAIL"} A4 preview gate: ${closed?.length ?? "?"} amc_a4_* tools without it, ${open?.length ?? "?"} with it`);
+      console.log(`${gated ? "ok  " : "FAIL"} A4 preview gate: ${closed?.length ?? "?"} amc_a4_* tools under AMC_A4_PREVIEW=0, ${open?.length ?? "?"} by default`);
       return gated;
     },
     () => {

@@ -15,7 +15,7 @@ import { listAgents } from "../fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { onboardingRunForApi, onboardingStatusForApi } from "./onboardingApi.js";
 import { runDiagnostic, generateReport, loadRunReport } from "../diagnostic/runner.js";
-import { agentRunFiles } from "../diagnostic/runReportResolution.js";
+import { latestRunFile } from "../diagnostic/runReportResolution.js";
 import { summarizeDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
 import { runAutoAnswer } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
 import { runAssurance } from "../assurance/assuranceRunner.js";
@@ -998,7 +998,7 @@ function parseComplianceFramework(raw: string | null): ComplianceFramework | nul
 }
 
 function agentLastStatus(workspace: string, agentId: string): AgentStatusResponse {
-  const latest = agentRunFiles(workspace, agentId).at(-1);
+  const latest = latestRunFile(workspace, agentId);
   if (!latest) {
     return { agentId, latestRun: null };
   }
@@ -1329,6 +1329,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
       }
 
+      // Browsers ask for /favicon.ico by themselves: answer with the console's icon instead of a 401 (C-14).
+      if (pathname === "/favicon.ico" && method === "GET" && serveConsolePath("/console/assets/icons/favicon-32.png", res)) {
+        return;
+      }
       if (pathname.startsWith("/console")) {
         if (serveConsolePath(pathname, res)) {
           return;

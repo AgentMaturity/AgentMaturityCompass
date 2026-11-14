@@ -1,6 +1,6 @@
 /**
- * A4 Forge over MCP (P1-64; design §12.3): four reads and one self-reported comment, registered only under
- * AMC_A4_PREVIEW=1. No tool decides, builds, completes or releases; decisions stay with people in Studio. Every result
+ * A4 Forge over MCP (P1-64; design §12.3): four reads and one self-reported comment, registered unless
+ * AMC_A4_PREVIEW=0 (the preview is on by default). No tool decides, builds, completes or releases; decisions stay with people in Studio. Every result
  * goes through withClaim with the server's own envelope (the readiness evaluator's `claim`, or the router's unbound
  * claim where no producer exists yet), never one composed here.
  *
@@ -65,7 +65,7 @@ const studioAnswerSchema = z.union([
   z.object({ ok: z.literal(false).optional(), error: z.string(), code: z.string().regex(/^[A-Z][A-Z0-9_]{0,63}$/).optional() })
 ]);
 
-/** The five A4 tools for MCP_TOOL_METADATA; none without AMC_A4_PREVIEW=1. */
+/** The five A4 tools for MCP_TOOL_METADATA; none under AMC_A4_PREVIEW=0. */
 export function a4ToolMetadata(): Array<{ name: string; description: string; input: string }> {
   return a4PreviewEnabled() ? TOOLS : [];
 }
@@ -115,7 +115,7 @@ function localStudioUrl(workspace: string): string {
   const studio = studioStateSchema.safeParse(recorded);
   // ponytail: pid liveness, not identity; a reused pid of this same OS user still passes.
   if (!studio.success || !processRunning(studio.data.pid)) {
-    throw new A4StoreError(503, "A4_STUDIO_NOT_RUNNING", "Studio records and signs comments; start it with `amc studio start` and AMC_A4_PREVIEW=1.");
+    throw new A4StoreError(503, "A4_STUDIO_NOT_RUNNING", "Studio records and signs comments; start it with `amc studio start` (without AMC_A4_PREVIEW=0).");
   }
   const host = studio.data.host.replace(/^\[|\]$/g, "").toLowerCase();
   const local = ["127.0.0.1", "::1", "localhost", "0.0.0.0", "::"].includes(host)
@@ -135,7 +135,7 @@ function studioFailure(error: unknown, baseUrl: string): unknown {
     return new A4StoreError(504, "A4_STUDIO_TIMEOUT", `Studio at ${baseUrl} did not answer within ${STUDIO_TIMEOUT_MS / 1000} s. The comment may be recorded: `
       + "retry with the same clientRequestId for the recorded result.");
   }
-  return new A4StoreError(503, "A4_STUDIO_NOT_RUNNING", `Studio at ${baseUrl} did not answer; start it with \`amc studio start\` and AMC_A4_PREVIEW=1.`);
+  return new A4StoreError(503, "A4_STUDIO_NOT_RUNNING", `Studio at ${baseUrl} did not answer; start it with \`amc studio start\` (without AMC_A4_PREVIEW=0).`);
 }
 
 /**
@@ -222,7 +222,7 @@ async function a4Tool(host: Host, name: string, workspace: string | undefined, p
   }
 }
 
-/** Registers the five A4 tools on `server`; nothing without AMC_A4_PREVIEW=1. */
+/** Registers the five A4 tools on `server`; nothing under AMC_A4_PREVIEW=0. */
 export function registerA4Tools(server: McpServer, host: Host): void {
   if (!a4PreviewEnabled()) return;
   const workspace = z.string().optional().describe("Path to the AMC workspace (defaults to current directory)");

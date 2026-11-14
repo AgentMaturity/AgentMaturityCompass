@@ -4,8 +4,10 @@
  * holds receipt.json (qualification/receipt.schema.json) and README.md.
  * Beyond the schema it checks the folder name, test totals, notes for failed
  * commands, artifact hashes, the 1 MB file limit and that no key material is
- * committed. An empty or missing root passes.
+ * committed. An empty or missing root passes. Run as a script, it also fails
+ * on any tracked path in the repository that Windows cannot check out.
  */
+import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, lstatSync, readdirSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -26,6 +28,36 @@ const VARIANT = /^-[a-z0-9]+(?:-[a-z0-9]+)*$/;
  * harness (P2-06) and the matched comparison campaign plans that checkComparisonCampaign reads (WP29).
  */
 const DEFINITION_FOLDERS = new Set(["reference-deployment", "wp29-campaign"]);
+
+/** Windows refuses these in a path component, so one tracked name fails every Windows checkout (2026-11 nightly). */
+const WINDOWS_BAD_CHAR = /[<>:"|?*\\\x00-\x1f]/;
+const WINDOWS_RESERVED = /^(con|prn|aux|nul|com[0-9\u00b9\u00b2\u00b3]|lpt[0-9\u00b9\u00b2\u00b3])(\.|$)/i;
+
+/** Why a repository-relative path cannot be checked out on Windows, or null when it can. */
+export function windowsPathProblem(path) {
+  for (const part of path.split("/")) {
+    if (WINDOWS_BAD_CHAR.test(part)) return `${path}: ${JSON.stringify(part)} has a character Windows refuses (<>:"|?*\\ or a control character).`;
+    if (/[. ]$/.test(part)) return `${path}: ${JSON.stringify(part)} ends in a dot or space, which Windows drops.`;
+    if (WINDOWS_RESERVED.test(part)) return `${path}: ${JSON.stringify(part)} is a reserved Windows device name.`;
+  }
+  return null;
+}
+
+/** Every tracked path Windows cannot check out, and every pair that differs only by case. Empty outside a git checkout. */
+export function trackedPathProblems(root = ".") {
+  const listed = spawnSync("git", ["ls-files", "-z"], { cwd: root, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  if (listed.status !== 0) return [];
+  const problems = [];
+  const seen = new Map();
+  for (const path of listed.stdout.split("\0").filter(Boolean)) {
+    const problem = windowsPathProblem(path);
+    if (problem) problems.push(problem);
+    const folded = path.toLowerCase();
+    if (seen.has(folded)) problems.push(`${path}: differs from ${seen.get(folded)} only by case.`);
+    else seen.set(folded, path);
+  }
+  return problems;
+}
 
 let validateSchema;
 function schemaValidator() {
@@ -61,6 +93,8 @@ function checkFiles(dir, errors) {
     }
     const path = join(dir, relative);
     const name = posix.basename(relative);
+    const unportable = windowsPathProblem(relative);
+    if (unportable) errors.push(unportable);
     const size = lstatSync(path).size;
     if (size > MAX_BYTES) errors.push(`${relative}: ${size} bytes exceeds the ${MAX_BYTES}-byte limit; summarise the log and keep its hash.`);
     if (FORBIDDEN_NAME.test(name)) errors.push(`${relative}: key, credential and vault files (${name}) must not be committed.`);
@@ -151,7 +185,12 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
     process.exit(1);
   }
   const result = validateQualificationDir(root);
-  for (const error of result.errors) console.error(error);
+  const unportable = trackedPathProblems();
+  for (const error of [...result.errors, ...unportable]) console.error(error);
+  if (unportable.length > 0) {
+    console.log(`Tracked paths invalid on Windows: ${unportable.length}.`);
+    process.exit(1);
+  }
   console.log(result.ok
     ? `Qualification receipts valid: ${result.receipts.length} receipt(s) under ${root}.`
     : `Qualification receipts invalid: ${result.errors.length} problem(s).`);

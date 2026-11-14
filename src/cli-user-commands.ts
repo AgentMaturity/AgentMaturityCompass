@@ -7,7 +7,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { userInfo } from "node:os";
 import chalk from "chalk";
-import inquirer from "inquirer";
+import { promptNewSecret } from "./cli/initPassphrase.js";
 import type { Command } from "commander";
 import { usersConfigPath } from "./auth/authApi.js";
 import { MIN_PASSWORD_LENGTH } from "./auth/passwordHash.js";
@@ -34,9 +34,7 @@ async function accountPassword(username: string, passwordFile: string | undefine
     return password;
   }
   if (process.stdin.isTTY !== true) throw new Error("No terminal for the password prompt: pass --password-file <path> (a private file holding the password).");
-  const answer = await inquirer.prompt<{ password: string }>([{ type: "password", name: "password", message: `Password for ${username}`, mask: "*",
-    validate: (value: string) => value.length >= MIN_PASSWORD_LENGTH || TOO_SHORT }]);
-  return answer.password;
+  return promptNewSecret(`Password for ${username}`, MIN_PASSWORD_LENGTH);
 }
 
 /** --username, else (in a terminal) the OS user name, said aloud; without a terminal the option stays required. */

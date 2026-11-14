@@ -1,8 +1,9 @@
 // A4 Studio page module (P1-58, design §11). a4.html and a4Project.html mount it from their own <script type="module">,
 // and home.html loads it for the "Start an agent project" card; app.js is byte-pinned and never learns about these pages.
 // Every call goes through apiNativeRequest. Studio re-checks every action: a disabled button is a convenience only.
-import { apiGet, apiNativeRequest, logout, onClaims, whoami } from "./api.js";
+import { apiGet, apiNativeRequest, apiPost, logout, onClaims, whoami } from "./api.js";
 import { installClaimStrip } from "./components/claimBadge.js";
+import { topbarHtml } from "./shell.js";
 import { renderHandholdingSteps } from "./components/handholdingSteps.js";
 import { definiteNativeSubmissionRefusal } from "./nativeTaskSubmission.js";
 import { stageAction, stageCards } from "./a4Cards.js";
@@ -81,7 +82,7 @@ async function send(action, retry = false) {
   try {
     const data = await apiNativeRequest(action.path, { method: "POST", body: action.body, nativeCsrfToken: me?.nativeCsrfToken ?? undefined });
     pending = null;
-    tell("");
+    tell(`Done: ${action.label}. Studio recorded it.`); // a visible confirmation after every write (A4-14)
     return data;
   } catch (error) {
     const refused = (error?.code === "NATIVE_CSRF_REQUIRED" && !retry) || definiteNativeSubmissionRefusal(error, retry);
@@ -95,6 +96,14 @@ notice?.addEventListener("click", (event) => {
   const action = pending;
   void guarded(async () => action.after?.(await send(action, true))).catch(showError);
 });
+
+/** The Industry Pack a project started from, per browser (localStorage can be absent or refuse: then only the address keeps it). */
+function storedPack(projectId) {
+  try { return localStorage.getItem(`amc.a4.pack.${projectId}`); } catch { return null; }
+}
+function storePack(projectId, pack) {
+  try { localStorage.setItem(`amc.a4.pack.${projectId}`, pack); } catch { /* the address still carries it */ }
+}
 
 /** The head a transition response names (its seq, or a head it returns); null when Studio named none. */
 const headSeqOf = (data) => [data?.seq, data?.headSeq, data?.head?.headSeq, data?.project?.headSeq].find(Number.isSafeInteger) ?? null;
@@ -116,51 +125,61 @@ async function previewOptions() {
  * Studio's role check answers 403 with no A4 code to anyone else, which the page cannot tell from a lost acknowledgement,
  * so the create form and the home card are offered only to OPERATOR or OWNER in a workspace Studio reports writable.
  */
+const isOwner = (who) => Array.isArray(who?.roles) && who.roles.includes("OWNER");
 const canCreate = (who, options) => Array.isArray(who?.roles) && who.roles.some((role) => role === "OPERATOR" || role === "OWNER")
   && options?.workspace?.readOnly === false;
 
-/** Home: the card and the nav link exist only when the preview answers; the card only while no project exists. */
+/**
+ * Home's first card (a4Start.homeCardHtml): build an agent, or continue the latest project. It is filled only when the
+ * preview answers and this person may create projects; the demo workspace gets a short note instead. The nav link is
+ * shown by default and hidden here when Studio reports the preview off.
+ */
 async function showHomeEntry() {
+  const card = document.getElementById("a4HomeCard");
   try {
     // Studio refuses every A4 route to the local demo session (DEMO_REFUSED, 403), so Home does not ask on each load.
     const who = await whoami();
-    if (who?.userId === "local-demo") return;
+    if (who?.userId === "local-demo") {
+      if (card) { card.innerHTML = start.homeCardHtml({ demo: true }); card.hidden = false; }
+      return;
+    }
     const options = await previewOptions();
-    if (!options) return;
-    document.getElementById("a4NavLink")?.removeAttribute("hidden");
-    if (!canCreate(who, options)) return;
+    if (!options) {
+      document.getElementById("a4NavLink")?.setAttribute("hidden", "");
+      return;
+    }
+    me = who;
     const projects = listOf(await apiNativeRequest(`${API}/projects`), "projects");
-    document.getElementById("a4HomeCard")?.toggleAttribute("hidden", projects.length > 0);
+    if (!card || (projects.length === 0 && !canCreate(who, options))) return;
+    const catalog = projects.length === 0 ? listOf(await apiGet("/industry-packs/list").catch(() => null), "packs") : [];
+    card.innerHTML = start.homeCardHtml({ projects, industryHtml: packs.packSelectHtml(catalog, null) });
+    card.hidden = false;
+    bindCreateForm(card.querySelector("#a4HomeForm"));
   } catch {
-    // Signed out, unreachable or refused: the entry stays absent, which is the preview gate's closed state.
+    // Signed out, unreachable or refused: the card stays absent, which is the preview gate's closed state.
   }
 }
 
-async function renderListPage(options) {
-  claimSink = [];
-  const projects = listOf(await apiNativeRequest(`${API}/projects`), "projects");
-  showClaims(claimSink);
-  claimSink = null;
-  // The Industry Pack catalog is optional here: without it the form simply has no industry choice.
-  const catalog = canCreate(me, options) ? listOf(await apiGet("/industry-packs/list").catch(() => null), "packs") : [];
-  root.innerHTML = `${start.renderIntro()}${canCreate(me, options) ? view.renderCreateForm(params.has("new") || projects.length === 0,
-    packs.packSelectHtml(catalog, packs.packIdOf(params.get("pack"))))
-    : `<p class="muted">${view.CREATE_NEEDS}.</p>`}${view.renderProjectList(projects)}`;
-  const createForm = root.querySelector("#a4CreateForm");
-  const formError = (text) => {
-    const target = createForm?.querySelector(".a4-form-error");
-    if (target) { target.textContent = text; target.hidden = !text; }
+/**
+ * A start form's submit: inline validation in sentences, then one create request; on success the new project opens (with
+ * ?pack= when an industry was picked). A refusal is shown in the form, as a sentence and the next step.
+ */
+function bindCreateForm(createForm) {
+  if (!createForm) return;
+  const formError = (html) => {
+    const target = createForm.querySelector(".a4-form-error");
+    if (target) { target.innerHTML = html; target.hidden = !html; }
   };
-  root.querySelector("[data-a4-example-project]")?.addEventListener("click", () => {
+  createForm.querySelector("[data-a4-example-project]")?.addEventListener("click", () => {
     createForm.elements.name.value = start.SAMPLE_PROJECT.name;
     createForm.elements.expertise.value = start.SAMPLE_PROJECT.expertise;
     formError("");
     createForm.elements.name.focus();
   });
-  createForm?.addEventListener("submit", (event) => {
+  createForm.addEventListener("submit", (event) => {
     event.preventDefault();
     void guarded(async () => {
-      const form = new FormData(event.target);
+      const form = new FormData(createForm);
       const agentId = String(form.get("agentId") ?? "").trim();
       const name = String(form.get("name") ?? "").trim();
       // Inline validation in sentences, before anything is sent.
@@ -172,11 +191,70 @@ async function renderListPage(options) {
       }
       formError("");
       const action = { label: "Start an agent project", path: `${API}/projects`,
-        body: { clientRequestId: uuid(), name, expertise: form.get("expertise"), ...(agentId ? { agentId } : {}) } };
+        body: { clientRequestId: uuid(), name, expertise: form.get("expertise") || "novice", ...(agentId ? { agentId } : {}) } };
       const pack = packs.packIdOf(form.get("pack"));
-      action.after = (data) => { location.href = `./a4Project?project=${encodeURIComponent(one(data, "project").projectId)}${pack ? `&pack=${pack}` : ""}`; };
+      action.after = (data) => {
+        const projectId = one(data, "project").projectId;
+        if (pack) storePack(projectId, pack);
+        location.href = `./a4Project?project=${encodeURIComponent(projectId)}${pack ? `&pack=${pack}` : ""}`;
+      };
       action.after(await send(action));
-    }).catch(showError);
+    }).catch((error) => {
+      if (notice) showError(error);
+      else formError(start.errorHtml(error));
+    });
+  });
+}
+
+/** The intro's inline "Add a person" form (OWNER only; Studio's /users/add checks the role again). */
+function bindAddPerson(form, toggle) {
+  if (!form || !toggle) return;
+  toggle.addEventListener("click", () => {
+    form.hidden = !form.hidden;
+    toggle.setAttribute("aria-expanded", String(!form.hidden));
+    if (!form.hidden) form.elements.username.focus();
+  });
+  form.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    form.hidden = true;
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.focus();
+  });
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const error = form.querySelector(".a4-form-error");
+    const status = form.querySelector("[data-a4-add-status]");
+    const username = String(form.elements.username.value ?? "").trim();
+    const password = String(form.elements.password.value ?? "");
+    error.hidden = true;
+    if (!username || !password) { error.textContent = "Write a user name and a first password. Nothing was sent."; error.hidden = false; return; }
+    try {
+      await apiPost("/users/add", { username, password, roles: String(form.elements.roles.value).split(",") });
+      form.reset();
+      status.textContent = `Added ${username}. Give them the password and this console's address so they can sign in, then add them to a project on its Members card.`;
+    } catch (failure) {
+      error.innerHTML = start.errorHtml(failure);
+      error.hidden = false;
+    }
+  });
+}
+
+async function renderListPage(options) {
+  claimSink = [];
+  const projects = listOf(await apiNativeRequest(`${API}/projects`), "projects");
+  showClaims(claimSink);
+  claimSink = null;
+  // The Industry Pack catalog is optional here: without it the form simply has no industry choice.
+  const catalog = canCreate(me, options) ? listOf(await apiGet("/industry-packs/list").catch(() => null), "packs") : [];
+  const creating = params.has("new") || projects.length === 0;
+  root.innerHTML = `${start.renderIntro({ creating, canAdd: isOwner(me) })}${canCreate(me, options) ? view.renderCreateForm(creating,
+    packs.packSelectHtml(catalog, packs.packIdOf(params.get("pack"))))
+    : `<p class="muted">${view.CREATE_NEEDS}.</p>`}${view.renderProjectList(projects)}`;
+  bindCreateForm(root.querySelector("#a4CreateForm"));
+  bindAddPerson(root.querySelector("#a4AddPerson"), root.querySelector("[data-a4-add-person]"));
+  root.querySelector("[data-a4-show-create]")?.addEventListener("click", () => {
+    const create = root.querySelector("#a4Create");
+    if (create) { create.hidden = false; create.querySelector("input")?.focus(); }
   });
 }
 
@@ -194,7 +272,9 @@ function mountProject(projectId, options) {
   let reflection = null, explanation = null;
   const drafts = new Map();
   // ?pack= starts Aspire from an Industry Pack: its suggestions fill empty answers once, on the page only (a4Pack.js).
-  const startPackId = packs.packIdOf(params.get("pack"));
+  // The pack chosen at the start stays with the project in this browser (A4-09), not only in the address.
+  const startPackId = packs.packIdOf(params.get("pack")) ?? packs.packIdOf(storedPack(projectId));
+  if (packs.packIdOf(params.get("pack"))) storePack(projectId, packs.packIdOf(params.get("pack")));
   let startPack = null, packFilled = null, packFilledAt = null;
   // Save answers binds the head the first answer edit began on, and each edited answer remembers Studio's value then:
   // a poll that shows another member's change to one of them holds Save instead of overwriting it.
@@ -343,8 +423,8 @@ function mountProject(projectId, options) {
       questions: listOf(state.options?.questions?.[stage], "questions").map((question) => ({ ...question, example: start.placeholderOf(stage, question.id) })),
       answers: shownAnswers(), understandingCurrent: state.understandingCurrent, exampleOffered: start.FILLABLE.has(stage) && stage === state.project.stage };
     root.innerHTML = `${view.holdBanner(project)}${start.renderStartHere(ctx)}${startPack && stage === "aspire" ? packs.packPanelHtml(startPack, state.project.revisionNo === packFilledAt ? packFilled ?? 0 : 0) : ""}${view.stageBanner(stage)}${conflict ? view.renderConflict(conflict) : ""}
-      <section class="card"><h3>${view.esc(project.name)}</h3><p class="muted">Agent <code>${view.esc(project.agentId)}</code> ·
-        r${view.esc(project.revisionNo)} · head ${view.esc(project.headSeq)}</p>${view.stageLinks(project, stage)}${view.movedNote(project, stage)}
+      <section class="card"><h3 class="a4-project-name">${view.esc(project.name)}</h3><p class="muted">Agent <code>${view.esc(project.agentId)}</code> ·
+        <span title="revision ${view.esc(project.revisionNo)}, head ${view.esc(project.headSeq)}">version ${view.esc(project.revisionNo)}</span></p>${view.stageLinks(project, stage)}${view.movedNote(project, stage)}
         <p class="muted">${view.esc(readiness.claimBoundary)}</p></section>
       <details class="card" data-a4-open="steps"><summary>The eight steps of a stage</summary><div id="a4Steps"></div></details>
       <div class="a4-cards">${stageCards(stage).map((card) => view.renderCard(card, ctx, state.comments)).join("")}</div>
@@ -376,12 +456,19 @@ function mountProject(projectId, options) {
     const sections = [...root.querySelectorAll(":scope > .a4-cards > .a4-card, :scope > .a4-cards ~ :is(section, details, .a4-lanes)")];
     // A step that needs a second section too (acknowledging an item listed under Missing requirements) names it in data-a4-also.
     const also = go?.dataset.a4Also ?? null;
-    const rest = sections.filter((section) => !section.contains(target) && !section.matches(".a4-approvals") && !(also && section.matches(also)));
+    // Never folded (A4-08): the members, the answers while the step asks for them, the specification while it is under
+    // review, and the build card (its Native Tasks link) from Build to Review.
+    const step = state.project.stage === stage ? state.project.step : null;
+    const keep = [".a4-members", ...(step === "asked" ? ['[data-card="conversation"]'] : []),
+      ...(["proposed", "reviewed"].includes(step) ? ['[data-card="specification"]'] : []),
+      ...(["direction_approved", "built"].includes(step) ? ['[data-card="build"]'] : [])].join(", ");
+    const rest = sections.filter((section) => !section.contains(target) && !section.matches(".a4-approvals") && !section.matches(keep)
+      && !(also && section.matches(also)));
     if (rest.length === 0) return;
     const more = document.createElement("details");
     more.className = "card a4-more";
     more.dataset.a4Open = "more";
-    more.innerHTML = `<summary>Everything else in this stage (${rest.length} sections: later steps, records, requirements, members)</summary>
+    more.innerHTML = `<summary>Everything else in this stage (${rest.length} sections: later steps, records and requirements)</summary>
       <p class="muted">Nothing here is needed for the step above. It is all still recorded and readable.</p>`;
     root.append(more);
     more.append(...rest);
@@ -655,7 +742,8 @@ function mountProject(projectId, options) {
   function goTo(go) {
     const target = root.querySelector(go.dataset.a4Go);
     if (!target) return tell("That control is not on this page yet. Reload the page.");
-    target.closest("details")?.setAttribute("open", "");
+    // Open every fold around the target, "Everything else" included, so the step never points at a hidden field (A4-08).
+    for (let fold = target.closest("details"); fold; fold = fold.parentElement?.closest("details")) fold.open = true;
     target.scrollIntoView({ block: "center", behavior: "smooth" });
     if (target.disabled) {
       target.focus();
@@ -663,6 +751,7 @@ function mountProject(projectId, options) {
     }
     target.focus({ preventScroll: true });
     if (go.hasAttribute("data-a4-press") && target.matches("button[data-a4-action]")) target.click();
+    else if (target.matches("a[href]")) target.click(); // a link the step needs (the build session on Native Tasks) is followed
   }
 
   /** Fills each empty answer field that `values` has text for; returns how many it filled. */
@@ -743,6 +832,13 @@ function mountProject(projectId, options) {
   root.addEventListener("click", (event) => {
     const go = event.target.closest?.("[data-a4-go]");
     if (go) return goTo(go);
+    if (event.target.closest?.("[data-a4-copy-link]")) {
+      const status = root.querySelector("[data-a4-copy-status]");
+      const say = (text) => { if (status) status.textContent = text; };
+      void navigator.clipboard?.writeText(location.href).then(() => say("Copied. Send it to the person who approves."),
+        () => say(`Copy unavailable. The link is ${location.href}`)) ?? say(`Copy unavailable. The link is ${location.href}`);
+      return;
+    }
     const button = event.target.closest?.("[data-a4-action],[data-a4-copy]");
     if (!button || button.disabled) return;
     if (button.dataset.a4Copy) { void navigator.clipboard?.writeText(button.dataset.a4Copy).catch(showError); return; }
@@ -779,16 +875,31 @@ function mountProject(projectId, options) {
   })();
 }
 
+/** The console's top bar on the A4 pages too (C-15): workspace, the guide, Records, a task and, signed in, Sign out. */
+function addTopbar(who) {
+  const main = document.querySelector("main");
+  if (!main || main.querySelector(".topbar")) return;
+  const bar = Object.assign(document.createElement("section"), { className: "topbar" });
+  const prefix = location.pathname.match(/^\/w\/([^/]+)\//)?.[1];
+  bar.innerHTML = topbarHtml({ workspace: prefix ? decodeURIComponent(prefix) : "local", demoMode: prefix === "demo", me: who });
+  main.insertBefore(bar, main.firstChild);
+  bar.querySelector("#signOutBtn")?.addEventListener("click", () => void logout().then(() => location.assign("./login"), showError));
+}
+
 async function main() {
   if (page === "home") return showHomeEntry();
-  const status = document.getElementById("status");
-  me = await whoami();
+  // A loading skeleton until the first render (motion.css animates [aria-busy]); every render replaces it.
+  root.setAttribute("aria-busy", "true");
+  root.innerHTML = '<section class="card skeleton" aria-label="Loading"><p class="muted">Loading…</p></section>';
+  me = await whoami().catch(() => null);
+  addTopbar(me);
   if (!me) {
-    status.innerHTML = 'Sign in to use agent projects. <a href="./login">Login</a>';
+    root.removeAttribute("aria-busy");
+    const next = `${page}${location.search}`;
+    root.innerHTML = `<section class="card a4-start"><h2>Sign in to build an agent</h2><p>Agent projects belong to a workspace, so sign in first.
+      You come back to this page afterwards.</p><p><a class="button" href="./login?next=${encodeURIComponent(next)}">Sign in</a></p></section>`;
     return;
   }
-  status.innerHTML = `Signed in as ${view.esc(me.username)} <button type="button" class="secondary" id="a4SignOut">Sign out</button>`;
-  status.querySelector("#a4SignOut").addEventListener("click", () => void logout().then(() => location.assign("./login"), showError));
   // The demo session is refused every A4 route (DEMO_REFUSED): say why and how to start a workspace of your own instead.
   if (me.userId === "local-demo") {
     root.innerHTML = start.demoHtml();
@@ -818,4 +929,12 @@ async function main() {
   return mountProject(projectId, options);
 }
 
-main().catch(showError);
+// The first render (or a failure) ends the loading state; a failed load says so and offers Retry (brief item 7).
+main().catch((error) => {
+  if (root && root.querySelector(".skeleton")) {
+    root.innerHTML = `<section class="card"><h3>This page did not load</h3><p>${start.errorHtml(error)}</p>
+      <p><button type="button" data-a4-reload>Retry</button></p></section>`;
+    root.querySelector("[data-a4-reload]")?.addEventListener("click", () => location.reload());
+  }
+  showError(error);
+}).finally(() => root?.removeAttribute("aria-busy"));

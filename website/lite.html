@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Agent Maturity Compass — Lite</title>
 <meta name="description" content="AMC watches Claude Code, Codex or your own agent at work on your machine, keeps a signed record of what it did, and scores it from that record. Lite version for slow connections.">
@@ -70,7 +73,7 @@ nav a{font-size:.8rem;color:#a0a0a0}nav a:hover{color:#4AEF79}
       <div class="stat"><b>244</b><span>Questions in<br>the full score</span></div>
       <div class="stat"><b>41</b><span>Free Industry<br>Packs</span></div>
       <div class="stat"><b><!-- amc:count:adapters -->16<!-- /amc:count --></b><span>Built-in<br>adapters</span></div>
-      <div class="stat"><b>2,569</b><span>Test source<br>files</span></div>
+      <div class="stat"><b>2,571</b><span>Test source<br>files</span></div>
     </div>
     <p><strong style="color:#fff">What to expect on a first run:</strong> a report can be signed and <code>VALID</code> and still say <code>INSUFFICIENT_EVIDENCE</code>. That is normal for a new folder. A signature shows who wrote it and that it has not changed, not that it is true or that there is enough evidence behind it.</p>
   </div>
@@ -157,7 +160,7 @@ nav a{font-size:.8rem;color:#a0a0a0}nav a:hover{color:#4AEF79}
   <h2 id="a4-forge">A4 Forge (preview)</h2>
   <div class="card">
     <p>A4 Forge takes one agent from a written brief to a recorded deployment in four approval-gated stages: <strong>Aspire</strong>, <strong>Assemble</strong>, <strong>Adapt</strong> and <strong>Activate</strong>.</p>
-    <p>Preview in the current source build only (not in the published 1.1.1 release), off unless <code>AMC_A4_PREVIEW=1</code>. Every record is self-reported: a signature shows who wrote it and that it has not changed, never that it is true, and no A4 output says the agent is safe, correct or lawful. A second approver in the same workspace is separation of duties, not independent review. Not available yet: independently reviewed claims and a real deployment target.</p>
+    <p>Preview in the current source build only (not in the published 1.1.1 release), on by default (<code>AMC_A4_PREVIEW=0</code> turns it off). Every record is self-reported: a signature shows who wrote it and that it has not changed, never that it is true, and no A4 output says the agent is safe, correct or lawful. A second approver in the same workspace is separation of duties, not independent review. Not available yet: independently reviewed claims and a real deployment target.</p>
     <p><a href="a4.html">How A4 Forge works</a></p>
   </div>
 

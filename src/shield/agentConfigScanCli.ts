@@ -24,6 +24,11 @@ export function runAgentConfigScanCli(params: {
   console.log(chalk.bold.cyan("\n🛡️  Agent Config Security Scan"));
   console.log(chalk.gray("Path:"), root);
   console.log(chalk.gray("Files scanned:"), result.filesScanned.length);
+  if (result.securityLevel === null) {
+    console.log(chalk.yellow("Nothing to assess: no agent configuration (CLAUDE.md, AGENTS.md, settings, hooks, MCP or agent definitions) was found here, so there is no level or score."));
+    console.log(chalk.gray("Next: run this in the folder your agent works in, or pass that folder as the argument."));
+    return;
+  }
   console.log(chalk.gray("Security level:"), chalk.hex(levelColors[result.securityLevel] ?? "#555").bold(`${result.securityLevel} — ${result.riskLabel}`));
   console.log(chalk.gray("Score:"), `${result.securityScore}/100`);
   const riskColor: Record<string, string> = { CLEAN: "#2ecc40", REVIEW: "#ff851b", BLOCK: "#e05d44" };

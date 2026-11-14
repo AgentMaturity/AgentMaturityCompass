@@ -125,7 +125,8 @@ export function envelopeForSelfAssessment(input: AdapterBase & { answers: readon
     ...input,
     method: "numeric_self_answer",
     regulated: input.regulated ?? false,
-    proposed: { result: answered ? "pass" : "not_evaluated", level: answered ? Math.min(...input.answers) : null },
+    // CLI-08: an answer at L0 (absent) is no pass; the result follows the weakest answer, as the level does.
+    proposed: { result: !answered ? "not_evaluated" : Math.min(...input.answers) >= 1 ? "pass" : "fail", level: answered ? Math.min(...input.answers) : null },
     evidence: evidence(input.answers.length, ["SELF_REPORTED"])
   });
 }

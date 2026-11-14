@@ -1,0 +1,102 @@
+/* Compass Console motion. Short, and only where it tells the user something: a page arrived, a control was pressed,
+   content is loading, a section opened. Everything here is switched off under prefers-reduced-motion. */
+
+/* Page to page: the browser cross-fades the old page into the new one where it supports it. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: .18s;
+}
+
+/* A page's content rises in once; cards follow one after another. */
+@keyframes amc-rise {
+  from { opacity: 0; transform: translateY(8px); }
+}
+
+main > :not(.boot-note) {
+  animation: amc-rise .28s cubic-bezier(.2, .7, .2, 1) backwards;
+}
+
+main > :nth-child(2):not(.boot-note) { animation-delay: .04s; }
+main > :nth-child(3):not(.boot-note) { animation-delay: .08s; }
+main > :nth-child(4):not(.boot-note) { animation-delay: .12s; }
+main > :nth-child(n+5):not(.boot-note) { animation-delay: .16s; }
+
+/* The brand mark: "amc" with the logo's green cursor. */
+@keyframes amc-cursor {
+  0%, 55% { opacity: 1; }
+  60%, 100% { opacity: .15; }
+}
+
+nav h1::after {
+  content: "_";
+  color: var(--accent);
+  animation: amc-cursor 1.2s steps(1, end) infinite;
+}
+
+/* Pressed controls give way a little. */
+button:active:not(:disabled),
+a.button:active {
+  transform: translateY(0) scale(.97);
+  transition-duration: .05s;
+}
+
+nav a {
+  transition: color .15s ease, background .15s ease, padding-left .15s ease;
+}
+
+/* A section that opens (details) fades its content in. */
+details[open] > :not(summary) {
+  animation: amc-rise .2s ease-out backwards;
+}
+
+/* Loading: any element marked aria-busy shows a moving sheen, so a wait never looks like a blank page. */
+@keyframes amc-sheen {
+  to { background-position: -200% 0; }
+}
+
+[aria-busy="true"] {
+  position: relative;
+  color: var(--muted);
+  background-image: linear-gradient(90deg, transparent 0%, rgba(74, 239, 121, .08) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: amc-sheen 1.2s linear infinite;
+}
+
+/* Status that just changed draws the eye once. */
+@keyframes amc-flash {
+  from { background-color: rgba(74, 239, 121, .18); }
+}
+
+[role="status"]:not(:empty),
+[role="alert"]:not(:empty) {
+  animation: amc-flash .6s ease-out;
+}
+
+progress {
+  transition: width .3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  nav h1::after {
+    animation: none;
+  }
+}

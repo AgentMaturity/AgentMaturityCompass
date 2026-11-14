@@ -19,7 +19,7 @@ import { localVaultPassphrasePath } from "../vault/localPassphrase.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { keysetAnchoring } from "../keys/keyset.js";
 import { getMode } from "../mode/mode.js";
-import { newVaultPassphraseChoices, rememberOrShowOnce, shownOncePassphraseLines } from "../cli/initPassphrase.js";
+import { newVaultPassphraseChoices, promptNewSecret, rememberOrShowOnce, shownOncePassphraseLines } from "../cli/initPassphrase.js";
 
 export async function ensureUpVaultPassphrase(workspace: string, rememberRequested: boolean): Promise<void> {
   // LIVE-VAULT-03: AMC_VAULT_REMEMBER=0 turns the stores off, so nothing below reads, offers or writes one.
@@ -118,14 +118,7 @@ async function askNewVaultPassphrase(workspace: string, remember: boolean): Prom
     }
     return true;
   } else {
-    const { customPass } = await inquirer.prompt([{
-      type: "password",
-      name: "customPass",
-      message: "Enter passphrase (min 8 chars):",
-      mask: "*",
-      validate: (v: string) => v.length >= 8 || "Must be at least 8 characters"
-    }]);
-    process.env.AMC_VAULT_PASSPHRASE = customPass;
+    process.env.AMC_VAULT_PASSPHRASE = await promptNewSecret("Vault passphrase", 8);
     return false;
   }
 }

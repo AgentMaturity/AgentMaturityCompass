@@ -1,8 +1,8 @@
 /**
  * The /api/v1/a4 router (P1-57; design §5.1, §12.1). The refusals run once, at the entry, before any dispatch: 401
  * without native Studio admission, 403 DEMO_REFUSED for the demo session on every method, 404 A4_PREVIEW_DISABLED
- * unless the process runs with AMC_A4_PREVIEW=1 (D-20: no signed config carries a features section, so the v1 gate is
- * the variable alone), then the live principal (the admin token reads only, NATIVE_READ_ONLY on mutations, the route's
+ * when the process runs with AMC_A4_PREVIEW=0 (D-20, on by default since 2026-11-14: no signed config carries a features
+ * section, so the v1 gate is the variable alone), then the live principal (the admin token reads only, NATIVE_READ_ONLY on mutations, the route's
  * role class re-run on live roles). Bodies are read losslessly and never name an identity; every mutation carries a
  * clientRequestId the store deduplicates inside its first write's transaction. This file holds the entry, the project
  * routes and the reads; src/a4/a4RouterStages.ts the stage, gate and effect routes; src/a4/a4RouterReleases.ts the

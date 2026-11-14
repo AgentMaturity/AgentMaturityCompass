@@ -82,7 +82,7 @@ import {
   summarizeConfidenceControls
 } from "./confidenceControls.js";
 import { buildQuestionExplainabilityReport, type QuestionExplainabilityInputRow } from "./questionScoreExplainability.js";
-import { evaluateDiagnosticEvidenceReadiness } from "./evidenceReadiness.js";
+import { evaluateDiagnosticEvidenceReadiness, recordedActivityOf } from "./evidenceReadiness.js";
 import { markdownCell, markdownHeatmap } from "./reportMarkdown.js";
 import { formatClaimLabel, renderClaimLabel, renderClaimLegend, type ClaimEnvelope } from "../claims/eligibility/index.js";
 import { envelopeForStoredRun } from "../claims/eligibility/adapters/results.js";
@@ -1347,6 +1347,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
       correlationWarnings: correlationNotes,
       evidenceCoverage: Number(evidenceCoverage.toFixed(4)),
       evidenceTrustCoverage: trustCoverage,
+      recordedActivity: recordedActivityOf(events),
       autonomyAllowanceIndex,
       dualityCompliance: {
         executeWithValidTicket,
@@ -1420,7 +1421,7 @@ export function explainDiagnosticReportStatus(
   report: Pick<
     DiagnosticReport,
     "status" | "verificationPassed" | "trustBoundaryViolated" | "trustBoundaryMessage" | "integrityIndex" | "trustLabel" | "evidenceCoverage" | "evidenceTrustCoverage"
-  >
+  > & Partial<Pick<DiagnosticReport, "recordedActivity">>
 ): DiagnosticReportStatusExplanation {
   const evidenceReadiness = evaluateDiagnosticEvidenceReadiness(report);
   const artifactLabel = report.status === "UNSIGNED"

@@ -4,8 +4,8 @@
  * `claimLabel` are the server's, the same object as the body's `claim`, and the client computes no verdict, readiness or
  * label. An error (400 SOD_VIOLATION, 409 A4_STALE_HEAD, …) is returned, not rethrown; only a failed transport or a
  * non-JSON answer throws. Identity is the caller's Studio session (its cookie and native CSRF proof) or the admin
- * token, which reads only; no body names a user. Every route answers 404 A4_PREVIEW_DISABLED unless the server runs
- * with AMC_A4_PREVIEW=1. Nothing is cached, so a one-time token in a response reaches the caller once.
+ * token, which reads only; no body names a user. Every route answers 404 A4_PREVIEW_DISABLED when the server runs
+ * with AMC_A4_PREVIEW=0. Nothing is cached, so a one-time token in a response reaches the caller once.
  * The release, deployment and rollback routes (Activate, P1-62) exist on the server but have no client method yet.
  */
 import { randomUUID } from "node:crypto";
@@ -42,7 +42,7 @@ export interface A4MutationResult { projectId: string; seq: number; kind: string
 interface Control { readonly expectedHeadSeq: number; readonly clientRequestId?: string }
 interface Decision { readonly reason: string; readonly expectedGateSeq: number; readonly clientRequestId?: string }
 
-/** `timeoutMs` bounds each request, its answer included; a timeout throws `NETWORK_ERROR` whose cause is the `TimeoutError`. @experimental A4 preview (AMC_A4_PREVIEW=1). */
+/** `timeoutMs` bounds each request, its answer included; a timeout throws `NETWORK_ERROR` whose cause is the `TimeoutError`. @experimental A4 preview (on by default; AMC_A4_PREVIEW=0 turns it off). */
 export function createA4Client(options: { baseUrl: string; session: A4Session; timeoutMs?: number }) {
   const origin = new URL(options.baseUrl).origin;
   const root = `${options.baseUrl.replace(/\/+$/, "")}/api/v1/a4`;

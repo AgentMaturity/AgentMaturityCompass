@@ -29,12 +29,18 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Gate: full test + build must pass before any release action
+  # Gate: full test + build must pass before any release action. The unsharded suite outgrew one runner: it hit the
+  # Test step's 120-minute limit on 2026-11-14 (run 43569454838), as ci.yml's did on 2026-11-03. So npm test runs in
+  # four shards, performance files excluded there and run on their own one file at a time, as ci.yml runs them.
   test-build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
     timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v6 # TODO(P1-41 follow-up): pin actions/checkout@v6 by full commit SHA
         with:
@@ -78,13 +84,17 @@ jobs:
         # log at all (every build-test run from 2026-09-16 to 2026-10-05).
         run: |
           mkdir -p tmp/ci-tests
-          npm test -- --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-tests/tests.json 2>&1 | tee tmp/ci-tests/tests.log | cut -c1-4096
+          npm test -- --exclude 'tests/performance/**' --shard=${{ matrix.shard }}/4 --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-tests/tests.json 2>&1 | tee tmp/ci-tests/tests.log | cut -c1-4096
+
+      - name: Performance floors (one file at a time)
+        if: matrix.shard == 1
+        run: npx vitest run tests/performance --no-file-parallelism
 
       - name: Upload test diagnostics
         if: always()
         uses: actions/upload-artifact@v7 # TODO(P1-41 follow-up): pin actions/upload-artifact@v7 by full commit SHA
         with:
-          name: npm-publish-test-diagnostics
+          name: npm-publish-test-diagnostics-${{ matrix.shard }}
           path: tmp/ci-tests/
           if-no-files-found: ignore
 

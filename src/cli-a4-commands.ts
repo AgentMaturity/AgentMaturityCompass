@@ -1,6 +1,6 @@
 /**
- * `amc a4 …` (P1-65; design §12.2): the A4 Forge command tree, behind AMC_A4_PREVIEW=1 like every A4 route (each leaf
- * refuses A4_PREVIEW_DISABLED without it; the tree stays registered so the command inventory does not depend on the
+ * `amc a4 …` (P1-65; design §12.2): the A4 Forge command tree, behind the A4 preview gate like every A4 route (on by default since
+ * 2026-11-14; each leaf refuses A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0; the tree stays registered so the command inventory does not depend on the
  * environment). Every leaf but `verify` and `export` runs the API's own route in process through `serveA4`
  * (src/a4/a4Router.ts): the same body schemas, refusals, gate functions, SoD, quorum, request dedupe, audits and effects.
  * Only the identity differs, and it never comes from a flag: `--session-token-file` names an `amc approvals login` token,
@@ -43,12 +43,13 @@ const BOUNDARY = "A4 records are self-reported: a gate decision is an acknowledg
   + "states that the agent is safe, correct or lawful.";
 
 /** The preview gate's refusal, in words: what is off and the exact way to turn it on (the gate itself stays). */
-export const PREVIEW_OFF = "A4 Forge is a preview and is turned off here. Run the command with AMC_A4_PREVIEW=1 in front, for example "
-  + "`AMC_A4_PREVIEW=1 amc a4 guide`. Studio needs it too: stop Studio with `amc down`, then start it with `AMC_A4_PREVIEW=1 amc up`.";
+export const PREVIEW_OFF = "A4 Forge is a preview and is turned off here (AMC_A4_PREVIEW=0). It is on by default: remove that setting or "
+  + "run the command with AMC_A4_PREVIEW=1 in front, for example `AMC_A4_PREVIEW=1 amc a4 guide`. Studio needs it too: stop Studio with "
+  + "`amc down`, then start it with `AMC_A4_PREVIEW=1 amc up`.";
 
 /** `amc a4 guide` with no project: the next step first, then the stage model in plain words. */
 export const GUIDE_START = [
-  "Next: open Studio (`AMC_A4_PREVIEW=1 amc up`), sign in, choose A4 in the menu and start an agent project. Projects are created and built in Studio;",
+  "Next: open Studio (`amc up`), sign in, choose Build an agent in the menu and start an agent project. Projects are created and built in Studio;",
   "  this command line reads them, decides gates and runs the release steps. Then run `amc a4 list` and `amc a4 guide <projectId>` here.",
   "",
   "What a project is: one agent's journey from a brief to a recorded deployment, in four stages:",
@@ -629,9 +630,9 @@ function registerReleases(a4: Command): void {
 
 /** `amc a4 …`: 22 leaves (src/mode/mode.ts blocks the owner-gated ones in agent mode). */
 export function registerA4Commands(program: Command): void {
-  const a4 = program.command("a4").description("A4 Forge (preview, AMC_A4_PREVIEW=1): projects, gates, releases and deployments, through the API's own routes")
-    .addHelpText("before", "Next step: `AMC_A4_PREVIEW=1 amc a4 guide` explains A4 and what to do first. Projects are created and built in Studio "
-      + "(`AMC_A4_PREVIEW=1 amc up`, then A4 in the menu); these commands read them, decide gates and run the release steps.\n");
+  const a4 = program.command("a4").description("A4 Forge (preview, on by default; AMC_A4_PREVIEW=0 turns it off): projects, gates, releases and deployments, through the API's own routes")
+    .addHelpText("before", "Next step: `amc a4 guide` explains A4 and what to do first. Projects are created and built in Studio "
+      + "(`amc up`, then Build an agent in the menu); these commands read them, decide gates and run the release steps.\n");
   registerReads(a4);
   registerDecisions(a4);
   registerProjectWrites(a4);

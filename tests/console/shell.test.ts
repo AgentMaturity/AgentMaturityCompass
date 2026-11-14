@@ -157,21 +157,26 @@ describe("canonical navigation", () => {
     renderCanonicalNav?: (nav: FakeElement) => void };
   const hrefs = (html: string) => [...html.matchAll(/href="([^"]+)"/g)].map((match) => match[1]!);
 
-  test("canonicalNavHtml lists Home first, the hidden A4 link and the All features group, Login renamed", () => {
+  test("canonicalNavHtml lists the primary links in plain words, then All features under short headings", () => {
     const html = api.canonicalNavHtml?.([]) ?? "";
     expect(hrefs(html)[0]).toBe("./home");
-    expect(html).toContain('<a href="./a4" id="a4NavLink" hidden>A4</a>');
-    expect(html).toContain('<details class="nav-features"><summary>All features</summary>');
-    expect(html).toContain(">Login / account</a>");
-    expect(html).not.toContain("This section");
+    const primary = (api.CANONICAL_NAV ?? []).filter((link) => !link.group).map((link) => link.label);
+    expect(primary).toEqual(["Home", "Build an agent", "Run a task", "My agent", "Records", "Approvals", "Industry Packs", "Live runs", "Sign in"]);
+    expect(html).toContain('<a href="./a4" id="a4NavLink">Build an agent</a>');
+    expect(html).toContain('<details class="nav-features"><summary>All features</summary><p class="nav-section">');
+    for (const heading of ["Rules and limits", "Watch and review", "Teams and many agents", "Workspace"]) expect(html).toContain(`<p class="nav-section">${heading}</p>`);
+    expect(html).not.toMatch(/>Login|>A4<|>Native Tasks</);
+    // Sentence case: no label is all lowercase or all uppercase.
+    for (const link of api.CANONICAL_NAV ?? []) expect(link.label[0], link.label).toBe(link.label[0]!.toUpperCase());
+    expect(html).not.toContain("More pages");
     expect(hrefs(html)).toHaveLength(31);
     expect(html).not.toMatch(/\son[a-z]+\s*=|javascript:/i);
   });
 
-  test("a page's own links go under This section, once each, never duplicating a canonical link", () => {
+  test("a page's own links go under More pages, once each, never duplicating a canonical link", () => {
     const html = api.canonicalNavHtml?.([{ href: "./home", label: "Home" }, { href: "./assuranceRun", label: "Run Detail" },
       { href: "./assuranceRun.html", label: "Run Detail again" }, { href: "./evidence?agent=x", label: "Evidence" }]) ?? "";
-    expect(html).toContain('<details class="nav-features" open><summary>This section</summary><a href="./assuranceRun">Run Detail</a></details>');
+    expect(html).toContain('<details class="nav-features" open><summary>More pages</summary><a href="./assuranceRun">Run Detail</a></details>');
     expect(hrefs(html).filter((href) => href === "./home")).toHaveLength(1);
     expect(hrefs(html).filter((href) => href.startsWith("./assuranceRun"))).toHaveLength(1);
     expect(hrefs(html).filter((href) => href.startsWith("./evidence"))).toHaveLength(1);
@@ -184,10 +189,10 @@ describe("canonical navigation", () => {
     const first = nav.querySelectorAll("a").length;
     expect(nav.dataset.canonical).toBe("1");
     expect(nav.children[0]!.tagName).toBe("H1");
-    // a4.js unhides the A4 link when the preview answers; a second render must not hide it again.
-    nav.querySelector("#a4NavLink")!.removeAttribute("hidden");
+    // a4.js hides the A4 link when the preview is off; a second render must not show it again.
+    nav.querySelector("#a4NavLink")!.setAttribute("hidden", "");
     api.renderCanonicalNav?.(nav);
-    expect(nav.querySelector("#a4NavLink")!.hasAttribute("hidden")).toBe(false);
+    expect(nav.querySelector("#a4NavLink")!.hasAttribute("hidden")).toBe(true);
     expect(nav.querySelectorAll("a")).toHaveLength(first);
     expect(first).toBe(33);
     initShell(doc);
@@ -196,13 +201,13 @@ describe("canonical navigation", () => {
     expect(nav.querySelector("a.active")!.getAttribute("href")).toBe("./assuranceRun");
   });
 
-  test("initShell gives a page with its own short menu the canonical one, its links under This section", () => {
+  test("initShell gives a page with its own short menu the canonical one, its links under More pages", () => {
     const doc = new FakeDocument();
     const nav = pageWithNav(doc, ["./home", "./assurance", "./assuranceRun"], "assuranceRun");
     initShell(doc);
     expect(nav.dataset.canonical).toBe("1");
     expect(nav.querySelectorAll("a")).toHaveLength(33);
-    const section = nav.querySelectorAll("details").find((details) => details.textContent.startsWith("This section"))!;
+    const section = nav.querySelectorAll("details").find((details) => details.textContent.startsWith("More pages"))!;
     expect(section.querySelectorAll("a").map((anchor) => anchor.getAttribute("href"))).toEqual(["./assurance", "./assuranceRun"]);
     expect(section.open).toBe(true);
   });
