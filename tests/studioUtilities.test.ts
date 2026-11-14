@@ -9,7 +9,7 @@ const mocks = vi.hoisted(() => ({
     proxy: { port: 3211 },
     routes: [{ prefix: "/openai" }]
   })),
-  readStudioState: vi.fn(() => ({ gatewayPort: 3210, proxyPort: 3211 })),
+  readStudioState: vi.fn((): { pid?: number; gatewayPort: number; proxyPort: number } => ({ gatewayPort: 3210, proxyPort: 3211 })),
   loadAdaptersConfig: vi.fn(() => ({ adapters: { perAgent: {} } })),
   loadAgentConfig: vi.fn(() => ({ provider: { routePrefix: "/anthropic" } })),
   latestActiveWorkOrder: vi.fn(() => ({ workOrderId: "wo-1" })),

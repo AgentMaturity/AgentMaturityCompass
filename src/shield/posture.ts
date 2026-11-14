@@ -114,9 +114,10 @@ export function buildPostureScorecard(params: { root: string; now: number }): Po
 
   // 1. Agent config
   const cfg = scanAgentConfig({ root, now: params.now });
-  dims.push({
+  // CLI-06: no agent configuration is no agent-config grade (an MCP config alone still grades the rest).
+  if (cfg.securityLevel !== null && cfg.securityScore !== null) dims.push({
     id: "agent-config",
-    level: cfg.securityLevel as PostureLevel,
+    level: cfg.securityLevel,
     score: cfg.securityScore,
     status: statusFor(cfg.securityScore),
     summary: `${cfg.filesScanned.length} config file(s); ${cfg.findings.length} finding(s); ${cfg.riskLabel}.`
