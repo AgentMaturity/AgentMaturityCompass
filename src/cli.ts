@@ -22458,16 +22458,35 @@ score
 
 score
   .command("task-horizon")
-  .description("Score task-completion time horizon (METR-inspired)")
+  .description("Autonomy span: check the controls AMC lists for a run of a given length (self-reported; not METR's time-horizon measure; a longer run never scores higher)")
+  .option("--minutes <n>", "How long the agent ran on its own, in minutes")
+  .option("--controls <list>", "Controls in place during the run, separated by commas")
+  .option("--human-stepped-in", "A person stepped in during the run")
   .option("--json", "Output as JSON")
-  .action(async (opts: { json?: boolean }) => {
+  .action(async (opts: { json?: boolean; minutes?: string; controls?: string; humanSteppedIn?: boolean }) => {
     try {
-      const { scoreTaskHorizon } = await import("./score/taskHorizon.js");
-      const result = scoreTaskHorizon({ taskDurationMinutes: 0, completedAutonomously: false, activeGovernanceControls: [] });
-      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🎯  Task Horizon"), result, unverifiedClaim("score:taskHorizon", 0), opts)) return;
-      console.log(chalk.gray("Score:"), result.score.toFixed(2));
-      console.log(chalk.gray("Band:"), result.band.label);
-      console.log(chalk.gray("Level:"), result.level);
+      const { scoreTaskHorizon, TASK_HORIZON_BANDS } = await import("./score/taskHorizon.js");
+      const title = chalk.bold.hex('#4AEF79')("\n🎯  Autonomy Span");
+      const claim = unverifiedClaim("score:taskHorizon", 0);
+      if (opts.minutes === undefined) {
+        const nextStep = "Tell AMC how long the agent ran and which controls were in place: amc score task-horizon --minutes 45 --controls \"output validation,tool allowlist\"";
+        const empty = { status: "not_evaluated" as const, score: null, reason: "No run length was given.", nextStep,
+          spans: TASK_HORIZON_BANDS.map((band) => ({ span: band.span, label: band.label, controls: band.governanceRequirements })) };
+        if (emitClaimResult(title, empty, claim, opts)) return;
+        console.log(chalk.gray("Result:"), chalk.yellow("not evaluated"), chalk.gray(`(${empty.reason})`));
+        console.log(chalk.gray(nextStep));
+        return;
+      }
+      const minutes = Number(opts.minutes);
+      if (!Number.isFinite(minutes) || minutes < 0) throw new Error(`--minutes must be a number of minutes, 0 or more. You gave "${opts.minutes}".`);
+      const controls = (opts.controls ?? "").split(",").map((item) => item.trim()).filter(Boolean);
+      const result = scoreTaskHorizon({ taskDurationMinutes: minutes, completedAutonomously: !opts.humanSteppedIn, activeGovernanceControls: controls });
+      if (emitClaimResult(title, result, claim, opts)) return;
+      console.log(chalk.gray("Run length:"), result.band.label);
+      console.log(chalk.gray("Controls in place:"), `${result.score}% of the ${result.band.governanceRequirements.length} listed for a run of this length`);
+      if (result.missingGovernance.length > 0) console.log(chalk.gray("Missing:"), result.missingGovernance.join(", "));
+      console.log(chalk.gray("Risk:"), result.riskLabel);
+      for (const note of result.notes) console.log(chalk.gray(`Note: ${note}`));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 

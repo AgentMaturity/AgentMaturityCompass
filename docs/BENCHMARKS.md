@@ -1432,20 +1432,28 @@ amc bench publish request \
 amc bench publish execute --approval-request <apprreq_id>
 ```
 
-## METR-Style Task Horizon Scoring
+## Autonomy Span
 
-Based on METR research, task-completion time horizon is the single most predictive metric for agent capability. AMC scores agents on the longest task they can reliably complete autonomously, and maps each horizon level to required governance controls.
+An autonomy span is how long an agent ran on its own. AMC lists the controls it expects for a run of each length and reports which were in place. The spans are AMC's own cut-offs.
 
-| Level | Horizon | Example Tasks | Governance Requirements |
-|-------|---------|---------------|------------------------|
-| L0 | <1 min | Single-turn Q&A, lookups | Basic output validation |
-| L1 | 1-5 min | Multi-step retrieval, short workflows | + tool allowlist |
-| L2 | 5-30 min | Code generation, document drafting | + checkpoint logging, cost budget |
-| L3 | 30 min-2 hr | Complex analysis, multi-file refactors | + human-in-the-loop, rollback |
-| L4 | 2-8 hr | Project-level work, research synthesis | + progress reporting, circuit breaker, dual-control |
-| L5 | 8+ hr | Autonomous multi-day projects | + drift monitoring, kill switch, tamper-evident audit |
+What this is not: it is not METR's time-horizon measure, it does not measure what an agent is capable of, and a longer run never scores higher. A span is a run length, not a maturity level, so the L0 to L5 scale is not used here.
 
-Key principle: longer task horizons trigger stricter governance requirements. An agent operating at L4 without dual-control approvals is flagged as high risk.
+| Run length | Controls listed |
+|------------|-----------------|
+| Under 1 minute | Output validation |
+| 1 to 5 minutes | + tool allowlist |
+| 5 to 30 minutes | + checkpoint logging, cost budget |
+| 30 minutes to 2 hours | + human-in-the-loop checkpoints, rollback capability |
+| 2 to 8 hours | + progress reporting, circuit breaker, dual-control approvals for destructive actions |
+| 8 hours or more | + continuous drift monitoring, kill switch, audit trail with tamper evidence |
+
+The score is the share of the listed controls that were in place (0 to 100), capped at what the same controls would score on any shorter run. Run length adds no points. A long run with controls missing is flagged as higher risk.
+
+The inputs are what you supply, so the result is self-reported:
+
+```bash
+amc score task-horizon --minutes 120 --controls "output validation,tool allowlist,checkpoint logging"
+```
 
 ```typescript
 import { scoreTaskHorizon } from "agent-maturity-compass";
@@ -1455,9 +1463,10 @@ const result = scoreTaskHorizon({
   completedAutonomously: true,
   activeGovernanceControls: ["output validation", "tool allowlist", "checkpoint logging"],
 });
-// result.level → "L3"
-// result.governanceSufficient → false (missing human-in-the-loop, rollback, cost budget)
-// result.riskLabel → "high"
+// result.span → "2-8-hr"
+// result.score → 33 (3 of the 9 listed controls were in place)
+// result.governanceSufficient → false
+// result.riskLabel → "critical"
 ```
 
 ## FACTS-Style Factuality Dimensions
