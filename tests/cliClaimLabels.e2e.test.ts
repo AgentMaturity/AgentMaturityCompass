@@ -23,7 +23,7 @@ const recipes: Recipe[] = [
   {"path": "quickscore", "args": ["--auto", "--json"], "json": true},
   {"path": "run", "args": ["--score-only", "--json"], "json": true},
   {"path": "report", "args": ["@RUN@"], "output": "markdown"},
-  {"path": "verify all", "args": ["--json"], "json": true, "refusal": {"reason": "The private monitor trust root is not independently pinned; optional policies do not grant anchoring.", "pattern": "Ledger verification FAILED: UNANCHORED"}},
+  {"path": "verify all", "args": ["--json"], "json": true, "refusal": {"reason": "The private monitor trust root is not independently pinned; optional policies do not grant anchoring.", "pattern": "Ledger verification NOT ANCHORED \\(UNANCHORED\\)"}},
   {"path": "eval import", "args": ["--format", "openai", "--file", "@MISSING@", "--json"], "json": true, "refusal": {"reason": "This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.", "pattern": "ENOENT|not found|No .*found|missing|unavailable|unknown.*run|does not exist"}},
   {"path": "eval status", "args": ["--json"], "json": true},
   {"path": "eval run", "args": ["--format", "json"], "json": true},

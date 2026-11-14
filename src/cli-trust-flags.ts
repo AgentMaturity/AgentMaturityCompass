@@ -6,7 +6,8 @@
  * never from the environment or a request body.
  */
 import type { Command } from "commander";
-import { resolve } from "node:path";
+import { existsSync } from "node:fs";
+import { join, resolve } from "node:path";
 import chalk from "chalk";
 import {
   loadTrustContext, untrustedReasons, verdictExitCode,
@@ -83,10 +84,17 @@ export function finishVerify(label: string, report: VerifierReportV1,
     const result = opts.result ?? report;
     console.log(JSON.stringify(claim ? withClaimFields(result, claim) : result, null, 2));
   } else {
+    // CLI-11: an intact artifact whose signer is only unpinned did not fail; it is not trusted yet, and the pin is named.
+    const refused = report.issuerAdmission.signatures.filter((signature) => signature.status !== "admitted");
+    const onlyUnpinned = code === 1 && report.integrity.status === "pass" && refused.length > 0 && refused.every((signature) => signature.status === "not-pinned");
     console.log(code === 0 ? chalk.green(`${label} verification PASSED`)
-      : code === 2 ? chalk.yellow(`${label} integrity verified, UNTRUSTED`) : chalk.red(`${label} verification FAILED`));
+      : code === 2 ? chalk.yellow(`${label} integrity verified, UNTRUSTED`)
+        : onlyUnpinned ? chalk.yellow(`${label} integrity verified, NOT TRUSTED: the signer's public key is not pinned`) : chalk.red(`${label} verification FAILED`));
     if (claim) printClaimResult(claim, {});
     for (const line of code === 0 ? opts.details ?? [] : reasons.map((reason) => `- ${reason}`)) console.log(line);
+    if (onlyUnpinned && refused.some((signature) => signature.purpose === "artifact-seal") && existsSync(join(process.cwd(), ".amc", "keys", "artifact-seal.pub"))) {
+      console.log(chalk.gray("Next: for a file this workspace signed, pass --pubkey .amc/keys/artifact-seal.pub (it shows this workspace signed it); for someone else's file, pass the public key they gave you."));
+    }
   }
   if (code === 2) untrusted(reasons, report.overrides);
   if (code !== 0) process.exit(code);
