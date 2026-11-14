@@ -25,10 +25,11 @@ function questionDetailHtml(pack, q) {
  * `pack` is the `pack` field of Studio's GET /industry-packs/:id. Each question is a labelled radio group offering the
  * levels `amc domain pack run` offers (L1-L5); an unanswered question is not evaluated, as in the CLI baseline.
  */
-export function industryPackDetailHtml(pack) {
+export function industryPackDetailHtml(pack, saved = null) {
+  const savedLevel = (q) => (saved && typeof saved === "object" ? saved[q.id] : undefined);
   const questions = pack.questions ?? [];
   const levels = (q, i) => [1, 2, 3, 4, 5].map((level) => [level, levelText(q, level)])
-    .map(([level, text]) => `<label class="pack-level"><input type="radio" name="pack-q${i}" value="${level}" data-question="${esc(q.id)}" />
+    .map(([level, text]) => `<label class="pack-level"><input type="radio" name="pack-q${i}" value="${level}" data-question="${esc(q.id)}"${savedLevel(q) === level ? " checked" : ""} />
       <span><strong>L${level}</strong> ${esc(text)}</span></label>`).join("");
   return `<div class="row spaced wrap">
       <h3 id="industryPackHeading" tabindex="-1">${esc(pack.name)}</h3>
@@ -44,7 +45,8 @@ export function industryPackDetailHtml(pack) {
     ${(pack.keyRisks ?? []).length ? `<h4>Key risks</h4><ol>${pack.keyRisks.map((risk) => `<li>${esc(risk)}</li>`).join("")}</ol>` : ""}
     <h4>Run it</h4>
     <p>Answer the questions below and choose Score, or run <code>amc domain pack run --pack ${esc(pack.id)}</code>.
-      Unanswered questions are not evaluated. The answers are scored, not stored.</p>
+      Unanswered questions are not evaluated. When you are signed in, your last scored answers are kept in this workspace,
+      so they are here when you come back${saved && Object.keys(saved).length ? " (they are filled in below)" : ""}.</p>
     <form id="industryPackForm" data-pack="${esc(pack.id)}">
       <ol class="pack-questions">${questions.map((q, i) => `
         <li><fieldset><legend><strong>${esc(q.id)}</strong> · ${esc(q.dimension)}<br />${esc(q.text)}${questionDetailHtml(pack, q)}</legend>${levels(q, i)}</fieldset></li>`).join("")}

@@ -2465,7 +2465,8 @@ async function renderIndustryPacks() {
     onAction(button, "click", async () => {
       const id = button.getAttribute("data-industry-pack");
       try {
-        detail.innerHTML = industryPackDetailHtml((await apiGet(`/industry-packs/${encodeURIComponent(id)}`)).pack);
+        const loaded = await apiGet(`/industry-packs/${encodeURIComponent(id)}`);
+        detail.innerHTML = industryPackDetailHtml(loaded.pack, loaded.savedResponses);
         bindIndustryPackDetail(detail, button);
       } catch (error) {
         detail.innerHTML = `<p class="status-bad">${htmlEscape(errText(error))}</p>`;
