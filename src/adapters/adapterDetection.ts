@@ -136,3 +136,22 @@ export function detectAdapter(definition: AdapterDefinition, options?: { timeout
     detail: `missing commands: ${definition.detection.commandCandidates.join(", ")}`
   };
 }
+
+/** Interpreters several adapters fall back to: finding one says nothing about the framework itself. */
+const GENERIC_RUNTIMES = new Set(["python3", "python", "node", "sh", "bash"]);
+
+/**
+ * How `amc doctor` shows one adapter. Adapters are optional, so an absent one is neutral (INFO), not a warning. PASS is
+ * kept for an adapter whose own command answered; one found only through an interpreter (crewai through python3) is not
+ * detected. generic-cli is the exception: its runtime is the shell. A command that was found but did not answer its version
+ * question is shown as found, not as PASS.
+ */
+export function adapterDoctorCheck(row: AdapterDetectionResult): { status: "PASS" | "INFO"; message: string } {
+  if (!row.installed || row.command === null) return { status: "INFO", message: `${row.adapterId}: not installed (optional)` };
+  const runtime = row.command.split(/[\\/]/).pop() ?? row.command;
+  if (GENERIC_RUNTIMES.has(runtime) && row.adapterId !== "generic-cli") {
+    return { status: "INFO", message: `${row.adapterId}: not detected (optional); only its runtime ${runtime}${row.version === null ? "" : ` ${row.version}`} is present` };
+  }
+  if (row.version === null) return { status: "INFO", message: `${row.adapterId}: ${row.command} found, but it did not report a version (${row.detail})` };
+  return { status: "PASS", message: `${row.adapterId}: ${row.command} ${row.version}`.trim() };
+}
