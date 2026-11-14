@@ -57,6 +57,8 @@ export async function buildConnectInstructions(params: {
     routePrefix = adapterProfile.preferredProviderRoute;
   }
 
+  // Without a terminal the mode prompt can only abort; say which flag answers it.
+  if (params.mode === undefined && !process.stdin.isTTY) throw new Error("amc connect needs a mode and there is no terminal to ask in. Add --mode supervise or --mode sandbox.");
   const selectedMode = params.mode ?? (await inquirer.prompt<{ mode: "supervise" | "sandbox" }>([
     {
       type: "list",

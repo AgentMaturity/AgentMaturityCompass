@@ -14,6 +14,7 @@ import { LlmRuntime } from "../src/llm/adapter/llmRuntime.js";
 import { openaiAdapter } from "../src/llm/providers/openaiAdapter.js";
 import { okStream, stubUpstream } from "./helpers/llmStubUpstream.js";
 import { nativeUsdUnits } from "../src/budgets/nativeUsdAmount.js";
+import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL, stubProviderRoute, stubProviderTransport } from "../src/agent/stubProvider.js";
 
 let workspace: string;
 let session: SessionService;
@@ -204,6 +205,47 @@ describe("signed native prospective USD admission", () => {
   });
 });
 
+describe("local stub route under a signed USD cap", () => {
+  beforeEach(() => {
+    workspace = mkdtempSync(join(tmpdir(), "amc-usd-stub-"));
+    initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+    session = new SessionService(workspace);
+    session.open({ agentId: "default", harnessVersion: "test", compositionDigest: "test", policyDigest: "test" });
+  });
+  afterEach(() => { session.close({ reason: "completed" }); rmSync(workspace, { recursive: true, force: true }); });
+  function stubRuntime() {
+    const registry = new AdapterRegistry(); registry.register(stubProviderRoute());
+    return new LlmRuntime({ session, registry, transport: stubProviderTransport({}), credentials: {
+      resolve: () => null, describe: () => ({ configured: false, source: null, writable: false }),
+      set: async () => {}, unset: async () => false
+    } });
+  }
+  // Workspaces initialised before the token-only default carry a signed daily maxCostUsd. The stub never leaves
+  // the process, so it has no USD exposure to bound; refusing it made the demo's first task fail.
+  it("runs the local stub repeatedly with no attested USD bound and reserves no USD", async () => {
+    policy([], 50);
+    const prompt = session.recordSystemPrompt("stub under a USD cap");
+    const runtime = stubRuntime();
+    session.startTurn({ trigger: "user" }); session.recordUserMessage("hello");
+    for (let request = 0; request < 2; request++) {
+      session.startStep();
+      for await (const _ of runtime.stream({ providerId: STUB_PROVIDER_ID, model: STUB_PROVIDER_MODEL, params: { max_tokens: 20 },
+        systemPromptEventId: prompt.eventId, tools: null })) { /* drain */ }
+      session.endStep({ stopReason: "end_turn", usage: null });
+    }
+    expect(budgetUsageSnapshot(workspace, "default").daily).toMatchObject({ llmRequests: 2, llmReservedCostUsd: 0, llmUnreservedCostRequests: 0 });
+  });
+  it("still refuses a request that names the stub provider but dispatches anywhere else", () => {
+    policy([], 50);
+    const body = Buffer.from(JSON.stringify({ model: STUB_PROVIDER_MODEL, messages: [{ role: "user", content: "hi" }], max_tokens: 20 }));
+    const prepared = session.recordRequestHeader({ providerId: STUB_PROVIDER_ID, model: STUB_PROVIDER_MODEL, encoderId: "anthropic-messages", encoderVersion: 1,
+      params: { max_tokens: 20 }, systemPromptEventId: "prompt", toolSchema: null, projectionCutoffEventId: "message", projectionDigest: "projection",
+      sourceEventIds: [], requestBytes: body });
+    expect(() => reserveNativeModelBudget(session, prepared.headerEventId, { url: "https://api.anthropic.com/v1/messages", body })).toThrow(/USD.*bound/i);
+    expect(budgetUsageSnapshot(workspace, "default").daily.llmRequests).toBe(0);
+  });
+});
+
 describe("USD reservation settlement projection", () => {
   const now = Date.now();
   function rows(values: Record<string, unknown> | null, age = 0, failed = false): EvidenceEvent[] {
@@ -254,6 +296,13 @@ describe("USD reservation settlement projection", () => {
     const reservation = evidence.find(row => row.id === "reservation")!;
     reservation.meta_json = JSON.stringify({ ...JSON.parse(reservation.meta_json), reservedCostUsd });
     expect(() => projectBudgetUsage(evidence, "default", now)).toThrow("reservation amount is invalid");
+  });
+  it("refuses a local-stub USD exemption on a reservation for any other provider", () => {
+    const evidence = rows(null);
+    const reservation = evidence.find(row => row.id === "reservation")!;
+    const { reservedCostUsd: _, ...meta } = JSON.parse(reservation.meta_json);
+    reservation.meta_json = JSON.stringify({ ...meta, usdExposure: "none-local-stub" });
+    expect(() => projectBudgetUsage(evidence, "default", now)).toThrow(/local-stub reservation/);
   });
   it("rounds exposure upward and capacity downward at trillionth-dollar resolution", () => {
     expect(nativeUsdUnits(1.1e-12)).toBe(2n); expect(nativeUsdUnits(1.1e-12, false)).toBe(1n);

@@ -107,8 +107,17 @@ export function decorateNav(nav, page) {
   }
 }
 
-/** The page top bar (LIVE-UX-17): workspace, session pill, two shortcuts and, once someone is signed in, Sign out. */
-export function topbarHtml({ workspace = "local", demoMode = false, me = null } = {}) {
+/** The label of the console's one first action: a demo task in the demo workspace, a real task elsewhere. */
+export const primaryActionLabel = (demoMode) => demoMode ? "Try a demo task" : "Run a task";
+
+/** Where that action goes: Native Tasks for the agent, with a sample prompt filled in (?sample=1). */
+export const primaryActionHref = (agent = "default") => `./native-tasks?agent=${encodeURIComponent(agent)}&sample=1`;
+
+/**
+ * The page top bar (LIVE-UX-17): workspace, session pill, the guide, Evidence, the first action and, once someone is
+ * signed in outside the demo workspace (where the session is the built-in viewer), Sign out.
+ */
+export function topbarHtml({ workspace = "local", demoMode = false, me = null, agent = "default" } = {}) {
   return `
     <div>
       <div class="topbar-kicker">Agent Maturity Compass</div>
@@ -119,8 +128,8 @@ export function topbarHtml({ workspace = "local", demoMode = false, me = null } 
       ${demoMode ? '<span class="pill ok">local demo session</span>' : '<span class="pill muted">session protected</span>'}
       <a class="button secondary" id="guideOpenLink" href="./home?guide=1">How AMC works</a>
       <a class="button secondary" href="./evidence">Evidence</a>
-      <a class="button secondary" href="./standard">Open Standard</a>
-      ${me ? '<button id="signOutBtn" type="button" class="secondary">Sign out</button>' : ""}
+      <a class="button" id="topbarPrimaryAction" href="${esc(primaryActionHref(agent))}">${primaryActionLabel(demoMode)}</a>
+      ${me && !demoMode ? '<button id="signOutBtn" type="button" class="secondary">Sign out</button>' : ""}
     </div>
   `;
 }
@@ -132,6 +141,8 @@ export function initShell(doc) {
   // app.js unhides the banner when it writes content (refreshUnifiedBanner); pages that never load it keep it hidden.
   const banner = doc.getElementById("ucBanner");
   if (banner) banner.hidden = true;
+  // The scripts started, so the static "Still blank?" note (styles.css shows it after a delay) is no longer needed.
+  for (const note of doc.querySelectorAll(".boot-note")) note.remove();
   const nav = doc.querySelector("nav");
   renderCanonicalNav(nav);
   decorateNav(nav, currentPage(doc));

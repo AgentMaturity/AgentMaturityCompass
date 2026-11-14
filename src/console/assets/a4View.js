@@ -5,7 +5,7 @@ import { renderPromptDiffViewer } from "./components/promptDiffViewer.js";
 
 export const STAGES = ["aspire", "assemble", "adapt", "activate"];
 const STEPS = ["asked", "understood", "explained", "proposed", "direction_approved", "built", "reviewed", "completion_approved"];
-const STEP_TITLES = { asked: "Ask", understood: "Understand", explained: "Explain", proposed: "Propose",
+export const STEP_TITLES = { asked: "Ask", understood: "Understand", explained: "Explain", proposed: "Propose",
   direction_approved: "Direction approved", built: "Build", reviewed: "Review", completion_approved: "Completion approved" };
 const LANES = [["recommendation", "Recommendation"], ["implementation", "Implementation"], ["observed", "Observed"],
   ["verified", "Independently reviewed"]];
@@ -110,14 +110,21 @@ export function stageBanner(stage) {
 /** Studio's role check refuses a create from anyone without OPERATOR or OWNER (accessPolicy), and A4 refuses it in a read-only workspace. */
 export const CREATE_NEEDS = "Starting an agent project needs a workspace OPERATOR or OWNER role in a workspace that is not read-only";
 
-export function renderCreateForm(open) {
+export function renderCreateForm(open, industryHtml = "") {
   return `<details class="card" id="a4Create"${open ? " open" : ""}><summary>Start an agent project</summary>
-    <form id="a4CreateForm" class="a4-form">
-      <label>Project name <input name="name" required maxlength="200" /></label>
-      <label>Existing agent id (optional) <input name="agentId" maxlength="128" pattern="[a-z0-9][a-z0-9_\\-]{0,127}"
-        title="Lowercase letters, digits, _ and -, starting with a letter or digit" /></label>
-      <label>Your expertise <select name="expertise">${LEVELS.map((level) => `<option value="${level}">${stageTitle(level)}</option>`).join("")}</select></label>
-      <button type="submit">Start an agent project</button>
+    <form id="a4CreateForm" class="a4-form" novalidate>
+      <label>Project name <input name="name" required maxlength="200" placeholder="For example: Invoice triage helper" aria-describedby="a4NameHint" /></label>
+      <p class="muted" id="a4NameHint">A short name your team will recognise. It is stored in the project's record.</p>
+      ${industryHtml}
+      <label>Existing agent id (optional) <input name="agentId" maxlength="128" pattern="[a-z0-9][a-z0-9_\\-]{0,127}" placeholder="Leave empty to create a new agent"
+        aria-describedby="a4AgentHint" /></label>
+      <p class="muted" id="a4AgentHint">Only if this agent already exists in AMC: its id, in lowercase letters, digits, _ and -, for example invoice-helper.
+        Leave it empty and AMC creates a new agent for the project.</p>
+      <label>How much detail do you want in explanations? <select name="expertise">${LEVELS.map((level) => `<option value="${level}">${stageTitle(level)}</option>`).join("")}</select></label>
+      <p class="a4-form-error status-bad" role="alert" hidden></p>
+      <div class="row wrap"><button type="submit" class="a4-primary">Start an agent project</button>
+        <button type="button" class="secondary" data-a4-example-project>Use an example</button></div>
+      <p class="muted">Use an example fills a sample project, marked (sample) in its name, so the records show it is sample data.</p>
     </form></details>`;
 }
 
@@ -140,14 +147,6 @@ export function stageLinks(project, stage) {
   const id = encodeURIComponent(project.projectId);
   return `<div class="row wrap">${STAGES.map((name) => `<a class="button secondary" href="./a4Project?project=${id}&stage=${name}"${
     name === stage ? ' aria-current="page"' : ""}>${stageTitle(name)}</a>`).join("")}</div>`;
-}
-
-/** The stage rail, in the shape renderPlanTimeline takes. Positions only: Studio's stage and step are the facts. */
-export function railPlan(project) {
-  const current = STAGES.indexOf(project.stage);
-  return { phases: STAGES.map((stage, index) => ({ phaseId: stageTitle(stage), actions: [],
-    goal: current < 0 ? project.stage : index < current ? "earlier stage" : index > current ? "later stage"
-      : `current · ${STEP_TITLES[project.step] ?? project.step}` })) };
 }
 
 /** The eight steps, in the shape renderHandholdingSteps takes. */
@@ -191,6 +190,7 @@ function askHold(ctx) {
 const CONTENT_MAX = 65_536;
 
 const NO_REFLECTION = "No statement recorded from this page yet";
+export const RECORDED_CURRENT = "Studio holds AMC's understanding of your current answers (shown on this page). If it is right, confirm it; if not, change your answers and run Understand again.";
 export const NO_PRODUCER = "No producer is registered for this stage yet, so Studio records what you write here as your own self-reported statement, not as AMC's.";
 const studioJson = (value) => `<pre class="scroll">${esc(JSON.stringify(value ?? null, null, 2))}</pre>`;
 /**
@@ -209,12 +209,15 @@ export const statementHolds = (statement, before, after) => statement != null &&
   && (after.revisionNo === before.revisionNo || (Number.isSafeInteger(statement.headSeq) && after.headSeq <= statement.headSeq));
 
 /** Understand's recorded statement; Confirm and Correct stay disabled until one is shown here. */
-function reflectionHtml(reflection, understand) {
+function reflectionHtml(reflection, understand, recordedCurrent = false) {
   const bound = Number.isSafeInteger(reflection?.headSeq);
-  const offer = bound ? understand : held(reflection ? "Studio did not say which head this statement was recorded at" : NO_REFLECTION);
+  // After a reload the page has no statement of its own, but Studio's recorded understanding was made for the current answers
+  // (a4Start.understandingIsCurrent): Yes binds the head shown, and Studio refuses it if the project moved or the answers changed.
+  const offer = bound || (!reflection && recordedCurrent) ? understand
+    : held(reflection ? "Studio did not say which head this statement was recorded at" : NO_REFLECTION);
   return `${reflection ? `${recorded("your statement", reflection)}<p class="muted">Yes and Correct bind this head: if the project
-    changes first, Studio refuses them and you run Understand again.</p>` : `<p class="muted">${NO_REFLECTION}. Run Understand to
-    record your statement before you confirm it.</p>`}
+    changes first, Studio refuses them and you run Understand again.</p>` : recordedCurrent ? `<p class="muted">${RECORDED_CURRENT}</p>`
+    : `<p class="muted">${NO_REFLECTION}. Run Understand to record your statement before you confirm it.</p>`}
     <div class="row wrap">${actionButton("Yes, that's it", "confirm", offer)} ${actionButton("Correct this", "correct", offer)}</div>
     <p class="muted">Correct this sends nothing: change your answers or your statement, then run Understand again.</p>`;
 }
@@ -250,7 +253,7 @@ export function renderConversation(ctx) {
     const answer = answered.get(question.id);
     const json = answer !== undefined && typeof answer.value !== "string";
     return `<label>${esc(question.prompt)}${question.required ? " (required)" : ""}${json ? " (JSON)" : ""}
-      <textarea name="${esc(question.id)}" rows="2"${json ? " data-json" : ""}>${esc(answerText(answers, question.id))}</textarea></label>`;
+      <textarea name="${esc(question.id)}" rows="2"${json ? " data-json" : ""}${question.example ? ` placeholder="${esc(question.example)}"` : ""}>${esc(answerText(answers, question.id))}</textarea></label>`;
   };
   const answerRow = (answer) => `<li><code>${esc(answer.questionId)}</code> <code>${esc(answer.source)}</code>: ${esc(shown(answer.value))}${
     answer.source === "user" ? "" : ` ${actionButton("Confirm", "confirm-answer", ask, `data-question="${esc(answer.questionId)}"`)}`}</li>`;
@@ -273,13 +276,16 @@ export function renderConversation(ctx) {
       ? `<details data-a4-open="change-answers"><summary>Change my answers</summary>${change.map(field).join("")}</details>` : ""}
       ${answerDrift ? `<p class="status-bad">${ANSWER_CHANGED}.</p>` : ""}
       <p class="muted">${RESTARTS} ${IN_RECORD}</p>
-      <div class="row wrap">${actionButton("Save answers", "answers", answerDrift ? held(ANSWER_CHANGED) : ask)}${answerDrift
+      ${ctx.exampleOffered && open.length ? `<p class="muted">Not sure what to write? Each empty field shows an example. Use an example fills the empty
+        fields with sample answers marked (sample), which you can change before saving.</p>` : ""}
+      <div class="row wrap">${actionButton("Save answers", "answers", answerDrift ? held(ANSWER_CHANGED) : ask)}${ctx.exampleOffered && open.length
+        ? ' <button type="button" class="secondary" data-a4-action="use-example">Use an example</button>' : ""}${answerDrift
         ? ` <button type="button" class="secondary" data-a4-action="discard-answers">Discard my answer edits</button>` : ""}</div></form>
     <h4>Understand</h4>
     <label>What this stage should achieve, in your words <textarea name="understanding" rows="3" maxlength="${CONTENT_MAX}"></textarea></label>
     <p class="muted">${NO_PRODUCER} ${RETAINED}</p>
     <div class="row wrap">${actionButton("Run Understand", "understand", understand)}</div>
-    ${reflectionHtml(reflection, confirmOffer)}
+    ${reflectionHtml(reflection, confirmOffer, ctx.understandingCurrent === true && ctx.project.stage === ctx.stage && ctx.project.step === "asked")}
     <h4>Explain</h4>
     <label>Your explanation <textarea name="explanation" rows="3" maxlength="${CONTENT_MAX}"></textarea></label>
     <p class="muted">${NO_PRODUCER} ${RETAINED}</p>

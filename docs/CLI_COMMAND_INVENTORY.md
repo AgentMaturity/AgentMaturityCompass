@@ -1219,7 +1219,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc truthguard validate` | Validate structured agent output claims against deterministic truth constraints | `--file <json>` | - |
 | `amc tune` | Mechanic mode tuning wizard | `--target <name>` | - |
 | `amc unknowns` | List known unknowns for an agent's latest diagnostic run | `--agent <id>` | - |
-| `amc up` | Start AMC control plane in one command (studio + gateway + bridge) | `--demo`<br>`--read-only`<br>`--dry-run`<br>`--no-open`<br>`--no-remember`<br>`--no-baseline` | `start` |
+| `amc up` | Start AMC and its console (Studio, gateway and bridge in one command) | `--demo`<br>`--read-only`<br>`--dry-run`<br>`--no-open`<br>`--no-remember`<br>`--no-baseline` | `start` |
 | `amc upgrade` | Generate upgrade plan | `--to <destination>` | - |
 | `amc usage` | Usage and cost across native sessions from verified signed rows (tokens, cost, latency; unknowns stay unknown) | `--since <when>`<br>`--until <iso>`<br>`--by <key>`<br>`--agent <agentId>`<br>`--utc`<br>`--expect-monitor <sha256>`<br>`--json` | - |
 | `amc user` | Multi-user RBAC account management | - | - |

@@ -51,7 +51,7 @@ describe("Codex hook CLI output", () => {
         registerHookIntegrationCommands(connect, () => agentId);
         await connect.parseAsync(["node", "connect", "hooks", ...args]);
       };
-      await run("install", "--provider", "codex", "--agent", agentId, "--mode", "observe");
+      await run("install", "--provider", "codex", "--agent", agentId, "--mode", "observe", "--bridge-url", "http://127.0.0.1:3212");
       const installed = lines.splice(0).join("\n");
       expect(installed).toContain("AMC hook installed");
       expect(installed).toContain("Limit: Codex runs this project hook only after you trust it in Codex");
@@ -60,7 +60,7 @@ describe("Codex hook CLI output", () => {
       const status = lines.splice(0).join("\n");
       expect(status).toContain("AMC hook: installed");
       expect(status).toContain("Next (in Codex, not in AMC):");
-      await run("install", "--provider", "codex", "--agent", agentId, "--mode", "observe", "--dry-run");
+      await run("install", "--provider", "codex", "--agent", agentId, "--mode", "observe", "--dry-run", "--bridge-url", "http://127.0.0.1:3212");
       expect(lines.join("\n")).not.toContain("Next (in Codex");
     } finally {
       log.mockRestore();

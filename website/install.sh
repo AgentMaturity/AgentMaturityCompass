@@ -123,8 +123,9 @@ installer="$tmp_dir/unpacked/${package_root}/install.sh"
 sh "$installer"
 
 printf '\nAMC %s installed from a verified GitHub release.\n' "$AMC_RELEASE_VERSION"
-if [ -n "${AMC_INSTALL_PREFIX:-}" ]; then
-  printf 'Add it to PATH: export PATH="%s/bin:$PATH"\n' "$AMC_INSTALL_PREFIX"
+# The archive's installer printed the PATH line already; repeat it only while amc is not on PATH, next to the next step.
+if [ -n "${AMC_INSTALL_PREFIX:-}" ] && ! command -v amc >/dev/null 2>&1; then
+  printf 'First add it to PATH: export PATH="%s/bin:$PATH"\n' "$AMC_INSTALL_PREFIX"
 fi
-printf 'Run: amc --version && amc doctor\n'
+printf 'Next step: type amc   (to check this machine first: amc --version && amc doctor)\n'
 printf 'Docs: https://agentmaturity.co/docs/\n'

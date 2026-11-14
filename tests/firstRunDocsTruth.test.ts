@@ -37,7 +37,10 @@ describe("the first console login is in the first-run path", () => {
 
 describe("the sign-in paragraphs stay true", () => {
   test.each([["README.md", readme], ["docs/GETTING_STARTED.md", gettingStarted]])("%s: remembered passphrase first, AMC_VAULT_PASSPHRASE as the fallback, never amc vault unlock", (_file, text) => {
-    expect(text).toContain("after `amc up` the passphrase it remembered is used. If it reports `Vault locked`, set `AMC_VAULT_PASSPHRASE` in that shell and run it again.");
+    // The signing question src/vault/operatorContext.ts asks (default No), then a typed passphrase, then the shell fallback.
+    expect(read("src/vault/operatorContext.ts")).toContain("message: `Use the vault passphrase saved in ${location} to sign amc ${path}?`");
+    expect(text).toContain("`Use the vault passphrase saved in <location> to sign amc user init?`");
+    expect(text).toContain("Without a terminal, set `AMC_VAULT_PASSPHRASE` in that shell and run it again.");
     for (const window of nearby(text, "user init")) expect(window).not.toContain("amc vault unlock");
     expect(text).toContain("amc user add");
   });

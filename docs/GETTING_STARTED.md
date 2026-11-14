@@ -2,7 +2,9 @@
 
 **Time to first full score: ~2 minutes.**
 
-AMC (Agent Maturity Compass) scores your AI agent's trustworthiness from actual behavior — not self-reported claims. Think of it as a credit score for AI agents.
+AMC (Agent Maturity Compass) records what your AI agent actually does and scores how far you can trust it from that record, not from what the agent claims about itself.
+
+The shortest path: install from source (below), go to your project folder, type `amc`, and pick from the menu. [Your first five minutes](FIRST_FIVE_MINUTES.md) walks through every screen for a first-time user, and [Troubleshooting](TROUBLESHOOTING.md#first-run-problems) has the fix for each message new users meet most often.
 
 ---
 
@@ -39,13 +41,49 @@ irm https://agentmaturity.co/install.ps1 | iex
 
 The hosted installer pins the published 1.1.1 GitHub release and verifies the downloaded platform archive against `SHA256SUMS` before it runs the packaged installer. npm also publishes 1.1.1; the Homebrew tap is not publicly available. See [publication evidence](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/website/publication-status.json).
 
+## Start: type `amc`
+
+```bash
+cd my-agent-project
+amc
+```
+
+In a terminal, `amc` with no arguments sets up the folder the first time (a hidden `.amc/` workspace) and shows one menu. On a computer where Claude Code and Codex are installed and signed in, it looks like this:
+
+```text
+AMC set up this folder (.amc/).
+? What do you want to do?
+❯ Watch Claude Code as it works (signed in)
+  Watch Codex as it works (signed in)
+  Try a demo chat (no account or key needed)
+  Build an agent for my industry (A4 Forge preview)
+  Open the console in my browser
+  Just show my score (empty for now)
+```
+
+The menu shows only what can work now:
+
+- **Watch Claude Code as it works** / **Watch Codex as it works**: starts AMC (`amc up`), asks before it adds an observe-mode watch hook to this project's settings (`amc connect hooks install --provider claude-code --mode observe --agent default`, or `--provider codex`), then offers to start the agent in this folder. A signed-out agent shows "Sign in to … first" instead, which runs the vendor's own sign-in (`amc login claude` or `amc login codex`). An agent that is not installed is not listed.
+- **Chat with a model**: listed when an API key such as `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` is set in your shell. It runs `amc agent-loop chat` for that provider and passes the key's name, never its value.
+- **Try a demo chat**: `amc agent-loop chat --provider stub`, a built-in demo model with canned replies. No account or key; every turn is recorded.
+- **Open the console in my browser**: starts AMC if needed and opens the Compass Console.
+- **Just show my score**: prints the full score (below).
+
+AMC preselects your last choice next time. In a pipe, in CI or in an agent's shell, `amc` prints the full score as before; `amc --no-menu` or `AMC_NO_MENU=1` does the same in a terminal. `amc --help` is a short task list; `amc --help --all` lists every command.
+
+Watching Claude Code from the menu takes three answers on a first run: the menu line, `Add AMC's watch hook to this project's Claude Code settings? It sends what Claude Code does to AMC on this Mac (http://127.0.0.1:<port>).`, and `Start Claude Code here now?`. Codex is the same. The hook points at this folder's own AMC; `amc connect hooks status` reports when AMC has since moved to another port and prints the command that points the hook there again.
+
+In a folder that `amc` set up, the vault passphrase is kept in `.amc/local-vault-passphrase`, and the menu hands it to the AMC it starts, so starting asks nothing about the vault. If another AMC folder already holds AMC's default gateway and proxy ports on this computer, the menu asks `Start AMC for this folder on its own ports?` and, on yes, starts this folder on free ports and names its gateway port.
+
+`amc up` on its own, in a folder with no vault yet, asks for a vault passphrase with two choices: "Let AMC create and remember one (recommended)" or "Enter my own". The first creates a passphrase, remembers it on this computer (the macOS Keychain, service `amc-vault`, or `~/.config/amc/vault-credentials.json`), and does not print it; it says where it is kept. `amc vault passphrase` sets one you know, and `amc vault forget` removes the remembered copy. `amc init` asks the same question, and `amc init --minimal` creates and remembers one without asking. Where nothing keeps it, the passphrase is printed once instead, and you must save it then, because the vault cannot be opened without it. That happens with `AMC_VAULT_REMEMBER=0` (the `amc up` choice then reads "Let AMC create one (shown once; remembering is off)"), in CI, in an agent's shell, and for `amc init --minimal` without a terminal.
+
 ## Your First Full Score (2 minutes)
 
 ```bash
 # 1. Create a workspace
 mkdir my-agent && cd my-agent
 
-# 2. Run the full AMC lifecycle
+# 2. Run the full AMC lifecycle (in a terminal, choose "Just show my score")
 amc
 ```
 
@@ -91,7 +129,9 @@ If `amc quickscore --auto --json` has no captured ledger evidence, AMC fails clo
 
 ### Observe Claude Code or Gemini CLI actions
 
-Use a dry run to inspect the exact project files, then install the reversible observer:
+The shortest path for Claude Code is the start menu: run `amc` and choose "Watch Claude Code as it works". It installs the same observe-mode hook as the commands below. For Codex, see [Sign in with Claude or ChatGPT](SIGN_IN_WITH_CLAUDE_OR_CHATGPT.md) and [codex.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/adapters/codex.md); Codex is observe only.
+
+To do it by hand, use a dry run to inspect the exact project files, then install the reversible observer:
 
 ```bash
 amc connect hooks install --provider claude-code --agent my-agent --dry-run
@@ -111,6 +151,8 @@ amc connect hooks install --provider claude-code --mode control --agent my-agent
 ```
 
 Control is loopback-only. It evaluates raw tool input in memory, retains no raw args, and returns a receipt-bound native decision from AMC's existing signed policies. Claude Code receives `allow` or `deny`; an ask is denied, because a provider-local ask is not AMC approval. Gemini CLI has no native `ask`, so AMC returns `deny` for that outcome. Provider-local ask is not proof of AMC quorum, and multi-user policies remain denied. Claude Code control also registers each session (SessionStart) and admits each prompt (UserPromptSubmit); see [adapters/claude-code-hooks.md](adapters/claude-code-hooks.md) for the claim per hook.
+
+Control needs Claude Code settings with no enabled plugin and no other hook that can change a tool call. With either present, AMC refuses to register the session and denies every tool call (`This Claude Code session has no AMC registration, so it is not governed; AMC denied the call.`); the install prints a warning that names the setting. Use observe mode in that case ([Troubleshooting](TROUBLESHOOTING.md#claude-code-every-tool-call-is-denied)).
 
 For Claude Code, control is enforced at the `PreToolUse` hook only while Claude Code runs it. Claude Code still runs the tool when the hook cannot start, times out, or is switched off by `disableAllHooks` or managed `allowManagedHooksOnly`, so verify it:
 
@@ -330,10 +372,12 @@ The Compass Console asks you to sign in. Create the first login, an OWNER:
 amc user init --username <you>    # asks for a password; signs .amc/users.yaml
 ```
 
-It signs with the workspace vault; after `amc up` the passphrase it remembered is used. If it reports `Vault locked`, set `AMC_VAULT_PASSPHRASE` in that shell and run it again.
+It signs with the workspace vault. When a passphrase is remembered, it first asks `Use the vault passphrase saved in <location> to sign amc user init?` (the default is No; answer `y`). When none is, it asks you to type the vault passphrase; for a folder that `amc` set up, it is in `.amc/local-vault-passphrase`. Without a terminal, set `AMC_VAULT_PASSPHRASE` in that shell and run it again.
 `amc user init` refuses when `.amc/users.yaml` already exists, so on a workspace that already has
 logins (for example after `amc init --coding`) use `amc user add` instead (`--force` replaces every login). Add more logins with `amc user add --username <name> --role <roles>`
 (see [RBAC](RBAC.md)).
+
+After you sign in, Home shows one plain status line (with Details), one card ("See what your AI agent really does.") with **Run a task** and **Connect my agent**, a progress line that names the next step, and everything else under **More**. **Run a task** opens Native Tasks with a sample prompt; in the demo workspace the button reads **Try a demo task**. "How AMC works" at the top opens a three-step guide; it does not open by itself.
 
 Studio gives you:
 - Live dashboard with agent scores
@@ -444,7 +488,9 @@ amc ingest ./external-agent-logs/ --type generic_json --agent imported-agent
 ### Lifecycle
 | Command | What it does |
 |---------|-------------|
-| `amc` | Create a workspace if needed and run the full score |
+| `amc` | Create a workspace if needed; in a terminal, show the start menu, elsewhere run the full score |
+| `amc --no-menu` | Run the full score in a terminal without the menu (also `AMC_NO_MENU=1`) |
+| `amc login status` | Show whether Claude Code and Codex are installed and signed in |
 | `amc init --minimal` | Startup-friendly workspace setup without vault prompt or immediate full-score prompt |
 | `amc quickstart --minimal` | Minimal quickstart path with lightweight next steps |
 | `amc setup` | Full setup with framework detection |
@@ -575,7 +621,8 @@ amc ingest ./external-agent-logs/ --type generic_json --agent imported-agent
 
 ### All commands
 ```bash
-amc --help              # Top-level commands
+amc --help              # The short task list
+amc --help --all        # Every top-level command and option
 amc score --help        # All scoring commands
 amc evidence --help     # Evidence management
 amc audit --help        # Audit tools
@@ -605,6 +652,8 @@ amc score formal-spec my-agent --json | jq '.overallScore'
 ---
 
 ## Troubleshooting
+
+[Troubleshooting](TROUBLESHOOTING.md#first-run-problems) has the exact message and the fix for the first-run failures new users meet most often: a vault passphrase that does not open the vault, "This workspace already has a vault", Claude Code control mode denying every call, a Codex hook that records nothing, a busy port, the database engine rebuild, `ROLLBACK_DETECTED`, a console stuck on "Starting AMC…", and "Authentication required" in the console.
 
 ### "Doctor result: FAIL"
 This is normal on first run. The doctor checks for optional components:
@@ -651,7 +700,7 @@ cd platform/python && python3 -m pytest tests/ -q
 
 ## Next Steps
 
-1. **Run `amc`** — get your full baseline
+1. **Run `amc`** — pick "Watch Claude Code as it works" (or Codex), or "Just show my score" for your full baseline
 2. **Run `amc guide --go`** — generate and apply guardrails automatically
 3. **Run `amc doctor`** — check your environment
 4. **Run `amc setup --demo`** — explore with sample data

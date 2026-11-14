@@ -61,8 +61,13 @@
 .native-task-attachment-evidence code { overflow-wrap:anywhere; word-break:break-word; }
 .native-task-attachment pre, #nativeTaskSubmittedText { white-space:pre-wrap; overflow-wrap:anywhere; font:inherit; font-size:.85rem; max-height:260px; overflow:auto; }
 #nativeTaskSubmissionPreview { margin:12px 0 18px; }
-#nativeTaskApprovals { scroll-margin-top:24px; }
+#nativeTaskApprovals, #nativeTaskRecord { scroll-margin-top:24px; }
 .native-tasks [aria-busy="true"] { cursor:progress; }
 .native-tasks button:disabled { cursor:not-allowed; }
 @media (max-width:1050px) { .native-task-layout { grid-template-columns:minmax(0,1fr); } .native-task-sidebar { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } }
 @media (max-width:560px) { .native-task-sidebar { display:block; } .native-task-fields { display:block; } .native-task-fields label { margin:12px 0; } .native-task-actions > button { width:100%; } .native-task-event { padding:10px; } }
+.native-task-run-row { justify-content:flex-start; margin:4px 0 8px; }
+.native-task-outcome { border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:8px; padding:10px 12px; margin:8px 0 12px; overflow-wrap:anywhere; }
+.native-task-outcome.status-bad { border-left-color:currentColor; }
+.native-task-disclosure { margin:10px 0; }
+.native-task-disclosure > summary { cursor:pointer; padding:4px 0; }

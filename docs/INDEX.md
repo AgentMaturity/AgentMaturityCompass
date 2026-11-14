@@ -16,7 +16,9 @@ Use this page to reach the shortest evidence-backed path for your task. AMC's pu
 
 ## Start Here
 
+- **New to AMC? Type `amc` and follow along** → [Your First Five Minutes](FIRST_FIVE_MINUTES.md)
 - **Install AMC and get the first full score** → [Start Here](START_HERE.md)
+- **Watch Claude Code or Codex with their own sign-in** → [Sign in with Claude or ChatGPT](SIGN_IN_WITH_CLAUDE_OR_CHATGPT.md)
 - **Choose a verified installation path** → [Install](INSTALL.md)
 - **Understand what to do after the first score** → [After First Score](AFTER_FIRST_SCORE.md)
 - **Interpret `VALID`, readiness, and claim eligibility** → [Evidence Trust](EVIDENCE_TRUST.md)

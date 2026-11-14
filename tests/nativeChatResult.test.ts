@@ -48,6 +48,14 @@ describe("native chat closed-child result contract", () => {
       expect(parse(summary({ endings: [{ reason }] }))).toMatchObject({ ok: true, summary: { endings: [{ reason }] } });
     }
   });
+  it("says the vault is locked, not that the result is malformed, when the child refused for that reason", () => {
+    const result = parseNativeChatResult({ stdout: "", truncated: false, requestedSessionId: null, forkFrom: null, childVaultLocked: true });
+    expect(result).toMatchObject({ ok: false, code: "VAULT_LOCKED" });
+    expect(result.ok ? "" : result.message).toMatch(/vault is locked/i);
+    // A valid summary still wins: the flag only explains a missing one.
+    expect(parseNativeChatResult({ stdout: JSON.stringify(summary()), truncated: false, requestedSessionId: null, forkFrom: null, childVaultLocked: true }))
+      .toMatchObject({ ok: true });
+  });
   it("leaves older missing usage/validation data unavailable instead of fabricating results", () => {
     const result = parse({ sessionId: "legacy-session", driverStatus: "idle", assistantText: [] });
     expect(result).toEqual({ ok: true, summary: { sessionId: "legacy-session", driverStatus: "idle", assistantText: [], endings: [] } });

@@ -193,13 +193,41 @@ describe("amc up in a terminal with a vault that already exists", () => {
     expect(seam.events).toContain("store");
   });
 
-  it("still sets up a new passphrase when there is no vault", async () => {
+  it("creates and remembers a new passphrase when there is no vault, without ever showing it", async () => {
     seam.vaultExists = false;
-    seam.answers = { choice: "auto", rememberChoice: false };
+    seam.answers = { choice: "auto" };
+    const lines = logged();
+    await ensureUpVaultPassphrase("/nonexistent/amc-up-ws", true);
+    expect(seam.asked.map((question) => question.name), "the choice already said remember").toEqual(["choice"]);
+    expect(process.env.AMC_VAULT_PASSPHRASE).toMatch(/^[A-Za-z0-9_-]{22}$/);
+    expect(seam.events).toContain("store");
+    const labels = JSON.stringify(seam.asked);
+    expect(labels).toContain("Let AMC create and remember one (recommended)");
+    expect(labels).toContain("Enter my own");
+    expect(`${labels}\n${lines.join("\n")}`).not.toContain(process.env.AMC_VAULT_PASSPHRASE!);
+    expect(lines.join("\n")).toContain("remembered in /home/x/.config/amc/vault-credentials.json");
+  });
+
+  it("with remembering off, shows a created passphrase once with a save-it-now line", async () => {
+    seam.vaultExists = false;
+    seam.answers = { choice: "auto" };
+    const lines = logged();
+    await ensureUpVaultPassphrase("/nonexistent/amc-up-ws", false);
+    expect(seam.asked.map((question) => question.name)).toEqual(["choice"]);
+    expect(JSON.stringify(seam.asked)).not.toContain(process.env.AMC_VAULT_PASSPHRASE!);
+    expect(seam.events).not.toContain("store");
+    const shown = lines.join("\n");
+    expect(shown).toContain("Save this vault passphrase now");
+    expect(shown.split(process.env.AMC_VAULT_PASSPHRASE!).length - 1, "printed exactly once").toBe(1);
+  });
+
+  it("asks whether to remember a passphrase the operator entered", async () => {
+    seam.vaultExists = false;
+    seam.answers = { choice: "custom", customPass: "my-own-passphrase", rememberChoice: false };
     logged();
     await ensureUpVaultPassphrase("/nonexistent/amc-up-ws", true);
-    expect(seam.asked.map((question) => question.name)).toEqual(["choice", "rememberChoice"]);
-    expect(process.env.AMC_VAULT_PASSPHRASE).toMatch(/^[A-Za-z0-9_-]{22}$/);
+    expect(seam.asked.map((question) => question.name)).toEqual(["choice", "customPass", "rememberChoice"]);
+    expect(seam.events).not.toContain("store");
   });
 });
 

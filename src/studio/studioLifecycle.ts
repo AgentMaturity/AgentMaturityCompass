@@ -8,7 +8,8 @@ import { createServer } from "node:net";
 const addressInUse = (error: unknown): boolean => String(error).includes("EADDRINUSE");
 
 function portInUseError(port: number, source: string): Error {
-  return new Error(`Port ${port} (from ${source}) is already in use. Stop the other process or change the port.`);
+  return new Error(`Port ${port} (from ${source}) is already in use. Stop the other process or change the port.${source.startsWith("the default")
+    ? " Another AMC folder may be running: stop it there with amc down, or give this folder its own ports." : ""}`);
 }
 
 /** Bind and close host:port, so a configured port that is busy is refused before anything starts (D-R7). */
@@ -21,6 +22,24 @@ export async function assertPortFree(host: string, port: number, source: string 
   });
 }
 
+/** `port` while it is free on `host`, else a free one picked by the OS. A probe: the caller still has to bind it. */
+export async function defaultPortOrFree(host: string, port: number): Promise<number> {
+  const probe = (candidate: number): Promise<number> => new Promise((resolvePromise, rejectPromise) => {
+    const server = createServer();
+    server.once("error", rejectPromise);
+    server.listen({ host, port: candidate }, () => {
+      const address = server.address();
+      server.close(() => resolvePromise(typeof address === "object" && address ? address.port : candidate));
+    });
+  });
+  try {
+    return await probe(port);
+  } catch (error) {
+    if (!addressInUse(error)) throw error;
+    return probe(0);
+  }
+}
+
 /**
  * Start on the policy's port. A busy configured port is a hard error naming the port and where it came from; a busy
  * default port falls back to a free one and says so, as before.
@@ -31,14 +50,26 @@ export async function listenOnPolicyPort<T extends { port: number }>(input: {
   source: string | null;
   start: (port: number) => Promise<T>;
   log?: (line: string) => void;
+  /** An unconfigured port prefers this one (the workspace's previous port, which installed hooks name) while it is free. */
+  preferredPort?: number | null;
 }): Promise<T> {
+  const log = input.log ?? console.log;
+  if (input.source === null && input.preferredPort && input.preferredPort !== input.port) {
+    try {
+      const kept = await input.start(input.preferredPort);
+      log(`${input.label} listening on ${kept.port}, the port this workspace used last time (the default is ${input.port})`);
+      return kept;
+    } catch (error) {
+      if (!addressInUse(error)) throw error;
+    }
+  }
   try {
     return await input.start(input.port);
   } catch (error) {
     if (!addressInUse(error)) throw error;
     if (input.source !== null) throw portInUseError(input.port, input.source);
     const started = await input.start(0);
-    (input.log ?? console.log)(`${input.label} port ${input.port} was busy; listening on ${started.port}`);
+    log(`${input.label} port ${input.port} was busy; listening on ${started.port}`);
     return started;
   }
 }

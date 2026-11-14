@@ -142,7 +142,13 @@ describe("studio connect wizard", () => {
       throw new Error("no agent config");
     });
 
-    const out = await buildConnectInstructions({ workspace: workspace(), agentId: "agent-2" });
+    // Without a terminal the prompt cannot be answered, so the wizard names the flag instead of aborting.
+    await expect(buildConnectInstructions({ workspace: workspace(), agentId: "agent-2" })).rejects.toThrow("Add --mode supervise or --mode sandbox.");
+    const tty = Object.getOwnPropertyDescriptor(process.stdin, "isTTY");
+    Object.defineProperty(process.stdin, "isTTY", { value: true, configurable: true });
+    const out = await buildConnectInstructions({ workspace: workspace(), agentId: "agent-2" }).finally(() => {
+      if (tty) Object.defineProperty(process.stdin, "isTTY", tty); else delete (process.stdin as { isTTY?: boolean }).isTTY;
+    });
     expect(mocks.inquirerPrompt).toHaveBeenCalled();
     expect(out.mode).toBe("sandbox");
     expect(out.routeUrl).toBe("http://127.0.0.1:3210/openai");

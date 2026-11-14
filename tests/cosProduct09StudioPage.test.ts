@@ -93,6 +93,22 @@ integration("P09 actual browser text attachments retain the original bytes acros
   });
 }, 180_000);
 
+integration("first run: ?sample=1 focuses a prefilled prompt above the fold, and a finished stub task shows one next step", async () => {
+  await withStudio(async ({ page, ui, check }) => {
+    await page.goto(`${ui.url()}&sample=1`);
+    await check(page.locator("#nativeTaskPrompt")).toBeFocused();
+    await check(page.locator("#nativeTaskPrompt")).not.toHaveValue("");
+    await check(page.locator("#nativeTaskProvider")).toHaveValue("stub");
+    const submit = await page.locator("#nativeTaskSubmit").boundingBox();
+    expect(submit && submit.y + submit.height).toBeLessThanOrEqual(900);
+    await check(page.locator("#nativeTaskAttachmentsDisclosure")).not.toHaveAttribute("open", "");
+    await page.locator("#nativeTaskSubmit").click();
+    await ui.ready();
+    await check(page.locator("#nativeTaskOutcome")).toContainText("Task finished");
+    await check(page.getByRole("link", { name: "See what AMC recorded" })).toHaveAttribute("href", "#nativeTaskRecord");
+  });
+}, 120_000);
+
 integration("P09 an old real poll cannot restore controls after offline, and failed setup still exposes reconnect", async () => {
   await withStudio(async ({ page, context, f, ui, check, writes }) => {
     const accepted = await ui.create("Original history for delayed-read recovery.");

@@ -101,8 +101,16 @@ amc agent-loop verify <session-id> --expect-monitor <monitor sha256>   # 3. veri
 
 Since P0-09, verification fails when the ledger is unanchored: the monitor key lives inside the workspace, so a verdict anchored only to it proves internal consistency, not authorship. Pin the fingerprint you recorded with `--expect-monitor` (or `AMC_EXPECTED_MONITOR_FINGERPRINT`); `--allow-unanchored` gives an integrity-only result with exit code 2.
 
-If `AMC_VAULT_PASSPHRASE` is not set, `amc init --minimal` generates one and prints
-the `export` line once; without it every signing command refuses with `Vault locked`.
+The `export` line is optional in your own terminal. If `AMC_VAULT_PASSPHRASE` is not set
+there, `amc init --minimal` generates a passphrase and remembers it on this computer
+(the macOS Keychain, service `amc-vault`, or `~/.config/amc/vault-credentials.json`)
+without printing it; it says where it is kept. `amc vault passphrase` sets one you know,
+and `amc vault forget` removes the remembered copy. Signing commands such as
+`amc firewall enable` then ask `Use the vault passphrase saved in <location> to sign
+amc firewall enable?` (the default is No; answer `y`). Where nothing can keep it
+(`AMC_VAULT_REMEMBER=0`, no terminal, CI, or an agent's shell), `amc init --minimal`
+prints the `export` line once instead; save it, because without it every signing
+command refuses with `Vault locked`.
 `amc firewall enable` run twice writes nothing the second time and says so; changing
 `--mode` writes a new signed revision.
 
@@ -179,7 +187,7 @@ mkdir my-agent && cd my-agent
 amc
 ```
 
-`amc` is the default path. It creates the `.amc/` workspace if needed, detects what it can score, runs the full maturity score, and prints the next action.
+`amc` is the default path. It creates the `.amc/` workspace if needed. In a terminal it then shows the start menu: choose "Just show my score" for the full maturity score, or "Watch Claude Code as it works" (or Codex) to start recording evidence first ([Your first five minutes](FIRST_FIVE_MINUTES.md)). In a pipe or CI, and with `amc --no-menu`, it runs the full maturity score directly, detects what it can score, and prints the next action.
 
 On a clean project, the report can be signed and `VALID` while evidence readiness is `INSUFFICIENT_EVIDENCE`. This is the honest first baseline: the artifact is intact, but AMC has not yet observed enough execution evidence to support external claims.
 
@@ -224,7 +232,7 @@ amc demo share --public-base-url https://reports.example.com/amc-demo
 ## 3. Read your result
 
 ```bash
-amc
+amc --no-menu       # or amc, then "Just show my score"
 ```
 
 AMC returns a maturity level from **L0** (no governance) to **L5** (self-governing), plus a gap analysis showing what to fix first.
@@ -473,7 +481,7 @@ amc adapters run --agent my-agent --adapter generic-cli -- your-agent-command
 
 **`better-sqlite3` build errors** — Install build tools: `sudo apt install build-essential python3` (Linux) or `xcode-select --install` (macOS).
 
-**Forgot passphrase** — The vault is encrypted. If lost, re-initialize with `amc init` (previous evidence chain is unrecoverable).
+**Forgot passphrase** — The vault is encrypted and cannot be opened without it. If `amc` set up the folder on this computer, the passphrase is in `.amc/local-vault-passphrase`, and `amc up` in a terminal offers it. If it is lost, start in a new folder: this computer refuses a new vault in a folder that already had one (the previous evidence chain is unrecoverable). More first-run fixes: [Troubleshooting](TROUBLESHOOTING.md#first-run-problems).
 
 ---
 

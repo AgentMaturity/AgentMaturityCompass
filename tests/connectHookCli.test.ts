@@ -4,6 +4,9 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { afterEach, describe, expect, test } from "vitest";
+
+/** No Studio runs in these fixtures, so install names the Bridge itself (without one it refuses: studioBridge.ts). */
+const BRIDGE = ["--bridge-url", "http://127.0.0.1:3212"];
 import { initWorkspace } from "../src/workspace.js";
 
 const roots: string[] = [];
@@ -69,7 +72,7 @@ describe("amc connect hooks CLI", () => {
   test("runs dry-run, install, status, and remove with machine-readable output", () => {
     const cwd = workspace();
     const dryRun = run(cwd, [
-      "connect", "hooks", "install",
+      "connect", "hooks", "install", ...BRIDGE,
       "--provider", "claude-code",
       "--agent", "cli-agent",
       "--dry-run",
@@ -79,7 +82,7 @@ describe("amc connect hooks CLI", () => {
     expect(JSON.parse(dryRun.stdout)).toEqual(expect.objectContaining({ dryRun: true, applied: false }));
 
     const installed = run(cwd, [
-      "connect", "hooks", "install",
+      "connect", "hooks", "install", ...BRIDGE,
       "--provider", "claude-code",
       "--agent", "cli-agent",
       "--json"
@@ -127,7 +130,7 @@ describe("amc connect hooks CLI", () => {
   test("returns a provider-native deny when an installed control hook cannot reach Bridge", () => {
     const cwd = workspace();
     const installed = run(cwd, [
-      "connect", "hooks", "install",
+      "connect", "hooks", "install", ...BRIDGE,
       "--provider", "claude-code",
       "--mode", "control",
       "--agent", "control-cli-agent",
@@ -176,9 +179,9 @@ describe("amc connect hooks CLI", () => {
     mkdirSync(configDir, { recursive: true });
     writeFileSync(join(configDir, "settings.json"), JSON.stringify({ enabledPlugins: { "some-plugin@market": true } }));
     const control = ["--provider", "claude-code", "--mode", "control", "--agent", "control-cli-agent"];
-    const clean = run(cwd, ["connect", "hooks", "install", ...control, "--json"]);
+    const clean = run(cwd, ["connect", "hooks", "install", ...BRIDGE, ...control, "--json"]);
     expect(JSON.parse(clean.stdout).warnings).toEqual([]);
-    const withPlugin = run(cwd, ["connect", "hooks", "install", ...control], undefined, claudePath(cwd), { CLAUDE_CONFIG_DIR: configDir });
+    const withPlugin = run(cwd, ["connect", "hooks", "install", ...BRIDGE, ...control], undefined, claudePath(cwd), { CLAUDE_CONFIG_DIR: configDir });
     expect(withPlugin.stdout).toMatch(/Warning: Claude Code's settings keep AMC from registering sessions \(an enabled plugin in .*settings\.json can run hooks AMC did not install\), so control denies every tool call here/);
     expect(withPlugin.stdout).toContain("amc connect hooks install --provider claude-code --mode observe --agent control-cli-agent");
   });
@@ -187,10 +190,10 @@ describe("amc connect hooks CLI", () => {
     const cwd = workspace();
     const noClaude = claudePath(join(cwd, "no-claude"), null);
     const control = ["--provider", "claude-code", "--mode", "control", "--agent", "control-cli-agent"];
-    const installed = run(cwd, ["connect", "hooks", "install", ...control, "--json"], undefined, noClaude);
+    const installed = run(cwd, ["connect", "hooks", "install", ...BRIDGE, ...control, "--json"], undefined, noClaude);
     expect(installed.status).toBe(0);
     expect(JSON.parse(installed.stdout).warnings).toEqual([expect.stringContaining("no Claude Code was on PATH, so the installation binds no qualified release and the hook denies every action")]);
-    const again = run(cwd, ["connect", "hooks", "install", ...control], undefined, noClaude);
+    const again = run(cwd, ["connect", "hooks", "install", ...BRIDGE, ...control], undefined, noClaude);
     expect(again.stdout).toContain("Warning: no Claude Code was on PATH");
     const forwarded = run(cwd, ["connect", "hooks", "forward", ...control, "--token-file", ".amc/hooks/claude-code.lease", "--event", "PreToolUse"],
       JSON.stringify({ session_id: "cli-unbound-session", transcript_path: "/private/transcript.jsonl", cwd, permission_mode: "default",

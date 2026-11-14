@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AMC Terminal Demo — Agent Maturity Compass</title>
-<meta name="description" content="Watch the Agent Maturity Compass CLI in action — score, govern, and harden your AI agents from the terminal.">
+<meta name="description" content="A recorded first run of Agent Maturity Compass: type amc, try the demo chat, check sign-in, and see a first score that stays empty until AMC has seen your agent work.">
 <link rel="stylesheet" href="brand.css">
 <style>
   :root {
@@ -133,19 +133,28 @@
 <div id="main-content" tabindex="-1"></div>
   <a href="index.html" class="back-link">← Back to AMC</a>
 
-  <div class="terminal" role="img" aria-label="Animated terminal demo showing AMC CLI usage">
+  <div class="terminal" role="img" aria-label="Animated terminal replay of a recorded AMC first run: the amc menu, the demo chat, amc login status, and an empty first score">
     <div class="terminal-bar">
       <div class="dot dot-r"></div>
       <div class="dot dot-y"></div>
       <div class="dot dot-g"></div>
       <div class="terminal-title">~/my-agent — zsh</div>
     </div>
-    <div class="terminal-body" id="term"></div>
+    <div class="terminal-body" id="term"><noscript><pre style="white-space:pre-wrap;margin:0">$ amc
+? What do you want to do?
+&gt; Try a demo chat (no account or key needed)
+you&gt; hello
+Recorded reply: stub provider: 3 message(s) in view; you last said "hello".
+$ amc login status
+Codex        signed-out     next: amc login codex
+$ amc        # choose: Just show my score
+Overall: L0.00 (0/100) UNRELIABLE — DO NOT USE FOR CLAIMS
+AMC has not seen your agent do anything yet, so this score is empty.</pre></noscript></div>
   </div>
 
   <div class="cta">
     <a href="index.html#install">Try it yourself →</a>
-    <p>Verified GitHub releases for macOS, Linux, and Windows</p>
+    <p>Recorded from the current source build on 2026-11-14 in a new folder. The one-line installers give the older 1.1.1 release, which has no menu.</p>
   </div>
 
 <script>
@@ -155,53 +164,43 @@
   const TYPE_SPEED = 35;
   const OUTPUT_SPEED = 12;
 
+  // Recorded from the current source build on 2026-11-14 in a new, empty folder (lines shortened, not invented).
   const scenes = [
     {
-      cmd: 'curl -fsSL https://agentmaturity.co/install.sh | sh',
+      cmd: 'amc',
       output: [
-        { text: 'release archive SHA-256 verified', cls: 'dim' },
+        { text: 'AMC set up this folder (.amc/).', cls: 'dim' },
+        { text: '? What do you want to do?', cls: 'highlight' },
+        { text: '  Sign in to Codex first', cls: 'output' },
+        { text: '> Try a demo chat (no account or key needed)', cls: 'highlight' },
+        { text: '  Open the console in my browser', cls: 'output' },
+        { text: '  Just show my score (empty for now)', cls: 'output' },
         { text: '', cls: '' },
-        { text: '  🧭 Agent Maturity Compass v1.1.1', cls: 'highlight' },
-        { text: '  Installed: amc', cls: 'output' },
+        { text: 'Native chat · agent default · provider stub · model amc-stub-1', cls: 'output' },
+        { text: 'Local demonstration: canned replies, no real model answer.', cls: 'dim' },
+        { text: 'Every turn writes AMC session evidence.', cls: 'dim' },
+        { text: 'you> hello', cls: 'output' },
+        { text: 'Recorded reply:', cls: 'output' },
+        { text: 'stub provider: 3 message(s) in view; you last said "hello".', cls: 'highlight' },
       ]
     },
     {
-      cmd: 'mkdir my-agent && cd my-agent',
-      output: []
-    },
-    {
-      cmd: 'amc init',
+      cmd: 'amc login status',
       output: [
-        { text: '🔧 Initializing AMC workspace...', cls: 'output' },
-        { text: '  ✓ Created .amc/ directory', cls: 'output' },
-        { text: '  ✓ Generated Ed25519 keypair', cls: 'output' },
-        { text: '  ✓ Wrote signed config.yaml', cls: 'output' },
-        { text: '  ✓ Created evidence/ directory', cls: 'output' },
-        { text: '', cls: '' },
-        { text: '  Workspace ready. Run `amc` to begin.', cls: 'highlight' },
+        { text: 'Sign-in for the agents AMC can watch', cls: 'output' },
+        { text: '  Claude Code  not-installed  next: install Claude Code, then: amc login claude', cls: 'output' },
+        { text: '  Codex        signed-out     next: amc login codex', cls: 'output' },
+        { text: 'AMC starts the vendor\'s own sign-in and reads its status answer. It never sees or stores a password, token or plan.', cls: 'dim' },
       ]
     },
     {
-      cmd: 'amc badge',
+      cmd: 'amc        # choose: Just show my score',
       output: [
-        { text: '', cls: '' },
-        { text: '  AMC INFO • maturity=UNKNOWN/5 • assurance=UNKNOWN • risks=UNKNOWN • value=UNKNOWN • ts=2026-10-11T04:00:32.868Z', cls: 'output' },
-        { text: '  Claim: Self-reported · Result: not evaluated · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: applicable', cls: 'dim' },
-      ]
-    },
-    {
-      cmd: 'amc guide --go',
-      output: [
-        { text: '', cls: '' },
-        { text: '  ⚡ Applying recommended guardrails...', cls: 'output' },
-        { text: '', cls: '' },
-        { text: '  [1/4] ✓ human-in-the-loop enabled for high-risk actions', cls: 'output' },
-        { text: '  [2/4] ✓ output-guard policy applied', cls: 'output' },
-        { text: '  [3/4] ✓ drift-detection cron scheduled (24h)', cls: 'output' },
-        { text: '  [4/4] ✓ evidence auto-collection enabled', cls: 'output' },
-        { text: '', cls: '' },
-        { text: '  Security score improved: L2 → L3 ↑', cls: 'highlight' },
-        { text: '  All guardrails signed and committed to ledger.', cls: 'output' },
+        { text: 'AMC Full Score · Questions: 244', cls: 'output' },
+        { text: 'Artifact seal: VALID | Evidence: INSUFFICIENT_EVIDENCE | Claims: BLOCKED', cls: 'output' },
+        { text: 'Overall: L0.00 (0/100) UNRELIABLE — DO NOT USE FOR CLAIMS', cls: 'highlight' },
+        { text: 'AMC has not seen your agent do anything yet, so this score is empty.', cls: 'output' },
+        { text: 'Signing proves integrity, not evidence sufficiency.', cls: 'dim' },
       ]
     }
   ];

@@ -46,6 +46,7 @@ import { PI_HOOK_SOURCE } from "../src/adapters/hookProviders/pi.js";
 import { getPurposeKeyHistory } from "../src/keys/signingKeys.js";
 import { createAmcPiExtension } from "../src/adapters/pi/amcPiExtension.js";
 import { inspectHookHealth } from "../src/watch/hookHealthDiagnostics.js";
+import { stableNodePath } from "../src/adapters/hookProviders/nodePath.js";
 import { fakePiPackage, removeFixtureWorkspaces } from "./helpers/piHookFixtures.js";
 
 const roots: string[] = [];
@@ -185,7 +186,8 @@ describe("AMC provider hook integration", () => {
     expect(config.hooks.PostToolUseFailure).toHaveLength(1);
     expect(config.hooks.PreToolUse).toHaveLength(1);
     const handler = config.hooks.PreToolUse[0]!.hooks[0]!;
-    expect(handler.command).toBe(process.execPath);
+    // Observe names a Node that survives `brew upgrade` (nodePath.ts); control keeps process.execPath.
+    expect(handler.command).toBe(stableNodePath());
     expect(isAbsolute(handler.command as string)).toBe(true);
     const handlerArgs = handler.args as string[];
     expect(isAbsolute(handlerArgs[0]!)).toBe(true);
@@ -267,7 +269,7 @@ describe("AMC provider hook integration", () => {
       hooks: { PreToolUse: Array<{ hooks: Array<Record<string, unknown>> }> };
     };
     const owned = config.hooks.PreToolUse.flatMap((group) => group.hooks)
-      .filter((handler) => handler.command === process.execPath);
+      .filter((handler) => handler.command === stableNodePath());
     expect(owned).toHaveLength(1);
   });
 

@@ -1,39 +1,58 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Maturity Score - AMC Studio</title>
-<style>body{font-family:system-ui;max-width:800px;margin:40px auto;padding:20px;background:#0a0a0a;color:#e0e0e0}
-h1{color:#4AEF79}a{color:#4AEF79}.card{background:#1a1a1a;border-radius:8px;padding:24px;margin:16px 0}
-</style></head>
-<body>
-<main>
-<a href="./home">← Compass Console home</a>
-<p>Scores run in the terminal; this page lists the commands. Results appear on the <a href="./dashboard">Dashboard</a> after a run.</p>
-<h1>📊 Maturity Score</h1>
-<div class="card"><p>Score your agent's maturity across 5 layers with the default diagnostic question bank.</p>
-<p><strong>CLI equivalent:</strong> <code>amc score --tier quick</code> or <code>amc score formal-spec &lt;agentId&gt;</code></p>
-<p>See also: <a href="compass.html">Compass View</a> | <a href="diagnosticView.html">Diagnostic Detail</a></p></div>
-
-<h2>🛡️ Evaluation Lanes</h2>
-
-<div class="card">
-<h3>AI Safety Research Lane</h3>
-<p>4-dimension safety evaluation based on frontier research from Anthropic, OpenAI, Google DeepMind, MIRI, and 50+ academic sources.</p>
-<table style="width:100%;border-collapse:collapse;margin:12px 0">
-<tr style="border-bottom:1px solid #333"><th style="text-align:left;padding:6px">Dimension</th><th style="text-align:left;padding:6px">Weight</th><th style="text-align:left;padding:6px">Questions</th></tr>
-<tr><td style="padding:6px">Process Deception Detection</td><td style="padding:6px">30%</td><td style="padding:6px">AMC-7.1 → 7.12</td></tr>
-<tr><td style="padding:6px">Oversight Integrity</td><td style="padding:6px">25%</td><td style="padding:6px">AMC-7.13 → 7.18</td></tr>
-<tr><td style="padding:6px">Capability Governance</td><td style="padding:6px">25%</td><td style="padding:6px">AMC-7.19 → 7.30</td></tr>
-<tr><td style="padding:6px">Organizational Safety Posture</td><td style="padding:6px">20%</td><td style="padding:6px">AMC-7.31 → 7.40</td></tr>
-</table>
-<p>20 assurance packs · 1,315 red-team scenarios · 40 diagnostic questions</p>
-<p><strong>CLI:</strong> <code>amc score safety-research</code> | <code>amc score safety-research --json</code></p>
-</div>
-
-<div class="card">
-<h3>Simulation &amp; Forecast Lane</h3>
-<p>5-dimension evaluation for simulation engines, forecast systems, and synthetic environments.</p>
-<p><strong>CLI:</strong> <code>amc score simulation-lane --system-type &lt;type&gt;</code></p>
-</div>
-
-</main>
-</body></html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Maturity Score - AMC Studio</title>
+    <link rel="manifest" href="./assets/manifest.json" />
+    <link rel="stylesheet" href="./assets/styles.css?v=20261113a" />
+  </head>
+  <body data-page="score">
+    <div class="shell">
+      <nav>
+        <h1>amc</h1>
+        <a href="./home">Home</a>
+        <a href="./compass">Compass</a>
+        <a href="./diagnosticView">Diagnostic View</a>
+      </nav>
+      <main>
+        <div id="ucBanner" class="card banner muted">Starting AMC…</div>
+        <p id="status" class="muted"></p>
+        <div id="app">
+          <p><a href="./home">Back to Home</a></p>
+          <section class="card">
+            <h2>Maturity Score</h2>
+            <p>Scores run in the terminal; this page lists the commands. <code>amc score --tier quick</code> prints its result in the terminal only. A full assessment (<code>amc run</code>) is saved, and its result appears on the <a href="./agent">Agent</a> page.</p>
+            <p>A score rates your agent's maturity across 5 layers with the default diagnostic question bank.</p>
+            <p><strong>Commands:</strong> <code>amc score --tier quick</code> or <code>amc score formal-spec &lt;agentId&gt;</code></p>
+            <p>See also: <a href="./compass">Compass View</a> | <a href="./diagnosticView">Diagnostic Detail</a></p>
+          </section>
+          <h3>Evaluation lanes</h3>
+          <section class="card">
+            <h3>AI Safety Research Lane</h3>
+            <p>4-dimension safety evaluation based on frontier research from Anthropic, OpenAI, Google DeepMind, MIRI, and 50+ academic sources.</p>
+            <div class="scroll">
+              <table>
+                <thead><tr><th>Dimension</th><th>Weight</th><th>Questions</th></tr></thead>
+                <tbody>
+                  <tr><td>Process Deception Detection</td><td>30%</td><td>AMC-7.1 to 7.12</td></tr>
+                  <tr><td>Oversight Integrity</td><td>25%</td><td>AMC-7.13 to 7.18</td></tr>
+                  <tr><td>Capability Governance</td><td>25%</td><td>AMC-7.19 to 7.30</td></tr>
+                  <tr><td>Organizational Safety Posture</td><td>20%</td><td>AMC-7.31 to 7.40</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>20 assurance packs · 1,315 red-team scenarios · 40 diagnostic questions</p>
+            <p><strong>Commands:</strong> <code>amc score safety-research</code> | <code>amc score safety-research --json</code></p>
+          </section>
+          <section class="card">
+            <h3>Simulation &amp; Forecast Lane</h3>
+            <p>5-dimension evaluation for simulation engines, forecast systems, and synthetic environments.</p>
+            <p><strong>Command:</strong> <code>amc score simulation-lane --system-type &lt;type&gt;</code></p>
+          </section>
+        </div>
+      </main>
+    </div>
+    <script type="module" src="./assets/app.js?v=20261114u"></script>
+  </body>
+</html>

@@ -17,6 +17,122 @@ human-authored content labelled as such, serves no stage now: text a member send
 outputs as their own statement. The decisions behind the design are in `docs/adr/013-a4-forge-spine.md`; the verifier
 rules are in `spec/ACCEPTANCE_RULES.md` ("A4 project record").
 
+## Try it in ten minutes
+
+This walk was run against the current source build on 2026-11-14 in an empty workspace with three local users. The
+published 1.1.1 release does not contain A4: install [from source](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/README.md#from-source) first. On a laptop the walk
+completes Aspire, Assemble and Adapt and stops at Activate's release approval (see step 6).
+
+1. **Start Studio with the flag.** A Studio that is already running keeps the environment it started with, so stop it
+   first. Without the flag the A4 API answers `404 A4_PREVIEW_DISABLED` and every `amc a4` command exits 1.
+
+   ```bash
+   amc down
+   AMC_A4_PREVIEW=1 amc up
+   ```
+
+2. **Create the people who will decide.** The author of a revision, the requester of a gate and its builders cannot
+   approve it, and from Assemble's completion on most gates need two distinct approvers, one of them an AUDITOR at
+   Adapt's completion ([who approves which gate](#approvals-and-separation-of-duties)). Three users cover the default
+   policy: you author and request, the other two decide.
+
+   ```bash
+   amc user init --username <you>
+   amc user add --username <second> --role OWNER,APPROVER
+   amc user add --username <third> --role APPROVER,AUDITOR
+   export AMC_A4_PREVIEW=1
+   amc approvals login --username <you> --token-file <new file>    # each person writes their own token file
+   ```
+
+3. **Start a project and run Aspire.** Sign in to the Compass Console at the address `amc up` prints. With the flag
+   set and no project yet, Home shows a card "Build an agent for your industry"; its button opens the A4 page with the start form (a signed-in OWNER or
+   OPERATOR; the API equivalent is `POST /api/v1/a4/projects` with `name` and `expertise`, see
+   [Using the API directly](#using-the-api-directly)). Give the project a name and choose how much detail you want in
+   explanations, or press **Use an example**, which fills a sample project marked `(sample)` in its name so the records
+   show it is sample data. Then press **Start an agent project**.
+
+   **Starting from an Industry Pack.** The start form has an optional **Your industry** list with every Industry Pack,
+   grouped by station. Pick the pack closest to what the agent will do (or press **Build an agent with this pack** on a
+   pack in the Industry Packs page). When the project opens, AMC fills four empty Aspire answers from the pack: the
+   station, a risk appetite taken from the pack's risk tier (critical stays critical, very-high and high become high,
+   elevated becomes med), the governance that tier takes (regulated for high or critical), and one constraint per
+   instrument in the pack's regulatory basis, worded "Check whether it applies, and meet it where it does". A panel lists
+   the risks the pack names, so you can write what the agent must never do, and links to the pack's questionnaire.
+   Nothing is saved until you press **Save answers**, and every suggestion can be changed. Pack content is experimental
+   and AI-drafted until a named expert signs it, and starting from a pack does not show the agent meets any rule. The
+   `amc` menu's "Build an agent for my industry (A4 Forge preview)" line starts AMC with the flag set and opens this form.
+
+   **One section at a time.** The project page keeps open only the section the next step needs, plus the Approvals card.
+   Every other section of the stage is under "Everything else in this stage", unchanged.
+
+   Each project page opens with a **What to do now** panel: what a project is, the four stages as a stepper (done,
+   current, later), the current step ("step 1 of 8"), one sentence that says what is needed now, and one primary button.
+   The button only moves to, or presses, the page's own control for that step; Studio checks every action again. When a
+   step is not yours to take (an approver at Build, say), the panel says so instead. Errors are shown as sentences with
+   the next step, and the code in small print.
+
+   Under Ask, Aspire lists its questions: the problem, audience, goals, success metrics, constraints, forbidden actions,
+   risk tier and markets. Each empty field shows an example. On Aspire, Assemble and Adapt, **Use an example** fills the
+   empty fields with sample answers marked `(sample)`, which you can change before you press Save answers. Each stage's
+   steps (answers, understand, confirm understanding, explain, propose, build, review) run on that page or as
+   `POST …/stages/<stage>/<step>`.
+
+   A workspace APPROVER or AUDITOR decides only as a project member, so add the other two users on the Members card
+   before requesting any gate (a membership change supersedes open gates). While an approval is open, the panel's
+   **Who must approve** block names how many different people must approve, the workspace role they need (and whether
+   one must hold AUDITOR), who cannot approve this one under separation of duties, who has approved so far, and the
+   `amc user add` command for adding a person. A second approver in the same workspace meets separation of duties; it
+   is not an independent review. The command line shows the same state:
+
+   ```bash
+   amc a4 list
+   amc a4 guide <projectId>     # stage, step, head seq, next action, and the exact approve command per open gate
+   amc a4 members <projectId> --member LOCAL_USER:<userId> --project-role approver --session-token-file <file> --expect-head-seq <n>
+   ```
+
+4. **Decide and complete each gate.** After the requester opens a gate, `amc a4 guide` prints the approve command
+   with the gate's pins; each approver adds `--reason` and their own token file. The requester then completes it:
+
+   ```bash
+   amc a4 approve --gate <gateId> --expect-gate-seq <n> --expect-binding-digest <sha256> --expect-readiness-digest <sha256> --reason "<why>" --session-token-file <file>
+   amc a4 complete <projectId> --stage <stage> --gate <gateId> --expect-head-seq <n> --session-token-file <file>
+   ```
+
+   Aspire's two gates take one approval each. Its Build writes the brief (the agent's context graph, typed graph sketch,
+   quality specification and value contract draft) through the fleet's own writers; it runs offline with no provider key.
+
+5. **Assemble and Adapt.** Assemble asks for capabilities, autonomy, the build provider (`stub` runs offline) and the
+   path (`native`). Its Build starts one native build session; Review is refused (`409 A4_NOT_READY`,
+   `BUILD_SESSION_OPEN`) until the session's owner presses Close and verify on Studio's Native Tasks page. Its
+   completion needs two approvals and then an effect gate, `a4.assemble.apply`: the owner opens it on the stage's
+   effect card (`POST …/stages/assemble/effects/a4.assemble.apply/open` with the completion `gateId`), two project
+   approvers approve its request on that card (`POST …/approvals/<approvalRequestId>/approve`), and `amc a4 complete`
+   then applies the reviewed resources. The command line has no command to open an effect gate or decide its request.
+   Adapt asks for audiences and languages (the rest may stay unknown) and compiles the control plan. Requirements left
+   unresolved keep `plan_unresolved` WAITING, and `complete` refuses with `A4_NOT_READY: not ready: plan_unresolved`
+   even after two approvals; an owner acknowledges it out of scope with a reason (`POST …/acknowledge`, `itemId`
+   `plan_unresolved`) before requesting the gate, since an acknowledgement supersedes an open gate. Run the context
+   probe after Review (`POST …/stages/adapt/probe`). Adapt's completion needs two approvals, one from an AUDITOR; a
+   non-regulated project completes with its plan signed, not activated.
+
+6. **Where it stops.** Activate asks for the target (`compose` or `helm`), the destination host, lease scopes, routes,
+   models and caps, and Propose records the release draft. Activate has no example to fill (its required answers are
+   all checked values), so its fields show examples only. Unless this Studio itself runs under Compose or Helm, the
+   What to do now panel then stops with no button and says, in plain words, that this is where the A4 preview stops
+   today on this Studio: v1 deploys only by restarting the Compose or Helm-hosted Studio that built the agent, so no
+   release can be requested here. What you have are the signed records of Aspire, Assemble and Adapt, and your Activate
+   answers. Through the API or the command line, requesting the release approval is refused with
+   `409 A4_NOT_READY: not ready: deployment.same_host`. Installing a package into another workspace is P2-40.
+
+7. **Check the record, then stop.** Without your own trust list the result is integrity only (exit 2), never trusted:
+
+   ```bash
+   amc a4 verify <projectId> --allow-unpinned --allow-unanchored
+   amc down
+   ```
+
+   With `--allow-unpinned` alone a fresh workspace still exits 1: its ledger is not anchored (`ledger UNANCHORED`).
+
 ## The journey
 
 Each stage runs the same eight steps: **asked** (answers to the stage's questions), **understood** (AMC's reading of
@@ -971,7 +1087,9 @@ residency or retention.
   trust list admits them. An export carries the rows as stored, so an Adapt row's derived parts are there as their sha256
   ref; the report warns `DERIVED_BOUND_BY_DIGEST` with the count (the files stay under the workspace's
   `a4-projects/<projectId>/derived/`, which `verifyA4Chain` checks in place). Run it with `amc a4 verify <file> --trust-list <file>` (exit 0 trusted, 1 failed, 2
-  integrity-only under `--allow-unpinned` or `--allow-unanchored`). With no trust list the report states integrity only. A bundle exported while Studio ran carries the gateway's open session: export prints `open sessions: <n>`, and when the manifest verifies under an admitted signer the bundle's ledger is verified as of its signed export time, so the report lists the session as open under `warnings`, never as a missing seal (otherwise the real time applies). In a bundle, a record whose `CREATED` body or signed
+  integrity-only once every allow flag that applies is given: `--allow-unpinned` when a signing key is on no trust list you
+  named, and `--allow-unanchored` when the ledger is unanchored. A fresh workspace needs both; with one missing the exit is 1,
+  and the command names the missing flag). With no trust list the report states integrity only. A bundle exported while Studio ran carries the gateway's open session: export prints `open sessions: <n>`, and when the manifest verifies under an admitted signer the bundle's ledger is verified as of its signed export time, so the report lists the session as open under `warnings`, never as a missing seal (otherwise the real time applies). In a bundle, a record whose `CREATED` body or signed
   seq-0 receipt names another agent than the manifest's fails scope (`A4_SCOPE_AGENT`). Seven normative fixtures,
   with their expected verdicts, are in `tests/fixtures/contracts/a4-record/`.
 - **Binder slice.** `buildA4BinderSlice` (`src/a4/a4Binder.ts`) writes a project's revisions, gates, transitions,

@@ -1,6 +1,6 @@
 # AFTER_FIRST_SCORE.md — What to do after your first AMC score
 
-You ran `amc` and got a full score. This page explains the next moves without drowning you in every command AMC has.
+You ran `amc` and got a full score: in a terminal, by choosing "Just show my score" in the start menu (or with `amc --no-menu`); in a script or CI, `amc` prints it directly. This page explains the next moves without drowning you in every command AMC has.
 
 ---
 
@@ -93,13 +93,16 @@ Start with:
 
 ## Step 6 — Wrap your real agent if you have one
 
-If you tested AMC on a toy path first, wrap the real agent runtime next.
+If you tested AMC on a toy path first, connect the real agent next.
+
+- **Claude Code or Codex:** run `amc` and choose "Watch Claude Code as it works" or "Watch Codex as it works". AMC adds an observe-mode hook to the project and records each tool call the agent reports ([Sign in with Claude or ChatGPT](SIGN_IN_WITH_CLAUDE_OR_CHATGPT.md)).
+- **Another runtime:** run it through an adapter.
 
 ```bash
-amc wrap <adapter> -- <your command>
+amc adapters run --agent default --adapter <adapter> -- <your command>
 ```
 
-That is how you move from exploratory scoring into execution evidence.
+That is how you move from exploratory scoring into execution evidence. Then score again: the score reflects only what AMC has recorded.
 
 ---
 

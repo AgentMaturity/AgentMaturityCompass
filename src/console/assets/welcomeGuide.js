@@ -1,26 +1,13 @@
-// The first-run "Welcome to AMC" guide on Home, and the plain-language help Home shows beside its status words. The
-// HTML builders are pure (tests/console/welcomeGuide.test.ts); installWelcomeGuide wires a native <dialog>. The guide
-// opens by itself until it is closed once (remembered in localStorage when the browser allows it) and reopens from the
-// top bar's "How AMC works" link (./home?guide=1). No counts here: scripts/gen-counts.mjs owns every published number.
+// The "How AMC works" guide on Home, and the plain-language help Home shows beside its status words. The HTML builders
+// are pure (tests/console/welcomeGuide.test.ts); installWelcomeGuide wires a native <dialog>. The guide never opens by
+// itself: the top bar's "How AMC works" link (./home?guide=1) opens it. A close is still remembered in localStorage when
+// the browser allows it, which changes nothing now that it never opens on its own. No counts here: scripts/gen-counts.mjs
+// owns every published number.
 
 export const GUIDE_STORAGE_KEY = "amc.welcomeGuide.dismissed.v1";
 
 const esc = (value) => String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
   .replaceAll('"', "&quot;").replaceAll("'", "&#39;");
-
-/** One line per feature, each a page in src/console/pages. */
-export const FEATURE_TOUR = [
-  ["./score", "Score", "How to get your agent's maturity score: the commands to run, and where results appear."],
-  ["./evidence", "Evidence", "The tamper-evident log of what your agent actually did."],
-  ["./firewall", "Guardrails: Firewall", "Checks risky actions and can stop them before they run."],
-  ["./approvals", "Guardrails: Approvals", "A person must say yes before a sensitive action runs."],
-  ["./budgets", "Guardrails: Budgets", "Limits on how much an agent may spend or do."],
-  ["./industrypacks", "Industry Packs", "Extra question sets for your sector. Free and all included in the current source build."],
-  ["./assurance", "Assurance tests", "Red-team tests: AMC attacks your own agent to find weak spots."],
-  ["./compliance", "Reports and compliance", "Lines your evidence up against frameworks. It is a self-assessed report, not a certificate."],
-  ["./fleet", "Fleet", "Watch many agents and how they work together."],
-  ["./org", "Org", "Scores rolled up across teams."]
-];
 
 /** The words Home and the score pages use, one plain sentence each. */
 export const GLOSSARY = [
@@ -32,14 +19,6 @@ export const GLOSSARY = [
   ["Freeze", "A pause that stops an agent from taking certain actions until a person lifts it."],
   ["Trust label", "A one-word summary of how much the score can be relied on, based on how strong the evidence is."]
 ];
-
-const START_CHOICES = [
-  ["firstUseNativeButton", "Run a task with AMC", "Try a task and watch AMC record it."],
-  ["firstUseBaselineButton", "Assess existing evidence", "See what AMC already knows and what is missing."],
-  ["firstUseConnectButton", "Connect an existing agent", "Send your own agent's actions through AMC."]
-];
-
-const list = (items) => `<ul class="welcome-guide-list">${items.join("")}</ul>`;
 
 /** The guide's steps: a title and a body of static, trusted markup. */
 export const GUIDE_STEPS = [
@@ -55,19 +34,9 @@ export const GUIDE_STEPS = [
         <li><strong>Connect or run.</strong> Connect your agent, or run a task right here.</li>
         <li><strong>AMC records it.</strong> Every action goes into a tamper-evident log, so changes later would show.</li>
         <li><strong>You get results.</strong> A score, the gaps to work on, and evidence you can share.</li>
-      </ol>`
-  },
-  {
-    title: "What you can do here",
-    body: `<p>Each name opens its page. You can also find them all under "All features" in the menu.</p>
-      ${list(FEATURE_TOUR.map(([href, name, line]) => `<li><a href="${esc(href)}">${esc(name)}</a>: ${esc(line)}</li>`))}`
-  },
-  {
-    title: "Pick your first step",
-    body: `<p>Not sure? "Run a task with AMC" is the quickest way to see it work.</p>
-      <div class="welcome-guide-choices">${START_CHOICES.map(([target, name, line]) => `
-        <button type="button" class="secondary" data-guide-start="${esc(target)}"><strong>${esc(name)}</strong><span>${esc(line)}</span></button>`).join("")}
-      </div>`
+      </ol>
+      <p>Not sure where to start? "Try a demo task" on Home shows it working with no setup. Every other page is under
+      "All features" in the menu.</p>`
   },
   {
     title: "Words you will see",
@@ -99,19 +68,6 @@ export function guideStepHtml(index) {
   `;
 }
 
-/** Home's first card: one sentence on AMC and the button that opens the guide. */
-export function welcomeCardHtml() {
-  return `
-    <section class="card welcome-card" aria-labelledby="welcomeCardTitle">
-      <div class="studio-kicker">New here?</div>
-      <h2 id="welcomeCardTitle">Welcome to AMC</h2>
-      <p>AMC checks how far you can trust an AI agent, using recorded proof of what it did instead of promises.
-      The short guide shows how it works and where to start.</p>
-      <button type="button" id="welcomeGuideOpen">Show me how AMC works</button>
-    </section>
-  `;
-}
-
 /** Plain-language tooltips for the Unified Clarity banner's labels. */
 export const BANNER_TIPS = {
   agent: "The agent these numbers are about.",
@@ -136,11 +92,11 @@ export function bannerHelpHtml() {
 /** What each activation milestone means and, until it is complete, what to do next. */
 export const ACTIVATION_HELP = {
   connected_agent: ["AMC knows your agent and can see what it does.",
-    (agent) => `Open "Connect an existing agent" above, or run <code>amc connect --agent ${esc(agent)}</code> in your terminal.`],
+    (agent) => `Use "Connect my agent" above, or run <code>amc connect --agent ${esc(agent)}</code> in your terminal.`],
   observed_action: ["AMC has recorded at least one real action by your agent.",
     (agent) => `Run one task: open <a href="./native-tasks?agent=${encodeURIComponent(agent)}">Native Tasks</a>, or use your connected agent once.`],
   control_decision: ["An AMC guardrail has checked one of your agent's actions and allowed or stopped it.",
-    () => "Turn on control mode with the command shown under Next below, then run one action."],
+    (agent) => `Turn on control mode: run <code>amc connect hooks install --provider claude-code --agent ${esc(agent)} --mode control</code> in your terminal (use <code>gemini-cli</code> or <code>pi</code> as the provider if that is your agent), then run one action.`],
   signed_proof: ["AMC has sealed that decision in a signed record you can show to others.",
     () => `This appears by itself after the first control decision. Then look at it on the <a href="./evidence">Evidence</a> page.`]
 };
@@ -162,6 +118,24 @@ export function activationHelpHtml(row, agentId) {
   const word = blocked ? "" : STATUS_WORDS[status] ?? "";
   return `<p class="activation-help">${esc(help[0])}${word ? ` <span class="muted">${word}</span>` : ""}</p>`
     + (todo ? `<p class="activation-help muted">${todo}</p>` : "");
+}
+
+const NEXT_STEP = {
+  connected_agent: "run one task",
+  observed_action: "run one task",
+  control_decision: "turn on control mode",
+  signed_proof: "look at the signed record on the Evidence page"
+};
+
+/** Home's one progress line: how many of the four outcomes are done and, in plain words, what comes next. */
+export function progressLineText(activation) {
+  const rows = Array.isArray(activation?.milestones) ? activation.milestones : [];
+  const total = Number(activation?.progress?.total) || 4;
+  const done = Math.min(Number(activation?.progress?.completed) || 0, total);
+  const next = rows.find((row) => row?.status !== "COMPLETE");
+  const tail = next?.status === "BLOCKED" ? "Needs attention: AMC cannot trust its records right now."
+    : done >= total ? "All steps done." : `Next: ${NEXT_STEP[next?.id] ?? "run one task"}.`;
+  return `Your progress: ${done} of ${total}. ${tail}`;
 }
 
 function storage(win) {
@@ -206,13 +180,6 @@ function bindDialog(dialog, win) {
     if (button.dataset.guide === "next") showStep(dialog, step + 1);
     else if (button.dataset.guide === "back") showStep(dialog, step - 1);
     else if (button.dataset.guide === "close") dialog.close();
-    else if (button.dataset.guideStart) {
-      dialog.close();
-      const target = dialog.ownerDocument.getElementById(button.dataset.guideStart);
-      target?.click();
-      target?.scrollIntoView({ block: "center" });
-      target?.focus({ preventScroll: true });
-    }
   });
 }
 
@@ -227,12 +194,12 @@ function openWelcomeGuide(doc, win) {
   dialog.querySelector("#welcomeGuideTitle")?.focus();
 }
 
-/** Called after each Home render: wires the openers and opens the guide on a first visit or with ?guide=1. */
+/** Called after each Home render: wires the opener and opens the guide only when asked (?guide=1), never by itself. */
 export function installWelcomeGuide(doc, win) {
-  // Home re-renders on refresh; only the page's first render may open the guide by itself.
+  // Home re-renders on refresh; only the page's first render may answer ?guide=1.
   const firstRender = !doc.getElementById("welcomeGuide");
   const open = (event) => { event?.preventDefault(); openWelcomeGuide(doc, win); };
-  for (const id of ["welcomeGuideOpen", "guideOpenLink"]) {
+  for (const id of ["guideOpenLink"]) {
     const opener = doc.getElementById(id);
     if (opener && opener.dataset.guideBound !== "1") {
       opener.dataset.guideBound = "1";
@@ -240,5 +207,5 @@ export function installWelcomeGuide(doc, win) {
     }
   }
   const asked = new URLSearchParams(win.location?.search || "").get("guide") === "1";
-  if (firstRender && (asked || !guideDismissed(win))) openWelcomeGuide(doc, win);
+  if (firstRender && asked) openWelcomeGuide(doc, win);
 }

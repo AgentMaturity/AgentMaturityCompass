@@ -12,7 +12,7 @@ import chalk from "chalk";
 import inquirer from "inquirer";
 import { getMode, OWNER_ONLY_COMMAND_PATHS } from "../mode/mode.js";
 import { forgetRememberedUnlock, rememberedUnlockLocation } from "./passphraseStore.js";
-import { lockVault } from "./vault.js";
+import { lockVault, unlockVault, vaultExists, vaultOpensWith, vaultStatus } from "./vault.js";
 
 /**
  * Set by an AMC-launched agent (AMC_LEASE, AMC_TOKEN, AMC_EVALUATED_AGENT) or by a coding-agent harness in the commands
@@ -94,11 +94,46 @@ export async function confirmRememberedUnlock(workspace: string, path: string): 
   const ask = inquirer.createPromptModule({ input: process.stdin, output: process.stderr });
   const confirmed = process.stdin.isTTY === true && (await ask<{ sign: boolean }>([{
     type: "confirm", name: "sign", default: false,
-    message: `Sign ${path} with the vault passphrase remembered in ${location}? (export AMC_VAULT_PASSPHRASE for this shell to skip this question)`
+    message: `Use the vault passphrase saved in ${location} to sign amc ${path}?`
   }])).sign === true;
   if (confirmed) return;
   lockVault(workspace);
   forgetRememberedUnlock(workspace);
   declineRememberedStore();
   process.stderr.write(`${chalk.gray("Vault left locked.")}\n`);
+}
+
+/** The signing prefixes (not every owner-only path: init, vault and keys commands collect their own passphrase). */
+function signsWithVault(path: string): boolean {
+  return GOVERNANCE_PREFIXES.some((entry) => path === entry || path.startsWith(`${entry} `)) && !READS.has(path) && !path.startsWith("keys");
+}
+
+/**
+ * A governance command that signs, run by an interactive operator whose vault is still locked (nothing in the environment,
+ * nothing remembered, or the remembered one declined is excluded: declined stays locked), asks for the passphrase once
+ * instead of failing with the locked-vault refusal. Only a passphrase that opens the vault is accepted; an empty answer
+ * continues locked, so a command that signs nothing still runs. The vault is unlocked in this process only, never through
+ * the environment. Agents (marker or agent mode) and shells without a terminal keep the refusal.
+ */
+export async function askToUnlockForSigning(workspace: string, path: string, env: NodeJS.ProcessEnv = process.env): Promise<void> {
+  if (!signsWithVault(path) || (env.AMC_VAULT_PASSPHRASE ?? "").length > 0 || (env.AMC_VAULT_PASSPHRASE_FILE ?? "").trim().length > 0) return;
+  if (!vaultExists(workspace) || vaultStatus(workspace).unlocked || !interactiveOperator({ workspace, env }).ok) return;
+  const ask = inquirer.createPromptModule({ input: process.stdin, output: process.stderr });
+  // A folder set up by bare `amc` keeps its passphrase in .amc/local-vault-passphrase, which the person never saw. It is
+  // offered by name (same gates as loadLocalVaultPassphrase: not an agent, and only a vault this machine created), with
+  // "no" as the default like the remembered-store question, and read into a scratch environment, never this process's.
+  const scratch: NodeJS.ProcessEnv = { ...env, AMC_VAULT_PASSPHRASE: "" };
+  const { loadLocalVaultPassphrase } = await import("./localPassphrase.js");
+  const saved = loadLocalVaultPassphrase(workspace, scratch).loaded ? scratch.AMC_VAULT_PASSPHRASE ?? "" : "";
+  if (saved.length > 0 && vaultOpensWith(workspace, saved)) {
+    const { useSaved } = await ask<{ useSaved: boolean }>([{ type: "confirm", name: "useSaved", default: false,
+      message: `Use the vault passphrase AMC saved in .amc/local-vault-passphrase to sign amc ${path}?` }]);
+    if (useSaved === true) { unlockVault(workspace, saved); return; }
+  }
+  const { passphrase } = await ask<{ passphrase: string }>([{
+    type: "password", name: "passphrase", mask: "*",
+    message: `amc ${path} signs with the vault keys. Vault passphrase (empty to continue without):`,
+    validate: (value: string) => value.length === 0 || vaultOpensWith(workspace, value) || "That passphrase does not open this workspace's vault."
+  }]);
+  if (passphrase.length > 0) unlockVault(workspace, passphrase);
 }

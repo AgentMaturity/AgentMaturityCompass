@@ -171,30 +171,61 @@ main:focus {
   outline: none;
 }
 
-.first-use-intents {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+.first-use h2 {
+  margin: 0 0 8px;
+  font-size: 1.6rem;
+  line-height: 1.2;
 }
 
-.first-use-intents button {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  min-width: 0;
-  text-align: left;
-  white-space: normal;
-}
-
-.first-use-intents button span {
-  font-weight: normal;
+.first-use-lead {
+  max-width: 60ch;
+  font-size: 1.05rem;
   line-height: 1.5;
 }
 
-.first-use-intents button[aria-expanded="true"] {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
+.first-use-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px 16px;
+  margin-top: 16px;
+}
+
+.first-use-sub {
+  max-width: 26ch;
+  margin: 6px 0 0;
+  font-size: .85rem;
+}
+
+.first-use-score {
+  margin: 14px 0 0;
+}
+
+.home-progress {
+  margin: 0 0 16px;
+  padding: 0 4px;
+}
+
+.home-progress > p {
+  margin: 0;
+}
+
+.home-more {
+  margin-top: 8px;
+}
+
+/* Pre-JavaScript: shown only if the scripts never start (shell.js removes it as they do). */
+.boot-note {
+  visibility: hidden;
+  animation: boot-note-show 0s linear 8s forwards;
+}
+
+@keyframes boot-note-show {
+  to { visibility: visible; }
+}
+
+.uc-line {
+  margin: 0;
 }
 
 .first-use-panel {
@@ -290,6 +321,11 @@ main {
   background: rgba(255,255,255,.035);
   font-family: var(--mono);
   font-size: 11px;
+}
+
+/* The pages no longer ship static status text; an empty status line takes no room until a script writes it. */
+#status:empty {
+  display: none;
 }
 
 .topbar {
@@ -1196,7 +1232,6 @@ a:hover {
   .api-quickstart-grid,
   .surface-rail,
   .quick-action-grid,
-  .first-use-intents,
   .onboarding-steps {
     grid-template-columns: 1fr;
   }
@@ -1334,24 +1369,6 @@ a:hover {
   color: var(--accent);
 }
 
-.welcome-guide-choices {
-  display: grid;
-  gap: 10px;
-}
-
-.welcome-guide-choices button {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  text-align: left;
-  white-space: normal;
-}
-
-.welcome-guide-choices button span {
-  font-weight: normal;
-}
-
 .welcome-guide-glossary dt {
   font-weight: 700;
   margin-top: 8px;
@@ -1372,6 +1389,9 @@ a:hover {
 
 .advanced-section > summary,
 .banner-help > summary,
+.uc-details > summary,
+.home-progress > details > summary,
+.home-more > summary,
 .auth-help > summary,
 .auth-advanced > summary {
   cursor: pointer;
@@ -1379,7 +1399,8 @@ a:hover {
   padding: 8px 0;
 }
 
-.advanced-section[open] > summary {
+.advanced-section[open] > summary,
+.home-more[open] > summary {
   margin-bottom: 8px;
 }
 

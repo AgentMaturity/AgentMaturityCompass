@@ -14,11 +14,13 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C554-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C569-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
 <p align="center">
+  <a href="#start">Start</a> ·
+  <a href="docs/FIRST_FIVE_MINUTES.md">First Five Minutes</a> ·
   <a href="#run-a-native-agent-task">Native Tasks</a> ·
   <a href="#60-seconds-to-your-first-score">First Score</a> ·
   <a href="#a4-forge-preview">A4 Forge</a> ·
@@ -28,6 +30,58 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/discussions">Community</a> ·
   <a href="CONTRIBUTING.md">Contribute</a>
 </p>
+
+---
+
+**AMC records what your AI agent actually does and turns that record into a score and a short list of gaps to fix.**
+
+It is for people who use or build AI agents, such as Claude Code, Codex or an agent of their own, and want to see what the agent did instead of taking its word for it. AMC runs on your own computer and collects no usage data.
+
+## Install
+
+The start menu below is in the current source build (1.2.0, unreleased; the next release is 2.0.0). Install it from source with Node.js 22 or 24:
+
+```bash
+corepack enable
+git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
+cd AgentMaturityCompass
+pnpm install --frozen-lockfile
+pnpm run build
+npm link            # puts the amc command on your PATH
+```
+
+The hosted installers and npm give the published 1.1.1 release, which has no start menu ([other install methods](#install-amc), [publication evidence](website/publication-status.json)).
+
+## Start
+
+Go to the folder of the project you want AMC to look at, and type:
+
+```bash
+amc
+```
+
+The first time, AMC sets up the folder (it adds a hidden `.amc/` folder) and shows one menu. This is a real run on a computer where Claude Code and Codex are installed and signed in:
+
+```text
+AMC set up this folder (.amc/).
+? What do you want to do?
+❯ Watch Claude Code as it works (signed in)
+  Watch Codex as it works (signed in)
+  Try a demo chat (no account or key needed)
+  Build an agent for my industry (A4 Forge preview)
+  Open the console in my browser
+  Just show my score (empty for now)
+```
+
+Move with the arrow keys and press Enter. The menu only lists what can work right now: a coding agent that is not installed is left out, one that is signed out shows "Sign in to … first", and "Chat with a model" appears when an API key such as `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` is set in your shell. In a pipe, in CI or inside an agent's shell, `amc` prints the score instead, as it always did; `amc --no-menu` or `AMC_NO_MENU=1` does the same in a terminal. `amc --help` lists the few commands you need first; `amc --help --all` lists every command.
+
+Three short paths:
+
+- **Watch my coding agent.** Choose "Watch Claude Code as it works" or "Watch Codex as it works". AMC starts on this computer, asks before it adds a watch hook to this project's settings, and offers to start the agent here. AMC uses the agent's own sign-in; it never sees a password or a plan. Codex records nothing until you trust the folder and the AMC hook inside Codex ([sign-in and trust steps](docs/SIGN_IN_WITH_CLAUDE_OR_CHATGPT.md)).
+- **Chat or run a task.** "Try a demo chat" needs no account or key: a built-in demo model gives canned replies, and every turn is recorded. With an API key in your shell, "Chat with a model" talks to that provider. In the console, "Run a task" (called "Try a demo task" in the demo workspace) runs a task from the browser.
+- **Score what I have.** "Just show my score" prints the score for the evidence AMC holds. A first score is low, because AMC has not seen your agent work yet. The report is signed, which shows it was not changed afterwards; it does not show that your agent is good.
+
+New to this? [Your first five minutes](docs/FIRST_FIVE_MINUTES.md) walks through each screen and explains the words (workspace, vault, evidence, score, observe and control). If something goes wrong, see [Troubleshooting](docs/TROUBLESHOOTING.md).
 
 ---
 
@@ -60,13 +114,13 @@ amc up
 
 In the current source build `amc start` is another name for `amc up`. In the run recorded for this README (a new workspace and home directory, current source build, 2026-10-11; [record](qualification/2026-10-11-P0-28/README.md)), it:
 
-- Created the workspace under `.amc/`: signing keys, a vault and signed configuration. It needs a vault passphrase: it reads `AMC_VAULT_PASSPHRASE`, uses one it remembered, asks in a terminal, or generates and remembers one in a non-interactive shell. **No account. No provider API key. No cloud.**
+- Created the workspace under `.amc/`: signing keys, a vault and signed configuration. It needs a vault passphrase: it reads `AMC_VAULT_PASSPHRASE`, uses one it remembered, asks in a terminal, or generates and remembers one in a non-interactive shell. In the current source build the terminal question offers "Let AMC create and remember one (recommended)" or "Enter my own"; the first remembers the passphrase on this computer without printing it and says where (`amc vault passphrase` sets one you know; `amc vault forget` removes the remembered copy). It is printed once only where nothing keeps it. **No account. No provider API key. No cloud.**
 - Started Studio (API and Compass Console), the gateway, a proxy, the dashboard and the bridge on `127.0.0.1` in the background, and printed the console URL. It did not open a browser.
 - Ran a first 8-surface baseline (`amc run`), because the workspace had no earlier run, and printed the result. With no agent connected it graded F, with 4 of 8 surfaces evaluated.
 
 `amc down` stops the background services. A second `amc up` in the same workspace reuses it, prints the latest run and skips the baseline, because the workspace already has a run (in the 2026-10-11 recorded run it did not yet find that run and ran the baseline again). `amc up --no-baseline` skips the baseline; `amc up --demo` starts a no-vault demo instead. The installers give the published 1.1.1 release: its `amc up` starts Studio and the gateway but runs no baseline, and it has no `amc start` (use [From source](#from-source) for the current build).
 
-To sign in to the Compass Console, create the first login with `amc user init --username <you>` (an OWNER account; it asks for a password and signs `.amc/users.yaml` with the workspace vault; after `amc up` the passphrase it remembered is used. If it reports `Vault locked`, set `AMC_VAULT_PASSPHRASE` in that shell and run it again.) `amc user init` refuses when `.amc/users.yaml` already exists: if the workspace already has logins (for example after `amc init --coding`), add yours with `amc user add --username <you> --role OWNER` instead (`amc user init --force` replaces every login). Keep `.amc/` out of version control by default (add it to `.gitignore`): it holds the signing keys, the Studio admin token (`.amc/studio/`), the evidence ledger and, when `amc` generated one, `.amc/local-vault-passphrase`. A new workspace also gets `.amc/.gitignore`, which keeps those secrets and per-machine runtime state out of git. `.amc/users.yaml` (console password hashes) is not ignored by that file; keep it out of git unless the repository is private. If you deliberately commit a workspace for CI ([amc-action](amc-action/README.md)), never commit `.amc/local-vault-passphrase` or `.amc/studio/`, supply `AMC_VAULT_PASSPHRASE` from a CI secret, and keep that repository private: the encrypted vault is offline brute-force material.
+To sign in to the Compass Console, create the first login with `amc user init --username <you>` (an OWNER account; it asks for a password and signs `.amc/users.yaml` with the workspace vault. With a remembered passphrase it first asks `Use the vault passphrase saved in <location> to sign amc user init?`, default No; otherwise it asks you to type the passphrase. Without a terminal, set `AMC_VAULT_PASSPHRASE` in that shell and run it again.) `amc user init` refuses when `.amc/users.yaml` already exists: if the workspace already has logins (for example after `amc init --coding`), add yours with `amc user add --username <you> --role OWNER` instead (`amc user init --force` replaces every login). Keep `.amc/` out of version control by default (add it to `.gitignore`): it holds the signing keys, the Studio admin token (`.amc/studio/`), the evidence ledger and, when `amc` generated one, `.amc/local-vault-passphrase`. A new workspace also gets `.amc/.gitignore`, which keeps those secrets and per-machine runtime state out of git. `.amc/users.yaml` (console password hashes) is not ignored by that file; keep it out of git unless the repository is private. If you deliberately commit a workspace for CI ([amc-action](amc-action/README.md)), never commit `.amc/local-vault-passphrase` or `.amc/studio/`, supply `AMC_VAULT_PASSPHRASE` from a CI secret, and keep that repository private: the encrypted vault is offline brute-force material.
 
 **What you get:**
 
@@ -126,7 +180,7 @@ cd your-agent-project
 amc up
 amc user init --username <you>   # new workspace only: the first console login (asks for a password)
 
-# Or just print the full score in your terminal
+# Or open the start menu (current source build; 1.1.1 prints the full score)
 amc
 ```
 
@@ -429,7 +483,7 @@ AMC_A4_PREVIEW=1 amc a4 verify <projectId> --trust-list <file> --allow-unanchore
 ### Score any agent in one line
 
 ```bash
-amc                               # full score after global install
+amc --no-menu                     # full score in a terminal (without the flag, a terminal gets the start menu)
 amc run                           # explicit 8-surface maturity run
 amc run --question-set lifecycle  # opt-in 264-question lifecycle expansion
 ```
@@ -442,7 +496,8 @@ Without a terminal, `amc quickscore` generates no placeholder score: it exits 1 
 
 If `amc quickscore --auto --json` cannot find captured execution evidence, it fails closed with `scoreStatus: "AUTO_NO_EVIDENCE"` and does not emit a measured zero score. Capture evidence with `amc adapters run --agent <id> --adapter generic-cli -- <your-agent-command>`, or use `amc quickscore --answers answers.json --json` for CI-safe survey scoring.
 
-Advanced proof check:
+<details>
+<summary><strong>Advanced proof check (Enforce, firewall, policy, approvals, evidence)</strong></summary>
 
 ```bash
 amc resource snapshot            # record agent-defining resources under Enforce
@@ -527,6 +582,8 @@ amc evidence lifecycle-receipts list # see proposal, validation, commit, rollbac
 npm run release:gate             # release gate for CLI, Studio assets, docs, website spec, domain packs, and receipt output
 ```
 
+</details>
+
 For a source-of-truth command map generated from the live CLI registry, run `amc commands --markdown` or see [docs/CLI_COMMAND_INVENTORY.md](docs/CLI_COMMAND_INVENTORY.md).
 
 ### Wrap an existing agent (zero code changes)
@@ -576,7 +633,7 @@ amc connect hooks install --provider claude-code --mode control --agent my-agent
 
 The default `observe` mode preserves unrelated provider settings, adds a managed `.gitignore` rule for `.amc/hooks/`, stores a dedicated `hook:observe` lease outside provider config with mode `0600`, signs its ownership manifest, and removes only the AMC-owned handlers and ignore block. It records requested actions and their completed or failed terminal state under one stable action ID. `hooks health` distinguishes an intact installation awaiting its first event from the latest receipt-verified event and from fail-closed drift, expiry, malformed metadata, or evidence tamper. Last-observed time is historical evidence, not a claim that the provider is live now. A locked Vault cannot authenticate encrypted event bodies, so health exits 2 with `HOOK_EVIDENCE_UNAVAILABLE`; run `amc vault unlock` or set `AMC_VAULT_PASSPHRASE` for non-interactive use. The lifecycle command verifies each receipt and fails closed on missing, ambiguous, conflicting, cross-agent, out-of-order, or tampered evidence. Tool arguments, outputs, error messages, cwd, transcript paths, and raw session IDs are not retained.
 
-`--mode control` is an explicit loopback-only Enforce path. It adds `hook:control`, evaluates raw provider input in memory without retaining it, reuses signed ToolHub, Action Policy, Approval Policy, budget, freeze, maturity, and assurance gates, and binds the exact native response to a signed receipt. For Claude Code AMC only restricts: it denies, or lets a call through with an empty answer so Claude Code's own permissions still decide, and only for AMC's signed decision bound to that exact payload. A provider-local ask is not AMC approval and AMC has no approval path for hook calls, so a call that needs approval is denied. Control mode also installs SessionStart (session registration), UserPromptSubmit (admission) and Stop hooks; [docs/adapters/claude-code-hooks.md](docs/adapters/claude-code-hooks.md) states the claim per hook, the managed-settings delivery and the limits. Gemini CLI has no native `ask` result, so AMC converts that outcome to an explicit deny. Multi-user or distinct-user AMC quorum is never weakened to one provider prompt. Codex, Cursor, OpenCode, and other providers remain unsupported until their native per-tool hook contracts are pinned and fixture-tested.
+`--mode control` is an explicit loopback-only Enforce path. It adds `hook:control`, evaluates raw provider input in memory without retaining it, reuses signed ToolHub, Action Policy, Approval Policy, budget, freeze, maturity, and assurance gates, and binds the exact native response to a signed receipt. For Claude Code AMC only restricts: it denies, or lets a call through with an empty answer so Claude Code's own permissions still decide, and only for AMC's signed decision bound to that exact payload. A provider-local ask is not AMC approval and AMC has no approval path for hook calls, so a call that needs approval is denied. Control mode also installs SessionStart (session registration), UserPromptSubmit (admission) and Stop hooks; [docs/adapters/claude-code-hooks.md](docs/adapters/claude-code-hooks.md) states the claim per hook, the managed-settings delivery and the limits. Gemini CLI has no native `ask` result, so AMC converts that outcome to an explicit deny. Multi-user or distinct-user AMC quorum is never weakened to one provider prompt. Codex is supported in observe mode only (`--provider codex --mode observe`; [codex.md](docs/adapters/codex.md)). Cursor, OpenCode, and other providers remain unsupported until their native per-tool hook contracts are pinned and fixture-tested.
 
 Track real first-run outcomes without creating traffic or evidence:
 
@@ -661,6 +718,9 @@ amc inventory scan --deep                                # discover agents, fram
 amc comms-check --text "Guaranteed 40% return" --domain wealth
 ```
 
+<details>
+<summary><strong>How the policy, approval and ToolHub commands behave</strong></summary>
+
 `amc policy controls` is a read-only projection over Runtime Firewall, Guardrails, Action Policy, and Approval Policy. It verifies the existing signed sources before reporting an effective result. Invalid Runtime or Guardrails evidence projects `BLOCK`, invalid Action Policy projects `SIMULATE`, and invalid Approval Policy projects `DENY`; the command exits with status 2 when any family fails closed. It does not create or activate controls.
 
 `amc policy scope` groups the existing nine action classes into four immutable AMC templates. Compile verifies the current signed Action and Approval Policy baselines and preserves every unselected rule; apply requires the exact content-bound compile ID, uses the existing lock/atomic writers/signers, restores prior bytes on failure, and records existing transparency/ledger evidence only after both policies verify. Workspace policies remain fleet-wide, so these templates never claim per-agent or per-environment scope. See [Reusable Policy Scope Templates](docs/SCOPE_TEMPLATES.md).
@@ -674,6 +734,8 @@ amc comms-check --text "Guaranteed 40% return" --domain wealth
 When ToolHub requires approval, the CLI, Dashboard, diagnostics, and Studio read the same signed quorum chain. `amc approvals list` can search the stable request ID and filter privacy-safe status, action, risk, mode, time, order, and limit fields. It audits every canonical request, decision, consumption record, and detached signature before filtering; malformed, tampered, misbound, or orphaned activity returns no rows. The view never searches tool names, intent/work-order IDs, reviewer identities, reasons, commands, prompts, or payloads, and it is marked `derivedView: true`, `recorded: false`, and `proofEligible: false`. Configured Integrations channels still receive only metadata-only lifecycle notifications. See [Approvals](docs/APPROVALS.md).
 
 `amc tools list --json` verifies the signed ToolHub allowlist, derives stable tool and MCP server identities, groups tools by declared provider context, and reuses those identities in the Fleet CGX trust graph. Existing version 1 configs remain native when context is omitted. Missing or invalid signatures, malformed declarations, duplicate tools, or conflicting server metadata return no rows. The projection is read-only and explicitly non-proof; it does not discover or attest a live MCP server. See [ToolHub](docs/TOOLHUB.md).
+
+</details>
 
 ### Auto-fix everything
 
@@ -856,6 +918,7 @@ AMC is **free and MIT licensed**, and in the current source build all 41 Industr
 
 | | |
 |--|--|
+| [Your First Five Minutes](docs/FIRST_FIVE_MINUTES.md) | [Watch Claude Code or Codex](docs/SIGN_IN_WITH_CLAUDE_OR_CHATGPT.md) |
 | [Getting Started (2 min)](docs/GETTING_STARTED.md) | [Agent Guide](docs/AGENT_GUIDE.md) |
 | [Community Demo Kit](docs/COMMUNITY_DEMO_KIT.md) | [Why AMC One-Pager](docs/WHY_AMC_ONE_PAGER.md) |
 | [Solo Dev Quickstart](docs/SOLO_DEV_QUICKSTART.md) | [Platform Engineer Quickstart](docs/PLATFORM_ENGINEER_QUICKSTART.md) |
@@ -900,7 +963,11 @@ AMC is **free and MIT licensed**, and in the current source build all 41 Industr
 
 ### Desktop Studio apps
 
-AMC desktop packages include `Agent Maturity Compass Studio` launchers for macOS and Windows. Each launcher verifies the included package digest and installs that exact build into a version-pinned per-user runtime, with mutable demo data kept in a separate persistent workspace. An older global CLI cannot start stale Studio code. The native macOS app uses a WebKit window; Windows opens the same loopback-only local Studio in the system browser. Neither bundles Electron or a browser runtime. Studio, CLI, docs, GitHub README, and the website share the same dark terminal identity.
+AMC desktop packages include `Agent Maturity Compass Studio` launchers for macOS and Windows. Each launcher verifies the included package digest and installs that exact build into a version-pinned per-user runtime, with its data kept in separate persistent workspaces. An older global CLI cannot start stale Studio code.
+
+The native macOS app uses a WebKit window. On first launch it asks how to start: Set Up My Workspace, Try the Demo, or Quit. Setting up creates your own workspace in `~/Library/Application Support/Agent Maturity Compass/workspace`, a vault whose passphrase AMC keeps in your macOS Keychain (service `amc-vault`), and an owner account whose password is kept there too (service `amc-console`). The console then opens signed in as that owner, so every control works. The Studio menu has Reload (⌘R), Open in Browser, Try the Demo or Open My Workspace (the view-only demo and your workspace never run at the same time), Stop AMC and Show Logs; quitting offers to stop AMC too. The app runs on its own ports (console 3232, gateway 3230 and 3231), so a terminal `amc up` elsewhere keeps the defaults.
+
+Windows opens the view-only demo in a loopback-only local Studio in the system browser. Neither bundles Electron or a browser runtime. Studio, CLI, docs, GitHub README, and the website share the same dark terminal identity.
 
 ```bash
 npm run package:desktop
@@ -909,11 +976,11 @@ npm run package:desktop:verify
 
 Run these in a source checkout ([From source](#from-source)); the desktop archives on the published GitHub release are 1.1.1 builds ([publication evidence](website/publication-status.json)). See [docs/DESKTOP_PACKAGES.md](docs/DESKTOP_PACKAGES.md) for archive contents and platform commands.
 
-The macOS app is not notarized (the current source build ad-hoc signs it): if macOS says it cannot verify the app, open System Settings > Privacy & Security and choose Open Anyway. An app built from current source carries its own copy of the package, so you can move it, for example to `/Applications`. Studio keeps running after you close the app window or browser tab; stop it with the launcher runtime's own `amc down`, run in its `studio-workspace` folder:
+The macOS app is not notarized (the current source build ad-hoc signs it): if macOS says it cannot verify the app, open System Settings > Privacy & Security and choose Open Anyway. An app built from current source carries its own copy of the package, so you can move it, for example to `/Applications`. In the macOS app, Studio > Stop AMC stops Studio. From Terminal, use the launcher runtime's own `amc down`, run in the workspace folder (on Windows, the demo's `studio-workspace` folder; Studio keeps running there after you close the browser tab):
 
 ```bash
 # macOS
-cd ~/"Library/Application Support/Agent Maturity Compass/studio-workspace" && ../runtime/node_modules/.bin/amc down
+cd ~/"Library/Application Support/Agent Maturity Compass/workspace" && ../runtime/node_modules/.bin/amc down
 ```
 
 ```powershell
@@ -971,7 +1038,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,554<!-- /amc:count --> test source files; Vitest reports run outcomes
+cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,569<!-- /amc:count --> test source files; Vitest reports run outcomes
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.

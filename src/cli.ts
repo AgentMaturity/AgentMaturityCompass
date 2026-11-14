@@ -296,9 +296,10 @@ import { installFatalHandlers } from "./runtime/fatalDiagnostic.js";
 import { changeVaultPassphraseInteractive, initVaultInteractive, lockVaultNow, printVaultPassphraseChange, promptPassphrase, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
 import { forgetVaultPassphrase, unlockWithRememberedPassphrase } from "./vault/passphraseStore.js";
 import { adoptVaultPassphraseFile, bootstrapVaultPassphrase, unlockWithPassphraseFile, vaultPassphraseFromEnv } from "./vault/passphraseFile.js";
-import { confirmRememberedUnlock } from "./vault/operatorContext.js";
+import { askToUnlockForSigning, confirmRememberedUnlock, interactiveOperator } from "./vault/operatorContext.js";
+import { runFrontDoor, scoreNextStep, shouldShowFrontDoor, terminalFrontDoorIo } from "./setup/frontDoor.js";
 import { ensureInstantVaultMode, type InstantVaultMode } from "./cli/instantVaultMode.js";
-import { generatedPassphraseForInit, rememberInitPassphrase, skipVaultPassphrase } from "./cli/initPassphrase.js";
+import { generatedPassphraseForInit, generatedPassphraseRoute, newVaultPassphraseChoices, rememberInitPassphrase, rememberOrShowOnce, shownOncePassphraseLines, skipVaultPassphrase } from "./cli/initPassphrase.js";
 import { ensureUpVaultPassphrase, printConsoleSignInStep, runFirstBaselineIfNeeded } from "./studio/oneCommandUp.js";
 import { agentRunFiles, latestRunSummary } from "./diagnostic/runReportResolution.js";
 import { buildConnectInstructions } from "./studio/connectWizard.js";
@@ -1482,6 +1483,7 @@ function renderInstantFullScore(
     reportJsonPath?: string;
     reportMarkdownPath?: string;
     studioEvidenceUrl?: string | null;
+    nextStep?: string;
   } = {}
 ): void {
   const avgLevel = diagnosticAverageLevel(report);
@@ -1548,6 +1550,7 @@ function renderInstantFullScore(
   console.log(chalk.gray(`  Artifact seal: ${report.status} | Evidence: ${statusExplanation.evidenceStatus} | Claims: ${statusExplanation.strongClaimsAllowed ? "ELIGIBLE" : "BLOCKED"}`));
   console.log("");
   console.log(chalk.bold(`  Overall: L${avgLevel.toFixed(2)} (${score100}/100) ${report.trustLabel}`));
+  if (report.evidenceCoverage === 0) console.log("  AMC has not seen your agent do anything yet, so this score is empty.");
   console.log(chalk.gray(`  Integrity: ${report.integrityIndex.toFixed(3)} | Evidence coverage: ${(report.evidenceCoverage * 100).toFixed(1)}%`));
   console.log(chalk.gray(`  Claim boundary: ${statusExplanation.claimBoundary}`));
   if (!statusExplanation.strongClaimsAllowed) {
@@ -1573,40 +1576,13 @@ function renderInstantFullScore(
   } else if (state.createdAgentContext) {
     console.log(chalk.green("  Created missing agent context automatically."));
   }
-  if (state.vault.createdLocalPassphrase && state.vault.localPassphrasePath) {
-    console.log(chalk.gray(`  Local signing vault initialized: ${state.vault.localPassphrasePath}`));
-  }
   if (state.vault.reason) {
     console.log(chalk.yellow(`  ${state.vault.reason}`));
   }
-  if (opts.lifecycleArtifactPath) {
-    console.log(chalk.gray(`  Lifecycle artifact: ${opts.lifecycleArtifactPath}`));
-  }
-  if (opts.episodeRecordPath) {
-    console.log(chalk.gray(`  Episode record:     ${opts.episodeRecordPath}`));
-  }
-  if (opts.findingProofsPath) {
-    console.log(chalk.gray(`  Finding proofs:     ${opts.findingProofsPath}`));
-  }
-  if (opts.lifecycleReceiptsPath) {
-    console.log(chalk.gray(`  Change receipts:    ${opts.lifecycleReceiptsPath}`));
-  }
-  if (opts.observabilityPath) {
-    console.log(chalk.gray(`  Observability:      ${opts.observabilityPath}`));
-  }
-  if (opts.reportMarkdownPath) {
-    console.log(chalk.gray(`  Report:             ${opts.reportMarkdownPath}`));
-  } else if (opts.reportJsonPath) {
-    console.log(chalk.gray(`  Report:             ${opts.reportJsonPath}`));
-  }
-  if (opts.studioEvidenceUrl) {
-    console.log(chalk.gray(`  Studio Evidence:    ${opts.studioEvidenceUrl}`));
-  } else {
-    console.log(chalk.gray("  Studio Evidence:    amc up  # then open /console/evidence"));
-  }
-  console.log(chalk.gray("  Next: amc up        # open Studio"));
-  console.log(chalk.gray("        amc evidence lifecycle list"));
-  console.log(chalk.gray("        amc shell     # interactive command shell"));
+  // The artifact paths stay in the JSON output and under .amc/; the person reading this needs one next step.
+  console.log(chalk.gray("  Details saved under .amc/ (amc --help --all lists the report commands)"));
+  if (opts.studioEvidenceUrl) console.log(chalk.gray(`  Evidence in the console: ${opts.studioEvidenceUrl}`));
+  console.log(chalk.bold(`  ${opts.nextStep ?? scoreNextStep(null)}`));
   console.log("");
 }
 
@@ -1722,7 +1698,7 @@ function printEuAiActNotEvaluated(): void {
   console.log(chalk.gray("  Risk class: amc compliance risk-classify · Evidence-linked report: amc compliance report --framework EU_AI_ACT"));
 }
 
-async function runInstantFullScoreForAgent(params: { workspace: string; agentId: string; json?: boolean }): Promise<void> {
+async function runInstantFullScoreForAgent(params: { workspace: string; agentId: string; json?: boolean; nextStep?: string }): Promise<void> {
   params = { ...params };
   const started = Date.now();
   const releaseLock = await acquireInstantScoreLock(params.workspace);
@@ -1826,6 +1802,7 @@ async function runInstantFullScoreForAgent(params: { workspace: string; agentId:
     });
     renderInstantFullScore(report, elapsedMs, state, {
       json: params.json,
+      nextStep: params.nextStep,
       ...refs
     });
   } catch (error: unknown) {
@@ -1930,6 +1907,7 @@ async function runInstantFullScoreForAgent(params: { workspace: string; agentId:
       }
       renderInstantFullScore(report, elapsedMs, unsignedState, {
         json: params.json,
+        nextStep: params.nextStep,
         ...refs
       });
       return;
@@ -1975,6 +1953,7 @@ program.option("--agent <agentId>", "agent ID (defaults to .amc/current-agent)")
 program.option("--json", "emit structured JSON for the top-level full score", false);
 // No default: a `false` default made `color` false on every command, so preAction switched colour off everywhere.
 program.option("--no-color", "disable ANSI color output; equivalent to NO_COLOR=1");
+program.option("--no-menu", "bare amc only: skip the start menu and print the score (or set AMC_NO_MENU=1)");
 program
   .command("help [commandPath...]")
   .description("Show help for a command (for example: amc help run)")
@@ -2111,6 +2090,8 @@ program.hook("preAction", async (_thisCommand, actionCommand) => {
   // B2: `amc up` reads it itself (--no-remember); the agent host's MCP server and hook forwarder never hold the vault.
   // LIVE-VAULT-01: the unlock is for an interactive operator only, and a governance command then confirms it.
   if (!/^(up|mcp|connect hooks forward)( |$)/.test(path)) { unlockWithRememberedPassphrase(process.cwd()); await confirmRememberedUnlock(process.cwd(), path); }
+  // A signing command asks an interactive operator for the passphrase rather than refusing (agents and pipes keep the refusal).
+  if (!/^(up|mcp|connect hooks forward)( |$)/.test(path)) await askToUnlockForSigning(process.cwd(), path);
 });
 installClaimLabelHooks(program);
 
@@ -2120,8 +2101,8 @@ async function initializeMinimalStartupWorkspace(opts: {
 }): Promise<void> {
   // The vault keys are created with this passphrase and every later signing
   // command (amc firewall enable, amc agent-loop run) needs it from the shell.
-  // A generated value that is never shown leaves the operator with a vault no
-  // command can unlock, so it is shown once, below, with the export to run.
+  // A generated value that is neither kept nor shown leaves a vault no command can unlock: an operator in a terminal has
+  // it remembered (never shown); elsewhere it is shown once, below, with the export to run.
   let generatedPassphrase: string | null = null;
   if (!process.env.AMC_VAULT_PASSPHRASE) {
     generatedPassphrase = generatedPassphraseForInit();
@@ -2150,7 +2131,9 @@ async function initializeMinimalStartupWorkspace(opts: {
   console.log(fmt.pass("Minimal startup workspace initialized"));
   console.log(fmt.info(`Location: ${init.workspacePath}`));
   console.log(fmt.info(`Profile: ${opts.profile}`));
-  if (generatedPassphrase !== null) {
+  if (generatedPassphrase !== null && generatedPassphraseRoute(process.env, process.stdin.isTTY === true) === "remember") {
+    for (const line of rememberOrShowOnce(init.workspacePath, generatedPassphrase)) console.log(fmt.info(line));
+  } else if (generatedPassphrase !== null) {
     console.log(fmt.warn("No AMC_VAULT_PASSPHRASE was set, so one was generated for this vault. Save it; signing commands need it in the shell:"));
     if (process.env.GITHUB_ACTIONS) console.log(`::add-mask::${generatedPassphrase}`); // LIVE-VAULT-04: GitHub masks it in the job log
     console.log(`    export AMC_VAULT_PASSPHRASE='${generatedPassphrase}'`);
@@ -2161,10 +2144,10 @@ async function initializeMinimalStartupWorkspace(opts: {
   console.log("");
 }
 
-/** One What's next list: the three actions to a first governed, verified, keyless turn, then any further steps. */
-function printFirstRunActions(fmt: typeof import("./cliFormat.js"), more: Array<{ cmd: string; desc: string }> = []): void {
-  console.log(fmt.info("The first three steps reach a first governed, verified turn without any provider key:"));
-  console.log(fmt.nextSteps([...firstRunActions().map((action) => ({ cmd: action.cmd, desc: action.desc })), ...more]));
+/** One What's next list: the plain first steps, the optional monitor-key pin last. */
+function printFirstRunActions(fmt: typeof import("./cliFormat.js")): void {
+  console.log(fmt.info("What to do next (no account or key needed):"));
+  console.log(fmt.nextSteps(firstRunActions().map((action) => ({ cmd: action.cmd, desc: action.desc }))));
 }
 
 program
@@ -2205,26 +2188,24 @@ program
       return;
     }
     // Ensure vault passphrase is available before init (it creates crypto keys)
+    let rememberAfterInit: string | null = null;
     if (!process.env.AMC_VAULT_PASSPHRASE) {
       if (process.stdin.isTTY) {
-        const crypto = await import("node:crypto");
-        const autoGenerated = crypto.randomBytes(16).toString("base64url");
+        const autoGenerated = generatedPassphraseForInit();
+        const remember = generatedPassphraseRoute(process.env, true) === "remember";
         console.log(chalk.bold("\n🔐 AMC Evidence Vault Setup"));
         console.log(chalk.gray("  AMC signs all scores with cryptographic keys. A passphrase protects your vault.\n"));
         const { choice } = await inquirer.prompt([{
           type: "select",
           name: "choice",
           message: "Vault passphrase:",
-          choices: [
-            { name: `Auto-generate (${autoGenerated})`, value: "auto" },
-            { name: "Enter my own passphrase", value: "custom" },
-          ]
+          choices: newVaultPassphraseChoices(remember)
         }]);
         let passphrase: string;
         if (choice === "auto") {
           passphrase = autoGenerated;
-          console.log(chalk.yellow(`\n  ⚠ Save this passphrase — you'll need it to access your vault:`));
-          console.log(chalk.bold.white(`    ${passphrase}\n`));
+          if (remember) rememberAfterInit = autoGenerated; // remembered once the vault exists, never shown
+          else for (const line of shownOncePassphraseLines(passphrase)) console.log(chalk.yellow(line));
         } else {
           const { customPass } = await inquirer.prompt([{
             type: "password",
@@ -2257,13 +2238,8 @@ program
     console.log(fmt.pass("Workspace initialized"));
     console.log(fmt.info(`Location: ${init.workspacePath}`));
     if (skip.generated) console.log(fmt.info(rememberInitPassphrase(init.workspacePath, skip.generated)));
-    printFirstRunActions(fmt, [
-      { cmd: "amc", desc: "Generate the full evidence score immediately" },
-      { cmd: "amc up", desc: "Start Studio (web dashboard)" },
-      { cmd: "amc doctor", desc: "Check what's available in your environment" },
-      { cmd: "amc setup --demo", desc: "Load demo data and explore all features" },
-      { cmd: `amc config profile ${opts.profile}`, desc: "Re-apply the selected workspace config profile" },
-    ]);
+    if (rememberAfterInit) for (const line of rememberOrShowOnce(init.workspacePath, rememberAfterInit)) console.log(fmt.info(line));
+    printFirstRunActions(fmt);
     console.log(fmt.colors.dim("  Full guide: https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md"));
     console.log("");
 
@@ -3512,7 +3488,7 @@ program
 program
   .command("up")
   .alias("start")
-  .description("Start AMC control plane in one command (studio + gateway + bridge)")
+  .description("Start AMC and its console (Studio, gateway and bridge in one command)")
   .option("--demo", "Start a no-vault local demo workspace for exploration", false)
   .option("--read-only", "Legacy alias for --demo; demo data is local and mutable", false)
   .option("--dry-run", "Print the startup plan without binding ports", false)
@@ -3655,6 +3631,7 @@ program
     console.log(`\n  ${chalk.bold("Open your report card:")}  ${chalk.hex("#4AEF79").bold(`http://${state.host}:${state.apiPort}/console`)}`);
     const advancedEndpoints = [`Gateway :${state.gatewayPort}`, state.proxyPort > 0 ? `Proxy :${state.proxyPort}` : "", `Dashboard :${state.dashboardPort}`, `Studio API :${state.apiPort}`, `Bridge :${state.apiPort}/bridge`].filter(Boolean).join(" · ");
     console.log(chalk.gray(`  Advanced endpoints (optional): ${advancedEndpoints}`));
+    for (const note of state.portNotes ?? []) console.log(chalk.yellow(`  ${note}`));
     console.log(chalk.gray(latest ? `  Latest run: ${latest.runId} | IntegrityIndex ${latest.integrityIndex.toFixed(3)} (${latest.trustLabel})`
       : opts.baseline === false ? "  Latest run: none (baseline skipped with --no-baseline; run `amc run` when ready)" : "  Latest run: none — running your first one below"));
     await runFirstBaselineIfNeeded({
@@ -4356,6 +4333,12 @@ const connect = program
         return;
       }
 
+      // A person in a terminal is first offered the Claude Code or Codex they are signed in to (an observe hook, on a yes).
+      if (process.stdin.isTTY && !opts.adapter && !opts.mode && !opts.printEnv && !opts.printCmd) {
+        const { offerWatchSignedIn } = await import("./studio/connectWatch.js");
+        const { connectWatchDeps } = await import("./studio/connectWatchIo.js");
+        if (await offerWatchSignedIn(resolveAgentId(process.cwd(), opts.agent ?? activeAgent(program)), connectWatchDeps(process.cwd())) === "watched") return;
+      }
       const output = await buildConnectInstructions({
         workspace: process.cwd(),
         agentId: opts.agent ?? activeAgent(program),
@@ -4375,10 +4358,10 @@ const connect = program
       console.log(chalk.hex('#4AEF79')(`Agent: ${output.agentId}`));
       console.log(`Gateway route: ${output.routeUrl}`);
       console.log("");
-      console.log(chalk.hex('#4AEF79')("Environment exports:"));
-      for (const line of output.envLines) {
-        console.log(line);
-      }
+      // The exports carry a live gateway lease: kept in a 0600 file, not in scrollback (--print-env prints them).
+      const envFile = (await import("./studio/connectWatch.js")).writeConnectEnvFile(process.cwd(), output.agentId, output.envLines);
+      console.log(chalk.hex('#4AEF79')("Environment exports (with a 60-minute gateway lease), written to a private file (mode 0600):"));
+      console.log(envFile.sourceLine);
       console.log("");
       console.log(chalk.hex('#4AEF79')("Recommended command:"));
       console.log(output.command);
@@ -19549,8 +19532,17 @@ program.action(async (_opts, command: Command) => {
 
   const opts = program.opts<{ agent?: string; json?: boolean }>();
   const agentId = resolveAgentId(process.cwd(), opts.agent ?? activeAgent(program) ?? undefined);
+  const workspace = process.cwd();
   try {
-    await runInstantFullScoreForAgent({ workspace: process.cwd(), agentId, json: Boolean(opts.json) });
+    if (shouldShowFrontDoor({ args: process.argv.slice(2), env: process.env, stdinTTY: process.stdin.isTTY === true,
+      stdoutTTY: process.stdout.isTTY === true, operatorOk: interactiveOperator({ workspace }).ok })) {
+      const operatorEnv = { ...process.env }; // before the workspace step can set AMC_VAULT_PASSPHRASE: children never inherit it
+      if (ensureInstantWorkspace(workspace, agentId).createdWorkspace) console.log(chalk.gray("AMC set up this folder (.amc/)."));
+      await runFrontDoor(terminalFrontDoorIo({ workspace, agentId, operatorEnv, openUrl: openExternalUrl,
+        showScore: (nextStep) => runInstantFullScoreForAgent({ workspace, agentId, nextStep }) }));
+      return;
+    }
+    await runInstantFullScoreForAgent({ workspace, agentId, json: Boolean(opts.json) });
   } catch (error: unknown) {
     console.error(chalk.red(normalizeCliErrorMessage(error)));
     process.exit(1);

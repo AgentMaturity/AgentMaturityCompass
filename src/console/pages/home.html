@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Compass Console - AMC Studio</title>
     <link rel="manifest" href="./assets/manifest.json" />
-    <link rel="stylesheet" href="./assets/styles.css?v=20261113a" />
+    <link rel="stylesheet" href="./assets/styles.css?v=20261114a" />
     <link rel="stylesheet" href="./assets/a4.css?v=20261009a" />
   </head>
   <body data-page="home">
@@ -48,17 +48,19 @@
         </details>
       </nav>
       <main>
-        <div id="ucBanner" class="card banner muted">Unified Clarity loading…</div>
-        <p id="status" class="muted">Authentication required.</p>
+        <div id="ucBanner" class="card banner muted">Starting AMC…</div>
+        <noscript><p class="status-bad">AMC needs JavaScript. Turn it on for this page, then reload.</p></noscript>
+        <p class="boot-note muted">Still blank? Press ⌘R (Ctrl+R). If it stays blank, run <code>amc doctor</code> in a terminal.</p>
+        <p id="status" class="muted"></p>
         <section id="a4HomeCard" class="card" hidden>
-          <h3>Start an agent project</h3>
-          <p class="muted">Take an agent from idea to release with your team, one reviewed stage at a time (A4 preview).</p>
+          <h3>Build an agent for your industry</h3>
+          <p class="muted">Pick your industry, answer plain questions, and AMC drafts the agent with you, one reviewed stage at a time. An Industry Pack suggests the sector, risk level and rules to check (A4 preview).</p>
           <a class="button" href="./a4?new=1">Start an agent project</a>
         </section>
         <div id="app"></div>
       </main>
     </div>
-    <script type="module" src="./assets/app.js?v=20261113a"></script>
+    <script type="module" src="./assets/app.js?v=20261114a"></script>
     <script type="module" src="./assets/a4.js?v=20261029a"></script>
   </body>
 </html>

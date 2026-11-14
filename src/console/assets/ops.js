@@ -16,6 +16,10 @@ async function getJson(path, init) {
   return body;
 }
 
+// Errors and server data go into the page as text, never as markup.
+const esc = (text) => String(text).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
+const warnHtml = (error) => "<div class='warn'>Could not load: " + esc(error instanceof Error ? error.message : error) + ". Refresh to try again.</div>";
+
 function setOut(value) {
   document.getElementById("out").textContent = JSON.stringify(value, null, 2);
 }
@@ -26,35 +30,35 @@ async function refresh() {
     const status = ready.status || "UNKNOWN";
     document.getElementById("ready").innerHTML =
       "<div><strong>" +
-      status +
+      esc(status) +
       "</strong></div><pre>" +
-      JSON.stringify(ready, null, 2) +
+      esc(JSON.stringify(ready, null, 2)) +
       "</pre>";
   } catch (error) {
-    document.getElementById("ready").innerHTML = "<div class='warn'>" + String(error) + "</div>";
+    document.getElementById("ready").innerHTML = warnHtml(error);
   }
 
   try {
     const retention = await getJson("/ops/retention/status");
-    document.getElementById("retention").innerHTML = "<pre>" + JSON.stringify(retention, null, 2) + "</pre>";
+    document.getElementById("retention").innerHTML = "<pre>" + esc(JSON.stringify(retention, null, 2)) + "</pre>";
   } catch (error) {
-    document.getElementById("retention").innerHTML = "<div class='warn'>" + String(error) + "</div>";
+    document.getElementById("retention").innerHTML = warnHtml(error);
   }
 
   try {
     const maintenance = await getJson("/ops/maintenance/stats");
-    document.getElementById("maintenance").innerHTML = "<pre>" + JSON.stringify(maintenance, null, 2) + "</pre>";
+    document.getElementById("maintenance").innerHTML = "<pre>" + esc(JSON.stringify(maintenance, null, 2)) + "</pre>";
   } catch (error) {
-    document.getElementById("maintenance").innerHTML = "<div class='warn'>" + String(error) + "</div>";
+    document.getElementById("maintenance").innerHTML = warnHtml(error);
   }
 
   try {
     const backup = await getJson("/ops/backup/status");
     const warning = backup.warning ? "warn" : "";
     document.getElementById("backup").innerHTML =
-      "<div class='" + warning + "'><pre>" + JSON.stringify(backup, null, 2) + "</pre></div>";
+      "<div class='" + warning + "'><pre>" + esc(JSON.stringify(backup, null, 2)) + "</pre></div>";
   } catch (error) {
-    document.getElementById("backup").innerHTML = "<div class='warn'>" + String(error) + "</div>";
+    document.getElementById("backup").innerHTML = warnHtml(error);
   }
 }
 
@@ -73,6 +77,7 @@ document.getElementById("retention-dry").addEventListener("click", async () => {
 });
 
 document.getElementById("retention-run").addEventListener("click", async () => {
+  if (!window.confirm("Run retention now? It archives old records and deletes what the retention policy says to remove. This cannot be undone. Run Dry-Run first to see what would change.")) return;
   try {
     const out = await getJson("/ops/retention/run", {
       method: "POST",

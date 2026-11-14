@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import type { EvidenceEvent, Gate } from "../src/types.js";
 import { evaluateGate, parseEvidenceEvent, type ParsedEvidenceEvent } from "../src/diagnostic/gates.js";
 import { selectRelevantEvents } from "../src/diagnostic/runner.js";
@@ -54,7 +54,15 @@ function makeLevel3Gate(overrides: Partial<Gate> = {}): Gate {
   };
 }
 
+const ORIGINAL_LOG_LEVEL = process.env.AMC_LOG_LEVEL;
+// The untagged-evidence note is printed only with AMC_LOG_LEVEL=debug; these tests read it, so they set it.
+beforeEach(() => {
+  process.env.AMC_LOG_LEVEL = "debug";
+});
+
 afterEach(() => {
+  if (ORIGINAL_LOG_LEVEL === undefined) delete process.env.AMC_LOG_LEVEL;
+  else process.env.AMC_LOG_LEVEL = ORIGINAL_LOG_LEVEL;
   if (ORIGINAL_STRICT_EVIDENCE_BINDING === undefined) {
     delete process.env.STRICT_EVIDENCE_BINDING;
   } else {
@@ -96,6 +104,14 @@ describe("anti-gaming: strict evidence binding", () => {
     expect(selected).toHaveLength(0);
     expect(warn).toHaveBeenCalledTimes(1);
     expect(warn.mock.calls[0]?.[0]).toContain("untagged evidence counts toward no question at any level");
+  });
+
+  test("the untagged-evidence note is not printed without AMC_LOG_LEVEL=debug", () => {
+    delete process.env.STRICT_EVIDENCE_BINDING;
+    delete process.env.AMC_LOG_LEVEL;
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    expect(selectRelevantEvents("AMC-1.1", [makeParsedEvent({ questionId: "AMC-1.2", trustTier: "OBSERVED" })], 2)).toHaveLength(0);
+    expect(warn).not.toHaveBeenCalled();
   });
 
   test("L0-L2 selection no longer borrows another question's evidence", () => {

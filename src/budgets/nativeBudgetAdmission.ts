@@ -4,11 +4,13 @@ import type { SessionService } from "../session/sessionService.js";
 import type { ToolExecution } from "../tools/toolTypes.js";
 import { sha256Hex } from "../utils/hash.js";
 import { budgetForAgent, evaluateBudgetStatus, loadVerifiedBudgetsConfig } from "./budgets.js";
-import { budgetSessionAgent, NATIVE_BUDGET_RESERVATION, projectBudgetUsage, readBudgetEvents } from "./nativeBudgetUsage.js";
+import { budgetSessionAgent, LOCAL_STUB_USD_EXPOSURE, NATIVE_BUDGET_RESERVATION, projectBudgetUsage, readBudgetEvents } from "./nativeBudgetUsage.js";
 import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { nativeUsdReservation, type NativeBudgetDispatch } from "./nativeUsdReservation.js";
 import { reserveExperimentModelRequest } from "./experimentBudget.js";
 import { nativeUsdUnits } from "./nativeUsdAmount.js";
+import { STUB_DISPATCH_URL, STUB_PROVIDER_ID, STUB_PROVIDER_MODEL } from "../agent/stubProvider.js";
+import { parseRequestHeaderMeta } from "../session/requestHeaderMeta.js";
 
 export class NativeBudgetRefusal extends Error {
   readonly code = "AMC_NATIVE_BUDGET_REFUSED";
@@ -41,6 +43,16 @@ export function nativeUnknownUsageNotice(workspace: string, agentId: string): st
   }
 }
 
+/**
+ * The exact signed request bytes go to the stub's never-resolving `.invalid` URL under the stub provider and model.
+ * Such a dispatch cannot reach a paid provider, so a USD cap has nothing to bound; any other URL is not exempt.
+ */
+function localStubDispatch(headerJson: string | undefined, dispatch: NativeBudgetDispatch | undefined): boolean {
+  const header = headerJson === undefined ? null : parseRequestHeaderMeta(headerJson);
+  return !!header && !!dispatch && header.providerId === STUB_PROVIDER_ID && header.model === STUB_PROVIDER_MODEL
+    && dispatch.url === STUB_DISPATCH_URL && sha256Hex(dispatch.body) === header.requestDigest;
+}
+
 type Spend = { kind: "llm"; nativeSessionId: string; headerEventId: string } |
   { kind: "tool"; nativeSessionId: string; toolToken: string; callId: string; actionClass: ToolExecution["actionClass"] };
 
@@ -69,7 +81,7 @@ function reserve(workspace: string, spend: Spend, agentId?: string, dispatch?: N
       if (!budget) throw new NativeBudgetRefusal("no signed budget applies to this native agent");
       const now = Date.now();
       const usage = projectBudgetUsage(rows, owner, now);
-      let usd: ReturnType<typeof nativeUsdReservation> | undefined;
+      let usd: ReturnType<typeof nativeUsdReservation> | { usdExposure: typeof LOCAL_STUB_USD_EXPOSURE } | undefined;
       if (spend.kind === "tool") {
         const limit = budget.daily.maxToolExecutes[spend.actionClass];
         if (limit !== undefined && usage.daily.toolExecutes[spend.actionClass] + usage.daily.toolPending[spend.actionClass] >= limit) {
@@ -85,12 +97,15 @@ function reserve(workspace: string, spend: Spend, agentId?: string, dispatch?: N
         if (usage.daily.llmTokens >= budget.daily.maxLlmTokens || usage.minute.llmTokens >= budget.perMinute.maxLlmTokens) {
           throw new NativeBudgetRefusal("native model token budget exhausted");
         }
-        if (budget.daily.maxCostUsd !== null) {
+        if (budget.daily.maxCostUsd !== null && localStubDispatch(header?.meta_json, dispatch)) usd = { usdExposure: LOCAL_STUB_USD_EXPOSURE };
+        else if (budget.daily.maxCostUsd !== null) {
           if (usage.daily.llmUnreservedCostRequests > 0) throw new NativeBudgetRefusal("USD exposure is unknown for a prior dispatch without a price reservation");
           if (!header) throw new NativeBudgetRefusal("USD reservation has no matching request header");
-          try { usd = nativeUsdReservation(budget, header.meta_json, dispatch, now); }
+          let bound: ReturnType<typeof nativeUsdReservation>;
+          try { bound = nativeUsdReservation(budget, header.meta_json, dispatch, now); }
           catch (error) { throw new NativeBudgetRefusal(error instanceof Error ? error.message : "USD request bound is unavailable"); }
-          if (BigInt(usage.daily.llmBudgetCostUnits) + nativeUsdUnits(usd.reservedCostUsd) > nativeUsdUnits(budget.daily.maxCostUsd, false)) throw new NativeBudgetRefusal("USD budget exhausted by measured spend plus request reservations");
+          usd = bound;
+          if (BigInt(usage.daily.llmBudgetCostUnits) + nativeUsdUnits(bound.reservedCostUsd) > nativeUsdUnits(budget.daily.maxCostUsd, false)) throw new NativeBudgetRefusal("USD budget exhausted by measured spend plus request reservations");
         }
       }
       const sessionId = `native-budget-${randomUUID()}`;

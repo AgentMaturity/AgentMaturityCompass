@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A4 Forge (preview) — Agent Maturity Compass</title>
+<meta name="description" content="A4 Forge walks one AI agent from a written brief to a recorded deployment in four stages, Aspire, Assemble, Adapt and Activate, and people you name approve each one. A preview, in the current source build only. Every record is signed and self-reported.">
+<link rel="canonical" href="https://agentmaturity.co/a4.html">
+<link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="brand.css">
+<style>
+:root{--bg:#0a0a0a;--card:#111111;--card2:#1a1a1a;--text:#fff;--muted:#a0a0a0;--accent:#4AEF79;--border:rgba(255,255,255,.1);--amber:#f59e0b;--mono:var(--amc-font-mono)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--amc-font-sans);background:var(--bg);color:var(--text);line-height:1.7}
+a{color:var(--accent)}
+.w{max-width:880px;margin:0 auto;padding:0 1.25rem}
+nav{border-bottom:1px solid var(--border);padding:1rem 0;background:rgba(10,10,10,.95);position:sticky;top:0;z-index:100}
+nav .w{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+nav a{text-decoration:none}
+nav a.logo{font-family:var(--mono);font-weight:700;color:var(--text)}
+nav a.logo span{color:var(--muted);font-weight:400;font-size:.9rem}
+nav .links{display:flex;gap:1.25rem;font-size:.9rem;flex-wrap:wrap}
+header.hero{padding:3.5rem 0 2.5rem;border-bottom:1px solid var(--border)}
+.hero h1{font-size:2.1rem;line-height:1.2;margin-bottom:.75rem}
+.hero h1 span{color:var(--accent)}
+.hero p.lead{font-size:1.1rem;color:#e0e0e0;max-width:700px}
+.labels{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.25rem;list-style:none}
+.labels li{font-family:var(--mono);font-size:.75rem;font-weight:700;padding:.25rem .6rem;border-radius:4px;border:1px solid rgba(74,239,121,.35);color:var(--accent);background:rgba(74,239,121,.06)}
+.labels li.warn{border-color:rgba(245,158,11,.45);color:var(--amber);background:rgba(245,158,11,.06)}
+section{padding:2.75rem 0;border-bottom:1px solid var(--border)}
+h2{font-size:1.4rem;margin-bottom:1rem}
+h3{font-size:1.1rem;margin-bottom:.4rem}
+p+p,p+ul,ul+p{margin-top:.75rem}
+ul.plain{padding-left:1.2rem}
+ul.plain li{margin:.35rem 0}
+.muted{color:var(--muted)}
+code{font-family:var(--mono);font-size:.88em;background:#1d1d1d;padding:.1rem .35rem;border-radius:4px;overflow-wrap:anywhere}
+.diagram{margin:1.5rem auto 0;max-width:480px}
+.diagram svg{width:100%;height:auto;display:block}
+.diagram .box{fill:var(--card2);stroke:rgba(74,239,121,.55);stroke-width:1.5}
+.diagram .end{fill:var(--card);stroke:rgba(255,255,255,.25);stroke-width:1.2;stroke-dasharray:4 3}
+.diagram .gate{fill:var(--amber)}
+.diagram .line{stroke:rgba(255,255,255,.45);stroke-width:1.5;fill:none}
+.diagram .chain{stroke:var(--accent);stroke-width:2;stroke-dasharray:2 5}
+.diagram text{fill:var(--text);font-family:var(--amc-font-sans);font-size:14px}
+.diagram text.k{fill:var(--accent);font-family:var(--amc-font-mono);font-size:12px;font-weight:700}
+.diagram text.s{fill:var(--muted);font-size:12px}
+.diagram text.t{font-size:17px;font-weight:700}
+.stages{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:1rem;margin-top:1.25rem}
+.stage{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.25rem}
+.stage .num{font-family:var(--mono);font-size:.75rem;color:var(--accent);font-weight:700;letter-spacing:.04em}
+.stage dl{margin-top:.6rem}
+.stage dt{font-weight:600;font-size:.85rem;color:var(--muted);margin-top:.6rem}
+.stage dd{font-size:.95rem}
+.cmd{background:var(--card);color:#e8e8e8;border:1px solid var(--border);border-radius:6px;padding:1rem 1.1rem;font-family:var(--mono);font-size:.82rem;line-height:1.75;margin:1rem 0;overflow-x:auto;white-space:pre}
+.cmd .c{color:var(--muted)}
+table{width:100%;border-collapse:collapse;margin-top:1rem;font-size:.92rem}
+th,td{text-align:left;padding:.55rem .6rem;border-bottom:1px solid var(--border);vertical-align:top}
+th{color:var(--accent);font-weight:600}
+.table-wrap{overflow-x:auto}
+details{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:.8rem 1rem;margin:.6rem 0}
+summary{cursor:pointer;font-weight:600}
+details p{margin-top:.6rem}
+.note{border-left:3px solid var(--amber);padding:.6rem 1rem;background:rgba(245,158,11,.05);margin-top:1rem}
+footer{padding:2rem 0;color:var(--muted);font-size:.85rem;text-align:center}
+@media(max-width:600px){.hero h1{font-size:1.6rem}.cmd{font-size:.76rem}}
+</style>
+<style id="skip-link-style">
+.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px var(--amc-font-sans);text-decoration:none}
+.skip-link:focus,.skip-link:focus-visible{left:12px}
+:where(a,button,input,select,textarea,summary,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
+</style>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to content</a>
+<nav aria-label="Site">
+<div class="w">
+  <a href="index.html" class="logo">amc<span style="color:var(--accent)">_</span> <span>/ a4 forge</span></a>
+  <div class="links">
+    <a href="index.html">Home</a>
+    <a href="docs/#A4_FORGE">Guide</a>
+    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
+  </div>
+</div>
+</nav>
+
+<main id="main-content" tabindex="-1">
+<header class="hero">
+<div class="w">
+  <h1>A4 Forge <span>(preview)</span></h1>
+  <p class="lead">A4 Forge walks one AI agent from a written brief to a recorded deployment in four stages: Aspire, Assemble, Adapt and Activate. A stage moves on only when the people you name approve the exact version in front of them.</p>
+  <ul class="labels" aria-label="Status">
+    <li class="warn">Preview</li>
+    <li class="warn">Current source build only, not in the published 1.1.1 release</li>
+    <li class="warn">Off unless AMC_A4_PREVIEW=1</li>
+    <li>Every record signed and self-reported</li>
+  </ul>
+</div>
+</header>
+
+<section aria-labelledby="who">
+<div class="w">
+  <h2 id="who">Who it is for</h2>
+  <p>Teams in large companies and regulated industries who must later show how an agent was made: who asked for it, what it should and should never do, who approved each step, exactly which version they approved, and what the operator says was deployed.</p>
+  <p>It does not score or judge the agent. AMC's score is a separate feature. A4 keeps the record of how the agent was built. It never says the agent is safe, correct or lawful.</p>
+  <figure class="diagram">
+    <svg viewBox="0 0 480 640" role="img" aria-labelledby="dg-title dg-desc" xmlns="http://www.w3.org/2000/svg">
+      <title id="dg-title">The four A4 stages and their gates</title>
+      <desc id="dg-desc">A brief enters Aspire. Each stage, Aspire, Assemble, Adapt and Activate, has a direction gate before its build and a completion gate after it; passing the completion gate opens the next stage. Activate ends in a recorded deployment, which in version 1 is only a same-host restart of the Studio that built the agent. A dotted line beside all four stages marks the one signed, hash-chained project record that every step is written to.</desc>
+      <line class="chain" x1="24" y1="70" x2="24" y2="560"/>
+      <text class="s" x="34" y="600">signed, hash-chained project record</text>
+      <rect class="end" x="140" y="10" width="300" height="40" rx="6"/>
+      <text x="290" y="35" text-anchor="middle">Your brief: people's answers</text>
+      <path class="line" d="M290 50 V70"/>
+      <g>
+        <rect class="box" x="60" y="70" width="380" height="100" rx="8"/>
+        <text class="k" x="80" y="96">01</text><text class="t" x="108" y="97">Aspire</text><text class="s" x="190" y="97">the approved brief</text>
+        <polygon class="gate" points="88,122 96,130 88,138 80,130"/><text x="104" y="135">direction gate</text>
+        <polygon class="gate" points="258,122 266,130 258,138 250,130"/><text x="274" y="135">completion gate</text>
+        <text class="s" x="80" y="160">before the build · after the review</text>
+      </g>
+      <path class="line" d="M250 170 V190"/>
+      <g>
+        <rect class="box" x="60" y="190" width="380" height="100" rx="8"/>
+        <text class="k" x="80" y="216">02</text><text class="t" x="108" y="217">Assemble</text><text class="s" x="208" y="217">the built agent</text>
+        <polygon class="gate" points="88,242 96,250 88,258 80,250"/><text x="104" y="255">direction gate</text>
+        <polygon class="gate" points="258,242 266,250 258,258 250,250"/><text x="274" y="255">completion gate</text>
+        <text class="s" x="80" y="280">2 approvers to complete</text>
+      </g>
+      <path class="line" d="M250 290 V310"/>
+      <g>
+        <rect class="box" x="60" y="310" width="380" height="100" rx="8"/>
+        <text class="k" x="80" y="336">03</text><text class="t" x="108" y="337">Adapt</text><text class="s" x="180" y="337">the agent's control plan</text>
+        <polygon class="gate" points="88,362 96,370 88,378 80,370"/><text x="104" y="375">direction gate</text>
+        <polygon class="gate" points="258,362 266,370 258,378 250,370"/><text x="274" y="375">completion gate</text>
+        <text class="s" x="80" y="400">2 approvers, one an auditor</text>
+      </g>
+      <path class="line" d="M250 410 V430"/>
+      <g>
+        <rect class="box" x="60" y="430" width="380" height="100" rx="8"/>
+        <text class="k" x="80" y="456">04</text><text class="t" x="108" y="457">Activate</text><text class="s" x="200" y="457">release and receipts</text>
+        <polygon class="gate" points="88,482 96,490 88,498 80,490"/><text x="104" y="495">release approval</text>
+        <polygon class="gate" points="258,482 266,490 258,498 250,490"/><text x="274" y="495">completion gate</text>
+        <text class="s" x="80" y="520">AMC prepares; the operator deploys</text>
+      </g>
+      <path class="line" d="M250 530 V550"/>
+      <rect class="end" x="140" y="550" width="300" height="40" rx="6"/>
+      <text x="290" y="575" text-anchor="middle">Recorded deployment</text>
+      <text class="s" x="290" y="625" text-anchor="middle">v1: same-host restart only; real targets are P2-40</text>
+    </svg>
+  </figure>
+</div>
+</section>
+
+<section aria-labelledby="stages">
+<div class="w">
+  <h2 id="stages">The four stages</h2>
+  <p>Every stage runs the same eight steps. You answer its questions. AMC writes down how it understood them, and you confirm. AMC explains the choices in plain terms and proposes a plan. People approve the <strong>direction</strong>. AMC builds. Someone reviews. People approve <strong>completion</strong>, which opens the next stage. If you change an answer, AMC makes a new version, and any open approval (gate) on the old one lapses. The approval counts below are AMC's default rules.</p>
+  <div class="stages">
+    <article class="stage">
+      <p class="num">01 · CONCEPTUALIZATION</p>
+      <h3>Aspire</h3>
+      <dl>
+        <dt>What you do</dt>
+        <dd>Answer questions about the agent: the problem, audience, goals, success metrics, constraints, actions it must never take, risk tier and markets.</dd>
+        <dt>What AMC records</dt>
+        <dd>Your answers, AMC's reading of them as you confirmed it, and the brief as a numbered version. Its build writes, offline, a map of the agent's context, a quality plan and a draft of the value it promises. A guess stays "proposed" until the running system writes a record that settles it.</dd>
+        <dt>Gates</dt>
+        <dd>Direction and completion: one approval each, from someone who did not write it or ask for it.</dd>
+      </dl>
+    </article>
+    <article class="stage">
+      <p class="num">02 · CREATION</p>
+      <h3>Assemble</h3>
+      <dl>
+        <dt>What you do</dt>
+        <dd>Say what the agent must do, how much autonomy it gets (advise only, or act with approval using the signed workspace tools), which tools and connectors, which model provider builds it, and the engineering path: native in Studio, or an external framework.</dd>
+        <dt>What AMC records</dt>
+        <dd>The build plan, one limited build session in Studio that you close and check before review, and the records it wrote while running. On the offline stub provider, a stand-in model, the record says "tool pipeline observed on a stub model; agent behaviour not evaluated".</dd>
+        <dt>Gates</dt>
+        <dd>Direction: one approval. Completion: two different approvers, neither of whom built it. Then a separate approval puts the reviewed parts into use as the agent's active setup.</dd>
+      </dl>
+    </article>
+    <article class="stage">
+      <p class="num">03 · CONTEXTUALIZATION</p>
+      <h3>Adapt</h3>
+      <dl>
+        <dt>What you do</dt>
+        <dd>Say who the agent serves, its languages, legal regions, sector, kinds of data, how long data is kept, who processes it and where it will run. Facts you do not know stay unknown. AMC never guesses them.</dd>
+        <dt>What AMC records</dt>
+        <dd>A plan of controls built for those facts, which rules apply and which are still open, a test run of the agent's context on the stub provider, and a count of rules met, never a percentage. Its legal records are experimental: an AI agent drafted them, nobody has fetched or legally reviewed the citations, and no named expert has approved them.</dd>
+        <dt>Gates</dt>
+        <dd>Direction: two approvals. Completion: two approvals, one from a workspace auditor. That approval only acknowledges the work; it is not an expert review. An owner may mark open rules as out of scope, with a reason. They still count as open.</dd>
+      </dl>
+    </article>
+    <article class="stage">
+      <p class="num">04 · COMMERCIALIZATION</p>
+      <h3>Activate</h3>
+      <dl>
+        <dt>What you do</dt>
+        <dd>Choose the target (Docker Compose or Helm), the address the deployed Studio answers on, what access it gets and for how long, routes, models, limits on requests and tokens, and how you expect to update, watch and roll back.</dd>
+        <dt>What AMC records</dt>
+        <dd>A release draft. After approval: a signed release package with Compose or Helm files for your operator to run, the operator's signed note that it was deployed (a receipt), AMC's own separate check that the address answers, rollbacks and value claims. AMC never deploys.</dd>
+        <dt>Gates</dt>
+        <dd>Release approval (the direction gate) and completion: two different approvers each. The release itself needs its own approval. Today AMC refuses the release approval unless the Studio itself runs under Compose or Helm (see below).</dd>
+      </dl>
+    </article>
+  </div>
+</div>
+</section>
+
+<section aria-labelledby="result">
+<div class="w">
+  <h2 id="result">What you get at the end</h2>
+  <ul class="plain">
+    <li>One project record per agent in your workspace log (ledger), each entry linked to the one before it. It holds every answer, version, approval request, decision, build, review and change. Each decision is tied to a fingerprint (digest) of exactly what was approved.</li>
+    <li>The approved brief, build plan, compiled control plan and (when Activate can run) the signed release package, deployment plan and the operator's receipts.</li>
+    <li>A record you can check yourself. <code>amc a4 verify</code> recomputes every fingerprint and signature against a trust list you choose. <code>amc a4 export</code> writes the records into a signed <code>.amcbundle</code> file that someone without your keys can check.</li>
+  </ul>
+  <p class="note">Any laptop install runs Studio outside Compose or Helm. There, a project ends after Adapt: Activate records its release draft and then refuses the release approval with <code>A4_NOT_READY: not ready: deployment.same_host</code>. Installing a package into another workspace is planned (P2-40).</p>
+</div>
+</section>
+
+<section aria-labelledby="try">
+<div class="w">
+  <h2 id="try">How to try it today</h2>
+  <p>A4 Forge is only in the current source build. Install AMC <a href="https://github.com/AgentMaturity/AgentMaturityCompass#from-source">from source</a>. The published 1.1.1 release (npm, GitHub, the install scripts) does not have it. It is off unless you set <code>AMC_A4_PREVIEW=1</code>; without it the A4 API answers 404 and every <code>amc a4</code> command exits 1.</p>
+  <p>A running Studio keeps the settings it started with, so stop it and start it again with the flag:</p>
+<pre class="cmd"><span class="c"># in your workspace</span>
+amc down
+AMC_A4_PREVIEW=1 amc up
+
+<span class="c"># the first console login is an OWNER; add the people who will approve</span>
+amc user init --username &lt;you&gt;
+amc user add --username &lt;second&gt; --role OWNER,APPROVER
+amc user add --username &lt;third&gt; --role APPROVER,AUDITOR</pre>
+  <p>Sign in to the Compass Console at the address <code>amc up</code> prints. While the workspace has no project, Home shows a card &ldquo;Start an agent project&rdquo;; creating one needs a signed-in OWNER or OPERATOR. Name the project, or press <strong>Use an example</strong> to fill in a sample project. It is marked &ldquo;(sample)&rdquo; so the records show it is sample data.</p>
+  <p>Each project page opens with a <strong>What to do now</strong> panel. It shows the four stages, the current step, one sentence on what is needed, and one button that takes you to the right control or presses it (Studio checks every action again). Every empty answer field shows an example, and on Aspire, Assemble and Adapt <strong>Use an example</strong> fills the empty fields with answers marked &ldquo;(sample)&rdquo; that you can change before saving. While an approval is open, a <strong>Who must approve</strong> block shows how many different people must approve, the role they need, who may not approve (because they wrote, asked for or built it), who has approved so far, and the command that adds a person. At Activate on a laptop, the panel has no button and says this is where the preview stops on this Studio.</p>
+  <p>You run the stage steps in the console or through the API. The command line can read projects, approve, complete and check them:</p>
+<pre class="cmd">export AMC_A4_PREVIEW=1
+amc approvals login --username &lt;you&gt; --token-file &lt;new file&gt;
+amc a4 list
+amc a4 guide &lt;projectId&gt;      <span class="c"># next action, head seq, and the exact approve command per open gate</span>
+amc a4 members &lt;projectId&gt; --member LOCAL_USER:&lt;userId&gt; --project-role approver \
+  --session-token-file &lt;file&gt; --expect-head-seq &lt;n&gt;
+amc a4 approve --gate &lt;gateId&gt; --expect-gate-seq &lt;n&gt; --expect-binding-digest &lt;sha256&gt; \
+  --expect-readiness-digest &lt;sha256&gt; --reason "&lt;why&gt;" --session-token-file &lt;file&gt;
+amc a4 complete &lt;projectId&gt; --stage &lt;stage&gt; --gate &lt;gateId&gt; --expect-head-seq &lt;n&gt; \
+  --session-token-file &lt;file&gt;
+amc a4 verify &lt;projectId&gt; --allow-unpinned --allow-unanchored   <span class="c"># integrity only, exit 2</span>
+amc down</pre>
+  <p class="muted">Each approver runs <code>amc approvals login</code> with their own username and their own token file. A workspace APPROVER or AUDITOR can decide only after you add them to the project with <code>amc a4 members</code>. Add them before you ask for an approval, because changing members cancels open approvals. Approvals that put a change into use are opened and decided in Studio or the API; the command line cannot do that yet. Without your own trust list, <code>amc a4 verify</code> only checks that nothing changed and never says "trusted". It exits 2 only when you give every allow flag that applies. A new workspace needs both <code>--allow-unpinned</code> and <code>--allow-unanchored</code>; with one missing it exits 1 and names the missing flag.</p>
+  <p class="muted">These commands were run against the current source build on 14 November 2026 with three local users. Aspire, Assemble and Adapt completed; Activate stopped at its release approval as described above.</p>
+</div>
+</section>
+
+<section aria-labelledby="not-yet">
+<div class="w">
+  <h2 id="not-yet">What it does not do yet</h2>
+  <ul class="plain">
+    <li><strong>No claims checked by someone independent.</strong> That needs a record signed by someone outside the workspace whom the operator trusts (P2-24, P3-21). Until then every A4 claim is self-reported.</li>
+    <li><strong>No real deployment target.</strong> Version 1 records only a restart, on the same machine, of the Compose- or Helm-hosted Studio that built the agent (P2-40). Compose is documented but has not passed AMC's qualification checks. Helm passed them, but only locally. The image is pinned by tag, not by digest.</li>
+    <li><strong>No expert-reviewed regulation.</strong> Adapt's legal records stay experimental until a named expert approves them (D-08). Reporting deadlines are listed for reference, not enforced (P3-23).</li>
+    <li><strong>No test of how the agent behaves.</strong> A build on the stub provider shows the tools ran. It says nothing about how the agent behaves.</li>
+    <li><strong>No update enforcement.</strong> The release's update policy is signed and recorded; nothing enforces it yet (P2-34).</li>
+    <li><strong>Not every step is on the command line.</strong> Creating a project, the stage steps and approvals that put changes into use run in Studio or through the API.</li>
+  </ul>
+</div>
+</section>
+
+<section aria-labelledby="faq">
+<div class="w">
+  <h2 id="faq">Questions</h2>
+  <details>
+    <summary>Is my data sent anywhere?</summary>
+    <p>A4 itself makes one outside connection: at Activate, the owner's check, with no token, that the address in a deployment receipt answers. Its records stay in your workspace log. Free text that may hold personal data (personal context, free text in the brief, comments) is not kept in the log. It is encrypted in the project's own store, and the log keeps only a salted fingerprint. An owner can erase it by destroying the project key. That takes full effect once every older backup has been replaced.</p>
+    <p>The build session runs on the model provider you pick. The stub provider is offline. A hosted provider receives that session's prompts, as with any AMC task. Exports are not encrypted, so that a checker can recompute every fingerprint. Keep them under your control.</p>
+  </details>
+  <details>
+    <summary>What does a signature prove?</summary>
+    <p>Who wrote a record, and that it has not changed since. Never that what it says is true. Every record A4 writes is self-reported. To trust the signer, check the record against your own trust list of keys you chose in advance. Without one, <code>amc a4 verify</code> only checks that nothing changed.</p>
+  </details>
+  <details>
+    <summary>Who approves?</summary>
+    <p>The people you name in your workspace. Whoever wrote a version, asked for the approval or built the work cannot approve it, and every approver must be a different user. By default, Aspire's approvals and Assemble's direction need one approval. Assemble's completion and every Adapt and Activate approval need two, and for Adapt's completion one of them must have the AUDITOR role.</p>
+    <p>A second approver in the same workspace keeps duties apart, but is not an independent review. Every local user's key comes from the same workspace, so two local users do not prove two real people. A workspace with only one user may approve its own one-approval steps on a non-regulated project, and the record says so.</p>
+  </details>
+  <details>
+    <summary>Can I use my own model?</summary>
+    <p>For Assemble's build session, yes. Answer the provider question with <code>stub</code> or <code>provider:model</code>, the provider one of openai, openai-responses, anthropic, deepseek, gemini, gemini-audio or ollama. A4 records whether a provider is set up, never its credential. Adapt's context test always runs on the stub provider, and after a stub build, the readiness report lists model delivery as not evaluated.</p>
+  </details>
+  <p style="margin-top:1.25rem">The full reference, every error code and the API are in the <a href="docs/#A4_FORGE">A4 Forge guide</a>.</p>
+</div>
+</section>
+</main>
+
+<footer>
+<div class="w">
+  <p>A4 Forge is a preview. No A4 output states that an agent is safe, correct or lawful. <a href="index.html">Agent Maturity Compass</a> · MIT licensed</p>
+</div>
+</footer>
+</body>
+</html>

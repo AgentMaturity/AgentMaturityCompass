@@ -19,7 +19,7 @@ amc doctor --live-probes
 
 When the current directory does not contain an `.amc` workspace, the default command verifies the installed CLI and Node runtime. It reports `mode: "INSTALL"`, marks the absent workspace as informational, skips workspace signatures and Gateway checks that cannot exist yet, and exits zero when the installation is healthy.
 
-Run `amc` to initialize the workspace and generate its first evidence result.
+Run `amc` to initialize the workspace. In a terminal it then shows the start menu ("Just show my score" generates the first evidence result); elsewhere it generates that result directly. [Troubleshooting](TROUBLESHOOTING.md#first-run-problems) lists the first-run messages doctor does not cover.
 
 ### Workspace readiness
 
@@ -82,8 +82,7 @@ Doctor prints PASS/FAIL/WARN plus direct fix hints.
 ## Common fix flow
 
 ```bash
-amc up
-amc vault unlock
+amc up                 # in a terminal: offers the saved vault passphrase or asks for it
 amc fix-signatures
 amc adapters init
 amc adapters verify

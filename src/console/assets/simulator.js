@@ -31,7 +31,7 @@ async function main() {
 
   const planId = await resolvePlanId();
   if (!planId) {
-    root.innerHTML = card("Simulator", "<p class='muted'>No plan found. Create a mechanic plan first.</p>");
+    root.innerHTML = card("Simulator", "<p class='muted'>No upgrade plan yet. Create one on the Mechanic page first.</p>");
     return;
   }
 

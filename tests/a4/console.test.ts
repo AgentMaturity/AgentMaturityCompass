@@ -64,8 +64,10 @@ describe("previewNoticeHtml", () => {
     expect(html()).toContain("A running Studio keeps the environment it started with.");
     expect(html()).not.toMatch(/\son[a-z]+\s*=|javascript:/i);
   });
+  // First-run walk (2026-11-14): the page wraps the notice in a heading and what A4 is (a4Start.previewOffHtml).
   test("the A4 page renders it", () => {
-    expect(readFileSync("src/console/assets/a4.js", "utf8")).toContain("view.previewNoticeHtml()");
+    expect(readFileSync("src/console/assets/a4.js", "utf8")).toContain("start.previewOffHtml()");
+    expect(readFileSync("src/console/assets/a4Start.js", "utf8")).toContain("previewNoticeHtml()");
   });
 });
 

@@ -93,6 +93,10 @@ export function assertQuery(params: URLSearchParams, allowed: readonly string[])
   }
 }
 
+/** The value at `path` inside a parsed body, or undefined where any step is missing. */
+const getPath = (value: unknown, path: readonly PropertyKey[]): unknown =>
+  path.reduce<unknown>((node, key) => (node !== null && typeof node === "object" && Object.hasOwn(node, key) ? (node as Record<PropertyKey, unknown>)[key] : undefined), value);
+
 /**
  * A client value (body, path segment, query parameter) parsed against `schema`: 400 INPUT_INVALID on a mismatch. Any
  * other ZodError is a stored row that no longer parses, which sendA4Error reports as an integrity failure.
@@ -101,6 +105,13 @@ function parseInput<S extends z.ZodType>(schema: S, value: unknown, what = "body
   const parsed = schema.safeParse(value);
   if (parsed.success) return parsed.data;
   const issue = parsed.error.issues[0];
+  // A required field left out is named in a sentence, not as a type mismatch against undefined.
+  const missing = parsed.error.issues.filter((entry) => entry.code === "invalid_type" && entry.path.length > 0
+    && getPath(value, entry.path) === undefined).map((entry) => entry.path.join("."));
+  if (missing.length > 0) {
+    throw a4Fail(400, "INPUT_INVALID", `The ${what} is missing the required field${missing.length > 1 ? "s" : ""} ${missing.map((field) => `"${field}"`).join(", ")}: `
+      + "send it in the JSON body and try again.");
+  }
   throw a4Fail(400, "INPUT_INVALID", `Invalid A4 request: ${issue ? `${issue.path.join(".") || what}: ${issue.message}` : "schema mismatch"}`);
 }
 /** A stage named by a path segment or query parameter. */

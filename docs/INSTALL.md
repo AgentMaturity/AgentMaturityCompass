@@ -71,6 +71,10 @@ pnpm run build
 npm link            # makes `amc` available globally
 ```
 
+Then go to your project folder and type `amc`. In a terminal it shows the start menu (watch Claude Code or Codex, chat, open the console, or show the score); [Your first five minutes](FIRST_FIVE_MINUTES.md) walks through it.
+
+The vault passphrase that protects AMC's signing keys needs no setup step. Bare `amc` keeps it in `.amc/local-vault-passphrase` in that folder. `amc up`, `amc init` and `amc init --minimal`, in your own terminal, create one and remember it on this computer (the macOS Keychain, service `amc-vault`, or `~/.config/amc/vault-credentials.json`) without printing it, and say where it is kept. `amc vault passphrase` sets one you know; `amc vault forget` removes the remembered copy. Only where nothing keeps it, for example with `AMC_VAULT_REMEMBER=0`, in CI, or `amc init --minimal` without a terminal, is it printed once, to save then.
+
 AMC is a pnpm workspace (`packageManager` pins the version). `npm ci` cannot resolve the `workspace:*`
 protocol the vendored `@amc/*` packages use, so it fails here by design.
 `pnpm run build` compiles the CLI; the vendored packages and `@amc/core` ship
@@ -110,7 +114,7 @@ npm run package:desktop
 npm run package:desktop:verify
 ```
 
-Archives are written to `dist/installers/archives/` and install AMC from the included AMC npm tarball. The macOS and Windows archives also include the `Agent Maturity Compass Studio` launcher app. It verifies the included package digest, installs that exact build into a version-pinned per-user runtime, and starts the loopback-only local demo from a separate persistent `studio-workspace` directory. The native macOS build uses a native WebKit window; Windows uses the system browser. Neither launcher falls back to a global `amc` installation or bundles a browser runtime. npm still needs access to AMC's public runtime dependencies unless they are already cached or mirrored.
+Archives are written to `dist/installers/archives/` and install AMC from the included AMC npm tarball. The macOS and Windows archives also include the `Agent Maturity Compass Studio` launcher app. It verifies the included package digest, installs that exact build into a version-pinned per-user runtime, and starts a loopback-only local Studio. The macOS app (native WebKit window) asks on first launch whether to set up your own workspace or try the demo. Your own workspace gets a vault passphrase and a console password kept in the macOS Keychain (services `amc-vault` and `amc-console`), and the app signs you in as its owner. It runs on its own ports (console 3232, gateway 3230 and 3231), so a terminal `amc up` keeps the defaults. The Windows launcher opens the view-only demo from a separate persistent `studio-workspace` directory in the system browser. Neither launcher falls back to a global `amc` installation or bundles a browser runtime. npm still needs access to AMC's public runtime dependencies unless they are already cached or mirrored.
 
 Without root, the macOS and Linux archive installer takes the same `AMC_INSTALL_PREFIX`: `AMC_INSTALL_PREFIX="$HOME/.local" sh ./install.sh`, then `export PATH="$HOME/.local/bin:$PATH"`. It stops before npm runs when the global npm folder is not writable; `sudo sh ./install.sh` is the last resort, because it runs the package postinstall and the native build as root.
 

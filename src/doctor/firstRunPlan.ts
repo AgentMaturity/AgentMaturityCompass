@@ -29,26 +29,23 @@ export const STUB_FIRST_TURN_COMMAND =
 /** The prefix a doctor fixHint uses when it names one copyable command. */
 const RUN_PREFIX = "Run: ";
 
+/** The verify command that pins the monitor key; the last, optional step `amc init` prints. */
+export const PINNED_VERIFY_COMMAND = "amc agent-loop verify <session-id> --expect-monitor <monitor sha256>";
+
 /**
- * The three operator actions after `amc init`, in order. `amc init` already
- * signs tools.yaml; the runtime firewall policy is the precondition it leaves
- * open, and every WORKSPACE tool call is denied (`missing-policy`) until it is
- * signed. The keyless stub turn uses the echo demonstration seam, which the
- * policy does not govern; it demonstrates signed recording and verification.
+ * What `amc init` prints next, plain steps first: the start menu, a keyless demo chat, then the Runtime Firewall
+ * policy (every WORKSPACE tool call is denied, `missing-policy`, until it is signed). The monitor-key pin is last and
+ * optional: without it `amc agent-loop verify` still checks integrity but says UNANCHORED and exits 1.
+ * STUB_FIRST_TURN_COMMAND is the scripted (non-interactive) form of the same keyless demo turn.
  */
 export function firstRunActions(): readonly FirstRunAction[] {
   return [
+    { cmd: "amc", desc: "Start here: pick what to do (watch Claude Code or Codex, chat with a model, or open the console)." },
+    { cmd: "amc agent-loop chat --provider stub", desc: "Try a demo chat with no account or key. The replies are canned; every turn is recorded in a signed session log." },
+    { cmd: "amc firewall enable", desc: "Before AMC's own agent may read or change files here, sign the policy for workspace tools. Until then those tool calls are refused." },
     {
-      cmd: "amc firewall enable",
-      desc: "Create and sign the Runtime Firewall policy. Until it exists every workspace tool call (--tools workspace: fs.read, fs.write, bash) is denied (missing-policy). Idempotent; explains what it wrote."
-    },
-    {
-      cmd: STUB_FIRST_TURN_COMMAND,
-      desc: "Run the first turn keyless: the stub provider records a canned response through the signed session log (no real model answer). Its echo tool is a demonstration seam outside the firewall and allowlist; workspace tools are what the signed policy governs."
-    },
-    {
-      cmd: "amc agent-loop verify <session-id> --expect-monitor <monitor sha256>",
-      desc: "Verify the recorded evidence of that turn; the run prints the session id. Pin the monitor key with the sha256 of .amc/keys/monitor_ed25519.pub, recorded outside the workspace after init; without the pin the verdict is UNANCHORED and exits 1. Verification checks integrity, not answer quality."
+      cmd: PINNED_VERIFY_COMMAND,
+      desc: "Optional extra protection: copy the sha256 of .amc/keys/monitor_ed25519.pub somewhere outside this folder now, then pass it when you check a session, so a swapped key is caught. Without it the check says UNANCHORED."
     }
   ];
 }

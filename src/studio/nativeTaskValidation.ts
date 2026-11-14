@@ -16,7 +16,7 @@ export const nativeTaskValidationSelectionSchema = z.object({
 
 /** Operator file only. Public inspection never returns commands, file paths or output. */
 export function inspectNativeTaskValidation(path: string | undefined, demo: boolean): NativeTaskValidationConfiguration {
-  if (demo) return { ready: false, configSha256: null, checks: [], message: "Sign in to select public validation checks. Demo tasks cannot execute checks." };
+  if (demo) return { ready: false, configSha256: null, checks: [], message: "Public validation checks are not available in the demo workspace: demo tasks run with no tools, and checks need signed workspace bash. Use a workspace you operate to select them." };
   if (!path) return { ready: false, configSha256: null, checks: [], message: "No public checks are configured by the Studio operator. Validation will be not requested." };
   try {
     const loaded = loadNativeValidationConfiguration(path);

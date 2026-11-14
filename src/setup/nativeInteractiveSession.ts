@@ -10,7 +10,7 @@ import { isActionClass } from "../governor/actionCatalog.js";
 import { approvalModeGatedClasses, parseApprovalMode } from "../approvals/approvalModes.js";
 import { reviewNativeMcpConfigurations, NativeMcpConfigError } from "./nativeMcpConfig.js";
 import { mergeScopedMcpSelection } from "../mcp/mcpScopes.js";
-import { inspectNativeFirstUse, NATIVE_FIRST_USE_PROVIDER_LIST, renderNativeFirstUseGuide, renderNativeGuideCommand, renderNativeVerifyHint } from "./nativeFirstUseGuide.js";
+import { renderNativeFirstUseGuide, renderNativeGuideCommand, renderNativeVerifyHint } from "./nativeFirstUseGuide.js";
 import { resolveNativeChatProfile, nativeChatProfileArgv, assertNativeChatProfileCurrent, type NativeChatProfileOptions } from "./nativeChatProfile.js";
 import { createNativeInteractiveApprovals } from "./nativeInteractiveApprovals.js";
 import { createNativeInteractiveAskUser } from "./nativeInteractiveAskUser.js";
@@ -29,6 +29,10 @@ import { renderNativeInteractiveToolResults } from "./nativeInteractiveResults.j
 import { escapeTerminalControls } from "../tools/builtin/askUserTool.js";
 import { listNativeQueuedSubmissions, withdrawNativeQueuedSubmission } from "./nativeInteractiveWithdraw.js";
 import { nativeUnknownUsageNotice } from "../budgets/nativeBudgetAdmission.js";
+import { VAULT_LOCKED_PREFIX } from "../vault/vaultLockedError.js";
+import { chatVaultPassphrase } from "./nativeChatVault.js";
+import { chatSetupDeps } from "./nativeChatSetupIo.js";
+import { resolveChatSetup } from "./nativeChatSetup.js";
 
 export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly validationConfig?: string;
@@ -72,10 +76,16 @@ export interface NativeChatIo {
   readonly fail: () => void;
 }
 
+/** The per-session detail blocks: usage and cost, diagnostics, and the public validation status. */
+function sessionDetailLines(summary: NativeChatChildSummary): string[] {
+  return [renderNativeRunUsage(summary.usage, { requestWindow: "latest" }), renderNativeRunDiagnostics(summary.diagnostics),
+    `Public task validation: ${summary.validation?.status ?? "unavailable"}. Passing selected checks does not guarantee correctness.`];
+}
+
 /** Interactive input only; every turn runs through the existing CLI boundary. */
 export async function runNativeInteractiveSession(options: NativeChatOptions, io: NativeChatIo): Promise<void> {
   if (!process.stdin.isTTY || !process.stdout.isTTY) {
-    io.error("Interactive chat requires a terminal. Use amc agent-loop guide --json for setup or agent-loop run for a scripted turn.");
+    io.error("Interactive chat requires a terminal. Use amc agent-loop guide --json for setup or amc agent-loop run for a scripted turn.");
     io.fail();
     return;
   }
@@ -103,6 +113,11 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     const catalog = buildSkillCatalog(workspaceSkillRoots(cwd, options.credentialsHome));
     return new Set([...catalog.skills, ...catalog.problems].map(skill => skill.name));
   };
+  // Asked before the line editor exists: a readline left on stdin would also take the keys of a masked question (the
+  // credential, the vault passphrase) into its line and history.
+  const setup = await resolveChatSetup({ ...options, workspace: cwd }, chatSetupDeps(io));
+  if (setup === null) return;
+  const vaultPassphrase = await chatVaultPassphrase(cwd);
   let extensions: NativeExtensionManager;
   try {
     extensions = loadNativeExtensions({ workspace: cwd, manifestPaths: options.extension, expectedDigests: options.extensionPin,
@@ -156,7 +171,8 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
   // No shell, alternate runner, approval bypass, or background session writer.
   // `display.stdin` is written to the child's stdin and closed (the turn prompt: `run -` reads it, so the entered text
   // is never an argv word and a bare "-" is a prompt, not a flag); without it the child's stdin is closed from the start.
-  const execute = (args: readonly string[], display: { interactiveApprovals?: boolean; askUser?: boolean; stream?: boolean; stdin?: string } = {}): Promise<{ code: number | null; stdout: string; truncated: boolean; cancelRequested: boolean }> => new Promise(resolveResult => {
+  const execute = (args: readonly string[], display: { interactiveApprovals?: boolean; askUser?: boolean; stream?: boolean; stdin?: string } = {}): Promise<{ code: number | null; stdout: string; truncated: boolean; cancelRequested: boolean; vaultLocked: boolean }> => new Promise(resolveResult => {
+    let vaultLocked = false;
     let stdout = "";
     let truncated = false;
     let cancelRequested = false;
@@ -166,13 +182,13 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     let running: ChildProcess;
     try {
       // Consent is recorded at chat admission. Later turns must never approve a changed workspace themselves.
-      const env = { ...process.env };
+      const env: NodeJS.ProcessEnv = { ...process.env, ...(vaultPassphrase === null ? {} : { AMC_VAULT_PASSPHRASE: vaultPassphrase }) };
       if (args[0] === "agent-loop" && args[1] === "run") delete env[TRUST_WORKSPACE_ENV];
       running = spawn(process.execPath, [...process.execArgv, resolve(entry), ...(selectedAgentId === null ? [] : ["--agent", selectedAgentId]), ...args], {
         cwd, env, shell: false,
         stdio: [display.stdin === undefined ? "ignore" : "pipe", "pipe", "pipe", ...(ipc ? ["ipc" as const] : [])]
       });
-    } catch { io.error("Could not start the AMC command."); resolveResult({ code: 1, stdout, truncated, cancelRequested }); return; }
+    } catch { io.error("Could not start the AMC command."); resolveResult({ code: 1, stdout, truncated, cancelRequested, vaultLocked }); return; }
     child = running;
     if (display.stdin !== undefined) {
       // A child that exits before reading (a refused flag) closes the pipe; that EPIPE is not this turn's outcome.
@@ -208,6 +224,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       stdout += text;
     });
     running.stderr!.on("data", (text: string) => {
+      if (text.includes(VAULT_LOCKED_PREFIX)) vaultLocked = true;
       if (display.stream) { process.stderr.write(text); previewOpen = !text.endsWith("\n"); }
       else io.error(text.trimEnd());
     });
@@ -224,7 +241,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
           if (previewOpen) process.stderr.write("\n");
           if (child === running) child = null;
           if (cancelActiveCommand === requestCancel) cancelActiveCommand = null;
-          resolveResult({ code: finalCode, stdout, truncated, cancelRequested });
+          resolveResult({ code: finalCode, stdout, truncated, cancelRequested, vaultLocked });
         }
       })();
     });
@@ -236,20 +253,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
   let unresolvedOutcome = false;
   let selectedHistory: NativeInteractiveSessionSummary | null = null;
   try {
-    let provider = options.provider;
-    if (provider === undefined) {
-      io.log(`Choose ${NATIVE_FIRST_USE_PROVIDER_LIST.replace(/, or stub$/, "")} for a real model task; choose stub for a local recording demonstration.`);
-      const choice = await question("Provider (no default): ");
-      if (choice === null) return;
-      provider = choice.trim();
-    }
-    let model = options.model;
-    if (provider !== "stub" && !model?.trim()) {
-      const choice = await question("Model ID you can access (no default): ");
-      if (choice === null) return;
-      model = choice.trim();
-    }
-    const guide = await inspectNativeFirstUse({ ...options, provider, model });
+    const { provider, guide } = setup;
     if (guide.status !== "ready" || guide.nextAction === null) {
       io.log(renderNativeFirstUseGuide(guide));
       io.fail();
@@ -560,9 +564,10 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         ...(forkFrom !== null ? ["--fork-from", forkFrom] : sessionId === null ? [] : ["--session", sessionId]), "--", "-"],
         { interactiveApprovals: approvalClass !== undefined || modeGated, askUser: tools === "workspace", stream: true, stdin: prompt });
       const result = parseNativeChatResult({ stdout: outcome.stdout, truncated: outcome.truncated,
-        requestedSessionId: priorSession, forkFrom: pendingFork, previousSummary });
+        requestedSessionId: priorSession, forkFrom: pendingFork, previousSummary, childVaultLocked: outcome.vaultLocked });
       if (!result.ok) {
         unresolvedOutcome = true;
+        if (result.code === "VAULT_LOCKED") { io.error(result.message); io.fail(); break; }
         io.error(`${result.code}: ${result.message} Chat has stopped without guessing a session ID or retrying the task. Inspect AMC's session evidence before continuing.`);
         io.fail(); break;
       }
@@ -578,9 +583,10 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       previousSummary = summary;
       const ending = freshEndings.at(-1);
       io.log(`Session ${sessionId} · driver ${summary.driverStatus}${ending?.reason ? ` · recorded turn ending ${ending.reason}` : ""}. This summary is not an evidence-verification result.`);
-      io.log(renderNativeRunUsage(summary.usage, { requestWindow: "latest" }));
-      io.log(renderNativeRunDiagnostics(summary.diagnostics));
-      io.log(`Public task validation: ${summary.validation?.status ?? "unavailable"}. Passing selected checks does not guarantee correctness.`);
+      // An ordinary finished turn shows the reply and one line; the usage, diagnostics and validation blocks print for a
+      // turn that did not finish cleanly, and once for the whole session on exit.
+      if (outcome.code === 0 && ending?.reason === "complete" && summary.driverStatus !== "failed") io.log("Usage, cost and diagnostics for this session print when you exit.");
+      else for (const line of sessionDetailLines(summary)) io.log(line);
       if (tools === "workspace") for (const line of renderSessionLists(cwd, sessionId)) io.log(line);
       // Exit codes 3-6 (cancelled, bounded, blocked, side effects unsettled; src/cli/agentLoopOutputOptions.ts) are
       // recorded outcomes, not failed turns. 3-5 show in the recorded ending below; 6 is a `complete` ending whose
@@ -604,6 +610,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       }
     }
     if (sessionId !== null) {
+      if (previousSummary !== null) for (const line of sessionDetailLines(previousSummary)) io.log(line);
       io.log(`Known session reference: ${sessionId}. A resume attempt will verify the evidence before acquiring its writer.`);
       io.log("Resume in this workspace:\n  " + renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "chat", ...routeBaseArgs, ...chatProfileArgs, ...nativeExtensionRunArgv(extensions), "--session", sessionId] }));
       io.log("Verify recorded evidence:\n  " + renderNativeVerifyHint(cwd, sessionId));

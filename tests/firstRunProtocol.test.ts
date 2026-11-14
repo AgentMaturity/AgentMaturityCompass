@@ -49,7 +49,7 @@ describe("first-run protocol against the built CLI", () => {
   test("registers the built-CLI cases only when dist/cli.js exists, and the plan names the three actions", () => {
     expect(testWithDist === undefined).toBe(!distPresent);
     const actions = firstRunActions();
-    expect(actions.map((action) => action.cmd)).toEqual(["amc firewall enable", STUB_FIRST_TURN_COMMAND,
+    expect(actions.map((action) => action.cmd)).toEqual(["amc", "amc agent-loop chat --provider stub", "amc firewall enable",
       "amc agent-loop verify <session-id> --expect-monitor <monitor sha256>"]);
     expect(STUB_FIRST_TURN_COMMAND).toContain("--provider stub");
   });
@@ -148,12 +148,13 @@ describe("first-run protocol against the built CLI", () => {
     expect(vault?.fixHint).toContain("export AMC_VAULT_PASSPHRASE=");
   });
 
-  testWithDist?.("full init prints one What's next list: the three actions first, then the other first steps", () => {
+  testWithDist?.("full init prints one What's next list: plain steps first, the optional monitor-key pin last", () => {
     const init = amc(freshWorkspace(), ["init"]);
     expect(init.status, init.text).toBe(0);
     expect(init.stdout.match(/What's next/g)).toHaveLength(1);
     const list = init.stdout.slice(init.stdout.indexOf("What's next"));
-    expect(list.indexOf("amc agent-loop verify")).toBeLessThan(list.indexOf("amc up"));
-    expect(list).toContain("amc doctor");
+    expect(list.indexOf("amc agent-loop chat --provider stub")).toBeLessThan(list.indexOf("amc firewall enable"));
+    expect(list.indexOf("amc firewall enable")).toBeLessThan(list.indexOf("--expect-monitor"));
+    expect(list).toContain("Optional");
   });
 });

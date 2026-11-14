@@ -15,6 +15,7 @@ import { withDeletionGate } from "../../residency/deletionGate.js";
 import { verifyManagedLease } from "../managedHookLease.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { writeFileAtomic } from "../../utils/fs.js";
+import { runningStudioBridgeBase } from "../../studio/studioBridge.js";
 
 export const HOOK_INTEGRATION_ID = "amc-observe-v1";
 export const HOOK_CONTROL_INTEGRATION_ID = "amc-control-v1";
@@ -311,7 +312,8 @@ export function parseInstallOptions(options: {
   const mode = parseMode(options.mode);
   const workspace = resolve(options.workspace);
   const agentId = validateAgentId(options.agentId);
-  const bridgeBase = normalizeBridgeBase(options.bridgeBase);
+  // No origin given: this workspace's running Studio, else the default port (the CLI refuses that case: studioBridge.ts).
+  const bridgeBase = normalizeBridgeBase(options.bridgeBase ?? runningStudioBridgeBase(options.workspace) ?? undefined);
   assertControlBridgeLocal(mode, bridgeBase);
   const ttl = options.ttl ?? DEFAULT_HOOK_TTL;
   if (!Number.isFinite(parseLeaseTtlToMs(ttl)) || parseLeaseTtlToMs(ttl) <= 0) {

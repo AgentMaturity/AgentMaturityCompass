@@ -147,7 +147,7 @@ text, not a line number, so unrelated edits do not break a citation.
 | C24 | `src/domains/packSelfAssessment.ts` | `The questions without an answer, in pack order: not evaluated, never a default level.` |
 | C25 | `src/cli.ts` (`compliance risk-classify`) | `capabilities = JSON.parse(opts.capabilities)` |
 | C26 | `src/cli.ts` | `const result = classifyEuAiActRisk(capabilities);` |
-| C27 | `src/doctor/firstRunPlan.ts` | `the stub provider records a canned response through the signed session log (no real model answer)` |
+| C27 | `src/doctor/firstRunPlan.ts` | `The replies are canned; every turn is recorded in a signed session log.` |
 | C28 | `src/cli-agent-commands.ts` | `Re-derive every model request in a session from the log and check the chains` |
 | C29 | `src/cli.ts` | `.option("--include-chain", "include hash chain verification fields")` |
 | C30 | `src/cli.ts` | `Create deterministic signed .amcaudit artifact` |

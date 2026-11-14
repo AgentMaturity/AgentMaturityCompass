@@ -23,39 +23,41 @@ describe("native first-use CLI discovery", () => {
     const native = program.commands.find(command => command.name() === "agent-loop")!;
     expect(native.helpInformation()).not.toContain("(internal)");
     expect(native.helpInformation()).toContain("guide");
-    expect(renderGroupedHelp(program)).toContain("amc agent-loop guide");
-    expect(renderGroupedHelp(program)).toContain("Assess existing evidence");
-    // A 33-character path still gets a space before its description.
-    expect(renderGroupedHelp(program)).toContain("  amc agent-loop verify <sessionId> Verify recorded native task evidence");
+    const help = renderGroupedHelp(program);
+    expect(help).toContain("  amc agent-loop chat              Chat with a model; every turn is recorded");
+    expect(help).toContain("  amc connect                      Connect an existing agent");
+    // The native guide stays one `amc help agent-loop` away; the short list names the chat, not every native command.
+    expect(help).not.toContain("amc agent-loop guide");
   });
 
-  // LIVE-UX-07: the README's one command (amc up), the first console account, amc down and the packs were absent.
-  it("adds a Studio and first run block after Start with a task, each row only when its command exists", () => {
+  // LIVE-UX-07 kept: the README's one command (amc up), the first console account, amc down and the packs, now in one short list.
+  it("lists the start-here tasks, each row only when its command exists", () => {
     const { program } = registry();
     program.command("up");
     program.command("down");
     program.command("user").command("init");
     program.command("domain").command("pack").command("list");
+    program.command("login").command("status");
+    program.command("doctor");
     const help = renderGroupedHelp(program);
-    expect(help).toContain("Studio and first run:");
-    expect(help).toContain("  amc up                           Start Studio and the Compass Console; first run scores the workspace");
-    expect(help).toContain("  amc user init --username <you>   Create the first console account (new workspace only; see amc user add)");
-    expect(help).toContain("  amc down                         Stop Studio");
+    expect(help).toContain("  amc                              Pick what to do: watch Claude Code or Codex, chat, or open the console");
+    expect(help).toContain("  amc up / amc down                Start or stop AMC and its console in your browser");
+    expect(help).toContain("  amc login status                 Show whether Claude Code and Codex are signed in");
+    expect(help).toContain("  amc doctor                       Check this folder and name each fix");
+    expect(help).toContain("  amc user init                    Create your console account (new workspace only; see amc user add)");
     expect(help).toContain("  amc domain pack list             List the free Industry Packs (self-reported questionnaires)");
-    expect(help.indexOf("Start with a task:")).toBeLessThan(help.indexOf("Studio and first run:"));
-    expect(help.indexOf("Studio and first run:")).toBeLessThan(help.indexOf("Primary command groups:"));
+    expect(help.indexOf("Start here:")).toBeLessThan(help.indexOf("More:"));
+    expect(help).toContain("amc --help --all");
     expect(help).not.toContain("amc user password");
+    expect(help).not.toContain("Primary command groups:");
   });
 
-  it("leaves out a first-run row whose command is not registered, and the block when none is", () => {
+  it("leaves out a row whose command is not registered", () => {
     const { program } = registry();
-    expect(renderGroupedHelp(program)).not.toContain("Studio and first run:");
-    program.command("down");
     const help = renderGroupedHelp(program);
-    expect(help).toContain("Studio and first run:");
-    expect(help).toContain("  amc down ");
-    expect(help).not.toContain("  amc up ");
+    expect(help).not.toContain("amc up ");
     expect(help).not.toContain("amc user init");
+    expect(help).toContain("Start here:");
   });
 
   it.each([

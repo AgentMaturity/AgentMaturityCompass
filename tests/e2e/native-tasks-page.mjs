@@ -122,12 +122,12 @@ export async function runNativeStudioScenarios({ browser, expect, fixture, crede
       await page.locator("#nativeTaskProvider").focus(); await page.keyboard.press("Tab");
       assert.equal(await page.locator("#nativeTaskModel").evaluate(node => node === document.activeElement), true);
       await page.goto(ui.url("home"));
-      await page.locator("#firstUseNativeButton").click();
+      await page.locator("#firstUseConnectButton").click();
       await expect(page.locator("#nativeGuideCommand")).toContainText(`--agent='${fixture.agentId}'`);
       await page.locator("#copyNativeGuide").click();
       const copied = await page.evaluate(() => navigator.clipboard.readText());
       assert.equal(copied, `amc --agent='${fixture.agentId}' agent-loop guide`);
-      await page.getByRole("link", { name: "Open Native Tasks", exact: true }).click();
+      await page.locator("#firstUsePrimary").click();
       await expect(page.locator("#nativeTaskAgent")).toHaveValue(fixture.agentId);
       return { widths: [1280, 390], clipboardAgent: fixture.agentId };
     }); } catch (error) {

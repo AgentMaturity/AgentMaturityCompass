@@ -270,8 +270,10 @@ function sameHostItem(facts: Record<string, unknown> | null, target: string | nu
   if (hosting.kind === target) return item("deployment.same_host", "READY", { reasonCodes: ["SAME_HOST_RESTART", `HOSTED:${target}`] });
   return item("deployment.same_host", "BLOCKED", { kind: "unsupported_integration", reasonCodes: ["DEPLOYMENT_NOT_SAME_HOST", "KEY:P2-40",
     `HOSTED:${typeof hosting.kind === "string" ? hosting.kind : "none"}`, `TARGET:${target}`],
-  nextAction: { label: "v1 deploys only by restarting the Compose or Helm-hosted Studio that built this agent; this Studio is not hosted under that target. "
-    + "Installing a package into another workspace is P2-40." } });
+  nextAction: { label: "This is where the A4 preview stops today on this Studio. v1 deploys only by restarting the Compose or Helm-hosted Studio that "
+    + "built this agent, and this Studio is not hosted under that target, so no release can be requested here. What you have: the signed records of "
+    + "Aspire, Assemble and Adapt, and your Activate answers. To go on, run this workspace's Studio under the chosen target (Compose or Helm); "
+    + "installing a package into another workspace is P2-40." } });
 }
 
 /**

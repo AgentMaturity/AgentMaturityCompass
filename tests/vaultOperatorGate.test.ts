@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -11,7 +11,8 @@ vi.mock("inquirer", () => ({ default: { prompt, createPromptModule: (options: un
 import { setMode } from "../src/mode/mode.js";
 import { initWorkspace } from "../src/workspace.js";
 import { lockVault, vaultStatus } from "../src/vault/vault.js";
-import { AGENT_ENV_MARKERS, confirmRememberedUnlock, GOVERNANCE_SIGNING_PATHS, interactiveOperator, isGovernancePath } from "../src/vault/operatorContext.js";
+import { keysetAnchoring } from "../src/keys/keyset.js";
+import { AGENT_ENV_MARKERS, askToUnlockForSigning, confirmRememberedUnlock, GOVERNANCE_SIGNING_PATHS, interactiveOperator, isGovernancePath } from "../src/vault/operatorContext.js";
 import { rememberedUnlockLocation, rememberVaultPassphrase, unlockWithRememberedPassphrase } from "../src/vault/passphraseStore.js";
 import { unlockVaultInteractive } from "../src/vault/vaultCli.js";
 
@@ -191,7 +192,11 @@ describe("governance signing from the remembered store asks first", () => {
     prompt.mockResolvedValue({ sign: false });
     await fresh.confirmRememberedUnlock(workspace, "policy sign");
     expect(prompt).toHaveBeenCalledTimes(1);
-    expect(JSON.stringify(prompt.mock.calls[0])).toContain("Sign policy sign with the vault passphrase remembered in");
+    const question = JSON.stringify(prompt.mock.calls[0]);
+    expect(question).toContain("Use the vault passphrase saved in");
+    expect(question).toContain("to sign amc policy sign?");
+    expect(question, "plain words: no environment variable inside the question").not.toMatch(/AMC_[A-Z_]+/);
+    expect(prompt.mock.calls[0]![0][0]).toMatchObject({ type: "confirm", default: false });
     expect(promptModules.at(-1), "asked on stderr, never in the command's stdout (skeptic SK-6)").toMatchObject({ output: process.stderr });
     expect(fresh.vaultStatus(workspace).unlocked).toBe(false);
     expect(fresh.rememberedUnlockLocation(workspace)).toBeNull();
@@ -227,6 +232,93 @@ describe("governance signing from the remembered store asks first", () => {
     const { workspace } = rememberedWorkspace();
     setTTY(process.stdin, true);
     await confirmRememberedUnlock(workspace, "policy sign");
+    expect(prompt).not.toHaveBeenCalled();
+  });
+});
+
+/** A workspace whose vault exists and is locked, with nothing remembered. */
+function lockedWorkspace(): string {
+  const workspace = join(tempDir("amc-signing-unlock-"), "ws");
+  vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS);
+  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  lockVault(workspace);
+  vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
+  return workspace;
+}
+
+describe("a signing command asks an interactive operator for the passphrase instead of refusing", () => {
+  it("asks once on stderr, masked, and leaves the vault unlocked in this process only", async () => {
+    const workspace = lockedWorkspace();
+    setTTY(process.stdin, true);
+    prompt.mockResolvedValue({ passphrase: PASS });
+    await askToUnlockForSigning(workspace, "firewall enable");
+    expect(prompt).toHaveBeenCalledTimes(1);
+    expect(prompt.mock.calls[0]![0][0]).toMatchObject({ type: "password", mask: "*" });
+    expect(promptModules.at(-1)).toMatchObject({ output: process.stderr });
+    expect(vaultStatus(workspace).unlocked).toBe(true);
+    expect(process.env.AMC_VAULT_PASSPHRASE ?? "", "never put into the environment children inherit").toBe("");
+  });
+
+  it("only accepts a passphrase that opens the vault, and an empty answer continues locked", async () => {
+    const workspace = lockedWorkspace();
+    setTTY(process.stdin, true);
+    prompt.mockResolvedValue({ passphrase: "" });
+    await askToUnlockForSigning(workspace, "policy sign");
+    const validate = prompt.mock.calls[0]![0][0].validate as (value: string) => true | string;
+    expect(validate("not-the-passphrase")).toMatch(/does not open/);
+    expect(validate(PASS)).toBe(true);
+    expect(validate("")).toBe(true);
+    expect(vaultStatus(workspace).unlocked).toBe(false);
+  });
+
+  // 2026-11-14: a folder set up by bare amc asked for a passphrase the person had never seen.
+  it("offers the passphrase bare amc saved, by name and with no as the default, only when it opens a vault this machine created", async () => {
+    const workspace = lockedWorkspace();
+    setTTY(process.stdin, true);
+    writeFileSync(join(workspace, ".amc", "local-vault-passphrase"), `${PASS}\n`, { mode: 0o600 });
+    const anchored = keysetAnchoring(workspace).state === "committed";
+    prompt.mockResolvedValueOnce({ useSaved: true }).mockResolvedValue({ passphrase: "" });
+    await askToUnlockForSigning(workspace, "user init");
+    const first = prompt.mock.calls[0]![0][0] as { type: string; default?: boolean; message: string };
+    if (anchored) {
+      expect(first).toMatchObject({ type: "confirm", default: false });
+      expect(first.message).toContain(".amc/local-vault-passphrase");
+      expect(vaultStatus(workspace).unlocked).toBe(true);
+    } else {
+      expect(first.type, "an unanchored vault's file is never offered").toBe("password");
+    }
+    expect(process.env.AMC_VAULT_PASSPHRASE ?? "").toBe("");
+  });
+
+  it("keeps the refusal for agents, shells without a terminal, reads and other commands", async () => {
+    const workspace = lockedWorkspace();
+    setTTY(process.stdin, false);
+    await askToUnlockForSigning(workspace, "firewall enable");
+    setTTY(process.stdin, true);
+    for (const name of AGENT_ENV_MARKERS) await askToUnlockForSigning(workspace, "firewall enable", { ...process.env, [name]: "1" });
+    for (const path of ["firewall status", "score", "keys rotate", "vault unlock", "init"]) await askToUnlockForSigning(workspace, path);
+    expect(prompt).not.toHaveBeenCalled();
+    expect(vaultStatus(workspace).unlocked).toBe(false);
+  });
+
+  it("does not ask when the passphrase comes from the environment or the vault is open", async () => {
+    const workspace = lockedWorkspace();
+    setTTY(process.stdin, true);
+    await askToUnlockForSigning(workspace, "firewall enable", { ...process.env, AMC_VAULT_PASSPHRASE_FILE: "/nowhere" });
+    await askToUnlockForSigning(workspace, "firewall enable", { ...process.env, AMC_VAULT_PASSPHRASE: "x" });
+    expect(prompt).not.toHaveBeenCalled();
+  });
+
+  it("does not ask after the operator declined to sign from the remembered store", async () => {
+    const { workspace, env } = rememberedWorkspace();
+    setTTY(process.stdin, true);
+    vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+    const fresh = await freshModules();
+    fresh.unlockWithRememberedPassphrase(workspace, env);
+    prompt.mockResolvedValue({ sign: false });
+    await fresh.confirmRememberedUnlock(workspace, "firewall enable");
+    prompt.mockClear();
+    await fresh.askToUnlockForSigning(workspace, "firewall enable");
     expect(prompt).not.toHaveBeenCalled();
   });
 });

@@ -22,6 +22,7 @@ import { claudeSettingsRefusal } from "../agent/providers/claudeCliProvider.js";
 import { CODEX_NEXT_STEPS } from "./hookProviders/codex.js";
 import { claudeHookSchemasFor } from "./hookProviders/claudeCodePayloads.js";
 import { normalizeBridgeBase } from "./hookProviders/installFiles.js";
+import { hookBridgeIssues, requireStudioBridgeBase } from "../studio/studioBridge.js";
 import { verifyClaudeControl, type ClaudeControlVerification } from "./claudeHookProbe.js";
 import { readStdinAll, runHookForward, type HookForwardOptions } from "./hookForwarder.js";
 // The hidden `connect hooks forward` and tests still reach the forwarder through here.
@@ -87,7 +88,7 @@ export function registerHookIntegrationCommands(
     .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi|dsh|codex")
     .option("--mode <mode>", "observe|control", "observe")
     .option("--agent <agentId>", "agent ID (defaults to active agent)")
-    .option("--bridge-url <url>", "Bridge origin", "http://127.0.0.1:3212")
+    .option("--bridge-url <url>", "Bridge origin (default: the Studio running in this folder)")
     .option("--ttl <ttl>", "dedicated observation lease TTL", "7d")
     .option("--rpm <rpm>", "maximum observed hook requests per minute", "120")
     .option("--dry-run", "show exact files without writing or minting a lease", false)
@@ -96,12 +97,13 @@ export function registerHookIntegrationCommands(
       provider: HookProvider;
       mode: HookMode;
       agent?: string;
-      bridgeUrl: string;
+      bridgeUrl?: string;
       ttl: string;
       rpm: string;
       dryRun: boolean;
       json: boolean;
     }) => {
+      const bridgeUrl = requireStudioBridgeBase(process.cwd(), opts.bridgeUrl); // refused before any passphrase is asked
       if (!opts.dryRun && !vaultStatusNow(process.cwd()).unlocked) {
         await unlockVaultInteractive(process.cwd());
       }
@@ -111,7 +113,7 @@ export function registerHookIntegrationCommands(
         provider: opts.provider,
         mode: opts.mode,
         agentId,
-        bridgeBase: opts.bridgeUrl,
+        bridgeBase: bridgeUrl,
         ttl: opts.ttl,
         rpm: Number(opts.rpm),
         dryRun: opts.dryRun,
@@ -120,7 +122,7 @@ export function registerHookIntegrationCommands(
         dshPackageDir: opts.provider === "dsh" ? findDshPackage() ?? undefined : undefined,
         claudeCodeBinary: opts.provider === "claude-code" && opts.mode === "control" && !opts.dryRun ? findClaudeCode() ?? undefined : undefined
       });
-      const warnings = opts.provider === "claude-code" && opts.mode === "control" && !opts.dryRun ? claudeControlWarnings(process.cwd(), agentId, opts.bridgeUrl) : [];
+      const warnings = opts.provider === "claude-code" && opts.mode === "control" && !opts.dryRun ? claudeControlWarnings(process.cwd(), agentId, bridgeUrl) : [];
       if (opts.json) {
         console.log(JSON.stringify({ ...result, warnings }, null, 2));
         return;
@@ -146,7 +148,9 @@ export function registerHookIntegrationCommands(
     .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi|dsh|codex")
     .option("--json", "emit structured JSON", false)
     .action(async (opts: { provider: HookProvider; json: boolean }) => {
-      const status = getHookIntegrationStatus({ workspace: process.cwd(), provider: opts.provider });
+      const found = getHookIntegrationStatus({ workspace: process.cwd(), provider: opts.provider });
+      const bridgeIssues = hookBridgeIssues(process.cwd(), { manifestPath: found.files.manifest, manifestValid: found.manifestValid, provider: found.provider, mode: found.mode });
+      const status = { ...found, issues: [...found.issues, ...bridgeIssues] };
       const control = status.provider === "claude-code" && status.mode === "control"
         ? await verifyClaudeControl({ workspace: process.cwd() })
         : null;
@@ -166,7 +170,7 @@ export function registerHookIntegrationCommands(
         if (control) printControlVerification(control);
         if (status.provider === "codex" && status.state === "installed") printCodexNextSteps();
       }
-      if (!["installed", "not-installed"].includes(status.state) || control?.verified === false) process.exitCode = 1;
+      if (!["installed", "not-installed"].includes(status.state) || control?.verified === false || bridgeIssues.length > 0) process.exitCode = 1;
     });
 
   hooks
@@ -195,12 +199,14 @@ export function registerHookIntegrationCommands(
       const latchRecovery = opts.recoverLatch
         ? recoverHookAuditLatch({ workspace, passphrase: passphrase ?? (await promptPassphrase("Vault passphrase (owner):")) })
         : null;
+      const installed = getHookIntegrationStatus({ workspace, provider: opts.provider });
       const health = inspectHookHealth({ workspace, provider: opts.provider });
+      const bridgeIssues = hookBridgeIssues(workspace, { manifestPath: installed.files.manifest, manifestValid: installed.manifestValid, provider: installed.provider, mode: installed.mode });
       const control = health.provider === "claude-code" && health.mode === "control"
         ? await verifyClaudeControl({ workspace })
         : null;
       if (opts.json) {
-        console.log(JSON.stringify({ ...health, ...(control ? { control } : {}), ...(latchRecovery ? { latchRecovery } : {}) }, null, 2));
+        console.log(JSON.stringify({ ...health, ...(control ? { control } : {}), ...(latchRecovery ? { latchRecovery } : {}), ...(bridgeIssues.length > 0 ? { bridgeIssues } : {}) }, null, 2));
       } else {
         if (latchRecovery) {
           console.log(latchRecovery.recovered ? `Hook audit latch cleared (was: ${latchRecovery.reason}); recovery recorded as ${latchRecovery.eventId}. `
@@ -222,7 +228,7 @@ export function registerHookIntegrationCommands(
           console.log(`Observed at: ${health.evidence.lastEvent.observedAt}`);
           console.log(`Action: ${health.evidence.lastEvent.actionId}`);
         }
-        for (const reason of health.reasonCodes) console.log(chalk.yellow(`Issue: ${reason}`));
+        for (const reason of [...health.reasonCodes, ...bridgeIssues]) console.log(chalk.yellow(`Issue: ${reason}`));
         if (control) printControlVerification(control);
         console.log(chalk.gray(`Boundary: ${health.claimBoundary}`));
       }

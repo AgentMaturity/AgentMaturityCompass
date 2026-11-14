@@ -54,7 +54,7 @@ function initReveals(){
 }
 
 var PRODUCTS=[
-  {name:'amc score',title:'Score',headline:'Score trust before you ship',summary:'Evidence-weighted scoring across live execution behavior instead of brochure claims.',badges:['244 default questions','264 lifecycle set','instant full score'],info:[{label:'what it does',title:'Calculates the trust baseline',text:'Finds maturity gaps across governance, security, reliability, cost, proof, and state.'},{label:'why it matters',title:'Kills documentation inflation',text:'Observed evidence carries full weight. Self-reported evidence is capped.'},{label:'output',title:'Actionable trust report',text:'Ships a scored report, signed evidence bundle, proof status, and remediation targets.'}],lines:[
+  {name:'amc score',title:'Score',headline:'Score your agent before you ship',summary:'Scores your agent from what it actually did, not from what its documentation says.',badges:['244 default questions','264 lifecycle set','instant full score'],info:[{label:'what it does',title:'Gives you a starting score',text:'Shows where the agent is weak across governance, security, reliability, cost, proof, and state.'},{label:'why it matters',title:'Claims cannot inflate the score',text:'What AMC saw counts in full. What the agent says about itself is capped.'},{label:'output',title:'A report you can act on',text:'A scored report, a signed bundle of the records behind it, a proof status, and a list of what to fix.'}],lines:[
     {type:'code',label:'$ amc'},
     {label:'full score',value:'244 default questions · VALID'},
     {label:'lifecycle option',value:'264 questions · runtime/proof/fleet'},
@@ -66,7 +66,7 @@ var PRODUCTS=[
     {label:'fixes generated',value:'12 mapped remediations'},
     {label:'signed artifact',value:'.amc/reports/latest.md'}
   ]},
-  {name:'amc shield',title:'Shield',headline:'Attack your agent before attackers do',summary:'Runs adversarial packs and controlled confirmation lanes against prompt injection, leakage, memory poisoning, and sycophancy.',badges:['registered assurance packs','authorized confirmation','safe proof'],info:[{label:'what it does',title:'Pressure-tests the runtime',text:'Executes attack scenarios against your actual prompt, tool, and memory surface.'},{label:'why it matters',title:'Finds brittle defenses fast',text:'One missed path can turn a polished demo into a production incident.'},{label:'output',title:'Pack report + safe proof',text:'Returns failing probes, redacted confirmation proof, and generated mitigation configs.'}],lines:[
+  {name:'amc shield',title:'Shield',headline:'Attack your agent before attackers do',summary:'Runs sets of attack tests, with a controlled way to confirm each finding, against prompt injection, data leaks, memory poisoning, and flattery.',badges:['registered assurance packs','authorized confirmation','safe proof'],info:[{label:'what it does',title:'Tests the agent you actually run',text:'Runs attack scenarios against your real prompts, tools, and memory.'},{label:'why it matters',title:'Finds weak defenses fast',text:'One missed path can turn a polished demo into a production incident.'},{label:'output',title:'Pack report + safe proof',text:'Lists the tests that failed, a redacted record confirming each one, and generated settings that reduce the risk.'}],lines:[
     {type:'code',label:'$ amc shield confirm run --scope sec-1 --task finding.json'},
     {label:'injection pack',value:'PASS · 12/12 probes blocked'},
     {label:'exfiltration pack',value:'WARN · 1 DLP bypass found'},
@@ -86,7 +86,7 @@ var PRODUCTS=[
     {label:'policy signatures',value:'verified'},
     {label:'evidence',value:'transparency + ledger receipt'}
   ]},
-  {name:'amc vault',title:'Vault',headline:'Cryptographically prove what happened',summary:'Signs evidence, verifies ledgers, and gives auditors a tamper-evident chain of custody.',badges:['Ed25519 signing','Merkle chain','audit-ready'],info:[{label:'what it does',title:'Creates verifiable evidence',text:'Every artifact can be signed, chained, and checked independently.'},{label:'why it matters',title:'Because “trust me” is not evidence',text:'Teams need proof that survives handoffs, audits, and disputes.'},{label:'output',title:'Evidence chain + signatures',text:'Produces a ledger with hashes, proofs, and verification metadata.'}],lines:[
+  {name:'amc vault',title:'Vault',headline:'Show what happened, with signatures',summary:'Signs each record and links it to the one before, so an auditor can see if anything was changed or removed.',badges:['Ed25519 signing','Merkle chain','audit-ready'],info:[{label:'what it does',title:'Makes records anyone can check',text:'Every record can be signed, linked to the one before, and checked by someone else.'},{label:'why it matters',title:'Because “trust me” is not evidence',text:'Teams need proof that survives handoffs, audits, and disputes.'},{label:'output',title:'A signed chain of records',text:'A ledger (an ordered log) with hashes, proofs, and what is needed to verify it.'}],lines:[
     {type:'code',label:'$ amc vault verify --chain .amc/evidence/'},
     {label:'chain length',value:'23 artifacts'},
     {label:'root hash',value:'a7f3c2d1...e890b4'},
@@ -96,7 +96,7 @@ var PRODUCTS=[
     {label:'notary timestamp',value:'2026-03-12T18:30:00Z'},
     {label:'status',value:'auditor-ready'}
   ]},
-  {name:'amc watch',title:'Watch',headline:'See trust drift before it hurts you',summary:'Monitors posture over time and surfaces anomalies, regressions, SLO breaches, and risky changes.',badges:['drift alerts','session receipts','SLO review'],info:[{label:'what it does',title:'Tracks trust over time',text:'Continuously compares current behavior against prior baselines, session receipts, and risk/cost/latency thresholds.'},{label:'why it matters',title:'Most failures are regressions',text:'A safe launch can quietly rot after a few prompt, route, policy, or resource changes.'},{label:'output',title:'Timeline + anomaly report',text:'Shows which dimension slipped, when it changed, which session proves it, and why it matters.'}],lines:[
+  {name:'amc watch',title:'Watch',headline:'See drift before it hurts you',summary:'Keeps watching after launch and tells you about odd behaviour, lower scores, missed service targets, and risky changes.',badges:['drift alerts','session receipts','SLO review'],info:[{label:'what it does',title:'Compares today with before',text:'Compares current behaviour with earlier runs, session receipts, and your limits for risk, cost, and speed.'},{label:'why it matters',title:'Most failures are things that used to work',text:'A good launch can quietly get worse after a few changes to prompts, routes, policies, or resources.'},{label:'output',title:'A timeline of what changed',text:'Shows which area slipped, when it changed, which session shows it, and why it matters.'}],lines:[
     {type:'code',label:'$ amc watch --agent prod-agent-01 --since 7d'},
     {label:'score trend',value:'L3.2 → L2.9'},
     {label:'session correlation',value:'complete · 18 signed refs'},
@@ -108,7 +108,7 @@ var PRODUCTS=[
     {label:'next action',value:'review approval gate diffs'},
     {label:'report',value:'.amc/watch/drift-7d.md'}
   ]},
-  {name:'amc comply',title:'Comply',headline:'Map trust evidence to real frameworks',summary:'Turns technical evidence into regulator-readable artifacts for audits and risk reviews.',badges:['EU AI Act','ISO 42001','NIST AI RMF'],info:[{label:'what it does',title:'Builds compliance binders',text:'Maps evidence and controls to the frameworks buyers and regulators care about.'},{label:'why it matters',title:'Compliance work is mostly evidence plumbing',text:'AMC shortens the gap between tests run and proof produced.'},{label:'output',title:'Binder + gap report',text:'Exports mapped requirements, evidence references, and remediation gaps.'}],lines:[
+  {name:'amc comply',title:'Comply',headline:'Line your records up with real frameworks',summary:'Turns technical records into documents an auditor or risk reviewer can read.',badges:['EU AI Act','ISO 42001','NIST AI RMF'],info:[{label:'what it does',title:'Builds a review folder (a binder)',text:'Matches your records and controls to the frameworks buyers and regulators ask about.'},{label:'why it matters',title:'Most compliance work is gathering records',text:'AMC shortens the time between running a test and having the record to show for it.'},{label:'output',title:'A binder and a list of gaps',text:'Exports each requirement, the records that support it, and what is still missing.'}],lines:[
     {type:'code',label:'$ amc comply --framework eu-ai-act,nist-rmf --output binder/'},
     {label:'EU AI Act',value:'34/41 requirements mapped'},
     {label:'NIST AI RMF',value:'28/28 covered'},
@@ -118,7 +118,7 @@ var PRODUCTS=[
     {label:'remediation plan',value:'binder/gap-remediation.md'},
     {label:'status',value:'review-ready'}
   ]},
-  {name:'amc fleet',title:'Fleet',headline:'Govern many agents like an actual platform',summary:'Validates typed multi-agent topology, compares risk posture, and enforces org-wide trust baselines.',badges:['fleet overview','trust graph','SLO status'],info:[{label:'what it does',title:'Surfaces topology and weak links',text:'Puts every agent and handoff contract on one trust map so routing risk is visible.'},{label:'why it matters',title:'Your stack fails at the weakest boundary',text:'One unsafe handoff can negate ten well-governed agents.'},{label:'output',title:'Fleet scorecard + graph validation',text:'Shows per-agent maturity, graph digest, validation findings, trust graph, threshold breaches, and policy coverage.'}],lines:[
+  {name:'amc fleet',title:'Fleet',headline:'Manage many agents in one place',summary:'Checks how your agents are wired together, compares their risk, and applies one minimum standard across the organisation.',badges:['fleet overview','trust graph','SLO status'],info:[{label:'what it does',title:'Shows the map and its weak links',text:'Puts every agent and every handoff between agents on one map, so you can see where work could go wrong.'},{label:'why it matters',title:'Your stack fails at the weakest boundary',text:'One unsafe handoff can undo ten well-run agents.'},{label:'output',title:'Fleet scorecard + graph validation',text:'Shows per-agent maturity, graph digest, validation findings, trust graph, threshold breaches, and policy coverage.'}],lines:[
     {type:'code',label:'$ amc fleet graph validate'},
     {label:'fleet overview',value:'ready · 12 agents scored'},
     {label:'agents scanned',value:'12'},
@@ -131,7 +131,7 @@ var PRODUCTS=[
     {label:'trust graph',value:'mermaid export ready'},
     {label:'report',value:'.amc/fleet/acme-corp.md'}
   ]},
-  {name:'amc passport',title:'Passport',headline:'Make trust portable between environments',summary:'Issues a portable, signed trust identity that can move between tools, teams, and environments.',badges:['portable identity','verifiable score','expiry controls'],info:[{label:'what it does',title:'Packages trust state',text:'Bundles score, evidence, validity window, and signature into a portable credential.'},{label:'why it matters',title:'Trust should travel with the agent',text:'Handoffs break when context and evidence get lost between systems.'},{label:'output',title:'Signed passport artifact',text:'Exports a machine-readable trust document with expiry and verification data.'}],lines:[
+  {name:'amc passport',title:'Passport',headline:'Take a score with you',summary:'Issues a signed document with the agent score that can move between tools, teams, and environments.',badges:['portable identity','verifiable score','expiry controls'],info:[{label:'what it does',title:'Packs the score to travel',text:'Bundles the score, the records behind it, how long it is valid, and a signature into one file.'},{label:'why it matters',title:'A score should travel with the agent',text:'Handoffs break when context and records get lost between systems.'},{label:'output',title:'A signed passport file',text:'Exports a file a program can read, with an expiry date and what is needed to verify it.'}],lines:[
     {type:'code',label:'$ amc passport issue --agent prod-agent-01'},
     {label:'agent',value:'prod-agent-01'},
     {label:'verified score',value:'L3.2'},

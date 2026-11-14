@@ -26,6 +26,8 @@ import { readOnlyCapabilityGovernance, readOnlyCapabilityLeaseStatus } from "./h
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { writeFileAtomic } from "../utils/fs.js";
+import { stableNodePath } from "./hookProviders/nodePath.js";
+import { limitations } from "./hookLimitations.js";
 import { isSafeProviderActionId, resolveProviderHookRequestIdentity, type HookActionIdentitySource } from "../bridge/hookActionIdentity.js";
 import {
   addManagedIgnoreBlock, assertAllPathsSafe, assertControlBridgeLocal, assertManagedPathSafe, controlApprovalPolicy, managedLeaseStatus,
@@ -372,7 +374,8 @@ function expectedHandler(input: {
     // an invalid answer blocks the action (`onFailure: "block"`, Claude Code 2.1.295 and later).
     return {
       type: "command",
-      command: process.execPath,
+      // Observe names a Node that survives `brew upgrade`; control keeps the exact binary (nodePath.ts says why).
+      command: input.mode === "control" ? process.execPath : stableNodePath(),
       args: [amcCliScriptPath(input.mode, import.meta.url, "forwarder"), ...args.slice(3), ...(input.eventName ? ["--event", input.eventName] : [])],
       timeout: CLAUDE_HOOK_TIMEOUT_SECONDS,
       statusMessage: input.mode === "control" ? CLAUDE_CONTROL_STATUS_MESSAGE : CLAUDE_STATUS_MESSAGE,
@@ -594,30 +597,6 @@ function validateManifestPaths(workspace: string, provider: ConfigHookProvider, 
   ) {
     throw new HookIntegrationError("HOOK_MANIFEST_INVALID", "hook installation manifest source, path, or provider binding is invalid");
   }
-}
-
-function limitations(provider: ConfigHookProvider, mode: HookMode): string[] {
-  if (provider === "claude-code" && mode === "control") {
-    return [
-      "enforced at Claude Code PreToolUse for mapped tools, in sessions registered under this installation, on qualified Claude Code versions only; other tools, MCP tools included, are denied",
-      "UserPromptSubmit admits a prompt only with a valid lease, verified signed policies and no active freeze; AMC never receives the prompt text",
-      "SessionStart, Stop, PostToolUse and PostToolUseFailure are observed; AMC never forces Claude Code to continue; control never asks (a Claude Code ask is not AMC approval)",
-      "a session registration is a lease-holder attestation checked against disk, not proof that Claude Code ran a hook; sessions without one are not governed",
-      "not covered: OS containment, what an allowed Bash command starts, anything once a hook is removed or disabled; .claude/settings.local.json is user-editable, so regulated deployments use managed settings",
-    ];
-  }
-  return [
-    mode === "control"
-      ? "control is loopback-only; raw provider input is evaluated in memory and never retained"
-      : "observation only; no provider control decision is returned",
-    mode === "control"
-      ? "provider-local ask is a control response, not proof that AMC approval quorum was met"
-      : "tool arguments, cwd, transcript path, and raw session ID are not forwarded",
-    provider === "gemini-cli"
-      ? "Gemini CLI does not expose a general provider tool-call ID in the pinned contract, so action identity is derived"
-      : "Claude Code tool_use_id is used when present; otherwise action identity is derived",
-    "Codex, Cursor, OpenCode, and other providers remain unsupported until their native contracts are pinned and fixture-tested"
-  ];
 }
 
 function unchangedInstallResult(input: {

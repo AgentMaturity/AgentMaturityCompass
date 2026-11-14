@@ -234,7 +234,13 @@ export const boundKeyset = inCheckPass((workspace: string, opts: { allowUnboundF
   const keyset = readKeysetFile(workspace, KEYSET_REL);
   const mark = readHighWater(markKey(workspace));
   if (mark !== null) {
-    if (keyset === null) throw new AntiRollbackError("ROLLBACK_DETECTED", `keyset.json is missing, but this machine committed generation ${mark.sequence}; run \`amc keys rotate --restore\` (owner mode)`);
+    if (keyset === null) {
+      throw new AntiRollbackError("ROLLBACK_DETECTED", `keyset.json is missing, but this machine committed generation ${mark.sequence}; run \`amc keys rotate --restore\` (owner mode). `
+        + "What happened: this folder's AMC keys were created on this machine and its .amc key set is now gone (deleted or replaced), so AMC "
+        + "refuses to start over here: new keys silently replacing old ones is what an attacker would do. Two ways forward: put the old .amc "
+        + "back (from a backup or git) and run `amc keys rotate --restore`, or start a new workspace in a new folder; AMC has no command that "
+        + "makes this folder start fresh.");
+    }
     if (keyset.generation > mark.sequence) {
       throw new AntiRollbackError("FORK_DETECTED", `key set generation ${keyset.generation} was never committed on this machine (it committed ${mark.sequence}); refusing it. `
         + "Run `amc keys rotate --restore` (owner mode) to put back the key set this machine committed");

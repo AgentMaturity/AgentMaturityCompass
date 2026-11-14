@@ -120,7 +120,6 @@ describe("every console page with a nav reaches the shell", () => {
     const navPages = readdirSync("src/console/pages").filter((file) => readFileSync(`src/console/pages/${file}`, "utf8").includes("<nav"));
     expect(navPages.length).toBeGreaterThan(60);
     expect(navPages).not.toContain("ops.html");
-    expect(navPages).not.toContain("score.html");
     for (const file of navPages) {
       const html = readFileSync(`src/console/pages/${file}`, "utf8");
       const scripts = [...html.matchAll(/src="\.\/assets\/([\w/-]+\.js)(?:\?v=[^"]*)?"/g)].map((match) => match[1]!);
@@ -255,7 +254,8 @@ describe("topbarHtml", () => {
     const html = topbar({ workspace: "<acme>", demoMode: false, me: { username: "a" } });
     expect(html).toContain("/ &lt;acme&gt; workspace");
     expect(html).toContain('href="./evidence"');
-    expect(html).toContain('href="./standard"');
+    expect(html).toContain('href="./native-tasks?agent=default&amp;sample=1">Run a task</a>');
+    expect(html).not.toContain("Open Standard");
     expect(html).toContain("session protected");
     expect(topbar({ demoMode: true })).toContain("local demo session");
     for (const variant of [html, topbar({ me: null }), topbar({ demoMode: true })]) expect(variant).not.toMatch(/\son[a-z]+\s*=|javascript:/i);

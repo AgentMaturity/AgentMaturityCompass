@@ -36,6 +36,19 @@ async function packOrExit(packId: string) {
   return pack;
 }
 
+/** `domain pack run` without --pack: a terminal picks from the list (prompt on stderr); anywhere else it stays required. */
+async function askForPack(): Promise<string> {
+  if (process.stdin.isTTY !== true || process.stdout.isTTY !== true) {
+    console.error("error: required option '--pack <packId>' not specified");
+    process.exit(1);
+  }
+  const { listIndustryPackIds, getIndustryPack } = await import("./domains/industryPacks.js");
+  const inq = await import("inquirer");
+  const { packId } = await inq.default.createPromptModule({ output: process.stderr })<{ packId: string }>([{ type: "select", name: "packId",
+    message: "Which Industry Pack?", pageSize: 15, choices: listIndustryPackIds().map((id) => ({ name: `${getIndustryPack(id).name} (${id})`, value: id })) }]);
+  return packId;
+}
+
 export function registerDomainProductCliCommands({ product, productGlossary, domainCmd }: DomainProductCliDeps): void {
   // ── Blocker #13: sector-pack CLI commands for industry packs ──────────────
   const sectorPack = domainCmd.command("pack").description("Industry sector packs — 41 packs across 7 domains");
@@ -212,16 +225,17 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
   sectorPack
     .command("run")
     .description("Run an industry sector pack — interactive assessment or baseline score")
-    .requiredOption("--pack <packId>", "Pack ID")
+    .option("--pack <packId>", "Pack ID (in a terminal, asks when omitted)")
     .option("--baseline", "Run with no answers: every question is not evaluated and no score is computed (no interaction needed)", false)
     .option("--responses <file.json>", "Score a JSON file of { questionId: level } self-reported answers (1-5) instead of asking; unanswered questions are not evaluated")
     .option("--json", "Output as JSON")
-    .action(async (opts: { pack: string; baseline: boolean; responses?: string; json?: boolean }) => {
+    .action(async (opts: { pack?: string; baseline: boolean; responses?: string; json?: boolean }) => {
+      const packId = opts.pack ?? await askForPack();
       const { scoreIndustryPack } = await import("./domains/industryPacks.js");
       const { packSelfAssessmentEnvelope } = await import("./domains/packSelfAssessment.js");
       const packRun = await import("./domains/packRunCli.js");
       type PackIdType = Parameters<typeof scoreIndustryPack>[0];
-      const pack = await packOrExit(opts.pack);
+      const pack = await packOrExit(packId);
       if (!opts.json) {
         console.log(chalk.bold.hex('#4AEF79')(`\n🏭  Running: ${pack.name}`));
         console.log(chalk.gray(`  Questions: ${pack.questions.length}\n`));
@@ -263,7 +277,7 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       }
 
       let result: ReturnType<typeof scoreIndustryPack>;
-      try { result = scoreIndustryPack(opts.pack as PackIdType, responses); }
+      try { result = scoreIndustryPack(packId as PackIdType, responses); }
       catch (e: unknown) { console.error(chalk.red(`Invalid --responses: ${toErrorMessage(e)}`)); process.exit(1); return; }
       // The same envelope scoreIndustryPack derives its claimKind and eligibleLevel from.
       const claim = packSelfAssessmentEnvelope(pack, responses, Date.now());

@@ -1,6 +1,6 @@
 # Agent Maturity Compass (AMC)
 
-> The credit score for AI agents. Open-source framework for scoring AI agent trustworthiness from execution evidence.
+> See what your AI agent really does. AMC watches Claude Code, Codex or your own agent at work on your machine, keeps a signed record of what it did, and scores it from that record. Free and open source (MIT); no AMC account.
 
 ## Docs
 - [Getting Started](https://agentmaturity.co/docs/#GETTING_STARTED)
@@ -13,15 +13,30 @@
 - [Scoring & Dimensions](https://agentmaturity.co/docs/#DIAGNOSTIC_BANK)
 - [Governance](https://agentmaturity.co/docs/#GOVERNANCE)
 
-## Install
+## Install (current source build, macOS and Linux)
+git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
+cd AgentMaturityCompass
+pnpm install --frozen-lockfile && pnpm run build && npm link
+amc
+
+Needs Node.js 22 or 24, pnpm and git. The source build is unreleased (the next release is 2.0.0) and untested on Windows.
+
+Published 1.1.1 release (older; no menu, no vendor sign-in, Industry Packs still behind the earlier licence gate):
 macOS/Linux: curl -fsSL https://agentmaturity.co/install.sh | sh
 Windows PowerShell: irm https://agentmaturity.co/install.ps1 | iex
+The installers pin the GitHub release and verify SHA-256 before installing. npm also publishes 1.1.1; the Homebrew tap is not public yet. Publication evidence: https://agentmaturity.co/publication-status.json
 
 Verify a real signed evidence bundle yourself: https://agentmaturity.co/verify.html
-The installers pin a GitHub release and verify SHA-256 before execution. npm also publishes the older 1.1.1 release; the Homebrew tap is not public yet.
 
-## Full Score
-amc
+## First run
+`amc` alone in a terminal shows one menu of what can work on this machine:
+- Watch Claude Code as it works / Watch Codex as it works (shown once you are signed in with the vendor's own sign-in; `amc login status` shows it; AMC never sees the password, token or plan)
+- Chat with a model (shown when a provider key such as ANTHROPIC_API_KEY is set)
+- Try a demo chat (no account or key needed; a built-in stub model)
+- Open the console in my browser (the local Compass Console on 127.0.0.1)
+- Just show my score (the full 244-question score; a new folder scores L0 because AMC has not seen the agent do anything yet)
+
+Watching uses hooks. Observe mode records each tool call. Claude Code control mode can deny a tool call and needs Claude Code settings with no enabled plugin and no other hook that can change a tool call.
 
 ## Key Concepts
 - L0-L5 maturity scale based on execution evidence
@@ -29,7 +44,6 @@ amc
 - 244 default diagnostic questions across 5 trust dimensions, plus a 264-question lifecycle-expanded set
 - 16 framework adapters (LangChain, CrewAI, AutoGen, etc.)
 - Signed adapter capability receipts separate declared/effective events and controls, runtime/version proof, hook mode, and lossiness; metadata-only adapters fail closed
-- 1,268 public CLI command paths
 - Domain Proof Lane with amcproof artifacts for source-to-rule correctness checks
 - Evidence trust tiers: SELF_REPORTED (0.4x), OBSERVED (1.0x), CRYPTOGRAPHIC (1.0x)
 - 41 Industry Packs, free in the current source build with no licence, account or payment (the published 1.1.1 release still locks them): self-reported questionnaires whose content is experimental, AI-drafted until a named expert signs it; access never changes a result
@@ -37,6 +51,7 @@ amc
 ## A4 Forge (preview)
 - One agent from a brief to a recorded deployment in four stages: Aspire (conceptualization), Assemble (creation), Adapt (contextualization), Activate (commercialization); current source build only, off unless AMC_A4_PREVIEW=1
 - Every A4 record is signed and self-reported; no A4 output says the agent is safe, correct or lawful, and approvals inside one workspace are not independent review
+- [A4 Forge overview](https://agentmaturity.co/a4.html)
 - [A4 Forge guide](https://agentmaturity.co/docs/#A4_FORGE)
 
 ## Links
