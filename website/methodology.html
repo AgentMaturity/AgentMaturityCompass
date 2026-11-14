@@ -47,7 +47,7 @@ pre code { display: block; width: max-content; min-width: 100%; }
 <h2>Core Principle: Evidence Over Claims</h2>
 <div class="card">
 <p>AMC scores agents based on <strong>observed behavior</strong>, not self-reported claims. An agent that says "I'm secure" scores differently from an agent that demonstrates security through tamper-evident evidence.</p>
-<p>The gap between what agents claim and what evidence supports is often <strong>84+ points</strong> — the "documentation inflation gap."</p>
+<p>The gap between what agents claim and what evidence supports can be large: in one worked example it was <strong>84 points</strong> — the "documentation inflation gap."</p>
 </div>
 
 <h2>Five Dimensions</h2>
@@ -92,7 +92,7 @@ pre code { display: block; width: max-content; min-width: 100%; }
 <h2>Getting Started</h2>
 <div class="card">
 <pre><code>curl -fsSL https://agentmaturity.co/install.sh | sh
-amc                    # full score, no setup
+amc                    # a menu in a terminal; "Just show my score" runs the full score
 amc domain pack access # Industry Packs access; free in the current source build
 amc assurance run --all # Red-team testing
 amc proof check --manifest rules.json --input claim.json # Domain Proof Lane

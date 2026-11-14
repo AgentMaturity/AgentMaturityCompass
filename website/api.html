@@ -252,12 +252,13 @@
         defaultModelsExpandDepth: -1,
         docExpansion: 'list',
         filter: true,
-        onComplete: function() {
-          if (baseUrl && baseUrl !== 'http://localhost:3000/api') {
-            // Update server URL dynamically if changed
-          }
-        }
+        onComplete: labelFilter
       });
+    }
+    // Swagger UI renders its filter box with a placeholder only; give it an accessible name.
+    function labelFilter() {
+      const box = document.querySelector('.operation-filter-input');
+      if (box) box.setAttribute('aria-label', 'Filter operations by tag or path');
     }
     function updateBaseUrl() {
       const val = document.getElementById('baseUrl').value.trim();
@@ -277,7 +278,8 @@
               deepLinking: true,
               defaultModelsExpandDepth: -1,
               docExpansion: 'list',
-              filter: true
+              filter: true,
+              onComplete: labelFilter
             });
           });
       }
