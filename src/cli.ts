@@ -104,7 +104,7 @@ import {
   unverifiedClaim, withClaimFields, withClaimFieldsEach
 } from "./cli/claimOutput.js";
 import { renderDiagnosticReportHtml } from "./cli/reportRenderers.js"; import { emitScoreEvidenceResult } from "./cli/scoreEvidenceOutput.js";
-import { envelopeForComplianceReport } from "./claims/eligibility/adapters/results.js";
+import { envelopeForComplianceReport, isLegacyAmcVersion } from "./claims/eligibility/adapters/results.js";
 import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "./claims/eligibility/render.js";
 import { listDecisionReceipts, loadDecisionReceipt, observeDecisionOutcomes, writeDecisionReceipts, type DecisionReceipt } from "./lifecycle/decisionReceipt.js";
 import { exportFindingProofs, listFindingProofs, loadFindingProof, writeFindingProofs } from "./lifecycle/findingProof.js";
@@ -5461,7 +5461,10 @@ program
   .action(async (runId: string, opts: { executive: boolean; html?: string; share: boolean; shareDir: string; publicBaseUrl?: string }) => {
     const resolved = resolveRunReport(process.cwd(), runId, activeAgent(program));
     const report = resolved.report;
-    if (!resolved.sealVerified) { // CLI-04: shown as INVALID, and the command fails
+    if (!resolved.sealVerified && isLegacyAmcVersion(report.methodology?.amcVersion)) {
+      // An AMC 1.x run carries no seal this version checks: shown INVALID and labelled legacy self-reported, not as tampered.
+      console.error(chalk.yellow(`Run ${resolved.resolvedRunId} was written by AMC 1.x, whose seal this version does not check. It is shown as INVALID and self-reported.`));
+    } else if (!resolved.sealVerified) { // CLI-04: shown as INVALID, and the command fails
       process.exitCode = 1;
       console.error(chalk.red(`Run ${resolved.resolvedRunId}: its seal does not verify, so the file changed after AMC wrote it or AMC did not write it. It is shown as INVALID; nothing in it is vouched for.`));
     }
