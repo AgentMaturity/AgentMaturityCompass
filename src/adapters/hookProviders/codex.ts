@@ -16,6 +16,7 @@ import { writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 import type { HookIntegrationStatus, HookMutationResult, InstallHookIntegrationOptions, RemoveHookIntegrationOptions } from "../hookIntegration.js";
 import { verifyManagedLease } from "../managedHookLease.js";
+import { stableNodePath } from "./nodePath.js";
 import {
   addManagedIgnoreBlock, assertAllPathsSafe, fileChange, HOOK_INTEGRATION_ID, HOOK_TOKEN_MODE, HookIntegrationError, hasManagedIgnoreBlock,
   ignoreBlockHash, leaseManifestFields, loadSignedHookManifest, managedLeaseStatus, obtainHookLease, parseInstallOptions, relativePortable, removeInstallationFiles, restore, snapshot, withInstallLock,
@@ -82,7 +83,7 @@ function shellWord(value: string): string {
 
 /** `.codex/hooks.json` (Codex HooksFile): one PostToolUse command hook for every tool, running AMC's forwarder. */
 function hooksFile(workspace: string, forwarderPath: string): Buffer {
-  const command = [process.execPath, forwarderPath, workspace].map(shellWord).join(" ");
+  const command = [stableNodePath(), forwarderPath, workspace].map(shellWord).join(" ");
   const file = { description: "AMC managed observation hook; written by `amc connect hooks install --provider codex`. Do not edit.",
     hooks: { PostToolUse: [{ hooks: [{ type: "command", command, timeout: 10, statusMessage: "AMC records this tool call" }] }] } };
   return Buffer.from(`${JSON.stringify(file, null, 2)}\n`, "utf8");

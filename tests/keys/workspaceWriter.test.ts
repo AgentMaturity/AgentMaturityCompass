@@ -228,6 +228,8 @@ describe("review round 2: a lost key set is refused, never re-created", () => {
     writeFileSync(join(keys, "monitor_ed25519"), mine.privatePem);
     writeFileSync(join(keys, "monitor_ed25519.pub"), mine.publicPem);
     expect(() => ensureSigningKeys(root)).toThrow(/keyset\.json is missing, but this machine committed generation/);
+    // The refusal stays; it also says what happened and the two honest ways forward (restore, or a new folder).
+    expect(() => ensureSigningKeys(root)).toThrow(/amc keys rotate --restore[\s\S]*new folder/);
     expect(vaultExists(root)).toBe(false);
     expect(existsSync(join(keys, "keyset.json"))).toBe(false);
     expect(readHighWater(highWaterKey("keyset", workspaceScope(root)))).toEqual(mark);

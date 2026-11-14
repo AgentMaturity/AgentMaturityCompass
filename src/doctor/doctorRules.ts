@@ -21,6 +21,7 @@ import { issueLeaseForCli } from "../leases/leaseCli.js";
 import { checkScopedEgress, EgressBlocked } from "../residency/checkEgress.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { adaptersDetectCli } from "../adapters/adapterCli.js";
+import { adapterDoctorCheck } from "../adapters/adapterDetection.js";
 import { pathAllowedByPatterns } from "../toolhub/toolhubValidators.js";
 import { checkNotaryTrust, loadTrustConfig, verifyTrustConfigSignature } from "../trust/trustConfig.js";
 import { signDigestWithPolicyAsync } from "../crypto/signing/signer.js";
@@ -80,12 +81,7 @@ function pushSignatureCheck(checks: DoctorCheck[], id: string, label: string, ve
 
 function pushAdapterChecks(checks: DoctorCheck[], workspace: string, includePlugins: boolean): void {
   for (const row of adaptersDetectCli({ workspace, timeoutMs: 250, includePlugins })) {
-    checks.push({
-      id: `adapter-${row.adapterId}`,
-      status: row.installed ? "PASS" : "WARN",
-      message: row.installed ? `${row.adapterId}: ${row.command} ${row.version ?? ""}`.trim() : `${row.adapterId}: ${row.detail}`,
-      fixHint: row.installed ? undefined : `Install/enable ${row.adapterId} CLI or use generic-cli`
-    });
+    checks.push({ id: `adapter-${row.adapterId}`, ...adapterDoctorCheck(row) });
   }
 }
 

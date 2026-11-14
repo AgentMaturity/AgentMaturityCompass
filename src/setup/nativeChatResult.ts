@@ -13,7 +13,7 @@ export interface NativeChatChildSummary {
 }
 export type NativeChatResult =
   | { readonly ok: true; readonly summary: NativeChatChildSummary }
-  | { readonly ok: false; readonly code: "OUTPUT_TRUNCATED" | "RESULT_INVALID" | "RESULT_STATE_INVALID" | "SESSION_MISMATCH" | "FORK_IDENTITY_INVALID" | "RESULT_HISTORY_CHANGED" | "RESULT_UNSIGNED"; readonly message: string };
+  | { readonly ok: false; readonly code: "OUTPUT_TRUNCATED" | "RESULT_INVALID" | "RESULT_STATE_INVALID" | "SESSION_MISMATCH" | "FORK_IDENTITY_INVALID" | "RESULT_HISTORY_CHANGED" | "RESULT_UNSIGNED" | "VAULT_LOCKED"; readonly message: string };
 
 const ENDINGS: ReadonlySet<string> = new Set<TurnEndReason>(["complete", "cancelled", "error", "interrupted", "max_steps", "max_tokens", "blocked"]);
 const VALIDATION: ReadonlySet<string> = new Set<NativeValidationStatus>(["not-requested", "pending", "passed", "failed", "unavailable"]);
@@ -33,9 +33,14 @@ export function parseNativeChatResult(input: {
   readonly forkFrom: string | null;
   /** Last admitted cumulative summary in this chat, never a guessed disk cursor. */
   readonly previousSummary?: NativeChatChildSummary | null;
+  /** The child wrote the vault's locked refusal (VAULT_LOCKED_PREFIX) to stderr. */
+  readonly childVaultLocked?: boolean;
 }): NativeChatResult {
   if (input.truncated) return { ok: false, code: "OUTPUT_TRUNCATED", message: "The child output exceeded the display limit. Its partial summary cannot establish a session reference." };
-  const invalid = (): NativeChatResult => ({ ok: false, code: "RESULT_INVALID", message: "The child returned a malformed or unsupported recorded-run summary." });
+  const invalid = (): NativeChatResult => input.childVaultLocked === true
+    ? { ok: false, code: "VAULT_LOCKED", message: "The vault is locked, so the turn could not be signed. Run chat from your own terminal "
+      + "(it uses the passphrase `amc setup` or `amc up` remembered, or asks for it), or export AMC_VAULT_PASSPHRASE for this shell." }
+    : { ok: false, code: "RESULT_INVALID", message: "The child returned a malformed or unsupported recorded-run summary." };
   let row: Record<string, unknown> | null;
   try { row = object(JSON.parse(input.stdout)); } catch { return invalid(); }
   if (!row || typeof row.sessionId !== "string" || !row.sessionId.trim() || row.sessionId.trim() !== row.sessionId
