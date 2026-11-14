@@ -174,7 +174,7 @@ function firstUseCard(agentId, demoMode) {
   const guideCommand = `amc --agent=${quotedAgent} agent-loop guide`;
   // The demo workspace's session is view-only, so its baseline button would refuse: name where scoring works instead.
   const scoreRecords = demoMode
-    ? '<p class="muted first-use-score">Already have records? Available in your own workspace: run <code>amc up</code> in a terminal.</p>'
+    ? '<p class="muted first-use-score">Already have records? Available in your own workspace: in the app choose Studio &gt; Open My Workspace, or run <code>amc up</code> in a terminal.</p>'
     : '<p class="first-use-score"><a href="#activationSteps" id="firstUseBaselineContinue">I already have records: score them</a></p>';
   return `
     <section id="firstUse" class="card first-use" aria-labelledby="firstUseTitle">

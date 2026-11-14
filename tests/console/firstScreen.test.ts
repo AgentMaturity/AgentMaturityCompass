@@ -32,7 +32,7 @@ describe("hero card", () => {
     expect(hero).toContain("No setup. Runs on this computer with no model or tools.");
     expect(hero).toContain(">Connect my agent</button>");
     expect(hero).toContain("I already have records: score them");
-    expect(hero).toContain("Available in your own workspace: run <code>amc up</code> in a terminal.");
+    expect(hero).toContain("Available in your own workspace: in the app choose Studio &gt; Open My Workspace, or run <code>amc up</code> in a terminal.");
   });
 
   test("the primary label and link follow the workspace", () => {
