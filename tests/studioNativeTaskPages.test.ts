@@ -238,3 +238,37 @@ test("Studio collector checks later payload commitments and complete media prove
     .toThrow(expect.objectContaining({ acpData: { reason: "evidence-inconsistent" } }));
   expect(collectUpdate).not.toHaveBeenCalled();
 });
+
+test("a page read that races a concurrent append reads again instead of reporting unauthenticated evidence", async () => {
+  const { randomUUID } = await import("node:crypto");
+  const { NativeTaskDescriptors, nativeTaskId } = await import("../src/studio/nativeTaskDescriptors.js");
+  const { createNativeTaskService } = await import("../src/studio/nativeTaskService.js");
+  const pages = await import("../src/acp/acpSessionUpdatePage.js");
+  const { SessionHistoryRefused } = await import("../src/session/sessionHistoryReader.js");
+  const workspace = orderedWorkspace(), writer = new SessionService(workspace);
+  const actor = { principalId: "race-owner", agentId: "default", demo: true };
+  writer.open({ agentId: "default", harnessVersion: "page-race", compositionDigest: "fixture", policyDigest: "fixture" });
+  writer.startTurn({ trigger: "user" }); writer.startStep(); writer.recordUserMessage("Committed before the race.");
+  writer.endStep({ stopReason: "complete", usage: null }); writer.endTurn({ reason: "complete" }); writer.sealTurn();
+  const sessionId = writer.sessionId, requestId = randomUUID(), taskId = nativeTaskId(actor.principalId, requestId), now = Date.now();
+  new NativeTaskDescriptors(workspace).write({ kind: "amc/studio-native-task/v1", taskId, principalId: actor.principalId, agentId: "default", demo: true,
+    sessionId, provider: "stub", model: null, tools: "none", toolsDigest: null, maxSteps: 2, maxTokens: 64,
+    createdAt: now, updatedAt: now, revision: 1, pendingTurn: false, closed: false,
+    submissions: [{ clientRequestId: requestId, bodyHash: "a".repeat(64), revision: 1 }] });
+  const read = pages.readAcpSessionUpdatePage;
+  let races = 2;
+  const spy = vi.spyOn(pages, "readAcpSessionUpdatePage").mockImplementation(options => {
+    if (races-- > 0) throw new SessionHistoryRefused("CHANGED", "History or trust changed during loading.");
+    return read(options);
+  });
+  const service = createNativeTaskService({ workspace, environment: { PATH: process.env.PATH } });
+  try {
+    const page = service.poll(actor, taskId, { limit: 64 });
+    expect(page.task.history.status).toBe("authenticated");
+    expect(page.events.some(event => event.text.includes("Committed before the race."))).toBe(true);
+    // A store that never holds still is still refused, with the cause named rather than an authentication failure.
+    races = Number.POSITIVE_INFINITY;
+    expect(() => service.poll(actor, taskId, { limit: 64 })).toThrow(expect.objectContaining({ code: "NATIVE_EVIDENCE_UNAVAILABLE", statusCode: 409,
+      message: expect.stringMatching(/kept changing/) }));
+  } finally { spy.mockRestore(); writer.disposeWithoutClosing(); await service.close(); await orderedCleanup(); }
+}, 60_000);

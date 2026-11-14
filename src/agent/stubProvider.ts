@@ -56,6 +56,8 @@ export const STUB_PROVIDER_MODEL = "amc-stub-1";
 
 /** The base URL the stub route registers. Never dialled — the transport is local. */
 const STUB_BASE_URL = "http://stub.invalid";
+/** The one URL a stub dispatch names. `.invalid` never resolves (RFC 6761), so it cannot carry a paid request. */
+export const STUB_DISPATCH_URL = `${STUB_BASE_URL}/v1/messages`;
 
 export interface StubProviderOptions {
   /**
