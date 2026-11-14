@@ -1,10 +1,10 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { generateReport, runDiagnostic } from "../src/diagnostic/runner.js";
-import { resolveRunReport } from "../src/diagnostic/runReportResolution.js";
+import { latestRunId, latestRunSummary, resolveRunReport } from "../src/diagnostic/runReportResolution.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
 import { lockVault } from "../src/vault/vault.js";
 
@@ -45,4 +45,14 @@ describe("run reports read back for display", () => {
     expect(markdown).not.toContain("Artifact Verification: PASSED");
     expect(markdown).not.toContain("Artifact Status: **VALID**");
   }, 120_000);
+
+  // CLI-05: "Latest run" sorted run files by their UUID names, so it named a random run.
+  test("the latest run is the one with the newest recorded time, whatever its file name", () => {
+    const runsDir = getAgentPaths(workspace, "default").runsDir;
+    mkdirSync(runsDir, { recursive: true });
+    writeFileSync(join(runsDir, "ffffffff-old.json"), JSON.stringify({ runId: "ffffffff-old", ts: 1_000, integrityIndex: 0, trustLabel: "LOW" }));
+    writeFileSync(join(runsDir, "00000000-new.json"), JSON.stringify({ runId: "00000000-new", ts: 2_000, integrityIndex: 0, trustLabel: "LOW" }));
+    expect(latestRunId(workspace, "default")).toBe("00000000-new");
+    expect(latestRunSummary(workspace, "default")?.runId).toBe("00000000-new");
+  });
 });

@@ -150,7 +150,7 @@ function locateRunReport(workspace: string, runId: string, agentId?: string): Om
 }
 
 /**
- * The agent's run files, oldest name first, in the runs directory the runner writes (getAgentPaths): `.amc/runs` for a
+ * The agent's run files in name order (not time order: latestRunFile picks by time), in the runs directory the runner writes (getAgentPaths): `.amc/runs` for a
  * root-scoped default agent, `.amc/agents/<id>/runs` otherwise. Every "latest run" reader goes through here.
  */
 export function agentRunFiles(workspace: string, agentId: string): string[] {
@@ -160,15 +160,31 @@ export function agentRunFiles(workspace: string, agentId: string): string[] {
     .map((name) => join(runsDir, name));
 }
 
+/**
+ * CLI-05: the newest run file by the time it records, not by name (run ids are random UUIDs, so name order is no order).
+ * A file that does not parse sorts first; equal times fall back to name order. Display only: the ts is unverified.
+ */
+export function latestRunFile(workspace: string, agentId: string): string | undefined {
+  const timeOf = (file: string): number => {
+    try { const ts = (JSON.parse(readUtf8(file)) as { ts?: unknown }).ts; return typeof ts === "number" ? ts : -Infinity; } catch { return -Infinity; }
+  };
+  let latest: { file: string; ts: number } | undefined;
+  for (const file of agentRunFiles(workspace, agentId)) {
+    const ts = timeOf(file);
+    if (latest === undefined || ts >= latest.ts) latest = { file, ts };
+  }
+  return latest?.file;
+}
+
 /** The newest run file's id (its name), or null when the agent has none. */
 export function latestRunId(workspace: string, agentId: string): string | null {
-  const latest = agentRunFiles(workspace, agentId).at(-1);
+  const latest = latestRunFile(workspace, agentId);
   return latest ? basename(latest, ".json") : null;
 }
 
 /** The newest run file's summary, for the "Latest run" lines and `--run latest`. */
 export function latestRunSummary(workspace: string, agentId: string): { runId: string; integrityIndex: number; trustLabel: string } | null {
-  const latest = agentRunFiles(workspace, agentId).at(-1);
+  const latest = latestRunFile(workspace, agentId);
   if (!latest) return null;
   try {
     const parsed = JSON.parse(readUtf8(latest)) as { runId?: string; integrityIndex?: number; trustLabel?: string };
