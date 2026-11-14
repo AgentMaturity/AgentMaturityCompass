@@ -71,7 +71,7 @@ export function approvalsNote(facts: A4StartFacts, practice: boolean): { kind: "
   const alone = facts.people === 1;
   return { kind: "standard", secondPersonNeeded: true, text: `${alone ? "You are the only person who can sign in to this workspace. " : ""}This project needs other `
     + "people to approve: whoever wrote, built or asked for a step cannot approve it (separation of duties). A brief with a high or critical risk level, which "
-    + "most Industry Packs suggest, is governed as regulated, and nobody approves their own work there."
+    + "every Industry Pack suggests, is governed as regulated, and nobody approves their own work there."
     + `${alone ? (facts.practiceAvailable ? " To try AMC alone, start a practice project instead." : "") + " To build for real, invite a second person from the project's Members card." : ""} `
     + SECOND_PERSON_NOT_INDEPENDENT };
 }

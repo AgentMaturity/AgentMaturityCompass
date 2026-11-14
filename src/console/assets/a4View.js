@@ -696,7 +696,8 @@ export function renderMembers(ctx) {
     ${Array.isArray(ctx.me?.roles) && ctx.me.roles.includes("OWNER") ? `<div class="a4-invite" data-card="members"><h4>Invite someone new</h4>
       <p class="muted">AMC creates their account with a first password, shows it to you once, and adds them here as an approver.</p>
       <label>Their user name <input name="inviteUsername" autocomplete="off" maxlength="64" /></label>
-      <label><input type="checkbox" name="inviteAuditor" /> They may also audit (Fit it to your rules needs one auditor)</label>
+      <label><input type="checkbox" name="inviteAuditor" /> They may also audit</label>
+      <p class="muted">Fit it to your rules (Adapt) needs two people besides the one who asks, each an auditor or a workspace owner.</p>
       ${actionButton("Invite", "invite-member", ctx.allowed.addMember)}</div>` : ""}
     <p class="muted">${TRUTH.twoUsers}.</p></section>`;
 }

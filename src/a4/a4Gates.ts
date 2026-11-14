@@ -331,6 +331,8 @@ export const NOT_READY_WORDS: Readonly<Record<string, string>> = {
   understanding_confirmed: "Run Understand, check what AMC understood from your answers, and confirm it.",
   plan_unresolved: "Some rules depend on facts that are still unknown. Answer them under Ask (on a regulated project they cannot be acknowledged instead).",
   "hold.none": "The project is on hold. A project owner resumes it.",
+  "gate.direction": "This step's plan waits for approval before anything is built.",
+  "gate.completion": "This step waits for the approval that completes it.",
   "resources.current": "The agent's files changed since this revision was recorded. Save an answer under Ask to record a new revision."
 };
 

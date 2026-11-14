@@ -280,13 +280,14 @@ export function renderIntro({ creating = true, canAdd = false } = {}) {
         <label>Their user name <input name="username" autocomplete="off" required maxlength="64" /></label>
         <p class="muted">AMC makes a first password for them and shows it here once. Give it to them yourself.</p>
         <label>What they may do <select name="roles"><option value="APPROVER">Approve steps (APPROVER)</option>
-          <option value="APPROVER,AUDITOR">Approve steps and audit (APPROVER, AUDITOR; the Fit it to your rules step needs one)</option></select></label>
+          <option value="APPROVER,AUDITOR">Approve steps and audit (APPROVER, AUDITOR)</option></select></label>
+        <p class="muted">Fit it to your rules (Adapt) needs two people besides the one who asks, each an auditor or a workspace owner, so give the audit role to at least two people.</p>
         <p class="a4-form-error status-bad" role="alert" hidden></p>
         <p class="muted" role="status" data-a4-add-status></p>
         <button type="submit" class="secondary">Add this person</button></form>` : ""}
       <details class="a4-terminal"><summary>Use the terminal instead</summary>
         <p class="muted">In the workspace folder run ${code(addUserCommand())}. Later steps need two approvers, and Fit it to your rules (Adapt)
-        needs one of them to hold AUDITOR (${code("--role APPROVER,AUDITOR")}).</p></details>
+        needs two besides the one who asks who hold AUDITOR or OWNER (${code("--role APPROVER,AUDITOR")}).</p></details>
       <p class="muted">${esc(SOD)}. ${esc(NOT_INDEPENDENT)}.</p></div></section>`;
 }
 

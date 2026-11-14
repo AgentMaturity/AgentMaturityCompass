@@ -282,7 +282,7 @@ function printOpenItems(readiness: Data): void {
   const open = items.filter((item) => item.mandatory && item.status !== "READY" && item.status !== "COMPLETE");
   // In words first (what it means and what to do), then the item id, its status and its reason codes for reference.
   for (const item of open.slice(0, TEXT_ROWS)) {
-    const words = NOT_READY_WORDS[item.id] ?? item.nextAction?.label;
+    const words = item.reasonCodes.includes("OWNER_ACKNOWLEDGED") ? "Acknowledged by a project owner; it stays listed." : NOT_READY_WORDS[item.id] ?? item.nextAction?.label;
     console.log(`- ${words ? `${safe(words)} ` : ""}[${item.id}: ${item.status.toLowerCase()}${item.reasonCodes.length > 0 ? `; ${item.reasonCodes.join(", ")}` : ""}]`);
   }
   if (open.length > TEXT_ROWS) console.log(`… ${open.length - TEXT_ROWS} more (--json prints them all)`);
