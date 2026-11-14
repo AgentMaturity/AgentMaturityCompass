@@ -104,7 +104,7 @@ export function finishVerify(label: string, report: VerifierReportV1,
  * key shows only that the file matches the key kept in this folder; whoever can change the records can replace the key
  * too. So the hint gives its sha256 to compare with one recorded outside the folder, and never recommends it alone.
  */
-export function folderKeyHint(workspace: string): string[] {
+function folderKeyHint(workspace: string): string[] {
   const path = join(workspace, ".amc", "keys", "artifact-seal.pub");
   const general = "Next: pass --pubkey with the signer's public key obtained outside this folder (for someone else's file, the key they gave you), or a signed trust list with --trust-list.";
   if (!existsSync(path)) return [general];

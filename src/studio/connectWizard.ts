@@ -33,7 +33,7 @@ export interface ConnectOutput {
 }
 
 /** CLI-13: the two modes, said the same way in the refusal, the prompt and the help. */
-export const CONNECT_MODES = {
+const CONNECT_MODES = {
   supervise: "AMC starts your agent's command with its model calls routed through AMC's gateway, which records them",
   sandbox: "the same, inside a hardened Docker container (amc sandbox run; needs Docker)"
 } as const;

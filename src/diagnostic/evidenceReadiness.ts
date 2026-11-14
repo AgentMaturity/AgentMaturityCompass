@@ -4,6 +4,14 @@ import type {
   EvidenceReadinessReasonCode
 } from "../types.js";
 
+import type { ParsedEvidenceEvent } from "./gates.js";
+
+/** CLI-01: what the agent did in the window, so an empty score can say it saw the run but accepted none of it. */
+export function recordedActivityOf(events: readonly ParsedEvidenceEvent[]): { events: number; sessions: number } {
+  const rows = events.filter((event) => event.event_type !== "audit");
+  return { events: rows.length, sessions: new Set(rows.map((event) => event.session_id)).size };
+}
+
 export const CLAIM_READY_INTEGRITY = 0.6 as const;
 export const INSUFFICIENT_INTEGRITY_BELOW = 0.4 as const;
 

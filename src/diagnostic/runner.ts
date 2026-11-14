@@ -82,7 +82,7 @@ import {
   summarizeConfidenceControls
 } from "./confidenceControls.js";
 import { buildQuestionExplainabilityReport, type QuestionExplainabilityInputRow } from "./questionScoreExplainability.js";
-import { evaluateDiagnosticEvidenceReadiness } from "./evidenceReadiness.js";
+import { evaluateDiagnosticEvidenceReadiness, recordedActivityOf } from "./evidenceReadiness.js";
 import { markdownCell, markdownHeatmap } from "./reportMarkdown.js";
 import { formatClaimLabel, renderClaimLabel, renderClaimLegend, type ClaimEnvelope } from "../claims/eligibility/index.js";
 import { envelopeForStoredRun } from "../claims/eligibility/adapters/results.js";
@@ -418,12 +418,6 @@ function computeEvidenceTrustCoverage(events: ParsedEvidenceEvent[]): {
     attested: Number((attestedCount / events.length).toFixed(4)),
     selfReported: Number((selfCount / events.length).toFixed(4))
   };
-}
-
-/** CLI-01: what the agent did in the window, so an empty score can say it saw the run but accepted none of it. */
-function recordedActivityOf(events: readonly ParsedEvidenceEvent[]): { events: number; sessions: number } {
-  const rows = events.filter((event) => event.event_type !== "audit");
-  return { events: rows.length, sessions: new Set(rows.map((event) => event.session_id)).size };
 }
 
 function isDiagnosticGeneratedAudit(event: ParsedEvidenceEvent): boolean {

@@ -77,7 +77,7 @@ function clampLevel(value: number): number {
  * CLI-08: the overall level is the level the average answer has reached (levels are cumulative, so 0.08 is L0), on the
  * same L0-L5 scale as the layer lines. A percentage band said L1 for 2% while every layer read L0.
  */
-export function levelFromAverage(average: number): FullDiagnosticResult["overallLevel"] {
+function levelFromAverage(average: number): FullDiagnosticResult["overallLevel"] {
   return `L${Math.max(0, Math.min(5, Math.floor(average + 1e-9)))}` as FullDiagnosticResult["overallLevel"];
 }
 
