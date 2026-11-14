@@ -143,7 +143,7 @@ var PRODUCTS=[
   ]}
 ];
 
-var currentProduct=0,cycleTimer=null;
+var currentProduct=0;
 
 function renderProduct(idx){
   var p=PRODUCTS[idx];
@@ -155,7 +155,12 @@ function renderProduct(idx){
   var badges=document.getElementById('product-badges');
   if(!body||!p) return;
 
-  document.querySelectorAll('.product-tab').forEach(function(t,i){t.classList.toggle('active',i===idx)});
+  document.querySelectorAll('.product-tab').forEach(function(t,i){
+    t.classList.toggle('active',i===idx);
+    if(t.getAttribute('role')==='tab'){ t.setAttribute('aria-selected',i===idx?'true':'false'); t.tabIndex=i===idx?0:-1; }
+  });
+  var panel=document.getElementById('product-panel');
+  if(panel) panel.setAttribute('aria-labelledby','product-tab-'+idx);
   if(title) title.textContent=p.name;
   if(headline) headline.textContent=p.headline||p.title;
   if(summary) summary.textContent=p.summary||'';
@@ -170,31 +175,26 @@ function renderProduct(idx){
   }).join('');
 }
 
-function startCycle(){
-  if(cycleTimer) clearInterval(cycleTimer);
-  cycleTimer=setInterval(function(){
-    currentProduct=(currentProduct+1)%PRODUCTS.length;
-    renderProduct(currentProduct);
-  },10000);
-}
-
 function initProducts(){
   var tabs=document.getElementById('product-tabs');
   if(!tabs) return;
+  // The tabs change only when the reader asks: no timer moves them.
+  function select(idx,focus){
+    currentProduct=(idx+PRODUCTS.length)%PRODUCTS.length;
+    renderProduct(currentProduct);
+    if(focus){ var tab=tabs.querySelectorAll('.product-tab')[currentProduct]; if(tab) tab.focus(); }
+  }
   tabs.addEventListener('click',function(e){
     var btn=e.target.closest('.product-tab');
-    if(!btn) return;
-    currentProduct=parseInt(btn.dataset.idx,10);
-    renderProduct(currentProduct);
-    startCycle();
+    if(btn) select(parseInt(btn.dataset.idx,10),false);
+  });
+  tabs.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='ArrowDown'){ e.preventDefault(); select(currentProduct+1,true); }
+    else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){ e.preventDefault(); select(currentProduct-1,true); }
+    else if(e.key==='Home'){ e.preventDefault(); select(0,true); }
+    else if(e.key==='End'){ e.preventDefault(); select(PRODUCTS.length-1,true); }
   });
   renderProduct(0);
-  if('IntersectionObserver' in window){
-    var obs=new IntersectionObserver(function(entries){
-      if(entries[0] && entries[0].isIntersecting){startCycle();obs.disconnect();}
-    },{threshold:0.2});
-    obs.observe(tabs);
-  }
 }
 
 function initFAQ(){
