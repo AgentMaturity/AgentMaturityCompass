@@ -114,4 +114,10 @@ describe("website hero truth", () => {
       expect(page, label).toContain(label);
     }
   });
+
+  test("the home page calls the built-in model the stand-in model, so it is not confused with a practice project", () => {
+    const page = read("website/index.html");
+    expect(page).not.toMatch(/practice model/i);
+    expect(page).toContain("stand-in model");
+  });
 });
