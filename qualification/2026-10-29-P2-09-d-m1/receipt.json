@@ -91,27 +91,27 @@
       "sha256": "b00336d0f5eccc413b71da3263540df8c2d4a9fd04ef1bd5e9a9d4aa6608a8c4"
     },
     {
-      "path": "check:api-ref.log",
+      "path": "check-api-ref.log",
       "sha256": "b3f05c856b6880ccf5985f87f8939d6948fc30ce3dc70edd6c71e0e1dff3cb2d"
     },
     {
-      "path": "check:counts.log",
+      "path": "check-counts.log",
       "sha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e"
     },
     {
-      "path": "check:dead-code.log",
+      "path": "check-dead-code.log",
       "sha256": "860c90e4f9cbe1cd354b76f59c0ed99b00a74121629c115cbcb371c706a8b310"
     },
     {
-      "path": "check:docs-drift.log",
+      "path": "check-docs-drift.log",
       "sha256": "2e3dca3a044e9bc68bfdc3cc6fb49191e73288449e27d6093769f3a9ca665a2e"
     },
     {
-      "path": "check:duplicates.log",
+      "path": "check-duplicates.log",
       "sha256": "b543e2fabc40e6524309ff9ce4939dea37d9f77733a1fb488074425e5407839f"
     },
     {
-      "path": "check:gates.log",
+      "path": "check-gates.log",
       "sha256": "e59398d6b10bd12bbfdd3ab4f1094f5a49247370760dfafe11996cce02f585f1"
     },
     {
@@ -147,7 +147,7 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "path": "typecheck:tests.log",
+      "path": "typecheck-tests.log",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     }
   ],
