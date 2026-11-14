@@ -28,7 +28,7 @@ describe("scenario: acknowledged blocker", () => {
     // be spent on a gate that cannot complete, since the acknowledgement supersedes it. The refusal names the item in words.
     const early = await j.p.post(j.t.alice, "/stages/aspire/gates/direction/request");
     expect(refusal(early)).toEqual([409, "A4_NOT_READY"]);
-    expect(early.body.error).toMatch(/Not ready yet: sod\.self_provisioned/);
+    expect(early.body.error).toMatch(/Not ready yet\. Every approver here was created in this one workspace.+\(sod\.self_provisioned\)/);
 
     await j.acknowledge("aspire", "sod.self_provisioned");
     const acknowledged = await j.item("sod.self_provisioned");

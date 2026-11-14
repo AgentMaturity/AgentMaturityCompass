@@ -311,11 +311,28 @@ export function assertAllowed(readiness: A4ReadinessV1, action: A4Action, ignore
   if (codes.includes("ON_HOLD")) throw fail(409, "A4_ON_HOLD", "The project is on hold; an owner resumes it.", named);
   if (codes.includes("A4_STEP_ORDER")) throw fail(409, "A4_STEP_ORDER", "The project is not at that stage; reload it.", { reasonCodes: codes });
   if (codes.includes("PRINCIPAL_UNRESOLVED")) throw fail(409, "PRINCIPAL_UNRESOLVED", "The active plan requires a principal: an active local users.yaml user runs this effect. Nothing was consumed.", { reasonCodes: codes });
-  // Each item with its own next action, in words; codes without an item (a gate's own state) are listed as they are.
-  const said = named.items.map((entry) => (entry.nextAction?.label ? `${entry.id} (${entry.nextAction.label})` : entry.id));
+  // Each item in words with what to do (its own next action, or NOT_READY_WORDS), its id after it; codes without an item
+  // (a gate's own state) are listed as they are.
+  const said = named.items.map((entry) => {
+    const words = NOT_READY_WORDS[entry.id] ?? entry.nextAction?.label;
+    return words ? `${words} (${entry.id})` : entry.id;
+  });
   const rest = codes.filter((code) => !named.items.some((entry) => entry.id === code));
-  throw fail(409, "A4_NOT_READY", `Not ready yet: ${[...said, ...rest].join("; ")}.`, named);
+  throw fail(409, "A4_NOT_READY", `Not ready yet. ${[...said, ...rest].join(" ")}`, named);
 }
+
+/** The items a refusal most often names, in plain words with the next step; any other item says its own next action. */
+const NOT_READY_WORDS: Readonly<Record<string, string>> = {
+  "sod.self_provisioned": "Every approver here was created in this one workspace, so AMC cannot show they are different people. A project owner "
+    + "acknowledges this once, with a reason, on the Missing requirements card; it holds for 90 days.",
+  sod: "Someone other than the person who wrote, built or asked for this step must approve it (separation of duties). Add a second person on the "
+    + "project's Members card first.",
+  ask_complete: "Some questions still need an answer, or an answer is not one AMC accepts. Answer them under Ask and press Save answers.",
+  understanding_confirmed: "Run Understand, check what AMC understood from your answers, and confirm it.",
+  plan_unresolved: "Some rules depend on facts that are still unknown. Answer them under Ask (on a regulated project they cannot be acknowledged instead).",
+  "hold.none": "The project is on hold. A project owner resumes it.",
+  "resources.current": "The agent's files changed since this revision was recorded. Save an answer under Ask to record a new revision."
+};
 
 /**
  * The automatic HOLD by amc-runtime naming the incidents (design §6.6); a project already held is left as it is. Like a
