@@ -311,8 +311,10 @@ static NSString * const AMCQuitChoiceKey = @"AMCQuitChoice"; // 0 ask, 1 stop AM
     self.switchItem.title = [mode isEqualToString:@"demo"] ? @"Open My Workspace" : @"Try the Demo";
     [self showProgress:@"Opening the Compass Console…"];
     [self clearStaleWebData:out[@"AMC_PACKAGE_DIGEST"] then:^{
-      [self setSessionCookie:out[@"AMC_SESSION"] forURL:url then:^{
-        [self.webView loadRequest:[NSURLRequest requestWithURL:url]];
+      [self forgetSessionCookieThen:^{
+        [self setSessionCookie:out[@"AMC_SESSION"] forURL:url then:^{
+          [self.webView loadRequest:[NSURLRequest requestWithURL:url]];
+        }];
       }];
     }];
   }];
@@ -348,6 +350,7 @@ static NSString * const AMCQuitChoiceKey = @"AMCQuitChoice"; // 0 ask, 1 stop AM
     self.studioURL = nil;
     self.startedStudio = NO;
     [self.webView loadHTMLString:@"" baseURL:nil];
+    [self forgetSessionCookieThen:^{}];
     [self showProblem:[NSString stringWithFormat:@"AMC is stopped. Your records stay in %@.", [self workspaceDir]] action:@"Start AMC"];
   }];
 }
@@ -379,8 +382,26 @@ static NSString * const AMCQuitChoiceKey = @"AMCQuitChoice"; // 0 ask, 1 stop AM
 
 // ---- Navigation: the console stays in the window, every other site opens in the default browser -----------------------
 
+// Cookies are not scoped to a port, so the owner session would go to any other program listening on this Mac's
+// loopback. Only the exact origin the launcher printed is the console; another 127.0.0.1 port opens outside the app.
 - (BOOL)isConsoleURL:(NSURL *)url {
-  return [url.scheme isEqualToString:@"http"] && [url.host isEqualToString:@"127.0.0.1"];
+  NSURL *studio = self.studioURL != nil ? [NSURL URLWithString:self.studioURL] : nil;
+  return studio != nil && studio.port != nil && url.port != nil && [url.scheme isEqualToString:@"http"]
+    && [url.host isEqualToString:@"127.0.0.1"] && [url.port isEqualToNumber:studio.port];
+}
+
+// The owner session leaves the window with the Studio it belongs to: on Stop AMC and before every start or switch.
+- (void)forgetSessionCookieThen:(void (^)(void))next {
+  WKHTTPCookieStore *store = self.webView.configuration.websiteDataStore.httpCookieStore;
+  [store getAllCookies:^(NSArray<NSHTTPCookie *> *cookies) {
+    dispatch_group_t group = dispatch_group_create();
+    for (NSHTTPCookie *cookie in cookies) {
+      if (![cookie.name isEqualToString:@"amc_session"]) continue;
+      dispatch_group_enter(group);
+      [store deleteCookie:cookie completionHandler:^{ dispatch_group_leave(group); }];
+    }
+    dispatch_group_notify(group, dispatch_get_main_queue(), next);
+  }];
 }
 
 - (void)openOutside:(NSURL *)url {

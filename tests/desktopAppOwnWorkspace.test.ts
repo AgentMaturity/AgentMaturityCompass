@@ -179,3 +179,13 @@ test.skipIf(process.platform === "win32")("first-launch failures say what to do:
   expect(npmFailed.lines.at(-1)).toBe(`AMC_ERROR=Installing AMC failed: npm could not finish, often because this Mac is offline. Details are in ${join(box.support, "Logs", "studio-launcher.log")}. Check the network connection, then click Retry.`);
   expect(readFileSync(join(box.support, "Logs", "studio-launcher.log"), "utf8")).toContain("npm ERR! network");
 });
+
+// 2026-11-14 review: cookies are not port-scoped, so the app must treat only the launcher's exact origin as the console.
+test("the app keeps the owner session to the console's own port and drops it on stop and switch", () => {
+  const source = readFileSync(packager, "utf8");
+  const isConsole = source.match(/- \(BOOL\)isConsoleURL:\(NSURL \*\)url \{([\s\S]*?)\n\}/)?.[1] ?? "";
+  expect(isConsole).toContain("[url.port isEqualToNumber:studio.port]");
+  expect(isConsole).toContain("studio != nil");
+  expect(source).toContain("- (void)forgetSessionCookieThen:");
+  expect(source.match(/forgetSessionCookieThen:\^/g)?.length).toBeGreaterThanOrEqual(2);
+});
