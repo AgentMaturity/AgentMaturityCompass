@@ -166,6 +166,8 @@ describe("amc up in a terminal with a vault that already exists", () => {
     logged();
     await ensureUpVaultPassphrase(workspaceWithSavedFile("the-real-vault-pass"), true);
     expect(seam.asked.map((question) => question.name)).toEqual(["useSaved", "rememberChoice"]);
+    // No key set committed on this machine (a clone, a copy, a 1.x vault): "no" is the default answer (SH-SANDBOX-07).
+    expect((seam.asked[0] as { default?: boolean }).default).toBe(false);
     expect(process.env.AMC_VAULT_PASSPHRASE).toBe("the-real-vault-pass");
     expect(seam.events).not.toContain("store");
   });

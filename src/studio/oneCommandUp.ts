@@ -17,6 +17,8 @@ import { getRememberedVaultPassphrase, rememberEnabled, rememberedLocation, reme
 import { vaultExists, vaultOpensWith } from "../vault/vault.js";
 import { localVaultPassphrasePath } from "../vault/localPassphrase.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
+import { keysetAnchoring } from "../keys/keyset.js";
+import { getMode } from "../mode/mode.js";
 
 export async function ensureUpVaultPassphrase(workspace: string, rememberRequested: boolean): Promise<void> {
   // LIVE-VAULT-03: AMC_VAULT_REMEMBER=0 turns the stores off, so nothing below reads, offers or writes one.
@@ -129,13 +131,16 @@ async function askExistingVaultPassphrase(workspace: string): Promise<void> {
   console.log(chalk.bold("\n🔐 This workspace already has a vault"));
   console.log(chalk.gray("  AMC needs that vault's passphrase. A new one cannot open it.\n"));
   const file = localVaultPassphrasePath(workspace);
-  const saved = agentMarker() === null && pathExists(file) ? readUtf8(file).trim() : "";
+  // The gates loadLocalVaultPassphrase applies: never for an agent (marker or agent mode). A vault whose key set this
+  // machine did not commit (a clone, a copy, or a 1.x vault) is offered with "no" as the default answer.
+  const saved = agentMarker() === null && getMode(workspace) !== "agent" && pathExists(file) ? readUtf8(file).trim() : "";
+  const anchored = keysetAnchoring(workspace).state === "committed";
   if (saved.length >= 8 && vaultOpensWith(workspace, saved)) {
     const { useSaved } = await inquirer.prompt([{
       type: "confirm",
       name: "useSaved",
       message: "The passphrase AMC saved in .amc/local-vault-passphrase opens this vault. Use it? (Answer no if this folder was copied or cloned from someone else.)",
-      default: true
+      default: anchored
     }]);
     if (useSaved) {
       process.env.AMC_VAULT_PASSPHRASE = saved;
