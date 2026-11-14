@@ -51,6 +51,7 @@ function staticAssets() {
     assetPath("assets/nativeTasks.js"),
     assetPath("assets/nativeTasksView.js"),
     assetPath("assets/nativeTaskSubmission.js"),
+    assetPath("assets/motion.css"),
     assetPath("assets/nativeTasks.css"),
     assetPath("assets/charts.js"),
     assetPath("assets/northstar.js"),
