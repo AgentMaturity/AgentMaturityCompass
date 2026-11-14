@@ -29,6 +29,8 @@ import { renderNativeInteractiveToolResults } from "./nativeInteractiveResults.j
 import { escapeTerminalControls } from "../tools/builtin/askUserTool.js";
 import { listNativeQueuedSubmissions, withdrawNativeQueuedSubmission } from "./nativeInteractiveWithdraw.js";
 import { nativeUnknownUsageNotice } from "../budgets/nativeBudgetAdmission.js";
+import { VAULT_LOCKED_PREFIX } from "../vault/vaultLockedError.js";
+import { chatVaultPassphrase } from "./nativeChatVault.js";
 
 export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly validationConfig?: string;
@@ -110,6 +112,9 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
   } catch (error) {
     io.error(error instanceof Error ? error.message : "Native extensions could not be loaded."); io.fail(); return;
   }
+  // Asked before the line editor exists: a readline left on stdin would also take the keys of the masked question into
+  // its line and history.
+  const vaultPassphrase = await chatVaultPassphrase(cwd);
   const terminal = createInterface({ input: process.stdin, output: process.stdout, terminal: true, historySize: 50,
     completer: (line: string) => {
       try { return nativeInteractiveCompleter(line, [...skillNames(), ...extensions.prepareTurn().commands.map(command => command.name)]); }
@@ -156,7 +161,9 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
   // No shell, alternate runner, approval bypass, or background session writer.
   // `display.stdin` is written to the child's stdin and closed (the turn prompt: `run -` reads it, so the entered text
   // is never an argv word and a bare "-" is a prompt, not a flag); without it the child's stdin is closed from the start.
-  const execute = (args: readonly string[], display: { interactiveApprovals?: boolean; askUser?: boolean; stream?: boolean; stdin?: string } = {}): Promise<{ code: number | null; stdout: string; truncated: boolean; cancelRequested: boolean }> => new Promise(resolveResult => {
+  const execute = (args: readonly string[], display: { interactiveApprovals?: boolean; askUser?: boolean; stream?: boolean; stdin?: string } = {}): Promise<{ code: number | null; stdout: string; truncated: boolean; cancelRequested: boolean; vaultLocked: boolean }> => new Promise(resolveSettled => {
+    let vaultLocked = false;
+    const resolveResult = (result: { code: number | null; stdout: string; truncated: boolean; cancelRequested: boolean }) => resolveSettled({ ...result, vaultLocked });
     let stdout = "";
     let truncated = false;
     let cancelRequested = false;
@@ -166,7 +173,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     let running: ChildProcess;
     try {
       // Consent is recorded at chat admission. Later turns must never approve a changed workspace themselves.
-      const env = { ...process.env };
+      const env: NodeJS.ProcessEnv = { ...process.env, ...(vaultPassphrase === null ? {} : { AMC_VAULT_PASSPHRASE: vaultPassphrase }) };
       if (args[0] === "agent-loop" && args[1] === "run") delete env[TRUST_WORKSPACE_ENV];
       running = spawn(process.execPath, [...process.execArgv, resolve(entry), ...(selectedAgentId === null ? [] : ["--agent", selectedAgentId]), ...args], {
         cwd, env, shell: false,
@@ -208,6 +215,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       stdout += text;
     });
     running.stderr!.on("data", (text: string) => {
+      if (text.includes(VAULT_LOCKED_PREFIX)) vaultLocked = true;
       if (display.stream) { process.stderr.write(text); previewOpen = !text.endsWith("\n"); }
       else io.error(text.trimEnd());
     });
@@ -560,9 +568,10 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         ...(forkFrom !== null ? ["--fork-from", forkFrom] : sessionId === null ? [] : ["--session", sessionId]), "--", "-"],
         { interactiveApprovals: approvalClass !== undefined || modeGated, askUser: tools === "workspace", stream: true, stdin: prompt });
       const result = parseNativeChatResult({ stdout: outcome.stdout, truncated: outcome.truncated,
-        requestedSessionId: priorSession, forkFrom: pendingFork, previousSummary });
+        requestedSessionId: priorSession, forkFrom: pendingFork, previousSummary, childVaultLocked: outcome.vaultLocked });
       if (!result.ok) {
         unresolvedOutcome = true;
+        if (result.code === "VAULT_LOCKED") { io.error(result.message); io.fail(); break; }
         io.error(`${result.code}: ${result.message} Chat has stopped without guessing a session ID or retrying the task. Inspect AMC's session evidence before continuing.`);
         io.fail(); break;
       }
