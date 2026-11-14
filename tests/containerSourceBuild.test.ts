@@ -217,7 +217,7 @@ child.spawnSync=(command,args)=>{
   else if(args[0]==="volume"&&args[1]==="create")output=args[2];
   else if(args[0]==="run"&&args.includes("node"))output=JSON.stringify({uid:10001,bundledPackages:1,version:"1.0.0"});
   else if(args.includes("--version"))output="1.0.0";
-  else if(args.includes("--help"))output="Usage: amc\\namc evidence verify\\namc --help --all";
+  else if(args.includes("--help"))output="Usage: amc\\namc doctor\\namc --help --all";
   else if(args.includes("firewall")&&args.includes("enable"))output=JSON.stringify({changed:true,revision:1,checkpointPath:"/workspace/control-checkpoints/scope/runtime-firewall/000000000001.json"});
   else if(args.includes("firewall")&&args.includes("status"))output=JSON.stringify({enabled:true,mode:"observe",integrity:"trusted",policyRevision:1,policyCheckpointPath:"/workspace/control-checkpoints/scope/runtime-firewall/000000000001.json"});
   else if(args[0]==="stats")output="512MiB / 2GiB 4.20%";
