@@ -5441,6 +5441,10 @@ program
   .action(async (runId: string, opts: { executive: boolean; html?: string; share: boolean; shareDir: string; publicBaseUrl?: string }) => {
     const resolved = resolveRunReport(process.cwd(), runId, activeAgent(program));
     const report = resolved.report;
+    if (!resolved.sealVerified) { // CLI-04: shown as INVALID, and the command fails
+      process.exitCode = 1;
+      console.error(chalk.red(`Run ${resolved.resolvedRunId}: its seal does not verify, so the file changed after AMC wrote it or AMC did not write it. It is shown as INVALID; nothing in it is vouched for.`));
+    }
     const statusExplanation = explainDiagnosticReportStatus(report);
 
     const claim = runClaimEnvelope(report);

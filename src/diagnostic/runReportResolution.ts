@@ -37,6 +37,11 @@ export interface ResolvedRunReport {
   resolvedBy: "exact" | "latest" | "alias" | "prefix";
   alias?: string;
   report: DiagnosticReport;
+  /**
+   * CLI-04: false when the run claims a seal (status other than UNSIGNED) that does not verify, as after a hand edit. Its
+   * `report` then reads INVALID with verificationPassed false, so no display says VALID or PASSED for it.
+   */
+  sealVerified: boolean;
 }
 
 function listRunReportCandidates(workspace: string, agentId?: string): DiagnosticReport[] {
@@ -73,7 +78,17 @@ function listRunReportCandidates(workspace: string, agentId?: string): Diagnosti
   return reports.sort((a, b) => b.ts - a.ts);
 }
 
+/** The run a display command names, never vouched for by its own fields: a seal that fails reads INVALID (CLI-04). */
 export function resolveRunReport(workspace: string, runId: string, agentId?: string): ResolvedRunReport {
+  const resolved = locateRunReport(workspace, runId, agentId);
+  const { report } = resolved;
+  if (report.status === "UNSIGNED" || sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>)) {
+    return { ...resolved, sealVerified: true };
+  }
+  return { ...resolved, sealVerified: false, report: { ...report, status: "INVALID", verificationPassed: false } };
+}
+
+function locateRunReport(workspace: string, runId: string, agentId?: string): Omit<ResolvedRunReport, "sealVerified"> {
   const requestedRunId = runId.trim();
   if (!requestedRunId) {
     throw new Error("runId is required.");
