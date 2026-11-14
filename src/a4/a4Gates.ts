@@ -322,7 +322,7 @@ export function assertAllowed(readiness: A4ReadinessV1, action: A4Action, ignore
 }
 
 /** The items a refusal most often names, in plain words with the next step; any other item says its own next action. */
-const NOT_READY_WORDS: Readonly<Record<string, string>> = {
+export const NOT_READY_WORDS: Readonly<Record<string, string>> = {
   "sod.self_provisioned": "Every approver here was created in this one workspace, so AMC cannot show they are different people. A project owner "
     + "acknowledges this once, with a reason, on the Missing requirements card; it holds for 90 days.",
   sod: "Someone other than the person who wrote, built or asked for this step must approve it (separation of duties). Add a second person on the "
