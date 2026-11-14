@@ -272,11 +272,30 @@ project never self-approves again, whatever later revocations do. A `policy` gat
 self-approved decision is recorded with `self_approved = 1` and its facts, and a verifier reports it as
 `not-evaluated` (`SINGLE_USER_WORKSPACE`).
 
+**Industry Packs and practice projects.** All 41 Industry Packs name a high, very high or critical risk level, so a
+project started from any pack is regulated, and the single-user rule never applies to it: one person alone stops at the
+first approval. The start form says so, and offers a **practice project** where Studio allows one (`practice: true` on
+`POST /api/v1/a4/projects`; `GET /api/v1/a4/options` reports `workspace.start.practiceAvailable` and, when it is false,
+the reason). On a practice project the brief's risk level does not make the project regulated, so the one person may
+approve their own work; each such decision is recorded and shown as self-approved, exactly as above. It stays a
+practice project only while the workspace has exactly one ACTIVE local user, no host session and nobody added since the
+project was created (an unreadable source counts as not practice) and the chain has not ratcheted. The moment a second
+person can sign in, the risk level governs again and nobody approves their own work, before any A4 write records them.
+The project view reports `practice` (opened as practice), `practiceActive` and `regulated`. Do not use a practice
+project for real work.
+
+**Adding the second person.** A signed-in workspace OWNER adds a person in one call: `POST /api/v1/a4/people`
+(`{ username, workspaceRoles: ["APPROVER"] or ["APPROVER", "AUDITOR"] }`) creates the account with a first password AMC
+shows once, and `POST …/projects/{id}/members/invite` also adds them to the project as an approver. An existing ACTIVE
+account is left as it is. The console's Add a person form and the Members card use these.
+
 ### Acknowledged items
 
 An owner may acknowledge some WAITING items (for example `sod.self_provisioned`). The item stays WAITING with
 `OWNER_ACKNOWLEDGED`, is bound into the next gate when it is one of the stage's bound items, lapses after 90 days and is
-never cleared. A BLOCKED item cannot be acknowledged. An item is acknowledged only at the project's current stage
+never cleared. `sod.self_provisioned` acknowledges a fact of the workspace, so its acknowledgement holds on later
+revisions of the project until it lapses; every other acknowledgement counts only on the revision it was given on. A
+BLOCKED item cannot be acknowledged. An item is acknowledged only at the project's current stage
 (`409 A4_STEP_ORDER` at any other, and Studio offers Acknowledge only there, and only for an item whose acknowledgement
 would count, by the same rule as the server). Acknowledge before requesting the gate: an
 acknowledgement supersedes an open gate on the same revision. Adapt's `plan_unresolved` (an owner's out of scope; never on a regulated
