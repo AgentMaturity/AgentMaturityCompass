@@ -111,7 +111,7 @@ function claudeControlHookRefusal(workspace: string, agentId: string, managedDir
  * hooks disabled anywhere, managed-hooks-only without managed delivery, an enabled plugin, a foreign PreToolUse (or
  * other call-changing) hook, or an AMC hook this installation did not write. Read as the registration reads them.
  */
-function claudeSettingsRefusal(workspace: string, manifestPath: string, managedDir: string | null): string | null {
+export function claudeSettingsRefusal(workspace: string, manifestPath: string, managedDir: string | null): string | null {
   const configDir = process.env.CLAUDE_CONFIG_DIR ?? join(homedir(), ".claude");
   const findings = claudeHookSettingsFindings({ workspace, home: join(configDir, ".."), managedDir });
   if (findings.blockers.length > 0) return findings.blockers.join("; ");

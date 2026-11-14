@@ -21,7 +21,7 @@ export interface SignInAgent {
 
 export const SIGN_IN_AGENTS: readonly SignInAgent[] = Object.freeze([
   { id: "claude", displayName: "Claude Code", binary: "claude", statusArgs: ["auth", "status"], loginArgs: ["auth", "login"],
-    connect: "amc connect hooks install --provider claude-code --mode control --agent default" },
+    connect: "amc connect hooks install --provider claude-code --mode observe --agent default" },
   { id: "codex", displayName: "Codex", binary: "codex", statusArgs: ["login", "status"], loginArgs: ["login"],
     connect: "amc connect hooks install --provider codex --mode observe --agent default" }
 ]);

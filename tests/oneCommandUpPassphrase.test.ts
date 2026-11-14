@@ -4,8 +4,12 @@ import { join } from "node:path";
 import { stripVTControlCharacters } from "node:util";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const seam = vi.hoisted(() => ({ vaultExists: false, events: [] as string[], remembered: null as null | { passphrase: string; backend: "file" } }));
-vi.mock("../src/vault/vault.js", () => ({ vaultExists: () => seam.vaultExists }));
+const seam = vi.hoisted(() => ({ vaultExists: false, opensWith: "", answers: {} as Record<string, unknown>, asked: [] as Array<{ name: string; validate?: (v: string) => unknown }>, events: [] as string[], remembered: null as null | { passphrase: string; backend: "file" } }));
+vi.mock("../src/vault/vault.js", () => ({ vaultExists: () => seam.vaultExists, vaultOpensWith: (_ws: string, passphrase: string) => passphrase === seam.opensWith }));
+vi.mock("inquirer", () => ({ default: { prompt: async (questions: Array<{ name: string; validate?: (v: string) => unknown }>) => {
+  seam.asked.push(...questions);
+  return Object.fromEntries(questions.map((question) => [question.name, seam.answers[question.name]]));
+} } }));
 vi.mock("../src/vault/passphraseStore.js", () => ({
   getRememberedVaultPassphrase: () => { seam.events.push("load"); return seam.remembered; },
   rememberEnabled: (env: NodeJS.ProcessEnv = process.env) => !["0", "false", "off", "no"].includes((env.AMC_VAULT_REMEMBER ?? "").trim().toLowerCase()),
@@ -25,6 +29,9 @@ afterEach(() => {
   vi.unstubAllEnvs();
   vi.restoreAllMocks();
   seam.vaultExists = false;
+  seam.opensWith = "";
+  seam.answers = {};
+  seam.asked = [];
   seam.events = [];
   seam.remembered = null;
   while (roots.length > 0) rmSync(roots.pop()!, { recursive: true, force: true });
@@ -116,6 +123,81 @@ describe("amc up in a non-interactive shell (B1)", () => {
     expect(seam.events).not.toContain("load");
     expect(seam.events).not.toContain("store");
     expect(process.env.AMC_VAULT_PASSPHRASE).toBeUndefined();
+  });
+});
+
+// 2026-11-14: amc up in a terminal offered a new passphrase for a vault that already existed, failed the unlock, and
+// remembered the wrong passphrase. A vault that exists is asked for its own passphrase, checked before use.
+describe("amc up in a terminal with a vault that already exists", () => {
+  const original = Object.getOwnPropertyDescriptor(process.stdin, "isTTY");
+  beforeEach(() => {
+    Object.defineProperty(process.stdin, "isTTY", { value: true, configurable: true, writable: true });
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
+    seam.vaultExists = true;
+    seam.opensWith = "the-real-vault-pass";
+  });
+  afterEach(() => {
+    if (original) Object.defineProperty(process.stdin, "isTTY", original);
+    else delete (process.stdin as { isTTY?: boolean }).isTTY;
+  });
+
+  function workspaceWithSavedFile(value: string): string {
+    const root = mkdtempSync(join(tmpdir(), "amc-up-existing-"));
+    roots.push(root);
+    mkdirSync(join(root, ".amc"));
+    writeFileSync(join(root, ".amc", "local-vault-passphrase"), `${value}\n`, { mode: 0o600 });
+    return root;
+  }
+
+  it("never offers to generate one: it asks for the vault's passphrase and refuses one that does not open it", async () => {
+    seam.answers = { entered: "the-real-vault-pass", rememberChoice: true };
+    logged();
+    await ensureUpVaultPassphrase("/nonexistent/amc-up-ws", true);
+    expect(seam.asked.map((question) => question.name)).toEqual(["entered", "rememberChoice"]);
+    const validate = seam.asked[0]!.validate!;
+    expect(validate("a-new-generated-one")).toBe("That passphrase does not open this vault.");
+    expect(validate("the-real-vault-pass")).toBe(true);
+    expect(process.env.AMC_VAULT_PASSPHRASE).toBe("the-real-vault-pass");
+    expect(seam.events).toContain("store");
+  });
+
+  it("offers the passphrase bare amc saved only when it opens the vault, and uses it on a yes", async () => {
+    seam.answers = { useSaved: true, rememberChoice: false };
+    logged();
+    await ensureUpVaultPassphrase(workspaceWithSavedFile("the-real-vault-pass"), true);
+    expect(seam.asked.map((question) => question.name)).toEqual(["useSaved", "rememberChoice"]);
+    expect(process.env.AMC_VAULT_PASSPHRASE).toBe("the-real-vault-pass");
+    expect(seam.events).not.toContain("store");
+  });
+
+  it("does not offer a saved file that does not open the vault, and asks instead when the offer is declined", async () => {
+    seam.answers = { useSaved: false, entered: "the-real-vault-pass", rememberChoice: false };
+    logged();
+    await ensureUpVaultPassphrase(workspaceWithSavedFile("some-other-vault-pass"), true);
+    expect(seam.asked.map((question) => question.name)).toEqual(["entered", "rememberChoice"]);
+    seam.asked = [];
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
+    await ensureUpVaultPassphrase(workspaceWithSavedFile("the-real-vault-pass"), true);
+    expect(seam.asked.map((question) => question.name)).toEqual(["useSaved", "entered", "rememberChoice"]);
+  });
+
+  it("does not use a remembered passphrase that no longer opens the vault", async () => {
+    seam.remembered = { passphrase: "a-wrong-remembered-one", backend: "file" };
+    seam.answers = { entered: "the-real-vault-pass", rememberChoice: true };
+    const lines = logged();
+    await ensureUpVaultPassphrase("/nonexistent/amc-up-ws", true);
+    expect(lines.join("\n")).toContain("does not open this workspace's vault, so it is not used");
+    expect(process.env.AMC_VAULT_PASSPHRASE).toBe("the-real-vault-pass");
+    expect(seam.events).toContain("store");
+  });
+
+  it("still sets up a new passphrase when there is no vault", async () => {
+    seam.vaultExists = false;
+    seam.answers = { choice: "auto", rememberChoice: false };
+    logged();
+    await ensureUpVaultPassphrase("/nonexistent/amc-up-ws", true);
+    expect(seam.asked.map((question) => question.name)).toEqual(["choice", "rememberChoice"]);
+    expect(process.env.AMC_VAULT_PASSPHRASE).toMatch(/^[A-Za-z0-9_-]{22}$/);
   });
 });
 
