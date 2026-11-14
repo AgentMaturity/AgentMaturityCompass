@@ -39,6 +39,7 @@ import {
 } from "./a4Gates.js";
 import { captureA4RequestActor, gateRequestActor } from "./a4TransitionSigning.js";
 import { memberCandidates, resolveA4Principal } from "./a4Identity.js";
+import { approvalsNote, assertPracticeAllowed, inviteMember, startFacts } from "./a4Onboarding.js";
 import { A4_PRESENCE_TTL_MS, presenceOf, touchPresence } from "./a4Presence.js";
 import { gateStatus, isRegulated, type A4Action, type A4ReadinessState } from "./a4Readiness.js";
 import { monitorView } from "./a4Monitor.js";
@@ -47,7 +48,7 @@ import { handleA4ReleaseRoute } from "./a4RouterReleases.js";
 import { assertTuneMechanicPlan } from "./a4Mechanic.js";
 import { handleA4StageRoute, STAGE_QUESTIONS } from "./a4RouterStages.js";
 import {
-  A4_GATES, A4_PROJECT_ROLES, A4_REF_KINDS, A4_STAGES, A4_STEPS, a4GatePolicyV1Schema, a4PreviewEnabled, clientRequestIdSchema, headSeqSchema, reasonSchema,
+  A4_GATES, A4_PROJECT_ROLES, A4_REF_KINDS, A4_STAGES, A4_STEPS, a4GatePolicyV1Schema, a4PreviewEnabled, clientRequestIdSchema, headSeqSchema, openedAsPractice, reasonSchema,
   type A4Member, type A4Principal, type A4ProjectRow, type A4ProjectV1, type A4Stage
 } from "./a4Schema.js";
 import { A4_REQUEST_WINDOW_MS, A4StoreError, openA4Store, refreshVolatileFacts, type A4RequestKey, type A4Store, type A4TransitionResult } from "./a4Store.js";
@@ -267,7 +268,8 @@ const createSchema = z.strictObject({
   name: z.string().trim().min(1).max(200).refine((value) => !/[\x00-\x1f\x7f-\x9f]/.test(value), "The project name cannot contain control characters."),
   agentId: z.string().regex(/^[a-z0-9][a-z0-9_-]{0,127}$/, "Choose a valid agent ID.").optional(),
   archetype: z.string().trim().min(1).max(128).optional(),
-  expertise: z.enum(["novice", "practitioner", "expert"])
+  expertise: z.enum(["novice", "practitioner", "expert"]),
+  practice: z.boolean().optional() // one person trying A4 alone (a4Schema.practiceNow); refused where self-approval could not apply
 });
 
 /**
@@ -299,10 +301,11 @@ async function createProject(route: A4Route): Promise<void> {
   if (existing && !principal.roles.includes("OWNER")) {
     throw a4Fail(403, "A4_EXISTING_AGENT_OWNER_ONLY", `Agent ${agentId} already exists; only a workspace OWNER can start a project for it.`);
   }
-  const call = callOf(route, request);
+  const call = callOf(route, request), practice = body.practice === true, start = startFacts(route.workspace, principal, call.hostedRouter === true);
+  if (practice) assertPracticeAllowed(start);
   const result = route.store.createProject({ actor: principal, agentId, name: body.name, hostedRouter: call.hostedRouter === true, request,
-    profile: { expertise: body.expertise, archetype: body.archetype ?? null } });
-  apiSuccess(route.res, mutationResult(result, { agentId }), result.replay ? 200 : 201);
+    profile: { expertise: body.expertise, archetype: body.archetype ?? null, ...(practice ? { practice: true as const } : {}) } });
+  apiSuccess(route.res, mutationResult(result, { agentId, practice, approvals: approvalsNote(start, practice), deployNote: start.deployNote }), result.replay ? 200 : 201);
 }
 
 /** GET /options: vocabularies, limits and this workspace's A4 state; no project data. */
@@ -318,7 +321,7 @@ function options(route: A4Route): void {
     schema: "amc.a4-options/v1", previewEnabled: true, stages: A4_STAGES, steps: A4_STEPS, gates: A4_GATES, projectRoles: A4_PROJECT_ROLES,
     refKinds: A4_REF_KINDS, expertise: ["novice", "practitioner", "expert"], questions: STAGE_QUESTIONS,
     limits: { eventWindow: A4_EVENT_WINDOW, presenceTtlMs: A4_PRESENCE_TTL_MS, requestWindowMs: A4_REQUEST_WINDOW_MS, bodyBytes: BODY_LIMIT },
-    workspace: { signingRoute: route_, readOnly: route.native?.executionAllowed() !== true },
+    workspace: { signingRoute: route_, readOnly: route.native?.executionAllowed() !== true, start: startFacts(route.workspace, route.principal, route.principal?.authSource === "WORKSPACE_ROUTER") },
     // Supported integration paths arrive with Assemble (P1-60). The running image digest would come from the bootstrap
     // report (never studioServer.ts); runBootstrap records none, so it is null with its reason (P1-62).
     integrationClaims: [], imageDigest: null, imageDigestReason: "the bootstrap report records no image digest, so A4's prepared files pin the image by tag (IMAGE_TAG_ONLY)"
@@ -420,6 +423,7 @@ async function projectMutation(route: A4Route, projectId: string, rest: string):
         assertVisible(route, store.membersOf(projectId));
         return store.addComment(projectId, { actor: principal, body: body.body, cardId: body.cardId, inReplyTo: body.inReplyTo ?? null, via: body.via, request });
       }, 201);
+    case "/members/invite": return inviteMember(route, projectId);
     case "/members":
       return mutate(route, projectId, membersSchema, (body, request) => {
         if (body.event !== "removed" && body.projectRoles.length === 0) throw a4Fail(400, "INPUT_INVALID", "A member holds at least one project role.");
@@ -540,7 +544,7 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
     const readiness = readinessAt(headStage(state.project));
     const revision = state.revisions.find((row) => row.revision_no === state.project.revision_no) ?? null;
     apiSuccess(route.res, { ...projectView(state.project, state.members, { status: readiness.status, bindingDigest: readiness.bindingDigest }),
-      revision: revision && { revisionNo: revision.revision_no, stage: revision.stage, parentRevisionNo: revision.parent_revision_no,
+      practice: openedAsPractice(state.chain), selfApprovalAllowed: readiness.selfApprovalAllowed, revision: revision && { revisionNo: revision.revision_no, stage: revision.stage, parentRevisionNo: revision.parent_revision_no,
         specDigest: revision.spec_digest, resourceDigestsSha256: revision.resource_digests_sha256, createdByKey: revision.created_by_key, ts: revision.ts },
       gates: readiness.gates, claim: readiness.claim });
     return true;

@@ -197,6 +197,16 @@ export function ratchetedFromChain(chain: readonly A4ChainLink[]): boolean {
   return false;
 }
 
+/** Whether the project was opened as a practice project (its CREATED record says so, for good): what a view labels. */
+export const openedAsPractice = (chain: readonly A4ChainLink[]): boolean => chain.some((link) => link.kind === "CREATED" && link.body.practice === true);
+/**
+ * A practice project is one person trying A4 alone: its brief's risk tier does not make it regulated, so the single-user
+ * rule lets that person approve their own work, each decision recorded and shown as self-approved. It holds only while
+ * the chain has never recorded a second person (the ratchet): from then on the tier decides again, and the
+ * self-approved lineage waits at Activate (`lineage.independent_approvals`). The workspace floor and an active plan still apply.
+ */
+export const practiceNow = (chain: readonly A4ChainLink[]): boolean => openedAsPractice(chain) && !ratchetedFromChain(chain);
+
 /**
  * Single-user self-approval is derived, never supplied (design §5.3): true only for the one ACTIVE local user, with no
  * host session, not through the hosted router, not regulated, not refused by the workspace floor and not ratcheted.

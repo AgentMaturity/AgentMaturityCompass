@@ -20,7 +20,7 @@ import { canonicalize } from "../utils/json.js";
 import { A4_STEPS } from "../contracts/v1/a4Project.js";
 import type { A4ResolvedRef } from "./a4Evidence.js";
 import {
-  A4_BOUND_ITEMS, A4_STAGES, deriveSelfApprovalAllowed, storedBoundItems, gatePolicyFloorViolations, gatePolicyOf, gateSupersededBy, ratchetedFromChain, type A4_BLOCKER_KINDS,
+  A4_BOUND_ITEMS, A4_STAGES, deriveSelfApprovalAllowed, storedBoundItems, gatePolicyFloorViolations, gatePolicyOf, gateSupersededBy, practiceNow, ratchetedFromChain, type A4_BLOCKER_KINDS,
   type A4ChainLink, type A4GatePolicyV1, type A4Member, type A4Principal, type A4ProjectRow, type A4ReadinessV1, type A4Stage, type A4Step,
   type a4DecisionRowSchema, type a4EffectRowSchema, type a4GateRowSchema, type a4ReadinessItemSchema, type a4RevisionRowSchema
 } from "./a4Schema.js";
@@ -279,10 +279,10 @@ const ACTIVATE_PLAN_EFFECT = "a4.adapt.activate_plan";
 export function isRegulated(state: A4ReadinessState, floor: ApprovalA4Floor): boolean {
   if (floor.regulated === true) return true;
   const tier = riskTierOf(state);
-  if (tier !== "low" && tier !== "med" && tier !== "medium") return true;
+  if (tier !== "low" && tier !== "med" && tier !== "medium" && !practiceNow(state.chain)) return true; // a practice project: a4Schema.practiceNow
   const brief = latestRevision(state, "aspire");
   const prior = brief ? (parseJson(brief.spec_json) as { brief?: { priorRiskTier?: unknown } } | null)?.brief?.priorRiskTier : undefined;
-  if (prior !== undefined && prior !== null && (typeof prior !== "string" || (TIER_RANK[prior] ?? 2) > TIER_RANK[tier]!)) return true;
+  if (prior !== undefined && prior !== null && (typeof prior !== "string" || (TIER_RANK[prior] ?? 2) > (TIER_RANK[tier ?? ""] ?? 2))) return true;
   if (state.chain.some((link) => link.kind === "EFFECT_FINISHED" && link.body.effect === ACTIVATE_PLAN_EFFECT)) return true;
   return state.revisions.some((revision) => {
     const digests = parseJson(revision.resource_digests_json) as { plan?: { journalEntrySha256?: unknown } } | null;
