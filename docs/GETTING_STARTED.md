@@ -456,7 +456,7 @@ amc evidence collect --first-run --dry-run --runtime any -- node agent.js
 amc evidence verify
 
 # Bundle evidence for sharing
-amc bundle export --out evidence.amcbundle
+amc bundle export --run latest --out evidence.amcbundle
 ```
 
 Without `AMC_VAULT_PASSPHRASE` (or with `AMC_NO_SIGN=1`) the first-run capture is unsigned and goes to `.amc/unsigned/evidence.sqlite`, never to the signed `.amc/evidence.sqlite`; score it with `AMC_NO_SIGN=1 amc quickscore --auto`, and capture again with the vault unlocked when you need verifier-ready evidence.
@@ -641,7 +641,7 @@ amc score calibration-gap --json
 amc doctor --json
 ```
 
-The top-level JSON keeps claim readiness explicit: `status` is the evidence-readiness status, `artifactStatus` is the seal result, and `claimEligible` is `true` only for `READY`. Use `claimBoundary` and `nextEvidenceStep` instead of inferring readiness from `signed: true`.
+The top-level JSON keeps claim readiness explicit: `status` and `artifactStatus` are the seal result (`VALID`, `INVALID` or `UNSIGNED`), `evidenceStatus` is the evidence-readiness status, and `claimEligible` is `true` only for `READY`. Use `claimBoundary` and `nextEvidenceStep` instead of inferring readiness from `signed: true`.
 
 Pipe into `jq` for scripting:
 

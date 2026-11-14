@@ -10275,21 +10275,23 @@ gateway
 bundle
   .command("export")
   .description("Export a portable, signed evidence bundle for a run")
-  .requiredOption("--run <runId>", "run ID")
+  .requiredOption("--run <runId>", "run ID, saved alias, unique prefix, or latest")
   .requiredOption("--out <file>", "output .amcbundle file")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .option("--attest", "add the agent's CycloneDX AIBOM and a DSSE-signed in-toto statement about the run (artifact-seal key)")
   .action((opts: { run: string; out: string; agent?: string; attest?: boolean }) => {
+    // CLI-15: "latest", an alias or a prefix named no file and failed with a raw ENOENT; resolve it as amc report does.
+    const runId = resolveRunReport(process.cwd(), opts.run, opts.agent ?? activeAgent(program)).resolvedRunId;
     const result = exportEvidenceBundle({
       workspace: process.cwd(),
-      runId: opts.run,
+      runId,
       outFile: opts.out,
       agentId: opts.agent ?? activeAgent(program),
       attest: opts.attest === true
     });
     console.log(chalk.green(`Bundle exported: ${result.outFile}`));
     if (opts.attest) console.log("Attested: attestations/aibom.cdx.json and attestations/control-results.sigstore.json (DSSE, workspace artifact-seal key: a local audit trail until a trust list pins that key)");
-    printClaimResult(runIdClaim(opts.run, opts.agent ?? activeAgent(program)), {});
+    printClaimResult(runIdClaim(runId, opts.agent ?? activeAgent(program)), {});
     console.log(`Files: ${result.fileCount}, Events: ${result.eventCount}, Sessions: ${result.sessionCount}${result.openSessions.length ? `, open sessions: ${result.openSessions.length} (${result.openSessions.join(", ")}; the export verifies as of its export time)` : ""}`);
   });
 
