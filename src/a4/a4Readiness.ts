@@ -26,6 +26,7 @@ import {
 } from "./a4Schema.js";
 import { SOD_SENTENCE } from "./a4SoD.js";
 import { ASSEMBLE_REVIEW, REDO_PROPOSAL, STEP_NEXT } from "./a4StepLabels.js";
+import { addApprovers } from "./a4Words.js";
 
 export { A4_BOUND_ITEMS };
 /** P2-22's blocker vocabulary plus the A4-only kinds; P2-22's blocker inbox imports it from here (design §7 rule 3). */
@@ -400,9 +401,6 @@ function soloSelfApproval(state: A4ReadinessState, query: A4ReadinessQuery): boo
   return only !== null && deriveSelfApprovalAllowed({ activeLocal, hostPrincipals, hostedRouter, regulated: false, workspaceFloor: query.floor.allowSelfApproval,
     ratcheted: selfApprovalFacts(state, query, only).ratcheted, decidingPrincipal: only });
 }
-/** `amc a4 members` as it runs: a writer names its `amc approvals login` token and the head it read (`amc a4 guide` prints it). */
-const addApprovers = (projectId: string, label: string): NonNullable<A4ReadinessItem["nextAction"]> => ({ label,
-  command: `amc a4 members ${projectId} --member LOCAL_USER:<userId> --project-role approver --session-token-file <file> --expect-head-seq <n>` });
 const QUORUM_UNREACHABLE = "QUORUM_UNREACHABLE"; // A-5's warning: progress never refuses on it (allowedFor)
 const unread = (id: string, reason: string, mandatory = true): A4ReadinessItem =>
   item(id, "NOT_EVALUATED", { kind: "source_unavailable", reasonCodes: [reason], mandatory });

@@ -23,3 +23,7 @@ const NOBODY_ELSE = "Nobody else on this project can approve it. Invite a second
 export function notReadyWords(item: { id: string; reasonCodes: readonly string[] }): string | undefined {
   return item.id === "sod.self_provisioned" && item.reasonCodes.includes("NO_SECOND_APPROVER") ? NOBODY_ELSE : NOT_READY_WORDS[item.id];
 }
+
+/** `amc a4 members` as it runs: a writer names its `amc approvals login` token and the head it read (`amc a4 guide` prints it). */
+export const addApprovers = (projectId: string, label: string): { label: string; command: string } => ({ label,
+  command: `amc a4 members ${projectId} --member LOCAL_USER:<userId> --project-role approver --session-token-file <file> --expect-head-seq <n>` });
