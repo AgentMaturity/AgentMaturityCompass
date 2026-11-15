@@ -221,7 +221,7 @@ AMC provides 1,304 public CLI command paths in the live command inventory.
 | 202 | `amc bootstrap` | Bootstrap workspace for production deployment (non-interactive) |
 | 203 | `amc budgets` | Signed autonomy and usage budgets |
 | 204 | `amc budgets init` | - |
-| 205 | `amc budgets reset` | - |
+| 205 | `amc budgets reset` | Record a budget-day reset (it does not restore allowance), or accept earlier unknown model usage |
 | 206 | `amc budgets sign` | Validate and sign the existing reviewed budget limits without changing the policy |
 | 207 | `amc budgets status` | - |
 | 208 | `amc budgets verify` | - |
@@ -2843,13 +2843,14 @@ Bootstrap workspace for production deployment (non-interactive)
 
 #### `amc budgets reset`
 
--
+Record a budget-day reset (it does not restore allowance), or accept earlier unknown model usage
 
 
 | Option | Description |
 |--------|-------------|
 | `--agent <agentId>` | - |
 | `--day <yyyy-mm-dd>` | - |
+| `--accept-unknown` | - |
 
 #### `amc budgets sign`
 
