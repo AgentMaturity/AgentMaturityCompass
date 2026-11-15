@@ -13,7 +13,7 @@
 
 ## CLI Commands
 
-AMC provides 1,304 public CLI command paths in the live command inventory.
+AMC provides 1,302 public CLI command paths in the live command inventory.
 
 | # | Command | Description |
 |---|---------|-------------|
@@ -1290,37 +1290,35 @@ AMC provides 1,304 public CLI command paths in the live command inventory.
 | 1271 | `amc vault status` | Show vault status |
 | 1272 | `amc vault unlock` | Check the vault passphrase (the vault stays unlocked only while this command runs) |
 | 1273 | `amc vault zk-commit` | Create a Pedersen commitment to a value |
-| 1274 | `amc vault zk-range-proof` | Create a range commitment for an AMC score threshold (NOT a zero-knowledge proof; unsound, does not verify) |
-| 1275 | `amc vault zk-verify` | Check a range commitment (NOT a zero-knowledge verification; unsound) |
-| 1276 | `amc verify` | Verify integrity across AMC artifacts |
-| 1277 | `amc verify all` | Verify trust/policies/plugins/logs/ledger/artifacts in one pass |
-| 1278 | `amc vibe-audit` | Run static safety checks for AI-generated code |
-| 1279 | `amc watch` | Observability, attestation, and safety testing |
-| 1280 | `amc watch alerts` | Show recent alerts for a monitored agent |
-| 1281 | `amc watch attest` | Attest an agent output |
-| 1282 | `amc watch connect` | Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook) |
-| 1283 | `amc watch explain` | Generate explainability packet for an agent run |
-| 1284 | `amc watch host-hardening` | Check host hardening status for this AMC deployment |
-| 1285 | `amc watch profiler-anomalies` | List detected behavioral anomalies for an agent |
-| 1286 | `amc watch profiler-start` | Start behavioral profiling for an agent |
-| 1287 | `amc watch profiler-status` | Show behavioral profiler status and any recent anomalies |
-| 1288 | `amc watch providers` | Show connected observability providers and trace stats |
-| 1289 | `amc watch safety-test` | Run safety tests for an agent |
-| 1290 | `amc watch start` | Start continuous production monitoring for an agent |
-| 1291 | `amc watch status` | Show all monitored agents and their current state |
-| 1292 | `amc whatif` | Equalizer what-if simulator |
-| 1293 | `amc whatif equalizer` | - |
-| 1294 | `amc whatif targets` | - |
-| 1295 | `amc why-capped` | Show why each question is capped at its current level |
-| 1296 | `amc wire` | Serve the NDJSON JSON-RPC wire; optionally execute accepted work through an owner-configured native route |
-| 1297 | `amc wiring-status` | Show in-process production wiring counters (cannot observe other processes) |
-| 1298 | `amc workorder` | Signed work order operations |
-| 1299 | `amc workorder create` | Create and sign a work order |
-| 1300 | `amc workorder expire` | Expire/revoke a work order |
-| 1301 | `amc workorder list` | List work orders for agent |
-| 1302 | `amc workorder show` | Show signed work order JSON |
-| 1303 | `amc workorder verify` | Verify work order signature |
-| 1304 | `amc wrap` | DEPRECATED — use 'amc adapters run', which also mints a lease and routes through the gateway. Wraps a runtime and captures tamper-evident evidence. |
+| 1274 | `amc verify` | Verify integrity across AMC artifacts |
+| 1275 | `amc verify all` | Verify trust/policies/plugins/logs/ledger/artifacts in one pass |
+| 1276 | `amc vibe-audit` | Run static safety checks for AI-generated code |
+| 1277 | `amc watch` | Observability, attestation, and safety testing |
+| 1278 | `amc watch alerts` | Show recent alerts for a monitored agent |
+| 1279 | `amc watch attest` | Attest an agent output |
+| 1280 | `amc watch connect` | Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook) |
+| 1281 | `amc watch explain` | Generate explainability packet for an agent run |
+| 1282 | `amc watch host-hardening` | Check host hardening status for this AMC deployment |
+| 1283 | `amc watch profiler-anomalies` | List detected behavioral anomalies for an agent |
+| 1284 | `amc watch profiler-start` | Start behavioral profiling for an agent |
+| 1285 | `amc watch profiler-status` | Show behavioral profiler status and any recent anomalies |
+| 1286 | `amc watch providers` | Show connected observability providers and trace stats |
+| 1287 | `amc watch safety-test` | Run safety tests for an agent |
+| 1288 | `amc watch start` | Start continuous production monitoring for an agent |
+| 1289 | `amc watch status` | Show all monitored agents and their current state |
+| 1290 | `amc whatif` | Equalizer what-if simulator |
+| 1291 | `amc whatif equalizer` | - |
+| 1292 | `amc whatif targets` | - |
+| 1293 | `amc why-capped` | Show why each question is capped at its current level |
+| 1294 | `amc wire` | Serve the NDJSON JSON-RPC wire; optionally execute accepted work through an owner-configured native route |
+| 1295 | `amc wiring-status` | Show in-process production wiring counters (cannot observe other processes) |
+| 1296 | `amc workorder` | Signed work order operations |
+| 1297 | `amc workorder create` | Create and sign a work order |
+| 1298 | `amc workorder expire` | Expire/revoke a work order |
+| 1299 | `amc workorder list` | List work orders for agent |
+| 1300 | `amc workorder show` | Show signed work order JSON |
+| 1301 | `amc workorder verify` | Verify work order signature |
+| 1302 | `amc wrap` | DEPRECATED — use 'amc adapters run', which also mints a lease and routes through the gateway. Wraps a runtime and captures tamper-evident evidence. |
 
 ### Command Details
 
@@ -11097,17 +11095,6 @@ Create a Pedersen commitment to a value
 | Option | Description |
 |--------|-------------|
 | `--value <n>` | - |
-
-#### `amc vault zk-range-proof`
-
-Create a range commitment for an AMC score threshold (NOT a zero-knowledge proof; unsound, does not verify)
-
-
-| Option | Description |
-|--------|-------------|
-| `--value <n>` | - |
-| `--threshold <n>` | - |
-| `--agent <id>` | - |
 
 #### `amc verify`
 

@@ -188,7 +188,7 @@ mkdir my-agent && cd my-agent
 amc
 ```
 
-`amc` is the default path. It creates the `.amc/` workspace if needed. In a terminal it then shows the start menu: choose "Just show my score" for the full maturity score, or "Watch Claude Code as it works" (or Codex) to start recording evidence first ([Your first five minutes](FIRST_FIVE_MINUTES.md)). In a pipe or CI, and with `amc --no-menu`, it runs the full maturity score directly, detects what it can score, and prints the next action.
+`amc` is the default path. It creates the `.amc/` workspace if needed. In a terminal it then shows the start menu: choose "Just show my score" for the full maturity score, or "Watch Claude Code as it works" (or Codex) to start recording evidence first ([Your first five minutes](FIRST_FIVE_MINUTES.md)). In a pipe or CI, and with `amc --no-menu`, it runs the full maturity score directly, detects what it can score, and prints the next action. Without a terminal it does not create `.amc/` on its own: in a new folder it says what it would create and stops, and `amc --yes` lets it go ahead.
 
 On a clean project, the report can be signed and `VALID` while evidence readiness is `INSUFFICIENT_EVIDENCE`. This is the honest first baseline: the artifact is intact, but AMC has not yet observed enough execution evidence to support external claims.
 
@@ -245,7 +245,7 @@ Read the two status lines independently:
 | Artifact status: `VALID`, `INVALID`, or `UNSIGNED` | Is this report intact and verifiable? |
 | Evidence readiness: `READY`, `LIMITED`, `INSUFFICIENT_EVIDENCE`, or `UNVERIFIED` | Is the evidence strong enough for external claims? |
 
-Only `READY` is claim-eligible. Signing proves artifact integrity, not evidence sufficiency.
+Only `READY` is claim-eligible. A signature shows the record is unchanged, not that there is enough evidence.
 
 **Optional expanded assessment:**
 

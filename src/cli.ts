@@ -138,6 +138,7 @@ import {
   verifyFleetConfigSignature
 } from "./fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "./fleet/paths.js";
+import { printNoAgentInstructionFile, printTopGaps, refuseNewFolderWithoutTerminal, refuseUnknownAgent, scoreStep } from "./cli/firstRunGuards.js";
 import { getProviderTemplateById, listProviderTemplates, providerTemplateChoices } from "./providers/providerTemplates.js";
 import { runSandboxCommand } from "./sandbox/sandbox.js";
 import { attestIngestSessionAsync, ingestEvidence, type IngestType } from "./ingest/ingest.js";
@@ -674,7 +675,7 @@ import {
   type TemporalDecaySourceRun
 } from "./trust/temporalDecay.js";
 import {
-  adaptersCapabilitiesCliAsync,
+  adaptersCapabilitiesCliAsync, capabilityTarget,
   adaptersCapabilitiesWithOutputCliAsync,
   adaptersConfigureCliAsync,
   adaptersDetectCli,
@@ -1470,7 +1471,7 @@ async function acquireInstantScoreLock(workspace: string): Promise<() => void> {
   throw new Error("Timed out waiting for another AMC score run to finish.");
 }
 
-function renderInstantFullScore(
+async function renderInstantFullScore(
   report: Awaited<ReturnType<typeof runDiagnostic>>,
   elapsedMs: number,
   state: InstantWorkspaceState,
@@ -1486,7 +1487,7 @@ function renderInstantFullScore(
     studioEvidenceUrl?: string | null;
     nextStep?: string;
   } = {}
-): void {
+): Promise<void> {
   const avgLevel = diagnosticAverageLevel(report);
   const score100 = Math.round((avgLevel / 5) * 100);
   const fullQuestionCount = report.questionScores.length;
@@ -1568,13 +1569,7 @@ function renderInstantFullScore(
     console.log(`  ${layer.layerName.padEnd(28)} L${layer.avgFinalLevel.toFixed(2)} ${bar}`);
   }
   const gaps = report.questionScores.filter((question) => question.finalLevel < 3).slice(0, 5);
-  if (gaps.length > 0) {
-    console.log("");
-    console.log(chalk.yellow("  Top gaps:"));
-    for (const gap of gaps) {
-      console.log(chalk.gray(`    ${gap.questionId}: L${gap.finalLevel} (${gap.flags.slice(0, 2).join(", ") || "needs evidence"})`));
-    }
-  }
+  await printTopGaps(gaps);
   console.log("");
   if (state.createdWorkspace) {
     console.log(chalk.green("  Created .amc workspace automatically."));
@@ -1585,7 +1580,7 @@ function renderInstantFullScore(
     console.log(chalk.yellow(`  ${state.vault.reason}`));
   }
   // The artifact paths stay in the JSON output and under .amc/; the person reading this needs one next step.
-  console.log(chalk.gray("  Details saved under .amc/ (amc --help --all lists the report commands)"));
+  console.log(chalk.gray("  The full report is saved in .amc/. Read it with: amc report latest"));
   if (opts.studioEvidenceUrl) console.log(chalk.gray(`  Evidence in the console: ${opts.studioEvidenceUrl}`));
   // CLI-01: once runs are recorded but none is scored, the menu's "try a demo chat" would be a loop; the readiness step says what counts.
   const loops = report.evidenceCoverage === 0 && recorded > 0;
@@ -1807,7 +1802,7 @@ async function runInstantFullScoreForAgent(params: { workspace: string; agentId:
       episodeRecordPath: refs.episodeRecordPath ?? null,
       studioEvidenceUrl: refs.studioEvidenceUrl
     });
-    renderInstantFullScore(report, elapsedMs, state, {
+    await renderInstantFullScore(report, elapsedMs, state, {
       json: params.json,
       nextStep: params.nextStep,
       ...refs
@@ -1912,7 +1907,7 @@ async function runInstantFullScoreForAgent(params: { workspace: string; agentId:
           studioEvidenceUrl: refs.studioEvidenceUrl
         });
       }
-      renderInstantFullScore(report, elapsedMs, unsignedState, {
+      await renderInstantFullScore(report, elapsedMs, unsignedState, {
         json: params.json,
         nextStep: params.nextStep,
         ...refs
@@ -1932,7 +1927,7 @@ async function runInstantFullScoreForAgent(params: { workspace: string; agentId:
 }
 
 function normalizeCliErrorMessage(error: unknown): string {
-  const message = error instanceof Error ? error.message : String(error);
+  const message = toErrorMessage(error);
   // Ctrl+C in any prompt (pack run, quickscore, setup); vault-setup advice would be unrelated to most of them.
   if (/User force closed the prompt/i.test(message)) return "Interactive prompt aborted.";
   // Publication errors wrap the actual refusal; show its cause chain so the reason is not hidden.
@@ -1955,12 +1950,13 @@ program
   .passThroughOptions()
   .showSuggestionAfterError(true)
   .showHelpAfterError("\nTip: add '--help' after any command to see available options.")
-  .addHelpText("afterAll", cliDiscoverabilityFooter());
+  .addHelpText("after", cliDiscoverabilityFooter()); // top-level help only; every subcommand repeated it (CLI-22)
 program.option("--agent <agentId>", "agent ID (defaults to .amc/current-agent)");
 program.option("--json", "emit structured JSON for the top-level full score", false);
 // No default: a `false` default made `color` false on every command, so preAction switched colour off everywhere.
 program.option("--no-color", "disable ANSI color output; equivalent to NO_COLOR=1");
 program.option("--no-menu", "bare amc only: skip the start menu and print the score (or set AMC_NO_MENU=1)");
+program.option("--yes", "bare amc without a terminal: set up this folder (.amc/) without asking first");
 program
   .command("help [commandPath...]")
   .description("Show help for a command (for example: amc help run)")
@@ -2311,6 +2307,7 @@ program
     // with a fix is still a missing precondition even when the exit code is 0.
     // Optional adapter installs follow the closing steps (doctorNextSteps).
     const fixCount = firstRunFixCommands(result).length;
+    const again = await scoreStep(process.cwd());
     if (!result.ok) {
       console.log(fmt.nextSteps(doctorNextSteps(result, [
         result.workspaceInitialized
@@ -2320,12 +2317,10 @@ program
       ])));
     } else if (fixCount > 0) {
       console.log(fmt.warn(`${fixCount} precondition(s) still missing; each names its fix:`));
-      console.log(fmt.nextSteps(doctorNextSteps(result, [{ cmd: "amc", desc: "Get your first full maturity score" }])));
+      console.log(fmt.nextSteps(doctorNextSteps(result, [again])));
     } else {
       console.log(fmt.pass(result.workspaceInitialized ? "The listed diagnostic checks passed; this does not qualify a governed task or a release." : "CLI install checks passed."));
-      console.log(fmt.nextSteps([
-        { cmd: "amc", desc: "Get your first full maturity score" },
-      ]));
+      console.log(fmt.nextSteps([again]));
     }
     process.exit(result.ok ? 0 : 1);
   });
@@ -2527,7 +2522,7 @@ program
       opts.quick = true;
       opts.autoDetect = true;
       opts.export = true;
-      opts.apply = true;
+      opts.apply ??= true; // keep a file named with --apply <file>
 
       // Re-run auto-detect since we just set the flag
       if (!opts.framework) {
@@ -2986,12 +2981,12 @@ program
       }
 
       // Always offer to create AGENTS.md if nothing detected
-      if (detected.length === 0) {
-        detected.push({ path: "AGENTS.md", label: "AGENTS.md (create new)" });
-      }
+      const createsNewFile = detected.length === 0;
+      if (createsNewFile) detected.push({ path: "AGENTS.md", label: "AGENTS.md (create new)" });
 
-      // Non-interactive: auto-pick first detected config (or AGENTS.md)
+      // Non-interactive: auto-pick the first agent config found. A new file is made only when named, since nobody saw a question.
       if (!process.stdin.isTTY) {
+        if (createsNewFile && !isDryRun) return printNoAgentInstructionFile();
         const autoTarget = (detected[0] ?? { path: "AGENTS.md" }).path;
         const fullPath = pathModule.resolve(process.cwd(), autoTarget);
         const result = applyGuardrails(fullPath, guardrailsContent, readFn, writeFn);
@@ -3946,14 +3941,14 @@ program
         .filter((row) => row.type === "BACKUP_CREATED")
         .sort((a, b) => b.ts - a.ts);
       if (backups.length === 0) {
-        console.log("Backup: never created (WARNING)");
+        console.log(chalk.yellow("Backup: none made yet. Make one with: amc backup create --out amc-backup.amcbackup"));
       } else {
         const latest = backups[0]!;
         const ageDays = Number(((Date.now() - latest.ts) / (24 * 60 * 60 * 1000)).toFixed(2));
         const warningDays = policy.opsPolicy.backups.maxBackupAgeDaysWarning;
         console.log(`Last backup age: ${ageDays}d (threshold ${warningDays}d)`);
         if (ageDays > warningDays) {
-          console.log(chalk.yellow("Backup age warning: exceeds ops policy threshold."));
+          console.log(chalk.yellow("The last backup is older than your ops policy allows. Make a new one with: amc backup create --out amc-backup.amcbackup"));
         }
       }
     } catch (error) {
@@ -4468,12 +4463,12 @@ adapters
 adapters
   .command("capabilities")
   .description("Issue a signed Passport receipt for declared and effective adapter capabilities")
-  .requiredOption("--agent <agentId>", "agent ID")
-  .requiredOption("--adapter <adapterId>", "adapter ID")
+  .option("--agent <agentId>", "agent ID (default: this folder's agent)")
+  .option("--adapter <adapterId>", "adapter ID (default: the adapter the agent is set up with, else generic-cli)")
   .option("--out <path>", "write the signed receipt to a JSON file")
   .option("--json", "print the complete signed receipt as JSON")
-  .action(async (opts: { agent: string; adapter: string; out?: string; json?: boolean }) => {
-    const params = { workspace: process.cwd(), agentId: opts.agent, adapterId: opts.adapter };
+  .action(async (opts: { agent?: string; adapter?: string; out?: string; json?: boolean }) => {
+    const params = { workspace: process.cwd(), ...capabilityTarget(process.cwd(), opts.agent ?? activeAgent(program), opts.adapter) };
     const output = opts.out ? await adaptersCapabilitiesWithOutputCliAsync(params, opts.out) : null;
     const receipt = output?.receipt ?? await adaptersCapabilitiesCliAsync(params);
     if (output !== null && !opts.json) console.log(chalk.green(`Adapter capability receipt: ${output.outPath}`));
@@ -5400,7 +5395,8 @@ program
       // Render output. The grade combines workspace inspections AMC does not verify, so it is self-reported.
       const claim = unverifiedClaim("unified:run", result.surfaceCoverage.evaluated);
       if (opts.json) {
-        console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
+        // S-01: with nothing to assess there is no grade, in JSON too (nothingToAssess says why).
+        console.log(JSON.stringify(withClaimFields(result.nothingToAssess ? { ...result, overallGrade: null, overallScore: null } : result, claim), null, 2));
       } else {
         if (opts.ci) console.log(renderCIAnnotations(result));
         printLabelledReport(renderUnifiedResult(result, { ci: opts.ci, claimLine: formatClaimLabel(renderClaimLabel(claim), "cli") }));
@@ -5432,11 +5428,12 @@ program
           "D+": 67, "D": 63, "D-": 60,
           "F": 0,
         }[opts.failBelow] ?? 0;
-        if (result.overallScore < thresholdScore) {
-          console.log(chalk.red(`\n  ✗ Grade ${result.overallGrade} is below --fail-below ${opts.failBelow}\n`));
+        if ((result.nothingToAssess && thresholdScore > 0) || result.overallScore < thresholdScore) {
+          console.log(chalk.red(result.nothingToAssess ? `\n  ✗ There is nothing to grade yet, so --fail-below ${opts.failBelow} is not met\n`
+            : `\n  ✗ Grade ${result.overallGrade} is below --fail-below ${opts.failBelow}\n`));
           process.exit(1);
         } else {
-          console.log(chalk.hex('#4AEF79')(`\n  ✓ Grade ${result.overallGrade} meets --fail-below ${opts.failBelow}\n`));
+          console.log(chalk.hex('#4AEF79')(result.nothingToAssess ? `\n  ✓ Nothing to grade yet; --fail-below ${opts.failBelow} sets no minimum\n` : `\n  ✓ Grade ${result.overallGrade} meets --fail-below ${opts.failBelow}\n`));
         }
       }
       } finally {
@@ -18375,7 +18372,7 @@ e2e
   });
 
 program
-  .command("_studio-daemon")
+  .command("_studio-daemon", { hidden: true }) // started by `amc up`, never by a person
   .requiredOption("--workspace <path>", "workspace path")
   .option("--api-port <port>", "studio API port")
   .option("--dashboard-port <port>", "dashboard port")
@@ -19570,9 +19567,11 @@ program.action(async (_opts, command: Command) => {
     return;
   }
 
-  const opts = program.opts<{ agent?: string; json?: boolean }>();
+  const opts = program.opts<{ agent?: string; json?: boolean; yes?: boolean }>();
   const agentId = resolveAgentId(process.cwd(), opts.agent ?? activeAgent(program) ?? undefined);
   const workspace = process.cwd();
+  if (isWorkspaceInitialized(workspace)) refuseUnknownAgent(workspace, agentId);
+  else if (process.stdin.isTTY !== true && opts.yes !== true) return refuseNewFolderWithoutTerminal(workspace);
   try {
     if (shouldShowFrontDoor({ args: process.argv.slice(2), env: process.env, stdinTTY: process.stdin.isTTY === true,
       stdoutTTY: process.stdout.isTTY === true, operatorOk: interactiveOperator({ workspace }).ok })) {
@@ -21954,6 +21953,7 @@ score
   .description("Compute formal maturity score for an agent")
   .option("--json", "Output as JSON")
   .action(async (agentId: string, opts: { json?: boolean }) => {
+    refuseUnknownAgent(process.cwd(), agentId);
     try {
       const { computeMaturityScore } = await import("./score/index.js");
       const result = computeMaturityScore([], {});

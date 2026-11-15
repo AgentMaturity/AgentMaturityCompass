@@ -131,7 +131,7 @@ export function evaluateDiagnosticEvidenceReadiness(
       "INSUFFICIENT_EVIDENCE",
       "No accepted evidence",
       ["NO_ACCEPTED_EVIDENCE", "LOW_INTEGRITY"],
-      "The artifact seal is valid, but no accepted evidence supports the score. Signing proves integrity, not evidence sufficiency. Use this only as a local baseline.",
+      "The artifact seal is valid, but no accepted evidence supports the score. A signature shows the record is unchanged, not that there is enough evidence. Use this only as a local baseline.",
       "Connect or capture an agent run, ingest accepted evidence, and rerun amc before making maturity, compliance, or deployment claims."
     );
   }
@@ -141,7 +141,7 @@ export function evaluateDiagnosticEvidenceReadiness(
       "INSUFFICIENT_EVIDENCE",
       "Insufficient evidence integrity",
       ["LOW_INTEGRITY"],
-      "The artifact seal is valid, but evidence integrity is below AMC's minimum claim threshold. Signing proves integrity, not evidence sufficiency.",
+      "The artifact seal is valid, but evidence integrity is below AMC's minimum claim threshold. A signature shows the record is unchanged, not that there is enough evidence.",
       "Collect stronger observed or attested evidence, resolve integrity penalties, and rerun amc."
     );
   }

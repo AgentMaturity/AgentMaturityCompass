@@ -95,7 +95,7 @@ export function renderStatusLines(input: { readonly scope: readonly string[]; re
   lines.push(...input.notes);
   if (input.summary !== null) {
     lines.push(renderNativeRunUsage(input.summary.usage, { requestWindow: "latest" }), renderNativeRunDiagnostics(input.summary.diagnostics),
-      `Public task validation: ${input.summary.validation?.status ?? "unavailable"}. Passing selected checks does not guarantee correctness.`);
+      `Public task validation: ${input.summary.validation?.status ?? "unavailable"}. Passing the selected checks does not show the work is correct.`);
   }
   if (input.resume !== null) lines.push(`Resume in this workspace: ${input.resume}`);
   if (input.verify !== null) lines.push(`Check the record: ${input.verify}`);

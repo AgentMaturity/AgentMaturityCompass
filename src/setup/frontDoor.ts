@@ -67,10 +67,16 @@ export function menuOptions(state: FrontDoorState): MenuOption[] {
 
 const BEST: readonly FrontDoorChoice[] = ["watch-claude", "watch-codex", "chat", "demo-chat"];
 
-/** The last choice while it is still offered, else the most useful one that is. */
+/** Choices that start AMC's background services or open a browser: a remembered one is never the pre-selected line. */
+const STARTS_SERVICES: readonly FrontDoorChoice[] = ["watch-claude", "watch-codex", "build", "console"];
+
+/**
+ * The last choice while it is still offered and does nothing beyond this terminal, else the most useful one that is.
+ * A remembered line that starts services or opens a browser is not pre-selected: Enter by habit must not do that.
+ */
 export function defaultChoice(state: FrontDoorState): FrontDoorChoice {
   const offered = new Set(menuOptions(state).map((option) => option.value));
-  if (state.lastChoice !== null && offered.has(state.lastChoice)) return state.lastChoice;
+  if (state.lastChoice !== null && offered.has(state.lastChoice) && !STARTS_SERVICES.includes(state.lastChoice)) return state.lastChoice;
   return BEST.find((choice) => offered.has(choice)) ?? "score";
 }
 
@@ -183,11 +189,16 @@ async function watchAgent(io: FrontDoorIo, agent: (typeof AGENTS)[keyof typeof A
   io.log(`See what AMC recorded in the console: ${origin}/console`);
 }
 
+/** A browser window is opened only on a yes; on a no, or when it cannot be opened, the address is printed instead. */
+async function showInBrowser(io: FrontDoorIo, url: string): Promise<void> {
+  const opened = (await io.confirm(`Open ${url} in your browser now?`)) && io.openUrl(url);
+  io.log(opened ? `Opening ${url}` : `Open ${url} in your browser.`);
+}
+
 async function openConsole(io: FrontDoorIo): Promise<void> {
   const origin = await ensureStudio(io);
   if (origin === null) return;
-  const url = `${origin}/console`;
-  io.log(io.openUrl(url) ? `Opening ${url}` : `Open ${url} in your browser.`);
+  await showInBrowser(io, `${origin}/console`);
 }
 
 /**
@@ -197,8 +208,7 @@ async function openConsole(io: FrontDoorIo): Promise<void> {
 async function buildAgent(io: FrontDoorIo, wasRunning: boolean): Promise<void> {
   const origin = await ensureStudio(io);
   if (origin === null) return;
-  const url = `${origin}/console/a4?new=1`;
-  io.log(io.openUrl(url) ? `Opening ${url}` : `Open ${url} in your browser.`);
+  await showInBrowser(io, `${origin}/console/a4?new=1`);
   io.log("Sign in as the workspace owner (create the account once with amc user init), pick your industry, and start an agent project.");
   io.log("Each step needs someone other than you to approve it. Alone, a practice project gets you as far as building the agent; the page asks for the people when they are needed.");
   if (wasRunning) io.log("AMC was already running. If the page says agent projects are turned off, it was started with AMC_A4_PREVIEW=0: run amc down, then choose this line again.");

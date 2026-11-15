@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C596-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C598-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -73,7 +73,7 @@ AMC set up this folder (.amc/).
   Just show my score (empty for now)
 ```
 
-Move with the arrow keys and press Enter. The menu only lists what can work right now: a coding agent that is not installed is left out, one that is signed out shows "Sign in to … first", and "Chat with a model" appears when an API key such as `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` is set in your shell. In a pipe, in CI or inside an agent's shell, `amc` prints the score instead, as it always did; `amc --no-menu` or `AMC_NO_MENU=1` does the same in a terminal. `amc --help` lists the few commands you need first; `amc --help --all` lists every command.
+Move with the arrow keys and press Enter. The menu only lists what can work right now: a coding agent that is not installed is left out, one that is signed out shows "Sign in to … first", and "Chat with a model" appears when an API key such as `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` is set in your shell. In a pipe, in CI or inside an agent's shell, `amc` prints the score instead (in a folder AMC has not set up yet, run `amc --yes` so it may create `.amc/` without a terminal to ask); `amc --no-menu` or `AMC_NO_MENU=1` does the same in a terminal. `amc --help` lists the few commands you need first; `amc --help --all` lists every command.
 
 Three short paths:
 
@@ -333,7 +333,7 @@ Industry Packs are free in the current source build: every pack's questions and 
 ```bash
 amc domain pack list                       # all 41 packs and their question counts
 amc domain pack describe --pack <packId>   # a pack's regulatory basis and every question
-amc domain pack run --pack <packId>        # in a terminal: choose L1, L3 or L5 for each question
+amc domain pack run --pack <packId>        # in a terminal: choose L1 to L5 for each question, or skip it
 amc domain pack run --pack <packId> --baseline --json   # no answers: every question not evaluated, no score
 ```
 
@@ -888,7 +888,7 @@ AMC is **free and MIT licensed**, and in the current source build all 41 Industr
 
 | Tier | What you get |
 |---|---|
-| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 41 Industry Packs, all <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, 1,304 registered CLI command paths, browser playground, CI gates |
+| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 41 Industry Packs, all <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, 1,302 registered CLI command paths, browser playground, CI gates |
 | **Enterprise (contact-first; not self-serve)** | Planned priority support, custom pack development, and deployment assistance; not needed for any feature or pack |
 
 > Industry Packs are 41 sector-specific questionnaires (healthcare, finance, education, logistics, government, etc.) that need ongoing regulatory research and expert review; their content stays experimental until a named expert signs it. See [`website/publication-status.json`](website/publication-status.json) for what each distribution channel publishes before making any availability claim.
@@ -923,7 +923,7 @@ AMC is **free and MIT licensed**, and in the current source build all 41 Industr
 | [Community Demo Kit](docs/COMMUNITY_DEMO_KIT.md) | [Why AMC One-Pager](docs/WHY_AMC_ONE_PAGER.md) |
 | [Solo Dev Quickstart](docs/SOLO_DEV_QUICKSTART.md) | [Platform Engineer Quickstart](docs/PLATFORM_ENGINEER_QUICKSTART.md) |
 | [Security & Compliance Quickstart](docs/SECURITY_COMPLIANCE_QUICKSTART.md) | [Troubleshooting](docs/TROUBLESHOOTING.md) |
-| [CLI Reference (1,304 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
+| [CLI Reference (1,302 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
 | [Compatibility Matrix](docs/COMPATIBILITY_MATRIX.md) | [Starter Blueprints](docs/STARTER_BLUEPRINTS.md) |
 | [Install Packages](docs/INSTALL_PACKAGES.md) | [Support Policy](docs/SUPPORT_POLICY.md) |
 | [Release Cadence](docs/RELEASE_CADENCE.md) | [CI Templates](docs/CI_TEMPLATES.md) |
@@ -1038,7 +1038,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,596<!-- /amc:count --> test source files; Vitest reports run outcomes
+cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,598<!-- /amc:count --> test source files; Vitest reports run outcomes
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
@@ -1059,6 +1059,6 @@ cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- a
 ---
 
 <p align="center">
-  <strong><!-- amc:count:diagnosticQuestions -->244<!-- /amc:count --> default diagnostic questions + 20 lifecycle expansion questions · <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs · 41 domain packs · <!-- amc:count:adapters -->16<!-- /amc:count --> adapters · 1,304 CLI command paths</strong><br>
+  <strong><!-- amc:count:diagnosticQuestions -->244<!-- /amc:count --> default diagnostic questions + 20 lifecycle expansion questions · <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs · 41 domain packs · <!-- amc:count:adapters -->16<!-- /amc:count --> adapters · 1,302 CLI command paths</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>

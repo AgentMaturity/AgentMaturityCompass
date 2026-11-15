@@ -26,11 +26,11 @@
     "src/runtime/firewall.ts": 1636,
     "src/gateway/server.ts": 1634,
     "src/cli-late-stage-commands.ts": 1521,
-    "src/adapters/hookIntegration.ts": 1379,
     "src/bridge/bridgeServer.ts": 1375,
+    "src/adapters/hookIntegration.ts": 1372,
     "src/eval/judgeCalibration.ts": 1291,
     "src/ledger/ledger.ts": 1288,
-    "src/guide/guideGenerator.ts": 1268,
+    "src/guide/guideGenerator.ts": 1256,
     "src/workspaces/hostDb.ts": 1248,
     "src/score/operationalIndependence.ts": 1202,
     "src/toolhub/toolhubServer.ts": 1131,
@@ -54,7 +54,6 @@
     "src/api/scoreRouter.ts": 893,
     "src/bridge/hookIngress.ts": 884,
     "src/score/predictiveValidity.ts": 854,
-    "src/cli-agent-commands.ts": 809,
     "src/observability/otelExporter.ts": 809
   }
 }
