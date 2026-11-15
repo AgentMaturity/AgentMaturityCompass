@@ -137,7 +137,8 @@ import {
   verifyAgentConfigSignature,
   verifyFleetConfigSignature
 } from "./fleet/registry.js";
-import { agentExists, getAgentPaths, resolveAgentId } from "./fleet/paths.js";
+import { getAgentPaths, resolveAgentId } from "./fleet/paths.js";
+import { printNoAgentInstructionFile, printTopGaps, refuseNewFolderWithoutTerminal, refuseUnknownAgent, scoreStep } from "./cli/firstRunGuards.js";
 import { getProviderTemplateById, listProviderTemplates, providerTemplateChoices } from "./providers/providerTemplates.js";
 import { runSandboxCommand } from "./sandbox/sandbox.js";
 import { attestIngestSessionAsync, ingestEvidence, type IngestType } from "./ingest/ingest.js";
@@ -674,8 +675,7 @@ import {
   type TemporalDecaySourceRun
 } from "./trust/temporalDecay.js";
 import {
-  adaptersCapabilitiesCliAsync,
-  capabilityTarget,
+  adaptersCapabilitiesCliAsync, capabilityTarget,
   adaptersCapabilitiesWithOutputCliAsync,
   adaptersConfigureCliAsync,
   adaptersDetectCli,
@@ -1412,14 +1412,6 @@ function ensureWorkspaceReadyForAgent(workspace: string, agentId?: string): void
   }
 }
 
-/** A score for an agent nobody added describes nothing, and scoring it used to create its folder as a side effect. */
-function refuseUnknownAgent(workspace: string, agentId: string): void {
-  if (agentExists(workspace, agentId)) return;
-  console.error(chalk.red(`There is no agent named '${agentId}' in this folder.`));
-  console.error("List the agents here with: amc agent list. Add one with: amc agent add. Leave --agent out to use this folder's own agent.");
-  process.exit(1);
-}
-
 interface InstantWorkspaceState {
   createdWorkspace: boolean;
   createdAgentContext: boolean;
@@ -1577,17 +1569,7 @@ async function renderInstantFullScore(
     console.log(`  ${layer.layerName.padEnd(28)} L${layer.avgFinalLevel.toFixed(2)} ${bar}`);
   }
   const gaps = report.questionScores.filter((question) => question.finalLevel < 3).slice(0, 5);
-  if (gaps.length > 0) {
-    console.log("");
-    // CLI-20: a person reads the question's title; its id stays in small print for `amc explain`, flag codes stay in the JSON.
-    const { questionBank } = await import("./diagnostic/questionBank.js");
-    const titles = new Map(questionBank.map((question) => [question.id, question.title]));
-    console.log(chalk.yellow("  Top gaps:"));
-    for (const gap of gaps) {
-      console.log(chalk.gray(`    ${titles.get(gap.questionId) ?? gap.questionId}: L${gap.finalLevel} (${gap.questionId})`));
-    }
-    console.log(chalk.gray(`  Why a question is at its level: amc explain ${gaps[0]!.questionId}`));
-  }
+  await printTopGaps(gaps);
   console.log("");
   if (state.createdWorkspace) {
     console.log(chalk.green("  Created .amc workspace automatically."));
@@ -2325,9 +2307,7 @@ program
     // with a fix is still a missing precondition even when the exit code is 0.
     // Optional adapter installs follow the closing steps (doctorNextSteps).
     const fixCount = firstRunFixCommands(result).length;
-    // CLI-21: once this folder has a score, the next step is scoring again, not a "first" score.
-    const { hasAnyRun } = await import("./startup/startupGuidance.js");
-    const scoreStep = { cmd: "amc", desc: hasAnyRun(process.cwd()) ? "Score again and see what changed" : "Get your first full maturity score" };
+    const again = await scoreStep(process.cwd());
     if (!result.ok) {
       console.log(fmt.nextSteps(doctorNextSteps(result, [
         result.workspaceInitialized
@@ -2337,10 +2317,10 @@ program
       ])));
     } else if (fixCount > 0) {
       console.log(fmt.warn(`${fixCount} precondition(s) still missing; each names its fix:`));
-      console.log(fmt.nextSteps(doctorNextSteps(result, [scoreStep])));
+      console.log(fmt.nextSteps(doctorNextSteps(result, [again])));
     } else {
       console.log(fmt.pass(result.workspaceInitialized ? "The listed diagnostic checks passed; this does not qualify a governed task or a release." : "CLI install checks passed."));
-      console.log(fmt.nextSteps([scoreStep]));
+      console.log(fmt.nextSteps([again]));
     }
     process.exit(result.ok ? 0 : 1);
   });
@@ -3008,12 +2988,7 @@ program
 
       // Non-interactive: auto-pick the first agent config found. A new file is made only when named, since nobody saw a question.
       if (!process.stdin.isTTY) {
-        if (createsNewFile && !isDryRun) {
-          console.log(chalk.yellow("  No agent instruction file was found here (AGENTS.md, CLAUDE.md and the like), so nothing was written."));
-          console.log(chalk.gray("  To create AGENTS.md with these guardrails:"), chalk.hex('#4AEF79')("amc guide --go --apply AGENTS.md"));
-          console.log("");
-          return;
-        }
+        if (createsNewFile && !isDryRun) return printNoAgentInstructionFile();
         const autoTarget = (detected[0] ?? { path: "AGENTS.md" }).path;
         const fullPath = pathModule.resolve(process.cwd(), autoTarget);
         const result = applyGuardrails(fullPath, guardrailsContent, readFn, writeFn);
@@ -5454,11 +5429,9 @@ program
           "D+": 67, "D": 63, "D-": 60,
           "F": 0,
         }[opts.failBelow] ?? 0;
-        if (result.nothingToAssess && thresholdScore > 0) {
-          console.log(chalk.red(`\n  ✗ There is nothing to grade yet, so --fail-below ${opts.failBelow} is not met\n`));
-          process.exit(1);
-        } else if (result.overallScore < thresholdScore) {
-          console.log(chalk.red(`\n  ✗ Grade ${result.overallGrade} is below --fail-below ${opts.failBelow}\n`));
+        if ((result.nothingToAssess && thresholdScore > 0) || result.overallScore < thresholdScore) {
+          console.log(chalk.red(result.nothingToAssess ? `\n  ✗ There is nothing to grade yet, so --fail-below ${opts.failBelow} is not met\n`
+            : `\n  ✗ Grade ${result.overallGrade} is below --fail-below ${opts.failBelow}\n`));
           process.exit(1);
         } else {
           console.log(chalk.hex('#4AEF79')(`\n  ✓ Grade ${result.overallGrade} meets --fail-below ${opts.failBelow}\n`));
@@ -19598,17 +19571,8 @@ program.action(async (_opts, command: Command) => {
   const opts = program.opts<{ agent?: string; json?: boolean; yes?: boolean }>();
   const agentId = resolveAgentId(process.cwd(), opts.agent ?? activeAgent(program) ?? undefined);
   const workspace = process.cwd();
-  if (isWorkspaceInitialized(workspace)) {
-    refuseUnknownAgent(workspace, agentId);
-  } else if (process.stdin.isTTY !== true && opts.yes !== true) {
-    // No terminal means nobody saw a question, so a new folder is set up only on an explicit --yes.
-    console.error("AMC has not set up this folder yet, and there is no terminal here to ask you first.");
-    console.error(`Setting it up creates a .amc/ folder in ${workspace} (AMC's settings, signing keys and records for this folder) and then prints an empty score.`);
-    console.error("To go ahead without a terminal, run: amc --yes");
-    console.error("Or run amc in a terminal and pick what to do from its menu.");
-    process.exit(1);
-    return;
-  }
+  if (isWorkspaceInitialized(workspace)) refuseUnknownAgent(workspace, agentId);
+  else if (process.stdin.isTTY !== true && opts.yes !== true) return refuseNewFolderWithoutTerminal(workspace);
   try {
     if (shouldShowFrontDoor({ args: process.argv.slice(2), env: process.env, stdinTTY: process.stdin.isTTY === true,
       stdoutTTY: process.stdout.isTTY === true, operatorOk: interactiveOperator({ workspace }).ok })) {
