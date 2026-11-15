@@ -3,165 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=1200, initial-scale=1.0">
-  <meta name="description" content="Run one command. Get the full score. Fix the gaps. Evidence over claims.">
+  <meta name="description" content="Build an AI agent for work that gets audited. Build, run and check AI agents for regulated work. Evidence over claims.">
   <title>Agent Maturity Compass</title>
+  <!-- The social card (website/og-card.png, 1200x630), in the home page's design. Render it with `npm run brand:render`.
+       Fonts come from the installed @fontsource packages, so the picture is the same on every machine. -->
   <style>
-    * { box-sizing: border-box; }
-    html, body { width: 1200px; height: 630px; margin: 0; overflow: hidden; }
+    @font-face { font-family: "Inter"; src: url("../../node_modules/@fontsource/inter/files/inter-latin-400-normal.woff2") format("woff2"); font-weight: 400; }
+    @font-face { font-family: "Inter"; src: url("../../node_modules/@fontsource/inter/files/inter-latin-700-normal.woff2") format("woff2"); font-weight: 700; }
+    @font-face { font-family: "Space Mono"; src: url("../../node_modules/@fontsource/space-mono/files/space-mono-latin-400-normal.woff2") format("woff2"); font-weight: 400; }
+    @font-face { font-family: "Space Mono"; src: url("../../node_modules/@fontsource/space-mono/files/space-mono-latin-700-normal.woff2") format("woff2"); font-weight: 700; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 1200px; height: 630px; overflow: hidden; }
     body {
-      background: #0a0a0a;
-      color: #FFFFFF;
-      font-family: 'Inter', system-ui, sans-serif;
+      background: #0a0a0a radial-gradient(60% 70% at 88% 8%, rgba(74, 239, 121, 0.13), transparent 70%);
+      color: #c9cac5;
+      font-family: "Inter", system-ui, sans-serif;
     }
-    .frame {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      padding: 56px 64px 52px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      overflow: hidden;
-    }
-    .watermark {
-      position: absolute;
-      right: -28px;
-      bottom: -132px;
-      color: rgba(255, 255, 255, 0.025);
-      font-size: 390px;
-      font-weight: 900;
-      line-height: 1;
-      letter-spacing: 0;
-    }
-    .topbar {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      gap: 22px;
-      font-family: 'Space Mono', ui-monospace, monospace;
-    }
-    .wordmark { font-size: 34px; font-weight: 700; }
-    .cursor { color: #4AEF79; }
-    .product-name {
-      color: #a0a0a0;
-      font-size: 15px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-    }
-    .content {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: minmax(0, 1.45fr) minmax(330px, 0.75fr);
-      gap: 72px;
-      align-items: end;
-      height: 430px;
-    }
-    .eyebrow {
-      margin: 0 0 20px;
-      color: #4AEF79;
-      font-family: 'Space Mono', ui-monospace, monospace;
-      font-size: 15px;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-    }
-    h1 {
-      margin: 0;
-      max-width: 650px;
-      font-size: 64px;
-      line-height: 1.06;
-      letter-spacing: 0;
-    }
-    h1 span { color: #a0a0a0; font-weight: 500; }
-    .command {
-      display: flex;
-      gap: 13px;
-      margin-top: 34px;
-      padding: 17px 20px;
-      max-width: 630px;
-      border: 1px solid rgba(74, 239, 121, 0.20);
-      background: #111111;
-      color: #FFFFFF;
-      font-family: 'Space Mono', ui-monospace, monospace;
-      font-size: 14px;
-      white-space: nowrap;
-    }
-    .command span { color: #4AEF79; font-weight: 700; }
-    .proof-panel {
-      align-self: center;
-      border-top: 2px solid #4AEF79;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 22px 0 20px;
-      font-family: 'Space Mono', ui-monospace, monospace;
-    }
-    .proof-label {
-      margin-bottom: 18px;
-      color: #a0a0a0;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-    }
-    .surface-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px 18px;
-      color: #FFFFFF;
-      font-size: 15px;
-    }
-    .surface-grid span::before { content: '_ '; color: #4AEF79; }
-    .proof-note {
-      margin-top: 22px;
-      padding-top: 16px;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      color: #a0a0a0;
-      font-size: 12px;
-      line-height: 1.55;
-    }
-    .footer {
-      position: absolute;
-      left: 64px;
-      right: 64px;
-      bottom: 28px;
-      z-index: 1;
-      display: flex;
-      justify-content: space-between;
-      color: #a0a0a0;
-      font-family: 'Space Mono', ui-monospace, monospace;
-      font-size: 13px;
-    }
-    .footer strong { color: #4AEF79; font-weight: 700; }
+    .frame { position: relative; height: 100%; padding: 52px 64px 48px; display: grid; grid-template-columns: minmax(0, 1fr) 410px; gap: 48px; }
+    .mono { font-family: "Space Mono", ui-monospace, monospace; }
+    .wordmark { font-size: 34px; font-weight: 700; color: #fff; }
+    .accent { color: #4AEF79; }
+    .copy { display: flex; flex-direction: column; }
+    h1 { margin-top: auto; font-size: 66px; line-height: 1.04; font-weight: 700; color: #fff; letter-spacing: 0; }
+    .line { margin-top: 26px; font-size: 25px; line-height: 1.4; max-width: 30em; }
+    .foot { margin-top: 34px; display: flex; gap: 28px; font-size: 16px; color: #8d8e89; }
+    .foot strong { color: #4AEF79; font-weight: 700; }
+    .sheet { align-self: center; position: relative; background: #f1f2ec; color: #12140e; border-radius: 4px; padding: 24px 22px 18px; box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6); }
+    .sheet::before { content: ""; position: absolute; left: 0; right: 0; top: -7px; height: 8px; background: radial-gradient(circle at 6px 0, transparent 5px, #f1f2ec 5.5px) 0 0 / 12px 8px repeat-x; }
+    .sheet-title { font-weight: 700; font-size: 16px; }
+    .sheet-note { margin: 4px 0 12px; font-size: 13px; color: #595d50; }
+    ol { list-style: none; counter-reset: entry; border-top: 1px dashed rgba(18, 20, 14, 0.16); }
+    li { counter-increment: entry; display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding: 8px 0; border-bottom: 1px dashed rgba(18, 20, 14, 0.16); font-size: 13px; }
+    li::before { content: counter(entry, decimal-leading-zero); color: #595d50; }
+    li em { font-style: normal; color: #595d50; }
+    li b::after { content: "signed off"; margin-left: 8px; padding: 1px 6px; border-radius: 3px; background: #1d7a3c; color: #fff; font-weight: 400; font-size: 11px; white-space: nowrap; }
   </style>
 </head>
 <body>
   <div class="frame">
-    <div class="watermark" aria-hidden="true">amc</div>
-    <header class="topbar">
-      <div class="wordmark">amc<span class="cursor">_</span></div>
-      <div class="product-name">Agent Maturity Compass</div>
-    </header>
-
-    <main class="content">
-      <section>
-        <p class="eyebrow">AI agent trust, measured from evidence</p>
-        <h1>Run one command.<br><span>Get the full score.</span><br>Fix the gaps.</h1>
-        <div class="command"><span>$</span> curl -fsSL https://agentmaturity.co/install.sh | sh</div>
-      </section>
-
-      <aside class="proof-panel" aria-label="AMC trust stack">
-        <div class="proof-label">One proof chain / eight surfaces</div>
-        <div class="surface-grid">
-          <span>Score</span><span>Shield</span>
-          <span>Enforce</span><span>Vault</span>
-          <span>Watch</span><span>Fleet</span>
-          <span>Passport</span><span>Comply</span>
-        </div>
-        <div class="proof-note">Artifact validity and evidence readiness stay separate. Claims pass only when the receipts support them.</div>
-      </aside>
-    </main>
-
-    <footer class="footer">
-      <strong>Evidence over claims.</strong>
-      <span>agentmaturity.co</span>
-    </footer>
+    <section class="copy">
+      <div class="wordmark mono">amc<span class="accent">_</span></div>
+      <h1>Build an AI agent for work that gets audited<span class="accent">_</span></h1>
+      <p class="line">Build, run and check AI agents for regulated work.</p>
+      <p class="foot mono"><strong>Evidence over claims.</strong><span>agentmaturity.co</span></p>
+    </section>
+    <aside class="sheet mono" aria-label="An example project record">
+      <p class="sheet-title">Project record</p>
+      <p class="sheet-note">An example</p>
+      <ol>
+        <li><span><b>Brief approved</b></span><em>approver</em></li>
+        <li><span><b>Build approved</b></span><em>2 people</em></li>
+        <li><span><b>Controls approved</b></span><em>2 people</em></li>
+        <li><span><b>Release approved</b></span><em>2 people</em></li>
+      </ol>
+    </aside>
   </div>
 </body>
 </html>

@@ -112,8 +112,9 @@ describe("AMC public brand system", () => {
     expect(existsSync(resolve(process.cwd(), "scripts/render-brand-assets.mjs"))).toBe(true);
     const source = read("scripts/brand/og-card.html");
     expect(source).toContain("Agent Maturity Compass");
-    expect(source).toContain("Run one command.");
-    expect(source).toContain("Get the full score. Fix the gaps.");
+    expect(source).toContain("Build an AI agent for work that gets audited");
+    expect(source).toContain("Build, run and check AI agents for regulated work.");
+    expect(source).not.toContain("Run one command");
     expect(source).toContain("Evidence over claims.");
     expect(source).toContain("#4AEF79");
     expect(source).not.toMatch(/235|5,031|🧭/u);
