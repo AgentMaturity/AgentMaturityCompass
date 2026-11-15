@@ -1,0 +1,17 @@
+[
+  {
+    "packId": "digital-health-record",
+    "questionId": "HLT-DHR-22",
+    "citation": "42 CFR Part 2 §2.31, §2.32, §2.12(d)(2)(i)(C)",
+    "instrument": "42 CFR Part 2 (Confidentiality of Substance Use Disorder Patient Records)",
+    "clause": "§ 2.31, § 2.32, § 2.12(d)(2)(i)(C)",
+    "verdict": "corrected",
+    "was": "42 CFR Part 2 §2.31, §2.32",
+    "now": "42 CFR Part 2 §2.31, §2.32, §2.12(d)(2)(i)(C)",
+    "sourceTitle": "eCFR, Title 42 Part 2 (up to date as of 2026-11-12)",
+    "sourceUrl": "https://www.ecfr.gov/api/versioner/v1/full/2026-11-12/title-42.xml?part=2",
+    "checkedOn": "2026-11-16",
+    "checkedBy": "ai-agent",
+    "note": "§2.31 (consent) and §2.32 (notice and copy of consent, or a clear explanation of its scope, with each disclosure) are right. The question said Part 2 requires these records to be kept segregated from HIPAA handling; §2.12(d)(2)(i)(C) says a part 2 program, covered entity or business associate receiving records under a single consent for treatment, payment and health care operations is not required to segregate or segment them. The compliance date 16 February 2026 was confirmed in the final rule, 89 FR 12472 (https://www.federalregister.gov/documents/2024/02/16/2024-02544/confidentiality-of-substance-use-disorder-sud-patient-records)."
+  }
+]

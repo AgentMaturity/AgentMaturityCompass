@@ -188,13 +188,16 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
     .option("--json", "Output as JSON")
     .action(async (opts: { pack: string; json?: boolean }) => {
       const pack = await packOrExit(opts.pack);
-      if (opts.json) { console.log(JSON.stringify(pack, null, 2)); return; }
+      const { citationCheckLine, citationCheckSummary } = await import("./domains/packs/citationChecks.js");
+      const citationChecks = citationCheckSummary(pack);
+      if (opts.json) { console.log(JSON.stringify({ ...pack, citationChecks }, null, 2)); return; }
 
       console.log(chalk.bold.hex('#4AEF79')(`\n🏭  ${pack.name}`));
       console.log(chalk.gray(`  Pack ID:    ${pack.id}`));
       console.log(chalk.gray(`  Station:    ${pack.stationId}`));
       console.log(chalk.gray(`  Risk level: ${pack.riskTier}`));
       console.log(chalk.gray(`  Questions:  ${pack.questions.length}`));
+      console.log(chalk.gray(`  Citations:  ${citationCheckLine(citationChecks)}`));
       const { QUESTIONNAIRE_CONTENT_STATUS, QUESTIONNAIRE_NOTICE } = await import("./domains/questionnaireLabel.js");
       console.log(chalk.gray(`  Content:    ${pack.contentStatus ?? QUESTIONNAIRE_CONTENT_STATUS}, self-reported questionnaire. ${QUESTIONNAIRE_NOTICE}`));
       if (pack.description) console.log(`\n  ${pack.description}`);
