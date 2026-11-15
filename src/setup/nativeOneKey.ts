@@ -8,9 +8,9 @@
 import type { Interface } from "node:readline";
 
 /** Keys this soon after the prompt is drawn were typed before it could be read. */
-export const ONE_KEY_SETTLE_MS = 300;
+const ONE_KEY_SETTLE_MS = 300;
 /** A y or n followed by another key this soon is part of a burst (a paste), not a keypress. */
-export const ONE_KEY_BURST_MS = 40;
+const ONE_KEY_BURST_MS = 40;
 const PASTE_ON = "\u001b[?2004h";
 const PASTE_OFF = "\u001b[?2004l";
 
