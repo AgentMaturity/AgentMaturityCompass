@@ -28,6 +28,17 @@ export const APPROVAL_ANSWERS: readonly ApprovalAnswer[] = ["allow", "deny", "un
 
 export type ApprovalRiskTier = "low" | "medium" | "high" | "critical";
 
+/**
+ * The call's own arguments, for the person deciding only (a prompt that shows the edit, the command or the host). Never
+ * hashed and never stored: a prompt presents them as the request's only after matching them to the digest it binds.
+ */
+export interface ApprovalAskDisplay {
+  /** A top-level call: the model's arguments, verbatim. */
+  readonly rawArguments?: string;
+  /** A call made from inside a program (Code Mode): its parsed arguments. */
+  readonly arguments?: Readonly<Record<string, unknown>>;
+}
+
 /** One permission question. */
 export interface ApprovalAsk {
   /** The tool call being decided. Links the audit rows to the call already in the log. */
@@ -46,6 +57,7 @@ export interface ApprovalAsk {
    * the approval it holds.
    */
   readonly intentPayload: Record<string, unknown>;
+  readonly display?: ApprovalAskDisplay;
   /** Defaults to EXECUTE — a seam that asks permission is asking to act. */
   readonly mode?: ExecutionMode;
   readonly workOrderId?: string;

@@ -75,6 +75,7 @@ import { registerPromptCommands } from "./cli-prompt-commands.js";
 import { registerNativeScheduleCommands } from "./cli-native-schedule-commands.js";
 import { registerAgentGuideCommands, selectedAgentOption } from "./cli-agent-guide-commands.js";
 import { nativeApprovalInstructions } from "./setup/nativeApprovalInstructions.js";
+import { reportedCallFor } from "./setup/nativeApprovalPreview.js";
 import { applyNativeDelegationPreset } from "./setup/nativePresetDelegation.js";
 import type { ActionClass } from "./types.js";
 import { loadNativeImageFiles } from "./attachments/nativeImageFiles.js";
@@ -695,9 +696,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                       if (typeof process.send !== "function" || !process.connected) {
                         io.error("The native approval channel disconnected; cancelling this turn."); process.emit("SIGINT"); return;
                       }
-                      try {
-                        process.send({ type: "amc/native-approval-raised", v: 1, agentId,
-                          approvalId: event.approvalId, approvalRequestId: event.approvalRequestId }, error => {
+                      try { process.send({ type: "amc/native-approval-raised", v: 1, agentId,
+                          approvalId: event.approvalId, approvalRequestId: event.approvalRequestId, ...reportedCallFor(event) }, error => {
                           if (error) { io.error("Could not deliver the actual approval request to native chat; cancelling this turn."); process.emit("SIGINT"); }
                         });
                       } catch { io.error("Native approval IPC failed; cancelling this turn."); process.emit("SIGINT"); }
