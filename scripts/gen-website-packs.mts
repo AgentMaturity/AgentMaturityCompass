@@ -1,15 +1,16 @@
-// Generates website/industry-packs.json: what the home page's "start from your industry" picker shows, from the pack
-// registry. The website never carries pack facts by hand.
+// Generates website/industry-packs.json (what the home page's "start from your industry" picker shows) and the seven
+// website/station-<id>.html pages, from the pack registry. The website never carries pack facts by hand.
 //
 // Usage: npx tsx scripts/gen-website-packs.mts [--check]
-//   --check  exit 1 when the file differs from a fresh render (drift), 0 when it is equal
-import { readFileSync, writeFileSync } from "node:fs";
+//   --check  exit 1 when a file differs from a fresh render (drift), 0 when all are equal
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { DOMAIN_REGISTRY, type Domain } from "../src/domains/domainRegistry.js";
 import { listIndustryPacks } from "../src/domains/industryPacks.js";
+import { renderStationPage, type WebsiteStation } from "./website-station-pages.mjs";
 
-const FILE = resolve(fileURLToPath(new URL("..", import.meta.url)), "website/industry-packs.json");
+const WEBSITE = resolve(fileURLToPath(new URL("..", import.meta.url)), "website");
 
 /** The picker's data: every station in registry order, and each pack's own name, summary, risk tier, rules and risks. */
 export function renderWebsitePacks(): string {
@@ -30,16 +31,28 @@ export function renderWebsitePacks(): string {
   return `${JSON.stringify({ packCount: packs.length, stations }, null, 1)}\n`;
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const fresh = renderWebsitePacks();
-  if (process.argv.includes("--check")) {
-    if (readFileSync(FILE, "utf8") !== fresh) {
-      console.error("website/industry-packs.json is out of date. Regenerate: npx tsx scripts/gen-website-packs.mts");
-      process.exit(1);
-    }
-    console.log("website/industry-packs.json matches the pack registry");
-  } else {
-    writeFileSync(FILE, fresh);
-    console.log(`wrote ${FILE}`);
+/** Every generated file under website/, keyed by its name there. */
+export function renderWebsiteFiles(): Map<string, string> {
+  const json = renderWebsitePacks();
+  const stations = (JSON.parse(json) as { stations: WebsiteStation[] }).stations;
+  const files = new Map([["industry-packs.json", json]]);
+  for (const station of stations.filter((s) => s.packs.length > 0)) {
+    files.set(`station-${station.id}.html`, renderStationPage(station, stations));
   }
+  return files;
+}
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const check = process.argv.includes("--check");
+  const stale: string[] = [];
+  for (const [name, fresh] of renderWebsiteFiles()) {
+    const path = resolve(WEBSITE, name);
+    if (!check) writeFileSync(path, fresh);
+    else if (!existsSync(path) || readFileSync(path, "utf8") !== fresh) stale.push(`website/${name}`);
+  }
+  if (stale.length > 0) {
+    console.error(`Out of date: ${stale.join(", ")}. Regenerate: npm run gen-website-packs`);
+    process.exit(1);
+  }
+  console.log(check ? "website/industry-packs.json and the station pages match the pack registry" : `wrote ${WEBSITE}/industry-packs.json and the station pages`);
 }

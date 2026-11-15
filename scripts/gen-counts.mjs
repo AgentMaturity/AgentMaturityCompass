@@ -236,7 +236,7 @@ function sectorTemplates(rel, text) {
   if (station) {
     const s = counts.sectorStations[station];
     if (!s) failures.push(`${rel}: no packs for station ${station}`);
-    else out = out.replace(/(Station: |■ )\d+ (packs|diagnostic packs) · \d+(?: experimental, self-reported)? questions/g,
+    else out = out.replace(/(Station: |■ |class="pack-count">)\d+ (packs|diagnostic packs) · \d+(?: experimental, self-reported)? questions/g,
       (_, lead, packs) => `${lead}${s.packs} ${packs} · ${s.questions} ${SECTOR_LABEL} questions`);
   }
   return out;
