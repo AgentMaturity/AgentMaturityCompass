@@ -1,17 +1,15 @@
 {
   "name": "Agent Maturity Compass",
   "short_name": "AMC",
-  "description": "AI Agent Trust Scoring",
+  "description": "Build, run and check AI agents for regulated work. Evidence over claims.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#00ff41",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
   "icons": [
-    {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23000'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%2300ff41' stroke-width='1.5'/%3E%3Cpath d='M16 5L17.5 14.5 16 18 14.5 14.5Z' fill='%2300ff41'/%3E%3Cpath d='M16 27L17.5 17.5 16 14 14.5 17.5Z' fill='%23006622'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%2300ff41'/%3E%3C/svg%3E",
-      "sizes": "any",
-      "type": "image/svg+xml"
-    }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
