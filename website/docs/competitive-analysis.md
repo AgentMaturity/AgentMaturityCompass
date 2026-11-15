@@ -574,9 +574,9 @@ These are our moats. No competitor replicates these:
 
 | Advantage | Why It Matters | Nearest Competitor Gap |
 |-----------|---------------|----------------------|
-| **Cryptographic Evidence Chains (Ed25519, Merkle trees)** | Tamper-proof audit trail. Essential for regulated industries. ZERO competitors have this. | Credo AI generates evidence but can't prove integrity cryptographically. |
+| **Cryptographic Evidence Chains (Ed25519, Merkle trees)** | Tamper-evident audit trail: a change after signing shows up when a record is checked. A signature shows who wrote a record and that it is unchanged, not that it is true. | Competitors' coverage of this is not verified. |
 | **L0-L5 Maturity Scoring** | Progression framework, not pass/fail. Shows journey. Maps to capability maturity (CMMI-style). | Everyone else does binary pass/fail or percentage scores. No maturity model. |
-| **Evidence Trust Tiers (SELF_REPORTED 0.4x, OBSERVED 1.0x)** | Distinguishes between claimed and proven behavior. Unique epistemological approach to AI assessment. | Nobody else weights evidence by collection method. |
+| **Evidence source caps the level** | Self-reported records reach L1 at most; only records AMC observed itself reach L2, the highest level today. | Competitors' approach is not verified. |
 | **Deep diagnostic coverage + broad assurance library** | Deepest assessment library in the market by far. Orders of magnitude more than any competitor. | Promptfoo has ~50 vulnerability types. DeepEval has ~50 metrics. AMC goes far beyond point-in-time vuln checks. |
 | **14 framework adapters** | Direct integration with actual agent frameworks (LangChain, CrewAI, AutoGen, etc.) for behavior capture. | Promptfoo connects to apps via API. Nobody adapts to the agent framework itself. |
 | **Gateway behavioral capture** | Sits between agent and LLM, captures real behavior without agent cooperation. | LangSmith requires SDK integration. AMC gateway is transparent. |
