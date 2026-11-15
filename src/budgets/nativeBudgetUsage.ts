@@ -293,7 +293,7 @@ export function projectBudgetUsage(rows: readonly EvidenceEvent[], agentId: stri
   // The gateway records each request's upper estimate (`tokenCeiling`, from its output limit); a request that got no
   // answer, or an answer without usage, counts at that estimate instead of blocking, as a native reservation does.
   const gatewayCeilings = new Map(rows.filter(row => row.event_type === "llm_request").map(row => {
-    const meta = budgetMeta(row); return [`${row.session_id}:${String(meta.request_id ?? meta.requestId ?? row.id)}`, number(meta.tokenCeiling)] as const;
+    const meta = budgetMeta(row); return [`${row.session_id}:${String(meta.request_id ?? meta.requestId ?? row.id)}` as string, number(meta.tokenCeiling)] as const;
   }));
   for (const row of rows) {
     if (row.ts > now || owner(row) !== agentId) continue;
