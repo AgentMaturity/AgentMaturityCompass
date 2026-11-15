@@ -10,7 +10,7 @@ import { isA4CommentScopeRoute } from "../studio/nativeAdmission.js";
 import { parseCookieHeader, issueSessionToken, issueSessionTokenAsync, verifySessionToken, type SessionPayload } from "./sessionTokens.js";
 import { hashPassword, padFailedVerify, passwordHashNeedsUpgrade, PasswordPolicyError, rehashPassword, verifyPassword } from "./passwordHash.js";
 import { vaultStatus } from "../vault/vault.js";
-import { createUserRecord, usersFileSchema, type UserRecord, type UsersFile } from "./userSchema.js";
+import { createUserRecord, UsernamePolicyError, usersFileSchema, type UserRecord, type UsersFile } from "./userSchema.js";
 import type { UserRole } from "./roles.js";
 import { enforceRoleOrAdmin, type AccessContext } from "./rbac.js";
 import { getPurposeKeyHistory } from "../keys/signingKeys.js";
@@ -319,7 +319,7 @@ export function respondUsersMutationError(request: Pick<IncomingMessage, "method
   if (error instanceof UsersLastOwnerError) {
     send(409, { error: error.message }); return true;
   }
-  if (error instanceof PasswordPolicyError) {
+  if (error instanceof PasswordPolicyError || error instanceof UsernamePolicyError) {
     send(400, { error: error.message }); return true;
   }
   if (error instanceof KeyProviderError && Object.hasOwn(KEY_PROVIDER_ERRORS, error.code)) {

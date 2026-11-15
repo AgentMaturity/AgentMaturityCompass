@@ -722,21 +722,11 @@ describe("universal agent integration layer", () => {
       token
     });
     try {
-      const getAuto = await httpJson({
-        method: "GET",
-        url: `${server.url}/diagnostic/auto-answer?agentId=default`,
-        headers: {
-          "x-amc-admin-token": token
-        }
-      });
-      expect(getAuto.status).toBe(200);
-      const autoPayload = JSON.parse(getAuto.body) as {
-        measuredScores?: Record<string, number>;
-        unknownReasons?: unknown[];
-      };
-      expect(autoPayload.measuredScores).toBeTruthy();
-      expect(Object.keys(autoPayload.measuredScores ?? {}).length).toBe(questionBank.length);
-      expect(Array.isArray(autoPayload.unknownReasons)).toBe(true);
+      // Changed on purpose (C-01): GET /diagnostic/auto-answer only reads the latest recorded run, so on a fresh workspace
+      // it answers 404 NO_RUN_YET and writes nothing; POST /diagnostic/run records the run it then reads.
+      const before = await httpJson({ method: "GET", url: `${server.url}/diagnostic/auto-answer?agentId=default`, headers: { "x-amc-admin-token": token } });
+      expect(before.status).toBe(404);
+      expect(JSON.parse(before.body).code).toBe("NO_RUN_YET");
 
       const runAuto = await httpJson({
         method: "POST",
@@ -748,8 +738,27 @@ describe("universal agent integration layer", () => {
       });
       expect(runAuto.status).toBe(200);
       const runPayload = JSON.parse(runAuto.body) as {
+        runId?: string;
         transformPlan?: { created?: boolean; planId?: string | null };
       };
+
+      const getAuto = await httpJson({
+        method: "GET",
+        url: `${server.url}/diagnostic/auto-answer?agentId=default`,
+        headers: {
+          "x-amc-admin-token": token
+        }
+      });
+      expect(getAuto.status).toBe(200);
+      const autoPayload = JSON.parse(getAuto.body) as {
+        runId?: string;
+        measuredScores?: Record<string, number>;
+        unknownReasons?: unknown[];
+      };
+      expect(autoPayload.runId).toBe(runPayload.runId);
+      expect(autoPayload.measuredScores).toBeTruthy();
+      expect(Object.keys(autoPayload.measuredScores ?? {}).length).toBe(questionBank.length);
+      expect(Array.isArray(autoPayload.unknownReasons)).toBe(true);
       expect(runPayload.transformPlan?.created).toBe(true);
       expect(typeof runPayload.transformPlan?.planId === "string" || runPayload.transformPlan?.planId === null).toBe(true);
     } finally {

@@ -17,7 +17,7 @@ import { onboardingRunForApi, onboardingStatusForApi } from "./onboardingApi.js"
 import { runDiagnostic, generateReport, loadRunReport } from "../diagnostic/runner.js";
 import { latestRunFile } from "../diagnostic/runReportResolution.js";
 import { summarizeDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
-import { runAutoAnswer } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
+import { autoAnswerFromLatestRun, runAutoAnswer } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
 import { runAssurance } from "../assurance/assuranceRunner.js";
 import {
   auditBinderCreateForApi,
@@ -107,6 +107,7 @@ import { authenticate, hasScope, verifyLeaseForScope, captureStudioToolhubIntent
 import { normalizeActionClass } from "../tickets/execTicketCli.js";
 import type { ActionClass } from "../types.js";
 import { runGovernorCheck } from "../governor/governorCli.js";
+import { studioInputError, studioSetupError } from "./studioInputErrors.js";
 import { issueLeaseForCli } from "../leases/leaseCli.js";
 import { readRevokedLeaseIds, readVerifiedLeaseRevocations, revokeLease } from "../leases/leaseStore.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js"; import { runLease } from "../leases/runLease.js"; import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
@@ -352,7 +353,7 @@ import { renderContextualizedDiagnostic } from "../diagnostic/contextualizer/con
 import { emitCgxSse } from "../cgx/cgxSse.js";
 import { validateTruthguardForWorkspace } from "../truthguard/truthguardApi.js";
 import { mechanicTargetsApplyForAuthority as mechanicTargetsApplyForApi, mechanicProfileApplyForAuthority as mechanicProfileApplyForApi, mechanicTuningApplyForAuthority as mechanicTuningApplyForApi } from "../mechanic/mechanicSettingsPublication.js";
-import { mechanicGapForAuthority as mechanicGapForApi, mechanicCreatePlanForAuthority as mechanicCreatePlanForApi, mechanicSimulateForAuthority as mechanicSimulateForApi } from "../mechanic/mechanicAnalysisPublication.js";
+import { mechanicGapFromLatestRun, mechanicCreatePlanForAuthority as mechanicCreatePlanForApi, mechanicSimulateForAuthority as mechanicSimulateForApi } from "../mechanic/mechanicAnalysisPublication.js";
 import {
   initMechanicWorkspace,
   mechanicLatestPlanForApi,
@@ -5615,15 +5616,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
-        const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? undefined);
-        const reportAuthority = captureReportSigningAuthority(options.workspace, signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]));
-        const out = await runAutoAnswer({
-          workspace: options.workspace,
-          agentId,
-          createPlan: false
-        }, { beforePublish: reportAuthority }).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; });
-        if (out === null) return;
-        json(res, 200, out);
+        // Reading only: the answers of the latest recorded run. POST /diagnostic/run records a new run.
+        const out = autoAnswerFromLatestRun(options.workspace, url.searchParams.get("agentId") ?? undefined);
+        json(res, out ? 200 : 404, out ?? { error: "No score yet. Run a score first: amc run in the workspace folder, or the Score page.", code: "NO_RUN_YET" });
         return;
       }
 
@@ -5713,17 +5708,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspace: options.workspace,
           agentId, bank: selected.bank
         });
-        selected.assertCurrent(); writeStudioAuditEvent({
-          workspace: options.workspace,
-          auditType: "DIAGNOSTIC_RENDERED",
-          severity: "LOW",
-          agentId,
-          payload: {
-            questions: render.questions.length,
-            profileType: render.profile.agentType
-          }
-        });
-        json(res, 200, render);
+        selected.assertCurrent(); json(res, 200, render); // a read writes no audit event
         } catch (cause) { if (res.headersSent) return; if (selected.completedPaths.length > 0) throw new DiagnosticBankFollowupError(selected.completedPaths, cause); throw cause; }
         return;
       }
@@ -6680,14 +6665,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "scope must be workspace|agent|node" });
           return;
         }
-        const targetId = url.searchParams.get("targetId") ?? undefined;
-        const out = await mechanicGapForApi({
-          workspace: options.workspace,
-          scopeType: scopeRaw.toUpperCase() as "WORKSPACE" | "NODE" | "AGENT",
-          scopeId: targetId
-        }, signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])).catch(error => { if (res.headersSent) return null; throw error; });
-        if (out === null) return;
-        json(res, 200, out);
+        // Reading only: the gap to the latest recorded run. `amc mechanic gap` records a gap report.
+        const out = mechanicGapFromLatestRun({ workspace: options.workspace, scopeType: scopeRaw.toUpperCase() as "WORKSPACE" | "NODE" | "AGENT", scopeId: url.searchParams.get("targetId") ?? undefined });
+        json(res, out ? 200 : 404, out ?? { error: "No score yet. Run a score first: amc run in the workspace folder, or the Score page.", code: "NO_RUN_YET" });
         return;
       }
 
@@ -8536,7 +8516,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       if (intentRefusal instanceof StudioToolhubIntentAuthorityError) { json(res, intentRefusal.status, { error: intentRefusal.message }); return; }
       if (respondUsersMutationError(req, error, (status, body) => json(res, status, body))) return;
       if (error instanceof TransformPublicationError) { if (!res.headersSent) json(res, 409, { error: error.message, code: error.code, publishedPaths: error.publishedPaths, attemptedPhase: error.attemptedPhase, knownTransparencyHash: error.knownTransparencyHash }); return; }
-      json(res, 500, { error: "internal server error" });
+      const refusal = studioInputError(new URL(req.url ?? "/", "http://studio").pathname, error) ?? studioSetupError(error);
+      if (refusal) { json(res, refusal.status, refusal.body); return; }
+      console.error(`[studio] ${req.method} ${(req.url ?? "").split("?")[0]} failed:`, error); json(res, 500, { error: "internal server error" });
     }
   });
 

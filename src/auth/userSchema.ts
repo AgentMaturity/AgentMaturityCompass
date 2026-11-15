@@ -28,11 +28,19 @@ export type UserStatus = z.infer<typeof userStatusSchema>;
 export type UserRecord = z.infer<typeof userRecordSchema>;
 export type UsersFile = z.infer<typeof usersFileSchema>;
 
+/** C-17: a new username is 1 to 64 letters (any language), digits, dots, dashes, underscores or @; no spaces or markup. */
+const USERNAME = /^[\p{L}\p{N}._@-]{1,64}$/u;
+export class UsernamePolicyError extends Error {}
+export function assertNewUsername(username: string): void {
+  if (!USERNAME.test(username)) throw new UsernamePolicyError("Username must be 1 to 64 letters, digits, dots, dashes, underscores or @, with no spaces.");
+}
+
 export function createUserRecord(input: {
   username: string;
   roles: Array<z.infer<typeof userRoleSchema>>;
   passwordHash: string;
 }): UserRecord {
+  assertNewUsername(input.username.trim());
   return userRecordSchema.parse({
     userId: randomUUID(),
     username: input.username.trim(),

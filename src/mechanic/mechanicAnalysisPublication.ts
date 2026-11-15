@@ -1,12 +1,12 @@
 /** Actual mechanic analysis publication. Diagnostic production remains its own inherited upstream operation. */
 import { join, relative } from "node:path";
 import YAML from "yaml";
-import { runAutoAnswer } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
+import { autoAnswerFromLatestRun, runAutoAnswer } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
 import { captureOrgPairs, prepareOrgPairsAsync } from "../org/preparedOrgPairs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { captureMechanicPair, requireMechanicPair } from "./mechanicPairs.js";
 import { captureMechanicRun, mechanicProgress, mechanicFailed, appendMechanicEntry } from "./mechanicPublication.js";
-import { mechanicRoot, mechanicTargetsPath, prepareInitialMechanicTargets } from "./targetsStore.js";
+import { mechanicRoot, mechanicTargetsPath, prepareInitialMechanicTargets, readMechanicTargets } from "./targetsStore.js";
 import { mechanicTargetsSchema, type MechanicScope } from "./targetSchema.js";
 import { captureMechanicAnalysisCgx, captureMechanicGap, captureMechanicEta } from "./mechanicAnalysisInputs.js";
 import { captureMechanicAnalysisBankAttempt } from "./mechanicAnalysisBank.js";
@@ -62,6 +62,11 @@ async function gap(params: ScopeParams, selectedScope: MechanicScope, run: Run, 
   });
   const saved = prepared.publish()[0]!; completed(params.workspace, saved, state);
   return { result: { gap: report, measured, ...saved }, assertCurrent() { run.beforePublish(); prepared.assertCurrent(); run.fixed(); } };
+}
+/** Reading only (GET /mechanic/gap): the gap between the targets and the latest recorded run. Runs, saves and signs nothing; null when there is no run yet. */
+export function mechanicGapFromLatestRun(input: ScopeParams) {
+  const selectedScope = scope(input), measured = autoAnswerFromLatestRun(input.workspace, selectedScope.type === "AGENT" ? selectedScope.id : "default");
+  return measured ? { gap: captureMechanicGap({ workspace: input.workspace, scope: selectedScope, targets: readMechanicTargets(input.workspace), measured }).gap, measured } : null;
 }
 /** Internal retained publication handle for the real CLI output suffix and the simulation dependency. */
 export async function mechanicGapForPublication(input: ScopeParams, beforePublish: () => void) {
