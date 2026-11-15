@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
+import { isDeepStrictEqual } from "node:util";
 import YAML from "yaml";
 import { z } from "zod";
 import { getSigningKey, getPublicKeyPem, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
@@ -314,14 +315,29 @@ export function budgetUsageSnapshot(workspace: string, agentId: string, now = Da
 export async function acceptUnknownUsageAsync(workspace: string, agentId: string, now = new Date()): Promise<{ entry: string; acceptedBefore: string }> {
   const publication = captureBudgetsPublication(workspace);
   if (publication.bytes === null) throw new Error(`Budgets config not found: ${budgetsPath(workspace)}`);
+  // Sign only on top of what the owner already signed: an edited or unsigned file is refused, never re-signed here.
+  const signature = verifyBudgetsConfigSignature(workspace, publication.bytes);
+  if (!signature.valid) {
+    throw new Error(`.amc/budgets.yaml does not match its signature (${signature.reason ?? "unknown reason"}), so nothing was signed. Run amc budgets verify; if the file was changed on purpose, review it and run amc budgets sign, then run this again.`);
+  }
   const document = YAML.parseDocument(publication.bytes.toString("utf8"));
-  const config = budgetsSchema.parse(document.toJS() as unknown);
+  const signedJs = document.toJS() as Record<string, unknown>;
+  const config = budgetsSchema.parse(signedJs);
   const entry = config.budgets.perAgent[agentId] ? agentId : config.budgets.perAgent.default ? "default" : null;
   if (entry === null) throw new Error(`No budget applies to agent ${agentId}; nothing to accept.`);
   const acceptedBefore = now.toISOString();
   document.setIn(["budgets", "perAgent", entry, "acceptUnknownUsageBefore"], acceptedBefore);
-  (await publication.prepareAsync(Buffer.from(document.toString()))).publish();
+  const next = Buffer.from(document.toString());
+  assertOnlyAcceptanceChanged(signedJs, YAML.parse(next.toString("utf8")) as unknown, entry, acceptedBefore);
+  (await publication.prepareAsync(next)).publish();
   return { entry, acceptedBefore };
+}
+
+/** The acceptance may change one field only; anything else would be signed without the owner reviewing it. */
+function assertOnlyAcceptanceChanged(signed: Record<string, unknown>, next: unknown, entry: string, acceptedBefore: string): void {
+  const budgetsNode = signed.budgets as { perAgent: Record<string, Record<string, unknown>> };
+  const expected = { ...signed, budgets: { ...budgetsNode, perAgent: { ...budgetsNode.perAgent, [entry]: { ...budgetsNode.perAgent[entry], acceptUnknownUsageBefore: acceptedBefore } } } };
+  if (!isDeepStrictEqual(next, expected)) throw new Error("Signing the acceptance would change more than budgets.perAgent." + entry + ".acceptUnknownUsageBefore, so nothing was signed. Run amc budgets verify and review .amc/budgets.yaml.");
 }
 
 /** The commands that let a person continue, one per kind of block. */

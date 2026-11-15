@@ -9,7 +9,7 @@ import YAML from "yaml";
 import { SessionService } from "../src/session/sessionService.js";
 import { openSessionEventStore } from "../src/persistence/openSessionEventStore.js";
 import { openLedger } from "../src/ledger/ledger.js";
-import { acceptUnknownUsageAsync, budgetUsageSnapshot, budgetsPath, evaluateBudgetStatus, loadBudgetsConfig, signBudgetsConfig } from "../src/budgets/budgets.js";
+import { acceptUnknownUsageAsync, budgetUsageSnapshot, budgetsPath, evaluateBudgetStatus, loadBudgetsConfig, signBudgetsConfig, verifyBudgetsConfigSignature } from "../src/budgets/budgets.js";
 import { measuredUsage, NATIVE_BUDGET_RESERVATION } from "../src/budgets/nativeBudgetUsage.js";
 import { nativeUnknownUsageNotice } from "../src/budgets/nativeBudgetAdmission.js";
 import { AdapterRegistry } from "../src/llm/adapter/adapterRegistry.js";
@@ -224,6 +224,25 @@ describe("AMC-1534 native budget admissions and signed accounting", () => {
     await drain(runtime(value, upstream).stream(spec));
     expect(upstream.sent).toHaveLength(1);
     expect(budgetUsageSnapshot(workspace, "default").daily.unknownLlmTokenRequests).toBe(1);
+  });
+
+  test("the acceptance refuses a budgets file that no longer matches its signature, and leaves it unsigned", async () => {
+    const config = loadBudgetsConfig(workspace); config.budgets.perAgent.default!.perMinute.maxLlmTokens = 999_999_999;
+    writeFileSync(budgetsPath(workspace), YAML.stringify(config));
+    await expect(acceptUnknownUsageAsync(workspace, "default")).rejects.toThrow("does not match its signature (digest mismatch), so nothing was signed. Run amc budgets verify");
+    expect(verifyBudgetsConfigSignature(workspace)).toMatchObject({ valid: false, reason: "digest mismatch" });
+    expect(readFileSync(budgetsPath(workspace), "utf8")).not.toContain("acceptUnknownUsageBefore");
+  });
+
+  test("the acceptance refuses when signing it would change a second field", async () => {
+    // A signed file where another agent's entry is a YAML alias of the default entry: setting the field changes both.
+    const signed = readFileSync(budgetsPath(workspace), "utf8").replace(/^ {4}default:/m, "    default: &shared");
+    writeFileSync(budgetsPath(workspace), `${signed.trimEnd()}\n    other: *shared\n`); signBudgetsConfig(workspace);
+    expect(loadBudgetsConfig(workspace).budgets.perAgent.other).toBeDefined();
+    const before = readFileSync(budgetsPath(workspace));
+    await expect(acceptUnknownUsageAsync(workspace, "default")).rejects.toThrow("would change more than budgets.perAgent.default.acceptUnknownUsageBefore");
+    expect(readFileSync(budgetsPath(workspace)).equals(before)).toBe(true);
+    expect(verifyBudgetsConfigSignature(workspace).valid).toBe(true);
   });
 
   test("H-01: gateway rows: a refused upstream connection and a 401 do not block; an unanswered request still does", () => {
