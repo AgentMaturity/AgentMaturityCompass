@@ -3,11 +3,12 @@
  * forwarder posts what Codex reports to the Bridge's Codex route, which records digests only and claims "observed".
  * No Codex binary runs here (pending): payloads follow Codex's own post-tool-use input schema at the pin.
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { Command } from "commander";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { CODEX_FORWARD_PATH, forwardCodexObservation } from "../src/adapters/codex/codexObserveForwarder.js";
+import { CODEX_FORWARD_PATH, codexLostObservationsPath, forwardCodexObservation, runCodexObserveForwarder } from "../src/adapters/codex/codexObserveForwarder.js";
+import { inspectHookHealth } from "../src/watch/hookHealthDiagnostics.js";
 import { codexActionId } from "../src/adapters/codex/codexIdentity.js";
 import { registerHookIntegrationCommands } from "../src/adapters/hookIntegrationCli.js";
 import { getHookIntegrationStatus, installHookIntegration, removeHookIntegration } from "../src/adapters/hookIntegration.js";
@@ -95,12 +96,32 @@ describe("Codex observe installation", () => {
     expect(readFileSync(join(workspace, ".codex", "hooks.json"), "utf8")).toBe("{\"hooks\":{}}\n");
   });
 
-  test("remove revokes the lease and removes AMC's hook file", () => {
+  test("remove revokes the lease and removes AMC's hook file, and the .codex folder only when AMC made it and it is empty", () => {
     const workspace = controlledWorkspace(agentId);
     installHookIntegration({ workspace, provider: "codex", agentId, mode: "observe" });
     expect(removeHookIntegration({ workspace, provider: "codex" }).applied).toBe(true);
     expect(existsSync(join(workspace, ".codex", "hooks.json"))).toBe(false);
+    expect(existsSync(join(workspace, ".codex"))).toBe(false);
     expect(getHookIntegrationStatus({ workspace, provider: "codex" }).state).toBe("not-installed");
+    // A folder AMC made but that now holds the person's own file stays, and so does a folder that was there before.
+    installHookIntegration({ workspace, provider: "codex", agentId, mode: "observe" });
+    writeFileSync(join(workspace, ".codex", "config.toml"), "# mine\n");
+    removeHookIntegration({ workspace, provider: "codex" });
+    expect(readFileSync(join(workspace, ".codex", "config.toml"), "utf8")).toBe("# mine\n");
+    rmSync(join(workspace, ".codex", "config.toml"));
+    installHookIntegration({ workspace, provider: "codex", agentId, mode: "observe" });
+    removeHookIntegration({ workspace, provider: "codex" });
+    expect(existsSync(join(workspace, ".codex"))).toBe(true);
+  });
+
+  test("health accepts codex and counts its observations", () => {
+    const workspace = controlledWorkspace(agentId);
+    installHookIntegration({ workspace, provider: "codex", agentId, mode: "observe" });
+    expect(inspectHookHealth({ workspace, provider: "codex" })).toMatchObject({ provider: "codex", status: "awaiting_first_event" });
+    recordCodexPostToolUse({ workspace, authenticatedAgentId: agentId, rawInput: JSON.stringify(report()) });
+    const health = inspectHookHealth({ workspace, provider: "codex" });
+    expect(health.evidence.eventCount).toBe(1);
+    expect(health.evidence.lastEvent?.actionId).toBe(codexActionId("codex-session", "call-1"));
   });
 
   test("the hook control route never accepts Codex", () => {
@@ -129,11 +150,20 @@ describe("Codex observations", () => {
       .toThrow(/conflicts/);
   });
 
+  // These two were refused before: a field or mode a newer Codex adds must not lose the observation (H-08).
   test.each([
-    ["an unknown field", report({ extra: 1 })],
+    ["an unknown extra field", report({ extra: 1, tool_use_id: "call-extra" })],
+    ["a permission mode AMC does not know yet", report({ permission_mode: "autoReview", tool_use_id: "call-mode" })],
+  ])("a report with %s is recorded", (_label, body) => {
+    const workspace = controlledWorkspace(agentId);
+    expect(recordCodexPostToolUse({ workspace, authenticatedAgentId: agentId, rawInput: JSON.stringify(body) }).idempotentReplay).toBe(false);
+    expect(Object.keys(ledgerRow(workspace, "cxpost_") ?? {})).not.toContain("extra");
+  });
+
+  test.each([
     ["another event", report({ hook_event_name: "PreToolUse" })],
     ["a missing tool_use_id", (({ tool_use_id: _omit, ...rest }) => rest)(report())],
-    ["an unknown permission mode", report({ permission_mode: "yolo" })],
+    ["a permission mode that is not a word", report({ permission_mode: "\u001b[2J" })],
   ])("a report with %s is refused", (_label, body) => {
     const workspace = controlledWorkspace(agentId);
     expect(() => recordCodexPostToolUse({ workspace, authenticatedAgentId: agentId, rawInput: JSON.stringify(body) })).toThrow(/does not match its schema/);
@@ -148,7 +178,19 @@ describe("Codex observations", () => {
       installHookIntegration({ workspace, provider: "codex", agentId, mode: "observe", bridgeBase: `http://127.0.0.1:${port}` });
       await forwardCodexObservation(workspace, JSON.stringify(report({ tool_use_id: "call-forwarded" })));
       expect(ledgerRow(workspace, "cxpost_")).toMatchObject({ toolUseId: "call-forwarded", leaseId: expect.stringMatching(/./) });
-      await expect(forwardCodexObservation(workspace, JSON.stringify(report({ extra: 1 })))).rejects.toThrow(/HTTP 400/);
+      const missing = JSON.stringify((({ tool_use_id: _omit, ...rest }) => rest)(report()));
+      await expect(forwardCodexObservation(workspace, missing)).rejects.toThrow(/HTTP 400/);
+      // The hook run itself: exit 1 with a line on stderr and a lost-report note that status and health show (H-08).
+      const stderr: string[] = [];
+      expect(await runCodexObserveForwarder(workspace, async () => missing, (text) => stderr.push(text))).toBe(1);
+      expect(stderr.join("")).toMatch(/AMC did not record this Codex tool call: .*HTTP 400.*amc connect hooks status --provider codex/);
+      expect(readFileSync(codexLostObservationsPath(workspace), "utf8")).not.toContain("codex-session");
+      const status = getHookIntegrationStatus({ workspace, provider: "codex" });
+      expect(status.lostObservations).toMatchObject({ count: 1, lastReason: expect.stringMatching(/HTTP 400/) });
+      expect(status.issues.join("\n")).toMatch(/1 Codex tool call report was not recorded by AMC/);
+      expect(await runCodexObserveForwarder(workspace, async () => JSON.stringify(report({ tool_use_id: "call-ok" })), () => {})).toBe(0);
+      removeHookIntegration({ workspace, provider: "codex" });
+      expect(existsSync(codexLostObservationsPath(workspace))).toBe(false);
     } finally {
       await bridge.close();
     }

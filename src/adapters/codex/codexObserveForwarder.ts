@@ -62,7 +62,9 @@ export async function runCodexObserveForwarder(workspace: string, read: () => Pr
     await forwardCodexObservation(workspace, await read());
     return 0;
   } catch (error) {
-    const reason = error instanceof Error ? error.message : String(error);
+    const message = error instanceof Error ? error.message : String(error);
+    // Node's fetch says only "fetch failed" when nothing listens at the Bridge address.
+    const reason = message === "fetch failed" ? "AMC Studio did not answer (is it running? amc up)" : message;
     noteLostCodexObservation(workspace, reason);
     stderr(`AMC did not record this Codex tool call: ${reason}. The call itself is unaffected. Check: amc connect hooks status --provider codex\n`);
     return 1;

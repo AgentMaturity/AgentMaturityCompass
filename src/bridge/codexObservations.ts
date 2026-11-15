@@ -26,7 +26,9 @@ const codexPostToolUseSchema = z.object({
   transcript_path: z.string().max(4_096).nullable(),
   cwd: z.string().min(1).max(4_096),
   model: z.string().min(1).max(256),
-  permission_mode: z.enum(["default", "acceptEdits", "plan", "dontAsk", "bypassPermissions"]),
+  // Recorded as Codex reports it; a mode a newer Codex adds must not lose the observation (default, acceptEdits, plan,
+  // dontAsk and bypassPermissions at the pin).
+  permission_mode: z.string().regex(/^[A-Za-z][A-Za-z0-9_-]{0,63}$/),
   tool_name: z.string().min(1).max(512),
   tool_use_id: z.string().min(1).max(256),
   tool_input: z.unknown(),

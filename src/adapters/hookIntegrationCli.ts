@@ -81,6 +81,14 @@ export function registerHookIntegrationCommands(
   const hooks = connect
     .command("hooks")
     .description("Install, inspect, or remove provider-native AMC observation and control hooks");
+  // Commander would answer `uninstall` with "Did you mean install?", the opposite of what the person wants.
+  hooks.on("command:*", (operands: string[]) => {
+    const name = String(operands[0] ?? "");
+    console.error(chalk.red(`error: unknown command 'connect hooks ${name}'`));
+    if (/^(uninstall|delete|disable|rm)$/i.test(name)) console.error("To take AMC's hook out again: amc connect hooks remove --provider <claude-code|gemini-cli|pi|dsh|codex>");
+    console.error(`Commands here: ${hooks.commands.filter((command) => !(command as unknown as { _hidden?: boolean })._hidden).map((command) => command.name()).join(", ")}`);
+    process.exitCode = 1;
+  });
 
   hooks
     .command("install")
