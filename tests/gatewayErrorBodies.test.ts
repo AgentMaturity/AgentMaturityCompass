@@ -126,4 +126,28 @@ describe("gateway error bodies", () => {
       expect(line).not.toContain("?");
     }
   }, 60_000);
+
+  test("QA M-07 / H-01: a refused upstream connection names the upstream, its address and the next step, and is recorded as never sent", async () => {
+    const { workspace, gateway, lease } = await setup();
+    let missing: { status: number; body: string };
+    try {
+      fail.next = Object.assign(new Error("connect ECONNREFUSED 127.0.0.1:9"), { code: "ECONNREFUSED" });
+      const response = await post(gateway.port, "/plain/v1/x", lease);
+      expect(response.status).toBe(502);
+      expect(JSON.parse(response.body)).toMatchObject({ error: "gateway proxy failure", upstream: "plain", address: expect.stringMatching(/^http:\/\/127\.0\.0\.1:\d+$/),
+        next: expect.stringContaining("(ECONNREFUSED). Start that server, or fix upstream plain in .amc/gateway.yaml") });
+      missing = await post(gateway.port, "/plain/v1/x", "");
+    } finally {
+      await gateway.close();
+    }
+    expect(missing.status).toBe(401);
+    expect(JSON.parse(missing.body)).toMatchObject({ error: "missing lease token", next: expect.stringContaining("amc lease issue --agent default --routes /plain") });
+    const ledger = openLedger(workspace);
+    try {
+      const failure = ledger.getAllEvents().map((event) => JSON.parse(event.meta_json ?? "{}") as Record<string, unknown>).find((meta) => meta.stage === "request_error");
+      expect(failure).toMatchObject({ status: 502, connectFailed: "ECONNREFUSED" });
+    } finally {
+      ledger.close();
+    }
+  }, 60_000);
 });
