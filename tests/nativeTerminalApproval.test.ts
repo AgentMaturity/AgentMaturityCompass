@@ -49,7 +49,7 @@ const childFixture = () => Object.assign(new EventEmitter(), { exitCode: null, s
 
 async function review(f: ReturnType<typeof fixture>, rawArguments: string, keyAnswer: string | null) {
   const child = childFixture(), logs: string[] = [], errors: string[] = [];
-  const key = vi.fn(async () => keyAnswer), question = vi.fn(async () => "cancel");
+  const key = vi.fn(async (_prompt: string) => keyAnswer), question = vi.fn(async (_prompt: string) => "cancel");
   const helper = createNativeInteractiveApprovals({ child, workspace: f.workspace, entry: "unused-cli.js", question, key,
     log: line => logs.push(line), error: line => errors.push(line) });
   child.emit("message", { type: "amc/native-approval-raised", v: 1, agentId: "default", approvalId: f.approvalId,

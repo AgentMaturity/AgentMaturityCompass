@@ -696,8 +696,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                       if (typeof process.send !== "function" || !process.connected) {
                         io.error("The native approval channel disconnected; cancelling this turn."); process.emit("SIGINT"); return;
                       }
-                      try {
-                        process.send({ type: "amc/native-approval-raised", v: 1, agentId,
+                      try { process.send({ type: "amc/native-approval-raised", v: 1, agentId,
                           approvalId: event.approvalId, approvalRequestId: event.approvalRequestId, ...reportedCallFor(event) }, error => {
                           if (error) { io.error("Could not deliver the actual approval request to native chat; cancelling this turn."); process.emit("SIGINT"); }
                         });
