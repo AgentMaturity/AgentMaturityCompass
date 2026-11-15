@@ -358,8 +358,15 @@ revision. The same holds for the context slots (`context.contextPluginSha256`, `
 `context.promptPackSha256`) and the operating-profile slots (`operatingProfile.sha256`, the agent's
 `amc-operating-profiles/<agent>/a4-<station>.operating-profile.json` files; `operatingProfile.activationSha256`, every
 activation record of the agent). Those files sit outside `.amc/`: an entry that is not a regular file (a link, a FIFO)
-or a profile directory that is a link reads `RESOURCE_UNREADABLE`. A prompt pack rebuilt by the prompt
-scheduler moves `context.promptPackSha256`, so an open gate reads `RESOURCE_DRIFTED` until it is requested again.
+or a profile directory that is a link reads `RESOURCE_UNREADABLE`. `context.promptPackSha256` is a digest of what the
+agent's latest prompt pack says: every member except its signatures, and the pack without its build id and build time.
+Aspire's Build builds the pack right after it writes the agent config, so the revision Build records binds it. Studio's
+prompt scheduler rebuilds every pack on the signed prompt policy's cadence (every 24 hours by default) with a new id,
+time and signatures; when nothing the pack says has
+changed, the slot does not move and open approvals stay open. A pack whose prompts, allowlists, advisories or any other
+content changed moves the slot, and an open gate reads `RESOURCE_DRIFTED` until it is requested again. A revision
+recorded before this digest existed binds the archive's sha256, so its open gates read `RESOURCE_DRIFTED` once: record a
+new revision.
 Under an active plan, Studio mints a native task's lease with the workspace lease key, which Studio's vault holds: while
 that vault is locked, `adapt.plan.nativeSessionsAllowed` reads WAITING (`LEASE_NOT_ISSUED`, `VAULT_LOCKED`). A CLI, SDK,
 ACP or in-process run with workspace tools signs its own lease with the vault of its own process (`AMC_VAULT_PASSPHRASE`),
@@ -809,11 +816,11 @@ resolves to a private, link-local or mapped address is refused (409 `VERIFY_EGRE
 nothing is recorded. AMC lists no private address, and no signed opt-in exists in v1. The connection is pinned to the
 checked address. TLS verifies against the system CA set, any 3xx fails, and the check is bounded at 5 s and 256 KiB.
 `/readyz` READY gives `reachable`; a 503, a redirect, a refused certificate or a mismatch gives `failed`. The image,
-package and plan-head checks are `not_evaluated` ("no unauthenticated digest source at the destination (P2-40)"), so
+package and plan-head checks are `not_evaluated` ("AMC cannot yet confirm which build runs where it is deployed: the
+destination offers no source of the release's digest that AMC can check"; reason code `KEY:P2-40`), so
 `passed` is unreachable in v1. No probe turn runs. The row keeps the operator's `recorded_status` untouched and adds
 `amc_check_status`, the resolved address, the response digest and a VerifierReportV1. The status text composes both
-columns, for example "recorded: succeeded; AMC check: reachable, release identity not evaluated at the destination
-(P2-40)".
+columns, for example "recorded: succeeded; AMC check: reachable, release identity not evaluated at the destination".
 
 Rollback is its own effect gate. `POST …/releases/:rid/rollback/preview { environment }` (owner) previews it and opens
 `a4.activate.rollback`, a DEPLOY engine request on the release's direction gate that approvers decide under A4's
