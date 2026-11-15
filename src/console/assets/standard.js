@@ -1,3 +1,4 @@
+import { showResult } from "./pageKit.js";
 import { renderSchemaViewer } from "./components/schemaViewer.js";
 import { renderVerifyPanel } from "./components/verifyPanel.js";
 
@@ -66,8 +67,9 @@ export async function renderStandardPage(params) {
   const show = (out, bad = false) => {
     const node = document.getElementById("standardOut");
     if (!node) return;
+    if (typeof out !== "string") return showResult(node, out);
     node.className = `scroll ${bad ? "status-bad" : "muted"}`;
-    node.textContent = typeof out === "string" ? out : JSON.stringify(out, null, 2);
+    node.textContent = out;
   };
   const failure = (error) => `${error?.status === 403 ? "Not permitted: " : ""}${String(error?.message || error)}`;
 

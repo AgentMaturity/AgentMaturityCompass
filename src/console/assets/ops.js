@@ -1,114 +1,65 @@
-// The Ops page's script, served from a file so the console's Content-Security-Policy needs no inline scripts.
-import "./focusableScroll.js";
+// The Maintenance (Ops) page. It uses the console's shared shell and request helper (api.js), so it has the menu, the
+// signed-out and AMC-stopped notices, and plain error words like every other page (C-07). Records read as rows; the raw
+// record is under "Show the record"; host paths read as .amc/...
+import { apiGet, apiPost, applyRoleGates, showSignIn, whoami } from "./api.js";
+import { confirmPress, esc, recordRows } from "./pageKit.js";
+import { plainErrorText } from "./plainError.js";
 
-async function getJson(path, init) {
-  const res = await fetch(path, Object.assign({ credentials: "include" }, init || {}));
-  const text = await res.text();
-  let body = null;
+const fill = (id, html) => {
+  const el = document.getElementById(id);
+  el.removeAttribute("aria-busy");
+  el.innerHTML = html;
+};
+const problem = (error) => `<p class="status-bad" role="alert">${esc(plainErrorText(error))}</p>`;
+
+async function section(id, path, lead = () => "") {
   try {
-    body = text ? JSON.parse(text) : null;
-  } catch {
-    body = { raw: text };
-  }
-  if (!res.ok) {
-    throw new Error((body && body.error) || res.status + " " + res.statusText);
-  }
-  return body;
-}
-
-// Errors and server data go into the page as text, never as markup.
-const esc = (text) => String(text).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
-const warnHtml = (error) => "<div class='warn'>Could not load: " + esc(error instanceof Error ? error.message : error) + ". Refresh to try again.</div>";
-
-function setOut(value) {
-  document.getElementById("out").textContent = JSON.stringify(value, null, 2);
-}
-
-async function refresh() {
-  try {
-    const ready = await getJson("/readyz");
-    const status = ready.status || "UNKNOWN";
-    document.getElementById("ready").innerHTML =
-      "<div><strong>" +
-      esc(status) +
-      "</strong></div><pre>" +
-      esc(JSON.stringify(ready, null, 2)) +
-      "</pre>";
+    const body = await apiGet(path);
+    fill(id, `${lead(body)}${recordRows(body)}`);
   } catch (error) {
-    document.getElementById("ready").innerHTML = warnHtml(error);
-  }
-
-  try {
-    const retention = await getJson("/ops/retention/status");
-    document.getElementById("retention").innerHTML = "<pre>" + esc(JSON.stringify(retention, null, 2)) + "</pre>";
-  } catch (error) {
-    document.getElementById("retention").innerHTML = warnHtml(error);
-  }
-
-  try {
-    const maintenance = await getJson("/ops/maintenance/stats");
-    document.getElementById("maintenance").innerHTML = "<pre>" + esc(JSON.stringify(maintenance, null, 2)) + "</pre>";
-  } catch (error) {
-    document.getElementById("maintenance").innerHTML = warnHtml(error);
-  }
-
-  try {
-    const backup = await getJson("/ops/backup/status");
-    const warning = backup.warning ? "warn" : "";
-    document.getElementById("backup").innerHTML =
-      "<div class='" + warning + "'><pre>" + esc(JSON.stringify(backup, null, 2)) + "</pre></div>";
-  } catch (error) {
-    document.getElementById("backup").innerHTML = warnHtml(error);
+    fill(id, problem(error));
   }
 }
 
-document.getElementById("retention-dry").addEventListener("click", async () => {
-  try {
-    const out = await getJson("/ops/retention/run", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ dryRun: true })
-    });
-    setOut(out);
-    refresh();
-  } catch (error) {
-    setOut({ error: String(error) });
-  }
-});
+function refresh() {
+  return Promise.all([
+    section("ready", "/readyz", (ready) => `<p><strong>${["READY", "OK"].includes(String(ready?.status).toUpperCase()) || ready?.ok === true
+      ? "Ready." : `Not ready (${esc(ready?.status ?? "unknown")}). The reasons are listed below.`}</strong></p>`),
+    section("retention", "/ops/retention/status"),
+    section("maintenance", "/ops/maintenance/stats"),
+    section("backup", "/ops/backup/status", (backup) => backup?.warning
+      ? `<p class="status-bad"><strong>${backup.lastBackupTs ? `The last backup is older than ${esc(backup.warningThresholdDays ?? 7)} days.` : "No backup has been made yet."}</strong>
+        Make one with <code>amc backup create</code> in the workspace folder.</p>` : "<p>Backup is recent enough.</p>")
+  ]);
+}
 
-document.getElementById("retention-run").addEventListener("click", async () => {
-  if (!window.confirm("Run retention now? It archives old records and deletes what the retention policy says to remove. This cannot be undone. Run Dry-Run first to see what would change.")) return;
-  try {
-    const out = await getJson("/ops/retention/run", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ dryRun: false })
-    });
-    setOut(out);
-    refresh();
-  } catch (error) {
-    setOut({ error: String(error) });
-  }
-});
+function action(id, path, body, done, confirmWhat = null) {
+  document.getElementById(id).addEventListener("click", async (event) => {
+    if (confirmWhat && !confirmPress(event.currentTarget, confirmWhat)) return;
+    try {
+      const out = await apiPost(path, body);
+      fill("out", `<p class="status-ok">${esc(done)} (${esc(new Date().toLocaleTimeString())})</p>${recordRows(out)}`);
+      await refresh();
+    } catch (error) {
+      fill("out", problem(error));
+    }
+  });
+}
 
-document.getElementById("vacuum").addEventListener("click", async () => {
-  try {
-    const out = await getJson("/ops/maintenance/vacuum", { method: "POST" });
-    setOut(out);
-    refresh();
-  } catch (error) {
-    setOut({ error: String(error) });
+async function main() {
+  const me = await whoami().catch(() => null);
+  if (!me) {
+    showSignIn(document.getElementById("status"));
+    for (const id of ["ready", "retention", "maintenance", "backup"]) fill(id, '<p class="muted">Sign in to see this.</p>');
+    return;
   }
-});
+  applyRoleGates(document);
+  action("retention-dry", "/ops/retention/run", { dryRun: true }, "Dry run finished: nothing was removed. What would go is listed below.");
+  action("retention-run", "/ops/retention/run", { dryRun: false }, "Old records were archived and removed as the retention rules say.",
+    "remove old records (this cannot be undone)");
+  action("vacuum", "/ops/maintenance/vacuum", {}, "The database was compacted.");
+  action("prune", "/ops/maintenance/prune", {}, "The cache was cleared.");
+  await refresh();
+}
 
-document.getElementById("prune").addEventListener("click", async () => {
-  try {
-    const out = await getJson("/ops/maintenance/prune", { method: "POST" });
-    setOut(out);
-    refresh();
-  } catch (error) {
-    setOut({ error: String(error) });
-  }
-});
-
-refresh();
+void main();

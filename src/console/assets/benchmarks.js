@@ -1,3 +1,5 @@
+import { showResult } from "./pageKit.js";
+import { recordRows } from "./pageKit.js";
 import { apiGet, apiPost, onClaims, showSignIn, whoami } from "./api.js";
 import { installClaimStrip } from "./components/claimBadge.js";
 import { benchCard } from "./components/benchCard.js";
@@ -32,7 +34,7 @@ async function loadData() {
 function render(root, data) {
   const exported = data.exports.map((row) => benchCard(row)).join("");
   const imported = data.imports.map((row) => benchCard(row)).join("");
-  const comparison = data.latestComparison ? `<pre class="scroll">${esc(JSON.stringify(data.latestComparison, null, 2))}</pre>` : `<p class="muted">No comparison yet.</p>`;
+  const comparison = data.latestComparison ? `${recordRows(data.latestComparison)}` : `<p class="muted">No comparison yet.</p>`;
   root.innerHTML = `
     ${card("Exports", exported || `<p class="muted">No local exports.</p>`)}
     ${card("Imports", imported || `<p class="muted">No imported benches.</p>`)}
@@ -72,7 +74,7 @@ function wirePublishHandlers() {
         explicitOwnerAck: Boolean(document.getElementById("benchPubAck")?.checked)
       };
       const result = await requestBenchPublish(apiPost, payload);
-      out.textContent = JSON.stringify(result, null, 2);
+      showResult(out, result);
     } catch (error) {
       out.textContent = String(error);
     }
@@ -81,7 +83,7 @@ function wirePublishHandlers() {
     try {
       const approvalRequestId = document.getElementById("benchPubApproval")?.value || "";
       const result = await executeBenchPublish(apiPost, { approvalRequestId });
-      out.textContent = JSON.stringify(result, null, 2);
+      showResult(out, result);
     } catch (error) {
       out.textContent = String(error);
     }

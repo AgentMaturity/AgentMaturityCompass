@@ -1,3 +1,4 @@
+import { recordRows } from "./pageKit.js";
 export async function renderTrustPage(params) {
   const trust = await params.apiGet("/trust/status");
   const signature = trust?.signature || {};
@@ -12,7 +13,7 @@ export async function renderTrustPage(params) {
         <div><div class="muted">Settings file signature</div><div class="tile-value">${signature.valid ? "VALID" : "INVALID"}</div></div>
         <div><div class="muted">Signing service reachable</div><div class="tile-value">${state.notaryReachable ? "YES" : "NO"}</div></div>
       </div>
-      <pre class="scroll">${params.htmlEscape(JSON.stringify({
+      ${recordRows({
         configSignatureReason: signature.reason || null,
         reasons: state.reasons || [],
         pinnedFingerprint: state.pinnedFingerprint || null,
@@ -21,16 +22,16 @@ export async function renderTrustPage(params) {
         attestationBasis: state.attestationBasis || null,
         requiredAttestationLevel: state.requiredAttestationLevel || null,
         lastAttestationTs: state.lastAttestationTs || null
-      }, null, 2))}</pre>
+      })}
     `)}
     ${params.card("Notary Log Tail", `
       <div class="muted">Hash-only view (no payloads)</div>
-      <pre class="scroll">${params.htmlEscape(JSON.stringify({
+      ${recordRows({
         ok: tail.ok,
         status: tail.status,
         error: tail.error,
         entries: Array.isArray(tail.entries) ? tail.entries : []
-      }, null, 2))}</pre>
+      })}
     `)}
   `;
 }

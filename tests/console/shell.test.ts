@@ -119,7 +119,7 @@ describe("every console page with a nav reaches the shell", () => {
   test("each nav page's scripts are app.js, api.js or a module that imports api.js or shell.js", () => {
     const navPages = readdirSync("src/console/pages").filter((file) => readFileSync(`src/console/pages/${file}`, "utf8").includes("<nav"));
     expect(navPages.length).toBeGreaterThan(60);
-    expect(navPages).not.toContain("ops.html");
+    expect(navPages).toContain("ops.html"); // C-07: Maintenance (ops) is on the console shell now
     for (const file of navPages) {
       const html = readFileSync(`src/console/pages/${file}`, "utf8");
       const scripts = [...html.matchAll(/src="\.\/assets\/([\w/-]+\.js)(?:\?v=[^"]*)?"/g)].map((match) => match[1]!);
@@ -169,7 +169,7 @@ describe("canonical navigation", () => {
     // Sentence case: no label is all lowercase or all uppercase.
     for (const link of api.CANONICAL_NAV ?? []) expect(link.label[0], link.label).toBe(link.label[0]!.toUpperCase());
     expect(html).not.toContain("More pages");
-    expect(hrefs(html)).toHaveLength(31);
+    expect(hrefs(html)).toHaveLength(32);
     expect(html).not.toMatch(/\son[a-z]+\s*=|javascript:/i);
   });
 
@@ -194,7 +194,7 @@ describe("canonical navigation", () => {
     api.renderCanonicalNav?.(nav);
     expect(nav.querySelector("#a4NavLink")!.hasAttribute("hidden")).toBe(true);
     expect(nav.querySelectorAll("a")).toHaveLength(first);
-    expect(first).toBe(33);
+    expect(first).toBe(34);
     initShell(doc);
     expect(nav.querySelectorAll("a")).toHaveLength(first);
     expect(nav.querySelectorAll(".mobile-nav-toggle")).toHaveLength(1);
@@ -206,14 +206,14 @@ describe("canonical navigation", () => {
     const nav = pageWithNav(doc, ["./home", "./assurance", "./assuranceRun"], "assuranceRun");
     initShell(doc);
     expect(nav.dataset.canonical).toBe("1");
-    expect(nav.querySelectorAll("a")).toHaveLength(33);
+    expect(nav.querySelectorAll("a")).toHaveLength(34);
     const section = nav.querySelectorAll("details").find((details) => details.textContent.startsWith("More pages"))!;
     expect(section.querySelectorAll("a").map((anchor) => anchor.getAttribute("href"))).toEqual(["./assurance", "./assuranceRun"]);
     expect(section.open).toBe(true);
   });
 
   test("every canonical link names an existing console page", () => {
-    expect(api.CANONICAL_NAV?.length).toBe(31);
+    expect(api.CANONICAL_NAV?.length).toBe(32);
     for (const link of api.CANONICAL_NAV ?? []) {
       expect(existsSync(`src/console/pages/${link.href.replace(/^\.\//, "")}.html`), link.href).toBe(true);
     }

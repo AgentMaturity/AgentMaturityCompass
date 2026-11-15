@@ -1,5 +1,6 @@
 import { renderKpiCard } from "./components/kpiCard.js";
 import { renderValueEvidenceBanner } from "./components/valueEvidenceBanner.js";
+import { recordRows } from "./pageKit.js";
 
 function escapeHtml(value) {
   return String(value)
@@ -23,8 +24,8 @@ export async function renderValueKpisPage(params) {
     params.card(
       "KPI Contract",
       `
-      <p class="muted">Signed value contract drives deterministic normalization and dimension attribution.</p>
-      <pre class="scroll">${escapeHtml(JSON.stringify(contract || { error: "contract unavailable for current role" }, null, 2))}</pre>
+      <p class="muted">The signed value contract says which numbers count as value for this agent and how they are weighed.</p>
+      ${contract ? recordRows(contract) : `<p>No value contract for <strong>${escapeHtml(agentId)}</strong> yet. A workspace owner creates one with <code>amc value init</code> in the workspace folder.</p>`}
       `
     ),
     params.card("KPI Detail", cards || "<div class='card muted'>No KPI rows available.</div>")
@@ -32,7 +33,8 @@ export async function renderValueKpisPage(params) {
 
   if (typeof params.subscribe === "function") {
     params.subscribe((event) => {
-      if (!event || !["VALUE_UPDATED", "VALUE_REGRESSION_DETECTED", "VALUE_EVIDENCE_INSUFFICIENT"].includes(event.type)) {
+      // Not VALUE_EVIDENCE_INSUFFICIENT: this page's own read sends it, and re-reading on it would never stop.
+      if (!event || !["VALUE_UPDATED", "VALUE_REGRESSION_DETECTED"].includes(event.type)) {
         return;
       }
       renderValueKpisPage(params).catch(() => undefined);

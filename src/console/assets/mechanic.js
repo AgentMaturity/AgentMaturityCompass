@@ -1,6 +1,7 @@
 import { apiGet, showSignIn, whoami } from "./api.js";
 import { renderGapTable } from "./components/gapTable.js";
 import { renderHandholdingSteps } from "./components/handholdingSteps.js";
+import { recordRows } from "./pageKit.js";
 
 function esc(value) {
   return String(value ?? "")
@@ -53,7 +54,7 @@ async function main() {
   ]);
   const gap = gapEnvelope?.gap;
   if (!gap) {
-    root.innerHTML = card("Mechanic Workbench", "<p class='muted'>Gap analysis unavailable.</p>");
+    root.innerHTML = card("Mechanic Workbench", "<p>No score yet, so there is no gap to show. Run a score first (amc run in the workspace folder); this page then compares it with your <a href='./equalizer'>target levels</a>.</p>");
     return;
   }
 
@@ -74,11 +75,11 @@ async function main() {
     `
     )}
     ${card("5 Dimensions: Measured vs Target", `<div class="grid">${renderDimensionBars(gap.perDimension)}</div>`)}
-    ${card("Strategy-Failure Risks (Read-Only)", `<pre class="scroll">${esc(JSON.stringify(gap.global?.strategyFailureRisks || {}, null, 2))}</pre>`)}
-    ${card("Value Dimensions (Read-Only)", `<pre class="scroll">${esc(JSON.stringify(gap.global?.valueDimensions || {}, null, 2))}</pre>`)}
+    ${card("Strategy-failure risks (read only)", recordRows(gap.global?.strategyFailureRisks || {}))}
+    ${card("Value dimensions (read only)", recordRows(gap.global?.valueDimensions || {}))}
     ${card("Question Gaps", `<div id="gapTable"></div>`)}
     ${card("Upgrade Autopilot Steps", `<div id="handholdingSteps"></div>`)}
-    ${card("Readiness Checks", `<pre class="scroll">${esc(JSON.stringify(readiness || {}, null, 2))}</pre>`)}
+    ${card("Readiness checks", recordRows(readiness || {}))}
   `;
   renderGapTable(document.getElementById("gapTable"), gap);
   renderHandholdingSteps(document.getElementById("handholdingSteps"), [

@@ -36,11 +36,11 @@ function kpiCards(snapshot, count = 8) {
   return rows.map((row) => renderKpiCard(row)).join("");
 }
 
-async function renderScope(params, scope, id, title) {
+async function renderScope(params, scope, id, title, made = null) {
   const encodedId = encodeURIComponent(id);
+  // Opening the page reads the latest snapshot only. A report is a new signed record, so it is made on the button (C-01).
   const snapshot = await params.apiGet(`/value/snapshot/latest?scope=${scope}&id=${encodedId}`).catch(() => null);
-  const reportResp = await params.apiGet(`/value/report?scope=${scope}&id=${encodedId}&windowDays=30`).catch(() => null);
-  const report = reportResp?.report ?? reportResp ?? null;
+  const report = made?.report ?? made ?? null;
   const points = Array.isArray(report?.series?.valueScore) ? report.series.valueScore : [];
 
   params.root.innerHTML = [
@@ -68,27 +68,29 @@ async function renderScope(params, scope, id, title) {
         </div>
       </div>
       <div class="row wrap">
-        <button id="valueRefreshBtn">Refresh Value Snapshot</button>
-        <a href="./valueKpis">Open KPI Detail</a>
+        <button id="valueRefreshBtn"${snapshot ? "" : " disabled"}>Make a value report for the last 30 days</button>
+        <a href="./valueKpis">Open KPI detail</a>
       </div>
-      <canvas id="valueTrendCanvas" width="640" height="170" role="img" aria-label="Value realization trend chart for the selected scope."></canvas>
-      <p class="muted">Realtime + continuous recurrence: value snapshots refresh on cadence and key governance events.</p>
+      ${points.length > 0 ? `<canvas id="valueTrendCanvas" width="640" height="170" role="img" aria-label="Value score over the last 30 days."></canvas>`
+        : `<p class="muted">${made ? "The report has no value scores to draw yet." : "The value trend appears here after you make a report."}</p>`}
+      <p class="muted">AMC refreshes value snapshots on a schedule and after important changes.</p>
       `
     ),
     params.card("KPI Signals", kpiCards(snapshot))
   ].join("");
 
   const canvas = document.getElementById("valueTrendCanvas");
-  renderValueTrendChart(canvas, points);
+  if (canvas) renderValueTrendChart(canvas, points);
 
   document.getElementById("valueRefreshBtn")?.addEventListener("click", async () => {
-    await params.apiGet(`/value/report?scope=${scope}&id=${encodedId}&windowDays=30`);
-    await renderScope(params, scope, id, title);
+    const fresh = await params.apiGet(`/value/report?scope=${scope}&id=${encodedId}&windowDays=30`);
+    await renderScope(params, scope, id, title, fresh);
   });
 
   if (typeof params.subscribe === "function") {
     params.subscribe((event) => {
-      if (!event || !["VALUE_UPDATED", "VALUE_REGRESSION_DETECTED", "VALUE_EVIDENCE_INSUFFICIENT"].includes(event.type)) {
+      // Not VALUE_EVIDENCE_INSUFFICIENT: this page's own read sends it, and re-reading on it would never stop.
+      if (!event || !["VALUE_UPDATED", "VALUE_REGRESSION_DETECTED"].includes(event.type)) {
         return;
       }
       renderScope(params, scope, id, title).catch(() => undefined);
@@ -97,5 +99,5 @@ async function renderScope(params, scope, id, title) {
 }
 
 export async function renderValuePage(params) {
-  await renderScope(params, "workspace", "workspace", "Value Realization: Workspace");
+  await renderScope(params, "workspace", "workspace", "Value for the whole workspace");
 }

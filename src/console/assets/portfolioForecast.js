@@ -1,3 +1,4 @@
+import { recordDetails } from "./pageKit.js";
 import { hostRouterPath } from "./hostPortfolio.js";
 
 function htmlEscape(value) {
@@ -61,6 +62,6 @@ export async function renderPortfolioForecastPage(params) {
         </table>
       </div>
     `)}
-    ${card("Raw", `<pre class="scroll">${htmlEscape(JSON.stringify(data, null, 2))}</pre>`)}
+    ${card("The full record", recordDetails(data))}
   `;
 }
