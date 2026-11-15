@@ -3,7 +3,7 @@ import { openLedger } from "../ledger/ledger.js";
 import type { SessionService } from "../session/sessionService.js";
 import type { ToolExecution } from "../tools/toolTypes.js";
 import { sha256Hex } from "../utils/hash.js";
-import { acceptUnknownOption, budgetForAgent, evaluateBudgetStatus, loadVerifiedBudgetsConfig } from "./budgets.js";
+import { acceptUnknownOption, budgetForAgent, evaluateBudgetStatus, loadVerifiedBudgetsConfig, requestTokenCeiling } from "./budgets.js";
 import { budgetSessionAgent, LOCAL_STUB_USD_EXPOSURE, NATIVE_BUDGET_RESERVATION, projectBudgetUsage, readBudgetEvents } from "./nativeBudgetUsage.js";
 import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { nativeUsdReservation, type NativeBudgetDispatch } from "./nativeUsdReservation.js";
@@ -11,7 +11,6 @@ import { reserveExperimentModelRequest } from "./experimentBudget.js";
 import { nativeUsdUnits } from "./nativeUsdAmount.js";
 import { STUB_DISPATCH_URL, STUB_PROVIDER_ID, STUB_PROVIDER_MODEL } from "../agent/stubProvider.js";
 import { parseRequestHeaderMeta } from "../session/requestHeaderMeta.js";
-import { requestTokenCeiling } from "./requestTokenCeiling.js";
 
 export class NativeBudgetRefusal extends Error {
   readonly code = "AMC_NATIVE_BUDGET_REFUSED";
