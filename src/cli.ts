@@ -1944,7 +1944,7 @@ async function runInstantFullScoreForAgent(params: { workspace: string; agentId:
 }
 
 function normalizeCliErrorMessage(error: unknown): string {
-  const message = error instanceof Error ? error.message : String(error);
+  const message = toErrorMessage(error);
   // Ctrl+C in any prompt (pack run, quickscore, setup); vault-setup advice would be unrelated to most of them.
   if (/User force closed the prompt/i.test(message)) return "Interactive prompt aborted.";
   // Publication errors wrap the actual refusal; show its cause chain so the reason is not hidden.

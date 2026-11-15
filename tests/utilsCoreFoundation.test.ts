@@ -15,6 +15,11 @@ describe("utils/errors", () => {
   test("toErrorMessage extracts message from Error", () => {
     expect(toErrorMessage(new Error("boom"))).toBe("boom");
   });
+  test("toErrorMessage says a missing path in words, not ENOENT (CLI-28)", () => {
+    let error: unknown;
+    try { readFileSync("/nonexistent-amc-path"); } catch (caught) { error = caught; }
+    expect(toErrorMessage(error)).toBe("There is no file or folder at /nonexistent-amc-path. Check the path and try again.");
+  });
   test("toErrorMessage returns string as-is", () => {
     expect(toErrorMessage("raw string")).toBe("raw string");
   });
