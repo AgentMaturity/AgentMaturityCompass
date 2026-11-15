@@ -73,7 +73,7 @@ export function effectUnsettled(chain: readonly A4ChainLink[], match: (body: Rec
 }
 const STAGING_LEASE_TTL_MS = 24 * 60 * 60 * 1000;
 /** No unauthenticated digest source exists at a destination until P2-40 (D-18 option 1). */
-export const IDENTITY_NOT_EVALUATED = "no unauthenticated digest source at the destination (P2-40)";
+export const IDENTITY_NOT_EVALUATED = "AMC cannot yet confirm which build runs where it is deployed: the destination offers no source of the release's digest that AMC can check";
 /** Why the prepared files pin the image by tag (IMAGE_TAG_ONLY): AMC holds no digest to pin, whatever the chart supports. */
 export const IMAGE_TAG_ONLY_REASON = "the bootstrap report records no digest of the image this Studio runs, so the prepared files pin it by tag";
 /**

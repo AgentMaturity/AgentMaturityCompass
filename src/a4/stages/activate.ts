@@ -135,7 +135,7 @@ function activateFacts(spec: Record<string, unknown>, answers: readonly A4Answer
     { id: "same-host", sources: ["D-18", "P2-40"], dataStatus: null,
       novice: "In this version, deploying means restarting the hosted AMC Studio that built this agent with a pinned image. An agent built elsewhere cannot be deployed yet.",
       practitioner: `v1 is a same-host restart: the overlay restarts this hosted Studio (found: ${String(hosting.kind ?? "not hosted")}). Receipts are recordable only for an agent built here; `
-        + "installing the package into another workspace is P2-40.",
+        + "installing the package into another workspace is not possible yet.",
       expert: `hostingNow() = ${JSON.stringify(hosting)}; deployment.same_host is BLOCKED (DEPLOYMENT_NOT_SAME_HOST, P2-40) unless it equals the target.` },
     { id: "leases", sources: ["issueLeaseForPrincipal", "P1-78", "design §10.4 Build"], dataStatus: null,
       novice: "AMC gives the operator a short-lived staging key when the release is built, and the production key only when the deployment is approved. Each key is shown once "
@@ -151,7 +151,7 @@ function activateFacts(spec: Record<string, unknown>, answers: readonly A4Answer
     { id: "lifecycle", sources: ["LIFECYCLE_BRIDGE", "requiredControlsForStage"], dataStatus: null,
       novice: `The agent's lifecycle stage is ${String(lifecycle.currentStage ?? "unknown")}. AMC only moves it when A4 evidence backs each control; otherwise the control stays not evaluated.`,
       practitioner: `Production requires ${Array.isArray(lifecycle.requiredForProduction) ? lifecycle.requiredForProduction.join(", ") : "(unread)"}. rollback_plan_validated and `
-        + "operator_handoff_acknowledged stay not evaluated until P2-40 (AMC's check reaches reachability only); monitoring_slo_enabled stays not evaluated "
+        + "operator_handoff_acknowledged stay not evaluated for now (AMC's check reaches reachability only); monitoring_slo_enabled stays not evaluated "
         + "while the SLO report is process-wide (it labels no agent).",
       expert: "a4Lifecycle.advance computes controlsSatisfied from LIFECYCLE_BRIDGE only, testing → staging after RELEASE and staging → production after the deployment approval; advanceLifecycleStage is never called backwards." },
     { id: "receipts", sources: ["design §10.4 Record deployment", "D-18 option 1"], dataStatus: null,
@@ -228,7 +228,7 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
         "the operator records the rollback row; deployed_release_id moves then"], lifecycle: "never moved backwards" },
     valueReportingPlan: { kpis: kpis.map((kpi) => ({ kpi, evidenceSource: null, method: "not_yet_decided" })), sustainability: listValue(values.get("sustainabilityObjectives")),
       social: listValue(values.get("socialObjectives")), claimKind: "self_reported", note: "one amc.a4-value-claim/v1 per value-contract KPI per release, recorded at Review" },
-    completion: { effect: PRODUCTION_LEASE_EFFECT_ID, note: "the deployment approval mints the production lease, then the lifecycle bridge moves staging → production only with every production control evidenced (P2-40 for two of them)" }
+    completion: { effect: PRODUCTION_LEASE_EFFECT_ID, note: "the deployment approval mints the production lease, then the lifecycle bridge moves staging → production only with every production control evidenced (two of them cannot have evidence yet)" }
   };
   return {
     outputs: [{ output: "proposal", label: "activate propose: the release draft (eight surfaces, package, lease, update, monitoring, rollback and value plans)", lane: "recommendation",
@@ -244,7 +244,7 @@ const LIMITATIONS = [
   `AMC's check of the destination establishes reachability only: ${IDENTITY_NOT_EVALUATED}; runtime behaviour there is not evaluated.`,
   `The image is pinned by tag (IMAGE_TAG_ONLY): ${IMAGE_TAG_ONLY_REASON}.`,
   "D-03 keeps Helm, Compose, Railway and Vercel documented, and A4 v1 prepares Compose and Helm only (D-18). Neither is qualified in CI: Helm passed its qualification checks locally only, and Railway and Vercel stay unqualified.",
-  "rollback_plan_validated and operator_handoff_acknowledged stay not evaluated until AMC's check can pass (P2-40), so the lifecycle stays at staging.",
+  "rollback_plan_validated and operator_handoff_acknowledged stay not evaluated until AMC's check can pass, so the lifecycle stays at staging.",
   `The update policy is signed and not enforced (P2-34); ${KILL_SWITCH_HOLD}.`,
   "The SLO source is in-memory and unsigned: the monitor record carries it self_reported with evidence incomplete.",
   "Independently reviewed value needs an admitted external record naming the KPI and its window (P2-24, P3-21)."

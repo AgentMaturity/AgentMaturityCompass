@@ -87,7 +87,7 @@ describe("scenario: failed deployment", () => {
     expect((await j.deploy(release.releaseId, receipt, { destinationRef: HOST })).status).toBe(201);
     const checked = await verify(j, release.releaseId, destination(READY));
     expect(checked.amcCheckStatus).toBe("reachable");
-    expect(checked.statusText).toBe("recorded: succeeded; AMC check: reachable, release identity not evaluated at the destination (P2-40)");
+    expect(checked.statusText).toBe("recorded: succeeded; AMC check: reachable, release identity not evaluated at the destination");
     const store = openA4Store(j.t.workspace);
     try {
       const row = store.ledger.db.prepare("SELECT * FROM a4_deployments WHERE project_id = ? AND kind = 'verify' ORDER BY rowid DESC LIMIT 1")

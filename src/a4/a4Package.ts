@@ -74,7 +74,7 @@ import { packageVersionManifest, recordLifecycleActivation } from "./a4RuntimeLi
 const coded = (code: string, message: string): Error => Object.assign(new Error(`${code}: ${message}`), { code });
 const MAX_INPUT_BYTES = 64 * 1024 * 1024; // ponytail: one input file; raise it if an agent's resources outgrow it
 const PACKAGE_BOUNDARY = "The signed provenance record of what this workspace held at the release digest (v1: a same-host restart of the hosted Studio "
-  + "that built the agent, D-18). AMC prepared and signed it; it never deployed it. Installing it into another workspace is P2-40.";
+  + "that built the agent, D-18). AMC prepared and signed it; it never deployed it. Installing it into another workspace is not possible yet.";
 /** AMC's own install root (src/a4/ or dist/a4/ → the package root): the runtime SBOM and the deploy base files are read there. */
 export const AMC_ROOT = fileURLToPath(new URL("../..", import.meta.url));
 
@@ -411,7 +411,7 @@ function packageInputs(workspace: string, state: A4ReadinessState, gateRevisionN
     `- IMAGE_TAG_ONLY: ${IMAGE_TAG_ONLY_REASON}. ${TOPOLOGY_QUALIFICATION[deployInput.target].reasonCode}: ${TOPOLOGY_QUALIFICATION[deployInput.target].note}.`,
     "- D-03 also keeps Railway and Vercel documented but unqualified; A4 v1 prepares Compose and Helm only (D-18).",
     `- AMC's check of a destination establishes reachability only: ${IDENTITY_NOT_EVALUATED}. Runtime behaviour at the destination is not evaluated.`,
-    "- A re-snapshot into another workspace is P2-40. The SBOM lists AMC's runtime dependencies only; the agent's AIBOM is P1-27/P2-18.",
+    "- A re-snapshot into another workspace is not possible yet. The SBOM lists AMC's runtime dependencies only; the agent's AIBOM is P1-27/P2-18.",
     "- The staging lease token is delivered once to the release owner and stored nowhere; mount it as an operator-supplied secret file. The manifest and leases.json name its id only.",
     `- ${UPDATE_POLICY_PATH} is the signed update policy; nothing enforces it yet (P2-34).`, ""
   ].join("\n"), "utf8") });

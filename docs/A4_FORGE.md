@@ -816,11 +816,11 @@ resolves to a private, link-local or mapped address is refused (409 `VERIFY_EGRE
 nothing is recorded. AMC lists no private address, and no signed opt-in exists in v1. The connection is pinned to the
 checked address. TLS verifies against the system CA set, any 3xx fails, and the check is bounded at 5 s and 256 KiB.
 `/readyz` READY gives `reachable`; a 503, a redirect, a refused certificate or a mismatch gives `failed`. The image,
-package and plan-head checks are `not_evaluated` ("no unauthenticated digest source at the destination (P2-40)"), so
+package and plan-head checks are `not_evaluated` ("AMC cannot yet confirm which build runs where it is deployed: the
+destination offers no source of the release's digest that AMC can check"; reason code `KEY:P2-40`), so
 `passed` is unreachable in v1. No probe turn runs. The row keeps the operator's `recorded_status` untouched and adds
 `amc_check_status`, the resolved address, the response digest and a VerifierReportV1. The status text composes both
-columns, for example "recorded: succeeded; AMC check: reachable, release identity not evaluated at the destination
-(P2-40)".
+columns, for example "recorded: succeeded; AMC check: reachable, release identity not evaluated at the destination".
 
 Rollback is its own effect gate. `POST …/releases/:rid/rollback/preview { environment }` (owner) previews it and opens
 `a4.activate.rollback`, a DEPLOY engine request on the release's direction gate that approvers decide under A4's
