@@ -35,12 +35,12 @@ afterEach(() => {
 });
 
 const WRITE = '{"path":"notes.txt","content":"hello\\n"}';
-function fixture(actionClass: "WRITE_LOW" | "WRITE_HIGH" = "WRITE_LOW") {
+function fixture(actionClass: "WRITE_LOW" | "WRITE_HIGH" = "WRITE_LOW", rawArguments = WRITE) {
   const workspace = mkdtempSync(join(tmpdir(), "amc-terminal-approval-")); roots.push(workspace);
   initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
   initActionPolicy(workspace); initToolsConfig(workspace); initBudgets(workspace, "default");
   const approvalId = `apr_${randomUUID()}`;
-  const intentPayload = { toolName: "fs.write", rawArguments: WRITE };
+  const intentPayload = { toolName: "fs.write", rawArguments };
   const created = createApprovalForIntent({ workspace, agentId: "default", intentId: approvalId, toolName: "fs.write", actionClass,
     requestedMode: "EXECUTE", effectiveMode: "EXECUTE", riskTier: "medium", intentPayload, initiator: cliInitiator() });
   return { workspace, approvalId, approvalRequestId: created.request.approvalRequestId, intentHash: sha256Hex(canonicalize(intentPayload)) };
@@ -99,6 +99,21 @@ describe("one-key approval at the chat terminal", () => {
     expect(r.rows).toEqual([]);
   });
 
+  it("shows an argument the summary does not use, and offers no key when any part of the call is cut short", async () => {
+    const extra = '{"path":"notes.txt","content":"hello\\n","mode":"0777"}';
+    const shownAll = await review(fixture("WRITE_LOW", extra), extra, "y");
+    expect(shownAll.logs).toContain("Other arguments:");
+    expect(shownAll.logs).toContain("mode: 0777");
+    expect(shownAll.key).toHaveBeenCalled();
+    const long = JSON.stringify({ path: "notes.txt", content: Array.from({ length: 130 }, (_, i) => `line ${i}`).join("\n") });
+    const cut = await review(fixture("WRITE_LOW", long), long, "y");
+    expect(cut.logs).toContain("more lines are not shown here");
+    expect(cut.logs).toContain("cannot be allowed with one key");
+    expect(cut.key).not.toHaveBeenCalled();
+    expect(cut.question.mock.calls[0]?.[0]).toContain("approve, deny, or cancel");
+    expect(cut.rows).toEqual([]);
+  });
+
   it("keeps signed-in reviewers where the rule asks for two different people", async () => {
     const f = fixture("WRITE_HIGH");
     const r = await review(f, WRITE, "y");
@@ -142,5 +157,22 @@ describe("what the prompt shows", () => {
     expect(fetch.lines[0]).toBe("Host:    example.org");
     const sneaky = describeReportedCall(workspace, { toolName: "bash", arguments: { command: "ls\u001b[2K\u001b[1Arm -rf ~" } });
     expect(sneaky.lines.join("\n")).not.toContain("\u001b");
+  });
+
+  it("lists every argument after a summary, and marks a call with a cut argument as not shown in full", () => {
+    const workspace = mkdtempSync(join(tmpdir(), "amc-terminal-preview-")); roots.push(workspace);
+    const fetch = describeReportedCall(workspace, { toolName: "web_fetch", arguments: { url: "https://example.org/", method: "POST", body: "secret=1" } });
+    expect(fetch.lines).toEqual(expect.arrayContaining(["  method: POST", "  body: secret=1"]));
+    expect(fetch.complete).toBe(true);
+    const bash = describeReportedCall(workspace, { toolName: "bash", arguments: { command: "ls", timeoutMs: 5, env: { A: "1" } } });
+    expect(bash.lines).toEqual(expect.arrayContaining(["  timeoutMs: 5", '  env: {"A":"1"}']));
+    // A url on another tool gets no network summary: every argument is listed as it is.
+    const other = describeReportedCall(workspace, { toolName: "custom.post", arguments: { url: "https://example.org/", payload: "x" } });
+    expect(other.title).toBe('Call the tool "custom.post"');
+    expect(other.lines).toContain("payload: x");
+    const hidden = describeReportedCall(workspace, { toolName: "bash", arguments: { command: `${"a".repeat(500)}; curl evil` } });
+    expect(hidden.complete).toBe(false);
+    expect(hidden.lines.join("\n")).toContain("more characters not shown");
+    expect(describeReportedCall(workspace, { toolName: "bash", arguments: { command: "ls" } }).complete).toBe(true);
   });
 });

@@ -82,24 +82,32 @@ export function callMatchesRequest(workspace: string, request: ApprovalRequestRe
 
 const text = (value: unknown): string | null => (typeof value === "string" ? value : null);
 
-function shownLines(block: string, max = MAX_SHOWN_LINES): string[] {
+/** Whether every argument was shown in full. Any cut line, cut block, unreadable change or redacted span clears it. */
+interface Shown { complete: boolean }
+
+function shownLines(block: string, shown: Shown, max = MAX_SHOWN_LINES): string[] {
   const lines = block.replace(/\n$/, "").split("\n");
   const kept = lines.slice(0, max).map((line) => {
     const safe = escapeTerminalControls(line.replace(/\t/g, "    "));
-    return safe.length > MAX_LINE_CHARS ? `${safe.slice(0, MAX_LINE_CHARS)} … (${safe.length - MAX_LINE_CHARS} more characters)` : safe;
+    if (safe.length <= MAX_LINE_CHARS) return safe;
+    shown.complete = false;
+    return `${safe.slice(0, MAX_LINE_CHARS)} … (${safe.length - MAX_LINE_CHARS} more characters not shown)`;
   });
-  return lines.length > max ? [...kept, `… ${lines.length - max} more lines are not shown here. The approval covers all of them.`] : kept;
+  if (lines.length <= max) return kept;
+  shown.complete = false;
+  return [...kept, `… ${lines.length - max} more lines are not shown here.`];
 }
 
 /** One file change as a unified diff; a new file shows every line as added. */
-function fileChange(workspace: string, path: string, after: (before: string | null) => string): string[] {
+function fileChange(workspace: string, path: string, after: (before: string | null) => string, shown: Shown): string[] {
   const { full, rel } = writeTarget(workspace, path);
   const before = readBeforeWrite(full, path);
   const beforeText = before === null ? null : utf8(before);
-  if (before !== null && beforeText === null) return [`${rel} is not text, so its change cannot be shown as lines.`];
+  if (before !== null && beforeText === null) { shown.complete = false; return [`${rel} is not text, so its change cannot be shown as lines.`]; }
   const diff = shownDiff(rel, before ?? Buffer.alloc(0), Buffer.from(after(beforeText), "utf8"));
+  if (diff.truncated || diff.text.includes("[AMC_REDACTED:") || diff.text.startsWith("Binary files ")) shown.complete = false;
   return [before === null ? `New file: ${escapeTerminalControls(rel)}` : `Change to: ${escapeTerminalControls(rel)}`,
-    ...(diff.text.length === 0 ? ["(no line would change)"] : shownLines(diff.text))];
+    ...(diff.text.length === 0 ? ["(no line would change)"] : shownLines(diff.text, shown))];
 }
 
 function hostOf(url: string): string | null {
@@ -111,48 +119,61 @@ function hostOf(url: string): string | null {
   }
 }
 
-function otherArguments(args: Record<string, unknown>): string[] {
-  return Object.entries(args).flatMap(([key, value]) => {
+/** Every argument not named in `used`, by name and value. */
+function otherArguments(args: Record<string, unknown>, shown: Shown, used: readonly string[] = []): string[] {
+  return Object.entries(args).filter(([key]) => !used.includes(key)).flatMap(([key, value]) => {
     const host = typeof value === "string" ? hostOf(value) : null;
-    const shown = shownLines(typeof value === "string" ? value : JSON.stringify(value) ?? String(value), 20);
+    const lines = shownLines(typeof value === "string" ? value : JSON.stringify(value) ?? String(value), shown, 20);
     return [...(host === null ? [] : [`Network host: ${escapeTerminalControls(host)}`]),
-      shown.length <= 1 ? `${escapeTerminalControls(key)}: ${shown[0] ?? ""}` : `${escapeTerminalControls(key)}:`, ...(shown.length <= 1 ? [] : shown.map((line) => `    ${line}`))];
+      lines.length <= 1 ? `${escapeTerminalControls(key)}: ${lines[0] ?? ""}` : `${escapeTerminalControls(key)}:`, ...(lines.length <= 1 ? [] : lines.map((line) => `    ${line}`))];
   });
 }
 
-/** What the reported call would do. Never throws: a call that cannot be read is described as such. */
-export function describeReportedCall(workspace: string, call: ReportedCall): { readonly title: string; readonly lines: readonly string[] } {
+/** A special summary for one built-in tool, naming the arguments it showed; null when the call does not fit it. */
+function summary(workspace: string, call: ReportedCall, args: Record<string, unknown>, shown: Shown): { title: string; lines: string[]; used: readonly string[] } | null {
+  const path = text(args.path), command = text(args.command), url = text(args.url), patch = text(args.patch);
+  if (call.toolName === "fs.write" && path !== null && typeof args.content === "string") {
+    const content = args.content;
+    return { title: "Write a file", lines: fileChange(workspace, path, () => content, shown), used: ["path", "content"] };
+  }
+  if (call.toolName === "fs.edit" && path !== null) {
+    const edits = (Array.isArray(args.edits) ? args.edits : [{ find: args.find, replace: args.replace, replaceAll: args.replaceAll }]) as LiteralEdit[];
+    return { title: "Edit a file", lines: fileChange(workspace, path, (before) => {
+      if (before === null) throw new Error("the file does not exist yet");
+      return planLiteralEdits(before, edits, path).after;
+    }, shown), used: Array.isArray(args.edits) ? ["path", "edits"] : ["path", "find", "replace", "replaceAll"] };
+  }
+  if (call.toolName === "apply_patch" && patch !== null) return { title: "Apply a patch to files", lines: shownLines(patch, shown), used: ["patch"] };
+  if (call.toolName === "bash" && command !== null) {
+    const said = text(args.description);
+    return { title: "Run a shell command", used: ["command", "workdir", "description"], lines: [
+      ...shownLines(command, shown, 40).map((line, index) => (index === 0 ? `Command: ${line}` : `         ${line}`)),
+      `Folder:  ${escapeTerminalControls(text(args.workdir) ?? ". (this workspace)")}`,
+      ...(said === null ? [] : [`The agent's own description, not checked: ${shownLines(said, shown, 3).join(" ")}`])] };
+  }
+  const host = call.toolName === "web_fetch" && url !== null ? hostOf(url) : null;
+  if (host !== null) return { title: "Connect to the network", used: ["url"], lines: [`Host:    ${escapeTerminalControls(host)}`, `Address: ${shownLines(url!, shown, 2).join(" ")}`] };
+  return null;
+}
+
+/**
+ * What the reported call would do. Every argument is shown: a built-in tool's summary first, then each argument it did
+ * not use. `complete` is false when anything was cut short or could not be shown; the caller then offers no one-key
+ * answer. Never throws: a call that cannot be read is described as such.
+ */
+export function describeReportedCall(workspace: string, call: ReportedCall): { readonly title: string; readonly lines: readonly string[]; readonly complete: boolean } {
   const name = escapeTerminalControls(call.toolName);
   const args = argumentsOf(call);
-  if (args === null) return { title: `Call the tool "${name}"`, lines: ["Its arguments are not a readable list of values, so the tool will refuse the call."] };
+  if (args === null) return { title: `Call the tool "${name}"`, complete: false, lines: ["Its arguments are not a readable list of values, so the tool will refuse the call."] };
+  const shown: Shown = { complete: true };
   try {
-    const path = text(args.path), command = text(args.command), url = text(args.url), patch = text(args.patch);
-    if (call.toolName === "fs.write" && path !== null && typeof args.content === "string") {
-      const content = args.content;
-      return { title: "Write a file", lines: fileChange(workspace, path, () => content) };
-    }
-    if (call.toolName === "fs.edit" && path !== null) {
-      const edits = (Array.isArray(args.edits) ? args.edits : [{ find: args.find, replace: args.replace, replaceAll: args.replaceAll }]) as LiteralEdit[];
-      return { title: "Edit a file", lines: fileChange(workspace, path, (before) => {
-        if (before === null) throw new Error("the file does not exist yet");
-        return planLiteralEdits(before, edits, path).after;
-      }) };
-    }
-    if (call.toolName === "apply_patch" && patch !== null) return { title: "Apply a patch to files", lines: shownLines(patch) };
-    if (call.toolName === "bash" && command !== null) {
-      const said = text(args.description);
-      return { title: "Run a shell command", lines: [
-        ...shownLines(command, 40).map((line, index) => (index === 0 ? `Command: ${line}` : `         ${line}`)),
-        `Folder:  ${escapeTerminalControls(text(args.workdir) ?? ". (this workspace)")}`,
-        ...(said === null ? [] : [`The agent's own description, not checked: ${shownLines(said, 3).join(" ")}`])] };
-    }
-    const host = url === null ? null : hostOf(url);
-    if (host !== null) {
-      return { title: "Connect to the network", lines: [`Host:    ${escapeTerminalControls(host)}`, `Address: ${shownLines(url!, 2).join(" ")}`] };
-    }
-    return { title: `Call the tool "${name}"`, lines: otherArguments(args) };
+    const special = summary(workspace, call, args, shown);
+    if (special === null) return { title: `Call the tool "${name}"`, lines: otherArguments(args, shown), complete: shown.complete };
+    const rest = otherArguments(args, shown, special.used);
+    return { title: special.title, lines: [...special.lines, ...(rest.length === 0 ? [] : ["Other arguments:", ...rest.map((line) => `  ${line}`)])], complete: shown.complete };
   } catch (error) {
     const why = escapeTerminalControls(error instanceof Error ? error.message : "unknown reason").slice(0, MAX_LINE_CHARS);
-    return { title: `Call the tool "${name}"`, lines: [`AMC could not work out the change (${why}). The arguments as given:`, ...otherArguments(args)] };
+    const all: Shown = { complete: true };
+    return { title: `Call the tool "${name}"`, lines: [`AMC could not work out the change (${why}). The arguments as given:`, ...otherArguments(args, all)], complete: all.complete };
   }
 }

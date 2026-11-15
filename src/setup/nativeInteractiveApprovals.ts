@@ -35,8 +35,8 @@ function raised(value: unknown, agentId: string): value is Raised {
     && typeof item.approvalRequestId === "string" && /^apprreq_[a-f0-9]{32}$/.test(item.approvalRequestId);
 }
 /**
- * Whether the person at this terminal may decide the request alone: the call it would run was shown (its arguments match
- * the signed request), the request's own rule and the signed policy's rule now both allow one local approver, and this
+ * Whether the person at this terminal may decide the request alone: the call it would run was shown in full (its
+ * arguments match the signed request and no argument was cut short or left out), the request's own rule and the signed policy's rule now both allow one local approver, and this
  * process is an interactive operator. The engine checks the rules and the operator again when it records the decision.
  */
 function terminalMayDecide(workspace: string, item: ApprovalInboxItem, shown: boolean): boolean {
@@ -45,16 +45,16 @@ function terminalMayDecide(workspace: string, item: ApprovalInboxItem, shown: bo
   catch { return false; }
 }
 const ROLE_WORDS: Record<string, string> = { OWNER: "an owner", APPROVER: "an approver", AUDITOR: "an auditor", OPERATOR: "an operator", VIEWER: "a viewer", AGENT: "an agent" };
+type CallView = ReturnType<typeof describeReportedCall>;
 /** The request in a few plain lines: what the call would do (or why it cannot be shown), and what the approval needs. */
-function describeAsk(workspace: string, item: ApprovalInboxItem, call: ReportedCall | null, shown: boolean): string[] {
+function describeAsk(item: ApprovalInboxItem, call: ReportedCall | null, what: CallView | null): string[] {
   const request = item.request;
-  const what = shown && call !== null ? describeReportedCall(workspace, call) : null;
   const needs = request.requiredApprovals <= 1 ? "one approval" : `${request.requiredApprovals} approvals`;
   return [
     what === null ? `The agent wants to use the tool "${request.toolName}".` : `The agent wants to: ${what.title}`,
     ...(what === null
       ? [call === null ? "  AMC cannot show this call here: the run did not send its arguments." : "  AMC cannot show this call here: the arguments sent do not match the signed request."]
-      : what.lines.map(line => `  ${line}`)),
+      : [...what.lines.map(line => `  ${line}`), ...(what.complete ? [] : ["  Part of this call is not shown here, so it cannot be allowed with one key."])]),
     `Needs ${needs} from ${request.rolesAllowed.map(role => ROLE_WORDS[role] ?? role.toLowerCase()).join(" or ")}${request.requireDistinctUsers ? ", each a different person who did not start this chat" : ""}. ` +
       `Kind: ${request.actionClass}, risk ${request.riskTier}${request.effectiveMode === "SIMULATE" ? "; if allowed it is only simulated" : ""}. Asks until ${new Date(request.expiresTs).toLocaleTimeString()}. Request ${request.approvalRequestId}.`
   ];
@@ -158,12 +158,13 @@ export function createNativeInteractiveApprovals(options: NativeApprovalPromptOp
     try {
       const request = item.request;
       const call = event.call === undefined ? null : parseReportedCall(event.call);
-      const shown = call !== null && callMatchesRequest(workspace, request, call);
-      options.log(describeAsk(workspace, item, call, shown).join("\n"));
+      const what = call !== null && callMatchesRequest(workspace, request, call) ? describeReportedCall(workspace, call) : null;
+      const shown = what !== null && what.complete;
+      options.log(describeAsk(item, call, what).join("\n"));
       if (terminalMayDecide(workspace, item, shown)) { await decideHere(event, item, controller.signal); return; }
       options.log(shown
         ? "This approval needs a signed-in reviewer: type approve, deny or cancel, then give a sign-in file from `amc approvals login`."
-        : "Only a signed-in reviewer can allow a call this terminal cannot show: type approve (then give a sign-in file from `amc approvals login`), deny, or cancel.");
+        : "Only a signed-in reviewer can allow a call this terminal cannot show in full: type approve (then give a sign-in file from `amc approvals login`), deny, or cancel.");
       const choice = await ask("Approval: approve, deny, or cancel this turn (no default): ", controller.signal);
       if (closed || cancelled || channelLost) return;
       if (choice === null || choice.trim().toLowerCase() === "cancel") { cancelTurn(); return; }
