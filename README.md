@@ -333,7 +333,7 @@ Industry Packs are free in the current source build: every pack's questions and 
 ```bash
 amc domain pack list                       # all 41 packs and their question counts
 amc domain pack describe --pack <packId>   # a pack's regulatory basis and every question
-amc domain pack run --pack <packId>        # in a terminal: choose L1, L3 or L5 for each question
+amc domain pack run --pack <packId>        # in a terminal: choose L1 to L5 for each question, or skip it
 amc domain pack run --pack <packId> --baseline --json   # no answers: every question not evaluated, no score
 ```
 

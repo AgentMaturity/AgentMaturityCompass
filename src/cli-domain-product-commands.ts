@@ -264,15 +264,24 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
         for (const q of pack.questions) {
           // Full texts: the question prints once above the prompt, so only the levels redraw as the cursor moves.
           (opts.json ? console.error : console.log)(`\n  ${chalk.cyan(q.id)} [${q.dimension}]: ${q.text}`);
-          const { level } = await ask([{
-            type: "select",
-            name: "level",
-            message: `Level for ${q.id}`,
-            // Inquirer wraps long choices; its default page of 7 rows would cut wrapped level texts off.
-            pageSize: 30,
-            choices: packRun.packLevelChoices(q)
-          }]);
-          responses[q.id] = level;
+          let level: number;
+          try {
+            ({ level } = await ask([{
+              type: "select",
+              name: "level",
+              message: `Level for ${q.id}`,
+              // Inquirer wraps long choices; its default page of 7 rows would cut wrapped level texts off.
+              pageSize: 30,
+              choices: packRun.packLevelChoices(q)
+            }]));
+          } catch (error) {
+            // CLI-29: Ctrl-C used to lose every answer given so far; they are kept in a file the person can score later.
+            if (!packRun.promptAborted(error)) throw error;
+            console.error(packRun.saveAnswersOnAbort(pack.id, responses, process.cwd()));
+            process.exit(130);
+            return;
+          }
+          if (level !== packRun.SKIP_LEVEL) responses[q.id] = level;
         }
       }
 
