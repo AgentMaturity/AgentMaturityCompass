@@ -46,7 +46,7 @@ import { applySecurityHeaders } from "../studio/securityHeaders.js";
 import { applyServerTimeouts } from "../studio/serverTimeouts.js";
 import { DEFAULT_GATEWAY_MAX_REQUEST_BYTES, readAll, readBoundedBody, refuseOversizedRequest } from "./requestBody.js";
 import { withoutUrlQueries } from "./logSafe.js";
-import { connectFailureCode } from "../utils/connectFailure.js";
+import { droppedKeyNote, leaseHint, upstreamFailure } from "./gatewayHints.js";
 import { createPreAuthAuditLimiter, type PreAuthAuditLimiter } from "./preAuthAudit.js";
 import { killSwitchDenial, killSwitchEgressDenial } from "../runtime/killSwitch.js";
 export interface StartGatewayOptions {
@@ -1181,9 +1181,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         res.statusCode = leaseVerification.statusCode;
         res.setHeader("content-type", "application/json");
         if (!preVerification.ok) res.setHeader("connection", "close"); // its body was never read
-        res.end(JSON.stringify({ error: leaseVerification.message, ...(leaseVerification.auditType === "LEASE_INVALID_OR_MISSING" ? {
-          next: `Send an AMC lease in the x-amc-lease header (or as the Bearer key). Create one with: amc lease issue --agent ${attributedAgentId} --routes ${route.prefix}`
-        } : {}) }));
+        res.end(JSON.stringify({ error: leaseVerification.message, ...leaseHint(leaseVerification.auditType, attributedAgentId, route.prefix) }));
         return;
       }
       leaseVerified = true;
@@ -1428,9 +1426,8 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         retryNonIdempotent: resilience.retryNonIdempotent,
         lookup: pinnedLookup(upstreamEgress.addresses), signal: fence.signal, failures: upstreamFailures
       });
-      // The gateway replaced the client's own key with the route's credential; an auth refusal is about that credential.
-      const droppedClientKey = strippedAuth.hadCredential && [401, 403].includes(upstreamResponse.statusCode ?? 0);
-      if (droppedClientKey) logger.error(`gateway: upstream ${route.upstream} refused authentication (HTTP ${upstreamResponse.statusCode}) for request ${requestId}; the client's own key was dropped (${upstreamResolved.auth.type === "none" ? "no upstream credential is configured" : `the gateway sent ${upstreamResolved.auth.env}`})`);
+      const droppedClientKey = strippedAuth.hadCredential && [401, 403].includes(upstreamResponse.statusCode ?? 0); // QA M-07
+      if (droppedClientKey) logger.error(`gateway: request ${requestId}: HTTP ${upstreamResponse.statusCode}. ${droppedKeyNote(route.upstream, upstreamResolved.auth)}`);
 
       const responseHeaders = normalizeResponseHeaders(upstreamResponse.headers);
       const responseHeaderRedaction = redactHeaders(responseHeaders, config.redaction.headerKeysDenylist, headerRedaction);
@@ -1513,9 +1510,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
           }
         }
         res.setHeader("x-amc-request-id", requestId);
-        if (droppedClientKey) res.setHeader("x-amc-gateway-note", upstreamResolved.auth.type === "none"
-          ? `AMC dropped the client's own API key, and upstream ${route.upstream} has no credential configured, so it received none. Configure the upstream's key in .amc/gateway.yaml (auth with an env reference); clients never pass keys through the gateway.`
-          : `AMC dropped the client's own API key and sent the key configured for upstream ${route.upstream} (${upstreamResolved.auth.env}); this refusal is about that key. Fix it where the gateway reads it, not in the client.`);
+        if (droppedClientKey) res.setHeader("x-amc-gateway-note", droppedKeyNote(route.upstream, upstreamResolved.auth));
         res.setHeader("x-amc-receipt", responseEvent?.receipt ?? ""); // "" only after the seal: no receipt
         res.setHeader("x-amc-request-receipt", requestEvent?.receipt ?? "");
         res.setHeader("x-amc-monitor-pub-fpr", monitorPubFingerprint);
@@ -1524,29 +1519,11 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
     } catch (error) {
       logger.error(`gateway error (request ${requestId}): ${withoutUrlQueries(String(error))}`);
       const status = gatewayErrorStatusCode(error);
-      // Every attempt failed before its connection opened: no byte reached the upstream, so budgets count no usage.
-      const connectFailed = upstreamFailures.length > 0 && upstreamFailures.every(failure => connectFailureCode(failure) !== undefined)
-        ? connectFailureCode(upstreamFailures.at(-1)) : undefined;
-      const body = { ...gatewayErrorBody(error), ...(upstreamTarget === null ? {} : {
-        upstream: upstreamTarget.id, address: upstreamTarget.origin,
-        next: connectFailed !== undefined
-          ? `Nothing answered at ${upstreamTarget.origin} (${connectFailed}). Start that server, or fix upstream ${upstreamTarget.id} in .amc/gateway.yaml, then retry.`
-          : `Check that upstream ${upstreamTarget.id} at ${upstreamTarget.origin} is up and reachable, then retry; amc gateway status shows the routes.`
-      }) };
-      if (leaseVerified) appendEvidence({
-        eventType: "gateway",
-        payload: JSON.stringify({
-          request_id: requestId,
-          status,
-          error: error instanceof Error ? error.message : String(error)
-        }),
-        meta: {
-          stage: "request_error",
-          request_id: requestId,
-          status,
-          ...(connectFailed === undefined ? {} : { connectFailed })
-        }
-      });
+      const failure = upstreamFailure(upstreamTarget, upstreamFailures);
+      const body = { ...gatewayErrorBody(error), ...failure.body };
+      if (leaseVerified) appendEvidence({ eventType: "gateway",
+        payload: JSON.stringify({ request_id: requestId, status, error: error instanceof Error ? error.message : String(error) }),
+        meta: { stage: "request_error", request_id: requestId, status, ...(failure.connectFailed === undefined ? {} : { connectFailed: failure.connectFailed }) } });
       // A partial stream cannot be replaced by a JSON error or a successful receipt.
       if (res.headersSent || res.destroyed || res.writableEnded) {
         if (!res.destroyed && !res.writableEnded) res.destroy();

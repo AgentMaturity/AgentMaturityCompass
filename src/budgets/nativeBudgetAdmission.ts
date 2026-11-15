@@ -18,7 +18,7 @@ export class NativeBudgetRefusal extends Error {
 }
 
 /** The command a person runs to accept earlier unknown usage and continue; it signs the acceptance into budgets.yaml. */
-export function acceptUnknownCommand(agentId: string): string {
+function acceptUnknownCommand(agentId: string): string {
   return `amc budgets reset --agent ${agentId} --accept-unknown`;
 }
 
@@ -26,7 +26,7 @@ export function acceptUnknownCommand(agentId: string): string {
  * Why the signed default `unknownTokenUsage: BLOCK` refuses, and how to continue (docs/BUDGETS.md, "Missing Usage and
  * Recovery"). Only requests AMC cannot bound block: one with a recorded output limit is counted at its upper estimate.
  */
-export function unknownUsageRefusal(agentId: string, unknown: number): string {
+function unknownUsageRefusal(agentId: string, unknown: number): string {
   return `${unknown} earlier model request(s) for agent ${agentId} ended without a usage report and with no output limit to bound them,`
     + " so AMC cannot tell what they cost; the signed budget (unknownTokenUsage: BLOCK) refuses new model requests until the local budget day ends."
     + ` To continue now, check what those requests did (amc budgets status --agent ${agentId}), then run: ${acceptUnknownCommand(agentId)}`;
@@ -52,7 +52,7 @@ function capRefusal(what: string, agentId: string, daily: boolean): string {
 
 /** Tokens the request can be billed at most: its bytes, an allowance for the provider's own prompt wrapping, its output limit. */
 const PROVIDER_WRAPPING_ALLOWANCE = 4096; // ponytail: fixed allowance; a per-provider figure if one ever proves larger
-export function requestTokenCeiling(dispatch: NativeBudgetDispatch | undefined): number | null {
+function requestTokenCeiling(dispatch: NativeBudgetDispatch | undefined): number | null {
   if (!dispatch) return null;
   let body: Record<string, unknown>;
   try { body = JSON.parse(dispatch.body.toString("utf8")) as Record<string, unknown>; } catch { return null; }
