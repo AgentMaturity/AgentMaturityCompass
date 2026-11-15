@@ -123,7 +123,7 @@ export function codingActionPolicy(): ActionPolicy {
 }
 
 /** One person working alone approves their own edits and commands: one OWNER or APPROVER for WRITE_LOW and WRITE_HIGH. */
-export function codingApprovalPolicy(): ApprovalPolicy {
+function codingApprovalPolicy(): ApprovalPolicy {
   const base = defaultApprovalPolicy();
   const solo = { requiredApprovals: 1, rolesAllowed: ["APPROVER", "OWNER"] as const, requireDistinctUsers: false };
   const classes = base.approvalPolicy.actionClasses;
@@ -180,19 +180,21 @@ export function applyStarterProfile(workspace: string, kind: StarterProfileKind,
       + "signed human approval decided under the WRITE_HIGH rule. The stub provider is a synthetic demonstration; name your own provider and model.",
     model: STUB_PROVIDER_MODEL, providerId: STUB_PROVIDER_ID, tools: "workspace", approveTools: "WRITE_HIGH" }]);
   }
-  return {
-    kind, firewallMode, readiness: checkToolsetReadiness(workspace),
-    owner: { userId: users.owner.userId, username: users.owner.username },
-    monitorFingerprint: sha256Hex(readFileSync(keyPaths(workspace).monitorPublic)),
-    plan: kind === "regulated" ? compileStarterPlan(workspace) : null,
-    nextCommand: nextCommandFor(kind)
-  };
+  return starterReport(workspace, kind, firewallMode, users.owner);
 }
 
 /** Coding: a chat that asks before each edit or command. Regulated: a run under the two-approver preset. */
 const nextCommandFor = (kind: StarterProfileKind): string => kind === "coding"
   ? "amc agent-loop chat --provider stub --tools workspace --approval-mode default"
   : 'amc agent-loop run "..." --provider stub --tools workspace --preset regulated';
+
+/** What init prints: readiness, the owner, the monitor fingerprint, the plan (`--regulated`) and the next command. */
+function starterReport(workspace: string, kind: StarterProfileKind, firewallMode: "warn" | "block",
+  owner: { readonly userId: string; readonly username: string }): StarterProfileReport {
+  return { kind, firewallMode, readiness: checkToolsetReadiness(workspace), owner: { userId: owner.userId, username: owner.username },
+    monitorFingerprint: sha256Hex(readFileSync(keyPaths(workspace).monitorPublic)), plan: kind === "regulated" ? compileStarterPlan(workspace) : null,
+    nextCommand: nextCommandFor(kind) };
+}
 
 class StarterProfilePublicationError extends Error {
   readonly code = "STARTER_PROFILE_INCOMPLETE";
@@ -235,9 +237,7 @@ async function applyStarterProfileAsync(workspace: string, kind: StarterProfileK
       presets.publish(); presetsCurrent = presets.assertCurrent; completed.push(phase);
     }
     stable(); phase = "report-and-control-plan";
-    return { kind, firewallMode, readiness: checkToolsetReadiness(workspace), owner: { userId: users.owner.userId, username: users.owner.username },
-      monitorFingerprint: sha256Hex(readFileSync(keyPaths(workspace).monitorPublic)), plan: kind === "regulated" ? compileStarterPlan(workspace) : null,
-      nextCommand: nextCommandFor(kind) };
+    return starterReport(workspace, kind, firewallMode, users.owner);
   } catch (cause) { throw new StarterProfilePublicationError(Object.freeze([...completed]), phase, cause); }
 }
 

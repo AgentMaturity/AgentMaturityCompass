@@ -41,7 +41,7 @@ export interface ActionPolicyCall {
 }
 
 /** Whether a person's approval is bound to this call: approvals named in its authorization record. */
-export function approvalBound(execution: Pick<ToolExecution, "authorization">): boolean {
+function approvalBound(execution: Pick<ToolExecution, "authorization">): boolean {
   return (execution.authorization?.record.authority.approvals.length ?? 0) > 0;
 }
 
