@@ -358,8 +358,13 @@ revision. The same holds for the context slots (`context.contextPluginSha256`, `
 `context.promptPackSha256`) and the operating-profile slots (`operatingProfile.sha256`, the agent's
 `amc-operating-profiles/<agent>/a4-<station>.operating-profile.json` files; `operatingProfile.activationSha256`, every
 activation record of the agent). Those files sit outside `.amc/`: an entry that is not a regular file (a link, a FIFO)
-or a profile directory that is a link reads `RESOURCE_UNREADABLE`. A prompt pack rebuilt by the prompt
-scheduler moves `context.promptPackSha256`, so an open gate reads `RESOURCE_DRIFTED` until it is requested again.
+or a profile directory that is a link reads `RESOURCE_UNREADABLE`. `context.promptPackSha256` is a digest of what the
+agent's latest prompt pack says: every member except its signatures, and the pack without its build id and build time.
+Aspire's Build builds the pack right after it writes the agent config, so the revision Build records binds it. Studio's
+prompt scheduler rebuilds every pack on the signed prompt policy's cadence (every 24 hours by default) with a new id,
+time and signatures; when nothing the pack says has
+changed, the slot does not move and open approvals stay open. A pack whose prompts, allowlists, advisories or any other
+content changed moves the slot, and an open gate reads `RESOURCE_DRIFTED` until it is requested again.
 Under an active plan, Studio mints a native task's lease with the workspace lease key, which Studio's vault holds: while
 that vault is locked, `adapt.plan.nativeSessionsAllowed` reads WAITING (`LEASE_NOT_ISSUED`, `VAULT_LOCKED`). A CLI, SDK,
 ACP or in-process run with workspace tools signs its own lease with the vault of its own process (`AMC_VAULT_PASSPHRASE`),

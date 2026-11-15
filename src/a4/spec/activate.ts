@@ -436,7 +436,7 @@ function lifecycleItem(state: A4ReadinessState, releaseId: string | null): A4Rea
   if (releaseId === null) return waiting("lifecycle.production_controls", ["NO_RELEASE"], { mandatory: false, section: "governance" });
   return missing.length === 0 ? item("lifecycle.production_controls", "READY", { mandatory: false, section: "governance" })
     : waiting("lifecycle.production_controls", missing.map((id) => `CONTROL_NOT_EVALUATED:${id}`), { mandatory: false, section: "governance", kind: "not_evaluated",
-      nextAction: { label: "The deployment approval may proceed; the lifecycle stays at staging until every production control has evidence (two need P2-40)" } });
+      nextAction: { label: "The deployment approval may proceed; the lifecycle stays at staging until every production control has evidence (two cannot have it yet: AMC cannot yet confirm which build runs where it is deployed)" } });
 }
 
 /**

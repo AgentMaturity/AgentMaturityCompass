@@ -507,8 +507,8 @@ function lockoutItem(state: A4ReadinessState, query: A4ReadinessQuery, regulated
   const codes = [active ? "PLAN_ACTIVE" : "PLAN_ACTIVATED_AT_COMPLETION", "PLAN_DENIES_NATIVE_SESSION", `NATIVE_TASK_LEASE:${NATIVE_LEASE_KEY}`,
     `RUN_LEASE:${RUN_LEASE_KEY}`, "PRE_ACTIVATION_SESSIONS_DENIED", "DELEGATED_CHILDREN_INHERIT_LEASE", "PRINCIPAL_REQUIRED", "NON_LOCAL_USER_SESSIONS_DENIED"];
   const denied = "tasks started before it carry none and are denied every call; a task whose signed-in principal is not an active local users.yaml user "
-    + "(a workspace-router session or the admin token included) is refused at start, 409 PRINCIPAL_UNRESOLVED (P1-78), and so is a run whose OS account "
-    + "is not one, PRINCIPAL_UNRESOLVED before its session opens or a delegated child starts (P1-79)";
+    + "(a workspace-router session or the admin token included) is refused at start, 409 PRINCIPAL_UNRESOLVED, and so is a run whose OS account "
+    + "is not one, PRINCIPAL_UNRESOLVED before its session opens or a delegated child starts";
   const vault = query.live.vaultUnlocked;
   if (active && vault !== true) {
     return item("adapt.plan.nativeSessionsAllowed", vault === null ? "NOT_EVALUATED" : "WAITING", { section: "governance", mandatory: false,
@@ -518,9 +518,9 @@ function lockoutItem(state: A4ReadinessState, query: A4ReadinessQuery, regulated
         + `which this item does not read; ${denied}` } });
   }
   return item("adapt.plan.nativeSessionsAllowed", "READY", { section: "governance", mandatory: false, kind: "plan_denies_native_session", reasonCodes: codes,
-    nextAction: { label: "Under an active plan, Studio native tasks with workspace tools started after activation run under a lease (P1-67), and CLI agent "
+    nextAction: { label: "Under an active plan, Studio native tasks with workspace tools started after activation run under a lease, and CLI agent "
       + "runs, SDK native client sessions, ACP sessions and in-process sessions with workspace tools mint their own, naming the active users.yaml user whose "
-      + "username is the OS account, which their delegated children inherit (P1-79); a run whose own process cannot unlock the vault fails to mint its "
+      + "username is the OS account, which their delegated children inherit; a run whose own process cannot unlock the vault fails to mint its "
       + `lease and is refused; ${denied}` } });
 }
 
@@ -589,7 +589,7 @@ function contextItems(state: A4ReadinessState, query: A4ReadinessQuery, answers:
         : item("configs_trusted", "READY", { section: "implementation", reasonCodes: Object.entries(configs).filter(([, config]) => config.state === "missing").map(([name]) => `MISSING:${name}`) }),
     clocks.length === 0 ? item("clocks_classified", "READY", { mandatory: false, reasonCodes: ["NO_CLOCK_CANDIDATES"] })
       : waiting("clocks_classified", ["NEEDS_CLASSIFICATION", ...clocks.slice(0, 32).map((clock) => `CLOCK:${clock.clockId}`)], { mandatory: false, kind: "review_pending",
-        nextAction: { label: "Each reporting clock listed for these stations is a candidate an operator confirms; AMC decides none (overlay rules: P3-23)" } }),
+        nextAction: { label: "Each reporting clock listed for these stations is a candidate an operator confirms; AMC decides none, and has no rules yet that suggest a class" } }),
     rule.requiredReviews.length === 0 ? item("required_entries_satisfied", "READY", { section: "governance", mandatory: false })
       : item("required_entries_satisfied", pending.size === 0 ? "READY" : "WAITING", { section: "governance", mandatory: false, kind: pending.size === 0 ? null : "review_pending",
         reasonCodes: rule.requiredReviews.map((entry) => `ENTRY:${entry.kind}${entry.role === undefined ? "" : `:${entry.role}`}:${pending.has(JSON.stringify(entry)) ? "pending" : "met"}`
@@ -602,7 +602,7 @@ function contextItems(state: A4ReadinessState, query: A4ReadinessQuery, answers:
       "ENFORCEMENT:none", "KEY:P2-01", "KEY:P2-02"] }),
     item("lifecycle_bridge", "NOT_EVALUATED", { kind: "not_evaluated", mandatory: false,
       reasonCodes: [...stagingBridge(state).map((row) => `BRIDGE:${row.controlId}:${row.status}`), `KEY:${LIFECYCLE_SEAM_KEY}`],
-      nextAction: { label: "testing → staging advances only on the rows above with refs; the A4 lifecycle wrapper (P1-62) advances it, never Adapt" } })
+      nextAction: { label: "testing → staging advances only on the rows above with refs; A4 advances it after Activate's release, never Adapt" } })
   ];
 }
 
