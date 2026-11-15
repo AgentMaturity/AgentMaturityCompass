@@ -137,7 +137,7 @@ import {
   verifyAgentConfigSignature,
   verifyFleetConfigSignature
 } from "./fleet/registry.js";
-import { getAgentPaths, resolveAgentId } from "./fleet/paths.js";
+import { agentExists, getAgentPaths, resolveAgentId } from "./fleet/paths.js";
 import { getProviderTemplateById, listProviderTemplates, providerTemplateChoices } from "./providers/providerTemplates.js";
 import { runSandboxCommand } from "./sandbox/sandbox.js";
 import { attestIngestSessionAsync, ingestEvidence, type IngestType } from "./ingest/ingest.js";
@@ -1410,6 +1410,14 @@ function ensureWorkspaceReadyForAgent(workspace: string, agentId?: string): void
   }
 }
 
+/** A score for an agent nobody added describes nothing, and scoring it used to create its folder as a side effect. */
+function refuseUnknownAgent(workspace: string, agentId: string): void {
+  if (agentExists(workspace, agentId)) return;
+  console.error(chalk.red(`There is no agent named '${agentId}' in this folder.`));
+  console.error("List the agents here with: amc agent list. Add one with: amc agent add. Leave --agent out to use this folder's own agent.");
+  process.exit(1);
+}
+
 interface InstantWorkspaceState {
   createdWorkspace: boolean;
   createdAgentContext: boolean;
@@ -1954,6 +1962,7 @@ program.option("--json", "emit structured JSON for the top-level full score", fa
 // No default: a `false` default made `color` false on every command, so preAction switched colour off everywhere.
 program.option("--no-color", "disable ANSI color output; equivalent to NO_COLOR=1");
 program.option("--no-menu", "bare amc only: skip the start menu and print the score (or set AMC_NO_MENU=1)");
+program.option("--yes", "bare amc without a terminal: set up this folder (.amc/) without asking first");
 program
   .command("help [commandPath...]")
   .description("Show help for a command (for example: amc help run)")
@@ -5405,7 +5414,10 @@ program
           "D+": 67, "D": 63, "D-": 60,
           "F": 0,
         }[opts.failBelow] ?? 0;
-        if (result.overallScore < thresholdScore) {
+        if (result.nothingToAssess && thresholdScore > 0) {
+          console.log(chalk.red(`\n  ✗ There is nothing to grade yet, so --fail-below ${opts.failBelow} is not met\n`));
+          process.exit(1);
+        } else if (result.overallScore < thresholdScore) {
           console.log(chalk.red(`\n  ✗ Grade ${result.overallGrade} is below --fail-below ${opts.failBelow}\n`));
           process.exit(1);
         } else {
@@ -19530,9 +19542,20 @@ program.action(async (_opts, command: Command) => {
     return;
   }
 
-  const opts = program.opts<{ agent?: string; json?: boolean }>();
+  const opts = program.opts<{ agent?: string; json?: boolean; yes?: boolean }>();
   const agentId = resolveAgentId(process.cwd(), opts.agent ?? activeAgent(program) ?? undefined);
   const workspace = process.cwd();
+  if (isWorkspaceInitialized(workspace)) {
+    refuseUnknownAgent(workspace, agentId);
+  } else if (process.stdin.isTTY !== true && opts.yes !== true) {
+    // No terminal means nobody saw a question, so a new folder is set up only on an explicit --yes.
+    console.error("AMC has not set up this folder yet, and there is no terminal here to ask you first.");
+    console.error(`Setting it up creates a .amc/ folder in ${workspace} (AMC's settings, signing keys and records for this folder) and then prints an empty score.`);
+    console.error("To go ahead without a terminal, run: amc --yes");
+    console.error("Or run amc in a terminal and pick what to do from its menu.");
+    process.exit(1);
+    return;
+  }
   try {
     if (shouldShowFrontDoor({ args: process.argv.slice(2), env: process.env, stdinTTY: process.stdin.isTTY === true,
       stdoutTTY: process.stdout.isTTY === true, operatorOk: interactiveOperator({ workspace }).ok })) {
@@ -21914,6 +21937,7 @@ score
   .description("Compute formal maturity score for an agent")
   .option("--json", "Output as JSON")
   .action(async (agentId: string, opts: { json?: boolean }) => {
+    refuseUnknownAgent(process.cwd(), agentId);
     try {
       const { computeMaturityScore } = await import("./score/index.js");
       const result = computeMaturityScore([], {});

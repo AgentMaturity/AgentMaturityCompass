@@ -79,7 +79,7 @@ describe("diagnostic evidence readiness", () => {
     delete env.AMC_VAULT_PASSPHRASE_FILE;
     delete env.AMC_NO_SIGN;
 
-    const result = spawnSync(process.execPath, [resolve(process.cwd(), "dist/cli.js"), "--json"], {
+    const result = spawnSync(process.execPath, [resolve(process.cwd(), "dist/cli.js"), "--yes", "--json"], { // --yes: without a terminal, bare amc sets up a new folder only when told to
       cwd: dir,
       env,
       encoding: "utf8",
