@@ -47,6 +47,8 @@ export const INTL_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     "iso.org lists ISO 21001:2018 and its Amd 1:2024; whether a newer edition replaced it was not confirmed."),
   verified("iec-62304", "IEC 62304:2006 + Amd 1:2015 Medical device software — Software life cycle processes", "INT", "standard", "in-force", "https://www.iso.org/standard/64686.html",
     ["IEC 62304:2006/AMD1:2015", "IEC 62304:2006", "IEC 62304"], { note: "Edition 2 (health software) is in development per IEC SC 62A documents; not yet published on the review date." }),
+  unverified("iso-42005", "ISO/IEC 42005 Artificial intelligence — AI system impact assessment (edition not confirmed)", "INT", "standard", ["ISO/IEC 42005:2025", "ISO/IEC 42005", "ISO 42005"],
+    "Recognised so pack text that names it resolves. iso.org and its national storefronts returned HTTP 403 on 2026-11-16, so edition and date are not confirmed; AMC maps no controls to it."),
   unverified("iso-22000", "ISO 22000:2018 Food safety management systems", "INT", "standard", ["ISO 22000:2018", "ISO 22000"]),
   unverified("iso-26000", "ISO 26000:2010 Guidance on social responsibility", "INT", "guidance", ["ISO 26000:2010", "ISO 26000"]),
   unverified("iso-37120", "ISO 37120:2018 Sustainable cities and communities — Indicators", "INT", "standard", ["ISO 37120:2018", "ISO 37120"]),
@@ -68,7 +70,8 @@ export const INTL_INSTRUMENTS: readonly RegulatoryInstrument[] = [
 
   // NIST, W3C, payment-card and security frameworks
   verified("nist-ai-rmf", "NIST AI 100-1 Artificial Intelligence Risk Management Framework (AI RMF 1.0)", "US", "framework", "in-force", "https://www.nist.gov/itl/ai-risk-management-framework",
-    ["NIST AI RMF 1.0", "NIST AI RMF", "NIST AI 100-1"], { frameworkId: "NIST_AI_RMF" }),
+    ["NIST AI RMF 1.0", "NIST AI RMF", "NIST AI 100-1"], { frameworkId: "NIST_AI_RMF",
+      note: "nist.gov page read 2026-11-16: AI RMF 1.0 (released 2023-01-26) is still the current edition; the page says it is being revised as part of the White House AI Action Plan, with no new edition or date given." }),
   verified("nist-csf-2", "NIST Cybersecurity Framework 2.0", "US", "framework", "in-force", "https://www.nist.gov/cyberframework", ["NIST CSF 2.0", "NIST CSF"]),
   verified("nist-sp-800-161", "NIST SP 800-161 Rev. 1 (update 1, 2024-11-01) Cybersecurity Supply Chain Risk Management Practices", "US", "standard", "in-force",
     "https://csrc.nist.gov/pubs/sp/800/161/r1/upd1/final", ["NIST SP 800-161r1-upd1", "NIST SP 800-161"]),
