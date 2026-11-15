@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import { createServer } from "node:net";
 
 /**
@@ -7,7 +8,30 @@ import { createServer } from "node:net";
 
 const addressInUse = (error: unknown): boolean => String(error).includes("EADDRINUSE");
 
+/**
+ * The folder of the AMC Studio listening on `port`, read from the listener's command line (`amc up` starts
+ * `cli.js _studio-daemon --workspace <folder>`); null when no Studio listens there or the system cannot say.
+ */
+export function studioFolderOnPort(port: number): string | null {
+  const run = (cmd: string, args: string[]): string => {
+    const out = spawnSync(cmd, args, { encoding: "utf8", timeout: 5_000 });
+    return out.status === 0 ? out.stdout : "";
+  };
+  if (process.platform === "win32") return null;
+  for (const pid of run("lsof", ["-nP", `-iTCP:${port}`, "-sTCP:LISTEN", "-t"]).split(/\s+/).filter(Boolean)) {
+    const folder = /\s_studio-daemon\s(?:.*\s)?--workspace\s+(.+?)(?:\s+--[a-z]|\s*$)/.exec(run("ps", ["-ww", "-o", "command=", "-p", pid]))?.[1];
+    if (folder) return folder;
+  }
+  return null;
+}
+
 function portInUseError(port: number, source: string): Error {
+  // CLI-31: name the AMC folder that holds the port, so the person knows where to run amc down.
+  const folder = studioFolderOnPort(port);
+  if (folder) {
+    return new Error(`Port ${port} (from ${source}) is already in use by AMC Studio for the folder ${folder}. `
+      + `Stop it there (cd ${folder}, then amc down), or change the port.`);
+  }
   return new Error(`Port ${port} (from ${source}) is already in use. Stop the other process or change the port.${source.startsWith("the default")
     ? " Another AMC folder may be running: stop it there with amc down, or give this folder its own ports." : ""}`);
 }
