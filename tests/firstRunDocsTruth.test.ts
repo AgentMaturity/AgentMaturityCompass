@@ -73,7 +73,7 @@ describe("round-2 features are documented as the code behaves", () => {
 
   test("STUDIO.md says which commands use the remembered passphrase, that the environment overrides it, and that agents never get it", () => {
     // The CLI preAction unlocks from the remembered store, then asks y/N on governance paths (LIVE-VAULT-01).
-    expect(read("src/cli.ts")).toMatch(/if \(!\/\^\(up\|mcp\|connect hooks forward\)\( \|\$\)\/\.test\(path\)\) \{ unlockWithRememberedPassphrase\(process\.cwd\(\)\); await confirmRememberedUnlock\(process\.cwd\(\), path\); \}/);
+    expect(read("src/cli.ts")).toMatch(/if \(!\/\^\(up\|mcp serve\|connect hooks forward\)\( \|\$\)\/\.test\(path\)\) \{ unlockWithRememberedPassphrase\(process\.cwd\(\)\); await confirmRememberedUnlock\(process\.cwd\(\), path\); \}/);
     const store = read("src/vault/passphraseStore.ts");
     expect(store).toContain('if ((env.AMC_VAULT_PASSPHRASE ?? "").length > 0');
     // Only an interactive operator gets the remembered passphrase: terminal, not agent mode, no agent marker.

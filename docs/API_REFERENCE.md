@@ -7018,6 +7018,9 @@ Write an unreviewed MCP server config to the user or project scope; review and s
 | `--timeout-ms <n>` | - |
 | `--credentials-home <dir>` | - |
 | `--force` | - |
+| `--action-class <class>` | - |
+| `--tool <name>` | - |
+| `--yes` | - |
 | `--json` | - |
 
 #### `amc mcp config`
