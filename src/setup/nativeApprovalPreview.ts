@@ -2,13 +2,13 @@
  * What a gated tool call would do, in words a person can check before allowing it: an edit as a unified diff, a shell call
  * as its command and folder, a network call as its host. The chat parent builds it from the arguments the agent run
  * reported over IPC, and calls it the request's own only when those arguments hash to the digest the signed request
- * binds (callMatchesRequest). The model wrote these arguments, so every shown line passes through escapeTerminalControls.
+ * binds (callMatchesRequest). The model wrote these arguments, so every shown character a terminal would hide, reorder or
+ * act on is written as a visible `\uXXXX`, and the preview then counts as incomplete.
  */
 import { normalizeArguments } from "../actions/normalizeArguments.js";
 import type { ApprovalRequestRecord } from "../approvals/approvalChainStore.js";
 import type { ApprovalAskDisplay } from "../approvals/seam/approvalSeamTypes.js";
 import { findToolDefinition, loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
-import { escapeTerminalControls } from "../tools/builtin/askUserTool.js";
 import { planLiteralEdits, type LiteralEdit } from "../tools/builtin/fsEditPlan.js";
 import { readBeforeWrite, shownDiff, utf8, writeTarget } from "../tools/builtin/fsWritePrimitives.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -82,13 +82,34 @@ export function callMatchesRequest(workspace: string, request: ApprovalRequestRe
 
 const text = (value: unknown): string | null => (typeof value === "string" ? value : null);
 
-/** Whether every argument was shown in full. Any cut line, cut block, unreadable change or redacted span clears it. */
+/** Whether every argument was shown in full. Any cut line, cut block, escaped character, unreadable change or redacted span clears it. */
 interface Shown { complete: boolean }
+
+/**
+ * Terminal controls (C0 but tab and newline, DEL, C1), Unicode format characters (bidi overrides and isolates, zero-width
+ * characters), line and paragraph separators, spaces other than U+0020, and characters drawn as nothing.
+ */
+const HIDDEN = /[\x00-\x08\x0b-\x1f\x7f-\x9f\p{Cf}\p{Zl}\p{Zp}\p{Zs}\u034f\u115f\u1160\u17b4\u17b5\u3164\uffa0\ufe00-\ufe0f\u{e0100}-\u{e01ef}]/gu;
+
+/** The text with each hidden character written as a visible `\uXXXX`; any such character marks the preview incomplete. */
+function visible(value: string, shown: Shown): string {
+  return value.replace(HIDDEN, (c) => {
+    if (c === " ") return c;
+    shown.complete = false;
+    return `\\u${c.codePointAt(0)!.toString(16).padStart(4, "0")}`;
+  });
+}
+
+/** A value that must fit one line (a key, a folder, a tool name, a path): tab and newline written visibly, length bounded. */
+function field(value: string, shown: Shown): string {
+  const flat = value.replace(/[\t\n]/g, (c) => { shown.complete = false; return c === "\n" ? "\\n" : "\\t"; });
+  return shownLines(flat, shown, 1)[0] ?? "";
+}
 
 function shownLines(block: string, shown: Shown, max = MAX_SHOWN_LINES): string[] {
   const lines = block.replace(/\n$/, "").split("\n");
   const kept = lines.slice(0, max).map((line) => {
-    const safe = escapeTerminalControls(line.replace(/\t/g, "    "));
+    const safe = visible(line.replace(/\t/g, "    "), shown);
     if (safe.length <= MAX_LINE_CHARS) return safe;
     shown.complete = false;
     return `${safe.slice(0, MAX_LINE_CHARS)} … (${safe.length - MAX_LINE_CHARS} more characters not shown)`;
@@ -106,7 +127,7 @@ function fileChange(workspace: string, path: string, after: (before: string | nu
   if (before !== null && beforeText === null) { shown.complete = false; return [`${rel} is not text, so its change cannot be shown as lines.`]; }
   const diff = shownDiff(rel, before ?? Buffer.alloc(0), Buffer.from(after(beforeText), "utf8"));
   if (diff.truncated || diff.text.includes("[AMC_REDACTED:") || diff.text.startsWith("Binary files ")) shown.complete = false;
-  return [before === null ? `New file: ${escapeTerminalControls(rel)}` : `Change to: ${escapeTerminalControls(rel)}`,
+  return [before === null ? `New file: ${field(rel, shown)}` : `Change to: ${field(rel, shown)}`,
     ...(diff.text.length === 0 ? ["(no line would change)"] : shownLines(diff.text, shown))];
 }
 
@@ -124,8 +145,9 @@ function otherArguments(args: Record<string, unknown>, shown: Shown, used: reado
   return Object.entries(args).filter(([key]) => !used.includes(key)).flatMap(([key, value]) => {
     const host = typeof value === "string" ? hostOf(value) : null;
     const lines = shownLines(typeof value === "string" ? value : JSON.stringify(value) ?? String(value), shown, 20);
-    return [...(host === null ? [] : [`Network host: ${escapeTerminalControls(host)}`]),
-      lines.length <= 1 ? `${escapeTerminalControls(key)}: ${lines[0] ?? ""}` : `${escapeTerminalControls(key)}:`, ...(lines.length <= 1 ? [] : lines.map((line) => `    ${line}`))];
+    const name = field(key, shown);
+    return [...(host === null ? [] : [`Network host: ${field(host, shown)}`]),
+      lines.length <= 1 ? `${name}: ${lines[0] ?? ""}` : `${name}:`, ...(lines.length <= 1 ? [] : lines.map((line) => `    ${line}`))];
   });
 }
 
@@ -145,35 +167,37 @@ function summary(workspace: string, call: ReportedCall, args: Record<string, unk
   }
   if (call.toolName === "apply_patch" && patch !== null) return { title: "Apply a patch to files", lines: shownLines(patch, shown), used: ["patch"] };
   if (call.toolName === "bash" && command !== null) {
-    const said = text(args.description);
-    return { title: "Run a shell command", used: ["command", "workdir", "description"], lines: [
+    const said = text(args.description), workdir = text(args.workdir);
+    // A folder or description that is not text is not summarised, so it is listed with the other arguments.
+    const used = ["command", ...(workdir === null && args.workdir !== undefined ? [] : ["workdir"]), ...(said === null ? [] : ["description"])];
+    return { title: "Run a shell command", used, lines: [
       ...shownLines(command, shown, 40).map((line, index) => (index === 0 ? `Command: ${line}` : `         ${line}`)),
-      `Folder:  ${escapeTerminalControls(text(args.workdir) ?? ". (this workspace)")}`,
+      ...(workdir === null && args.workdir !== undefined ? [] : [`Folder:  ${workdir === null ? ". (this workspace)" : field(workdir, shown)}`]),
       ...(said === null ? [] : [`The agent's own description, not checked: ${shownLines(said, shown, 3).join(" ")}`])] };
   }
   const host = call.toolName === "web_fetch" && url !== null ? hostOf(url) : null;
-  if (host !== null) return { title: "Connect to the network", used: ["url"], lines: [`Host:    ${escapeTerminalControls(host)}`, `Address: ${shownLines(url!, shown, 2).join(" ")}`] };
+  if (host !== null) return { title: "Connect to the network", used: ["url"], lines: [`Host:    ${field(host, shown)}`, `Address: ${shownLines(url!, shown, 2).join(" ")}`] };
   return null;
 }
 
 /**
  * What the reported call would do. Every argument is shown: a built-in tool's summary first, then each argument it did
- * not use. `complete` is false when anything was cut short or could not be shown; the caller then offers no one-key
- * answer. Never throws: a call that cannot be read is described as such.
+ * not use. `complete` is false when anything was cut short, escaped or could not be shown; the caller then lets
+ * only a signed-in reviewer decide. Never throws: a call that cannot be read is described as such.
  */
 export function describeReportedCall(workspace: string, call: ReportedCall): { readonly title: string; readonly lines: readonly string[]; readonly complete: boolean } {
-  const name = escapeTerminalControls(call.toolName);
+  const shown: Shown = { complete: true };
+  const name = field(call.toolName, shown);
   const args = argumentsOf(call);
   if (args === null) return { title: `Call the tool "${name}"`, complete: false, lines: ["Its arguments are not a readable list of values, so the tool will refuse the call."] };
-  const shown: Shown = { complete: true };
   try {
     const special = summary(workspace, call, args, shown);
     if (special === null) return { title: `Call the tool "${name}"`, lines: otherArguments(args, shown), complete: shown.complete };
     const rest = otherArguments(args, shown, special.used);
     return { title: special.title, lines: [...special.lines, ...(rest.length === 0 ? [] : ["Other arguments:", ...rest.map((line) => `  ${line}`)])], complete: shown.complete };
   } catch (error) {
-    const why = escapeTerminalControls(error instanceof Error ? error.message : "unknown reason").slice(0, MAX_LINE_CHARS);
-    const all: Shown = { complete: true };
+    const all: Shown = { complete: shown.complete };
+    const why = field(error instanceof Error ? error.message : "unknown reason", all);
     return { title: `Call the tool "${name}"`, lines: [`AMC could not work out the change (${why}). The arguments as given:`, ...otherArguments(args, all)], complete: all.complete };
   }
 }
