@@ -168,6 +168,7 @@ amc adapters capabilities --agent my-agent --adapter generic-cli --json</code></
   --adapter claude-cli \
   --out adapter-capabilities.json \
   --json</code></pre>
+      <p>Without <code>--agent</code> the command uses this folder's agent; without <code>--adapter</code> it uses the adapter that agent is set up with (<code>amc adapters configure</code>), or <code>generic-cli</code> when none is set. The receipt is signed, so the vault must be open: run the command in a terminal, or set <code>AMC_VAULT_PASSPHRASE_FILE</code> to a file that holds the passphrase.</p>
       <div class="callout callout-green">
         <strong>Honest by construction</strong>
         <code>verified</code> means AMC-owned declaration evidence and the inspected proof inputs are valid for this subject. <code>partial</code> records a host/shell-only version probe or an absent/observe-only optional hook. <code>fail_closed</code> records missing runtime/version, invalid signed config, unverified or publisher-only plugin metadata, or hook drift. Plugins cannot self-certify; partner certification remains a separate lane. A valid partial receipt is proof of a limitation, not a green badge.

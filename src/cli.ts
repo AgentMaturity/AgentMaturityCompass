@@ -675,6 +675,7 @@ import {
 } from "./trust/temporalDecay.js";
 import {
   adaptersCapabilitiesCliAsync,
+  capabilityTarget,
   adaptersCapabilitiesWithOutputCliAsync,
   adaptersConfigureCliAsync,
   adaptersDetectCli,
@@ -4489,12 +4490,12 @@ adapters
 adapters
   .command("capabilities")
   .description("Issue a signed Passport receipt for declared and effective adapter capabilities")
-  .requiredOption("--agent <agentId>", "agent ID")
-  .requiredOption("--adapter <adapterId>", "adapter ID")
+  .option("--agent <agentId>", "agent ID (default: this folder's agent)")
+  .option("--adapter <adapterId>", "adapter ID (default: the adapter the agent is set up with, else generic-cli)")
   .option("--out <path>", "write the signed receipt to a JSON file")
   .option("--json", "print the complete signed receipt as JSON")
-  .action(async (opts: { agent: string; adapter: string; out?: string; json?: boolean }) => {
-    const params = { workspace: process.cwd(), agentId: opts.agent, adapterId: opts.adapter };
+  .action(async (opts: { agent?: string; adapter?: string; out?: string; json?: boolean }) => {
+    const params = { workspace: process.cwd(), ...capabilityTarget(process.cwd(), opts.agent ?? activeAgent(program), opts.adapter) };
     const output = opts.out ? await adaptersCapabilitiesWithOutputCliAsync(params, opts.out) : null;
     const receipt = output?.receipt ?? await adaptersCapabilitiesCliAsync(params);
     if (output !== null && !opts.json) console.log(chalk.green(`Adapter capability receipt: ${output.outPath}`));
