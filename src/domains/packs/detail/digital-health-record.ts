@@ -250,7 +250,7 @@ export const digitalHealthRecordDetail: PackQuestionDetail = {
   },
   "HLT-DHR-20": {
     l2: "Source attributes exist for one predictive model in a static document that clinicians cannot reach from the workflow",
-    l4: "Every predictive DSI has versioned source attributes, but risk management evidence is not linked per release or the HTI-5 status flag is missing",
+    l4: "Every predictive DSI has versioned source attributes, but risk management evidence is not linked per release or the HTI-5 removal date is not recorded",
     evidence: ["predictive_dsi_source_attribute_versions", "dsi_risk_management_evidence_per_release", "hti5_regulatory_status_flag"],
     remediation:
       "Store source attributes as versioned data tied to each model release and block deployment of a new model version until its attributes and risk " +
