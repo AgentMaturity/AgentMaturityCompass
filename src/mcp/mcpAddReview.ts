@@ -36,7 +36,7 @@ export function jsonForTerminal(value: unknown): string {
 }
 
 /** A tool name with a hidden character cannot be read reliably by a person, so it is never granted. */
-export const hasHiddenCharacters = (value: string): boolean => new RegExp(HIDDEN.source, "u").test(value.replace(/ /g, ""));
+const hasHiddenCharacters = (value: string): boolean => new RegExp(HIDDEN.source, "u").test(value.replace(/ /g, ""));
 
 export interface McpAddSelection {
   readonly granted: readonly { readonly name: string; readonly amcName: string }[];

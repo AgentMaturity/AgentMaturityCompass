@@ -174,10 +174,7 @@ export interface HookIntegrationStatus {
   files: { config: string; ignore: string; token: string; manifest: string; signature: string };
   /** Pi and Claude Code control: what AMC may claim for the agent's sessions, from verified session registrations. */
   governance?: PiGovernance | ClaudeCodeGovernance;
-  /**
-   * Codex: tool-call reports the hook could not hand to AMC (Studio stopped, or it refused the report), from the hook's
-   * own local note. Unsigned and a lower bound: the hook process holds no vault key, and a hook Codex never ran writes nothing.
-   */
+  /** Codex: reports the hook could not hand to AMC, from its own unsigned local note; a lower bound (a hook that never ran writes nothing). */
   lostObservations?: { count: number; lastTs: number; lastReason: string };
 }
 
@@ -1118,29 +1115,16 @@ export function removeHookIntegration(options: RemoveHookIntegrationOptions): Ho
       writeFileAtomic(paths.ignore, nextIgnore, ignoreBefore.mode);
     }
     try {
-      revokeLeaseForCli({
-        workspace,
-        leaseId: manifest.leaseId,
-        reason: "AMC provider hook integration removed"
-      });
+      revokeLeaseForCli({ workspace, leaseId: manifest.leaseId, reason: "AMC provider hook integration removed" });
     } catch (error) {
       restore(paths.config, before.config);
       restore(paths.ignore, before.ignore);
       throw error;
     }
-    for (const path of [paths.token, paths.manifest, paths.signature]) {
-      if (existsSync(path)) unlinkSync(path);
-    }
+    for (const path of [paths.token, paths.manifest, paths.signature]) if (existsSync(path)) unlinkSync(path);
     if (manifest.configDirCreated === true) removeDirIfEmpty(dirname(paths.config));
     return {
-      operation: "remove",
-      provider,
-      mode: manifest.mode,
-      source: providerSource(provider),
-      dryRun: false,
-      applied: true,
-      changed: true,
-      files,
+      operation: "remove", provider, mode: manifest.mode, source: providerSource(provider), dryRun: false, applied: true, changed: true, files,
       lease: { scope: "hook:observe", scopes: leaseScopes(manifest.mode), route: "/hooks", leaseId: manifest.leaseId, expiresTs: manifest.leaseExpiresTs },
       limitations: limitations(provider, manifest.mode)
     };

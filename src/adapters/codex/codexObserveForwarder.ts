@@ -42,7 +42,7 @@ export const codexLostObservationsPath = (workspace: string): string => join(wor
 const LOST_NOTE_MAX_BYTES = 262_144;
 
 /** Append one lost-observation line (time and reason only). Never throws, never creates a folder, stops at 256 KiB. */
-export function noteLostCodexObservation(workspace: string, reason: string, now = Date.now()): void {
+function noteLostCodexObservation(workspace: string, reason: string, now = Date.now()): void {
   const path = codexLostObservationsPath(workspace);
   let fd: number | null = null;
   try {
