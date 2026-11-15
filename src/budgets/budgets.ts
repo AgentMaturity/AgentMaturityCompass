@@ -283,18 +283,48 @@ export function loadVerifiedBudgetsConfig(workspace: string): BudgetsConfig {
 
 /** Tokens a model request can be billed at most: its bytes, an allowance for the provider's own prompt wrapping, its output limit. */
 const PROVIDER_WRAPPING_ALLOWANCE = 4096; // ponytail: fixed allowance; a per-provider figure if one ever proves larger
+// Top-level fields AMC's native encoders write that do not let a request spend past its output limit. Any other field
+// (a count such as `n`, stored state such as `previous_response_id` or `cachedContent`, a server tool) means no estimate.
+const CEILING_FIELDS = new Set(["model", "messages", "system", "tools", "tool_choice", "parallel_tool_calls", "stream", "stream_options",
+  "input", "instructions", "store", "text", "reasoning", "reasoning_effort", "thinking", "contents", "systemInstruction", "generationConfig",
+  "toolConfig", "options", "think", "format", "keep_alive", "temperature", "top_p", "top_k", "stop", "seed", "response_format",
+  "presence_penalty", "frequency_penalty", "prompt_cache_key", "prompt_cache_retention",
+  "max_tokens", "max_completion_tokens", "max_output_tokens", "n", "best_of"]);
+const GEMINI_CONFIG_FIELDS = new Set(["maxOutputTokens", "temperature", "topP", "topK", "stopSequences", "candidateCount", "thinkingConfig", "responseMimeType"]);
+const OLLAMA_OPTION_FIELDS = new Set(["num_predict", "num_ctx", "seed", "temperature", "top_k", "top_p", "min_p", "typical_p",
+  "repeat_last_n", "repeat_penalty", "presence_penalty", "frequency_penalty", "stop"]);
+// Content the provider reads from elsewhere (an uploaded file, a cache, a web address) is not in the bytes counted.
+const STORED_CONTENT_FIELDS = new Set(["previous_response_id", "conversation", "cached_content", "cachedContent", "file_id", "file_url", "file_uri", "fileUri", "fileData"]);
 
-/** The upper estimate for a request body, or null when the body names no output limit (then nothing bounds its usage). */
+const record = (value: unknown): value is Record<string, unknown> => Boolean(value) && typeof value === "object" && !Array.isArray(value);
+const onlyKnown = (value: unknown, known: Set<string>) => value === undefined || (record(value) && Object.keys(value).every(key => known.has(key)));
+// ponytail: a tool call whose arguments carry a web address also counts as remote content; harmless, it only blocks when unanswered.
+function readsStoredContent(value: unknown): boolean {
+  if (Array.isArray(value)) return value.some(readsStoredContent);
+  if (!record(value)) return false;
+  return Object.entries(value).some(([key, inner]) => STORED_CONTENT_FIELDS.has(key)
+    || ((key === "url" || key === "image_url") && typeof inner === "string" && !inner.startsWith("data:")) || readsStoredContent(inner));
+}
+
+/**
+ * The upper estimate for a request body AMC's native agent wrote, or null when nothing in the body is known to bound
+ * its usage: no output limit, more than one answer asked for, a field this function does not know, or content read
+ * from elsewhere. Only for bodies AMC encoded itself; a client's body through the gateway gets no estimate.
+ */
 export function requestTokenCeiling(requestBody: Buffer): number | null {
-  let body: Record<string, unknown>;
-  try { body = JSON.parse(requestBody.toString("utf8")) as Record<string, unknown>; } catch { return null; }
-  if (!body || typeof body !== "object" || Array.isArray(body)) return null;
-  const nested = (key: string, inner: string) => { const value = body[key]; return value && typeof value === "object" ? (value as Record<string, unknown>)[inner] : undefined; };
+  let body: unknown;
+  try { body = JSON.parse(requestBody.toString("utf8")); } catch { return null; }
+  if (!record(body) || !Object.keys(body).every(key => CEILING_FIELDS.has(key))) return null;
+  const config = body.generationConfig, options = body.options;
+  if (!onlyKnown(config, GEMINI_CONFIG_FIELDS) || !onlyKnown(options, OLLAMA_OPTION_FIELDS) || readsStoredContent(body)) return null;
+  const configValue = (key: string) => (record(config) ? config[key] : undefined);
+  if ([body.n, body.best_of, configValue("candidateCount")].some(count => count !== undefined && count !== 1)) return null;
   // Every output limit an AMC encoder writes; a thinking budget is added in case a provider counts it apart.
-  const limits = [body.max_tokens, body.max_completion_tokens, body.max_output_tokens, nested("options", "num_predict"), nested("generationConfig", "maxOutputTokens")]
+  const limits = [body.max_tokens, body.max_completion_tokens, body.max_output_tokens, record(options) ? options.num_predict : undefined, configValue("maxOutputTokens")]
     .filter((value): value is number => Number.isSafeInteger(value) && (value as number) > 0);
   if (limits.length === 0) return null;
-  const thinking = (nested("generationConfig", "thinkingConfig") as Record<string, unknown> | undefined)?.thinkingBudget;
+  const thinkingConfig = configValue("thinkingConfig"), thinking = record(thinkingConfig) ? thinkingConfig.thinkingBudget : undefined;
+  if (thinking === -1 || (record(thinkingConfig) && thinkingConfig.thinkingLevel !== undefined)) return null; // thinking of no stated size
   // A token is at least one byte for byte-level tokenizers, so the bytes sent bound the input.
   return requestBody.length + PROVIDER_WRAPPING_ALLOWANCE + Math.max(...limits) + (Number.isSafeInteger(thinking) && (thinking as number) > 0 ? thinking as number : 0);
 }

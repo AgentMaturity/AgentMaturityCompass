@@ -9,7 +9,7 @@ import YAML from "yaml";
 import { SessionService } from "../src/session/sessionService.js";
 import { openSessionEventStore } from "../src/persistence/openSessionEventStore.js";
 import { openLedger } from "../src/ledger/ledger.js";
-import { acceptUnknownUsageAsync, budgetUsageSnapshot, budgetsPath, evaluateBudgetStatus, loadBudgetsConfig, signBudgetsConfig, verifyBudgetsConfigSignature } from "../src/budgets/budgets.js";
+import { acceptUnknownUsageAsync, budgetUsageSnapshot, requestTokenCeiling, budgetsPath, evaluateBudgetStatus, loadBudgetsConfig, signBudgetsConfig, verifyBudgetsConfigSignature } from "../src/budgets/budgets.js";
 import { measuredUsage, NATIVE_BUDGET_RESERVATION } from "../src/budgets/nativeBudgetUsage.js";
 import { nativeUnknownUsageNotice } from "../src/budgets/nativeBudgetAdmission.js";
 import { AdapterRegistry } from "../src/llm/adapter/adapterRegistry.js";
@@ -245,7 +245,7 @@ describe("AMC-1534 native budget admissions and signed accounting", () => {
     expect(verifyBudgetsConfigSignature(workspace).valid).toBe(true);
   });
 
-  test("H-01: gateway rows: a refused upstream connection, a 401 and a cut-off request with an output limit do not block; one without a limit does", () => {
+  test("H-01: gateway rows: a refused upstream connection and a 401 do not block; a cut-off request blocks even with an estimate on its row", () => {
     const write = (sessionId: string, rows: [eventType: "llm_request" | "llm_response" | "gateway", meta: Record<string, unknown>][]) => {
       const ledger = openLedger(workspace);
       try {
@@ -257,14 +257,32 @@ describe("AMC-1534 native budget admissions and signed accounting", () => {
     write("gateway-fixture", [["llm_request", { request_id: "down" }], ["gateway", { stage: "request_error", request_id: "down", status: 502, connectFailed: "ECONNREFUSED" }],
       ["llm_request", { request_id: "denied" }], ["llm_response", { request_id: "denied", statusCode: 401 }]]);
     expect(budgetUsageSnapshot(workspace, "default").daily).toMatchObject({ llmRequests: 2, blockingUnknownLlmTokenRequests: 0 });
-    // A request cut off after the gateway sent it counts at the upper estimate the gateway recorded from its output limit.
+    // The client wrote a gateway request's body, so an estimate on its row is never used: cut off, or answered without
+    // usage, it blocks, and the refusal says why in words.
     write("gateway-fixture-2", [["llm_request", { request_id: "cut", tokenCeiling: 5000 }], ["llm_request", { request_id: "quiet", tokenCeiling: 700 }],
       ["llm_response", { request_id: "quiet", statusCode: 200 }]]);
-    expect(budgetUsageSnapshot(workspace, "default").daily).toMatchObject({ llmRequests: 4, llmTokens: 5700, unknownLlmTokenRequests: 3, blockingUnknownLlmTokenRequests: 0 });
-    // One with no output limit (no estimate) still blocks, and the refusal says why in words.
-    write("gateway-fixture-3", [["llm_request", { request_id: "lost", tokenCeiling: null }]]);
-    expect(budgetUsageSnapshot(workspace, "default").daily.blockingUnknownLlmTokenRequests).toBe(1);
-    expect(evaluateBudgetStatus(workspace, "default").reasons).toEqual(["new model requests are refused: 1 earlier request(s) ended without a usage report and with no upper estimate to count instead (no output limit was set, or the record is older)"]);
+    expect(budgetUsageSnapshot(workspace, "default").daily).toMatchObject({ llmRequests: 4, llmTokens: 0, unknownLlmTokenRequests: 3, blockingUnknownLlmTokenRequests: 2 });
+    expect(evaluateBudgetStatus(workspace, "default").reasons).toEqual(["new model requests are refused: 2 earlier request(s) ended without a usage report and with no upper estimate to count instead (no output limit was set, or the record is older)"]);
+  });
+
+  test("an upper estimate is taken only for a body whose fields all bound its output", () => {
+    const ceiling = (body: unknown) => requestTokenCeiling(Buffer.from(JSON.stringify(body)));
+    const bounded = { model: "m", messages: [{ role: "user", content: "hi" }], max_tokens: 16, stream: true };
+    expect(ceiling(bounded)).toBe(Buffer.byteLength(JSON.stringify(bounded)) + 4096 + 16);
+    expect(ceiling({ ...bounded, n: 1, prompt_cache_key: "amc:x", prompt_cache_retention: "in_memory" })).not.toBeNull();
+    // Each refusal: more than one answer, an unknown field, a stored or remote source, thinking of no stated size.
+    expect(ceiling({ ...bounded, n: 50 })).toBeNull();
+    expect(ceiling({ ...bounded, best_of: 20, n: 20 })).toBeNull();
+    expect(ceiling({ contents: [], generationConfig: { maxOutputTokens: 16, candidateCount: 8 } })).toBeNull();
+    expect(ceiling({ contents: [], generationConfig: { maxOutputTokens: 16, thinkingConfig: { thinkingBudget: -1 } } })).toBeNull();
+    expect(ceiling({ contents: [], generationConfig: { maxOutputTokens: 16, responseModalities: ["AUDIO"] } })).toBeNull();
+    expect(ceiling({ ...bounded, logit_bias: {} })).toBeNull();
+    expect(ceiling({ model: "m", options: { num_predict: 16, num_keep: 4 }, messages: [] })).toBeNull();
+    expect(ceiling({ previous_response_id: "resp_abc", max_output_tokens: 16 })).toBeNull();
+    expect(ceiling({ contents: [], cachedContent: "cachedContents/x", generationConfig: { maxOutputTokens: 16 } })).toBeNull();
+    expect(ceiling({ model: "m", max_tokens: 16, messages: [{ role: "user", content: [{ type: "image_url", image_url: { url: "https://x/y.png" } }] }] })).toBeNull();
+    expect(ceiling({ contents: [{ parts: [{ fileData: { fileUri: "gs://b/f.pdf" } }] }], generationConfig: { maxOutputTokens: 16 } })).toBeNull();
+    expect(ceiling({ model: "m", max_tokens: 16, messages: [{ role: "user", content: [{ type: "image_url", image_url: { url: "data:image/png;base64,AA" } }] }] })).not.toBeNull();
   });
 
   test("smoke H-2: the unknown-usage refusal counts the blocking requests and names the documented recovery", async () => {
