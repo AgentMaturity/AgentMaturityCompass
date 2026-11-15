@@ -191,16 +191,17 @@ async function openConsole(io: FrontDoorIo): Promise<void> {
 }
 
 /**
- * Agent projects (A4 Forge) are a preview that a Studio serves only when started with AMC_A4_PREVIEW=1. Choosing this
- * line is the operator turning it on for the AMC this menu starts; an AMC that already runs is left as it is.
+ * Agent projects (A4 Forge) are a preview that Studio serves by default (AMC_A4_PREVIEW=0 turns it off). Choosing this
+ * line starts AMC if needed and opens the start form; an AMC that already runs is left as it is.
  */
 async function buildAgent(io: FrontDoorIo, wasRunning: boolean): Promise<void> {
-  const origin = await ensureStudio(io, { AMC_A4_PREVIEW: "1" });
+  const origin = await ensureStudio(io);
   if (origin === null) return;
   const url = `${origin}/console/a4?new=1`;
   io.log(io.openUrl(url) ? `Opening ${url}` : `Open ${url} in your browser.`);
   io.log("Sign in as the workspace owner (create the account once with amc user init), pick your industry, and start an agent project.");
-  if (wasRunning) io.log("AMC was already running. If the page says agent projects are turned off, run amc down, then choose this line again.");
+  io.log("Each step needs someone other than you to approve it. Alone, a practice project gets you as far as building the agent; the page asks for the people when they are needed.");
+  if (wasRunning) io.log("AMC was already running. If the page says agent projects are turned off, it was started with AMC_A4_PREVIEW=0: run amc down, then choose this line again.");
 }
 
 async function act(io: FrontDoorIo, choice: FrontDoorChoice, state: FrontDoorState): Promise<"done" | "menu"> {

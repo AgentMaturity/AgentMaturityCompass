@@ -104,7 +104,7 @@ function composeSteps(input: DeployPlanInput): Step[] {
     { phase: "preflight", command: null, note: `Write the lease token (shown once by AMC) to deploy/compose/secrets/amc_a4_lease_${input.releaseId}.txt, mode 0600. AMC never stores it; never commit it.` },
     { phase: "preflight", command: "docker compose -f docker-compose.yml exec studio amc doctor --strict --json", note: "Pre-flight on the running Studio." },
     { phase: "deploy", command: `docker compose -f docker-compose.yml -f ${name} up -d`, note: "Restarts the hosted Studio; never down -v." },
-    { phase: "verify", command: `curl -fsS https://${input.destinationRef}/readyz`, note: "Reachability only; release identity is not evaluated at the destination (P2-40)." },
+    { phase: "verify", command: `curl -fsS https://${input.destinationRef}/readyz`, note: "Reachability only; AMC cannot yet confirm which build runs where it is deployed." },
     { phase: "verify", command: `docker compose -f docker-compose.yml -f ${name} exec studio amc verify all --json`, note: "Integrity of the workspace records." },
     { phase: "verify", command: `sha256sum ${name}`, note: "The overlayDigest for the receipt." },
     ...(previous === null
@@ -127,7 +127,7 @@ function helmSteps(input: DeployPlanInput): Step[] {
     { phase: "deploy", command: `kubectl${ns} set env deploy/amc-amc -c amc-studio AMC_A4_PREVIEW=1`,
       note: "A4_PREVIEW_NOT_SET_BY_CHART: the chart cannot set the A4 preview flag, so set it on the Studio container after each upgrade (this restarts it once more); without it A4 answers 404 and the receipt cannot be recorded." },
     { phase: "verify", command: `helm${ns} history amc`, note: "The revision this upgrade made, an integer from helm history, is the receipt's helmRevision (it replaces the form's 0)." },
-    { phase: "verify", command: `curl -fsS https://${input.destinationRef}/readyz`, note: "Reachability only; release identity is not evaluated at the destination (P2-40)." },
+    { phase: "verify", command: `curl -fsS https://${input.destinationRef}/readyz`, note: "Reachability only; AMC cannot yet confirm which build runs where it is deployed." },
     { phase: "verify", command: `${exec} amc verify all --json`, note: "Integrity of the workspace records." },
     { phase: "verify", command: `sha256sum ${name}`, note: "The overlayDigest for the receipt." },
     { phase: "verify", command: "helm package deploy/helm/amc", note: "The chart digest (sha256 of the .tgz) for your records; the v1 receipt does not carry it." },
@@ -358,7 +358,7 @@ function deploymentChecks(state: A4ReadinessState, releaseId: string, body: Depl
 
 /** The operator's status and AMC's check, composed and never merged (C-35). */
 export function statusText(recorded: string, check: string, reasonCodes: readonly string[] = []): string {
-  const amc = check === "reachable" ? `reachable, release identity not evaluated at the destination (P2-40)`
+  const amc = check === "reachable" ? `reachable, release identity not evaluated at the destination`
     : check === "failed" ? `failed (${reasonCodes[0] ?? "AMC_CHECK_FAILED"})` : check === "passed" ? "passed" : "not evaluated";
   return `recorded: ${recorded}; AMC check: ${amc}`;
 }

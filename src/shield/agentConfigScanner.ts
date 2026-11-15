@@ -49,10 +49,11 @@ export interface AgentConfigScanResult {
   scannedAt: number;
   root: string;
   filesScanned: string[];
-  securityLevel: ConfigSecurityLevel;
-  securityScore: number;
+  /** CLI-06: null when no agent configuration was found: nothing was assessed, so there is no level or score. */
+  securityLevel: ConfigSecurityLevel | null;
+  securityScore: number | null;
   riskLabel: string;
-  aggregateRisk: "CLEAN" | "REVIEW" | "BLOCK";
+  aggregateRisk: "CLEAN" | "REVIEW" | "BLOCK" | "NOT_ASSESSED";
   findings: AgentConfigFinding[];
   recommendations: string[];
   receiptHash: string;
@@ -293,10 +294,11 @@ export function scanAgentConfig(params: { root: string; now: number }): AgentCon
   let score = 100;
   for (const f of findings) score -= SEVERITY_WEIGHT[f.severity];
   score = Math.max(0, Math.min(100, score));
-  const securityLevel = scoreToLevel(score);
+  const assessed = files.length > 0;
+  const securityLevel = assessed ? scoreToLevel(score) : null;
   const anyCritical = findings.some((f) => f.severity === "CRITICAL");
   const anyHigh = findings.some((f) => f.severity === "HIGH");
-  const aggregateRisk: AgentConfigScanResult["aggregateRisk"] = anyCritical ? "BLOCK" : anyHigh ? "REVIEW" : "CLEAN";
+  const aggregateRisk: AgentConfigScanResult["aggregateRisk"] = !assessed ? "NOT_ASSESSED" : anyCritical ? "BLOCK" : anyHigh ? "REVIEW" : "CLEAN";
 
   const recommendations = [...new Set(findings.map((f) => f.recommendation))].slice(0, 10);
 
@@ -306,8 +308,8 @@ export function scanAgentConfig(params: { root: string; now: number }): AgentCon
     root,
     filesScanned: files.map((f) => f.relPath),
     securityLevel,
-    securityScore: score,
-    riskLabel: RISK_LABEL[securityLevel],
+    securityScore: assessed ? score : null,
+    riskLabel: securityLevel === null ? "NOTHING TO ASSESS" : RISK_LABEL[securityLevel],
     aggregateRisk,
     findings: findings.sort((a, b) => SEVERITY_WEIGHT[b.severity] - SEVERITY_WEIGHT[a.severity]),
     recommendations

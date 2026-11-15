@@ -21,7 +21,7 @@ describe("the scoring commands page", () => {
   const score = readFileSync("src/console/pages/score.html", "utf8");
 
   test("names Studio, links home first and says where results appear", () => {
-    expect(score).toContain("<title>Maturity Score - AMC Studio</title>");
+    expect(score).toContain("<title>Maturity score · Compass Console</title>");
     const main = score.slice(score.indexOf("<main>"));
     expect(main.indexOf('<a href="./home">')).toBeGreaterThan(-1);
     expect(main.indexOf('<a href="./home">')).toBeLessThan(main.indexOf("<h2>"));

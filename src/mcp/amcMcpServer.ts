@@ -121,7 +121,7 @@ export const MCP_TOOL_METADATA = [
   ...a4ToolMetadata(),
 ];
 
-/** Registers the 15 tools (20 with AMC_A4_PREVIEW=1) and the agent resource without a transport, so tests can connect in memory. */
+/** Registers the 20 tools (15 under AMC_A4_PREVIEW=0) and the agent resource without a transport, so tests can connect in memory. */
 export function createAmcMcpServer(defaultWorkspace = process.cwd()): McpServer {
   const server = new McpServer({
     name: "amc",

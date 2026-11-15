@@ -41,28 +41,34 @@ async function setup() {
   const upstream = createServer((req, res) => { req.resume(); req.on("end", () => res.writeHead(200).end("{}")); });
   servers.push(upstream);
   const port = await new Promise<number>((done) => upstream.listen(0, "127.0.0.1", () => done((upstream.address() as { port: number }).port)));
+  // Answers, then drops the connection part-way through the body: the request did reach it.
+  const broken = createServer((req, res) => { req.resume(); req.on("end", () => { res.writeHead(200, { "content-length": "100" }); res.write("{\"partial\""); setTimeout(() => res.destroy(), 20); }); });
+  servers.push(broken);
+  const brokenPort = await new Promise<number>((done) => broken.listen(0, "127.0.0.1", () => done((broken.address() as { port: number }).port)));
   initGatewayConfig(workspace, gatewayConfigSchema.parse({
     listen: { host: "127.0.0.1", port: 0 },
     redaction: { headerKeysDenylist: ["authorization"], jsonPathsDenylist: [], textRegexDenylist: [] },
     upstreams: {
       keyed: { baseUrl: `http://127.0.0.1:${port}`, auth: { type: "bearer_env", env: "AMC_TEST_ABSENT_UPSTREAM_KEY_7F3A" }, allowLocalhost: true },
       unresolved: { baseUrl: "${AMC_TEST_UNSET_BASE_URL_7F3A}", auth: { type: "none" } },
-      plain: { baseUrl: `http://127.0.0.1:${port}`, auth: { type: "none" }, allowLocalhost: true }
+      plain: { baseUrl: `http://127.0.0.1:${port}`, auth: { type: "none" }, allowLocalhost: true },
+      broken: { baseUrl: `http://127.0.0.1:${brokenPort}`, auth: { type: "none" }, allowLocalhost: true }
     },
     routes: [
       { prefix: "/keyed", upstream: "keyed", stripPrefix: true, openaiCompatible: false },
       { prefix: "/unresolved", upstream: "unresolved", stripPrefix: true, openaiCompatible: false },
-      { prefix: "/plain", upstream: "plain", stripPrefix: true, openaiCompatible: false }
+      { prefix: "/plain", upstream: "plain", stripPrefix: true, openaiCompatible: false },
+      { prefix: "/broken", upstream: "broken", stripPrefix: true, openaiCompatible: false }
     ]
   }));
   const lines: string[] = [];
   const gateway = await startGateway({ workspace, logger: { log: () => undefined, error: (line: string) => { lines.push(String(line)); } } });
-  const lease = issueLeaseForCli({ workspace, agentId: "default", ttl: "60m", scopes: "gateway:llm", routes: "/keyed,/unresolved,/plain",
+  const lease = issueLeaseForCli({ workspace, agentId: "default", ttl: "60m", scopes: "gateway:llm", routes: "/keyed,/unresolved,/plain,/broken",
     models: "*", rpm: 1000, tpm: 1_000_000, maxCostUsdPerDay: null }).token;
   return { workspace, gateway, lease, lines };
 }
 
-function post(port: number, path: string, lease: string): Promise<{ status: number; body: string }> {
+function post(port: number, path: string, lease: string, body = "{}"): Promise<{ status: number; body: string }> {
   return new Promise((resolvePromise, rejectPromise) => {
     const req = httpRequest({ host: "127.0.0.1", port, path, method: "POST",
       headers: { "content-type": "application/json", "x-amc-agent-id": "default", "x-amc-lease": lease } }, (res) => {
@@ -71,7 +77,7 @@ function post(port: number, path: string, lease: string): Promise<{ status: numb
       res.on("end", () => resolvePromise({ status: res.statusCode ?? 0, body }));
     });
     req.on("error", rejectPromise);
-    req.end("{}");
+    req.end(body);
   });
 }
 
@@ -124,6 +130,56 @@ describe("gateway error bodies", () => {
     for (const line of logged) {
       expect(line).not.toContain("key=secret");
       expect(line).not.toContain("?");
+    }
+  }, 60_000);
+
+  test("QA M-07 / H-01: a refused upstream connection names the upstream, its address and the next step, and is recorded as never sent", async () => {
+    const { workspace, gateway, lease } = await setup();
+    let missing: { status: number; body: string };
+    try {
+      fail.next = Object.assign(new Error("connect ECONNREFUSED 127.0.0.1:9"), { code: "ECONNREFUSED" });
+      const response = await post(gateway.port, "/plain/v1/x", lease);
+      expect(response.status).toBe(502);
+      expect(JSON.parse(response.body)).toMatchObject({ error: "gateway proxy failure", upstream: "plain", address: expect.stringMatching(/^http:\/\/127\.0\.0\.1:\d+$/),
+        next: expect.stringContaining("(ECONNREFUSED). Start that server, or fix upstream plain in .amc/gateway.yaml") });
+      missing = await post(gateway.port, "/plain/v1/x", "");
+    } finally {
+      await gateway.close();
+    }
+    expect(missing.status).toBe(401);
+    expect(JSON.parse(missing.body)).toMatchObject({ error: "missing lease token", next: expect.stringContaining("amc lease issue --agent default --routes /plain") });
+    const ledger = openLedger(workspace);
+    try {
+      const failure = ledger.getAllEvents().map((event) => JSON.parse(event.meta_json ?? "{}") as Record<string, unknown>).find((meta) => meta.stage === "request_error");
+      expect(failure).toMatchObject({ status: 502, connectFailed: "ECONNREFUSED" });
+    } finally {
+      ledger.close();
+    }
+  }, 60_000);
+
+  test("a refused first attempt, then an answer that breaks off mid-body, is not recorded as never sent", async () => {
+    vi.stubEnv("AMC_GATEWAY_RETRY_NON_IDEMPOTENT", "true");
+    vi.stubEnv("AMC_GATEWAY_UPSTREAM_RETRY_BASE_DELAY_MS", "1");
+    const { workspace, gateway, lease } = await setup();
+    try {
+      fail.next = Object.assign(new Error("connect ECONNREFUSED 127.0.0.1:9"), { code: "ECONNREFUSED" });
+      const response = await post(gateway.port, "/broken/v1/x", lease, "{\"max_tokens\":50}").catch(() => ({ status: 0, body: "" }));
+      expect(fail.next).toBeNull(); // the refused attempt was used, so the retry is the one that was answered
+      expect(response.body).not.toContain("Nothing answered");
+    } finally {
+      await gateway.close();
+      vi.unstubAllEnvs();
+    }
+    const ledger = openLedger(workspace);
+    try {
+      const metas = ledger.getAllEvents().map((event) => JSON.parse(event.meta_json ?? "{}") as Record<string, unknown>);
+      const failure = metas.find((meta) => meta.stage === "request_error");
+      expect(failure).toBeDefined();
+      expect(failure).not.toHaveProperty("connectFailed");
+      // The client wrote this body, so its max_tokens is not taken as a bound: no estimate is recorded.
+      expect(metas.find((meta) => meta.bodySha256 !== undefined && "tokenCeiling" in meta)).toMatchObject({ tokenCeiling: null });
+    } finally {
+      ledger.close();
     }
   }, 60_000);
 });

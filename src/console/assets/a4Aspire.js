@@ -4,6 +4,7 @@
 // esc(), statuses and reason codes are printed as Studio returned them, and no card names a maturity level.
 import { registerStageCard } from "./a4Cards.js";
 import * as view from "./a4View.js";
+import { itemWithRecord } from "./a4Plain.js";
 
 const { esc } = view;
 const ASPIRE_SPEC = "amc.a4-aspire-spec/v1";
@@ -16,11 +17,8 @@ const proposed = (spec) => spec.schema === ASPIRE_SPEC;
 const items = (ctx) => list(ctx.readiness?.items);
 const itemOf = (ctx, id) => items(ctx).find((item) => item.id === id) ?? null;
 const codes = (values) => list(values).map((code) => `<code>${esc(code)}</code>`).join(" ");
-/** One readiness item's status and reason codes, as Studio returned them. */
-const status = (ctx, id) => {
-  const item = itemOf(ctx, id);
-  return item ? `<p class="muted"><code>${esc(id)}</code> <code>${esc(item.status)}</code> ${codes(item.reasonCodes)}</p>` : "";
-};
+/** One readiness item in words, its record (id, status, reason codes, next action) under "Show the record". */
+const status = (ctx, id) => itemWithRecord(itemOf(ctx, id), id);
 const bullets = (values, empty = "None") => (list(values).length ? `<ul class="a4-rows">${list(values).map((value) => `<li>${esc(value)}</li>`).join("")}</ul>`
   : `<p class="muted">${esc(empty)}</p>`);
 const table = (head, rows, empty) => (rows.length ? `<div class="scroll"><table><thead><tr>${head.map((cell) => `<th>${esc(cell)}</th>`).join("")}</tr></thead>

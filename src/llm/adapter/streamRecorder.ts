@@ -165,14 +165,16 @@ export class StreamRecorder {
     readonly kind: "error" | "aborted";
     readonly httpStatus: number | null;
     readonly cause: string;
+    readonly connectFailed?: string;
   }): SettledStream {
     const assembly = this.assembler.abort(input.cause);
-    return this.record(assembly, { kind: input.kind, failure: input.failure, httpStatus: input.httpStatus });
+    return this.record(assembly, { kind: input.kind, failure: input.failure, httpStatus: input.httpStatus,
+      ...(input.connectFailed === undefined ? {} : { connectFailed: input.connectFailed }) });
   }
 
   private record(
     assembly: StreamAssembly,
-    failed: { readonly kind: "error" | "aborted"; readonly failure: LlmFailure; readonly httpStatus: number | null } | null,
+    failed: { readonly kind: "error" | "aborted"; readonly failure: LlmFailure; readonly httpStatus: number | null; readonly connectFailed?: string } | null,
     successStatus = 0
   ): SettledStream {
     if (this.settled) {
@@ -220,7 +222,8 @@ export class StreamRecorder {
               mode: this.init.pinned.retryPolicy.mode,
               retryable: isRetryableFailure(this.init.pinned.retryPolicy, failed.failure)
             },
-            credential: this.init.credential
+            credential: this.init.credential,
+            ...(failed.connectFailed === undefined ? {} : { connectFailed: failed.connectFailed })
           };
 
     const ref: SessionEventRef = this.init.session.recordRequestOutcome(params);

@@ -247,7 +247,7 @@ amc vault status
 ```
 
 ### `amc vault unlock|lock`
-Unlock or lock the vault.
+`unlock` checks the passphrase; the vault stays unlocked only while that command runs, so export `AMC_VAULT_PASSPHRASE` in the shell that runs a signing command. `lock` clears keys held in memory.
 ```bash
 amc vault unlock
 amc vault lock

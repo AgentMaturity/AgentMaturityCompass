@@ -402,10 +402,36 @@ jobs:
           python-version: "3.12"
       - name: Install the Python SDK's test dependency
         run: python3 -m pip install --require-hashes -r sdk/python/requirements-ci.txt
-      - name: Full release gate
+      # A hosted macOS runner (3 cores) cannot finish the gate's unsharded instrumented suite inside its 2-hour step cap,
+      # and measures the session-spine throughput floor at 88-112 ev/s (CI 2026-11-12..14). Both run on Linux in this
+      # workflow instead: test-shard runs every test file with coverage, build-test merges it and runs the per-file floors
+      # and the performance floors one file at a time. So this job runs the gate's quick profile, which executes every
+      # other gate check and records the skipped ones (qualification "partial"); a failed executed check still fails the
+      # job. The steps after it run on Darwin what quick skips and Linux cannot show: every test file that names Darwin,
+      # Seatbelt or the keychain, the packed install and the install personas. The full gate runs before every release
+      # (release.yml) and locally: npm run release:gate.
+      - name: Release gate (quick profile on the hosted runner)
         env:
           AMC_RELEASE_GATE_LIVE_URL: ${{ vars.AMC_RELEASE_GATE_LIVE_URL }}
-        run: npm run release:gate -- --json --out tmp/release-gate/ci.json
+        run: npm run release:gate -- --quick --json --out tmp/release-gate/ci.json
+      - name: Darwin-specific test files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p tmp/release-gate
+          git grep -lzE 'darwin|sandbox-exec|[Ss]eatbelt|keychain' -- 'tests/*.test.ts' 'tests/**/*.test.ts' ':!tests/performance/**' > /tmp/darwin-tests
+          echo "$(tr -cd '\0' < /tmp/darwin-tests | wc -c) test files"
+          xargs -0 npx vitest run --reporter=default < /tmp/darwin-tests 2>&1 | tee tmp/release-gate/darwin-tests.log | cut -c1-4096
+      - name: Packed install on Darwin
+        run: node scripts/packed-install-check.mjs --no-build
+      - name: Install personas on Darwin
+        run: npm run qa:install-personas -- --json --out tmp/release-gate/install-personas.json
+      - name: Record what this gate run did not execute
+        if: always()
+        shell: bash
+        run: |
+          [ -f tmp/release-gate/ci.json ] || exit 0
+          node -e 'const r=JSON.parse(require("node:fs").readFileSync(process.argv[1],"utf8"));const skipped=r.steps.filter(s=>s.status==="skipped");const text=`Release gate ${r.qualification}: ${r.summary}\n\n${skipped.map(s=>`- ${s.id}: ${s.remediation}`).join("\n")}\n`;require("node:fs").appendFileSync(process.env.GITHUB_STEP_SUMMARY,text);if(skipped.length)console.log(`::notice title=Release gate ${r.qualification}::${skipped.map(s=>s.id).join(", ")} not executed here; see the job summary.`)' tmp/release-gate/ci.json
       - name: Upload release gate receipts
         if: always()
         uses: actions/upload-artifact@v7

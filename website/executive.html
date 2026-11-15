@@ -2,127 +2,164 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AMC for Executives - Board Brief</title>
-  <meta name="description" content="A short brief on Agent Maturity Compass for executives: what it does, what you see, and how your teams use its records to lower the risk of AI agents.">
+  <meta name="description" content="A short brief on Agent Maturity Compass for executives: how your teams build AI agents for regulated work with a person's sign-off on each step, what the board sees, and how AMC's records lower the risk of AI agents.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="canonical" href="https://agentmaturity.co/executive.html">
   <meta property="og:type" content="website">
   <meta property="og:title" content="AMC for Executives - Board Brief">
-  <meta property="og:description" content="See how ready each AI agent is, what it actually did, and what to fix next.">
+  <meta property="og:description" content="See how each AI agent was built and approved, what it actually did, and what to fix next.">
   <meta property="og:url" content="https://agentmaturity.co/executive.html">
   <meta property="og:image" content="https://agentmaturity.co/og-card.png">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="style.css?v=14">
-  <style>
-    .exec-page{min-height:100vh;padding:8rem 0 5rem}
-    .exec-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,420px);gap:clamp(2rem,5vw,4rem);align-items:center;padding:3rem 0 5rem}
-    .exec-hero h1{white-space:normal;margin:.6rem 0 1.2rem}
-    .exec-lede{font-size:1.05rem;color:var(--text-muted);max-width:680px;line-height:1.75}
-    .exec-visual{border:1px solid var(--border);background:rgba(255,255,255,.025);padding:1rem}
-    .exec-visual img{width:100%;height:auto}
-    .exec-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin:2rem 0 4rem}
-    .exec-panel{border:1px solid var(--border);background:rgba(255,255,255,.025);padding:1.25rem;min-height:190px}
-    .exec-panel h2{font-size:1rem;color:var(--text);letter-spacing:0;text-transform:none;margin-bottom:.75rem}
-    .exec-panel p,.exec-panel li{color:var(--text-muted);font-size:.92rem;line-height:1.65}
-    .exec-panel ul{margin-left:1rem}
-    .exec-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--border);border:1px solid var(--border);margin:2rem 0 4rem}
-    .exec-kpi{background:var(--bg);padding:1.25rem}
-    .exec-kpi strong{display:block;font-family:var(--mono);font-size:1.6rem;color:var(--accent);line-height:1}
-    .exec-kpi span{display:block;margin-top:.5rem;color:var(--text-muted);font-size:.78rem}
-    .exec-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:1px solid var(--border);margin-top:1.5rem}
-    .exec-step{padding:1.2rem;border-right:1px solid var(--border)}
-    .exec-step:last-child{border-right:none}
-    .exec-step span{font-family:var(--mono);font-size:.7rem;color:var(--accent)}
-    .exec-step h3{font-size:.95rem;text-transform:none;letter-spacing:0;margin:.45rem 0;color:var(--text)}
-    .exec-step p{font-size:.85rem;color:var(--text-muted);line-height:1.6}
-    @media(max-width:900px){.exec-hero,.exec-grid,.exec-kpis,.exec-steps{grid-template-columns:1fr}.exec-step{border-right:none;border-bottom:1px solid var(--border)}.exec-step:last-child{border-bottom:none}}
-  </style>
+  <link rel="stylesheet" href="home.css?v=5">
+  <link rel="stylesheet" href="pages.css?v=1">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
-  <nav class="nav scrolled">
+
+  <nav class="nav" aria-label="Main">
     <div class="nav-inner">
-      <a href="./" class="nav-brand">amc<span class="accent">_</span></a>
+      <a href="./" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>
       <ul class="nav-links">
-        <li><a href="./#install">install</a></li>
-        <li><a href="./executive.html">executives</a></li>
-        <li><a href="./playground.html">playground</a></li>
-        <li><a href="./docs/index.html">docs</a></li>
-        <li><a href="https://github.com/AgentMaturity/AgentMaturityCompass">github</a></li>
+        <li><a href="./#a4-forge">Build an agent</a></li>
+        <li><a href="./#capabilities">Run it</a></li>
+        <li><a href="./#domains">Industries</a></li>
+        <li><a href="a4.html">A4 Forge</a></li>
+        <li><a href="docs/index.html">Docs</a></li>
       </ul>
-      <button class="nav-hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+      <div class="nav-right">
+        <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="nav-quiet">GitHub</a>
+        <a href="./#install" class="btn btn-primary btn-small">Get AMC</a>
+        <button class="nav-hamburger" aria-label="Menu" aria-controls="navMobile" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
     </div>
   </nav>
   <div class="nav-mobile" id="navMobile">
-    <a href="./#install">install</a>
-    <a href="./executive.html">executives</a>
-    <a href="./playground.html">playground</a>
-    <a href="./docs/index.html">docs</a>
-    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">github</a>
+    <a href="./#a4-forge">Build an agent</a>
+    <a href="./#capabilities">Run it</a>
+    <a href="./#domains">Industries</a>
+    <a href="./#paths">Already have an agent?</a>
+    <a href="./#install">Get AMC</a>
+    <a href="./#desktop">macOS app</a>
+    <a href="./#pricing">Price</a>
+    <a href="a4.html">A4 Forge (preview)</a>
+    <a href="docs/index.html">Docs</a>
+    <a href="executive.html">For executives</a>
+    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
   </div>
+
   <span id="main-content" tabindex="-1"></span>
-  <main class="exec-page">
-    <div class="container">
-      <section class="exec-hero">
+  <main id="main">
+
+    <section class="page-hero">
+      <div class="wrap hero-split">
         <div>
-          <p class="label">board brief</p>
-          <h1>Know which AI agents are ready for real work<span class="accent">.</span></h1>
-          <p class="exec-lede">AMC watches each AI agent while it works, keeps a signed record of what it did, and scores it from that record. For each agent you get a level, the record behind it, and a list of fixes. It tells you what is running, what it can do, where it can fail, and what to fix before you give it more freedom.</p>
+          <p class="product-name">AMC for Executives · board brief</p>
+          <h1>Know how each AI agent was built, and whether it is ready for real work</h1>
+          <p class="lede">AMC helps your teams build an AI agent for regulated work in four steps, with a named person's sign-off on each. Then it watches the agent while it works, keeps a signed record of what it did, and scores it from that record. For each agent you get a level, the record behind it, and a list of fixes.</p>
+          <div class="cta-row">
+            <a href="./#install" class="btn btn-primary">Get AMC</a>
+            <a href="docs/#BOARD_RISK_L3_MEMO" class="btn btn-ghost">Read the L3 risk memo</a>
+          </div>
         </div>
-        <div class="exec-visual">
-          <img src="og-card.png" alt="Agent Maturity Compass scorecard preview showing evidence over claims">
-        </div>
-      </section>
-
-      <div class="exec-kpis" aria-label="AMC executive facts">
-        <div class="exec-kpi"><strong>L0-L5</strong><span>readiness levels, from none to strongest</span></div>
-        <div class="exec-kpi"><strong>244</strong><span>default diagnostic questions</span></div>
-        <div class="exec-kpi"><strong><!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --></strong><span>sets of attack tests (assurance packs)</span></div>
-        <div class="exec-kpi"><strong>41</strong><span>industry question sets across 7 sectors</span></div>
+        <figure class="shot"><img src="img/console-home.webp" width="1200" height="925" decoding="async" alt="The Compass Console home with a project under way: Continue the project, and See what an AI agent really does, with Watch an agent I already use, Try a sample task, and a link to score existing records."><figcaption>The Compass Console, running on your own machine.</figcaption></figure>
       </div>
-
-      <div class="exec-grid">
-        <section class="exec-panel">
-          <h2>What The Board Sees</h2>
-          <ul>
-            <li>Each agent's level and how its score changes over time.</li>
-            <li>The biggest risks, and which actions the agent is not yet allowed to take alone.</li>
-            <li>How much of the agent's work is recorded, whether the records are intact, and whether they are ready for an audit.</li>
-            <li>The EU AI Act risk class, where it applies.</li>
-            <li><a href="docs/#BOARD_RISK_L3_MEMO">L3 business-risk memo</a> for deciding on limited use.</li>
-          </ul>
-        </section>
-        <section class="exec-panel">
-          <h2>What Engineering Does</h2>
-          <ul>
-            <li>Runs `amc` in the folder where the agent works.</li>
-            <li>Connects the agent's activity logs, rules, and other records.</li>
-            <li>Follows AMC's advice to fix weak spots, then scores again.</li>
-            <li>Exports reports, audit files, and build checks that block a release until it passes.</li>
-          </ul>
-        </section>
-        <section class="exec-panel">
-          <h2>What Changes</h2>
-          <ul>
-            <li>What a vendor says is kept apart from what the agent was seen doing.</li>
-            <li>Accepted risks become tracked tasks, not meeting notes.</li>
-            <li>An agent gets more freedom only when its record supports it.</li>
-            <li>Compliance teams get records they can check again, not screenshots.</li>
-          </ul>
-        </section>
-      </div>
-
-      <section>
-        <p class="label">operating path</p>
-        <h2>From first score to a record you can show the board<span class="accent">_</span></h2>
-        <div class="exec-steps">
-          <div class="exec-step"><span>01</span><h3>Inventory</h3><p>List your agents, their owners, their tools, the data they can reach, and what they may do alone.</p></div>
-          <div class="exec-step"><span>02</span><h3>Score</h3><p>Run the default questions. Answers backed by a record count for more than claims.</p></div>
-          <div class="exec-step"><span>03</span><h3>Fix</h3><p>Rank the gaps by risk, compliance impact, and effort.</p></div>
-          <div class="exec-step"><span>04</span><h3>Govern</h3><p>Use reports, audit files, and release checks to keep each agent within what you approved.</p></div>
+      <div class="wrap">
+        <div class="stats" aria-label="AMC facts">
+          <div class="stat"><b>L0-L5</b><span>readiness levels, from none to strongest</span></div>
+          <div class="stat"><b>244</b><span>default diagnostic questions</span></div>
+          <div class="stat"><b><!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --></b><span>sets of attack tests (assurance packs)</span></div>
+          <div class="stat"><b>41</b><span>industry question sets across 7 sectors</span></div>
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
+
+    <section class="band">
+      <div class="wrap">
+        <div class="cards">
+          <section>
+            <h2 class="band-sub">What The Board Sees</h2>
+            <ul class="dots">
+              <li>For each new agent, who asked for it, who approved each step of its build, and exactly which version they approved.</li>
+              <li>Each agent's level and how its score changes over time.</li>
+              <li>The biggest risks, and which actions the agent is not yet allowed to take alone.</li>
+              <li>How much of the agent's work is recorded, whether the records are intact, and whether they are ready for an audit.</li>
+              <li>The EU AI Act risk class, where it applies.</li>
+              <li><a href="docs/#BOARD_RISK_L3_MEMO">L3 business-risk memo</a> for deciding on limited use.</li>
+            </ul>
+          </section>
+          <section>
+            <h2 class="band-sub">What Engineering Does</h2>
+            <ul class="dots">
+              <li>Builds new agents with A4 Forge, AMC's guided build, so every step has a named approver.</li>
+              <li>Runs <code>amc</code> in the folder where an agent works and connects its activity logs and rules.</li>
+              <li>Follows AMC's advice to fix weak spots, then scores again.</li>
+              <li>Exports reports, audit files, and build checks that block a release until it passes.</li>
+            </ul>
+          </section>
+          <section>
+            <h2 class="band-sub">What Changes</h2>
+            <ul class="dots">
+              <li>What a vendor says is kept apart from what the agent was seen doing.</li>
+              <li>Accepted risks become tracked tasks, not meeting notes.</li>
+              <li>An agent gets more freedom only when its record supports it.</li>
+              <li>Compliance teams get records they can check again, not screenshots.</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="band band-alt">
+      <div class="wrap">
+        <header class="band-head">
+          <h2>When your team builds a new agent</h2>
+          <p>A4 Forge, a preview that is on by default, takes one agent through four steps. No step moves on until the people your team names approve it, and every step is written to a signed record.</p>
+        </header>
+        <ol class="how">
+          <li><strong>Say what it is for.</strong> The brief: the problem, who it serves, what it must never do, how risky the work is.</li>
+          <li><strong>Build it.</strong> Two people, neither of whom built it, approve the result.</li>
+          <li><strong>Fit it to your rules.</strong> Two people other than the one who asks approve it, each a workspace owner or auditor.</li>
+          <li><strong>Release it.</strong> AMC prepares a signed release package and your operator deploys it.</li>
+        </ol>
+        <p class="band-more">A second approver in your own workspace keeps duties apart; it is not an independent review. No A4 record says an agent is safe, correct or lawful. <a href="a4.html">How A4 Forge works</a></p>
+      </div>
+    </section>
+
+    <section class="band">
+      <div class="wrap">
+        <header class="band-head">
+          <h2>From first score to a record you can show the board<span class="accent">_</span></h2>
+        </header>
+        <ol class="how">
+          <li><strong>Inventory.</strong> List your agents, their owners, their tools, the data they can reach, and what they may do alone.</li>
+          <li><strong>Score.</strong> Run the default questions. Answers backed by a record count for more than claims.</li>
+          <li><strong>Fix.</strong> Rank the gaps by risk, compliance impact, and effort.</li>
+          <li><strong>Govern.</strong> Use reports, audit files, and release checks to keep each agent within what you approved.</li>
+        </ol>
+      </div>
+    </section>
   </main>
-  <script src="script.js?v=12"></script>
+
+  <footer class="footer">
+    <div class="footer-inner wrap">
+      <div class="footer-top">
+        <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p></div>
+        <div class="footer-col"><h3>Product</h3><a href="./#a4-forge">Build an agent</a><a href="./#capabilities">Run it</a><a href="./#paths">Already have an agent?</a><a href="./#install">Get AMC</a><a href="./#desktop">macOS app</a><a href="./#products">Eight tools</a><a href="executive.html">Executives</a><a href="playground.html">Playground</a><a href="docs/index.html">Documentation</a></div>
+        <div class="footer-col"><h3>Depth</h3><a href="a4.html">A4 Forge</a><a href="methodology.html">Approach and research</a><a href="compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="./#pricing">Price</a><a href="./#faq">FAQ</a></div>
+        <div class="footer-col"><h3>Industry Packs</h3><a href="./#domains">All packs</a><a href="station-environment.html">Environment</a><a href="station-health.html">Health</a><a href="station-wealth.html">Wealth</a><a href="station-education.html">Education</a><a href="station-mobility.html">Mobility</a><a href="station-technology.html">Technology</a><a href="station-governance.html">Governance</a></div>
+        <div class="footer-col"><h3>Code</h3><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="accessibility.html">Accessibility</a></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
+    </div>
+  </footer>
+
+  <script src="script.js?v=13"></script>
+  <script src="home.js?v=3"></script>
 </body>
 </html>

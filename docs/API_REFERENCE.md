@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-11-14
+> Auto-generated from source on 2026-11-15
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@ AMC provides 1,304 public CLI command paths in the live command inventory.
 
 | # | Command | Description |
 |---|---------|-------------|
-| 1 | `amc a4` | A4 Forge (preview, AMC_A4_PREVIEW=1): projects, gates, releases and deployments, through the API's own routes |
+| 1 | `amc a4` | A4 Forge (preview, on by default; AMC_A4_PREVIEW=0 turns it off): projects, gates, releases and deployments, through the API's own routes |
 | 2 | `amc a4 approve` | Approve an A4 gate you reviewed (bound to its digests) |
 | 3 | `amc a4 complete` | Consume an approved gate and run the effect it starts (the API's complete) |
 | 4 | `amc a4 deny` | Deny an A4 gate you reviewed (bound to its digests) |
@@ -221,7 +221,7 @@ AMC provides 1,304 public CLI command paths in the live command inventory.
 | 202 | `amc bootstrap` | Bootstrap workspace for production deployment (non-interactive) |
 | 203 | `amc budgets` | Signed autonomy and usage budgets |
 | 204 | `amc budgets init` | - |
-| 205 | `amc budgets reset` | - |
+| 205 | `amc budgets reset` | Record a budget-day reset (it does not restore allowance), or accept earlier unknown model usage |
 | 206 | `amc budgets sign` | Validate and sign the existing reviewed budget limits without changing the policy |
 | 207 | `amc budgets status` | - |
 | 208 | `amc budgets verify` | - |
@@ -1288,7 +1288,7 @@ AMC provides 1,304 public CLI command paths in the live command inventory.
 | 1269 | `amc vault scrub` | Scrub metadata from a file |
 | 1270 | `amc vault secret-share` | Split a secret into shares using Shamir's Secret Sharing |
 | 1271 | `amc vault status` | Show vault status |
-| 1272 | `amc vault unlock` | Unlock vault into memory for signing operations |
+| 1272 | `amc vault unlock` | Check the vault passphrase (the vault stays unlocked only while this command runs) |
 | 1273 | `amc vault zk-commit` | Create a Pedersen commitment to a value |
 | 1274 | `amc vault zk-range-proof` | Create a range commitment for an AMC score threshold (NOT a zero-knowledge proof; unsound, does not verify) |
 | 1275 | `amc vault zk-verify` | Check a range commitment (NOT a zero-knowledge verification; unsound) |
@@ -2843,13 +2843,14 @@ Bootstrap workspace for production deployment (non-interactive)
 
 #### `amc budgets reset`
 
--
+Record a budget-day reset (it does not restore allowance), or accept earlier unknown model usage
 
 
 | Option | Description |
 |--------|-------------|
 | `--agent <agentId>` | - |
 | `--day <yyyy-mm-dd>` | - |
+| `--accept-unknown` | - |
 
 #### `amc budgets sign`
 
@@ -9920,6 +9921,7 @@ Show a session's projected conversation and its event spine
 | Option | Description |
 |--------|-------------|
 | `--json` | - |
+| `--spine` | - |
 | `--limit <rows>` | - |
 | `--cursor <cursor>` | - |
 

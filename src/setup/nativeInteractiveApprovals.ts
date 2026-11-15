@@ -1,7 +1,13 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { resolve } from "node:path";
+import { approvalRequestBindingDigest } from "../approvals/approvalChainStore.js";
 import { getApprovalInboxItem, type ApprovalInboxItem } from "../approvals/approvalInbox.js";
+import { approvalRuleForAction, loadApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
+import { terminalApproverAllowed } from "../approvals/approvalQuorum.js";
+import { cliInitiator, decideApprovalForIntent } from "../approvals/approvalEngine.js";
+import { interactiveOperator } from "../vault/operatorContext.js";
 import { readNativeApprovalActor } from "./nativeApprovalIdentity.js";
+import { callMatchesRequest, describeReportedCall, parseReportedCall, type ReportedCall } from "./nativeApprovalPreview.js";
 
 export interface NativeApprovalPromptOptions {
   readonly child: ChildProcess; readonly workspace: string; readonly entry: string;
@@ -9,11 +15,17 @@ export interface NativeApprovalPromptOptions {
   readonly agentId?: string;
   /** The parent should cancel its readline question when this signal aborts. */
   readonly question: (prompt: string, signal?: AbortSignal) => Promise<string | null>;
+  /** An approval's y or n typed after the prompt, then Enter; null for anything else (Esc, Ctrl-C, a paste, a closed terminal). Falls back to `question`. */
+  readonly answer?: (prompt: string, signal: AbortSignal) => Promise<string | null>;
+  /** Opens the vault in this process before a terminal decision is signed, when chat holds its passphrase. */
+  readonly unlockVault?: () => void;
   readonly log: (line: string) => void; readonly error: (line: string) => void;
 }
 interface Raised {
   readonly type: "amc/native-approval-raised"; readonly v: 1;
   readonly agentId: string; readonly approvalId: string; readonly approvalRequestId: string;
+  /** The call's own arguments as the run reported them; shown only once they match the signed request's digest. */
+  readonly call?: unknown;
 }
 function raised(value: unknown, agentId: string): value is Raised {
   if (value === null || typeof value !== "object") return false;
@@ -21,6 +33,31 @@ function raised(value: unknown, agentId: string): value is Raised {
   return item.type === "amc/native-approval-raised" && item.v === 1 && item.agentId === agentId
     && typeof item.approvalId === "string" && /^apr_[a-f0-9-]{36}$/.test(item.approvalId)
     && typeof item.approvalRequestId === "string" && /^apprreq_[a-f0-9]{32}$/.test(item.approvalRequestId);
+}
+/**
+ * Whether the person at this terminal may decide the request alone: the call it would run was shown in full (its
+ * arguments match the signed request and no argument was cut short or left out), the request's own rule and the signed policy's rule now both allow one local approver, and this
+ * process is an interactive operator. The engine checks the rules and the operator again when it records the decision.
+ */
+function terminalMayDecide(workspace: string, item: ApprovalInboxItem, shown: boolean): boolean {
+  if (!shown || !interactiveOperator({ workspace }).ok || !terminalApproverAllowed(item.request)) return false;
+  try { return terminalApproverAllowed(approvalRuleForAction(loadApprovalPolicy(workspace), item.request.actionClass)); }
+  catch { return false; }
+}
+const ROLE_WORDS: Record<string, string> = { OWNER: "an owner", APPROVER: "an approver", AUDITOR: "an auditor", OPERATOR: "an operator", VIEWER: "a viewer", AGENT: "an agent" };
+type CallView = ReturnType<typeof describeReportedCall>;
+/** The request in a few plain lines: what the call would do (or why it cannot be shown), and what the approval needs. */
+function describeAsk(item: ApprovalInboxItem, call: ReportedCall | null, what: CallView | null): string[] {
+  const request = item.request;
+  const needs = request.requiredApprovals <= 1 ? "one approval" : `${request.requiredApprovals} approvals`;
+  return [
+    what === null ? `The agent wants to use the tool "${request.toolName}".` : `The agent wants to: ${what.title}`,
+    ...(what === null
+      ? [call === null ? "  AMC cannot show this call here: the run did not send its arguments." : "  AMC cannot show this call here: the arguments sent do not match the signed request."]
+      : [...what.lines.map(line => `  ${line}`), ...(what.complete ? [] : ["  Part of this call is not shown here, so it cannot be allowed from this terminal alone."])]),
+    `Needs ${needs} from ${request.rolesAllowed.map(role => ROLE_WORDS[role] ?? role.toLowerCase()).join(" or ")}${request.requireDistinctUsers ? ", each a different person who did not start this chat" : ""}. ` +
+      `Kind: ${request.actionClass}, risk ${request.riskTier}${request.effectiveMode === "SIMULATE" ? "; if allowed it is only simulated" : ""}. Asks until ${new Date(request.expiresTs).toLocaleTimeString()}. Request ${request.approvalRequestId}.`
+  ];
 }
 function loadPending(workspace: string, event: Raised): ApprovalInboxItem {
   const item = getApprovalInboxItem({ workspace, agentId: event.agentId, approvalRequestId: event.approvalRequestId });
@@ -92,6 +129,26 @@ export function createNativeInteractiveApprovals(options: NativeApprovalPromptOp
       });
     });
   };
+  /** y then Enter at this terminal allows this one call, n refuses it, anything else stops the turn. Signed in this process. */
+  const decideHere = async (event: Raised, item: ApprovalInboxItem, signal: AbortSignal): Promise<void> => {
+    const prompt = "Allow this once? Type y (yes) or n (no), then Enter; anything else stops this turn: ";
+    const answer = options.answer === undefined ? await ask(prompt, signal) : closed || cancelled || signal.aborted ? null : await options.answer(prompt, signal).catch(() => null);
+    if (closed || cancelled || channelLost) return;
+    const word = (answer ?? "").trim().toLowerCase();
+    const decision = word === "y" || word === "yes" ? "APPROVED" : word === "n" || word === "no" ? "DENIED" : null;
+    if (decision === null || signal.aborted) { options.log("Stopping this turn; nothing was allowed."); cancelTurn(); return; }
+    const current = loadPending(workspace, event);
+    if (current.status !== "PENDING" || current.requestDigestSha256 !== item.requestDigestSha256) throw new Error("The approval changed while you were reviewing it; no decision recorded");
+    options.unlockVault?.();
+    const account = cliInitiator();
+    const result = decideApprovalForIntent({ workspace, agentId: item.request.agentId, approvalId: item.request.approvalRequestId,
+      decision, mode: item.request.effectiveMode, reviewerAuthentication: "terminal", username: account, userId: account, userRoles: ["OWNER"],
+      expectedRequestDigestSha256: approvalRequestBindingDigest(item.request),
+      reason: `${decision === "APPROVED" ? "Allowed" : "Refused"} by typing at the interactive chat terminal of OS account ${account}; nobody signed in.` });
+    options.log(decision === "APPROVED"
+      ? `Allowed once. Recorded as approved at this terminal by ${account} (no sign-in); it covers only this call.${result.approval.status === "PENDING" ? " More approval is still needed." : ""}`
+      : "Refused. Recorded at this terminal; the agent is told no and the turn goes on.");
+  };
   const handle = async (event: Raised): Promise<void> => {
     if (closed || cancelled || channelLost) return;
     const item = loadPending(workspace, event);
@@ -100,12 +157,14 @@ export function createNativeInteractiveApprovals(options: NativeApprovalPromptOp
     const expiry = setTimeout(() => controller.abort(), Math.max(0, Math.min(2_147_483_647, item.request.expiresTs - Date.now())));
     try {
       const request = item.request;
-      options.log("Actual signed approval request:\n" + JSON.stringify({ approvalRequestId: request.approvalRequestId,
-        requestDigestSha256: item.requestDigestSha256, tool: request.toolName, actionClass: request.actionClass,
-        riskTier: request.riskTier, requestedMode: request.requestedMode, effectiveMode: request.effectiveMode,
-        quorum: item.quorum, rolesAllowed: request.rolesAllowed, expiresAt: new Date(request.expiresTs).toISOString(),
-        boundHashes: request.boundHashes }, null, 2));
-      options.log("The inbox binds tool arguments by digest; it does not store their text. Cancel if you cannot establish the intended scope from the recorded task.");
+      const call = event.call === undefined ? null : parseReportedCall(event.call);
+      const what = call !== null && callMatchesRequest(workspace, request, call) ? describeReportedCall(workspace, call) : null;
+      const shown = what !== null && what.complete;
+      options.log(describeAsk(item, call, what).join("\n"));
+      if (terminalMayDecide(workspace, item, shown)) { await decideHere(event, item, controller.signal); return; }
+      options.log(shown
+        ? "This approval needs a signed-in reviewer: type approve, deny or cancel, then give a sign-in file from `amc approvals login`."
+        : "Only a signed-in reviewer can allow a call this terminal cannot show in full: type approve (then give a sign-in file from `amc approvals login`), deny, or cancel.");
       const choice = await ask("Approval: approve, deny, or cancel this turn (no default): ", controller.signal);
       if (closed || cancelled || channelLost) return;
       if (choice === null || choice.trim().toLowerCase() === "cancel") { cancelTurn(); return; }
@@ -136,7 +195,8 @@ export function createNativeInteractiveApprovals(options: NativeApprovalPromptOp
       const kind = decision === "deny" ? "DENY" : request.effectiveMode === "EXECUTE" ? "APPROVE_EXECUTE" : "APPROVE_SIMULATE";
       const signed = after.decisions.find(row => !item.decisions.some(old => old.approvalDecisionId === row.approvalDecisionId)
         && row.userId === actor.userId && row.username === actor.username && row.decision === kind
-        && row.requestDigestSha256 === item.requestDigestSha256);
+        // The CLI binds a decision to the engine's binding digest (initiator left out), so either digest names this request.
+        && (row.requestDigestSha256 === item.requestDigestSha256 || row.requestDigestSha256 === approvalRequestBindingDigest(item.request)));
       if (!completed || !signed) {
         options.error(signed ? "The decision is recorded, but its command did not complete cleanly. No retry was sent; inspect approval delivery." : "No matching signed decision was confirmed. No approval or successful execution is claimed.");
         cancelTurn(); return;

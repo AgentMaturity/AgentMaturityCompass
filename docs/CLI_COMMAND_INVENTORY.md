@@ -4,7 +4,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 
 | Command | Description | Options | Aliases |
 |---|---|---|---|
-| `amc a4` | A4 Forge (preview, AMC_A4_PREVIEW=1): projects, gates, releases and deployments, through the API's own routes | - | - |
+| `amc a4` | A4 Forge (preview, on by default; AMC_A4_PREVIEW=0 turns it off): projects, gates, releases and deployments, through the API's own routes | - | - |
 | `amc a4 approve` | Approve an A4 gate you reviewed (bound to its digests) | `--json`<br>`--session-token-file <file>`<br>`--request-id <id>`<br>`--gate <gateId>`<br>`--reason <text>`<br>`--expect-binding-digest <sha256>`<br>`--expect-gate-seq <n>`<br>`--expect-readiness-digest <sha256>` | - |
 | `amc a4 complete` | Consume an approved gate and run the effect it starts (the API's complete) | `--json`<br>`--session-token-file <file>`<br>`--request-id <id>`<br>`--expect-head-seq <n>`<br>`--stage <stage>`<br>`--gate <gateId>` | - |
 | `amc a4 deny` | Deny an A4 gate you reviewed (bound to its digests) | `--json`<br>`--session-token-file <file>`<br>`--request-id <id>`<br>`--gate <gateId>`<br>`--reason <text>`<br>`--expect-binding-digest <sha256>`<br>`--expect-gate-seq <n>`<br>`--expect-readiness-digest <sha256>` | - |
@@ -208,7 +208,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc bootstrap` | Bootstrap workspace for production deployment (non-interactive) | `--workspace <path>` | - |
 | `amc budgets` | Signed autonomy and usage budgets | - | - |
 | `amc budgets init` | - | `--agent <agentId>` | - |
-| `amc budgets reset` | - | `--agent <agentId>`<br>`--day <yyyy-mm-dd>` | - |
+| `amc budgets reset` | Record a budget-day reset (it does not restore allowance), or accept earlier unknown model usage | `--agent <agentId>`<br>`--day <yyyy-mm-dd>`<br>`--accept-unknown` | - |
 | `amc budgets sign` | Validate and sign the existing reviewed budget limits without changing the policy | `--json` | - |
 | `amc budgets status` | - | `--agent <agentId>` | - |
 | `amc budgets verify` | - | - | - |
@@ -1103,7 +1103,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc session proof` | Export a session's inclusion proof (verifiable offline, without this workspace) | `--out <path>` | - |
 | `amc session recover` | Recover a crashed session by appending synthetic closers under a fenced claim (append-only) | `--force`<br>`--close`<br>`--stale-after <ms>`<br>`--json` | - |
 | `amc session replay-request` | Rebuild each request this session sent from its signed rows and check it against the recorded digest | `--json`<br>`--out <path>` | - |
-| `amc session show` | Show a session's projected conversation and its event spine | `--json`<br>`--limit <rows>`<br>`--cursor <cursor>` | - |
+| `amc session show` | Show a session's projected conversation and its event spine | `--json`<br>`--spine`<br>`--limit <rows>`<br>`--cursor <cursor>` | - |
 | `amc session spill-read` | Read a bounded byte range of retained output against its signed origin | `--workspace <path>`<br>`--offset <bytes>`<br>`--limit <bytes>`<br>`--expect-monitor <sha256>`<br>`--json` | - |
 | `amc session verify` | Verify the ledger and report per-session lifecycle verdicts (open / released / interrupted / closed) | `--json`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unanchored` | - |
 | `amc session verify-export` | Verify an exported session offline against a pinned monitor key fingerprint | `--accept-unverifiable-content`<br>`--json`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unanchored` | - |
@@ -1275,7 +1275,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc vault scrub` | Scrub metadata from a file | `--json` | - |
 | `amc vault secret-share` | Split a secret into shares using Shamir's Secret Sharing | `--secret <value>`<br>`--shares <n>`<br>`--threshold <k>` | - |
 | `amc vault status` | Show vault status | - | - |
-| `amc vault unlock` | Unlock vault into memory for signing operations | - | - |
+| `amc vault unlock` | Check the vault passphrase (the vault stays unlocked only while this command runs) | - | - |
 | `amc vault zk-commit` | Create a Pedersen commitment to a value | `--value <n>` | - |
 | `amc vault zk-range-proof` | Create a range commitment for an AMC score threshold (NOT a zero-knowledge proof; unsound, does not verify) | `--value <n>`<br>`--threshold <n>`<br>`--agent <id>` | - |
 | `amc vault zk-verify` | Check a range commitment (NOT a zero-knowledge verification; unsound) | - | - |

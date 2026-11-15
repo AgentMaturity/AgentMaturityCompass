@@ -6,6 +6,13 @@ export type LiveTextPreviewEvent = {
   readonly trust: "provisional";
 } & ({ readonly kind: "text"; readonly text: string } | { readonly kind: "end"; readonly truncated: boolean });
 
+/**
+ * Chat sets LIVE_FRAME_ENV=1 on its turn child, which then starts the live reply's header and end lines with LIVE_FRAME.
+ * `clean` below strips that byte from every piece of model text, so a reply can never write a line chat reads as AMC's own.
+ */
+export const LIVE_FRAME_ENV = "AMC_CHAT_LIVE_FRAME";
+export const LIVE_FRAME = "\x1e";
+
 /** Presentation only. It never dispatches tools or supplies committed request history. */
 export class LiveTextPreview {
   private buffer = "";

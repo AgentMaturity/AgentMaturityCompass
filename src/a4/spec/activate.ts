@@ -73,7 +73,7 @@ export function effectUnsettled(chain: readonly A4ChainLink[], match: (body: Rec
 }
 const STAGING_LEASE_TTL_MS = 24 * 60 * 60 * 1000;
 /** No unauthenticated digest source exists at a destination until P2-40 (D-18 option 1). */
-export const IDENTITY_NOT_EVALUATED = "no unauthenticated digest source at the destination (P2-40)";
+export const IDENTITY_NOT_EVALUATED = "AMC cannot yet confirm which build runs where it is deployed: the destination offers no source of the release's digest that AMC can check";
 /** Why the prepared files pin the image by tag (IMAGE_TAG_ONLY): AMC holds no digest to pin, whatever the chart supports. */
 export const IMAGE_TAG_ONLY_REASON = "the bootstrap report records no digest of the image this Studio runs, so the prepared files pin it by tag";
 /**
@@ -263,6 +263,11 @@ function packageInputsItem(state: A4ReadinessState, spec: Record<string, unknown
  * v1 is a same-host restart (D-18): the overlay restarts the hosted Studio that built the agent, so a release needs this
  * Studio to run under the chosen target (as Understand found it). Anything else has no v1 deployment path (P2-40).
  */
+/** How a laptop user reaches a Studio that can record a deployment, with the steps deploy/compose/README.md gives. */
+export const COMPOSE_STEPS = "To release and deploy, run AMC under Docker Compose and create the project there: in the AMC source folder, "
+  + "`cd deploy/compose`, `cp .env.example .env`, create the secret files its README lists under `deploy/compose/secrets/`, then "
+  + "`docker compose up -d --build` and open http://localhost:3212/console. A project built here does not move there by itself.";
+
 function sameHostItem(facts: Record<string, unknown> | null, target: string | null): A4ReadinessItem {
   const hosting = (facts?.hosting ?? null) as { kind?: unknown; signal?: unknown } | null;
   if (hosting === null) return waiting("deployment.same_host", ["PRODUCED_AT_UNDERSTAND"]);
@@ -270,10 +275,9 @@ function sameHostItem(facts: Record<string, unknown> | null, target: string | nu
   if (hosting.kind === target) return item("deployment.same_host", "READY", { reasonCodes: ["SAME_HOST_RESTART", `HOSTED:${target}`] });
   return item("deployment.same_host", "BLOCKED", { kind: "unsupported_integration", reasonCodes: ["DEPLOYMENT_NOT_SAME_HOST", "KEY:P2-40",
     `HOSTED:${typeof hosting.kind === "string" ? hosting.kind : "none"}`, `TARGET:${target}`],
-  nextAction: { label: "This is where the A4 preview stops today on this Studio. v1 deploys only by restarting the Compose or Helm-hosted Studio that "
-    + "built this agent, and this Studio is not hosted under that target, so no release can be requested here. What you have: the signed records of "
-    + "Aspire, Assemble and Adapt, and your Activate answers. To go on, run this workspace's Studio under the chosen target (Compose or Helm); "
-    + "installing a package into another workspace is P2-40." } });
+  nextAction: { label: "This AMC cannot release this agent: AMC deploys an agent only by restarting the AMC that built it, and that AMC must run "
+    + `under the target you chose (${target === "helm" ? "Helm" : "Docker Compose"}). This one does not. You keep the signed records of the first three `
+    + `steps and your answers here. ${target === "helm" ? "To go on, run this workspace's AMC under Helm and continue there." : COMPOSE_STEPS}` } });
 }
 
 /**
@@ -432,7 +436,7 @@ function lifecycleItem(state: A4ReadinessState, releaseId: string | null): A4Rea
   if (releaseId === null) return waiting("lifecycle.production_controls", ["NO_RELEASE"], { mandatory: false, section: "governance" });
   return missing.length === 0 ? item("lifecycle.production_controls", "READY", { mandatory: false, section: "governance" })
     : waiting("lifecycle.production_controls", missing.map((id) => `CONTROL_NOT_EVALUATED:${id}`), { mandatory: false, section: "governance", kind: "not_evaluated",
-      nextAction: { label: "The deployment approval may proceed; the lifecycle stays at staging until every production control has evidence (two need P2-40)" } });
+      nextAction: { label: "The deployment approval may proceed; the lifecycle stays at staging until every production control has evidence (two cannot have it yet: AMC cannot yet confirm which build runs where it is deployed)" } });
 }
 
 /**

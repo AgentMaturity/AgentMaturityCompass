@@ -3,187 +3,65 @@
 // Every call goes through apiNativeRequest. Studio re-checks every action: a disabled button is a convenience only.
 import { apiGet, apiNativeRequest, logout, onClaims, whoami } from "./api.js";
 import { installClaimStrip } from "./components/claimBadge.js";
+import { topbarHtml } from "./shell.js";
 import { renderHandholdingSteps } from "./components/handholdingSteps.js";
-import { definiteNativeSubmissionRefusal } from "./nativeTaskSubmission.js";
 import { stageAction, stageCards } from "./a4Cards.js";
 import * as view from "./a4View.js";
 import * as start from "./a4Start.js";
 import * as packs from "./a4Pack.js";
+import { approvalWaiting, canCreate } from "./a4Who.js";
 import { register as registerAspire } from "./a4Aspire.js";
 import { register as registerAssemble } from "./a4Assemble.js";
 import { register as registerAdapt } from "./a4Adapt.js";
 import { register as registerActivate } from "./a4Activate.js";
+import { API, claimSink, errorText, guarded, listOf, me, notice, one, params, previewOptions, root, send, setClaimSink, setMe, setShowClaims,
+  showClaims, showError, storePack, storedPack, tell, uuid } from "./a4Send.js";
+import { bindCreateForm, renderListPage } from "./a4ListPage.js";
 
-const API = "/api/v1/a4";
 const page = document.body.dataset.page;
-const root = document.getElementById("app");
-const notice = document.getElementById("a4Notice");
-const params = new URLSearchParams(location.search);
 const isObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
-const listOf = (data, key) => (Array.isArray(data) ? data : Array.isArray(data?.[key]) ? data[key] : []);
-const one = (data, key) => (isObject(data?.[key]) ? data[key] : data);
 for (const register of [registerAspire, registerAssemble, registerAdapt, registerActivate]) register();
-
-let me = null;
-// The labelled claims the responses of the page load in flight carried, and the strip's "show these instead" hook: the
-// strip shows a load's claims only once that load has rendered, so it never mixes a superseded load's labels in.
-let claimSink = null;
-let showClaims = () => {};
-let pending = null; // the unconfirmed mutation; a retry repeats its clientRequestId so Studio returns the recorded result
-let busy = false; // one write in flight at a time, so a double click cannot mint a second, non-deduplicable request id
-
-/** Runs one user-started write; a click or submit while another is in flight is ignored. */
-async function guarded(work) {
-  if (busy) return undefined;
-  busy = true;
-  root?.setAttribute("aria-busy", "true"); // a4.css dims the actions until the write and the reload after it end
-  try {
-    return await work();
-  } finally {
-    busy = false;
-    root?.removeAttribute("aria-busy");
-  }
-}
-
-function uuid() {
-  if (typeof crypto?.randomUUID !== "function") throw new Error("Open Studio over HTTPS or localhost before changing a project.");
-  return crypto.randomUUID();
-}
-
-function errorText(error) {
-  const message = error?.message ?? String(error);
-  // P1-57's error text already starts with its code; it is printed once.
-  const code = typeof error?.code === "string" && !["HTTP_ERROR", "INVALID_RESPONSE"].includes(error.code)
-    && !message.startsWith(`${error.code}:`) ? `${error.code}: ` : "";
-  return `${code}${message}`;
-}
-
-function showError(error) {
-  if (!notice || error?.name === "AbortError") return;
-  // A sentence and the next step first; Studio's code stays, in small print (a4Start.errorHtml).
-  notice.innerHTML = `${start.errorHtml(error)}${pending ? ` Studio did not confirm "${view.esc(pending.label)}".
-    Retry repeats the same request id, so Studio returns the recorded result if the first attempt was admitted. A refused
-    retry does not show that the first attempt failed: reload the page and check the project, its decisions and its
-    comments before doing it again. <button type="button" id="a4Retry">Retry</button>` : ""}`;
-}
-
-function tell(message) {
-  if (notice) notice.textContent = message;
-}
-
-/**
- * POSTs one action. Only a definite refusal of a first attempt clears the unconfirmed action: a refused retry says
- * nothing about the first attempt (auth, rate and ownership checks run before Studio's idempotent lookup). While one
- * action is unconfirmed no other is sent, so a second lost acknowledgement can never go unreported.
- */
-async function send(action, retry = false) {
-  if (pending !== null && pending !== action) throw new Error("Nothing was sent.");
-  try {
-    const data = await apiNativeRequest(action.path, { method: "POST", body: action.body, nativeCsrfToken: me?.nativeCsrfToken ?? undefined });
-    pending = null;
-    tell("");
-    return data;
-  } catch (error) {
-    const refused = (error?.code === "NATIVE_CSRF_REQUIRED" && !retry) || definiteNativeSubmissionRefusal(error, retry);
-    pending = refused ? null : action;
-    throw error;
-  }
-}
-
-notice?.addEventListener("click", (event) => {
-  if (event.target.id !== "a4Retry" || !pending) return;
-  const action = pending;
-  void guarded(async () => action.after?.(await send(action, true))).catch(showError);
-});
 
 /** The head a transition response names (its seq, or a head it returns); null when Studio named none. */
 const headSeqOf = (data) => [data?.seq, data?.headSeq, data?.head?.headSeq, data?.project?.headSeq].find(Number.isSafeInteger) ?? null;
 
 /**
- * The preview gate: null only for the gate's own refusal, or for a 404 that carries no code (a Studio without the A4
- * router, where the preview cannot be on). A4_ROUTE_NOT_FOUND and every other error is an error, not "not enabled".
+ * Home's first card (a4Start.homeCardHtml): build an agent, or continue the latest project. It is filled only when the
+ * preview answers and this person may create projects; the demo workspace gets a short note instead. The nav link is
+ * shown by default and hidden here when Studio reports the preview off.
  */
-async function previewOptions() {
-  try {
-    return await apiNativeRequest(`${API}/options`);
-  } catch (error) {
-    if (error?.code === "A4_PREVIEW_DISABLED" || (error?.status === 404 && error?.code === "HTTP_ERROR")) return null;
-    throw error;
-  }
-}
-
-/**
- * Studio's role check answers 403 with no A4 code to anyone else, which the page cannot tell from a lost acknowledgement,
- * so the create form and the home card are offered only to OPERATOR or OWNER in a workspace Studio reports writable.
- */
-const canCreate = (who, options) => Array.isArray(who?.roles) && who.roles.some((role) => role === "OPERATOR" || role === "OWNER")
-  && options?.workspace?.readOnly === false;
-
-/** Home: the card and the nav link exist only when the preview answers; the card only while no project exists. */
 async function showHomeEntry() {
+  const card = document.getElementById("a4HomeCard");
   try {
     // Studio refuses every A4 route to the local demo session (DEMO_REFUSED, 403), so Home does not ask on each load.
     const who = await whoami();
-    if (who?.userId === "local-demo") return;
+    if (who?.userId === "local-demo") {
+      if (card) { card.innerHTML = start.homeCardHtml({ demo: true }); card.hidden = false; }
+      return;
+    }
     const options = await previewOptions();
-    if (!options) return;
-    document.getElementById("a4NavLink")?.removeAttribute("hidden");
-    if (!canCreate(who, options)) return;
+    if (!options) {
+      document.getElementById("a4NavLink")?.setAttribute("hidden", "");
+      return;
+    }
+    setMe(who);
     const projects = listOf(await apiNativeRequest(`${API}/projects`), "projects");
-    document.getElementById("a4HomeCard")?.toggleAttribute("hidden", projects.length > 0);
+    if (!card || (projects.length === 0 && !canCreate(who, options))) return;
+    const catalog = projects.length === 0 ? listOf(await apiGet("/industry-packs/list").catch(() => null), "packs") : [];
+    const waiting = await approvalWaiting(projects, who, apiNativeRequest, API);
+    card.innerHTML = start.homeCardHtml({ projects, waiting, industryHtml: packs.packSelectHtml(catalog, null), start: options.workspace?.start ?? null });
+    card.hidden = false;
+    bindCreateForm(card.querySelector("#a4HomeForm"));
   } catch {
-    // Signed out, unreachable or refused: the entry stays absent, which is the preview gate's closed state.
+    // Signed out, unreachable or refused: the card stays absent, which is the preview gate's closed state.
   }
-}
-
-async function renderListPage(options) {
-  claimSink = [];
-  const projects = listOf(await apiNativeRequest(`${API}/projects`), "projects");
-  showClaims(claimSink);
-  claimSink = null;
-  // The Industry Pack catalog is optional here: without it the form simply has no industry choice.
-  const catalog = canCreate(me, options) ? listOf(await apiGet("/industry-packs/list").catch(() => null), "packs") : [];
-  root.innerHTML = `${start.renderIntro()}${canCreate(me, options) ? view.renderCreateForm(params.has("new") || projects.length === 0,
-    packs.packSelectHtml(catalog, packs.packIdOf(params.get("pack"))))
-    : `<p class="muted">${view.CREATE_NEEDS}.</p>`}${view.renderProjectList(projects)}`;
-  const createForm = root.querySelector("#a4CreateForm");
-  const formError = (text) => {
-    const target = createForm?.querySelector(".a4-form-error");
-    if (target) { target.textContent = text; target.hidden = !text; }
-  };
-  root.querySelector("[data-a4-example-project]")?.addEventListener("click", () => {
-    createForm.elements.name.value = start.SAMPLE_PROJECT.name;
-    createForm.elements.expertise.value = start.SAMPLE_PROJECT.expertise;
-    formError("");
-    createForm.elements.name.focus();
-  });
-  createForm?.addEventListener("submit", (event) => {
-    event.preventDefault();
-    void guarded(async () => {
-      const form = new FormData(event.target);
-      const agentId = String(form.get("agentId") ?? "").trim();
-      const name = String(form.get("name") ?? "").trim();
-      // Inline validation in sentences, before anything is sent.
-      if (!name) { formError("Write a project name, for example Invoice triage helper. Nothing was sent."); createForm.elements.name.focus(); return; }
-      if (agentId && !/^[a-z0-9][a-z0-9_-]{0,127}$/.test(agentId)) {
-        formError("The agent id uses lowercase letters, digits, _ and -, and starts with a letter or digit (for example invoice-helper). Leave it empty for a new agent. Nothing was sent.");
-        createForm.elements.agentId.focus();
-        return;
-      }
-      formError("");
-      const action = { label: "Start an agent project", path: `${API}/projects`,
-        body: { clientRequestId: uuid(), name, expertise: form.get("expertise"), ...(agentId ? { agentId } : {}) } };
-      const pack = packs.packIdOf(form.get("pack"));
-      action.after = (data) => { location.href = `./a4Project?project=${encodeURIComponent(one(data, "project").projectId)}${pack ? `&pack=${pack}` : ""}`; };
-      action.after(await send(action));
-    }).catch(showError);
-  });
 }
 
 function mountProject(projectId, options) {
   const projectPath = (sub) => `${API}/projects/${encodeURIComponent(projectId)}${sub}`;
   const state = { project: null, readiness: null, gates: [], revision: null, stageRevision: null, comments: [], members: null, diff: null, refs: [], options };
   let stage = null, activeCard = params.get("card") || "specification", cursor = 0, timer = null;
+  const invited = []; // what each Add a person answered on this page (first passwords included), never stored
   let loading = null, loadAgain = false;
   let presence = [], presenceError = "", conflict = null, specBase = null;
   // The gate and readiness digest the approvals bar first showed. Polls re-render the bar, so a decision binds these,
@@ -194,7 +72,9 @@ function mountProject(projectId, options) {
   let reflection = null, explanation = null;
   const drafts = new Map();
   // ?pack= starts Aspire from an Industry Pack: its suggestions fill empty answers once, on the page only (a4Pack.js).
-  const startPackId = packs.packIdOf(params.get("pack"));
+  // The pack chosen at the start stays with the project in this browser (A4-09), not only in the address.
+  const startPackId = packs.packIdOf(params.get("pack")) ?? packs.packIdOf(storedPack(projectId));
+  if (packs.packIdOf(params.get("pack"))) storePack(projectId, packs.packIdOf(params.get("pack")));
   let startPack = null, packFilled = null, packFilledAt = null;
   // Save answers binds the head the first answer edit began on, and each edited answer remembers Studio's value then:
   // a poll that shows another member's change to one of them holds Save instead of overwriting it.
@@ -264,7 +144,7 @@ function mountProject(projectId, options) {
         } while (loadAgain);
       } finally {
         loading = null;
-        claimSink = null;
+        setClaimSink(null);
       }
     })();
     return loading;
@@ -275,7 +155,7 @@ function mountProject(projectId, options) {
     // revision's gate under another revision's specification. Read again until they agree, three times at most; a view
     // that still disagrees is shown, but its gate is never pinned and deciding stays disabled (pinnable, the bar).
     for (let attempt = 1; ; attempt += 1) {
-      claimSink = [];
+      setClaimSink([]);
       const read = await readProject();
       if (view.oneRevision(read.project, read.revision, read.gates, read.readiness) || attempt === 3) {
         // A statement binds the head it was recorded at: once a later revision or another stage supersedes it, Confirm could
@@ -340,17 +220,18 @@ function mountProject(projectId, options) {
     const shown = shownReview();
     const gateChange = view.boundReview(shown) && reviewed && !view.sameReview(reviewed, shown) ? { from: reviewed, to: shown } : null;
     const ctx = { ...state, stage, allowed: readiness.allowed, me, gateChange, reflection, explanation, answerDrift: answerDrift(), specDraft: specBase !== null,
-      questions: listOf(state.options?.questions?.[stage], "questions").map((question) => ({ ...question, example: start.placeholderOf(stage, question.id) })),
+      questions: listOf(state.options?.questions?.[stage], "questions").map((question) => ({ ...question, example: start.placeholderOf(stage, question.id),
+        ...(stage === "adapt" && Array.isArray(state.options?.catalogTerms?.[question.id]) ? { terms: state.options.catalogTerms[question.id] } : {}) })),
       answers: shownAnswers(), understandingCurrent: state.understandingCurrent, exampleOffered: start.FILLABLE.has(stage) && stage === state.project.stage };
-    root.innerHTML = `${view.holdBanner(project)}${start.renderStartHere(ctx)}${startPack && stage === "aspire" ? packs.packPanelHtml(startPack, state.project.revisionNo === packFilledAt ? packFilled ?? 0 : 0) : ""}${view.stageBanner(stage)}${conflict ? view.renderConflict(conflict) : ""}
-      <section class="card"><h3>${view.esc(project.name)}</h3><p class="muted">Agent <code>${view.esc(project.agentId)}</code> ·
-        r${view.esc(project.revisionNo)} · head ${view.esc(project.headSeq)}</p>${view.stageLinks(project, stage)}${view.movedNote(project, stage)}
+    root.innerHTML = `${view.holdBanner(project)}${view.practiceBanner(project)}${start.renderStartHere(ctx)}${startPack && stage === "aspire" ? packs.packPanelHtml(startPack, state.project.revisionNo === packFilledAt ? packFilled ?? 0 : 0) : ""}${view.stageBanner(stage)}${conflict ? view.renderConflict(conflict) : ""}
+      <section class="card"><h3 class="a4-project-name">${view.esc(project.name)}</h3><p class="muted">Agent <code>${view.esc(project.agentId)}</code> ·
+        <span title="revision ${view.esc(project.revisionNo)}, head ${view.esc(project.headSeq)}">version ${view.esc(project.revisionNo)}</span></p>${view.stageLinks(project, stage)}${view.movedNote(project, stage)}
         <p class="muted">${view.esc(readiness.claimBoundary)}</p></section>
       <details class="card" data-a4-open="steps"><summary>The eight steps of a stage</summary><div id="a4Steps"></div></details>
       <div class="a4-cards">${stageCards(stage).map((card) => view.renderCard(card, ctx, state.comments)).join("")}</div>
-      <section class="card"><h4>Differences</h4>${state.diff?.error ? `<p class="status-bad">${view.esc(state.diff.error)}</p>`
+      <section class="card"><h4>What changed since the last version</h4>${state.diff?.error ? `<p class="status-bad">${view.esc(state.diff.error)}</p>`
         : view.renderDifferences(state.diff, project)}</section>
-      <section class="card" id="a4Missing" tabindex="-1"><h4>Missing requirements</h4>${view.renderMissing(readiness, stage, (key) => view.nameOf(ctx, key))}</section>
+      <section class="card" id="a4Missing" tabindex="-1"><h4>What this step still needs <small class="a4-code">(Missing requirements)</small></h4>${view.renderMissing(readiness, stage, (key) => view.nameOf(ctx, key))}</section>
       ${view.renderLanes(readiness, state.refs, project.revisionNo)}${view.renderApprovalsBar(ctx)}${view.renderMembers(ctx)}
       <section class="card"><h4>Here now</h4><div id="a4Presence"></div></section>`;
     renderHandholdingSteps(root.querySelector("#a4Steps"), view.stepRows(project, stage));
@@ -376,12 +257,19 @@ function mountProject(projectId, options) {
     const sections = [...root.querySelectorAll(":scope > .a4-cards > .a4-card, :scope > .a4-cards ~ :is(section, details, .a4-lanes)")];
     // A step that needs a second section too (acknowledging an item listed under Missing requirements) names it in data-a4-also.
     const also = go?.dataset.a4Also ?? null;
-    const rest = sections.filter((section) => !section.contains(target) && !section.matches(".a4-approvals") && !(also && section.matches(also)));
+    // Never folded (A4-08): the members, the answers while the step asks for them, the specification while it is under
+    // review, and the build card (its Native Tasks link) from Build to Review.
+    const step = state.project.stage === stage ? state.project.step : null;
+    const keep = [".a4-members", ...(step === "asked" ? ['[data-card="conversation"]'] : []),
+      ...(["proposed", "reviewed"].includes(step) ? ['[data-card="specification"]'] : []),
+      ...(["direction_approved", "built"].includes(step) ? ['[data-card="build"]'] : [])].join(", ");
+    const rest = sections.filter((section) => !section.contains(target) && !section.matches(".a4-approvals") && !section.matches(keep)
+      && !(also && section.matches(also)));
     if (rest.length === 0) return;
     const more = document.createElement("details");
     more.className = "card a4-more";
     more.dataset.a4Open = "more";
-    more.innerHTML = `<summary>Everything else in this stage (${rest.length} sections: later steps, records, requirements, members)</summary>
+    more.innerHTML = `<summary>Everything else in this stage (${rest.length} sections: later steps, records and requirements)</summary>
       <p class="muted">Nothing here is needed for the step above. It is all still recorded and readable.</p>`;
     root.append(more);
     more.append(...rest);
@@ -409,10 +297,11 @@ function mountProject(projectId, options) {
   }
 
   function specAction(spec, base) {
+    const changed = view.changedParts(spec, base.spec);
     return { label: "Propose this specification", path: stagePath("propose"), spec, base, clears: ["specification:spec"],
       got: () => { specBase = null; },
       // P1-57 takes no parent for a first revision (a null is refused).
-      body: { spec, ...(base.revisionNo > 0 ? { parentRevisionNo: base.revisionNo } : {}), expectedHeadSeq: base.headSeq, clientRequestId: uuid() } };
+      body: { spec: changed, ...(base.revisionNo > 0 ? { parentRevisionNo: base.revisionNo } : {}), expectedHeadSeq: base.headSeq, clientRequestId: uuid() } };
   }
 
   function parseSpec(text) {
@@ -466,12 +355,13 @@ function mountProject(projectId, options) {
     switch (name) {
       case "answers": {
         if (answerDrift()) throw new Error(`${view.ANSWER_CHANGED}. Nothing was sent.`);
-        // Only the fields the user changed: an untouched carried answer is never re-sent as the user's own statement.
+        // Only the fields the user changed: an untouched carried answer is never re-sent as the user's own statement. A field
+        // the user emptied clears its answer (sent as null, which Studio records as no answer).
         const edited = [...scope.querySelectorAll("form[data-a4-answers] textarea[name]")]
-          .filter((field) => field.value.trim() && field.value.trim() !== field.defaultValue.trim());
+          .filter((field) => field.value.trim() !== field.defaultValue.trim());
         if (edited.length === 0) throw new Error("No answer was changed. Nothing was sent.");
         return { ...post("Save answers", stagePath("answers"), { expectedHeadSeq: answerBase ?? state.project.headSeq, clientRequestId: uuid(),
-          answers: edited.map((field) => ({ questionId: field.name, value: answerValue(field) })) }, [], () => dropAnswerDrafts(card)), answers: true };
+          answers: edited.map((field) => ({ questionId: field.name, value: field.value.trim() ? answerValue(field) : null })) }, [], () => dropAnswerDrafts(card)), answers: true };
       }
       case "confirm-answer": {
         const answer = shownAnswers().find((row) => row.questionId === button.dataset.question);
@@ -527,6 +417,15 @@ function mountProject(projectId, options) {
         return post("Add member", projectPath("/members"), { principalKey: row.dataset.principal,
           projectRoles: [row.querySelector('[name="role"]').value], ...headBinding() }, [`member:${row.dataset.principal}:role`],
           () => { if (live) tell(`Member added. The open ${live.gate} approval request was superseded by the add: request it again.`); });
+      }
+      case "invite-member": {
+        const username = value("inviteUsername");
+        if (!username) throw new Error("Write their user name first. Nothing was sent.");
+        const auditor = scope.querySelector('[name="inviteAuditor"]')?.checked === true;
+        // Each person added stays listed with their first password until the page is left, so adding a second keeps the first's.
+        const link = `${location.origin}${location.pathname}?project=${encodeURIComponent(projectId)}&stage=${encodeURIComponent(stage)}`;
+        return post("Invite", projectPath("/members/invite"), { username, workspaceRoles: auditor ? ["APPROVER", "AUDITOR"] : ["APPROVER"], ...headBinding() }, [`${scope.dataset?.card ?? "page"}:inviteUsername`],
+          (data) => { invited.push(start.invitedText(data)); tell(`${invited.join(" ")} ${start.approverHowTo(link)}`); });
       }
       case "comment": {
         const body = value("comment");
@@ -655,7 +554,8 @@ function mountProject(projectId, options) {
   function goTo(go) {
     const target = root.querySelector(go.dataset.a4Go);
     if (!target) return tell("That control is not on this page yet. Reload the page.");
-    target.closest("details")?.setAttribute("open", "");
+    // Open every fold around the target, "Everything else" included, so the step never points at a hidden field (A4-08).
+    for (let fold = target.closest("details"); fold; fold = fold.parentElement?.closest("details")) fold.open = true;
     target.scrollIntoView({ block: "center", behavior: "smooth" });
     if (target.disabled) {
       target.focus();
@@ -663,6 +563,7 @@ function mountProject(projectId, options) {
     }
     target.focus({ preventScroll: true });
     if (go.hasAttribute("data-a4-press") && target.matches("button[data-a4-action]")) target.click();
+    else if (target.matches("a[href]")) target.click(); // a link the step needs (the build session on Native Tasks) is followed
   }
 
   /** Fills each empty answer field that `values` has text for; returns how many it filled. */
@@ -694,7 +595,7 @@ function mountProject(projectId, options) {
 
   /** Fills each empty answer with this stage's example, marked "(sample)" where it is free text (a4Start.EXAMPLES). */
   function useExample() {
-    const filled = fillEmptyAnswers(start.EXAMPLES[stage] ?? {});
+    const filled = fillEmptyAnswers(start.exampleFor(stage, stage === "aspire" && startPackId ? packs.PACK_FIELDS : []));
     tell(filled ? `Filled ${filled} empty answer(s) with sample text, marked (sample). Check them, change what you like, then press Save answers.`
       : "Every answer that has an example is already filled. Nothing was changed.");
   }
@@ -743,6 +644,13 @@ function mountProject(projectId, options) {
   root.addEventListener("click", (event) => {
     const go = event.target.closest?.("[data-a4-go]");
     if (go) return goTo(go);
+    if (event.target.closest?.("[data-a4-copy-link]")) {
+      const status = root.querySelector("[data-a4-copy-status]");
+      const say = (text) => { if (status) status.textContent = text; };
+      void navigator.clipboard?.writeText(location.href).then(() => say("Copied. Send it to the person who approves."),
+        () => say(`Copy unavailable. The link is ${location.href}`)) ?? say(`Copy unavailable. The link is ${location.href}`);
+      return;
+    }
     const button = event.target.closest?.("[data-a4-action],[data-a4-copy]");
     if (!button || button.disabled) return;
     if (button.dataset.a4Copy) { void navigator.clipboard?.writeText(button.dataset.a4Copy).catch(showError); return; }
@@ -779,16 +687,31 @@ function mountProject(projectId, options) {
   })();
 }
 
+/** The console's top bar on the A4 pages too (C-15): workspace, the guide, Records, a task and, signed in, Sign out. */
+function addTopbar(who) {
+  const main = document.querySelector("main");
+  if (!main || main.querySelector(".topbar")) return;
+  const bar = Object.assign(document.createElement("section"), { className: "topbar" });
+  const prefix = location.pathname.match(/^\/w\/([^/]+)\//)?.[1];
+  bar.innerHTML = topbarHtml({ workspace: prefix ? decodeURIComponent(prefix) : "local", demoMode: prefix === "demo", me: who });
+  main.insertBefore(bar, main.firstChild);
+  bar.querySelector("#signOutBtn")?.addEventListener("click", () => void logout().then(() => location.assign("./login"), showError));
+}
+
 async function main() {
   if (page === "home") return showHomeEntry();
-  const status = document.getElementById("status");
-  me = await whoami();
+  // A loading skeleton until the first render (motion.css animates [aria-busy]); every render replaces it.
+  root.setAttribute("aria-busy", "true");
+  root.innerHTML = '<section class="card skeleton" aria-label="Loading"><p class="muted">Loading…</p></section>';
+  setMe(await whoami().catch(() => null));
+  addTopbar(me);
   if (!me) {
-    status.innerHTML = 'Sign in to use agent projects. <a href="./login">Login</a>';
+    root.removeAttribute("aria-busy");
+    const next = `${page}${location.search}`;
+    root.innerHTML = `<section class="card a4-start"><h2>Sign in to build an agent</h2><p>Agent projects belong to a workspace, so sign in first.
+      You come back to this page afterwards.</p><p><a class="button" href="./login?next=${encodeURIComponent(next)}">Sign in</a></p></section>`;
     return;
   }
-  status.innerHTML = `Signed in as ${view.esc(me.username)} <button type="button" class="secondary" id="a4SignOut">Sign out</button>`;
-  status.querySelector("#a4SignOut").addEventListener("click", () => void logout().then(() => location.assign("./login"), showError));
   // The demo session is refused every A4 route (DEMO_REFUSED): say why and how to start a workspace of your own instead.
   if (me.userId === "local-demo") {
     root.innerHTML = start.demoHtml();
@@ -805,10 +728,10 @@ async function main() {
   let deliver = null;
   const strip = installClaimStrip(page, (listener) => { deliver = listener; });
   onClaims((claims) => claimSink?.push(...claims.filter((claim) => typeof claim?.claimLabel === "string")));
-  showClaims = (claims) => {
+  setShowClaims((claims) => {
     strip?.reset();
     if (claims.length > 0) deliver?.(claims);
-  };
+  });
   if (page === "a4") return renderListPage(options);
   const projectId = params.get("project");
   if (!projectId) {
@@ -818,4 +741,12 @@ async function main() {
   return mountProject(projectId, options);
 }
 
-main().catch(showError);
+// The first render (or a failure) ends the loading state; a failed load says so and offers Retry (brief item 7).
+main().catch((error) => {
+  if (root && root.querySelector(".skeleton")) {
+    root.innerHTML = `<section class="card"><h3>This page did not load</h3><p>${start.errorHtml(error)}</p>
+      <p><button type="button" data-a4-reload>Retry</button></p></section>`;
+    root.querySelector("[data-a4-reload]")?.addEventListener("click", () => location.reload());
+  }
+  showError(error);
+}).finally(() => root?.removeAttribute("aria-busy"));

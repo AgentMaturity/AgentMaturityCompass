@@ -59,6 +59,7 @@ import type { HttpTransport } from "./transport.js";
 import { assertRequestCapabilities, assertRequiredCapabilities, LlmCapabilityError } from "./providerCapabilities.js";
 import { LiveTextPreview, type LiveTextPreviewEvent } from "./liveTextPreview.js";
 import { reserveNativeModelBudget } from "../../budgets/nativeBudgetAdmission.js";
+import { connectFailureCode } from "../../utils/connectFailure.js";
 import { BudgetEvidenceIntegrityError } from "../../budgets/nativeBudgetUsage.js";
 import { bindProviderToolNames, usesProviderToolNames } from "../request/providerToolNames.js";
 import { ProviderToolBinding } from "./providerToolBinding.js";
@@ -470,7 +471,7 @@ export class LlmRuntime {
   private transportFailure(
     error: unknown,
     signal: AbortSignal | undefined
-  ): { failure: LlmFailure; kind: "error" | "aborted"; httpStatus: null; cause: string } {
+  ): { failure: LlmFailure; kind: "error" | "aborted"; httpStatus: null; cause: string; connectFailed?: string } {
     if (error instanceof EgressBlocked) {
       return { failure: { message: error.message, code: "AMC_RESIDENCY_EGRESS_BLOCKED" },
         kind: "error", httpStatus: null, cause: "residency_blocked" };
@@ -484,6 +485,8 @@ export class LlmRuntime {
       };
     }
     const normalized = normalizeLlmFailure(error);
+    // Recorded so budgets can count a connection that never opened as a request that cost nothing.
+    const connectFailed = connectFailureCode(error);
     return {
       failure:
         normalized.code === LLM_FAILURE_CODE.UNKNOWN
@@ -491,7 +494,8 @@ export class LlmRuntime {
           : normalized,
       kind: "error",
       httpStatus: null,
-      cause: "transport"
+      cause: "transport",
+      ...(connectFailed === undefined ? {} : { connectFailed })
     };
   }
 

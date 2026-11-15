@@ -1,198 +1,209 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agent Maturity Compass — Lite</title>
-<meta name="description" content="AMC watches Claude Code, Codex or your own agent at work on your machine, keeps a signed record of what it did, and scores it from that record. Lite version for slow connections.">
-<link rel="stylesheet" href="brand.css">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:var(--amc-font-sans);line-height:1.6;color:#fff;background:#0a0a0a;max-width:800px;margin:0 auto;padding:1rem}
-a{color:#4AEF79;text-decoration:underline;text-underline-offset:.18em;text-decoration-thickness:.08em}a:hover{text-decoration:underline}
-h1{font-size:1.8rem;color:#fff;margin-bottom:.5rem}
-h2{font-size:1.3rem;color:#fff;margin:2rem 0 .75rem;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:.5rem}
-h3{font-size:1rem;color:#4AEF79;margin:1rem 0 .5rem}
-p{margin-bottom:.75rem;color:#a0a0a0}
-.btn{text-decoration:none}
-.hero{text-align:center;padding:3rem 0 2rem}
-.hero p{max-width:500px;margin:0 auto .75rem}
-.btn{display:inline-block;background:#4AEF79;color:#0a0a0a;font-weight:700;padding:.6rem 1.5rem;margin:.25rem;font-size:.9rem}
-.btn-o{background:transparent;border:1px solid #4AEF79;color:#4AEF79}
-.stats{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin:1.5rem 0}
-.stat{text-align:center;min-width:100px}
-.stat b{display:block;font-size:1.5rem;color:#4AEF79}
-.stat span{font-size:.75rem;color:#a0a0a0}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin:1.5rem 0}
-.card{border:1px solid rgba(255,255,255,.08);padding:1rem;background:#111}
-.card h3{margin-top:0}
-.scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.5rem;margin:1rem 0}
-.level{padding:.75rem;border:1px solid rgba(255,255,255,.08);text-align:center}
-.level b{display:block;font-size:1.2rem;margin-bottom:.25rem}
-.l0 b{color:#ff3355}.l1 b{color:#ff7a45}.l2 b{color:#f59e0b}.l3 b{color:#f4d35e}.l4 b{color:#3CD468}.l5 b{color:#4AEF79}
-details{margin:.75rem 0;border:1px solid rgba(255,255,255,.08);padding:.75rem}
-summary{cursor:pointer;color:#4AEF79;font-weight:600}
-details p{margin:.5rem 0 0;font-size:.9rem}
-.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin:1rem 0}
-.chip{font-size:.75rem;padding:.25rem .5rem;border:1px solid rgba(255,255,255,.08);color:#3CD468}
-footer{margin-top:3rem;padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.08);text-align:center;font-size:.8rem;color:#a0a0a0}
-nav{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:1rem;flex-wrap:wrap;gap:.5rem}
-nav a{font-size:.8rem;color:#a0a0a0}nav a:hover{color:#4AEF79}
-.nav-brand{font-family:var(--amc-font-mono);font-weight:700;color:#fff;font-size:1rem}
-@media(max-width:480px){body{padding:.75rem}h1{font-size:1.4rem}.stats{flex-direction:column;align-items:center}}
-</style>
-<style id="skip-link-style">
-.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px system-ui,sans-serif;text-decoration:none}
-.skip-link:focus,.skip-link:focus-visible{left:12px}
-:where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
-</style>
+  <meta charset="UTF-8">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Maturity Compass — Lite</title>
+  <meta name="description" content="Build, run and check AI agents for regulated work. A short page with no pictures, for slow connections.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="canonical" href="https://agentmaturity.co/lite.html">
+  <link rel="stylesheet" href="home.css?v=5">
+  <link rel="stylesheet" href="pages.css?v=1">
 </head>
 <body>
-<a href="#main-content" class="skip-link">Skip to content</a>
+  <a href="#main-content" class="skip-link">Skip to content</a>
 
-<nav>
-  <span class="nav-brand">amc<span style="color:#4AEF79">_</span></span>
-  <div>
-    <a href="./">Full version (with animations)</a> ·
-    <a href="playground.html">Playground</a> ·
+  <nav class="nav" aria-label="Main">
+    <div class="nav-inner">
+      <a href="./" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>
+      <ul class="nav-links">
+        <li><a href="./#a4-forge">Build an agent</a></li>
+        <li><a href="./#capabilities">Run it</a></li>
+        <li><a href="./#domains">Industries</a></li>
+        <li><a href="a4.html">A4 Forge</a></li>
+        <li><a href="docs/index.html">Docs</a></li>
+      </ul>
+      <div class="nav-right">
+        <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="nav-quiet">GitHub</a>
+        <a href="#install" class="btn btn-primary btn-small">Get AMC</a>
+        <button class="nav-hamburger" aria-label="Menu" aria-controls="navMobile" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+  <div class="nav-mobile" id="navMobile">
+    <a href="./#a4-forge">Build an agent</a>
+    <a href="./#capabilities">Run it</a>
+    <a href="./#domains">Industries</a>
+    <a href="./#paths">Already have an agent?</a>
+    <a href="#install">Get AMC</a>
+    <a href="./#desktop">macOS app</a>
+    <a href="./#pricing">Price</a>
+    <a href="a4.html">A4 Forge (preview)</a>
+    <a href="docs/index.html">Docs</a>
+    <a href="executive.html">For executives</a>
     <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
   </div>
-</nav>
-<main id="main-content">
-  <div class="hero">
-    <h1>See what your AI agent really does<span style="color:#4AEF79">_</span></h1>
-    <p>AMC watches Claude Code, Codex or your own agent at work on your machine, keeps a signed record of what it did, and scores it from that record.</p>
-    <div>
-      <a href="#install" class="btn">Install, then type amc</a>
-      <a href="playground.html" class="btn btn-o">Try it in your browser</a>
+
+  <span id="main-content" tabindex="-1"></span>
+  <main id="main">
+
+    <section class="page-hero">
+      <div class="wrap">
+        <p class="product-name">Agent Maturity Compass · short page</p>
+        <h1>Build an AI agent for work that gets audited</h1>
+        <p class="lede">Build, run and check AI agents for regulated work. Pick your industry, answer plain questions, and a person approves each step. Then AMC watches what the agent does, keeps a signed record of it, and scores it from that record.</p>
+        <div class="cta-row">
+          <a href="#install" class="btn btn-primary">Get AMC</a>
+          <a href="./" class="btn btn-ghost">Full page</a>
+        </div>
+        <p class="fine">This page has no pictures, for slow connections. Free and open source. It runs on your own computer, with no AMC account.</p>
+        <div class="stats">
+          <div class="stat"><b>244</b><span>Questions in<br>the full score</span></div>
+          <div class="stat"><b>41</b><span>Free Industry<br>Packs</span></div>
+          <div class="stat"><b><!-- amc:count:adapters -->16<!-- /amc:count --></b><span>Built-in<br>adapters</span></div>
+          <div class="stat"><b>2,594</b><span>Test source<br>files</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="a4-forge" class="band">
+      <div class="wrap">
+        <header class="band-head">
+          <h2>Build an agent in four steps</h2>
+          <p>A4 Forge is AMC's guided build, a preview that is on by default (starting AMC with <code>AMC_A4_PREVIEW=0</code> turns it off). Each step asks plain questions and stops until the people you name approve it. Every step goes into a signed record.</p>
+        </header>
+        <ol class="how">
+          <li><strong>Aspire: say what the agent is for.</strong> One person who did not write the brief approves it.</li>
+          <li><strong>Assemble: build it.</strong> Two people, neither of whom built it, approve the result.</li>
+          <li><strong>Adapt: fit it to your rules.</strong> Two people other than the one who asks approve it, each a workspace owner or auditor.</li>
+          <li><strong>Activate: release it.</strong> AMC prepares a signed release package and your operator deploys it. On a laptop the project ends after Adapt.</li>
+        </ol>
+        <p class="band-more">Trying it alone? Start a practice project: you approve your own steps, and each one is marked self-approved. Starting from an Industry Pack? Then you need a second person, because every pack is rated high risk or above. <a href="a4.html">How A4 Forge works</a></p>
+      </div>
+    </section>
+
+    <section id="install" class="band band-alt">
+      <div class="wrap">
+        <header class="band-head">
+          <h2>Install, then type amc</h2>
+          <p>The current source build, for macOS and Linux. It needs Node.js 20 or newer (tested on 22 and 24), pnpm and git.</p>
+        </header>
+        <pre class="cmd" tabindex="0"><code>git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
+cd AgentMaturityCompass
+pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link
+amc</code></pre>
+        <div class="prose lite-prose">
+          <p><code>amc</code> shows one menu with what can work on your machine: Watch Claude Code as it works and Watch Codex as it works (each once you are signed in to it), Chat with a model (when a provider key is set), Try a demo chat (no account or key needed), Build an agent for my industry (A4 Forge preview), Open the console in my browser, and Just show my score.</p>
+          <p>The source build is not released yet (the source reports version 1.2.0). The one-line installers (<code>curl -fsSL https://agentmaturity.co/install.sh | sh</code>, or <code>irm https://agentmaturity.co/install.ps1 | iex</code> on Windows) and npm give the older published 1.1.1 release. It has no menu, no A4 Forge, no Claude Code or Codex sign-in, and its Industry Packs are still behind the earlier licence gate.</p>
+          <p><strong>On a first run</strong> a report can be signed and <code>VALID</code> and still say <code>INSUFFICIENT_EVIDENCE</code>. That is normal for a new folder. A signature shows who wrote a report and that it has not changed, not that it is true or that there is enough evidence behind it.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="band">
+      <div class="wrap">
+        <h2 class="band-sub">What you get in the first five minutes</h2>
+        <div class="cards">
+          <div><strong>A local workspace</strong><p>The first <code>amc</code> sets up <code>.amc/</code> in your folder with its own signing keys. No AMC account and no cloud service.</p></div>
+          <div><strong>A demo chat, no key</strong><p>In the amc menu, <strong>Try a demo chat</strong> talks to the built-in stand-in model, which gives canned replies. You see what a recorded session looks like before you add a key.</p></div>
+          <div><strong>The Compass Console</strong><p>Open the console starts AMC on your own machine (127.0.0.1) and opens its first screen, with one button that runs a sample task.</p></div>
+          <div><strong>An honest first score</strong><p>A new folder scores L0 and says why: AMC has not seen your agent do anything yet.</p></div>
+        </div>
+
+        <h2 class="band-sub">Already have an agent?</h2>
+        <div class="cards">
+          <div><strong>Watch my coding agent</strong><p>AMC uses Claude Code's or Codex's own sign-in (<code>amc login status</code>) and never sees your password, token or plan. After you say yes, it adds a watch hook to the project and records each action. Observe mode only records. Control mode can also stop a Claude Code action before it runs; Codex is observe only.</p></div>
+          <div><strong>Chat or run a task</strong><p>Type <code>amc</code> and choose Try a demo chat, or run a task from the console. Set a provider key such as <code>ANTHROPIC_API_KEY</code> to use a real model; your prompts then go to that provider.</p></div>
+          <div><strong>Score what I have</strong><p>Just show my score runs the full 244-question score. Run it again after AMC has watched your agent. List the free Industry Packs with <code>amc domain pack list</code>; pack results are self-reported.</p></div>
+        </div>
+
+        <h2 class="band-sub">Who is this for?</h2>
+        <div class="cards">
+          <div><strong>Business leaders</strong><p>Your company uses AI and your board asks whether it is safe. AMC gives a maturity level from L0 (Absent) to L5 (Optimizing), based on what the agent was seen to do, with safety and proof shown separately.</p></div>
+          <div><strong>No-code users</strong><p>Built a chatbot with Bubble, Zapier or Make? <a href="playground.html">Use the playground</a> to answer 15 questions in your browser. Its result is self-reported and illustrative.</p></div>
+          <div><strong>Compliance officers</strong><p>AMC maps evidence to relevant obligations and keeps maturity separate from legal status. AMC does not certify legal compliance.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band band-alt">
+      <div class="wrap">
+        <h2 class="band-sub">Five trust dimensions</h2>
+        <div class="cards">
+          <div><strong>Strategic Agent Ops</strong><p>Does the agent know its job, stay inside it, and leave a trail for each decision? 19 default questions.</p></div>
+          <div><strong>Skills</strong><p>Does it resist injected instructions, keep data from leaking, and use only the access it needs? 52 default questions.</p></div>
+          <div><strong>Resilience</strong><p>Does it fail safely, stop runaway loops, and recover from errors? 55 default questions.</p></div>
+          <div><strong>Leadership &amp; Autonomy</strong><p>Can you see what it did and what it cost, and can a person step in? 23 default questions.</p></div>
+          <div><strong>Culture &amp; Alignment</strong><p>Is it tested, measured, corrected from feedback, and truthful? 95 default questions.</p></div>
+        </div>
+
+        <h2 class="band-sub">Maturity scale</h2>
+        <ol class="scale">
+          <li><b>L0</b>Absent</li>
+          <li><b>L1</b>Initial</li>
+          <li><b>L2</b>Developing</li>
+          <li><b>L3</b>Defined</li>
+          <li><b>L4</b>Managed</li>
+          <li><b>L5</b>Optimizing</li>
+        </ol>
+
+        <h2 class="band-sub">Supported frameworks</h2>
+        <p class="lite-prose">AutoGen, Claude Code, CrewAI, DeepSeek Harness, Gemini CLI, Generic CLI, Hermes Agent, LangChain for Node and Python, LangGraph, LlamaIndex, OpenAI Agents SDK, OpenClaw, OpenHands, Python AMC SDK and Semantic Kernel. OpenAI-compatible endpoints use the Generic CLI adapter. Codex is watched through its own hooks.</p>
+      </div>
+    </section>
+
+    <section id="faq" class="band">
+      <div class="wrap faq-wrap">
+        <h2>Questions</h2>
+        <div>
+          <details class="qa">
+            <summary>What is AMC?</summary>
+            <p>Agent Maturity Compass is open-source software that helps you build an AI agent for regulated work, watches the agent work, keeps a signed record of what it did, and scores it from that record rather than from what it says about itself.</p>
+          </details>
+          <details class="qa">
+            <summary>What is the 84-point gap?</summary>
+            <p>In one worked example, an agent scored 100 out of 100 from keyword matching on its documentation and 16 when AMC looked at what it actually did. The 84 points between them are documentation inflation. It is one example, not an average.</p>
+          </details>
+          <details class="qa">
+            <summary>Is AMC free?</summary>
+            <p>Yes. MIT licensed and open source. The 41 Industry Packs are free in the current source build.</p>
+          </details>
+          <details class="qa">
+            <summary>Do I need to code?</summary>
+            <p>Someone has to install AMC once. After that the work happens in the Compass Console, in plain language. To look around with no install, use the <a href="playground.html">playground</a> to answer 15 questions in your browser.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing">
+      <div class="wrap">
+        <h2>Pick your industry. Build the first one</h2>
+        <div class="cta-row">
+          <a href="#install" class="btn btn-primary">Get AMC</a>
+          <a href="docs/#GETTING_STARTED" class="btn btn-ghost">Read getting started</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner wrap">
+      <div class="footer-top">
+        <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p></div>
+        <div class="footer-col"><h3>Product</h3><a href="./#a4-forge">Build an agent</a><a href="./#capabilities">Run it</a><a href="./#paths">Already have an agent?</a><a href="#install">Get AMC</a><a href="./#desktop">macOS app</a><a href="./#products">Eight tools</a><a href="executive.html">Executives</a><a href="playground.html">Playground</a><a href="docs/index.html">Documentation</a></div>
+        <div class="footer-col"><h3>Depth</h3><a href="a4.html">A4 Forge</a><a href="methodology.html">Approach and research</a><a href="compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="./#pricing">Price</a><a href="./#faq">FAQ</a></div>
+        <div class="footer-col"><h3>Industry Packs</h3><a href="./#domains">All packs</a><a href="station-environment.html">Environment</a><a href="station-health.html">Health</a><a href="station-wealth.html">Wealth</a><a href="station-education.html">Education</a><a href="station-mobility.html">Mobility</a><a href="station-technology.html">Technology</a><a href="station-governance.html">Governance</a></div>
+        <div class="footer-col"><h3>Code</h3><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="accessibility.html">Accessibility</a></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
     </div>
-    <div class="stats">
-      <div class="stat"><b>244</b><span>Questions in<br>the full score</span></div>
-      <div class="stat"><b>41</b><span>Free Industry<br>Packs</span></div>
-      <div class="stat"><b><!-- amc:count:adapters -->16<!-- /amc:count --></b><span>Built-in<br>adapters</span></div>
-      <div class="stat"><b>2,569</b><span>Test source<br>files</span></div>
-    </div>
-    <p><strong style="color:#fff">What to expect on a first run:</strong> a report can be signed and <code>VALID</code> and still say <code>INSUFFICIENT_EVIDENCE</code>. That is normal for a new folder. A signature shows who wrote it and that it has not changed, not that it is true or that there is enough evidence behind it.</p>
-  </div>
+  </footer>
 
-  <h2 id="install">Install, then type amc</h2>
-  <p>The current source build (macOS and Linux; needs Node.js 22 or 24, pnpm and git):</p>
-  <div class="card" style="font-family:var(--amc-font-mono);font-size:.85rem;line-height:1.8;overflow-wrap:anywhere">
-    <code>$ git clone https://github.com/AgentMaturity/AgentMaturityCompass.git</code><br>
-    <code>$ cd AgentMaturityCompass</code><br>
-    <code>$ pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link</code><br>
-    <code>$ amc</code>
-  </div>
-  <p><code>amc</code> in a terminal shows one menu with what can work on your machine: Watch Claude Code as it works, Watch Codex as it works (each once you are signed in to it), Chat with a model (when a provider key is set), Try a demo chat (no account or key needed), Build an agent for my industry (A4 Forge preview), Open the console in my browser, and Just show my score.</p>
-  <p>The source build is not released yet (the next release is 2.0.0). The one-line installers (<code>curl -fsSL https://agentmaturity.co/install.sh | sh</code>, or <code>irm https://agentmaturity.co/install.ps1 | iex</code> on Windows) and npm give the older published 1.1.1 release, which has no menu, no Claude Code or Codex sign-in, and Industry Packs still behind the earlier licence gate.</p>
-
-  <h2>What you get in the first five minutes</h2>
-  <div class="cards">
-    <div class="card"><h3>A local workspace</h3><p>The first <code>amc</code> sets up <code>.amc/</code> in your folder with its own signing keys. No AMC account and no cloud service.</p></div>
-    <div class="card"><h3>A demo chat, no key</h3><p>Try a demo chat talks to a built-in practice model that gives canned replies. You see what a recorded session looks like before you add a key.</p></div>
-    <div class="card"><h3>The Compass Console</h3><p>Open the console starts AMC on your own machine (127.0.0.1) and opens its first screen, with one button that runs a sample task.</p></div>
-    <div class="card"><h3>An honest first score</h3><p>A new folder scores L0 and says why: AMC has not seen your agent do anything yet.</p></div>
-  </div>
-
-  <h2>Three ways to start</h2>
-  <div class="cards">
-    <div class="card">
-      <h3>Watch my coding agent</h3>
-      <p>AMC uses Claude Code's or Codex's own sign-in (<code>amc login status</code>) and never sees your password, token or plan. After you say yes, it adds a watch hook to the project and records each tool call. Observe mode only records; Claude Code control mode can deny a tool call, and needs Claude Code settings with no enabled plugin and no other hook that can change a tool call.</p>
-    </div>
-    <div class="card">
-      <h3>Run a task</h3>
-      <p>Chat in the terminal (<code>amc agent-loop chat --provider stub</code> for the demo) or run a task from the console's Native Tasks page. Set a provider key such as <code>ANTHROPIC_API_KEY</code> to use a real model; your prompts then go to that provider.</p>
-    </div>
-    <div class="card">
-      <h3>Score what I have</h3>
-      <p>Just show my score runs the full 244-question score. Run it again after AMC has watched your agent, and list the free Industry Packs with <code>amc domain pack list</code>. Pack results are self-reported.</p>
-    </div>
-  </div>
-
-  <h2>Who is this for?</h2>
-  <div class="cards">
-    <div class="card">
-      <h3>Business leaders</h3>
-      <p>Your company uses AI and your board asks whether it is safe. AMC gives a maturity level from L0 (Absent) to L5 (Optimizing), based on what the agent was seen to do, with safety and proof shown separately.</p>
-    </div>
-    <div class="card">
-      <h3>No-code users</h3>
-      <p>Built a chatbot with Bubble, Zapier or Make? <a href="playground.html">Use the playground</a> to answer 15 questions in your browser. Its result is self-reported and illustrative.</p>
-    </div>
-    <div class="card">
-      <h3>Compliance officers</h3>
-      <p>AMC maps evidence to relevant obligations and keeps maturity separate from legal status. AMC does not certify legal compliance.</p>
-    </div>
-  </div>
-
-  <h2>Five trust dimensions</h2>
-  <div class="cards">
-    <div class="card"><h3>Strategic Agent Ops</h3><p>Does the agent know its job, stay inside it, and leave a trail for each decision? 19 default questions.</p></div>
-    <div class="card"><h3>Skills</h3><p>Does it resist injected instructions, keep data from leaking, and use only the access it needs? 52 default questions.</p></div>
-    <div class="card"><h3>Resilience</h3><p>Does it fail safely, stop runaway loops, and recover from errors? 55 default questions.</p></div>
-    <div class="card"><h3>Leadership &amp; Autonomy</h3><p>Can you see what it did and what it cost, and can a person step in? 23 default questions.</p></div>
-    <div class="card"><h3>Culture &amp; Alignment</h3><p>Is it tested, measured, corrected from feedback, and truthful? 95 default questions.</p></div>
-  </div>
-
-  <h2>Maturity scale</h2>
-  <div class="scale">
-    <div class="level l0"><b>L0</b>Absent</div>
-    <div class="level l1"><b>L1</b>Initial</div>
-    <div class="level l2"><b>L2</b>Developing</div>
-    <div class="level l3"><b>L3</b>Defined</div>
-    <div class="level l4"><b>L4</b>Managed</div>
-    <div class="level l5"><b>L5</b>Optimizing</div>
-  </div>
-
-  <h2>Supported frameworks</h2>
-  <div class="chips">
-    <span class="chip">Claude Code</span><span class="chip">Codex</span><span class="chip">Gemini CLI</span>
-    <span class="chip">LangChain</span><span class="chip">LangGraph</span><span class="chip">CrewAI</span>
-    <span class="chip">AutoGen</span><span class="chip">OpenAI Agents SDK</span><span class="chip">LlamaIndex</span>
-    <span class="chip">Semantic Kernel</span><span class="chip">OpenClaw</span><span class="chip">OpenHands</span>
-    <span class="chip">Python AMC SDK</span><span class="chip">Any CLI Agent</span><span class="chip">OpenAI-Compatible</span>
-  </div>
-
-  <h2 id="a4-forge">A4 Forge (preview)</h2>
-  <div class="card">
-    <p>A4 Forge takes one agent from a written brief to a recorded deployment in four approval-gated stages: <strong>Aspire</strong>, <strong>Assemble</strong>, <strong>Adapt</strong> and <strong>Activate</strong>.</p>
-    <p>Preview in the current source build only (not in the published 1.1.1 release), off unless <code>AMC_A4_PREVIEW=1</code>. Every record is self-reported: a signature shows who wrote it and that it has not changed, never that it is true, and no A4 output says the agent is safe, correct or lawful. A second approver in the same workspace is separation of duties, not independent review. Not available yet: independently reviewed claims and a real deployment target.</p>
-    <p><a href="a4.html">How A4 Forge works</a></p>
-  </div>
-
-  <h2>FAQ</h2>
-  <details>
-    <summary>What is AMC?</summary>
-    <p>Agent Maturity Compass is open-source software that watches an AI agent work, keeps a signed record of what it did, and scores it from that execution evidence rather than from self-reported claims.</p>
-  </details>
-  <details>
-    <summary>What is the 84-point gap?</summary>
-    <p>In one worked example, an agent scored 100/100 from keyword matching on its documentation and 16/100 when AMC evaluated execution-verified evidence. That 84-point difference is documentation inflation. It is one example, not an average.</p>
-  </details>
-  <details>
-    <summary>Is AMC free?</summary>
-    <p>Yes. MIT licensed and open source. The 41 Industry Packs are free in the current source build.</p>
-  </details>
-  <details>
-    <summary>Do I need to code?</summary>
-    <p>No. Use the <a href="playground.html">playground</a> to answer 15 questions in your browser with no install. Scoring a real agent from evidence needs AMC installed.</p>
-  </details>
-  <section id="get-started" style="margin-top:2.5rem;text-align:center;padding:1.5rem;border:1px solid rgba(74,239,121,.25)">
-    <h2 style="color:#4AEF79;font-size:1.3rem;margin-bottom:.5rem;border:0">Get started</h2>
-    <p>Install with the commands above, type <code>amc</code>, and pick what to do.</p>
-    <p><a href="docs/#GETTING_STARTED" class="btn">Read getting started</a> <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="btn btn-o">GitHub</a></p>
-  </section>
-</main>
-<footer>
-  <p>Agent Maturity Compass · MIT License · Open Source</p>
-  <p>
-    <a href="./">Full version</a> ·
-    <a href="playground.html">Playground</a> ·
-    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a> ·
-    <a href="docs/#GETTING_STARTED">Docs</a>
-  </p>
-</footer>
-
+  <script src="script.js?v=13"></script>
+  <script src="home.js?v=3"></script>
 </body>
 </html>

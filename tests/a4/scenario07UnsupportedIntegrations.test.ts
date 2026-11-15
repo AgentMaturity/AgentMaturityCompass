@@ -38,7 +38,7 @@ describe("scenario: unsupported integrations", () => {
     // open gate, so approvals given before it would be asked for again. The refusal names each item with its next action.
     const refused = await j.p.post(j.t.alice, "/stages/assemble/gates/direction/request");
     expect(refusal(refused)).toEqual([409, "A4_NOT_READY"]);
-    expect(refused.body.error).toMatch(/Not ready yet: path_supported \(.*\); unsupported_acknowledged \(/);
+    expect(refused.body.error).toMatch(/Not ready yet\. .+ \(path_supported\) .+ \(unsupported_acknowledged\)/);
 
     await j.acknowledge("assemble", "path_supported");
     expect(refusal(await j.p.post(j.t.alice, "/stages/assemble/gates/direction/request"))).toEqual([409, "A4_NOT_READY"]);

@@ -7,6 +7,7 @@ import { initWorkspace } from "../src/workspace.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { closeAllSqlitePools } from "../src/storage/sqlitePool.js";
 import { sha256Hex } from "../src/utils/hash.js";
+import { lockVault } from "../src/vault/vault.js";
 import type { SignedDigest } from "../src/crypto/signing/signerTypes.js";
 import {
   applyVerifyRepair, planVerifyRepair, RepairRefused, type HoldState, type RepairPlan, type RepairReceipt
@@ -126,6 +127,21 @@ describe("planVerifyRepair", () => {
     expect(plan.action).toBe("none");
     expect(plan.files).toEqual([]);
     expect(withoutSidecars(snapshot(workspace))).toEqual(withoutSidecars(before));
+  });
+
+  // CLI-03: a locked vault used to read as 34 "payload authentication failed" lines and a plan to archive a healthy store.
+  it("reports payloads a locked vault keeps closed as not evaluated and proposes no move", () => {
+    const workspace = blobWorkspace();
+    lockVault(workspace);
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
+    vi.stubEnv("AMC_VAULT_PASSPHRASE_FILE", "");
+    try {
+      const plan = planVerifyRepair(workspace);
+      expect(plan.payloadsNotEvaluated).toBe(2);
+      expect(plan.errorCounts.payload_mismatch).toBeUndefined();
+      expect(plan.action).toBe("none");
+      expect(plan.files).toEqual([]);
+    } finally { vi.unstubAllEnvs(); }
   });
 
   it("counts a tampered blob and plans to archive the ledger, the blobs, the index and its signature", () => {

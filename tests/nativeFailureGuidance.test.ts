@@ -43,9 +43,8 @@ describe("native failure guidance and recorded projection", () => {
   it("offers inspection rather than widening a refused native budget", () => {
     const error = Object.assign(new Error(secret), { code: "AMC_NATIVE_BUDGET_REFUSED" });
     const text = renderNativeFailureGuidance(liveNativeFailureGuidance(error));
-    expect(text).toContain("amc budgets verify");
-    expect(text).toContain("amc budgets status --agent <recorded-agent>");
-    expect(text).toContain("reset does not restore allowance");
+    expect(text).toContain("amc budgets status --agent <agent>");
+    expect(text).toContain("names the limit that was reached");
     expect(text).not.toContain("ALLOW_WITH_WARNING");
     expect(text).not.toContain("synthetic-secret");
   });

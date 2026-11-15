@@ -275,7 +275,7 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
         id: "vault",
         status: "WARN",
         message: "Vault locked in this shell: signing commands (amc firewall enable, amc agent-loop run) will refuse with \"Vault locked\"",
-        fixHint: "Run: export AMC_VAULT_PASSPHRASE='<the passphrase chosen or shown at amc init>' (interactive alternative: amc vault unlock). "
+        fixHint: "Run: export AMC_VAULT_PASSPHRASE='<your vault passphrase>' in this shell, or set AMC_VAULT_PASSPHRASE_FILE (amc vault unlock lasts only for its own command). "
           + `A passphrase \`amc up\` remembered is kept in ${rememberedStores()}; `
           + (gate.ok ? "amc commands you run in this workspace from your own terminal unlock with it."
             : `it is not used here because ${operatorRefusalText(gate)} (it unlocks only for commands you run from your own terminal, outside agent mode).`)

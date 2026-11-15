@@ -1,7 +1,8 @@
 import { resolveAgentId } from "../fleet/paths.js";
 import type { LessonTransferRequest } from "../learning/lessonProvenance.js";
 import { assertPromptLessonOutputs, assertPromptLessonsCurrent } from "./promptLessonTransfer.js";
-import { mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { collectFiles } from "../utils/archiveFiles.js";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { canonicalize } from "../utils/json.js";
@@ -120,6 +121,42 @@ export function buildPromptPackArtifact(params: {
   };
   publishPromptFiles(params.workspace, before, [{ path: outFile, bytes }], assertLessons);
   return { outFile, sha256: sha256Hex(bytes), pack: compiled.pack, signature, lint: compiled.lint, providerFiles: compiled.providerFiles };
+}
+
+/** Members a rebuild from unchanged inputs always rewrites (fresh signatures); everything else is what the pack says. */
+const SIGNATURE_MEMBERS = new Set(["amc-prompt/pack.sig", "amc-prompt/lint/lint.json.sig", "amc-prompt/lint/lint.sig"]);
+
+/**
+ * A digest of what a prompt pack says rather than of its archive bytes: every member except the three signatures, with
+ * pack.json read without its build id and build time. A scheduled rebuild from unchanged inputs gives the same digest
+ * (only `packId`, `generatedTs`, the signatures and the gzip framing differ); a change to any other byte of any member,
+ * an added or a removed member gives another. Bytes that do not extract as an archive answer their own sha256.
+ */
+export function promptPackContentSha256(bytes: Buffer): string {
+  const temp = mkdtempSync(join(tmpdir(), "amc-prompt-content-"));
+  try {
+    const file = join(temp, "pack.amcprompt"), out = join(temp, "members");
+    writeFileSync(file, bytes, { mode: 0o600 });
+    mkdirSync(out);
+    try {
+      tarExtract(file, out);
+    } catch {
+      return sha256Hex(bytes);
+    }
+    const members = collectFiles(out).filter((path) => !SIGNATURE_MEMBERS.has(path)).map((path) => {
+      const raw = readFileSync(join(out, path));
+      if (path !== "amc-prompt/pack.json") return [path, sha256Hex(raw)];
+      try {
+        const { packId: _packId, generatedTs: _generatedTs, ...rest } = JSON.parse(raw.toString("utf8")) as Record<string, unknown>;
+        return [path, sha256Hex(canonicalize(rest))];
+      } catch {
+        return [path, sha256Hex(raw)];
+      }
+    });
+    return sha256Hex(canonicalize({ schema: "amc.prompt-pack-content/v1", members }));
+  } finally {
+    cleanupDir(temp);
+  }
 }
 
 export function inspectPromptPackArtifact(file: string): {
