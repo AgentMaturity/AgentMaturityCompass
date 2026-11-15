@@ -14,10 +14,10 @@ const GUIDANCE = {
   INVALID_REQUEST: ["The provider rejected the request shape or content.", "Inspect the selected model/protocol and request metadata in this session. Correct the request before another deliberate run; do not relax policy checks to make it pass."],
   SERVER: ["The provider reported a server error.", "Inspect recorded retry attempts and settlement before continuing. A partial reply is not a completed task; the existing retry policy remains authoritative."],
   TIMEOUT: ["The provider request or stream timed out.", "Inspect this session's failed attempt, retained partial output and budget status before a deliberate resume. A timeout does not prove zero usage or that no work occurred."],
-  TRANSPORT: ["The provider connection failed.", "Inspect the selected origin, connection and recorded request settlement. Do not assume zero usage or automatically replay a task whose effects are unknown."],
+  TRANSPORT: ["The connection to the model provider failed.", "Check that the address below is right and its server is running (a local Ollama needs ollama serve and the model pulled with ollama pull), then run the task again. When the connection never opened, the budget counts the request as costing nothing."],
   EMPTY_RESPONSE: ["The provider returned no usable completed reply.", "Inspect the recorded failed attempt and configured retry policy. No task completion is implied by an empty response."],
   ABORTED: ["The request ended without a completed provider response.", "Inspect the recorded cancellation/termination cause and any partial output before a deliberate continuation. Do not infer zero usage or completion."],
-  AMC_NATIVE_BUDGET_REFUSED: ["Signed native budget admission refused this dispatch.", "Inspect amc budgets verify and amc budgets status --agent <recorded-agent>. A nonzero blockingUnknownLlmTokenRequests or daily.llmPendingRequests means an earlier cancelled or interrupted request left unknown token usage; docs/BUDGETS.md (Missing Usage and Recovery) says when that clears. Preserve pending reservations and unknown usage. budgets reset does not restore allowance; policy changes require explicit review, not an automatic bypass."],
+  AMC_NATIVE_BUDGET_REFUSED: ["AMC's signed budget for this agent refused the model request before sending it.", "Run amc budgets status --agent <agent>: it names the limit that was reached and the command, or the wait, that lets you continue (docs/BUDGETS.md, Missing Usage and Recovery)."],
   DATA_FLOW_REFUSED: ["Protected-data admission refused this model request before it was sent (P2-02).", "Inspect the recorded refusal reason, processor and purpose, then the signed processor registry (.amc/dataflow/processors.yaml) the operator maintains. Do not retry the same request or remove the registry to bypass admission."],
   AMC_EVIDENCE_INTEGRITY: ["Workspace evidence failed verification before budget admission.", "Run amc verify and amc budgets verify. Rows written with AMC_NO_SIGN=1, or edited rows, make signed budgets unverifiable in this workspace. Do not reset budgets to bypass this."],
   METADATA_UNAVAILABLE: ["Recorded failure metadata is missing or inconsistent.", "Inspect amc session show <session-id> and separately run amc agent-loop verify <session-id>. Do not infer a provider failure class or repair history implicitly."],
@@ -36,6 +36,10 @@ export interface NativeRunDiagnostic {
   readonly turn: number | null;
   readonly step: number | null;
   readonly guidance: NativeFailureGuidance;
+  /** For TRANSPORT and TIMEOUT: the provider address the request went to (from the signed header's route), when recorded. */
+  readonly origin?: string;
+  /** For AMC_NATIVE_BUDGET_REFUSED: AMC's own refusal text, which names the limit and the next step. */
+  readonly budgetCause?: string;
   /** For DATA_FLOW_REFUSED: the recorded refusal's reason and registry identifiers, never the refused content. */
   readonly dataFlow?: { readonly reason: string; readonly processorId: string | null; readonly purposeId: string | null };
 }
@@ -46,6 +50,21 @@ function own(value: unknown, key: string): unknown {
 }
 function position(value: unknown): number | null { return typeof value === "number" && Number.isSafeInteger(value) && value >= 0 ? value : null; }
 function httpStatus(value: unknown): number | null { return typeof value === "number" && Number.isInteger(value) && value >= 100 && value <= 599 ? value : null; }
+
+/** A provider origin (scheme, host, port) or null; never a path, query or credential. */
+function safeOrigin(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  try { const url = new URL(value); return ["http:", "https:"].includes(url.protocol) ? url.origin : null; } catch { return null; }
+}
+/** AMC's own budget refusal text (never a provider's), one line, printable characters only. */
+function safeBudgetCause(value: unknown): string | null {
+  if (typeof value !== "string" || value.length === 0) return null;
+  return value.replace(/[^\x20-\x7e]/g, " ").slice(0, 700);
+}
+/** The live refusal's own text when AMC's budget refused, else null. */
+export function liveBudgetRefusalCause(error: unknown): string | null {
+  return own(error, "code") === "AMC_NATIVE_BUDGET_REFUSED" ? safeBudgetCause(own(error, "message")) : null;
+}
 
 /** Only fixed public wording is returned; raw exception messages never escape. */
 export function nativeFailureGuidance(code: unknown, status?: unknown): NativeFailureGuidance {
@@ -110,8 +129,11 @@ export function projectNativeRunDiagnostics(events: readonly EvidenceEvent[], se
     const failure = own(meta, "failure"), code = own(failure, "code");
     const valid = linked && own(meta, "outcome") === "failed" && typeof code === "string"
       && (own(meta, "finishReason") === "error" || own(meta, "finishReason") === "aborted");
+    const origin = valid && (code === "TRANSPORT" || code === "TIMEOUT") ? safeOrigin(header?.physicalRoute?.baseUrl) : null;
+    const budgetCause = valid && code === "AMC_NATIVE_BUDGET_REFUSED" ? safeBudgetCause(own(failure, "message")) : null;
     rows.push({ eventId: event.id, source: "request-failure", turn, step,
-      guidance: nativeFailureGuidance(valid ? code : "METADATA_UNAVAILABLE", valid ? own(failure, "status") : undefined) });
+      guidance: nativeFailureGuidance(valid ? code : "METADATA_UNAVAILABLE", valid ? own(failure, "status") : undefined),
+      ...(origin === null ? {} : { origin }), ...(budgetCause === null ? {} : { budgetCause }) });
     if (turn !== null) failureTurns.add(turn);
   }
   for (const event of events) {
@@ -144,6 +166,9 @@ export function renderNativeRunDiagnostics(value: unknown): string {
     lines.push(`  ${source} ${JSON.stringify(eventId)} · turn ${turn ?? "unknown"} · step ${step ?? "unknown"}`);
     const guidance = own(raw, "guidance");
     lines.push(`  ${renderNativeFailureGuidance(nativeFailureGuidance(own(guidance, "code"), own(guidance, "httpStatus")))}`);
+    const origin = safeOrigin(own(raw, "origin")), cause = safeBudgetCause(own(raw, "budgetCause"));
+    if (origin !== null) lines.push(`  address: ${origin}`);
+    if (cause !== null) lines.push(`  why: ${cause}`);
     // Re-validated from the projection, so only a known reason and registry-shaped identifiers reach the terminal.
     const flow = own(raw, "dataFlow"), refusal = flow === undefined ? null
       : DataFlowRefused.from({ reason: own(flow, "reason"), processorId: own(flow, "processorId"), purposeId: own(flow, "purposeId") });

@@ -208,7 +208,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc bootstrap` | Bootstrap workspace for production deployment (non-interactive) | `--workspace <path>` | - |
 | `amc budgets` | Signed autonomy and usage budgets | - | - |
 | `amc budgets init` | - | `--agent <agentId>` | - |
-| `amc budgets reset` | - | `--agent <agentId>`<br>`--day <yyyy-mm-dd>` | - |
+| `amc budgets reset` | Record a budget-day reset (it does not restore allowance), or accept earlier unknown model usage | `--agent <agentId>`<br>`--day <yyyy-mm-dd>`<br>`--accept-unknown` | - |
 | `amc budgets sign` | Validate and sign the existing reviewed budget limits without changing the policy | `--json` | - |
 | `amc budgets status` | - | `--agent <agentId>` | - |
 | `amc budgets verify` | - | - | - |
