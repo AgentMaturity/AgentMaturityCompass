@@ -4,6 +4,7 @@
 // action, so the primary action only points at the page's own buttons and never decides anything itself.
 import { QUESTION_LABELS } from "./a4Questions.js";
 import { SELF_APPROVE, selfApproves, selfCountsOnce } from "./a4Who.js";
+import { itemTitle } from "./a4Plain.js";
 import { actionButton, reasonsText, STAGES, STAGE_PLAIN, STEP_NEXT, STEP_PLAIN, STEP_TITLES, TRUTH, esc, previewNoticeHtml, renderCreateForm } from "./a4View.js";
 
 const isObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
@@ -251,8 +252,8 @@ function gateMove(ctx, kind) {
       + "already sign in there. To learn AMC alone, start a practice project instead.", act: { label: "Invite someone", focus: ".a4-invite input" } };
   }
   const ack = toAcknowledge(readiness);
-  if (ack.length) return { now: `Before asking for approval, a project owner acknowledges ${ack.map((item) => item.id).join(", ")}: ${ACK_PLAIN[ack[0].id] ?? ack[0].nextAction?.label ?? "see Missing requirements"}.`,
-    why: "Write a short reason in the Approvals card, then press Acknowledge beside the item under Missing requirements (shown below). Acknowledging after the request would cancel it.",
+  if (ack.length) return { now: `Before asking for approval, a project owner acknowledges ${ack.map((item) => `"${itemTitle(item.id)}"`).join(", ")}: ${ACK_PLAIN[ack[0].id] ?? ack[0].nextAction?.label ?? "see Missing requirements"}.`,
+    why: "Write a short reason in the Approvals card, then press Acknowledge beside the item under What this step still needs (shown below). Acknowledging after the request would cancel it.",
     act: { label: "Write the reason", focus: '.a4-approvals [name="reason"]' }, also: "#a4Missing" };
   if (codesOf(readiness, "members.candidates").includes("NO_SECOND_APPROVER")) {
     const candidates = list(ctx.members?.candidates).filter((row) => !list(ctx.project.members).some((member) => member.principalKey === row.principalKey));
