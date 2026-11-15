@@ -9,7 +9,7 @@ import YAML from "yaml";
 import { SessionService } from "../src/session/sessionService.js";
 import { openSessionEventStore } from "../src/persistence/openSessionEventStore.js";
 import { openLedger } from "../src/ledger/ledger.js";
-import { budgetUsageSnapshot, budgetsPath, evaluateBudgetStatus, loadBudgetsConfig, signBudgetsConfig } from "../src/budgets/budgets.js";
+import { acceptUnknownUsageAsync, budgetUsageSnapshot, budgetsPath, evaluateBudgetStatus, loadBudgetsConfig, signBudgetsConfig } from "../src/budgets/budgets.js";
 import { measuredUsage, NATIVE_BUDGET_RESERVATION } from "../src/budgets/nativeBudgetUsage.js";
 import { nativeUnknownUsageNotice } from "../src/budgets/nativeBudgetAdmission.js";
 import { AdapterRegistry } from "../src/llm/adapter/adapterRegistry.js";
@@ -53,6 +53,16 @@ function runtime(value: SessionService, upstream: ReturnType<typeof stubUpstream
   registry.register({ providerId: "fixture", models: ["fixture"], adapter, baseUrl: "https://fixture.invalid", credentialRef: null });
   return new LlmRuntime({ session: value, registry, credentials, transport: upstream.transport });
 }
+/** A request whose body names no output limit: AMC cannot bound its usage, so unknown usage from it still blocks. */
+const unbounded = <T extends { params: Record<string, unknown> }>(spec: T): T => ({ ...spec, params: { stream: true } });
+const ceilings = () => {
+  const ledger = openLedger(workspace);
+  try {
+    return ledger.getAllEvents().map(row => JSON.parse(row.meta_json) as Record<string, unknown>)
+      .filter(meta => meta.auditType === NATIVE_BUDGET_RESERVATION && meta.kind === "llm").map(meta => meta.tokenCeiling);
+  } finally { ledger.close(); }
+};
+const refusedConnection = () => Object.assign(new TypeError("fetch failed"), { cause: Object.assign(new Error("connect ECONNREFUSED 127.0.0.1:11434"), { code: "ECONNREFUSED" }) });
 const response = () => okStream(anthropicTextStream({ text: ["done"], inputTokens: 10, outputTokens: 3, cacheReadTokens: 2 }));
 async function drain(stream: AsyncIterable<unknown>) { for await (const _ of stream) { /* consume */ } }
 function limits(edit: (config: ReturnType<typeof loadBudgetsConfig>) => void) {
@@ -138,11 +148,11 @@ describe("AMC-1534 native budget admissions and signed accounting", () => {
     const diagnostics = projectNativeRunDiagnostics(exhausted.value.readEvents(), exhausted.value.sessionId);
     expect(diagnostics.map(row => row.guidance.code)).toEqual(["AMC_NATIVE_BUDGET_REFUSED"]);
     expect(diagnostics[0]!.guidance.summary).not.toMatch(/provider/i);
-    // Unknown token usage from an earlier failed dispatch.
+    // Unknown token usage from an earlier failed dispatch that AMC cannot bound.
     limits(config => { config.budgets.perAgent.default!.daily.maxLlmRequests = 100; });
     const unknown = session(); const failing = runtime(unknown.value, refusingUpstream(new Error("socket failed")));
-    await expect(drain(failing.stream(unknown.spec))).rejects.toThrow();
-    await expect(drain(failing.stream(unknown.spec))).rejects.toThrow("token usage is unknown");
+    await expect(drain(failing.stream(unbounded(unknown.spec)))).rejects.toThrow();
+    await expect(drain(failing.stream(unknown.spec))).rejects.toThrow("cannot tell what they cost");
     expect(refusalCode(unknown.value)).toMatchObject({ failure: { code: "AMC_NATIVE_BUDGET_REFUSED" }, dispatchAttempted: false });
   });
 
@@ -154,26 +164,92 @@ describe("AMC-1534 native budget admissions and signed accounting", () => {
     expect(budgetUsageSnapshot(workspace, "default").daily.llmCostUsageComplete).toBe(false);
   });
 
-  test("keeps unknown transport usage unknown and prevents a later spend", async () => {
+  test("keeps unbounded unknown transport usage unknown and prevents a later spend", async () => {
     const { value, spec } = session(); const upstream = refusingUpstream(new Error("socket failed")); const llm = runtime(value, upstream);
-    await expect(drain(llm.stream(spec))).rejects.toThrow();
+    await expect(drain(llm.stream(unbounded(spec)))).rejects.toThrow();
     const usage = budgetUsageSnapshot(workspace, "default");
     expect(usage.daily.llmRequests).toBe(1); expect(usage.daily.llmTokens).toBe(0);
     expect(usage.daily.llmTokenUsageComplete).toBe(false); expect(usage.daily.unknownLlmTokenRequests).toBe(1);
-    await expect(drain(llm.stream(spec))).rejects.toThrow("token usage is unknown");
+    await expect(drain(llm.stream(spec))).rejects.toThrow("cannot tell what they cost");
     expect(upstream.sent).toHaveLength(1);
     const failed = value.readEvents().find(row => row.event_type === "request/failure")!;
     expect(JSON.parse(failed.meta_json).usage).toMatchObject({ reported: false, complete: false });
   });
 
+  test("H-01: a request whose connection never opened costs nothing and does not lock the agent", async () => {
+    const { value, spec } = session(); const llm = runtime(value, refusingUpstream(refusedConnection()));
+    await expect(drain(llm.stream(spec))).rejects.toThrow();
+    const failed = value.readEvents().find(row => row.event_type === "request/failure")!;
+    expect(JSON.parse(failed.meta_json)).toMatchObject({ dispatchAttempted: true, connectFailed: "ECONNREFUSED" });
+    // QA M-08: the read-back names the address that did not answer.
+    expect(projectNativeRunDiagnostics(value.readEvents(), value.sessionId)[0]).toMatchObject({ guidance: { code: "TRANSPORT" }, origin: "https://fixture.invalid" });
+    const usage = budgetUsageSnapshot(workspace, "default");
+    expect(usage.daily.llmRequests).toBe(1); expect(usage.daily.llmTokens).toBe(0);
+    expect(usage.daily.unknownLlmTokenRequests).toBe(0); expect(usage.daily.blockingUnknownLlmTokenRequests).toBe(0);
+    const upstream = stubUpstream([response]);
+    await drain(runtime(value, upstream).stream(spec));
+    expect(upstream.sent).toHaveLength(1);
+    expect(evaluateBudgetStatus(workspace, "default")).toMatchObject({ ok: true, next: [] });
+  });
+
+  test("H-01: a request cut off after it was sent counts at its upper estimate, and a real token cap still stops the agent", async () => {
+    const { value, spec } = session(); const llm = runtime(value, refusingUpstream(new Error("socket failed")));
+    await expect(drain(llm.stream(spec))).rejects.toThrow();
+    const [ceiling] = ceilings() as number[];
+    expect(ceiling).toBeGreaterThan(4096 + 20);
+    const usage = budgetUsageSnapshot(workspace, "default");
+    expect(usage.daily.llmTokens).toBe(ceiling); expect(usage.daily.unknownLlmTokenRequests).toBe(1);
+    expect(usage.daily.blockingUnknownLlmTokenRequests).toBe(0); expect(usage.daily.llmTokenUsageComplete).toBe(false);
+    // The person goes on working after the failure...
+    const upstream = stubUpstream([response]);
+    await drain(runtime(value, upstream).stream(spec));
+    expect(upstream.sent).toHaveLength(1);
+    // ...and a real limit still stops the agent, counting the estimate (ceiling + the 15 measured tokens).
+    limits(config => { config.budgets.perAgent.default!.daily.maxLlmTokens = ceiling + 15; });
+    await expect(drain(runtime(value, upstream).stream(spec))).rejects.toThrow(`native model token budget exhausted: ${ceiling + 15} of ${ceiling + 15} tokens counted today`);
+    expect(upstream.sent).toHaveLength(1);
+  });
+
+  test("H-01: budgets status reports the unknown-usage block, and the signed acceptance lets the person continue", async () => {
+    const { value, spec } = session(); const llm = runtime(value, refusingUpstream(new Error("socket failed")));
+    await expect(drain(llm.stream(unbounded(spec)))).rejects.toThrow();
+    const blocked = evaluateBudgetStatus(workspace, "default");
+    expect(blocked.ok).toBe(false);
+    expect(blocked.reasons).toEqual(["new model requests are refused: 1 earlier request(s) ended without a usage report and with no output limit to bound them"]);
+    expect(blocked.next.join("\n")).toContain("amc budgets reset --agent default --accept-unknown");
+    await expect(acceptUnknownUsageAsync(workspace, "default")).resolves.toMatchObject({ entry: "default" });
+    expect(loadBudgetsConfig(workspace).budgets.perAgent.default!.daily.maxLlmTokens).toBe(5_000_000);
+    expect(evaluateBudgetStatus(workspace, "default")).toMatchObject({ ok: true, next: [] });
+    const upstream = stubUpstream([response]);
+    await drain(runtime(value, upstream).stream(spec));
+    expect(upstream.sent).toHaveLength(1);
+    expect(budgetUsageSnapshot(workspace, "default").daily.unknownLlmTokenRequests).toBe(1);
+  });
+
+  test("H-01: gateway rows: a refused upstream connection and a 401 do not block; an unanswered request still does", () => {
+    const write = (sessionId: string, rows: [eventType: "llm_request" | "llm_response" | "gateway", meta: Record<string, unknown>][]) => {
+      const ledger = openLedger(workspace);
+      try {
+        ledger.startSession({ sessionId, runtime: "amc", binaryPath: "fixture", binarySha256: "a".repeat(64) });
+        for (const [eventType, meta] of rows) ledger.appendEvidence({ sessionId, runtime: "amc", eventType, inline: true, payload: JSON.stringify(meta), meta: { agentId: "default", ...meta } });
+        ledger.sealSession(sessionId);
+      } finally { ledger.close(); }
+    };
+    write("gateway-fixture", [["llm_request", { request_id: "down" }], ["gateway", { stage: "request_error", request_id: "down", status: 502, connectFailed: "ECONNREFUSED" }],
+      ["llm_request", { request_id: "denied" }], ["llm_response", { request_id: "denied", statusCode: 401 }]]);
+    expect(budgetUsageSnapshot(workspace, "default").daily).toMatchObject({ llmRequests: 2, blockingUnknownLlmTokenRequests: 0 });
+    write("gateway-fixture-2", [["llm_request", { request_id: "lost" }]]);
+    expect(budgetUsageSnapshot(workspace, "default").daily.blockingUnknownLlmTokenRequests).toBe(1);
+  });
+
   test("smoke H-2: the unknown-usage refusal counts the blocking requests and names the documented recovery", async () => {
     expect(nativeUnknownUsageNotice(workspace, "default")).toBeNull();
     const { value, spec } = session(); const llm = runtime(value, refusingUpstream(new Error("socket failed")));
-    await expect(drain(llm.stream(spec))).rejects.toThrow();
+    await expect(drain(llm.stream(unbounded(spec)))).rejects.toThrow();
     const refusal = drain(llm.stream(spec));
-    await expect(refusal).rejects.toThrow("blocked by 1 earlier native model request(s) whose token usage is unknown");
-    await expect(refusal).rejects.toThrow("budgets.perAgent.default.unknownTokenUsage: ALLOW_WITH_WARNING in .amc/budgets.yaml, then run amc budgets sign");
-    expect(nativeUnknownUsageNotice(workspace, "default")).toMatch(/^blocked by 1 earlier native model request\(s\) whose token usage is unknown.*until the local budget day ends/);
+    await expect(refusal).rejects.toThrow("1 earlier model request(s) for agent default ended without a usage report");
+    await expect(refusal).rejects.toThrow("then run: amc budgets reset --agent default --accept-unknown");
+    expect(nativeUnknownUsageNotice(workspace, "default")).toMatch(/^1 earlier model request\(s\) for agent default ended without a usage report.*until the local budget day ends/);
     limits(config => { config.budgets.perAgent.default!.unknownTokenUsage = "ALLOW_WITH_WARNING"; });
     expect(nativeUnknownUsageNotice(workspace, "default")).toBeNull();
   });
@@ -189,7 +265,7 @@ describe("AMC-1534 native budget admissions and signed accounting", () => {
     expect(usage.daily.llmTokenUsageComplete).toBe(false);
   });
 
-  test("retains partial usage on a failed stream, and requires an explicitly signed uncertainty waiver to continue", async () => {
+  test("retains partial usage on a failed stream and counts it at no less than the request's upper estimate", async () => {
     const { value, spec } = session(); const upstream = stubUpstream([response]);
     const adapter: LlmAdapter = { ...anthropicAdapter, decode: async function* () {
       yield { type: "usage", usage: { inputTokens: 2, outputTokens: 3, cacheReadTokens: 4, cacheWriteTokens: 5, reasoningTokens: 2 } };
@@ -199,9 +275,9 @@ describe("AMC-1534 native budget admissions and signed accounting", () => {
     await expect(drain(llm.stream(spec))).rejects.toThrow("stream failed");
     const failed = value.readEvents().find(row => row.event_type === "request/failure")!;
     expect(JSON.parse(failed.meta_json).usage).toMatchObject({ reported: true, complete: false, inputTokens: 2, outputTokens: 3 });
-    expect(budgetUsageSnapshot(workspace, "default").daily.llmTokens).toBe(14);
-    await expect(drain(llm.stream(spec))).rejects.toThrow("amc budgets sign");
-    expect(upstream.sent).toHaveLength(1);
+    // The partial report is below the request's upper estimate, so the estimate is what counts (H-01: not a lock-out).
+    expect(budgetUsageSnapshot(workspace, "default").daily.llmTokens).toBe(ceilings()[0]);
+    expect(budgetUsageSnapshot(workspace, "default").daily.blockingUnknownLlmTokenRequests).toBe(0);
     limits(config => { config.budgets.perAgent.default!.unknownTokenUsage = "ALLOW_WITH_WARNING"; });
     await drain(runtime(value, upstream).stream(spec));
     expect(upstream.sent).toHaveLength(2);

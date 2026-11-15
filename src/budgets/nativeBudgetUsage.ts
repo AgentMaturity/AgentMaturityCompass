@@ -157,7 +157,12 @@ export function localDayStart(ts: number): number {
   return date.getTime();
 }
 
-export function projectBudgetUsage(rows: readonly EvidenceEvent[], agentId: string, now: number): BudgetUsage {
+export interface BudgetProjectionOptions {
+  /** From the signed budget (`acceptUnknownUsageBefore`): unknown usage recorded before this time no longer blocks. */
+  readonly acceptUnknownBefore?: number;
+}
+
+export function projectBudgetUsage(rows: readonly EvidenceEvent[], agentId: string, now: number, options: BudgetProjectionOptions = {}): BudgetUsage {
   const dayStart = localDayStart(now);
   const result: BudgetUsage = { daily: { ...period(), toolExecutes: toolCounts(), toolDenied: toolCounts(), toolPending: toolCounts(), llmPendingRequests: 0,
     llmReservedCostUsd: 0, llmBudgetCostUsd: 0, llmBudgetCostUnits: "0", llmUnreservedCostRequests: 0 }, minute: period() };
@@ -195,15 +200,25 @@ export function projectBudgetUsage(rows: readonly EvidenceEvent[], agentId: stri
       tools.set(key, row);
     }
   }
-  const recordRequest = (ts: number, usage: unknown, native: boolean, protocolRefused = false) => {
+  /**
+   * `free`: provably no byte reached a paid provider (the stub, or a connection that never opened), so usage is zero.
+   * `ceiling`: the reservation's upper estimate, counted in place of unknown usage so the token caps still apply.
+   * `nonBlocking`: unknown usage that does not stop the next request (a 401/403/429 refusal, or an owner's signed acceptance).
+   */
+  const recordRequest = (ts: number, usage: unknown, native: boolean, how: { nonBlocking?: boolean; free?: boolean; ceiling?: number | null } = {}) => {
     const measured = measuredUsage(usage, native);
+    const known = measured.tokensKnown || how.free === true;
+    const bounded = !known && how.ceiling !== undefined && how.ceiling !== null;
+    const tokens = bounded ? Math.max(measured.tokens, how.ceiling!) : measured.tokens;
     if (ts >= dayStart && ts <= now) budgetCostUnits += nativeUsdUnits(measured.cost);
     for (const part of periods(ts)) {
-      part.llmRequests++; part.llmTokens += measured.tokens; part.llmCostUsd += measured.cost;
-      if (!measured.tokensKnown) { part.unknownLlmTokenRequests++; if (!protocolRefused) part.blockingUnknownLlmTokenRequests++; }
-      if (!measured.costKnown) part.unknownLlmCostRequests++;
+      part.llmRequests++; part.llmTokens += tokens; part.llmCostUsd += measured.cost;
+      if (!known) { part.unknownLlmTokenRequests++; if (!how.nonBlocking && !bounded) part.blockingUnknownLlmTokenRequests++; }
+      if (!measured.costKnown && how.free !== true) part.unknownLlmCostRequests++;
     }
   };
+  const accepted = (ts: number) => options.acceptUnknownBefore !== undefined && ts < options.acceptUnknownBefore;
+  const refusedStatus = (status: unknown) => [401, 403, 429].includes(Number(status));
   const handledHeaders = new Set<string>();
   for (const reservation of reservations.values()) {
     const meta = budgetMeta(reservation);
@@ -213,12 +228,18 @@ export function projectBudgetUsage(rows: readonly EvidenceEvent[], agentId: stri
       if (!header || header.session_id !== meta.nativeSessionId) throw new Error("Native budget reservation has no matching header");
       const settled = settlements.get(headerId);
       const settledMeta = settled ? budgetMeta(settled) : {};
-      recordRequest(reservation.ts, settledMeta.usage, true, settled?.event_type === "request/failure" && [401, 403, 429].includes(Number(settledMeta.httpStatus)));
+      const failed = settled?.event_type === "request/failure";
+      // Recorded by the runtime itself: refused before the transport, or the connection never opened.
+      const neverSent = failed && (settledMeta.dispatchAttempted === false || typeof settledMeta.connectFailed === "string");
+      const stub = meta.usdExposure === LOCAL_STUB_USD_EXPOSURE;
+      recordRequest(reservation.ts, settledMeta.usage, true, { free: neverSent || stub, ceiling: number(meta.tokenCeiling),
+        nonBlocking: (failed && refusedStatus(settledMeta.httpStatus)) || accepted(reservation.ts) });
       const measured = measuredUsage(settledMeta.usage, true);
       const completeCost = completeNativeCost(header, settled);
       const reserved = number(meta.reservedCostUsd);
       if (meta.reservedCostUsd !== undefined && (reserved === null || reserved === 0)) throw new Error("Native USD reservation amount is invalid");
-      if (reserved !== null && !completeCost) {
+      if (neverSent && !stub) { /* Nothing reached the provider: the USD ceiling is released and nothing is unpriced. */ }
+      else if (reserved !== null && !completeCost) {
         // An incomplete observation cannot release the ceiling. Preserve exposure over day boundaries.
         reservedCostUnits += nativeUsdUnits(Math.max(reserved, measured.cost));
         if (reservation.ts >= dayStart) budgetCostUnits -= nativeUsdUnits(measured.cost);
@@ -251,7 +272,7 @@ export function projectBudgetUsage(rows: readonly EvidenceEvent[], agentId: stri
     const failure = meta.failure as Record<string, unknown> | undefined;
     const historicalAttempt = meta.dispatchAttempted === undefined && (meta.httpStatus !== null || ["TRANSPORT", "ABORTED"].includes(String(failure?.code)));
     if (!handledHeaders.has(headerId) && (settled.event_type === "request/response" || meta.dispatchAttempted === true || historicalAttempt)) {
-      recordRequest(header.ts, meta.usage, true, settled.event_type === "request/failure" && [401, 403, 429].includes(Number(meta.httpStatus)));
+      recordRequest(header.ts, meta.usage, true, { nonBlocking: (settled.event_type === "request/failure" && refusedStatus(meta.httpStatus)) || accepted(header.ts) });
       if (!completeNativeCost(header, settled)) result.daily.llmUnreservedCostRequests++;
     }
   }
@@ -266,14 +287,20 @@ export function projectBudgetUsage(rows: readonly EvidenceEvent[], agentId: stri
   const legacyResponses = new Set(rows.filter(row => row.event_type === "llm_response").map(row => {
     const meta = budgetMeta(row); return `${row.session_id}:${String(meta.request_id ?? meta.requestId ?? row.id)}`;
   }));
+  // The gateway records a request whose upstream connection never opened (nothing listening, no such host).
+  const gatewayNeverSent = new Set(rows.filter(row => row.event_type === "gateway").map(row => ({ row, meta: budgetMeta(row) }))
+    .filter(({ meta }) => meta.stage === "request_error" && typeof meta.connectFailed === "string").map(({ row, meta }) => `${row.session_id}:${String(meta.request_id)}`));
   for (const row of rows) {
     if (row.ts > now || owner(row) !== agentId) continue;
     const meta = budgetMeta(row);
-    if (row.event_type === "llm_request" && !legacyResponses.has(`${row.session_id}:${String(meta.request_id ?? meta.requestId ?? row.id)}`)) result.daily.llmUnreservedCostRequests++;
+    const requestKey = `${row.session_id}:${String(meta.request_id ?? meta.requestId ?? row.id)}`;
+    const unanswered = row.event_type === "llm_request" && !legacyResponses.has(requestKey) && !gatewayNeverSent.has(requestKey);
+    if (unanswered) result.daily.llmUnreservedCostRequests++;
     if (row.event_type === "llm_request") for (const part of periods(row.ts)) {
       part.llmRequests++;
-      if (!legacyResponses.has(`${row.session_id}:${String(meta.request_id ?? meta.requestId ?? row.id)}`)) {
-        part.unknownLlmTokenRequests++; part.blockingUnknownLlmTokenRequests++; part.unknownLlmCostRequests++;
+      if (unanswered) {
+        part.unknownLlmTokenRequests++; part.unknownLlmCostRequests++;
+        if (!accepted(row.ts)) part.blockingUnknownLlmTokenRequests++;
       }
     }
     if (row.event_type === "llm_response") {
@@ -284,7 +311,10 @@ export function projectBudgetUsage(rows: readonly EvidenceEvent[], agentId: stri
       if (!costComplete) result.daily.llmUnreservedCostRequests++;
       for (const part of periods(row.ts)) {
         part.llmTokens += measured.tokens; part.llmCostUsd += measured.cost;
-        if (!measured.tokensKnown) { part.unknownLlmTokenRequests++; part.blockingUnknownLlmTokenRequests++; }
+        if (!measured.tokensKnown) {
+          part.unknownLlmTokenRequests++;
+          if (!refusedStatus(meta.statusCode) && !accepted(row.ts)) part.blockingUnknownLlmTokenRequests++;
+        }
         if (!costComplete) part.unknownLlmCostRequests++;
       }
     }

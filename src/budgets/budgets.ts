@@ -20,7 +20,7 @@ import { vaultStatus } from "../vault/vault.js";
 import { pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ActionClass } from "../types.js";
-import { projectBudgetUsage, readBudgetEvents, type BudgetUsage } from "./nativeBudgetUsage.js";
+import { projectBudgetUsage, readBudgetEvents, type BudgetProjectionOptions, type BudgetUsage } from "./nativeBudgetUsage.js";
 import type { TrustContext } from "../trust/trustContext.js";
 import { nativeUsdUnits } from "./nativeUsdAmount.js";
 import { VAULT_LOCKED_NO_SIGN_MESSAGE } from "../vault/vaultLockedError.js";
@@ -43,6 +43,8 @@ export const budgetsSchema = z.object({
     perAgent: z.record(z.string(), 
       z.object({
         unknownTokenUsage: z.enum(["BLOCK", "ALLOW_WITH_WARNING"]).optional(),
+        /** Signed by `amc budgets reset --accept-unknown`: unknown usage recorded before this time no longer blocks. */
+        acceptUnknownUsageBefore: z.iso.datetime().optional(),
         daily: z.object({
           maxLlmRequests: z.number().int().positive(),
           maxLlmTokens: z.number().int().positive(),
@@ -294,27 +296,65 @@ export function budgetForAgent(config: BudgetsConfig, agentId: string): BudgetsC
   return fallback ?? null;
 }
 
+type AgentBudget = BudgetsConfig["budgets"]["perAgent"][string];
+export function acceptUnknownOption(budget: AgentBudget | null): BudgetProjectionOptions {
+  return budget?.acceptUnknownUsageBefore === undefined ? {} : { acceptUnknownBefore: Date.parse(budget.acceptUnknownUsageBefore) };
+}
+
 /** Counters combine verified native and legacy evidence; numeric usage is a known subtotal. */
-export function budgetUsageSnapshot(workspace: string, agentId: string, now = Date.now(), options: { trust?: TrustContext } = {}): BudgetUsage {
-  return projectBudgetUsage(readBudgetEvents(workspace, undefined, options), agentId, now);
+export function budgetUsageSnapshot(workspace: string, agentId: string, now = Date.now(), options: { trust?: TrustContext } & BudgetProjectionOptions = {}): BudgetUsage {
+  return projectBudgetUsage(readBudgetEvents(workspace, undefined, options), agentId, now, options);
+}
+
+/**
+ * The owner's recorded decision to go on after requests whose usage AMC cannot bound: signs `acceptUnknownUsageBefore`
+ * (now) into the budget entry that applies to the agent, through the same signing path as `amc budgets sign`. Limits are
+ * unchanged, and requests recorded later still block when their usage is unknown.
+ */
+export async function acceptUnknownUsageAsync(workspace: string, agentId: string, now = new Date()): Promise<{ entry: string; acceptedBefore: string }> {
+  const publication = captureBudgetsPublication(workspace);
+  if (publication.bytes === null) throw new Error(`Budgets config not found: ${budgetsPath(workspace)}`);
+  const document = YAML.parseDocument(publication.bytes.toString("utf8"));
+  const config = budgetsSchema.parse(document.toJS() as unknown);
+  const entry = config.budgets.perAgent[agentId] ? agentId : config.budgets.perAgent.default ? "default" : null;
+  if (entry === null) throw new Error(`No budget applies to agent ${agentId}; nothing to accept.`);
+  const acceptedBefore = now.toISOString();
+  document.setIn(["budgets", "perAgent", entry, "acceptUnknownUsageBefore"], acceptedBefore);
+  (await publication.prepareAsync(Buffer.from(document.toString()))).publish();
+  return { entry, acceptedBefore };
+}
+
+/** The commands that let a person continue, one per kind of block. */
+function budgetNextSteps(agentId: string, reasons: readonly string[], unknownBlocked: boolean): string[] {
+  const next: string[] = [];
+  if (reasons.includes("budgets config signature invalid")) next.push("Run amc budgets verify; if .amc/budgets.yaml was edited on purpose, review it and run amc budgets sign.");
+  if (unknownBlocked) next.push(`Check what the earlier requests did, then accept their unknown usage: amc budgets reset --agent ${agentId} --accept-unknown`);
+  if (reasons.some(reason => reason.startsWith("per-minute"))) next.push("Wait a minute: per-minute limits count the last 60 seconds.");
+  if (reasons.some(reason => reason.startsWith("daily"))) next.push(`Wait until the local budget day ends (midnight), or raise the limit on purpose: edit budgets.perAgent.${agentId} in .amc/budgets.yaml, then run amc budgets sign.`);
+  if (reasons.some(reason => reason.startsWith("USD exposure"))) next.push("Earlier requests have no price ceiling; see docs/BUDGETS.md (USD limits) before the next paid request.");
+  return next;
 }
 
 export function evaluateBudgetStatus(workspace: string, agentId: string, now = Date.now(), options: { trust?: TrustContext } = {}): {
   ok: boolean;
   reasons: string[];
+  /** What to run or wait for to continue, in plain words; empty when nothing blocks. */
+  next: string[];
   exceededActionClasses: ActionClass[];
   usage: ReturnType<typeof budgetUsageSnapshot>;
   budgetConfigValid: boolean;
-  nativeAdmissionPolicy: { unknownTokenUsage: "BLOCK" | "ALLOW_WITH_WARNING"; tokenLimit: "between-dispatch-threshold"; costLimit: "signed-request-reservations" | "disabled" };
+  nativeAdmissionPolicy: { unknownTokenUsage: "BLOCK" | "ALLOW_WITH_WARNING"; tokenLimit: "between-dispatch-threshold"; costLimit: "signed-request-reservations" | "disabled"; acceptUnknownUsageBefore: string | null };
 } {
-  const nativeAdmissionPolicy = (unknownTokenUsage: "BLOCK" | "ALLOW_WITH_WARNING" = "BLOCK", usd = true) => ({ unknownTokenUsage, tokenLimit: "between-dispatch-threshold" as const, costLimit: usd ? "signed-request-reservations" as const : "disabled" as const });
+  const nativeAdmissionPolicy = (unknownTokenUsage: "BLOCK" | "ALLOW_WITH_WARNING" = "BLOCK", usd = true, acceptUnknownUsageBefore: string | null = null) => ({ unknownTokenUsage, tokenLimit: "between-dispatch-threshold" as const, costLimit: usd ? "signed-request-reservations" as const : "disabled" as const, acceptUnknownUsageBefore });
   let policyBytes: Buffer | undefined;
   try { policyBytes = readFileSync(budgetsPath(workspace)); } catch { /* Preserve the existing invalid/missing policy status branch. */ }
   const signature = policyBytes === undefined ? { valid: false } : verifyBudgetsConfigSignature(workspace, policyBytes);
   if (!signature.valid) {
+    const reasons = ["budgets config signature invalid"];
     return {
       ok: false,
-      reasons: ["budgets config signature invalid"],
+      reasons,
+      next: budgetNextSteps(agentId, reasons, false),
       exceededActionClasses: ["DEPLOY", "WRITE_HIGH", "SECURITY"],
       usage: budgetUsageSnapshot(workspace, agentId, now, options),
       budgetConfigValid: false,
@@ -328,17 +368,24 @@ export function evaluateBudgetStatus(workspace: string, agentId: string, now = D
     return {
       ok: true,
       reasons: [],
+      next: [],
       exceededActionClasses: [],
       usage: budgetUsageSnapshot(workspace, agentId, now, options),
       budgetConfigValid: true,
       nativeAdmissionPolicy: nativeAdmissionPolicy()
     };
   }
-  const usage = budgetUsageSnapshot(workspace, agentId, now, options);
+  const usage = budgetUsageSnapshot(workspace, agentId, now, { ...options, ...acceptUnknownOption(budget) });
   const reasons: string[] = [];
   const exceededActionClasses: ActionClass[] = [];
   if (budget.daily.maxCostUsd !== null && usage.daily.llmUnreservedCostRequests > 0) {
     reasons.push("USD exposure is unknown for prior dispatches without request reservations");
+  }
+  // The same test native admission makes, so status never says ok while the agent is refused.
+  const unknown = Math.max(usage.daily.blockingUnknownLlmTokenRequests, usage.minute.blockingUnknownLlmTokenRequests);
+  const unknownBlocked = budget.unknownTokenUsage !== "ALLOW_WITH_WARNING" && unknown > 0;
+  if (unknownBlocked) {
+    reasons.push(`new model requests are refused: ${unknown} earlier request(s) ended without a usage report and with no output limit to bound them`);
   }
 
   if (usage.minute.llmRequests > budget.perMinute.maxLlmRequests) {
@@ -367,10 +414,11 @@ export function evaluateBudgetStatus(workspace: string, agentId: string, now = D
   return {
     ok: reasons.length === 0,
     reasons,
+    next: budgetNextSteps(agentId, reasons, unknownBlocked),
     exceededActionClasses: [...new Set(exceededActionClasses)],
     usage,
     budgetConfigValid: true,
-    nativeAdmissionPolicy: nativeAdmissionPolicy(budget.unknownTokenUsage, budget.daily.maxCostUsd !== null)
+    nativeAdmissionPolicy: nativeAdmissionPolicy(budget.unknownTokenUsage, budget.daily.maxCostUsd !== null, budget.acceptUnknownUsageBefore ?? null)
   };
 }
 
