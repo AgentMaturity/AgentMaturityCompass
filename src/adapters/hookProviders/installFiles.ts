@@ -3,7 +3,7 @@
  * providers, src/adapters/hookProviders/pi.ts for Pi): input validation, path safety, the install lock, snapshot and
  * rollback, the managed .gitignore block and lease decoding. Moved verbatim from hookIntegration.ts (P1-22).
  */
-import { closeSync, existsSync, lstatSync, mkdirSync, openSync, readFileSync, statSync, unlinkSync, writeFileSync } from "node:fs";
+import { closeSync, existsSync, lstatSync, mkdirSync, openSync, readFileSync, readdirSync, rmdirSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { z } from "zod";
 import { approvalPolicyPath, approvalPolicySigPath, verifyApprovalPolicySignature } from "../../approvals/approvalPolicyEngine.js";
@@ -386,6 +386,13 @@ export function loadSignedHookManifest<T>(workspace: string, paths: { manifest: 
  * Remove an installation's own files (DSH and Codex, P2-17) inside a fresh deletion gate. No deletion target kind names
  * hook installation files, so the closest one (caches) is used: a hold on caches refuses the removal and leaves every file.
  */
+/** Delete `dir` only when it is empty: for a folder the install itself created (the manifest says so), never another one. */
+export function removeDirIfEmpty(dir: string): void {
+  try {
+    if (readdirSync(dir).length === 0) rmdirSync(dir);
+  } catch { /* gone, not a folder, or not ours to remove: leave it */ }
+}
+
 export function removeInstallationFiles(workspace: string, executor: string, targets: readonly string[]): void {
   withDeletionGate({ workspace, executor, target: { kind: "caches" } }, () => {
     for (const path of targets) if (existsSync(path)) unlinkSync(path);

@@ -6,7 +6,6 @@ import {
   type HookIntegrationStatus,
   type HookMode,
   type HookIntegrationProvider,
-  type HookProvider,
 } from "../adapters/hookIntegration.js";
 import { verifyEvidenceEventIntegrity, type EvidenceLedgerReader } from "../ledger/ledger.js";
 import type { EvidenceEvent } from "../types.js";
@@ -67,6 +66,9 @@ export interface HookHealthDiagnostic {
 interface IndexedEvidenceEvent extends EvidenceEvent {
   row_id: number;
 }
+
+/** The facts of one verified hook event that health reports, whichever provider recorded it. */
+type HookEvidenceFacts = Pick<ReturnType<typeof hookActionEvidenceMetaSchema.parse>, "sourceEventType" | "actionId" | "receipt_id" | "receipt_sha256">;
 
 const REASON_ORDER: HookHealthReasonCode[] = [
   "HOOK_INSTALLATION_INVALID",
@@ -182,7 +184,20 @@ function finalize(input: {
   };
 }
 
-export function inspectHookHealth(input: { workspace: string; provider: HookProvider }): HookHealthDiagnostic {
+/**
+ * A Codex observation row (bridge/codexObservations.ts) read as the facts health reports. Codex reports only finished
+ * calls (PostToolUse), through its own route and as an `audit` row, so it never matches the AEP metadata the other
+ * providers write. A row AMC kept only to flag a conflict (`conflictOf`) is not counted.
+ */
+function codexObservationFacts(metadata: unknown, agentId: string): HookEvidenceFacts | "malformed" | null {
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return null;
+  const row = metadata as Record<string, unknown>;
+  if (row.provider !== "codex" || row.codexObservationSchemaVersion !== 1 || row.agentId !== agentId || row.conflictOf !== undefined) return null;
+  if (typeof row.actionId !== "string" || typeof row.receipt_id !== "string" || typeof row.receipt_sha256 !== "string") return "malformed";
+  return { sourceEventType: "action.completed", actionId: row.actionId, receipt_id: row.receipt_id, receipt_sha256: row.receipt_sha256 };
+}
+
+export function inspectHookHealth(input: { workspace: string; provider: HookIntegrationProvider }): HookHealthDiagnostic {
   const workspace = resolve(input.workspace);
   const installation = getHookIntegrationStatus({ workspace, provider: input.provider });
   if (installation.state === "not-installed") {
@@ -223,17 +238,25 @@ export function inspectHookHealth(input: { workspace: string; provider: HookProv
     database = new Database(databasePath, { readonly: true, fileMustExist: true });
     database.pragma("query_only = ON");
     const reader: EvidenceLedgerReader = { workspace, db: database };
-    const rows = database.prepare(
-      "SELECT rowid AS row_id, * FROM evidence_events WHERE event_type IN ('tool_action', 'tool_result') ORDER BY rowid ASC",
+    const codex = installation.provider === "codex";
+    const rows = database.prepare(codex
+      ? "SELECT rowid AS row_id, * FROM evidence_events WHERE event_type = 'audit' AND id LIKE 'cxpost%' ORDER BY rowid ASC"
+      : "SELECT rowid AS row_id, * FROM evidence_events WHERE event_type IN ('tool_action', 'tool_result') ORDER BY rowid ASC",
     ).all() as IndexedEvidenceEvent[];
     const tail = database.prepare(
       "SELECT id, blob_ref FROM evidence_events ORDER BY rowid DESC LIMIT 1",
     ).get() as { id: string; blob_ref: string | null } | undefined;
 
-    const matching: Array<{ event: IndexedEvidenceEvent; metadata: ReturnType<typeof hookActionEvidenceMetaSchema.parse> }> = [];
+    const matching: Array<{ event: IndexedEvidenceEvent; metadata: HookEvidenceFacts }> = [];
     let malformedMatchingEvent = false;
     for (const event of rows) {
       const metadata = parseMetadata(event);
+      if (codex) {
+        const facts = codexObservationFacts(metadata, installation.agentId);
+        if (facts === "malformed") malformedMatchingEvent = true;
+        else if (facts) matching.push({ event, metadata: facts });
+        continue;
+      }
       if (!candidateTargetsAgent(metadata, installation.agentId)) continue;
       const parsed = hookActionEvidenceMetaSchema.safeParse(metadata);
       if (!parsed.success) {

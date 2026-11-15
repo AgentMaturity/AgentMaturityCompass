@@ -33,7 +33,7 @@ import {
   addManagedIgnoreBlock, assertAllPathsSafe, assertControlBridgeLocal, assertManagedPathSafe, controlApprovalPolicy, managedLeaseStatus,
   leaseManifestFields, obtainHookLease, parseInstallOptions, fileChange, HOOK_CONTROL_INTEGRATION_ID, HOOK_INTEGRATION_ID, HOOK_TOKEN_MODE, HookIntegrationError,
   hasManagedIgnoreBlock, hookModeSchema, ignoreBlockHash, integrationId, leaseScopes, normalizeBridgeBase, parseMode, relativePortable,
-  removeManagedIgnoreBlock, restore, snapshot, validateAgentId, withInstallLock, type HookFileChange, type HookMode,
+  removeDirIfEmpty, removeManagedIgnoreBlock, restore, snapshot, validateAgentId, withInstallLock, type HookFileChange, type HookMode,
 } from "./hookProviders/installFiles.js";
 export { HOOK_CONTROL_INTEGRATION_ID, HOOK_INTEGRATION_ID, HookIntegrationError, type HookFileChange, type HookMode } from "./hookProviders/installFiles.js";
 
@@ -87,6 +87,8 @@ const manifestCommonSchema = z.object({
   tokenPath: z.string().min(1),
   ...leaseManifestFields,
   configExistedBefore: z.boolean(),
+  /** True when the install created the provider's config folder (.claude, .gemini); `remove` then deletes it if it is empty. Absent on older installs: the folder is kept. */
+  configDirCreated: z.boolean().optional(),
   ignoreExistedBefore: z.boolean(),
   ignoreBlockSha256: z.string().regex(/^[a-f0-9]{64}$/),
   configSha256: z.string().regex(/^[a-f0-9]{64}$/),
@@ -172,6 +174,8 @@ export interface HookIntegrationStatus {
   files: { config: string; ignore: string; token: string; manifest: string; signature: string };
   /** Pi and Claude Code control: what AMC may claim for the agent's sessions, from verified session registrations. */
   governance?: PiGovernance | ClaudeCodeGovernance;
+  /** Codex: reports the hook could not hand to AMC, from its own unsigned local note; a lower bound (a hook that never ran writes nothing). */
+  lostObservations?: { count: number; lastTs: number; lastReason: string };
 }
 
 export interface InstallHookIntegrationOptions {
@@ -255,7 +259,7 @@ function parseProvider(provider: unknown): ConfigHookProvider {
   if (!parsed.success) {
     throw new HookIntegrationError(
       "HOOK_PROVIDER_UNSUPPORTED",
-      `unsupported hook provider: ${String(provider)}; supported providers: claude-code, gemini-cli`
+      `unsupported hook provider: ${String(provider)}; supported providers: claude-code, gemini-cli, pi, dsh, codex (codex: observe mode only)`
     );
   }
   return parsed.data;
@@ -806,6 +810,7 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
       leaseIssuedTs: leasePayload.issuedTs,
       leaseExpiresTs: leasePayload.expiresTs,
       configExistedBefore: existingManifest?.configExistedBefore ?? config.existed,
+      configDirCreated: existingManifest ? existingManifest.configDirCreated ?? false : !existsSync(dirname(paths.config)),
       ignoreExistedBefore: existingManifest?.ignoreExistedBefore ?? ignoreBefore.existed,
       ignoreBlockSha256: ignoreBlockHash(),
       configSha256: sha256Hex(configBytes),
@@ -1110,28 +1115,16 @@ export function removeHookIntegration(options: RemoveHookIntegrationOptions): Ho
       writeFileAtomic(paths.ignore, nextIgnore, ignoreBefore.mode);
     }
     try {
-      revokeLeaseForCli({
-        workspace,
-        leaseId: manifest.leaseId,
-        reason: "AMC provider hook integration removed"
-      });
+      revokeLeaseForCli({ workspace, leaseId: manifest.leaseId, reason: "AMC provider hook integration removed" });
     } catch (error) {
       restore(paths.config, before.config);
       restore(paths.ignore, before.ignore);
       throw error;
     }
-    for (const path of [paths.token, paths.manifest, paths.signature]) {
-      if (existsSync(path)) unlinkSync(path);
-    }
+    for (const path of [paths.token, paths.manifest, paths.signature]) if (existsSync(path)) unlinkSync(path);
+    if (manifest.configDirCreated === true) removeDirIfEmpty(dirname(paths.config));
     return {
-      operation: "remove",
-      provider,
-      mode: manifest.mode,
-      source: providerSource(provider),
-      dryRun: false,
-      applied: true,
-      changed: true,
-      files,
+      operation: "remove", provider, mode: manifest.mode, source: providerSource(provider), dryRun: false, applied: true, changed: true, files,
       lease: { scope: "hook:observe", scopes: leaseScopes(manifest.mode), route: "/hooks", leaseId: manifest.leaseId, expiresTs: manifest.leaseExpiresTs },
       limitations: limitations(provider, manifest.mode)
     };

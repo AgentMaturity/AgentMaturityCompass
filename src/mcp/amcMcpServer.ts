@@ -12,7 +12,7 @@
  * Usage:
  *   amc mcp serve
  *
- * Quick config for Claude Code (.claude/mcp.json):
+ * Quick config for Claude Code (.mcp.json in the project root):
  *   { "mcpServers": { "amc": { "command": "amc", "args": ["mcp", "serve"] } } }
  */
 

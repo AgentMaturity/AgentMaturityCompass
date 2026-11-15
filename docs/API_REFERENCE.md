@@ -735,7 +735,7 @@ AMC provides 1,304 public CLI command paths in the live command inventory.
 | 716 | `amc marketplace undeprecate` | Remove deprecation from a pack |
 | 717 | `amc marketplace uninstall` | Uninstall a pack |
 | 718 | `amc mcp` | AMC Model Context Protocol (MCP) server for AI coding assistants, and scoped MCP server configs for the native loop |
-| 719 | `amc mcp add` | Write an unreviewed MCP server config to the user or project scope; review and sign it before mounting |
+| 719 | `amc mcp add` | Add an MCP server to the user or project scope: at a terminal it shows the server's tools and allows them after you type yes; otherwise it writes an unreviewed file |
 | 720 | `amc mcp config` | Print MCP configuration snippets for supported AI coding assistants |
 | 721 | `amc mcp get` | Show one scoped config (id, project:id or user:id) as --mcp would admit it |
 | 722 | `amc mcp list` | List scoped MCP server configs: scope, path, digest, transport, review and signature state; never secrets |
@@ -7004,7 +7004,7 @@ Uninstall a pack
 
 #### `amc mcp add`
 
-Write an unreviewed MCP server config to the user or project scope; review and sign it before mounting
+Add an MCP server to the user or project scope: at a terminal it shows the server's tools and allows them after you type yes; otherwise it writes an unreviewed file
 
 
 | Option | Description |
@@ -7018,6 +7018,9 @@ Write an unreviewed MCP server config to the user or project scope; review and s
 | `--timeout-ms <n>` | - |
 | `--credentials-home <dir>` | - |
 | `--force` | - |
+| `--action-class <class>` | - |
+| `--tool <name>` | - |
+| `--yes` | - |
 | `--json` | - |
 
 #### `amc mcp config`
