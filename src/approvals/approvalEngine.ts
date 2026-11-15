@@ -400,7 +400,7 @@ export function decideApprovalForIntent(params: {
    * (`readNativeApprovalActor`), Studio's signed-in session. Anything else is `self-asserted`: such a reviewer may deny
    * or approve SIMULATE, never approve EXECUTE, and the kind is recorded on the signed row so no consumer counts a
    * self-asserted approval as an identity or role attestation (countedApprovalDecisions).
-   * `terminal`: the caller read one key from the interactive terminal it runs in (native chat). Checked here again
+   * `terminal`: the caller read a typed y or n from the interactive terminal it runs in (native chat). Checked here again
    * (a terminal on stdin, no agent marker, not agent mode), and an approval is taken only for a request whose own rule
    * lets one local person decide (terminalApproverAllowed). No CLI flag selects it.
    */

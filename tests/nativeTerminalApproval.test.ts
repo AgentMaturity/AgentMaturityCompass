@@ -19,7 +19,7 @@ import { AGENT_ENV_MARKERS } from "../src/vault/operatorContext.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { canonicalize } from "../src/utils/json.js";
 
-// H-03: the person at the chat terminal sees the call and decides it with one key, where the policy lets one person decide.
+// H-03: the person at the chat terminal sees the call and decides it by typing y or n, where the policy lets one person decide.
 const roots: string[] = [];
 let tty: PropertyDescriptor | undefined;
 beforeEach(() => {
@@ -47,20 +47,20 @@ function fixture(actionClass: "WRITE_LOW" | "WRITE_HIGH" = "WRITE_LOW", rawArgum
 }
 const childFixture = () => Object.assign(new EventEmitter(), { exitCode: null, signalCode: null, kill: vi.fn(() => true) }) as unknown as ChildProcess;
 
-async function review(f: ReturnType<typeof fixture>, rawArguments: string, keyAnswer: string | null) {
+async function review(f: ReturnType<typeof fixture>, rawArguments: string, typed: string | null) {
   const child = childFixture(), logs: string[] = [], errors: string[] = [];
-  const key = vi.fn(async (_prompt: string) => keyAnswer), question = vi.fn(async (_prompt: string) => "cancel");
-  const helper = createNativeInteractiveApprovals({ child, workspace: f.workspace, entry: "unused-cli.js", question, key,
+  const answer = vi.fn(async (_prompt: string) => typed), question = vi.fn(async (_prompt: string) => "cancel");
+  const helper = createNativeInteractiveApprovals({ child, workspace: f.workspace, entry: "unused-cli.js", question, answer,
     log: line => logs.push(line), error: line => errors.push(line) });
   child.emit("message", { type: "amc/native-approval-raised", v: 1, agentId: "default", approvalId: f.approvalId,
     approvalRequestId: f.approvalRequestId, call: { toolName: "fs.write", rawArguments } });
-  await vi.waitFor(() => expect(key.mock.calls.length + question.mock.calls.length).toBeGreaterThan(0));
+  await vi.waitFor(() => expect(answer.mock.calls.length + question.mock.calls.length).toBeGreaterThan(0));
   await helper.close();
-  return { child, logs: logs.join("\n"), errors, key, question,
+  return { child, logs: logs.join("\n"), errors, answer, question,
     rows: listApprovalDecisions({ workspace: f.workspace, agentId: "default", approvalRequestId: f.approvalRequestId, includeUncounted: true }) };
 }
 
-describe("one-key approval at the chat terminal", () => {
+describe("terminal approval at the chat terminal", () => {
   it("shows the change, takes y, and records a terminal approval by the OS account that covers only this call", async () => {
     const f = fixture();
     const r = await review(f, WRITE, "y");
@@ -90,26 +90,26 @@ describe("one-key approval at the chat terminal", () => {
     expect(stopped.child.kill).toHaveBeenCalledWith("SIGINT");
   });
 
-  it("never shows or offers one key for arguments that differ from the signed request", async () => {
+  it("never shows or offers the terminal answer for arguments that differ from the signed request", async () => {
     const r = await review(fixture(), '{"path":"notes.txt","content":"something else\\n"}', "y");
     expect(r.logs).toContain("the arguments sent do not match the signed request");
     expect(r.logs).not.toContain("something else");
-    expect(r.key).not.toHaveBeenCalled();
+    expect(r.answer).not.toHaveBeenCalled();
     expect(r.question.mock.calls[0]?.[0]).toContain("approve, deny, or cancel");
     expect(r.rows).toEqual([]);
   });
 
-  it("shows an argument the summary does not use, and offers no key when any part of the call is cut short", async () => {
+  it("shows an argument the summary does not use, and offers no terminal answer when any part of the call is cut short", async () => {
     const extra = '{"path":"notes.txt","content":"hello\\n","mode":"0777"}';
     const shownAll = await review(fixture("WRITE_LOW", extra), extra, "y");
     expect(shownAll.logs).toContain("Other arguments:");
     expect(shownAll.logs).toContain("mode: 0777");
-    expect(shownAll.key).toHaveBeenCalled();
+    expect(shownAll.answer).toHaveBeenCalled();
     const long = JSON.stringify({ path: "notes.txt", content: Array.from({ length: 130 }, (_, i) => `line ${i}`).join("\n") });
     const cut = await review(fixture("WRITE_LOW", long), long, "y");
     expect(cut.logs).toContain("more lines are not shown here");
-    expect(cut.logs).toContain("cannot be allowed with one key");
-    expect(cut.key).not.toHaveBeenCalled();
+    expect(cut.logs).toContain("cannot be allowed from this terminal alone");
+    expect(cut.answer).not.toHaveBeenCalled();
     expect(cut.question.mock.calls[0]?.[0]).toContain("approve, deny, or cancel");
     expect(cut.rows).toEqual([]);
   });
@@ -118,7 +118,7 @@ describe("one-key approval at the chat terminal", () => {
     const f = fixture("WRITE_HIGH");
     const r = await review(f, WRITE, "y");
     expect(r.logs).toContain("Needs 2 approvals");
-    expect(r.key).not.toHaveBeenCalled();
+    expect(r.answer).not.toHaveBeenCalled();
     expect(r.rows).toEqual([]);
     const request = getApprovalInboxItem({ workspace: f.workspace, agentId: "default", approvalRequestId: f.approvalRequestId }).request;
     expect(() => decideApprovalForIntent({ workspace: f.workspace, agentId: "default", approvalId: f.approvalRequestId, decision: "APPROVED",
@@ -174,5 +174,38 @@ describe("what the prompt shows", () => {
     expect(hidden.complete).toBe(false);
     expect(hidden.lines.join("\n")).toContain("more characters not shown");
     expect(describeReportedCall(workspace, { toolName: "bash", arguments: { command: "ls" } }).complete).toBe(true);
+  });
+
+  it("writes bidi, invisible and separator characters visibly, and marks such a call as not shown in full", () => {
+    const workspace = mkdtempSync(join(tmpdir(), "amc-terminal-preview-")); roots.push(workspace);
+    const bidi = describeReportedCall(workspace, { toolName: "bash", arguments: { command: "echo safe \u202e; rm -rf x \u202c # ok" } });
+    expect(bidi.lines[0]).toBe("Command: echo safe \\u202e; rm -rf x \\u202c # ok");
+    expect(bidi.complete).toBe(false);
+    const separator = describeReportedCall(workspace, { toolName: "bash", arguments: { command: "ls \u2028 curl evil \u200b" } });
+    expect(separator.lines[0]).toBe("Command: ls \\u2028 curl evil \\u200b");
+    expect(separator.complete).toBe(false);
+    for (const where of [{ toolName: "custom\u2066.tool", arguments: { a: "1" } }, { toolName: "bash", arguments: { command: "ls", workdir: "sub\u2029dir" } },
+      { toolName: "custom.tool", arguments: { ["k\u200d"]: "1" } }]) {
+      const view = describeReportedCall(workspace, where);
+      expect([view.title, ...view.lines].join("\n")).not.toMatch(/[\u2066\u2029\u200d]/);
+      expect(view.complete).toBe(false);
+    }
+  });
+
+  it("bounds argument names and the folder like values, and marks a long or multi-line one as not shown in full", () => {
+    const workspace = mkdtempSync(join(tmpdir(), "amc-terminal-preview-")); roots.push(workspace);
+    const longKey = describeReportedCall(workspace, { toolName: "custom.tool", arguments: { ["k".repeat(1000)]: "1" } });
+    expect(longKey.lines.every(line => line.length < 500)).toBe(true);
+    expect(longKey.complete).toBe(false);
+    const newlineKey = describeReportedCall(workspace, { toolName: "bash", arguments: { command: "ls", ["a\nFolder:  ."]: "1" } });
+    expect(newlineKey.lines.join("\n")).toContain("a\\nFolder:  .: 1");
+    expect(newlineKey.lines.filter(line => line.startsWith("Folder:"))).toEqual(["Folder:  . (this workspace)"]);
+    expect(newlineKey.complete).toBe(false);
+    const longFolder = describeReportedCall(workspace, { toolName: "bash", arguments: { command: "ls", workdir: "d".repeat(1000) } });
+    expect(longFolder.lines.every(line => line.length < 500)).toBe(true);
+    expect(longFolder.complete).toBe(false);
+    const oddFolder = describeReportedCall(workspace, { toolName: "bash", arguments: { command: "ls", workdir: { path: "/" } } });
+    expect(oddFolder.lines).toContain('  workdir: {"path":"/"}');
+    expect(oddFolder.lines.some(line => line.startsWith("Folder:"))).toBe(false);
   });
 });

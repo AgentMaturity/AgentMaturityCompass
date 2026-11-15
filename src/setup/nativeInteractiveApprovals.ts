@@ -15,8 +15,8 @@ export interface NativeApprovalPromptOptions {
   readonly agentId?: string;
   /** The parent should cancel its readline question when this signal aborts. */
   readonly question: (prompt: string, signal?: AbortSignal) => Promise<string | null>;
-  /** One key, without Enter: the key's character, or null (Esc, Ctrl-C, a closed terminal). Falls back to `question`. */
-  readonly key?: (prompt: string, signal: AbortSignal) => Promise<string | null>;
+  /** An approval's y or n typed after the prompt, then Enter; null for anything else (Esc, Ctrl-C, a paste, a closed terminal). Falls back to `question`. */
+  readonly answer?: (prompt: string, signal: AbortSignal) => Promise<string | null>;
   /** Opens the vault in this process before a terminal decision is signed, when chat holds its passphrase. */
   readonly unlockVault?: () => void;
   readonly log: (line: string) => void; readonly error: (line: string) => void;
@@ -54,7 +54,7 @@ function describeAsk(item: ApprovalInboxItem, call: ReportedCall | null, what: C
     what === null ? `The agent wants to use the tool "${request.toolName}".` : `The agent wants to: ${what.title}`,
     ...(what === null
       ? [call === null ? "  AMC cannot show this call here: the run did not send its arguments." : "  AMC cannot show this call here: the arguments sent do not match the signed request."]
-      : [...what.lines.map(line => `  ${line}`), ...(what.complete ? [] : ["  Part of this call is not shown here, so it cannot be allowed with one key."])]),
+      : [...what.lines.map(line => `  ${line}`), ...(what.complete ? [] : ["  Part of this call is not shown here, so it cannot be allowed from this terminal alone."])]),
     `Needs ${needs} from ${request.rolesAllowed.map(role => ROLE_WORDS[role] ?? role.toLowerCase()).join(" or ")}${request.requireDistinctUsers ? ", each a different person who did not start this chat" : ""}. ` +
       `Kind: ${request.actionClass}, risk ${request.riskTier}${request.effectiveMode === "SIMULATE" ? "; if allowed it is only simulated" : ""}. Asks until ${new Date(request.expiresTs).toLocaleTimeString()}. Request ${request.approvalRequestId}.`
   ];
@@ -129,10 +129,10 @@ export function createNativeInteractiveApprovals(options: NativeApprovalPromptOp
       });
     });
   };
-  /** One key at this terminal: y allows this one call, n refuses it, anything else stops the turn. Signed in this process. */
+  /** y then Enter at this terminal allows this one call, n refuses it, anything else stops the turn. Signed in this process. */
   const decideHere = async (event: Raised, item: ApprovalInboxItem, signal: AbortSignal): Promise<void> => {
-    const prompt = "Allow this once? y = yes, n = no, Esc = stop this turn: ";
-    const answer = options.key === undefined ? await ask(prompt, signal) : closed || cancelled || signal.aborted ? null : await options.key(prompt, signal).catch(() => null);
+    const prompt = "Allow this once? Type y (yes) or n (no), then Enter; anything else stops this turn: ";
+    const answer = options.answer === undefined ? await ask(prompt, signal) : closed || cancelled || signal.aborted ? null : await options.answer(prompt, signal).catch(() => null);
     if (closed || cancelled || channelLost) return;
     const word = (answer ?? "").trim().toLowerCase();
     const decision = word === "y" || word === "yes" ? "APPROVED" : word === "n" || word === "no" ? "DENIED" : null;
@@ -144,7 +144,7 @@ export function createNativeInteractiveApprovals(options: NativeApprovalPromptOp
     const result = decideApprovalForIntent({ workspace, agentId: item.request.agentId, approvalId: item.request.approvalRequestId,
       decision, mode: item.request.effectiveMode, reviewerAuthentication: "terminal", username: account, userId: account, userRoles: ["OWNER"],
       expectedRequestDigestSha256: approvalRequestBindingDigest(item.request),
-      reason: `${decision === "APPROVED" ? "Allowed" : "Refused"} with one key at the interactive chat terminal of OS account ${account}; nobody signed in.` });
+      reason: `${decision === "APPROVED" ? "Allowed" : "Refused"} by typing at the interactive chat terminal of OS account ${account}; nobody signed in.` });
     options.log(decision === "APPROVED"
       ? `Allowed once. Recorded as approved at this terminal by ${account} (no sign-in); it covers only this call.${result.approval.status === "PENDING" ? " More approval is still needed." : ""}`
       : "Refused. Recorded at this terminal; the agent is told no and the turn goes on.");

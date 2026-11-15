@@ -1,6 +1,6 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { createInterface } from "node:readline";
-import { readOneKey } from "./nativeOneKey.js";
+import { readApprovalAnswer } from "./nativeApprovalAnswer.js";
 import { resolve } from "node:path";
 import { admitWorkspaceTrust } from "../cli-agent-options.js";
 import { TRUST_WORKSPACE_ENV } from "../security/workspaceTrust.js";
@@ -190,10 +190,10 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       catch { finish(null); }
     });
   };
-  // One key without Enter (an approval's y or n); typed-ahead and pasted text never answer (nativeOneKey.ts).
-  const key = (prompt: string, signal: AbortSignal): Promise<string | null> => {
+  // An approval's y or n, typed after the prompt and then Enter; typed-ahead and pasted text never answer (nativeApprovalAnswer.ts).
+  const answer = (prompt: string, signal: AbortSignal): Promise<string | null> => {
     if (closed || signal.aborted || pendingAnswer !== null) return Promise.resolve(null);
-    return readOneKey({ terminal, input: process.stdin, output: process.stdout, question }, prompt, signal);
+    return readApprovalAnswer({ terminal, input: process.stdin, output: process.stdout, question }, prompt, signal);
   };
   const cancel = () => {
     if (cancelActiveCommand !== null) cancelActiveCommand();
@@ -240,7 +240,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     const onMcpReceipt = (value: unknown) => currentMcpView.accept(value);
     if (display.stream) running.on("message", onMcpReceipt);
     const approvals = interactiveApprovals ? createNativeInteractiveApprovals({
-      child: running, workspace: cwd, entry, agentId: selectedAgentId ?? "default", question, key, log: io.log, error: io.error,
+      child: running, workspace: cwd, entry, agentId: selectedAgentId ?? "default", question, answer, log: io.log, error: io.error,
       unlockVault: () => { if (vaultPassphrase !== null && !vaultStatus(cwd).unlocked) unlockVault(cwd, vaultPassphrase); }
     }) : null;
     const askUser = display.askUser === true ? createNativeInteractiveAskUser({ child: running, workspace: cwd, question, log: io.log, error: io.error }) : null;
@@ -402,7 +402,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         ? `Workspace tools on${options.tools === undefined ? " (this workspace is set up for them; --tools none turns them off)" : ""}. The signed allowlist and Action Policy still decide what runs; ${gateActive ? "an approval gate is active." : "no approval gate is active, so a call the Action Policy allows runs without asking anyone."}`
         : tools === "echo" ? "Echo demonstration tool only; no workspace editing tool is offered."
           : "No tools offered; model replies cannot edit workspace files through this session.");
-      const asks = "Before a gated call runs, this terminal shows what it would do and asks you; where the approval policy lets one person decide, you answer with one key, otherwise a signed-in reviewer decides.";
+      const asks = "Before a gated call runs, this terminal shows what it would do and asks you; where the approval policy lets one person decide, you type y or n and press Enter, otherwise a signed-in reviewer decides.";
       if (approvalMode !== undefined && approvalMode.ok) io.log(`Approval mode: ${approvalMode.mode}${modeGated ? `. ${asks}` : " (nothing executes: every call outside READ_ONLY is simulated)."}`);
       if (approvalClass !== undefined) io.log(`Tool approval gate: ${approvalClass}, risk ${approvalRisk}. ${asks}`);
       if (mcpArgs.length > 0) io.log("MCP tools use each reviewed catalog and pinned config. Each turn starts and disposes its own configured servers; a changed catalog or config refuses the run. /mcp shows each mount.");
