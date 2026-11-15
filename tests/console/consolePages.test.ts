@@ -86,6 +86,9 @@ describe("C-09: records read as rows, escaped", () => {
     expect(keyWords("riskAssuranceScore")).toBe("Risk assurance score");
     expect(workspacePath("C:\\w\\.amc\\x.json")).toBe(".amc/x.json");
     expect(codeWords("GATE_FAIL_LOW_INTEGRITY")).toBe('<span title="GATE_FAIL_LOW_INTEGRITY">low integrity</span>');
+    const maintenance = recordRows({ ts: 1794772410081, dbSizeBytes: 2850816, prunedBlobRows: 0, status: "READY" }, { record: false });
+    for (const words of ["Time", "Database size", "2.9 MB", "Attachments removed", '<span title="READY">Ready</span>']) expect(maintenance).toContain(words);
+    expect(maintenance).not.toContain("2850816");
   });
 });
 
@@ -128,6 +131,7 @@ describe("C-04, C-08, C-17: refusals are 4xx with words", () => {
     expect(refusal?.status).toBe(409);
     expect(refusal?.body.error).toContain("no model configured");
     expect(refusal?.body.error).toContain("AMC_ASSURANCE_MODEL");
+    expect(refusal?.body.error).toContain("From the console: stop AMC Studio and start it again with AMC_ASSURANCE_MODEL set");
     expect(studioSetupError(new Error("other"))).toBeNull();
   });
 
@@ -135,7 +139,8 @@ describe("C-04, C-08, C-17: refusals are 4xx with words", () => {
     for (const bad of ["<img src=x onerror=alert(1)>", "qa viewer", "a".repeat(65), "", "x\u202Ey"]) {
       expect(() => assertNewUsername(bad), bad).toThrow(UsernamePolicyError);
     }
-    for (const good of ["ann", "ann.lee-2_x@corp", "zoë_用户"]) expect(() => assertNewUsername(good), good).not.toThrow();
+    for (const good of ["ann", "ann.lee-2_x@corp", "zoë_用户", "सिद्धार्थ", "jose\u0301"]) expect(() => assertNewUsername(good), good).not.toThrow();
+    expect(createUserRecord({ username: "jose\u0301", roles: ["VIEWER"], passwordHash: "h" }).username).toBe("jos\u00e9");
     expect(() => createUserRecord({ username: "qa viewer", roles: ["VIEWER"], passwordHash: "h" })).toThrow(UsernamePolicyError);
     expect(createUserRecord({ username: "  ann  ", roles: ["VIEWER"], passwordHash: "h" }).username).toBe("ann");
     expect(studioInputError("/a4/x", new UsernamePolicyError("Username must be 1 to 64 letters, digits, dots, dashes, underscores or @, with no spaces."))?.status).toBe(400);

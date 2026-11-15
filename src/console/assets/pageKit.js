@@ -20,7 +20,16 @@ export function recordDetails(value, summary = "Show the record") {
 }
 
 /** camelCase or snake_case key in words: "lastCertStatus" → "Last cert status". */
+// Keys whose mechanical reading would not mean much to a person.
+const KEY_WORDS = {
+  ts: "Time", dbSizeBytes: "Database size", totalEvents: "Records in the evidence log", archivedEvents: "Records archived",
+  prunedEvents: "Records with their content removed", blobRows: "Records with a stored attachment", prunedBlobRows: "Attachments removed",
+  segmentCount: "Archive parts", latestSegmentId: "Newest archive part", latestSegmentTs: "Newest archive part made",
+  dbPath: "Database file", blobs: "Stored attachments", cacheBytes: "Cache size", logsBytes: "Log size", lastBackupTs: "Last backup"
+};
+
 export function keyWords(key) {
+  if (Object.hasOwn(KEY_WORDS, key)) return KEY_WORDS[key];
   const words = String(key).replace(/([a-z0-9])([A-Z])/g, "$1 $2").replace(/[_-]+/g, " ").trim().toLowerCase();
   return words ? words[0].toUpperCase() + words.slice(1) : "";
 }
@@ -37,9 +46,19 @@ function cell(value, key = "") {
   // A time in milliseconds under a key that names one (ts, createdTs, generatedAt…) reads as a date.
   if (typeof value === "number" && value > 1e12 && /(?:^ts$|Ts$|At$|_ts$)/.test(key)) return esc(new Date(value).toLocaleString());
   if (typeof value === "boolean") return value ? "yes" : "no";
+  // A size in bytes reads as KB, MB or GB.
+  if (typeof value === "number" && /(?:^b|B)ytes$/.test(key) && value >= 0) {
+    const [size, unit] = value >= 1e9 ? [value / 1e9, "GB"] : value >= 1e6 ? [value / 1e6, "MB"] : value >= 1e3 ? [value / 1e3, "KB"] : [value, "bytes"];
+    return esc(`${unit === "bytes" ? size : size.toFixed(1)} ${unit}`);
+  }
   if (typeof value === "number") return esc(Number.isInteger(value) ? value : Number(value.toFixed(3)));
   if (Array.isArray(value) && value.every((item) => item === null || typeof item !== "object")) return value.length ? esc(value.join(", ")) : '<span class="muted">none</span>';
   if (typeof value === "object") return recordDetails(value, `${Array.isArray(value) ? `${value.length} items` : "Details"}`);
+  // A state code reads as words, the code kept in the title: "READY" → "Ready", "INSUFFICIENT_EVIDENCE" → "Insufficient evidence".
+  if (typeof value === "string" && /^[A-Z]{3,}(?:_[A-Z0-9]+)*$/.test(value)) {
+    const words = value.toLowerCase().replaceAll("_", " ");
+    return `<span title="${esc(value)}">${esc(words[0].toUpperCase() + words.slice(1))}</span>`;
+  }
   return esc(workspacePath(String(value)));
 }
 
