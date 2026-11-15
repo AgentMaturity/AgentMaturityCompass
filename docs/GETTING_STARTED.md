@@ -69,7 +69,7 @@ The menu shows only what can work now:
 - **Open the console in my browser**: starts AMC if needed and opens the Compass Console.
 - **Just show my score**: prints the full score (below).
 
-AMC preselects your last choice next time. In a pipe, in CI or in an agent's shell, `amc` prints the full score as before; `amc --no-menu` or `AMC_NO_MENU=1` does the same in a terminal. `amc --help` is a short task list; `amc --help --all` lists every command.
+AMC preselects your last choice next time, unless that choice starts services or opens a browser. In a pipe, in CI or in an agent's shell, `amc` prints the full score (in a folder AMC has not set up yet, add `--yes`: `amc --yes` lets it create `.amc/` without a terminal to ask); `amc --no-menu` or `AMC_NO_MENU=1` does the same in a terminal. `amc --help` is a short task list; `amc --help --all` lists every command.
 
 Watching Claude Code from the menu takes three answers on a first run: the menu line, `Add AMC's watch hook to this project's Claude Code settings? It sends what Claude Code does to AMC on this Mac (http://127.0.0.1:<port>).`, and `Start Claude Code here now?`. Codex is the same. The hook points at this folder's own AMC; `amc connect hooks status` reports when AMC has since moved to another port and prints the command that points the hook there again.
 

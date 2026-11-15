@@ -1,6 +1,6 @@
 # AFTER_FIRST_SCORE.md — What to do after your first AMC score
 
-You ran `amc` and got a full score: in a terminal, by choosing "Just show my score" in the start menu (or with `amc --no-menu`); in a script or CI, `amc` prints it directly. This page explains the next moves without drowning you in every command AMC has.
+You ran `amc` and got a full score: in a terminal, by choosing "Just show my score" in the start menu (or with `amc --no-menu`); in a script or CI, `amc` prints it directly (in a folder AMC has not set up yet, `amc --yes`). This page explains the next moves without drowning you in every command AMC has.
 
 ---
 

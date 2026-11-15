@@ -73,7 +73,7 @@ AMC set up this folder (.amc/).
   Just show my score (empty for now)
 ```
 
-Move with the arrow keys and press Enter. The menu only lists what can work right now: a coding agent that is not installed is left out, one that is signed out shows "Sign in to … first", and "Chat with a model" appears when an API key such as `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` is set in your shell. In a pipe, in CI or inside an agent's shell, `amc` prints the score instead, as it always did; `amc --no-menu` or `AMC_NO_MENU=1` does the same in a terminal. `amc --help` lists the few commands you need first; `amc --help --all` lists every command.
+Move with the arrow keys and press Enter. The menu only lists what can work right now: a coding agent that is not installed is left out, one that is signed out shows "Sign in to … first", and "Chat with a model" appears when an API key such as `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` is set in your shell. In a pipe, in CI or inside an agent's shell, `amc` prints the score instead (in a folder AMC has not set up yet, run `amc --yes` so it may create `.amc/` without a terminal to ask); `amc --no-menu` or `AMC_NO_MENU=1` does the same in a terminal. `amc --help` lists the few commands you need first; `amc --help --all` lists every command.
 
 Three short paths:
 
