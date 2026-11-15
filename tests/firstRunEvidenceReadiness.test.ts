@@ -45,7 +45,7 @@ describe("diagnostic evidence readiness", () => {
     expect(empty.status).toBe("INSUFFICIENT_EVIDENCE");
     expect(empty.claimEligible).toBe(false);
     expect(empty.reasonCodes).toContain("NO_ACCEPTED_EVIDENCE");
-    expect(empty.claimBoundary).toContain("Signing proves integrity, not evidence sufficiency");
+    expect(empty.claimBoundary).toContain("A signature shows the record is unchanged, not that there is enough evidence");
 
     const limited = evaluateDiagnosticEvidenceReadiness(readinessInput({
       integrityIndex: 0.52,
@@ -133,7 +133,7 @@ describe("diagnostic evidence readiness", () => {
     expect(markdown).toContain("Artifact Status: **VALID**");
     expect(markdown).toContain("Evidence Readiness: **INSUFFICIENT_EVIDENCE**");
     expect(markdown).toContain("Claim Eligible: **NO**");
-    expect(markdown).toContain("Signing proves integrity, not evidence sufficiency");
+    expect(markdown).toContain("A signature shows the record is unchanged, not that there is enough evidence");
 
     const htmlPath = join(dir, "first-report.html");
     const htmlResult = spawnSync(process.execPath, [

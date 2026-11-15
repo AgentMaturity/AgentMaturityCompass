@@ -28,7 +28,7 @@ Read the two trust lines separately:
 - **Artifact status** (`VALID`, `INVALID`, `UNSIGNED`) tells you whether the report and seal verify.
 - **Evidence readiness** (`READY`, `LIMITED`, `INSUFFICIENT_EVIDENCE`, `UNVERIFIED`) tells you whether the evidence can support external claims.
 
-A clean first run commonly reports `VALID` plus `INSUFFICIENT_EVIDENCE`. That is not a contradiction. Signing proves integrity, not evidence sufficiency. Only `READY` is claim-eligible.
+A clean first run commonly reports `VALID` plus `INSUFFICIENT_EVIDENCE`. That is not a contradiction. A signature shows the record is unchanged, not that there is enough evidence. Only `READY` is claim-eligible.
 
 ---
 

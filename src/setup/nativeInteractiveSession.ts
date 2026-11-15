@@ -97,7 +97,7 @@ function toolsetNotes(readiness: ToolsetReadiness): string[] {
 /** The per-session detail blocks: usage and cost, diagnostics, and the public validation status. */
 function sessionDetailLines(summary: NativeChatChildSummary): string[] {
   return [renderNativeRunUsage(summary.usage, { requestWindow: "latest" }), renderNativeRunDiagnostics(summary.diagnostics),
-    `Public task validation: ${summary.validation?.status ?? "unavailable"}. Passing selected checks does not guarantee correctness.`];
+    `Public task validation: ${summary.validation?.status ?? "unavailable"}. Passing the selected checks does not show the work is correct.`];
 }
 
 /**

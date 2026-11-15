@@ -245,7 +245,7 @@ Read the two status lines independently:
 | Artifact status: `VALID`, `INVALID`, or `UNSIGNED` | Is this report intact and verifiable? |
 | Evidence readiness: `READY`, `LIMITED`, `INSUFFICIENT_EVIDENCE`, or `UNVERIFIED` | Is the evidence strong enough for external claims? |
 
-Only `READY` is claim-eligible. Signing proves artifact integrity, not evidence sufficiency.
+Only `READY` is claim-eligible. A signature shows the record is unchanged, not that there is enough evidence.
 
 **Optional expanded assessment:**
 

@@ -1478,7 +1478,7 @@ async function acquireInstantScoreLock(workspace: string): Promise<() => void> {
   throw new Error("Timed out waiting for another AMC score run to finish.");
 }
 
-function renderInstantFullScore(
+async function renderInstantFullScore(
   report: Awaited<ReturnType<typeof runDiagnostic>>,
   elapsedMs: number,
   state: InstantWorkspaceState,
@@ -1578,10 +1578,14 @@ function renderInstantFullScore(
   const gaps = report.questionScores.filter((question) => question.finalLevel < 3).slice(0, 5);
   if (gaps.length > 0) {
     console.log("");
+    // CLI-20: a person reads the question's title; its id stays in small print for `amc explain`, flag codes stay in the JSON.
+    const { questionBank } = await import("./diagnostic/questionBank.js");
+    const titles = new Map(questionBank.map((question) => [question.id, question.title]));
     console.log(chalk.yellow("  Top gaps:"));
     for (const gap of gaps) {
-      console.log(chalk.gray(`    ${gap.questionId}: L${gap.finalLevel} (${gap.flags.slice(0, 2).join(", ") || "needs evidence"})`));
+      console.log(chalk.gray(`    ${titles.get(gap.questionId) ?? gap.questionId}: L${gap.finalLevel} (${gap.questionId})`));
     }
+    console.log(chalk.gray(`  Why a question is at its level: amc explain ${gaps[0]!.questionId}`));
   }
   console.log("");
   if (state.createdWorkspace) {
@@ -1593,7 +1597,7 @@ function renderInstantFullScore(
     console.log(chalk.yellow(`  ${state.vault.reason}`));
   }
   // The artifact paths stay in the JSON output and under .amc/; the person reading this needs one next step.
-  console.log(chalk.gray("  Details saved under .amc/ (amc --help --all lists the report commands)"));
+  console.log(chalk.gray("  The full report is saved in .amc/. Read it with: amc report latest"));
   if (opts.studioEvidenceUrl) console.log(chalk.gray(`  Evidence in the console: ${opts.studioEvidenceUrl}`));
   // CLI-01: once runs are recorded but none is scored, the menu's "try a demo chat" would be a loop; the readiness step says what counts.
   const loops = report.evidenceCoverage === 0 && recorded > 0;
@@ -1815,7 +1819,7 @@ async function runInstantFullScoreForAgent(params: { workspace: string; agentId:
       episodeRecordPath: refs.episodeRecordPath ?? null,
       studioEvidenceUrl: refs.studioEvidenceUrl
     });
-    renderInstantFullScore(report, elapsedMs, state, {
+    await renderInstantFullScore(report, elapsedMs, state, {
       json: params.json,
       nextStep: params.nextStep,
       ...refs
@@ -1920,7 +1924,7 @@ async function runInstantFullScoreForAgent(params: { workspace: string; agentId:
           studioEvidenceUrl: refs.studioEvidenceUrl
         });
       }
-      renderInstantFullScore(report, elapsedMs, unsignedState, {
+      await renderInstantFullScore(report, elapsedMs, unsignedState, {
         json: params.json,
         nextStep: params.nextStep,
         ...refs
@@ -2536,7 +2540,7 @@ program
       opts.quick = true;
       opts.autoDetect = true;
       opts.export = true;
-      opts.apply = true;
+      opts.apply ??= true; // keep a file named with --apply <file>
 
       // Re-run auto-detect since we just set the flag
       if (!opts.framework) {
@@ -2995,12 +2999,19 @@ program
       }
 
       // Always offer to create AGENTS.md if nothing detected
-      if (detected.length === 0) {
+      const createsNewFile = detected.length === 0;
+      if (createsNewFile) {
         detected.push({ path: "AGENTS.md", label: "AGENTS.md (create new)" });
       }
 
-      // Non-interactive: auto-pick first detected config (or AGENTS.md)
+      // Non-interactive: auto-pick the first agent config found. A new file is made only when named, since nobody saw a question.
       if (!process.stdin.isTTY) {
+        if (createsNewFile && !isDryRun) {
+          console.log(chalk.yellow("  No agent instruction file was found here (AGENTS.md, CLAUDE.md and the like), so nothing was written."));
+          console.log(chalk.gray("  To create AGENTS.md with these guardrails:"), chalk.hex('#4AEF79')("amc guide --go --apply AGENTS.md"));
+          console.log("");
+          return;
+        }
         const autoTarget = (detected[0] ?? { path: "AGENTS.md" }).path;
         const fullPath = pathModule.resolve(process.cwd(), autoTarget);
         const result = applyGuardrails(fullPath, guardrailsContent, readFn, writeFn);
@@ -3955,14 +3966,14 @@ program
         .filter((row) => row.type === "BACKUP_CREATED")
         .sort((a, b) => b.ts - a.ts);
       if (backups.length === 0) {
-        console.log("Backup: never created (WARNING)");
+        console.log(chalk.yellow("Backup: none made yet. Make one with: amc backup create --out amc-backup.amcbackup"));
       } else {
         const latest = backups[0]!;
         const ageDays = Number(((Date.now() - latest.ts) / (24 * 60 * 60 * 1000)).toFixed(2));
         const warningDays = policy.opsPolicy.backups.maxBackupAgeDaysWarning;
         console.log(`Last backup age: ${ageDays}d (threshold ${warningDays}d)`);
         if (ageDays > warningDays) {
-          console.log(chalk.yellow("Backup age warning: exceeds ops policy threshold."));
+          console.log(chalk.yellow("The last backup is older than your ops policy allows. Make a new one with: amc backup create --out amc-backup.amcbackup"));
         }
       }
     } catch (error) {
