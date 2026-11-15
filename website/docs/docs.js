@@ -601,7 +601,7 @@ function renderDoc(md, docName, section = '') {
     <div class="doc-brandline" aria-label="AMC documentation trust contract">
       <span class="doc-brandline-wordmark">amc<span class="brand-cursor">_</span> docs</span>
       <span>Evidence over claims.</span>
-      <span class="doc-brandline-status">artifact valid ≠ evidence ready</span>
+      <span class="doc-brandline-status">A guide from the AMC source</span>
     </div>
     <article class="doc-article" data-doc="${escHtml(docName)}">${html}</article>
   `;
@@ -662,6 +662,24 @@ function addCopyButtons() {
 }
 
 // ─── Welcome Page ───
+function showNotFound(docName) {
+  currentDoc = null;
+  document.getElementById('breadcrumbs').innerHTML = '';
+  document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+  document.getElementById('doc-content').innerHTML = `
+    <div class="welcome">
+      <h1>No guide called “${escHtml(docName)}”</h1>
+      <p>It may have been renamed or removed, or it is not one of the public guides. Search above, or <a href="#" onclick="event.preventDefault();showWelcome()">see all docs</a>.</p>
+    </div>
+  `;
+}
+
+function showRoute(route) {
+  if (route.docName && PUBLIC_DOCS.includes(route.docName)) loadDoc(route.docName, route.section);
+  else if (route.docName) showNotFound(route.docName);
+  else showWelcome();
+}
+
 function showWelcome() {
   currentDoc = null;
   window.location.hash = '';
@@ -673,27 +691,29 @@ function showWelcome() {
     <div class="welcome">
       <section class="welcome-hero">
         <div class="welcome-kicker">Evidence over claims.</div>
-        <h1>Run one command<span class="brand-cursor">_</span></h1>
-        <p class="welcome-lede"><strong>Get the full score. Fix the gaps.</strong> Use the same evidence-first workflow across CLI, Studio, API, desktop, and CI. A valid seal proves artifact integrity; evidence readiness decides whether claims are eligible.</p>
+        <h1>Build an AI agent for work that gets audited<span class="brand-cursor">_</span></h1>
+        <p class="welcome-lede"><strong>Build, run and check AI agents for regulated work.</strong> These guides cover the command line, the Compass Console and the macOS app. Start with <a href="getting-started.html">Getting started</a>.</p>
         <div class="welcome-install-grid">
           <div class="welcome-install-option">
-            <div class="welcome-platform">macOS + Linux</div>
-            <div class="welcome-command"><span>$</span> curl -fsSL https://agentmaturity.co/install.sh | sh</div>
+            <div class="welcome-platform">Current source build, macOS and Linux</div>
+            <div class="welcome-command"><span>$</span> git clone https://github.com/AgentMaturity/AgentMaturityCompass.git</div>
+            <div class="welcome-command"><span>$</span> cd AgentMaturityCompass</div>
+            <div class="welcome-command"><span>$</span> pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link</div>
           </div>
           <div class="welcome-install-option">
-            <div class="welcome-platform">Windows PowerShell</div>
-            <div class="welcome-command"><span>PS&gt;</span> irm https://agentmaturity.co/install.ps1 | iex</div>
+            <div class="welcome-platform">Published 1.1.1 release (older)</div>
+            <p class="welcome-note">The one-line installers, <code>curl -fsSL https://agentmaturity.co/install.sh | sh</code> and <code>irm https://agentmaturity.co/install.ps1 | iex</code>, install the published 1.1.1 release. It has no menu, no A4 Forge and no Claude Code or Codex sign-in, so these guides describe the source build.</p>
           </div>
         </div>
       </section>
 
       <div class="stat-grid">
-        <div class="stat-card"><div class="num">${PUBLIC_DOCS.length}</div><div class="label">Public Guides</div></div>
+        <div class="stat-card"><div class="num">${PUBLIC_DOCS.length}</div><div class="label">Guides</div></div>
         <div class="stat-card"><div class="num">${PUBLIC_CATEGORIES.length}</div><div class="label">Categories</div></div>
-        <div class="stat-card"><div class="num">244</div><div class="label">Default Questions</div></div>
-        <div class="stat-card"><div class="num">1,304</div><div class="label">CLI Paths</div></div>
+        <div class="stat-card"><div class="num">244</div><div class="label">Score questions</div></div>
+        <div class="stat-card"><div class="num">1,304</div><div class="label">Command paths</div></div>
         <div class="stat-card"><div class="num">41</div><div class="label">Industry Packs</div></div>
-        <div class="stat-card"><div class="num">16</div><div class="label">Framework Adapters</div></div>
+        <div class="stat-card"><div class="num">16</div><div class="label">Adapters</div></div>
       </div>
 
       <h2>Start Here</h2>
@@ -701,10 +721,11 @@ function showWelcome() {
         <a href="#GETTING_STARTED" onclick="event.preventDefault();loadDoc('GETTING_STARTED')"><span>01</span> Getting Started</a>
         <a href="#QUICKSTART" onclick="event.preventDefault();loadDoc('QUICKSTART')"><span>02</span> Quick Start Guide</a>
         <a href="#INSTALL" onclick="event.preventDefault();loadDoc('INSTALL')"><span>03</span> Installation</a>
-        <a href="#NATIVE_AGENT_WORKFLOW" onclick="event.preventDefault();loadDoc('NATIVE_AGENT_WORKFLOW')"><span>04</span> Run a Native Agent</a>
-        <a href="#SECURITY" onclick="event.preventDefault();loadDoc('SECURITY')"><span>05</span> Security</a>
-        <a href="#EU_AI_ACT_COMPLIANCE" onclick="event.preventDefault();loadDoc('EU_AI_ACT_COMPLIANCE')"><span>06</span> Compliance</a>
-        <a href="../spec/index.html"><span>07</span> AMC Core Spec (draft)</a>
+        <a href="#A4_FORGE" onclick="event.preventDefault();loadDoc('A4_FORGE')"><span>04</span> Build an agent with A4 Forge</a>
+        <a href="#NATIVE_AGENT_WORKFLOW" onclick="event.preventDefault();loadDoc('NATIVE_AGENT_WORKFLOW')"><span>05</span> Run the native agent</a>
+        <a href="#SECURITY" onclick="event.preventDefault();loadDoc('SECURITY')"><span>06</span> Security</a>
+        <a href="#EU_AI_ACT_COMPLIANCE" onclick="event.preventDefault();loadDoc('EU_AI_ACT_COMPLIANCE')"><span>07</span> Compliance</a>
+        <a href="../spec/index.html"><span>08</span> AMC Core Spec (draft)</a>
       </div>
 
       <h2>Featured Guides</h2>
@@ -722,14 +743,14 @@ function showWelcome() {
           <div class="feature-card-body">
             <h3>Starter Blueprints</h3>
             <p>Opinionated starting points for OpenClaw, LangChain RAG, CrewAI, and OpenAI-compatible apps.</p>
-            <span>Steal the baseline →</span>
+            <span>Pick a starting point →</span>
           </div>
         </a>
         <a class="feature-card-link" href="#EVIDENCE_TRUST" onclick="event.preventDefault();loadDoc('EVIDENCE_TRUST')">
           <div class="feature-card-icon">proof</div>
           <div class="feature-card-body">
             <h3>Evidence & Receipts</h3>
-            <p>Understand evidence readiness, signed receipts, claim eligibility, and what AMC can actually prove.</p>
+            <p>What AMC records, what a signature shows (who wrote a record and that it is unchanged, not that it is true) and when a score may back a claim.</p>
             <span>Follow the proof chain →</span>
           </div>
         </a>
@@ -737,7 +758,7 @@ function showWelcome() {
           <div class="feature-card-icon">comply</div>
           <div class="feature-card-body">
             <h3>Compliance & Audit</h3>
-            <p>Trace the path from agent behavior to evidence-backed compliance and audit-ready artifacts.</p>
+            <p>Line up an agent's records against a framework. AMC does not certify that you comply.</p>
             <span>Open compliance docs →</span>
           </div>
         </a>
@@ -843,26 +864,17 @@ if (typeof document !== 'undefined' && typeof window !== 'undefined') (function 
   initSearch();
 
   // Route
-  const route = parseDocsRoute(window.location.hash);
-  if (route.docName && PUBLIC_DOCS.includes(route.docName)) {
-    loadDoc(route.docName, route.section);
-  } else {
-    showWelcome();
-  }
+  showRoute(parseDocsRoute(window.location.hash));
 
   // Handle back/forward
   window.addEventListener('popstate', () => {
-    const nextRoute = parseDocsRoute(window.location.hash);
-    if (nextRoute.docName && PUBLIC_DOCS.includes(nextRoute.docName)) {
-      loadDoc(nextRoute.docName, nextRoute.section);
-    } else {
-      showWelcome();
-    }
+    showRoute(parseDocsRoute(window.location.hash));
   });
 
   // Mobile menu toggle
-  document.getElementById('menu-toggle').addEventListener('click', () => {
-    document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('menu-toggle').addEventListener('click', (event) => {
+    const open = document.getElementById('sidebar').classList.toggle('open');
+    event.currentTarget.setAttribute('aria-expanded', open ? 'true' : 'false');
   });
 
   // Preload search index after a delay

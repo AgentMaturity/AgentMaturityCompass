@@ -32,3 +32,25 @@
     select(0, false);
   });
 })();
+
+// Reading pages (docs-pages.css): the side menu starts folded on a narrow screen, and each code block gets a Copy
+// button. Without this script the menu stays open and the code can still be selected by hand.
+(function () {
+  'use strict';
+  if (window.matchMedia && window.matchMedia('(max-width: 1020px)').matches) {
+    [].forEach.call(document.querySelectorAll('.doc-side details[open]'), function (d) { d.open = false; });
+  }
+  if (!navigator.clipboard) return;
+  [].forEach.call(document.querySelectorAll('.doc pre'), function (pre) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copy';
+    btn.addEventListener('click', function () {
+      var code = pre.querySelector('code') || pre;
+      navigator.clipboard.writeText(code.textContent.trim()).then(function () { btn.textContent = 'Copied'; }, function () { btn.textContent = 'Copy failed'; });
+      setTimeout(function () { btn.textContent = 'Copy'; }, 1500);
+    });
+    pre.appendChild(btn);
+  });
+})();

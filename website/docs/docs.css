@@ -19,7 +19,7 @@
   --border: var(--amc-border);
   --border2: var(--amc-border-accent);
   --sidebar-w: 280px;
-  --topbar-h: 56px;
+  --topbar-h: calc(var(--nav-h, 68px) + 56px);
   --mono: var(--amc-font-mono);
   --sans: var(--amc-font-sans);
 }
@@ -61,45 +61,27 @@ code, pre { font-family: var(--mono); }
   left: 12px;
 }
 
-/* ─── Topbar ─── */
-.topbar {
-  position: fixed; top: 0; left: 0; right: 0;
-  height: var(--topbar-h);
-  background: rgba(10,10,10,0.95);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center;
-  padding: 0 20px; gap: 16px; z-index: 100;
-}
-.topbar-logo {
-  font-family: var(--mono); font-weight: 700; font-size: 1rem;
-  color: var(--fg); display: flex; align-items: center; gap: 6px;
-  white-space: nowrap; letter-spacing: 0;
-}
-.topbar-logo:hover { text-decoration: none; }
-.topbar-logo span { color: var(--fg); }
-.brand-cursor { color: var(--green) !important; }
-.topbar-tagline {
-  color: var(--muted);
-  font-family: var(--mono);
-  font-size: 0.65rem;
-  white-space: nowrap;
+/* ─── Docs bar: under the site nav (home.css), the guide search and the docs pages ─── */
+.docs-bar {
+  position: fixed; top: var(--nav-h, 68px); left: 0; right: 0; z-index: 90;
+  height: 56px; display: flex; align-items: center; gap: 16px;
+  padding: 0 var(--gutter, 20px);
+  background: rgba(10,10,10,0.96); border-bottom: 1px solid var(--border);
 }
 .menu-btn {
-  display: none; background: none; border: none;
-  color: var(--green); font-size: 1.4rem; cursor: pointer;
+  display: none; min-height: 40px; padding: 0 14px; border: 1px solid var(--border2);
+  border-radius: 999px; color: var(--fg); font-size: 0.9rem;
 }
-.topbar-search { flex: 1; max-width: 400px; position: relative; }
+.topbar-search { flex: 1; max-width: 420px; position: relative; }
 .topbar-search input {
-  width: 100%; padding: 7px 14px;
+  width: 100%; min-height: 40px; padding: 0 14px; border-radius: 8px;
   border: 1px solid var(--border); background: rgba(255,255,255,0.04);
-  color: var(--fg); font-size: 0.82rem; outline: none;
-  font-family: var(--mono);
+  color: var(--fg); font: inherit; font-size: 0.92rem; outline: none;
 }
 .topbar-search input:focus { border-color: var(--green); box-shadow: 0 0 0 2px rgba(74,239,121,0.1); }
-.topbar-links { display: flex; gap: 14px; margin-left: auto; align-items: center; }
-.topbar-links a { color: var(--muted); font-size: 0.78rem; font-family: var(--mono); text-transform: lowercase; letter-spacing: 0.04em; }
-.topbar-links a:hover { color: var(--green); text-decoration: none; }
+.docs-bar-links { display: flex; gap: 18px; margin-left: auto; }
+.docs-bar-links a { color: var(--body, #c9cac5); font-size: 0.9rem; text-decoration: none; }
+.docs-bar-links a:hover { color: var(--fg); }
 
 /* ─── Search Results ─── */
 .search-results {
@@ -125,7 +107,7 @@ code, pre { font-family: var(--mono); }
 
 /* ─── Layout ─── */
 .layout {
-  display: flex; min-height: 100vh;
+  display: flex; align-items: flex-start; min-height: 100vh;
   padding-top: var(--topbar-h);
 }
 
@@ -133,8 +115,8 @@ code, pre { font-family: var(--mono); }
 .sidebar {
   width: var(--sidebar-w); min-height: calc(100vh - var(--topbar-h));
   background: var(--bg2); border-right: 1px solid var(--border);
-  position: fixed; top: var(--topbar-h); bottom: 0; left: 0;
-  overflow-y: auto; z-index: 50;
+  position: sticky; top: var(--topbar-h); flex: none;
+  height: calc(100vh - var(--topbar-h)); overflow-y: auto; z-index: 50;
 }
 .sidebar-inner { padding: 16px 0; }
 
@@ -172,7 +154,7 @@ code, pre { font-family: var(--mono); }
 
 /* ─── Main Content ─── */
 .main {
-  flex: 1; margin-left: var(--sidebar-w);
+  flex: 1;
   padding: 32px clamp(24px, 4vw, 48px);
   min-width: 0;
   max-width: 880px;
@@ -375,8 +357,8 @@ code, pre { font-family: var(--mono); }
   margin: 0 0 12px;
   color: var(--fg);
   font-family: var(--sans);
-  font-size: 3rem;
-  line-height: 1;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.05;
 }
 .welcome-lede {
   position: relative;
@@ -418,7 +400,10 @@ code, pre { font-family: var(--mono); }
   font-size: 0.64rem;
   text-transform: uppercase;
 }
-.welcome-install-option .welcome-command { width: 100%; height: 100%; }
+.welcome-install-option .welcome-command { width: 100%; }
+.welcome-install-option .welcome-command + .welcome-command { border-top: 0; }
+.welcome-note { position: relative; z-index: 1; font-size: 0.88rem; line-height: 1.55; color: var(--fg2); }
+.welcome-note code { overflow-wrap: anywhere; }
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -533,15 +518,14 @@ code, pre { font-family: var(--mono); }
 /* ─── Responsive ─── */
 @media (max-width: 768px) {
   .menu-btn { display: block; }
-  .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+  .docs-bar-links { display: none; }
+  .sidebar { position: fixed; left: 0; bottom: 0; transform: translateX(-100%); transition: transform 0.3s; }
   .sidebar.open { transform: translateX(0); }
   .main {
     width: 100%;
     max-width: 100%;
     margin-left: 0;
   }
-  .topbar-links { display: none; }
-  .topbar-tagline { display: none; }
   .welcome-hero { padding: 28px 22px; }
   .welcome-hero h1 { font-size: 2.25rem; }
   .stat-grid,
