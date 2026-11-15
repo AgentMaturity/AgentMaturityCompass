@@ -2651,6 +2651,68 @@
         }
       ]
     },
+    "nextGate": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "eligible": {
+              "anyOf": [
+                {
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "gate": {
+              "enum": [
+                "direction",
+                "completion"
+              ],
+              "type": "string"
+            },
+            "required": {
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991,
+              "type": "integer"
+            },
+            "roleVote": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "rolesAllowed": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "gate",
+            "required",
+            "rolesAllowed",
+            "roleVote",
+            "eligible"
+          ],
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "schema": {
       "const": "amc.a4-readiness/v1",
       "type": "string"
