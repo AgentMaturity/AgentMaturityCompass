@@ -3,7 +3,8 @@
  * record kept under "Show the record", the specification as an outline, and only takeable actions as buttons.
  */
 import { describe, expect, test } from "vitest";
-import * as project from "../../src/contracts/v1/a4Project.js";
+import { A4_ADMISSIONS, A4_AUTH_SOURCES, A4_GATES, A4_IDENTITY_CHECKS, A4_ITEM_STATUSES, A4_LANES, A4_PROJECT_ROLES, A4_READINESS_STATUSES,
+  A4_STAGES, A4_STAGE_STATES, A4_STEPS } from "../../src/contracts/v1/a4Project.js";
 import { A4_BLOCKER_KINDS } from "../../src/contracts/v1/a4Readiness.js";
 import { a4GateV1Schema } from "../../src/contracts/v1/a4Gate.js";
 import { a4DecisionV1Schema } from "../../src/contracts/v1/a4Decision.js";
@@ -15,11 +16,11 @@ import * as view from "../../src/console/assets/a4View.js";
 
 type Table = keyof typeof PLAIN;
 const enums: Array<[Table, readonly string[], string]> = [
-  ["stage", project.A4_STAGES, "A4_STAGES"], ["stageState", project.A4_STAGE_STATES, "A4_STAGE_STATES"], ["step", project.A4_STEPS, "A4_STEPS"],
-  ["lane", project.A4_LANES, "A4_LANES"], ["gate", project.A4_GATES, "A4_GATES"], ["projectRole", project.A4_PROJECT_ROLES, "A4_PROJECT_ROLES"],
-  ["authSource", project.A4_AUTH_SOURCES, "A4_AUTH_SOURCES"], ["admission", project.A4_ADMISSIONS, "A4_ADMISSIONS"],
-  ["identityCheck", project.A4_IDENTITY_CHECKS, "A4_IDENTITY_CHECKS"], ["itemStatus", project.A4_ITEM_STATUSES, "A4_ITEM_STATUSES"],
-  ["readinessStatus", project.A4_READINESS_STATUSES, "A4_READINESS_STATUSES"], ["blockerKind", A4_BLOCKER_KINDS, "A4_BLOCKER_KINDS"],
+  ["stage", A4_STAGES, "A4_STAGES"], ["stageState", A4_STAGE_STATES, "A4_STAGE_STATES"], ["step", A4_STEPS, "A4_STEPS"],
+  ["lane", A4_LANES, "A4_LANES"], ["gate", A4_GATES, "A4_GATES"], ["projectRole", A4_PROJECT_ROLES, "A4_PROJECT_ROLES"],
+  ["authSource", A4_AUTH_SOURCES, "A4_AUTH_SOURCES"], ["admission", A4_ADMISSIONS, "A4_ADMISSIONS"],
+  ["identityCheck", A4_IDENTITY_CHECKS, "A4_IDENTITY_CHECKS"], ["itemStatus", A4_ITEM_STATUSES, "A4_ITEM_STATUSES"],
+  ["readinessStatus", A4_READINESS_STATUSES, "A4_READINESS_STATUSES"], ["blockerKind", A4_BLOCKER_KINDS, "A4_BLOCKER_KINDS"],
   ["refKind", A4_REF_KINDS, "A4_REF_KINDS"], ["gateStatus", a4GateV1Schema.shape.status.options, "a4Gate status"],
   ["gateStatus", a4GateV1Schema.shape.quorum.shape.status.options, "a4Gate quorum status"],
   ["decision", a4DecisionV1Schema.shape.decision.options, "a4Decision decision"], ["answerSource", a4AnswerSchema.shape.source.options, "a4Answer source"]

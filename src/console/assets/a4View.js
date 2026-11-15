@@ -66,7 +66,7 @@ export function actionButton(label, action, allowed, attributes = "") {
   return "";
 }
 /** Renders `render()`, collecting each action it cannot offer now (actionButton): returns the HTML and the list of those actions. */
-export function collectNotNow(render) {
+function collectNotNow(render) {
   const outer = notNow;
   notNow = [];
   try {
