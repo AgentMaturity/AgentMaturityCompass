@@ -1967,7 +1967,7 @@ program
   .passThroughOptions()
   .showSuggestionAfterError(true)
   .showHelpAfterError("\nTip: add '--help' after any command to see available options.")
-  .addHelpText("afterAll", cliDiscoverabilityFooter());
+  .addHelpText("after", cliDiscoverabilityFooter()); // top-level help only; every subcommand repeated it (CLI-22)
 program.option("--agent <agentId>", "agent ID (defaults to .amc/current-agent)");
 program.option("--json", "emit structured JSON for the top-level full score", false);
 // No default: a `false` default made `color` false on every command, so preAction switched colour off everywhere.
@@ -2324,6 +2324,9 @@ program
     // with a fix is still a missing precondition even when the exit code is 0.
     // Optional adapter installs follow the closing steps (doctorNextSteps).
     const fixCount = firstRunFixCommands(result).length;
+    // CLI-21: once this folder has a score, the next step is scoring again, not a "first" score.
+    const { hasAnyRun } = await import("./startup/startupGuidance.js");
+    const scoreStep = { cmd: "amc", desc: hasAnyRun(process.cwd()) ? "Score again and see what changed" : "Get your first full maturity score" };
     if (!result.ok) {
       console.log(fmt.nextSteps(doctorNextSteps(result, [
         result.workspaceInitialized
@@ -2333,12 +2336,10 @@ program
       ])));
     } else if (fixCount > 0) {
       console.log(fmt.warn(`${fixCount} precondition(s) still missing; each names its fix:`));
-      console.log(fmt.nextSteps(doctorNextSteps(result, [{ cmd: "amc", desc: "Get your first full maturity score" }])));
+      console.log(fmt.nextSteps(doctorNextSteps(result, [scoreStep])));
     } else {
       console.log(fmt.pass(result.workspaceInitialized ? "The listed diagnostic checks passed; this does not qualify a governed task or a release." : "CLI install checks passed."));
-      console.log(fmt.nextSteps([
-        { cmd: "amc", desc: "Get your first full maturity score" },
-      ]));
+      console.log(fmt.nextSteps([scoreStep]));
     }
     process.exit(result.ok ? 0 : 1);
   });
@@ -18398,7 +18399,7 @@ e2e
   });
 
 program
-  .command("_studio-daemon")
+  .command("_studio-daemon", { hidden: true }) // started by `amc up`, never by a person
   .requiredOption("--workspace <path>", "workspace path")
   .option("--api-port <port>", "studio API port")
   .option("--dashboard-port <port>", "dashboard port")

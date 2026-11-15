@@ -105,7 +105,7 @@ function detectFramework(workspace: string, explicit?: string): string {
   return "generic agent";
 }
 
-function hasAnyRun(workspace: string): boolean {
+export function hasAnyRun(workspace: string): boolean {
   const flatRunsDir = join(workspace, ".amc", "runs");
   if (existsSync(flatRunsDir) && readdirSync(flatRunsDir).some((file) => file.endsWith(".json"))) {
     return true;
