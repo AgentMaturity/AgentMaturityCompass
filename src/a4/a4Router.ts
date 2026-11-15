@@ -44,6 +44,7 @@ import { approvalsNote, assertPracticeAllowed, inviteMember, startFacts } from "
 import { A4_PRESENCE_TTL_MS, presenceOf, touchPresence } from "./a4Presence.js";
 import { gateStatus, isRegulated, type A4Action, type A4ReadinessState } from "./a4Readiness.js";
 import { monitorView } from "./a4Monitor.js";
+import { viewerReadiness } from "./a4NextGate.js";
 import { valueView } from "./a4Value.js";
 import { handleA4ReleaseRoute } from "./a4RouterReleases.js";
 import { assertTuneMechanicPlan } from "./a4Mechanic.js";
@@ -545,7 +546,7 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
   const now = Date.now();
   const state = loadA4State(store, projectId, now);
   assertVisible(route, state.members);
-  const readinessAt = (stage: A4Stage) => evaluateFor(store, state, route.principal, route.principal ? callOf(route, undefined, true) : { fullIntegrity: true }, stage, now).readiness;
+  const readinessAt = (stage: A4Stage) => viewerReadiness(evaluateFor(store, state, route.principal, route.principal ? callOf(route, undefined, true) : { fullIntegrity: true }, stage, now), state, route.native);
   if (rest === "") {
     assertQuery(params, []);
     const readiness = readinessAt(headStage(state.project));

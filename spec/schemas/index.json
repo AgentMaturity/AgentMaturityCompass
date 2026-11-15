@@ -48,7 +48,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-readiness.schema.json",
       "name": "a4-readiness.schema.json",
-      "sha256": "cbdaa841ba879bbf73af55fa481b9160d8c1b6a53c291c39732d090d52563890"
+      "sha256": "0fc10acaf7f51d7d74079c6a00f0c56acf03a8818227d93abb427dc51a86926d"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-record.schema.json",

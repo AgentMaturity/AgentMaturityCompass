@@ -3821,10 +3821,11 @@ async function renderPage() {
   try {
     if (page === "home") return await renderHome();
     if (page === "native-tasks") {
-      // Opened from an agent project's build session (?project=): a way back to it.
+      // Opened from an agent project's build session (?project=): a way back to it, kept in view while the page scrolls, so it
+      // is there right after Close and verify (the project's next step, Review, is on that page).
       const project = new URLSearchParams(location.search).get("project");
       if (/^a4p_[0-9a-f]{32}$/.test(project ?? "") && !document.getElementById("a4BackLink")) {
-        root.insertAdjacentHTML("beforebegin", `<p id="a4BackLink"><a class="button secondary" href="./a4Project?project=${project}&amp;stage=assemble">Back to the agent project</a></p>`);
+        root.insertAdjacentHTML("beforebegin", `<p id="a4BackLink" style="position:sticky;top:0;z-index:5;margin:0;padding:8px 0;background:var(--bg)"><a class="button" href="./a4Project?project=${project}&amp;stage=assemble">Back to the agent project</a></p>`);
       }
       return await renderNativeTasksPage({ root, initialAgent: currentAgent() });
     }

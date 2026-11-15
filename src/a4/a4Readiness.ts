@@ -386,7 +386,7 @@ export function proposeNextAction(state: A4ReadinessState, stage: A4Stage, label
  * role: generous) and the ACTIVE local workspace OWNERs (implicit owners). Null when unread, or with a host session live (a hosted
  * call has one): host roles are unread. ponytail: an OWNER of the host who is not signed in is not seen; read host memberships then.
  */
-function localDeciders(state: A4ReadinessState, live: A4LiveFacts): Set<string> | null {
+export function localDeciders(state: A4ReadinessState, live: A4LiveFacts): Set<string> | null {
   if (live.localOwners == null || live.hostPrincipals !== 0) return null;
   return new Set([...state.members.filter((member) => member.roles.includes("approver") || member.roles.includes("owner")).map((member) => member.principalKey),
     ...live.localOwners.map((userId) => `LOCAL_USER:${userId}`)]);

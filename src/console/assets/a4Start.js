@@ -3,7 +3,8 @@
 // answers. Pure: data in, HTML or plain values out; every server string goes through esc(). Studio re-checks every
 // action, so the primary action only points at the page's own buttons and never decides anything itself.
 import { QUESTION_LABELS } from "./a4Questions.js";
-import { reasonsText, STAGES, STAGE_PLAIN, STEP_NEXT, STEP_PLAIN, STEP_TITLES, TRUTH, esc, previewNoticeHtml, renderCreateForm } from "./a4View.js";
+import { SELF_APPROVE, selfApproves, selfCountsOnce } from "./a4Who.js";
+import { actionButton, reasonsText, STAGES, STAGE_PLAIN, STEP_NEXT, STEP_PLAIN, STEP_TITLES, TRUTH, esc, previewNoticeHtml, renderCreateForm } from "./a4View.js";
 
 const isObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
 const list = (value) => (Array.isArray(value) ? value : []);
@@ -12,8 +13,10 @@ const STEPS = ["asked", "understood", "explained", "proposed", "direction_approv
 
 const WHAT_IS_A_PROJECT = "An agent project takes one agent from a brief to a recorded deployment in four stages. "
   + "Each stage asks you questions, AMC drafts from your answers, and a second person approves before the project moves on.";
-const PRACTICE_IS = "A practice project takes one agent through the four stages so you can learn AMC alone. Each stage asks you questions, "
-  + "AMC drafts from your answers, and you approve your own work; each such approval is recorded as self-approved.";
+/** How far one person gets (docs/A4_FORGE.md, "How many people a walk needs"): the default policy's first three gates take one approval. */
+export const PRACTICE_IS = "A practice project lets you try A4 Forge alone. Each stage asks you questions, AMC drafts from your answers, and you "
+  + "approve your own steps; each such approval is recorded as self-approved. Alone you can get as far as building the agent in step 2, Build it "
+  + "(Assemble): its final approval and every step after it need two people other than you, and the guide asks for them when they are needed.";
 const SOD = "The person who wrote, built or requested a stage cannot approve it (separation of duties)";
 const NOT_INDEPENDENT = "A second approver in the same workspace meets separation of duties; it is not an independent review";
 
@@ -82,7 +85,13 @@ function rawMove(ctx) {
     act: { label: "Write a reason to resume", focus: '.a4-approvals [name="reason"]' } };
   const sameHost = itemOf(readiness, "deployment.same_host");
   if (sameHost?.status === "BLOCKED") return { now: sameHost.nextAction?.label ?? "This Studio cannot deploy this release.", stop: true };
-  const blocked = list(readiness?.items).find((item) => item.mandatory && item.status === "BLOCKED" && !["gate.direction", "gate.completion"].includes(item.id));
+  // Files AMC recorded changed underneath (another AMC process rewrote one): a new revision records them again. At Ask the
+  // answers the step asks for are that revision, so the step itself is the way on.
+  const blocked = list(readiness?.items).find((item) => item.mandatory && item.status === "BLOCKED" && !["gate.direction", "gate.completion"].includes(item.id)
+    && !(item.id === "resources.current" && project.step === "asked"));
+  if (blocked?.id === "resources.current") return { now: "Some of the agent's files changed after this step was recorded (listed under Missing requirements). "
+    + "To go on, change any answer under Ask and press Save answers: AMC records a new revision with the files as they are now, and you run the steps again from there.",
+  act: { label: "Change an answer", focus: "form[data-a4-answers] textarea" } };
   if (blocked) return { now: `Something blocks this stage: ${blocked.nextAction?.label ?? blocked.id}.`, why: `Item ${blocked.id}; see Missing requirements.`,
     act: { label: "Show what is missing", focus: "#a4Missing" } };
   const step = project.step;
@@ -96,9 +105,7 @@ function rawMove(ctx) {
     return { now: "Build: AMC writes what the approved direction describes. Every file it writes is recorded with its digest.", act: { label: "Build", press: "build" } };
   }
   if (step === "built") {
-    // Review refuses while the build session is open (A4-06): until Studio allows it, the one action is the session's own page.
-    if (stage === "assemble" && ctx.allowed?.review?.allowed !== true) return { now: "Close the build session, then run Review. Open the session on Native Tasks, press Close and verify, then come back to this page (your browser's Back button).",
-      act: { label: "Open the build session", focus: '[data-card="build"] a[href*="native-tasks"]' } };
+    if (stage === "assemble" && list(ctx.allowed?.review?.reasonCodes).some((value) => SESSION_CODES.includes(value))) return sessionMove(ctx);
     return { now: "Review: AMC checks what was built; you can add your own findings.", act: { label: "Review", press: "review" } };
   }
   if (step === "reviewed") return gateMove(ctx, "completion");
@@ -106,6 +113,25 @@ function rawMove(ctx) {
   return nextStage ? { now: `${title(stage)} is complete.`, act: { label: `Go to ${title(nextStage)}`, href: `./a4Project?project=${encodeURIComponent(project.projectId)}&stage=${nextStage}` } }
     : { now: `${title(stage)} is complete.` };
 }
+
+/**
+ * Assemble between Build and Review. Studio reads the build session for the page (allowed.review carries BUILD_SESSION_OPEN,
+ * BUILD_RUNNING or SESSION_OWNER_REQUIRED while Review would refuse): the one action opens that session on Native Tasks, whose
+ * "Back to the agent project" returns here.
+ */
+function sessionMove(ctx) {
+  const codes = list(ctx.allowed?.review?.reasonCodes);
+  const session = list(ctx.stageRevision?.spec?.build?.sessions)[0];
+  const href = session ? `./native-tasks?agent=${encodeURIComponent(session.start?.agentId ?? ctx.project.agentId)}&task=${encodeURIComponent(session.taskId)}`
+    + `&project=${encodeURIComponent(ctx.project.projectId)}` : "./native-tasks";
+  if (codes.includes("SESSION_OWNER_REQUIRED")) return { now: `${session?.ownerUsername ?? "The person who pressed Build"} started the build session, so they close it and run Review.` };
+  if (codes.includes("BUILD_RUNNING")) return { now: "The build session is still running. Open it, wait until it stops, then press Close and verify there.", act: { label: "Open the build session", href } };
+  if (codes.includes("BUILD_FAILED")) return { now: "The build session did not finish. Open it on Native Tasks to resume it, or request changes and build again.", act: { label: "Open the build session", href } };
+  return { now: "Close the build session: it opens on Native Tasks. Press Close and verify there, then Back to the agent project. Review comes next.",
+    act: { label: "Close the build session", href } };
+}
+/** Review's refusals that come from the build session itself (assembleBuild.reviewRefusals). */
+const SESSION_CODES = ["BUILD_SESSION_OPEN", "BUILD_RUNNING", "BUILD_FAILED", "SESSION_OWNER_REQUIRED"];
 
 function askMove(ctx) {
   const codes = codesOf(ctx.readiness, "ask_complete");
@@ -132,8 +158,21 @@ function askMove(ctx) {
   return { now: "Run Understand: AMC reads your answers and says back what it understood.", act: { label: "Run Understand", press: "understand" } };
 }
 
+/** What the panel's Add a person answered, in words: the first password once and what did not finish (approverHowTo follows once). */
+export function invitedText(data) {
+  const name = typeof data?.user?.username === "string" ? data.user.username : "The person";
+  const added = data?.memberAdded === false ? `${name}'s account is ready, but adding them to this project did not finish: add them on the Members card. `
+    : `${name} is now an approver on this project. `;
+  const password = typeof data?.firstPassword === "string" ? `Their first password, shown only this once: ${data.firstPassword}. Write it down now and give it to them yourself. `
+    : `${name} already had an account and keeps its password; if they no longer have it, a workspace owner sets a new one with amc user password ${name} in the workspace folder. `;
+  return `${added}${password}`;
+}
+
 /** How the person who has to act reaches the decision, and the one action for whoever waits: copy this page's link. */
-const WAITING_HOW = "They sign in to this console, open this link and approve on the Approvals card of this project.";
+const WAITING_HOW = "They sign in on their own device, or in a private window on this one, then open this page's link: the approval waits for them there.";
+/** After a person is added: how they approve, with the link that opens this project at its stage. */
+export const approverHowTo = (url) => `To approve, they sign in on their own device, or in a private window on this one (a new private window, so you stay signed in here), `
+  + `with their user name and password, then open ${url}. The approval waits for them at the top of that page.`;
 const COPY_LINK = { label: "Copy link to this page", copy: true };
 
 /** What acknowledging an item accepts, in a sentence (the item id stays beside it). */
@@ -152,25 +191,41 @@ function gateMove(ctx, kind) {
   if (status === "QUORUM_MET") {
     if (kind === "direction" && stage !== "activate") return { now: "The direction is approved. Use the approval to move on to Build.", act: { label: "Continue to Build", press: "complete" } };
     if (stage === "activate") return { now: "Approved. Activate's release and deployment approval are completed on the Release card.", act: { label: "Open the Release card", focus: '[data-card="release"]' } };
-    const effect = codesOf(readiness, "effect_gate");
-    if (effect.includes("EFFECT_GATE_NOT_OPEN")) return { effect: true, now: "Approved. Completing Assemble applies the reviewed resources, which is a second request: a project owner opens it, then two approvers approve it on the Completion effect card.",
-      act: { label: "Open the effect gate", press: "open-effect" } };
+    // The second request completing applies: Assemble's resources (effect_gate), or a regulated Adapt plan's activation
+    // (plan_review_opened, required while progress waits for plan_activated); a non-regulated Adapt completes without it.
+    const adapt = stage === "adapt";
+    const effect = codesOf(readiness, adapt ? "plan_review_opened" : "effect_gate");
+    const what = adapt ? "activates the plan" : "applies what was built";
+    const cardName = adapt ? "Plan activation card" : "Completion effect card";
+    const cardSel = adapt ? '[data-card="activation"]' : '[data-card="effect"]';
+    const needed = !adapt || list(ctx.allowed?.progress?.reasonCodes).includes("plan_activated") || codesOf(readiness, "plan_activated").includes("ACTIVATED_AT_COMPLETION");
+    if (needed && effect.includes("EFFECT_GATE_NOT_OPEN")) return { effect: true, now: `Approved. Completing ${title(stage)} ${what}, which is a second request: `
+      + `a project owner opens it, then two approvers approve it on the ${cardName}.`, act: { label: adapt ? "Open the plan review" : "Open the effect gate", press: "open-effect" } };
     const effectStatus = prefixed(effect, "APPROVAL_STATUS:")[0];
-    if (effectStatus && effectStatus !== "QUORUM_MET" && effectStatus !== "CONSUMED") return { effect: true, now: `Waiting for project approvers to approve the second request, which applies what was built, on the Completion effect card (now ${effectStatus}). The approvals of the completion above do not count for it.`,
-      act: { label: "Go to the Completion effect card", focus: '[data-card="effect"] [name="engine-reason"]' } };
+    if (needed && effectStatus && effectStatus !== "QUORUM_MET" && effectStatus !== "CONSUMED") {
+      // Whoever the completion gate excludes (its requester, authors, builders) is excluded from the effect's request too.
+      const excludedHere = typeof me?.userId === "string" && list(liveGate(ctx, "completion")?.excludedKeys).some((key) => String(key).endsWith(`:${me.userId}`));
+      if (!excludedHere && ctx.allowed?.requestChanges?.allowed === true) return { effect: true, now: `Your approval is needed on a second request, which ${what}: `
+        + `the approval of the completion above does not count for it. Write a reason on the ${cardName}, then press Approve there. If you have approved it already, nothing more is needed from you.`,
+      act: { label: "Write your reason", focus: `${cardSel} [name="engine-reason"]` } };
+      return { effect: true, now: `Waiting for the project's approvers to approve the second request, which ${what}, on the ${cardName} (now ${effectStatus}). The approvals of the completion above do not count for it.`,
+        why: WAITING_HOW, act: COPY_LINK };
+    }
     return { now: `Approved. Complete ${title(stage)} to move the project on.`, act: { label: `Complete ${title(stage)}`, press: "complete" } };
   }
   if (status === "PENDING") {
     const sod = codesOf(readiness, "sod");
     if (sod.includes("QUORUM_UNREACHABLE")) {
-      const eligible = prefixed(sod, "ELIGIBLE:")[0] ?? "?", required = prefixed(sod, "REQUIRED:")[0] ?? gate.required ?? "?";
-      const role = codesOf(readiness, "gate.required_reviews").some((value) => String(value).includes("AUDITOR")) ? "APPROVER,AUDITOR" : roleFor(gate.request?.rolesAllowed);
-      return { now: `This approval needs ${required} people who may approve it, and only ${eligible} can. Add another person: in the workspace folder run `
-        + `${addUserCommand(role)}, add them on the Members card with the approver role, then request the approval again (adding a member cancels this request).`,
-      act: { label: "Go to the Members card", focus: "li[data-principal] select" } };
+      const auditor = codesOf(readiness, "gate.required_reviews").some((value) => String(value).includes("AUDITOR"));
+      return peopleMove(ctx, { required: Number(prefixed(sod, "REQUIRED:")[0] ?? gate.required), eligible: Number(prefixed(sod, "ELIGIBLE:")[0] ?? 0),
+        roleVote: auditor ? "AUDITOR" : null, open: true });
     }
     const excluded = typeof me?.userId === "string" && list(gate.excludedKeys).some((key) => String(key).endsWith(`:${me.userId}`));
-    if (excluded) return { now: `Waiting for a second person to approve: ${gate.approvals ?? 0} of ${gate.required ?? "?"} approvals so far. ${SOD}, so someone else decides.`,
+    // Alone on a practice project the excluded author may approve: Studio records it as self-approved (A4 single-user rule).
+    if (excluded && selfApproves(readiness, gate.required) && ctx.allowed?.decide?.allowed === true) {
+      return { now: `${SELF_APPROVE} Write a reason in the Approvals card, then press Approve.`, act: { label: "Write your reason", focus: '.a4-approvals [name="reason"]' } };
+    }
+    if (excluded) return { now: `Waiting for ${gate.required > 1 ? "the other approvers" : "a second person"} to approve: ${gate.approvals ?? 0} of ${gate.required ?? "?"} approvals so far. ${SOD}, so someone else decides.`,
       why: WAITING_HOW, act: COPY_LINK };
     const refusals = list(ctx.allowed?.decide?.reasonCodes);
     if (refusals.includes("A4_DUPLICATE_DECISION")) return { now: `You have decided this one. Waiting for the other approvers: ${gate.approvals ?? 0} of ${gate.required ?? "?"} approvals so far.`,
@@ -187,6 +242,9 @@ function gateMove(ctx, kind) {
       act: { label: "Write your reason", focus: '.a4-approvals [name="reason"]' } };
   }
   if (status === "DENIED") return { now: "This revision was denied. Change an answer under Ask and save it to start a new revision.", act: { label: "Change an answer", focus: "form[data-a4-answers] textarea" } };
+  // Before asking: an approval the project's people cannot reach is said first, with the form that adds them (Studio's nextGate preview).
+  const next = readiness?.nextGate;
+  if (next && next.gate === kind && Number.isSafeInteger(next.eligible) && next.eligible < next.required) return peopleMove(ctx, { ...next, open: false });
   // Alone, an acknowledgement only meets a second refusal: the words match amc a4 readiness and Studio's refusal (a4Words).
   if (codesOf(readiness, "sod.self_provisioned").includes("NO_SECOND_APPROVER") && list(readiness?.allowed?.requestGate?.reasonCodes).includes("sod.self_provisioned")) {
     return { now: "Nobody else on this project can approve it. Invite a second person on the Members card (Invite someone new), or add someone who can "
@@ -208,13 +266,53 @@ function gateMove(ctx, kind) {
   const sodHeld = codesOf(readiness, "sod").some((value) => ["SOD_VIOLATION", "QUORUM_UNREACHABLE"].includes(String(value)));
   const later = [sodHeld ? itemOf(readiness, "sod") : null, itemOf(readiness, "plan_unresolved")]
     .find((entry) => entry && entry.mandatory && entry.status !== "READY" && entry.status !== "COMPLETE" && entry.acknowledged == null);
+  // A regulated plan settles every requirement from facts: the guide names the facts still unknown and goes to the first one.
+  const facts = later?.id === "plan_unresolved" ? prefixed(codesOf(readiness, "plan_no_missing_facts"), "ANSWER_NEEDED:") : [];
+  if (facts.length) {
+    return { now: `Before asking for approval: the rules this plan checks depend on facts nobody has given yet: ${facts.map((id) => `"${QUESTION_LABELS[id]?.[0] ?? id}"`).join(", ")}. `
+      + "Answer them under Ask, choosing from the terms each question lists, and press Save answers. AMC then runs Understand, Explain and Propose again with you.",
+    why: "A regulated project's plan must settle every requirement before it is approved; an unknown fact leaves the requirements it decides unresolved.",
+    act: { label: "Answer the missing facts", focus: `form[data-a4-answers] [name="${esc(facts[0])}"]` } };
+  }
   if (later) {
     return { now: `Before asking for approval: ${later.nextAction?.label ?? reasonsText([later.id])}`,
       why: "Do this first. Fixing it after the approval would cancel the approvals already given.",
       act: later.id === "sod" ? { label: "Go to the Members card", focus: ".a4-members" } : { label: "Show what is missing", focus: "#a4Missing" } };
   }
+  // A step a card's own button takes (the context probe) that completing would still wait for is done before the request:
+  // it records a transition, which would cancel approvals already given.
+  const cardStep = list(ctx.allowed?.progress?.reasonCodes).find((value) => ITEM_ACTIONS[value] && itemOf(readiness, value)?.status !== "READY");
+  if (cardStep) return { now: `Before asking for approval: ${itemOf(readiness, cardStep)?.nextAction?.label ?? cardStep}.`,
+    why: "Do this first. Doing it after the approval would cancel the approvals already given.", act: { label: ITEM_ACTIONS[cardStep][0], press: ITEM_ACTIONS[cardStep][1] } };
   return { now: `Ask for approval: request the ${kind} approval. ${kind === "direction" ? "Approvers check the proposed specification." : "Approvers check what was built and reviewed."}`,
     act: { label: `Request ${kind} approval`, press: `request-${kind}` } };
+}
+
+/**
+ * An approval the project's people cannot reach: how many it needs, who may not count, the role one of them needs, and the
+ * Add a person form right in the panel (`people`), set so the people added can decide every later step of a walk too.
+ * Alone with self-approval, adding anyone ends it, so every approval then comes from the people added.
+ */
+function peopleMove(ctx, { required, eligible, roleVote, open }) {
+  const solo = ctx.readiness?.selfApprovalAllowed === true;
+  const more = Math.max(solo ? required : required - eligible, 1);
+  const owner = Array.isArray(ctx.me?.roles) && ctx.me.roles.includes("OWNER");
+  const now = `This approval needs ${required} ${required === 1 ? "person" : "different people"} other than whoever wrote, built or asked for this step`
+    + `${roleVote ? `, and one of them must hold the ${roleVote} role` : ""}. ${eligible > 0 && !solo ? `Only ${eligible} can approve it now. ` : "Nobody else here can approve it yet. "}`
+    + `${owner ? `Add ${more} ${more === 1 ? "person" : "people"} below.` : "Ask a workspace owner to add them."} `
+    + `${required < 2 ? "Later steps need two such people, so you can add both now." : "The same people can approve every later step too."}`;
+  const why = [solo ? "Adding a person ends self-approval on this workspace for good, so from then on others approve your steps." : "",
+    open ? "Adding a person cancels this request: ask for the approval again once they are added." : ""].filter(Boolean).join(" ");
+  return owner ? { now, ...(why ? { why } : {}), people: true, act: { label: "Add a person", focus: '.a4-start [name="inviteUsername"]' } } : { now, ...(why ? { why } : {}) };
+}
+
+/** The Add a person form inside the panel: the invite route creates the account (or finds it) and adds them as an approver. */
+function peopleFormHtml(ctx) {
+  return `<div class="a4-invite a4-people" data-card="people"><label>Their user name <input name="inviteUsername" autocomplete="off" maxlength="64" /></label>
+    <label><input type="checkbox" name="inviteAuditor" checked /> They may also audit (step 3, Fit it to your rules, needs two people who may audit)</label>
+    <p class="muted">AMC creates their account with a first password, shows it to you once here, and adds them to this project as an approver. With both
+      roles ticked, the same two people can approve every later step. ${NOT_INDEPENDENT}.</p>
+    ${actionButton("Add this person", "invite-member", ctx.allowed?.addMember)}</div>`;
 }
 
 /** The primary action: one button (or link) per screen; a4.js moves to or presses the page control it names. */
@@ -227,7 +325,7 @@ function primary(act, also) {
 }
 
 /** Who must approve the live gate of the viewed stage, why, and how to add a person; "" when no gate is live. */
-export function renderWhoApproves(ctx, gate) {
+export function renderWhoApproves(ctx, gate, formShown = false) {
   if (!isObject(gate)) return "";
   const request = isObject(gate.request) ? gate.request : {};
   const required = Number.isSafeInteger(gate.required) ? gate.required : request.requiredApprovals;
@@ -238,13 +336,16 @@ export function renderWhoApproves(ctx, gate) {
   const auditor = codesOf(ctx.readiness, "gate.required_reviews").some((value) => String(value).includes("AUDITOR"));
   const short = prefixed(codesOf(ctx.readiness, "sod"), "ELIGIBLE:")[0];
   const role = auditor ? "APPROVER,AUDITOR" : roleFor(roles);
+  // Alone, one self-approval meets a one-approval gate; a gate that needs more says what the person's own approval does instead.
+  const who = selfApproves(ctx.readiness, required) ? `${esc(SELF_APPROVE)} Self-approval counts once.` : ctx.readiness?.selfApprovalAllowed === true
+    ? esc(selfCountsOnce(required)) : `${SOD}${excluded.length ? `: ${excluded.map(esc).join(", ")} cannot approve this one` : ""}.`;
   return `<div class="a4-who"><p><strong>Who must approve:</strong> ${esc(required ?? "?")} ${required === 1 ? "person" : "different people"} with the workspace role
     ${roles.length ? roles.map(code).join(" or ") : "that the approval policy names"}${auditor ? ", one of them holding AUDITOR" : ""}, who are members of this project
-    (workspace owners count). ${SOD}${excluded.length ? `: ${excluded.map(esc).join(", ")} cannot approve this one` : ""}.</p>
-    <p>Approved so far: ${approved.length ? approved.map(esc).join(", ") : "nobody yet"}.${short !== undefined ? ` Studio counts ${esc(short)} person(s) who could still approve.` : ""}</p>
-    <p class="muted">Need another person? In the workspace folder run ${code(addUserCommand(role))} (or give an existing user the role with
+    (workspace owners count). ${who}</p>
+    <p>Approved so far: ${approved.length ? approved.map(esc).join(", ") : "nobody yet"}.${short !== undefined && !formShown ? ` Studio counts ${esc(short)} person(s) who could still approve.` : ""}</p>
+    ${formShown ? "" : `<p class="muted">Need another person? In the workspace folder run ${code(addUserCommand(role))} (or give an existing user the role with
     ${code(`amc user role set <username> --roles <their current roles>,${role}`)}), then add them on the Members card with the approver role. Adding a member cancels the open
-    request, so request it again afterwards. ${NOT_INDEPENDENT}.</p></div>`;
+    request, so request it again afterwards. ${NOT_INDEPENDENT}.</p>`}</div>`;
 }
 
 /** The "start here" panel at the top of a project page. */
@@ -260,8 +361,8 @@ export function renderStartHere(ctx) {
     ${stage === project.stage && at >= 0 ? `<p>${esc(STAGE_PLAIN[stage] ?? title(stage))}: part ${at + 1} of ${STEPS.length}, ${esc(STEP_PLAIN[project.step] ?? project.step)}
       <small class="muted">(${esc(title(stage))}, ${esc(STEP_TITLES[project.step] ?? project.step)})</small>.</p>` : ""}
     <p class="a4-now"><strong>${esc(move.now)}</strong></p>${move.why ? `<p class="muted">${esc(move.why)}</p>` : ""}
-    ${live && !move.effect ? renderWhoApproves(ctx, live) : ""}
-    <div class="row wrap">${primary(move.act, move.also)}</div>
+    ${live && !move.effect ? renderWhoApproves(ctx, live, move.people === true) : ""}
+    <div class="row wrap">${primary(move.act, move.also)}</div>${move.people ? peopleFormHtml(ctx) : ""}
     <p class="muted">${esc(TRUTH.signatures)}. Every A4 record is self-reported; nothing here says the agent is safe, correct or lawful.</p></section>`;
 }
 
@@ -302,8 +403,10 @@ export function renderIntro({ creating = true, canAdd = false } = {}) {
 export function addedPersonHtml(data) {
   const user = isObject(data?.user) ? data.user : {};
   const password = typeof data?.firstPassword === "string" ? data.firstPassword : null;
-  return `<p>${password ? `Added ${esc(user.username)}. Their first password, shown only this once: ${code(password)}` : `${esc(user.username)} already had an account.`}</p>
-    ${list(data?.notes).map((note) => `<p class="muted">${esc(note)}</p>`).join("")}`;
+  return `<p>${password ? `Added ${esc(user.username)}. Their first password, shown only this once: ${code(password)}` : `${esc(user.username)} already had an account, `
+    + "so no new password was made and AMC cannot show the old one."}</p>${password ? "" : `<p>If they no longer have their password, a workspace owner sets a new one in the
+    workspace folder with ${code(`amc user password ${user.username ?? "<name>"}`)} and gives it to them. Then add them to a project on its Members card.</p>`}
+    ${list(data?.notes).filter((note) => password || !String(note).includes("already had an account")).map((note) => `<p class="muted">${esc(note)}</p>`).join("")}`;
 }
 
 /** The page shown while the preview is off: what A4 is and the exact way to turn it on (the gate itself stays). */
@@ -368,6 +471,13 @@ export const EXAMPLES = {
   activate: { target: "compose", destinationRef: "amc.example.internal:443", leaseScopes: "gateway:llm", stagingRoutes: "/openai", productionRoutes: "/openai",
     modelAllowlist: "gpt-4o-mini", budgetRequestsPerMinute: "30", budgetTokensPerMinute: "20000" }
 };
+/**
+ * The example "Use an example" fills at `stage`, less the fields an Industry Pack suggests (`skip`): an example never
+ * replaces what a pack filled, the risk level least of all, even when it is pressed before the pack's answers arrive.
+ */
+export function exampleFor(stage, skip = []) {
+  return Object.fromEntries(Object.entries(EXAMPLES[stage] ?? {}).filter(([questionId]) => !skip.includes(questionId)));
+}
 /** Stages whose example fills the form; Activate's required answers are all validated values, so it shows placeholders only. */
 export const FILLABLE = new Set(["aspire", "assemble", "adapt"]);
 export const placeholderOf = (stage, questionId) => {
@@ -404,11 +514,18 @@ function latestProject(projects) {
  * button. With projects: "Continue <name>", what it needs now in one sentence, one button, and "Start another" as a link.
  * In the demo workspace, which cannot hold projects, it says where building works instead.
  */
-export function homeCardHtml({ projects = [], industryHtml = "", demo = false, start = null } = {}) {
+export function homeCardHtml({ projects = [], waiting = null, industryHtml = "", demo = false, start = null } = {}) {
   const lead = "Pick your industry, answer plain questions, and AMC drafts the agent with you. A second person approves each step before it moves on.";
   if (demo) {
     return `<h2 id="a4HomeTitle">Build an agent for your industry</h2><p class="first-use-lead">${esc(lead)}</p>
       <p>This demo workspace is view-only, so it cannot hold agent projects. <a href="./a4">See how building works</a></p>`;
+  }
+  if (isObject(waiting?.project)) {
+    const { project: row, kind } = waiting;
+    return `<h2 id="a4HomeTitle">An approval waits for you</h2>
+      <p class="first-use-lead">${esc(row.name)}: ${esc(STAGE_PLAIN[row.stage] ?? title(row.stage))} (${esc(title(row.stage))}) ${kind === "effect"
+        ? `needs your approval on a second request, which ${row.stage === "adapt" ? "activates the plan" : "applies what was built"}` : `asks for its ${esc(kind)} approval`}. Open it, read what it asks for, then approve it or request changes.</p>
+      <div class="row wrap a4-home-actions"><a class="button" href="./a4Project?project=${encodeURIComponent(row.projectId ?? "")}&stage=${encodeURIComponent(row.stage ?? "")}">Open the approval</a></div>`;
   }
   const project = latestProject(projects);
   if (project) {

@@ -17,6 +17,8 @@ const RISK_TIER = { critical: "critical", "very-high": "high", high: "high", ele
  * constraint per instrument in its regulatory basis. The pack names risks, not rules for one agent, so what the agent
  * must never do stays the member's to write (the panel lists the pack's key risks beside it).
  */
+/** The Aspire answers a pack suggests (packAnswers' keys); "Use an example" leaves them to the pack. */
+export const PACK_FIELDS = ["stations", "riskTier", "governance", "constraints"];
 export function packAnswers(pack) {
   const riskTier = RISK_TIER[pack?.riskTier] ?? "";
   return {

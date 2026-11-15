@@ -70,8 +70,8 @@ describe("What to do now: one next step per screen", () => {
     const readiness = { gates: { completion: { gateId: "g4", status: "PENDING", approvals: 0, required: 2 } },
       items: [item("sod", { reasonCodes: ["QUORUM_UNREACHABLE", "ELIGIBLE:1", "REQUIRED:2"] })] };
     const m = move(ctx({ stage: "assemble", project: project({ stage: "assemble", step: "reviewed" }), gates: [{ gateId: "g4", request: { rolesAllowed: ["APPROVER", "OWNER"] } }] }, readiness));
-    expect(m.now).toContain("needs 2 people who may approve it, and only 1 can");
-    expect(m.now).toContain("amc user add --username <name> --role APPROVER");
+    expect(m.now).toContain("needs 2 different people other than whoever wrote, built or asked for this step");
+    expect(m.now).toContain("Only 1 can approve it now");
   });
   test("a requirement that holds the step comes first, with its own button when a card has one", () => {
     const readiness = { gates: { completion: { gateId: "g5", status: "QUORUM_MET" } },
@@ -88,7 +88,8 @@ describe("What to do now: one next step per screen", () => {
     expect(m.now).toContain("amc user role set alice");
   });
   test("Assemble: close the build session before Review; open the effect gate after the completion quorum", () => {
-    expect(move(ctx({ stage: "assemble", project: project({ stage: "assemble", step: "built" }) })).now).toContain("Close and verify");
+    expect(move(ctx({ stage: "assemble", project: project({ stage: "assemble", step: "built" }), allowed: { review: { allowed: false, reasonCodes: ["BUILD_SESSION_OPEN"] } } })).now)
+      .toContain("Close and verify");
     const met = { gates: { completion: { gateId: "g3", status: "QUORUM_MET" } }, items: [item("effect_gate", { mandatory: false, reasonCodes: ["EFFECT_GATE_NOT_OPEN"] })] };
     expect(move(ctx({ stage: "assemble", project: project({ stage: "assemble", step: "reviewed" }) }, met)).act?.press).toBe("open-effect");
   });

@@ -65,7 +65,9 @@ completes Aspire, Assemble and Adapt and stops at Activate's release approval (s
    elevated becomes med), the governance that tier takes (regulated for high or critical), and one constraint per
    instrument in the pack's regulatory basis, worded "Check whether it applies, and meet it where it does". A panel lists
    the risks the pack names, so you can write what the agent must never do, and links to the pack's questionnaire.
-   Nothing is saved until you press **Save answers**, and every suggestion can be changed. Pack content is experimental
+   Nothing is saved until you press **Save answers**, and every suggestion can be changed. **Use an example** never
+   fills a field the pack suggests (the sector, the risk level, the governance and the rules to check), even when it is
+   pressed before the pack's suggestions arrive. Pack content is experimental
    and AI-drafted until a named expert signs it, and starting from a pack does not show the agent meets any rule. The
    `amc` menu's "Build an agent for my industry (A4 Forge preview)" line starts AMC with the flag set and opens this form.
 
@@ -88,8 +90,15 @@ completes Aspire, Assemble and Adapt and stops at Activate's release approval (s
    before requesting any gate (a membership change supersedes open gates). While an approval is open, the panel's
    **Who must approve** block names how many different people must approve, the workspace role they need (and whether
    one must hold AUDITOR), who cannot approve this one under separation of duties, who has approved so far, and the
-   `amc user add` command for adding a person. A second approver in the same workspace meets separation of duties; it
-   is not an independent review. The command line shows the same state:
+   `amc user add` command for adding a person. Before you ask for an approval the project's people cannot give, the
+   panel says so first: how many people it needs besides whoever wrote, built or asks for the step, which role one of
+   them needs, and an **Add a person** form right there (a workspace owner only). It creates the account with a first
+   password shown once (or finds an existing one) and adds the person to the project as an approver, with the audit role
+   ticked so the same two people can decide every later step. The panel then says how they approve: they sign in on their
+   own device, or in a private window on this one, and open the project's link. An approver's Home opens with "An
+   approval waits for you" and a button to it. On a practice project, while self-approval is open, the panel and the
+   Approvals card say you approve the step yourself and that it is recorded as self-approved. A second approver in the
+   same workspace meets separation of duties; it is not an independent review. The command line shows the same state:
 
    ```bash
    amc a4 list
@@ -110,7 +119,9 @@ completes Aspire, Assemble and Adapt and stops at Activate's release approval (s
 
 5. **Assemble and Adapt.** Assemble asks for capabilities, autonomy, the build provider (`stub` runs offline) and the
    path (`native`). Its Build starts one native build session; Review is refused (`409 A4_NOT_READY`,
-   `BUILD_SESSION_OPEN`) until the session's owner presses Close and verify on Studio's Native Tasks page. Its
+   `BUILD_SESSION_OPEN`) until the session's owner presses Close and verify on Studio's Native Tasks page. Studio's
+   readiness says so before you press Review (`allowed.review` carries `BUILD_SESSION_OPEN`), so the panel's step is
+   **Close the build session**: its button opens that session on Native Tasks, and **Back to the agent project** returns. Its
    completion needs two approvals and then an effect gate, `a4.assemble.apply`: the owner opens it on the stage's
    effect card (`POST …/stages/assemble/effects/a4.assemble.apply/open` with the completion `gateId`), two project
    approvers approve its request on that card (`POST …/approvals/<approvalRequestId>/approve`), and `amc a4 complete`
@@ -261,6 +272,12 @@ files read unsigned until that verifier admits the pinned notary.
   `approver` or `owner` role counts, whatever their workspace roles and the gate's roles, so it can miss a shortfall.
   It counts local users only: with a live host (WORKSPACE_ROUTER) session or on a call through the hosted router it is
   not made, since readiness cannot read host users' roles, and a host OWNER who is not signed in is not counted.
+  Studio's readiness (`GET …/readiness`, `GET …/projects/<id>`) also carries `nextGate` before the stage's gate is
+  requested: its `required` approvals, `rolesAllowed`, the `roleVote` one approver must hold (AUDITOR at Adapt's
+  completion) and `eligible`, the same count made as if an author of the revision asks, so an approver who opens the page
+  before the request still counts (members only on a regulated project).
+  It is guidance for the panel, never a rule: the request records its own quorum, and nothing about who may approve
+  changes.
 
 ### The single-user rule
 
@@ -284,7 +301,9 @@ practice project only while the workspace has exactly one ACTIVE local user, no 
 project was created (an unreadable source counts as not practice) and the chain has not ratcheted. The moment a second
 person can sign in, the risk level governs again and nobody approves their own work, before any A4 write records them.
 The project view reports `practice` (opened as practice), `practiceActive` and `regulated`. Do not use a practice
-project for real work.
+project for real work. Self-approval counts once, so with the default policy one person alone gets as far as building in
+Assemble (Aspire's two approvals and Assemble's direction approval): Assemble's completion and every later gate need two
+approvers, and the What to do now panel then says how many people the approval needs and offers Add a person right there.
 
 **Adding the second person.** A signed-in workspace OWNER adds a person in one call: `POST /api/v1/a4/people`
 (`{ username, workspaceRoles: ["APPROVER"] or ["APPROVER", "AUDITOR"] }`) creates the account with a first password AMC

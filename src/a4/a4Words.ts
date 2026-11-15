@@ -19,9 +19,23 @@ const NOT_READY_WORDS: Readonly<Record<string, string>> = {
 const NOBODY_ELSE = "Nobody else on this project can approve it. Invite a second person on the Members card (Invite someone new), "
   + "or add someone who can already sign in there. To learn AMC alone, start a practice project instead.";
 
-/** NOT_READY_WORDS for one readiness item; sod.self_provisioned carries NO_SECOND_APPROVER when nobody else can decide. */
-export function notReadyWords(item: { id: string; reasonCodes: readonly string[] }): string | undefined {
-  return item.id === "sod.self_provisioned" && item.reasonCodes.includes("NO_SECOND_APPROVER") ? NOBODY_ELSE : NOT_READY_WORDS[item.id];
+/** A gate the one person here may approve themselves (readiness selfApprovalAllowed), as the console's guide says it too. */
+export const SELF_APPROVE = "You are the only person who can sign in here, so you approve this one yourself, and it is recorded as self-approved. "
+  + "Self-approval counts once: a step that needs two approvals also needs a second person.";
+
+/** The step of the stage that makes a record an item waits for (reason code PRODUCED_AT_<STEP>, or NOT_PROPOSED), in the console's words. */
+const PRODUCED_AT: Readonly<Record<string, string>> = { UNDERSTAND: "Understand", PROPOSE: "Propose", BUILD: "Build", REVIEW: "Review" };
+
+/**
+ * One readiness item in words: NOT_READY_WORDS, else its own next action, else, for a record a later step makes
+ * (PRODUCED_AT_<STEP>), when it is made. sod.self_provisioned carries NO_SECOND_APPROVER when nobody else can decide.
+ */
+export function notReadyWords(item: { id: string; reasonCodes: readonly string[]; nextAction?: { label?: string } | null }): string | undefined {
+  if (item.id === "sod.self_provisioned" && item.reasonCodes.includes("NO_SECOND_APPROVER")) return NOBODY_ELSE;
+  const step = item.reasonCodes.map((code) => code === "NOT_PROPOSED" ? "PROPOSE" : /^PRODUCED_AT_([A-Z]+)$/.exec(code)?.[1])
+    .find((name) => name !== undefined && PRODUCED_AT[name] !== undefined);
+  return NOT_READY_WORDS[item.id] ?? item.nextAction?.label
+    ?? (step === undefined ? undefined : `Not made yet: AMC records it when you run ${PRODUCED_AT[step]} at this stage.`);
 }
 
 /** `amc a4 members` as it runs: a writer names its `amc approvals login` token and the head it read (`amc a4 guide` prints it). */

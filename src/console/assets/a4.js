@@ -10,6 +10,7 @@ import { stageAction, stageCards } from "./a4Cards.js";
 import * as view from "./a4View.js";
 import * as start from "./a4Start.js";
 import * as packs from "./a4Pack.js";
+import { approvalWaiting, canCreate, isOwner } from "./a4Who.js";
 import { register as registerAspire } from "./a4Aspire.js";
 import { register as registerAssemble } from "./a4Assemble.js";
 import { register as registerAdapt } from "./a4Adapt.js";
@@ -122,14 +123,6 @@ async function previewOptions() {
 }
 
 /**
- * Studio's role check answers 403 with no A4 code to anyone else, which the page cannot tell from a lost acknowledgement,
- * so the create form and the home card are offered only to OPERATOR or OWNER in a workspace Studio reports writable.
- */
-const isOwner = (who) => Array.isArray(who?.roles) && who.roles.includes("OWNER");
-const canCreate = (who, options) => Array.isArray(who?.roles) && who.roles.some((role) => role === "OPERATOR" || role === "OWNER")
-  && options?.workspace?.readOnly === false;
-
-/**
  * Home's first card (a4Start.homeCardHtml): build an agent, or continue the latest project. It is filled only when the
  * preview answers and this person may create projects; the demo workspace gets a short note instead. The nav link is
  * shown by default and hidden here when Studio reports the preview off.
@@ -152,7 +145,8 @@ async function showHomeEntry() {
     const projects = listOf(await apiNativeRequest(`${API}/projects`), "projects");
     if (!card || (projects.length === 0 && !canCreate(who, options))) return;
     const catalog = projects.length === 0 ? listOf(await apiGet("/industry-packs/list").catch(() => null), "packs") : [];
-    card.innerHTML = start.homeCardHtml({ projects, industryHtml: packs.packSelectHtml(catalog, null), start: options.workspace?.start ?? null });
+    const waiting = await approvalWaiting(projects, who, apiNativeRequest, API);
+    card.innerHTML = start.homeCardHtml({ projects, waiting, industryHtml: packs.packSelectHtml(catalog, null), start: options.workspace?.start ?? null });
     card.hidden = false;
     bindCreateForm(card.querySelector("#a4HomeForm"));
   } catch {
@@ -267,6 +261,7 @@ function mountProject(projectId, options) {
   const projectPath = (sub) => `${API}/projects/${encodeURIComponent(projectId)}${sub}`;
   const state = { project: null, readiness: null, gates: [], revision: null, stageRevision: null, comments: [], members: null, diff: null, refs: [], options };
   let stage = null, activeCard = params.get("card") || "specification", cursor = 0, timer = null;
+  const invited = []; // what each Add a person answered on this page (first passwords included), never stored
   let loading = null, loadAgain = false;
   let presence = [], presenceError = "", conflict = null, specBase = null;
   // The gate and readiness digest the approvals bar first showed. Polls re-render the bar, so a decision binds these,
@@ -627,9 +622,10 @@ function mountProject(projectId, options) {
         const username = value("inviteUsername");
         if (!username) throw new Error("Write their user name first. Nothing was sent.");
         const auditor = scope.querySelector('[name="inviteAuditor"]')?.checked === true;
-        return post("Invite", projectPath("/members/invite"), { username, workspaceRoles: auditor ? ["APPROVER", "AUDITOR"] : ["APPROVER"], ...headBinding() }, [],
-          (data) => tell(`${data?.firstPassword ? `${data.user?.username} was invited. Their first password, shown only this once: ${data.firstPassword}. ` : ""}${
-            (Array.isArray(data?.notes) ? data.notes : []).join(" ")}`));
+        // Each person added stays listed with their first password until the page is left, so adding a second keeps the first's.
+        const link = `${location.origin}${location.pathname}?project=${encodeURIComponent(projectId)}&stage=${encodeURIComponent(stage)}`;
+        return post("Invite", projectPath("/members/invite"), { username, workspaceRoles: auditor ? ["APPROVER", "AUDITOR"] : ["APPROVER"], ...headBinding() }, [`${scope.dataset?.card ?? "page"}:inviteUsername`],
+          (data) => { invited.push(start.invitedText(data)); tell(`${invited.join(" ")} ${start.approverHowTo(link)}`); });
       }
       case "comment": {
         const body = value("comment");
@@ -799,7 +795,7 @@ function mountProject(projectId, options) {
 
   /** Fills each empty answer with this stage's example, marked "(sample)" where it is free text (a4Start.EXAMPLES). */
   function useExample() {
-    const filled = fillEmptyAnswers(start.EXAMPLES[stage] ?? {});
+    const filled = fillEmptyAnswers(start.exampleFor(stage, stage === "aspire" && startPackId ? packs.PACK_FIELDS : []));
     tell(filled ? `Filled ${filled} empty answer(s) with sample text, marked (sample). Check them, change what you like, then press Save answers.`
       : "Every answer that has an example is already filled. Nothing was changed.");
   }

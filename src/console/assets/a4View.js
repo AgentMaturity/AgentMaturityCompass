@@ -3,6 +3,7 @@
 import { renderEvidenceRefList } from "./components/evidenceRefList.js";
 import { renderPromptDiffViewer } from "./components/promptDiffViewer.js";
 import { QUESTION_LABELS, questionDisplay } from "./a4Questions.js";
+import { exclusionLine, PRACTICE_CHOICE } from "./a4Who.js";
 
 export const STAGES = ["aspire", "assemble", "adapt", "activate"];
 const STEPS = ["asked", "understood", "explained", "proposed", "direction_approved", "built", "reviewed", "completion_approved"];
@@ -138,8 +139,7 @@ export function approverChoiceHtml(start) {
     <p class="muted">Every Industry Pack is high risk or above, so a project started from a pack is governed as regulated: someone other than
       you approves each step, and nobody approves their own work. Add that person with Add a person, or on the project's Members card.</p>
     <label><input type="radio" name="practice" value="yes"${practice ? "" : " disabled"} /> Just me, as practice (for learning AMC alone)</label>
-    <p class="muted">${practice ? "You may approve your own work. Each such approval is recorded and shown as self-approved, and a practice project "
-      + "stops being one as soon as a second person can sign in. Do not use it for real work." : esc(start.practiceRefusal ?? "A practice project is not offered here.")}</p>
+    <p class="muted">${practice ? PRACTICE_CHOICE : esc(start.practiceRefusal ?? "A practice project is not offered here.")}</p>
     </fieldset>`;
 }
 
@@ -649,7 +649,7 @@ export function renderApprovalsBar(ctx) {
   // Readiness's status verbatim; only the decisions readiness.staleApprovals lists carry codes (decisionRow).
   const gateBlock = (row) => `<p><code>${esc(row.gate)}</code> gate r${esc(row.revisionNo)} · <code>${esc(row.status)}</code> ·
       ${esc(row.approvals)} of ${esc(row.required)} required approvals</p>
-      ${Array.isArray(row.excludedKeys) && row.excludedKeys.length ? `<p>Cannot approve (separation of duties); may still deny: ${row.excludedKeys.map((key) => nameOf(ctx, key)).join(", ")}</p>` : ""}
+      ${Array.isArray(row.excludedKeys) && row.excludedKeys.length ? exclusionLine(readiness, row, row.excludedKeys.map((key) => nameOf(ctx, key))) : ""}
       ${list(row.decisions.map((decision) => decisionRow(decision, staleCodes.get(decision.decisionId))), "No decisions yet.")}`;
   const earlierRows = earlier.map((old) => `<li><code>${esc(old.gate)}</code> gate bound to r${esc(old.revisionNo)} · <code>${esc(old.status)}</code>
     ${list(old.decisions.map((decision) => decisionRow(decision)), "No decisions.")}</li>`);

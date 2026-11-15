@@ -3,13 +3,21 @@ import { approvalRequestBindingDigest, approvalRequestSchema } from "../approval
 import { approvalRuleForAction } from "../approvals/approvalPolicyEngine.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
-import { A4_BOUND_ITEMS, gateStatus, isRegulated, readinessMoved, type A4ReadinessState } from "./a4Readiness.js";
+import { A4_BOUND_ITEMS, gateStatus, isRegulated, readinessMoved, type A4ReadinessQuery, type A4ReadinessState } from "./a4Readiness.js";
 import { A4_BOUND_ITEMS_VERSION, a4GatePolicyV1Schema, gatePolicyFloorViolations, type A4Stage } from "./a4Schema.js";
 import { assertAllowed, DAY_MS, engineRiskTier, evaluateFor, evaluateForAsyncRecord, fail, fileSha, governed, governedAsync,
   intentOf, livePrincipal, randomId, type A4Call } from "./a4Gates.js";
 import type { A4Store, A4TransitionResult } from "./a4Store.js";
 import type { A4TransitionAttempt } from "./a4TransitionSigning.js";
 import type { A4ChangeSpec } from "./a4TransitionRecords.js";
+
+/** A gate's quorum as a request would record it: the gate policy's rule over the signed approval policy's action class. */
+export function gateQuorum(query: Pick<A4ReadinessQuery, "policy" | "gatePolicy">, stage: A4Stage, gate: "direction" | "completion" | "policy") {
+  const rule = query.gatePolicy.gates[gate === "policy" ? "policy" : `${stage}.${gate}` as `${A4Stage}.${"direction" | "completion"}`];
+  const policyRule = approvalRuleForAction(query.policy, rule.actionClass);
+  const rolesAllowed = rule.rolesAllowed ? policyRule.rolesAllowed.filter((role) => rule.rolesAllowed!.includes(role)) : policyRule.rolesAllowed;
+  return { rule, policyRule, rolesAllowed, required: Math.max(policyRule.requiredApprovals, rule.minApprovals ?? 0, 1) };
+}
 
 type GateRequest = A4Call & { stage: A4Stage; gate: "direction" | "completion" | "policy"; proposedGatePolicy?: unknown; expectedHeadSeq: number };
 /** One actual gate recipe, shared by the explicit retained sync API and the maintained async callers. */
@@ -47,10 +55,8 @@ function requestPlan(store: A4Store, projectId: string, input: GateRequest, eval
       const below = gatePolicyFloorViolations(proposed, query.floor, query.gatePolicy);
       if (below.length > 0) throw fail(409, "GATE_POLICY_BELOW_FLOOR", below.join("; "), below);
     }
-    const rule = query.gatePolicy.gates[input.gate === "policy" ? "policy" : `${stage}.${input.gate}` as `${A4Stage}.${"direction" | "completion"}`];
-    const policyRule = approvalRuleForAction(query.policy, rule.actionClass);
+    const { rule, policyRule, rolesAllowed, required } = gateQuorum(query, stage, input.gate);
     const regulated = isRegulated(state, query.floor);
-    const rolesAllowed = rule.rolesAllowed ? policyRule.rolesAllowed.filter((role) => rule.rolesAllowed!.includes(role)) : policyRule.rolesAllowed;
     if (rolesAllowed.length === 0) throw fail(409, "A4_NOT_READY", "The gate policy leaves no role that may approve.", { reasonCodes: ["GATE_POLICY_BELOW_FLOOR"] });
     const boundItemIds = A4_BOUND_ITEMS[stage];
     const intent = intentOf(state, { stage, gate: input.gate, revisionNo: project.revision_no, requesterKey: principal.key,
@@ -61,7 +67,7 @@ function requestPlan(store: A4Store, projectId: string, input: GateRequest, eval
       toolName: `a4.${stage}.${input.gate}`, actionClass: rule.actionClass, requestedMode: "EXECUTE", effectiveMode: "EXECUTE",
       riskTier: engineRiskTier(state),
       createdTs: now, expiresTs: now + Math.min(rule.ttlDays, query.floor.maxTtlDays ?? 90) * DAY_MS, status: "PENDING",
-      requiredApprovals: Math.max(policyRule.requiredApprovals, rule.minApprovals ?? 0, 1),
+      requiredApprovals: required,
       requireDistinctUsers: policyRule.requireDistinctUsers || rule.requireDistinctUsers === true || regulated || input.gate === "policy", rolesAllowed,
       boundHashes: { intentHash: sha256Hex(canonicalize(intent)), policyHash: amc("approval-policy.yaml"), toolsHash: amc("tools.yaml"),
         budgetsHash: amc("budgets.yaml"), leaseConstraintsHash: sha256Hex(canonicalize({})) },
