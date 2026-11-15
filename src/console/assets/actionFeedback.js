@@ -6,6 +6,7 @@ import { plainErrorText } from "./plainError.js";
 // A request belongs to the last pressed control while that control's work is still going: started within this long of
 // the press or of its previous request ending. Background refreshes after that are not its work.
 const QUIET_MS = 1500;
+const SETTLE_MS = 400;
 // A4 Forge and Native Tasks report on every action themselves.
 const OWN_FEEDBACK = /\/(?:a4|a4Project|native-tasks)$/;
 let last = null; // { control, at, requests, failed }
@@ -35,11 +36,16 @@ export function trackRequest() {
     entry.at = Date.now();
     if (!ok) entry.failed = true;
     if (entry.requests > 0) return;
-    entry.control.removeAttribute("aria-busy");
-    // A page that re-rendered the same control (same id) gets the line on the new one, so a refresh that changed
-    // nothing still answers.
-    const control = current(entry.control);
-    if (control && !entry.failed && !control.parentElement?.querySelector(":scope > .action-error")) note(control, "done", `Done at ${timeNow()}.`);
+    // Handlers often send one request after another and re-render in between: answer only once the work has been
+    // quiet for a moment. A page that re-rendered the same control (same id) gets the line on the new one, so a
+    // refresh that changed nothing still answers.
+    setTimeout(() => {
+      if (entry.requests > 0 || Date.now() - entry.at < SETTLE_MS - 50) return;
+      entry.control.removeAttribute("aria-busy");
+      const control = current(entry.control);
+      control?.removeAttribute("aria-busy");
+      if (control && !entry.failed && !control.parentElement?.querySelector(":scope > .action-error")) note(control, "done", `Done at ${timeNow()}.`);
+    }, SETTLE_MS);
   };
 }
 
