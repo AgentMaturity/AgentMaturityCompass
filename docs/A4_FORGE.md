@@ -364,7 +364,9 @@ Aspire's Build builds the pack right after it writes the agent config, so the re
 prompt scheduler rebuilds every pack on the signed prompt policy's cadence (every 24 hours by default) with a new id,
 time and signatures; when nothing the pack says has
 changed, the slot does not move and open approvals stay open. A pack whose prompts, allowlists, advisories or any other
-content changed moves the slot, and an open gate reads `RESOURCE_DRIFTED` until it is requested again.
+content changed moves the slot, and an open gate reads `RESOURCE_DRIFTED` until it is requested again. A revision
+recorded before this digest existed binds the archive's sha256, so its open gates read `RESOURCE_DRIFTED` once: record a
+new revision.
 Under an active plan, Studio mints a native task's lease with the workspace lease key, which Studio's vault holds: while
 that vault is locked, `adapt.plan.nativeSessionsAllowed` reads WAITING (`LEASE_NOT_ISSUED`, `VAULT_LOCKED`). A CLI, SDK,
 ACP or in-process run with workspace tools signs its own lease with the vault of its own process (`AMC_VAULT_PASSPHRASE`),
