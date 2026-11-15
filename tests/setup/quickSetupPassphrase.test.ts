@@ -48,6 +48,17 @@ describe("amc setup with no AMC_VAULT_PASSPHRASE", () => {
     expect(lines.join("\n")).not.toContain(generated);
   });
 
+  // CLI-24: a second run without a terminal stopped on a bare "vault locked" that pointed back at amc setup.
+  test("a second run with the vault locked says why and what to do", async () => {
+    const lines: string[] = [];
+    const { cwd, run } = setup(lines);
+    await run();
+    lockVault(cwd);
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
+    await expect(run()).rejects.toThrow("This folder is already set up, and its vault is locked. Without a terminal, AMC does not use the passphrase");
+    expect(store.calls).toHaveLength(1);
+  });
+
   test("refuses before the workspace is created when remembering is off", async () => {
     const lines: string[] = [];
     const { cwd, run } = setup(lines);
