@@ -1091,6 +1091,40 @@ button.danger {
   margin: 6px 0 0;
 }
 
+/* A pressed button says it finished (actionFeedback.js); pageKit.js records, inline questions and record rows. */
+.action-done {
+  flex-basis: 100%;
+  margin: 6px 0 0;
+  font-size: 13px;
+}
+
+/* A table row the page marks as chosen (Northstar's agent, an opened approval): the theme's colours, never white. */
+tr.selected > td { background: rgba(74, 239, 121, .08); }
+
+.users-table td:first-child { overflow-wrap: anywhere; max-width: 18ch; }
+
+.record { margin: 8px 0; }
+.record > summary { cursor: pointer; color: var(--muted); font-size: 13px; padding: 2px 0; }
+.record[open] { border-left: 2px solid var(--border); padding-left: 10px; }
+.record pre { max-width: 100%; }
+
+.record-rows th[scope="row"] {
+  text-align: left;
+  font-weight: 500;
+  color: var(--muted);
+  width: 38%;
+  vertical-align: top;
+}
+
+.ask-inline {
+  flex-basis: 100%;
+  margin: 8px 0;
+  align-items: flex-end;
+}
+
+.ask-inline label { flex: 1 1 260px; }
+.ask-inline [role="alert"] { flex-basis: 100%; margin: 0; }
+
 .row {
   display: flex;
   gap: 8px;
