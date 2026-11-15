@@ -1,12 +1,13 @@
 /** Actual mechanic analysis publication. Diagnostic production remains its own inherited upstream operation. */
 import { join, relative } from "node:path";
 import YAML from "yaml";
-import { runAutoAnswer } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
+import { autoAnswerFromLatestRun, runAutoAnswer } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
 import { captureOrgPairs, prepareOrgPairsAsync } from "../org/preparedOrgPairs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { UnverifiedRecordError } from "../utils/unverifiedRecordError.js";
 import { captureMechanicPair, requireMechanicPair } from "./mechanicPairs.js";
 import { captureMechanicRun, mechanicProgress, mechanicFailed, appendMechanicEntry } from "./mechanicPublication.js";
-import { mechanicRoot, mechanicTargetsPath, prepareInitialMechanicTargets } from "./targetsStore.js";
+import { mechanicRoot, mechanicTargetsPath, prepareInitialMechanicTargets, readMechanicTargets } from "./targetsStore.js";
 import { mechanicTargetsSchema, type MechanicScope } from "./targetSchema.js";
 import { captureMechanicAnalysisCgx, captureMechanicGap, captureMechanicEta } from "./mechanicAnalysisInputs.js";
 import { captureMechanicAnalysisBankAttempt } from "./mechanicAnalysisBank.js";
@@ -62,6 +63,23 @@ async function gap(params: ScopeParams, selectedScope: MechanicScope, run: Run, 
   });
   const saved = prepared.publish()[0]!; completed(params.workspace, saved, state);
   return { result: { gap: report, measured, ...saved }, assertCurrent() { run.beforePublish(); prepared.assertCurrent(); run.fixed(); } };
+}
+/** Signed targets for a read; the in-memory defaults only when no targets file exists. Edited or unsigned targets are refused. */
+function readableTargets(workspace: string) {
+  try {
+    return existingTargets(workspace)?.targets ?? readMechanicTargets(workspace);
+  } catch {
+    throw new UnverifiedRecordError("TARGETS_UNVERIFIED", "The saved target levels do not pass their signature check, so the gap is not shown. Save the target levels again on the Equalizer page.");
+  }
+}
+/**
+ * Reading only (GET /mechanic/gap): the gap between the targets and the latest recorded run. Runs, saves and signs
+ * nothing; null when there is no run yet. An unverified run or unverified targets are refused (UnverifiedRecordError).
+ */
+export function mechanicGapFromLatestRun(input: ScopeParams) {
+  const selectedScope = scope(input), targets = readableTargets(input.workspace);
+  const measured = autoAnswerFromLatestRun(input.workspace, selectedScope.type === "AGENT" ? selectedScope.id : "default");
+  return measured ? { gap: captureMechanicGap({ workspace: input.workspace, scope: selectedScope, targets, measured }).gap, measured } : null;
 }
 /** Internal retained publication handle for the real CLI output suffix and the simulation dependency. */
 export async function mechanicGapForPublication(input: ScopeParams, beforePublish: () => void) {

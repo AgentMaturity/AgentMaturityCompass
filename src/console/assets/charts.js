@@ -1,3 +1,12 @@
+// C-22: a chart with nothing to draw says so in words, and one whose values are all 0 says that, so a box is never blank.
+function note(ctx, text, w, h) {
+  ctx.fillStyle = "#9ca3af";
+  ctx.font = "14px system-ui, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(text, w / 2, h / 2);
+  ctx.textAlign = "start";
+}
+
 export function renderLine(canvas, values, color = "#4AEF79") {
   if (!canvas) {
     return;
@@ -20,6 +29,7 @@ export function renderLine(canvas, values, color = "#4AEF79") {
     ctx.stroke();
   }
   if (!values || values.length === 0) {
+    note(ctx, "No data yet", w, h);
     return;
   }
   const min = Math.min(...values);
@@ -57,6 +67,11 @@ export function renderBars(canvas, values, color = "#4AEF79") {
   ctx.fillStyle = "#101010";
   ctx.fillRect(0, 0, w, h);
   if (!values || values.length === 0) {
+    note(ctx, "No data yet", w, h);
+    return;
+  }
+  if (values.every((value) => !value)) {
+    note(ctx, "Every value is 0 so far", w, h);
     return;
   }
   const max = Math.max(1, ...values);

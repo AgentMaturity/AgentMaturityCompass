@@ -1,3 +1,4 @@
+import { askInline } from "./pageKit.js";
 import { renderRequestCard } from "./components/requestCard.js";
 
 function esc(value) {
@@ -24,13 +25,14 @@ export async function renderAuditRequestsPage(params) {
     params.card(
       "Evidence Requests",
       `
+      <p class="muted">An auditor asks for evidence here; an owner approves the request and fulfils it with a binder.</p>
       <div class="row wrap">
-        <input id="auditReqScope" value="WORKSPACE" />
-        <input id="auditReqScopeId" value="workspace" />
-        <input id="auditReqItems" value="control:ACCESS_CONTROL.SSO_SCIM" />
+        <label><span class="muted">Scope</span><select id="auditReqScope"><option>WORKSPACE</option><option>NODE</option><option>AGENT</option></select></label>
+        <label><span class="muted">Which one (for the workspace: workspace)</span><input id="auditReqScopeId" value="workspace" /></label>
+        <label><span class="muted">What to ask for, comma separated</span><input id="auditReqItems" value="control:ACCESS_CONTROL.SSO_SCIM" /></label>
       </div>
       <div class="row wrap">
-        <button id="auditReqCreate">Create Request (AUDITOR)</button>
+        <button id="auditReqCreate" data-roles="AUDITOR">Ask for evidence (auditor)</button>
         <button id="auditReqRefresh" class="secondary">Refresh</button>
       </div>
       <p class="muted">Requests can include <code>control:&lt;id&gt;</code>, <code>proof:&lt;proofId&gt;</code>, or <code>artifact:&lt;id&gt;@&lt;sha256&gt;</code>. Fulfillment exports a restricted, privacy-safe binder.</p>
@@ -59,6 +61,7 @@ export async function renderAuditRequestsPage(params) {
     const scopeType = (document.getElementById("auditReqScope")?.value || "WORKSPACE").trim();
     const scopeId = (document.getElementById("auditReqScopeId")?.value || "workspace").trim();
     const items = parseItems(document.getElementById("auditReqItems")?.value || "");
+    if (items.length === 0) throw new Error("Name at least one thing to ask for, for example control:ACCESS_CONTROL.SSO_SCIM.");
     await params.apiPost("/audit/requests/create", {
       scopeType,
       scopeId,
@@ -81,7 +84,8 @@ export async function renderAuditRequestsPage(params) {
       } else if (action === "reject") {
         await params.apiPost(`/audit/requests/${encodeURIComponent(requestId)}/reject`, {});
       } else if (action === "fulfill") {
-        const outFile = window.prompt("Output .amcaudit path", `.amc/audit/binders/exports/workspace/workspace/request_${requestId}.amcaudit`);
+        const outFile = await askInline(button, { label: "Save the binder for this request to (ending in .amcaudit)",
+          value: `.amc/audit/binders/exports/workspace/workspace/request_${requestId}.amcaudit`, submit: "Save", check: (text) => text.endsWith(".amcaudit") ? null : "The file name must end in .amcaudit." });
         if (!outFile) {
           return;
         }

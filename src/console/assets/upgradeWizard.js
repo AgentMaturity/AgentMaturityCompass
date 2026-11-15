@@ -1,4 +1,6 @@
-import { apiGet, apiPost, showSignIn, whoami } from "./api.js";
+import { apiGet, apiPost, applyRoleGates, showSignIn, whoami } from "./api.js";
+import { recordDetails } from "./pageKit.js";
+import { plainErrorText } from "./plainError.js";
 import { renderPlanTimeline } from "./components/planTimeline.js";
 import { renderHandholdingSteps } from "./components/handholdingSteps.js";
 
@@ -15,16 +17,9 @@ function card(title, body) {
   return `<section class="card"><h3>${esc(title)}</h3>${body}</section>`;
 }
 
-async function ensurePlan() {
+async function latestPlan() {
   const latest = await apiGet("/mechanic/plan/latest").catch(() => null);
-  if (latest?.plan?.planId) {
-    return latest.plan;
-  }
-  const created = await apiPost("/mechanic/plan/create", {
-    scopeType: "WORKSPACE",
-    scopeId: "workspace"
-  });
-  return created.plan;
+  return latest?.plan?.planId ? latest.plan : null;
 }
 
 async function main() {
@@ -37,33 +32,46 @@ async function main() {
   }
   status.textContent = `Signed in as ${user.username ?? user.userId ?? "user"}`;
 
-  const plan = await ensurePlan();
+  // Opening the page only reads the latest plan (C-01); making one writes a signed record, so it is a button.
+  const plan = await latestPlan();
+  if (!plan) {
+    root.innerHTML = card("Upgrade Wizard", `<p>No upgrade plan yet. A plan compares your latest score with your target levels and lists the steps between them.</p>
+      <div class="row wrap"><button id="makePlanBtn" data-roles="OWNER,OPERATOR">Make an upgrade plan</button></div>`);
+    applyRoleGates(root);
+    document.getElementById("makePlanBtn")?.addEventListener("click", async () => {
+      await apiPost("/mechanic/plan/create", { scopeType: "WORKSPACE", scopeId: "workspace" });
+      await main();
+    });
+    return;
+  }
   root.innerHTML = `
     ${card(
       "Upgrade Wizard",
       `
       <p class="muted">
-        Compass-over-maps workflow: the plan is deterministic and evidence-bound. Actions update real signed configs only
-        after governance approvals.
+        The plan lists the steps from your latest score to your target levels. Its steps change signed settings only after
+        the approvals they need.
       </p>
       <div class="grid">
-        <div><div class="muted">Plan</div><div class="tile-value">${esc(plan.planId)}</div></div>
+        <div><div class="muted">Plan made</div><div class="tile-value">${plan.generatedTs ? esc(new Date(plan.generatedTs).toLocaleString()) : "-"}</div></div>
         <div><div class="muted">Readiness</div><div class="tile-value">${esc(plan.summary?.readiness || "UNKNOWN")}</div></div>
         <div><div class="muted">Gap Points</div><div class="tile-value">${Number(plan.summary?.gapPointsTotal || 0).toFixed(2)}</div></div>
         <div><div class="muted">Unknown Questions</div><div class="tile-value">${Number(plan.summary?.unknownQuestionsCount || 0)}</div></div>
       </div>
       <div class="row wrap">
-        <input id="approvalReason" placeholder="Approval request reason" />
-        <button id="requestApprovalBtn">Request Approvals</button>
-        <button id="executePlanBtn">Execute Plan</button>
+        <label><span class="muted">Why these changes (for the approvers)</span><input id="approvalReason" /></label>
+        <button id="requestApprovalBtn" data-roles="OWNER,OPERATOR">Request approvals</button>
+        <button id="executePlanBtn" data-roles="OWNER,OPERATOR">Carry out the plan</button>
       </div>
-      <pre id="wizardOut" class="scroll muted"></pre>
+      <div id="wizardOut" aria-live="polite"></div>
+      ${recordDetails(plan)}
     `
     )}
     ${card("Plan Timeline", `<div id="planTimeline"></div>`)}
     ${card("Guided Steps", `<div id="wizardSteps"></div>`)}
   `;
 
+  applyRoleGates(root);
   renderPlanTimeline(document.getElementById("planTimeline"), plan);
   renderHandholdingSteps(document.getElementById("wizardSteps"), [
     { title: "Instrumentation", body: "Verify bridge/tool receipts and evidence coverage before changing autonomy posture." },
@@ -76,7 +84,7 @@ async function main() {
   document.getElementById("requestApprovalBtn")?.addEventListener("click", async () => {
     const reason = document.getElementById("approvalReason")?.value?.trim() || "";
     if (!reason) {
-      out.textContent = "Reason is required.";
+      out.innerHTML = `<p class="status-bad" role="alert">Say why, so the approvers know what they are approving.</p>`;
       return;
     }
     try {
@@ -84,9 +92,9 @@ async function main() {
         planId: plan.planId,
         reason
       });
-      out.textContent = JSON.stringify(requested, null, 2);
+      out.innerHTML = `<p class="status-ok">Approvals requested. They are listed on the <a href="./approvals">Approvals</a> page.</p>${recordDetails(requested)}`;
     } catch (error) {
-      out.textContent = String(error);
+      out.innerHTML = `<p class="status-bad" role="alert">${esc(plainErrorText(error))}</p>`;
     }
   });
 
@@ -95,9 +103,9 @@ async function main() {
       const executed = await apiPost("/mechanic/plan/execute", {
         planId: plan.planId
       });
-      out.textContent = JSON.stringify(executed, null, 2);
+      out.innerHTML = `<p class="status-ok">Finished. Each step and its result are in the record below.</p>${recordDetails(executed)}`;
     } catch (error) {
-      out.textContent = String(error);
+      out.innerHTML = `<p class="status-bad" role="alert">${esc(plainErrorText(error))}</p>`;
     }
   });
 }

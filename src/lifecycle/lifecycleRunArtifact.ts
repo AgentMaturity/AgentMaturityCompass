@@ -40,8 +40,8 @@ export const AMC_SURFACE_DEFINITIONS: AMCSurfaceDefinition[] = [
   },
   {
     surface: "Vault",
-    headline: "Cryptographically prove what happened",
-    description: "Signs evidence, verifies ledgers, and gives auditors a tamper-evident chain of custody."
+    headline: "Keep a signed record of what happened",
+    description: "Signs records and checks the ledgers, so an auditor can see who wrote each record and that it has not changed since. A signature does not make a record true."
   },
   {
     surface: "Watch",

@@ -45,7 +45,8 @@ export const CANONICAL_NAV = [
     ["./commitments-org", "Team commitments", "Plan what each team commits to improve."],
     ["./fleet", "Fleet", "Many agents and how they work together."]]],
   ["Workspace", [["./users", "Users", "Who can sign in, and their roles."],
-    ["./integrations", "Connections", "Connect AMC to the tools you already use."]]]]
+    ["./integrations", "Connections", "Connect AMC to the tools you already use."],
+    ["./ops", "Maintenance", "Readiness, how long records are kept, clean-up and backups."]]]]
     .flatMap(([section, links]) => links.map(([href, label, desc]) => ({ href, label, desc, section, group: "features" })))
 ];
 
@@ -112,6 +113,20 @@ export function decorateNav(nav, page) {
     if (current) anchor.setAttribute("aria-current", "page");
     else anchor.removeAttribute("aria-current");
   }
+}
+
+/**
+ * The menu's session link follows the session: "Sign in" while nobody is signed in, "Sign out" with who is signed in
+ * while someone is. api.js calls this whenever it learns who is signed in. The demo's built-in viewer keeps "Sign in".
+ */
+export function renderNavSession(doc, me, onSignOut) {
+  const link = doc?.querySelector?.('nav a[href="./login"]');
+  if (!link) return;
+  const signedIn = Boolean(me) && me.userId !== "local-demo";
+  const name = me?.username || me?.userId || "";
+  link.innerHTML = signedIn ? `Sign out<small class="nav-desc">Signed in as ${esc(name)}</small>` : "Sign in";
+  link.title = signedIn ? `Signed in as ${name}. Sign out of the Compass Console.` : "";
+  link.onclick = signedIn ? (event) => { event.preventDefault(); onSignOut?.(); } : null;
 }
 
 /** The label of the console's one first action: a demo task in the demo workspace, a real task elsewhere. */

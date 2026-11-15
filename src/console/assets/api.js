@@ -1,8 +1,10 @@
 // The console's page scripts all import this module, so the shared shell (nav, status, banner) and the focusable-scroll
 // fix reach their pages from here.
 import "./shell.js";
-import { showShellNotice } from "./shell.js";
+import { renderNavSession, showShellNotice } from "./shell.js";
 import "./focusableScroll.js";
+import { trackRequest } from "./actionFeedback.js";
+import { plainErrorText } from "./plainError.js";
 
 const state = {
   adminToken: null,
@@ -104,9 +106,26 @@ export class ConsoleApiError extends Error {
     this.code = code;
     this.data = data;
   }
+
+  /** Shown wherever a page prints the error: plain words, never the class name or a server code (C-10). */
+  toString() {
+    return plainErrorText(this);
+  }
 }
 
 async function request(path, options) {
+  const finished = trackRequest();
+  try {
+    const result = await requestOnce(path, options);
+    finished(result.ok !== false);
+    return result;
+  } catch (error) {
+    finished(false);
+    throw error;
+  }
+}
+
+async function requestOnce(path, options) {
   let response;
   try {
     response = await fetch(withBase(path), {
@@ -126,6 +145,7 @@ async function request(path, options) {
   if (response.status === 401 && !options?.allowAuthErrors && state.me !== null) {
     state.me = null;
     showShellNotice("signedOut");
+    renderNavSession(document, null);
   }
   const text = await response.text();
   let parsed;
@@ -201,13 +221,12 @@ export async function whoami() {
     allowAuthErrors: true
   });
   const body = typeof document === "undefined" ? null : document.body;
-  if (!result.ok) {
-    state.me = null;
-    if (body && !getAdminToken()) body.dataset.session = "none";
-    return null;
+  state.me = result.ok ? result.data : null;
+  if (body && !result.ok && !getAdminToken()) body.dataset.session = "none";
+  if (body && result.ok) delete body.dataset.session;
+  if (typeof document !== "undefined") {
+    renderNavSession(document, state.me, () => logout().then(() => window.location.assign("./login"), () => window.location.assign("./login")));
   }
-  state.me = result.data;
-  if (body) delete body.dataset.session;
   return state.me;
 }
 
