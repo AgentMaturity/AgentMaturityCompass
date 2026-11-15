@@ -224,7 +224,7 @@ function unrecordedResolutionsOf(store: A4Store, chain: A4ReadinessState["chain"
 
 /**
  * Everything readiness reads that is not a row; each unreadable source is null. `approvalPolicy` is the verdict of the
- * read evaluateFor used; the action journal and the engine requests the chain names are read only for an evaluation at `stage` Assemble,
+ * read evaluateFor used; the action journal is read only for an evaluation at `stage` Assemble, the engine requests the chain names at Assemble and Adapt,
  * the signed control results Adapt's Review recorded and the session store backend only at Adapt, the package route, the releases' transparency entries, the lease-principal rule and the active local owners only at Activate.
  */
 function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, approvalPolicy: A4LiveFacts["approvalPolicy"], stage?: A4Stage, availability = vaultUnlocked): A4LiveFacts {
@@ -250,7 +250,7 @@ function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, appr
     lostEffects: state.effects.filter((row) => row.state === "running" && effectOwnerLost(row, Date.now() - DEFAULT_ACTION_STALE_AFTER_MS)).map((row) => row.effect_id),
     blockingExecutions: blocking,
     unrecordedResolutions: stage === "assemble" ? unrecordedResolutionsOf(store, state.chain, blocking) : null,
-    engineRequests: stage === "assemble" ? engineRequestStatusesIn(workspace, state.project.agent_id, state.chain, blocking ?? []) : null,
+    engineRequests: stage === "assemble" || stage === "adapt" ? engineRequestStatusesIn(workspace, state.project.agent_id, state.chain, blocking ?? []) : null,
     ...(stage === "adapt" ? { controlResults: controlResultsNow(workspace, state), sessionStore: resolveSessionStoreBackend(workspace),
       retentionFloor: memoryRetentionFloor(workspace) } : {}),
     ...(stage === "activate" ? { packageSigningRoute: collectRoute(workspace, "A4_PACKAGE"), packageTransparency: releaseEntries(workspace, state.chain), ...leasePrincipalFacts(workspace) } : {})
@@ -315,7 +315,7 @@ export function assertAllowed(readiness: A4ReadinessV1, action: A4Action, ignore
   // Each item in words with what to do (its own next action, or notReadyWords), its id after it; codes without an item
   // (a gate's own state) are listed as they are.
   const said = readiness.items.filter((entry) => codes.includes(entry.id)).map((entry) => {
-    const words = notReadyWords(entry) ?? entry.nextAction?.label;
+    const words = notReadyWords(entry);
     return words ? `${words} (${entry.id})` : entry.id;
   });
   const rest = codes.filter((code) => !named.items.some((entry) => entry.id === code));

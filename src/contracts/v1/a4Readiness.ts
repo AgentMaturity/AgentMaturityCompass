@@ -60,6 +60,9 @@ export const a4ReadinessV1Schema = z.strictObject({
   claimBoundary: nonEmpty,
   selfApproved: z.boolean(),
   selfApprovalAllowed: z.boolean(),
+  /** Studio's project routes only: the quorum the viewed stage's next gate will ask for, before it is requested (a4NextGate.ts). */
+  nextGate: z.strictObject({ gate: z.enum(["direction", "completion"]), required: z.number().int().positive(), rolesAllowed: z.array(nonEmpty),
+    roleVote: nonEmpty.nullable(), eligible: z.number().int().nonnegative().nullable() }).nullable().optional(),
   identityCheck: z.enum(A4_IDENTITY_CHECKS),
   evaluatedAt: isoTimeSchema,
   bindingDigest: sha256HexSchema,

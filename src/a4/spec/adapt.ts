@@ -328,7 +328,7 @@ function planItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Recor
       : waiting("plan_unresolved", ["PLAN_MISSING_FACTS", ...mandatory.slice(0, 32).map((row) => `UNRESOLVED:${row.controlId}`),
         ...(regulated ? ["REGULATED_READY_PLAN_ONLY"] : settled.length > 0 ? ["OWNER_OUT_OF_SCOPE", "KEY:P2-24"] : [])], { kind: "review_pending",
         nextAction: { label: regulated ? "A regulated project activates only a ready plan: answer the missing facts"
-          : "Answer the missing facts, or an owner records the unresolved requirements out of scope with a reason (Acknowledge); they stay unresolved (a true exception is P2-24)" } }),
+          : "Answer the missing facts under Ask, or a project owner marks the unresolved requirements out of scope with a reason (Acknowledge); they stay unresolved in the record" } }),
     lockMoved ? item("plan_lock_drift", "BLOCKED", { kind: "scope_changed", reasonCodes: ["PLAN_LOCK_DRIFT", "RESOURCE_DRIFTED"],
       nextAction: { label: "catalog lock changed: the plan was compiled against another catalog; run Understand again (reopen Adapt once past it)" } })
       : item("plan_lock_drift", "READY")
@@ -421,9 +421,10 @@ function signingItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Re
     conformance === null ? waiting("conformance_statement", ["PRODUCED_AT_REVIEW"], { mandatory: reached(state, "built") })
       : item("conformance_statement", "READY", { reasonCodes: ["pass", "fail", "not_evaluated", "not_applicable", "unresolved"]
         .map((key) => `${key.toUpperCase()}:${Number(counts[key]) || 0}`) }),
-    // Opened, not decided: the engine request's own status is the card's to read (REVIEW_STATUS_NOT_READ).
+    // Opened: the engine request's own status as Studio read it (APPROVAL_STATUS, as Assemble's effect_gate), REVIEW_STATUS_NOT_READ when unread.
     opened !== undefined && typeof opened.body.requestDigestSha256 === "string"
-      ? item("plan_review_opened", "READY", { section: "governance", mandatory: false, reasonCodes: ["EFFECT_GATE_OPENED", "REVIEW_STATUS_NOT_READ",
+      ? item("plan_review_opened", "READY", { section: "governance", mandatory: false, reasonCodes: ["EFFECT_GATE_OPENED",
+        query.live.engineRequests?.[String(opened.body.approvalRequestId)] ? `APPROVAL_STATUS:${query.live.engineRequests[String(opened.body.approvalRequestId)]}` : "REVIEW_STATUS_NOT_READ",
         `APPROVAL_REQUEST:${String(opened.body.approvalRequestId)}:${opened.body.requestDigestSha256}`, `GATE:${String(opened.body.gateId)}`] })
       : item("plan_review_opened", "WAITING", { kind: "review_pending", section: "governance", mandatory: false, reasonCodes: ["EFFECT_GATE_NOT_OPEN"],
         nextAction: { label: `Once the completion gate has its quorum, an owner opens ${ACTIVATE_PLAN_EFFECT_ID}: a second, separately decided plan review` } }),
