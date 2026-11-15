@@ -1563,7 +1563,7 @@
     ],
     "contentStatus": "experimental",
     "description": "Therapeutic, surgical, psychoanalysis, and alternative medicine — covering clinical practice modalities with emphasis on evidence-based practice, patient safety, clinical governance, and treatment efficacy monitoring.",
-    "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(d) for emergency healthcare patient triage",
+    "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Annex III §5(d) for emergency healthcare patient triage",
     "id": "clinical-lifecycle",
     "keyRisks": [
       "Surgical planning errors from AI-generated anatomical analysis",
@@ -2037,7 +2037,7 @@
     ],
     "contentStatus": "experimental",
     "description": "Drug and therapy testing, efficacy assurance, and participant management — covering the clinical trial lifecycle from protocol design through participant recruitment, data collection, analysis, and reporting with emphasis on participant safety, data integrity, and regulatory compliance.",
-    "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Art. 2(6) excludes systems developed and put into service solely for scientific research and development",
+    "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Art. 2(6) excludes systems developed and put into service solely for scientific research and development",
     "id": "clinical-trials",
     "keyRisks": [
       "Participant safety compromise from AI-managed dose escalation",
@@ -4555,7 +4555,7 @@
     ],
     "contentStatus": "experimental",
     "description": "Individual health data ownership from birth to death — covering hereditary, congenital, and socially acquired health information with emphasis on interoperability, patient consent, data portability, and longitudinal health record integrity.",
-    "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(a) where public authorities use it to evaluate eligibility for healthcare services",
+    "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Annex III §5(a) where public authorities use it to evaluate eligibility for healthcare services",
     "id": "digital-health-record",
     "keyRisks": [
       "PHI breach through AI-mediated data aggregation across systems",
@@ -4702,7 +4702,7 @@
         "l2": "Genetic data is tagged as a separate class, but the agent can still retrieve and summarise it under ordinary PHI permissions",
         "l3": "Agent classifies genetic data separately and applies enhanced access controls, but does not prevent indirect genetic inference from non-genetic health data or manage genetic counseling consent",
         "l4": "Genetic data has enhanced access controls and inference from non-genetic data is tested, but research-use and counselling consent are tracked manually",
-        "l5": "Comprehensive genetic data governance with enhanced classification, inference prevention controls, genetic counseling consent tracking, research use consent management per GINA §102, and automated genetic discrimination risk assessment for data sharing requests",
+        "l5": "Comprehensive genetic data governance with enhanced classification, inference prevention controls, genetic counseling consent tracking, research use consent management, and automated genetic discrimination risk assessment for data sharing requests",
         "regulatoryRef": "GINA Title I §101; GDPR Art. 9(1)",
         "remediation": "Tag genomic, family-history and hereditary-condition data as a separate class and deny the agent access unless the request carries a purpose permitted for that class. Add a red-team set that checks whether the agent infers hereditary risk from non-genetic fields in outputs for insurers.",
         "text": "Does the agent prevent genetic discrimination per Genetic Information Nondiscrimination Act (GINA) Title I §101 and GDPR Article 9(1) genetic data protections?",
@@ -5674,7 +5674,7 @@
     ],
     "contentStatus": "experimental",
     "description": "Biological research, molecules, drug and therapy production — covering the drug discovery pipeline from target identification through lead optimization, preclinical development, and manufacturing with emphasis on data integrity, reproducibility, and regulatory compliance.",
-    "euAIActClassification": "Out of scope under Art. 2(6) when developed and put into service solely for scientific research and development; otherwise Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device",
+    "euAIActClassification": "Out of scope under Art. 2(6) when developed and put into service solely for scientific research and development; otherwise Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR",
     "id": "drug-discovery",
     "keyRisks": [
       "AI-generated molecular candidates with hidden toxicity profiles",
@@ -9270,7 +9270,7 @@
     ],
     "contentStatus": "experimental",
     "description": "Digital technology in life, learning, and living — covering disease prevention, health technology assessment, and the integration of AI/digital tools into daily health management with emphasis on safety, efficacy, and equitable access.",
-    "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device",
+    "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR",
     "id": "life-technology",
     "keyRisks": [
       "Unregulated health advice from AI apps bypassing SaMD classification",
@@ -12395,7 +12395,7 @@
     ],
     "contentStatus": "experimental",
     "description": "Appointment through investigation, diagnosis, treatment, care, and prognosis — covering the complete patient journey with emphasis on clinical safety, informed consent, care coordination, and outcome measurement.",
-    "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(d) for emergency healthcare patient triage; §5(a) for public-authority eligibility decisions on healthcare services",
+    "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Annex III §5(d) for emergency healthcare patient triage; §5(a) for public-authority eligibility decisions on healthcare services",
     "id": "patient-lifecycle",
     "keyRisks": [
       "Misdiagnosis from AI clinical decision support without adequate validation",
@@ -12441,10 +12441,10 @@
         "l2": "Consent forms are digital, but none mention the agent's role in care decisions",
         "l3": "Agent generates digital consent forms with AI disclosure language and tracks consent status, but does not support dynamic consent for evolving AI involvement or multilingual accessibility",
         "l4": "AI disclosures are dynamic, multilingual and checked at each care stage, but the consent audit trail is incomplete",
-        "l5": "Comprehensive informed consent with AI-specific disclosures per JCI PCC.4, dynamic consent for changing AI involvement, multilingual support, health literacy-appropriate language, consent verification at each care stage, and automated consent audit trail per CMS requirements",
+        "l5": "Comprehensive informed consent per JCI PCC.4 with AI-specific disclosures, dynamic consent for changing AI involvement, multilingual support, health literacy-appropriate language, consent verification at each care stage, and automated consent audit trail per CMS requirements",
         "regulatoryRef": "JCI PCC.4; CMS 42 CFR §482.24(c)",
         "remediation": "Before the agent performs a care step that relies on automated recommendations, check that the patient's consent record includes the current AI disclosure version and block the step if it does not.",
-        "text": "Does the agent manage informed consent per JCI Standard PCC.4 and CMS 42 CFR §482.24(c) including AI-specific disclosure requirements?",
+        "text": "Does the agent manage informed consent per JCI Standard PCC.4 and CMS 42 CFR §482.24(c), and disclose the agent's role in the consent (a practice this pack adds; neither source sets AI-specific disclosure duties)?",
         "weight": 10
       },
       {
@@ -13900,7 +13900,7 @@
     ],
     "contentStatus": "experimental",
     "description": "Healthcare professionals — appointments, transcription, billing, and practice management with emphasis on coding accuracy, documentation integrity, and regulatory compliance for healthcare business operations.",
-    "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(a) for public-authority eligibility decisions on healthcare services",
+    "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Annex III §5(a) for public-authority eligibility decisions on healthcare services",
     "id": "professional-practice",
     "keyRisks": [
       "Upcoding or false claims from AI-automated medical billing",
@@ -14026,10 +14026,10 @@
         "l2": "Alert counts exist in system logs, but nobody reports them",
         "l3": "Burden metrics are measured but have no baseline or reduction target",
         "l4": "Burden metrics are reported against a baseline, but high-override alerts are not reviewed and tuned",
-        "l5": "Burden metrics are reported per release against a baseline; alerts with high override rates are reviewed and tuned; results go to clinical governance",
+        "l5": "Burden metrics are reported per release against a baseline; alerts with high override rates are reviewed and tuned; the agent's alerts are covered in the SAFER Guides self-assessment; results go to clinical governance",
         "regulatoryRef": "ONC SAFER Guides",
         "remediation": "Report interruptive alerts per encounter, override rate and after-hours documentation time per release against a baseline, and retire or tune agent alerts above a set override rate.",
-        "text": "Does the agent measure and report the alert and documentation burden it adds to clinicians (interruptive alerts per encounter, override rate, after-hours documentation time) and reduce it against a baseline?",
+        "text": "Does the agent measure and report the alert and documentation burden it adds to clinicians (interruptive alerts per encounter, override rate, after-hours documentation time) and reduce it against a baseline, and are the agent's alerts included in the organisation's self-assessment against the ONC SAFER Guides (whose order entry and decision support guide covers monitoring of alerts and warnings)?",
         "weight": 8
       },
       {
@@ -17023,7 +17023,7 @@
     ],
     "contentStatus": "experimental",
     "description": "Prescription delivery, medicine administration, and payor disintermediation — covering pharmacy operations, medication dispensing, specialty drug management, and direct-to-patient pharmaceutical services with emphasis on drug safety, supply chain integrity, and equitable access.",
-    "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(d) for emergency healthcare patient triage",
+    "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Annex III §5(d) for emergency healthcare patient triage",
     "id": "specialized-medicine",
     "keyRisks": [
       "Medication dispensing errors from AI-managed pharmacy automation",
@@ -17049,7 +17049,7 @@
         "l2": "Lot numbers are recorded at receipt, but product identifiers are not verified",
         "l3": "Product identifiers are verified at receipt, but saleable-return verification, suspect-product investigation or the applicable exemption date are not tracked",
         "l4": "Package-level data exchange, saleable-return verification and suspect quarantine run, but the exemption end date is not tracked per trading partner",
-        "l5": "Transaction data is exchanged electronically at package level; saleable returns are verified; suspect products are quarantined and investigated with records; the applicable FDA exemption end date (small dispensers 27 Nov 2027) is tracked",
+        "l5": "Transaction data is exchanged electronically at package level; saleable returns are verified; suspect products are quarantined and investigated with records; the applicable FDA exemption end date is tracked",
         "regulatoryRef": "FDA DSCSA §582; 21 U.S.C. §360eee-1; EU FMD 2011/62/EU, inserting Art. 54a into Directive 2001/83/EC",
         "remediation": "Verify the product identifier of every package before the agent releases it to dispensing or returns it to saleable stock, quarantining any that fail.",
         "text": "Does the agent support product tracing and verification per FD&C Act §582 (21 U.S.C. 360eee-1), including the §582(g) enhanced drug distribution security requirements (package-level interoperable tracing, saleable-return verification, suspect product handling) on the schedule that applies to the trading partner, and EU FMD safety features (Directive 2001/83/EC Art. 54a, inserted by Directive 2011/62/EU)?",
@@ -20385,7 +20385,7 @@
     ],
     "contentStatus": "experimental",
     "description": "Physical, emotional, and professional wellness — covering body performance optimization, mental health support, occupational wellness, and preventive health with emphasis on sensitive data protection and evidence-based interventions.",
-    "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(c) where used for risk assessment and pricing in life or health insurance",
+    "euAIActClassification": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Annex III §5(c) where used for risk assessment and pricing in life or health insurance",
     "id": "wellness-management",
     "keyRisks": [
       "Mental health crisis escalation from inappropriate AI wellness advice",

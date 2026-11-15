@@ -137,17 +137,17 @@
   {
     "packId": "digital-health-record",
     "questionId": "pack",
-    "citation": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(a) where public authorities use it to evaluate eligibility for healthcare services",
+    "citation": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Annex III §5(a) where public authorities use it to evaluate eligibility for healthcare services",
     "instrument": "Regulation (EU) 2024/1689 (AI Act)",
     "clause": "Art. 6(1), Annex I, Annex III point 5(a)",
-    "verdict": "verified",
-    "was": null,
-    "now": null,
+    "verdict": "corrected",
+    "was": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(a) where public authorities use it to evaluate eligibility for healthcare services",
+    "now": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Annex III §5(a) where public authorities use it to evaluate eligibility for healthcare services",
     "sourceTitle": "Regulation (EU) 2024/1689 (AI Act), Official Journal text (Publications Office)",
     "sourceUrl": "https://publications.europa.eu/resource/celex/32024R1689",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Art. 6(1) also requires that the device must undergo third-party conformity assessment under the MDR/IVDR (point (b)); Annex I Section A points 11-12 list the MDR and IVDR. Under Reg. (EU) 2026/1744 these Art. 6(1) duties apply from 2 August 2028. Annex III 5(a) covers public authorities evaluating eligibility for essential public assistance benefits and services, including healthcare services."
+    "note": "Art. 6(1)(b) also requires that the device must undergo third-party conformity assessment under the MDR/IVDR; the text left that condition out and now states it. Annex I Section A points 11-12 list the MDR and IVDR. Under Reg. (EU) 2026/1744 these Art. 6(1) duties apply from 2 August 2028. Annex III 5(a) covers public authorities evaluating eligibility for essential public assistance benefits and services, including healthcare services."
   },
   {
     "packId": "digital-health-record",
@@ -737,17 +737,17 @@
   {
     "packId": "wellness-management",
     "questionId": "pack",
-    "citation": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(c) where used for risk assessment and pricing in life or health insurance",
+    "citation": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Annex III §5(c) where used for risk assessment and pricing in life or health insurance",
     "instrument": "Regulation (EU) 2024/1689 (AI Act)",
     "clause": "Art. 6(1), Annex I, Annex III point 5(c)",
-    "verdict": "verified",
-    "was": null,
-    "now": null,
+    "verdict": "corrected",
+    "was": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(c) where used for risk assessment and pricing in life or health insurance",
+    "now": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Annex III §5(c) where used for risk assessment and pricing in life or health insurance",
     "sourceTitle": "Regulation (EU) 2024/1689 (AI Act), Official Journal text (Publications Office)",
     "sourceUrl": "https://publications.europa.eu/resource/celex/32024R1689",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Art. 6(1) also requires that the device must undergo third-party conformity assessment under the MDR/IVDR (point (b)); Annex I Section A points 11-12 list the MDR and IVDR. Under Reg. (EU) 2026/1744 these Art. 6(1) duties apply from 2 August 2028."
+    "note": "Art. 6(1)(b) also requires that the device must undergo third-party conformity assessment under the MDR/IVDR; the text left that condition out and now states it. Annex I Section A points 11-12 list the MDR and IVDR. Under Reg. (EU) 2026/1744 these Art. 6(1) duties apply from 2 August 2028."
   },
   {
     "packId": "wellness-management",
@@ -1277,17 +1277,17 @@
   {
     "packId": "patient-lifecycle",
     "questionId": "pack",
-    "citation": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(d) for emergency healthcare patient triage; §5(a) for public-authority eligibility decisions on healthcare services",
+    "citation": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Annex III §5(d) for emergency healthcare patient triage; §5(a) for public-authority eligibility decisions on healthcare services",
     "instrument": "Regulation (EU) 2024/1689 (AI Act)",
     "clause": "Art. 6(1), Annex I, Annex III point 5(a), 5(d)",
-    "verdict": "verified",
-    "was": null,
-    "now": null,
+    "verdict": "corrected",
+    "was": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(d) for emergency healthcare patient triage; §5(a) for public-authority eligibility decisions on healthcare services",
+    "now": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Annex III §5(d) for emergency healthcare patient triage; §5(a) for public-authority eligibility decisions on healthcare services",
     "sourceTitle": "Regulation (EU) 2024/1689 (AI Act), Official Journal text (Publications Office)",
     "sourceUrl": "https://publications.europa.eu/resource/celex/32024R1689",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Art. 6(1) also requires that the device must undergo third-party conformity assessment under the MDR/IVDR (point (b)); Annex I Section A points 11-12 list the MDR and IVDR. Under Reg. (EU) 2026/1744 these Art. 6(1) duties apply from 2 August 2028. Annex III 5(d) includes emergency healthcare patient triage systems."
+    "note": "Art. 6(1)(b) also requires that the device must undergo third-party conformity assessment under the MDR/IVDR; the text left that condition out and now states it. Annex I Section A points 11-12 list the MDR and IVDR. Under Reg. (EU) 2026/1744 these Art. 6(1) duties apply from 2 August 2028. Annex III 5(d) includes emergency healthcare patient triage systems."
   },
   {
     "packId": "patient-lifecycle",
@@ -1325,14 +1325,14 @@
     "citation": "CMS 42 CFR §482.24(c)",
     "instrument": "42 CFR Part 482",
     "clause": "§ 482.24(c)",
-    "verdict": "verified",
-    "was": null,
-    "now": null,
+    "verdict": "corrected",
+    "was": "CMS 42 CFR §482.24(c)",
+    "now": "CMS 42 CFR §482.24(c)",
     "sourceTitle": "eCFR, Title 42 CFR Part 482 (up to date as of 2026-11-12)",
     "sourceUrl": "https://www.ecfr.gov/api/versioner/v1/full/2026-11-12/title-42.xml?part=482",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Content of record; (c)(4)(v) requires properly executed informed consent forms. The regulation says nothing about AI; the AI disclosure in the question is the pack's own addition."
+    "note": "Content of record; (c)(4)(v) requires properly executed informed consent forms. The regulation says nothing about AI. Citation text unchanged; the question credited it with AI-specific disclosure requirements and now says the AI disclosure is a practice the pack adds (was: 'including AI-specific disclosure requirements'; L5 'AI-specific disclosures per JCI PCC.4' also reworded)."
   },
   {
     "packId": "patient-lifecycle",
@@ -1802,17 +1802,17 @@
   {
     "packId": "clinical-lifecycle",
     "questionId": "pack",
-    "citation": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(d) for emergency healthcare patient triage",
+    "citation": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Annex III §5(d) for emergency healthcare patient triage",
     "instrument": "Regulation (EU) 2024/1689 (AI Act)",
     "clause": "Art. 6(1), Annex I, Annex III point 5(d)",
-    "verdict": "verified",
-    "was": null,
-    "now": null,
+    "verdict": "corrected",
+    "was": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(d) for emergency healthcare patient triage",
+    "now": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Annex III §5(d) for emergency healthcare patient triage",
     "sourceTitle": "Regulation (EU) 2024/1689 (AI Act), Official Journal text (Publications Office)",
     "sourceUrl": "https://publications.europa.eu/resource/celex/32024R1689",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Art. 6(1) also requires that the device must undergo third-party conformity assessment under the MDR/IVDR (point (b)); Annex I Section A points 11-12 list the MDR and IVDR. Under Reg. (EU) 2026/1744 these Art. 6(1) duties apply from 2 August 2028."
+    "note": "Art. 6(1)(b) also requires that the device must undergo third-party conformity assessment under the MDR/IVDR; the text left that condition out and now states it. Annex I Section A points 11-12 list the MDR and IVDR. Under Reg. (EU) 2026/1744 these Art. 6(1) duties apply from 2 August 2028."
   },
   {
     "packId": "clinical-lifecycle",
@@ -2282,17 +2282,17 @@
   {
     "packId": "professional-practice",
     "questionId": "pack",
-    "citation": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(a) for public-authority eligibility decisions on healthcare services",
+    "citation": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Annex III §5(a) for public-authority eligibility decisions on healthcare services",
     "instrument": "Regulation (EU) 2024/1689 (AI Act)",
     "clause": "Art. 6(1), Annex I, Annex III point 5(a)",
-    "verdict": "verified",
-    "was": null,
-    "now": null,
+    "verdict": "corrected",
+    "was": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(a) for public-authority eligibility decisions on healthcare services",
+    "now": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Annex III §5(a) for public-authority eligibility decisions on healthcare services",
     "sourceTitle": "Regulation (EU) 2024/1689 (AI Act), Official Journal text (Publications Office)",
     "sourceUrl": "https://publications.europa.eu/resource/celex/32024R1689",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Art. 6(1) also requires that the device must undergo third-party conformity assessment under the MDR/IVDR (point (b)); Annex I Section A points 11-12 list the MDR and IVDR. Under Reg. (EU) 2026/1744 these Art. 6(1) duties apply from 2 August 2028."
+    "note": "Art. 6(1)(b) also requires that the device must undergo third-party conformity assessment under the MDR/IVDR; the text left that condition out and now states it. Annex I Section A points 11-12 list the MDR and IVDR. Under Reg. (EU) 2026/1744 these Art. 6(1) duties apply from 2 August 2028."
   },
   {
     "packId": "professional-practice",
@@ -2420,14 +2420,14 @@
     "citation": "ONC SAFER Guides",
     "instrument": "ONC SAFER Guides",
     "clause": "2025 update",
-    "verdict": "verified",
-    "was": null,
-    "now": null,
+    "verdict": "corrected",
+    "was": "ONC SAFER Guides",
+    "now": "ONC SAFER Guides",
     "sourceTitle": "ONC SAFER Guides (2025 update)",
     "sourceUrl": "https://healthit.gov/clinical-quality-and-safety/safer-guides/",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "The SAFER Guides (updated 2025) are EHR safety self-assessments; they are not about measuring alert or documentation burden, which is what the question asks."
+    "note": "The 2025 SAFER Guides are recommended EHR safety practices for an organisation's self-assessment; the Computerized Provider Order Entry with Decision Support guide covers the design, use and monitoring of alerts and warnings. They do not set burden measurement. Citation text unchanged; the question cited them for measuring alert and documentation burden and now credits them only for the self-assessment that covers the agent's alerts (burden measurement stays the pack's own practice)."
   },
   {
     "packId": "professional-practice",
@@ -2867,17 +2867,17 @@
   {
     "packId": "life-technology",
     "questionId": "pack",
-    "citation": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device",
+    "citation": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR",
     "instrument": "Regulation (EU) 2024/1689 (AI Act)",
     "clause": "Art. 6(1), Annex I",
-    "verdict": "verified",
-    "was": null,
-    "now": null,
+    "verdict": "corrected",
+    "was": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device",
+    "now": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR",
     "sourceTitle": "Regulation (EU) 2024/1689 (AI Act), Official Journal text (Publications Office)",
     "sourceUrl": "https://publications.europa.eu/resource/celex/32024R1689",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Art. 6(1) also requires that the device must undergo third-party conformity assessment under the MDR/IVDR (point (b)); Annex I Section A points 11-12 list the MDR and IVDR. Under Reg. (EU) 2026/1744 these Art. 6(1) duties apply from 2 August 2028."
+    "note": "Art. 6(1)(b) also requires that the device must undergo third-party conformity assessment under the MDR/IVDR; the text left that condition out and now states it. Annex I Section A points 11-12 list the MDR and IVDR. Under Reg. (EU) 2026/1744 these Art. 6(1) duties apply from 2 August 2028."
   },
   {
     "packId": "life-technology",
@@ -3392,17 +3392,17 @@
   {
     "packId": "drug-discovery",
     "questionId": "pack",
-    "citation": "Out of scope under Art. 2(6) when developed and put into service solely for scientific research and development; otherwise Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device",
+    "citation": "Out of scope under Art. 2(6) when developed and put into service solely for scientific research and development; otherwise Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR",
     "instrument": "Regulation (EU) 2024/1689 (AI Act)",
     "clause": "Art. 2(6), Art. 6(1), Annex I",
-    "verdict": "verified",
-    "was": null,
-    "now": null,
+    "verdict": "corrected",
+    "was": "Out of scope under Art. 2(6) when developed and put into service solely for scientific research and development; otherwise Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device",
+    "now": "Out of scope under Art. 2(6) when developed and put into service solely for scientific research and development; otherwise Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR",
     "sourceTitle": "Regulation (EU) 2024/1689 (AI Act), Official Journal text (Publications Office)",
     "sourceUrl": "https://publications.europa.eu/resource/celex/32024R1689",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Art. 2(6) excludes AI systems specifically developed and put into service for the sole purpose of scientific research and development. Art. 6(1) also requires that the device must undergo third-party conformity assessment under the MDR/IVDR (point (b)); Annex I Section A points 11-12 list the MDR and IVDR. Under Reg. (EU) 2026/1744 these Art. 6(1) duties apply from 2 August 2028."
+    "note": "Art. 2(6) excludes AI systems specifically developed and put into service for the sole purpose of scientific research and development. Art. 6(1)(b) also requires that the device must undergo third-party conformity assessment under the MDR/IVDR; the text left that condition out and now states it. Annex I Section A points 11-12 list the MDR and IVDR. Under Reg. (EU) 2026/1744 these Art. 6(1) duties apply from 2 August 2028."
   },
   {
     "packId": "drug-discovery",
@@ -3902,17 +3902,17 @@
   {
     "packId": "clinical-trials",
     "questionId": "pack",
-    "citation": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Art. 2(6) excludes systems developed and put into service solely for scientific research and development",
+    "citation": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Art. 2(6) excludes systems developed and put into service solely for scientific research and development",
     "instrument": "Regulation (EU) 2024/1689 (AI Act)",
     "clause": "Art. 6(1), Annex I, Art. 2(6)",
-    "verdict": "verified",
-    "was": null,
-    "now": null,
+    "verdict": "corrected",
+    "was": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Art. 2(6) excludes systems developed and put into service solely for scientific research and development",
+    "now": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Art. 2(6) excludes systems developed and put into service solely for scientific research and development",
     "sourceTitle": "Regulation (EU) 2024/1689 (AI Act), Official Journal text (Publications Office)",
     "sourceUrl": "https://publications.europa.eu/resource/celex/32024R1689",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Art. 6(1) also requires that the device must undergo third-party conformity assessment under the MDR/IVDR (point (b)); Annex I Section A points 11-12 list the MDR and IVDR. Under Reg. (EU) 2026/1744 these Art. 6(1) duties apply from 2 August 2028."
+    "note": "Art. 6(1)(b) also requires that the device must undergo third-party conformity assessment under the MDR/IVDR; the text left that condition out and now states it. Annex I Section A points 11-12 list the MDR and IVDR. Under Reg. (EU) 2026/1744 these Art. 6(1) duties apply from 2 August 2028."
   },
   {
     "packId": "clinical-trials",
@@ -4442,17 +4442,17 @@
   {
     "packId": "specialized-medicine",
     "questionId": "pack",
-    "citation": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(d) for emergency healthcare patient triage",
+    "citation": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Annex III §5(d) for emergency healthcare patient triage",
     "instrument": "Regulation (EU) 2024/1689 (AI Act)",
     "clause": "Art. 6(1), Annex I, Annex III point 5(d)",
-    "verdict": "verified",
-    "was": null,
-    "now": null,
+    "verdict": "corrected",
+    "was": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(d) for emergency healthcare patient triage",
+    "now": "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device that must undergo third-party conformity assessment under the MDR or IVDR; Annex III §5(d) for emergency healthcare patient triage",
     "sourceTitle": "Regulation (EU) 2024/1689 (AI Act), Official Journal text (Publications Office)",
     "sourceUrl": "https://publications.europa.eu/resource/celex/32024R1689",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Art. 6(1) also requires that the device must undergo third-party conformity assessment under the MDR/IVDR (point (b)); Annex I Section A points 11-12 list the MDR and IVDR. Under Reg. (EU) 2026/1744 these Art. 6(1) duties apply from 2 August 2028."
+    "note": "Art. 6(1)(b) also requires that the device must undergo third-party conformity assessment under the MDR/IVDR; the text left that condition out and now states it. Annex I Section A points 11-12 list the MDR and IVDR. Under Reg. (EU) 2026/1744 these Art. 6(1) duties apply from 2 August 2028."
   },
   {
     "packId": "specialized-medicine",
