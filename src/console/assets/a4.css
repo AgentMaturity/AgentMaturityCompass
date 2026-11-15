@@ -7,16 +7,12 @@
 .a4-rows li { margin: 6px 0; overflow-wrap: anywhere; }
 .chip { display: inline-block; border: 1px solid var(--border-strong); border-radius: 999px; padding: 1px 8px; font-size: .8rem; }
 .a4-hold { border-left: 4px solid var(--warn); }
-/* The four lanes share one column; the Integrity panel keeps its own beside them down to the phone breakpoint. */
-.a4-lanes { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 1.2fr); gap: 12px; align-items: start; }
+/* "What is recorded so far": words first; the four lane columns and the Integrity panel sit in its record. */
 .a4-lane-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; align-items: start; }
 .a4-integrity { border-style: dashed; }
 .a4-conflict { border-color: var(--warn); }
-@media (max-width: 1100px) {
-  .a4-lanes { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
-  .a4-lane-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (max-width: 640px) { .a4-lanes, .a4-lane-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 1100px) { .a4-lane-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .a4-lane-grid { grid-template-columns: minmax(0, 1fr); } }
 
 /* While one write and the reload after it run (a4.js guarded), actions are dimmed and not clickable. */
 #app[aria-busy="true"] [data-a4-action] { pointer-events: none; opacity: 0.55; }
@@ -57,6 +53,29 @@ body[data-page="a4Project"] #app button:not(.a4-primary):not(.danger) { backgrou
 /* Long project names wrap instead of running past the card (A4-18). */
 .a4-project-name, #a4HomeTitle, .a4-home h2 { overflow-wrap: anywhere; }
 .a4-tech > summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+/* Words first, record second (a4Plain.js): the raw record folds under a small "Show the record"; a code sits beside its words
+   in small print; a long hash shows its start, the whole value in its title. */
+.a4-record { margin: 6px 0; }
+.a4-record > summary { cursor: pointer; color: var(--muted); font-size: 13px; padding: 2px 0; }
+.a4-record[open] { border-left: 2px solid var(--border-strong); padding-left: 10px; }
+.a4-record pre, .a4-record textarea { max-width: 100%; }
+.a4-code { color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+:is(button, .button) .a4-code { margin-left: 4px; font-weight: 400; }
+.a4-hash { font-family: var(--mono, ui-monospace, monospace); }
+.a4-item { margin: 6px 0 2px; overflow-wrap: anywhere; }
+/* An item's own record sits at the end of its line and takes the full width once opened. */
+.a4-item-row { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; margin: 4px 0; }
+.a4-item-row > .a4-item { margin: 2px 0; min-width: 0; }
+.a4-item-row > .a4-record { margin: 0; }
+.a4-item-row > .a4-record > summary { font-size: 12px; }
+.a4-item-row > .a4-record[open] { flex-basis: 100%; }
+.a4-state { display: inline-block; border: 1px solid var(--border-strong); border-radius: 999px; padding: 0 8px; font-size: 12px; margin-right: 4px; }
+.a4-state-ready, .a4-state-complete { border-color: var(--accent); color: var(--accent); }
+.a4-state-blocked { border-color: var(--warn); color: var(--warn); }
+.a4-outline h5, .a4-lanes h5, #a4Missing h5, .a4-card h5 { margin: 12px 0 4px; font-size: 14px; }
+.a4-outline p { margin: 2px 0 6px; overflow-wrap: anywhere; }
+.a4-more-actions > summary, .a4-approvals details > summary { cursor: pointer; color: var(--muted); padding: 6px 0; }
+.a4-not-now li { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
 /* The start form's "Who approves each step?" choice and the Members card's invite checkbox: the control beside its words. */
 .a4-approvers { border: 1px solid var(--border-strong); border-radius: 8px; padding: 8px 12px; }
 .a4-approvers label, .a4-invite label:has(input[type="checkbox"]) { display: flex; gap: 8px; align-items: center; }

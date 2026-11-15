@@ -4,6 +4,7 @@
 // action, so the primary action only points at the page's own buttons and never decides anything itself.
 import { QUESTION_LABELS } from "./a4Questions.js";
 import { SELF_APPROVE, selfApproves, selfCountsOnce } from "./a4Who.js";
+import { itemTitle } from "./a4Plain.js";
 import { actionButton, reasonsText, STAGES, STAGE_PLAIN, STEP_NEXT, STEP_PLAIN, STEP_TITLES, TRUTH, esc, previewNoticeHtml, renderCreateForm } from "./a4View.js";
 
 const isObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
@@ -200,7 +201,7 @@ function gateMove(ctx, kind) {
     const cardSel = adapt ? '[data-card="activation"]' : '[data-card="effect"]';
     const needed = !adapt || list(ctx.allowed?.progress?.reasonCodes).includes("plan_activated") || codesOf(readiness, "plan_activated").includes("ACTIVATED_AT_COMPLETION");
     if (needed && effect.includes("EFFECT_GATE_NOT_OPEN")) return { effect: true, now: `Approved. Completing ${title(stage)} ${what}, which is a second request: `
-      + `a project owner opens it, then two approvers approve it on the ${cardName}.`, act: { label: adapt ? "Open the plan review" : "Open the effect gate", press: "open-effect" } };
+      + `a project owner opens it, then two approvers approve it on the ${cardName}.`, act: { label: adapt ? "Open the plan review" : "Ask for the second approval that applies the build", press: "open-effect" } };
     const effectStatus = prefixed(effect, "APPROVAL_STATUS:")[0];
     if (needed && effectStatus && effectStatus !== "QUORUM_MET" && effectStatus !== "CONSUMED") {
       // Whoever the completion gate excludes (its requester, authors, builders) is excluded from the effect's request too.
@@ -251,8 +252,8 @@ function gateMove(ctx, kind) {
       + "already sign in there. To learn AMC alone, start a practice project instead.", act: { label: "Invite someone", focus: ".a4-invite input" } };
   }
   const ack = toAcknowledge(readiness);
-  if (ack.length) return { now: `Before asking for approval, a project owner acknowledges ${ack.map((item) => item.id).join(", ")}: ${ACK_PLAIN[ack[0].id] ?? ack[0].nextAction?.label ?? "see Missing requirements"}.`,
-    why: "Write a short reason in the Approvals card, then press Acknowledge beside the item under Missing requirements (shown below). Acknowledging after the request would cancel it.",
+  if (ack.length) return { now: `Before asking for approval, a project owner acknowledges ${ack.map((item) => `"${itemTitle(item.id)}"`).join(", ")}: ${ACK_PLAIN[ack[0].id] ?? ack[0].nextAction?.label ?? "see Missing requirements"}.`,
+    why: "Write a short reason in the Approvals card, then press Acknowledge beside the item under What this step still needs (shown below). Acknowledging after the request would cancel it.",
     act: { label: "Write the reason", focus: '.a4-approvals [name="reason"]' }, also: "#a4Missing" };
   if (codesOf(readiness, "members.candidates").includes("NO_SECOND_APPROVER")) {
     const candidates = list(ctx.members?.candidates).filter((row) => !list(ctx.project.members).some((member) => member.principalKey === row.principalKey));
