@@ -3540,6 +3540,7 @@ Alias: `amc comply risk-classify`
 |--------|-------------|
 | `--agent <agentId>` | - |
 | `--capabilities <json>` | - |
+| `--guide` | - |
 | `--biometric` | - |
 | `--critical-infra` | - |
 | `--education` | - |
@@ -3552,9 +3553,15 @@ Alias: `amc comply risk-classify`
 | `--social-scoring` | - |
 | `--subliminal` | - |
 | `--exploits-vulnerabilities` | - |
+| `--crime-prediction` | - |
+| `--face-scraping` | - |
 | `--emotion-recognition` | - |
+| `--sensitive-biometric-categorisation` | - |
+| `--intimate-imagery` | - |
+| `--child-abuse-material` | - |
 | `--chatbot` | - |
 | `--synthetic-content` | - |
+| `--deep-fakes` | - |
 | `--human-interaction` | - |
 | `--safety-component` | - |
 | `--json` | - |

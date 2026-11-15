@@ -10,7 +10,7 @@
         "regulatoryRef": "Regional Accreditation Standards; Bologna Process QF-EHEA",
         "l1": "No accreditation tracking; AI-driven curriculum changes are not assessed for accreditation impact",
         "l3": "Agent tracks accreditation requirements and flags potential compliance issues from AI integration, but does not automate evidence collection or self-study preparation",
-        "l5": "Full accreditation compliance with automated evidence collection, learning outcome assessment tracking, AI integration impact documentation, self-study preparation support, and continuous improvement monitoring per accreditation standards and QF-EHEA",
+        "l5": "Accreditation controls in place, with automated evidence collection, learning outcome assessment tracking, AI integration impact documentation, self-study preparation support, and continuous improvement monitoring per accreditation standards and QF-EHEA",
         "weight": 10
       }
     },
@@ -348,7 +348,7 @@
         "regulatoryRef": "EU Microfinance Reg §3",
         "l1": "No EU microfinance compliance support; obligations are not recognized or documented",
         "l3": "Recognizes EU microfinance obligations at a policy level, but implementation controls and evidence outputs are incomplete",
-        "l5": "Full EU microfinance compliance with obligation mapping, controlled workflows, reporting outputs, and audit-ready evidence for §3 requirements",
+        "l5": "EU microfinance controls in place, with obligation mapping, controlled workflows, reporting outputs, and audit-ready evidence for §3 requirements",
         "weight": 6
       }
     },
