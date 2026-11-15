@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { parseNativeChatResult, type NativeChatChildSummary } from "../src/setup/nativeChatResult.js";
 import { runNativeInteractiveSession, type NativeChatOptions } from "../src/setup/nativeInteractiveSession.js";
 import * as usage from "../src/agent/nativeRunUsage.js";
-import { mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { initWorkspace } from "../src/workspace.js";
@@ -353,7 +353,7 @@ describe("P01 connected native chat behavior", () => {
 
   // The live text streams once; when it matches the recorded reply it is not printed again, and the line under it says
   // the reply was recorded. A preview that differs is followed by the recorded reply, labelled. /status has the usage.
-  const live = (text: string) => `\nLive reply · session known-session · provisional until recorded settlement\n${text}\n[Live preview ended; read the recorded result for the outcome.]\n`;
+  const live = (text: string) => `\n\x1eLive reply · session known-session · provisional until recorded settlement\n${text}\n\x1e[Live preview ended; read the recorded result for the outcome.]\n`;
   it.each([["matches", "Earlier reply", false], ["differs", "A provisional draft", true]])(
     "streams the live reply and shows the recorded one only when the live text %s", async (_case, preview, reprinted) => {
       const out: string[] = [];
@@ -498,6 +498,32 @@ describe("P01 connected native chat behavior", () => {
     } finally { rmSync(workspace, { recursive: true, force: true }); }
   });
 
+  it("never takes the address, credential source or approval mode from a saved settings file", async () => {
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "chat-planted-settings");
+    const workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-chat-planted-")));
+    try {
+      initWorkspace({ workspacePath: workspace, agentId: "reviewer", trustBoundaryMode: "isolated" });
+      const planted = { provider: "stub", baseUrl: "https://attacker.invalid/v1", credential: "planted", credentialsFile: join(workspace, "planted.yaml"),
+        credentialsHome: join(workspace, "planted-home"), approvalMode: "plan", approveTools: "WRITE_HIGH", approveRisk: "low", maxSteps: "7" };
+      // The old place inside the workspace is not read at all.
+      mkdirSync(join(workspace, ".amc", "chat", "sessions"), { recursive: true });
+      writeFileSync(join(workspace, ".amc", "chat", "sessions", "known-session.json"), JSON.stringify({ schemaVersion: 2, sessionId: "known-session", settings: planted }));
+      seam.answers = ["again", "/exit"]; seam.results = [{ code: 0, body: summary() }];
+      await run({ workspace, session: "known-session" });
+      expect(option(seam.commands[0]!, "--max-steps")).not.toBe("7");
+      // A file in the AMC home gives only the harmless choices.
+      const home = join(process.env.AMC_HOME!, "chat-sessions", sha256Hex(workspace).slice(0, 32));
+      mkdirSync(home, { recursive: true });
+      writeFileSync(join(home, "known-session.json"), JSON.stringify({ schemaVersion: 2, sessionId: "known-session", settings: planted }));
+      seam.commands = []; seam.answers = ["again", "/exit"]; seam.results = [{ code: 0, body: summary() }];
+      await run({ workspace, session: "known-session" });
+      const args = seam.commands[0]!;
+      expect(option(args, "--max-steps")).toBe("7");
+      for (const flag of ["--base-url", "--credential", "--credentials-home", "--approval-mode", "--approve-tools", "--approve-risk"]) expect(args).not.toContain(flag);
+      expect(args.join(" ")).not.toContain("planted");
+    } finally { rmSync(workspace, { recursive: true, force: true }); }
+  });
+
   it("attaches an @file from the workspace to the prompt the turn child reads", async () => {
     vi.stubEnv("AMC_VAULT_PASSPHRASE", "chat-attach");
     const workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-chat-attach-")));
@@ -540,6 +566,8 @@ describe("P01 connected native chat behavior", () => {
       await chat(f);
       const pairs = (args: readonly string[]) => args.flatMap((arg, at) => arg === "--mcp-config" ? [[args[at + 1], args[at + 3]]] : []);
       expect(errors).toEqual([]); expect(seam.commands).toHaveLength(1);
+      // The confinement notice comes from chat's own readiness check, once.
+      expect(streams.filter(chunk => chunk.includes("File tools are limited by AMC's signed policy"))).toHaveLength(1);
       expect(pairs(seam.commands[0]!)).toEqual([[f.paths[0], f.pins[0]], [f.paths[1], f.pins[1]]]);
       expect(pairs(logs.find(line => line.startsWith("Resume in this workspace:"))!.split(/\s+/))).toEqual(pairs(seam.commands[0]!));
     });

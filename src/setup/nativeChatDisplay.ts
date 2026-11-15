@@ -1,13 +1,16 @@
 import { stripVTControlCharacters } from "node:util";
 import chalk from "chalk";
 import { escapeTerminalControls } from "../tools/builtin/askUserTool.js";
-import { renderMarkdownLine, wrapLine, type MarkdownState } from "../utils/terminalMarkdown.js";
+import { LIVE_FRAME } from "../llm/adapter/liveTextPreview.js";
+import { renderMarkdownLine, type MarkdownState } from "../utils/terminalMarkdown.js";
 
 /**
  * What chat shows of a turn child's stderr. The child (`agent-loop run --json --stream`) prints its progress lines and
- * the provisional live reply there; chat turns them into a spinner, the reply rendered as Markdown while it streams, and
- * keeps the setup lines (write scope, policy, confinement) for /status instead of repeating them every turn. Anything it
- * does not recognise (errors, warnings, refusals) is passed through unchanged.
+ * the provisional live reply there; chat turns them into a spinner and the reply rendered as Markdown while it streams.
+ * The reply is framed by lines that start with LIVE_FRAME, a byte model text never carries, so a reply cannot end the
+ * region early and pose as AMC. The child's setup lines (write scope, policy, confinement) are dropped: chat says those
+ * from its own readiness check. Anything else (errors, warnings, refusals) is passed through with colour kept and every
+ * other control character shown, never executed.
  */
 export interface ChatContextReading { readonly promptTokens: number | null; readonly windowTokens: number | null }
 export interface ChatDisplay {
@@ -25,13 +28,12 @@ export interface ChatDisplay {
   liveText(): string;
   /** The last context reading the child reported in this turn. */
   context(): ChatContextReading | null;
-  /** Setup lines the child printed and chat kept for /status. */
-  notes(): readonly string[];
 }
 
-const LIVE_HEADER = /^Live reply · session \S+ · provisional/;
-const LIVE_END = "\n[Live preview ";
-const KEPT = [/^tool writes are scoped to: /, /^action policy: /, /^approval mode [a-z-]+: /, /^File tools are limited by /, /^this process is not OS-confined/];
+const LIVE_HEADER = new RegExp(`^${LIVE_FRAME}Live reply · session \\S+ · provisional`);
+const LIVE_END = `\n${LIVE_FRAME}[Live preview `;
+const LIVE_CLOSED = new RegExp(`^${LIVE_FRAME}\\[Live preview (ended|truncated)`);
+const SETUP = [/^tool writes are scoped to: /, /^action policy: /, /^approval mode [a-z-]+: /, /^File tools are limited by /, /^this process is not OS-confined/];
 const SPINNER = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 
 /** Streams one reply: plain prose word by word (wrapped), Markdown block lines (headings, lists, code) once complete. */
@@ -106,7 +108,6 @@ export function createChatDisplay(options: {
   let region: { markdown: LiveMarkdown; tail: string } | null = null;
   let live = "";
   let reading: ChatContextReading | null = null;
-  const kept: string[] = [];
   let timer: NodeJS.Timeout | null = null;
   let label = "";
   let started = 0;
@@ -128,7 +129,7 @@ export function createChatDisplay(options: {
   const onLine = (raw: string) => {
     const text = stripVTControlCharacters(raw).trimEnd();
     if (LIVE_HEADER.test(text)) { clear(); region = { markdown: new LiveMarkdown(out, options.columns), tail: "" }; return; }
-    if (text.trim() === "" || /^\[Live preview (ended|truncated)/.test(text)) {
+    if (text.trim() === "" || LIVE_CLOSED.test(text)) {
       if (text.includes("truncated")) out(`${chalk.dim("(The live text was cut short; the recorded reply follows.)")}\n`);
       return;
     }
@@ -138,18 +139,10 @@ export function createChatDisplay(options: {
     const context = /^step \d+\.\d+ context: prompt (\d+|unmeasured) tokens(?: of (\d+))?/.exec(text.trim());
     if (context) { reading = { promptTokens: context[1] === "unmeasured" ? null : Number(context[1]), windowTokens: context[2] === undefined ? null : Number(context[2]) }; return; }
     if (/^turn \d+ ended: complete$/.test(text)) { clear(); return; }
-    if (KEPT.some(pattern => pattern.test(text))) {
-      const first = !kept.includes(text);
-      if (first) kept.push(text);
-      // The confinement notice is shown once per chat; the other setup lines only in /status.
-      if (first && /^(File tools are limited by|this process is not OS-confined)/.test(text)) {
-        clear();
-        for (const part of wrapLine(text, options.columns())) options.writeError(`${chalk.dim(part)}\n`);
-      }
-      return;
-    }
+    if (SETUP.some(pattern => pattern.test(text))) return;
     clear();
-    options.writeError(`${raw}\n`);
+    // Colour (SGR) stays; any other control character is shown as \uXXXX.
+    options.writeError(`${raw.split(/(\x1b\[[0-9;]*m)/).map((part, at) => at % 2 === 1 ? part : escapeTerminalControls(part)).join("")}\n`);
   };
 
   const outside = (text: string) => {
@@ -190,7 +183,6 @@ export function createChatDisplay(options: {
     busy, clear,
     beginTurn: () => { live = ""; reading = null; },
     liveText: () => live,
-    context: () => reading,
-    notes: () => [...kept]
+    context: () => reading
   };
 }

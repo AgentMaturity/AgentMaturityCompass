@@ -34,7 +34,8 @@ import { VAULT_LOCKED_PREFIX } from "../vault/vaultLockedError.js";
 import { chatVaultPassphrase } from "./nativeChatVault.js";
 import { unlockVault, vaultStatus } from "../vault/vault.js";
 import { chatSetupDeps } from "./nativeChatSetupIo.js";
-import { checkToolsetReadiness } from "../agent/agentToolset.js";
+import { checkToolsetReadiness, toolsetConfinementNotice, type ToolsetReadiness } from "../agent/agentToolset.js";
+import { LIVE_FRAME_ENV } from "../llm/adapter/liveTextPreview.js";
 import { actionPolicyState, executeOnApprovalClasses } from "../tools/guards/actionPolicyGuard.js";
 import { lookupModelPrice } from "../product/modelPricing.js";
 import { resolveChatSetup } from "./nativeChatSetup.js";
@@ -86,6 +87,13 @@ export interface NativeChatIo {
   readonly fail: () => void;
 }
 
+/** /status lines about the workspace tools, from this process's own readiness check. */
+function toolsetNotes(readiness: ToolsetReadiness): string[] {
+  const confinement = toolsetConfinementNotice(readiness);
+  return [`Tool writes are scoped to: ${readiness.writeScope.length > 0 ? readiness.writeScope.join(", ") : "(nothing)"}.`,
+    `Action policy: ${readiness.actionPolicy}.`, ...(confinement === null ? [] : [confinement])];
+}
+
 /** The per-session detail blocks: usage and cost, diagnostics, and the public validation status. */
 function sessionDetailLines(summary: NativeChatChildSummary): string[] {
   return [renderNativeRunUsage(summary.usage, { requestWindow: "latest" }), renderNativeRunDiagnostics(summary.diagnostics),
@@ -132,15 +140,19 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
   if (options.session !== undefined && options.forkFrom !== undefined) {
     io.error("Choose --session or --fork-from, not both."); io.fail(); return;
   }
-  // A resumed session's saved settings fill in every flag the person did not pass (nativeChatInput.ts).
-  const saved = options.session === undefined ? null : loadChatSettings(resolve(options.workspace), options.session);
-  if (saved !== null) options = withChatSettings(options, saved);
   const chatDisplay = createChatDisplay({ write: text => { process.stdout.write(text); }, writeError: text => { process.stderr.write(text); },
     columns: () => process.stdout.columns ?? null, spinner: process.env.TERM !== "dumb" });
   const plainIo = io;
   io = { ...io, log: line => { chatDisplay.clear(); plainIo.log(line); }, error: line => { chatDisplay.clear(); plainIo.error(line); } };
   const trust = admitWorkspaceTrust(io, options, options.workspace);
   if (trust === undefined) return;
+  // Only after trust: a resumed session's saved choices fill in what the person did not pass (nativeChatInput.ts). Address,
+  // credential and approval settings are never among them; the person's own flags for those go on the resume line.
+  const saved = options.session === undefined ? null : loadChatSettings(resolve(options.workspace), options.session);
+  if (saved !== null) options = withChatSettings(options, saved);
+  const passedFlags = ([["--base-url", options.baseUrl], ["--credential", options.credential], ["--credentials-file", options.credentialsFile],
+    ["--credentials-home", options.credentialsHome], ["--approval-mode", options.approvalMode], ["--approve-tools", options.approveTools],
+    ["--approve-risk", options.approveRisk]] as const).flatMap(([flag, value]) => value === undefined ? [] : [flag, value]);
   let profile: ReturnType<typeof resolveNativeChatProfile>;
   let validation: ReturnType<typeof resolveNativeValidationSelection>;
   // Captured before the preset's values merge in: an explicit --approve-tools/--approve-risk beside a mode is refused, a preset's is replaced.
@@ -237,7 +249,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       // Consent is recorded at chat admission. Later turns must never approve a changed workspace themselves.
       // The piped child follows this terminal's colour decision (chalk honours NO_COLOR, --no-color, TERM=dumb).
       const env: NodeJS.ProcessEnv = { ...process.env, ...(vaultPassphrase === null ? {} : { AMC_VAULT_PASSPHRASE: vaultPassphrase }),
-        ...(chalk.level > 0 ? { FORCE_COLOR: String(chalk.level) } : {}) };
+        ...(chalk.level > 0 ? { FORCE_COLOR: String(chalk.level) } : {}), ...(stream ? { [LIVE_FRAME_ENV]: "1" } : {}) };
       if (args[0] === "agent-loop" && args[1] === "run") delete env[TRUST_WORKSPACE_ENV];
       running = spawn(process.execPath, [...process.execArgv, resolve(entry), ...(selectedAgentId === null ? [] : ["--agent", selectedAgentId]), ...args], {
         cwd, env, shell: false,
@@ -316,7 +328,9 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       return;
     }
     selectedAgentId = guide.agentId;
-    const defaults = chatDefaults(cwd, provider!, guide.model);
+    const computed = chatDefaults(cwd, provider!, guide.model);
+    // A saved tool level stands in for the default, never for the person's choice, so chatApprovalMode still gates it.
+    const defaults = saved?.tools === undefined ? computed : { ...computed, tools: saved.tools };
     const tools = options.tools ?? defaults.tools;
     if (!["none", "echo", "workspace"].includes(tools)) {
       io.error("Choose --tools none, echo, or workspace."); io.fail(); return;
@@ -408,18 +422,18 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     const chatProfileArgs = [...(options.trustWorkspace === true ? ["--trust-workspace"] : []), ...nativeChatProfileArgv(profile, "chat")];
     // What `--session`/`--continue` restores from the saved settings (nativeChatInput.ts); the rest stays on the resume line.
     // The stand-in model takes no --model, --base-url or --credential (its guide refuses them).
-    const chatSettings = (): ChatSettings => Object.fromEntries(Object.entries({ provider, ...(provider === "stub" ? {} : { model, baseUrl: guide.baseUrl ?? undefined,
-      credential: guide.credential?.ref }), credentialsFile: credentialFile, credentialsHome: options.credentialsHome, tools, maxSteps, maxTokens,
-      approveTools: approvalClass, approveRisk: approvalClass === undefined ? undefined : approvalRisk, approvalMode: approvalMode?.ok ? approvalMode.mode : undefined,
+    const chatSettings = (): ChatSettings => Object.fromEntries(Object.entries({ provider, ...(provider === "stub" ? {} : { model }), tools, maxSteps, maxTokens,
       thinking: options.thinking, reasoningEffort: options.reasoningEffort, thinkingBudget: options.thinkingBudget, cacheRetention: options.cacheRetention,
       maxRetries: options.maxRetries, retryMaxDelay: options.retryMaxDelay, retryMaxProviderDelay: options.retryMaxProviderDelay,
       contextWindow: options.contextWindow, compactThreshold: options.compactThreshold,
       autoSummary: options.autoSummary === false ? false : undefined, autoCompact: options.autoCompact === false ? false : undefined
     }).filter(([, value]) => value !== undefined)) as ChatSettings;
     const resumeCommand = (id: string, full = false) => renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "chat",
-      ...(full ? routeBaseArgs() : ["--agent", guide.agentId, ...(options.unsafeUnconfinedShell === true ? ["--unsafe-unconfined-shell"] : []),
+      ...(full ? routeBaseArgs() : ["--agent", guide.agentId, ...passedFlags, ...(options.unsafeUnconfinedShell === true ? ["--unsafe-unconfined-shell"] : []),
         ...(options.webSearchSearxng === undefined ? [] : ["--web-search-searxng", options.webSearchSearxng]), ...mcpArgs, ...validationArgs]),
       ...chatProfileArgs, ...nativeExtensionRunArgv(extensions), "--session", id] });
+    const toolsetNow = () => checkToolsetReadiness(cwd, options.unsafeUnconfinedShell === true ? { unconfinedShell: "cli-flag" } : {});
+    let confinementShown = false;
     const say = (line: string) => { for (const part of wrapLine(line, process.stdout.columns ?? null)) io.log(part); };
     const showScope = () => {
       say(`Native chat · agent ${guide.agentId} · provider ${provider} · model ${model}`);
@@ -464,13 +478,13 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       if (text === "/cost") { for (const line of renderCostLines(previousSummary)) say(line); return false; }
       if (text === "/status") {
         const scope: string[] = [];
-        const toolset = tools === "workspace" ? checkToolsetReadiness(cwd) : null;
+        const toolset = tools === "workspace" ? toolsetNow() : null;
         const shell = toolset === null ? null : `Shell: ${toolset.shell.offered ? `offered, ${toolset.shell.boundary ?? "UNCONFINED"}` : "not offered"}${toolset.shell.reason ? ` (${toolset.shell.reason})` : ""}. File tools: limited by policy; process confinement: ${toolset.sandboxReason ?? "unknown"}.`;
         const capture = { ...io, log: (line: string) => { scope.push(line); } };
         const keep = io; io = capture; try { showScope(); } finally { io = keep; }
         const known = sessionId ?? forkFrom;
         // Commands stay on one line so they can be copied; the prose wraps.
-        for (const line of renderStatusLines({ scope, notes: chatDisplay.notes(), shell, summary: previousSummary,
+        for (const line of renderStatusLines({ scope, notes: toolset === null ? [] : toolsetNotes(toolset), shell, summary: previousSummary,
           resume: sessionId === null ? null : resumeCommand(sessionId, true), verify: known === null ? null : renderNativeVerifyHint(cwd, known) })) {
           if (/^(Resume in this workspace|Check the record):/.test(line)) io.log(line); else say(line);
         }
@@ -682,6 +696,13 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         catch (error) { io.error(escapeTerminalControls(error instanceof Error ? error.message : "Session selection changed; use /resume again.")); continue; }
       }
       chatDisplay.beginTurn();
+      // Once per chat, from this process's own readiness check (never from the child's output); not on a resumed session.
+      if (!confinementShown && tools === "workspace" && options.session === undefined) {
+        confinementShown = true;
+        const notice = toolsetConfinementNotice(toolsetNow());
+        // A notice, not an error: written to the terminal's error stream as the child's own notice used to be.
+        if (notice !== null) for (const part of wrapLine(notice, process.stdout.columns ?? null)) process.stderr.write(`${chalk.dim(part)}\n`);
+      }
       if (process.env.TERM === "dumb") io.log(`Working (${provider}/${model}); Ctrl-C cancels.`);
       else chatDisplay.busy(`Working · ${provider}/${model}`);
       const priorSession = sessionId;

@@ -37,7 +37,7 @@ export function wrapLine(text: string, width: number | null, indent?: string): s
 
 function inline(text: string): string {
   return text
-    .replace(/`([^`]+)`/g, (_m, code: string) => chalk.cyan(code))
+    .replace(/(?<!`)`([^`\n]+)`(?!`)/g, (_m, code: string) => chalk.cyan(code))
     .replace(/\*\*([^*]+)\*\*/g, (_m, bold: string) => chalk.bold(bold));
 }
 
