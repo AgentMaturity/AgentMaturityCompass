@@ -56,6 +56,8 @@ function highRiskDuties(input: EuAiActDutyInput): EuAiActDuty[] {
   const note = dates.length > 1
     ? `Annex III use from ${T.annexIIIHighRisk}; Annex I product from ${T.article6_1AnnexIHighRisk}. The earlier date is shown.`
     : undefined;
+  // Art. 113 delays only Chapter III Sections 1 to 3; Arts. 72 and 73 (Chapter IX) carry no date of their own.
+  const afterMarketNote = `The Act sets no separate date for this duty; the date shown is AMC's reading, not a date the Act states.${note ? ` ${note}` : ""}`;
   const p = (article: string, duty: string, extra: Partial<EuAiActDuty> = {}): EuAiActDuty => ({ role: "provider", article, duty, appliesFrom, ...(note ? { note } : {}), ...extra });
   const d = (article: string, duty: string, extra: Partial<EuAiActDuty> = {}): EuAiActDuty => ({ role: "deployer", article, duty, appliesFrom, ...(note ? { note } : {}), ...extra });
   const duties: EuAiActDuty[] = [
@@ -69,8 +71,8 @@ function highRiskDuties(input: EuAiActDutyInput): EuAiActDuty[] {
     p("Art. 17", "Run a quality management system."),
     p("Art. 43", "Carry out the conformity assessment before the system is placed on the market."),
     p("Art. 47, Art. 48", "Draw up the EU declaration of conformity and affix the CE marking."),
-    p("Art. 72", "Monitor the system after it is on the market, following a written plan."),
-    p("Art. 73", "Report serious incidents to the market surveillance authority."),
+    p("Art. 72", "Monitor the system after it is on the market, following a written plan.", { note: afterMarketNote }),
+    p("Art. 73", "Report serious incidents to the market surveillance authority.", { note: afterMarketNote }),
     d("Art. 26", "Use the system as its instructions say, assign trained people to oversee it, watch how it works and keep its logs."),
   ];
   if (input.annexIII && !input.annexIIIPoint2Only) {

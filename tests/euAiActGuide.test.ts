@@ -2,13 +2,16 @@ import { describe, expect, it } from "vitest";
 import { GUIDE_AREA_CHOICES, GUIDE_BANNED_CHOICES, guideCapabilities } from "../src/compliance/euAiActCli.js";
 import { classifyEuAiActRisk } from "../src/compliance/euAiActClassifier.js";
 
-const none = { banned: [], areas: [], safetyComponent: false, talksToPeople: false, makesContent: false, role: "both" as const };
+const none = { banned: [], areas: [], safetyComponent: false, talksToPeople: false, content: [], role: "both" as const };
 
 describe("comply risk-classify --guide", () => {
   it("maps the six answers to the classifier's capabilities", () => {
     expect(guideCapabilities(none)).toEqual({});
-    expect(guideCapabilities({ ...none, areas: ["employment"], talksToPeople: true, makesContent: true, safetyComponent: true }))
+    expect(guideCapabilities({ ...none, areas: ["employment"], talksToPeople: true, content: ["syntheticContentGeneration"], safetyComponent: true }))
       .toEqual({ employment: true, humanInteraction: true, syntheticContentGeneration: true, safetyComponent: true });
+    expect(guideCapabilities({ ...none, content: ["deepFakes"] })).toEqual({ deepFakes: true });
+    const deployer = classifyEuAiActRisk(guideCapabilities({ ...none, content: ["deepFakes"] })).duties ?? [];
+    expect(deployer.some((d) => d.role === "deployer" && d.article.startsWith("Art. 50(4)"))).toBe(true);
     expect(classifyEuAiActRisk(guideCapabilities({ ...none, banned: ["childSexualAbuseMaterial"] })).riskTier).toBe("UNACCEPTABLE");
   });
 

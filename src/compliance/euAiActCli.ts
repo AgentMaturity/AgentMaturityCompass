@@ -76,7 +76,7 @@ export interface GuideAnswers {
   areas: Array<keyof AgentCapabilities>;
   safetyComponent: boolean;
   talksToPeople: boolean;
-  makesContent: boolean;
+  content: Array<"syntheticContentGeneration" | "deepFakes">;
   role: EuAiActRole | "both";
 }
 
@@ -85,7 +85,7 @@ export function guideCapabilities(answers: GuideAnswers): AgentCapabilities {
   for (const key of [...answers.banned, ...answers.areas]) caps[key] = true;
   if (answers.safetyComponent) caps.safetyComponent = true;
   if (answers.talksToPeople) caps.humanInteraction = true;
-  if (answers.makesContent) caps.syntheticContentGeneration = true;
+  for (const key of answers.content) caps[key] = true;
   return caps;
 }
 
@@ -95,12 +95,15 @@ async function askGuide(): Promise<GuideAnswers> {
   console.log(chalk.bold("\nWhat applies to my agent? Six questions about the EU AI Act."));
   console.log(chalk.gray("Answer for what the agent is meant to do. Space ticks a choice, Enter goes on. Tick nothing if none apply.\n"));
   const a = await ask<{ banned: Array<keyof AgentCapabilities>; areas: Array<keyof AgentCapabilities>; safetyComponent: boolean;
-    talksToPeople: boolean; makesContent: boolean; role: GuideAnswers["role"] }>([
+    talksToPeople: boolean; content: GuideAnswers["content"]; role: GuideAnswers["role"] }>([
     { type: "checkbox", name: "banned", message: "1 of 6. Does the agent do any of these? (banned in the EU)", choices: GUIDE_BANNED_CHOICES.map(([value, name]) => ({ name, value })) },
     { type: "checkbox", name: "areas", message: "2 of 6. Does the agent work in any of these areas?", choices: GUIDE_AREA_CHOICES.map(([value, name]) => ({ name, value })) },
     { type: "confirm", name: "safetyComponent", default: false, message: "3 of 6. Is the agent a safety part of a product that already needs an EU safety check (for example a medical device, machine, lift or toy)?" },
     { type: "confirm", name: "talksToPeople", default: false, message: "4 of 6. Does the agent talk or chat with people?" },
-    { type: "confirm", name: "makesContent", default: false, message: "5 of 6. Does the agent make text, images, audio or video?" },
+    { type: "checkbox", name: "content", message: "5 of 6. Does any of this apply to the agent's output?", choices: [
+      { name: "The agent makes text, images, audio or video", value: "syntheticContentGeneration" },
+      { name: "You publish deep fakes, or AI-written text that informs the public", value: "deepFakes" },
+    ] },
     { type: "select", name: "role", message: "6 of 6. Who are you for this agent?", choices: [
       { name: "I build it and offer it under my name (provider)", value: "provider" },
       { name: "I use it in my own work (deployer)", value: "deployer" },
@@ -157,7 +160,7 @@ function printClassification(result: EuAiActClassification, roles: readonly EuAi
   printDuties(result.duties ?? [], roles);
   console.log(chalk.gray("This lists what your answers point to. It is not legal advice and does not say the agent meets the EU AI Act."));
   console.log(chalk.gray("Sources: Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744 (Official Journal texts, read 2026-11-16)."));
-  console.log(chalk.gray("Next: amc comply roadmap --framework EU_AI_ACT for a step-by-step plan."));
+  console.log(chalk.gray(`Next: amc comply roadmap --framework EU_AI_ACT --risk-tier ${result.riskTier} for a step-by-step plan.`));
 }
 
 export async function riskClassifyAction(opts: Record<string, unknown> & { capabilities?: string; guide?: boolean; json?: boolean }): Promise<void> {

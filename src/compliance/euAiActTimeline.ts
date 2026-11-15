@@ -1,7 +1,7 @@
 /**
  * EU AI Act application dates, shared by the classifier (euAiActClassifier.ts) and the duty list (euAiActDuties.ts).
  * Re-checked on 2026-11-16 in the Official Journal text of Regulation (EU) 2026/1744 (Art. 1 points (39) and (40):
- * Art. 111(2) and (4), Art. 113 third paragraph points (a), (c) and (d)) and its Art. 3 (entry into force on the third
+ * Art. 111(2) and (4), Art. 113 third paragraph points (a), (c) and (d)) and its Art. 4 (entry into force on the third
  * day after publication on 24.7.2026), opened through https://publications.europa.eu/resource/celex/32026R1744.
  * First read on 2026-10-03 from the Commission's AI Act Service Desk.
  * Each key must equal the verified keyDate of the same id in the regulatory
