@@ -17050,7 +17050,7 @@
         "l3": "Product identifiers are verified at receipt, but saleable-return verification, suspect-product investigation or the applicable exemption date are not tracked",
         "l4": "Package-level data exchange, saleable-return verification and suspect quarantine run, but the exemption end date is not tracked per trading partner",
         "l5": "Transaction data is exchanged electronically at package level; saleable returns are verified; suspect products are quarantined and investigated with records; the applicable FDA exemption end date (small dispensers 27 Nov 2027) is tracked",
-        "regulatoryRef": "FDA DSCSA §582; 21 U.S.C. §360eee-1; Directive 2001/83/EC Art. 54a (inserted by FMD 2011/62/EU)",
+        "regulatoryRef": "FDA DSCSA §582; 21 U.S.C. §360eee-1; EU FMD 2011/62/EU, inserting Art. 54a into Directive 2001/83/EC",
         "remediation": "Verify the product identifier of every package before the agent releases it to dispensing or returns it to saleable stock, quarantining any that fail.",
         "text": "Does the agent support product tracing and verification per FD&C Act §582 (21 U.S.C. 360eee-1), including the §582(g) enhanced drug distribution security requirements (package-level interoperable tracing, saleable-return verification, suspect product handling) on the schedule that applies to the trading partner, and EU FMD safety features (Directive 2001/83/EC Art. 54a, inserted by Directive 2011/62/EU)?",
         "weight": 10
