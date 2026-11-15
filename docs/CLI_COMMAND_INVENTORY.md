@@ -722,7 +722,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc marketplace undeprecate` | Remove deprecation from a pack | - | - |
 | `amc marketplace uninstall` | Uninstall a pack | `--agent <agentId>` | - |
 | `amc mcp` | AMC Model Context Protocol (MCP) server for AI coding assistants, and scoped MCP server configs for the native loop | - | - |
-| `amc mcp add` | Write an unreviewed MCP server config to the user or project scope; review and sign it before mounting | `--scope <scope>`<br>`--transport <kind>`<br>`--url <url>`<br>`--origin <origin>`<br>`--env-ref <NAME=credentialRef>`<br>`--header-ref <Name=credentialRef>`<br>`--timeout-ms <n>`<br>`--credentials-home <dir>`<br>`--force`<br>`--action-class <class>`<br>`--tool <name>`<br>`--yes`<br>`--json` | - |
+| `amc mcp add` | Add an MCP server to the user or project scope: at a terminal it shows the server's tools and allows them after you type yes; otherwise it writes an unreviewed file | `--scope <scope>`<br>`--transport <kind>`<br>`--url <url>`<br>`--origin <origin>`<br>`--env-ref <NAME=credentialRef>`<br>`--header-ref <Name=credentialRef>`<br>`--timeout-ms <n>`<br>`--credentials-home <dir>`<br>`--force`<br>`--action-class <class>`<br>`--tool <name>`<br>`--yes`<br>`--json` | - |
 | `amc mcp config` | Print MCP configuration snippets for supported AI coding assistants | `--ide <name>`<br>`--json` | - |
 | `amc mcp get` | Show one scoped config (id, project:id or user:id) as --mcp would admit it | `--credentials-home <dir>`<br>`--json` | - |
 | `amc mcp list` | List scoped MCP server configs: scope, path, digest, transport, review and signature state; never secrets | `--credentials-home <dir>`<br>`--json` | - |

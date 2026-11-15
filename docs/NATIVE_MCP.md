@@ -47,7 +47,9 @@ At a terminal this is the whole job. AMC starts the server once, lists its tools
 
 - What the server says about itself (tool names, descriptions, instructions for the model) is shown with every control, bidi and invisible character written as `\uXXXX`. It is the server's text, never an instruction from you, and AMC never uses it to decide what a tool may do. A tool whose name has such characters is not allowed.
 - Every allowed tool gets the same action class: `WRITE_HIGH` unless you pass `--action-class`, so each call goes through your Action Policy and asks for approval like the agent's own shell commands. Pass `--action-class READ_ONLY` only for a server you know only reads. `--tool <name>` (repeatable) allows only the tools you name.
-- `--yes` answers the question for a script; the review is still printed. Without a terminal and without `--yes`, `amc mcp add` writes the file unreviewed, as before, and prints the steps below.
+- `--yes` answers the question for a script, so the tools are allowed before anyone reads the list: read them first with `amc agent-loop mcp-catalog --config <path>`. Without a terminal and without `--yes`, `amc mcp add` writes the file unreviewed, as before, and prints the steps below.
+- Nothing is written until you answer `yes`. Any other answer, Ctrl-C or a server that does not start leaves an existing file for that id as it was, so `--force` never breaks a server that already works. When a new server does not start, the file is saved unreviewed so `mcp-catalog --diagnostics` (or `--authorize` for an OAuth server) can look at it.
+- The server id is lowercase (letters, digits, `_` and `-`), because it names the server in the signed tool policy.
 - If the server later changes its tools, AMC refuses to start it until you run `amc mcp add` for it again with `--force`.
 - The tool policy is per folder. A user-scope server (`--scope user`) is allowed in the folder where you add it; in another folder run the same command there with `--force`.
 - The server's resources are not allowed by this step; grant `resources/list` or `resources/read` by hand as described above.

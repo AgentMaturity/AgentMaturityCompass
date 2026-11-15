@@ -159,6 +159,19 @@ describe("real surfaces", () => {
       await program.parseAsync(["node", "amc", "agent-loop", "run", "hello", "--tools", "workspace", "--approve-tools", "READ_ONLY", "--credentials-home", home, "--json", "--mcp", "fixture"]);
       expect(failures, errors.join("\n")).toEqual([]);
     } finally { process.chdir(cwd); }
+    // The allowlist entries name this server, so action records name the adapter mcp:fixture.
+    expect(loadToolsConfig(workspace).tools.allowedTools.find((tool) => tool.name === nativeMcpToolName("fixture", "lookup"))?.context)
+      .toMatchObject({ kind: "mcp", server: { id: "fixture" } });
+    // An id the signed policy cannot carry is refused before anything is written.
+    const upper = amc("add", "Big", "--scope", "project", "--yes", "--", process.execPath, "-e", SERVER, log);
+    expect(upper.status).toBe(1); expect(upper.stderr).toContain("use a lowercase id");
+    expect(existsSync(join(dirs.project, "Big.json"))).toBe(false);
+    // A --force re-add that fails leaves the reviewed, signed server as it was.
+    const before = readFileSync(join(dirs.project, "fixture.json"));
+    const broken = amc("add", "fixture", "--scope", "project", "--force", "--yes", "--", join(workspace, "no-such-server"));
+    expect(broken.status).toBe(1); expect(broken.stderr).toContain("is unchanged");
+    expect(readFileSync(join(dirs.project, "fixture.json"))).toEqual(before);
+    expect(JSON.parse(amc("list", "--json").stdout).servers).toMatchObject([{ id: "fixture", reviewed: true, signatureValid: true, mountable: true }]);
     // Without a terminal and without --yes nothing is allowed: the file is written unreviewed, as before.
     const plain = amc("add", "other", "--scope", "project", "--", process.execPath, "-e", SERVER, log);
     expect(plain.stdout).toContain("not yet reviewed");

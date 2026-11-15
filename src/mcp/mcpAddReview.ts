@@ -88,12 +88,11 @@ export function reviewedMcpConfig(config: NativeMcpConfiguration, catalog: Nativ
 export function allowlistWithMcpGrants(tools: ToolsConfig, config: NativeMcpConfiguration, selection: McpAddSelection, actionClass: ActionClass): string {
   const id = config.server.id;
   const names = new Set(selection.granted.map((tool) => tool.amcName));
-  // The signed context names this server and transport; the schema takes only a lowercase id, so another id goes without one.
-  const context = /^[a-z0-9][a-z0-9._:/-]*$/.test(id)
-    ? { context: { kind: "mcp" as const, server: { id, name: id, transport: config.server.transport ?? "stdio" } } } : {};
+  // The signed context names this server and transport (`mcp add` takes only a lowercase id, which the schema needs).
+  const context = { kind: "mcp" as const, server: { id, name: id, transport: config.server.transport ?? "stdio" } };
   const kept = tools.tools.allowedTools.filter((tool) => !names.has(tool.name)
     && !(tool.context?.kind === "mcp" && tool.context.server.id === id));
-  const added: ToolDefinition[] = selection.granted.map((tool) => ({ name: tool.amcName, actionClass, ...context }));
+  const added: ToolDefinition[] = selection.granted.map((tool) => ({ name: tool.amcName, actionClass, context }));
   const search: ToolDefinition[] = kept.some((tool) => tool.name === "tool_search") ? [] : [{ name: "tool_search", actionClass: "READ_ONLY" }];
   return YAML.stringify(toolsConfigSchema.parse({ tools: { ...tools.tools, allowedTools: [...kept, ...search, ...added] } }));
 }

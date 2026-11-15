@@ -1,7 +1,7 @@
 /**
  * The interactive half of `amc mcp add` (mcpAddReview.ts says what is decided and why): start the server once, show its
- * tools, ask, then sign. The question is answered only by typing `yes`; anything else, end of input or Ctrl-C leaves
- * the unreviewed file and changes no policy. The allowlist is signed first, so a refusal there (a locked vault, an
+ * tools, ask, then sign. The question is answered only by typing `yes`; anything else, end of input or Ctrl-C writes
+ * nothing (an earlier file for this id stays as it was) and changes no policy. The allowlist is signed first, so a refusal there (a locked vault, an
  * unsigned tools.yaml) leaves nothing half-allowed.
  */
 import { existsSync, readFileSync } from "node:fs";
@@ -21,8 +21,9 @@ export interface McpAddReviewInput {
   readonly yes: boolean; readonly json: boolean; readonly credentialsHome?: string;
 }
 
-const unreviewed = (input: McpAddReviewInput) =>
-  `${input.path} is saved but unreviewed, so nothing can use it. To try again: amc mcp add ${input.config.server.id} --scope ${input.scope} --force ...`;
+// Called only before the reviewed file is written, so the path still holds whatever was there before this command.
+const unreviewed = (input: McpAddReviewInput) => `Nothing was saved${existsSync(input.path) ? `; ${input.path} is unchanged` : ""}. `
+  + `To try again: amc mcp add ${input.config.server.id} --scope ${input.scope}${existsSync(input.path) ? " --force" : ""} ...`;
 
 async function askYes(question: string): Promise<boolean> {
   const rl = createInterface({ input: process.stdin, output: process.stderr, terminal: true });
@@ -52,20 +53,29 @@ export async function reviewAndAllowMcpServer(input: McpAddReviewInput): Promise
   } catch (error) {
     // Only AMC's own fixed messages are shown; server or network text could carry terminal controls.
     const fixed = error instanceof Error && ["NativeMcpConfigError", "NativeMcpHttpRefused", "NativeMcpProtocolRefused"].includes(error.name);
-    return stop(`${fixed ? (error as Error).message : "The server could not be started or did not answer with its tools."} `
-      + `Details: amc agent-loop mcp-catalog --config ${input.path} --diagnostics (an OAuth server first needs --authorize there). ${unreviewed(input)}`, "mcp-add-discovery-failed");
+    const problem = `${fixed ? (error as Error).message : "The server could not be started or did not answer with its tools."} `;
+    const details = `amc agent-loop mcp-catalog --config ${input.path} --diagnostics (an OAuth server first needs --authorize there)`;
+    // A new id loses nothing by saving the unreviewed file, and the diagnostics and OAuth sign-in need it. An existing file
+    // (--force) is kept: the person may still rely on it.
+    if (existsSync(input.path)) {
+      return stop(`${problem}${unreviewed(input)} To look closer, save the new settings unreviewed in its place (amc mcp add ${input.config.server.id} `
+        + `--scope ${input.scope} --force --json ...), then run ${details}.`, "mcp-add-discovery-failed");
+    }
+    writeScopedMcpConfig(input.dirs, input.scope, input.config, false);
+    return stop(`${problem}Saved ${input.path} unreviewed, so nothing can use it yet. Details: ${details}; then run amc mcp add `
+      + `${input.config.server.id} --scope ${input.scope} --force ... again.`, "mcp-add-discovery-failed");
   }
   let selection;
   try { selection = selectMcpTools(catalog, input.only); } catch (error) { return stop(`${(error as Error).message} ${unreviewed(input)}`); }
   for (const line of mcpAddReviewLines(catalog, selection, input.actionClass)) say(line);
   if (selection.granted.length === 0) return stop(`No tool can be allowed. ${unreviewed(input)}`);
   const allowed = input.yes || await askYes(`Allow ${selection.granted.length} tool${selection.granted.length === 1 ? "" : "s"} as ${input.actionClass}? Type yes to sign, anything else to stop: `);
-  if (!allowed) return stop(`Nothing was allowed. ${unreviewed(input)}`);
+  if (!allowed) return stop(`${unreviewed(input)}`);
   const reviewed = reviewedMcpConfig(input.config, catalog, selection, input.actionClass);
   try {
     (await prepareToolsConfigPair(input.workspace, Buffer.from(allowlistWithMcpGrants(policy, reviewed, selection, input.actionClass)))).publish();
   } catch {
-    return stop(`The tool policy could not be signed (is the vault unlocked? amc vault unlock). Nothing was allowed. ${unreviewed(input)}`, "mcp-add-signing-refused");
+    return stop(`The tool policy could not be signed (is the vault unlocked? amc vault unlock). ${unreviewed(input)}`, "mcp-add-signing-refused");
   }
   const written = writeScopedMcpConfig(input.dirs, input.scope, reviewed, true);
   let signaturePath: string | null = null;

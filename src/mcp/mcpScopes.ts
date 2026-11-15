@@ -156,7 +156,9 @@ export function mergeScopedMcpSelection<T extends { readonly mcp?: readonly stri
  * behind and a `--force` add never replaces a valid file with an invalid one. The user-scope directory is created
  * owner-only and an existing one is tightened, because `assertPrivateFile` refuses a group-writable parent.
  */
-export function writeScopedMcpConfig(dirs: McpScopeDirs, scope: McpScope, config: NativeMcpConfiguration, force = false): { readonly path: string; readonly sha256: string } {
+/** Writes the file; with `checkOnly` it runs every check (id, existing file, other scope, schema) and writes nothing. */
+export function writeScopedMcpConfig(dirs: McpScopeDirs, scope: McpScope, config: NativeMcpConfiguration, force = false,
+  checkOnly = false): { readonly path: string; readonly sha256: string } {
   const id = scopedMcpId(config.server.id);
   const path = join(dirs[scope], `${id}.json`), other = scope === "project" ? "user" : "project";
   if (!force && existsSync(path)) return refuse(`${path} exists; pass --force to replace it (its signature, if any, no longer applies).`);
@@ -168,6 +170,7 @@ export function writeScopedMcpConfig(dirs: McpScopeDirs, scope: McpScope, config
   writeFileAtomic(pending, bytes, 0o600);
   try { loadNativeMcpConfiguration(pending); }
   catch (error) { try { unlinkSync(pending); } catch { /* already gone */ } throw error; }
+  if (checkOnly) { unlinkSync(pending); return { path, sha256: sha256Hex(Buffer.from(bytes)) }; }
   renameSync(pending, path);
   if (existsSync(`${path}.sig`)) unlinkSync(`${path}.sig`);
   return { path, sha256: sha256Hex(Buffer.from(bytes)) };

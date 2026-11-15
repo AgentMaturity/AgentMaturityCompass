@@ -14,7 +14,7 @@ import {
 
 /**
  * `amc mcp add | remove | list | get | sign` (SH-EXT-02). At a terminal, or with `--yes`, `add` is one confirmed step
- * (mcpAddReview.ts): it starts the server, shows its tools, and on a yes writes the reviewed file, adds the tools to the
+ * (mcpAddReview.ts): it starts the server, shows its tools, and only on a yes writes the reviewed file, adds the tools to the
  * signed allowlist and signs a project file. Without a terminal and without `--yes` it writes an UNREVIEWED file as
  * before; mounting it then needs the catalog reviewed (`amc agent-loop mcp-catalog --config <path>`),
  * `expectedCatalogDigest` and `grants` at the top level of the file, the generated tool names and `tool_search` in the
@@ -36,7 +36,7 @@ const dirsFor = (opts: { credentialsHome?: string }) => scopedMcpDirs(process.cw
 
 export function registerMcpScopeCommands(mcp: Command): void {
   mcp.command("add <id> [command...]")
-    .description("Write an unreviewed MCP server config to the user or project scope; review and sign it before mounting")
+    .description("Add an MCP server to the user or project scope: at a terminal it shows the server's tools and allows them after you type yes; otherwise it writes an unreviewed file")
     .requiredOption("--scope <scope>", "user (<AMC home>/mcp) or project (.amc/mcp)")
     .option("--transport <kind>", "stdio (default; give the command after --) or streamable-http (give --url and --origin)")
     .option("--url <url>", "streamable-http endpoint").option("--origin <origin>", "streamable-http origin the endpoint must stay on")
@@ -51,6 +51,8 @@ export function registerMcpScopeCommands(mcp: Command): void {
     .action(async (id: string, command: string[], opts: { scope?: string; transport?: string; url?: string; origin?: string; envRef?: string[]; headerRef?: string[];
       timeoutMs?: string; credentialsHome?: string; force?: boolean; actionClass?: string; tool?: string[]; yes?: boolean; json?: boolean }) => {
       try {
+        // The id becomes the server's name in the signed tool policy, which takes only lowercase ids.
+        if (!/^[a-z0-9][a-z0-9_-]{0,31}$/.test(id)) throw new McpScopeError(`${JSON.stringify(id)} cannot be a server id: use a lowercase id (1 to 32 lowercase letters, digits, _ or -, starting with a letter or digit).`);
         const refs = (pairs: string[] | undefined) => pairs === undefined ? {} : Object.fromEntries(pairs.map(pair => {
           const at = pair.indexOf("="); if (at <= 0) throw new McpScopeError(`${pair}: expected NAME=credentialRef.`); return [pair.slice(0, at), pair.slice(at + 1)];
         }));
@@ -69,13 +71,15 @@ export function registerMcpScopeCommands(mcp: Command): void {
         const actionClass = opts.actionClass ?? MCP_ADD_DEFAULT_CLASS;
         if (!isActionClass(actionClass)) throw new McpScopeError(`--action-class ${JSON.stringify(actionClass)} is not an action class (READ_ONLY, WRITE_LOW, WRITE_HIGH, ...).`);
         const scope = scopeOf(opts.scope), config: NativeMcpConfiguration = { schemaVersion: 1, server };
-        const written = writeScopedMcpConfig(dirsFor(opts), scope, config, opts.force === true);
-        if (opts.yes === true || (process.stdin.isTTY === true && opts.json !== true)) {
+        const review = opts.yes === true || (process.stdin.isTTY === true && opts.json !== true);
+        // When it reviews, nothing is written until the person says yes, so an existing reviewed server keeps working.
+        const written = writeScopedMcpConfig(dirsFor(opts), scope, config, opts.force === true, review);
+        if (review) {
           await reviewAndAllowMcpServer({ workspace: process.cwd(), dirs: dirsFor(opts), scope, config, path: written.path, actionClass: actionClass as ActionClass,
             only: opts.tool, yes: opts.yes === true, json: opts.json === true, ...(opts.credentialsHome === undefined ? {} : { credentialsHome: opts.credentialsHome }) });
           return;
         }
-        const next = [`Review and allow its tools in one step: run this command again at a terminal with --force, or add --yes after reading what it prints.`,
+        const next = [`Review and allow its tools in one step: run this command again at a terminal with --force; or read its tools first with amc agent-loop mcp-catalog --config ${written.path}, then run this command again with --force --yes.`,
           `Or by hand: amc agent-loop mcp-catalog --config ${written.path}; then put "expectedCatalogDigest" and "grants" at the top level of the file (next to "server", not inside it); add each generated tool name and tool_search (READ_ONLY) to .amc/tools.yaml and run amc tools sign.`,
           ...(scope === "project" ? [`Sign it: amc mcp sign ${id} --scope project --expect-digest <sha256 from amc mcp list>`] : []), `Use it: amc agent-loop chat --mcp ${id} --tools workspace --approve-tools <the action class of its grants>`];
         if (opts.json) console.log(JSON.stringify({ ok: true, id, scope, ...written, reviewed: false, next }, null, 2));
