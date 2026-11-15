@@ -237,6 +237,19 @@ export interface ToolsetReadiness {
 }
 
 /**
+ * The one-line confinement notice, in the words `amc init --coding` uses for the shell: file tools are bounded by the
+ * signed policy (this process is not OS-confined), and the shell by its own sandbox when one is offered. Null when this
+ * process is confined. The measured reason stays in `sandboxReason` (chat shows it in /status).
+ */
+export function toolsetConfinementNotice(readiness: Pick<ToolsetReadiness, "confined" | "sandboxBackendAvailable" | "shell">): string | null {
+  if (readiness.confined) return null;
+  const shell = !readiness.shell.offered ? "no shell is offered"
+    : readiness.shell.boundary === null ? "the shell runs UNCONFINED, with your full user rights, because you opted in"
+      : `shell commands run inside the ${readiness.shell.boundary} sandbox`;
+  return `File tools are limited by AMC's signed policy, not by the operating system; ${shell}.${readiness.sandboxBackendAvailable ? "" : " This machine has no sandbox backend."}`;
+}
+
+/**
  * Check the two signed configs and the sandbox BEFORE running anything.
  *
  * Without this an operator's first `amc agent` in a fresh repo produces a wall

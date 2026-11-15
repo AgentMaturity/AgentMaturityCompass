@@ -109,20 +109,22 @@ describe.skipIf(process.platform === "win32")("WP30 measured native interactive 
     const root = workspace();
     const result = await terminal(root, route(root), [
       { waitFor: "you> ", send: "WP30 measured recording task\r" },
-      { waitFor: "Recorded reply:" },
+      { waitFor: "reply recorded" },
       { waitFor: "you> ", send: "/inspect\r" },
-      { waitFor: "Event spine" },
+      { waitFor: "Transcript \\(what the model saw\\)" },
+      { waitFor: "you> ", send: "/status\r" },
+      { waitFor: "Public task validation" },
       { waitFor: "you> ", send: "/exit\r" }
     ]);
     expect(result.code, result.output).toBe(0);
     expect(result.output).toContain("Public task validation: not-requested.");
     expect(result.output).toContain("WP30 measured recording task");
-    const sessionId = /Known session reference: ([A-Za-z0-9._-]+)\. A resume attempt/.exec(result.output)?.[1];
+    const sessionId = /Session ([A-Za-z0-9._-]+) · 1 turn · last turn complete/.exec(result.output)?.[1];
     expect(sessionId, result.output).toBeDefined();
     const events = readNativeSessionEvents(root, sessionId!);
     expect(events.some(row => row.event_type === "turn/seal"), result.output).toBe(true);
     expect(events.at(-1)?.event_type, result.output).toBe("session/release");
-    measured("run-inspect-validation-state", result, 3);
+    measured("run-inspect-validation-state", result, 4);
   }, 110_000);
 
   test("a gating --approval-mode gives the chat turn its IPC reviewer, so the child does not refuse --interactive-approvals", async () => {
@@ -135,12 +137,13 @@ describe.skipIf(process.platform === "win32")("WP30 measured native interactive 
       { waitFor: "Approval: approve, deny, or cancel this turn \\(no default\\): ", send: "cancel\r" },
       { waitFor: "you> ", send: "/exit\r" }
     ]);
-    expect(result.output).toContain("Approval mode: default. Before a gated call runs, this terminal shows what it would do");
+    // Chat wraps its prose at the terminal width, so the sentence is compared with line breaks folded.
+    expect(result.output.replace(/\s+/g, " ")).toContain("Approval mode: default. Before a gated call runs, this terminal shows what it would do");
     expect(result.output).not.toContain("requires an AMC parent with a dedicated IPC channel");
     expect(result.output).toContain("The agent wants to: Call the tool \"echo\"");
     expect(result.output).toContain("cancelling the turn (cause: user)");
     expect(result.output).toContain("turn 1 ended: cancelled");
-    expect(result.output).toMatch(/echo · DENIED/);
+    expect(result.output).toMatch(/✗ echo · denied/);
     measured("gated-approval-mode-chat", result, 3);
   }, 110_000);
 
@@ -151,12 +154,12 @@ describe.skipIf(process.platform === "win32")("WP30 measured native interactive 
       { waitFor: "Session number to inspect \\(blank cancels\\): ", send: "1\r" },
       { waitFor: "Type resume to select this session \\(blank cancels\\): ", send: "resume\r" },
       { waitFor: "you> ", send: "WP30 explicit resumed task\r" },
-      { waitFor: "Recorded reply:" },
+      { waitFor: "reply recorded" },
       { waitFor: "you> ", send: "/exit\r" }
     ]);
     expect(result.code, result.output).toBe(0);
     expect(result.output).toContain(`Session selected: ${sessionId}.`);
-    expect(result.output).toContain("Event spine");
+    expect(result.output).toContain("Transcript (what the model saw)");
     const events = readNativeSessionEvents(root, sessionId);
     expect(events.filter(row => row.event_type === "session/resume")).toHaveLength(1);
     expect(events.filter(row => row.event_type === "turn/start")).toHaveLength(2);

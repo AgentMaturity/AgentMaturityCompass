@@ -9921,6 +9921,7 @@ Show a session's projected conversation and its event spine
 | Option | Description |
 |--------|-------------|
 | `--json` | - |
+| `--spine` | - |
 | `--limit <rows>` | - |
 | `--cursor <cursor>` | - |
 

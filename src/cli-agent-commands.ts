@@ -44,7 +44,7 @@ import { echoToolSeam } from "./agent/echoTool.js";
 import { MAX_ACTIVE_CHILDREN_HELP, NO_DELEGATE_STOP_HELP, VALIDATION_REPAIR_HELP, WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
 import { leaseFileToken, withLeaseFileOption } from "./cli/agentLoopLeaseFile.js";
 import { continuedSession, reportContinueRefusal, resolveContinuityRun, withContinuityChatOptions, withContinuityRunOptions, type ContinuityOptions } from "./cli/agentLoopContinuityOptions.js";
-import { agentToolset, type AgentToolset } from "./agent/agentToolset.js";
+import { agentToolset, toolsetConfinementNotice, type AgentToolset } from "./agent/agentToolset.js";
 import { runLease } from "./leases/runLease.js";
 import { NATIVE_DELEGATION_CAPABILITIES, selectSupportedNativeTools } from "./agent/nativeToolCapabilities.js";
 import type { MountedNativeMcpServer } from "./mcp/nativeMcpClient.js";
@@ -556,23 +556,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             toolset.readiness.writeScope.length > 0 ? toolset.readiness.writeScope.join(", ") : "(nothing)"
           }`
         )); progress(chalk.dim(`action policy: ${toolset.readiness.actionPolicy}`));
-        if (!toolset.readiness.confined) {
-          // A warning, not a refusal: an unconfined fs.read is still governed
-          // by the allowlist and the firewall. Code Mode is the part that
-          // genuinely cannot run without a sandbox, and it refuses on its own.
-          //
-          // The two clauses are different facts and used to be one. Whether the
-          // MACHINE has a backend is what an operator can fix by installing
-          // something; whether THIS PROCESS is confined is what actually bounds
-          // a program, and it is false everywhere today.
-          io.error(chalk.yellow(
-            `this process is not OS-confined (${toolset.readiness.sandboxReason ?? "unknown"}); `
-            + "tool writes are bounded by policy only"
-            + (toolset.readiness.sandboxBackendAvailable
-              ? ""
-              : ", and this machine has no sandbox backend either")
-          ));
-        }
+        // Once per session (a resumed turn does not repeat it), in the words init uses; the measured reason is in readiness.
+        const confinement = opts.session === undefined ? toolsetConfinementNotice(toolset.readiness) : null;
+        if (confinement !== null) io.error(chalk.yellow(confinement));
         toolSeam = toolset.seam;
         // The kernel builds the delegation capability once it has the parent's
         // session and a child-session-bound LLM factory; this is where it lands.
