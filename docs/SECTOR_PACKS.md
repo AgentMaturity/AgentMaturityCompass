@@ -170,6 +170,11 @@ UNECE WP.29 R155 §7   ← not just "automotive safety"
 UNCAC Art. 7, 9        ← not just "anti-corruption"
 ```
 
+### Citation checks
+A specific article is only useful if it is the right one. Every citation in a pack (each regulatory basis entry, the EU AI Act classification, and each part of a question's reference) starts as **not checked**. When someone opens the primary source and checks it, a record is added to `src/domains/packs/citationChecks/<station>.json` with the instrument, the clause, the verdict (`verified`, `corrected`, `wrong`, `unverifiable` or `superseded`), the date, who checked it and the source address.
+
+`amc domain pack describe --pack <packId>` shows how many are checked, for example `2 of 35 citations checked; 2 of them by an AI agent, not an expert review`. A check counts for 365 days, and only while the pack still says what was checked. The test suite fails on any citation marked `wrong` and on records that no longer match the pack. A check by an AI agent is not an expert or legal review, and no record says a pack is verified or approved.
+
 ### Five Pack-Level Fields
 Each pack carries enterprise metadata:
 

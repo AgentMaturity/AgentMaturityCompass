@@ -272,8 +272,8 @@ export const digitalHealthRecordDetail: PackQuestionDetail = {
   },
   "HLT-DHR-22": {
     l2: "Part 2 records are tagged, but the agent can summarise them into general notes without a consent check",
-    l4: "Disclosures are gated on consent and carry the Sec. 2.32 notice, but segmentation is not tested or disclosures are not logged per recipient",
-    evidence: ["part2_consent_scope_check_log", "sec2_32_notice_attachment_sample", "part2_segmentation_test_results"],
+    l4: "Disclosures are gated on consent and carry the Sec. 2.32 notice, but the Part 2 tagging is not tested or disclosures are not logged per recipient",
+    evidence: ["part2_consent_scope_check_log", "sec2_32_notice_attachment_sample", "part2_tagging_test_results"],
     remediation:
       "Gate every agent summary, route or disclosure that includes Part 2-tagged data on a matching Sec. 2.31 consent for that recipient and purpose, " +
       "attaching the Sec. 2.32 notice and consent copy automatically. Fail closed when no consent matches.",

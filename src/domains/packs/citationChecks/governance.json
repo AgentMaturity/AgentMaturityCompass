@@ -1,0 +1,47 @@
+[
+  {
+    "packId": "digital-citizens-rights",
+    "questionId": "GOV-DCR-1",
+    "citation": "EU eIDAS 2.0 2024/1183 (amending Reg. (EU) No 910/2014) Art. 5a, 8",
+    "instrument": "Regulation (EU) No 910/2014 as amended by Regulation (EU) 2024/1183 (eIDAS)",
+    "clause": "Art. 5a, Art. 8",
+    "verdict": "corrected",
+    "was": "EU eIDAS 2.0 2024/1183 Art. 6a, 8",
+    "now": "EU eIDAS 2.0 2024/1183 (amending Reg. (EU) No 910/2014) Art. 5a, 8",
+    "sourceTitle": "Regulation (EU) 2024/1183, Official Journal text (Publications Office)",
+    "sourceUrl": "https://publications.europa.eu/resource/celex/32024R1183",
+    "checkedOn": "2026-11-16",
+    "checkedBy": "ai-agent",
+    "note": "The European Digital Identity Wallet article inserted by Regulation (EU) 2024/1183 is Article 5a of Regulation (EU) No 910/2014; there is no Article 6a. Article 5a(4)(d) requires wallets to meet the Article 8 requirements for assurance level high. Cross-border acceptance is Article 5f. Question text and L3/L5 updated to match."
+  },
+  {
+    "packId": "citizen-services",
+    "questionId": "GOV-CS-3",
+    "citation": "EU AI Act Art. 10(2)(f) as amended by Regulation (EU) 2026/1744 (Art. 10(5) deleted)",
+    "instrument": "Regulation (EU) 2024/1689 (AI Act) as amended by Regulation (EU) 2026/1744",
+    "clause": "Art. 10(2)(f); Art. 10(5)",
+    "verdict": "verified",
+    "was": null,
+    "now": null,
+    "sourceTitle": "Regulation (EU) 2026/1744, Official Journal text (Publications Office)",
+    "sourceUrl": "https://publications.europa.eu/resource/celex/32026R1744",
+    "checkedOn": "2026-11-16",
+    "checkedBy": "ai-agent",
+    "note": "Art. 10(2)(f) (examination for biases likely to affect fundamental rights or lead to discrimination) read in CELEX 32024R1689; Art. 1 point (9)(b) of Regulation (EU) 2026/1744 deletes Art. 10(5), and its new Art. 4a now governs processing special categories of data for bias detection."
+  },
+  {
+    "packId": "citizen-services",
+    "questionId": "GOV-CS-3",
+    "citation": "ECHR Art. 14",
+    "instrument": "European Convention on Human Rights",
+    "clause": "Art. 14",
+    "verdict": "verified",
+    "was": null,
+    "now": null,
+    "sourceTitle": "Convention for the Protection of Human Rights and Fundamental Freedoms (English text, European Court of Human Rights)",
+    "sourceUrl": "https://www.echr.coe.int/documents/d/echr/Convention_ENG",
+    "checkedOn": "2026-11-16",
+    "checkedBy": "ai-agent",
+    "note": "Article 14, Prohibition of discrimination, read in the Court's English text of the Convention."
+  }
+]

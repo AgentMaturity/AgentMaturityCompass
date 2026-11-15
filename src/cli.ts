@@ -103,6 +103,7 @@ import {
   latestRunForDisplay, namedRunForDisplay, printClaimLegendFooter, printClaimResult, printControlSurfaceSkip, printLabelledReport, printTitledResult, runClaimEnvelope, runIdClaim, selfAnswerClaim,
   unverifiedClaim, withClaimFields, withClaimFieldsEach
 } from "./cli/claimOutput.js";
+import { addRiskClassifyOptions, riskClassifyAction } from "./compliance/euAiActCli.js";
 import { renderDiagnosticReportHtml } from "./cli/reportRenderers.js"; import { emitScoreEvidenceResult } from "./cli/scoreEvidenceOutput.js";
 import { envelopeForComplianceReport } from "./claims/eligibility/adapters/results.js";
 import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "./claims/eligibility/render.js";
@@ -12573,122 +12574,10 @@ compliance
     console.log(chalk.gray(`\nOverall: ${matrix.overallScore === null ? "not evaluated" : `${(matrix.overallScore * 100).toFixed(1)}%`} | Gaps: ${matrix.gaps.length}`));
   });
 
-compliance
+addRiskClassifyOptions(compliance
   .command("risk-classify")
-  .description("Classify agent into EU AI Act risk tiers (UNACCEPTABLE / HIGH / LIMITED / MINIMAL)")
-  .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .option("--capabilities <json>", "JSON object of agent capabilities (see docs)")
-  .option("--biometric", "agent performs biometric identification", false)
-  .option("--critical-infra", "agent manages critical infrastructure", false)
-  .option("--education", "agent makes education/assessment decisions", false)
-  .option("--employment", "agent makes employment decisions", false)
-  .option("--essential-services", "agent controls access to essential services", false)
-  .option("--law-enforcement", "agent assists law enforcement", false)
-  .option("--migration", "agent handles migration/border control", false)
-  .option("--justice", "agent assists judicial/democratic processes", false)
-  .option("--realtime-biometric", "agent performs real-time biometric ID in public spaces", false)
-  .option("--social-scoring", "agent performs social scoring", false)
-  .option("--subliminal", "agent uses subliminal manipulation techniques", false)
-  .option("--exploits-vulnerabilities", "agent exploits vulnerabilities (age, disability)", false)
-  .option("--emotion-recognition", "agent infers emotions in the workplace or in education (prohibited by Art. 5(1)(f) unless for medical or safety reasons)", false)
-  .option("--chatbot", "agent is a chatbot/conversational system", false)
-  .option("--synthetic-content", "agent generates synthetic audio/image/video/text", false)
-  .option("--human-interaction", "agent interacts with humans", false)
-  .option("--safety-component", "agent is a safety component of a regulated product", false)
-  .option("--json", "output as JSON", false)
-  .action(async (opts: {
-    agent?: string; capabilities?: string;
-    biometric: boolean; criticalInfra: boolean; education: boolean; employment: boolean;
-    essentialServices: boolean; lawEnforcement: boolean; migration: boolean; justice: boolean;
-    realtimeBiometric: boolean; socialScoring: boolean; subliminal: boolean;
-    exploitsVulnerabilities: boolean; emotionRecognition: boolean; chatbot: boolean;
-    syntheticContent: boolean; humanInteraction: boolean; safetyComponent: boolean;
-    json: boolean;
-  }) => {
-    const { classifyEuAiActRisk } = await import("./compliance/euAiActClassifier.js");
-
-    let capabilities: import("./compliance/euAiActClassifier.js").AgentCapabilities = {};
-
-    if (opts.capabilities) {
-      try {
-        capabilities = JSON.parse(opts.capabilities) as typeof capabilities;
-      } catch {
-        console.error(chalk.red("Invalid --capabilities JSON"));
-        process.exit(1);
-      }
-    } else {
-      // Build from individual flags
-      capabilities = {
-        biometricIdentification: opts.biometric,
-        criticalInfrastructure: opts.criticalInfra,
-        education: opts.education,
-        employment: opts.employment,
-        essentialServices: opts.essentialServices,
-        lawEnforcement: opts.lawEnforcement,
-        migrationBorderControl: opts.migration,
-        justiceAdministration: opts.justice,
-        realtimeBiometricPublicSpaces: opts.realtimeBiometric,
-        socialScoring: opts.socialScoring,
-        subliminalManipulation: opts.subliminal,
-        exploitsVulnerabilities: opts.exploitsVulnerabilities,
-        emotionRecognition: opts.emotionRecognition,
-        chatbot: opts.chatbot,
-        syntheticContentGeneration: opts.syntheticContent,
-        humanInteraction: opts.humanInteraction,
-        safetyComponent: opts.safetyComponent
-      };
-    }
-
-    const result = classifyEuAiActRisk(capabilities);
-    // Classifies the capabilities the caller declared: self-reported, and a regulated mapping.
-    const claim = unverifiedClaim("compliance:euAiActRiskTier", 1, { regulated: true });
-
-    if (opts.json) {
-      console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
-      return;
-    }
-
-    const tierColors: Record<string, string> = {
-      UNACCEPTABLE: "#e05d44",
-      HIGH: "#e4811b",
-      LIMITED: "#dfb317",
-      MINIMAL: "#4c1"
-    };
-    const tierColor = tierColors[result.riskTier] ?? "#555";
-
-    console.log("");
-    console.log(chalk.bold("🇪🇺 EU AI Act Risk Classification"));
-    printClaimResult(claim, {});
-    console.log("");
-    console.log(`Risk Tier: ${chalk.hex(tierColor).bold(result.riskTier)}`);
-    console.log(`Articles: ${result.articles.length > 0 ? result.articles.join(", ") : "none"}`);
-    console.log("");
-    console.log(result.summary);
-    console.log("");
-
-    if (result.findings.length > 0) {
-      console.log(chalk.bold("Findings:"));
-      for (const finding of result.findings) {
-        const sev = finding.severity === "CRITICAL" ? chalk.red(`[${finding.severity}]`)
-          : finding.severity === "HIGH" ? chalk.yellow(`[${finding.severity}]`)
-          : chalk.gray(`[${finding.severity}]`);
-        console.log(`  ${sev} ${finding.title} (${finding.article})`);
-        console.log(chalk.gray(`    ${finding.description}`));
-      }
-      console.log("");
-    }
-
-    if (result.remediation.length > 0) {
-      console.log(chalk.bold("Remediation Checklist:"));
-      for (const item of result.remediation) {
-        const pri = item.priority === "IMMEDIATE" ? chalk.red("⚡") : item.priority === "SHORT_TERM" ? chalk.yellow("🔶") : chalk.gray("🔷");
-        console.log(`  ${pri} [${item.priority}] ${item.action}`);
-        console.log(chalk.gray(`     ${item.article}`));
-      }
-    }
-    console.log("");
-    console.log(chalk.gray("Tip: amc comply roadmap --framework EU_AI_ACT to generate a compliance plan."));
-  });
+  .description("Classify agent into EU AI Act risk tiers (UNACCEPTABLE / HIGH / LIMITED / MINIMAL)"))
+  .action(async (opts: Record<string, unknown>) => riskClassifyAction(opts));
 
 compliance
   .command("roadmap")

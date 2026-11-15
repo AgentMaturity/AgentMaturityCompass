@@ -68,7 +68,8 @@ export const INTL_INSTRUMENTS: readonly RegulatoryInstrument[] = [
 
   // NIST, W3C, payment-card and security frameworks
   verified("nist-ai-rmf", "NIST AI 100-1 Artificial Intelligence Risk Management Framework (AI RMF 1.0)", "US", "framework", "in-force", "https://www.nist.gov/itl/ai-risk-management-framework",
-    ["NIST AI RMF 1.0", "NIST AI RMF", "NIST AI 100-1"], { frameworkId: "NIST_AI_RMF" }),
+    ["NIST AI RMF 1.0", "NIST AI RMF", "NIST AI 100-1"], { frameworkId: "NIST_AI_RMF",
+      note: "nist.gov page read 2026-11-16: AI RMF 1.0 (released 2023-01-26) is still the current edition; the page says it is being revised as part of the White House AI Action Plan, with no new edition or date given." }),
   verified("nist-csf-2", "NIST Cybersecurity Framework 2.0", "US", "framework", "in-force", "https://www.nist.gov/cyberframework", ["NIST CSF 2.0", "NIST CSF"]),
   verified("nist-sp-800-161", "NIST SP 800-161 Rev. 1 (update 1, 2024-11-01) Cybersecurity Supply Chain Risk Management Practices", "US", "standard", "in-force",
     "https://csrc.nist.gov/pubs/sp/800/161/r1/upd1/final", ["NIST SP 800-161r1-upd1", "NIST SP 800-161"]),

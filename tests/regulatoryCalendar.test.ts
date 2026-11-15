@@ -145,13 +145,15 @@ describe("curated milestones sidecar", () => {
     expect(pastDue(rows, "2026-10-04")).toEqual(["2026-06-30 Test Act"]);
   });
 
-  test("Colorado SB26-189 and the Art. 50(2) grace end are present, each flagged for re-verification", () => {
+  test("Colorado SB26-189 (flagged for re-verification) and the Art. 50(2) grace end (re-read in the OJ text) are present", () => {
     const rows = sidecar.milestones as Array<{ instrument: string; date: string; status: string; source: { url: string; retrievedAt: string } }>;
     const colorado = rows.find((m) => m.instrument.startsWith("Colorado SB26-189"));
     expect(colorado).toMatchObject({ date: "2027-01-01", source: { url: "https://leg.colorado.gov/bills/sb26-189" } });
     const art50 = rows.find((m) => m.date === "2026-12-02" && m.instrument.includes("Art. 111(4)"));
     expect(art50?.source.url).toBe("https://publications.europa.eu/resource/celex/32026R1744");
-    for (const m of [colorado, art50]) expect(m?.status).toContain("re-verify against the primary source before publishing");
+    expect(colorado?.status).toContain("re-verify against the primary source before publishing");
+    // The Art. 111(4) date was re-read in the Official Journal text on 2026-11-16 (lane comply), so it no longer carries the flag.
+    expect(art50?.status).toContain("read in the Official Journal text 2026-11-16");
     expect(rows.some((m) => m.instrument.includes("SB25B-004") && m.date === "2026-06-30")).toBe(false);
   });
 

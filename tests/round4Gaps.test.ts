@@ -319,7 +319,7 @@ describe("R4-08 EU AI Act Risk Classification", () => {
   });
 
   test("modifiers can escalate risk", () => {
-    const result = classifyEuAiActRisk("Law Enforcement", "Predictive policing", ["Real-time biometric"]);
+    const result = classifyEuAiActRisk("Law Enforcement", "Predictive policing", ["Based solely on profiling"]);
     expect(result.riskLevel).toBe("unacceptable");
   });
 

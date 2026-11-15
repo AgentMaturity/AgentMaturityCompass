@@ -1,0 +1,32 @@
+[
+  {
+    "packId": "networked-ecosystems",
+    "questionId": "TECH-NE-8",
+    "citation": "EU DMA Art. 6(5), 6(12)",
+    "instrument": "Regulation (EU) 2022/1925 (Digital Markets Act)",
+    "clause": "Art. 6(5), Art. 6(12)",
+    "verdict": "corrected",
+    "was": "EU DMA Art. 6(12)",
+    "now": "EU DMA Art. 6(5), 6(12)",
+    "sourceTitle": "Regulation (EU) 2022/1925, Official Journal text (Publications Office)",
+    "sourceUrl": "https://publications.europa.eu/resource/celex/32022R1925",
+    "checkedOn": "2026-11-16",
+    "checkedBy": "ai-agent",
+    "note": "Art. 6(12) is fair, reasonable and non-discriminatory access conditions for business users to app stores, search engines and social networks; ranking transparency and non-discrimination is Art. 6(5). Question text updated to name both."
+  },
+  {
+    "packId": "networked-ecosystems",
+    "questionId": "TECH-NE-8",
+    "citation": "EU Data Act Art. 9",
+    "instrument": "Regulation (EU) 2023/2854 (Data Act)",
+    "clause": "Art. 9",
+    "verdict": "corrected",
+    "was": "EU Data Act Art. 33",
+    "now": "EU Data Act Art. 9",
+    "sourceTitle": "Regulation (EU) 2023/2854, Official Journal text (Publications Office)",
+    "sourceUrl": "https://publications.europa.eu/resource/celex/32023R2854",
+    "checkedOn": "2026-11-16",
+    "checkedBy": "ai-agent",
+    "note": "Art. 33 sets interoperability requirements for participants in data spaces; compensation for making data available (non-discriminatory and reasonable) is Art. 9. L5 text and the per-question L4 detail updated."
+  }
+]

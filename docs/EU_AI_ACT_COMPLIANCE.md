@@ -10,7 +10,7 @@ Status: Engineering compliance mapping — not legal advice
 
 This document maps AMC's five maturity dimensions and evidence infrastructure to the EU AI Act's obligations for high-risk AI systems. AMC provides deterministic, evidence-linked compliance signals — not legal certifications.
 
-A signed or `VALID` AMC report proves artifact integrity, not evidence sufficiency. Use a mapping externally only when evidence readiness is `READY`; AMC does not classify a system as a matter of law, perform conformity assessment, or certify legal compliance.
+A signed or `VALID` AMC report shows who wrote the report and that it is unchanged; it does not show the evidence is sufficient. Use a mapping externally only when evidence readiness is `READY`; AMC does not classify a system as a matter of law, perform conformity assessment, or certify legal compliance.
 
 The EU AI Act applies a risk-based approach. AMC's compliance engine now supports `EU_AI_ACT` as a first-class framework alongside SOC2, NIST AI RMF, ISO 27001, and ISO 42001.
 
@@ -38,7 +38,9 @@ Domain classification is stored in `.amc/eu_ai_act_classification.json` and scor
 
 Annex III identifies specific high-risk use cases in areas including biometrics, critical infrastructure, education, employment, essential services, law enforcement, migration, asylum, border control, and justice. An industry label alone does not establish classification.
 
-Use `amc comply risk-classify` for the CLI risk-tier pre-check. It is an alias for `amc compliance risk-classify` and maps capability flags to the EU AI Act risk tiers in Regulation (EU) 2024/1689, including Article 5 prohibited practices, Article 6 high-risk systems, Annex III use areas, and Article 50 transparency obligations. Official source: https://data.europa.eu/eli/reg/2024/1689/oj.
+Use `amc comply risk-classify` for the CLI risk-tier pre-check. It is an alias for `amc compliance risk-classify` and maps capability flags to the EU AI Act risk tiers in Regulation (EU) 2024/1689, including Article 5 prohibited practices (with points (ba) and (bb) added by Regulation (EU) 2026/1744, which apply from 2 December 2026), Article 6 high-risk systems, Annex III use areas, and Article 50 transparency obligations. A high-risk agent keeps its Article 50 duties. The output lists what a provider must do and what a deployer must do, apart, each with the date it applies from; registration is cited as Article 49 (critical infrastructure systems register nationally, Article 49(5)). Official source: https://data.europa.eu/eli/reg/2024/1689/oj.
+
+Not sure which flags fit? `amc comply risk-classify --guide` asks six plain questions in a terminal (banned practices, high-risk areas, product safety part, talking to people, making content, and whether you build or use the agent) and shows only the duties for your role. It lists what your answers point to; it is not legal advice and never says an agent meets the Act.
 
 ### Autonomy Duration Factor
 
@@ -224,14 +226,14 @@ These dates are agent-drafted and stay experimental until a named expert reviews
 | 2030-08-02 | High-risk systems intended for use by public authorities comply | Art. 111(2) as amended |
 | 2030-12-31 | AI components of Annex X large-scale IT systems placed on the market before 2027-08-02 comply | Art. 111(1) |
 
-`amc comply risk-classify --json` now returns `applicationDates` for the tier it assigns (Art. 5, Art. 50, Annex III or Annex I basis).
+`amc comply risk-classify --json` returns `applicationDates` for the tier it assigns (Art. 5, Art. 5(1)(ba)-(bb), Art. 50, Annex III or Annex I basis) and `duties`, each with `role` (provider or deployer), `article`, `duty` and `appliesFrom`.
 
-Sources (retrieved 2026-10-03 unless stated):
+Sources (retrieved 2026-10-03 unless stated; the Official Journal texts and the Commission page were re-read on 2026-11-16):
 
 - AI Act Service Desk, Article 113: https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113
 - AI Act Service Desk, Article 111: https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-111
 - AI Act Service Desk, implementation timeline: https://ai-act-service-desk.ec.europa.eu/en/ai-act/timeline/timeline-implementation-eu-ai-act
-- European Commission AI Act policy page (last updated 2026-08-03): https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
+- European Commission AI Act policy page (last updated 2026-10-19 when re-read on 2026-11-16): https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
 - Official Journal text via the Publications Office, retrieved 2026-10-04: https://publications.europa.eu/resource/celex/32024R1689 and https://publications.europa.eu/resource/celex/32026R1744
 - Regulation (EU) 2026/1744 on EUR-Lex: https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng — EUR-Lex answered automated requests with a bot challenge, so the text was read through the Service Desk; title and date (8 July 2026) come from the EUR-Lex index.
 
