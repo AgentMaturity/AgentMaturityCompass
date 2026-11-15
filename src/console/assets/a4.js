@@ -1,126 +1,29 @@
 // A4 Studio page module (P1-58, design §11). a4.html and a4Project.html mount it from their own <script type="module">,
 // and home.html loads it for the "Start an agent project" card; app.js is byte-pinned and never learns about these pages.
 // Every call goes through apiNativeRequest. Studio re-checks every action: a disabled button is a convenience only.
-import { apiGet, apiNativeRequest, apiPost, logout, onClaims, whoami } from "./api.js";
+import { apiGet, apiNativeRequest, logout, onClaims, whoami } from "./api.js";
 import { installClaimStrip } from "./components/claimBadge.js";
 import { topbarHtml } from "./shell.js";
 import { renderHandholdingSteps } from "./components/handholdingSteps.js";
-import { definiteNativeSubmissionRefusal } from "./nativeTaskSubmission.js";
 import { stageAction, stageCards } from "./a4Cards.js";
 import * as view from "./a4View.js";
 import * as start from "./a4Start.js";
 import * as packs from "./a4Pack.js";
-import { approvalWaiting, canCreate, isOwner } from "./a4Who.js";
+import { approvalWaiting, canCreate } from "./a4Who.js";
 import { register as registerAspire } from "./a4Aspire.js";
 import { register as registerAssemble } from "./a4Assemble.js";
 import { register as registerAdapt } from "./a4Adapt.js";
 import { register as registerActivate } from "./a4Activate.js";
+import { API, claimSink, errorText, guarded, listOf, me, notice, one, params, previewOptions, root, send, setClaimSink, setMe, setShowClaims,
+  showClaims, showError, storePack, storedPack, tell, uuid } from "./a4Send.js";
+import { bindCreateForm, renderListPage } from "./a4ListPage.js";
 
-const API = "/api/v1/a4";
 const page = document.body.dataset.page;
-const root = document.getElementById("app");
-const notice = document.getElementById("a4Notice");
-const params = new URLSearchParams(location.search);
 const isObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
-const listOf = (data, key) => (Array.isArray(data) ? data : Array.isArray(data?.[key]) ? data[key] : []);
-const one = (data, key) => (isObject(data?.[key]) ? data[key] : data);
 for (const register of [registerAspire, registerAssemble, registerAdapt, registerActivate]) register();
-
-let me = null;
-// The labelled claims the responses of the page load in flight carried, and the strip's "show these instead" hook: the
-// strip shows a load's claims only once that load has rendered, so it never mixes a superseded load's labels in.
-let claimSink = null;
-let showClaims = () => {};
-let pending = null; // the unconfirmed mutation; a retry repeats its clientRequestId so Studio returns the recorded result
-let busy = false; // one write in flight at a time, so a double click cannot mint a second, non-deduplicable request id
-
-/** Runs one user-started write; a click or submit while another is in flight is ignored. */
-async function guarded(work) {
-  if (busy) return undefined;
-  busy = true;
-  root?.setAttribute("aria-busy", "true"); // a4.css dims the actions until the write and the reload after it end
-  try {
-    return await work();
-  } finally {
-    busy = false;
-    root?.removeAttribute("aria-busy");
-  }
-}
-
-function uuid() {
-  if (typeof crypto?.randomUUID !== "function") throw new Error("Open Studio over HTTPS or localhost before changing a project.");
-  return crypto.randomUUID();
-}
-
-function errorText(error) {
-  const message = error?.message ?? String(error);
-  // P1-57's error text already starts with its code; it is printed once.
-  const code = typeof error?.code === "string" && !["HTTP_ERROR", "INVALID_RESPONSE"].includes(error.code)
-    && !message.startsWith(`${error.code}:`) ? `${error.code}: ` : "";
-  return `${code}${message}`;
-}
-
-function showError(error) {
-  if (!notice || error?.name === "AbortError") return;
-  // A sentence and the next step first; Studio's code stays, in small print (a4Start.errorHtml).
-  notice.innerHTML = `${start.errorHtml(error)}${pending ? ` Studio did not confirm "${view.esc(pending.label)}".
-    Retry repeats the same request id, so Studio returns the recorded result if the first attempt was admitted. A refused
-    retry does not show that the first attempt failed: reload the page and check the project, its decisions and its
-    comments before doing it again. <button type="button" id="a4Retry">Retry</button>` : ""}`;
-}
-
-function tell(message) {
-  if (notice) notice.textContent = message;
-}
-
-/**
- * POSTs one action. Only a definite refusal of a first attempt clears the unconfirmed action: a refused retry says
- * nothing about the first attempt (auth, rate and ownership checks run before Studio's idempotent lookup). While one
- * action is unconfirmed no other is sent, so a second lost acknowledgement can never go unreported.
- */
-async function send(action, retry = false) {
-  if (pending !== null && pending !== action) throw new Error("Nothing was sent.");
-  try {
-    const data = await apiNativeRequest(action.path, { method: "POST", body: action.body, nativeCsrfToken: me?.nativeCsrfToken ?? undefined });
-    pending = null;
-    tell(`Done: ${action.label}. Studio recorded it.`); // a visible confirmation after every write (A4-14)
-    return data;
-  } catch (error) {
-    const refused = (error?.code === "NATIVE_CSRF_REQUIRED" && !retry) || definiteNativeSubmissionRefusal(error, retry);
-    pending = refused ? null : action;
-    throw error;
-  }
-}
-
-notice?.addEventListener("click", (event) => {
-  if (event.target.id !== "a4Retry" || !pending) return;
-  const action = pending;
-  void guarded(async () => action.after?.(await send(action, true))).catch(showError);
-});
-
-/** The Industry Pack a project started from, per browser (localStorage can be absent or refuse: then only the address keeps it). */
-function storedPack(projectId) {
-  try { return localStorage.getItem(`amc.a4.pack.${projectId}`); } catch { return null; }
-}
-function storePack(projectId, pack) {
-  try { localStorage.setItem(`amc.a4.pack.${projectId}`, pack); } catch { /* the address still carries it */ }
-}
 
 /** The head a transition response names (its seq, or a head it returns); null when Studio named none. */
 const headSeqOf = (data) => [data?.seq, data?.headSeq, data?.head?.headSeq, data?.project?.headSeq].find(Number.isSafeInteger) ?? null;
-
-/**
- * The preview gate: null only for the gate's own refusal, or for a 404 that carries no code (a Studio without the A4
- * router, where the preview cannot be on). A4_ROUTE_NOT_FOUND and every other error is an error, not "not enabled".
- */
-async function previewOptions() {
-  try {
-    return await apiNativeRequest(`${API}/options`);
-  } catch (error) {
-    if (error?.code === "A4_PREVIEW_DISABLED" || (error?.status === 404 && error?.code === "HTTP_ERROR")) return null;
-    throw error;
-  }
-}
 
 /**
  * Home's first card (a4Start.homeCardHtml): build an agent, or continue the latest project. It is filled only when the
@@ -141,7 +44,7 @@ async function showHomeEntry() {
       document.getElementById("a4NavLink")?.setAttribute("hidden", "");
       return;
     }
-    me = who;
+    setMe(who);
     const projects = listOf(await apiNativeRequest(`${API}/projects`), "projects");
     if (!card || (projects.length === 0 && !canCreate(who, options))) return;
     const catalog = projects.length === 0 ? listOf(await apiGet("/industry-packs/list").catch(() => null), "packs") : [];
@@ -152,109 +55,6 @@ async function showHomeEntry() {
   } catch {
     // Signed out, unreachable or refused: the card stays absent, which is the preview gate's closed state.
   }
-}
-
-/**
- * A start form's submit: inline validation in sentences, then one create request; on success the new project opens (with
- * ?pack= when an industry was picked). A refusal is shown in the form, as a sentence and the next step.
- */
-function bindCreateForm(createForm) {
-  if (!createForm) return;
-  const formError = (html) => {
-    const target = createForm.querySelector(".a4-form-error");
-    if (target) { target.innerHTML = html; target.hidden = !html; }
-  };
-  createForm.querySelector("[data-a4-example-project]")?.addEventListener("click", () => {
-    createForm.elements.name.value = start.SAMPLE_PROJECT.name;
-    createForm.elements.expertise.value = start.SAMPLE_PROJECT.expertise;
-    formError("");
-    createForm.elements.name.focus();
-  });
-  createForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    void guarded(async () => {
-      const form = new FormData(createForm);
-      const agentId = String(form.get("agentId") ?? "").trim();
-      const name = String(form.get("name") ?? "").trim();
-      // Inline validation in sentences, before anything is sent.
-      if (!name) { formError("Write a project name, for example Invoice triage helper. Nothing was sent."); createForm.elements.name.focus(); return; }
-      if (agentId && !/^[a-z0-9][a-z0-9_-]{0,127}$/.test(agentId)) {
-        formError("The agent id uses lowercase letters, digits, _ and -, and starts with a letter or digit (for example invoice-helper). Leave it empty for a new agent. Nothing was sent.");
-        createForm.elements.agentId.focus();
-        return;
-      }
-      formError("");
-      const action = { label: "Start an agent project", path: `${API}/projects`,
-        body: { clientRequestId: uuid(), name, expertise: form.get("expertise") || "novice", ...(agentId ? { agentId } : {}),
-          ...(form.get("practice") === "yes" ? { practice: true } : {}) } };
-      const pack = packs.packIdOf(form.get("pack"));
-      action.after = (data) => {
-        const projectId = one(data, "project").projectId;
-        if (pack) storePack(projectId, pack);
-        location.href = `./a4Project?project=${encodeURIComponent(projectId)}${pack ? `&pack=${pack}` : ""}`;
-      };
-      action.after(await send(action));
-    }).catch((error) => {
-      if (notice) showError(error);
-      else formError(start.errorHtml(error));
-    });
-  });
-}
-
-/**
- * The intro's inline "Add a person" form (OWNER only; Studio checks the role again). One call (POST /api/v1/a4/people)
- * creates the account with a first password AMC makes and shows once, here; the owner hands it over in person.
- */
-function bindAddPerson(form, toggle) {
-  if (!form || !toggle) return;
-  toggle.addEventListener("click", () => {
-    form.hidden = !form.hidden;
-    toggle.setAttribute("aria-expanded", String(!form.hidden));
-    if (!form.hidden) form.elements.username.focus();
-  });
-  form.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape") return;
-    form.hidden = true;
-    toggle.setAttribute("aria-expanded", "false");
-    toggle.focus();
-  });
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const error = form.querySelector(".a4-form-error");
-    const status = form.querySelector("[data-a4-add-status]");
-    const username = String(form.elements.username.value ?? "").trim();
-    error.hidden = true;
-    status.replaceChildren();
-    if (!username) { error.textContent = "Write their user name. Nothing was sent."; error.hidden = false; return; }
-    try {
-      const data = await apiNativeRequest(`${API}/people`, { method: "POST", nativeCsrfToken: me?.nativeCsrfToken ?? undefined,
-        body: { clientRequestId: uuid(), username, workspaceRoles: String(form.elements.roles.value).split(",") } });
-      form.reset();
-      status.innerHTML = start.addedPersonHtml(data);
-    } catch (failure) {
-      error.innerHTML = start.errorHtml(failure);
-      error.hidden = false;
-    }
-  });
-}
-
-async function renderListPage(options) {
-  claimSink = [];
-  const projects = listOf(await apiNativeRequest(`${API}/projects`), "projects");
-  showClaims(claimSink);
-  claimSink = null;
-  // The Industry Pack catalog is optional here: without it the form simply has no industry choice.
-  const catalog = canCreate(me, options) ? listOf(await apiGet("/industry-packs/list").catch(() => null), "packs") : [];
-  const creating = params.has("new") || projects.length === 0;
-  root.innerHTML = `${start.renderIntro({ creating, canAdd: isOwner(me) })}${canCreate(me, options) ? view.renderCreateForm(creating,
-    packs.packSelectHtml(catalog, packs.packIdOf(params.get("pack"))), { start: options?.workspace?.start ?? null })
-    : `<p class="muted">${view.CREATE_NEEDS}.</p>`}${view.renderProjectList(projects)}`;
-  bindCreateForm(root.querySelector("#a4CreateForm"));
-  bindAddPerson(root.querySelector("#a4AddPerson"), root.querySelector("[data-a4-add-person]"));
-  root.querySelector("[data-a4-show-create]")?.addEventListener("click", () => {
-    const create = root.querySelector("#a4Create");
-    if (create) { create.hidden = false; create.querySelector("input")?.focus(); }
-  });
 }
 
 function mountProject(projectId, options) {
@@ -344,7 +144,7 @@ function mountProject(projectId, options) {
         } while (loadAgain);
       } finally {
         loading = null;
-        claimSink = null;
+        setClaimSink(null);
       }
     })();
     return loading;
@@ -355,7 +155,7 @@ function mountProject(projectId, options) {
     // revision's gate under another revision's specification. Read again until they agree, three times at most; a view
     // that still disagrees is shown, but its gate is never pinned and deciding stays disabled (pinnable, the bar).
     for (let attempt = 1; ; attempt += 1) {
-      claimSink = [];
+      setClaimSink([]);
       const read = await readProject();
       if (view.oneRevision(read.project, read.revision, read.gates, read.readiness) || attempt === 3) {
         // A statement binds the head it was recorded at: once a later revision or another stage supersedes it, Confirm could
@@ -903,7 +703,7 @@ async function main() {
   // A loading skeleton until the first render (motion.css animates [aria-busy]); every render replaces it.
   root.setAttribute("aria-busy", "true");
   root.innerHTML = '<section class="card skeleton" aria-label="Loading"><p class="muted">Loading…</p></section>';
-  me = await whoami().catch(() => null);
+  setMe(await whoami().catch(() => null));
   addTopbar(me);
   if (!me) {
     root.removeAttribute("aria-busy");
@@ -928,10 +728,10 @@ async function main() {
   let deliver = null;
   const strip = installClaimStrip(page, (listener) => { deliver = listener; });
   onClaims((claims) => claimSink?.push(...claims.filter((claim) => typeof claim?.claimLabel === "string")));
-  showClaims = (claims) => {
+  setShowClaims((claims) => {
     strip?.reset();
     if (claims.length > 0) deliver?.(claims);
-  };
+  });
   if (page === "a4") return renderListPage(options);
   const projectId = params.get("project");
   if (!projectId) {
