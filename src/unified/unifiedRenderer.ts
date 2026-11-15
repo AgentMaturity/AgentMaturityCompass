@@ -68,7 +68,9 @@ export function renderUnifiedResult(result: UnifiedRunResult, opts?: { ci?: bool
     const nameLabel = `  ${mod.icon} ${BOLD}${WHITE}${mod.name}${RESET}`;
     const gradeLabel = mod.skipped
       ? `${DIM}—   (${mod.skipReason})${RESET}`
-      : `${gradeColor(mod.grade)}${BOLD}${mod.grade}${RESET}`;
+      : result.nothingToAssess
+        ? `${DIM}—   (not graded yet)${RESET}`
+        : `${gradeColor(mod.grade)}${BOLD}${mod.grade}${RESET}`;
 
     const dotsFill = dots(`  ${mod.icon} ${mod.name} `, 32);
     lines.push(`  ${mod.icon} ${WHITE}${mod.name}${RESET} ${dotsFill} ${gradeLabel}`);
@@ -76,7 +78,7 @@ export function renderUnifiedResult(result: UnifiedRunResult, opts?: { ci?: bool
 
     // Show issues (max 2 per module)
     for (const issue of mod.issues.slice(0, 2)) {
-      const icon = mod.grade === "F" || mod.grade.startsWith("D") ? "🔴" : "🟡";
+      const icon = !result.nothingToAssess && (mod.grade === "F" || mod.grade.startsWith("D")) ? "🔴" : "🟡";
       lines.push(`    ${icon} ${issue}`);
     }
     if (mod.issues.length > 2) {
@@ -87,8 +89,15 @@ export function renderUnifiedResult(result: UnifiedRunResult, opts?: { ci?: bool
 
   // Overall grade
   lines.push(`  ${"─".repeat(W)}`);
-  const overallColor = gradeColor(result.overallGrade);
-  lines.push(`  ${BOLD}${WHITE}Overall Grade:${RESET}  ${overallColor}${BOLD}${result.overallGrade}${RESET}  ${DIM}(${result.overallScore}/100)${RESET}`);
+  if (result.nothingToAssess) {
+    // The same rule as bare amc's empty score: with nothing to assess there is no grade to show.
+    lines.push(`  ${BOLD}${WHITE}Overall Grade:${RESET}  none yet`);
+    lines.push(`  ${DIM}AMC has not seen your agent do anything yet, so there is nothing to grade.${RESET}`);
+    lines.push(`  ${DIM}Let it watch your agent work (run amc and pick from the menu), then run this again.${RESET}`);
+  } else {
+    const overallColor = gradeColor(result.overallGrade);
+    lines.push(`  ${BOLD}${WHITE}Overall Grade:${RESET}  ${overallColor}${BOLD}${result.overallGrade}${RESET}  ${DIM}(${result.overallScore}/100)${RESET}`);
+  }
   lines.push(`  ${BOLD}${WHITE}Surface coverage:${RESET} ${result.surfaceCoverage.evaluated}/${result.surfaceCoverage.total} evaluated${result.surfaceCoverage.pending.length > 0 ? `; ${result.surfaceCoverage.pending.length} pending` : ""}${result.surfaceCoverage.failed.length > 0 ? `; ${RED}${result.surfaceCoverage.failed.length} failed${RESET}` : ""}`);
   lines.push(`  ${"─".repeat(W)}`);
   lines.push("");
@@ -143,7 +152,7 @@ export function renderCIAnnotations(result: UnifiedRunResult): string {
   const lines: string[] = [];
 
   for (const mod of result.modules) {
-    if (mod.skipped) continue;
+    if (mod.skipped || result.nothingToAssess) continue;
     for (const issue of mod.issues) {
       if (mod.grade === "F" || mod.grade.startsWith("D")) {
         lines.push(`::error title=AMC ${mod.name}::${issue}`);
@@ -157,6 +166,8 @@ export function renderCIAnnotations(result: UnifiedRunResult): string {
     lines.push(`::error title=AMC Failed Surfaces::${result.surfaceCoverage.failed.join(", ")}`);
   }
   lines.push(`::notice title=AMC Surface Coverage::${result.surfaceCoverage.evaluated}/${result.surfaceCoverage.total} evaluated; ${result.surfaceCoverage.pending.length} pending`);
-  lines.push(`::notice title=AMC Overall Grade::${result.overallGrade} (${result.overallScore}/100)`);
+  lines.push(result.nothingToAssess
+    ? "::notice title=AMC Overall Grade::none yet (AMC has not seen this agent do anything, so there is nothing to grade)"
+    : `::notice title=AMC Overall Grade::${result.overallGrade} (${result.overallScore}/100)`);
   return lines.join("\n");
 }
