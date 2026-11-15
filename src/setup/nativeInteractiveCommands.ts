@@ -3,6 +3,10 @@ import { fuzzyMatch } from "../repl/replParser.js";
 /** Shared command names for help, terminal completion and extension reservation. */
 export const NATIVE_INTERACTIVE_COMMANDS = [
   { name: "help", description: "Show session scope and available commands." },
+  { name: "status", description: "Show the session, settings, workspace limits, usage and how to resume." },
+  { name: "cost", description: "Show tokens used and the estimated cost of this session." },
+  { name: "model", description: "Show the model; /model <name> uses another model from the next task." },
+  { name: "clear", description: "Clear the screen and start a new conversation; the current session is kept." },
   { name: "inspect", description: "Inspect the current recorded session." },
   { name: "verify", description: "Check the current session's evidence." },
   { name: "compact", description: "Review and summarize a recorded event range." },

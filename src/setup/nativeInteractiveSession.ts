@@ -38,6 +38,11 @@ import { checkToolsetReadiness } from "../agent/agentToolset.js";
 import { actionPolicyState, executeOnApprovalClasses } from "../tools/guards/actionPolicyGuard.js";
 import { lookupModelPrice } from "../product/modelPricing.js";
 import { resolveChatSetup } from "./nativeChatSetup.js";
+import chalk from "chalk";
+import { createChatDisplay } from "./nativeChatDisplay.js";
+import { renderExitSummary, renderTurnFooter, renderStatusLines, renderCostLines } from "./nativeChatSummary.js";
+import { attachMentionedFiles, loadChatSettings, saveChatSettings, withChatSettings, type ChatSettings } from "./nativeChatInput.js";
+import { renderMarkdown, wrapLine } from "../utils/terminalMarkdown.js";
 
 export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly validationConfig?: string;
@@ -127,6 +132,13 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
   if (options.session !== undefined && options.forkFrom !== undefined) {
     io.error("Choose --session or --fork-from, not both."); io.fail(); return;
   }
+  // A resumed session's saved settings fill in every flag the person did not pass (nativeChatInput.ts).
+  const saved = options.session === undefined ? null : loadChatSettings(resolve(options.workspace), options.session);
+  if (saved !== null) options = withChatSettings(options, saved);
+  const chatDisplay = createChatDisplay({ write: text => { process.stdout.write(text); }, writeError: text => { process.stderr.write(text); },
+    columns: () => process.stdout.columns ?? null, spinner: process.env.TERM !== "dumb" });
+  const plainIo = io;
+  io = { ...io, log: line => { chatDisplay.clear(); plainIo.log(line); }, error: line => { chatDisplay.clear(); plainIo.error(line); } };
   const trust = admitWorkspaceTrust(io, options, options.workspace);
   if (trust === undefined) return;
   let profile: ReturnType<typeof resolveNativeChatProfile>;
@@ -185,6 +197,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       };
       const aborted = () => finish(null);
       pendingAnswer = finish;
+      chatDisplay.clear();
       signal?.addEventListener("abort", aborted, { once: true });
       try { terminal.question(prompt, { signal: controller.signal }, finish); }
       catch { finish(null); }
@@ -216,13 +229,15 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     let stdout = "";
     let truncated = false;
     let cancelRequested = false;
-    let previewOpen = false;
     const interactiveApprovals = display.interactiveApprovals === true;
+    const stream = display.stream === true;
     const ipc = interactiveApprovals || display.askUser === true;
     let running: ChildProcess;
     try {
       // Consent is recorded at chat admission. Later turns must never approve a changed workspace themselves.
-      const env: NodeJS.ProcessEnv = { ...process.env, ...(vaultPassphrase === null ? {} : { AMC_VAULT_PASSPHRASE: vaultPassphrase }) };
+      // The piped child follows this terminal's colour decision (chalk honours NO_COLOR, --no-color, TERM=dumb).
+      const env: NodeJS.ProcessEnv = { ...process.env, ...(vaultPassphrase === null ? {} : { AMC_VAULT_PASSPHRASE: vaultPassphrase }),
+        ...(chalk.level > 0 ? { FORCE_COLOR: String(chalk.level) } : {}) };
       if (args[0] === "agent-loop" && args[1] === "run") delete env[TRUST_WORKSPACE_ENV];
       running = spawn(process.execPath, [...process.execArgv, resolve(entry), ...(selectedAgentId === null ? [] : ["--agent", selectedAgentId]), ...args], {
         cwd, env, shell: false,
@@ -266,7 +281,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     });
     running.stderr!.on("data", (text: string) => {
       if (text.includes(VAULT_LOCKED_PREFIX)) vaultLocked = true;
-      if (display.stream) { process.stderr.write(text); previewOpen = !text.endsWith("\n"); }
+      if (stream) chatDisplay.child(text);
       else io.error(text.trimEnd());
     });
     running.once("error", () => { io.error("Could not start the AMC command."); });
@@ -279,7 +294,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         try { await approvals?.close(); }
         catch { io.error("Native approval cleanup did not complete cleanly; inspect the recorded request before continuing."); finalCode = 1; }
         finally {
-          if (previewOpen) process.stderr.write("\n");
+          if (stream) chatDisplay.end();
           if (child === running) child = null;
           if (cancelActiveCommand === requestCancel) cancelActiveCommand = null;
           resolveResult({ code: finalCode, stdout, truncated, cancelRequested, vaultLocked });
@@ -306,7 +321,8 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     if (!["none", "echo", "workspace"].includes(tools)) {
       io.error("Choose --tools none, echo, or workspace."); io.fail(); return;
     }
-    const maxTokens = options.maxTokens ?? defaults.maxTokens;
+    let maxTokens = options.maxTokens ?? defaults.maxTokens;
+    let model = guide.model!;
     const defaultedMode = chatApprovalMode(options, defaults);
     if (defaultedMode !== undefined) options = { ...options, approvalMode: defaultedMode };
     const maxSteps = options.maxSteps ?? (provider === "stub" ? "2" : "8");
@@ -372,7 +388,9 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     const credentialFile = guide.nextAction.argv[guide.nextAction.argv.indexOf("--credentials-file") + 1]!;
     // The file pin preserves credential lookup, not the independently selected
     // shared skill root. Keep both on every child and on the printed resume.
-    const routeBaseArgs = ["--agent", guide.agentId, "--provider", provider!, ...(guide.baseUrl === null ? [] : ["--base-url", guide.baseUrl]), "--model", guide.model!,
+    const validationArgs = validation === undefined ? [] : ["--validation-config", resolve(options.validationConfig!), "--validation-config-sha256", validation.configSha256,
+      ...validation.checks.flatMap(check => ["--validate", check.id]), ...(validation.repair === undefined ? [] : ["--validation-repair", JSON.stringify(validation.repair)])];
+    const routeBaseArgs = () => ["--agent", guide.agentId, "--provider", provider!, ...(guide.baseUrl === null ? [] : ["--base-url", guide.baseUrl]), "--model", model,
       ...(options.credentialsHome === undefined ? [] : ["--credentials-home", options.credentialsHome]), "--credentials-file", credentialFile,
       ...(guide.credential === null ? [] : ["--credential", guide.credential.ref]),
       "--tools", tools, "--max-steps", maxSteps, "--max-tokens", maxTokens, ...(options.unsafeUnconfinedShell === true ? ["--unsafe-unconfined-shell"] : []),
@@ -385,37 +403,51 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       ...(options.compactThreshold === undefined ? [] : ["--compact-threshold", options.compactThreshold]),
       ...(options.autoSummary === false ? ["--no-auto-summary"] : []), ...(options.autoCompact === false ? ["--no-auto-compact"] : []),
       ...(approvalClass === undefined ? [] : ["--approve-tools", approvalClass, "--approve-risk", approvalRisk]),
-      ...(approvalMode === undefined || !approvalMode.ok ? [] : ["--approval-mode", approvalMode.mode]), ...mcpArgs,
-      ...(validation === undefined ? [] : ["--validation-config", resolve(options.validationConfig!), "--validation-config-sha256", validation.configSha256,
-        ...validation.checks.flatMap(check => ["--validate", check.id]),
-        ...(validation.repair === undefined ? [] : ["--validation-repair", JSON.stringify(validation.repair)])])];
-    const routeArgs = [...routeBaseArgs, ...nativeChatProfileArgv(profile)];
+      ...(approvalMode === undefined || !approvalMode.ok ? [] : ["--approval-mode", approvalMode.mode]), ...mcpArgs, ...validationArgs];
+    const routeArgs = () => [...routeBaseArgs(), ...nativeChatProfileArgv(profile)];
     const chatProfileArgs = [...(options.trustWorkspace === true ? ["--trust-workspace"] : []), ...nativeChatProfileArgv(profile, "chat")];
+    // What `--session`/`--continue` restores from the saved settings (nativeChatInput.ts); the rest stays on the resume line.
+    // The stand-in model takes no --model, --base-url or --credential (its guide refuses them).
+    const chatSettings = (): ChatSettings => Object.fromEntries(Object.entries({ provider, ...(provider === "stub" ? {} : { model, baseUrl: guide.baseUrl ?? undefined,
+      credential: guide.credential?.ref }), credentialsFile: credentialFile, credentialsHome: options.credentialsHome, tools, maxSteps, maxTokens,
+      approveTools: approvalClass, approveRisk: approvalClass === undefined ? undefined : approvalRisk, approvalMode: approvalMode?.ok ? approvalMode.mode : undefined,
+      thinking: options.thinking, reasoningEffort: options.reasoningEffort, thinkingBudget: options.thinkingBudget, cacheRetention: options.cacheRetention,
+      maxRetries: options.maxRetries, retryMaxDelay: options.retryMaxDelay, retryMaxProviderDelay: options.retryMaxProviderDelay,
+      contextWindow: options.contextWindow, compactThreshold: options.compactThreshold,
+      autoSummary: options.autoSummary === false ? false : undefined, autoCompact: options.autoCompact === false ? false : undefined
+    }).filter(([, value]) => value !== undefined)) as ChatSettings;
+    const resumeCommand = (id: string, full = false) => renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "chat",
+      ...(full ? routeBaseArgs() : ["--agent", guide.agentId, ...(options.unsafeUnconfinedShell === true ? ["--unsafe-unconfined-shell"] : []),
+        ...(options.webSearchSearxng === undefined ? [] : ["--web-search-searxng", options.webSearchSearxng]), ...mcpArgs, ...validationArgs]),
+      ...chatProfileArgs, ...nativeExtensionRunArgv(extensions), "--session", id] });
+    const say = (line: string) => { for (const part of wrapLine(line, process.stdout.columns ?? null)) io.log(part); };
     const showScope = () => {
-      io.log(`Native chat · agent ${guide.agentId} · provider ${provider} · model ${guide.model}`);
-      if (guide.baseUrl !== null) io.log(`Provider origin: ${guide.baseUrl}`);
-      if (guide.credential !== null) io.log(`Credential reference: ${guide.credential.ref}; local source ${guide.credential.source ?? "unavailable"}. This setup snapshot is not remote authentication proof.`);
-      if (profile.presetId !== null) io.log(`Signed native preset: ${profile.presetId}; changes require a new reviewed chat.`);
-      if (options.delegate) io.log("Native in-process delegation enabled under the signed tool grant, configured scope and depth bound.");
-      io.log(provider === "stub" ? "Local demonstration: canned replies, no real model answer." : "Real provider: requests may incur charges; local setup does not prove authentication or model access.");
-      io.log(tools === "workspace"
+      say(`Native chat · agent ${guide.agentId} · provider ${provider} · model ${model}`);
+      if (guide.baseUrl !== null) say(`Provider origin: ${guide.baseUrl}`);
+      if (guide.credential !== null) say(`Credential reference: ${guide.credential.ref}; local source ${guide.credential.source ?? "unavailable"}. This setup snapshot is not remote authentication proof.`);
+      if (profile.presetId !== null) say(`Signed native preset: ${profile.presetId}; changes require a new reviewed chat.`);
+      if (options.delegate) say("Native in-process delegation enabled under the signed tool grant, configured scope and depth bound.");
+      say(provider === "stub" ? "Local demonstration: canned replies, no real model answer." : "Real provider: requests may incur charges; local setup does not prove authentication or model access.");
+      say(tools === "workspace"
         ? `Workspace tools on${options.tools === undefined ? " (this workspace is set up for them; --tools none turns them off)" : ""}. The signed allowlist and Action Policy still decide what runs; ${gateActive ? "an approval gate is active." : "no approval gate is active, so a call the Action Policy allows runs without asking anyone."}`
         : tools === "echo" ? "Echo demonstration tool only; no workspace editing tool is offered."
           : "No tools offered; model replies cannot edit workspace files through this session.");
       const asks = "Before a gated call runs, this terminal shows what it would do and asks you; where the approval policy lets one person decide, you type y or n and press Enter, otherwise a signed-in reviewer decides.";
-      if (approvalMode !== undefined && approvalMode.ok) io.log(`Approval mode: ${approvalMode.mode}${modeGated ? `. ${asks}` : " (nothing executes: every call outside READ_ONLY is simulated)."}`);
-      if (approvalClass !== undefined) io.log(`Tool approval gate: ${approvalClass}, risk ${approvalRisk}. ${asks}`);
-      if (mcpArgs.length > 0) io.log("MCP tools use each reviewed catalog and pinned config. Each turn starts and disposes its own configured servers; a changed catalog or config refuses the run. /mcp shows each mount.");
-      if (extensions.list().length > 0) io.log(`Signed native extensions: ${extensions.list().map(item => item.id).join(", ")}. /extensions lists their commands and reviewed digests.`);
-      if (validation) io.log(`Public task checks: ${validation.checks.map(check => check.title).join(", ")}. Existing shell permissions and approvals still apply.`);
-      io.log(`Every turn writes AMC session evidence. Limit: ${maxSteps} model steps per turn, ${maxTokens} output tokens per request.`);
-      io.log(`Session: ${sessionId ?? "created on first task"}${forkFrom === null ? "" : `; next task forks ${forkFrom}`}`);
+      if (approvalMode !== undefined && approvalMode.ok) say(`Approval mode: ${approvalMode.mode}${modeGated ? `. ${asks}` : " (nothing executes: every call outside READ_ONLY is simulated)."}`);
+      if (approvalClass !== undefined) say(`Tool approval gate: ${approvalClass}, risk ${approvalRisk}. ${asks}`);
+      if (mcpArgs.length > 0) say("MCP tools use each reviewed catalog and pinned config. Each turn starts and disposes its own configured servers; a changed catalog or config refuses the run. /mcp shows each mount.");
+      if (extensions.list().length > 0) say(`Signed native extensions: ${extensions.list().map(item => item.id).join(", ")}. /extensions lists their commands and reviewed digests.`);
+      if (validation) say(`Public task checks: ${validation.checks.map(check => check.title).join(", ")}. Existing shell permissions and approvals still apply.`);
+      say(`Every turn writes AMC session evidence. Limit: ${maxSteps} model steps per turn, ${maxTokens} output tokens per request.`);
+      say(`Session: ${sessionId ?? "created on first task"}${forkFrom === null ? "" : `; next task forks ${forkFrom}`}`);
     };
     showScope();
     if (forkFrom !== null) io.log("The fork copies the verified parent conversation into a new signed session; unsupported history refuses before creating a child.");
-    io.log(process.env.TERM === "dumb"
+    say(process.env.TERM === "dumb"
       ? "Type a task. /help lists commands. Ctrl-C requests cancellation during a command or exits at the prompt."
       : "Type a task. /help lists commands; Tab completes them. Up/Down recalls input in this terminal only. Ctrl-C requests cancellation during a command or exits at the prompt.");
+    say("Write @path to attach a file from this folder. Replies stream as they arrive; the line under each reply says whether it was recorded.");
+    if (saved !== null) say(`Resuming session ${sessionId} with the settings it was started with.`);
     if (options.session !== undefined) io.log("The first reply also displays prior recorded assistant text from the resumed session.");
     const handleBuiltin = async (text: string): Promise<boolean> => {
       if (text === "/exit") return true;
@@ -429,6 +461,41 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         return false;
       }
       if (text === "/mcp") { for (const line of mcpView.render()) io.log(line); return false; }
+      if (text === "/cost") { for (const line of renderCostLines(previousSummary)) say(line); return false; }
+      if (text === "/status") {
+        const scope: string[] = [];
+        const toolset = tools === "workspace" ? checkToolsetReadiness(cwd) : null;
+        const shell = toolset === null ? null : `Shell: ${toolset.shell.offered ? `offered, ${toolset.shell.boundary ?? "UNCONFINED"}` : "not offered"}${toolset.shell.reason ? ` (${toolset.shell.reason})` : ""}. File tools: limited by policy; process confinement: ${toolset.sandboxReason ?? "unknown"}.`;
+        const capture = { ...io, log: (line: string) => { scope.push(line); } };
+        const keep = io; io = capture; try { showScope(); } finally { io = keep; }
+        const known = sessionId ?? forkFrom;
+        // Commands stay on one line so they can be copied; the prose wraps.
+        for (const line of renderStatusLines({ scope, notes: chatDisplay.notes(), shell, summary: previousSummary,
+          resume: sessionId === null ? null : resumeCommand(sessionId, true), verify: known === null ? null : renderNativeVerifyHint(cwd, known) })) {
+          if (/^(Resume in this workspace|Check the record):/.test(line)) io.log(line); else say(line);
+        }
+        return false;
+      }
+      if (text === "/model" || text.startsWith("/model ")) {
+        const next = text.slice("/model".length).trim();
+        if (provider === "stub") { say(`Model: ${provider}/${model}, the stand-in model. It has no other models; start chat with a real provider to choose one.`); return false; }
+        if (next === "") { say(`Model: ${provider}/${model}. To use another model of this provider from the next task: /model <name>.`); return false; }
+        try { nativeRouteFor(provider!, { ...options, ...(guide.baseUrl === null ? {} : { baseUrl: guide.baseUrl }) }, next); }
+        catch (error) { io.error(escapeTerminalControls(error instanceof Error ? error.message : "That model cannot be used with this provider.")); return false; }
+        model = next;
+        if (options.maxTokens === undefined) maxTokens = chatDefaults(cwd, provider!, next).maxTokens;
+        // A session keeps the model it was started with, so the conversation continues in a new session (a fork).
+        if (sessionId !== null && forkFrom === null) forkFrom = sessionId;
+        say(`Model set to ${escapeTerminalControls(next)}.${forkFrom === null ? "" : ` Your next task continues this conversation in a new session that uses it; session ${forkFrom} is kept as it is.`}`);
+        return false;
+      }
+      if (text === "/clear") {
+        if (process.stdout.isTTY && process.env.TERM !== "dumb") process.stdout.write("\x1b[2J\x1b[3J\x1b[H");
+        const earlier = sessionId;
+        sessionId = null; forkFrom = null; previousSummary = null; selectedHistory = null;
+        say(`Cleared. Your next task starts a new conversation.${earlier === null ? "" : ` The earlier session is kept: ${earlier} (resume it with /resume).`}`);
+        return false;
+      }
       if (text === "/sessions" || text === "/resume") {
         try {
           const rows = listNativeInteractiveSessions(cwd, guide.agentId);
@@ -578,13 +645,18 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       }
       const name = /^\/([^ \t]+)/.exec(text)?.[1];
       if (NATIVE_INTERACTIVE_COMMANDS.some(command => command.name === name)) {
-        if (text !== `/${name}` && text !== "/fork cancel") { io.error(`/${name} prompts for its inputs; use /help.`); continue; }
+        if (text !== `/${name}` && text !== "/fork cancel" && name !== "model") { io.error(`/${name} prompts for its inputs; use /help.`); continue; }
         try {
           if (await runNativeInteractiveCommand({ workspace: cwd, command: name!, sessionId }, () => handleBuiltin(text))) break;
         } catch (error) { io.error(escapeTerminalControls(error instanceof Error ? error.message : "Native command refused.")); io.fail(); }
         continue;
       }
       let prompt = entered;
+      if (!text.startsWith("/")) {
+        const attached = attachMentionedFiles(cwd, entered);
+        for (const note of attached.notes) say(note);
+        prompt = attached.prompt;
+      }
       try {
         assertNativeChatProfileCurrent(profile);
         const extensionTurn = extensions.prepareTurn();
@@ -609,11 +681,12 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         try { assertNativeInteractiveSelection(cwd, guide.agentId, selectedHistory); }
         catch (error) { io.error(escapeTerminalControls(error instanceof Error ? error.message : "Session selection changed; use /resume again.")); continue; }
       }
-      io.log(`Running ${provider}/${guide.model}; Ctrl-C requests cancellation.`);
-      io.log("Live output is provisional until the recorded reply below; a preview is not proof of completion.");
+      chatDisplay.beginTurn();
+      if (process.env.TERM === "dumb") io.log(`Working (${provider}/${model}); Ctrl-C cancels.`);
+      else chatDisplay.busy(`Working · ${provider}/${model}`);
       const priorSession = sessionId;
       const pendingFork = forkFrom;
-      const outcome = await execute(["agent-loop", "run", ...routeArgs, ...nativeExtensionRunArgv(extensions),
+      const outcome = await execute(["agent-loop", "run", ...routeArgs(), ...nativeExtensionRunArgv(extensions),
         ...(approvalClass === undefined && !modeGated ? [] : ["--interactive-approvals"]), ...(tools === "workspace" ? ["--interactive-ask-user"] : []),
         "--keep-open", "--json", "--stream",
         ...(forkFrom !== null ? ["--fork-from", forkFrom] : sessionId === null ? [] : ["--session", sessionId]), "--", "-"],
@@ -632,16 +705,26 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       sessionId = summary.sessionId;
       selectedHistory = null;
       forkFrom = null;
+      saveChatSettings(cwd, sessionId, chatSettings());
       for (const line of renderNativeInteractiveToolResults(cwd, sessionId)) io.log(line);
-      io.log("Recorded reply:");
-      for (const block of summary.assistantText.slice(previous?.assistantText.length ?? 0)) io.log(escapeTerminalControls(block));
+      // The live text already shown is the reply when it matches the recorded one; otherwise the recorded reply is shown.
+      const fresh = summary.assistantText.slice(previous?.assistantText.length ?? 0);
+      const flat = (value: string) => value.replace(/\s+/g, " ").trim();
+      const live = flat(chatDisplay.liveText());
+      // A resumed session's first summary also carries its earlier replies, ahead of what streamed now.
+      const split = live === "" ? -1 : fresh.findIndex((_, at) => flat(fresh.slice(at).join(" ")) === live);
+      const shownLive = split >= 0;
+      // Earlier replies of a session this chat already showed (a /model fork) are not repeated.
+      const unshown = shownLive ? (pendingFork !== null && previousSummary !== null ? [] : fresh.slice(0, split)) : fresh;
+      if (unshown.length > 0) {
+        io.log(shownLive ? "Earlier replies in this session:" : live === "" ? "Recorded reply:" : "Recorded reply (it differs from the live text above, which was only a preview):");
+        for (const block of unshown) for (const line of renderMarkdown(block, process.stdout.columns ?? null)) io.log(line);
+      }
       previousSummary = summary;
       const ending = freshEndings.at(-1);
-      io.log(`Session ${sessionId} · driver ${summary.driverStatus}${ending?.reason ? ` · recorded turn ending ${ending.reason}` : ""}. This summary is not an evidence-verification result.`);
-      // An ordinary finished turn shows the reply and one line; the usage, diagnostics and validation blocks print for a
-      // turn that did not finish cleanly, and once for the whole session on exit.
-      if (outcome.code === 0 && ending?.reason === "complete" && summary.driverStatus !== "failed") io.log("Usage, cost and diagnostics for this session print when you exit.");
-      else for (const line of sessionDetailLines(summary)) io.log(line);
+      io.log(renderTurnFooter({ recorded: shownLive || fresh.length > 0, turn: ending?.turn, ending: ending?.reason, usage: summary.usage, context: chatDisplay.context() }));
+      // The usage, diagnostics and validation blocks print for a turn that did not finish cleanly; otherwise /status has them.
+      if (!(outcome.code === 0 && ending?.reason === "complete" && summary.driverStatus !== "failed")) for (const line of sessionDetailLines(summary)) io.log(line);
       if (tools === "workspace") for (const line of renderSessionLists(cwd, sessionId)) io.log(line);
       // Exit codes 3-6 (cancelled, bounded, blocked, side effects unsettled; src/cli/agentLoopOutputOptions.ts) are
       // recorded outcomes, not failed turns. 3-5 show in the recorded ending below; 6 is a `complete` ending whose
@@ -661,14 +744,13 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     if (forkFrom !== null) {
       if (unresolvedOutcome) io.error("The attempted fork has no admitted child result. Do not repeat it blindly; inspect the parent's recorded lineage before choosing a continuation.");
       else {
-        io.log("The fork remains queued, not created. To continue that selection in this workspace:\n  " + renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "chat", ...routeBaseArgs, ...chatProfileArgs, ...nativeExtensionRunArgv(extensions), "--fork-from", forkFrom] }));
+        io.log("The fork remains queued, not created. To continue that selection in this workspace:\n  " + renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "chat", ...routeBaseArgs(), ...chatProfileArgs, ...nativeExtensionRunArgv(extensions), "--fork-from", forkFrom] }));
       }
     }
     if (sessionId !== null) {
-      if (previousSummary !== null) for (const line of sessionDetailLines(previousSummary)) io.log(line);
-      io.log(`Known session reference: ${sessionId}. A resume attempt will verify the evidence before acquiring its writer.`);
-      io.log("Resume in this workspace:\n  " + renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "chat", ...routeBaseArgs, ...chatProfileArgs, ...nativeExtensionRunArgv(extensions), "--session", sessionId] }));
-      io.log("Verify recorded evidence:\n  " + renderNativeVerifyHint(cwd, sessionId));
+      // A resume with no saved settings (an older session) needs every flag.
+      const resume = resumeCommand(sessionId, loadChatSettings(cwd, sessionId) === null);
+      for (const line of renderExitSummary({ sessionId, summary: previousSummary, resume, verify: renderNativeVerifyHint(cwd, sessionId) })) io.log(line);
     }
   } finally {
     extensions.unloadAll();

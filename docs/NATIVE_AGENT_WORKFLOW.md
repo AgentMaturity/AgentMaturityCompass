@@ -63,11 +63,17 @@ amc agent-loop run "Check the recording path." --provider stub --max-steps 2
 
 The stub output demonstrates orchestration and evidence recording, not model capability. For a real single-turn command, use the concrete `agent-loop run` action produced by `guide` after you select a real provider/model and configure its credential. Human output includes a verification next step; `--json` retains the structured run summary.
 
-Chat runs each turn through the existing governed `agent-loop run` path with `--keep-open`. It requires a terminal and does not implement an alternate runner. Live text is labeled provisional until the model request settles into recorded evidence; interrupted or truncated previews are not a completion verdict. For scripted turns, add `--stream` to `agent-loop run`: previews go to stderr, while `--json` keeps the final structured result on stdout.
+Chat runs each turn through the existing governed `agent-loop run` path with `--keep-open`. It requires a terminal and does not implement an alternate runner. While a turn runs, a spinner shows what it is waiting for; the reply streams as it arrives, with Markdown headings, lists and code blocks laid out and long lines wrapped to the terminal width. Colour follows `NO_COLOR`, `--no-color` and `TERM=dumb`. The line under each reply says whether the reply was recorded, how the turn ended, the tokens used so far and, as estimates, the cost and how full the model's context is. If the recorded reply differs from the streamed text, chat prints the recorded reply; an interrupted or cut-short stream is not a completion verdict. Each tool call is one line: what it called, on what, and its result or why it failed, was denied or was only simulated. For scripted turns, add `--stream` to `agent-loop run`: previews go to stderr, while `--json` keeps the final structured result on stdout.
+
+Write `@path` in a task to attach a text file from this folder (up to 100 KB a file); environment, key and credential files, `.amc`, `.git` and `node_modules` are refused. On leaving, chat prints at most six lines: the session, its usage, a resume command and a verify command. `amc agent-loop chat --continue` (or `--session SESSION_ID`) resumes with the settings the session was started with; any flag you pass overrides a saved one, and resume still refuses a session whose recorded settings differ.
 
 | In chat | Behavior |
 |---|---|
-| `/inspect` | Shows the current recorded conversation and event structure. It is not a verification verdict. |
+| `/status` | Shows the session, its settings, the workspace's limits (write scope, policy, shell sandbox), full usage and diagnostics, and the full resume command. |
+| `/cost` | Shows tokens used and the estimated cost of this session. Estimates come from AMC's price list; your provider's bill is what counts. |
+| `/model` | Shows the model. `/model NAME` uses another model of the same provider from the next task, which continues the conversation in a new session (a fork); the stand-in model has no other models. |
+| `/clear` | Clears the screen and starts a new conversation with the next task. The earlier session is kept and can be resumed. |
+| `/inspect` | Shows the current session's transcript (what the model saw), usage and diagnostics. It is not a verification verdict. |
 | `/verify` | Runs the native evidence verifier for the selected session. |
 | `/compact` | Lists current context origins, then asks for a reviewed range, your UTF-8 summary file and a reason. Records compaction while retaining raw evidence. |
 | `/extensions` | Lists loaded native extensions, their command names and reviewed digests. |
@@ -76,7 +82,7 @@ Chat runs each turn through the existing governed `agent-loop run` path with `--
 | `/exit` | Leaves chat; a successfully released, unsealed session can be resumed later. |
 | Ctrl-C | Requests cancellation of the active command, or exits at the input prompt. Read the resulting status; cancellation is not successful task completion. |
 
-These built-in slash commands prompt for any needed inputs. Loaded extension commands accept text arguments. Outside chat, use the actual session ID printed by the run with `amc session show SESSION_ID` or `amc agent-loop verify SESSION_ID --expect-monitor <monitor sha256>` (the sha256 of `.amc/keys/monitor_ed25519.pub`, recorded outside the workspace; without it the verdict is UNANCHORED and the command exits 1). The `session` group is an explicit operator inspection/recovery surface and may be hidden from top-level help.
+These built-in slash commands prompt for any needed inputs; only `/model` takes a word after it. Loaded extension commands accept text arguments. Outside chat, use the actual session ID printed by the run with `amc session show SESSION_ID` (a readable transcript while the vault is unlocked; `--spine` also lists every recorded event) or `amc agent-loop verify SESSION_ID --expect-monitor <monitor sha256>` (the sha256 of `.amc/keys/monitor_ed25519.pub`, recorded outside the workspace; without it the verdict is UNANCHORED and the command exits 1). The `session` group is an explicit operator inspection/recovery surface and may be hidden from top-level help.
 
 ## Handoff, verification and limits
 
