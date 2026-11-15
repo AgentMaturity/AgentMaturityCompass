@@ -290,24 +290,19 @@ export function projectBudgetUsage(rows: readonly EvidenceEvent[], agentId: stri
   // The gateway records a request whose upstream connection never opened (nothing listening, no such host).
   const gatewayNeverSent = new Set(rows.filter(row => row.event_type === "gateway").map(row => ({ row, meta: budgetMeta(row) }))
     .filter(({ meta }) => meta.stage === "request_error" && typeof meta.connectFailed === "string").map(({ row, meta }) => `${row.session_id}:${String(meta.request_id)}`));
-  // The gateway records each request's upper estimate (`tokenCeiling`, from its output limit); a request that got no
-  // answer, or an answer without usage, counts at that estimate instead of blocking, as a native reservation does.
-  const gatewayCeilings = new Map(rows.filter(row => row.event_type === "llm_request").map(row => {
-    const meta = budgetMeta(row); return [`${row.session_id}:${String(meta.request_id ?? meta.requestId ?? row.id)}` as string, number(meta.tokenCeiling)] as const;
-  }));
+  // A gateway request carries the client's own body, so no estimate is taken from it: an unanswered one, or one
+  // answered without usage, blocks (only a native reservation, whose body AMC wrote, counts at an estimate).
   for (const row of rows) {
     if (row.ts > now || owner(row) !== agentId) continue;
     const meta = budgetMeta(row);
     const requestKey = `${row.session_id}:${String(meta.request_id ?? meta.requestId ?? row.id)}`;
-    const ceiling = gatewayCeilings.get(requestKey) ?? null;
     const unanswered = row.event_type === "llm_request" && !legacyResponses.has(requestKey) && !gatewayNeverSent.has(requestKey);
     if (unanswered) result.daily.llmUnreservedCostRequests++;
     if (row.event_type === "llm_request") for (const part of periods(row.ts)) {
       part.llmRequests++;
       if (unanswered) {
         part.unknownLlmTokenRequests++; part.unknownLlmCostRequests++;
-        if (ceiling !== null) part.llmTokens += ceiling;
-        else if (!accepted(row.ts)) part.blockingUnknownLlmTokenRequests++;
+        if (!accepted(row.ts)) part.blockingUnknownLlmTokenRequests++;
       }
     }
     if (row.event_type === "llm_response") {
@@ -316,12 +311,11 @@ export function projectBudgetUsage(rows: readonly EvidenceEvent[], agentId: stri
       const costComplete = measured.costKnown && provenance?.reported !== false && provenance?.complete !== false;
       if (row.ts >= dayStart) budgetCostUnits += nativeUsdUnits(measured.cost);
       if (!costComplete) result.daily.llmUnreservedCostRequests++;
-      const bounded = !measured.tokensKnown && ceiling !== null;
       for (const part of periods(row.ts)) {
-        part.llmTokens += bounded ? Math.max(measured.tokens, ceiling) : measured.tokens; part.llmCostUsd += measured.cost;
+        part.llmTokens += measured.tokens; part.llmCostUsd += measured.cost;
         if (!measured.tokensKnown) {
           part.unknownLlmTokenRequests++;
-          if (!bounded && !refusedStatus(meta.statusCode) && !accepted(row.ts)) part.blockingUnknownLlmTokenRequests++;
+          if (!refusedStatus(meta.statusCode) && !accepted(row.ts)) part.blockingUnknownLlmTokenRequests++;
         }
         if (!costComplete) part.unknownLlmCostRequests++;
       }

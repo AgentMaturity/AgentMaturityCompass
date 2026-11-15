@@ -36,7 +36,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { readRevokedLeaseIds } from "../leases/leaseStore.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
-import { evaluateBudgetStatus, requestTokenCeiling } from "../budgets/budgets.js";
+import { evaluateBudgetStatus } from "../budgets/budgets.js";
 import { CircuitOpenError, TimeoutError, withCircuitBreaker } from "../ops/circuitBreaker.js";
 import { checkUpstreamEgress, pinnedLookup, prepareFieldGuard, requestFieldRefusal, type FieldGuard } from "./requestFieldGuard.js";
 import { checkEgress, EgressBlocked } from "../residency/checkEgress.js";
@@ -1380,7 +1380,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         ...(leaseVerification.payload?.claimKind === "synthetic_example"
           ? { claimKind: "synthetic_example", trustTier: "SELF_REPORTED" }
           : { trustTier: "OBSERVED" }),
-        bodySha256: sha256Hex(requestBodyRedaction.redactedBytes), tokenCeiling: requestTokenCeiling(requestBody) // counted if no answer comes
+        bodySha256: sha256Hex(requestBodyRedaction.redactedBytes), tokenCeiling: null // a client's body cannot bound what the provider bills
       };
       if (requestBodyRedaction.originalPayloadSha256) {
         llmRequestMeta.originalPayloadSha256 = requestBodyRedaction.originalPayloadSha256;

@@ -176,8 +176,8 @@ describe("gateway error bodies", () => {
       const failure = metas.find((meta) => meta.stage === "request_error");
       expect(failure).toBeDefined();
       expect(failure).not.toHaveProperty("connectFailed");
-      // The request's upper estimate (its 17 bytes + the 4096 wrapping allowance + max_tokens 50), counted when no usage comes back.
-      expect(metas.find((meta) => meta.bodySha256 !== undefined && "tokenCeiling" in meta)).toMatchObject({ tokenCeiling: 17 + 4096 + 50 });
+      // The client wrote this body, so its max_tokens is not taken as a bound: no estimate is recorded.
+      expect(metas.find((meta) => meta.bodySha256 !== undefined && "tokenCeiling" in meta)).toMatchObject({ tokenCeiling: null });
     } finally {
       ledger.close();
     }
