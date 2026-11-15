@@ -18,8 +18,8 @@ const CYAN = chalk.cyan;
 export function renderBanner(ctx: ReplContext): string {
   const lines: string[] = [];
   lines.push("");
-  lines.push(`  ${BOLD("🧭 AMC")} ${DIM("— Agent Maturity Compass")}`);
-  lines.push(`  ${DIM("The credit score for AI agents")}`);
+  lines.push(`  ${BOLD("amc")}${ACCENT("_")} ${DIM("Agent Maturity Compass")}`);
+  lines.push(`  ${DIM("Evidence over claims.")}`);
   lines.push("");
 
   // Agent status line
