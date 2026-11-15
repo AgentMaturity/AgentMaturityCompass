@@ -208,7 +208,7 @@ amc guide --compliance EU_AI_ACT
 <span style="color:#6a9955"># Map remaining gaps to specific regulatory obligations</span>
 amc guide --go</code></pre>
 
-<p>AMC generates concrete artifacts: guardrails configuration, CI pipeline gates that prevent regressions below L3, governance documentation, and framework-specific config files. These aren't templates — they're generated from your agent's actual gap analysis.</p>
+<p>AMC generates concrete artifacts: guardrails configuration, CI pipeline gates that prevent regressions below L2, the highest level AMC gives today, governance documentation, and framework-specific config files. These aren't templates — they're generated from your agent's actual gap analysis.</p>
 
 <h3>4. Generate the audit binder</h3>
 
@@ -228,8 +228,8 @@ amc report &lt;assessment-id&gt; --html eu-compliance-report.html</code></pre>
 <pre><code><span style="color:#6a9955"># Continuous compliance monitoring</span>
 amc guide --watch
 
-<span style="color:#6a9955"># CI gate: fail builds that drop below L3</span>
-amc guide --ci --target 3
+<span style="color:#6a9955"># CI gate: fail builds that drop below L2</span>
+amc guide --ci --target 2
 
 <span style="color:#6a9955"># Track what improved since last assessment</span>
 amc guide --diff</code></pre>

@@ -197,7 +197,7 @@ amc</code></pre>
 <p>Don't let regressions ship. AMC can gate your CI pipeline to fail builds if the agent drops below a target level:</p>
 
 <pre><code><span style="color:#6a9955"># In your CI/CD pipeline</span>
-amc guide --ci --target 3    <span style="color:#6a9955"># Fail if below L3</span>
+amc guide --ci --target 2    <span style="color:#6a9955"># Fail if below L2, the highest level today</span>
 
 <span style="color:#6a9955"># Or generate the CI workflow file</span>
 amc fix --target-level L3    <span style="color:#6a9955"># Writes guardrails into your agent config</span></code></pre>

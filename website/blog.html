@@ -242,7 +242,7 @@ amc</code></pre>
       <p><strong>Article 15</strong> → AMC: Shield (threat detection), Enforce (policy guardrails)</p>
     </div>
 
-    <p>Run <code>amc assurance run --pack eu-ai-act</code> for an automated compliance check against all relevant articles.</p>
+    <p>Run <code>amc assurance run --pack euAiActArticle</code> to run AMC's checks for EU AI Act Articles 9, 10, 13, 14, 15 and 17. It does not show that you comply.</p>
 
     <h2>Timeline</h2>
     <ul>
@@ -258,7 +258,7 @@ amc</code></pre>
     <pre><code>git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
 pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link
-amc init && amc assurance run --pack eu-ai-act</code></pre>
+amc init && amc assurance run --pack euAiActArticle</code></pre>
 
     <div class="share">
       <a href="https://twitter.com/intent/tweet?text=EU%20AI%20Act%20Compliance%20Checklist%20for%20AI%20Agents&url=https://agentmaturity.co/blog.html%23eu-ai-act-checklist" target="_blank">Share on X</a>
@@ -308,14 +308,13 @@ amc init && amc assurance run --pack eu-ai-act</code></pre>
 
     <ol>
       <li><strong>Self-reported evidence reaches L1 at most.</strong> Claim whatever you want: above L1 only records AMC observed itself count.</li>
-      <li><strong>Observed evidence scores at 1.0x.</strong> What AMC watches your agent actually do? Full weight.</li>
-      <li><strong>Cryptographic evidence also scores at 1.0x.</strong> Ed25519 signed, Merkle-tree chained, tamper-evident.</li>
+      <li><strong>Only records AMC observed itself can reach L2, the highest level today.</strong> Each record is signed (Ed25519) and chained, so a later change shows up when it is checked.</li>
       <li><strong>Evidence decays.</strong> Old evidence is worth less. You can't coast on a good assessment from 6 months ago.</li>
       <li><strong>Anti-gaming.</strong> Temporal consistency prevents overnight jumps. Cross-reference validation catches inconsistencies.</li>
     </ol>
 
     <div class="highlight">
-      <strong>The result:</strong> AMC scores reflect what agents actually do, not what they claim. An L3 in AMC means something — it's backed by signed execution evidence, not a bullet point in a README.
+      <strong>The result:</strong> AMC scores reflect what agents actually do, not what they claim. An L2 in AMC, the highest level it gives today, rests on records AMC observed and signed, not on a bullet point in a README.
     </div>
 
     <h2>Try It Yourself</h2>

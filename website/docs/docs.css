@@ -287,6 +287,7 @@ code, pre { font-family: var(--mono); }
   word-break: normal;
 }
 .doc-content table {
+  display: block; max-width: 100%; overflow-x: auto;
   width: 100%; border-collapse: collapse; margin: 14px 0;
   font-size: 0.88rem;
 }

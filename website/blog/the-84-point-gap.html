@@ -145,7 +145,7 @@
 
 <h2>Evidence Trust Tiers: Not All Evidence Is Equal</h2>
 
-<p>AMC solves this with a tiered evidence system. Every piece of evidence that contributes to an agent's score carries a trust weight based on <em>how</em> it was collected, not just <em>what</em> it claims:</p>
+<p>AMC solves this with a tiered evidence system. Every piece of evidence that contributes to an agent's score carries the source it came from, which caps how high it can count, based on <em>how</em> it was collected, not just <em>what</em> it claims:</p>
 
 <table>
   <thead>
@@ -161,9 +161,9 @@
 
 <p>The critical insight: <strong>self-reported evidence reaches L1 at most</strong>. It's not rejected outright — that would be unfair to honest agents. But it can never be the basis for a higher level.</p>
 
-<p>An agent that only provides self-reported evidence — perfect documentation, glowing self-assessments, all the right keywords — tops out at roughly 40% of its potential score. To break through that ceiling, it needs <em>observed</em> evidence: real behavior captured by an independent system that the agent can't influence.</p>
+<p>An agent that only provides self-reported evidence — perfect documentation, glowing self-assessments, all the right keywords — stops at L1. To go higher, it needs <em>observed</em> evidence: real behavior captured by an independent system that the agent can't influence.</p>
 
-<p>This is what creates the 84-point gap. An agent that scores 100 on self-reported metrics (keyword-matching) lands at approximately 16 when rescored with AMC's evidence-weighted system, because the other 84 points require observed evidence that simply doesn't exist.</p>
+<p>This is what creates the 84-point gap. An agent that scores 100 on self-reported metrics (keyword-matching) lands at approximately 16 when rescored by AMC, where each record's source caps how high it can count, because the other 84 points require observed evidence that simply doesn't exist.</p>
 
 <h2>How AMC Sits Between Agent and LLM</h2>
 
@@ -204,7 +204,7 @@
   </tbody>
 </table>
 
-<p>Each question can be answered with evidence from any trust tier, but the weight of that evidence determines how much it contributes to the final score. A dimension where all evidence is self-reported will score significantly lower than one with observed evidence — even if the answers are identical.</p>
+<p>Each question can be answered with evidence from any trust tier, but its source caps the level it can support: a self-reported answer counts up to L1 at most. A dimension where all evidence is self-reported will score significantly lower than one with observed evidence — even if the answers are identical.</p>
 
 <h2>The Maturity Scale: L0 Through L5</h2>
 

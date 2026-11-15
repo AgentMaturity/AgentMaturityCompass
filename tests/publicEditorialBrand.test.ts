@@ -102,4 +102,16 @@ describe("AMC public editorial identity", () => {
       expect(html, path).toContain('<footer class="footer">');
     }
   });
+
+  test("posts name a real pack, a reachable CI target and no evidence weights", () => {
+    const text = editorialPages.map(read).join("\n");
+    expect(text).not.toMatch(/--pack eu-ai-act\b/);
+    expect(text).toContain("--pack euAiActArticle");
+    expect(text).not.toMatch(/--target 3\b/);
+    expect(text).not.toMatch(/scores at 1\.0x|trust weight|evidence-weighted|roughly 40%/);
+  });
+
+  test("docs app tables scroll inside the page on a phone", () => {
+    expect(read("website/docs/docs.css")).toMatch(/\.doc-content table \{\s*display: block; max-width: 100%; overflow-x: auto;/);
+  });
 });
