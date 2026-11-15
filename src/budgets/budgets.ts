@@ -274,6 +274,13 @@ export function verifyBudgetsConfigSignature(workspace: string, content?: Buffer
   }
 }
 
+/** Admission parses the exact bytes whose signature it verified. */
+export function loadVerifiedBudgetsConfig(workspace: string): BudgetsConfig {
+  const bytes = readFileSync(budgetsPath(workspace));
+  if (!verifyBudgetsConfigSignature(workspace, bytes).valid) throw new Error("budgets config is not verifiable");
+  return budgetsSchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
+}
+
 /** Tokens a model request can be billed at most: its bytes, an allowance for the provider's own prompt wrapping, its output limit. */
 const PROVIDER_WRAPPING_ALLOWANCE = 4096; // ponytail: fixed allowance; a per-provider figure if one ever proves larger
 
@@ -290,13 +297,6 @@ export function requestTokenCeiling(requestBody: Buffer): number | null {
   const thinking = (nested("generationConfig", "thinkingConfig") as Record<string, unknown> | undefined)?.thinkingBudget;
   // A token is at least one byte for byte-level tokenizers, so the bytes sent bound the input.
   return requestBody.length + PROVIDER_WRAPPING_ALLOWANCE + Math.max(...limits) + (Number.isSafeInteger(thinking) && (thinking as number) > 0 ? thinking as number : 0);
-}
-
-/** Admission parses the exact bytes whose signature it verified. */
-export function loadVerifiedBudgetsConfig(workspace: string): BudgetsConfig {
-  const bytes = readFileSync(budgetsPath(workspace));
-  if (!verifyBudgetsConfigSignature(workspace, bytes).valid) throw new Error("budgets config is not verifiable");
-  return budgetsSchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
 }
 
 export function initBudgets(workspace: string, agentId = "default"): { configPath: string; sigPath: string } {
