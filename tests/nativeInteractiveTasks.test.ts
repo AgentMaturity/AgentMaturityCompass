@@ -135,10 +135,9 @@ describe.skipIf(process.platform === "win32")("WP30 measured native interactive 
       { waitFor: "Approval: approve, deny, or cancel this turn \\(no default\\): ", send: "cancel\r" },
       { waitFor: "you> ", send: "/exit\r" }
     ]);
-    expect(result.output).toContain("Approval mode: default. This terminal asks you to review");
+    expect(result.output).toContain("Approval mode: default. Before a gated call runs, this terminal shows what it would do");
     expect(result.output).not.toContain("requires an AMC parent with a dedicated IPC channel");
-    expect(result.output).toContain("Actual signed approval request:");
-    expect(result.output).toContain("\"tool\": \"echo\"");
+    expect(result.output).toContain("The agent wants to: Call the tool \"echo\"");
     expect(result.output).toContain("cancelling the turn (cause: user)");
     expect(result.output).toContain("turn 1 ended: cancelled");
     expect(result.output).toMatch(/echo · DENIED/);

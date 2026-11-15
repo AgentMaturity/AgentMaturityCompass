@@ -31,6 +31,7 @@ import { listNativeQueuedSubmissions, withdrawNativeQueuedSubmission } from "./n
 import { nativeUnknownUsageNotice } from "../budgets/nativeBudgetAdmission.js";
 import { VAULT_LOCKED_PREFIX } from "../vault/vaultLockedError.js";
 import { chatVaultPassphrase } from "./nativeChatVault.js";
+import { unlockVault, vaultStatus } from "../vault/vault.js";
 import { chatSetupDeps } from "./nativeChatSetupIo.js";
 import { checkToolsetReadiness } from "../agent/agentToolset.js";
 import { actionPolicyState, executeOnApprovalClasses } from "../tools/guards/actionPolicyGuard.js";
@@ -188,6 +189,24 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       catch { finish(null); }
     });
   };
+  // One key without Enter (an approval's y or n). The line editor has already put the key on its line when this listener
+  // sees it: y or n is submitted as the answer at once, Esc empties the line and submits it (no answer), any other key is
+  // taken off the line again. Ctrl-C cancels the turn as everywhere else.
+  const key = (prompt: string, signal: AbortSignal): Promise<string | null> => {
+    if (closed || signal.aborted || pendingAnswer !== null) return Promise.resolve(null);
+    const onKey = (text: string | undefined, info: { name?: string; ctrl?: boolean } | undefined) => {
+      if (info?.ctrl === true) return;
+      if (info?.name === "escape") { terminal.write(null, { ctrl: true, name: "u" }); terminal.write("\r"); }
+      else if (text === "y" || text === "n" || text === "Y" || text === "N") terminal.write("\r");
+      else if (info?.name !== "return" && info?.name !== "enter") terminal.write(null, { ctrl: true, name: "u" });
+    };
+    process.stdin.on("keypress", onKey);
+    return question(prompt, signal).then(answer => {
+      process.stdin.removeListener("keypress", onKey);
+      const word = (answer ?? "").trim().toLowerCase();
+      return word === "y" || word === "n" ? word : null;
+    });
+  };
   const cancel = () => {
     if (cancelActiveCommand !== null) cancelActiveCommand();
     else terminal.close();
@@ -233,7 +252,8 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     const onMcpReceipt = (value: unknown) => currentMcpView.accept(value);
     if (display.stream) running.on("message", onMcpReceipt);
     const approvals = interactiveApprovals ? createNativeInteractiveApprovals({
-      child: running, workspace: cwd, entry, agentId: selectedAgentId ?? "default", question, log: io.log, error: io.error
+      child: running, workspace: cwd, entry, agentId: selectedAgentId ?? "default", question, key, log: io.log, error: io.error,
+      unlockVault: () => { if (vaultPassphrase !== null && !vaultStatus(cwd).unlocked) unlockVault(cwd, vaultPassphrase); }
     }) : null;
     const askUser = display.askUser === true ? createNativeInteractiveAskUser({ child: running, workspace: cwd, question, log: io.log, error: io.error }) : null;
     const requestCancel = () => {
@@ -353,6 +373,14 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         io.error(error instanceof NativeMcpConfigError ? error.message : "MCP chat preflight refused before server startup."); io.fail(); return;
       }
     }
+    // Checked before the first task: each turn's run refuses a workspace that is not ready, and chat would stop there. MCP and
+    // delegation add tools only the run knows, so those chats are left to the run's own check.
+    const readiness = tools === "workspace" && mcpArgs.length === 0 && options.delegate !== true ? checkToolsetReadiness(cwd) : null;
+    if (readiness !== null && !readiness.ready) {
+      io.error(["Workspace tools are not ready in this folder, so chat did not start:", ...readiness.blockers.map(line => `  - ${line}`),
+        "Run the command on each line above, then start chat again (a new folder set up with `amc init --coding` has all of these). To chat without tools, start again with --tools none."].join("\n"));
+      io.fail(); return;
+    }
     const credentialFile = guide.nextAction.argv[guide.nextAction.argv.indexOf("--credentials-file") + 1]!;
     // The file pin preserves credential lookup, not the independently selected
     // shared skill root. Keep both on every child and on the printed resume.
@@ -386,8 +414,9 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         ? `Workspace tools on${options.tools === undefined ? " (this workspace is set up for them; --tools none turns them off)" : ""}. The signed allowlist and Action Policy still decide what runs; ${gateActive ? "an approval gate is active." : "no approval gate is active, so a call the Action Policy allows runs without asking anyone."}`
         : tools === "echo" ? "Echo demonstration tool only; no workspace editing tool is offered."
           : "No tools offered; model replies cannot edit workspace files through this session.");
-      if (approvalMode !== undefined && approvalMode.ok) io.log(`Approval mode: ${approvalMode.mode}${modeGated ? ". This terminal asks you to review actual queued requests using an existing authenticated reviewer session; quorum still applies." : " (nothing executes: every call outside READ_ONLY is simulated)."}`);
-      if (approvalClass !== undefined) io.log(`Tool approval gate: ${approvalClass}, risk ${approvalRisk}. This terminal asks you to review actual queued requests using an existing authenticated reviewer session; quorum still applies.`);
+      const asks = "Before a gated call runs, this terminal shows what it would do and asks you; where the approval policy lets one person decide, you answer with one key, otherwise a signed-in reviewer decides.";
+      if (approvalMode !== undefined && approvalMode.ok) io.log(`Approval mode: ${approvalMode.mode}${modeGated ? `. ${asks}` : " (nothing executes: every call outside READ_ONLY is simulated)."}`);
+      if (approvalClass !== undefined) io.log(`Tool approval gate: ${approvalClass}, risk ${approvalRisk}. ${asks}`);
       if (mcpArgs.length > 0) io.log("MCP tools use each reviewed catalog and pinned config. Each turn starts and disposes its own configured servers; a changed catalog or config refuses the run. /mcp shows each mount.");
       if (extensions.list().length > 0) io.log(`Signed native extensions: ${extensions.list().map(item => item.id).join(", ")}. /extensions lists their commands and reviewed digests.`);
       if (validation) io.log(`Public task checks: ${validation.checks.map(check => check.title).join(", ")}. Existing shell permissions and approvals still apply.`);
