@@ -17,7 +17,10 @@ import inquirer from "inquirer";
 import YAML from "yaml";
 import { checkToolsetReadiness, type ToolsetReadiness } from "../agent/agentToolset.js";
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL } from "../agent/stubProvider.js";
-import { initApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
+import { defaultApprovalPolicy, initApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
+import type { ApprovalPolicy } from "../approvals/approvalPolicySchema.js";
+import { defaultActionPolicy, initActionPolicy, initActionPolicyAsync } from "../governor/actionPolicyStore.js";
+import type { ActionPolicy } from "../governor/actionPolicySchema.js";
 import { initUsersConfig, usersConfigPath } from "../auth/authApi.js";
 import { passwordPolicyProblem } from "../auth/passwordHash.js";
 import { compileCatalogPlan } from "../catalog/catalogCli.js";
@@ -88,7 +91,8 @@ export function starterProfileFlag(opts: { coding?: boolean; regulated?: boolean
 function starterTools(webHosts: readonly string[] = []): string {
   const defaults = defaultToolsConfig().tools;
   const tool = (name: string): ToolDefinition => defaults.allowedTools.find((t) => t.name === name)!;
-  const files = (name: string): ToolDefinition => ({ ...tool(name), allow: { ...tool(name).allow, paths: ["./**"] } });
+  const files = (name: string): ToolDefinition => ({ ...tool(name), allow: { ...tool(name).allow, paths: ["./**"] },
+    deny: { ...tool(name).deny, paths: [...(tool(name).deny?.paths ?? []), ...SECRET_PATHS] } });
   const web = (name: string): ToolDefinition => ({ name, actionClass: "NETWORK_EXTERNAL", allow: { hostAllowlist: [...webHosts] } } as ToolDefinition);
   const config = toolsConfigSchema.parse({ tools: { ...defaults, allowedTools: [files("fs.read"), files("fs.write"), files("fs.edit"),
     { ...tool("bash"), nativeSandbox: { kind: "os-native", writableDirectories: ["."] } },
@@ -101,6 +105,31 @@ function starterTools(webHosts: readonly string[] = []): string {
     "# then run: amc tools sign",
     YAML.stringify(config)
   ].join("\n");
+}
+
+/** Files that usually hold secrets: the coding profile's file tools never read or write them. */
+const SECRET_PATHS = ["**/.env", "**/.env.*", "**/*.pem", "**/*.key", "**/*.p12", "**/*.pfx", "**/id_rsa*", "**/id_ed25519*",
+  "**/.ssh/**", "**/.aws/**", "**/.gnupg/**", "**/.netrc", "**/.npmrc", "**/.pypirc", "**/secrets/**"];
+
+/**
+ * The coding profile's Action Policy: the default, except that a file edit (WRITE_LOW) or a shell command (WRITE_HIGH)
+ * a person approves runs for real (`executeOnApproval`); without that approval it stays SIMULATE. The shell keeps its OS
+ * sandbox; the per-call approval stands in for the owner's execution ticket. Every other class is unchanged.
+ */
+export function codingActionPolicy(): ActionPolicy {
+  return { ...defaultActionPolicy(), actions: defaultActionPolicy().actions.map((rule) =>
+    rule.actionClass === "WRITE_LOW" ? { ...rule, executeOnApproval: true }
+      : rule.actionClass === "WRITE_HIGH" ? { ...rule, executeOnApproval: true, requireExecTicket: false } : rule) };
+}
+
+/** One person working alone approves their own edits and commands: one OWNER or APPROVER for WRITE_LOW and WRITE_HIGH. */
+export function codingApprovalPolicy(): ApprovalPolicy {
+  const base = defaultApprovalPolicy();
+  const solo = { requiredApprovals: 1, rolesAllowed: ["APPROVER", "OWNER"] as const, requireDistinctUsers: false };
+  const classes = base.approvalPolicy.actionClasses;
+  return { ...base, approvalPolicy: { ...base.approvalPolicy, actionClasses: { ...classes,
+    WRITE_LOW: { ...classes.WRITE_LOW!, ...solo, rolesAllowed: [...solo.rolesAllowed], ttlMinutes: 60 },
+    WRITE_HIGH: { ...classes.WRITE_HIGH!, ...solo, rolesAllowed: [...solo.rolesAllowed], ttlMinutes: 15 } } } };
 }
 
 /** Every fact unknown: the compiler never guesses one, and the operator states them before any activation. */
@@ -141,6 +170,10 @@ export function applyStarterProfile(workspace: string, kind: StarterProfileKind,
   saveAMCConfig(workspace, applyAMCConfigProfile(kind === "coding" ? "dev" : "prod", loadAMCConfig(workspace)));
   signAmcConfig(workspace);
   const users = initUsersConfig({ workspace, username: owner.username, password: owner.password });
+  if (kind === "coding") {
+    initActionPolicy(workspace, codingActionPolicy());
+    initApprovalPolicy(workspace, codingApprovalPolicy());
+  }
   if (kind === "regulated") {
     initApprovalPolicy(workspace);
     savePresets(workspace, [{ id: "regulated", description: "Regulated starter (amc init --regulated): every tool call waits for a "
@@ -152,9 +185,14 @@ export function applyStarterProfile(workspace: string, kind: StarterProfileKind,
     owner: { userId: users.owner.userId, username: users.owner.username },
     monitorFingerprint: sha256Hex(readFileSync(keyPaths(workspace).monitorPublic)),
     plan: kind === "regulated" ? compileStarterPlan(workspace) : null,
-    nextCommand: `amc agent-loop run "..." --provider stub --tools workspace${kind === "regulated" ? " --preset regulated" : ""}`
+    nextCommand: nextCommandFor(kind)
   };
 }
+
+/** Coding: a chat that asks before each edit or command. Regulated: a run under the two-approver preset. */
+const nextCommandFor = (kind: StarterProfileKind): string => kind === "coding"
+  ? "amc agent-loop chat --provider stub --tools workspace --approval-mode default"
+  : 'amc agent-loop run "..." --provider stub --tools workspace --preset regulated';
 
 class StarterProfilePublicationError extends Error {
   readonly code = "STARTER_PROFILE_INCOMPLETE";
@@ -181,9 +219,12 @@ async function applyStarterProfileAsync(workspace: string, kind: StarterProfileK
     phase = "users"; const users = initUsersConfig({ workspace, ...selectedOwner }); completed.push(phase);
     const paths = [toolsConfigPath(workspace), `${toolsConfigPath(workspace)}.sig`, join(workspace, ".amc", "amc.config.yaml"),
       join(workspace, ".amc", "amc.config.yaml.sig"), users.path, users.sigPath, firewall.path, firewall.signaturePath, firewall.checkpointPath];
-    if (kind === "regulated") {
-      phase = "approval-policy"; const approval = initApprovalPolicy(workspace); completed.push(phase); paths.push(approval.path, approval.sigPath);
+    if (kind === "coding") {
+      phase = "action-policy"; const action = await initActionPolicyAsync(workspace, codingActionPolicy()); completed.push(phase);
+      paths.push(action.policyPath, action.signaturePath);
     }
+    phase = "approval-policy"; const approval = initApprovalPolicy(workspace, kind === "coding" ? codingApprovalPolicy() : undefined);
+    completed.push(phase); paths.push(approval.path, approval.sigPath);
     let presetsCurrent = () => {};
     const sources = captureOrgFiles(paths), stable = () => { inputs?.(); original(); assertOrgPairsCurrent(sources); presetsCurrent(); };
     if (kind === "regulated") {
@@ -196,7 +237,7 @@ async function applyStarterProfileAsync(workspace: string, kind: StarterProfileK
     stable(); phase = "report-and-control-plan";
     return { kind, firewallMode, readiness: checkToolsetReadiness(workspace), owner: { userId: users.owner.userId, username: users.owner.username },
       monitorFingerprint: sha256Hex(readFileSync(keyPaths(workspace).monitorPublic)), plan: kind === "regulated" ? compileStarterPlan(workspace) : null,
-      nextCommand: `amc agent-loop run "..." --provider stub --tools workspace${kind === "regulated" ? " --preset regulated" : ""}` };
+      nextCommand: nextCommandFor(kind) };
   } catch (cause) { throw new StarterProfilePublicationError(Object.freeze([...completed]), phase, cause); }
 }
 

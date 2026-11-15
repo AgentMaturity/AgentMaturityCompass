@@ -1,10 +1,10 @@
 import { existsSync } from "node:fs";
-import { actionPolicyPath, actionPolicySigPath, verifyActionPolicySignature } from "../../governor/actionPolicyEngine.js";
+import { actionPolicyPath, actionPolicySigPath, loadActionPolicy, verifyActionPolicySignature } from "../../governor/actionPolicyEngine.js";
 import { actionPolicyDeclaredAbsent } from "../../governor/actionPolicyStore.js";
 import { runGovernorCheck } from "../../governor/governorCli.js";
 import type { ActionClass } from "../../types.js";
 import { RUN_CODE_TOOL } from "../toolPipeline.js";
-import type { ToolGuard, ToolMode } from "../toolTypes.js";
+import type { ToolExecution, ToolGuard, ToolMode } from "../toolTypes.js";
 
 /**
  * The governor's signed Action Policy on native tool calls (AXR-02), as ToolHub decides it.
@@ -32,6 +32,27 @@ export interface ActionPolicyCall {
   readonly agentId: string;
   readonly actionClass: ActionClass;
   readonly requestedMode: ToolMode;
+  /**
+   * A person's signed approval names this call. At entry this is the pipeline's expectation (the call carries, or will
+   * be asked for, an approval through an approval gate); at the guard it is read from the bound authorization record,
+   * whose approvals the authorization stage rechecks against the exact call and consumes before the body.
+   */
+  readonly approved?: boolean;
+}
+
+/** Whether a person's approval is bound to this call: approvals named in its authorization record. */
+export function approvalBound(execution: Pick<ToolExecution, "authorization">): boolean {
+  return (execution.authorization?.record.authority.approvals.length ?? 0) > 0;
+}
+
+/** The classes the signed Action Policy runs as EXECUTE once a person approves the call (`executeOnApproval`). */
+export function executeOnApprovalClasses(workspace: string): ReadonlySet<ActionClass> {
+  if (actionPolicyState(workspace) !== "signed") return new Set();
+  try {
+    return new Set(loadActionPolicy(workspace).actions.filter((rule) => rule.executeOnApproval === true).map((rule) => rule.actionClass));
+  } catch {
+    return new Set();
+  }
 }
 
 /** The Action Policy's verdict for one call, or null when it does not apply (not configured, or the Code Mode transport). */
@@ -47,7 +68,8 @@ function actionPolicyVerdict(workspace: string, call: ActionPolicyCall):
       : "Action Policy was removed after signing; every governed class is denied until .amc/action-policy.yaml is restored from backup or re-created (amc policy action init)", mode: "SIMULATE" };
   }
   try {
-    const decision = runGovernorCheck({ workspace, agentId: call.agentId, actionClass: call.actionClass, riskTier: "med", mode: call.requestedMode });
+    const decision = runGovernorCheck({ workspace, agentId: call.agentId, actionClass: call.actionClass, riskTier: "med", mode: call.requestedMode,
+      approvedByPerson: call.approved === true });
     if (!decision.allowed) return { denial: `Action Policy denied ${call.actionClass}: ${decision.reasons.join(" ") || decision.matchedRuleId}`, mode: "SIMULATE" };
     // A freeze or an exhausted budget does not run an EXECUTE simulated: ToolHub refuses it at execution, and so does
     // this guard. The mode is left as requested so the budgets guard, composed before this one, names it first.
@@ -77,7 +99,10 @@ export function simulationNotice(workspace: string, otherNarrowing: string | nul
     if (call.requestedMode !== "EXECUTE" || call.effectiveMode !== "SIMULATE" || call.actionClass === "READ_ONLY") return output;
     const verdict = actionPolicyVerdict(workspace, call);
     const reasons = verdict?.mode === "SIMULATE" ? (verdict.reasons ?? []) : [];
-    const why = verdict?.mode === "SIMULATE"
+    const onApproval = verdict?.mode === "SIMULATE" && call.approved !== true && actionPolicyVerdict(workspace, { ...call, approved: true })?.mode === "EXECUTE";
+    const why = onApproval
+      ? `the signed Action Policy runs ${call.actionClass} only after a person approves the call, and nobody was asked (start the agent with --approval-mode default to be asked)`
+      : verdict?.mode === "SIMULATE"
       ? `the signed Action Policy runs ${call.actionClass} as SIMULATE${reasons.length === 0 ? "" : ` (${reasons.slice(0, 2).join("; ")}${reasons.length > 2 ? `; +${reasons.length - 2} more` : ""})`}`
       : otherNarrowing ?? `${call.actionClass} was narrowed to SIMULATE`;
     return `${output}\nsimulated, not executed: ${why}; see \`amc governor check --agent ${call.agentId} --action ${call.actionClass} --risk med --mode execute\``;
@@ -90,7 +115,7 @@ export function simulationNotice(workspace: string, otherNarrowing: string | nul
  */
 export function actionPolicyGuard(workspace: string): ToolGuard {
   return (execution) => {
-    const verdict = actionPolicyVerdict(workspace, execution);
+    const verdict = actionPolicyVerdict(workspace, { ...execution, approved: approvalBound(execution) });
     if (verdict === null) return undefined;
     if (verdict.denial !== null) return verdict.denial;
     return execution.effectiveMode === "EXECUTE" && verdict.mode !== "EXECUTE"
