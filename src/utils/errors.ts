@@ -6,7 +6,7 @@ export function toErrorMessage(err: unknown): string {
   if (err instanceof Error) {
     // CLI-28: a missing path reached people as "ENOENT: no such file or directory, open '/x'".
     const missing = /^ENOENT: no such file or directory, \w+ '(.+)'$/.exec(err.message);
-    return missing ? `There is no file or folder at ${missing[1]}. Check the path and try again.` : err.message;
+    return missing ? `The file or folder ${missing[1]} does not exist. Check the path and try again.` : err.message;
   }
   if (typeof err === "string") return err;
   return String(err);

@@ -461,7 +461,8 @@ describe("guideGenerator", () => {
       const guide = generateGuide({ overall: 0, questionScores: scores, targetLevel: 3 });
       const ocSection = guide.sections.find(s => s.questionId === ocQuestion.id);
       if (ocSection) {
-        expect(ocSection.cliCommands.some(c => c.includes("overCompliance"))).toBe(true);
+        // The pack id is over-compliance (overCompliance named no pack; CLI-18).
+        expect(ocSection.cliCommands).toContain("amc assurance run --pack over-compliance");
       }
     }
   });

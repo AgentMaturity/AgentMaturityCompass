@@ -88,7 +88,7 @@ const recipes: Recipe[] = [
   {"path": "fleet overview", "args": ["--json"], "json": true},
   {"path": "fleet slo status", "args": []},
   {"path": "fleet trust-report", "args": [], "refusal": {"reason": "The private ledger has no usable observed fleet evidence.", "pattern": "not found|No.*run|No.*evidence|refus|insufficient|signature|INVALID"}},
-  {"path": "agent diagnose", "args": ["--token-file", "@MISSING@", "--studio", "http://127.0.0.1:1"], "refusal": {"reason": "No Studio token file exists and the fixture denies network transport.", "pattern": "ENOENT|P0_22_OFFLINE_FIXTURE"}},
+  {"path": "agent diagnose", "args": ["--token-file", "@MISSING@", "--studio", "http://127.0.0.1:1"], "refusal": {"reason": "No Studio token file exists and the fixture denies network transport.", "pattern": "ENOENT|does not exist|P0_22_OFFLINE_FIXTURE"}},
   {"path": "ingest", "args": ["@MISSING@", "--type", "generic_text"], "refusal": {"reason": "This fixture deliberately has no external artifact, imported export, receipt, or named secondary run.", "pattern": "ENOENT|not found|No .*found|missing|unavailable|unknown.*run|does not exist"}},
   {"path": "attest", "args": ["--ingest-session", "fixture-missing-session", "--attested-by", "fixture-operator", "--statement", "P0-22 fixture only"], "refusal": {"reason": "No matching ingested session exists.", "pattern": "session|not found|missing|ENOENT"}},
   {"path": "transform attest", "args": ["--agent", "default", "--task", "fixture-missing-task", "--statement", "P0-22 fixture only"], "refusal": {"reason": "No matching transformation task exists.", "pattern": "task|not found|missing|ENOENT"}},
