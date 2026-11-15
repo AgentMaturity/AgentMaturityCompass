@@ -36,6 +36,7 @@
 .doc > h1, .doc-head h1 { font-size: clamp(2.2rem, 4vw, 3.2rem); line-height: 1.08; margin-bottom: 16px; }
 .doc .subtitle, .doc .lede { font-size: 1.15rem; line-height: 1.6; color: var(--body); margin-bottom: 28px; max-width: 40em; }
 .doc h2 { font-size: clamp(1.5rem, 2.4vw, 2rem); line-height: 1.15; margin: clamp(48px, 5vw, 72px) 0 16px; padding-top: 24px; border-top: 1px solid var(--line); scroll-margin-top: calc(var(--nav-h) + 16px); }
+.doc > h2:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
 .doc h3 { margin: 32px 0 10px; scroll-margin-top: calc(var(--nav-h) + 16px); }
 .doc h4 { font-size: 1rem; line-height: 1.4; color: var(--text); margin: 20px 0 6px; }
 .doc p { margin-bottom: 14px; }
