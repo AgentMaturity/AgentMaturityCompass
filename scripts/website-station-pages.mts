@@ -118,6 +118,7 @@ export function renderStationPage(station: WebsiteStation, stations: WebsiteStat
   <link rel="icon" href="favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${esc(title)} | Agent Maturity Compass</title>
   <meta name="description" content="${esc(`Start an AI agent project for ${sector.work} from an Industry Pack: the rules to check, the risks to plan for, and a first draft you correct. ${station.packs.length} packs, free. Experimental, AI-drafted, not legal advice.`)}">
