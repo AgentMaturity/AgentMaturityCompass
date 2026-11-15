@@ -3,6 +3,7 @@
 // answers. Pure: data in, HTML or plain values out; every server string goes through esc(). Studio re-checks every
 // action, so the primary action only points at the page's own buttons and never decides anything itself.
 import { QUESTION_LABELS } from "./a4Questions.js";
+import { SELF_APPROVE, selfApproves, selfCountsOnce } from "./a4Who.js";
 import { actionButton, reasonsText, STAGES, STAGE_PLAIN, STEP_NEXT, STEP_PLAIN, STEP_TITLES, TRUTH, esc, previewNoticeHtml, renderCreateForm } from "./a4View.js";
 
 const isObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
@@ -14,10 +15,8 @@ const WHAT_IS_A_PROJECT = "An agent project takes one agent from a brief to a re
   + "Each stage asks you questions, AMC drafts from your answers, and a second person approves before the project moves on.";
 /** How far one person gets (docs/A4_FORGE.md, "How many people a walk needs"): the default policy's first three gates take one approval. */
 export const PRACTICE_IS = "A practice project lets you try A4 Forge alone. Each stage asks you questions, AMC drafts from your answers, and you "
-  + "approve your own steps; each such approval is recorded as self-approved. Alone you get as far as building in Build it (Assemble): its final "
-  + "approval and every step after it need two people other than you, and the guide asks for them when they are needed.";
-/** The guide's words while self-approval is open for the gate (readiness.selfApprovalAllowed; src/a4/a4Words.ts SELF_APPROVE). */
-const SELF_APPROVE = "You are the only person who can sign in here, so you approve this one yourself, and it is recorded as self-approved.";
+  + "approve your own steps; each such approval is recorded as self-approved. Alone you can get as far as building the agent in step 2, Build it "
+  + "(Assemble): its final approval and every step after it need two people other than you, and the guide asks for them when they are needed.";
 const SOD = "The person who wrote, built or requested a stage cannot approve it (separation of duties)";
 const NOT_INDEPENDENT = "A second approver in the same workspace meets separation of duties; it is not an independent review";
 
@@ -223,7 +222,7 @@ function gateMove(ctx, kind) {
     }
     const excluded = typeof me?.userId === "string" && list(gate.excludedKeys).some((key) => String(key).endsWith(`:${me.userId}`));
     // Alone on a practice project the excluded author may approve: Studio records it as self-approved (A4 single-user rule).
-    if (excluded && readiness?.selfApprovalAllowed === true && ctx.allowed?.decide?.allowed === true) {
+    if (excluded && selfApproves(readiness, gate.required) && ctx.allowed?.decide?.allowed === true) {
       return { now: `${SELF_APPROVE} Write a reason in the Approvals card, then press Approve.`, act: { label: "Write your reason", focus: '.a4-approvals [name="reason"]' } };
     }
     if (excluded) return { now: `Waiting for ${gate.required > 1 ? "the other approvers" : "a second person"} to approve: ${gate.approvals ?? 0} of ${gate.required ?? "?"} approvals so far. ${SOD}, so someone else decides.`,
@@ -309,8 +308,8 @@ function peopleMove(ctx, { required, eligible, roleVote, open }) {
 
 /** The Add a person form inside the panel: the invite route creates the account (or finds it) and adds them as an approver. */
 function peopleFormHtml(ctx) {
-  return `<div class="a4-invite a4-people" data-card="members"><label>Their user name <input name="inviteUsername" autocomplete="off" maxlength="64" /></label>
-    <label><input type="checkbox" name="inviteAuditor" checked /> They may also audit (Fit it to your rules needs it)</label>
+  return `<div class="a4-invite a4-people" data-card="people"><label>Their user name <input name="inviteUsername" autocomplete="off" maxlength="64" /></label>
+    <label><input type="checkbox" name="inviteAuditor" checked /> They may also audit (step 3, Fit it to your rules, needs two people who may audit)</label>
     <p class="muted">AMC creates their account with a first password, shows it to you once here, and adds them to this project as an approver. With both
       roles ticked, the same two people can approve every later step. ${NOT_INDEPENDENT}.</p>
     ${actionButton("Add this person", "invite-member", ctx.allowed?.addMember)}</div>`;
@@ -337,11 +336,13 @@ export function renderWhoApproves(ctx, gate, formShown = false) {
   const auditor = codesOf(ctx.readiness, "gate.required_reviews").some((value) => String(value).includes("AUDITOR"));
   const short = prefixed(codesOf(ctx.readiness, "sod"), "ELIGIBLE:")[0];
   const role = auditor ? "APPROVER,AUDITOR" : roleFor(roles);
+  // Alone, one self-approval meets a one-approval gate; a gate that needs more says what the person's own approval does instead.
+  const who = selfApproves(ctx.readiness, required) ? `${esc(SELF_APPROVE)} Self-approval counts once.` : ctx.readiness?.selfApprovalAllowed === true
+    ? esc(selfCountsOnce(required)) : `${SOD}${excluded.length ? `: ${excluded.map(esc).join(", ")} cannot approve this one` : ""}.`;
   return `<div class="a4-who"><p><strong>Who must approve:</strong> ${esc(required ?? "?")} ${required === 1 ? "person" : "different people"} with the workspace role
     ${roles.length ? roles.map(code).join(" or ") : "that the approval policy names"}${auditor ? ", one of them holding AUDITOR" : ""}, who are members of this project
-    (workspace owners count). ${ctx.readiness?.selfApprovalAllowed === true ? `${esc(SELF_APPROVE)} Self-approval counts once` : `${SOD}${excluded.length
-      ? `: ${excluded.map(esc).join(", ")} cannot approve this one` : ""}`}.</p>
-    <p>Approved so far: ${approved.length ? approved.map(esc).join(", ") : "nobody yet"}.${short !== undefined ? ` Studio counts ${esc(short)} person(s) who could still approve.` : ""}</p>
+    (workspace owners count). ${who}</p>
+    <p>Approved so far: ${approved.length ? approved.map(esc).join(", ") : "nobody yet"}.${short !== undefined && !formShown ? ` Studio counts ${esc(short)} person(s) who could still approve.` : ""}</p>
     ${formShown ? "" : `<p class="muted">Need another person? In the workspace folder run ${code(addUserCommand(role))} (or give an existing user the role with
     ${code(`amc user role set <username> --roles <their current roles>,${role}`)}), then add them on the Members card with the approver role. Adding a member cancels the open
     request, so request it again afterwards. ${NOT_INDEPENDENT}.</p>`}</div>`;

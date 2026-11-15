@@ -10,6 +10,7 @@ import { stageAction, stageCards } from "./a4Cards.js";
 import * as view from "./a4View.js";
 import * as start from "./a4Start.js";
 import * as packs from "./a4Pack.js";
+import { approvalWaiting, canCreate, isOwner } from "./a4Who.js";
 import { register as registerAspire } from "./a4Aspire.js";
 import { register as registerAssemble } from "./a4Assemble.js";
 import { register as registerAdapt } from "./a4Adapt.js";
@@ -122,38 +123,10 @@ async function previewOptions() {
 }
 
 /**
- * Studio's role check answers 403 with no A4 code to anyone else, which the page cannot tell from a lost acknowledgement,
- * so the create form and the home card are offered only to OPERATOR or OWNER in a workspace Studio reports writable.
- */
-const isOwner = (who) => Array.isArray(who?.roles) && who.roles.includes("OWNER");
-const canCreate = (who, options) => Array.isArray(who?.roles) && who.roles.some((role) => role === "OPERATOR" || role === "OWNER")
-  && options?.workspace?.readOnly === false;
-
-/**
  * Home's first card (a4Start.homeCardHtml): build an agent, or continue the latest project. It is filled only when the
  * preview answers and this person may create projects; the demo workspace gets a short note instead. The nav link is
  * shown by default and hidden here when Studio reports the preview off.
  */
-/**
- * The first open project whose gate waits for this person's decision: a PENDING gate Studio lets them decide
- * (readiness.allowed.decide) that does not exclude them, unless self-approval is open. At most ten projects are read.
- */
-async function approvalWaiting(projects, who) {
-  for (const project of projects.filter((row) => row.stage !== "retired").slice(0, 10)) {
-    const path = `${API}/projects/${encodeURIComponent(project.projectId)}`;
-    const readiness = one(await apiNativeRequest(`${path}/readiness`).catch(() => null), "readiness");
-    // A gate's own approval, or the second request that applies what was built (effect_gate, decided like requestChanges).
-    const effect = readiness?.gates?.completion?.status === "QUORUM_MET" && readiness.allowed?.requestChanges?.allowed === true
-      && listOf(readiness.items, "items").some((item) => (item.id === "effect_gate" || item.id === "plan_review_opened") && listOf(item.reasonCodes, "codes").includes("APPROVAL_STATUS:PENDING"));
-    const kind = ["direction", "completion"].find((name) => readiness?.gates?.[name]?.status === "PENDING" && readiness.allowed?.decide?.allowed === true) ?? (effect ? "effect" : null);
-    if (!kind) continue;
-    const gate = listOf(await apiNativeRequest(`${path}/gates`).catch(() => null), "gates").find((row) => row.gateId === readiness.gates[kind === "effect" ? "completion" : kind].gateId);
-    const excluded = Array.isArray(gate?.excludedKeys) && gate.excludedKeys.some((key) => String(key).endsWith(`:${who?.userId}`));
-    if (gate && (!excluded || readiness.selfApprovalAllowed === true)) return { project, kind };
-  }
-  return null;
-}
-
 async function showHomeEntry() {
   const card = document.getElementById("a4HomeCard");
   try {
@@ -172,7 +145,7 @@ async function showHomeEntry() {
     const projects = listOf(await apiNativeRequest(`${API}/projects`), "projects");
     if (!card || (projects.length === 0 && !canCreate(who, options))) return;
     const catalog = projects.length === 0 ? listOf(await apiGet("/industry-packs/list").catch(() => null), "packs") : [];
-    const waiting = await approvalWaiting(projects, who);
+    const waiting = await approvalWaiting(projects, who, apiNativeRequest, API);
     card.innerHTML = start.homeCardHtml({ projects, waiting, industryHtml: packs.packSelectHtml(catalog, null), start: options.workspace?.start ?? null });
     card.hidden = false;
     bindCreateForm(card.querySelector("#a4HomeForm"));
@@ -651,7 +624,7 @@ function mountProject(projectId, options) {
         const auditor = scope.querySelector('[name="inviteAuditor"]')?.checked === true;
         // Each person added stays listed with their first password until the page is left, so adding a second keeps the first's.
         const link = `${location.origin}${location.pathname}?project=${encodeURIComponent(projectId)}&stage=${encodeURIComponent(stage)}`;
-        return post("Invite", projectPath("/members/invite"), { username, workspaceRoles: auditor ? ["APPROVER", "AUDITOR"] : ["APPROVER"], ...headBinding() }, [],
+        return post("Invite", projectPath("/members/invite"), { username, workspaceRoles: auditor ? ["APPROVER", "AUDITOR"] : ["APPROVER"], ...headBinding() }, [`${scope.dataset?.card ?? "page"}:inviteUsername`],
           (data) => { invited.push(start.invitedText(data)); tell(`${invited.join(" ")} ${start.approverHowTo(link)}`); });
       }
       case "comment": {

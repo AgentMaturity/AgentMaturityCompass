@@ -4,17 +4,22 @@
  * "Use an example" lowered a pack project's risk level; Add a person for an existing account left nothing to do; amc a4
  * readiness printed bare PRODUCED_AT_* items; and nobody was told, before asking, that an approval needed more people.
  */
+import { writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { Command } from "commander";
 import { afterEach, describe, expect, test, vi } from "vitest";
+import { createSession, initUsersConfig } from "../../src/auth/authApi.js";
+import { registerA4Commands } from "../../src/cli-a4-commands.js";
 import * as start from "../../src/console/assets/a4Start.js";
-import * as view from "../../src/console/assets/a4View.js";
+import * as who from "../../src/console/assets/a4Who.js";
 import { PACK_FIELDS, packAnswers } from "../../src/console/assets/a4Pack.js";
 import { notReadyWords, SELF_APPROVE } from "../../src/a4/a4Words.js";
 import { reviewRefusals } from "../../src/a4/assembleBuild.js";
-import { cleanupGovernanceFixtures } from "../governor/governanceFixture.js";
-import { a4, A4Project, a4Workspace, aspireAnswers, requestId } from "./a4Harness.js";
+import { cleanupGovernanceFixtures, governanceFixture } from "../governor/governanceFixture.js";
+import { a4, A4Project, a4Workspace, aspireAnswers, requestId, type Who } from "./a4Harness.js";
 
 vi.setConfig({ testTimeout: 60_000 });
-afterEach(() => cleanupGovernanceFixtures());
+afterEach(() => { vi.restoreAllMocks(); cleanupGovernanceFixtures(); });
 
 type Ctx = Record<string, unknown>;
 const project = (over: Ctx = {}) => ({ projectId: "a4p_1", agentId: "helper", stage: "aspire", step: "proposed", hold: false, members: [], ...over });
@@ -41,19 +46,41 @@ describe("a person alone on a practice project approves their own step", () => {
   });
 
   test("the Approvals card says the same, and still names who is excluded when self-approval is not open", () => {
-    const row = { excludedKeys: ["LOCAL_USER:u1"] };
-    expect(view.exclusionLine({ readiness: { selfApprovalAllowed: true }, project: { members: [] } }, row)).toContain("recorded as self-approved");
-    expect(view.exclusionLine({ readiness: { selfApprovalAllowed: false }, project: { members: [{ principalKey: "LOCAL_USER:u1", username: "owner" }] } }, row))
-      .toContain("Cannot approve (separation of duties)");
+    const row = { excludedKeys: ["LOCAL_USER:u1"], required: 1 };
+    expect(who.exclusionLine({ selfApprovalAllowed: true }, row, ["owner"])).toContain("you approve this one yourself, and it is recorded as self-approved");
+    expect(who.exclusionLine({ selfApprovalAllowed: false }, row, ["owner"])).toContain("Cannot approve (separation of duties); may still deny: owner");
+    // A two-approval gate alone: the person's own approval counts once, and the gate needs two new people.
+    const two = who.exclusionLine({ selfApprovalAllowed: true }, { ...row, required: 2 }, ["owner"]);
+    expect(two).toContain("counts once and this approval needs 2");
+    expect(two).not.toContain("so you approve this one yourself");
   });
 
-  test("amc a4 guide uses the same words", () => {
-    expect(SELF_APPROVE).toContain("you approve this one yourself, and it is recorded as self-approved");
+  test("amc a4 guide prints the same words for an open gate the person approves alone", async () => {
+    const { workspace } = governanceFixture();
+    vi.stubEnv("AMC_A4_PREVIEW", "1");
+    const user = initUsersConfig({ workspace, username: "a4-owner", password: "walk-owner-password" }).owner;
+    const tokenFile = join(workspace, "..", "walk-owner.token");
+    writeFileSync(tokenFile, createSession({ workspace, user }).token, { mode: 0o600 });
+    const owner = { userId: user.userId };
+    const created = await a4(workspace, owner, "POST", "/api/v1/a4/projects", { clientRequestId: requestId(), name: "Practice", expertise: "novice", practice: true });
+    const practice = new A4Project(workspace, created.body.data!.projectId as string, owner);
+    practice.head = created.body.data!.seq as number;
+    await practice.proposeAspire();
+    await practice.openGate(owner);
+    vi.spyOn(process, "cwd").mockReturnValue(workspace);
+    const out: string[] = [];
+    vi.spyOn(console, "log").mockImplementation((...line: unknown[]) => { out.push(line.join(" ")); });
+    const program = new Command().exitOverride();
+    registerA4Commands(program);
+    await program.parseAsync(["node", "amc", "a4", "guide", practice.projectId, "--session-token-file", tokenFile]);
+    const gateLine = out.join("\n").split("\n").find((line) => line.startsWith("Open aspire direction gate")) ?? "";
+    expect(gateLine).toContain(SELF_APPROVE);
+    expect(gateLine).not.toContain("Someone other than its author");
   });
 
   test("a practice project says how far one person gets, never all four stages", () => {
     expect(start.PRACTICE_IS).not.toMatch(/four stages|learn AMC alone/);
-    expect(start.PRACTICE_IS).toContain("Alone you get as far as building");
+    expect(start.PRACTICE_IS).toContain("Alone you can get as far as building the agent in step 2, Build it (Assemble)");
   });
 });
 
@@ -87,6 +114,30 @@ describe("an approval the project's people cannot reach is said before anyone as
     const m = move(ctx({ stage: "assemble", project: project({ stage: "assemble", step: "reviewed" }), gates: [{ gateId: "g4", request: { rolesAllowed: ["APPROVER"] } }] }, readiness));
     expect(m.now).toContain("Only 1 can approve it now. Add 1 person below.");
     expect(m.why).toContain("cancels this request");
+  });
+
+  test("alone at an open two-approval gate, the panel never says both 'approve it yourself' and 'add people'", () => {
+    const readiness = { selfApprovalAllowed: true, gates: { completion: { gateId: "g5", status: "PENDING", approvals: 1, required: 2 } },
+      items: [{ id: "sod", status: "WAITING", reasonCodes: ["QUORUM_UNREACHABLE", "ELIGIBLE:1", "REQUIRED:2"], mandatory: true, acknowledged: null, nextAction: null }] };
+    const c = ctx({ stage: "assemble", project: project({ stage: "assemble", step: "reviewed" }), allowed: { addMember: { allowed: true, reasonCodes: [] } },
+      gates: [{ gateId: "g5", excludedKeys: ["LOCAL_USER:u1"], request: { rolesAllowed: ["APPROVER", "OWNER"] }, decisions: [{ decision: "APPROVE", username: "owner" }] }] }, readiness);
+    const html = start.renderStartHere(c as never);
+    expect(html).toContain("Add 2 people below");
+    expect(html).not.toContain("so you approve this one yourself");
+    expect(html).toContain("counts once and this approval needs 2");
+    expect(html).not.toContain("Studio counts");
+    expect(html).toContain('data-card="people"');
+  });
+
+  test("an approver who opens the project before the owner asks counts as one who can approve", async () => {
+    const { workspace, owner, alice } = a4Workspace();
+    const p = await A4Project.create(workspace, owner);
+    await p.addMember(owner, alice);
+    await p.proposeAspire(aspireAnswers({ riskTier: "high", governance: "regulated" }));
+    const seen = async (viewer: Who) => (await p.get(viewer, "/readiness?stage=aspire")).body.data!.nextGate as { eligible: number; required: number };
+    expect(await seen(owner)).toMatchObject({ required: 1, eligible: 1 });
+    const forAlice = await seen(alice);
+    expect(forAlice.eligible).toBeGreaterThanOrEqual(forAlice.required);
   });
 
   test("someone who is not an owner is told to ask one, with no form", () => {

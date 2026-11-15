@@ -366,7 +366,7 @@ function registerReads(a4: Command): void {
       console.log(`Readiness: ${readiness?.status ?? "not_evaluated"}; members: ${(data.members as unknown[]).length}`);
       console.log(data.practice === true && data.practiceActive === true
         ? "Who approves: this is a practice project, so you may approve your own work; each such approval is recorded and shown as self-approved. "
-          + "Alone you get as far as building in Assemble: its final approval and every later step need two people other than you."
+          + "Alone you can get as far as building the agent in Assemble (stage 2): its final approval and every later step need two people other than you."
         : `Who approves: someone other than the person who wrote, built or asked for each step${data.regulated === true ? " (the project is governed as regulated)" : ""}`
           + `${data.practice === true ? "; this was a practice project until a second person could sign in" : ""}.`);
       for (const view of Object.values(data.gates as Record<string, Data | null>)) {
