@@ -320,7 +320,7 @@ describe("website phone navigation", () => {
 
   test("verify.html wraps inline code, so its fingerprint cannot widen the page", () => {
     const verify = readFileSync(join(website, "verify.html"), "utf8");
-    expect(verify).toContain('<div class="wrap doc">');
+    expect(verify).toContain('<div class="wrap"><div class="doc">');
     expect(verify).toContain('href="docs-pages.css?v=1"');
     const reading = readFileSync(join(website, "docs-pages.css"), "utf8");
     expect(reading).toContain(".doc :where(p, li, td) code { overflow-wrap: anywhere; }");

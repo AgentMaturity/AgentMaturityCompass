@@ -107,3 +107,6 @@
   .level-scale { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .scroll-hint { display: block; }
 }
+
+/* A reading page goes straight from its hero into the text. */
+.page-hero + .band { padding-top: 0; border-top: 0; }
