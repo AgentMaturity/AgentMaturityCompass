@@ -50,6 +50,8 @@ describe("the methodology and frameworks pages", () => {
     expect(text).toContain("No question can reach L3, L4 or L5 yet");
     expect(text).not.toMatch(/OBSERVED_HARDENED|1\.1×|0\.4×/);
     expect(text).toContain("They do not set a question's level");
+    expect(text).not.toContain("the lowest level");
+    expect(text).toContain("can reach L1 at most");
     expect(visible(read("website/compliance.html"))).not.toMatch(/L4.{0,4}L5[^.]*(?:MANAGED|Stronger checks)/);
   });
 });
