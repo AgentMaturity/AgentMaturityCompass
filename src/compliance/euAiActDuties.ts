@@ -49,8 +49,10 @@ function prohibitedDuties(prohibited: EuAiActDutyInput["prohibited"]): EuAiActDu
 }
 
 function highRiskDuties(input: EuAiActDutyInput): EuAiActDuty[] {
-  const dates = [input.annexIII ? T.annexIIIHighRisk : null, input.annexI ? T.article6_1AnnexIHighRisk : null].filter((d): d is string => d !== null);
-  const appliesFrom = [...dates].sort()[0];
+  const dates: string[] = [];
+  if (input.annexIII) dates.push(T.annexIIIHighRisk);
+  if (input.annexI) dates.push(T.article6_1AnnexIHighRisk);
+  const appliesFrom = [...dates].sort()[0] ?? T.annexIIIHighRisk;
   const note = dates.length > 1
     ? `Annex III use from ${T.annexIIIHighRisk}; Annex I product from ${T.article6_1AnnexIHighRisk}. The earlier date is shown.`
     : undefined;
