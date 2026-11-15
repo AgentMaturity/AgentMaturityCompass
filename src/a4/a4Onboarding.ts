@@ -128,7 +128,8 @@ export async function inviteMember(route: A4Route, projectId: string | null): Pr
   const notes = [
     existing === undefined ? `Give ${user.username} the first password yourself, in person or over a channel you trust. AMC shows it once and keeps only a `
       + "one-way hash. They sign in to this Studio with it; a workspace owner can set a new one with `amc user password`."
-      : `${user.username} already had an account, so its password and workspace roles (${user.roles.join(", ")}) were left as they are.`,
+      : `${user.username} already had an account, so its password and workspace roles (${user.roles.join(", ")}) were left as they are. If they no longer `
+        + `have their password, a workspace owner sets a new one in the workspace folder with \`amc user password ${user.username}\` and gives it to them.`,
     ...(canApprove ? [] : [`${user.username} cannot approve yet: an owner gives the role with \`amc user role set ${user.username} --roles APPROVER\`.`]),
     "Adding a person ends self-approval on this workspace's projects for good, and open approval requests are asked for again.",
     SECOND_PERSON_NOT_INDEPENDENT

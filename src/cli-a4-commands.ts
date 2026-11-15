@@ -18,7 +18,7 @@ import { InvalidArgumentError, Option, type Command } from "commander";
 import { A4_API_PREFIX, serveA4, unboundClaim } from "./a4/a4Router.js";
 import { verifyTrackedSessionToken } from "./auth/authApi.js";
 import { pendingExecutors } from "./a4/a4Gates.js";
-import { notReadyWords } from "./a4/a4Words.js";
+import { notReadyWords, SELF_APPROVE } from "./a4/a4Words.js";
 import { resolveA4LoginPrincipal } from "./a4/a4Identity.js";
 import { A4_PROJECT_ROLES, A4_STAGES, A4_STEPS, a4PreviewEnabled, type A4Principal } from "./a4/a4Schema.js";
 import { A4StoreError, readOnlyNow } from "./a4/a4Store.js";
@@ -283,7 +283,7 @@ function printOpenItems(readiness: Data): void {
   const open = items.filter((item) => item.mandatory && item.status !== "READY" && item.status !== "COMPLETE");
   // In words first (what it means and what to do), then the item id, its status and its reason codes for reference.
   for (const item of open.slice(0, TEXT_ROWS)) {
-    const words = item.reasonCodes.includes("OWNER_ACKNOWLEDGED") ? "Acknowledged by a project owner; it stays listed." : notReadyWords(item) ?? item.nextAction?.label;
+    const words = item.reasonCodes.includes("OWNER_ACKNOWLEDGED") ? "Acknowledged by a project owner; it stays listed." : notReadyWords(item);
     console.log(`- ${words ? `${safe(words)} ` : ""}[${item.id}: ${item.status.toLowerCase()}${item.reasonCodes.length > 0 ? `; ${item.reasonCodes.join(", ")}` : ""}]`);
   }
   if (open.length > TEXT_ROWS) console.log(`… ${open.length - TEXT_ROWS} more (--json prints them all)`);
@@ -338,7 +338,8 @@ function registerReads(a4: Command): void {
         + `${project.hold === true ? "; on hold" : ""}.`);
       console.log(`Stages: ${A4_STAGES.join(" → ")}; steps in each: ${A4_STEPS.join(" → ")}`);
       for (const gate of openGates) {
-        console.log(`Open ${gate.stage} ${gate.gate} gate ${gate.gateId}: someone other than its author, builder and requester decides it. After reviewing it:\n  amc a4 approve --gate ${gate.gateId}`
+        const who = project.selfApprovalAllowed === true ? SELF_APPROVE : "Someone other than its author, builder and requester decides it.";
+        console.log(`Open ${gate.stage} ${gate.gate} gate ${gate.gateId}. ${who} After reviewing it:\n  amc a4 approve --gate ${gate.gateId}`
           + ` --expect-gate-seq ${gate.expectedGateSeq ?? "<not found>"} --expect-binding-digest ${gate.expectedBindingDigest}`
           + ` --expect-readiness-digest ${gate.expectedReadinessDigest ?? "<not published>"} --reason "…" --session-token-file <file>`);
       }
@@ -364,7 +365,8 @@ function registerReads(a4: Command): void {
         + `${data.hold === true ? `; on hold (${safe(data.holdReason)})` : ""}`);
       console.log(`Readiness: ${readiness?.status ?? "not_evaluated"}; members: ${(data.members as unknown[]).length}`);
       console.log(data.practice === true && data.practiceActive === true
-        ? "Who approves: this is a practice project, so you may approve your own work; each such approval is recorded and shown as self-approved."
+        ? "Who approves: this is a practice project, so you may approve your own work; each such approval is recorded and shown as self-approved. "
+          + "Alone you get as far as building in Assemble: its final approval and every later step need two people other than you."
         : `Who approves: someone other than the person who wrote, built or asked for each step${data.regulated === true ? " (the project is governed as regulated)" : ""}`
           + `${data.practice === true ? "; this was a practice project until a second person could sign in" : ""}.`);
       for (const view of Object.values(data.gates as Record<string, Data | null>)) {
