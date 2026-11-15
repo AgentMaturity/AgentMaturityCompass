@@ -1,6 +1,6 @@
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { EventEmitter } from "node:events";
 import type { ChildProcess } from "node:child_process";
 import { randomUUID } from "node:crypto";
@@ -27,14 +27,14 @@ afterEach(() => {
   if (oldPassphrase === undefined) delete process.env.AMC_VAULT_PASSPHRASE; else process.env.AMC_VAULT_PASSPHRASE = oldPassphrase;
   vi.restoreAllMocks();
 });
-function fixture(agentId = "default") {
+function fixture(agentId = "default", initiator?: string) {
   const workspace = mkdtempSync(join(tmpdir(), "amc-native-approval-")); roots.push(workspace);
   initWorkspace({ workspacePath: workspace, agentId, trustBoundaryMode: "isolated" });
   initActionPolicy(workspace); initToolsConfig(workspace); initBudgets(workspace, agentId);
   const approvalId = `apr_${randomUUID()}`;
   const created = createApprovalForIntent({ workspace, agentId, intentId: approvalId,
     toolName: "fs.write", actionClass: "WRITE_LOW", requestedMode: "EXECUTE", effectiveMode: "EXECUTE", riskTier: "medium",
-    intentPayload: { toolName: "fs.write", rawArguments: '{"path":"notes.txt"}' } });
+    intentPayload: { toolName: "fs.write", rawArguments: '{"path":"notes.txt"}' }, ...(initiator === undefined ? {} : { initiator }) });
   const approvalRequestId = created.request.approvalRequestId;
   const item = getApprovalInboxItem({ workspace, agentId, approvalRequestId });
   return { workspace, approvalId, approvalRequestId, created, item };
@@ -122,6 +122,25 @@ describe("native approvals retain authenticated authority and exact request bind
     expect(listApprovalDecisions({ workspace: f.workspace, agentId: "default", approvalRequestId: f.approvalRequestId })).toEqual([]);
     expect(child.listenerCount("message")).toBe(0);
   });
+
+  it("confirms the signed decision the approvals CLI just recorded and does not cancel the turn", async () => {
+    // A run records the OS account as initiator, which the decision's binding digest leaves out (P1-78).
+    const f = fixture("default", "os-account"), child = childFixture();
+    const user = initUsersConfig({ workspace: f.workspace, username: "alice", password: "alice-fixture-password" }).owner;
+    const tokenFile = join(f.workspace, "reviewer-session.txt");
+    writeFileSync(tokenFile, createSession({ workspace: f.workspace, user }).token, { mode: 0o600 });
+    const answers = ["approve", tokenFile, "reviewed exact request"], logs: string[] = [], errors: string[] = [];
+    let settled!: () => void; const done = new Promise<void>(resolve => { settled = resolve; });
+    const helper = createNativeInteractiveApprovals({ child, workspace: f.workspace, entry: resolve("dist/cli.js"),
+      question: async () => answers.shift() ?? null,
+      log: line => { logs.push(line); if (line.startsWith("Signed approve decision")) settled(); },
+      error: line => { errors.push(line); settled(); } });
+    child.emit("message", { type: "amc/native-approval-raised", v: 1, agentId: "default", approvalId: f.approvalId, approvalRequestId: f.approvalRequestId });
+    await done; await helper.close();
+    expect(errors).toEqual([]);
+    expect(logs.join("\n")).toContain("request status QUORUM_MET");
+    expect(child.kill).not.toHaveBeenCalled();
+  }, 60_000);
 
   it("close aborts a pending prompt and ignores its late approve response", async () => {
     const f = fixture(), child = childFixture();
