@@ -59,7 +59,7 @@ import {
   valueSchedulerRunNowForApi,
   valueSchedulerSetEnabledForApiAsync as valueSchedulerSetEnabledForApi,
   valueSchedulerStatusForApi,
-  valueSnapshotLatestForApi,
+  valueSnapshotStoredForApi,
   verifyValueWebhookToken, assertValueWebhookTokenCurrent
 } from "../value/valueApi.js";
 import { loadValuePolicyReadOnly as loadValuePolicy, verifyValuePolicySignature } from "../value/valueStore.js";
@@ -332,7 +332,7 @@ import { buildHealthPayload } from "../api/health.js";
 import { closeScoreSessionStores } from "../api/scoreStore.js";
 import { bindRequestContext, resolveRequestId } from "../api/requestContext.js";
 import { canonApplyForPublicationAsync, CanonAuditIncompleteError, canonGetForApi, canonVerifyForApi } from "../canon/canonApi.js";
-import { loadDiagnosticBankAttemptAsync, DiagnosticBankFollowupError } from "../diagnostic/bank/bankLoader.js";
+import { diagnosticBankForReading } from "../diagnostic/bank/bankLoader.js";
 import { verifyCanonSignature } from "../canon/canonLoader.js";
 import {
   diagnosticBankApplyForApiAsync as diagnosticBankApplyForApi,
@@ -4604,9 +4604,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       if (pathname === "/value/snapshot/latest" && req.method === "GET") {
         const query = valueReadQuery();
         if (query === null) return;
-        const out = await valueSnapshotLatestForApi({
-          workspace: options.workspace, scopeType: query.scopeType, scopeId: query.scopeId, windowDays: query.windowDays
-        }, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
+        // Reading only (C-01): the stored snapshot. A report (GET /value/report, the page's button) or amc value snapshot makes one.
+        const out = valueSnapshotStoredForApi({ workspace: options.workspace, scopeType: query.scopeType, scopeId: query.scopeId });
+        if (out === null) {
+          const command = query.scopeType === "WORKSPACE" ? "amc value snapshot --scope workspace" : `amc value snapshot --scope ${query.scopeType.toLowerCase()} --id <its id>`;
+          json(res, 404, { error: `No value report yet. Press "Make a value report" on the Value page, or run ${command} in the workspace folder.`, code: "NO_SNAPSHOT" });
+          return;
+        }
         if (out.status === "INSUFFICIENT_EVIDENCE") {
           emitValueSse({
             hub: orgSse,
@@ -5701,15 +5705,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? undefined);
-        const selected = await loadDiagnosticBankAttemptAsync(options.workspace, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (selected === null) return;
-        try {
-        selected.assertCurrent();
-        const render = renderContextualizedDiagnostic({
-          workspace: options.workspace,
-          agentId, bank: selected.bank
-        });
-        selected.assertCurrent(); json(res, 200, render); // a read writes no audit event
-        } catch (cause) { if (res.headersSent) return; if (selected.completedPaths.length > 0) throw new DiagnosticBankFollowupError(selected.completedPaths, cause); throw cause; }
+        // Reading only (C-01): the stored bank or the built-in default in memory; nothing is written, not even an audit event.
+        json(res, 200, renderContextualizedDiagnostic({ workspace: options.workspace, agentId, bank: diagnosticBankForReading(options.workspace) }));
         return;
       }
 

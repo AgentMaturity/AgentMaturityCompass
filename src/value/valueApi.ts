@@ -378,6 +378,17 @@ export function importValueCsvForApi(params: {
   };
 }
 
+/**
+ * Reading only (GET /value/snapshot/latest, C-01): the stored snapshot for the scope, or null when none is stored.
+ * Never prepares a policy or publishes a snapshot; `amc value snapshot` and the report button make one.
+ */
+export function valueSnapshotStoredForApi(params: { workspace: string; scopeType?: string | null; scopeId?: string | null }) {
+  if (!pathExists(valuePolicyPath(params.workspace))) return null;
+  const policy = loadValuePolicyReadOnly(params.workspace), verify = verifyValuePolicySignature(params.workspace);
+  if (!verify.valid && policy.valuePolicy.enforceSignedInputs) throw new Error(`VALUE_POLICY_UNTRUSTED:${verify.reason ?? "unknown"}`);
+  return loadValueSnapshot(params.workspace, scopeNormalized(params.scopeType, params.scopeId));
+}
+
 export async function valueSnapshotLatestForApi(params: {
   workspace: string;
   scopeType?: string | null;

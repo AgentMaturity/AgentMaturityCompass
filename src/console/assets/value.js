@@ -39,12 +39,13 @@ function kpiCards(snapshot, count = 8) {
 async function renderScope(params, scope, id, title, made = null) {
   const encodedId = encodeURIComponent(id);
   // Opening the page reads the latest snapshot only. A report is a new signed record, so it is made on the button (C-01).
-  const snapshot = await params.apiGet(`/value/snapshot/latest?scope=${scope}&id=${encodedId}`).catch(() => null);
+  let missingCode = null;
+  const snapshot = await params.apiGet(`/value/snapshot/latest?scope=${scope}&id=${encodedId}`).catch((error) => { missingCode = error?.code ?? null; return null; });
   const report = made?.report ?? made ?? null;
   const points = Array.isArray(report?.series?.valueScore) ? report.series.valueScore : [];
 
   params.root.innerHTML = [
-    renderValueEvidenceBanner(snapshot),
+    renderValueEvidenceBanner(snapshot, missingCode),
     params.card(
       title,
       `
@@ -68,9 +69,10 @@ async function renderScope(params, scope, id, title, made = null) {
         </div>
       </div>
       <div class="row wrap">
-        <button id="valueRefreshBtn"${snapshot ? "" : " disabled"}>Make a value report for the last 30 days</button>
+        <button id="valueRefreshBtn"${snapshot || missingCode === "NO_SNAPSHOT" ? "" : " disabled"}>Make a value report for the last 30 days</button>
         <a href="./valueKpis">Open KPI detail</a>
       </div>
+      <p id="valueRefreshOut" role="status" aria-live="polite"></p>
       ${points.length > 0 ? `<canvas id="valueTrendCanvas" width="640" height="170" role="img" aria-label="Value score over the last 30 days."></canvas>`
         : `<p class="muted">${made ? "The report has no value scores to draw yet." : "The value trend appears here after you make a report."}</p>`}
       <p class="muted">AMC refreshes value snapshots on a schedule and after important changes.</p>
@@ -82,9 +84,17 @@ async function renderScope(params, scope, id, title, made = null) {
   const canvas = document.getElementById("valueTrendCanvas");
   if (canvas) renderValueTrendChart(canvas, points);
 
-  document.getElementById("valueRefreshBtn")?.addEventListener("click", async () => {
-    const fresh = await params.apiGet(`/value/report?scope=${scope}&id=${encodedId}&windowDays=30`);
-    await renderScope(params, scope, id, title, fresh);
+  document.getElementById("valueRefreshBtn")?.addEventListener("click", async (event) => {
+    const button = event.currentTarget, out = document.getElementById("valueRefreshOut");
+    button.disabled = true;
+    if (out) out.textContent = "Making the value report…";
+    try {
+      const fresh = await params.apiGet(`/value/report?scope=${scope}&id=${encodedId}&windowDays=30`);
+      await renderScope(params, scope, id, title, fresh);
+    } catch (error) {
+      button.disabled = false;
+      if (out) out.textContent = String(error);
+    }
   });
 
   if (typeof params.subscribe === "function") {

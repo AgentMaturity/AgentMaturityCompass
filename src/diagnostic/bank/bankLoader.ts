@@ -69,6 +69,11 @@ export async function initDiagnosticBankAsync(workspace: string, options: OrgPai
   const bank = defaultDiagnosticBankV1(), prepared = await prepareDiagnosticBankAsync(workspace, bank, options, previous);
   return { ...prepared.publish()[0]!, bank };
 }
+/** Reading only (GET /diagnostic/render, C-01): the stored bank, or the built-in default in memory when none is stored. Writes nothing. */
+export function diagnosticBankForReading(workspace: string): DiagnosticBank {
+  const path = diagnosticBankPath(workspace), body = orgPairBytes(captureOrgFiles([path]), path);
+  return body === null ? defaultDiagnosticBankV1() : diagnosticBankSchema.parse(YAML.parse(body.toString("utf8")) as unknown);
+}
 /** Existing loads consume only the body. A genuinely missing body also captures its sidecar destination. */
 export function captureDiagnosticBankInput(workspace: string) {
   const path = diagnosticBankPath(workspace), body = captureOrgFiles([path]);

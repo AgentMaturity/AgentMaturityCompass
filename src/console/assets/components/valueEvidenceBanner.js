@@ -7,8 +7,15 @@ function escapeHtml(value) {
     .replaceAll("'", "&#39;");
 }
 
-/** The value pages' first line (C-02): no snapshot is "no value data yet", never a green "OK". */
-export function renderValueEvidenceBanner(snapshot) {
+/**
+ * The value pages' first line (C-02): no snapshot is "no value data yet", never a green "OK". `missingCode` is the
+ * read's refusal code: NO_SNAPSHOT means value tracking is set up and no report has been made yet.
+ */
+export function renderValueEvidenceBanner(snapshot, missingCode = null) {
+  if (!snapshot && missingCode === "NO_SNAPSHOT") {
+    return `<div class="card"><strong>No value report yet.</strong> Value tracking is set up, and no report has been made
+      for this scope. Make one on the <a href="./value">Value page</a> with "Make a value report".</div>`;
+  }
   if (!snapshot) {
     return `<div class="card"><strong>No value data yet.</strong> AMC has no value snapshot for this scope, so there is nothing to
       judge. A workspace owner starts value tracking with <code>amc value init</code> in the workspace folder.</div>`;

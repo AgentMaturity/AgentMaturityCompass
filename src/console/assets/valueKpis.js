@@ -15,12 +15,13 @@ export async function renderValueKpisPage(params) {
   const agentId = typeof params.currentAgent === "function" ? params.currentAgent() : "default";
   const scope = "agent";
   const id = encodeURIComponent(agentId);
-  const snapshot = await params.apiGet(`/value/snapshot/latest?scope=${scope}&id=${id}`).catch(() => null);
+  let missingCode = null;
+  const snapshot = await params.apiGet(`/value/snapshot/latest?scope=${scope}&id=${id}`).catch((error) => { missingCode = error?.code ?? null; return null; });
   const contract = await params.apiGet(`/value/contracts?scope=${scope}&id=${id}`).catch(() => null);
   const cards = Array.isArray(snapshot?.kpis) ? snapshot.kpis.map((row) => renderKpiCard(row)).join("") : "";
 
   params.root.innerHTML = [
-    renderValueEvidenceBanner(snapshot),
+    renderValueEvidenceBanner(snapshot, missingCode),
     params.card(
       "KPI Contract",
       `
