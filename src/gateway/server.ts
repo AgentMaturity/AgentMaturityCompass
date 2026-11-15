@@ -37,6 +37,7 @@ import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { readRevokedLeaseIds } from "../leases/leaseStore.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { evaluateBudgetStatus } from "../budgets/budgets.js";
+import { requestTokenCeiling } from "../budgets/requestTokenCeiling.js";
 import { CircuitOpenError, TimeoutError, withCircuitBreaker } from "../ops/circuitBreaker.js";
 import { checkUpstreamEgress, pinnedLookup, prepareFieldGuard, requestFieldRefusal, type FieldGuard } from "./requestFieldGuard.js";
 import { checkEgress, EgressBlocked } from "../residency/checkEgress.js";
@@ -1380,7 +1381,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         ...(leaseVerification.payload?.claimKind === "synthetic_example"
           ? { claimKind: "synthetic_example", trustTier: "SELF_REPORTED" }
           : { trustTier: "OBSERVED" }),
-        bodySha256: sha256Hex(requestBodyRedaction.redactedBytes)
+        bodySha256: sha256Hex(requestBodyRedaction.redactedBytes), tokenCeiling: requestTokenCeiling(requestBody) // counted if no answer comes
       };
       if (requestBodyRedaction.originalPayloadSha256) {
         llmRequestMeta.originalPayloadSha256 = requestBodyRedaction.originalPayloadSha256;
@@ -1425,8 +1426,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         retryBaseDelayMs: resilience.upstreamRetryBaseDelayMs,
         retryNonIdempotent: resilience.retryNonIdempotent,
         lookup: pinnedLookup(upstreamEgress.addresses), signal: fence.signal, failures: upstreamFailures
-      });
-      upstreamResponded = true;
+      }); upstreamResponded = true;
       const droppedClientKey = strippedAuth.hadCredential && [401, 403].includes(upstreamResponse.statusCode ?? 0); // QA M-07
       if (droppedClientKey) logger.error(`gateway: request ${requestId}: HTTP ${upstreamResponse.statusCode}. ${droppedKeyNote(route.upstream, upstreamResolved.auth)}`);
 

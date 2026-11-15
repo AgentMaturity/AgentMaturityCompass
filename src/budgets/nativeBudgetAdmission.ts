@@ -11,6 +11,7 @@ import { reserveExperimentModelRequest } from "./experimentBudget.js";
 import { nativeUsdUnits } from "./nativeUsdAmount.js";
 import { STUB_DISPATCH_URL, STUB_PROVIDER_ID, STUB_PROVIDER_MODEL } from "../agent/stubProvider.js";
 import { parseRequestHeaderMeta } from "../session/requestHeaderMeta.js";
+import { requestTokenCeiling } from "./requestTokenCeiling.js";
 
 export class NativeBudgetRefusal extends Error {
   readonly code = "AMC_NATIVE_BUDGET_REFUSED";
@@ -27,7 +28,7 @@ function acceptUnknownCommand(agentId: string): string {
  * Recovery"). Only requests AMC cannot bound block: one with a recorded output limit is counted at its upper estimate.
  */
 function unknownUsageRefusal(agentId: string, unknown: number): string {
-  return `${unknown} earlier model request(s) for agent ${agentId} ended without a usage report and with no output limit to bound them,`
+  return `${unknown} earlier model request(s) for agent ${agentId} ended without a usage report and with no upper estimate to count instead (the request set no output limit, or was recorded before AMC kept one),`
     + " so AMC cannot tell what they cost; the signed budget (unknownTokenUsage: BLOCK) refuses new model requests until the local budget day ends."
     + ` To continue now, check what those requests did (amc budgets status --agent ${agentId}), then run: ${acceptUnknownCommand(agentId)}`;
 }
@@ -48,23 +49,6 @@ export function nativeUnknownUsageNotice(workspace: string, agentId: string): st
 function capRefusal(what: string, agentId: string, daily: boolean): string {
   return `${what} for agent ${agentId}; new model requests are refused until ${daily ? "the local budget day ends (midnight)" : "the current minute passes"}.`
     + ` To change the limit on purpose, edit budgets.perAgent.${agentId} in .amc/budgets.yaml and run amc budgets sign.`;
-}
-
-/** Tokens the request can be billed at most: its bytes, an allowance for the provider's own prompt wrapping, its output limit. */
-const PROVIDER_WRAPPING_ALLOWANCE = 4096; // ponytail: fixed allowance; a per-provider figure if one ever proves larger
-function requestTokenCeiling(dispatch: NativeBudgetDispatch | undefined): number | null {
-  if (!dispatch) return null;
-  let body: Record<string, unknown>;
-  try { body = JSON.parse(dispatch.body.toString("utf8")) as Record<string, unknown>; } catch { return null; }
-  if (!body || typeof body !== "object" || Array.isArray(body)) return null;
-  const nested = (key: string, inner: string) => { const value = body[key]; return value && typeof value === "object" ? (value as Record<string, unknown>)[inner] : undefined; };
-  // Every output limit an AMC encoder writes; a thinking budget is added in case a provider counts it apart.
-  const limits = [body.max_tokens, body.max_completion_tokens, body.max_output_tokens, nested("options", "num_predict"), nested("generationConfig", "maxOutputTokens")]
-    .filter((value): value is number => Number.isSafeInteger(value) && (value as number) > 0);
-  if (limits.length === 0) return null;
-  const thinking = (nested("generationConfig", "thinkingConfig") as Record<string, unknown> | undefined)?.thinkingBudget;
-  // A token is at least one byte for byte-level tokenizers, so the bytes sent bound the input.
-  return dispatch.body.length + PROVIDER_WRAPPING_ALLOWANCE + Math.max(...limits) + (Number.isSafeInteger(thinking) && (thinking as number) > 0 ? thinking as number : 0);
 }
 
 /**
@@ -129,7 +113,7 @@ function reserve(workspace: string, spend: Spend, agentId?: string, dispatch?: N
         if (usage.minute.llmTokens >= budget.perMinute.maxLlmTokens) {
           throw new NativeBudgetRefusal(capRefusal(`native model token budget exhausted: ${usage.minute.llmTokens} of ${budget.perMinute.maxLlmTokens} tokens counted in the last minute`, owner, false));
         }
-        if (!stub) ceiling = requestTokenCeiling(dispatch);
+        if (!stub && dispatch) ceiling = requestTokenCeiling(dispatch.body);
         if (stub) usd = { usdExposure: LOCAL_STUB_USD_EXPOSURE };
         else if (budget.daily.maxCostUsd !== null) {
           if (usage.daily.llmUnreservedCostRequests > 0) throw new NativeBudgetRefusal("USD exposure is unknown for a prior dispatch without a price reservation");

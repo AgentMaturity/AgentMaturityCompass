@@ -215,7 +215,7 @@ describe("AMC-1534 native budget admissions and signed accounting", () => {
     await expect(drain(llm.stream(unbounded(spec)))).rejects.toThrow();
     const blocked = evaluateBudgetStatus(workspace, "default");
     expect(blocked.ok).toBe(false);
-    expect(blocked.reasons).toEqual(["new model requests are refused: 1 earlier request(s) ended without a usage report and with no output limit to bound them"]);
+    expect(blocked.reasons).toEqual(["new model requests are refused: 1 earlier request(s) ended without a usage report and with no upper estimate to count instead (no output limit was set, or the record is older)"]);
     expect(blocked.next.join("\n")).toContain("amc budgets reset --agent default --accept-unknown");
     await expect(acceptUnknownUsageAsync(workspace, "default")).resolves.toMatchObject({ entry: "default" });
     expect(loadBudgetsConfig(workspace).budgets.perAgent.default!.daily.maxLlmTokens).toBe(5_000_000);
@@ -245,7 +245,7 @@ describe("AMC-1534 native budget admissions and signed accounting", () => {
     expect(verifyBudgetsConfigSignature(workspace).valid).toBe(true);
   });
 
-  test("H-01: gateway rows: a refused upstream connection and a 401 do not block; an unanswered request still does", () => {
+  test("H-01: gateway rows: a refused upstream connection, a 401 and a cut-off request with an output limit do not block; one without a limit does", () => {
     const write = (sessionId: string, rows: [eventType: "llm_request" | "llm_response" | "gateway", meta: Record<string, unknown>][]) => {
       const ledger = openLedger(workspace);
       try {
@@ -257,8 +257,14 @@ describe("AMC-1534 native budget admissions and signed accounting", () => {
     write("gateway-fixture", [["llm_request", { request_id: "down" }], ["gateway", { stage: "request_error", request_id: "down", status: 502, connectFailed: "ECONNREFUSED" }],
       ["llm_request", { request_id: "denied" }], ["llm_response", { request_id: "denied", statusCode: 401 }]]);
     expect(budgetUsageSnapshot(workspace, "default").daily).toMatchObject({ llmRequests: 2, blockingUnknownLlmTokenRequests: 0 });
-    write("gateway-fixture-2", [["llm_request", { request_id: "lost" }]]);
+    // A request cut off after the gateway sent it counts at the upper estimate the gateway recorded from its output limit.
+    write("gateway-fixture-2", [["llm_request", { request_id: "cut", tokenCeiling: 5000 }], ["llm_request", { request_id: "quiet", tokenCeiling: 700 }],
+      ["llm_response", { request_id: "quiet", statusCode: 200 }]]);
+    expect(budgetUsageSnapshot(workspace, "default").daily).toMatchObject({ llmRequests: 4, llmTokens: 5700, unknownLlmTokenRequests: 3, blockingUnknownLlmTokenRequests: 0 });
+    // One with no output limit (no estimate) still blocks, and the refusal says why in words.
+    write("gateway-fixture-3", [["llm_request", { request_id: "lost", tokenCeiling: null }]]);
     expect(budgetUsageSnapshot(workspace, "default").daily.blockingUnknownLlmTokenRequests).toBe(1);
+    expect(evaluateBudgetStatus(workspace, "default").reasons).toEqual(["new model requests are refused: 1 earlier request(s) ended without a usage report and with no upper estimate to count instead (no output limit was set, or the record is older)"]);
   });
 
   test("smoke H-2: the unknown-usage refusal counts the blocking requests and names the documented recovery", async () => {

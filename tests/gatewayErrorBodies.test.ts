@@ -68,7 +68,7 @@ async function setup() {
   return { workspace, gateway, lease, lines };
 }
 
-function post(port: number, path: string, lease: string): Promise<{ status: number; body: string }> {
+function post(port: number, path: string, lease: string, body = "{}"): Promise<{ status: number; body: string }> {
   return new Promise((resolvePromise, rejectPromise) => {
     const req = httpRequest({ host: "127.0.0.1", port, path, method: "POST",
       headers: { "content-type": "application/json", "x-amc-agent-id": "default", "x-amc-lease": lease } }, (res) => {
@@ -77,7 +77,7 @@ function post(port: number, path: string, lease: string): Promise<{ status: numb
       res.on("end", () => resolvePromise({ status: res.statusCode ?? 0, body }));
     });
     req.on("error", rejectPromise);
-    req.end("{}");
+    req.end(body);
   });
 }
 
@@ -163,7 +163,7 @@ describe("gateway error bodies", () => {
     const { workspace, gateway, lease } = await setup();
     try {
       fail.next = Object.assign(new Error("connect ECONNREFUSED 127.0.0.1:9"), { code: "ECONNREFUSED" });
-      const response = await post(gateway.port, "/broken/v1/x", lease).catch(() => ({ status: 0, body: "" }));
+      const response = await post(gateway.port, "/broken/v1/x", lease, "{\"max_tokens\":50}").catch(() => ({ status: 0, body: "" }));
       expect(fail.next).toBeNull(); // the refused attempt was used, so the retry is the one that was answered
       expect(response.body).not.toContain("Nothing answered");
     } finally {
@@ -172,9 +172,12 @@ describe("gateway error bodies", () => {
     }
     const ledger = openLedger(workspace);
     try {
-      const failure = ledger.getAllEvents().map((event) => JSON.parse(event.meta_json ?? "{}") as Record<string, unknown>).find((meta) => meta.stage === "request_error");
+      const metas = ledger.getAllEvents().map((event) => JSON.parse(event.meta_json ?? "{}") as Record<string, unknown>);
+      const failure = metas.find((meta) => meta.stage === "request_error");
       expect(failure).toBeDefined();
       expect(failure).not.toHaveProperty("connectFailed");
+      // The request's upper estimate (its 17 bytes + the 4096 wrapping allowance + max_tokens 50), counted when no usage comes back.
+      expect(metas.find((meta) => meta.bodySha256 !== undefined && "tokenCeiling" in meta)).toMatchObject({ tokenCeiling: 17 + 4096 + 50 });
     } finally {
       ledger.close();
     }

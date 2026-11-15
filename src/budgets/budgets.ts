@@ -401,7 +401,7 @@ export function evaluateBudgetStatus(workspace: string, agentId: string, now = D
   const unknown = Math.max(usage.daily.blockingUnknownLlmTokenRequests, usage.minute.blockingUnknownLlmTokenRequests);
   const unknownBlocked = budget.unknownTokenUsage !== "ALLOW_WITH_WARNING" && unknown > 0;
   if (unknownBlocked) {
-    reasons.push(`new model requests are refused: ${unknown} earlier request(s) ended without a usage report and with no output limit to bound them`);
+    reasons.push(`new model requests are refused: ${unknown} earlier request(s) ended without a usage report and with no upper estimate to count instead (no output limit was set, or the record is older)`);
   }
 
   if (usage.minute.llmRequests > budget.perMinute.maxLlmRequests) {
