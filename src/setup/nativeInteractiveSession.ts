@@ -33,7 +33,7 @@ import { VAULT_LOCKED_PREFIX } from "../vault/vaultLockedError.js";
 import { chatVaultPassphrase } from "./nativeChatVault.js";
 import { chatSetupDeps } from "./nativeChatSetupIo.js";
 import { checkToolsetReadiness } from "../agent/agentToolset.js";
-import { executeOnApprovalClasses } from "../tools/guards/actionPolicyGuard.js";
+import { actionPolicyState, executeOnApprovalClasses } from "../tools/guards/actionPolicyGuard.js";
 import { lookupModelPrice } from "../product/modelPricing.js";
 import { resolveChatSetup } from "./nativeChatSetup.js";
 
@@ -93,14 +93,26 @@ function sessionDetailLines(summary: NativeChatChildSummary): string[] {
 const CHAT_MAX_TOKENS_FALLBACK = 8192, CHAT_MAX_TOKENS_CAP = 16384;
 export function chatDefaults(workspace: string, provider: string, model: string | null):
   { readonly tools: string; readonly maxTokens: string; readonly asksBeforeEffects: boolean } {
+  // Workspace tools by default only under a signed Action Policy: "not configured" passes readiness but governs nothing.
   let ready = false;
-  try { ready = checkToolsetReadiness(workspace).ready; } catch { ready = false; }
+  try { ready = actionPolicyState(workspace) === "signed" && checkToolsetReadiness(workspace).ready; } catch { ready = false; }
   const catalog = provider === "stub" || model === null ? null : lookupModelPrice(model)?.maxOutputTokens ?? null;
   return {
     tools: ready ? "workspace" : provider === "stub" ? "echo" : "none",
     maxTokens: provider === "stub" ? "512" : String(Math.min(catalog ?? CHAT_MAX_TOKENS_FALLBACK, CHAT_MAX_TOKENS_CAP)),
     asksBeforeEffects: executeOnApprovalClasses(workspace).size > 0
   };
+}
+
+/**
+ * Tools on by default always come with an approval gate (`default`), and so does `--tools workspace` where the signed
+ * policy runs edits on a person's approval. A person's own --approval-mode or --approve-tools (or a preset's) is kept.
+ */
+export function chatApprovalMode(options: Pick<NativeChatOptions, "tools" | "approvalMode" | "approveTools">,
+  defaults: { readonly tools: string; readonly asksBeforeEffects: boolean }): string | undefined {
+  if (options.approvalMode !== undefined || options.approveTools !== undefined) return options.approvalMode;
+  const tools = options.tools ?? defaults.tools;
+  return (options.tools === undefined && tools === "workspace") || (tools === "workspace" && defaults.asksBeforeEffects) ? "default" : undefined;
 }
 
 /** Interactive input only; every turn runs through the existing CLI boundary. */
@@ -287,10 +299,8 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       io.error("Choose --tools none, echo, or workspace."); io.fail(); return;
     }
     const maxTokens = options.maxTokens ?? defaults.maxTokens;
-    // A workspace whose signed policy runs edits and commands on a person's approval asks about each one by default.
-    if (options.approvalMode === undefined && options.approveTools === undefined && tools === "workspace" && defaults.asksBeforeEffects) {
-      options = { ...options, approvalMode: "default" };
-    }
+    const defaultedMode = chatApprovalMode(options, defaults);
+    if (defaultedMode !== undefined) options = { ...options, approvalMode: defaultedMode };
     const maxSteps = options.maxSteps ?? (provider === "stub" ? "2" : "8");
     if (![maxTokens, maxSteps].every(value => /^[1-9][0-9]*$/.test(value) && Number.isSafeInteger(Number(value)))) {
       io.error("--max-tokens and --max-steps must be positive integers."); io.fail(); return;
@@ -318,6 +328,8 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     if (approvalMode !== undefined && options.approveTools !== undefined) io.log(`Approval mode ${approvalMode.ok ? approvalMode.mode : ""} replaces the preset's approveTools ${options.approveTools}.`);
     // A mode other than plan composes a gate in the child run, so this terminal reviews its requests too.
     const modeGated = approvalMode !== undefined && approvalMode.ok && approvalModeGatedClasses(approvalMode.mode) !== null;
+    // plan simulates every call outside READ_ONLY; a mode or class gate asks a person first.
+    const gateActive = modeGated || approvalClass !== undefined || (approvalMode !== undefined && approvalMode.ok && approvalMode.mode === "plan");
     if ((approvalClass !== undefined && !isActionClass(approvalClass)) ||
         !["low", "medium", "high", "critical"].includes(approvalRisk) ||
         (options.approveRisk !== undefined && approvalClass === undefined)) {
@@ -371,7 +383,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       if (options.delegate) io.log("Native in-process delegation enabled under the signed tool grant, configured scope and depth bound.");
       io.log(provider === "stub" ? "Local demonstration: canned replies, no real model answer." : "Real provider: requests may incur charges; local setup does not prove authentication or model access.");
       io.log(tools === "workspace"
-        ? `Workspace tools on${options.tools === undefined ? " (this workspace is set up for them; --tools none turns them off)" : ""}. The signed allowlist and Action Policy still decide what runs; nothing skips an approval.`
+        ? `Workspace tools on${options.tools === undefined ? " (this workspace is set up for them; --tools none turns them off)" : ""}. The signed allowlist and Action Policy still decide what runs; ${gateActive ? "an approval gate is active." : "no approval gate is active, so a call the Action Policy allows runs without asking anyone."}`
         : tools === "echo" ? "Echo demonstration tool only; no workspace editing tool is offered."
           : "No tools offered; model replies cannot edit workspace files through this session.");
       if (approvalMode !== undefined && approvalMode.ok) io.log(`Approval mode: ${approvalMode.mode}${modeGated ? ". This terminal asks you to review actual queued requests using an existing authenticated reviewer session; quorum still applies." : " (nothing executes: every call outside READ_ONLY is simulated)."}`);
