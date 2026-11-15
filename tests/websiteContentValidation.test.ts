@@ -24,7 +24,8 @@ describe("website content validation", () => {
     expect(changelog).toContain("Make <code>amc doctor</code> report healthy install readiness");
     expect(changelog).toContain("supported Node.js 24 action versions");
     expect(changelog).toContain("Complete changelog");
-    expect(changelog).not.toContain("<script");
+    // The notes are static: the only scripts are the site's own nav scripts, none of them fetches the notes.
+    for (const tag of changelog.matchAll(/<script\b[^>]*>/g)) expect(tag[0]).toMatch(/^<script src="(?:script|home|pages)\.js\?v=\d+">$/);
     expect(changelog).not.toContain("raw.githubusercontent.com");
     expect(changelog).not.toContain("content of those pages not audited for staleness");
   });

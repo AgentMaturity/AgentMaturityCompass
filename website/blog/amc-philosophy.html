@@ -1,40 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+  <meta charset="UTF-8">
   <link rel="icon" href="../favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
   <link rel="apple-touch-icon" href="../apple-touch-icon.png">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The AMC Philosophy: Trust, But Verify — With Receipts</title>
-<meta name="description" content="Why we built Agent Maturity Compass and the principles behind evidence-based trust scoring for AI agents.">
-<meta name="author" content="AMC Team">
-<meta property="og:title" content="The AMC Philosophy: Trust, But Verify — With Receipts">
-<meta property="og:description" content="Why Agent Maturity Compass measures AI agent trust from evidence rather than claims.">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://agentmaturity.co/blog/amc-philosophy.html">
-<meta property="og:image" content="https://agentmaturity.co/og-card.png">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="canonical" href="https://agentmaturity.co/blog/amc-philosophy.html">
-<link rel="stylesheet" href="editorial.css?v=1">
-<script src="editorial.js?v=1" defer></script>
+  <link rel="manifest" href="../manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The AMC Philosophy: Trust, But Verify — With Receipts</title>
+  <meta name="description" content="Why we built Agent Maturity Compass and the principles behind evidence-based trust scoring for AI agents.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="canonical" href="https://agentmaturity.co/blog/amc-philosophy.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="The AMC Philosophy: Trust, But Verify — With Receipts">
+  <meta property="og:description" content="Why Agent Maturity Compass measures AI agent trust from evidence rather than claims.">
+  <meta property="og:url" content="https://agentmaturity.co/blog/amc-philosophy.html">
+  <meta property="og:image" content="https://agentmaturity.co/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="../home.css?v=5">
+  <link rel="stylesheet" href="../pages.css?v=1">
+  <link rel="stylesheet" href="../blog/editorial.css?v=2">
+  <meta name="author" content="AMC Team">
+  <meta property="article:section" content="Journal">
+  <script src="../blog/editorial.js?v=1" defer></script>
 </head>
 <body>
-<a href="#main-content" class="skip-link">Skip to content</a>
-<nav class="editorial-topbar" aria-label="Primary">
-  <a href="../" class="editorial-wordmark" aria-label="Agent Maturity Compass home">amc<span class="brand-cursor">_</span><span class="editorial-surface">editorial</span></a>
-  <span class="editorial-tagline">Evidence over claims.</span>
-  <div class="editorial-nav-links">
-    <a href="../">Product</a>
-    <a href="../docs/">Docs</a>
-    <a href="./" aria-current="page">Journal</a>
-    <a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">GitHub</a>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <nav class="nav" aria-label="Main">
+    <div class="nav-inner">
+      <a href="../" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>
+      <ul class="nav-links">
+        <li><a href="../#a4-forge">Build an agent</a></li>
+        <li><a href="../#capabilities">Run it</a></li>
+        <li><a href="../#domains">Industries</a></li>
+        <li><a href="../a4.html">A4 Forge</a></li>
+        <li><a href="../docs/index.html">Docs</a></li>
+      </ul>
+      <div class="nav-right">
+        <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="nav-quiet">GitHub</a>
+        <a href="../#install" class="btn btn-primary btn-small">Get AMC</a>
+        <button class="nav-hamburger" aria-label="Menu" aria-controls="navMobile" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+  <div class="nav-mobile" id="navMobile">
+    <a href="../#a4-forge">Build an agent</a>
+    <a href="../#capabilities">Run it</a>
+    <a href="../#domains">Industries</a>
+    <a href="../#paths">Already have an agent?</a>
+    <a href="../#install">Get AMC</a>
+    <a href="../#desktop">macOS app</a>
+    <a href="../#pricing">Price</a>
+    <a href="../a4.html">A4 Forge (preview)</a>
+    <a href="../docs/index.html">Docs</a>
+    <a href="../executive.html">For executives</a>
+    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
   </div>
-</nav>
+
 <main id="main-content" class="article-shell" tabindex="-1">
 <article>
 <h1>The AMC Philosophy: Trust, But Verify — With Receipts</h1>
 <div class="meta">March 2026 · 6 min read</div>
+<aside class="warning-box editor-note"><strong>Note, 15 November 2026.</strong> Parts of this post are out of date. Today the highest level AMC gives is L2: L3, L4 and L5 are not evaluated yet. Where a record came from caps how high a question can go (self-reported records reach L1 at most); it is not a weight. The current way to install AMC is the source build; the one-line installer gives the older 1.1.1 release. <a href="../methodology.html">How the score works today</a>.</aside>
+
 
 <p>Every AI agent you deploy today has a trust problem.</p>
 
@@ -62,7 +91,7 @@
 
 <p>We apply the same principle to AI agents, with a twist: the evidence is cryptographically verifiable.</p>
 
-<p>When AMC observes an agent through its transparent gateway, the evidence is <strong>OBSERVED</strong> — weighted at 1.0×. When the agent provides its own attestation, that's <strong>ATTESTED</strong> at 0.8×. When the agent self-reports, that's capped at <strong>0.4×</strong>.</p>
+<p>When AMC observes an agent through its transparent gateway, the evidence is <strong>OBSERVED</strong>, and it can lift a question to L2. When the agent or its makers report on themselves, the evidence is <strong>SELF_REPORTED</strong>, and it reaches L1 at most.</p>
 
 <p>This isn't punitive. It's honest. A score built on observed behavior is worth more than a score built on promises.</p>
 
@@ -96,15 +125,29 @@
 
 <p>AMC is our contribution to that future. It's open source, it's free, and it works in 60 seconds:</p>
 
-<p><code>curl -fsSL https://agentmaturity.co/install.sh | sh</code></p>
+<pre><code>git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
+cd AgentMaturityCompass
+pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link</code></pre>
 
 <p>Stop trusting. Start verifying.</p>
 
 </article>
 </main>
-<footer class="editorial-footer">
-  <span>Agent Maturity Compass · MIT License</span>
-  <span>Evidence over claims.</span>
-</footer>
+  <footer class="footer">
+    <div class="footer-inner wrap">
+      <div class="footer-top">
+        <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p></div>
+        <div class="footer-col"><h3>Product</h3><a href="../#a4-forge">Build an agent</a><a href="../#capabilities">Run it</a><a href="../#paths">Already have an agent?</a><a href="../#install">Get AMC</a><a href="../#desktop">macOS app</a><a href="../#products">Eight tools</a><a href="../executive.html">Executives</a><a href="../playground.html">Playground</a><a href="../docs/index.html">Documentation</a></div>
+        <div class="footer-col"><h3>Depth</h3><a href="../a4.html">A4 Forge</a><a href="../methodology.html">Approach and research</a><a href="../compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="../#pricing">Price</a><a href="../#faq">FAQ</a></div>
+        <div class="footer-col"><h3>Industry Packs</h3><a href="../#domains">All packs</a><a href="../station-environment.html">Environment</a><a href="../station-health.html">Health</a><a href="../station-wealth.html">Wealth</a><a href="../station-education.html">Education</a><a href="../station-mobility.html">Mobility</a><a href="../station-technology.html">Technology</a><a href="../station-governance.html">Governance</a></div>
+        <div class="footer-col"><h3>Code</h3><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="../accessibility.html">Accessibility</a></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
+    </div>
+  </footer>
+
+  <script src="../script.js?v=13"></script>
+  <script src="../home.js?v=3"></script>
+  <script src="../pages.js?v=2"></script>
 </body>
 </html>
