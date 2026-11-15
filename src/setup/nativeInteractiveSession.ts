@@ -32,6 +32,9 @@ import { nativeUnknownUsageNotice } from "../budgets/nativeBudgetAdmission.js";
 import { VAULT_LOCKED_PREFIX } from "../vault/vaultLockedError.js";
 import { chatVaultPassphrase } from "./nativeChatVault.js";
 import { chatSetupDeps } from "./nativeChatSetupIo.js";
+import { checkToolsetReadiness } from "../agent/agentToolset.js";
+import { executeOnApprovalClasses } from "../tools/guards/actionPolicyGuard.js";
+import { lookupModelPrice } from "../product/modelPricing.js";
 import { resolveChatSetup } from "./nativeChatSetup.js";
 
 export interface NativeChatOptions extends NativeChatProfileOptions {
@@ -80,6 +83,24 @@ export interface NativeChatIo {
 function sessionDetailLines(summary: NativeChatChildSummary): string[] {
   return [renderNativeRunUsage(summary.usage, { requestWindow: "latest" }), renderNativeRunDiagnostics(summary.diagnostics),
     `Public task validation: ${summary.validation?.status ?? "unavailable"}. Passing selected checks does not guarantee correctness.`];
+}
+
+/**
+ * Chat defaults: the workspace tools when this workspace is ready for them (signed allowlist, firewall, a verifying
+ * Action Policy), else the echo demo (stub) or none; the model's own output limit from the catalog, at most
+ * CHAT_MAX_TOKENS_CAP, else CHAT_MAX_TOKENS_FALLBACK; and whether the signed Action Policy runs effects on approval.
+ */
+const CHAT_MAX_TOKENS_FALLBACK = 8192, CHAT_MAX_TOKENS_CAP = 16384;
+export function chatDefaults(workspace: string, provider: string, model: string | null):
+  { readonly tools: string; readonly maxTokens: string; readonly asksBeforeEffects: boolean } {
+  let ready = false;
+  try { ready = checkToolsetReadiness(workspace).ready; } catch { ready = false; }
+  const catalog = provider === "stub" || model === null ? null : lookupModelPrice(model)?.maxOutputTokens ?? null;
+  return {
+    tools: ready ? "workspace" : provider === "stub" ? "echo" : "none",
+    maxTokens: provider === "stub" ? "512" : String(Math.min(catalog ?? CHAT_MAX_TOKENS_FALLBACK, CHAT_MAX_TOKENS_CAP)),
+    asksBeforeEffects: executeOnApprovalClasses(workspace).size > 0
+  };
 }
 
 /** Interactive input only; every turn runs through the existing CLI boundary. */
@@ -260,11 +281,16 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       return;
     }
     selectedAgentId = guide.agentId;
-    const tools = options.tools ?? (provider === "stub" ? "echo" : "none");
+    const defaults = chatDefaults(cwd, provider!, guide.model);
+    const tools = options.tools ?? defaults.tools;
     if (!["none", "echo", "workspace"].includes(tools)) {
       io.error("Choose --tools none, echo, or workspace."); io.fail(); return;
     }
-    const maxTokens = options.maxTokens ?? "512";
+    const maxTokens = options.maxTokens ?? defaults.maxTokens;
+    // A workspace whose signed policy runs edits and commands on a person's approval asks about each one by default.
+    if (options.approvalMode === undefined && options.approveTools === undefined && tools === "workspace" && defaults.asksBeforeEffects) {
+      options = { ...options, approvalMode: "default" };
+    }
     const maxSteps = options.maxSteps ?? (provider === "stub" ? "2" : "8");
     if (![maxTokens, maxSteps].every(value => /^[1-9][0-9]*$/.test(value) && Number.isSafeInteger(Number(value)))) {
       io.error("--max-tokens and --max-steps must be positive integers."); io.fail(); return;
@@ -345,7 +371,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       if (options.delegate) io.log("Native in-process delegation enabled under the signed tool grant, configured scope and depth bound.");
       io.log(provider === "stub" ? "Local demonstration: canned replies, no real model answer." : "Real provider: requests may incur charges; local setup does not prove authentication or model access.");
       io.log(tools === "workspace"
-        ? "Workspace tools enabled explicitly. The existing signed allowlist and governor still control access; no approval or policy bypass is added."
+        ? `Workspace tools on${options.tools === undefined ? " (this workspace is set up for them; --tools none turns them off)" : ""}. The signed allowlist and Action Policy still decide what runs; nothing skips an approval.`
         : tools === "echo" ? "Echo demonstration tool only; no workspace editing tool is offered."
           : "No tools offered; model replies cannot edit workspace files through this session.");
       if (approvalMode !== undefined && approvalMode.ok) io.log(`Approval mode: ${approvalMode.mode}${modeGated ? ". This terminal asks you to review actual queued requests using an existing authenticated reviewer session; quorum still applies." : " (nothing executes: every call outside READ_ONLY is simulated)."}`);
