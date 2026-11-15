@@ -1,5 +1,6 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { createInterface } from "node:readline";
+import { readOneKey } from "./nativeOneKey.js";
 import { resolve } from "node:path";
 import { admitWorkspaceTrust } from "../cli-agent-options.js";
 import { TRUST_WORKSPACE_ENV } from "../security/workspaceTrust.js";
@@ -189,23 +190,10 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       catch { finish(null); }
     });
   };
-  // One key without Enter (an approval's y or n). The line editor has already put the key on its line when this listener
-  // sees it: y or n is submitted as the answer at once, Esc empties the line and submits it (no answer), any other key is
-  // taken off the line again. Ctrl-C cancels the turn as everywhere else.
+  // One key without Enter (an approval's y or n); typed-ahead and pasted text never answer (nativeOneKey.ts).
   const key = (prompt: string, signal: AbortSignal): Promise<string | null> => {
     if (closed || signal.aborted || pendingAnswer !== null) return Promise.resolve(null);
-    const onKey = (text: string | undefined, info: { name?: string; ctrl?: boolean } | undefined) => {
-      if (info?.ctrl === true) return;
-      if (info?.name === "escape") { terminal.write(null, { ctrl: true, name: "u" }); terminal.write("\r"); }
-      else if (text === "y" || text === "n" || text === "Y" || text === "N") terminal.write("\r");
-      else if (info?.name !== "return" && info?.name !== "enter") terminal.write(null, { ctrl: true, name: "u" });
-    };
-    process.stdin.on("keypress", onKey);
-    return question(prompt, signal).then(answer => {
-      process.stdin.removeListener("keypress", onKey);
-      const word = (answer ?? "").trim().toLowerCase();
-      return word === "y" || word === "n" ? word : null;
-    });
+    return readOneKey({ terminal, input: process.stdin, output: process.stdout, question }, prompt, signal);
   };
   const cancel = () => {
     if (cancelActiveCommand !== null) cancelActiveCommand();

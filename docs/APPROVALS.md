@@ -140,17 +140,21 @@ expert `approveTools` form.
 
 When a gated call in `amc agent-loop chat` waits for approval, the chat terminal shows what it would do in plain form: a
 file write or edit as a unified diff, a shell call as its command and folder (the agent's own description is marked as
-not checked), a network call as its host, and any other tool's arguments as values. AMC shows these only after the
+not checked), a `web_fetch` call as its host and address, and any other tool's arguments as values. Every argument a
+summary does not cover is listed after it. AMC shows these only after the
 arguments the run sent hash to the digest the signed request binds; otherwise it says it cannot show the call and does
 not offer the one-key answer.
 
 Where the request's own rule and the class's rule in the signed approval policy both allow one local approver (at most
 one approval, no distinct-user rule, OWNER among the roles, as in a workspace made by `amc init --coding`), the person
-at the terminal answers with one key: `y` allows this one call, `n` refuses it, Esc stops the turn. The decision is
+at the terminal answers with one key: `y` allows this one call, `n` refuses it, Esc stops the turn. The key is
+offered only when every argument of the call is shown in full; when any part is cut short or cannot be shown, the
+call goes to the signed-in path below. Only a key pressed after the prompt appears counts: text typed before it, a
+key in its first 0.3 seconds and pasted text are cleared and never answer. The decision is
 signed in the chat process and recorded as `authentication: "terminal"`, with the OS account as the reviewer, role
 OWNER and a reason saying nobody signed in. The engine checks again that the process has a terminal on stdin, carries
 no agent marker and is not in agent mode, and that both rules allow one approver; no CLI flag selects this path, and the
-agent's run (which has no terminal) cannot take it. The approval binds the shown arguments and is used up by that one
+agent's run (which has no terminal) cannot take it. The approval binds those arguments and is used up by that one
 call. A terminal approval is never counted toward a request that needs two approvals, different people or a role other
 than OWNER: those requests keep the signed-in path below.
 
