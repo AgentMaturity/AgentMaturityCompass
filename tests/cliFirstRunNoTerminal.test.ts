@@ -54,4 +54,16 @@ describe("amc without a terminal", () => {
     expect(result.stdout).toContain("Score again and see what changed");
     expect(result.stdout).not.toContain("first full maturity score");
   }, 120_000);
+
+  // S-01: with nothing to assess there is no grade, neither in --fail-below's verdict nor in the JSON.
+  test("amc run shows no grade while there is nothing to assess", () => {
+    const gate = amc("run", "--fail-below", "F");
+    expect(gate.status, gate.stderr).toBe(0);
+    expect(gate.stdout).toContain("Nothing to grade yet; --fail-below F sets no minimum");
+    expect(gate.stdout).not.toContain("meets --fail-below");
+    const json = amc("run", "--json");
+    expect(json.status, json.stderr).toBe(0);
+    const parsed = JSON.parse(json.stdout.slice(json.stdout.indexOf("{"))) as Record<string, unknown>;
+    expect(parsed).toMatchObject({ nothingToAssess: true, overallGrade: null, overallScore: null });
+  }, 240_000);
 });

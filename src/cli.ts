@@ -5395,7 +5395,8 @@ program
       // Render output. The grade combines workspace inspections AMC does not verify, so it is self-reported.
       const claim = unverifiedClaim("unified:run", result.surfaceCoverage.evaluated);
       if (opts.json) {
-        console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
+        // S-01: with nothing to assess there is no grade, in JSON too (nothingToAssess says why).
+        console.log(JSON.stringify(withClaimFields(result.nothingToAssess ? { ...result, overallGrade: null, overallScore: null } : result, claim), null, 2));
       } else {
         if (opts.ci) console.log(renderCIAnnotations(result));
         printLabelledReport(renderUnifiedResult(result, { ci: opts.ci, claimLine: formatClaimLabel(renderClaimLabel(claim), "cli") }));
@@ -5432,7 +5433,7 @@ program
             : `\n  ✗ Grade ${result.overallGrade} is below --fail-below ${opts.failBelow}\n`));
           process.exit(1);
         } else {
-          console.log(chalk.hex('#4AEF79')(`\n  ✓ Grade ${result.overallGrade} meets --fail-below ${opts.failBelow}\n`));
+          console.log(chalk.hex('#4AEF79')(result.nothingToAssess ? `\n  ✓ Nothing to grade yet; --fail-below ${opts.failBelow} sets no minimum\n` : `\n  ✓ Grade ${result.overallGrade} meets --fail-below ${opts.failBelow}\n`));
         }
       }
       } finally {
