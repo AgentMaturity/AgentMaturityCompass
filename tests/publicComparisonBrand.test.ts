@@ -11,8 +11,9 @@ describe("AMC public comparison identity and claim boundary", () => {
 
     const html = read("website/compare.html");
     const css = read("website/compare.css");
-    expect(html).toContain('href="compare.css?v=20260710a"');
-    expect(html).toContain('src="compare.js?v=20260710a"');
+    expect(html).toContain('href="compare.css?v=20261115"');
+    expect(html).toContain('src="compare.js?v=20261115"');
+    expect(html).toContain('href="home.css?v=5"');
     expect(html).not.toMatch(/<style(?:\s[^>]*)?>/i);
     expect(html).not.toMatch(/\sstyle=/i);
     expect(css).toContain('@import url("./brand.css")');
@@ -30,9 +31,9 @@ describe("AMC public comparison identity and claim boundary", () => {
     expect(html).toContain('<link rel="canonical" href="https://agentmaturity.co/compare.html">');
     expect(html).toContain('<meta property="og:image" content="https://agentmaturity.co/og-card.png">');
     expect(html).toContain('<meta name="twitter:card" content="summary_large_image">');
-    expect(html).toContain('class="comparison-wordmark"');
-    expect(html).toContain('amc<span class="brand-cursor">_</span><span class="surface-name">compare</span>');
-    expect(html).toContain('class="comparison-tagline">Evidence over claims.</span>');
+    // One nav and one footer on every page: the home page's.
+    expect(html).toContain('<a href="./" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>');
+    expect(html).toContain('<p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p>');
     expect(html).toContain('data-reviewed="2026-07-10"');
     expect(html).toContain('<img src="og-card.png"');
     expect(html).not.toMatch(/<(?:a|h1|h2|h3|button)[^>]*>[^<]*\p{Extended_Pictographic}/u);
@@ -80,20 +81,19 @@ describe("AMC public comparison identity and claim boundary", () => {
     expect(html).toContain("AMC does not replace model benchmarks, model cards, organizational assurance reports, or expert adversarial testing.");
   });
 
-  test("uses semantic landmarks, a captioned comparison table, and accessible persistent theme state", () => {
+  test("uses semantic landmarks, a captioned comparison table that says it scrolls, and the site's one dark theme", () => {
     const html = read("website/compare.html");
     const script = read("website/compare.js");
-    expect(html).toContain('<nav class="comparison-topbar"');
+    expect(html).toContain('<nav class="nav" aria-label="Main">');
     expect(html).toContain('<main id="main-content"');
-    expect(html).toContain('<footer class="comparison-footer"');
+    expect(html).toContain('<footer class="footer">');
+    expect(html).toContain('<p class="scroll-hint">Swipe the table sideways to see every column.</p>');
     expect(html).toContain('<div class="table-region" role="region"');
     expect(html).toContain("<caption>");
-    expect(html).toContain('id="themeToggle"');
-    expect(html).toContain('aria-pressed="false"');
+    expect(html).not.toContain('id="themeToggle"');
     expect(script).toContain("scrollWidth > region.clientWidth");
     expect(script).toContain('region.setAttribute("tabindex", "0")');
-    expect(script).toContain("localStorage.setItem(\"amc-theme\", theme)");
-    expect(script).toContain("Switch to dark theme");
-    expect(script).toContain("Switch to light theme");
+    expect(script).toContain('localStorage.removeItem("amc-theme")');
+    expect(script).not.toContain("clean-theme");
   });
 });
