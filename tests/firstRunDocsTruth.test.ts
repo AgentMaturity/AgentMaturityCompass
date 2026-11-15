@@ -27,11 +27,14 @@ describe("the first console login is in the first-run path", () => {
     expect(block.indexOf("amc user init")).toBeGreaterThan(block.indexOf("amc up"));
   });
 
-  test("the website's Open Studio step names amc user init and amc user add", () => {
-    const step = website.slice(website.indexOf("<h4>Open Studio when ready</h4>"), website.indexOf("</div>", website.indexOf("<h4>Open Studio when ready</h4>")));
+  test("the website's open-the-console step names amc user init and amc user add", () => {
+    const start = website.indexOf('<h2 id="console">');
+    const step = website.slice(start, website.indexOf("<h2", start + 4));
     expect(step).toContain("amc user init --username &lt;you&gt;   # new workspace only: the first console login (asks for a password)");
-    expect(step).toContain("Then sign in to the Compass Console at the URL amc up printed.");
-    expect(step).toContain("If the workspace already has logins, an OWNER adds yours with <code>amc user add</code>.");
+    expect(step.indexOf("amc user init")).toBeGreaterThan(step.indexOf("amc up"));
+    expect(step).toContain("Then sign in to the Compass Console at the address <code>amc up</code> printed.");
+    expect(step).toContain("If the workspace already has logins, an owner adds yours with <code>amc user add</code>.");
+    expect(step).not.toContain("amc vault unlock");
   });
 });
 

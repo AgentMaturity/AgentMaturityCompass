@@ -34,11 +34,11 @@ describe("AMC public changelog identity", () => {
     const html = read("website/changelog.html");
     const css = read("website/changelog.css");
 
-    expect(html).toContain('href="changelog.css?v=1"');
-    expect(html).toContain('class="editorial-topbar"');
-    expect(html).toContain('class="editorial-wordmark"');
-    expect(html).toContain('class="editorial-tagline">Evidence over claims.</span>');
-    expect(html).toContain('amc<span class="brand-cursor">_</span><span class="editorial-surface">releases</span>');
+    expect(html).toContain('href="changelog.css?v=2"');
+    expect(html).toContain('href="home.css?v=6"');
+    // One nav and one footer on every page: the home page's.
+    expect(html).toContain('<a href="./" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>');
+    expect(html).toContain('<p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p>');
     expect(css).toContain('@import url("./blog/editorial.css")');
     for (const token of ["var(--amc-bg)", "var(--amc-text)", "var(--amc-muted)", "var(--amc-accent)", "var(--amc-font-sans)", "var(--amc-font-mono)"]) {
       expect(css).toContain(token);
@@ -49,7 +49,10 @@ describe("AMC public changelog identity", () => {
     const html = read("website/changelog.html");
     const css = read("website/changelog.css");
 
-    expect(html).not.toContain("<script");
+    // Only the site's own nav scripts load; the notes themselves are static HTML.
+    expect([...html.matchAll(/<script\b[^>]*>/g)].map((tag) => tag[0])).toEqual([
+      '<script src="script.js?v=13">', '<script src="home.js?v=3">', '<script src="pages.js?v=2">'
+    ]);
     expect(html).not.toContain("marked");
     expect(html).not.toContain("raw.githubusercontent.com");
     expect(html).not.toContain("innerHTML");
@@ -80,10 +83,9 @@ describe("AMC public changelog identity", () => {
     const css = read("website/changelog.css");
 
     expect(html).toContain('<a href="#main-content" class="skip-link">Skip to content</a>');
-    expect(html).toContain('<nav class="editorial-topbar" aria-label="Primary">');
+    expect(html).toContain('<nav class="nav" aria-label="Main">');
     expect(html).toContain('<main id="main-content" tabindex="-1">');
-    expect(html).toContain('<footer class="editorial-footer">');
-    expect(html).toContain('href="changelog.html" aria-current="page"');
+    expect(html).toContain('<footer class="footer">');
     expect(html).toMatch(/target="_blank" rel="noopener"/);
     expect(css).toContain("overflow-wrap: anywhere");
     expect(css).toContain("@media (max-width: 760px)");

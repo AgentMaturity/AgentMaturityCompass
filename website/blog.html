@@ -1,42 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+  <meta charset="UTF-8">
   <link rel="icon" href="favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blog — Agent Maturity Compass</title>
-<meta name="description" content="Insights on AI agent evaluation, EU AI Act compliance, and the documentation inflation gap. From the creators of AMC.">
-<meta property="og:title" content="AMC Blog — AI Agent Trust & Safety Insights">
-<meta property="og:description" content="Technical articles on AI agent evaluation, compliance, and the 84-point documentation inflation gap.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://agentmaturity.co/blog.html">
-<meta property="og:image" content="https://agentmaturity.co/og-card.png">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="canonical" href="https://agentmaturity.co/blog.html">
-<link rel="stylesheet" href="blog/editorial.css?v=1">
-<script src="blog/editorial.js?v=1" defer></script>
+  <link rel="manifest" href="manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — Agent Maturity Compass</title>
+  <meta name="description" content="Insights on AI agent evaluation, EU AI Act compliance, and the documentation inflation gap. From the creators of AMC.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="canonical" href="https://agentmaturity.co/blog.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="AMC Blog — AI Agent Trust & Safety Insights">
+  <meta property="og:description" content="Technical articles on AI agent evaluation, compliance, and the 84-point documentation inflation gap.">
+  <meta property="og:url" content="https://agentmaturity.co/blog.html">
+  <meta property="og:image" content="https://agentmaturity.co/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="home.css?v=6">
+  <link rel="stylesheet" href="pages.css?v=1">
+  <link rel="stylesheet" href="blog/editorial.css?v=2">
+  <script src="blog/editorial.js?v=1" defer></script>
 </head>
 <body>
-<a href="#main-content" class="skip-link">Skip to content</a>
+  <a href="#main-content" class="skip-link">Skip to content</a>
 
-<nav class="editorial-topbar" aria-label="Primary">
-  <a href="./" class="editorial-wordmark" aria-label="Agent Maturity Compass home">amc<span class="brand-cursor">_</span><span class="editorial-surface">editorial</span></a>
-  <span class="editorial-tagline">Evidence over claims.</span>
-  <div class="editorial-nav-links">
-    <a href="./">Product</a>
-    <a href="docs/">Docs</a>
-    <a href="blog.html" aria-current="page">Journal</a>
-    <a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">GitHub</a>
+  <nav class="nav" aria-label="Main">
+    <div class="nav-inner">
+      <a href="./" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>
+      <ul class="nav-links">
+        <li><a href="./#a4-forge">Build an agent</a></li>
+        <li><a href="./#capabilities">Run it</a></li>
+        <li><a href="./#domains">Industries</a></li>
+        <li><a href="a4.html">A4 Forge</a></li>
+        <li><a href="docs/index.html">Docs</a></li>
+      </ul>
+      <div class="nav-right">
+        <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="nav-quiet">GitHub</a>
+        <a href="./#install" class="btn btn-primary btn-small">Get AMC</a>
+        <button class="nav-hamburger" aria-label="Menu" aria-controls="navMobile" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+  <div class="nav-mobile" id="navMobile">
+    <a href="./#a4-forge">Build an agent</a>
+    <a href="./#capabilities">Run it</a>
+    <a href="./#domains">Industries</a>
+    <a href="./#paths">Already have an agent?</a>
+    <a href="./#install">Get AMC</a>
+    <a href="./#desktop">macOS app</a>
+    <a href="./#pricing">Price</a>
+    <a href="a4.html">A4 Forge (preview)</a>
+    <a href="docs/index.html">Docs</a>
+    <a href="executive.html">For executives</a>
+    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
   </div>
-</nav>
+
 <main id="main-content" tabindex="-1">
 
-<div class="hero" id="blog-hero">
+<div class="ed-hero" id="blog-hero">
   <h1>AMC Blog</h1>
   <p>Insights on AI agent trust, evaluation, and compliance.</p>
 </div>
+<aside class="warning-box editor-note"><strong>Note, 15 November 2026.</strong> Parts of these posts are out of date. Today the highest level AMC gives is L2: L3, L4 and L5 are not evaluated yet. Where a record came from caps how high a question can go (self-reported records reach L1 at most); it is not a weight. The current way to install AMC is the source build; the one-line installer gives the older 1.1.1 release. <a href="methodology.html">How the score works today</a>.</aside>
 
 <div class="container">
 
@@ -93,11 +119,13 @@
 
     <p>Deep diagnostic coverage across 5 trust dimensions. Evidence-gated scoring from L0 to L5. 16 framework adapters — LangChain, CrewAI, AutoGen, OpenAI Agents SDK, and more. To get a first score:</p>
 
-    <pre><code>curl -fsSL https://agentmaturity.co/install.sh | sh
+    <pre><code>git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
+cd AgentMaturityCompass
+pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link
 amc</code></pre>
 
     <div class="highlight">
-      <strong>The key insight:</strong> Self-reported evidence is capped at 0.4x weight. Observed evidence scores at 1.0x. Cryptographic evidence also scores at 1.0x. The scoring system structurally incentivizes real evidence over claims.
+      <strong>The key insight:</strong> Where a record came from caps how high a question can go: self-reported records reach L1 at most, and only records AMC observed itself can reach L2, the highest level today. The scoring system rewards real evidence over claims.
     </div>
 
     <h2>What to Do This Week</h2>
@@ -214,7 +242,7 @@ amc</code></pre>
       <p><strong>Article 15</strong> → AMC: Shield (threat detection), Enforce (policy guardrails)</p>
     </div>
 
-    <p>Run <code>amc assurance run --pack eu-ai-act</code> for an automated compliance check against all relevant articles.</p>
+    <p>Run <code>amc assurance run --pack euAiActArticle</code> to run AMC's checks for EU AI Act Articles 9, 10, 13, 14, 15 and 17. It does not show that you comply.</p>
 
     <h2>Timeline</h2>
     <ul>
@@ -227,8 +255,10 @@ amc</code></pre>
 
     <p>Verify the current dates in the <a href="https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems">European Commission high-risk guidance</a>. AMC maps evidence to obligations but does not certify legal compliance. A signed <code>VALID</code> artifact may still be <code>INSUFFICIENT_EVIDENCE</code>.</p>
 
-    <pre><code>curl -fsSL https://agentmaturity.co/install.sh | sh
-amc init && amc assurance run --pack eu-ai-act</code></pre>
+    <pre><code>git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
+cd AgentMaturityCompass
+pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link
+amc init && amc assurance run --pack euAiActArticle</code></pre>
 
     <div class="share">
       <a href="https://twitter.com/intent/tweet?text=EU%20AI%20Act%20Compliance%20Checklist%20for%20AI%20Agents&url=https://agentmaturity.co/blog.html%23eu-ai-act-checklist" target="_blank">Share on X</a>
@@ -277,20 +307,21 @@ amc init && amc assurance run --pack eu-ai-act</code></pre>
     <p>AMC's approach:</p>
 
     <ol>
-      <li><strong>Self-reported evidence is capped at 0.4x weight.</strong> Claim whatever you want — it's worth less than half of observed evidence.</li>
-      <li><strong>Observed evidence scores at 1.0x.</strong> What AMC watches your agent actually do? Full weight.</li>
-      <li><strong>Cryptographic evidence also scores at 1.0x.</strong> Ed25519 signed, Merkle-tree chained, tamper-evident.</li>
+      <li><strong>Self-reported evidence reaches L1 at most.</strong> Claim whatever you want: above L1 only records AMC observed itself count.</li>
+      <li><strong>Only records AMC observed itself can reach L2, the highest level today.</strong> Each record is signed (Ed25519) and chained, so a later change shows up when it is checked.</li>
       <li><strong>Evidence decays.</strong> Old evidence is worth less. You can't coast on a good assessment from 6 months ago.</li>
       <li><strong>Anti-gaming.</strong> Temporal consistency prevents overnight jumps. Cross-reference validation catches inconsistencies.</li>
     </ol>
 
     <div class="highlight">
-      <strong>The result:</strong> AMC scores reflect what agents actually do, not what they claim. An L3 in AMC means something — it's backed by signed execution evidence, not a bullet point in a README.
+      <strong>The result:</strong> AMC scores reflect what agents actually do, not what they claim. An L2 in AMC, the highest level it gives today, rests on records AMC observed and signed, not on a bullet point in a README.
     </div>
 
     <h2>Try It Yourself</h2>
     <p>Score your agent. See where the gap is. It's free and open source:</p>
-    <pre><code>curl -fsSL https://agentmaturity.co/install.sh | sh
+    <pre><code>git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
+cd AgentMaturityCompass
+pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link
 amc</code></pre>
 
     <p>The gap might be uncomfortable. But knowing your real score is the first step to closing it.</p>
@@ -305,9 +336,22 @@ amc</code></pre>
 </div>
 </main>
 
-<footer class="editorial-footer">
-  <p>Agent Maturity Compass — MIT Licensed — <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a> · <a href="docs/">Docs</a> · <a href="changelog.html">Changelog</a></p>
-</footer>
+  <footer class="footer">
+    <div class="footer-inner wrap">
+      <div class="footer-top">
+        <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p></div>
+        <div class="footer-col"><h2>Product</h2><a href="./#a4-forge">Build an agent</a><a href="./#capabilities">Run it</a><a href="./#paths">Already have an agent?</a><a href="./#install">Get AMC</a><a href="./#desktop">macOS app</a><a href="./#products">Eight tools</a><a href="executive.html">Executives</a><a href="playground.html">Playground</a><a href="docs/index.html">Documentation</a></div>
+        <div class="footer-col"><h2>Depth</h2><a href="a4.html">A4 Forge</a><a href="methodology.html">Approach and research</a><a href="compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="./#pricing">Price</a><a href="./#faq">FAQ</a></div>
+        <div class="footer-col"><h2>Industry Packs</h2><a href="./#domains">All packs</a><a href="station-environment.html">Environment</a><a href="station-health.html">Health</a><a href="station-wealth.html">Wealth</a><a href="station-education.html">Education</a><a href="station-mobility.html">Mobility</a><a href="station-technology.html">Technology</a><a href="station-governance.html">Governance</a></div>
+        <div class="footer-col"><h2>Code</h2><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="accessibility.html">Accessibility</a></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
+    </div>
+  </footer>
+
+  <script src="script.js?v=13"></script>
+  <script src="home.js?v=3"></script>
+  <script src="pages.js?v=2"></script>
 
 <script>
 function showArticle(id) {

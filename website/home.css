@@ -312,7 +312,7 @@ code { font-family: var(--mono); font-size: 0.86em; padding: 0.1em 0.38em; borde
 .footer-top { display: grid; grid-template-columns: 1.3fr repeat(4, minmax(0, 1fr)); gap: 32px; }
 .footer-brand { font-family: var(--mono); font-weight: 700; font-size: 1.5rem; color: var(--text); }
 .footer-tagline { margin-top: 10px; color: var(--muted); }
-.footer-col h3 { font-size: 0.85rem; font-weight: 600; color: var(--muted); margin-bottom: 12px; }
+.footer-col h2 { font-size: 0.85rem; line-height: 1.4; font-weight: 600; color: var(--muted); margin-bottom: 12px; }
 .footer-col a { display: block; padding: 4px 0; color: var(--body); text-decoration: none; }
 .footer-col a:hover { color: var(--accent); }
 .footer-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--line); }

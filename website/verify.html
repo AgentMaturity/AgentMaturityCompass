@@ -5,60 +5,71 @@
   <link rel="icon" href="favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verify Our Claims - Agent Maturity Compass</title>
-  <meta name="description" content="Don't take our word for it. Download a real signed AMC file and check it yourself with one command.">
+  <title>Check a signed AMC record yourself | Agent Maturity Compass</title>
+  <meta name="description" content="Download a real signed AMC bundle and check it yourself, offline, with one command. No account needed.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="canonical" href="https://agentmaturity.co/verify.html">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Verify Our Claims - Agent Maturity Compass">
-  <meta property="og:description" content="Download a real signed AMC file and check it yourself with one command. No account needed.">
+  <meta property="og:title" content="Check a signed AMC record yourself | Agent Maturity Compass">
+  <meta property="og:description" content="Download a real signed AMC bundle and check it yourself, offline, with one command. No account needed.">
   <meta property="og:url" content="https://agentmaturity.co/verify.html">
   <meta property="og:image" content="https://agentmaturity.co/og-card.png">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="style.css?v=14">
-  <style>
-    .plain-page{min-height:100vh;padding:8rem 0 4rem}
-    .plain-page .label{margin-bottom:.75rem}
-    .plain-page h1{white-space:normal;margin-bottom:1.5rem}
-    .plain-page p,.plain-page li{max-width:760px;color:var(--text-muted);line-height:1.75}
-    .plain-page ul,.plain-page ol{margin:1rem 0 2rem 1.25rem}
-    .plain-page h2{font-size:1.15rem;text-transform:none;letter-spacing:0;color:var(--text);margin:2rem 0 .75rem}
-    .plain-page a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
-    .plain-page pre{max-width:760px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:1rem;overflow-x:auto;margin:0 0 1.5rem}
-    .plain-page code{font-size:.9rem;overflow-wrap:anywhere}
-    .plain-page pre code{overflow-wrap:normal}
-  </style>
+  <link rel="stylesheet" href="home.css?v=6">
+  <link rel="stylesheet" href="pages.css?v=1">
+  <link rel="stylesheet" href="docs-pages.css?v=1">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
-  <nav class="nav scrolled">
+
+  <nav class="nav" aria-label="Main">
     <div class="nav-inner">
-      <a href="./" class="nav-brand">amc<span class="accent">_</span></a>
+      <a href="./" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>
       <ul class="nav-links">
-        <li><a href="./#install">install</a></li>
-        <li><a href="./playground.html">playground</a></li>
-        <li><a href="./docs/index.html">docs</a></li>
-        <li><a href="https://github.com/AgentMaturity/AgentMaturityCompass">github</a></li>
+        <li><a href="./#a4-forge">Build an agent</a></li>
+        <li><a href="./#capabilities">Run it</a></li>
+        <li><a href="./#domains">Industries</a></li>
+        <li><a href="a4.html">A4 Forge</a></li>
+        <li><a href="docs/index.html">Docs</a></li>
       </ul>
-      <button class="nav-hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+      <div class="nav-right">
+        <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="nav-quiet">GitHub</a>
+        <a href="./#install" class="btn btn-primary btn-small">Get AMC</a>
+        <button class="nav-hamburger" aria-label="Menu" aria-controls="navMobile" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
     </div>
   </nav>
   <div class="nav-mobile" id="navMobile">
-    <a href="./#install">install</a>
-    <a href="./playground.html">playground</a>
-    <a href="./docs/index.html">docs</a>
-    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">github</a>
+    <a href="./#a4-forge">Build an agent</a>
+    <a href="./#capabilities">Run it</a>
+    <a href="./#domains">Industries</a>
+    <a href="./#paths">Already have an agent?</a>
+    <a href="./#install">Get AMC</a>
+    <a href="./#desktop">macOS app</a>
+    <a href="./#pricing">Price</a>
+    <a href="a4.html">A4 Forge (preview)</a>
+    <a href="docs/index.html">Docs</a>
+    <a href="executive.html">For executives</a>
+    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
   </div>
+
   <span id="main-content" tabindex="-1"></span>
-  <main class="plain-page">
-    <div class="container">
-      <p class="label">check it yourself</p>
-      <h1>Don't trust us. Check us.</h1>
+  <main id="main">
+    <section class="page-hero">
+      <div class="wrap">
+        <p class="product-name">Check it yourself</p>
+        <h1>Don't trust us. Check us.</h1>
+        <p class="lede">Every AMC score comes in a bundle: one signed file that holds the score and the records behind it. Anyone can check a bundle offline. You need no account and no AMC server, only the sender's public key, which you get from them some other way than the bundle. You can try it now on a real bundle we made and published.</p>
+      </div>
+    </section>
 
-      <p>Every AMC score comes in a bundle: one signed file that holds the score and the records behind it. Anyone can check a bundle offline. You need no account, no AMC server, and no trust in the person who sent it. You can try it now on a real bundle we made and published.</p>
-
+    <section class="band">
+      <div class="wrap"><div class="doc">
       <h2>Check a real bundle in two minutes</h2>
-      <p>1. Install AMC (free, open source):</p>
-      <pre><code>curl -fsSL https://agentmaturity.co/install.sh | sh</code></pre>
+      <p>1. Install AMC (free, open source). The current version is the source build; the <a href="./#install">Get AMC</a> section has the commands. Check that it works:</p>
+      <pre><code>amc --version</code></pre>
       <p>2. Download the sample bundle we published:</p>
       <pre><code>curl -fsSLO https://agentmaturity.co/verify/amc-sample-evidence.amcbundle</code></pre>
       <p>3. Save the sample's auditor public key. We publish it here, outside the bundle, because a key packed inside a bundle cannot vouch for that bundle. Its fingerprint (SHA-256 of the key file) is <code>eb6f84cc395175206962b8054442619563ceca075ff38a746739cd6df2031945</code>.</p>
@@ -71,11 +82,12 @@ EOF</code></pre>
       <pre><code>amc bundle verify amc-sample-evidence.amcbundle \
   --pubkey amc-sample-auditor.pub \
   --expect-monitor 93a2ad7bebb2e8b93a0de857710f9c39205f3dd29e23c8557291a0c4a470610f</code></pre>
-      <p>You should see this, with exit code 0:</p>
+      <p>The first line should be this, and the exit code 0:</p>
       <pre><code>Bundle verification PASSED</code></pre>
+      <p>The lines after it describe the sample: a first run on a new workspace, self-reported, with no accepted records yet.</p>
       <p>Without the two pins, the same command prints <code>Bundle verification FAILED</code>, lists each signing key as <code>not-pinned</code> with its fingerprint, and exits 1. Anyone can sign a fake bundle with a new key and put that key inside it. So AMC trusts only keys you got from outside the bundle. With <code>--allow-unpinned --allow-unanchored</code> it only checks that nothing changed: exit code 2 and an <code>UNTRUSTED:</code> line, never a pass.</p>
 
-      <p>AMC checks the bundle's signatures, the chain of fingerprints that links its records, and its list of contents, all offline. If one byte changed after signing, the check fails. Try it: change one character anywhere in the file and run the command again. We did that while publishing this page, and the check failed as it should.</p>
+      <p>AMC checks the bundle's signatures, the chain of fingerprints that links its records, and its list of contents, all offline. If one byte changed after signing, the check fails. Try it: change one character anywhere in the file and run the command again; the check fails.</p>
 
       <p>To check the download itself, here is the sample's SHA-256:</p>
       <pre><code>b5860614cf52ef621693e41241c0c608c455538431263ac58aa1e18bb6029441</code></pre>
@@ -95,12 +107,29 @@ amc bundle inspect their-agent-evidence.amcbundle</code></pre>
       <p>To pin keys for many senders at once, use a signed trust list (<code>--trust-list</code> and <code>--trust-root</code>); see <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/TRUST_LIST.md">the trust-list guide</a>.</p>
 
       <h2>Check our releases too</h2>
-      <p>You can check the installer too. It downloads one fixed GitHub Release, checks every archive against the published <code>SHA256SUMS</code>, and refuses anything that does not match. The test suite checks our published test count against itself, so the number cannot quietly go stale.</p>
+      <p>You can check the installer too. It downloads one fixed GitHub Release, checks every archive against the published <code>SHA256SUMS</code>, and refuses anything that does not match.</p>
 
       <h2>How the scoring works</h2>
-      <p>The full scoring method is public: levels, how much each kind of record counts, how old records lose weight, release checks, and how scores map to compliance frameworks: <a href="methodology.html">methodology</a> · <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/METHODOLOGY_CROSSWALK.md">framework crosswalk</a>.</p>
-    </div>
+      <p>The full scoring method is public: the levels, which records count and for how long, and how records line up with frameworks: <a href="methodology.html">methodology</a> · <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/METHODOLOGY_CROSSWALK.md">framework crosswalk</a>.</p>
+      </div></div>
+    </section>
   </main>
-  <script src="script.js?v=12"></script>
+
+  <footer class="footer">
+    <div class="footer-inner wrap">
+      <div class="footer-top">
+        <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p></div>
+        <div class="footer-col"><h2>Product</h2><a href="./#a4-forge">Build an agent</a><a href="./#capabilities">Run it</a><a href="./#paths">Already have an agent?</a><a href="./#install">Get AMC</a><a href="./#desktop">macOS app</a><a href="./#products">Eight tools</a><a href="executive.html">Executives</a><a href="playground.html">Playground</a><a href="docs/index.html">Documentation</a></div>
+        <div class="footer-col"><h2>Depth</h2><a href="a4.html">A4 Forge</a><a href="methodology.html">Approach and research</a><a href="compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="./#pricing">Price</a><a href="./#faq">FAQ</a></div>
+        <div class="footer-col"><h2>Industry Packs</h2><a href="./#domains">All packs</a><a href="station-environment.html">Environment</a><a href="station-health.html">Health</a><a href="station-wealth.html">Wealth</a><a href="station-education.html">Education</a><a href="station-mobility.html">Mobility</a><a href="station-technology.html">Technology</a><a href="station-governance.html">Governance</a></div>
+        <div class="footer-col"><h2>Code</h2><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="accessibility.html">Accessibility</a></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
+    </div>
+  </footer>
+
+  <script src="script.js?v=13"></script>
+  <script src="home.js?v=3"></script>
+  <script src="pages.js?v=2"></script>
 </body>
 </html>
