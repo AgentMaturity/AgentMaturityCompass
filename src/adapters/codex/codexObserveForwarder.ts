@@ -11,6 +11,7 @@
  */
 import { closeSync, constants, fstatSync, openSync, writeSync } from "node:fs";
 import { join } from "node:path";
+import { escapeTerminalControls } from "../../tools/builtin/askUserTool.js";
 import { postToBridge, readPiHookConfig } from "../pi/piControlClient.js";
 
 /** The Bridge's Codex observation route (codexObserveHttp.ts CODEX_OBSERVE_PATH), pinned by a test. */
@@ -64,7 +65,8 @@ export async function runCodexObserveForwarder(workspace: string, read: () => Pr
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     // Node's fetch says only "fetch failed" when nothing listens at the Bridge address.
-    const reason = message === "fetch failed" ? "AMC Studio did not answer (is it running? amc up)" : message;
+    // The Bridge's error text is not AMC's own words: escaped before it reaches the note or Codex's terminal.
+    const reason = message === "fetch failed" ? "AMC Studio did not answer (is it running? amc up)" : escapeTerminalControls(message.replace(/\s+/g, " ").slice(0, 300));
     noteLostCodexObservation(workspace, reason);
     stderr(`AMC did not record this Codex tool call: ${reason}. The call itself is unaffected. Check: amc connect hooks status --provider codex\n`);
     return 1;

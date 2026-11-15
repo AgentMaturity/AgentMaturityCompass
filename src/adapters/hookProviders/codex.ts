@@ -17,6 +17,7 @@ import { sha256Hex } from "../../utils/hash.js";
 import type { HookIntegrationStatus, HookMutationResult, InstallHookIntegrationOptions, RemoveHookIntegrationOptions } from "../hookIntegration.js";
 import { verifyManagedLease } from "../managedHookLease.js";
 import { codexLostObservationsPath } from "../codex/codexObserveForwarder.js";
+import { escapeTerminalControls } from "../../tools/builtin/askUserTool.js";
 import { stableNodePath } from "./nodePath.js";
 import {
   addManagedIgnoreBlock, assertAllPathsSafe, fileChange, HOOK_INTEGRATION_ID, HOOK_TOKEN_MODE, HookIntegrationError, hasManagedIgnoreBlock,
@@ -102,7 +103,9 @@ function lostObservations(workspace: string): HookIntegrationStatus["lostObserva
   if (lines.length === 0) return undefined;
   let last: { ts?: unknown; reason?: unknown } = {};
   try { last = JSON.parse(lines.at(-1)!) as typeof last; } catch { /* a torn last line still counts */ }
-  return { count: lines.length, lastTs: typeof last.ts === "number" ? last.ts : 0, lastReason: typeof last.reason === "string" ? last.reason : "unknown" };
+  return { count: lines.length, lastTs: typeof last.ts === "number" ? last.ts : 0,
+    // The file sits in the workspace, where the agent can write: its reason is shown escaped, on one line, bounded.
+    lastReason: typeof last.reason === "string" ? escapeTerminalControls(last.reason.replace(/\s+/g, " ").slice(0, 300)) : "unknown" };
 }
 
 function result(operation: "install" | "remove", dryRun: boolean, applied: boolean, files: HookFileChange[],

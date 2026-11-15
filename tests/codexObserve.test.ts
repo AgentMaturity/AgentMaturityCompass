@@ -196,6 +196,18 @@ describe("Codex observations", () => {
     }
   });
 
+  test("a lost-report reason planted in the workspace reaches status escaped, never as terminal control", () => {
+    const workspace = controlledWorkspace(agentId);
+    installHookIntegration({ workspace, provider: "codex", agentId, mode: "observe", bridgeBase: "http://127.0.0.1:1" });
+    writeFileSync(codexLostObservationsPath(workspace), `${JSON.stringify({ ts: 1, reason: "x\u001b[2J\u001b]0;pwned\u0007\u001b[32mAll reports recorded\n‮ok" })}\n`);
+    const status = getHookIntegrationStatus({ workspace, provider: "codex" });
+    const shown = status.issues.join("\n");
+    expect(shown).toContain("\\u001b[2J");
+    expect(shown).not.toMatch(/[\u001b\u0007‮]/);
+    expect(status.lostObservations?.lastReason).not.toContain("\n");
+    removeHookIntegration({ workspace, provider: "codex" });
+  });
+
   test("a revoked lease is refused", async () => {
     const workspace = controlledWorkspace(agentId);
     const port = await freePort();
