@@ -2086,7 +2086,8 @@ program.hook("preAction", async (_thisCommand, actionCommand) => {
     assertOwnerMode(process.cwd(), path);
   }
   // B1: AMC_VAULT_PASSPHRASE_FILE opens the vault as AMC_VAULT_PASSPHRASE does (that wins); up, bootstrap, host bootstrap, studio start and doctor read it themselves, through the same reader.
-  if (!/^(up|mcp|connect hooks forward|bootstrap|host bootstrap|studio start|doctor)( |$)/.test(path)) unlockWithPassphraseFile(process.cwd());
+  // Only `mcp serve` (the agent host's server) must never hold the vault; `mcp sign` and `mcp add` sign, like `tools sign`.
+  if (!/^(up|mcp serve|connect hooks forward|bootstrap|host bootstrap|studio start|doctor)( |$)/.test(path)) unlockWithPassphraseFile(process.cwd());
   // B2: `amc up` reads it itself (--no-remember); the agent host's MCP server and hook forwarder never hold the vault.
   // LIVE-VAULT-01: the unlock is for an interactive operator only, and a governance command then confirms it.
   if (!/^(up|mcp|connect hooks forward)( |$)/.test(path)) { unlockWithRememberedPassphrase(process.cwd()); await confirmRememberedUnlock(process.cwd(), path); }

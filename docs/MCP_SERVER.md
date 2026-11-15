@@ -30,7 +30,7 @@ amc mcp config
 ## IDE Configurations
 
 ### Claude Code
-File: `.claude/mcp.json`
+File: `.mcp.json` in the project's top folder (Claude Code does not read `.claude/mcp.json`). You can also let Claude Code write it: `claude mcp add --scope project amc -- amc mcp serve`.
 ```json
 {
   "mcpServers": {
