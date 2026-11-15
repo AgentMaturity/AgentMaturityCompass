@@ -1,5 +1,6 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { resolve } from "node:path";
+import { approvalRequestBindingDigest } from "../approvals/approvalChainStore.js";
 import { getApprovalInboxItem, type ApprovalInboxItem } from "../approvals/approvalInbox.js";
 import { readNativeApprovalActor } from "./nativeApprovalIdentity.js";
 
@@ -136,7 +137,8 @@ export function createNativeInteractiveApprovals(options: NativeApprovalPromptOp
       const kind = decision === "deny" ? "DENY" : request.effectiveMode === "EXECUTE" ? "APPROVE_EXECUTE" : "APPROVE_SIMULATE";
       const signed = after.decisions.find(row => !item.decisions.some(old => old.approvalDecisionId === row.approvalDecisionId)
         && row.userId === actor.userId && row.username === actor.username && row.decision === kind
-        && row.requestDigestSha256 === item.requestDigestSha256);
+        // The CLI binds a decision to the engine's binding digest (initiator left out), so either digest names this request.
+        && (row.requestDigestSha256 === item.requestDigestSha256 || row.requestDigestSha256 === approvalRequestBindingDigest(item.request)));
       if (!completed || !signed) {
         options.error(signed ? "The decision is recorded, but its command did not complete cleanly. No retry was sent; inspect approval delivery." : "No matching signed decision was confirmed. No approval or successful execution is claimed.");
         cancelTurn(); return;

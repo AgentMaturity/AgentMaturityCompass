@@ -129,7 +129,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--approve-tools <actionClass>", "require the signed approval gate before each tool call")
     .option("--approve-risk <tier>", "approval risk tier (default high)")
     .option("--approval-mode <mode>", "plan, default, accept-edits or untrusted: which calls a human is asked about, on top of every signed policy; plan runs nothing (SIMULATE); not with --approve-tools")
-    .option("--tools <mode>", "none, echo, or explicitly enabled workspace tools; existing policy still applies")
+    .option("--tools <mode>", "none, echo or workspace; by default workspace (asking before each call, --approval-mode default) when a signed Action Policy and tool policy are set up, else echo for stub and none for a real model")
     .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")
     .option("--trust-workspace", "trust this workspace's signed configuration (key set, tools policy and presets) on this machine, recording the consent in the AMC home; otherwise a workspace this machine never trusted is refused (AMC_TRUST_WORKSPACE=1 for headless hosts)")
     .option("--web-search-searxng <origin>", WEB_SEARCH_SEARXNG_HELP)
