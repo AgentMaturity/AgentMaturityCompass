@@ -43,7 +43,8 @@ describe("What to do now: one next step per screen", () => {
   test("an unacknowledged item is acknowledged before approval is asked for", () => {
     const waiting = item("plan_unresolved", { nextAction: { label: "Answer the missing facts" } });
     const m = move(ctx({ project: project({ step: "proposed" }) }, { items: [waiting], allowed: { requestGate: { allowed: false, reasonCodes: ["plan_unresolved"] } } }));
-    expect(m.now).toContain("acknowledges plan_unresolved");
+    expect(m.now).toContain('acknowledges "Rules that depend on unknown facts"');
+    expect(m.now).not.toContain("plan_unresolved");
     expect(m.act?.focus).toContain("reason");
   });
   test("with no second person, it says so before a gate is requested, with the exact command when nobody else exists", () => {
