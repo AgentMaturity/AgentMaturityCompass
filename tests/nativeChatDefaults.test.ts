@@ -18,7 +18,7 @@ function workspace(kind: "coding" | "regulated" | null, actionPolicy = true): st
   vi.stubEnv("AMC_CONTROL_CHECKPOINT_DIR", join(ckpt, "checkpoints"));
   const ws = realpathSync(mkdtempSync(join(tmpdir(), "amc-chat-defaults-")));
   dirs.push(ws, ckpt);
-  initWorkspace({ workspacePath: ws, actionPolicy });
+  initWorkspace({ workspacePath: ws, ...(actionPolicy ? {} : { actionPolicy: false as const }) });
   if (kind !== null) applyStarterProfile(ws, kind, { username: "chat-owner", password: "chat-owner-password" });
   return ws;
 }
