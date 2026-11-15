@@ -104,11 +104,14 @@ export function renderUnifiedResult(result: UnifiedRunResult, opts?: { ci?: bool
 
   // Top fixes
   if (result.topFixes.length > 0) {
-    lines.push(`  ${BOLD}${WHITE}Top fixes${RESET} ${DIM}(biggest grade impact):${RESET}`);
+    lines.push(result.nothingToAssess
+      ? `  ${BOLD}${WHITE}Things to set up${RESET}${DIM}:${RESET}`
+      : `  ${BOLD}${WHITE}Top fixes${RESET} ${DIM}(biggest grade impact):${RESET}`);
     for (let i = 0; i < result.topFixes.length; i++) {
       const fix = result.topFixes[i]!;
       lines.push(`  ${WHITE}${i + 1}.${RESET} ${fix.action}`);
-      lines.push(`     ${DIM}${fix.impact}${RESET}`);
+      // The impact names a grade ("Score → F (+22.5 overall)"), which says nothing while there is nothing to grade.
+      if (!result.nothingToAssess) lines.push(`     ${DIM}${fix.impact}${RESET}`);
       if (fix.command) {
         lines.push(`     ${GREEN}${fix.command}${RESET}`);
       }

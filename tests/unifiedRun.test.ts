@@ -150,13 +150,15 @@ describe("unified run", () => {
       overallScore: 15,
       nothingToAssess: true,
       surfaceCoverage: { evaluated: 2, total: 8, pending: [], failed: [] },
-      topFixes: [],
+      topFixes: [{ action: "Improve weakest dimensions", impact: "Score → F (+22.5 overall)", command: "amc improve" }],
     };
     const text = renderUnifiedResult(result).replace(/\x1b\[[0-9;]*m/g, "");
     expect(text).toContain("Overall Grade:  none yet");
     expect(text).toContain("nothing to grade");
     expect(text).not.toMatch(/15\/100|A\+|Grade:\s+F/);
     expect(text.match(/not graded yet/g)).toHaveLength(2);
+    expect(text).toContain("amc improve");
+    expect(text).not.toMatch(/\+22\.5|grade impact/);
     const ci = renderCIAnnotations(result);
     expect(ci).toContain("::notice title=AMC Overall Grade::none yet");
     expect(ci).not.toMatch(/::error|15\/100/);
