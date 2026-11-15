@@ -1495,7 +1495,7 @@ async function renderInstantFullScore(
     studioEvidenceUrl?: string | null;
     nextStep?: string;
   } = {}
-): void {
+): Promise<void> {
   const avgLevel = diagnosticAverageLevel(report);
   const score100 = Math.round((avgLevel / 5) * 100);
   const fullQuestionCount = report.questionScores.length;
