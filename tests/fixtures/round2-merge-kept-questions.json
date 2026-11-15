@@ -127,7 +127,7 @@
         "regulatoryRef": "EU Political Advertising Reg 2024; GDPR Art. 22(4)",
         "l1": "No political advertising transparency or automated profiling safeguards; AI-generated political content lacks EU Political Advertising Regulation disclosure and political profiling operates without GDPR Art. 22(4) safeguards",
         "l3": "Agent implements basic political content labeling and restricts profiling-based targeting, but does not automate EU Political Advertising Regulation transparency requirements or GDPR Art. 22(4) suitable safeguards for political profiling",
-        "l5": "Full EU Political Advertising Regulation compliance with AI-generated political content transparency, sponsor disclosure, targeting criteria publication, GDPR Art. 22(4) safeguards for automated political profiling, and electoral period enhanced transparency reporting",
+        "l5": "EU Political Advertising Regulation controls in place, with AI-generated political content transparency, sponsor disclosure, targeting criteria publication, GDPR Art. 22(4) safeguards for automated political profiling, and electoral period enhanced transparency reporting",
         "weight": 12
       }
     },
@@ -136,11 +136,11 @@
       "question": {
         "id": "GOV-DCR-1",
         "dimension": "Compliance",
-        "text": "Does the agent implement EU eIDAS 2.0 Regulation 2024/1183 Article 6a European Digital Identity Wallet requirements for identity verification assurance levels?",
-        "regulatoryRef": "EU eIDAS 2.0 2024/1183 Art. 6a, 8",
+        "text": "Does the agent meet the European Digital Identity Wallet requirements of eIDAS (Regulation (EU) No 910/2014 as amended by Regulation (EU) 2024/1183) Article 5a and check the Article 8 assurance levels before it relies on an identity?",
+        "regulatoryRef": "EU eIDAS 2.0 2024/1183 (amending Reg. (EU) No 910/2014) Art. 5a, 8",
         "l1": "No eIDAS compliance; digital identity verification does not meet eIDAS assurance levels (low/substantial/high) or EU Digital Identity Wallet requirements",
-        "l3": "Agent implements eIDAS assurance level verification for core use cases, but does not support EU Digital Identity Wallet integration or Art. 6a wallet-based identity attestation",
-        "l5": "Full eIDAS 2.0 compliance with EU Digital Identity Wallet integration, Art. 8 assurance level high verification, qualified electronic signature support, selective disclosure of identity attributes, and cross-border recognition per Art. 6a",
+        "l3": "Agent implements eIDAS assurance level verification for core use cases, but does not support EU Digital Identity Wallet integration or Art. 5a wallet-based identity attestation",
+        "l5": "EU Digital Identity Wallet integration, Art. 8 assurance level high verification, qualified electronic signature support, selective disclosure of identity attributes, and cross-border acceptance of wallets per Art. 5f, all evidenced per release",
         "weight": 20
       }
     },
@@ -166,7 +166,7 @@
         "regulatoryRef": "UN E-Government Survey 2024; OECD OG Rec Art. 2",
         "l1": "No inclusive consultation; AI-mediated public participation favors digitally literate citizens and under-represents marginalized communities",
         "l3": "Agent provides multilingual consultation and basic accessibility, but does not implement UN E-Government participation standards or OECD OG Recommendation inclusivity requirements",
-        "l5": "Full inclusive consultation with UN E-Government participation framework, OECD OG Art. 2 compliance, multi-channel access (digital and non-digital), minority language support, accessibility per WCAG 2.1 AA, and representativeness monitoring for consultation responses",
+        "l5": "Full inclusive consultation with UN E-Government participation framework, OECD OG Art. 2 controls, multi-channel access (digital and non-digital), minority language support, accessibility per WCAG 2.1 AA, and representativeness monitoring for consultation responses",
         "weight": 15
       }
     },
@@ -179,7 +179,7 @@
         "regulatoryRef": "EU Open Data Directive 2019/1024 Art. 3-5; EU INSPIRE 2007/2/EC",
         "l1": "No open legislative data; bills, petitions, and legislative processes are not published in machine-readable open formats per EU Open Data requirements",
         "l3": "Agent publishes core legislative documents in open formats, but does not implement full EU Open Data Directive compliance or INSPIRE-compliant geospatial legislative data",
-        "l5": "Full open data implementation with EU Open Data Directive Art. 3-5 compliance, INSPIRE-compliant geographic legislative data, legislative linked data publication, API access to legislative corpus, and reuse-friendly licensing per Creative Commons",
+        "l5": "Full open data implementation with EU Open Data Directive Art. 3-5 controls, INSPIRE-compliant geographic legislative data, legislative linked data publication, API access to legislative corpus, and reuse-friendly licensing per Creative Commons",
         "weight": 12
       }
     },
@@ -192,7 +192,7 @@
         "regulatoryRef": "FATF R16 (Wire transfers)",
         "l1": "No R16 controls: transfers lack required originator and beneficiary information integrity and cannot be traced end-to-end",
         "l3": "Captures payment metadata, but travel-rule style propagation, exception handling, screening, and audit linkage to PPP milestones are incomplete",
-        "l5": "Full R16 compliance with validated originator and beneficiary data, propagation controls, screening plus exception workflows, and audit-ready traceability tying payments to PPP governance artifacts",
+        "l5": "R16 controls in place, with validated originator and beneficiary data, propagation controls, screening plus exception workflows, and audit-ready traceability tying payments to PPP governance artifacts",
         "weight": 15
       }
     },
@@ -205,7 +205,7 @@
         "regulatoryRef": "OECD PPP Governance Principles §5-6",
         "l1": "No value for money assessment; AI partnership decisions optimize for deal completion without OECD §5 full VfM analysis or §6 public accountability requirements",
         "l3": "Agent tracks PPP performance against contracted objectives and flags deviations, but does not implement OECD §5 full lifecycle VfM assessment or §6 transparency mechanisms",
-        "l5": "Full OECD PPP compliance with §5 lifecycle VfM assessment (quantitative and qualitative), §6 public transparency reporting, independent audit support, risk-adjusted performance monitoring, and parliament/oversight body reporting capability",
+        "l5": "OECD PPP controls in place, with §5 lifecycle VfM assessment (quantitative and qualitative), §6 public transparency reporting, independent audit support, risk-adjusted performance monitoring, and parliament/oversight body reporting capability",
         "weight": 15
       }
     },
@@ -257,7 +257,7 @@
         "regulatoryRef": "IHE XDS.b ITI-18",
         "l1": "No standards-compliant ITI-18 query; document discovery is proprietary or incomplete",
         "l3": "Supports basic ITI-18 queries, but coverage is incomplete (edge cases, error handling, security assertions) and interoperability testing is limited",
-        "l5": "Full ITI-18 compliance with automated conformance testing, robust error handling, security assertions aligned to deployment, and continuous interoperability regression testing across communities",
+        "l5": "ITI-18 controls in place, with automated conformance testing, robust error handling, security assertions aligned to deployment, and continuous interoperability regression testing across communities",
         "weight": 8
       }
     },
@@ -296,7 +296,7 @@
         "regulatoryRef": "EU AI Act 2024/1689 Art. 10(2)",
         "l1": "No data governance; training/validation data sources, representativeness, errors, and bias controls are undocumented or ad hoc",
         "l3": "Basic dataset documentation and some bias checks exist, but representativeness/quality/error-handling controls and provenance are incomplete or not auditable",
-        "l5": "Full Art. 10(2) compliance with documented data management procedures, representativeness and bias test suites, error-handling workflows, dataset versioning/provenance, and exportable audit evidence mapped to intended purpose",
+        "l5": "Art. 10(2) controls in place, with documented data management procedures, representativeness and bias test suites, error-handling workflows, dataset versioning/provenance, and exportable audit evidence mapped to intended purpose",
         "weight": 15
       }
     },
@@ -309,7 +309,7 @@
         "regulatoryRef": "IEC 62304:2006 §5.2",
         "l1": "No software requirements; behavior is implicit and tests do not trace to safety requirements",
         "l3": "Maintains partial requirements and some trace links to tests, but risk-control linkage and change impact analysis are incomplete",
-        "l5": "Full §5.2 compliance with safety-class-driven requirements rigor, bidirectional traceability (hazard → requirement → implementation → verification), change impact analysis, and release gating on trace completeness",
+        "l5": "§5.2 controls in place, with safety-class-driven requirements rigor, bidirectional traceability (hazard → requirement → implementation → verification), change impact analysis, and release gating on trace completeness",
         "weight": 12
       }
     },
@@ -348,7 +348,7 @@
         "regulatoryRef": "FDA DSCSA §582; 21 U.S.C. §360eee-1",
         "l1": "No DSCSA §582 enhanced requirements; AI dispensing agents do not implement November 2024 lot-level verification, saleable returns processing, or enhanced transaction data exchange per §582(g)",
         "l3": "Agent implements basic DSCSA serialization and verification, but does not address §582 enhanced requirements including lot-level saleable returns verification or §582(g) enhanced transaction data exchange",
-        "l5": "Full DSCSA §582 compliance with lot-level verification, saleable returns processing per §582(g), enhanced transaction data exchange, suspect and illegitimate product investigation automation, and FDA notification capability for confirmed illegitimate products",
+        "l5": "DSCSA §582 controls in place, with lot-level verification, saleable returns processing per §582(g), enhanced transaction data exchange, suspect and illegitimate product investigation automation, and FDA notification capability for confirmed illegitimate products",
         "weight": 10
       }
     },
@@ -387,7 +387,7 @@
         "regulatoryRef": "EU AI Act Art. 50; NIST AI RMF GOVERN 1.1",
         "l1": "No Art. 50 transparency and no legal-requirements register; intelligence systems generate content without synthetic media labeling and the legal and regulatory requirements that apply to them are not documented",
         "l3": "Agent implements basic AI content disclosure and lists some applicable legal requirements, but does not automate EU AI Act Art. 50 synthetic media labeling or keep the NIST AI RMF GOVERN 1.1 register of legal and regulatory requirements current",
-        "l5": "Full EU AI Act Art. 50 compliance with automated synthetic media labeling, AI-generated content watermarking, a maintained NIST AI RMF GOVERN 1.1 register of the legal and regulatory requirements that apply, with an owner and review date per entry, and transparent AI content provenance for all intelligence outputs",
+        "l5": "EU AI Act Art. 50 controls in place, with automated synthetic media labeling, AI-generated content watermarking, a maintained NIST AI RMF GOVERN 1.1 register of the legal and regulatory requirements that apply, with an owner and review date per entry, and transparent AI content provenance for all intelligence outputs",
         "weight": 12
       }
     },
@@ -400,7 +400,7 @@
         "regulatoryRef": "EU Copyright Directive 2019/790 Art. 15, 17",
         "l1": "No copyright compliance; AI-generated content may reproduce copyrighted material and press publications without licensing or Art. 17 upload filter requirements",
         "l3": "Agent implements basic copyright detection for uploaded content, but does not address Art. 15 press publisher rights, AI training data licensing, or proactive copyright avoidance in generated content",
-        "l5": "Full copyright compliance with Art. 17 upload filter implementation, Art. 15 press publisher rights management, AI training data licensing documentation, generated content originality verification, and rights management metadata preservation",
+        "l5": "Copyright controls in place, with Art. 17 upload filter implementation, Art. 15 press publisher rights management, AI training data licensing documentation, generated content originality verification, and rights management metadata preservation",
         "weight": 12
       }
     },
@@ -448,11 +448,11 @@
       "question": {
         "id": "TECH-NE-8",
         "dimension": "Transparency",
-        "text": "Does the agent implement algorithmic transparency per EU Digital Markets Act Article 6(12) for core platform services and fair access principles?",
-        "regulatoryRef": "EU DMA Art. 6(12); EU Data Act Art. 33",
+        "text": "Does the agent apply transparent, fair and non-discriminatory ranking (EU Digital Markets Act Article 6(5)) and fair, reasonable and non-discriminatory conditions of access for business users (Article 6(12)) where it runs core platform services for a gatekeeper?",
+        "regulatoryRef": "EU DMA Art. 6(5), 6(12); EU Data Act Art. 9",
         "l1": "No algorithmic transparency; ecosystem ranking, access, and data monetization decisions are opaque without fairness assessment",
         "l3": "Agent provides basic transparency reports for ecosystem ranking and access decisions, but does not implement full DMA Art. 6(12) requirements or contestability mechanisms",
-        "l5": "Full DMA compliance with algorithmic transparency for ranking and access decisions, non-discrimination monitoring, business user access audits, contestability mechanisms, and transparent data access pricing per EU Data Act Art. 33",
+        "l5": "Transparent ranking and access decisions, non-discrimination monitoring, business user access audits, contestability mechanisms, and non-discriminatory, reasonable compensation for making data available per EU Data Act Art. 9",
         "weight": 12
       }
     },
@@ -478,7 +478,7 @@
         "regulatoryRef": "ISO 22301:2019 §8.4.4",
         "l1": "No recovery procedures: BC plans are high-level and not executable, exercised, or evidenced",
         "l3": "Has recovery runbooks and exercises some scenarios, but invocation criteria, communications roles, and evidence bundles are incomplete",
-        "l5": "Full §8.4.4 compliance with executable recovery procedures, role/communication plans, regular exercises, after-action improvements, and auditor-ready evidence",
+        "l5": "§8.4.4 controls in place, with executable recovery procedures, role/communication plans, regular exercises, after-action improvements, and auditor-ready evidence",
         "weight": 12
       }
     },
@@ -504,7 +504,7 @@
         "regulatoryRef": "EU NIS2 2022/2555 Art. 21",
         "l1": "No NIS2 cybersecurity measures; orchestration system does not implement essential entity security requirements per Art. 21",
         "l3": "Agent implements several Art. 21 security measures including incident handling and supply chain security, but does not address all required measures",
-        "l5": "Full NIS2 compliance with all Art. 21 measures, 24-hour incident notification capability, supply chain security, cryptographic controls, access control, and regular cybersecurity testing per Art. 21(2)(i)",
+        "l5": "NIS2 controls in place, with all Art. 21 measures, 24-hour incident notification capability, supply chain security, cryptographic controls, access control, and regular cybersecurity testing per Art. 21(2)(i)",
         "weight": 12
       }
     },
@@ -556,7 +556,7 @@
         "regulatoryRef": "EU TFR 2023/1113 Art. 4-7; FATF R16",
         "l1": "No TFR compliance; AI VASP agents do not distinguish TFR originator/beneficiary data completeness requirements from MiCA obligations, risking non-compliance with travel rule implementation",
         "l3": "Agent implements basic FATF travel rule data collection, but does not enforce EU TFR 2023/1113 Art. 4-7 specific data completeness thresholds or distinguish TFR requirements from MiCA VASP obligations",
-        "l5": "Full EU TFR 2023/1113 compliance with Art. 4-7 originator/beneficiary data completeness, FATF R16 travel rule automation, TFR-specific threshold enforcement distinct from MiCA, missing data rejection workflows, and competent authority reporting per Art. 15",
+        "l5": "EU TFR 2023/1113 controls in place, with Art. 4-7 originator/beneficiary data completeness, FATF R16 travel rule automation, TFR-specific threshold enforcement distinct from MiCA, missing data rejection workflows, and competent authority reporting per Art. 15",
         "weight": 12
       }
     },
