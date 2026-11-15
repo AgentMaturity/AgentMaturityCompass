@@ -220,7 +220,8 @@ function initAnchors(){
       var target=document.querySelector(id);
       if(!target) return;
       e.preventDefault();
-      target.scrollIntoView({behavior:'smooth',block:'start'});
+      var still=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      target.scrollIntoView({behavior:still?'auto':'smooth',block:'start'});
       if(a.classList.contains('skip-link')){
         if(!target.hasAttribute('tabindex')) target.setAttribute('tabindex','-1');
         target.focus({preventScroll:true});

@@ -139,7 +139,7 @@ code { font-family: var(--mono); font-size: 0.86em; padding: 0.1em 0.38em; borde
 .sheet { background: var(--paper); color: var(--paper-ink); border-radius: 6px; padding: 20px 22px 18px; min-height: 430px; display: flex; flex-direction: column; gap: 14px; }
 .sheet-kind { font-family: var(--mono); font-size: 0.74rem; color: var(--paper-muted); }
 .sheet-title { font-size: 1.3rem; line-height: 1.2; font-weight: 700; margin-top: 4px; }
-.sheet-summary { font-size: 0.9rem; line-height: 1.5; color: var(--paper-muted); margin-top: 6px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.sheet-summary { font-size: 0.9rem; line-height: 1.5; color: var(--paper-muted); margin-top: 6px; }
 .sheet-rows { display: grid; gap: 0; border-top: 1px dashed var(--paper-line); }
 .sheet-rows > div { display: grid; grid-template-columns: 128px minmax(0, 1fr); gap: 14px; padding: 11px 0; border-bottom: 1px dashed var(--paper-line); }
 .sheet-rows dt { font-family: var(--mono); font-size: 0.74rem; line-height: 1.45; color: var(--paper-muted); padding-top: 2px; }
@@ -207,6 +207,8 @@ code { font-family: var(--mono); font-size: 0.86em; padding: 0.1em 0.38em; borde
 /* The stamp lands a beat after its line prints. */
 .js-record .record-lines .is-approval span::after { display: inline-block; opacity: 0; transform: scale(1.35); transition: opacity 0.2s ease 0.5s, transform 0.28s cubic-bezier(0.2, 1.5, 0.4, 1) 0.5s; }
 .js-record .record-lines .is-approval.is-on span::after { opacity: 1; transform: none; }
+/* The record stays in view beside the last step until the reader has passed it: the steps column ends with room. */
+@media (min-width: 1021px) and (prefers-reduced-motion: no-preference) { .steps { padding-bottom: 40rem; } }
 
 /* ── Run it ──────────────────────────────────────────────────────────── */
 .run-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(32px, 5vw, 80px); align-items: start; }
@@ -334,6 +336,8 @@ code { font-family: var(--mono); font-size: 0.86em; padding: 0.1em 0.38em; borde
   .desktop-icon { width: 88px; height: 88px; border-radius: 20px; order: -1; }
   .sheet-rows > div { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .sheet { min-height: 0; }
+  /* Narrow: each approval's stamp sits under its label, so the three approval lines read alike. */
+  .record-lines .is-approval span::after { display: block; width: max-content; margin: 4px 0 0; }
   .btn { width: 100%; }
   .btn-small { width: auto; }
   .footer-top { grid-template-columns: minmax(0, 1fr); }

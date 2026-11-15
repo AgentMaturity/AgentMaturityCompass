@@ -7,82 +7,114 @@
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Accessibility - Agent Maturity Compass</title>
-  <meta name="description" content="Accessibility statement for Agent Maturity Compass CLI, website, generated dashboard, and local Studio.">
+  <meta name="description" content="Accessibility statement for Agent Maturity Compass: the website, the Compass Console, the generated dashboard and the command line.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="canonical" href="https://agentmaturity.co/accessibility.html">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Accessibility - Agent Maturity Compass">
   <meta property="og:description" content="AMC accessibility support, standards target, known limitations, and feedback path.">
   <meta property="og:url" content="https://agentmaturity.co/accessibility.html">
   <meta property="og:image" content="https://agentmaturity.co/og-card.png">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="style.css?v=14">
-  <style>
-    .plain-page{min-height:100vh;padding:8rem 0 4rem}
-    .plain-page .label{margin-bottom:.75rem}
-    .plain-page h1{white-space:normal;margin-bottom:1.5rem}
-    .plain-page p,.plain-page li{max-width:760px;color:var(--text-muted);line-height:1.75}
-    .plain-page ul{margin:1rem 0 2rem 1.25rem}
-    .plain-page h2{font-size:1.15rem;text-transform:none;letter-spacing:0;color:var(--text);margin:2rem 0 .75rem}
-    .plain-page a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
-  </style>
+  <link rel="stylesheet" href="home.css?v=5">
+  <link rel="stylesheet" href="pages.css?v=1">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
-  <nav class="nav scrolled">
+
+  <nav class="nav" aria-label="Main">
     <div class="nav-inner">
-      <a href="./" class="nav-brand">amc<span class="accent">_</span></a>
+      <a href="./" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>
       <ul class="nav-links">
-        <li><a href="./#install">install</a></li>
-        <li><a href="./playground.html">playground</a></li>
-        <li><a href="./docs/index.html">docs</a></li>
-        <li><a href="https://github.com/AgentMaturity/AgentMaturityCompass">github</a></li>
+        <li><a href="./#a4-forge">Build an agent</a></li>
+        <li><a href="./#capabilities">Run it</a></li>
+        <li><a href="./#domains">Industries</a></li>
+        <li><a href="a4.html">A4 Forge</a></li>
+        <li><a href="docs/index.html">Docs</a></li>
       </ul>
-      <button class="nav-hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+      <div class="nav-right">
+        <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="nav-quiet">GitHub</a>
+        <a href="./#install" class="btn btn-primary btn-small">Get AMC</a>
+        <button class="nav-hamburger" aria-label="Menu" aria-controls="navMobile" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
     </div>
   </nav>
   <div class="nav-mobile" id="navMobile">
-    <a href="./#install">install</a>
-    <a href="./playground.html">playground</a>
-    <a href="./docs/index.html">docs</a>
-    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">github</a>
+    <a href="./#a4-forge">Build an agent</a>
+    <a href="./#capabilities">Run it</a>
+    <a href="./#domains">Industries</a>
+    <a href="./#paths">Already have an agent?</a>
+    <a href="./#install">Get AMC</a>
+    <a href="./#desktop">macOS app</a>
+    <a href="./#pricing">Price</a>
+    <a href="a4.html">A4 Forge (preview)</a>
+    <a href="docs/index.html">Docs</a>
+    <a href="executive.html">For executives</a>
+    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
   </div>
+
   <span id="main-content" tabindex="-1"></span>
-  <main class="plain-page">
-    <div class="container">
-      <p class="label">accessibility</p>
-      <h1>You should be able to use AMC without relying on color or a mouse<span class="accent">.</span></h1>
-      <p>Last reviewed: 2026-06-16. This statement covers the website, the browser playground, the dashboard AMC generates, the local Studio, and the command-line output.</p>
+  <main id="main">
+    <section class="page-hero">
+      <div class="wrap">
+        <p class="product-name">Accessibility</p>
+        <h1>You should be able to use AMC without relying on color or a mouse</h1>
+        <p class="lede">This statement covers the website, the browser playground, the dashboard AMC generates, the Compass Console and the command-line output.</p>
+        <p class="fine">Last reviewed: 2026-11-15.</p>
+      </div>
+    </section>
 
-      <h2>What we aim for</h2>
-      <ul>
-        <li>Website and generated dashboard: checks based on WCAG 2.2 AA for contrast, visible keyboard focus, skip links, and chart names.</li>
-        <li>Generated dashboard: Settings includes a high-contrast theme, and the onboarding dialog traps keyboard focus while open.</li>
-        <li>Generated dashboard heatmaps give score, target, gap, and confidence as text, and to screen readers as ARIA grid, gridcell, selected-state, and meter values.</li>
-        <li>Command line: color is never the only signal. Use <code>NO_COLOR=1</code> or <code>--no-color</code> for plain output where supported.</li>
-        <li>Proof: accessibility claims should be backed by tests, not only screenshots.</li>
-      </ul>
+    <section class="band">
+      <div class="wrap prose">
+        <h2>What we aim for</h2>
+        <ul class="dots">
+          <li>Website and generated dashboard: checks based on WCAG 2.2 AA for contrast, visible keyboard focus, skip links, and chart names.</li>
+          <li>Generated dashboard: Settings includes a high-contrast theme, and the onboarding dialog traps keyboard focus while open.</li>
+          <li>Generated dashboard heatmaps give score, target, gap, and confidence as text, and to screen readers as ARIA grid, gridcell, selected-state, and meter values.</li>
+          <li>Command line: color is never the only signal. Use <code>NO_COLOR=1</code> or <code>--no-color</code> for plain output where supported.</li>
+          <li>Proof: accessibility claims should be backed by tests, not only screenshots.</li>
+        </ul>
 
-      <h2>What works today</h2>
-      <ul>
-        <li>Static pages have skip links and a visible keyboard focus.</li>
-        <li>Decorative canvases are hidden from assistive technology.</li>
-        <li>Charts in the playground and the generated console have names that screen readers can read.</li>
-        <li>The generated dashboard's secondary text now has more contrast, after an audit flagged it.</li>
-        <li>The generated dashboard can switch to a high-contrast theme for low-vision review.</li>
-        <li>The generated dashboard's question heatmap shows level, gap, and confidence as visible labels, so color is not the only signal.</li>
-      </ul>
+        <h2>What works today</h2>
+        <ul class="dots">
+          <li>Static pages have skip links and a visible keyboard focus.</li>
+          <li>The home page and the pages built on its design stop their animation when your system asks for reduced motion.</li>
+          <li>Decorative canvases are hidden from assistive technology.</li>
+          <li>Charts in the playground and the generated console have names that screen readers can read.</li>
+          <li>The generated dashboard's secondary text has more contrast, after an audit flagged it.</li>
+          <li>The generated dashboard can switch to a high-contrast theme for low-vision review.</li>
+          <li>The generated dashboard's question heatmap shows level, gap, and confidence as visible labels, so color is not the only signal.</li>
+        </ul>
 
-      <h2>Known limits</h2>
-      <ul>
-        <li>Interactive terminal prompts depend on terminal and screen-reader support.</li>
-        <li>Dense generated reports still need a person to review them with a screen reader and realistic data.</li>
-        <li>Automated axe checks do not replace testing by hand with a keyboard and assistive technology.</li>
-      </ul>
+        <h2>Known limits</h2>
+        <ul class="dots">
+          <li>The website is dark only; it does not follow a light setting on your system.</li>
+          <li>Interactive terminal prompts depend on terminal and screen-reader support.</li>
+          <li>Dense generated reports still need a person to review them with a screen reader and realistic data.</li>
+          <li>Automated axe checks do not replace testing by hand with a keyboard and assistive technology.</li>
+        </ul>
 
-      <h2>Feedback</h2>
-      <p>Open an issue. Tell us the page, command, or file; the assistive technology and browser or terminal you used; what you expected; what happened; and any screenshot, terminal output, or axe report.</p>
-      <p><a href="https://github.com/AgentMaturity/AgentMaturityCompass/issues">Report an accessibility issue</a></p>
-    </div>
+        <h2>Feedback</h2>
+        <p>Open an issue. Tell us the page, command, or file; the assistive technology and browser or terminal you used; what you expected; what happened; and any screenshot, terminal output, or axe report.</p>
+        <p><a href="https://github.com/AgentMaturity/AgentMaturityCompass/issues">Report an accessibility issue</a></p>
+      </div>
+    </section>
   </main>
-  <script src="script.js?v=12"></script>
+
+  <footer class="footer">
+    <div class="footer-inner wrap">
+      <div class="footer-top">
+        <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p></div>
+        <div class="footer-col"><h3>Product</h3><a href="./#a4-forge">Build an agent</a><a href="./#capabilities">Run it</a><a href="./#paths">Already have an agent?</a><a href="./#install">Get AMC</a><a href="./#desktop">macOS app</a><a href="./#products">Eight tools</a><a href="executive.html">Executives</a><a href="playground.html">Playground</a><a href="docs/index.html">Documentation</a></div>
+        <div class="footer-col"><h3>Depth</h3><a href="a4.html">A4 Forge</a><a href="methodology.html">Approach and research</a><a href="compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="./#pricing">Price</a><a href="./#faq">FAQ</a></div>
+        <div class="footer-col"><h3>Industry Packs</h3><a href="./#domains">All packs</a><a href="station-environment.html">Environment</a><a href="station-health.html">Health</a><a href="station-wealth.html">Wealth</a><a href="station-education.html">Education</a><a href="station-mobility.html">Mobility</a><a href="station-technology.html">Technology</a><a href="station-governance.html">Governance</a></div>
+        <div class="footer-col"><h3>Code</h3><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="accessibility.html">Accessibility</a></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
+    </div>
+  </footer>
+
+  <script src="script.js?v=13"></script>
+  <script src="home.js?v=3"></script>
 </body>
 </html>
