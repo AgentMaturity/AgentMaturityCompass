@@ -229,9 +229,9 @@ function mountProject(projectId, options) {
         <p class="muted">${view.esc(readiness.claimBoundary)}</p></section>
       <details class="card" data-a4-open="steps"><summary>The eight steps of a stage</summary><div id="a4Steps"></div></details>
       <div class="a4-cards">${stageCards(stage).map((card) => view.renderCard(card, ctx, state.comments)).join("")}</div>
-      <section class="card"><h4>Differences</h4>${state.diff?.error ? `<p class="status-bad">${view.esc(state.diff.error)}</p>`
+      <section class="card"><h4>What changed since the last version</h4>${state.diff?.error ? `<p class="status-bad">${view.esc(state.diff.error)}</p>`
         : view.renderDifferences(state.diff, project)}</section>
-      <section class="card" id="a4Missing" tabindex="-1"><h4>Missing requirements</h4>${view.renderMissing(readiness, stage, (key) => view.nameOf(ctx, key))}</section>
+      <section class="card" id="a4Missing" tabindex="-1"><h4>What this step still needs <small class="a4-code">(Missing requirements)</small></h4>${view.renderMissing(readiness, stage, (key) => view.nameOf(ctx, key))}</section>
       ${view.renderLanes(readiness, state.refs, project.revisionNo)}${view.renderApprovalsBar(ctx)}${view.renderMembers(ctx)}
       <section class="card"><h4>Here now</h4><div id="a4Presence"></div></section>`;
     renderHandholdingSteps(root.querySelector("#a4Steps"), view.stepRows(project, stage));

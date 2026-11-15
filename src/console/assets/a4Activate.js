@@ -9,6 +9,7 @@
 import { apiNativeRequest } from "./api.js";
 import { registerStageAction, registerStageCard } from "./a4Cards.js";
 import * as view from "./a4View.js";
+import { itemWithRecord } from "./a4Plain.js";
 
 const { esc } = view;
 const SPEC = "amc.a4-activate-spec/v1";
@@ -22,11 +23,8 @@ const specOf = (ctx) => (isObject(ctx.stageRevision?.spec) ? ctx.stageRevision.s
 const itemOf = (ctx, id) => list(ctx.readiness?.items).find((item) => item.id === id) ?? null;
 const codes = (values) => list(values).map((code) => `<code>${esc(code)}</code>`).join(" ");
 const json = (value) => `<code>${esc(JSON.stringify(value ?? null))}</code>`;
-const status = (ctx, id) => {
-  const item = itemOf(ctx, id);
-  return item ? `<p class="muted"><code>${esc(id)}</code> <code>${esc(item.status)}</code> ${codes(item.reasonCodes)}${item.nextAction?.label
-    ? ` · ${esc(item.nextAction.label)}` : ""}</p>` : "";
-};
+/** One readiness item in words, its record (id, status, reason codes, next action) under "Show the record". */
+const status = (ctx, id) => itemWithRecord(itemOf(ctx, id), id);
 const table = (head, rows, empty) => (rows.length ? `<div class="scroll"><table><thead><tr>${head.map((cell) => `<th>${esc(cell)}</th>`).join("")}</tr></thead>
   <tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>`).join("")}</tbody></table></div>` : `<p class="muted">${esc(empty)}</p>`);
 const coded = (item, prefix) => list(item?.reasonCodes).filter((code) => String(code).startsWith(`${prefix}:`)).map((code) => String(code).slice(prefix.length + 1).split(":"));
@@ -72,8 +70,8 @@ function sameHostNotice(ctx) {
   if (item?.status === "READY") return "";
   return `<div class="card banner"><p><strong>Activate needs a Compose- or Helm-hosted Studio.</strong> Version 1 releases an agent only by
     restarting the Compose- or Helm-hosted Studio that built it. On a Studio started any other way (for example with <code>amc up</code>),
-    the walk ends after Adapt: the release is refused (<code>deployment.same_host</code>). Installing a package into another workspace is
-    planned (P2-40).</p></div>`;
+    the walk ends after Adapt: the release is refused (<code>deployment.same_host</code>). Installing a release into another workspace is
+    not possible yet.</p></div>`;
 }
 
 function renderConversation(ctx) {
@@ -121,7 +119,7 @@ function releaseRecord(release) {
     <p class="muted">Version ${esc(release.version)} · package <code>${esc(release.packageDigest)}</code> · record envelope
       <code>${release.envelopeValid ? "valid under this workspace's keys or its pinned notary" : "does not verify"}</code> · transparency entry <code>${esc(release.transparencyEntryId ?? release.transparency?.reason ?? "none")}</code>
       · previous <code>${esc(release.previousReleaseId ?? "none")}</code> · base <code>${esc(release.baseReleaseId ?? "none")}</code></p>
-    <p class="muted">Expert review at the deployment approval (D-21): <code>${esc(release.expertReview?.status ?? "not_recorded")}</code>${release.expertReview?.acknowledgement
+    <p class="muted">Expert review at the deployment approval: <code>${esc(release.expertReview?.status ?? "not_recorded")}</code>${release.expertReview?.acknowledgement
       ? ` · acknowledged by <code>${esc(release.expertReview.acknowledgement.by)}</code> until ${esc(new Date(release.expertReview.acknowledgement.expiresTs).toISOString())}: ${esc(release.expertReview.acknowledgement.reason)}`
       : ""}</p>
     <h4>Eight surfaces</h4>${table(["Surface", "Status", "Reason", "Values"], list(release.surfaceTable).map((row) => [`<code>${esc(row.surface)}</code>`,
@@ -151,7 +149,7 @@ function renderRelease(ctx) {
   const project = `data-project="${esc(ctx.project.projectId)}"`;
   const release = releaseOf(ctx);
   return `<p class="muted">AMC builds a signed package and prepares the files an operator runs; it never deploys. Recorded: what the operator stated.
-      Checked: what AMC's own probe found. v1 deploys by restarting the hosted Studio that built this agent (D-18).</p>
+      Checked: what AMC's own probe found. v1 deploys by restarting the hosted Studio that built this agent.</p>
     ${proposal ? proposalSummary(proposal) : "<p class=\"muted\">Propose the release first: the draft comes from your answers.</p>"}
     ${["package.inputs", "signing.notary_route", "lineage.independent_approvals", "release_effect", "lease.scope", "lease.principal"].map((id) => status(ctx, id)).join("")}
     <h4>Release</h4>
@@ -164,8 +162,8 @@ function renderRelease(ctx) {
     ${decideForm(ctx, request, "release-reason")}
     <h4>Deployment approval</h4>
     <p class="muted">Completing the deployment approval (completion gate) mints the production lease, whose token this page shows once, then moves the
-      lifecycle to production only with every production control evidenced; in v1 it stays at staging (P2-40). A DENY of it revokes the staging lease.
-      On a regulated project an owner acknowledges the pending expert review (D-21) before requesting it.</p>
+      lifecycle to production only with every production control evidenced; in v1 it stays at staging. A DENY of it revokes the staging lease.
+      On a regulated project an owner acknowledges the pending expert review before requesting it.</p>
     ${["package.transparency", "deployment.receipt", "deployment.amc_check", "monitoring.source", "regulatory_sources_status", "lifecycle.production_controls"].map((id) => status(ctx, id)).join("")}
     <div class="row wrap">${view.actionButton("Complete the deployment approval", "complete-activate", quorumMet(completion) ? ctx.allowed.progress
       : view.held("The deployment approval has no quorum yet"), `data-gate="${esc(completion?.gateId ?? "")}" ${project}`)}</div>
@@ -203,7 +201,7 @@ function receiptForm(ctx, release) {
   const offer = ctx.allowed.recordDeployment;
   return `<h4>Record the operator's receipt (${esc(target)})</h4>
     <p class="muted">What the operator ran and saw; it lists what changed and nothing more. Studio refuses it unless this Studio runs under the target
-      (DEPLOYMENT_NOT_SAME_HOST, P2-40), and it issues no lease and starts no run.</p>
+      (DEPLOYMENT_NOT_SAME_HOST), and it issues no lease and starts no run.</p>
     <div class="a4-form">
       <label>Kind <select name="receipt-kind"><option value="deploy">deploy</option><option value="rollback">rollback</option></select></label>
       <label>Environment <select name="receipt-environment"><option value="staging">staging</option><option value="production">production</option></select></label>
@@ -230,8 +228,7 @@ function renderDeploy(ctx) {
     <h4>Receipts: recorded by the operator, checked by AMC</h4>
     ${table(["Receipt", "Kind", "Recorded", "AMC check", "Status", "Check detail"], receiptRows(release.deployments), "No receipt recorded.")}
     <h4>AMC's check</h4>
-    <p class="muted">Owner only, token-less, to the newest receipt's destination: reachability at best in v1 (release identity not evaluated at the destination
-      until P2-40). A failed check blocks the deployment approval; it never changes the operator's status.</p>
+    <p class="muted">Owner only, token-less, to the newest receipt's destination: reachability at best in v1 (AMC does not yet check which release runs at the destination). A failed check blocks the deployment approval; it never changes the operator's status.</p>
     <div class="row wrap"><select name="verify-environment"><option value="staging">staging</option><option value="production">production</option></select>
       ${view.actionButton("Run AMC's check", "verify", ctx.allowed.verifyDeployment, `data-release="${esc(release.releaseId)}" data-project="${esc(ctx.project.projectId)}"`)}</div>
     ${check ? `<p>AMC check <code>${esc(check.checkId)}</code>: <code>${esc(check.amcCheckStatus)}</code> · ${esc(check.statusText)}</p>` : ""}

@@ -8,6 +8,7 @@ import { apiNativeRequest } from "./api.js";
 import { effectDecideButtons, engineDecision, rememberDecided } from "./a4Approvals.js";
 import { registerStageAction, registerStageCard } from "./a4Cards.js";
 import * as view from "./a4View.js";
+import { itemWithRecord, record, say, short } from "./a4Plain.js";
 import { validateNativeTaskPoll } from "./nativeTasks.js";
 
 const { esc } = view;
@@ -25,11 +26,8 @@ const specOf = (ctx) => (isObject(ctx.stageRevision?.spec) ? ctx.stageRevision.s
 const proposed = (spec) => spec.schema === SPEC;
 const itemOf = (ctx, id) => list(ctx.readiness?.items).find((item) => item.id === id) ?? null;
 const codes = (values) => list(values).map((code) => `<code>${esc(code)}</code>`).join(" ");
-const status = (ctx, id) => {
-  const item = itemOf(ctx, id);
-  return item ? `<p class="muted"><code>${esc(id)}</code> <code>${esc(item.status)}</code> ${codes(item.reasonCodes)}${item.nextAction?.label
-    ? ` · ${esc(item.nextAction.label)}${item.nextAction.command ? ` <code>${esc(item.nextAction.command)}</code>` : ""}` : ""}</p>` : "";
-};
+/** One readiness item in words, its record (id, status, reason codes, next action) under "Show the record". */
+const status = (ctx, id) => itemWithRecord(itemOf(ctx, id), id);
 const bullets = (values, empty = "None") => (list(values).length ? `<ul class="a4-rows">${list(values).map((value) => `<li>${esc(value)}</li>`).join("")}</ul>`
   : `<p class="muted">${esc(empty)}</p>`);
 const table = (head, rows, empty) => (rows.length ? `<div class="scroll"><table><thead><tr>${head.map((cell) => `<th>${esc(cell)}</th>`).join("")}</tr></thead>
@@ -61,13 +59,16 @@ function renderPaths(ctx) {
     esc(path.evidenceTier), `<code>${esc(path.label ?? path.supported)}</code>`, esc(path.reason ?? ""),
     `${esc(path.source ?? "")}${path.pinnedVersion ? ` · pinned <code>${esc(path.pinnedVersion)}</code>` : ""}`]);
   const claim = isObject(spec.claim) ? spec.claim : null;
-  return `<p class="muted">What AMC can enforce and evidence on each way of building the agent. A claim is about AMC's integration path,
+  return `<p>${claim ? `${claim.path === "native" ? "It is built inside AMC" : `It is built with ${esc(claim.path)}`}. ${claim.evidenceTier === "observed"
+    ? "AMC sees each of its tool calls" : "AMC only has what is reported to it"}${claim.enforcementBoundary && claim.enforcementBoundary !== "none"
+    ? " and can stop a call its rules do not allow" : ""}. This is about how it is built, never about the agent itself.` : "Run Understand to list the ways it can be built."}</p>
+    ${status(ctx, "path_supported")}${status(ctx, "unsupported_acknowledged")}
+    ${record(`<p class="muted">What AMC can enforce and evidence on each way of building the agent. A claim is about AMC's integration path,
     never about the agent; "enforced" outside the native pipeline needs an adapter claim manifest whose hook enforces and blocks on
     failure, with a conformance receipt for the pinned version.</p>
     ${table(["Path", "Enforcement boundary", "Evidence", "Status", "Reason", "Source"], rows, "Run Understand to list the paths.")}
     ${claim ? `<h4>Chosen: <code>${esc(claim.path)}</code></h4><p class="muted">Source ${esc(claim.source)}${claim.conformanceReceipt
-      ? ` · pinned <code>${esc(claim.conformanceReceipt.pinnedVersion)}</code>` : " · no conformance receipt"}</p><p>Not covered:</p>${bullets(claim.notCovered)}` : ""}
-    ${status(ctx, "path_supported")}${status(ctx, "unsupported_acknowledged")}`;
+      ? ` · pinned <code>${esc(claim.conformanceReceipt.pinnedVersion)}</code>` : " · no conformance receipt"}</p><p>Not covered:</p>${bullets(claim.notCovered)}` : ""}`, "paths")}`;
 }
 
 /** The declared workflow (design §10.2, C6): every reason it does not run, the compiled plan's denial with its controls, and its nodes. */
@@ -88,7 +89,11 @@ function renderPlan(ctx) {
     task.supported ? "yes" : `no (<code>${esc(task.key)}</code>)`, task.command ? `<code>${esc(task.command)}</code>` : esc(task.acceptance)]);
   const node = list(spec.graph?.nodes).find((entry) => entry.nodeId === "agent");
   const workflow = list(spec.plan).find((task) => task?.executor === "workflow");
-  return `<p class="muted">${esc(spec.claimBoundary ?? "")}</p>
+  const steps = list(spec.plan).map((task) => `${task.title}${task.executor === "human" ? " (you do this; AMC never runs it)" : ""}${task.supported ? "" : " (not supported yet)"}`);
+  return `<p>What AMC will do when you press Build:</p>${bullets(steps, "Nothing.")}
+    ${list(spec.unsupported).length ? `<p>${list(spec.unsupported).length} part(s) are not supported yet; the record lists them.</p>` : ""}
+    ${["plan_proposed", "baseline_manifest", "toolset_ready", "signed_configs_trusted"].map((id) => status(ctx, id)).join("")}
+    ${record(`<p class="muted">${esc(spec.claimBoundary ?? "")}</p>
     ${table(["Task", "What", "Executor", "Supported", "Acceptance or command"], tasks, "No tasks.")}
     <p class="muted">A human task is a command for you to run; AMC never runs it.</p>${workflow ? renderWorkflow(workflow) : ""}
     <h4>Unsupported items (listed with their key, never hidden)</h4>
@@ -96,8 +101,7 @@ function renderPlan(ctx) {
     <p><strong>Agent permissions in the typed graph:</strong> ${codes(node?.permissions)}</p>
     ${spec.session ? `<p><strong>Build session:</strong> <code>${esc(spec.session.provider)}</code>${spec.session.model ? ` <code>${esc(spec.session.model)}</code>` : ""}
       tools <code>${esc(spec.session.tools)}</code>, at most ${esc(spec.session.maxSteps)} steps per turn</p>` : ""}
-    <p><strong>Baseline Enforce manifest:</strong> <code>${esc(spec.baseline?.state)}</code> <code>${esc(spec.baseline?.manifestId ?? "none")}</code></p>
-    ${["plan_proposed", "baseline_manifest", "toolset_ready", "signed_configs_trusted"].map((id) => status(ctx, id)).join("")}`;
+    <p><strong>Baseline Enforce manifest:</strong> <code>${esc(spec.baseline?.state)}</code> <code>${esc(spec.baseline?.manifestId ?? "none")}</code></p>`, "plan")}`;
 }
 
 /** One session's build log, read by its owner from cursor 0 onward; only committed events Studio authenticated are shown. */
@@ -160,20 +164,24 @@ function renderBuild(ctx) {
   // Only the owner's session starts the same task again (the task id is the owner's principal and the recorded request id).
   // Review needs each session closed: its owner closes it with "Close and verify" on the native tasks page.
   const taskLink = (session) => `<a href="./native-tasks?agent=${encodeURIComponent(session.start?.agentId ?? ctx.project.agentId)}&task=${encodeURIComponent(session.taskId)}&project=${encodeURIComponent(ctx.project.projectId)}">Open on Native Tasks</a>`;
-  const sessions = list(build?.sessions).map((session) => [`<code>${esc(session.taskId)}</code> ${taskLink(session)}`, esc(session.ownerUsername), `<code>${esc(session.start?.provider)}</code>`,
+  const sessions = list(build?.sessions).map((session) => [`${short(session.taskId)} ${taskLink(session)}`, esc(session.ownerUsername),
+    session.start?.provider === "stub" ? `the stand-in model <small class="a4-code">(stub)</small>` : `<code>${esc(session.start?.provider)}</code>`,
     ctx.me?.username === session.ownerUsername && isObject(session.start)
       ? view.actionButton("Start it again", "start-session", ctx.allowed.build, `data-start="${esc(JSON.stringify(session.start))}"`) : ""]);
-  return `<p class="muted">${esc(view.TRUTH.admission)}. Build, an owner's action, checks the signing key, the agent's signed Enforce
+  return `<p>Build writes what the approved plan describes and starts one build session. When the session stops, its owner opens it
+    and presses Close and verify; Review comes next.</p>
+    ${table(["Session", "Owner", "Model", ""], sessions, "No build session yet.")}
+    ${["preset_signed", "validation_pinned"].map((id) => status(ctx, id)).join("")}
+    ${record(`<p class="muted">${esc(view.TRUTH.admission)}. Build, an owner's action, checks the signing key, the agent's signed Enforce
     baseline and the native session's admission first, then writes the revised typed graph and signs the agent's preset into
     <code>.amc/agents.yaml</code>, and journals one native build session in this revision; Studio starts it once the step is recorded,
     on its own native task service. Run further turns, cancel or resume it on the <a href="./native-tasks">native tasks</a> page as
     its owner; other members watch. "Start it again" repeats the recorded start (the same task), only for a session that never started.</p>
     ${build ? `<p class="muted">Enforce preview against the baseline: ${esc(build.preview?.added)} added, ${esc(build.preview?.changed)} changed,
       ${esc(build.preview?.removed)} removed (<code>${esc(build.preview?.validation)}</code>)</p>` : ""}
-    ${table(["Session", "Owner", "Provider", ""], sessions, "No build session yet.")}
+    ${list(build?.sessions).map((session) => `<p><code>${esc(session.taskId)}</code> <code>${esc(session.start?.provider)}</code></p>`).join("")}`, "build")}
     ${list(build?.sessions).map((session) => renderLog(ctx, session)).join("")}
     ${renderExternal(ctx, spec)}
-    ${["preset_signed", "validation_pinned"].map((id) => status(ctx, id)).join("")}
     <label>Build note <textarea name="content" rows="3" maxlength="65536"></textarea></label>
     <div class="row wrap">${view.actionButton("Build", "build", view.stepOffer(ctx.allowed.build, ctx, "build"))}</div>`;
 }
@@ -188,7 +196,11 @@ function renderReview(ctx) {
     `<code>${esc(phase.status)}</code>`, phase.detail ? `<code>${esc(phase.detail)}</code>` : "", esc(phase.source)]));
   const open = list(specOf(ctx).build?.sessions).map((session) => `<a href="./native-tasks?agent=${encodeURIComponent(session.start?.agentId ?? ctx.project.agentId)}&task=${
     encodeURIComponent(session.taskId)}&project=${encodeURIComponent(ctx.project.projectId)}">${esc(session.taskId.slice(0, 12))}…</a>`).join(", ");
-  return `<p class="muted">Review reads each build session through its owner and refuses while one runs, has failed or is still open: its owner
+  const said = list(review?.capabilities).map((row) => `${row.capability}: ${say("claimKind", row.status)}${row.reason ? ` (${row.reason})` : ""}`);
+  return `<p>Review checks what the build session did. The session has to be closed first: its owner opens it${open ? ` (${open})` : ""} and presses
+    Close and verify.</p>${review?.wording ? `<p><strong>${esc(review.wording)}</strong></p>` : ""}${said.length ? `<p>What it must be able to do:</p>${bullets(said)}` : ""}
+    ${["manifest_active", "build_sessions_integrity", "lifecycle_bridge", "composition_bound"].map((id) => status(ctx, id)).join("")}
+    ${record(`<p class="muted">Review reads each build session through its owner and refuses while one runs, has failed or is still open: its owner
     opens it on the native tasks page${open ? ` (${open})` : ""} and presses Close and verify first, which closes it, so it takes no turn after what is reviewed. AMC's verifyAgentRun
     is an integrity self-check under this workspace's keys (the Integrity panel), never a claim about the agent.</p>
     ${review?.wording ? `<p><strong>${esc(review.wording)}</strong></p>` : ""}
@@ -203,8 +215,7 @@ function renderReview(ctx) {
         esc(row.reason)]), "None.")}
       <h4>Limitations</h4>${bullets(review.limitations)}
       <p class="muted">Lifecycle stage, as Review read it: <code>${esc(review.lifecycle?.stage)}</code>${review.lifecycle?.reason ? ` (${esc(review.lifecycle.reason)})` : ""};
-        unit_tests_passing <code>${esc(review.lifecycle?.unitTestsPassing)}</code>. Assemble does not advance it: A4 moves development → testing after Activate's release.</p>` : ""}
-    ${["manifest_active", "build_sessions_integrity", "lifecycle_bridge", "composition_bound"].map((id) => status(ctx, id)).join("")}
+        unit_tests_passing <code>${esc(review.lifecycle?.unitTestsPassing)}</code>. Assemble does not advance it: A4 moves development → testing after Activate's release.</p>` : ""}`, "review")}
     <label>Findings <textarea name="content" rows="3" maxlength="65536"></textarea></label>
     <div class="row wrap">${view.actionButton("Review", "review", view.stepOffer(ctx.allowed.review, ctx, "review"))}</div>`;
 }

@@ -1,25 +1,21 @@
-// A4 Studio renderers (P1-58, design §11). Pure: data in, HTML out. Every server string goes through esc(); status
-// codes, reason codes and claim kinds are printed as Studio returned them, and the page adds no status word of its own.
+// A4 Studio renderers (P1-58, design §11). Pure: data in, HTML out. Every server string goes through esc(). Each section
+// says what it means in plain words (a4Plain.js); status codes, reason codes and claim kinds stay as Studio returned them,
+// unchanged, under "Show the record" in that section.
 import { renderEvidenceRefList } from "./components/evidenceRefList.js";
 import { renderPromptDiffViewer } from "./components/promptDiffViewer.js";
 import { QUESTION_LABELS, questionDisplay } from "./a4Questions.js";
 import { exclusionLine, PRACTICE_CHOICE } from "./a4Who.js";
 import { cardLabel, codes, esc, isObject, list, shown, stageTitle, time } from "./a4Html.js";
+import { STAGE_PLAIN, STEP_PLAIN, code, itemLine, itemTitle, record, say, sayCode, when } from "./a4Plain.js";
+import { renderOutline } from "./a4Outline.js";
 export { clashingChanges, jsonDiff, mergeOnTop, presenceRows, renderConflict, renderPresence, validateA4Poll } from "./a4Sync.js";
 
-export { esc };
+export { esc, STAGE_PLAIN, STEP_PLAIN };
 
 export const STAGES = ["aspire", "assemble", "adapt", "activate"];
 const STEPS = ["asked", "understood", "explained", "proposed", "direction_approved", "built", "reviewed", "completion_approved"];
 export const STEP_TITLES = { asked: "Ask", understood: "Understand", explained: "Explain", proposed: "Propose",
   direction_approved: "Direction approved", built: "Build", reviewed: "Review", completion_approved: "Completion approved" };
-/** Where an answer came from, in plain words; the stored source stays in the tooltip. */
-const SOURCE_PLAIN = { user: "your answer", inferred: "suggested by AMC", carried: "from an earlier step" };
-/** The four stages and eight parts in plain words; the A4 name stays beside them in small text. */
-export const STAGE_PLAIN = { aspire: "Say what it is for", assemble: "Build it", adapt: "Fit it to your rules", activate: "Release it" };
-export const STEP_PLAIN = { asked: "Answer the questions", understood: "Check how AMC understood you", explained: "See AMC's choices explained",
-  proposed: "Review the plan", direction_approved: "Get approval to build", built: "Build", reviewed: "Review the result",
-  completion_approved: "Get final approval" };
 /** What a project at each part needs next, in one sentence (Home's "Continue" card). */
 export const STEP_NEXT = { asked: "Next: answer the questions, then let AMC say back what it understood.",
   understood: "Next: let AMC explain the choices it will make.", explained: "Next: let AMC draft the plan, then review it.",
@@ -57,11 +53,30 @@ const IN_RECORD = "This is stored as written in the project's record, not in its
  * A disabled button names Studio's reason codes; Studio re-checks every action, so this is a convenience only. `held`
  * builds the one other kind of disabled state: a page-side hold whose note says why (for example, the gate changed).
  */
+let notNow = null; // while collectNotNow renders: the actions that cannot be taken now, each with its reason in words
 export function actionButton(label, action, allowed, attributes = "") {
   const ok = allowed?.allowed === true;
   const why = allowed?.reasonCodes?.length ? reasonsText(allowed.reasonCodes) : allowed?.note ?? "Not available at this point.";
-  return `<button type="button" data-a4-action="${esc(action)}" ${attributes}${ok ? "" : ` disabled title="${esc(why)}"`}>${esc(label)}</button>`;
+  const button = `<button type="button" data-a4-action="${esc(action)}" ${attributes}${ok ? "" : ` disabled title="${esc(why)}"`}>${esc(label)}</button>`;
+  if (ok || notNow === null) return button;
+  // A button on one row (an answer, an item) keeps its place and says why beside it; any other moves to the card's More list.
+  if (/data-(question|item|attempt|row)=/.test(attributes)) return `${button} <small class="muted">${esc(why)}</small>`;
+  const named = /aria-label="([^"]*)"/.exec(attributes)?.[1];
+  notNow.push(`<li>${button}${named ? ` <span class="muted">${named}:</span>` : ""} <span class="muted">${esc(why)}</span></li>`);
+  return "";
 }
+/** Renders `render()`, collecting each action it cannot offer now (actionButton): returns the HTML and the list of those actions. */
+export function collectNotNow(render) {
+  const outer = notNow;
+  notNow = [];
+  try {
+    const html = render();
+    return { html, rows: notNow };
+  } finally {
+    notNow = outer;
+  }
+}
+const notNowList = (rows) => (rows.length ? `<p class="muted">Not open now, and why:</p><ul class="a4-rows a4-not-now">${rows.join("")}</ul>` : "");
 
 /**
  * What each reason code a disabled action can carry (readiness.allowed and this page's own holds) asks the user to do, in
@@ -172,27 +187,28 @@ export function renderProjectList(projects) {
     <a href="./a4Project?project=${encodeURIComponent(project.projectId)}"><strong>${esc(project.name)}</strong></a>
     <span class="chip" title="${esc(stageTitle(project.stage))}">${esc(STAGE_PLAIN[project.stage] ?? stageTitle(project.stage))}</span>
     <span class="chip" title="${esc(STEP_TITLES[project.step] ?? project.step)}">${esc(STEP_PLAIN[project.step] ?? project.step)}</span>
-    ${project.readiness ? `<code>${esc(project.readiness.status)}</code>` : ""}
+    ${project.readiness ? `<span>${sayCode("readinessStatus", project.readiness.status)}</span>` : ""}
     <span class="muted">agent <code>${esc(project.agentId)}</code> · r${esc(project.revisionNo)}</span>${holdBanner(project)}</li>`),
   "No agent projects yet.")}</section>`;
 }
 
 /** The page keeps the stage it opened on (a4.js); when the project is at another stage, it says so. */
 export function movedNote(project, stage) {
-  return stage === project.stage ? "" : `<p>The project is at ${esc(stageTitle(project.stage))} · ${esc(STEP_TITLES[project.step] ?? project.step)};
-    this page shows ${esc(stageTitle(stage))}. Open a stage above to work there.</p>`;
+  return stage === project.stage ? "" : `<p>The project is now at ${esc(say("stageState", project.stage))} ${code(stageTitle(project.stage))},
+    ${esc(say("step", project.step))} ${code(STEP_TITLES[project.step] ?? project.step)}; this page shows ${esc(say("stage", stage))} ${code(stageTitle(stage))}.
+    Open a stage above to work there.</p>`;
 }
 
 export function stageLinks(project, stage) {
   const id = encodeURIComponent(project.projectId);
   return `<div class="row wrap">${STAGES.map((name) => `<a class="button secondary" href="./a4Project?project=${id}&stage=${name}"${
-    name === stage ? ' aria-current="page"' : ""}>${stageTitle(name)}</a>`).join("")}</div>`;
+    name === stage ? ' aria-current="page"' : ""}>${esc(STAGE_PLAIN[name])} ${code(stageTitle(name))}</a>`).join("")}</div>`;
 }
 
 /** The eight steps, in the shape renderHandholdingSteps takes. */
 export function stepRows(project, stage) {
   const current = stage === project.stage ? STEPS.indexOf(project.step) : -1;
-  return STEPS.map((step, index) => ({ title: STEP_TITLES[step],
+  return STEPS.map((step, index) => ({ title: `${STEP_PLAIN[step]} (${STEP_TITLES[step]})`,
     body: current < 0 ? "" : index === current ? "current step" : index < current ? "earlier step" : "" }));
 }
 
@@ -232,8 +248,8 @@ const CONTENT_MAX = 65_536;
 const NO_REFLECTION = "No statement recorded from this page yet";
 export const RECORDED_CURRENT = "Studio holds AMC's understanding of your current answers (shown on this page). If it is right, confirm it; if not, change your answers and run Understand again.";
 export const NO_PRODUCER = "No producer is registered for this stage yet, so Studio records what you write here as your own self-reported statement, not as AMC's.";
-// Studio's receipt stays readable but folded under "Technical details", below the plain summary (A4-13).
-const studioJson = (value) => `<details class="a4-tech"><summary>Technical details</summary><pre class="scroll">${esc(JSON.stringify(value ?? null, null, 2))}</pre></details>`;
+// Studio's receipt stays readable but folded under "Show the record", below the plain summary (A4-13).
+const studioJson = (value) => record(`<pre class="scroll">${esc(JSON.stringify(value ?? null, null, 2))}</pre>`, "studio");
 /**
  * What the member sent and Studio's receipt for it, verbatim: with no producer registered, nothing here is AMC's. With
  * nothing sent (a stage whose producer ran), the receipt is the step's output, never labelled as the member's statement.
@@ -304,7 +320,7 @@ export function renderConversation(ctx) {
       <textarea name="${esc(question.id)}" rows="2"${display.help ? ` aria-describedby="${helpId}"` : ""}${json ? " data-json" : ""}${display.example ? ` placeholder="${esc(display.example)}"` : ""}>${esc(answerText(answers, question.id))}</textarea></label>`;
   };
   const answerRow = (answer) => `<li><span title="${esc(answer.questionId)}">${esc(QUESTION_LABELS[answer.questionId]?.[0] ?? answer.questionId)}</span>
-    <small class="muted" title="${esc(answer.source)}">${esc(SOURCE_PLAIN[answer.source] ?? answer.source)}</small>: ${esc(shown(answer.value))}${
+    <small class="muted" title="${esc(answer.source)}">${esc(say("answerSource", answer.source))}</small>: ${esc(shown(answer.value))}${
     answer.source === "user" ? "" : ` ${actionButton("Confirm", "confirm-answer", ask, `data-question="${esc(answer.questionId)}"`)}`}</li>`;
   const notMine = answers.filter((answer) => answer.source !== "user").length;
   const change = questions.filter((question) => answered.has(question.id));
@@ -356,11 +372,12 @@ export const changedParts = (spec, base) => Object.fromEntries(Object.entries(is
 
 export function renderSpecEditor(ctx) {
   const { revision, allowed, project, stage } = ctx;
+  const outline = renderOutline(stage, ctx.stageRevision);
   if (stage !== project.stage) {
     // Another stage's view: the head revision belongs to the project's current stage, so it is shown, never proposed here.
-    return `<p class="muted">${esc(stageTitle(stage))} is not this project's current stage (${esc(stageTitle(project.stage))}).
+    return `${outline}${record(`<p class="muted">${esc(stageTitle(stage))} is not this project's current stage (${esc(stageTitle(project.stage))}).
       ${revision ? `This is r${esc(revision.revisionNo)}${revision.stage ? `, a ${esc(stageTitle(revision.stage))} specification` : ""}, shown read-only.` : "No specification yet."}
-      Propose from the ${esc(stageTitle(project.stage))} view.</p>${revision ? studioJson(revision.spec ?? {}) : ""}`;
+      Propose from the ${esc(stageTitle(project.stage))} view.</p>${revision ? `<pre class="scroll">${esc(JSON.stringify(revision.spec ?? {}, null, 2))}</pre>` : ""}`, "spec")}`;
   }
   // After a reopen the stage has its own, older revision; the editor still starts from the head revision.
   const seeded = revision && revision.stage !== stage ? ` ${ctx.stageRevision ? `The newest ${esc(stageTitle(stage))} specification is
@@ -369,12 +386,14 @@ export function renderSpecEditor(ctx) {
   // P1-57 takes a proposal only at step `explained`; a re-proposal from `proposed` is not routed yet, so the way to a new
   // revision from there is Save answers (NOTES).
   const proposable = project.step === "explained";
-  return `<p class="muted">${proposable ? "Editing after Propose creates a new revision"
+  return `${outline}<p class="muted">${proposable ? "Propose drafts this plan from your answers. Someone who reads JSON can also edit the record below before proposing."
+    : "To change this plan, change an answer under Ask and press Save answers: AMC records a new version and you run the steps again from there."}</p>
+    ${record(`<p class="muted">${proposable ? "Editing after Propose creates a new revision"
     : `Studio takes a proposal only at step <code>explained</code>; this project is at <code>${esc(project.step)}</code>`}${revision
     ? ` (current r${esc(revision.revisionNo)}, spec <code>${esc(revision.specDigest)}</code>)` : ""}.${seeded}${proposable ? ""
     : " To change the specification from here, save an answer under Ask: that starts this stage's loop again at a new revision."} ${IN_RECORD}</p>
     <textarea name="spec" rows="14" spellcheck="false" aria-label="Specification (JSON)">${esc(JSON.stringify(editableSpec(revision?.spec), null, 2))}</textarea>
-    <p class="muted">Answers are not edited here: they are recorded through Save answers.</p>
+    <p class="muted">Answers are not edited here: they are recorded through Save answers.</p>`, "spec")}
     <div class="row wrap">${actionButton("Propose this specification", "propose", stepOffer(allowed.propose, ctx, "propose"))}${ctx.specDraft
       ? ` <button type="button" class="secondary" data-a4-action="reload">Discard my edits</button>` : ""}</div>`;
 }
@@ -399,8 +418,8 @@ export function renderReviewCard(ctx) {
 function renderComments(cardId, comments, members = []) {
   const names = new Map(members.map((member) => [member.principalKey, member.username]));
   const rows = comments.filter((comment) => comment.cardId === cardId).map((comment) => `<li>
-    <span class="pill">SELF_REPORTED</span>${comment.via === "mcp" ? ' <span class="pill">VIA MCP</span>' : ""} <strong>${esc(names.get(comment.authorKey) ?? comment.authorKey)}</strong>
-    <span class="muted">${time(comment.ts)}</span><div>${typeof comment.body === "string" ? esc(comment.body)
+    <span class="pill" title="SELF_REPORTED">self-reported</span>${comment.via === "mcp" ? ' <span class="pill" title="sent through MCP, a tool connection">VIA MCP</span>' : ""} <strong>${esc(names.get(comment.authorKey) ?? comment.authorKey)}</strong>
+    <span class="muted">${when(comment.ts)}</span><div>${typeof comment.body === "string" ? esc(comment.body)
       : `<span class="muted">Text not returned by Studio</span> ${codes(comment.reasonCode ? [comment.reasonCode] : [])}`}</div></li>`);
   return `<details class="a4-comments" data-a4-open="discussion"${rows.length ? " open data-a4-default-open" : ""}><summary>Discussion (${rows.length})</summary>${list(rows, "No comments yet.")}
     <textarea name="comment" rows="2" maxlength="${COMMENT_MAX_BYTES}" aria-label="Comment on ${esc(cardLabel(cardId))}"></textarea>
@@ -410,14 +429,22 @@ function renderComments(cardId, comments, members = []) {
 
 export function renderCard(card, ctx, comments) {
   let body;
-  try { body = card.render(ctx); }
-  catch (error) { body = `<p class="status-bad">This card could not render: ${esc(error?.message ?? error)}</p>`; }
+  try {
+    const { html, rows } = collectNotNow(() => card.render(ctx));
+    body = `${html}${rows.length ? `<details class="a4-more-actions" data-a4-open="not-now"><summary>More (${rows.length} not open now)</summary>${notNowList(rows)}</details>` : ""}`;
+  } catch (error) { body = `<p class="status-bad">This card could not render: ${esc(error?.message ?? error)}</p>`; }
   return `<section class="card a4-card" data-card="${esc(card.id)}"><h4>${esc(card.title)}</h4>${body}${renderComments(`${ctx.stage}:${card.id}`, comments, ctx.project.members)}</section>`;
 }
 
+/** The plan's part names a change path starts with, in words (spec.review.enforce.added reads "review"). */
+const SPEC_PARTS = { answers: "the answers", brief: "the brief", build: "what was built", review: "the review", plan: "the plan",
+  understanding: "what AMC understood", explanation: "the explanation", graph: "how the agent is put together" };
 export function renderDifferences(diff, project) {
-  if (project.revisionNo < 2) return `<p class="muted">No earlier revision to compare.</p>`;
-  return renderPromptDiffViewer(isObject(diff) ? { status: "ok", ...diff } : null);
+  if (project.revisionNo < 2) return `<p class="muted">This is the first version, so there is nothing to compare yet.</p>`;
+  const changed = Array.isArray(diff?.changed) ? diff.changed : [];
+  const parts = [...new Set(changed.map((row) => String(row?.path ?? "").split(".")[1]).filter(Boolean))].map((part) => SPEC_PARTS[part] ?? part);
+  return `<p>${changed.length ? `${changed.length} change(s) from version ${esc(diff.from ?? project.revisionNo - 1)} to version ${esc(diff.to ?? project.revisionNo)}, in ${esc(parts.join(", "))}.`
+    : "Nothing in the plan changed from the version before."}</p>${record(renderPromptDiffViewer(isObject(diff) ? { status: "ok", ...diff } : null), "diff")}`;
 }
 
 function nextActionHtml(next) {
@@ -452,21 +479,32 @@ function retryButton(item, allowed) {
     `data-attempt="${esc(attempt.slice("ATTEMPT:".length))}" data-effect-stage="${esc(route[1])}" data-effect="${esc(route[2])}"`)}` : "";
 }
 
-function itemRow(item, allowed, stage, nameFor) {
+/** An item as recorded: its id, status, kind, reason codes, acknowledgement and command, as Studio returned them. */
+function itemRecord(item, nameFor) {
   const ack = item.acknowledged;
   return `<li><code>${esc(item.id)}</code> <code>${esc(item.status)}</code>${item.kind ? ` <span class="chip">${esc(item.kind)}</span>` : ""}
     ${codes(item.reasonCodes)}${ack ? `<div class="muted">Acknowledged by ${nameFor(ack.by)} until ${time(ack.expiresTs)}: ${esc(ack.reason)};
-      still ${esc(item.status)}</div>` : ""}${nextActionHtml(item.nextAction)}${retryButton(item, allowed)}${
+      still ${esc(item.status)}</div>` : ""}${typeof item.nextAction?.command === "string" ? ` <code>${esc(item.nextAction.command)}</code>` : ""}</li>`;
+}
+
+/** An item in words, with the way on: its next action, Retry for a failed effect, and Acknowledge where Studio takes one. */
+function itemRow(item, allowed, stage, nameFor) {
+  const ack = item.acknowledged;
+  return `<li>${itemLine(item, false)}${ack ? `<div class="muted">${nameFor(ack.by)} acknowledged this until ${when(ack.expiresTs)}: ${esc(ack.reason)}.
+      It is still ${esc(say("itemStatus", item.status))}.</div>` : ""}${nextActionHtml(item.nextAction)}${retryButton(item, allowed)}${
     !ack && item.status === "WAITING" && acknowledgeable(item, stage) && allowed.acknowledge?.allowed === true
       ? ` ${actionButton("Acknowledge", "acknowledge", allowed.acknowledge, `data-item="${esc(item.id)}"`)}` : ""}</li>`;
 }
 
-/** `nameFor(key)` names a principal key as HTML (nameOf); by default the key is shown escaped. */
+/** What this step still needs, in words; `nameFor(key)` names a principal key as HTML (nameOf). The items as recorded stay under "Show the record". */
 export function renderMissing(readiness, stage, nameFor = esc) {
   const open = readiness.items.filter((item) => !["READY", "COMPLETE"].includes(item.status));
-  const group = (mandatory) => list(open.filter((item) => item.mandatory === mandatory).map((item) => itemRow(item, readiness.allowed, stage, nameFor)), "None.");
-  return `<p>Readiness <code>${esc(readiness.status)}</code>${nextActionHtml(readiness.nextAction)}</p>
-    <h4>Mandatory</h4>${group(true)}<h4>Advisory</h4>${group(false)}`;
+  const group = (mandatory, row) => list(open.filter((item) => item.mandatory === mandatory).map(row), "Nothing.");
+  return `<p>This step is ${sayCode("readinessStatus", readiness.status)}.${nextActionHtml(readiness.nextAction)}</p>
+    <h5>Needed before you go on</h5>${group(true, (item) => itemRow(item, readiness.allowed, stage, nameFor))}
+    <h5>Good to have</h5>${group(false, (item) => itemRow(item, readiness.allowed, stage, nameFor))}
+    ${record(`<p>Readiness <code>${esc(readiness.status)}</code></p><h4>Mandatory</h4>${group(true, (item) => itemRecord(item, nameFor))}
+      <h4>Advisory</h4>${group(false, (item) => itemRecord(item, nameFor))}`, "missing")}`;
 }
 
 function laneItem(item) {
@@ -488,10 +526,26 @@ export function renderLanes(readiness, refs, revisionNo) {
   "Nothing recorded.")}</section>`).join("");
   const checks = readiness.items.filter((item) => item.section === "integrity").map((item) => `<details data-a4-open="integrity:${esc(item.id)}"><summary><code>${esc(item.id)}</code>
     <code>${esc(item.status)}</code> ${codes(item.reasonCodes)}</summary><pre class="scroll">${esc(JSON.stringify(item.report, null, 2))}</pre></details>`);
-  return `<p class="muted">Readiness items for this stage and the evidence refs Studio lists for r${esc(revisionNo)}, as recorded.</p>
-    <div class="a4-lanes"><div class="a4-lane-grid">${lanes}</div><section class="card a4-integrity"><h4>Integrity</h4>
+  const plainLane = ([lane]) => {
+    const items = readiness.items.filter((item) => item.section === lane);
+    const done = items.filter((item) => ["READY", "COMPLETE"].includes(item.status));
+    const kept = refs.filter((ref) => ref.lane === lane);
+    if (!items.length && !kept.length) return "";
+    return `<h5>${esc(say("lane", lane))}</h5>${items.filter((item) => !done.includes(item)).map((item) => itemLine(item)).join("")}${done.length
+      ? `<p class="muted">Done: ${esc(done.map((item) => itemTitle(item.id)).join("; "))}.</p>` : ""}${kept.length
+      ? `<p class="muted">${kept.length} record(s) kept: ${esc([...new Set(kept.map((ref) => say("refKind", ref.refKind)))].join(", "))}.</p>` : ""}`;
+  };
+  const valid = readiness.integrity.valid === true;
+  return `<section class="card a4-lanes"><h4>What is recorded so far</h4>
+    <p class="muted">What AMC has recorded at this stage for version ${esc(revisionNo)}, and its own check of the project's record.</p>
+    ${LANES.map(plainLane).join("") || "<p class=\"muted\">Nothing recorded yet.</p>"}
+    <h5>${esc(say("lane", "integrity"))}</h5><p>${valid ? "AMC checked the project's record and found no problem."
+      : "AMC checked the project's record and found a problem: open the record below and ask whoever runs this AMC to look at it."}
+      This is about the record's bytes, not about the agent. ${TRUTH.signatures}.</p>
+    ${record(`<p class="muted">Readiness items for this stage and the evidence refs Studio lists for r${esc(revisionNo)}, as recorded.</p>
+    <div class="a4-lane-grid">${lanes}</div><section class="card a4-integrity"><h4>Integrity</h4>
     <p class="muted">Integrity of bytes; not evidence about the agent. ${TRUTH.signatures}.</p>
-    <p><code>valid: ${esc(readiness.integrity.valid)}</code> ${codes(readiness.integrity.reasonCodes)}</p>${checks.join("")}</section></div>`;
+    <p><code>valid: ${esc(readiness.integrity.valid)}</code> ${codes(readiness.integrity.reasonCodes)}</p>${checks.join("")}</section>`, "lanes")}</section>`;
 }
 
 const STAGE_GATES = new Set(["direction", "completion"]);
@@ -558,6 +612,12 @@ function decisionRow(decision, reasonCodes = []) {
     <span class="muted">${time(decision.ts)}</span>${decision.selfApproved ? ` <span class="muted">${TRUTH.selfApproved}</span>` : ""}</li>`;
 }
 const POLICY_ELSEWHERE = "A gate-policy change is open. This page does not show the proposed policy, so it cannot be decided here";
+const capital = (text) => text.charAt(0).toUpperCase() + text.slice(1);
+/** A decision in words: who, what, when (the reader's time), and whether it still counts. */
+function decisionWords(decision, reasonCodes = []) {
+  return `<li>${esc(decision.username)} ${esc(say("decision", decision.decision))} on ${when(decision.ts)}${decision.selfApproved
+    ? `. ${TRUTH.selfApproved}` : ""}${reasonCodes.includes("GATE_STALE") ? ". It no longer counts: something it covered changed since" : ""}.</li>`;
+}
 
 function gateChangeBanner({ from, to }) {
   const what = from.gateId === to.gateId && from.bindingDigest === to.bindingDigest
@@ -636,33 +696,39 @@ export function renderApprovalsBar(ctx) {
   const shownIds = new Set(shown.flatMap((row) => row.decisions.map((decision) => decision.decisionId)));
   const pinned = (offer) => (gateChange ? held(GATE_CHANGED) : gate && !boundReview(gateReview(gate, readiness)) ? held(UNBOUND)
     : gate && gate.revisionNo !== ctx.revision?.revisionNo ? held(OTHER_REVISION) : gate && specDraft ? held(specDraftNote(gate.revisionNo)) : offer);
-  // Readiness's status verbatim; only the decisions readiness.staleApprovals lists carry codes (decisionRow).
+  // Readiness's status verbatim in the record; only the decisions readiness.staleApprovals lists carry codes (decisionRow).
   const gateBlock = (row) => `<p><code>${esc(row.gate)}</code> gate r${esc(row.revisionNo)} · <code>${esc(row.status)}</code> ·
       ${esc(row.approvals)} of ${esc(row.required)} required approvals</p>
       ${Array.isArray(row.excludedKeys) && row.excludedKeys.length ? exclusionLine(readiness, row, row.excludedKeys.map((key) => nameOf(ctx, key))) : ""}
       ${list(row.decisions.map((decision) => decisionRow(decision, staleCodes.get(decision.decisionId))), "No decisions yet.")}`;
+  // In words: each gate, how many approvals it has, and who decided; who may approve is said only while it waits for approvals.
+  const gateWords = (row) => `<p><strong>${esc(capital(say("gate", row.gate)))}</strong> for version ${esc(row.revisionNo)}: ${sayCode("gateStatus", row.status)}.
+      ${esc(row.approvals)} of ${esc(row.required)} approvals.</p>
+      ${row.status === "PENDING" && Array.isArray(row.excludedKeys) && row.excludedKeys.length ? exclusionLine(readiness, row, row.excludedKeys.map((key) => nameOf(ctx, key))) : ""}
+      ${row.decisions.length ? list(row.decisions.map((decision) => decisionWords(decision, staleCodes.get(decision.decisionId))), "") : "<p class=\"muted\">Nobody has decided yet.</p>"}`;
   const earlierRows = earlier.map((old) => `<li><code>${esc(old.gate)}</code> gate bound to r${esc(old.revisionNo)} · <code>${esc(old.status)}</code>
     ${list(old.decisions.map((decision) => decisionRow(decision)), "No decisions.")}</li>`);
   const otherStale = readiness.staleApprovals.filter((row) => !shownIds.has(row.decisionId))
     .map((row) => `<li>${strikeIfStale(`<code>${esc(row.decisionId)}</code>`, staleCodes.get(row.decisionId))} ${codes(row.reasonCodes)}</li>`);
+  // Only what a person can do now is a button; the rest is listed under More with the reason in words (actionButton).
+  const { html: buttons, rows: waiting } = collectNotNow(() => [
+    actionButton("Approve", "approve", open ? pinned(approveOffer(allowed.decide, open, readiness, ctx.me)) : null),
+    actionButton("Request changes", "request-changes", open ? pinned(allowed.requestChanges) : null),
+    actionButton("Request direction approval", "request-direction", requestOffer(ctx, "direction")),
+    actionButton("Request completion approval", "request-completion", requestOffer(ctx, "completion")),
+    actionButton(completeLabel(met, stage), "complete", stage === "activate" && met ? held(ACTIVATE_COMPLETE)
+      : met ? effectHold(met, readiness) ?? pinned(allowed.progress) : null)].join(" "));
+  const { html: more, rows: moreNotNow } = collectNotNow(() => [actionButton("Hold", "hold", allowed.hold),
+    actionButton("Deny", "deny", open ? pinned(allowed.decide) : null), allowed.resume ? actionButton("Resume", "resume", allowed.resume) : ""].join(" "));
   return `<section class="card a4-approvals"><h4>Approvals</h4>${gateChange ? gateChangeBanner(gateChange) : ""}
-    ${shown.length ? `${shown.map(gateBlock).join("")}<p class="muted">Valid while the specification and resources are unchanged. ${TRUTH.vote}.</p>`
-      : `<p class="muted">No direction or completion gate has been requested at this stage.</p>`}
-    ${policy.length ? `<p class="muted">${POLICY_ELSEWHERE}: ${policy.map((row) => `<code>${esc(row.gateId)}</code> <code>${esc(row.quorum.status)}</code>`).join(", ")}.</p>` : ""}
-    ${earlierRows.length ? `<details data-a4-open="earlier-gates"><summary>Earlier gates</summary>${list(earlierRows, "")}</details>` : ""}
-    ${otherStale.length ? `<details data-a4-open="stale-decisions"><summary>Stale decisions</summary>${list(otherStale, "")}</details>` : ""}
-    <label>Reason (required to decide, hold, resume or acknowledge) <input name="reason" required maxlength="2000" /></label>
-    <div class="row wrap">
-      ${actionButton("Approve", "approve", open ? pinned(approveOffer(allowed.decide, open, readiness, ctx.me)) : null)}
-      ${actionButton("Request changes", "request-changes", open ? pinned(allowed.requestChanges) : null)}
-      ${actionButton("Hold", "hold", allowed.hold)}
-      ${actionButton("Request direction approval", "request-direction", requestOffer(ctx, "direction"))}
-      ${actionButton("Request completion approval", "request-completion", requestOffer(ctx, "completion"))}
-      ${actionButton(completeLabel(met, stage), "complete", stage === "activate" && met ? held(ACTIVATE_COMPLETE)
-        : met ? effectHold(met, readiness) ?? pinned(allowed.progress) : null)}
-    </div>
-    <details data-a4-open="more"><summary>More</summary><div class="row wrap">${actionButton("Deny", "deny", open ? pinned(allowed.decide) : null)}
-      ${allowed.resume ? actionButton("Resume", "resume", allowed.resume) : ""}</div></details></section>`;
+    ${shown.length ? `${shown.map(gateWords).join("")}<p class="muted">An approval holds while the plan and the agent's files stay as they were. ${TRUTH.vote}.</p>`
+      : `<p class="muted">Nobody has asked for an approval at this stage yet.</p>`}
+    ${policy.length ? `<p class="muted">${POLICY_ELSEWHERE}.</p>` : ""}
+    <label>Your reason (needed to approve, turn down, ask for changes, hold, resume or acknowledge) <input name="reason" required maxlength="2000" /></label>
+    ${buttons.trim() ? `<div class="row wrap">${buttons}</div>` : "<p class=\"muted\">There is nothing to decide here right now.</p>"}
+    <details data-a4-open="more"><summary>More</summary>${more.trim() ? `<div class="row wrap">${more}</div>` : ""}${notNowList([...waiting, ...moreNotNow])}</details>
+    ${record(`${shown.map(gateBlock).join("")}${policy.length ? `<p class="muted">${POLICY_ELSEWHERE}: ${policy.map((row) => `<code>${esc(row.gateId)}</code> <code>${esc(row.quorum.status)}</code>`).join(", ")}.</p>` : ""}
+      ${earlierRows.length ? `<h5>Earlier gates</h5>${list(earlierRows, "")}` : ""}${otherStale.length ? `<h5>Stale decisions</h5>${list(otherStale, "")}` : ""}`, "approvals")}</section>`;
 }
 
 export function renderMembers(ctx) {
@@ -674,15 +740,18 @@ export function renderMembers(ctx) {
   const { open, met } = currentGates(ctx.gates, ctx.stage, readiness);
   const live = open ?? met;
   return `<section class="card a4-members"><h4>Members</h4>
-    ${list(project.members.map((member) => `<li>${esc(member.username)} <code>${esc(member.authSource)}</code> ${codes(member.roles)}</li>`), "No members.")}
-    ${readiness.identityCheck === "session_record" ? `<p><code>IDENTITY_CHECK_LIMITED</code> Host-mode roles come from session records, not a live check.</p>` : ""}
+    ${list(project.members.map((member) => `<li>${esc(member.username)}: ${esc(member.roles.map((role) => say("projectRole", role)).join(", "))}
+      <span class="muted">(signs in with ${esc(say("authSource", member.authSource))})</span></li>`), "No members.")}
+    ${readiness.identityCheck === "session_record" ? `<p>Roles here come from the host's session records, so AMC does not check them live.</p>` : ""}
+    ${record(`${list(project.members.map((member) => `<li>${esc(member.username)} <code>${esc(member.authSource)}</code> ${codes(member.roles)}</li>`), "No members.")}
+      ${readiness.identityCheck === "session_record" ? `<p><code>IDENTITY_CHECK_LIMITED</code> Host-mode roles come from session records, not a live check.</p>` : ""}`, "members")}
     ${members?.candidatesLimited === true ? `<p class="muted">Host mode: candidates come from tracked session records, so this list may be incomplete.</p>` : ""}
     ${members?.error ? `<p class="status-bad">${esc(members.error)}</p>` : ""}
     ${candidates.length ? `<h4>Candidates</h4>${live ? `<p class="status-bad">Adding a member records a new project transition: the open
       ${esc(live.gate)} approval request (r${esc(live.revisionNo)}) is superseded and its approvals stop counting, so it must be requested again.</p>` : ""}
       ${list(candidates.map((candidate) => `<li data-principal="${esc(candidate.principalKey)}">
-      ${esc(candidate.username)} <select name="role" aria-label="Project role for ${esc(candidate.username)}">${roles.map((role) => `<option>${role}</option>`).join("")}</select>
-      ${actionButton("Add", "add-member", ctx.allowed.addMember, `aria-label="Add ${esc(candidate.username)} to the project"`)}</li>`), "")}` : ""}
+      ${esc(candidate.username)} <select name="role" aria-label="Project role for ${esc(candidate.username)}">${roles.map((role) => `<option value="${role}">${esc(say("projectRole", role))}</option>`).join("")}</select>
+      ${actionButton("Add", "add-member", ctx.allowed.addMember, `data-row="member" aria-label="Add ${esc(candidate.username)} to the project"`)}</li>`), "")}` : ""}
     ${Array.isArray(ctx.me?.roles) && ctx.me.roles.includes("OWNER") ? `<div class="a4-invite" data-card="members"><h4>Invite someone new</h4>
       <p class="muted">AMC creates their account with a first password, shows it to you once, and adds them here as an approver.</p>
       <label>Their user name <input name="inviteUsername" autocomplete="off" maxlength="64" /></label>
