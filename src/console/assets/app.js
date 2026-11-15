@@ -3826,6 +3826,8 @@ async function renderPage() {
       const project = new URLSearchParams(location.search).get("project");
       if (/^a4p_[0-9a-f]{32}$/.test(project ?? "") && !document.getElementById("a4BackLink")) {
         root.insertAdjacentHTML("beforebegin", `<p id="a4BackLink" style="position:sticky;top:0;z-index:5;margin:0;padding:8px 0;background:var(--bg)"><a class="button" href="./a4Project?project=${project}&amp;stage=assemble">Back to the agent project</a></p>`);
+        // A control the page scrolls into view (a focused field, a result) stops below the bar, never under it.
+        document.documentElement.style.scrollPaddingTop = "76px";
       }
       return await renderNativeTasksPage({ root, initialAgent: currentAgent() });
     }
