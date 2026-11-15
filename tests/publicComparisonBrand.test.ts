@@ -13,7 +13,7 @@ describe("AMC public comparison identity and claim boundary", () => {
     const css = read("website/compare.css");
     expect(html).toContain('href="compare.css?v=20261115"');
     expect(html).toContain('src="compare.js?v=20261115"');
-    expect(html).toContain('href="home.css?v=5"');
+    expect(html).toContain('href="home.css?v=6"');
     expect(html).not.toMatch(/<style(?:\s[^>]*)?>/i);
     expect(html).not.toMatch(/\sstyle=/i);
     expect(css).toContain('@import url("./brand.css")');

@@ -17,7 +17,7 @@
   <meta property="og:url" content="https://agentmaturity.co/docs/adapters.html">
   <meta property="og:image" content="https://agentmaturity.co/og-card.png">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="../home.css?v=5">
+  <link rel="stylesheet" href="../home.css?v=6">
   <link rel="stylesheet" href="../pages.css?v=1">
   <link rel="stylesheet" href="../docs-pages.css?v=1">
 </head>
@@ -114,7 +114,7 @@
       <div class="step">
         <div class="step-num">1</div>
         <div class="step-content">
-          <h4>Lease minted</h4>
+          <h3>Lease minted</h3>
           <p>A short-lived, scoped <strong>lease token</strong> is automatically created for the session.</p>
         </div>
       </div>
@@ -180,7 +180,7 @@ amc adapters capabilities --agent my-agent --adapter generic-cli --json</code></
       <h2 id="langchain">LangChain (Python)</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>langchain-python</code></div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <pre><code>pip install langchain langchain-openai</code></pre>
         <h4>Configure &amp; Run</h4>
         <pre><code><span class="comment"># Set your agent's adapter</span>
@@ -198,7 +198,7 @@ amc adapters run --agent my-langchain --adapter langchain-python -- python my_ch
       <h2 id="langchain-node">LangChain (Node)</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">Node.js</span> &nbsp; Adapter: <code>langchain-node</code></div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <pre><code>npm install langchain @langchain/openai</code></pre>
         <h4>Configure &amp; Run</h4>
         <pre><code>amc adapters configure --agent my-langchain-js --adapter langchain-node --route /openai --model gpt-4o --mode SUPERVISE
@@ -211,7 +211,7 @@ amc adapters run --agent my-langchain-js --adapter langchain-node -- node my_age
       <h2 id="langgraph">LangGraph</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>langgraph-python</code></div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <pre><code>pip install langgraph langchain-openai</code></pre>
         <h4>Configure &amp; Run</h4>
         <pre><code>amc adapters configure --agent my-graph --adapter langgraph-python --route /openai --model gpt-4o --mode SUPERVISE
@@ -223,7 +223,7 @@ amc adapters run --agent my-graph --adapter langgraph-python -- python my_graph.
       <h2 id="crewai">CrewAI</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>crewai-cli</code></div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <pre><code>pip install crewai</code></pre>
         <h4>Configure &amp; Run</h4>
         <pre><code>amc adapters configure --agent my-crew --adapter crewai-cli --route /openai --model gpt-4o --mode SUPERVISE
@@ -235,7 +235,7 @@ amc adapters run --agent my-crew --adapter crewai-cli -- python my_crew.py</code
       <h2 id="autogen">AutoGen</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>autogen-cli</code></div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <pre><code>pip install pyautogen</code></pre>
         <h4>Configure &amp; Run</h4>
         <pre><code>amc adapters configure --agent my-autogen --adapter autogen-cli --route /openai --model gpt-4o --mode SUPERVISE
@@ -247,7 +247,7 @@ amc adapters run --agent my-autogen --adapter autogen-cli -- python my_autogen.p
       <h2 id="openai-agents">OpenAI Agents SDK</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">Node.js sample</span> &nbsp; Adapter: <code>openai-agents-sdk</code></div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <pre><code>pip install openai-agents  <span class="comment"># Python</span>
 npm install openai         <span class="comment"># Node.js</span></code></pre>
         <h4>Configure &amp; Run</h4>
@@ -260,7 +260,7 @@ amc adapters run --agent my-oai --adapter openai-agents-sdk -- node my_agent.mjs
       <h2 id="llamaindex">LlamaIndex</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>llamaindex-python</code></div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <pre><code>pip install llama-index</code></pre>
         <h4>Configure &amp; Run</h4>
         <pre><code>amc adapters configure --agent my-llama --adapter llamaindex-python --route /openai --model gpt-4o --mode SUPERVISE
@@ -272,7 +272,7 @@ amc adapters run --agent my-llama --adapter llamaindex-python -- python my_index
       <h2 id="semantic-kernel">Semantic Kernel</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-orange">Node.js sample</span> &nbsp; Adapter: <code>semantic-kernel</code></div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <pre><code>dotnet add package Microsoft.SemanticKernel  <span class="comment"># C#</span>
 pip install semantic-kernel                    <span class="comment"># Python</span></code></pre>
         <h4>Configure &amp; Run</h4>
@@ -285,7 +285,7 @@ amc adapters run --agent my-sk --adapter semantic-kernel -- node my-agent.mjs</c
       <h2 id="claude-code">Claude Code</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-dark">CLI</span> &nbsp; Adapter: <code>claude-cli</code></div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <pre><code>npm install -g @anthropic-ai/claude-code</code></pre>
         <h4>Configure &amp; Run</h4>
         <pre><code>amc adapters configure --agent my-claude --adapter claude-cli --route /anthropic --model claude-sonnet-4-6
@@ -302,7 +302,7 @@ amc adapters run --agent my-claude --adapter claude-cli -- claude --model claude
       <h2 id="gemini">Gemini</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-dark">CLI</span> &nbsp; Adapter: <code>gemini-cli</code></div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <pre><code>npm install -g @google/gemini-cli</code></pre>
         <h4>Configure &amp; Run</h4>
         <pre><code>amc adapters configure --agent my-gemini --adapter gemini-cli --route /gemini --model gemini-flash --mode SUPERVISE
@@ -315,7 +315,7 @@ amc adapters run --agent my-gemini --adapter gemini-cli -- gemini --model gemini
       <h2 id="openclaw">OpenClaw</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-dark">CLI</span> &nbsp; Adapter: <code>openclaw-cli</code></div>
-        <h4>Configure &amp; Run</h4>
+        <h3>Configure &amp; Run</h3>
         <pre><code>amc adapters run --agent my-openclaw --adapter openclaw-cli -- openclaw run</code></pre>
         <p>Or configure OpenClaw to route all sessions through the AMC gateway permanently for continuous evidence capture.</p>
       </div>
@@ -324,7 +324,7 @@ amc adapters run --agent my-gemini --adapter gemini-cli -- gemini --model gemini
       <h2 id="openhands">OpenHands</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">CLI</span> &nbsp; Adapter: <code>openhands-cli</code></div>
-        <h4>Configure &amp; Run</h4>
+        <h3>Configure &amp; Run</h3>
         <pre><code>amc adapters configure --agent my-openhands --adapter openhands-cli --route /openai --model gpt-4o --mode SUPERVISE
 amc adapters run --agent my-openhands --adapter openhands-cli -- openhands</code></pre>
         <p>The base adapter path records process evidence and conditionally routed model traffic. It does not claim provider-native file/tool lifecycle coverage.</p>
@@ -334,7 +334,7 @@ amc adapters run --agent my-openhands --adapter openhands-cli -- openhands</code
       <h2 id="deepseek-harness">DeepSeek Harness</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">CLI</span> &nbsp; Adapter: <code>deepseek-harness</code></div>
-        <h4>Configure &amp; Run</h4>
+        <h3>Configure &amp; Run</h3>
         <pre><code><span class="comment"># dsh-launch.json pins the reviewed DSH executable (and optional entrypoint) by path and SHA-256</span>
 amc adapters configure --agent default --adapter deepseek-harness --route /deepseek --model deepseek-v4-flash --launch-config ./dsh-launch.json
 amc adapters run --agent default --adapter deepseek-harness -- <span class="string">"Summarize the README and explain the main entry point."</span></code></pre>
@@ -345,7 +345,7 @@ amc adapters run --agent default --adapter deepseek-harness -- <span class="stri
       <h2 id="hermes">Hermes Agent</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">CLI</span> &nbsp; Adapter: <code>hermes-cli</code></div>
-        <h4>Configure &amp; Run</h4>
+        <h3>Configure &amp; Run</h3>
         <pre><code>amc adapters configure --agent my-hermes --adapter hermes-cli --route /openai --model gpt-4o --mode SUPERVISE
 amc adapters run --agent my-hermes --adapter hermes-cli -- hermes</code></pre>
         <p>Detection runs <code>hermes --version</code>. AMC sets <code>OPENAI_BASE_URL</code>, <code>OPENAI_API_BASE</code>, <code>OPENAI_API_HOST</code> and <code>AMC_LLM_BASE_URL</code> to the gateway route and passes a lease, not a provider key, in <code>OPENAI_API_KEY</code>. Check what is effective for your agent with <code>amc adapters capabilities --agent my-hermes --adapter hermes-cli --json</code>.</p>
@@ -355,7 +355,7 @@ amc adapters run --agent my-hermes --adapter hermes-cli -- hermes</code></pre>
       <h2 id="python-sdk">Python AMC SDK</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>python-amc-sdk</code> &nbsp; Package: <code>amc-sdk</code> (import <code>amc_sdk</code>)</div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <p>The SDK is not on PyPI yet (publication is pending). Install it from source; do not install a similarly named PyPI package, none is published by AMC.</p>
         <pre><code>pip install &quot;git+https://github.com/AgentMaturity/AgentMaturityCompass.git#subdirectory=sdk/python&quot;</code></pre>
         <p>The SDK drives AMC's native agent through <code>amc acp</code> and requires an AMC 1.2.x runtime, which is the current source build: it refuses the published 1.1.1 release. Initialize the workspace with <code>amc init</code> first.</p>
@@ -505,10 +505,10 @@ curl -sS http://127.0.0.1:3212/bridge/hooks/aep/0.1/events \
     <div class="footer-inner wrap">
       <div class="footer-top">
         <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p></div>
-        <div class="footer-col"><h3>Product</h3><a href="../#a4-forge">Build an agent</a><a href="../#capabilities">Run it</a><a href="../#paths">Already have an agent?</a><a href="../#install">Get AMC</a><a href="../#desktop">macOS app</a><a href="../#products">Eight tools</a><a href="../executive.html">Executives</a><a href="../playground.html">Playground</a><a href="../docs/index.html">Documentation</a></div>
-        <div class="footer-col"><h3>Depth</h3><a href="../a4.html">A4 Forge</a><a href="../methodology.html">Approach and research</a><a href="../compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="../#pricing">Price</a><a href="../#faq">FAQ</a></div>
-        <div class="footer-col"><h3>Industry Packs</h3><a href="../#domains">All packs</a><a href="../station-environment.html">Environment</a><a href="../station-health.html">Health</a><a href="../station-wealth.html">Wealth</a><a href="../station-education.html">Education</a><a href="../station-mobility.html">Mobility</a><a href="../station-technology.html">Technology</a><a href="../station-governance.html">Governance</a></div>
-        <div class="footer-col"><h3>Code</h3><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="../accessibility.html">Accessibility</a></div>
+        <div class="footer-col"><h2>Product</h2><a href="../#a4-forge">Build an agent</a><a href="../#capabilities">Run it</a><a href="../#paths">Already have an agent?</a><a href="../#install">Get AMC</a><a href="../#desktop">macOS app</a><a href="../#products">Eight tools</a><a href="../executive.html">Executives</a><a href="../playground.html">Playground</a><a href="../docs/index.html">Documentation</a></div>
+        <div class="footer-col"><h2>Depth</h2><a href="../a4.html">A4 Forge</a><a href="../methodology.html">Approach and research</a><a href="../compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="../#pricing">Price</a><a href="../#faq">FAQ</a></div>
+        <div class="footer-col"><h2>Industry Packs</h2><a href="../#domains">All packs</a><a href="../station-environment.html">Environment</a><a href="../station-health.html">Health</a><a href="../station-wealth.html">Wealth</a><a href="../station-education.html">Education</a><a href="../station-mobility.html">Mobility</a><a href="../station-technology.html">Technology</a><a href="../station-governance.html">Governance</a></div>
+        <div class="footer-col"><h2>Code</h2><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="../accessibility.html">Accessibility</a></div>
       </div>
       <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
     </div>

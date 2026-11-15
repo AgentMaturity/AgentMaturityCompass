@@ -16,7 +16,7 @@ describe("AMC public Playground identity", () => {
     const html = read("website/playground.html");
     const css = read("website/playground.css");
     expect(html).toContain('href="playground.css?v=20261115"');
-    expect(html).toContain('href="home.css?v=5"');
+    expect(html).toContain('href="home.css?v=6"');
     expect(html).not.toMatch(/<style(?:\s[^>]*)?>/i);
     expect(css).toContain('@import url("./brand.css")');
     expect(css).toContain("var(--amc-bg)");

@@ -17,7 +17,7 @@
   <meta property="og:url" content="https://agentmaturity.co/docs/compliance.html">
   <meta property="og:image" content="https://agentmaturity.co/og-card.png">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="../home.css?v=5">
+  <link rel="stylesheet" href="../home.css?v=6">
   <link rel="stylesheet" href="../pages.css?v=1">
   <link rel="stylesheet" href="../docs-pages.css?v=1">
   <style>
@@ -33,14 +33,14 @@
     }
     .deadline-banner .countdown small { font-size: 0.7rem; color: var(--text-muted); display: block; font-weight: 400; }
     .deadline-banner .detail { flex: 1; }
-    .deadline-banner .detail h3 { margin: 0 0 4px; font-size: 1.1rem; }
+    .deadline-banner .detail :is(h2, h3) { margin: 0 0 4px; padding: 0; border: 0; font-size: 1.1rem; }
     .deadline-banner .detail p { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
     .domain-card {
       background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
       min-width: 0;
       padding: 20px 24px; margin-bottom: 12px;
     }
-    .domain-card h4 { margin: 0 0 8px; display: flex; align-items: center; gap: 8px; }
+    .domain-card :is(h3, h4) { margin: 0 0 8px; display: flex; align-items: center; gap: 8px; }
     .domain-card .stats { display: flex; gap: 16px; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px; }
     .domain-card .stats span { display: flex; align-items: center; gap: 4px; }
     .framework-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
@@ -123,7 +123,7 @@
           <small>Annex III timeline</small>
         </div>
         <div class="detail">
-          <h3>EU AI Act — current high-risk timeline</h3>
+          <h2>EU AI Act — current high-risk timeline</h2>
           <p>The European Commission's AI Act page gives 2 December 2027 for the high-risk rules in sensitive areas (Annex III) and 2 August 2028 for AI built into regulated products, after changes made by the AI Omnibus. The <a href="../compliance.html">Frameworks page</a> lists every date with its source. Check the Commission's page for later changes.</p>
         </div>
       </div>
@@ -173,7 +173,7 @@ amc audit binder create --scope workspace --out binder.amcaudit</code></pre>
       <div class="step">
         <div class="step-num">1</div>
         <div class="step-content">
-          <h4>Classify your agent</h4>
+          <h3>Classify your agent</h3>
           <pre><code>amc compliance report --framework EU_AI_ACT</code></pre>
           <p>The report lists each duty and whether records support it.</p>
         </div>
@@ -225,7 +225,7 @@ amc domain report --domain environment --output env.md  <span class="comment"># 
 
       <!-- Environment -->
       <div class="domain-card" id="domain-environment">
-        <h4>Environment</h4>
+        <h3>Environment</h3>
         <div class="stats">
           <span>6 packs</span>
           <span>104 questions</span>
@@ -308,7 +308,7 @@ amc domain report --domain environment --output env.md  <span class="comment"># 
       <h2 id="other-frameworks">Other Compliance Frameworks</h2>
       <div class="framework-grid">
         <div class="card">
-          <h4>ISO 42001</h4>
+          <h3>ISO 42001</h3>
           <p>AI management system standard. Clauses 4–10 mapped to AMC dimensions.</p>
           <pre><code>amc compliance report --framework ISO_42001</code></pre>
         </div>
@@ -361,10 +361,10 @@ amc audit binder export-execute</code></pre>
     <div class="footer-inner wrap">
       <div class="footer-top">
         <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p></div>
-        <div class="footer-col"><h3>Product</h3><a href="../#a4-forge">Build an agent</a><a href="../#capabilities">Run it</a><a href="../#paths">Already have an agent?</a><a href="../#install">Get AMC</a><a href="../#desktop">macOS app</a><a href="../#products">Eight tools</a><a href="../executive.html">Executives</a><a href="../playground.html">Playground</a><a href="../docs/index.html">Documentation</a></div>
-        <div class="footer-col"><h3>Depth</h3><a href="../a4.html">A4 Forge</a><a href="../methodology.html">Approach and research</a><a href="../compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="../#pricing">Price</a><a href="../#faq">FAQ</a></div>
-        <div class="footer-col"><h3>Industry Packs</h3><a href="../#domains">All packs</a><a href="../station-environment.html">Environment</a><a href="../station-health.html">Health</a><a href="../station-wealth.html">Wealth</a><a href="../station-education.html">Education</a><a href="../station-mobility.html">Mobility</a><a href="../station-technology.html">Technology</a><a href="../station-governance.html">Governance</a></div>
-        <div class="footer-col"><h3>Code</h3><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="../accessibility.html">Accessibility</a></div>
+        <div class="footer-col"><h2>Product</h2><a href="../#a4-forge">Build an agent</a><a href="../#capabilities">Run it</a><a href="../#paths">Already have an agent?</a><a href="../#install">Get AMC</a><a href="../#desktop">macOS app</a><a href="../#products">Eight tools</a><a href="../executive.html">Executives</a><a href="../playground.html">Playground</a><a href="../docs/index.html">Documentation</a></div>
+        <div class="footer-col"><h2>Depth</h2><a href="../a4.html">A4 Forge</a><a href="../methodology.html">Approach and research</a><a href="../compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="../#pricing">Price</a><a href="../#faq">FAQ</a></div>
+        <div class="footer-col"><h2>Industry Packs</h2><a href="../#domains">All packs</a><a href="../station-environment.html">Environment</a><a href="../station-health.html">Health</a><a href="../station-wealth.html">Wealth</a><a href="../station-education.html">Education</a><a href="../station-mobility.html">Mobility</a><a href="../station-technology.html">Technology</a><a href="../station-governance.html">Governance</a></div>
+        <div class="footer-col"><h2>Code</h2><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="../accessibility.html">Accessibility</a></div>
       </div>
       <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
     </div>

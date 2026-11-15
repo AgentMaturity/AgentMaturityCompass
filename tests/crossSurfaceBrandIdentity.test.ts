@@ -106,7 +106,7 @@ describe("cross-surface AMC brand identity", () => {
       expect(html).not.toContain('<span class="logo-icon">A</span>');
       expect(html).not.toMatch(/background:\s*#fff\b/i);
       expect(html).not.toContain("%230D6E6E");
-      expect(html).toContain('href="../home.css?v=5"');
+      expect(html).toContain('href="../home.css?v=6"');
       expect(html).toContain('href="../docs-pages.css?v=1"');
     }
 

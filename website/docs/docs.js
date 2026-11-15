@@ -621,6 +621,8 @@ function addCopyButtons() {
     wrapper.className = 'code-block';
     pre.before(wrapper);
     wrapper.appendChild(pre);
+    // A code line wider than the screen scrolls inside the block; keyboard users can reach it to scroll it.
+    if (pre.scrollWidth > pre.clientWidth + 1) pre.setAttribute('tabindex', '0');
 
     const btn = document.createElement('button');
     btn.type = 'button';

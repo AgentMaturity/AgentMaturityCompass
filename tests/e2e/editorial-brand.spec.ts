@@ -21,20 +21,20 @@ test.describe("AMC editorial brand shell", () => {
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto(pageUrl("blog/index.html"));
 
-    await expect(page.locator(".editorial-wordmark")).toHaveText(/amc_editorial/);
-    await expect(page.locator(".editorial-tagline")).toHaveText("Evidence over claims.");
+    await expect(page.locator(".nav-brand")).toHaveText("amc_");
+    await expect(page.locator(".footer-tagline")).toContainText("Evidence over claims.");
     await expect(page.getByRole("heading", { name: "AMC Blog" })).toBeVisible();
     await expect(page.locator(".blog-card")).toHaveCount(3);
 
     const layout = await page.evaluate(() => ({
       viewportWidth: window.innerWidth,
       documentWidth: document.documentElement.scrollWidth,
-      topbarHeight: document.querySelector(".editorial-topbar")?.getBoundingClientRect().height,
+      navHeight: document.querySelector("nav.nav")?.getBoundingClientRect().height,
       mainCount: document.querySelectorAll("main").length,
       footerCount: document.querySelectorAll("footer").length
     }));
     expect(layout.documentWidth).toBe(layout.viewportWidth);
-    expect(layout.topbarHeight).toBe(56);
+    expect(layout.navHeight).toBe(68);
     expect(layout.mainCount).toBe(1);
     expect(layout.footerCount).toBe(1);
 
@@ -56,9 +56,9 @@ test.describe("AMC editorial brand shell", () => {
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(pageUrl(path));
 
-      await expect(page.locator(".editorial-wordmark")).toBeVisible();
+      await expect(page.locator(".nav-brand")).toBeVisible();
       await expect(page.locator("main#main-content")).toHaveCount(1);
-      await expect(page.locator("footer.editorial-footer")).toHaveCount(1);
+      await expect(page.locator("footer.footer")).toHaveCount(1);
 
       const layout = await page.evaluate(() => ({
         viewportWidth: window.innerWidth,

@@ -40,6 +40,15 @@
   if (window.matchMedia && window.matchMedia('(max-width: 1020px)').matches) {
     [].forEach.call(document.querySelectorAll('.doc-side details[open]'), function (d) { d.open = false; });
   }
+  // A table or code block wider than the screen scrolls inside its box; keyboard users can reach it to scroll it.
+  function markScrollable() {
+    [].forEach.call(document.querySelectorAll('.doc table, .doc pre'), function (box) {
+      if (box.scrollWidth > box.clientWidth + 1) box.setAttribute('tabindex', '0');
+      else if (box.getAttribute('tabindex') === '0') box.removeAttribute('tabindex');
+    });
+  }
+  markScrollable();
+  window.addEventListener('resize', markScrollable);
   if (!navigator.clipboard) return;
   [].forEach.call(document.querySelectorAll('.doc pre'), function (pre) {
     var btn = document.createElement('button');

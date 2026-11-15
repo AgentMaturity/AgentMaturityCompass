@@ -35,7 +35,7 @@ describe("AMC public changelog identity", () => {
     const css = read("website/changelog.css");
 
     expect(html).toContain('href="changelog.css?v=2"');
-    expect(html).toContain('href="home.css?v=5"');
+    expect(html).toContain('href="home.css?v=6"');
     // One nav and one footer on every page: the home page's.
     expect(html).toContain('<a href="./" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>');
     expect(html).toContain('<p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p>');
