@@ -76,7 +76,7 @@ describe("Home's build card", () => {
   test("home.html carries the card before the rest of Home, and a4.js fills it", () => {
     const home = readFileSync("src/console/pages/home.html", "utf8");
     expect(home.indexOf('id="a4HomeCard"')).toBeLessThan(home.indexOf('id="app"'));
-    expect(readFileSync("src/console/assets/a4.js", "utf8")).toContain("start.homeCardHtml({ projects, industryHtml");
+    expect(readFileSync("src/console/assets/a4.js", "utf8")).toContain("start.homeCardHtml({ projects, waiting, industryHtml");
   });
 });
 
@@ -113,7 +113,7 @@ describe("waiting states", () => {
       readiness: { status: "WAITING", items: [], allowed: {}, gates: { direction: { gateId: "g1", status: "PENDING", approvals: 0, required: 1 } } } };
     const move = start.nextMove(ctx as never) as { now: string; why?: string; act?: { copy?: boolean } };
     expect(move.now).toContain("Waiting for a second person to approve");
-    expect(move.why).toContain("They sign in to this console, open this link");
+    expect(move.why).toContain("They sign in on their own device, or in a private window on this one, then open this page's link");
     expect(move.act?.copy).toBe(true);
     expect(start.renderStartHere(ctx as never)).toContain("data-a4-copy-link");
   });

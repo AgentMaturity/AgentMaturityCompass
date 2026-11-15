@@ -134,6 +134,26 @@ const canCreate = (who, options) => Array.isArray(who?.roles) && who.roles.some(
  * preview answers and this person may create projects; the demo workspace gets a short note instead. The nav link is
  * shown by default and hidden here when Studio reports the preview off.
  */
+/**
+ * The first open project whose gate waits for this person's decision: a PENDING gate Studio lets them decide
+ * (readiness.allowed.decide) that does not exclude them, unless self-approval is open. At most ten projects are read.
+ */
+async function approvalWaiting(projects, who) {
+  for (const project of projects.filter((row) => row.stage !== "retired").slice(0, 10)) {
+    const path = `${API}/projects/${encodeURIComponent(project.projectId)}`;
+    const readiness = one(await apiNativeRequest(`${path}/readiness`).catch(() => null), "readiness");
+    // A gate's own approval, or the second request that applies what was built (effect_gate, decided like requestChanges).
+    const effect = readiness?.gates?.completion?.status === "QUORUM_MET" && readiness.allowed?.requestChanges?.allowed === true
+      && listOf(readiness.items, "items").some((item) => (item.id === "effect_gate" || item.id === "plan_review_opened") && listOf(item.reasonCodes, "codes").includes("APPROVAL_STATUS:PENDING"));
+    const kind = ["direction", "completion"].find((name) => readiness?.gates?.[name]?.status === "PENDING" && readiness.allowed?.decide?.allowed === true) ?? (effect ? "effect" : null);
+    if (!kind) continue;
+    const gate = listOf(await apiNativeRequest(`${path}/gates`).catch(() => null), "gates").find((row) => row.gateId === readiness.gates[kind === "effect" ? "completion" : kind].gateId);
+    const excluded = Array.isArray(gate?.excludedKeys) && gate.excludedKeys.some((key) => String(key).endsWith(`:${who?.userId}`));
+    if (gate && (!excluded || readiness.selfApprovalAllowed === true)) return { project, kind };
+  }
+  return null;
+}
+
 async function showHomeEntry() {
   const card = document.getElementById("a4HomeCard");
   try {
@@ -152,7 +172,8 @@ async function showHomeEntry() {
     const projects = listOf(await apiNativeRequest(`${API}/projects`), "projects");
     if (!card || (projects.length === 0 && !canCreate(who, options))) return;
     const catalog = projects.length === 0 ? listOf(await apiGet("/industry-packs/list").catch(() => null), "packs") : [];
-    card.innerHTML = start.homeCardHtml({ projects, industryHtml: packs.packSelectHtml(catalog, null), start: options.workspace?.start ?? null });
+    const waiting = await approvalWaiting(projects, who);
+    card.innerHTML = start.homeCardHtml({ projects, waiting, industryHtml: packs.packSelectHtml(catalog, null), start: options.workspace?.start ?? null });
     card.hidden = false;
     bindCreateForm(card.querySelector("#a4HomeForm"));
   } catch {
@@ -267,6 +288,7 @@ function mountProject(projectId, options) {
   const projectPath = (sub) => `${API}/projects/${encodeURIComponent(projectId)}${sub}`;
   const state = { project: null, readiness: null, gates: [], revision: null, stageRevision: null, comments: [], members: null, diff: null, refs: [], options };
   let stage = null, activeCard = params.get("card") || "specification", cursor = 0, timer = null;
+  const invited = []; // what each Add a person answered on this page (first passwords included), never stored
   let loading = null, loadAgain = false;
   let presence = [], presenceError = "", conflict = null, specBase = null;
   // The gate and readiness digest the approvals bar first showed. Polls re-render the bar, so a decision binds these,
@@ -627,9 +649,10 @@ function mountProject(projectId, options) {
         const username = value("inviteUsername");
         if (!username) throw new Error("Write their user name first. Nothing was sent.");
         const auditor = scope.querySelector('[name="inviteAuditor"]')?.checked === true;
+        // Each person added stays listed with their first password until the page is left, so adding a second keeps the first's.
+        const link = `${location.origin}${location.pathname}?project=${encodeURIComponent(projectId)}&stage=${encodeURIComponent(stage)}`;
         return post("Invite", projectPath("/members/invite"), { username, workspaceRoles: auditor ? ["APPROVER", "AUDITOR"] : ["APPROVER"], ...headBinding() }, [],
-          (data) => tell(`${data?.firstPassword ? `${data.user?.username} was invited. Their first password, shown only this once: ${data.firstPassword}. ` : ""}${
-            (Array.isArray(data?.notes) ? data.notes : []).join(" ")}`));
+          (data) => { invited.push(start.invitedText(data)); tell(`${invited.join(" ")} ${start.approverHowTo(link)}`); });
       }
       case "comment": {
         const body = value("comment");
@@ -799,7 +822,7 @@ function mountProject(projectId, options) {
 
   /** Fills each empty answer with this stage's example, marked "(sample)" where it is free text (a4Start.EXAMPLES). */
   function useExample() {
-    const filled = fillEmptyAnswers(start.EXAMPLES[stage] ?? {});
+    const filled = fillEmptyAnswers(start.exampleFor(stage, stage === "aspire" && startPackId ? packs.PACK_FIELDS : []));
     tell(filled ? `Filled ${filled} empty answer(s) with sample text, marked (sample). Check them, change what you like, then press Save answers.`
       : "Every answer that has an example is already filled. Nothing was changed.");
   }
