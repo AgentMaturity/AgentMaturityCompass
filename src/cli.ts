@@ -2982,9 +2982,7 @@ program
 
       // Always offer to create AGENTS.md if nothing detected
       const createsNewFile = detected.length === 0;
-      if (createsNewFile) {
-        detected.push({ path: "AGENTS.md", label: "AGENTS.md (create new)" });
-      }
+      if (createsNewFile) detected.push({ path: "AGENTS.md", label: "AGENTS.md (create new)" });
 
       // Non-interactive: auto-pick the first agent config found. A new file is made only when named, since nobody saw a question.
       if (!process.stdin.isTTY) {
