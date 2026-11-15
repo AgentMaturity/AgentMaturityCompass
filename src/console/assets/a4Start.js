@@ -201,7 +201,7 @@ function gateMove(ctx, kind) {
     const cardSel = adapt ? '[data-card="activation"]' : '[data-card="effect"]';
     const needed = !adapt || list(ctx.allowed?.progress?.reasonCodes).includes("plan_activated") || codesOf(readiness, "plan_activated").includes("ACTIVATED_AT_COMPLETION");
     if (needed && effect.includes("EFFECT_GATE_NOT_OPEN")) return { effect: true, now: `Approved. Completing ${title(stage)} ${what}, which is a second request: `
-      + `a project owner opens it, then two approvers approve it on the ${cardName}.`, act: { label: adapt ? "Open the plan review" : "Open the effect gate", press: "open-effect" } };
+      + `a project owner opens it, then two approvers approve it on the ${cardName}.`, act: { label: adapt ? "Open the plan review" : "Ask for the second approval that applies the build", press: "open-effect" } };
     const effectStatus = prefixed(effect, "APPROVAL_STATUS:")[0];
     if (needed && effectStatus && effectStatus !== "QUORUM_MET" && effectStatus !== "CONSUMED") {
       // Whoever the completion gate excludes (its requester, authors, builders) is excluded from the effect's request too.

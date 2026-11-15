@@ -3,7 +3,7 @@
 // specification stays, unchanged, under "Show the record" on the Specification card (a4View.renderSpecEditor).
 import { QUESTION_LABELS } from "./a4Questions.js";
 import { esc, isObject, shown } from "./a4Html.js";
-import { say, STAGE_PLAIN } from "./a4Plain.js";
+import { answerHtml, say, STAGE_PLAIN } from "./a4Plain.js";
 
 const arr = (value) => (Array.isArray(value) ? value : value === null || value === undefined || value === "" ? [] : [value]);
 const text = (value) => (typeof value === "string" ? value : shown(value));
@@ -57,7 +57,7 @@ export function renderOutline(stage, revision) {
   const spec = isObject(revision?.spec) ? revision.spec : null;
   if (!spec) return `<p class="muted">Nothing is drafted for ${esc(STAGE_PLAIN[stage] ?? stage)} yet: answer the questions, then Propose drafts it.</p>`;
   const asked = arr(spec.answers).filter((answer) => answer?.value !== null && answer?.value !== undefined && text(answer.value).trim() !== "")
-    .map((answer) => `<li><strong>${esc(QUESTION_LABELS[answer.questionId]?.[0] ?? answer.questionId)}</strong> ${esc(text(answer.value))}</li>`);
+    .map((answer) => `<li><strong>${esc(QUESTION_LABELS[answer.questionId]?.[0] ?? answer.questionId)}</strong> ${answerHtml(answer.questionId, text(answer.value))}</li>`);
   const drafted = DRAFTED[stage]?.(spec) ?? "";
   return `<div class="a4-outline"><h5>What was asked</h5>${asked.length ? `<ul class="a4-rows">${asked.join("")}</ul>` : "<p class=\"muted\">No answers yet.</p>"}
     <h5>What AMC drafted</h5>${drafted || "<p class=\"muted\">Nothing drafted yet: Propose drafts it from the answers.</p>"}</div>`;

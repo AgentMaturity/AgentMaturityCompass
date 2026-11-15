@@ -51,6 +51,19 @@ export const say = (table, code) => PLAIN[table]?.[code] ?? String(code ?? "");
 export const code = (value) => `<small class="a4-code">(${esc(value)})</small>`;
 export const sayCode = (table, value) => `${esc(say(table, value))} ${code(value)}`;
 
+/** A stored answer that is a code (src/a4/spec/*.ts choices), in words; other answers read as written. */
+const STAND_IN = "the stand-in model (canned replies; it says nothing about a real agent)";
+const ANSWER_WORDS = {
+  providers: { stub: STAND_IN }, path: { native: "inside AMC" }, riskTier: PLAIN.riskTier,
+  autonomy: { advise: "only advise (no tools; it only answers)", act_with_approval: "act with the workspace's signed tools, with an approval for consequential calls" },
+  governance: { regulated: "the stricter approval rules for regulated work", standard: "the standard approval rules" }
+};
+/** HTML: the answer's words with the stored value in small print when it is a known code, else the value as written. */
+export const answerHtml = (questionId, value) => {
+  const words = typeof value === "string" ? ANSWER_WORDS[questionId]?.[value] : undefined;
+  return words === undefined ? esc(value) : words === value ? esc(words) : `${esc(words)} ${code(value)}`;
+};
+
 /** What each readiness item checks, in a few words; an id not listed reads as its own words, spaced out. */
 const ITEM_TITLES = {
   ask_complete: "Every needed question has an answer", understanding_confirmed: "You confirmed what AMC understood",

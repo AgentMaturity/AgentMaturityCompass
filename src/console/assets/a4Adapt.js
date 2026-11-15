@@ -8,7 +8,7 @@
 import { effectDecideButtons, engineDecision, rememberDecided } from "./a4Approvals.js";
 import { registerStageAction, registerStageCard } from "./a4Cards.js";
 import * as view from "./a4View.js";
-import { itemLine, itemWithRecord, record, say, when } from "./a4Plain.js";
+import { code as smallCode, itemLine, itemWithRecord, record, say, when } from "./a4Plain.js";
 
 const { esc } = view;
 const SPEC = "amc.a4-adapt-spec/v1";
@@ -88,7 +88,7 @@ function renderActivation(ctx) {
   const item = itemOf(ctx, "plan_review_opened");
   const [request] = coded(item, "APPROVAL_REQUEST");
   const completion = ctx.readiness?.gates?.completion;
-  const openable = completion?.status === "QUORUM_MET" ? ctx.allowed.openEffect : view.held("The completion gate has no quorum yet");
+  const openable = completion?.status === "QUORUM_MET" ? ctx.allowed.openEffect : view.held("The final approval does not have enough approvals yet");
   return `<p class="muted">Build signs the plan (a local audit trail under this workspace's keys). Activation is a second, separately decided plan review
     that an owner opens once the completion gate has its quorum; project approvers decide it here (two distinct people when regulated), and completing
     the stage activates the plan for the whole workspace. A regulated project activates at completion; any other completes with the plan signed and
@@ -203,15 +203,15 @@ function renderClocks(ctx) {
 function renderDataHandling(ctx) {
   const declared = isObject(specOf(ctx).dataHandling) ? specOf(ctx).dataHandling : null;
   const shown = (value) => (Array.isArray(value) ? value.join(", ") : value) || "not stated";
-  // Propose records whether redaction was confirmed for the declared classes ("enforced at redaction"). The last column says what
-  // would change the enforcement; it names no plan key.
-  const later = "a later AMC version";
-  const rows = declared === null ? [] : [["Data classes", declared.dataClasses, declared.dataClassesEnforcement ?? "none", later], ["Residency", declared.residency, "none", later],
-    ["Retention", declared.retention, "none", later], ["Processors", declared.processors, "none", later],
-    ["Memory policy", buildOf(ctx)?.memoryPolicy?.policy?.retentionTag, "advisory", "the reasoning-memory writeback"]]
-    .map(([field, value, enforced, key]) => [esc(field), esc(shown(value)), `<code>${esc(enforced)}</code>`, esc(key)]);
+  // Propose records whether redaction was confirmed for the declared classes ("enforced at redaction"). Only what is true today
+  // is said: a field AMC does not enforce says so, with no promise about later versions.
+  const enforcedWords = { none: "not enforced by AMC", advisory: "advice only: AMC does not enforce it" };
+  const rows = declared === null ? [] : [["Data classes", declared.dataClasses, declared.dataClassesEnforcement ?? "none"], ["Residency", declared.residency, "none"],
+    ["Retention", declared.retention, "none"], ["Processors", declared.processors, "none"],
+    ["Memory policy", buildOf(ctx)?.memoryPolicy?.policy?.retentionTag, "advisory"]]
+    .map(([field, value, enforced]) => [esc(field), esc(shown(value)), `${esc(enforcedWords[enforced] ?? enforced)} ${smallCode(enforced)}`]);
   return `${declared === null ? "<p class=\"muted\">Propose records what you declared about data handling.</p>"
-    : table(["Declared", "Value", "Enforced by AMC", "Changes with"], rows, "Nothing declared.")}${status(ctx, "data_handling_declared")}`;
+    : table(["Declared", "Value", "Enforced by AMC"], rows, "Nothing declared.")}${status(ctx, "data_handling_declared")}`;
 }
 
 const stepCard = (step, note) => (ctx) => `<p class="muted">${esc(note)}</p><label>Your note <textarea name="content" rows="3" maxlength="65536"></textarea></label>

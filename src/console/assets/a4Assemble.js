@@ -264,11 +264,11 @@ function renderEffect(ctx) {
   const [request] = coded(item, "APPROVAL_REQUEST");
   const [[requestState] = []] = coded(item, "APPROVAL_STATUS");
   const completion = ctx.readiness?.gates?.completion;
-  const openable = completion?.status === "QUORUM_MET" ? ctx.allowed.openEffect : view.held("The completion gate has no quorum yet");
+  const openable = completion?.status === "QUORUM_MET" ? ctx.allowed.openEffect : view.held("The final approval does not have enough approvals yet");
   return `<p class="muted">Completing Assemble applies the reviewed Enforce resources as the agent's active manifest (signed receipt). It is a
     second, separately decided request: an owner opens it, project approvers decide it (two distinct people when regulated), then the owner completes
     the stage. A failed apply leaves the gate consumed and offers one owner retry.</p>${status(ctx, "effect_gate")}
-    <div class="row wrap">${view.actionButton(request ? "Re-open the effect gate" : "Open the effect gate", "open-effect", openable,
+    <div class="row wrap">${view.actionButton(request ? "Ask again for the second approval that applies the build" : "Ask for the second approval that applies the build", "open-effect", openable,
       `data-gate="${esc(completion?.gateId ?? "")}"`)}</div>
     ${request ? `<p class="muted">Engine request <code>${esc(request[0])}</code> (<code>${esc(requestState ?? "unknown")}</code>)</p>${requestState === "PENDING" || requestState === "QUORUM_MET"
       ? `<label>Decision reason <textarea name="engine-reason" rows="2" maxlength="1000"></textarea></label>
@@ -304,7 +304,7 @@ export function register() {
     got: () => rememberDecided(button.dataset.approval, me?.username) }));
   registerStageAction("assemble", "open-effect", ({ button, headBinding, projectPath }) => {
     if (!button.dataset.gate) throw new Error("No approved completion gate is shown. Refresh first. Nothing was sent.");
-    return { label: "Open the effect gate", path: projectPath("/stages/assemble/effects/a4.assemble.apply/open"), body: { gateId: button.dataset.gate, ...headBinding() } };
+    return { label: "Ask for the second approval that applies the build", path: projectPath("/stages/assemble/effects/a4.assemble.apply/open"), body: { gateId: button.dataset.gate, ...headBinding() } };
   });
   registerStageAction("assemble", "load-log", ({ button }) => ({ local: true, pending: loadLog(button.dataset.task, button.dataset.agent) }));
   registerStageAction("assemble", "scaffold", ({ value, headBinding, projectPath }) => {

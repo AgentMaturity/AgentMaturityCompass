@@ -156,8 +156,8 @@ function renderRelease(ctx) {
     <p class="muted">Once the release approval (direction gate) has its quorum, an owner opens <code>${RELEASE_EFFECT}</code>, a second DEPLOY request decided
       separately; then an owner releases. The response carries the staging lease token (WRITE_LOW at most, the staging routes, 24 hours) once.</p>
     <div class="row wrap">${view.actionButton(request ? "Re-open the release request" : "Open the release request", "open-release",
-      quorumMet(direction) ? ctx.allowed.openEffect : view.held("The release approval has no quorum yet"), `data-gate="${esc(direction?.gateId ?? "")}"`)}
-      ${view.actionButton("Release", "release", quorumMet(direction) ? ctx.allowed.release : view.held("The release approval has no quorum yet"),
+      quorumMet(direction) ? ctx.allowed.openEffect : view.held("The release approval does not have enough approvals yet"), `data-gate="${esc(direction?.gateId ?? "")}"`)}
+      ${view.actionButton("Release", "release", quorumMet(direction) ? ctx.allowed.release : view.held("The release approval does not have enough approvals yet"),
         `data-gate="${esc(direction?.gateId ?? "")}" ${project}`)}</div>
     ${decideForm(ctx, request, "release-reason")}
     <h4>Deployment approval</h4>
@@ -166,7 +166,7 @@ function renderRelease(ctx) {
       On a regulated project an owner acknowledges the pending expert review before requesting it.</p>
     ${["package.transparency", "deployment.receipt", "deployment.amc_check", "monitoring.source", "regulatory_sources_status", "lifecycle.production_controls"].map((id) => status(ctx, id)).join("")}
     <div class="row wrap">${view.actionButton("Complete the deployment approval", "complete-activate", quorumMet(completion) ? ctx.allowed.progress
-      : view.held("The deployment approval has no quorum yet"), `data-gate="${esc(completion?.gateId ?? "")}" ${project}`)}</div>
+      : view.held("The deployment approval does not have enough approvals yet"), `data-gate="${esc(completion?.gateId ?? "")}" ${project}`)}</div>
     ${tokenBox(tokens.get(ctx.project.projectId))}
     ${loadButton(ctx)}${release ? releaseRecord(release) : ""}
     ${release && release.transparencyEntryId === null ? `<div class="row wrap">${view.actionButton("Append the transparency entry", "append-transparency", ctx.allowed.release,
