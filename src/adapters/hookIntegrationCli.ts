@@ -140,6 +140,7 @@ export function registerHookIntegrationCommands(
         : "Boundary: observation only; provider control decisions are unchanged.");
       if (result.provider === "pi" || result.provider === "codex" || result.mode === "control") for (const limit of result.limitations) console.log(chalk.yellow(`Limit: ${limit}`));
       if (result.provider === "codex" && !opts.dryRun) printCodexNextSteps();
+      if (!opts.dryRun) console.log(chalk.gray(`To take it out again: amc connect hooks remove --provider ${result.provider}`));
     });
 
   hooks
@@ -176,12 +177,12 @@ export function registerHookIntegrationCommands(
   hooks
     .command("health")
     .description("Verify signed hook setup and show the latest verified provider event")
-    .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi|dsh")
+    .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi|dsh|codex")
     .option("--recover-latch", "owner only: first clear this workspace's hook audit latch (vault passphrase); the recovery is recorded", false)
     .option("--json", "emit structured JSON", false)
     .action(async (opts: { provider: string; json: boolean; recoverLatch: boolean }) => {
-      if (!isHookProvider(opts.provider)) {
-        const message = "provider must be claude-code, gemini-cli, pi or dsh";
+      if (opts.provider !== "codex" && !isHookProvider(opts.provider)) {
+        const message = "provider must be claude-code, gemini-cli, pi, dsh or codex";
         if (opts.json) console.log(JSON.stringify({ ok: false, error: message }, null, 2));
         else console.error(chalk.red(message));
         process.exitCode = 2;
@@ -229,6 +230,7 @@ export function registerHookIntegrationCommands(
           console.log(`Action: ${health.evidence.lastEvent.actionId}`);
         }
         for (const reason of [...health.reasonCodes, ...bridgeIssues]) console.log(chalk.yellow(`Issue: ${reason}`));
+        if (installed.lostObservations) console.log(chalk.yellow(`Issue: ${installed.issues.at(-1)}`));
         if (control) printControlVerification(control);
         console.log(chalk.gray(`Boundary: ${health.claimBoundary}`));
       }

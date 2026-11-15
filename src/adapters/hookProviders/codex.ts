@@ -16,10 +16,11 @@ import { writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 import type { HookIntegrationStatus, HookMutationResult, InstallHookIntegrationOptions, RemoveHookIntegrationOptions } from "../hookIntegration.js";
 import { verifyManagedLease } from "../managedHookLease.js";
+import { codexLostObservationsPath } from "../codex/codexObserveForwarder.js";
 import { stableNodePath } from "./nodePath.js";
 import {
   addManagedIgnoreBlock, assertAllPathsSafe, fileChange, HOOK_INTEGRATION_ID, HOOK_TOKEN_MODE, HookIntegrationError, hasManagedIgnoreBlock,
-  ignoreBlockHash, leaseManifestFields, loadSignedHookManifest, managedLeaseStatus, obtainHookLease, parseInstallOptions, relativePortable, removeInstallationFiles, restore, snapshot, withInstallLock,
+  ignoreBlockHash, leaseManifestFields, loadSignedHookManifest, managedLeaseStatus, obtainHookLease, parseInstallOptions, relativePortable, removeDirIfEmpty, removeInstallationFiles, restore, snapshot, withInstallLock,
   type HookFileChange,
 } from "./installFiles.js";
 
@@ -92,6 +93,17 @@ function hooksFile(workspace: string, forwarderPath: string): Buffer {
 const loadManifest = (workspace: string, paths: ReturnType<typeof codexPaths>): CodexManifest | null => loadSignedHookManifest(workspace, paths, codexManifestSchema, "Codex");
 
 const fileSha = (path: string): string | null => (existsSync(path) ? sha256Hex(readFileSync(path)) : null);
+
+/** What the hook noted it could not hand to AMC (codexObserveForwarder.ts): a count, and the latest time and reason. */
+function lostObservations(workspace: string): HookIntegrationStatus["lostObservations"] {
+  let lines: string[];
+  try { lines = readFileSync(codexLostObservationsPath(workspace), "utf8").split("\n").filter((line) => line.trim().length > 0); }
+  catch { return undefined; }
+  if (lines.length === 0) return undefined;
+  let last: { ts?: unknown; reason?: unknown } = {};
+  try { last = JSON.parse(lines.at(-1)!) as typeof last; } catch { /* a torn last line still counts */ }
+  return { count: lines.length, lastTs: typeof last.ts === "number" ? last.ts : 0, lastReason: typeof last.reason === "string" ? last.reason : "unknown" };
+}
 
 function result(operation: "install" | "remove", dryRun: boolean, applied: boolean, files: HookFileChange[],
   lease: { leaseId: string | null; expiresTs: number | null }): HookMutationResult {
@@ -185,8 +197,15 @@ export function codexHookStatus(workspaceInput: string): HookIntegrationStatus {
   const lease = managedLeaseStatus(workspace, paths.token, manifest, issues);
   const state: HookIntegrationStatus["state"] = !manifest || (!lease.valid && !lease.expired) || !ignoreProtected ? "invalid"
     : lease.expired ? "expired" : !configOwned || forwarderMissing ? "drifted" : "installed";
+  const lost = lostObservations(workspace);
+  if (lost) {
+    issues.push(`${lost.count} Codex tool call report${lost.count === 1 ? " was" : "s were"} not recorded by AMC`
+      + `${lost.lastTs > 0 ? ` (latest ${new Date(lost.lastTs).toISOString()}: ${lost.lastReason})` : ""}. `
+      + "Those calls ran in Codex but are missing from AMC's records. Check that AMC Studio is running (amc up) and that AMC is up to date.");
+  }
   return { ...base, agentId: manifest?.agentId ?? null, mode: manifest ? "observe" : null, state, configOwned, manifestValid: manifest !== null,
-    leaseValid: lease.valid, leaseId: lease.payload?.leaseId ?? manifest?.leaseId ?? null, expiresTs: lease.payload?.expiresTs ?? manifest?.leaseExpiresTs ?? null, issues };
+    leaseValid: lease.valid, leaseId: lease.payload?.leaseId ?? manifest?.leaseId ?? null, expiresTs: lease.payload?.expiresTs ?? manifest?.leaseExpiresTs ?? null, issues,
+    ...(lost ? { lostObservations: lost } : {}) };
 }
 
 /** Revoke the lease, then remove AMC's own files through the deletion gate; a changed `.codex/hooks.json` is left in place. */
@@ -201,12 +220,17 @@ export function removeCodexHook(options: RemoveHookIntegrationOptions): HookMuta
     if (existsSync(paths.config) && fileSha(paths.config) !== manifest.configSha256) {
       throw new HookIntegrationError("HOOK_OWNERSHIP_CONFLICT", ".codex/hooks.json differs from the signed installation manifest");
     }
-    const targets = [paths.config, paths.token, paths.manifest, paths.signature];
+    // The hook's own note of lost reports goes with the installation; it is AMC's file under .amc/hooks/.
+    const lostNote = codexLostObservationsPath(workspace);
+    assertAllPathsSafe(workspace, [lostNote]);
+    const targets = [paths.config, paths.token, paths.manifest, paths.signature, ...(existsSync(lostNote) ? [lostNote] : [])];
     const files = targets.map((path) => fileChange(path, path === paths.token, snapshot(path), null, dryRun));
     const lease = { leaseId: manifest.leaseId, expiresTs: manifest.leaseExpiresTs };
     if (dryRun) return result("remove", true, false, files, lease);
     revokeLeaseForCli({ workspace, leaseId: manifest.leaseId, reason: "AMC Codex hook integration removed" });
     removeInstallationFiles(workspace, "hook-codex-remove", targets);
+    // Only the folder this installation created (the signed manifest says so), and only when nothing else is in it.
+    if (manifest.createdDirs.includes(".codex")) removeDirIfEmpty(dirname(paths.config));
     return result("remove", false, true, files, lease);
   };
   return dryRun ? execute() : withInstallLock(workspace, paths.lock, execute);

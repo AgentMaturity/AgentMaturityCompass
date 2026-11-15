@@ -3,7 +3,10 @@
  * PreToolUse fails open (docs/source-reviews/P2-17-codex-hooks.md), so AMC installs no Codex control hook and claims
  * nothing but "observed": the call already ran, and AMC cannot tell whether Codex ran a call it never reported.
  *
- * The payload must match Codex's own `post-tool-use.command.input` schema at the pin (no other field). AMC stores the
+ * The payload must carry every field of Codex's own `post-tool-use.command.input` schema at the pin. A field AMC does
+ * not know is ignored, not refused: Codex adds payload fields between releases (its hooks page says the schemas on
+ * `main` "may include hook fields that are not in the current release", https://learn.chatgpt.com/docs/hooks, read
+ * 2026-11-14), and refusing the whole report would lose the observation. AMC stores the
  * tool name and the SHA-256 of the session id, tool input and tool response, never their contents. Observations are
  * capped per lease and workspace like the other providers' (claudeCodeObservations.ts admitObservation); the same
  * report sent again is recorded already, and a different one for the same call is kept and flagged.
@@ -15,8 +18,8 @@ import { canonicalize } from "../utils/json.js";
 import { admitObservation, observationId, parse, recordHookAudit, type HookObservationResult } from "./claudeCodeObservations.js";
 import type { HookLease } from "./hookAuthorization.js";
 
-/** Codex 0.165.0 `post-tool-use.command.input.schema.json` (additionalProperties: false). */
-const codexPostToolUseSchema = z.strictObject({
+/** Codex 0.165.0 `post-tool-use.command.input.schema.json`; unknown extra fields are dropped (see above). */
+const codexPostToolUseSchema = z.object({
   hook_event_name: z.literal("PostToolUse"),
   session_id: z.string().min(1).max(256),
   turn_id: z.string().min(1).max(256),
