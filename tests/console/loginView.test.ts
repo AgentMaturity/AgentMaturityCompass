@@ -113,11 +113,11 @@ describe("loginFailureText", () => {
     const text = loginFailureText("users config missing; login blocked");
     expect(text).toContain("No console account exists yet in this workspace");
     expect(text).toContain("amc user init --username <you>");
-    expect(text).not.toContain("Login failed");
+    expect(text).not.toContain("Sign-in failed");
   });
 
   test.each(["users config signature invalid; login blocked", "invalid credentials", "pairing required before login"])("other errors stay verbatim: %s", (message) => {
-    expect(loginFailureText(message)).toBe(`Login failed: ${message}`);
+    expect(loginFailureText(message)).toBe(`Sign-in failed: ${message}`);
   });
 });
 

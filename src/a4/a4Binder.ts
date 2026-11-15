@@ -57,7 +57,7 @@ function exportProblems(files: Record<string, string>): string[] {
  * verified head. The report and the slice are read in one read transaction, so the slice is exactly the chain the
  * report verified. Refuses a project whose chain does not verify (409 A4_INTEGRITY_FAILED) and any slice the scans flag
  * (409 A4_BINDER_REFUSED). The slice is staged in a sibling directory, signed there and renamed into place, so a refusal
- * or a signing failure leaves nothing behind. Absent without `AMC_A4_PREVIEW=1` (404 A4_PREVIEW_DISABLED), for every caller.
+ * or a signing failure leaves nothing behind. Absent under `AMC_A4_PREVIEW=0` (404 A4_PREVIEW_DISABLED), for every caller.
  */
 export function buildA4BinderSlice(workspace: string, input: { projectId: string; stage?: A4Stage; gateId?: string; trust?: TrustContext }): {
   dir: string; manifestSha256: string; files: string[];

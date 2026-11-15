@@ -187,7 +187,7 @@ function runner() {
   check("runner: non-root installed artifact, SQLite and bundle notices", true, installed);
   const version = docker([...base, runnerImage, "--version"]).stdout.trim();
   const help = docker([...base, runnerImage, "--help"]).stdout;
-  check("runner: default CLI entrypoint", version === installed.version && help.includes("Usage: amc") && help.includes("amc evidence verify") && help.includes("amc --help --all"));
+  check("runner: default CLI entrypoint", version === installed.version && help.includes("Usage: amc") && help.includes("amc doctor") && help.includes("amc --help --all"));
   for (const utility of ["python", "git", "jq"]) docker([...base, "--entrypoint", utility, runnerImage, "--version"]);
   check("runner: Python, Git and jq available", true);
   const invoke = (args) => docker([...base, "--entrypoint", "sh", runnerImage, ...cliWithSecret.slice(1), ...args]);

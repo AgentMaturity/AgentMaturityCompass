@@ -29,6 +29,7 @@ import { revokeLease } from "../leases/leaseStore.js";
 import { readAndVerifyArtifactFileSignature, signArtifactBytes, signArtifactFile, type ArtifactSignature } from "../lifecycle/artifactSignature.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { promptLatestPackPath } from "../prompt/promptPolicyStore.js";
+import { promptPackContentSha256 } from "../prompt/promptPackArtifact.js";
 import { generateProvenanceRecord } from "../release/releaseProvenance.js";
 import { generateCycloneDxSbom } from "../release/releaseSbom.js";
 import { scanExtractedReleaseForSecrets } from "../release/releaseSecretScan.js";
@@ -49,8 +50,7 @@ import { asLeasePrincipal, assertPurposeKeys, leasePrincipalPreflight, vaultLock
 import { isRegulated, redoneStages, type A4ReadinessState } from "./a4Readiness.js";
 import {
   a4PackageV1Schema, a4PrincipalSchema, a4QualitySpecSchema, a4ReleaseV1Schema, a4ResourceDigestsSchema, type A4ChainLink, type A4PackageV1, type A4Principal, type A4ProjectRow,
-  type A4ReleaseV1
-} from "./a4Schema.js";
+  type A4ReleaseV1 } from "./a4Schema.js";
 import { A4StoreError, openA4Store } from "./a4Store.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
 import { deploymentPlan, PLAN_PATH } from "./a4Deploy.js";
@@ -74,7 +74,7 @@ import { packageVersionManifest, recordLifecycleActivation } from "./a4RuntimeLi
 const coded = (code: string, message: string): Error => Object.assign(new Error(`${code}: ${message}`), { code });
 const MAX_INPUT_BYTES = 64 * 1024 * 1024; // ponytail: one input file; raise it if an agent's resources outgrow it
 const PACKAGE_BOUNDARY = "The signed provenance record of what this workspace held at the release digest (v1: a same-host restart of the hosted Studio "
-  + "that built the agent, D-18). AMC prepared and signed it; it never deployed it. Installing it into another workspace is P2-40.";
+  + "that built the agent, D-18). AMC prepared and signed it; it never deployed it. Installing it into another workspace is not possible yet.";
 /** AMC's own install root (src/a4/ or dist/a4/ → the package root): the runtime SBOM and the deploy base files are read there. */
 export const AMC_ROOT = fileURLToPath(new URL("../..", import.meta.url));
 
@@ -139,10 +139,12 @@ const CAPTURE_SOURCES: Readonly<Record<string, (workspace: string, agentId: stri
   "signedConfigs.budgets": (workspace) => join(workspace, ".amc", "budgets.yaml"), "signedConfigs.actionPolicy": (workspace) => join(workspace, ".amc", "action-policy.yaml"),
   "signedConfigs.opsPolicy": (workspace) => join(workspace, ".amc", "ops-policy.yaml"), "signedConfigs.firewall": (workspace) => runtimeFirewallPolicyPath(workspace)
 };
+// As each slot's recomputer takes it: the prompt pack by what it says (promptPackContentSha256), every other file by its bytes.
+const capturedDigest = (slot: string, bytes: Buffer): string => slot === "context.promptPackSha256" ? promptPackContentSha256(bytes) : sha256Hex(bytes);
 const casDir = (workspace: string, projectId: string, revisionNo: number): string => join(a4ProjectsRoot(workspace), projectId, String(revisionNo));
 
 /**
- * Propose's copy of each captured slot's live file into the content-addressed store, named by its sha256 (harmless when
+ * Propose's copy of each captured slot's live file into the content-addressed store, named by its slot digest (harmless when
  * the revision is then refused: nothing names it). Returns slot → digest (null when the file is absent). The revision
  * binds the slot as recomputed inside its transaction; a file that moved in between is a digest the store lacks, which
  * readiness and the effect refuse (INPUT_NOT_CAPTURED), never a different file packaged.
@@ -153,7 +155,7 @@ export function captureInputs(workspace: string, projectId: string, agentId: str
   return Object.fromEntries(Object.entries(CAPTURE_SOURCES).map(([slot, source]) => {
     const bytes = regularBytes(source(workspace, agentId), slot);
     if (bytes === null) return [slot, null];
-    const sha = sha256Hex(bytes);
+    const sha = capturedDigest(slot, bytes);
     if (!pathExists(join(dir, sha))) writeFileAtomic(join(dir, sha), bytes, 0o600);
     return [slot, sha];
   }));
@@ -164,7 +166,7 @@ function readCaptured(workspace: string, projectId: string, revisionNo: number, 
   assertNoLinks(a4ProjectsRoot(workspace), `${projectId}/${revisionNo}/${sha}`);
   const bytes = /^[0-9a-f]{64}$/.test(sha) ? regularBytes(join(dir, sha), slot) : null;
   if (bytes === null) throw coded("INPUT_NOT_CAPTURED", slot);
-  if (sha256Hex(bytes) !== sha) throw coded("INPUT_DIGEST_MISMATCH", slot);
+  if (capturedDigest(slot, bytes) !== sha) throw coded("INPUT_DIGEST_MISMATCH", slot);
   return bytes;
 }
 
@@ -409,7 +411,7 @@ function packageInputs(workspace: string, state: A4ReadinessState, gateRevisionN
     `- IMAGE_TAG_ONLY: ${IMAGE_TAG_ONLY_REASON}. ${TOPOLOGY_QUALIFICATION[deployInput.target].reasonCode}: ${TOPOLOGY_QUALIFICATION[deployInput.target].note}.`,
     "- D-03 also keeps Railway and Vercel documented but unqualified; A4 v1 prepares Compose and Helm only (D-18).",
     `- AMC's check of a destination establishes reachability only: ${IDENTITY_NOT_EVALUATED}. Runtime behaviour at the destination is not evaluated.`,
-    "- A re-snapshot into another workspace is P2-40. The SBOM lists AMC's runtime dependencies only; the agent's AIBOM is P1-27/P2-18.",
+    "- A re-snapshot into another workspace is not possible yet. The SBOM lists AMC's runtime dependencies only; the agent's AIBOM is P1-27/P2-18.",
     "- The staging lease token is delivered once to the release owner and stored nowhere; mount it as an operator-supplied secret file. The manifest and leases.json name its id only.",
     `- ${UPDATE_POLICY_PATH} is the signed update policy; nothing enforces it yet (P2-34).`, ""
   ].join("\n"), "utf8") });

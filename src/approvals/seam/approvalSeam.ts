@@ -43,6 +43,7 @@ import {
   type ApprovalAnswer,
   type ApprovalAnswerer,
   type ApprovalAsk,
+  type ApprovalAskDisplay,
   type ApprovalDecision,
   type ApprovalPollSchedule,
   type ApprovalWaitRuntime
@@ -66,8 +67,12 @@ export interface ApprovalSeamInit {
   readonly poll?: ApprovalPollSchedule;
   /** Injected so a test can pin the audit id. */
   readonly newApprovalId?: () => string;
-  /** Reports the engine request id the moment it exists, so a UI can render the prompt against the gated tool call. */
-  readonly onRaised?: (event: { readonly approvalId: string; readonly approvalRequestId: string; readonly toolCallId: string }) => void;
+  /**
+   * Reports the engine request id the moment it exists, so a UI can render the prompt against the gated tool call.
+   * `toolName` and `display` (the call's own arguments, when the asker gave them) let that prompt show what would happen.
+   */
+  readonly onRaised?: (event: { readonly approvalId: string; readonly approvalRequestId: string; readonly toolCallId: string;
+    readonly toolName: string; readonly display?: ApprovalAskDisplay }) => void;
   /** Who started the session whose calls this seam asks about (P1-78), recorded on every engine request it raises. */
   readonly initiator?: string;
 }
@@ -236,7 +241,8 @@ export class ApprovalSeam {
         ? {}
         : {
             onRaised: (approvalRequestId: string): void => {
-              this.onRaised?.({ approvalId, approvalRequestId, toolCallId: ask.toolCallId });
+              this.onRaised?.({ approvalId, approvalRequestId, toolCallId: ask.toolCallId, toolName: ask.toolName,
+                ...(ask.display === undefined ? {} : { display: ask.display }) });
             }
           })
     });

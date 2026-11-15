@@ -148,8 +148,13 @@ export interface ToolPipelineInit {
    * the authorized classes are journaled. A journal that cannot be read or opened denies the call `journal_unavailable`.
    */
   readonly journal?: () => ActionJournal;
-  /** The mode a call enters with (AXR-02: the signed Action Policy's downgrade). It can only turn EXECUTE into SIMULATE. */
-  readonly narrowMode?: (call: { readonly name: string; readonly agentId: string; readonly actionClass: ActionClass; readonly requestedMode: ToolMode }) => ToolMode;
+  /**
+   * The mode a call enters with (AXR-02: the signed Action Policy's downgrade). It can only turn EXECUTE into SIMULATE.
+   * `approved` says the call is bound to a person's approval (carried, or asked by a bound gate before it binds); only
+   * an authorized class gets it, so the authorization stage rechecks that approval against the call before the body.
+   */
+  readonly narrowMode?: (call: { readonly name: string; readonly agentId: string; readonly actionClass: ActionClass; readonly requestedMode: ToolMode;
+    readonly approved: boolean }) => ToolMode;
 }
 
 export interface ToolCallInput {
@@ -256,12 +261,13 @@ export class ToolPipeline {
     const definition = this.init.registry.visible(input.agentId).get(input.name);
     if (!definition || !this.authorizes(definition.actionClass)) return null;
     return authorizationIntentFor({ workspace: this.init.workspace, name: definition.name, actionClass: definition.actionClass,
-      effectiveMode: this.entryMode(definition.name, definition.actionClass, input), arguments: input.arguments }, this.init.authorizationContext?.());
+      // The intent a person is asked to approve is the call as it runs once approved.
+      effectiveMode: this.entryMode(definition.name, definition.actionClass, input, true), arguments: input.arguments }, this.init.authorizationContext?.());
   }
 
-  private entryMode(name: string, actionClass: ActionClass, input: Pick<ToolCallInput, "agentId" | "requestedMode">): ToolMode {
-    return input.requestedMode === "EXECUTE" && this.init.narrowMode?.({ name, agentId: input.agentId, actionClass, requestedMode: "EXECUTE" }) === "SIMULATE"
-      ? "SIMULATE" : input.requestedMode;
+  private entryMode(name: string, actionClass: ActionClass, input: Pick<ToolCallInput, "agentId" | "requestedMode">, approved: boolean): ToolMode {
+    return input.requestedMode === "EXECUTE" && this.init.narrowMode?.({ name, agentId: input.agentId, actionClass, requestedMode: "EXECUTE",
+      approved: approved && this.authorizes(actionClass) }) === "SIMULATE" ? "SIMULATE" : input.requestedMode;
   }
 
   private authorizes(actionClass: string): boolean {
@@ -296,6 +302,9 @@ export class ToolPipeline {
       // Capture the selected registration and route before approval or queue waits. The registry rechecks both at effect time.
       const available = this.init.registry.admissionCheck(input.name, input.agentId, nested);
       const callId = input.callId ?? randomUUID();
+      const gate = [...this.gates].reverse().find((candidate) => candidate.gates({ name: definition.name, actionClass: definition.actionClass }));
+      // Approved: a top-level call the gate granted carries its approvals; a sub-call under a bound gate is asked before it binds.
+      const approved = (input.authority?.approvalRequestIds.length ?? 0) > 0 || (gate !== undefined && (input.parentToken ?? null) !== null);
       const draft: ToolExecution = {
         token: `tok_${randomUUID()}`,
         callId,
@@ -305,7 +314,7 @@ export class ToolPipeline {
         workspace: this.init.workspace,
         actionClass: definition.actionClass,
         requestedMode: input.requestedMode,
-        effectiveMode: this.entryMode(definition.name, definition.actionClass, input),
+        effectiveMode: this.entryMode(definition.name, definition.actionClass, input, approved),
         arguments: freezeToolArguments(input.arguments),
         parentToken: input.parentToken ?? null,
         ...(input.ownerStep === undefined ? {} : { ownerStep: Object.freeze({ ...input.ownerStep }) }),
@@ -316,7 +325,6 @@ export class ToolPipeline {
       const invalid = argumentSchemaError(definition.parameters, draft.arguments);
       if (invalid !== null) return this.recordUnresolved(input, definition.actionClass, thrownOutcome(invalid));
 
-      const gate = [...this.gates].reverse().find((candidate) => candidate.gates({ name: draft.name, actionClass: definition.actionClass }));
       // A journaled sub-call must be admitted before its bound gate can ask. Other paths keep their existing entry order.
       const deferEntry = this.init.journal !== undefined && this.authorizes(definition.actionClass)
         && draft.parentToken !== null && gate !== undefined;

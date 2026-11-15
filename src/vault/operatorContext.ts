@@ -62,7 +62,7 @@ export function operatorRefusalText(refusal: OperatorRefusal): string {
 
 const GOVERNANCE_PREFIXES = [
   "user", "trust", "firewall", "policy", "tools", "keys", "identity", "sso", "scim", "ops sign", "studio lan", "connect hooks install",
-  "connect hooks remove", "lease issue", "gateway", "ticket issue", "workorder", "notary sign"
+  "connect hooks remove", "lease issue", "gateway", "ticket issue", "workorder", "notary sign", "mcp add", "mcp sign"
 ];
 
 /** D4: the owner-only commands plus the signing prefixes; an entry's command part is the text before any ` --`. */

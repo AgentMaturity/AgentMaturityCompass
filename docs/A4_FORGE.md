@@ -6,8 +6,9 @@ stage records what people asked, understood, proposed, built and reviewed, and e
 approvers decided on. A4 produces signed, `self_reported` records of how the agent was built; no A4 output is a
 statement that the agent is safe, correct or lawful.
 
-Status: preview. Every A4 route and Studio page is absent unless the operator sets `AMC_A4_PREVIEW=1` in the Studio
-process environment (D-20), and every `amc a4` command refuses without it in its own environment. The spine (store,
+Status: preview. A4 Forge is on by default since 2026-11-14 (D-20 as amended): setting `AMC_A4_PREVIEW=0` in the Studio
+process environment removes every A4 route and Studio page, and every `amc a4` command refuses under it in its own
+environment. The spine (store,
 gates, readiness, verification, Studio shell) and every stage's producers have landed (Aspire P1-59, Assemble P1-60,
 Adapt P1-61, Activate P1-62; Activate's Build is the release effect, `POST …/releases`), and so have the `amc a4` command
 line (P1-65, below) and, with P1-64, five MCP tools (four reads and a self-reported comment; none decides, builds,
@@ -23,12 +24,13 @@ This walk was run against the current source build on 2026-11-14 in an empty wor
 published 1.1.1 release does not contain A4: install [from source](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/README.md#from-source) first. On a laptop the walk
 completes Aspire, Assemble and Adapt and stops at Activate's release approval (see step 6).
 
-1. **Start Studio with the flag.** A Studio that is already running keeps the environment it started with, so stop it
-   first. Without the flag the A4 API answers `404 A4_PREVIEW_DISABLED` and every `amc a4` command exits 1.
+1. **Start Studio.** A4 is on by default. A Studio that is already running keeps the environment it started with: if it
+   was started with `AMC_A4_PREVIEW=0`, the A4 API answers `404 A4_PREVIEW_DISABLED` and every `amc a4` command exits 1,
+   so stop it and start it without that setting.
 
    ```bash
    amc down
-   AMC_A4_PREVIEW=1 amc up
+   amc up
    ```
 
 2. **Create the people who will decide.** The author of a revision, the requester of a gate and its builders cannot
@@ -40,16 +42,21 @@ completes Aspire, Assemble and Adapt and stops at Activate's release approval (s
    amc user init --username <you>
    amc user add --username <second> --role OWNER,APPROVER
    amc user add --username <third> --role APPROVER,AUDITOR
-   export AMC_A4_PREVIEW=1
    amc approvals login --username <you> --token-file <new file>    # each person writes their own token file
    ```
 
-3. **Start a project and run Aspire.** Sign in to the Compass Console at the address `amc up` prints. With the flag
-   set and no project yet, Home shows a card "Build an agent for your industry"; its button opens the A4 page with the start form (a signed-in OWNER or
-   OPERATOR; the API equivalent is `POST /api/v1/a4/projects` with `name` and `expertise`, see
-   [Using the API directly](#using-the-api-directly)). Give the project a name and choose how much detail you want in
-   explanations, or press **Use an example**, which fills a sample project marked `(sample)` in its name so the records
-   show it is sample data. Then press **Start an agent project**.
+3. **Start a project and run Aspire.** Sign in to the Compass Console at the address `amc up` prints. With no
+   project yet, Home's first card is "Build an agent for your industry": pick your industry, write a project name and press
+   **Start building** (a signed-in OWNER or OPERATOR; the API equivalent is `POST /api/v1/a4/projects` with `name` and
+   `expertise`, see [Using the API directly](#using-the-api-directly)). Once a project exists the card becomes "Continue
+   <project name>" with what it needs next, and **Start another** opens the start form on the **Build an agent** page. There,
+   **More options** holds the existing agent id, how much detail you want in explanations and **Use an example**, which
+   fills a sample project marked `(sample)` in its name so the records show it is sample data.
+
+   The console names the four stages in plain words, with the A4 name beside them: 1 Say what it is for (Aspire), 2 Build
+   it (Assemble), 3 Fit it to your rules (Adapt), 4 Release it (Activate). Each question shows a plain label (for example
+   "Which sector is this agent for?" for `stations`), the question bank's own wording as help, and an example; the stored
+   question ids and wording are unchanged.
 
    **Starting from an Industry Pack.** The start form has an optional **Your industry** list with every Industry Pack,
    grouped by station. Pick the pack closest to what the agent will do (or press **Build an agent with this pack** on a
@@ -58,7 +65,9 @@ completes Aspire, Assemble and Adapt and stops at Activate's release approval (s
    elevated becomes med), the governance that tier takes (regulated for high or critical), and one constraint per
    instrument in the pack's regulatory basis, worded "Check whether it applies, and meet it where it does". A panel lists
    the risks the pack names, so you can write what the agent must never do, and links to the pack's questionnaire.
-   Nothing is saved until you press **Save answers**, and every suggestion can be changed. Pack content is experimental
+   Nothing is saved until you press **Save answers**, and every suggestion can be changed. **Use an example** never
+   fills a field the pack suggests (the sector, the risk level, the governance and the rules to check), even when it is
+   pressed before the pack's suggestions arrive. Pack content is experimental
    and AI-drafted until a named expert signs it, and starting from a pack does not show the agent meets any rule. The
    `amc` menu's "Build an agent for my industry (A4 Forge preview)" line starts AMC with the flag set and opens this form.
 
@@ -81,8 +90,15 @@ completes Aspire, Assemble and Adapt and stops at Activate's release approval (s
    before requesting any gate (a membership change supersedes open gates). While an approval is open, the panel's
    **Who must approve** block names how many different people must approve, the workspace role they need (and whether
    one must hold AUDITOR), who cannot approve this one under separation of duties, who has approved so far, and the
-   `amc user add` command for adding a person. A second approver in the same workspace meets separation of duties; it
-   is not an independent review. The command line shows the same state:
+   `amc user add` command for adding a person. Before you ask for an approval the project's people cannot give, the
+   panel says so first: how many people it needs besides whoever wrote, built or asks for the step, which role one of
+   them needs, and an **Add a person** form right there (a workspace owner only). It creates the account with a first
+   password shown once (or finds an existing one) and adds the person to the project as an approver, with the audit role
+   ticked so the same two people can decide every later step. The panel then says how they approve: they sign in on their
+   own device, or in a private window on this one, and open the project's link. An approver's Home opens with "An
+   approval waits for you" and a button to it. On a practice project, while self-approval is open, the panel and the
+   Approvals card say you approve the step yourself and that it is recorded as self-approved. A second approver in the
+   same workspace meets separation of duties; it is not an independent review. The command line shows the same state:
 
    ```bash
    amc a4 list
@@ -103,7 +119,9 @@ completes Aspire, Assemble and Adapt and stops at Activate's release approval (s
 
 5. **Assemble and Adapt.** Assemble asks for capabilities, autonomy, the build provider (`stub` runs offline) and the
    path (`native`). Its Build starts one native build session; Review is refused (`409 A4_NOT_READY`,
-   `BUILD_SESSION_OPEN`) until the session's owner presses Close and verify on Studio's Native Tasks page. Its
+   `BUILD_SESSION_OPEN`) until the session's owner presses Close and verify on Studio's Native Tasks page. Studio's
+   readiness says so before you press Review (`allowed.review` carries `BUILD_SESSION_OPEN`), so the panel's step is
+   **Close the build session**: its button opens that session on Native Tasks, and **Back to the agent project** returns. Its
    completion needs two approvals and then an effect gate, `a4.assemble.apply`: the owner opens it on the stage's
    effect card (`POST …/stages/assemble/effects/a4.assemble.apply/open` with the completion `gateId`), two project
    approvers approve its request on that card (`POST …/approvals/<approvalRequestId>/approve`), and `amc a4 complete`
@@ -188,7 +206,7 @@ never the agent, and are never a lane, a ref or a claim kind.
 
 ## What each record proves
 
-A signature proves who wrote a record and that it is unchanged since, never that its statement is true.
+A signature shows who wrote a record and that it is unchanged since, never that its statement is true.
 
 | Record | Signed by | Proves |
 | --- | --- | --- |
@@ -228,6 +246,8 @@ files read unsigned until that verifier admits the pinned notary.
   (`<n>` is the head seq `amc a4 guide` prints). Readiness says so: `members.candidates` reads WAITING with
   `NO_SECOND_APPROVER` while fewer than two people may decide (members with the `approver` or `owner` role and active
   local workspace OWNERs, counted as for `sod` below), except in a single-user workspace, where self-approval counts.
+  On a regulated project a WAITING `sod.self_provisioned` carries the same code in that case, and AMC then tells the
+  person to invite a second person (or start a practice project), since an acknowledgement alone cannot get them past it.
 - **How many people a walk needs.** Each gate's action class decides its quorum under the signed workspace approval
   policy (`amc policy approval init` signs the default). With the default policy:
 
@@ -252,6 +272,12 @@ files read unsigned until that verifier admits the pinned notary.
   `approver` or `owner` role counts, whatever their workspace roles and the gate's roles, so it can miss a shortfall.
   It counts local users only: with a live host (WORKSPACE_ROUTER) session or on a call through the hosted router it is
   not made, since readiness cannot read host users' roles, and a host OWNER who is not signed in is not counted.
+  Studio's readiness (`GET …/readiness`, `GET …/projects/<id>`) also carries `nextGate` before the stage's gate is
+  requested: its `required` approvals, `rolesAllowed`, the `roleVote` one approver must hold (AUDITOR at Adapt's
+  completion) and `eligible`, the same count made as if an author of the revision asks, so an approver who opens the page
+  before the request still counts (members only on a regulated project).
+  It is guidance for the panel, never a rule: the request records its own quorum, and nothing about who may approve
+  changes.
 
 ### The single-user rule
 
@@ -265,11 +291,32 @@ project never self-approves again, whatever later revocations do. A `policy` gat
 self-approved decision is recorded with `self_approved = 1` and its facts, and a verifier reports it as
 `not-evaluated` (`SINGLE_USER_WORKSPACE`).
 
+**Industry Packs and practice projects.** All 41 Industry Packs name a high, very high or critical risk level, so a
+project started from any pack is regulated, and the single-user rule never applies to it: one person alone stops at the
+first approval. The start form says so, and offers a **practice project** where Studio allows one (`practice: true` on
+`POST /api/v1/a4/projects`; `GET /api/v1/a4/options` reports `workspace.start.practiceAvailable` and, when it is false,
+the reason). On a practice project the brief's risk level does not make the project regulated, so the one person may
+approve their own work; each such decision is recorded and shown as self-approved, exactly as above. It stays a
+practice project only while the workspace has exactly one ACTIVE local user, no host session and nobody added since the
+project was created (an unreadable source counts as not practice) and the chain has not ratcheted. The moment a second
+person can sign in, the risk level governs again and nobody approves their own work, before any A4 write records them.
+The project view reports `practice` (opened as practice), `practiceActive` and `regulated`. Do not use a practice
+project for real work. Self-approval counts once, so with the default policy one person alone gets as far as building in
+Assemble (Aspire's two approvals and Assemble's direction approval): Assemble's completion and every later gate need two
+approvers, and the What to do now panel then says how many people the approval needs and offers Add a person right there.
+
+**Adding the second person.** A signed-in workspace OWNER adds a person in one call: `POST /api/v1/a4/people`
+(`{ username, workspaceRoles: ["APPROVER"] or ["APPROVER", "AUDITOR"] }`) creates the account with a first password AMC
+shows once, and `POST …/projects/{id}/members/invite` also adds them to the project as an approver. An existing ACTIVE
+account is left as it is. The console's Add a person form and the Members card use these.
+
 ### Acknowledged items
 
 An owner may acknowledge some WAITING items (for example `sod.self_provisioned`). The item stays WAITING with
 `OWNER_ACKNOWLEDGED`, is bound into the next gate when it is one of the stage's bound items, lapses after 90 days and is
-never cleared. A BLOCKED item cannot be acknowledged. An item is acknowledged only at the project's current stage
+never cleared. `sod.self_provisioned` acknowledges a fact of the workspace, so its acknowledgement holds on later
+revisions of the project until it lapses; every other acknowledgement counts only on the revision it was given on. A
+BLOCKED item cannot be acknowledged. An item is acknowledged only at the project's current stage
 (`409 A4_STEP_ORDER` at any other, and Studio offers Acknowledge only there, and only for an item whose acknowledgement
 would count, by the same rule as the server). Acknowledge before requesting the gate: an
 acknowledgement supersedes an open gate on the same revision. Adapt's `plan_unresolved` (an owner's out of scope; never on a regulated
@@ -311,8 +358,15 @@ revision. The same holds for the context slots (`context.contextPluginSha256`, `
 `context.promptPackSha256`) and the operating-profile slots (`operatingProfile.sha256`, the agent's
 `amc-operating-profiles/<agent>/a4-<station>.operating-profile.json` files; `operatingProfile.activationSha256`, every
 activation record of the agent). Those files sit outside `.amc/`: an entry that is not a regular file (a link, a FIFO)
-or a profile directory that is a link reads `RESOURCE_UNREADABLE`. A prompt pack rebuilt by the prompt
-scheduler moves `context.promptPackSha256`, so an open gate reads `RESOURCE_DRIFTED` until it is requested again.
+or a profile directory that is a link reads `RESOURCE_UNREADABLE`. `context.promptPackSha256` is a digest of what the
+agent's latest prompt pack says: every member except its signatures, and the pack without its build id and build time.
+Aspire's Build builds the pack right after it writes the agent config, so the revision Build records binds it. Studio's
+prompt scheduler rebuilds every pack on the signed prompt policy's cadence (every 24 hours by default) with a new id,
+time and signatures; when nothing the pack says has
+changed, the slot does not move and open approvals stay open. A pack whose prompts, allowlists, advisories or any other
+content changed moves the slot, and an open gate reads `RESOURCE_DRIFTED` until it is requested again. A revision
+recorded before this digest existed binds the archive's sha256, so its open gates read `RESOURCE_DRIFTED` once: record a
+new revision.
 Under an active plan, Studio mints a native task's lease with the workspace lease key, which Studio's vault holds: while
 that vault is locked, `adapt.plan.nativeSessionsAllowed` reads WAITING (`LEASE_NOT_ISSUED`, `VAULT_LOCKED`). A CLI, SDK,
 ACP or in-process run with workspace tools signs its own lease with the vault of its own process (`AMC_VAULT_PASSPHRASE`),
@@ -726,7 +780,9 @@ chart's `image.digest` unset. The overlay, the plan's `topology` and `gaps` and 
 WAITING items, never blockers. The Compose overlay sets `AMC_CONTROL_CHECKPOINT_DIR` on its own named volume outside the
 workspace; the chart mounts only the workspace, so the Helm overlay cannot and the plan says so. The chart also renders
 a fixed environment list, so the Helm overlay cannot set `AMC_A4_PREVIEW=1` (`A4_PREVIEW_NOT_SET_BY_CHART`): the plan's
-deploy step sets it on the Studio container after the upgrade. The lease token is mounted
+deploy step sets it on the Studio container after the upgrade. Since 2026-11-14 A4 is on by default, so that step only
+matters where the container's environment sets `AMC_A4_PREVIEW=0`; the plan text is unchanged because the overlay and plan
+bytes are digest-bound into each release's records. The lease token is mounted
 as an operator-supplied secret file. The update policy is `update-policy.yaml`, signed beside it (`A4_PACKAGE`); nothing
 enforces it yet (P2-34).
 
@@ -760,11 +816,11 @@ resolves to a private, link-local or mapped address is refused (409 `VERIFY_EGRE
 nothing is recorded. AMC lists no private address, and no signed opt-in exists in v1. The connection is pinned to the
 checked address. TLS verifies against the system CA set, any 3xx fails, and the check is bounded at 5 s and 256 KiB.
 `/readyz` READY gives `reachable`; a 503, a redirect, a refused certificate or a mismatch gives `failed`. The image,
-package and plan-head checks are `not_evaluated` ("no unauthenticated digest source at the destination (P2-40)"), so
+package and plan-head checks are `not_evaluated` ("AMC cannot yet confirm which build runs where it is deployed: the
+destination offers no source of the release's digest that AMC can check"; reason code `KEY:P2-40`), so
 `passed` is unreachable in v1. No probe turn runs. The row keeps the operator's `recorded_status` untouched and adds
 `amc_check_status`, the resolved address, the response digest and a VerifierReportV1. The status text composes both
-columns, for example "recorded: succeeded; AMC check: reachable, release identity not evaluated at the destination
-(P2-40)".
+columns, for example "recorded: succeeded; AMC check: reachable, release identity not evaluated at the destination".
 
 Rollback is its own effect gate. `POST …/releases/:rid/rollback/preview { environment }` (owner) previews it and opens
 `a4.activate.rollback`, a DEPLOY engine request on the release's direction gate that approvers decide under A4's
@@ -1061,7 +1117,7 @@ residency or retention.
   token, or a member proven by member rows that verify. When the member rows themselves fail, any other reader gets
   `409 A4_INTEGRITY_FAILED` with the fixed BLOCKED detail. `amc verify all` runs the same check
   (`a4-projects`) for every project.
-- **Export.** With `AMC_A4_PREVIEW=1`, `amc bundle export` adds each A4 project of the run's agent to the `.amcbundle`
+- **Export.** Unless `AMC_A4_PREVIEW=0`, `amc bundle export` adds each A4 project of the run's agent to the `.amcbundle`
   as an `amc.a4-record/v1` file, `a4/<projectId>.json`: the project rows as stored and the ledger rows they name.
   `a4/index.json` names each project's head and `containsSyntheticExamples`, and the signed manifest lists every file.
   The records are plaintext: the structured brief is included so that a verifier can recompute every digest without a
@@ -1098,12 +1154,12 @@ residency or retention.
   ref id (a file name, a receipt or external id) is hashed with its kind. P2-02's detectors then run over every string,
   and each match is replaced by its hash. A credential match refuses the slice. The slice is then scanned for personal
   data and key material, staged, signed and moved into place, so a refused slice leaves nothing behind. It is a library
-  function for now, absent without `AMC_A4_PREVIEW=1` (404 `A4_PREVIEW_DISABLED`): no route or command serves it yet.
+  function for now, absent under `AMC_A4_PREVIEW=0` (404 `A4_PREVIEW_DISABLED`): no route or command serves it yet.
 
 ## The `amc a4` command line
 
 `amc a4` (P1-65) runs the same routes as the API, in process: the same body schemas, refusals, gate functions,
-separation of duties, quorum, request deduplication, audits and effects. Without `AMC_A4_PREVIEW=1` every command is
+separation of duties, quorum, request deduplication, audits and effects. Under `AMC_A4_PREVIEW=0` every command is
 refused with `A4_PREVIEW_DISABLED` and exit code 1. Projects are created and stages are built in Studio; the command line
 reads them, decides gates, completes them and runs the release, deployment and rollback steps.
 
@@ -1134,7 +1190,7 @@ reads them, decides gates, completes them and runs the release, deployment and r
 
 ## Using the API directly
 
-With `AMC_A4_PREVIEW=1` and a Studio session (`amc approvals login` or the Studio login), read the native CSRF token
+With A4 on (the default; not `AMC_A4_PREVIEW=0`) and a Studio session (`amc approvals login` or the Studio login), read the native CSRF token
 from `GET /auth/me` (field `nativeCsrfToken`), then send on every call:
 
 ```text

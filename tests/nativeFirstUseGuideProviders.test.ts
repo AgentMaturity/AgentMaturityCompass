@@ -78,7 +78,11 @@ describe("native first-use guide provider coverage", () => {
   });
 
   it("treats ollama as a local model server: model required, no credential assumed, origin named", async () => {
-    expect(await inspect({ provider: "ollama" })).toMatchObject({ status: "needs-model", code: "MODEL_REQUIRED", provider: "ollama", credential: null });
+    const needsModel = await inspect({ provider: "ollama" });
+    expect(needsModel).toMatchObject({ status: "needs-model", code: "MODEL_REQUIRED", provider: "ollama", credential: null });
+    // QA M-08: the rerun line asks for the model it needs, and the message says where to find one.
+    expect(needsModel.recheck?.argv.slice(-2)).toEqual(["--model", "MODEL"]);
+    expect(needsModel.message).toContain("ollama list");
     const ready = await inspect({ provider: "ollama", model: "local-model" });
     expect(ready).toMatchObject({ status: "ready", code: "LOCAL_CONFIGURATION_PRESENT", credential: null });
     expect(ready.message).toContain(OLLAMA_DEFAULT_BASE_URL);

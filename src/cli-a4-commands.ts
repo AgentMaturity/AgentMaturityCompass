@@ -1,6 +1,6 @@
 /**
- * `amc a4 …` (P1-65; design §12.2): the A4 Forge command tree, behind AMC_A4_PREVIEW=1 like every A4 route (each leaf
- * refuses A4_PREVIEW_DISABLED without it; the tree stays registered so the command inventory does not depend on the
+ * `amc a4 …` (P1-65; design §12.2): the A4 Forge command tree, behind the A4 preview gate like every A4 route (on by default since
+ * 2026-11-14; each leaf refuses A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0; the tree stays registered so the command inventory does not depend on the
  * environment). Every leaf but `verify` and `export` runs the API's own route in process through `serveA4`
  * (src/a4/a4Router.ts): the same body schemas, refusals, gate functions, SoD, quorum, request dedupe, audits and effects.
  * Only the identity differs, and it never comes from a flag: `--session-token-file` names an `amc approvals login` token,
@@ -18,6 +18,7 @@ import { InvalidArgumentError, Option, type Command } from "commander";
 import { A4_API_PREFIX, serveA4, unboundClaim } from "./a4/a4Router.js";
 import { verifyTrackedSessionToken } from "./auth/authApi.js";
 import { pendingExecutors } from "./a4/a4Gates.js";
+import { notReadyWords, SELF_APPROVE } from "./a4/a4Words.js";
 import { resolveA4LoginPrincipal } from "./a4/a4Identity.js";
 import { A4_PROJECT_ROLES, A4_STAGES, A4_STEPS, a4PreviewEnabled, type A4Principal } from "./a4/a4Schema.js";
 import { A4StoreError, readOnlyNow } from "./a4/a4Store.js";
@@ -43,12 +44,13 @@ const BOUNDARY = "A4 records are self-reported: a gate decision is an acknowledg
   + "states that the agent is safe, correct or lawful.";
 
 /** The preview gate's refusal, in words: what is off and the exact way to turn it on (the gate itself stays). */
-export const PREVIEW_OFF = "A4 Forge is a preview and is turned off here. Run the command with AMC_A4_PREVIEW=1 in front, for example "
-  + "`AMC_A4_PREVIEW=1 amc a4 guide`. Studio needs it too: stop Studio with `amc down`, then start it with `AMC_A4_PREVIEW=1 amc up`.";
+export const PREVIEW_OFF = "A4 Forge is a preview and is turned off here (AMC_A4_PREVIEW=0). It is on by default: remove that setting or "
+  + "run the command with AMC_A4_PREVIEW=1 in front, for example `AMC_A4_PREVIEW=1 amc a4 guide`. Studio needs it too: stop Studio with "
+  + "`amc down`, then start it with `AMC_A4_PREVIEW=1 amc up`.";
 
 /** `amc a4 guide` with no project: the next step first, then the stage model in plain words. */
 export const GUIDE_START = [
-  "Next: open Studio (`AMC_A4_PREVIEW=1 amc up`), sign in, choose A4 in the menu and start an agent project. Projects are created and built in Studio;",
+  "Next: open Studio (`amc up`), sign in, choose Build an agent in the menu and start an agent project. Projects are created and built in Studio;",
   "  this command line reads them, decides gates and runs the release steps. Then run `amc a4 list` and `amc a4 guide <projectId>` here.",
   "",
   "What a project is: one agent's journey from a brief to a recorded deployment, in four stages:",
@@ -277,9 +279,13 @@ async function finishWrite(opts: Write, projectId: string, data: Data, print: ()
 
 /** Readiness items worth reading in text: the mandatory ones not READY or COMPLETE, at most TEXT_ROWS. */
 function printOpenItems(readiness: Data): void {
-  const items = (readiness.items as Array<{ id: string; status: string; mandatory: boolean; reasonCodes: string[] }> | undefined) ?? [];
+  const items = (readiness.items as Array<{ id: string; status: string; mandatory: boolean; reasonCodes: string[]; nextAction?: { label?: string } | null }> | undefined) ?? [];
   const open = items.filter((item) => item.mandatory && item.status !== "READY" && item.status !== "COMPLETE");
-  for (const item of open.slice(0, TEXT_ROWS)) console.log(`- ${item.id}: ${item.status}${item.reasonCodes.length > 0 ? ` (${item.reasonCodes.join(", ")})` : ""}`);
+  // In words first (what it means and what to do), then the item id, its status and its reason codes for reference.
+  for (const item of open.slice(0, TEXT_ROWS)) {
+    const words = item.reasonCodes.includes("OWNER_ACKNOWLEDGED") ? "Acknowledged by a project owner; it stays listed." : notReadyWords(item);
+    console.log(`- ${words ? `${safe(words)} ` : ""}[${item.id}: ${item.status.toLowerCase()}${item.reasonCodes.length > 0 ? `; ${item.reasonCodes.join(", ")}` : ""}]`);
+  }
   if (open.length > TEXT_ROWS) console.log(`… ${open.length - TEXT_ROWS} more (--json prints them all)`);
   const next = readiness.nextAction as { label?: string } | null | undefined;
   if (next?.label) console.log(`Next: ${safe(next.label)}`);
@@ -332,7 +338,8 @@ function registerReads(a4: Command): void {
         + `${project.hold === true ? "; on hold" : ""}.`);
       console.log(`Stages: ${A4_STAGES.join(" → ")}; steps in each: ${A4_STEPS.join(" → ")}`);
       for (const gate of openGates) {
-        console.log(`Open ${gate.stage} ${gate.gate} gate ${gate.gateId}: someone other than its author, builder and requester decides it. After reviewing it:\n  amc a4 approve --gate ${gate.gateId}`
+        const who = project.selfApprovalAllowed === true ? SELF_APPROVE : "Someone other than its author, builder and requester decides it.";
+        console.log(`Open ${gate.stage} ${gate.gate} gate ${gate.gateId}. ${who} After reviewing it:\n  amc a4 approve --gate ${gate.gateId}`
           + ` --expect-gate-seq ${gate.expectedGateSeq ?? "<not found>"} --expect-binding-digest ${gate.expectedBindingDigest}`
           + ` --expect-readiness-digest ${gate.expectedReadinessDigest ?? "<not published>"} --reason "…" --session-token-file <file>`);
       }
@@ -357,6 +364,11 @@ function registerReads(a4: Command): void {
       console.log(`Stage ${String(data.stage)}, step ${String(data.step)}; revision ${String(data.revisionNo)}; head seq ${String(data.headSeq)}`
         + `${data.hold === true ? `; on hold (${safe(data.holdReason)})` : ""}`);
       console.log(`Readiness: ${readiness?.status ?? "not_evaluated"}; members: ${(data.members as unknown[]).length}`);
+      console.log(data.practice === true && data.practiceActive === true
+        ? "Who approves: this is a practice project, so you may approve your own work; each such approval is recorded and shown as self-approved. "
+          + "Alone you can get as far as building the agent in Assemble (stage 2): its final approval and every later step need two people other than you."
+        : `Who approves: someone other than the person who wrote, built or asked for each step${data.regulated === true ? " (the project is governed as regulated)" : ""}`
+          + `${data.practice === true ? "; this was a practice project until a second person could sign in" : ""}.`);
       for (const view of Object.values(data.gates as Record<string, Data | null>)) {
         if (view) console.log(`Gate ${String(view.gate)} ${String(view.gateId)}: ${String(view.status)}, ${String(view.approvals)}/${String(view.required)} approvals, requested at seq ${String(view.requestedSeq)}`);
       }
@@ -629,9 +641,9 @@ function registerReleases(a4: Command): void {
 
 /** `amc a4 …`: 22 leaves (src/mode/mode.ts blocks the owner-gated ones in agent mode). */
 export function registerA4Commands(program: Command): void {
-  const a4 = program.command("a4").description("A4 Forge (preview, AMC_A4_PREVIEW=1): projects, gates, releases and deployments, through the API's own routes")
-    .addHelpText("before", "Next step: `AMC_A4_PREVIEW=1 amc a4 guide` explains A4 and what to do first. Projects are created and built in Studio "
-      + "(`AMC_A4_PREVIEW=1 amc up`, then A4 in the menu); these commands read them, decide gates and run the release steps.\n");
+  const a4 = program.command("a4").description("A4 Forge (preview, on by default; AMC_A4_PREVIEW=0 turns it off): projects, gates, releases and deployments, through the API's own routes")
+    .addHelpText("before", "Next step: `amc a4 guide` explains A4 and what to do first. Projects are created and built in Studio "
+      + "(`amc up`, then Build an agent in the menu); these commands read them, decide gates and run the release steps.\n");
   registerReads(a4);
   registerDecisions(a4);
   registerProjectWrites(a4);

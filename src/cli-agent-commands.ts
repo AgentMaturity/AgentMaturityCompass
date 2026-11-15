@@ -37,14 +37,14 @@ import {
   stubProviderTransport
 } from "./agent/stubProvider.js";
 import type { LoopNotification } from "./agent/loopTypes.js";
-import { liveNativeFailureGuidance } from "./agent/nativeFailureGuidance.js";
+import { liveBudgetRefusalCause, liveNativeFailureGuidance } from "./agent/nativeFailureGuidance.js";
 import { nativeUnknownUsageNotice } from "./budgets/nativeBudgetAdmission.js";
 import { missingCredentialGuidance } from "./setup/nativeFirstUseGuide.js";
 import { echoToolSeam } from "./agent/echoTool.js";
 import { MAX_ACTIVE_CHILDREN_HELP, NO_DELEGATE_STOP_HELP, VALIDATION_REPAIR_HELP, WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
 import { leaseFileToken, withLeaseFileOption } from "./cli/agentLoopLeaseFile.js";
 import { continuedSession, reportContinueRefusal, resolveContinuityRun, withContinuityChatOptions, withContinuityRunOptions, type ContinuityOptions } from "./cli/agentLoopContinuityOptions.js";
-import { agentToolset, type AgentToolset } from "./agent/agentToolset.js";
+import { agentToolset, toolsetConfinementNotice, type AgentToolset } from "./agent/agentToolset.js";
 import { runLease } from "./leases/runLease.js";
 import { NATIVE_DELEGATION_CAPABILITIES, selectSupportedNativeTools } from "./agent/nativeToolCapabilities.js";
 import type { MountedNativeMcpServer } from "./mcp/nativeMcpClient.js";
@@ -75,6 +75,7 @@ import { registerPromptCommands } from "./cli-prompt-commands.js";
 import { registerNativeScheduleCommands } from "./cli-native-schedule-commands.js";
 import { registerAgentGuideCommands, selectedAgentOption } from "./cli-agent-guide-commands.js";
 import { nativeApprovalInstructions } from "./setup/nativeApprovalInstructions.js";
+import { reportedCallFor } from "./setup/nativeApprovalPreview.js";
 import { applyNativeDelegationPreset } from "./setup/nativePresetDelegation.js";
 import type { ActionClass } from "./types.js";
 import { loadNativeImageFiles } from "./attachments/nativeImageFiles.js";
@@ -129,7 +130,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--approve-tools <actionClass>", "require the signed approval gate before each tool call")
     .option("--approve-risk <tier>", "approval risk tier (default high)")
     .option("--approval-mode <mode>", "plan, default, accept-edits or untrusted: which calls a human is asked about, on top of every signed policy; plan runs nothing (SIMULATE); not with --approve-tools")
-    .option("--tools <mode>", "none, echo, or explicitly enabled workspace tools; existing policy still applies")
+    .option("--tools <mode>", "none, echo or workspace; by default workspace (asking before each call, --approval-mode default) when a signed Action Policy and tool policy are set up, else echo for stub and none for a real model")
     .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")
     .option("--trust-workspace", "trust this workspace's signed configuration (key set, tools policy and presets) on this machine, recording the consent in the AMC home; otherwise a workspace this machine never trusted is refused (AMC_TRUST_WORKSPACE=1 for headless hosts)")
     .option("--web-search-searxng <origin>", WEB_SEARCH_SEARXNG_HELP)
@@ -555,23 +556,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             toolset.readiness.writeScope.length > 0 ? toolset.readiness.writeScope.join(", ") : "(nothing)"
           }`
         )); progress(chalk.dim(`action policy: ${toolset.readiness.actionPolicy}`));
-        if (!toolset.readiness.confined) {
-          // A warning, not a refusal: an unconfined fs.read is still governed
-          // by the allowlist and the firewall. Code Mode is the part that
-          // genuinely cannot run without a sandbox, and it refuses on its own.
-          //
-          // The two clauses are different facts and used to be one. Whether the
-          // MACHINE has a backend is what an operator can fix by installing
-          // something; whether THIS PROCESS is confined is what actually bounds
-          // a program, and it is false everywhere today.
-          io.error(chalk.yellow(
-            `this process is not OS-confined (${toolset.readiness.sandboxReason ?? "unknown"}); `
-            + "tool writes are bounded by policy only"
-            + (toolset.readiness.sandboxBackendAvailable
-              ? ""
-              : ", and this machine has no sandbox backend either")
-          ));
-        }
+        // Once per session (a resumed turn does not repeat it), in the words init uses; the measured reason is in readiness.
+        const confinement = opts.session === undefined ? toolsetConfinementNotice(toolset.readiness) : null;
+        if (confinement !== null) io.error(chalk.yellow(confinement));
         toolSeam = toolset.seam;
         // The kernel builds the delegation capability once it has the parent's
         // session and a child-session-bound LLM factory; this is where it lands.
@@ -695,9 +682,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                       if (typeof process.send !== "function" || !process.connected) {
                         io.error("The native approval channel disconnected; cancelling this turn."); process.emit("SIGINT"); return;
                       }
-                      try {
-                        process.send({ type: "amc/native-approval-raised", v: 1, agentId,
-                          approvalId: event.approvalId, approvalRequestId: event.approvalRequestId }, error => {
+                      try { process.send({ type: "amc/native-approval-raised", v: 1, agentId,
+                          approvalId: event.approvalId, approvalRequestId: event.approvalRequestId, ...reportedCallFor(event) }, error => {
                           if (error) { io.error("Could not deliver the actual approval request to native chat; cancelling this turn."); process.emit("SIGINT"); }
                         });
                       } catch { io.error("Native approval IPC failed; cancelling this turn."); process.emit("SIGINT"); }
@@ -751,7 +737,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                 if (line !== null) (opts.json ? io.error : io.log)(line);
                 // Smoke H-2: say which earlier requests block this agent and how to recover, from verified usage.
                 const usageNotice = notification.kind === "error" && liveNativeFailureGuidance(notification.error).code === "AMC_NATIVE_BUDGET_REFUSED"
-                  ? nativeUnknownUsageNotice(process.cwd(), agentId) : null;
+                  ? liveBudgetRefusalCause(notification.error) ?? nativeUnknownUsageNotice(process.cwd(), agentId) : null;
                 if (usageNotice !== null) io.error(`  ${usageNotice}`);
               },
           onReady: (handle) => {

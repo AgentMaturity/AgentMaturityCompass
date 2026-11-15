@@ -642,7 +642,7 @@ describe("multi-workspace host mode", () => {
       expect(withQuery.body).not.toContain("actionClass query parameter is required");
 
       expect(defaultConsole.status).toBe(200);
-      expect(defaultConsole.body).toContain("Compass Console - AMC Studio");
+      expect(defaultConsole.body).toContain("Home · Compass Console");
       expect(defaultConsole.body).not.toContain("missing workspace session");
       expect(defaultConsoleJs.status).toBe(200);
       expect(defaultConsoleJs.body).toContain("Desktop app");
@@ -713,7 +713,7 @@ describe("multi-workspace host mode", () => {
       expect(process.env.AMC_VAULT_PASSPHRASE).toBe(readFileSync(join(hostDir, "demo-vault-passphrase"), "utf8").trim());
       expect(readFileSync(join(hostWorkspaceDir(hostDir, "demo"), ".amc", "amc.config.yaml"), "utf8")).toContain("trustBoundaryMode");
       expect(consolePage.status).toBe(200);
-      expect(consolePage.body).toContain("Compass Console - AMC Studio");
+      expect(consolePage.body).toContain("Home · Compass Console");
     } finally {
       await runtime.stop();
       if (typeof originalPassphrase === "string") {

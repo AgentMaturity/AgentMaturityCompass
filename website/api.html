@@ -1,126 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AMC API Playground — Agent Maturity Compass</title>
-<meta name="description" content="Interactive API explorer for the Agent Maturity Compass REST API. Test endpoints, explore schemas, and integrate with your AMC instance.">
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="brand.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.34.0/swagger-ui.css" integrity="sha384-4c3vsE5f+trhFyHrFrLM1fFGUn531NIaC7dcqEWIJdoRQJ5CkJbSuSCwXLpaS1KF" crossorigin="anonymous">
-<style>
-  :root {
-    --bg: #050505;
-    --green: #00ff41;
-    --green-dim: #00661a;
-    --text: #b0b0b0;
-    --text2: #8cc88c;
-    --border: rgba(0,255,65,0.1);
-    --mono: var(--amc-font-mono);
-  }
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-  *:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--mono), monospace;
-    min-height: 100vh;
-  }
-  .top-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 1rem;
-    padding: 1rem 2rem;
-    border-bottom: 1px solid var(--border);
-    background: rgba(5,5,5,0.95);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .top-bar a {
-    color: var(--green);
-    text-decoration: none;
-    font-size: 0.85rem;
-    font-weight: 600;
-  }
-  .top-bar a:hover { text-shadow: 0 0 10px rgba(0,255,65,0.4); }
-  .top-bar h1 {
-    color: var(--green);
-    font-size: 1.2rem;
-    font-weight: 700;
-  }
-  .base-url-form {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-    max-width: 100%;
-    min-width: 0;
-  }
-  .base-url-form label {
-    font-size: 0.75rem;
-    color: var(--text2);
-  }
-  .base-url-form input {
-    background: #0a0a0a;
-    border: 1px solid var(--border);
-    color: var(--green);
-    font-family: var(--mono);
-    font-size: 0.75rem;
-    padding: 0.4rem 0.8rem;
-    border-radius: 3px;
-    width: 280px;
-    max-width: 100%;
-    min-width: 0;
-    flex: 1 1 180px;
-  }
-  .base-url-form button {
-    background: var(--green);
-    color: #000;
-    border: none;
-    padding: 0.4rem 1rem;
-    font-family: var(--mono);
-    font-size: 0.75rem;
-    font-weight: 700;
-    border-radius: 3px;
-    cursor: pointer;
-  }
-  .base-url-form button:hover { opacity: 0.9; }
-  .api-version-note { margin: 1rem 2rem 0; color: var(--text2); font-size: 0.8rem; }
-  @media (max-width: 600px) {
-    .top-bar { padding: 1rem; }
-    .api-version-note { margin: 1rem 1rem 0; }
-  }
-
-  /* Swagger UI overrides for hacker theme */
+  <meta charset="UTF-8">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AMC REST API reference | Agent Maturity Compass</title>
+  <meta name="description" content="Every route of the Agent Maturity Compass REST API, with its parameters and answers. Studio serves it on your own computer, by default at http://127.0.0.1:3212/api.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="canonical" href="https://agentmaturity.co/api.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="AMC REST API reference | Agent Maturity Compass">
+  <meta property="og:description" content="Every route of the Agent Maturity Compass REST API, with its parameters and answers. Studio serves it on your own computer, by default at http://127.0.0.1:3212/api.">
+  <meta property="og:url" content="https://agentmaturity.co/api.html">
+  <meta property="og:image" content="https://agentmaturity.co/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="home.css?v=6">
+  <link rel="stylesheet" href="pages.css?v=1">
+  <link rel="stylesheet" href="docs-pages.css?v=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.34.0/swagger-ui.css" integrity="sha384-4c3vsE5f+trhFyHrFrLM1fFGUn531NIaC7dcqEWIJdoRQJ5CkJbSuSCwXLpaS1KF" crossorigin="anonymous">
+  <style>
+  .api-tools { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; margin-top: 28px; }
+  .api-tools label { display: grid; gap: 6px; font-size: 0.9rem; color: var(--muted); flex: 1 1 280px; max-width: 420px; }
+  .api-tools input { min-height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--line-strong); background: var(--panel); color: var(--text); font: inherit; font-family: var(--mono); font-size: 0.9rem; }
+  .swagger-ui .info .title small, .swagger-ui .info .title small pre.version { background: var(--card) !important; color: var(--text) !important; }
+  .swagger-ui .renderedMarkdown code, .swagger-ui code { background: rgba(255, 255, 255, 0.08) !important; color: var(--text) !important; }
+  .swagger-ui .servers-title, .swagger-ui .servers > label, .swagger-ui label, .swagger-ui .opblock-tag small, .swagger-ui .info p, .swagger-ui .info li { color: var(--body) !important; }
+  .swagger-wrap { --green: var(--accent); --text: var(--body); --text2: var(--muted); --border: var(--line); --bg: var(--bg); padding-bottom: var(--band); }
   .swagger-ui {
-    font-family: var(--mono), monospace !important;
+    font-family: var(--sans) !important;
   }
   .swagger-ui .topbar { display: none !important; }
   .swagger-ui .wrapper { padding: 0 !important; }
-  .swagger-ui .info { margin: 20px 2rem !important; }
+  .swagger-ui .info { margin: 20px 0 !important; }
   .swagger-ui .info .title { color: var(--green) !important; font-family: var(--mono) !important; }
   .swagger-ui .info .description p { color: var(--text) !important; }
   .swagger-ui .info a { color: var(--green) !important; }
   .swagger-ui .scheme-container {
-    background: #0a0a0a !important;
+    background: var(--panel) !important;
     border-bottom: 1px solid var(--border) !important;
     box-shadow: none !important;
-    padding: 10px 2rem !important;
+    padding: 10px 0 !important;
   }
   .swagger-ui .opblock-tag {
     color: var(--green) !important;
     font-family: var(--mono) !important;
-    border-bottom: 1px solid rgba(0,255,65,0.05) !important;
+    border-bottom: 1px solid var(--line) !important;
   }
-  .swagger-ui .opblock-tag:hover { background: rgba(0,255,65,0.02) !important; }
+  .swagger-ui .opblock-tag:hover { background: rgba(255,255,255,0.03) !important; }
   .swagger-ui .opblock-tag small { color: var(--text2) !important; }
   .swagger-ui .opblock {
     border: 1px solid var(--border) !important;
     border-radius: 4px !important;
-    background: #0a0a0a !important;
+    background: var(--panel) !important;
     box-shadow: none !important;
   }
   .swagger-ui .opblock .opblock-summary {
@@ -131,14 +65,14 @@
     font-weight: 700 !important;
     border-radius: 3px !important;
   }
-  .swagger-ui .opblock.opblock-get { border-color: rgba(0,255,65,0.15) !important; }
-  .swagger-ui .opblock.opblock-get .opblock-summary-method { background: #009926 !important; }
-  .swagger-ui .opblock.opblock-post .opblock-summary-method { background: #1a6a1a !important; }
-  .swagger-ui .opblock.opblock-put .opblock-summary-method { background: #554400 !important; }
-  .swagger-ui .opblock.opblock-delete .opblock-summary-method { background: #661111 !important; }
+  .swagger-ui .opblock.opblock-get { border-color: var(--line-strong) !important; }
+  .swagger-ui .opblock.opblock-get .opblock-summary-method { background: #1d7a3c !important; }
+  .swagger-ui .opblock.opblock-post .opblock-summary-method { background: #1f5f2a !important; }
+  .swagger-ui .opblock.opblock-put .opblock-summary-method { background: #6b5300 !important; }
+  .swagger-ui .opblock.opblock-delete .opblock-summary-method { background: #8a1c1c !important; }
   .swagger-ui .opblock.opblock-patch .opblock-summary-method { background: #335533 !important; }
   .swagger-ui .opblock .opblock-summary-path { color: var(--text) !important; font-family: var(--mono) !important; }
-  .swagger-ui .opblock .opblock-summary-description { color: var(--text2) !important; }
+  .swagger-ui .opblock .opblock-summary-description { color: var(--body) !important; opacity: 1 !important; }
   .swagger-ui .opblock-body {
     background: var(--bg) !important;
   }
@@ -151,25 +85,25 @@
   .swagger-ui .response-col_status { color: var(--green) !important; font-family: var(--mono) !important; }
   .swagger-ui .response-col_description p { color: var(--text) !important; }
   .swagger-ui table thead tr th { color: var(--text2) !important; border-bottom: 1px solid var(--border) !important; }
-  .swagger-ui table tbody tr td { color: var(--text) !important; border-bottom: 1px solid rgba(0,255,65,0.03) !important; }
+  .swagger-ui table tbody tr td { color: var(--text) !important; border-bottom: 1px solid var(--line) !important; }
   .swagger-ui .parameters-col_description p { color: var(--text) !important; }
   .swagger-ui .parameter__name { color: var(--green) !important; font-family: var(--mono) !important; }
   .swagger-ui .parameter__type { color: var(--text2) !important; }
   .swagger-ui .parameter__in { color: var(--text2) !important; }
   .swagger-ui input[type=text] {
-    background: #0f0f0f !important;
+    background: var(--panel) !important;
     color: var(--green) !important;
     border: 1px solid var(--border) !important;
     font-family: var(--mono) !important;
   }
   .swagger-ui textarea {
-    background: #0f0f0f !important;
+    background: var(--panel) !important;
     color: var(--green) !important;
     border: 1px solid var(--border) !important;
     font-family: var(--mono) !important;
   }
   .swagger-ui select {
-    background: #0f0f0f !important;
+    background: var(--panel) !important;
     color: var(--text) !important;
     border: 1px solid var(--border) !important;
   }
@@ -185,7 +119,7 @@
   .swagger-ui .btn.execute:hover { opacity: 0.9 !important; }
   .swagger-ui .btn.cancel { border-color: #993333 !important; color: #ff3333 !important; }
   .swagger-ui .model-box {
-    background: #0a0a0a !important;
+    background: var(--panel) !important;
     border: 1px solid var(--border) !important;
   }
   .swagger-ui .model { color: var(--text) !important; font-family: var(--mono) !important; }
@@ -197,7 +131,7 @@
   }
   .swagger-ui section.models h4 { color: var(--green) !important; }
   .swagger-ui .highlight-code > .microlight {
-    background: #050505 !important;
+    background: var(--panel) !important;
     color: var(--green) !important;
     font-family: var(--mono) !important;
     border: 1px solid var(--border) !important;
@@ -205,43 +139,99 @@
   }
   .swagger-ui .curl { color: var(--green) !important; }
   .swagger-ui .responses-inner h4 { color: var(--text) !important; }
-  .swagger-ui .copy-to-clipboard { background: #0f0f0f !important; }
+  .swagger-ui .copy-to-clipboard { background: var(--panel) !important; }
   .swagger-ui .authorization__btn { fill: var(--green) !important; }
   .swagger-ui .unlocked svg { fill: var(--green) !important; }
   .swagger-ui .locked svg { fill: #ff3333 !important; }
-  .swagger-ui .dialog-ux .modal-ux { background: #0a0a0a !important; border: 1px solid var(--border) !important; }
+  .swagger-ui .dialog-ux .modal-ux { background: var(--panel) !important; border: 1px solid var(--border) !important; }
   .swagger-ui .dialog-ux .modal-ux-header { border-bottom: 1px solid var(--border) !important; }
   .swagger-ui .dialog-ux .modal-ux-header h3 { color: var(--green) !important; }
   .swagger-ui .dialog-ux .modal-ux-content p { color: var(--text) !important; }
-  .swagger-ui .auth-container input { background: #0f0f0f !important; color: var(--green) !important; border: 1px solid var(--border) !important; }
+  .swagger-ui .auth-container input { background: var(--panel) !important; color: var(--green) !important; border: 1px solid var(--border) !important; }
   .swagger-ui .loading-container .loading::after { color: var(--green) !important; }
-</style>
-<style id="skip-link-style">
-.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px system-ui,sans-serif;text-decoration:none}
-.skip-link:focus,.skip-link:focus-visible{left:12px}
-:where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
-</style>
+  </style>
 </head>
 <body>
-<a href="#main-content" class="skip-link">Skip to content</a>
-<div id="main-content" tabindex="-1"></div>
-  <div class="top-bar">
-    <div style="display:flex;align-items:center;gap:1.5rem">
-      <a href="index.html">← Back to AMC</a>
-      <h1>🔌 API Playground</h1>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <nav class="nav" aria-label="Main">
+    <div class="nav-inner">
+      <a href="./" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>
+      <ul class="nav-links">
+        <li><a href="./#a4-forge">Build an agent</a></li>
+        <li><a href="./#capabilities">Run it</a></li>
+        <li><a href="./#domains">Industries</a></li>
+        <li><a href="a4.html">A4 Forge</a></li>
+        <li><a href="docs/index.html">Docs</a></li>
+      </ul>
+      <div class="nav-right">
+        <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="nav-quiet">GitHub</a>
+        <a href="./#install" class="btn btn-primary btn-small">Get AMC</a>
+        <button class="nav-hamburger" aria-label="Menu" aria-controls="navMobile" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
     </div>
-    <div class="base-url-form">
-      <label for="baseUrl">Base URL:</label>
-      <input type="text" id="baseUrl" value="http://localhost:3000/api" placeholder="http://localhost:3000/api">
-      <button onclick="updateBaseUrl()">Apply</button>
-    </div>
+  </nav>
+  <div class="nav-mobile" id="navMobile">
+    <a href="./#a4-forge">Build an agent</a>
+    <a href="./#capabilities">Run it</a>
+    <a href="./#domains">Industries</a>
+    <a href="./#paths">Already have an agent?</a>
+    <a href="./#install">Get AMC</a>
+    <a href="./#desktop">macOS app</a>
+    <a href="./#pricing">Price</a>
+    <a href="a4.html">A4 Forge (preview)</a>
+    <a href="docs/index.html">Docs</a>
+    <a href="executive.html">For executives</a>
+    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
   </div>
-  <p class="api-version-note">The version shown below is the REST API document's own version, not an AMC release. The published AMC release is 1.1.1.</p>
-  <div id="swagger-ui"></div>
+
+  <span id="main-content" tabindex="-1"></span>
+  <main id="main">
+    <section class="page-hero">
+      <div class="wrap"><div class="doc">
+        <p class="product-name">API reference</p>
+        <h1>AMC's REST API</h1>
+        <p class="lede">Every route the AMC server, Studio, answers on your own computer or your own server. The version shown below is the API document's own version, not an AMC release.</p>
+        <div class="callout callout-orange">
+          <strong>Try a route with curl, not from this page.</strong>
+          <p>Studio accepts calls only from its own address, so "Try it out" on this page is refused. On the computer where AMC runs, start it with <code>amc up</code>; it prints the Studio API address, by default <code>http://127.0.0.1:3212/api</code>. Then, for example:</p>
+          <pre><code>curl http://127.0.0.1:3212/api/v1/health</code></pre>
+          <p>It answers <code>{"status":"ok","version":"1.2.0",…}</code>. Most other routes need you to be signed in.</p>
+        </div>
+        <form class="api-tools" id="baseUrlForm">
+          <label for="baseUrl">Server address the routes below are shown against
+            <input type="text" id="baseUrl" value="http://127.0.0.1:3212/api" spellcheck="false">
+          </label>
+          <button class="btn btn-ghost btn-small" type="submit">Show</button>
+        </form>
+      </div></div>
+    </section>
+  </main>
+  <section class="swagger-wrap" aria-label="API routes">
+    <div class="wrap"><div id="swagger-ui"></div></div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-inner wrap">
+      <div class="footer-top">
+        <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p></div>
+        <div class="footer-col"><h2>Product</h2><a href="./#a4-forge">Build an agent</a><a href="./#capabilities">Run it</a><a href="./#paths">Already have an agent?</a><a href="./#install">Get AMC</a><a href="./#desktop">macOS app</a><a href="./#products">Eight tools</a><a href="executive.html">Executives</a><a href="playground.html">Playground</a><a href="docs/index.html">Documentation</a></div>
+        <div class="footer-col"><h2>Depth</h2><a href="a4.html">A4 Forge</a><a href="methodology.html">Approach and research</a><a href="compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="./#pricing">Price</a><a href="./#faq">FAQ</a></div>
+        <div class="footer-col"><h2>Industry Packs</h2><a href="./#domains">All packs</a><a href="station-environment.html">Environment</a><a href="station-health.html">Health</a><a href="station-wealth.html">Wealth</a><a href="station-education.html">Education</a><a href="station-mobility.html">Mobility</a><a href="station-technology.html">Technology</a><a href="station-governance.html">Governance</a></div>
+        <div class="footer-col"><h2>Code</h2><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="accessibility.html">Accessibility</a></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
+    </div>
+  </footer>
+
+  <script src="script.js?v=13"></script>
+  <script src="home.js?v=3"></script>
+  <script src="pages.js?v=2"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.34.0/swagger-ui-bundle.js" integrity="sha384-9Td7MKiIr2S83E1kZyyVi8KdJw/S8CpAvu0llLyMeg0xq/hDGiZJfVn0fV4llCmK" crossorigin="anonymous"></script>
   <script>
     let ui;
+    document.getElementById('baseUrlForm').addEventListener('submit', function (event) { event.preventDefault(); updateBaseUrl(); });
     function initSwagger(baseUrl) {
       ui = SwaggerUIBundle({
         url: 'openapi.yaml',
@@ -259,6 +249,8 @@
     function labelFilter() {
       const box = document.querySelector('.operation-filter-input');
       if (box) box.setAttribute('aria-label', 'Filter operations by tag or path');
+      const servers = document.getElementById('servers');
+      if (servers) servers.setAttribute('aria-label', 'Server address');
     }
     function updateBaseUrl() {
       const val = document.getElementById('baseUrl').value.trim();
@@ -284,7 +276,8 @@
           });
       }
     }
-    initSwagger();
+    // Show the routes against the address a local Studio really uses (amc up prints it), not the spec's first server.
+    updateBaseUrl();
   </script>
 </body>
 </html>

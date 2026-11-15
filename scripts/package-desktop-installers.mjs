@@ -20,6 +20,7 @@ const packWorkRoot = join(workRoot, "npm-pack");
 const archivesRoot = join(outRoot, "archives");
 const studioAppName = "Agent Maturity Compass Studio";
 const studioMacAppBundleName = "Agent Maturity Compass Studio.app";
+const studioMacIconName = "amc-studio.icns";
 const studioWindowsCmdName = "Agent Maturity Compass Studio.cmd";
 const studioWindowsPs1Name = "Agent Maturity Compass Studio.ps1";
 const studioUrl = "http://127.0.0.1:3212/w/demo/console/";
@@ -680,6 +681,7 @@ function writeMacStudioApp(targetDir, tarballName, tarballDigest) {
   mkdirSync(resourcesDir, { recursive: true });
   // The app carries its own copy so it still starts after it is moved out of the extracted folder.
   cpSync(join(targetDir, tarballName), join(resourcesDir, tarballName));
+  cpSync(join(root, "scripts", "brand", studioMacIconName), join(resourcesDir, studioMacIconName));
 
   writeFileSync(join(contentsDir, "Info.plist"), `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -691,6 +693,8 @@ function writeMacStudioApp(targetDir, tarballName, tarballDigest) {
   <string>${studioAppName}</string>
   <key>CFBundleExecutable</key>
   <string>${studioAppName}</string>
+  <key>CFBundleIconFile</key>
+  <string>${studioMacIconName}</string>
   <key>CFBundleIdentifier</key>
   <string>${studioMacBundleId}</string>
   <key>CFBundleInfoDictionaryVersion</key>

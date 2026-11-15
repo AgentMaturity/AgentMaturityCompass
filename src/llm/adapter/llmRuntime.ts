@@ -59,6 +59,7 @@ import type { HttpTransport } from "./transport.js";
 import { assertRequestCapabilities, assertRequiredCapabilities, LlmCapabilityError } from "./providerCapabilities.js";
 import { LiveTextPreview, type LiveTextPreviewEvent } from "./liveTextPreview.js";
 import { reserveNativeModelBudget } from "../../budgets/nativeBudgetAdmission.js";
+import { connectFailureCode } from "../../utils/connectFailure.js";
 import { BudgetEvidenceIntegrityError } from "../../budgets/nativeBudgetUsage.js";
 import { bindProviderToolNames, usesProviderToolNames } from "../request/providerToolNames.js";
 import { ProviderToolBinding } from "./providerToolBinding.js";
@@ -470,7 +471,7 @@ export class LlmRuntime {
   private transportFailure(
     error: unknown,
     signal: AbortSignal | undefined
-  ): { failure: LlmFailure; kind: "error" | "aborted"; httpStatus: null; cause: string } {
+  ): { failure: LlmFailure; kind: "error" | "aborted"; httpStatus: null; cause: string; connectFailed?: string } {
     if (error instanceof EgressBlocked) {
       return { failure: { message: error.message, code: "AMC_RESIDENCY_EGRESS_BLOCKED" },
         kind: "error", httpStatus: null, cause: "residency_blocked" };
@@ -483,7 +484,16 @@ export class LlmRuntime {
         cause: "aborted"
       };
     }
+    if (refusedRedirect(error)) {
+      // A redirect answers the same way every time, so it is in no default retryable set: repeating it would only
+      // send the same request body again (signed audio included) to an endpoint that will not take it.
+      return { failure: { message: "The provider answered with a redirect. AMC does not follow redirects, so nothing was "
+        + "sent to the new address. Check the provider's base URL.", code: "AMC_REDIRECT_REFUSED" },
+      kind: "error", httpStatus: null, cause: "redirect_refused" };
+    }
     const normalized = normalizeLlmFailure(error);
+    // Recorded so budgets can count a connection that never opened as a request that cost nothing.
+    const connectFailed = connectFailureCode(error);
     return {
       failure:
         normalized.code === LLM_FAILURE_CODE.UNKNOWN
@@ -491,7 +501,8 @@ export class LlmRuntime {
           : normalized,
       kind: "error",
       httpStatus: null,
-      cause: "transport"
+      cause: "transport",
+      ...(connectFailed === undefined ? {} : { connectFailed })
     };
   }
 
@@ -542,4 +553,10 @@ function missingCredentialFailure(route: PinnedRoute): LlmFailure {
     message: `no layer supplies credential ${name} for provider ${route.providerId}`,
     code: LLM_FAILURE_CODE.MISSING_CREDENTIAL
   };
+}
+
+/** fetch with `redirect: "error"` throws TypeError("fetch failed") whose cause says "unexpected redirect" (undici). */
+function refusedRedirect(error: unknown): boolean {
+  const cause = error instanceof TypeError ? (error as { cause?: unknown }).cause : undefined;
+  return cause instanceof Error && cause.message === "unexpected redirect";
 }

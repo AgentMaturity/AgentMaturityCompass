@@ -36,11 +36,11 @@ import {
   runtimeFirewallGuard,
   toolhubAllowlistGuard
 } from "../tools/guards/policyGuards.js";
-import { actionPolicyGuard, actionPolicyMode, actionPolicyState, simulationNotice, type ActionPolicyState } from "../tools/guards/actionPolicyGuard.js";
+import { actionPolicyGuard, actionPolicyMode, actionPolicyState, executeOnApprovalClasses, simulationNotice, type ActionPolicyState } from "../tools/guards/actionPolicyGuard.js";
 import { approvalModeGatedClasses, approvalModeNarrowing, type ApprovalMode } from "../approvals/approvalModes.js";
 import { redactionCountsFor, secretRedactionFilter } from "../shield/redaction/toolOutputRedaction.js";
 import { compiledApprovalClasses, compiledPolicyFacts, compiledPolicyGuard, compiledPolicyShows, planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
-import { ToolPipeline } from "../tools/toolPipeline.js";
+import { DEFAULT_AUTHORIZE_CLASSES, ToolPipeline } from "../tools/toolPipeline.js";
 import type { ActionClass } from "../types.js";
 import { applyPlanMode } from "./planMode.js";
 import { ControlCheckpointRootInWorkspaceError, loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
@@ -234,6 +234,19 @@ export interface ToolsetReadiness {
   readonly shell: NativeShellReadiness;
   /** The signed Action Policy native calls meet (AXR-02); "not configured" means none is checked. */
   readonly actionPolicy: ActionPolicyState;
+}
+
+/**
+ * The one-line confinement notice, in the words `amc init --coding` uses for the shell: file tools are bounded by the
+ * signed policy (this process is not OS-confined), and the shell by its own sandbox when one is offered. Null when this
+ * process is confined. The measured reason stays in `sandboxReason` (chat shows it in /status).
+ */
+export function toolsetConfinementNotice(readiness: Pick<ToolsetReadiness, "confined" | "sandboxBackendAvailable" | "shell">): string | null {
+  if (readiness.confined) return null;
+  const shell = !readiness.shell.offered ? "no shell is offered"
+    : readiness.shell.boundary === null ? "the shell runs UNCONFINED, with your full user rights, because you opted in"
+      : `shell commands run inside the ${readiness.shell.boundary} sandbox`;
+  return `File tools are limited by AMC's signed policy, not by the operating system; ${shell}.${readiness.sandboxBackendAvailable ? "" : " This machine has no sandbox backend."}`;
 }
 
 /**
@@ -635,7 +648,10 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     filters: [secretRedactionFilter, simulationNotice(workspace, options.approvalMode === undefined ? null : `approval mode ${options.approvalMode} runs it as SIMULATE`)],
     narrowMode: composeNarrowing(actionPolicyMode(workspace), options.approvalMode === undefined ? null : approvalModeNarrowing(options.approvalMode)),
     // Under a compiled policy every call is bound to a record, and its approval classes need a signed approval.
-    ...(compiled ? { authorizeClasses: new Set<string>(ACTION_CLASSES), boundApprovalRequiredFor: compiledApprovalClasses(compiled) } : {}),
+    ...(compiled ? { authorizeClasses: new Set<string>(ACTION_CLASSES), boundApprovalRequiredFor: compiledApprovalClasses(compiled) }
+      // A class the signed Action Policy runs on a person's approval is bound to a record, so that approval is rechecked
+      // against the exact call and consumed before the body (the guard reads it from the record).
+      : { authorizeClasses: new Set<string>([...DEFAULT_AUTHORIZE_CLASSES, ...executeOnApprovalClasses(workspace)]) }),
     // Read per call: the CLI binds its session writer after composing.
     authorizationContext: () => {
       let evidenceRefs: string[] = [];

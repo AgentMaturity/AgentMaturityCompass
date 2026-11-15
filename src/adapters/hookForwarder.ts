@@ -17,7 +17,7 @@
 import { randomUUID } from "node:crypto";
 import { realpathSync } from "node:fs";
 import { homedir } from "node:os";
-import { join, resolve } from "node:path";
+import { isAbsolute, join, resolve } from "node:path";
 import { stdin } from "node:process";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
@@ -605,6 +605,16 @@ async function answerClaudeHook(opts: HookForwardOptions, readInput: () => Promi
 }
 
 /**
+ * The AMC workspace a hook delivery belongs to. Claude Code may run a hook from a folder below the project (where the
+ * session was started); it names the project root, whose .claude/settings.json holds this hook, in CLAUDE_PROJECT_DIR
+ * (https://code.claude.com/docs/en/hooks, read 2026-11-15). The relative --token-file is then read from that root.
+ */
+export function hookWorkspace(provider: string, env: NodeJS.ProcessEnv = process.env, cwd = process.cwd()): string {
+  const projectDir = provider === "claude-code" ? env.CLAUDE_PROJECT_DIR : undefined;
+  return projectDir !== undefined && isAbsolute(projectDir) ? projectDir : cwd;
+}
+
+/**
  * Runs one provider hook delivery under forwardDeadlineMs(). Claude Code control mode turns every failure into the
  * answer its event needs (claudeFailure), because Claude Code runs the action after any other failure; Gemini CLI and
  * observe mode keep their earlier outputs and exit codes.
@@ -612,7 +622,7 @@ async function answerClaudeHook(opts: HookForwardOptions, readInput: () => Promi
 export async function runHookForward(
   opts: HookForwardOptions,
   readInput: () => Promise<string | Buffer>,
-  workspace = process.cwd(),
+  workspace = hookWorkspace(opts.provider),
   deadlineMs = forwardDeadlineMs(),
 ): Promise<HookForwardOutcome> {
   if (opts.provider === "claude-code" && opts.mode === "control") return answerClaudeHook(opts, readInput, workspace, deadlineMs);

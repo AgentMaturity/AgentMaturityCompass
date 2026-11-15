@@ -138,9 +138,10 @@ export interface VerifyResult {
 }
 
 /** P0-09 step 9: what a ledger verdict says when no pinned monitor key anchors it. */
-export const LEDGER_UNANCHORED_MESSAGE = "Ledger verification FAILED: UNANCHORED. The monitor key was read from the workspace being verified, " +
-  "so this proves internal consistency only. Pin it with --expect-monitor, AMC_EXPECTED_MONITOR_FINGERPRINT or a trust list, " +
-  "using a fingerprint recorded outside this workspace.";
+// CLI-11: nothing failed on a healthy workspace; the verdict is withheld because the key is not anchored, and says so.
+export const LEDGER_UNANCHORED_MESSAGE = "Ledger verification NOT ANCHORED (UNANCHORED): the records are internally consistent, but they were checked " +
+  "against the monitor key stored in this workspace, which anyone able to rewrite the records could also replace. " +
+  "Pin it with --expect-monitor, AMC_EXPECTED_MONITOR_FINGERPRINT or a trust list, using a fingerprint recorded outside this workspace.";
 
 export interface LedgerVerifyOptions {
   externallyAuthenticatedPayloads?: ReadonlyMap<string, string>;

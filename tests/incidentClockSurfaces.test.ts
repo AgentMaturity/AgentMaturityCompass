@@ -161,7 +161,7 @@ async function fixture(body: (f: { root: string; workspace: string; seed: Json; 
   writeFileSync(script, DRIVER, { flag: "wx", mode: 0o600 });
   const env: NodeJS.ProcessEnv = { PATH: `${dirname(NODE)}:/usr/bin:/bin`, HOME: home, AMC_HOME: home, TMPDIR: root, LANG: "C", LC_ALL: "C", TZ: "UTC", NO_COLOR: "1",
     AMC_VAULT_PASSPHRASE: passphrase, AMC_VAULT_REMEMBER: "false", AMC_NO_SIGN: "0", AMC_OTEL_ENABLED: "false", AMC_LEDGER_SQLITE_SYNCHRONOUS: "FULL",
-    AMC_CONTROL_CHECKPOINT_DIR: checkpoints, AMC_GUARD_EVENTS_DB_PATH: join(root, "guard.sqlite"), AMC_GUARD_RECEIPTS_WORKSPACE: workspace };
+    AMC_CONTROL_CHECKPOINT_DIR: checkpoints, AMC_GUARD_EVENTS_DB_PATH: join(root, "guard.sqlite"), AMC_GUARD_RECEIPTS_WORKSPACE: workspace, AMC_A4_PREVIEW: "0" };
   const inputPins = [CLI, ...["api/incidentRouter.js", "incidents/incidentClockEvents.js", "incidents/incidentStore.js", "mcp/amcMcpServer.js", "workspace.js",
     "ledger/ledger.js", "storage/sqlitePool.js", "vault/vault.js", "crypto/keys.js", "utils/json.js", "utils/hash.js"].map(path => join(SOURCE, "dist", path)),
     ...["client/index.js", "inMemory.js", "types.js"].map(path => join(SOURCE, "node_modules/@modelcontextprotocol/sdk/dist/esm", path))]

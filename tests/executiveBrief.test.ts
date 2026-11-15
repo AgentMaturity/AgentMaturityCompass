@@ -159,8 +159,9 @@ describe("executive brief artifact", () => {
 
     expect(result.status, result.stderr || result.stdout).toBe(0);
     const html = readFileSync(join(root, "board-brief.html"), "utf8");
-    expect(html).toContain("INSUFFICIENT_EVIDENCE");
-    expect(html).toContain("Signing proves integrity, not evidence sufficiency");
+    // CLI-04: this fixture says VALID but carries no seal, so the brief now reads it as unverified (it asserted the
+    // fixture's own VALID status before); either way it is not board-ready.
+    expect(html).toContain("UNVERIFIED");
     expect(html).not.toContain("suitable for board review");
   });
 });

@@ -165,7 +165,7 @@ const refused = (projectId: string, problems: string[]): A4StoreError => new A4S
   `A4 project ${projectId} does not verify (${problems.slice(0, 3).join("; ")}); the bundle is not exported.`, problems);
 
 /**
- * The A4 slice of a run bundle (the one hook in `exportEvidenceBundle`; preview only, `AMC_A4_PREVIEW=1`): each A4
+ * The A4 slice of a run bundle (the one hook in `exportEvidenceBundle`; preview, off under `AMC_A4_PREVIEW=0`): each A4
  * project of the bundle's agent as an `amc.a4-record/v1` file `a4/<projectId>.json`, and `a4/index.json` naming each
  * project's head, all listed in the signed manifest with every other file. A project is the agent's by the receipt
  * signed for its seq-0 audit row, never by the head row's unsigned `agent_id`; a project no receipt attributes is

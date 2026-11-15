@@ -34,6 +34,7 @@ import { assertOwnerMode } from "../mode/mode.js";
 import type { ContextPlugin } from "../prompt/context/contextTypes.js";
 import { agentContextPluginFileSchema, agentContextPluginPath, AGENT_CONTEXT_PLUGIN_ARTIFACT, AGENT_CONTEXT_PLUGIN_ORDER, AGENT_CONTEXT_PLUGIN_SCHEMA, type AgentContextPluginFile } from "../prompt/agentContextPluginFile.js";
 import { readPromptPackSnapshot } from "../prompt/promptPackSnapshot.js";
+import { promptPackContentSha256 } from "../prompt/promptPackArtifact.js";
 import { promptLatestPackPath } from "../prompt/promptPolicyStore.js";
 import { readEventPayload } from "../session/eventPayload.js";
 import { readTurnEndMeta } from "../session/turnLifecycleMeta.js";
@@ -166,10 +167,13 @@ export function promptPackStatus(workspace: string, agentId: string): { present:
   return { present, sha256, packId, verified, problems };
 }
 
-/** The `context.promptPackSha256` slot: the latest pack's sha256, null only when it is absent; any other read error is 409 RESOURCE_UNREADABLE. */
+/**
+ * The `context.promptPackSha256` slot: the digest of what the latest pack says (promptPackContentSha256), so a scheduled
+ * refresh that only re-signs unchanged content keeps it; null only when the pack is absent; any other read error is 409 RESOURCE_UNREADABLE.
+ */
 export function promptPackSha256(workspace: string, agentId: string): string | null {
   try {
-    return sha256Hex(readFileSync(promptLatestPackPath(workspace, agentId)));
+    return promptPackContentSha256(readFileSync(promptLatestPackPath(workspace, agentId)));
   } catch (error) {
     const code = (error as NodeJS.ErrnoException).code;
     if (code === "ENOENT") return null;

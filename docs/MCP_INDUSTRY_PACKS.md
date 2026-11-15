@@ -72,4 +72,4 @@ tools and the pack audit. `tests/industryPackMcpTools.test.ts` and `tests/indust
 in-memory MCP client.
 `tests/industryPackMcpToolsWiring.test.ts` starts the real `startMcpServer()` with its stdio transport
 replaced by an in-memory pair. `tests/mcpServer.test.ts` pins the `amc mcp list-tools` entries: 15
-tools, or 20 with `AMC_A4_PREVIEW=1`.
+tools, or 20 with the A4 preview on (the default; `AMC_A4_PREVIEW=0` turns it off).

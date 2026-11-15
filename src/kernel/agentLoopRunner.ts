@@ -48,6 +48,7 @@ import type { NativeShellReadiness } from "../sandbox/nativeShellGate.js";
 import type { NativeValidationPlan, NativeValidationResult } from "../agent/nativeValidation.js";
 import { projectNativeValidation } from "../agent/nativeValidationProjection.js";
 import type { ApprovalAnswerer } from "../approvals/seam/approvalSeamTypes.js";
+import type { ApprovalSeamInit } from "../approvals/seam/approvalSeam.js";
 import { cliInitiator } from "../approvals/approvalEngine.js";
 import type { LlmRouteConfig } from "../llm/adapter/adapterRegistry.js";
 import type { HttpTransport } from "../llm/adapter/transport.js";
@@ -138,7 +139,7 @@ export interface ComposedApprovalGate extends ToolApprovalGateOptions {
    */
   readonly answerers?: readonly ApprovalAnswerer[];
   /** Reports the engine request id the moment it exists, so a UI can render the prompt. */
-  readonly onRaised?: (event: { readonly approvalId: string; readonly approvalRequestId: string }) => void;
+  readonly onRaised?: ApprovalSeamInit["onRaised"];
 }
 
 /** What a caller may do to a turn while it runs. */

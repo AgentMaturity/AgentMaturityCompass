@@ -28,7 +28,7 @@ describe("scenario: acknowledged blocker", () => {
     // be spent on a gate that cannot complete, since the acknowledgement supersedes it. The refusal names the item in words.
     const early = await j.p.post(j.t.alice, "/stages/aspire/gates/direction/request");
     expect(refusal(early)).toEqual([409, "A4_NOT_READY"]);
-    expect(early.body.error).toMatch(/Not ready yet: sod\.self_provisioned/);
+    expect(early.body.error).toMatch(/Not ready yet\. Every approver here was created in this one workspace.+\(sod\.self_provisioned\)/);
 
     await j.acknowledge("aspire", "sod.self_provisioned");
     const acknowledged = await j.item("sod.self_provisioned");
@@ -41,6 +41,13 @@ describe("scenario: acknowledged blocker", () => {
     expect(intent.boundItemIds).toContain("sod.self_provisioned");
     expect((await j.complete("aspire", second)).status).toBe(200);
     expect((await j.item("sod.self_provisioned"))?.status).not.toBe("READY");
+
+    // A4-15: what it acknowledges is a fact of the workspace, so it holds on the next revision too (Build records one),
+    // and the next gate is not held for it again.
+    const before = (await j.p.get(j.t.alice)).body.data!.revisionNo as number;
+    await j.p.ok(j.t.alice, "/stages/aspire/build");
+    expect((await j.p.get(j.t.alice)).body.data!.revisionNo).toBeGreaterThan(before);
+    expect((await j.item("sod.self_provisioned"))?.reasonCodes).toContain("OWNER_ACKNOWLEDGED");
 
     // Ninety days on, the acknowledgement no longer counts: the item blocks progression again.
     vi.useFakeTimers({ toFake: ["Date"], now: Date.now() + 91 * 86_400_000 });

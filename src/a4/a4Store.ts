@@ -644,7 +644,7 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext, mi
      * refusal leaves no key).
      */
     createProject(input: { actor: A4Principal; agentId: string; name: string; hostedRouter: boolean; request?: A4RequestKey;
-      profile?: { expertise: string; archetype: string | null } }): A4TransitionResult {
+      profile?: { expertise: string; archetype: string | null; practice?: true } }): A4TransitionResult {
       // A VIEWER, APPROVER or AUDITOR would otherwise become the owner of a project it may not build (live roles, not the caller's).
       if (!liveRolesFor(workspace, input.actor).some((role) => role === "OPERATOR" || role === "OWNER")) {
         throw new A4StoreError(403, "PRINCIPAL_ROLE_INSUFFICIENT", "Creating an A4 project needs a live OPERATOR or OWNER role.");

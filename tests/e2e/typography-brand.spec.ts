@@ -104,5 +104,8 @@ test("public surfaces load canonical typography only from the AMC artifact", asy
   const remoteFonts = [...requests].filter(url => /fonts\.(?:googleapis|gstatic)\.com/i.test(url));
   const sameOriginFonts = [...requests].filter(url => url.startsWith(`${baseUrl}/fonts/`) && url.endsWith(".woff2"));
   expect(remoteFonts).toEqual([]);
-  expect(sameOriginFonts.length).toBeGreaterThanOrEqual(7);
+  // The pages use Inter at 400, 600 and 700 and Space Mono at 400 and 700; each comes from the site's own fonts.
+  for (const file of ["inter-latin-400-normal", "inter-latin-600-normal", "inter-latin-700-normal", "space-mono-latin-400-normal", "space-mono-latin-700-normal"]) {
+    expect(sameOriginFonts.some(url => url.endsWith(`/fonts/${file}.woff2`)), file).toBe(true);
+  }
 });

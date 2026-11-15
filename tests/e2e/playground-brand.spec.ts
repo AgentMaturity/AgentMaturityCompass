@@ -13,8 +13,8 @@ test.describe("AMC Playground brand shell", () => {
 
   test("renders the canonical browser lab and preserves the three workflows", async ({ page }, testInfo) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await expect(page.locator(".playground-wordmark")).toHaveText(/amc_playground/);
-    await expect(page.locator(".playground-tagline")).toHaveText("Evidence over claims.");
+    await expect(page.locator(".nav-brand")).toHaveText("amc_");
+    await expect(page.locator(".footer-tagline")).toContainText("Evidence over claims.");
     await expect(page.locator(".question")).toHaveCount(15);
 
     await page.getByRole("tab", { name: "Scenario Lab" }).click();
@@ -47,20 +47,10 @@ test.describe("AMC Playground brand shell", () => {
     await page.screenshot({ path: testInfo.outputPath("amc-playground-desktop.png"), fullPage: true });
   });
 
-  test("persists an accessible canonical light theme", async ({ page }) => {
-    const toggle = page.locator("#themeToggle");
-    await expect(toggle).toHaveAttribute("aria-label", "Switch to light theme");
-    await expect(toggle).toHaveAttribute("aria-pressed", "false");
-
-    await toggle.click();
-    await expect(page.locator("body")).toHaveClass(/clean-theme/);
-    await expect(toggle).toHaveAttribute("aria-label", "Switch to dark theme");
-    await expect(toggle).toHaveAttribute("aria-pressed", "true");
-    await expect.poll(() => page.evaluate(() => localStorage.getItem("amc-theme"))).toBe("clean");
-
-    await page.reload();
-    await expect(page.locator("body")).toHaveClass(/clean-theme/);
-    await expect(page.locator("#themeToggle")).toHaveAttribute("aria-label", "Switch to dark theme");
+  test("the skip link lands on the lab itself", async ({ page }) => {
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Enter");
+    await expect(page.locator("main#main-content")).toBeFocused();
   });
 
   test("keeps the guided tour keyboard-contained and dismissible", async ({ page }) => {
@@ -75,10 +65,17 @@ test.describe("AMC Playground brand shell", () => {
     await expect(trigger).toBeFocused();
   });
 
-  test("is accessible and bounded at 390px in both themes", async ({ page }, testInfo) => {
+  test("a click outside the tour ends it and still reaches what was clicked", async ({ page }) => {
+    await page.getByRole("button", { name: "Tour" }).click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await page.getByRole("tab", { name: "Assurance Packs" }).click();
+    await expect(page.getByRole("dialog")).toBeHidden();
+    await expect(page.getByRole("tab", { name: "Assurance Packs" })).toHaveAttribute("aria-selected", "true");
+  });
+
+  test("is accessible and bounded at 390px", async ({ page }, testInfo) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    for (const theme of ["dark", "light"] as const) {
-      if (theme === "light") await page.locator("#themeToggle").click();
+    {
 
       const layout = await page.evaluate(() => ({
         viewportWidth: innerWidth,

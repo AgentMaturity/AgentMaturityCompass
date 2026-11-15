@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
+import { isDeepStrictEqual } from "node:util";
 import YAML from "yaml";
 import { z } from "zod";
 import { getSigningKey, getPublicKeyPem, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
@@ -20,7 +21,7 @@ import { vaultStatus } from "../vault/vault.js";
 import { pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ActionClass } from "../types.js";
-import { projectBudgetUsage, readBudgetEvents, type BudgetUsage } from "./nativeBudgetUsage.js";
+import { projectBudgetUsage, readBudgetEvents, type BudgetProjectionOptions, type BudgetUsage } from "./nativeBudgetUsage.js";
 import type { TrustContext } from "../trust/trustContext.js";
 import { nativeUsdUnits } from "./nativeUsdAmount.js";
 import { VAULT_LOCKED_NO_SIGN_MESSAGE } from "../vault/vaultLockedError.js";
@@ -43,6 +44,8 @@ export const budgetsSchema = z.object({
     perAgent: z.record(z.string(), 
       z.object({
         unknownTokenUsage: z.enum(["BLOCK", "ALLOW_WITH_WARNING"]).optional(),
+        /** Signed by `amc budgets reset --accept-unknown`: unknown usage recorded before this time no longer blocks. */
+        acceptUnknownUsageBefore: z.iso.datetime().optional(),
         daily: z.object({
           maxLlmRequests: z.number().int().positive(),
           maxLlmTokens: z.number().int().positive(),
@@ -278,6 +281,54 @@ export function loadVerifiedBudgetsConfig(workspace: string): BudgetsConfig {
   return budgetsSchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
 }
 
+/** Tokens a model request can be billed at most: its bytes, an allowance for the provider's own prompt wrapping, its output limit. */
+const PROVIDER_WRAPPING_ALLOWANCE = 4096; // ponytail: fixed allowance; a per-provider figure if one ever proves larger
+// Top-level fields AMC's native encoders write that do not let a request spend past its output limit. Any other field
+// (a count such as `n`, stored state such as `previous_response_id` or `cachedContent`, a server tool) means no estimate.
+const CEILING_FIELDS = new Set(["model", "messages", "system", "tools", "tool_choice", "parallel_tool_calls", "stream", "stream_options",
+  "input", "instructions", "store", "text", "reasoning", "reasoning_effort", "thinking", "contents", "systemInstruction", "generationConfig",
+  "toolConfig", "options", "think", "format", "keep_alive", "temperature", "top_p", "top_k", "stop", "seed", "response_format",
+  "presence_penalty", "frequency_penalty", "prompt_cache_key", "prompt_cache_retention",
+  "max_tokens", "max_completion_tokens", "max_output_tokens", "n", "best_of"]);
+const GEMINI_CONFIG_FIELDS = new Set(["maxOutputTokens", "temperature", "topP", "topK", "stopSequences", "candidateCount", "thinkingConfig", "responseMimeType"]);
+const OLLAMA_OPTION_FIELDS = new Set(["num_predict", "num_ctx", "seed", "temperature", "top_k", "top_p", "min_p", "typical_p",
+  "repeat_last_n", "repeat_penalty", "presence_penalty", "frequency_penalty", "stop"]);
+// Content the provider reads from elsewhere (an uploaded file, a cache, a web address) is not in the bytes counted.
+const STORED_CONTENT_FIELDS = new Set(["previous_response_id", "conversation", "cached_content", "cachedContent", "file_id", "file_url", "file_uri", "fileUri", "fileData"]);
+
+const record = (value: unknown): value is Record<string, unknown> => Boolean(value) && typeof value === "object" && !Array.isArray(value);
+const onlyKnown = (value: unknown, known: Set<string>) => value === undefined || (record(value) && Object.keys(value).every(key => known.has(key)));
+// ponytail: a tool call whose arguments carry a web address also counts as remote content; harmless, it only blocks when unanswered.
+function readsStoredContent(value: unknown): boolean {
+  if (Array.isArray(value)) return value.some(readsStoredContent);
+  if (!record(value)) return false;
+  return Object.entries(value).some(([key, inner]) => STORED_CONTENT_FIELDS.has(key)
+    || ((key === "url" || key === "image_url") && typeof inner === "string" && !inner.startsWith("data:")) || readsStoredContent(inner));
+}
+
+/**
+ * The upper estimate for a request body AMC's native agent wrote, or null when nothing in the body is known to bound
+ * its usage: no output limit, more than one answer asked for, a field this function does not know, or content read
+ * from elsewhere. Only for bodies AMC encoded itself; a client's body through the gateway gets no estimate.
+ */
+export function requestTokenCeiling(requestBody: Buffer): number | null {
+  let body: unknown;
+  try { body = JSON.parse(requestBody.toString("utf8")); } catch { return null; }
+  if (!record(body) || !Object.keys(body).every(key => CEILING_FIELDS.has(key))) return null;
+  const config = body.generationConfig, options = body.options;
+  if (!onlyKnown(config, GEMINI_CONFIG_FIELDS) || !onlyKnown(options, OLLAMA_OPTION_FIELDS) || readsStoredContent(body)) return null;
+  const configValue = (key: string) => (record(config) ? config[key] : undefined);
+  if ([body.n, body.best_of, configValue("candidateCount")].some(count => count !== undefined && count !== 1)) return null;
+  // Every output limit an AMC encoder writes; a thinking budget is added in case a provider counts it apart.
+  const limits = [body.max_tokens, body.max_completion_tokens, body.max_output_tokens, record(options) ? options.num_predict : undefined, configValue("maxOutputTokens")]
+    .filter((value): value is number => Number.isSafeInteger(value) && (value as number) > 0);
+  if (limits.length === 0) return null;
+  const thinkingConfig = configValue("thinkingConfig"), thinking = record(thinkingConfig) ? thinkingConfig.thinkingBudget : undefined;
+  if (thinking === -1 || (record(thinkingConfig) && thinkingConfig.thinkingLevel !== undefined)) return null; // thinking of no stated size
+  // A token is at least one byte for byte-level tokenizers, so the bytes sent bound the input.
+  return requestBody.length + PROVIDER_WRAPPING_ALLOWANCE + Math.max(...limits) + (Number.isSafeInteger(thinking) && (thinking as number) > 0 ? thinking as number : 0);
+}
+
 export function initBudgets(workspace: string, agentId = "default"): { configPath: string; sigPath: string } {
   return captureBudgetsPublication(workspace).prepareLocal(Buffer.from(YAML.stringify(defaultBudgets(agentId)))).publish();
 }
@@ -294,27 +345,80 @@ export function budgetForAgent(config: BudgetsConfig, agentId: string): BudgetsC
   return fallback ?? null;
 }
 
+type AgentBudget = BudgetsConfig["budgets"]["perAgent"][string];
+export function acceptUnknownOption(budget: AgentBudget | null): BudgetProjectionOptions {
+  return budget?.acceptUnknownUsageBefore === undefined ? {} : { acceptUnknownBefore: Date.parse(budget.acceptUnknownUsageBefore) };
+}
+
 /** Counters combine verified native and legacy evidence; numeric usage is a known subtotal. */
-export function budgetUsageSnapshot(workspace: string, agentId: string, now = Date.now(), options: { trust?: TrustContext } = {}): BudgetUsage {
-  return projectBudgetUsage(readBudgetEvents(workspace, undefined, options), agentId, now);
+export function budgetUsageSnapshot(workspace: string, agentId: string, now = Date.now(), options: { trust?: TrustContext } & BudgetProjectionOptions = {}): BudgetUsage {
+  return projectBudgetUsage(readBudgetEvents(workspace, undefined, options), agentId, now, options);
+}
+
+/**
+ * The owner's recorded decision to go on after requests whose usage AMC cannot bound: signs `acceptUnknownUsageBefore`
+ * (now) into the budget entry that applies to the agent, through the same signing path as `amc budgets sign`. Limits are
+ * unchanged, and requests recorded later still block when their usage is unknown.
+ */
+export async function acceptUnknownUsageAsync(workspace: string, agentId: string, now = new Date()): Promise<{ entry: string; acceptedBefore: string }> {
+  const publication = captureBudgetsPublication(workspace);
+  if (publication.bytes === null) throw new Error(`Budgets config not found: ${budgetsPath(workspace)}`);
+  // Sign only on top of what the owner already signed: an edited or unsigned file is refused, never re-signed here.
+  const signature = verifyBudgetsConfigSignature(workspace, publication.bytes);
+  if (!signature.valid) {
+    throw new Error(`.amc/budgets.yaml does not match its signature (${signature.reason ?? "unknown reason"}), so nothing was signed. Run amc budgets verify; if the file was changed on purpose, review it and run amc budgets sign, then run this again.`);
+  }
+  const document = YAML.parseDocument(publication.bytes.toString("utf8"));
+  const signedJs = document.toJS() as Record<string, unknown>;
+  const config = budgetsSchema.parse(signedJs);
+  const entry = config.budgets.perAgent[agentId] ? agentId : config.budgets.perAgent.default ? "default" : null;
+  if (entry === null) throw new Error(`No budget applies to agent ${agentId}; nothing to accept.`);
+  const acceptedBefore = now.toISOString();
+  document.setIn(["budgets", "perAgent", entry, "acceptUnknownUsageBefore"], acceptedBefore);
+  const next = Buffer.from(document.toString());
+  assertOnlyAcceptanceChanged(signedJs, YAML.parse(next.toString("utf8")) as unknown, entry, acceptedBefore);
+  (await publication.prepareAsync(next)).publish();
+  return { entry, acceptedBefore };
+}
+
+/** The acceptance may change one field only; anything else would be signed without the owner reviewing it. */
+function assertOnlyAcceptanceChanged(signed: Record<string, unknown>, next: unknown, entry: string, acceptedBefore: string): void {
+  const budgetsNode = signed.budgets as { perAgent: Record<string, Record<string, unknown>> };
+  const expected = { ...signed, budgets: { ...budgetsNode, perAgent: { ...budgetsNode.perAgent, [entry]: { ...budgetsNode.perAgent[entry], acceptUnknownUsageBefore: acceptedBefore } } } };
+  if (!isDeepStrictEqual(next, expected)) throw new Error("Signing the acceptance would change more than budgets.perAgent." + entry + ".acceptUnknownUsageBefore, so nothing was signed. Run amc budgets verify and review .amc/budgets.yaml.");
+}
+
+/** The commands that let a person continue, one per kind of block. */
+function budgetNextSteps(agentId: string, reasons: readonly string[], unknownBlocked: boolean): string[] {
+  const next: string[] = [];
+  if (reasons.includes("budgets config signature invalid")) next.push("Run amc budgets verify; if .amc/budgets.yaml was edited on purpose, review it and run amc budgets sign.");
+  if (unknownBlocked) next.push(`Check what the earlier requests did, then accept their unknown usage: amc budgets reset --agent ${agentId} --accept-unknown`);
+  if (reasons.some(reason => reason.startsWith("per-minute"))) next.push("Wait a minute: per-minute limits count the last 60 seconds.");
+  if (reasons.some(reason => reason.startsWith("daily"))) next.push(`Wait until the local budget day ends (midnight), or raise the limit on purpose: edit budgets.perAgent.${agentId} in .amc/budgets.yaml, then run amc budgets sign.`);
+  if (reasons.some(reason => reason.startsWith("USD exposure"))) next.push("Earlier requests have no price ceiling; see docs/BUDGETS.md (USD limits) before the next paid request.");
+  return next;
 }
 
 export function evaluateBudgetStatus(workspace: string, agentId: string, now = Date.now(), options: { trust?: TrustContext } = {}): {
   ok: boolean;
   reasons: string[];
+  /** What to run or wait for to continue, in plain words; empty when nothing blocks. */
+  next: string[];
   exceededActionClasses: ActionClass[];
   usage: ReturnType<typeof budgetUsageSnapshot>;
   budgetConfigValid: boolean;
-  nativeAdmissionPolicy: { unknownTokenUsage: "BLOCK" | "ALLOW_WITH_WARNING"; tokenLimit: "between-dispatch-threshold"; costLimit: "signed-request-reservations" | "disabled" };
+  nativeAdmissionPolicy: { unknownTokenUsage: "BLOCK" | "ALLOW_WITH_WARNING"; tokenLimit: "between-dispatch-threshold"; costLimit: "signed-request-reservations" | "disabled"; acceptUnknownUsageBefore: string | null };
 } {
-  const nativeAdmissionPolicy = (unknownTokenUsage: "BLOCK" | "ALLOW_WITH_WARNING" = "BLOCK", usd = true) => ({ unknownTokenUsage, tokenLimit: "between-dispatch-threshold" as const, costLimit: usd ? "signed-request-reservations" as const : "disabled" as const });
+  const nativeAdmissionPolicy = (unknownTokenUsage: "BLOCK" | "ALLOW_WITH_WARNING" = "BLOCK", usd = true, acceptUnknownUsageBefore: string | null = null) => ({ unknownTokenUsage, tokenLimit: "between-dispatch-threshold" as const, costLimit: usd ? "signed-request-reservations" as const : "disabled" as const, acceptUnknownUsageBefore });
   let policyBytes: Buffer | undefined;
   try { policyBytes = readFileSync(budgetsPath(workspace)); } catch { /* Preserve the existing invalid/missing policy status branch. */ }
   const signature = policyBytes === undefined ? { valid: false } : verifyBudgetsConfigSignature(workspace, policyBytes);
   if (!signature.valid) {
+    const reasons = ["budgets config signature invalid"];
     return {
       ok: false,
-      reasons: ["budgets config signature invalid"],
+      reasons,
+      next: budgetNextSteps(agentId, reasons, false),
       exceededActionClasses: ["DEPLOY", "WRITE_HIGH", "SECURITY"],
       usage: budgetUsageSnapshot(workspace, agentId, now, options),
       budgetConfigValid: false,
@@ -328,17 +432,24 @@ export function evaluateBudgetStatus(workspace: string, agentId: string, now = D
     return {
       ok: true,
       reasons: [],
+      next: [],
       exceededActionClasses: [],
       usage: budgetUsageSnapshot(workspace, agentId, now, options),
       budgetConfigValid: true,
       nativeAdmissionPolicy: nativeAdmissionPolicy()
     };
   }
-  const usage = budgetUsageSnapshot(workspace, agentId, now, options);
+  const usage = budgetUsageSnapshot(workspace, agentId, now, { ...options, ...acceptUnknownOption(budget) });
   const reasons: string[] = [];
   const exceededActionClasses: ActionClass[] = [];
   if (budget.daily.maxCostUsd !== null && usage.daily.llmUnreservedCostRequests > 0) {
     reasons.push("USD exposure is unknown for prior dispatches without request reservations");
+  }
+  // The same test native admission makes, so status never says ok while the agent is refused.
+  const unknown = Math.max(usage.daily.blockingUnknownLlmTokenRequests, usage.minute.blockingUnknownLlmTokenRequests);
+  const unknownBlocked = budget.unknownTokenUsage !== "ALLOW_WITH_WARNING" && unknown > 0;
+  if (unknownBlocked) {
+    reasons.push(`new model requests are refused: ${unknown} earlier request(s) ended without a usage report and with no upper estimate to count instead (no output limit was set, or the record is older)`);
   }
 
   if (usage.minute.llmRequests > budget.perMinute.maxLlmRequests) {
@@ -367,10 +478,11 @@ export function evaluateBudgetStatus(workspace: string, agentId: string, now = D
   return {
     ok: reasons.length === 0,
     reasons,
+    next: budgetNextSteps(agentId, reasons, unknownBlocked),
     exceededActionClasses: [...new Set(exceededActionClasses)],
     usage,
     budgetConfigValid: true,
-    nativeAdmissionPolicy: nativeAdmissionPolicy(budget.unknownTokenUsage, budget.daily.maxCostUsd !== null)
+    nativeAdmissionPolicy: nativeAdmissionPolicy(budget.unknownTokenUsage, budget.daily.maxCostUsd !== null, budget.acceptUnknownUsageBefore ?? null)
   };
 }
 

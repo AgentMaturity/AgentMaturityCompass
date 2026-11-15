@@ -185,10 +185,10 @@ describe("runFrontDoor", () => {
   });
 
 
-  it("build an agent: starts AMC with the A4 preview on and opens the new-project page; a running AMC is left as it is", async () => {
+  it("build an agent: starts AMC (the A4 preview is on by default) and opens the new-project page; a running AMC is left as it is", async () => {
     const f = fake(["build"]);
     await runFrontDoor(f.io);
-    expect(f.amc).toEqual([["(chat env)", "up", "--no-baseline", "AMC_A4_PREVIEW=1"]]);
+    expect(f.amc).toEqual([["(chat env)", "up", "--no-baseline"]]);
     expect(f.opened).toEqual(["http://127.0.0.1:4000/console/a4?new=1"]);
     expect(f.lines.join("\n")).toContain("pick your industry");
     const running = fake(["build"], { origin: ["http://127.0.0.1:4000"], states: [state({ studioRunning: true })] });

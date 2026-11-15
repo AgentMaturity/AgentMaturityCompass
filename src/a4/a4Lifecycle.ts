@@ -83,10 +83,10 @@ function productionRows(state: A4ReadinessState, releaseId: string): BridgeContr
   return [
     row("assurance_pack_passing", null, null, "no assurance run artifact with a non-inconclusive VALID result is linked to this release (P0-19; the echo scenarios are P2-27)"),
     row("rollback_plan_validated", null, null, stagingRollback ? `rollback recorded by the operator, not checked by AMC: ${IDENTITY_NOT_EVALUATED}`
-      : "no staging rollback row is recorded, and AMC's check cannot pass before P2-40"),
+      : `no staging rollback row is recorded, and AMC's check cannot pass yet: ${IDENTITY_NOT_EVALUATED}`),
     row("monitoring_slo_enabled", null, null, "the SLO report is process-wide: it labels no agent, so no measurement is attributed to this agent's deployment"),
     row("operator_handoff_acknowledged", null, null, deployments.some((link) => link.body.deploymentKind === "deploy")
-      ? `the deploy row's AMC check cannot pass before P2-40: ${IDENTITY_NOT_EVALUATED}` : "no deploy row is recorded for this release")
+      ? `the deploy row's AMC check cannot pass yet: ${IDENTITY_NOT_EVALUATED}` : "no deploy row is recorded for this release")
   ];
 }
 

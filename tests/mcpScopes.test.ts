@@ -128,6 +128,56 @@ require('node:readline').createInterface({ input: process.stdin }).on('line', li
 });`;
 
 describe("real surfaces", () => {
+  it("amc mcp add --yes reviews, allows and signs in one step; sign reads AMC_VAULT_PASSPHRASE_FILE (H-07)", async () => {
+    const { workspace, home, dirs } = fixture();
+    const controls = temp("amc-mcp-scopes-controls-");
+    vi.stubEnv("AMC_CONTROL_CHECKPOINT_DIR", controls); vi.stubEnv("AMC_VAULT_PASSPHRASE", "mcp-scopes-fixture");
+    initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
+    initBudgets(workspace, "default"); writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
+    const log = join(workspace, "fixture.log"); writeFileSync(log, "");
+    const secrets = temp("amc-mcp-scopes-secret-"); chmodSync(secrets, 0o700);
+    const passFile = join(secrets, "pass"); writeFileSync(passFile, "mcp-scopes-fixture\n", { mode: 0o600 });
+    const env = { ...process.env, AMC_HOME: home, HOME: home, AMC_VAULT_PASSPHRASE: "", AMC_VAULT_PASSPHRASE_FILE: passFile,
+      AMC_CONTROL_CHECKPOINT_DIR: controls, AMC_NO_AUTO_REBUILD: "1", NO_COLOR: "1" };
+    const amc = (...args: string[]) => spawnSync(process.execPath, [join(process.cwd(), "dist", "cli.js"), "mcp", ...args], { cwd: workspace, encoding: "utf8", env });
+    const added = amc("add", "fixture", "--scope", "project", "--action-class", "READ_ONLY", "--yes", "--", process.execPath, "-e", SERVER, log);
+    expect(added.status, added.stderr + added.stdout).toBe(0);
+    expect(added.stdout).toContain("the server's own words");
+    expect(added.stdout).toContain("Use it: amc agent-loop chat --mcp fixture --tools workspace --approve-tools READ_ONLY");
+    expect(JSON.parse(amc("list", "--json").stdout).servers).toMatchObject([{ id: "fixture", reviewed: true, signatureValid: true, mountable: true }]);
+    const allowed = loadToolsConfig(workspace).tools.allowedTools.map((tool) => [tool.name, tool.actionClass]);
+    expect(allowed).toEqual(expect.arrayContaining([["tool_search", "READ_ONLY"], [nativeMcpToolName("fixture", "lookup"), "READ_ONLY"]]));
+    // `mcp sign` with only the passphrase file (it used to say the vault was locked).
+    const digest = JSON.parse(amc("list", "--json").stdout).servers[0].sha256 as string;
+    const signed = amc("sign", "fixture", "--scope", "project", "--expect-digest", digest);
+    expect(signed.status, signed.stderr + signed.stdout).toBe(0);
+    const cwd = process.cwd(); process.chdir(workspace);
+    try {
+      const out: string[] = [], errors: string[] = [], failures: number[] = [];
+      const program = new Command(); program.exitOverride();
+      registerAgentCommands(program, { log: line => out.push(line), error: line => errors.push(line), fail: () => failures.push(1) });
+      await program.parseAsync(["node", "amc", "agent-loop", "run", "hello", "--tools", "workspace", "--approve-tools", "READ_ONLY", "--credentials-home", home, "--json", "--mcp", "fixture"]);
+      expect(failures, errors.join("\n")).toEqual([]);
+    } finally { process.chdir(cwd); }
+    // The allowlist entries name this server, so action records name the adapter mcp:fixture.
+    expect(loadToolsConfig(workspace).tools.allowedTools.find((tool) => tool.name === nativeMcpToolName("fixture", "lookup"))?.context)
+      .toMatchObject({ kind: "mcp", server: { id: "fixture" } });
+    // An id the signed policy cannot carry is refused before anything is written.
+    const upper = amc("add", "Big", "--scope", "project", "--yes", "--", process.execPath, "-e", SERVER, log);
+    expect(upper.status).toBe(1); expect(upper.stderr).toContain("use a lowercase id");
+    expect(existsSync(join(dirs.project, "Big.json"))).toBe(false);
+    // A --force re-add that fails leaves the reviewed, signed server as it was.
+    const before = readFileSync(join(dirs.project, "fixture.json"));
+    const broken = amc("add", "fixture", "--scope", "project", "--force", "--yes", "--", join(workspace, "no-such-server"));
+    expect(broken.status).toBe(1); expect(broken.stderr).toContain("is unchanged");
+    expect(readFileSync(join(dirs.project, "fixture.json"))).toEqual(before);
+    expect(JSON.parse(amc("list", "--json").stdout).servers).toMatchObject([{ id: "fixture", reviewed: true, signatureValid: true, mountable: true }]);
+    // Without a terminal and without --yes nothing is allowed: the file is written unreviewed, as before.
+    const plain = amc("add", "other", "--scope", "project", "--", process.execPath, "-e", SERVER, log);
+    expect(plain.stdout).toContain("not yet reviewed");
+    expect(existsSync(join(dirs.project, "other.json.sig"))).toBe(false);
+  }, 120_000);
+
   it("amc mcp add, review, sign and run --mcp mount a project-scope server; an unsigned file is refused", async () => {
     const { workspace, home, dirs } = fixture();
     const controls = temp("amc-mcp-scopes-controls-");
