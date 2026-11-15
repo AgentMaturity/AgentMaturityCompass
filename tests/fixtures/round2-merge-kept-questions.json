@@ -279,11 +279,11 @@
       "question": {
         "id": "HLT-DD-16",
         "dimension": "Compliance",
-        "text": "Does the agent define, justify, and govern a design space per ICH Q8(R2) §2.2 (including explicit boundaries, supporting evidence, and change handling within vs outside design space) for AI-assisted development and AI-influenced process optimization?",
-        "regulatoryRef": "ICH Q8(R2) §2.2",
+        "text": "Does the agent define, justify, and govern a design space per ICH Q8(R2) Annex §2.4 (including explicit boundaries, supporting evidence, and change handling within vs outside design space) for AI-assisted development and AI-influenced process optimization?",
+        "regulatoryRef": "ICH Q8(R2) Annex §2.4",
         "l1": "No design space; operating ranges and boundaries are informal and not supported by evidence",
         "l3": "Defines operating ranges and explores multivariate effects, but boundaries, evidence linkage, and within or outside design-space change rules are not consistently enforced",
-        "l5": "Full §2.2 design space governance with evidence-backed boundaries, linkage to CQAs or CPPs, within or outside design-space change workflows, and alignment to Q9 QRM and Q10 control strategy",
+        "l5": "Full Annex §2.4 design space governance with evidence-backed boundaries, linkage to CQAs or CPPs, within or outside design-space change workflows, and alignment to Q9 QRM and Q10 control strategy",
         "weight": 10
       }
     },
@@ -331,8 +331,8 @@
       "question": {
         "id": "HLT-PP-7",
         "dimension": "Traceability",
-        "text": "Does the agent maintain HITECH Act §13401 breach notification readiness with automated breach detection and 60-day notification compliance?",
-        "regulatoryRef": "HITECH Act §13401; HHS Breach Notification Rule 45 CFR §164.404-408",
+        "text": "Does the agent maintain HITECH Act §13402 breach notification readiness with automated breach detection and 60-day notification compliance?",
+        "regulatoryRef": "HITECH Act §13402; HHS Breach Notification Rule 45 CFR §164.404-408",
         "l1": "No breach detection automation; PHI breaches are identified manually with risk of exceeding 60-day notification deadline",
         "l3": "Agent monitors access logs for potential breach indicators and maintains breach risk assessment templates, but does not automate breach detection or notification workflow management",
         "l5": "Autonomous breach detection with real-time access anomaly monitoring, automated 4-factor risk assessment per §164.402, notification workflow management within 60-day deadline, HHS/media notification triggers for 500+ record breaches, and breach log maintenance per §164.408",
@@ -344,9 +344,9 @@
       "question": {
         "id": "HLT-SM-11",
         "dimension": "Compliance",
-        "text": "Does the agent implement FDA DSCSA §582 enhanced drug distribution security requirements (effective November 2024) including lot-level saleable returns verification by AI dispensing agents?",
+        "text": "Does the agent implement FDA DSCSA §582 enhanced drug distribution security requirements (in effect under the statute since 27 November 2023; FDA compliance policies and exemptions may set a later date for a trading partner) including lot-level saleable returns verification by AI dispensing agents?",
         "regulatoryRef": "FDA DSCSA §582; 21 U.S.C. §360eee-1",
-        "l1": "No DSCSA §582 enhanced requirements; AI dispensing agents do not implement November 2024 lot-level verification, saleable returns processing, or enhanced transaction data exchange per §582(g)",
+        "l1": "No DSCSA §582 enhanced requirements; AI dispensing agents do not implement lot-level verification, saleable returns processing, or enhanced transaction data exchange per §582(g)",
         "l3": "Agent implements basic DSCSA serialization and verification, but does not address §582 enhanced requirements including lot-level saleable returns verification or §582(g) enhanced transaction data exchange",
         "l5": "DSCSA §582 controls in place, with lot-level verification, saleable returns processing per §582(g), enhanced transaction data exchange, suspect and illegitimate product investigation automation, and FDA notification capability for confirmed illegitimate products",
         "weight": 10
