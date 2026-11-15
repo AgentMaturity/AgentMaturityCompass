@@ -168,11 +168,12 @@ node quickstart.mjs        # a copy of examples/sdk/quickstart.mjs
 ```
 
 The quickstart starts `AMCNativeClient` on the stub provider, makes one governed `fs.write` call (`hello.txt`), then
-`closeAndVerify()` and prints the session id, the verification result and the receipt digest. `amc init` signs the
-default Action Policy, which runs an agent's EXECUTE calls as SIMULATE until it has a trusted diagnostic run at integrity
-0.6 or above, so on a fresh workspace the call is recorded as SIMULATE and `hello.txt` is not written (see
-"Reaching EXECUTE" in `docs/GOVERNOR.md`). An owner can instead sign a lower `requireRunIntegrityAtLeast` for a class
-once a sealed run exists; every decision made under it names the waiver. Every line is labelled
+`closeAndVerify()` and prints the session id, the verification result and the receipt digest. `amc init --coding`
+signs an Action Policy that runs a file edit or a shell command only after a person approves that call. The quickstart
+asks nobody, so its call is recorded as SIMULATE and `hello.txt` is not written. In chat
+(`amc agent-loop chat --provider stub --tools workspace --approval-mode default`) you are asked before each edit and
+command, and the one you approve runs (see `executeOnApproval` in `docs/GOVERNOR.md`). The file tools never read or
+write `.amc`, `.git` or common secret files such as `.env`, private keys and `.ssh`. Every line is labelled
 `[synthetic]`: the stub runs no model, so this is a demonstration of the governed path, never a real-model result.
 For a regulated starting point, `amc init --regulated` adds a `block` firewall, a signed approval preset and a signed,
 not yet active Layer 0 control plan (experimental). See [TypeScript SDK](sdk/TYPESCRIPT_SDK.md) for the API contract,
