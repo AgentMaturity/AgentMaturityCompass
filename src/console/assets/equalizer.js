@@ -28,7 +28,7 @@ async function main() {
 
   const [targetsEnvelope, gapEnvelope] = await Promise.all([
     apiGet("/mechanic/targets").catch(() => null),
-    apiGet("/mechanic/gap?scope=workspace").catch(() => null)
+    apiGet("/mechanic/gap?scope=workspace").catch((error) => (error?.status === 404 ? null : { refused: plainErrorText(error) }))
   ]);
   if (!targetsEnvelope?.targets?.mechanicTargets) {
     root.innerHTML = card("Target levels", "<p>The target levels could not be read. Refresh the page; if this stays, run amc mechanic targets in the workspace folder to see why.</p>");
@@ -58,7 +58,8 @@ async function main() {
         Measured levels come from your agent's records. The sliders set the level you want; they change nothing about the
         agent. A higher measured level needs new records after the work is done.
       </p>
-      ${gapEnvelope ? "" : "<p>No score yet, so every measured level shows 0. Run a score (amc run in the workspace folder) to fill them in.</p>"}
+      ${gapEnvelope?.refused ? `<p role="alert">${esc(gapEnvelope.refused)} Every measured level shows 0 until then.</p>`
+        : gapEnvelope ? "" : "<p>No score yet, so every measured level shows 0. Run a score (amc run in the workspace folder) to fill them in.</p>"}
       <div class="row wrap">
         <label><span class="muted">Why you are changing the targets (required)</span><input id="targetsReason" maxlength="500" /></label>
         <button id="targetsApplyBtn" data-roles="OWNER">Save target levels</button>

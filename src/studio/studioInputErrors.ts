@@ -1,3 +1,5 @@
+import { UnverifiedRecordError } from "../utils/unverifiedRecordError.js";
+
 /**
  * C-08: refusals about what the caller sent that some routes throw as plain Errors deep inside (an advisory, plugin,
  * registry or org role that does not exist, a file that is not there). They answer 404 or 400 with words a person can
@@ -19,10 +21,15 @@ export function studioInputError(pathname: string, error: unknown): { status: 40
   return null;
 }
 
-/** C-04: a run that needs a real agent to test, when none is set up, is a state the person can fix, not a server fault. */
+/**
+ * C-04: a run that needs a real agent to test, when none is set up, is a state the person can fix, not a server fault.
+ * So is a record a read refuses because it does not pass its signature check.
+ */
 export function studioSetupError(error: unknown): { status: 409; body: { error: string; code: string } } | null {
+  if (error instanceof UnverifiedRecordError) return { status: 409, body: { error: error.message, code: error.code } };
   const candidate = error as { code?: unknown; reason?: unknown; remediation?: unknown } | null;
   if (candidate?.code !== "AGENT_RESPONDER_UNAVAILABLE" || typeof candidate.reason !== "string") return null;
   const fix = typeof candidate.remediation === "string" ? ` ${candidate.remediation}` : "";
-  return { status: 409, body: { error: `Assurance needs a real agent to test, and none is set up: ${candidate.reason}.${fix}`, code: "AGENT_RESPONDER_UNAVAILABLE" } };
+  const fromConsole = " From the console: stop AMC Studio and start it again with AMC_ASSURANCE_MODEL set to the model your agent uses, or run amc assurance run --model <model> in the workspace folder.";
+  return { status: 409, body: { error: `Assurance needs a real agent to test, and none is set up: ${candidate.reason}.${fix}${fromConsole}`, code: "AGENT_RESPONDER_UNAVAILABLE" } };
 }

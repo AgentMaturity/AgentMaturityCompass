@@ -2,6 +2,7 @@ import { apiGet, showSignIn, whoami } from "./api.js";
 import { renderGapTable } from "./components/gapTable.js";
 import { renderHandholdingSteps } from "./components/handholdingSteps.js";
 import { recordRows } from "./pageKit.js";
+import { plainErrorText } from "./plainError.js";
 
 function esc(value) {
   return String(value ?? "")
@@ -48,11 +49,16 @@ async function main() {
   status.textContent = `Signed in as ${user.username ?? user.userId ?? "user"}`;
 
   const [gapEnvelope, scheduler, readiness] = await Promise.all([
-    apiGet("/mechanic/gap?scope=workspace").catch(() => null),
+    // 404: no score yet. A refusal (a record that does not pass its signature check) is shown in its own words.
+    apiGet("/mechanic/gap?scope=workspace").catch((error) => (error?.status === 404 ? null : { refused: plainErrorText(error) })),
     apiGet("/forecast/scheduler/status").catch(() => null),
     apiGet("/readyz").catch(() => null)
   ]);
   const gap = gapEnvelope?.gap;
+  if (gapEnvelope?.refused) {
+    root.innerHTML = card("Mechanic Workbench", `<p role="alert">${esc(gapEnvelope.refused)}</p>`);
+    return;
+  }
   if (!gap) {
     root.innerHTML = card("Mechanic Workbench", "<p>No score yet, so there is no gap to show. Run a score first (amc run in the workspace folder); this page then compares it with your <a href='./equalizer'>target levels</a>.</p>");
     return;

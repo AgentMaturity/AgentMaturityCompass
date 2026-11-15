@@ -5,6 +5,7 @@ import { resolveAgentId } from "../../fleet/paths.js";
 import { createAgentTransformPlanForApi, createAgentTransformPlanForApiAsync } from "../../transformation/transformApi.js";
 import { deriveAutoAnswerResults } from "./autoAnswerEvidenceQueries.js";
 import { latestDisplayRun } from "../runReportResolution.js";
+import { UnverifiedRecordError } from "../../utils/unverifiedRecordError.js";
 import type { DiagnosticReport } from "../../types.js";
 
 export interface AutoAnswerOutput {
@@ -80,8 +81,13 @@ function autoAnswerOutput(agentId: string, report: DiagnosticReport, transformPl
   };
 }
 
-/** The auto-answer view of the agent's latest recorded run, for reading only: it runs nothing and writes nothing. Null when there is no run yet. */
+/**
+ * The auto-answer view of the agent's latest recorded run, for reading only: it runs nothing and writes nothing. Null
+ * when there is no run yet. A run whose seal does not verify (edited or unsigned) is refused, never shown as trusted.
+ */
 export function autoAnswerFromLatestRun(workspace: string, agentId?: string): AutoAnswerOutput | null {
   const resolved = resolveAgentId(workspace, agentId), latest = latestDisplayRun(workspace, resolved);
-  return latest ? autoAnswerOutput(resolved, latest.report, { created: false, planId: null, next3Tasks: [] }) : null;
+  if (!latest) return null;
+  if (!latest.verified) throw new UnverifiedRecordError("RUN_UNVERIFIED", "The latest score record does not pass its signature check, so it is not shown. Run a new score.");
+  return autoAnswerOutput(resolved, latest.report, { created: false, planId: null, next3Tasks: [] });
 }
