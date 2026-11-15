@@ -37,9 +37,24 @@ Both raw canonical results and final rendered output are limited to 256 KiB. Typ
 
 Resource calls revalidate the catalog before dispatch. Reads also check catalog and HTTP recovery generation before publishing their result. Resource-list notifications invalidate grants, including notifications consumed inside HTTP response streams. Changed catalogs require operator review and a fresh mount. A read failure returns an explicit failed result; it does not fabricate empty or successful content. Request cancellation and deadlines use the existing mount lifecycle.
 
+## Add a server in one step
+
+```sh
+amc mcp add github --scope project -- /absolute/path/to/server --flag
+```
+
+At a terminal this is the whole job. AMC starts the server once, lists its tools and asks `Allow 3 tools as WRITE_HIGH? Type yes to sign, anything else to stop`. On `yes` it pins the catalog digest and one grant per tool in `.amc/mcp/github.json`, adds each tool's AMC name and `tool_search` to the signed tool policy (`.amc/tools.yaml`), and signs the project file. Then use it with the command it prints, for example `amc agent-loop chat --mcp github --tools workspace --approve-tools WRITE_HIGH`.
+
+- What the server says about itself (tool names, descriptions, instructions for the model) is shown with every control, bidi and invisible character written as `\uXXXX`. It is the server's text, never an instruction from you, and AMC never uses it to decide what a tool may do. A tool whose name has such characters is not allowed.
+- Every allowed tool gets the same action class: `WRITE_HIGH` unless you pass `--action-class`, so each call goes through your Action Policy and asks for approval like the agent's own shell commands. Pass `--action-class READ_ONLY` only for a server you know only reads. `--tool <name>` (repeatable) allows only the tools you name.
+- `--yes` answers the question for a script; the review is still printed. Without a terminal and without `--yes`, `amc mcp add` writes the file unreviewed, as before, and prints the steps below.
+- If the server later changes its tools, AMC refuses to start it until you run `amc mcp add` for it again with `--force`.
+- The tool policy is per folder. A user-scope server (`--scope user`) is allowed in the folder where you add it; in another folder run the same command there with `--force`.
+- The server's resources are not allowed by this step; grant `resources/list` or `resources/read` by hand as described above.
+
 ## CLI configuration
 
-Create an explicit JSON file with one local server:
+The steps `amc mcp add` takes for you, by hand. Create an explicit JSON file with one local server:
 
 ```json
 {
@@ -60,7 +75,18 @@ Replace the executable and credential reference with your actual configuration. 
 amc agent-loop mcp-catalog --config mcp.json --json
 ```
 
-Discovery starts that program and disposes it after reading the catalog. Review its returned digest, original tool names and generated allowlist names. Add `expectedCatalogDigest` and `grants` to the same file. Each grant has the original remote `name` and an explicit AMC `actionClass`; do not copy a server's suggestion as an authority decision. The signed tool allowlist must independently admit each generated name under that same action class.
+Discovery starts that program and disposes it after reading the catalog. Review its returned digest, original tool names and generated allowlist names. Add `expectedCatalogDigest` and `grants` to the same file, at the top level next to `server` (inside `server` they make the file invalid):
+
+```json
+{
+  "schemaVersion": 1,
+  "server": { "id": "local-tools", "command": "/absolute/path/to/server" },
+  "expectedCatalogDigest": "<digest from mcp-catalog>",
+  "grants": [{ "name": "lookup", "actionClass": "READ_ONLY" }]
+}
+```
+
+Each grant has the original remote `name` and an explicit AMC `actionClass`; do not copy a server's suggestion as an authority decision. The signed tool allowlist (`.amc/tools.yaml`, signed with `amc tools sign`) must independently admit each generated name (`amcToolName` in the catalog output) under that same action class, and must also allow `tool_search` as `READ_ONLY`: MCP tools are deferred, and the model loads them through `tool_search`. Without it a run stops with "Deferred MCP tools require native tool_search as READ_ONLY in the signed allowlist".
 
 Pass the reviewed file to `agent-loop run` or `agent-loop chat` with `--mcp-config mcp.json`, `--tools workspace` and the matching `--approve-tools <action-class>`. Choose provider/model/task explicitly as in the [native guide](START_HERE.md). All grants in one invocation must use the approval action class; use separate runs for different classes. `agent-loop run` accepts `--mcp-config` more than once to mount several servers under that same review: each file has its own pinned digest and grants, server ids must differ, and `--mcp-config-sha256`, when given, is repeated once per file in the same order. Chat pins the configuration bytes at startup and refuses later changes until the operator restarts it.
 
@@ -68,11 +94,12 @@ The stdio path was qualified on installed candidate `90855cf7` through native CL
 
 ## Scopes: `amc mcp add|remove|list|get|sign` and `--mcp <id>`
 
-Instead of a path on every run, a reviewed file can live in a scope: the user scope `<AMC home>/mcp/<id>.json` (`~/.config/amc/mcp`, or `$AMC_HOME/mcp`, the same home as the OAuth token store; `--credentials-home` selects another) or the project scope `<workspace>/.amc/mcp/<id>.json`. The file format is exactly the one above, and `--mcp <id>` on `agent-loop run`, `agent-loop chat` and `amc acp` resolves the id to that file and its current sha256 and hands both to the unchanged `--mcp-config` review. A scoped mount therefore needs everything an explicit one needs: `expectedCatalogDigest`, `grants`, and the generated names in the signed tool allowlist.
+Instead of a path on every run, a reviewed file can live in a scope: the user scope `<AMC home>/mcp/<id>.json` (`~/.config/amc/mcp`, or `$AMC_HOME/mcp`, the same home as the OAuth token store; `--credentials-home` selects another) or the project scope `<workspace>/.amc/mcp/<id>.json`. The file format is exactly the one above, and `--mcp <id>` on `agent-loop run`, `agent-loop chat` and `amc acp` resolves the id to that file and its current sha256 and hands both to the unchanged `--mcp-config` review. A scoped mount therefore needs everything an explicit one needs: `expectedCatalogDigest`, `grants`, and the generated names and `tool_search` in the signed tool allowlist (`amc mcp add` at a terminal writes all three). `amc mcp list` names each file it cannot read and why.
 
 ```sh
-amc mcp add github --scope project -- /absolute/path/to/server --flag        # stdio; or --transport streamable-http --url … --origin …
-amc agent-loop mcp-catalog --mcp-config .amc/mcp/github.json                 # review; then write expectedCatalogDigest and grants into the file
+amc mcp add github --scope project -- /absolute/path/to/server --flag        # at a terminal: review, allow and sign in one step
+# without a terminal and without --yes, by hand:
+amc agent-loop mcp-catalog --config .amc/mcp/github.json                     # review; then write expectedCatalogDigest and grants at the top level of the file
 amc mcp sign github --scope project --expect-digest <sha256 from amc mcp list> # project scope only: BUNDLE signature over exactly the reviewed bytes
 amc mcp list --json                                                          # scope, path, sha256, transport, reviewed, signatureValid, mountable; never secrets
 amc agent-loop run --mcp github --tools workspace --approve-tools READ_ONLY "…"
@@ -84,7 +111,7 @@ Rules, each one deliberate:
 - A project file must carry a valid `<file>.sig` BUNDLE signature (`amc mcp sign`), verified over the exact bytes that were parsed and pinned (never a second read of the path) against the workspace keyset, which is adopted on first use like every other workspace signature; a changed file loses both its pin and its signature. A user file must be your own private file: owned by you, not group- or world-writable, in a directory with the same properties.
 - `server.id` must equal the file name. Ids are 1 to 32 of `[A-Za-z0-9_-]`; on a case-insensitive filesystem choose ids that differ in more than case.
 - No `${VAR}` expansion: `envRefs` and `headerRefs` already keep credential values out of the file.
-- `amc mcp add` validates the file before it lands (a rejected add leaves nothing behind, and `--force` never replaces a valid file with an invalid one) and creates the user-scope directory owner-only whatever your umask. `amc mcp sign` signs only bytes whose sha256 equals `--expect-digest`, and the `.sig` is read through the same bounded non-blocking reader as the config, so a FIFO or an oversize sidecar cannot hang admission. `amc mcp add` writes an unreviewed file and prints the review steps. `mountable` in `amc mcp list` means reviewed and (for the project scope) signed; the allowlist is checked at mount, not here. `amc mcp list` shows an OAuth server's `auth.kind` and scopes from the file, not token state.
+- `amc mcp add` validates the file before it lands (a rejected add leaves nothing behind, and `--force` never replaces a valid file with an invalid one) and creates the user-scope directory owner-only whatever your umask. `amc mcp sign` signs only bytes whose sha256 equals `--expect-digest`, and the `.sig` is read through the same bounded non-blocking reader as the config, so a FIFO or an oversize sidecar cannot hang admission. Without a terminal and without `--yes`, `amc mcp add` writes an unreviewed file and prints the review steps. `mountable` in `amc mcp list` means reviewed and (for the project scope) signed; the allowlist is checked at mount, not here. `amc mcp list` shows an OAuth server's `auth.kind` and scopes from the file, not token state.
 - The SDK's `AMCNativeClient` does not expose the ids yet; pass `mcpConfig` paths and pins as before (`amc acp --mcp <id>` works when you start the ACP server yourself).
 
 ## Streamable HTTP configuration

@@ -1,7 +1,11 @@
 import { readFileSync } from "node:fs";
 import type { Command } from "commander";
+import { isActionClass } from "../governor/actionCatalog.js";
 import { prepareFileSignatureWithAuditor } from "../org/orgSigner.js";
 import { NativeMcpConfigError, type NativeMcpConfiguration } from "../setup/nativeMcpConfig.js";
+import type { ActionClass } from "../types.js";
+import { jsonForTerminal, MCP_ADD_DEFAULT_CLASS } from "./mcpAddReview.js";
+import { reviewAndAllowMcpServer } from "./mcpAddReviewCli.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import {
@@ -9,9 +13,12 @@ import {
 } from "./mcpScopes.js";
 
 /**
- * `amc mcp add | remove | list | get | sign` (SH-EXT-02). `add` writes an UNREVIEWED file: mounting still needs the
- * catalog reviewed (`amc agent-loop mcp-catalog --mcp-config <path>`), `expectedCatalogDigest` and `grants` written
- * into the file, the generated tool names in the signed allowlist, and for the project scope `amc mcp sign`.
+ * `amc mcp add | remove | list | get | sign` (SH-EXT-02). At a terminal, or with `--yes`, `add` is one confirmed step
+ * (mcpAddReview.ts): it starts the server, shows its tools, and on a yes writes the reviewed file, adds the tools to the
+ * signed allowlist and signs a project file. Without a terminal and without `--yes` it writes an UNREVIEWED file as
+ * before; mounting it then needs the catalog reviewed (`amc agent-loop mcp-catalog --config <path>`),
+ * `expectedCatalogDigest` and `grants` at the top level of the file, the generated tool names and `tool_search` in the
+ * signed allowlist, and for the project scope `amc mcp sign`.
  */
 
 const collect = (value: string, previous: string[] = []) => [...previous, value];
@@ -37,9 +44,12 @@ export function registerMcpScopeCommands(mcp: Command): void {
     .option("--header-ref <Name=credentialRef>", "streamable-http: header resolved from an AMC credential reference; repeatable", collect)
     .option("--timeout-ms <n>", "per-request timeout")
     .option("--credentials-home <dir>", "AMC home for the user scope").option("--force", "replace an existing file or create a cross-scope collision")
+    .option("--action-class <class>", `how AMC treats every allowed tool (default ${MCP_ADD_DEFAULT_CLASS}: each call asks for approval); READ_ONLY only for a server you know only reads`)
+    .option("--tool <name>", "allow only this tool of the server; repeatable (default: all of its tools)", collect)
+    .option("--yes", "allow the tools without the question (the review is still printed); without a terminal and without --yes the file is written unreviewed")
     .option("--json", "machine-readable output")
-    .action((id: string, command: string[], opts: { scope?: string; transport?: string; url?: string; origin?: string; envRef?: string[]; headerRef?: string[];
-      timeoutMs?: string; credentialsHome?: string; force?: boolean; json?: boolean }) => {
+    .action(async (id: string, command: string[], opts: { scope?: string; transport?: string; url?: string; origin?: string; envRef?: string[]; headerRef?: string[];
+      timeoutMs?: string; credentialsHome?: string; force?: boolean; actionClass?: string; tool?: string[]; yes?: boolean; json?: boolean }) => {
       try {
         const refs = (pairs: string[] | undefined) => pairs === undefined ? {} : Object.fromEntries(pairs.map(pair => {
           const at = pair.indexOf("="); if (at <= 0) throw new McpScopeError(`${pair}: expected NAME=credentialRef.`); return [pair.slice(0, at), pair.slice(at + 1)];
@@ -56,10 +66,19 @@ export function registerMcpScopeCommands(mcp: Command): void {
           if (opts.url !== undefined || opts.origin !== undefined || opts.headerRef !== undefined) throw new McpScopeError("stdio takes no --url, --origin or --header-ref.");
           server = { id, command: command[0]!, ...(command.length > 1 ? { args: command.slice(1) } : {}), ...(opts.envRef === undefined ? {} : { envRefs: refs(opts.envRef) }), ...timeout };
         }
-        const written = writeScopedMcpConfig(dirsFor(opts), scopeOf(opts.scope), { schemaVersion: 1, server }, opts.force === true);
-        const next = [`Review the catalog: amc agent-loop mcp-catalog --mcp-config ${written.path}`, "Add expectedCatalogDigest and grants to the file, and the generated tool names to the signed allowlist.",
-          ...(opts.scope === "project" ? [`Sign it: amc mcp sign ${id} --scope project --expect-digest <sha256 from amc mcp list>`] : []), `Mount it: amc agent-loop run --mcp ${id} --tools workspace --approve-tools READ_ONLY ...`];
-        if (opts.json) console.log(JSON.stringify({ ok: true, id, scope: opts.scope, ...written, reviewed: false, next }, null, 2));
+        const actionClass = opts.actionClass ?? MCP_ADD_DEFAULT_CLASS;
+        if (!isActionClass(actionClass)) throw new McpScopeError(`--action-class ${JSON.stringify(actionClass)} is not an action class (READ_ONLY, WRITE_LOW, WRITE_HIGH, ...).`);
+        const scope = scopeOf(opts.scope), config: NativeMcpConfiguration = { schemaVersion: 1, server };
+        const written = writeScopedMcpConfig(dirsFor(opts), scope, config, opts.force === true);
+        if (opts.yes === true || (process.stdin.isTTY === true && opts.json !== true)) {
+          await reviewAndAllowMcpServer({ workspace: process.cwd(), dirs: dirsFor(opts), scope, config, path: written.path, actionClass: actionClass as ActionClass,
+            only: opts.tool, yes: opts.yes === true, json: opts.json === true, ...(opts.credentialsHome === undefined ? {} : { credentialsHome: opts.credentialsHome }) });
+          return;
+        }
+        const next = [`Review and allow its tools in one step: run this command again at a terminal with --force, or add --yes after reading what it prints.`,
+          `Or by hand: amc agent-loop mcp-catalog --config ${written.path}; then put "expectedCatalogDigest" and "grants" at the top level of the file (next to "server", not inside it); add each generated tool name and tool_search (READ_ONLY) to .amc/tools.yaml and run amc tools sign.`,
+          ...(scope === "project" ? [`Sign it: amc mcp sign ${id} --scope project --expect-digest <sha256 from amc mcp list>`] : []), `Use it: amc agent-loop chat --mcp ${id} --tools workspace --approve-tools <the action class of its grants>`];
+        if (opts.json) console.log(JSON.stringify({ ok: true, id, scope, ...written, reviewed: false, next }, null, 2));
         else console.log([`Wrote ${written.path} (sha256 ${written.sha256}); not yet reviewed.`, ...next.map(line => `- ${line}`)].join("\n"));
       } catch (error) { fail(error, opts.json === true); }
     });
@@ -90,7 +109,7 @@ export function registerMcpScopeCommands(mcp: Command): void {
           for (const server of servers) console.log(`${server.scope}:${server.id} ${server.transport} ${server.reviewed ? "reviewed" : "unreviewed"}${server.scope === "project" ? (server.signatureValid ? " signed" : " unsigned") : ""} ${server.path} sha256=${server.sha256}`);
           for (const id of ambiguous) console.log(`${id} exists in both scopes: --mcp must say project:${id} or user:${id}`);
           for (const problem of listed.problems) console.error(`${problem.scope}: ${problem.path}: ${problem.reason}`);
-          if (servers.length === 0) console.log("No scoped MCP servers.");
+          if (servers.length === 0) console.log(listed.problems.length === 0 ? "No scoped MCP servers." : "No usable MCP servers: each file above could not be read, for the reason after its path.");
         }
         if (listed.problems.length > 0) process.exitCode = 1;
       } catch (error) { fail(error, opts.json === true); }
@@ -102,7 +121,7 @@ export function registerMcpScopeCommands(mcp: Command): void {
       try {
         const [entry] = resolveScopedMcpSelection(process.cwd(), [selection], dirsFor(opts)).entries;
         if (opts.json) console.log(JSON.stringify({ ok: true, ...entry }, null, 2));
-        else console.log(`${entry!.scope}:${entry!.id} ${entry!.path} sha256=${entry!.sha256} ${entry!.reviewed ? "reviewed" : "unreviewed"}\n${JSON.stringify(entry!.config, null, 2)}`);
+        else console.log(`${entry!.scope}:${entry!.id} ${entry!.path} sha256=${entry!.sha256} ${entry!.reviewed ? "reviewed" : "unreviewed"}\n${jsonForTerminal(entry!.config)}`);
       } catch (error) { fail(error, opts.json === true); }
     });
   mcp.command("sign <id>")

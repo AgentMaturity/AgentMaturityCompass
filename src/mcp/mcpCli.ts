@@ -36,9 +36,9 @@ const GENERIC_CONFIG = {
 };
 
 // Claude Code reads a project's MCP servers from `.mcp.json` in the project root (https://code.claude.com/docs/en/mcp,
-// read 2026-11-14); it does not read `.claude/mcp.json`. `claude mcp add --scope project` writes the same file.
+// read 2026-11-15); it does not read `.claude/mcp.json`. `claude mcp add --scope project` writes the same file.
 const IDE_CONFIGS: Record<string, { file: string; config: unknown; command?: string }> = {
-  "Claude Code": { file: ".mcp.json", config: CLAUDE_CODE_CONFIG, command: "claude mcp add --scope project amc -- amc mcp serve" },
+  "Claude Code": { file: ".mcp.json", config: CLAUDE_CODE_CONFIG, command: "claude mcp add --transport stdio --scope project amc -- amc mcp serve" },
   "Cursor": { file: ".cursor/mcp.json", config: CURSOR_CONFIG },
   "Windsurf": { file: ".windsurf/mcp.json", config: CURSOR_CONFIG },
   "VS Code Copilot": { file: ".vscode/mcp.json", config: CURSOR_CONFIG },
