@@ -13,9 +13,10 @@ import { reviewRefusals } from "./assembleBuild.js";
 
 /**
  * The next gate of the viewed stage while none is open: proposed → direction, reviewed → completion. `eligible` counts
- * as readiness's `sod` item does once the gate is open: the deciders (approver or owner members, local workspace OWNERs; on a
- * regulated project the members alone) less the caller as requester, the revision's authors and, at completion, its builders;
- * one self-approving user counts once.
+ * as readiness's `sod` item does once the gate is open, as if an author asks: the deciders (approver or owner members, local
+ * workspace OWNERs; on a regulated project the members alone) less the revision's authors and, at completion, its builders.
+ * The viewer is not left out for being the viewer: an approver who reads the page before the owner asks is one who can decide.
+ * One self-approving user counts once.
  */
 function nextGateOf(state: A4ReadinessState, query: A4ReadinessQuery, readiness: A4ReadinessV1): A4ReadinessV1["nextGate"] {
   const { project } = state;
@@ -26,7 +27,7 @@ function nextGateOf(state: A4ReadinessState, query: A4ReadinessQuery, readiness:
   const { rule, rolesAllowed, required } = gateQuorum(query, query.stage, gate);
   const roleVote = rule.requiredReviews.find((entry) => entry.kind === "role_vote" && entry.role !== undefined)?.role ?? null;
   const principal: A4Principal | null = query.principal;
-  const excluded = new Set([...(principal ? [principal.key] : []), ...authorsOf(state.chain, { gate, revisionNo: project.revision_no }),
+  const excluded = new Set([...authorsOf(state.chain, { gate, revisionNo: project.revision_no }),
     ...(gate === "completion" ? buildersOf(state.chain, project.revision_no) : [])]);
   const regulated = isRegulated(state, query.floor);
   const deciders = regulated ? new Set(state.members.filter((member) => member.roles.includes("approver") || member.roles.includes("owner")).map((member) => member.principalKey))

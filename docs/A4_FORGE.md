@@ -274,7 +274,8 @@ files read unsigned until that verifier admits the pinned notary.
   not made, since readiness cannot read host users' roles, and a host OWNER who is not signed in is not counted.
   Studio's readiness (`GET …/readiness`, `GET …/projects/<id>`) also carries `nextGate` before the stage's gate is
   requested: its `required` approvals, `rolesAllowed`, the `roleVote` one approver must hold (AUDITOR at Adapt's
-  completion) and `eligible`, the same count made with the caller as the requester (members only on a regulated project).
+  completion) and `eligible`, the same count made as if an author of the revision asks, so an approver who opens the page
+  before the request still counts (members only on a regulated project).
   It is guidance for the panel, never a rule: the request records its own quorum, and nothing about who may approve
   changes.
 
