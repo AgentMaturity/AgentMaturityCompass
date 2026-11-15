@@ -3,6 +3,7 @@ import type { Command } from "commander";
 import type { AgentToolsetOptions } from "../agent/agentToolset.js";
 import type { AgentStatus } from "../agent/loopTypes.js";
 import { readAgentRunSummary, renderRunSummary } from "../agent/runReport.js";
+import { renderNativeInteractiveToolResults } from "../setup/nativeInteractiveResults.js";
 import { describeRunLimit, type RunLimitBreach } from "../agent/runLimits.js";
 import { executionStatusFor } from "../execution/executionStatus.js";
 import { renderNativeVerifyHint } from "../setup/nativeFirstUseGuide.js";
@@ -128,6 +129,8 @@ export function resolveBreadthRun(io: AgentLoopCliIo, opts: RunOptions, context:
       if (context.output?.sink) context.output.sink.result({ ...report, exitCode, ...(goal === undefined ? {} : { goalRounds: goal }) });
       else io.log(opts.json ? JSON.stringify({ ...summary, ...(goal === undefined ? {} : { goalRounds: goal, goalReceiptStates: report.goalReceiptStates }), ...(workflow === undefined ? {} : { workflow }), ...(report.runLimit === undefined ? {} : { runLimit: report.runLimit }), execution, exitCode }, null, 2) : renderRunSummary(summary));
       if (!opts.json) {
+        // M-01: each tool call of the turn as one line with its recorded result or failure.
+        if (!context.output?.sink) for (const line of renderNativeInteractiveToolResults(process.cwd(), summary.sessionId)) io.log(line);
         if (goal !== undefined) {
           io.log(`Goal rounds: ${goal.rounds} run, stopped by ${goal.stoppedBy} (${goal.reason}). Each round is a delegated child session in this session's log.`);
           if (goal.lastText) io.log(goal.lastText);
