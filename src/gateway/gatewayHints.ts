@@ -16,13 +16,15 @@ export function droppedKeyNote(upstreamId: string, auth: UpstreamAuth): string {
 }
 
 /**
- * The upstream named in a failed request's error body, with the next step, and `connectFailed` when every attempt
- * failed before its connection opened: no byte reached the upstream, so budgets count the request as costing nothing.
+ * The upstream named in a failed request's error body, with the next step, and `connectFailed` only when no upstream
+ * response was obtained, every attempt failed before its connection opened and the error that ended the request is
+ * itself such a failure: then no byte reached the upstream, so budgets count the request as costing nothing.
  */
-export function upstreamFailure(target: { id: string; origin: string } | null, failures: readonly unknown[]):
-  { connectFailed?: string; body: Record<string, string> } {
-  const connectFailed = failures.length > 0 && failures.every(failure => connectFailureCode(failure) !== undefined)
-    ? connectFailureCode(failures.at(-1)) : undefined;
+export function upstreamFailure(target: { id: string; origin: string } | null,
+  outcome: { responded: boolean; failures: readonly unknown[]; thrown: unknown }): { connectFailed?: string; body: Record<string, string> } {
+  const { responded, failures, thrown } = outcome;
+  const connectFailed = !responded && failures.length > 0 && failures.every(failure => connectFailureCode(failure) !== undefined)
+    ? connectFailureCode(thrown) : undefined;
   if (target === null) return { ...(connectFailed === undefined ? {} : { connectFailed }), body: {} };
   return {
     ...(connectFailed === undefined ? {} : { connectFailed }),

@@ -1053,7 +1053,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
 
     let leaseVerified = false; // SR-3: a failure before the lease verified is logged, never a ledger row
     const upstreamFailures: unknown[] = [];
-    let upstreamTarget: { id: string; origin: string } | null = null;
+    let upstreamTarget: { id: string; origin: string } | null = null, upstreamResponded = false; // responded: never "not sent"
     try {
       const hostForUrl = req.headers.host ?? `${resolvedConfig.listen.host}:${resolvedConfig.listen.port}`;
       const incomingUrl = new URL(req.url ?? "/", `http://${hostForUrl}`);
@@ -1426,6 +1426,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         retryNonIdempotent: resilience.retryNonIdempotent,
         lookup: pinnedLookup(upstreamEgress.addresses), signal: fence.signal, failures: upstreamFailures
       });
+      upstreamResponded = true;
       const droppedClientKey = strippedAuth.hadCredential && [401, 403].includes(upstreamResponse.statusCode ?? 0); // QA M-07
       if (droppedClientKey) logger.error(`gateway: request ${requestId}: HTTP ${upstreamResponse.statusCode}. ${droppedKeyNote(route.upstream, upstreamResolved.auth)}`);
 
@@ -1519,7 +1520,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
     } catch (error) {
       logger.error(`gateway error (request ${requestId}): ${withoutUrlQueries(String(error))}`);
       const status = gatewayErrorStatusCode(error);
-      const failure = upstreamFailure(upstreamTarget, upstreamFailures);
+      const failure = upstreamFailure(upstreamTarget, { responded: upstreamResponded, failures: upstreamFailures, thrown: error });
       const body = { ...gatewayErrorBody(error), ...failure.body };
       if (leaseVerified) appendEvidence({ eventType: "gateway",
         payload: JSON.stringify({ request_id: requestId, status, error: error instanceof Error ? error.message : String(error) }),
