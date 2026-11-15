@@ -56,7 +56,7 @@ const IN_RECORD = "This is stored as written in the project's record, not in its
 let notNow = null; // while collectNotNow renders: the actions that cannot be taken now, each with its reason in words
 export function actionButton(label, action, allowed, attributes = "") {
   const ok = allowed?.allowed === true;
-  const why = allowed?.reasonCodes?.length ? reasonsText(allowed.reasonCodes) : allowed?.note ?? "Not available at this point.";
+  const why = allowed?.reasonCodes?.length ? reasonsText(allowed.reasonCodes) : allowed?.note ?? "AMC does not offer this now: What to do now, at the top of the page, names the next step.";
   const button = `<button type="button" data-a4-action="${esc(action)}" ${attributes}${ok ? "" : ` disabled title="${esc(why)}"`}>${esc(label)}</button>`;
   if (ok || notNow === null) return button;
   // A button on one row (an answer, an item) keeps its place and says why beside it; any other moves to the card's More list.
@@ -83,7 +83,7 @@ const notNowList = (rows) => (rows.length ? `<p class="muted">Not open now, and 
  * plain words. A lowercase code is a readiness item's id. The code itself follows in parentheses.
  */
 const REASON_TEXT = {
-  A4_STEP_ORDER: "Not yet: finish the earlier steps of this stage first.",
+  A4_STEP_ORDER: "Not at this step: a stage's steps run in order, and this one is not the next.",
   A4_GATE_OPEN: "An approval request is already open for this step; approvers decide it in the Approvals card.",
   A4_GATE_DENIED: "This revision was denied: save an answer under Ask to start a new revision.",
   SOD_VIOLATION: "You cannot approve this yourself (separation of duties): another approver must. You may still deny it.",
@@ -221,9 +221,21 @@ const STEP_FROM = { answers: null, understand: ["asked"], explain: ["understood"
   review: ["built"], "request-direction": ["proposed"], "request-completion": ["reviewed"] };
 /** `offer` held, with `codes` added to Studio's reason codes. */
 const refuse = (offer, ...codes) => ({ allowed: false, reasonCodes: [...new Set([...(offer?.reasonCodes ?? []), ...codes])] });
+/** Why a step route is not open, in words: the viewed stage is over or not begun, or this stage is past (or short of) the step. */
+function stepOrderHold(ctx, from) {
+  const viewed = STAGES.indexOf(ctx.stage), now = STAGES.indexOf(ctx.project.stage);
+  if (viewed !== now) {
+    const where = `the project is at ${STAGE_PLAIN[ctx.project.stage] ?? ctx.project.stage} now`;
+    return held(`${viewed < now ? "This stage is finished" : "This stage has not started yet"}: ${where}. (A4_STEP_ORDER)`);
+  }
+  if (from !== null && STEPS.indexOf(from[0]) < STEPS.indexOf(ctx.project.step))
+    return held("Already done at this stage. To do it again, change an answer under Ask; the stage's steps then start again. (A4_STEP_ORDER)");
+  return null;
+}
 export function stepOffer(offer, ctx, route) {
   const from = STEP_FROM[route];
-  if (ctx.project.stage !== ctx.stage || (from !== null && !from.includes(ctx.project.step))) return refuse(offer, "A4_STEP_ORDER");
+  if (ctx.project.stage !== ctx.stage || (from !== null && !from.includes(ctx.project.step)))
+    return stepOrderHold(ctx, from) ?? refuse(offer, "A4_STEP_ORDER");
   return (route === "propose" && offer?.allowed === true && askHold(ctx)) || offer;
 }
 /**
@@ -442,7 +454,12 @@ const SPEC_PARTS = { answers: "the answers", brief: "the brief", build: "what wa
 export function renderDifferences(diff, project) {
   if (project.revisionNo < 2) return `<p class="muted">This is the first version, so there is nothing to compare yet.</p>`;
   const changed = Array.isArray(diff?.changed) ? diff.changed : [];
-  const parts = [...new Set(changed.map((row) => String(row?.path ?? "").split(".")[1]).filter(Boolean))].map((part) => SPEC_PARTS[part] ?? part);
+  // Studio's paths are spec.<part>... or resources.<slot>... (src/a4/a4Router.ts /revisions/diff); the paths stay in the record.
+  const partOf = (path) => {
+    const [root, part] = String(path ?? "").split(".");
+    return root === "resources" ? "the agent's files" : SPEC_PARTS[part] ?? "other parts of the specification";
+  };
+  const parts = [...new Set(changed.map((row) => partOf(row?.path)))];
   return `<p>${changed.length ? `${changed.length} change(s) from version ${esc(diff.from ?? project.revisionNo - 1)} to version ${esc(diff.to ?? project.revisionNo)}, in ${esc(parts.join(", "))}.`
     : "Nothing in the plan changed from the version before."}</p>${record(renderPromptDiffViewer(isObject(diff) ? { status: "ok", ...diff } : null), "diff")}`;
 }
@@ -688,6 +705,8 @@ export function effectHold(met, readiness) {
     : `Project approvers approve the effect gate's request on the stage's effect card first (now ${status}).`);
 }
 
+const NO_OPEN_REQUEST = held("No approval request is waiting for a decision at this stage.");
+const NOTHING_TO_USE = held("Nothing to use yet: no approval at this stage has all the approvals it needs and is waiting to be used.");
 export function renderApprovalsBar(ctx) {
   const { readiness, gates, stage, allowed, gateChange, specDraft } = ctx;
   const { shown, open, met, earlier, policy } = currentGates(gates, stage, readiness);
@@ -712,14 +731,14 @@ export function renderApprovalsBar(ctx) {
     .map((row) => `<li>${strikeIfStale(`<code>${esc(row.decisionId)}</code>`, staleCodes.get(row.decisionId))} ${codes(row.reasonCodes)}</li>`);
   // Only what a person can do now is a button; the rest is listed under More with the reason in words (actionButton).
   const { html: buttons, rows: waiting } = collectNotNow(() => [
-    actionButton("Approve", "approve", open ? pinned(approveOffer(allowed.decide, open, readiness, ctx.me)) : null),
-    actionButton("Request changes", "request-changes", open ? pinned(allowed.requestChanges) : null),
+    actionButton("Approve", "approve", open ? pinned(approveOffer(allowed.decide, open, readiness, ctx.me)) : NO_OPEN_REQUEST),
+    actionButton("Request changes", "request-changes", open ? pinned(allowed.requestChanges) : NO_OPEN_REQUEST),
     actionButton("Request direction approval", "request-direction", requestOffer(ctx, "direction")),
     actionButton("Request completion approval", "request-completion", requestOffer(ctx, "completion")),
     actionButton(completeLabel(met, stage), "complete", stage === "activate" && met ? held(ACTIVATE_COMPLETE)
-      : met ? effectHold(met, readiness) ?? pinned(allowed.progress) : null)].join(" "));
+      : met ? effectHold(met, readiness) ?? pinned(allowed.progress) : NOTHING_TO_USE)].join(" "));
   const { html: more, rows: moreNotNow } = collectNotNow(() => [actionButton("Hold", "hold", allowed.hold),
-    actionButton("Deny", "deny", open ? pinned(allowed.decide) : null), allowed.resume ? actionButton("Resume", "resume", allowed.resume) : ""].join(" "));
+    actionButton("Deny", "deny", open ? pinned(allowed.decide) : NO_OPEN_REQUEST), allowed.resume ? actionButton("Resume", "resume", allowed.resume) : ""].join(" "));
   return `<section class="card a4-approvals"><h4>Approvals</h4>${gateChange ? gateChangeBanner(gateChange) : ""}
     ${shown.length ? `${shown.map(gateWords).join("")}<p class="muted">An approval holds while the plan and the agent's files stay as they were. ${TRUTH.vote}.</p>`
       : `<p class="muted">Nobody has asked for an approval at this stage yet.</p>`}
@@ -747,8 +766,10 @@ export function renderMembers(ctx) {
       ${readiness.identityCheck === "session_record" ? `<p><code>IDENTITY_CHECK_LIMITED</code> Host-mode roles come from session records, not a live check.</p>` : ""}`, "members")}
     ${members?.candidatesLimited === true ? `<p class="muted">Host mode: candidates come from tracked session records, so this list may be incomplete.</p>` : ""}
     ${members?.error ? `<p class="status-bad">${esc(members.error)}</p>` : ""}
-    ${candidates.length ? `<h4>Candidates</h4>${live ? `<p class="status-bad">Adding a member records a new project transition: the open
-      ${esc(live.gate)} approval request (r${esc(live.revisionNo)}) is superseded and its approvals stop counting, so it must be requested again.</p>` : ""}
+    ${candidates.length ? `<h4>Candidates</h4>${live ? `<p class="status-bad">Adding someone cancels the open request for
+      ${esc(say("gate", live.gate))} (version ${esc(live.revisionNo)}), and the approvals it has stop counting: ask for it again once they are added.</p>
+      ${record(`<p>Adding a member records a new project transition: the open <code>${esc(live.gate)}</code> gate (r${esc(live.revisionNo)}) is
+      superseded and its approvals stop counting.</p>`, "candidates")}` : ""}
       ${list(candidates.map((candidate) => `<li data-principal="${esc(candidate.principalKey)}">
       ${esc(candidate.username)} <select name="role" aria-label="Project role for ${esc(candidate.username)}">${roles.map((role) => `<option value="${role}">${esc(say("projectRole", role))}</option>`).join("")}</select>
       ${actionButton("Add", "add-member", ctx.allowed.addMember, `data-row="member" aria-label="Add ${esc(candidate.username)} to the project"`)}</li>`), "")}` : ""}

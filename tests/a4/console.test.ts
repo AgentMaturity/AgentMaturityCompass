@@ -151,7 +151,8 @@ describe("go-live A4 console fixes", () => {
       gates: [], readiness: { items: [], gates: { direction: { gateId: "g", gate: "direction", status: "PENDING", revisionNo: 4 } } }, allowed: { addMember: { allowed: true } } }) as string;
     expect(html).not.toContain('data-principal="K1"');
     expect(html).toContain('aria-label="Add appr to the project"');
-    expect(html).toContain("is superseded");
+    expect(html).toContain("approval of the plan (version 4), and the approvals it has stop counting");
+    expect(html).toContain("superseded and its approvals stop counting");
   });
 });
 

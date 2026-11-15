@@ -103,6 +103,15 @@ describe("the specification as an outline", () => {
     expect(html).not.toContain("a".repeat(64));
   });
 
+  test("answers that are codes read in words, the stored value beside them", () => {
+    const html = renderOutline("assemble", { spec: { answers: [{ questionId: "providers", value: "stub" }, { questionId: "path", value: "native" },
+      { questionId: "autonomy", value: "advise" }, { questionId: "budget", value: "stub budget" }] } });
+    expect(html).toContain("<strong>Which AI model builds it?</strong> the stand-in model (canned replies; it says nothing about a real agent) <small class=\"a4-code\">(stub)</small>");
+    expect(html).toContain("<strong>How should it be built?</strong> inside AMC <small class=\"a4-code\">(native)</small>");
+    expect(html).toContain("only advise (no tools; it only answers) <small class=\"a4-code\">(advise)</small>");
+    expect(html).toContain("</strong> stub budget</li>");
+  });
+
   test("a stage with no revision says so; the JSON stays under the record on the card", () => {
     expect(renderOutline("adapt", null)).toContain("Nothing is drafted for Fit it to your rules yet");
     const ctx = { revision: aspire, stageRevision: aspire, allowed: { propose: { allowed: false, reasonCodes: ["A4_STEP_ORDER"] } },
@@ -145,6 +154,32 @@ describe("buttons are only what a person can do now", () => {
     const card = { id: "build", title: "Build", render: () => view.actionButton("Build", "build", { allowed: false, reasonCodes: ["A4_STEP_ORDER"] }) };
     const html = view.renderCard(card as never, { ...ctx, project: { ...ctx.project, members: [] } } as never, []);
     expect(html).toContain("More (1 not open now)");
-    expect(html).toContain("Not yet: finish the earlier steps of this stage first. (A4_STEP_ORDER)");
+    expect(html).toContain("Not at this step: a stage&#39;s steps run in order, and this one is not the next. (A4_STEP_ORDER)");
+  });
+
+  test("a step already done at this stage says so, and a finished stage says where the project is", () => {
+    const at = (stage: string, step: string, viewed = stage) => ({ ...ctx, stage: viewed, project: { ...ctx.project, stage, step } });
+    const allowed = { allowed: true, reasonCodes: [] };
+    expect(view.stepOffer(allowed, at("assemble", "reviewed") as never, "understand")).toMatchObject({ allowed: false,
+      note: "Already done at this stage. To do it again, change an answer under Ask; the stage's steps then start again. (A4_STEP_ORDER)" });
+    expect(view.stepOffer(allowed, at("assemble", "asked") as never, "build")).toMatchObject({ allowed: false, reasonCodes: ["A4_STEP_ORDER"] });
+    expect(view.stepOffer(allowed, at("adapt", "asked", "assemble") as never, "review").note).toContain("This stage is finished: the project is at Fit it to your rules now.");
+    expect(view.stepOffer(allowed, at("assemble", "built") as never, "review")).toBe(allowed);
+  });
+
+  test("with no open or approved gate, Approve, Request changes, Deny and Complete each say why in words", () => {
+    const none = { ...ctx, gates: [], readiness: { ...ctx.readiness, gates: { direction: null, completion: null } } };
+    const html = view.renderApprovalsBar(none as never);
+    expect(html).not.toContain("Not available at this point.");
+    expect(html).toContain("No approval request is waiting for a decision at this stage.");
+    expect(html).toContain("Nothing to use yet: no approval at this stage has all the approvals it needs");
+  });
+
+  test("Differences name the agent's files for resource paths and never a raw key", () => {
+    const html = view.renderDifferences({ from: 11, to: 12, changed: [{ path: "resources.context", from: "a", to: "b" },
+      { path: "spec.plan.tasks", from: 1, to: 2 }, { path: "spec.someNewPart", from: 1, to: 2 }] }, { revisionNo: 12 } as never);
+    const words = html.slice(0, html.indexOf("Show the record"));
+    expect(words).toContain("3 change(s) from version 11 to version 12, in the agent&#39;s files, the plan, other parts of the specification.");
+    expect(words).not.toContain("context");
   });
 });
