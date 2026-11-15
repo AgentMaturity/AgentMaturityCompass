@@ -571,7 +571,8 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
     }
   }
 
-  const onApproval = rule?.executeOnApproval === true && issues.length === 0 && missingEvidence.length > 0;
+  // executeOnApproval always needs the person's approval, earned evidence or not: an unapproved call stays SIMULATE.
+  const onApproval = rule?.executeOnApproval === true && issues.length === 0;
   if (onApproval) {
     const approved = input.approvedByPerson === true;
     addCondition(decision, {
@@ -581,15 +582,16 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
       actual: approved,
       expected: true,
       reason: approved
-        ? `A person's signed approval names this call; the signed ${input.actionClass} rule (executeOnApproval) lets it run without the evidence above.`
+        ? `A person's signed approval names this call; the signed ${input.actionClass} rule (executeOnApproval) lets it run whether or not the evidence above is met.`
         : `The signed ${input.actionClass} rule (executeOnApproval) runs this call only after a person approves it.`,
     });
     if (approved) {
       decision.allowed = true;
       decision.effectiveMode = "EXECUTE";
-      decision.reasons.push(`EXECUTE ON A PERSON'S APPROVAL: ${input.actionClass} runs because a person approved this call, not on evidence (${missingEvidence.length} evidence gate${missingEvidence.length === 1 ? "" : "s"} not met).`);
+      decision.reasons.push(`EXECUTE ON A PERSON'S APPROVAL: ${input.actionClass} runs because a person approved this call${missingEvidence.length === 0 ? "" : `, not on evidence (${missingEvidence.length} evidence gate${missingEvidence.length === 1 ? "" : "s"} not met)`}.`);
       return decision;
     }
+    issues.push(`the signed ${input.actionClass} rule (executeOnApproval) runs this call only after a person approves it`);
     decision.requiredApprovals.push(`A person's approval of this call (an approval gate, such as --approval-mode default) runs it as EXECUTE under the signed executeOnApproval rule.`);
   }
   if (issues.length > 0 || missingEvidence.length > 0) {

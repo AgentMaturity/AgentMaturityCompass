@@ -3,11 +3,12 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { initBudgets } from "../src/budgets/budgets.js";
-import { actionPolicyPath, defaultActionPolicy, initActionPolicy } from "../src/governor/actionPolicyEngine.js";
+import { actionPolicyPath, defaultActionPolicy, evaluateActionPermission, initActionPolicy } from "../src/governor/actionPolicyEngine.js";
 import { runGovernorCheck } from "../src/governor/governorCli.js";
 import { codingActionPolicy } from "../src/setup/starterProfiles.js";
 import type { ActionClass } from "../src/types.js";
 import { initWorkspace } from "../src/workspace.js";
+import { observedRunReport } from "./helpers/actionPolicyFixtures.js";
 
 /** `executeOnApproval`: a person's approval stands in for missing evidence, and for nothing else. */
 const dirs: string[] = [];
@@ -48,5 +49,27 @@ describe("executeOnApproval in the signed Action Policy", () => {
     const tampered = workspace();
     appendFileSync(actionPolicyPath(tampered), "# edited after signing\n");
     expect(check(tampered, true).effectiveMode).toBe("SIMULATE");
+  });
+
+  it("still needs the person's approval once every evidence gate passes (earned evidence never skips it)", () => {
+    const coding = codingActionPolicy();
+    // Every evidence gate met: no maturity levels, no packs, a tier the trust summary reaches, no sandbox requirement.
+    const policy = { ...coding,
+      riskTierDefaults: Object.fromEntries(Object.entries(coding.riskTierDefaults).map(([tier, value]) => [tier, { ...value, requireSandboxForExecute: false }])) as typeof coding.riskTierDefaults,
+      actions: coding.actions.map((rule) => ({ ...rule, minEffectiveQuestionLevels: {}, requireAssurancePacks: {}, evidenceLogic: undefined, requireTrustTierAtLeast: "SELF_REPORTED" as const })) };
+    const decide = (actionClass: ActionClass, approvedByPerson: boolean, rules = policy) => evaluateActionPermission({
+      agentId: "default", actionClass, riskTier: "med", targetProfile: null, currentDiagnosticRun: observedRunReport("default"),
+      trustSummary: { trustTier: "OBSERVED_HARDENED", sandboxEvidence: true, untrustedConfig: false, correlationRatio: 1 },
+      assuranceSummary: { packs: {} }, requestedMode: "EXECUTE", policy: rules, policySignatureValid: true, approvedByPerson });
+    const withoutFlag = { ...policy, actions: policy.actions.map((rule) => ({ ...rule, executeOnApproval: undefined })) };
+    expect(decide("WRITE_HIGH", false, withoutFlag).effectiveMode, "the evidence alone is enough without the flag").toBe("EXECUTE");
+    for (const actionClass of ["WRITE_LOW", "WRITE_HIGH"] as const) {
+      const unapproved = decide(actionClass, false);
+      expect(unapproved.effectiveMode, actionClass).toBe("SIMULATE");
+      expect(unapproved.conditionResults.find((row) => row.conditionId === "person-approval")?.passed).toBe(false);
+      const approved = decide(actionClass, true);
+      expect(approved.effectiveMode).toBe("EXECUTE");
+      expect(approved.reasons.join("\n")).toMatch(new RegExp(`EXECUTE ON A PERSON'S APPROVAL: ${actionClass} runs because a person approved this call\\.`));
+    }
   });
 });
