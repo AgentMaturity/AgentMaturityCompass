@@ -132,6 +132,19 @@ describe("host mode", () => {
     }
   }, 60_000);
 
+  // C-03: `amc up --demo` ignored AMC_STUDIO_PORT and failed whenever another Studio held 3212.
+  test("the local demo reads AMC_STUDIO_PORT", async () => {
+    const free = (await hold())!;
+    await new Promise<void>((done) => holders.pop()!.close(() => done()));
+    const demo = { allowLocalDemoWorkspace: true, defaultWorkspaceId: "demo" };
+    const chosen = await runStudioForeground({ workspace: dir("amc-port-demo-ws-"), hostDir: dir("amc-port-demo-"), env: { AMC_STUDIO_PORT: String(free) }, ...demo });
+    try {
+      expect(chosen.state.apiPort).toBe(free);
+    } finally {
+      await chosen.stop();
+    }
+  }, 120_000);
+
   test("a busy configured host port is refused, never replaced", async () => {
     const hostDir = dir("amc-port-policy-host-");
     const busy = (await hold())!;
