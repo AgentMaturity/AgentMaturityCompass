@@ -31,6 +31,15 @@ export function isApprovalInitiator(request: Pick<ApprovalRequestRecord, "initia
   return id === reviewer.userId || id === reviewer.username;
 }
 
+/**
+ * Whether the request's own signed rule lets one person at the local terminal decide it: at most one approval, no
+ * distinct-user rule, and OWNER among the roles. A rule that asks for two approvals, for different people, or for a role
+ * only a sign-in can show (APPROVER, AUDITOR) keeps its signed-in reviewers.
+ */
+export function terminalApproverAllowed(request: Pick<ApprovalRequestRecord, "requiredApprovals" | "requireDistinctUsers" | "rolesAllowed">): boolean {
+  return request.requiredApprovals <= 1 && !request.requireDistinctUsers && request.rolesAllowed.includes("OWNER");
+}
+
 function hasAllowedRole(roles: readonly UserRole[], allowed: readonly UserRole[]): boolean {
   for (const role of roles) {
     if (allowed.includes(role)) {
@@ -114,6 +123,10 @@ export function evaluateApprovalQuorum(params: {
       continue;
     }
     if (decision.decision !== "APPROVE_EXECUTE") {
+      continue;
+    }
+    // A terminal approval is one local person: it never counts where the request asks for more than that.
+    if (decision.authentication === "terminal" && !terminalApproverAllowed(request)) {
       continue;
     }
     // Where the request requires distinct users, the initiator is never an approver (P1-78): such a decision was refused

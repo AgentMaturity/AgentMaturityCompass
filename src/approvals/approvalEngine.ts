@@ -38,7 +38,8 @@ import {
   type ApprovalDecisionKind,
   type ApprovalRequestRecord
 } from "./approvalChainStore.js";
-import { evaluateApprovalQuorum, isApprovalInitiator } from "./approvalQuorum.js";
+import { evaluateApprovalQuorum, isApprovalInitiator, terminalApproverAllowed } from "./approvalQuorum.js";
+import { interactiveOperator, operatorRefusalText } from "../vault/operatorContext.js";
 import { AUTHZ_INTENT_SCHEMA } from "../actions/authorizationRecord.js";
 import { captureApprovalConsumptionEntry, type ApprovalConsumptionOptions } from "./approvalConsumptionPublication.js";
 import { parseUserRoles, type UserRole } from "../auth/roles.js";
@@ -375,6 +376,11 @@ const SELF_ASSERTED_EXECUTE_REFUSAL =
   "Log in with `amc approvals login --username <reviewer> --token-file <private-file>`, inspect with `amc approvals show`, " +
   "then approve with --session-token-file <private-file> --expect-request-digest <sha256>. No decision was recorded.";
 
+const TERMINAL_APPROVER_REFUSAL =
+  "This request cannot be approved from the terminal alone: its approval rule asks for more than one approval, for " +
+  "different people, or for a signed-in reviewer role. Each reviewer signs in with `amc approvals login` and approves " +
+  "with --session-token-file. No decision was recorded.";
+
 export function decideApprovalForIntent(params: {
   workspace: string;
   agentId?: string;
@@ -394,8 +400,11 @@ export function decideApprovalForIntent(params: {
    * (`readNativeApprovalActor`), Studio's signed-in session. Anything else is `self-asserted`: such a reviewer may deny
    * or approve SIMULATE, never approve EXECUTE, and the kind is recorded on the signed row so no consumer counts a
    * self-asserted approval as an identity or role attestation (countedApprovalDecisions).
+   * `terminal`: the caller read one key from the interactive terminal it runs in (native chat). Checked here again
+   * (a terminal on stdin, no agent marker, not agent mode), and an approval is taken only for a request whose own rule
+   * lets one local person decide (terminalApproverAllowed). No CLI flag selects it.
    */
-  reviewerAuthentication: "authenticated" | "self-asserted";
+  reviewerAuthentication: "authenticated" | "self-asserted" | "terminal";
 }): {
   approval: {
     approvalId: string;
@@ -415,8 +424,12 @@ export function decideApprovalForIntent(params: {
   if (params.expectedRequestDigestSha256 !== undefined && (!params.userId || !params.username || !params.userRoles?.length)) {
     throw new Error("a bound native decision requires explicit authenticated reviewer fields");
   }
-  if (params.reviewerAuthentication !== "authenticated" && params.decision === "APPROVED" && params.mode === "EXECUTE") {
+  if (params.reviewerAuthentication !== "authenticated" && params.reviewerAuthentication !== "terminal" && params.decision === "APPROVED" && params.mode === "EXECUTE") {
     throw new Error(SELF_ASSERTED_EXECUTE_REFUSAL);
+  }
+  if (params.reviewerAuthentication === "terminal") {
+    const operator = interactiveOperator({ workspace: params.workspace });
+    if (!operator.ok) throw new Error(`A terminal decision needs a person at an interactive terminal, and ${operatorRefusalText(operator)}. No decision was recorded.`);
   }
   const request = loadApprovalRequestRecord({
     workspace: params.workspace,
@@ -424,6 +437,11 @@ export function decideApprovalForIntent(params: {
     approvalRequestId: params.approvalId,
     requireValidSignature: true
   });
+  // The signed request's own rule and the class's rule in the signed approval policy now must both allow one local person.
+  if (params.reviewerAuthentication === "terminal" && params.decision === "APPROVED" && (!terminalApproverAllowed(request)
+    || !terminalApproverAllowed(approvalRuleForAction(loadApprovalPolicy(params.workspace), request.actionClass)))) {
+    throw new Error(TERMINAL_APPROVER_REFUSAL);
+  }
   if (params.expectedRequestDigestSha256 !== undefined &&
     (request.approvalRequestId !== params.approvalId || (params.agentId !== undefined && request.agentId !== params.agentId)
       || !/^[a-f0-9]{64}$/.test(params.expectedRequestDigestSha256) || params.expectedRequestDigestSha256 !== approvalRequestBindingDigest(request))) {
@@ -474,10 +492,11 @@ export function decideApprovalForIntent(params: {
     approvalRequestId: request.approvalRequestId,
     userId: reviewerUserId,
     username: reviewerUsername,
-    roles: params.userRoles ?? ["OWNER"],
+    // A terminal decision claims no role a sign-in would have to show: it is the workspace's own operator, OWNER.
+    roles: params.reviewerAuthentication === "terminal" ? ["OWNER"] : params.userRoles ?? ["OWNER"],
     decision: modeDecision,
     reason: params.reason,
-    authentication: params.reviewerAuthentication === "authenticated" ? "authenticated" : "self-asserted",
+    authentication: params.reviewerAuthentication === "authenticated" || params.reviewerAuthentication === "terminal" ? params.reviewerAuthentication : "self-asserted",
     ...(params.expectedRequestDigestSha256 === undefined ? {} : { expectedRequestDigestSha256: params.expectedRequestDigestSha256 })
   }).decision;
   const policy = loadApprovalPolicy(params.workspace);

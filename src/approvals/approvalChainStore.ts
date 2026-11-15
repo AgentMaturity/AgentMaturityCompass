@@ -284,7 +284,7 @@ export function recordApprovalDecision(params: {
   reason: string;
   expectedRequestDigestSha256?: string;
   /** Recorded on the signed row (H-1); see countedApprovalDecisions. */
-  authentication: "authenticated" | "self-asserted";
+  authentication: "authenticated" | "self-asserted" | "terminal";
 }): { decision: ApprovalDecisionRecord; path: string; sigPath: string } {
   const request = loadApprovalRequestRecord({
     workspace: params.workspace,
@@ -325,10 +325,12 @@ export function recordApprovalDecision(params: {
 /**
  * The decisions that may attest to a reviewer's identity and roles (H-1): every DENY (a refusal only ever stops an
  * action), and an approval only when its recorder authenticated the reviewer. A self-asserted or legacy unmarked
- * approval, of either mode, never counts toward a quorum, a role requirement or a distinct-user check.
+ * approval, of either mode, never counts toward a quorum, a role requirement or a distinct-user check. A "terminal"
+ * approval is written only by the engine, from an interactive terminal, for a request whose own rule lets one local
+ * person decide (terminalApproverAllowed); the quorum checks that rule again before it counts one.
  */
 export function countedApprovalDecisions(rows: readonly ApprovalDecisionRecord[]): ApprovalDecisionRecord[] {
-  return rows.filter((row) => row.decision === "DENY" || row.authentication === "authenticated");
+  return rows.filter((row) => row.decision === "DENY" || row.authentication === "authenticated" || row.authentication === "terminal");
 }
 
 /** Signed decisions in time order, only the counted ones (countedApprovalDecisions) unless `includeUncounted` (displays). */
