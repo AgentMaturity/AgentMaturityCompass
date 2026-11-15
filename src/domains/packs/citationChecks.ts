@@ -20,16 +20,15 @@ import governance from "./citationChecks/governance.json" with { type: "json" };
 import technology from "./citationChecks/technology.json" with { type: "json" };
 import wealth from "./citationChecks/wealth.json" with { type: "json" };
 
-export const CITATION_VERDICTS = ["verified", "corrected", "wrong", "unverifiable", "superseded"] as const;
-export type CitationVerdict = (typeof CITATION_VERDICTS)[number];
+const CITATION_VERDICTS = ["verified", "corrected", "wrong", "unverifiable", "superseded"] as const;
 export const CITATION_CHECK_MAX_AGE_DAYS = 365;
 /** checkedBy value for a check made by an AI agent. */
-export const AI_AGENT_CHECKER = "ai-agent";
+const AI_AGENT_CHECKER = "ai-agent";
 
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "must be an ISO date (YYYY-MM-DD)");
 const text = z.string().trim().min(1);
 
-export const citationCheckSchema = z.object({
+const citationCheckSchema = z.object({
   packId: text,
   questionId: text,
   citation: text,
@@ -50,7 +49,7 @@ export const CITATION_CHECK_FILES: Readonly<Record<string, unknown>> = { health,
 
 export interface PackCitation { packId: string; questionId: string; citation: string }
 
-export type CitationState = "checked" | "not-checked" | "expired" | "wrong" | "unverifiable" | "superseded";
+type CitationState = "checked" | "not-checked" | "expired" | "wrong" | "unverifiable" | "superseded";
 
 const key = (c: PackCitation) => `${c.packId}\u0000${c.questionId}\u0000${c.citation}`;
 const DAY_MS = 86_400_000;
@@ -69,7 +68,7 @@ export function packCitations(pack: Pick<IndustryPack, "id" | "regulatoryBasis" 
 }
 
 /** All records of every station file, with the file each came from; rows that fail the schema are reported, not returned. */
-export function loadCitationChecks(files: Readonly<Record<string, unknown>> = CITATION_CHECK_FILES): { records: Array<CitationCheck & { file: string }>; problems: string[] } {
+function loadCitationChecks(files: Readonly<Record<string, unknown>> = CITATION_CHECK_FILES): { records: Array<CitationCheck & { file: string }>; problems: string[] } {
   const records: Array<CitationCheck & { file: string }> = [];
   const problems: string[] = [];
   for (const [file, rows] of Object.entries(files)) {

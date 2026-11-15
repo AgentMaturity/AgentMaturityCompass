@@ -53,15 +53,3 @@ describe("Industry Pack citation check records", () => {
     expect(line).not.toMatch(/verified|approved|compliant/i);
   });
 });
-
-describe("regulatory catalogue recognises ISO/IEC 42005", () => {
-  it("resolves its usual spellings to an unverified instrument with no source claimed", async () => {
-    const { resolveRegulatoryInstrument } = await import("../src/domains/packs/regulatorySchema.js");
-    for (const text of ["ISO/IEC 42005:2025", "ISO/IEC 42005", "ISO 42005"]) {
-      const inst = resolveRegulatoryInstrument(text);
-      expect(inst?.id, text).toBe("iso-42005");
-      expect(inst?.status).toBe("unverified");
-      expect(inst?.url).toBeUndefined();
-    }
-  });
-});

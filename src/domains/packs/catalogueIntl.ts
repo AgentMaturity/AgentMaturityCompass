@@ -47,8 +47,6 @@ export const INTL_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     "iso.org lists ISO 21001:2018 and its Amd 1:2024; whether a newer edition replaced it was not confirmed."),
   verified("iec-62304", "IEC 62304:2006 + Amd 1:2015 Medical device software — Software life cycle processes", "INT", "standard", "in-force", "https://www.iso.org/standard/64686.html",
     ["IEC 62304:2006/AMD1:2015", "IEC 62304:2006", "IEC 62304"], { note: "Edition 2 (health software) is in development per IEC SC 62A documents; not yet published on the review date." }),
-  unverified("iso-42005", "ISO/IEC 42005 Artificial intelligence — AI system impact assessment (edition not confirmed)", "INT", "standard", ["ISO/IEC 42005:2025", "ISO/IEC 42005", "ISO 42005"],
-    "Recognised so pack text that names it resolves. iso.org and its national storefronts returned HTTP 403 on 2026-11-16, so edition and date are not confirmed; AMC maps no controls to it."),
   unverified("iso-22000", "ISO 22000:2018 Food safety management systems", "INT", "standard", ["ISO 22000:2018", "ISO 22000"]),
   unverified("iso-26000", "ISO 26000:2010 Guidance on social responsibility", "INT", "guidance", ["ISO 26000:2010", "ISO 26000"]),
   unverified("iso-37120", "ISO 37120:2018 Sustainable cities and communities — Indicators", "INT", "standard", ["ISO 37120:2018", "ISO 37120"]),
