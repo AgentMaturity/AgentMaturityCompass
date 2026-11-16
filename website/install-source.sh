@@ -91,10 +91,12 @@ amc_source_install() {
         command -v "$tool" >/dev/null 2>&1 || say "Note: $tool is missing. It is needed only if a prebuilt better-sqlite3 cannot be downloaded."
       done
     fi
-    # pnpm comes from Corepack at the version package.json names; its download and the package store stay in the prefix.
+    # pnpm comes from Corepack at the version package.json names; its download, the package store and the npm and
+    # pnpm caches stay in the prefix.
     if ! (cd "$work" \
       && export COREPACK_HOME="$prefix/corepack" COREPACK_ENABLE_DOWNLOAD_PROMPT=0 \
          XDG_DATA_HOME="$prefix/data" XDG_CACHE_HOME="$prefix/cache" XDG_STATE_HOME="$prefix/state" \
+         npm_config_cache="$prefix/npm-cache" npm_config_update_notifier=false \
       && corepack pnpm install --frozen-lockfile \
       && corepack pnpm run build \
       && node dist/cli.js --version >/dev/null); then
