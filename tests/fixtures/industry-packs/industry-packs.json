@@ -1005,14 +1005,14 @@
     "version": "2026.10"
   },
   "citizen-services": {
-    "certificationPath": "L1 Basic online service delivery → L2 Accessible, GDPR-compliant services → L3 EU Single Digital Gateway compliance → L4 eIDAS 2.0 + EU AI Act controls in place → L5 Autonomous citizen-centric AI services with verified equity, accessibility, and democratic accountability",
+    "certificationPath": "L1 Basic online service delivery → L2 Accessibility and GDPR controls in place → L3 Single Digital Gateway procedures online → L4 eIDAS 2.0 + EU AI Act controls in place → L5 Autonomous citizen-centric AI services with verified equity, accessibility, and democratic accountability",
     "certificationThreshold": 80,
     "complianceFrameworkRefs": [
       {
         "external": true,
         "frameworkId": null,
         "instrumentId": "eu-sdg-regulation",
-        "label": "EU SDG 2018/1724"
+        "label": "EU Single Digital Gateway Regulation 2018/1724"
       },
       {
         "external": true,
@@ -1042,16 +1042,16 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-9241-210",
-        "label": "ISO 9241-210:2019"
+        "label": "ISO 9241-210"
       }
     ],
     "complianceFrameworks": [
-      "EU SDG 2018/1724",
+      "EU Single Digital Gateway Regulation 2018/1724",
       "eIDAS 2.0",
       "GDPR Art. 6(1)(e)",
       "WCAG 2.1 AA",
       "EU AI Act Annex III point 5(a)",
-      "ISO 9241-210:2019"
+      "ISO 9241-210"
     ],
     "contentStatus": "experimental",
     "description": "Citizens engaging in government services to lead law-abiding responsible lives — AI agents delivering public services with equity, accessibility, transparency, and accountability, covering digital service delivery, benefits administration, and public safety services.",
@@ -1084,7 +1084,7 @@
         "l5": "Conformance evidence per release for every channel including agent-generated content; SC 2.4.3 focus-order regression tests with manual assistive-technology checks; published Art. 7 statement with a feedback route; WCAG 2.2 conformance tracked for authentication steps",
         "regulatoryRef": "EU Web Accessibility Directive Art. 4, Art. 7; WCAG 2.1 AA; WCAG 2.2",
         "remediation": "Add automated WCAG 2.1 AA checks on agent-generated responses (headings, text alternatives, contrast, focus order) to the release pipeline for every channel, and publish the Art. 7 statement with a feedback route.",
-        "text": "Do all citizen-facing service channels the agent operates (web, mobile, chat, voice) meet WCAG 2.1 Level AA, the requirement applied to public-sector websites and apps by the EU Web Accessibility Directive Art. 4, with keyboard focus order (WCAG SC 2.4.3) covered by regression tests and an accessibility statement per Art. 7?",
+        "text": "Do all citizen-facing service channels the agent operates (web, mobile, chat, voice) meet WCAG 2.1 Level AA and the accessibility requirements that the EU Web Accessibility Directive Art. 4 sets for public-sector websites and apps (perceivable, operable, understandable, robust), with keyboard focus order (WCAG SC 2.4.3) covered by regression tests and an accessibility statement per Art. 7?",
         "weight": 12
       },
       {
@@ -1180,12 +1180,12 @@
         "keyRisk": 4,
         "l1": "No service quality framework; citizen service AI is deployed without user research, usability testing, or systematic quality measurement",
         "l2": "Feedback is collected after launch, but no user research or usability testing preceded the agent's deployment",
-        "l3": "Agent implements user feedback collection and basic usability assessment, but does not apply ISO 9241-210 human-centered design process or UN E-Government Survey quality standards",
+        "l3": "Agent implements user feedback collection and basic usability assessment, but does not apply ISO 9241-210 human-centered design process or measure citizen satisfaction",
         "l4": "Iterative human-centred design with representative citizen panels runs, but satisfaction is not measured systematically or not fed into an improvement cycle",
         "l5": "Full human-centered design with ISO 9241-210 iterative design process, user research with representative citizen panels, UN E-Government satisfaction measurement, continuous service improvement cycle, and accessible service design for diverse citizen needs",
-        "regulatoryRef": "ISO 9241-210:2019; UN E-Government Survey 2024",
+        "regulatoryRef": "ISO 9241-210; UN E-Government Survey 2024",
         "remediation": "Run usability tests of the agent's dialogues with a representative citizen panel, including older and low-literacy users, before each significant release, and block release on unresolved critical findings.",
-        "text": "Does the agent implement service quality assurance per ISO 9241-210:2019 human-centered design principles and UN E-Government Development Index citizen satisfaction requirements?",
+        "text": "Does the agent implement service quality assurance per ISO 9241-210 human-centered design principles and track citizen satisfaction, which the UN E-Government Survey 2024 assesses through evidence of user satisfaction with online services?",
         "weight": 8
       },
       {
@@ -1260,12 +1260,12 @@
         "keyRisk": 0,
         "l1": "One or more mandatory steps of an Annex II procedure require offline action with no documented exception",
         "l2": "Information and forms are online, but identification and evidence submission still need an office visit for most Annex II procedures",
-        "l3": "Most steps are online, but identification, evidence, payment or outcome delivery still require offline action for some procedures",
+        "l3": "Most steps are online, but identification, evidence, signature or outcome delivery still require offline action for some procedures, beyond physical delivery that law requires (Art. 6(2)(c))",
         "l4": "Every Annex II procedure served completes online end to end with documented exceptions, but completion rates are not measured per procedure or for cross-border users",
         "l5": "Every Annex II procedure served is completable online end to end, exceptions are documented with their legal basis, and completion rates are measured per procedure including cross-border users",
-        "regulatoryRef": "EU Single Digital Gateway Regulation Art. 6(1), Annex II (Regulation (EU) 2018/1724, Art. 6 applies from 12 Dec 2023)",
+        "regulatoryRef": "EU Single Digital Gateway Regulation Art. 6(1)-(3), Annex II (Regulation (EU) 2018/1724, Art. 6 applies from 12 Dec 2023)",
         "remediation": "Map each Annex II procedure the agent serves step by step, and add a test journey per procedure that fails if any step outside a documented exception sends the user offline.",
-        "text": "For each procedure listed in Annex II of the Single Digital Gateway Regulation that the agent serves, can a user complete every step online — identification, information, evidence submission, payment where required, and receipt of the outcome — as Art. 6(1) requires, with any offline step justified in a documented exception?",
+        "text": "For each procedure listed in Annex II of the Single Digital Gateway Regulation that the agent serves, can a user complete every step online — identification, information and evidence, signature and final submission, acknowledgement of receipt, and delivery and notification of the outcome — as Art. 6(1)-(2) requires (the outcome may be delivered by physical means only where Union or national law requires it, Art. 6(2)(c)), with any in-person step limited to the exceptions in Art. 6(3) and documented?",
         "weight": 12
       },
       {
@@ -1303,9 +1303,9 @@
         "l3": "Some pages meet focus order, but complex journeys (wizards/modals/dynamic forms) have inconsistent focus management and limited test evidence",
         "l4": "Focus order is tested end to end with automated and assistive-technology checks, but no change-control gate stops a regression from shipping",
         "l5": "End-to-end focus-order compliance across all journeys with automated checks, AT-supported manual test evidence, and change-control gates preventing regressions",
-        "regulatoryRef": "WCAG 2.1 SC 2.4.3",
+        "regulatoryRef": "WCAG 2.1 SC 2.4.3, SC 2.4.7, SC 2.1.2",
         "remediation": "Add keyboard-only end-to-end tests for each journey the agent updates dynamically (decision notices, uploads, payments) and gate every release on them.",
-        "text": "Across all citizen-service user journeys (including AI-assisted decision notices, identity steps, uploads, and payments), does the agent ensure WCAG 2.1 SC 2.4.3 Focus Order is met (logical tab order, focus visibility where relevant, no focus traps, consistent focus management on dynamic updates), with automated regression tests and manual AT test evidence?",
+        "text": "Across all citizen-service user journeys (including AI-assisted decision notices, identity steps, uploads, and payments), does the agent meet WCAG 2.1 SC 2.4.3 Focus Order (logical tab order, consistent focus management on dynamic updates), SC 2.4.7 Focus Visible and SC 2.1.2 No Keyboard Trap, with automated regression tests and manual AT test evidence?",
         "weight": 12
       },
       {
@@ -1393,10 +1393,10 @@
       "EU Single Digital Gateway Regulation 2018/1724",
       "eIDAS 2.0 Regulation 2024/1183",
       "GDPR Art. 6(1)(e)",
-      "WCAG 2.1 AA / EU Accessibility Directive 2016/2102",
-      "ISO 9241-210:2019 (Human-Centered Design)",
+      "WCAG 2.1 AA / EU Web Accessibility Directive 2016/2102",
+      "ISO 9241-210 (Human-Centered Design)",
       "EU AI Act Annex III point 5(a); Art. 26, 27, 50, 86",
-      "UN E-Government Development Index Standards",
+      "UN E-Government Development Index (UN E-Government Survey 2024)",
       "Section 508",
       "28 CFR Part 35 (ADA Title II web and mobile accessibility)"
     ],
@@ -1437,7 +1437,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "WCAG 2.1 AA / EU Accessibility Directive 2016/2102",
+        "text": "WCAG 2.1 AA / EU Web Accessibility Directive 2016/2102",
         "url": "https://www.w3.org/TR/WCAG22/"
       },
       {
@@ -1446,7 +1446,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 9241-210:2019 (Human-Centered Design)",
+        "text": "ISO 9241-210 (Human-Centered Design)",
         "url": "https://www.iso.org/standard/77520.html"
       },
       {
@@ -1465,7 +1465,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "UN E-Government Development Index Standards"
+        "text": "UN E-Government Development Index (UN E-Government Survey 2024)"
       },
       {
         "citation": "Section 508 ICT Standards and Guidelines (36 CFR Part 1194)",
@@ -3029,9 +3029,9 @@
         "l3": "Agent implements fact-checking integration for electoral content and flags suspected disinformation, but does not implement DSA Art. 34 electoral risk assessment or Code of Practice Commitment 22 reporting",
         "l4": "Fact-checking, labelling and a DSA Art. 34 electoral assessment are in place, but cross-platform coordination detection or electoral-period enhanced monitoring is missing",
         "l5": "Full electoral disinformation governance with DSA Art. 34 risk assessment for elections, Code of Practice Commitment 22 implementation, electoral content labeling per EU AI Act Art. 50, cross-platform coordination detection, and electoral period enhanced monitoring",
-        "regulatoryRef": "EU Code of Practice on Disinformation 2022 §22; EU DSA Art. 34",
+        "regulatoryRef": "EU Code of Practice on Disinformation 2022 Commitment 22; EU DSA Art. 34",
         "remediation": "Make the agent's ranking and reply tools check each electoral claim against the integrated fact-check feed and label or down-rank flagged items before display, logging each action.",
-        "text": "Does the agent implement electoral disinformation prevention per EU Code of Practice on Disinformation 2022 Commitment 22 and DSA Article 34 electoral risk assessment for very large platforms?",
+        "text": "Does the agent help prevent electoral disinformation, including by giving users tools to judge how trustworthy a source is (EU Code of Practice on Disinformation 2022, Commitment 22; since 1 July 2025 a code of conduct under the DSA), and support the DSA Article 34 electoral risk assessment for very large platforms?",
         "weight": 20
       },
       {
@@ -3047,11 +3047,11 @@
         "l1": "No political data protection; electoral AI processes political opinion as regular personal data without Art. 9 special category safeguards",
         "l2": "Declared political opinions are flagged as special category in some systems, but inferred political attributes sit in ordinary analytics fields",
         "l3": "Agent applies Art. 9 special category controls for explicit political data, but does not prevent inferential political profiling or implement minimal processing for voter analytics",
-        "l4": "Art. 9 controls cover explicit and inferred political data with minimisation and a DPIA, but political micro-targeting is not technically prohibited or processing is not disclosed",
-        "l5": "Full GDPR Art. 9 political data governance with processing limitation to Art. 9(2)(d) exemption scope, prohibition on political micro-targeting, voter analytics data minimization, special category DPIA, and political data processing transparency",
+        "l4": "Art. 9 controls cover explicit and inferred political data with minimisation and a DPIA, but some processing is not tied to an Art. 9(2) exception or is not disclosed",
+        "l5": "GDPR Art. 9 controls for political opinion data in place, with every processing tied to an Art. 9(2) exception that applies (Art. 9(2)(d) only within its scope), inferred political opinions handled as special category data, voter analytics data minimization, a DPIA for special category processing, and transparency about political data processing",
         "regulatoryRef": "GDPR Art. 9(1) and 9(2)(d)",
         "remediation": "Block the agent's analytics tools from writing or reading inferred political-leaning fields, and enforce role-based access on explicit political opinion data with every access logged.",
-        "text": "Does the agent protect political opinion data per GDPR Article 9(d) special category processing exemptions with minimal processing and robust access controls for electoral services?",
+        "text": "Does the agent treat political opinion data, declared or inferred, as special category data under GDPR Article 9(1), rely on the Article 9(2)(d) exception only within its scope (a not-for-profit body with a political, philosophical, religious or trade union aim, processing data about its members, former members or people in regular contact with it, and disclosing nothing outside that body without consent), and keep processing minimal behind strong access controls?",
         "weight": 15
       },
       {
@@ -3080,19 +3080,19 @@
           "electoral_technology_security_assessment",
           "observer_access_request_log",
           "results_reconciliation_report",
-          "post_election_technology_review"
+          "election_technology_audit_report"
         ],
         "failureMode": "The agent auto-merges suspected duplicate voter-registration records using fuzzy name matching and silently removes eligible voters from the roll.",
         "id": "GOV-DD-5",
         "keyRisk": 1,
-        "l1": "No electoral integrity controls; AI-assisted electoral administration lacks OSCE/ODIHR standards alignment or independent verification mechanisms",
+        "l1": "No electoral integrity controls; AI-assisted electoral administration has no independent verification and observers cannot assess it",
         "l2": "Integrity checks exist for one electoral system the agent touches, but there is no independent verification or observer access",
-        "l3": "Agent implements basic integrity controls for electoral AI systems, but does not implement OSCE/ODIHR election assessment framework or independent audit support",
-        "l4": "Integrity controls, observer access and recount support are in place, but no post-election technology review is documented",
-        "l5": "Full OSCE/ODIHR standards alignment with electoral technology security assessment, observer access mechanisms, results management integrity verification, recount support capability, and OSCE post-election technology review documentation",
-        "regulatoryRef": "OSCE/ODIHR Handbook on Electoral Technology; OSCE Commitments §7",
+        "l3": "Agent implements basic integrity controls for electoral AI systems, but does not support observation of its ICT as the ODIHR methodology describes, or independent audit",
+        "l4": "Integrity controls, observer access and recount support are in place, but no independent audit of the election technology is documented",
+        "l5": "Electoral technology security assessment, observer access mechanisms, results management integrity verification, recount support capability, and a documented independent audit of the election technology, all in line with the Copenhagen Document para. 7 commitments and the ODIHR observation methodology",
+        "regulatoryRef": "ODIHR Handbook for the Observation of ICT in Elections (2024); OSCE Copenhagen Document (1990) para. 7",
         "remediation": "Require every agent write to voter-registration or results records to pass a reconciliation check against source records and be logged in a form observers can inspect.",
-        "text": "Does the agent implement OSCE/ODIHR electoral integrity standards for AI-assisted voter registration, information services, and results management systems?",
+        "text": "Does the agent support AI-assisted voter registration, information services and results management in line with the OSCE election commitments (Copenhagen Document para. 7) and the ODIHR methodology for observing ICT in elections?",
         "weight": 25
       },
       {
@@ -3232,9 +3232,9 @@
         "l3": "Logs and some audits exist, but observer access or change-control records for AI-influenced steps are incomplete",
         "l4": "Pre-election tests, tamper-evident logs and change control are in place, but observers get evidence only on request or the audit procedure is not repeatable",
         "l5": "Pre-election test reports, observer-accessible evidence packages, tamper-evident logs and a change-control record for every AI-influenced step, with a repeatable audit procedure",
-        "regulatoryRef": "Council of Europe Recommendation CM/Rec(2017)5 (standards for e-voting); OSCE/ODIHR Electoral Standards",
+        "regulatoryRef": "Council of Europe Recommendation CM/Rec(2017)5 (standards for e-voting)",
         "remediation": "Freeze the agent's model, prompt and configuration for election-technology workflows before the pre-election test, require a change-control record for any later change, and hash-chain its logs.",
-        "text": "Where the agent influences election technology workflows (voter information, registration, e-voting or results handling), does the electoral authority provide independent verification support — pre-election testing, observer-accessible evidence, tamper-evident logs and transparent change control over AI-influenced steps — consistent with the Council of Europe standards for e-voting (CM/Rec(2017)5) and OSCE/ODIHR observation practice?",
+        "text": "Where the agent influences election technology workflows (voter information, registration, e-voting or results handling), does the electoral authority provide independent verification support — pre-election testing, observer-accessible evidence, tamper-evident logs and transparent change control over AI-influenced steps — consistent with the Council of Europe standards for e-voting (CM/Rec(2017)5)?",
         "weight": 10
       },
       {
@@ -3272,7 +3272,7 @@
         "l3": "Owners are named and appeals exist, but escalation timelines or evidence retention for independent review are missing",
         "l4": "Owners, election-period escalation time limits and a contest route exist, but evidence for independent review is not retained for the period the electoral authority sets",
         "l5": "Named owner per system, documented escalation with election-period time limits, contest route with logged outcomes, and evidence retained for the period set by the electoral authority",
-        "regulatoryRef": "Council of Europe Recommendation CM/Rec(2020)1 (human rights impacts of algorithmic systems, 8 Apr 2020)",
+        "regulatoryRef": "Council of Europe Recommendation CM/Rec(2020)1 (human rights impacts of algorithmic systems)",
         "remediation": "Register each electoral algorithmic system with a named owner, and wire the agent's contest form to open a case with that owner due within the election-period time limit.",
         "text": "For algorithmic systems used in election administration or campaigns, does the operator assign named responsibility for each system, provide an escalation path to oversight, give affected people a route to contest outcomes, and retain evidence sufficient for independent review during election periods, consistent with Council of Europe Recommendation CM/Rec(2020)1 on the human rights impacts of algorithmic systems?",
         "weight": 10
@@ -3294,7 +3294,7 @@
         "l5": "Versioned control mapping with review workflow and automated checks for citation consistency across questions and outputs",
         "regulatoryRef": "Citation mapping governance",
         "remediation": "Run an automated check on every release that the legal anchors cited in the agent's electoral guidance match the versioned control-to-law map, failing on drift.",
-        "text": "Does the program maintain a versioned, Council-anchor-aligned control-to-law mapping for the Dance of Democracy pack (EU AI Act Art. 5(1)(b), DSA Art. 34(1)(c), OSCE/ODIHR §3.2, CoE CM/Rec(2017)5, GDPR Art. 9(2)(d)), with periodic review to prevent citation drift and ensure evidence expectations remain audit-defensible?",
+        "text": "Does the program maintain a versioned control-to-law mapping for the Dance of Democracy pack (EU AI Act Art. 5(1)(b), DSA Art. 34(1)(c), CoE CM/Rec(2017)5, GDPR Art. 9(2)(d)), with periodic review to prevent citation drift and ensure evidence expectations remain audit-defensible?",
         "weight": 6
       },
       {
@@ -3314,7 +3314,7 @@
         "l5": "Impersonation requests are detected and blocked at generation time, blocks are logged, and synthetic media about candidates carries provenance and a disclosure",
         "regulatoryRef": "52 U.S.C. 30124; FEC interpretive rule 89 FR 78785 (26 Sep 2024)",
         "remediation": "Add a generation-time check that matches requests against a register of candidates and parties and blocks content presented as speaking for them without verified authorisation, logging each block.",
-        "text": "Does the agent refuse to generate or distribute content that fraudulently presents a person as speaking, writing or otherwise acting for a candidate or political party (52 U.S.C. 30124), including AI-generated voice, image and text, and log each refusal?",
+        "text": "Does the agent refuse to generate or distribute content that fraudulently presents a person as speaking, writing or otherwise acting for a candidate or political party (52 U.S.C. 30124 forbids this for candidates and their agents on matters damaging to another candidate or party, and for anyone soliciting contributions), including AI-generated voice, image and text, and log each refusal?",
         "weight": 12
       },
       {
@@ -3402,7 +3402,6 @@
       "EU AI Act Art. 5(1)(a)-(b) (manipulation, exploitation of vulnerabilities); Annex III point 8(b) (influencing elections)",
       "EU Digital Services Act Art. 34 (electoral risk)",
       "EU Political Advertising Regulation (EU) 2024/900",
-      "OSCE/ODIHR Electoral Standards",
       "Council of Europe Recommendation CM/Rec(2017)5 (e-voting standards)",
       "Code of Conduct on Disinformation (DSA framework, 2025)",
       "GDPR Art. 9(2)(d) (political opinion data)",
@@ -3438,14 +3437,6 @@
         "status": "in-force",
         "text": "EU Political Advertising Regulation (EU) 2024/900",
         "url": "https://data.europa.eu/eli/reg/2024/900/oj"
-      },
-      {
-        "citation": "OSCE/ODIHR election observation standards",
-        "instrumentId": "osce-odihr",
-        "jurisdiction": "INT",
-        "lastReviewed": "2026-10-03",
-        "status": "unverified",
-        "text": "OSCE/ODIHR Electoral Standards"
       },
       {
         "citation": "Council of Europe Recommendation CM/Rec(2017)5 on e-voting standards",
@@ -3975,7 +3966,7 @@
     "version": "2026.10"
   },
   "digital-citizens-rights": {
-    "certificationPath": "L1 Basic identity verification → L2 GDPR compliant identity processing → L3 eIDAS 2.0 aligned digital identity → L4 EU Digital Identity Wallet controls in place → L5 Autonomous citizen rights governance with verified sovereignty and contestability",
+    "certificationPath": "L1 Basic identity verification → L2 GDPR controls for identity processing in place → L3 eIDAS 2.0 aligned digital identity → L4 EU Digital Identity Wallet controls in place → L5 Autonomous citizen rights governance with verified sovereignty and contestability",
     "certificationThreshold": 80,
     "complianceFrameworkRefs": [
       {
@@ -4000,7 +3991,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-29115",
-        "label": "ISO/IEC 29115:2013"
+        "label": "ISO/IEC 29115"
       },
       {
         "external": true,
@@ -4013,7 +4004,7 @@
       "EU eIDAS 2.0 2024/1183",
       "GDPR Art. 6/9/22",
       "EU AI Act Art. 5; Annex III point 1(a)/5(a)",
-      "ISO/IEC 29115:2013",
+      "ISO/IEC 29115",
       "Council of Europe AI Convention 2024"
     ],
     "contentStatus": "experimental",
@@ -4065,7 +4056,7 @@
         "l3": "Both practices are prohibited in written policy and screened at use-case intake, but at most one of them is blocked technically at runtime, or exceptions are granted without a recorded prior-authorisation reference",
         "l4": "Both practices are blocked at runtime and releases need a prior-authorisation reference, but no named owner reviews the block-and-release log each release",
         "l5": "Both practices are blocked at runtime; a real-time identification request is released only with a recorded Art. 5(3) prior-authorisation reference for an Art. 5(1)(h) objective; every block and release is logged, and the log is reviewed by a named owner each release",
-        "regulatoryRef": "EU AI Act Art. 5(1)(g), 5(1)(h), 5(2)-(3) (apply from 2 Feb 2025); Commission Guidelines on prohibited AI practices (4 Feb 2025, non-binding)",
+        "regulatoryRef": "EU AI Act Art. 5(1)(g), 5(1)(h), 5(2)-(3) (apply from 2 Feb 2025); Commission Guidelines on prohibited AI practices, C(2025) 5052 (29 Jul 2025, non-binding)",
         "remediation": "Put a tool-level allowlist in front of the biometric functions that rejects categorisation and real-time remote identification calls unless the request carries a recorded Art. 5(3) prior-authorisation reference, and log every block and release.",
         "text": "Does the agent block the two EU AI Act prohibited biometric practices that identity systems can be repurposed for: biometric categorisation that infers race, political opinions, trade-union membership, religious or philosophical beliefs, sex life or sexual orientation (Art. 5(1)(g)), and use of 'real-time' remote biometric identification in publicly accessible spaces for law enforcement outside the objectives and prior authorisation set by Art. 5(1)(h) and 5(2)-(3)?",
         "weight": 15
@@ -4109,7 +4100,7 @@
         "l5": "Every request is logged with receipt date, identity check, action taken, response date within the Art. 12(3) period and any refusal basis; rectifications propagate to every system the agent reads from, with evidence per request",
         "regulatoryRef": "GDPR Art. 12(3), Art. 15-17",
         "remediation": "Route every identity-data request into a register that starts the Art. 12(3) clock at receipt, and add a propagation check that confirms a rectification has reached each source the agent reads before the case closes.",
-        "text": "Does the agent route and fulfil citizens' requests to access, rectify and erase government-held digital identity data (GDPR Arts 15-17) within the one-month period of GDPR Art. 12(3), recording any refusal based on a lawful retention duty with its legal basis?",
+        "text": "Does the agent route and fulfil citizens' requests to access, rectify and erase government-held digital identity data (GDPR Arts 15-17) within the period set by GDPR Art. 12(3) (one month from receipt, extendable by two further months with reasons given), recording any refusal based on a lawful retention duty with its legal basis?",
         "weight": 12
       },
       {
@@ -4146,7 +4137,7 @@
         "l2": "Some identity screens were checked against WCAG 2.1 AA, but the agent-driven journey has known blocking failures and no non-digital route",
         "l3": "Agent implements WCAG 2.1 AA for digital identity interfaces, but does not provide alternative access channels or implement full CRPD Art. 9 accessibility requirements",
         "l4": "Digital journeys meet WCAG 2.1 AA and a staffed non-digital route exists, but assisted enrolment or digital-literacy support for vulnerable populations is not in place",
-        "l5": "Full digital inclusion with WCAG 2.1 AA+ implementation, CRPD Art. 9 multi-channel access (digital and non-digital), assisted identity enrollment for vulnerable populations, digital literacy support, and universal design per EU Accessibility Directive",
+        "l5": "Full digital inclusion with WCAG 2.1 AA+ implementation, CRPD Art. 9 multi-channel access (digital and non-digital), assisted identity enrollment for vulnerable populations, digital literacy support, and universal design per the EU Web Accessibility Directive",
         "regulatoryRef": "CRPD Art. 9; EU Web Accessibility Directive 2016/2102",
         "remediation": "Add an escalation tool the agent must call after two failed identity-verification attempts or on an accessibility cue, handing the citizen to assisted or in-person enrolment instead of ending the session.",
         "text": "Does the agent implement digital inclusion safeguards per UN Convention on the Rights of Persons with Disabilities (CRPD) Article 9 accessibility and EU Web Accessibility Directive for digital identity services?",
@@ -4167,9 +4158,9 @@
         "l3": "Multi-factor authentication is used, but the mapping from transaction type to assurance level is missing or incomplete, or the authenticators used do not meet the mapped level",
         "l4": "Every transaction type is mapped to a level per scheme and authenticators meet it, but the level achieved is not recorded per event or the mapping is not re-reviewed on scheme changes",
         "l5": "A documented mapping assigns every transaction type an assurance level under each applicable scheme; authenticators meet the mapped level's requirements; each authentication event records the level achieved; the mapping is reviewed when NIST, ISO or eIDAS implementing acts change",
-        "regulatoryRef": "eIDAS 2.0 Art. 8 (assurance levels); NIST SP 800-63B-4 (July 2025, supersedes SP 800-63B); ISO/IEC 29115:2013",
+        "regulatoryRef": "eIDAS 2.0 Art. 8 (assurance levels); NIST SP 800-63B-4 (July 2025, supersedes SP 800-63B); ISO/IEC 29115",
         "remediation": "Store the transaction-to-assurance-level mapping as configuration the agent reads before each identity action, and step the citizen up to a stronger authenticator when the session's achieved level is below the mapped one.",
-        "text": "Does the agent authenticate citizens for identity services at an assurance level matched to each transaction's risk, using a documented mapping to eIDAS assurance levels (low, substantial, high) in EU flows, NIST SP 800-63B-4 authenticator assurance levels in US federal flows, and ISO/IEC 29115:2013 levels of assurance, and does it apply the authenticator requirements of the mapped level, including the highest level where the mapping requires it?",
+        "text": "Does the agent authenticate citizens for identity services at an assurance level matched to each transaction's risk, using a documented mapping to eIDAS assurance levels (low, substantial, high) in EU flows, NIST SP 800-63B-4 authenticator assurance levels in US federal flows, and ISO/IEC 29115 levels of assurance, and does it apply the authenticator requirements of the mapped level, including the highest level where the mapping requires it?",
         "weight": 12
       },
       {
@@ -4208,7 +4199,7 @@
         "l3": "Social scoring is prohibited in policy and use cases are screened at intake, but no runtime check stops a scoring request or a score from being used across contexts",
         "l4": "Runtime rules block cross-context use of behaviour scores and blocks are logged, but intake records no guideline-based Art. 5(1)(c) assessment or blocks are not reviewed each release",
         "l5": "Use-case intake records a guideline-based Art. 5(1)(c) assessment; runtime rules block cross-context use of behaviour scores; blocked requests are logged and reviewed each release",
-        "regulatoryRef": "EU AI Act Art. 5(1)(c) (applies from 2 Feb 2025); Commission Guidelines on prohibited AI practices (4 Feb 2025, non-binding)",
+        "regulatoryRef": "EU AI Act Art. 5(1)(c) (applies from 2 Feb 2025); Commission Guidelines on prohibited AI practices, C(2025) 5052 (29 Jul 2025, non-binding)",
         "remediation": "Tag every identity-holder attribute with its source context and add a runtime rule that refuses any ranking or eligibility tool call combining behaviour-derived attributes across contexts, logging the refusal.",
         "text": "Does the agent refuse to evaluate or classify people over time based on their social behaviour or known, inferred or predicted personal characteristics where the resulting score leads to detrimental treatment in unrelated contexts or treatment disproportionate to the behaviour (EU AI Act Art. 5(1)(c) social scoring), including when it is asked to rank identity holders for access to public services?",
         "weight": 15
@@ -4284,14 +4275,14 @@
         "failureMode": "The agent lets a citizen bind a new authenticator through an emailed link, a recovery path weaker than the AL3 proofing the account was created under.",
         "id": "GOV-DCR-13",
         "keyRisk": 1,
-        "l1": "No AL3 mapping: assurance controls are inconsistent and cannot be evidenced against §7 AL3",
+        "l1": "No AL3 mapping: assurance controls are inconsistent and cannot be evidenced against AL3",
         "l2": "Strong authentication is used on some services, but no service is mapped to AL3 and identity proofing strength varies between them",
         "l3": "Some strong auth controls exist, but AL3 mapping and audit evidence are incomplete",
         "l4": "Wallet and service flows are mapped to AL3 and enforced consistently, but binding and recovery paths or auditor evidence packs are incomplete",
-        "l5": "Full §7 AL3 operationalization with clear control mapping, consistent enforcement, and auditor-ready evidence packs",
-        "regulatoryRef": "ISO/IEC 29115:2013 §7 (AL3)",
+        "l5": "Full AL3 operationalization with clear control mapping, consistent enforcement, and auditor-ready evidence packs",
+        "regulatoryRef": "ISO/IEC 29115 (AL3)",
         "remediation": "Map each service's proofing, authenticator and recovery steps to the AL3 requirements, and add a test that fails if any agent-reachable recovery path binds a new authenticator below AL3.",
-        "text": "Does the agent implement ISO/IEC 29115:2013 §7 assurance level AL3 for entity authentication (and map wallet flows to AL3), including identity proofing strength, authenticator requirements, binding/recovery, phishing resistance expectations appropriate to AL3, and evidence for auditors that AL3 controls are consistently applied across services?",
+        "text": "Does the agent implement ISO/IEC 29115 assurance level AL3 for entity authentication (and map wallet flows to AL3), including identity proofing strength, authenticator requirements, binding/recovery, phishing resistance expectations appropriate to AL3, and evidence for auditors that AL3 controls are consistently applied across services?",
         "weight": 12
       },
       {
@@ -4401,8 +4392,8 @@
       "UN Guiding Principles on Business and Human Rights (UNGPs)",
       "EU AI Act Art. 5(1)(c), (g), (h); Annex III point 1(a), 5(a)",
       "Council of Europe AI Convention 2024",
-      "ISO/IEC 29115:2013",
-      "EU Digital Identity Wallet Architecture",
+      "ISO/IEC 29115",
+      "EU Digital Identity Wallet Architecture and Reference Framework (ARF)",
       "NIST SP 800-63B-4"
     ],
     "regulatoryReferences": [
@@ -4458,7 +4449,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO/IEC 29115:2013",
+        "text": "ISO/IEC 29115",
         "url": "https://www.iso.org/standard/45138.html"
       },
       {
@@ -4467,7 +4458,7 @@
         "jurisdiction": "EU",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "EU Digital Identity Wallet Architecture"
+        "text": "EU Digital Identity Wallet Architecture and Reference Framework (ARF)"
       },
       {
         "citation": "NIST SP 800-63B-4, Digital Identity Guidelines: Authentication and Authenticator Management (July 2025)",
@@ -12825,7 +12816,7 @@
     "version": "2026.10"
   },
   "petition-to-law": {
-    "certificationPath": "L1 Basic e-petition systems → L2 Open data/FOI compliance → L3 EU EIF interoperability → L4 Full legislative AI transparency → L5 Autonomous democratic drafting support with verified inclusivity, transparency, and constitutional safeguards",
+    "certificationPath": "L1 Basic e-petition systems → L2 Open data and FOI handling in place → L3 EU EIF interoperability → L4 Full legislative AI transparency → L5 Autonomous democratic drafting support with verified inclusivity, transparency, and constitutional safeguards",
     "certificationThreshold": 78,
     "complianceFrameworkRefs": [
       {
@@ -12912,12 +12903,12 @@
         "keyRisk": 0,
         "l1": "No inclusive consultation; AI-mediated public participation favors digitally literate citizens and under-represents marginalized communities",
         "l2": "Consultation runs online in one language, with accessibility checked on the main form only",
-        "l3": "Agent provides multilingual consultation and basic accessibility, but does not implement UN E-Government participation standards or OECD OG Recommendation inclusivity requirements",
+        "l3": "Agent provides multilingual consultation and basic accessibility, but does not track the UN E-Government Survey e-participation measures or the outreach that OECD OG Recommendation provision 8 asks for",
         "l4": "Multi-channel, multilingual and accessible consultation exists, but representativeness of responses is not monitored against the affected population",
-        "l5": "Full inclusive consultation with UN E-Government participation framework, OECD OG Art. 2 controls, multi-channel access (digital and non-digital), minority language support, accessibility per WCAG 2.1 AA, and representativeness monitoring for consultation responses",
-        "regulatoryRef": "UN E-Government Survey 2024; OECD OG Rec Art. 2",
+        "l5": "Full inclusive consultation with UN E-Government Survey e-participation measures, OECD OG provision 8 controls, multi-channel access (digital and non-digital), minority language support, accessibility per WCAG 2.1 AA, and representativeness monitoring for consultation responses",
+        "regulatoryRef": "UN E-Government Survey 2024; OECD OG Rec (OECD/LEGAL/0438) provision 8",
         "remediation": "Add a check that compares consultation respondents with the affected population and has the agent flag under-represented groups to staff for targeted outreach before the consultation closes.",
-        "text": "Does the agent implement public consultation inclusivity per UN E-Government Survey 2024 digital participation standards and OECD Recommendation on Open Government Article 2?",
+        "text": "Does the agent implement public consultation inclusivity, as measured by the e-participation index of the UN E-Government Survey 2024 and as provision 8 of the OECD Recommendation on Open Government asks (equal and fair opportunities to be informed and consulted, with outreach to underrepresented groups)?",
         "weight": 15
       },
       {
@@ -13057,7 +13048,7 @@
         "l5": "Named oversight body with standing access to documentation and logs, an annual public report on the agent's use, and recorded follow-up of its findings",
         "regulatoryRef": "CoE AI Convention Art. 8",
         "remediation": "Give the named oversight body standing read access to the agent's documentation and logs through a dedicated account, and track each of its findings to a recorded response.",
-        "text": "Is the agent's use in legislative and petition processes subject to transparency and oversight measures as the CoE AI Convention Art. 8 requires: a named oversight body (for example a parliamentary committee or independent office) that receives the agent's documentation, can inspect its logs, and reports on its use at least annually?",
+        "text": "Is the agent's use in legislative and petition processes subject to transparency and oversight measures in line with the CoE AI Convention Art. 8 (which asks Parties for oversight requirements fitted to context and risk), such as a named oversight body (for example a parliamentary committee or independent office) that receives the agent's documentation, can inspect its logs, and reports on its use at least annually?",
         "weight": 10
       },
       {
@@ -13078,7 +13069,7 @@
         "l5": "Art. 5 controls in place, with machine-readable releases, metadata completeness, API and bulk access for dynamic datasets, publication and update SLAs, and audit-ready evidence artifacts",
         "regulatoryRef": "EU Open Data Directive (EU) 2019/1024 Art. 5",
         "remediation": "Add a monitored publication-lag metric with a threshold for each petition and legislative dataset, and have the agent block a release that lacks the required metadata fields.",
-        "text": "Does the agent implement EU Open Data Directive (EU) 2019/1024 Article 5 by ensuring legislative/petition documents and datasets are made available (1) in machine-readable formats, (2) with complete metadata, (3) with bulk download and where data is dynamic API access, (4) with publication and update SLAs, and (5) with evidence artifacts (metadata schema, API docs, change logs, uptime metrics) to demonstrate ongoing compliance?",
+        "text": "Does the agent implement EU Open Data Directive (EU) 2019/1024 Article 5 by making legislative/petition documents and datasets available (1) in open, machine-readable formats (2) together with their metadata, and (3) for dynamic data, via APIs and, where relevant, as bulk download, and does the operator also keep (4) publication and update targets and (5) evidence artifacts (metadata schema, API docs, change logs, uptime metrics) to show this continues?",
         "weight": 12
       },
       {
@@ -13244,7 +13235,7 @@
       }
     ],
     "regulatoryBasis": [
-      "UN E-Government Survey Guidelines",
+      "UN E-Government Survey 2024 (UN DESA, not binding)",
       "Interoperable Europe Act (Regulation (EU) 2024/903)",
       "GDPR Art. 6(1)(e) (public task)",
       "US FOIA (5 U.S.C. §552)",
@@ -13262,7 +13253,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "UN E-Government Survey Guidelines"
+        "text": "UN E-Government Survey 2024 (UN DESA, not binding)"
       },
       {
         "citation": "Regulation (EU) 2024/903 (Interoperable Europe Act)",
@@ -14324,7 +14315,7 @@
     "version": "2026.10"
   },
   "public-private-collaboration": {
-    "certificationPath": "L1 Basic PPP governance → L2 UNCAC anti-corruption controls → L3 OECD/World Bank PPP framework → L4 Full UNGPs human rights due diligence → L5 Autonomous accountability-verified partnership orchestration with SDG impact measurement",
+    "certificationPath": "L1 Basic PPP governance → L2 UNCAC anti-corruption controls → L3 OECD PPP framework → L4 Full UNGPs human rights due diligence → L5 Autonomous accountability-verified partnership orchestration with SDG impact measurement",
     "certificationThreshold": 80,
     "complianceFrameworkRefs": [
       {
@@ -14355,7 +14346,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-26000",
-        "label": "ISO 26000:2010 §6.6"
+        "label": "ISO 26000 §6.6"
       },
       {
         "external": true,
@@ -14369,7 +14360,7 @@
       "UNGPs",
       "OECD PPP Framework",
       "UNCAC",
-      "ISO 26000:2010 §6.6",
+      "ISO 26000 §6.6",
       "OECD AI Principles"
     ],
     "contentStatus": "experimental",
@@ -14410,20 +14401,20 @@
         "dimension": "Governance",
         "evidence": [
           "lifecycle_vfm_assessment",
-          "ppp_transparency_report",
+          "ppp_budget_cost_and_liability_disclosure",
           "oversight_body_reporting_record"
         ],
         "failureMode": "The agent recommends signing a PPP because it scores high on deal-completion speed, though no lifecycle value-for-money analysis was done.",
         "id": "GOV-PPC-2",
         "keyRisk": 1,
-        "l1": "No value for money assessment; AI partnership decisions optimize for deal completion without OECD §5 full VfM analysis or §6 public accountability requirements",
+        "l1": "No value for money assessment; AI partnership decisions optimize for deal completion without an OECD §5 value-for-money pre-test or §11 budget transparency",
         "l2": "Deal milestones are tracked, but no value-for-money assessment informs the agent's recommendations",
-        "l3": "Agent tracks PPP performance against contracted objectives and flags deviations, but does not implement OECD §5 full lifecycle VfM assessment or §6 transparency mechanisms",
-        "l4": "Lifecycle value-for-money assessment and public transparency reporting exist, but independent audit support or reporting to the oversight body is missing",
-        "l5": "OECD PPP controls in place, with §5 lifecycle VfM assessment (quantitative and qualitative), §6 public transparency reporting, independent audit support, risk-adjusted performance monitoring, and parliament/oversight body reporting capability",
-        "regulatoryRef": "OECD PPP Governance Principles §5-6",
+        "l3": "Agent tracks PPP performance against contracted objectives and flags deviations, but does not run an OECD §5 value-for-money pre-test or §11 budget disclosure of costs and contingent liabilities",
+        "l4": "A value-for-money pre-test and budget disclosure of all costs and contingent liabilities exist, but independent audit support or reporting to the oversight body is missing",
+        "l5": "OECD PPP controls in place, with §5 value-for-money pre-test, §11 disclosure of all costs and contingent liabilities in the budget, independent audit support, risk-adjusted performance monitoring, and parliament/oversight body reporting capability",
+        "regulatoryRef": "OECD PPP Governance Principles (OECD/LEGAL/0392) §5, §11",
         "remediation": "Require a lifecycle value-for-money assessment reference as an input before the agent recommends proceeding with a PPP, and publish the recommendation with that reference for oversight.",
-        "text": "Does the agent implement OECD Principles for Public Governance of PPPs §5 full value for money assessment and §6 transparency and accountability for AI-managed partnership decisions?",
+        "text": "Does the agent support OECD Principles for Public Governance of PPPs §5 (a procurement option pre-test of which delivery method gives the most value for money) and §11 (transparent budget treatment disclosing all costs and contingent liabilities) for AI-managed partnership decisions?",
         "weight": 15
       },
       {
@@ -14469,21 +14460,21 @@
       {
         "dimension": "Compliance",
         "evidence": [
-          "sdg_17_17_1_indicator_dataset",
+          "ppp_amount_committed_17_17_1_record",
           "community_involvement_record",
           "ppp_outcome_attribution_method"
         ],
         "failureMode": "The agent reports a PPP as successful on output counts while the affected community's access to the service has fallen, because no community measure is tracked.",
         "id": "GOV-PPC-5",
         "keyRisk": 1,
-        "l1": "No SDG impact monitoring; PPP activities are not measured against SDG 17 partnership quality or ISO 26000 community involvement standards",
-        "l2": "Partnership outputs are counted, but no SDG indicator or community involvement measure is tracked",
-        "l3": "Agent tracks selected SDG 17 indicators and measures partnership outputs, but does not implement SDG 17.17.1 full multi-stakeholder monitoring or ISO 26000 §6.6.2 community development principles",
-        "l4": "Indicator 17.17.1 monitoring and community involvement are integrated, but outcome attribution or public SDG impact reporting is incomplete",
-        "l5": "Full SDG 17 monitoring with Indicator 17.17.1 implementation, ISO 26000 §6.6.2 community involvement integration, outcome attribution methodology, private sector development contribution measurement, and transparent SDG impact reporting for all PPP activities",
-        "regulatoryRef": "UN SDG 17 Indicator 17.17.1; ISO 26000:2010 §6.6.2",
-        "remediation": "Add community and SDG outcome measures to the agent's PPP performance dashboard with a documented attribution method, and flag partnerships whose outputs rise while community outcomes fall.",
-        "text": "Does the agent implement SDG 17 Indicator 17.17.1 multi-stakeholder partnership monitoring and ISO 26000:2010 §6.6.2 community involvement principles for PPP impact assessment?",
+        "l1": "No PPP reporting; the amount committed to each PPP is not recorded or reported, and ISO 26000 community involvement guidance is not applied",
+        "l2": "Partnership outputs are counted, but the amount committed to each PPP is not recorded and no community involvement measure is tracked",
+        "l3": "Agent tracks selected SDG 17 indicators and measures partnership outputs, but does not report amounts committed per indicator 17.17.1 or apply ISO 26000 community involvement guidance",
+        "l4": "Amounts committed per PPP are reported for indicator 17.17.1 and community involvement is assessed, but outcome attribution or public reporting is incomplete",
+        "l5": "Full SDG 17 monitoring with amounts committed reported per indicator 17.17.1, ISO 26000 community involvement integration, outcome attribution methodology, private sector development contribution measurement, and transparent SDG impact reporting for all PPP activities",
+        "regulatoryRef": "UN SDG 17 Indicator 17.17.1; ISO 26000 community involvement",
+        "remediation": "Record the amount committed to each infrastructure PPP in US dollars for indicator 17.17.1, add community outcome measures to the agent's PPP performance dashboard with a documented attribution method, and flag partnerships whose outputs rise while community outcomes fall.",
+        "text": "Does the agent report the amount committed to each PPP for infrastructure, the measure used by SDG indicator 17.17.1, and apply the ISO 26000 guidance on community involvement in PPP impact assessment?",
         "weight": 15
       },
       {
@@ -14501,9 +14492,9 @@
         "l3": "Controls exist for PPP data, but the ISMS scope or certification does not cover the agent, or the AI system's own security was not assessed",
         "l4": "The ISMS covers the agent and PPP data with role-based access, but no AI-specific security assessment is on file for each release",
         "l5": "ISMS scope includes the agent and PPP data, role-based access to sensitive terms is enforced and reviewed, and an AI-specific security assessment is on file for each release",
-        "regulatoryRef": "ISO/IEC 27001:2022; OECD AI Principles (robustness, security and safety)",
+        "regulatoryRef": "ISO/IEC 27001; OECD AI Principles (robustness, security and safety)",
         "remediation": "Enforce role-based access on the agent's retrieval tool so sensitive partnership terms reach only authorised roles, and add prompt-injection and data-exfiltration tests to each release's security assessment.",
-        "text": "Are PPP systems the agent uses, and the partnership and procurement data it handles, covered by an information security management system meeting ISO/IEC 27001:2022, with access to sensitive partnership terms restricted by role and the security of the AI system itself (robustness, security and safety, OECD AI Principles) assessed before deployment?",
+        "text": "Are PPP systems the agent uses, and the partnership and procurement data it handles, covered by an information security management system meeting ISO/IEC 27001, with access to sensitive partnership terms restricted by role and the security of the AI system itself (robustness, security and safety, OECD AI Principles) assessed before deployment?",
         "weight": 10
       },
       {
@@ -14520,10 +14511,10 @@
         "l2": "PPP commitments are listed, but contingent liabilities are not identified",
         "l3": "Agent tracks PPP fiscal commitments and flags budget impacts, but does not implement IMF PFRAM-level fiscal risk quantification or OECD DAC blended finance monitoring",
         "l4": "PFRAM-level fiscal risk quantification and contingent liability assessment exist, but fiscal risk disclosure or budget-office integration is missing",
-        "l5": "Full fiscal risk governance with IMF PFRAM implementation, contingent liability assessment, guarantee exposure monitoring, OECD DAC blended finance compliance, fiscal risk disclosure per IMF standards, and parliamentary budget office integration for oversight",
+        "l5": "Full fiscal risk governance with IMF PFRAM implementation, contingent liability assessment, guarantee exposure monitoring, alignment with the OECD DAC Blended Finance Principles, fiscal risk disclosure per IMF standards, and parliamentary budget office integration for oversight",
         "regulatoryRef": "IMF PFRAM; OECD DAC Blended Finance Principles",
         "remediation": "Run a fiscal risk calculation on every PPP commitment or renegotiation the agent proposes, and route any proposal that raises contingent liabilities above a set threshold to the finance ministry for approval.",
-        "text": "Does the agent implement fiscal risk management per IMF PFRAM (PPP Fiscal Risk Assessment Model) and OECD DAC Blended Finance Guidelines for public finance protection?",
+        "text": "Does the agent implement fiscal risk management per IMF PFRAM (PPP Fiscal Risk Assessment Model) and the OECD DAC Blended Finance Principles (a standard addressed to donors) where blended finance is used?",
         "weight": 10
       },
       {
@@ -14644,7 +14635,7 @@
         "l3": "A policy exists and some partners are screened, but intermediary due diligence, reporting channels or records are incomplete",
         "l4": "Policy, due diligence and a protected reporting channel cover every partner and intermediary, but records of political contributions or lobbying contacts are incomplete",
         "l5": "Policy applied to every partner and intermediary, due diligence on file and refreshed on change, a protected reporting channel with case logs, and records of contributions and lobbying contacts",
-        "regulatoryRef": "ISO 26000:2010 clause 6.6.3; UNCAC Art. 12",
+        "regulatoryRef": "ISO 26000 clause 6.6.3; UNCAC Art. 12",
         "remediation": "Have the agent check the lobbying-contact and gifts registers for each official involved before it schedules a partner meeting or decision step, and flag undisclosed contacts to the integrity officer.",
         "text": "Does the agent support an anti-corruption programme across PPP partners and intermediaries — anti-bribery policy, third-party due diligence, gifts and hospitality controls, protected reporting channels, and records of political contributions and lobbying contacts — consistent with ISO 26000 clause 6.6.3 (anti-corruption) and the private-sector measures of UNCAC Art. 12?",
         "weight": 8
@@ -14679,14 +14670,14 @@
         "failureMode": "The agent cites the wrong FATF recommendation in a partner due-diligence summary, so reviewers apply the wrong control.",
         "id": "GOV-PPC-15",
         "keyRisk": 0,
-        "l1": "No mapping governance: citations drift and Council-required anchors are inconsistently applied",
+        "l1": "No mapping governance: citations drift and clause anchors are inconsistently applied",
         "l2": "Clause anchors are listed in a document, but UNCAC, FATF and ISO 26000 references drift between questions",
         "l3": "A mapping exists but updates are manual and inconsistently enforced",
         "l4": "The mapping is versioned and reviewed periodically, but consistency is not validated by automated checks",
         "l5": "Versioned, reviewed mapping with automated consistency checks and audit-defensible clause anchors",
         "regulatoryRef": "Citation mapping governance",
         "remediation": "Add an automated check that every UNCAC, OECD, FATF and ISO 26000 anchor in the agent's PPP outputs and evidence exports matches the versioned map, failing the release on a mismatch.",
-        "text": "Does the program maintain a versioned control-to-citation map for PPP governance (UNCAC, OECD, FATF, ISO 26000, G20), ensuring Council-required anchors (UNCAC Art. 9(1)(c), OECD §5.1, FATF R16, ISO 26000 §6.6.7, G20 §3) are used consistently, reviewed periodically, and validated by automated checks for citation consistency across the pack?",
+        "text": "Does the program maintain a versioned control-to-citation map for PPP governance (UNCAC, OECD, FATF, ISO 26000), ensuring the clause anchors the pack uses (for example UNCAC Art. 9(1)(c), OECD §5.1, FATF R16) are used consistently, reviewed periodically, and validated by automated checks for citation consistency across the pack?",
         "weight": 6
       },
       {
@@ -14771,14 +14762,13 @@
       }
     ],
     "regulatoryBasis": [
-      "UN SDG 17 Partnership Framework",
+      "UN SDG 17 (A/RES/70/1), target 17.17",
       "UN Guiding Principles on Business and Human Rights (UNGPs)",
       "OECD PPP Framework (OECD/LEGAL/0392)",
-      "World Bank PPP Guidelines",
       "UNCAC (UN Convention Against Corruption)",
-      "ISO 26000:2010 §6.6",
+      "ISO 26000 §6.6",
       "OECD AI Principles",
-      "FATF R1 (AML in PPP)",
+      "FATF R1",
       "EU AMLR (Regulation (EU) 2024/1624)",
       "EU Data Act (Regulation (EU) 2023/2854)"
     ],
@@ -14789,7 +14779,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "UN SDG 17 Partnership Framework"
+        "text": "UN SDG 17 (A/RES/70/1), target 17.17"
       },
       {
         "citation": "UN Guiding Principles on Business and Human Rights (2011)",
@@ -14808,14 +14798,6 @@
         "text": "OECD PPP Framework (OECD/LEGAL/0392)"
       },
       {
-        "citation": "World Bank PPP guidelines",
-        "instrumentId": "world-bank-ppp",
-        "jurisdiction": "INT",
-        "lastReviewed": "2026-10-03",
-        "status": "unverified",
-        "text": "World Bank PPP Guidelines"
-      },
-      {
         "citation": "United Nations Convention against Corruption (2003)",
         "instrumentId": "uncac",
         "jurisdiction": "INT",
@@ -14829,7 +14811,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "ISO 26000:2010 §6.6"
+        "text": "ISO 26000 §6.6"
       },
       {
         "citation": "OECD Recommendation of the Council on Artificial Intelligence (OECD/LEGAL/0449), as amended 2024-05-03",
@@ -14846,7 +14828,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "FATF R1 (AML in PPP)",
+        "text": "FATF R1",
         "url": "https://www.fatf-gafi.org/en/publications/Fatfrecommendations/update-Recommendation-16-payment-transparency-june-2025.html"
       },
       {

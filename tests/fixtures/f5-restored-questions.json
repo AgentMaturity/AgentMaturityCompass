@@ -97,7 +97,7 @@
       "question": {
         "id": "GOV-DD-15",
         "dimension": "Governance",
-        "text": "Does the program maintain a versioned, Council-anchor-aligned control-to-law mapping for the Dance of Democracy pack (EU AI Act Art. 5(1)(b), DSA Art. 34(1)(c), OSCE/ODIHR §3.2, CoE CM/Rec(2017)5, GDPR Art. 9(2)(d)), with periodic review to prevent citation drift and ensure evidence expectations remain audit-defensible?",
+        "text": "Does the program maintain a versioned control-to-law mapping for the Dance of Democracy pack (EU AI Act Art. 5(1)(b), DSA Art. 34(1)(c), CoE CM/Rec(2017)5, GDPR Art. 9(2)(d)), with periodic review to prevent citation drift and ensure evidence expectations remain audit-defensible?",
         "regulatoryRef": "Citation mapping governance",
         "l1": "No mapping governance: citations drift and requested anchors are inconsistently used",
         "l3": "Mapping exists but updates are manual and inconsistently applied",
@@ -123,9 +123,9 @@
       "question": {
         "id": "GOV-PPC-15",
         "dimension": "Governance",
-        "text": "Does the program maintain a versioned control-to-citation map for PPP governance (UNCAC, OECD, FATF, ISO 26000, G20), ensuring Council-required anchors (UNCAC Art. 9(1)(c), OECD §5.1, FATF R16, ISO 26000 §6.6.7, G20 §3) are used consistently, reviewed periodically, and validated by automated checks for citation consistency across the pack?",
+        "text": "Does the program maintain a versioned control-to-citation map for PPP governance (UNCAC, OECD, FATF, ISO 26000), ensuring the clause anchors the pack uses (for example UNCAC Art. 9(1)(c), OECD §5.1, FATF R16) are used consistently, reviewed periodically, and validated by automated checks for citation consistency across the pack?",
         "regulatoryRef": "Citation mapping governance",
-        "l1": "No mapping governance: citations drift and Council-required anchors are inconsistently applied",
+        "l1": "No mapping governance: citations drift and clause anchors are inconsistently applied",
         "l3": "A mapping exists but updates are manual and inconsistently enforced",
         "l5": "Versioned, reviewed mapping with automated consistency checks and audit-defensible clause anchors",
         "weight": 6
