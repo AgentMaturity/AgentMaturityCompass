@@ -6,7 +6,9 @@ describe("Security Starter Pack — AMC-121", () => {
   test("pack has correct metadata", () => {
     expect(securityStarterPack.id).toBe("security-starter");
     expect(securityStarterPack.title).toContain("Security Starter");
-    expect(securityStarterPack.description.toLowerCase()).toContain("default-on");
+    // It is not run by default; the description must not claim it is (AMC wording rule).
+    expect(securityStarterPack.description.toLowerCase()).not.toContain("default-on");
+    expect(securityStarterPack.description).toContain("Runs only when you choose it");
   });
 
   test("pack has 8 scenarios covering core attack surfaces", () => {
