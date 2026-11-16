@@ -54,7 +54,9 @@ describe("cross-surface AMC brand identity", () => {
     const header = readme.slice(0, 2200);
 
     expect(header).toContain('src="website/og-card.png"');
-    expect(header).toContain("Run one command. Get the full score. Fix the gaps.");
+    expect(header).toContain("Build an AI agent for work that gets audited");
+    expect(header).toContain("Build, run and check AI agents for regulated work.");
+    expect(header).not.toContain("Run one command");
     expect(header).toContain("Evidence over claims.");
     expect(header).not.toContain("img.shields.io/badge/🧭_AMC");
     const whitepaper = read("whitepaper/AMC_WHITEPAPER_v1.md");
@@ -67,7 +69,9 @@ describe("cross-surface AMC brand identity", () => {
     const header = docsIndex.slice(0, 1200);
 
     expect(header).toContain('src="https://agentmaturity.co/og-card.png"');
-    expect(header).toContain("Run one command. Get the full score. Fix the gaps.");
+    expect(header).toContain("Build an AI agent for work that gets audited");
+    expect(header).toContain("Build, run and check AI agents for regulated work.");
+    expect(header).not.toContain("Run one command");
     expect(header).toContain("Evidence over claims.");
   });
 

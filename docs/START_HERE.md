@@ -1,15 +1,16 @@
 # START_HERE.md — Where to begin with AMC
 
-Choose what you want to do first. AMC can run a native task, assess evidence, or connect to an agent you already use.
+AMC helps you build an AI agent for work that gets audited, run it, and check what it really did. Most people start by building an agent for their industry, then watch or score an agent they already have. Install the current source build first ([README](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/README.md#install)).
 
 | Your intent | Start here | What happens |
 |---|---|---|
-| Not sure yet | `amc` in a terminal | A start menu: watch Claude Code or Codex, chat, open the console, or show the score. [Your first five minutes](FIRST_FIVE_MINUTES.md) walks through it. |
+| Build an agent for my industry | `amc` in a terminal, then "Build an agent for my industry (A4 Forge preview)" | AMC starts and offers to open the A4 page of the Compass Console, where you pick your industry and start an agent project. Each step waits for a person's approval. [A4 Forge](A4_FORGE.md) |
+| Not sure yet | `amc` in a terminal | A start menu: build an agent, watch Claude Code or Codex, chat, open the console, or show the score. [Your first five minutes](FIRST_FIVE_MINUTES.md) walks through it. |
 | Run a native task | `amc agent-loop guide` | Read-only guidance for an explicit provider, model and credential reference. |
 | Assess existing evidence | `amc --no-menu` (or `amc` in a pipe or CI; `amc --yes` in a folder AMC has not set up yet) | Creates or updates an evidence baseline; a valid report can still have insufficient evidence. |
 | Connect an existing agent | `amc connect --help` | Shows capture and connection options for your existing runtime. |
 
-The native task commands on this page (`amc agent-loop` and the keyless turn below) need the current source build, which is unreleased (the next release is 2.0.0); follow [the source installation](INSTALL.md#option-b-from-github-development) first. The hosted installers and npm give the published 1.1.1, which does not contain them.
+The commands on this page need the current source build, which reports version 1.2.0 and is not published yet; follow [the source installation](INSTALL.md#option-b-from-github-development) first. The hosted installers and npm give the published 1.1.1, which does not contain them.
 
 The native guide does not contact a model, open a session or change configuration. Choose OpenAI Chat Completions (`openai`), OpenAI Responses (`openai-responses`), or Anthropic with a model you can access for a real task. Choose `--provider stub` explicitly for a local recording demonstration; it does not produce a real model answer. Native commands pin the selected agent: explicit `--agent`, then `AMC_AGENT_ID`, the workspace's current agent, and finally `default`.
 
@@ -30,7 +31,7 @@ amc --agent default agent-loop run "Check recording with a local demonstration."
 amc agent-loop verify <session-id> --expect-monitor <monitor sha256>   # the run prints the session id
 ```
 
-Without the pinned fingerprint the verdict is UNANCHORED and the command exits 1: the monitor key is read from the workspace being verified, so the check proves internal consistency, not authorship.
+Without the pinned fingerprint the verdict is UNANCHORED and the command exits 1: the monitor key is read from the workspace being verified, so the check shows internal consistency, not authorship.
 
 `amc doctor` names each missing precondition and the exact command that fixes it
 (`runtime-firewall-policy` and `vault` are the two a fresh init leaves open); plain
@@ -142,11 +143,11 @@ Next step:
 Use the CLI.
 
 ```bash
-curl -fsSL https://agentmaturity.co/install.sh | sh
+curl -fsSL https://agentmaturity.co/install-source.sh | sh
 amc
 ```
 
-On Windows PowerShell, install with `irm https://agentmaturity.co/install.ps1 | iex`, then run `amc`. The installers give the published 1.1.1 release; for the current build, use [the source installation](INSTALL.md#option-b-from-github-development).
+The install address serves the script only after the website is published from `main`; until then, build by hand ([the source installation](INSTALL.md#option-b-from-github-development)). On Windows PowerShell, `irm https://agentmaturity.co/install-source.ps1 | iex` does the same, but it has not been tested on a real Windows machine yet. The older `install.sh` and `install.ps1` installers give the published 1.1.1 release, which has no start menu and no A4 Forge.
 
 The first run is an honest baseline. A signed `VALID` artifact can still be `INSUFFICIENT_EVIDENCE`; capture a real agent run and rerun before making external claims. Only evidence readiness `READY` is claim-eligible.
 
@@ -211,7 +212,7 @@ Examples:
 Use:
 
 ```bash
-amc wrap <adapter> -- <your command>
+amc adapters run --agent default --adapter <adapter> -- <your command>
 ```
 
 Then move into:
@@ -229,10 +230,10 @@ These names are canonical:
 - **Score** — trust scoring and maturity diagnostics
 - **Shield** — adversarial assurance packs
 - **Enforce** — policy controls and approvals
-- **Vault** — signatures, proof chains, evidence integrity
+- **Vault** — signatures and signed records (a signature shows who wrote a record and that it is unchanged, not that it is true)
 - **Watch** — traces, anomalies, monitoring
 - **Fleet** — multi-agent oversight and inventory
-- **Passport** — portable identity and credential artifacts
+- **Passport** — a self-issued, signed summary of an agent's results that others can check
 - **Comply** — compliance mapping and audit outputs
 
 Do not overthink this on day one.
@@ -245,7 +246,7 @@ If you are new, start with:
 
 ## Recommended first 15 minutes
 
-1. Install from the verified release script, then run `amc`
+1. Install the current source build ([README](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/README.md#install)), then run `amc`
 2. Read the gaps
 3. Run `amc fix`
 4. Read `docs/AFTER_FIRST_SCORE.md`
