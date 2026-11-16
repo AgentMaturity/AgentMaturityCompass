@@ -207,7 +207,7 @@
     "sourceUrl": "https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-prohibited-artificial-intelligence-ai-practices-defined-ai-act",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "The Commission page dated 4 February 2025 published the approved content of the draft; the English guidelines document it links is the Communication C(2025) 5052 final of 29.7.2025, and its paragraph (5) says the guidelines are non-binding. The citation now names the adopted Communication and its date."
+    "note": "The Commission page dated 4 February 2025 published the draft guidelines; the English guidelines document it links is the Communication C(2025) 5052 final of 29.7.2025, and its paragraph (5) says the guidelines are non-binding. The citation now names the adopted Communication and its date."
   },
   {
     "packId": "digital-citizens-rights",
@@ -417,7 +417,7 @@
     "sourceUrl": "https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-prohibited-artificial-intelligence-ai-practices-defined-ai-act",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "The Commission page dated 4 February 2025 published the approved content of the draft; the English guidelines document it links is the Communication C(2025) 5052 final of 29.7.2025, and its paragraph (5) says the guidelines are non-binding. The citation now names the adopted Communication and its date."
+    "note": "The Commission page dated 4 February 2025 published the draft guidelines; the English guidelines document it links is the Communication C(2025) 5052 final of 29.7.2025, and its paragraph (5) says the guidelines are non-binding. The citation now names the adopted Communication and its date."
   },
   {
     "packId": "digital-citizens-rights",
@@ -987,7 +987,7 @@
     "sourceUrl": "https://digital-strategy.ec.europa.eu/en/library/code-conduct-disinformation",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "The Commission page says the conversion takes effect from 1 July 2025, 'making its commitments auditable from that date onwards'; it is a benchmark for signatory VLOPs and VLOSEs. The Code PDF was not readable (image text); only the date and status are relied on."
+    "note": "The Commission page says the conversion takes effect from 1 July 2025, 'making its commitments auditable from that date onwards'; it is a benchmark for signatory VLOPs and VLOSEs. The 2025 Code of Conduct PDF is image text and could not be parsed; the page says it is the 2022 Strengthened Code of Practice integrated into the DSA framework, and the 2022 Code text was read (https://digital-strategy.ec.europa.eu/en/library/2022-strengthened-code-practice-disinformation)."
   },
   {
     "packId": "dance-of-democracy",
@@ -1092,7 +1092,7 @@
     "sourceUrl": "https://www.federalregister.gov/documents/2024/09/26/2024-21983/fraudulent-misrepresentation-of-campaign-authority",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Federal Register document 2024-21983, 89 FR 78785, action 'Interpretive rule', published and effective 26 September 2024."
+    "note": "Federal Register document 2024-21983, 89 FR 78785, action 'Interpretive rule', published and effective 26 September 2024. The text says 52 U.S.C. 30124 and 11 CFR 110.16 apply irrespective of the technology used, including content generated with the assistance of artificial intelligence."
   },
   {
     "packId": "dance-of-democracy",
@@ -1722,7 +1722,7 @@
     "sourceUrl": "https://publications.europa.eu/resource/celex/32018R1724",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Regulation (EU) 2018/1724 exists as cited. The complianceFrameworks label 'EU SDG 2018/1724' was renamed to the full name so it is not read as the UN Sustainable Development Goals."
+    "note": "Regulation (EU) 2018/1724 exists as cited. The complianceFrameworks label 'EU SDG 2018/1724' was renamed to the full name so it is not mistaken for the UN Sustainable Development Goals."
   },
   {
     "packId": "citizen-services",
@@ -1999,15 +1999,15 @@
     "questionId": "GOV-CS-7",
     "citation": "FedRAMP",
     "instrument": "Federal Risk and Authorization Management Program (FedRAMP)",
-    "clause": "programme",
-    "verdict": "verified",
+    "clause": "baselines",
+    "verdict": "unverifiable",
     "was": null,
     "now": null,
-    "sourceTitle": "FedRAMP home page (fedramp.gov)",
-    "sourceUrl": "https://www.fedramp.gov/",
+    "sourceTitle": null,
+    "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "fedramp.gov home page read: the US government programme for cloud security authorisation. Baseline content not read; the question relies only on the programme and authorisation existing."
+    "note": "Only the fedramp.gov home page was read; it confirms the programme exists, but the baseline and authorisation requirements the question relies on were not read."
   },
   {
     "packId": "citizen-services",
