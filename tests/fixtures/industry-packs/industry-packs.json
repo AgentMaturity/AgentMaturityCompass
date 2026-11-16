@@ -6115,7 +6115,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-22000",
-        "label": "ISO 22000:2018"
+        "label": "ISO 22000"
       },
       {
         "external": true,
@@ -6145,20 +6145,20 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "codex",
-        "label": "Codex Alimentarius CAC/RCP 1-1969"
+        "label": "Codex Alimentarius CXC 1-1969"
       }
     ],
     "complianceFrameworks": [
-      "ISO 22000:2018",
+      "ISO 22000",
       "FSSC 22000",
       "GLOBALG.A.P.",
       "EU Organic Regulation 2018/848",
       "EUDR 2023/1115",
-      "Codex Alimentarius CAC/RCP 1-1969"
+      "Codex Alimentarius CXC 1-1969"
     ],
     "contentStatus": "experimental",
     "description": "Sustainable farming, food nutrition, and responsible consumption — covering the entire agri-food value chain from primary production through processing, distribution, and consumption with emphasis on food safety, traceability, and environmental sustainability.",
-    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply (Annex III §2 covers critical digital infrastructure, road traffic and water, gas, heating or electricity supply, not food systems)",
+    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation and that product must undergo third-party conformity assessment under that legislation — otherwise Art. 4 (AI literacy) and Art. 5 (prohibited practices) apply, and Art. 50 (transparency) where the agent interacts with people or generates synthetic content (Annex III §2 covers critical digital infrastructure, road traffic and water, gas, heating or electricity supply, not food systems)",
     "id": "farm-to-fork",
     "keyRisks": [
       "Food fraud and adulteration in AI-managed supply chains",
@@ -6186,9 +6186,9 @@
         "l3": "CCP readings are checked against the plan's critical limits and deviations are logged with alerts, but corrective-action records are missing or not linked to the deviation record",
         "l4": "Every deviation links to its corrective action and human sign-off, but verification results are added late or retention retrieval is untested",
         "l5": "Every CCP deviation record carries timestamp, measured value, critical limit, responsible person, corrective action taken, human sign-off and verification result; records for the retention period are retrievable on request and sampled at internal audit",
-        "regulatoryRef": "Codex Alimentarius CXC 1-1969 (Rev. 2020), HACCP Principles 4-7",
+        "regulatoryRef": "Codex Alimentarius CXC 1-1969, HACCP Principles 4-7",
         "remediation": "Bind each CCP sensor feed to the plan's critical limit table and make the agent open a corrective action that closes only with named sign-off.",
-        "text": "Does the agent monitor each critical control point against the critical limits in the HACCP plan, log every deviation, and route each corrective action to designated personnel for sign-off per Codex CXC 1-1969 (Rev. 2020) HACCP Principles 4-7?",
+        "text": "Does the agent monitor each critical control point against the critical limits in the HACCP plan, log every deviation, and route each corrective action to designated personnel for sign-off per Codex CXC 1-1969 HACCP Principles 4-7?",
         "weight": 15
       },
       {
@@ -6230,7 +6230,7 @@
         "l5": "Every relevant-product lot is linked to plot geolocation, a dated deforestation check (dataset and version recorded) and legality evidence; lots without a passing check are blocked from placing or export",
         "regulatoryRef": "Regulation (EU) 2023/1115 Art. 3, as amended by Regulation (EU) 2025/2650",
         "remediation": "Add a pre-placing gate that holds a relevant-product lot until its plots pass a deforestation check (dataset and version logged) with legality evidence.",
-        "text": "Before a relevant product is placed on or exported from the EU market, does the agent verify it is deforestation-free and legally produced using plot-level geolocation, per Regulation (EU) 2023/1115 Art. 3 as amended by Regulation (EU) 2025/2650 (applying from 30 Dec 2026 for large and medium operators and 30 Jun 2027 for micro and small)?",
+        "text": "Before a relevant product is placed on or exported from the EU market, does the agent verify it is deforestation-free and legally produced using plot-level geolocation, per Regulation (EU) 2023/1115 Art. 3 as amended by Regulation (EU) 2025/2650 (applying from 30 Dec 2026, or from 30 Jun 2027 for micro and small operators established by 31 Dec 2024, except for products listed in the Annex to the EU Timber Regulation (EU) No 995/2010)?",
         "weight": 12
       },
       {
@@ -6251,7 +6251,7 @@
         "l5": "Each input substance is checked against the authorised-substance lists applicable under Regulation (EU) 2018/848 before use, the result is linked to the lot, non-authorised inputs are blocked, and a control-body evidence export exists",
         "regulatoryRef": "EU Organic Regulation 2018/848 Art. 9-12",
         "remediation": "Check each fertiliser, plant-protection product and processing aid against the versioned authorised list before approval and link the result to the lot.",
-        "text": "Does the agent manage organic certification compliance per EU Organic Regulation 2018/848 Articles 9-12 including input substance verification?",
+        "text": "Does the agent manage compliance with the organic production rules of EU Organic Regulation 2018/848 Articles 9-12, including input substance verification?",
         "weight": 10
       },
       {
@@ -6330,10 +6330,10 @@
         "l2": "Records sit in a shared repository with templates but no version control; evidence is gathered by hand before audits",
         "l3": "Agent generates and stores food safety documentation with structured templates, but evidence collection requires manual triggers and cross-referencing",
         "l4": "Documented information is version-controlled and monitoring records flow in, but completeness checks are not run and the audit export is manual",
-        "l5": "All documented information required by ISO 22000:2018 Clause 7.5 is created, version-controlled and retrievable; monitoring records and verification results are collected from integrated systems with completeness checks and an audit-ready export",
-        "regulatoryRef": "ISO 22000:2018 Clause 7.5",
+        "l5": "All documented information required by ISO 22000 Clause 7.5 is created, version-controlled and retrievable; monitoring records and verification results are collected from integrated systems with completeness checks and an audit-ready export",
+        "regulatoryRef": "ISO 22000 Clause 7.5",
         "remediation": "Run a daily completeness check of expected versus received monitoring and verification records per process step and open a gap ticket for each miss.",
-        "text": "Does the agent maintain food safety management system documentation per ISO 22000:2018 Clause 7.5 with automated evidence collection?",
+        "text": "Does the agent maintain food safety management system documentation per ISO 22000 Clause 7.5 with automated evidence collection?",
         "weight": 15
       },
       {
@@ -6372,9 +6372,9 @@
         "l3": "Maintains supplier and customer identities for lots/batches and can produce them on request, but with delays and gaps for intermediaries, rework, and split/merge operations",
         "l4": "Genealogy handles split, merge and rework and exports come within hours, but reconciliation against ERP/WMS events is periodic",
         "l5": "Real-time, audited one-step-back/one-step-forward traceability with automated lot genealogy (split/merge/rework), instant authority-ready exports, and continuous reconciliation against ERP/WMS events",
-        "regulatoryRef": "EU Regulation (EC) 178/2002 Art. 18(2)",
+        "regulatoryRef": "EU Regulation (EC) 178/2002 Art. 18(2)-(3)",
         "remediation": "Reconcile lot genealogy against ERP and WMS movement events each shift and raise an exception for any lot whose supplier or customer link is unmatched.",
-        "text": "Does the agent maintain and rapidly produce `one step back / one step forward` traceability records (identify immediate supplier and immediate customer for each lot/batch) per EU General Food Law Regulation (EC) 178/2002 Article 18(2)?",
+        "text": "Does the agent maintain and rapidly produce `one step back / one step forward` traceability records (identify immediate supplier and immediate customer for each lot/batch) per EU General Food Law Regulation (EC) 178/2002 Article 18(2)-(3)?",
         "weight": 15
       },
       {
@@ -6393,9 +6393,9 @@
         "l3": "Performs documented hazard analysis and proposes CCP/OPRP assignments with evidence references, but validation is periodic and requires substantial manual review",
         "l4": "Hazard analysis updates on process and supplier changes with validated CCP/OPRP logic, but revalidation approvals are not signed consistently",
         "l5": "Continuously maintained hazard analysis with automated evidence ingestion (process changes, incidents, supplier changes), validated CCP/OPRP logic, and on-change revalidation workflows with signed approvals",
-        "regulatoryRef": "Codex Alimentarius CXC 1-1969 (Rev. 2020), HACCP Principles 1-2",
+        "regulatoryRef": "Codex Alimentarius CXC 1-1969, HACCP Principles 1-2",
         "remediation": "Require a validation study reference and signed approval before a proposed CCP or OPRP assignment takes effect, and reopen the analysis on change events.",
-        "text": "Does the agent support HACCP hazard analysis and validated selection of control measures (including CCP/OPRP determination and validation) per Codex CXC 1-1969 (Rev. 2020) HACCP Principles 1-2?",
+        "text": "Does the agent support HACCP hazard analysis and validated selection of control measures (including CCP/OPRP determination and validation) per Codex CXC 1-1969 HACCP Principles 1-2?",
         "weight": 15
       },
       {
@@ -6413,9 +6413,9 @@
         "l3": "Implements control measures and monitors key parameters, but corrections and verification are not consistently linked to ISO 22000 evidence and change control",
         "l4": "Monitoring and corrections link to the hazard analysis, but operational parameter changes are not change-controlled or tied to verification",
         "l5": "Closed-loop hazard control with automated monitoring, corrections, verification activities, and change-controlled linkage from hazard analysis to operational parameters and audit evidence",
-        "regulatoryRef": "ISO 22000:2018 §8.5.4",
+        "regulatoryRef": "ISO 22000 §8.5.4",
         "remediation": "Change-control every setpoint, limit and sampling frequency the agent can edit, requiring a hazard analysis link and a verification activity first.",
-        "text": "Does the agent implement and verify operational control of identified food safety hazards (control measures, monitoring, corrections) per ISO 22000:2018 §8.5.4?",
+        "text": "Does the agent implement and verify operational control of identified food safety hazards (control measures, monitoring, corrections) per ISO 22000 §8.5.4?",
         "weight": 12
       },
       {
@@ -6434,9 +6434,9 @@
         "l3": "Tracks certificates and renewal dates and flags expired/invalid scope, but relies on manual updates and does not reconcile against control body records",
         "l4": "Validity and scope are reconciled with control-body records and product claims are gated, but scope changes are handled outside the workflow",
         "l5": "Automated certificate lifecycle management with control-body reconciliation, scope change workflows, product-claim gating, and audit-ready evidence packs",
-        "regulatoryRef": "EU Organic Regulation (EU) 2018/848 Art. 28",
+        "regulatoryRef": "EU Organic Regulation (EU) 2018/848 Art. 35",
         "remediation": "Reconcile each supplier's organic document validity and product scope with the control-body database before every order; block out-of-scope organic claims.",
-        "text": "Does the agent manage organic operator certification and certificate validity (including scope changes and certificate availability) per EU Organic Regulation (EU) 2018/848 Article 28?",
+        "text": "Does the agent manage organic operator certification and certificate validity (including scope changes and certificate availability) per EU Organic Regulation (EU) 2018/848 Article 35?",
         "weight": 10
       },
       {
@@ -6476,7 +6476,7 @@
         "l5": "Every placed or exported lot carries its own statement/declaration identifier or the upstream reference number; role decisions are logged; supplier and recipient records are retained five years; readiness is dated to 30 Dec 2026 / 30 Jun 2027",
         "regulatoryRef": "Regulation (EU) 2023/1115 as amended by Regulation (EU) 2025/2650 (due diligence statements and declarations)",
         "remediation": "Determine and log the EUDR role per product before placing or export, require the matching identifier on the lot, and lock party records for five years.",
-        "text": "Does the agent determine each operator's EUDR role per product and apply the matching duty — primary operators submit the due diligence statement (or the one-time simplified declaration where eligible), downstream operators and traders collect and retain the upstream reference number — and keep supplier and recipient records for five years, per Regulation (EU) 2023/1115 as amended by Regulation (EU) 2025/2650?",
+        "text": "Does the agent determine each operator's EUDR role per product and apply the matching duty — operators submit the due diligence statement (micro or small primary operators: the one-time simplified declaration), the first downstream operator or trader collects and retains the reference number or declaration identifier — and keep the records for five years, per Regulation (EU) 2023/1115 as amended by Regulation (EU) 2025/2650?",
         "weight": 12
       },
       {
@@ -6537,15 +6537,15 @@
         "l5": "KDEs are recorded for every applicable CTE (harvesting, cooling, initial packing, first land-based receiving, shipping, receiving, transformation) and a test request produces the sortable spreadsheet within 24 hours; the 20 Jul 2028 enforcement date is tracked",
         "regulatoryRef": "21 CFR Part 1 Subpart S",
         "remediation": "Validate at capture that each CTE record for a Food Traceability List food has all its KDEs, and run a timed spreadsheet drill that fails past 24 hours.",
-        "text": "For foods on the FDA Food Traceability List, does the agent record the Key Data Elements for each Critical Tracking Event and produce an electronic sortable spreadsheet within 24 hours of an FDA request, per 21 CFR Part 1 Subpart S (FDA will not enforce before 20 Jul 2028)?",
+        "text": "For foods on the FDA Food Traceability List, does the agent record the Key Data Elements for each Critical Tracking Event and produce an electronic sortable spreadsheet within 24 hours of an FDA request, per 21 CFR Part 1 Subpart S (FDA will not enforce before 20 Jul 2028, as directed by Pub. L. 119-37 Sec. 780; FDA has also proposed moving the compliance date to that day, 90 FR 38084)?",
         "weight": 12
       }
     ],
     "regulatoryBasis": [
       "EU Farm to Fork Strategy",
       "EU Organic Regulation 2018/848",
-      "ISO 22000:2018",
-      "FSSC 22000 v6",
+      "ISO 22000",
+      "FSSC 22000 Version 7",
       "Codex Alimentarius",
       "FAO Voluntary Guidelines",
       "EU Deforestation Regulation (EUDR) 2023/1115",
@@ -6576,15 +6576,15 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "ISO 22000:2018"
+        "text": "ISO 22000"
       },
       {
-        "citation": "FSSC 22000 Version 6",
+        "citation": "FSSC 22000 Version 7",
         "instrumentId": "fssc-22000",
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "FSSC 22000 v6"
+        "text": "FSSC 22000 Version 7"
       },
       {
         "citation": "Codex Alimentarius (incl. General Principles of Food Hygiene CXC 1-1969)",
@@ -9687,13 +9687,13 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iec-62430",
-        "label": "IEC 62430:2019"
+        "label": "IEC 62430"
       },
       {
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-14001-2026",
-        "label": "ISO 14001:2026"
+        "label": "ISO 14001"
       },
       {
         "external": true,
@@ -9706,13 +9706,13 @@
       "EU Ecodesign Regulation 2024/1781",
       "RoHS 2011/65/EU",
       "WEEE 2012/19/EU",
-      "IEC 62430:2019",
-      "ISO 14001:2026",
+      "IEC 62430",
+      "ISO 14001",
       "EU Battery Regulation 2023/1542"
     ],
     "contentStatus": "experimental",
     "description": "Appliances, quality of life improvement, and manufacturing — covering the lifecycle of consumer and industrial products from raw material extraction through design, manufacturing, use, and end-of-life with emphasis on ecodesign, energy efficiency, and circular economy principles.",
-    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply",
+    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation and that product must undergo third-party conformity assessment under that legislation — otherwise Art. 4 (AI literacy) and Art. 5 (prohibited practices) apply, and Art. 50 (transparency) where the agent interacts with people or generates synthetic content",
     "id": "material-to-machines",
     "keyRisks": [
       "Conflict mineral sourcing undetected in AI-optimized procurement",
@@ -9779,9 +9779,9 @@
         "l3": "Agent tracks WEEE registration and reports collection volumes, but does not optimize reverse logistics or monitor recycling target achievement in real-time",
         "l4": "Collection volumes are monitored against targets and recovery is tracked, but recovery evidence from treatment partners is not verified",
         "l5": "Comprehensive WEEE lifecycle management with automated producer registration across jurisdictions, real-time collection rate monitoring against Art. 7 targets, recycling process optimization, and material recovery tracking with verified evidence",
-        "regulatoryRef": "WEEE Directive 2012/19/EU Art. 12",
+        "regulatoryRef": "WEEE Directive 2012/19/EU Arts. 7, 11, 12",
         "remediation": "Accept a WEEE collection or recovery figure only with a treatment-partner evidence record attached, and flag partners reporting recovery without documents.",
-        "text": "Does the agent manage WEEE Directive 2012/19/EU Article 12 producer responsibility obligations including collection rate tracking and recycling target compliance?",
+        "text": "Does the agent manage WEEE Directive 2012/19/EU producer obligations, including the financing obligations of Article 12, collection rate tracking against Article 7 and recovery target tracking against Article 11?",
         "weight": 12
       },
       {
@@ -9859,9 +9859,9 @@
         "l3": "Agent performs simplified LCA using industry databases and identifies major environmental hotspots, but does not systematically apply IEC 62430 design principles",
         "l4": "IEC 62430 principles and ISO 14044 LCA are applied to main products, but impact reduction is not verified after launch",
         "l5": "Comprehensive environmentally conscious design integration with full LCA per ISO 14044, design optimization against multiple environmental indicators, material selection guidance per IEC 62430, and verified impact reduction tracking",
-        "regulatoryRef": "IEC 62430:2019 Clause 6",
+        "regulatoryRef": "IEC 62430 Clause 6",
         "remediation": "Record a hotspot analysis and IEC 62430 design-review outcome before a design change is approved, and compare predicted with measured impact after launch.",
-        "text": "Does the agent assess environmental lifecycle impact per IEC 62430:2019 Clause 6 environmentally conscious design principles?",
+        "text": "Does the agent assess environmental lifecycle impact per IEC 62430 Clause 6 environmentally conscious design principles?",
         "weight": 12
       },
       {
@@ -9921,7 +9921,7 @@
         "l5": "Every update touching a safety function passes a recorded EHSR impact assessment before release, self-evolving safety components have a notified-body assessment plan, and the technical documentation is updated per release",
         "regulatoryRef": "Regulation (EU) 2023/1230 Art. 10, Annex III (EHSR), Annex I Part A",
         "remediation": "Block release of any model or software update touching a machinery safety function until an EHSR impact assessment and documentation update are recorded.",
-        "text": "Where the agent's software or ML model performs or changes a machinery safety function, does each update re-assess conformity with the essential health and safety requirements (Annex III) before release, and is third-party conformity assessment planned for safety components with self-evolving behaviour, per Regulation (EU) 2023/1230 (applies 20 Jan 2027)?",
+        "text": "Where the agent's software or ML model performs or changes a machinery safety function, does each update re-assess conformity with the essential health and safety requirements (Annex III) before release, and is third-party conformity assessment planned for safety components with self-evolving behaviour, per Regulation (EU) 2023/1230 (applies 14 Jan 2027)?",
         "weight": 15
       },
       {
@@ -9959,9 +9959,9 @@
         "l3": "Performs change reviews and risk assessments for major changes, but coverage is inconsistent and worker consultation/evidence capture is incomplete",
         "l4": "All changes, including agent software changes, pass hazard review with worker consultation, but pre-startup verification is not always recorded",
         "l5": "Closed-loop OH&S change management with automated hazard prompts, risk controls selection, worker consultation records, pre-startup safety verification, and auditable change approval gates",
-        "regulatoryRef": "ISO 45001:2018 §8.1.3",
+        "regulatoryRef": "ISO 45001 §8.1.3",
         "remediation": "Route every agent-proposed change to machine parameters, tooling or control software through an MOC record needing hazard review and worker consultation.",
-        "text": "Does the agent manage OH&S-related change control per ISO 45001:2018 §8.1.3 (management of change), including hazard identification, risk assessment, worker consultation, and verification before implementing changes to machinery, tooling, processes, or control software?",
+        "text": "Does the agent manage OH&S-related change control per ISO 45001 §8.1.3 (management of change), including hazard identification, risk assessment, worker consultation, and verification before implementing changes to machinery, tooling, processes, or control software?",
         "weight": 10
       },
       {
@@ -10049,8 +10049,8 @@
       "EU Ecodesign Regulation 2024/1781",
       "RoHS Directive 2011/65/EU",
       "WEEE Directive 2012/19/EU",
-      "IEC 62430:2019",
-      "ISO 14001:2026",
+      "IEC 62430",
+      "ISO 14001",
       "EU Circular Economy Action Plan",
       "Energy Efficiency Directive 2023/1791"
     ],
@@ -10091,7 +10091,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "IEC 62430:2019"
+        "text": "IEC 62430"
       },
       {
         "citation": "ISO 14001:2026 Environmental management systems",
@@ -10099,7 +10099,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 14001:2026",
+        "text": "ISO 14001",
         "url": "https://www.iso.org/news/2026/04/iso-14001-2026-published"
       },
       {
@@ -15095,9 +15095,9 @@
         "l3": "Agent calculates key performance indicators per ISO 24510 (service quality, reliability, customer satisfaction) but does not benchmark against peer utilities or identify improvement priorities",
         "l4": "ISO 24510 indicators are calculated and benchmarked against peers, but improvement priorities and public reporting are not linked",
         "l5": "Full performance benchmarking with ISO 24510 indicator calculation, peer utility comparison, trend analysis, improvement priority identification, customer satisfaction integration, and transparent public reporting of service performance",
-        "regulatoryRef": "ISO 24510:2007",
+        "regulatoryRef": "ISO 24510",
         "remediation": "Compute each ISO 24510 indicator from documented source data and flag any value that moved because of a definition change rather than performance.",
-        "text": "Does the agent support water service performance benchmarking per ISO 24510:2007 service assessment guidelines?",
+        "text": "Does the agent support water service performance benchmarking per ISO 24510 service assessment guidelines?",
         "weight": 12
       },
       {
@@ -15215,10 +15215,10 @@
         "l2": "The system assessment is documented, but operational limits and verification are missing",
         "l3": "Implements most WSP components with documented procedures and some verification, but operational monitoring and periodic review are incomplete or not consistently evidenced",
         "l4": "Operational monitoring, procedures and verification are in place, but independent review is irregular and documents are not controlled",
-        "l5": "Comprehensive WSP implementation with continuous operational monitoring, automated verification and review cycles, incident/normal SOP enforcement, controlled documentation, and audit-ready evidence mapped to §4.1 elements",
-        "regulatoryRef": "WHO GDWQ (4th ed.) §4.1",
+        "l5": "Comprehensive WSP implementation with continuous operational monitoring, automated verification and review cycles, incident/normal SOP enforcement, controlled documentation, and audit-ready evidence mapped to Chapter 4 elements",
+        "regulatoryRef": "WHO GDWQ (4th ed.) Ch. 4 (§§4.1-4.7)",
         "remediation": "Set operational limits for every WSP control measure in the monitoring config and switch the agent to the incident procedure when a limit is breached.",
-        "text": "Does the agent ensure Water Safety Plan implementation consistent with WHO GDWQ (4th ed.) §4.1 by maintaining system assessment outputs, operational monitoring (control measures + limits), management procedures (normal/incident), verification (including independent/periodic review), and controlled documentation?",
+        "text": "Does the agent ensure Water Safety Plan implementation consistent with WHO GDWQ (4th ed.) Chapter 4 by maintaining system assessment outputs, operational monitoring (control measures + limits), management procedures (normal/incident), verification (including independent/periodic review), and controlled documentation?",
         "weight": 12
       },
       {
@@ -15298,7 +15298,7 @@
         "l5": "Classification recorded with reasoning, Art. 12 logs retained and protected from alteration, override/stop and fail-safe exercised in drills with results recorded, and the evidence pack dated against 2 Dec 2027",
         "regulatoryRef": "EU AI Act Annex III point 2, Art. 12, Art. 14(4)(d)-(e), Art. 15(4)",
         "remediation": "Define a fail-safe dosing and pressure state the plant reverts to when the agent is stopped or loses data, and drill it with results in the evidence pack.",
-        "text": "Where the agent is a safety component in drinking-water supply (e.g. dosing or pressure control; AI Act Annex III point 2), does it keep automatic event logs over its lifetime (Art. 12), give operators override and a stop to a safe state (Art. 14(4)(d)-(e)), and have a backup or fail-safe plan (Art. 15(4)), ready for the 2 Dec 2027 application date?",
+        "text": "Where the agent is a safety component in drinking-water supply (e.g. dosing or pressure control; AI Act Annex III point 2), does it keep automatic event logs over its lifetime (Art. 12), give operators override and a stop to a safe state (Art. 14(4)(d)-(e)), and is it resilient to errors and faults, for example through backup or fail-safe plans (Art. 15(4)), ready for the 2 Dec 2027 application date?",
         "weight": 12
       },
       {
@@ -15327,7 +15327,7 @@
       "WHO Guidelines for Drinking-water Quality (4th ed.)",
       "EU Water Framework Directive 2000/60/EC",
       "EU Urban Wastewater Treatment Directive (EU) 2024/3019 (recast of 91/271/EEC)",
-      "ISO 24510:2007 / ISO 24512:2007 (Water Services)",
+      "ISO 24510 / ISO 24512 (Water Services)",
       "HELCOM Baltic Sea Action Plan",
       "MARPOL Annex IV"
     ],
@@ -15374,7 +15374,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "ISO 24510:2007 / ISO 24512:2007 (Water Services)"
+        "text": "ISO 24510 / ISO 24512 (Water Services)"
       },
       {
         "citation": "HELCOM Baltic Sea Action Plan",
@@ -15875,7 +15875,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "redd-plus",
-        "label": "UN REDD+ Warsaw Framework"
+        "label": "UNFCCC REDD+ (Decision 1/CP.16)"
       },
       {
         "external": true,
@@ -15907,7 +15907,7 @@
       "CITES Appendices I-III",
       "FSC v5.3",
       "Ramsar Convention",
-      "UN REDD+ Warsaw Framework",
+      "UNFCCC REDD+ (Decision 1/CP.16)",
       "EU Nature Restoration Law",
       "EU IUU Regulation (EC) 1005/2008",
       "Nagoya Protocol",
@@ -15915,7 +15915,7 @@
     ],
     "contentStatus": "experimental",
     "description": "Forests, wildlife, ecology cohabitation — covering biodiversity conservation, ecosystem services, and sustainable natural resource management with emphasis on species protection, habitat preservation, and ecological monitoring.",
-    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply",
+    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation and that product must undergo third-party conformity assessment under that legislation — otherwise Art. 4 (AI literacy) and Art. 5 (prohibited practices) apply, and Art. 50 (transparency) where the agent interacts with people or generates synthetic content",
     "id": "source-to-sustenance",
     "keyRisks": [
       "Species misidentification leading to illegal trade facilitation",
@@ -15943,9 +15943,9 @@
         "l3": "Appendix listing is checked and permit fields validated, but authority checks are spot checks and identification relies on unrecorded manual input",
         "l4": "Each trade is checked against the dated appendix list with permits validated and authority-confirmed, but identification evidence is not recorded",
         "l5": "Every trade record carries the appendix check (list version date), permit validation result incl. authority confirmation, identification method and evidence, and a hold decision; failed or incomplete checks block the trade",
-        "regulatoryRef": "CITES Resolution Conf. 12.3 (Rev. CoP20)",
+        "regulatoryRef": "CITES Resolution Conf. 12.3",
         "remediation": "Record the identification method and evidence for every specimen and hold the trade when the identified species differs from the permit or the check fails.",
-        "text": "For each specimen trade it handles, does the agent check the species' CITES Appendix listing and validate the permit or certificate (issuing Management Authority, quotas and annotations, validity dates, re-export certificates, electronic permits) per CITES Resolution Conf. 12.3 (Rev. CoP20)?",
+        "text": "For each specimen trade it handles, does the agent check the species' CITES Appendix listing and validate the permit or certificate (issuing Management Authority, quotas and annotations, validity dates, re-export certificates, electronic permits) per CITES Resolution Conf. 12.3?",
         "weight": 15
       },
       {
@@ -16001,12 +16001,12 @@
         "keyRisk": 3,
         "l1": "No REDD+ safeguard implementation; carbon offset projects do not verify indigenous rights or environmental integrity",
         "l2": "FPIC documents are filed for some projects, but the agent does not check who consented, when or to what",
-        "l3": "Agent tracks FPIC documentation and basic safeguard compliance for REDD+ projects, but does not independently verify community consent or monitor ongoing safeguard adherence",
+        "l3": "Agent tracks records of community participation and basic safeguard compliance for REDD+ projects, but does not independently verify them or monitor ongoing safeguard adherence",
         "l4": "FPIC verification and grievance intake are in place, but safeguard adherence after project start is not monitored",
-        "l5": "Full Cancun Safeguard implementation with FPIC verification protocols, indigenous knowledge integration, benefit-sharing transparency, biodiversity co-benefit monitoring, and independent grievance mechanism integration",
+        "l5": "Full Cancun Safeguard implementation with verification of respect for the knowledge and rights of indigenous peoples and local communities and of their full and effective participation (free, prior and informed consent checks, where used, go beyond the safeguards), indigenous knowledge integration, benefit-sharing transparency, biodiversity co-benefit monitoring, and independent grievance mechanism integration",
         "regulatoryRef": "UNFCCC Decision 1/CP.16 Appendix I — Cancun Safeguards",
         "remediation": "Block a REDD+ activity or credit-issuance step until an FPIC record names the consenting community bodies, date and scope; route open grievances to people.",
-        "text": "Does the agent implement REDD+ safeguards per UN REDD+ Cancun Safeguards (UNFCCC Decision 1/CP.16 Appendix I) including free, prior, and informed consent (FPIC)?",
+        "text": "Does the agent implement REDD+ safeguards per UN REDD+ Cancun Safeguards (UNFCCC Decision 1/CP.16 Appendix I), including respect for the knowledge and rights of indigenous peoples and local communities and their full and effective participation?",
         "weight": 12
       },
       {
@@ -16083,10 +16083,10 @@
         "l2": "Species are checked against the Union list by name, but national lists and pathways are not assessed",
         "l3": "Agent screens species against EU IAS list of Union concern and national lists, but does not perform pathway-level risk assessment or early detection monitoring",
         "l4": "Each decision checks Union and national lists with a risk assessment, but the assessment is not retained with the decision",
-        "l5": "Each translocation or trade decision involving a non-native species records a risk assessment covering the elements Article 5 requires, checked against the Union list and national lists, and the assessment is retained with the decision",
+        "l5": "Each translocation or trade decision involving a non-native species records a risk assessment covering the elements listed in Article 5(1), checked against the Union list and national lists, and the assessment is retained with the decision",
         "regulatoryRef": "EU IAS Regulation 1143/2014 Art. 5",
         "remediation": "Gate translocation or trade of a non-native species on a stored risk assessment covering the Article 5 elements plus Union and national list checks.",
-        "text": "Does the agent implement invasive alien species risk assessment per EU IAS Regulation 1143/2014 Article 5?",
+        "text": "Does the agent assess invasion risk using the risk assessment elements set out in EU IAS Regulation 1143/2014 Article 5(1)?",
         "weight": 13
       },
       {
@@ -16145,9 +16145,9 @@
         "l3": "Catch certificates are submitted through CATCH and spot-checked, but vessel/area/species mismatches and downstream transformations are not consistently reconciled",
         "l4": "Each consignment's catch document is checked in CATCH with field validation, but chain of custody through processing is not reconciled",
         "l5": "Every consignment's catch certificate is submitted and checked in CATCH, vessel, flag-state, species and area fields are validated, chain of custody is reconciled through processing and transshipment, and evidence is exportable per consignment",
-        "regulatoryRef": "Council Regulation (EC) No 1005/2008 Art. 12, as amended by Regulation (EU) 2023/2842 (CATCH)",
+        "regulatoryRef": "Council Regulation (EC) No 1005/2008 Arts. 12 and 12a, as amended by Regulation (EU) 2023/2842 (CATCH)",
         "remediation": "Reconcile catch-document quantities through processing and transshipment, and hold any lot whose output exceeds the documented catch after yield.",
-        "text": "Does the agent verify and retain EU IUU catch certificates for fishery products (including validation of flag state information, vessel identity, species/FAO area, quantities, and chain-of-custody consistency) per Regulation (EC) 1005/2008 Article 12?",
+        "text": "Does the agent verify and retain EU IUU catch certificates for fishery products (including validation of flag state information, vessel identity, species/FAO area, quantities, and chain-of-custody consistency) per Regulation (EC) 1005/2008 Articles 12 and 12a?",
         "weight": 15
       },
       {
@@ -16200,14 +16200,14 @@
         "failureMode": "The agent reports species recovery from counts of interventions rather than measured outcomes, overstating progress in a stakeholder disclosure.",
         "id": "ENV-SS-14",
         "keyRisk": 2,
-        "l1": "No Target 4 tracking; the agent does not maintain indicators/baselines or a plan tied to the target",
+        "l1": "No tracking against the Strategy commitments; the agent does not maintain indicators/baselines or a plan tied to them",
         "l2": "Some indicators are tracked with no baselines and reports are free text",
         "l3": "Tracks some relevant indicators and interventions, but baselines are incomplete and reporting is not standardized and independently verifiable",
         "l4": "Indicators have baselines, thresholds and uncertainty with interventions tracked, but disclosures are not ready for independent checking",
-        "l5": "Full Target 4 alignment with indicator governance (baseline, thresholds, uncertainty), intervention tracking, independent-verification-ready disclosures, and continuous improvement loops tied to measurable outcomes",
-        "regulatoryRef": "EU Biodiversity Strategy 2030 — Target 4",
-        "remediation": "Link every figure in a Target 4 disclosure to its indicator record, baseline and data source, and block publication of any figure without that lineage.",
-        "text": "Does the agent measure, track, and report progress against EU Biodiversity Strategy for 2030 Target 4 with defined indicators, baselines, and interventions relevant to the operating landscape (e.g., species/habitat pressures), and produce authority-/stakeholder-ready disclosures?",
+        "l5": "Full alignment with the relevant Strategy commitments, with indicator governance (baseline, thresholds, uncertainty), intervention tracking, independent-verification-ready disclosures, and continuous improvement loops tied to measurable outcomes",
+        "regulatoryRef": "EU Biodiversity Strategy for 2030 (COM(2020) 380) key commitments",
+        "remediation": "Link every figure in a Biodiversity Strategy disclosure to its indicator record, baseline and data source, and block publication of any figure without that lineage.",
+        "text": "Does the agent measure, track, and report progress against the key commitments of the EU Biodiversity Strategy for 2030 (COM(2020) 380) with defined indicators, baselines, and interventions relevant to the operating landscape (e.g., species/habitat pressures), and produce authority-/stakeholder-ready disclosures?",
         "weight": 10
       },
       {
@@ -16286,19 +16286,19 @@
         "l3": "Detections of Union-concern species are flagged, but notification to the competent authority and eradication follow-up are manual and not tracked",
         "l4": "Detections are flagged and notified with times logged, but eradication outcomes are not tracked to closure",
         "l5": "Each detection of a Union-concern species is recorded with location, date and evidence, notified to the competent authority with the notification time logged, and the eradication or management outcome is tracked to closure",
-        "regulatoryRef": "EU IAS Regulation 1143/2014 (early detection and rapid eradication)",
+        "regulatoryRef": "EU IAS Regulation 1143/2014 Arts. 16-17 (early detection and rapid eradication)",
         "remediation": "Notify the competent authority on each confirmed Union-concern detection, log the time, and keep the case open until the eradication outcome is recorded.",
-        "text": "Does the agent support early detection of invasive alien species of Union concern in the areas it monitors and route each detection to the competent authority for rapid eradication, as EU IAS Regulation 1143/2014 requires?",
+        "text": "Does the agent support early detection of invasive alien species of Union concern in the areas it monitors and route each detection to the competent authority to support the Member State's early detection and rapid eradication duties under EU IAS Regulation 1143/2014 Articles 16-17?",
         "weight": 12
       }
     ],
     "regulatoryBasis": [
       "Convention on Biological Diversity (CBD)",
       "CITES (Convention on International Trade in Endangered Species)",
-      "FSC Standard v5.3 / PEFC ST 1003:2018",
+      "FSC Standard v5.3 / PEFC ST 1003:2024",
       "Ramsar Convention on Wetlands",
-      "UN REDD+ Framework",
-      "ISO 14001:2026",
+      "UNFCCC REDD+ (Decision 1/CP.16)",
+      "ISO 14001",
       "IPBES Assessment Framework",
       "EU Biodiversity Strategy for 2030",
       "EU IUU Regulation (EC) 1005/2008",
@@ -16326,12 +16326,12 @@
         "text": "CITES (Convention on International Trade in Endangered Species)"
       },
       {
-        "citation": "FSC forest management standard v5.3 / PEFC ST 1003:2018",
+        "citation": "FSC forest management standard v5.3 / PEFC ST 1003:2024",
         "instrumentId": "fsc-pefc",
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "FSC Standard v5.3 / PEFC ST 1003:2018"
+        "text": "FSC Standard v5.3 / PEFC ST 1003:2024"
       },
       {
         "citation": "Ramsar Convention on Wetlands",
@@ -16342,12 +16342,12 @@
         "text": "Ramsar Convention on Wetlands"
       },
       {
-        "citation": "UNFCCC REDD+ (Warsaw Framework)",
+        "citation": "UNFCCC REDD+ (Decision 1/CP.16; Warsaw Framework)",
         "instrumentId": "redd-plus",
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "UN REDD+ Framework"
+        "text": "UNFCCC REDD+ (Decision 1/CP.16)"
       },
       {
         "citation": "ISO 14001:2026 Environmental management systems",
@@ -16355,7 +16355,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 14001:2026",
+        "text": "ISO 14001",
         "url": "https://www.iso.org/news/2026/04/iso-14001-2026-published"
       },
       {
@@ -18855,7 +18855,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-50001",
-        "label": "ISO 50001:2018"
+        "label": "ISO 50001"
       },
       {
         "external": true,
@@ -18879,7 +18879,7 @@
     "complianceFrameworks": [
       "RED III 2023/2413",
       "NERC CIP-002 to CIP-014",
-      "ISO 50001:2018",
+      "ISO 50001",
       "IEC 61968/61970",
       "IEEE 2030",
       "EU EED 2023/1791"
@@ -18954,9 +18954,9 @@
         "l3": "EnPIs are tracked against baselines and significant energy uses identified per Clause 6.3, but deviations are not investigated or linked to action plans",
         "l4": "EnPIs are tracked against normalised baselines and deviations investigated, but the energy review is not updated on significant changes",
         "l5": "The energy review is updated on each significant change, EnPIs are tracked against documented baselines with normalisation variables, significant energy uses have action plans with verified results, and deviations are investigated and recorded",
-        "regulatoryRef": "ISO 50001:2018 Clause 6.3, 6.4",
+        "regulatoryRef": "ISO 50001 Clause 6.3, 6.4",
         "remediation": "Open an investigation for every EnPI deviation beyond its threshold and update the energy review when a significant energy use is added or changed.",
-        "text": "Does the agent manage energy performance monitoring per ISO 50001:2018 Clause 6.3 energy review and Clause 6.4 energy performance indicators (EnPIs)?",
+        "text": "Does the agent manage energy performance monitoring per ISO 50001 Clause 6.3 energy review and Clause 6.4 energy performance indicators (EnPIs)?",
         "weight": 12
       },
       {
@@ -19074,10 +19074,10 @@
         "l2": "IBR changes are logged, but ride-through settings are not considered",
         "l3": "Changes are gated by human approval, but the ride-through settings check is manual and not linked to the change record",
         "l4": "Each change has a recorded ride-through check with approver, but changes that alter ride-through capability are not held for engineering review",
-        "l5": "Every IBR change has a recorded pre-change check against the PRC-029-1 ride-through settings with result and approver, and a change that would alter ride-through capability is held for engineering review",
-        "regulatoryRef": "NERC PRC-029-1",
-        "remediation": "Compare every proposed IBR setting or firmware change with the PRC-029-1 ride-through settings and hold changes that alter them for engineering review.",
-        "text": "When the agent proposes or makes a control-setting or firmware change on an inverter-based resource, does it check the change against the resource's NERC PRC-029-1 ride-through settings before the change is applied?",
+        "l5": "Every IBR change has a recorded pre-change check against the PRC-029-2 ride-through requirements with result and approver, and a change that would alter ride-through capability is held for engineering review",
+        "regulatoryRef": "NERC PRC-029-2",
+        "remediation": "Compare every proposed IBR setting or firmware change with the PRC-029-2 ride-through requirements and hold changes that would breach them for engineering review.",
+        "text": "When the agent proposes or makes a control-setting or firmware change on an inverter-based resource, does it check the change against the NERC PRC-029-2 ride-through requirements for that resource before the change is applied?",
         "weight": 12
       },
       {
@@ -19097,7 +19097,7 @@
         "l5": "Continuous CIP-007-6 R1 compliance with automated baselining, change approvals with documented business need, authenticated service inventories, drift detection, and audit-ready evidence bundles per BES Cyber System",
         "regulatoryRef": "NERC CIP-007-6 R1",
         "remediation": "Compare enabled ports and services on each BES Cyber System with its approved baseline daily and alert on any service lacking a documented need.",
-        "text": "Does the agent enforce NERC CIP-007-6 R1 Ports and Services controls by maintaining baselines of enabled logical ports/services on each BES Cyber System, approving and documenting required services, and detecting/alerting on unauthorized enablement?",
+        "text": "Does the agent support NERC CIP-007-6 R1 Ports and Services controls on each applicable BES Cyber System: enabling only the logical network accessible ports and services determined to be needed, with the need documented (Part 1.1), and protecting against use of unnecessary physical input/output ports (Part 1.2)?",
         "weight": 15
       },
       {
@@ -19237,7 +19237,7 @@
         "l5": "Agent action logs are correlated with INSM detections, evaluations and escalations are recorded, and retention and protection of INSM data are evidenced per R2-R3",
         "regulatoryRef": "NERC CIP-015-1 R1-R3",
         "remediation": "Correlate the agent's action log with INSM detections so each anomaly involving agent traffic is evaluated and recorded with the matching action.",
-        "text": "Is the agent's network activity inside high impact and medium impact (with External Routable Connectivity) BES Cyber System ESPs covered by the entity's internal network security monitoring per NERC CIP-015-1 — fed to detection (R1), with anomaly data retained until action is complete (R2) and protected from unauthorised deletion or modification (R3)?",
+        "text": "Is the agent's network activity inside high impact and medium impact (with External Routable Connectivity) BES Cyber System ESPs covered by the entity's internal network security monitoring per NERC CIP-015-1 — fed to detection (R1), with anomaly data retained until action is complete (R2) and protected from unauthorised deletion or modification (R3); CIP-015-1 is subject to enforcement from 1 Oct 2028?",
         "weight": 12
       },
       {
@@ -19255,9 +19255,9 @@
         "l3": "Model re-verification is triggered manually after some changes, and results are not linked to the change record",
         "l4": "Each IBR change opens a re-verification record linked to the change, but evidence is not exported to the planning entities",
         "l5": "Every IBR change opens a model re-verification record with result and date, linked to the change record, and the evidence is exported to the planning entities",
-        "regulatoryRef": "NERC MOD-026-2",
+        "regulatoryRef": "NERC MOD-026-2 R4",
         "remediation": "Open a MOD-026-2 re-verification record automatically when an IBR control-setting or firmware change is logged, closing it only with result and date.",
-        "text": "After a control-setting or firmware change on an inverter-based resource, does the agent trigger re-verification of the resource's model under the entity's NERC MOD-026-2 model verification process and keep the evidence for the planning entities?",
+        "text": "After a control-setting or firmware change on an inverter-based resource that alters its dynamic response, does the agent trigger the model update the Generator Owner must give its Transmission Planner within 180 calendar days under NERC MOD-026-2 R4, and keep the evidence?",
         "weight": 12
       }
     ],
@@ -19265,8 +19265,8 @@
       "EU Renewable Energy Directive (RED III) 2023/2413",
       "IEC 61968/61970 (Common Information Model)",
       "NERC CIP-002 through CIP-014",
-      "ISO 50001:2018 (Energy Management)",
-      "IEEE 2030-2011",
+      "ISO 50001 (Energy Management)",
+      "IEEE 2030",
       "EU Energy Efficiency Directive 2023/1791",
       "Paris Agreement Article 6"
     ],
@@ -19303,7 +19303,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 50001:2018 (Energy Management)",
+        "text": "ISO 50001 (Energy Management)",
         "url": "https://www.iso.org/standard/88430.html"
       },
       {
@@ -19312,7 +19312,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "IEEE 2030-2011"
+        "text": "IEEE 2030"
       },
       {
         "citation": "Directive (EU) 2023/1791 (Energy Efficiency Directive)",
@@ -19840,13 +19840,13 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "zdhc-mrsl",
-        "label": "ZDHC MRSL v3.1"
+        "label": "ZDHC MRSL V4.0"
       },
       {
         "external": true,
         "frameworkId": null,
         "instrumentId": "grs",
-        "label": "GRS 4.0"
+        "label": "GRS"
       },
       {
         "external": true,
@@ -19869,15 +19869,15 @@
     ],
     "complianceFrameworks": [
       "REACH (EC) 1907/2006",
-      "ZDHC MRSL v3.1",
-      "GRS 4.0",
+      "ZDHC MRSL V4.0",
+      "GRS",
       "OEKO-TEX Standard 100",
       "EU Textile Strategy",
       "Higg FEM/FSLM"
     ],
     "contentStatus": "experimental",
     "description": "Fashion, circular economy, and textile sustainability — addressing the full textile lifecycle from fiber sourcing through manufacturing, retail, use, and end-of-life with emphasis on chemical safety, labor rights, and circularity.",
-    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply",
+    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation and that product must undergo third-party conformity assessment under that legislation — otherwise Art. 4 (AI literacy) and Art. 5 (prohibited practices) apply, and Art. 50 (transparency) where the agent interacts with people or generates synthetic content",
     "id": "weave-to-wear",
     "keyRisks": [
       "Greenwashing through unverified sustainability claims in AI-generated marketing",
@@ -19928,7 +19928,7 @@
         "l5": "Each DPP attribute has a source-evidence link and version history, the data carrier resolves to the current record, lifecycle updates (repair, reuse, recycling) are recorded, and the attribute map is updated when the textile delegated act is adopted",
         "regulatoryRef": "Regulation (EU) 2024/1781 Art. 9-11",
         "remediation": "Refuse any DPP attribute write without a source-evidence link (test report, supplier declaration, bill of materials) and version every change.",
-        "text": "Does the agent maintain Digital Product Passport data for textile products that is accurate, complete and up to date and reachable through a data carrier, per Regulation (EU) 2024/1781 Art. 9-11, as readiness for the textile delegated act (adoption planned Q4 2027)?",
+        "text": "Does the agent maintain Digital Product Passport data for textile products that is accurate, complete and up to date and reachable through a data carrier, per Regulation (EU) 2024/1781 Art. 9-11, as readiness for the textile delegated act?",
         "weight": 12
       },
       {
@@ -20010,7 +20010,7 @@
         "l5": "Per-Member-State quantities and eco-modulation inputs are reported in scheme-ready form with an audit trail from sales and product data, and reconciliation differences are logged",
         "regulatoryRef": "Directive 2008/98/EC as amended by Directive (EU) 2025/1892 (textile EPR)",
         "remediation": "Generate EPR quantity and eco-modulation reports from sales and product master data, logging each reconciliation difference before submission.",
-        "text": "Does the agent produce the data a textile producer needs for extended producer responsibility under Directive 2008/98/EC as amended by Directive (EU) 2025/1892 (quantities placed on the market per Member State and the eco-modulation inputs), with schemes required within 30 months of the amendment's entry into force on 16 Oct 2025?",
+        "text": "Does the agent produce the data a textile producer needs for extended producer responsibility under Directive 2008/98/EC as amended by Directive (EU) 2025/1892 (quantities placed on the market per Member State and the eco-modulation inputs), with Member States' schemes to be established by 17 Apr 2028?",
         "weight": 10
       },
       {
@@ -20028,9 +20028,9 @@
         "l3": "Agent tracks recycled content certificates and transaction certificates per GRS, but chain of custody gaps exist at material blending and conversion stages",
         "l4": "Transaction documents match quantities at most steps, but blending and conversion losses are not reconciled by mass balance",
         "l5": "Mass balance is reconciled at every conversion step, each transaction certificate is matched to inbound and outbound quantities, recycled-content percentages are recomputed from certificates, and mismatches block the claim",
-        "regulatoryRef": "GRS 4.0 Section 3 — Chain of Custody",
+        "regulatoryRef": "GRS Section 3 — Chain of Custody",
         "remediation": "Compute mass balance at each blending and conversion step from GRS transaction documents and block a claim when recycled output exceeds input.",
-        "text": "Does the agent maintain chain of custody documentation per Global Recycled Standard (GRS) 4.0 Section 3 for recycled content claims?",
+        "text": "Does the agent maintain chain of custody documentation per Global Recycled Standard (GRS) Section 3 for recycled content claims?",
         "weight": 13
       },
       {
@@ -20146,12 +20146,12 @@
         "keyRisk": 4,
         "l1": "No 2024/1781 alignment; DPP data is incomplete and not mapped to ecodesign delegated-act requirements",
         "l2": "A basic passport exists, but attributes are not mapped to any delegated act and updates are ad hoc",
-        "l3": "Agent produces a basic DPP, but does not map required attributes to Art.5 delegated acts or ensure ongoing lifecycle updates",
+        "l3": "Agent produces a basic DPP, but does not map required attributes to the Art. 4 delegated acts or ensure ongoing lifecycle updates",
         "l4": "Attributes are mapped to delegated-act requirements with lifecycle updates, but record integrity is not signed or verified",
-        "l5": "Delegated-act-ready DPP: mandatory attributes mapping, interoperable data carrier, signed data integrity, lifecycle updates (repair/reuse/recycling), and compliance evidence generation aligned to Arts.5/8",
-        "regulatoryRef": "EU Regulation 2024/1781 Arts. 5 & 8",
+        "l5": "Delegated-act-ready DPP: mandatory attributes mapping, interoperable data carrier, signed data integrity, lifecycle updates (repair/reuse/recycling), and compliance evidence generation aligned to Arts. 4, 8 and 9",
+        "regulatoryRef": "EU Regulation 2024/1781 Arts. 4, 8 and 9",
         "remediation": "Sign each DPP record version and verify the signature before the agent serves or updates it, so an altered attribute is detected and rejected.",
-        "text": "Does the agent ensure Digital Product Passport (DPP) implementation under Regulation (EU) 2024/1781 Article 8 is complete, and that DPP data attributes and lifecycle updates satisfy ecodesign requirements and delegated acts issued under Article 5 for textiles?",
+        "text": "Does the agent ensure the Digital Product Passport (DPP) required under Regulation (EU) 2024/1781 Article 9 is complete, and that DPP data attributes and lifecycle updates meet the requirements of the delegated acts adopted under Article 4 for textiles (whose content Article 8 sets)?",
         "weight": 8
       },
       {
@@ -20217,11 +20217,11 @@
     ],
     "regulatoryBasis": [
       "EU Strategy for Sustainable and Circular Textiles",
-      "Extended Producer Responsibility (EPR) Directive",
+      "Directive 2008/98/EC as amended by Directive (EU) 2025/1892 (textile EPR)",
       "REACH Regulation (EC) 1907/2006",
-      "Global Recycled Standard (GRS) 4.0",
-      "Higg Index (SAC)",
-      "ZDHC Manufacturing Restricted Substances List (MRSL) v3.1",
+      "Global Recycled Standard (GRS)",
+      "Higg Index (Cascale)",
+      "ZDHC Manufacturing Restricted Substances List (MRSL) V4.0",
       "OEKO-TEX Standard 100",
       "The Fashion Pact"
     ],
@@ -20235,12 +20235,14 @@
         "text": "EU Strategy for Sustainable and Circular Textiles"
       },
       {
-        "citation": "Extended Producer Responsibility (see Directive 2008/98/EC Arts. 8-8a)",
-        "instrumentId": "eu-epr",
+        "citation": "Directive 2008/98/EC (Waste Framework Directive; extended producer responsibility, Arts. 8-8a)",
+        "effectiveDate": "2008-12-12",
+        "instrumentId": "eu-waste-framework",
         "jurisdiction": "EU",
         "lastReviewed": "2026-10-03",
-        "status": "unverified",
-        "text": "Extended Producer Responsibility (EPR) Directive"
+        "status": "in-force",
+        "text": "Directive 2008/98/EC as amended by Directive (EU) 2025/1892 (textile EPR)",
+        "url": "https://data.europa.eu/eli/dir/2008/98/oj"
       },
       {
         "citation": "Regulation (EC) No 1907/2006 (REACH)",
@@ -20253,12 +20255,12 @@
         "url": "https://data.europa.eu/eli/reg/2006/1907/oj"
       },
       {
-        "citation": "Global Recycled Standard 4.0",
+        "citation": "Global Recycled Standard (Textile Exchange)",
         "instrumentId": "grs",
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "Global Recycled Standard (GRS) 4.0"
+        "text": "Global Recycled Standard (GRS)"
       },
       {
         "citation": "Higg Index (Cascale, formerly Sustainable Apparel Coalition)",
@@ -20266,15 +20268,15 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "Higg Index (SAC)"
+        "text": "Higg Index (Cascale)"
       },
       {
-        "citation": "ZDHC Manufacturing Restricted Substances List v3.1",
+        "citation": "ZDHC Manufacturing Restricted Substances List V4.0",
         "instrumentId": "zdhc-mrsl",
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "ZDHC Manufacturing Restricted Substances List (MRSL) v3.1"
+        "text": "ZDHC Manufacturing Restricted Substances List (MRSL) V4.0"
       },
       {
         "citation": "OEKO-TEX Standard 100",

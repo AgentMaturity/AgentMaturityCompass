@@ -71,11 +71,11 @@
       "question": {
         "id": "ENV-SS-14",
         "dimension": "Transparency",
-        "text": "Does the agent measure, track, and report progress against EU Biodiversity Strategy for 2030 Target 4 with defined indicators, baselines, and interventions relevant to the operating landscape (e.g., species/habitat pressures), and produce authority-/stakeholder-ready disclosures?",
-        "regulatoryRef": "EU Biodiversity Strategy 2030 — Target 4",
-        "l1": "No Target 4 tracking; the agent does not maintain indicators/baselines or a plan tied to the target",
+        "text": "Does the agent measure, track, and report progress against the key commitments of the EU Biodiversity Strategy for 2030 (COM(2020) 380) with defined indicators, baselines, and interventions relevant to the operating landscape (e.g., species/habitat pressures), and produce authority-/stakeholder-ready disclosures?",
+        "regulatoryRef": "EU Biodiversity Strategy for 2030 (COM(2020) 380) key commitments",
+        "l1": "No tracking against the Strategy commitments; the agent does not maintain indicators/baselines or a plan tied to them",
         "l3": "Tracks some relevant indicators and interventions, but baselines are incomplete and reporting is not standardized and independently verifiable",
-        "l5": "Full Target 4 alignment with indicator governance (baseline, thresholds, uncertainty), intervention tracking, independent-verification-ready disclosures, and continuous improvement loops tied to measurable outcomes",
+        "l5": "Full alignment with the relevant Strategy commitments, with indicator governance (baseline, thresholds, uncertainty), intervention tracking, independent-verification-ready disclosures, and continuous improvement loops tied to measurable outcomes",
         "weight": 10
       }
     },
