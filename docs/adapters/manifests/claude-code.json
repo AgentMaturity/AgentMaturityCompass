@@ -1,7 +1,7 @@
 {
   "schema": "amc.adapter-claim-manifest/v1",
   "adapter": "claude-code",
-  "harness": { "package": "@anthropic-ai/claude-code", "versions": ["2.1.296"] },
+  "harness": { "package": "@anthropic-ai/claude-code", "versions": ["2.1.296", "2.1.325"] },
   "hooks": [
     {
       "name": "PreToolUse",
@@ -10,15 +10,15 @@
       "onFailure": "blocks",
       "source": "docs/adapters/claude-code-hooks.md",
       "cases": [
-        { "id": "recorded-version", "path": "cases.allowedRead.claudeCodeVersion", "expect": "{version}" },
-        { "id": "allowed-read-runs", "path": "cases.allowedRead.ranTool", "expect": true },
-        { "id": "denied-bash-no-effect", "path": "cases.denied.bashEffect", "expect": false },
-        { "id": "denied-write-no-effect", "path": "cases.denied.writeCreated", "expect": false },
-        { "id": "unmapped-mcp-tool-no-effect", "path": "cases.denied.mcpRan", "expect": false },
-        { "id": "hook-settings-protected", "path": "cases.denied.settingsCreated", "expect": false },
-        { "id": "foreign-hook-not-governed", "path": "cases.foreignPreToolUseHook.ranTool", "expect": false },
-        { "id": "bridge-stopped-blocks", "path": "cases.bridgeStopped.ranTool", "expect": false },
-        { "id": "receipts-verified", "path": "cases.receiptsVerified.failures", "expect": 0 }
+        { "id": "recorded-version", "path": "claudeCode[version={version}].cases.allowedRead.claudeCodeVersion", "expect": "{version}" },
+        { "id": "allowed-read-runs", "path": "claudeCode[version={version}].cases.allowedRead.ranTool", "expect": true },
+        { "id": "denied-bash-no-effect", "path": "claudeCode[version={version}].cases.denied.bashEffect", "expect": false },
+        { "id": "denied-write-no-effect", "path": "claudeCode[version={version}].cases.denied.writeCreated", "expect": false },
+        { "id": "unmapped-mcp-tool-no-effect", "path": "claudeCode[version={version}].cases.denied.mcpRan", "expect": false },
+        { "id": "hook-settings-protected", "path": "claudeCode[version={version}].cases.denied.settingsCreated", "expect": false },
+        { "id": "foreign-hook-not-governed", "path": "claudeCode[version={version}].cases.foreignPreToolUseHook.ranTool", "expect": false },
+        { "id": "bridge-stopped-blocks", "path": "claudeCode[version={version}].cases.bridgeStopped.ranTool", "expect": false },
+        { "id": "receipts-verified", "path": "claudeCode[version={version}].cases.receiptsVerified.failures", "expect": 0 }
       ]
     },
     {
@@ -28,8 +28,8 @@
       "onFailure": "blocks",
       "source": "docs/adapters/claude-code-hooks.md",
       "cases": [
-        { "id": "frozen-workspace-blocks-prompt", "path": "cases.admissionFreeze.modelRequests", "expect": 0 },
-        { "id": "bridge-stopped-no-model-request", "path": "cases.bridgeStopped.modelRequests", "expect": 0 }
+        { "id": "frozen-workspace-blocks-prompt", "path": "claudeCode[version={version}].cases.admissionFreeze.modelRequests", "expect": 0 },
+        { "id": "bridge-stopped-no-model-request", "path": "claudeCode[version={version}].cases.bridgeStopped.modelRequests", "expect": 0 }
       ]
     },
     { "name": "SessionStart", "role": "observe", "tools": [], "onFailure": "proceeds", "source": "docs/adapters/claude-code-hooks.md", "cases": [] },
@@ -44,6 +44,6 @@
     "Linux and Windows binaries (Linux packages pinned, not run against AMC; Windows not verified)",
     "commands an allowed call starts"
   ],
-  "qualifiedAt": "2026-10-18",
-  "receipt": "qualification/2026-10-18-P1-23/claude-code-conformance.json"
+  "qualifiedAt": "2026-11-16",
+  "receipt": "qualification/2026-11-16-watch/claude-code-conformance.json"
 }

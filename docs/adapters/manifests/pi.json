@@ -1,7 +1,7 @@
 {
   "schema": "amc.adapter-claim-manifest/v1",
   "adapter": "pi",
-  "harness": { "package": "@earendil-works/pi-coding-agent", "versions": ["1.0.2", "1.0.4"] },
+  "harness": { "package": "@earendil-works/pi-coding-agent", "versions": ["1.0.2", "1.0.4", "1.5.2"] },
   "hooks": [
     {
       "name": "tool_call",
@@ -38,6 +38,6 @@
     "sessions in which Pi did not load AMC's extension (reported as not governed)",
     "commands an allowed call starts"
   ],
-  "qualifiedAt": "2026-10-18",
-  "receipt": "qualification/2026-10-18-P1-22/pi-conformance.json"
+  "qualifiedAt": "2026-11-16",
+  "receipt": "qualification/2026-11-16-watch/pi-conformance.json"
 }

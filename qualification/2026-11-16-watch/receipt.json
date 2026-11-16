@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "key": "watch-2026-11-16",
+  "date": "2026-11-16",
+  "commit": "22b9ce7a2e7e87d72d7ca16a9a337c3833adf0e1",
+  "branch": "rtd/l-watch-1115",
+  "os": "darwin 25.6.0",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "AMC_CLAUDE_CODE_CONFORMANCE=1 AMC_CLAUDE_CODE_VERSION=2.1.325 AMC_CLAUDE_CODE_PREFIX=<prefix> AMC_CLAUDE_CODE_CONFORMANCE_OUT=<file> AMC_CLAUDE_CODE_LATENCY_N=30 npx vitest run tests/conformance/claudeCodeHooks.conformance.test.ts",
+      "exit": 0,
+      "tests": {
+        "total": 7,
+        "passed": 7
+      }
+    },
+    {
+      "cmd": "AMC_PI_CONFORMANCE=1 AMC_PI_PREFIXES=1.5.2=<prefix> AMC_PI_CONFORMANCE_OUT=<file> AMC_PI_CONFORMANCE_FIXTURES=1 npx vitest run tests/conformance/piToolCall.conformance.test.ts",
+      "exit": 0,
+      "tests": {
+        "total": 12,
+        "passed": 12
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "claude-code-conformance.json",
+      "sha256": "41d23ccc6fec516f35bae9f253c53b08156a00eb1d422b547c47c03aaf289a45"
+    },
+    {
+      "path": "pi-conformance.json",
+      "sha256": "96b30b219f577c0b392ac7c744b66ed7f55fc37991b2da0dadd3cef5d3a5b0f5"
+    }
+  ]
+}

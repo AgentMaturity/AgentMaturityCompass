@@ -4,7 +4,8 @@
  * denied except loopback). Opt-in: AMC_CLAUDE_CODE_CONFORMANCE=1. The binary comes from AMC_CLAUDE_CODE_PREFIX (an npm
  * prefix holding @anthropic-ai/claude-code and its platform package), else the qualified version is installed with npm
  * into a temp prefix. AMC_CLAUDE_CODE_CONFORMANCE_OUT names a JSON file for the per-case results;
- * AMC_CLAUDE_CODE_LATENCY_N sets the latency sample size (default 200).
+ * AMC_CLAUDE_CODE_LATENCY_N sets the latency sample size (default 200). AMC_CLAUDE_CODE_VERSION picks the qualified release to run
+ * (default: the newest); AMC_CONFORMANCE_PORTS="<model>,<bridge>" pins the two loopback ports (default: any free port).
  */
 import { spawn, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
@@ -25,7 +26,8 @@ import { controlledWorkspace, freePort, removeFixtureWorkspaces } from "../helpe
 
 const enabled = process.env.AMC_CLAUDE_CODE_CONFORMANCE === "1";
 const agentId = "claude-conformance-agent";
-const version = QUALIFIED_CLAUDE_CODE_VERSIONS[0]!;
+const version = process.env.AMC_CLAUDE_CODE_VERSION ?? QUALIFIED_CLAUDE_CODE_VERSIONS.at(-1)!;
+const pinnedPorts = (process.env.AMC_CONFORMANCE_PORTS ?? "").split(",").map(Number).filter((port) => Number.isInteger(port) && port > 0);
 type Step = { name: string; input: Record<string, unknown> };
 
 const MCP_SERVER = `import { createInterface } from "node:readline";
@@ -118,9 +120,10 @@ describe.runIf(enabled)(`Claude Code ${version} hook conformance (P1-23)`, { tim
           .end(sse(next ? { type: "tool_use", id: next.id, name: next.name, input: next.input } : { type: "text", text: "done" }));
       });
     });
-    await new Promise<void>((done) => model.listen(0, "127.0.0.1", done));
+    if (!QUALIFIED_CLAUDE_CODE_VERSIONS.includes(version)) throw new Error(`Claude Code ${version} has no payload schema in claudeCodePayloads.ts`);
+    await new Promise<void>((done) => model.listen(pinnedPorts[0] ?? 0, "127.0.0.1", done));
     modelBase = `http://127.0.0.1:${(model.address() as { port: number }).port}`;
-    const port = await freePort();
+    const port = pinnedPorts[1] ?? await freePort();
     bridgeBase = `http://127.0.0.1:${port}`;
     bridge = await startBridgeServer({ workspace, host: "127.0.0.1", port, gatewayBaseUrl: "http://127.0.0.1:1" });
     // Headroom over the default 120 requests a minute per route, which the 200-call latency loop would otherwise reach (and be denied).

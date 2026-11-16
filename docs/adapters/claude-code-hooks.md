@@ -4,7 +4,7 @@ This page states what AMC claims for each Claude Code hook in control mode, how 
 where the claim stops. The Claude Code contract it relies on is pinned in
 `docs/source-reviews/P1-23-claude-code-hooks.md` in the repository.
 
-- Qualified Claude Code release: **2.1.296** (macOS arm64 run against AMC; Linux packages pinned, not run; Windows not verified).
+- Qualified Claude Code releases: **2.1.296** and **2.1.325** (macOS arm64 runs against AMC, the second on 2026-11-16 in `qualification/2026-11-16-watch`; Linux packages pinned, not run; Windows not verified). 2.1.325 ships the same tool input types and uses 2.1.296's payload schemas.
 - Any other release is refused at registration, so its sessions are not governed.
 - Support status: supported at the qualified release in the harness support matrix (`docs/adapters/SUPPORT_MATRIX.md`),
   which is generated from `docs/adapters/manifests/claude-code.json`.
