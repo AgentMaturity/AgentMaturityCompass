@@ -1,3 +1,4 @@
+import { hookReleaseDoctorChecks } from "../watch/hookReleaseCheck.js";
 import { randomBytes } from "node:crypto";
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -83,6 +84,8 @@ function pushAdapterChecks(checks: DoctorCheck[], workspace: string, includePlug
   for (const row of adaptersDetectCli({ workspace, timeoutMs: 250, includePlugins })) {
     checks.push({ id: `adapter-${row.adapterId}`, ...adapterDoctorCheck(row) });
   }
+  // Control hooks after a self-update: a release AMC has not qualified is denied every call; name observe mode.
+  checks.push(...hookReleaseDoctorChecks(workspace));
 }
 
 /**

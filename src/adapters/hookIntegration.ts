@@ -27,6 +27,7 @@ import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { stableNodePath } from "./hookProviders/nodePath.js";
+import { unqualifiedReleaseIssue } from "./hookProviders/releaseQualification.js";
 import { limitations } from "./hookLimitations.js";
 import { isSafeProviderActionId, resolveProviderHookRequestIdentity, type HookActionIdentitySource } from "../bridge/hookActionIdentity.js";
 import {
@@ -314,9 +315,7 @@ function parseUnambiguousJson(text: string, kind: "config" | "input"): unknown {
   return parsed;
 }
 
-function isJsonObject(value: unknown): value is JsonObject {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
+const isJsonObject = (value: unknown): value is JsonObject => typeof value === "object" && value !== null && !Array.isArray(value);
 
 function loadConfig(path: string): { value: JsonObject; existed: boolean; raw: string | null; mode: number } {
   if (!existsSync(path)) return { value: {}, existed: false, raw: null, mode: 0o600 };
@@ -665,6 +664,7 @@ function claudeControlStatus(workspace: string, manifest: HookManifest, issues: 
       ? "Claude Code on disk changed after installation (upgrade, edit or removal); reinstall to bind it" : null,
   ].filter((issue): issue is string => issue !== null);
   if (binding && !binding.install) issues.push("the control installation binds no Claude Code (none was given or on PATH at install); sessions cannot register and are not governed");
+  const release = binding?.install ? unqualifiedReleaseIssue("claude-code", binding.install.version) : null; if (release) issues.push(release);
   issues.push(...drift);
   let governance: ClaudeCodeGovernance;
   try {

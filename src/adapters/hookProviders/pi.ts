@@ -23,6 +23,7 @@ import type { HookIntegrationStatus, HookMutationResult, InstallHookIntegrationO
 import { verifyManagedLease } from "../managedHookLease.js";
 import { clearPiDigestCache, measurePiInstall } from "../pi/piInstall.js";
 import { QUALIFIED_PI_VERSIONS } from "../pi/piVersions.js";
+import { unqualifiedReleaseIssue } from "./releaseQualification.js";
 import {
   addManagedIgnoreBlock, assertAllPathsSafe, controlApprovalPolicy, fileChange, HOOK_CONTROL_INTEGRATION_ID, HOOK_INTEGRATION_ID,
   HOOK_TOKEN_MODE, HookIntegrationError, hasManagedIgnoreBlock, hookModeSchema, ignoreBlockHash, integrationId, leaseScopes,
@@ -245,6 +246,8 @@ function piInstallDrifted(manifest: PiManifest | null, issues: string[]): boolea
     return false;
   }
   const measured = measurePiInstall(manifest.piInstall.packageDir);
+  const release = unqualifiedReleaseIssue("pi", measured?.version ?? manifest.piInstall.version);
+  if (release) issues.push(release);
   if (measured?.sha256 === manifest.piInstall.sha256 && measured.version === manifest.piInstall.version) return false;
   issues.push("Pi on disk changed after installation (upgrade, edit or removal); reinstall to bind it");
   return true;
