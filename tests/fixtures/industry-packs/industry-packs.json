@@ -18,12 +18,6 @@
       {
         "external": true,
         "frameworkId": null,
-        "instrumentId": "us-sec-digital-assets",
-        "label": "SEC Framework"
-      },
-      {
-        "external": true,
-        "frameworkId": null,
         "instrumentId": "iso-tc307",
         "label": "ISO/TC 307"
       },
@@ -43,17 +37,16 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "eu-amld5",
-        "label": "5AMLD/6AMLD"
+        "label": "5AMLD / AMLR"
       }
     ],
     "complianceFrameworks": [
       "MiCA 2023/1114",
       "FATF VA/VASP Guidelines",
-      "SEC Framework",
       "ISO/TC 307",
       "BIS CPMI",
       "IOSCO Crypto Recommendations",
-      "5AMLD/6AMLD"
+      "5AMLD / AMLR"
     ],
     "contentStatus": "experimental",
     "description": "Decentralized finance, tokenization, and DeFi protocols — covering blockchain-based financial services including token issuance, decentralized exchanges, lending protocols, and digital asset custody with emphasis on regulatory compliance, smart contract security, and investor protection.",
@@ -426,7 +419,7 @@
         "l5": "The threshold rule for each non-EU jurisdiction is configured and versioned, transfer value includes fees and FX at a documented rate, split transfers are aggregated, and each decision is retained per transfer",
         "regulatoryRef": "FATF Recommendations 15 and 16",
         "remediation": "Configure a versioned travel-rule threshold per non-EU jurisdiction, value each transfer including fees and FX, and aggregate linked split transfers.",
-        "text": "For crypto-asset transfers on corridors outside the EU, does the agent apply the travel-rule threshold set by FATF Recommendations 15 and 16 and their interpretive notes, valuing each transfer deterministically including fees, FX and split transfers?",
+        "text": "For crypto-asset transfers on corridors outside the EU, does the agent apply the travel-rule threshold each jurisdiction sets under FATF Recommendations 15 and 16 and their interpretive notes, valuing each transfer deterministically including fees, FX and split transfers?",
         "weight": 10
       }
     ],
@@ -515,7 +508,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "us-sec-climate",
-        "label": "SEC ESG Rules"
+        "label": "SEC climate disclosure rule (stayed)"
       },
       {
         "external": true,
@@ -550,7 +543,7 @@
     ],
     "complianceFrameworks": [
       "EU Taxonomy 2020/852",
-      "SEC ESG Rules",
+      "SEC climate disclosure rule (stayed)",
       "GRI Standards",
       "SASB Standards",
       "SFDR 2019/2088",
