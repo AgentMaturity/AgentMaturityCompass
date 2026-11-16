@@ -8,6 +8,7 @@ import type { ActionClass, RiskTier } from "../types.js";
 import type { ShellCommandConnector, ShellCommandPlan } from "../enforce/shellCommandPlan.js";
 import { hookCallRefusal, type CanonicalToolRequest, type HookCall, type HookControlOutcome, type HookProvider } from "./hookProviders.js";
 import type { AuthorizationTarget } from "./hookAuthorization.js";
+import { applyInputGuard, type InputGuardRecord } from "../enforce/untrustedInputGuard.js";
 
 export type CompoundCommandBlastRadiusReasonCode =
   | "SIGNED_AUTHORITY_UNTRUSTED"
@@ -57,6 +58,8 @@ export interface NormalizedProviderToolRequest {
   rawInputSha256: string;
   call: HookCall | null;
   toolInput: Record<string, unknown>;
+  /** The provider's session id, which the untrusted-input guard derives its session labels under; null when it names none. */
+  sessionId: string | null;
 }
 
 function riskTierFor(actionClass: ActionClass): RiskTier {
@@ -270,6 +273,8 @@ interface RequestedControlDecision {
   /** The highest-class canonical tool evaluated: what an authorization record for this call names. */
   target?: AuthorizationTarget | null;
   approvals?: AuthorizationTarget[];
+  /** What the untrusted-input guard recorded and decided for this call (src/enforce/untrustedInputGuard.ts). */
+  inputGuard?: InputGuardRecord;
 }
 
 export function requestedControlDecision(input: {
@@ -333,16 +338,20 @@ export function requestedControlDecision(input: {
     }));
     const approvals = evaluations.filter(evaluation => evaluation.outcome === "ask" && evaluation.actionClass !== null)
       .map(evaluation => ({ toolName: evaluation.request.name, actionClass: evaluation.actionClass! }));
+    // Runs after today's policy and can only tighten it (allow < ask < deny); off, it records this call's labels only.
+    const guarded = (today: RequestedControlDecision): RequestedControlDecision => applyInputGuard({ workspace: input.workspace,
+      agentId: input.agentId, provider: input.request.provider, sessionId: input.request.sessionId, shownAs: input.request.providerToolName,
+      requests: input.request.canonicalRequests, tools, today });
     if (!input.request.commandPlan) {
       const evaluation = evaluations[0];
       if (!evaluation) throw new Error("control evaluation produced no result");
-      return {
+      return guarded({
         approvals,
         decision: evaluation.outcome,
         reason: evaluation.reason,
         commandBlastRadius: null,
         target: evaluation.actionClass ? { toolName: evaluation.request.name, actionClass: evaluation.actionClass } : null,
-      };
+      });
     }
     const review = completeCommandReview(input.request.commandPlan, evaluations);
     const decisive = review.decisiveStepIndex === null
@@ -353,7 +362,7 @@ export function requestedControlDecision(input: {
       : decisive?.reason ?? "AMC control evaluation failed closed.";
     const top = evaluations.find((evaluation) => evaluation.actionClass === review.highestActionClass);
     const target = top?.actionClass ? { toolName: top.request.name, actionClass: top.actionClass } : null;
-    return { decision: review.aggregateOutcome, reason, commandBlastRadius: review, target, approvals };
+    return guarded({ decision: review.aggregateOutcome, reason, commandBlastRadius: review, target, approvals });
   } catch {
     return {
       decision: "deny",

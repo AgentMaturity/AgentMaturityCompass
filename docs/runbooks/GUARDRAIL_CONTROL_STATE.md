@@ -79,6 +79,79 @@ amc guardrails profile financial
 
 Profiles persist only their runtime-bound subset. The command lists every other guardrail in the profile with `(not enforced)`, or with `(enforced at <boundary>)` for the tool-pipeline rows, instead of claiming the full profile is effective. No profile can request a guardrail whose enforcement is `none`.
 
+## Untrusted-input guard
+
+The `untrusted-input-guard` preset asks you before the agent does something risky after it has read content AMC cannot
+vouch for, such as a web page, an MCP tool's output or a file from outside the project.
+
+```bash
+amc guardrails profile untrusted-input-guard                  # on (enforce)
+amc guardrails profile untrusted-input-guard --mode log-only  # watch first: changes no decision
+amc guardrails profile untrusted-input-guard --mode off
+amc guardrails list                                           # the last line shows the guard's mode
+```
+
+**What it may claim, and nothing more:** in Claude Code and Gemini CLI sessions that AMC's hooks govern, AMC asks for
+approval before (or blocks) consequential calls made after untrusted input. It does not stop prompt injection. A call
+made through a tool AMC cannot see is outside this claim. It works only where the hooks run in control mode
+(`amc connect hooks install --provider claude-code --mode control`).
+
+How it works:
+
+1. **Each call is classified** by the table below. AMC records the result in the call's signed decision row.
+2. **A session's labels come from those rows only**, for calls AMC let run. Labels only go up: nothing a tool returns, a
+   file says or the agent writes can lower them, and no command clears them while the session runs. A new session
+   starts with no labels. A call counts as soon as AMC allows it, so a sibling in the same batch counts before its
+   PostToolUse arrives.
+3. **Two rules run after your signed policies and can only make a decision stricter** (allow, then ask, then deny):
+   - the session has read untrusted input, and this call is consequential: AMC asks a person (a signed AMC approval for
+     this exact call, at least one approver even where the policy needs none);
+   - the session has read untrusted input and private data, and this call sends data out: AMC denies it.
+4. **Fail closed.** If AMC cannot read the session's labels (no session id, a damaged record, the ledger unavailable),
+   a consequential call asks. If the guard's own setting cannot be read, the guard counts as on.
+5. **Providers.** Claude Code and Gemini CLI get the ask. Pi, DSH and ACS have no AMC-backed ask, so they get a deny with
+   the same words. Codex is observed only: its observation row records what the guard would have done; nothing is blocked.
+6. **Log-only** changes no decision. Each decision row's `inputGuard.note` starts with "Log only, nothing was changed".
+7. **MCP definitions.** `amc shield mcp-ledger <server files>` records each tool's description and input-schema digests in
+   the workspace ledger and lists the tools whose digests changed since the last recorded scan. With the guard on, the
+   next consequential call of a changed tool asks; once one call of that tool has run after the change (approved by a
+   person while the guard is on), later calls are decided as before.
+
+The message a person sees names the untrusted source and the action, for example: "This session earlier read a web page
+(WebFetch), which AMC cannot vouch for, so a person must approve before the agent can send data out of this computer
+(Bash: curl)."
+
+Switching the guard on, to log-only or off writes a signed revision of the guardrail control state (the same authority as
+any other profile change) and an `UNTRUSTED_INPUT_GUARD_CHANGED` audit row. A command run by an agent (any agent marker
+in its environment, or a workspace in agent mode) cannot change it. Applying another profile, or enabling and disabling
+guardrails, leaves the guard as it is.
+
+### Classification table
+
+Default-deny: a call AMC has no entry for counts as untrusted input and as an outbound send.
+
+| Call (ToolHub tool) | Untrusted input | Private data | Outbound send |
+| --- | --- | --- | --- |
+| A tool whose ToolHub entry has `labels: [untrusted-input]` | yes | | |
+| A tool whose ToolHub entry has `labels: [private-data]` or `protectedFields` | | yes | |
+| Any MCP tool (ToolHub `context.kind: mcp`) | yes | | yes |
+| `http.fetch` (WebFetch, web_fetch) | yes | | yes |
+| `git.push`, and git subcommands AMC maps to it (fetch, pull, clone) | yes | | yes |
+| `fs.read`, `glob`, `grep`, `ls` inside the workspace | | if a secret file | |
+| the same outside the workspace | yes | if a secret file | |
+| `process.spawn` of a local program (`ls`, `cat`, `grep`, `find`, `cp`, `rm` and the others in `LOCAL_PROGRAMS`), named bare or from a system folder | if an argument is outside the workspace, a URL or an expansion | if an argument is a secret file | |
+| `process.spawn` of any other program, or a local one told to run another (`find -exec`) | yes | if an argument is a secret file | yes |
+| `fs.write`, `fs.edit`, `apply_patch`, `git.status`, `git.commit` | | | |
+| Any other tool | yes | | yes |
+
+Any call whose ToolHub action class is `NETWORK_EXTERNAL` or `DATA_EXPORT` is an outbound send. A **consequential** call is an
+outbound send or a call of class `WRITE_HIGH`, `DEPLOY`, `FINANCIAL`, `IDENTITY`, `SECURITY`, `NETWORK_EXTERNAL` or
+`DATA_EXPORT`. A **secret file** is one under `~/.ssh`, `~/.aws`, `~/.gnupg` and the other credential stores the shell
+sandbox denies, or named like `.env*`, `id_rsa*`, `*.pem`, `*.key`, `.npmrc`, `.netrc` or `credentials*`.
+
+Known limits: two calls a provider starts at the same moment can both be decided before either is recorded; a person
+who can delete rows from the ledger can lower a session's labels (ledger verification reports that).
+
 ## Integrity behavior
 
 AMC fails closed when an initialized control artifact has any of these conditions:
@@ -137,6 +210,7 @@ GET  /api/v1/guardrails/list
 POST /api/v1/guardrails/enable   { "name": "prompt-injection-detection" }
 POST /api/v1/guardrails/disable  { "name": "prompt-injection-detection" }
 POST /api/v1/guardrails/profile  { "name": "standard" }
+POST /api/v1/guardrails/profile  { "name": "untrusted-input-guard", "mode": "enforce" | "log_only" | "off" }
 ```
 
 The local Dashboard server and Studio use these same workspace-scoped routes. Responses are not cached. Dashboard mutation requires a per-server HttpOnly capability cookie plus an exact loopback `Origin`; a page from another origin cannot toggle controls. If live integrity verification fails, Dashboard clears its cache, shows a visible integrity error, and renders build-time catalog metadata as read-only and unverified.

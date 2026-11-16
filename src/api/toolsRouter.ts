@@ -28,6 +28,12 @@ function guardrailErrorStatus(error: unknown): number {
   return 500;
 }
 
+/** A profile request; `mode` only for the untrusted-input guard (enforce, log_only or off). */
+const guardrailProfileBodySchema = z.object({
+  name: z.string().trim().min(1),
+  mode: z.enum(['enforce', 'log_only', 'off']).optional()
+}).strict();
+
 function guardrailName(body: unknown): string {
   return guardrailMutationBodySchema.parse(body).name;
 }
@@ -194,7 +200,7 @@ export async function handleToolsRoute(
     if (pathname === '/api/v1/guardrails/profile' && method === 'POST') {
       try {
         if (!currentActor()) return true;
-        const name = guardrailName(await bodyJson<unknown>(req));
+        const { name, mode } = guardrailProfileBodySchema.parse(await bodyJson<unknown>(req));
         if (!currentActor()) return true;
         const { applyGuardrailControlProfile, recoverGuardrailControlState } = await import('../enforce/guardrailControlState.js');
         if (!currentActor()) return true;
@@ -206,7 +212,8 @@ export async function handleToolsRoute(
           workspace,
           profileName: name,
           source: 'api' as const,
-          actor: 'local-api'
+          actor: 'local-api',
+          ...(mode === undefined ? {} : { mode })
         };
         let applied: ReturnType<typeof applyGuardrailControlProfile>;
         if (revalidateAuthority === undefined) applied = applyGuardrailControlProfile(input);
@@ -229,6 +236,7 @@ export async function handleToolsRoute(
           applied: true,
           profile: name,
           revision: applied.state.revision,
+          untrustedInputGuard: applied.state.untrustedInputGuard ?? 'off',
           requestedCount: applied.state.requestedGuardrails.length,
           effectiveCount: statusError ? null : effective.length,
           unsupported: applied.unsupported,
