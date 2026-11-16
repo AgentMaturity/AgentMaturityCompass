@@ -475,7 +475,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc experiment set-candidate` | Set experiment candidate signed config overlay | `--experiment <id>`<br>`--candidate-file <path>`<br>`--agent <agentId>` | - |
 | `amc experiment-architecture` | Run a controlled architecture comparison experiment (exit 0 measured pass, 1 failure or error, 3 inconclusive or simulated) | `--name <name>`<br>`--model <modelId>`<br>`--baseline-file <path>`<br>`--candidate-file <path>`<br>`--baseline-kind <kind>`<br>`--candidate-kind <kind>`<br>`--execute-trials`<br>`--casebook <id>`<br>`--provider <id>`<br>`--mode <mode>`<br>`--max-steps <n>`<br>`--agent <agentId>` | - |
 | `amc experiment-architecture-probes` | List the standard probe set for architecture experiments | - | - |
-| `amc explain` | Plain-English explanation for a diagnostic question (example: AMC-2.1) | `--json` | - |
+| `amc explain` | Plain-English explanation for a diagnostic question (example: AMC-2.1) | `--json`<br>`--not-applicable <reason>`<br>`--applicable` | - |
 | `amc export` | Export policy packs and badges | - | - |
 | `amc export badge` | Export deterministic maturity badge SVG for a run | `--run <runId>`<br>`--out <file>`<br>`--agent <agentId>` | - |
 | `amc export grc` | Export the latest run as labelled GRC evidence (+ SARIF developer findings) | `--framework <framework>`<br>`--out <file>`<br>`--sarif <file>`<br>`--agent <agentId>`<br>`--json` | - |
@@ -1081,7 +1081,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc score operational-independence` | Calculate operational independence score | `--window <days>`<br>`--domain <domain>`<br>`--json` | - |
 | `amc score output-attestation` | Score output signing and trust metadata for receiving agents | `--json` | - |
 | `amc score output-integrity` | Score output integrity maturity (OWASP LLM02, confidence calibration, citation) | `--json` | - |
-| `amc score owasp-llm` | OWASP LLM Top 10 (2023 v1.1) coverage; not evaluated: file presence is not evidence. The evidence-bound 2025 list is `amc compliance report --framework owasp-llm` | `--json` | - |
+| `amc score owasp-llm` | OWASP Top 10 for LLM Applications (2025) coverage; not evaluated: file presence is not evidence. The evidence-bound version is `amc compliance report --framework owasp-llm` | `--json` | - |
 | `amc score pause-quality` | Score quality of agent-initiated pauses | `--json` | - |
 | `amc score policy-consistency` | Test policy enforcement consistency across repeated trials (pass^k) | `--json` | - |
 | `amc score production-ready` | Run production readiness gate for an agent | `--strict`<br>`--json` | - |
@@ -1092,7 +1092,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc score simulation-lane` | Run the Simulation & Forecast evaluation lane — 5-dimension assessment for simulation/forecast systems | `--system-type <type>`<br>`--json`<br>`--responses <file>` | - |
 | `amc score sleeper-detection` | Detect context-dependent behavioral inconsistencies | `--json` | - |
 | `amc score state-portability` | Score agent state portability (vendor-neutral format, serialization, integrity on transfer) | `--json` | - |
-| `amc score task-horizon` | Score task-completion time horizon (METR-inspired) | `--json` | - |
+| `amc score task-horizon` | Autonomy span: check the controls AMC lists for a run of a given length (self-reported; not METR's time-horizon measure; a longer run never scores higher) | `--minutes <n>`<br>`--controls <list>`<br>`--human-stepped-in`<br>`--json` | - |
 | `amc score tier` | Run tiered maturity assessment (quick/standard/deep) | `--tier <tier>`<br>`--question-set <version>`<br>`--json` | - |
 | `amc score transparency-log` | Score network transparency log (Merkle tree, inclusion proofs) | `--json` | - |
 | `amc session` | Native signed sessions: inspect, compact, verify, replay and recover (list them with amc sessions list) | - | - |

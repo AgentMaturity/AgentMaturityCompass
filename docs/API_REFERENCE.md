@@ -1094,7 +1094,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 1075 | `amc score operational-independence` | Calculate operational independence score |
 | 1076 | `amc score output-attestation` | Score output signing and trust metadata for receiving agents |
 | 1077 | `amc score output-integrity` | Score output integrity maturity (OWASP LLM02, confidence calibration, citation) |
-| 1078 | `amc score owasp-llm` | OWASP LLM Top 10 (2023 v1.1) coverage; not evaluated: file presence is not evidence. The evidence-bound 2025 list is `amc compliance report --framework owasp-llm` |
+| 1078 | `amc score owasp-llm` | OWASP Top 10 for LLM Applications (2025) coverage; not evaluated: file presence is not evidence. The evidence-bound version is `amc compliance report --framework owasp-llm` |
 | 1079 | `amc score pause-quality` | Score quality of agent-initiated pauses |
 | 1080 | `amc score policy-consistency` | Test policy enforcement consistency across repeated trials (pass^k) |
 | 1081 | `amc score production-ready` | Run production readiness gate for an agent |
@@ -1105,7 +1105,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 1086 | `amc score simulation-lane` | Run the Simulation & Forecast evaluation lane — 5-dimension assessment for simulation/forecast systems |
 | 1087 | `amc score sleeper-detection` | Detect context-dependent behavioral inconsistencies |
 | 1088 | `amc score state-portability` | Score agent state portability (vendor-neutral format, serialization, integrity on transfer) |
-| 1089 | `amc score task-horizon` | Score task-completion time horizon (METR-inspired) |
+| 1089 | `amc score task-horizon` | Autonomy span: check the controls AMC lists for a run of a given length (self-reported; not METR's time-horizon measure; a longer run never scores higher) |
 | 1090 | `amc score tier` | Run tiered maturity assessment (quick/standard/deep) |
 | 1091 | `amc score transparency-log` | Score network transparency log (Merkle tree, inclusion proofs) |
 | 1092 | `amc session` | Native signed sessions: inspect, compact, verify, replay and recover (list them with amc sessions list) |
@@ -5255,6 +5255,8 @@ Plain-English explanation for a diagnostic question (example: AMC-2.1)
 | Option | Description |
 |--------|-------------|
 | `--json` | - |
+| `--not-applicable <reason>` | - |
+| `--applicable` | - |
 
 #### `amc export badge`
 
@@ -9710,7 +9712,7 @@ Score output integrity maturity (OWASP LLM02, confidence calibration, citation)
 
 #### `amc score owasp-llm`
 
-OWASP LLM Top 10 (2023 v1.1) coverage; not evaluated: file presence is not evidence. The evidence-bound 2025 list is `amc compliance report --framework owasp-llm`
+OWASP Top 10 for LLM Applications (2025) coverage; not evaluated: file presence is not evidence. The evidence-bound version is `amc compliance report --framework owasp-llm`
 
 
 | Option | Description |
@@ -9814,11 +9816,14 @@ Score agent state portability (vendor-neutral format, serialization, integrity o
 
 #### `amc score task-horizon`
 
-Score task-completion time horizon (METR-inspired)
+Autonomy span: check the controls AMC lists for a run of a given length (self-reported; not METR's time-horizon measure; a longer run never scores higher)
 
 
 | Option | Description |
 |--------|-------------|
+| `--minutes <n>` | - |
+| `--controls <list>` | - |
+| `--human-stepped-in` | - |
 | `--json` | - |
 
 #### `amc score tier`

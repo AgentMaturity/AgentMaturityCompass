@@ -4,6 +4,19 @@ Each public methodology version, newest first. The machine-readable copy is the 
 
 Entries for `2026.08.27-r225` and earlier remain in the "Methodology Changelog" section of [SCORING_METHODOLOGY.md](../SCORING_METHODOLOGY.md) for now. More than a hundred existing test assertions read that history there, so it moves here together with those tests rather than ahead of them.
 
+## 2026.11.16-r227 (2026-11-16)
+
+**Summary.** Applicability, the 2025 OWASP list, an estimated range and a truthful scale.
+
+- A person can mark a question as not applying to one agent, with a reason: `amc explain <questionId> --not-applicable "<reason>"` (and `--applicable` to undo). The answers are signed with the config-signature key. A marked question is left out of the layer and overall averages and out of evidence coverage, and every report lists it with the reason. With no answers every question counts, as before; a file that does not verify is ignored and the report says so.
+- AMC-5.8 to AMC-5.17 follow the OWASP Top 10 for LLM Applications 2025 edition (https://genai.owasp.org/llm-top-10/, read 2026-11-16). Eight keep their subject under the 2025 id. AMC-5.14 (Insecure Plugin Design, no longer on the list) becomes LLM07:2025 System Prompt Leakage, and AMC-5.17 (Model Theft, which the 2025 list folds into LLM10:2025 Unbounded Consumption) becomes LLM08:2025 Vector and Embedding Weaknesses. `amc score owasp-llm` lists the 2025 edition.
+- The overall score is shown with an estimated range: plus or minus 1.96 standard errors of the question levels inside each layer. It is an estimate and does not cover evidence AMC has not seen.
+- The score scale in `amc methodology` gives each level one name, what it needs, and how many questions can reach it today (240 of 244 cannot rise above L1). The trust-tier table now says that a diagnostic level uses no trust weight; the weights 1.1, 1.0, 0.8 and 0.4 apply only to the formal-spec, model-drift and evidence-ingest side scores.
+- Fix plans (prioritized upgrade actions, the evidence checklist, `amc improve`, top gaps) list only steps that can move a level.
+- Gates, bands, layer and overall arithmetic, and the question counts (244 and 264) are unchanged.
+
+**Migration.** Reports, badges, methodology receipts and signed outputs generated under `2026.10.08-r226` remain valid as r226 scores and must not be rewritten. Re-score under `2026.11.16-r227` before comparing or publishing. With no question marked not applicable a score is the same number as under r226. Where questions are marked not applicable the averages are taken over fewer questions and the score can move in either direction. Evidence tagged to AMC-5.14 or AMC-5.17 under r226 was gathered for a different OWASP risk.
+
 ## 2026.10.08-r226 (2026-10-08)
 
 **Summary.** Rebuilds the diagnostic gates from runtime evidence and makes levels cumulative (P1-07).
