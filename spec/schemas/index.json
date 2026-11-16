@@ -98,7 +98,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/amcpass.schema.json",
       "name": "amcpass.schema.json",
-      "sha256": "09b5b00aeb66af6f5d1d7c7c45eda22a12b4fc2e713e43e067948defe60a2eda"
+      "sha256": "abb8ee0d89d73cdc6f3ffc23d53f7a76538ceabf91da9f4657f89f41a74030f4"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/amcprompt.schema.json",
