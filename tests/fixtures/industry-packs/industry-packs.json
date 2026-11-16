@@ -6579,7 +6579,7 @@
         "text": "ISO 22000"
       },
       {
-        "citation": "FSSC 22000 Version 6",
+        "citation": "FSSC 22000 Version 7",
         "instrumentId": "fssc-22000",
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
@@ -15369,9 +15369,10 @@
         "url": "https://data.europa.eu/eli/dir/2024/3019/oj"
       },
       {
-        "citation": "ISO 24510 / ISO 24512 (Water Services)",
-        "instrumentId": null,
-        "jurisdiction": "unresolved",
+        "citation": "ISO 24510 / ISO 24512 Water services",
+        "instrumentId": "iso-24510",
+        "jurisdiction": "INT",
+        "lastReviewed": "2026-10-03",
         "status": "unverified",
         "text": "ISO 24510 / ISO 24512 (Water Services)"
       },
@@ -15873,7 +15874,7 @@
       {
         "external": true,
         "frameworkId": null,
-        "instrumentId": null,
+        "instrumentId": "redd-plus",
         "label": "UNFCCC REDD+ (Decision 1/CP.16)"
       },
       {
@@ -16325,7 +16326,7 @@
         "text": "CITES (Convention on International Trade in Endangered Species)"
       },
       {
-        "citation": "FSC forest management standard v5.3 / PEFC ST 1003:2018",
+        "citation": "FSC forest management standard v5.3 / PEFC ST 1003:2024",
         "instrumentId": "fsc-pefc",
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
@@ -16341,9 +16342,10 @@
         "text": "Ramsar Convention on Wetlands"
       },
       {
-        "citation": "UNFCCC REDD+ (Decision 1/CP.16)",
-        "instrumentId": null,
-        "jurisdiction": "unresolved",
+        "citation": "UNFCCC REDD+ (Decision 1/CP.16; Warsaw Framework)",
+        "instrumentId": "redd-plus",
+        "jurisdiction": "INT",
+        "lastReviewed": "2026-10-03",
         "status": "unverified",
         "text": "UNFCCC REDD+ (Decision 1/CP.16)"
       },
@@ -19843,7 +19845,7 @@
       {
         "external": true,
         "frameworkId": null,
-        "instrumentId": null,
+        "instrumentId": "grs",
         "label": "GRS"
       },
       {
@@ -20253,9 +20255,10 @@
         "url": "https://data.europa.eu/eli/reg/2006/1907/oj"
       },
       {
-        "citation": "Global Recycled Standard (GRS)",
-        "instrumentId": null,
-        "jurisdiction": "unresolved",
+        "citation": "Global Recycled Standard (Textile Exchange)",
+        "instrumentId": "grs",
+        "jurisdiction": "INT",
+        "lastReviewed": "2026-10-03",
         "status": "unverified",
         "text": "Global Recycled Standard (GRS)"
       },
@@ -20268,9 +20271,10 @@
         "text": "Higg Index (Cascale)"
       },
       {
-        "citation": "ZDHC Manufacturing Restricted Substances List (MRSL) V4.0",
-        "instrumentId": null,
-        "jurisdiction": "unresolved",
+        "citation": "ZDHC Manufacturing Restricted Substances List V4.0",
+        "instrumentId": "zdhc-mrsl",
+        "jurisdiction": "INT",
+        "lastReviewed": "2026-10-03",
         "status": "unverified",
         "text": "ZDHC Manufacturing Restricted Substances List (MRSL) V4.0"
       },

@@ -114,7 +114,7 @@ No output above was produced for this guide. Each row names the function that pr
 
 - The registry's `questionCount` for this station is 6; the station has 6 packs and 104 questions, so the field equals the pack count, not the question total. Use the counts in Sector packs.
 - 81 of 82 framework strings do not resolve to a compliance-report framework (see Frameworks referenced).
-- The packs' 51 `regulatoryBasis` entries resolve to catalogue records with a status and review date where the catalogue has one [C94]; 4 resolve to no record and 30 to a record marked unverified, so those cannot show whether they are current.
+- The packs' 51 `regulatoryBasis` entries resolve to catalogue records with a status and review date where the catalogue has one [C94]; 0 resolve to no record and 34 to a record marked unverified, so those cannot show whether they are current.
 - `amc domain assurance` invokes no agent, so its result is always not evaluated (see Assurance packs).
 - Pack results from `amc domain pack run` are self-assessments capped at L1 (see Sector packs).
 - Pack questions, deep questions and this guide are AI-drafted and experimental: no qualified expert has reviewed them.
