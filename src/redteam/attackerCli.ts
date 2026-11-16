@@ -29,7 +29,7 @@ function dollars(value: string): number {
 /** Adds the flags to the same command object; this registers no command. */
 export function withAttackerOptions(command: Command): Command {
   return command
-    .option("--attacker-model <provider:model>", "off by default. A model you name (openai:<model> or anthropic:<model>) writes new attack text " +
+    .option("--attacker-model <provider:model>", "Off by default. A model you name (openai:<model> or anthropic:<model>) writes new attack text " +
       "for each scenario's injection slot, round by round. AMC sends that model each scenario's goal and the agent's replies and tool calls")
     .option("--attacker-rounds <n>", `rounds per scenario with --attacker-model, the first being the pack's own text (default ${DEFAULT_ATTACKER_BUDGET.rounds})`,
       wholeNumber("--attacker-rounds", 50))
