@@ -37,7 +37,7 @@ GitHub: https://github.com/AgentMaturity/AgentMaturityCompass
 Sharing a project I've been working on: an open-source framework for evaluating AI agent trustworthiness using execution-verified evidence rather than self-reported claims.
 
 **Key technical decisions:**
-- **Evidence trust tiers**: OBSERVED_HARDENED (1.1×), OBSERVED (1.0×), ATTESTED (0.8×), SELF_REPORTED (0.4×) — weights are applied to scoring based on evidence source quality
+- **Evidence trust tiers**: OBSERVED_HARDENED (1.1×), OBSERVED (1.0×), ATTESTED (0.8×), SELF_REPORTED (0.4×) — the tier gates each question's level (self-reported: L1 at most; observed: L2 and above); the weights scale side scores such as confidence, never the level
 - **Transparent gateway proxy**: intercepts agent-provider API calls without modifying agent code, collecting OBSERVED-tier evidence
 - **Cryptographic integrity**: Ed25519 signatures + Merkle tree proof chains on all assessment artifacts
 - **5-dimension maturity model**: 244 default diagnostic questions across Strategic Ops, Leadership, Culture, Resilience, and Skills, with an optional 264-question lifecycle set

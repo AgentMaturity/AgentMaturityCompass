@@ -799,7 +799,7 @@ The canonical reference implementation is this repository. Key modules:
 
 ### 10.1 Scoring Manipulation Prevention
 
-**Self-reporting attack:** An agent inflates its maturity score by submitting falsified self-reported evidence. Mitigation: self-reported evidence receives a 0.4× weight multiplier and cannot achieve L4/L5 without OBSERVED or ATTESTED evidence.
+**Self-reporting attack:** An agent inflates its maturity score by submitting falsified self-reported evidence. Mitigation: self-reported evidence supports a question's level up to L1 at most; only OBSERVED evidence can support L2 and above. No trust weight is applied to the level itself (weights scale side scores such as confidence only).
 
 **Evidence flooding:** An agent submits large volumes of low-quality evidence to improve aggregate scores. Mitigation: the scoring formula normalizes by evidence count; the `correlationRatio` gate in assurance runs detects anomalous evidence patterns.
 
