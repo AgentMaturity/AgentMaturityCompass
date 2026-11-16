@@ -16,6 +16,9 @@ import {
   type RuntimeRunSeverity,
   type RuntimeRunSource
 } from "../runtime/runManager.js";
+import { resolveAgentId } from "../fleet/paths.js";
+import { parseWindowToMs } from "../utils/time.js";
+import { observedRates, readObservedRows } from "../watch/observedTraffic.js";
 import { activateKillSwitch, killSwitchStatus, releaseKillSwitch, type KillSwitchRecord } from "../runtime/killSwitch.js";
 
 function numericLimit(value: unknown, fallback: number): number {
@@ -94,6 +97,21 @@ export async function handleRuntimeRoute(
   if (pathname === "/api/v1/runtime/status" && method === "GET") {
     const agentId = queryParam(req.url ?? "", "agentId") ?? undefined;
     apiSuccess(res, runtimeRunStatus(workspace, agentId));
+    return true;
+  }
+
+  // Read-only: tool-call decision, error and refusal counts and rates from rows AMC recorded (src/watch/observedTraffic.ts).
+  if (pathname === "/api/v1/runtime/tool-rates" && method === "GET") {
+    try {
+      const agentId = resolveAgentId(workspace, queryParam(req.url ?? "", "agentId") || undefined);
+      const windowMs = parseWindowToMs(queryParam(req.url ?? "", "window") ?? "24h");
+      if (windowMs > 90 * 24 * 3_600_000) throw new Error("window must be 90 days or less");
+      const untilTs = Date.now(), sinceTs = untilTs - windowMs;
+      const { rows, truncated } = readObservedRows(workspace, { agentId, sinceTs, untilTs });
+      apiSuccess(res, { agentId, sinceTs, untilTs, rowsRead: rows.length, truncated, ...observedRates(rows) });
+    } catch (err) {
+      apiError(res, 400, err instanceof Error ? err.message : "could not read tool rates");
+    }
     return true;
   }
 
