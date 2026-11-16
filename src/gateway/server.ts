@@ -537,14 +537,11 @@ function bestEffortJsonInfo(bytes: Buffer, pathname?: string, openaiCompatible =
 
     if (typeof parsed.model === "string") info.model = parsed.model; else if (typeof parsed.modelId === "string") info.model = parsed.modelId;
     const firstChoice = Array.isArray(parsed.choices) && parsed.choices[0] && typeof parsed.choices[0] === "object" ? parsed.choices[0] as Record<string, unknown> : null;
-    const stop = typeof parsed.stop_reason === "string" ? parsed.stop_reason : firstChoice && typeof firstChoice.finish_reason === "string" ? firstChoice.finish_reason : null;
+    const stop = typeof parsed.stop_reason === "string" ? parsed.stop_reason : typeof firstChoice?.finish_reason === "string" ? firstChoice.finish_reason : null;
     if (stop !== null) info.stopReason = stop.slice(0, 64);
 
-    if (parsed.usage && typeof parsed.usage === "object") {
-      info.usage = parsed.usage as Record<string, unknown>;
-    } else if (parsed.usageMetadata && typeof parsed.usageMetadata === "object") {
-      info.usage = parsed.usageMetadata as Record<string, unknown>;
-    }
+    if (parsed.usage && typeof parsed.usage === "object") info.usage = parsed.usage as Record<string, unknown>;
+    else if (parsed.usageMetadata && typeof parsed.usageMetadata === "object") info.usage = parsed.usageMetadata as Record<string, unknown>;
 
     if (Array.isArray(parsed.tools) || Array.isArray(parsed.tool_calls)) {
       info.hasToolCalls = true;

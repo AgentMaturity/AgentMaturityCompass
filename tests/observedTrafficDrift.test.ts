@@ -12,7 +12,6 @@ import { openLedger } from "../src/ledger/ledger.js";
 import { observedChangeNotes } from "../src/watch/observedChange.js";
 import { observedRates, readObservedRows, type ObservedRow } from "../src/watch/observedTraffic.js";
 import { initWorkspace } from "../src/workspace.js";
-// @ts-expect-error plain browser module without types
 import { toolRatesHtml } from "../src/console/assets/runtimeRates.js";
 
 const roots: string[] = [];

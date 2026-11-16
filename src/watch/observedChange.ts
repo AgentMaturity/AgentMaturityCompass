@@ -7,9 +7,9 @@ import { detectCusumChangePoints } from "../forecast/changePoint.js";
 import { median } from "../experiments/stats.js";
 import { observedRates, type ObservedChangeNote, type ObservedRow } from "./observedTraffic.js";
 
-export const OBSERVED_BUCKETS = 24;
+const OBSERVED_BUCKETS = 24;
 /** A bucket gives a value for a metric only with at least this many rows behind it. */
-export const MIN_ROWS_PER_BUCKET = 3;
+const MIN_ROWS_PER_BUCKET = 3;
 
 type Metric = Exclude<ObservedChangeNote["metric"], "response model">;
 

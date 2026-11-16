@@ -9,9 +9,7 @@
 import type { AMCTraceV1 } from "../correlation/traceSchema.js";
 import type { ProductionTrace } from "../agents/traceIngestion.js";
 
-export const MAST_SOURCE = "https://arxiv.org/abs/2503.13657v3";
-
-export const MAST_FAILURE_MODES = {
+const MAST_FAILURE_MODES = {
   "FM-1.1": { category: "System design issues", name: "Disobey task specification" },
   "FM-1.2": { category: "System design issues", name: "Disobey role specification" },
   "FM-1.3": { category: "System design issues", name: "Step repetition" },
@@ -28,7 +26,7 @@ export const MAST_FAILURE_MODES = {
   "FM-3.3": { category: "Task verification", name: "Incorrect verification" }
 } as const;
 
-export type MastMode = keyof typeof MAST_FAILURE_MODES;
+type MastMode = keyof typeof MAST_FAILURE_MODES;
 
 export interface MastLabel {
   mode: MastMode;
@@ -42,7 +40,7 @@ export interface MastLabel {
 }
 
 /** Same tool, same arguments, this many times in a row. */
-export const REPEAT_THRESHOLD = 3;
+const REPEAT_THRESHOLD = 3;
 
 function label(mode: MastMode, rule: string, basis: string): MastLabel {
   return { mode, ...MAST_FAILURE_MODES[mode], rule, basis, meaning: "label assigned by an AMC rule; not a finding" };

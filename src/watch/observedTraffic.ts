@@ -12,7 +12,7 @@
 import { openLedger } from "../ledger/ledger.js";
 import { plainName } from "../importers/sessionImportCommon.js";
 
-export const OBSERVED_ROW_LIMIT = 200_000;
+const OBSERVED_ROW_LIMIT = 200_000;
 
 export interface ObservedRow {
   id: string;

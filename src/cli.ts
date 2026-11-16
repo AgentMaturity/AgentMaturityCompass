@@ -15932,11 +15932,7 @@ drift
   .option("--json", "with --against observed: JSON output", false)
   .action(async (opts: { agent?: string; against?: string; window: string; json: boolean }) => {
     if (opts.against === "observed") process.exit((await import("./watch/observedChangeCli.js")).printObservedDriftCheck({ workspace: process.cwd(), agentId: opts.agent ?? activeAgent(program), window: opts.window, json: opts.json }));
-    const result = await driftCheckCli({
-      workspace: process.cwd(),
-      agentId: opts.agent ?? activeAgent(program),
-      against: "previous"
-    });
+    const result = await driftCheckCli({ workspace: process.cwd(), agentId: opts.agent ?? activeAgent(program), against: "previous" });
     console.log(JSON.stringify(result, null, 2));
     if (result.triggered || driftNotEvaluated(result)) process.exit(result.triggered ? 2 : 3); // 3: drift could not be evaluated
   });
