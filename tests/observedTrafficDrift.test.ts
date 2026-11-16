@@ -113,6 +113,18 @@ describe("observed change notes", () => {
   });
 });
 
+describe("tokens per task across bucket edges", () => {
+  test("a task whose replies straddle two buckets is counted once, so steady tasks give no note", () => {
+    const hour = 3_600_000, rows: ObservedRow[] = [];
+    // Each task has four 30-token replies two minutes apart; from task 12 on they start one minute before a bucket edge.
+    for (let task = 1; task < 24; task += 1) for (let n = 0; n < 4; n += 1) {
+      rows.push({ id: `ev-${task}-${n}`, ts: task * hour + (task < 12 ? 600_000 : -60_000) + n * 120_000, kind: "model-reply", task: `task-${task}`, model: "m",
+        tokens: 30, refusal: false, denied: false, asked: false, failed: null });
+    }
+    expect(observedChangeNotes(rows, { sinceTs: 0, untilTs: 24 * hour })).toEqual([]);
+  });
+});
+
 describe("Runtime page card", () => {
   test("every value is escaped and missing numbers read as not recorded", () => {
     const html = toolRatesHtml({ rowsRead: "<img src=x onerror=alert(1)>", toolDecisions: { total: 4, denied: 1, denialRate: 0.25, asked: "<b>" },

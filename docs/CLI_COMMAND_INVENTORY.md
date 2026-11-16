@@ -378,7 +378,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc domain roadmap` | Generate 30/60/90-day roadmap for this domain (not evaluated without evidence) | `--agent <id>`<br>`--domain <d>`<br>`--example`<br>`--json` | `sector roadmap` |
 | `amc down` | Stop AMC Studio local control plane | - | - |
 | `amc drift` | Drift/regression detection and reporting | - | - |
-| `amc drift check` | - | `--agent <agentId>`<br>`--against <kind>` | - |
+| `amc drift check` | - | `--agent <agentId>`<br>`--against <kind>`<br>`--window <window>`<br>`--json` | - |
 | `amc drift report` | - | `--agent <agentId>`<br>`--out <file>` | - |
 | `amc e2e` | End-to-end smoke verification | - | - |
 | `amc e2e smoke` | Run go-live smoke tests: local, docker, or helm-template | `--mode <mode>`<br>`--workspace <path>`<br>`--repo-root <path>`<br>`--json` | - |
@@ -610,7 +610,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc identity workload-trust publish` | Validate a YAML workload trust config and publish it signed with the auditor key (owner mode) | - | - |
 | `amc identity workload-trust show` | Show what the verified workload trust config pins (names and counts, no key material) | `--json` | - |
 | `amc identity workload-trust verify` | Verify the workload trust config's signature and schema; exits 1 when it does not verify | - | - |
-| `amc import` | Import neutral traces, runs, workflow graphs, configs, memory, evals, and benchmarks | `--agent <agentId>`<br>`--dry-run`<br>`--validate`<br>`--json`<br>`--expected-digest <sha256>`<br>`--no-retain-original` | - |
+| `amc import` | Import neutral traces, runs, workflow graphs, configs, memory, evals, benchmarks, and agent sessions: Claude Code transcripts (experimental: the format is not published, AMC infers its fields), codex exec --json output, and ATIF v1 trajectories | `--agent <agentId>`<br>`--dry-run`<br>`--validate`<br>`--json`<br>`--expected-digest <sha256>`<br>`--no-retain-original`<br>`--keep-text` | - |
 | `amc imports` | List, inspect, and roll back neutral import runs | - | - |
 | `amc imports list` | List recent neutral import runs | `--limit <n>`<br>`--json` | - |
 | `amc imports rollback` | Remove files written by a neutral import run | `--json` | - |
