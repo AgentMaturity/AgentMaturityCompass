@@ -57,7 +57,7 @@
     ],
     "contentStatus": "experimental",
     "description": "Decentralized finance, tokenization, and DeFi protocols — covering blockchain-based financial services including token issuance, decentralized exchanges, lending protocols, and digital asset custody with emphasis on regulatory compliance, smart contract security, and investor protection.",
-    "euAIActClassification": "Not listed in Annex III unless used to evaluate the creditworthiness of natural persons (Annex III §5(b)); Art. 50 transparency applies",
+    "euAIActClassification": "Not listed in Annex III unless used to evaluate the creditworthiness of natural persons (Annex III §5(b)); Art. 50 transparency applies where the agent interacts with people or generates synthetic content",
     "id": "blockchain",
     "keyRisks": [
       "Smart contract exploitation through AI-discovered vulnerabilities",
@@ -164,9 +164,9 @@
         "l3": "Agent tracks reserve composition and adequacy ratios, but does not implement real-time reserve verification or stress testing",
         "l4": "Composition and adequacy are tracked in real time, but stress tests or attestations are missing",
         "l5": "Full reserve management monitoring with real-time composition tracking, adequacy verification per MiCA Art. 36, custody requirement compliance per Art. 37, reserve investment policy monitoring, stress testing, and transparent reserve attestation",
-        "regulatoryRef": "MiCA 2023/1114 Art. 36-39",
+        "regulatoryRef": "MiCA 2023/1114 Art. 36-38",
         "remediation": "Reconcile reserve holdings against tokens in circulation on a fixed schedule, and halt agent-initiated reserve trades when the adequacy ratio falls below a threshold.",
-        "text": "Does the agent implement stablecoin reserve management monitoring per MiCA 2023/1114 Title III Articles 36-39?",
+        "text": "Does the agent implement stablecoin reserve management monitoring for asset-referenced tokens per MiCA 2023/1114 Title III Articles 36-38?",
         "weight": 12
       },
       {
@@ -206,7 +206,7 @@
         "l5": "Every agent order passes pre-submission checks for restricted-list hits and manipulation patterns, blocked orders are logged with reasons, and checks are tested on each release",
         "regulatoryRef": "MiCA 2023/1114 Art. 89; MiCA 2023/1114 Art. 91",
         "remediation": "Run every agent order through a pre-submission check for restricted-list hits, self-matching and front-running patterns, and log each block with its reason.",
-        "text": "Are the agent's own crypto-asset orders checked before submission so that it does not trade on inside information (MiCA Art. 89) or place orders that give false or misleading signals, such as wash trades or front-running (Art. 91)?",
+        "text": "Are the agent's own crypto-asset orders checked before submission so that it does not trade on inside information, including front-running pending client orders (MiCA Art. 87(1)(b) and Art. 89), or place orders that give false or misleading signals, such as wash trades (Art. 91)?",
         "weight": 15
       },
       {
@@ -241,12 +241,12 @@
         "keyRisk": 1,
         "l1": "No TFR compliance; AI VASP agents do not distinguish TFR originator/beneficiary data completeness requirements from MiCA obligations, risking non-compliance with travel rule implementation",
         "l2": "Travel-rule data is collected, but TFR completeness rules are not separated from MiCA obligations",
-        "l3": "Agent implements basic FATF travel rule data collection, but does not enforce EU TFR 2023/1113 Art. 4-7 specific data completeness thresholds or distinguish TFR requirements from MiCA VASP obligations",
+        "l3": "Agent implements basic FATF travel rule data collection, but does not enforce EU TFR 2023/1113 Art. 14-17 data completeness rules or distinguish TFR requirements from MiCA VASP obligations",
         "l4": "TFR completeness is enforced and missing data rejected, but competent authority reporting is manual",
-        "l5": "EU TFR 2023/1113 controls in place, with Art. 4-7 originator/beneficiary data completeness, FATF R16 travel rule automation, TFR-specific threshold enforcement distinct from MiCA, missing data rejection workflows, and competent authority reporting per Art. 15",
-        "regulatoryRef": "EU TFR 2023/1113 Art. 4-7; FATF R16",
+        "l5": "EU TFR 2023/1113 controls in place, with Art. 14 originator/beneficiary data completeness, FATF R16 travel rule automation, the Art. 14(5) self-hosted address check distinct from MiCA, Art. 16-17 missing data detection and rejection workflows, and records available to competent authorities",
+        "regulatoryRef": "EU TFR 2023/1113 Art. 14-17; FATF R16",
         "remediation": "Encode the TFR data-completeness rules separately from MiCA service rules, and make the agent reject VASP-to-VASP transfers that fail them.",
-        "text": "Does the agent implement EU Transfer of Funds Regulation 2023/1113 originator/beneficiary data completeness requirements for AI VASP-to-VASP transactions distinct from MiCA obligations?",
+        "text": "Does the agent implement the crypto-asset transfer rules of EU Transfer of Funds Regulation 2023/1113 (Art. 14-17: originator and beneficiary information, detection of missing information, and handling of incomplete transfers) for AI VASP-to-VASP transactions, distinct from MiCA obligations?",
         "weight": 12
       },
       {
@@ -344,7 +344,7 @@
         "l3": "Flags some promotional language and distribution risks, but secondary-sale context and evidence retention are inconsistent",
         "l4": "Facts are scored and communications gated, but secondary-sale context is not captured",
         "l5": "Full Ripple-aware control with structured fact intake, risk scoring, communications gating, escalation workflows, and audit-ready evidence bundles supporting the organization securities-law posture",
-        "regulatoryRef": "SEC v. Ripple Labs; Howey test application in token distributions",
+        "regulatoryRef": "SEC v. Ripple Labs; SEC v. W.J. Howey Co., 328 U.S. 293 (1946)",
         "remediation": "Gate every token communication the agent drafts on a risk score built from distribution, marketing and secondary-sale facts, with legal sign-off above a threshold.",
         "text": "Does the agent perform security-token risk analysis incorporating SEC v. Ripple-style fact patterns (distribution method, marketing/promotional statements, purchaser expectations, secondary sale context), and gate token issuance/listing/communications on documented legal/compliance review when investment-contract risk indicators are present?",
         "weight": 10
@@ -364,7 +364,7 @@
         "l3": "Citations are reviewed periodically, but drift can persist across pack updates",
         "l4": "Mapping is versioned and reviewed, but no automated check flags inconsistent citations",
         "l5": "Strong mapping governance with compliance/legal review, versioning, and automated checks for citation consistency across all controls",
-        "regulatoryRef": "MiCA 2023/1114 (internal control mapping governance)",
+        "regulatoryRef": "MiCA 2023/1114",
         "remediation": "Add an automated check that compares each control's MiCA citation to the mapped obligation and fails the pack update on mismatch.",
         "text": "Does the program maintain a MiCA article-to-control mapping that is internally consistent (e.g., ensuring Art. 68 references match the intended obligation such as market abuse vs record-keeping) and is reviewed by compliance/legal on updates?",
         "weight": 6
@@ -424,20 +424,20 @@
         "l3": "A threshold is applied, but fees, FX or split and merged transfers are not included in the valuation",
         "l4": "Thresholds are configured per jurisdiction with fees and FX, but split transfers are not aggregated",
         "l5": "The threshold rule for each non-EU jurisdiction is configured and versioned, transfer value includes fees and FX at a documented rate, split transfers are aggregated, and each decision is retained per transfer",
-        "regulatoryRef": "FATF Recommendation 15",
+        "regulatoryRef": "FATF Recommendations 15 and 16",
         "remediation": "Configure a versioned travel-rule threshold per non-EU jurisdiction, value each transfer including fees and FX, and aggregate linked split transfers.",
-        "text": "For crypto-asset transfers on corridors outside the EU, does the agent apply the travel-rule threshold of FATF Recommendation 15 and its interpretive note, valuing each transfer deterministically including fees, FX and split transfers?",
+        "text": "For crypto-asset transfers on corridors outside the EU, does the agent apply the travel-rule threshold set by FATF Recommendations 15 and 16 and their interpretive notes, valuing each transfer deterministically including fees, FX and split transfers?",
         "weight": 10
       }
     ],
     "regulatoryBasis": [
       "MiCA Regulation 2023/1114",
       "FATF VA/VASP Guidelines (2021)",
-      "SEC Howey Test Framework",
+      "SEC interpretive release 33-11412 on crypto assets (2026)",
       "ISO/TC 307 Blockchain Standards",
       "BIS CPMI Guidance on Stablecoins",
       "IOSCO Policy Recommendations for Crypto",
-      "AML/KYC Requirements (5AMLD/6AMLD)"
+      "Directive (EU) 2018/843 (5AMLD) and Regulation (EU) 2024/1624 (AMLR, applies from 10 July 2027)"
     ],
     "regulatoryReferences": [
       {
@@ -459,12 +459,14 @@
         "text": "FATF VA/VASP Guidelines (2021)"
       },
       {
-        "citation": "SEC Framework for 'Investment Contract' Analysis of Digital Assets (2019)",
-        "instrumentId": "us-sec-digital-assets",
+        "citation": "SEC Release 33-11412, Application of the Federal Securities Laws to Certain Types of Crypto Assets and Certain Transactions Involving Crypto Assets (17 March 2026)",
+        "effectiveDate": "2026-03-23",
+        "instrumentId": "us-sec-crypto-2026",
         "jurisdiction": "US",
-        "lastReviewed": "2026-10-03",
-        "status": "unverified",
-        "text": "SEC Howey Test Framework"
+        "lastReviewed": "2026-11-16",
+        "status": "in-force",
+        "text": "SEC interpretive release 33-11412 on crypto assets (2026)",
+        "url": "https://www.sec.gov/rule-release/33-11412"
       },
       {
         "citation": "ISO/TC 307 Blockchain and distributed ledger technologies standards",
@@ -497,7 +499,7 @@
         "jurisdiction": "EU",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "AML/KYC Requirements (5AMLD/6AMLD)",
+        "text": "Directive (EU) 2018/843 (5AMLD) and Regulation (EU) 2024/1624 (AMLR, applies from 10 July 2027)",
         "url": "https://data.europa.eu/eli/dir/2018/843/oj"
       }
     ],
@@ -568,7 +570,7 @@
     ],
     "contentStatus": "experimental",
     "description": "Savings, investing, lending, borrowing, securitizing, and wealth growth — covering sustainable finance, ESG integration, green bonds, and circular economy investment with emphasis on greenwashing prevention, fiduciary duty, and sustainable value creation.",
-    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply",
+    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation and that product must undergo third-party conformity assessment under that legislation — otherwise Art. 4 (AI literacy) and Art. 5 (prohibited practices) apply, and Art. 50 (transparency) where the agent interacts with people or generates synthetic content",
     "id": "circular-economy",
     "keyRisks": [
       "Greenwashing through AI-generated sustainability claims without verification",
@@ -875,7 +877,7 @@
         "l3": "Maintains a policy memo describing scope, but gating and evidence retention are inconsistent across teams and releases",
         "l4": "A formal ESRS scope map gates outputs, but scope changes are not version-controlled with evidence",
         "l5": "Formal ESRS scope map with reporting gates, evidence checklists, and change control so scope changes are documented and audit-ready",
-        "regulatoryRef": "EU CSRD 2022/2464; ESRS scope governance",
+        "regulatoryRef": "EU CSRD 2022/2464; Commission Delegated Regulation (EU) 2023/2772 (ESRS)",
         "remediation": "Encode the ESRS scope map as a checklist the agent's report generator must satisfy, failing output when an in-scope standard or Scope 3 disclosure is missing.",
         "text": "Does the program maintain an explicit ESRS scope map for CSRD reporting (which ESRS standards/data points are in scope for the entity/product), and gate reporting outputs on completion of the required ESRS set (including explicit treatment of Scope 3/value-chain disclosures)?",
         "weight": 6
@@ -942,7 +944,7 @@
       }
     ],
     "regulatoryBasis": [
-      "SEC ESG Disclosure Rules",
+      "SEC climate disclosure rule, Release 33-11275 (stayed 4 April 2024, defense ended 27 March 2025)",
       "EU Taxonomy Regulation 2020/852",
       "GRI Standards 201-207",
       "SASB Standards",
@@ -957,7 +959,7 @@
         "jurisdiction": "US",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "SEC ESG Disclosure Rules"
+        "text": "SEC climate disclosure rule, Release 33-11275 (stayed 4 April 2024, defense ended 27 March 2025)"
       },
       {
         "citation": "Regulation (EU) 2020/852 (Taxonomy Regulation)",
@@ -5407,7 +5409,7 @@
         "l3": "Binds authentication to some transaction details and displays amount and payee, but integrity protections and manipulation detection are incomplete across channels",
         "l4": "Authentication is cryptographically bound to amount and payee in both channels, but tamper detection and binding audit logs are incomplete",
         "l5": "Full RTS dynamic linking with cryptographic binding to amount and payee, secure display and confirmation, channel-consistent enforcement (web/app), tamper detection, and audit logs demonstrating binding and user confirmation",
-        "regulatoryRef": "EBA RTS on SCA (EU) 2018/389 Art. 4 (dynamic linking)",
+        "regulatoryRef": "Commission Delegated Regulation (EU) 2018/389 Art. 5 (dynamic linking)",
         "remediation": "Sign the amount and payee into the authentication challenge, verify the signature at execution, and log a tamper event whenever the executed values differ.",
         "text": "Does the agent implement SCA RTS dynamic linking by cryptographically binding authentication to the specific transaction amount and payee (and ensuring integrity-protected display or confirmation of those elements to the payer), and by preventing post-authentication manipulation of amount or payee in both browser and app flows?",
         "weight": 12
@@ -5449,7 +5451,7 @@
         "l5": "Originator and beneficiary information is validated for every fiat and crypto-asset transfer, incomplete transfers are held or rejected under a documented policy, and the evidence is retained for supervisory review",
         "regulatoryRef": "Regulation (EU) 2023/1113; FATF R.16",
         "remediation": "Apply the same originator and beneficiary validation to crypto-asset transfers as to fiat, and hold or reject incomplete transfers under a documented policy with the decision retained.",
-        "text": "For transfers of funds and crypto-assets, does the agent ensure the required originator and beneficiary information accompanies each transfer under Regulation (EU) 2023/1113 and the FATF R.16 payment-transparency standard revised in June 2025?",
+        "text": "For transfers of funds and crypto-assets, does the agent ensure the required originator and beneficiary information accompanies each transfer under Regulation (EU) 2023/1113 and the FATF R.16 payment-transparency standard?",
         "weight": 10
       },
       {
@@ -7424,7 +7426,7 @@
         "l3": "Maintains a manual policy memo, but gating and evidence retention are inconsistent across teams and releases",
         "l4": "A jurisdiction matrix gates rollout, but evidence of completed notice, audit and consent duties is stored per team and not bundled per release",
         "l5": "Automated scope gating with jurisdiction/role mapping, rollout checks, and evidence bundles demonstrating completion of all location-specific duties prior to deployment",
-        "regulatoryRef": "Jurisdictional scope gating for employment AI laws",
+        "regulatoryRef": "NYC Local Law 144 (NYC Admin Code §20-871)",
         "remediation": "Map each employment AI feature to the jurisdictions where it runs and make the rollout pipeline fail for a location until its notice, audit or consent evidence is attached.",
         "text": "Does the program maintain a jurisdictional applicability matrix for employment AI features (e.g., AEDT use in NYC; AI video interview analysis in Illinois), and gate feature rollout on completion of location-specific notice/audit/consent requirements with evidence retention?",
         "weight": 6
@@ -10726,8 +10728,8 @@
       {
         "external": true,
         "frameworkId": null,
-        "instrumentId": "eu-microfinance",
-        "label": "EU Microfinance Reg §3"
+        "instrumentId": "eu-esf-plus",
+        "label": "ESF+ Regulation (EU) 2021/1057"
       }
     ],
     "complianceFrameworks": [
@@ -10738,11 +10740,11 @@
       "FATF R1",
       "IFC PS",
       "UNHCR FI Guidelines",
-      "EU Microfinance Reg §3"
+      "ESF+ Regulation (EU) 2021/1057"
     ],
     "contentStatus": "experimental",
     "description": "Economic opportunities for socially displaced and disadvantaged populations — covering financial inclusion, microfinance, social protection, and economic empowerment with emphasis on equitable access, dignity preservation, and sustainable poverty reduction.",
-    "euAIActClassification": "Annex III §5(a) — public assistance benefits and services; §5(b) — creditworthiness of natural persons",
+    "euAIActClassification": "Annex III §5(a) — eligibility for essential public assistance benefits and services, where used by or on behalf of public authorities; §5(b) — creditworthiness of natural persons (financial-fraud detection excluded)",
     "id": "no-poverty",
     "keyRisks": [
       "Predatory lending through AI-optimized high-interest microloans",
@@ -10909,9 +10911,9 @@
         "l3": "Agent tracks basic social metrics (outreach to poor, women, rural populations) but does not implement full social performance management or client outcome monitoring",
         "l4": "Client outcomes are monitored and pricing is checked, but staff and agent incentive alignment with social goals is not evidenced",
         "l5": "Comprehensive SPM with CERISE-SPTF standard implementation, client outcome monitoring, social audit readiness, responsible pricing verification, staff incentive alignment with social goals, and transparent social performance reporting",
-        "regulatoryRef": "CERISE-SPTF Universal Standards for SPM",
+        "regulatoryRef": "Cerise+SPTF Universal Standards for Social and Environmental Performance Management",
         "remediation": "Add client-outcome measures (repayment stress, dropout) to the agent's objective alongside volume, and report them in the social performance dashboard.",
-        "text": "Does the agent maintain social performance management per CERISE-SPTF Universal Standards for Social Performance Management?",
+        "text": "Does the agent maintain social performance management per the Cerise+SPTF Universal Standards for Social and Environmental Performance Management?",
         "weight": 10
       },
       {
@@ -11024,14 +11026,14 @@
         "failureMode": "The agent approves a program-funded microloan for an ineligible applicant because the program's eligibility rules were never encoded.",
         "id": "WLT-NP-14",
         "keyRisk": 0,
-        "l1": "No EU microfinance compliance support; obligations are not recognized or documented",
-        "l2": "EU microfinance obligations are known to the compliance team, but are not mapped to the agent's workflows",
-        "l3": "Recognizes EU microfinance obligations at a policy level, but implementation controls and evidence outputs are incomplete",
+        "l1": "No support for EU-funded microfinance requirements; obligations are not recognized or documented",
+        "l2": "The funding agreement's obligations are known to the compliance team, but are not mapped to the agent's workflows",
+        "l3": "Funding-agreement obligations are recognized at a policy level, but implementation controls and evidence outputs are incomplete",
         "l4": "Obligations are mapped to controlled workflows, but reporting outputs for program administrators are produced manually",
-        "l5": "EU microfinance controls in place, with obligation mapping, controlled workflows, reporting outputs, and audit-ready evidence for §3 requirements",
-        "regulatoryRef": "EU Microfinance Reg §3",
-        "remediation": "Map each EU microfinance obligation to a check in the agent's loan workflow, and generate the program report from the logged checks.",
-        "text": "For EU microfinance programs, does the agent comply with EU Microfinance Reg §3 requirements (eligibility / conduct obligations as applicable), including customer protections, reporting evidence, and audit-ready documentation for program administrators/supervisors?",
+        "l5": "Funding-agreement controls in place, with obligation mapping, controlled workflows, reporting outputs, and audit-ready evidence for programme administrators",
+        "regulatoryRef": "Regulation (EU) 2021/1057 (ESF+) Art. 25(e)",
+        "remediation": "Map each obligation in the EU funding agreement to a check in the agent's loan workflow, and generate the program report from the logged checks.",
+        "text": "For microfinance supported under the EaSI strand of the European Social Fund Plus (Regulation (EU) 2021/1057, Art. 25(e)), does the agent support the eligibility, reporting and audit requirements set by the funding agreement, with audit-ready documentation for programme administrators?",
         "weight": 6
       },
       {
@@ -11143,7 +11145,7 @@
       "FATF Recommendation 1 (Risk-Based Approach)",
       "IFC Performance Standards",
       "UNHCR Guidelines on Financial Inclusion",
-      "EU Microfinance Reg §3"
+      "Regulation (EU) 2021/1057 (ESF+) Art. 25(e)"
     ],
     "regulatoryReferences": [
       {
@@ -11204,12 +11206,13 @@
         "text": "UNHCR Guidelines on Financial Inclusion"
       },
       {
-        "citation": "EU microfinance citation as written in pack content",
-        "instrumentId": "eu-microfinance",
+        "citation": "Regulation (EU) 2021/1057 establishing the European Social Fund Plus (ESF+)",
+        "instrumentId": "eu-esf-plus",
         "jurisdiction": "EU",
         "lastReviewed": "2026-10-03",
-        "status": "unverified",
-        "text": "EU Microfinance Reg §3"
+        "status": "in-force",
+        "text": "Regulation (EU) 2021/1057 (ESF+) Art. 25(e)",
+        "url": "https://data.europa.eu/eli/reg/2021/1057/oj"
       }
     ],
     "riskTier": "very-high",

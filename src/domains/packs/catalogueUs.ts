@@ -118,7 +118,7 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     }),
   verified("us-sec-climate", "SEC climate-related disclosure rules (Release 33-11275)", "US", "law", "unverified",
     `${FR}/2024/04/12/2024-07648/the-enhancement-and-standardization-of-climate-related-disclosures-for-investors-delay-of-effective`,
-    ["SEC ESG Rules", "SEC ESG Disclosure Rules"], {
+    ["SEC ESG Rules", "SEC ESG Disclosure Rules", "SEC climate disclosure rule"], {
       url: undefined, retrievedAt: undefined,
       note: "Adopted 2024-03-28; effective date stayed 2024-04-12 (FR 2024-07648). Current status not confirmed in this review.",
     }),
@@ -135,6 +135,13 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   unverified("us-essa", "Every Student Succeeds Act (2015)", "US", "law", ["ESSA"]),
   unverified("us-cipa", "Children's Internet Protection Act (47 CFR §54.520)", "US", "law", ["CIPA"]),
   unverified("us-dodd-frank-x", "Dodd-Frank Act Title X (Consumer Financial Protection Act of 2010)", "US", "law", ["Dodd-Frank Act Title X", "Dodd-Frank Title X", "Dodd-Frank"]),
+  verified("us-sec-crypto-2026", "SEC Release 33-11412, Application of the Federal Securities Laws to Certain Types of Crypto Assets and Certain Transactions Involving Crypto Assets (17 March 2026)", "US", "guidance", "in-force",
+    "https://www.sec.gov/rule-release/33-11412", ["SEC interpretive release 33-11412", "SEC Release 33-11412"], {
+      lastReviewed: "2026-11-16", retrievedAt: "2026-11-16", clause: "whole instrument",
+      instrument: "SEC Release 33-11412 (34-105020), interpretive", edition: "17 March 2026", statusType: "supervisory-guidance",
+      effectiveDate: "2026-03-23", dateNote: "Commission interpretation effective 23 March 2026; it sets no compliance-due date.",
+      note: "sec.gov release page read 2026-11-16 (packs-wealth lane). sec.gov marks the 2019 staff 'Framework for Investment Contract Analysis of Digital Assets' as withdrawn and superseded by this release. experimental: AI-agent check, not an expert review.",
+    }),
   unverified("us-sec-digital-assets", "SEC Framework for 'Investment Contract' Analysis of Digital Assets (2019)", "US", "guidance", ["SEC Howey Test Framework", "SEC Framework"]),
   unverified("us-ccpa", "California Consumer Privacy Act as amended by CPRA (Cal. Civ. Code §1798.100 et seq.) and CPPA regulations", "US-CA", "law", ["CCPA/CPRA", "CCPA"]),
   unverified("us-nerc-cip", "NERC Critical Infrastructure Protection Reliability Standards CIP-002 through CIP-014", "US", "standard", ["NERC CIP"]),

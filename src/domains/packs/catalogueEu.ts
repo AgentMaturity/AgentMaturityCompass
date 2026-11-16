@@ -217,6 +217,13 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
       dateNote: "Published 4 February 2025; non-binding guidance carries no effective or compliance-due date.",
       note: `Commission page read ${P024_READ}: published 04 February 2025; the guidelines are non-binding, with authoritative interpretation reserved to the CJEU. Cited by GOV-DCR-9. ${P024_NOTE}`,
     }),
+  eu("eu-esf-plus", "reg/2021/1057", "Regulation (EU) 2021/1057 establishing the European Social Fund Plus (ESF+)", "in-force", undefined,
+    ["Regulation (EU) 2021/1057", "ESF+ Regulation (EU) 2021/1057"], {
+      instrument: "Regulation (EU) 2021/1057 establishing the European Social Fund Plus (ESF+)", clause: "Art. 25(e) (EaSI strand, microfinance); Art. 2 point (16)",
+      edition: "Regulation of 24 June 2021", statusType: "binding-now",
+      dateNote: "Entry-into-force and application dates were not recorded in this review; the Regulation funds programmes and sets no compliance-due date for providers.",
+      note: "Official Journal text read on publications.europa.eu on 2026-11-16 (packs-wealth lane): Art. 25(e) sets the EaSI strand objective of supporting the market ecosystem for microfinance to microenterprises; Art. 2 point (16) defines microfinance. Replaces the pack citation 'EU Microfinance Reg §3', for which no instrument exists. experimental: AI-agent check, not an expert review.",
+    }),
   unverified("eu-microfinance", "EU microfinance citation as written in pack content", "EU", "guidance", ["EU Microfinance Reg"],
     "No EU regulation by this name was identified in this review; the citation needs an owner to confirm or replace it."),
   unverified("eu-epr", "Extended Producer Responsibility (see Directive 2008/98/EC Arts. 8-8a)", "EU", "law", ["Extended Producer Responsibility (EPR) Directive"],

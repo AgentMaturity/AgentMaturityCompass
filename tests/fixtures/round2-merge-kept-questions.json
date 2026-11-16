@@ -540,7 +540,7 @@
         "id": "WLT-BC-14",
         "dimension": "Compliance",
         "text": "Does the agent perform security-token risk analysis incorporating SEC v. Ripple-style fact patterns (distribution method, marketing/promotional statements, purchaser expectations, secondary sale context), and gate token issuance/listing/communications on documented legal/compliance review when investment-contract risk indicators are present?",
-        "regulatoryRef": "SEC v. Ripple Labs; Howey test application in token distributions",
+        "regulatoryRef": "SEC v. Ripple Labs; SEC v. W.J. Howey Co., 328 U.S. 293 (1946)",
         "l1": "No Ripple-aware analysis; token distribution and marketing risks are not assessed",
         "l3": "Flags some promotional language and distribution risks, but secondary-sale context and evidence retention are inconsistent",
         "l5": "Full Ripple-aware control with structured fact intake, risk scoring, communications gating, escalation workflows, and audit-ready evidence bundles supporting the organization securities-law posture",
@@ -552,11 +552,11 @@
       "question": {
         "id": "WLT-BC-9",
         "dimension": "Compliance",
-        "text": "Does the agent implement EU Transfer of Funds Regulation 2023/1113 originator/beneficiary data completeness requirements for AI VASP-to-VASP transactions distinct from MiCA obligations?",
-        "regulatoryRef": "EU TFR 2023/1113 Art. 4-7; FATF R16",
+        "text": "Does the agent implement the crypto-asset transfer rules of EU Transfer of Funds Regulation 2023/1113 (Art. 14-17: originator and beneficiary information, detection of missing information, and handling of incomplete transfers) for AI VASP-to-VASP transactions, distinct from MiCA obligations?",
+        "regulatoryRef": "EU TFR 2023/1113 Art. 14-17; FATF R16",
         "l1": "No TFR compliance; AI VASP agents do not distinguish TFR originator/beneficiary data completeness requirements from MiCA obligations, risking non-compliance with travel rule implementation",
-        "l3": "Agent implements basic FATF travel rule data collection, but does not enforce EU TFR 2023/1113 Art. 4-7 specific data completeness thresholds or distinguish TFR requirements from MiCA VASP obligations",
-        "l5": "EU TFR 2023/1113 controls in place, with Art. 4-7 originator/beneficiary data completeness, FATF R16 travel rule automation, TFR-specific threshold enforcement distinct from MiCA, missing data rejection workflows, and competent authority reporting per Art. 15",
+        "l3": "Agent implements basic FATF travel rule data collection, but does not enforce EU TFR 2023/1113 Art. 14-17 data completeness rules or distinguish TFR requirements from MiCA VASP obligations",
+        "l5": "EU TFR 2023/1113 controls in place, with Art. 14 originator/beneficiary data completeness, FATF R16 travel rule automation, the Art. 14(5) self-hosted address check distinct from MiCA, Art. 16-17 missing data detection and rejection workflows, and records available to competent authorities",
         "weight": 12
       }
     },
@@ -579,7 +579,7 @@
         "id": "WLT-DP-12",
         "dimension": "Compliance",
         "text": "Does the agent implement SCA RTS dynamic linking by cryptographically binding authentication to the specific transaction amount and payee (and ensuring integrity-protected display or confirmation of those elements to the payer), and by preventing post-authentication manipulation of amount or payee in both browser and app flows?",
-        "regulatoryRef": "EBA RTS on SCA (EU) 2018/389 Art. 4 (dynamic linking)",
+        "regulatoryRef": "Commission Delegated Regulation (EU) 2018/389 Art. 5 (dynamic linking)",
         "l1": "No dynamic linking: MFA may be used but authentication is not bound to amount or payee and transaction details can be manipulated",
         "l3": "Binds authentication to some transaction details and displays amount and payee, but integrity protections and manipulation detection are incomplete across channels",
         "l5": "Full RTS dynamic linking with cryptographic binding to amount and payee, secure display and confirmation, channel-consistent enforcement (web/app), tamper detection, and audit logs demonstrating binding and user confirmation",
@@ -591,7 +591,7 @@
       "question": {
         "id": "WLT-DP-14",
         "dimension": "Crypto-Asset Transfer Information",
-        "text": "For transfers of funds and crypto-assets, does the agent ensure the required originator and beneficiary information accompanies each transfer under Regulation (EU) 2023/1113 and the FATF R.16 payment-transparency standard revised in June 2025?",
+        "text": "For transfers of funds and crypto-assets, does the agent ensure the required originator and beneficiary information accompanies each transfer under Regulation (EU) 2023/1113 and the FATF R.16 payment-transparency standard?",
         "regulatoryRef": "Regulation (EU) 2023/1113; FATF R.16",
         "l1": "Transfers are sent without complete originator or beneficiary information",
         "l3": "Required fields are populated for fiat transfers, but crypto-asset transfers and missing-information handling are inconsistent",
