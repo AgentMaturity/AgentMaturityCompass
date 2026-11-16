@@ -22,7 +22,7 @@ import { gunzip } from "node:zlib";
 import { verifyBridgeLease } from "../bridge/bridgeAuth.js";
 import { consumeObservedHookRateLimit } from "../bridge/hookIngress.js";
 import { openLedger } from "../ledger/ledger.js";
-import { isLoopback } from "../standards/acs/acsGuardianHttp.js";
+import { isLoopback, readCappedBytes } from "../standards/acs/acsGuardianHttp.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 
@@ -198,16 +198,8 @@ function answer(res: ServerResponse, status: number, body: Json): true {
 
 /** The request body, at most `max` bytes as read and (for gzip) after inflating; null when over. */
 async function readBody(req: IncomingMessage, max: number, gzipped: boolean): Promise<Buffer | null> {
-  const chunks: Buffer[] = [];
-  let total = 0;
-  for await (const chunk of req) {
-    const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk as string);
-    total += buffer.byteLength;
-    if (total > max) return null;
-    chunks.push(buffer);
-  }
-  const raw = Buffer.concat(chunks);
-  if (!gzipped) return raw;
+  const raw = await readCappedBytes(req, max);
+  if (raw === null || !gzipped) return raw;
   try {
     return await promisify(gunzip)(raw, { maxOutputLength: max });
   } catch (error) {

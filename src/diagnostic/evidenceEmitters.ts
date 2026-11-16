@@ -147,6 +147,8 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/tools/toolEvidence.ts", why: "authorization records (P1-02) for AMC enforcement; untagged, so they bind to no question" },
   { module: "src/watch/continuousMonitor.ts", why: "score-drop alert about a prior score" },
   { module: "src/watch/observabilityBridge.ts", why: "observability ingestion; external reports are self-reported" },
+  { module: "src/watch/otlpReceiver.ts", why: "OTLP telemetry an agent runtime sends about itself; self-reported, digests only, never maturity evidence" },
+  { module: "src/bridge/sessionObservations.ts", why: "session hook reports in Claude Code's or Codex's own words; self-reported, never maturity evidence" },
   { module: "src/workspaces/workspaceRouter.ts", why: "workspace override refusal" }
 ];
 

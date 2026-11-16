@@ -23,7 +23,7 @@ import { appendVerified, observationId } from "./claudeCodeObservations.js";
 import { consumeObservedHookRateLimit } from "./hookIngress.js";
 
 export type SessionProvider = "claude-code" | "codex";
-export const MAX_SESSION_EVENT_BYTES = 262_144;
+const MAX_SESSION_EVENT_BYTES = 262_144;
 /** The session events each provider documents (tool events are recorded by their own routes). */
 export const SESSION_EVENTS: Readonly<Record<SessionProvider, readonly string[]>> = {
   "claude-code": CLAUDE_OBSERVE_SESSION_HOOKS,

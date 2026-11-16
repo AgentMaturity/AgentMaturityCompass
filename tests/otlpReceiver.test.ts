@@ -63,7 +63,7 @@ function claudeLogs(records = 1, extraAttrs: unknown[] = []) {
 }
 
 async function post(path: string, body: string | Buffer, headers: Record<string, string>) {
-  const response = await fetch(`${base}${path}`, { method: "POST", headers, body });
+  const response = await fetch(`${base}${path}`, { method: "POST", headers, body: typeof body === "string" ? body : new Uint8Array(body) });
   return { status: response.status, text: await response.text() };
 }
 
@@ -72,7 +72,7 @@ describe("OTLP receiver", () => {
     const json = JSON.stringify(claudeLogs());
     const gatewayLease = lease("gateway:llm", "/openai");
     const forged = `${lease("hook:observe", "/hooks/otlp").slice(0, -4)}AAAA`;
-    for (const headers of [{}, { "x-amc-lease": gatewayLease }, { "x-amc-lease": forged }, { "x-amc-lease": lease("hook:observe", "/hooks/other") }]) {
+    for (const headers of [{}, { "x-amc-lease": gatewayLease }, { "x-amc-lease": forged }, { "x-amc-lease": lease("hook:observe", "/hooks/other") }] as Array<Record<string, string>>) {
       const answer = await post("/v1/logs", json, { "content-type": "application/json", ...headers });
       expect(answer.status).toBe(401);
       expect(JSON.parse(answer.text)).toEqual({ code: 401, message: "Unauthorized" });

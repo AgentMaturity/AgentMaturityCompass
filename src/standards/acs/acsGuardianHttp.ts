@@ -23,7 +23,8 @@ export function isLoopback(address: string | undefined): boolean {
   return Boolean(address) && (address === "::1" || address!.startsWith("127.") || address!.startsWith("::ffff:127."));
 }
 
-export async function readCapped(req: IncomingMessage, maxBytes: number): Promise<string | null> {
+/** The request body's bytes, or null once it passes `maxBytes` (reading stops there). */
+export async function readCappedBytes(req: IncomingMessage, maxBytes: number): Promise<Buffer | null> {
   const chunks: Buffer[] = [];
   let total = 0;
   for await (const chunk of req) {
@@ -32,7 +33,11 @@ export async function readCapped(req: IncomingMessage, maxBytes: number): Promis
     if (total > maxBytes) return null;
     chunks.push(buffer);
   }
-  return Buffer.concat(chunks).toString("utf8");
+  return Buffer.concat(chunks);
+}
+
+export async function readCapped(req: IncomingMessage, maxBytes: number): Promise<string | null> {
+  return (await readCappedBytes(req, maxBytes))?.toString("utf8") ?? null;
 }
 
 export async function handleAcsGuardianHttp(options: { workspace: string; req: IncomingMessage; res: ServerResponse; url: URL }): Promise<true> {
