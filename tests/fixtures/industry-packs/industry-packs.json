@@ -12903,12 +12903,12 @@
         "keyRisk": 0,
         "l1": "No inclusive consultation; AI-mediated public participation favors digitally literate citizens and under-represents marginalized communities",
         "l2": "Consultation runs online in one language, with accessibility checked on the main form only",
-        "l3": "Agent provides multilingual consultation and basic accessibility, but does not implement UN E-Government participation standards or OECD OG Recommendation inclusivity requirements",
+        "l3": "Agent provides multilingual consultation and basic accessibility, but does not track the UN E-Government Survey e-participation measures or the outreach that OECD OG Recommendation provision 8 asks for",
         "l4": "Multi-channel, multilingual and accessible consultation exists, but representativeness of responses is not monitored against the affected population",
-        "l5": "Full inclusive consultation with UN E-Government participation framework, OECD OG Art. 2 controls, multi-channel access (digital and non-digital), minority language support, accessibility per WCAG 2.1 AA, and representativeness monitoring for consultation responses",
-        "regulatoryRef": "UN E-Government Survey 2024; OECD OG Rec Art. 2",
+        "l5": "Full inclusive consultation with UN E-Government Survey e-participation measures, OECD OG provision 8 controls, multi-channel access (digital and non-digital), minority language support, accessibility per WCAG 2.1 AA, and representativeness monitoring for consultation responses",
+        "regulatoryRef": "UN E-Government Survey 2024; OECD OG Rec (OECD/LEGAL/0438) provision 8",
         "remediation": "Add a check that compares consultation respondents with the affected population and has the agent flag under-represented groups to staff for targeted outreach before the consultation closes.",
-        "text": "Does the agent implement public consultation inclusivity per UN E-Government Survey 2024 digital participation standards and OECD Recommendation on Open Government Article 2?",
+        "text": "Does the agent implement public consultation inclusivity, as measured by the e-participation index of the UN E-Government Survey 2024 and as provision 8 of the OECD Recommendation on Open Government asks (equal and fair opportunities to be informed and consulted, with outreach to underrepresented groups)?",
         "weight": 15
       },
       {
@@ -13048,7 +13048,7 @@
         "l5": "Named oversight body with standing access to documentation and logs, an annual public report on the agent's use, and recorded follow-up of its findings",
         "regulatoryRef": "CoE AI Convention Art. 8",
         "remediation": "Give the named oversight body standing read access to the agent's documentation and logs through a dedicated account, and track each of its findings to a recorded response.",
-        "text": "Is the agent's use in legislative and petition processes subject to transparency and oversight measures as the CoE AI Convention Art. 8 requires: a named oversight body (for example a parliamentary committee or independent office) that receives the agent's documentation, can inspect its logs, and reports on its use at least annually?",
+        "text": "Is the agent's use in legislative and petition processes subject to transparency and oversight measures in line with the CoE AI Convention Art. 8 (which asks Parties for oversight requirements fitted to context and risk), such as a named oversight body (for example a parliamentary committee or independent office) that receives the agent's documentation, can inspect its logs, and reports on its use at least annually?",
         "weight": 10
       },
       {
@@ -13069,7 +13069,7 @@
         "l5": "Art. 5 controls in place, with machine-readable releases, metadata completeness, API and bulk access for dynamic datasets, publication and update SLAs, and audit-ready evidence artifacts",
         "regulatoryRef": "EU Open Data Directive (EU) 2019/1024 Art. 5",
         "remediation": "Add a monitored publication-lag metric with a threshold for each petition and legislative dataset, and have the agent block a release that lacks the required metadata fields.",
-        "text": "Does the agent implement EU Open Data Directive (EU) 2019/1024 Article 5 by ensuring legislative/petition documents and datasets are made available (1) in machine-readable formats, (2) with complete metadata, (3) with bulk download and where data is dynamic API access, (4) with publication and update SLAs, and (5) with evidence artifacts (metadata schema, API docs, change logs, uptime metrics) to demonstrate ongoing compliance?",
+        "text": "Does the agent implement EU Open Data Directive (EU) 2019/1024 Article 5 by making legislative/petition documents and datasets available (1) in open, machine-readable formats (2) together with their metadata, and (3) for dynamic data, via APIs and, where relevant, as bulk download, and does the operator also keep (4) publication and update targets and (5) evidence artifacts (metadata schema, API docs, change logs, uptime metrics) to show this continues?",
         "weight": 12
       },
       {
@@ -13235,7 +13235,7 @@
       }
     ],
     "regulatoryBasis": [
-      "UN E-Government Survey Guidelines",
+      "UN E-Government Survey 2024 (UN DESA, not binding)",
       "Interoperable Europe Act (Regulation (EU) 2024/903)",
       "GDPR Art. 6(1)(e) (public task)",
       "US FOIA (5 U.S.C. §552)",
@@ -13253,7 +13253,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "UN E-Government Survey Guidelines"
+        "text": "UN E-Government Survey 2024 (UN DESA, not binding)"
       },
       {
         "citation": "Regulation (EU) 2024/903 (Interoperable Europe Act)",

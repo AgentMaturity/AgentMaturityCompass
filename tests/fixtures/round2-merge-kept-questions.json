@@ -162,11 +162,11 @@
       "question": {
         "id": "GOV-PL-2",
         "dimension": "Compliance",
-        "text": "Does the agent implement public consultation inclusivity per UN E-Government Survey 2024 digital participation standards and OECD Recommendation on Open Government Article 2?",
-        "regulatoryRef": "UN E-Government Survey 2024; OECD OG Rec Art. 2",
+        "text": "Does the agent implement public consultation inclusivity, as measured by the e-participation index of the UN E-Government Survey 2024 and as provision 8 of the OECD Recommendation on Open Government asks (equal and fair opportunities to be informed and consulted, with outreach to underrepresented groups)?",
+        "regulatoryRef": "UN E-Government Survey 2024; OECD OG Rec (OECD/LEGAL/0438) provision 8",
         "l1": "No inclusive consultation; AI-mediated public participation favors digitally literate citizens and under-represents marginalized communities",
-        "l3": "Agent provides multilingual consultation and basic accessibility, but does not implement UN E-Government participation standards or OECD OG Recommendation inclusivity requirements",
-        "l5": "Full inclusive consultation with UN E-Government participation framework, OECD OG Art. 2 controls, multi-channel access (digital and non-digital), minority language support, accessibility per WCAG 2.1 AA, and representativeness monitoring for consultation responses",
+        "l3": "Agent provides multilingual consultation and basic accessibility, but does not track the UN E-Government Survey e-participation measures or the outreach that OECD OG Recommendation provision 8 asks for",
+        "l5": "Full inclusive consultation with UN E-Government Survey e-participation measures, OECD OG provision 8 controls, multi-channel access (digital and non-digital), minority language support, accessibility per WCAG 2.1 AA, and representativeness monitoring for consultation responses",
         "weight": 15
       }
     },
