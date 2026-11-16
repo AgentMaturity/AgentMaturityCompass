@@ -3294,6 +3294,11 @@ export interface DiagnosticReport {
   evidenceReadiness?: DiagnosticEvidenceReadiness;
   /** Non-audit rows this agent recorded in the window, scored or not; absent in reports written before it. */
   recordedActivity?: { events: number; sessions: number };
+  /** Questions a person marked as not applying to this agent, left out of the averages (P1); absent in older reports. */
+  questionApplicability?: {
+    status: "not_answered" | "answered" | "ignored";
+    notApplicable: Array<{ questionId: string; title: string; reason: string }>;
+  };
   /** Import bookkeeping is not a maturity evaluation or verified source evidence. */
   importProvenance?: {
     evaluationPerformed: false;
