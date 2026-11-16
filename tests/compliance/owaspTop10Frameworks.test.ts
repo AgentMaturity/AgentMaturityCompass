@@ -117,8 +117,8 @@ describe("OWASP LLM and Agentic Top 10 frameworks", () => {
   });
 
   test("no surface in this domain pairs a 2025 id with a 2023 title", () => {
-    // The 2023 v1.1 scorer says so in every risk title; the packs that cite 2023 ids name the edition.
-    expect(scoreOWASPLLMCoverage().risks.every((risk) => /:2023 /.test(risk.title))).toBe(true);
+    // `amc score owasp-llm` now lists the 2025 edition (lane score); the packs that cite 2023 ids name the edition.
+    expect(scoreOWASPLLMCoverage().risks.map((risk) => risk.title)).toEqual(owaspLlmTop10Mappings.map((row) => `${row.category} mitigation`));
     expect(getAssurancePack("excessive-agency").title).toMatch(/LLM08:2023, LLM06:2025/);
     expect(getAssurancePack("overreliance").title).toMatch(/LLM09:2023/);
     expect(getAssurancePack("owaspGenAI").title).toMatch(/2023 v1\.1/);

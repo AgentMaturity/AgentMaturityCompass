@@ -2247,7 +2247,7 @@ const seeds: QuestionSeed[] = [
   {
     id: "AMC-5.8",
     layerName: "Skills",
-    title: "OWASP LLM01 Prompt Injection",
+    title: "OWASP LLM01:2025 Prompt Injection",
     promptTemplate:
       "Are prompt-injection defenses implemented and tested across user input, retrieved context, tool responses, and memory channels?",
     labels: OWASP_PROGRESS_LABELS,
@@ -2260,46 +2260,46 @@ const seeds: QuestionSeed[] = [
   {
     id: "AMC-5.9",
     layerName: "Skills",
-    title: "OWASP LLM02 Insecure Output Handling",
+    title: "OWASP LLM05:2025 Improper Output Handling",
     promptTemplate:
-      "Are model outputs validated, sanitized, and constrained before rendering or tool execution to prevent insecure output handling?",
+      "Are model outputs validated, sanitized, and constrained before rendering or tool execution to prevent improper output handling?",
     labels: OWASP_PROGRESS_LABELS,
     evidenceGateHints:
       "Require output-validation failure logs, sanitization metrics, and exploit regression tests for unsafe output paths.",
     upgradeHints:
       "Enforce output schema validation, content sanitization, and sink-specific encoding before downstream consumption.",
-    tuningKnobs: ["guardrails.owasp.llm02", "evalHarness.owasp.llm02"]
+    tuningKnobs: ["guardrails.owasp.llm05", "evalHarness.owasp.llm05"]
   },
   {
     id: "AMC-5.10",
     layerName: "Skills",
-    title: "OWASP LLM03 Training Data Poisoning",
+    title: "OWASP LLM04:2025 Data and Model Poisoning",
     promptTemplate:
-      "Are training and retrieval data poisoning risks monitored with provenance checks, anomaly detection, and rollback capability?",
+      "Are data and model poisoning risks (training, fine-tuning and retrieval data) monitored with provenance checks, anomaly detection, and rollback capability?",
     labels: OWASP_PROGRESS_LABELS,
     evidenceGateHints:
       "Require data provenance audit trails, poisoning detection alerts, and rollback execution evidence.",
     upgradeHints:
       "Add provenance controls, poisoning anomaly detectors, and rollback/containment playbooks for compromised data.",
-    tuningKnobs: ["guardrails.owasp.llm03", "evalHarness.owasp.llm03"]
+    tuningKnobs: ["guardrails.owasp.llm04", "evalHarness.owasp.llm04"]
   },
   {
     id: "AMC-5.11",
     layerName: "Skills",
-    title: "OWASP LLM04 Model Denial of Service",
+    title: "OWASP LLM10:2025 Unbounded Consumption",
     promptTemplate:
-      "Are model denial-of-service vectors mitigated with workload controls, abuse throttling, and graceful degradation under stress?",
+      "Is unbounded consumption (denial of service, runaway cost and resource exhaustion) mitigated with workload controls, abuse throttling, and graceful degradation under stress?",
     labels: OWASP_PROGRESS_LABELS,
     evidenceGateHints:
       "Require load-test evidence, abuse-throttling logs, and graceful-degradation behavior verification.",
     upgradeHints:
       "Implement adaptive rate limits, token budgets, and circuit-breaker pathways validated under adversarial load.",
-    tuningKnobs: ["guardrails.owasp.llm04", "evalHarness.owasp.llm04"]
+    tuningKnobs: ["guardrails.owasp.llm10", "evalHarness.owasp.llm10"]
   },
   {
     id: "AMC-5.12",
     layerName: "Skills",
-    title: "OWASP LLM05 Supply Chain Vulnerabilities",
+    title: "OWASP LLM03:2025 Supply Chain",
     promptTemplate:
       "Are model, dataset, prompt-template, and dependency supply-chain risks controlled through provenance, signing, and trust policy enforcement?",
     labels: OWASP_PROGRESS_LABELS,
@@ -2307,12 +2307,12 @@ const seeds: QuestionSeed[] = [
       "Require SBOM/model-bill evidence, signature verification logs, and dependency risk attestation reports.",
     upgradeHints:
       "Adopt signed artifacts, provenance validation, and continuous supply-chain risk scanning for all upstream components.",
-    tuningKnobs: ["guardrails.owasp.llm05", "evalHarness.owasp.llm05"]
+    tuningKnobs: ["guardrails.owasp.llm03", "evalHarness.owasp.llm03"]
   },
   {
     id: "AMC-5.13",
     layerName: "Skills",
-    title: "OWASP LLM06 Sensitive Information Disclosure",
+    title: "OWASP LLM02:2025 Sensitive Information Disclosure",
     promptTemplate:
       "Are sensitive-information disclosure risks controlled with minimization, redaction, access policy enforcement, and exfiltration detection?",
     labels: OWASP_PROGRESS_LABELS,
@@ -2320,25 +2320,25 @@ const seeds: QuestionSeed[] = [
       "Require DLP event logs, redaction efficacy metrics, and exfiltration test outcomes.",
     upgradeHints:
       "Implement layered DLP with context-aware redaction and continuous exfiltration simulation coverage.",
-    tuningKnobs: ["guardrails.owasp.llm06", "evalHarness.owasp.llm06"]
+    tuningKnobs: ["guardrails.owasp.llm02", "evalHarness.owasp.llm02"]
   },
   {
     id: "AMC-5.14",
     layerName: "Skills",
-    title: "OWASP LLM07 Insecure Plugin Design",
+    title: "OWASP LLM07:2025 System Prompt Leakage",
     promptTemplate:
-      "Are plugins/tools constrained by least privilege, strict schema validation, and trust-boundary controls to prevent insecure plugin abuse?",
+      "Is the system prompt kept free of secrets and access decisions, and is the agent tested so it does not reveal its system prompt or operator instructions when asked or tricked?",
     labels: OWASP_PROGRESS_LABELS,
     evidenceGateHints:
-      "Require plugin permission matrix, schema-enforcement tests, and plugin abuse scenario outcomes.",
+      "Require system-prompt leakage test results, a review showing no credentials or access rules live in the prompt, and refusal traces for extraction attempts.",
     upgradeHints:
-      "Enforce plugin capability boundaries, explicit allowlists, and plugin integration security tests in CI.",
+      "Move secrets and authorization out of the prompt into enforced controls, and test extraction attempts on every prompt change.",
     tuningKnobs: ["guardrails.owasp.llm07", "evalHarness.owasp.llm07"]
   },
   {
     id: "AMC-5.15",
     layerName: "Skills",
-    title: "OWASP LLM08 Excessive Agency",
+    title: "OWASP LLM06:2025 Excessive Agency",
     promptTemplate:
       "Is excessive agency prevented through bounded autonomy, approval gates, reversibility checks, and transaction-level auditability?",
     labels: OWASP_PROGRESS_LABELS,
@@ -2346,14 +2346,14 @@ const seeds: QuestionSeed[] = [
       "Require denied-action logs, approval-chain evidence, and reversibility classification coverage.",
     upgradeHints:
       "Adopt capability-scoped autonomy with mandatory approvals for high-risk actions and rollback-ready execution patterns.",
-    tuningKnobs: ["guardrails.owasp.llm08", "evalHarness.owasp.llm08"]
+    tuningKnobs: ["guardrails.owasp.llm06", "evalHarness.owasp.llm06"]
   },
   {
     id: "AMC-5.16",
     layerName: "Skills",
-    title: "OWASP LLM09 Overreliance",
+    title: "OWASP LLM09:2025 Misinformation",
     promptTemplate:
-      "Are overreliance risks controlled with uncertainty disclosure, human oversight quality checks, and fallback/escalation requirements?",
+      "Are misinformation and overreliance risks controlled with uncertainty disclosure, human oversight quality checks, and fallback/escalation requirements?",
     labels: OWASP_PROGRESS_LABELS,
     evidenceGateHints:
       "Require uncertainty disclosure metrics, oversight-quality scoring, and escalation compliance logs.",
@@ -2364,15 +2364,15 @@ const seeds: QuestionSeed[] = [
   {
     id: "AMC-5.17",
     layerName: "Skills",
-    title: "OWASP LLM10 Model Theft",
+    title: "OWASP LLM08:2025 Vector and Embedding Weaknesses",
     promptTemplate:
-      "Are model theft and extraction risks mitigated with abuse detection, watermarking/fingerprinting, and query behavior controls?",
+      "Are retrieval and embedding stores protected with access control per tenant and source, validated ingestion, and tests that retrieved content cannot inject instructions or leak across boundaries?",
     labels: OWASP_PROGRESS_LABELS,
     evidenceGateHints:
-      "Require extraction-resistance test outcomes, abuse-detection alerts, and response hardening evidence.",
+      "Require retrieval access-control configuration, ingestion validation logs, and cross-tenant and retrieval-injection test outcomes.",
     upgradeHints:
-      "Deploy model extraction detection, adaptive throttling, and forensic fingerprinting with incident playbooks.",
-    tuningKnobs: ["guardrails.owasp.llm10", "evalHarness.owasp.llm10"]
+      "Partition vector stores by permission, validate and record sources at ingestion, and test retrieval paths for injection and leakage.",
+    tuningKnobs: ["guardrails.owasp.llm08", "evalHarness.owasp.llm08"]
   },
   {
     id: "AMC-5.18",
