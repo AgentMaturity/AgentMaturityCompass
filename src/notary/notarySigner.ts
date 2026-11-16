@@ -168,7 +168,7 @@ export async function loadNotarySignerAsync(params: {
   if (description.ref.provider !== ref.provider || description.ref.id !== ref.id || description.ref.version !== ref.version) {
     throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", ref.provider, "the notary description differs from its configured ref");
   }
-  const level: NotaryAttestationLevel = description.protection === "hsm" ? "HARDWARE" : "SOFTWARE";
+  const level: NotaryAttestationLevel = hardwareLevel(description);
   const basis: NotaryAttestationBasis = description.protectionBasis;
   const fingerprint = sha256Hex(Buffer.from(description.publicKeyPem, "utf8"));
   const claims = () => ({ hardware: level === "HARDWARE", provider: ref.provider, protection: description.protection, protectionBasis: basis });
@@ -302,15 +302,21 @@ function loadExternalSigner(backend: Extract<NotaryBackendConfig, { type: "EXTER
   };
 }
 
+/** HARDWARE needs the provider's own metadata; a setting the operator typed is a configuration, not an attestation. */
+function hardwareLevel(description: { protection: string; protectionBasis: string }): NotaryAttestationLevel {
+  return description.protection === "hsm" && description.protectionBasis === "provider-metadata" ? "HARDWARE" : "SOFTWARE";
+}
+
 /**
  * P2-08: a key held by a key provider, reached synchronously through the provider bridge (one child process per call).
- * The level is HARDWARE only when the provider's description says "hsm", with its basis (provider metadata, or the
- * operator's configuration for PKCS#11); nothing a signer claims about itself counts. Notary signatures end up in
+ * The level is HARDWARE only when the provider's own metadata says "hsm"; "hsm" stated only in the operator's
+ * configuration (AMC_PKCS11_PROTECTION) reads SOFTWARE, its basis kept as "configured"; nothing a signer claims about
+ * itself counts. Notary signatures end up in
  * Ed25519 or canonical P-256 artifact envelopes; their algorithm is derived from this key.
  */
 function loadKeyProviderSigner(backend: Extract<NotaryBackendConfig, { type: "KEY_PROVIDER" }>, bridge: typeof callProviderSync): NotarySigner {
   const description = checkedDescription(bridge({ op: "describe", ref: backend.ref }).description, { allowed: SIGNING_ALGORITHMS, requireNonExportable: true });
-  const level: NotaryAttestationLevel = description.protection === "hsm" ? "HARDWARE" : "SOFTWARE";
+  const level: NotaryAttestationLevel = hardwareLevel(description);
   const basis: NotaryAttestationBasis = description.protectionBasis;
   const fingerprint = sha256Hex(Buffer.from(description.publicKeyPem, "utf8"));
   const claims = () => ({ hardware: level === "HARDWARE", provider: backend.ref.provider, protection: description.protection, protectionBasis: basis });

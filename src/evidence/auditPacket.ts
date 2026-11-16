@@ -72,7 +72,7 @@ function packetReadme(nowTs: number): string {
     "- `integrity/ledger-verify.json`: full ledger integrity verification output.",
     "- `incidents/`: incident records and evidence link edges.",
     "- `corrections/`: correction records and evidence correction-closure links.",
-    "- `ledger/evidence.sqlite`: raw immutable ledger database.",
+    "- `ledger/evidence.sqlite`: the raw append-only ledger database (changes to it show when it is verified; they are not prevented).",
     "- `keys/`: public keys and key history. They identify the keys; they do not vouch for this packet.",
     "- `meta/manifest.json` + `meta/manifest.sig.json`: packet manifest and auditor signature.",
     "",

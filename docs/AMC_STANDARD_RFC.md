@@ -564,7 +564,7 @@ Certificates are bundled as deterministic `.tar.gz` archives (`amc-cert/cert.jso
 amc verify all --json --expect-monitor <monitor sha256>
 
 # Certificate verification
-amc assurance cert verify --cert ./amc-cert.tar.gz
+amc assurance cert-verify ./amc-cert.tar.gz
 
 # Merkle proof verification (offline)
 amc transparency merkle verify-proof proof.amcproof --pubkey <recorded-auditor.pub>
@@ -960,7 +960,7 @@ See Section 6.4 for the full `AssuranceCert` TypeScript interface.
 
 **Verification:**
 ```bash
-amc assurance cert verify --cert ./amc-cert.tar.gz
+amc assurance cert-verify ./amc-cert.tar.gz
 amc assurance cert print --cert ./amc-cert.tar.gz
 ```
 
