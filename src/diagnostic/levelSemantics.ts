@@ -260,7 +260,7 @@ export function overallScore(layers: ReadonlyArray<Pick<LayerScore, "avgFinalLev
 }
 
 /** How the overall score's range is computed; every surface that shows the range shows this sentence with it. */
-export const OVERALL_BAND_METHOD =
+const OVERALL_BAND_METHOD =
   "an estimate: the overall plus or minus 1.96 standard errors of the question levels inside each layer; it does not cover evidence AMC has not seen";
 
 /**

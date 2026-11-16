@@ -11,7 +11,7 @@
  * A span is not a maturity level: the L0 to L5 scale (./maturityTaxonomy.ts) is not used here.
  */
 
-export type AutonomySpanId = "under-1-min" | "1-5-min" | "5-30-min" | "30-min-2-hr" | "2-8-hr" | "8-hr-plus";
+type AutonomySpanId = "under-1-min" | "1-5-min" | "5-30-min" | "30-min-2-hr" | "2-8-hr" | "8-hr-plus";
 
 export interface TaskHorizonBand {
   span: AutonomySpanId;

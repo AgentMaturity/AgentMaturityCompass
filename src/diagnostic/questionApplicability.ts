@@ -15,7 +15,7 @@ import { canonicalize } from "../utils/json.js";
  * config-signature key, because leaving a question out can raise a score; a file that does not verify is ignored (every
  * question counts) and the report says so.
  */
-export const MAX_APPLICABILITY_REASON = 500;
+const MAX_APPLICABILITY_REASON = 500;
 
 const fileSchema = z.object({
   v: z.literal(1),
