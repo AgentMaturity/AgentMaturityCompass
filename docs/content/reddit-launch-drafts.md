@@ -22,7 +22,7 @@ Different tools for different jobs. Promptfoo evaluates prompt quality. AMC answ
 
 **What's paid:** Nothing. The 41 industry-specific domain packs for regulated verticals (healthcare, finance, education, logistics) are free too in the current source build: experimental, self-reported questionnaires, with no licence or account (the 1.1.1 release that the install script fetches still asks for a licence for them).
 
-2,617 Vitest test source files. Would love feedback from this community.
+2,621 Vitest test source files. Would love feedback from this community.
 
 GitHub: https://github.com/AgentMaturity/AgentMaturityCompass
 
@@ -37,7 +37,7 @@ GitHub: https://github.com/AgentMaturity/AgentMaturityCompass
 Sharing a project I've been working on: an open-source framework for evaluating AI agent trustworthiness using execution-verified evidence rather than self-reported claims.
 
 **Key technical decisions:**
-- **Evidence trust tiers**: OBSERVED_HARDENED (1.1×), OBSERVED (1.0×), ATTESTED (0.8×), SELF_REPORTED (0.4×) — weights are applied to scoring based on evidence source quality
+- **Evidence trust tiers**: OBSERVED_HARDENED (1.1×), OBSERVED (1.0×), ATTESTED (0.8×), SELF_REPORTED (0.4×) — the tier gates each question's level (self-reported: L1 at most; observed: L2 and above); the weights scale side scores such as confidence, never the level
 - **Transparent gateway proxy**: intercepts agent-provider API calls without modifying agent code, collecting OBSERVED-tier evidence
 - **Cryptographic integrity**: Ed25519 signatures + Merkle tree proof chains on all assessment artifacts
 - **5-dimension maturity model**: 244 default diagnostic questions across Strategic Ops, Leadership, Culture, Resilience, and Skills, with an optional 264-question lifecycle set
@@ -46,7 +46,7 @@ Sharing a project I've been working on: an open-source framework for evaluating 
 
 The framework generates compliance mappings for EU AI Act, ISO 42001, NIST AI RMF, and OWASP LLM Top 10.
 
-MIT licensed, 2,617 Vitest test source files, TypeScript.
+MIT licensed, 2,621 Vitest test source files, TypeScript.
 
 Paper references and methodology: https://agentmaturity.co/methodology.html
 GitHub: https://github.com/AgentMaturity/AgentMaturityCompass

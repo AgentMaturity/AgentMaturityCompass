@@ -63,5 +63,5 @@ export function openReceiptChild(bytes: Buffer, signed: SignedReceiptAuthority):
 }
 const b64 = (size: number) => z.string().refine(text => { const b = Buffer.from(text, "base64"); return b.length === size && b.toString("base64") === text; });
 export const receiptChildEnvelopeSchema = z.strictObject({ v: z.literal(1),
-  kdf: z.strictObject({ name: z.literal("pbkdf2-sha256"), iterations: z.literal(210_000), keyLen: z.literal(32), digest: z.literal("sha256"), saltB64: b64(16) }),
+  kdf: z.strictObject({ name: z.literal("pbkdf2-sha256"), iterations: z.union([z.literal(210_000), z.literal(600_000)]), keyLen: z.literal(32), digest: z.literal("sha256"), saltB64: b64(16) }),
   cipher: z.strictObject({ name: z.literal("aes-256-gcm"), ivB64: b64(12), authTagB64: b64(16), ciphertextB64: z.string().min(4).max(16_384).refine(text => Buffer.from(text, "base64").toString("base64") === text) }) });

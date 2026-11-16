@@ -5,6 +5,7 @@
  * identity verification, content moderation, reputation integrity,
  * evidence layer, trust composition.
  */
+import { TRUST_WEIGHTS } from "../score/trustWeights.js";
 import { z } from "zod";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -91,10 +92,11 @@ export const communityPlatformConfigSchema = z.object({
 
 // ── Tier weights (OBSERVED > ATTESTED > SELF_REPORTED) ─────────────────────
 
+// The one weight table (src/score/trustWeights.ts); community signals are weighted like any other side score.
 const TIER_WEIGHTS: Record<CommunityTrustTier, number> = {
-  OBSERVED: 1.0,
-  ATTESTED: 0.7,
-  SELF_REPORTED: 0.3,
+  OBSERVED: TRUST_WEIGHTS.OBSERVED,
+  ATTESTED: TRUST_WEIGHTS.ATTESTED,
+  SELF_REPORTED: TRUST_WEIGHTS.SELF_REPORTED,
 };
 
 // ── Core logic ─────────────────────────────────────────────────────────────

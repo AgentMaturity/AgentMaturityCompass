@@ -14,6 +14,7 @@
  *  - "Unsupported confidence penalty" → when confidence and evidence diverge
  */
 
+import { TRUST_WEIGHTS } from "../score/trustWeights.js";
 import { mean as statsMean, median as statsMedian } from "../experiments/stats.js";
 import Database from "better-sqlite3";
 import { z } from "zod";
@@ -171,12 +172,8 @@ export function classifyConfidenceDomain(questionId: string): ConfidenceDomain {
 // Citation quality scoring
 // ---------------------------------------------------------------------------
 
-const TRUST_TIER_WEIGHTS: Record<TrustTier, number> = {
-  SELF_REPORTED: 0.2,
-  ATTESTED: 0.6,
-  OBSERVED: 0.8,
-  OBSERVED_HARDENED: 1.0,
-};
+// The one weight table (src/score/trustWeights.ts), not a second opinion; it feeds this side score, never a level.
+const TRUST_TIER_WEIGHTS: Record<TrustTier, number> = TRUST_WEIGHTS;
 
 /**
  * Compute citation quality score for a claim based on its evidence references.
@@ -227,7 +224,7 @@ export function computeCitationQuality(
   // Compute quality score based on evidence richness
   const evidenceDepthScore = Math.min(1.0, evidenceCount / 5); // 5+ events = max
   const sessionDiversityScore = Math.min(1.0, sessionCount / 3); // 3+ sessions = max
-  const trustWeight = TRUST_TIER_WEIGHTS[highestTrustTier] ?? 0.2;
+  const trustWeight = TRUST_TIER_WEIGHTS[highestTrustTier] ?? TRUST_WEIGHTS.SELF_REPORTED;
   const attestationBonus = hasAttestedEvidence ? 0.1 : 0;
 
   const qualityScore = Math.min(

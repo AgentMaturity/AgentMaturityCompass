@@ -1757,7 +1757,6 @@
     {"id":"4fedf817c3423bc354fc403b61fe6d49dbb0dd701dcc10a3d5886e619c4ab011","file":"src/redteam/index.ts","kind":"exports"},
     {"id":"4fefecb92158ea20f9055242619d42075dff1e3d35ba4077b3ce355a506571ea","file":"src/diagnostic/autoAnswer/traceEvidenceMapper.ts","kind":"types"},
     {"id":"4ff4a733902469f2e6bf9cafc4669af70a06210ba4d5e171f51b6db8d6f9638f","file":"src/score/metricValidity.ts","kind":"types"},
-    {"id":"5004b45a4598956fec9780d21318abd642d4f23d6cd40cf7912dc0285c1e3112","file":"src/passport/passportSchema.ts","kind":"exports"},
     {"id":"502e36cda71369bc3fd916a0a396787350c1ec0ab890d685903fa32d73f48cac","file":"src/benchmarks/replayBenchmarkCorpus.ts","kind":"types"},
     {"id":"5059acfd54afacbae50987ac3a15c9a0d82c4cdbe8ed35979a992a8d730d5be2","file":"src/tools/toolEvidence.ts","kind":"types"},
     {"id":"50685202428011a04a20eaf8bd653bafe01158348a3fd8943eedab214f5b0bea","file":"src/runtime/index.ts","kind":"types"},

@@ -317,6 +317,43 @@
       ],
       "type": "object"
     },
+    "issuance": {
+      "properties": {
+        "issuerRelationship": {
+          "const": "self",
+          "type": "string"
+        },
+        "revocationListId": {
+          "pattern": "^passports:[a-z0-9][a-z0-9:._-]{0,117}$",
+          "type": "string"
+        },
+        "revocationListKeyId": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "selfIssued": {
+          "const": true,
+          "type": "boolean"
+        },
+        "statusBasis": {
+          "const": "workspace-own-gates",
+          "type": "string"
+        },
+        "timeBasis": {
+          "const": "claimed",
+          "type": "string"
+        }
+      },
+      "required": [
+        "issuerRelationship",
+        "selfIssued",
+        "timeBasis",
+        "statusBasis",
+        "revocationListId",
+        "revocationListKeyId"
+      ],
+      "type": "object"
+    },
     "maturity": {
       "properties": {
         "byFiveLayers": {
@@ -554,6 +591,27 @@
             "sourceRefs"
           ],
           "type": "object"
+        },
+        "questionScores": {
+          "items": {
+            "properties": {
+              "qIdHash": {
+                "pattern": "^q_[a-f0-9]{8,64}$",
+                "type": "string"
+              },
+              "score": {
+                "maximum": 5,
+                "minimum": 0,
+                "type": "number"
+              }
+            },
+            "required": [
+              "qIdHash",
+              "score"
+            ],
+            "type": "object"
+          },
+          "type": "array"
         },
         "questionScores42": {
           "items": {

@@ -30,11 +30,13 @@ import {
   passportPolicyPath,
   savePassportPolicy,
   getPassportRevocation,
+  passportRevocationStatus,
   revokePassport
 } from "./passportStore.js";
+import { publishPassportRevocation } from "./passportRevocationList.js";
 import { computePassportExpiresTs } from "./passportConstants.js";
 import { verifyPassportArtifactFile, verifyPassportWorkspace } from "./passportVerifier.js";
-import { loadTrustContext, type TrustContext } from "../trust/trustContext.js";
+import { loadTrustContext, workspaceSelfTrust, type TrustContext } from "../trust/trustContext.js";
 import { untrustedReasons } from "../trust/verifierReport.js";
 
 const pendingExportSchema = z.object({
@@ -353,7 +355,7 @@ function renderPassportBadge(passport: ReturnType<typeof inspectPassportArtifact
     ? String(Math.round(passport.valueDimensions.valueScore))
     : "UNKNOWN";
   const badge = [
-    `AMC ${badgeStatus(passport.status.label)}`,
+    `AMC ${badgeStatus(passport.status.label)} self-issued`,
     `maturity=${maturity}/5`,
     `assurance=${assurance}`,
     `risks=${riskSummary(passport)}`,
@@ -534,7 +536,11 @@ export function passportVerifyPublicForApi(params: {
     trust: loadTrustContext()
   });
   const passport = verified.passport ?? inspectPassportArtifact(found.file).passport;
-  const revocation = getPassportRevocation(params.workspace, passport.passportId);
+  // Fail closed: an unreadable or rolled-back signed revocation list counts as revoked-unknown, so ok stays false.
+  let revocation: ReturnType<typeof passportRevocationStatus> = null;
+  let revocationListError: string | null = null;
+  try { revocation = passportRevocationStatus(params.workspace, passport.passportId); }
+  catch (error) { revocationListError = error instanceof Error ? error.message : String(error); }
   const expiresTs = passportExpiresTs(passport);
   const nowTs = Date.now();
   const expired = nowTs > expiresTs;
@@ -553,6 +559,9 @@ export function passportVerifyPublicForApi(params: {
       message: `passport expired at ${new Date(expiresTs).toISOString()}`
     });
   }
+  if (revocationListError !== null && !runtimeErrors.some((error) => error.code === "PASSPORT_REVOCATION_LIST_INVALID")) {
+    runtimeErrors.push({ code: "PASSPORT_REVOCATION_LIST_INVALID", message: `the passport revocation list could not be checked: ${revocationListError}` });
+  }
   if (revoked && !runtimeErrors.some((error) => error.code === "PASSPORT_REVOKED")) {
     runtimeErrors.push({
       code: "PASSPORT_REVOKED",
@@ -564,7 +573,7 @@ export function passportVerifyPublicForApi(params: {
     baseUrl: params.baseUrl
   });
   return {
-    ok: verified.ok && !expired && !revoked,
+    ok: verified.ok && !expired && !revoked && revocationListError === null,
     passportId: passport.passportId,
     verifiedTs: nowTs,
     fileSha256: verified.fileSha256,
@@ -584,15 +593,32 @@ export function passportVerifyPublicForApi(params: {
   };
 }
 
+/**
+ * The passport in `file` when it is intact and this workspace's own artifact-seal key signed it (an expired passport may
+ * still be revoked); null otherwise. Revocation reads the expiry from here, never from a file nobody checked.
+ */
+function ownVerifiedPassport(workspace: string, file: string, passportId: string): { expiresTs: number; sha256: string } | null {
+  const verified = verifyPassportArtifactFile({ file, trust: workspaceSelfTrust(workspace) });
+  const intact = verified.errors.every((error) => error.code === "PASSPORT_EXPIRED") && verified.report.issuerAdmission.status === "pass";
+  return intact && verified.passport?.passportId === passportId ? { expiresTs: passportExpiresTs(verified.passport), sha256: verified.fileSha256 } : null;
+}
+
 export function passportRevokeForApi(params: {
   workspace: string;
   passportId: string;
   reason?: string | null;
   revokedBy?: string | null;
+  /** A .amcpass this workspace made, when it is not under .amc/passport/exports; it must verify as this workspace's own. */
+  file?: string;
 }) {
-  const found = findPassportExportById(params.workspace, params.passportId);
+  const found = params.file === undefined ? findPassportExportById(params.workspace, params.passportId) : { file: params.file, sha256: "" };
   if (!found) {
     return null;
+  }
+  const own = ownVerifiedPassport(params.workspace, found.file, params.passportId);
+  if (params.file !== undefined && own === null) {
+    throw new Error(`${params.file} is not a passport this workspace signed (it was changed, or another workspace made it), so nothing was revoked. `
+      + "Pass the passport's id instead, or the unchanged .amcpass file this workspace exported.");
   }
   const entry = revokePassport({
     workspace: params.workspace,
@@ -600,13 +626,23 @@ export function passportRevokeForApi(params: {
     reason: params.reason,
     revokedBy: params.revokedBy
   });
+  // The signed list an outsider can check. The local revocation above already holds on this machine if signing fails.
+  let signedList: ReturnType<typeof publishPassportRevocation> | null = null;
+  let signedListError: string | null = null;
+  try {
+    // An export whose file no longer verifies gives no expiry: its row is then never pruned.
+    signedList = publishPassportRevocation(params.workspace, { passportId: params.passportId, reason: entry.reason ?? "unspecified",
+      expiresTs: own?.expiresTs ?? null });
+  } catch (error) {
+    signedListError = error instanceof Error ? error.message : String(error);
+  }
   appendTransparencyEntry({
     workspace: params.workspace,
     type: "PASSPORT_REVOKED",
     agentId: "workspace",
     artifact: {
       kind: "amcpass",
-      sha256: found.sha256,
+      sha256: own?.sha256 ?? found.sha256,
       id: params.passportId
     }
   });
@@ -615,7 +651,9 @@ export function passportRevokeForApi(params: {
     passportId: params.passportId,
     revokedTs: entry.revokedTs,
     reason: entry.reason,
-    revokedBy: entry.revokedBy
+    revokedBy: entry.revokedBy,
+    signedList,
+    signedListError
   };
 }
 

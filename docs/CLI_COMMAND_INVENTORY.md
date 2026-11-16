@@ -662,7 +662,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc keys` | Purpose signing keys: list, rotate, revoke and export public keys | - | - |
 | `amc keys export-public` | Print a purpose's public key, key id and proof of possession, for an organisation's trust list | `--purpose <purpose>` | - |
 | `amc keys list` | List each signing purpose's key id, shared keys, history size, rotations, provider, algorithm and protection (public files only) | `--json` | - |
-| `amc keys revoke` | Record a retired key's revocation in the workspace's signed, anchored key revocation list | `--purpose <purpose>`<br>`--key-id <id>`<br>`--reason <reason>` | - |
+| `amc keys revoke` | Record a retired key's revocation in the workspace's signed, anchored key revocation list; with --passport, a passport's revocation in the signed passport revocation list others can check | `--purpose <purpose>`<br>`--key-id <id>`<br>`--passport <id|file.amcpass>`<br>`--reason <reason>` | - |
 | `amc keys rotate` | Rotate one purpose's key with a signed, chained statement (or bind the provider key keys.refs names); --resume completes or rolls back an interrupted change | `--purpose <purpose>`<br>`--config-candidate <file>`<br>`--reason <reason>`<br>`--overlap-days <n>`<br>`--root-key <file...>`<br>`--resume`<br>`--restore`<br>`--accept <generation>`<br>`--digest <sha256>`<br>`--allow-gap <reason>`<br>`--quarantine-unbound-pub` | - |
 | `amc lab-compare` | Compare two lab experiments | `--baseline <id>`<br>`--candidate <id>` | - |
 | `amc lab-create` | Create a new lab experiment | `--kind <kind>`<br>`--name <name>`<br>`--model <modelId>`<br>`--description <desc>` | - |
@@ -885,7 +885,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc passport create` | Create deterministic signed .amcpass artifact | `--scope <scope>`<br>`--out <file.amcpass>`<br>`--id <id>` | - |
 | `amc passport export-latest` | Export latest passport for a scope to .amcpass | `--scope <scope>`<br>`--out <file.amcpass>`<br>`--id <id>` | - |
 | `amc passport init` | Create and sign .amc/passport/policy.yaml | - | - |
-| `amc passport issue-token` | Issue an AMC Trust Token for an agent | `--agent <id>`<br>`--dimensions <list>`<br>`--ttl <hours>` | - |
+| `amc passport issue-token` | Issue a demo AMC Trust Token for an agent (public demo secret: not a credential, never verified) | `--agent <id>`<br>`--dimensions <list>`<br>`--ttl <hours>`<br>`--json` | - |
 | `amc passport link` | Link agent passport to external platform identity | `--agent <id>`<br>`--platform <name>`<br>`--identity <handle>` | - |
 | `amc passport policy` | Passport policy operations | - | - |
 | `amc passport policy apply` | Apply passport policy from JSON/YAML file | `--file <path>` | - |
@@ -896,7 +896,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc passport translate-score` | Translate trust scores between scoring systems | `--from <system>`<br>`--to <system>`<br>`--score <n>`<br>`--json` | - |
 | `amc passport verify` | Verify .amcpass artifact offline | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc passport verify-policy` | Verify signed passport policy | - | - |
-| `amc passport verify-token` | Verify an AMC Trust Token (pass JSON string) | `--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
+| `amc passport verify-token` | Check a demo AMC Trust Token (pass JSON string); it is never verified, because the demo secret is public | `--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc playground` | Interactive scenario runner | - | - |
 | `amc playground list` | List available scenarios | - | - |
 | `amc playground run` | Run all demo scenarios | `--json` | - |

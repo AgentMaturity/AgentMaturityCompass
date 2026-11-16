@@ -9,6 +9,7 @@
  * refused. `verify` is the one surface where the caller names a trust list (`--trust-list`); `export` is `amc bundle
  * export` scoped to a project's agent. Results print their claim label; a refusal exits 1, verify exits by verdict.
  */
+import { exportAttestationLine } from "./attest/exportAttestation.js";
 import { randomBytes } from "node:crypto";
 import { existsSync, lstatSync, readFileSync, realpathSync } from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
@@ -628,12 +629,12 @@ function registerReleases(a4: Command): void {
       const agentId = String((await route(undefined, "GET", `/projects/${projectId}`)).agentId);
       const result = exportEvidenceBundle({ workspace, runId: opts.run, outFile, agentId });
       const claim = runIdClaim(opts.run, agentId);
-      const summary = { projectId, agentId, outFile: result.outFile, fileCount: result.fileCount, eventCount: result.eventCount, sessionCount: result.sessionCount };
+      const summary = { projectId, agentId, outFile: result.outFile, attestation: result.attestation, fileCount: result.fileCount, eventCount: result.eventCount, sessionCount: result.sessionCount };
       if (opts.json) {
         console.log(JSON.stringify(withClaimFields(summary, claim), null, 2));
         return;
       }
-      console.log(`Bundle exported: ${result.outFile}`);
+      console.log(`Bundle exported: ${result.outFile}\n${exportAttestationLine(result.attestation)}`);
       printClaimResult(claim, {});
       console.log(`Agent ${agentId}; files: ${result.fileCount}, events: ${result.eventCount}, sessions: ${result.sessionCount}${result.openSessions.length ? `, open sessions: ${result.openSessions.length} (${result.openSessions.join(", ")}; the export verifies as of its export time)` : ""}. Verify it: amc a4 verify ${opts.out} --trust-list <file>`);
     }));

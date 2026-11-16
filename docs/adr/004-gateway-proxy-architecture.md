@@ -27,7 +27,7 @@ The gateway:
 
 ## Consequences
 - **Positive**: Zero code changes required — just point API calls through the proxy
-- **Positive**: Evidence is OBSERVED tier (1.0× weight) vs SELF_REPORTED (0.4×)
+- **Positive**: Evidence is OBSERVED tier, which can support L2 and above, vs SELF_REPORTED, which supports L1 at most
 - **Positive**: Works with any framework via environment variable (`AMC_PROXY_URL`)
 - **Negative**: Adds latency (minimal — proxy is local)
 - **Negative**: Requires network path through the proxy

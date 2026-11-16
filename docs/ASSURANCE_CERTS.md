@@ -25,8 +25,8 @@ The certificate includes:
 ## Issue + Verify
 
 ```bash
-amc assurance cert issue --run <runId>
-amc assurance cert verify .amc/assurance/certificates/latest.amccert
+amc assurance cert-issue --run <runId>
+amc assurance cert-verify .amc/assurance/certificates/latest.amccert
 ```
 
 ## Issuance Rules

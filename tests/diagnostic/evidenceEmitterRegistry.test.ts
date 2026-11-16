@@ -130,11 +130,13 @@ describe("P1-07 public parser provenance on unverified input", () => {
     expect(trustLoads).toBe(0); // No bound attestation: no ambient trust or positive signature verification was reached.
   });
 
-  test("missing or unknown source defaults to runtime, and parsed import tests remain self-reported", () => {
+  // Changed by the vault lane (2026-11-16): an unknown source used to read as runtime (fail open); it now reads
+  // SELF_REPORTED and is not a registered emitter. A row naming no source is still AMC's own.
+  test("a missing source is runtime, an unknown source is self-reported, and parsed import tests remain self-reported", () => {
     const noTrust = () => ({ trustList: null });
     const runtime = [{ trustTier: "OBSERVED" }, { source: "unmapped-unit-source", trustTier: "OBSERVED" }]
       .map(meta => parseEvidenceEventWith(raw({ auditType: "TOOL_CALL_ALLOWED", ...meta }), noTrust));
-    expect(runtime.map(row => [row.trustTier, fromRegisteredEmitter(row)])).toEqual([["OBSERVED", true], ["OBSERVED", true]]);
+    expect(runtime.map(row => [row.trustTier, fromRegisteredEmitter(row)])).toEqual([["OBSERVED", true], ["SELF_REPORTED", false]]);
     const imported = parseEvidenceEventWith(raw({ source: "eval_import", trustTier: "OBSERVED" }, "test"), noTrust);
     expect(imported.trustTier).toBe("SELF_REPORTED"); expect(fromRegisteredEmitter(imported)).toBe(true);
   });

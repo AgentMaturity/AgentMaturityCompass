@@ -42,3 +42,20 @@ export const intotoStatement = obj({
   })
 });
 export type IntotoStatement = ReturnType<typeof intotoStatement>;
+
+/** AMC's export statement (src/attest/exportAttestation.ts): the subject is a whole exported file. */
+export const EXPORT_PREDICATE = "https://agentmaturity.co/attestations/export/v0.1";
+export const EXPORT_NOTICE = "A signature shows who issued this file and that it is unchanged, not that its content is true.";
+export const exportStatement = obj({
+  _type: lit("https://in-toto.io/Statement/v1", "UNSUPPORTED_VERSION"),
+  subject: arr(obj({ name: nonEmpty, digest: obj({ sha256 }) }), { min: 1, max: 1 }),
+  predicateType: lit(EXPORT_PREDICATE, "UNSUPPORTED_VERSION"),
+  predicate: obj({
+    kind: oneOf(["amcpass", "amcbundle", "amccert"] as const),
+    issuerRelationship: lit("self"),
+    workspace: nonEmpty,
+    issuedAt: isoTime,
+    timeBasis: lit("claimed"),
+    notice: lit(EXPORT_NOTICE)
+  })
+});

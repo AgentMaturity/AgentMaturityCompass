@@ -14,8 +14,8 @@
  * unmatched and refused: it never takes the call's place, so whoever posts first cannot own the record. A second
  * observation of the same call is kept beside the first and flagged as a conflict (`conflictOf`), never dropped; for Pi,
  * a repeat of exactly the recorded observation, bound to the same decision, is answered as recorded (an idempotent replay).
- * What the provider reports (the input that ran, completed or failed) is labelled `reported: { by: <provider> }`:
- * AMC records it, it does not vouch for it. A mismatch (`authorizationMismatch: true`) is observed, not prevented,
+ * What the provider reports (the input that ran, completed or failed) is labelled `reported: { by: <provider> }` and
+ * `contentTier: "SELF_REPORTED"`: AMC records it, it does not vouch for it, and readers never count it as observed. A mismatch (`authorizationMismatch: true`) is observed, not prevented,
  * because the tool already ran. Raw tool input reaches AMC over loopback only and is never stored.
  */
 import { codexActionId, codexSessionSha256 } from "../adapters/codex/codexIdentity.js";
@@ -45,6 +45,13 @@ const MAX_BODY_BYTES = 262_144;
 type Ledger = ReturnType<typeof openLedger>;
 // ponytail: in-memory counters per Bridge process (bounded, hookIntake.ts); a restart resets them, summary rows already written stay.
 const observationCounters = new IntakeCounters(OBSERVATION_LIMITS);
+
+/**
+ * The label on a row whose substance is what the provider told AMC (a turn ended, a tool ran or failed with this input).
+ * AMC observed the report arriving, so the row is still written by AMC's runtime, but the content is the provider's own
+ * word: readers count it as SELF_REPORTED (effectiveTrustTier), never as something AMC observed.
+ */
+const PROVIDER_REPORTED = { contentTier: "SELF_REPORTED" } as const;
 
 /** The providers whose after-the-fact observations AMC records here, and how each names its sessions, calls and registrations. */
 export type ObservedProvider = "claude-code" | "pi" | "codex";
@@ -225,7 +232,7 @@ export function recordClaudeCodeStop(input: { workspace: string; authenticatedAg
   const sessionSha256 = claudeSessionSha256(parsed.session_id);
   const record = { kind: "amc.claude-code-turn-end/v1", agentId: input.authenticatedAgentId, sessionSha256, reported: { by: "claude-code",
     promptId: parsed.prompt_id ?? null, stopHookActive: parsed.stop_hook_active } };
-  return recordHookAudit({ workspace: input.workspace, now, sessionSha256, body: record, meta: { turnEndSchemaVersion: 1, ...record },
+  return recordHookAudit({ workspace: input.workspace, now, sessionSha256, body: record, meta: { turnEndSchemaVersion: 1, ...PROVIDER_REPORTED, ...record },
     id: observationId("ccstop", [input.authenticatedAgentId, sessionSha256, parsed.prompt_id, parsed.stop_hook_active], now),
     receipt: { kind: "work_accepted", providerId: "hook-session:claude-code" }, underRegistration: registered });
 }
@@ -328,7 +335,7 @@ export function recordPostExecution(input: { workspace: string; authenticatedAge
       decisionReceiptSha256: reported.decisionReceiptSha256, leaseId: input.lease?.leaseId ?? null },
     ingressRecorded: reported.ingressRecorded,
   };
-  const audit = { workspace: input.workspace, now, sessionSha256, meta: { postExecutionSchemaVersion: 1, ...record }, body: record, provider,
+  const audit = { workspace: input.workspace, now, sessionSha256, meta: { postExecutionSchemaVersion: 1, ...PROVIDER_REPORTED, ...record }, body: record, provider,
     receipt: { kind: "tool_result" as const, providerId: `hook-post-execution:${provider}` }, underRegistration: registered };
   const prefix = `${PROVIDERS[provider].prefix}post`;
   if (bindingRefusal !== null) {

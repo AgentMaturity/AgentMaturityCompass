@@ -42,12 +42,12 @@ const notaryDir = () => { const dir = mkdtempSync(join(tmpdir(), "amc-notary-kp-
 const REF = { provider: "aws-kms" as const, id: "arn:aws:kms:eu-west-1:111122223333:key/notary" };
 
 /** A synchronous stand-in for the provider bridge child: one local key, described as `protection`. */
-function bridgeFor(kind: "ed25519" | "p256", protection: KeyDescription["protection"], opts: { badSignature?: boolean; claims?: unknown; encoding?: "der" | "high-s"; wrongKey?: boolean } = {}) {
+function bridgeFor(kind: "ed25519" | "p256", protection: KeyDescription["protection"], opts: { badSignature?: boolean; claims?: unknown; encoding?: "der" | "high-s"; wrongKey?: boolean; basis?: KeyDescription["protectionBasis"] } = {}) {
   const pair = kind === "ed25519" ? generateKeyPairSync("ed25519") : generateKeyPairSync("ec", { namedCurve: "P-256" });
   const wrong = opts.wrongKey ? (kind === "ed25519" ? generateKeyPairSync("ed25519") : generateKeyPairSync("ec", { namedCurve: "P-256" })) : null;
   const publicKeyPem = pair.publicKey.export({ format: "pem", type: "spki" }).toString();
   const description: KeyDescription = { ref: REF, algorithm: kind === "ed25519" ? "ed25519" : "ecdsa-p256-sha256", publicKeyPem, keyId: signingKeyId(publicKeyPem)!,
-    protection, protectionBasis: "provider-metadata", exportable: false };
+    protection, protectionBasis: opts.basis ?? "provider-metadata", exportable: false };
   const calls: BridgeRequest[] = [];
   const bridge = (request: BridgeRequest) => {
     calls.push(request);
@@ -67,6 +67,12 @@ function bridgeFor(kind: "ed25519" | "p256", protection: KeyDescription["protect
 }
 
 describe("notary KEY_PROVIDER backend (P2-08)", () => {
+  it("reads SOFTWARE when \"hsm\" comes only from the operator's configuration, never HARDWARE (vault lane, 2026-11-16)", () => {
+    const configured = loadNotarySigner({ notaryDir: notaryDir(), backend: { type: "KEY_PROVIDER", ref: REF }, bridge: bridgeFor("ed25519", "hsm", { basis: "configured" }).bridge });
+    expect(configured.attestationLevel()).toBe("SOFTWARE");
+    expect(configured.attestationBasis()).toBe("configured");
+  });
+
   it("takes its attestation level and basis from the provider's description, never from a hardware claim", () => {
     const hsm = bridgeFor("ed25519", "hsm", { claims: { hardware: false } });
     const signer = loadNotarySigner({ notaryDir: notaryDir(), backend: { type: "KEY_PROVIDER", ref: REF }, bridge: hsm.bridge });

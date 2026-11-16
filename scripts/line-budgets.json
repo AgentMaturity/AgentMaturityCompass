@@ -9,7 +9,7 @@
   ],
   "budgets": {
     "src/benchmarks/replayBenchmarkCorpus.ts": 29468,
-    "src/cli.ts": 23991,
+    "src/cli.ts": 23987,
     "src/score/metricValidity.ts": 16881,
     "src/watch/liveDriftAlerts.ts": 9792,
     "src/studio/studioServer.ts": 8572,
@@ -35,7 +35,7 @@
     "src/score/operationalIndependence.ts": 1202,
     "src/toolhub/toolhubServer.ts": 1131,
     "src/org/orgRun.ts": 1124,
-    "src/bundles/bundle.ts": 1106,
+    "src/bundles/bundle.ts": 1101,
     "src/audit/binderCollector.ts": 1086,
     "src/cli-business-commands.ts": 1078,
     "src/watch/observabilityBridge.ts": 1072,

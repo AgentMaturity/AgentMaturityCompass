@@ -13,6 +13,7 @@ import { cleanupDir } from "../utils/archiveFiles.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { writeExportAttestation } from "../attest/exportAttestation.js";
 import { defaultPassportExportPath, passportArchiveMemberBytes, tarCreateDeterministic, type PassportCreateResult } from "./passportArtifact.js";
 import { capturePassportCollection } from "./passportInputs.js";
 import { passportPolicySchema } from "./passportPolicySchema.js";
@@ -113,7 +114,7 @@ function captureArtifactCreation(input: {
       });
       exportedHash = exported.entry.hash; finalOutputs(); exported.assertCurrent();
       const result: PassportCreateResult = { outFile, sha256, passport, signature: signed.signature, piiScan, cachePath: saved.path, cacheSigPath: saved.sigPath,
-        transparencyCreatedHash: createdHash, transparencyExportedHash: exportedHash };
+        transparencyCreatedHash: createdHash, transparencyExportedHash: exportedHash, attestation: writeExportAttestation(workspace, outFile, "amcpass", sha256) };
       return Object.freeze({ result, assertCurrent() { finalOutputs(); exported.assertCurrent(); },
         publishedPaths: Object.freeze([...knownPaths]), createdDirectories: Object.freeze([...directories.created]) });
     } catch (cause) {

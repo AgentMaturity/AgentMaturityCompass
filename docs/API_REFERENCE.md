@@ -675,7 +675,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 656 | `amc keys` | Purpose signing keys: list, rotate, revoke and export public keys |
 | 657 | `amc keys export-public` | Print a purpose's public key, key id and proof of possession, for an organisation's trust list |
 | 658 | `amc keys list` | List each signing purpose's key id, shared keys, history size, rotations, provider, algorithm and protection (public files only) |
-| 659 | `amc keys revoke` | Record a retired key's revocation in the workspace's signed, anchored key revocation list |
+| 659 | `amc keys revoke` | Record a retired key's revocation in the workspace's signed, anchored key revocation list; with --passport, a passport's revocation in the signed passport revocation list others can check |
 | 660 | `amc keys rotate` | Rotate one purpose's key with a signed, chained statement (or bind the provider key keys.refs names); --resume completes or rolls back an interrupted change |
 | 661 | `amc lab-compare` | Compare two lab experiments |
 | 662 | `amc lab-create` | Create a new lab experiment |
@@ -898,7 +898,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 879 | `amc passport create` | Create deterministic signed .amcpass artifact |
 | 880 | `amc passport export-latest` | Export latest passport for a scope to .amcpass |
 | 881 | `amc passport init` | Create and sign .amc/passport/policy.yaml |
-| 882 | `amc passport issue-token` | Issue an AMC Trust Token for an agent |
+| 882 | `amc passport issue-token` | Issue a demo AMC Trust Token for an agent (public demo secret: not a credential, never verified) |
 | 883 | `amc passport link` | Link agent passport to external platform identity |
 | 884 | `amc passport policy` | Passport policy operations |
 | 885 | `amc passport policy apply` | Apply passport policy from JSON/YAML file |
@@ -909,7 +909,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 890 | `amc passport translate-score` | Translate trust scores between scoring systems |
 | 891 | `amc passport verify` | Verify .amcpass artifact offline |
 | 892 | `amc passport verify-policy` | Verify signed passport policy |
-| 893 | `amc passport verify-token` | Verify an AMC Trust Token (pass JSON string) |
+| 893 | `amc passport verify-token` | Check a demo AMC Trust Token (pass JSON string); it is never verified, because the demo secret is public |
 | 894 | `amc playground` | Interactive scenario runner |
 | 895 | `amc playground list` | List available scenarios |
 | 896 | `amc playground run` | Run all demo scenarios |
@@ -6599,13 +6599,14 @@ List each signing purpose's key id, shared keys, history size, rotations, provid
 
 #### `amc keys revoke`
 
-Record a retired key's revocation in the workspace's signed, anchored key revocation list
+Record a retired key's revocation in the workspace's signed, anchored key revocation list; with --passport, a passport's revocation in the signed passport revocation list others can check
 
 
 | Option | Description |
 |--------|-------------|
 | `--purpose <purpose>` | - |
 | `--key-id <id>` | - |
+| `--passport <id|file.amcpass>` | - |
 | `--reason <reason>` | - |
 
 #### `amc keys rotate`
@@ -8197,7 +8198,7 @@ Export latest passport for a scope to .amcpass
 
 #### `amc passport issue-token`
 
-Issue an AMC Trust Token for an agent
+Issue a demo AMC Trust Token for an agent (public demo secret: not a credential, never verified)
 
 
 | Option | Description |
@@ -8205,6 +8206,7 @@ Issue an AMC Trust Token for an agent
 | `--agent <id>` | - |
 | `--dimensions <list>` | - |
 | `--ttl <hours>` | - |
+| `--json` | - |
 
 #### `amc passport link`
 
@@ -8285,7 +8287,7 @@ Verify .amcpass artifact offline
 
 #### `amc passport verify-token`
 
-Verify an AMC Trust Token (pass JSON string)
+Check a demo AMC Trust Token (pass JSON string); it is never verified, because the demo secret is public
 
 
 | Option | Description |

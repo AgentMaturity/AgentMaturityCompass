@@ -2,7 +2,7 @@ import { generateKeyPairSync, sign, verify } from "node:crypto";
 import { chmodSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
-import { decryptVaultPayload, encryptVaultPayload, type VaultEnvelope } from "../vault/vaultCrypto.js";
+import { decryptVaultPayload, encryptVaultPayload, storedVaultIterations, VAULT_ITERATIONS, type VaultEnvelope } from "../vault/vaultCrypto.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -112,7 +112,9 @@ function readPayload(hostDir: string, passphrase: string): HostVaultPayload {
 function writePayload(hostDir: string, payload: HostVaultPayload, passphrase: string, auditorPub: string, sessionPub: string): void {
   const paths = hostVaultPaths(hostDir);
   ensureDir(paths.dir);
-  const encrypted = encryptVaultPayload(Buffer.from(JSON.stringify(payload), "utf8"), passphrase);
+  // A rewrite keeps the host vault's own iteration count; a new host vault gets the current default.
+  const iterations = pathExists(paths.vaultFile) ? storedVaultIterations(readUtf8(paths.vaultFile)) : VAULT_ITERATIONS;
+  const encrypted = encryptVaultPayload(Buffer.from(JSON.stringify(payload), "utf8"), passphrase, iterations);
   writeFileAtomic(paths.vaultFile, JSON.stringify(encrypted, null, 2), 0o600);
   try {
     chmodSync(paths.vaultFile, 0o600);

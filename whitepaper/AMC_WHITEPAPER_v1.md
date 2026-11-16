@@ -20,7 +20,7 @@
 
 ## Abstract
 
-The rapid proliferation of autonomous AI agents in enterprise settings has outpaced the development of rigorous frameworks for assessing their operational maturity, safety, and readiness for deployment. Existing approaches—borrowed from software capability maturity models, AI risk management frameworks, or ad-hoc internal reviews—fail to address the distinctive characteristics of agents: persistent autonomy, dynamic tool use, self-modification capacity, and emergent multi-agent coordination. We present the **Agent Maturity Compass (AMC) Framework**, an evidence-grounded system for evaluating autonomous AI agents across 244 default diagnostic questions plus 723 experimental, self-reported sector-specific questions, with an optional 264-question lifecycle set for deeper runtime and proof coverage, at six levels (L0: Absent through L5: Optimizing). The five dimensions—Strategic Operations, Reliability & Safety, Security & Compliance, Observability & Cost, and Evaluation & Growth—provide comprehensive coverage of the operational surface of deployed agents. The central contribution of AMC is its **Execution-Proof Evidence System (EPES)**, which assigns differential trust multipliers to four evidence tiers—ranging from self-reported claims (0.4×) to observed-and-hardened execution artifacts (1.1×)—thereby rendering the framework resistant to the "documentation inflation" observed in prior approaches. Section 6 illustrates keyword inflation on an example agent (ContentModerationBot); no study record exists for its figures, so they are not measured results. Artifact validity and evidence readiness are reported independently; only evidence readiness `READY` permits scoped external claims. We further introduce an autonomous self-improvement loop in which agents autonomously diagnose maturity gaps, implement remediations, and re-score across dimensions, illustrated by two case studies of example agents, one human-guided and one autonomously self-improving (Section 6; figures not measured). AMC incorporates research-backed scoring modules including Bloom-inspired behavioral attack packs (sycophancy, self-preservation, sabotage, self-preferential bias), METR-inspired task horizon scoring, Google FACTS-inspired factuality dimensions, graduated autonomy governance, memory integrity scoring, and an alignment index. The framework integrates <!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> registered assurance packs, maps to EU AI Act, ISO 42001, NIST AI RMF, and SOC 2, and introduces the Agent Passport (.amcpass) portable verifiable credential for fleet-level trust composition. AMC v2.0 introduces 41 industry-specific sector packs spanning seven regulated industries (Environment, Health, Wealth, Education, Mobility, Technology, Governance), bringing product diagnostic coverage to 967 questions (244 default + 723 experimental, self-reported sector-specific). The framework also adds MCP (Model Context Protocol) security scoring, agent protocol hardening, and vibe code audit capabilities. AMC is formally specified through a time-parameterized maturity function M(a,d,t), incorporates evidence decay, and is implemented as 1,200+ platform modules with 2,617 Vitest test source files.
+The rapid proliferation of autonomous AI agents in enterprise settings has outpaced the development of rigorous frameworks for assessing their operational maturity, safety, and readiness for deployment. Existing approaches—borrowed from software capability maturity models, AI risk management frameworks, or ad-hoc internal reviews—fail to address the distinctive characteristics of agents: persistent autonomy, dynamic tool use, self-modification capacity, and emergent multi-agent coordination. We present the **Agent Maturity Compass (AMC) Framework**, an evidence-grounded system for evaluating autonomous AI agents across 244 default diagnostic questions plus 723 experimental, self-reported sector-specific questions, with an optional 264-question lifecycle set for deeper runtime and proof coverage, at six levels (L0: Absent through L5: Optimizing). The five dimensions—Strategic Operations, Reliability & Safety, Security & Compliance, Observability & Cost, and Evaluation & Growth—provide comprehensive coverage of the operational surface of deployed agents. The central contribution of AMC is its **Execution-Proof Evidence System (EPES)**, which sorts evidence into four trust tiers and gates each question's level by tier—self-reported and attested evidence support L1 at most, and only observed execution evidence can support L2 and above—so that documentation alone cannot raise a level (correction, 2026-11-16: earlier versions said the tiers apply trust multipliers to the score; they do not). Section 6 illustrates keyword inflation on an example agent (ContentModerationBot); no study record exists for its figures, so they are not measured results. Artifact validity and evidence readiness are reported independently; only evidence readiness `READY` permits scoped external claims. We further introduce an autonomous self-improvement loop in which agents autonomously diagnose maturity gaps, implement remediations, and re-score across dimensions, illustrated by two case studies of example agents, one human-guided and one autonomously self-improving (Section 6; figures not measured). AMC incorporates research-backed scoring modules including Bloom-inspired behavioral attack packs (sycophancy, self-preservation, sabotage, self-preferential bias), METR-inspired task horizon scoring, Google FACTS-inspired factuality dimensions, graduated autonomy governance, memory integrity scoring, and an alignment index. The framework integrates <!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> registered assurance packs, maps to EU AI Act, ISO 42001, NIST AI RMF, and SOC 2, and introduces the Agent Passport (.amcpass), a self-issued, signed summary of an agent's results that others can check against a key they pin (it is not a verifiable credential, and its signature shows who wrote it, not that its figures are true). AMC v2.0 introduces 41 industry-specific sector packs spanning seven regulated industries (Environment, Health, Wealth, Education, Mobility, Technology, Governance), bringing product diagnostic coverage to 967 questions (244 default + 723 experimental, self-reported sector-specific). The framework also adds MCP (Model Context Protocol) security scoring, agent protocol hardening, and vibe code audit capabilities. AMC is formally specified through a time-parameterized maturity function M(a,d,t), incorporates evidence decay, and is implemented as 1,200+ platform modules with 2,621 Vitest test source files.
 
 **Keywords:** AI agent maturity, autonomous systems evaluation, execution-proof evidence, AI governance, capability maturity, agent reliability, AI risk management, EU AI Act compliance, agent passport, fleet trust composition
 
@@ -60,7 +60,7 @@ This paper introduces **Agent Maturity Compass (AMC)**, which makes seven primar
 
 1. **A five-dimensional maturity model** with 244 default diagnostic questions across six levels (L0–L5), providing the first structured instrument covering Strategic Operations, Reliability & Safety, Security & Compliance, Observability & Cost, and Evaluation & Growth holistically for autonomous agents.
 
-2. **An Execution-Proof Evidence System (EPES)** with four trust tiers and calibrated score multipliers, making AMC demonstrably resistant to documentation gaming—a critical property absent from all prior frameworks.
+2. **An Execution-Proof Evidence System (EPES)** with four trust tiers that gate each question's level (only observed evidence can support L2 and above), so that documentation alone cannot raise a level.
 
 3. **A formal maturity function M(a,d,t)** with time-parameterized evidence decay, confidence intervals, and improvement velocity metrics, enabling longitudinal tracking of agent maturity.
 
@@ -68,7 +68,7 @@ This paper introduces **Agent Maturity Compass (AMC)**, which makes seven primar
 
 5. **Novel scoring modules** including Bloom-inspired behavioral evaluation (sycophancy, self-preservation, sabotage, self-preferential bias), METR-inspired task horizon scoring, Google FACTS-inspired factuality dimensions, graduated autonomy governance, memory integrity scoring, interpretability scoring, and an alignment index.
 
-6. **Comprehensive compliance mapping** to EU AI Act (12 article mappings), ISO 42001 clause mappings, NIST AI RMF, and SOC 2, with an Agent Passport (.amcpass) portable verifiable credential for fleet-level trust composition.
+6. **Comprehensive compliance mapping** to EU AI Act (12 article mappings), ISO 42001 clause mappings, NIST AI RMF, and SOC 2, with an Agent Passport (.amcpass): a self-issued, signed summary of an agent's results.
 
 7. **An Agent Guide system** that generates operational guardrails from maturity gaps, auto-detects the agent framework from project files, and applies severity-tagged rules directly to agent config files (15 targets including AGENTS.md, .cursorrules, CLAUDE.md). Includes CI gate mode, continuous watch, and per-question verification commands.
 
@@ -167,7 +167,7 @@ The addition of L0 (Absent) addresses a critical gap in prior maturity models: t
 
 This level structure is deliberately readable alongside CMMI while remaining agent-specific: L0 has no CMMI equivalent, L1 and L3 share the Initial and Defined anchors, L4 emphasizes measured operational control, and L5 extends continuous optimization with evidence-backed self-correction.
 
-Level assignment within each dimension is not binary per-question but continuous, weighted by evidence trust (see Section 4). An agent demonstrating L4 behavior in 60% of Strategic Operations diagnostic questions with execution-verified evidence may receive a Strategic Operations level score of 3.6.
+Level assignment within each dimension is gated by evidence trust tier (see Section 4 and its correction note). An agent demonstrating L4 behavior in 60% of Strategic Operations diagnostic questions with execution-verified evidence may receive a Strategic Operations level score of 3.6.
 
 ### 3.4 The Diagnostic Question Structure
 
@@ -279,6 +279,12 @@ The sector pack system represents the realization of the "Domain-Specific Diagno
 ---
 
 ## 4. The Execution-Proof Evidence System (EPES)
+
+> **Correction (2026-11-16).** The multipliers in this section are not applied to maturity levels. In AMC today a
+> question's level is gated by evidence tier: self-reported and attested evidence support L1 at most, and only
+> OBSERVED evidence can support L2 and above. The weights (0.4, 0.8, 1.0, 1.1) scale side scores only, such as
+> confidence, citation quality, drift and community signals (`src/score/trustWeights.ts`). Read the formulas and the
+> "documentation saturation" bound below as the original design, not as how scores are computed now.
 
 ### 4.1 Motivation: The Gaming Problem
 
@@ -415,7 +421,7 @@ The self-improvement loop is subject to five mandatory safeguards:
 
 ### 6.1 Experimental Design
 
-We evaluate AMC through two primary case studies and one controlled anti-gaming experiment. The agents were example agents run in a test harness, not production deployments. The platform's 1130 modules span six packages, with 2,617 Vitest test source files:
+We evaluate AMC through two primary case studies and one controlled anti-gaming experiment. The agents were example agents run in a test harness, not production deployments. The platform's 1130 modules span six packages, with 2,621 Vitest test source files:
 
 - **`shield`** (31 modules): Input validation, prompt injection detection, output filtering
 - **`enforce`** (28 modules): Policy enforcement, constitutional constraints, access controls
@@ -423,7 +429,7 @@ We evaluate AMC through two primary case studies and one controlled anti-gaming 
 - **`vault`** (22 modules): Evidence artifact storage, integrity verification, audit logs
 - **`product`** (42 modules): Evaluation runners, cost controls, remediation catalog, scoring engine
 
-Test source inventory: 2,617 Vitest test source files as of the current repository audit. This count measures source paths; execution outcomes and coverage require their own run reports from the [CI workflow](https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml).
+Test source inventory: 2,621 Vitest test source files as of the current repository audit. This count measures source paths; execution outcomes and coverage require their own run reports from the [CI workflow](https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml).
 
 ### 6.2 Case Study 1: ContentModerationBot (CMB) — Human-Guided Maturity Improvement
 
@@ -554,7 +560,7 @@ AMC replaces convention with cryptographic proof at every layer:
 | Authorship | "Claude wrote this JSONL" (convention) | Vault/notary signature (verifiable) |
 | Session linking | Sequential timestamps | Hash-linked chain entries |
 | Knowledge validity | System created the edge (convention) | Signed, evidence-referenced graph nodes |
-| Evidence trust | All evidence treated equally | 4-tier EPES with calibrated multipliers (SELF_REPORTED 0.4×, ATTESTED 0.8×, OBSERVED 1.0×, OBSERVED_HARDENED 1.1×) |
+| Evidence trust | All evidence treated equally | 4-tier EPES that gates each level by tier (self-reported and attested: L1 at most; observed: L2 and above) |
 | Offline verification | Not supported | Merkle inclusion proofs |
 | Cross-agent trust | Not addressed | Weakest-link composition with signed receipts |
 
@@ -579,13 +585,13 @@ Prior art represents thoughtful engineering with genuine architectural insight. 
 | Session linking | ✅ Session blockchain | ✅ Evidence chain | AMC adds cryptographic signing |
 | Knowledge graph | ✅ Atlas (typed edges) | ✅ CGX (signed, deterministic) | AMC adds signature verification |
 | Provenance labels | ❌ Lost (was in Pathfinder) | ✅ 8-tier provenance system | AMC restores and extends |
-| Trust classification | ❌ All evidence equal | ✅ 4-tier EPES multipliers | AMC differentiates trust quality |
+| Trust classification | ❌ All evidence equal | ✅ 4-tier EPES level gates | AMC differentiates trust quality |
 | Cryptographic signing | ❌ Convention only | ✅ Vault/notary at every link | AMC's core differentiator |
 | Multi-agent trust | ❌ Single-agent focus | ✅ Fleet composition | AMC extends to fleets |
 | Offline verification | ❌ | ✅ Merkle proofs | AMC enables cross-device trust |
 | Anti-hallucination | ❌ | ✅ Truthguard + confidence gates | AMC prevents claim inflation |
 
-AMC can ingest the prior art's JSONL artifacts as `SELF_REPORTED` evidence (0.4× trust), then upgrade them through attestation or re-observation — providing a migration path for prior art users who want cryptographic guarantees.
+AMC can ingest the prior art's JSONL artifacts as `SELF_REPORTED` evidence (it supports a level up to L1 at most), then upgrade them through attestation or re-observation — a migration path for prior art users who want signed records.
 
 ### 7.6 Positioning Against Evaluation Platforms
 
@@ -772,9 +778,9 @@ The EU AI Act [7] imposes technical requirements on "high-risk AI systems" (Anne
 | **Article 17** | Quality management system | Self-improvement loop: continuous quality management | Improvement velocity metrics, remediation audit trail |
 | **Article 26** | Obligations of deployers | Strategic Operations: deployment readiness thresholds | Tier-based deployment gates (Supervised/Assisted/Autonomous) |
 | **Article 52** | Transparency obligations for certain AI systems | Observability & Cost: interpretability scoring | Explanation coverage, faithfulness, calibration metrics |
-| **Article 72** | Monitoring by market surveillance authorities | EPES: externally verifiable evidence artifacts | Agent Passport (.amcpass) portable verifiable credential |
+| **Article 72** | Monitoring by market surveillance authorities | EPES: externally verifiable evidence artifacts | Agent Passport (.amcpass), a self-issued signed summary |
 
-AMC's EU AI Act compliance scoring module maps each of these 12 articles to specific diagnostic questions and evidence requirements, enabling organizations to generate structured compliance evidence as part of their regular AMC assessment cycle. The Agent Passport (.amcpass) provides a portable, cryptographically signed credential that market surveillance authorities can verify independently.
+AMC's EU AI Act compliance scoring module maps each of these 12 articles to specific diagnostic questions and evidence requirements, enabling organizations to generate structured compliance evidence as part of their regular AMC assessment cycle. The Agent Passport (.amcpass) is a self-issued, signed summary; anyone can check its signature against a key they pin, but the signature shows who wrote it, not that its figures are true.
 
 Note: AMC is a measurement and maturity framework, not a legal compliance instrument. Organizations should obtain independent legal counsel on EU AI Act compliance.
 
@@ -869,9 +875,9 @@ AMC provides the first purpose-built, multi-dimensional, execution-proof maturit
 
 The empirical results are encouraging. Human-guided improvement brought the ContentModerationBot from 12 to 94/100 across five dimensions. Autonomous self-improvement brought the DataPipelineBot from 12 to 80/100 without human-authored code. The anti-gaming experiment demonstrated that keyword-based scoring would have inflated scores by 84 points—a gap large enough to incorrectly label a documentation-only agent as production-ready.
 
-AMC's integration of Bloom-inspired behavioral evaluation, METR task horizon scoring, Google FACTS factuality dimensions, graduated autonomy governance, memory integrity scoring, and interpretability assessment represents a significant expansion of what agent maturity measurement covers. The framework's mapping to EU AI Act (12 articles), ISO 42001 (14 clauses), NIST AI RMF, and SOC 2 positions it as the execution substrate for regulatory compliance. The Agent Passport (.amcpass) provides a portable, verifiable credential for fleet-level trust composition.
+AMC's integration of Bloom-inspired behavioral evaluation, METR task horizon scoring, Google FACTS factuality dimensions, graduated autonomy governance, memory integrity scoring, and interpretability assessment represents a significant expansion of what agent maturity measurement covers. The framework's mapping to EU AI Act (12 articles), ISO 42001 (14 clauses), NIST AI RMF, and SOC 2 positions it as the execution substrate for regulatory compliance. The Agent Passport (.amcpass) is a self-issued, signed summary of an agent's results.
 
-AMC is not a compliance checkbox or a one-time audit exercise. It is a continuous, executable, self-improving measurement system—with 2,617 Vitest test source files and 1,200+ platform modules—designed to grow alongside the agents it measures. As AI agents advance from tools to collaborators to autonomous teammates, the question of how we establish credible evidence for their trustworthiness becomes one of the most important in technology. AMC offers a rigorous, empirically validated answer.
+AMC is not a compliance checkbox or a one-time audit exercise. It is a continuous, executable, self-improving measurement system—with 2,621 Vitest test source files and 1,200+ platform modules—designed to grow alongside the agents it measures. As AI agents advance from tools to collaborators to autonomous teammates, the question of how we establish credible evidence for their trustworthiness becomes one of the most important in technology. AMC offers a rigorous, empirically validated answer.
 
 ---
 
