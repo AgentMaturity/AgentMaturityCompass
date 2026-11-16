@@ -304,7 +304,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc config provenance` | Show which layer and file set each resolved amcconfig.yaml value; with a JSON Pointer, the winner and every shadowed value | `--config <path>`<br>`--user-config [path]`<br>`--json` | - |
 | `amc config run` | Run the evaluation pipeline declared in amcconfig.yaml | `--config <path>`<br>`--user-config [path]`<br>`--no-user-config`<br>`--window <window>`<br>`--format <format>`<br>`--output <path>`<br>`--dry-run`<br>`--verbose`<br>`--json` | - |
 | `amc config validate` | Validate amcconfig.yaml without running anything | `--config <path>`<br>`--user-config [path]`<br>`--no-user-config`<br>`--json`<br>`--schema [name]` | - |
-| `amc connect` | Connect an agent runtime and track first action, decision, and proof | `--agent <agentId>`<br>`--adapter <adapterId>`<br>`--token-file <path>`<br>`--bridge-url <url>`<br>`--mode <mode>`<br>`--status`<br>`--json`<br>`--print-env`<br>`--print-cmd` | - |
+| `amc connect` | Connect an agent runtime and track first action, decision, and proof | `--agent <agentId>`<br>`--adapter <adapterId>`<br>`--token-file <path>`<br>`--bridge-url <url>`<br>`--mode <mode>`<br>`--status`<br>`--json`<br>`--print-env`<br>`--print-cmd`<br>`--runtime <runtime>` | - |
 | `amc connect hooks` | Install, inspect, or remove provider-native AMC observation and control hooks | - | - |
 | `amc connect hooks health` | Verify signed hook setup and show the latest verified provider event | `--provider <provider>`<br>`--recover-latch`<br>`--json` | - |
 | `amc connect hooks install` | Install a reversible project hook for Claude Code, Gemini CLI, Pi, DSH (control) or Codex (observe) | `--provider <provider>`<br>`--mode <mode>`<br>`--agent <agentId>`<br>`--bridge-url <url>`<br>`--ttl <ttl>`<br>`--rpm <rpm>`<br>`--dry-run`<br>`--json` | - |
@@ -1283,7 +1283,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc watch` | Observability, attestation, and safety testing | - | - |
 | `amc watch alerts` | Show recent alerts for a monitored agent | `--agent <id>`<br>`--limit <n>`<br>`--json` | - |
 | `amc watch attest` | Attest an agent output | `--json` | - |
-| `amc watch connect` | Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook) | `--provider <provider>`<br>`--endpoint <url>`<br>`--api-key <key>`<br>`--api-key-file <path>`<br>`--secret-key-file <path>`<br>`--poll-interval <ms>`<br>`--agent <agentId>` | - |
+| `amc watch connect` | Poll an observability backend for traces (trace-query, langfuse, helicone, datadog, webhook); to receive OTLP from an agent, see amc connect --print-env --runtime | `--provider <provider>`<br>`--endpoint <url>`<br>`--api-key <key>`<br>`--api-key-file <path>`<br>`--secret-key-file <path>`<br>`--poll-interval <ms>`<br>`--agent <agentId>` | - |
 | `amc watch explain` | Generate explainability packet for an agent run | `--json` | - |
 | `amc watch host-hardening` | Check host hardening status for this AMC deployment | `--json` | - |
 | `amc watch profiler-anomalies` | List detected behavioral anomalies for an agent | `--agent <id>`<br>`--limit <n>` | - |

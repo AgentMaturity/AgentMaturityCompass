@@ -227,7 +227,7 @@ interface ProviderHookSpec {
 /** The hooks an installation in `mode` writes. Claude Code control adds SessionStart, Stop and UserPromptSubmit; observe adds every session hook. */
 function providerHookSpecs(provider: ConfigHookProvider, mode: HookMode = "control"): ProviderHookSpec[] {
   return provider === "claude-code"
-    ? [
+    ? ([
         { eventName: "PostToolUse", phase: "completed", eventType: "action.completed" },
         { eventName: "PostToolUseFailure", phase: "failed", eventType: "action.failed" },
         { eventName: "PreToolUse", phase: "requested", eventType: "action.requested" },
@@ -236,7 +236,7 @@ function providerHookSpecs(provider: ConfigHookProvider, mode: HookMode = "contr
           { eventName: "Stop", phase: "turn-end", eventType: null },
           { eventName: "UserPromptSubmit", phase: "prompt-submit", eventType: null },
         ] as const : CLAUDE_OBSERVE_SESSION_HOOKS.map((eventName) => ({ eventName, phase: "session-event" as const, eventType: null }))),
-      ].sort((left, right) => left.eventName.localeCompare(right.eventName)) // bindings are compared in event-name order
+      ] satisfies ProviderHookSpec[]).sort((left, right) => left.eventName.localeCompare(right.eventName)) // bindings compare in event-name order
     : [
         { eventName: "AfterTool", phase: "completed-or-failed", eventType: "action.completed" },
         { eventName: "BeforeTool", phase: "requested", eventType: "action.requested" },
