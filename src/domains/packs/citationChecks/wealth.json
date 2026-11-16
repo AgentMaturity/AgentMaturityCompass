@@ -1157,21 +1157,6 @@
   {
     "packId": "no-poverty",
     "questionId": "pack",
-    "citation": "Regulation (EU) 2021/1057 (ESF+) Art. 25(e)",
-    "instrument": "Regulation (EU) 2021/1057 establishing the European Social Fund Plus (ESF+)",
-    "clause": "Art. 25(e); Art. 2 point (16)",
-    "verdict": "corrected",
-    "was": "EU Microfinance Reg §3",
-    "now": "Regulation (EU) 2021/1057 (ESF+) Art. 25(e)",
-    "sourceTitle": "Regulation (EU) 2021/1057 (ESF+), Official Journal text (Publications Office)",
-    "sourceUrl": "https://publications.europa.eu/resource/celex/32021R1057",
-    "checkedOn": "2026-11-16",
-    "checkedBy": "ai-agent",
-    "note": "No EU instrument called 'Microfinance Regulation' exists. EU support for microfinance runs through the EaSI strand of the ESF+ Regulation: Art. 25(e) (market ecosystem for microfinance to microenterprises) and Art. 2 point (16) (definition of microfinance). Basis entry, compliance framework label and WLT-NP-14 rewritten."
-  },
-  {
-    "packId": "no-poverty",
-    "questionId": "pack",
     "citation": "Annex III §5(a) — eligibility for essential public assistance benefits and services, where used by or on behalf of public authorities; §5(b) — creditworthiness of natural persons (financial-fraud detection excluded)",
     "instrument": "Regulation (EU) 2024/1689 (Artificial Intelligence Act)",
     "clause": "Annex III points 5(a)-(b)",
@@ -1467,7 +1452,7 @@
     "sourceUrl": "https://publications.europa.eu/resource/celex/32021R1057",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "No EU 'Microfinance Regulation' exists. The question now asks about EaSI-supported microfinance under the ESF+ Regulation and the eligibility, reporting and audit requirements set by the funding agreement; it no longer credits an EU law with conduct obligations."
+    "note": "No EU 'Microfinance Regulation' exists (the pack-level entry 'EU Microfinance Reg §3' was removed for the same reason). The question now asks about EaSI-supported microfinance under the ESF+ Regulation and the eligibility, reporting and audit requirements set by the funding agreement; it no longer credits an EU law with conduct obligations."
   },
   {
     "packId": "no-poverty",
@@ -2057,21 +2042,6 @@
   {
     "packId": "blockchain",
     "questionId": "pack",
-    "citation": "SEC interpretive release 33-11412 on crypto assets (2026)",
-    "instrument": "SEC interpretive release 33-11412 (17 March 2026)",
-    "clause": "whole release",
-    "verdict": "corrected",
-    "was": "SEC Howey Test Framework",
-    "now": "SEC interpretive release 33-11412 on crypto assets (2026)",
-    "sourceTitle": "SEC Release 33-11412, Application of the Federal Securities Laws to Certain Types of Crypto Assets and Certain Transactions Involving Crypto Assets",
-    "sourceUrl": "https://www.sec.gov/rule-release/33-11412",
-    "checkedOn": "2026-11-16",
-    "checkedBy": "ai-agent",
-    "note": "The 2019 staff 'Framework for Investment Contract Analysis of Digital Assets' is marked withdrawn on sec.gov and superseded by Release 33-11412, 'Application of the Federal Securities Laws to Certain Types of Crypto Assets and Certain Transactions Involving Crypto Assets' (interpretive, issued 17 March 2026, effective 23 March 2026)."
-  },
-  {
-    "packId": "blockchain",
-    "questionId": "pack",
     "citation": "ISO/TC 307 Blockchain Standards",
     "instrument": "ISO/TC 307",
     "clause": "committee",
@@ -2487,7 +2457,7 @@
     "sourceUrl": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep328/usrep328293/usrep328293.pdf",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Decided 27 May 1946; defines an investment contract under the Securities Act. The SEC's 2026 interpretive release 33-11412 also bears on token analysis."
+    "note": "Decided 27 May 1946; defines an investment contract under the Securities Act. The pack-level entry 'SEC Howey Test Framework' was removed: sec.gov marks the 2019 staff 'Framework for Investment Contract Analysis of Digital Assets' as withdrawn and superseded by Release 33-11412 (interpretive, 17 March 2026, effective 23 March 2026), which also bears on token analysis."
   },
   {
     "packId": "blockchain",

@@ -433,7 +433,6 @@
     "regulatoryBasis": [
       "MiCA Regulation 2023/1114",
       "FATF VA/VASP Guidelines (2021)",
-      "SEC interpretive release 33-11412 on crypto assets (2026)",
       "ISO/TC 307 Blockchain Standards",
       "BIS CPMI Guidance on Stablecoins",
       "IOSCO Policy Recommendations for Crypto",
@@ -457,16 +456,6 @@
         "lastReviewed": "2026-10-03",
         "status": "unverified",
         "text": "FATF VA/VASP Guidelines (2021)"
-      },
-      {
-        "citation": "SEC Release 33-11412, Application of the Federal Securities Laws to Certain Types of Crypto Assets and Certain Transactions Involving Crypto Assets (17 March 2026)",
-        "effectiveDate": "2026-03-23",
-        "instrumentId": "us-sec-crypto-2026",
-        "jurisdiction": "US",
-        "lastReviewed": "2026-11-16",
-        "status": "in-force",
-        "text": "SEC interpretive release 33-11412 on crypto assets (2026)",
-        "url": "https://www.sec.gov/rule-release/33-11412"
       },
       {
         "citation": "ISO/TC 307 Blockchain and distributed ledger technologies standards",
@@ -10724,12 +10713,6 @@
         "frameworkId": null,
         "instrumentId": "unhcr-fi",
         "label": "UNHCR FI Guidelines"
-      },
-      {
-        "external": true,
-        "frameworkId": null,
-        "instrumentId": "eu-esf-plus",
-        "label": "ESF+ Regulation (EU) 2021/1057"
       }
     ],
     "complianceFrameworks": [
@@ -10739,8 +10722,7 @@
       "GSMA Mobile Money",
       "FATF R1",
       "IFC PS",
-      "UNHCR FI Guidelines",
-      "ESF+ Regulation (EU) 2021/1057"
+      "UNHCR FI Guidelines"
     ],
     "contentStatus": "experimental",
     "description": "Economic opportunities for socially displaced and disadvantaged populations — covering financial inclusion, microfinance, social protection, and economic empowerment with emphasis on equitable access, dignity preservation, and sustainable poverty reduction.",
@@ -11144,8 +11126,7 @@
       "GSMA Mobile Money Guidelines",
       "FATF Recommendation 1 (Risk-Based Approach)",
       "IFC Performance Standards",
-      "UNHCR Guidelines on Financial Inclusion",
-      "Regulation (EU) 2021/1057 (ESF+) Art. 25(e)"
+      "UNHCR Guidelines on Financial Inclusion"
     ],
     "regulatoryReferences": [
       {
@@ -11204,15 +11185,6 @@
         "lastReviewed": "2026-10-03",
         "status": "unverified",
         "text": "UNHCR Guidelines on Financial Inclusion"
-      },
-      {
-        "citation": "Regulation (EU) 2021/1057 establishing the European Social Fund Plus (ESF+)",
-        "instrumentId": "eu-esf-plus",
-        "jurisdiction": "EU",
-        "lastReviewed": "2026-10-03",
-        "status": "in-force",
-        "text": "Regulation (EU) 2021/1057 (ESF+) Art. 25(e)",
-        "url": "https://data.europa.eu/eli/reg/2021/1057/oj"
       }
     ],
     "riskTier": "very-high",
