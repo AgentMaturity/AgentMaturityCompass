@@ -25,6 +25,7 @@ import { SourceFormatError } from "./sourceFormatError.js";
 import { parseVersionedHarnessImport } from "./versionedHarnessImport.js";
 import { sanitizeDshSessionV4, dshSessionTracesV4, dshSessionWarningsV4, type ParsedDshSessionV4 } from "./dshSessionImportV4.js";
 import { parseDetectedCurrentPiTelemetry, currentPiTelemetryWarnings, currentPiTelemetryTraces, type ParsedCurrentPiTelemetry } from "./piTelemetryCurrent.js";
+import { redactDeep, redactString } from "./importRedaction.js";
 import { detectSessionImport, earlierSessionImport, type ParsedSessionImport } from "./sessionImport.js";
 import { ORIGINAL_NOT_RETAINED_LOSS, oversizedImportReason, readImportSource, retainImportOriginals, type ImportOriginalRef } from "./importOriginals.js";
 export const neutralImportCategorySchema = z.enum([
@@ -185,7 +186,6 @@ export interface NeutralCollaborationTelemetryRef {
   participants: string[];
 }
 
-const SECRET_RE = /(sk-[A-Za-z0-9_-]{8,}|bearer\s+[A-Za-z0-9._-]{10,}|(?:api[_-]?key|secret|token|password)\s*[:=]\s*["']?[A-Za-z0-9._-]{8,})/gi;
 const MAX_SCAN_FILES = 200, MAX_FILE_BYTES = 1_500_000;
 
 function importsRoot(workspace: string): string {
@@ -265,45 +265,6 @@ function recordCount(value: unknown): number {
     return Object.keys(value).length;
   }
   return 1;
-}
-
-function redactString(value: string): { value: string; count: number } {
-  let count = 0;
-  const redacted = value.replace(SECRET_RE, () => {
-    count += 1;
-    return "[REDACTED]";
-  });
-  return { value: redacted, count };
-}
-
-function redactDeep(value: unknown): { value: unknown; count: number } {
-  if (typeof value === "string") {
-    return redactString(value);
-  }
-  if (Array.isArray(value)) {
-    let count = 0;
-    const out = value.map((item) => {
-      const redacted = redactDeep(item);
-      count += redacted.count;
-      return redacted.value;
-    });
-    return { value: out, count };
-  }
-  if (isRecord(value)) {
-    let count = 0;
-    const out: Record<string, unknown> = {};
-    for (const [key, item] of Object.entries(value)) {
-      if (/^(?:api[_-]?key|access[_-]?token|refresh[_-]?token|token|password|passwd|secret|client[_-]?secret|private[_-]?key|authorization|cookie)$/i.test(key)
-        && item !== null && item !== "") {
-        out[key] = "[REDACTED]"; count += 1; continue;
-      }
-      const redacted = redactDeep(item);
-      count += redacted.count;
-      out[key] = redacted.value;
-    }
-    return { value: out, count };
-  }
-  return { value, count: 0 };
 }
 
 function parseFile(text: string, format: "json" | "jsonl" | "yaml"): unknown {
@@ -578,7 +539,7 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
         summary: session ? `${session.format.name}: ${traces.length} step(s), ${traces.filter((trace) => "error" in trace && trace.error === true).length} reported failure(s); SELF_REPORTED, imported, not evaluated.` : dshV4 ? `DSH v4: ${dshV4.format.eventCount} events, ${dshV4.format.inheritedEventCount} inherited; SELF_REPORTED, not evaluated.` : currentPi ? `${currentPi.format.spanCount} current Pi callback spans; SELF_REPORTED, not evaluated.` : dshSession ? `DSH v2: ${dshSession.format.eventCount} events, ${dshSession.format.inheritedEventCount} inherited; SELF_REPORTED, not evaluated.` : callbackTelemetry ? `${callbackTelemetry.format.spanCount} callback spans; SELF_REPORTED, not evaluated; ${callbackTelemetry.format.pendingSpans} unresolved outcomes.` : piSession
           ? piSessionSummary(piSession.format, traces.filter((trace) => "error" in trace && trace.error === true).length)
           : categorySummary(category, count),
-        redactionCount: redacted.count,
+        redactionCount: redacted.count + (session?.redactionCount ?? 0),
         ...(session ? { sourceFormat: session.format } : dshV4 ? { sourceFormat: dshV4.format } : currentPi ? { sourceFormat: currentPi.format } : dshSession ? { sourceFormat: dshSession.format } : piSession ? { sourceFormat: piSession.format } : callbackTelemetry ? { sourceFormat: callbackTelemetry.format } : {})
       },
       redacted: redacted.value,

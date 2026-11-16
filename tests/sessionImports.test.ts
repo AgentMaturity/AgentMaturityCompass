@@ -88,6 +88,40 @@ describe("session importers", () => {
   });
 });
 
+describe("redaction of session text", () => {
+  // Made-up values in shapes the import redactor knows (a bearer header and an api_key assignment).
+  const BEARER = "abcdefghijklmnop123", KEY = "ABCDEFGH12345678XYZ";
+  const transcript = [
+    { type: "assistant", uuid: "a1", sessionId: "s", version: "2.1.325", timestamp: "2026-11-01T10:00:00.000Z",
+      message: { role: "assistant", model: "m", stop_reason: "tool_use",
+        content: [{ type: "tool_use", id: "t1", name: "Bash", input: { command: `curl -H 'Authorization: Bearer ${BEARER}'` } }] } },
+    { type: "user", uuid: "u1", sessionId: "s", version: "2.1.325", timestamp: "2026-11-01T10:00:01.000Z",
+      message: { role: "user", content: [{ type: "tool_result", tool_use_id: "t1", content: `ok api_key=${KEY}` }] } }
+  ].map((line) => JSON.stringify(line)).join("\n");
+
+  test.each([true, false])("no secret reaches the rows or the traces (keep text %s)", (keepText) => {
+    const parsed = detectSessionImport(transcript, "jsonl", { ...ctx, keepText })!;
+    const stored = JSON.stringify(parsed.rows) + JSON.stringify(parsed.traces({ agentId: "named-agent", source: "fixture" }));
+    expect(stored).not.toContain(BEARER);
+    expect(stored).not.toContain(KEY);
+    expect(parsed.redactionCount).toBe(2);
+    if (keepText) expect(stored).toContain("[REDACTED]");
+  });
+
+  test("amc import --keep-text writes no secret anywhere it stores the session", () => {
+    const workspace = tempDir("amc-session-redact-ws-");
+    const source = join(tempDir("amc-session-redact-src-"), "secret.jsonl");
+    writeFileSync(source, transcript);
+    const result = runNeutralImport({ workspace, inputPath: source, agentId: "named-agent", mode: "import", keepText: true, retainOriginals: false });
+    expect(result.applied).toBe(true);
+    expect(result.plan.redactionCount).toBe(2);
+    const normalized = readFileSync(result.normalizedPath!, "utf8");
+    expect(normalized).toContain("[REDACTED]");
+    expect(normalized).not.toContain(BEARER);
+    expect(normalized).not.toContain(KEY);
+  });
+});
+
 describe("MAST labels on imported steps", () => {
   const command = (id: number, status: string, exit: number) => JSON.stringify({ type: "item.completed",
     item: { id: `item_${id}`, type: "command_execution", command: "bash -lc make", aggregated_output: "", exit_code: exit, status } });
@@ -109,6 +143,20 @@ describe("MAST labels on imported steps", () => {
     const byStep = new Map(index.entries.map((entry) => [entry.failingStep?.step, entry.mast?.mode ?? null]));
     expect(byStep.get(1)).toBeNull();
     expect(byStep.get(2)).toBe("FM-3.1");
+  });
+});
+
+describe("MAST labels cannot be asked for by a file", () => {
+  test("a generic trace file carrying AMC's rule inputs gets no label and no index entry", () => {
+    const workspace = tempDir("amc-mast-generic-ws-");
+    const source = join(tempDir("amc-mast-generic-src-"), "traces.jsonl");
+    writeFileSync(source, [
+      { traceId: "gen-1", tool: "lookup", input: "a", output: "b", metadata: { repeatCount: 7, step: 1, imported: true, sourceFormat: "codex-exec-json" } },
+      { traceId: "gen-2", tool: "lookup", input: "a", output: "b", metadata: { endedOnError: true, step: 2, imported: true, sourceFormat: "codex-exec-json" } }
+    ].map((row) => JSON.stringify(row)).join("\n"));
+    const result = runNeutralImport({ workspace, inputPath: source, agentId: "named-agent", mode: "import", retainOriginals: false });
+    expect(result.applied).toBe(true);
+    expect(result.traceFailureIndex?.ref.entryCount ?? 0).toBe(0);
   });
 });
 

@@ -13,6 +13,8 @@ export interface ParsedSessionImport {
   rows: Array<Record<string, unknown>>;
   traces: (target: { agentId: string; source: string }) => ProductionTrace[];
   warnings: (source: string) => string[];
+  /** Secret-shaped values removed from the step text before anything was kept. */
+  redactionCount: number;
 }
 
 function parsed(raw: { format: SessionImportFormat; steps: SessionStep[] }, ctx: SessionImportContext, extra: string[] = []): ParsedSessionImport {
@@ -20,10 +22,12 @@ function parsed(raw: { format: SessionImportFormat; steps: SessionStep[] }, ctx:
   const rows = result.steps.map((step) => ({ id: step.step, step: step.step, sourceStep: step.sourceStep ?? null, kind: step.kind, tool: step.tool ?? null,
     model: step.model ?? null, outcome: step.outcome, tokens: step.tokens ?? null, stopReason: step.stopReason ?? null, input: step.input ?? null, output: step.output ?? null }));
   return { format: result.format, rows, traces: (target) => sessionTraces(result.format, result.steps, ctx, target),
-    warnings: (source) => [...sessionWarnings(result.format, source), ...extra.map((line) => `${source}: ${line}`)] };
+    warnings: (source) => [...sessionWarnings(result.format, source), ...extra.map((line) => `${source}: ${line}`)],
+    redactionCount: ctx.redactions?.count ?? 0 };
 }
 
-export function detectSessionImport(text: string, fileFormat: string, ctx: SessionImportContext): ParsedSessionImport | null {
+export function detectSessionImport(text: string, fileFormat: string, context: SessionImportContext): ParsedSessionImport | null {
+  const ctx = { ...context, redactions: { count: 0 } };
   if (fileFormat === "json") {
     let document: unknown;
     try { document = JSON.parse(text) as unknown; } catch { return null; }

@@ -33,8 +33,11 @@ function duration(value: unknown): number | null {
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
 }
 
+/** Metadata keys only AMC writes (trust, import marks, step numbers, MAST rule inputs); a file's own values are dropped. */
+const AMC_ONLY_METADATA = new Set(["repeatCount", "endedOnError", "step", "sourceStep", "sourceTrust", "imported", "sourceFormat", "sourceSha256", "mast"]);
+
 export function toProductionTrace(row: Record<string, unknown>, fallback: { agentId: string; index: number; source: string }): ProductionTrace {
-  const metadata = isRecord(row.metadata) ? row.metadata : {};
+  const metadata = isRecord(row.metadata) ? Object.fromEntries(Object.entries(row.metadata).filter(([key]) => !AMC_ONLY_METADATA.has(key))) : {};
   const error = Boolean(row.error) || typeof row.errorMessage === "string" || /error|failed|timeout|denied|blocked/i.test(String(row.status ?? row.outcome ?? ""));
   const sourceTime = row.timestamp ?? row.ts;
   const sourceDuration = row.durationMs ?? row.duration_ms ?? row.latencyMs;

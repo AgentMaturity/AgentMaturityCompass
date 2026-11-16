@@ -46,16 +46,23 @@ function label(mode: MastMode, rule: string, basis: string): MastLabel {
   return { mode, ...MAST_FAILURE_MODES[mode], rule, basis, meaning: "label assigned by an AMC rule; not a finding" };
 }
 
-/** The label, if any, an AMC rule assigns to one recorded step. Only traces that carry the step metadata are labelled. */
+/** The formats whose step metadata AMC itself writes (src/importers/sessionImportCommon.ts sessionTraces). */
+const SESSION_FORMATS = new Set(["claude-code-transcript", "codex-exec-json", "atif-trajectory"]);
+
+/**
+ * The label, if any, an AMC rule assigns to one recorded step. Only steps AMC's session importers built are labelled:
+ * the generic trace importer drops these metadata keys from a file (src/importers/traceMapping.ts), so a file cannot
+ * ask for a label. Premature termination needs a step that really failed.
+ */
 export function mastLabelFor(trace: AMCTraceV1 | ProductionTrace): MastLabel | null {
   const metadata = "metadata" in trace && trace.metadata && typeof trace.metadata === "object" ? trace.metadata as Record<string, unknown> : null;
-  if (!metadata) return null;
+  if (!metadata || metadata.imported !== true || !SESSION_FORMATS.has(String(metadata.sourceFormat))) return null;
   const repeats = typeof metadata.repeatCount === "number" ? metadata.repeatCount : 0;
   if (repeats >= REPEAT_THRESHOLD) {
     return label("FM-1.3", "amc.mast.same-call-repeated",
       `The same tool was called with the same arguments ${repeats} times in a row.`);
   }
-  if (metadata.endedOnError === true) {
+  if (metadata.endedOnError === true && "error" in trace && trace.error === true) {
     return label("FM-3.1", "amc.mast.ended-on-error",
       "The recorded session ends on this failed step, with no reply from the agent after it.");
   }

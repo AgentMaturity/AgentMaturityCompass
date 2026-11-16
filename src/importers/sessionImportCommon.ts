@@ -9,6 +9,7 @@
 import type { ProductionTrace } from "../agents/traceIngestion.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { redactDeep } from "./importRedaction.js";
 import { traceTimestamp } from "./traceMapping.js";
 
 export const SESSION_LIMITS = { maxLineBytes: 1_048_576, maxRecords: 50_000, maxKeptTextChars: 4_000, maxNameChars: 128 } as const;
@@ -31,7 +32,11 @@ export interface SessionImportFormat {
   unknownTimestamps: number;
 }
 
-export interface SessionImportContext { keepText: boolean; sourceSha256: string; now: number }
+export interface SessionImportContext {
+  keepText: boolean; sourceSha256: string; now: number;
+  /** Secret-shaped values removed so far; detectSessionImport sets a fresh counter for each file. */
+  redactions?: { count: number };
+}
 
 export interface JsonRow { line: number; value: Record<string, unknown> }
 
@@ -71,10 +76,15 @@ export function plainName(value: unknown): string | null {
   return out;
 }
 
-/** Prompt, reply or tool text: a digest by default, the (capped) text only when the person asked to keep text. */
+/**
+ * Prompt, reply or tool text: redacted first, then a digest by default, the (capped) text only when the person asked to
+ * keep text. Steps, stored rows and traces all take their text from here, so none of them holds a secret the redactor knows.
+ */
 export function storedText(value: unknown, ctx: SessionImportContext): unknown {
   if (value === undefined || value === null) return null;
-  const text = typeof value === "string" ? value : canonicalize(value);
+  const redacted = redactDeep(value);
+  if (ctx.redactions) ctx.redactions.count += redacted.count;
+  const text = typeof redacted.value === "string" ? redacted.value : canonicalize(redacted.value);
   if (!ctx.keepText) return { sha256: sha256Hex(text), chars: text.length };
   return text.length > SESSION_LIMITS.maxKeptTextChars ? `${text.slice(0, SESSION_LIMITS.maxKeptTextChars)} [cut]` : text;
 }

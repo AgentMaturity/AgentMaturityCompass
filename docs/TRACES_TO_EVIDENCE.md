@@ -74,7 +74,7 @@ What to expect:
 
 - Every row is self-reported and imported. It carries the file's SHA-256 and the format name. AMC did not watch it happen.
 - The agent is the one you name (`--agent`), never one the file names. Nothing in the file sets a trust level, a decision or a session label. A time later than the import becomes the import time, and the import says so.
-- Prompt, reply and tool text is kept only as SHA-256 digests unless you pass `--keep-text`. Without it, the file itself is not kept either.
+- Prompt, reply and tool text is kept only as SHA-256 digests unless you pass `--keep-text`. Without it, the file itself is not kept either. Either way, secret-looking values (API keys, bearer tokens, passwords) are replaced by `[REDACTED]` before the text is kept or digested, in the stored rows and in the traces alike. With `--keep-text` the original file is kept as it is unless you also pass `--no-retain-original`.
 - Each line is read on its own. A line that is not JSON, is longer than 1 MiB, or comes after the first 50,000 records is counted and skipped.
 - Importing the same file again for the same agent adds nothing.
 - AMC never opens a path written inside the file. A link in the folder you name that points elsewhere is not read.
