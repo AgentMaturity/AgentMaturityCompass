@@ -1,6 +1,6 @@
 import type { DiagnosticQuestion } from "../types.js";
 import { questionBank } from "./questionBank.js";
-import { notEvaluatedLevel } from "./levelSemantics.js";
+import { notEvaluatedLevel, reachableLevel } from "./levelSemantics.js";
 
 const LAYER_EXPLANATIONS: Record<string, string> = {
   "Strategic Agent Operations":
@@ -23,6 +23,8 @@ export interface DiagnosticQuestionExplanation {
   whyItMatters: string;
   howToImprove: string[];
   exampleEvidence: string[];
+  /** The highest level AMC can evaluate for this question today (P2). */
+  highestLevelToday: number;
 }
 
 function normalizeQuestionId(questionId: string): string {
@@ -45,7 +47,7 @@ function firstNonEmptySentences(text: string, maxItems: number): string[] {
 function buildImprovementSteps(question: DiagnosticQuestion): string[] {
   const fromHints = firstNonEmptySentences(question.upgradeHints, 2);
   const fromKnobs = question.tuningKnobs.slice(0, 2).map((knob) => `Tune: ${knob}.`);
-  const fallback = [`Apply controls until evidence can consistently support at least L3 for ${question.id}.`];
+  const fallback = [`Apply controls until evidence consistently supports L${reachableLevel(question)}, the highest level AMC can evaluate for ${question.id} today.`];
   const steps = [...fromHints, ...fromKnobs];
   return steps.length > 0 ? steps : fallback;
 }
@@ -95,7 +97,8 @@ export function explainDiagnosticQuestion(questionId: string): DiagnosticQuestio
     whatItMeasures: compactSentence(question.promptTemplate),
     whyItMatters: `${layerContext} ${compactSentence(question.evidenceGateHints)}`,
     howToImprove: buildImprovementSteps(question),
-    exampleEvidence: buildEvidenceExamples(question)
+    exampleEvidence: buildEvidenceExamples(question),
+    highestLevelToday: reachableLevel(question)
   };
 }
 

@@ -65,6 +65,7 @@ import { sha256Hex } from "./utils/hash.js";
 import { canonicalize } from "./utils/json.js";
 import { amcVersion } from "./version.js";
 import { AMC_MATURITY_LEGEND } from "./score/maturityTaxonomy.js";
+import { LEVEL_GUIDE } from "./diagnostic/levelSemantics.js";
 import {
   buildEnforceResourceManifest,
   diffEnforceResourceManifests,
@@ -1493,6 +1494,8 @@ async function renderInstantFullScore(
   const score100 = Math.round((avgLevel / 5) * 100);
   const fullQuestionCount = report.questionScores.length;
   const statusExplanation = explainDiagnosticReportStatus(report);
+  const { scoreSummary, scoreSummaryLines } = await import("./diagnostic/scoreSummary.js");
+  const summary = scoreSummary(report);
   if (opts.json) {
     const dimensions = Object.fromEntries(
       report.layerScores.map((layer) => [
@@ -1519,6 +1522,8 @@ async function renderInstantFullScore(
       score: score100,
       level: `L${avgLevel.toFixed(2)}`,
       overallLevel: Number(avgLevel.toFixed(2)),
+      overallRange: summary.band, levelsEvaluableToday: summary.reach,
+      questionApplicability: report.questionApplicability ?? { status: "not_answered", notApplicable: [] },
       trustLabel: report.trustLabel,
       questionCount: fullQuestionCount,
       integrityIndex: Number(report.integrityIndex.toFixed(3)),
@@ -1553,6 +1558,7 @@ async function renderInstantFullScore(
   console.log(chalk.gray(`  Artifact seal: ${report.status} | Evidence: ${statusExplanation.evidenceStatus} | Claims: ${statusExplanation.strongClaimsAllowed ? "ELIGIBLE" : "BLOCKED"}`));
   console.log("");
   console.log(chalk.bold(`  Overall: L${avgLevel.toFixed(2)} (${score100}/100) ${report.trustLabel}`));
+  console.log(chalk.gray(`  Range: L${summary.band.low.toFixed(2)} to L${summary.band.high.toFixed(2)} (${summary.band.method})`));
   const recorded = report.recordedActivity?.events ?? 0;
   if (report.evidenceCoverage === 0 && recorded > 0) {
     const sessions = report.recordedActivity?.sessions ?? 0;
@@ -1569,8 +1575,9 @@ async function renderInstantFullScore(
     const bar = "█".repeat(lv) + "░".repeat(5 - lv);
     console.log(`  ${layer.layerName.padEnd(28)} L${layer.avgFinalLevel.toFixed(2)} ${bar}`);
   }
-  const gaps = report.questionScores.filter((question) => question.finalLevel < 3).slice(0, 5);
-  await printTopGaps(gaps);
+  await printTopGaps(report.questionScores, report.questionApplicability);
+  console.log("");
+  for (const line of scoreSummaryLines(report, "  ").slice(1)) console.log(chalk.gray(line));
   console.log("");
   if (state.createdWorkspace) {
     console.log(chalk.green("  Created .amc workspace automatically."));
@@ -2391,7 +2398,10 @@ program
     console.log(chalk.bold(`  Current: ${result.preliminaryLevel} (${result.totalScore}/${result.maxScore} points from ${result.maxScore / 5} self-answers, 0-5 each)`));
     printClaimResult(claim, opts);
     console.log("");
-    console.log(chalk.bold("  What L3 means for your product:"));
+    const { levelReach } = await import("./diagnostic/levelSemantics.js");
+    const { questionBank } = await import("./diagnostic/questionBank.js");
+    console.log(chalk.gray(`  Levels AMC can evaluate today: ${levelReach(questionBank).sentence}`));
+    console.log(chalk.bold("  What L3 would mean for your product (AMC cannot evaluate L3 yet):"));
     console.log(chalk.gray("  L3 = evidence-backed and reviewable: customers can trust the agent's behavior because key decisions have replayable proof, not just team claims."));
     console.log(chalk.gray("  PM translation: define the product promise, capture proof when the agent acts, and make that proof easy for a reviewer to inspect."));
     console.log(chalk.bold("  L3 examples by agent archetype:"));
@@ -2402,7 +2412,7 @@ program
     console.log("");
 
     if (result.recommendations.length === 0) {
-      console.log(chalk.green("  🎉 You're at L5 across the board. Nothing to improve!"));
+      console.log(chalk.green("  Each of these questions is at the highest level AMC can evaluate for it today. Nothing here can move further yet."));
       console.log("");
       return;
     }
@@ -3430,15 +3440,23 @@ program
   .command("explain <questionId>")
   .description("Plain-English explanation for a diagnostic question (example: AMC-2.1)")
   .option("--json", "emit JSON output", false)
-  .action(async (questionId: string, opts: { json: boolean }) => {
+  .option("--not-applicable <reason>", "mark this question as not applying to the agent, with your reason; it is left out of the score and listed in every report (signs with the vault)")
+  .option("--applicable", "count this question in the score again (signs with the vault)", false)
+  .action(async (questionId: string, opts: { json: boolean; notApplicable?: string; applicable: boolean }) => {
     const { explainDiagnosticQuestion } = await import("./diagnostic/questionExplain.js");
     const explanation = explainDiagnosticQuestion(questionId);
+    if (opts.notApplicable !== undefined || opts.applicable) {
+      const { markQuestionApplicability } = await import("./cli/questionApplicabilityCli.js");
+      markQuestionApplicability(process.cwd(), activeAgent(program), explanation, opts.applicable ? null : opts.notApplicable ?? null);
+      return;
+    }
     if (opts.json) {
       console.log(JSON.stringify(explanation, null, 2));
       return;
     }
     console.log(chalk.bold(`${explanation.questionId} - ${explanation.title}`));
     console.log(`Layer: ${explanation.layerName}`);
+    console.log(`Highest level AMC can evaluate for this question today: L${explanation.highestLevelToday}`);
     console.log(chalk.dim(`Maturity Levels: ${AMC_MATURITY_LEGEND}`));
     console.log("");
     console.log(chalk.hex('#4AEF79')("What it measures:"));
@@ -3462,7 +3480,7 @@ program
     console.log(chalk.gray("  context.mission    ") + "— your agent's stated purpose and scope (document it in AGENTS.md or a charter file)");
     console.log(chalk.gray("  guardrails.alignment") + "— rules that prevent the agent from acting outside its mission (e.g. topic filters, action limits)");
     console.log(chalk.gray("  evidence           ") + "— logged proof that a behavior actually occurred (not just claimed in docs)");
-    console.log(chalk.gray("  L0–L5 levels       ") + "— L0=undocumented, L1=documented, L2=automated checks, L3=evidence-backed, L4=proactive, L5=certifiable");
+    console.log(chalk.gray("  L0–L5 levels       ") + `— ${LEVEL_GUIDE.join("; ")}`);
     console.log(chalk.gray("  tuning knobs       ") + "— configurable parameters that control agent behavior (e.g. temperature, retry limits)");
     console.log(chalk.gray("  gate               ") + "— a pass/fail check that blocks deployment if requirements are not met");
   });
@@ -22116,13 +22134,13 @@ score
 
 score
   .command("owasp-llm")
-  .description("OWASP LLM Top 10 (2023 v1.1) coverage; not evaluated: file presence is not evidence. The evidence-bound 2025 list is `amc compliance report --framework owasp-llm`")
+  .description("OWASP Top 10 for LLM Applications (2025) coverage; not evaluated: file presence is not evidence. The evidence-bound version is `amc compliance report --framework owasp-llm`")
   .option("--json", "Output as JSON")
   .action(async (opts: { json?: boolean }) => {
     try {
       const { scoreOWASPLLMCoverage } = await import("./score/owaspLLMCoverage.js");
       const result = scoreOWASPLLMCoverage();
-      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🛡️  OWASP LLM Top 10 (2023 v1.1) Coverage"), result, unverifiedClaim("score:owaspLLMCoverage", 0, { regulated: true }), opts)) return;
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🛡️  OWASP Top 10 for LLM Applications (2025) Coverage"), result, unverifiedClaim("score:owaspLLMCoverage", 0, { regulated: true }), opts)) return;
       printNotEvaluatedCriteria(result.risks, result.recommendations);
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });

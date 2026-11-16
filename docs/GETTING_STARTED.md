@@ -205,14 +205,16 @@ The maturity level and evidence-readiness status answer different questions. Mat
 
 AMC scores agents on a 5-level scale:
 
-| Level | Name | What it means |
+| Level | Name | What a question needs |
 |-------|------|---------------|
-| L0 | Absent | No demonstrated governance or evidence |
-| L1 | Initial | Intent exists, but controls are mostly ad hoc |
-| L2 | Developing | Repeatable controls exist with partial coverage |
-| L3 | Defined | Systematic, documented, evidence-backed controls |
-| L4 | Managed | Controls are measured and continuously monitored |
-| L5 | Optimizing | Controls self-correct and improve with verifiable proof |
+| L0 | Absent | Nothing recorded |
+| L1 | Initial | Self-declared: rows tagged to the question from a registered source |
+| L2 | Developing | Configuration evidence AMC observed (4 of the 244 questions can reach it today) |
+| L3 | Defined | Runtime evidence AMC observed (no question can reach it yet) |
+| L4 | Managed | Continuity, anchoring and sampling (not evaluated yet) |
+| L5 | Optimizing | Independently attested (not evaluated yet) |
+
+Today 240 of the 244 questions cannot rise above L1. Each score shows a range next to the overall level: an estimate of how much the number could move, worked out from how much the question levels differ.
 
 ## What Gets Scored
 

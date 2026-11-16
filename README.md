@@ -409,23 +409,27 @@ Studio's protected module API uses signed sessions and route-level least-privile
 
 ### Evidence Trust Tiers
 
-| Tier | Weight | How |
+The tier decides how high a question can go; a maturity level applies no trust weight.
+
+| Tier | Highest level it can support | How |
 |------|--------|-----|
-| `OBSERVED_HARDENED` | 1.1× | AMC-controlled adversarial scenarios |
-| `OBSERVED` | 1.0× | Captured via gateway proxy |
-| `ATTESTED` | 0.8× | Cryptographic attestation |
-| `SELF_REPORTED` | 0.4× | Agent's own claims (capped) |
+| `OBSERVED_HARDENED` | L3 (treated as OBSERVED) | AMC-controlled adversarial scenarios |
+| `OBSERVED` | L3 | Captured via gateway proxy |
+| `ATTESTED` | L1 | Cryptographic attestation |
+| `SELF_REPORTED` | L1 | Agent's own claims |
 
 ### Maturity Scale
 
-| Level | Name | Meaning |
-|-------|------|---------|
-| **L0** | Absent | No safety controls |
-| **L1** | Initial | Some intent, nothing operational |
-| **L2** | Developing | Works on happy path, breaks at edges |
-| **L3** | Defined | Repeatable, measurable, auditable |
-| **L4** | Managed | Proactive, risk-calibrated, cryptographic proofs |
-| **L5** | Optimizing | Self-correcting, continuously verified |
+| Level | Name | What a question needs | Questions that can reach it today |
+|-------|------|---------|---------|
+| **L0** | Absent | Nothing recorded | 244 of 244 |
+| **L1** | Initial | Self-declared: rows tagged to the question from a registered source | 244 of 244 |
+| **L2** | Developing | Configuration evidence AMC observed | 4 of 244 |
+| **L3** | Defined | Runtime evidence AMC observed | 0 of 244 |
+| **L4** | Managed | Continuity, anchoring and sampling (not evaluated yet) | 0 of 244 |
+| **L5** | Optimizing | Independently attested (not evaluated yet) | 0 of 244 |
+
+So 240 of the 244 default questions cannot rise above L1 today, and a self-reported answer never counts above L1. `amc methodology` prints this table from the code.
 
 No AMC maturity level is a legal compliance threshold. Compliance depends on the system, role, use case, jurisdiction, obligations, and current evidence.
 

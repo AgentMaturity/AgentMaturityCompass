@@ -122,12 +122,13 @@ const TRANSLATION_KEYS: TranslationKey[] = [
   { key: "report.generated", defaultValue: "Report generated at {timestamp}" },
 
   // Score levels
-  { key: "score.level.0", defaultValue: "Not Assessed" },
-  { key: "score.level.1", defaultValue: "Initial — Ad hoc, no formal processes" },
-  { key: "score.level.2", defaultValue: "Developing — Some processes, inconsistent" },
-  { key: "score.level.3", defaultValue: "Defined — Standardized processes in place" },
-  { key: "score.level.4", defaultValue: "Managed — Measured and controlled" },
-  { key: "score.level.5", defaultValue: "Optimizing — Continuous improvement" },
+  // One L0-L5 vocabulary (LEVEL_GUIDE in src/diagnostic/levelSemantics.ts): the band name, then what the level needs.
+  { key: "score.level.0", defaultValue: "Absent — nothing recorded" },
+  { key: "score.level.1", defaultValue: "Initial — self-declared" },
+  { key: "score.level.2", defaultValue: "Developing — configuration evidence" },
+  { key: "score.level.3", defaultValue: "Defined — runtime evidence" },
+  { key: "score.level.4", defaultValue: "Managed — continuity, anchoring and sampling (not evaluated yet)" },
+  { key: "score.level.5", defaultValue: "Optimizing — independently attested (not evaluated yet)" },
 
   // Trust labels
   { key: "trust.high", defaultValue: "HIGH TRUST" },

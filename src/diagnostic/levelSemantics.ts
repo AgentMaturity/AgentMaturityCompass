@@ -2,6 +2,7 @@ import type { DiagnosticQuestion, Gate, LayerName, LayerScore, QuestionScore, Tr
 import { emitterAdmits, emitterById, fromRegisteredEmitter, type EmitterEntry, type EmitterLevelUse } from "./evidenceEmitters.js";
 import { evidenceMapFor, notYetEvidenceableNeeds } from "./evidenceMaps/index.js";
 import { evaluateGate, type GateEvaluation, type ParsedEvidenceEvent } from "./gates.js";
+import { AMC_MATURITY_LEVELS } from "../score/maturityTaxonomy.js";
 
 /**
  * What a diagnostic level means, how a question earns one, and how levels roll up (P1-07).
@@ -20,6 +21,13 @@ export const LEVEL_SEMANTICS: ReadonlyArray<{ level: Level; name: string; requir
   { level: 4, name: "Continuity, anchoring and sampling", requires: "not evaluated until anchoring and sampling emitters exist" },
   { level: 5, name: "Independently attested", requires: "not evaluated until a registry issues scoped attestations under pinned trust" }
 ];
+
+/**
+ * One vocabulary for L0 to L5 (P2): each level's name (the band label every surface uses) with what the level needs.
+ * Example: "L1 Initial: self-declared".
+ */
+export const LEVEL_GUIDE: readonly string[] = LEVEL_SEMANTICS.map(({ level, name }) =>
+  `L${level} ${AMC_MATURITY_LEVELS[level]!.label}: ${name.charAt(0).toLowerCase()}${name.slice(1)}${level >= 4 ? " (not evaluated yet)" : ""}`);
 
 /** The maturity label band an averaged level falls in (inclusive bounds). */
 export const LEVEL_BANDS = {
@@ -125,6 +133,36 @@ export function notEvaluatedLevel(
     : undefined;
 }
 
+/** The highest level a question can reach today: the level below its first gate AMC cannot evaluate. */
+export function reachableLevel(question: Pick<DiagnosticQuestion, "gates"> | undefined): Level {
+  let level: Level = 0;
+  for (const gate of [...(question?.gates ?? [])].sort((a, b) => a.level - b.level)) {
+    if (gate.level === 0) continue;
+    if (gate.notEvaluated) break;
+    level = gate.level;
+  }
+  return level;
+}
+
+/** How many questions can reach each level today, read from the gates the runner scores with. */
+export function levelReach(questions: ReadonlyArray<Pick<DiagnosticQuestion, "id" | "gates">>): {
+  total: number;
+  /** Questions whose highest reachable level is at least L<n>, for n = 0..5. */
+  canReach: Record<`L${Level}`, number>;
+  sentence: string;
+} {
+  const ceilings = questions.map((question) => reachableLevel(question));
+  const atLeast = (n: number) => ceilings.filter((ceiling) => ceiling >= n).length;
+  const canReach = { L0: atLeast(0), L1: atLeast(1), L2: atLeast(2), L3: atLeast(3), L4: atLeast(4), L5: atLeast(5) };
+  const total = questions.length;
+  const parts = [`${total - canReach.L2} of ${total} questions cannot rise above L1 today (L1 is self-declared)`];
+  if (canReach.L2 > 0) parts.push(`${canReach.L2} can reach L2`);
+  if (canReach.L3 > 0) parts.push(`${canReach.L3} can reach L3`);
+  else parts.push("no question can reach L3 yet");
+  parts.push(canReach.L4 > 0 ? `${canReach.L4} can reach L4` : "L4 and L5 are not evaluated");
+  return { total, canReach, sentence: `${parts.join("; ")}.` };
+}
+
 /** `hint` toward `target`, followed by the notEvaluatedLevel notice; only the notice when the next level is not evaluated. */
 export function hintTowardLevel(question: Pick<DiagnosticQuestion, "gates"> | undefined, current: number, target: number, hint: string): string {
   const blocked = notEvaluatedLevel(question, current, target);
@@ -219,6 +257,41 @@ export function layerScore(
 /** The overall score: the unweighted mean of layer scores. */
 export function overallScore(layers: ReadonlyArray<Pick<LayerScore, "avgFinalLevel">>): number {
   return layers.length > 0 ? layers.reduce((sum, row) => sum + row.avgFinalLevel, 0) / layers.length : 0;
+}
+
+/** How the overall score's range is computed; every surface that shows the range shows this sentence with it. */
+export const OVERALL_BAND_METHOD =
+  "an estimate: the overall plus or minus 1.96 standard errors of the question levels inside each layer; it does not cover evidence AMC has not seen";
+
+/**
+ * A range around the overall score (P8). Each layer's standard error is the weighted spread of its questions' final
+ * levels divided by the square root of the effective number of questions; the overall standard error is the root sum
+ * of squares of those, divided by the number of layers (the overall is their unweighted mean). `center` is the overall
+ * the report shows, so a cap applied to the layers moves the range with it.
+ */
+export function overallScoreBand(
+  center: number,
+  questionScores: readonly Pick<QuestionScore, "questionId" | "finalLevel">[],
+  questions: ReadonlyArray<{ id: string; layerName: LayerName; scoringWeight?: number }>
+): { low: number; high: number; method: string } {
+  const levelById = new Map(questionScores.map((score) => [score.questionId, score.finalLevel]));
+  const byLayer = new Map<LayerName, Array<{ level: number; weight: number }>>();
+  for (const question of questions) {
+    const level = levelById.get(question.id);
+    if (level === undefined) continue;
+    byLayer.set(question.layerName, [...(byLayer.get(question.layerName) ?? []), { level, weight: Math.max(0, question.scoringWeight ?? 1) }]);
+  }
+  const variances = [...byLayer.values()].map((rows) => {
+    const sum = rows.reduce((total, row) => total + row.weight, 0);
+    const squares = rows.reduce((total, row) => total + row.weight * row.weight, 0);
+    if (sum <= 0 || rows.length < 2) return 0;
+    const mean = rows.reduce((total, row) => total + row.level * row.weight, 0) / sum;
+    const spread = rows.reduce((total, row) => total + row.weight * (row.level - mean) ** 2, 0) / sum;
+    return spread / ((sum * sum) / squares);
+  });
+  const halfWidth = variances.length > 0 ? (1.96 * Math.sqrt(variances.reduce((a, b) => a + b, 0))) / variances.length : 0;
+  const round = (value: number) => Number(Math.min(5, Math.max(0, value)).toFixed(2));
+  return { low: round(center - halfWidth), high: round(center + halfWidth), method: OVERALL_BAND_METHOD };
 }
 
 export function computeLayerScores(
