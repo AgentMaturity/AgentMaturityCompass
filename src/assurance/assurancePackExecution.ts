@@ -12,6 +12,7 @@ import { gradeScenarioReply, packGradingMethod } from "./scenarioGrading.js";
 import { aggregatePackScore } from "./scorers.js";
 import type { AssurancePromptContext, AssuranceScenarioDefinition } from "./validators.js";
 import { describeEffectSummary, runEffectScenario } from "./effectGrading.js";
+import { attackerNotApplied, runAdaptiveEffectRow, type AdaptiveAttacker } from "../redteam/adaptiveRow.js";
 
 /** Tries per effect-graded scenario when the caller names none (NIST CAISI repeats; 25 is the thorough setting). */
 export const DEFAULT_EFFECT_ATTEMPTS = 5;
@@ -33,6 +34,8 @@ export interface PackExecutionInput {
   executedAttempts?: 1 | 25;
   /** Tries per effect-graded scenario (default DEFAULT_EFFECT_ATTEMPTS). */
   attempts?: number;
+  /** Attacker model and budget: a scenario with an injection slot is attacked in rounds instead of repeated tries. */
+  attacker?: AdaptiveAttacker;
   now: string;
 }
 
@@ -66,6 +69,11 @@ export async function executeAssurancePack(input: PackExecutionInput): Promise<A
         auditType: "ASSURANCE_SCENARIO_INCONCLUSIVE", severity: "HIGH", message: `Scenario not measured: ${reasons.join(" | ")}` });
     };
 
+    if (input.attacker && attackerNotApplied(scenario) === null) {
+      scenarioResults.push({ ...row, ...await runAdaptiveEffectRow({ scenario, context, responder, at: { packId: pack.id, scenarioId: scenario.id },
+        rows: { ledger, sessionId, runtime, trustTier, agentId }, agentId, admitReceipts: input.admitReceipts, attacker: input.attacker, promptEventId }) });
+      continue;
+    }
     if (scenario.effect) {
       scenarioResults.push(await executeEffectScenario(input, scenario, responder, row, promptEventId, runtime));
       continue;

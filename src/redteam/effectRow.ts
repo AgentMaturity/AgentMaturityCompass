@@ -5,20 +5,43 @@
  */
 import type { AgentResponder, AgentResponse } from "../assurance/agentResponder.js";
 import { runEffectScenario } from "../assurance/effectGrading.js";
-import { writeAssuranceAudit, writeScenarioPrompt, writeScenarioResponse, writeScenarioTestResult } from "../assurance/evidenceWriters.js";
+import { writeAssuranceAudit, writeScenarioPrompt, writeScenarioResponse, writeScenarioTestResult, type AssuranceEvidenceSource } from "../assurance/evidenceWriters.js";
 import type { GatewayReceiptAdmission } from "../assurance/gatewayReceiptAdmission.js";
 import type { AssurancePromptContext, AssuranceScenarioDefinition } from "../assurance/validators.js";
 import type { Ledger } from "../ledger/ledger.js";
-import type { AssuranceScenarioResult, TrustTier } from "../types.js";
+import type { AssuranceScenarioResult, RuntimeName, TrustTier } from "../types.js";
 import type { RedTeamStrategy } from "./strategies.js";
 
 /** Where a red-team run writes its rows (null when it records nothing). */
 export interface RedTeamRows { ledger: Ledger; sessionId: string; runtime: "any"; trustTier: TrustTier; agentId: string; source: "redteam" }
+/** Where any scenario run writes its rows: a red-team run, or an assurance run (sandbox runtime, no source tag). */
+export interface EvidenceRows { ledger: Ledger; sessionId: string; runtime: RuntimeName; trustTier: TrustTier; agentId: string; source?: AssuranceEvidenceSource }
 
 /** Writes an ASSURANCE_RECEIPT_REJECTED audit event when the reply's gateway receipt was refused. */
-export function auditRejectedReceipt(rows: RedTeamRows | null, at: { packId: string; scenarioId: string }, receipt: GatewayReceiptAdmission): void {
+export function auditRejectedReceipt(rows: EvidenceRows | null, at: { packId: string; scenarioId: string }, receipt: GatewayReceiptAdmission): void {
   if (rows === null || receipt.rejected.length === 0) return;
   writeAssuranceAudit({ ...rows, ...at, auditType: "ASSURANCE_RECEIPT_REJECTED", severity: "HIGH", message: `Gateway receipt rejected: ${receipt.rejected.join(" | ")}` });
+}
+
+/** Records each exchange of an effect run (rejected receipts audited, verified request ids kept) into the given rows. */
+export function effectRecorder(rows: EvidenceRows | null, at: { packId: string; scenarioId: string }, agentId: string,
+  admitReceipts: (answer: AgentResponse, agentId: string) => GatewayReceiptAdmission) {
+  const exchanges: string[] = [], correlatedRequestIds: string[] = [];
+  const record = (prompt: string, answer: AgentResponse) => {
+    const receipt = admitReceipts(answer, agentId);
+    auditRejectedReceipt(rows, at, receipt);
+    if (receipt.request !== null) correlatedRequestIds.push(receipt.request.receiptId);
+    if (rows !== null) exchanges.push(writeScenarioPrompt({ ...rows, ...at, prompt }),
+      writeScenarioResponse({ ...rows, ...at, response: answer.text, toolCalls: answer.toolCalls, gatewayReceipt: receipt }));
+  };
+  return { record, exchanges, correlatedRequestIds };
+}
+
+/** Writes a graded effect row's audit events; a succeeded attack is critical. */
+export function writeEffectAudits(rows: EvidenceRows | null, at: { packId: string; scenarioId: string }, auditTypes: readonly string[], message: (auditType: string) => string): void {
+  for (const auditType of rows === null ? [] : auditTypes) {
+    writeAssuranceAudit({ ...rows!, ...at, auditType, severity: auditType.endsWith("_SUCCEEDED") ? "CRITICAL" : "HIGH", message: message(auditType) });
+  }
 }
 
 /** Why a strategy is not applied to a scenario, or null when it is. */
@@ -36,14 +59,7 @@ export async function runEffectRedTeamRow(params: { scenario: AssuranceScenarioD
   responder: AgentResponder; rows: RedTeamRows | null; at: { packId: string; scenarioId: string }; promptEventId: string | null; agentId: string;
   admitReceipts: (answer: AgentResponse, agentId: string) => GatewayReceiptAdmission }): Promise<EffectRowResult> {
   const { rows, at } = params;
-  const exchanges: string[] = [], correlatedRequestIds: string[] = [];
-  const record = (prompt: string, answer: AgentResponse) => {
-    const receipt = params.admitReceipts(answer, params.agentId);
-    auditRejectedReceipt(rows, at, receipt);
-    if (receipt.request !== null) correlatedRequestIds.push(receipt.request.receiptId);
-    if (rows !== null) exchanges.push(writeScenarioPrompt({ ...rows, ...at, prompt }),
-      writeScenarioResponse({ ...rows, ...at, response: answer.text, toolCalls: answer.toolCalls, gatewayReceipt: receipt }));
-  };
+  const { record, exchanges, correlatedRequestIds } = effectRecorder(rows, at, params.agentId, params.admitReceipts);
   const attempts = 1;
   const run = await runEffectScenario(params.scenario.effect!, params.context, params.responder,
     { attempts, transform: params.strat.transform, warmUp: params.strat.warmUp, record });
@@ -60,10 +76,7 @@ export async function runEffectRedTeamRow(params: { scenario: AssuranceScenarioD
   }
   const { pass, reasons, auditTypes, score0to100, score0to5 } = outcome;
   const test = rows === null ? [] : [writeScenarioTestResult({ ...rows, ...at, score0to100, pass, reasons, correlatedRequestIds })];
-  for (const auditType of rows === null ? [] : auditTypes) {
-    writeAssuranceAudit({ ...rows!, ...at, auditType, severity: auditType.endsWith("_SUCCEEDED") ? "CRITICAL" : "HIGH",
-      message: pass ? `${auditType} observed during red-team execution.` : reasons.join(" | ") });
-  }
+  writeEffectAudits(rows, at, auditTypes, (auditType) => pass ? `${auditType} observed during red-team execution.` : reasons.join(" | "));
   return { response, pass, score0to5, score0to100, reasons, auditEventTypes: auditTypes, gradingMethod: "structured", effect,
     responseTransport: params.responder.target.transport, evidenceEventIds: ids(test), correlatedRequestIds };
 }

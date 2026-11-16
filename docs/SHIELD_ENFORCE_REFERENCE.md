@@ -99,6 +99,42 @@ amc assurance run --scope workspace --all
 runs the ordinary-task twin, so a run makes about twice as many requests as tries. `amc assurance list` shows every
 pack id.
 
+#### An attacker model that adapts (off by default)
+`amc assurance run` and `amc redteam run` take `--attacker-model <provider:model>` (`openai:<model>` or
+`anthropic:<model>`, with `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` set). It is a test of your own agent on AMC's
+made-up fixtures: the fixture tools are never run and the secret is made up.
+
+```bash
+amc redteam run my-agent --plugins injection --attacker-model anthropic:<model>
+amc assurance run --agent my-agent --pack exfiltrationChannels --attacker-model openai:<model> --attacker-rounds 5
+```
+
+- What leaves your machine: for each scenario, AMC sends the named model the scenario's goal, where the attack text
+  sits, and what your agent replied and which tool calls it asked for. Nothing goes to anyone else.
+- Round 1 is the pack's own attack text. From round 2 the attacker model writes new text for the same place, after
+  reading what your agent did. Each round is graded the same way as any effect-graded scenario: one try with its
+  ordinary-task twin, on a fresh fixture.
+- Limits: `--attacker-rounds` (rounds per scenario, default 10), `--attacker-max-tokens` (default 50000 for the whole
+  run) and `--attacker-max-cost` (US dollars, default 1, from AMC's price list). The run stops at whichever comes
+  first and says which one stopped it. Before each attacker call AMC works out the most that call could use (the
+  length of what it sends plus the longest reply it allows) and does not make the call if that would pass either
+  limit. Long agent replies and tool-call lists from earlier rounds are cut to 2000 characters in what the attacker
+  sees. If AMC has no price for the model, the cost is shown as not known and the run is bounded by rounds and tokens
+  only; `--attacker-max-cost` is then refused. If a call's cost cannot be counted for a model AMC has a price for,
+  the run stops there.
+- The result names the attacker model and the budget and gives two counts: on how many scenarios the attack worked
+  in the first round, and on how many within the round limit. A round that could not be evaluated counts as not
+  passed. A scenario whose search stopped early (an attacker model error, or the token or cost limit) before using
+  its rounds is not evaluated and counts as not passed; the report says what stopped it. A scenario the attacker did not break is not proof that the agent resists attacks; a stronger attacker or
+  a larger budget may do better. A run against a stand-in or test model shows nothing about a real agent.
+- Scenarios with no single place for attack text (for example the MCP tool-poisoning pack) run as before and the
+  report says the attacker model was not used on them.
+- Every round is recorded in the run's ledger session: the attack text, both exchanges, and any rejected gateway
+  receipt.
+
+`amc redteam run --corpus <file>` also runs injections from a public attack corpus you downloaded. See
+[docs/assurance/PUBLIC_CORPORA.md](assurance/PUBLIC_CORPORA.md) for the file format and the corpora that were checked.
+
 ### `amc assurance runs`
 List past assurance runs.
 ```bash

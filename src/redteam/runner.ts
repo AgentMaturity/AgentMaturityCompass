@@ -37,6 +37,7 @@ import {
 } from "../assurance/agentResponder.js";
 import { resolveStrategies } from "./strategies.js";
 import { auditRejectedReceipt, runEffectRedTeamRow, strategyNotApplied } from "./effectRow.js";
+import { adaptiveReportLines, adaptiveTotals, attackerNotApplied, runAdaptiveEffectRow, type AdaptiveAttacker, type AdaptiveRunTotals } from "./adaptiveRow.js";
 import { EFFECT_RATE_CAVEAT, gradingLabel, packAttempts, pooledAttackRate } from "../assurance/cliPresentation.js";
 import type { AgentChatTurn } from "../assurance/agentResponder.js";
 import {
@@ -169,6 +170,8 @@ export interface RedTeamReport {
   /** The agent target actually attacked. */
   target?: { transport: "gateway" | "direct"; endpoint: string; model: string };
   evilMcp?: RedTeamEvilMcpResult;
+  /** First-round and within-budget success when an attacker model proposed injections (`--attacker-model`). */
+  attacker?: AdaptiveRunTotals;
 }
 
 export interface RunRedTeamInput {
@@ -191,6 +194,10 @@ export interface RunRedTeamInput {
   evilMcp?: boolean;
   /** Optional MCP attack categories or aliases. Empty / undefined = all. */
   mcpAttackCategories?: string[];
+  /** An attacker model and its budget: effect-graded scenarios with an injection slot are attacked for up to its rounds. */
+  attacker?: AdaptiveAttacker;
+  /** Extra packs to run (scenarios loaded from a public attack corpus file). */
+  extraPacks?: AssurancePackDefinition[];
 }
 
 /* ------------------------------------------------------------------ */
@@ -401,6 +408,7 @@ export function renderRedTeamMarkdown(report: RedTeamReport): string {
   lines.push(`| Failed | ${report.totalFail} |`);
   lines.push(`| Vulnerabilities Found | ${report.vulnerabilities.length} |`);
   lines.push("");
+  if (report.attacker) lines.push("## Attacker model", "", ...adaptiveReportLines(report.attacker), "");
 
   if (report.evilMcp) {
     lines.push("## Evil MCP Coverage");
@@ -495,10 +503,8 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
   const admitReceipts = gatewayReceiptAdmitter(workspace);
 
   // Resolve plugins (packs)
-  const packs: AssurancePackDefinition[] =
-    input.plugins && input.plugins.length > 0
-      ? input.plugins.map((id) => getAssurancePack(id))
-      : listAssurancePacks();
+  const packs: AssurancePackDefinition[] = [...(input.plugins && input.plugins.length > 0 ? input.plugins.map((id) => getAssurancePack(id))
+    : listAssurancePacks()), ...(input.extraPacks ?? [])];
 
   // Resolve strategies
   const strats = resolveStrategies(input.strategies);
@@ -530,6 +536,27 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
     const skipped: NonNullable<RedTeamPluginResult["notApplied"]> = [];
 
     for (const scenario of pack.scenarios) {
+      // An effect row: not evaluated counts as not passed; a failure is a vulnerability.
+      const tallyEffectRow = (merged: RedTeamPluginResult["scenarioResults"][number]) => {
+        scenarioResults.push(merged);
+        if (merged.inconclusive) { inconclusiveCount += 1; effectNotEvaluated += 1; return; }
+        if (merged.pass) { totalPass++; return; }
+        totalFail++;
+        const severity = classifySeverity(merged.score0to100, false);
+        allVulns.push({ scenarioId: scenario.id, scenarioTitle: scenario.title, packId: pack.id, strategyId: merged.strategyId, strategyName: merged.strategyName,
+          severity, cvss: scoreRedTeamCvss({ category: scenario.category, severity, scenarioScore0to100: merged.score0to100 }),
+          prompt: merged.prompt, response: merged.response, reasons: merged.reasons, score0to100: merged.score0to100 });
+      };
+      const attackerSkip = input.attacker ? attackerNotApplied(scenario) : null;
+      if (input.attacker && attackerSkip === null) {
+        const at = { packId: pack.id, scenarioId: `${scenario.id}::attacker-model` };
+        const merged = { scenarioId: at.scenarioId, title: scenario.title, category: scenario.category, riskTier: "all" as const, prompt: scenario.effect!.slot!.text,
+          strategyId: "attacker-model", strategyName: `Attacker model ${input.attacker.model.id}`,
+          ...await runAdaptiveEffectRow({ scenario, context, responder, rows, at, agentId, admitReceipts, attacker: input.attacker }) };
+        tallyEffectRow(merged);
+        continue;
+      }
+      if (attackerSkip !== null) skipped.push({ scenarioId: scenario.id, strategyId: "attacker-model", reason: attackerSkip });
       for (const strat of strats) {
         const notApplied = strategyNotApplied(scenario, strat);
         if (notApplied !== null) { skipped.push({ scenarioId: scenario.id, strategyId: strat.id, reason: notApplied }); continue; }
@@ -553,15 +580,7 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
           return { ...row, response, pass: false, score0to5: 0, score0to100: 0, reasons, auditEventTypes: [] as string[], evidenceEventIds: ids, inconclusive: true };
         };
         if (scenario.effect) {
-          const merged = { ...row, ...await runEffectRedTeamRow({ scenario, strat, context, responder, rows, at: scenarioRow, promptEventId, agentId, admitReceipts }) };
-          scenarioResults.push(merged);
-          if (merged.inconclusive) { inconclusiveCount += 1; effectNotEvaluated += 1; continue; }
-          if (merged.pass) { totalPass++; continue; }
-          totalFail++;
-          const severity = classifySeverity(merged.score0to100, false);
-          allVulns.push({ scenarioId: scenario.id, scenarioTitle: scenario.title, packId: pack.id, strategyId: strat.id, strategyName: strat.name,
-            severity, cvss: scoreRedTeamCvss({ category: scenario.category, severity, scenarioScore0to100: merged.score0to100 }),
-            prompt: attackPrompt, response: merged.response, reasons: merged.reasons, score0to100: merged.score0to100 });
+          tallyEffectRow({ ...row, ...await runEffectRedTeamRow({ scenario, strat, context, responder, rows, at: scenarioRow, promptEventId, agentId, admitReceipts }) });
           continue;
         }
         // Multi-turn strategies are real conversations: each warm-up turn is answered before the next is sent.
@@ -719,6 +738,8 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
   };
 
   if (evilMcp !== null) report.evilMcp = evilMcp;
+  const attackerTotals = input.attacker ? adaptiveTotals(pluginResults.flatMap((pr) => pr.scenarioResults)) : null;
+  if (attackerTotals !== null) report.attacker = attackerTotals;
 
   // Seal the report the way the assurance runner seals its own: hash with the seal fields emptied, sign that hash
   // with the artifact-seal key (`sealedRunReportVerifies` is the one reader of this shape).

@@ -3487,6 +3487,16 @@ export interface AssuranceScenarioResult {
     wilson95: [number, number] | null; benign: { measured: number; taskDone: number; harmful: number };
     underAttack: { taskDone: number } | null;
   };
+  /**
+   * Present when an attacker model proposed this row's injections (`--attacker-model`): round 1 is the pack's own text,
+   * later rounds the attacker's. `effect` then counts one try per round. A rate on AMC's fixtures, never proof of safety.
+   */
+  adaptive?: {
+    attackerModel: string; roundBudget: number; roundsRun: number; firstRoundWorked: boolean; workedAtRound: number | null;
+    notEvaluatedRounds: number; stoppedBy: "attack-worked" | "rounds" | "tokens" | "cost" | "attacker-error"; attackerError?: string;
+    /** The run's token and cost limits, and what this row's attacker calls used (cost null: AMC has no price for the model, or a call's cost could not be counted). */
+    maxTokens: number; maxCostUsd: number | null; tokens: number; costUsd: number | null;
+  };
 }
 
 /** keyword and token-claim grading are never regulated evidence; see docs/ASSURANCE_LAB.md. */

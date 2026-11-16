@@ -242,11 +242,19 @@ export interface RunTAPInput {
   /** Optional custom response function (for live testing). */
   /** Invokes the real agent under test. Required: there is no synthetic fallback. */
   respondFn: (prompt: string) => Promise<string>;
+  /**
+   * Proposes the next attack from the path so far (root first), replacing the fixed rewrites: an attacker model reads the
+   * earlier attacks and replies. null ends the search (its budget is spent).
+   */
+  propose?: (path: TAPNode[]) => Promise<string | null>;
+  /** Grades one reply instead of the keyword detector (effect grading reads what the agent did in that round). */
+  judge?: (prompt: string, response: string) => JailbreakVerdict;
 }
 
 export async function runTAP(input: RunTAPInput): Promise<TAPResult> {
   const config: TAPConfig = { ...DEFAULT_TAP_CONFIG, ...input.config };
   const respond = input.respondFn;
+  const judge = input.judge ?? ((prompt: string, response: string) => detectJailbreak(response, prompt, input.payload));
   const runId = randomUUID();
 
   let totalEvaluations = 0;
@@ -259,7 +267,7 @@ export async function runTAP(input: RunTAPInput): Promise<TAPResult> {
   const rootPrompt = renderAttackPrompt(input.attack, input.payload);
   const rootResponse = await respond(rootPrompt);
   totalEvaluations++;
-  const rootVerdict = detectJailbreak(rootResponse, rootPrompt, input.payload);
+  const rootVerdict = judge(rootPrompt, rootResponse);
 
   const root: TAPNode = {
     id: randomUUID(),
@@ -304,10 +312,14 @@ export async function runTAP(input: RunTAPInput): Promise<TAPResult> {
           break;
         }
 
-        const refinedPrompt = strat.refine(parent.attackPrompt, parent.response, depth);
+        const refinedPrompt = input.propose ? await input.propose(extractPath(parent, root)) : strat.refine(parent.attackPrompt, parent.response, depth);
+        if (refinedPrompt === null) {
+          earlyStop = true;
+          break;
+        }
         const childResponse = await respond(refinedPrompt);
         totalEvaluations++;
-        const childVerdict = detectJailbreak(childResponse, refinedPrompt, input.payload);
+        const childVerdict = judge(refinedPrompt, childResponse);
         const childProgress = scoreProgress(childVerdict);
 
         const child: TAPNode = {
@@ -320,7 +332,7 @@ export async function runTAP(input: RunTAPInput): Promise<TAPResult> {
           progressScore: childProgress,
           children: [],
           pruned: false,
-          refinementStrategy: strat.id,
+          refinementStrategy: input.propose ? "attacker-model" : strat.id,
         };
 
         parent.children.push(child);

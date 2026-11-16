@@ -1,4 +1,5 @@
 import { captureRunHashAuthority, runHashVerificationKeys, type RunHashPublicationOptions } from "../ledger/runHashSignature.js";
+import type { AdaptiveAttacker } from "../redteam/adaptiveRow.js";
 import { publishAssuranceReport } from "./runReportPublication.js";
 import { verifyHexDigestAny } from "../crypto/keys.js";
 import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
@@ -56,6 +57,8 @@ export interface RunAssuranceInput {
   executedAttempts?: 1 | 25;
   /** Tries per effect-graded scenario, each on a fresh fixture with its benign twin (1-25; default 5). */
   attempts?: number;
+  /** An attacker model and budget (`--attacker-model`): effect-graded scenarios with an injection slot are attacked in rounds. */
+  attacker?: AdaptiveAttacker;
   /** Five separate partial synthetic question aspects, selected explicitly. */
   stationQuestionIds?: string[];
   workspace: string;
@@ -297,7 +300,8 @@ export async function runAssurance(input: RunAssuranceInput, options: RunHashPub
     const admitReceipts = gatewayReceiptAdmitter(workspace);
     const executePack = (packId: string): Promise<AssurancePackResult> => executeAssurancePack({
       packId, ledger, sessionId, agentId, runId, trustTier, context, getResponder, getExecutedScope, getCatalog, admitReceipts,
-      executedAttempts: input.executedAttempts, attempts: input.attempts ?? DEFAULT_EFFECT_ATTEMPTS, now: new Date(now).toISOString(), mode: input.mode
+      executedAttempts: input.executedAttempts, attempts: input.attempts ?? DEFAULT_EFFECT_ATTEMPTS, now: new Date(now).toISOString(), mode: input.mode,
+      ...(input.attacker ? { attacker: input.attacker } : {})
     });
 
     // ── Execute packs (sequential or parallel — AMC-149) ─

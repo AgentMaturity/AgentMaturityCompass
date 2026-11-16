@@ -2248,6 +2248,10 @@ Run assurance pack(s) with deterministic validation
 | `--verbose` | - |
 | `--model <modelId>` | - |
 | `--no-sign` | - |
+| `--attacker-model <provider:model>` | - |
+| `--attacker-rounds <n>` | - |
+| `--attacker-max-tokens <n>` | - |
+| `--attacker-max-cost <usd>` | - |
 | `--attempts <n>` | - |
 | `--executed-attempts <1|25>` | - |
 | `--station-questions <ids>` | - |
@@ -8857,6 +8861,11 @@ Execute red-team plugins with chosen attack strategies and generate a vulnerabil
 | `--mcp-attacks <categories...>` | - |
 | `--model <modelId>` | - |
 | `--json` | - |
+| `--attacker-model <provider:model>` | - |
+| `--attacker-rounds <n>` | - |
+| `--attacker-max-tokens <n>` | - |
+| `--attacker-max-cost <usd>` | - |
+| `--corpus <file>` | - |
 
 #### `amc redteam strategies`
 

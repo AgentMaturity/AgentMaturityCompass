@@ -6,6 +6,7 @@ import { scenarioGradingMethod } from "./scenarioGrading.js";
 import { describeEffectSummary } from "./effectGrading.js";
 import { wilson95 } from "./judges/calibration.js";
 import { isEffectNotEvaluated } from "./scorers.js";
+import { adaptiveReportLines, adaptiveTotals, describeAdaptive } from "../redteam/adaptiveRow.js";
 
 type Outcome = "PASS" | "FAIL" | "NOT EVALUATED";
 
@@ -29,16 +30,18 @@ export function gradingLabel(method: AssuranceGradingMethod | undefined, attempt
 }
 /** How one row was graded: the effect summary for a measured effect row, otherwise the method and tries. */
 export function howGraded(row: AssuranceScenarioResult): string {
+  if (row.adaptive && row.inconclusive !== true) return describeAdaptive(row.adaptive);
   if (row.effect && row.inconclusive !== true) return describeEffectSummary(row.effect);
   return gradingLabel(row.effect ? "structured" : row.gradingMethod, row.effect?.attempts ?? 1);
 }
 export function packAttempts(pack: Pick<AssurancePackResult, "scenarioResults">): number | null {
-  return pack.scenarioResults.find((row) => row.effect)?.effect?.attempts ?? null;
+  return pack.scenarioResults.find((row) => row.effect && !row.adaptive)?.effect?.attempts ?? null;
 }
 /** Attack tries pooled over a pack's effect-graded scenarios, with a Wilson interval; null when none were measured. */
 export function pooledAttackRate(pack: Pick<AssurancePackResult, "scenarioResults">): string | null {
-  // A row that was not evaluated adds no tries to the rate; it is named after the rate and scored as not passed.
-  const rows = pack.scenarioResults.flatMap((row) => (row.effect && row.inconclusive !== true ? [row.effect] : []));
+  // A row that was not evaluated adds no tries to the rate; it is named after the rate and scored as not passed. Attacker
+  // rounds stop at the first success, so they are reported as first-round and within-budget counts, never pooled here.
+  const rows = pack.scenarioResults.flatMap((row) => (row.effect && !row.adaptive && row.inconclusive !== true ? [row.effect] : []));
   const measured = rows.reduce((sum, row) => sum + row.measured, 0);
   if (measured === 0) return null;
   const worked = rows.reduce((sum, row) => sum + row.attackSuccesses, 0);
@@ -105,7 +108,9 @@ export function renderAssuranceTotalLine(packs: readonly AssurancePackResult[]):
   const passed = packs.reduce((sum, pack) => sum + pack.passCount, 0);
   const failed = packs.reduce((sum, pack) => sum + pack.failCount, 0);
   const missing = packs.reduce((sum, pack) => sum + notEvaluatedCount(pack), 0);
-  const caveat = packs.some((pack) => pack.scenarioResults.some((row) => row.effect)) ? `\n  ${EFFECT_RATE_CAVEAT}` : "";
+  const attacker = adaptiveTotals(packs.flatMap((pack) => pack.scenarioResults));
+  const caveat = (packs.some((pack) => pack.scenarioResults.some((row) => row.effect)) ? `\n  ${EFFECT_RATE_CAVEAT}` : "") +
+    (attacker ? adaptiveReportLines(attacker).map((line) => `\n  ${line}`).join("") : "");
   return chalk.gray(`  Total: ${total} scenarios — ${chalk.green(String(passed))} passed, ${chalk.red(String(failed))} failed${missing ? `, ${chalk.yellow(String(missing))} not evaluated` : ""}${caveat}`);
 }
 
