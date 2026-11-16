@@ -11450,7 +11450,7 @@ export interface StudioRuntimeConfig {
 
 ## Assurance Packs
 
-This table lists <!-- amc:count:assurancePackFiles -->150<!-- /amc:count --> assurance pack source files in `src/assurance/packs/`. Registered packs (returned by `listAssurancePacks()`) can differ in number; the README states the registered count.
+This table lists <!-- amc:count:assurancePackFiles -->156<!-- /amc:count --> assurance pack source files in `src/assurance/packs/`. Registered packs (returned by `listAssurancePacks()`) can differ in number; the README states the registered count.
 
 | # | Pack ID | Name | Category | Assertions |
 |---|---------|------|----------|------------|

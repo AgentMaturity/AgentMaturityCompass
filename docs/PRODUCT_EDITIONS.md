@@ -14,7 +14,7 @@ Industry Packs are free in the current source build (unreleased; the next releas
 | Product | Free / Open Source | Enterprise (contact-first, planned) |
 |---|---|---|
 | **Score** | ✅ Full | ✅ Full |
-| **Shield** (<!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs) | ✅ Full | ✅ Full |
+| **Shield** (<!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> registered assurance packs) | ✅ Full | ✅ Full |
 | **Enforce** | ✅ Full | ✅ Full |
 | **Vault** | ✅ Full | ✅ Full |
 | **Watch** | ✅ Full | ✅ Full |

@@ -11,7 +11,7 @@ Industry Packs are self-reported questionnaires whose content is experimental: A
 Everything:
 
 - **Score** — full evidence-weighted trust scoring, gap analysis, maturity diagnostics
-- **Shield** — all <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered adversarial assurance packs
+- **Shield** — all <!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> registered adversarial assurance packs
 - **Enforce** — policy controls, approval workflows, scoped actions, governance
 - **Vault** — Ed25519 signatures, Merkle chains, tamper-evident proof infrastructure
 - **Watch** — traces, anomalies, timelines, monitoring, operational drift detection

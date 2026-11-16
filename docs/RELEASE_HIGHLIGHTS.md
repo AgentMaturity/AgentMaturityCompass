@@ -19,7 +19,7 @@ This page exists to show momentum without making users read the entire changelog
 - <!-- amc:count:cliCommandPaths -->1,302<!-- /amc:count --> generated CLI command paths in the public command inventory
 - Domain Proof Lane with `amc proof check`, `amcproof` artifacts, and fail-closed correctness status
 - Watch/Fleet evidence upgrades: session correlation, risk/cost/latency SLOs, incident-to-regression closure, fleet overview, and trust graph export
-- <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs, <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, 41 Industry Packs, API/OpenAPI docs, and Studio/browser/docs paths refreshed around the same eight AMC surfaces
+- <!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> registered assurance packs, <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, 41 Industry Packs, API/OpenAPI docs, and Studio/browser/docs paths refreshed around the same eight AMC surfaces
 
 ## Good future format
 For each release/month:

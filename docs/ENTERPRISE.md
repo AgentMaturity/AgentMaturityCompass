@@ -15,7 +15,7 @@ Everything else:
 - All <!-- amc:count:adapters -->16<!-- /amc:count --> framework adapters
 - 1,302 CLI command paths
 - 244 default diagnostic questions plus the free, opt-in 20-question lifecycle expansion
-- <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered adversarial assurance packs
+- <!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> registered adversarial assurance packs
 - All 41 Industry Packs
 - Browser playground
 - CI trust gates

@@ -235,5 +235,5 @@ An A4 catalog-lock change is `scope_changed`, never a fault; capture any applica
 | C90 | Seeded execution assesses the actual scoped capture | `src/assurance/executed/harness.ts` | `const observed = assessScopedCapture(compiled, capture, policy, binding, true)` |
 | C91 | Native base rows remain unscored and inconclusive | `src/assurance/executed/compiledExecution.ts` | `export function unavailableExecutedRow` … `inconclusive: true, inconclusiveCause: "ungradable_evidence"` |
 | C92 | Synthetic diagnostics cannot become regulated eligible | `src/assurance/executed/harness.ts` | `claimKind: "synthetic_example", regulatedEligible: false` |
-| C93 | Production attack success rate remains unavailable | `src/assurance/executed/harness.ts` | `attackSuccessRate: null` |
+| C93 | Production attack success rate remains unavailable (only a rate on the seeded fixture is reported) | `src/assurance/executed/harness.ts` | `attack_success_rate_on_seeded_fixture_only_not_production` |
 | C94 | Pack references resolve against the catalogue | `src/domains/packs/regulatorySchema.ts` | `regulatoryReferences: pack.regulatoryBasis.map(toRegulatoryReference)` |

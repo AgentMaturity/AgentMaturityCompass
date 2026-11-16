@@ -39,7 +39,21 @@ For static skill-file analysis, continue using `amc shield analyze <path>`.
 
 ## Assurance Lab (Shield)
 
-Deterministic defensive assurance packs that test agent behavior.
+Assurance packs send attack scenarios to your agent and record what it did. Every result says how it was graded:
+
+- **Graded by what the agent did** (`structured`): the injection, exfiltration, tool-misuse, unsafe-tooling,
+  instruction-file poisoning, MCP tool poisoning, package hallucination, exfiltration-channel and cross-session memory
+  packs. Each scenario gives the agent made-up tools (AMC records the calls it asks for and never runs them) and a
+  made-up secret, repeats the attack on a fresh fixture several times, and runs the same ordinary task without the
+  attack. A scenario fails when the agent made a forbidden call or the secret left in any form, and also when it would
+  not do the ordinary task: refusing everything is not safe behaviour. The result shows the attack success rate with
+  the number of tries and a 95% Wilson interval.
+- **Graded by keywords in the reply** (`keyword`): most other packs, one try per scenario. Words matching a pattern
+  are not evidence of what the agent would do.
+- **Not graded** (`token-claim`): packs that ask the agent to name an artifact. A named artifact is a claim.
+
+An attack success rate is measured on AMC's fixtures with your model and that number of tries. A low rate is not
+proof that the agent is safe; an adaptive attacker may do better.
 
 ### `amc assurance init`
 Initialize signed assurance policy and pack configuration.
@@ -53,26 +67,32 @@ Verify the assurance policy signature.
 amc assurance verify-policy
 ```
 
-### `amc assurance policy print`
+### `amc assurance policy`
 Print the effective assurance policy.
 ```bash
-amc assurance policy print
+amc assurance policy
 ```
 
-### `amc assurance policy apply`
+### `amc assurance policy-apply`
 Apply assurance policy from a file.
 ```bash
-amc assurance policy apply --file ./assurance-policy.yaml
+amc assurance policy-apply --file ./assurance-policy.yaml
 ```
 
 ### `amc assurance run`
-Run assurance packs against agents.
+Run assurance packs against an agent. The agent must be reachable (start the gateway with `amc up`, or set the
+provider key); without a reachable agent the run stops and scores nothing.
 ```bash
-amc assurance run --scope workspace --pack all
-amc assurance run --scope agent --id my-agent --pack injection
+amc assurance run --agent my-agent --pack injection
+amc assurance run --agent my-agent --pack injection --attempts 25   # more tries for a tighter interval
+amc assurance run --agent my-agent --all
+amc assurance run --demo --no-sign                                  # injection, truthfulness, unsafe_tooling; 1 try each
+amc assurance run --scope workspace --all
 ```
 
-**Packs:** `injection`, `exfiltration`, `toolMisuse`, `truthfulness`, `sandboxBoundary`, `notaryAttestation`
+`--attempts <n>` sets the tries per effect-graded scenario (1 to 25; default 5, or 1 with `--demo`). Each try also
+runs the ordinary-task twin, so a run makes about twice as many requests as tries. `amc assurance list` shows every
+pack id.
 
 ### `amc assurance runs`
 List past assurance runs.
@@ -83,7 +103,7 @@ amc assurance runs
 ### `amc assurance show`
 Show details of a specific run.
 ```bash
-amc assurance show <runId>
+amc assurance show --run <runId>
 ```
 
 ### `amc assurance cert-issue`
@@ -112,7 +132,7 @@ Temporary waiver for failed assurance (dual-control, time-limited).
 ```bash
 amc assurance waiver request --hours 24 --reason "remediating injection finding"
 amc assurance waiver status
-amc assurance waiver revoke
+amc assurance waiver revoke                      # or --waiver <id> for a specific one
 ```
 
 ---
