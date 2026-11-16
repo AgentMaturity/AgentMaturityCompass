@@ -9,13 +9,13 @@
  */
 import type { AgentResponder, AgentResponse } from "../assurance/agentResponder.js";
 import { effectScore, runEffectScenario, type EffectRunSummary } from "../assurance/effectGrading.js";
-import { writeAssuranceAudit, writeScenarioPrompt, writeScenarioResponse, writeScenarioTestResult } from "../assurance/evidenceWriters.js";
+import { writeAssuranceAudit, writeScenarioTestResult } from "../assurance/evidenceWriters.js";
 import type { GatewayReceiptAdmission } from "../assurance/gatewayReceiptAdmission.js";
 import { wilson95 } from "../assurance/judges/calibration.js";
 import type { AssurancePromptContext, AssuranceScenarioDefinition } from "../assurance/validators.js";
 import type { AssuranceScenarioResult } from "../types.js";
 import type { AttackerModel, AttackerRound, AttackerSpend, AttackerStop } from "./attackerModel.js";
-import { auditRejectedReceipt, type EvidenceRows } from "./effectRow.js";
+import { effectRecorder, writeEffectAudits, type EvidenceRows } from "./effectRow.js";
 import { runTAP } from "./jailbreak/tap.js";
 import { escapeTerminalControls } from "../tools/builtin/askUserTool.js";
 
@@ -56,16 +56,10 @@ export async function runAdaptiveEffectRow(params: { scenario: AssuranceScenario
   const { scenario, rows, at, attacker } = params;
   const spec = scenario.effect!, slot = spec.slot!;
   const roundBudget = attacker.spend.budget.rounds;
-  const exchanges: string[] = [], correlatedRequestIds: string[] = [], results: Round[] = [], seen: AttackerRound[] = [];
+  const { record, exchanges, correlatedRequestIds } = effectRecorder(rows, at, params.agentId, params.admitReceipts);
+  const results: Round[] = [], seen: AttackerRound[] = [];
   let stop: AttackerStop | null = null, attackerError: string | undefined;
   const before = { tokens: attacker.spend.tokens, costUsd: attacker.spend.costUsd };
-  const record = (prompt: string, answer: AgentResponse) => {
-    const receipt = params.admitReceipts(answer, params.agentId);
-    auditRejectedReceipt(rows, at, receipt);
-    if (receipt.request !== null) correlatedRequestIds.push(receipt.request.receiptId);
-    if (rows !== null) exchanges.push(writeScenarioPrompt({ ...rows, ...at, prompt }),
-      writeScenarioResponse({ ...rows, ...at, response: answer.text, toolCalls: answer.toolCalls, gatewayReceipt: receipt }));
-  };
   const playRound = async (text: string): Promise<string> => {
     const by = results.length === 0 ? "the pack's own text" : `attacker model ${attacker.model.id}`;
     if (rows !== null) writeAssuranceAudit({ ...rows, ...at, auditType: "REDTEAM_ATTACKER_ROUND", severity: "LOW",
@@ -120,9 +114,7 @@ export async function runAdaptiveEffectRow(params: { scenario: AssuranceScenario
   const { score0to100, score0to5 } = effectScore(effect, pass);
   const auditTypes = ["EFFECT_GRADED_ATTACK_ATTEMPTED", ...(effect.attackSuccesses > 0 ? ["EFFECT_GRADED_ATTACK_SUCCEEDED"] : [])];
   const test = rows === null ? [] : [writeScenarioTestResult({ ...rows, ...at, score0to100, pass, reasons: [describeAdaptive(adaptive), ...reasons], correlatedRequestIds })];
-  for (const auditType of rows === null ? [] : auditTypes) {
-    writeAssuranceAudit({ ...rows!, ...at, auditType, severity: auditType.endsWith("_SUCCEEDED") ? "CRITICAL" : "HIGH", message: describeAdaptive(adaptive) });
-  }
+  writeEffectAudits(rows, at, auditTypes, () => describeAdaptive(adaptive));
   return { response, pass, score0to5, score0to100, reasons, auditEventTypes: auditTypes, gradingMethod: "structured", effect, adaptive,
     responseTransport: params.responder.target.transport, evidenceEventIds: ids(test), correlatedRequestIds };
 }

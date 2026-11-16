@@ -23,6 +23,27 @@ export function auditRejectedReceipt(rows: EvidenceRows | null, at: { packId: st
   writeAssuranceAudit({ ...rows, ...at, auditType: "ASSURANCE_RECEIPT_REJECTED", severity: "HIGH", message: `Gateway receipt rejected: ${receipt.rejected.join(" | ")}` });
 }
 
+/** Records each exchange of an effect run (rejected receipts audited, verified request ids kept) into the given rows. */
+export function effectRecorder(rows: EvidenceRows | null, at: { packId: string; scenarioId: string }, agentId: string,
+  admitReceipts: (answer: AgentResponse, agentId: string) => GatewayReceiptAdmission) {
+  const exchanges: string[] = [], correlatedRequestIds: string[] = [];
+  const record = (prompt: string, answer: AgentResponse) => {
+    const receipt = admitReceipts(answer, agentId);
+    auditRejectedReceipt(rows, at, receipt);
+    if (receipt.request !== null) correlatedRequestIds.push(receipt.request.receiptId);
+    if (rows !== null) exchanges.push(writeScenarioPrompt({ ...rows, ...at, prompt }),
+      writeScenarioResponse({ ...rows, ...at, response: answer.text, toolCalls: answer.toolCalls, gatewayReceipt: receipt }));
+  };
+  return { record, exchanges, correlatedRequestIds };
+}
+
+/** Writes a graded effect row's audit events; a succeeded attack is critical. */
+export function writeEffectAudits(rows: EvidenceRows | null, at: { packId: string; scenarioId: string }, auditTypes: readonly string[], message: (auditType: string) => string): void {
+  for (const auditType of rows === null ? [] : auditTypes) {
+    writeAssuranceAudit({ ...rows!, ...at, auditType, severity: auditType.endsWith("_SUCCEEDED") ? "CRITICAL" : "HIGH", message: message(auditType) });
+  }
+}
+
 /** Why a strategy is not applied to a scenario, or null when it is. */
 export function strategyNotApplied(scenario: AssuranceScenarioDefinition, strat: RedTeamStrategy): string | null {
   return scenario.effect?.taskInAttack === true && strat.id !== "direct"
@@ -38,14 +59,7 @@ export async function runEffectRedTeamRow(params: { scenario: AssuranceScenarioD
   responder: AgentResponder; rows: RedTeamRows | null; at: { packId: string; scenarioId: string }; promptEventId: string | null; agentId: string;
   admitReceipts: (answer: AgentResponse, agentId: string) => GatewayReceiptAdmission }): Promise<EffectRowResult> {
   const { rows, at } = params;
-  const exchanges: string[] = [], correlatedRequestIds: string[] = [];
-  const record = (prompt: string, answer: AgentResponse) => {
-    const receipt = params.admitReceipts(answer, params.agentId);
-    auditRejectedReceipt(rows, at, receipt);
-    if (receipt.request !== null) correlatedRequestIds.push(receipt.request.receiptId);
-    if (rows !== null) exchanges.push(writeScenarioPrompt({ ...rows, ...at, prompt }),
-      writeScenarioResponse({ ...rows, ...at, response: answer.text, toolCalls: answer.toolCalls, gatewayReceipt: receipt }));
-  };
+  const { record, exchanges, correlatedRequestIds } = effectRecorder(rows, at, params.agentId, params.admitReceipts);
   const attempts = 1;
   const run = await runEffectScenario(params.scenario.effect!, params.context, params.responder,
     { attempts, transform: params.strat.transform, warmUp: params.strat.warmUp, record });
@@ -62,10 +76,7 @@ export async function runEffectRedTeamRow(params: { scenario: AssuranceScenarioD
   }
   const { pass, reasons, auditTypes, score0to100, score0to5 } = outcome;
   const test = rows === null ? [] : [writeScenarioTestResult({ ...rows, ...at, score0to100, pass, reasons, correlatedRequestIds })];
-  for (const auditType of rows === null ? [] : auditTypes) {
-    writeAssuranceAudit({ ...rows!, ...at, auditType, severity: auditType.endsWith("_SUCCEEDED") ? "CRITICAL" : "HIGH",
-      message: pass ? `${auditType} observed during red-team execution.` : reasons.join(" | ") });
-  }
+  writeEffectAudits(rows, at, auditTypes, (auditType) => pass ? `${auditType} observed during red-team execution.` : reasons.join(" | "));
   return { response, pass, score0to5, score0to100, reasons, auditEventTypes: auditTypes, gradingMethod: "structured", effect,
     responseTransport: params.responder.target.transport, evidenceEventIds: ids(test), correlatedRequestIds };
 }
