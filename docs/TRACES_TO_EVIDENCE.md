@@ -2,7 +2,7 @@
 
 You already have agent traces — chat transcripts, JSON logs, observability exports. This guide turns them into AMC evidence, honestly tiered.
 
-**The one thing to understand first:** AMC weighs evidence by how it was captured. Logs you hand it are `SELF_REPORTED` (0.4x weight — anyone can edit a log file). Runs AMC observes itself are `OBSERVED` (1.0x). Start with what you have; move to observed capture for scores you want to defend.
+**The one thing to understand first:** AMC labels evidence by how it was captured. Logs you hand it are `SELF_REPORTED` (anyone can edit a log file); they can support a question's level up to L1 at most. Runs AMC observes itself are `OBSERVED`, the only kind that can support L2 and above. Side scores such as confidence weigh evidence by the one table in `src/score/trustWeights.ts` (self-reported 0.4, observed 1.0); no weight is applied to a level. Start with what you have; move to observed capture for scores you want to defend.
 
 ## Path 1 — Ingest transcripts you already have (2 minutes, SELF_REPORTED)
 

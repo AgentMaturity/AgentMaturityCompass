@@ -1,3 +1,4 @@
+import { TRUST_WEIGHTS } from "../score/trustWeights.js";
 import { populationVariance } from "../experiments/stats.js";
 /**
  * Meta-Confidence / Confidence in Maturity Score
@@ -70,8 +71,8 @@ function computeTrustTierQuality(report: DiagnosticReport): number {
   if (!coverage) return 0.5;
   const total = coverage.observed + coverage.attested + coverage.selfReported;
   if (total === 0) return 0;
-  // Weighted: observed=1.0, attested=0.7, selfReported=0.3
-  return (coverage.observed * 1.0 + coverage.attested * 0.7 + coverage.selfReported * 0.3) / total;
+  // The one weight table (src/score/trustWeights.ts); a confidence side score, never a level.
+  return (coverage.observed * TRUST_WEIGHTS.OBSERVED + coverage.attested * TRUST_WEIGHTS.ATTESTED + coverage.selfReported * TRUST_WEIGHTS.SELF_REPORTED) / total;
 }
 
 function computeConsistency(

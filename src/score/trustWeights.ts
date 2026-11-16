@@ -1,15 +1,12 @@
 /**
- * Canonical evidence trust weights.
+ * The one evidence trust-weight table. Every module that weights evidence by trust tier imports it: evidence ingestion,
+ * the formal-spec and model-drift side scores, meta-confidence, claim citation quality and community signals.
  *
- * Three tables previously disagreed about the same concept: SELF_REPORTED was
- * 0.5 in score/evidenceIngestion but 0.4 in score/formalSpec and
- * score/modelDrift, so identical evidence scored differently depending on which
- * path happened to process it. The published methodology (README, whitepaper)
- * states 0.4, making the 0.5 the outlier.
- *
- * For a product whose central claim is that a score traces to weighted
- * evidence, the weights cannot be a per-module opinion. Every scorer imports
- * these.
+ * What these weights do, truthfully: they scale side scores (confidence, citation quality, drift, community signals).
+ * No trust weight is applied to a maturity level. A question's level is gated instead: only OBSERVED (and
+ * OBSERVED_HARDENED, which gates treat as OBSERVED) evidence can support L2 and above, and self-reported or attested
+ * evidence supports L1 at most (`amc methodology`, evidenceTrustTiers). Before 2026-11-16 claim confidence,
+ * community governance and meta-confidence kept their own tables with other numbers; they now read this one.
  */
 
 /** Uppercase tier names, as used in the ledger and diagnostic runner. */
