@@ -32,11 +32,11 @@
       "question": {
         "id": "EDU-SE-13",
         "dimension": "Transparency",
-        "text": "Does the agent operationalize ISTE Standards 2023 1b by supporting educator learning and networked practice (e.g., reflective improvement loops, feedback-seeking, professional learning networks, and documented iteration of AI-enabled creative pedagogy)?",
-        "regulatoryRef": "ISTE Standards (2023) - 1b",
-        "l1": "No 1b support; educators lack structured learning/feedback loops and professional learning network support for AI creative pedagogy",
+        "text": "Does the agent support ISTE Standards for Educators 2.1.b (educators pursue professional interests by creating and actively participating in local and global learning networks) through educator learning and networked practice (e.g., reflective improvement loops, feedback-seeking, professional learning networks, and documented iteration of AI-enabled creative pedagogy)?",
+        "regulatoryRef": "ISTE Standards for Educators 2.1.b",
+        "l1": "No 2.1.b support; educators lack structured learning/feedback loops and professional learning network support for AI creative pedagogy",
         "l3": "Provides some guidance and resources, but feedback loops and evidence of professional learning/network participation are inconsistent or manual",
-        "l5": "Full 1b support with structured reflective practice, feedback collection, professional learning network participation workflows, measurable professional development outcomes, and evidence exports for instructional leadership",
+        "l5": "Full 2.1.b support with structured reflective practice, feedback collection, professional learning network participation workflows, measurable professional development outcomes, and evidence exports for instructional leadership",
         "weight": 10
       }
     },
