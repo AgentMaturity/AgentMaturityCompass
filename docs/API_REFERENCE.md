@@ -538,13 +538,13 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 519 | `amc fleet slo list` | List fleet SLO definitions |
 | 520 | `amc fleet slo status` | Show fleet SLO compliance status |
 | 521 | `amc fleet status` | Show fleet overview (agent count, average score, health) |
-| 522 | `amc fleet tag` | Tag an agent with an environment |
+| 522 | `amc fleet tag` | Tag an agent with an environment or a named owner |
 | 523 | `amc fleet trust-add-edge` | Add a delegation edge (orchestrator → worker) |
 | 524 | `amc fleet trust-edges` | List all delegation edges |
 | 525 | `amc fleet trust-graph` | Render delegation trust graph as Mermaid, DOT, or JSON |
 | 526 | `amc fleet trust-init` | Initialize trust composition config |
 | 527 | `amc fleet trust-mode` | Set trust inheritance policy mode |
-| 528 | `amc fleet trust-receipts` | Verify cross-agent receipt chains |
+| 528 | `amc fleet trust-receipts` | Count time-window overlap across declared delegations (a heuristic: compares times, checks no signatures) |
 | 529 | `amc fleet trust-remove-edge` | Remove a delegation edge |
 | 530 | `amc fleet trust-report` | Generate trust composition report across fleet |
 | 531 | `amc forecast` | Deterministic evidence-gated forecasting and planning |
@@ -1771,6 +1771,16 @@ List advisories for scope
 |--------|-------------|
 | `--scope <scope>` | - |
 | `--id <targetId>` | - |
+
+#### `amc agent add`
+
+Interactively add an agent to the fleet
+
+
+| Option | Description |
+|--------|-------------|
+| `--from-observed <agentId>` | - |
+| `--owner <name>` | - |
 
 #### `amc agent diagnose`
 
@@ -5649,15 +5659,21 @@ Show fleet overview (agent count, average score, health)
 | Option | Description |
 |--------|-------------|
 | `--json` | - |
+| `--inventory` | - |
+| `--csv` | - |
+| `--window <window>` | - |
+| `--freeze <agentId>` | - |
+| `--reason <text>` | - |
 
 #### `amc fleet tag`
 
-Tag an agent with an environment
+Tag an agent with an environment or a named owner
 
 
 | Option | Description |
 |--------|-------------|
 | `--env <environment>` | - |
+| `--owner <name>` | - |
 
 #### `amc fleet trust-add-edge`
 
@@ -5694,7 +5710,7 @@ Set trust inheritance policy mode
 
 #### `amc fleet trust-receipts`
 
-Verify cross-agent receipt chains
+Count time-window overlap across declared delegations (a heuristic: compares times, checks no signatures)
 
 
 | Option | Description |

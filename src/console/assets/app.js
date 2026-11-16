@@ -3,6 +3,7 @@ import { plainErrorText } from "./plainError.js";
 import { askInline, confirmPress, recordDetails, recordRows, showResult } from "./pageKit.js";
 import { renderNativeTasksPage } from "./nativeTasks.js";
 import { toolRatesHtml } from "./runtimeRates.js";
+import { fleetInventoryHtml, wireFleetInventory } from "./fleetInventory.js";
 import { apiGet, apiPost, applyRoleGates, getAdminToken, getCurrentUser, login, logout, onClaims, setAdminToken, whoami } from "./api.js";
 import { installClaimStrip } from "./components/claimBadge.js";
 import { industryPackDetailHtml, industryPackResultHtml } from "./industryPackView.js";
@@ -3079,11 +3080,13 @@ function metric(label, value) {
 }
 
 async function renderFleetLifecycle() {
-  const [listEnvelope, graphEnvelope, graphValidationEnvelope] = await Promise.all([
+  const [inventoryEnvelope, listEnvelope, graphEnvelope, graphValidationEnvelope] = await Promise.all([
+    apiGet("/api/v1/fleet/inventory?include=csv").catch(() => null),
     apiGet("/api/v1/fleet/lifecycle?limit=12").catch(() => ({ runs: [] })),
     apiGet("/api/v1/fleet/graph").catch(() => ({ graph: null, ref: null })),
     apiGet("/api/v1/fleet/graph/validate").catch(() => ({ validation: null }))
   ]);
+  const inventory = inventoryEnvelope ? apiPayload(inventoryEnvelope) : null;
   const listPayload = apiPayload(listEnvelope) || {};
   const graphPayload = apiPayload(graphEnvelope) || {};
   const graphValidationPayload = apiPayload(graphValidationEnvelope) || {};
@@ -3102,8 +3105,8 @@ async function renderFleetLifecycle() {
     <section class="hero-panel compact">
       <div>
         <p class="eyebrow">Fleet + Evidence</p>
-        <h2>Fleet Lifecycle</h2>
-        <p>Inspect parent fleet runs, child lifecycle evidence, topology, shared resources, and cascade risks.</p>
+        <h2>Fleet</h2>
+        <p>Your agents: who owns each one, what it runs on, when AMC last saw it, its budget and cost, and whether it is frozen. Below that: fleet runs, how the agents depend on each other, and cascade risks.</p>
       </div>
       <div class="hero-actions">
         <span class="pill">${runs.length} runs</span>
@@ -3111,6 +3114,7 @@ async function renderFleetLifecycle() {
         <span class="pill ${graphValidation?.valid ? "ok" : "warn"}">graph ${graphValidation?.valid ? "valid" : "review"}</span>
       </div>
     </section>
+    ${fleetInventoryHtml(inventory, { card, metric })}
     ${card("Typed Multi-Agent Graph", `
       <div class="studio-kpi-grid">
         ${metric("Graph", graphRef?.graphId || graph?.graphId || "none")}
@@ -3157,6 +3161,7 @@ async function renderFleetLifecycle() {
       </div>
     `)}
   `;
+  wireFleetInventory(root, { apiPost, reload: renderFleetLifecycle }, inventory);
 }
 
 async function renderFirewall() {

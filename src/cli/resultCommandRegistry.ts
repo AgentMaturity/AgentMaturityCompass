@@ -101,7 +101,8 @@ export const RESULT_COMMANDS: readonly ResultCommand[] = [
   self("fleet score", "fleet:score"),
   self("fleet report", "fleet:report"),
   self("fleet overview", "fleet:health"),
-  self("fleet status", "fleet:health"),
+  // The inventory and freeze options print facts and an action, not a health result.
+  self("fleet status", "fleet:health", (o) => !o.inventory && !o.csv && o.freeze === undefined),
   self("fleet health", "fleet:health"),
   self("fleet trust-report", "fleet:trust-composition"),
   self("fleet slo status", "fleet:health"),

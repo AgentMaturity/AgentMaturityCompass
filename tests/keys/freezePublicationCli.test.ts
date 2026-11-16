@@ -5,6 +5,7 @@ import { verify } from "node:crypto";
 import { expect, test } from "vitest";
 import { createFreezeIncident, listIncidents } from "../../src/drift/freezeEngine.js";
 import { sha256Hex } from "../../src/utils/hash.js";
+import { AGENT_ENV_MARKERS } from "../../src/vault/operatorContext.js";
 import { canonicalize } from "../../src/utils/json.js";
 import { spawnOwnedNode } from "../helpers/ownedNodeGroup.js";
 import { freezeFixture, writeFreezeDecisionInputs } from "../helpers/freezePublicationFixture.js";
@@ -18,7 +19,9 @@ function harness(f: ReturnType<typeof freezeFixture>) {
   writeFileSync(fileWrapper, `import{appendFileSync}from"node:fs";import{fileKeyProvider as actual}from${JSON.stringify(file)};\nexport function fileKeyProvider(workspace){const provider=actual(workspace);return{...provider,async sign(ref,bytes){const signature=await provider.sign(ref,bytes);appendFileSync(process.env.P208_FREEZE_REQUESTS,JSON.stringify({ref,hex:Buffer.from(bytes).toString("hex")})+"\\n");return signature;}};}\n`);
   writeFileSync(deny, 'export function callProviderSync(){throw new Error("owned freeze CLI denies provider bridge invocation");}\nexport const answerBridgeRequest=callProviderSync;\n');
   writeFileSync(loader, `export async function resolve(specifier,context,nextResolve){\nif(["@aws-sdk/","@google-cloud/","@azure/","pkcs11js","agent-maturity-compass-key-provider-pkcs11"].some(prefix=>specifier.startsWith(prefix)))throw new Error("owned freeze CLI denies real SDK/native imports");\nconst found=await nextResolve(specifier,context);\nif(found.url===${JSON.stringify(bridge)})return{url:${JSON.stringify(pathToFileURL(deny).href)},shortCircuit:true};\nif(context.parentURL===${JSON.stringify(cli)}&&found.url===${JSON.stringify(drift)})return{url:${JSON.stringify(pathToFileURL(wrapper).href)},shortCircuit:true};\nif(context.parentURL===${JSON.stringify(purpose)}&&found.url===${JSON.stringify(file)})return{url:${JSON.stringify(pathToFileURL(fileWrapper).href)},shortCircuit:true};\nreturn found;}\n`);
-  const env = { ...process.env, PATH: bin, NO_COLOR: "1", NODE_OPTIONS: "--experimental-loader=" + pathToFileURL(loader).href, P208_FREEZE_REQUESTS: requests };
+  // A person's shell: lifting a freeze refuses a shell that carries an agent marker (the harness running these tests may set one).
+  const person = Object.fromEntries(Object.entries(process.env).filter(([name]) => !AGENT_ENV_MARKERS.includes(name)));
+  const env = { ...person, PATH: bin, NO_COLOR: "1", NODE_OPTIONS: "--experimental-loader=" + pathToFileURL(loader).href, P208_FREEZE_REQUESTS: requests };
   const run = async (args: string[]) => { const child = spawnOwnedNode([resolve("dist/cli.js"), ...args], { cwd: f.workspace, env }); return child.wait(30_000); };
   const calls = () => readFileSync(requests, "utf8").split("\n").filter(Boolean).map(line => JSON.parse(line));
   return { run, calls, wrapper, env };

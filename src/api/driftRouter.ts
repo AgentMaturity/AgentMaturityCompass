@@ -8,6 +8,14 @@ import { KeyProviderError } from '../keys/provider.js';
 import { initAlertsConfigAsync } from '../drift/alerts.js';
 import { bodyJson, apiSuccess, apiError, queryParam } from './apiHelpers.js';
 
+/** The answer to a failed freeze lift, shared by the drift and fleet lift routes: a refused agent (FreezeLiftRefused) gets 403 in words. */
+export function answerFreezeLiftError(res: ServerResponse, err: unknown, checked: boolean): void {
+  if (res.headersSent) return;
+  if ((err as { code?: unknown } | null)?.code === 'PERSON_REQUIRED') { apiError(res, 403, (err as Error).message); return; }
+  apiError(res, checked && err instanceof KeyProviderError ? err.status : 500,
+    checked ? err instanceof KeyProviderError ? err.code : 'Freeze lift failed' : err instanceof Error ? err.message : 'Freeze lift failed');
+}
+
 export async function handleDriftRoute(
   pathname: string,
   method: string,
@@ -95,8 +103,7 @@ export async function handleDriftRoute(
       const result = revalidateAuthority === undefined ? drift.freezeLiftCli(input) : await drift.freezeLiftCliForAuthority(input, guard);
       apiSuccess(res, { lifted: true, ...result });
     } catch (err) {
-      if (!res.headersSent) apiError(res, revalidateAuthority !== undefined && err instanceof KeyProviderError ? err.status : 500,
-        revalidateAuthority !== undefined ? err instanceof KeyProviderError ? err.code : 'Freeze lift failed' : err instanceof Error ? err.message : 'Freeze lift failed');
+      answerFreezeLiftError(res, err, revalidateAuthority !== undefined);
     }
     return true;
   }

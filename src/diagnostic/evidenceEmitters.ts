@@ -96,6 +96,7 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/drift/driftDetector.ts", why: "drift regressions and freezes; they cap scores" },
   { module: "src/enforce/actionEvidenceLogic.ts", why: "policy evidence-logic changes; untagged, so they bind to no question" },
   { module: "src/enforce/scopeTemplates.ts", why: "policy scope template applied; untagged, so it binds to no question" },
+  { module: "src/fleet/fleetActions.ts", why: "a person froze an agent by hand (who, which agent, why); operator control bookkeeping, untagged, never maturity evidence" },
   { module: "src/eoc/flows.ts", why: "education, ownership and commitment bookkeeping" },
   { module: "src/eval/evalImporters.ts", why: "import bookkeeping and imported failures; self-reported by provenance" },
   { module: "src/eval/suiteRunner.ts", why: "eval suite run records (SH-OBS-04): the results digest a gate checks; eval bookkeeping, untagged, never maturity evidence" },

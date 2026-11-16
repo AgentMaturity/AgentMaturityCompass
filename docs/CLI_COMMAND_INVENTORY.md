@@ -51,7 +51,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc advisory list` | List advisories for scope | `--scope <scope>`<br>`--id <targetId>` | - |
 | `amc advisory show` | Show one advisory by ID | - | - |
 | `amc agent` | Agent registry operations | - | - |
-| `amc agent add` | Interactively add an agent to the fleet | - | - |
+| `amc agent add` | Interactively add an agent to the fleet | `--from-observed <agentId>`<br>`--owner <name>` | - |
 | `amc agent diagnose` | Lease-auth self-run diagnostic (agent-triggered, evidence-scored server-side) | `--token-file <file>`<br>`--studio <url>` | - |
 | `amc agent harness` | Run the autonomous improvement harness loop | `--type <type>`<br>`--iterations <n>`<br>`--target <score>` | - |
 | `amc agent list` | List fleet agents | - | - |
@@ -524,14 +524,14 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc fleet slo define` | Define a fleet SLO, e.g. "95% of production agents must score L3+ on dimension 2" | `--objective <text>`<br>`--id <sloId>` | - |
 | `amc fleet slo list` | List fleet SLO definitions | - | - |
 | `amc fleet slo status` | Show fleet SLO compliance status | - | - |
-| `amc fleet status` | Show fleet overview (agent count, average score, health) | `--json` | - |
-| `amc fleet tag` | Tag an agent with an environment | `--env <environment>` | - |
+| `amc fleet status` | Show fleet overview (agent count, average score, health) | `--json`<br>`--inventory`<br>`--csv`<br>`--window <window>`<br>`--freeze <agentId>`<br>`--reason <text>` | - |
+| `amc fleet tag` | Tag an agent with an environment or a named owner | `--env <environment>`<br>`--owner <name>` | - |
 | `amc fleet trust-add-edge` | Add a delegation edge (orchestrator → worker) | `--from <agentId>`<br>`--to <agentId>`<br>`--purpose <purpose>`<br>`--risk <tier>`<br>`--mode <mode>`<br>`--weight <n>` | - |
 | `amc fleet trust-edges` | List all delegation edges | - | - |
 | `amc fleet trust-graph` | Render delegation trust graph as Mermaid, DOT, or JSON | `--format <format>`<br>`--out <path>` | - |
 | `amc fleet trust-init` | Initialize trust composition config | - | - |
 | `amc fleet trust-mode` | Set trust inheritance policy mode | `--mode <mode>` | - |
-| `amc fleet trust-receipts` | Verify cross-agent receipt chains | `--window <window>` | - |
+| `amc fleet trust-receipts` | Count time-window overlap across declared delegations (a heuristic: compares times, checks no signatures) | `--window <window>` | - |
 | `amc fleet trust-remove-edge` | Remove a delegation edge | - | - |
 | `amc fleet trust-report` | Generate trust composition report across fleet | `--window <window>`<br>`--output <path>`<br>`--no-sign` | - |
 | `amc forecast` | Deterministic evidence-gated forecasting and planning | - | - |

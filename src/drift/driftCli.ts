@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { resolveAgentId } from "../fleet/paths.js";
-import { activeFreezeStatus, liftFreeze, liftFreezeAsync, liftFreezeForAuthority } from "./freezeEngine.js";
+import { activeFreezeStatus, assertPersonLifts, liftFreeze, liftFreezeAsync, liftFreezeForAuthority } from "./freezeEngine.js";
 import { dispatchAlert } from "./alerts.js";
 import { runDriftCheck, runDriftCheckAsync, runDriftCheckForAuthority, writeDriftCheckReport, driftPostPublicationError, driftNotEvaluated,
   driftNotEvaluatedAlert, type DriftCheckResult } from "./driftDetector.js";
@@ -77,12 +77,14 @@ export function freezeStatusCli(params: {
   return activeFreezeStatus(params.workspace, params.agentId);
 }
 
+/** `amc freeze lift` and its SDK export: an agent must not unfreeze itself or another agent (liftFreeze checks again). */
 export function freezeLiftCli(params: {
   workspace: string;
   agentId?: string;
   incidentId: string;
   reason: string;
 }): { liftPath: string } {
+  assertPersonLifts(params.workspace);
   return liftFreeze({
     workspace: params.workspace,
     agentId: params.agentId,
@@ -113,6 +115,7 @@ export async function driftReportCliAsync(input: Parameters<typeof driftReportCl
   } catch (error) { throw driftPostPublicationError(params.workspace, result, "report-output", error); }
 }
 export async function freezeLiftCliAsync(params: Parameters<typeof freezeLiftCli>[0]): Promise<{ liftPath: string }> {
+  assertPersonLifts(params.workspace);
   return liftFreezeAsync({ ...params });
 }
 /** Internal trusted router handoff, not a root SDK actor option. */
