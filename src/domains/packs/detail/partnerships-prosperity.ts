@@ -84,11 +84,11 @@ export const partnershipsProsperityDetail: PackQuestionDetail = {
     keyRisk: 2,
   },
   "TECH-PP-9": {
-    l2: "Generic access controls cover partnership data; AI-generated IP has no technological protection.",
-    l4: "AI-specific classification, protection measures and an inventory exist, but misappropriation detection or the audit trail is partial.",
-    evidence: ["ai_generated_ip_tpm_config", "misappropriation_detection_alert_log", "ip_protection_audit_trail"],
+    l2: "Generic access controls cover partnership data; partnership works carry no technological protection measures.",
+    l4: "AI-specific access classification, technological measures on partnership works and a trade secret inventory exist, but misappropriation detection or the audit trail is partial.",
+    evidence: ["partnership_work_tpm_config", "misappropriation_detection_alert_log", "ip_protection_audit_trail"],
     remediation:
-      "Apply technological protection measures to AI-generated partnership assets at export, and alert " +
+      "Apply technological protection measures to partnership works at export, and alert " +
       "when an asset is accessed outside the partner's entitlement.",
     failureMode: "The agent exports AI-generated partnership models without protection measures, and a departing partner walks away with the full asset.",
     keyRisk: 3,

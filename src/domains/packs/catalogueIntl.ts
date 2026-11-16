@@ -85,8 +85,8 @@ export const INTL_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   unverified("csa-star", "Cloud Security Alliance STAR", "INT", "framework", ["CSA STAR"]),
   unverified("emv", "EMVCo specifications", "INT", "standard", ["EMV Specifications", "EMV"]),
   unverified("swift-csp", "SWIFT Customer Security Programme", "INT", "framework", ["SWIFT Customer Security Programme"]),
-  unverified("itil-4", "ITIL 4", "INT", "framework", ["ITIL v4"]),
-  unverified("oidc-oauth21", "OpenID Connect / OAuth 2.1", "INT", "standard", ["OpenID Connect / OAuth 2.1", "OAuth 2.1"], "OAuth 2.1 was an IETF draft when last checked; not confirmed in this review."),
+  unverified("itil-4", "ITIL 4", "INT", "framework", ["ITIL 4", "ITIL v4"]),
+  unverified("oidc-oauth21", "OpenID Connect Core 1.0 / OAuth 2.0 (RFC 6749)", "INT", "standard", ["OpenID Connect Core 1.0", "OpenID Connect / OAuth 2.1", "OAuth 2.1"], "OAuth 2.1 is not a published standard: datatracker.ietf.org showed draft-ietf-oauth-v2-1-17 (31 October 2026) as an active Internet-Draft when read on 2026-11-16. Packs cite the published OpenID Connect Core 1.0 and RFC 6749."),
 
   // Health and life-sciences standards and guidance
   verified("ich-e6-r3", "ICH E6(R3) Guideline for Good Clinical Practice", "INT", "guidance", "in-force", "https://www.ema.europa.eu/en/ich-e6-good-clinical-practice-scientific-guideline",

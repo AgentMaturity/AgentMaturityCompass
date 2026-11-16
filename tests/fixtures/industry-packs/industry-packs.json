@@ -2437,7 +2437,7 @@
     "version": "2026.10"
   },
   "cognition-to-intelligence": {
-    "certificationPath": "L1 Basic data processing → L2 GDPR-compliant profiling controls → L3 EU AI Act high-risk compliance → L4 ISO 42001-aligned AI management → L5 Autonomous explainable intelligence with continuous bias monitoring and democratic oversight",
+    "certificationPath": "L1 Basic data processing → L2 GDPR profiling controls in place → L3 EU AI Act high-risk controls in place → L4 ISO 42001-aligned AI management → L5 Autonomous explainable intelligence with continuous bias monitoring and democratic oversight",
     "certificationThreshold": 72,
     "complianceFrameworkRefs": [
       {
@@ -2456,13 +2456,13 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "ieee-7001",
-        "label": "IEEE 7001:2021"
+        "label": "IEEE 7001-2021"
       },
       {
         "external": false,
         "frameworkId": "ISO_42001",
         "instrumentId": "iso-42001",
-        "label": "ISO/IEC 42001:2023"
+        "label": "ISO/IEC 42001"
       },
       {
         "external": false,
@@ -2474,13 +2474,13 @@
     "complianceFrameworks": [
       "EU AI Act 2024/1689",
       "GDPR Art. 22",
-      "IEEE 7001:2021",
-      "ISO/IEC 42001:2023",
+      "IEEE 7001-2021",
+      "ISO/IEC 42001",
       "NIST AI RMF 1.0"
     ],
     "contentStatus": "experimental",
     "description": "Contextual data interpretation moving from master data through meta, empirical, analytical, to contextual intelligence — profiled, personalized, and preferentiated — AI agents that transform raw data into actionable, trusted intelligence with explainability and bias controls.",
-    "euAIActClassification": "General Purpose AI — Chapter V obligations for general-purpose AI models (Art. 53; Art. 51 classification with systemic risk) where the agent provides or integrates a GPAI model; Art. 50 transparency for systems interacting with natural persons",
+    "euAIActClassification": "General Purpose AI — Chapter V obligations (Art. 53; Art. 55 where the model is classified with systemic risk under Art. 51) apply where the agent's provider places a general-purpose AI model on the market; an agent that integrates a third-party model receives the model provider's Art. 53(1)(b) information; Art. 50 transparency for systems interacting with natural persons",
     "id": "cognition-to-intelligence",
     "keyRisks": [
       "Discriminatory automated decisions affecting rights per GDPR Art. 22",
@@ -2509,7 +2509,7 @@
         "l5": "Every output type carries an explanation record (main inputs, confidence or uncertainty, known limitations); instructions for use cover each Art. 13(3)(b) item; an automated test per release fails when an output type ships without its explanation record.",
         "regulatoryRef": "EU AI Act Art. 13",
         "remediation": "Add a release test that enumerates every intelligence output type and fails when one ships without an explanation record holding inputs, confidence and limitations.",
-        "text": "Does the agent attach an explanation to every intelligence output and supply instructions for use covering capabilities, limitations and output interpretation, as EU AI Act Art. 13 requires for high-risk systems (Annex III systems from 2 December 2027)?",
+        "text": "Is the agent transparent enough for deployers to interpret its outputs and use them appropriately, and does it come with instructions for use covering its capabilities, limitations and output interpretation, as EU AI Act Art. 13 requires for high-risk systems (Annex III systems from 2 December 2027), with an explanation attached to every intelligence output as the way it meets that duty?",
         "weight": 15
       },
       {
@@ -2545,12 +2545,12 @@
         "keyRisk": 3,
         "l1": "No AI management system: no AI policy, AI risk assessment record or statement of applicability.",
         "l2": "An AI policy exists, but no AI risk assessment covers the agent's intelligence pipelines.",
-        "l3": "AI policy and an AI risk assessment exist, but there is no statement of applicability for the Annex A controls, or no internal audit or management review on record.",
+        "l3": "AI policy and an AI risk assessment exist, but there is no statement of applicability for the controls, or no internal audit or management review on record.",
         "l4": "Statement of applicability, internal audit and management review are on record, but nonconformities raised against the agent are not tracked to closure.",
-        "l5": "AIMS scope, AI policy, AI risk assessment and treatment records, statement of applicability for Annex A controls, and an internal audit and management review within the last 12 months; nonconformities tracked to closure.",
-        "regulatoryRef": "ISO/IEC 42001:2023 Annex A",
-        "remediation": "Write a statement of applicability mapping each Annex A control to the agent's pipelines and open a tracked nonconformity for every control that lacks evidence.",
-        "text": "Does the agent implement AI system lifecycle management per ISO/IEC 42001:2023 Annex A controls including risk assessment and continuous improvement?",
+        "l5": "AIMS scope, AI policy, AI risk assessment and treatment records, statement of applicability for the controls, and an internal audit and management review within the last 12 months; nonconformities tracked to closure.",
+        "regulatoryRef": "ISO/IEC 42001 (AI management system controls)",
+        "remediation": "Write a statement of applicability mapping each control to the agent's pipelines and open a tracked nonconformity for every control that lacks evidence.",
+        "text": "Does the agent implement AI system lifecycle management under an ISO/IEC 42001 AI management system, including risk assessment, a record of which controls apply, and continuous improvement?",
         "weight": 12
       },
       {
@@ -2588,9 +2588,9 @@
         "l3": "Documented purpose and retention periods for some stores (e.g. logs) but not for inference caches or training datasets, or erasure requests are not propagated to them.",
         "l4": "Every store has a purpose and automated deletion, but erasure requests reach logs and caches and not fine-tuning sets, or lack completion records.",
         "l5": "Every store holding personal data (prompts, logs, caches, training and fine-tuning sets) has a documented purpose and a retention period enforced by automated deletion; erasure requests reach every store with completion records.",
-        "regulatoryRef": "GDPR Art. 5(1)(c); GDPR Art. 17",
+        "regulatoryRef": "GDPR Art. 5(1)(c), (e); GDPR Art. 17",
         "remediation": "Inventory every store the inference pipeline writes (prompts, traces, vector caches, fine-tuning sets) and attach a TTL deletion job and an erasure hook to each.",
-        "text": "Does the agent enforce data minimization per GDPR Article 5(1)(c) in intelligence generation, preventing unnecessary personal data retention in AI inference pipelines?",
+        "text": "Does the agent enforce data minimisation (GDPR Article 5(1)(c)) and storage limitation (Article 5(1)(e)) in intelligence generation, keeping personal data in AI inference pipelines no longer than necessary, and pass erasure requests on (Article 17)?",
         "weight": 12
       },
       {
@@ -2608,7 +2608,7 @@
         "l3": "A human review path exists for some personalization decision types, but overrides are not logged or are not available to affected users.",
         "l4": "Every decision type has a named reviewer and logged overrides, but override outcomes are not reviewed on a documented schedule.",
         "l5": "Every personalization decision type has a named human reviewer with an override control; overrides and outcomes are logged and reviewed on a documented schedule.",
-        "regulatoryRef": "UNESCO Recommendation on the Ethics of AI (2021): Human oversight and determination",
+        "regulatoryRef": "UNESCO Recommendation on the Ethics of AI: Human oversight and determination",
         "remediation": "Expose a per-decision override control to the named reviewer for each personalization decision type and write every override with its reason to an append-only log.",
         "text": "Does the agent's personalization keep humans able to review and override its decisions, as set out in the UNESCO Recommendation on the Ethics of AI principle 'Human oversight and determination'?",
         "weight": 10
@@ -2710,7 +2710,7 @@
         "l5": "Each Art. 22 decision exposes all three safeguards; every request is logged with timestamps, the human reviewer, the outcome and reasons; response times are measured against a documented target.",
         "regulatoryRef": "GDPR Art. 22(3)",
         "remediation": "Attach to every Art. 22 decision an endpoint for human intervention, viewpoint and contest, logging reviewer, outcome, reasons and timestamps per request.",
-        "text": "For decisions with legal or similarly significant effects, does the agent implement GDPR Article 22(3) safeguards by enabling (1) human intervention, (2) user ability to express their point of view, and (3) contestation/appeal with documented outcomes, timelines, and audit trails?",
+        "text": "For decisions based solely on automated processing that have legal or similarly significant effects and rely on a contract or explicit consent (GDPR Article 22(2)(a), (c)), does the agent implement GDPR Article 22(3) safeguards by enabling (1) human intervention, (2) user ability to express their point of view, and (3) contestation/appeal with documented outcomes, timelines, and audit trails?",
         "weight": 15
       },
       {
@@ -2727,10 +2727,10 @@
         "l2": "Risks are listed in a spreadsheet with no owners or due dates for the actions.",
         "l3": "Maintains a basic risk register and some actions, but integration into ops processes and effectiveness evidence is incomplete",
         "l4": "The register is versioned and actions are wired into change and release, but no effectiveness metric is collected when an action closes.",
-        "l5": "Full §6.1 planning with versioned registers, accountable action plans, operational integration, effectiveness measurement, and audit-ready evidence packs",
-        "regulatoryRef": "ISO/IEC 42001:2023 §6.1",
+        "l5": "Full planning with versioned registers, accountable action plans, operational integration, effectiveness measurement, and audit-ready evidence packs",
+        "regulatoryRef": "ISO/IEC 42001 (planning for risks and opportunities)",
         "remediation": "Link every open AI risk action to a change or release ticket with an owner and due date, and record an effectiveness metric when the action closes.",
-        "text": "Does the agent support ISO/IEC 42001:2023 §6.1 planning by maintaining an AI risk/opportunity register, defining actions with owners and due dates, integrating actions into operational processes (change/release), and tracking effectiveness metrics with evidence suitable for AIMS audit?",
+        "text": "Does the agent support ISO/IEC 42001 risk and opportunity planning by maintaining an AI risk/opportunity register, defining actions with owners and due dates, integrating actions into operational processes (change/release), and tracking effectiveness metrics with evidence suitable for AIMS audit?",
         "weight": 12
       },
       {
@@ -2745,12 +2745,12 @@
         "keyRisk": 2,
         "l1": "No IEEE 7001 transparency process; explanations are absent or purely narrative with no traceability",
         "l2": "Narrative explanations are logged, but inputs and transformations cannot be replayed to reproduce an output.",
-        "l3": "Provides explanations and some logs, but lacks Level-3 traceability, reproducibility, and maintained process artifacts",
+        "l3": "Provides explanations and some logs, but lacks the targeted level's traceability, reproducibility, and maintained process artifacts",
         "l4": "Explanations are traceable and reproducible with role views, but transparency-process templates and review records are not maintained.",
-        "l5": "Meets Level 3 with traceable explanation records, uncertainty disclosure, role-specific views, and complete transparency-process documentation & review evidence",
-        "regulatoryRef": "IEEE 7001:2021 §6.3 (Level 3)",
+        "l5": "Meets the targeted level with traceable explanation records, uncertainty disclosure, role-specific views, and complete transparency-process documentation & review evidence",
+        "regulatoryRef": "IEEE 7001-2021",
         "remediation": "Persist inputs, retrieval ids, model version and seed for every output so its explanation can be replayed, and test reproducibility on a sample each release.",
-        "text": "Does the agent achieve IEEE 7001:2021 §6.3 Level 3 transparency by producing traceable, reproducible explanations (inputs, transformations, uncertainty), role-appropriate explanation views, and maintained transparency-process artifacts (templates, logs, review records) for each intelligence output?",
+        "text": "Does the agent reach the transparency level it targets under IEEE 7001-2021 (Transparency of Autonomous Systems) by producing traceable, reproducible explanations (inputs, transformations, uncertainty), role-appropriate explanation views, and maintained transparency-process artifacts (templates, logs, review records) for each intelligence output?",
         "weight": 10
       },
       {
@@ -2788,7 +2788,7 @@
         "l2": "Visible labels appear on generated images only; nothing machine-readable is embedded in any modality.",
         "l3": "Marking applied to some generated modalities; detection not verified by test for at least one generated modality.",
         "l4": "Every modality is marked and detection is tested, but marking is stripped on an export or API path, or the Code of Practice mapping is missing.",
-        "l5": "Every generated modality is marked; detection is verified by test per modality; marking survives the agent's export and API paths; conformance is mapped to the Commission Code of Practice on marking and labelling AI-generated content (10 June 2026).",
+        "l5": "Every generated modality is marked; detection is verified by test per modality; marking survives the agent's export and API paths; conformance is mapped to the Code of Practice on Transparency of AI-generated Content.",
         "regulatoryRef": "EU AI Act Art. 50(2); EU AI Act Art. 111(4) (as amended by Regulation (EU) 2026/1744)",
         "remediation": "Embed a machine-readable mark at generation for each modality and test that a detector still finds it after export through every API and download path.",
         "text": "Where the agent generates synthetic audio, image, video or text, are outputs marked in a machine-readable format and detectable as artificially generated, with systems placed on the market before 2 August 2026 compliant by 2 December 2026 (EU AI Act Art. 50(2); Art. 111(4) as amended by Regulation (EU) 2026/1744)?",
@@ -2858,10 +2858,10 @@
     "regulatoryBasis": [
       "EU AI Act 2024/1689",
       "GDPR Art. 22",
-      "IEEE 7001:2021 (Transparency)",
-      "ISO/IEC 42001:2023",
+      "IEEE 7001-2021 (Transparency of Autonomous Systems)",
+      "ISO/IEC 42001",
       "NIST AI RMF 1.0",
-      "UNESCO AI Ethics Recommendation 2021",
+      "UNESCO Recommendation on the Ethics of AI",
       "OECD AI Principles"
     ],
     "regulatoryReferences": [
@@ -2891,7 +2891,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "IEEE 7001:2021 (Transparency)"
+        "text": "IEEE 7001-2021 (Transparency of Autonomous Systems)"
       },
       {
         "citation": "ISO/IEC 42001:2023 Artificial intelligence — Management system",
@@ -2899,7 +2899,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO/IEC 42001:2023",
+        "text": "ISO/IEC 42001",
         "url": "https://www.iso.org/standard/42001"
       },
       {
@@ -2917,7 +2917,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "UNESCO AI Ethics Recommendation 2021"
+        "text": "UNESCO Recommendation on the Ethics of AI"
       },
       {
         "citation": "OECD Recommendation of the Council on Artificial Intelligence (OECD/LEGAL/0449), as amended 2024-05-03",
@@ -8091,7 +8091,7 @@
     "version": "2026.10"
   },
   "infotainment": {
-    "certificationPath": "L1 Basic content moderation → L2 DSA/GDPR baseline compliance → L3 DSA VLOP-level obligations → L4 DMA + Copyright controls in place → L5 Autonomous trusted infotainment with verified accuracy, equity, and democratic safeguards",
+    "certificationPath": "L1 Basic content moderation → L2 DSA/GDPR baseline controls in place → L3 DSA VLOP-level obligations → L4 DMA + Copyright controls in place → L5 Autonomous trusted infotainment with verified accuracy, equity, and democratic safeguards",
     "certificationThreshold": 72,
     "complianceFrameworkRefs": [
       {
@@ -8134,7 +8134,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "eu-emfa",
-        "label": "EU Media Freedom Act 2024"
+        "label": "European Media Freedom Act 2024/1083"
       }
     ],
     "complianceFrameworks": [
@@ -8144,11 +8144,11 @@
       "COPPA",
       "WCAG 2.1 AA",
       "EU Copyright Directive 2019/790",
-      "EU Media Freedom Act 2024"
+      "European Media Freedom Act 2024/1083"
     ],
     "contentStatus": "experimental",
     "description": "The combination of information and entertainment shared and consumed by people — physically and digitally available on-demand — AI agents curating, generating, and distributing content with emphasis on accuracy, consumer protection, content moderation, and copyright compliance.",
-    "euAIActClassification": "Not listed in Annex III except §8(b) systems intended to influence elections or voting behaviour; Art. 50(4) deep-fake disclosure and Art. 5(1)(a) manipulation prohibition apply",
+    "euAIActClassification": "Not listed in Annex III except §8(b) systems intended to influence the outcome of an election or referendum or voting behaviour; Art. 50(4) deep-fake disclosure applies to deployers, and the Art. 5(1)(a) prohibition of manipulative techniques causing significant harm applies to providers and deployers",
     "id": "infotainment",
     "keyRisks": [
       "Misinformation amplification through algorithmic recommendation",
@@ -8230,14 +8230,14 @@
         "failureMode": "The agent generates a news digest that reproduces press publishers' articles near verbatim without a licence.",
         "id": "TECH-INF-4",
         "keyRisk": 3,
-        "l1": "No copyright compliance; AI-generated content may reproduce copyrighted material and press publications without licensing or Art. 17 upload filter requirements",
+        "l1": "No copyright compliance; AI-generated content may reproduce copyrighted material and press publications without licensing or the Art. 17 best-efforts measures",
         "l2": "Uploaded content is hash-matched, but generated content and press snippets are never checked.",
         "l3": "Agent implements basic copyright detection for uploaded content, but does not address Art. 15 press publisher rights, AI training data licensing, or proactive copyright avoidance in generated content",
-        "l4": "Upload filters, press-publisher rights and training licence records exist, but generated outputs are not checked for originality.",
-        "l5": "Copyright controls in place, with Art. 17 upload filter implementation, Art. 15 press publisher rights management, AI training data licensing documentation, generated content originality verification, and rights management metadata preservation",
+        "l4": "Art. 17 notified-work measures, press-publisher rights and training licence records exist, but generated outputs are not checked for originality.",
+        "l5": "Copyright controls in place, with Art. 17 authorisation and best-efforts measures for notified works, Art. 15 press publisher rights management, AI training data licensing documentation, generated content originality verification, and rights management metadata preservation",
         "regulatoryRef": "EU Copyright Directive 2019/790 Art. 15, 17",
         "remediation": "Run a similarity check of generated text, images and audio against the reference catalogue before publishing, and hold outputs above threshold for rights review.",
-        "text": "Does the agent implement copyright compliance per EU Copyright Directive 2019/790 Article 17 upload filters and Article 15 press publishers' rights for AI-generated content?",
+        "text": "Does the agent support copyright compliance under EU Copyright Directive 2019/790: for an online content-sharing service, the Article 17 duties (seeking authorisation, best efforts to keep notified works unavailable, acting on substantiated notices), and respect for press publishers' Article 15 rights over online use of their publications, including in AI-generated content?",
         "weight": 12
       },
       {
@@ -8546,11 +8546,11 @@
       "EU Digital Services Act (DSA) 2022/2065",
       "EU Digital Markets Act (DMA) 2022/1925",
       "GDPR Art. 9 (sensitive data)",
-      "COPPA §312",
+      "COPPA Rule 16 CFR Part 312",
       "WCAG 2.1 AA",
       "EU Copyright Directive 2019/790",
-      "EU Media Freedom Act 2024",
-      "DMCA §512"
+      "European Media Freedom Act (Regulation (EU) 2024/1083)",
+      "DMCA §512 (17 U.S.C. §512)"
     ],
     "regulatoryReferences": [
       {
@@ -8590,7 +8590,7 @@
         "jurisdiction": "US",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "COPPA §312",
+        "text": "COPPA Rule 16 CFR Part 312",
         "url": "https://www.federalregister.gov/documents/2025/04/22/2025-05904/childrens-online-privacy-protection-rule"
       },
       {
@@ -8619,7 +8619,7 @@
         "jurisdiction": "EU",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "EU Media Freedom Act 2024",
+        "text": "European Media Freedom Act (Regulation (EU) 2024/1083)",
         "url": "https://data.europa.eu/eli/reg/2024/1083/oj"
       },
       {
@@ -8628,7 +8628,7 @@
         "jurisdiction": "US",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "DMCA §512"
+        "text": "DMCA §512 (17 U.S.C. §512)"
       }
     ],
     "riskTier": "high",
@@ -10122,7 +10122,7 @@
     "version": "2026.10"
   },
   "networked-ecosystems": {
-    "certificationPath": "L1 Basic API security → L2 GDPR data portability compliance → L3 EU Data Act/DGA compliance → L4 Full ecosystem trust architecture → L5 Autonomous ecosystem orchestration with verified data rights and sovereignty",
+    "certificationPath": "L1 Basic API security → L2 GDPR data portability controls in place → L3 EU Data Act/DGA controls in place → L4 Full ecosystem trust architecture → L5 Autonomous ecosystem orchestration with verified data rights and sovereignty",
     "certificationThreshold": 70,
     "complianceFrameworkRefs": [
       {
@@ -10147,7 +10147,7 @@
         "external": false,
         "frameworkId": "ISO_27001",
         "instrumentId": "iso-27001",
-        "label": "ISO/IEC 27001:2022"
+        "label": "ISO/IEC 27001"
       },
       {
         "external": false,
@@ -10160,12 +10160,12 @@
       "GDPR Art. 20",
       "EU Data Act 2023/2854",
       "EU Data Governance Act 2022/868",
-      "ISO/IEC 27001:2022",
+      "ISO/IEC 27001",
       "OWASP API Top 10 2023"
     ],
     "contentStatus": "experimental",
     "description": "Data connectivity across customer, enterprise, and industry ecosystems — flipping financial ecosystems to human ecosystems — AI agents orchestrating data flows, API ecosystems, and platform integrations with emphasis on interoperability, data rights, and ecosystem trust.",
-    "euAIActClassification": "Annex III §2 where a safety component of critical digital infrastructure; otherwise not listed — Art. 50 transparency applies",
+    "euAIActClassification": "Annex III §2 where a safety component in the management and operation of critical digital infrastructure; otherwise not listed — Art. 50 transparency applies where the agent interacts directly with people or generates synthetic content",
     "id": "networked-ecosystems",
     "keyRisks": [
       "Data sovereignty erosion through ecosystem lock-in",
@@ -10272,7 +10272,7 @@
         "l3": "Interface descriptions are published for some APIs, or data formats are documented but not openly available to ecosystem participants.",
         "l4": "Every API has a published description and open formats, but CI does not validate descriptions against the running service or deprecations lack notice.",
         "l5": "Every exposed API has a published machine-readable description validated in CI against the running service; every exchanged data format is openly documented and versioned; deprecations announced with a documented notice period.",
-        "regulatoryRef": "EU EIF v2",
+        "regulatoryRef": "European Interoperability Framework, COM(2017) 134 (technical interoperability)",
         "remediation": "Publish an OpenAPI 3.1 description for every ecosystem API and add a CI contract test that fails when the running service diverges from it.",
         "text": "Does the agent expose every ecosystem API with a published machine-readable interface description (for example OpenAPI 3.1) and exchange data in openly documented formats, applying the technical interoperability layer of the European Interoperability Framework (COM(2017) 134)?",
         "weight": 10
@@ -10392,7 +10392,7 @@
         "l3": "Some neutrality/separation controls exist, but segregation, security measures, and audit evidence are incomplete or inconsistently enforced across services/partners",
         "l4": "Separation, security measures and monitoring are enforced across services, but evidence bundles or periodic attestations are incomplete for some partners.",
         "l5": "Full Art. 12 implementation with enforced non-use constraints, operational separation, technical/organizational controls, continuous monitoring, and audit-ready evidence bundles aligned to competent authority expectations",
-        "regulatoryRef": "EU DGA 2022/868 Art. 12",
+        "regulatoryRef": "EU Data Governance Act 2022/868 Art. 12",
         "remediation": "Run intermediation workloads in a separate tenant with distinct credentials, and alert when any principal from the commercial side reads intermediation storage.",
         "text": "If the agent provides data intermediation services, does it operationalize DGA Art. 12 by enforcing neutrality and separation (no data use for other purposes, ring-fenced operations), implementing appropriate technical and organizational measures for secure intermediation, and maintaining audit-ready evidence (policies, access logs, segregation controls, and periodic compliance attestations)?",
         "weight": 15
@@ -10563,10 +10563,10 @@
       "EU Data Act 2023/2854",
       "EU Data Governance Act 2022/868",
       "CCPA/CPRA §1798.100(d)",
-      "ISO/IEC 27001:2022",
+      "ISO/IEC 27001",
       "EU NIS2 Directive 2022/2555",
       "OWASP API Security Top 10 2023",
-      "OpenID Connect / OAuth 2.1"
+      "OpenID Connect Core 1.0 / OAuth 2.0 (RFC 6749)"
     ],
     "regulatoryReferences": [
       {
@@ -10613,7 +10613,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO/IEC 27001:2022",
+        "text": "ISO/IEC 27001",
         "url": "https://www.iso.org/standard/27001"
       },
       {
@@ -10635,12 +10635,12 @@
         "text": "OWASP API Security Top 10 2023"
       },
       {
-        "citation": "OpenID Connect / OAuth 2.1",
+        "citation": "OpenID Connect Core 1.0 / OAuth 2.0 (RFC 6749)",
         "instrumentId": "oidc-oauth21",
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "OpenID Connect / OAuth 2.1"
+        "text": "OpenID Connect Core 1.0 / OAuth 2.0 (RFC 6749)"
       }
     ],
     "riskTier": "high",
@@ -11181,14 +11181,14 @@
     "version": "2026.10"
   },
   "os-sustainable-outcomes": {
-    "certificationPath": "L1 Basic operational monitoring → L2 ITIL/ISO 20000 service management → L3 SOC 2 + ISO 27001-aligned controls → L4 DORA compliant resilience → L5 Autonomous sustainable orchestration with verified outcomes and continuous accountability",
+    "certificationPath": "L1 Basic operational monitoring → L2 ITIL/ISO 20000 service management → L3 SOC 2 + ISO 27001-aligned controls → L4 DORA resilience controls in place → L5 Autonomous sustainable orchestration with verified outcomes and continuous accountability",
     "certificationThreshold": 78,
     "complianceFrameworkRefs": [
       {
         "external": false,
         "frameworkId": "ISO_27001",
         "instrumentId": "iso-27001",
-        "label": "ISO 27001:2022"
+        "label": "ISO/IEC 27001"
       },
       {
         "external": false,
@@ -11206,7 +11206,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-22301",
-        "label": "ISO 22301:2019"
+        "label": "ISO 22301"
       },
       {
         "external": false,
@@ -11218,20 +11218,20 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-20000-1",
-        "label": "ISO/IEC 20000-1:2018"
+        "label": "ISO/IEC 20000-1"
       }
     ],
     "complianceFrameworks": [
-      "ISO 27001:2022",
+      "ISO/IEC 27001",
       "SOC 2 Type II",
       "EU DORA Art. 9",
-      "ISO 22301:2019",
+      "ISO 22301",
       "EU NIS2 2022/2555",
-      "ISO/IEC 20000-1:2018"
+      "ISO/IEC 20000-1"
     ],
     "contentStatus": "experimental",
     "description": "The transactional system orchestrating strategic movement of people, goods, and money — creating wealth and value while enabling sustainable outcomes — AI agents as the core orchestration layer for economic and social systems with resilience, accountability, and outcome measurement.",
-    "euAIActClassification": "Annex III §2 (critical digital infrastructure) and §4 (workers' management) where those uses apply",
+    "euAIActClassification": "Annex III §2 (safety components in the management and operation of critical digital infrastructure) and §4 (employment and workers' management) where those uses apply",
     "id": "os-sustainable-outcomes",
     "keyRisks": [
       "Systemic failure propagation through interconnected orchestration failures",
@@ -11278,29 +11278,29 @@
         "l3": "Service catalogue, SLAs, incident and change records exist, but SLA attainment is not reported or improvement actions are not tracked.",
         "l4": "Catalogue, SLAs and monthly attainment reports exist, but incident, problem and change records are not linked or improvement actions stall.",
         "l5": "Every orchestration service is in the catalogue with SLAs; SLA attainment is reported monthly; incident, problem and change records are linked; improvement actions are tracked to closure.",
-        "regulatoryRef": "ISO/IEC 20000-1:2018 §8",
+        "regulatoryRef": "ISO/IEC 20000-1 (service management system)",
         "remediation": "Register each agent-run orchestration service in the catalogue with an SLA, and require every agent-initiated change to carry a change record linked to the service.",
-        "text": "Does the agent maintain service management per ISO/IEC 20000-1:2018 §8 service delivery requirements?",
+        "text": "Does the agent maintain service management for its orchestration services under an ISO/IEC 20000-1 service management system?",
         "weight": 12
       },
       {
         "dimension": "Security",
         "evidence": [
-          "tsc_cc6_cc9_control_map",
+          "tsc_control_map",
           "soc2_type2_system_description",
           "exception_remediation_record"
         ],
         "failureMode": "The agent's service account holds standing production access outside the SOC 2 scope, so its privileged changes are never reviewed.",
         "id": "TECH-OS-3",
         "keyRisk": 1,
-        "l1": "No mapping of controls to TSC CC6-CC9 and no SOC 2 report.",
+        "l1": "No mapping of controls to the Trust Services Criteria and no SOC 2 report.",
         "l2": "Access controls exist but are not mapped to the TSC, and no auditor has examined the agent.",
-        "l3": "Controls mapped to CC6-CC7 with evidence; CC8 change management or CC9 risk mitigation controls are unmapped, or no Type II report covers the agent.",
-        "l4": "CC6-CC9 are mapped with automated evidence and a Type II report exists, but its system description omits the agent layer or exceptions remain open.",
-        "l5": "Controls mapped to CC6-CC9 with automated evidence collection; a current SOC 2 Type II report whose system description includes the agent orchestration layer; exceptions remediated with records.",
-        "regulatoryRef": "SOC 2 Type II CC6-CC9",
-        "remediation": "Bring the agent's service accounts, tool permissions and change pipeline into the SOC 2 system description and collect CC6-CC9 evidence for them automatically.",
-        "text": "Does the agent implement security operations per SOC 2 Type II Trust Service Criteria CC6-CC9 logical and physical access controls and system operations?",
+        "l3": "Access and system operations controls mapped with evidence; change management or risk mitigation controls are unmapped, or no Type II report covers the agent.",
+        "l4": "Access, operations, change and risk mitigation criteria are mapped with automated evidence and a Type II report exists, but its system description omits the agent layer or exceptions remain open.",
+        "l5": "Access, system operations, change management and risk mitigation controls mapped with automated evidence collection; a current SOC 2 Type II report whose system description includes the agent orchestration layer; exceptions remediated with records.",
+        "regulatoryRef": "SOC 2 Type II (Trust Services Criteria)",
+        "remediation": "Bring the agent's service accounts, tool permissions and change pipeline into the SOC 2 system description and collect Trust Services Criteria evidence for them automatically.",
+        "text": "Does the agent implement security operations against the AICPA Trust Services Criteria used in SOC 2 reports, covering logical and physical access, system operations, change management and risk mitigation?",
         "weight": 12
       },
       {
@@ -11317,10 +11317,10 @@
         "l2": "Only throughput and cost metrics are tracked; no economic or social outcome measures exist.",
         "l3": "Agent tracks economic performance metrics and generates basic GRI-aligned reports, but does not implement full SDG impact measurement or stakeholder outcome reporting",
         "l4": "GRI 201-207 reporting and SDG impact measurement are in place, but stakeholder outcome distribution or negative externalities are not analysed.",
-        "l5": "Full outcome accountability with GRI 201-207 economic reporting, UN SDG impact measurement per SDG Impact Standards, stakeholder outcome distribution analysis, negative externality identification, and transparent sustainable outcome reporting",
-        "regulatoryRef": "GRI Standards 201-207; UN SDG Impact Standards",
+        "l5": "Full outcome accountability with GRI 201-207 economic reporting, impact management per the UNDP SDG Impact Standards, stakeholder outcome distribution analysis, negative externality identification, and transparent sustainable outcome reporting",
+        "regulatoryRef": "GRI Standards 201-207; UNDP SDG Impact Standards for Enterprises",
         "remediation": "Add outcome metrics per stakeholder group beside efficiency metrics in the orchestration objective, and report the negative externalities the optimisation produces.",
-        "text": "Does the agent implement outcome accountability per GRI Standards 201-207 economic performance reporting and UN SDG impact measurement framework?",
+        "text": "Does the agent implement outcome accountability by reporting under the GRI economic topic Standards (GRI 201 Economic Performance to GRI 207 Tax) and by integrating impact management into decisions as the UNDP SDG Impact Standards describe?",
         "weight": 12
       },
       {
@@ -11338,9 +11338,9 @@
         "l3": "RTO/RPO set and continuity plans documented for core pathways, but exercises do not measure achieved recovery times or some critical pathways are not covered.",
         "l4": "The BIA covers every critical pathway and exercises measure achieved RTO/RPO, but gaps found in exercises are not tracked to closure.",
         "l5": "Business impact analysis covers every critical pathway; documented recovery procedures; exercises at least annually measure achieved RTO/RPO against targets; gaps tracked to closure.",
-        "regulatoryRef": "ISO 22301:2019 §8.4",
+        "regulatoryRef": "ISO 22301 (business continuity plans)",
         "remediation": "Set RTO and RPO for each critical orchestration pathway in the BIA and run a failover exercise that measures achieved recovery time against them.",
-        "text": "Does the agent implement business continuity per ISO 22301:2019 §8.4 business continuity plans with RTO/RPO verification for critical orchestration pathways?",
+        "text": "Does the agent implement business continuity under an ISO 22301 business continuity management system, with business continuity plans and RTO/RPO verification for critical orchestration pathways?",
         "weight": 12
       },
       {
@@ -11358,7 +11358,7 @@
         "l3": "Disparities measured for some groups or ad hoc, without documented thresholds or remediation.",
         "l4": "Disparity metrics and thresholds run on schedule with tracked remediation, but results are not reported to stakeholders.",
         "l5": "Disparity metrics per defined group on a fixed schedule; thresholds documented; each breach triggers tracked remediation; results reported to stakeholders.",
-        "regulatoryRef": "UNESCO Recommendation on the Ethics of AI (2021): Fairness and non-discrimination",
+        "regulatoryRef": "UNESCO Recommendation on the Ethics of AI: Fairness and non-discrimination",
         "remediation": "Compute access and outcome rates per defined user group weekly from orchestration logs and open a remediation ticket whenever a gap exceeds the documented threshold.",
         "text": "Does the agent measure disparities in access to and outcomes of its orchestration services across defined user groups and act on them, per the UNESCO Recommendation on the Ethics of AI principle 'Fairness and non-discrimination'?",
         "weight": 10
@@ -11373,14 +11373,14 @@
         "failureMode": "The agent's orchestration network has no segmentation, so one compromised connector propagates to every downstream transaction system.",
         "id": "TECH-OS-7",
         "keyRisk": 0,
-        "l1": "No NIS2 cybersecurity measures; orchestration system does not implement essential entity security requirements per Art. 21",
+        "l1": "No NIS2 cybersecurity measures; orchestration system does not implement the Art. 21 risk-management measures",
         "l2": "A few security measures (backups, MFA) exist with no mapping to Art. 21.",
         "l3": "Agent implements several Art. 21 security measures including incident handling and supply chain security, but does not address all required measures",
         "l4": "Most Art. 21 measures are in place with regular testing, but at least one, such as cryptography or supply chain, lacks evidence for the orchestration system.",
-        "l5": "NIS2 controls in place, with all Art. 21 measures, 24-hour incident notification capability, supply chain security, cryptographic controls, access control, and regular cybersecurity testing per Art. 21(2)(i)",
+        "l5": "NIS2 controls in place, with all Art. 21 measures, 24-hour early warning capability for significant incidents (Art. 23(4)(a)), supply chain security, cryptographic controls, access control (Art. 21(2)(i)), and regular assessment of the effectiveness of the measures (Art. 21(2)(f))",
         "regulatoryRef": "EU NIS2 2022/2555 Art. 21",
         "remediation": "Build an Art. 21(2) coverage matrix for the orchestration system with one evidence link per measure, and schedule recurring security tests of the agent's tool interfaces.",
-        "text": "Does the agent implement NIS2 cybersecurity measures per EU NIS2 Directive 2022/2555 Article 21 for essential entity digital infrastructure?",
+        "text": "Does the agent implement NIS2 cybersecurity measures per EU NIS2 Directive 2022/2555 Article 21, where the operator is an essential or important entity?",
         "weight": 12
       },
       {
@@ -11436,12 +11436,12 @@
         "keyRisk": 0,
         "l1": "No TLPT: no threat-led testing program, no governance, and no evidence bundles",
         "l2": "Annual penetration tests and occasional scenario exercises run, with no TLPT policy or independence controls.",
-        "l3": "Performs some penetration testing and occasional scenario exercises, but TLPT governance, independence, and evidence bundles are incomplete or not mapped to the required DORA anchor",
+        "l3": "Performs some penetration testing and occasional scenario exercises, but TLPT governance, independence, and evidence bundles are incomplete or not mapped to DORA Art. 26",
         "l4": "TLPT policy, governance, threat-intelligence red teaming and remediation exist, but evidence bundles lack retest outcomes or rules of engagement.",
-        "l5": "Full TLPT program with governance, scoped threat-led testing, independence controls, remediation + retesting, and supervisor-ready evidence mapped to the required DORA Art. 9(4) anchor",
-        "regulatoryRef": "EU DORA (EU) 2022/2554 Art. 9(4) (TLPT anchor)",
+        "l5": "Full TLPT program with governance, scoped threat-led testing, independence controls, remediation + retesting, and supervisor-ready evidence mapped to DORA Art. 26",
+        "regulatoryRef": "EU DORA (EU) 2022/2554 Art. 26",
         "remediation": "Write a TLPT policy whose scoping includes agent attack paths such as prompt injection driving tool calls, and assemble an evidence bundle per test with retests.",
-        "text": "Does the agent implement threat-led penetration testing (TLPT) governance and execution aligned to the Councils required mapping for EU DORA Art. 9(4), including (1) a TLPT policy and scoping methodology, (2) engagement governance and independence, (3) red-team execution with threat intelligence, (4) findings remediation tracking, and (5) an auditor/supervisor-ready evidence bundle (scope, rules of engagement, reports, remediation, and retest outcomes)?",
+        "text": "Where the financial entity must perform threat-led penetration testing (TLPT) under EU DORA Art. 26, does the agent support TLPT governance and execution, including (1) a TLPT policy and scoping methodology, (2) engagement governance and independence, (3) red-team execution with threat intelligence, (4) findings remediation tracking, and (5) an auditor/supervisor-ready evidence bundle (scope, rules of engagement, reports, remediation, and retest outcomes)?",
         "weight": 15
       },
       {
@@ -11478,10 +11478,10 @@
         "l2": "A high-level continuity plan exists; recovery steps live in individual engineers' heads.",
         "l3": "Has recovery runbooks and exercises some scenarios, but invocation criteria, communications roles, and evidence bundles are incomplete",
         "l4": "Executable runbooks with invocation criteria and roles are exercised, but after-action improvements are not fed back into the runbooks.",
-        "l5": "§8.4.4 controls in place, with executable recovery procedures, role/communication plans, regular exercises, after-action improvements, and auditor-ready evidence",
-        "regulatoryRef": "ISO 22301:2019 §8.4.4",
+        "l5": "Recovery procedure controls in place, with executable recovery procedures, role/communication plans, regular exercises, after-action improvements, and auditor-ready evidence",
+        "regulatoryRef": "ISO 22301 (recovery procedures)",
         "remediation": "Write an executable runbook per critical orchestration pathway with invocation criteria, including how to pause the agent and drain its queue, and exercise it.",
-        "text": "Does the agent implement ISO 22301:2019 §8.4.4 recovery procedures by defining invocation criteria, step-by-step recovery runbooks for critical orchestration pathways, communications/roles during recovery, exercise/testing outputs, and evidence retention that demonstrates procedures are current and effective?",
+        "text": "Does the agent implement ISO 22301 recovery procedures by defining invocation criteria, step-by-step recovery runbooks for critical orchestration pathways, communications/roles during recovery, exercise/testing outputs, and evidence retention that demonstrates procedures are current and effective?",
         "weight": 12
       },
       {
@@ -11499,9 +11499,9 @@
         "l3": "Targets set for some services; dependency mapping incomplete or plans not tested in the last 12 months.",
         "l4": "Targets per service, mapped dependencies and annual tests exist, but exceptions are approved informally or availability trend is not reported.",
         "l5": "Availability and continuity targets per service; critical dependencies mapped; plans tested at least annually with reports; exceptions approved and corrective actions tracked; availability trend reported monthly.",
-        "regulatoryRef": "ISO/IEC 20000-1:2018 §8.6",
+        "regulatoryRef": "ISO/IEC 20000-1 (service continuity and availability)",
         "remediation": "Map every model provider, tool API and data store each orchestration service depends on, and set availability targets that account for the weakest dependency.",
-        "text": "Does the agent implement ISO/IEC 20000-1:2018 §8.6 by defining service continuity and availability targets for orchestration services, mapping critical dependencies (third parties and internal components), testing continuity/availability plans, managing exceptions, and producing evidence packs (targets, test reports, corrective actions, and trend metrics)?",
+        "text": "Does the agent support ISO/IEC 20000-1 service continuity and availability management by defining service continuity and availability targets for orchestration services, mapping critical dependencies (third parties and internal components), testing continuity/availability plans, managing exceptions, and producing evidence packs (targets, test reports, corrective actions, and trend metrics)?",
         "weight": 12
       },
       {
@@ -11519,9 +11519,9 @@
         "l3": "Some ITIL-like processes exist, but KPIs, ownership, and evidence outputs are incomplete or inconsistent",
         "l4": "Owned KPIs, runbooks and an improvement backlog exist, but evidence of sustained execution over several periods is missing.",
         "l5": "Full ITIL practice operationalization with owned KPIs, runbooks, continual improvement, and audit-ready evidence demonstrating sustained execution",
-        "regulatoryRef": "ITIL v4 §5.2.7",
+        "regulatoryRef": "ITIL 4 (service management practices)",
         "remediation": "Name a practice owner, publish MTTR, availability and drill-success KPIs for agent-run services, and review the improvement backlog monthly.",
-        "text": "Does the agent operationalize the ITIL v4 §5.2.7 practice expectations by defining practice ownership, KPIs (availability, incident MTTR, recovery drill success), runbooks/workflows, continual improvement backlog, and evidence outputs that demonstrate the practice is executed and improved over time for orchestration services?",
+        "text": "Does the agent operationalize ITIL 4 service management practices by defining practice ownership, KPIs (availability, incident MTTR, recovery drill success), runbooks/workflows, continual improvement backlog, and evidence outputs that demonstrate the practice is executed and improved over time for orchestration services?",
         "weight": 10
       },
       {
@@ -11538,10 +11538,10 @@
         "l2": "Control citations were copied into a spreadsheet once and never revisited.",
         "l3": "Mapping exists but review/versioning is manual and can lag updates",
         "l4": "The mapping is versioned and reviewed, but no automated check flags controls whose cited clause changed.",
-        "l5": "Strong mapping governance with versioning, periodic review, and checks that controls cite the Council-required anchors consistently",
+        "l5": "Strong mapping governance with versioning, periodic review, and checks that controls cite the article or section they rely on consistently",
         "regulatoryRef": "Citation mapping governance",
         "remediation": "Version the control-to-clause map, run a CI check that every control cites a mapped article, and log each periodic review.",
-        "text": "Does the program maintain a versioned control-to-clause mapping (DORA/ISO/ITIL/GDPR) with periodic review, so each question/control is anchored to the exact Council-required article/section and evidence expectations remain audit-defensible over time?",
+        "text": "Does the program maintain a versioned control-to-clause mapping (DORA/ISO/ITIL/GDPR) with periodic review, so each question/control is anchored to the exact article or section it relies on and evidence expectations remain audit-defensible over time?",
         "weight": 6
       },
       {
@@ -11666,13 +11666,13 @@
       }
     ],
     "regulatoryBasis": [
-      "ISO 27001:2022",
+      "ISO/IEC 27001",
       "SOC 2 Type II",
-      "EU DORA Art. 9 ICT risk management",
-      "ISO 22301:2019",
+      "EU DORA Art. 9 (protection and prevention)",
+      "ISO 22301",
       "EU NIS2 Directive 2022/2555",
-      "ITIL v4",
-      "ISO/IEC 20000-1:2018",
+      "ITIL 4",
+      "ISO/IEC 20000-1",
       "GDPR Art. 32"
     ],
     "regulatoryReferences": [
@@ -11682,7 +11682,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 27001:2022",
+        "text": "ISO/IEC 27001",
         "url": "https://www.iso.org/standard/27001"
       },
       {
@@ -11700,7 +11700,7 @@
         "jurisdiction": "EU",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "EU DORA Art. 9 ICT risk management",
+        "text": "EU DORA Art. 9 (protection and prevention)",
         "url": "https://data.europa.eu/eli/reg/2022/2554/oj"
       },
       {
@@ -11709,7 +11709,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 22301:2019",
+        "text": "ISO 22301",
         "url": "https://www.iso.org/standard/88412.html"
       },
       {
@@ -11728,7 +11728,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "ITIL v4"
+        "text": "ITIL 4"
       },
       {
         "citation": "ISO/IEC 20000-1:2018 Service management system requirements",
@@ -11736,7 +11736,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO/IEC 20000-1:2018",
+        "text": "ISO/IEC 20000-1",
         "url": "https://www.iso.org/standard/70636.html"
       },
       {
@@ -11760,14 +11760,14 @@
     "version": "2026.10"
   },
   "partnerships-prosperity": {
-    "certificationPath": "L1 Basic partnership governance → L2 IP rights management → L3 FRAND/open source compliance → L4 Full SDG 17 partnership framework → L5 Autonomous partnership orchestration with verified equity, IP protection, and measurable prosperity outcomes",
+    "certificationPath": "L1 Basic partnership governance → L2 IP rights management → L3 FRAND/open source licence controls in place → L4 SDG 17.16 partnership monitoring and impact reporting → L5 Autonomous partnership orchestration with verified equity, IP protection, and measurable prosperity outcomes",
     "certificationThreshold": 68,
     "complianceFrameworkRefs": [
       {
         "external": true,
         "frameworkId": null,
         "instrumentId": "eu-data-act",
-        "label": "EU Data Act 2023/2854 Ch. V"
+        "label": "EU Data Act 2023/2854"
       },
       {
         "external": true,
@@ -11785,7 +11785,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-26000",
-        "label": "ISO 26000:2010"
+        "label": "ISO 26000"
       },
       {
         "external": true,
@@ -11795,15 +11795,15 @@
       }
     ],
     "complianceFrameworks": [
-      "EU Data Act 2023/2854 Ch. V",
+      "EU Data Act 2023/2854",
       "TRIPS Agreement",
       "WIPO Copyright Treaty",
-      "ISO 26000:2010",
+      "ISO 26000",
       "UN SDG 17"
     ],
     "contentStatus": "experimental",
     "description": "Global collaboration and sharing to create intellectual property in an open shared environment — AI agents facilitating multi-stakeholder partnerships, open innovation ecosystems, and IP co-creation with emphasis on governance, fair access, and prevention of exploitation.",
-    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply",
+    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation and that product must undergo a third-party conformity assessment under that legislation — otherwise Art. 4 (AI literacy) and Art. 5 (prohibited practices) apply, and Art. 50 (transparency) where the agent interacts directly with people or generates synthetic content",
     "id": "partnerships-prosperity",
     "keyRisks": [
       "IP exploitation by dominant partners through AI-facilitated access",
@@ -11825,14 +11825,14 @@
         "failureMode": "The agent attributes a jointly developed design to the partner that hosts the collaboration workspace, handing that partner the IP.",
         "id": "TECH-PP-1",
         "keyRisk": 0,
-        "l1": "No IP rights management; partnership AI creates joint outputs without clear ownership, licensing terms, or TRIPS-compliant protection",
+        "l1": "No IP rights management; partnership AI creates joint outputs without clear ownership, licensing terms, or attention to the protections TRIPS requires Members to provide",
         "l2": "Ownership of joint outputs is discussed per project, without written allocation.",
-        "l3": "Agent tracks IP ownership in partnership outputs and applies standard licensing templates, but does not implement automated TRIPS compliance or proactive IP conflict detection",
+        "l3": "Agent tracks IP ownership in partnership outputs and applies standard licensing templates, but does not check outputs against TRIPS-based protections automatically or detect IP conflicts proactively",
         "l4": "Ownership is tracked with agreements and AI authorship disclosure, but contribution tracking or IP conflict detection is partial.",
-        "l5": "Full IP governance with automated TRIPS-compliant rights management, joint IP ownership agreements, AI authorship disclosure, patent landscape monitoring, copyright registration support, and IP dispute prevention through clear contribution tracking",
+        "l5": "Full IP governance with automated rights management that reflects TRIPS-based protections, joint IP ownership agreements, AI authorship disclosure, patent landscape monitoring, copyright registration support, and IP dispute prevention through clear contribution tracking",
         "regulatoryRef": "TRIPS Agreement Art. 10, 27-34",
         "remediation": "Record every partner and AI contribution to a joint output in a contribution ledger at creation, and check new outputs against existing IP claims before release.",
-        "text": "Does the agent manage IP rights in partnership ecosystems per TRIPS Agreement Articles 27-34 patent rights and Article 10 copyright protection for AI-generated collaborative outputs?",
+        "text": "Does the agent manage IP rights in partnership outputs, including AI-assisted ones, in line with the patent rights WTO Members must provide under TRIPS Agreement Articles 27-34 and the protection of computer programs and compilations of data under Article 10?",
         "weight": 15
       },
       {
@@ -11870,9 +11870,9 @@
         "l3": "Agent monitors partnership contribution metrics and flags imbalanced participation, but does not act on flags through a documented process.",
         "l4": "Metrics, thresholds and recorded actions exist per partner, but governance reports do not reach the partners.",
         "l5": "Contribution and benefit metrics per partner on a fixed schedule; documented thresholds; each imbalance triggers a recorded action; governance reporting to partners.",
-        "regulatoryRef": "ISO 26000:2010 §6.8",
+        "regulatoryRef": "ISO 26000 (community involvement and development)",
         "remediation": "Compute contribution and benefit per partner each quarter and open a recorded action when any partner, including developing-economy partners, falls below threshold.",
-        "text": "Does the agent implement equitable partnership governance per ISO 26000:2010 §6.8 (community involvement and development), with partner participation measured and imbalances acted on?",
+        "text": "Does the agent implement equitable partnership governance in line with ISO 26000 guidance on community involvement and development, with partner participation measured and imbalances acted on?",
         "weight": 10
       },
       {
@@ -11932,7 +11932,7 @@
         "l5": "Classified trade-secret inventory; access controls and logging cover AI inputs, logs and outputs; confidentiality agreements with every partner; misappropriation response procedure exercised; evidence assembled for the Art. 2(1)(c) 'reasonable steps' test.",
         "regulatoryRef": "EU Trade Secrets Directive 2016/943 Art. 2, 4",
         "remediation": "Classify trade secrets and apply DLP to prompts, logs and outputs of partnership AI tools so classified content is blocked or redacted before reaching the model.",
-        "text": "Does the agent protect trade secrets in partnership AI systems per EU Trade Secrets Directive 2016/943 Articles 2 and 4 reasonable measures requirements?",
+        "text": "Does the agent keep information shared in partnership AI systems under the reasonable steps that make it a trade secret (EU Trade Secrets Directive 2016/943 Art. 2(1)(c)) and guard it against the unlawful acquisition, use and disclosure defined in Art. 4?",
         "weight": 12
       },
       {
@@ -11947,12 +11947,12 @@
         "keyRisk": 2,
         "l1": "No partnership impact measurement; collaborative outcomes are not systematically measured against SDG targets or GRI economic impact standards",
         "l2": "Activity counts are reported, with no economic impact estimate.",
-        "l3": "Agent tracks partnership outputs and estimates economic impact, but does not implement UN SDG 17 multi-stakeholder monitoring or GRI 203 indirect economic impact reporting",
+        "l3": "Agent tracks partnership outputs and estimates economic impact, but does not support SDG 17.16 multi-stakeholder monitoring or GRI 203 indirect economic impact reporting",
         "l4": "SDG 17 and GRI 203 reporting are in place, but prosperity distribution across partners is not analysed.",
         "l5": "Full impact measurement with SDG 17 indicator 17.16.1 tracking, GRI 203 indirect economic impact reporting, prosperity distribution analysis across partners, and transparent partnership impact disclosure for stakeholders",
-        "regulatoryRef": "UN SDG 17 Indicator 17.16.1; GRI 203",
+        "regulatoryRef": "UN SDG 17 Indicator 17.16.1; GRI Standards 203 (Indirect Economic Impacts)",
         "remediation": "Report GRI 203 indirect economic impacts per partner alongside activity metrics, and disclose how value created by the partnership is distributed.",
-        "text": "Does the agent implement partnership impact measurement per UN SDG 17 indicator 17.16.1 multi-stakeholder monitoring frameworks and GRI 203 Indirect Economic Impacts?",
+        "text": "Does the agent measure partnership impact, report indirect economic impacts under GRI 203, and support the multi-stakeholder development effectiveness monitoring that SDG indicator 17.16.1 tracks (a count of countries reporting progress)?",
         "weight": 12
       },
       {
@@ -11978,21 +11978,21 @@
       {
         "dimension": "Compliance",
         "evidence": [
-          "ai_generated_ip_tpm_config",
+          "partnership_work_tpm_config",
           "misappropriation_detection_alert_log",
           "ip_protection_audit_trail"
         ],
         "failureMode": "The agent exports AI-generated partnership models without protection measures, and a departing partner walks away with the full asset.",
         "id": "TECH-PP-9",
         "keyRisk": 3,
-        "l1": "No trade secret or TPM compliance; AI collaboration environments lack Art. 2 reasonable measures for confidential information and WIPO WCT Art. 11 technological protection for AI-generated IP",
-        "l2": "Generic access controls cover partnership data; AI-generated IP has no technological protection.",
-        "l3": "Agent implements basic access controls for partnership data, but does not systematically apply Art. 2 reasonable measures standard or WIPO WCT Art. 11 technological protection for AI-generated collaborative IP",
-        "l4": "AI-specific classification, protection measures and an inventory exist, but misappropriation detection or the audit trail is partial.",
-        "l5": "Full EU Trade Secrets Directive Art. 2 reasonable measures with AI-specific access classification, WIPO WCT Art. 11 technological protection for AI-generated IP, trade secret inventory management, misappropriation detection, and IP protection audit trail for partnership governance",
-        "regulatoryRef": "EU Trade Secrets Directive 2016/943 Art. 2; WIPO WCT Art. 11",
-        "remediation": "Apply technological protection measures to AI-generated partnership assets at export, and alert when an asset is accessed outside the partner's entitlement.",
-        "text": "Does the agent implement EU Trade Secrets Directive 2016/943 Article 2 reasonable measures standard for AI collaboration environments and WIPO Copyright Treaty Article 11 technological protection measures for AI-generated partnership IP?",
+        "l1": "No trade secret or technological protection measures; AI collaboration environments lack Art. 2(1)(c) reasonable steps for confidential information and technological measures on partnership works",
+        "l2": "Generic access controls cover partnership data; partnership works carry no technological protection measures.",
+        "l3": "Agent implements basic access controls for partnership data, but does not systematically apply Art. 2(1)(c) reasonable steps or technological measures on partnership works",
+        "l4": "AI-specific access classification, technological measures on partnership works and a trade secret inventory exist, but misappropriation detection or the audit trail is partial.",
+        "l5": "Full EU Trade Secrets Directive Art. 2(1)(c) reasonable steps with AI-specific access classification, technological measures on partnership works (WCT Art. 11 context), trade secret inventory management, misappropriation detection, and IP protection audit trail for partnership governance",
+        "regulatoryRef": "EU Trade Secrets Directive 2016/943 Art. 2; WIPO Copyright Treaty Art. 11",
+        "remediation": "Apply technological protection measures to partnership works at export, and alert when an asset is accessed outside the partner's entitlement.",
+        "text": "Does the agent apply the reasonable steps of EU Trade Secrets Directive 2016/943 Article 2(1)(c) in AI collaboration environments, and use technological measures on partnership works of the kind WIPO Copyright Treaty Article 11 requires Contracting Parties to protect against circumvention?",
         "weight": 12
       },
       {
@@ -12090,7 +12090,7 @@
         "l3": "Maintains a mapping in documentation, but it is not kept current with workflow changes or used to gate AI content operations",
         "l4": "A versioned mapping with legal review exists, but it is not used to gate AI content operations.",
         "l5": "Robust mapping governance with versioning, legal review, and workflow gating so that WCT/WPPT obligations are correctly applied and evidence is produced per right/article",
-        "regulatoryRef": "WIPO WCT/WPPT (mapping governance)",
+        "regulatoryRef": "WIPO Copyright Treaty; WIPO WPPT",
         "remediation": "Map each content workflow step (capture, reproduction, distribution, TPM) to the WCT or WPPT article it implicates and gate the agent's workflow on that rights check.",
         "text": "Does the program maintain a WIPO treaty-to-right mapping (WCT vs WPPT) for partnership outputs (authors rights vs performers neighboring rights), ensuring each content workflow (capture, reproduction, distribution, TPM/DRM) is mapped to the correct treaty article(s) and reviewed periodically by legal/compliance?",
         "weight": 6
@@ -12217,14 +12217,12 @@
       }
     ],
     "regulatoryBasis": [
-      "EU Data Act 2023/2854 Ch. V",
-      "Creative Commons Licensing",
+      "EU Data Act 2023/2854 (Ch. II, IV, VII)",
+      "Creative Commons licences 4.0 International",
       "TRIPS Agreement",
       "WIPO Internet Treaties",
-      "EU FRAND Licensing Guidelines",
-      "WTO IP Framework",
-      "UN SDG 17 Partnership Framework",
-      "ISO 26000:2010"
+      "UN SDG 17, target 17.16",
+      "ISO 26000"
     ],
     "regulatoryReferences": [
       {
@@ -12234,7 +12232,7 @@
         "jurisdiction": "EU",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "EU Data Act 2023/2854 Ch. V",
+        "text": "EU Data Act 2023/2854 (Ch. II, IV, VII)",
         "url": "https://data.europa.eu/eli/reg/2023/2854/oj"
       },
       {
@@ -12243,7 +12241,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "Creative Commons Licensing"
+        "text": "Creative Commons licences 4.0 International"
       },
       {
         "citation": "WTO TRIPS Agreement",
@@ -12262,28 +12260,12 @@
         "text": "WIPO Internet Treaties"
       },
       {
-        "citation": "EU FRAND licensing guidance",
-        "instrumentId": "eu-frand",
-        "jurisdiction": "EU",
-        "lastReviewed": "2026-10-03",
-        "status": "unverified",
-        "text": "EU FRAND Licensing Guidelines"
-      },
-      {
-        "citation": "WTO TRIPS Agreement",
-        "instrumentId": "trips",
-        "jurisdiction": "INT",
-        "lastReviewed": "2026-10-03",
-        "status": "unverified",
-        "text": "WTO IP Framework"
-      },
-      {
         "citation": "UN 2030 Agenda Sustainable Development Goals",
         "instrumentId": "un-sdgs",
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "UN SDG 17 Partnership Framework"
+        "text": "UN SDG 17, target 17.16"
       },
       {
         "citation": "ISO 26000:2010 Guidance on social responsibility",
@@ -12291,7 +12273,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "ISO 26000:2010"
+        "text": "ISO 26000"
       }
     ],
     "riskTier": "high",
