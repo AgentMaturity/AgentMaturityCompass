@@ -341,9 +341,8 @@ function prioritizeUpgradeActions(
 
 export function collectEvidenceChecklist(scores: QuestionScore[], questions: readonly DiagnosticQuestion[]): string[] {
   const out = new Set<string>();
-  for (const score of scores) {
+  for (const score of scores.filter((row) => questions.some((q) => q.id === row.questionId))) { // P1: only questions that count
     const question = questions.find((q) => q.id === score.questionId), to = Math.min(3, reachableLevel(question)); // P12: only levels AMC can evaluate
-    if (!question) continue; // `questions` holds only the questions that count: one marked not applicable gets no line (P1)
     if (score.finalLevel < to) out.add(`${score.questionId}: ${hintTowardLevel(question, score.finalLevel, to, "capture multi-session evidence with audit + metric events.")}`);
     if (score.flags.includes("FLAG_UNSUPPORTED_CLAIM")) {
       out.add(`${score.questionId}: avoid unsupported high claims; attach [ev:<eventId>] references.`);
