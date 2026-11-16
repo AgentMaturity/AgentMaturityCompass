@@ -24,7 +24,6 @@ import {
 } from "./passportApi.js";
 import { inspectPassportArtifact } from "./passportArtifact.js";
 import { passportEvidenceMixWords, passportStatusWords } from "./passportSchema.js";
-import { writeExportAttestation } from "../attest/exportAttestation.js";
 import type { TrustContext } from "../trust/trustContext.js";
 
 function parseJsonOrYaml(raw: string): unknown {
@@ -325,8 +324,7 @@ export async function passportExportLatestCliAsync(params: Parameters<typeof pas
   const input = { ...params }, workspace = resolve(input.workspace);
   const attempt = await passportExportLatestAttemptForApiAsync({ workspace, scopeType: input.scope.toUpperCase(), scopeId: input.id, outFile: resolve(workspace, input.outFile) },
     { beforePublish: () => assertOwnerMode(workspace, "passport export-latest") });
-  const attestation = writeExportAttestation(workspace, attempt.result.outFile, "amcpass", attempt.result.sha256);
-  return { result: { ...attempt.result, attestation }, assertCurrent: () => attempt.assertCurrent() };
+  return { result: attempt.result, assertCurrent: () => attempt.assertCurrent() };
 }
 
 /** Sequential ordinary reads; each miss owns its genuine create, never an atomic two-agent snapshot. */
@@ -386,8 +384,7 @@ export async function passportPolicyApplyCliAsync(params: Parameters<typeof pass
 }
 export async function passportCreateCliAsync(params: Parameters<typeof passportCreateCli>[0]) {
   const input = { ...params }, beforePublish = () => assertPassportCliOwner(input.workspace, "passport create"); beforePublish();
-  const out = await passportCreateForApiAsync({ workspace: input.workspace, scopeType: input.scope.toUpperCase(), scopeId: input.id, outFile: resolve(input.workspace, input.outFile) }, { beforePublish });
-  return { ...out, attestation: writeExportAttestation(input.workspace, out.outFile, "amcpass", out.sha256) };
+  return passportCreateForApiAsync({ workspace: input.workspace, scopeType: input.scope.toUpperCase(), scopeId: input.id, outFile: resolve(input.workspace, input.outFile) }, { beforePublish });
 }
 
 interface SharePdfState {

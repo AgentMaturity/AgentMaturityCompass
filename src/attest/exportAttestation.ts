@@ -37,14 +37,18 @@ export function exportStatement(input: { name: string; bytes: Uint8Array; kind: 
   };
 }
 
+export type ExportAttestation = { path: string } | { error: string };
+
 /**
  * Writes `<file>.sigstore.json` for `file` and returns its path, or the reason it could not be signed (a locked vault,
- * no-sign mode). The export itself is never undone for that; the caller prints the reason.
+ * no-sign mode, or a file that no longer has the digest the exporter computed when it wrote it). The exporter passes that
+ * digest, so a file swapped after the export is never signed. The export itself is never undone; the caller shows the
+ * reason.
  */
-export function writeExportAttestation(workspace: string, file: string, kind: ExportKind, expectedSha256?: string): { path: string } | { error: string } {
+export function writeExportAttestation(workspace: string, file: string, kind: ExportKind, expectedSha256: string): ExportAttestation {
   try {
     const bytes = readFileSync(file);
-    if (expectedSha256 !== undefined && sha256Hex(bytes) !== expectedSha256) throw new Error(`${basename(file)} changed after it was written`);
+    if (sha256Hex(bytes) !== expectedSha256) throw new Error(`${basename(file)} changed after it was written, so it was not signed`);
     const statement = exportStatement({ name: basename(file), bytes, kind, workspaceId: workspaceIdFromDirectory(workspace), issuedAt: new Date() });
     const signer = ed25519Signer(getSigningKey(workspace, "artifact-seal"));
     const bundle = toSigstoreBundle(signDsse(INTOTO_PAYLOAD_TYPE, Buffer.from(JSON.stringify(statement), "utf8"), signer));

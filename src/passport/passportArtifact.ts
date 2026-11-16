@@ -7,6 +7,7 @@ import { spawnSync } from "node:child_process";
 import { canonicalize } from "../utils/json.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { writeExportAttestation, type ExportAttestation } from "../attest/exportAttestation.js";
 import { getPublicKeyHistory } from "../crypto/keys.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { loadPassportPolicy, savePassportCache, verifyPassportPolicySignature } from "./passportStore.js";
@@ -103,6 +104,8 @@ export interface PassportCreateResult {
   cacheSigPath: string;
   transparencyCreatedHash: string;
   transparencyExportedHash: string;
+  /** `<outFile>.sigstore.json` for this digest, or why it was not written; the passport stands either way. */
+  attestation: ExportAttestation;
 }
 
 export function createPassportArtifact(params: {
@@ -229,7 +232,8 @@ export function createPassportArtifact(params: {
     cachePath: cache.path,
     cacheSigPath: cache.sigPath,
     transparencyCreatedHash: createdEntry.hash,
-    transparencyExportedHash: exportedEntry.hash
+    transparencyExportedHash: exportedEntry.hash,
+    attestation: writeExportAttestation(params.workspace, outFile, "amcpass", sha256)
   };
 }
 

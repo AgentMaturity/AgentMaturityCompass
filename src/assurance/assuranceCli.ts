@@ -1,4 +1,3 @@
-import { writeExportAttestation } from "../attest/exportAttestation.js";
 import { cliInitiator } from "../approvals/approvalEngine.js";
 import { readUtf8 } from "../utils/fs.js";
 import YAML from "yaml";
@@ -61,8 +60,7 @@ export async function assuranceIssueCertCli(params: {
   runId: string;
   outFile?: string;
 }, options: { beforePublish?: () => void } = {}) {
-  const issued = await assuranceCertIssueForApi(params, options);
-  return { ...issued, attestation: writeExportAttestation(params.workspace, issued.outFile, "amccert") };
+  return assuranceCertIssueForApi(params, options);
 }
 
 export function assuranceVerifyCertCli(params: {

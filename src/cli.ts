@@ -795,7 +795,7 @@ import {
   passportVerifyCli,
   passportVerifyPolicyCli
 } from "./passport/passportCli.js";
-import { passportIssuanceLines } from "./passport/passportSchema.js"; import { exportAttestationLine, writeExportAttestation } from "./attest/exportAttestation.js";
+import { passportIssuanceLines } from "./passport/passportSchema.js"; import { exportAttestationLine } from "./attest/exportAttestation.js";
 import {
   standardGenerateCliAsync as standardGenerateCli,
   standardListCli,
@@ -10260,7 +10260,7 @@ bundle
       agentId: opts.agent ?? activeAgent(program),
       attest: opts.attest === true
     });
-    console.log(`${chalk.green(`Bundle exported: ${result.outFile}`)}\n${exportAttestationLine(writeExportAttestation(process.cwd(), result.outFile, "amcbundle"))}`);
+    console.log(`${chalk.green(`Bundle exported: ${result.outFile}`)}\n${exportAttestationLine(result.attestation)}`);
     if (opts.attest) console.log("Attested: attestations/aibom.cdx.json and attestations/control-results.sigstore.json (DSSE, workspace artifact-seal key: a local audit trail until a trust list pins that key)");
     printClaimResult(runIdClaim(runId, opts.agent ?? activeAgent(program)), {});
     console.log(`Files: ${result.fileCount}, Events: ${result.eventCount}, Sessions: ${result.sessionCount}${result.openSessions.length ? `, open sessions: ${result.openSessions.length} (${result.openSessions.join(", ")}; the export verifies as of its export time)` : ""}`);
