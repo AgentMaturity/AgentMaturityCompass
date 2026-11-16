@@ -1,15 +1,20 @@
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterAll, describe, expect, test } from "vitest";
+import { afterAll, describe, expect, test, vi } from "vitest";
 import { questionBank } from "../src/diagnostic/questionBank.js";
 import { getQuestionSet, LIFECYCLE_QUESTION_SET_VERSION } from "../src/diagnostic/questionSets.js";
-import { LEVEL_GUIDE, levelReach, overallScoreBand, reachableLevel } from "../src/diagnostic/levelSemantics.js";
+import { computeLayerScores, LEVEL_GUIDE, levelReach, overallScoreBand, reachableLevel } from "../src/diagnostic/levelSemantics.js";
 import { applicabilityPath, loadQuestionApplicability, scoredQuestions, setQuestionApplicability } from "../src/diagnostic/questionApplicability.js";
-import { scoreRapidAssessment } from "../src/diagnostic/rapidQuickscore.js";
+import { rapidSelfAssessmentLine, scoreRapidAssessment } from "../src/diagnostic/rapidQuickscore.js";
+import { scoreSummary } from "../src/diagnostic/scoreSummary.js";
+import { writeDiagnosticReportShareBundle } from "../src/diagnostic/reportShare.js";
+import { printExecutiveSummary, renderDiagnosticReportHtml } from "../src/cli/reportRenderers.js";
+import { runClaimEnvelope } from "../src/cli/claimOutput.js";
+import type { QuestionScore } from "../src/types.js";
 import { OWASP_LLM_CATEGORIES } from "../src/compliance/mappings/owaspLlmTop10.js";
 import { getPublicMethodologyManifest, renderPublicMethodologyMarkdown } from "../src/methodology/publicMethodology.js";
-import { runDiagnostic } from "../src/diagnostic/runner.js";
+import { collectEvidenceChecklist, explainDiagnosticReportStatus, generateReport, runDiagnostic } from "../src/diagnostic/runner.js";
 import { initWorkspace } from "../src/workspace.js";
 
 const byId = new Map(questionBank.map((question) => [question.id, question]));
@@ -58,6 +63,23 @@ describe("fix plans list only steps that can move a level (P12)", () => {
     const atCeiling = scoreRapidAssessment({ "AMC-1.1": 1, "AMC-2.1": 1, "AMC-3.1.1": 1, "AMC-4.1": 1, "AMC-5.1": 1 });
     expect(atCeiling.recommendations).toEqual([]);
   });
+
+  test("amc improve never shows self-answers as an L-level: five answers of 5 do not read L5", () => {
+    const allFive = scoreRapidAssessment({ "AMC-1.1": 5, "AMC-2.1": 5, "AMC-3.1.1": 5, "AMC-4.1": 5, "AMC-5.1": 5 });
+    const line = rapidSelfAssessmentLine(allFive);
+    expect(line).toContain("25/25 points (100%)");
+    expect(line).not.toMatch(/\bL[2-5]\b/);
+    expect(line).toContain("never counts above L1");
+  });
+
+  test("questions marked not applicable get no recommendation in amc improve or the evidence checklist", () => {
+    expect(scoreRapidAssessment({}, ["AMC-1.1", "AMC-2.1"]).recommendations.map((rec) => rec.questionId)).toEqual(["AMC-3.1.1", "AMC-4.1", "AMC-5.1"]);
+    const score = (questionId: string) => ({ questionId, finalLevel: 0, flags: [], evidenceEventIds: [] }) as unknown as QuestionScore;
+    const counted = questionBank.filter((question) => question.id !== "AMC-1.1");
+    const lines = collectEvidenceChecklist([score("AMC-1.1"), score("AMC-2.1")], counted);
+    expect(lines.some((line) => line.startsWith("AMC-1.1:"))).toBe(false);
+    expect(lines.some((line) => line.startsWith("AMC-2.1:"))).toBe(true);
+  });
 });
 
 describe("overall range (P8)", () => {
@@ -75,7 +97,59 @@ describe("overall range (P8)", () => {
     const band = overallScoreBand(1, scores, questions);
     expect(band.low).toBe(0.31);
     expect(band.high).toBe(1.69);
-    expect(band.method).toContain("an estimate");
+    expect(band.method).toContain("not how far the score could move");
+  });
+  test("with no evidence, or no spread, the score says there is no range instead of a 0-wide one", () => {
+    const flat = { layerScores: [{ layerName: "Skills" as const, avgFinalLevel: 0, confidenceWeightedFinalLevel: 0 }],
+      questionScores: [{ questionId: "AMC-1.1", finalLevel: 0, evidenceEventIds: [] }] as unknown as QuestionScore[] };
+    expect(scoreSummary(flat)).toMatchObject({ band: null, range: "no range: not enough evidence to estimate one" });
+  });
+});
+
+describe("leaving a question out changes the layer average (P1)", () => {
+  test("an excluded question with a different level no longer pulls its layer down", () => {
+    const questions = [{ id: "a", layerName: "Skills" as const }, { id: "b", layerName: "Skills" as const }];
+    const scores = [{ questionId: "a", finalLevel: 2, confidence: 1 }, { questionId: "b", finalLevel: 0, confidence: 1 }] as unknown as QuestionScore[];
+    expect(computeLayerScores(scores, questions)[0]!.avgFinalLevel).toBe(1);
+    const counted = scoredQuestions(questions, { status: "answered", notApplicable: [{ questionId: "b", title: "b", reason: "r" }] });
+    expect(computeLayerScores(scores, counted)[0]!.avgFinalLevel).toBe(2);
+  });
+});
+
+describe("every report lists the questions marked not applicable, with the reason (P1)", () => {
+  const ws = mkdtempSync(join(tmpdir(), "amc-applicability-reports-"));
+  process.env.AMC_VAULT_PASSPHRASE ??= "applicability-test-pass";
+  initWorkspace({ workspacePath: ws, trustBoundaryMode: "isolated" });
+  afterAll(() => rmSync(ws, { recursive: true, force: true }));
+  const reason = "This agent has no system prompt to leak.";
+
+  test("Markdown, HTML, share bundle and executive summary each name AMC-5.14 and the reason", async () => {
+    setQuestionApplicability({ workspace: ws, agentId: "default", question: { id: "AMC-5.14" }, reason });
+    const report = await runDiagnostic({ workspace: ws, window: "1d", agentId: "default" });
+    expect(report.evidenceToCollectNext.some((line) => line.startsWith("AMC-5.14:"))).toBe(false);
+    const claim = runClaimEnvelope(report, ws);
+    const statusExplanation = explainDiagnosticReportStatus(report);
+    expect(generateReport(report, "md", claim) as string).toContain(`(AMC-5.14): ${reason}`);
+
+    const html = renderDiagnosticReportHtml({ report, runId: report.runId, statusExplanation, claim });
+    expect(html).toContain("<code>AMC-5.14</code>): This agent has no system prompt to leak.");
+    expect(html).toContain("1 question is marked as not applying");
+
+    const bundle = writeDiagnosticReportShareBundle({ outputRoot: join(ws, "share"), report, html, requestedRunId: report.runId,
+      resolvedBy: "latest", claimBoundary: statusExplanation.claimBoundary });
+    expect(readFileSync(bundle.htmlPath, "utf8")).toContain("<code>AMC-5.14</code>): This agent has no system prompt to leak.");
+
+    const logged: string[] = [];
+    const spy = vi.spyOn(console, "log").mockImplementation((...args: unknown[]) => { logged.push(args.map(String).join(" ")); });
+    try {
+      printExecutiveSummary({ report, runId: report.runId, statusExplanation, claim });
+    } finally {
+      spy.mockRestore();
+    }
+    const executive = logged.join("\n");
+    expect(executive).toContain(`(AMC-5.14): ${reason}`);
+    expect(executive).toContain("1 question is marked as not applying");
+    expect(executive).toContain("no range: not enough evidence to estimate one");
   });
 });
 

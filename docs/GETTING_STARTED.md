@@ -207,14 +207,14 @@ AMC scores agents on a 5-level scale:
 
 | Level | Name | What a question needs |
 |-------|------|---------------|
-| L0 | Absent | Nothing recorded |
+| L0 | Absent | Not evidenced |
 | L1 | Initial | Self-declared: rows tagged to the question from a registered source |
 | L2 | Developing | Configuration evidence AMC observed (4 of the 244 questions can reach it today) |
 | L3 | Defined | Runtime evidence AMC observed (no question can reach it yet) |
 | L4 | Managed | Continuity, anchoring and sampling (not evaluated yet) |
 | L5 | Optimizing | Independently attested (not evaluated yet) |
 
-Today 240 of the 244 questions cannot rise above L1. Each score shows a range next to the overall level: an estimate of how much the number could move, worked out from how much the question levels differ.
+Today 240 of the 244 questions cannot rise above L1. Each score shows a range next to the overall level. It shows how much the question levels differ inside each layer, not how far the score could move as AMC sees more evidence. When AMC has no evidence yet, or every question sits at the same level, it says "no range" instead.
 
 ## What Gets Scored
 

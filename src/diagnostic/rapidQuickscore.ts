@@ -98,7 +98,17 @@ export function getRapidQuestions(): DiagnosticQuestion[] {
   return RAPID_QUESTION_IDS.map((questionId) => findQuestionOrThrow(questionId));
 }
 
-export function scoreRapidAssessment(answers: Record<string, number>): RapidQuickscoreResult {
+/**
+ * `amc improve`'s headline: the self-answers as points and a percentage, never an L-level. A self-reported answer never
+ * counts above L1 (self-declared), so five answers of 5 must not read as L5.
+ */
+export function rapidSelfAssessmentLine(result: Pick<RapidQuickscoreResult, "totalScore" | "maxScore" | "percentage" | "questionCount">): string {
+  return `Self-assessed: ${result.totalScore}/${result.maxScore} points (${result.percentage}%) from ${result.questionCount} self-answers, 0-5 each. `
+    + "This is not a maturity level: a self-reported answer never counts above L1 (self-declared).";
+}
+
+/** `notApplicable`: question ids a person marked as not applying to this agent; they get no recommendation (P1). */
+export function scoreRapidAssessment(answers: Record<string, number>, notApplicable: readonly string[] = []): RapidQuickscoreResult {
   const questions = getRapidQuestions();
   const scored = questions.map<RapidQuestionScore>((question) => ({
     questionId: question.id,
@@ -116,7 +126,7 @@ export function scoreRapidAssessment(answers: Record<string, number>): RapidQuic
   const recommendations = scored
     .map((row) => ({ row, question: findQuestionOrThrow(row.questionId) }))
     .map(({ row, question }) => ({ row, question, targetLevel: Math.min(3, reachableLevel(question)) }))
-    .filter(({ row, targetLevel }) => row.level < targetLevel)
+    .filter(({ row, targetLevel }) => row.level < targetLevel && !notApplicable.includes(row.questionId))
     .sort((a, b) => a.row.level - b.row.level || a.row.questionId.localeCompare(b.row.questionId))
     .slice(0, 3)
     .map<RapidImprovementRecommendation>(({ row, question, targetLevel }) => ({

@@ -261,7 +261,7 @@ export function overallScore(layers: ReadonlyArray<Pick<LayerScore, "avgFinalLev
 
 /** How the overall score's range is computed; every surface that shows the range shows this sentence with it. */
 const OVERALL_BAND_METHOD =
-  "an estimate: the overall plus or minus 1.96 standard errors of the question levels inside each layer; it does not cover evidence AMC has not seen";
+  "the overall plus or minus 1.96 standard errors of the question levels inside each layer: it shows how much question levels differ inside each layer, not how far the score could move as AMC sees more evidence";
 
 /**
  * A range around the overall score (P8). Each layer's standard error is the weighted spread of its questions' final

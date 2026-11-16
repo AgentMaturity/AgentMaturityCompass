@@ -105,7 +105,7 @@ import {
   unverifiedClaim, withClaimFields, withClaimFieldsEach
 } from "./cli/claimOutput.js";
 import { addRiskClassifyOptions, riskClassifyAction } from "./compliance/euAiActCli.js";
-import { renderDiagnosticReportHtml } from "./cli/reportRenderers.js"; import { emitScoreEvidenceResult } from "./cli/scoreEvidenceOutput.js";
+import { printExecutiveSummary, renderDiagnosticReportHtml } from "./cli/reportRenderers.js"; import { emitScoreEvidenceResult } from "./cli/scoreEvidenceOutput.js";
 import { envelopeForComplianceReport } from "./claims/eligibility/adapters/results.js";
 import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "./claims/eligibility/render.js";
 import { listDecisionReceipts, loadDecisionReceipt, observeDecisionOutcomes, writeDecisionReceipts, type DecisionReceipt } from "./lifecycle/decisionReceipt.js";
@@ -1522,7 +1522,7 @@ async function renderInstantFullScore(
       score: score100,
       level: `L${avgLevel.toFixed(2)}`,
       overallLevel: Number(avgLevel.toFixed(2)),
-      overallRange: summary.band, levelsEvaluableToday: summary.reach,
+      overallRange: summary.band, overallRangeText: summary.range, levelsEvaluableToday: summary.reach,
       questionApplicability: report.questionApplicability ?? { status: "not_answered", notApplicable: [] },
       trustLabel: report.trustLabel,
       questionCount: fullQuestionCount,
@@ -1558,7 +1558,7 @@ async function renderInstantFullScore(
   console.log(chalk.gray(`  Artifact seal: ${report.status} | Evidence: ${statusExplanation.evidenceStatus} | Claims: ${statusExplanation.strongClaimsAllowed ? "ELIGIBLE" : "BLOCKED"}`));
   console.log("");
   console.log(chalk.bold(`  Overall: L${avgLevel.toFixed(2)} (${score100}/100) ${report.trustLabel}`));
-  console.log(chalk.gray(`  Range: L${summary.band.low.toFixed(2)} to L${summary.band.high.toFixed(2)} (${summary.band.method})`));
+  console.log(chalk.gray(`  ${summary.range.charAt(0).toUpperCase()}${summary.range.slice(1)}`));
   const recorded = report.recordedActivity?.events ?? 0;
   if (report.evidenceCoverage === 0 && recorded > 0) {
     const sessions = report.recordedActivity?.sessions ?? 0;
@@ -2360,7 +2360,7 @@ program
   .description("Guided improvement — shows what to fix next based on your current score")
   .option("--json", "emit JSON output", false)
   .action(async (opts: { json: boolean }) => {
-    const { getRapidQuestions, scoreRapidAssessment } = await import("./diagnostic/rapidQuickscore.js");
+    const { getRapidQuestions, rapidSelfAssessmentLine, scoreRapidAssessment } = await import("./diagnostic/rapidQuickscore.js");
 
     // Check if we have a recent quickscore, otherwise run one
     let answers: Record<string, number> = {};
@@ -2378,7 +2378,7 @@ program
           name: "level",
           message: `${question.id}: ${question.title}`,
           choices: question.options.map((option) => ({
-            name: `L${option.level} - ${option.label}`,
+            name: `${option.level} - ${option.label}`,
             value: option.level
           }))
         }]);
@@ -2386,7 +2386,9 @@ program
       }
     }
 
-    const result = scoreRapidAssessment(answers);
+    const { loadQuestionApplicability } = await import("./diagnostic/questionApplicability.js");
+    const excluded = loadQuestionApplicability(process.cwd(), resolveAgentId(process.cwd(), activeAgent(program)), questions).notApplicable.map((row) => row.questionId);
+    const result = scoreRapidAssessment(answers, excluded);
     const claim = selfAnswerClaim("diagnostic:rapidQuickscore", Object.values(answers));
 
     if (opts.json) {
@@ -2395,7 +2397,7 @@ program
     }
 
     console.log("");
-    console.log(chalk.bold(`  Current: ${result.preliminaryLevel} (${result.totalScore}/${result.maxScore} points from ${result.maxScore / 5} self-answers, 0-5 each)`));
+    console.log(chalk.bold(`  ${rapidSelfAssessmentLine(result)}`));
     printClaimResult(claim, opts);
     console.log("");
     const { levelReach } = await import("./diagnostic/levelSemantics.js");
@@ -5530,59 +5532,7 @@ program
     }
 
     if (opts.executive) {
-      const avgLayerScore = report.layerScores.length > 0
-        ? report.layerScores.reduce((s, l) => s + l.avgFinalLevel, 0) / report.layerScores.length
-        : 0;
-      const score = avgLayerScore;
-      const levelNum = Math.min(5, Math.floor(avgLayerScore));
-      const level = `L${levelNum}`;
-      const riskLabel = levelNum >= 4 ? "Low" : levelNum >= 3 ? "Moderate" : levelNum >= 2 ? "Elevated" : "High";
-      const riskColor = levelNum >= 4 ? chalk.green : levelNum >= 3 ? chalk.yellow : chalk.red;
-      console.log(chalk.bold("\n═══════════════════════════════════════════"));
-      console.log(chalk.bold("  AMC Executive Summary"));
-      console.log(chalk.bold("═══════════════════════════════════════════\n"));
-      printClaimResult(claim, {});
-      console.log(chalk.gray("  Agent:        "), report.agentId ?? "default");
-      if (resolved.alias) {
-        console.log(chalk.gray("  Alias:        "), resolved.alias);
-      }
-      console.log(chalk.gray("  Date:         "), new Date(report.ts).toISOString().split("T")[0]);
-      console.log(chalk.gray("  Maturity:     "), chalk.bold(level));
-      console.log(chalk.gray("  Overall Score:"), chalk.bold(`${typeof score === "number" ? score.toFixed(1) : score}/5`));
-      console.log(chalk.gray("  Risk Level:   "), riskColor(riskLabel));
-      console.log(chalk.gray("  Artifact:     "), `${report.status} — ${statusExplanation.artifactLabel}`);
-      console.log(chalk.gray("  Evidence:     "), `${statusExplanation.evidenceStatus} — ${statusExplanation.readinessLabel}`);
-      console.log(chalk.gray("  Claims:       "), statusExplanation.strongClaimsAllowed ? "ELIGIBLE" : "BLOCKED");
-      console.log(chalk.gray("  Claim Boundary:"), statusExplanation.claimBoundary);
-      console.log(chalk.gray("  Evidence Next:"), statusExplanation.nextStep);
-      console.log("");
-      console.log(chalk.bold("  What This Means"));
-      console.log(chalk.gray("  ─────────────────"));
-      const meanings: Record<number, string> = {
-        0: "This agent has no governance controls. It should not be deployed in production.",
-        1: "This agent has basic intent toward safety but lacks operational controls.",
-        2: "This agent has repeatable processes but gaps remain in edge cases.",
-        3: "This agent has defined controls; production readiness still depends on scoped evidence and applicable requirements.",
-        4: "This agent has measured controls and strong proof coverage for the assessed scope.",
-        5: "This agent demonstrates continuously verified controls for the assessed scope.",
-      };
-      console.log(`  ${statusExplanation.strongClaimsAllowed ? meanings[levelNum] ?? meanings[0] : "This score is a local baseline only because evidence is not claim-ready."}`);
-      console.log("");
-      console.log(chalk.bold("  Recommendation"));
-      console.log(chalk.gray("  ─────────────────"));
-      if (!statusExplanation.strongClaimsAllowed) {
-        console.log("  Collect sufficient verified evidence before making deployment, compliance, or audit-readiness claims.");
-      } else if (levelNum >= 3) {
-        console.log("  Review the scoped evidence, applicable controls, and operating risk before production expansion.");
-      } else if (levelNum >= 2) {
-        console.log("  ⚠️  Address identified gaps before production deployment. Run: amc guide --go");
-      } else {
-        console.log("  ❌ Significant governance gaps. Not recommended for production. Run: amc guide --go");
-      }
-      console.log("");
-      console.log(chalk.gray("  Full report: amc report " + resolved.resolvedRunId));
-      console.log(chalk.gray("  Improvement plan: amc guide --go"));
-      console.log(chalk.gray("  EU AI Act mapping: amc quickscore --eu-ai-act\n"));
+      printExecutiveSummary({ report, runId: resolved.resolvedRunId, alias: resolved.alias, statusExplanation, claim });
       return;
     }
     printLabelledReport(generateReport(report, "md", claim) as string);

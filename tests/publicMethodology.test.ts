@@ -62,7 +62,7 @@ describe("public methodology manifest", () => {
     expect(first.changelog[0]?.version).toBe(AMC_PUBLIC_METHODOLOGY_VERSION);
     expect(first.changelog[0]?.date).toBe(AMC_PUBLIC_METHODOLOGY_RELEASE_DATE);
     expect(first.releaseDate).toBe("2026-11-16");
-    // r227 (lane score): applicability, the 2025 OWASP list, an estimated range and the reach of each level.
+    // r227 (lane score): applicability, the 2025 OWASP list, a range and the reach of each level.
     expect(first.changelog[0]).toMatchObject({ version: "2026.11.16-r227", date: "2026-11-16" });
     expect(first.changelog[0]?.summary).toContain("not applying to one agent");
     expect(first.changelog[0]?.migration).toContain("2026.10.08-r226");

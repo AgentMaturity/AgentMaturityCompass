@@ -343,6 +343,7 @@ export function collectEvidenceChecklist(scores: QuestionScore[], questions: rea
   const out = new Set<string>();
   for (const score of scores) {
     const question = questions.find((q) => q.id === score.questionId), to = Math.min(3, reachableLevel(question)); // P12: only levels AMC can evaluate
+    if (!question) continue; // `questions` holds only the questions that count: one marked not applicable gets no line (P1)
     if (score.finalLevel < to) out.add(`${score.questionId}: ${hintTowardLevel(question, score.finalLevel, to, "capture multi-session evidence with audit + metric events.")}`);
     if (score.flags.includes("FLAG_UNSUPPORTED_CLAIM")) {
       out.add(`${score.questionId}: avoid unsupported high claims; attach [ev:<eventId>] references.`);
@@ -1282,7 +1283,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
 
     const prioritized = prioritizeUpgradeActions(questionScores, targetProfile, countedQuestions);
     const confidenceSummary = summarizeConfidenceControls(questionScores, prioritized.recommendationControls);
-    const evidenceToCollectNext = collectEvidenceChecklist(questionScores, activeQuestions);
+    const evidenceToCollectNext = collectEvidenceChecklist(questionScores, countedQuestions);
     const questionExplainability = buildQuestionExplainabilityReport({
       agentId,
       runId,
