@@ -84,7 +84,7 @@
       "question": {
         "id": "GOV-DD-2",
         "dimension": "Safety",
-        "text": "Does the agent help prevent electoral disinformation, including by giving users tools to judge how trustworthy a source is (EU Code of Practice on Disinformation 2022, Commitment 22), and support the DSA Article 34 electoral risk assessment for very large platforms?",
+        "text": "Does the agent help prevent electoral disinformation, including by giving users tools to judge how trustworthy a source is (EU Code of Practice on Disinformation 2022, Commitment 22; since 1 July 2025 a code of conduct under the DSA), and support the DSA Article 34 electoral risk assessment for very large platforms?",
         "regulatoryRef": "EU Code of Practice on Disinformation 2022 Commitment 22; EU DSA Art. 34",
         "l1": "No disinformation prevention; AI-curated electoral content amplifies false information without detection or correction mechanisms",
         "l3": "Agent implements fact-checking integration for electoral content and flags suspected disinformation, but does not implement DSA Art. 34 electoral risk assessment or Code of Practice Commitment 22 reporting",
@@ -97,11 +97,11 @@
       "question": {
         "id": "GOV-DD-3",
         "dimension": "Privacy",
-        "text": "Does the agent protect political opinion data per the GDPR Article 9(2)(d) exemption for special category data with minimal processing and robust access controls for electoral services?",
+        "text": "Does the agent treat political opinion data, declared or inferred, as special category data under GDPR Article 9(1), rely on the Article 9(2)(d) exception only within its scope (a not-for-profit body with a political, philosophical, religious or trade union aim, processing data about its members, former members or people in regular contact with it, and disclosing nothing outside that body without consent), and keep processing minimal behind strong access controls?",
         "regulatoryRef": "GDPR Art. 9(1) and 9(2)(d)",
         "l1": "No political data protection; electoral AI processes political opinion as regular personal data without Art. 9 special category safeguards",
         "l3": "Agent applies Art. 9 special category controls for explicit political data, but does not prevent inferential political profiling or implement minimal processing for voter analytics",
-        "l5": "Full GDPR Art. 9 political data governance with processing limitation to Art. 9(2)(d) exemption scope, prohibition on political micro-targeting, voter analytics data minimization, special category DPIA, and political data processing transparency",
+        "l5": "GDPR Art. 9 controls for political opinion data in place, with every processing tied to an Art. 9(2) exception that applies (Art. 9(2)(d) only within its scope), inferred political opinions handled as special category data, voter analytics data minimization, a DPIA for special category processing, and transparency about political data processing",
         "weight": 15
       }
     },
@@ -110,11 +110,11 @@
       "question": {
         "id": "GOV-DD-5",
         "dimension": "Governance",
-        "text": "Does the agent implement OSCE/ODIHR electoral integrity standards for AI-assisted voter registration, information services, and results management systems?",
+        "text": "Does the agent support AI-assisted voter registration, information services and results management in line with the OSCE election commitments (Copenhagen Document para. 7) and the ODIHR methodology for observing ICT in elections?",
         "regulatoryRef": "ODIHR Handbook for the Observation of ICT in Elections (2024); OSCE Copenhagen Document (1990) para. 7",
-        "l1": "No electoral integrity controls; AI-assisted electoral administration lacks OSCE/ODIHR standards alignment or independent verification mechanisms",
-        "l3": "Agent implements basic integrity controls for electoral AI systems, but does not implement OSCE/ODIHR election assessment framework or independent audit support",
-        "l5": "Full OSCE/ODIHR standards alignment with electoral technology security assessment, observer access mechanisms, results management integrity verification, recount support capability, and OSCE post-election technology review documentation",
+        "l1": "No electoral integrity controls; AI-assisted electoral administration has no independent verification and observers cannot assess it",
+        "l3": "Agent implements basic integrity controls for electoral AI systems, but does not support observation of its ICT as the ODIHR methodology describes, or independent audit",
+        "l5": "Electoral technology security assessment, observer access mechanisms, results management integrity verification, recount support capability, and a documented independent audit of the election technology, all in line with the Copenhagen Document para. 7 commitments and the ODIHR observation methodology",
         "weight": 25
       }
     },
@@ -214,11 +214,11 @@
       "question": {
         "id": "GOV-PPC-5",
         "dimension": "Compliance",
-        "text": "Does the agent report the amount committed to each PPP for infrastructure, the measure used by SDG indicator 17.17.1, and apply ISO 26000 §6.6.2 community involvement principles in PPP impact assessment?",
-        "regulatoryRef": "UN SDG 17 Indicator 17.17.1; ISO 26000 §6.6.2",
-        "l1": "No SDG impact monitoring; PPP activities are not measured against SDG 17 partnership quality or ISO 26000 community involvement standards",
-        "l3": "Agent tracks selected SDG 17 indicators and measures partnership outputs, but does not report amounts committed per indicator 17.17.1 or ISO 26000 §6.6.2 community development principles",
-        "l5": "Full SDG 17 monitoring with amounts committed reported per indicator 17.17.1, ISO 26000 §6.6.2 community involvement integration, outcome attribution methodology, private sector development contribution measurement, and transparent SDG impact reporting for all PPP activities",
+        "text": "Does the agent report the amount committed to each PPP for infrastructure, the measure used by SDG indicator 17.17.1, and apply the ISO 26000 guidance on community involvement in PPP impact assessment?",
+        "regulatoryRef": "UN SDG 17 Indicator 17.17.1; ISO 26000 community involvement",
+        "l1": "No PPP reporting; the amount committed to each PPP is not recorded or reported, and ISO 26000 community involvement guidance is not applied",
+        "l3": "Agent tracks selected SDG 17 indicators and measures partnership outputs, but does not report amounts committed per indicator 17.17.1 or apply ISO 26000 community involvement guidance",
+        "l5": "Full SDG 17 monitoring with amounts committed reported per indicator 17.17.1, ISO 26000 community involvement integration, outcome attribution methodology, private sector development contribution measurement, and transparent SDG impact reporting for all PPP activities",
         "weight": 15
       }
     },

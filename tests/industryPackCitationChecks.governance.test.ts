@@ -56,6 +56,21 @@ describe("governance station clauses the review corrected", () => {
     expect(text("public-private-collaboration", "GOV-PPC-5")).not.toMatch(/multi-stakeholder partnership monitoring/);
     expect(text("petition-to-law", "GOV-PL-9")).not.toMatch(/Art\. 8 requires/);
     expect(text("dance-of-democracy", "GOV-DD-16")).toMatch(/candidates and their agents/);
+    expect(text("dance-of-democracy", "GOV-DD-3")).toMatch(/not-for-profit body/);
+    expect(text("dance-of-democracy", "GOV-DD-3")).not.toMatch(/micro-targeting/);
+    expect(text("dance-of-democracy", "GOV-DD-5")).not.toMatch(/OSCE\/ODIHR electoral integrity standards|OSCE post-election|post_election_technology_review/);
+    expect(text("dance-of-democracy", "GOV-DD-12")).not.toMatch(/OSCE\/ODIHR observation practice/);
+    expect(text("dance-of-democracy", "GOV-DD-2")).toMatch(/since 1 July 2025 a code of conduct under the DSA/);
+    expect(text("citizen-services", "GOV-CS-10")).toMatch(/Art\. 6\(2\)\(c\)/);
+    expect(text("public-private-collaboration", "GOV-PPC-5")).not.toMatch(/6\.6\.2|partnership quality/);
+    expect(text("public-private-collaboration", "GOV-PPC-2")).not.toMatch(/ppp_transparency_report|public transparency reporting/);
+  });
+
+  it("keeps compliance claims and unnamed documents out of the maturity path and the rules to check", () => {
+    for (const p of governancePacks) {
+      expect(p.certificationPath, p.id).not.toMatch(/complian|World Bank/i);
+      expect(p.regulatoryBasis.join("; "), p.id).not.toMatch(/World Bank/);
+    }
   });
 
   it("names documents that exist and keeps no unconfirmed ISO edition year in the station's own text", () => {

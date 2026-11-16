@@ -747,7 +747,7 @@
     "sourceUrl": "https://digital-strategy.ec.europa.eu/en/library/2022-strengthened-code-practice-disinformation",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Commitment 22 is about giving users tools to make more informed decisions about information that may be false or misleading, including indicators of the trustworthiness of sources; it is not a general electoral disinformation prevention duty. The citation now says 'Commitment 22' and the question says what it covers. A voluntary code."
+    "note": "Commitment 22 is about giving users tools to make more informed decisions about information that may be false or misleading, including indicators of the trustworthiness of sources; it is not a general electoral disinformation prevention duty. The citation now says 'Commitment 22' and the question says what it covers. A voluntary code. On 13 February 2025 the 2022 Code of Practice was integrated into the DSA framework as the Code of Conduct on Disinformation, taking effect from 1 July 2025 (https://digital-strategy.ec.europa.eu/en/library/code-conduct-disinformation); the question now says so, and the citation keeps the 2022 text whose Commitment 22 was read."
   },
   {
     "packId": "dance-of-democracy",
@@ -777,7 +777,7 @@
     "sourceUrl": "https://publications.europa.eu/resource/celex/32016R0679",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Citation unchanged. The question text said 'Article 9(d)', which does not exist; it now says Article 9(2)(d). Art. 9(2)(d) applies only to not-for-profit bodies with a political, philosophical, religious or trade union aim."
+    "note": "Citation unchanged. Art. 9(1) prohibits processing personal data revealing political opinions unless an Art. 9(2) exception applies. Art. 9(2)(d) covers only processing by a foundation, association or other not-for-profit body with a political, philosophical, religious or trade union aim, relating solely to its members, former members or people in regular contact with it, with no disclosure outside the body without consent. The question used to say 'Article 9(d)' and applied the exception to electoral services in general; it now asks for Art. 9(1) protection with 9(2)(d) relied on only within that scope. L5 used to credit GDPR Art. 9 with a 'prohibition on political micro-targeting', which Art. 9 does not set; that wording was removed (targeting rules for political advertising are in Regulation (EU) 2024/900 Art. 18, cited in GOV-DD-17)."
   },
   {
     "packId": "dance-of-democracy",
@@ -822,7 +822,7 @@
     "sourceUrl": "https://odihr.osce.org/sites/default/files/f/documents/c/9/558318_0.pdf",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "No ODIHR 'Handbook on Electoral Technology' was found; ODIHR's current handbook on election technology is the 2024 Handbook for the Observation of ICT in Elections, which replaced the 2013 Handbook for the Observation of New Voting Technologies. It is observation methodology, not binding. The pack-level entry 'OSCE/ODIHR Electoral Standards' named no real document and its replacement would need a new catalogue record, so it was removed from the pack's regulatory basis."
+    "note": "No ODIHR 'Handbook on Electoral Technology' was found; ODIHR's current handbook on election technology is the 2024 Handbook for the Observation of ICT in Elections, which replaced the 2013 Handbook for the Observation of New Voting Technologies. It is observation methodology, not binding. The pack-level entry 'OSCE/ODIHR Electoral Standards' named no real document and its replacement would need a new catalogue record, so it was removed from the pack's regulatory basis. The question and level texts used to ask for 'OSCE/ODIHR electoral integrity standards' and an 'OSCE post-election technology review', which neither source sets; they now ask for support in line with the Copenhagen Document para. 7 commitments and the ODIHR methodology for observing ICT in elections."
   },
   {
     "packId": "dance-of-democracy",
@@ -837,7 +837,7 @@
     "sourceUrl": "https://www.osce.org/files/f/documents/9/c/14304.pdf",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "'OSCE Commitments §7' named no document; paragraph 7 of the 1990 Copenhagen Document sets the election commitments (free elections at reasonable intervals, universal and equal suffrage, secret ballot, honest counting)."
+    "note": "'OSCE Commitments §7' named no document; paragraph 7 of the 1990 Copenhagen Document sets the election commitments (free elections at reasonable intervals, universal and equal suffrage, secret ballot, honest counting). The question and level texts used to ask for 'OSCE/ODIHR electoral integrity standards' and an 'OSCE post-election technology review', which neither source sets; they now ask for support in line with the Copenhagen Document para. 7 commitments and the ODIHR methodology for observing ICT in elections."
   },
   {
     "packId": "dance-of-democracy",
@@ -1002,7 +1002,7 @@
     "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "rm.coe.int and www.coe.int answered HTTP 403 (Cloudflare block, curl and WebFetch) on 2026-11-16 and search.coe.int returns only a script page, so the text was not read. The second part of this question's citation, 'OSCE/ODIHR Electoral Standards', named no real document; it was removed rather than replaced, because the replacement (the 2024 ODIHR ICT handbook, cited in GOV-DD-5) has no catalogue record. The question still mentions OSCE/ODIHR observation practice as context."
+    "note": "rm.coe.int and www.coe.int answered HTTP 403 (Cloudflare block, curl and WebFetch) on 2026-11-16 and search.coe.int returns only a script page, so the text was not read. The second part of this question's citation, 'OSCE/ODIHR Electoral Standards', named no real document; it was removed rather than replaced, because the replacement (the 2024 ODIHR ICT handbook, cited in GOV-DD-5) has no catalogue record. The words 'and OSCE/ODIHR observation practice' were also taken out of the question, since no citation backs them."
   },
   {
     "packId": "dance-of-democracy",
@@ -2052,7 +2052,7 @@
     "sourceUrl": "https://publications.europa.eu/resource/celex/32018R1724",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Art. 6(1) requires Annex II procedures to be completable fully online; 6(2) defines 'fully online' (identification, information and evidence, signature and final submission, acknowledgement, electronic output, notification of completion) and does not mention payment; 6(3) allows in-person steps only for overriding public security, public health or anti-fraud reasons. Citation, question and L4 updated; Art. 6 applies from 12 December 2023 (Art. 39)."
+    "note": "Art. 6(1) requires Annex II procedures to be completable fully online; 6(2) defines 'fully online' (identification, information and evidence, signature and final submission, acknowledgement, electronic output, notification of completion) and does not mention payment; 6(3) allows in-person steps only for overriding public security, public health or anti-fraud reasons. Citation, question and L4 updated; Art. 6 applies from 12 December 2023 (Art. 39). Art. 6(2)(c) lets the output be delivered by physical means where Union or national law requires it; the question and L3 now say so."
   },
   {
     "packId": "citizen-services",
@@ -2202,22 +2202,7 @@
     "sourceUrl": "https://legalinstruments.oecd.org/en/instruments/OECD-LEGAL-0392",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "OECD/LEGAL/0392 is the Recommendation on Principles for Public Governance of Public-Private Partnerships (adopted 4 May 2012); 'PPP Framework' is the pack's short name for it."
-  },
-  {
-    "packId": "public-private-collaboration",
-    "questionId": "pack",
-    "citation": "World Bank PPP Guidelines",
-    "instrument": "World Bank PPP guidance (document not identified)",
-    "clause": "whole instrument",
-    "verdict": "unverifiable",
-    "was": null,
-    "now": null,
-    "sourceTitle": null,
-    "sourceUrl": null,
-    "checkedOn": "2026-11-16",
-    "checkedBy": "ai-agent",
-    "note": "ppp.worldbank.org answered HTTP 403 (curl and WebFetch) on 2026-11-16, and the citation names no specific World Bank document, so nothing was read."
+    "note": "OECD/LEGAL/0392 is the Recommendation on Principles for Public Governance of Public-Private Partnerships (adopted 4 May 2012); 'PPP Framework' is the pack's short name for it. The pack-level entry 'World Bank PPP Guidelines' was removed from the regulatory basis and the maturity path: it names no specific World Bank document, and ppp.worldbank.org answered HTTP 403 on 2026-11-16, so nothing was read."
   },
   {
     "packId": "public-private-collaboration",
@@ -2352,7 +2337,7 @@
     "sourceUrl": "https://legalinstruments.oecd.org/en/instruments/OECD-LEGAL-0392",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Principle 6 is risk allocation (transfer risks to those that manage them best), not transparency and accountability; transparent budget treatment disclosing all costs and contingent liabilities is Principle 11. Citation, question and level texts now name §5 (procurement option pre-test) and §11."
+    "note": "Principle 6 is risk allocation (transfer risks to those that manage them best), not transparency and accountability; transparent budget treatment disclosing all costs and contingent liabilities is Principle 11. Citation, question and level texts now name §5 (procurement option pre-test) and §11. The detail text and the evidence id (ppp_transparency_report became ppp_budget_cost_and_liability_disclosure) were reworded with the question."
   },
   {
     "packId": "public-private-collaboration",
@@ -2397,22 +2382,22 @@
     "sourceUrl": "https://unstats.un.org/sdgs/indicators/Global-Indicator-Framework-after-2025-review-English.pdf",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Citation unchanged. Indicator 17.17.1 is the amount in United States dollars committed to public-private partnerships for infrastructure, not multi-stakeholder partnership monitoring; the question and level texts now say that."
+    "note": "Citation unchanged. Indicator 17.17.1 is the amount in United States dollars committed to public-private partnerships for infrastructure, not multi-stakeholder partnership monitoring; the question and level texts now say that. L1, the detail texts, the evidence id (now ppp_amount_committed_17_17_1_record) and the remediation now ask for the amount committed per PPP."
   },
   {
     "packId": "public-private-collaboration",
     "questionId": "GOV-PPC-5",
-    "citation": "ISO 26000 §6.6.2",
+    "citation": "ISO 26000 community involvement",
     "instrument": "ISO 26000 Guidance on social responsibility",
-    "clause": "§6.6.2",
+    "clause": "community involvement (clause not confirmed)",
     "verdict": "unverifiable",
-    "was": null,
-    "now": null,
+    "was": "ISO 26000 §6.6.2",
+    "now": "ISO 26000 community involvement",
     "sourceTitle": null,
     "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "www.iso.org answered HTTP 403 (curl and WebFetch) on 2026-11-16, so neither the catalogue page nor the text was read. The edition year was taken out of the citation and the station's text because it could not be confirmed; the clause number is not confirmed."
+    "note": "www.iso.org answered HTTP 403 (curl and WebFetch) on 2026-11-16, so neither the catalogue page nor the text was read. The clause number '§6.6.2' was taken out of the citation, question and level texts because it could not be confirmed (the same station places anti-corruption at clause 6.6.3, so 6.6.2 labelled community involvement is doubtful); the edition year was taken out for the same reason. A clause number may return only after the ISO text is opened."
   },
   {
     "packId": "public-private-collaboration",
