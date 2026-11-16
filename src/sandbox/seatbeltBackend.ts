@@ -2,6 +2,9 @@ import { existsSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "no
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runProcess } from "../exec/runProcess.js";
+import { EgressUnavailable, proxyEnvironment, startPolicyEgress, withRefusals } from "./egress/sessionEgress.js";
+import type { ShellEgressProxy } from "./egress/shellEgressProxy.js";
+import { SEATBELT_NO_OUTSIDE_HELPERS, seatbeltNetworkRules } from "./seatbeltNativeShell.js";
 import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTypes.js";
 
 /**
@@ -31,11 +34,17 @@ import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTyp
  *    anything the command itself can produce, which is what makes honest
  *    attribution possible at all.
  *
+ * NETWORK IS DENIED, as in the native shell profile (seatbeltNativeShell.ts):
+ * `(deny network*)`, Unix sockets included, so DNS through mDNSResponder fails
+ * too; and Mach lookups are limited to five system services with LaunchServices,
+ * AppleEvents and launchd jobs denied, so the command cannot ask another
+ * process to fetch something for it. With a signed `allowHosts` the only
+ * exception is AMC's per-call egress proxy on `localhost:<port>`.
+ *
  * WHAT IS NOT CONFINED. Reads. A coding agent has to load Node, libraries and
  * toolchains from all over the filesystem, and an allowlist wide enough for
- * that is not a meaningful read boundary. Network is not confined here either
- * — AMC's egress allowlist is the orthogonal layer for that, by design. This
- * backend confines WRITES, and says so rather than implying more.
+ * that is not a meaningful read boundary. Nor a process count. A caller asking
+ * for a read deny-list or a process cap is refused with nothing run.
  */
 
 const SANDBOX_EXEC = "/usr/bin/sandbox-exec";
@@ -80,7 +89,7 @@ export function sbplString(value: string): string {
   return value.split("\\").join("\\\\").split("\"").join("\\\"");
 }
 
-export function buildSeatbeltProfile(writableRoots: readonly string[]): string {
+export function buildSeatbeltProfile(writableRoots: readonly string[], proxyPort: number | null = null): string {
   const roots = writableRoots.map((root) => `(subpath "${sbplString(realOrLiteral(root))}")`);
   return [
     "(version 1)",
@@ -92,6 +101,9 @@ export function buildSeatbeltProfile(writableRoots: readonly string[]): string {
     ";; /dev is required for a process to have stdio at all.",
     `(allow file-write* (literal "/dev/null") (literal "/dev/dtracehelper") (literal "/dev/tty"))`,
     roots.length > 0 ? `(allow file-write* ${roots.join(" ")})` : ";; no writable roots",
+    ";; No network: only AMC's per-call egress proxy port, when the caller has a signed allow-list.",
+    ...seatbeltNetworkRules(proxyPort),
+    ...SEATBELT_NO_OUTSIDE_HELPERS,
     ""
   ].join("\n");
 }
@@ -112,29 +124,29 @@ export function seatbeltBackend(): SandboxBackend {
 
     async run(command: readonly string[], cwd: string, policy: SandboxPolicy): Promise<SandboxOutcome> {
       const writableRoots = policy.writableRoots.map(realOrLiteral);
-      // This profile confines writes only. A requested network, read or process
+      // This profile confines writes and the network. A requested read or process
       // boundary is refused with nothing launched, never silently left open (WP32).
-      const unenforceable = (["network", "readDeny", "allowHosts", "maxProcesses", "onEgress", "egressScope"] as const)
-        .filter((field) => policy[field] !== undefined);
-      if (unenforceable.length > 0) {
-        return { confined: false, backend: "seatbelt", exitCode: null, timedOut: false, stdout: "", stderr: "", writableRoots,
-          failure: { kind: "unavailable", reason: `the write-only Seatbelt backend cannot enforce ${unenforceable.join(", ")}; nothing was run` } };
-      }
+      const unenforceable = (["readDeny", "maxProcesses"] as const).filter((field) => policy[field] !== undefined);
+      const refuse = (kind: "unavailable" | "runner-failure", reason: string): SandboxOutcome =>
+        ({ confined: false, backend: "seatbelt", exitCode: null, timedOut: false, stdout: "", stderr: "", writableRoots, failure: { kind, reason } });
+      if (unenforceable.length > 0) return refuse("unavailable", `the Seatbelt backend cannot enforce ${unenforceable.join(", ")}; nothing was run`);
+      let proxy: ShellEgressProxy | null = null;
       const profileDir = mkdtempSync(join(tmpdir(), "amc-sbpl-"));
-      const profilePath = join(profileDir, "policy.sb");
-      writeFileSync(profilePath, buildSeatbeltProfile(policy.writableRoots), { mode: 0o600 });
-
       try {
+        try { proxy = await startPolicyEgress(policy); }
+        catch (error) { return refuse("runner-failure", error instanceof EgressUnavailable ? error.message : "AMC's network filter could not start; nothing was run."); }
+        const profilePath = join(profileDir, "policy.sb");
+        writeFileSync(profilePath, buildSeatbeltProfile(policy.writableRoots, proxy?.port ?? null), { mode: 0o600 });
         const outcome = await runProcess({
           argv: [SANDBOX_EXEC, "-f", profilePath, ...command],
           cwd,
-          env: { PATH: process.env["PATH"] ?? "", HOME: process.env["HOME"] ?? "" },
+          env: { PATH: process.env["PATH"] ?? "", HOME: process.env["HOME"] ?? "", ...(proxy?.url ? proxyEnvironment(proxy.url) : {}) },
           stdin: "ignore",
           stdout: "capture",
           stderr: "capture",
           maxCaptureBytes: 64_000,
           // Forwarded as bwrap does: dropping them returned unscrubbed output and skipped streaming without saying so.
-          scrubValues: policy.scrubValues ?? [],
+          scrubValues: [...(policy.scrubValues ?? []), ...(proxy ? [proxy.token] : [])],
           ...(policy.onOutput ? { onOutput: policy.onOutput } : {}),
           graceMs: 2_000,
           timeoutMs: policy.timeoutMs,
@@ -157,10 +169,11 @@ export function seatbeltBackend(): SandboxBackend {
           timedOut: outcome.terminatedBy === "timeout",
           cancelled: outcome.terminatedBy === "cancel",
           stdout: outcome.stdout.text,
-          stderr,
+          stderr: withRefusals(stderr, proxy),
           writableRoots
         };
       } finally {
+        proxy?.close();
         rmSync(profileDir, { recursive: true, force: true });
       }
     }
