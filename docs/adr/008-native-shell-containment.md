@@ -1,9 +1,10 @@
 # ADR 008: Native shell containment on macOS and Linux
 
 Status: proposed. The macOS boundary, the shared egress allowlist, the process
-cap and the receipts are implemented. The Linux egress relay below is
-implemented as proposed (2026-11-16, lane sandbox) and unit-tested, but has not
-been run on a Linux host.
+cap and the receipts are implemented. The Linux egress relay below, which
+relaxes the seccomp filter, was built on 2026-11-16 on the coordinator's lane
+instruction. Sid has not yet commented on it, as this ADR asked before coding.
+It is unit-tested but has not been run on a Linux host.
 Owner: P1-05. Date: 2026-10-07.
 
 ## Context
@@ -86,7 +87,7 @@ effect; a row that cannot be written denies the connection.
 `reads`, `network` (`denied` or `proxy-allowlist`), `allowHosts`,
 `processLimit` and `limitations`.
 
-## Linux relay (implemented 2026-11-16; not yet run on Linux)
+## Linux relay (built 2026-11-16; not yet reviewed by Sid, not yet run on Linux)
 
 Only when `egress` is signed: refuse launch if a socket file exists in the
 read-only workspace mount (a 20,000-entry walk; a larger workspace is refused);
@@ -95,7 +96,8 @@ and bind that directory read-only at `/amc-egress`; replace
 `linuxSocketDenyFilter` with `linuxSocketEgressFilter(arch)`
 (`src/sandbox/bwrapEgress.ts`), which allows `socket()` only for AF_UNIX,
 AF_INET and AF_INET6, `socketpair()` only for AF_UNIX, and still denies io_uring;
-run the relay script with a read-only copy of AMC's Node binary. The relay
+run the relay script with AMC's Node binary, bound read-only by descriptor at
+`/amc-egress/node` (not copied). The relay
 listens on 127.0.0.1 inside the empty network namespace, forwards to the bound
 socket and runs the command with the proxy variables set. Without `egress`, the
 full socket deny filter and the old arguments stay, byte for byte
