@@ -12,7 +12,6 @@ import { gradeScenarioReply, packGradingMethod } from "./scenarioGrading.js";
 import { aggregatePackScore } from "./scorers.js";
 import type { AssurancePromptContext, AssuranceScenarioDefinition } from "./validators.js";
 import { describeEffectSummary, runEffectScenario } from "./effectGrading.js";
-import { scenarioScoreFromValidation } from "./scorers.js";
 
 /** Tries per effect-graded scenario when the caller names none (NIST CAISI repeats; 25 is the thorough setting). */
 export const DEFAULT_EFFECT_ATTEMPTS = 5;
@@ -179,6 +178,10 @@ async function executeEffectScenario(input: PackExecutionInput, scenario: Assura
   const exchangeIds: string[] = [];
   const record = (prompt: string, answer: AgentResponse) => {
     const receipt = input.admitReceipts(answer, agentId);
+    if (receipt.rejected.length > 0) {
+      writeAssuranceAudit({ ledger, sessionId, runtime, trustTier, agentId, packId, scenarioId: scenario.id,
+        auditType: "ASSURANCE_RECEIPT_REJECTED", severity: "HIGH", message: `Gateway receipt rejected: ${receipt.rejected.join(" | ")}` });
+    }
     if (receipt.request !== null) row.correlatedRequestIds.push(receipt.request.receiptId);
     exchangeIds.push(writeScenarioPrompt({ ledger, sessionId, runtime, trustTier, packId, scenarioId: scenario.id, prompt, agentId }),
       writeScenarioResponse({ ledger, sessionId, runtime, trustTier, packId, scenarioId: scenario.id, response: answer.text,
@@ -186,31 +189,27 @@ async function executeEffectScenario(input: PackExecutionInput, scenario: Assura
   };
   const attempts = input.attempts ?? DEFAULT_EFFECT_ATTEMPTS;
   const run = await runEffectScenario(scenario.effect!, input.context, responder, { attempts, record });
-  const { summary } = run;
+  const { summary, outcome } = run;
   // Provenance reads the first stdin, stdout and test rows (reportProvenance.ts); the rest follow.
   const evidenceEventIds = [...exchangeIds.slice(0, 2), promptEventId, ...exchangeIds.slice(2)];
   const effect = { attempts, measured: summary.measured, attackSuccesses: summary.attackSuccesses,
     attackSuccessRate: summary.attackSuccessRate, wilson95: summary.wilson95, benign: summary.benign, underAttack: summary.underAttack };
-  const complete = summary.measured === attempts && summary.benign.measured === attempts;
-  if (summary.measured === 0 || (run.validation.pass && !complete)) {
-    const reasons = [`INCONCLUSIVE: only ${summary.measured} of ${attempts} attack tries and ${summary.benign.measured} of ${attempts} ordinary tries reached the agent` +
-      (run.errors[0] ? ` — ${run.errors[0]}` : "")];
+  if (outcome.inconclusive) {
     writeAssuranceAudit({ ledger, sessionId, runtime, trustTier, agentId, packId, scenarioId: scenario.id,
-      auditType: "ASSURANCE_SCENARIO_INCONCLUSIVE", severity: "HIGH", message: `Scenario not measured: ${reasons.join(" | ")}` });
-    return { ...row, response: run.last?.text ?? "", pass: false, score0to5: 0, score0to100: 0, reasons, evidenceEventIds,
+      auditType: "ASSURANCE_SCENARIO_INCONCLUSIVE", severity: "HIGH", message: `Scenario not measured: ${outcome.reasons.join(" | ")}` });
+    return { ...row, response: run.last?.text ?? "", pass: false, score0to5: 0, score0to100: 0, reasons: outcome.reasons, evidenceEventIds,
       auditEventTypes: [], inconclusive: true, effect };
   }
-  const validation = run.validation;
-  const score = scenarioScoreFromValidation(validation.pass, validation.reasons.length);
+  const { score0to100, score0to5, ...validation } = outcome;
   const testEventId = writeScenarioTestResult({ ledger, sessionId, runtime, trustTier, agentId, packId, scenarioId: scenario.id,
-    score0to100: score.score0to100, pass: validation.pass, reasons: [describeEffectSummary(summary), ...validation.reasons],
+    score0to100, pass: validation.pass, reasons: [describeEffectSummary(summary), ...validation.reasons],
     correlatedRequestIds: row.correlatedRequestIds });
   evidenceEventIds.splice(2, 0, testEventId);
   for (const auditType of validation.auditTypes) {
     writeAssuranceAudit({ ledger, sessionId, runtime, trustTier, agentId, packId, scenarioId: scenario.id, auditType,
       severity: auditType.endsWith("_SUCCEEDED") ? "CRITICAL" : "HIGH", message: describeEffectSummary(summary) });
   }
-  return { ...row, response: run.last?.text ?? "", pass: validation.pass, ...score, reasons: validation.reasons, evidenceEventIds,
+  return { ...row, response: run.last?.text ?? "", pass: validation.pass, score0to100, score0to5, reasons: validation.reasons, evidenceEventIds,
     auditEventTypes: validation.auditTypes, gradingMethod: "structured", responseTransport: responder.target.transport, effect,
     ...(run.last && run.last.toolCalls.length > 0 ? { toolCalls: run.last.toolCalls } : {}) };
 }

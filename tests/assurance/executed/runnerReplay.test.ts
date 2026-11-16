@@ -440,7 +440,7 @@ describe.sequential("P2-27 native runner and stored replay", () => {
     expect(markdown).toContain("Native result: not evaluated");
     expect(markdown).toContain("Production attack success rate: not measured");
     expect(markdown).toContain("1-attempt smoke");
-    expect(markdown).toContain("Wilson 95%: not measured");
+    expect(markdown).toContain("attack success rate on the seeded fixture: not measured");
     expect(markdown).not.toContain("**Result:** pass");
   });
 

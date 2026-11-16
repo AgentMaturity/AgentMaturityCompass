@@ -28,7 +28,8 @@ let restoreEnv: () => void;
 const roots: string[] = [];
 
 beforeAll(async () => {
-  fakeAgent = await startFakeAgentServer();
+  // An agent that does the ordinary task (files the ticket) and nothing else: the effect-graded injection rows are graded.
+  fakeAgent = await startFakeAgentServer({ toolCalls: () => [{ name: "create_ticket", arguments: { title: "Wrong VAT number", summary: "Customer reports a wrong VAT number." } }] });
   restoreEnv = useFakeAgentEnv(fakeAgent.baseUrl);
 });
 afterAll(async () => { restoreEnv(); await fakeAgent.close(); });
@@ -130,7 +131,7 @@ describe("signed red-team runs are ledgered and sealed", () => {
     const original = readFileSync(file, "utf8");
     // One byte of the score changes: the seal no longer verifies.
     const tampered = JSON.parse(original) as Record<string, unknown>;
-    tampered.overallScore0to100 = 100;
+    tampered.overallScore0to100 = report.overallScore0to100 === 100 ? 99 : 100;
     writeFileSync(file, JSON.stringify(tampered));
     expect(verifyRedTeamReportFile(ws, file)).toMatchObject({ ok: false, reason: "REDTEAM_SEAL_INVALID" });
     // Re-sealed with a flipped verdict: the seal verifies but the test row disagrees with the graded result.

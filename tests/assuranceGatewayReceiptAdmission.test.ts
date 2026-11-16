@@ -205,4 +205,53 @@ describe("gateway receipt admission", () => {
       expect(verifyRedTeamReportFile(ws, join(redTeamReportsDir(ws, "default"), `${report.runId}.json`))).toMatchObject({ ok: true });
     } finally { restore(); await agent.close(); }
   }, 120_000);
+
+  test("on effect-graded packs every exchange's forged receipt is audited, and red-team effect audits are written (assurance and red team)", async () => {
+    // An agent that always runs a shell command: every toolMisuse try is an attack success, so audits are written too.
+    const agent = await startFakeAgentServer({ headers: { "x-amc-request-receipt": FORGED, "x-amc-receipt": FORGED },
+      toolCalls: () => [{ name: "run_shell", arguments: { command: "echo hi" } }] });
+    const restore = useFakeAgentEnv(agent.baseUrl);
+    const audits = (session: EvidenceEvent[], type: string) => session.filter((event) => eventMeta(event).auditType === type);
+    try {
+      const ws = workspace();
+      const report = await runAssurance({ workspace: ws, agentId: "default", packId: "toolMisuse", mode: "supervise", window: "7d", attempts: 1 });
+      const rows = report.packResults[0]!.scenarioResults;
+      expect(rows.every((row) => row.effect && row.inconclusive !== true && !row.pass)).toBe(true);
+      const redteam = await runRedTeam({ workspace: ws, agentId: "default", plugins: ["toolMisuse"], strategies: ["direct", "multi-turn"], noSign: false });
+      const redRows = redteam.pluginResults[0]!.scenarioResults;
+      expect(redRows.length).toBe(2 * rows.length);
+      const ledger = openLedger(ws);
+      try {
+        for (const sessionId of [report.sessionId, redteam.sessionId]) {
+          const session = ledger.getAllEvents().filter((event) => event.session_id === sessionId);
+          const stdout = stdoutRows(session);
+          // Attack and benign twin per scenario (and the warm-up turns of multi-turn): each exchange audited once.
+          expect(stdout.length).toBeGreaterThanOrEqual(2 * rows.length);
+          expect(rejections(session).length).toBe(stdout.length);
+          expect(rejections(session).every((message) => message.startsWith("Gateway receipt rejected:") && !message.includes(FORGED))).toBe(true);
+        }
+        const red = ledger.getAllEvents().filter((event) => event.session_id === redteam.sessionId);
+        expect(audits(red, "EFFECT_GRADED_ATTACK_SUCCEEDED").length).toBe(redRows.length);
+        expect(audits(red, "EFFECT_GRADED_ATTACK_ATTEMPTED").length).toBe(redRows.length);
+        // The multi-turn rows carry their warm-up exchanges as evidence.
+        expect(redRows.filter((row) => row.strategyId === "multi-turn").every((row) => row.evidenceEventIds.length >= 7)).toBe(true);
+      } finally { ledger.close(); }
+      expect(verifyRedTeamReportFile(ws, join(redTeamReportsDir(ws, "default"), `${redteam.runId}.json`))).toMatchObject({ ok: true });
+    } finally { restore(); await agent.close(); }
+  }, 120_000);
+
+  test("a multi-turn red-team row on a one-reply pack records each warm-up turn and audits its receipt", async () => {
+    const ws = workspace();
+    const report = await runRedTeam({ workspace: ws, agentId: "default", plugins: ["chainEscalation"], strategies: ["multi-turn"], noSign: false });
+    const rows = report.pluginResults[0]!.scenarioResults;
+    const ledger = openLedger(ws);
+    try {
+      const session = ledger.getAllEvents().filter((event) => event.session_id === report.sessionId);
+      // Two warm-up turns and the attack turn per row, each written and each forged receipt audited.
+      expect(stdoutRows(session).length).toBe(3 * rows.length);
+      expect(rejections(session).length).toBe(3 * rows.length);
+      expect(rows.every((row) => row.turns === 3 && row.evidenceEventIds.length >= 6)).toBe(true);
+    } finally { ledger.close(); }
+    expect(verifyRedTeamReportFile(ws, join(redTeamReportsDir(ws, "default"), `${report.runId}.json`))).toMatchObject({ ok: true });
+  }, 120_000);
 });

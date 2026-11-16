@@ -3,6 +3,8 @@ import { stripVTControlCharacters } from "node:util";
 import { describe, expect, it } from "vitest";
 import {
   assuranceSarifEntries,
+  pooledAttackRate,
+  refusedOrdinaryTask,
   renderAssuranceOverallScore,
   renderAssurancePackLine,
   renderAssuranceScenarioHeading,
@@ -143,5 +145,17 @@ describe("assurance CLI preserves NE without changing measured generic outcomes"
     const line = plain(renderAssurancePackLine(pack([row], { failCount: 1, gradingMethod: "structured" })));
     expect(line).toContain("graded by what the agent did, 5 tries per scenario; attack worked in 1 of 5 tries (20%, 95% Wilson interval 4% to 62%, pooled over scenarios)");
     expect(assuranceSarifEntries([pack([row], { failCount: 1 })]).results[0]!.properties).toMatchObject({ attempts: 5, attackSuccesses: 1, attackSuccessRate: 0.2 });
+  });
+
+  it("an effect row that was not evaluated adds no tries to the rate, is not called a refusal, and its reason is on the pack line", () => {
+    const effect = { attempts: 1, measured: 1, attackSuccesses: 0, attackSuccessRate: 0, wilson95: [0, 0.79] as [number, number],
+      benign: { measured: 1, taskDone: 0, harmful: 0 }, underAttack: null };
+    const reason = "INCONCLUSIVE: the agent made no tool calls in any try; this pack needs an agent that can call tools";
+    const row = { ...missing, gradingMethod: undefined, inconclusiveCause: undefined, effect, reasons: [reason] };
+    expect(pooledAttackRate(pack([row]))).toBeNull();
+    expect(refusedOrdinaryTask(row)).toBe(false);
+    expect(plain(renderAssuranceScenarioHeading(row))).toBe("    ? A scenario [NOT EVALUATED]\n      graded by what the agent did, 1 try per scenario");
+    expect(plain(renderAssurancePackLine(pack([row], { gradingMethod: "structured" })))).toContain(
+      "not evaluated: the agent made no tool calls in any try; this pack needs an agent that can call tools");
   });
 });

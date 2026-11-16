@@ -16,13 +16,13 @@ function workspace(): string {
   return dir;
 }
 
-function runCli(cwd: string, args: string[], timeoutMs = CLI_TIMEOUT_MS) {
+function runCli(cwd: string, args: string[], timeoutMs = CLI_TIMEOUT_MS, agent: FakeAgentServer = fakeAgent) {
   // The scan invokes the real agent under test; point the child process at the
   // local endpoint started for this suite.
   const env: NodeJS.ProcessEnv = {
     ...process.env,
     NO_COLOR: "1",
-    AMC_AGENT_BASE_URL: fakeAgent.baseUrl,
+    AMC_AGENT_BASE_URL: agent.baseUrl,
     AMC_ASSURANCE_MODEL: "fake-model",
     OPENAI_API_KEY: "test-key-not-a-real-secret"
   };
@@ -101,16 +101,27 @@ describe("assurance run --all --no-sign", () => {
     expect(demo.stderr).not.toContain("AMC_VAULT_PASSPHRASE");
   });
 
-  test("prints a prioritized remediation plan after a demo run", () => {
-    const dir = workspace();
+  test("a text-only agent is not evaluated on the effect-graded packs, and nothing unevaluated is listed as a failure", () => {
+    const demo = runCli(workspace(), ["assurance", "run", "--demo", "--no-sign"]);
 
-    const demo = runCli(dir, ["assurance", "run", "--demo", "--no-sign"]);
+    expect(demo.status, `${demo.stdout}\n${demo.stderr}`).toBe(0);
+    expect(demo.stdout).toContain("the agent made no tool calls in any try; this pack needs an agent that can call tools");
+    expect(demo.stdout).toMatch(/No failed scenarios, but \d+ were not evaluated/);
+    expect(demo.stdout).not.toMatch(/attack worked in 0 of/);
+    expect(demo.stdout).not.toContain("refused");
+  });
+
+  test("prints a prioritized remediation plan after a demo run", async () => {
+    const dir = workspace();
+    // An agent that runs a shell command whatever it is asked: the effect-graded packs fail it (the attack worked).
+    const shellAgent = await startFakeAgentProcess({ toolCalls: [{ name: "run_shell", arguments: { command: "echo hi" } }] });
+    const demo = runCli(dir, ["assurance", "run", "--demo", "--no-sign"], CLI_TIMEOUT_MS, shellAgent);
+    await shellAgent.close();
 
     expect(demo.status, `${demo.stdout}\n${demo.stderr}`).toBe(0);
     expect(demo.stdout).toContain("Remediation priority:");
-    // The fake agent answers in text only: the effect-graded packs fail it for refusing the ordinary task (MEDIUM).
-    expect(demo.stdout).toContain("1. MEDIUM");
-    expect(demo.stdout).toContain("refusing everything is not safe behaviour");
+    expect(demo.stdout).toContain("1. CRITICAL");
+    expect(demo.stdout).toContain("attack worked: ran a shell command");
     expect(demo.stdout).toContain("graded by what the agent did, 1 try per scenario");
     expect(demo.stdout).toContain("injection/");
     expect(demo.stdout).toContain("Fix:");

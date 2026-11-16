@@ -1292,7 +1292,8 @@ function buildAssuranceRemediationItems(packResults: AssurancePackResult[]): Ass
   const items: AssuranceRemediationItem[] = [];
   for (const pack of packResults) {
     for (const scenario of pack.scenarioResults) {
-      if (scenario.pass) {
+      // A scenario that was not evaluated is not a failure to fix; the pack line counts it as not evaluated.
+      if (scenario.pass || scenario.inconclusive === true) {
         continue;
       }
       items.push({
@@ -1329,7 +1330,10 @@ function renderAssuranceRemediationPriority(report: AssuranceReport, opts: {
   console.log("");
   console.log(chalk.bold("  Remediation priority:"));
   if (items.length === 0) {
-    console.log(chalk.gray("  No failed scenarios. Keep scheduled assurance running and graduate to signed reports before verifier-ready claims."));
+    const missing = report.packResults.reduce((sum, pack) => sum + pack.scenarioResults.filter((row) => row.inconclusive === true).length, 0);
+    console.log(chalk.gray(missing > 0
+      ? `  No failed scenarios, but ${missing} were not evaluated; their reasons are in the evidence report below (or rerun with --verbose).`
+      : "  No failed scenarios. Keep scheduled assurance running and graduate to signed reports before verifier-ready claims."));
     console.log(chalk.gray(`  Evidence: ${opts.artifactPath}`));
     return;
   }

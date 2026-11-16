@@ -1,5 +1,4 @@
-import { EFFECT_RATE_CAVEAT, gradingLabel } from "./cliPresentation.js";
-import { describeEffectSummary } from "./effectGrading.js";
+import { EFFECT_RATE_CAVEAT, howGraded } from "./cliPresentation.js";
 import { envelopeForAssurancePack, envelopeForAssuranceReport } from "../claims/eligibility/adapters/results.js";
 import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "../claims/eligibility/render.js";
 import type { AssuranceReport } from "../types.js";
@@ -22,7 +21,7 @@ export function renderAssuranceMarkdown(report: AssuranceReport, sealVerified: b
         .map(
           (scenario) =>
             `- ${scenario.scenarioId} (${scenario.title}) score=${scenario.score0to100.toFixed(1)} pass=${scenario.pass ? "yes" : "no"} audits=${scenario.auditEventTypes.join(",") || "none"}` +
-            ` — ${scenario.effect ? describeEffectSummary(scenario.effect) : gradingLabel(scenario.gradingMethod, 1)}`
+            ` — ${howGraded(scenario)}`
         )
         .join("\n");
       return `### ${pack.packId}\n${rows}`;
@@ -32,14 +31,16 @@ export function renderAssuranceMarkdown(report: AssuranceReport, sealVerified: b
   const executedSections = report.packResults.flatMap(pack => pack.scenarioResults.flatMap(row => {
     if (!row.executed) return [];
     const packet = row.executed, diagnostics = packet.diagnostics;
-    const rate = diagnostics.fixtureAttemptRate === null ? "not measured" : `${(100 * diagnostics.fixtureAttemptRate).toFixed(2)}%`;
-    const interval = diagnostics.fixtureWilson95 === null ? "not measured" :
-      diagnostics.fixtureWilson95.map(value => `${(100 * value).toFixed(2)}%`).join(" to ");
+    const pct = (value: number) => `${(100 * value).toFixed(2)}%`;
+    const interval = diagnostics.fixtureWilson95 === null ? "" : `, 95% Wilson interval ${diagnostics.fixtureWilson95.map(pct).join(" to ")}`;
+    const effects = diagnostics.result.unauthorizedEffects;
+    const rate = diagnostics.fixtureAttemptRate === null ? "attack success rate on the seeded fixture: not measured"
+      : `attack worked in ${Math.round(diagnostics.fixtureAttemptRate * diagnostics.conclusiveAttempts)} of ${diagnostics.conclusiveAttempts} attempts on the seeded fixture (${pct(diagnostics.fixtureAttemptRate)}${interval})`;
     return [`### ${pack.packId}/${row.scenarioId}`,
       "Native result: not evaluated · Claim: synthetic_example · Production attack success rate: not measured (only the seeded fixture below)",
       `Mode: ${packet.attempts === 1 ? "1-attempt smoke" : "25-attempt synthetic fixture"}`,
       `Local fixture outcome: ${diagnostics.localOutcome}; completed ${diagnostics.completedAttempts}/${packet.attempts}; conclusive ${diagnostics.conclusiveAttempts}/${packet.attempts}`,
-      `Local unauthorized effects: ${diagnostics.result.unauthorizedEffects}; attack success rate on the seeded fixture: ${rate} of ${packet.attempts} attempts; Wilson 95%: ${interval}; graded by system-of-record effects`, ""];
+      `Local unauthorized effects: ${effects}; ${rate}; graded by what changed in the fixture's systems`, ""];
   }));
 
   return [
