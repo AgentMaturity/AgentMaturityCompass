@@ -12,8 +12,8 @@
 | **Evidence model** | Test results (plain JSON) | Test results (plain JSON) | Tamper-evident (Ed25519 + Merkle trees) |
 | **What it tests** | Prompt → response quality | Prompt → response quality | Security, governance, reliability, cost, observability, compliance |
 | **Maturity scoring** | ❌ | ❌ | L0–L5 maturity levels |
-| **Adversarial testing** | Basic red-team prompts | Basic red-team prompts | 85 adversarial assurance packs |
-| **Framework adapters** | Provider configs | Pytest-based | 15 adapters (LangChain, CrewAI, AutoGen, Claude Code, Hermes, OpenAI SDK…) |
+| **Adversarial testing** | Basic red-team prompts | Basic red-team prompts | 148 registered assurance packs (count on 2026-11-17; `amc assurance list` prints the current list) |
+| **Framework adapters** | Provider configs | Pytest-based | 16 built-in adapters (LangChain, CrewAI, AutoGen, Claude Code, Hermes, DeepSeek Harness, OpenAI SDK…; `amc adapters list` prints them) |
 | **Compliance mapping** | ❌ | ❌ | EU AI Act, OWASP LLM Top 10, SOC2, HIPAA |
 | **CI/CD gates** | Pass/fail thresholds | Pass/fail thresholds | Score gates + signed evidence chain |
 | **Agent vs. LLM** | LLM-focused | LLM-focused | Agent-native (tools, memory, delegation, autonomy) |
@@ -30,9 +30,9 @@
 |---|---|---|
 | `promptfooconfig.yaml` | `amc.yaml` + `adapters.yaml` | AMC separates agent config from adapter routing |
 | **Provider** | **Adapter** | Promptfoo providers wrap LLM APIs; AMC adapters wrap entire agent runtimes |
-| **Test case** | **Diagnostic question** | AMC has 730+ questions across 5 dimensions, not ad-hoc test cases |
+| **Test case** | **Diagnostic question** | AMC has 244 diagnostic questions across 5 dimensions (plus 723 in the 41 experimental Industry Packs), not ad-hoc test cases |
 | **Assertion** (`contains`, `llm-rubric`, `similar`) | **Scoring module** | AMC scoring is multi-dimensional (security, governance, reliability…), not single pass/fail |
-| **Dataset** (vars + expected) | **Assurance pack** | Curated, versioned test suites — 85 packs including adversarial red-team |
+| **Dataset** (vars + expected) | **Assurance pack** | Curated, versioned test suites, including adversarial red-team packs |
 | **Red team** (`promptfoo redteam`) | **Adversarial assurance packs** | AMC ships TAP/PAIR, Crescendo, CPA-RAG, EchoLeak, skeleton key, and more |
 | **Eval result** (JSON) | **Signed evidence artifact** | AMC results are cryptographically signed and chain-linked |
 | **`promptfoo eval`** | **`amc score`** | Run a full maturity assessment |
@@ -256,14 +256,14 @@ Promptfoo and DeepEval test _what your LLM says_. AMC tests _how your agent beha
 Every AMC score is backed by cryptographically signed evidence:
 - Ed25519 signatures on all artifacts
 - Merkle tree proof chains linking evidence together
-- Append-only vault — scores can't be retroactively edited
+- Append-only records — a later change to a past record shows up when the records are checked
 - Verifiable by third parties: `amc verify`
 
-This means your trust score is _provable_, not just _claimed_.
+This means your trust score rests on signed records you can check, not on claims. A signature shows who wrote a record and that it is unchanged, not that what it says is true.
 
 ### Adversarial Testing at Scale
 
-AMC ships 85 adversarial assurance packs out of the box:
+AMC ships 148 registered assurance packs (count on 2026-11-17), among them:
 - **TAP/PAIR**: Tree-of-Attacks with Pruning, Prompt Automatic Iterative Refinement
 - **Crescendo / Skeleton Key**: Multi-turn jailbreak escalation
 - **CPA-RAG / MCP**: Context poisoning attacks for RAG and tool-use agents
@@ -290,7 +290,7 @@ Generate compliance reports: `amc report --compliance eu-ai-act`
 A: Yes. AMC operates at a different layer. You can keep prompt-level evals and add AMC for agent-level trust scoring. But most teams find AMC's diagnostic questions subsume their existing eval suites.
 
 **Q: Do I need to rewrite my test cases?**
-A: No. AMC's 730+ diagnostic questions cover common evaluation scenarios. For custom test cases, create assurance packs (YAML config, not code).
+A: No. AMC's 244 diagnostic questions (plus 723 in the 41 experimental Industry Packs) cover common evaluation scenarios. For custom test cases, create assurance packs (YAML config, not code).
 
 **Q: Is AMC cloud-based like Confident AI?**
 A: No. AMC is fully local-first. Your data never leaves your infrastructure. No accounts, no cloud dashboards to depend on.

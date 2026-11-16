@@ -115,4 +115,4 @@ That is how you move from exploratory scoring into execution evidence. Then scor
 - **Watch** — traces, anomalies, monitoring, and decision observability
 - **Comply** — framework mapping and audit reporting
 - **Fleet** — multi-agent comparison and governance
-- **Passport** — portable trust identity artifacts
+- **Passport** — a self-issued, signed summary of an agent's results that others can check

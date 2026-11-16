@@ -1,31 +1,24 @@
 # Getting Started with AMC
 
-**Time to first full score: ~2 minutes.**
+AMC (Agent Maturity Compass) helps you build an AI agent for work that gets audited, run it, and check what it really did. It keeps signed records of what an agent did and scores how far you can trust it from that record, not from what the agent claims about itself.
 
-AMC (Agent Maturity Compass) records what your AI agent actually does and scores how far you can trust it from that record, not from what the agent claims about itself.
-
-The shortest path: install from source (below), go to your project folder, type `amc`, and pick from the menu. [Your first five minutes](FIRST_FIVE_MINUTES.md) walks through every screen for a first-time user, and [Troubleshooting](TROUBLESHOOTING.md#first-run-problems) has the fix for each message new users meet most often.
+The first run has two parts: build an agent for your industry with A4 Forge, then watch or score an agent you already have. The shortest path: install (below), go to your project folder, type `amc`, and pick from the menu. [Your first five minutes](FIRST_FIVE_MINUTES.md) walks through every screen for a first-time user and ends with [a short glossary](FIRST_FIVE_MINUTES.md#words-you-will-meet), and [Troubleshooting](TROUBLESHOOTING.md#first-run-problems) has the fix for each message new users meet most often.
 
 ---
 
 ## Install
 
-**Prerequisites:** Node.js 22 or 24 for production qualification; Node 20 is only the package compatibility floor. AMC uses `better-sqlite3` which includes prebuilt binaries for most platforms. If prebuilds aren't available for your OS/arch, you'll need Python 3 and a C++ compiler (`build-essential` on Linux, Xcode CLI tools on macOS).
-
-This guide describes the current **1.2.0 source**. The published npm package and GitHub release are **1.1.1**, which predates the native agent workflow. For current behavior or development on a new device, follow [the source installation](INSTALL.md#option-b-from-github-development):
+**Install the current source build.** You need git and Node.js (>=20, tested on 22 and 24) with Corepack. Node.js 20, 22 and 24 include Corepack; Node.js 25 and later do not, so install 22 or 24. On macOS or Linux, run:
 
 ```bash
-corepack enable
-git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass
-pnpm install --frozen-lockfile
-pnpm run build
-npm link
+curl -fsSL https://agentmaturity.co/install-source.sh | sh
 ```
 
-If Corepack is unavailable, install pnpm with `npm install --global pnpm@10.33.0`. After installation, change to the agent project you want to assess. Provider credentials and private runtime state are configured separately; they are not part of a Git clone.
+It fetches AMC from GitHub, builds it on your computer (a few minutes, no administrator password) and puts `amc` on your PATH. It prints the commit it built. Open a new terminal, go to your project folder and type `amc`. Run the same command again to update; if an update fails to build, the version you had keeps working. To remove it, delete the folder `~/.amc-source` and the line marked `# AMC source install` in your shell profile. On Windows, `irm https://agentmaturity.co/install-source.ps1 | iex` does the same, but it has not been tested on a real Windows machine yet. Details: [INSTALL.md](INSTALL.md#option-b-from-github-development).
 
-To install the older published **1.1.1** release instead:
+That address serves the script only after the website is published from `main`. Until then, build by hand: [the source installation](INSTALL.md#option-b-from-github-development) lists the commands (git clone, `pnpm install --frozen-lockfile`, `pnpm run build`, `npm link`). AMC uses `better-sqlite3`, which includes prebuilt binaries for most platforms; if none fits your system, you need Python 3 and a C++ compiler (`build-essential` on Linux, Xcode command line tools on macOS).
+
+This guide describes the current **1.2.0 source**, which is not published yet (`amc --version` prints its version). The published npm package and GitHub release are **1.1.1**, which predates the start menu, A4 Forge and the native agent workflow. To install that older release instead:
 
 macOS or Linux:
 
@@ -48,14 +41,13 @@ cd my-agent-project
 amc
 ```
 
-In a terminal, `amc` with no arguments sets up the folder the first time (a hidden `.amc/` workspace) and shows one menu. On a computer where Claude Code and Codex are installed and signed in, it looks like this:
+In a terminal, `amc` with no arguments sets up the folder the first time (a hidden `.amc/` workspace) and shows one menu. This is a real run on a computer where Codex is installed but signed out and Claude Code is not installed:
 
 ```text
 AMC set up this folder (.amc/).
 ? What do you want to do?
-❯ Watch Claude Code as it works (signed in)
-  Watch Codex as it works (signed in)
-  Try a demo chat (no account or key needed)
+  Sign in to Codex first
+❯ Try a demo chat (no account or key needed)
   Build an agent for my industry (A4 Forge preview)
   Open the console in my browser
   Just show my score (empty for now)
@@ -64,8 +56,9 @@ AMC set up this folder (.amc/).
 The menu shows only what can work now:
 
 - **Watch Claude Code as it works** / **Watch Codex as it works**: starts AMC (`amc up`), asks before it adds an observe-mode watch hook to this project's settings (`amc connect hooks install --provider claude-code --mode observe --agent default`, or `--provider codex`), then offers to start the agent in this folder. A signed-out agent shows "Sign in to … first" instead, which runs the vendor's own sign-in (`amc login claude` or `amc login codex`). An agent that is not installed is not listed.
+- **Build an agent for my industry (A4 Forge preview)**: starts AMC (`amc up`, without the first baseline score), prints the console address and the sign-in hint, and asks `Open http://127.0.0.1:<port>/console/a4?new=1 in your browser now?`. Sign in as the workspace owner (create the account once with `amc user init --username <you>`), pick your industry and start an agent project. Alone you can get as far as building the agent in Assemble; [A4 Forge](A4_FORGE.md) says who approves each later step.
 - **Chat with a model**: listed when an API key such as `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` is set in your shell. It runs `amc agent-loop chat` for that provider and passes the key's name, never its value.
-- **Try a demo chat**: `amc agent-loop chat --provider stub`, a built-in demo model with canned replies. No account or key; every turn is recorded.
+- **Try a demo chat**: `amc agent-loop chat --provider stub`, the stand-in model with canned replies. No account or key; every turn is recorded. A result on the stand-in model says nothing about a real agent.
 - **Open the console in my browser**: starts AMC if needed and opens the Compass Console.
 - **Just show my score**: prints the full score (below).
 
@@ -73,7 +66,7 @@ AMC preselects your last choice next time, unless that choice starts services or
 
 Watching Claude Code from the menu takes three answers on a first run: the menu line, `Add AMC's watch hook to this project's Claude Code settings? It sends what Claude Code does to AMC on this Mac (http://127.0.0.1:<port>).`, and `Start Claude Code here now?`. Codex is the same. The hook points at this folder's own AMC; `amc connect hooks status` reports when AMC has since moved to another port and prints the command that points the hook there again.
 
-In a folder that `amc` set up, the vault passphrase is kept in `.amc/local-vault-passphrase`, and the menu hands it to the AMC it starts, so starting asks nothing about the vault. If another AMC folder already holds AMC's default gateway and proxy ports on this computer, the menu asks `Start AMC for this folder on its own ports?` and, on yes, starts this folder on free ports and names its gateway port.
+In a folder that `amc` set up, AMC keeps the vault passphrase for this folder on this computer, and the menu hands it to the AMC it starts, so starting asks nothing about the vault. If another AMC folder already holds AMC's default gateway and proxy ports on this computer, the menu asks `Start AMC for this folder on its own ports?` and, on yes, starts this folder on free ports and names its gateway port.
 
 `amc up` on its own, in a folder with no vault yet, asks for a vault passphrase with two choices: "Let AMC create and remember one (recommended)" or "Enter my own". The first creates a passphrase, remembers it on this computer (the macOS Keychain, service `amc-vault`, or `~/.config/amc/vault-credentials.json`), and does not print it; it says where it is kept. `amc vault passphrase` sets one you know, and `amc vault forget` removes the remembered copy. `amc init` asks the same question, and `amc init --minimal` creates and remembers one without asking. Where nothing keeps it, the passphrase is printed once instead, and you must save it then, because the vault cannot be opened without it. That happens with `AMC_VAULT_REMEMBER=0` (the `amc up` choice then reads "Let AMC create one (shown once; remembering is off)"), in CI, in an agent's shell, and for `amc init --minimal` without a terminal.
 
@@ -89,7 +82,7 @@ amc
 
 That's it. AMC creates the workspace if needed, runs the full score, prints the maturity level (L0-L5), separates artifact validity from evidence readiness, and shows the next action.
 
-> **First-run trust contract:** a clean project can produce a signed, `VALID` report with `INSUFFICIENT_EVIDENCE`. The signature proves the report was not altered; it does not prove that AMC observed enough agent behavior. Capture a real run and rerun AMC. Only `READY` evidence is eligible for external claims.
+> **First-run trust contract:** a clean project can produce a signed, `VALID` report with `INSUFFICIENT_EVIDENCE`. The signature shows the report was not changed; it does not show that AMC observed enough agent behavior. Capture a real run and rerun AMC. Only `READY` evidence is eligible for external claims.
 
 > **Why no setup command first?** The top-level `amc` command is the default onboarding path. It detects what is available, creates the minimum workspace state, and falls back to unsigned/demo-safe behavior when a local vault cannot be unlocked.
 
@@ -241,11 +234,11 @@ Everything AMC does fits under one simple trust stack:
 | **Score** | Score trust before you ship | Evidence-weighted scoring across live execution behavior instead of brochure claims. |
 | **Shield** | Attack your agent before attackers do | Runs adversarial packs against prompt injection, leakage, memory poisoning, and sycophancy. |
 | **Enforce** | Wrap agent actions in policy | Approval gates, scoped permissions, and runtime controls for sensitive operations. |
-| **Vault** | Cryptographically prove what happened | Signs evidence, verifies ledgers, and gives auditors a tamper-evident chain of custody. |
+| **Vault** | Keep a signed record of what happened | Signs evidence, verifies ledgers, and gives auditors a tamper-evident chain of custody. A signature shows who wrote a record and that it is unchanged, not that it is true. |
 | **Watch** | See trust drift before it hurts you | Monitors posture over time and surfaces anomalies, regressions, and risky changes. |
 | **Comply** | Map trust evidence to real frameworks | Turns technical evidence into regulator-readable artifacts for audits and risk reviews. |
 | **Fleet** | Govern many agents like an actual platform | Benchmarks multiple agents, compares risk posture, and enforces org-wide trust baselines. |
-| **Passport** | Make trust portable between environments | Issues a portable, signed trust identity that can move between tools, teams, and environments. |
+| **Passport** | Make trust portable between environments | Issues a self-issued, signed summary of an agent's results that others can check with AMC or amc-verify against a key they pin. |
 
 ---
 
@@ -294,6 +287,8 @@ amc
 
 ### Common improvements by level
 
+Today 240 of the 244 questions cannot rise above L1 and no question can reach L3, so the commands below are side scores that show where to work; they do not raise a level by themselves.
+
 **L0 → L1** (the basics):
 ```bash
 # Define what your agent is allowed to do
@@ -339,7 +334,7 @@ amc score density-map
 amc score gaming-resistance
 ```
 
-**L4 → L5** (prove it):
+**L4 → L5** (not evaluated yet):
 ```bash
 # Cryptographic evidence chains
 amc score output-attestation
@@ -374,7 +369,7 @@ The Compass Console asks you to sign in. Create the first login, an OWNER:
 amc user init --username <you>    # asks for a password; signs .amc/users.yaml
 ```
 
-It signs with the workspace vault. When a passphrase is remembered, it first asks `Use the vault passphrase saved in <location> to sign amc user init?` (the default is No; answer `y`). When none is, it asks you to type the vault passphrase; for a folder that `amc` set up, it is in `.amc/local-vault-passphrase`. Without a terminal, set `AMC_VAULT_PASSPHRASE` in that shell and run it again.
+It signs with the workspace vault. When a passphrase is remembered, it first asks `Use the vault passphrase saved in <location> to sign amc user init?` (the default is No; answer `y`). When none is, it asks you to type the vault passphrase. Without a terminal, set `AMC_VAULT_PASSPHRASE` in that shell and run it again.
 `amc user init` refuses when `.amc/users.yaml` already exists, so on a workspace that already has
 logins (for example after `amc init --coding`) use `amc user add` instead (`--force` replaces every login). Add more logins with `amc user add --username <name> --role <roles>`
 (see [RBAC](RBAC.md)).
@@ -457,7 +452,7 @@ amc evidence collect --first-run --dry-run --runtime any -- node agent.js
 # Verify evidence integrity
 amc evidence verify
 
-# Bundle evidence for sharing
+# Bundle evidence for sharing (after a first score; --run is required)
 amc bundle export --run latest --out evidence.amcbundle
 ```
 
@@ -702,7 +697,7 @@ cd platform/python && python3 -m pytest tests/ -q
 
 ## Next Steps
 
-1. **Run `amc`** — pick "Watch Claude Code as it works" (or Codex), or "Just show my score" for your full baseline
+1. **Run `amc`** — pick "Build an agent for my industry", "Watch Claude Code as it works" (or Codex), or "Just show my score" for your full baseline
 2. **Run `amc guide --go`** — generate and apply guardrails automatically
 3. **Run `amc doctor`** — check your environment
 4. **Run `amc setup --demo`** — explore with sample data

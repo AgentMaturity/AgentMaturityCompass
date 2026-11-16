@@ -133,7 +133,7 @@ amc assurance run --agent my-agent --pack exfiltrationChannels --attacker-model 
   receipt.
 
 `amc redteam run --corpus <file>` also runs injections from a public attack corpus you downloaded. See
-[docs/assurance/PUBLIC_CORPORA.md](assurance/PUBLIC_CORPORA.md) for the file format and the corpora that were checked.
+[docs/assurance/PUBLIC_CORPORA.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/assurance/PUBLIC_CORPORA.md) for the file format and the corpora that were checked.
 
 ### `amc assurance runs`
 List past assurance runs.
