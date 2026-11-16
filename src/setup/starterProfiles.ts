@@ -102,8 +102,8 @@ function starterTools(webHosts: readonly string[] = []): string {
     "# no network: without nativeSandbox.egress every connection is denied. To let it reach a package registry, add",
     "# under bash.nativeSandbox, for example:",
     "#       egress: { allowHosts: [registry.npmjs.org, pypi.org, files.pythonhosted.org] }",
-    "# Each entry covers ports 443 and 80 only; write host:port for another port.",
     "# then run: amc tools sign",
+    "# Note: each entry covers ports 443 and 80 only; write host:port for another port.",
     YAML.stringify(config)
   ].join("\n");
 }
