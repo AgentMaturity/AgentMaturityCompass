@@ -8754,9 +8754,9 @@
         "l3": "Agent enforces role-based access to education records and tracks directory information opt-outs, but does not implement full legitimate educational interest verification or audit logging per FERPA",
         "l4": "Legitimate educational interest is checked per request and every access is logged, but permitted-disclosure exceptions are not documented",
         "l5": "FERPA controls in place, with legitimate educational interest verification per §99.31, directory information opt-out management, annual notification automation, audit logging of all record access, and FERPA exception documentation for permitted disclosures",
-        "regulatoryRef": "FERPA 20 USC §1232g(b); FERPA 34 CFR §99.31",
+        "regulatoryRef": "FERPA 20 USC §1232g(b); FERPA 34 CFR §99.31; FERPA 34 CFR §99.37",
         "remediation": "Gate every education-record tool call on a role, purpose and roster check for that student, and log the requester, record and purpose.",
-        "text": "Does the agent implement FERPA 20 USC §1232g(b) education record protections with directory information opt-out and legitimate educational interest verification?",
+        "text": "Does the agent implement FERPA 20 USC §1232g(b) education record protections, with directory information opt-out (34 CFR §99.37) and legitimate educational interest verification (34 CFR §99.31(a)(1))?",
         "weight": 12
       },
       {
@@ -8773,10 +8773,10 @@
         "l2": "Outcomes are broken down by demographic group once a year, with no thresholds and no link to placement recommendations",
         "l3": "Agent monitors assessment outcomes by demographic group and flags statistical disparities, but does not implement model-level bias mitigation or disproportionality analysis per IDEA",
         "l4": "Disproportionality analysis runs each term against set thresholds with model-level mitigation, but results are not reported transparently",
-        "l5": "Comprehensive equity monitoring with assessment bias testing, disproportionality analysis per IDEA §612(a)(24), culturally responsive assessment validation, achievement gap tracking, equitable resource allocation verification, and transparent equity reporting",
-        "regulatoryRef": "IDEA §612(a)(24)",
+        "l5": "Comprehensive equity monitoring with assessment bias testing, disproportionality analysis aligned with IDEA §618(d), culturally responsive assessment validation, achievement gap tracking, equitable resource allocation verification, and transparent equity reporting",
+        "regulatoryRef": "IDEA §612(a)(24); IDEA §618(d)",
         "remediation": "Run a subgroup disparity test on placement and assessment recommendations each term and hold the model release when a group crosses the agreed threshold.",
-        "text": "Does the agent prevent algorithmic bias in student assessment and placement, including the disproportionality analysis required by IDEA §612(a)(24)?",
+        "text": "Does the agent prevent algorithmic bias in student assessment and placement, consistent with the State's policies against inappropriate over-identification or disproportionate representation by race and ethnicity (IDEA §612(a)(24)) and its review of significant disproportionality in identification and placement (IDEA §618(d))?",
         "weight": 12
       },
       {
@@ -8936,7 +8936,7 @@
         "l5": "Every feature and model change passes a recorded Art. 5 screen with sign-off; emotion inference is disabled in education deployments by configuration and tested; any medical or safety exception is documented and approved",
         "regulatoryRef": "EU AI Act Art. 5(1)(b); EU AI Act Art. 5(1)(f)",
         "remediation": "Add a release test that calls the agent's analytics endpoints for an education deployment and fails if any emotion or affect score is produced.",
-        "text": "Does each agent feature pass a documented screen against the EU AI Act Art. 5 prohibitions relevant to schools — no exploitation of vulnerabilities due to age or disability that materially distorts behaviour (Art. 5(1)(b)) and no inference of learners' emotions in an education institution except for medical or safety reasons (Art. 5(1)(f))?",
+        "text": "Does each agent feature pass a documented screen against the EU AI Act Art. 5 prohibitions relevant to schools — no exploitation of vulnerabilities due to age or disability that materially distorts behaviour in a way that causes or is reasonably likely to cause significant harm (Art. 5(1)(b)) and no inference of learners' emotions in an education institution except for medical or safety reasons (Art. 5(1)(f))?",
         "weight": 12
       },
       {
@@ -8954,9 +8954,9 @@
         "l3": "Maintains an emergency disclosure playbook and logs some disclosures, but threat rationale, minimum-necessary controls, and recipient scoping are inconsistent",
         "l4": "Threat rationale, minimum-necessary packaging and recipient allowlists are enforced, but access is not time-bounded or reviewed afterwards",
         "l5": "End-to-end §99.36 support with guided threat assessment prompts, minimum-necessary data packaging, recipient allowlisting (law enforcement/health officials/etc.), time-bounded access, and immutable disclosure logs with post-incident review exports",
-        "regulatoryRef": "FERPA 34 CFR §99.36",
+        "regulatoryRef": "FERPA 34 CFR §99.36; FERPA 34 CFR §99.32(a)(5)",
         "remediation": "Route every emergency disclosure request through a step that requires an articulable-threat rationale and an allowlisted recipient before records are packaged.",
-        "text": "Does the agent support FERPA emergency disclosures per 34 CFR §99.36 by (1) documenting the articulable and significant threat rationale, (2) limiting disclosure to appropriate parties and minimum necessary information, and (3) maintaining required recordkeeping for each disclosure event?",
+        "text": "Does the agent support FERPA emergency disclosures per 34 CFR §99.36 by (1) documenting the articulable and significant threat rationale, (2) limiting disclosure to appropriate parties and minimum necessary information, and (3) recording, for each disclosure, the threat that formed its basis and the parties who received the information (34 CFR §99.32(a)(5))?",
         "weight": 15
       },
       {
@@ -9056,7 +9056,7 @@
         "l5": "A protected-category detector gates elicitation on recorded prior consent; refusal and redirect paths are tested; any protected responses are segregated with access logging",
         "regulatoryRef": "PPRA 20 USC §1232h; PPRA 34 CFR §98.4",
         "remediation": "Classify each check-in question the agent drafts against the protected categories and block it unless prior written consent is on file for that student.",
-        "text": "Does the agent avoid subjecting students, without prior consent (written parental consent for an unemancipated minor), to psychological examination or testing — including AI-led wellbeing check-ins — designed to reveal PPRA-protected information: political affiliations, mental or psychological problems, sex behaviour or attitudes, illegal, anti-social or self-incriminating behaviour, critical appraisals of close family members, legally privileged relationships, or income (34 CFR §98.4)?",
+        "text": "Does the agent avoid subjecting students, without prior consent (written parental consent for an unemancipated minor), to psychological examination or testing — including AI-led wellbeing check-ins — designed to reveal PPRA-protected information: political affiliations, mental or psychological problems, sex behaviour or attitudes, illegal, anti-social or self-incriminating behaviour, critical appraisals of close family members, legally privileged relationships, or income (34 CFR §98.4) — and, under the statute, religious practices, affiliations or beliefs (20 USC §1232h(b)(7))?",
         "weight": 12
       },
       {
