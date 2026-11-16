@@ -422,7 +422,7 @@ The tier decides how high a question can go; a maturity level applies no trust w
 
 | Level | Name | What a question needs | Questions that can reach it today |
 |-------|------|---------|---------|
-| **L0** | Absent | Nothing recorded | 244 of 244 |
+| **L0** | Absent | Not evidenced | 244 of 244 |
 | **L1** | Initial | Self-declared: rows tagged to the question from a registered source | 244 of 244 |
 | **L2** | Developing | Configuration evidence AMC observed | 4 of 244 |
 | **L3** | Defined | Runtime evidence AMC observed | 0 of 244 |

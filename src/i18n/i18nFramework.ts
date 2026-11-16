@@ -123,7 +123,7 @@ const TRANSLATION_KEYS: TranslationKey[] = [
 
   // Score levels
   // One L0-L5 vocabulary (LEVEL_GUIDE in src/diagnostic/levelSemantics.ts): the band name, then what the level needs.
-  { key: "score.level.0", defaultValue: "Absent — nothing recorded" },
+  { key: "score.level.0", defaultValue: "Absent — not evidenced" },
   { key: "score.level.1", defaultValue: "Initial — self-declared" },
   { key: "score.level.2", defaultValue: "Developing — configuration evidence" },
   { key: "score.level.3", defaultValue: "Defined — runtime evidence" },

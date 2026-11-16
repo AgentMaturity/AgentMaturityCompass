@@ -60,7 +60,7 @@ We tested a content moderation agent with two methods:
 
 | Level | Name | What It Means | Evidence interpretation |
 |-------|------|---------------|-------------------------|
-| **L0** | Absent | Nothing recorded | Major control gaps |
+| **L0** | Absent | Not evidenced | Major control gaps |
 | **L1** | Initial | Self-declared | Early baseline; 240 of 244 questions cannot rise above L1 today |
 | **L2** | Developing | Configuration evidence AMC observed | Reachable today for 4 questions |
 | **L3** | Defined | Runtime evidence AMC observed | No question can reach it yet |
