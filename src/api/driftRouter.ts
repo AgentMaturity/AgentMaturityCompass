@@ -95,7 +95,8 @@ export async function handleDriftRoute(
       const result = revalidateAuthority === undefined ? drift.freezeLiftCli(input) : await drift.freezeLiftCliForAuthority(input, guard);
       apiSuccess(res, { lifted: true, ...result });
     } catch (err) {
-      if (!res.headersSent) apiError(res, revalidateAuthority !== undefined && err instanceof KeyProviderError ? err.status : 500,
+      if (!res.headersSent && (err as { code?: unknown } | null)?.code === 'PERSON_REQUIRED') apiError(res, 403, (err as Error).message); // FreezeLiftRefused
+      else if (!res.headersSent) apiError(res, revalidateAuthority !== undefined && err instanceof KeyProviderError ? err.status : 500,
         revalidateAuthority !== undefined ? err instanceof KeyProviderError ? err.code : 'Freeze lift failed' : err instanceof Error ? err.message : 'Freeze lift failed');
     }
     return true;

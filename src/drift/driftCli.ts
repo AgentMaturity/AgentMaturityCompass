@@ -1,9 +1,8 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { resolveAgentId } from "../fleet/paths.js";
-import { activeFreezeStatus, liftFreeze, liftFreezeAsync, liftFreezeForAuthority } from "./freezeEngine.js";
+import { activeFreezeStatus, assertPersonLifts, liftFreeze, liftFreezeAsync, liftFreezeForAuthority } from "./freezeEngine.js";
 import { dispatchAlert } from "./alerts.js";
-import { agentMarker } from "../vault/operatorContext.js";
 import { runDriftCheck, runDriftCheckAsync, runDriftCheckForAuthority, writeDriftCheckReport, driftPostPublicationError, driftNotEvaluated,
   driftNotEvaluatedAlert, type DriftCheckResult } from "./driftDetector.js";
 
@@ -78,18 +77,14 @@ export function freezeStatusCli(params: {
   return activeFreezeStatus(params.workspace, params.agentId);
 }
 
-/** `amc freeze lift`: an agent must not unfreeze itself or another agent, so a shell that carries an agent marker is refused (Studio's lift routes take an OWNER session, never an agent lease). */
-function assertPersonLifts(): void {
-  const marker = agentMarker();
-  if (marker !== null) throw new Error(`Lifting a freeze needs a person, and this shell carries the agent marker ${marker}. Run amc freeze lift yourself in your own terminal.`);
-}
-
+/** `amc freeze lift` and its SDK export: an agent must not unfreeze itself or another agent (liftFreeze checks again). */
 export function freezeLiftCli(params: {
   workspace: string;
   agentId?: string;
   incidentId: string;
   reason: string;
 }): { liftPath: string } {
+  assertPersonLifts(params.workspace);
   return liftFreeze({
     workspace: params.workspace,
     agentId: params.agentId,
@@ -120,7 +115,7 @@ export async function driftReportCliAsync(input: Parameters<typeof driftReportCl
   } catch (error) { throw driftPostPublicationError(params.workspace, result, "report-output", error); }
 }
 export async function freezeLiftCliAsync(params: Parameters<typeof freezeLiftCli>[0]): Promise<{ liftPath: string }> {
-  assertPersonLifts();
+  assertPersonLifts(params.workspace);
   return liftFreezeAsync({ ...params });
 }
 /** Internal trusted router handoff, not a root SDK actor option. */

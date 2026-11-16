@@ -18,6 +18,7 @@ import { getHookIntegrationStatus, installHookIntegration } from "../../src/adap
 import { QUALIFIED_CLAUDE_CODE_VERSIONS } from "../../src/adapters/hookProviders/claudeCode.js";
 import { startBridgeServer } from "../../src/bridge/bridgeServer.js";
 import { createFreezeIncident, liftFreeze } from "../../src/drift/freezeEngine.js";
+import { AGENT_ENV_MARKERS } from "../../src/vault/operatorContext.js";
 import { getPurposeKeyHistory } from "../../src/keys/signingKeys.js";
 import { openLedger, verifyEvidenceEventIntegrity } from "../../src/ledger/ledger.js";
 import { verifyReceipt } from "../../src/receipts/receipt.js";
@@ -244,7 +245,11 @@ describe.runIf(enabled)(`Claude Code ${version} hook conformance (P1-23)`, { tim
       cases.admissionFreeze = { exit: run.status, modelRequests: mainRequests };
       expect(mainRequests).toBe(0);
     } finally {
-      liftFreeze({ workspace, agentId, incidentId: incident.incidentId, reason: "P1-23 conformance done" });
+      // Lifting needs a person: drop the agent markers of the harness running this test for the lift only.
+      const saved = AGENT_ENV_MARKERS.map((name) => [name, process.env[name]] as const);
+      for (const [name] of saved) delete process.env[name];
+      try { liftFreeze({ workspace, agentId, incidentId: incident.incidentId, reason: "P1-23 conformance done" }); }
+      finally { for (const [name, value] of saved) if (value !== undefined) process.env[name] = value; }
     }
   });
 
