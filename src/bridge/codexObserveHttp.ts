@@ -42,7 +42,8 @@ export async function handleCodexObserveHttp(options: { workspace: string; req: 
     const rawInput = await readCapped(req, MAX_CONTROL_HOOK_BODY_BYTES);
     if (rawInput === null) return refuse(res, 413, "Codex observation exceeds 256 KiB");
     const lease = auth.payload;
-    // Session hooks (SessionStart, Stop, Subagent*, *Compact, Interrupt, …) are recorded leniently: never refused.
+    // Session hooks (SessionStart, Stop, Subagent*, *Compact, Interrupt, …) are recorded as self-reported under the same
+    // audit latch and intake caps as tool observations (recordLeasedObservation), so they can be refused with 429 or 503.
     if (!isPostToolUse(rawInput)) {
       const session = recordSessionEvent({ workspace, agentId: lease.agentId, provider: "codex", rawInput, leaseId: lease.leaseId });
       writeControlJson(res, 201, { ok: true, observed: true, claim: "self-reported", ...session });
