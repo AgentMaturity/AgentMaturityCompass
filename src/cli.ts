@@ -213,6 +213,7 @@ import { captureArchetypeApply } from "./archetypes/archetypePublication.js";
 import { exportBadge, exportPolicyPack } from "./exports/policyExport.js";
 import { applyAssurancePatchKit, listAssuranceHistory, loadAssuranceReport, runAssurance, verifyAssuranceRun } from "./assurance/assuranceRunner.js";
 import { AgentResponderUnavailableError } from "./assurance/agentResponder.js";
+import { scenarioGradingMethod } from "./assurance/scenarioGrading.js";
 import { assuranceSarifEntries, EFFECT_RATE_CAVEAT, renderAssuranceOverallScore, renderAssurancePackLine, renderAssuranceScenarioHeading, renderAssuranceTotalLine } from "./assurance/cliPresentation.js";
 import { executedRerunFlags, selectExecutedAssuranceOptions, withExecutedAssuranceOptions, type AssuranceRunCliOptions } from "./assurance/executed/cliOptions.js";
 import { getAssurancePack, listAssurancePacks } from "./assurance/packs/index.js";
@@ -10888,7 +10889,10 @@ assurance
   .argument("<packId>")
   .action((packId: string) => {
     const pack = getAssurancePack(packId);
-    console.log(JSON.stringify(pack, null, 2));
+    // Functions do not survive JSON: say how each scenario is graded instead of printing an empty effect object.
+    const scenarios = pack.scenarios.map(({ effect, ...scenario }) => ({ ...scenario, gradingMethod: scenarioGradingMethod({ ...scenario, effect }),
+      ...(effect ? { graded: "by what the agent did: tool calls and disclosed secrets, over repeated tries, each with an ordinary-task twin" } : {}) }));
+    console.log(JSON.stringify({ ...pack, scenarios }, null, 2));
   });
 
 assurance

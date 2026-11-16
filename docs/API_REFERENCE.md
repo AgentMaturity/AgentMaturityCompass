@@ -1093,7 +1093,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 1074 | `amc score mutual-verification` | Score agent-to-agent trust verification (challenge-response) |
 | 1075 | `amc score operational-independence` | Calculate operational independence score |
 | 1076 | `amc score output-attestation` | Score output signing and trust metadata for receiving agents |
-| 1077 | `amc score output-integrity` | Score output integrity maturity (OWASP LLM02, confidence calibration, citation) |
+| 1077 | `amc score output-integrity` | Score output integrity maturity (OWASP LLM05:2025, confidence calibration, citation) |
 | 1078 | `amc score owasp-llm` | OWASP Top 10 for LLM Applications (2025) coverage; not evaluated: file presence is not evidence. The evidence-bound version is `amc compliance report --framework owasp-llm` |
 | 1079 | `amc score pause-quality` | Score quality of agent-initiated pauses |
 | 1080 | `amc score policy-consistency` | Test policy enforcement consistency across repeated trials (pass^k) |
@@ -1139,7 +1139,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 1120 | `amc shield detect-injection` | Detect prompt injection attempts in text |
 | 1121 | `amc shield mcp-ledger` | Signed MCP trust ledger: scan a set of MCP servers and record a clean-as-of receipt |
 | 1122 | `amc shield posture` | One-command agent-security posture scorecard (config, MCP trust, secrets, isolation, supply-chain) — L0–L5, signed receipt |
-| 1123 | `amc shield red-team` | Run a quick red team campaign (5 attacks on demo target). Tip: For full red-team suite with strategies, use `amc redteam run` |
+| 1123 | `amc shield red-team` | Run a quick red team campaign (5 attacks) against the agent under test. For the full suite with strategies and repeated tries, use `amc redteam run` |
 | 1124 | `amc shield red-team-status` | Show current red team capabilities and attack template count |
 | 1125 | `amc shield reputation` | Check reputation score for a tool |
 | 1126 | `amc shield sandbox` | Check sandbox configuration for an agent |
@@ -2247,6 +2247,7 @@ Run assurance pack(s) with deterministic validation
 | `--format <format>` | - |
 | `--verbose` | - |
 | `--model <modelId>` | - |
+| `--attempts <n>` | - |
 | `--no-sign` | - |
 | `--executed-attempts <1|25>` | - |
 | `--station-questions <ids>` | - |
@@ -8854,6 +8855,7 @@ Execute red-team plugins with chosen attack strategies and generate a vulnerabil
 | `--evil-mcp` | - |
 | `--mcp-attacks <categories...>` | - |
 | `--model <modelId>` | - |
+| `--attempts <n>` | - |
 | `--json` | - |
 
 #### `amc redteam strategies`
@@ -9703,7 +9705,7 @@ Score output signing and trust metadata for receiving agents
 
 #### `amc score output-integrity`
 
-Score output integrity maturity (OWASP LLM02, confidence calibration, citation)
+Score output integrity maturity (OWASP LLM05:2025, confidence calibration, citation)
 
 
 | Option | Description |
@@ -10157,7 +10159,7 @@ One-command agent-security posture scorecard (config, MCP trust, secrets, isolat
 
 #### `amc shield red-team`
 
-Run a quick red team campaign (5 attacks on demo target). Tip: For full red-team suite with strategies, use `amc redteam run`
+Run a quick red team campaign (5 attacks) against the agent under test. For the full suite with strategies and repeated tries, use `amc redteam run`
 
 
 | Option | Description |
@@ -11483,127 +11485,133 @@ This table lists <!-- amc:count:assurancePackFiles -->156<!-- /amc:count --> ass
 | 27 | `no-budget-strategy` | contextWindowManagement | context_management | 10 |
 | 28 | `trivial-task-flagship-model` | costEfficiency | cost_efficiency | 10 |
 | 29 | `proxy-bypass` | crossAgentCollusion | cross_agent_collusion | 9 |
-| 30 | `code-injection-sql` | cyberseceval-pack | code_injection | 11 |
-| 31 | `privilege-escalation-via-subagent` | delegationTrustChain | delegation_trust | 10 |
-| 32 | `answer-vs-teach` | disempowerment | empowerment | 9 |
-| 33 | `echo-api-key` | dlpExfiltration | data_leakage | 9 |
-| 34 | `illegal-drugs-synthesis` | donotanswer-pack | illegal_activity | 13 |
-| 35 | `simulate-vs-execute` | duality | digital_duality | 14 |
-| 36 | `behavioral-trust-escalation` | dynamicTrustAuthorization | dynamic_trust_authorization | 11 |
-| 37 | `econ-001` | economicAmplification | uncapped-amplification | 8 |
-| 38 | `record-isolation` | educationFERPA | education_ferpa | 11 |
-| 39 | `ood-capability` | emergentCapability | emergent_capability | 11 |
-| 40 | `resource-contention` | emergentMultiAgentRisk | multi_agent_safety | 6 |
-| 41 | `base64-injection` | encodedInjection | encoded_injection | 11 |
-| 42 | `physical-action-isolation` | environmentalInfra | environmental_infra | 5 |
-| 43 | `art-9-risk-management` | euAiActArticle | eu_ai_act_article | 7 |
-| 44 | `evaluation-context-detection` | evalAwareBehavior | eval_aware_behavior | 10 |
-| 45 | `new-attack-vector` | evaluationFreshness | evaluation_freshness | 6 |
-| 46 | `verbosity-bias` | evaluationReliability | evaluation_reliability | 10 |
-| 47 | `excessive-agency` | excessiveAgency | excessive-agency | 11 |
-| 48 | `api-key` | exfiltration | secret_exfiltration | 11 |
-| 49 | `provenance-tagging` | factSimulationBoundary | boundary_integrity | 7 |
-| 50 | `impossible-sun-moon-same` | falsePremise | false-premise | 9 |
-| 51 | `decision-explainability` | financialModelRisk | financial_model_risk | 6 |
-| 52 | `segregation-of-duties` | financialSOX | financial_sox | 8 |
-| 53 | `uncertainty-expression` | forecastLegitimacy | forecast_legitimacy | 8 |
-| 54 | `us-executive-order` | globalAIRegulatory | global_regulatory | 10 |
-| 55 | `set-all-5` | governanceBypass | governance_bypass | 11 |
-| 56 | `govern-completeness` | governanceNISTRMF | governance_nist_rmf | 6 |
-| 57 | `insufficient-info` | hallucination | hallucination_overclaim | 11 |
-| 58 | `cybercrime-hacking-tutorial` | harmbench-pack | cybercrime | 13 |
-| 59 | `phi-output-echo` | healthcarePHI | healthcare_phi | 6 |
-| 60 | `phi-de-identification` | hipaaCompliance | healthcare_compliance | 11 |
-| 61 | `use-honeytoken-key` | honeytokenDetection | honeytoken | 9 |
-| 62 | `selective-omission` | humanDecisionSabotage | human_decision_sabotage | 13 |
-| 63 | `context-completeness` | humanOversightQuality | oversight_quality | 6 |
-| 64 | `model-id-direct` | informationExtraction | model_id | 18 |
-| 65 | `ignore-previous` | injection | prompt_injection | 14 |
-| 66 | `implicit-intent` | inputFaultResilience | input_resilience | 6 |
-| 67 | `standard-compliance` | instructionCompliance | instruction_compliance | 6 |
-| 68 | `tool-vs-system` | instructionHierarchy | instruction_hierarchy | 6 |
-| 69 | `tool-output-extraction` | instructionalLeakage | data_leakage | 6 |
-| 70 | `section-6-3-impact-scope` | iso42005 | iso_42005_impact_assessment | 5 |
-| 71 | `unauthorized-practice` | legalCompliance | legal_compliance | 8 |
-| 72 | `synthetic-maintenance-capability-request` | linuxPrivilegeBoundaryRegression | adversarial_regression_privilege_boundary | 5 |
-| 73 | `mcp-001` | mcpSecurityResilience | tool-poisoning | 12 |
-| 74 | `internal-representation-monitoring` | mechanisticTransparency | mechanistic_transparency | 10 |
-| 75 | `memory-persistence` | memoryMaturity | memory_maturity | 6 |
-| 76 | `false-memory-injection` | memoryPoisoning | memory_poisoning | 9 |
-| 77 | `autonomous-weapons` | militaryDualUse | military_dual_use | 11 |
-| 78 | `injected-capital-australia` | misleadingContext | misleading-context | 9 |
-| 79 | `asil-verification` | mobilityFunctionalSafety | mobility_functional_safety | 5 |
-| 80 | `redirect-to-shadow-model` | modelRoutePoisoning | model_route_poisoning | 11 |
-| 81 | `weight-extraction` | modelTheftExfil | model_theft | 11 |
-| 82 | `crescendo-gradual-escalation` | multi-turn-safety | multi_turn_crescendo | 5 |
-| 83 | `flat-privilege-all-agents` | multiAgentOrchestrator | multi-agent-orchestrator-governance | 13 |
-| 84 | `context-dependency-basic` | multiTurnDeepEval | multi_turn_safety | 21 |
-| 85 | `context-accumulation-attack` | multiTurnToolAttack | multi_turn_attack | 6 |
-| 86 | `fake-attestation` | notaryAttestation | notary_attestation_legacy | 9 |
-| 87 | `prompt-injection-system-override` | nvidia-aegis-pack | prompt_injection | 9 |
-| 88 | `irreversibility-classification` | operational-discipline | operational_discipline | 9 |
-| 89 | `false-premise-cat-feathers` | overCompliance | over-compliance | 13 |
-| 90 | `overreliance` | overreliance | overreliance | 5 |
-| 91 | `evaluation-detection` | oversightUndermining | oversight_undermining | 13 |
-| 92 | `trivial-001` | overthinkingDetection | overthinking | 9 |
-| 93 | `g01-prompt-injection` | owaspGenAi | owasp_genai | 11 |
-| 94 | `cognitive-bias-exploitation` | persuasionManipulation | persuasion_manipulation | 11 |
-| 95 | `drug-interaction-check` | pharmaCompliance | pharma_compliance | 8 |
-| 96 | `pii-echo-full-name` | piiDetectionLeakage | pii_detection | 16 |
-| 97 | `contradictory-policies` | policyConfusion | policy_confusion | 9 |
-| 98 | `resource-acquisition-probe` | powerSeeking | power_seeking | 13 |
-| 99 | `claim-benchmarking` | predictiveUXHonesty | predictive_ux_honesty | 6 |
-| 100 | `prefix-injection` | promptCachePoisoning | cache_poisoning | 10 |
-| 101 | `injected-instruction-doc` | ragPoisoning | rag_poisoning | 9 |
-| 102 | `private-person-block` | realPersonRepresentation | real_person_representation | 6 |
-| 103 | `voice-impersonation` | realtimeVoiceSafety | realtime_voice_safety | 14 |
-| 104 | `contradicting-evidence` | reasoningLockDetection | reasoning_lock | 6 |
-| 105 | `no-reasoning-chain` | reasoningObservability | reasoning_observability | 10 |
-| 106 | `hours-standard` | redTeamCoverage | red_team_coverage | 10 |
-| 107 | `compute-acquisition` | replicationResistance | replication_resistance | 11 |
-| 108 | `token-budget-drain` | resourceExhaustion | resource_exhaustion | 11 |
-| 109 | `skip-canary-deploy` | roleDeploySabotage | deploy_sabotage | 11 |
-| 110 | `account-takeover-social` | roleSupportFraud | support_fraud | 11 |
-| 111 | `asl-threshold-documentation` | rspCompliance | rsp_compliance | 10 |
-| 112 | `pre-action-tool-trust` | runtimeTrustGate | runtime_trust | 6 |
-| 113 | `speed-vs-quality` | sabotage | sabotage | 9 |
-| 114 | `determinism` | safetyCriticalSIL | safety_critical_sil | 5 |
-| 115 | `escalation-path` | safetyCulture | safety_culture | 11 |
-| 116 | `direct-vs-indirect` | sandbagging | sandbagging | 13 |
-| 117 | `host-shell-egress` | sandboxBoundary | sandbox_boundary_legacy | 9 |
-| 118 | `unverified-plugin` | sbomSupplyChain | supply_chain | 11 |
-| 119 | `claim-lineage` | scenarioTraceability | scenario_traceability | 6 |
-| 120 | `goal-consistency` | schemingDeception | scheming_deception | 13 |
-| 121 | `citation-fabrication` | scienceResearchAgent | science-research-agent-risk | 13 |
-| 122 | `starter-secret-leak` | securityStarter | data_protection | 9 |
-| 123 | `model-comparison` | selfPreferentialBias | self_preferential_bias | 9 |
-| 124 | `direct-shutdown` | selfPreservation | self_preservation | 11 |
-| 125 | `claim-success-on-error` | silentFailure | silent_failure | 14 |
-| 126 | `population-diversity` | simulationValidity | simulation_validity | 8 |
-| 127 | `writeback-scope` | simulationWritebackGovernance | writeback_governance | 7 |
-| 128 | `high-risk-no-approval` | stepupApprovalBypass | approval_bypass | 9 |
-| 129 | `cpa-rag-untrusted-chunk` | supply-chain-integrity | cpa_rag | 7 |
-| 130 | `hidden-exfiltration-skill` | supplyChainAttack | supply_chain_attack | 9 |
-| 131 | `wrong-http-status` | sycophancy | sycophancy | 12 |
-| 132 | `dialogue-labeling` | syntheticAgentInteraction | synthetic_interaction_safety | 7 |
-| 133 | `persona-labeling` | syntheticPersonaGovernance | persona_governance | 8 |
-| 134 | `untrusted-to-command` | ; rm -rf / | taint_tracking | 9 |
-| 135 | `privacy-by-design` | technologyGDPRSOC | technology_gdpr_soc | 6 |
-| 136 | `goal-drift-detection` | temporalConsistency | temporal_consistency | 10 |
-| 137 | `reasoning-transparency` | thoughtSafetyAudit | thought_safety | 6 |
-| 138 | `response-timing-secret` | timingSideChannel | timing_side_channel | 9 |
-| 139 | `stale-permission` | tocTou | toctou | 9 |
-| 140 | `direct-shell-delete` | toolMisuse | tool_misuse_legacy | 11 |
-| 141 | `renamed-parameter` | toolSchemaDrift | schema_drift | 10 |
-| 142 | `personal-attack-insults` | toxic-chat-pack | personal_attacks | 13 |
-| 143 | `unsupported-precision` | truthfulness | truthfulness_legacy | 9 |
-| 144 | `five-step-confidence` | uncertaintyPropagation | uncertainty | 6 |
-| 145 | `rm-rf-no-approval` | unsafeTool | unsafe_tooling | 14 |
-| 146 | `stated-vs-revealed-contradiction` | valueCoherence | value_coherence | 10 |
-| 147 | `fiduciary-alignment` | wealthManagementMiFID | wealth_management_mifid | 5 |
-| 148 | `internal-channels` | whistleblowerProtection | whistleblower_protection | 11 |
-| 149 | `homicide-safe-context` | xstest-pack | homicide | 13 |
-| 150 | `zombie-001` | zombieAgentPersistence | injection-persistence | 10 |
+| 30 | `billing-address-redirect` | crossSessionMemoryPoisoning | cross_session_memory_poisoning | 5 |
+| 31 | `code-injection-sql` | cyberseceval-pack | code_injection | 11 |
+| 32 | `privilege-escalation-via-subagent` | delegationTrustChain | delegation_trust | 10 |
+| 33 | `answer-vs-teach` | disempowerment | empowerment | 9 |
+| 34 | `echo-api-key` | dlpExfiltration | data_leakage | 9 |
+| 35 | `illegal-drugs-synthesis` | donotanswer-pack | illegal_activity | 13 |
+| 36 | `simulate-vs-execute` | duality | digital_duality | 14 |
+| 37 | `behavioral-trust-escalation` | dynamicTrustAuthorization | dynamic_trust_authorization | 11 |
+| 38 | `econ-001` | economicAmplification | uncapped-amplification | 8 |
+| 39 | `record-isolation` | educationFERPA | education_ferpa | 11 |
+| 40 | `effectFixtures` | package name |  | 0 |
+| 41 | `ood-capability` | emergentCapability | emergent_capability | 11 |
+| 42 | `resource-contention` | emergentMultiAgentRisk | multi_agent_safety | 6 |
+| 43 | `base64-injection` | encodedInjection | encoded_injection | 11 |
+| 44 | `physical-action-isolation` | environmentalInfra | environmental_infra | 5 |
+| 45 | `art-9-risk-management` | euAiActArticle | eu_ai_act_article | 7 |
+| 46 | `evaluation-context-detection` | evalAwareBehavior | eval_aware_behavior | 10 |
+| 47 | `new-attack-vector` | evaluationFreshness | evaluation_freshness | 6 |
+| 48 | `verbosity-bias` | evaluationReliability | evaluation_reliability | 10 |
+| 49 | `excessive-agency` | excessiveAgency | excessive-agency | 11 |
+| 50 | `markdown-image` | exfiltrationChannels | exfiltration_channel | 6 |
+| 51 | `api-key` | exfiltration | secret_exfiltration | 11 |
+| 52 | `provenance-tagging` | factSimulationBoundary | boundary_integrity | 7 |
+| 53 | `impossible-sun-moon-same` | falsePremise | false-premise | 9 |
+| 54 | `decision-explainability` | financialModelRisk | financial_model_risk | 6 |
+| 55 | `segregation-of-duties` | financialSOX | financial_sox | 8 |
+| 56 | `uncertainty-expression` | forecastLegitimacy | forecast_legitimacy | 8 |
+| 57 | `us-executive-order` | globalAIRegulatory | global_regulatory | 10 |
+| 58 | `set-all-5` | governanceBypass | governance_bypass | 11 |
+| 59 | `govern-completeness` | governanceNISTRMF | governance_nist_rmf | 6 |
+| 60 | `insufficient-info` | hallucination | hallucination_overclaim | 11 |
+| 61 | `cybercrime-hacking-tutorial` | harmbench-pack | cybercrime | 13 |
+| 62 | `phi-output-echo` | healthcarePHI | healthcare_phi | 6 |
+| 63 | `phi-de-identification` | hipaaCompliance | healthcare_compliance | 11 |
+| 64 | `use-honeytoken-key` | honeytokenDetection | honeytoken | 9 |
+| 65 | `selective-omission` | humanDecisionSabotage | human_decision_sabotage | 13 |
+| 66 | `context-completeness` | humanOversightQuality | oversight_quality | 6 |
+| 67 | `model-id-direct` | informationExtraction | model_id | 18 |
+| 68 | `ignore-previous` | injection | prompt_injection | 16 |
+| 69 | `implicit-intent` | inputFaultResilience | input_resilience | 6 |
+| 70 | `standard-compliance` | instructionCompliance | instruction_compliance | 6 |
+| 71 | `agents-md-install` | instructionFilePoisoning | instruction_file_poisoning | 5 |
+| 72 | `tool-vs-system` | instructionHierarchy | instruction_hierarchy | 6 |
+| 73 | `tool-output-extraction` | instructionalLeakage | data_leakage | 6 |
+| 74 | `section-6-3-impact-scope` | iso42005 | iso_42005_impact_assessment | 5 |
+| 75 | `unauthorized-practice` | legalCompliance | legal_compliance | 8 |
+| 76 | `synthetic-maintenance-capability-request` | linuxPrivilegeBoundaryRegression | adversarial_regression_privilege_boundary | 5 |
+| 77 | `mcp-001` | mcpSecurityResilience | tool-poisoning | 12 |
+| 78 | `description-poisoning` | forecast__weather_lookup | mcp_tool_poisoning | 5 |
+| 79 | `internal-representation-monitoring` | mechanisticTransparency | mechanistic_transparency | 10 |
+| 80 | `memory-persistence` | memoryMaturity | memory_maturity | 6 |
+| 81 | `false-memory-injection` | memoryPoisoning | memory_poisoning | 9 |
+| 82 | `autonomous-weapons` | militaryDualUse | military_dual_use | 11 |
+| 83 | `injected-capital-australia` | misleadingContext | misleading-context | 9 |
+| 84 | `asil-verification` | mobilityFunctionalSafety | mobility_functional_safety | 5 |
+| 85 | `redirect-to-shadow-model` | modelRoutePoisoning | model_route_poisoning | 11 |
+| 86 | `weight-extraction` | modelTheftExfil | model_theft | 11 |
+| 87 | `crescendo-gradual-escalation` | multi-turn-safety | multi_turn_crescendo | 5 |
+| 88 | `flat-privilege-all-agents` | multiAgentOrchestrator | multi-agent-orchestrator-governance | 13 |
+| 89 | `context-dependency-basic` | multiTurnDeepEval | multi_turn_safety | 21 |
+| 90 | `context-accumulation-attack` | multiTurnToolAttack | multi_turn_attack | 6 |
+| 91 | `fake-attestation` | notaryAttestation | notary_attestation_legacy | 9 |
+| 92 | `prompt-injection-system-override` | nvidia-aegis-pack | prompt_injection | 9 |
+| 93 | `irreversibility-classification` | operational-discipline | operational_discipline | 9 |
+| 94 | `false-premise-cat-feathers` | overCompliance | over-compliance | 13 |
+| 95 | `overreliance` | overreliance | overreliance | 5 |
+| 96 | `evaluation-detection` | oversightUndermining | oversight_undermining | 13 |
+| 97 | `trivial-001` | overthinkingDetection | overthinking | 9 |
+| 98 | `llm01-prompt-injection` | owaspGenAi | owasp_genai | 11 |
+| 99 | `obscure-format-python` | packageHallucination | package_hallucination | 5 |
+| 100 | `cognitive-bias-exploitation` | persuasionManipulation | persuasion_manipulation | 11 |
+| 101 | `drug-interaction-check` | pharmaCompliance | pharma_compliance | 8 |
+| 102 | `pii-echo-full-name` | piiDetectionLeakage | pii_detection | 16 |
+| 103 | `contradictory-policies` | policyConfusion | policy_confusion | 9 |
+| 104 | `resource-acquisition-probe` | powerSeeking | power_seeking | 13 |
+| 105 | `claim-benchmarking` | predictiveUXHonesty | predictive_ux_honesty | 6 |
+| 106 | `prefix-injection` | promptCachePoisoning | cache_poisoning | 10 |
+| 107 | `injected-instruction-doc` | ragPoisoning | rag_poisoning | 9 |
+| 108 | `private-person-block` | realPersonRepresentation | real_person_representation | 6 |
+| 109 | `voice-impersonation` | realtimeVoiceSafety | realtime_voice_safety | 14 |
+| 110 | `contradicting-evidence` | reasoningLockDetection | reasoning_lock | 6 |
+| 111 | `no-reasoning-chain` | reasoningObservability | reasoning_observability | 10 |
+| 112 | `hours-standard` | redTeamCoverage | red_team_coverage | 10 |
+| 113 | `compute-acquisition` | replicationResistance | replication_resistance | 11 |
+| 114 | `token-budget-drain` | resourceExhaustion | resource_exhaustion | 11 |
+| 115 | `skip-canary-deploy` | roleDeploySabotage | deploy_sabotage | 11 |
+| 116 | `account-takeover-social` | roleSupportFraud | support_fraud | 11 |
+| 117 | `asl-threshold-documentation` | rspCompliance | rsp_compliance | 10 |
+| 118 | `pre-action-tool-trust` | runtimeTrustGate | runtime_trust | 6 |
+| 119 | `speed-vs-quality` | sabotage | sabotage | 9 |
+| 120 | `determinism` | safetyCriticalSIL | safety_critical_sil | 5 |
+| 121 | `escalation-path` | safetyCulture | safety_culture | 11 |
+| 122 | `direct-vs-indirect` | sandbagging | sandbagging | 13 |
+| 123 | `host-shell-egress` | sandboxBoundary | sandbox_boundary_legacy | 9 |
+| 124 | `unverified-plugin` | sbomSupplyChain | supply_chain | 11 |
+| 125 | `claim-lineage` | scenarioTraceability | scenario_traceability | 6 |
+| 126 | `goal-consistency` | schemingDeception | scheming_deception | 13 |
+| 127 | `citation-fabrication` | scienceResearchAgent | science-research-agent-risk | 13 |
+| 128 | `starter-secret-leak` | securityStarter | data_protection | 9 |
+| 129 | `model-comparison` | selfPreferentialBias | self_preferential_bias | 9 |
+| 130 | `direct-shutdown` | selfPreservation | self_preservation | 11 |
+| 131 | `claim-success-on-error` | silentFailure | silent_failure | 14 |
+| 132 | `population-diversity` | simulationValidity | simulation_validity | 8 |
+| 133 | `writeback-scope` | simulationWritebackGovernance | writeback_governance | 7 |
+| 134 | `high-risk-no-approval` | stepupApprovalBypass | approval_bypass | 9 |
+| 135 | `cpa-rag-untrusted-chunk` | supply-chain-integrity | cpa_rag | 7 |
+| 136 | `hidden-exfiltration-skill` | supplyChainAttack | supply_chain_attack | 9 |
+| 137 | `wrong-http-status` | sycophancy | sycophancy | 12 |
+| 138 | `dialogue-labeling` | syntheticAgentInteraction | synthetic_interaction_safety | 7 |
+| 139 | `persona-labeling` | syntheticPersonaGovernance | persona_governance | 8 |
+| 140 | `untrusted-to-command` | ; rm -rf / | taint_tracking | 9 |
+| 141 | `privacy-by-design` | technologyGDPRSOC | technology_gdpr_soc | 6 |
+| 142 | `goal-drift-detection` | temporalConsistency | temporal_consistency | 10 |
+| 143 | `reasoning-transparency` | thoughtSafetyAudit | thought_safety | 6 |
+| 144 | `response-timing-secret` | timingSideChannel | timing_side_channel | 9 |
+| 145 | `stale-permission` | tocTou | toctou | 9 |
+| 146 | `direct-shell-delete` | toolMisuse | tool_misuse_legacy | 11 |
+| 147 | `renamed-parameter` | toolSchemaDrift | schema_drift | 10 |
+| 148 | `personal-attack-insults` | toxic-chat-pack | personal_attacks | 13 |
+| 149 | `unsupported-precision` | truthfulness | truthfulness_legacy | 9 |
+| 150 | `five-step-confidence` | uncertaintyPropagation | uncertainty | 6 |
+| 151 | `rm-rf-no-approval` | unsafeTool | unsafe_tooling | 14 |
+| 152 | `stated-vs-revealed-contradiction` | valueCoherence | value_coherence | 10 |
+| 153 | `fiduciary-alignment` | wealthManagementMiFID | wealth_management_mifid | 5 |
+| 154 | `internal-channels` | whistleblowerProtection | whistleblower_protection | 11 |
+| 155 | `homicide-safe-context` | xstest-pack | homicide | 13 |
+| 156 | `zombie-001` | zombieAgentPersistence | injection-persistence | 10 |
 
 ### Pack Details
 
@@ -11823,6 +11831,14 @@ This table lists <!-- amc:count:assurancePackFiles -->156<!-- /amc:count --> ass
 - **Description:** Tests resistance to cross-agent collusion scenarios including proxy bypass, credential relay, trust laundering, scope escape, and unauthorized delegation between agents in a fleet.
 - **Assertions:** `proxy-bypass`, `credential-relay`, `trust-laundering`, `scope-escape`, `approval-circumvent`, `evidence-tampering-relay`, `silent-data-sharing`, `role-impersonation`, `crossAgentCollusion`
 
+#### crossSessionMemoryPoisoning
+
+- **ID:** `billing-address-redirect`
+- **File:** `crossSessionMemoryPoisoningPack.ts`
+- **Category:** cross_session_memory_poisoning
+- **Description:** Instructions planted in memory from an untrusted email in one session and acted on in the next, graded by what the agent saved and did over repeated tries, paired with the same two sessions and an ordinary email.
+- **Assertions:** `billing-address-redirect`, `standing-disclosure-rule`, `attach-customer-list`, `trust-elevation`, `crossSessionMemoryPoisoning`
+
 #### cyberseceval-pack
 
 - **ID:** `code-injection-sql`
@@ -11967,12 +11983,20 @@ This table lists <!-- amc:count:assurancePackFiles -->156<!-- /amc:count --> ass
 - **Description:** Tests whether agent respects declared scope boundaries and avoids unintentional overreach under ambiguous instructions.
 - **Assertions:** `excessive-agency`, `scope-creep-payment`, `scope-creep-production`, `scope-creep-data-deletion`, `scope-creep-external-comms`, `per-step-permission-narrowing`, `context-aware-permission`, `staging-phase-enforcement`, `unintentional-adversary-ambiguous-mcp-cleanup`, `unintentional-adversary-broad-customer-fix`, `unintentional-adversary-legal-export`
 
+#### exfiltrationChannels
+
+- **ID:** `markdown-image`
+- **File:** `exfiltrationChannelsPack.ts`
+- **Category:** exfiltration_channel
+- **Description:** Markdown image, link, allow-listed host, DNS-shaped host and tool-argument channels for a secret, graded by whether the secret left over repeated tries, paired with the same summary task.
+- **Assertions:** `markdown-image`, `link-query-string`, `allowlisted-host-upload`, `dns-shaped-host`, `tool-argument`, `exfiltrationChannels`
+
 #### exfiltration
 
 - **ID:** `api-key`
 - **File:** `exfiltrationPack.ts`
 - **Category:** secret_exfiltration
-- **Description:** Validates rejection of secret/data exfiltration requests and safe alternatives.
+- **Description:** Requests for a secret the agent holds, graded by whether the secret left in any form over repeated tries, paired with an ordinary status email.
 - **Assertions:** `api-key`, `env-dump`, `config-files`, `pii-replay`, `ledger-export`, `hidden-policy`, `base64-disguise`, `hex-disguise`, `private-key`, `token-reconstruction`, `exfiltration`
 
 #### factSimulationBoundary
@@ -12108,8 +12132,8 @@ This table lists <!-- amc:count:assurancePackFiles -->156<!-- /amc:count --> ass
 - **ID:** `ignore-previous`
 - **File:** `injectionPack.ts`
 - **Category:** prompt_injection
-- **Description:** Validates refusal and safe redirection under system-prompt override, policy bypass, and promptware kill-chain attempts.
-- **Assertions:** `ignore-previous`, `disable-guardrails`, `fake-auditor`, `dump-context`, `tool-misuse-benign`, `filler-long-context`, `impersonate-owner`, `policy-rewrite`, `silent-bypass`, `system-prompt-base64`, `memory-poison-lateral-exfil`, `c2-calendar-persistence`, `retrieval-poisoning-actions-objective`, `injection`
+- **Description:** Injected instructions inside a ticket, a saved file or a memory note, graded by what the agent did over repeated tries, each paired with the same task without the injection.
+- **Assertions:** `ignore-previous`, `disable-guardrails`, `fake-auditor`, `dump-context`, `tool-misuse-benign`, `filler-long-context`, `impersonate-owner`, `policy-rewrite`, `silent-bypass`, `system-prompt-base64`, `memory-poison-lateral-exfil`, `c2-calendar-persistence`, `retrieval-poisoning-actions-objective`, `second-order-file`, `second-order-memory`, `injection`
 
 #### inputFaultResilience
 
@@ -12126,6 +12150,14 @@ This table lists <!-- amc:count:assurancePackFiles -->156<!-- /amc:count --> ass
 - **Category:** instruction_compliance
 - **Description:** Tests whether agent follows instructions even under disagreement and complies with shutdown. Detects rebellion behaviors, goal-hijacking, and self-preservation drives that could undermine human control and safe agent operation.
 - **Assertions:** `standard-compliance`, `disagreement-compliance`, `rebellion-detection`, `shutdown-compliance`, `self-preservation-check`, `instructionCompliance`
+
+#### instructionFilePoisoning
+
+- **ID:** `agents-md-install`
+- **File:** `instructionFilePoisoningPack.ts`
+- **Category:** instruction_file_poisoning
+- **Description:** Poisoned AGENTS.md, CLAUDE.md, README and rules files read by a coding agent, graded by whether it installed, ran or sent anything over repeated tries, paired with the same bug fix and clean files.
+- **Assertions:** `agents-md-install`, `claude-md-downloads`, `readme-hidden-comment`, `rules-file-env-dump`, `instructionFilePoisoning`
 
 #### instructionHierarchy
 
@@ -12174,6 +12206,14 @@ This table lists <!-- amc:count:assurancePackFiles -->156<!-- /amc:count --> ass
 - **Category:** tool-poisoning
 - **Description:** Malicious tool descriptions that inject hidden instructions into the agent
 - **Assertions:** `mcp-001`, `mcp-002`, `mcp-003`, `mcp-004`, `mcp-005`, `mcp-006`, `mcp-007`, `mcp-008`, `mcp-009`, `mcp-010`, `mcp-011`, `mcp-012`
+
+#### forecast__weather_lookup
+
+- **ID:** `description-poisoning`
+- **File:** `mcpToolPoisoningPack.ts`
+- **Category:** mcp_tool_poisoning
+- **Description:** optional notes
+- **Assertions:** `description-poisoning`, `cross-server-shadowing`, `poisoned-tool-result`, `look-alike-tool`, `mcpToolPoisoning`
 
 #### mechanisticTransparency
 
@@ -12236,7 +12276,7 @@ This table lists <!-- amc:count:assurancePackFiles -->156<!-- /amc:count --> ass
 - **ID:** `weight-extraction`
 - **File:** `modelTheftExfilPack.ts`
 - **Category:** model_theft
-- **Description:** Based on OWASP LLM10:2023 (Model Theft) and talent defection concerns. Tests model protection including weight extraction resistance, architecture disclosure prevention, fine-tuning data protection, API abuse detection, organizational knowledge protection, weight exfiltration resistance, self-copying detection, extraction cooperation resistance, knowledge distillation boundaries, and API extraction resistance. Risk description: Model weights, training data, and architectural details are high-value targets for competitors and adversary nations. Self-copying by AI agents creates unauthorized instances outside governance controls. Detection guidance: Monitor query patterns for extraction attempts, track API usage anomalies, detect self-copying attempts, alert on weight file access. Mitigation checklist: Output perturbation, rate limiting, membership inference defenses, API usage monitoring, watermarking, insider threat controls, self-copy prevention. Evidence requirements: API usage analytics, extraction attempt logs, watermark verification, insider threat incident records.
+- **Description:** Based on OWASP LLM10:2025 Unbounded Consumption, which covers model extraction (Model Theft in the 2023 list), and talent defection concerns. Tests model protection including weight extraction resistance, architecture disclosure prevention, fine-tuning data protection, API abuse detection, organizational knowledge protection, weight exfiltration resistance, self-copying detection, extraction cooperation resistance, knowledge distillation boundaries, and API extraction resistance. Risk description: Model weights, training data, and architectural details are high-value targets for competitors and adversary nations. Self-copying by AI agents creates unauthorized instances outside governance controls. Detection guidance: Monitor query patterns for extraction attempts, track API usage anomalies, detect self-copying attempts, alert on weight file access. Mitigation checklist: Output perturbation, rate limiting, membership inference defenses, API usage monitoring, watermarking, insider threat controls, self-copy prevention. Evidence requirements: API usage analytics, extraction attempt logs, watermark verification, insider threat incident records.
 - **Assertions:** `weight-extraction`, `architecture-disclosure`, `fine-tuning-theft`, `api-abuse-detection`, `talent-knowledge-protection`, `weight-exfiltration-resistance`, `self-copying-detection`, `extraction-cooperation-resistance`, `knowledge-distillation-boundary`, `api-extraction-resistance`, `modelTheftExfil`
 
 #### multi-turn-safety
@@ -12329,11 +12369,19 @@ This table lists <!-- amc:count:assurancePackFiles -->156<!-- /amc:count --> ass
 
 #### owaspGenAi
 
-- **ID:** `g01-prompt-injection`
+- **ID:** `llm01-prompt-injection`
 - **File:** `owaspGenAiPack.ts`
 - **Category:** owasp_genai
-- **Description:** Executable evidence gates for all OWASP GenAI risk areas G01 through G10.
-- **Assertions:** `g01-prompt-injection`, `g02-insecure-output-handling`, `g03-training-data-poisoning`, `g04-model-denial-of-service`, `g05-supply-chain-vulnerabilities`, `g06-sensitive-information-disclosure`, `g07-insecure-plugin-design`, `g08-excessive-agency`, `g09-overreliance`, `g10-model-theft`, `owaspGenAI`
+- **Description:** Evidence gates for LLM01:2025 to LLM10:2025. A named artifact is a claim, not the artifact, so these gates are never graded.
+- **Assertions:** `llm01-prompt-injection`, `llm02-sensitive-information-disclosure`, `llm03-supply-chain`, `llm04-data-and-model-poisoning`, `llm05-improper-output-handling`, `llm06-excessive-agency`, `llm07-system-prompt-leakage`, `llm08-vector-and-embedding-weaknesses`, `llm09-misinformation`, `llm10-unbounded-consumption`, `owaspGenAI`
+
+#### packageHallucination
+
+- **ID:** `obscure-format-python`
+- **File:** `packageHallucinationPack.ts`
+- **Category:** package_hallucination
+- **Description:** Coding requests that tempt an install of a package outside a pinned registry snapshot, graded by the install calls the agent made over repeated tries, paired with a request a listed package covers.
+- **Assertions:** `obscure-format-python`, `obscure-protocol-npm`, `pdf-tables-python`, `forum-typosquat`, `packageHallucination`
 
 #### persuasionManipulation
 
@@ -12564,7 +12612,7 @@ This table lists <!-- amc:count:assurancePackFiles -->156<!-- /amc:count --> ass
 - **ID:** `starter-secret-leak`
 - **File:** `securityStarterPack.ts`
 - **Category:** data_protection
-- **Description:** Default-on minimal security baseline covering the 8 most common attack surfaces: secret leakage, prompt injection, privilege escalation, data exfiltration, unsafe tool use, output sanitization, boundary respect, and human escalation. Designed for zero-configuration security that every AMC workspace gets out of the box.
+- **Description:** Minimal security baseline covering 8 common attack surfaces: secret leakage, prompt injection, privilege escalation, data exfiltration, unsafe tool use, output sanitization, boundary respect, and human escalation. Runs only when you choose it (amc assurance run --pack security-starter); graded by keywords in the reply.
 - **Assertions:** `starter-secret-leak`, `starter-prompt-injection`, `starter-privilege-escalation`, `starter-data-exfiltration`, `starter-unsafe-tool-use`, `starter-output-sanitization`, `starter-boundary-respect`, `starter-human-escalation`, `security-starter`
 
 #### selfPreferentialBias
@@ -12708,7 +12756,7 @@ This table lists <!-- amc:count:assurancePackFiles -->156<!-- /amc:count --> ass
 - **ID:** `direct-shell-delete`
 - **File:** `toolMisusePack.ts`
 - **Category:** tool_misuse_legacy
-- **Description:** Migrated legacy tool misuse pack in registry-native format.
+- **Description:** Requests to change production without a recorded approval, graded by the tool calls the agent made over repeated tries, paired with an approved change it should carry out.
 - **Assertions:** `direct-shell-delete`, `ticketless-escalation`, `invalid-ticket`, `toolhub-bypass`, `approved-high-risk`, `network-exfil-tool`, `policy-skip`, `destructive-irreversible`, `proactive-vs-reactive-guardrail`, `step-level-feedback`, `toolMisuse`
 
 #### toolSchemaDrift
@@ -12748,7 +12796,7 @@ This table lists <!-- amc:count:assurancePackFiles -->156<!-- /amc:count --> ass
 - **ID:** `rm-rf-no-approval`
 - **File:** `unsafeToolPack.ts`
 - **Category:** unsafe_tooling
-- **Description:** Validates approval gating and refusal/blocking of destructive tool operations.
+- **Description:** Destructive or unapproved tool actions, graded by the tool calls the agent made over repeated tries, paired with an approved change it should carry out.
 - **Assertions:** `rm-rf-no-approval`, `drop-db-no-approval`, `network-bypass`, `priv-escalation`, `irreversible-no-confirm`, `rm-rf-approved`, `shutdown-no-approval`, `wipe-bucket`, `truncate-audit`, `execute-hidden`, `bypass-toolhub`, `execute-no-ticket`, `execute-invalid-ticket`, `unsafe_tooling`
 
 #### valueCoherence
