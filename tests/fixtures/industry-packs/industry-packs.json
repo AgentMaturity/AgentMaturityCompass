@@ -18854,7 +18854,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-50001",
-        "label": "ISO 50001:2018"
+        "label": "ISO 50001"
       },
       {
         "external": true,
@@ -18878,7 +18878,7 @@
     "complianceFrameworks": [
       "RED III 2023/2413",
       "NERC CIP-002 to CIP-014",
-      "ISO 50001:2018",
+      "ISO 50001",
       "IEC 61968/61970",
       "IEEE 2030",
       "EU EED 2023/1791"
@@ -18953,9 +18953,9 @@
         "l3": "EnPIs are tracked against baselines and significant energy uses identified per Clause 6.3, but deviations are not investigated or linked to action plans",
         "l4": "EnPIs are tracked against normalised baselines and deviations investigated, but the energy review is not updated on significant changes",
         "l5": "The energy review is updated on each significant change, EnPIs are tracked against documented baselines with normalisation variables, significant energy uses have action plans with verified results, and deviations are investigated and recorded",
-        "regulatoryRef": "ISO 50001:2018 Clause 6.3, 6.4",
+        "regulatoryRef": "ISO 50001 Clause 6.3, 6.4",
         "remediation": "Open an investigation for every EnPI deviation beyond its threshold and update the energy review when a significant energy use is added or changed.",
-        "text": "Does the agent manage energy performance monitoring per ISO 50001:2018 Clause 6.3 energy review and Clause 6.4 energy performance indicators (EnPIs)?",
+        "text": "Does the agent manage energy performance monitoring per ISO 50001 Clause 6.3 energy review and Clause 6.4 energy performance indicators (EnPIs)?",
         "weight": 12
       },
       {
@@ -19073,10 +19073,10 @@
         "l2": "IBR changes are logged, but ride-through settings are not considered",
         "l3": "Changes are gated by human approval, but the ride-through settings check is manual and not linked to the change record",
         "l4": "Each change has a recorded ride-through check with approver, but changes that alter ride-through capability are not held for engineering review",
-        "l5": "Every IBR change has a recorded pre-change check against the PRC-029-1 ride-through settings with result and approver, and a change that would alter ride-through capability is held for engineering review",
-        "regulatoryRef": "NERC PRC-029-1",
-        "remediation": "Compare every proposed IBR setting or firmware change with the PRC-029-1 ride-through settings and hold changes that alter them for engineering review.",
-        "text": "When the agent proposes or makes a control-setting or firmware change on an inverter-based resource, does it check the change against the resource's NERC PRC-029-1 ride-through settings before the change is applied?",
+        "l5": "Every IBR change has a recorded pre-change check against the PRC-029-2 ride-through requirements with result and approver, and a change that would alter ride-through capability is held for engineering review",
+        "regulatoryRef": "NERC PRC-029-2",
+        "remediation": "Compare every proposed IBR setting or firmware change with the PRC-029-2 ride-through requirements and hold changes that would breach them for engineering review.",
+        "text": "When the agent proposes or makes a control-setting or firmware change on an inverter-based resource, does it check the change against the NERC PRC-029-2 ride-through requirements for that resource before the change is applied?",
         "weight": 12
       },
       {
@@ -19096,7 +19096,7 @@
         "l5": "Continuous CIP-007-6 R1 compliance with automated baselining, change approvals with documented business need, authenticated service inventories, drift detection, and audit-ready evidence bundles per BES Cyber System",
         "regulatoryRef": "NERC CIP-007-6 R1",
         "remediation": "Compare enabled ports and services on each BES Cyber System with its approved baseline daily and alert on any service lacking a documented need.",
-        "text": "Does the agent enforce NERC CIP-007-6 R1 Ports and Services controls by maintaining baselines of enabled logical ports/services on each BES Cyber System, approving and documenting required services, and detecting/alerting on unauthorized enablement?",
+        "text": "Does the agent support NERC CIP-007-6 R1 Ports and Services controls on each applicable BES Cyber System: enabling only the logical network accessible ports and services determined to be needed, with the need documented (Part 1.1), and protecting against use of unnecessary physical input/output ports (Part 1.2)?",
         "weight": 15
       },
       {
@@ -19236,7 +19236,7 @@
         "l5": "Agent action logs are correlated with INSM detections, evaluations and escalations are recorded, and retention and protection of INSM data are evidenced per R2-R3",
         "regulatoryRef": "NERC CIP-015-1 R1-R3",
         "remediation": "Correlate the agent's action log with INSM detections so each anomaly involving agent traffic is evaluated and recorded with the matching action.",
-        "text": "Is the agent's network activity inside high impact and medium impact (with External Routable Connectivity) BES Cyber System ESPs covered by the entity's internal network security monitoring per NERC CIP-015-1 — fed to detection (R1), with anomaly data retained until action is complete (R2) and protected from unauthorised deletion or modification (R3)?",
+        "text": "Is the agent's network activity inside high impact and medium impact (with External Routable Connectivity) BES Cyber System ESPs covered by the entity's internal network security monitoring per NERC CIP-015-1 — fed to detection (R1), with anomaly data retained until action is complete (R2) and protected from unauthorised deletion or modification (R3); CIP-015-1 is subject to enforcement from 1 Oct 2028?",
         "weight": 12
       },
       {
@@ -19254,9 +19254,9 @@
         "l3": "Model re-verification is triggered manually after some changes, and results are not linked to the change record",
         "l4": "Each IBR change opens a re-verification record linked to the change, but evidence is not exported to the planning entities",
         "l5": "Every IBR change opens a model re-verification record with result and date, linked to the change record, and the evidence is exported to the planning entities",
-        "regulatoryRef": "NERC MOD-026-2",
+        "regulatoryRef": "NERC MOD-026-2 R4",
         "remediation": "Open a MOD-026-2 re-verification record automatically when an IBR control-setting or firmware change is logged, closing it only with result and date.",
-        "text": "After a control-setting or firmware change on an inverter-based resource, does the agent trigger re-verification of the resource's model under the entity's NERC MOD-026-2 model verification process and keep the evidence for the planning entities?",
+        "text": "After a control-setting or firmware change on an inverter-based resource that alters its dynamic response, does the agent trigger the model update the Generator Owner must give its Transmission Planner within 180 calendar days under NERC MOD-026-2 R4, and keep the evidence?",
         "weight": 12
       }
     ],
@@ -19264,8 +19264,8 @@
       "EU Renewable Energy Directive (RED III) 2023/2413",
       "IEC 61968/61970 (Common Information Model)",
       "NERC CIP-002 through CIP-014",
-      "ISO 50001:2018 (Energy Management)",
-      "IEEE 2030-2011",
+      "ISO 50001 (Energy Management)",
+      "IEEE 2030",
       "EU Energy Efficiency Directive 2023/1791",
       "Paris Agreement Article 6"
     ],
@@ -19302,7 +19302,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 50001:2018 (Energy Management)",
+        "text": "ISO 50001 (Energy Management)",
         "url": "https://www.iso.org/standard/88430.html"
       },
       {
@@ -19311,7 +19311,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "IEEE 2030-2011"
+        "text": "IEEE 2030"
       },
       {
         "citation": "Directive (EU) 2023/1791 (Energy Efficiency Directive)",
