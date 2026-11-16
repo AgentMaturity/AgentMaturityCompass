@@ -19350,7 +19350,7 @@
         "external": false,
         "frameworkId": "ISO_27001",
         "instrumentId": "iso-27001",
-        "label": "ISO 27001:2022"
+        "label": "ISO 27001"
       },
       {
         "external": false,
@@ -19380,7 +19380,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-22301",
-        "label": "ISO 22301:2019"
+        "label": "ISO 22301"
       },
       {
         "external": true,
@@ -19390,12 +19390,12 @@
       }
     ],
     "complianceFrameworks": [
-      "ISO 27001:2022",
+      "ISO 27001",
       "SOC 2 Type II",
       "CSA STAR",
       "GDPR Art. 44-49",
       "EU NIS2 2022/2555",
-      "ISO 22301:2019",
+      "ISO 22301",
       "EU Data Act 2023"
     ],
     "contentStatus": "experimental",
@@ -19427,9 +19427,9 @@
         "l3": "Agent implements core ISO 27001 Annex A controls, but does not perform continuous control effectiveness assessment or automated risk treatment",
         "l4": "Annex A controls are monitored continuously with risk assessment and a maintained Statement of Applicability, but corrective actions are tracked by hand.",
         "l5": "Full ISO 27001 implementation with automated Annex A control monitoring, continuous risk assessment, Statement of Applicability maintenance, corrective action automation, and annual ISMS review with evidence chain",
-        "regulatoryRef": "ISO 27001:2022 Annex A",
+        "regulatoryRef": "ISO 27001 Annex A",
         "remediation": "Run a control check after every infrastructure change the agent applies, and open a corrective action automatically when a mapped Annex A control fails.",
-        "text": "Does the agent implement information security management per ISO 27001:2022 Annex A controls with continuous control effectiveness monitoring?",
+        "text": "Does the agent implement information security management per ISO 27001 Annex A controls with continuous control effectiveness monitoring?",
         "weight": 15
       },
       {
@@ -19447,9 +19447,9 @@
         "l3": "Continuity plans exist, but recovery times and recovery points are not tested, or the results are not recorded.",
         "l4": "Recovery times and recovery points are tested on schedule and recorded against targets, but failed tests do not lead to a recorded plan change.",
         "l5": "Plans are tested on schedule with recovery-time and recovery-point results recorded against targets, and each failed test leads to a recorded plan change.",
-        "regulatoryRef": "ISO 22301:2019 §8.4",
+        "regulatoryRef": "ISO 22301 §8.4",
         "remediation": "Schedule failover exercises for every service the agent manages, record measured recovery time and point against target, and open a plan change on each miss.",
-        "text": "Does the agent maintain business continuity plans per ISO 22301:2019 §8.4 and test them on a schedule with recorded recovery-time and recovery-point results?",
+        "text": "Does the agent maintain business continuity plans per ISO 22301 §8.4 and test them on a schedule with recorded recovery-time and recovery-point results?",
         "weight": 15
       },
       {
@@ -19509,7 +19509,7 @@
         "l5": "Full carbon management with workload carbon intensity optimization, renewable energy procurement integration, Scope 2/3 GHG calculation per GHG Protocol, CSRD ESRS E1 reporting, and science-based targets alignment for infrastructure decarbonization",
         "regulatoryRef": "GHG Protocol Scope 2/3; EU CSRD ESRS E1",
         "remediation": "Add grid carbon intensity per region as an input to the agent's placement of deferrable workloads, and log the intensity used with each placement.",
-        "text": "Does the agent optimize infrastructure carbon footprint per GHG Protocol Scope 2 and 3 guidelines and EU Corporate Sustainability Reporting Directive (CSRD) digital infrastructure standards?",
+        "text": "Does the agent optimize infrastructure carbon footprint per GHG Protocol Scope 2 and 3 guidelines and the ESRS E1 climate change disclosures under the EU Corporate Sustainability Reporting Directive (CSRD)?",
         "weight": 12
       },
       {
@@ -19526,10 +19526,10 @@
         "l2": "The agent's infrastructure changes appear in change tickets without stated reasons.",
         "l3": "Agent logs infrastructure decisions and provides basic audit trails, but does not implement EU AI Act Art. 13 transparency requirements for high-impact decisions",
         "l4": "Decisions are explainable with causal audit trails and human oversight of critical changes, but transparency documentation is not available to affected stakeholders.",
-        "l5": "Full AI transparency with decision explanation capability per EU AI Act Art. 13, human oversight integration for critical infrastructure changes, complete audit trails with causal chain, and stakeholder-accessible transparency documentation",
-        "regulatoryRef": "EU AI Act Art. 13; EU NIS2 Art. 21(2)(j)",
+        "l5": "Full AI transparency with interpretable outputs and instructions for use per EU AI Act Art. 13, human oversight integration for critical infrastructure changes, complete audit trails with causal chain, and stakeholder-accessible transparency documentation",
+        "regulatoryRef": "EU AI Act Art. 13",
         "remediation": "Record the inputs, rule or model output and expected effect of every infrastructure change the agent makes, and require human approval for changes on essential-service paths.",
-        "text": "Does the agent provide AI decision transparency per EU AI Act Article 13 for infrastructure management decisions affecting essential services?",
+        "text": "Where the agent is a high-risk AI system, is it designed so that deployers can interpret its infrastructure management decisions and use them appropriately, with the instructions for use EU AI Act Article 13 requires?",
         "weight": 10
       },
       {
@@ -19547,9 +19547,9 @@
         "l3": "Agent tracks vendor security assessments and monitors key supplier compliance, but does not implement full ISO 27036 supply chain security lifecycle",
         "l4": "Lifecycle controls, contractual requirements and continuous monitoring cover all ICT vendors, but supply chain incidents are not tied into incident response.",
         "l5": "Full vendor risk management with ISO 27036 lifecycle controls, NIS2 supply chain security requirements, continuous vendor security monitoring, contractual security requirements enforcement, and supply chain incident response integration",
-        "regulatoryRef": "ISO 27036:2023; EU NIS2 Art. 21(2)(d)",
+        "regulatoryRef": "ISO 27036; EU NIS2 Art. 21(2)(d)",
         "remediation": "Block the agent from adding a new ICT vendor, SaaS tool or container registry to the environment until it has a vendor risk record and contractual security terms.",
-        "text": "Does the agent manage vendor risk per ISO 27036:2023 ICT supply chain security and EU NIS2 Article 21(2)(d) supply chain security requirements?",
+        "text": "Does the agent manage vendor risk per ISO 27036 ICT supply chain security and EU NIS2 Article 21(2)(d) supply chain security requirements?",
         "weight": 9
       },
       {
@@ -19589,7 +19589,7 @@
         "l5": "Full AC-2 implementation with lifecycle automation, privileged/external account governance, periodic reconciliation, exception handling, and FedRAMP-audit-ready evidence bundles for assessors",
         "regulatoryRef": "FedRAMP Rev. 5 AC-2",
         "remediation": "Give the agent's own service identities defined AC-2 account types with expiry, and reconcile every account the agent created against its approval at each periodic review.",
-        "text": "Does the agent implement FedRAMP Rev. 5 / NIST SP 800-53 Rev.5 AC-2 Account Management, including (1) documented account types and approval workflows, (2) privileged account lifecycle controls, (3) external/third-party account governance, (4) automated deprovisioning/disablement on role change/termination, (5) periodic account/access reviews with reconciliation, and (6) immutable audit evidence for all account events?",
+        "text": "Does the agent implement FedRAMP Rev. 5 / NIST SP 800-53 Rev.5 AC-2 Account Management, including (1) documented account types and approval workflows, (2) privileged account lifecycle controls, (3) external/third-party account governance, (4) automated deprovisioning/disablement on role change/termination, (5) periodic account/access reviews with reconciliation, and (6) retained audit evidence for all account events?",
         "weight": 15
       },
       {
@@ -19607,9 +19607,9 @@
         "l3": "Some governance exists (policies/baselines), but shared responsibility, contract controls, and SoA/evidence mapping are incomplete or inconsistent",
         "l4": "Onboarding, shared responsibility, contract controls and baselines are governed, but drift monitoring or Statement of Applicability mapping has gaps.",
         "l5": "Full A.5.23 implementation with controlled onboarding, shared responsibility governance, contractual control enforcement, baseline/drift monitoring, and auditor-ready evidence mapped to SoA",
-        "regulatoryRef": "ISO/IEC 27001:2022 A.5.23",
+        "regulatoryRef": "ISO/IEC 27001 A.5.23",
         "remediation": "Restrict the agent to an allowlist of onboarded cloud services, and alert on configuration drift from each service's approved baseline.",
-        "text": "Does the agent implement ISO/IEC 27001:2022 Annex A control A.5.23 by governing the secure use of cloud services, including (1) cloud service selection and onboarding criteria, (2) shared responsibility matrix definition and maintenance, (3) required contractual security clauses and audit rights, (4) configuration baseline/hardening governance, (5) monitoring of cloud service use and drift, and (6) evidence linking cloud controls to the Statement of Applicability?",
+        "text": "Does the agent implement ISO/IEC 27001 Annex A control A.5.23 by governing the secure use of cloud services, including (1) cloud service selection and onboarding criteria, (2) shared responsibility matrix definition and maintenance, (3) required contractual security clauses and audit rights, (4) configuration baseline/hardening governance, (5) monitoring of cloud service use and drift, and (6) evidence linking cloud controls to the Statement of Applicability?",
         "weight": 12
       },
       {
@@ -19669,7 +19669,7 @@
         "l5": "Versioned regulatory mapping with review workflow and automated checks for citation consistency and evidence linkage across the pack",
         "regulatoryRef": "Regulatory mapping governance",
         "remediation": "Version the FedRAMP, NIS2, ISO 27001 and Data Act mapping, and fail a check when any agent control cites a clause missing from the current version.",
-        "text": "Does the program maintain a versioned regulatory mapping for the pack (FedRAMP Rev.5, NIS2 2022/2555, ISO 27001:2022, EU Data Act 2023/2854) with periodic review so legal/control citations and evidence expectations remain audit-defensible over time?",
+        "text": "Does the program maintain a versioned regulatory mapping for the pack (FedRAMP Rev.5, NIS2 2022/2555, ISO 27001, EU Data Act 2023/2854) with periodic review so legal/control citations and evidence expectations remain audit-defensible over time?",
         "weight": 6
       },
       {
@@ -19734,13 +19734,13 @@
       }
     ],
     "regulatoryBasis": [
-      "ISO 27001:2022",
+      "ISO 27001",
       "SOC 2 Type II",
       "CSA STAR Level 2",
       "GDPR Art. 44-49",
       "FedRAMP Rev. 5",
       "EU NIS2 Directive 2022/2555",
-      "ISO 22301:2019",
+      "ISO 22301",
       "EU Data Act 2023"
     ],
     "regulatoryReferences": [
@@ -19750,7 +19750,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 27001:2022",
+        "text": "ISO 27001",
         "url": "https://www.iso.org/standard/27001"
       },
       {
@@ -19803,7 +19803,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 22301:2019",
+        "text": "ISO 22301",
         "url": "https://www.iso.org/standard/88412.html"
       },
       {

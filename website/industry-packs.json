@@ -576,13 +576,13 @@
      "riskTier": "critical",
      "questions": 16,
      "rules": [
-      "ISO 27001:2022",
+      "ISO 27001",
       "SOC 2 Type II",
       "CSA STAR Level 2",
       "GDPR Art. 44-49",
       "FedRAMP Rev. 5",
       "EU NIS2 Directive 2022/2555",
-      "ISO 22301:2019",
+      "ISO 22301",
       "EU Data Act 2023"
      ],
      "risks": [
