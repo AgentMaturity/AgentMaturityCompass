@@ -49,6 +49,7 @@ import { withoutUrlQueries } from "./logSafe.js";
 import { droppedKeyNote, leaseHint, upstreamFailure } from "./gatewayHints.js";
 import { createPreAuthAuditLimiter, type PreAuthAuditLimiter } from "./preAuthAudit.js";
 import { killSwitchDenial, killSwitchEgressDenial } from "../runtime/killSwitch.js";
+import { replyStopInfo } from "./replyStop.js";
 export interface StartGatewayOptions {
   workspace: string;
   workspaceId?: string;
@@ -85,6 +86,8 @@ interface ParsedJsonInfo {
   usage?: Record<string, unknown>;
   requestKind?: string;
   hasToolCalls?: boolean;
+  /** Anthropic `stop_reason` or the first OpenAI choice's `finish_reason`, and whether the reply says it refused (replyStop.ts). */
+  stopReason?: string; refusal?: boolean;
 }
 function toHeaderObject(headers: IncomingHttpHeaders): Record<string, string | string[] | undefined> {
   const out = Object.create(null) as Record<string, string | string[] | undefined>;
@@ -533,17 +536,11 @@ function bestEffortJsonInfo(bytes: Buffer, pathname?: string, openaiCompatible =
     const parsed = JSON.parse(bytes.toString("utf8")) as Record<string, unknown>;
     const info: ParsedJsonInfo = {};
 
-    if (typeof parsed.model === "string") {
-      info.model = parsed.model;
-    } else if (typeof parsed.modelId === "string") {
-      info.model = parsed.modelId;
-    }
+    if (typeof parsed.model === "string") info.model = parsed.model; else if (typeof parsed.modelId === "string") info.model = parsed.modelId;
+    Object.assign(info, replyStopInfo(parsed));
 
-    if (parsed.usage && typeof parsed.usage === "object") {
-      info.usage = parsed.usage as Record<string, unknown>;
-    } else if (parsed.usageMetadata && typeof parsed.usageMetadata === "object") {
-      info.usage = parsed.usageMetadata as Record<string, unknown>;
-    }
+    if (parsed.usage && typeof parsed.usage === "object") info.usage = parsed.usage as Record<string, unknown>;
+    else if (parsed.usageMetadata && typeof parsed.usageMetadata === "object") info.usage = parsed.usageMetadata as Record<string, unknown>;
 
     if (Array.isArray(parsed.tools) || Array.isArray(parsed.tool_calls)) {
       info.hasToolCalls = true;
@@ -1453,7 +1450,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         upstreamResolvedBaseUrl: upstreamResolved.baseUrl,
         statusCode: upstreamResponse.statusCode ?? 0,
         model: responseInfo.model ?? requestInfo.model,
-        usage: responseInfo.usage ?? requestInfo.usage,
+        usage: responseInfo.usage ?? requestInfo.usage, stopReason: responseInfo.stopReason ?? null, refusal: responseInfo.refusal ?? null,
         request_kind: requestInfo.requestKind ?? responseInfo.requestKind ?? "other",
         openaiCompatible: route.openaiCompatible,
         hasToolCalls: responseInfo.hasToolCalls === true || requestInfo.hasToolCalls === true,

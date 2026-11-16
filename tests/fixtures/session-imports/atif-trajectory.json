@@ -1,0 +1,15 @@
+{
+  "schema_version": "ATIF-v1.7",
+  "session_id": "fixture-atif-1",
+  "agent": { "name": "example-agent", "version": "0.0.1", "model_name": "example-model-b" },
+  "steps": [
+    { "step_id": 1, "timestamp": "2026-11-02T09:00:00Z", "source": "user", "message": "Example task text." },
+    { "step_id": 2, "timestamp": "2026-11-02T09:00:01Z", "source": "agent", "model_name": "example-model-b", "message": "Example plan.",
+      "tool_calls": [ { "tool_call_id": "call_1", "function_name": "search", "arguments": { "q": "example" } } ],
+      "observation": { "results": [ { "source_call_id": "call_1", "content": "Example result." } ] },
+      "metrics": { "prompt_tokens": 500, "completion_tokens": 40, "cached_tokens": 100 } },
+    { "step_id": 3, "timestamp": "2026-11-02T09:00:02Z", "source": "agent", "message": "Example final answer.",
+      "metrics": { "prompt_tokens": 560, "completion_tokens": 25 } }
+  ],
+  "final_metrics": { "total_prompt_tokens": 1060, "total_completion_tokens": 65 }
+}

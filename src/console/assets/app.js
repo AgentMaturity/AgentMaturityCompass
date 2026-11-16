@@ -2,6 +2,7 @@ import { renderNeutralImportReview } from "./neutralImportReview.js";
 import { plainErrorText } from "./plainError.js";
 import { askInline, confirmPress, recordDetails, recordRows, showResult } from "./pageKit.js";
 import { renderNativeTasksPage } from "./nativeTasks.js";
+import { toolRatesHtml } from "./runtimeRates.js";
 import { apiGet, apiPost, applyRoleGates, getAdminToken, getCurrentUser, login, logout, onClaims, setAdminToken, whoami } from "./api.js";
 import { installClaimStrip } from "./components/claimBadge.js";
 import { industryPackDetailHtml, industryPackResultHtml } from "./industryPackView.js";
@@ -2931,9 +2932,10 @@ function renderRuntimeEventRows(events) {
 
 async function renderRuntimeRuns() {
   const agentId = currentAgent();
-  const [statusEnvelope, runsEnvelope] = await Promise.all([
+  const [statusEnvelope, runsEnvelope, ratesEnvelope] = await Promise.all([
     apiGet(`/api/v1/runtime/status?agentId=${encodeURIComponent(agentId)}`).catch((error) => ({ error: errText(error) })),
-    apiGet(`/api/v1/runtime/runs?agentId=${encodeURIComponent(agentId)}&limit=20`).catch(() => ({ runs: [] }))
+    apiGet(`/api/v1/runtime/runs?agentId=${encodeURIComponent(agentId)}&limit=20`).catch(() => ({ runs: [] })),
+    apiGet(`/api/v1/runtime/tool-rates?agentId=${encodeURIComponent(agentId)}&window=24h`).catch(() => null)
   ]);
   const status = apiPayload(statusEnvelope) || {};
   const runsPayload = apiPayload(runsEnvelope) || {};
@@ -2975,6 +2977,7 @@ async function renderRuntimeRuns() {
         <div class="studio-terminal-line"><strong>Degraded</strong><span>${Number(status.degraded || 0)}</span></div>
         <div class="studio-terminal-line"><strong>Latest</strong><span>${latest ? `${htmlEscape(latest.runId)} (${htmlEscape(latest.status)})` : "-"}</span></div>
       `)}
+      ${card("Tool calls", toolRatesHtml(apiPayload(ratesEnvelope)))}
     </div>
     ${card("Runtime Runs", `
       <div class="scroll">

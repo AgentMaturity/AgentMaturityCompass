@@ -15927,13 +15927,12 @@ const drift = program.command("drift").description("Drift/regression detection a
 drift
   .command("check")
   .option("--agent <agentId>", "agent ID")
-  .option("--against <kind>", "comparison baseline", "previous")
-  .action(async (opts: { agent?: string; against?: "previous" }) => {
-    const result = await driftCheckCli({
-      workspace: process.cwd(),
-      agentId: opts.agent ?? activeAgent(program),
-      against: opts.against ?? "previous"
-    });
+  .addOption(new Option("--against <kind>", "previous (the last two scored runs) or observed (gateway replies and hook reports AMC recorded)").choices(["previous", "observed"]).default("previous"))
+  .option("--window <window>", "with --against observed: how far back to read, for example 24h or 7d", "7d")
+  .option("--json", "with --against observed: JSON output", false)
+  .action(async (opts: { agent?: string; against?: string; window: string; json: boolean }) => {
+    if (opts.against === "observed") process.exit((await import("./watch/observedChangeCli.js")).printObservedDriftCheck({ workspace: process.cwd(), agentId: opts.agent ?? activeAgent(program), window: opts.window, json: opts.json }));
+    const result = await driftCheckCli({ workspace: process.cwd(), agentId: opts.agent ?? activeAgent(program), against: "previous" });
     console.log(JSON.stringify(result, null, 2));
     if (result.triggered || driftNotEvaluated(result)) process.exit(result.triggered ? 2 : 3); // 3: drift could not be evaluated
   });
@@ -15949,9 +15948,7 @@ drift
       outFile: opts.out
     });
     console.log(report.markdown);
-    if (report.outFile) {
-      console.log(chalk.green(`Saved: ${report.outFile}`));
-    }
+    if (report.outFile) console.log(chalk.green(`Saved: ${report.outFile}`));
   });
 
 const freeze = program.command("freeze").description("Execution freeze status and controls");

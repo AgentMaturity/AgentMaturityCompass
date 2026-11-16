@@ -623,7 +623,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 604 | `amc identity workload-trust publish` | Validate a YAML workload trust config and publish it signed with the auditor key (owner mode) |
 | 605 | `amc identity workload-trust show` | Show what the verified workload trust config pins (names and counts, no key material) |
 | 606 | `amc identity workload-trust verify` | Verify the workload trust config's signature and schema; exits 1 when it does not verify |
-| 607 | `amc import` | Import neutral traces, runs, workflow graphs, configs, memory, evals, and benchmarks |
+| 607 | `amc import` | Import neutral traces, runs, workflow graphs, configs, memory, evals, benchmarks, and agent sessions: Claude Code transcripts (experimental: the format is not published, AMC infers its fields), codex exec --json output, and ATIF v1 trajectories |
 | 608 | `amc imports` | List, inspect, and roll back neutral import runs |
 | 609 | `amc imports list` | List recent neutral import runs |
 | 610 | `amc imports rollback` | Remove files written by a neutral import run |
@@ -4415,6 +4415,8 @@ Alias: `amc sector roadmap`
 |--------|-------------|
 | `--agent <agentId>` | - |
 | `--against <kind>` | - |
+| `--window <window>` | - |
+| `--json` | - |
 
 #### `amc drift report`
 
@@ -6260,7 +6262,7 @@ Show what the verified workload trust config pins (names and counts, no key mate
 
 #### `amc import`
 
-Import neutral traces, runs, workflow graphs, configs, memory, evals, and benchmarks
+Import neutral traces, runs, workflow graphs, configs, memory, evals, benchmarks, and agent sessions: Claude Code transcripts (experimental: the format is not published, AMC infers its fields), codex exec --json output, and ATIF v1 trajectories
 
 
 | Option | Description |
@@ -6271,6 +6273,7 @@ Import neutral traces, runs, workflow graphs, configs, memory, evals, and benchm
 | `--json` | - |
 | `--expected-digest <sha256>` | - |
 | `--no-retain-original` | - |
+| `--keep-text` | - |
 
 #### `amc imports list`
 

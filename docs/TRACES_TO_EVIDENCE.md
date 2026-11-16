@@ -54,6 +54,32 @@ New Watch indexes use `schemaVersion: "2026-09-08"`. Their entry `timestamp` and
 
 `IngestionStats.avgLatencyMs` is now `number | null`: it averages finite, nonnegative measured durations over the pipeline lifetime. Unknown/invalid values are excluded; a real zero is included. Scoring skips and buffer eviction do not alter the sample history. `clear()` resets it to unknown. Consumers should display null event times and latency as “unknown”. Generic import mapping and its existing fallbacks are unchanged by this Pi correction.
 
+## Import Claude Code, Codex and ATIF sessions
+
+`amc import` also reads three session formats other tools write:
+
+| Format | What it is | Status |
+| --- | --- | --- |
+| Claude Code transcript | The JSONL file Claude Code keeps for each session (a hook names it `transcript_path`) | Experimental: Anthropic has not published the line format, so AMC infers its fields |
+| `codex exec --json` | The event stream Codex prints with `--json` | Documented events; `aggregated_output` and `exit_code` are read from the Codex source |
+| ATIF | A trajectory file (`schema_version` "ATIF-v1.x") from the Harbor RFC | Documented; it has no error field, so tool outcomes stay unknown |
+
+```sh
+amc import ./session.jsonl --dry-run      # see what AMC would record
+amc import ./session.jsonl                # record it
+amc import ./session.jsonl --keep-text    # also keep the text (cut at 4,000 characters) and the file
+```
+
+What to expect:
+
+- Every row is self-reported and imported. It carries the file's SHA-256 and the format name. AMC did not watch it happen.
+- The agent is the one you name (`--agent`), never one the file names. Nothing in the file sets a trust level, a decision or a session label. A time later than the import becomes the import time, and the import says so.
+- Prompt, reply and tool text is kept only as SHA-256 digests unless you pass `--keep-text`. Without it, the file itself is not kept either. Either way, secret-looking values (API keys, bearer tokens, passwords) are replaced by `[REDACTED]` before the text is kept or digested, in the stored rows and in the traces alike. With `--keep-text` the original file is kept as it is unless you also pass `--no-retain-original`.
+- Each line is read on its own. A line that is not JSON, is longer than 1 MiB, or comes after the first 50,000 records is counted and skipped.
+- Importing the same file again for the same agent adds nothing.
+- AMC never opens a path written inside the file. A link in the folder you name that points elsewhere is not read.
+- Failed tool calls go into the Watch failure index with the step they happened at. Where an AMC rule matches, an entry carries a MAST failure-mode label (from "Why Do Multi-Agent LLM Systems Fail?", arXiv 2503.13657v3) with the rule's name. Two rules exist today: the same call three times in a row (FM-1.3, step repetition) and a session that ends on a failed step (FM-3.1, premature termination). A label is a label, not a finding.
+
 ## Path 2 — Run your agent command through an adapter (5 minutes, configured capture)
 
 Let AMC watch a real run through configured process, proxy, and tool capture paths. `amc adapters run` mints a lease and routes model traffic through the gateway. Activity those paths actually capture can carry observed provenance; activity outside their coverage remains unknown:
