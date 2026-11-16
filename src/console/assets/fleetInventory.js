@@ -30,7 +30,7 @@ function budgetText(row) {
   return `${dollars}, ${Number(row.budget.maxLlmTokensPerDay).toLocaleString()} tokens a day${row.budget.inherited ? " (shared default)" : ""}`;
 }
 /** Same words as the terminal: an estimate, and "not known" (never $0) when nothing could be priced. */
-export function costText(cost) {
+function costText(cost) {
   if (!cost) return "not known";
   if (!cost.calls) return "no calls recorded";
   if (cost.estimatedUsd == null) return `not known (${cost.calls} call${cost.calls === 1 ? "" : "s"} with no price)`;

@@ -24,12 +24,12 @@ const VERSION_KEYS: Readonly<Record<string, string>> = { claudeCodeVersion: "cla
 /** Ledger agent ids that name AMC itself or the whole workspace, not an agent. */
 const NOT_AGENTS = new Set(["system", "workspace", "unknown", "any"]);
 /** An observed id longer than this is shown cut short; it is outside text. */
-export const OBSERVED_ID_MAX = 128;
-export const COST_NOTE = "Cost is an estimate from the token counts AMC recorded and the model price list (or the cost the provider reported). "
+const OBSERVED_ID_MAX = 128;
+const COST_NOTE = "Cost is an estimate from the token counts AMC recorded and the model price list (or the cost the provider reported). "
   + "Calls to a model with no price are not known, never counted as zero. Only calls that went through AMC are counted.";
 
-export interface FleetInventoryRuntime { runtime: string; version: string | null; qualified: boolean | null }
-export interface FleetInventoryHook { provider: string; mode: string | null; state: string; controlVerified: boolean; releaseWarning: string | null }
+interface FleetInventoryRuntime { runtime: string; version: string | null; qualified: boolean | null }
+interface FleetInventoryHook { provider: string; mode: string | null; state: string; controlVerified: boolean; releaseWarning: string | null }
 export interface FleetInventoryCost {
   /** Estimated dollars for the priced calls; null when no call in the window could be priced. */
   estimatedUsd: number | null;

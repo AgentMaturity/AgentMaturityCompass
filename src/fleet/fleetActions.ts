@@ -38,7 +38,7 @@ export function fleetWindowMs(raw: string): number {
 }
 
 /** The workspace's own agent, "default", lives at the top of .amc and always exists; named agents are folders under .amc/agents. */
-export function isKnownAgent(workspace: string, agentId: string): boolean {
+function isKnownAgent(workspace: string, agentId: string): boolean {
   return agentId === "default" || listAgents(workspace).some((entry) => entry.id === agentId);
 }
 

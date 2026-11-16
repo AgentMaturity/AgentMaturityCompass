@@ -12,7 +12,8 @@ function call(workspace: string, method: string, path: string, body: unknown, pr
   const req = Readable.from(body === undefined ? [] : [Buffer.from(JSON.stringify(body))]) as unknown as IncomingMessage;
   Object.assign(req, { method, url: path, headers: { "content-type": "application/json" } });
   const out = { status: 0, body: "" };
-  const res = { headersSent: false, writeHead(status: number) { out.status = status; this.headersSent = true; return this; }, end(text?: string) { out.body = text ?? ""; } } as unknown as ServerResponse;
+  const fake = { headersSent: false, writeHead(status: number) { out.status = status; fake.headersSent = true; return fake; }, end(text?: string) { out.body = text ?? ""; } };
+  const res = fake as unknown as ServerResponse;
   return handleFleetRoute(path.split("?")[0]!, method, req, res, workspace, () => true, principal).then((handled) => ({ handled, ...out, json: out.body ? JSON.parse(out.body) : null }));
 }
 
@@ -43,7 +44,6 @@ describe("freeze now", () => {
       const row = ledger.getAllEvents().find((event) => event.id === frozen.json.data.auditEventId)!;
       expect(JSON.parse(row.meta_json)).toMatchObject({ auditType: FLEET_AGENT_FROZEN, agentId: "default" });
       expect(JSON.parse(row.payload_inline!)).toMatchObject({ frozenBy: "owner-a", via: "studio", reason: "unexpected refunds", incidentId: frozen.json.data.incidentId });
-      expect(row.receipt_id ?? row.id).toBeTruthy();
     } finally { ledger.close(); }
   }, 60_000);
 

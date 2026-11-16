@@ -16,7 +16,7 @@ export function costWords(cost: Pick<FleetInventoryCost, "estimatedUsd" | "calls
   const unknown = cost.unknownCalls > 0 ? `, plus ${cost.unknownCalls} call${cost.unknownCalls === 1 ? "" : "s"} not known` : "";
   return `about ${usd(cost.estimatedUsd)} (estimate${unknown})`;
 }
-export const runtimeWords = (row: FleetInventoryRow): string => row.runtimes.length === 0 ? "not known"
+const runtimeWords = (row: FleetInventoryRow): string => row.runtimes.length === 0 ? "not known"
   : row.runtimes.map((entry) => `${plainId(entry.runtime)}${entry.version ? ` ${plainId(entry.version)}` : ""}${entry.qualified === false ? " (not a release AMC has qualified)" : ""}`).join("; ");
 const hookWords = (row: FleetInventoryRow): string => row.hooks.length === 0 ? "none"
   : row.hooks.map((hook) => `${hook.provider}: ${hook.state}${hook.mode ? `, ${hook.mode} mode` : ""}${hook.controlVerified ? ", control verified" : ""}`).join("; ");
