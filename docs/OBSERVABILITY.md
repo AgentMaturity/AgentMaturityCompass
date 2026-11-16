@@ -21,11 +21,13 @@ Every POST passes the workspace's residency egress check before it is sent. Tele
 
 ### Span tree
 
+AMC's spans and metrics follow one declared vocabulary: the OpenTelemetry semantic conventions release 1.41.0 for generative AI (released names only). Every OTLP request carries `schemaUrl` `https://opentelemetry.io/schemas/1.41.0`. The GenAI conventions are still marked Development and have since moved to their own repository (https://github.com/open-telemetry/semantic-conventions-genai, no release yet, read 2026-11-16); AMC does not emit that repository's unreleased names. The deprecated `gen_ai.system` is no longer sent; use `gen_ai.provider.name`.
+
 Native session rows fold into one trace per session (trace id derived from the session id, so a resumed session lands in the same trace):
 
 - `invoke_agent <agentId>` (INTERNAL): one segment per writer, from `session/open` or `session/resume` to `session/release` or `session/close`. Attributes `gen_ai.operation.name`, `gen_ai.agent.name`, `gen_ai.conversation.id`, `amc.session.id`, `amc.session.segment` (`open`/`resume`), `amc.session.end`.
 - `turn <n>` (INTERNAL): `amc.turn`, `amc.turn.trigger`, `amc.turn.reason`; status ERROR unless the turn ended `complete`.
-- `chat <model>` (CLIENT): `gen_ai.provider.name` and `gen_ai.system` (the recorded provider id), `gen_ai.request.model`, `gen_ai.response.finish_reasons`, `http.response.status_code`, `error.type` on a failure, `amc.request.digest`, `amc.request.duration_ms`, `amc.usage.status`, `amc.cost.basis`. Token attributes `gen_ai.usage.input_tokens`, `.output_tokens`, `.cache_read.input_tokens`, `.cache_write.input_tokens`, `.reasoning.output_tokens` appear only for a request whose provider reported them (`usage.status` complete or partial); `amc.cost.usd` only when the cost basis is `provider-reported` or `catalog-estimate`. The classification is the one `amc session show` prints for the same request, computed on its header and outcome rows.
+- `chat <model>` (CLIENT): `gen_ai.provider.name` (the recorded provider id), `gen_ai.request.model`, `gen_ai.response.finish_reasons`, `http.response.status_code`, `error.type` on a failure, `amc.request.digest`, `amc.request.duration_ms`, `amc.usage.status`, `amc.cost.basis`. Token attributes `gen_ai.usage.input_tokens`, `.output_tokens`, `.cache_read.input_tokens`, `.cache_creation.input_tokens`, `.reasoning.output_tokens` appear only for a request whose provider reported them (`usage.status` complete or partial); `amc.cost.usd` only when the cost basis is `provider-reported` or `catalog-estimate`. The classification is the one `amc session show` prints for the same request, computed on its header and outcome rows.
 - `execute_tool <name>` (INTERNAL): `gen_ai.tool.name`, `gen_ai.tool.call.id`, `gen_ai.tool.type=function`, `amc.tool.dispatch` (`native`/`code`), `amc.tool.args_sha256`, `amc.tool.outcome`, `amc.tool.exit_code`, `amc.tool.denied`; status ERROR unless the outcome was `OK`.
 - `loop/retry` and `loop/cancel` rows become span events on the turn.
 
@@ -35,7 +37,7 @@ No prompt, tool argument, output or model text ever leaves the process: only dig
 
 Delta temporality, one data point per (metric, attribute set) per flush:
 
-- `gen_ai.client.inference.usage.input_tokens`, `.output_tokens`, `.cache_read.input_tokens`, `.cache_write.input_tokens`, `.reasoning.output_tokens` (`{token}`, monotonic sums): only provider-reported counts. A stub run, or a provider that reported nothing, produces no point: an absent count is never zero.
+- `gen_ai.client.token.usage` (`{token}`, histogram with the convention's token bounds, attribute `gen_ai.token.type` `input` or `output`): only provider-reported counts. A stub run, or a provider that reported nothing, produces no point: an absent count is never zero. Cache and reasoning counts have no token type in 1.41.0, so they appear only as span attributes.
 - `amc.request.cost.usd` (`USD`, sum, attribute `amc.cost.basis`): only when the basis is known.
 - `gen_ai.client.operation.duration` (`s`, histogram with the GenAI convention's bounds) per chat request; `amc.tool.duration` per tool call.
 

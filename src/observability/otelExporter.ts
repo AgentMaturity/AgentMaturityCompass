@@ -145,8 +145,12 @@ const DEFAULT_CONFIG: ObservabilityOTELConfig = {
 const DEFAULT_FLUSH_TIMEOUT_MS = 5_000;
 const DEFAULT_FLUSH_MAX_RETRIES = 1;
 const DEFAULT_FLUSH_RETRY_BASE_DELAY_MS = 200;
-/** Seconds; the GenAI convention's duration buckets, reused for tool durations. */
+/** The GenAI convention's (semconv 1.41.0) buckets: seconds for durations (reused for tool durations), and `{token}` for token usage. */
 const DURATION_BOUNDS = [0.01, 0.02, 0.04, 0.08, 0.16, 0.32, 0.64, 1.28, 2.56, 5.12, 10.24, 20.48, 40.96, 81.92];
+const TOKEN_BOUNDS = [1, 4, 16, 64, 256, 1024, 4096, 16384, 65536, 262144, 1048576, 4194304, 16777216, 67108864];
+const boundsFor = (unit: string): number[] => (unit === "{token}" ? TOKEN_BOUNDS : DURATION_BOUNDS);
+/** The semantic conventions release AMC's own spans and metrics follow (docs/OBSERVABILITY.md). */
+const OTEL_SCHEMA_URL = "https://opentelemetry.io/schemas/1.41.0";
 const AGGREGATION_TEMPORALITY_DELTA = 1;
 
 const TRUST_TIER_ORDER: TrustTier[] = ["SELF_REPORTED", "ATTESTED", "OBSERVED", "OBSERVED_HARDENED"];
@@ -361,7 +365,7 @@ export class ObservabilityOTELExporter {
     if (!stream) {
       if (this.streams.size >= this.config.maxBufferSize) { noteTelemetryDropped(1); return; }
       stream = { kind: point.kind, name: point.name, unit: point.unit, attributes: [...point.attributes], startTs: Date.now(), count: 0, sum: 0,
-        min: Number.POSITIVE_INFINITY, max: Number.NEGATIVE_INFINITY, bucketCounts: new Array<number>(DURATION_BOUNDS.length + 1).fill(0) };
+        min: Number.POSITIVE_INFINITY, max: Number.NEGATIVE_INFINITY, bucketCounts: new Array<number>(boundsFor(point.unit).length + 1).fill(0) };
       this.captureItem(stream, scope);
       this.streams.set(key, stream);
     }
@@ -370,8 +374,7 @@ export class ObservabilityOTELExporter {
     stream.min = Math.min(stream.min, point.value);
     stream.max = Math.max(stream.max, point.value);
     if (point.kind === "histogram") {
-      const at = DURATION_BOUNDS.findIndex((bound) => point.value <= bound);
-      const slot = at === -1 ? DURATION_BOUNDS.length : at;
+      const bounds = boundsFor(point.unit), at = bounds.findIndex((bound) => point.value <= bound), slot = at === -1 ? bounds.length : at;
       stream.bucketCounts[slot] = (stream.bucketCounts[slot] ?? 0) + 1;
     }
   }
@@ -624,7 +627,7 @@ export class ObservabilityOTELExporter {
 
       if (spans.length > 0 && enabledForSignal(target, "traces")) {
         requests.push({ targetKind: target.kind, signal: "traces", endpoint: otlpEndpoint(target, "traces"), headers,
-          payload: { resourceSpans: [{ resource: { attributes: resourceAttributes }, scopeSpans: [{ scope, spans }] }] },
+          payload: { resourceSpans: [{ resource: { attributes: resourceAttributes }, schemaUrl: OTEL_SCHEMA_URL, scopeSpans: [{ scope, spans, schemaUrl: OTEL_SCHEMA_URL }] }] },
           counts: { traces: spans.length, metrics: 0, logs: 0 } });
       }
 
@@ -678,7 +681,7 @@ export class ObservabilityOTELExporter {
       const first = group[0]!;
       const points = group.map((stream) => ({ startTimeUnixNano: msToNanos(stream.startTs), timeUnixNano: msToNanos(Math.max(now, stream.startTs)), attributes: stream.attributes,
         ...(stream.kind === "sum" ? { asDouble: stream.sum }
-          : { count: stream.count, sum: stream.sum, min: stream.min, max: stream.max, bucketCounts: stream.bucketCounts, explicitBounds: DURATION_BOUNDS }) }));
+          : { count: stream.count, sum: stream.sum, min: stream.min, max: stream.max, bucketCounts: stream.bucketCounts, explicitBounds: boundsFor(stream.unit) }) }));
       metrics.push({ name: first.name, unit: first.unit, ...(first.kind === "sum"
         ? { sum: { aggregationTemporality: AGGREGATION_TEMPORALITY_DELTA, isMonotonic: true, dataPoints: points } }
         : { histogram: { aggregationTemporality: AGGREGATION_TEMPORALITY_DELTA, dataPoints: points } }) });
@@ -688,12 +691,8 @@ export class ObservabilityOTELExporter {
       resourceMetrics: [
         {
           resource: { attributes: resourceAttributes },
-          scopeMetrics: [
-            {
-              scope: { name: "amc.observability", version: this.config.serviceVersion },
-              metrics
-            }
-          ]
+          schemaUrl: OTEL_SCHEMA_URL,
+          scopeMetrics: [{ scope: { name: "amc.observability", version: this.config.serviceVersion }, schemaUrl: OTEL_SCHEMA_URL, metrics }]
         }
       ]
     };

@@ -13,7 +13,7 @@
  *
  * Supports:
  *   - AMC trace → OTLP span conversion
- *   - Semantic conventions for GenAI (gen_ai.system, gen_ai.request.model)
+ *   - Semantic conventions for GenAI (gen_ai.provider.name, gen_ai.request.model; semconv 1.41.0)
  *   - Batch export with configurable flush interval
  *   - HTTP/JSON OTLP endpoint push
  *   - Resource attributes (service.name, service.version, amc.agent.id)
@@ -200,7 +200,7 @@ export function amcTraceToOTLPSpan(
   ];
 
   // GenAI semantic conventions
-  if (trace.providerId) attributes.push(attr('gen_ai.system', trace.providerId));
+  if (trace.providerId) attributes.push(attr('gen_ai.provider.name', trace.providerId));
   if (trace.model) attributes.push(attr('gen_ai.request.model', trace.model));
   if (trace.request_id) attributes.push(attr('amc.request.id', trace.request_id));
   if (trace.receipt) attributes.push(attr('amc.receipt', trace.receipt));
