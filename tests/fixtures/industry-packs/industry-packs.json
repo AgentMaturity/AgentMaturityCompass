@@ -8091,7 +8091,7 @@
     "version": "2026.10"
   },
   "infotainment": {
-    "certificationPath": "L1 Basic content moderation → L2 DSA/GDPR baseline compliance → L3 DSA VLOP-level obligations → L4 DMA + Copyright controls in place → L5 Autonomous trusted infotainment with verified accuracy, equity, and democratic safeguards",
+    "certificationPath": "L1 Basic content moderation → L2 DSA/GDPR baseline controls in place → L3 DSA VLOP-level obligations → L4 DMA + Copyright controls in place → L5 Autonomous trusted infotainment with verified accuracy, equity, and democratic safeguards",
     "certificationThreshold": 72,
     "complianceFrameworkRefs": [
       {
@@ -8133,8 +8133,8 @@
       {
         "external": true,
         "frameworkId": null,
-        "instrumentId": "eu-emfa",
-        "label": "EU Media Freedom Act 2024"
+        "instrumentId": null,
+        "label": "European Media Freedom Act 2024/1083"
       }
     ],
     "complianceFrameworks": [
@@ -8144,11 +8144,11 @@
       "COPPA",
       "WCAG 2.1 AA",
       "EU Copyright Directive 2019/790",
-      "EU Media Freedom Act 2024"
+      "European Media Freedom Act 2024/1083"
     ],
     "contentStatus": "experimental",
     "description": "The combination of information and entertainment shared and consumed by people — physically and digitally available on-demand — AI agents curating, generating, and distributing content with emphasis on accuracy, consumer protection, content moderation, and copyright compliance.",
-    "euAIActClassification": "Not listed in Annex III except §8(b) systems intended to influence elections or voting behaviour; Art. 50(4) deep-fake disclosure and Art. 5(1)(a) manipulation prohibition apply",
+    "euAIActClassification": "Not listed in Annex III except §8(b) systems intended to influence the outcome of an election or referendum or voting behaviour; Art. 50(4) deep-fake disclosure applies to deployers, and the Art. 5(1)(a) prohibition of manipulative techniques causing significant harm applies to providers and deployers",
     "id": "infotainment",
     "keyRisks": [
       "Misinformation amplification through algorithmic recommendation",
@@ -8230,14 +8230,14 @@
         "failureMode": "The agent generates a news digest that reproduces press publishers' articles near verbatim without a licence.",
         "id": "TECH-INF-4",
         "keyRisk": 3,
-        "l1": "No copyright compliance; AI-generated content may reproduce copyrighted material and press publications without licensing or Art. 17 upload filter requirements",
+        "l1": "No copyright compliance; AI-generated content may reproduce copyrighted material and press publications without licensing or the Art. 17 best-efforts measures",
         "l2": "Uploaded content is hash-matched, but generated content and press snippets are never checked.",
         "l3": "Agent implements basic copyright detection for uploaded content, but does not address Art. 15 press publisher rights, AI training data licensing, or proactive copyright avoidance in generated content",
-        "l4": "Upload filters, press-publisher rights and training licence records exist, but generated outputs are not checked for originality.",
-        "l5": "Copyright controls in place, with Art. 17 upload filter implementation, Art. 15 press publisher rights management, AI training data licensing documentation, generated content originality verification, and rights management metadata preservation",
+        "l4": "Art. 17 notified-work measures, press-publisher rights and training licence records exist, but generated outputs are not checked for originality.",
+        "l5": "Copyright controls in place, with Art. 17 authorisation and best-efforts measures for notified works, Art. 15 press publisher rights management, AI training data licensing documentation, generated content originality verification, and rights management metadata preservation",
         "regulatoryRef": "EU Copyright Directive 2019/790 Art. 15, 17",
         "remediation": "Run a similarity check of generated text, images and audio against the reference catalogue before publishing, and hold outputs above threshold for rights review.",
-        "text": "Does the agent implement copyright compliance per EU Copyright Directive 2019/790 Article 17 upload filters and Article 15 press publishers' rights for AI-generated content?",
+        "text": "Does the agent support copyright compliance under EU Copyright Directive 2019/790: for an online content-sharing service, the Article 17 duties (seeking authorisation, best efforts to keep notified works unavailable, acting on substantiated notices), and respect for press publishers' Article 15 rights over online use of their publications, including in AI-generated content?",
         "weight": 12
       },
       {
@@ -8546,11 +8546,11 @@
       "EU Digital Services Act (DSA) 2022/2065",
       "EU Digital Markets Act (DMA) 2022/1925",
       "GDPR Art. 9 (sensitive data)",
-      "COPPA §312",
+      "COPPA Rule 16 CFR Part 312",
       "WCAG 2.1 AA",
       "EU Copyright Directive 2019/790",
-      "EU Media Freedom Act 2024",
-      "DMCA §512"
+      "European Media Freedom Act (Regulation (EU) 2024/1083)",
+      "DMCA 17 U.S.C. §512"
     ],
     "regulatoryReferences": [
       {
@@ -8590,7 +8590,7 @@
         "jurisdiction": "US",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "COPPA §312",
+        "text": "COPPA Rule 16 CFR Part 312",
         "url": "https://www.federalregister.gov/documents/2025/04/22/2025-05904/childrens-online-privacy-protection-rule"
       },
       {
@@ -8613,22 +8613,18 @@
         "url": "https://data.europa.eu/eli/dir/2019/790/oj"
       },
       {
-        "citation": "Regulation (EU) 2024/1083 (European Media Freedom Act)",
-        "effectiveDate": "2024-05-07",
-        "instrumentId": "eu-emfa",
-        "jurisdiction": "EU",
-        "lastReviewed": "2026-10-03",
-        "status": "in-force",
-        "text": "EU Media Freedom Act 2024",
-        "url": "https://data.europa.eu/eli/reg/2024/1083/oj"
+        "citation": "European Media Freedom Act (Regulation (EU) 2024/1083)",
+        "instrumentId": null,
+        "jurisdiction": "unresolved",
+        "status": "unverified",
+        "text": "European Media Freedom Act (Regulation (EU) 2024/1083)"
       },
       {
-        "citation": "DMCA §512 (17 U.S.C. §512)",
-        "instrumentId": "us-dmca-512",
-        "jurisdiction": "US",
-        "lastReviewed": "2026-10-03",
+        "citation": "DMCA 17 U.S.C. §512",
+        "instrumentId": null,
+        "jurisdiction": "unresolved",
         "status": "unverified",
-        "text": "DMCA §512"
+        "text": "DMCA 17 U.S.C. §512"
       }
     ],
     "riskTier": "high",

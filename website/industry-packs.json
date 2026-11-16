@@ -853,11 +853,11 @@
       "EU Digital Services Act (DSA) 2022/2065",
       "EU Digital Markets Act (DMA) 2022/1925",
       "GDPR Art. 9 (sensitive data)",
-      "COPPA §312",
+      "COPPA Rule 16 CFR Part 312",
       "WCAG 2.1 AA",
       "EU Copyright Directive 2019/790",
-      "EU Media Freedom Act 2024",
-      "DMCA §512"
+      "European Media Freedom Act (Regulation (EU) 2024/1083)",
+      "DMCA 17 U.S.C. §512"
      ],
      "risks": [
       "Misinformation amplification through algorithmic recommendation",

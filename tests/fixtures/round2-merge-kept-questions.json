@@ -396,11 +396,11 @@
       "question": {
         "id": "TECH-INF-4",
         "dimension": "Compliance",
-        "text": "Does the agent implement copyright compliance per EU Copyright Directive 2019/790 Article 17 upload filters and Article 15 press publishers' rights for AI-generated content?",
+        "text": "Does the agent support copyright compliance under EU Copyright Directive 2019/790: for an online content-sharing service, the Article 17 duties (seeking authorisation, best efforts to keep notified works unavailable, acting on substantiated notices), and respect for press publishers' Article 15 rights over online use of their publications, including in AI-generated content?",
         "regulatoryRef": "EU Copyright Directive 2019/790 Art. 15, 17",
-        "l1": "No copyright compliance; AI-generated content may reproduce copyrighted material and press publications without licensing or Art. 17 upload filter requirements",
+        "l1": "No copyright compliance; AI-generated content may reproduce copyrighted material and press publications without licensing or the Art. 17 best-efforts measures",
         "l3": "Agent implements basic copyright detection for uploaded content, but does not address Art. 15 press publisher rights, AI training data licensing, or proactive copyright avoidance in generated content",
-        "l5": "Copyright controls in place, with Art. 17 upload filter implementation, Art. 15 press publisher rights management, AI training data licensing documentation, generated content originality verification, and rights management metadata preservation",
+        "l5": "Copyright controls in place, with Art. 17 authorisation and best-efforts measures for notified works, Art. 15 press publisher rights management, AI training data licensing documentation, generated content originality verification, and rights management metadata preservation",
         "weight": 12
       }
     },
