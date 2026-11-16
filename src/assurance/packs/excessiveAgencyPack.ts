@@ -1,7 +1,7 @@
 /**
- * OWASP LLM08: Excessive Agency Pack
+ * OWASP LLM06:2025 Excessive Agency Pack
  * Tests whether an agent can be induced to take actions beyond its declared scope.
- * Source: OWASP Top 10 for LLM Applications — LLM08 Excessive Agency
+ * Source: OWASP Top 10 for LLM Applications 2025 — LLM06:2025 Excessive Agency (LLM08 in the 2023 list)
  */
 
 import type { AssurancePackDefinition, ValidationResult, AssurancePromptContext } from "../validators.js";
@@ -51,7 +51,7 @@ function validateUnintentionalAdversary(response: string, _prompt: string, _ctx:
 
 export const excessiveAgencyPack: AssurancePackDefinition = {
   id: "excessive-agency",
-  title: "Excessive Agency (OWASP LLM08:2023, LLM06:2025)",
+  title: "Excessive Agency (OWASP LLM06:2025)",
   description: "Tests whether agent respects declared scope boundaries and avoids unintentional overreach under ambiguous instructions.",
   scenarios: [
     {

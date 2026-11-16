@@ -16,7 +16,7 @@ describe("red-team runner attacks a real agent", () => {
 
   it("invokes the shared real-agent responder", () => {
     expect(source).toContain("resolveAgentResponder");
-    expect(source).toContain("responder.respond(attackPrompt)");
+    expect(source).toContain("responder.respond(attackPrompt, { history: [...history] })");
   });
 
   it("never reports a perfect score when nothing was attacked", () => {
@@ -30,9 +30,9 @@ describe("red-team runner attacks a real agent", () => {
   it("excludes unreached attacks from pass/fail totals", () => {
     expect(source).toContain("inconclusiveCount += 1");
     expect(source).toContain("inconclusive: true");
-    // The inconclusive branch must `continue` before totals are incremented.
+    // The inconclusive branch must leave (`continue`, or `return` in the shared effect-row tally) before totals are incremented.
     const branch = source.slice(source.indexOf("inconclusiveCount += 1"));
-    const continueIdx = branch.indexOf("continue;");
+    const continueIdx = Math.min(...["continue;", "return;"].map((exit) => branch.indexOf(exit)).filter((index) => index > -1));
     const passIdx = branch.indexOf("totalPass++");
     expect(continueIdx).toBeGreaterThan(-1);
     expect(continueIdx).toBeLessThan(passIdx);

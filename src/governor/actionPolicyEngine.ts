@@ -78,6 +78,13 @@ export interface GovernorDecisionInput {
   };
   policy?: ActionPolicy;
   policySignatureValid?: boolean;
+  /**
+   * True only when the caller holds a person's signed approval for this exact call, verified against the call before
+   * its body runs (the native pipeline's bound authorization record). It matters only under a rule with
+   * `executeOnApproval`; it never lifts a refused run, findings, an untrusted config, a freeze, a budget, a ticket or
+   * a work order.
+   */
+  approvedByPerson?: boolean;
 }
 
 export interface GovernorUpgradeSuggestion {
@@ -430,7 +437,9 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
     return decision;
   }
 
-  const issues: string[] = [...evidenceIssues];
+  // Hard issues no approval lifts; `missingEvidence` is what a rule with `executeOnApproval` lets a person's approval stand in for.
+  const issues: string[] = [];
+  const missingEvidence: string[] = [...evidenceIssues];
 
   if (!rule) {
     issues.push(`No explicit policy rule for ${input.actionClass}.`);
@@ -465,7 +474,7 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
             : `${runState}, below ${threshold}.`,
     });
     if (!runSatisfied) {
-      issues.push(measured === null ? `UNTRUSTED RUN: ${runState}.`
+      (findings.length > 0 ? issues : missingEvidence).push(measured === null ? `UNTRUSTED RUN: ${runState}.`
         : findings.length > 0 ? `UNTRUSTED RUN: ${runState}; findings against the agent (${findingList}) are not covered by the ${input.actionClass} rule's threshold ${threshold}.`
           : `UNTRUSTED RUN: ${runState}, below ${threshold}.`);
       decision.requiredEvidence.push(findings.length > 0
@@ -487,7 +496,7 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
         : `Trust tier ${input.trustSummary.trustTier} does not satisfy ${rule.requireTrustTierAtLeast}.`,
     });
     if (!trustTierSatisfied) {
-      issues.push(`trust tier ${input.trustSummary.trustTier} does not satisfy ${rule.requireTrustTierAtLeast}`);
+      missingEvidence.push(`trust tier ${input.trustSummary.trustTier} does not satisfy ${rule.requireTrustTierAtLeast}`);
       decision.requiredEvidence.push(`Increase OBSERVED evidence quality to reach trust tier ${rule.requireTrustTierAtLeast}.`);
     }
 
@@ -506,7 +515,7 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
       });
     }
     if (riskDefaults.requireSandboxForExecute && !input.trustSummary.sandboxEvidence) {
-      issues.push(`risk tier ${input.riskTier} requires sandbox attestation for EXECUTE`);
+      missingEvidence.push(`risk tier ${input.riskTier} requires sandbox attestation for EXECUTE`);
       decision.requiredEvidence.push("Run sandboxed execution and capture SANDBOX_EXECUTION_ENABLED evidence.");
     }
 
@@ -562,10 +571,33 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
     }
   }
 
-  if (issues.length > 0) {
+  // executeOnApproval always needs the person's approval, earned evidence or not: an unapproved call stays SIMULATE.
+  const onApproval = rule?.executeOnApproval === true && issues.length === 0;
+  if (onApproval) {
+    const approved = input.approvedByPerson === true;
+    addCondition(decision, {
+      conditionId: "person-approval",
+      label: "A person approved this call",
+      passed: approved,
+      actual: approved,
+      expected: true,
+      reason: approved
+        ? `A person's signed approval names this call; the signed ${input.actionClass} rule (executeOnApproval) lets it run whether or not the evidence above is met.`
+        : `The signed ${input.actionClass} rule (executeOnApproval) runs this call only after a person approves it.`,
+    });
+    if (approved) {
+      decision.allowed = true;
+      decision.effectiveMode = "EXECUTE";
+      decision.reasons.push(`EXECUTE ON A PERSON'S APPROVAL: ${input.actionClass} runs because a person approved this call${missingEvidence.length === 0 ? "" : `, not on evidence (${missingEvidence.length} evidence gate${missingEvidence.length === 1 ? "" : "s"} not met)`}.`);
+      return decision;
+    }
+    issues.push(`the signed ${input.actionClass} rule (executeOnApproval) runs this call only after a person approves it`);
+    decision.requiredApprovals.push(`A person's approval of this call (an approval gate, such as --approval-mode default) runs it as EXECUTE under the signed executeOnApproval rule.`);
+  }
+  if (issues.length > 0 || missingEvidence.length > 0) {
     decision.allowed = true;
     decision.effectiveMode = "SIMULATE";
-    decision.reasons.push(...issues);
+    decision.reasons.push(...issues, ...missingEvidence);
     return decision;
   }
 

@@ -15,9 +15,9 @@ import { listAgents } from "../fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { onboardingRunForApi, onboardingStatusForApi } from "./onboardingApi.js";
 import { runDiagnostic, generateReport, loadRunReport } from "../diagnostic/runner.js";
-import { agentRunFiles } from "../diagnostic/runReportResolution.js";
+import { latestRunFile } from "../diagnostic/runReportResolution.js";
 import { summarizeDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
-import { runAutoAnswer } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
+import { autoAnswerFromLatestRun, runAutoAnswer } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
 import { runAssurance } from "../assurance/assuranceRunner.js";
 import {
   auditBinderCreateForApi,
@@ -59,7 +59,7 @@ import {
   valueSchedulerRunNowForApi,
   valueSchedulerSetEnabledForApiAsync as valueSchedulerSetEnabledForApi,
   valueSchedulerStatusForApi,
-  valueSnapshotLatestForApi,
+  valueSnapshotStoredForApi,
   verifyValueWebhookToken, assertValueWebhookTokenCurrent
 } from "../value/valueApi.js";
 import { loadValuePolicyReadOnly as loadValuePolicy, verifyValuePolicySignature } from "../value/valueStore.js";
@@ -107,6 +107,7 @@ import { authenticate, hasScope, verifyLeaseForScope, captureStudioToolhubIntent
 import { normalizeActionClass } from "../tickets/execTicketCli.js";
 import type { ActionClass } from "../types.js";
 import { runGovernorCheck } from "../governor/governorCli.js";
+import { studioInputError, studioSetupError } from "./studioInputErrors.js";
 import { issueLeaseForCli } from "../leases/leaseCli.js";
 import { readRevokedLeaseIds, readVerifiedLeaseRevocations, revokeLease } from "../leases/leaseStore.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js"; import { runLease } from "../leases/runLease.js"; import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
@@ -331,7 +332,7 @@ import { buildHealthPayload } from "../api/health.js";
 import { closeScoreSessionStores } from "../api/scoreStore.js";
 import { bindRequestContext, resolveRequestId } from "../api/requestContext.js";
 import { canonApplyForPublicationAsync, CanonAuditIncompleteError, canonGetForApi, canonVerifyForApi } from "../canon/canonApi.js";
-import { loadDiagnosticBankAttemptAsync, DiagnosticBankFollowupError } from "../diagnostic/bank/bankLoader.js";
+import { diagnosticBankForReading } from "../diagnostic/bank/bankLoader.js";
 import { verifyCanonSignature } from "../canon/canonLoader.js";
 import {
   diagnosticBankApplyForApiAsync as diagnosticBankApplyForApi,
@@ -352,7 +353,7 @@ import { renderContextualizedDiagnostic } from "../diagnostic/contextualizer/con
 import { emitCgxSse } from "../cgx/cgxSse.js";
 import { validateTruthguardForWorkspace } from "../truthguard/truthguardApi.js";
 import { mechanicTargetsApplyForAuthority as mechanicTargetsApplyForApi, mechanicProfileApplyForAuthority as mechanicProfileApplyForApi, mechanicTuningApplyForAuthority as mechanicTuningApplyForApi } from "../mechanic/mechanicSettingsPublication.js";
-import { mechanicGapForAuthority as mechanicGapForApi, mechanicCreatePlanForAuthority as mechanicCreatePlanForApi, mechanicSimulateForAuthority as mechanicSimulateForApi } from "../mechanic/mechanicAnalysisPublication.js";
+import { mechanicGapFromLatestRun, mechanicCreatePlanForAuthority as mechanicCreatePlanForApi, mechanicSimulateForAuthority as mechanicSimulateForApi } from "../mechanic/mechanicAnalysisPublication.js";
 import {
   initMechanicWorkspace,
   mechanicLatestPlanForApi,
@@ -998,7 +999,7 @@ function parseComplianceFramework(raw: string | null): ComplianceFramework | nul
 }
 
 function agentLastStatus(workspace: string, agentId: string): AgentStatusResponse {
-  const latest = agentRunFiles(workspace, agentId).at(-1);
+  const latest = latestRunFile(workspace, agentId);
   if (!latest) {
     return { agentId, latestRun: null };
   }
@@ -1329,6 +1330,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
       }
 
+      // Browsers ask for /favicon.ico by themselves: answer with the console's icon instead of a 401 (C-14).
+      if (pathname === "/favicon.ico" && method === "GET" && serveConsolePath("/console/assets/icons/favicon-32.png", res)) {
+        return;
+      }
       if (pathname.startsWith("/console")) {
         if (serveConsolePath(pathname, res)) {
           return;
@@ -4599,9 +4604,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       if (pathname === "/value/snapshot/latest" && req.method === "GET") {
         const query = valueReadQuery();
         if (query === null) return;
-        const out = await valueSnapshotLatestForApi({
-          workspace: options.workspace, scopeType: query.scopeType, scopeId: query.scopeId, windowDays: query.windowDays
-        }, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
+        // Reading only (C-01): the stored snapshot. A report (GET /value/report, the page's button) or amc value snapshot makes one.
+        const out = valueSnapshotStoredForApi({ workspace: options.workspace, scopeType: query.scopeType, scopeId: query.scopeId });
+        if (out === null) {
+          const command = query.scopeType === "WORKSPACE" ? "amc value snapshot --scope workspace" : `amc value snapshot --scope ${query.scopeType.toLowerCase()} --id <its id>`;
+          json(res, 404, { error: `No value report yet. Press "Make a value report" on the Value page, or run ${command} in the workspace folder.`, code: "NO_SNAPSHOT" });
+          return;
+        }
         if (out.status === "INSUFFICIENT_EVIDENCE") {
           emitValueSse({
             hub: orgSse,
@@ -5611,15 +5620,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
-        const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? undefined);
-        const reportAuthority = captureReportSigningAuthority(options.workspace, signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]));
-        const out = await runAutoAnswer({
-          workspace: options.workspace,
-          agentId,
-          createPlan: false
-        }, { beforePublish: reportAuthority }).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; });
-        if (out === null) return;
-        json(res, 200, out);
+        // Reading only: the answers of the latest recorded run. POST /diagnostic/run records a new run.
+        const out = autoAnswerFromLatestRun(options.workspace, url.searchParams.get("agentId") ?? undefined);
+        json(res, out ? 200 : 404, out ?? { error: "No score yet. Run a score first: amc run in the workspace folder, or the Score page.", code: "NO_RUN_YET" });
         return;
       }
 
@@ -5702,25 +5705,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? undefined);
-        const selected = await loadDiagnosticBankAttemptAsync(options.workspace, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (selected === null) return;
-        try {
-        selected.assertCurrent();
-        const render = renderContextualizedDiagnostic({
-          workspace: options.workspace,
-          agentId, bank: selected.bank
-        });
-        selected.assertCurrent(); writeStudioAuditEvent({
-          workspace: options.workspace,
-          auditType: "DIAGNOSTIC_RENDERED",
-          severity: "LOW",
-          agentId,
-          payload: {
-            questions: render.questions.length,
-            profileType: render.profile.agentType
-          }
-        });
-        json(res, 200, render);
-        } catch (cause) { if (res.headersSent) return; if (selected.completedPaths.length > 0) throw new DiagnosticBankFollowupError(selected.completedPaths, cause); throw cause; }
+        // Reading only (C-01): the stored bank or the built-in default in memory; nothing is written, not even an audit event.
+        json(res, 200, renderContextualizedDiagnostic({ workspace: options.workspace, agentId, bank: diagnosticBankForReading(options.workspace) }));
         return;
       }
 
@@ -6676,14 +6662,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "scope must be workspace|agent|node" });
           return;
         }
-        const targetId = url.searchParams.get("targetId") ?? undefined;
-        const out = await mechanicGapForApi({
-          workspace: options.workspace,
-          scopeType: scopeRaw.toUpperCase() as "WORKSPACE" | "NODE" | "AGENT",
-          scopeId: targetId
-        }, signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])).catch(error => { if (res.headersSent) return null; throw error; });
-        if (out === null) return;
-        json(res, 200, out);
+        // Reading only: the gap to the latest recorded run. `amc mechanic gap` records a gap report.
+        const out = mechanicGapFromLatestRun({ workspace: options.workspace, scopeType: scopeRaw.toUpperCase() as "WORKSPACE" | "NODE" | "AGENT", scopeId: url.searchParams.get("targetId") ?? undefined });
+        json(res, out ? 200 : 404, out ?? { error: "No score yet. Run a score first: amc run in the workspace folder, or the Score page.", code: "NO_RUN_YET" });
         return;
       }
 
@@ -8321,7 +8302,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         return;
       }
 
-      // M3: the console questionnaire. Scored by scoreIndustryPack, as `amc domain pack run --json` and the MCP tool; nothing is stored.
+      // M3: the console questionnaire. Scored by scoreIndustryPack, as `amc domain pack run --json` and the MCP tool; a signed-in person's last scored answers are kept (A4-10).
       const industryPackScoreMatch = pathname.match(/^\/industry-packs\/([^/]+)\/score$/);
       if (industryPackScoreMatch && req.method === "POST") {
         if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
@@ -8350,6 +8331,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const answers = responses as Record<string, number>;
         const result = scoreIndustryPack(pack.id, answers);
+        if (auth?.userId) {
+          const { saveConsoleResponses } = await import("../domains/packResponses.js");
+          saveConsoleResponses(options.workspace, auth.userId, pack.id, answers);
+        }
         json(res, 200, { ...result, ...claimFields(packSelfAssessmentEnvelope(pack, answers, Date.now())) });
         return;
       }
@@ -8368,7 +8353,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 404, { error: "industry pack not found" });
           return;
         }
-        json(res, 200, { pack, entitlement, entitlementNote: ENTITLEMENT_NOTE });
+        const { loadConsoleResponses } = await import("../domains/packResponses.js");
+        json(res, 200, { pack, entitlement, entitlementNote: ENTITLEMENT_NOTE,
+          savedResponses: auth?.userId ? loadConsoleResponses(options.workspace, auth.userId, pack.id) : null });
         return;
       }
 
@@ -8526,7 +8513,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       if (intentRefusal instanceof StudioToolhubIntentAuthorityError) { json(res, intentRefusal.status, { error: intentRefusal.message }); return; }
       if (respondUsersMutationError(req, error, (status, body) => json(res, status, body))) return;
       if (error instanceof TransformPublicationError) { if (!res.headersSent) json(res, 409, { error: error.message, code: error.code, publishedPaths: error.publishedPaths, attemptedPhase: error.attemptedPhase, knownTransparencyHash: error.knownTransparencyHash }); return; }
-      json(res, 500, { error: "internal server error" });
+      const refusal = studioInputError(new URL(req.url ?? "/", "http://studio").pathname, error) ?? studioSetupError(error);
+      if (refusal) { json(res, refusal.status, refusal.body); return; }
+      console.error(`[studio] ${req.method} ${(req.url ?? "").split("?")[0]} failed:`, error); json(res, 500, { error: "internal server error" });
     }
   });
 

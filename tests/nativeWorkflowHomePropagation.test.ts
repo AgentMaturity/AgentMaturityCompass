@@ -266,8 +266,9 @@ describe("AMC-1512 native home propagation through the chat composition seam", (
       log: line => logs.push(line), error: line => errors.push(line), fail
     });
     expect(fail).toHaveBeenCalledOnce();
-    expect(logs.join("\n")).toContain("driver failed");
-    expect(logs.join("\n")).toContain("recorded turn ending error");
+    // 83635b333: the per-turn session line became the footer under the reply and the exit summary.
+    expect(logs.join("\n")).toMatch(/no reply recorded · turn \S+ error/);
+    expect(logs.join("\n")).toContain("last turn error");
     expect(errors.join("\n")).toContain("No successful task completion is claimed");
     expect(logs.find(line => line.startsWith("Resume in this workspace:"))).toContain("--session known-session");
   });

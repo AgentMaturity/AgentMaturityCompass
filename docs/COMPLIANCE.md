@@ -46,6 +46,7 @@ AMC intentionally avoids legal-claim language and does not infer unseen controls
 - `amc compliance verify`
 - `amc compliance report --framework SOC2 --window 14d --out .amc/reports/soc2.md`
 - `amc comply risk-classify --employment --json`
+- `amc comply risk-classify --guide` (six plain questions in a terminal: what applies to my agent)
 - `amc compliance fleet --framework SOC2 --window 30d --out .amc/reports/fleet-compliance.json`
 - `amc compliance diff <reportA.json> <reportB.json>`
 

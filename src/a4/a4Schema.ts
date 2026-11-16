@@ -131,9 +131,9 @@ export function laneForClaimKind(claimKind: ClaimKind, trustTier: string | null,
   return { lane: fallback, claimKind: claimKind === "synthetic_example" ? "synthetic_example" : "self_reported" };
 }
 
-/** The A4 preview gate (D-20): every A4 route, page and export stays absent unless the operator set AMC_A4_PREVIEW=1. */
+/** The A4 preview gate (D-20, amended 2026-11-14): A4 Forge is still a preview but is on by default; AMC_A4_PREVIEW=0 turns every A4 route, page and export off. */
 export function a4PreviewEnabled(): boolean {
-  return process.env.AMC_A4_PREVIEW === "1";
+  return process.env.AMC_A4_PREVIEW !== "0";
 }
 
 /** A4ResourceDigests as `group.slot` → value: what a gate's intent binds, and what decide, complete and verify recompute. */
@@ -196,6 +196,16 @@ export function ratchetedFromChain(chain: readonly A4ChainLink[]): boolean {
   }
   return false;
 }
+
+/** Whether the project was opened as a practice project (its CREATED record says so, for good): what a view labels. */
+export const openedAsPractice = (chain: readonly A4ChainLink[]): boolean => chain.some((link) => link.kind === "CREATED" && link.body.practice === true);
+/**
+ * A practice project is one person trying A4 alone: its brief's risk tier does not make it regulated, so the single-user
+ * rule lets that person approve their own work, each decision recorded and shown as self-approved. It holds only while
+ * the chain has never recorded a second person (the ratchet): from then on the tier decides again, and the
+ * self-approved lineage waits at Activate (`lineage.independent_approvals`). The workspace floor and an active plan still apply.
+ */
+export const practiceNow = (chain: readonly A4ChainLink[]): boolean => openedAsPractice(chain) && !ratchetedFromChain(chain);
 
 /**
  * Single-user self-approval is derived, never supplied (design §5.3): true only for the one ACTIVE local user, with no

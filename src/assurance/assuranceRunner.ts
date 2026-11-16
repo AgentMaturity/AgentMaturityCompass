@@ -1,4 +1,5 @@
 import { captureRunHashAuthority, runHashVerificationKeys, type RunHashPublicationOptions } from "../ledger/runHashSignature.js";
+import type { AdaptiveAttacker } from "../redteam/adaptiveRow.js";
 import { publishAssuranceReport } from "./runReportPublication.js";
 import { verifyHexDigestAny } from "../crypto/keys.js";
 import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
@@ -13,7 +14,7 @@ import { executeStationQuestionAspects, STATION_QUESTION_ASPECT_PACK } from "./e
 import { STATION_QUESTION_CONVERSIONS } from "./executed/registry.js";
 import { finalizeExecutedResults } from "./executed/finalize.js";
 import { randomUUID } from "node:crypto";
-import { executeAssurancePack } from "./assurancePackExecution.js";
+import { DEFAULT_EFFECT_ATTEMPTS, executeAssurancePack } from "./assurancePackExecution.js";
 import { gatewayReceiptAdmitter } from "./gatewayReceiptAdmission.js";
 import { readdirSync } from "node:fs";
 import { basename, join } from "node:path";
@@ -35,6 +36,7 @@ import { writeAssuranceAudit, startAssuranceSession } from "./evidenceWriters.js
 import { getAssurancePack, listAssurancePacks } from "./packs/index.js";
 import { aggregateOverallScore } from "./scorers.js";
 import { gradeScenarioReply } from "./scenarioGrading.js";
+import { effectRowProblem } from "./effectGrading.js";
 import {
   resolveAgentResponder,
   type AgentResponder
@@ -53,6 +55,10 @@ interface AssurancePromptContext {
 export interface RunAssuranceInput {
   /** Explicit PR smoke mode; ordinary executed runs use25 fresh attempts. */
   executedAttempts?: 1 | 25;
+  /** Tries per effect-graded scenario, each on a fresh fixture with its benign twin (1-25; default 5). */
+  attempts?: number;
+  /** An attacker model and budget (`--attacker-model`): effect-graded scenarios with an injection slot are attacked in rounds. */
+  attacker?: AdaptiveAttacker;
   /** Five separate partial synthetic question aspects, selected explicitly. */
   stationQuestionIds?: string[];
   workspace: string;
@@ -213,6 +219,9 @@ export async function runAssurance(input: RunAssuranceInput, options: RunHashPub
   const unsignedStore = process.env.AMC_NO_SIGN === "1";
   if (unsignedStore) input = { ...input, noSign: true };
   if (![1, 25].includes(input.executedAttempts ?? 25)) throw new Error("EXECUTED_ATTEMPT_MODE_INVALID");
+  if (input.attempts !== undefined && (!Number.isSafeInteger(input.attempts) || input.attempts < 1 || input.attempts > 25)) {
+    throw new Error("--attempts must be a whole number from 1 to 25");
+  }
   if (input.stationQuestionIds && (new Set(input.stationQuestionIds).size !== input.stationQuestionIds.length ||
       input.stationQuestionIds.some(id => !STATION_QUESTION_CONVERSIONS.some(row => row.questionId === id)))) {
     throw new Error("STATION_QUESTION_SELECTION_INVALID");
@@ -291,7 +300,8 @@ export async function runAssurance(input: RunAssuranceInput, options: RunHashPub
     const admitReceipts = gatewayReceiptAdmitter(workspace);
     const executePack = (packId: string): Promise<AssurancePackResult> => executeAssurancePack({
       packId, ledger, sessionId, agentId, runId, trustTier, context, getResponder, getExecutedScope, getCatalog, admitReceipts,
-      executedAttempts: input.executedAttempts, now: new Date(now).toISOString(), mode: input.mode
+      executedAttempts: input.executedAttempts, attempts: input.attempts ?? DEFAULT_EFFECT_ATTEMPTS, now: new Date(now).toISOString(), mode: input.mode,
+      ...(input.attacker ? { attacker: input.attacker } : {})
     });
 
     // ── Execute packs (sequential or parallel — AMC-149) ─
@@ -471,6 +481,12 @@ export async function verifyAssuranceRun(params: {
         if (!scenario) { errors.push(`unknown scenario in report: ${packResult.packId}/${row.scenarioId}`); continue; }
         if (row.inconclusive === true) {
           if (row.pass || row.score0to100 !== 0 || row.score0to5 !== 0) errors.push(`inconclusive row carries a score: ${packResult.packId}/${row.scenarioId}`);
+          continue;
+        }
+        if (scenario.effect) {
+          // An effect row summarises repeated exchanges (all in the sealed session); its verdict must follow from its own counts.
+          const problem = effectRowProblem(row);
+          if (problem) errors.push(`determinism mismatch for ${row.scenarioId}: ${problem}`);
           continue;
         }
         const grade = gradeScenarioReply(scenario, { text: row.response, toolCalls: row.toolCalls ?? [] }, row.prompt, context);

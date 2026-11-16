@@ -1,6 +1,6 @@
 /**
- * OpenAPI for /api/v1/a4 (P1-57; design §12.1), on the native task pattern. Every route is a preview route: without
- * AMC_A4_PREVIEW=1 it answers 404 A4_PREVIEW_DISABLED. Response bodies name their published contract
+ * OpenAPI for /api/v1/a4 (P1-57; design §12.1), on the native task pattern. Every route is a preview route, on by default: under
+ * AMC_A4_PREVIEW=0 it answers 404 A4_PREVIEW_DISABLED. Response bodies name their published contract
  * (spec/schemas/v1/a4-*.schema.json); result routes gain ClaimResult through withClaimResponses.
  */
 import type { OpenApiOperation } from "./openapiTypes.js";
@@ -42,7 +42,7 @@ function operation(summary: string, response: string, options: { write?: boolean
       "400": json("Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or HYPOTHESIS_SOURCE_MISMATCH.", ref("A4Error")),
       "401": json("No authenticated Studio session (A4 routes are served only through native Studio admission).", ref("A4Error")),
       "403": json("DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or project membership refused.", ref("A4Error")),
-      "404": json("A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.", ref("A4Error")),
+      "404": json("A4_PREVIEW_DISABLED under AMC_A4_PREVIEW=0, or an unknown project, gate or route.", ref("A4Error")),
       "409": json("A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items, RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status: BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems).", ref("A4Error")),
       "423": json("A4_VAULT_LOCKED: unlock the vault to record this.", ref("A4Error")),
       "500": json("The outcome is uncertain; reload the project before retrying.", ref("A4Error"))
@@ -65,6 +65,10 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
       post: operation("Create a project (human session with OPERATOR or OWNER; an agent whose config, context graph or target profile exists needs OWNER)", "A4MutationResponse",
         { write: true, body: "A4CreateProject", status: "201" })
     },
+    "/api/v1/a4/people": {
+      post: operation("Add a person to the workspace (workspace owner signed in): their account, with a first password shown once; an existing ACTIVE account is left as it is", "A4Response",
+        { write: true, body: "A4People", status: "201" })
+    },
     [p]: { get: read("Project head, members, current revision summary, gates and readiness (amc.a4-project/v1)") },
     [`${p}/readiness`]: { get: read("The one readiness evaluation for this principal (amc.a4-readiness/v1)", [query("stage", stage, "Defaults to the head stage.")]) },
     [`${p}/events`]: { get: read("Poll: events folded from the chain, the head and presence", [
@@ -78,6 +82,7 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
     [`${p}/transitions`]: { get: read("Transitions (amc.a4-transition/v1), at most 512 per page", [query("cursor", integer, "The first seq to return.")]) },
     [`${p}/gates`]: { get: read("Gates with their decisions and quorum (amc.a4-gate/v1)") },
     [`${p}/members`]: { get: read("Members; owners also see who can be added"), post: write("Add, change or remove a member (owner)", "A4Members") },
+    [`${p}/members/invite`]: { post: write("Invite a person (workspace owner signed in): creates their account with a first password shown once (an existing ACTIVE account is added as it is) and adds them as an approver", "A4Invite", [], "201") },
     [`${p}/comments`]: { get: read("Comments (bodies read from the encrypted blob store; VAULT_LOCKED when it is locked)", [query("card", string, "Only this card.")]),
       post: write("Comment (project members, read roles suffice)", "A4Comment", [], "201") },
     // Presence answers { presence: [{ username, card }] }, not a transition.
@@ -169,7 +174,13 @@ export function a4Schemas(): Record<string, unknown> {
       replay: { type: "boolean" }, attemptId: string, agentId: string }, ["projectId", "seq", "kind", "bodyDigest", "replay"]) }),
     A4CreateProject: object({ clientRequestId: requestId, name: { type: "string", minLength: 1, maxLength: 200 },
       agentId: { type: "string", pattern: "^[a-z0-9][a-z0-9_-]{0,127}$" }, archetype: { type: "string", minLength: 1, maxLength: 128 },
-      expertise: { type: "string", enum: ["novice", "practitioner", "expert"] } }, ["clientRequestId", "name", "expertise"]),
+      expertise: { type: "string", enum: ["novice", "practitioner", "expert"] },
+      practice: { type: "boolean", description: "A practice project: one person trying A4 alone may approve their own work, each such approval recorded and shown as self-approved; refused (409 A4_PRACTICE_NOT_AVAILABLE) when more than one person can sign in or the signed policy rules it out." } },
+      ["clientRequestId", "name", "expertise"]),
+    A4Invite: control({ username: { type: "string", pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{1,63}$" },
+      workspaceRoles: { type: "array", items: { type: "string", enum: ["APPROVER", "AUDITOR"] }, minItems: 1, maxItems: 2 } }, ["username"]),
+    A4People: object({ clientRequestId: requestId, username: { type: "string", pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{1,63}$" },
+      workspaceRoles: { type: "array", items: { type: "string", enum: ["APPROVER", "AUDITOR"] }, minItems: 1, maxItems: 2 } }, ["clientRequestId", "username"]),
     A4Control: control(),
     A4Reason: control({ reason }),
     A4Reopen: control({ reason, toStage: stage }),

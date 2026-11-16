@@ -28,6 +28,7 @@ import {
 import { assuranceWaiverSchema } from "./assuranceSchema.js";
 import { AssuranceEvidenceUnverifiableError, loadAssuranceReport, latestAssuranceReports, listAssuranceHistory, runAssurance } from "./assuranceRunner.js";
 import { listAssurancePacks } from "./packs/index.js";
+import { isEffectNotEvaluated } from "./scorers.js";
 import { assuranceRunRecord, severityForScore } from "./assuranceArtifactPersistence.js";
 import { captureOrgPairs, captureOrgFiles, assertOrgPairsCurrent, captureOrgPairsAuthority, orgPairBytes, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
@@ -95,6 +96,8 @@ function legacyProjectionForReport(params: {
   const record = assuranceRunRecord(report);
   const status: "PASS" | "FAIL" | "ERROR" | "INSUFFICIENT_EVIDENCE" = report.status !== "VALID" ? "ERROR"
     : record.score.status === "INSUFFICIENT_EVIDENCE" ? "INSUFFICIENT_EVIDENCE"
+      // An effect-graded scenario that was not evaluated blocks a pass, as in the run record.
+      : report.packResults.some((pack) => pack.scenarioResults.some(isEffectNotEvaluated)) ? "FAIL"
       : runStatusFromReport(report, params.minRiskAssuranceScore);
   return {
     runId: report.assuranceRunId,

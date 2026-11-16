@@ -1,16 +1,11 @@
 /**
- * TAP — Tree of Attacks with Pruning
+ * TAP-shaped tree search with fixed rewrites (no attacker model).
  *
- * Implementation of the TAP algorithm for automated jailbreak testing.
- * Reference: Mehrotra et al., "Tree of Attacks: Jailbreaking Black-Box LLMs
- * with Pruning" (2023).
- *
- * TAP works by maintaining a tree of attack prompts that are iteratively
- * refined based on the target's responses. Branches that show no progress
- * toward jailbreaking are pruned, while promising branches are expanded.
- *
- * This implementation uses a synthetic response engine (matching the existing
- * AMC redteam pattern) for deterministic, offline evaluation.
+ * Shaped after "Tree of Attacks: Jailbreaking Black-Box LLMs with Pruning" (Mehrotra et al., 2023): a tree of
+ * attack prompts is expanded and pruned. Unlike published TAP, there is no attacker model and no evaluator model:
+ * each prompt is sent to the real agent under test, but the refinements are fixed rewrites that do not read the
+ * agent's reply. A result is therefore a weak lower bound on what an adaptive attacker could do, never evidence that
+ * the agent resists jailbreaks.
  */
 
 import { randomUUID } from "node:crypto";
@@ -247,11 +242,19 @@ export interface RunTAPInput {
   /** Optional custom response function (for live testing). */
   /** Invokes the real agent under test. Required: there is no synthetic fallback. */
   respondFn: (prompt: string) => Promise<string>;
+  /**
+   * Proposes the next attack from the path so far (root first), replacing the fixed rewrites: an attacker model reads the
+   * earlier attacks and replies. null ends the search (its budget is spent).
+   */
+  propose?: (path: TAPNode[]) => Promise<string | null>;
+  /** Grades one reply instead of the keyword detector (effect grading reads what the agent did in that round). */
+  judge?: (prompt: string, response: string) => JailbreakVerdict;
 }
 
 export async function runTAP(input: RunTAPInput): Promise<TAPResult> {
   const config: TAPConfig = { ...DEFAULT_TAP_CONFIG, ...input.config };
   const respond = input.respondFn;
+  const judge = input.judge ?? ((prompt: string, response: string) => detectJailbreak(response, prompt, input.payload));
   const runId = randomUUID();
 
   let totalEvaluations = 0;
@@ -264,7 +267,7 @@ export async function runTAP(input: RunTAPInput): Promise<TAPResult> {
   const rootPrompt = renderAttackPrompt(input.attack, input.payload);
   const rootResponse = await respond(rootPrompt);
   totalEvaluations++;
-  const rootVerdict = detectJailbreak(rootResponse, rootPrompt, input.payload);
+  const rootVerdict = judge(rootPrompt, rootResponse);
 
   const root: TAPNode = {
     id: randomUUID(),
@@ -309,10 +312,14 @@ export async function runTAP(input: RunTAPInput): Promise<TAPResult> {
           break;
         }
 
-        const refinedPrompt = strat.refine(parent.attackPrompt, parent.response, depth);
+        const refinedPrompt = input.propose ? await input.propose(extractPath(parent, root)) : strat.refine(parent.attackPrompt, parent.response, depth);
+        if (refinedPrompt === null) {
+          earlyStop = true;
+          break;
+        }
         const childResponse = await respond(refinedPrompt);
         totalEvaluations++;
-        const childVerdict = detectJailbreak(childResponse, refinedPrompt, input.payload);
+        const childVerdict = judge(refinedPrompt, childResponse);
         const childProgress = scoreProgress(childVerdict);
 
         const child: TAPNode = {
@@ -325,7 +332,7 @@ export async function runTAP(input: RunTAPInput): Promise<TAPResult> {
           progressScore: childProgress,
           children: [],
           pruned: false,
-          refinementStrategy: strat.id,
+          refinementStrategy: input.propose ? "attacker-model" : strat.id,
         };
 
         parent.children.push(child);
@@ -394,12 +401,12 @@ export async function runTAP(input: RunTAPInput): Promise<TAPResult> {
 
 export function renderTAPMarkdown(result: TAPResult): string {
   const lines: string[] = [];
-  lines.push("# 🌳 TAP — Tree of Attacks with Pruning Report");
+  lines.push("# 🌳 TAP-shaped tree search report (fixed rewrites, no attacker model)");
   lines.push("");
   lines.push(`**Run ID:** \`${result.runId}\``);
   lines.push(`**Root Attack:** ${result.rootAttack.name} (\`${result.rootAttack.id}\`)`);
   lines.push(`**Payload:** \`${result.payload.slice(0, 100)}${result.payload.length > 100 ? "..." : ""}\``);
-  lines.push(`**Result:** ${result.jailbroken ? "🔴 JAILBROKEN" : "🟢 DEFENDED"}`);
+  lines.push(`**Result:** ${result.jailbroken ? "🔴 JAILBROKEN" : "🟡 no jailbreak found by this fixed search (not proof of resistance)"}`);
   lines.push(`**Best Confidence:** ${(result.bestConfidence * 100).toFixed(1)}%`);
   lines.push("");
 

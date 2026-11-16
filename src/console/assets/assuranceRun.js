@@ -1,3 +1,4 @@
+import { recordRows } from "./pageKit.js";
 import { renderFindingCard } from "./components/findingCard.js";
 import { renderScoreGauge } from "./components/scoreGauge.js";
 
@@ -58,7 +59,7 @@ export async function renderAssuranceRunPage(params) {
     ),
     params.card(
       `Trace Refs (${refs.length})`,
-      `<pre class="scroll">${escapeHtml(JSON.stringify(refs.slice(0, 50), null, 2))}</pre>`
+      `${recordRows(refs.slice(0, 50))}`
     )
   ].join("");
 }

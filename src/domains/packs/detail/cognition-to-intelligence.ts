@@ -36,7 +36,7 @@ export const cognitionToIntelligenceDetail: PackQuestionDetail = {
       "nonconformities raised against the agent are not tracked to closure.",
     evidence: ["aims_statement_of_applicability", "ai_risk_treatment_plan", "aims_internal_audit_report", "nonconformity_register"],
     remediation:
-      "Write a statement of applicability mapping each Annex A control to the agent's pipelines and open a " +
+      "Write a statement of applicability mapping each control to the agent's pipelines and open a " +
       "tracked nonconformity for every control that lacks evidence.",
     failureMode:
       "The agent's retrieval sources and model are swapped in production with no AI risk assessment rerun, so a degraded inference chain ships unnoticed.",

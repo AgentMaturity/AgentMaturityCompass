@@ -117,11 +117,15 @@ describe("OWASP LLM and Agentic Top 10 frameworks", () => {
   });
 
   test("no surface in this domain pairs a 2025 id with a 2023 title", () => {
-    // The 2023 v1.1 scorer says so in every risk title; the packs that cite 2023 ids name the edition.
-    expect(scoreOWASPLLMCoverage().risks.every((risk) => /:2023 /.test(risk.title))).toBe(true);
-    expect(getAssurancePack("excessive-agency").title).toMatch(/LLM08:2023, LLM06:2025/);
-    expect(getAssurancePack("overreliance").title).toMatch(/LLM09:2023/);
-    expect(getAssurancePack("owaspGenAI").title).toMatch(/2023 v1\.1/);
+    // `amc score owasp-llm` lists the 2025 edition (lane score); the assurance packs follow the same edition (lane shield).
+    expect(scoreOWASPLLMCoverage().risks.map((risk) => risk.title)).toEqual(owaspLlmTop10Mappings.map((row) => `${row.category} mitigation`));
+    expect(getAssurancePack("excessive-agency").title).toBe("Excessive Agency (OWASP LLM06:2025)");
+    expect(getAssurancePack("overreliance").title).toBe("Overreliance (OWASP LLM09:2025 Misinformation)");
+    expect(getAssurancePack("owaspGenAI").title).toBe("OWASP Top 10 for LLM Applications 2025 Evidence Gates");
+    for (const id of ["excessive-agency", "overreliance", "owaspGenAI", "modelTheftExfil"]) {
+      const pack = getAssurancePack(id);
+      expect([pack.title, ...pack.scenarios.map((row) => row.title)].join(" "), id).not.toMatch(/:2023|2023 v1\.1/);
+    }
     const llm = owaspLlmTop10Mappings.map((row) => row.category);
     expect(llm[5]).toBe("LLM06:2025 Excessive Agency");
     expect(llm[1]).toBe("LLM02:2025 Sensitive Information Disclosure");

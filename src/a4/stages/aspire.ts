@@ -39,6 +39,7 @@ import { a4HypothesisSchema, mapRiskTier, type A4Answer, type A4Hypothesis, type
 import { TIER_RANK, type A4ReadinessState } from "../a4Readiness.js";
 import { A4StoreError } from "../a4Store.js";
 import { errorCodeOf, understandAspire } from "../aspireUnderstand.js";
+import { buildPromptPackForApiAsync } from "../../prompt/promptPackAsync.js";
 import {
   ASPIRE_CLAIM_BOUNDARY, ASPIRE_SPEC_SCHEMA, HYPOTHESIS_ID, QUESTIONS, answerGaps, answerValues, answersDigestOf, askGapCodes, aspireItems, aspireSpecOf, dependencyDigest,
   hypothesisDigestOf, learningPlanSchema, listValue, misuseSchema, previousHypotheses, textValue, unmeasuredTargets
@@ -627,7 +628,7 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
  * that records them; a head that moves in between leaves them written, and Build run again is then refused as drifted,
  * so the brief is proposed and approved again.
  */
-function build(ctx: A4ProducerContext): A4ProducerResult {
+async function build(ctx: A4ProducerContext): Promise<A4ProducerResult> {
   const { workspace } = ctx;
   for (const command of ["agent add", "target set", "snapshot"]) assertOwnerMode(workspace, command);
   const { spec, answers } = aspireSpecOf(ctx.state);
@@ -685,6 +686,15 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
     // Only a code is recorded (members and viewers read it); an error's message may carry absolute workspace paths.
     manifest = { error: errorCodeOf(error, "ENFORCE_MANIFEST_REFUSED") };
   }
+  // The prompt pack's inputs settle here (the agent config above): build it now, so the revision this Build appends binds the
+  // pack as it stays, and Studio's scheduled refresh of unchanged content changes nothing an approval bound. Never refuses.
+  let promptPack: { built: boolean; error?: string };
+  try {
+    await buildPromptPackForApiAsync({ workspace, agentId });
+    promptPack = { built: true };
+  } catch (error) {
+    promptPack = { built: false, error: errorCodeOf(error, "PROMPT_PACK_NOT_BUILT") };
+  }
   const files = ([["context-graph", paths.contextGraph, "written"], ["agent-config", paths.agentConfig, "written"], ["target-profile", targetPath, "written"],
     ["outcome-contract", outcomePath, outcomeKept ? "kept" : "written"], ["typed-graph", graphWritten.graphPath, "written"], ...("path" in manifest ? [["enforce-manifest", manifest.path, "written"] as const] : [])] as const)
     .map(([writer, path, action]) => ({ writer, path: relPath(workspace, path), action, sha256: fileSha(path, `the ${writer} Build ${action}`) }));
@@ -692,7 +702,7 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
     outputs: files.map((file) => ({ output: "build", lane: "implementation" as const, method: null, body: file,
       label: `aspire build: ${file.writer} ${file.action === "kept" ? "kept (not written by Build)" : "written"} (${file.path})` })),
     spec: { ...spec, build: { files, agentCreated: !prior.exists, verifiedBefore: prior.checked, contextGraphHash, outcomeContract: outcomeKept ? "kept" : "initialised",
-      typedGraphDigest: graphWritten.ref.digestSha256, ...("manifestId" in manifest ? { manifestId: manifest.manifestId } : { manifestError: manifest.error }),
+      typedGraphDigest: graphWritten.ref.digestSha256, promptPack, ...("manifestId" in manifest ? { manifestId: manifest.manifestId } : { manifestError: manifest.error }),
       provider: prior.config === null ? "local_openai placeholder, no key (Assemble chooses the provider)" : "kept" } }
   };
 }

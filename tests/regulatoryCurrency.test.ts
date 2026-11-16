@@ -219,4 +219,14 @@ describe("legacy GLOBAL_FRAMEWORKS view", () => {
     expect(ref("Clinical decision support")).toBe("Art. 6(1) + Annex I (Regulation (EU) 2017/745)");
     expect(ref("Resume screening")).toBe("Annex III, 4(a)");
   });
+
+  it("EU risk matrix covers all eight Annex III areas and never makes fraud detection high-risk", () => {
+    const refs = EU_AI_ACT_RISK_MATRIX.map((m) => m.annexRef);
+    for (const area of ["1", "2", "3", "4", "5", "6", "7", "8"]) {
+      expect(refs.some((r) => r === `Annex III, ${area}` || r.startsWith(`Annex III, ${area}(`)), `Annex III area ${area}`).toBe(true);
+    }
+    const fraud = EU_AI_ACT_RISK_MATRIX.find((m) => m.useCase === "Fraud detection")!;
+    expect([fraud.defaultRisk, ...fraud.modifiers.map((m) => m.riskChange)]).not.toContain("high");
+    expect(EU_AI_ACT_RISK_MATRIX.find((m) => m.useCase === "Predictive policing")!.modifiers[0]!.condition).toMatch(/solely on profiling/);
+  });
 });

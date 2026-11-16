@@ -35,8 +35,10 @@ const GENERIC_CONFIG = {
   transport: "stdio",
 };
 
-const IDE_CONFIGS: Record<string, { file: string; config: unknown }> = {
-  "Claude Code": { file: ".claude/mcp.json", config: CLAUDE_CODE_CONFIG },
+// Claude Code reads a project's MCP servers from `.mcp.json` in the project root (https://code.claude.com/docs/en/mcp,
+// read 2026-11-15); it does not read `.claude/mcp.json`. `claude mcp add --scope project` writes the same file.
+const IDE_CONFIGS: Record<string, { file: string; config: unknown; command?: string }> = {
+  "Claude Code": { file: ".mcp.json", config: CLAUDE_CODE_CONFIG, command: "claude mcp add --transport stdio --scope project amc -- amc mcp serve" },
   "Cursor": { file: ".cursor/mcp.json", config: CURSOR_CONFIG },
   "Windsurf": { file: ".windsurf/mcp.json", config: CURSOR_CONFIG },
   "VS Code Copilot": { file: ".vscode/mcp.json", config: CURSOR_CONFIG },
@@ -106,10 +108,11 @@ export function registerMcpCommands(program: Command): void {
         process.exit(1);
       }
 
-      for (const [name, { file, config }] of filtered) {
+      for (const [name, { file, config, command }] of filtered) {
         console.log(chalk.bold.green(`── ${name}`));
-        console.log(chalk.gray(`   File: ${file}`));
+        console.log(chalk.gray(`   File: ${file}${file.includes("/") ? "" : " (in the project's top folder)"}`));
         console.log(chalk.white(JSON.stringify(config, null, 2)));
+        if (command) console.log(chalk.gray(`   Or let ${name} write that file for you: `) + chalk.cyan(command));
         console.log();
       }
 

@@ -101,7 +101,7 @@ describe("amc init --coding (P1-40)", () => {
     expect(presets.ok && presets.presets.length).toBe(0);
     expect(report.plan).toBeNull();
     expect(report.readiness.ready, report.readiness.blockers.join("; ")).toBe(true);
-    expect(report.nextCommand).toBe('amc agent-loop run "..." --provider stub --tools workspace');
+    expect(report.nextCommand).toBe("amc agent-loop chat --provider stub --tools workspace --approval-mode default");
     expect(report.monitorFingerprint).toMatch(/^[0-9a-f]{64}$/);
   });
 

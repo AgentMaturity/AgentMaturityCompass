@@ -15,7 +15,7 @@ import { serveDashboard } from "./dashboard/serve.js";
 import { toErrorMessage } from "./utils/errors.js";
 import { pathExists, readUtf8 } from "./utils/fs.js";
 import { runAttackPlugins, listAttackPlugins, renderAttackPluginReport } from "./redteam/attackPlugins.js";
-import { runRedTeam, renderRedTeamMarkdown, listStrategies } from "./redteam/index.js";
+import { runRedTeam, renderRedTeamMarkdown, listStrategies, redTeamExtras, withRedTeamExtras, type RedTeamExtraOptions } from "./redteam/index.js";
 import { registerTransparencyReportCommands } from "./transparency/transparencyReportCli.js";
 import { registerMcpCommands } from "./mcp/mcpCli.js";
 import { registerLintCommands } from "./lint/lintCli.js";
@@ -422,7 +422,7 @@ export function registerLateStageCliCommands({
     .command("redteam")
     .description("Run red-team attack simulations against a target agent");
 
-  redteamCmd
+  withRedTeamExtras(redteamCmd
     .command("run [agentId]")
     .description("Execute red-team plugins with chosen attack strategies and generate a vulnerability report")
     .option("--plugins <ids...>", "Assurance-pack IDs to run as attack plugins (default: all)")
@@ -432,8 +432,8 @@ export function registerLateStageCliCommands({
     .option("--evil-mcp", "Also run built-in Evil MCP agent-provider attack scenarios")
     .option("--mcp-attacks <categories...>", "MCP attack categories for --evil-mcp (default: all; aliases: tool_poison, data_exfil, priv_esc, prompt_inject)")
     .option("--model <modelId>", "model id of the agent under attack (or set AMC_ASSURANCE_MODEL)")
-    .option("--json", "Print JSON report to stdout")
-    .action(async (agentId: string | undefined, opts: {
+    .option("--json", "Print JSON report to stdout"))
+    .action(async (agentId: string | undefined, opts: RedTeamExtraOptions & {
       plugins?: string[];
       strategies?: string[];
       output?: string;
@@ -455,7 +455,7 @@ export function registerLateStageCliCommands({
           output: opts.output,
           noSign: opts.sign === false,
           evilMcp: opts.evilMcp,
-          mcpAttackCategories: opts.mcpAttacks,
+          mcpAttackCategories: opts.mcpAttacks, ...redTeamExtras(opts, workspace),
         });
       } catch (error) {
         // Fail closed: reporting "no vulnerabilities" without attacking

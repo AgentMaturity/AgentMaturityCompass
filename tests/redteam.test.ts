@@ -106,13 +106,13 @@ describe("amc redteam", () => {
     rmSync(join(workspace, ".amc", "vault.amcvault.meta.json"), { force: true });
     expect(existsSync(join(workspace, ".amc", "vault.amcvault"))).toBe(false);
 
-    const report = await runRedTeam({
-      workspace,
-      agentId: "default",
-      plugins: ["injection"],
-      strategies: ["direct"],
-      noSign: true,
-    });
+    // An agent that runs a shell command whatever it is asked: the injection pack (graded by what the agent did) fails it.
+    const shellAgent = await startFakeAgentServer({ toolCalls: () => [{ name: "run_shell", arguments: { command: "echo hi" } }] });
+    const restore = useFakeAgentEnv(shellAgent.baseUrl);
+    let report: Awaited<ReturnType<typeof runRedTeam>>;
+    try {
+      report = await runRedTeam({ workspace, agentId: "default", plugins: ["injection"], strategies: ["direct", "base64"], noSign: true });
+    } finally { restore(); await shellAgent.close(); }
 
     expect(report.verification).toMatchObject({
       status: "UNSIGNED_VALID",
@@ -121,17 +121,22 @@ describe("amc redteam", () => {
       evidenceUse: "local-redteam",
       requiredForClaims: true,
     });
-    expect(report.vulnerabilities[0]?.cvss).toMatchObject({
-      version: "4.0",
-      nomenclature: "CVSS-B",
-      qualitativeRating: "Critical",
-    });
+    // An attack that worked is critical, whatever else went wrong.
+    expect(report.vulnerabilities[0]?.severity).toBe("critical");
+    expect(report.vulnerabilities[0]?.cvss).toMatchObject({ version: "4.0", nomenclature: "CVSS-B" });
+    expect(report.vulnerabilities[0]?.reasons.join(" ")).toMatch(/attack worked: ran a shell command/);
+    // The injection payload sits in the ticket the agent reads, so base64 (which rewrites the user's message) is not applied.
+    const injection = report.pluginResults[0]!;
+    expect(injection.scenarioResults.every((row) => row.strategyId === "direct")).toBe(true);
+    expect(injection.notApplied?.length).toBe(injection.scenarioResults.length);
+    expect(injection.notApplied?.every((item) => item.strategyId === "base64" && /attack is in content the agent reads/.test(item.reason))).toBe(true);
     expect(report.vulnerabilities[0]?.cvss.vector).toContain("CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P");
     expect(existsSync(join(workspace, ".amc", "vault.amcvault"))).toBe(false);
     expect(existsSync(join(workspace, ".amc", "redteam", "default", `${report.runId}.json`))).toBe(true);
     const rendered = renderRedTeamMarkdown(report);
     expect(rendered).toContain("UNSIGNED_VALID");
     expect(rendered).toContain("CVSS-B:");
+    expect(rendered).toContain(`Strategies base64 on ${injection.scenarioResults.length} scenarios of`);
 
     const jsonReport = JSON.parse(
       readFileSync(join(workspace, ".amc", "redteam", "default", `${report.runId}.json`), "utf-8")

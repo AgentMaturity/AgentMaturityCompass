@@ -7,7 +7,7 @@
 
 **Claim:** Self-reported · **Result:** not evaluated (no applicability decision is recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** unresolved
 
-Source: `GLOBAL_FRAMEWORKS` and `EU_AI_ACT_RISK_MATRIX` in `src/compliance/globalRegulatory.ts` — 5 frameworks, 18 key requirements, 12 EU AI Act risk-matrix rows; 5 of 5 frameworks are unverified. Register key dates: 450 (397 verified), from `src/compliance/regulatory/register.json`. Curated milestones: 13, from `docs/industries/_data/regulatory-milestones.json`.
+Source: `GLOBAL_FRAMEWORKS` and `EU_AI_ACT_RISK_MATRIX` in `src/compliance/globalRegulatory.ts` — 5 frameworks, 18 key requirements, 27 EU AI Act risk-matrix rows; 5 of 5 frameworks are unverified. Register key dates: 450 (397 verified), from `src/compliance/regulatory/register.json`. Curated milestones: 13, from `docs/industries/_data/regulatory-milestones.json`.
 
 ## How to read this calendar
 
@@ -496,14 +496,14 @@ These rows are not register data. They come from `docs/industries/_data/regulato
 | 2024-07-26 | NIST AI 600-1 | Generative AI Profile released | published (voluntary) | [NIST, AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework), retrieved 2026-10-03 |
 | 2025-01-06 | Canada Bill C-27 (44th Parliament, 1st session) | Session ended with the bill at committee consideration in the House of Commons; no Royal Assent | not enacted | [LEGISinfo, Bill C-27 (44-1)](https://www.parl.ca/legisinfo/en/bill/44-1/c-27), retrieved 2026-10-03 |
 | 2025-01-20 | US Executive Order 14148 | Section 2(ggg) revokes Executive Order 14110 (Safe, Secure, and Trustworthy Development and Use of AI) | revoked | [Federal Register FR Doc. 2025-01901 (govinfo)](https://www.govinfo.gov/content/pkg/FR-2025-01-28/html/2025-01901.htm), retrieved 2026-10-03 |
-| 2025-02-02 | EU AI Act (Regulation (EU) 2024/1689), Art. 113 as amended | Chapters I and II apply | applies; amended text per EC AI Act Service Desk, OJ citation of the amending act unverified | [EC AI Act Service Desk, Article 113](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113), retrieved 2026-10-03 |
-| 2025-08-02 | EU AI Act (Regulation (EU) 2024/1689), Art. 113 as amended | Chapter III Section 4, Chapters V, VII and XII, and Article 78 apply (Article 101 excluded) | applies; amended text per EC AI Act Service Desk, OJ citation of the amending act unverified | [EC AI Act Service Desk, Article 113](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113), retrieved 2026-10-03 |
+| 2025-02-02 | EU AI Act (Regulation (EU) 2024/1689), Art. 113 as amended | Chapters I and II apply | applies; Art. 113 third paragraph as amended by Art. 1 point (40) of Regulation (EU) 2026/1744, read in the Official Journal text 2026-11-16 | [Regulation (EU) 2026/1744, Official Journal text (Publications Office)](https://publications.europa.eu/resource/celex/32026R1744), retrieved 2026-11-16 |
+| 2025-08-02 | EU AI Act (Regulation (EU) 2024/1689), Art. 113 as amended | Chapter III Section 4, Chapters V, VII and XII, and Article 78 apply (Article 101 excluded) | applies; Art. 113 of Regulation (EU) 2024/1689 (not changed by Regulation (EU) 2026/1744), read in the Official Journal texts 2026-11-16 | [Regulation (EU) 2024/1689, Official Journal text (Publications Office)](https://publications.europa.eu/resource/celex/32024R1689), retrieved 2026-11-16 |
 | 2025-11-14 | India Digital Personal Data Protection Rules, 2025 | DPDP Rules, 2025 notified, operationalising the DPDP Act, 2023 | notified | [PIB explainer: DPDP Rules, 2025 Notified (posted 17 Nov 2025)](https://www.pib.gov.in/PressNoteDetails.aspx?NoteId=156054&ModuleId=3&reg=3&lang=2), retrieved 2026-10-03 |
-| 2026-08-02 | EU AI Act (Regulation (EU) 2024/1689), Art. 113 as amended | General date of application | applies; amended text per EC AI Act Service Desk, OJ citation of the amending act unverified | [EC AI Act Service Desk, Article 113](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113), retrieved 2026-10-03 |
-| 2026-12-02 | EU AI Act (Regulation (EU) 2024/1689), Art. 111(4) as amended by Regulation (EU) 2026/1744 | Art. 50(2) marking deadline for systems generating synthetic content that were placed on the market before 2 August 2026 | scheduled; date as recorded by register entry eu-ai-act (Official Journal text, CELEX 32026R1744, read 2026-10-04), not re-read by P1-42; re-verify against the primary source before publishing | [Regulation (EU) 2026/1744, Official Journal text (Publications Office)](https://publications.europa.eu/resource/celex/32026R1744), retrieved 2026-10-04 |
+| 2026-08-02 | EU AI Act (Regulation (EU) 2024/1689), Art. 113 as amended | General date of application | applies; Art. 113 of Regulation (EU) 2024/1689 (not changed by Regulation (EU) 2026/1744), read in the Official Journal texts 2026-11-16 | [Regulation (EU) 2024/1689, Official Journal text (Publications Office)](https://publications.europa.eu/resource/celex/32024R1689), retrieved 2026-11-16 |
+| 2026-12-02 | EU AI Act (Regulation (EU) 2024/1689), Art. 111(4) as amended by Regulation (EU) 2026/1744 | Art. 50(2) marking deadline for systems generating synthetic content that were placed on the market before 2 August 2026 | scheduled; Art. 111(4) added by Art. 1 point (39) of Regulation (EU) 2026/1744, read in the Official Journal text 2026-11-16 | [Regulation (EU) 2026/1744, Official Journal text (Publications Office)](https://publications.europa.eu/resource/celex/32026R1744), retrieved 2026-11-16 |
 | 2027-01-01 | Colorado SB26-189, Automated Decision-Making Technology (repeals and reenacts the SB24-205 provisions) | SB26-189 takes effect; the SB24-205 date of 2026-06-30 set by SB25B-004 no longer applies | scheduled; date as recorded by register entry us-co-sb26-189 (read on leg.colorado.gov 2026-10-03), not re-read by P1-42; re-verify against the primary source before publishing | [Colorado General Assembly, SB26-189](https://leg.colorado.gov/bills/sb26-189), retrieved 2026-10-03 |
-| 2027-12-02 | EU AI Act (Regulation (EU) 2024/1689), Art. 113 as amended | High-risk obligations for Article 6(2) and Annex III systems apply | scheduled; amended text per EC AI Act Service Desk, OJ citation of the amending act unverified | [EC AI Act Service Desk, Article 113](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113), retrieved 2026-10-03 |
-| 2028-08-02 | EU AI Act (Regulation (EU) 2024/1689), Art. 113 as amended | High-risk obligations for Article 6(1) and Annex I systems apply | scheduled; amended text per EC AI Act Service Desk, OJ citation of the amending act unverified | [EC AI Act Service Desk, Article 113](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113), retrieved 2026-10-03 |
+| 2027-12-02 | EU AI Act (Regulation (EU) 2024/1689), Art. 113 as amended | High-risk obligations for Article 6(2) and Annex III systems apply | scheduled; Art. 113 third paragraph as amended by Art. 1 point (40) of Regulation (EU) 2026/1744, read in the Official Journal text 2026-11-16 | [Regulation (EU) 2026/1744, Official Journal text (Publications Office)](https://publications.europa.eu/resource/celex/32026R1744), retrieved 2026-11-16 |
+| 2028-08-02 | EU AI Act (Regulation (EU) 2024/1689), Art. 113 as amended | High-risk obligations for Article 6(1) and Annex I systems apply | scheduled; Art. 113 third paragraph as amended by Art. 1 point (40) of Regulation (EU) 2026/1744, read in the Official Journal text 2026-11-16 | [Regulation (EU) 2026/1744, Official Journal text (Publications Office)](https://publications.europa.eu/resource/celex/32026R1744), retrieved 2026-11-16 |
 
 ## EU AI Act risk matrix (as recorded)
 
@@ -514,15 +514,30 @@ Default risk levels and annex references are the register's own entries, copied 
 | HR | Resume screening | high | Annex III, 4(a) | Pre-screening only, human final decision → remains high |
 | HR | Employee training recommendation | limited | N/A | Affects promotion decisions → high |
 | Finance | Credit scoring | high | Annex III, 5(b) | — |
-| Finance | Fraud detection | limited | N/A | Auto-blocks transactions → high |
+| Finance | Fraud detection | limited | N/A (Annex III, 5(b) excludes fraud detection) | — |
 | Healthcare | Clinical decision support | high | Art. 6(1) + Annex I (Regulation (EU) 2017/745) | — |
 | Healthcare | Administrative scheduling | minimal | N/A | — |
-| Law Enforcement | Predictive policing | high | Annex III, 6(d) | Real-time biometric → unacceptable |
+| Law Enforcement | Predictive policing | high | Annex III, 6(d) | Based solely on profiling → unacceptable |
 | Education | Student assessment scoring | high | Annex III, 3(b) | — |
 | Education | Content recommendation | minimal | N/A | Minors involved → limited |
 | Critical Infrastructure | Energy grid management | high | Annex III, 2 | — |
 | Customer Service | Chatbot | limited | Article 50 | Handles complaints affecting rights → high |
 | General | Internal productivity tool | minimal | N/A | — |
+| Biometrics | Remote biometric identification | high | Annex III, 1(a) | Real-time, in public, for law enforcement → unacceptable |
+| Biometrics | Emotion recognition | high | Annex III, 1(c) | In the workplace or education → unacceptable |
+| Biometrics | Biometric categorisation by sensitive attributes | unacceptable | Art. 5(1)(g) | — |
+| Biometrics | Facial image scraping for recognition databases | unacceptable | Art. 5(1)(e) | — |
+| Education | Admission and placement decisions | high | Annex III, 3(a) | — |
+| Education | Exam proctoring | high | Annex III, 3(d) | — |
+| HR | Task allocation and performance monitoring | high | Annex III, 4(b) | — |
+| Public Services | Public benefit eligibility | high | Annex III, 5(a) | — |
+| Insurance | Life and health insurance risk pricing | high | Annex III, 5(c) | — |
+| Emergency Services | Emergency call triage and dispatch | high | Annex III, 5(d) | — |
+| Migration | Visa, asylum and residence applications | high | Annex III, 7(c) | — |
+| Justice | Judicial research and decision support | high | Annex III, 8(a) | — |
+| Democratic Processes | Influencing elections or voting | high | Annex III, 8(b) | — |
+| General | Social scoring | unacceptable | Art. 5(1)(c) | — |
+| Media | Deep fake generation | limited | Art. 50(2), 50(4); Art. 5(1)(ba) from 2026-12-02 | Intimate images of a real person without consent → unacceptable |
 
 ## Frameworks
 

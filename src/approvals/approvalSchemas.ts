@@ -82,7 +82,8 @@ export const approvalDecisionSchema = z.object({
   requestDigestSha256: z.string().regex(/^[a-f0-9]{64}$/).optional(),
   // H-1: whether the recorder verified the reviewer (a session) or took the fields as given. Absent on legacy rows, which
   // count as self-asserted: only an authenticated approval attests to an identity or role (countedApprovalDecisions).
-  authentication: z.enum(["authenticated", "self-asserted"]).optional(),
+  // "terminal": y or n typed at the interactive terminal that runs the chat; the OS account is named, nobody signed in.
+  authentication: z.enum(["authenticated", "self-asserted", "terminal"]).optional(),
   decisionTs: z.number().int()
 });
 

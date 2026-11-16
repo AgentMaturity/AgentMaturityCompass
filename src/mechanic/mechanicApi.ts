@@ -5,7 +5,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { loadLatestMechanicPlan, loadMechanicPlanById, verifyMechanicPlanSignatures } from "./planStore.js";
 import {
   initMechanicTargets,
-  loadMechanicTargets,
+  readMechanicTargets,
   saveMechanicTargets,
   verifyMechanicTargetsSignature
 } from "./targetsStore.js";
@@ -96,7 +96,7 @@ export function mechanicTargetsForApi(workspace: string): {
   signature: ReturnType<typeof verifyMechanicTargetsSignature>;
 } {
   return {
-    targets: loadMechanicTargets(workspace),
+    targets: readMechanicTargets(workspace),
     signature: verifyMechanicTargetsSignature(workspace)
   };
 }

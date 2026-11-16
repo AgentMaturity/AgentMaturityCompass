@@ -46,6 +46,7 @@ import { applySecurityHeaders } from "../studio/securityHeaders.js";
 import { applyServerTimeouts } from "../studio/serverTimeouts.js";
 import { DEFAULT_GATEWAY_MAX_REQUEST_BYTES, readAll, readBoundedBody, refuseOversizedRequest } from "./requestBody.js";
 import { withoutUrlQueries } from "./logSafe.js";
+import { droppedKeyNote, leaseHint, upstreamFailure } from "./gatewayHints.js";
 import { createPreAuthAuditLimiter, type PreAuthAuditLimiter } from "./preAuthAudit.js";
 import { killSwitchDenial, killSwitchEgressDenial } from "../runtime/killSwitch.js";
 export interface StartGatewayOptions {
@@ -249,6 +250,7 @@ async function requestUpstreamWithResilience(params: {
   retryNonIdempotent: boolean;
   lookup?: LookupFunction;
   signal?: AbortSignal; // the close fence's: aborting destroys the pending upstream request
+  failures?: unknown[]; // every attempt's error, so the caller can tell whether any byte reached the upstream
 }): Promise<IncomingMessage> {
   const totalAttempts = params.maxRetries + 1;
   const canRetry = isRetryableMethod(params.method, params.retryNonIdempotent);
@@ -283,6 +285,7 @@ async function requestUpstreamWithResilience(params: {
       return response;
     } catch (error) {
       lastError = error;
+      params.failures?.push(error);
       if (attempt < totalAttempts && canRetry && isRetryableTransportError(error)) {
         await sleep(backoffMs(params.retryBaseDelayMs, attempt));
         continue;
@@ -1049,6 +1052,8 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
     }
 
     let leaseVerified = false; // SR-3: a failure before the lease verified is logged, never a ledger row
+    const upstreamFailures: unknown[] = [];
+    let upstreamTarget: { id: string; origin: string } | null = null, upstreamResponded = false; // responded: never "not sent"
     try {
       const hostForUrl = req.headers.host ?? `${resolvedConfig.listen.host}:${resolvedConfig.listen.port}`;
       const incomingUrl = new URL(req.url ?? "/", `http://${hostForUrl}`);
@@ -1176,7 +1181,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         res.statusCode = leaseVerification.statusCode;
         res.setHeader("content-type", "application/json");
         if (!preVerification.ok) res.setHeader("connection", "close"); // its body was never read
-        res.end(JSON.stringify({ error: leaseVerification.message }));
+        res.end(JSON.stringify({ error: leaseVerification.message, ...leaseHint(leaseVerification.auditType, attributedAgentId, route.prefix) }));
         return;
       }
       leaseVerified = true;
@@ -1375,7 +1380,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         ...(leaseVerification.payload?.claimKind === "synthetic_example"
           ? { claimKind: "synthetic_example", trustTier: "SELF_REPORTED" }
           : { trustTier: "OBSERVED" }),
-        bodySha256: sha256Hex(requestBodyRedaction.redactedBytes)
+        bodySha256: sha256Hex(requestBodyRedaction.redactedBytes), tokenCeiling: null // a client's body cannot bound what the provider bills
       };
       if (requestBodyRedaction.originalPayloadSha256) {
         llmRequestMeta.originalPayloadSha256 = requestBodyRedaction.originalPayloadSha256;
@@ -1405,6 +1410,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         }
       });
 
+      upstreamTarget = { id: route.upstream, origin: upstreamUrl.origin };
       const upstreamResponse = await requestUpstreamWithResilience({
         workspace: options.workspace,
         channel: "provider",
@@ -1418,8 +1424,10 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         maxRetries: resilience.upstreamMaxRetries,
         retryBaseDelayMs: resilience.upstreamRetryBaseDelayMs,
         retryNonIdempotent: resilience.retryNonIdempotent,
-        lookup: pinnedLookup(upstreamEgress.addresses), signal: fence.signal
-      });
+        lookup: pinnedLookup(upstreamEgress.addresses), signal: fence.signal, failures: upstreamFailures
+      }); upstreamResponded = true;
+      const droppedClientKey = strippedAuth.hadCredential && [401, 403].includes(upstreamResponse.statusCode ?? 0); // QA M-07
+      if (droppedClientKey) logger.error(`gateway: request ${requestId}: HTTP ${upstreamResponse.statusCode}. ${droppedKeyNote(route.upstream, upstreamResolved.auth)}`);
 
       const responseHeaders = normalizeResponseHeaders(upstreamResponse.headers);
       const responseHeaderRedaction = redactHeaders(responseHeaders, config.redaction.headerKeysDenylist, headerRedaction);
@@ -1502,6 +1510,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
           }
         }
         res.setHeader("x-amc-request-id", requestId);
+        if (droppedClientKey) res.setHeader("x-amc-gateway-note", droppedKeyNote(route.upstream, upstreamResolved.auth));
         res.setHeader("x-amc-receipt", responseEvent?.receipt ?? ""); // "" only after the seal: no receipt
         res.setHeader("x-amc-request-receipt", requestEvent?.receipt ?? "");
         res.setHeader("x-amc-monitor-pub-fpr", monitorPubFingerprint);
@@ -1510,20 +1519,11 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
     } catch (error) {
       logger.error(`gateway error (request ${requestId}): ${withoutUrlQueries(String(error))}`);
       const status = gatewayErrorStatusCode(error);
-      const body = gatewayErrorBody(error);
-      if (leaseVerified) appendEvidence({
-        eventType: "gateway",
-        payload: JSON.stringify({
-          request_id: requestId,
-          status,
-          error: error instanceof Error ? error.message : String(error)
-        }),
-        meta: {
-          stage: "request_error",
-          request_id: requestId,
-          status
-        }
-      });
+      const failure = upstreamFailure(upstreamTarget, { responded: upstreamResponded, failures: upstreamFailures, thrown: error });
+      const body = { ...gatewayErrorBody(error), ...failure.body };
+      if (leaseVerified) appendEvidence({ eventType: "gateway",
+        payload: JSON.stringify({ request_id: requestId, status, error: error instanceof Error ? error.message : String(error) }),
+        meta: { stage: "request_error", request_id: requestId, status, ...(failure.connectFailed === undefined ? {} : { connectFailed: failure.connectFailed }) } });
       // A partial stream cannot be replaced by a JSON error or a successful receipt.
       if (res.headersSent || res.destroyed || res.writableEnded) {
         if (!res.destroyed && !res.writableEnded) res.destroy();

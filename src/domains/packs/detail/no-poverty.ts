@@ -120,10 +120,10 @@ export const noPovertyDetail: PackQuestionDetail = {
     keyRisk: 2,
   },
   "WLT-NP-14": {
-    l2: "EU microfinance obligations are known to the compliance team, but are not mapped to the agent's workflows",
+    l2: "The funding agreement's obligations are known to the compliance team, but are not mapped to the agent's workflows",
     l4: "Obligations are mapped to controlled workflows, but reporting outputs for program administrators are produced manually",
     evidence: ["eu_microfinance_obligation_map", "microloan_eligibility_check_log", "program_administrator_report"],
-    remediation: "Map each EU microfinance obligation to a check in the agent's loan workflow, and generate the program report from the logged checks.",
+    remediation: "Map each obligation in the EU funding agreement to a check in the agent's loan workflow, and generate the program report from the logged checks.",
     failureMode: "The agent approves a program-funded microloan for an ineligible applicant because the program's eligibility rules were never encoded.",
     keyRisk: 0,
   },

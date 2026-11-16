@@ -32,6 +32,15 @@ export function sandboxNode(): string | null {
     .find(path => path.startsWith("/usr/") || path.startsWith("/bin/")) ?? null;
 }
 
+/** A loopback port that was free a moment ago, so a test can sign `127.0.0.1:<port>` before starting its origin there. */
+export async function freePort(): Promise<number> {
+  const server = createServer();
+  await new Promise<void>(resolve => server.listen(0, "127.0.0.1", resolve));
+  const { port } = server.address() as { port: number };
+  await new Promise<void>(resolve => server.close(() => resolve()));
+  return port;
+}
+
 /** Real signed tools, default P1-02 binding and private native permit; no injected backend or body. */
 export function nativeContainmentFixture(options: { allowHosts?: string[]; maxProcesses?: number; /** false: the AMC home is not on the signed readDeny, so only the backend's own deny list protects it. */ readDenyHome?: boolean } = {}) {
   const root = realpathSync(mkdtempSync(join(tmpdir(), "amc-p105-escape-")));
@@ -94,7 +103,8 @@ export function nativeContainmentFixture(options: { allowHosts?: string[]; maxPr
       facts.push({ kind: "call", callId: observed.execution.callId, data, outcome, receipt: receipt.outcome });
       return { outcome, receipt: receipt.outcome, execution: observed.execution, data };
     }
-    async function origin() {
+    /** An owned loopback origin; `port` lets a test sign `127.0.0.1:<port>` before the origin exists (see freePort). */
+    async function origin(port = 0) {
       const requests: Array<{ method: string; url: string }> = [], errors: string[] = [];
       let connections = 0;
       const server = createServer((request, response) => {
@@ -104,7 +114,7 @@ export function nativeContainmentFixture(options: { allowHosts?: string[]; maxPr
       server.on("connection", () => { connections += 1; });
       server.on("error", error => errors.push(error.message));
       await new Promise<void>((resolve, reject) => {
-        server.once("error", reject); server.listen(0, "127.0.0.1", () => { server.off("error", reject); resolve(); });
+        server.once("error", reject); server.listen(port, "127.0.0.1", () => { server.off("error", reject); resolve(); });
       });
       closers.push(() => new Promise<void>((resolve, reject) => {
         server.closeAllConnections(); server.close(error => error ? reject(error) : resolve());

@@ -1,132 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AMC vs Promptfoo — Agent Maturity Compass</title>
-<meta name="description" content="How AMC compares to Promptfoo for AI agent evaluation. Different tools for different problems.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23000'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%2300ff41' stroke-width='1.5'/%3E%3Cpath d='M16 5L17.5 14.5 16 18 14.5 14.5Z' fill='%2300ff41'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%2300ff41'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="brand.css">
-<style>
-:root{--bg:#000;--bg2:#060d06;--fg:#e0ffe0;--fg2:#b0d8b0;--muted:#5a8a5a;--green:#00ff41;--green2:#00cc33;--border:rgba(0,255,65,.12);--border2:rgba(0,255,65,.25);--amber:#f59e0b;--mono:var(--amc-font-mono);--sans:var(--amc-font-sans)}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:var(--sans);background:var(--bg);color:var(--fg);line-height:1.7;min-height:100vh}
-a{color:var(--green);text-decoration:none}a:hover{text-decoration:underline}
-.nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:20px;font-family:var(--mono);font-size:.85rem;position:sticky;top:0;z-index:100}
-.nav a{color:var(--muted)}.nav a:hover{color:var(--green)}.nav .logo{color:var(--green);font-weight:600;font-size:1rem}
-.container{max-width:900px;margin:0 auto;padding:0 24px}
-.hero{text-align:center;padding:80px 24px 40px}
-.hero h1{font-family:var(--mono);font-size:2.2rem;color:var(--green);margin-bottom:12px}
-.hero p{color:var(--fg2);font-size:1.1rem;max-width:650px;margin:0 auto}
-.fair{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:24px;margin:40px auto;max-width:700px;text-align:center}
-.fair h3{color:var(--amber);font-family:var(--mono);margin-bottom:8px}
-.fair p{color:var(--fg2);font-size:.95rem}
-table{display:block;width:100%;max-width:100%;border-collapse:collapse;margin:32px 0;font-size:.9rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
-th{text-align:left;padding:12px 16px;background:var(--bg2);color:var(--green);font-family:var(--mono);font-size:.8rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border2)}
-td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--fg2)}
-td:first-child{color:var(--fg);font-weight:500}
-tr:hover td{background:rgba(0,255,65,.03)}
-.section{padding:48px 0}
-.section h2{font-family:var(--mono);font-size:1.4rem;color:var(--green);margin-bottom:16px}
-.section p{color:var(--fg2);margin-bottom:16px}
-.verdict{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:32px;margin:40px 0}
-.verdict h2{color:var(--green);font-family:var(--mono);margin-bottom:16px}
-.verdict ul{list-style:none;padding:0}
-.verdict li{padding:8px 0;color:var(--fg2)}
-.verdict li::before{content:"→ ";color:var(--green)}
-.cta{text-align:center;padding:48px 0}
-.btn{display:inline-block;padding:12px 28px;background:var(--green);color:#000;font-weight:600;border-radius:6px;font-family:var(--mono);transition:all .2s}
-.btn:hover{background:var(--green2);text-decoration:none}
-@media(max-width:600px){.nav{gap:12px;padding:12px 16px;flex-wrap:wrap}.container{padding:0 16px}.hero{padding:56px 16px 24px}.hero h1{font-size:1.8rem}.fair,.verdict{padding:20px}}
-</style>
-<style id="skip-link-style">
-.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px var(--amc-font-sans);text-decoration:none}
-.skip-link:focus,.skip-link:focus-visible{left:12px}
-:where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
-</style>
+  <meta charset="UTF-8">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AMC and Promptfoo | Agent Maturity Compass</title>
+  <meta name="description" content="How Agent Maturity Compass and Promptfoo differ: Promptfoo tests prompts and model answers; AMC builds, runs and checks an agent that acts at work, with a signed record.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="canonical" href="https://agentmaturity.co/vs-promptfoo.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="AMC and Promptfoo | Agent Maturity Compass">
+  <meta property="og:description" content="How Agent Maturity Compass and Promptfoo differ: Promptfoo tests prompts and model answers; AMC builds, runs and checks an agent that acts at work, with a signed record.">
+  <meta property="og:url" content="https://agentmaturity.co/vs-promptfoo.html">
+  <meta property="og:image" content="https://agentmaturity.co/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="home.css?v=6">
+  <link rel="stylesheet" href="pages.css?v=1">
+  <link rel="stylesheet" href="docs-pages.css?v=1">
 </head>
 <body>
-<a href="#main-content" class="skip-link">Skip to content</a>
-<nav class="nav">
-<a href="index.html" class="logo">AMC</a>
-<a href="index.html">Home</a>
-<a href="compare.html">Compare</a>
-<a href="methodology.html">Methodology</a>
-<a href="docs/index.html">Docs</a>
-</nav>
-<div id="main-content" tabindex="-1"></div>
+  <a href="#main-content" class="skip-link">Skip to content</a>
 
-<div class="hero">
-<h1>AMC vs Promptfoo</h1>
-<p>Both tools help you test AI. They solve different problems. Here is how they differ.</p>
-</div>
+  <nav class="nav" aria-label="Main">
+    <div class="nav-inner">
+      <a href="./" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>
+      <ul class="nav-links">
+        <li><a href="./#a4-forge">Build an agent</a></li>
+        <li><a href="./#capabilities">Run it</a></li>
+        <li><a href="./#domains">Industries</a></li>
+        <li><a href="a4.html">A4 Forge</a></li>
+        <li><a href="docs/index.html">Docs</a></li>
+      </ul>
+      <div class="nav-right">
+        <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="nav-quiet">GitHub</a>
+        <a href="./#install" class="btn btn-primary btn-small">Get AMC</a>
+        <button class="nav-hamburger" aria-label="Menu" aria-controls="navMobile" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+  <div class="nav-mobile" id="navMobile">
+    <a href="./#a4-forge">Build an agent</a>
+    <a href="./#capabilities">Run it</a>
+    <a href="./#domains">Industries</a>
+    <a href="./#paths">Already have an agent?</a>
+    <a href="./#install">Get AMC</a>
+    <a href="./#desktop">macOS app</a>
+    <a href="./#pricing">Price</a>
+    <a href="a4.html">A4 Forge (preview)</a>
+    <a href="docs/index.html">Docs</a>
+    <a href="executive.html">For executives</a>
+    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
+  </div>
 
-<div class="container">
+  <span id="main-content" tabindex="-1"></span>
+  <main id="main">
+    <section class="page-hero">
+      <div class="wrap">
+        <p class="product-name">Compare</p>
+        <h1>AMC and Promptfoo</h1>
+        <p class="lede">Both help you test AI. Promptfoo is built for testing prompts and model answers. AMC is built for building, running and checking an agent that acts at work, with a signed record of what it did.</p>
+      </div>
+    </section>
 
-<div class="fair">
-<h3>⚖️ Fair comparison policy</h3>
-<p>Promptfoo is an established open-source tool for testing prompts and attacking AI apps. We respect their work. This page compares how the tools are built and what they are for.</p>
-</div>
+    <section class="band">
+      <div class="wrap"><div class="doc">
+        <div class="callout">
+          <strong>How we wrote this</strong>
+          <p>Promptfoo is an open-source tool, and we respect it. What this page says about AMC was checked against the AMC source. What it says about Promptfoo comes from its public description and was not re-checked for this page; read <a href="https://www.promptfoo.dev/docs/intro/" target="_blank" rel="noopener">Promptfoo's own documentation</a> before you decide.</p>
+        </div>
 
-<div class="section">
-<h2>At a glance</h2>
-<table>
-<tr><th>Dimension</th><th>AMC</th><th>Promptfoo</th></tr>
-<tr><td>Primary purpose</td><td>Watches an AI agent at work, keeps a signed record, and scores it</td><td>Eval & red-team harness for LLM apps</td></tr>
-<tr><td>Core question</td><td>"Does this agent's record support trusting it with this job?"</td><td>"Does this prompt/model produce correct output?"</td></tr>
-<tr><td>Evidence model</td><td>Signed records of what the agent actually did</td><td>Test pass/fail with LLM-as-judge grading</td></tr>
-<tr><td>Maturity model</td><td>L0-L5 across 5 dimensions (244 default questions, 264 with lifecycle expansion)</td><td>No maturity model — binary pass/fail per test</td></tr>
-<tr><td>Red teaming</td><td><!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs (sets of attack tests) + attacks that adapt as they run</td><td>134 plugins + strategy-based probes</td></tr>
-<tr><td>Compliance</td><td>Maps to EU AI Act, ISO 42001, NIST, SOC 2, OWASP + audit files. Does not certify legal compliance</td><td>OWASP LLM Top 10 coverage</td></tr>
-<tr><td>Framework support</td><td>16 adapters (no code changes)</td><td>30+ target types (config-driven)</td></tr>
-<tr><td>Governance</td><td>Rules for actions, approval steps, records of who handed work to whom</td><td>Not a focus</td></tr>
-<tr><td>Multi-agent</td><td>Oversight of several agents, handing trust between them, inventory</td><td>Single-target evaluation</td></tr>
-<tr><td>Evidence integrity</td><td>Ed25519 signatures + Merkle tree hash chains</td><td>JSON/CSV output files</td></tr>
-<tr><td>License</td><td>MIT</td><td>MIT</td></tr>
-<tr><td>Install</td><td><code>curl -fsSL https://agentmaturity.co/install.sh | sh</code></td><td><code>npx promptfoo@latest init</code></td></tr>
-</table>
-</div>
+        <h2>At a glance</h2>
+        <table>
+          <thead><tr><th>Question</th><th>AMC</th><th>Promptfoo (not verified)</th></tr></thead>
+          <tbody>
+            <tr><td>What it is for</td><td>Building an agent with sign-offs (A4 Forge), watching it at work, setting rules for it and scoring it from what it did</td><td>Testing prompts, models and LLM apps, including attack tests</td></tr>
+            <tr><td>The question it answers</td><td>"Does this agent's record support trusting it with this job?"</td><td>"Does this prompt or model give the answers I expect?"</td></tr>
+            <tr><td>What a result rests on</td><td>Records of what the agent did; the source of each record caps how high a question can score</td><td>Test results, graded by rules or by another model</td></tr>
+            <tr><td>Levels</td><td>L0 to L5 in five areas, 244 default questions (264 with lifecycle expansion); L2 is the highest level AMC gives today</td><td>Pass or fail per test</td></tr>
+            <tr><td>Attack tests</td><td><!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> registered assurance packs (sets of attack tests)</td><td>Red-team plugins and strategies</td></tr>
+            <tr><td>Frameworks</td><td>Lines records up with frameworks such as the EU AI Act, ISO/IEC 42001 and the NIST AI RMF. Does not certify compliance</td><td>Maps attack tests to lists such as the OWASP Top 10 for LLM Applications</td></tr>
+            <tr><td>Connecting an agent</td><td>16 built-in adapters, and hooks for Claude Code, Codex, Gemini CLI and pi</td><td>Many target types, set up in a config file</td></tr>
+            <tr><td>Records</td><td>Signed and linked to each other. A signature shows who wrote a record and that it is unchanged, not that it is true</td><td>Result files</td></tr>
+            <tr><td>Licence</td><td>MIT</td><td>Open source</td></tr>
+          </tbody>
+        </table>
+        <p class="scroll-hint">Swipe the table sideways to see every column.</p>
 
-<div class="section">
-<h2>Where Promptfoo is stronger</h2>
-<table>
-<tr><th>Capability</th><th>Details</th></tr>
-<tr><td>Prompt-level evaluation</td><td>Built for testing prompts across models. Comparison to known-good answers, A/B testing, moving to a new model. AMC does not test single prompts.</td></tr>
-<tr><td>Target variety</td><td>30+ target types including HTTP APIs, browser automation, direct model calls. Broader input surface than AMC's adapter approach.</td></tr>
-<tr><td>Research datasets</td><td>12 built-in attack datasets (HarmBench, BeaverTails, ToxicChat, etc.). AMC writes its own test cases instead of shipping outside datasets.</td></tr>
-<tr><td>LLM-as-judge</td><td>A mature system that uses an LLM to grade answers. Useful when quality is a matter of judgment.</td></tr>
-<tr><td>Community size</td><td>A larger ecosystem with more third-party integrations.</td></tr>
-</table>
-</div>
+        <h2>When to use which</h2>
+        <ul>
+          <li><strong>Use Promptfoo</strong> when you are tuning prompts, comparing model answers, or testing an LLM app that does not act on its own.</li>
+          <li><strong>Use AMC</strong> when an agent acts at work and you need a signed record of what it did, people's sign-off on how it was built, and records to line up against a framework.</li>
+          <li><strong>Use both</strong> when you want both. AMC can import Promptfoo results as self-reported records: <code>amc eval import --format promptfoo --file results.json</code>.</li>
+        </ul>
 
-<div class="section">
-<h2>Where AMC is stronger</h2>
-<table>
-<tr><th>Capability</th><th>Details</th></tr>
-<tr><td>Maturity model</td><td>L0–L5 scores across 5 areas show what to improve next. Promptfoo gives pass/fail per test, with no overall level.</td></tr>
-<tr><td>Evidence integrity</td><td>Signatures and hash chains (Ed25519 + Merkle trees) show if anyone changed a score. They show who signed it and that it is unchanged, not that it is true. Promptfoo results are unsigned JSON files.</td></tr>
-<tr><td>Compliance mapping</td><td>Builds audit files for EU AI Act, ISO 42001, NIST AI RMF, SOC 2, and links results to legal requirements. It does not certify legal compliance. Promptfoo maps to OWASP only.</td></tr>
-<tr><td>Agent governance</td><td>Rules for actions, approval steps, time-limited access, spending limits, records of who handed work to whom. Promptfoo does not cover this.</td></tr>
-<tr><td>Multi-agent fleet</td><td>Compare agents, track trust handed between them, find the agents you run. Promptfoo tests one target at a time.</td></tr>
-<tr><td>Industry packs</td><td>41 industry question sets (healthcare/HIPAA, finance/MiFID II, education/FERPA, logistics/warehouse reliability), experimental and AI-drafted until a named expert signs them. Promptfoo has some industry plugins but fewer legal mappings.</td></tr>
-<tr><td>Transparent proxy</td><td>A gateway sees what the agent does without code changes. Those records count for more than self-reported test results.</td></tr>
-</table>
-</div>
+        <div class="cta-row">
+          <a href="./#install" class="btn btn-primary">Get AMC</a>
+          <a href="compare.html" class="btn btn-ghost">Compare other ways to check an agent</a>
+        </div>
+      </div></div>
+    </section>
+  </main>
 
-<div class="verdict">
-<h2>When to use which</h2>
-<ul>
-<li><strong>Use Promptfoo</strong> when you are tuning prompts, comparing model answers, or building tests for an LLM app that does not act on its own.</li>
-<li><strong>Use AMC</strong> when you need a signed record of what an agent did, files for a compliance review, and a level that shows what to fix.</li>
-<li><strong>Use both</strong> when you want prompt quality (Promptfoo) and an agent-level score (AMC). AMC can import Promptfoo eval results via <code>amc eval import --format promptfoo</code>.</li>
-</ul>
-</div>
+  <footer class="footer">
+    <div class="footer-inner wrap">
+      <div class="footer-top">
+        <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p></div>
+        <div class="footer-col"><h2>Product</h2><a href="./#a4-forge">Build an agent</a><a href="./#capabilities">Run it</a><a href="./#paths">Already have an agent?</a><a href="./#install">Get AMC</a><a href="./#desktop">macOS app</a><a href="./#products">Eight tools</a><a href="executive.html">Executives</a><a href="playground.html">Playground</a><a href="docs/index.html">Documentation</a></div>
+        <div class="footer-col"><h2>Depth</h2><a href="a4.html">A4 Forge</a><a href="methodology.html">Approach and research</a><a href="compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="./#pricing">Price</a><a href="./#faq">FAQ</a></div>
+        <div class="footer-col"><h2>Industry Packs</h2><a href="./#domains">All packs</a><a href="station-environment.html">Environment</a><a href="station-health.html">Health</a><a href="station-wealth.html">Wealth</a><a href="station-education.html">Education</a><a href="station-mobility.html">Mobility</a><a href="station-technology.html">Technology</a><a href="station-governance.html">Governance</a></div>
+        <div class="footer-col"><h2>Code</h2><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="accessibility.html">Accessibility</a></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
+    </div>
+  </footer>
 
-<div class="cta">
-<p style="color:var(--fg2);margin-bottom:16px">Try AMC — no account required</p>
-<a href="docs/#GETTING_STARTED" class="btn">install verified AMC -&gt;</a>
-</div>
-
-</div>
+  <script src="script.js?v=13"></script>
+  <script src="home.js?v=3"></script>
+  <script src="pages.js?v=2"></script>
 </body>
 </html>

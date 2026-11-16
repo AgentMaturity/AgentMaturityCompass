@@ -191,6 +191,14 @@ describe("envelope adapters", () => {
     expect(envelope.statusDimensions.result).toBe("not_evaluated");
   });
 
+  // CLI-08: sample answers that leave every layer at L0 printed "Result: pass".
+  test("a self-assessment whose weakest answer is L0 does not pass", () => {
+    const envelope = envelopeForSelfAssessment({ producer: "questionnaire", answers: [2, 2, 0], now: NOW });
+    expect(envelope.statusDimensions.result).not.toBe("pass");
+    const answered = envelopeForSelfAssessment({ producer: "questionnaire", answers: [2, 2, 1], now: NOW });
+    expect(answered.statusDimensions.result).toBe("pass");
+  });
+
   test("synthetic examples are labelled and carry no level", () => {
     const envelope = envelopeForSyntheticExample({ producer: "example-mode", now: NOW });
     expect(envelope.claimKind).toBe("synthetic_example");

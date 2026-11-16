@@ -1,4 +1,9 @@
+import { spawnSync } from "node:child_process";
+import { existsSync } from "node:fs";
 import { createServer } from "node:net";
+import { isAbsolute } from "node:path";
+import { escapeTerminalControls } from "../tools/builtin/askUserTool.js";
+import { readStudioState } from "./studioState.js";
 
 /**
  * Start and stop orchestration for runStudioForeground (LIVE-RUNTIME-02, -03, -10), kept out of the supervisor so it
@@ -7,7 +12,49 @@ import { createServer } from "node:net";
 
 const addressInUse = (error: unknown): boolean => String(error).includes("EADDRINUSE");
 
+/**
+ * Who holds `port`: `{ folder }` when it is this user's AMC Studio daemon (`amc up` starts `<node> cli.js _studio-daemon
+ * --workspace <folder>`) and that folder's own .amc/studio/state.json names the same pid; `"studio"` when a Studio
+ * daemon holds it but that cannot be confirmed; null when no Studio listens there or the system cannot say. Any local
+ * process can write a command line, so the folder is named only after the uid, the folder (absolute, existing, no
+ * control characters) and AMC's own state agree.
+ */
+export function studioFolderOnPort(port: number): { folder: string } | "studio" | null {
+  const run = (cmd: string, args: string[]): string => {
+    const out = spawnSync(cmd, args, { encoding: "utf8", timeout: 5_000 });
+    return out.status === 0 ? out.stdout : "";
+  };
+  if (process.platform === "win32" || typeof process.getuid !== "function") return null;
+  let sawStudio = false;
+  for (const pid of run("lsof", ["-nP", `-iTCP:${port}`, "-sTCP:LISTEN", "-t"]).split(/\s+/).filter(Boolean)) {
+    const line = /^\s*(\d+)\s.*?\s_studio-daemon\s+--workspace\s+(.+?)(?:\s+--[a-z]|\s*$)/
+      .exec(run("ps", ["-ww", "-o", "uid=,command=", "-p", pid]));
+    if (!line) continue;
+    sawStudio = true;
+    const [, uid, folder = ""] = line;
+    if (Number(uid) !== process.getuid() || !isAbsolute(folder) || /[\x00-\x1f\x7f-\x9f]/.test(folder) || !existsSync(folder)) continue;
+    let statePid: unknown = null;
+    try { statePid = readStudioState(folder)?.pid; } catch { /* unreadable state confirms nothing */ }
+    if (statePid === Number(pid)) return { folder };
+  }
+  return sawStudio ? "studio" : null;
+}
+
+/** A folder as a shell word a person can paste: single quotes, with any single quote inside closed and escaped. */
+const shellQuoted = (text: string): string => `'${text.replace(/'/g, "'\\''")}'`;
+
 function portInUseError(port: number, source: string): Error {
+  // CLI-31: name the AMC folder that holds the port, so the person knows where to run amc down.
+  const holder = studioFolderOnPort(port);
+  if (holder && holder !== "studio") {
+    const folder = escapeTerminalControls(holder.folder);
+    return new Error(`Port ${port} (from ${source}) is already in use by AMC Studio for the folder ${folder}. `
+      + `Stop it there (cd ${escapeTerminalControls(shellQuoted(holder.folder))}, then amc down), or change the port.`);
+  }
+  if (holder === "studio") {
+    return new Error(`Port ${port} (from ${source}) is already in use by another AMC Studio. `
+      + "Stop it in its own folder with amc down, or change the port.");
+  }
   return new Error(`Port ${port} (from ${source}) is already in use. Stop the other process or change the port.${source.startsWith("the default")
     ? " Another AMC folder may be running: stop it there with amc down, or give this folder its own ports." : ""}`);
 }

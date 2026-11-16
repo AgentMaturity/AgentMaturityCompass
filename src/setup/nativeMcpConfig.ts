@@ -120,6 +120,9 @@ export function loadNativeMcpConfiguration(path: string, expectedSha256?: string
     return refuse("MCP config requires schemaVersion 1 and one explicit server; unsupported fields are refused.");
   }
   const server = value.server;
+  if (Object.hasOwn(server, "expectedCatalogDigest") || Object.hasOwn(server, "grants")) {
+    return refuse("MCP expectedCatalogDigest and grants belong at the top level of the file, next to \"server\", not inside it.");
+  }
   if (typeof server.id !== "string" || !/^[a-zA-Z0-9_-]{1,32}$/.test(server.id)) return refuse("MCP server requires a supported explicit id.");
   if (server.timeoutMs !== undefined && (typeof server.timeoutMs !== "number" || !Number.isSafeInteger(server.timeoutMs) || server.timeoutMs < 1 || server.timeoutMs > 300_000)) {
     return refuse("MCP server timeoutMs must be an integer from 1 through 300000.");

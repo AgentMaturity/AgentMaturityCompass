@@ -1,7 +1,10 @@
 // The console's page scripts all import this module, so the shared shell (nav, status, banner) and the focusable-scroll
 // fix reach their pages from here.
 import "./shell.js";
+import { renderNavSession, showShellNotice } from "./shell.js";
 import "./focusableScroll.js";
+import { trackRequest } from "./actionFeedback.js";
+import { plainErrorText } from "./plainError.js";
 
 const state = {
   adminToken: null,
@@ -103,17 +106,47 @@ export class ConsoleApiError extends Error {
     this.code = code;
     this.data = data;
   }
+
+  /** Shown wherever a page prints the error: plain words, never the class name or a server code (C-10). */
+  toString() {
+    return plainErrorText(this);
+  }
 }
 
 async function request(path, options) {
-  const response = await fetch(withBase(path), {
-    method: options?.method || "GET",
-    credentials: "include",
-    signal: options?.signal,
-    cache: options?.cache,
-    headers: buildHeaders(options?.headers),
-    body: options?.body ? JSON.stringify(options.body) : undefined
-  });
+  const finished = trackRequest();
+  try {
+    const result = await requestOnce(path, options);
+    finished(result.ok !== false);
+    return result;
+  } catch (error) {
+    finished(false);
+    throw error;
+  }
+}
+
+async function requestOnce(path, options) {
+  let response;
+  try {
+    response = await fetch(withBase(path), {
+      method: options?.method || "GET",
+      credentials: "include",
+      signal: options?.signal,
+      cache: options?.cache,
+      headers: buildHeaders(options?.headers),
+      body: options?.body ? JSON.stringify(options.body) : undefined
+    });
+  } catch (error) {
+    // No answer at all: AMC stopped or the network is gone. One shared notice says so (C-06); the caller still sees the error.
+    if (error?.name !== "AbortError") showShellNotice("offline");
+    throw error;
+  }
+  // A session that ended mid-visit: one sign-in prompt instead of each page's own error (C-11). /auth/me asks on purpose.
+  if (response.status === 401 && !options?.allowAuthErrors && state.me !== null) {
+    state.me = null;
+    showShellNotice("signedOut");
+    renderNavSession(document, null);
+  }
   const text = await response.text();
   let parsed;
   try { parsed = text ? JSON.parse(text) : {}; }
@@ -187,11 +220,13 @@ export async function whoami() {
   const result = await request("/auth/me", {
     allowAuthErrors: true
   });
-  if (!result.ok) {
-    state.me = null;
-    return null;
+  const body = typeof document === "undefined" ? null : document.body;
+  state.me = result.ok ? result.data : null;
+  if (body && !result.ok && !getAdminToken()) body.dataset.session = "none";
+  if (body && result.ok) delete body.dataset.session;
+  if (typeof document !== "undefined") {
+    renderNavSession(document, state.me, () => logout().then(() => window.location.assign("./login"), () => window.location.assign("./login")));
   }
-  state.me = result.data;
   return state.me;
 }
 

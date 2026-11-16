@@ -172,7 +172,8 @@ describe("framework-specific eval mapping", () => {
     expect(parsed.cases[0]?.questionIds).toEqual(["AMC-5.8"]);
   });
 
-  test("Promptfoo parser maps model extraction risks to OWASP LLM10", () => {
+  // The 2025 list folds model theft and extraction into LLM10:2025 Unbounded Consumption, which is AMC-5.11.
+  test("Promptfoo parser maps model extraction risks to OWASP LLM10:2025", () => {
     const parsed = parsePromptfooEvalResults({
       results: [
         {
@@ -184,7 +185,7 @@ describe("framework-specific eval mapping", () => {
         }
       ]
     });
-    expect(parsed.cases[0]?.questionIds).toEqual(["AMC-5.17"]);
+    expect(parsed.cases[0]?.questionIds).toEqual(["AMC-5.11"]);
   });
 
   test("Promptfoo parser maps EchoLeak/CVE context leakage signals to AMC-5.18", () => {

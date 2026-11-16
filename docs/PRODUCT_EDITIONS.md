@@ -14,7 +14,7 @@ Industry Packs are free in the current source build (unreleased; the next releas
 | Product | Free / Open Source | Enterprise (contact-first, planned) |
 |---|---|---|
 | **Score** | ✅ Full | ✅ Full |
-| **Shield** (<!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs) | ✅ Full | ✅ Full |
+| **Shield** (<!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> registered assurance packs) | ✅ Full | ✅ Full |
 | **Enforce** | ✅ Full | ✅ Full |
 | **Vault** | ✅ Full | ✅ Full |
 | **Watch** | ✅ Full | ✅ Full |
@@ -22,7 +22,7 @@ Industry Packs are free in the current source build (unreleased; the next releas
 | **Passport** | ✅ Full | ✅ Full |
 | **Comply** | ✅ Full | ✅ Full |
 | **All <!-- amc:count:adapters -->16<!-- /amc:count --> adapters** | ✅ Full | ✅ Full |
-| **1,304 CLI command paths** | ✅ Full | ✅ Full |
+| **1,302 CLI command paths** | ✅ Full | ✅ Full |
 | **Browser playground** | ✅ Full | ✅ Full |
 | **CI trust gates** | ✅ Full | ✅ Full |
 | **Industry Packs** (41 packs, 7 stations) | ✅ All 41 packs | ✅ All 41 packs |

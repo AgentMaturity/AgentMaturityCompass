@@ -54,7 +54,8 @@ export async function handleSecurityRoute(
       const tracker = new TaintTracker();
       tracker.markTainted(body.input, body.input, body.source ?? 'api');
       const result = tracker.check(body.input);
-      apiSuccess(res, { input: body.input, tainted: !!result, details: result ?? null });
+      apiSuccess(res, { input: body.input, tainted: !!result, details: result ?? null, enforced: false,
+        note: 'Demo only: no AMC decision reads this result. The untrusted-input guard (guardrails profile untrusted-input-guard) is the enforced one.' });
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Taint tracking failed');
     }

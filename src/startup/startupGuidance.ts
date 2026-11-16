@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { dirname, join } from "node:path";
 
 import { getQuestionsForTier } from "../diagnostic/quickScore.js";
+import { localVaultPassphrasePath } from "../vault/localPassphrase.js";
 
 export type StartupRole = "founder" | "cto" | "developer" | "operator";
 
@@ -104,7 +105,7 @@ function detectFramework(workspace: string, explicit?: string): string {
   return "generic agent";
 }
 
-function hasAnyRun(workspace: string): boolean {
+export function hasAnyRun(workspace: string): boolean {
   const flatRunsDir = join(workspace, ".amc", "runs");
   if (existsSync(flatRunsDir) && readdirSync(flatRunsDir).some((file) => file.endsWith(".json"))) {
     return true;
@@ -134,7 +135,9 @@ export function buildStartupGuidancePlan(input: StartupGuidanceInput): StartupGu
   const hasWorkspace = existsSync(join(input.workspace, ".amc", "amc.config.yaml"));
   const hasSampleAnswers = existsSync(join(input.workspace, sampleAnswersPath));
   const hasRuns = hasAnyRun(input.workspace);
-  const hasVaultPassphrase = Boolean(env.AMC_VAULT_PASSPHRASE);
+  // A file named by AMC_VAULT_PASSPHRASE_FILE counts, and so does the passphrase a folder set up by bare `amc` keeps.
+  const hasVaultPassphrase = Boolean(env.AMC_VAULT_PASSPHRASE || env.AMC_VAULT_PASSPHRASE_FILE?.trim())
+    || existsSync(localVaultPassphrasePath(input.workspace));
   const detectedFramework = detectFramework(input.workspace, input.framework);
   const issues: StartupIssue[] = [];
 
@@ -171,7 +174,7 @@ export function buildStartupGuidancePlan(input: StartupGuidanceInput): StartupGu
       severity: "info",
       title: "Vault passphrase is not set in the environment",
       whyItMatters: "Unsigned startup checks work, but signed evidence capture needs an explicit secret outside source control.",
-      fixCommand: "export AMC_VAULT_PASSPHRASE='replace-with-a-secret'"
+      fixCommand: "put your vault passphrase in a file only you can read, then set AMC_VAULT_PASSPHRASE_FILE to that file's path"
     });
   }
 
@@ -222,6 +225,17 @@ export function writeStartupSampleAnswers(path: string, answers: Record<string, 
   writeFileSync(path, `${JSON.stringify(answers, null, 2)}\n`, "utf8");
 }
 
+/** The next commands, leaving out set-up steps the check found already done (an initialized folder, an answer file). */
+function nextCommands(plan: StartupGuidancePlan): string[] {
+  const open = new Set(plan.issues.map((issue) => issue.id));
+  return [
+    ...(open.has("workspace_missing") ? [plan.commands.initialize] : []),
+    ...(open.has("sample_answers_missing") ? [plan.commands.writeAnswers] : []),
+    plan.commands.scoreFromAnswers,
+    plan.commands.generateGuardrails
+  ];
+}
+
 function renderIssue(issue: StartupIssue): string {
   return `- [${issue.severity}] ${issue.title}\n  Why: ${issue.whyItMatters}\n  Fix: ${issue.fixCommand}`;
 }
@@ -244,10 +258,7 @@ export function renderStartupGuidancePlan(plan: StartupGuidancePlan, opts: { onl
       "",
       "## Fastest Next Commands",
       "",
-      `1. ${plan.commands.initialize}`,
-      `2. ${plan.commands.writeAnswers}`,
-      `3. ${plan.commands.scoreFromAnswers}`,
-      `4. ${plan.commands.generateGuardrails}`
+      ...nextCommands(plan).map((command, index) => `${index + 1}. ${command}`)
     ].join("\n");
   }
 

@@ -4,6 +4,8 @@ import { runDiagnostic } from "../runner.js";
 import { resolveAgentId } from "../../fleet/paths.js";
 import { createAgentTransformPlanForApi, createAgentTransformPlanForApiAsync } from "../../transformation/transformApi.js";
 import { deriveAutoAnswerResults } from "./autoAnswerEvidenceQueries.js";
+import { latestDisplayRun } from "../runReportResolution.js";
+import { UnverifiedRecordError } from "../../utils/unverifiedRecordError.js";
 import type { DiagnosticReport } from "../../types.js";
 
 export interface AutoAnswerOutput {
@@ -44,7 +46,6 @@ export async function runAutoAnswer(params: {
     targetName: params.targetName ?? "default",
     claimMode: "auto"
   }, undefined, { ...options, beforePublish });
-  const derived = deriveAutoAnswerResults(report);
   let planId: string | null = null;
   let next3Tasks: string[] = [];
   let created = false;
@@ -57,6 +58,11 @@ export async function runAutoAnswer(params: {
       completedPlan = planned.plan.planId; beforePublish(); planId = completedPlan; next3Tasks = [...planned.plan.summary.next3Tasks]; created = true;
     } catch (cause) { runReportFailure([`diagnostic-run:${report.runId}`, ...(completedPlan === null ? [] : [`transform-plan:${completedPlan}`])], "auto-answer-transform-plan", cause); }
   }
+  return autoAnswerOutput(agentId, report, { created, planId, next3Tasks });
+}
+
+function autoAnswerOutput(agentId: string, report: DiagnosticReport, transformPlan: AutoAnswerOutput["transformPlan"]): AutoAnswerOutput {
+  const derived = deriveAutoAnswerResults(report);
   return {
     agentId,
     runId: report.runId,
@@ -71,10 +77,17 @@ export async function runAutoAnswer(params: {
     trustLabel: report.trustLabel,
     evidenceTrustCoverage: report.evidenceTrustCoverage,
     reportStatus: report.status,
-    transformPlan: {
-      created,
-      planId,
-      next3Tasks
-    }
+    transformPlan
   };
+}
+
+/**
+ * The auto-answer view of the agent's latest recorded run, for reading only: it runs nothing and writes nothing. Null
+ * when there is no run yet. A run whose seal does not verify (edited or unsigned) is refused, never shown as trusted.
+ */
+export function autoAnswerFromLatestRun(workspace: string, agentId?: string): AutoAnswerOutput | null {
+  const resolved = resolveAgentId(workspace, agentId), latest = latestDisplayRun(workspace, resolved);
+  if (!latest) return null;
+  if (!latest.verified) throw new UnverifiedRecordError("RUN_UNVERIFIED", "The latest score record does not pass its signature check, so it is not shown. Run a new score.");
+  return autoAnswerOutput(resolved, latest.report, { created: false, planId: null, next3Tasks: [] });
 }

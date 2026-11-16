@@ -54,6 +54,12 @@ export const GUARDRAIL_PROFILES: GuardrailProfile[] = [
     description: "SOC2/PCI-aligned guardrails for financial AI agents",
     guardrails: ["prompt-injection-detection", "pii-redaction", "data-exfiltration-guard", "rate-limiter", "audit-trail-enforcer", "cost-budget-limit", "tool-call-allowlist", "compliance-boundary", "credential-rotation"],
   },
+  {
+    // Not a set of guardrails: it switches the untrusted-input guard (untrustedInputGuard.ts) and leaves every other request as it is.
+    name: "untrusted-input-guard",
+    description: "Ask before risky actions after the agent reads untrusted content (Claude Code and Gemini CLI hooks in control mode)",
+    guardrails: [],
+  },
 ];
 
 export interface GuardrailState {

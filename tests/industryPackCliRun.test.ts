@@ -62,7 +62,8 @@ test("amc domain pack run shows every question and level text in full", async ()
       expect.objectContaining({ name: `L2 — ${q.l2 ?? "between L1 and L3"}`, short: "L2", value: 2 }),
       expect.objectContaining({ name: `L3 — ${q.l3}`, short: "L3", value: 3 }),
       expect.objectContaining({ name: `L4 — ${q.l4 ?? "between L3 and L5"}`, short: "L4", value: 4 }),
-      expect.objectContaining({ name: `L5 — ${q.l5}`, short: "L5", value: 5 })
+      expect.objectContaining({ name: `L5 — ${q.l5}`, short: "L5", value: 5 }),
+      expect.objectContaining({ short: "skipped", value: 0 }) // CLI-29: a question can be left unanswered
     ]);
     // Wrapped choices must fit one page, or inquirer cuts the wrapped lines off.
     expect(question.pageSize).toBeGreaterThan(7);

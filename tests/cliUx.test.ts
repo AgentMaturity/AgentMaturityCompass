@@ -8,6 +8,7 @@ import {
   buildCommandInventory,
   cliDiscoverabilityFooter,
   flattenCommandPaths,
+  generateCompletionScript,
   parseUnknownCommandToken,
   renderCommandInventoryMarkdown,
   suggestCommandPaths
@@ -111,16 +112,59 @@ describe("the built CLI with an unknown top-level command (run `npm run build` f
     if (suggestion) expect(result.stderr).toContain(`amc ${suggestion}`);
   });
 
-  it.each([["evidence", "verify"], ["verify", "all"], ["vault", "unlock"]])("amc %s %s in a directory with no workspace says so and names amc init", (...args) => {
-    const result = amc(...args);
-    expect(result.status).toBe(1);
-    expect(result.stderr).toContain("No AMC workspace here");
-    expect(result.stderr).toContain("amc init");
-  });
+  // CLI-16: verify, user init and connect gave "FAILED", "Vault locked" and a raw "Gateway config not found" here.
+  it.each([["evidence", "verify"], ["verify", "all"], ["vault", "unlock"], ["verify"], ["user", "init"], ["connect", "--mode", "supervise"]])(
+    "amc %s %s in a directory with no workspace says so and names amc", (...args) => {
+      const result = amc(...args);
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain("No AMC workspace here");
+      expect(result.stderr).toContain("run amc in this folder");
+      expect(result.stderr).not.toMatch(/FAILED|Vault locked|Gateway config not found/);
+    });
 
   it("amc version suggests --version", () => {
     const result = amc("version");
     expect(result.status).not.toBe(0);
     expect(result.stderr).toContain("amc --version");
+  });
+});
+
+describe("shell completion scripts", () => {
+  const paths = ["adapters list", "adapters run", "run", "adapters", "run"];
+
+  it("bash completes top-level commands and the children of the typed parent", () => {
+    const script = generateCompletionScript("bash", paths);
+    expect(script).toContain("complete -F _amc_complete amc");
+    const complete = (...words: string[]) => {
+      const program = `${script}\nCOMP_WORDS=(${words.map((word) => `'${word}'`).join(" ")}); COMP_CWORD=${words.length - 1}; _amc_complete; printf '%s\\n' "\${COMPREPLY[@]}"`;
+      const result = spawnSync("bash", ["-c", program], { encoding: "utf8" });
+      expect(result.status, result.stderr).toBe(0);
+      return result.stdout.split("\n").filter(Boolean).sort();
+    };
+    expect(complete("amc", "")).toEqual(["adapters", "run"]);
+    expect(complete("amc", "adapters", "r")).toEqual(["run"]);
+    expect(complete("amc", "adapters", "")).toEqual(["list", "run"]);
+    expect(complete("amc", "nothing", "")).toEqual([]);
+  });
+
+  it("zsh lists each command path once under compdef", () => {
+    const script = generateCompletionScript("zsh", paths);
+    expect(script.startsWith("#compdef amc")).toBe(true);
+    expect(script).toContain("compdef _amc_complete amc");
+    const listed = script.split("<<'__AMC_COMMANDS__'\n")[1]!.split("\n__AMC_COMMANDS__")[0]!.split("\n");
+    expect(listed).toEqual(["adapters", "adapters list", "adapters run", "run"]);
+  });
+
+  it("fish completes top-level commands and each parent's children", () => {
+    expect(generateCompletionScript("fish", [...paths, "", "adapters run fast"]).split("\n")).toEqual([
+      'complete -c amc -f -a "adapters run"',
+      'complete -c amc -f -n "__fish_seen_subcommand_from adapters" -a "list run"',
+      'complete -c amc -f -n "__fish_seen_subcommand_from adapters run" -a "fast"'
+    ]);
+  });
+
+  it("suggestions handle an empty query and an empty candidate", () => {
+    expect(suggestCommandPaths("  ", ["run"])).toEqual([]);
+    expect(suggestCommandPaths("ru", ["", "run", "rub", "ra"]).slice(0, 3)).toEqual(["rub", "run", "ra"]);
   });
 });

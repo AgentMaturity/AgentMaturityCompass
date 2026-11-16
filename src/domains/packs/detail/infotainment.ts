@@ -36,7 +36,7 @@ export const infotainmentDetail: PackQuestionDetail = {
   },
   "TECH-INF-4": {
     l2: "Uploaded content is hash-matched, but generated content and press snippets are never checked.",
-    l4: "Upload filters, press-publisher rights and training licence records exist, but generated outputs are not checked for originality.",
+    l4: "Art. 17 notified-work measures, press-publisher rights and training licence records exist, but generated outputs are not checked for originality.",
     evidence: ["generated_content_similarity_check", "press_publisher_licence_register", "training_data_licence_record"],
     remediation:
       "Run a similarity check of generated text, images and audio against the reference catalogue before " +

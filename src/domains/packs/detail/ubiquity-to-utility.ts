@@ -91,7 +91,7 @@ export const ubiquityToUtilityDetail: PackQuestionDetail = {
     l4: "Each change has a recorded ride-through check with approver, but changes that alter ride-through capability are not held for engineering review",
     evidence: ["ibr_change_record", "ride_through_settings_check", "engineering_review_hold_log"],
     remediation:
-      "Compare every proposed IBR setting or firmware change with the PRC-029-1 ride-through settings and hold changes that alter them for engineering review.",
+      "Compare every proposed IBR setting or firmware change with the PRC-029-2 ride-through requirements and hold changes that would breach them for engineering review.",
     failureMode:
       "The agent pushes inverter firmware that tightens voltage trip settings, so the plant trips on a fault its ride-through settings were meant to " +
       "withstand.",

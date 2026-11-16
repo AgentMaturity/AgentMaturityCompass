@@ -8,8 +8,12 @@
  */
 import type { CompiledPlan, PlanDiff } from "../../catalog/compiler/types.js";
 import { digestOf } from "../../catalog/digest.js";
+import { defaultCatalogRoot, parseWith, parseYaml } from "../../catalog/loader.js";
+import { vocabularySchema, type CatalogIssue } from "../../catalog/schema.js";
 import type { CatalogLockfile } from "../../catalog/lockfile.js";
 import { A4_STEPS } from "../../contracts/v1/a4Project.js";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { STATIONS } from "../../domains/stations.js";
 import {
   gateStatus, isRegulated, latestGate, LIFECYCLE_BRIDGE, pendingReviews, PLAN_ACTIVATION_DEFERRED, proposeNextAction, readinessItemBuilders, type A4ReadinessItem,
@@ -98,6 +102,28 @@ export function carriedValues(state: Pick<A4ReadinessState, "revisions">): Map<s
   return carriedValuesOf(state, CARRIED);
 }
 
+/** The catalog vocabulary list each fact asked here takes its terms from (src/catalog/predicate.ts FACT_TERMS). */
+const VOCABULARY_OF = { jurisdictions: "jurisdictions", domains: "domains", roles: "roles", entityTypes: "entityTypes", riskClass: "riskClasses",
+  useCases: "useCases", dataClasses: "dataClasses" } as const;
+let vocabularyCache: Record<keyof typeof VOCABULARY_OF, string[]> | null | undefined;
+/**
+ * The terms the shipped catalog knows for each fact Adapt asks (catalog/vocabulary.yaml), so a member picks from a list
+ * instead of guessing; null when the file does not read (then only the term shape is checked). A term outside the list
+ * matches no catalog record, so it is refused rather than silently compiling to nothing.
+ */
+export function catalogTerms(): Record<keyof typeof VOCABULARY_OF, string[]> | null {
+  if (vocabularyCache !== undefined) return vocabularyCache;
+  try {
+    const issues: CatalogIssue[] = [];
+    const vocabulary = parseWith(vocabularySchema, parseYaml(readFileSync(join(defaultCatalogRoot(), "vocabulary.yaml"), "utf8"), "vocabulary.yaml", issues), "vocabulary.yaml", issues);
+    vocabularyCache = vocabulary === null ? null
+      : Object.fromEntries(Object.entries(VOCABULARY_OF).map(([fact, list]) => [fact, [...vocabulary[list]]])) as Record<keyof typeof VOCABULARY_OF, string[]>;
+  } catch {
+    vocabularyCache = null;
+  }
+  return vocabularyCache;
+}
+
 const TERM = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$/;
 const MAX_TERMS = 64;
 const unknown = (entry: string): boolean => entry.toLowerCase() === "unknown";
@@ -131,6 +157,10 @@ export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<st
     const value = factAnswer(answers, fact)?.value;
     const terms = FACTS[fact] === "list" ? factList(value) ?? [] : [factTerm(value)].filter((term): term is string => term !== null);
     if (terms.length > MAX_TERMS || terms.some((term) => !TERM.test(term))) return true;
+    // A term the member typed for this fact must be one the catalog knows (a jurisdiction carried from Aspire's markets is
+    // not checked here: it is changed at Aspire).
+    const known = fact in VOCABULARY_OF && factAnswer(answers, fact)?.questionId === fact ? catalogTerms()?.[fact as keyof typeof VOCABULARY_OF] : undefined;
+    if (known !== undefined && terms.some((term) => !known.includes(term))) return true;
     if (fact === "stations") return terms.some((term) => !(STATIONS as readonly string[]).includes(term));
     return fact === "primaryStation" && terms.length > 0 && !(factList(values.get("stations")) ?? []).includes(terms[0]!);
   });
@@ -298,7 +328,7 @@ function planItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Recor
       : waiting("plan_unresolved", ["PLAN_MISSING_FACTS", ...mandatory.slice(0, 32).map((row) => `UNRESOLVED:${row.controlId}`),
         ...(regulated ? ["REGULATED_READY_PLAN_ONLY"] : settled.length > 0 ? ["OWNER_OUT_OF_SCOPE", "KEY:P2-24"] : [])], { kind: "review_pending",
         nextAction: { label: regulated ? "A regulated project activates only a ready plan: answer the missing facts"
-          : "Answer the missing facts, or an owner records the unresolved requirements out of scope with a reason (Acknowledge); they stay unresolved (a true exception is P2-24)" } }),
+          : "Answer the missing facts under Ask, or a project owner marks the unresolved requirements out of scope with a reason (Acknowledge); they stay unresolved in the record" } }),
     lockMoved ? item("plan_lock_drift", "BLOCKED", { kind: "scope_changed", reasonCodes: ["PLAN_LOCK_DRIFT", "RESOURCE_DRIFTED"],
       nextAction: { label: "catalog lock changed: the plan was compiled against another catalog; run Understand again (reopen Adapt once past it)" } })
       : item("plan_lock_drift", "READY")
@@ -391,9 +421,10 @@ function signingItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Re
     conformance === null ? waiting("conformance_statement", ["PRODUCED_AT_REVIEW"], { mandatory: reached(state, "built") })
       : item("conformance_statement", "READY", { reasonCodes: ["pass", "fail", "not_evaluated", "not_applicable", "unresolved"]
         .map((key) => `${key.toUpperCase()}:${Number(counts[key]) || 0}`) }),
-    // Opened, not decided: the engine request's own status is the card's to read (REVIEW_STATUS_NOT_READ).
+    // Opened: the engine request's own status as Studio read it (APPROVAL_STATUS, as Assemble's effect_gate), REVIEW_STATUS_NOT_READ when unread.
     opened !== undefined && typeof opened.body.requestDigestSha256 === "string"
-      ? item("plan_review_opened", "READY", { section: "governance", mandatory: false, reasonCodes: ["EFFECT_GATE_OPENED", "REVIEW_STATUS_NOT_READ",
+      ? item("plan_review_opened", "READY", { section: "governance", mandatory: false, reasonCodes: ["EFFECT_GATE_OPENED",
+        query.live.engineRequests?.[String(opened.body.approvalRequestId)] ? `APPROVAL_STATUS:${query.live.engineRequests[String(opened.body.approvalRequestId)]}` : "REVIEW_STATUS_NOT_READ",
         `APPROVAL_REQUEST:${String(opened.body.approvalRequestId)}:${opened.body.requestDigestSha256}`, `GATE:${String(opened.body.gateId)}`] })
       : item("plan_review_opened", "WAITING", { kind: "review_pending", section: "governance", mandatory: false, reasonCodes: ["EFFECT_GATE_NOT_OPEN"],
         nextAction: { label: `Once the completion gate has its quorum, an owner opens ${ACTIVATE_PLAN_EFFECT_ID}: a second, separately decided plan review` } }),
@@ -476,8 +507,8 @@ function lockoutItem(state: A4ReadinessState, query: A4ReadinessQuery, regulated
   const codes = [active ? "PLAN_ACTIVE" : "PLAN_ACTIVATED_AT_COMPLETION", "PLAN_DENIES_NATIVE_SESSION", `NATIVE_TASK_LEASE:${NATIVE_LEASE_KEY}`,
     `RUN_LEASE:${RUN_LEASE_KEY}`, "PRE_ACTIVATION_SESSIONS_DENIED", "DELEGATED_CHILDREN_INHERIT_LEASE", "PRINCIPAL_REQUIRED", "NON_LOCAL_USER_SESSIONS_DENIED"];
   const denied = "tasks started before it carry none and are denied every call; a task whose signed-in principal is not an active local users.yaml user "
-    + "(a workspace-router session or the admin token included) is refused at start, 409 PRINCIPAL_UNRESOLVED (P1-78), and so is a run whose OS account "
-    + "is not one, PRINCIPAL_UNRESOLVED before its session opens or a delegated child starts (P1-79)";
+    + "(a workspace-router session or the admin token included) is refused at start, 409 PRINCIPAL_UNRESOLVED, and so is a run whose OS account "
+    + "is not one, PRINCIPAL_UNRESOLVED before its session opens or a delegated child starts";
   const vault = query.live.vaultUnlocked;
   if (active && vault !== true) {
     return item("adapt.plan.nativeSessionsAllowed", vault === null ? "NOT_EVALUATED" : "WAITING", { section: "governance", mandatory: false,
@@ -487,9 +518,9 @@ function lockoutItem(state: A4ReadinessState, query: A4ReadinessQuery, regulated
         + `which this item does not read; ${denied}` } });
   }
   return item("adapt.plan.nativeSessionsAllowed", "READY", { section: "governance", mandatory: false, kind: "plan_denies_native_session", reasonCodes: codes,
-    nextAction: { label: "Under an active plan, Studio native tasks with workspace tools started after activation run under a lease (P1-67), and CLI agent "
+    nextAction: { label: "Under an active plan, Studio native tasks with workspace tools started after activation run under a lease, and CLI agent "
       + "runs, SDK native client sessions, ACP sessions and in-process sessions with workspace tools mint their own, naming the active users.yaml user whose "
-      + "username is the OS account, which their delegated children inherit (P1-79); a run whose own process cannot unlock the vault fails to mint its "
+      + "username is the OS account, which their delegated children inherit; a run whose own process cannot unlock the vault fails to mint its "
       + `lease and is refused; ${denied}` } });
 }
 
@@ -558,7 +589,7 @@ function contextItems(state: A4ReadinessState, query: A4ReadinessQuery, answers:
         : item("configs_trusted", "READY", { section: "implementation", reasonCodes: Object.entries(configs).filter(([, config]) => config.state === "missing").map(([name]) => `MISSING:${name}`) }),
     clocks.length === 0 ? item("clocks_classified", "READY", { mandatory: false, reasonCodes: ["NO_CLOCK_CANDIDATES"] })
       : waiting("clocks_classified", ["NEEDS_CLASSIFICATION", ...clocks.slice(0, 32).map((clock) => `CLOCK:${clock.clockId}`)], { mandatory: false, kind: "review_pending",
-        nextAction: { label: "Each reporting clock listed for these stations is a candidate an operator confirms; AMC decides none (overlay rules: P3-23)" } }),
+        nextAction: { label: "Each reporting clock listed for these stations is a candidate an operator confirms; AMC decides none, and has no rules yet that suggest a class" } }),
     rule.requiredReviews.length === 0 ? item("required_entries_satisfied", "READY", { section: "governance", mandatory: false })
       : item("required_entries_satisfied", pending.size === 0 ? "READY" : "WAITING", { section: "governance", mandatory: false, kind: pending.size === 0 ? null : "review_pending",
         reasonCodes: rule.requiredReviews.map((entry) => `ENTRY:${entry.kind}${entry.role === undefined ? "" : `:${entry.role}`}:${pending.has(JSON.stringify(entry)) ? "pending" : "met"}`
@@ -571,7 +602,7 @@ function contextItems(state: A4ReadinessState, query: A4ReadinessQuery, answers:
       "ENFORCEMENT:none", "KEY:P2-01", "KEY:P2-02"] }),
     item("lifecycle_bridge", "NOT_EVALUATED", { kind: "not_evaluated", mandatory: false,
       reasonCodes: [...stagingBridge(state).map((row) => `BRIDGE:${row.controlId}:${row.status}`), `KEY:${LIFECYCLE_SEAM_KEY}`],
-      nextAction: { label: "testing → staging advances only on the rows above with refs; the A4 lifecycle wrapper (P1-62) advances it, never Adapt" } })
+      nextAction: { label: "testing → staging advances only on the rows above with refs; A4 advances it after Activate's release, never Adapt" } })
   ];
 }
 

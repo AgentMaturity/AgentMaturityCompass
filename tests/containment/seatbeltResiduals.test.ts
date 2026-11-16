@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { seatbeltNativeShell } from "../../src/sandbox/seatbeltNativeShell.js";
 import type { SandboxOutcome } from "../../src/sandbox/sandboxTypes.js";
-import { nativeContainmentFixture } from "../helpers/nativeContainment.js";
+import { freePort, nativeContainmentFixture } from "../helpers/nativeContainment.js";
 
 // The five macOS cases P1-05 left unverified, run against the real kernel. Under
 // AMC_REQUIRE_REAL_SANDBOX=1 on macOS none of them may skip.
@@ -109,9 +109,10 @@ print("found=%s"%(service!=0)); print("open=%s"%hex(iokit.IOServiceOpen(service,
   });
 
   macTest("node fetch reaches an allowlisted origin through the egress proxy", async () => {
-    const f = nativeContainmentFixture({ allowHosts: ["127.0.0.1"] }); let passed = false;
+    const port = await freePort();
+    const f = nativeContainmentFixture({ allowHosts: [`127.0.0.1:${port}`] }); let passed = false;
     try {
-      const origin = await f.origin(), before = origin.requests.length;
+      const origin = await f.origin(port), before = origin.requests.length;
       const call = await f.run(`fetch(${JSON.stringify(`${origin.url}/fetched`)},{signal:AbortSignal.timeout(4000)}).then(async r=>{${emit("{attempted:true,status:r.status,body:await r.text()}")}},e=>{${emit("{attempted:true,error:String(e.cause?.code||e.message)}")}});`);
       expect(call.receipt.confined).toBe(true);
       expect(call.data).toMatchObject({ status: 200, body: "owned-p105-origin" });

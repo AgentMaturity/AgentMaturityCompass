@@ -1,4 +1,6 @@
 import { renderNeutralImportReview } from "./neutralImportReview.js";
+import { plainErrorText } from "./plainError.js";
+import { askInline, confirmPress, recordDetails, recordRows, showResult } from "./pageKit.js";
 import { renderNativeTasksPage } from "./nativeTasks.js";
 import { apiGet, apiPost, applyRoleGates, getAdminToken, getCurrentUser, login, logout, onClaims, setAdminToken, whoami } from "./api.js";
 import { installClaimStrip } from "./components/claimBadge.js";
@@ -91,10 +93,7 @@ function setStatus(text, bad = false) {
 }
 
 function errText(error) {
-  if (!error) {
-    return "Unknown error";
-  }
-  return typeof error.message === "string" ? error.message : String(error);
+  return plainErrorText(error);
 }
 
 /** /cli/exec failures carry the command's output, not an `error`; show its last line instead of "HTTP 422" (H2). */
@@ -145,18 +144,13 @@ function htmlEscape(text) {
     .replaceAll("'", "&#39;");
 }
 
-/** JSON for display (M11): a host path under the workspace's .amc directory reads as `.amc/...`. */
-function displayJson(value) {
-  return JSON.stringify(value, (_key, item) => typeof item === "string" ? workspacePath(item) : item, 2);
-}
-
 function workspacePath(text) {
   return /^(?:\/|[A-Za-z]:\\).*[\\/]\.amc[\\/]/.test(text) ? text.slice(text.search(/[\\/]\.amc[\\/]/) + 1).replaceAll("\\", "/") : text;
 }
 
 /** M11: a one-line plain summary, with the raw JSON collapsed beneath it. */
 function jsonDetails(summary, value) {
-  return `<p>${summary}</p><details><summary>Raw JSON</summary><pre class="scroll">${htmlEscape(displayJson(value))}</pre></details>`;
+  return `<p>${summary}</p>${recordDetails(value)}`;
 }
 
 function card(title, body) {
@@ -164,8 +158,10 @@ function card(title, body) {
 }
 
 /**
- * Home's one hero card: what AMC does in one sentence, one primary action (a task in Native Tasks, with a sample prompt),
- * "Connect my agent" revealing the connection command, and a text link for scoring records already held.
+ * Home's second card, under "Build an agent for your industry" (a4.js fills that one): two quieter ways in. "Watch an agent I
+ * already use" reveals the connection command; "Try a sample task" opens Native Tasks with a sample prompt. A text link
+ * scores records already held. When the build card is absent (demo, preview off, no create role) styles.css makes the
+ * sample task the page's primary action.
  */
 function firstUseCard(agentId, demoMode) {
   // This is a POSIX terminal handoff, never a browser execution request.
@@ -178,14 +174,17 @@ function firstUseCard(agentId, demoMode) {
     : '<p class="first-use-score"><a href="#activationSteps" id="firstUseBaselineContinue">I already have records: score them</a></p>';
   return `
     <section id="firstUse" class="card first-use" aria-labelledby="firstUseTitle">
-      <h2 id="firstUseTitle">See what your AI agent really does.</h2>
-      <p class="first-use-lead">AMC records every action your agent takes and turns that record into a trust score and a short list of gaps to fix.</p>
+      <h2 id="firstUseTitle">See what an AI agent really does</h2>
+      <p class="first-use-lead">AMC records every action an agent takes and turns that record into a trust score and a short list of gaps to fix.</p>
       <div class="first-use-actions">
         <div>
-          <a class="button" id="firstUsePrimary" href="${htmlEscape(primaryActionHref(agentId))}">${primaryActionLabel(demoMode)}</a>
+          <button type="button" id="firstUseConnectButton" class="secondary" data-first-intent="firstUseConnect" aria-controls="firstUseConnect" aria-expanded="false">Watch an agent I already use</button>
+          <p class="muted first-use-sub">For Claude Code, Codex or your own agent. You run one command in a terminal.</p>
+        </div>
+        <div>
+          <a class="button secondary" id="firstUsePrimary" href="${htmlEscape(primaryActionHref(agentId))}">${demoMode ? primaryActionLabel(true) : "Try a sample task"}</a>
           <p class="muted first-use-sub">No setup. Runs on this computer with no model or tools.</p>
         </div>
-        <button type="button" id="firstUseConnectButton" class="secondary" data-first-intent="firstUseConnect" aria-controls="firstUseConnect" aria-expanded="false">Connect my agent</button>
       </div>
       ${scoreRecords}
       <div id="firstUseConnect" class="first-use-panel" hidden>
@@ -325,8 +324,8 @@ const FALLBACK_SURFACES = [
   },
   {
     surface: "Vault",
-    headline: "Cryptographically prove what happened",
-    description: "Signs evidence, verifies ledgers, and gives auditors a tamper-evident chain of custody."
+    headline: "Keep a signed record of what happened",
+    description: "Signs records and checks the ledgers, so an auditor can see who wrote each record and that it has not changed since. A signature does not make a record true."
   },
   {
     surface: "Watch",
@@ -717,7 +716,7 @@ async function renderEvidence() {
           <div><span class="muted">Created</span><strong>${htmlEscape(formatTime(latestRun.createdAt))}</strong></div>
           <div><span class="muted">Vault</span>${statusPill(latestRun.setup?.signed ? "VALID" : "MISSING")}</div>
         </div>
-        <pre class="scroll">${htmlEscape(JSON.stringify({
+        ${recordRows({
           diagnosticReport: latestRun.evidence?.diagnosticReport,
           episodeRecords: latestRun.evidence?.episodeRecords,
           decisionReceipts: latestRun.evidence?.decisionReceipts,
@@ -725,7 +724,7 @@ async function renderEvidence() {
           findingProofs: latestRun.evidence?.findingProofs,
           observabilityRecords: latestRun.evidence?.observabilityRecords,
           resourceManifests: latestRun.evidence?.resourceManifests
-        }, null, 2))}</pre>
+        })}
       ` : "<p class='muted'>No lifecycle artifact has been generated for this agent yet.</p>")}
       ${card("Decision Observability", latestObservability ? `
         <div class="lifecycle-summary">
@@ -734,12 +733,12 @@ async function renderEvidence() {
           <div><span class="muted">Experience</span><strong>${Number(latestObservability.summary?.experienceSignalCount || 0)}</strong></div>
           <div><span class="muted">Observed</span><strong>${Number(latestObservability.summary?.observedDecisionCount || 0)}/${Number(latestObservability.summary?.decisionCount || 0)}</strong></div>
         </div>
-        <pre class="scroll">${htmlEscape(JSON.stringify({
+        ${recordRows({
           highRiskComponents: latestObservability.summary?.highRiskComponentCount || 0,
           componentAttribution: (latestObservability.componentAttribution || []).slice(0, 8),
           experienceCorpus: (latestObservability.experienceCorpus || []).slice(0, 8),
           decisionChain: (latestObservability.decisionChain || []).slice(0, 8)
-        }, null, 2))}</pre>
+        })}
       ` : "<p class='muted'>No decision observability record yet. Run `amc` to capture component attribution, experience signals, and decision outcomes.</p>")}
       ${card("Repeated failures", latestTraceIndex ? `
         <div class="lifecycle-summary">
@@ -764,7 +763,7 @@ async function renderEvidence() {
           <div><span class="muted">Regression tests</span><strong>${Number(latestFixerReport?.regressionTests?.length || 0)}</strong></div>
           <div><span class="muted">Validation</span>${statusPill(latestFixerReport?.validationReceipt?.status || "READY")}</div>
         </div>
-        <pre id="fixerRcaOut" class="scroll">${htmlEscape(JSON.stringify(latestFixerReport ? {
+        <div id="fixerRcaOut" aria-live="polite">${recordRows(latestFixerReport ? {
           runId: latestFixerReport.runId,
           rootCauses: (latestFixerReport.rootCauses || []).slice(0, 4),
           proposals: (latestFixerReport.proposals || []).slice(0, 4),
@@ -772,7 +771,7 @@ async function renderEvidence() {
         } : {
           next: "Generate RCA from the latest trace failure index.",
           command: "amc mechanic rca run <run-id>"
-        }, null, 2))}</pre>
+        })}</div>
         <div class="row wrap">
           <button id="evidenceGenerateRca" data-roles="OWNER,OPERATOR" class="secondary">find root causes</button>
         </div>
@@ -787,7 +786,7 @@ async function renderEvidence() {
             <td><button class="secondary" data-memory-show="${htmlEscape(item.memoryId || "")}">Show</button></td>
           </tr>
         `).join("") || "<tr><td colspan='5' class='muted'>No reasoning memory items.</td></tr>"}</tbody></table></div>
-        <pre id="reasoningMemoryOut" class="scroll">${htmlEscape(JSON.stringify(reasoningMemoryItems.slice(0, 3), null, 2))}</pre>
+        <div id="reasoningMemoryOut" aria-live="polite">${recordRows(reasoningMemoryItems.slice(0, 3))}</div>
         <div class="row wrap">
           <button id="evidenceWriteMemory" data-roles="OWNER,OPERATOR" class="secondary">write memory</button>
         </div>
@@ -802,7 +801,7 @@ async function renderEvidence() {
           <div><span class="muted">Signature</span>${statusPill(resourceSignature)}</div>
           <div><span class="muted">Changed</span><strong>${Number(resourceStatusData?.pendingDiff?.changed?.length || 0)}</strong></div>
         </div>
-        <pre id="resourceProofOut" class="scroll">${htmlEscape(JSON.stringify({
+        <div id="resourceProofOut" aria-live="polite">${recordRows({
           status: resourceStatusData || {},
           verification: resourceVerifyData || {},
           validation: resourceValidationData || {},
@@ -812,7 +811,7 @@ async function renderEvidence() {
             gates: resourceContractData?.gates || []
           },
           history: resourceHistoryEntries.slice(0, 6)
-        }, null, 2))}</pre>
+        })}</div>
         <div class="row wrap">
           <button id="evidenceVerifyResources" class="secondary">verify now</button>
           <button id="evidenceValidateResources" class="secondary">validate gates</button>
@@ -830,7 +829,7 @@ async function renderEvidence() {
         </div>
         <p class="muted">Imported claims remain self-reported and unevaluated. Review unknown timing, skipped files and mapping limits before applying.</p>
         <div id="neutralImportReview" role="status" aria-live="polite"></div>
-        <pre id="neutralImportOut" class="scroll">${htmlEscape(JSON.stringify({
+        <div id="neutralImportOut" aria-live="polite">${recordRows({
           recent: neutralImports.map((row) => ({
             importId: row.importId,
             agentId: row.agentId,
@@ -838,7 +837,7 @@ async function renderEvidence() {
             redactions: row.plan?.redactionCount || 0,
             createdAt: row.createdAt
           }))
-        }, null, 2))}</pre>
+        })}</div>
         <div class="scroll"><table><thead><tr><th>Import</th><th>Agent</th><th>Artifacts</th><th>Categories</th><th>Redactions</th></tr></thead><tbody>${neutralImports.map((row) => `
           <tr>
             <td><details><summary><code>${htmlEscape(shortId(row.importId, 18))}</code></summary>${renderNeutralImportReview(row.plan, { applied: true })}</details></td>
@@ -850,7 +849,7 @@ async function renderEvidence() {
         `).join("") || "<tr><td colspan='5' class='muted'>No neutral imports yet.</td></tr>"}</tbody></table></div>
       `)}
       ${card("Model strategy comparison", `
-        <pre id="strategyCompareOut" class="scroll">${htmlEscape(JSON.stringify({
+        <div id="strategyCompareOut" aria-live="polite">${recordRows({
           recent: strategyRuns.map((row) => ({
             strategyRunId: row.strategyRunId,
             recommended: row.recommendedStrategyId,
@@ -858,7 +857,7 @@ async function renderEvidence() {
             confidence: row.confidence,
             summary: row.tradeoffSummary
           }))
-        }, null, 2))}</pre>
+        })}</div>
         <div class="scroll"><table><thead><tr><th>Run</th><th>Recommended</th><th>Route</th><th>Confidence</th><th>Tradeoff</th></tr></thead><tbody>${strategyRuns.map((row) => `
           <tr>
             <td><code>${htmlEscape(shortId(row.strategyRunId, 18))}</code></td>
@@ -911,7 +910,7 @@ async function renderEvidence() {
     setStatus("Enforce resource snapshot generated.");
     const proofOut = document.getElementById("resourceProofOut");
     if (proofOut) {
-      proofOut.textContent = JSON.stringify(out, null, 2);
+      showResult(proofOut, out);
     }
   });
   onAction(document.getElementById("evidenceGenerateRca"), "click", async () => {
@@ -925,7 +924,7 @@ async function renderEvidence() {
     setStatus("Fixer RCA generated.");
     const fixerOut = document.getElementById("fixerRcaOut");
     if (fixerOut) {
-      fixerOut.textContent = JSON.stringify(payload.report || payload, null, 2);
+      showResult(fixerOut, payload.report || payload);
     }
   });
   onAction(document.getElementById("evidenceWriteMemory"), "click", async () => {
@@ -942,7 +941,7 @@ async function renderEvidence() {
     setStatus("Reasoning memory writeback recorded.");
     const memoryOut = document.getElementById("reasoningMemoryOut");
     if (memoryOut) {
-      memoryOut.textContent = JSON.stringify(apiPayload(out) || out, null, 2);
+      showResult(memoryOut, apiPayload(out) || out);
     }
   });
   document.querySelectorAll("button[data-memory-show]").forEach((button) => {
@@ -951,7 +950,7 @@ async function renderEvidence() {
       const out = await apiGet(`/api/v1/memory/reasoning/${encodeURIComponent(id)}?agentId=${encodeURIComponent(agentId)}`);
       const memoryOut = document.getElementById("reasoningMemoryOut");
       if (memoryOut) {
-        memoryOut.textContent = JSON.stringify(apiPayload(out) || out, null, 2);
+        showResult(memoryOut, apiPayload(out) || out);
       }
     });
   });
@@ -959,28 +958,28 @@ async function renderEvidence() {
     const out = await apiGet(`/api/v1/enforce/resources/verify?agentId=${encodeURIComponent(agentId)}`).catch((error) => ({ valid: false, error: errText(error) }));
     const proofOut = document.getElementById("resourceProofOut");
     if (proofOut) {
-      proofOut.textContent = JSON.stringify(out, null, 2);
+      showResult(proofOut, out);
     }
   });
   onAction(document.getElementById("evidenceValidateResources"), "click", async () => {
     const out = await apiGet(`/api/v1/enforce/resources/validate?agentId=${encodeURIComponent(agentId)}`).catch((error) => ({ status: "blocked", error: errText(error) }));
     const proofOut = document.getElementById("resourceProofOut");
     if (proofOut) {
-      proofOut.textContent = JSON.stringify(out, null, 2);
+      showResult(proofOut, out);
     }
   });
   onAction(document.getElementById("evidenceApplyDryRun"), "click", async () => {
     const out = await apiPost("/api/v1/enforce/resources/apply", { agentId, dryRun: true });
     const proofOut = document.getElementById("resourceProofOut");
     if (proofOut) {
-      proofOut.textContent = JSON.stringify(out, null, 2);
+      showResult(proofOut, out);
     }
   });
   onAction(document.getElementById("evidenceRestoreDryRun"), "click", async () => {
     const out = await apiPost("/api/v1/enforce/resources/restore", { agentId, apply: false });
     const proofOut = document.getElementById("resourceProofOut");
     if (proofOut) {
-      proofOut.textContent = JSON.stringify(out, null, 2);
+      showResult(proofOut, out);
     }
   });
   onAction(document.getElementById("evidenceActivateResources"), "click", async () => {
@@ -998,7 +997,7 @@ async function renderEvidence() {
       confirmManifestId: targetManifestId
     });
     const proofOut = document.getElementById("resourceProofOut");
-    if (proofOut) proofOut.textContent = JSON.stringify(out, null, 2);
+    showResult(proofOut, out);
     setStatus(`Activated resource version ${targetManifestId}.`);
     await renderEvidence();
   });
@@ -1016,7 +1015,7 @@ async function renderEvidence() {
       confirmManifestId: rollbackTarget.manifestId
     });
     const proofOut = document.getElementById("resourceProofOut");
-    if (proofOut) proofOut.textContent = JSON.stringify(out, null, 2);
+    showResult(proofOut, out);
     setStatus(`Rolled back to resource version ${rollbackTarget.manifestId}.`);
     await renderEvidence();
   });
@@ -1045,7 +1044,7 @@ async function renderEvidence() {
         inputPath, agentId, ...(!dryRun ? { expectedSemanticDigest: reviewedImport.digest } : {})
       });
       const payload = apiPayload(out) || out;
-      if (outNode) outNode.textContent = JSON.stringify(payload, null, 2);
+      showResult(outNode, payload);
       const receipt = payload.plan?.normalization;
       const review = document.getElementById("neutralImportReview");
       if (review) review.innerHTML = renderNeutralImportReview(payload.plan, { applied: payload.applied === true });
@@ -1352,7 +1351,7 @@ function renderAuthScreen() {
         password,
         pairingCode: pairingCode.trim() || undefined
       });
-      setStatus("Login successful.");
+      setStatus("Signed in.");
       await afterSignIn();
     } catch (error) {
       setStatus(loginFailureText(errText(error)), true);
@@ -1510,7 +1509,7 @@ async function renderHome() {
         <div class="studio-kicker">Desktop app</div>
         <h3>Native macOS shell, same AMC evidence-first surface.</h3>
         <p class="muted">
-          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs, 41 Industry Packs, and 1,304 CLI paths.
+          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, <!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> registered assurance packs, 41 Industry Packs, and 1,302 CLI paths.
         </p>
       </div>
       <div class="row wrap">
@@ -1561,7 +1560,7 @@ async function renderHome() {
     try {
       const result = await apiPost("/onboarding/run", {});
       if (out) {
-        out.textContent = JSON.stringify(result?.state || result, null, 2);
+        showResult(out, result?.state || result);
       }
       setStatus("Baseline finished.");
       await renderHome();
@@ -1599,7 +1598,7 @@ async function renderAgent() {
     ${card(`Agent ${agentId}`, `<p>${runStateSummary(agentId, row.latestRun)}</p>${runStateWarning(row.latestRun)}` + (report
       ? `
       <p>Overall: <strong>${((report.layerScores || []).reduce((s, x) => s + x.avgFinalLevel, 0) / Math.max(1, (report.layerScores || []).length)).toFixed(3)}</strong></p>
-      <p>IntegrityIndex: <strong>${Number(report.integrityIndex || 0).toFixed(3)}</strong> (${report.trustLabel})</p>
+      <p>IntegrityIndex: <strong>${Number(report.integrityIndex || 0).toFixed(3)}</strong> (${htmlEscape(String(report.trustLabel ?? ""))})</p>
       <p>Evidence Coverage: ${(Number(report.evidenceCoverage || 0) * 100).toFixed(1)}%</p>
       <p>Artifact Status: <strong>${htmlEscape(String(report.status || "UNKNOWN"))}</strong></p>
       <p>Evidence Readiness: <strong>${htmlEscape(String(report.evidenceReadiness?.status || "UNVERIFIED"))}</strong></p>
@@ -1657,11 +1656,11 @@ async function renderEqualizer() {
   };
   onAction(document.getElementById("whatifBtn"), "click", async () => {
     const out = await apiPost(`/agents/${encodeURIComponent(agentId)}/targets/whatif`, { mapping: gather() });
-    document.getElementById("whatifOut").textContent = JSON.stringify(out.summary, null, 2);
+    showResult(document.getElementById("whatifOut"), out.summary);
   });
   onAction(document.getElementById("applyBtn"), "click", async () => {
     const out = await apiPost(`/agents/${encodeURIComponent(agentId)}/targets/apply`, { mapping: gather() });
-    document.getElementById("whatifOut").textContent = JSON.stringify(out, null, 2);
+    showResult(document.getElementById("whatifOut"), out);
   });
 }
 
@@ -1761,7 +1760,7 @@ async function renderApprovals() {
               ${["25", "50", "100", "200"].map((value) => `<option value="${value}"${approvalActivityState.limit === value ? " selected" : ""}>${value}</option>`).join("")}
             </select>
           </label>
-          <button type="submit">Search</button>
+          <button id="approvalSearch" type="submit">Search</button>
           <button id="approvalFiltersReset" type="button" class="secondary">Reset</button>
         </form>
         <p id="approvalActivityIntegrity" class="${activity?.integrity?.valid ? "status-ok" : "status-bad"}">
@@ -1798,7 +1797,7 @@ async function renderApprovals() {
       <td>
         ${canDecide ? `<div class="row" data-agent="${htmlEscape(row.agentId || agentId)}" data-intent="${htmlEscape(row.intentId || "")}" data-digest="${htmlEscape(row.requestDigestSha256 || "")}">
             <button data-approve="${htmlEscape(row.approvalRequestId)}">Approve</button>
-            <button class="secondary" data-sim="${htmlEscape(row.approvalRequestId)}">Simulate</button>
+            <button class="secondary" data-sim="${htmlEscape(row.approvalRequestId)}" title="Allow it only as a dry run: AMC records what would happen and does nothing">Dry run only</button>
             <button class="danger" data-deny="${htmlEscape(row.approvalRequestId)}">Deny</button>
           </div>` : '<span class="muted">Unavailable</span>'}
       </td>
@@ -1816,7 +1815,14 @@ async function renderApprovals() {
     approvalActivityState.createdBefore = document.getElementById("approvalCreatedBefore")?.value || "";
     approvalActivityState.order = document.getElementById("approvalOrder")?.value || "newest";
     approvalActivityState.limit = document.getElementById("approvalLimit")?.value || "50";
-    await renderApprovals();
+    try {
+      await renderApprovals();
+    } catch (error) {
+      // A search Studio refuses (a malformed request id, say) is said beside Search, also when Enter sent it.
+      const search = document.getElementById("approvalSearch");
+      search?.parentElement?.querySelector(":scope > .action-error")?.remove();
+      search?.insertAdjacentHTML("afterend", `<p class="action-error status-bad" role="alert">${htmlEscape(errText(error))}</p>`);
+    }
   });
   document.getElementById("approvalFiltersReset")?.addEventListener("click", async () => {
     Object.assign(approvalActivityState, {
@@ -1833,14 +1839,14 @@ async function renderApprovals() {
     await renderApprovals();
   });
   for (const [attribute, decision, label, initialReason] of [
-    ["data-approve", "APPROVE_EXECUTE", "EXECUTE approval", "Approved execute"],
-    ["data-sim", "APPROVE_SIMULATE", "SIMULATE approval", "Approved simulate"],
+    ["data-approve", "APPROVE_EXECUTE", "approval", "Approved"],
+    ["data-sim", "APPROVE_SIMULATE", "dry-run-only approval", "Approved as a dry run only"],
     ["data-deny", "DENY", "denial", "Denied"]
   ]) {
     body.querySelectorAll(`button[${attribute}]`).forEach((button) => {
       button.addEventListener("click", async () => {
         const id = button.getAttribute(attribute);
-        const reason = window.prompt(`Reason for ${label}:`, initialReason);
+        const reason = await askInline(button.closest("[data-agent]") ?? button, { label: `Reason for this ${label} (kept in the signed record)`, value: initialReason, submit: "Record decision" });
         if (!reason) return;
         button.disabled = true;
         try {
@@ -1901,10 +1907,11 @@ async function renderUsers() {
   const users = await apiGet("/users");
   root.innerHTML = `
     ${card("Users", `
-      <div class="scroll"><table><thead><tr><th>Username</th><th>Roles</th><th>Status</th><th>Actions</th></tr></thead><tbody id="userRows"></tbody></table></div>
-      <h4>Add User</h4>
+      <div class="scroll"><table class="users-table"><thead><tr><th>Username</th><th>Roles</th><th>Status</th><th>Actions</th></tr></thead><tbody id="userRows"></tbody></table></div>
+      <h4>Add a person</h4>
+      <p class="muted">A username is 1 to 64 letters, digits, dots, dashes, underscores or @, with no spaces.</p>
       <div class="row wrap">
-        <label>Username <input id="addUserName" autocomplete="off" /></label>
+        <label>Username <input id="addUserName" autocomplete="off" maxlength="64" pattern="[\p{L}\p{N}._@\-]{1,64}" /></label>
         <label>Password <input id="addUserPass" type="password" autocomplete="new-password" /></label>
         <label for="addUserRoles">Roles</label> ${userRolesSelect("addUserRoles", ["VIEWER"])}
         <button id="addUserBtn" data-roles="OWNER">Add</button>
@@ -1928,11 +1935,14 @@ async function renderUsers() {
       </td>
     </tr>
   `).join("");
+  // Revoking and changing roles take effect at once, so each asks for a second press (C-18).
   body.querySelectorAll("button[data-revoke]").forEach((button) => {
     onAction(button, "click", async () => {
       const username = button.getAttribute("data-revoke");
+      if (!confirmPress(button, `revoke ${username}`)) return;
       await apiPost("/users/revoke", { username });
       await renderUsers();
+      setStatus(`${username} can no longer sign in.`);
     });
   });
   body.querySelectorAll("button[data-role]").forEach((button) => {
@@ -1940,14 +1950,19 @@ async function renderUsers() {
       const username = button.getAttribute("data-role");
       const roles = selectedRoles(`roles-${username}`);
       if (roles.length === 0) throw new Error("Choose at least one role.");
+      if (!confirmPress(button, `set ${roles.join(", ")}`)) return;
       await apiPost("/users/roles", { username, roles });
       await renderUsers();
+      setStatus(`${username} now has: ${roles.join(", ")}.`);
     });
   });
   onAction(document.getElementById("addUserBtn"), "click", async () => {
-    const username = document.getElementById("addUserName")?.value || "";
+    const username = (document.getElementById("addUserName")?.value || "").trim();
     const password = document.getElementById("addUserPass")?.value || "";
     const out = document.getElementById("usersOut");
+    if (!/^[\p{L}\p{N}._@-]{1,64}$/u.test(username)) {
+      throw new Error("A username is 1 to 64 letters, digits, dots, dashes, underscores or @, with no spaces.");
+    }
     try {
       await apiPost("/users/add", { username, password, roles: selectedRoles("addUserRoles") });
       await renderUsers();
@@ -2240,7 +2255,7 @@ async function renderPolicyPacks() {
         logic: evidenceLogicRequest
       });
       evidenceLogicPreview = apiPayload(envelope);
-      evidenceLogicOut.textContent = JSON.stringify(evidenceLogicPreview, null, 2);
+      showResult(evidenceLogicOut, evidenceLogicPreview);
       setStatus(evidenceLogicPreview.canApply ? "Evidence logic preview ready." : "Evidence logic has no changes.");
     } catch (error) {
       evidenceLogicPreview = null;
@@ -2271,7 +2286,7 @@ async function renderPolicyPacks() {
         acknowledgeAlternatives: evidenceLogicAcknowledge.checked
       });
       const applied = apiPayload(envelope);
-      evidenceLogicOut.textContent = displayJson(applied);
+      showResult(evidenceLogicOut, applied);
       setStatus(applied.applied ? "Evidence logic applied." : "Evidence logic unchanged.");
       evidenceLogicPreview = null;
       evidenceLogicRequest = null;
@@ -2325,7 +2340,7 @@ async function renderPolicyPacks() {
       });
       scopePreview = apiPayload(envelope);
       scopeConfirm.value = "";
-      scopeOut.textContent = JSON.stringify(scopePreview, null, 2);
+      showResult(scopeOut, scopePreview);
       updateScopeApplyState();
       setStatus(scopePreview.canApply ? "Scope preview ready." : "Scope preview has no changes.");
     } catch (error) {
@@ -2350,7 +2365,7 @@ async function renderPolicyPacks() {
         confirmCompileId: scopePreview.compileId
       });
       const applied = apiPayload(envelope);
-      scopeOut.textContent = displayJson(applied);
+      showResult(scopeOut, applied);
       scopePreview = null;
       scopeConfirm.value = "";
       updateScopeApplyState();
@@ -2387,7 +2402,7 @@ async function renderPolicyPacks() {
     onAction(button, "click", async () => {
       const id = button.getAttribute("data-describe");
       const desc = await apiGet(`/policy-packs/${encodeURIComponent(id)}`);
-      out.textContent = JSON.stringify(desc, null, 2);
+      showResult(out, desc);
     });
   });
   rows.querySelectorAll("button[data-diff]").forEach((button) => {
@@ -2396,7 +2411,7 @@ async function renderPolicyPacks() {
       const diff = await apiPost(`/policy-packs/${encodeURIComponent(id)}/diff`, {
         agentId: currentAgent()
       });
-      out.textContent = displayJson(diff);
+      showResult(out, diff);
     });
   });
   rows.querySelectorAll("button[data-apply]").forEach((button) => {
@@ -2409,7 +2424,7 @@ async function renderPolicyPacks() {
         agentId: currentAgent(),
         confirm: true
       });
-      out.textContent = displayJson(applied);
+      showResult(out, applied);
       await refreshUnifiedBanner();
     });
   });
@@ -2460,7 +2475,8 @@ async function renderIndustryPacks() {
     onAction(button, "click", async () => {
       const id = button.getAttribute("data-industry-pack");
       try {
-        detail.innerHTML = industryPackDetailHtml((await apiGet(`/industry-packs/${encodeURIComponent(id)}`)).pack);
+        const loaded = await apiGet(`/industry-packs/${encodeURIComponent(id)}`);
+        detail.innerHTML = industryPackDetailHtml(loaded.pack, loaded.savedResponses);
         bindIndustryPackDetail(detail, button);
       } catch (error) {
         detail.innerHTML = `<p class="status-bad">${htmlEscape(errText(error))}</p>`;
@@ -2602,7 +2618,7 @@ async function renderIntegrations() {
   `;
   onAction(document.getElementById("integrationTestBtn"), "click", async () => {
     const out = await apiPost("/integrations/test", {});
-    document.getElementById("integrationOut").textContent = JSON.stringify(out, null, 2);
+    showResult(document.getElementById("integrationOut"), out);
   });
 }
 
@@ -2684,7 +2700,7 @@ async function renderExperiments() {
         <button id="expRefreshBtn" class="secondary">Refresh</button>
       </div>
       <div class="scroll"><table><thead><tr><th>ID</th><th>Name</th><th>Casebook</th><th>Uplift Success</th><th>Uplift Value</th><th>Cost Ratio</th><th>Verdict</th><th>Actions</th></tr></thead><tbody id="expRows"></tbody></table></div>
-      <pre id="expOut" class="muted"></pre>
+      <div id="expOut" aria-live="polite"></div>
     `)}
     ${card("Governed Optimizer", `
       <div class="row wrap">
@@ -2693,7 +2709,7 @@ async function renderExperiments() {
       </div>
       <div class="scroll"><table><thead><tr><th>Run</th><th>Selected for probing (estimated metrics, not executed)</th><th>Structural status</th><th>Candidates</th><th>Top Reason</th><th>Actions</th></tr></thead><tbody id="optimizerRows"></tbody></table></div>
     `)}
-    ${card("Experiment Registry", `<pre class="scroll">${htmlEscape(JSON.stringify(listed.experiments || listed, null, 2))}</pre>`)}
+    ${card("Experiment registry", recordRows(listed.experiments || listed))}
   `;
   const tbody = document.getElementById("expRows");
   const optimizerBody = document.getElementById("optimizerRows");
@@ -2740,12 +2756,14 @@ async function renderExperiments() {
     .join("");
   const out = document.getElementById("expOut");
   onAction(document.getElementById("expCreateBtn"), "click", async () => {
-    const name = window.prompt("Experiment name:", "candidate-vs-baseline");
+    const button = document.getElementById("expCreateBtn");
+    const name = await askInline(button, { label: "Name for the experiment", value: "candidate-vs-baseline", submit: "Next",
+      check: (text) => /^[\w.-]{1,80}$/.test(text) ? null : "Use letters, digits, dots, dashes or underscores (up to 80)." });
     if (!name) return;
-    const casebookId = window.prompt("Casebook ID:", "default");
+    const casebookId = await askInline(button, { label: "Casebook to test with (the set of example tasks)", value: "default", submit: "Create experiment" });
     if (!casebookId) return;
     const created = await apiPost("/experiments/create", { agentId, name, casebookId });
-    out.textContent = JSON.stringify(created, null, 2);
+    out.innerHTML = `<p class="status-ok">Experiment created.</p>${recordDetails(created)}`;
   });
   onAction(document.getElementById("expRefreshBtn"), "click", async () => {
     await renderExperiments();
@@ -2754,27 +2772,33 @@ async function renderExperiments() {
     await renderExperiments();
   });
   onAction(document.getElementById("optimizerRunBtn"), "click", async () => {
-    const rcaSelector = window.prompt("Fixer RCA selector:", "latest") || "latest";
+    const rcaSelector = await askInline(document.getElementById("optimizerRunBtn"), { label: "Which root-cause report to start from",
+      value: "latest", submit: "Generate" });
+    if (!rcaSelector) return;
     const run = await apiPost("/experiments/optimize", { agentId, rcaSelector });
-    out.textContent = JSON.stringify(run, null, 2);
+    out.innerHTML = `<p class="status-ok">Optimizer generated.</p>${recordDetails(run)}`;
     await renderExperiments();
   });
   optimizerBody.querySelectorAll("button[data-optimizer-show]").forEach((button) => {
     onAction(button, "click", async () => {
       const id = button.getAttribute("data-optimizer-show");
       const run = await apiGet(`/experiments/optimizers/${encodeURIComponent(id)}?agentId=${encodeURIComponent(agentId)}`);
-      out.textContent = JSON.stringify(run, null, 2);
+      out.innerHTML = recordRows(run);
     });
   });
   tbody.querySelectorAll("button[data-run]").forEach((button) => {
     onAction(button, "click", async () => {
       const id = button.getAttribute("data-run");
-      const mode = window.prompt("Mode (sandbox|supervise):", "sandbox") || "sandbox";
-      const candidateWindow = window.prompt("Candidate evidence window (e.g. 7d):", "");
+      const mode = await askInline(button, { label: "How to run it: sandbox (isolated) or supervise (watched)", value: "sandbox", submit: "Next",
+        check: (text) => ["sandbox", "supervise"].includes(text) ? null : "Type sandbox or supervise." });
+      if (!mode) return;
+      const candidateWindow = await askInline(button, { label: "Records of the new version from the last… (for example 7d)", value: "7d", submit: "Next",
+        check: (text) => /^\d+[hdw]$/.test(text) ? null : "Write a number and h, d or w, for example 7d." });
       if (!candidateWindow) return;
-      const candidateAgentId = window.prompt("Candidate agent (blank = same agent):", "") || undefined;
-      const run = await apiPost(`/experiments/${encodeURIComponent(id)}/run`, { agentId, mode, candidateWindow, candidateAgentId });
-      out.textContent = JSON.stringify(run, null, 2);
+      const candidateAgentId = await askInline(button, { label: "Agent that runs the new version (leave empty for the same agent)", required: false, submit: "Run" });
+      if (candidateAgentId === null) return;
+      const run = await apiPost(`/experiments/${encodeURIComponent(id)}/run`, { agentId, mode, candidateWindow, candidateAgentId: candidateAgentId || undefined });
+      out.innerHTML = `<p class="status-ok">Experiment run recorded.</p>${recordDetails(run)}`;
       await renderExperiments();
     });
   });
@@ -2782,17 +2806,16 @@ async function renderExperiments() {
     onAction(button, "click", async () => {
       const id = button.getAttribute("data-analyze");
       const analyzed = await apiGet(`/experiments/${encodeURIComponent(id)}/analyze?agentId=${encodeURIComponent(agentId)}`);
-      out.textContent = JSON.stringify(analyzed, null, 2);
+      out.innerHTML = recordRows(analyzed);
     });
   });
   tbody.querySelectorAll("button[data-gate]").forEach((button) => {
     onAction(button, "click", async () => {
       const id = button.getAttribute("data-gate");
-      const policyPath =
-        window.prompt("Experiment gate policy path:", `.amc/agents/${agentId}/experimentGate.json`) ||
-        `.amc/agents/${agentId}/experimentGate.json`;
+      const policyPath = await askInline(button, { label: "Gate rules file (a path inside the workspace)", value: `.amc/agents/${agentId}/experimentGate.json`, submit: "Check the gate" });
+      if (!policyPath) return;
       const gated = await apiPost(`/experiments/${encodeURIComponent(id)}/gate`, { agentId, policyPath });
-      out.textContent = JSON.stringify(gated, null, 2);
+      out.innerHTML = recordRows(gated);
     });
   });
 }
@@ -2854,17 +2877,18 @@ function topRows(rows, n) {
 }
 
 async function loadLatestOrgScorecard() {
-  const existing = await apiGet("/org/scorecards/latest").catch(() => null);
-  if (existing) {
-    return existing;
-  }
-  // Recompute is OWNER/OPERATOR only (studioServer.ts): anyone else would get a 403 on every Org, Compare and Systemic load.
-  const me = getCurrentUser();
-  if (me && !(me.roles || []).some((role) => role === "OWNER" || role === "OPERATOR")) {
-    return null;
-  }
-  const recomputed = await apiPost("/org/scorecards/recompute", { window: "14d" }).catch(() => null);
-  return recomputed?.scorecard || null;
+  // Reading only (C-01): opening a page never builds team scores; the button below does, on purpose.
+  return apiGet("/org/scorecards/latest").catch(() => null);
+}
+
+/** No team scores yet: say so, and let an owner or operator build them now. `again` re-renders the page. */
+function noScorecardCard(title, again) {
+  root.innerHTML = card(title, `<p>No team scores yet. They are worked out from the latest scores of the agents in your org chart.</p>
+    <div class="row wrap"><button id="orgScoreBuild" data-roles="OWNER,OPERATOR">Work out team scores now</button></div>`);
+  onAction(document.getElementById("orgScoreBuild"), "click", async () => {
+    await apiPost("/org/scorecards/recompute", { window: "14d" });
+    await again();
+  });
 }
 
 function renderFirewallEvents(events) {
@@ -2979,7 +3003,7 @@ async function renderRuntimeRuns() {
       source: "studio",
       stage: currentStage()
     }));
-    if (out) out.textContent = JSON.stringify(created, null, 2);
+    showResult(out, created);
     await renderRuntimeRuns();
   });
   onAction(document.getElementById("runtimeTraceBtn"), "click", async () => {
@@ -2992,25 +3016,27 @@ async function renderRuntimeRuns() {
       message: "Studio trace checkpoint received.",
       payload: { preview: "Studio event stream checkpoint" }
     }));
-    if (out) out.textContent = JSON.stringify(written, null, 2);
+    showResult(out, written);
     await renderRuntimeRuns();
   });
-  onAction(document.getElementById("runtimeDegradeBtn"), "click", async () => {
+  onAction(document.getElementById("runtimeDegradeBtn"), "click", async (event) => {
+    if (!confirmPress(event.currentTarget, `mark ${currentRun()} degraded`)) return;
     const written = apiPayload(await apiPost(`/api/v1/runtime/runs/${encodeURIComponent(currentRun())}/degrade`, {
       agentId,
       source: "studio",
       reason: "Operator marked run degraded from Studio."
     }));
-    if (out) out.textContent = JSON.stringify(written, null, 2);
+    showResult(out, written);
     await renderRuntimeRuns();
   });
-  onAction(document.getElementById("runtimeCompleteBtn"), "click", async () => {
+  onAction(document.getElementById("runtimeCompleteBtn"), "click", async (event) => {
+    if (!confirmPress(event.currentTarget, `mark ${currentRun()} finished`)) return;
     const written = apiPayload(await apiPost(`/api/v1/runtime/runs/${encodeURIComponent(currentRun())}/complete`, {
       agentId,
       source: "studio",
       reason: "Operator completed run from Studio."
     }));
-    if (out) out.textContent = JSON.stringify(written, null, 2);
+    showResult(out, written);
     await renderRuntimeRuns();
   });
 }
@@ -3211,7 +3237,7 @@ async function renderFirewall() {
         agentId: document.getElementById("firewallAgent")?.value || currentAgent(),
         requirePolicy: true
       }));
-      if (out) out.textContent = JSON.stringify(checked, null, 2);
+      showResult(out, checked);
       setStatus(`Runtime Firewall decision: ${checked.action} risk ${Number(checked.riskScore || 0)}`);
     } catch (error) {
       if (out) out.textContent = errText(error);
@@ -3225,14 +3251,13 @@ async function renderFirewall() {
       redacted: true,
       limit: 100
     }));
-    if (out) out.textContent = JSON.stringify(exported, null, 2);
+    showResult(out, exported);
   });
 }
 
 function renderOrgRunnerCard(runsResp, rolesResp) {
   const summaries = Array.isArray(runsResp?.summaries) ? runsResp.summaries : [];
   const roles = Array.isArray(rolesResp?.roles) ? rolesResp.roles : [];
-  const defaultRoles = "REV_PRODUCT_MANAGER,REV_TECH_LEAD,REV_QA_LEAD";
   const roleOptions = roles
     .slice(0, 70)
     .map((role) => `<option value="${htmlEscape(role.roleId)}">${htmlEscape(role.roleId)}</option>`)
@@ -3249,14 +3274,15 @@ function renderOrgRunnerCard(runsResp, rolesResp) {
     </tr>`)
     .join("");
   return card("Org Runner", `
+    <p class="muted">An org run gives a goal to a team of agent roles and checks in on them at a set pace.</p>
     <div class="row wrap">
-      <input id="orgRunGoal" placeholder="Goal" aria-label="Goal for the org run" value="Complete AMC lifecycle gaps and write handoffs" />
-      <input id="orgRunRoles" placeholder="Roles CSV" aria-label="Roles to run, comma separated" value="${htmlEscape(defaultRoles)}" list="orgRoleChoices" />
+      <label><span class="muted">Goal</span><input id="orgRunGoal" maxlength="500" /></label>
+      <label><span class="muted">Roles, comma separated (pick from the list)</span><input id="orgRunRoles" list="orgRoleChoices" /></label>
       <datalist id="orgRoleChoices">${roleOptions}</datalist>
-      <input id="orgRunHeartbeat" type="number" aria-label="Minutes between heartbeats" min="1" max="240" value="30" />
+      <label><span class="muted">Minutes between check-ins</span><input id="orgRunHeartbeat" type="number" min="1" max="240" value="30" /></label>
       <button id="orgRunStartBtn" data-roles="OWNER,OPERATOR">Run</button>
     </div>
-    <pre id="orgRunOut" class="scroll muted"></pre>
+    <div id="orgRunOut" aria-live="polite"></div>
     <div class="scroll">
       <table>
         <thead><tr><th>Run</th><th>Status</th><th>Roles</th><th>Heartbeats</th><th>Gates</th><th>Created</th></tr></thead>
@@ -3270,27 +3296,23 @@ function bindOrgRunnerControls() {
   const button = document.getElementById("orgRunStartBtn");
   const out = document.getElementById("orgRunOut");
   onAction(button, "click", async () => {
-    if (out) out.textContent = "Running...";
-    try {
-      const roles = document.getElementById("orgRunRoles")?.value || "REV_PRODUCT_MANAGER,REV_TECH_LEAD,REV_QA_LEAD";
-      const goal = document.getElementById("orgRunGoal")?.value || "Complete AMC lifecycle gaps and write handoffs";
-      const heartbeat = Number(document.getElementById("orgRunHeartbeat")?.value || "30");
-      const result = await apiPost("/org/runs", {
-        roles,
-        goal,
-        heartbeatPolicy: {
-          intervalMinutes: heartbeat,
-          maxStaleMinutes: heartbeat * 3,
-          plateauAfterHeartbeats: 3
-        }
-      });
-      if (out) {
-        out.textContent = JSON.stringify(result.summary || result.artifact?.summary || result, null, 2);
+    const roles = (document.getElementById("orgRunRoles")?.value || "").trim();
+    const goal = (document.getElementById("orgRunGoal")?.value || "").trim();
+    const heartbeat = Number(document.getElementById("orgRunHeartbeat")?.value || "30");
+    if (!goal) throw new Error("Write the goal for this run.");
+    if (!roles) throw new Error("Name at least one role; the list shows the roles you can pick.");
+    if (!Number.isInteger(heartbeat) || heartbeat < 1 || heartbeat > 240) throw new Error("Minutes between check-ins must be a whole number from 1 to 240.");
+    const result = await apiPost("/org/runs", {
+      roles,
+      goal,
+      heartbeatPolicy: {
+        intervalMinutes: heartbeat,
+        maxStaleMinutes: heartbeat * 3,
+        plateauAfterHeartbeats: 3
       }
-      await renderOrg();
-    } catch (err) {
-      if (out) out.textContent = err?.message || String(err);
-    }
+    });
+    if (out) out.innerHTML = `<p class="status-ok">Org run started.</p>${recordDetails(result.summary || result.artifact?.summary || result)}`;
+    await renderOrg();
   });
 }
 
@@ -3302,10 +3324,8 @@ async function renderOrg() {
   ]);
   const runnerCard = renderOrgRunnerCard(runsResp, rolesResp);
   if (!scorecard) {
-    root.innerHTML = `
-      ${runnerCard}
-      ${card("Org Compass", "<p class='muted'>No team scores yet. AMC builds them when an owner or operator opens the Org page. If that is you and this stays empty, the build did not finish: refresh to try again.</p>")}
-    `;
+    noScorecardCard("Team scores", renderOrg);
+    root.insertAdjacentHTML("afterbegin", runnerCard);
     bindOrgRunnerControls();
     return;
   }
@@ -3474,7 +3494,7 @@ async function renderOrg() {
 async function renderCompare() {
   const scorecard = await loadLatestOrgScorecard();
   if (!scorecard) {
-    root.innerHTML = card("Org Compare", "<p class='muted'>No team scores yet. AMC builds them when an owner or operator opens the Org page. If that is you and this stays empty, the build did not finish: refresh to try again.</p>");
+    noScorecardCard("Compare teams", renderCompare);
     return;
   }
   const nodes = Array.isArray(scorecard.nodes) ? scorecard.nodes : [];
@@ -3527,7 +3547,7 @@ async function renderCompare() {
 async function renderSystemic() {
   const scorecard = await loadLatestOrgScorecard();
   if (!scorecard) {
-    root.innerHTML = card("Systemic Risks", "<p class='muted'>No team scores yet. AMC builds them when an owner or operator opens the Org page. If that is you and this stays empty, the build did not finish: refresh to try again.</p>");
+    noScorecardCard("Shared risks", renderSystemic);
     return;
   }
   const enterprise = scorecard.summary?.enterpriseRollup;
@@ -3600,7 +3620,7 @@ async function renderOrgCommitments() {
     const kind = document.getElementById("orgCommitKind")?.value || "commit";
     const days = Number(document.getElementById("orgCommitDays")?.value || "30");
     const created = await apiPost("/org/commitments/generate", { nodeId, kind, days });
-    out.textContent = JSON.stringify(created, null, 2);
+    showResult(out, created);
   });
 }
 
@@ -3664,7 +3684,7 @@ async function renderPlugins() {
     }
     try {
       const out = await apiGet(`/plugins/registry/browse?id=${encodeURIComponent(id)}&query=${encodeURIComponent(query)}`);
-      browseOut.textContent = JSON.stringify(out, null, 2);
+      showResult(browseOut, out);
     } catch (error) {
       browseOut.textContent = `browse failed: ${errText(error)}`;
     }
@@ -3680,7 +3700,7 @@ async function renderPlugins() {
     }
     try {
       const out = await apiPost("/plugins/install", { agentId: currentAgent(), registryId, pluginRef });
-      actionOut.textContent = JSON.stringify(out, null, 2);
+      showResult(actionOut, out);
     } catch (error) {
       actionOut.textContent = `install request failed: ${errText(error)}`;
     }
@@ -3695,7 +3715,7 @@ async function renderPlugins() {
     const [pluginId, to] = pluginRef.includes("@") ? pluginRef.split("@") : [pluginRef, "latest"];
     try {
       const out = await apiPost("/plugins/upgrade", { agentId: currentAgent(), registryId, pluginId, to });
-      actionOut.textContent = JSON.stringify(out, null, 2);
+      showResult(actionOut, out);
     } catch (error) {
       actionOut.textContent = `upgrade request failed: ${errText(error)}`;
     }
@@ -3708,7 +3728,7 @@ async function renderPlugins() {
     }
     try {
       const out = await apiPost("/plugins/remove", { agentId: currentAgent(), pluginId });
-      actionOut.textContent = JSON.stringify(out, null, 2);
+      showResult(actionOut, out);
     } catch (error) {
       actionOut.textContent = `remove request failed: ${errText(error)}`;
     }
@@ -3721,7 +3741,7 @@ async function renderPlugins() {
     }
     try {
       const out = await apiPost("/plugins/execute", { approvalRequestId });
-      actionOut.textContent = JSON.stringify(out, null, 2);
+      showResult(actionOut, out);
       await renderPlugins();
     } catch (error) {
       actionOut.textContent = `execute failed: ${errText(error)}`;
@@ -3814,7 +3834,17 @@ async function renderPage() {
 
   try {
     if (page === "home") return await renderHome();
-    if (page === "native-tasks") return await renderNativeTasksPage({ root, initialAgent: currentAgent() });
+    if (page === "native-tasks") {
+      // Opened from an agent project's build session (?project=): a way back to it, kept in view while the page scrolls, so it
+      // is there right after Close and verify (the project's next step, Review, is on that page).
+      const project = new URLSearchParams(location.search).get("project");
+      if (/^a4p_[0-9a-f]{32}$/.test(project ?? "") && !document.getElementById("a4BackLink")) {
+        root.insertAdjacentHTML("beforebegin", `<p id="a4BackLink" style="position:sticky;top:0;z-index:5;margin:0;padding:8px 0;background:var(--bg)"><a class="button" href="./a4Project?project=${project}&amp;stage=assemble">Back to the agent project</a></p>`);
+        // A control the page scrolls into view (a focused field, a result) stops below the bar, never under it.
+        document.documentElement.style.scrollPaddingTop = "76px";
+      }
+      return await renderNativeTasksPage({ root, initialAgent: currentAgent() });
+    }
     if (page === "agent") return await renderAgent();
     if (page === "evidence") return await renderEvidence();
     if (page === "runtime") return await renderRuntimeRuns();
@@ -3838,10 +3868,14 @@ async function renderPage() {
         }).catch((error) => ({ error: errText(error) }));
         rows.push({ actionClass, decision });
       }
-      const verdict = ({ decision }) => decision.error ? `error (${htmlEscape(decision.error)})` : `${decision.allowed ? "allowed" : "denied"}${decision.effectiveMode ? ` as ${htmlEscape(decision.effectiveMode)}` : ""}`;
+      // A check only evaluates the policy; it records nothing.
+      const classWords = { READ_ONLY: "Reading only", WRITE_LOW: "Small changes", WRITE_HIGH: "Bigger changes", DEPLOY: "Releasing", SECURITY: "Security settings" };
+      const verdict = ({ decision }) => decision.error ? `could not be checked: ${htmlEscape(decision.error)}`
+        : !decision.allowed ? "not allowed"
+          : decision.effectiveMode === "SIMULATE" ? "allowed only as a dry run: AMC records what would happen and does nothing" : "allowed";
       root.innerHTML = card("Governor", `
-        <p class="muted">What the Governor decides for ${htmlEscape(currentAgent())} at medium risk in EXECUTE mode.</p>
-        <ul>${rows.map((row) => `<li><strong>${row.actionClass}</strong>: ${verdict(row)}</li>`).join("")}</ul>
+        <p class="muted">What the Governor would decide for ${htmlEscape(currentAgent())} if it asked to really do each kind of action at medium risk.</p>
+        <ul>${rows.map((row) => `<li><strong>${classWords[row.actionClass]}</strong> <small class="muted">${row.actionClass}</small>: ${verdict(row)}</li>`).join("")}</ul>
         ${jsonDetails("Full decisions, with every condition and reason:", rows)}`);
       return;
     }
@@ -3861,7 +3895,7 @@ async function renderPage() {
         <div class="row">
           <button id="issueLeaseBtn" data-roles="OWNER">Issue Lease For ${htmlEscape(currentAgent())}</button>
         </div>
-        <pre id="leaseOut" class="muted"></pre>
+        <div id="leaseOut" aria-live="polite"></div>
       `);
       onAction(document.getElementById("issueLeaseBtn"), "click", async () => {
         const issued = await apiPost(`/agents/${encodeURIComponent(currentAgent())}/lease`, {
@@ -3872,7 +3906,23 @@ async function renderPage() {
           rpm: 60,
           tpm: 200000
         });
-        document.getElementById("leaseOut").textContent = `Lease token (copy once): ${issued.lease}`;
+        // C-30: the token in a read-only field with a Copy button; AMC shows it this once.
+        const holder = document.getElementById("leaseOut");
+        holder.innerHTML = `<p>Lease issued for one hour. Copy the token now: AMC shows it only this once.</p>
+          <div class="row wrap"><input id="leaseToken" readonly aria-label="Lease token" spellcheck="false" autocomplete="off" />
+          <button type="button" id="leaseCopy" class="secondary">Copy token</button><span id="leaseCopyStatus" class="muted" role="status"></span></div>`;
+        const field = document.getElementById("leaseToken");
+        field.value = String(issued.lease ?? "");
+        onAction(document.getElementById("leaseCopy"), "click", async () => {
+          const said = document.getElementById("leaseCopyStatus");
+          try {
+            await navigator.clipboard.writeText(field.value);
+            said.textContent = "Copied.";
+          } catch {
+            field.select();
+            said.textContent = "Select the token and copy it (Cmd+C or Ctrl+C).";
+          }
+        });
       });
       return;
     }
@@ -3881,9 +3931,9 @@ async function renderPage() {
       root.innerHTML = card("Budgets", `
         <p class="muted">Budgets cap what an agent may spend and how much it may do. Edit the draft below (JSON) and apply it as a signed update.</p>
         <label for="budgetsDraft">Budgets config (JSON)</label>
-        <textarea id="budgetsDraft" rows="18">${JSON.stringify(data.config, null, 2)}</textarea>
+        <textarea id="budgetsDraft" rows="18">${htmlEscape(JSON.stringify(data.config, null, 2))}</textarea>
         <div class="row"><button id="applyBudgets" data-roles="OWNER">Apply Budgets</button></div>
-        <pre id="budgetOut" class="muted"></pre>
+        <div id="budgetOut" aria-live="polite"></div>
       `);
       onAction(document.getElementById("applyBudgets"), "click", async () => {
         const raw = document.getElementById("budgetsDraft").value;
@@ -3894,7 +3944,7 @@ async function renderPage() {
           throw new Error(`Budgets JSON is invalid, nothing was applied: ${errText(error)}`); // M8: onAction shows it inline
         }
         const out = await apiPost("/budgets/apply", { config: parsed });
-        document.getElementById("budgetOut").textContent = displayJson(out);
+        document.getElementById("budgetOut").innerHTML = `<p class="status-ok">Budgets saved and signed at ${htmlEscape(new Date().toLocaleTimeString())}.</p>${recordDetails(out)}`;
         await refreshUnifiedBanner();
       });
       return;
@@ -3906,12 +3956,12 @@ async function renderPage() {
         <p class="muted">Drift compares the agent's latest run with the run before it and flags behaviour that changed.</p>
         ${jsonDetails(runStateSummary(agentId, status.latestRun), status)}
         ${runStateWarning(status.latestRun)}
-        <button id="driftCheck" data-roles="OWNER,OPERATOR">Run Drift Check Now</button>
-        <pre id="driftOut" class="muted"></pre>
+        <button id="driftCheck" data-roles="OWNER,OPERATOR">Check for drift now</button>
+        <div id="driftOut" aria-live="polite"></div>
       `);
       onAction(document.getElementById("driftCheck"), "click", async () => {
         const out = await apiPost(`/agents/${encodeURIComponent(agentId)}/drift/check`, { against: "previous" });
-        document.getElementById("driftOut").textContent = displayJson(out);
+        document.getElementById("driftOut").innerHTML = `<p>Checked at ${htmlEscape(new Date().toLocaleTimeString())}.</p>${recordRows(out)}`;
         await refreshUnifiedBanner();
       });
       return;
@@ -3921,9 +3971,9 @@ async function renderPage() {
       const stats = await apiGet("/benchmarks/stats");
       const federation = await apiGet("/federation/status").catch(() => null);
       root.innerHTML = `
-        ${card("Benchmark Stats", `<pre>${JSON.stringify(stats, null, 2)}</pre>`)}
-        ${card("Benchmarks", `<pre>${JSON.stringify(list, null, 2)}</pre>`)}
-        ${card("Federation", `<pre>${JSON.stringify(federation || {}, null, 2)}</pre>`)}
+        ${card("Benchmark stats", recordRows(stats))}
+        ${card("Benchmarks", recordRows(list))}
+        ${card("Federation", recordRows(federation || {}))}
       `;
       return;
     }
@@ -4123,7 +4173,13 @@ async function renderPage() {
     if (page === "score") return; // score.html's command list is static markup inside #app
     return await renderGeneric("Console", "/status");
   } catch (error) {
-    root.innerHTML = `<div class="card status-bad">${htmlEscape(errText(error))}</div>`;
+    // Nothing recorded yet is a state, not a failure: say what makes it appear (C-01 left these pages read-only).
+    if (error?.code === "NO_RUN_YET") {
+      root.innerHTML = card("No score yet", `<p>This page shows what AMC learned from your agent's latest score, and there is none yet.</p>
+        <p>Run a score with <code>amc run</code> in the workspace folder, or let AMC watch your agent work first (<a href="./home">Home</a> shows how).</p>`);
+      return;
+    }
+    root.innerHTML = `<div class="card status-bad" role="alert">${htmlEscape(errText(error))}</div>`;
     setStatus(errText(error), true);
   }
 }

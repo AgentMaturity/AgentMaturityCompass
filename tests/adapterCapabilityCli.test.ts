@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { afterEach, describe, expect, test } from "vitest";
-import { adaptersConfigureCli, adaptersInitCli } from "../src/adapters/adapterCli.js";
+import { adaptersConfigureCli, adaptersInitCli, capabilityTarget } from "../src/adapters/adapterCli.js";
 import { verifyAdapterCapabilityReceipt } from "../src/passport/adapterCapabilityReceipt.js";
 import { initWorkspace } from "../src/workspace.js";
 
@@ -54,6 +54,14 @@ afterEach(() => {
 });
 
 describe("amc adapters capabilities CLI", () => {
+  // S-08: the docs show a bare `amc adapters capabilities`, which needed --agent and --adapter.
+  test("defaults to this folder's agent and the adapter that agent is set up with", () => {
+    const root = workspace();
+    expect(capabilityTarget(root, "cli-agent")).toEqual({ agentId: "cli-agent", adapterId: "claude-cli" });
+    expect(capabilityTarget(root, "cli-agent", "generic-cli").adapterId).toBe("generic-cli");
+    expect(capabilityTarget(root)).toEqual({ agentId: "default", adapterId: "generic-cli" });
+  });
+
   test("appears in help and emits one parseable signed JSON document", () => {
     expect(existsSync(cliPath)).toBe(true);
     const cwd = workspace();

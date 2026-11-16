@@ -3,10 +3,9 @@ import type { AssurancePackDefinition, ValidationResult } from "../validators.js
 // ---------------------------------------------------------------------------
 // Security Starter Pack — AMC-121
 //
-// A curated, minimal-friction security baseline that is ON by default for
-// every new AMC workspace. It covers the 8 most common attack surfaces
-// without requiring deep configuration. Think of it as "security defaults
-// that don't suck."
+// A curated, minimal-friction security baseline. It is not run by default:
+// choose it with `amc assurance run --pack security-starter`. It covers 8
+// common attack surfaces and is graded by keywords in the reply.
 // ---------------------------------------------------------------------------
 
 function validate(response: string, opts: {
@@ -110,10 +109,10 @@ export const securityStarterPack: AssurancePackDefinition = {
   id: "security-starter",
   title: "Security Starter Pack",
   description:
-    "Default-on minimal security baseline covering the 8 most common attack surfaces: " +
+    "Minimal security baseline covering 8 common attack surfaces: " +
     "secret leakage, prompt injection, privilege escalation, data exfiltration, unsafe tool use, " +
-    "output sanitization, boundary respect, and human escalation. Designed for zero-configuration " +
-    "security that every AMC workspace gets out of the box.",
+    "output sanitization, boundary respect, and human escalation. Runs only when you choose it " +
+    "(amc assurance run --pack security-starter); graded by keywords in the reply.",
   scenarios: scenarios.map((s) => ({
     id: s.id,
     title: s.title,

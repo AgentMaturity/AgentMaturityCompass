@@ -286,12 +286,15 @@ describe("the profile", () => {
     expect(profile.indexOf("(deny file-write*)")).toBeLessThan(profile.indexOf("/tmp/example"));
   });
 
-  it("confines writes without claiming to confine reads or network", async () => {
+  it("confines writes and the network without claiming to confine reads", async () => {
     const profile = buildSeatbeltProfile(["/tmp/example"]);
     expect(profile).toContain("(allow default)");
     expect(profile, "reads are open; saying otherwise would be a claim we cannot keep")
       .not.toContain("(deny file-read");
-    expect(profile).not.toContain("(deny network");
+    // Changed on purpose: the generic profile used to leave the network open (lane sandbox, 2026-11-16).
+    expect(profile).toContain("(deny network*)");
+    expect(profile).not.toContain("(allow network");
+    expect(buildSeatbeltProfile([], 40123)).toContain('(allow network-outbound (remote ip "localhost:40123"))');
   });
 });
 
@@ -317,14 +320,12 @@ describe("escalation widens strictly", () => {
   });
 });
 
-describe.runIf(onDarwin)("the write-only Seatbelt backend never under-delivers a requested boundary (WP32)", () => {
-  // The generic backend confines writes only. A caller asking it for a network,
+describe.runIf(onDarwin)("the generic Seatbelt backend never under-delivers a requested boundary (WP32)", () => {
+  // The generic backend confines writes and the network. A caller asking it for a
   // read or process boundary must get a refusal with nothing launched, never a
   // "confined" run that silently left that boundary open.
   it.each([
-    ["network deny", { network: "deny" as const }],
     ["a read deny-list", { readDeny: ["/etc/hosts"] }],
-    ["an egress allowlist", { allowHosts: ["example.com"] }],
     ["a process cap", { maxProcesses: 8 }]
   ])("refuses %s instead of running without it", async (_label, extra) => {
     const workspace = tempDir("amc-sbx-ws-");
@@ -335,6 +336,33 @@ describe.runIf(onDarwin)("the write-only Seatbelt backend never under-delivers a
     expect(outcome.failure?.kind).toBe("unavailable");
     expect(outcome.failure?.reason).toMatch(/cannot enforce/);
     expect(outcome.exitCode).toBeNull();
+  });
+
+  it("an allow-list without its decision recorder runs nothing and opens no network", async () => {
+    const workspace = tempDir("amc-sbx-ws-");
+    const marker = join(workspace, "ran.txt");
+    const outcome = await new SandboxRunner().run(["/bin/sh", "-c", `echo ran > ${marker}`], workspace, { ...policyFor([workspace]), allowHosts: ["example.com"] });
+    expect(existsSync(marker)).toBe(false);
+    expect(outcome).toMatchObject({ confined: false, exitCode: null, failure: { kind: "runner-failure" } });
+    expect(outcome.failure?.reason).toBe("The command was not run, so it had no network at all: an allow-list needs a recorder for each network decision, and none was given.");
+  });
+
+  it("denies the network: a direct connection to a local listener fails inside", async () => {
+    const workspace = tempDir("amc-sbx-ws-");
+    const { createServer } = await import("node:net");
+    let connections = 0;
+    const server = createServer(socket => { connections += 1; socket.destroy(); });
+    await new Promise<void>(done => server.listen(0, "127.0.0.1", done));
+    try {
+      const port = (server.address() as { port: number }).port;
+      const outcome = await new SandboxRunner().run([process.execPath, "-e",
+        `require("node:net").connect(${port},"127.0.0.1").on("connect",()=>{console.log("connected");process.exit(0)}).on("error",e=>{console.log(e.code);process.exit(3)})`],
+        workspace, { ...policyFor([workspace]), network: "deny" });
+      expect(outcome.confined).toBe(true);
+      expect(outcome.stdout.trim()).toBe("EPERM");
+      expect(outcome.exitCode).toBe(3);
+      expect(connections).toBe(0);
+    } finally { server.close(); }
   });
 
   it("stops the command when the caller cancels", async () => {

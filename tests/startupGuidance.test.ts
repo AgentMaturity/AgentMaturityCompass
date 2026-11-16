@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -56,6 +56,25 @@ describe("startup guidance", () => {
     expect(rendered).toContain("What Is Blocking You");
     expect(rendered).toContain("amc init --minimal");
     expect(rendered).toContain("amc quickscore --answers amc-startup-answers.json --json");
+  });
+
+  // CLI-19: a passphrase file read as "not set", the fix was a placeholder secret, and init was offered in a set-up folder.
+  test("what-broken counts a passphrase file and skips set-up steps already done", () => {
+    const root = tempRoot();
+    writeFileSync(join(root, "amc-startup-answers.json"), "{}", "utf8");
+    const plan = buildStartupGuidancePlan({ workspace: root, env: { AMC_VAULT_PASSPHRASE_FILE: "/secrets/amc" } });
+    expect(plan.issues.map((issue) => issue.id)).not.toContain("vault_env_missing");
+    const rendered = renderStartupGuidancePlan(plan, { onlyBroken: true });
+    expect(rendered).toContain("1. amc init --minimal");
+    expect(rendered).not.toContain("--answers-out");
+    const unset = buildStartupGuidancePlan({ workspace: root, env: {} });
+    expect(renderStartupGuidancePlan(unset, { onlyBroken: true })).not.toContain("replace-with-a-secret");
+    expect(unset.issues.find((issue) => issue.id === "vault_env_missing")?.fixCommand).toContain("AMC_VAULT_PASSPHRASE_FILE");
+    mkdirSync(join(root, ".amc"));
+    writeFileSync(join(root, ".amc", "amc.config.yaml"), "", "utf8");
+    const ready = renderStartupGuidancePlan(buildStartupGuidancePlan({ workspace: root, env: {} }), { onlyBroken: true });
+    expect(ready).not.toContain("amc init");
+    expect(ready).toContain("1. amc quickscore");
   });
 
   test("built CLI writes sample answers and prints startup plan JSON", () => {

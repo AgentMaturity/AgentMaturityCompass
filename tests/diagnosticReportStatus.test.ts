@@ -127,7 +127,7 @@ describe("diagnostic report status explanation", () => {
     const explanation = explainDiagnosticReportStatus(empty);
     expect(explanation.strongClaimsAllowed).toBe(false);
     expect(explanation.evidenceStatus).toBe("INSUFFICIENT_EVIDENCE");
-    expect(explanation.claimBoundary).toContain("Signing proves integrity, not evidence sufficiency");
+    expect(explanation.claimBoundary).toContain("A signature shows the record is unchanged, not that there is enough evidence");
 
     const markdown = generateReport(empty, "md") as string;
     expect(markdown).toContain("Artifact Status: **VALID** — Verified evidence chain");

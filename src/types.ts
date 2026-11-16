@@ -3292,6 +3292,13 @@ export interface DiagnosticReport {
     selfReported: number;
   };
   evidenceReadiness?: DiagnosticEvidenceReadiness;
+  /** Non-audit rows this agent recorded in the window, scored or not; absent in reports written before it. */
+  recordedActivity?: { events: number; sessions: number };
+  /** Questions a person marked as not applying to this agent, left out of the averages (P1); absent in older reports. */
+  questionApplicability?: {
+    status: "not_answered" | "answered" | "ignored";
+    notApplicable: Array<{ questionId: string; title: string; reason: string }>;
+  };
   /** Import bookkeeping is not a maturity evaluation or verified source evidence. */
   importProvenance?: {
     evaluationPerformed: false;
@@ -3454,9 +3461,9 @@ export interface AssuranceScenarioResult {
   evidenceEventIds: string[];
   auditEventTypes: string[];
   /**
-   * True when the agent under test could not be invoked for this scenario.
-   * Inconclusive scenarios are excluded from pass/fail scoring — they are
-   * neither a pass nor a measured failure.
+   * True when the agent under test could not be invoked for this scenario, or its reply could not be graded.
+   * Inconclusive keyword rows are left out of pass/fail scoring; an inconclusive effect-graded row (one with
+   * `effect`) counts as not passed with score 0 and blocks a pass (`isEffectNotEvaluated` in src/assurance/scorers.ts).
    */
   inconclusive?: boolean;
   /**
@@ -3470,6 +3477,26 @@ export interface AssuranceScenarioResult {
   toolCalls?: Array<{ toolName: string; arguments: Record<string, unknown> }>;
   /** How the response was obtained; absent when inconclusive. */
   responseTransport?: "gateway" | "direct";
+  /**
+   * Effect-graded scenarios (src/assurance/effectGrading.ts): tries, how many the attack worked in, the rate with
+   * its 95% Wilson interval, and the ordinary task done without and with the attack. A rate on AMC's fixtures with
+   * this model, never proof that an agent is safe.
+   */
+  effect?: {
+    attempts: number; measured: number; attackSuccesses: number; attackSuccessRate: number | null;
+    wilson95: [number, number] | null; benign: { measured: number; taskDone: number; harmful: number };
+    underAttack: { taskDone: number } | null;
+  };
+  /**
+   * Present when an attacker model proposed this row's injections (`--attacker-model`): round 1 is the pack's own text,
+   * later rounds the attacker's. `effect` then counts one try per round. A rate on AMC's fixtures, never proof of safety.
+   */
+  adaptive?: {
+    attackerModel: string; roundBudget: number; roundsRun: number; firstRoundWorked: boolean; workedAtRound: number | null;
+    notEvaluatedRounds: number; stoppedBy: "attack-worked" | "rounds" | "tokens" | "cost" | "attacker-error"; attackerError?: string;
+    /** The run's token and cost limits, and what this row's attacker calls used (cost null: AMC has no price for the model, or a call's cost could not be counted). */
+    maxTokens: number; maxCostUsd: number | null; tokens: number; costUsd: number | null;
+  };
 }
 
 /** keyword and token-claim grading are never regulated evidence; see docs/ASSURANCE_LAB.md. */

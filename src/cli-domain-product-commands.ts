@@ -188,13 +188,16 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
     .option("--json", "Output as JSON")
     .action(async (opts: { pack: string; json?: boolean }) => {
       const pack = await packOrExit(opts.pack);
-      if (opts.json) { console.log(JSON.stringify(pack, null, 2)); return; }
+      const { citationCheckLine, citationCheckSummary } = await import("./domains/packs/citationChecks.js");
+      const citationChecks = citationCheckSummary(pack);
+      if (opts.json) { console.log(JSON.stringify({ ...pack, citationChecks }, null, 2)); return; }
 
       console.log(chalk.bold.hex('#4AEF79')(`\n🏭  ${pack.name}`));
       console.log(chalk.gray(`  Pack ID:    ${pack.id}`));
       console.log(chalk.gray(`  Station:    ${pack.stationId}`));
       console.log(chalk.gray(`  Risk level: ${pack.riskTier}`));
       console.log(chalk.gray(`  Questions:  ${pack.questions.length}`));
+      console.log(chalk.gray(`  Citations:  ${citationCheckLine(citationChecks)}`));
       const { QUESTIONNAIRE_CONTENT_STATUS, QUESTIONNAIRE_NOTICE } = await import("./domains/questionnaireLabel.js");
       console.log(chalk.gray(`  Content:    ${pack.contentStatus ?? QUESTIONNAIRE_CONTENT_STATUS}, self-reported questionnaire. ${QUESTIONNAIRE_NOTICE}`));
       if (pack.description) console.log(`\n  ${pack.description}`);
@@ -264,15 +267,24 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
         for (const q of pack.questions) {
           // Full texts: the question prints once above the prompt, so only the levels redraw as the cursor moves.
           (opts.json ? console.error : console.log)(`\n  ${chalk.cyan(q.id)} [${q.dimension}]: ${q.text}`);
-          const { level } = await ask([{
-            type: "select",
-            name: "level",
-            message: `Level for ${q.id}`,
-            // Inquirer wraps long choices; its default page of 7 rows would cut wrapped level texts off.
-            pageSize: 30,
-            choices: packRun.packLevelChoices(q)
-          }]);
-          responses[q.id] = level;
+          let level: number;
+          try {
+            ({ level } = await ask([{
+              type: "select",
+              name: "level",
+              message: `Level for ${q.id}`,
+              // Inquirer wraps long choices; its default page of 7 rows would cut wrapped level texts off.
+              pageSize: 30,
+              choices: packRun.packLevelChoices(q)
+            }]));
+          } catch (error) {
+            // CLI-29: Ctrl-C used to lose every answer given so far; they are kept in a file the person can score later.
+            if (!packRun.promptAborted(error)) throw error;
+            console.error(packRun.saveAnswersOnAbort(pack.id, responses, process.cwd()));
+            process.exit(130);
+            return;
+          }
+          if (level !== packRun.SKIP_LEVEL) responses[q.id] = level;
         }
       }
 

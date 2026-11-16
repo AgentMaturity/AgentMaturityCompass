@@ -1,3 +1,4 @@
+import { esc, recordDetails } from "./pageKit.js";
 import { renderCgxViewer } from "./components/cgxViewer.js";
 
 export async function renderContextGraphPage(params) {
@@ -9,15 +10,16 @@ export async function renderContextGraphPage(params) {
   ]);
 
   params.root.innerHTML = `
-    ${params.card("CGX Status", `
+    ${params.card("Context graph", `
+      <p class="muted">What AMC knows about how this agent's parts, tools and data connect, and whether those records are signed.</p>
       <div class="grid">
-        <div><div class="muted">Agent</div><div class="tile-value">${agentId}</div></div>
+        <div><div class="muted">Agent</div><div class="tile-value">${esc(agentId)}</div></div>
         <div><div class="muted">Graph Signature</div><div class="tile-value">${verify?.workspaceGraph?.valid ? "PASS" : "WARN"}</div></div>
         <div><div class="muted">Pack Signature</div><div class="tile-value">${verify?.agentPacks?.find?.((row) => row.agentId === agentId)?.verify?.valid ? "PASS" : "WARN"}</div></div>
         <div><div class="muted">Pack Hash</div><div class="tile-value">${pack ? "present" : "missing"}</div></div>
       </div>
-      <details><summary>Verification details</summary><pre>${JSON.stringify(verify, null, 2)}</pre></details>
-      <details><summary>Context pack</summary><pre>${JSON.stringify(pack, null, 2)}</pre></details>
+      ${recordDetails(verify, "Show the signature checks")}
+      ${recordDetails(pack, "Show the context pack")}
     `)}
     <div id="cgxViewer"></div>
   `;

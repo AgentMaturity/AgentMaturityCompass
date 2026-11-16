@@ -6,7 +6,9 @@
  * never from the environment or a request body.
  */
 import type { Command } from "commander";
-import { resolve } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { sha256Hex } from "./utils/hash.js";
+import { join, resolve } from "node:path";
 import chalk from "chalk";
 import {
   loadTrustContext, untrustedReasons, verdictExitCode,
@@ -83,13 +85,33 @@ export function finishVerify(label: string, report: VerifierReportV1,
     const result = opts.result ?? report;
     console.log(JSON.stringify(claim ? withClaimFields(result, claim) : result, null, 2));
   } else {
+    // CLI-11: an intact artifact whose signer is only unpinned did not fail; it is not trusted yet, and the pin is named.
+    const refused = report.issuerAdmission.signatures.filter((signature) => signature.status !== "admitted");
+    const onlyUnpinned = code === 1 && report.integrity.status === "pass" && refused.length > 0 && refused.every((signature) => signature.status === "not-pinned");
     console.log(code === 0 ? chalk.green(`${label} verification PASSED`)
-      : code === 2 ? chalk.yellow(`${label} integrity verified, UNTRUSTED`) : chalk.red(`${label} verification FAILED`));
+      : code === 2 ? chalk.yellow(`${label} integrity verified, UNTRUSTED`)
+        : onlyUnpinned ? chalk.yellow(`${label} integrity verified, NOT TRUSTED: the signer's public key is not pinned`) : chalk.red(`${label} verification FAILED`));
     if (claim) printClaimResult(claim, {});
     for (const line of code === 0 ? opts.details ?? [] : reasons.map((reason) => `- ${reason}`)) console.log(line);
+    if (onlyUnpinned && refused.some((signature) => signature.purpose === "artifact-seal")) for (const line of folderKeyHint(process.cwd())) console.log(chalk.gray(line));
   }
   if (code === 2) untrusted(reasons, report.overrides);
   if (code !== 0) process.exit(code);
+}
+
+/**
+ * CLI-11: how to pin a signer without treating the key stored next to the records as a trust root. A check against that
+ * key shows only that the file matches the key kept in this folder; whoever can change the records can replace the key
+ * too. So the hint gives its sha256 to compare with one recorded outside the folder, and never recommends it alone.
+ */
+function folderKeyHint(workspace: string): string[] {
+  const path = join(workspace, ".amc", "keys", "artifact-seal.pub");
+  const general = "Next: pass --pubkey with the signer's public key obtained outside this folder (for someone else's file, the key they gave you), or a signed trust list with --trust-list.";
+  if (!existsSync(path)) return [general];
+  return [general,
+    `This folder keeps its own signing key at .amc/keys/artifact-seal.pub (sha256 ${sha256Hex(readFileSync(path))}). Checking against it shows only that the file`
+      + " matches the key kept in this folder, and anyone who can change the records here can replace that key too. Pass it as --pubkey only after comparing"
+      + " that sha256 with one you recorded outside this folder."];
 }
 
 /** After an action that proceeds on an allowed integrity-only verdict (backup restore): "UNTRUSTED:" on stderr, exit 2. */

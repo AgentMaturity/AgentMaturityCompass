@@ -8,6 +8,7 @@
 import { effectDecideButtons, engineDecision, rememberDecided } from "./a4Approvals.js";
 import { registerStageAction, registerStageCard } from "./a4Cards.js";
 import * as view from "./a4View.js";
+import { code as smallCode, itemLine, itemWithRecord, record, say, when } from "./a4Plain.js";
 
 const { esc } = view;
 const SPEC = "amc.a4-adapt-spec/v1";
@@ -18,11 +19,8 @@ const list = (value) => (Array.isArray(value) ? value : []);
 const specOf = (ctx) => (isObject(ctx.stageRevision?.spec) ? ctx.stageRevision.spec : {});
 const itemOf = (ctx, id) => list(ctx.readiness?.items).find((item) => item.id === id) ?? null;
 const codes = (values) => list(values).map((code) => `<code>${esc(code)}</code>`).join(" ");
-const status = (ctx, id) => {
-  const item = itemOf(ctx, id);
-  return item ? `<p class="muted"><code>${esc(id)}</code> <code>${esc(item.status)}</code> ${codes(item.reasonCodes)}${item.nextAction?.label
-    ? ` · ${esc(item.nextAction.label)}` : ""}</p>` : "";
-};
+/** One readiness item in words, its record (id, status, reason codes, next action) under "Show the record". */
+const status = (ctx, id) => itemWithRecord(itemOf(ctx, id), id);
 const table = (head, rows, empty) => (rows.length ? `<div class="scroll"><table><thead><tr>${head.map((cell) => `<th>${esc(cell)}</th>`).join("")}</tr></thead>
   <tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>`).join("")}</tbody></table></div>` : `<p class="muted">${esc(empty)}</p>`);
 const coded = (item, prefix) => list(item?.reasonCodes).filter((code) => String(code).startsWith(`${prefix}:`)).map((code) => String(code).slice(prefix.length + 1).split(":"));
@@ -45,7 +43,7 @@ function renderApplicability(ctx) {
       <code>${esc(citation.appliesWhen)}</code>; retrieval <code>${esc(citation.retrieval)}</code>)`).join("<br>")]);
   const register = list(facts.register).map((entry) => [`<code>${esc(entry.id)}</code>`, esc(entry.instrument), esc(entry.jurisdiction),
     `<code>${esc(entry.status)}</code>`, `<code>verified: ${esc(entry.verified)}</code>`]);
-  return `<p><strong>${esc(facts.notice)}</strong> <code>D-08</code></p>
+  return `<p><strong>${esc(facts.notice)}</strong></p>
     ${facts.compileError ? `<p class="status-bad">The answers did not compile: <code>${esc(facts.compileError.code)}</code> ${esc(facts.compileError.message)}</p>` : ""}
     ${table(["Requirement", "Applicability", "Missing facts", "Support / review", "Citations"], rows, "No requirement compiled.")}
     <h4>Register entries of the stations</h4>${table(["Entry", "Instrument", "Jurisdiction", "Status", "Verified (as recorded)"], register, "None.")}
@@ -75,9 +73,12 @@ function renderBlockers(ctx) {
   if (!Array.isArray(ctx.readiness?.items)) return "<p class=\"status-bad\">Studio returned no readiness evaluation, so nothing here is shown as clear.</p>";
   const open = list(ctx.readiness?.items).filter((item) => item.status !== "READY" && item.status !== "COMPLETE");
   const kinds = [...new Set(open.map((item) => item.kind ?? "not_evaluated"))];
-  return kinds.length === 0 ? `<p class="muted">No item is waiting in this evaluation (${esc(ctx.readiness.evaluatedAt ?? "time not stated")}).</p>` : kinds.map((kind) => `<h4><code>${esc(kind)}</code></h4><ul class="a4-rows">${open
-    .filter((item) => (item.kind ?? "not_evaluated") === kind).map((item) => `<li><code>${esc(item.id)}</code> <code>${esc(item.status)}</code>${item.mandatory ? "" : " (informational)"}
-      ${codes(item.reasonCodes)}${item.nextAction?.label ? `<br><span class="muted">${esc(item.nextAction.label)}</span>` : ""}</li>`).join("")}</ul>`).join("");
+  if (kinds.length === 0) return `<p class="muted">Nothing is waiting in this check (made ${when(ctx.readiness.evaluatedAt) || "at a time Studio did not state"}).</p>
+    ${record(`<p class="muted">No item is waiting in this evaluation (${esc(ctx.readiness.evaluatedAt ?? "time not stated")}).</p>`, "blockers")}`;
+  const of = (kind) => open.filter((item) => (item.kind ?? "not_evaluated") === kind);
+  return `${kinds.map((kind) => `<h5>${esc(say("blockerKind", kind))}</h5>${of(kind).map((item) => `${itemLine(item)}${item.mandatory ? "" : "<p class=\"muted\">Good to have; it does not hold the step.</p>"}`).join("")}`).join("")}
+    ${record(kinds.map((kind) => `<h4><code>${esc(kind)}</code></h4><ul class="a4-rows">${of(kind).map((item) => `<li><code>${esc(item.id)}</code> <code>${esc(item.status)}</code>${item.mandatory ? "" : " (informational)"}
+      ${codes(item.reasonCodes)}${item.nextAction?.label ? `<br><span class="muted">${esc(item.nextAction.label)}</span>` : ""}</li>`).join("")}</ul>`).join(""), "blockers")}`;
 }
 
 const decideButtons = (ctx, approvalRequestId, digest) => effectDecideButtons(ctx, "adapt", approvalRequestId, digest);
@@ -87,7 +88,7 @@ function renderActivation(ctx) {
   const item = itemOf(ctx, "plan_review_opened");
   const [request] = coded(item, "APPROVAL_REQUEST");
   const completion = ctx.readiness?.gates?.completion;
-  const openable = completion?.status === "QUORUM_MET" ? ctx.allowed.openEffect : view.held("The completion gate has no quorum yet");
+  const openable = completion?.status === "QUORUM_MET" ? ctx.allowed.openEffect : view.held("The final approval does not have enough approvals yet");
   return `<p class="muted">Build signs the plan (a local audit trail under this workspace's keys). Activation is a second, separately decided plan review
     that an owner opens once the completion gate has its quorum; project approvers decide it here (two distinct people when regulated), and completing
     the stage activates the plan for the whole workspace. A regulated project activates at completion; any other completes with the plan signed and
@@ -97,9 +98,9 @@ function renderActivation(ctx) {
     activated, only once an owner acknowledges <code>plan_activated</code> with a reason after Review (<code>PLAN_ACTIVATION_DEFERRED</code>); the conformance
     statement records that acknowledgement.</p>
     <p><strong>Lockout.</strong> An active compiled plan with <code>L0-IDN-01</code> denies every native tool call that carries no verified lease. Studio
-      native tasks with workspace tools started after activation run under a lease Studio mints (P1-67), and CLI agent runs, SDK native client
+      native tasks with workspace tools started after activation run under a lease Studio mints, and CLI agent runs, SDK native client
       sessions, ACP sessions and in-process sessions with workspace tools mint their own, naming the active <code>users.yaml</code> user whose
-      username is the OS account, which their delegated children inherit (P1-79); a run whose OS account is not one is refused
+      username is the OS account, which their delegated children inherit; a run whose OS account is not one is refused
       <code>PRINCIPAL_UNRESOLVED</code> before its session opens or a child starts. Tasks started before activation carry none and are denied.
       A non-regulated project therefore completes with the plan signed and not activated.</p>
     ${["plan_signed", "plan_activated", "plan_review_opened", "adapt.plan.nativeSessionsAllowed"].map((id) => status(ctx, id)).join("")}
@@ -202,13 +203,15 @@ function renderClocks(ctx) {
 function renderDataHandling(ctx) {
   const declared = isObject(specOf(ctx).dataHandling) ? specOf(ctx).dataHandling : null;
   const shown = (value) => (Array.isArray(value) ? value.join(", ") : value) || "not stated";
-  // P2-36: Propose records whether P2-02's redaction was confirmed for the declared classes ("enforced at redaction").
-  const rows = declared === null ? [] : [["Data classes", declared.dataClasses, declared.dataClassesEnforcement ?? "none", "P2-02"], ["Residency", declared.residency, "none", "P2-01"],
-    ["Retention", declared.retention, "none", "P2-02"], ["Processors", declared.processors, "none", "P2-01"],
-    ["Memory policy", buildOf(ctx)?.memoryPolicy?.policy?.retentionTag, "advisory", "the reasoning-memory writeback"]]
-    .map(([field, value, enforced, key]) => [esc(field), esc(shown(value)), `<code>${esc(enforced)}</code>`, esc(key)]);
+  // Propose records whether redaction was confirmed for the declared classes ("enforced at redaction"). Only what is true today
+  // is said: a field AMC does not enforce says so, with no promise about later versions.
+  const enforcedWords = { none: "not enforced by AMC", advisory: "advice only: AMC does not enforce it" };
+  const rows = declared === null ? [] : [["Data classes", declared.dataClasses, declared.dataClassesEnforcement ?? "none"], ["Residency", declared.residency, "none"],
+    ["Retention", declared.retention, "none"], ["Processors", declared.processors, "none"],
+    ["Memory policy", buildOf(ctx)?.memoryPolicy?.policy?.retentionTag, "advisory"]]
+    .map(([field, value, enforced]) => [esc(field), esc(shown(value)), `${esc(enforcedWords[enforced] ?? enforced)} ${smallCode(enforced)}`]);
   return `${declared === null ? "<p class=\"muted\">Propose records what you declared about data handling.</p>"
-    : table(["Declared", "Value", "Enforced by AMC", "Changes with"], rows, "Nothing declared.")}${status(ctx, "data_handling_declared")}`;
+    : table(["Declared", "Value", "Enforced by AMC"], rows, "Nothing declared.")}${status(ctx, "data_handling_declared")}`;
 }
 
 const stepCard = (step, note) => (ctx) => `<p class="muted">${esc(note)}</p><label>Your note <textarea name="content" rows="3" maxlength="65536"></textarea></label>

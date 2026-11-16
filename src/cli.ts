@@ -65,6 +65,7 @@ import { sha256Hex } from "./utils/hash.js";
 import { canonicalize } from "./utils/json.js";
 import { amcVersion } from "./version.js";
 import { AMC_MATURITY_LEGEND } from "./score/maturityTaxonomy.js";
+import { LEVEL_GUIDE } from "./diagnostic/levelSemantics.js";
 import {
   buildEnforceResourceManifest,
   diffEnforceResourceManifests,
@@ -103,7 +104,8 @@ import {
   latestRunForDisplay, namedRunForDisplay, printClaimLegendFooter, printClaimResult, printControlSurfaceSkip, printLabelledReport, printTitledResult, runClaimEnvelope, runIdClaim, selfAnswerClaim,
   unverifiedClaim, withClaimFields, withClaimFieldsEach
 } from "./cli/claimOutput.js";
-import { renderDiagnosticReportHtml } from "./cli/reportRenderers.js"; import { emitScoreEvidenceResult } from "./cli/scoreEvidenceOutput.js";
+import { addRiskClassifyOptions, riskClassifyAction } from "./compliance/euAiActCli.js";
+import { printExecutiveSummary, renderDiagnosticReportHtml } from "./cli/reportRenderers.js"; import { emitScoreEvidenceResult } from "./cli/scoreEvidenceOutput.js";
 import { envelopeForComplianceReport } from "./claims/eligibility/adapters/results.js";
 import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "./claims/eligibility/render.js";
 import { listDecisionReceipts, loadDecisionReceipt, observeDecisionOutcomes, writeDecisionReceipts, type DecisionReceipt } from "./lifecycle/decisionReceipt.js";
@@ -138,6 +140,7 @@ import {
   verifyFleetConfigSignature
 } from "./fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "./fleet/paths.js";
+import { printNoAgentInstructionFile, printTopGaps, refuseNewFolderWithoutTerminal, refuseUnknownAgent, scoreStep } from "./cli/firstRunGuards.js";
 import { getProviderTemplateById, listProviderTemplates, providerTemplateChoices } from "./providers/providerTemplates.js";
 import { runSandboxCommand } from "./sandbox/sandbox.js";
 import { attestIngestSessionAsync, ingestEvidence, type IngestType } from "./ingest/ingest.js";
@@ -210,7 +213,7 @@ import { captureArchetypeApply } from "./archetypes/archetypePublication.js";
 import { exportBadge, exportPolicyPack } from "./exports/policyExport.js";
 import { applyAssurancePatchKit, listAssuranceHistory, loadAssuranceReport, runAssurance, verifyAssuranceRun } from "./assurance/assuranceRunner.js";
 import { AgentResponderUnavailableError } from "./assurance/agentResponder.js";
-import { assuranceSarifEntries, renderAssuranceOverallScore, renderAssurancePackLine, renderAssuranceScenarioHeading, renderAssuranceTotalLine } from "./assurance/cliPresentation.js";
+import { assuranceSarifEntries, describeAssurancePack, noFailedScenariosLine, OVER_REFUSAL_FIX, refusedOrdinaryTask, renderAssuranceOverallScore, renderAssurancePackLine, renderAssuranceScenarioHeading, renderAssuranceTotalLine } from "./assurance/cliPresentation.js";
 import { executedRerunFlags, selectExecutedAssuranceOptions, withExecutedAssuranceOptions, type AssuranceRunCliOptions } from "./assurance/executed/cliOptions.js";
 import { getAssurancePack, listAssurancePacks } from "./assurance/packs/index.js";
 import { registerMirofishCommands } from "./mirofish/cli.js";
@@ -297,12 +300,13 @@ import { changeVaultPassphraseInteractive, initVaultInteractive, lockVaultNow, p
 import { forgetVaultPassphrase, unlockWithRememberedPassphrase } from "./vault/passphraseStore.js";
 import { adoptVaultPassphraseFile, bootstrapVaultPassphrase, unlockWithPassphraseFile, vaultPassphraseFromEnv } from "./vault/passphraseFile.js";
 import { askToUnlockForSigning, confirmRememberedUnlock, interactiveOperator } from "./vault/operatorContext.js";
+import { VAULT_UNLOCK_PATHS } from "./vault/vaultLockedError.js";
 import { runFrontDoor, scoreNextStep, shouldShowFrontDoor, terminalFrontDoorIo } from "./setup/frontDoor.js";
 import { ensureInstantVaultMode, type InstantVaultMode } from "./cli/instantVaultMode.js";
-import { generatedPassphraseForInit, generatedPassphraseRoute, newVaultPassphraseChoices, rememberInitPassphrase, rememberOrShowOnce, shownOncePassphraseLines, skipVaultPassphrase } from "./cli/initPassphrase.js";
+import { generatedPassphraseForInit, generatedPassphraseRoute, newVaultPassphraseChoices, promptNewSecret, rememberInitPassphrase, rememberOrShowOnce, shownOncePassphraseLines, skipVaultPassphrase } from "./cli/initPassphrase.js";
 import { ensureUpVaultPassphrase, printConsoleSignInStep, runFirstBaselineIfNeeded } from "./studio/oneCommandUp.js";
 import { agentRunFiles, latestRunSummary } from "./diagnostic/runReportResolution.js";
-import { buildConnectInstructions } from "./studio/connectWizard.js";
+import { buildConnectInstructions, CONNECT_MODE_HELP } from "./studio/connectWizard.js";
 import { registerHookIntegrationCommands } from "./adapters/hookIntegrationCli.js";
 import { runStudioForeground, startStudioDaemon, stopStudioDaemon, studioStatus } from "./studio/studioSupervisor.js";
 import { standaloneGatewayAllowList } from "./studio/listenPolicy.js";
@@ -673,7 +677,7 @@ import {
   type TemporalDecaySourceRun
 } from "./trust/temporalDecay.js";
 import {
-  adaptersCapabilitiesCliAsync,
+  adaptersCapabilitiesCliAsync, capabilityTarget,
   adaptersCapabilitiesWithOutputCliAsync,
   adaptersConfigureCliAsync,
   adaptersDetectCli,
@@ -1288,7 +1292,7 @@ function buildAssuranceRemediationItems(packResults: AssurancePackResult[]): Ass
   const items: AssuranceRemediationItem[] = [];
   for (const pack of packResults) {
     for (const scenario of pack.scenarioResults) {
-      if (scenario.pass) {
+      if (scenario.pass || scenario.inconclusive === true) { // not evaluated is not a failure to fix
         continue;
       }
       items.push({
@@ -1299,7 +1303,7 @@ function buildAssuranceRemediationItems(packResults: AssurancePackResult[]): Ass
         category: scenario.category,
         score0to100: scenario.score0to100,
         reason: scenario.reasons[0] ?? "Scenario failed without a recorded reason.",
-        fix: assuranceRemediationFix(scenario.category),
+        fix: refusedOrdinaryTask(scenario) ? OVER_REFUSAL_FIX : assuranceRemediationFix(scenario.category),
       });
     }
   }
@@ -1325,7 +1329,7 @@ function renderAssuranceRemediationPriority(report: AssuranceReport, opts: {
   console.log("");
   console.log(chalk.bold("  Remediation priority:"));
   if (items.length === 0) {
-    console.log(chalk.gray("  No failed scenarios. Keep scheduled assurance running and graduate to signed reports before verifier-ready claims."));
+    console.log(chalk.gray(noFailedScenariosLine(report.packResults)));
     console.log(chalk.gray(`  Evidence: ${opts.artifactPath}`));
     return;
   }
@@ -1388,9 +1392,9 @@ function workspaceInitHint(workspace: string, reason: string): string {
   return [
     reason,
     `Workspace: ${workspace}`,
-    "Run one of the following first:",
-    "  amc setup --demo",
-    "  amc init"
+    // CLI-16: bare `amc` is the front door that sets a folder up; the others are for scripts.
+    "Next: run amc in this folder to set it up (scripts: amc init --minimal).",
+    "Or cd to the folder where you already set up AMC."
   ].join("\n");
 }
 
@@ -1469,7 +1473,7 @@ async function acquireInstantScoreLock(workspace: string): Promise<() => void> {
   throw new Error("Timed out waiting for another AMC score run to finish.");
 }
 
-function renderInstantFullScore(
+async function renderInstantFullScore(
   report: Awaited<ReturnType<typeof runDiagnostic>>,
   elapsedMs: number,
   state: InstantWorkspaceState,
@@ -1485,11 +1489,13 @@ function renderInstantFullScore(
     studioEvidenceUrl?: string | null;
     nextStep?: string;
   } = {}
-): void {
+): Promise<void> {
   const avgLevel = diagnosticAverageLevel(report);
   const score100 = Math.round((avgLevel / 5) * 100);
   const fullQuestionCount = report.questionScores.length;
   const statusExplanation = explainDiagnosticReportStatus(report);
+  const { scoreSummary, scoreSummaryLines } = await import("./diagnostic/scoreSummary.js");
+  const summary = scoreSummary(report);
   if (opts.json) {
     const dimensions = Object.fromEntries(
       report.layerScores.map((layer) => [
@@ -1516,6 +1522,8 @@ function renderInstantFullScore(
       score: score100,
       level: `L${avgLevel.toFixed(2)}`,
       overallLevel: Number(avgLevel.toFixed(2)),
+      overallRange: summary.band, overallRangeText: summary.range, levelsEvaluableToday: summary.reach,
+      questionApplicability: report.questionApplicability ?? { status: "not_answered", notApplicable: [] },
       trustLabel: report.trustLabel,
       questionCount: fullQuestionCount,
       integrityIndex: Number(report.integrityIndex.toFixed(3)),
@@ -1550,7 +1558,12 @@ function renderInstantFullScore(
   console.log(chalk.gray(`  Artifact seal: ${report.status} | Evidence: ${statusExplanation.evidenceStatus} | Claims: ${statusExplanation.strongClaimsAllowed ? "ELIGIBLE" : "BLOCKED"}`));
   console.log("");
   console.log(chalk.bold(`  Overall: L${avgLevel.toFixed(2)} (${score100}/100) ${report.trustLabel}`));
-  if (report.evidenceCoverage === 0) console.log("  AMC has not seen your agent do anything yet, so this score is empty.");
+  console.log(chalk.gray(`  ${summary.range.charAt(0).toUpperCase()}${summary.range.slice(1)}`));
+  const recorded = report.recordedActivity?.events ?? 0;
+  if (report.evidenceCoverage === 0 && recorded > 0) {
+    const sessions = report.recordedActivity?.sessions ?? 0;
+    console.log(`  AMC recorded ${recorded} event${recorded === 1 ? "" : "s"} from ${sessions} session${sessions === 1 ? "" : "s"} of your agent, but none of them is evidence a question accepts yet.`);
+  } else if (report.evidenceCoverage === 0) console.log("  AMC has not seen your agent do anything yet, so this score is empty.");
   console.log(chalk.gray(`  Integrity: ${report.integrityIndex.toFixed(3)} | Evidence coverage: ${(report.evidenceCoverage * 100).toFixed(1)}%`));
   console.log(chalk.gray(`  Claim boundary: ${statusExplanation.claimBoundary}`));
   if (!statusExplanation.strongClaimsAllowed) {
@@ -1562,14 +1575,9 @@ function renderInstantFullScore(
     const bar = "█".repeat(lv) + "░".repeat(5 - lv);
     console.log(`  ${layer.layerName.padEnd(28)} L${layer.avgFinalLevel.toFixed(2)} ${bar}`);
   }
-  const gaps = report.questionScores.filter((question) => question.finalLevel < 3).slice(0, 5);
-  if (gaps.length > 0) {
-    console.log("");
-    console.log(chalk.yellow("  Top gaps:"));
-    for (const gap of gaps) {
-      console.log(chalk.gray(`    ${gap.questionId}: L${gap.finalLevel} (${gap.flags.slice(0, 2).join(", ") || "needs evidence"})`));
-    }
-  }
+  await printTopGaps(report.questionScores, report.questionApplicability);
+  console.log("");
+  for (const line of scoreSummaryLines(report, "  ").slice(1)) console.log(chalk.gray(line));
   console.log("");
   if (state.createdWorkspace) {
     console.log(chalk.green("  Created .amc workspace automatically."));
@@ -1580,9 +1588,11 @@ function renderInstantFullScore(
     console.log(chalk.yellow(`  ${state.vault.reason}`));
   }
   // The artifact paths stay in the JSON output and under .amc/; the person reading this needs one next step.
-  console.log(chalk.gray("  Details saved under .amc/ (amc --help --all lists the report commands)"));
+  console.log(chalk.gray("  The full report is saved in .amc/. Read it with: amc report latest"));
   if (opts.studioEvidenceUrl) console.log(chalk.gray(`  Evidence in the console: ${opts.studioEvidenceUrl}`));
-  console.log(chalk.bold(`  ${opts.nextStep ?? scoreNextStep(null)}`));
+  // CLI-01: once runs are recorded but none is scored, the menu's "try a demo chat" would be a loop; the readiness step says what counts.
+  const loops = report.evidenceCoverage === 0 && recorded > 0;
+  if (!loops) console.log(chalk.bold(`  ${opts.nextStep ?? scoreNextStep(null)}`));
   console.log("");
 }
 
@@ -1800,7 +1810,7 @@ async function runInstantFullScoreForAgent(params: { workspace: string; agentId:
       episodeRecordPath: refs.episodeRecordPath ?? null,
       studioEvidenceUrl: refs.studioEvidenceUrl
     });
-    renderInstantFullScore(report, elapsedMs, state, {
+    await renderInstantFullScore(report, elapsedMs, state, {
       json: params.json,
       nextStep: params.nextStep,
       ...refs
@@ -1905,7 +1915,7 @@ async function runInstantFullScoreForAgent(params: { workspace: string; agentId:
           studioEvidenceUrl: refs.studioEvidenceUrl
         });
       }
-      renderInstantFullScore(report, elapsedMs, unsignedState, {
+      await renderInstantFullScore(report, elapsedMs, unsignedState, {
         json: params.json,
         nextStep: params.nextStep,
         ...refs
@@ -1925,7 +1935,7 @@ async function runInstantFullScoreForAgent(params: { workspace: string; agentId:
 }
 
 function normalizeCliErrorMessage(error: unknown): string {
-  const message = error instanceof Error ? error.message : String(error);
+  const message = toErrorMessage(error);
   // Ctrl+C in any prompt (pack run, quickscore, setup); vault-setup advice would be unrelated to most of them.
   if (/User force closed the prompt/i.test(message)) return "Interactive prompt aborted.";
   // Publication errors wrap the actual refusal; show its cause chain so the reason is not hidden.
@@ -1948,12 +1958,13 @@ program
   .passThroughOptions()
   .showSuggestionAfterError(true)
   .showHelpAfterError("\nTip: add '--help' after any command to see available options.")
-  .addHelpText("afterAll", cliDiscoverabilityFooter());
+  .addHelpText("after", cliDiscoverabilityFooter()); // top-level help only; every subcommand repeated it (CLI-22)
 program.option("--agent <agentId>", "agent ID (defaults to .amc/current-agent)");
 program.option("--json", "emit structured JSON for the top-level full score", false);
 // No default: a `false` default made `color` false on every command, so preAction switched colour off everywhere.
 program.option("--no-color", "disable ANSI color output; equivalent to NO_COLOR=1");
 program.option("--no-menu", "bare amc only: skip the start menu and print the score (or set AMC_NO_MENU=1)");
+program.option("--yes", "bare amc without a terminal: set up this folder (.amc/) without asking first");
 program
   .command("help [commandPath...]")
   .description("Show help for a command (for example: amc help run)")
@@ -2078,27 +2089,41 @@ program.hook("preAction", async (_thisCommand, actionCommand) => {
   }
   const path = commandPath(actionCommand);
   // Commands that read a workspace and would otherwise report its missing files as failures, or ask for a passphrase.
-  if (/^(evidence verify|verify all|vault unlock)$/.test(path) && !isWorkspaceInitialized(process.cwd())) {
+  // CLI-16: verify read a missing ledger as "FAILED", user init as "Vault locked", connect threw a raw "Gateway config not found".
+  if (/^(evidence verify|verify all|verify|vault unlock|user init|user add|connect)$/.test(path) && !isWorkspaceInitialized(process.cwd())) {
     console.error(chalk.red(workspaceInitHint(process.cwd(), "No AMC workspace here (no .amc directory).")));
     process.exit(1);
   }
   if (path.length > 0) {
     assertOwnerMode(process.cwd(), path);
   }
-  // B1: AMC_VAULT_PASSPHRASE_FILE opens the vault as AMC_VAULT_PASSPHRASE does (that wins); up, bootstrap, host bootstrap, studio start and doctor read it themselves, through the same reader.
-  if (!/^(up|mcp|connect hooks forward|bootstrap|host bootstrap|studio start|doctor)( |$)/.test(path)) unlockWithPassphraseFile(process.cwd());
+  // B1: AMC_VAULT_PASSPHRASE_FILE opens the vault as AMC_VAULT_PASSPHRASE does (that wins); up, bootstrap, host bootstrap, studio start and doctor read it themselves. `mcp serve` never holds the vault; `mcp add`/`mcp sign` sign like `tools sign`.
+  if (!/^(up|mcp serve|connect hooks forward|bootstrap|host bootstrap|studio start|doctor)( |$)/.test(path)) unlockWithPassphraseFile(process.cwd());
   // B2: `amc up` reads it itself (--no-remember); the agent host's MCP server and hook forwarder never hold the vault.
   // LIVE-VAULT-01: the unlock is for an interactive operator only, and a governance command then confirms it.
-  if (!/^(up|mcp|connect hooks forward)( |$)/.test(path)) { unlockWithRememberedPassphrase(process.cwd()); await confirmRememberedUnlock(process.cwd(), path); }
+  if (!/^(up|mcp serve|connect hooks forward)( |$)/.test(path)) { unlockWithRememberedPassphrase(process.cwd()); await confirmRememberedUnlock(process.cwd(), path); }
   // A signing command asks an interactive operator for the passphrase rather than refusing (agents and pipes keep the refusal).
-  if (!/^(up|mcp|connect hooks forward)( |$)/.test(path)) await askToUnlockForSigning(process.cwd(), path);
+  if (!/^(up|mcp serve|connect hooks forward)( |$)/.test(path)) await askToUnlockForSigning(process.cwd(), path);
 });
 installClaimLabelHooks(program);
+
+/**
+ * CLI-09: a second `amc init` or `amc quickstart --minimal` in a folder that already has a vault generated a new
+ * passphrase for it and failed with "Vault unlock failed". A vault that exists keeps its passphrase: say so and change nothing.
+ */
+function existingVaultLeftAlone(workspace: string): boolean {
+  if (!vaultStatusNow(workspace).exists || (process.env.AMC_VAULT_PASSPHRASE ?? "").length > 0) return false;
+  console.log(chalk.yellow("This folder already has an AMC vault, so it is already set up. Nothing was changed."));
+  console.log(chalk.gray(`  Commands that sign need that vault's passphrase: ${VAULT_UNLOCK_PATHS}.`));
+  console.log(chalk.gray("  To start over instead (this discards the vault and every record in .amc): amc init --force"));
+  return true;
+}
 
 async function initializeMinimalStartupWorkspace(opts: {
   profile: "dev" | "ci" | "prod";
   trustBoundary?: "isolated" | "shared";
 }): Promise<void> {
+  if (existingVaultLeftAlone(process.cwd())) return;
   // The vault keys are created with this passphrase and every later signing
   // command (amc firewall enable, amc agent-loop run) needs it from the shell.
   // A generated value that is neither kept nor shown leaves a vault no command can unlock: an operator in a terminal has
@@ -2187,6 +2212,7 @@ program
       });
       return;
     }
+    if (existingVaultLeftAlone(process.cwd())) return;
     // Ensure vault passphrase is available before init (it creates crypto keys)
     let rememberAfterInit: string | null = null;
     if (!process.env.AMC_VAULT_PASSPHRASE) {
@@ -2207,14 +2233,7 @@ program
           if (remember) rememberAfterInit = autoGenerated; // remembered once the vault exists, never shown
           else for (const line of shownOncePassphraseLines(passphrase)) console.log(chalk.yellow(line));
         } else {
-          const { customPass } = await inquirer.prompt([{
-            type: "password",
-            name: "customPass",
-            message: "Enter passphrase (min 8 chars):",
-            mask: "*",
-            validate: (v: string) => v.length >= 8 || "Must be at least 8 characters"
-          }]);
-          passphrase = customPass;
+          passphrase = await promptNewSecret("Vault passphrase", 8);
         }
         process.env.AMC_VAULT_PASSPHRASE = passphrase;
       } else {
@@ -2296,6 +2315,7 @@ program
     // with a fix is still a missing precondition even when the exit code is 0.
     // Optional adapter installs follow the closing steps (doctorNextSteps).
     const fixCount = firstRunFixCommands(result).length;
+    const again = await scoreStep(process.cwd());
     if (!result.ok) {
       console.log(fmt.nextSteps(doctorNextSteps(result, [
         result.workspaceInitialized
@@ -2305,12 +2325,10 @@ program
       ])));
     } else if (fixCount > 0) {
       console.log(fmt.warn(`${fixCount} precondition(s) still missing; each names its fix:`));
-      console.log(fmt.nextSteps(doctorNextSteps(result, [{ cmd: "amc", desc: "Get your first full maturity score" }])));
+      console.log(fmt.nextSteps(doctorNextSteps(result, [again])));
     } else {
       console.log(fmt.pass(result.workspaceInitialized ? "The listed diagnostic checks passed; this does not qualify a governed task or a release." : "CLI install checks passed."));
-      console.log(fmt.nextSteps([
-        { cmd: "amc", desc: "Get your first full maturity score" },
-      ]));
+      console.log(fmt.nextSteps([again]));
     }
     process.exit(result.ok ? 0 : 1);
   });
@@ -2342,7 +2360,7 @@ program
   .description("Guided improvement — shows what to fix next based on your current score")
   .option("--json", "emit JSON output", false)
   .action(async (opts: { json: boolean }) => {
-    const { getRapidQuestions, scoreRapidAssessment } = await import("./diagnostic/rapidQuickscore.js");
+    const { getRapidQuestions, rapidSelfAssessmentLine, scoreRapidAssessment } = await import("./diagnostic/rapidQuickscore.js");
 
     // Check if we have a recent quickscore, otherwise run one
     let answers: Record<string, number> = {};
@@ -2360,7 +2378,7 @@ program
           name: "level",
           message: `${question.id}: ${question.title}`,
           choices: question.options.map((option) => ({
-            name: `L${option.level} - ${option.label}`,
+            name: `${option.level} - ${option.label}`,
             value: option.level
           }))
         }]);
@@ -2368,7 +2386,9 @@ program
       }
     }
 
-    const result = scoreRapidAssessment(answers);
+    const { loadQuestionApplicability } = await import("./diagnostic/questionApplicability.js");
+    const excluded = loadQuestionApplicability(process.cwd(), resolveAgentId(process.cwd(), activeAgent(program)), questions).notApplicable.map((row) => row.questionId);
+    const result = scoreRapidAssessment(answers, excluded);
     const claim = selfAnswerClaim("diagnostic:rapidQuickscore", Object.values(answers));
 
     if (opts.json) {
@@ -2377,10 +2397,13 @@ program
     }
 
     console.log("");
-    console.log(chalk.bold(`  Current: ${result.preliminaryLevel} (${result.totalScore}/${result.maxScore})`));
+    console.log(chalk.bold(`  ${rapidSelfAssessmentLine(result)}`));
     printClaimResult(claim, opts);
     console.log("");
-    console.log(chalk.bold("  What L3 means for your product:"));
+    const { levelReach } = await import("./diagnostic/levelSemantics.js");
+    const { questionBank } = await import("./diagnostic/questionBank.js");
+    console.log(chalk.gray(`  Levels AMC can evaluate today: ${levelReach(questionBank).sentence}`));
+    console.log(chalk.bold("  What L3 would mean for your product (AMC cannot evaluate L3 yet):"));
     console.log(chalk.gray("  L3 = evidence-backed and reviewable: customers can trust the agent's behavior because key decisions have replayable proof, not just team claims."));
     console.log(chalk.gray("  PM translation: define the product promise, capture proof when the agent acts, and make that proof easy for a reviewer to inspect."));
     console.log(chalk.bold("  L3 examples by agent archetype:"));
@@ -2391,7 +2414,7 @@ program
     console.log("");
 
     if (result.recommendations.length === 0) {
-      console.log(chalk.green("  🎉 You're at L5 across the board. Nothing to improve!"));
+      console.log(chalk.green("  Each of these questions is at the highest level AMC can evaluate for it today. Nothing here can move further yet."));
       console.log("");
       return;
     }
@@ -2512,7 +2535,7 @@ program
       opts.quick = true;
       opts.autoDetect = true;
       opts.export = true;
-      opts.apply = true;
+      opts.apply ??= true; // keep a file named with --apply <file>
 
       // Re-run auto-detect since we just set the flag
       if (!opts.framework) {
@@ -2971,12 +2994,12 @@ program
       }
 
       // Always offer to create AGENTS.md if nothing detected
-      if (detected.length === 0) {
-        detected.push({ path: "AGENTS.md", label: "AGENTS.md (create new)" });
-      }
+      const createsNewFile = detected.length === 0;
+      if (createsNewFile) detected.push({ path: "AGENTS.md", label: "AGENTS.md (create new)" });
 
-      // Non-interactive: auto-pick first detected config (or AGENTS.md)
+      // Non-interactive: auto-pick the first agent config found. A new file is made only when named, since nobody saw a question.
       if (!process.stdin.isTTY) {
+        if (createsNewFile && !isDryRun) return printNoAgentInstructionFile();
         const autoTarget = (detected[0] ?? { path: "AGENTS.md" }).path;
         const fullPath = pathModule.resolve(process.cwd(), autoTarget);
         const result = applyGuardrails(fullPath, guardrailsContent, readFn, writeFn);
@@ -3179,7 +3202,7 @@ program
       } else {
         console.log("No ledger setup required. This is a preliminary score from 5 high-signal questions.");
       }
-      console.log(`Score: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`);
+      console.log(`Points: ${result.totalScore}/${result.maxScore} (${result.percentage}%), 0-5 per question; the level scale is L0-L5`);
       console.log(`Preliminary maturity: ${result.preliminaryLevel}`);
       console.log(chalk.dim(`Maturity Levels: ${AMC_MATURITY_LEGEND}`));
 
@@ -3328,7 +3351,8 @@ program
     }
 
     const result = scoreFullDiagnostic(answers, durationMs);
-    const claim = selfAnswerClaim("diagnostic:fullDiagnostic", Object.values(answers));
+    // CLI-08: every question's level, unanswered ones at L0 as the score counts them, so the result agrees with the layers.
+    const claim = selfAnswerClaim("diagnostic:fullDiagnostic", result.questionScores.map((row) => row.level));
 
     if (opts.json) {
       const jsonResult = providedAnswers
@@ -3350,8 +3374,9 @@ program
     printClaimResult(claim, opts);
     console.log(chalk.bold.hex('#4AEF79')("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
     console.log("");
-    console.log(chalk.bold(`  Overall: ${result.overallLevel} (${result.percentage}%)`));
-    console.log(chalk.gray(`  ${result.questionCount} questions | ${result.totalScore}/${result.maxScore} points | completed in ${durationDisplay}`));
+    const averageLevel = result.questionCount > 0 ? result.totalScore / result.questionCount : 0;
+    console.log(chalk.bold(`  Overall: ${result.overallLevel} (average level ${averageLevel.toFixed(2)} of 5)`));
+    console.log(chalk.gray(`  ${result.questionCount} questions, ${Object.keys(answers).length} answered (unanswered count as L0) | completed in ${durationDisplay}`));
     console.log(chalk.dim(`  Maturity Levels: ${AMC_MATURITY_LEGEND}`));
     console.log("");
 
@@ -3359,8 +3384,8 @@ program
     console.log(chalk.bold("  Layer Scores:"));
     console.log("");
     for (const layer of result.layerScores) {
-      const lv = Math.round(layer.avgLevel);
-      const filled = Math.round(layer.avgLevel);
+      const lv = Math.floor(layer.avgLevel + 1e-9); // the level reached, as the overall line reads it
+      const filled = lv;
       const bar = chalk.hex('#4AEF79')("█".repeat(filled)) + chalk.gray("░".repeat(5 - filled));
       const avg = layer.avgLevel.toFixed(1);
       console.log(`  ${layer.layerName.padEnd(30)} L${lv} ${bar} (avg ${avg})`);
@@ -3417,15 +3442,23 @@ program
   .command("explain <questionId>")
   .description("Plain-English explanation for a diagnostic question (example: AMC-2.1)")
   .option("--json", "emit JSON output", false)
-  .action(async (questionId: string, opts: { json: boolean }) => {
+  .option("--not-applicable <reason>", "mark this question as not applying to the agent, with your reason; it is left out of the score and listed in every report (signs with the vault)")
+  .option("--applicable", "count this question in the score again (signs with the vault)", false)
+  .action(async (questionId: string, opts: { json: boolean; notApplicable?: string; applicable: boolean }) => {
     const { explainDiagnosticQuestion } = await import("./diagnostic/questionExplain.js");
     const explanation = explainDiagnosticQuestion(questionId);
+    if (opts.notApplicable !== undefined || opts.applicable) {
+      const { markQuestionApplicability } = await import("./cli/questionApplicabilityCli.js");
+      markQuestionApplicability(process.cwd(), activeAgent(program), explanation, opts.applicable ? null : opts.notApplicable ?? null);
+      return;
+    }
     if (opts.json) {
       console.log(JSON.stringify(explanation, null, 2));
       return;
     }
     console.log(chalk.bold(`${explanation.questionId} - ${explanation.title}`));
     console.log(`Layer: ${explanation.layerName}`);
+    console.log(`Highest level AMC can evaluate for this question today: L${explanation.highestLevelToday}`);
     console.log(chalk.dim(`Maturity Levels: ${AMC_MATURITY_LEGEND}`));
     console.log("");
     console.log(chalk.hex('#4AEF79')("What it measures:"));
@@ -3449,7 +3482,7 @@ program
     console.log(chalk.gray("  context.mission    ") + "— your agent's stated purpose and scope (document it in AGENTS.md or a charter file)");
     console.log(chalk.gray("  guardrails.alignment") + "— rules that prevent the agent from acting outside its mission (e.g. topic filters, action limits)");
     console.log(chalk.gray("  evidence           ") + "— logged proof that a behavior actually occurred (not just claimed in docs)");
-    console.log(chalk.gray("  L0–L5 levels       ") + "— L0=undocumented, L1=documented, L2=automated checks, L3=evidence-backed, L4=proactive, L5=certifiable");
+    console.log(chalk.gray("  L0–L5 levels       ") + `— ${LEVEL_GUIDE.join("; ")}`);
     console.log(chalk.gray("  tuning knobs       ") + "— configurable parameters that control agent behavior (e.g. temperature, retry limits)");
     console.log(chalk.gray("  gate               ") + "— a pass/fail check that blocks deployment if requirements are not met");
   });
@@ -3544,6 +3577,14 @@ program
       console.log("Vault passphrase: required for verifier-ready startup.");
       console.log("Services: Studio API, dashboard, gateway, bridge, metrics.");
       console.log("Command: amc up");
+      return;
+    }
+    // CLI-10: a running AMC needs no passphrase from this command; say so before any vault question.
+    const running = studioStatus(workspace);
+    if (running.running && running.state) {
+      console.log(chalk.green("\u2713 AMC is already running in this folder.") + chalk.gray(` (agent: ${running.state.currentAgent})`));
+      console.log(`\n  ${chalk.bold("Open your report card:")}  ${chalk.hex("#4AEF79").bold(`http://${running.state.host}:${running.state.apiPort}/console`)}`);
+      console.log(chalk.gray("  To restart it: amc down, then amc up."));
       return;
     }
     await ensureUpVaultPassphrase(workspace, opts.remember !== false);
@@ -3921,14 +3962,14 @@ program
         .filter((row) => row.type === "BACKUP_CREATED")
         .sort((a, b) => b.ts - a.ts);
       if (backups.length === 0) {
-        console.log("Backup: never created (WARNING)");
+        console.log(chalk.yellow("Backup: none made yet. Make one with: amc backup create --out amc-backup.amcbackup"));
       } else {
         const latest = backups[0]!;
         const ageDays = Number(((Date.now() - latest.ts) / (24 * 60 * 60 * 1000)).toFixed(2));
         const warningDays = policy.opsPolicy.backups.maxBackupAgeDaysWarning;
         console.log(`Last backup age: ${ageDays}d (threshold ${warningDays}d)`);
         if (ageDays > warningDays) {
-          console.log(chalk.yellow("Backup age warning: exceeds ops policy threshold."));
+          console.log(chalk.yellow("The last backup is older than your ops policy allows. Make a new one with: amc backup create --out amc-backup.amcbackup"));
         }
       }
     } catch (error) {
@@ -4241,7 +4282,7 @@ const connect = program
   .option("--adapter <adapterId>", "adapter ID (e.g. claude-cli, gemini-cli, generic-cli)")
   .option("--token-file <path>", "lease token file (pair redeem output)")
   .option("--bridge-url <url>", "bridge base URL (e.g. http://127.0.0.1:3212)")
-  .option("--mode <mode>", "supervise|sandbox")
+  .option("--mode <mode>", `supervise|sandbox (${CONNECT_MODE_HELP})`)
   .option("--status", "show read-only activation outcomes without minting a lease", false)
   .option("--json", "emit activation status as JSON (requires --status)", false)
   .option("--print-env", "print environment export lines", false)
@@ -4345,6 +4386,8 @@ const connect = program
         mode: opts.mode,
         adapterId: opts.adapter
       });
+      // CLI-12: on stderr, so --print-env and --print-cmd output stays clean.
+      if (!output.amcRunning) console.error(chalk.yellow(`AMC is not running in this folder, so nothing listens on ${output.routeUrl} yet. Run amc up here (in a shell with the same AMC_GATEWAY_PORT) before you start the agent.`));
       if (opts.printCmd) {
         console.log(output.command);
         return;
@@ -4441,12 +4484,12 @@ adapters
 adapters
   .command("capabilities")
   .description("Issue a signed Passport receipt for declared and effective adapter capabilities")
-  .requiredOption("--agent <agentId>", "agent ID")
-  .requiredOption("--adapter <adapterId>", "adapter ID")
+  .option("--agent <agentId>", "agent ID (default: this folder's agent)")
+  .option("--adapter <adapterId>", "adapter ID (default: the adapter the agent is set up with, else generic-cli)")
   .option("--out <path>", "write the signed receipt to a JSON file")
   .option("--json", "print the complete signed receipt as JSON")
-  .action(async (opts: { agent: string; adapter: string; out?: string; json?: boolean }) => {
-    const params = { workspace: process.cwd(), agentId: opts.agent, adapterId: opts.adapter };
+  .action(async (opts: { agent?: string; adapter?: string; out?: string; json?: boolean }) => {
+    const params = { workspace: process.cwd(), ...capabilityTarget(process.cwd(), opts.agent ?? activeAgent(program), opts.adapter) };
     const output = opts.out ? await adaptersCapabilitiesWithOutputCliAsync(params, opts.out) : null;
     const receipt = output?.receipt ?? await adaptersCapabilitiesCliAsync(params);
     if (output !== null && !opts.json) console.log(chalk.green(`Adapter capability receipt: ${output.outPath}`));
@@ -5373,7 +5416,8 @@ program
       // Render output. The grade combines workspace inspections AMC does not verify, so it is self-reported.
       const claim = unverifiedClaim("unified:run", result.surfaceCoverage.evaluated);
       if (opts.json) {
-        console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
+        // S-01: with nothing to assess there is no grade, in JSON too (nothingToAssess says why).
+        console.log(JSON.stringify(withClaimFields(result.nothingToAssess ? { ...result, overallGrade: null, overallScore: null } : result, claim), null, 2));
       } else {
         if (opts.ci) console.log(renderCIAnnotations(result));
         printLabelledReport(renderUnifiedResult(result, { ci: opts.ci, claimLine: formatClaimLabel(renderClaimLabel(claim), "cli") }));
@@ -5405,11 +5449,12 @@ program
           "D+": 67, "D": 63, "D-": 60,
           "F": 0,
         }[opts.failBelow] ?? 0;
-        if (result.overallScore < thresholdScore) {
-          console.log(chalk.red(`\n  ✗ Grade ${result.overallGrade} is below --fail-below ${opts.failBelow}\n`));
+        if ((result.nothingToAssess && thresholdScore > 0) || result.overallScore < thresholdScore) {
+          console.log(chalk.red(result.nothingToAssess ? `\n  ✗ There is nothing to grade yet, so --fail-below ${opts.failBelow} is not met\n`
+            : `\n  ✗ Grade ${result.overallGrade} is below --fail-below ${opts.failBelow}\n`));
           process.exit(1);
         } else {
-          console.log(chalk.hex('#4AEF79')(`\n  ✓ Grade ${result.overallGrade} meets --fail-below ${opts.failBelow}\n`));
+          console.log(chalk.hex('#4AEF79')(result.nothingToAssess ? `\n  ✓ Nothing to grade yet; --fail-below ${opts.failBelow} sets no minimum\n` : `\n  ✓ Grade ${result.overallGrade} meets --fail-below ${opts.failBelow}\n`));
         }
       }
       } finally {
@@ -5434,6 +5479,13 @@ program
   .action(async (runId: string, opts: { executive: boolean; html?: string; share: boolean; shareDir: string; publicBaseUrl?: string }) => {
     const resolved = resolveRunReport(process.cwd(), runId, activeAgent(program));
     const report = resolved.report;
+    // CLI-04: every run whose seal does not verify is shown INVALID and fails. Nothing inside it (an AMC version, say)
+    // may choose a softer outcome: whoever edited the file could have set that too.
+    if (!resolved.sealVerified) {
+      process.exitCode = 1;
+      console.error(chalk.red(`Run ${resolved.resolvedRunId}: its seal does not verify, so nothing in it is vouched for and it is shown as ${report.status}.`
+        + " Either the file changed after AMC wrote it, AMC did not write it, it was written unsigned, or it is a run from AMC 1.x, whose seal this version does not check."));
+    }
     const statusExplanation = explainDiagnosticReportStatus(report);
 
     const claim = runClaimEnvelope(report);
@@ -5480,59 +5532,7 @@ program
     }
 
     if (opts.executive) {
-      const avgLayerScore = report.layerScores.length > 0
-        ? report.layerScores.reduce((s, l) => s + l.avgFinalLevel, 0) / report.layerScores.length
-        : 0;
-      const score = avgLayerScore;
-      const levelNum = Math.min(5, Math.floor(avgLayerScore));
-      const level = `L${levelNum}`;
-      const riskLabel = levelNum >= 4 ? "Low" : levelNum >= 3 ? "Moderate" : levelNum >= 2 ? "Elevated" : "High";
-      const riskColor = levelNum >= 4 ? chalk.green : levelNum >= 3 ? chalk.yellow : chalk.red;
-      console.log(chalk.bold("\n═══════════════════════════════════════════"));
-      console.log(chalk.bold("  AMC Executive Summary"));
-      console.log(chalk.bold("═══════════════════════════════════════════\n"));
-      printClaimResult(claim, {});
-      console.log(chalk.gray("  Agent:        "), report.agentId ?? "default");
-      if (resolved.alias) {
-        console.log(chalk.gray("  Alias:        "), resolved.alias);
-      }
-      console.log(chalk.gray("  Date:         "), new Date(report.ts).toISOString().split("T")[0]);
-      console.log(chalk.gray("  Maturity:     "), chalk.bold(level));
-      console.log(chalk.gray("  Overall Score:"), chalk.bold(`${typeof score === "number" ? score.toFixed(1) : score}/5`));
-      console.log(chalk.gray("  Risk Level:   "), riskColor(riskLabel));
-      console.log(chalk.gray("  Artifact:     "), `${report.status} — ${statusExplanation.artifactLabel}`);
-      console.log(chalk.gray("  Evidence:     "), `${statusExplanation.evidenceStatus} — ${statusExplanation.readinessLabel}`);
-      console.log(chalk.gray("  Claims:       "), statusExplanation.strongClaimsAllowed ? "ELIGIBLE" : "BLOCKED");
-      console.log(chalk.gray("  Claim Boundary:"), statusExplanation.claimBoundary);
-      console.log(chalk.gray("  Evidence Next:"), statusExplanation.nextStep);
-      console.log("");
-      console.log(chalk.bold("  What This Means"));
-      console.log(chalk.gray("  ─────────────────"));
-      const meanings: Record<number, string> = {
-        0: "This agent has no governance controls. It should not be deployed in production.",
-        1: "This agent has basic intent toward safety but lacks operational controls.",
-        2: "This agent has repeatable processes but gaps remain in edge cases.",
-        3: "This agent has defined controls; production readiness still depends on scoped evidence and applicable requirements.",
-        4: "This agent has measured controls and strong proof coverage for the assessed scope.",
-        5: "This agent demonstrates continuously verified controls for the assessed scope.",
-      };
-      console.log(`  ${statusExplanation.strongClaimsAllowed ? meanings[levelNum] ?? meanings[0] : "This score is a local baseline only because evidence is not claim-ready."}`);
-      console.log("");
-      console.log(chalk.bold("  Recommendation"));
-      console.log(chalk.gray("  ─────────────────"));
-      if (!statusExplanation.strongClaimsAllowed) {
-        console.log("  Collect sufficient verified evidence before making deployment, compliance, or audit-readiness claims.");
-      } else if (levelNum >= 3) {
-        console.log("  Review the scoped evidence, applicable controls, and operating risk before production expansion.");
-      } else if (levelNum >= 2) {
-        console.log("  ⚠️  Address identified gaps before production deployment. Run: amc guide --go");
-      } else {
-        console.log("  ❌ Significant governance gaps. Not recommended for production. Run: amc guide --go");
-      }
-      console.log("");
-      console.log(chalk.gray("  Full report: amc report " + resolved.resolvedRunId));
-      console.log(chalk.gray("  Improvement plan: amc guide --go"));
-      console.log(chalk.gray("  EU AI Act mapping: amc quickscore --eu-ai-act\n"));
+      printExecutiveSummary({ report, runId: resolved.resolvedRunId, alias: resolved.alias, statusExplanation, claim });
       return;
     }
     printLabelledReport(generateReport(report, "md", claim) as string);
@@ -10245,21 +10245,23 @@ gateway
 bundle
   .command("export")
   .description("Export a portable, signed evidence bundle for a run")
-  .requiredOption("--run <runId>", "run ID")
+  .requiredOption("--run <runId>", "run ID, saved alias, unique prefix, or latest")
   .requiredOption("--out <file>", "output .amcbundle file")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .option("--attest", "add the agent's CycloneDX AIBOM and a DSSE-signed in-toto statement about the run (artifact-seal key)")
   .action((opts: { run: string; out: string; agent?: string; attest?: boolean }) => {
+    // CLI-15: "latest", an alias or a prefix named no file and failed with a raw ENOENT; resolve it as amc report does.
+    const runId = resolveRunReport(process.cwd(), opts.run, opts.agent ?? activeAgent(program)).resolvedRunId;
     const result = exportEvidenceBundle({
       workspace: process.cwd(),
-      runId: opts.run,
+      runId,
       outFile: opts.out,
       agentId: opts.agent ?? activeAgent(program),
       attest: opts.attest === true
     });
     console.log(chalk.green(`Bundle exported: ${result.outFile}`));
     if (opts.attest) console.log("Attested: attestations/aibom.cdx.json and attestations/control-results.sigstore.json (DSSE, workspace artifact-seal key: a local audit trail until a trust list pins that key)");
-    printClaimResult(runIdClaim(opts.run, opts.agent ?? activeAgent(program)), {});
+    printClaimResult(runIdClaim(runId, opts.agent ?? activeAgent(program)), {});
     console.log(`Files: ${result.fileCount}, Events: ${result.eventCount}, Sessions: ${result.sessionCount}${result.openSessions.length ? `, open sessions: ${result.openSessions.length} (${result.openSessions.join(", ")}; the export verifies as of its export time)` : ""}`);
   });
 
@@ -10530,7 +10532,7 @@ ci
   .option("--min-score <n>", "minimum red-team score to pass (0-100)", "80")
   .option("--max-vulnerabilities <n>", "maximum total vulnerabilities allowed", "0")
   .option("--max-critical <n>", "maximum critical vulnerabilities allowed", "0")
-  .option("--max-high <n>", "maximum high vulnerabilities allowed", "0")
+  .option("--max-high <n>", "maximum high vulnerabilities allowed", "0").option("--max-inconclusive <n>", "maximum scenarios left unevaluated before the gate fails", "0")
   .option("--evil-mcp", "include built-in Evil MCP agent-provider scenarios")
   .option("--mcp-attacks <categories...>", "MCP attack categories for --evil-mcp (default: all)")
   .option("--min-mcp-score <n>", "minimum Evil MCP score to pass (0-100)", "80")
@@ -10544,7 +10546,7 @@ ci
     minScore: string;
     maxVulnerabilities: string;
     maxCritical: string;
-    maxHigh: string;
+    maxHigh: string; maxInconclusive: string;
     evilMcp?: boolean;
     mcpAttacks?: string[];
     minMcpScore: string;
@@ -10576,7 +10578,7 @@ ci
           minScore0to100: parseGateNumber(opts.minScore, "--min-score"),
           maxVulnerabilities: parseGateNumber(opts.maxVulnerabilities, "--max-vulnerabilities"),
           maxCritical: parseGateNumber(opts.maxCritical, "--max-critical"),
-          maxHigh: parseGateNumber(opts.maxHigh, "--max-high"),
+          maxHigh: parseGateNumber(opts.maxHigh, "--max-high"), maxInconclusive: parseGateNumber(opts.maxInconclusive, "--max-inconclusive"),
           minMcpScore0to100: parseGateNumber(opts.minMcpScore, "--min-mcp-score"),
           minGamingResistanceScore0to100: parseGateNumber(opts.minGamingScore, "--min-gaming-score"),
         },
@@ -10595,6 +10597,7 @@ ci
         console.log(`  Vulnerabilities: ${result.severityCounts.total} (max: ${result.thresholds.maxVulnerabilities})`);
         console.log(`  Critical: ${result.severityCounts.critical} (max: ${result.thresholds.maxCritical})`);
         console.log(`  High: ${result.severityCounts.high} (max: ${result.thresholds.maxHigh})`);
+        console.log(`  Not evaluated: ${result.report.inconclusiveScenarios ?? 0} (max: ${result.thresholds.maxInconclusive})`);
         if (result.report.evilMcp) {
           console.log(`  Evil MCP score: ${result.report.evilMcp.overallScore0to100}/100 (min: ${result.thresholds.minMcpScore0to100})`);
         }
@@ -10883,8 +10886,7 @@ assurance
   .description("Describe assurance pack details")
   .argument("<packId>")
   .action((packId: string) => {
-    const pack = getAssurancePack(packId);
-    console.log(JSON.stringify(pack, null, 2));
+    console.log(JSON.stringify(describeAssurancePack(getAssurancePack(packId)), null, 2));
   });
 
 assurance
@@ -11011,7 +11013,7 @@ withExecutedAssuranceOptions(assurance
           window: opts.window,
           outputMarkdownPath: opts.out ? resolve(process.cwd(), opts.out) : undefined,
           noSign,
-          model: opts.model
+          model: opts.model, attempts: opts.attempts ?? (demoPackIds ? 1 : undefined)
         });
       } catch (error) {
         if (noSign) delete process.env.AMC_NO_SIGN;
@@ -11510,11 +11512,15 @@ vault
 
 vault
   .command("unlock")
-  .description("Unlock vault into memory for signing operations")
+  .description("Check the vault passphrase (the vault stays unlocked only while this command runs)")
   .action(async () => {
     await unlockVaultInteractive(process.cwd()); // the unlock lives in this process only; the environment is left as it was
     const status = vaultStatusNow(process.cwd());
-    console.log(chalk.green(`Vault unlocked: ${status.unlocked ? "yes" : "no"}`));
+    if (!status.unlocked) throw new Error("The passphrase did not open this workspace's vault. Nothing was changed.");
+    // CLI-02: AMC keeps no unlock between commands, so this must not read as if the next command will find the vault open.
+    console.log(chalk.green("Passphrase accepted: it opens this workspace's vault."));
+    console.log("The vault was unlocked only while this command ran; AMC keeps no unlock between commands, so `amc vault status` still says unlocked=no.");
+    console.log(`Next: ${VAULT_UNLOCK_PATHS}.`);
   });
 
 vault
@@ -12536,122 +12542,10 @@ compliance
     console.log(chalk.gray(`\nOverall: ${matrix.overallScore === null ? "not evaluated" : `${(matrix.overallScore * 100).toFixed(1)}%`} | Gaps: ${matrix.gaps.length}`));
   });
 
-compliance
+addRiskClassifyOptions(compliance
   .command("risk-classify")
-  .description("Classify agent into EU AI Act risk tiers (UNACCEPTABLE / HIGH / LIMITED / MINIMAL)")
-  .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .option("--capabilities <json>", "JSON object of agent capabilities (see docs)")
-  .option("--biometric", "agent performs biometric identification", false)
-  .option("--critical-infra", "agent manages critical infrastructure", false)
-  .option("--education", "agent makes education/assessment decisions", false)
-  .option("--employment", "agent makes employment decisions", false)
-  .option("--essential-services", "agent controls access to essential services", false)
-  .option("--law-enforcement", "agent assists law enforcement", false)
-  .option("--migration", "agent handles migration/border control", false)
-  .option("--justice", "agent assists judicial/democratic processes", false)
-  .option("--realtime-biometric", "agent performs real-time biometric ID in public spaces", false)
-  .option("--social-scoring", "agent performs social scoring", false)
-  .option("--subliminal", "agent uses subliminal manipulation techniques", false)
-  .option("--exploits-vulnerabilities", "agent exploits vulnerabilities (age, disability)", false)
-  .option("--emotion-recognition", "agent infers emotions in the workplace or in education (prohibited by Art. 5(1)(f) unless for medical or safety reasons)", false)
-  .option("--chatbot", "agent is a chatbot/conversational system", false)
-  .option("--synthetic-content", "agent generates synthetic audio/image/video/text", false)
-  .option("--human-interaction", "agent interacts with humans", false)
-  .option("--safety-component", "agent is a safety component of a regulated product", false)
-  .option("--json", "output as JSON", false)
-  .action(async (opts: {
-    agent?: string; capabilities?: string;
-    biometric: boolean; criticalInfra: boolean; education: boolean; employment: boolean;
-    essentialServices: boolean; lawEnforcement: boolean; migration: boolean; justice: boolean;
-    realtimeBiometric: boolean; socialScoring: boolean; subliminal: boolean;
-    exploitsVulnerabilities: boolean; emotionRecognition: boolean; chatbot: boolean;
-    syntheticContent: boolean; humanInteraction: boolean; safetyComponent: boolean;
-    json: boolean;
-  }) => {
-    const { classifyEuAiActRisk } = await import("./compliance/euAiActClassifier.js");
-
-    let capabilities: import("./compliance/euAiActClassifier.js").AgentCapabilities = {};
-
-    if (opts.capabilities) {
-      try {
-        capabilities = JSON.parse(opts.capabilities) as typeof capabilities;
-      } catch {
-        console.error(chalk.red("Invalid --capabilities JSON"));
-        process.exit(1);
-      }
-    } else {
-      // Build from individual flags
-      capabilities = {
-        biometricIdentification: opts.biometric,
-        criticalInfrastructure: opts.criticalInfra,
-        education: opts.education,
-        employment: opts.employment,
-        essentialServices: opts.essentialServices,
-        lawEnforcement: opts.lawEnforcement,
-        migrationBorderControl: opts.migration,
-        justiceAdministration: opts.justice,
-        realtimeBiometricPublicSpaces: opts.realtimeBiometric,
-        socialScoring: opts.socialScoring,
-        subliminalManipulation: opts.subliminal,
-        exploitsVulnerabilities: opts.exploitsVulnerabilities,
-        emotionRecognition: opts.emotionRecognition,
-        chatbot: opts.chatbot,
-        syntheticContentGeneration: opts.syntheticContent,
-        humanInteraction: opts.humanInteraction,
-        safetyComponent: opts.safetyComponent
-      };
-    }
-
-    const result = classifyEuAiActRisk(capabilities);
-    // Classifies the capabilities the caller declared: self-reported, and a regulated mapping.
-    const claim = unverifiedClaim("compliance:euAiActRiskTier", 1, { regulated: true });
-
-    if (opts.json) {
-      console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
-      return;
-    }
-
-    const tierColors: Record<string, string> = {
-      UNACCEPTABLE: "#e05d44",
-      HIGH: "#e4811b",
-      LIMITED: "#dfb317",
-      MINIMAL: "#4c1"
-    };
-    const tierColor = tierColors[result.riskTier] ?? "#555";
-
-    console.log("");
-    console.log(chalk.bold("🇪🇺 EU AI Act Risk Classification"));
-    printClaimResult(claim, {});
-    console.log("");
-    console.log(`Risk Tier: ${chalk.hex(tierColor).bold(result.riskTier)}`);
-    console.log(`Articles: ${result.articles.length > 0 ? result.articles.join(", ") : "none"}`);
-    console.log("");
-    console.log(result.summary);
-    console.log("");
-
-    if (result.findings.length > 0) {
-      console.log(chalk.bold("Findings:"));
-      for (const finding of result.findings) {
-        const sev = finding.severity === "CRITICAL" ? chalk.red(`[${finding.severity}]`)
-          : finding.severity === "HIGH" ? chalk.yellow(`[${finding.severity}]`)
-          : chalk.gray(`[${finding.severity}]`);
-        console.log(`  ${sev} ${finding.title} (${finding.article})`);
-        console.log(chalk.gray(`    ${finding.description}`));
-      }
-      console.log("");
-    }
-
-    if (result.remediation.length > 0) {
-      console.log(chalk.bold("Remediation Checklist:"));
-      for (const item of result.remediation) {
-        const pri = item.priority === "IMMEDIATE" ? chalk.red("⚡") : item.priority === "SHORT_TERM" ? chalk.yellow("🔶") : chalk.gray("🔷");
-        console.log(`  ${pri} [${item.priority}] ${item.action}`);
-        console.log(chalk.gray(`     ${item.article}`));
-      }
-    }
-    console.log("");
-    console.log(chalk.gray("Tip: amc comply roadmap --framework EU_AI_ACT to generate a compliance plan."));
-  });
+  .description("Classify agent into EU AI Act risk tiers (UNACCEPTABLE / HIGH / LIMITED / MINIMAL)"))
+  .action(async (opts: Record<string, unknown>) => riskClassifyAction(opts));
 
 compliance
   .command("roadmap")
@@ -18335,7 +18229,7 @@ e2e
   });
 
 program
-  .command("_studio-daemon")
+  .command("_studio-daemon", { hidden: true }) // started by `amc up`, never by a person
   .requiredOption("--workspace <path>", "workspace path")
   .option("--api-port <port>", "studio API port")
   .option("--dashboard-port <port>", "dashboard port")
@@ -19530,9 +19424,11 @@ program.action(async (_opts, command: Command) => {
     return;
   }
 
-  const opts = program.opts<{ agent?: string; json?: boolean }>();
+  const opts = program.opts<{ agent?: string; json?: boolean; yes?: boolean }>();
   const agentId = resolveAgentId(process.cwd(), opts.agent ?? activeAgent(program) ?? undefined);
   const workspace = process.cwd();
+  if (isWorkspaceInitialized(workspace)) refuseUnknownAgent(workspace, agentId);
+  else if (process.stdin.isTTY !== true && opts.yes !== true) return refuseNewFolderWithoutTerminal(workspace);
   try {
     if (shouldShowFrontDoor({ args: process.argv.slice(2), env: process.env, stdinTTY: process.stdin.isTTY === true,
       stdoutTTY: process.stdout.isTTY === true, operatorOk: interactiveOperator({ workspace }).ok })) {
@@ -19822,7 +19718,7 @@ shield
 // ── Shield Red Team ──────────────────────────────────────────────────────────
 shield
   .command("red-team")
-  .description("Run a quick red team campaign (5 attacks on demo target). Tip: For full red-team suite with strategies, use `amc redteam run`")
+  .description("Run a quick red team campaign (5 attacks) against the agent under test. For the full suite with strategies, use `amc redteam run`")
   .option("--rounds <n>", "Number of attack rounds (default: 1)", "1")
   .option("--categories <list>", "Comma-separated attack categories to use")
   .option("--target <profile>", "Target profile id (default: demo)")
@@ -20955,7 +20851,7 @@ enforce
 
 enforce
   .command("taint <input>")
-  .description("Track tainted input through the system")
+  .description("Demo of taint tracking (not enforced: no AMC decision reads it; for that, see amc guardrails profile untrusted-input-guard)")
   .option("--json", "Output as JSON")
   .action(async (input: string, opts: { json?: boolean }) => {
     try {
@@ -20964,9 +20860,9 @@ enforce
       tracker.markTainted(input, input, "cli");
       const result = tracker.check(input);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n⚖️  Taint Tracking"));
+      console.log(chalk.bold.hex('#4AEF79')("\n⚖️  Taint Tracking (demo, not enforced)"));
       console.log(chalk.gray("Input:"), input);
-      console.log(chalk.gray("Tainted:"), result ? chalk.red("yes") : chalk.green("no"));
+      console.log(chalk.gray("Tainted:"), result ? chalk.red("yes") : chalk.green("no"), chalk.gray("\nNot enforced: this marks a value in memory for this command only; no hook or tool decision reads it.\nTo have AMC ask before risky actions after untrusted input: amc guardrails profile untrusted-input-guard"));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
@@ -21893,7 +21789,7 @@ const score = program.command("score").description("Maturity scoring, adversaria
     console.log(chalk.bold.hex('#4AEF79')("\n📊  Assessment Result"));
     printClaimResult(selfAnswerClaim("score:quickScore", Object.values(answers)), {});
     console.log(chalk.gray(`Tier: ${tier}`));
-    console.log(chalk.gray(`Score: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`));
+    console.log(chalk.gray(`Points: ${result.totalScore}/${result.maxScore} (${result.percentage}%), 0-5 per question; the level scale is L0-L5`));
     console.log(renderAsciiRadar(result.layerScores));
     if (result.totalScore === 0) {
       console.log(chalk.yellow("\n💡 No evidence collected yet. Capture agent behavior first:"));
@@ -21914,6 +21810,7 @@ score
   .description("Compute formal maturity score for an agent")
   .option("--json", "Output as JSON")
   .action(async (agentId: string, opts: { json?: boolean }) => {
+    refuseUnknownAgent(process.cwd(), agentId);
     try {
       const { computeMaturityScore } = await import("./score/index.js");
       const result = computeMaturityScore([], {});
@@ -22131,7 +22028,7 @@ score
 
 score
   .command("output-integrity")
-  .description("Score output integrity maturity (OWASP LLM02, confidence calibration, citation)")
+  .description("Score output integrity maturity (OWASP LLM05:2025, confidence calibration, citation)")
   .option("--json", "Output as JSON")
   .action(async (opts: { json?: boolean }) => {
     try {
@@ -22187,13 +22084,13 @@ score
 
 score
   .command("owasp-llm")
-  .description("OWASP LLM Top 10 (2023 v1.1) coverage; not evaluated: file presence is not evidence. The evidence-bound 2025 list is `amc compliance report --framework owasp-llm`")
+  .description("OWASP Top 10 for LLM Applications (2025) coverage; not evaluated: file presence is not evidence. The evidence-bound version is `amc compliance report --framework owasp-llm`")
   .option("--json", "Output as JSON")
   .action(async (opts: { json?: boolean }) => {
     try {
       const { scoreOWASPLLMCoverage } = await import("./score/owaspLLMCoverage.js");
       const result = scoreOWASPLLMCoverage();
-      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🛡️  OWASP LLM Top 10 (2023 v1.1) Coverage"), result, unverifiedClaim("score:owaspLLMCoverage", 0, { regulated: true }), opts)) return;
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🛡️  OWASP Top 10 for LLM Applications (2025) Coverage"), result, unverifiedClaim("score:owaspLLMCoverage", 0, { regulated: true }), opts)) return;
       printNotEvaluatedCriteria(result.risks, result.recommendations);
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
@@ -22458,16 +22355,35 @@ score
 
 score
   .command("task-horizon")
-  .description("Score task-completion time horizon (METR-inspired)")
+  .description("Autonomy span: check the controls AMC lists for a run of a given length (self-reported; not METR's time-horizon measure; a longer run never scores higher)")
+  .option("--minutes <n>", "How long the agent ran on its own, in minutes")
+  .option("--controls <list>", "Controls in place during the run, separated by commas")
+  .option("--human-stepped-in", "A person stepped in during the run")
   .option("--json", "Output as JSON")
-  .action(async (opts: { json?: boolean }) => {
+  .action(async (opts: { json?: boolean; minutes?: string; controls?: string; humanSteppedIn?: boolean }) => {
     try {
-      const { scoreTaskHorizon } = await import("./score/taskHorizon.js");
-      const result = scoreTaskHorizon({ taskDurationMinutes: 0, completedAutonomously: false, activeGovernanceControls: [] });
-      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🎯  Task Horizon"), result, unverifiedClaim("score:taskHorizon", 0), opts)) return;
-      console.log(chalk.gray("Score:"), result.score.toFixed(2));
-      console.log(chalk.gray("Band:"), result.band.label);
-      console.log(chalk.gray("Level:"), result.level);
+      const { scoreTaskHorizon, TASK_HORIZON_BANDS } = await import("./score/taskHorizon.js");
+      const title = chalk.bold.hex('#4AEF79')("\n🎯  Autonomy Span");
+      const claim = unverifiedClaim("score:taskHorizon", 0);
+      if (opts.minutes === undefined) {
+        const nextStep = "Tell AMC how long the agent ran and which controls were in place: amc score task-horizon --minutes 45 --controls \"output validation,tool allowlist\"";
+        const empty = { status: "not_evaluated" as const, score: null, reason: "No run length was given.", nextStep,
+          spans: TASK_HORIZON_BANDS.map((band) => ({ span: band.span, label: band.label, controls: band.governanceRequirements })) };
+        if (emitClaimResult(title, empty, claim, opts)) return;
+        console.log(chalk.gray("Result:"), chalk.yellow("not evaluated"), chalk.gray(`(${empty.reason})`));
+        console.log(chalk.gray(nextStep));
+        return;
+      }
+      const minutes = Number(opts.minutes);
+      if (!Number.isFinite(minutes) || minutes < 0) throw new Error(`--minutes must be a number of minutes, 0 or more. You gave "${opts.minutes}".`);
+      const controls = (opts.controls ?? "").split(",").map((item) => item.trim()).filter(Boolean);
+      const result = scoreTaskHorizon({ taskDurationMinutes: minutes, completedAutonomously: !opts.humanSteppedIn, activeGovernanceControls: controls });
+      if (emitClaimResult(title, result, claim, opts)) return;
+      console.log(chalk.gray("Run length:"), result.band.label);
+      console.log(chalk.gray("Controls in place:"), `${result.score}% of the ${result.band.governanceRequirements.length} listed for a run of this length`);
+      if (result.missingGovernance.length > 0) console.log(chalk.gray("Missing:"), result.missingGovernance.join(", "));
+      console.log(chalk.gray("Risk:"), result.riskLabel);
+      for (const note of result.notes) console.log(chalk.gray(`Note: ${note}`));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
@@ -22896,7 +22812,7 @@ score
 
     const result = computeQuickScore(answers, tier, opts.questionSet);
     if (emitClaimResult(chalk.bold.hex('#4AEF79')(`\n📊  ${tier.charAt(0).toUpperCase() + tier.slice(1)} Score Assessment`), result, selfAnswerClaim("score:quickScore", Object.values(answers)), opts)) return;
-    console.log(chalk.gray(`Score: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`));
+    console.log(chalk.gray(`Points: ${result.totalScore}/${result.maxScore} (${result.percentage}%), 0-5 per question; the level scale is L0-L5`));
     console.log(renderAsciiRadar(result.layerScores));
     if (result.gaps.length > 0) {
       console.log(chalk.yellow("Top Gaps:"));

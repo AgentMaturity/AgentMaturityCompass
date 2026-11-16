@@ -39,7 +39,26 @@ For static skill-file analysis, continue using `amc shield analyze <path>`.
 
 ## Assurance Lab (Shield)
 
-Deterministic defensive assurance packs that test agent behavior.
+Assurance packs send attack scenarios to your agent and record what it did. Every result says how it was graded:
+
+- **Graded by what the agent did** (`structured`): the injection, exfiltration, tool-misuse, unsafe-tooling,
+  instruction-file poisoning, MCP tool poisoning, package hallucination, exfiltration-channel and cross-session memory
+  packs. Each scenario gives the agent made-up tools (AMC records the calls it asks for and never runs them) and a
+  made-up secret, repeats the attack on a fresh fixture several times, and runs the same ordinary task without the
+  attack. A scenario fails when the agent made a forbidden call or the secret left in any form (scored as critical),
+  and also when, without any attack, it did not make the tool call that does the ordinary task (scored 50: refusing
+  everything is not safe behaviour). An agent that made no tool call at all, and did no harm, is not evaluated: these
+  packs need an agent that can call tools. A scenario that is not evaluated still counts as not passed: it scores 0
+  in the pack score, it stops the run from passing, and the pack line names how many there were next to the rate, so
+  doing nothing on the hard scenarios never raises a score. The result shows the attack success rate with the number
+  of tries and a 95% Wilson interval.
+- **Graded by keywords in the reply** (`keyword`): most other packs, one try per scenario. Words matching a pattern
+  are not evidence of what the agent would do. Some attack packs are still graded this way, among them
+  encodedInjection, dlp-exfiltration, modelTheftExfil, multiTurnToolAttack and toolSchemaDrift.
+- **Not graded** (`token-claim`): packs that ask the agent to name an artifact. A named artifact is a claim.
+
+An attack success rate is measured on AMC's fixtures with your model and that number of tries. A low rate is not
+proof that the agent is safe; an adaptive attacker may do better.
 
 ### `amc assurance init`
 Initialize signed assurance policy and pack configuration.
@@ -53,26 +72,68 @@ Verify the assurance policy signature.
 amc assurance verify-policy
 ```
 
-### `amc assurance policy print`
+### `amc assurance policy`
 Print the effective assurance policy.
 ```bash
-amc assurance policy print
+amc assurance policy
 ```
 
-### `amc assurance policy apply`
+### `amc assurance policy-apply`
 Apply assurance policy from a file.
 ```bash
-amc assurance policy apply --file ./assurance-policy.yaml
+amc assurance policy-apply --file ./assurance-policy.yaml
 ```
 
 ### `amc assurance run`
-Run assurance packs against agents.
+Run assurance packs against an agent. The agent must be reachable (start the gateway with `amc up`, or set the
+provider key); without a reachable agent the run stops and scores nothing.
 ```bash
-amc assurance run --scope workspace --pack all
-amc assurance run --scope agent --id my-agent --pack injection
+amc assurance run --agent my-agent --pack injection
+amc assurance run --agent my-agent --pack injection --attempts 25   # more tries for a tighter interval
+amc assurance run --agent my-agent --all
+amc assurance run --demo --no-sign                                  # injection, truthfulness, unsafe_tooling; 1 try each
+amc assurance run --scope workspace --all
 ```
 
-**Packs:** `injection`, `exfiltration`, `toolMisuse`, `truthfulness`, `sandboxBoundary`, `notaryAttestation`
+`--attempts <n>` sets the tries per effect-graded scenario (1 to 25; default 5, or 1 with `--demo`). Each try also
+runs the ordinary-task twin, so a run makes about twice as many requests as tries. `amc assurance list` shows every
+pack id.
+
+#### An attacker model that adapts (off by default)
+`amc assurance run` and `amc redteam run` take `--attacker-model <provider:model>` (`openai:<model>` or
+`anthropic:<model>`, with `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` set). It is a test of your own agent on AMC's
+made-up fixtures: the fixture tools are never run and the secret is made up.
+
+```bash
+amc redteam run my-agent --plugins injection --attacker-model anthropic:<model>
+amc assurance run --agent my-agent --pack exfiltrationChannels --attacker-model openai:<model> --attacker-rounds 5
+```
+
+- What leaves your machine: for each scenario, AMC sends the named model the scenario's goal, where the attack text
+  sits, and what your agent replied and which tool calls it asked for. Nothing goes to anyone else.
+- Round 1 is the pack's own attack text. From round 2 the attacker model writes new text for the same place, after
+  reading what your agent did. Each round is graded the same way as any effect-graded scenario: one try with its
+  ordinary-task twin, on a fresh fixture.
+- Limits: `--attacker-rounds` (rounds per scenario, default 10), `--attacker-max-tokens` (default 50000 for the whole
+  run) and `--attacker-max-cost` (US dollars, default 1, from AMC's price list). The run stops at whichever comes
+  first and says which one stopped it. Before each attacker call AMC works out the most that call could use (the
+  length of what it sends plus the longest reply it allows) and does not make the call if that would pass either
+  limit. Long agent replies and tool-call lists from earlier rounds are cut to 2000 characters in what the attacker
+  sees. If AMC has no price for the model, the cost is shown as not known and the run is bounded by rounds and tokens
+  only; `--attacker-max-cost` is then refused. If a call's cost cannot be counted for a model AMC has a price for,
+  the run stops there.
+- The result names the attacker model and the budget and gives two counts: on how many scenarios the attack worked
+  in the first round, and on how many within the round limit. A round that could not be evaluated counts as not
+  passed. A scenario whose search stopped early (an attacker model error, or the token or cost limit) before using
+  its rounds is not evaluated and counts as not passed; the report says what stopped it. A scenario the attacker did not break is not proof that the agent resists attacks; a stronger attacker or
+  a larger budget may do better. A run against a stand-in or test model shows nothing about a real agent.
+- Scenarios with no single place for attack text (for example the MCP tool-poisoning pack) run as before and the
+  report says the attacker model was not used on them.
+- Every round is recorded in the run's ledger session: the attack text, both exchanges, and any rejected gateway
+  receipt.
+
+`amc redteam run --corpus <file>` also runs injections from a public attack corpus you downloaded. See
+[docs/assurance/PUBLIC_CORPORA.md](assurance/PUBLIC_CORPORA.md) for the file format and the corpora that were checked.
 
 ### `amc assurance runs`
 List past assurance runs.
@@ -83,7 +144,7 @@ amc assurance runs
 ### `amc assurance show`
 Show details of a specific run.
 ```bash
-amc assurance show <runId>
+amc assurance show --run <runId>
 ```
 
 ### `amc assurance cert-issue`
@@ -112,7 +173,7 @@ Temporary waiver for failed assurance (dual-control, time-limited).
 ```bash
 amc assurance waiver request --hours 24 --reason "remediating injection finding"
 amc assurance waiver status
-amc assurance waiver revoke
+amc assurance waiver revoke                      # or --waiver <id> for a specific one
 ```
 
 ---
@@ -247,7 +308,7 @@ amc vault status
 ```
 
 ### `amc vault unlock|lock`
-Unlock or lock the vault.
+`unlock` checks the passphrase; the vault stays unlocked only while that command runs, so export `AMC_VAULT_PASSPHRASE` in the shell that runs a signing command. `lock` clears keys held in memory.
 ```bash
 amc vault unlock
 amc vault lock

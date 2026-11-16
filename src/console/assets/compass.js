@@ -1,3 +1,5 @@
+import { esc, keyWords } from "./pageKit.js";
+
 function latestValue(series, key) {
   const row = series?.[key];
   const point = row?.points?.[row.points.length - 1];
@@ -5,7 +7,7 @@ function latestValue(series, key) {
 }
 
 function cardRow(label, value) {
-  return `<div><div class="muted">${label}</div><div class="tile-value">${value}</div></div>`;
+  return `<div><div class="muted">${esc(label)}</div><div class="tile-value">${esc(value)}</div></div>`;
 }
 
 export async function renderCompassPage(params) {
@@ -46,7 +48,7 @@ export async function renderCompassPage(params) {
     ["RiskAssuranceRisk", latestValue(forecast.series?.indices ?? {}, "RiskAssuranceRisk")],
     ["DigitalDualityRisk", latestValue(forecast.series?.indices ?? {}, "DigitalDualityRisk")]
   ]
-    .map(([label, value]) => cardRow(label, typeof value === "number" ? value.toFixed(1) : "n/a"))
+    .map(([label, value]) => cardRow(keyWords(label), typeof value === "number" ? value.toFixed(1) : "n/a"))
     .join("");
   const valueGrid = [
     ["EmotionalValue", latestValue(forecast.series?.value ?? {}, "EmotionalValue")],
@@ -55,7 +57,7 @@ export async function renderCompassPage(params) {
     ["BrandValue", latestValue(forecast.series?.value ?? {}, "BrandValue")],
     ["LifetimeValue", latestValue(forecast.series?.value ?? {}, "LifetimeValue")]
   ]
-    .map(([label, value]) => cardRow(label, typeof value === "number" ? value.toFixed(1) : "n/a"))
+    .map(([label, value]) => cardRow(keyWords(label), typeof value === "number" ? value.toFixed(1) : "n/a"))
     .join("");
 
   params.root.innerHTML = `
@@ -68,7 +70,7 @@ export async function renderCompassPage(params) {
         ${cardRow("Unknown Questions", unknownCount)}
         ${cardRow("Next Refresh", scheduler?.nextRefreshTs ? new Date(scheduler.nextRefreshTs).toISOString() : "n/a")}
       </div>
-      ${insufficient ? `<p class="status-bad"><strong>Honesty banner:</strong> insufficient evidence. Forecast numbers are informational only.</p>` : ""}
+      ${insufficient ? `<p class="status-bad"><strong>Not enough records yet.</strong> The forecast numbers are for information only.</p>` : ""}
     `)}
     ${params.card("Five Dimensions", `<div class="grid">${dimensionGrid}</div>`)}
     ${params.card("Five Strategy-Failure Risks", `<div class="grid">${riskGrid}</div>`)}

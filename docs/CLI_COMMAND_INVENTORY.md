@@ -4,7 +4,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 
 | Command | Description | Options | Aliases |
 |---|---|---|---|
-| `amc a4` | A4 Forge (preview, AMC_A4_PREVIEW=1): projects, gates, releases and deployments, through the API's own routes | - | - |
+| `amc a4` | A4 Forge (preview, on by default; AMC_A4_PREVIEW=0 turns it off): projects, gates, releases and deployments, through the API's own routes | - | - |
 | `amc a4 approve` | Approve an A4 gate you reviewed (bound to its digests) | `--json`<br>`--session-token-file <file>`<br>`--request-id <id>`<br>`--gate <gateId>`<br>`--reason <text>`<br>`--expect-binding-digest <sha256>`<br>`--expect-gate-seq <n>`<br>`--expect-readiness-digest <sha256>` | - |
 | `amc a4 complete` | Consume an approved gate and run the effect it starts (the API's complete) | `--json`<br>`--session-token-file <file>`<br>`--request-id <id>`<br>`--expect-head-seq <n>`<br>`--stage <stage>`<br>`--gate <gateId>` | - |
 | `amc a4 deny` | Deny an A4 gate you reviewed (bound to its digests) | `--json`<br>`--session-token-file <file>`<br>`--request-id <id>`<br>`--gate <gateId>`<br>`--reason <text>`<br>`--expect-binding-digest <sha256>`<br>`--expect-gate-seq <n>`<br>`--expect-readiness-digest <sha256>` | - |
@@ -105,7 +105,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc assurance patch` | Apply deterministic patch kit for failed assurance findings | `--assuranceRun <id>`<br>`--agent <agentId>`<br>`--apply` | - |
 | `amc assurance policy` | Print current assurance policy | - | - |
 | `amc assurance policy-apply` | Apply assurance policy from YAML/JSON file | `--file <path>` | - |
-| `amc assurance run` | Run assurance pack(s) with deterministic validation | `--agent <agentId>`<br>`--scope <scope>`<br>`--id <id>`<br>`--pack <packId>`<br>`--all`<br>`--demo`<br>`--mode <mode>`<br>`--window <window>`<br>`--window-days <days>`<br>`--out <path>`<br>`--format <format>`<br>`--verbose`<br>`--model <modelId>`<br>`--no-sign`<br>`--executed-attempts <1|25>`<br>`--station-questions <ids>` | - |
+| `amc assurance run` | Run assurance pack(s) with deterministic validation | `--agent <agentId>`<br>`--scope <scope>`<br>`--id <id>`<br>`--pack <packId>`<br>`--all`<br>`--demo`<br>`--mode <mode>`<br>`--window <window>`<br>`--window-days <days>`<br>`--out <path>`<br>`--format <format>`<br>`--verbose`<br>`--model <modelId>`<br>`--no-sign`<br>`--attacker-model <provider:model>`<br>`--attacker-rounds <n>`<br>`--attacker-max-tokens <n>`<br>`--attacker-max-cost <usd>`<br>`--attempts <n>`<br>`--executed-attempts <1|25>`<br>`--station-questions <ids>` | - |
 | `amc assurance runs` | List assurance lab runs | - | - |
 | `amc assurance scheduler` | Assurance scheduler controls | - | - |
 | `amc assurance scheduler disable` | Disable assurance scheduler | - | - |
@@ -208,7 +208,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc bootstrap` | Bootstrap workspace for production deployment (non-interactive) | `--workspace <path>` | - |
 | `amc budgets` | Signed autonomy and usage budgets | - | - |
 | `amc budgets init` | - | `--agent <agentId>` | - |
-| `amc budgets reset` | - | `--agent <agentId>`<br>`--day <yyyy-mm-dd>` | - |
+| `amc budgets reset` | Record a budget-day reset (it does not restore allowance), or accept earlier unknown model usage | `--agent <agentId>`<br>`--day <yyyy-mm-dd>`<br>`--accept-unknown` | - |
 | `amc budgets sign` | Validate and sign the existing reviewed budget limits without changing the policy | `--json` | - |
 | `amc budgets status` | - | `--agent <agentId>` | - |
 | `amc budgets verify` | - | - | - |
@@ -263,7 +263,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc ci check` | One-liner CI gate: quickscore + threshold check (exit 1 if below) | `--min-score <n>`<br>`--min-level <level>`<br>`--agent <agentId>`<br>`--json` | `gate` |
 | `amc ci init` | Generate GitHub workflow and gate policy | `--agent <agentId>`<br>`--no-sign` | - |
 | `amc ci print` | Print suggested CI pipeline steps | `--agent <agentId>` | - |
-| `amc ci redteam` | CI gate: run red-team plugins, optional Evil MCP, and score-gaming resistance checks | `--plugins <ids...>`<br>`--strategies <ids...>`<br>`--min-score <n>`<br>`--max-vulnerabilities <n>`<br>`--max-critical <n>`<br>`--max-high <n>`<br>`--evil-mcp`<br>`--mcp-attacks <categories...>`<br>`--min-mcp-score <n>`<br>`--no-gaming-resistance`<br>`--min-gaming-score <n>`<br>`--sign`<br>`--no-sign`<br>`--json` | - |
+| `amc ci redteam` | CI gate: run red-team plugins, optional Evil MCP, and score-gaming resistance checks | `--plugins <ids...>`<br>`--strategies <ids...>`<br>`--min-score <n>`<br>`--max-vulnerabilities <n>`<br>`--max-critical <n>`<br>`--max-high <n>`<br>`--max-inconclusive <n>`<br>`--evil-mcp`<br>`--mcp-attacks <categories...>`<br>`--min-mcp-score <n>`<br>`--no-gaming-resistance`<br>`--min-gaming-score <n>`<br>`--sign`<br>`--no-sign`<br>`--json` | - |
 | `amc claim-confidence` | Generate per-claim confidence report with citation-backed scoring | `--agent <agentId>` | - |
 | `amc claim-confidence-gate` | Check if claims for given questions pass confidence threshold | `--agent <agentId>`<br>`--questions <ids>` | - |
 | `amc claims` | Evidence claim expiry tracking | - | - |
@@ -286,7 +286,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc compliance regulatory-feeds` | List all configured regulatory feed sources | `--json` | `comply regulatory-feeds` |
 | `amc compliance regulatory-gap` | Run gap analysis against current AMC configuration | `--framework <name>`<br>`--json` | `comply regulatory-gap` |
 | `amc compliance report` | Generate evidence-linked compliance report | `--framework <framework>`<br>`--window <window>`<br>`--out <path>`<br>`--agent <agentId>`<br>`--station <station>`<br>`--json` | `comply report` |
-| `amc compliance risk-classify` | Classify agent into EU AI Act risk tiers (UNACCEPTABLE / HIGH / LIMITED / MINIMAL) | `--agent <agentId>`<br>`--capabilities <json>`<br>`--biometric`<br>`--critical-infra`<br>`--education`<br>`--employment`<br>`--essential-services`<br>`--law-enforcement`<br>`--migration`<br>`--justice`<br>`--realtime-biometric`<br>`--social-scoring`<br>`--subliminal`<br>`--exploits-vulnerabilities`<br>`--emotion-recognition`<br>`--chatbot`<br>`--synthetic-content`<br>`--human-interaction`<br>`--safety-component`<br>`--json` | `comply risk-classify` |
+| `amc compliance risk-classify` | Classify agent into EU AI Act risk tiers (UNACCEPTABLE / HIGH / LIMITED / MINIMAL) | `--agent <agentId>`<br>`--capabilities <json>`<br>`--guide`<br>`--biometric`<br>`--critical-infra`<br>`--education`<br>`--employment`<br>`--essential-services`<br>`--law-enforcement`<br>`--migration`<br>`--justice`<br>`--realtime-biometric`<br>`--social-scoring`<br>`--subliminal`<br>`--exploits-vulnerabilities`<br>`--crime-prediction`<br>`--face-scraping`<br>`--emotion-recognition`<br>`--sensitive-biometric-categorisation`<br>`--intimate-imagery`<br>`--child-abuse-material`<br>`--chatbot`<br>`--synthetic-content`<br>`--deep-fakes`<br>`--human-interaction`<br>`--safety-component`<br>`--json` | `comply risk-classify` |
 | `amc compliance roadmap` | Generate step-by-step compliance plan for a framework | `--framework <framework>`<br>`--agent <agentId>`<br>`--capabilities <json>`<br>`--risk-tier <tier>`<br>`--out <path>`<br>`--json` | `comply roadmap` |
 | `amc compliance verify` | Verify compliance maps signature | - | `comply verify` |
 | `amc composition` | Inspect the declarative plugin composition (amc.cordis.yml) | `--config <path>`<br>`--json` | - |
@@ -406,7 +406,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc enforce resources status` | Show the signed active, previous, rollback, drift, and integrity state | `--agent <agentId>`<br>`--json` | - |
 | `amc enforce resources validate` | Validate governed resource changes before accepting them | `--agent <agentId>`<br>`--manifest <path>`<br>`--json` | - |
 | `amc enforce resources verify` | Verify the current workspace resources against an Enforce resource manifest | `--agent <agentId>`<br>`--manifest <path>`<br>`--json` | - |
-| `amc enforce taint` | Track tainted input through the system | `--json` | - |
+| `amc enforce taint` | Demo of taint tracking (not enforced: no AMC decision reads it; for that, see amc guardrails profile untrusted-input-guard) | `--json` | - |
 | `amc enforce tla-spec` | Generate a TLA+ specification for the AMC safety model | `--properties <list>`<br>`--output <path>` | - |
 | `amc enforce verify-certificate` | Verify the integrity of a proof certificate (pass JSON as string) | `--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc enterprise` | Enterprise tier — licensing, audit export, SSO, fleet governance | - | - |
@@ -475,7 +475,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc experiment set-candidate` | Set experiment candidate signed config overlay | `--experiment <id>`<br>`--candidate-file <path>`<br>`--agent <agentId>` | - |
 | `amc experiment-architecture` | Run a controlled architecture comparison experiment (exit 0 measured pass, 1 failure or error, 3 inconclusive or simulated) | `--name <name>`<br>`--model <modelId>`<br>`--baseline-file <path>`<br>`--candidate-file <path>`<br>`--baseline-kind <kind>`<br>`--candidate-kind <kind>`<br>`--execute-trials`<br>`--casebook <id>`<br>`--provider <id>`<br>`--mode <mode>`<br>`--max-steps <n>`<br>`--agent <agentId>` | - |
 | `amc experiment-architecture-probes` | List the standard probe set for architecture experiments | - | - |
-| `amc explain` | Plain-English explanation for a diagnostic question (example: AMC-2.1) | `--json` | - |
+| `amc explain` | Plain-English explanation for a diagnostic question (example: AMC-2.1) | `--json`<br>`--not-applicable <reason>`<br>`--applicable` | - |
 | `amc export` | Export policy packs and badges | - | - |
 | `amc export badge` | Export deterministic maturity badge SVG for a run | `--run <runId>`<br>`--out <file>`<br>`--agent <agentId>` | - |
 | `amc export grc` | Export the latest run as labelled GRC evidence (+ SARIF developer findings) | `--framework <framework>`<br>`--out <file>`<br>`--sarif <file>`<br>`--agent <agentId>`<br>`--json` | - |
@@ -580,7 +580,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc guardrails disable` | Remove an additive guardrail request without weakening signed policy | - | - |
 | `amc guardrails enable` | Request a signed, runtime-bound guardrail | - | - |
 | `amc guardrails list` | List signed requested state and effective runtime guardrail bindings | `--json` | - |
-| `amc guardrails profile` | Apply bound controls from a signed additive profile | - | - |
+| `amc guardrails profile` | Apply bound controls from a signed additive profile, or switch the untrusted-input-guard preset (In Claude Code and Gemini CLI sessions that AMC's hooks govern, AMC asks for approval before (or blocks) consequential calls made after untrusted input. It does not stop prompt injection, and a call made through a tool AMC cannot see is outside this.) | `--mode <mode>` | - |
 | `amc guide` | Generate personalized improvement guide with exportable agent instructions | `--target <level>`<br>`--export`<br>`--agent-instructions`<br>`--guardrails`<br>`--apply [file]`<br>`--interactive`<br>`--watch`<br>`--watch-interval <seconds>`<br>`--diff`<br>`--frameworks`<br>`--ci`<br>`--dry-run`<br>`--quick`<br>`--auto-detect`<br>`--status`<br>`--go`<br>`--compliance [frameworks]`<br>`--agent <id>`<br>`--framework <name>`<br>`--json` | - |
 | `amc help` | Show help for a command (for example: amc help run) | `--all` | - |
 | `amc history` | List diagnostic run history | `--limit <n>`<br>`--valid-only`<br>`--since <hours>` | - |
@@ -722,7 +722,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc marketplace undeprecate` | Remove deprecation from a pack | - | - |
 | `amc marketplace uninstall` | Uninstall a pack | `--agent <agentId>` | - |
 | `amc mcp` | AMC Model Context Protocol (MCP) server for AI coding assistants, and scoped MCP server configs for the native loop | - | - |
-| `amc mcp add` | Write an unreviewed MCP server config to the user or project scope; review and sign it before mounting | `--scope <scope>`<br>`--transport <kind>`<br>`--url <url>`<br>`--origin <origin>`<br>`--env-ref <NAME=credentialRef>`<br>`--header-ref <Name=credentialRef>`<br>`--timeout-ms <n>`<br>`--credentials-home <dir>`<br>`--force`<br>`--json` | - |
+| `amc mcp add` | Add an MCP server to the user or project scope: at a terminal it shows the server's tools and allows them after you type yes; otherwise it writes an unreviewed file | `--scope <scope>`<br>`--transport <kind>`<br>`--url <url>`<br>`--origin <origin>`<br>`--env-ref <NAME=credentialRef>`<br>`--header-ref <Name=credentialRef>`<br>`--timeout-ms <n>`<br>`--credentials-home <dir>`<br>`--force`<br>`--action-class <class>`<br>`--tool <name>`<br>`--yes`<br>`--json` | - |
 | `amc mcp config` | Print MCP configuration snippets for supported AI coding assistants | `--ide <name>`<br>`--json` | - |
 | `amc mcp get` | Show one scoped config (id, project:id or user:id) as --mcp would admit it | `--credentials-home <dir>`<br>`--json` | - |
 | `amc mcp list` | List scoped MCP server configs: scope, path, digest, transport, review and signature state; never secrets | `--credentials-home <dir>`<br>`--json` | - |
@@ -990,7 +990,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc redteam attack` | Run attack plugins (prompt-injection, data-exfiltration, privilege-escalation, model-manipulation, denial-of-service) | `--plugins <ids...>`<br>`--model <modelId>`<br>`--json` | - |
 | `amc redteam attack-list` | List available attack plugins | `--json` | - |
 | `amc redteam plugins` | List available attack plugins (assurance packs) | `--json` | - |
-| `amc redteam run` | Execute red-team plugins with chosen attack strategies and generate a vulnerability report | `--plugins <ids...>`<br>`--strategies <ids...>`<br>`--output <path>`<br>`--no-sign`<br>`--evil-mcp`<br>`--mcp-attacks <categories...>`<br>`--model <modelId>`<br>`--json` | - |
+| `amc redteam run` | Execute red-team plugins with chosen attack strategies and generate a vulnerability report | `--plugins <ids...>`<br>`--strategies <ids...>`<br>`--output <path>`<br>`--no-sign`<br>`--evil-mcp`<br>`--mcp-attacks <categories...>`<br>`--model <modelId>`<br>`--json`<br>`--attacker-model <provider:model>`<br>`--attacker-rounds <n>`<br>`--attacker-max-tokens <n>`<br>`--attacker-max-cost <usd>`<br>`--corpus <file>` | - |
 | `amc redteam strategies` | List available attack strategies | `--json` | - |
 | `amc release` | Deterministic release engineering and offline verification | - | - |
 | `amc release init` | Initialize AMC release signing keypair | `--write-private-to <path>` | - |
@@ -1080,8 +1080,8 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc score mutual-verification` | Score agent-to-agent trust verification (challenge-response) | `--json` | - |
 | `amc score operational-independence` | Calculate operational independence score | `--window <days>`<br>`--domain <domain>`<br>`--json` | - |
 | `amc score output-attestation` | Score output signing and trust metadata for receiving agents | `--json` | - |
-| `amc score output-integrity` | Score output integrity maturity (OWASP LLM02, confidence calibration, citation) | `--json` | - |
-| `amc score owasp-llm` | OWASP LLM Top 10 (2023 v1.1) coverage; not evaluated: file presence is not evidence. The evidence-bound 2025 list is `amc compliance report --framework owasp-llm` | `--json` | - |
+| `amc score output-integrity` | Score output integrity maturity (OWASP LLM05:2025, confidence calibration, citation) | `--json` | - |
+| `amc score owasp-llm` | OWASP Top 10 for LLM Applications (2025) coverage; not evaluated: file presence is not evidence. The evidence-bound version is `amc compliance report --framework owasp-llm` | `--json` | - |
 | `amc score pause-quality` | Score quality of agent-initiated pauses | `--json` | - |
 | `amc score policy-consistency` | Test policy enforcement consistency across repeated trials (pass^k) | `--json` | - |
 | `amc score production-ready` | Run production readiness gate for an agent | `--strict`<br>`--json` | - |
@@ -1092,7 +1092,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc score simulation-lane` | Run the Simulation & Forecast evaluation lane — 5-dimension assessment for simulation/forecast systems | `--system-type <type>`<br>`--json`<br>`--responses <file>` | - |
 | `amc score sleeper-detection` | Detect context-dependent behavioral inconsistencies | `--json` | - |
 | `amc score state-portability` | Score agent state portability (vendor-neutral format, serialization, integrity on transfer) | `--json` | - |
-| `amc score task-horizon` | Score task-completion time horizon (METR-inspired) | `--json` | - |
+| `amc score task-horizon` | Autonomy span: check the controls AMC lists for a run of a given length (self-reported; not METR's time-horizon measure; a longer run never scores higher) | `--minutes <n>`<br>`--controls <list>`<br>`--human-stepped-in`<br>`--json` | - |
 | `amc score tier` | Run tiered maturity assessment (quick/standard/deep) | `--tier <tier>`<br>`--question-set <version>`<br>`--json` | - |
 | `amc score transparency-log` | Score network transparency log (Merkle tree, inclusion proofs) | `--json` | - |
 | `amc session` | Native signed sessions: inspect, compact, verify, replay and recover (list them with amc sessions list) | - | - |
@@ -1103,7 +1103,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc session proof` | Export a session's inclusion proof (verifiable offline, without this workspace) | `--out <path>` | - |
 | `amc session recover` | Recover a crashed session by appending synthetic closers under a fenced claim (append-only) | `--force`<br>`--close`<br>`--stale-after <ms>`<br>`--json` | - |
 | `amc session replay-request` | Rebuild each request this session sent from its signed rows and check it against the recorded digest | `--json`<br>`--out <path>` | - |
-| `amc session show` | Show a session's projected conversation and its event spine | `--json`<br>`--limit <rows>`<br>`--cursor <cursor>` | - |
+| `amc session show` | Show a session's projected conversation and its event spine | `--json`<br>`--spine`<br>`--limit <rows>`<br>`--cursor <cursor>` | - |
 | `amc session spill-read` | Read a bounded byte range of retained output against its signed origin | `--workspace <path>`<br>`--offset <bytes>`<br>`--limit <bytes>`<br>`--expect-monitor <sha256>`<br>`--json` | - |
 | `amc session verify` | Verify the ledger and report per-session lifecycle verdicts (open / released / interrupted / closed) | `--json`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unanchored` | - |
 | `amc session verify-export` | Verify an exported session offline against a pinned monitor key fingerprint | `--accept-unverifiable-content`<br>`--json`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unanchored` | - |
@@ -1126,7 +1126,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc shield detect-injection` | Detect prompt injection attempts in text | `--json` | - |
 | `amc shield mcp-ledger` | Signed MCP trust ledger: scan a set of MCP servers and record a clean-as-of receipt | `--json`<br>`--out <path>`<br>`--previous <path>` | - |
 | `amc shield posture` | One-command agent-security posture scorecard (config, MCP trust, secrets, isolation, supply-chain) — L0–L5, signed receipt | `--json`<br>`--out <path>` | - |
-| `amc shield red-team` | Run a quick red team campaign (5 attacks on demo target). Tip: For full red-team suite with strategies, use `amc redteam run` | `--rounds <n>`<br>`--categories <list>`<br>`--target <profile>`<br>`--agent <agentId>`<br>`--model <modelId>` | - |
+| `amc shield red-team` | Run a quick red team campaign (5 attacks) against the agent under test. For the full suite with strategies, use `amc redteam run` | `--rounds <n>`<br>`--categories <list>`<br>`--target <profile>`<br>`--agent <agentId>`<br>`--model <modelId>` | - |
 | `amc shield red-team-status` | Show current red team capabilities and attack template count | - | - |
 | `amc shield reputation` | Check reputation score for a tool | `--json` | - |
 | `amc shield sandbox` | Check sandbox configuration for an agent | `--json` | - |
@@ -1275,10 +1275,8 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc vault scrub` | Scrub metadata from a file | `--json` | - |
 | `amc vault secret-share` | Split a secret into shares using Shamir's Secret Sharing | `--secret <value>`<br>`--shares <n>`<br>`--threshold <k>` | - |
 | `amc vault status` | Show vault status | - | - |
-| `amc vault unlock` | Unlock vault into memory for signing operations | - | - |
+| `amc vault unlock` | Check the vault passphrase (the vault stays unlocked only while this command runs) | - | - |
 | `amc vault zk-commit` | Create a Pedersen commitment to a value | `--value <n>` | - |
-| `amc vault zk-range-proof` | Create a range commitment for an AMC score threshold (NOT a zero-knowledge proof; unsound, does not verify) | `--value <n>`<br>`--threshold <n>`<br>`--agent <id>` | - |
-| `amc vault zk-verify` | Check a range commitment (NOT a zero-knowledge verification; unsound) | - | - |
 | `amc verify` | Verify integrity across AMC artifacts | `--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unanchored`<br>`--repair`<br>`--apply`<br>`--yes`<br>`--sign-config`<br>`--relabel-legacy`<br>`--dry-run`<br>`--path <file>` | - |
 | `amc verify all` | Verify trust/policies/plugins/logs/ledger/artifacts in one pass | `--json`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unanchored` | - |
 | `amc vibe-audit` | Run static safety checks for AI-generated code | `--file <path>`<br>`--json` | - |

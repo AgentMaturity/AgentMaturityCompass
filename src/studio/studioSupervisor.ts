@@ -320,10 +320,13 @@ export async function runStudioForeground(params: {
 }): Promise<StudioRuntime> {
   if (params.hostDir) {
     const hostDir = params.hostDir;
-    const listen = resolveListenPolicy({ env: params.env ?? {}, hostMode: true, flags: { bind: params.apiHost, port: params.apiPort, allowedCidrs: params.allowedCidrs } });
+    // `amc up --demo` is this machine's own Studio: it reads AMC_STUDIO_PORT and AMC_BIND (not a host server's AMC_HOST_*),
+    // and, like `amc up`, moves to a free port when the default one is taken (it used to fail on a busy 3212).
+    const demo = params.allowLocalDemoWorkspace === true;
+    const listen = resolveListenPolicy({ env: params.env ?? {}, hostMode: !demo, flags: { bind: params.apiHost, port: params.apiPort, allowedCidrs: params.allowedCidrs } });
     assertPublicBindAcknowledged(listen);
     assertProxyTrustNamed(params.trustedProxyHops, listen);
-    if (params.allowLocalDemoWorkspace === true) {
+    if (demo) {
       process.env.AMC_VAULT_PASSPHRASE = ensureDemoVaultPassphrase(hostDir);
     }
     const defaultWorkspaceId = params.defaultWorkspaceId ?? "default";
@@ -343,10 +346,10 @@ export async function runStudioForeground(params: {
         trustBoundaryMode: "isolated"
       });
     }
-    const router = await startWorkspaceRouter({
+    const startRouter = (port: number) => startWorkspaceRouter({
       hostDir,
       host: listen.apiHost,
-      port: listen.apiPort,
+      port,
       defaultWorkspaceId,
       allowLocalDemoWorkspace: params.allowLocalDemoWorkspace,
       allowedCidrs: listen.allowedCidrs,
@@ -355,6 +358,9 @@ export async function runStudioForeground(params: {
       maxRequestBytes: params.maxRequestBytes,
       corsAllowedOrigins: params.corsAllowedOrigins
     });
+    // A host server never moves off its port; the demo falls back from a busy default only.
+    const router = demo ? await listenOnPolicyPort({ label: "Studio API", port: listen.apiPort, source: listen.apiPortSource, start: startRouter })
+      : await startRouter(listen.apiPort);
     const state: StudioState = {
       pid: process.pid,
       startedTs: Date.now(),

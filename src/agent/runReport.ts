@@ -113,14 +113,15 @@ function assistantTextOf(workspace: string, events: readonly EvidenceEvent[]): s
   return out;
 }
 
-/** The session's allowed tool calls whose signed audit row says they ran as SIMULATE (the ledger keeps audit rows on every backend). */
+/** The session's allowed calls with an effect that ran as SIMULATE, from the signed audit rows (kept on every backend). */
 function simulatedToolCalls(workspace: string, sessionId: string): number {
   const ledger = openLedger(workspace, { readonly: true });
   try {
     return ledger.getAllEvents().filter((event) => {
       if (event.session_id !== sessionId || event.event_type !== "audit") return false;
-      const meta = JSON.parse(event.meta_json ?? "{}") as { auditType?: unknown; effectiveMode?: unknown; toolName?: unknown };
-      return meta.auditType === "TOOL_CALL_ALLOWED" && meta.effectiveMode === "SIMULATE" && typeof meta.toolName === "string";
+      const meta = JSON.parse(event.meta_json ?? "{}") as { auditType?: unknown; effectiveMode?: unknown; toolName?: unknown; actionClass?: unknown };
+      // A READ_ONLY body has no effect to withhold: fs.read, glob and grep return real results under SIMULATE (simulationNotice).
+      return meta.auditType === "TOOL_CALL_ALLOWED" && meta.effectiveMode === "SIMULATE" && typeof meta.toolName === "string" && meta.actionClass !== "READ_ONLY";
     }).length;
   } finally {
     ledger.close();

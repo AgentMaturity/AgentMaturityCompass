@@ -46,7 +46,7 @@ const licences: TestIndustryPackLicence[] = [];
 const connections: Array<{ client: Client; server: ReturnType<typeof createAmcMcpServer> }> = [];
 
 beforeEach(() => {
-  vi.stubEnv("AMC_A4_PREVIEW", undefined);
+  vi.stubEnv("AMC_A4_PREVIEW", "0");
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "p0-23-owned-sdk-fixture-passphrase");
   vi.stubEnv("AMC_VAULT_PASSPHRASE_FILE", undefined);
   for (const key of LICENSE_ENV_KEYS) vi.stubEnv(key, undefined);

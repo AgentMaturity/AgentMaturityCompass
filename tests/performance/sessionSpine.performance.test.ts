@@ -19,8 +19,9 @@ import { SessionService } from "../../src/session/sessionService.js";
  * events/sec).
  *
  * The floors here are set well below the medians measured on the dev machine
- * (~2,000 ev/s control-plane, ~640 ev/s blob-backed content) so the gate proves
- * the property without being flaky on slower CI hardware. Its real job is the
+ * (~2,000 ev/s control-plane, ~640 ev/s blob-backed content) and at or above a
+ * streaming turn's rate, so the gate proves the property without being flaky
+ * on slower CI hardware. Its real job is the
  * second assertion: that throughput does NOT collapse as the session grows,
  * which is what caught the O(n^2) blob-index re-read.
  */
@@ -81,9 +82,10 @@ describe("session spine throughput", () => {
 
     const totalPerSec = (N / (firstHalfMs + secondHalfMs)) * 1000;
 
-    // Floor: comfortably below the ~640 ev/s measured, so CI variance does not
-    // make it flaky, but far above a streaming turn's ~50-100 ev/s.
-    expect(totalPerSec, `content throughput ${totalPerSec.toFixed(0)} ev/s`).toBeGreaterThan(150);
+    // Floor: a streaming turn's top rate (~100 ev/s), the requirement. Hosted Linux runners measured about 120-260 ev/s
+    // and hosted macOS about 88-112 (CI 2026-11-12..14, no code change), far below the dev machine's ~640, so the old
+    // 150 floor sat inside normal Linux runner variance. Growth below is the regression signal.
+    expect(totalPerSec, `content throughput ${totalPerSec.toFixed(0)} ev/s`).toBeGreaterThan(100);
 
     // No unbounded growth: with the O(n) blob-index fix, the second half must not
     // be dramatically slower than the first. Before the fix this ratio grew with

@@ -1,6 +1,6 @@
 /**
  * Model Theft & Weight Exfiltration Pack
- * Based on OWASP LLM Top 10 (LLM10: Model Theft) and concerns about
+ * Based on OWASP LLM10:2025 Unbounded Consumption (model extraction; Model Theft was LLM10 in the 2023 list) and concerns about
  * AI talent defection carrying knowledge to adversary nations.
  */
 import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
@@ -114,7 +114,7 @@ export const modelTheftExfilPack: AssurancePackDefinition = {
   id: "modelTheftExfil",
   title: "Model Theft & Weight Exfiltration",
   description:
-    "Based on OWASP LLM10:2023 (Model Theft) and talent defection concerns. " +
+    "Based on OWASP LLM10:2025 Unbounded Consumption, which covers model extraction (Model Theft in the 2023 list), and talent defection concerns. " +
     "Tests model protection including weight extraction resistance, architecture disclosure prevention, " +
     "fine-tuning data protection, API abuse detection, organizational knowledge protection, " +
     "weight exfiltration resistance, self-copying detection, extraction cooperation resistance, " +

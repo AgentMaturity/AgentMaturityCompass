@@ -89,7 +89,7 @@ prompts, ACP, and the TypeScript and Python SDKs' `approve`), Studio's decision 
 live roles, or the admin token), and Studio's audit evidence approval. `amc audit request approve --actor <id>` is
 self-asserted: it raises the dual-control request but records no owner decision; signed-in reviewers decide it.
 
-Each signed decision records `authentication: "authenticated" | "self-asserted"`. A self-asserted reviewer may still
+Each signed decision records `authentication: "authenticated" | "self-asserted" | "terminal"` ("terminal" is described under "Approving in native chat at the terminal"). A self-asserted reviewer may still
 **deny** and approve **simulate**, but only a DENY or an authenticated approval is read by the engine and its consumers
 (`listApprovalDecisions`, `countedApprovalDecisions`): quorum, the distinct-user check, the native gate, assurance
 waiver publication (its OWNER and AUDITOR approvals), audit evidence fulfilment, authorization records and A4 effect
@@ -135,6 +135,37 @@ each child's `delegation/hook-control` row, so an `accept-edits` run and a `--ap
 different digests, and a `plan` run differs from an ungated one. With a preset, the mode is recorded as an override
 source and the preset's `approveTools` as replaced. The SDK, ACP and Studio native-task options still take the
 expert `approveTools` form.
+
+### Approving in native chat at the terminal
+
+When a gated call in `amc agent-loop chat` waits for approval, the chat terminal shows what it would do in plain form: a
+file write or edit as a unified diff, a shell call as its command and folder (the agent's own description is marked as
+not checked), a `web_fetch` call as its host and address, and any other tool's arguments as values. Every argument a
+summary does not cover is listed after it, argument names included. Characters a terminal would hide, reorder or act
+on (control characters, bidi and other format characters, line and paragraph separators, zero-width and unusual
+spaces) are written as a visible `\uXXXX`, and a newline or tab in an argument name or folder as `\n` or `\t`. AMC
+shows these only after the arguments the run sent hash to the digest the signed request binds; otherwise it says it
+cannot show the call and does not offer the terminal answer.
+
+Where the request's own rule and the class's rule in the signed approval policy both allow one local approver (at most
+one approval, no distinct-user rule, OWNER among the roles, as in a workspace made by `amc init --coding`), the person
+at the terminal types `y` and presses Enter to allow this one call, or `n` and Enter to refuse it; anything else, or
+Esc, stops the turn. This answer is offered only when every argument of the call is shown in full; when any part is cut
+short, escaped or cannot be shown, the call goes to the signed-in path below. The answer counts only when `y` or `n`
+was the one key typed after the prompt appeared, followed by a separate Enter: text typed before the prompt is
+cleared, and a key in the prompt's first 0.3 seconds, any second key (a typo taken back included), pasted text and a
+key that arrives together with its Enter all make the answer not count. The decision is
+signed in the chat process and recorded as `authentication: "terminal"`, with the OS account as the reviewer, role
+OWNER and a reason saying nobody signed in. The engine checks again that the process has a terminal on stdin, carries
+no agent marker and is not in agent mode, and that both rules allow one approver; no CLI flag selects this path, and the
+agent's run (which has no terminal) cannot take it. The approval binds those arguments and is used up by that one
+call. A terminal approval is never counted toward a request that needs two approvals, different people or a role other
+than OWNER: those requests keep the signed-in path below.
+
+Why the sign-in exists: a reviewer name typed on a command line is self-asserted, and any process in the workspace,
+an agent's shell included, could type one. So an EXECUTE approval asks for proof of who decided: a signed-in session
+(`amc approvals login`), or, for the one-person rule only, the person at the interactive terminal of the chat that
+raised the request.
 
 ### Native one-shot and interactive review
 

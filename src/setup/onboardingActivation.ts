@@ -338,11 +338,12 @@ function blockedProjection(agentId: string, reasons: Set<OnboardingActivationRea
 
 function nextAction(agentId: string, completed: number, ready: boolean): OnboardingActivationProjection["nextAction"] {
   if (completed === 4) return null;
+  // The mode is named: `amc connect` without it asks in a terminal and stops anywhere else (CLI-30).
   if (!ready && completed === 0) {
-    return { label: "Configure a connection", command: `amc connect --agent ${agentId}` };
+    return { label: "Configure a connection", command: `amc connect --agent ${agentId} --mode supervise` };
   }
   if (completed < 2) {
-    return { label: "Run one agent action through AMC", command: `amc connect --agent ${agentId}` };
+    return { label: "Run one agent action through AMC", command: `amc connect --agent ${agentId} --mode supervise` };
   }
   return {
     label: "Run one controlled action",

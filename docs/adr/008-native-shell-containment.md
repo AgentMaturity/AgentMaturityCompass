@@ -1,8 +1,10 @@
 # ADR 008: Native shell containment on macOS and Linux
 
 Status: proposed. The macOS boundary, the shared egress allowlist, the process
-cap and the receipts are implemented. The Linux egress relay, which relaxes the
-seccomp filter, waits for Sid's comment on this ADR and is not implemented.
+cap and the receipts are implemented. The Linux egress relay below, which
+relaxes the seccomp filter, was built on 2026-11-16 on the coordinator's lane
+instruction. Sid has not yet commented on it, as this ADR asked before coding.
+It is unit-tested but has not been run on a Linux host.
 Owner: P1-05. Date: 2026-10-07.
 
 ## Context
@@ -85,18 +87,32 @@ effect; a row that cannot be written denies the connection.
 `reads`, `network` (`denied` or `proxy-allowlist`), `allowHosts`,
 `processLimit` and `limitations`.
 
-## Proposed Linux relay (needs Sid's comment before coding)
+## Linux relay (built 2026-11-16; not yet reviewed by Sid, not yet run on Linux)
 
 Only when `egress` is signed: refuse launch if a socket file exists in the
-read-only workspace mount (the existing 20,000-entry walk); listen on a Unix
-socket (mode 0600) in the launcher's private temp directory and bind it into the
-sandbox; replace `linuxSocketDenyFilter` with `linuxSocketEgressFilter(arch)`,
-which allows `socket()` only for AF_UNIX, AF_INET and AF_INET6 and still denies
-io_uring; run `sandboxRelay.mjs` with a read-only copy of the Node binary. The
-relay listens on 127.0.0.1 inside the empty network namespace, forwards to the
-bound socket and runs `/bin/sh -c <command>` with the proxy variables set.
-Without `egress`, the full socket deny filter stays. Until this is reviewed, a
-Linux policy with `egress` is refused at launch.
+read-only workspace mount (a 20,000-entry walk; a larger workspace is refused);
+listen on a Unix socket in the launcher's private temp directory (mode 0700)
+and bind that directory read-only at `/amc-egress`; replace
+`linuxSocketDenyFilter` with `linuxSocketEgressFilter(arch)`
+(`src/sandbox/bwrapEgress.ts`), which allows `socket()` only for AF_UNIX,
+AF_INET and AF_INET6, `socketpair()` only for AF_UNIX, and still denies io_uring;
+run the relay script with AMC's Node binary, bound read-only by descriptor at
+`/amc-egress/node` (not copied). The relay
+listens on 127.0.0.1 inside the empty network namespace, forwards to the bound
+socket and runs the command with the proxy variables set. Without `egress`, the
+full socket deny filter and the old arguments stay, byte for byte
+(`tests/sandbox/confinementNoLooser.test.ts`).
+
+## Allow-list matching (2026-11-16)
+
+An entry may carry `:port`; an entry without one covers only the default port
+(443 for CONNECT, 80 for plain HTTP). Hosts are matched lowercased and without a
+trailing dot. A request whose Host header names another site than its target is
+refused; a Host header naming a loopback address (Node's client names its proxy
+there) is ignored, since the proxy never connects to it. A session may narrow
+its list (`narrowSessionEgress`): the effective list is the intersection. The
+generic macOS Seatbelt profile now denies the network as the shell profile
+does.
 
 ## Known limits
 
@@ -115,4 +131,7 @@ Linux policy with `egress` is refused at launch.
   pins the `Host` header for plain HTTP only.
 - Tools that ignore `HTTP_PROXY`, `HTTPS_PROXY` and `ALL_PROXY` (for example
   git over SSH) cannot reach the network.
+- On Linux with egress, a socket file a host process creates in the workspace
+  during the call could be connected to; the runtime roots (`/usr`, `/lib`) are
+  not walked for socket files.
 - The escape suite and the `contained-shell` CI job are not written yet.

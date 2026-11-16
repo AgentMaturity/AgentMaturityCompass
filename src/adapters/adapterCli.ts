@@ -73,6 +73,12 @@ export function adaptersCapabilitiesCli(params: {
   });
 }
 
+/** `adapters capabilities` without --agent or --adapter: this folder's agent, and the adapter its profile prefers (as `adapters run` picks it). */
+export function capabilityTarget(workspace: string, agentId?: string, adapterId?: string): { agentId: string; adapterId: string } {
+  const agent = resolveAgentId(workspace, agentId);
+  return { agentId: agent, adapterId: adapterId ?? loadAdaptersConfig(workspace).adapters.perAgent[agent]?.preferredAdapter ?? "generic-cli" };
+}
+
 export async function adaptersCapabilitiesCliAsync(params: {
   workspace: string;
   agentId?: string;

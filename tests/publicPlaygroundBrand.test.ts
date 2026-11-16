@@ -15,7 +15,8 @@ describe("AMC public Playground identity", () => {
 
     const html = read("website/playground.html");
     const css = read("website/playground.css");
-    expect(html).toContain('href="playground.css?v=20260710a"');
+    expect(html).toContain('href="playground.css?v=20261115"');
+    expect(html).toContain('href="home.css?v=6"');
     expect(html).not.toMatch(/<style(?:\s[^>]*)?>/i);
     expect(css).toContain('@import url("./brand.css")');
     expect(css).toContain("var(--amc-bg)");
@@ -33,12 +34,12 @@ describe("AMC public Playground identity", () => {
     expect(html).toContain('<link rel="canonical" href="https://agentmaturity.co/playground.html">');
     expect(html).toContain('<meta property="og:image" content="https://agentmaturity.co/og-card.png">');
     expect(html).toContain('<meta name="twitter:card" content="summary_large_image">');
-    expect(html).toContain('class="playground-wordmark"');
-    expect(html).toContain('amc<span class="brand-cursor">_</span><span class="surface-name">playground</span>');
-    expect(html).toContain('class="playground-tagline">Evidence over claims.</span>');
+    // One nav and one footer on every page: the home page's.
+    expect(html).toContain('<a href="./" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>');
+    expect(html).toContain("You give the answers, so the score is self-reported.");
     expect(html).toContain("curated browser preview from AMC's full CLI catalog of <!-- amc:count:assurancePacksRegistered -->");
     expect(html).not.toMatch(/explore 143 assurance packs|shows all 143 test suites/i);
-    expect(html).toContain('<footer class="playground-footer">');
+    expect(html).toContain('<footer class="footer">');
   });
 
   test("keeps decorative emoji out of Playground chrome and localized controls", () => {
@@ -80,21 +81,24 @@ describe("AMC public Playground identity", () => {
   test("distinguishes the complete product registry from the curated browser preview", () => {
     const html = read("website/playground.html");
     const browserPackBlock = html.match(/const PACKS = \[([\s\S]*?)\n\];/)?.[1] ?? "";
-    expect(listAssurancePacks()).toHaveLength(143);
+    expect(listAssurancePacks()).toHaveLength(148);
     expect(browserPackBlock.match(/\{ id:/g)).toHaveLength(85);
     expect(html).toContain("Showing ${filtered.length} of ${PACKS.length} browser previews");
     expect(html).toContain("full CLI catalog of <!-- amc:count:assurancePacksRegistered -->");
   });
 
-  test("exposes persistent theme state and a keyboard-safe guided tour", () => {
+  test("stays dark like the rest of the site, and its guided tour never traps a click (S-23)", () => {
     const html = read("website/playground.html");
-    expect(html).toContain('id="themeToggle"');
-    expect(html).toContain('aria-pressed="false"');
-    expect(html).toContain("function updateThemeControl(isLight)");
-    expect(html).toContain("themeToggle.setAttribute('aria-label', isLight ? 'Switch to dark theme' : 'Switch to light theme')");
-    expect(html).toContain("themeToggle.setAttribute('aria-pressed', String(isLight))");
+    const css = read("website/playground.css");
+    expect(html).not.toContain('id="themeToggle"');
+    expect(html).toContain("localStorage.removeItem('amc-theme')");
+    // The skip link lands on the lab itself, not on the page body.
+    expect(html).toContain('<main id="main-content" class="playground-main" tabindex="-1">');
     expect(html).toContain("tooltip.focus()");
     expect(html).toContain("if (e.key === 'Escape' && tourActive) endTour()");
-    expect(html).toContain("tourTrigger?.focus()");
+    expect(html).toContain("if (returnFocus) tourTrigger?.focus()");
+    // A click outside the tour box ends the tour and still reaches what was clicked: the overlay takes no clicks.
+    expect(css).toMatch(/\.tour-overlay \{[^}]*pointer-events: none;/s);
+    expect(html).toContain("endTour(false);\n}, true);");
   });
 });

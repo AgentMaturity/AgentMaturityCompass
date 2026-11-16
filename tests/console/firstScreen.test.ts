@@ -24,13 +24,16 @@ describe("welcome guide", () => {
 describe("hero card", () => {
   const hero = fnBody("function firstUseCard(agentId, demoMode)");
 
-  test("has exactly one primary action, a link to Native Tasks with the sample prompt", () => {
-    expect(hero.match(/class="button"/g) ?? []).toHaveLength(1);
-    expect(hero).toContain('id="firstUsePrimary" href="${htmlEscape(primaryActionHref(agentId))}"');
+  test("is the quieter second card: Watch an agent I already use, and Try a sample task (Native Tasks with the sample prompt)", () => {
+    expect(hero.match(/class="button"/g) ?? []).toHaveLength(0);
+    expect(hero).toContain('class="button secondary" id="firstUsePrimary" href="${htmlEscape(primaryActionHref(agentId))}"');
     for (const button of hero.match(/<button[^>]*>/g) ?? []) expect(button).toContain('class="secondary"');
-    expect(hero).toContain("See what your AI agent really does.");
+    expect(hero).toContain("See what an AI agent really does");
+    expect(hero).toContain('"Try a sample task"');
     expect(hero).toContain("No setup. Runs on this computer with no model or tools.");
-    expect(hero).toContain(">Connect my agent</button>");
+    expect(hero).toContain(">Watch an agent I already use</button>");
+    // Without the build card, the sample task is the page's one primary action.
+    expect(readFileSync("src/console/assets/styles.css", "utf8")).toContain("#a4HomeCard[hidden] ~ #app #firstUsePrimary");
     expect(hero).toContain("I already have records: score them");
     expect(hero).toContain("Available in your own workspace: in the app choose Studio &gt; Open My Workspace, or run <code>amc up</code> in a terminal.");
   });
