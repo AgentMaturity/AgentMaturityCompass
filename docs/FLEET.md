@@ -96,9 +96,13 @@ amc freeze lift --agent support-bot --incident <incident id> --reason "<why it i
 **What a freeze does not do.** A freeze stops only calls that are routed through AMC (for example its tool hub, the
 native agent's tools and hooks in control mode). An agent that calls a model or a tool directly, without AMC in the path, is not stopped.
 
-Lifting a freeze needs a person: `amc freeze lift` refuses a shell that carries an agent marker (for example one
-started by Claude Code, Codex, Gemini CLI or pi) and a workspace in agent mode, and Studio's lift route takes an
-OWNER session, never an agent's lease.
+Lifting a freeze needs a person. Every way of lifting one (`amc freeze lift`, the SDK, Studio's lift routes) is
+refused in a process that carries an agent marker (for example one started by Claude Code, Codex, Gemini CLI or pi)
+and in a workspace in agent mode, and Studio's lift routes also need an OWNER session, never an agent's lease. Run
+`amc freeze lift` yourself, in your own terminal.
+
+If AMC cannot read its records, the inventory says cost and last seen are **not known** (for each agent and each
+owner) rather than showing zero or "never".
 
 ## Delegations: time-window overlap
 

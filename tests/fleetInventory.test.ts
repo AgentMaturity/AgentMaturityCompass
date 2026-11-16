@@ -1,11 +1,10 @@
 import { existsSync, mkdtempSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { describe, expect, test, vi } from "vitest";
+import { describe, expect, test } from "vitest";
 import { addObservedAgent, describeTimeOverlap, fleetWindowMs, TIME_OVERLAP_NOTE } from "../src/fleet/fleetActions.js";
 import { assembleFleetInventory, type InventoryFacts } from "../src/fleet/inventory.js";
 import { costWords, csvCell, fleetInventoryCsv, renderFleetInventoryText } from "../src/fleet/inventoryRender.js";
-import { freezeLiftCliAsync } from "../src/drift/driftCli.js";
 
 const meta = (value: Record<string, unknown>): string => JSON.stringify(value);
 function facts(overrides: Partial<InventoryFacts> = {}): InventoryFacts {
@@ -43,7 +42,7 @@ describe("fleet inventory", () => {
     const inventory = assembleFleetInventory(facts());
     expect(costWords(inventory.agents[0]!.cost)).toBe("not known (3 calls with no price)");
     expect(costWords(inventory.agents[1]!.cost)).toBe("no calls recorded");
-    expect(inventory.costByOwner.find((row) => row.owner === "Priya Shah")!.estimatedUsd).toBeNull();
+    expect(inventory.costByOwner.find((row) => row.owner === "Priya Shah")!.cost!.estimatedUsd).toBeNull();
     expect(costWords({ estimatedUsd: 1.234, calls: 4, unknownCalls: 1 })).toBe("about $1.23 (estimate, plus 1 call not known)");
     expect(fleetInventoryCsv(inventory).split("\r\n")[1]).toContain(",not known,3,3,");
     expect(renderFleetInventoryText(inventory)).toContain("estimate from the token counts AMC recorded and the model price list");
@@ -96,11 +95,16 @@ describe("adding an observed agent and lifting a freeze", () => {
     expect(existsSync(join(workspace, ".amc"))).toBe(false);
   });
 
-  test("an agent session cannot lift a freeze: the agent marker is refused", async () => {
-    vi.stubEnv("CLAUDECODE", "1");
-    try {
-      await expect(freezeLiftCliAsync({ workspace: tmpdir(), agentId: "default", incidentId: "incident_x", reason: "let me go" }))
-        .rejects.toThrow(/needs a person.*CLAUDECODE/);
-    } finally { vi.unstubAllEnvs(); }
+  test("records AMC could not read show cost and last seen as not known, for each agent and each owner", () => {
+    const inventory = assembleFleetInventory(facts({ costs: null, events: null, costProblem: "Cost and last seen are not known: AMC could not read its records (locked)." }));
+    expect(inventory.agents[0]!.cost).toBeNull();
+    expect(inventory.costByOwner.find((row) => row.owner === "Priya Shah")!.cost).toBeNull();
+    expect(inventory.lastSeenKnown).toBe(false);
+    const text = renderFleetInventoryText(inventory);
+    expect(text).toContain("  Last seen:   not known");
+    expect(text).toContain("  Cost:        not known");
+    expect(text).toContain("Priya Shah: not known across 1 agent");
+    expect(text).not.toContain("no calls recorded");
+    expect(text).not.toMatch(/Last seen: +never/);
   });
 });

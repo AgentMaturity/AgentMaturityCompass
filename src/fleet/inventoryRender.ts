@@ -1,7 +1,7 @@
 /** The fleet inventory as terminal text and as CSV. Every id, name and owner is outside text: escaped before it is shown. */
 import { oneLine, plainId, type FleetInventory, type FleetInventoryCost, type FleetInventoryRow } from "./inventory.js";
 
-const when = (ts: number | null): string => ts === null ? "never" : `${new Date(ts).toISOString().replace("T", " ").slice(0, 16)} UTC`;
+const when = (ts: number | null, known = true): string => !known ? "not known" : ts === null ? "never" : `${new Date(ts).toISOString().replace("T", " ").slice(0, 16)} UTC`;
 const usd = (value: number): string => `$${value.toFixed(2)}`;
 const days = (inventory: FleetInventory): string => {
   const span = Math.round((inventory.costWindow.until - inventory.costWindow.since) / 3_600_000);
@@ -50,13 +50,13 @@ export function fleetInventoryCsv(inventory: FleetInventory): string {
   return [CSV_COLUMNS.map(([name]) => name).join(","), ...rows.map((row) => CSV_COLUMNS.map(([, read]) => csvCell(oneLine(read(row)))).join(","))].join("\r\n") + "\r\n";
 }
 
-function agentLines(row: FleetInventoryRow): string[] {
+function agentLines(row: FleetInventoryRow, lastSeenKnown: boolean): string[] {
   const id = plainId(row.agentId);
   return [
     `${id}${row.agentName && row.agentName !== row.agentId ? ` (${plainId(row.agentName)})` : ""}`,
     `  Owner:       ${row.owner ? plainId(row.owner) : `none. Name one: amc fleet tag ${id} --owner "<name>"`}`,
     `  Runs on:     ${runtimeWords(row)}`,
-    `  Last seen:   ${when(row.lastSeenTs)}`,
+    `  Last seen:   ${when(row.lastSeenTs, lastSeenKnown)}`,
     `  Hooks:       ${hookWords(row)}`,
     `  Budget:      ${budgetWords(row)}`,
     `  Frozen:      ${freezeWords(row)}`,
@@ -71,16 +71,16 @@ export function renderFleetInventoryText(inventory: FleetInventory): string {
     `Fleet inventory: ${summary.registered} registered agent${summary.registered === 1 ? "" : "s"}, ${summary.withoutOwner} without an owner, ${summary.frozen} frozen, ${summary.unregistered} seen but not registered.`,
     `Cost covers the last ${days(inventory)}.`, ""
   ];
-  for (const row of inventory.agents) lines.push(...agentLines(row));
+  for (const row of inventory.agents) lines.push(...agentLines(row, inventory.lastSeenKnown));
   if (inventory.agents.length === 0) lines.push("No registered agents yet. Add one: amc agent add");
   if (inventory.unregistered.length > 0) {
     lines.push("", "Seen by AMC but not registered (names as AMC recorded them):");
-    for (const row of inventory.unregistered) lines.push(`  ${plainId(row.agentId)}  last seen ${when(row.lastSeenTs)}  runs on ${runtimeWords(row)}`);
+    for (const row of inventory.unregistered) lines.push(`  ${plainId(row.agentId)}  last seen ${when(row.lastSeenTs, inventory.lastSeenKnown)}  runs on ${runtimeWords(row)}`);
     lines.push(`  To add one on purpose: amc agent add --from-observed <id> --owner "<name>"`);
   }
   if (inventory.agents.length > 0) {
     lines.push("", "Cost by owner:");
-    for (const total of inventory.costByOwner) lines.push(`  ${total.owner ? plainId(total.owner) : "(no owner)"}: ${costWords(total)} across ${total.agents} agent${total.agents === 1 ? "" : "s"}`);
+    for (const total of inventory.costByOwner) lines.push(`  ${total.owner ? plainId(total.owner) : "(no owner)"}: ${costWords(total.cost)} across ${total.agents} agent${total.agents === 1 ? "" : "s"}`);
   }
   lines.push("", inventory.costNote);
   if (inventory.costProblem) lines.push(plainId(inventory.costProblem));

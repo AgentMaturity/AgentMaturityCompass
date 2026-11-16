@@ -63,7 +63,10 @@ export interface FleetInventory {
   agents: FleetInventoryRow[];
   /** Seen in the ledger or in a hook install, but not registered. */
   unregistered: FleetInventoryRow[];
-  costByOwner: Array<{ owner: string | null; agents: number; estimatedUsd: number | null; calls: number; unknownCalls: number }>;
+  /** `cost` is null when any of the owner's agents has a cost AMC could not read: the total is then not known. */
+  costByOwner: Array<{ owner: string | null; agents: number; cost: FleetInventoryCost | null }>;
+  /** false when AMC's records could not be read: "last seen" is then not known rather than "never". */
+  lastSeenKnown: boolean;
   costNote: string;
   /** Why cost could not be read, when it could not. */
   costProblem: string | null;
@@ -75,7 +78,8 @@ export interface InventoryFacts {
   now: number;
   costWindow: { since: number; until: number };
   registered: RegisteredFacts[];
-  events: ReadonlyArray<Pick<EvidenceEvent, "ts" | "runtime" | "meta_json">>;
+  /** null when AMC's records could not be read. */
+  events: ReadonlyArray<Pick<EvidenceEvent, "ts" | "runtime" | "meta_json">> | null;
   hooks: ReadonlyArray<FleetInventoryHook & { agentId: string | null }>;
   budgetFor: (agentId: string) => FleetInventoryRow["budget"];
   freezeFor: (agentId: string) => FleetInventoryRow["freeze"];
@@ -95,7 +99,7 @@ const releaseQualified = (runtime: string, version: string): boolean | null =>
   runtime === "claude-code" || runtime === "pi" ? qualifiedReleases(runtime).includes(version) : null;
 
 type Seen = { lastSeenTs: number; runtimes: Set<string>; versions: Map<string, { version: string; ts: number }> };
-function observed(events: InventoryFacts["events"]): Map<string, Seen> {
+function observed(events: NonNullable<InventoryFacts["events"]>): Map<string, Seen> {
   const seen = new Map<string, Seen>();
   for (const event of events) {
     let meta: Record<string, unknown>;
@@ -129,7 +133,7 @@ function missingFor(row: Omit<FleetInventoryRow, "missing">): string[] {
 
 /** Pure assembly of the inventory from facts already read; the caller decides where the facts come from. */
 export function assembleFleetInventory(facts: InventoryFacts): FleetInventory {
-  const seen = observed(facts.events);
+  const seen = observed(facts.events ?? []);
   const registeredIds = new Set(facts.registered.map((agent) => agent.id));
   const row = (agentId: string, config: RegisteredFacts | null): FleetInventoryRow => {
     const found = seen.get(agentId);
@@ -159,19 +163,17 @@ export function assembleFleetInventory(facts: InventoryFacts): FleetInventory {
   const unregistered = [...unregisteredIds].sort((a, b) => a.localeCompare(b)).map((id) => row(id, null));
   const byOwner = new Map<string | null, FleetInventory["costByOwner"][number]>();
   for (const agent of agents) {
-    const total = byOwner.get(agent.owner) ?? { owner: agent.owner, agents: 0, estimatedUsd: null, calls: 0, unknownCalls: 0 };
-    total.agents += 1;
-    if (agent.cost) {
-      total.calls += agent.cost.calls; total.unknownCalls += agent.cost.unknownCalls;
-      if (agent.cost.estimatedUsd !== null) total.estimatedUsd = (total.estimatedUsd ?? 0) + agent.cost.estimatedUsd;
-    }
-    byOwner.set(agent.owner, total);
+    const previous = byOwner.get(agent.owner) ?? { owner: agent.owner, agents: 0, cost: { estimatedUsd: null, calls: 0, unknownCalls: 0 } };
+    const sum = previous.cost, add = agent.cost;
+    byOwner.set(agent.owner, { owner: agent.owner, agents: previous.agents + 1, cost: sum === null || add === null ? null : {
+      calls: sum.calls + add.calls, unknownCalls: sum.unknownCalls + add.unknownCalls,
+      estimatedUsd: add.estimatedUsd === null ? sum.estimatedUsd : (sum.estimatedUsd ?? 0) + add.estimatedUsd } });
   }
   return {
     generatedTs: facts.now, costWindow: facts.costWindow,
     summary: { registered: agents.length, withoutOwner: agents.filter((agent) => agent.owner === null).length, unregistered: unregistered.length,
       frozen: agents.filter((agent) => agent.freeze?.active === true).length, belowMinimum: agents.filter((agent) => agent.missing.length > 0).length },
-    agents, unregistered,
+    agents, unregistered, lastSeenKnown: facts.events !== null,
     costByOwner: [...byOwner.values()].sort((a, b) => (a.owner === null ? 1 : b.owner === null ? -1 : a.owner.localeCompare(b.owner))),
     costNote: COST_NOTE, costProblem: facts.costProblem ?? null, freezeScope: FREEZE_SCOPE_NOTE
   };
@@ -196,7 +198,7 @@ export async function buildFleetInventory(workspace: string, options: { now?: nu
   if (!registered.some((agent) => agent.id === "default") && pathExists(getAgentPaths(workspace, "default").agentConfig)) registered.unshift(load("default"));
   // ponytail: two full ledger reads (last seen here, verified spend in readBudgetEvents). Add a per-agent SQL
   // aggregate when a ledger grows big enough for this page to feel slow.
-  let events: EvidenceEvent[] = [];
+  let events: EvidenceEvent[] | null = null;
   let costs: Map<string, FleetInventoryCost> | null = null;
   let costProblem: string | null = null;
   try {
@@ -207,7 +209,10 @@ export async function buildFleetInventory(workspace: string, options: { now?: nu
         costProblem = `Cost is not known: AMC's records of model calls did not check out (${error instanceof Error ? error.message : String(error)}).`;
       }
     } finally { ledger.close(); }
-  } catch { costs = new Map(); }
+  } catch (error) {
+    costs = null;
+    costProblem = `Cost and last seen are not known: AMC could not read its records (${error instanceof Error ? error.message : String(error)}).`;
+  }
   const hooks: Array<FleetInventoryHook & { agentId: string | null }> = [];
   const { getHookIntegrationStatus } = await import("../adapters/hookIntegration.js");
   for (const provider of HOOK_PROVIDERS) {
@@ -223,7 +228,7 @@ export async function buildFleetInventory(workspace: string, options: { now?: nu
   let budgets: ReturnType<typeof loadBudgetsConfig> | null = null;
   try { budgets = loadBudgetsConfig(workspace); } catch { budgets = null; }
   if (!registered.some((agent) => agent.id === "default")
-    && (hooks.some((hook) => hook.agentId === "default") || events.some((event) => event.meta_json.includes('"agentId":"default"')))) registered.unshift({ id: "default" });
+    && (hooks.some((hook) => hook.agentId === "default") || (events ?? []).some((event) => event.meta_json.includes('"agentId":"default"')))) registered.unshift({ id: "default" });
   return assembleFleetInventory({
     now, costWindow, registered, events, hooks, costs, costProblem,
     budgetFor: (agentId) => {

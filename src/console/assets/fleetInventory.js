@@ -11,7 +11,7 @@ const shown = (value) => {
   return esc(text.length > MAX_SHOWN ? `${text.slice(0, MAX_SHOWN)}...` : text);
 };
 const usd = (value) => `$${Number(value || 0).toFixed(2)}`;
-const when = (ts) => (typeof ts === "number" && ts > 0 ? new Date(ts).toLocaleString() : "never");
+const when = (ts, known = true) => (known === false ? "not known" : typeof ts === "number" && ts > 0 ? new Date(ts).toLocaleString() : "never");
 const list = (value) => (Array.isArray(value) ? value : []);
 
 function runtimeText(row) {
@@ -38,7 +38,7 @@ function costText(cost) {
   return `about ${usd(cost.estimatedUsd)} (estimate${unknown})`;
 }
 
-function agentRow(row) {
+function agentRow(row, lastSeenKnown) {
   const owner = row.owner ? shown(row.owner) : `<span class="pill warn">no owner</span>`;
   const freeze = row.freeze && row.freeze.active
     ? `<span class="pill warn">frozen</span>`
@@ -48,7 +48,7 @@ function agentRow(row) {
     <td>${shown(row.agentId)}${row.agentName && row.agentName !== row.agentId ? `<br><span class="muted">${shown(row.agentName)}</span>` : ""}</td>
     <td>${owner}</td>
     <td>${shown(runtimeText(row))}</td>
-    <td>${esc(when(row.lastSeenTs))}</td>
+    <td>${esc(when(row.lastSeenTs, lastSeenKnown))}</td>
     <td>${shown(hookText(row))}</td>
     <td>${esc(budgetText(row))}</td>
     <td>${esc(costText(row.cost))}</td>
@@ -82,7 +82,7 @@ export function fleetInventoryHtml(inventory, { card, metric }) {
       <div class="scroll">
         <table>
           <thead><tr><th>Agent</th><th>Owner</th><th>Runs on</th><th>Last seen</th><th>Hooks</th><th>Budget</th><th>Cost (estimate)</th><th>Still needs</th><th>Freeze</th></tr></thead>
-          <tbody>${agents.map(agentRow).join("") || "<tr><td colspan='9' class='muted'>No registered agents yet. Add one in a terminal: amc agent add</td></tr>"}</tbody>
+          <tbody>${agents.map((row) => agentRow(row, inventory.lastSeenKnown)).join("") || "<tr><td colspan='9' class='muted'>No registered agents yet. Add one in a terminal: amc agent add</td></tr>"}</tbody>
         </table>
       </div>
       <p class="muted" id="fleetFreezeNote">${esc(FREEZE_SCOPE)} Only a person can lift a freeze, at a terminal: <code>amc freeze lift</code>.</p>
@@ -98,7 +98,7 @@ export function fleetInventoryHtml(inventory, { card, metric }) {
       <div class="scroll">
         <table>
           <thead><tr><th>Name as recorded</th><th>Runs on</th><th>Last seen</th></tr></thead>
-          <tbody>${unregistered.map((row) => `<tr><td>${shown(row.agentId)}</td><td>${shown(runtimeText(row))}</td><td>${esc(when(row.lastSeenTs))}</td></tr>`).join("")}</tbody>
+          <tbody>${unregistered.map((row) => `<tr><td>${shown(row.agentId)}</td><td>${shown(runtimeText(row))}</td><td>${esc(when(row.lastSeenTs, inventory.lastSeenKnown))}</td></tr>`).join("")}</tbody>
         </table>
       </div>
       <p class="muted">To add one, run in a terminal: <code>amc agent add --from-observed &lt;id&gt; --owner "&lt;name&gt;"</code></p>
@@ -107,7 +107,7 @@ export function fleetInventoryHtml(inventory, { card, metric }) {
       <div class="scroll">
         <table>
           <thead><tr><th>Owner</th><th>Agents</th><th>Cost (estimate)</th></tr></thead>
-          <tbody>${owners.map((total) => `<tr><td>${total.owner ? shown(total.owner) : "(no owner)"}</td><td>${esc(String(total.agents))}</td><td>${esc(costText(total))}</td></tr>`).join("")}</tbody>
+          <tbody>${owners.map((total) => `<tr><td>${total.owner ? shown(total.owner) : "(no owner)"}</td><td>${esc(String(total.agents))}</td><td>${esc(costText(total.cost))}</td></tr>`).join("")}</tbody>
         </table>
       </div>
     `)}
