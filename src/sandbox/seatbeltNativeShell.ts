@@ -7,6 +7,7 @@ import { EgressUnavailable, proxyEnvironment, startPolicyEgress, withRefusals } 
 import type { ShellEgressProxy } from "./egress/shellEgressProxy.js";
 import { PROCESS_LIMIT_LIMITATION, ROOT_PROCESS_LIMIT_LIMITATION, processLimit, withProcessLimit } from "./processCap.js";
 import { realOrLiteral, sbplString } from "./seatbeltBackend.js";
+import { SEATBELT_NO_OUTSIDE_HELPERS, seatbeltNetworkRules } from "./seatbeltRules.js";
 import { shellSecretPaths } from "./shellSecretPaths.js";
 import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTypes.js";
 
@@ -36,13 +37,6 @@ import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTyp
  */
 const SANDBOX_EXEC = "/usr/bin/sandbox-exec";
 
-/** The only Mach services the shell may look up: temp-dir helper, logging, notifications, user and group lookups. */
-export const MACOS_MACH_SERVICES = ["com.apple.bsd.dirhelper", "com.apple.logd", "com.apple.system.notification_center",
-  "com.apple.system.opendirectoryd.libinfo", "com.apple.system.opendirectoryd.membership"] as const;
-
-/** Launchers denied by path as well, in case a later macOS reaches them without a Mach lookup. */
-const LAUNCHERS = ["/usr/bin/open", "/usr/bin/osascript", "/bin/launchctl", "/usr/bin/at"] as const;
-
 // `true`, not `:`: a failed redirection on a special builtin ends a POSIX shell such as dash.
 const PROBE_WRAPPER = '{ true >"$1"; } 2>/dev/null && exit 125; true >"$2" || exit 125; shift 2; exec "$@"';
 const MARKER = ".amc-seatbelt-applied";
@@ -57,22 +51,6 @@ export function seatbeltPrerequisites(): { ok: true } | { ok: false; reason: str
     return { ok: false, reason: `${SANDBOX_EXEC} is missing.` };
   }
 }
-
-/** All networking denied, Unix sockets included (so DNS through mDNSResponder too); with a proxy, only its localhost port. */
-export function seatbeltNetworkRules(proxyPort: number | null): string[] {
-  return ["(deny network*)", ...(proxyPort === null ? [] : [`(allow network-outbound (remote ip "localhost:${proxyPort}"))`])];
-}
-
-/** Rules that stop a command asking launchd, LaunchServices, another app or an XPC service to act (or fetch) for it. */
-export const SEATBELT_NO_OUTSIDE_HELPERS: readonly string[] = [
-  ";; Nothing may ask launchd, LaunchServices or another app to start a process outside this profile.",
-  "(deny mach-lookup)",
-  `(allow mach-lookup (global-name ${MACOS_MACH_SERVICES.map(name => `"${name}"`).join(" ")}))`,
-  "(deny lsopen)",
-  "(deny appleevent-send)",
-  "(deny job-creation)",
-  `(deny process-exec ${LAUNCHERS.map(path => `(literal "${path}")`).join(" ")})`
-];
 
 export interface SeatbeltShellProfileInput {
   /** All paths real (resolved). */

@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { runProcess } from "../exec/runProcess.js";
 import { EgressUnavailable, proxyEnvironment, startPolicyEgress, withRefusals } from "./egress/sessionEgress.js";
 import type { ShellEgressProxy } from "./egress/shellEgressProxy.js";
-import { SEATBELT_NO_OUTSIDE_HELPERS, seatbeltNetworkRules } from "./seatbeltNativeShell.js";
+import { SEATBELT_NO_OUTSIDE_HELPERS, seatbeltNetworkRules } from "./seatbeltRules.js";
 import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTypes.js";
 
 /**
