@@ -86,7 +86,7 @@ export function egressEntry(entry: string): { host: string; port: number | null 
 }
 
 /** The hosts of the entries that cover `port`: a portless entry covers only the default port. */
-export function entriesForPort(list: readonly string[], port: number, defaultPort: number): string[] {
+function entriesForPort(list: readonly string[], port: number, defaultPort: number): string[] {
   return list.flatMap(raw => {
     const entry = egressEntry(raw);
     return entry && (entry.port === null ? port === defaultPort : entry.port === port) ? [entry.host] : [];
