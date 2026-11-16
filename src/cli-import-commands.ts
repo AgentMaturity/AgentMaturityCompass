@@ -4,15 +4,20 @@ import chalk from "chalk";
 import { emitClaimResult, unverifiedClaim } from "./cli/claimOutput.js";
 import { finishVerify, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
 import { admitKey, buildVerifierReport, ed25519KeyId, withPins } from "./trust/index.js";
+import { escapeTerminalControls } from "./tools/builtin/askUserTool.js";
 
 type ImportOriginalRef = import("./importers/importOriginals.js").ImportOriginalRef;
+/** " v2" for a bare version, " ATIF-v1.7" for a named one, nothing when the source states none. */
+const versionWords = (version: string | number | null | undefined): string =>
+  version === null || version === undefined ? "" : /^\d/.test(String(version)) ? ` v${version}` : ` ${escapeTerminalControls(String(version))}`;
 function renderOriginals(originals: ImportOriginalRef[] | undefined): void {
   // Manifests written before original retention carry no list; say so rather than imply the bytes exist.
   if (!originals) { console.log("  Originals: not recorded (import predates original-byte retention)."); return; }
   for (const original of originals) {
-    const source = original.source ? `${original.source.format} v${original.source.version ?? "?"}${original.source.sourceRevision ? ` (revision ${original.source.sourceRevision.slice(0, 12)})` : ""}` : "unknown format";
+    const source = original.source ? `${original.source.format}${versionWords(original.source.version)}${original.source.sourceRevision ? ` (revision ${original.source.sourceRevision.slice(0, 12)})` : ""}` : "unknown format";
     console.log(`  Original: SHA-256 ${original.sha256}; ${original.bytes} bytes; ${source}; ${original.storage.kind === "encrypted-blob"
-      ? `retained encrypted as ${original.storage.blobId}` : "not retained (operator opt-out)"}`);
+      ? `retained encrypted as ${original.storage.blobId}` : original.storage.reason === "text-kept-as-digest"
+      ? "not retained (session text kept as digests; --keep-text keeps it)" : "not retained (operator opt-out)"}`);
   }
 }
 
@@ -31,9 +36,10 @@ function renderNormalization(plan: import("./importers/neutralImporter.js").Neut
   console.log(`  Unknown timing: ${count.unknownTimestamps} event times; ${count.unknownDurations} durations`);
   console.log(`  Normalizer: ${receipt.normalizerVersion}; semantic digest: ${receipt.semanticDigest}`);
   for (const loss of receipt.losses) console.log(chalk.gray(`  ${loss}`));
+  for (const warning of plan.warnings ?? []) console.log(chalk.gray(`  ${escapeTerminalControls(warning)}`));
   for (const candidate of plan.candidates) {
-    const format = candidate.sourceFormat ? `${candidate.sourceFormat.name} v${candidate.sourceFormat.version} (${candidate.format})` : candidate.format;
-    console.log(`  Source: ${candidate.path}; SHA-256 ${candidate.digest}; format ${format}`);
+    const format = candidate.sourceFormat ? `${candidate.sourceFormat.name}${versionWords(candidate.sourceFormat.version)} (${candidate.format})` : candidate.format;
+    console.log(`  Source: ${escapeTerminalControls(candidate.path)}; SHA-256 ${candidate.digest}; format ${format}`);
   }
   // Receipts written before nextActions existed carry none; print nothing rather than invent one.
   if (next === "actions") for (const action of receipt.nextActions ?? []) console.log(`  Next: ${action.label}: ${action.argv.map(shellWord).join(" ")}`);
@@ -43,14 +49,16 @@ function renderNormalization(plan: import("./importers/neutralImporter.js").Neut
 export function registerNeutralImportCommands(program: Command, activeAgent: (p: Command) => string | undefined): void {
   program
     .command("import <path>")
-    .description("Import neutral traces, runs, workflow graphs, configs, memory, evals, and benchmarks")
+    .description("Import neutral traces, runs, workflow graphs, configs, memory, evals, benchmarks, and agent sessions: Claude Code transcripts "
+      + "(experimental: the format is not published, AMC infers its fields), codex exec --json output, and ATIF v1 trajectories")
     .option("--agent <agentId>", "agent ID")
     .option("--dry-run", "detect and summarize without writing artifacts", false)
     .option("--validate", "validate support without writing artifacts", false)
     .option("--json", "JSON output")
     .option("--expected-digest <sha256>", "apply only the semantic source digest reviewed in a preview")
     .option("--no-retain-original", "keep only the SHA-256 of each source file instead of its encrypted original bytes")
-    .action(async (path: string, opts: { agent?: string; dryRun?: boolean; validate?: boolean; json?: boolean; expectedDigest?: string; retainOriginal?: boolean }) => {
+    .option("--keep-text", "for agent sessions: keep prompt, reply and tool text (cut at 4,000 characters) and the original file; by default only SHA-256 digests are kept", false)
+    .action(async (path: string, opts: { agent?: string; dryRun?: boolean; validate?: boolean; json?: boolean; expectedDigest?: string; retainOriginal?: boolean; keepText?: boolean }) => {
       try {
         const agentId = opts.agent ?? activeAgent(program) ?? "default";
         const mode = opts.validate ? "validate" : opts.dryRun ? "dry-run" : "import";
@@ -61,7 +69,8 @@ export function registerNeutralImportCommands(program: Command, activeAgent: (p:
           agentId,
           mode,
           expectedSemanticDigest: opts.expectedDigest,
-          retainOriginals: opts.retainOriginal !== false
+          retainOriginals: opts.retainOriginal !== false,
+          keepText: opts.keepText === true
         });
         // Imported records are what their source reported: self-reported, and no maturity evaluation is performed.
         if (emitClaimResult(chalk.bold(`Neutral import ${result.importId}`), result, unverifiedClaim("import:neutral", result.plan.candidateCount), opts)) return;
@@ -71,6 +80,10 @@ export function registerNeutralImportCommands(program: Command, activeAgent: (p:
         console.log(`  Categories: ${result.plan.categories.join(", ") || "-"}`);
         console.log(`  Redactions: ${result.plan.redactionCount}`);
         renderNormalization(result.plan, result.applied ? "inspect" : "actions");
+        if (result.alreadyImportedAs) {
+          console.log(`  This session file was already imported for this agent as ${result.alreadyImportedAs}. Nothing was added.`);
+          return;
+        }
         if (!result.applied) {
           console.log(chalk.gray("  Dry run only. Re-run without --dry-run or --validate to write AMC evidence."));
           for (const path of result.plan.wouldWrite.slice(0, 8)) {

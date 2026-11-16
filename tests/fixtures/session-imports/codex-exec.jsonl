@@ -1,0 +1,8 @@
+{"type":"thread.started","thread_id":"00000000-0000-7000-8000-000000000001"}
+{"type":"turn.started"}
+{"type":"item.started","item":{"id":"item_0","type":"command_execution","command":"bash -lc ls","status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_0","type":"command_execution","command":"bash -lc ls","aggregated_output":"example output","exit_code":0,"status":"completed"}}
+{"type":"item.completed","item":{"id":"item_1","type":"command_execution","command":"bash -lc 'cat missing.txt'","aggregated_output":"example error output","exit_code":1,"status":"failed"}}
+{"type":"item.completed","item":{"id":"item_2","type":"mcp_tool_call","server":"example-server","tool":"lookup","arguments":{"q":"example"},"status":"failed","error":{"message":"example tool error"}}}
+{"type":"item.completed","item":{"id":"item_3","type":"agent_message","text":"Example final reply."}}
+{"type":"turn.completed","usage":{"input_tokens":2400,"cached_input_tokens":2000,"output_tokens":120,"reasoning_output_tokens":0}}
