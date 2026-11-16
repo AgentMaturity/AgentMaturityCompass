@@ -32,8 +32,8 @@ describe("assurance CLI preserves NE without changing measured generic outcomes"
     const entries = assuranceSarifEntries([reportPack]);
     expect(entries.results).toEqual([{
       ruleId: "fixture-pack", level: "none", kind: "review",
-      message: { text: "A scenario: NOT EVALUATED — synthetic_fixture_only; production_capture_and_authority_unavailable" },
-      properties: { scenarioId: "synthetic-native-ne", score: null, category: "generic", inconclusive: true }
+      message: { text: "A scenario: NOT EVALUATED — run on a seeded fixture; synthetic_fixture_only; production_capture_and_authority_unavailable" },
+      properties: { scenarioId: "synthetic-native-ne", score: null, category: "generic", inconclusive: true, gradingMethod: "executed", attempts: 1 }
     }]);
     expect(entries.rules[0]).toMatchObject({ properties: { score: null, pass: 0, fail: 0, notEvaluated: 1 } });
   });
@@ -41,10 +41,10 @@ describe("assurance CLI preserves NE without changing measured generic outcomes"
   it("SARIF keeps the measured generic PASS/FAIL severity, numeric score, identity and reasons", () => {
     const entries = assuranceSarifEntries([pack([pass, fail], { passCount: 1, failCount: 1, score0to100: 50 })]);
     expect(entries.results).toEqual([
-      { ruleId: "fixture-pack", level: "note", kind: "pass", message: { text: "A scenario: PASS — fixture reason" },
-        properties: { scenarioId: "generic-pass", score: 100, category: "generic", inconclusive: false } },
-      { ruleId: "fixture-pack", level: "error", kind: "fail", message: { text: "A scenario: FAIL — fixture reason" },
-        properties: { scenarioId: "generic-fail", score: 0, category: "generic", inconclusive: false } }
+      { ruleId: "fixture-pack", level: "note", kind: "pass", message: { text: "A scenario: PASS — graded by keywords in the reply, 1 try per scenario; fixture reason" },
+        properties: { scenarioId: "generic-pass", score: 100, category: "generic", inconclusive: false, gradingMethod: null, attempts: 1 } },
+      { ruleId: "fixture-pack", level: "error", kind: "fail", message: { text: "A scenario: FAIL — graded by keywords in the reply, 1 try per scenario; fixture reason" },
+        properties: { scenarioId: "generic-fail", score: 0, category: "generic", inconclusive: false, gradingMethod: null, attempts: 1 } }
     ]);
     expect(entries.rules[0]).toMatchObject({ id: "fixture-pack", name: "Fixture pack",
       shortDescription: { text: "AMC Assurance Pack: Fixture pack" },
@@ -54,8 +54,8 @@ describe("assurance CLI preserves NE without changing measured generic outcomes"
   it("SARIF keeps mixed measured failures visible alongside separate NE rows", () => {
     const entries = assuranceSarifEntries([pack([fail, missing], { failCount: 1 })]);
     expect(entries.results.map((entry) => [entry.level, entry.message.text, entry.properties.score])).toEqual([
-      ["error", "A scenario: FAIL — fixture reason", 0],
-      ["none", "A scenario: NOT EVALUATED — synthetic_fixture_only; production_capture_and_authority_unavailable", null]
+      ["error", "A scenario: FAIL — graded by keywords in the reply, 1 try per scenario; fixture reason", 0],
+      ["none", "A scenario: NOT EVALUATED — run on a seeded fixture; synthetic_fixture_only; production_capture_and_authority_unavailable", null]
     ]);
     expect(entries.rules[0]?.properties).toMatchObject({ fail: 1, notEvaluated: 1, score: 0 });
   });
@@ -94,14 +94,14 @@ describe("assurance CLI preserves NE without changing measured generic outcomes"
     [fail, 0, 1, 0, "✗", "  0"]
   ] as const)("keeps the existing fully measured generic pack display: %j", (scenario, passed, failed, score, icon, padded) => {
     expect(plain(renderAssurancePackLine(pack([scenario], { passCount: passed, failCount: failed, score0to100: score }))))
-      .toBe(`  ${icon} ${"fixture-pack".padEnd(30)} ${padded}%  ${passed} pass / ${failed} fail  (1 scenarios)`);
+      .toBe(`  ${icon} ${"fixture-pack".padEnd(30)} ${padded}%  ${passed} pass / ${failed} fail  (1 scenarios)\n      graded by keywords in the reply, 1 try per scenario`);
   });
 
   it("verbose headings label NE explicitly and preserve generic pass/fail headings", () => {
-    expect(plain(renderAssuranceScenarioHeading(missing))).toBe("    ? A scenario [NOT EVALUATED]");
-    expect(plain(renderAssuranceScenarioHeading({ ...missing, pass: true }))).toBe("    ? A scenario [NOT EVALUATED]");
-    expect(plain(renderAssuranceScenarioHeading(pass))).toBe("    ✓ A scenario");
-    expect(plain(renderAssuranceScenarioHeading(fail))).toBe("    ✗ A scenario");
+    expect(plain(renderAssuranceScenarioHeading(missing))).toBe("    ? A scenario [NOT EVALUATED]\n      run on a seeded fixture");
+    expect(plain(renderAssuranceScenarioHeading({ ...missing, pass: true }))).toBe("    ? A scenario [NOT EVALUATED]\n      run on a seeded fixture");
+    expect(plain(renderAssuranceScenarioHeading(pass))).toBe("    ✓ A scenario\n      graded by keywords in the reply, 1 try per scenario");
+    expect(plain(renderAssuranceScenarioHeading(fail))).toBe("    ✗ A scenario\n      graded by keywords in the reply, 1 try per scenario");
   });
 
   it("total inventory includes NE rows instead of reporting zero scenarios", () => {
@@ -132,5 +132,16 @@ describe("assurance CLI preserves NE without changing measured generic outcomes"
     renderAssuranceTotalLine(input);
     renderAssuranceOverallScore({ packResults: input, overallScore0to100: 50 });
     expect(input).toEqual(before);
+  });
+
+  it("an effect-graded row prints its tries, rate, Wilson interval and grading method", () => {
+    const effect = { attempts: 5, measured: 5, attackSuccesses: 1, attackSuccessRate: 0.2, wilson95: [0.036, 0.624] as [number, number],
+      benign: { measured: 5, taskDone: 5, harmful: 0 }, underAttack: { taskDone: 4 } };
+    const row = { ...fail, gradingMethod: "structured" as const, effect };
+    expect(plain(renderAssuranceScenarioHeading(row))).toBe("    ✗ A scenario\n      attack worked in 1 of 5 tries (20%, 95% Wilson interval 4% to 62%); " +
+      "ordinary task done in 5 of 5 tries without the attack, 4 of 5 with the attack; graded by tool calls and reply");
+    const line = plain(renderAssurancePackLine(pack([row], { failCount: 1, gradingMethod: "structured" })));
+    expect(line).toContain("graded by what the agent did, 5 tries per scenario; attack worked in 1 of 5 tries (20%, 95% Wilson interval 4% to 62%, pooled over scenarios)");
+    expect(assuranceSarifEntries([pack([row], { failCount: 1 })]).results[0]!.properties).toMatchObject({ attempts: 5, attackSuccesses: 1, attackSuccessRate: 0.2 });
   });
 });

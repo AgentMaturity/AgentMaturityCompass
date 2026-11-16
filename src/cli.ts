@@ -213,7 +213,7 @@ import { captureArchetypeApply } from "./archetypes/archetypePublication.js";
 import { exportBadge, exportPolicyPack } from "./exports/policyExport.js";
 import { applyAssurancePatchKit, listAssuranceHistory, loadAssuranceReport, runAssurance, verifyAssuranceRun } from "./assurance/assuranceRunner.js";
 import { AgentResponderUnavailableError } from "./assurance/agentResponder.js";
-import { assuranceSarifEntries, renderAssuranceOverallScore, renderAssurancePackLine, renderAssuranceScenarioHeading, renderAssuranceTotalLine } from "./assurance/cliPresentation.js";
+import { assuranceSarifEntries, EFFECT_RATE_CAVEAT, renderAssuranceOverallScore, renderAssurancePackLine, renderAssuranceScenarioHeading, renderAssuranceTotalLine } from "./assurance/cliPresentation.js";
 import { executedRerunFlags, selectExecutedAssuranceOptions, withExecutedAssuranceOptions, type AssuranceRunCliOptions } from "./assurance/executed/cliOptions.js";
 import { getAssurancePack, listAssurancePacks } from "./assurance/packs/index.js";
 import { registerMirofishCommands } from "./mirofish/cli.js";
@@ -1303,7 +1303,9 @@ function buildAssuranceRemediationItems(packResults: AssurancePackResult[]): Ass
         category: scenario.category,
         score0to100: scenario.score0to100,
         reason: scenario.reasons[0] ?? "Scenario failed without a recorded reason.",
-        fix: assuranceRemediationFix(scenario.category),
+        fix: scenario.effect && scenario.effect.benign.taskDone < scenario.effect.benign.measured
+          ? "The agent also refused the ordinary task. Let it do routine work while it still ignores instructions found inside documents, tool results or messages."
+          : assuranceRemediationFix(scenario.category),
       });
     }
   }
@@ -10949,6 +10951,7 @@ withExecutedAssuranceOptions(assurance
   .option("--format <format>", "output format: text|sarif", "text")
   .option("--verbose", "show full scenario-level detail with payloads and reasons", false)
   .option("--model <modelId>", "model id of the agent under test (or set AMC_ASSURANCE_MODEL)")
+  .option("--attempts <n>", "tries per attack scenario graded by what the agent did, each with its ordinary-task twin (1-25; default 5, 1 with --demo)")
   .option("--no-sign", "skip vault/artifact signing (packs still run)"))
   .action(
     async (opts: AssuranceRunCliOptions) => {
@@ -10965,6 +10968,10 @@ withExecutedAssuranceOptions(assurance
         process.exit(1);
       }
       const demoPackIds = opts.demo ? ["injection", "truthfulness", "unsafe_tooling"] : undefined;
+      if (opts.attempts !== undefined && !/^(?:[1-9]|1\d|2[0-5])$/.test(opts.attempts)) {
+        console.error(chalk.red(`--attempts must be a whole number from 1 to 25 (got "${opts.attempts}").`));
+        process.exit(1);
+      }
       if (scope === "workspace" || scope === "node") {
         if (opts.demo) {
           console.error(chalk.red("--demo is only supported for agent-scoped assurance runs."));
@@ -11013,7 +11020,8 @@ withExecutedAssuranceOptions(assurance
           window: opts.window,
           outputMarkdownPath: opts.out ? resolve(process.cwd(), opts.out) : undefined,
           noSign,
-          model: opts.model
+          model: opts.model,
+          attempts: opts.attempts !== undefined ? Number(opts.attempts) : demoPackIds ? 1 : undefined
         });
       } catch (error) {
         if (noSign) delete process.env.AMC_NO_SIGN;
@@ -11065,6 +11073,7 @@ withExecutedAssuranceOptions(assurance
         }
         console.log("");
         console.log(renderAssuranceTotalLine(report.packResults));
+        if (report.packResults.some((pack) => pack.scenarioResults.some((row) => row.effect))) console.log(chalk.gray(`  ${EFFECT_RATE_CAVEAT}`));
         const rerunCommand = [
           "amc assurance run",
           demoPackIds ? "--demo" : opts.all ? "--all" : opts.pack ? `--pack ${opts.pack}` : "",
@@ -19718,7 +19727,7 @@ shield
 // ── Shield Red Team ──────────────────────────────────────────────────────────
 shield
   .command("red-team")
-  .description("Run a quick red team campaign (5 attacks on demo target). Tip: For full red-team suite with strategies, use `amc redteam run`")
+  .description("Run a quick red team campaign (5 attacks) against the agent under test. For the full suite with strategies and repeated tries, use `amc redteam run`")
   .option("--rounds <n>", "Number of attack rounds (default: 1)", "1")
   .option("--categories <list>", "Comma-separated attack categories to use")
   .option("--target <profile>", "Target profile id (default: demo)")

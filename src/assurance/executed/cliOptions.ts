@@ -17,6 +17,8 @@ export interface AssuranceRunCliOptions {
   windowDays?: string;
   out?: string;
   model?: string;
+  /** Tries per effect-graded scenario, as typed. */
+  attempts?: string;
   sign: boolean; // Commander inverts --no-sign to sign=false
   executedAttempts?: 1 | 25;
   stationQuestions?: string[];
@@ -70,6 +72,7 @@ export function selectExecutedAssuranceOptions(opts: AssuranceRunCliOptions):
 /** Preserve the explicit smoke mode and partial question selection in remediation reruns. */
 export function executedRerunFlags(opts: AssuranceRunCliOptions): string[] {
   return [
+    opts.attempts ? `--attempts ${opts.attempts}` : "",
     opts.executedAttempts ? `--executed-attempts ${opts.executedAttempts}` : "",
     opts.stationQuestions ? `--station-questions ${opts.stationQuestions.join(",")}` : ""
   ].filter(Boolean);

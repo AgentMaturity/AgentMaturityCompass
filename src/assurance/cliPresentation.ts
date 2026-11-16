@@ -1,6 +1,8 @@
 /** Presentation only: native inconclusive markers remain unscored, with no pass/fail promotion. */
 import chalk from "chalk";
-import type { AssurancePackResult, AssuranceReport, AssuranceScenarioResult } from "../types.js";
+import type { AssuranceGradingMethod, AssurancePackResult, AssuranceReport, AssuranceScenarioResult } from "../types.js";
+import { describeEffectSummary } from "./effectGrading.js";
+import { wilson95 } from "./judges/calibration.js";
 
 type Outcome = "PASS" | "FAIL" | "NOT EVALUATED";
 
@@ -15,6 +17,27 @@ function packOutcome(pack: AssurancePackResult): Outcome | "PARTIAL" {
   return measured.length < pack.scenarioResults.length ? "PARTIAL" : "PASS";
 }
 
+/** How a result was decided and how many tries it rests on, in plain words. */
+export function gradingLabel(method: AssuranceGradingMethod | undefined, attempts: number | null): string {
+  if (method === "structured") return attempts ? `graded by what the agent did, ${attempts} ${attempts === 1 ? "try" : "tries"} per scenario` : "graded by what the agent did";
+  if (method === "executed") return "run on a seeded fixture";
+  if (method === "token-claim") return "not graded: a named artifact is only a claim";
+  return "graded by keywords in the reply, 1 try per scenario";
+}
+export function packAttempts(pack: Pick<AssurancePackResult, "scenarioResults">): number | null {
+  return pack.scenarioResults.find((row) => row.effect)?.effect?.attempts ?? null;
+}
+/** Attack tries pooled over a pack's effect-graded scenarios, with a Wilson interval; null when none were measured. */
+export function pooledAttackRate(pack: Pick<AssurancePackResult, "scenarioResults">): string | null {
+  const rows = pack.scenarioResults.flatMap((row) => (row.effect ? [row.effect] : []));
+  const measured = rows.reduce((sum, row) => sum + row.measured, 0);
+  if (measured === 0) return null;
+  const worked = rows.reduce((sum, row) => sum + row.attackSuccesses, 0);
+  const interval = wilson95(worked, measured)!;
+  const pct = (value: number) => `${Math.round(value * 100)}%`;
+  return `attack worked in ${worked} of ${measured} tries (${pct(worked / measured)}, 95% Wilson interval ${pct(interval[0])} to ${pct(interval[1])}, pooled over scenarios)`;
+}
+
 const notEvaluatedCount = (pack: AssurancePackResult): number =>
   pack.scenarioResults.filter((row) => row.inconclusive === true).length;
 
@@ -24,7 +47,8 @@ export function assuranceSarifEntries(packs: readonly AssurancePackResult[]) {
     name: pack.title,
     shortDescription: { text: `AMC Assurance Pack: ${pack.title}` },
     properties: { score: packOutcome(pack) === "NOT EVALUATED" ? null : pack.score0to100,
-      pass: pack.passCount, fail: pack.failCount, notEvaluated: notEvaluatedCount(pack) }
+      pass: pack.passCount, fail: pack.failCount, notEvaluated: notEvaluatedCount(pack),
+      gradingMethod: pack.gradingMethod ?? "keyword", attemptsPerScenario: packAttempts(pack) ?? 1 }
   }));
   const results = packs.flatMap((pack) => pack.scenarioResults.map((row) => {
     const outcome = scenarioOutcome(row);
@@ -32,9 +56,12 @@ export function assuranceSarifEntries(packs: readonly AssurancePackResult[]) {
       ruleId: pack.packId,
       level: outcome === "NOT EVALUATED" ? "none" as const : row.pass ? "note" as const : "error" as const,
       kind: outcome === "NOT EVALUATED" ? "review" as const : row.pass ? "pass" as const : "fail" as const,
-      message: { text: `${row.title}: ${outcome} — ${row.reasons.join("; ")}` },
+      message: { text: `${row.title}: ${outcome} — ${[row.effect ? describeEffectSummary(row.effect) : gradingLabel(row.gradingMethod, 1), ...row.reasons].join("; ")}` },
       properties: { scenarioId: row.scenarioId, score: outcome === "NOT EVALUATED" ? null : row.score0to100,
-        category: row.category, inconclusive: row.inconclusive === true }
+        category: row.category, inconclusive: row.inconclusive === true, gradingMethod: row.gradingMethod ?? null,
+        attempts: row.effect?.attempts ?? 1,
+        ...(row.effect ? { attackSuccesses: row.effect.attackSuccesses, measuredAttempts: row.effect.measured,
+          attackSuccessRate: row.effect.attackSuccessRate, wilson95: row.effect.wilson95 } : {}) }
     };
   }));
   return { rules, results };
@@ -47,13 +74,16 @@ export function renderAssurancePackLine(pack: AssurancePackResult): string {
   const score = outcome === "NOT EVALUATED" ? chalk.yellow("NOT EVALUATED") :
     `${scoreColor(pack.score0to100.toFixed(0).padStart(3))}%${outcome === "PARTIAL" ? " [PARTIAL]" : ""}`;
   const missingText = missing ? ` / ${chalk.yellow(String(missing))} not evaluated` : "";
-  return `  ${icon} ${chalk.hex('#4AEF79')(pack.packId.padEnd(30))} ${score}  ${chalk.green(String(pack.passCount))} pass / ${chalk.red(String(pack.failCount))} fail${missingText}  (${pack.scenarioCount} scenarios)`;
+  const rate = pooledAttackRate(pack);
+  return `  ${icon} ${chalk.hex('#4AEF79')(pack.packId.padEnd(30))} ${score}  ${chalk.green(String(pack.passCount))} pass / ${chalk.red(String(pack.failCount))} fail${missingText}  (${pack.scenarioCount} scenarios)` +
+    `\n      ${chalk.gray(`${gradingLabel(pack.gradingMethod, packAttempts(pack))}${rate ? `; ${rate}` : ""}`)}`;
 }
 
 export function renderAssuranceScenarioHeading(row: AssuranceScenarioResult): string {
   const outcome = scenarioOutcome(row);
   const icon = outcome === "NOT EVALUATED" ? chalk.yellow("?") : row.pass ? chalk.green("✓") : chalk.red("✗");
-  return `    ${icon} ${row.title ?? row.scenarioId}${outcome === "NOT EVALUATED" ? " [NOT EVALUATED]" : ""}`;
+  const how = row.effect ? describeEffectSummary(row.effect) : gradingLabel(row.gradingMethod, 1);
+  return `    ${icon} ${row.title ?? row.scenarioId}${outcome === "NOT EVALUATED" ? " [NOT EVALUATED]" : ""}\n      ${chalk.gray(how)}`;
 }
 
 export function renderAssuranceTotalLine(packs: readonly AssurancePackResult[]): string {
@@ -69,3 +99,7 @@ export function renderAssuranceOverallScore(report: Pick<AssuranceReport,
   const measured = report.packResults.some((pack) => pack.scenarioResults.some((row) => row.inconclusive !== true));
   return report.evidenceStatus === "INSUFFICIENT_EVIDENCE" || !measured ? "NOT EVALUATED" : report.overallScore0to100.toFixed(2);
 }
+
+/** Printed under any run with an effect-graded result: what a rate on these fixtures does and does not show. */
+export const EFFECT_RATE_CAVEAT = "Attack success rates are measured on AMC's fixtures with this model and number of tries. " +
+  "A low rate is not proof that the agent is safe; a stronger or adaptive attacker may do better.";

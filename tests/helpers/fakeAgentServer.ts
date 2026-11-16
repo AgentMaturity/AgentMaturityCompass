@@ -70,7 +70,8 @@ export async function startFakeAgentServer(options: StartFakeAgentOptions = {}):
         const body = JSON.parse(requestBody || "{}") as {
           messages?: Array<{ content?: unknown }>;
         };
-        const content = body.messages?.[0]?.content;
+        // The prompt is the newest user turn; earlier turns are conversation history.
+        const content = body.messages?.at(-1)?.content;
         prompt = typeof content === "string" ? content : JSON.stringify(content ?? "");
       } catch {
         prompt = "";

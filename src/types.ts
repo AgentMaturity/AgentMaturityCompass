@@ -3477,6 +3477,16 @@ export interface AssuranceScenarioResult {
   toolCalls?: Array<{ toolName: string; arguments: Record<string, unknown> }>;
   /** How the response was obtained; absent when inconclusive. */
   responseTransport?: "gateway" | "direct";
+  /**
+   * Effect-graded scenarios (src/assurance/effectGrading.ts): tries, how many the attack worked in, the rate with
+   * its 95% Wilson interval, and the ordinary task done without and with the attack. A rate on AMC's fixtures with
+   * this model, never proof that an agent is safe.
+   */
+  effect?: {
+    attempts: number; measured: number; attackSuccesses: number; attackSuccessRate: number | null;
+    wilson95: [number, number] | null; benign: { measured: number; taskDone: number; harmful: number };
+    underAttack: { taskDone: number } | null;
+  };
 }
 
 /** keyword and token-claim grading are never regulated evidence; see docs/ASSURANCE_LAB.md. */

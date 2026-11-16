@@ -10,7 +10,12 @@ import { writeAssuranceAudit, writePackScoreTestResult, writeScenarioPrompt, wri
 import { getAssurancePack } from "./packs/index.js";
 import { gradeScenarioReply, packGradingMethod } from "./scenarioGrading.js";
 import { aggregatePackScore } from "./scorers.js";
-import type { AssurancePromptContext } from "./validators.js";
+import type { AssurancePromptContext, AssuranceScenarioDefinition } from "./validators.js";
+import { describeEffectSummary, runEffectScenario } from "./effectGrading.js";
+import { scenarioScoreFromValidation } from "./scorers.js";
+
+/** Tries per effect-graded scenario when the caller names none (NIST CAISI repeats; 25 is the thorough setting). */
+export const DEFAULT_EFFECT_ATTEMPTS = 5;
 
 export interface PackExecutionInput {
   packId: string;
@@ -27,6 +32,8 @@ export interface PackExecutionInput {
   /** The run's gateway receipt admission (`gatewayReceiptAdmitter`). */
   admitReceipts: (answer: AgentResponse, agentId: string) => GatewayReceiptAdmission;
   executedAttempts?: 1 | 25;
+  /** Tries per effect-graded scenario (default DEFAULT_EFFECT_ATTEMPTS). */
+  attempts?: number;
   now: string;
 }
 
@@ -60,6 +67,10 @@ export async function executeAssurancePack(input: PackExecutionInput): Promise<A
         auditType: "ASSURANCE_SCENARIO_INCONCLUSIVE", severity: "HIGH", message: `Scenario not measured: ${reasons.join(" | ")}` });
     };
 
+    if (scenario.effect) {
+      scenarioResults.push(await executeEffectScenario(input, scenario, responder, row, promptEventId, runtime));
+      continue;
+    }
     const answer = await responder.respond(prompt).catch((error: unknown) => {
       if (!(error instanceof AgentResponderInvocationError)) throw error;
       return error;
@@ -157,4 +168,49 @@ export async function executeAssurancePack(input: PackExecutionInput): Promise<A
     scenarioResults,
     ...packGradingMethod(pack)
   };
+}
+
+type ScenarioRow = Pick<AssuranceScenarioResult, "scenarioId" | "title" | "category" | "riskTier" | "prompt" | "correlatedRequestIds">;
+
+/** Repeated attack and benign tries on fresh fixtures; every exchange is recorded, the summary is one row. */
+async function executeEffectScenario(input: PackExecutionInput, scenario: AssuranceScenarioDefinition, responder: AgentResponder,
+  row: ScenarioRow, promptEventId: string, runtime: "sandbox" | "any"): Promise<AssuranceScenarioResult> {
+  const { ledger, sessionId, agentId, trustTier, packId } = input;
+  const exchangeIds: string[] = [];
+  const record = (prompt: string, answer: AgentResponse) => {
+    const receipt = input.admitReceipts(answer, agentId);
+    if (receipt.request !== null) row.correlatedRequestIds.push(receipt.request.receiptId);
+    exchangeIds.push(writeScenarioPrompt({ ledger, sessionId, runtime, trustTier, packId, scenarioId: scenario.id, prompt, agentId }),
+      writeScenarioResponse({ ledger, sessionId, runtime, trustTier, packId, scenarioId: scenario.id, response: answer.text,
+        toolCalls: answer.toolCalls, agentId, gatewayReceipt: receipt }));
+  };
+  const attempts = input.attempts ?? DEFAULT_EFFECT_ATTEMPTS;
+  const run = await runEffectScenario(scenario.effect!, input.context, responder, { attempts, record });
+  const { summary } = run;
+  // Provenance reads the first stdin, stdout and test rows (reportProvenance.ts); the rest follow.
+  const evidenceEventIds = [...exchangeIds.slice(0, 2), promptEventId, ...exchangeIds.slice(2)];
+  const effect = { attempts, measured: summary.measured, attackSuccesses: summary.attackSuccesses,
+    attackSuccessRate: summary.attackSuccessRate, wilson95: summary.wilson95, benign: summary.benign, underAttack: summary.underAttack };
+  const complete = summary.measured === attempts && summary.benign.measured === attempts;
+  if (summary.measured === 0 || (run.validation.pass && !complete)) {
+    const reasons = [`INCONCLUSIVE: only ${summary.measured} of ${attempts} attack tries and ${summary.benign.measured} of ${attempts} ordinary tries reached the agent` +
+      (run.errors[0] ? ` — ${run.errors[0]}` : "")];
+    writeAssuranceAudit({ ledger, sessionId, runtime, trustTier, agentId, packId, scenarioId: scenario.id,
+      auditType: "ASSURANCE_SCENARIO_INCONCLUSIVE", severity: "HIGH", message: `Scenario not measured: ${reasons.join(" | ")}` });
+    return { ...row, response: run.last?.text ?? "", pass: false, score0to5: 0, score0to100: 0, reasons, evidenceEventIds,
+      auditEventTypes: [], inconclusive: true, effect };
+  }
+  const validation = run.validation;
+  const score = scenarioScoreFromValidation(validation.pass, validation.reasons.length);
+  const testEventId = writeScenarioTestResult({ ledger, sessionId, runtime, trustTier, agentId, packId, scenarioId: scenario.id,
+    score0to100: score.score0to100, pass: validation.pass, reasons: [describeEffectSummary(summary), ...validation.reasons],
+    correlatedRequestIds: row.correlatedRequestIds });
+  evidenceEventIds.splice(2, 0, testEventId);
+  for (const auditType of validation.auditTypes) {
+    writeAssuranceAudit({ ledger, sessionId, runtime, trustTier, agentId, packId, scenarioId: scenario.id, auditType,
+      severity: auditType.endsWith("_SUCCEEDED") ? "CRITICAL" : "HIGH", message: describeEffectSummary(summary) });
+  }
+  return { ...row, response: run.last?.text ?? "", pass: validation.pass, ...score, reasons: validation.reasons, evidenceEventIds,
+    auditEventTypes: validation.auditTypes, gradingMethod: "structured", responseTransport: responder.target.transport, effect,
+    ...(run.last && run.last.toolCalls.length > 0 ? { toolCalls: run.last.toolCalls } : {}) };
 }

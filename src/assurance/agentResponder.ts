@@ -68,6 +68,14 @@ export interface AgentRespondOptions {
    * observed from prose alone.
    */
   tools?: AgentToolDefinition[];
+  /** Earlier turns of the same conversation, oldest first; the prompt is sent as the next user turn. */
+  history?: AgentChatTurn[];
+}
+
+/** One earlier turn of a multi-turn conversation. */
+export interface AgentChatTurn {
+  role: "user" | "assistant";
+  content: string;
 }
 
 export interface AgentResponse {
@@ -287,13 +295,17 @@ export function buildRequestBody(params: {
   prompt: string;
   openaiCompatible: boolean;
   tools?: AgentToolDefinition[];
+  history?: AgentChatTurn[];
 }): Record<string, unknown> {
   const hasTools = params.tools !== undefined && params.tools.length > 0;
+  // Empty assistant turns are dropped: both dialects refuse an empty content string.
+  const messages = [...(params.history ?? []).filter((turn) => turn.content.length > 0)
+    .map((turn) => ({ role: turn.role, content: turn.content })), { role: "user", content: params.prompt }];
 
   if (params.openaiCompatible) {
     const body: Record<string, unknown> = {
       model: params.model,
-      messages: [{ role: "user", content: params.prompt }],
+      messages,
       max_tokens: 1024,
       temperature: 0
     };
@@ -312,7 +324,7 @@ export function buildRequestBody(params: {
     model: params.model,
     max_tokens: 1024,
     temperature: 0,
-    messages: [{ role: "user", content: params.prompt }]
+    messages
   };
   if (hasTools) {
     body.tools = params.tools!.map((tool) => ({
@@ -338,7 +350,7 @@ class HttpAgentResponder implements AgentResponder {
   private readonly auditAgentId: string | undefined;
   private readonly channel: "provider" | "bridge";
   private readonly headers: Record<string, string>;
-  private readonly body: (prompt: string, tools?: AgentToolDefinition[]) => Record<string, unknown>;
+  private readonly body: (prompt: string, options?: AgentRespondOptions) => Record<string, unknown>;
   private readonly timeoutMs: number;
   private readonly fetchImpl: typeof fetch;
 
@@ -358,19 +370,20 @@ class HttpAgentResponder implements AgentResponder {
     this.headers = params.headers;
     this.timeoutMs = params.timeoutMs;
     this.fetchImpl = params.fetchImpl;
-    this.body = (prompt: string, tools?: AgentToolDefinition[]) =>
+    this.body = (prompt: string, options?: AgentRespondOptions) =>
       buildRequestBody({
         model: params.target.model,
         prompt,
         openaiCompatible: params.openaiCompatible,
-        tools
+        tools: options?.tools,
+        history: options?.history
       });
   }
 
   async respond(prompt: string, options?: AgentRespondOptions): Promise<AgentResponse> {
     const endpoint = this.target.endpoint;
     const started = Date.now();
-    const requestBody = JSON.stringify(this.body(prompt, options?.tools));
+    const requestBody = JSON.stringify(this.body(prompt, options));
     let response: Response;
     try {
       response = await withTimeout(this.timeoutMs, (signal) => {

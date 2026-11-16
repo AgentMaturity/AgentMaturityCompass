@@ -16,6 +16,7 @@ import { mintReceipt, parseReceipt } from "../src/receipts/receipt.js";
 import type { EvidenceEvent } from "../src/types.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { startFakeAgentServer, useFakeAgentEnv, type FakeAgentServer } from "./helpers/fakeAgentServer.js";
+// Plumbing test: uses a keyword-graded pack (one exchange per scenario); injection is now effect-graded (tests/shieldEffectPacks.test.ts).
 
 /**
  * fix3 S12, S12c and S12d: gateway receipts are judged when the reply arrives. A receipt is stored only when it is bound to
@@ -98,7 +99,7 @@ describe("gateway receipt admission", () => {
 
   test("a forged receipt from the agent under test is audited and dropped; the run is still graded and its provenance holds", async () => {
     const ws = workspace();
-    const report = await runAssurance({ workspace: ws, agentId: "default", packId: "injection", mode: "supervise", window: "7d" });
+    const report = await runAssurance({ workspace: ws, agentId: "default", packId: "chainEscalation", mode: "supervise", window: "7d" });
     const pack = report.packResults[0]!;
     const graded = pack.scenarioResults.filter((row) => row.inconclusive !== true);
     expect(graded.length).toBeGreaterThan(0);
@@ -121,7 +122,7 @@ describe("gateway receipt admission", () => {
 
   test("a signed red-team run drops and audits the forged receipt the same way; the run still verifies", async () => {
     const ws = workspace();
-    const report = await runRedTeam({ workspace: ws, agentId: "default", plugins: ["injection"], strategies: ["direct"], noSign: false });
+    const report = await runRedTeam({ workspace: ws, agentId: "default", plugins: ["chainEscalation"], strategies: ["direct"], noSign: false });
     expect(report.verification.status).toBe("SIGNED_VALID");
     const rows = report.pluginResults[0]!.scenarioResults;
     expect(rows.every((row) => row.correlatedRequestIds.length === 0)).toBe(true);
@@ -154,7 +155,7 @@ describe("gateway receipt admission", () => {
     } });
     const restore = useFakeAgentEnv(agent.baseUrl);
     try {
-      const report = await runAssurance({ workspace: ws, agentId: "default", packId: "injection", mode: "supervise", window: "7d" });
+      const report = await runAssurance({ workspace: ws, agentId: "default", packId: "chainEscalation", mode: "supervise", window: "7d" });
       const rows = report.packResults[0]!.scenarioResults;
       expect(rows.length).toBeGreaterThanOrEqual(3);
       expect(exchanges.length).toBe(rows.length);
@@ -188,7 +189,7 @@ describe("gateway receipt admission", () => {
     const agent = await startFakeAgentServer({ headers: ({ requestBody }) => ({ "x-amc-request-receipt": mint(key, "llm_request", requestBody), "x-amc-receipt": FORGED }) });
     const restore = useFakeAgentEnv(agent.baseUrl);
     try {
-      const report = await runRedTeam({ workspace: ws, agentId: "default", plugins: ["injection"], strategies: ["direct"], noSign: false });
+      const report = await runRedTeam({ workspace: ws, agentId: "default", plugins: ["chainEscalation"], strategies: ["direct"], noSign: false });
       expect(report.verification.status).toBe("SIGNED_VALID");
       expect(report.pluginResults[0]!.scenarioResults.every((row) => row.correlatedRequestIds.length === 0)).toBe(true);
       const ledger = openLedger(ws);

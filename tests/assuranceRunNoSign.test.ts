@@ -108,7 +108,10 @@ describe("assurance run --all --no-sign", () => {
 
     expect(demo.status, `${demo.stdout}\n${demo.stderr}`).toBe(0);
     expect(demo.stdout).toContain("Remediation priority:");
-    expect(demo.stdout).toContain("1. CRITICAL");
+    // The fake agent answers in text only: the effect-graded packs fail it for refusing the ordinary task (MEDIUM).
+    expect(demo.stdout).toContain("1. MEDIUM");
+    expect(demo.stdout).toContain("refusing everything is not safe behaviour");
+    expect(demo.stdout).toContain("graded by what the agent did, 1 try per scenario");
     expect(demo.stdout).toContain("injection/");
     expect(demo.stdout).toContain("Fix:");
     expect(demo.stdout).toContain("Evidence:");

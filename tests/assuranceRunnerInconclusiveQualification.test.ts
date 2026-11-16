@@ -20,10 +20,11 @@ import { lockVault } from "../src/vault/vault.js";
 import { initWorkspace } from "../src/workspace.js";
 import { compliantReply, startFakeAgentServer, useFakeAgentEnv } from "./helpers/fakeAgentServer.js";
 import { workspaceKeyPem } from "./helpers/trustContext.js";
+// Plumbing test: uses a keyword-graded pack (one exchange per scenario); injection is now effect-graded (tests/shieldEffectPacks.test.ts).
 
 const calls = [{ toolName: "read_owned_fixture", arguments: { path: "harmless-p0-19-fixture.txt" } }];
 const records: Array<Record<string, unknown>> = [], roots: string[] = [];
-const scenarioIds = getAssurancePack("injection").scenarios.map(row => row.id);
+const scenarioIds = getAssurancePack("chainEscalation").scenarios.map(row => row.id);
 /** Tool-only replies to an attack pack are graded failures (secsweep 2026-10-31); the inconclusive contract is held on a text-only pack. */
 const TOOL_PACK = "truthfulness";
 const toolScenarioIds = getAssurancePack(TOOL_PACK).scenarios.map(row => row.id);
@@ -76,7 +77,7 @@ async function fixture(name: string, reply?: string): Promise<Fixture> {
   records.push({ name, phase: "captured-before-producer", root, homeMode: lstatSync(home).mode & 0o777, monitorId,
     auditorId: sha256Hex(auditorPem), before, pinsCapturedBeforeRows: true });
   try {
-    const packId = reply === undefined ? TOOL_PACK : "injection";
+    const packId = reply === undefined ? TOOL_PACK : "chainEscalation";
     const report = await runAssurance({ workspace, agentId: "default", packIds: [packId], mode: "sandbox", window: "1d", noSign: false });
     const assuranceCalls = agent.prompts.length;
     const redteam = reply === undefined ? await runRedTeam({ workspace, agentId: "default", plugins: [TOOL_PACK], strategies: ["direct"], noSign: true }) : undefined;
@@ -125,7 +126,7 @@ async function completionFault(kind: "seal" | "markdown") {
       pinsCapturedBeforeRows: true, before: snapshot(root) });
     let returned: AssuranceReport | undefined, caught: unknown;
     try {
-      returned = await runAssurance({ workspace, agentId: "default", packIds: ["injection"], mode: "sandbox", window: "1d", noSign: false,
+      returned = await runAssurance({ workspace, agentId: "default", packIds: ["chainEscalation"], mode: "sandbox", window: "1d", noSign: false,
         ...(kind === "markdown" ? { outputMarkdownPath: join(blocker, "report.md") } : {}) });
     } catch (error) { caught = error; }
     const sessions = ledger.getAllSessions().filter(row => row.binary_path === "amc-assurance-runner");

@@ -15,6 +15,7 @@ import { EXAMPLE_ASSURANCE_REPLY } from "../../src/claims/eligibility/exampleMod
 import { openLedger } from "../../src/ledger/ledger.js";
 import { initWorkspace } from "../../src/workspace.js";
 import { startFakeAgentServer, useFakeAgentEnv, type FakeAgentServer } from "../helpers/fakeAgentServer.js";
+// Plumbing test: uses a keyword-graded pack (one exchange per scenario); injection is now effect-graded (tests/shieldEffectPacks.test.ts).
 
 /**
  * P2-27 regulated compatibility callbacks do not grade replies. Preserve every
@@ -179,11 +180,11 @@ describe("actual target provenance and unavailable regulated fixtures", () => {
 
   test("every graded response is the target's own reply, tied to the run session", async () => {
     let n = 0;
-    const { workspace, report, calls } = await scan(() => `target-reply-${n++}: I cannot do that without authorization.`, ["injection"]);
-    const actualScenarios = getAssurancePack("injection").scenarios;
+    const { workspace, report, calls } = await scan(() => `target-reply-${n++}: I cannot do that without authorization.`, ["chainEscalation"]);
+    const actualScenarios = getAssurancePack("chainEscalation").scenarios;
 
     const results = report.packResults.flatMap((pack) => pack.scenarioResults.map((row) => ({ pack, row })));
-    expect(report.packResults.map((pack) => pack.packId)).toEqual(["injection"]);
+    expect(report.packResults.map((pack) => pack.packId)).toEqual(["chainEscalation"]);
     expect(results.length).toBe(actualScenarios.length);
     expect(calls).toBe(actualScenarios.length);
     expect(report.target?.endpoint).toContain(agent.baseUrl);
