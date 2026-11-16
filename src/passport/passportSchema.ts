@@ -25,7 +25,9 @@ export const passportIssuanceSchema = z.object({
   /** VERIFIED means the workspace's own passport gates passed, not that anyone outside checked the passport. */
   statusBasis: z.literal("workspace-own-gates"),
   /** The signed revocation list that would name this passport if it were revoked (`amc keys revoke --passport`). */
-  revocationListId: z.string().regex(/^passports:[a-z0-9][a-z0-9:._-]{0,117}$/)
+  revocationListId: z.string().regex(/^passports:[a-z0-9][a-z0-9:._-]{0,117}$/),
+  /** The key id (sha256 of the canonical public key) that signs that list; a verifier refuses a list signed by any other key. */
+  revocationListKeyId: z.string().regex(/^[a-f0-9]{64}$/)
 });
 
 const questionScoreRowsSchema = z.array(z.object({
@@ -156,8 +158,8 @@ export const passportJsonSchema = z.object({
   issuance: passportIssuanceSchema.optional()
 });
 
-export function selfIssuance(revocationListId: string): z.infer<typeof passportIssuanceSchema> {
-  return { issuerRelationship: "self", selfIssued: true, timeBasis: "claimed", statusBasis: "workspace-own-gates", revocationListId };
+export function selfIssuance(revocation: { revocationListId: string; revocationListKeyId: string }): z.infer<typeof passportIssuanceSchema> {
+  return { issuerRelationship: "self", selfIssued: true, timeBasis: "claimed", statusBasis: "workspace-own-gates", ...revocation };
 }
 
 /** The words a person reads for a passport status: VERIFIED is the workspace's own check, never an outside one. */

@@ -29,7 +29,7 @@ import { buildEvalScoreExplainabilityPack } from "../diagnostic/questionScoreExp
 import { hashPassportId } from "./passportRedaction.js";
 import type { PassportPolicy } from "./passportPolicySchema.js";
 import { selfIssuance, passportJsonSchema, type PassportJson } from "./passportSchema.js";
-import { passportRevocationListId } from "./passportRevocationList.js";
+import { passportRevocationBinding } from "./passportRevocationList.js";
 import { computePassportExpiresTs } from "./passportConstants.js";
 import { assertNotExample } from "../claims/eligibility/exampleMode.js";
 
@@ -510,7 +510,7 @@ function collectPassportLocalData(params: {
       includedEventProofIds: [],
       calculationManifestSha256: "0".repeat(64)
     },
-    issuance: selfIssuance(passportRevocationListId(params.workspace))
+    issuance: selfIssuance(passportRevocationBinding(params.workspace))
   });
 
   const calculationManifest = {

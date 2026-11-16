@@ -105,6 +105,11 @@ export async function handlePassportRoute(
       apiError(res, 404, "Passport not found");
       return true;
     }
+    if (result.signedList === null) {
+      // Revoked here, but nobody outside this workspace can see it yet: never answer that as success.
+      apiError(res, 503, `The passport is revoked on this machine, but the signed revocation list was not published, so people outside this workspace cannot see it yet (${result.signedListError ?? "unknown reason"}). Unlock the vault and send this request again.`);
+      return true;
+    }
     apiSuccess(res, result);
     return true;
   }

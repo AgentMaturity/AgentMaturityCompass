@@ -42,7 +42,7 @@ const issuer = key();
 const root = key();
 const now = Date.parse("2026-11-16T00:00:00.000Z");
 const asOf = new Date(now + 60_000);
-const LIST_ID = "passports:default";
+const LIST_ID = "passports:default:0123456789abcdef0123456789abcdef";
 function trustList(entries: Array<{ pem: string; id: string; purposes: string[] }>) {
   return signTrustList({ type: "amc.trust-list", version: 1, listId: "checker", sequence: 1, issuedAt: "2026-11-01T00:00:00.000Z",
     expiresAt: "2027-11-01T00:00:00.000Z", distrust: [],
@@ -55,7 +55,8 @@ const options = (extra: Partial<VerifyOptions> = {}): VerifyOptions => ({ trustL
 const passport = (over: Record<string, unknown> = {}) => ({
   v: 1, passportId: "pass_0123456789abcdef", generatedTs: now, expiresTs: now + 90 * 86_400_000,
   status: { label: "VERIFIED", reasons: [] },
-  issuance: { issuerRelationship: "self", selfIssued: true, timeBasis: "claimed", statusBasis: "workspace-own-gates", revocationListId: LIST_ID },
+  issuance: { issuerRelationship: "self", selfIssued: true, timeBasis: "claimed", statusBasis: "workspace-own-gates", revocationListId: LIST_ID,
+    revocationListKeyId: issuer.id },
   ...over
 });
 function passportSig(value: unknown, signer = issuer, named = signer) {
@@ -104,6 +105,25 @@ describe("passports (.amcpass)", () => {
     expect(verifyArtifact(amcpass(value), options({ revocationLists: [noRows] })).reasonCodes.freshness).toEqual(["ATTESTATION_EXPIRED"]);
   });
 
+  test("a revoked passport checked against another pinned issuer's list does not pass freshness", () => {
+    const other = key();
+    const both = trustList([{ ...issuer, purposes: ["artifact-seal", "revocation-list"] }, { ...other, purposes: ["artifact-seal", "revocation-list"] }]);
+    const revokedHere = revocations([{ id: "pass_0123456789abcdef", kind: "passport", revokedAt: "2026-11-14T00:00:00.000Z", reason: "retired" }]);
+    expect(verifyArtifact(amcpass(), options({ trustLists: [both], revocationLists: [revokedHere] })).reasonCodes.freshness).toEqual(["REPLAYED_OR_SUPERSEDED"]);
+    // The other issuer's valid list, even one carrying this passport's list id, never stands in for the issuer's own.
+    for (const listId of [LIST_ID, "passports:default:fedcba9876543210fedcba9876543210"]) {
+      const report = verifyArtifact(amcpass(), options({ trustLists: [both], revocationLists: [revocations([], { signer: other, listId })] }));
+      expect(report.reasonCodes.integrity).toEqual(["MALFORMED"]);
+      expect(report.freshness.status).not.toBe("pass");
+      expect(exitCode(report)).toBe(1);
+    }
+    // A passport made before the issuance block: only a list signed by the key that signed the passport.
+    const legacy = passport({ issuance: undefined });
+    expect(verifyArtifact(amcpass(legacy), options({ trustLists: [both], revocationLists: [revocations([], { signer: other })] })).reasonCodes.integrity)
+      .toEqual(["MALFORMED"]);
+    expect(verifyArtifact(amcpass(legacy), options({ trustLists: [both], revocationLists: [noRows] })).freshness.status).toBe("pass");
+  });
+
   test("a changed body fails integrity", () => {
     const signedFor = passport();
     const report = verifyArtifact(amcpass(passport({ status: { label: "UNTRUSTED", reasons: [] } }), passportSig(signedFor)), options());
@@ -146,7 +166,10 @@ describe("passports (.amcpass)", () => {
     edited.list.revoked = [{ id: "pass_other0000000", kind: "passport", revokedAt: "2026-11-14T00:00:00.000Z", reason: "x" }];
     const editedBytes = Buffer.from(canonicalize(edited));
     expect(verifyArtifact(amcpass(), options({ revocationLists: [{ value: edited, bytes: editedBytes }] })).reasonCodes.integrity).toEqual(["SIGNATURE_INVALID"]);
-    expect(verifyArtifact(amcpass(), options({ revocationLists: [revocations([], { signer: key() })] })).reasonCodes.issuerAdmission).toEqual(["ISSUER_NOT_PINNED"]);
+    const unpinned = key();
+    const namesUnpinned = passport({ issuance: { ...passport().issuance, revocationListKeyId: unpinned.id } });
+    expect(verifyArtifact(amcpass(namesUnpinned), options({ revocationLists: [revocations([], { signer: unpinned })] })).reasonCodes.issuerAdmission)
+      .toEqual(["ISSUER_NOT_PINNED"]);
     expect(verifyArtifact(amcpass(), options({ revocationLists: [revocations([], { listId: "passports:elsewhere" })] })).reasonCodes.integrity).toEqual(["MALFORMED"]);
     expect(verifyArtifact(amcpass(), options({ revocationLists: [noRows], knownSequences: { [LIST_ID]: 4 } })).reasonCodes.issuerAdmission).toEqual(["ROLLBACK_DETECTED"]);
     const pretty = Buffer.from(JSON.stringify(noRows.value, null, 2));

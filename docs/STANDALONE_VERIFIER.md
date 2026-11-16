@@ -185,9 +185,11 @@ verification, and that its times are the issuer's own clock. What `amc-verify` c
 canonical encoding and hashes to the digest `passport.sig` signs; the signature verifies under a key your trust list
 pins for `artifact-seal`; the passport has not expired as of `--as-of`; and, with `--revocation-list`, that the list is
 in its one canonical encoding, is the list the passport names (`issuance.revocationListId`; an older passport that names
-none accepts any `passports:` list, with a warning), verifies under a key your trust list pins for `revocation-list`,
+none accepts any `passports:` list, with a warning), is signed by the key the passport names for it
+(`issuance.revocationListKeyId`; for an older passport, the key that signed the passport), verifies under a key your
+trust list pins for `revocation-list`,
 is not older than `--known-sequence <listId>=<n>` (`ROLLBACK_DETECTED`), and does not name the passport
-(`REPLAYED_OR_SUPERSEDED`). A list that is malformed, edited or names another list fails integrity; one whose signer you
+(`REPLAYED_OR_SUPERSEDED`). A list that is malformed, edited, names another list or is signed by another issuer's key fails integrity; one whose signer you
 did not pin fails issuer admission. What it does not check: the transparency and Merkle proofs inside the passport
 (`amc passport verify` does) and the figures themselves.
 
@@ -221,7 +223,7 @@ issuer's signed revocation list, and the issuer's public keys, obtained from the
 
 ```bash
 amc-verify verify agent.amcpass --trust-list my-trust-list.json --trust-root <your root key id> \
-  --revocation-list revocations.signed.json --known-sequence passports:<workspaceId>=<highest sequence you saw>
+  --revocation-list revocations.signed.json --known-sequence <the passport's revocationListId>=<highest sequence you saw>
 ```
 
 3. Read the result: exit 3 with integrity, issuer admission, freshness and completeness passing is the best a passport

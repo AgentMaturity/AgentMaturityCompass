@@ -2,8 +2,10 @@
  * An AMC passport (.amcpass): `passport.json` signed in `passport.sig` (the signer's key over the raw SHA-256 digest of
  * the passport's canonical JSON). The signing key is taken only from the supplied trust lists, admitted for artifact-seal;
  * a key the signature envelope or `signer.pub` names only selects among them. Revocation is checked against signed
- * passport revocation lists the verifier's user supplies, whose signer must be pinned for revocation-list. Without one,
- * freshness is not evaluated: nobody checked whether the passport was revoked.
+ * passport revocation lists the verifier's user supplies, whose signer must be pinned for revocation-list AND be the
+ * passport's own issuer: the key the passport names in `issuance.revocationListKeyId` (an older passport: the key that
+ * signed it). Another pinned issuer's list never stands in. Without a list, freshness is not evaluated: nobody checked
+ * whether the passport was revoked.
  */
 import { canonicalize, canonicalSigningPem, parseJson, same, sha256Hex, signingKeyId, statementMessage, verifySignature } from "../bytes.js";
 import type { Finding } from "../codes.js";
@@ -64,7 +66,8 @@ interface ListCheck {
 }
 
 /** Each supplied list must be canonical, name the passport's list, verify under a key pinned for revocation-list and not roll back. */
-function checkLists(supplied: readonly SuppliedList[], expectedListId: string | null, env: Env): ListCheck {
+function checkLists(supplied: readonly SuppliedList[], expected: { listId: string | null; signerKeyId: string | null }, env: Env): ListCheck {
+  const expectedListId = expected.listId;
   const out: ListCheck = { integrity: [], unverifiable: [], admissions: [], admissionFindings: [], lists: [] };
   supplied.forEach((item, index) => {
     const at = `revocation list ${index + 1}`;
@@ -73,6 +76,10 @@ function checkLists(supplied: readonly SuppliedList[], expectedListId: string | 
     const { list, signature } = parsed.value;
     if (expectedListId === null ? !list.listId.startsWith("passports:") : list.listId !== expectedListId) {
       out.integrity.push({ code: "MALFORMED", detail: `${at} is ${list.listId}, not ${expectedListId ?? "a passport revocation list (passports:...)"}` });
+      return;
+    }
+    if (expected.signerKeyId === null || !same(signature.keyId, expected.signerKeyId)) {
+      out.integrity.push({ code: "MALFORMED", detail: `${at} is signed by key ${signature.keyId}, not by ${expected.signerKeyId ?? "a key this passport's issuer names"}, the key that signs this passport's revocation list` });
       return;
     }
     const pem = listedPem(env.ctx, signature.keyId);
@@ -117,7 +124,8 @@ export function evaluatePassport(members: ReadonlyMap<string, Buffer>, supplied:
   else if (!verifySignature(digest, key.pem, Buffer.from(sig.signature, "base64"))) integrity.push({ code: "SIGNATURE_INVALID", detail: "passport.sig does not verify" });
   const passportAdmission = admit({ signature: "passport.sig", keyId: key.keyId, purpose: "artifact-seal" }, env.ctx);
   const listId = typeof fields.issuance?.revocationListId === "string" ? fields.issuance.revocationListId : null;
-  const lists = checkLists(supplied, listId, env);
+  const listSigner = typeof fields.issuance?.revocationListKeyId === "string" ? fields.issuance.revocationListKeyId : key.keyId;
+  const lists = checkLists(supplied, { listId, signerKeyId: listSigner }, env);
   const revoked = lists.lists.flatMap(signed => signed.list.revoked).find(row => row.kind === "passport" && row.id === fields.id);
   const selfIssued = fields.issuance?.selfIssued === true;
   return {
@@ -130,7 +138,7 @@ export function evaluatePassport(members: ReadonlyMap<string, Buffer>, supplied:
       "the passport's status (VERIFIED, INFORMATIONAL or UNTRUSTED) is the issuing workspace's own check, not an outside verification",
       "times are the issuing machine's own clock (time basis: claimed)",
       "the transparency proofs inside the passport are checked by AMC (amc passport verify), not by this verifier",
-      ...(listId === null && supplied.length > 0 ? ["the passport names no revocation list; any passports:... list was accepted"] : [])
+      ...(listId === null && supplied.length > 0 ? ["the passport names no revocation list; a passports:... list signed by the key that signed the passport was accepted"] : [])
     ],
     scope: () => scopeResult({}, env.expect),
     freshness: () => {

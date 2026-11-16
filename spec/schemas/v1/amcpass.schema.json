@@ -327,6 +327,10 @@
           "pattern": "^passports:[a-z0-9][a-z0-9:._-]{0,117}$",
           "type": "string"
         },
+        "revocationListKeyId": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
         "selfIssued": {
           "const": true,
           "type": "boolean"
@@ -345,7 +349,8 @@
         "selfIssued",
         "timeBasis",
         "statusBasis",
-        "revocationListId"
+        "revocationListId",
+        "revocationListKeyId"
       ],
       "type": "object"
     },

@@ -51,7 +51,8 @@ Passports made from 2026-11-16 carry an `issuance` block inside the signed `pass
 - `issuerRelationship: "self"` and `selfIssued: true`: the workspace signed it about its own agent.
 - `timeBasis: "claimed"`: `generatedTs` and `expiresTs` are the signing machine's own clock; no trusted timestamp vouches for them.
 - `statusBasis: "workspace-own-gates"`: what `status.label` means (above).
-- `revocationListId`: the signed revocation list that would name this passport if it were revoked (below).
+- `revocationListId`: the signed revocation list that would name this passport if it were revoked (below). It is unique to the issuing workspace: `passports:<workspaceId>:<the first 32 hex characters of the key id of its first revocation-list key>`.
+- `revocationListKeyId`: the key id of the key that signs that list. A checker accepts only a list signed by this key, so another issuer's list can never stand in for this one. If the workspace later rotates its revocation-list key, lists signed by the new key are refused for passports made before the rotation (the check fails rather than passes); issue those passports again.
 
 The evidence mix is `trust.evidenceCoverage`: the share of evidence AMC observed itself, the share others attested, and the share that was self-reported (`null` when nothing measured it). `amc passport create` and `amc passport verify` print it in words.
 
@@ -65,7 +66,7 @@ Compatibility: an AMC version from before 2026-11-16 does not know the `issuance
 amc keys revoke --passport ./agent.amcpass --reason "agent retired"   # or the passportId of one under .amc/passport/exports
 ```
 
-This records the revocation on this machine and publishes `.amc/passport/revocations.signed.json`, a signed revocation list (`amc.revocation-list`, list id `passports:<workspaceId>`). The workspace's revocation-list key signs it; it carries the time it was issued, a sequence number that goes up by one with every change, and the digest of the list before it. Share that file with the people who check your passports. They check it with `amc-verify ... --revocation-list revocations.signed.json` against the revocation-list key their own trust list pins, and pass `--known-sequence passports:<workspaceId>=<n>` with the highest sequence they have seen, so an older copy is reported as a rollback. The console's revoke button publishes the same list. If the vault is locked, the revocation still holds on this machine, the command says the list was not published, and exits 1.
+This records the revocation on this machine and publishes `.amc/passport/revocations.signed.json`, a signed revocation list (`amc.revocation-list`, with the list id the passport names). The workspace's revocation-list key signs it; it carries the time it was issued, a sequence number that goes up by one with every change, and the digest of the list before it. Share that file with the people who check your passports. They check it with `amc-verify ... --revocation-list revocations.signed.json` against the revocation-list key their own trust list pins, and pass `--known-sequence <list id>=<n>` with the highest sequence they have seen, so an older copy is reported as a rollback. The admin API route `POST /api/v1/passport/:id/revoke` publishes the same list, and answers 503 when the list could not be published. A `.amcpass` file passed to the command must verify as one this workspace signed; a changed file is refused and nothing is revoked (pass the passport id instead). If the vault is locked, the revocation still holds on this machine, the command says the list was not published, and exits 1.
 
 On this machine, `amc passport verify` reads the signed list; a list that does not verify, or is older than one this machine already saw, makes the passport fail (`PASSPORT_REVOCATION_LIST_INVALID`) rather than pass.
 
@@ -85,7 +86,7 @@ amc passport export-latest --scope agent --id <agentId> --out ./agent-latest.amc
 amc keys revoke --passport ./agent.amcpass --reason "<why>"
 ```
 
-`create` and `export-latest` also write `<file>.sigstore.json` beside the passport: a DSSE-signed in-toto statement in a key-based Sigstore bundle whose subject is the sha256 of the whole `.amcpass` file (docs/STANDALONE_VERIFIER.md, "Export statements").
+Every passport export (the CLI, the console and the API) also writes `<file>.sigstore.json` beside the passport: a DSSE-signed in-toto statement in a key-based Sigstore bundle whose subject is the sha256 of the whole `.amcpass` file (docs/STANDALONE_VERIFIER.md, "Export statements").
 
 `amc passport issue-token`, `verify-token` and `translate-score` are demos. A trust token is signed with a public demo secret that anyone can use, says so inside the token, and is never reported as verified. The score translations use conversion factors AMC made up as examples: NIST AI RMF and ISO/IEC 42001 have no numeric score.
 
