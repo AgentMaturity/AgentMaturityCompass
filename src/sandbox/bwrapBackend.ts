@@ -7,7 +7,6 @@ import { PROCESS_LIMIT_LIMITATION, ROOT_PROCESS_LIMIT_LIMITATION, processLimit, 
 import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTypes.js";
 import { shellSecretPaths } from "./shellSecretPaths.js";
 import { EGRESS_MOUNT, encodeBpf, linuxSocketEgressFilter, prepareRelayDirectory, refuseSocketFiles, relayCommand, socketDenyList, socketFilterHead } from "./bwrapEgress.js";
-import { EgressUnavailable, startPolicyEgress, withRefusals } from "./egress/sessionEgress.js";
 import type { ShellEgressProxy } from "./egress/shellEgressProxy.js";
 
 const BWRAP = "/usr/bin/bwrap";
@@ -196,6 +195,7 @@ export function bwrapBackend(): SandboxBackend {
       if (policy.signal?.aborted) return { ...declined("The shell was cancelled before launch."), cancelled: true };
       let temporary: string | undefined;
       let proxy: ShellEgressProxy | null = null;
+      let refusals = (stderr: string, _proxy: ShellEgressProxy | null): string => stderr;
       let launched = false;
       const descriptors: number[] = [];
       try {
@@ -222,8 +222,11 @@ export function bwrapBackend(): SandboxBackend {
         if (policy.allowHosts) {
           try { refuseSocketFiles(workspace); } catch (error) { return declined(`${error instanceof Error ? error.message : "The workspace could not be checked for socket files."} Nothing was run.`); }
           mkdirSync(egressDirectory, { mode: 0o700 });
-          try { proxy = await startPolicyEgress(policy, join(egressDirectory, "proxy.sock")); }
-          catch (error) { return declined(error instanceof EgressUnavailable ? error.message : "AMC's network filter could not start; nothing was run."); }
+          // Loaded only here: its import chain reaches back to this module through the native binding.
+          const egress = await import("./egress/sessionEgress.js");
+          try { proxy = await egress.startPolicyEgress(policy, join(egressDirectory, "proxy.sock")); }
+          catch (error) { return declined(error instanceof egress.EgressUnavailable ? error.message : "AMC's network filter could not start; nothing was run."); }
+          refusals = egress.withRefusals;
           prepareRelayDirectory(egressDirectory);
         }
         const arch = process.arch as "x64" | "arm64";
@@ -274,7 +277,7 @@ export function bwrapBackend(): SandboxBackend {
           failure: !applied ? { kind: "runner-failure", reason: "Bubblewrap did not provide a complete command-exit receipt; execution and confinement are unconfirmed." }
             : !outcome.treeExitProven ? { kind: "runner-failure", reason: "The launcher exited but process-group cleanup could not be confirmed." } : null,
           exitCode: applied ? status : null, timedOut: outcome.terminatedBy === "timeout", cancelled: outcome.terminatedBy === "cancel",
-          stdout: outcome.stdout.text, stderr: withRefusals(outcome.stderr.text, proxy), writableRoots: applied ? writableRoots : [],
+          stdout: outcome.stdout.text, stderr: refusals(outcome.stderr.text, proxy), writableRoots: applied ? writableRoots : [],
           treeExitProven: outcome.treeExitProven, droppedBytes: outcome.stdout.droppedBytes + outcome.stderr.droppedBytes,
           ...(applied ? { enforcement: {
             boundary: "linux-bwrap" as const, hostWrites: "declared-roots-only" as const, reads: "workspace-ro-and-runtime" as const,

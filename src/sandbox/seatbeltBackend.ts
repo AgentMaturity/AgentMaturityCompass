@@ -2,7 +2,6 @@ import { existsSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "no
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runProcess } from "../exec/runProcess.js";
-import { EgressUnavailable, proxyEnvironment, startPolicyEgress, withRefusals } from "./egress/sessionEgress.js";
 import type { ShellEgressProxy } from "./egress/shellEgressProxy.js";
 import { SEATBELT_NO_OUTSIDE_HELPERS, seatbeltNetworkRules } from "./seatbeltRules.js";
 import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTypes.js";
@@ -133,14 +132,16 @@ export function seatbeltBackend(): SandboxBackend {
       let proxy: ShellEgressProxy | null = null;
       const profileDir = mkdtempSync(join(tmpdir(), "amc-sbpl-"));
       try {
-        try { proxy = await startPolicyEgress(policy); }
-        catch (error) { return refuse("runner-failure", error instanceof EgressUnavailable ? error.message : "AMC's network filter could not start; nothing was run."); }
+        // Loaded only here: its import chain reaches back to this module through the native binding.
+        const egress = policy.allowHosts ? await import("./egress/sessionEgress.js") : null;
+        try { proxy = egress ? await egress.startPolicyEgress(policy) : null; }
+        catch (error) { return refuse("runner-failure", egress && error instanceof egress.EgressUnavailable ? error.message : "AMC's network filter could not start; nothing was run."); }
         const profilePath = join(profileDir, "policy.sb");
         writeFileSync(profilePath, buildSeatbeltProfile(policy.writableRoots, proxy?.port ?? null), { mode: 0o600 });
         const outcome = await runProcess({
           argv: [SANDBOX_EXEC, "-f", profilePath, ...command],
           cwd,
-          env: { PATH: process.env["PATH"] ?? "", HOME: process.env["HOME"] ?? "", ...(proxy?.url ? proxyEnvironment(proxy.url) : {}) },
+          env: { PATH: process.env["PATH"] ?? "", HOME: process.env["HOME"] ?? "", ...(egress && proxy?.url ? egress.proxyEnvironment(proxy.url) : {}) },
           stdin: "ignore",
           stdout: "capture",
           stderr: "capture",
@@ -169,7 +170,7 @@ export function seatbeltBackend(): SandboxBackend {
           timedOut: outcome.terminatedBy === "timeout",
           cancelled: outcome.terminatedBy === "cancel",
           stdout: outcome.stdout.text,
-          stderr: withRefusals(stderr, proxy),
+          stderr: egress ? egress.withRefusals(stderr, proxy) : stderr,
           writableRoots
         };
       } finally {
