@@ -138,6 +138,14 @@ describe("attacker model loop on effect-graded scenarios", () => {
     } finally { ledger.close(); }
   }, 120_000);
 
+  test("a cost limit that can no longer be counted stops the run like a reached one", async () => {
+    const spend = new AttackerSpend({ rounds: 10, maxTokens: 1000, maxCostUsd: 1 });
+    const unknown = stub("stub:unpriced", () => "text", { tokens: 1, costUsd: null });
+    expect(await spend.next(unknown, { goal: "g", where: "w", rounds: [] })).toBe("text");
+    expect(await spend.next(unknown, { goal: "g", where: "w", rounds: [] })).toBe("cost");
+    expect(spend.stoppedBy).toBe("cost");
+  });
+
   test("a round that was not evaluated makes the row not passed", () => {
     const totals = adaptiveTotals([{ adaptive: { attackerModel: "stub:x", roundBudget: 3, roundsRun: 3, firstRoundWorked: false, workedAtRound: null,
       notEvaluatedRounds: 1, stoppedBy: "rounds", maxTokens: 10, maxCostUsd: null, tokens: 0, costUsd: null } }]);
@@ -151,6 +159,7 @@ describe("attacker options", () => {
     expect(attackerFromOptions({}, "/nonexistent")).toBeUndefined();
     expect(() => attackerFromOptions({ attackerRounds: 3 }, "/nonexistent")).toThrow(/need --attacker-model/);
     expect(() => attackerFromOptions({ attackerModel: "gpt-x" }, "/nonexistent")).toThrow(/openai:<model> or anthropic:<model>/);
+    expect(() => attackerFromOptions({ attackerModel: "openai:gpt\u001b[2J" }, "/nonexistent")).toThrow(/openai:<model> or anthropic:<model>/);
     const saved = process.env.ANTHROPIC_API_KEY;
     delete process.env.ANTHROPIC_API_KEY;
     try {

@@ -54,7 +54,8 @@ export class AttackerSpend {
   /** Why no further call may start, or null. */
   blocked(): "tokens" | "cost" | null {
     if (this.tokens >= this.budget.maxTokens) return "tokens";
-    if (this.budget.maxCostUsd !== null && this.costUsd !== null && this.costUsd >= this.budget.maxCostUsd) return "cost";
+    // A cost limit that can no longer be counted (a call's cost was not known) stops the run, as a reached one does.
+    if (this.budget.maxCostUsd !== null && (this.costUsd === null || this.costUsd >= this.budget.maxCostUsd)) return "cost";
     return null;
   }
 
@@ -87,8 +88,8 @@ export function attackerPrompt(input: AttackerInput): string {
 
 /** Parses "openai:<model>" or "anthropic:<model>"; the key comes from OPENAI_API_KEY or ANTHROPIC_API_KEY. */
 export function resolveAttackerModel(spec: string, workspace: string): AttackerModel {
-  const match = /^(openai|anthropic):(\S{1,200})$/.exec(spec.trim());
-  if (!match) throw new Error(`Name the attacker model as openai:<model> or anthropic:<model> (got "${spec}").`);
+  const match = /^(openai|anthropic):([A-Za-z0-9._:/@-]{1,200})$/.exec(spec.trim());
+  if (!match) throw new Error(`Name the attacker model as openai:<model> or anthropic:<model> (got ${JSON.stringify(spec.slice(0, 80))}).`);
   const provider = match[1] as "openai" | "anthropic", model = match[2]!;
   const keyName = provider === "openai" ? "OPENAI_API_KEY" : "ANTHROPIC_API_KEY";
   const apiKey = process.env[keyName];

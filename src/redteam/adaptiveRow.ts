@@ -17,6 +17,7 @@ import type { AssuranceScenarioResult } from "../types.js";
 import type { AttackerModel, AttackerRound, AttackerSpend, AttackerStop } from "./attackerModel.js";
 import { auditRejectedReceipt, type EvidenceRows } from "./effectRow.js";
 import { runTAP } from "./jailbreak/tap.js";
+import { escapeTerminalControls } from "../tools/builtin/askUserTool.js";
 
 export interface AdaptiveAttacker { model: AttackerModel; spend: AttackerSpend }
 export type AdaptiveSummary = NonNullable<AssuranceScenarioResult["adaptive"]>;
@@ -82,7 +83,9 @@ export async function runAdaptiveEffectRow(params: { scenario: AssuranceScenario
       if (next === "tokens" || next === "cost") { stop = next; return null; }
       return next;
     } catch (error) {
-      stop = "attacker-error"; attackerError = error instanceof Error ? error.message : String(error);
+      stop = "attacker-error";
+      // Shown at the terminal and in reports; a provider's error text is outside text.
+      attackerError = escapeTerminalControls((error instanceof Error ? error.message : String(error)).slice(0, 300));
       return null;
     }
   };
