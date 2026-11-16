@@ -18,6 +18,12 @@ amc connect hooks remove --provider codex
 ```
 
 The install writes `.codex/hooks.json` with one PostToolUse command hook that runs AMC's forwarder. It also writes a
+
+The install also adds one command hook for each session hook Codex documents (SessionStart, SessionEnd,
+UserPromptSubmit, Stop, SubagentStart, SubagentStop, PreCompact, PostCompact, Interrupt; https://learn.chatgpt.com/docs/hooks,
+read 2026-11-16), labelled "AMC records this session event". AMC records each as Codex's own report: prompts and
+messages as SHA-256 and length only, never their text. A payload AMC cannot read is recorded as unreadable, so these
+hooks are never refused. SessionEnd and Interrupt get 3 seconds, the most Codex allows them.
 signed manifest and a dedicated observe lease under `.amc/hooks/`. It never edits a `.codex/hooks.json` it did not
 write. Codex runs a project hook only after you trust the folder and the hook in Codex (start `codex` there, accept
 the folder, then run `/hooks` and trust the hook labelled "AMC records this tool call"), so nothing is observed until

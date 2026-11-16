@@ -1296,7 +1296,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 1277 | `amc watch` | Observability, attestation, and safety testing |
 | 1278 | `amc watch alerts` | Show recent alerts for a monitored agent |
 | 1279 | `amc watch attest` | Attest an agent output |
-| 1280 | `amc watch connect` | Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook) |
+| 1280 | `amc watch connect` | Poll an observability backend for traces (trace-query, langfuse, helicone, datadog, webhook); to receive OTLP from an agent, see amc connect --print-env --runtime |
 | 1281 | `amc watch explain` | Generate explainability packet for an agent run |
 | 1282 | `amc watch host-hardening` | Check host hardening status for this AMC deployment |
 | 1283 | `amc watch profiler-anomalies` | List detected behavioral anomalies for an agent |
@@ -3729,6 +3729,7 @@ Connect an agent runtime and track first action, decision, and proof
 | `--json` | - |
 | `--print-env` | - |
 | `--print-cmd` | - |
+| `--runtime <runtime>` | - |
 
 #### `amc connect hooks health`
 
@@ -11194,7 +11195,7 @@ Attest an agent output
 
 #### `amc watch connect`
 
-Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook)
+Poll an observability backend for traces (trace-query, langfuse, helicone, datadog, webhook); to receive OTLP from an agent, see amc connect --print-env --runtime
 
 
 | Option | Description |

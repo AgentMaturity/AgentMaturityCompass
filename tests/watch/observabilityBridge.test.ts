@@ -17,6 +17,7 @@ import {
   createObservabilityBridge,
   type NormalizedSpan,
 } from "../../src/watch/observabilityBridge.js";
+import { attributeUsage } from "../../src/watch/observabilityUsage.js";
 
 describe("ObservabilityBridge", () => {
   describe("estimateCost", () => {
@@ -49,10 +50,21 @@ describe("ObservabilityBridge", () => {
   });
 
   describe("createProviderAdapter", () => {
-    it("creates OTLP adapter", () => {
-      const adapter = createProviderAdapter("otlp");
-      expect(adapter).toBeInstanceOf(OTLPAdapter);
-      expect(adapter.provider).toBe("otlp");
+    it("creates the trace-query adapter, also under its old name otlp (OTLP itself has no GET)", () => {
+      for (const name of ["trace-query", "otlp"] as const) {
+        const adapter = createProviderAdapter(name);
+        expect(adapter).toBeInstanceOf(OTLPAdapter);
+        expect(adapter.provider).toBe("trace-query");
+      }
+    });
+
+    it("reads gen_ai.provider.name and the cache and reasoning counts (OTel 1.41 and OpenInference) without adding them to input", () => {
+      expect(attributeUsage("gpt-4o", { "gen_ai.usage.input_tokens": "10", "gen_ai.usage.output_tokens": "5", "gen_ai.usage.cache_read.input_tokens": "4",
+        "gen_ai.usage.cache_creation.input_tokens": "2", "gen_ai.usage.reasoning.output_tokens": "3" })).toMatchObject({
+        tokenUsage: { prompt: 10, completion: 5, total: 15 }, tokenDetails: { cacheRead: 4, cacheWrite: 2, reasoning: 3 } });
+      expect(attributeUsage(undefined, { "llm.token_count.prompt_details.cache_read": "7", "llm.token_count.prompt_details.cache_write": "1",
+        "llm.token_count.completion_details.reasoning": "-1" }).tokenDetails).toEqual({ cacheRead: 7, cacheWrite: 1 });
+      expect(attributeUsage(undefined, {}).tokenDetails).toBeUndefined();
     });
 
     it("creates Langfuse adapter", () => {

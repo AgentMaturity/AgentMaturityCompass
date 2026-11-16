@@ -26,6 +26,7 @@ import { openLedger, verifyEvidenceEventIntegrity } from "../ledger/ledger.js";
 import { OBSERVED_AEP_HOOK_PATH, OBSERVED_HOOK_CORRELATION_PATH, type ObservedAepActionEvent } from "../bridge/hookIngress.js";
 import { isSafeProviderActionId } from "../bridge/hookActionIdentity.js";
 import { redactBridgeText } from "../bridge/bridgeRedaction.js";
+import { SESSION_HOOK_PATH } from "../bridge/sessionObservations.js";
 import {
   renderProviderControlResponse, serializeProviderControlResponse, type HookControlDecision, type HookProvider, type ProviderControlResponse,
 } from "../bridge/hookProviders.js";
@@ -38,7 +39,7 @@ import {
 } from "./hookIntegration.js";
 import { assertControlBridgeLocal, normalizeBridgeBase, parseMode, validateAgentId } from "./hookProviders/installFiles.js";
 import { claudeEnvelope, claudeHookSchemasFor, strictClaudeJson, type ClaudeHookPayload } from "./hookProviders/claudeCodePayloads.js";
-import { claudeActionId, claudeSessionSha256 } from "./hookProviders/claudeCode.js";
+import { CLAUDE_OBSERVE_SESSION_HOOKS, claudeActionId, claudeSessionSha256 } from "./hookProviders/claudeCode.js";
 import { claudeAllow, claudeDeny } from "./hookProviders/claudeAllow.js";
 
 /** Synchronous preflight right before each hook POST; its typed refusal is thrown outside every retry loop. */
@@ -626,6 +627,9 @@ export async function runHookForward(
   deadlineMs = forwardDeadlineMs(),
 ): Promise<HookForwardOutcome> {
   if (opts.provider === "claude-code" && opts.mode === "control") return answerClaudeHook(opts, readInput, workspace, deadlineMs);
+  if (opts.provider === "claude-code" && opts.mode === "observe" && (CLAUDE_OBSERVE_SESSION_HOOKS as readonly string[]).includes(opts.event ?? "")) {
+    return observeClaudeSessionHook(opts, readInput, workspace, deadlineMs);
+  }
   const deny = (message: string): HookForwardOutcome => ({
     stdout: `${serializeProviderControlResponse(failClosedProviderControlResponse(opts.provider))}\n`,
     stderr: `${message}\n`,
@@ -661,6 +665,31 @@ export async function runHookForward(
       return deny(stage === "control" ? "AMC hook control unavailable; action denied." : "AMC hook control input invalid; action denied.");
     }
     return { stdout: "", stderr: `${error instanceof Error ? error.message : String(error)}\n`, exitCode: 1 };
+  }
+}
+
+/**
+ * Claude Code observe mode, a session hook (SessionStart, UserPromptSubmit, Stop, SubagentStart, PreCompact, …): the
+ * payload goes to AMC's session route on loopback, which keeps digests only (bridge/sessionObservations.ts). This hook
+ * only watches, so it always answers `{}` with exit 0, recorded or not, within its deadline: it never blocks the agent.
+ */
+async function observeClaudeSessionHook(opts: HookForwardOptions, readInput: () => Promise<string | Buffer>, workspace: string,
+  deadlineMs: number): Promise<HookForwardOutcome> {
+  try {
+    await withHookDeadline(deadlineMs, async (signal) => {
+      const received = await readInput();
+      const authorization = authorizeForwardInvocation({ workspace, provider: "claude-code", mode: "observe", agentId: validateAgentId(opts.agent),
+        bridgeBase: normalizeBridgeBase(opts.bridgeUrl), tokenFile: opts.tokenFile });
+      admitHookEgress(workspace, `${authorization.bridgeBase}${SESSION_HOOK_PATH}`);
+      const response = await fetch(`${authorization.bridgeBase}${SESSION_HOOK_PATH}`, { method: "POST", redirect: "error", signal: boundedFetchSignal(3_000, signal),
+        headers: { authorization: `Bearer ${authorization.token}`, "content-type": "application/json", "x-amc-hook-provider": "claude-code" },
+        body: typeof received === "string" ? received : new Uint8Array(received) });
+      if (!response.ok) throw new Error(`AMC answered HTTP ${response.status}`);
+    });
+    return { stdout: "{}\n", stderr: "", exitCode: 0 };
+  } catch (error) {
+    const reason = error instanceof HookDeadlineError ? "timed out" : redactBridgeText(error instanceof Error ? error.message : String(error)).slice(0, 200);
+    return { stdout: "{}\n", stderr: `AMC did not record this session event (${reason}); the session goes on.\n`, exitCode: 0 };
   }
 }
 

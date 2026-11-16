@@ -28,7 +28,7 @@ import {
   removeHookIntegration
 } from "../src/adapters/hookIntegration.js";
 import { forwardProviderHookEvent, hookWorkspace } from "../src/adapters/hookForwarder.js";
-import { CLAUDE_CONTROL_STATUS_MESSAGE, CLAUDE_STATUS_MESSAGE, claudeActionId } from "../src/adapters/hookProviders/claudeCode.js";
+import { CLAUDE_CONTROL_STATUS_MESSAGE, CLAUDE_OBSERVE_SESSION_HOOKS, CLAUDE_STATUS_MESSAGE, claudeActionId } from "../src/adapters/hookProviders/claudeCode.js";
 import { HOOK_CONTROL_INTEGRATION_ID, HOOK_INTEGRATION_ID } from "../src/adapters/hookProviders/installFiles.js";
 import { boundClaudeCode } from "./helpers/claudeCodeHookFixtures.js";
 import { getPublicKeyHistory } from "../src/crypto/keys.js";
@@ -211,11 +211,13 @@ describe("AMC provider hook integration", () => {
       observation: { eventTypes: string[] };
     };
     expect(manifest.v).toBe(2);
+    // Observe mode watches the whole session: the tool hooks plus every session hook, in event-name order.
     expect(manifest.handlers.map((row) => [row.eventName, row.phase])).toEqual([
       ["PostToolUse", "completed"],
       ["PostToolUseFailure", "failed"],
       ["PreToolUse", "requested"],
-    ]);
+      ...CLAUDE_OBSERVE_SESSION_HOOKS.map((eventName) => [eventName, "session-event"]),
+    ].sort((left, right) => left[0]!.localeCompare(right[0]!)));
     expect(manifest.handlers.every((row) => /^[a-f0-9]{64}$/.test(row.handlerSha256))).toBe(true);
     expect(manifest.observation.eventTypes).toEqual([
       "action.requested",
@@ -297,6 +299,8 @@ describe("AMC provider hook integration", () => {
       !group.hooks.some((handler) => String(handler.statusMessage).startsWith("AMC Observe")),
     );
     delete config.hooks.PostToolUseFailure;
+    // A v1 installation predates the session hooks too: only its PreToolUse handler is AMC's.
+    for (const eventName of CLAUDE_OBSERVE_SESSION_HOOKS) delete config.hooks[eventName];
     const configText = `${JSON.stringify(config, null, 2)}\n`;
     writeFileSync(paths.config, configText, "utf8");
     const preToolHandler = v2.handlers.find((row: { eventName: string }) => row.eventName === "PreToolUse");
@@ -330,7 +334,7 @@ describe("AMC provider hook integration", () => {
     expect(readFileSync(paths.token, "utf8")).toBe(leaseBefore);
     const migratedManifest = readJson(paths.manifest) as { v: number; handlers: unknown[] };
     expect(migratedManifest.v).toBe(2);
-    expect(migratedManifest.handlers).toHaveLength(3);
+    expect(migratedManifest.handlers).toHaveLength(3 + CLAUDE_OBSERVE_SESSION_HOOKS.length);
     const migratedConfig = readJson(paths.config) as {
       hooks: Record<string, Array<{ hooks: Array<Record<string, unknown>> }>>;
     };
@@ -1316,7 +1320,7 @@ describe("AMC Pi hook installation (P1-22)", () => {
     expect(manifest).toMatchObject({
       provider: "pi", mode: "control", extensionPath: ".pi/extensions/amc.js", modulePath: piModule,
       extensionSha256: sha256Hex(readFileSync(files.extension)), moduleSha256: sha256Hex(readFileSync(piModule)),
-      createdDirs: [".pi", ".pi/extensions"], qualifiedPiVersions: ["1.0.2", "1.0.4"],
+      createdDirs: [".pi", ".pi/extensions"], qualifiedPiVersions: ["1.0.2", "1.0.4", "1.5.2"],
       receiptPublicKeys: getPurposeKeyHistory(workspace, "receipt"),
       piInstall: { packageDir: piPackageDir, version: "1.0.4", sha256: expect.stringMatching(/^[a-f0-9]{64}$/) },
       control: { endpoint: "/hooks/control/v1", leaseScope: "hook:control", providerOutcomes: ["allow", "deny", "ask"] },

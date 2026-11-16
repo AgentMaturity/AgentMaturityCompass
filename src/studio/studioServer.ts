@@ -327,6 +327,7 @@ import { schedulerTickAsync } from "../forecast/forecastPublication.js";
 import { verifyForecastPolicySignature } from "../forecast/forecastStore.js";
 import { renderForecastMarkdown } from "../forecast/forecastReports.js";
 import { handleBridgeRequest } from "../bridge/bridgeServer.js";
+import { handleOtlpHttp, isOtlpPath } from "../watch/otlpReceiver.js";
 import { createBridgePairingCode, redeemBridgePairingCode } from "../bridge/bridgeAuth.js";
 import { buildHealthPayload } from "../api/health.js";
 import { closeScoreSessionStores } from "../api/scoreStore.js";
@@ -1361,12 +1362,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           req,
           res,
           authenticate,
-          requireRoles: (params) => requireRoles({
-            auth: params.auth as AuthContext,
-            res: params.res,
-            workspace: params.workspace,
-            roles: params.roles as UserRole[]
-          }),
+          requireRoles: (params) => requireRoles({ auth: params.auth as AuthContext, res: params.res, workspace: params.workspace, roles: params.roles as UserRole[] }),
           json,
           apiLimiter,
           privilegedApiLimiter,
@@ -1439,6 +1435,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         return;
       }
+
+      // OTLP/HTTP export from an agent runtime (loopback, observe lease): rows are recorded as self-reported.
+      if (isOtlpPath(pathname)) return void await handleOtlpHttp({ workspace: options.workspace, req, res, url, pathname });
 
       if (pathname.startsWith("/bridge/")) {
         const state = readStudioState(options.workspace);

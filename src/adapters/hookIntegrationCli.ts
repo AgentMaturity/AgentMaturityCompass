@@ -29,6 +29,7 @@ import { readStdinAll, runHookForward, type HookForwardOptions } from "./hookFor
 export { runHookForward } from "./hookForwarder.js";
 import { inspectHookActionLifecycle } from "../watch/hookActionLifecycle.js";
 import { inspectHookHealth } from "../watch/hookHealthDiagnostics.js";
+import { claudeCodeOnPathIssue } from "../watch/hookReleaseCheck.js";
 
 function printControlVerification(control: ClaudeControlVerification): void {
   console.log((control.verified ? chalk.green : chalk.red)(control.summary));
@@ -159,7 +160,9 @@ export function registerHookIntegrationCommands(
     .action(async (opts: { provider: HookProvider; json: boolean }) => {
       const found = getHookIntegrationStatus({ workspace: process.cwd(), provider: opts.provider });
       const bridgeIssues = hookBridgeIssues(process.cwd(), { manifestPath: found.files.manifest, manifestValid: found.manifestValid, provider: found.provider, mode: found.mode });
-      const status = { ...found, issues: [...found.issues, ...bridgeIssues] };
+      // A Claude Code that updated itself after the install: control denies its calls; say so and name observe mode.
+      const onPath = found.provider === "claude-code" && found.mode === "control" ? claudeCodeOnPathIssue() : null;
+      const status = { ...found, issues: [...found.issues, ...bridgeIssues, ...(onPath && !found.issues.includes(onPath) ? [onPath] : [])] };
       const control = status.provider === "claude-code" && status.mode === "control"
         ? await verifyClaudeControl({ workspace: process.cwd() })
         : null;

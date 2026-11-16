@@ -37,6 +37,7 @@ export interface NormalizedSpan {
   model?: string;
   provider?: string;
   tokenUsage?: { prompt: number; completion: number; total: number };
+  tokenDetails?: { cacheRead?: number; cacheWrite?: number; reasoning?: number }; // as reported; never added to input or output
   /** Measured total when the provider did not report both token components. */
   reportedTotalTokens?: number;
   costUsd?: number;
@@ -73,7 +74,7 @@ export interface NormalizedTrace {
 
 /* ── Provider adapter interface ──────────────────────────────────── */
 
-export type ObservabilityProvider = "otlp" | "langfuse" | "helicone" | "datadog" | "webhook";
+export type ObservabilityProvider = "trace-query" | "otlp" | "langfuse" | "helicone" | "datadog" | "webhook"; // otlp: trace-query's old name
 
 export interface ProviderConfig {
   provider: ObservabilityProvider;
@@ -94,10 +95,10 @@ export interface ProviderAdapter {
   isConnected(): boolean;
 }
 
-/* ── OTLP Adapter (OpenTelemetry Protocol) ───────────────────────── */
+/* ── Trace-query adapter: polls a backend that stores OTLP traces (OTLP itself has no GET; AMC's receiver is otlpReceiver.ts) ── */
 
 export class OTLPAdapter implements ProviderAdapter {
-  readonly provider: ObservabilityProvider = "otlp";
+  readonly provider: ObservabilityProvider = "trace-query";
   private config: ProviderConfig | null = null;
   private connected = false;
   private cursor: number = 0;
@@ -209,8 +210,7 @@ export class OTLPAdapter implements ProviderAdapter {
     const attrs = attrMap(span.attributes ?? []);
     const startNano = Number(span.startTimeUnixNano ?? 0);
     const endNano = Number(span.endTimeUnixNano ?? 0);
-    const startMs = startNano / 1_000_000;
-    const endMs = endNano / 1_000_000;
+    const startMs = startNano / 1_000_000, endMs = endNano / 1_000_000;
     const model = attrs["gen_ai.request.model"] ?? attrs["llm.model"] ?? attrs["ai.model"];
     const usage = attributeUsage(model, attrs);
     const kind = classifySpanKind(span.name, attrs);
@@ -230,7 +230,7 @@ export class OTLPAdapter implements ProviderAdapter {
       durationMs: endMs - startMs,
       status,
       model,
-      provider: attrs["gen_ai.system"] ?? attrs["llm.provider"],
+      provider: attrs["gen_ai.provider.name"] ?? attrs["gen_ai.system"] ?? attrs["llm.provider"],
       ...usage,
       error: status === "error" ? { type: span.status?.message ?? "error", message: attrs["exception.message"] ?? span.status?.message ?? "unknown" } : undefined,
       toolName: attrs["tool.name"] ?? attrs["gen_ai.tool.name"],
@@ -848,7 +848,7 @@ export class ObservabilityBridge extends EventEmitter {
             auditType: "OBSERVABILITY_BRIDGE_INGEST",
             traceId: trace.traceId,
             agentId: this.config.agentId,
-            trustTier: "OBSERVED",
+            trustTier: "SELF_REPORTED", // what an outside backend reports; AMC did not see the calls
           },
         });
       }
@@ -865,7 +865,7 @@ export class ObservabilityBridge extends EventEmitter {
 
 export function createProviderAdapter(provider: ObservabilityProvider): ProviderAdapter {
   switch (provider) {
-    case "otlp": return new OTLPAdapter();
+    case "trace-query": case "otlp": return new OTLPAdapter();
     case "langfuse": return new LangfuseAdapter();
     case "helicone": return new HeliconeAdapter();
     case "datadog": return new DatadogAdapter() as ProviderAdapter;
@@ -890,7 +890,7 @@ function classifySpanKind(name: string, attrs: Record<string, string | undefined
   if (n.includes("guard") || n.includes("shield") || n.includes("safety")) return "guard";
   if (n.includes("chain") || n.includes("sequence") || n.includes("pipeline")) return "chain";
   if (n.includes("agent") || n.includes("step")) return "agent_step";
-  if (attrs["gen_ai.system"] || attrs["llm.provider"]) return "llm_call";
+  if (attrs["gen_ai.provider.name"] || attrs["gen_ai.system"] || attrs["llm.provider"]) return "llm_call";
   return "unknown";
 }
 

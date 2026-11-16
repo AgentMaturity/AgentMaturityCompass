@@ -2,7 +2,8 @@
  * `amc connect hooks install|status|remove --provider codex` (P2-17), observe mode only.
  *
  * Codex 0.165.0's PreToolUse fails open (docs/source-reviews/P2-17-codex-hooks.md), so AMC installs no control hook.
- * The installer writes `.codex/hooks.json` with one PostToolUse command hook that runs AMC's forwarder
+ * The installer writes `.codex/hooks.json` with a PostToolUse command hook, and one for each session hook Codex documents
+ * (sessionObservations.ts SESSION_EVENTS, recorded leniently as Codex's own word), all running AMC's forwarder
  * (codexObserveForwarder.ts), plus the signed manifest, the dedicated observe lease and the .gitignore block the
  * other providers use. It refuses to touch a `.codex/hooks.json` it did not write. Codex runs a project hook only after
  * the user trusts it (its trusted hash), so nothing is observed until then. Claim: "observed" only.
@@ -19,6 +20,7 @@ import { verifyManagedLease } from "../managedHookLease.js";
 import { codexLostObservationsPath } from "../codex/codexObserveForwarder.js";
 import { escapeTerminalControls } from "../../tools/builtin/askUserTool.js";
 import { stableNodePath } from "./nodePath.js";
+import { SESSION_EVENTS } from "../../bridge/sessionObservations.js";
 import {
   addManagedIgnoreBlock, assertAllPathsSafe, fileChange, HOOK_INTEGRATION_ID, HOOK_TOKEN_MODE, HookIntegrationError, hasManagedIgnoreBlock,
   ignoreBlockHash, leaseManifestFields, loadSignedHookManifest, managedLeaseStatus, obtainHookLease, parseInstallOptions, relativePortable, removeDirIfEmpty, removeInstallationFiles, restore, snapshot, withInstallLock,
@@ -34,7 +36,7 @@ import {
 export const CODEX_NEXT_STEPS: readonly string[] = Object.freeze([
   "sign in to Codex if you have not: codex login (AMC never sees or stores the sign-in)",
   "start codex in this folder and trust the folder when Codex asks",
-  "in Codex, run /hooks and trust the hook labelled \"AMC records this tool call\"",
+  "in Codex, run /hooks and trust the hooks labelled \"AMC records this tool call\" and \"AMC records this session event\"",
   "run a task in Codex; each tool call it reports is then recorded by AMC as observed"
 ]);
 
@@ -71,10 +73,21 @@ function codexPaths(workspace: string) {
     signature: `${base}.json.sig`, lock: `${base}.lock` };
 }
 
+/** Whether `.codex/hooks.json` names every session hook AMC installs (an install made before AMC observed sessions does not). */
+function sessionHooksInstalled(configPath: string): boolean {
+  try {
+    const hooks = (JSON.parse(readFileSync(configPath, "utf8")) as { hooks?: Record<string, unknown> }).hooks ?? {};
+    return SESSION_EVENTS.codex.every((event) => Object.hasOwn(hooks, event));
+  } catch {
+    return false;
+  }
+}
+
 const LIMITATIONS = [
   "observation only: Codex's PreToolUse lets a call run when its hook fails, so AMC controls no Codex call",
   "Codex runs this project hook only after you trust it in Codex; nothing is observed until then",
   "AMC records what Codex reports at PostToolUse (digests of input and output, never their contents); calls Codex does not report are not covered",
+  "AMC records Codex's session hooks (start and end, prompts as digests, turn ends, sub-agents, compaction, interrupts) as Codex's own report; a payload AMC cannot read is recorded as unreadable",
 ];
 
 /** One shell word for `$SHELL -lc`: single-quoted; a path holding a single quote or a control character is refused. */
@@ -83,11 +96,16 @@ function shellWord(value: string): string {
   return `'${value}'`;
 }
 
-/** `.codex/hooks.json` (Codex HooksFile): one PostToolUse command hook for every tool, running AMC's forwarder. */
+/**
+ * `.codex/hooks.json` (Codex HooksFile): a PostToolUse command hook for every tool and one per session hook, running AMC's
+ * forwarder. SessionEnd and Interrupt allow Codex at most 3 seconds (https://learn.chatgpt.com/docs/hooks, read 2026-11-16).
+ */
 function hooksFile(workspace: string, forwarderPath: string): Buffer {
   const command = [stableNodePath(), forwarderPath, workspace].map(shellWord).join(" ");
+  const session = Object.fromEntries(SESSION_EVENTS.codex.map((event) => [event, [{ hooks: [{ type: "command", command,
+    timeout: event === "SessionEnd" || event === "Interrupt" ? 3 : 10, statusMessage: "AMC records this session event" }] }]]));
   const file = { description: "AMC managed observation hook; written by `amc connect hooks install --provider codex`. Do not edit.",
-    hooks: { PostToolUse: [{ hooks: [{ type: "command", command, timeout: 10, statusMessage: "AMC records this tool call" }] }] } };
+    hooks: { PostToolUse: [{ hooks: [{ type: "command", command, timeout: 10, statusMessage: "AMC records this tool call" }] }], ...session } };
   return Buffer.from(`${JSON.stringify(file, null, 2)}\n`, "utf8");
 }
 
@@ -193,6 +211,10 @@ export function codexHookStatus(workspaceInput: string): HookIntegrationStatus {
   }
   const configOwned = manifest !== null && fileSha(paths.config) === manifest.configSha256;
   if (manifest && !configOwned) issues.push(".codex/hooks.json is missing or changed after installation");
+  if (configOwned && !sessionHooksInstalled(paths.config)) {
+    issues.push("installed without the session hooks (session start and end, prompts, sub-agents, compaction); "
+      + "run `amc connect hooks install --provider codex` again to observe whole sessions");
+  }
   const forwarderMissing = manifest !== null && !existsSync(manifest.forwarderPath);
   if (forwarderMissing) issues.push("AMC's Codex forwarder is missing; build or reinstall AMC");
   const ignoreProtected = hasManagedIgnoreBlock(existsSync(paths.ignore) ? readFileSync(paths.ignore, "utf8") : null);
