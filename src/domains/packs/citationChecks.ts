@@ -118,8 +118,14 @@ export function citationCheckSummary(pack: Parameters<typeof packCitations>[0], 
 export function citationCheckLine(summary: Omit<CitationCheckSummary, "citations">): string {
   const parts = [`${summary.checked} of ${summary.total} citations checked`];
   if (summary.checkedByAiAgent > 0) parts.push(`${summary.checkedByAiAgent} of them by an AI agent, not an expert review`);
-  for (const [state, label] of [["expired", "check expired"], ["unverifiable", "source could not be opened"], ["superseded", "instrument replaced"], ["wrong", "marked wrong"]] as const) {
-    if (summary.counts[state] > 0) parts.push(`${summary.counts[state]} ${label}`);
+  for (const [state, one, many] of [
+    ["expired", "check expired", "checks expired"],
+    ["unverifiable", "source could not be opened", "sources could not be opened"],
+    ["superseded", "instrument replaced", "instruments replaced"],
+    ["wrong", "marked wrong", "marked wrong"],
+  ] as const) {
+    const n = summary.counts[state];
+    if (n > 0) parts.push(`${n} ${n === 1 ? one : many}`);
   }
   return parts.join("; ");
 }

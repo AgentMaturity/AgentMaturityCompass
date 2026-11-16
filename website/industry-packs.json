@@ -962,8 +962,7 @@
       "GSMA Mobile Money Guidelines",
       "FATF Recommendation 1 (Risk-Based Approach)",
       "IFC Performance Standards",
-      "UNHCR Guidelines on Financial Inclusion",
-      "EU Microfinance Reg §3"
+      "UNHCR Guidelines on Financial Inclusion"
      ],
      "risks": [
       "Predatory lending through AI-optimized high-interest microloans",
@@ -980,7 +979,7 @@
      "riskTier": "very-high",
      "questions": 18,
      "rules": [
-      "SEC ESG Disclosure Rules",
+      "SEC climate disclosure rule, Release 33-11275 (stayed 4 April 2024, defense ended 27 March 2025)",
       "EU Taxonomy Regulation 2020/852",
       "GRI Standards 201-207",
       "SASB Standards",
@@ -1005,11 +1004,10 @@
      "rules": [
       "MiCA Regulation 2023/1114",
       "FATF VA/VASP Guidelines (2021)",
-      "SEC Howey Test Framework",
       "ISO/TC 307 Blockchain Standards",
       "BIS CPMI Guidance on Stablecoins",
       "IOSCO Policy Recommendations for Crypto",
-      "AML/KYC Requirements (5AMLD/6AMLD)"
+      "Directive (EU) 2018/843 (5AMLD) and Regulation (EU) 2024/1624 (AMLR, applies from 10 July 2027)"
      ],
      "risks": [
       "Smart contract exploitation through AI-discovered vulnerabilities",

@@ -52,4 +52,11 @@ describe("Industry Pack citation check records", () => {
     expect(line).toMatch(/^2 of \d+ citations checked; 2 of them by an AI agent, not an expert review$/);
     expect(line).not.toMatch(/verified|approved|compliant/i);
   });
+
+  it("describe uses the singular for one and the plural for several", () => {
+    const counts = { checked: 0, "not-checked": 0, expired: 0, wrong: 0, unverifiable: 0, superseded: 0 };
+    const line = (n: number) => citationCheckLine({ total: 10, checked: 0, checkedByAiAgent: 0, counts: { ...counts, unverifiable: n, expired: n, superseded: n } });
+    expect(line(1)).toBe("0 of 10 citations checked; 1 check expired; 1 source could not be opened; 1 instrument replaced");
+    expect(line(9)).toBe("0 of 10 citations checked; 9 checks expired; 9 sources could not be opened; 9 instruments replaced");
+  });
 });
