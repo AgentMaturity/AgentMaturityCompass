@@ -236,7 +236,7 @@ function providerHookSpecs(provider: ConfigHookProvider, mode: HookMode = "contr
           { eventName: "Stop", phase: "turn-end", eventType: null },
           { eventName: "UserPromptSubmit", phase: "prompt-submit", eventType: null },
         ] as const : CLAUDE_OBSERVE_SESSION_HOOKS.map((eventName) => ({ eventName, phase: "session-event" as const, eventType: null }))),
-      ]
+      ].sort((left, right) => left.eventName.localeCompare(right.eventName)) // bindings are compared in event-name order
     : [
         { eventName: "AfterTool", phase: "completed-or-failed", eventType: "action.completed" },
         { eventName: "BeforeTool", phase: "requested", eventType: "action.requested" },
