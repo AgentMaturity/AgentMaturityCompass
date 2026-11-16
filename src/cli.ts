@@ -15927,11 +15927,10 @@ const drift = program.command("drift").description("Drift/regression detection a
 drift
   .command("check")
   .option("--agent <agentId>", "agent ID")
-  .option("--against <kind>", "previous (the last two scored runs) or observed (gateway replies and hook reports AMC recorded)", "previous")
+  .addOption(new Option("--against <kind>", "previous (the last two scored runs) or observed (gateway replies and hook reports AMC recorded)").choices(["previous", "observed"]).default("previous"))
   .option("--window <window>", "with --against observed: how far back to read, for example 24h or 7d", "7d")
   .option("--json", "with --against observed: JSON output", false)
   .action(async (opts: { agent?: string; against?: string; window: string; json: boolean }) => {
-    if (opts.against !== "previous" && opts.against !== "observed") { console.error(`--against must be previous or observed, not ${JSON.stringify(opts.against)}.`); process.exit(1); }
     if (opts.against === "observed") process.exit((await import("./watch/observedChangeCli.js")).printObservedDriftCheck({ workspace: process.cwd(), agentId: opts.agent ?? activeAgent(program), window: opts.window, json: opts.json }));
     const result = await driftCheckCli({ workspace: process.cwd(), agentId: opts.agent ?? activeAgent(program), against: "previous" });
     console.log(JSON.stringify(result, null, 2));
