@@ -224,10 +224,10 @@ export async function handleOtlpHttp(options: { workspace: string; req: Incoming
   const { req, res, workspace } = options;
   const signal = SIGNALS[options.pathname]!;
   const refuse = (status: number, message: string): true => answer(res, status, { code: status, message });
-  if ((req.method ?? "GET").toUpperCase() !== "POST") return refuse(405, "OTLP export is a POST; AMC's receiver answers nothing else on this path.");
   if (!isLoopback(req.socket.remoteAddress)) return refuse(403, "AMC's OTLP receiver accepts requests from this machine only.");
   const auth = verifyBridgeLease({ workspace, requestUrl: options.url, headers: req.headers, routePath: `${OTLP_LEASE_ROUTE}${options.pathname}`, requiredScope: "hook:observe" });
   if (!auth.ok || !auth.payload) return refuse(401, "Unauthorized");
+  if ((req.method ?? "GET").toUpperCase() !== "POST") return refuse(405, "OTLP export is a POST; AMC's receiver answers nothing else on this path.");
   const type = String(req.headers["content-type"] ?? "");
   if (!/^application\/json\b/i.test(type)) {
     return refuse(415, "AMC's OTLP receiver reads JSON only. Set OTEL_EXPORTER_OTLP_PROTOCOL=http/json in the agent's environment.");
