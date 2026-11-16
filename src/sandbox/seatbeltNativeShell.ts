@@ -3,9 +3,11 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { runProcess } from "../exec/runProcess.js";
 import { admitWritableDirectory, within } from "./bwrapBackend.js";
-import { startShellEgressProxy, type ShellEgressProxy } from "./egress/shellEgressProxy.js";
+import { EgressUnavailable, proxyEnvironment, startPolicyEgress, withRefusals } from "./egress/sessionEgress.js";
+import type { ShellEgressProxy } from "./egress/shellEgressProxy.js";
 import { PROCESS_LIMIT_LIMITATION, ROOT_PROCESS_LIMIT_LIMITATION, processLimit, withProcessLimit } from "./processCap.js";
 import { realOrLiteral, sbplString } from "./seatbeltBackend.js";
+import { SEATBELT_NO_OUTSIDE_HELPERS, seatbeltNetworkRules } from "./seatbeltRules.js";
 import { shellSecretPaths } from "./shellSecretPaths.js";
 import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTypes.js";
 
@@ -34,13 +36,6 @@ import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTyp
  * and the outcome is not confined.
  */
 const SANDBOX_EXEC = "/usr/bin/sandbox-exec";
-
-/** The only Mach services the shell may look up: temp-dir helper, logging, notifications, user and group lookups. */
-export const MACOS_MACH_SERVICES = ["com.apple.bsd.dirhelper", "com.apple.logd", "com.apple.system.notification_center",
-  "com.apple.system.opendirectoryd.libinfo", "com.apple.system.opendirectoryd.membership"] as const;
-
-/** Launchers denied by path as well, in case a later macOS reaches them without a Mach lookup. */
-const LAUNCHERS = ["/usr/bin/open", "/usr/bin/osascript", "/bin/launchctl", "/usr/bin/at"] as const;
 
 // `true`, not `:`: a failed redirection on a special builtin ends a POSIX shell such as dash.
 const PROBE_WRAPPER = '{ true >"$1"; } 2>/dev/null && exit 125; true >"$2" || exit 125; shift 2; exec "$@"';
@@ -89,18 +84,12 @@ export function buildSeatbeltShellProfile(input: SeatbeltShellProfileInput): str
     ]),
     ";; A hard link in a writable root to an outside file would write through to it.",
     "(deny file-link)",
-    "(deny network*)",
-    ...(input.proxyPort === null ? [] : [`(allow network-outbound (remote ip "localhost:${input.proxyPort}"))`]),
-    ";; Nothing may ask launchd, LaunchServices or another app to start a process outside this profile.",
-    "(deny mach-lookup)",
-    `(allow mach-lookup (global-name ${MACOS_MACH_SERVICES.map(name => `"${name}"`).join(" ")}))`,
-    "(deny lsopen)",
-    "(deny appleevent-send)",
-    "(deny job-creation)",
+    ...seatbeltNetworkRules(input.proxyPort),
+    ...SEATBELT_NO_OUTSIDE_HELPERS.slice(0, 6),
     "(deny signal (target others))",
     "(allow signal (target pgrp))",
     "(deny process-info* (target others))",
-    `(deny process-exec ${LAUNCHERS.map(path => `(literal "${path}")`).join(" ")})`,
+    SEATBELT_NO_OUTSIDE_HELPERS[6]!,
     ";; Host state outside the write grants: named POSIX shared memory and System V IPC outlive the shell and reach other processes. The kernel still lets a System V segment be created; attaching it is denied.",
     "(deny ipc-posix-shm-write-create ipc-posix-shm-write-data ipc-posix-shm-write-unlink)",
     "(deny ipc-sysv*)",
@@ -159,12 +148,9 @@ export function seatbeltNativeShell(): SandboxBackend {
         mkdirSync(privateTmp, { mode: 0o700 });
         const denied = [...shellSecretPaths(), ...(policy.readDeny ?? [])].map(realOrLiteral);
         const env: Record<string, string> = { PATH: process.env["PATH"] ?? "/usr/bin:/bin", HOME: privateTmp, TMPDIR: privateTmp, LANG: "en_US.UTF-8" };
-        if (policy.allowHosts && policy.onEgress && policy.egressScope) {
-          proxy = await startShellEgressProxy({ allowHosts: policy.allowHosts, record: policy.onEgress, ...policy.egressScope });
-          for (const name of ["HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY"]) env[name] = env[name.toLowerCase()] = proxy.url;
-          // Node's fetch ignores the proxy variables unless told to read them; it would connect directly and be denied.
-          env["NODE_USE_ENV_PROXY"] = "1";
-        }
+        try { proxy = await startPolicyEgress(policy) ?? undefined; }
+        catch (error) { return declined(error instanceof EgressUnavailable ? error.message : "AMC's network filter could not start; nothing was run."); }
+        if (proxy?.url) Object.assign(env, proxyEnvironment(proxy.url));
         const profilePath = join(launcher, "profile.sb");
         writeFileSync(profilePath, buildSeatbeltShellProfile({ workspace, writableRoots, privateTmp, denied, proxyPort: proxy?.port ?? null }), { mode: 0o600 });
         const limit = policy.maxProcesses === undefined ? null : processLimit(policy.maxProcesses);
@@ -187,7 +173,7 @@ export function seatbeltNativeShell(): SandboxBackend {
           failure: !applied ? { kind: "runner-failure", reason: "Seatbelt did not confirm the profile before the command; the command did not run under it and no unconfined fallback was attempted." }
             : !outcome.treeExitProven ? { kind: "runner-failure", reason: "The launcher exited but process-group cleanup could not be confirmed." } : null,
           exitCode: applied ? outcome.exitCode : null, timedOut: outcome.terminatedBy === "timeout", cancelled: outcome.terminatedBy === "cancel",
-          stdout: outcome.stdout.text, stderr: outcome.stderr.text, writableRoots: applied ? writableRoots : [],
+          stdout: outcome.stdout.text, stderr: withRefusals(outcome.stderr.text, proxy ?? null), writableRoots: applied ? writableRoots : [],
           treeExitProven: outcome.treeExitProven, droppedBytes: outcome.stdout.droppedBytes + outcome.stderr.droppedBytes,
           ...(applied ? { enforcement: {
             boundary: "macos-seatbelt" as const, hostWrites: "declared-roots-only" as const, reads: "open-except-denylist" as const,

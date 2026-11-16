@@ -20,11 +20,17 @@ const stableServerIdSchema = z.string()
   .max(160)
   .regex(/^[a-z0-9][a-z0-9._:/-]*$/, "must be a lowercase stable identifier");
 
-/** A lowercase host name, a `.suffix` or an IP literal without a zone; never a wildcard, port or URL. */
-const egressHostSchema = z.string().min(1).max(253).refine(
-  host => (isIP(host) !== 0 && !host.includes("%")) || /^\.?(?:[a-z0-9-]+\.)*[a-z0-9-]+$/.test(host),
-  "egress hosts are lowercase names, .suffix entries or IP literals"
-);
+/**
+ * A lowercase host name, a `.suffix` or an IP literal without a zone, optionally with `:port` (`[v6]:port` for IPv6);
+ * never a wildcard or URL. An entry without a port covers only the default port (80 for http, 443 for https).
+ */
+const egressHostSchema = z.string().min(1).max(253).refine(entry => {
+  if (isIP(entry) !== 0) return !entry.includes("%");
+  const match = /^(\[[0-9a-f:.]+\]|[^:[\]]+)(?::(\d{1,5}))?$/.exec(entry);
+  if (!match || (match[2] !== undefined && (Number(match[2]) < 1 || Number(match[2]) > 65_535))) return false;
+  const host = match[1]!;
+  return host.startsWith("[") ? match[2] !== undefined && isIP(host.slice(1, -1)) === 6 : isIP(host) === 4 || /^\.?(?:[a-z0-9-]+\.)*[a-z0-9-]+$/.test(host);
+}, "egress hosts are lowercase names, .suffix entries or IP literals, each optionally with :port");
 
 export const toolContextSchema = z.discriminatedUnion("kind", [
   z.object({

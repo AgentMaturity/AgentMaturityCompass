@@ -35,7 +35,7 @@ export interface SandboxPolicy {
   readonly writableRoots: readonly string[];
   /** Wall-clock limit for the confined command. */
   readonly timeoutMs: number;
-  /** Native shells deny direct networking; `allowHosts` is the only, proxied exception. */
+  /** Confined commands have no direct network; `allowHosts` is the only, proxied exception. */
   readonly network?: "deny";
   readonly signal?: AbortSignal;
   readonly scrubValues?: readonly string[];
@@ -51,6 +51,10 @@ export interface SandboxPolicy {
   readonly onEgress?: (row: ShellEgressRow) => void;
   /** Required with `allowHosts`: the workspace and agent each proxied connection is checked for (checkEgress). */
   readonly egressScope?: { readonly workspace: string; readonly agentId: string };
+  /** Per-session lists that can only shrink `allowHosts` (src/sandbox/egress/sessionEgress.ts). */
+  readonly egressNarrowing?: readonly (readonly string[])[];
+  /** How a person allows a refused entry, in plain words, for the refusal message. */
+  readonly egressHowToAllow?: (entries: readonly string[]) => string;
 }
 
 /** One `NATIVE_SHELL_EGRESS` decision by the shell's egress proxy. */

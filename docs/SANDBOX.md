@@ -77,7 +77,7 @@ records `boundary`, `hostWrites`, `reads`, `network` (`denied` or
 |---|---|---|
 | Writes | Signed `writableDirectories`; private `/tmp` and `/dev` | Signed `writableDirectories`, a private per-call `TMPDIR` (also `HOME`), `/dev/null` |
 | Reads (`reads`) | Runtime roots and the workspace, read-only; `.amc`, workspace `readDeny` paths and the deny-list's paths inside the workspace masked (`workspace-ro-and-runtime`) | Everything your user can read, except the deny-list below (`open-except-denylist`) |
-| Network | Denied: separate network namespace and a seccomp socket filter | Denied, Unix sockets included; with a signed egress allowlist, only AMC's per-call proxy |
+| Network | Denied: separate network namespace and a seccomp socket filter; with a signed egress allowlist, only AMC's per-call proxy, through a relay inside the namespace (not yet run on Linux) | Denied, Unix sockets included; with a signed egress allowlist, only AMC's per-call proxy |
 | Processes | RLIMIT_NPROC of your process count at launch plus `maxProcesses` (default 256) | Same |
 | Escape | Process-group kill at the deadline or on cancel | Same |
 
@@ -137,9 +137,16 @@ Network and IPC namespaces are separate, capabilities are dropped, nested user
 namespaces are disabled, and a seccomp filter denies socket creation/connection
 and io_uring entry points, including alternate syscall ABIs. Socket egress is
 denied even if other network tools have a signed host allowlist; use the governed
-network tools for those operations. A signed `nativeSandbox.egress` is refused
-on Linux: its in-namespace relay needs a seccomp change that waits for review of
-[ADR-008](adr/008-native-shell-containment.md). `readDeny` paths inside the
+network tools for those operations. With a signed `nativeSandbox.egress`, the
+shell keeps its empty network namespace and runs under a small relay
+([ADR-008](adr/008-native-shell-containment.md)): AMC's proxy listens on a Unix
+socket in the launcher's private directory, bound read-only at `/amc-egress`
+with AMC's own Node binary mounted read-only by descriptor (not copied); the relay listens on 127.0.0.1 inside the
+namespace and forwards there. For that call the socket filter allows Unix, IPv4
+and IPv6 sockets only (other families and io_uring stay denied), and the launch
+is refused when the workspace holds a socket file or more than 20,000 entries to
+check for one. This Linux path is unit-tested (its arguments, its socket filter
+and the relay on macOS) but has not yet been run on Linux. `readDeny` paths inside the
 workspace are masked; other host paths are not mounted at all, and a `readDeny`
 path under the system runtime roots is refused. The paths the macOS profile
 below denies (the home credential stores, AMC's own home and secret files) are
@@ -249,13 +256,18 @@ nativeSandbox:
   writableDirectories: [workspace/output]
   egress:
     allowHosts:
-      - registry.npmjs.org   # exactly this host
+      - registry.npmjs.org   # exactly this host, ports 443 and 80
       - .github.com          # any subdomain of github.com, not github.com itself
       - 10.0.0.12            # an IP literal, required for a private address
+      - 10.0.0.12:8443       # another port needs host:port
 ```
 
-Entries are lowercase host names, `.suffix` entries or IP literals; wildcards,
-ports and URLs are refused at signing. Each shell call then starts its own HTTP
+Entries are lowercase host names, `.suffix` entries or IP literals, each with an
+optional `:port` (`[::1]:8080` for IPv6); wildcards and URLs are refused at
+signing. A host is matched lowercased and without a trailing dot. An entry
+without a port covers only the default port: 443 for HTTPS (CONNECT) and 80 for
+plain HTTP. A request whose `Host` header names another site than its target is
+refused. Each shell call then starts its own HTTP
 forward proxy (CONNECT and plain HTTP) on 127.0.0.1, protected by a per-call
 token, and passes it as `HTTP_PROXY`, `HTTPS_PROXY` and `ALL_PROXY` (and their
 lowercase forms); the token is scrubbed from output. The proxy refuses a host
@@ -264,7 +276,16 @@ if any address is loopback, link-local (including 169.254.169.254), private,
 CGNAT, documentation, benchmarking, unique-local, multicast or reserved (IPv6
 forms that carry such an IPv4 address included; 6to4 and Teredo always) unless
 that exact IP literal is listed, and
-connects only to the addresses it checked, trying each in turn. Denials answer HTTP 403. Every decision
+connects only to the addresses it checked, trying each in turn. Denials answer HTTP 403, and
+the command's error output ends with one plain line per blocked host, for example:
+
+```text
+amc: blocked a network connection to example.org port 443: example.org is not in the egress allowlist. To allow it, add "example.org" under bash, nativeSandbox, egress, allowHosts in .amc/tools.yaml, then sign the file again: amc tools sign.
+```
+
+On macOS the proxy also holds its port on `::1`, so the profile's
+`localhost:<port>` rule reaches only the proxy. If the proxy cannot start, the
+command is not run and no network is opened. Every decision
 writes a `NATIVE_SHELL_EGRESS` audit row (`callId`, `host`, `port`, `decision`,
 `reason`) before it takes effect; a row that cannot be written denies the
 connection. A CONNECT tunnel writes one more row (`reason: "connected"`,
@@ -278,8 +299,26 @@ with Node 22.23; a Node that does not know the variable ignores it, and its
 Check other tools' own proxy settings. A tool that ignores the variables, such as git over SSH, cannot
 reach the network. The gateway forward proxy uses the same host decision
 (`decideEgress`, through `resolveAndCheck`): it resolves a listed name for every
-connection and connects only to an address it checked. This is available on macOS; on Linux a signed `egress` is
-refused until the relay in ADR-008 is reviewed and built.
+connection and connects only to an address it checked. This is available on macOS and, through the relay above,
+on Linux (not yet run on a Linux host).
+
+### Narrowing the list for one session
+
+Code that governs a session may shrink the shell's list for that session only:
+`narrowSessionEgress(sessionId, hosts)` (`src/sandbox/egress/sessionEgress.ts`).
+A destination must then match the signed list and every narrowing, so a
+narrowing never adds a host, and a second call can only shrink further. It
+applies to native shell calls of that session, lasts for the AMC process, and a
+new session uses the signed list again. Nothing calls it yet.
+
+### Other confined commands (generic Seatbelt profile)
+
+On macOS, the generic sandbox runner used outside the native shell (for example
+by eval graders) also denies all networking, Unix sockets included, and limits
+Mach lookups the same way as the shell profile. A caller with a signed
+allow-list gets the same per-call proxy. It still confines writes and the
+network only: a caller asking for a read deny-list or a process cap is refused
+with nothing run.
 
 ### Windows runner prototype (P2-14)
 
