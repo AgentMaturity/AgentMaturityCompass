@@ -27,15 +27,20 @@ export interface DiagnosticReportHtmlInput {
   claim: ClaimEnvelope;
 }
 
+/** The overall (mean of layer scores), its whole level and the risk label both report views show. */
+function overallRisk(report: DiagnosticReport) {
+  const avgLayerScore = report.layerScores.length > 0
+    ? report.layerScores.reduce((sum, layer) => sum + layer.avgFinalLevel, 0) / report.layerScores.length
+    : 0;
+  const levelNum = Math.min(5, Math.floor(avgLayerScore));
+  const riskLabel = levelNum >= 4 ? "Low" : levelNum >= 3 ? "Moderate" : levelNum >= 2 ? "Elevated" : "High";
+  return { avgLayerScore, levelNum, level: `L${levelNum}`, riskLabel };
+}
+
 /** `amc report --html` and `--share`: a styled, printable page. */
 export function renderDiagnosticReportHtml(input: DiagnosticReportHtmlInput): string {
   const { report, statusExplanation } = input;
-  const avgLayerScore = report.layerScores.length > 0
-    ? report.layerScores.reduce((s: number, l: any) => s + l.avgFinalLevel, 0) / report.layerScores.length
-    : 0;
-  const levelNum = Math.min(5, Math.floor(avgLayerScore));
-  const level = `L${levelNum}`;
-  const riskLabel = levelNum >= 4 ? "Low" : levelNum >= 3 ? "Moderate" : levelNum >= 2 ? "Elevated" : "High";
+  const { avgLayerScore, levelNum, level, riskLabel } = overallRisk(report);
   const riskColor = levelNum >= 4 ? "#4AEF79" : levelNum >= 3 ? "#f59e0b" : "#ff3355";
   const date = new Date(report.ts).toISOString().split("T")[0];
   const layerRows = report.layerScores.map((l: any) => {
@@ -131,12 +136,7 @@ ${renderClaimLegend("html")}
 /** `amc report --executive`: a short board-friendly summary in the terminal. */
 export function printExecutiveSummary(input: DiagnosticReportHtmlInput): void {
   const { report, statusExplanation } = input;
-  const avgLayerScore = report.layerScores.length > 0
-    ? report.layerScores.reduce((s, l) => s + l.avgFinalLevel, 0) / report.layerScores.length
-    : 0;
-  const levelNum = Math.min(5, Math.floor(avgLayerScore));
-  const level = `L${levelNum}`;
-  const riskLabel = levelNum >= 4 ? "Low" : levelNum >= 3 ? "Moderate" : levelNum >= 2 ? "Elevated" : "High";
+  const { avgLayerScore, levelNum, level, riskLabel } = overallRisk(report);
   const riskColor = levelNum >= 4 ? chalk.green : levelNum >= 3 ? chalk.yellow : chalk.red;
   console.log(chalk.bold("\n═══════════════════════════════════════════"));
   console.log(chalk.bold("  AMC Executive Summary"));
