@@ -102,7 +102,7 @@ function starterTools(webHosts: readonly string[] = []): string {
     "# no network: without nativeSandbox.egress every connection is denied. To let it reach a package registry, add",
     "# under bash.nativeSandbox, for example:",
     "#       egress: { allowHosts: [registry.npmjs.org, pypi.org, files.pythonhosted.org] }",
-    "# then run: amc tools sign",
+    "# Each entry covers ports 443 and 80 only; write host:port for another port. Then run: amc tools sign",
     YAML.stringify(config)
   ].join("\n");
 }
@@ -281,6 +281,12 @@ function printReport(workspace: string, report: StarterProfileReport): void {
   console.log(readiness.ready ? "Readiness: ready" : `Readiness: not ready\n${readiness.blockers.map((b) => `  - ${b}`).join("\n")}`);
   console.log(`Action policy: ${readiness.actionPolicy}`);
   console.log(`Shell: ${readiness.shell.offered ? `offered, ${readiness.shell.boundary ?? "UNCONFINED"}` : "not offered"}${readiness.shell.reason ? ` (${readiness.shell.reason})` : ""}`);
+  const reads = readiness.shell.boundary === "macos-seatbelt" ? "it can still read any file your user can, except credential folders and AMC's own files"
+    : readiness.shell.boundary === "linux-bwrap" ? "it reads only the workspace and system files" : null;
+  if (reads) {
+    console.log(`  The shell writes only inside this folder (not .amc) and has no network; ${reads}. To let it reach a host, add the host`
+      + " under bash, nativeSandbox, egress, allowHosts in .amc/tools.yaml, then run: amc tools sign");
+  }
   console.log(`Monitor key fingerprint (record it outside the workspace; verification pins it): ${report.monitorFingerprint}`);
   console.log(`  export AMC_EXPECTED_MONITOR_FINGERPRINT=${report.monitorFingerprint}`);
   if (plan) {
