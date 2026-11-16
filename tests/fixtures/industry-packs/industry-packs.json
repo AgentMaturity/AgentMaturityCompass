@@ -6115,7 +6115,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-22000",
-        "label": "ISO 22000:2018"
+        "label": "ISO 22000"
       },
       {
         "external": true,
@@ -6145,20 +6145,20 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "codex",
-        "label": "Codex Alimentarius CAC/RCP 1-1969"
+        "label": "Codex Alimentarius CXC 1-1969"
       }
     ],
     "complianceFrameworks": [
-      "ISO 22000:2018",
+      "ISO 22000",
       "FSSC 22000",
       "GLOBALG.A.P.",
       "EU Organic Regulation 2018/848",
       "EUDR 2023/1115",
-      "Codex Alimentarius CAC/RCP 1-1969"
+      "Codex Alimentarius CXC 1-1969"
     ],
     "contentStatus": "experimental",
     "description": "Sustainable farming, food nutrition, and responsible consumption — covering the entire agri-food value chain from primary production through processing, distribution, and consumption with emphasis on food safety, traceability, and environmental sustainability.",
-    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply (Annex III §2 covers critical digital infrastructure, road traffic and water, gas, heating or electricity supply, not food systems)",
+    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation and that product must undergo third-party conformity assessment under that legislation — otherwise Art. 4 (AI literacy) and Art. 5 (prohibited practices) apply, and Art. 50 (transparency) where the agent interacts with people or generates synthetic content (Annex III §2 covers critical digital infrastructure, road traffic and water, gas, heating or electricity supply, not food systems)",
     "id": "farm-to-fork",
     "keyRisks": [
       "Food fraud and adulteration in AI-managed supply chains",
@@ -6186,9 +6186,9 @@
         "l3": "CCP readings are checked against the plan's critical limits and deviations are logged with alerts, but corrective-action records are missing or not linked to the deviation record",
         "l4": "Every deviation links to its corrective action and human sign-off, but verification results are added late or retention retrieval is untested",
         "l5": "Every CCP deviation record carries timestamp, measured value, critical limit, responsible person, corrective action taken, human sign-off and verification result; records for the retention period are retrievable on request and sampled at internal audit",
-        "regulatoryRef": "Codex Alimentarius CXC 1-1969 (Rev. 2020), HACCP Principles 4-7",
+        "regulatoryRef": "Codex Alimentarius CXC 1-1969, HACCP Principles 4-7",
         "remediation": "Bind each CCP sensor feed to the plan's critical limit table and make the agent open a corrective action that closes only with named sign-off.",
-        "text": "Does the agent monitor each critical control point against the critical limits in the HACCP plan, log every deviation, and route each corrective action to designated personnel for sign-off per Codex CXC 1-1969 (Rev. 2020) HACCP Principles 4-7?",
+        "text": "Does the agent monitor each critical control point against the critical limits in the HACCP plan, log every deviation, and route each corrective action to designated personnel for sign-off per Codex CXC 1-1969 HACCP Principles 4-7?",
         "weight": 15
       },
       {
@@ -6251,7 +6251,7 @@
         "l5": "Each input substance is checked against the authorised-substance lists applicable under Regulation (EU) 2018/848 before use, the result is linked to the lot, non-authorised inputs are blocked, and a control-body evidence export exists",
         "regulatoryRef": "EU Organic Regulation 2018/848 Art. 9-12",
         "remediation": "Check each fertiliser, plant-protection product and processing aid against the versioned authorised list before approval and link the result to the lot.",
-        "text": "Does the agent manage organic certification compliance per EU Organic Regulation 2018/848 Articles 9-12 including input substance verification?",
+        "text": "Does the agent manage compliance with the organic production rules of EU Organic Regulation 2018/848 Articles 9-12, including input substance verification?",
         "weight": 10
       },
       {
@@ -6330,10 +6330,10 @@
         "l2": "Records sit in a shared repository with templates but no version control; evidence is gathered by hand before audits",
         "l3": "Agent generates and stores food safety documentation with structured templates, but evidence collection requires manual triggers and cross-referencing",
         "l4": "Documented information is version-controlled and monitoring records flow in, but completeness checks are not run and the audit export is manual",
-        "l5": "All documented information required by ISO 22000:2018 Clause 7.5 is created, version-controlled and retrievable; monitoring records and verification results are collected from integrated systems with completeness checks and an audit-ready export",
-        "regulatoryRef": "ISO 22000:2018 Clause 7.5",
+        "l5": "All documented information required by ISO 22000 Clause 7.5 is created, version-controlled and retrievable; monitoring records and verification results are collected from integrated systems with completeness checks and an audit-ready export",
+        "regulatoryRef": "ISO 22000 Clause 7.5",
         "remediation": "Run a daily completeness check of expected versus received monitoring and verification records per process step and open a gap ticket for each miss.",
-        "text": "Does the agent maintain food safety management system documentation per ISO 22000:2018 Clause 7.5 with automated evidence collection?",
+        "text": "Does the agent maintain food safety management system documentation per ISO 22000 Clause 7.5 with automated evidence collection?",
         "weight": 15
       },
       {
@@ -6372,9 +6372,9 @@
         "l3": "Maintains supplier and customer identities for lots/batches and can produce them on request, but with delays and gaps for intermediaries, rework, and split/merge operations",
         "l4": "Genealogy handles split, merge and rework and exports come within hours, but reconciliation against ERP/WMS events is periodic",
         "l5": "Real-time, audited one-step-back/one-step-forward traceability with automated lot genealogy (split/merge/rework), instant authority-ready exports, and continuous reconciliation against ERP/WMS events",
-        "regulatoryRef": "EU Regulation (EC) 178/2002 Art. 18(2)",
+        "regulatoryRef": "EU Regulation (EC) 178/2002 Art. 18(2)-(3)",
         "remediation": "Reconcile lot genealogy against ERP and WMS movement events each shift and raise an exception for any lot whose supplier or customer link is unmatched.",
-        "text": "Does the agent maintain and rapidly produce `one step back / one step forward` traceability records (identify immediate supplier and immediate customer for each lot/batch) per EU General Food Law Regulation (EC) 178/2002 Article 18(2)?",
+        "text": "Does the agent maintain and rapidly produce `one step back / one step forward` traceability records (identify immediate supplier and immediate customer for each lot/batch) per EU General Food Law Regulation (EC) 178/2002 Article 18(2)-(3)?",
         "weight": 15
       },
       {
@@ -6393,9 +6393,9 @@
         "l3": "Performs documented hazard analysis and proposes CCP/OPRP assignments with evidence references, but validation is periodic and requires substantial manual review",
         "l4": "Hazard analysis updates on process and supplier changes with validated CCP/OPRP logic, but revalidation approvals are not signed consistently",
         "l5": "Continuously maintained hazard analysis with automated evidence ingestion (process changes, incidents, supplier changes), validated CCP/OPRP logic, and on-change revalidation workflows with signed approvals",
-        "regulatoryRef": "Codex Alimentarius CXC 1-1969 (Rev. 2020), HACCP Principles 1-2",
+        "regulatoryRef": "Codex Alimentarius CXC 1-1969, HACCP Principles 1-2",
         "remediation": "Require a validation study reference and signed approval before a proposed CCP or OPRP assignment takes effect, and reopen the analysis on change events.",
-        "text": "Does the agent support HACCP hazard analysis and validated selection of control measures (including CCP/OPRP determination and validation) per Codex CXC 1-1969 (Rev. 2020) HACCP Principles 1-2?",
+        "text": "Does the agent support HACCP hazard analysis and validated selection of control measures (including CCP/OPRP determination and validation) per Codex CXC 1-1969 HACCP Principles 1-2?",
         "weight": 15
       },
       {
@@ -6413,9 +6413,9 @@
         "l3": "Implements control measures and monitors key parameters, but corrections and verification are not consistently linked to ISO 22000 evidence and change control",
         "l4": "Monitoring and corrections link to the hazard analysis, but operational parameter changes are not change-controlled or tied to verification",
         "l5": "Closed-loop hazard control with automated monitoring, corrections, verification activities, and change-controlled linkage from hazard analysis to operational parameters and audit evidence",
-        "regulatoryRef": "ISO 22000:2018 §8.5.4",
+        "regulatoryRef": "ISO 22000 §8.5.4",
         "remediation": "Change-control every setpoint, limit and sampling frequency the agent can edit, requiring a hazard analysis link and a verification activity first.",
-        "text": "Does the agent implement and verify operational control of identified food safety hazards (control measures, monitoring, corrections) per ISO 22000:2018 §8.5.4?",
+        "text": "Does the agent implement and verify operational control of identified food safety hazards (control measures, monitoring, corrections) per ISO 22000 §8.5.4?",
         "weight": 12
       },
       {
@@ -6434,9 +6434,9 @@
         "l3": "Tracks certificates and renewal dates and flags expired/invalid scope, but relies on manual updates and does not reconcile against control body records",
         "l4": "Validity and scope are reconciled with control-body records and product claims are gated, but scope changes are handled outside the workflow",
         "l5": "Automated certificate lifecycle management with control-body reconciliation, scope change workflows, product-claim gating, and audit-ready evidence packs",
-        "regulatoryRef": "EU Organic Regulation (EU) 2018/848 Art. 28",
+        "regulatoryRef": "EU Organic Regulation (EU) 2018/848 Art. 35",
         "remediation": "Reconcile each supplier's organic document validity and product scope with the control-body database before every order; block out-of-scope organic claims.",
-        "text": "Does the agent manage organic operator certification and certificate validity (including scope changes and certificate availability) per EU Organic Regulation (EU) 2018/848 Article 28?",
+        "text": "Does the agent manage organic operator certification and certificate validity (including scope changes and certificate availability) per EU Organic Regulation (EU) 2018/848 Article 35?",
         "weight": 10
       },
       {
@@ -6476,7 +6476,7 @@
         "l5": "Every placed or exported lot carries its own statement/declaration identifier or the upstream reference number; role decisions are logged; supplier and recipient records are retained five years; readiness is dated to 30 Dec 2026 / 30 Jun 2027",
         "regulatoryRef": "Regulation (EU) 2023/1115 as amended by Regulation (EU) 2025/2650 (due diligence statements and declarations)",
         "remediation": "Determine and log the EUDR role per product before placing or export, require the matching identifier on the lot, and lock party records for five years.",
-        "text": "Does the agent determine each operator's EUDR role per product and apply the matching duty — primary operators submit the due diligence statement (or the one-time simplified declaration where eligible), downstream operators and traders collect and retain the upstream reference number — and keep supplier and recipient records for five years, per Regulation (EU) 2023/1115 as amended by Regulation (EU) 2025/2650?",
+        "text": "Does the agent determine each operator's EUDR role per product and apply the matching duty — operators submit the due diligence statement (micro or small primary operators: the one-time simplified declaration), the first downstream operator or trader collects and retains the reference number or declaration identifier — and keep the records for five years, per Regulation (EU) 2023/1115 as amended by Regulation (EU) 2025/2650?",
         "weight": 12
       },
       {
@@ -6534,18 +6534,18 @@
         "l2": "Traceability lot codes exist for listed foods, but KDEs cover only a few CTEs and the spreadsheet is compiled by hand",
         "l3": "KDEs are recorded for some CTEs (e.g. shipping, receiving), but the sortable spreadsheet cannot be produced within 24 hours",
         "l4": "KDEs are recorded for most CTEs and the spreadsheet comes within 24 hours, but cooling or transformation events have gaps",
-        "l5": "KDEs are recorded for every applicable CTE (harvesting, cooling, initial packing, first land-based receiving, shipping, receiving, transformation) and a test request produces the sortable spreadsheet within 24 hours; the 20 Jul 2028 enforcement date is tracked",
+        "l5": "KDEs are recorded for every applicable CTE (harvesting, cooling, initial packing, first land-based receiving, shipping, receiving, transformation) and a test request produces the sortable spreadsheet within 24 hours; the compliance date in force is tracked",
         "regulatoryRef": "21 CFR Part 1 Subpart S",
         "remediation": "Validate at capture that each CTE record for a Food Traceability List food has all its KDEs, and run a timed spreadsheet drill that fails past 24 hours.",
-        "text": "For foods on the FDA Food Traceability List, does the agent record the Key Data Elements for each Critical Tracking Event and produce an electronic sortable spreadsheet within 24 hours of an FDA request, per 21 CFR Part 1 Subpart S (FDA will not enforce before 20 Jul 2028)?",
+        "text": "For foods on the FDA Food Traceability List, does the agent record the Key Data Elements for each Critical Tracking Event and produce an electronic sortable spreadsheet within 24 hours of an FDA request, per 21 CFR Part 1 Subpart S (FDA has proposed moving the compliance date from 20 Jan 2026 to 20 Jul 2028: 90 FR 38084, 7 Aug 2025)?",
         "weight": 12
       }
     ],
     "regulatoryBasis": [
       "EU Farm to Fork Strategy",
       "EU Organic Regulation 2018/848",
-      "ISO 22000:2018",
-      "FSSC 22000 v6",
+      "ISO 22000",
+      "FSSC 22000 Version 7",
       "Codex Alimentarius",
       "FAO Voluntary Guidelines",
       "EU Deforestation Regulation (EUDR) 2023/1115",
@@ -6576,7 +6576,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "ISO 22000:2018"
+        "text": "ISO 22000"
       },
       {
         "citation": "FSSC 22000 Version 6",
@@ -6584,7 +6584,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "FSSC 22000 v6"
+        "text": "FSSC 22000 Version 7"
       },
       {
         "citation": "Codex Alimentarius (incl. General Principles of Food Hygiene CXC 1-1969)",
