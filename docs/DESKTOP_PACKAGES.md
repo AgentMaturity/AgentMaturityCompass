@@ -24,7 +24,7 @@ Each archive also contains a Studio launcher:
 
 Each launcher app verifies the included tarball digest, installs that exact AMC package into a version-pinned per-user runtime, and runs its private `amc` executable. It never falls back to an older global `amc` install. Studio binds only to loopback, on the app's own ports (below), and every launcher starts your own workspace by default, with A4 Forge on (it is on by default; only `AMC_A4_PREVIEW=0` turns it off) and the console's home page first.
 
-The native macOS build renders the Compass Console in a native WebKit window. The Windows and Linux launchers, and the macOS cross-build fallback, open the same local Studio console in the system browser. The launcher app does not bundle Electron, Chromium, WebKit content, or another browser runtime.
+The native macOS build renders the Compass Console in a native WebKit window. Each of the Windows and Linux launchers, and the macOS cross-build fallback, opens the same local Studio console in the system browser. The launcher app does not bundle Electron, Chromium, WebKit content, or another browser runtime.
 
 **Node.js.** One rule everywhere: Node.js 20 or newer (`engines.node` in package.json; the launchers read it from there when they are built). Every launcher says which `node` it picked, and refuses an older one with a message that names the version and the path it found.
 
