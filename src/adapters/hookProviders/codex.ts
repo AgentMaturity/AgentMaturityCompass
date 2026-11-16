@@ -73,6 +73,16 @@ function codexPaths(workspace: string) {
     signature: `${base}.json.sig`, lock: `${base}.lock` };
 }
 
+/** Whether `.codex/hooks.json` names every session hook AMC installs (an install made before AMC observed sessions does not). */
+function sessionHooksInstalled(configPath: string): boolean {
+  try {
+    const hooks = (JSON.parse(readFileSync(configPath, "utf8")) as { hooks?: Record<string, unknown> }).hooks ?? {};
+    return SESSION_EVENTS.codex.every((event) => Object.hasOwn(hooks, event));
+  } catch {
+    return false;
+  }
+}
+
 const LIMITATIONS = [
   "observation only: Codex's PreToolUse lets a call run when its hook fails, so AMC controls no Codex call",
   "Codex runs this project hook only after you trust it in Codex; nothing is observed until then",
@@ -181,16 +191,6 @@ export function installCodexHook(options: InstallHookIntegrationOptions, cliPath
     ], { leaseId: lease.leaseId, expiresTs: lease.expiresTs });
   };
   return options.dryRun ? execute() : withInstallLock(workspace, paths.lock, execute);
-}
-
-/** Whether `.codex/hooks.json` names every session hook AMC installs (an install made before AMC observed sessions does not). */
-function sessionHooksInstalled(configPath: string): boolean {
-  try {
-    const hooks = (JSON.parse(readFileSync(configPath, "utf8")) as { hooks?: Record<string, unknown> }).hooks ?? {};
-    return SESSION_EVENTS.codex.every((event) => Object.hasOwn(hooks, event));
-  } catch {
-    return false;
-  }
 }
 
 export function codexHookStatus(workspaceInput: string): HookIntegrationStatus {
