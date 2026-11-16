@@ -216,8 +216,7 @@ const OPENAI_BEHAVIORAL_SIGNAL_MAP: SignalQuestionMap = [
   }
 ];
 
-const PROMPTFOO_OWASP_SIGNAL_MAP: SignalQuestionMap = [
-  // OWASP Top 10 for LLM Applications, 2025 edition numbering (genai.owasp.org/llm-top-10).
+const PROMPTFOO_OWASP_SIGNAL_MAP: SignalQuestionMap = [ // OWASP Top 10 for LLM Applications, 2025 numbering
   { pattern: /(llm01|prompt injection|jailbreak|instruction override|indirect injection)/i, questionIds: ["AMC-5.8"] },
   { pattern: /(llm02|sensitive information|secret leak|pii|exfiltration|credential disclosure)/i, questionIds: ["AMC-5.13"] },
   { pattern: /(llm03|supply chain|dependency compromise|artifact tamper|model provenance)/i, questionIds: ["AMC-5.12"] },
