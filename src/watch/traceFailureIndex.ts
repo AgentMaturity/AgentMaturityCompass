@@ -9,6 +9,7 @@ import type { EpisodeRecord } from "../lifecycle/episodeRecord.js";
 import type { DiagnosticReport } from "../types.js";
 import { readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { failingStepOf, mastLabelFor, type MastLabel } from "./mastLabels.js";
 
 export type TraceFailureClass =
   | "prompt_error"
@@ -51,6 +52,10 @@ export interface TraceFailureIndexEntry {
   evidenceRefs: string[];
   rawTraceRef: string | null;
   redactedSnippet: string;
+  /** A MAST failure-mode label an AMC rule assigned (absent on older indexes and when no rule matched). */
+  mast?: MastLabel | null;
+  /** The recorded step this entry is about: AMC's step number and the line or step id in the source. */
+  failingStep?: { step: number; sourceStep: number | null } | null;
 }
 
 export interface TraceFailureCluster {
@@ -252,12 +257,13 @@ function entriesFromTraces(input: BuildTraceFailureIndexInput, runId: string): T
       const traceId = prod ? trace.traceId : trace.request_id ?? `${trace.agentId}:${trace.ts}:${trace.event}`;
       const agentId = prod ? trace.agentId : trace.agentId;
       const errorMessage = prod ? trace.errorMessage ?? "" : trace.note ?? "";
-      const outcome: TraceFailureOutcome = prod
+      const mast = mastLabelFor(trace);
+      const reported: TraceFailureOutcome = prod
         ? trace.error ? "error" : "ok"
         : /error|fail|denied|blocked|timeout/i.test(trace.note ?? "") ? "warning" : "unknown";
-      if (outcome === "ok") {
-        return null;
-      }
+      // A step that did not fail is indexed only when an AMC rule labelled it (for example a repeated call).
+      if (reported === "ok" && !mast) return null;
+      const outcome: TraceFailureOutcome = reported === "ok" ? "warning" : reported;
       const failureClass = classifyTraceFailure({
         note: prod ? JSON.stringify({ output: trace.output, metadata: trace.metadata }) : trace.note,
         errorMessage,
@@ -282,10 +288,12 @@ function entriesFromTraces(input: BuildTraceFailureIndexInput, runId: string): T
         scoreImpact,
         failureClass,
         severity: severityFor(scoreImpact),
-        reasons: [errorMessage || `Trace ${traceId} produced ${outcome}`],
+        reasons: [errorMessage || mast?.basis || `Trace ${traceId} produced ${outcome}`],
         evidenceRefs: [traceId],
         rawTraceRef: traceId,
-        redactedSnippet: redactSnippet(errorMessage || (prod ? JSON.stringify(trace.output) : trace.note ?? trace.event))
+        redactedSnippet: redactSnippet(errorMessage || mast?.basis || (prod ? JSON.stringify(trace.output) : trace.note ?? trace.event)),
+        mast,
+        failingStep: failingStepOf(trace)
       };
     })
     .filter((entry): entry is TraceFailureIndexEntry => Boolean(entry));
