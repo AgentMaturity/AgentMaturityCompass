@@ -19,19 +19,19 @@ export type EvidenceProducer = "amc-runtime" | "import" | "manual" | "external-r
  * its label here (tests/compliance/evidenceBinding.test.ts fails until every `source: "…"` literal in src is classified).
  */
 export const AMC_RUNTIME_SOURCES: ReadonlySet<string> = new Set([
-  "active", "adapter-observation", "adapters", "agent", "agents", "amc", "amc-registered", "amc.audit", "api",
+  "active", "adapter-observation", "adapters", "agents", "amc", "amc-registered", "amc.audit", "api",
   "api.score.formal-spec", "api.score.result", "api.score.run",
-  "approvals", "assurance", "audit-logs", "backoff", "backup", "both", "bridge", "budgets", "built-in-mcp-agent-provider",
+  "approvals", "assurance", "audit-logs", "backup", "bridge", "budgets", "built-in-mcp-agent-provider",
   "builtin", "catalog-only", "cli", "compliance", "correlation", "decision", "defaults", "derived", "detector",
   "diagnostic-eval-replay-corpus-boundary", "env", "eoc", "eval-replay-corpus", "eval.run.layer", "eval.run.question",
   "events", "failed-evaluation", "file", "filesystem", "firewall", "fleet", "forecast", "gateway", "hook", "hook_control",
   "host", "identity", "incident-regression", "inference-strategy-comparison", "judge-calibration", "ledger", "leases",
   "linked-recorded-request-outcomes", "live-score-behavior-drift", "local", "model", "native", "none", "ops", "ops.blobs",
-  "override-near-miss-analytics", "parent-loop", "plugin", "plugins", "policy", "project-env", "provider", "provider-drift-benchmark",
+  "override-near-miss-analytics", "parent-loop", "plugin", "plugins", "policy", "project-env", "provider-drift-benchmark",
   "redteam", "registry", "release", "replay-benchmark-corpus", "reports", "request-failure", "retention.auto",
   "risk-cost-latency-slo", "roles", "sdk", "settings", "shield.exploit_confirmation", "stdin_pipe", "studio",
   "studio-audit", "support-observation", "toolhub", "tools", "trace", "transform", "transparency", "trust", "trust-list",
-  "trust-list-history", "turn-error", "turn-events", "undeclared-runner", "user-env", "users", "validators"
+  "trust-list-history", "turn-error", "turn-events", "undeclared-runner", "users", "validators"
 ]);
 
 /** Every `meta.source` that is known not to be AMC runtime evidence. */

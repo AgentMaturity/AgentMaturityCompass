@@ -45,6 +45,8 @@ describe("evidenceProducer", () => {
     // Fail closed: a source nobody classified is unknown, never AMC runtime (and never an inherited object key).
     [{ source: "constructor" }, "unknown-source"],
     [{ source: "some_new_importer" }, "unknown-source"],
+    // Words that label something other than a ledger row never count as AMC runtime.
+    ...["agent", "provider", "backoff", "user-env", "both"].map((source): [Record<string, unknown>, string] => [{ source }, "unknown-source"]),
     [{ source: 7 }, "unknown-source"],
     [{}, "amc-runtime"]
   ];
@@ -83,6 +85,12 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   // action identity's id origin (src/bridge/hookActionIdentity.ts), an external-evidence export's producer name
   // (src/importers/externalEvidenceExport.ts) and a guardrail binding's origin (src/enforce/guardrailRuntimeBindings.ts).
   "answers.stations", "blob", "derived-request-id", "provider-call-id", "neutral-artifact", "tool-pipeline",
+  // Labels that name something other than a ledger row (vault lane review, 2026-11-16), so the reader does not count them
+  // as AMC runtime: a memory item's author (src/score/memoryIntegrity.ts), where a retry delay came from
+  // (src/agent/requestRetry.ts delaySource), a credential's origin (src/credentials/credentialsSnapshot.ts) and a secret
+  // pattern's engine (src/shield/redaction/secretPatterns.ts). "none" stays runtime: the delegated child's hook-control
+  // row writes it as meta.source (src/agent/subagentRunner.ts).
+  "agent", "provider", "backoff", "user-env", "both",
   // A secret pattern's contributing engine (P2-02 hardening, src/shield/redaction/secretPatterns.ts SecretPatternSource),
   // reviewed 2026-10-18 at the codex-full merge. It labels where a redaction pattern came from, never a ledger meta.source.
   "dataflow",
