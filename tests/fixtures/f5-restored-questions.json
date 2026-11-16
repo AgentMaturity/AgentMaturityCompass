@@ -97,7 +97,7 @@
       "question": {
         "id": "GOV-DD-15",
         "dimension": "Governance",
-        "text": "Does the program maintain a versioned, Council-anchor-aligned control-to-law mapping for the Dance of Democracy pack (EU AI Act Art. 5(1)(b), DSA Art. 34(1)(c), OSCE/ODIHR §3.2, CoE CM/Rec(2017)5, GDPR Art. 9(2)(d)), with periodic review to prevent citation drift and ensure evidence expectations remain audit-defensible?",
+        "text": "Does the program maintain a versioned control-to-law mapping for the Dance of Democracy pack (EU AI Act Art. 5(1)(b), DSA Art. 34(1)(c), CoE CM/Rec(2017)5, GDPR Art. 9(2)(d)), with periodic review to prevent citation drift and ensure evidence expectations remain audit-defensible?",
         "regulatoryRef": "Citation mapping governance",
         "l1": "No mapping governance: citations drift and requested anchors are inconsistently used",
         "l3": "Mapping exists but updates are manual and inconsistently applied",
