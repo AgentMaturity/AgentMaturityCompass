@@ -151,7 +151,7 @@ export function inputGuardMode(workspace: string): { mode: InputGuardMode; unrea
   return { mode: snapshot.state?.untrustedInputGuard ?? "off", unreadable: false };
 }
 
-export const inputGuardSessionKey = (provider: string, agentId: string, sessionId: string) =>
+const inputGuardSessionKey = (provider: string, agentId: string, sessionId: string) =>
   sha256Hex(`amc-input-guard\0${provider}\0${agentId}\0${sessionId}`);
 
 const rowSchema = z.object({
@@ -169,9 +169,9 @@ function ranRows(ledger: Ledger, needle: string, since = 0): Array<z.infer<typeo
     .filter((row) => row.decision === "allow" || (row.decision === undefined && row.inputGuard.observed === true));
 }
 
-export type SessionLabels = { ok: true; untrusted: string | null; private: string | null } | { ok: false; why: string };
+type SessionLabels = { ok: true; untrusted: string | null; private: string | null } | { ok: false; why: string };
 /** A session's labels from its recorded rows alone: the first untrusted source and the first private source, or why not readable. */
-export function readSessionLabels(workspace: string, sessionKey: string | null): SessionLabels {
+function readSessionLabels(workspace: string, sessionKey: string | null): SessionLabels {
   if (sessionKey === null) return { ok: false, why: "the agent's tool named no session" };
   let ledger: Ledger | null = null;
   try {

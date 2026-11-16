@@ -22,7 +22,7 @@ export function inputGuardModeArg(raw: string | undefined): InputGuardMode {
   throw new Error(`Unknown mode "${raw}". Use one of: enforce, log-only, off.`);
 }
 
-export class InputGuardAuthorityError extends Error {
+class InputGuardAuthorityError extends Error {
   readonly code = "AUTHORIZATION" as const;
 }
 

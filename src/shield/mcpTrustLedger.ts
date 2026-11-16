@@ -187,10 +187,10 @@ export function previousHashMap(receipt: McpTrustReceipt): Record<string, string
   return map;
 }
 
-export const mcpServerKey = (entry: Pick<McpLedgerEntry, "path" | "serverName">) => entry.serverName ?? entry.path;
+const mcpServerKey = (entry: Pick<McpLedgerEntry, "path" | "serverName">) => entry.serverName ?? entry.path;
 
 /** Tools that both receipts list for the same server whose description or input schema digest differs. */
-export function changedToolsSince(entries: ReadonlyArray<Pick<McpLedgerEntry, "path" | "serverName" | "tools">>,
+function changedToolsSince(entries: ReadonlyArray<Pick<McpLedgerEntry, "path" | "serverName" | "tools">>,
   previous: ReadonlyArray<Pick<McpLedgerEntry, "path" | "serverName" | "tools">>): McpChangedTool[] {
   const known = new Map(previous.map((entry) => [mcpServerKey(entry), new Map((entry.tools ?? []).map((tool) => [tool.name, tool]))]));
   const changed: McpChangedTool[] = [];

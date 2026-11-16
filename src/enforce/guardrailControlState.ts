@@ -59,8 +59,7 @@ export type GuardrailControlErrorCode =
   | "LOCK_TIMEOUT"
   | "UNKNOWN_GUARDRAIL"
   | "UNBOUND_GUARDRAIL"
-  | "UNKNOWN_PROFILE"
-  | "AUTHORIZATION";
+  | "UNKNOWN_PROFILE";
 
 export class GuardrailControlError extends Error {
   readonly code: GuardrailControlErrorCode;
