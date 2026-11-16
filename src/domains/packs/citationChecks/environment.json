@@ -170,14 +170,14 @@
     "citation": "Regulation (EU) 2023/1115 Art. 3, as amended by Regulation (EU) 2025/2650",
     "instrument": "Regulation (EU) 2023/1115 (Deforestation Regulation) as amended by Regulation (EU) 2025/2650",
     "clause": "Art. 3; Art. 38 as amended",
-    "verdict": "verified",
-    "was": null,
-    "now": null,
+    "verdict": "corrected",
+    "was": "Regulation (EU) 2023/1115 Art. 3, as amended by Regulation (EU) 2025/2650",
+    "now": "Regulation (EU) 2023/1115 Art. 3, as amended by Regulation (EU) 2025/2650",
     "sourceTitle": "Regulation (EU) 2025/2650 amending Regulation (EU) 2023/1115, Official Journal text (Publications Office)",
     "sourceUrl": "https://publications.europa.eu/resource/celex/32025R2650",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Art. 3: deforestation-free, produced in line with the law of the country of production, covered by a due diligence statement. The amendment sets application from 30 December 2026, and 30 June 2027 for micro and small operators established by 31 December 2024; the question's shorthand 'micro and small' leaves out that date condition."
+    "note": "Citation unchanged. Art. 3: deforestation-free, produced in line with the law of the country of production, covered by a due diligence statement. Amended Art. 38(2)-(3): the obligations apply from 30 December 2026, and from 30 June 2027 for natural persons and micro or small undertakings established as such by 31 December 2024, except for products covered by the Annex to Regulation (EU) No 995/2010. The question said '30 Dec 2026 for large and medium operators and 30 Jun 2027 for micro and small'; it now states the 31 December 2024 condition and the timber exception."
   },
   {
     "packId": "farm-to-fork",
@@ -398,11 +398,11 @@
     "verdict": "corrected",
     "was": "21 CFR Part 1 Subpart S",
     "now": "21 CFR Part 1 Subpart S",
-    "sourceTitle": "eCFR, 21 CFR Part 1 Subpart S (up to date as of 2026-11-12)",
-    "sourceUrl": "https://www.ecfr.gov/api/versioner/v1/full/2026-11-12/title-21.xml?part=1&subpart=S",
+    "sourceTitle": "FDA, Challenges and Solutions in Lot-Level Food Traceability; Public Meeting, 91 FR 64656 (9 Oct 2026), FR Doc. 2026-20720; with eCFR 21 CFR Part 1 Subpart S (up to date as of 2026-11-12)",
+    "sourceUrl": "https://www.federalregister.gov/documents/full_text/text/2026/10/09/2026-20720.txt",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Citation unchanged. §1.1455(c): records within 24 hours of request, and an electronic sortable spreadsheet for the KDE information. The question said 'FDA will not enforce before 20 Jul 2028'; the Federal Register shows only a proposal (90 FR 38084, 7 August 2025) to move the compliance date from 20 January 2026 to 20 July 2028, and no final rule was found, so the question now says that and the L5 text tracks 'the compliance date in force'."
+    "note": "Citation unchanged. eCFR §1.1455(c): records within 24 hours of request, and an electronic sortable spreadsheet for the KDE information. FR Doc. 2026-20720 (91 FR 64656, 9 October 2026) states that FDA proposed moving the compliance date from 20 January 2026 to 20 July 2028 (90 FR 38084), that Pub. L. 119-37 (Continuing Appropriations Act 2026, Sec. 780) directed FDA not to enforce the Food Traceability Rule before 20 July 2028, and that FDA intends to comply. The question said 'FDA will not enforce before 20 Jul 2028' with no source; it now names Pub. L. 119-37 Sec. 780 and the proposal, and L5 tracks 'the 20 Jul 2028 enforcement date'."
   },
   {
     "packId": "weave-to-wear",
@@ -1422,7 +1422,7 @@
     "sourceUrl": "https://unfccc.int/resource/docs/2010/cop16/eng/07a01.pdf",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Citation unchanged. The Cancun safeguards do not name free, prior and informed consent; para 2(c)-(d) asks for respect for the knowledge and rights of indigenous peoples and local communities (noting UNDRIP) and their full and effective participation. The question now says that instead of 'including FPIC'."
+    "note": "Citation unchanged. The Cancun safeguards do not name free, prior and informed consent; para 2(c)-(d) asks for respect for the knowledge and rights of indigenous peoples and local communities (noting UNDRIP) and their full and effective participation. The question now says that instead of 'including FPIC'. L3 and L5 no longer credit the safeguards with FPIC: L5 describes para 2(c)-(d) and marks FPIC checks as going beyond the safeguards."
   },
   {
     "packId": "source-to-sustenance",

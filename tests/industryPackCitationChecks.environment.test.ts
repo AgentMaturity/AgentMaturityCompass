@@ -33,3 +33,25 @@ describe("environment station citation check wording", () => {
     for (const r of rows) expect(r.note).not.toMatch(/\b(pack is verified|approved|legally reviewed|compliant)\b/i);
   });
 });
+
+describe("environment station dates and duties the review corrected", () => {
+  const question = (packId: string, id: string) => environmentPacks.find((p) => p.id === packId)!.questions.find((q) => q.id === id)!;
+  const text = (packId: string, id: string) => JSON.stringify(question(packId, id));
+
+  it("states the FDA traceability enforcement date with the law that sets it", () => {
+    expect(text("farm-to-fork", "ENV-FF-18")).toMatch(/will not enforce before 20 Jul 2028, as directed by Pub\. L\. 119-37 Sec\. 780/);
+    expect(text("farm-to-fork", "ENV-FF-18")).toMatch(/the 20 Jul 2028 enforcement date is tracked/);
+  });
+
+  it("limits the EUDR micro and small date to operators established by 31 Dec 2024", () => {
+    expect(text("farm-to-fork", "ENV-FF-3")).toMatch(/micro and small operators established by 31 Dec 2024/);
+    expect(rows.find((r) => r.questionId === "ENV-FF-3")!.verdict).toBe("corrected");
+  });
+
+  it("does not credit the Cancun safeguards with FPIC", () => {
+    const q = question("source-to-sustenance", "ENV-SS-4") as unknown as Record<string, unknown>;
+    const cancun = Object.values(q).filter((v): v is string => typeof v === "string" && /Cancun/.test(v));
+    expect(cancun.length).toBeGreaterThan(0);
+    for (const value of cancun) expect(value).not.toMatch(/FPIC|including free, prior and informed consent/);
+  });
+});

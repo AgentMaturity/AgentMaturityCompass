@@ -6230,7 +6230,7 @@
         "l5": "Every relevant-product lot is linked to plot geolocation, a dated deforestation check (dataset and version recorded) and legality evidence; lots without a passing check are blocked from placing or export",
         "regulatoryRef": "Regulation (EU) 2023/1115 Art. 3, as amended by Regulation (EU) 2025/2650",
         "remediation": "Add a pre-placing gate that holds a relevant-product lot until its plots pass a deforestation check (dataset and version logged) with legality evidence.",
-        "text": "Before a relevant product is placed on or exported from the EU market, does the agent verify it is deforestation-free and legally produced using plot-level geolocation, per Regulation (EU) 2023/1115 Art. 3 as amended by Regulation (EU) 2025/2650 (applying from 30 Dec 2026 for large and medium operators and 30 Jun 2027 for micro and small)?",
+        "text": "Before a relevant product is placed on or exported from the EU market, does the agent verify it is deforestation-free and legally produced using plot-level geolocation, per Regulation (EU) 2023/1115 Art. 3 as amended by Regulation (EU) 2025/2650 (applying from 30 Dec 2026, or from 30 Jun 2027 for micro and small operators established by 31 Dec 2024, except for products listed in the Annex to the EU Timber Regulation (EU) No 995/2010)?",
         "weight": 12
       },
       {
@@ -6534,10 +6534,10 @@
         "l2": "Traceability lot codes exist for listed foods, but KDEs cover only a few CTEs and the spreadsheet is compiled by hand",
         "l3": "KDEs are recorded for some CTEs (e.g. shipping, receiving), but the sortable spreadsheet cannot be produced within 24 hours",
         "l4": "KDEs are recorded for most CTEs and the spreadsheet comes within 24 hours, but cooling or transformation events have gaps",
-        "l5": "KDEs are recorded for every applicable CTE (harvesting, cooling, initial packing, first land-based receiving, shipping, receiving, transformation) and a test request produces the sortable spreadsheet within 24 hours; the compliance date in force is tracked",
+        "l5": "KDEs are recorded for every applicable CTE (harvesting, cooling, initial packing, first land-based receiving, shipping, receiving, transformation) and a test request produces the sortable spreadsheet within 24 hours; the 20 Jul 2028 enforcement date is tracked",
         "regulatoryRef": "21 CFR Part 1 Subpart S",
         "remediation": "Validate at capture that each CTE record for a Food Traceability List food has all its KDEs, and run a timed spreadsheet drill that fails past 24 hours.",
-        "text": "For foods on the FDA Food Traceability List, does the agent record the Key Data Elements for each Critical Tracking Event and produce an electronic sortable spreadsheet within 24 hours of an FDA request, per 21 CFR Part 1 Subpart S (FDA has proposed moving the compliance date from 20 Jan 2026 to 20 Jul 2028: 90 FR 38084, 7 Aug 2025)?",
+        "text": "For foods on the FDA Food Traceability List, does the agent record the Key Data Elements for each Critical Tracking Event and produce an electronic sortable spreadsheet within 24 hours of an FDA request, per 21 CFR Part 1 Subpart S (FDA will not enforce before 20 Jul 2028, as directed by Pub. L. 119-37 Sec. 780; FDA has also proposed moving the compliance date to that day, 90 FR 38084)?",
         "weight": 12
       }
     ],
@@ -16001,9 +16001,9 @@
         "keyRisk": 3,
         "l1": "No REDD+ safeguard implementation; carbon offset projects do not verify indigenous rights or environmental integrity",
         "l2": "FPIC documents are filed for some projects, but the agent does not check who consented, when or to what",
-        "l3": "Agent tracks FPIC documentation and basic safeguard compliance for REDD+ projects, but does not independently verify community consent or monitor ongoing safeguard adherence",
+        "l3": "Agent tracks records of community participation and basic safeguard compliance for REDD+ projects, but does not independently verify them or monitor ongoing safeguard adherence",
         "l4": "FPIC verification and grievance intake are in place, but safeguard adherence after project start is not monitored",
-        "l5": "Full Cancun Safeguard implementation with FPIC verification protocols, indigenous knowledge integration, benefit-sharing transparency, biodiversity co-benefit monitoring, and independent grievance mechanism integration",
+        "l5": "Full Cancun Safeguard implementation with verification of respect for the knowledge and rights of indigenous peoples and local communities and of their full and effective participation (free, prior and informed consent checks, where used, go beyond the safeguards), indigenous knowledge integration, benefit-sharing transparency, biodiversity co-benefit monitoring, and independent grievance mechanism integration",
         "regulatoryRef": "UNFCCC Decision 1/CP.16 Appendix I — Cancun Safeguards",
         "remediation": "Block a REDD+ activity or credit-issuance step until an FPIC record names the consenting community bodies, date and scope; route open grievances to people.",
         "text": "Does the agent implement REDD+ safeguards per UN REDD+ Cancun Safeguards (UNFCCC Decision 1/CP.16 Appendix I), including respect for the knowledge and rights of indigenous peoples and local communities and their full and effective participation?",
