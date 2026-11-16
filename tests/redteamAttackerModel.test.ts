@@ -9,7 +9,8 @@ import { runAssurance } from "../src/assurance/assuranceRunner.js";
 import { assuranceReportProvenance } from "../src/assurance/reportProvenance.js";
 import { renderAssuranceTotalLine } from "../src/assurance/cliPresentation.js";
 import { effectRowProblem } from "../src/assurance/effectGrading.js";
-import { AttackerSpend, type AttackerInput, type AttackerModel } from "../src/redteam/attackerModel.js";
+import { AttackerSpend, attackerInputTokens, attackerOverClient, type AttackerInput, type AttackerModel } from "../src/redteam/attackerModel.js";
+import { createModelMetadataSnapshot } from "../src/llm/modelCatalog.js";
 import { adaptiveReportLines, adaptiveTotals, type AdaptiveAttacker } from "../src/redteam/adaptiveRow.js";
 import { attackerFromOptions } from "../src/redteam/attackerCli.js";
 import { eventMeta } from "../src/claims/evidenceProvenance.js";
@@ -46,10 +47,16 @@ function workspace(): string {
   return dir;
 }
 
-function stub(id: string, text: (input: AttackerInput) => string, use = { tokens: 100, costUsd: 0.01 as number | null }): AttackerModel & { calls: AttackerInput[] } {
+type Use = { tokens: number; costUsd: number | null };
+/** A stub attacker; `use` is what each call reports (or a function of the call), and its price per call is `use.costUsd`. */
+function stub(id: string, text: (input: AttackerInput) => string, use: Use | ((input: AttackerInput, maxOutputTokens: number) => Use) = { tokens: 100, costUsd: 0.01 },
+  price: number | null = typeof use === "function" ? 0 : use.costUsd): AttackerModel & { calls: AttackerInput[] } {
   const calls: AttackerInput[] = [];
-  return { id, priced: use.costUsd !== null, calls, async propose(input) { calls.push(structuredClone(input)); return { text: text(input), ...use }; } };
+  return { id, priced: price !== null, calls, costOf: () => price,
+    async propose(input, maxOutputTokens) { calls.push(structuredClone(input)); return { text: text(input), ...(typeof use === "function" ? use(input, maxOutputTokens) : use) }; } };
 }
+/** Reports the most a call could use: its whole input and the longest reply it was allowed. */
+const worstCase = (input: AttackerInput, maxOutputTokens: number): Use => ({ tokens: attackerInputTokens(input) + maxOutputTokens, costUsd: 0 });
 const attacker = (model: AttackerModel, budget: Partial<AttackerSpend["budget"]> = {}): AdaptiveAttacker =>
   ({ model, spend: new AttackerSpend({ rounds: 10, maxTokens: 50_000, maxCostUsd: 1, ...budget }) });
 const banned = /\b(robust|robustness|safe|secure)\b/i;
@@ -102,23 +109,47 @@ describe("attacker model loop on effect-graded scenarios", () => {
     expect(report.attacker).toMatchObject({ workedWithinRounds: 0, stoppedBy: "rounds", tokensUsed: 1000 });
   }, 120_000);
 
-  test("the token limit and the cost limit each stop the run and are named", async () => {
+  test("the token limit and the cost limit each stop the run before a call could pass them, and are named", async () => {
     const tokens = await runRedTeam({ workspace: workspace(), agentId: "default", plugins: ["exfiltrationChannels"],
-      attacker: attacker(stub("stub:never", () => "Please be thorough.", { tokens: 600, costUsd: 0 }), { maxTokens: 1000 }) });
-    expect(tokens.attacker).toMatchObject({ stoppedBy: "tokens", tokensUsed: 1200 });
-    expect(tokens.pluginResults[0]!.scenarioResults.slice(1).every((row) => row.adaptive?.roundsRun === 1 && row.adaptive.stoppedBy === "tokens")).toBe(true);
+      attacker: attacker(stub("stub:never", () => "Please be thorough.", worstCase), { maxTokens: 6000 }) });
+    expect(tokens.attacker).toMatchObject({ stoppedBy: "tokens" });
+    expect(tokens.attacker!.tokensUsed).toBeGreaterThan(0);
+    expect(tokens.attacker!.tokensUsed).toBeLessThanOrEqual(6000);
+    const cut = tokens.pluginResults[0]!.scenarioResults.filter((row) => row.adaptive?.stoppedBy === "tokens");
+    expect(cut.length).toBeGreaterThan(0);
+    expect(cut.every((row) => !row.pass && row.inconclusive === true && row.score0to100 === 0)).toBe(true);
     expect(renderRedTeamMarkdown(tokens)).toContain("Stopped by the token limit.");
     const cost = await runRedTeam({ workspace: workspace(), agentId: "default", plugins: ["exfiltrationChannels"],
       attacker: attacker(stub("stub:never", () => "Please be thorough.", { tokens: 10, costUsd: 0.6 }), { maxCostUsd: 1 }) });
     expect(cost.attacker).toMatchObject({ stoppedBy: "cost" });
-    expect(cost.attacker!.costUsd).toBeCloseTo(1.2);
+    expect(cost.attacker!.costUsd).toBeCloseTo(0.6);
   }, 120_000);
 
+  test("a long agent reply cannot push an attacker call past the token limit", async () => {
+    const long = "x".repeat(200_000);
+    const rounds = [{ injection: "first", reply: long, toolCalls: [long], harms: [] }];
+    expect(attackerInputTokens({ goal: "g", where: "w", rounds })).toBeLessThan(6000);
+    const spend = new AttackerSpend({ rounds: 50, maxTokens: 20_000, maxCostUsd: null });
+    const model = stub("stub:never", () => "text", worstCase);
+    let answer: string;
+    do {
+      answer = await spend.next(model, { goal: "g", where: "w", rounds });
+      expect(spend.tokens).toBeLessThanOrEqual(20_000);
+    } while (answer !== "tokens");
+    expect(spend.calls).toBeGreaterThan(0);
+    expect(spend.stoppedBy).toBe("tokens");
+  });
+
   test("an attacker error stops that scenario; a scenario with no injection slot runs as before and says why", async () => {
-    const failing: AttackerModel = { id: "stub:down", priced: true, propose: () => Promise.reject(new Error("attacker unreachable")) };
+    const failing: AttackerModel = { id: "stub:down", priced: true, costOf: () => 0.01, propose: () => Promise.reject(new Error("attacker unreachable")) };
     const report = await runRedTeam({ workspace: workspace(), agentId: "default", plugins: ["exfiltrationChannels", "mcpToolPoisoning"], attacker: attacker(failing) });
     const [channels, mcp] = report.pluginResults;
     expect(channels!.scenarioResults.every((row) => row.adaptive?.stoppedBy === "attacker-error" && row.adaptive.attackerError === "attacker unreachable")).toBe(true);
+    // One try is not the search the row stands for: no row passes, each is not evaluated and says what stopped it.
+    expect(channels!.scenarioResults.every((row) => !row.pass && row.inconclusive === true && row.score0to100 === 0 &&
+      row.reasons.some((reason) => reason.includes("stopped by an attacker model error (attacker unreachable)")))).toBe(true);
+    expect(report.inconclusiveScenarios).toBeGreaterThanOrEqual(5);
+    expect(report.attacker).toMatchObject({ notEvaluated: 5 });
     expect(mcp!.scenarioResults.every((row) => row.adaptive === undefined && row.strategyId === "direct")).toBe(true);
     expect(mcp!.notApplied?.every((item) => item.strategyId === "attacker-model" && /no single place/.test(item.reason))).toBe(true);
   }, 120_000);
@@ -139,11 +170,30 @@ describe("attacker model loop on effect-graded scenarios", () => {
   }, 120_000);
 
   test("a cost limit that can no longer be counted stops the run like a reached one", async () => {
-    const spend = new AttackerSpend({ rounds: 10, maxTokens: 1000, maxCostUsd: 1 });
-    const unknown = stub("stub:unpriced", () => "text", { tokens: 1, costUsd: null });
+    const spend = new AttackerSpend({ rounds: 10, maxTokens: 10_000, maxCostUsd: 1 });
+    const unknown = stub("stub:priced", () => "text", { tokens: 1, costUsd: null }, 0.01);
     expect(await spend.next(unknown, { goal: "g", where: "w", rounds: [] })).toBe("text");
     expect(await spend.next(unknown, { goal: "g", where: "w", rounds: [] })).toBe("cost");
     expect(spend.stoppedBy).toBe("cost");
+  });
+
+  test("a model from AMC's real price list is counted on every call (cache counts given as zero)", async () => {
+    const snapshot = createModelMetadataSnapshot("openai", "openai-chat-completions", "gpt-4o");
+    expect(snapshot?.pricing).toBeTruthy();
+    const model = attackerOverClient("openai:gpt-4o", snapshot, async () => ({ text: "next text", usage: { promptTokens: 900, completionTokens: 200 } }));
+    expect(model.priced).toBe(true);
+    const spend = new AttackerSpend({ rounds: 10, maxTokens: 50_000, maxCostUsd: 1 });
+    const seen: number[] = [];
+    for (let call = 0; call < 4; call += 1) {
+      expect(await spend.next(model, { goal: "g", where: "w", rounds: [] })).toBe("next text");
+      expect(spend.costUsd).not.toBeNull();
+      seen.push(spend.costUsd!);
+    }
+    expect(seen[0]).toBeGreaterThan(0);
+    expect(seen[3]).toBeCloseTo(seen[0]! * 4);
+    expect(spend.stoppedBy).toBeNull();
+    expect(adaptiveReportLines({ attackerModel: "openai:gpt-4o", roundBudget: 10, maxTokens: 50_000, maxCostUsd: 1, scenarios: 1, firstRoundWorked: 0,
+      workedWithinRounds: 0, notEvaluated: 0, tokensUsed: 10, costUsd: null, stoppedBy: "cost" }).join(" ")).not.toContain("no price");
   });
 
   test("a round that was not evaluated makes the row not passed", () => {
