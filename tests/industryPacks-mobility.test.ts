@@ -51,7 +51,7 @@ describe("mobility station packs", () => {
   });
 
   test("refuter corrections: no compound DORA anchor, no unconfirmed IR 2022/1426 point 2.3", () => {
-    expect(question("MOB-VI-2")?.regulatoryRef).toBe("ISO 22301:2019 §8.4");
+    expect(question("MOB-VI-2")?.regulatoryRef).toBe("ISO 22301 §8.4");
     expect(question("MOB-VI-17")?.regulatoryRef).toBe("EU DORA Art. 11; EU DORA Art. 12");
     const all = JSON.stringify(packs);
     expect(all).not.toMatch(/§2\.1-2\.3|annual in-service report/);
@@ -61,7 +61,7 @@ describe("mobility station packs", () => {
     expect(question("MOB-SC-9")?.regulatoryRef).toContain("Art. 5(1)(h)");
     expect(question("MOB-SP-1")?.regulatoryRef).not.toContain("§12");
     expect(question("MOB-RE-10")?.regulatoryRef).toBe("EU EPBD Art. 7(1); EU EPBD Art. 11");
-    expect(question("MOB-PS-11")?.regulatoryRef).toBe("ISO/SAE 21434:2021 Clause 15");
+    expect(question("MOB-PS-11")?.regulatoryRef).toBe("ISO 21434 Clause 15");
   });
 
   test("deep questions continue S4's numbering at 11 with official sources", () => {

@@ -13374,8 +13374,8 @@
       {
         "external": true,
         "frameworkId": null,
-        "instrumentId": null,
-        "label": "ISO/SAE 21434"
+        "instrumentId": "iso-21434",
+        "label": "ISO 21434"
       },
       {
         "external": true,
@@ -13392,12 +13392,6 @@
       {
         "external": true,
         "frameworkId": null,
-        "instrumentId": null,
-        "label": "ISO/IEC 27701"
-      },
-      {
-        "external": true,
-        "frameworkId": null,
         "instrumentId": "nist-csf-2",
         "label": "NIST CSF 2.0"
       }
@@ -13405,10 +13399,9 @@
     "complianceFrameworks": [
       "GDPR Art. 5/25/32",
       "CCPA/CPRA",
-      "ISO/SAE 21434",
+      "ISO 21434",
       "ETSI EN 303 645",
       "EU NIS2 2022/2555",
-      "ISO/IEC 27701",
       "NIST CSF 2.0"
     ],
     "contentStatus": "experimental",
@@ -17482,7 +17475,7 @@
     ],
     "contentStatus": "experimental",
     "description": "Urban and rural community building with environmental goals — covering smart city AI, urban planning, community services, and sustainable development with emphasis on citizen participation, environmental sustainability, and equitable urban development.",
-    "euAIActClassification": "Annex III point 2 where the agent is a safety component in the management and operation of critical digital infrastructure, road traffic, or the supply of water, gas, heating or electricity; Annex III point 1 where it performs remote biometric identification, biometric categorisation or emotion recognition; Annex III point 5(a) where it evaluates eligibility for essential public assistance benefits or services for a public authority; otherwise not listed",
+    "euAIActClassification": "Annex III §2 where the agent is a safety component in the management and operation of critical digital infrastructure, road traffic, or the supply of water, gas, heating or electricity; §1 where it performs remote biometric identification, biometric categorisation or emotion recognition; §5(a) where it evaluates eligibility for essential public assistance benefits or services for a public authority; otherwise not listed",
     "id": "sustainable-communities",
     "keyRisks": [
       "Surveillance city through AI-managed urban monitoring",
@@ -17942,7 +17935,7 @@
     ],
     "contentStatus": "experimental",
     "description": "Transportation infrastructure, ports of entry, and goods/people movement — covering AI in port operations, logistics, customs, and border management with emphasis on supply chain security, environmental compliance, and trade facilitation.",
-    "euAIActClassification": "Not listed in Annex III (point 2 covers critical digital infrastructure, road traffic and the supply of water, gas, heating or electricity, not port or maritime operations); high-risk under Art. 6(1) only where the agent is, or is a safety component of, a product covered by Annex I legislation and that product must undergo third-party conformity assessment under that legislation",
+    "euAIActClassification": "Not listed in Annex III (§2 covers critical digital infrastructure, road traffic and the supply of water, gas, heating or electricity, not port or maritime operations); high-risk under Art. 6(1) only where the agent is, or is a safety component of, a product covered by Annex I legislation and that product must undergo third-party conformity assessment under that legislation",
     "id": "sustainable-ports",
     "keyRisks": [
       "Security breach through AI-managed access control failures",
@@ -18402,7 +18395,7 @@
     ],
     "contentStatus": "experimental",
     "description": "Industrial real estate, manufacturing facilities, travel/leisure, entertainment, and hospital infrastructure — AI agents managing buildings, facilities, and real estate portfolios with focus on energy performance, occupant wellbeing, sustainability certification, and climate resilience.",
-    "euAIActClassification": "Not listed in Annex III unless a safety component in the supply of water, gas, heating or electricity (point 2); Art. 50 transparency duties apply where the agent interacts directly with people or generates synthetic content",
+    "euAIActClassification": "Not listed in Annex III unless a safety component in the supply of water, gas, heating or electricity (§2); Art. 50 transparency duties apply where the agent interacts directly with people or generates synthetic content",
     "id": "sustainable-real-estate",
     "keyRisks": [
       "Greenwashing through unverified sustainability claims",

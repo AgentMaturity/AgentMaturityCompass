@@ -107,12 +107,12 @@
   {
     "packId": "sustainable-communities",
     "questionId": "pack",
-    "citation": "Annex III point 2 where the agent is a safety component in the management and operation of critical digital infrastructure, road traffic, or the supply of water, gas, heating or electricity; Annex III point 1 where it performs remote biometric identification, biometric categorisation or emotion recognition; Annex III point 5(a) where it evaluates eligibility for essential public assistance benefits or services for a public authority; otherwise not listed",
+    "citation": "Annex III §2 where the agent is a safety component in the management and operation of critical digital infrastructure, road traffic, or the supply of water, gas, heating or electricity; §1 where it performs remote biometric identification, biometric categorisation or emotion recognition; §5(a) where it evaluates eligibility for essential public assistance benefits or services for a public authority; otherwise not listed",
     "instrument": "Regulation (EU) 2024/1689 (Artificial Intelligence Act)",
     "clause": "Annex III points 1, 2, 5(a)",
     "verdict": "corrected",
     "was": "Annex III §2 only for safety components in road traffic or in water, gas, heating or electricity supply; otherwise not listed",
-    "now": "Annex III point 2 where the agent is a safety component in the management and operation of critical digital infrastructure, road traffic, or the supply of water, gas, heating or electricity; Annex III point 1 where it performs remote biometric identification, biometric categorisation or emotion recognition; Annex III point 5(a) where it evaluates eligibility for essential public assistance benefits or services for a public authority; otherwise not listed",
+    "now": "Annex III §2 where the agent is a safety component in the management and operation of critical digital infrastructure, road traffic, or the supply of water, gas, heating or electricity; §1 where it performs remote biometric identification, biometric categorisation or emotion recognition; §5(a) where it evaluates eligibility for essential public assistance benefits or services for a public authority; otherwise not listed",
     "sourceTitle": "Regulation (EU) 2024/1689 (AI Act), Official Journal text (Publications Office); amendments checked in Regulation (EU) 2026/1744",
     "sourceUrl": "https://publications.europa.eu/resource/celex/32024R1689",
     "checkedOn": "2026-11-16",
@@ -617,12 +617,12 @@
   {
     "packId": "sustainable-ports",
     "questionId": "pack",
-    "citation": "Not listed in Annex III (point 2 covers critical digital infrastructure, road traffic and the supply of water, gas, heating or electricity, not port or maritime operations); high-risk under Art. 6(1) only where the agent is, or is a safety component of, a product covered by Annex I legislation and that product must undergo third-party conformity assessment under that legislation",
+    "citation": "Not listed in Annex III (§2 covers critical digital infrastructure, road traffic and the supply of water, gas, heating or electricity, not port or maritime operations); high-risk under Art. 6(1) only where the agent is, or is a safety component of, a product covered by Annex I legislation and that product must undergo third-party conformity assessment under that legislation",
     "instrument": "Regulation (EU) 2024/1689 (Artificial Intelligence Act)",
     "clause": "Annex III point 2; Art. 6(1)",
     "verdict": "corrected",
     "was": "Not listed in Annex III (§2 covers road traffic, not port or maritime operations); Art. 6(1) where the agent is a safety component of a product covered by Annex I legislation",
-    "now": "Not listed in Annex III (point 2 covers critical digital infrastructure, road traffic and the supply of water, gas, heating or electricity, not port or maritime operations); high-risk under Art. 6(1) only where the agent is, or is a safety component of, a product covered by Annex I legislation and that product must undergo third-party conformity assessment under that legislation",
+    "now": "Not listed in Annex III (§2 covers critical digital infrastructure, road traffic and the supply of water, gas, heating or electricity, not port or maritime operations); high-risk under Art. 6(1) only where the agent is, or is a safety component of, a product covered by Annex I legislation and that product must undergo third-party conformity assessment under that legislation",
     "sourceTitle": "Regulation (EU) 2024/1689 (AI Act), Official Journal text (Publications Office); amendments checked in Regulation (EU) 2026/1744",
     "sourceUrl": "https://publications.europa.eu/resource/celex/32024R1689",
     "checkedOn": "2026-11-16",
@@ -1112,12 +1112,12 @@
   {
     "packId": "sustainable-real-estate",
     "questionId": "pack",
-    "citation": "Not listed in Annex III unless a safety component in the supply of water, gas, heating or electricity (point 2); Art. 50 transparency duties apply where the agent interacts directly with people or generates synthetic content",
+    "citation": "Not listed in Annex III unless a safety component in the supply of water, gas, heating or electricity (§2); Art. 50 transparency duties apply where the agent interacts directly with people or generates synthetic content",
     "instrument": "Regulation (EU) 2024/1689 (Artificial Intelligence Act)",
     "clause": "Annex III point 2; Art. 50",
     "verdict": "corrected",
     "was": "Not listed in Annex III unless a safety component in the supply of heating or electricity (§2); Art. 50 transparency applies",
-    "now": "Not listed in Annex III unless a safety component in the supply of water, gas, heating or electricity (point 2); Art. 50 transparency duties apply where the agent interacts directly with people or generates synthetic content",
+    "now": "Not listed in Annex III unless a safety component in the supply of water, gas, heating or electricity (§2); Art. 50 transparency duties apply where the agent interacts directly with people or generates synthetic content",
     "sourceTitle": "Regulation (EU) 2024/1689 (AI Act), Official Journal text (Publications Office); amendments checked in Regulation (EU) 2026/1744",
     "sourceUrl": "https://publications.europa.eu/resource/celex/32024R1689",
     "checkedOn": "2026-11-16",
@@ -2067,7 +2067,7 @@
     "sourceUrl": "https://publications.europa.eu/resource/celex/32016R0679",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Pseudonymisation and data minimisation as examples of by-design measures; purpose limitation is an Art. 5(1)(b) principle that Art. 25 implements. The second citation 'ISO/IEC 27701:2025' (also listed in the pack's regulatory basis) was removed: www.iso.org answered HTTP 403, so the edition could not be confirmed, and without the year the catalogue cannot resolve it. The L5 text and the framework list still name ISO/IEC 27701."
+    "note": "Pseudonymisation and data minimisation as examples of by-design measures; purpose limitation is an Art. 5(1)(b) principle that Art. 25 implements. The second citation 'ISO/IEC 27701:2025' (also listed in the pack's regulatory basis) was removed: www.iso.org answered HTTP 403, so the edition could not be confirmed, and without the year the catalogue cannot resolve it. The pack's framework list entry 'ISO/IEC 27701:2025' was removed for the same reason; the L5 text still names ISO/IEC 27701."
   },
   {
     "packId": "privacy-security-mobility",
