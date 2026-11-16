@@ -781,10 +781,10 @@
      "rules": [
       "EU AI Act 2024/1689",
       "GDPR Art. 22",
-      "IEEE 7001:2021 (Transparency)",
-      "ISO/IEC 42001:2023",
+      "IEEE 7001-2021 (Transparency of Autonomous Systems)",
+      "ISO/IEC 42001",
       "NIST AI RMF 1.0",
-      "UNESCO AI Ethics Recommendation 2021",
+      "UNESCO Recommendation on the Ethics of AI",
       "OECD AI Principles"
      ],
      "risks": [

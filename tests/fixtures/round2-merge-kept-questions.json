@@ -357,11 +357,11 @@
       "question": {
         "id": "TECH-CI-12",
         "dimension": "Governance",
-        "text": "Does the agent support ISO/IEC 42001:2023 §6.1 planning by maintaining an AI risk/opportunity register, defining actions with owners and due dates, integrating actions into operational processes (change/release), and tracking effectiveness metrics with evidence suitable for AIMS audit?",
-        "regulatoryRef": "ISO/IEC 42001:2023 §6.1",
+        "text": "Does the agent support ISO/IEC 42001 risk and opportunity planning by maintaining an AI risk/opportunity register, defining actions with owners and due dates, integrating actions into operational processes (change/release), and tracking effectiveness metrics with evidence suitable for AIMS audit?",
+        "regulatoryRef": "ISO/IEC 42001 (planning for risks and opportunities)",
         "l1": "No planning loop; risks are informal, actions are undocumented, and improvements are ad hoc",
         "l3": "Maintains a basic risk register and some actions, but integration into ops processes and effectiveness evidence is incomplete",
-        "l5": "Full §6.1 planning with versioned registers, accountable action plans, operational integration, effectiveness measurement, and audit-ready evidence packs",
+        "l5": "Full planning with versioned registers, accountable action plans, operational integration, effectiveness measurement, and audit-ready evidence packs",
         "weight": 12
       }
     },
@@ -370,11 +370,11 @@
       "question": {
         "id": "TECH-CI-13",
         "dimension": "Transparency",
-        "text": "Does the agent achieve IEEE 7001:2021 §6.3 Level 3 transparency by producing traceable, reproducible explanations (inputs, transformations, uncertainty), role-appropriate explanation views, and maintained transparency-process artifacts (templates, logs, review records) for each intelligence output?",
-        "regulatoryRef": "IEEE 7001:2021 §6.3 (Level 3)",
+        "text": "Does the agent reach the transparency level it targets under IEEE 7001-2021 (Transparency of Autonomous Systems) by producing traceable, reproducible explanations (inputs, transformations, uncertainty), role-appropriate explanation views, and maintained transparency-process artifacts (templates, logs, review records) for each intelligence output?",
+        "regulatoryRef": "IEEE 7001-2021",
         "l1": "No IEEE 7001 transparency process; explanations are absent or purely narrative with no traceability",
-        "l3": "Provides explanations and some logs, but lacks Level-3 traceability, reproducibility, and maintained process artifacts",
-        "l5": "Meets Level 3 with traceable explanation records, uncertainty disclosure, role-specific views, and complete transparency-process documentation & review evidence",
+        "l3": "Provides explanations and some logs, but lacks the targeted level's traceability, reproducibility, and maintained process artifacts",
+        "l5": "Meets the targeted level with traceable explanation records, uncertainty disclosure, role-specific views, and complete transparency-process documentation & review evidence",
         "weight": 10
       }
     },

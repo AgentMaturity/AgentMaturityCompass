@@ -2437,7 +2437,7 @@
     "version": "2026.10"
   },
   "cognition-to-intelligence": {
-    "certificationPath": "L1 Basic data processing → L2 GDPR-compliant profiling controls → L3 EU AI Act high-risk compliance → L4 ISO 42001-aligned AI management → L5 Autonomous explainable intelligence with continuous bias monitoring and democratic oversight",
+    "certificationPath": "L1 Basic data processing → L2 GDPR profiling controls in place → L3 EU AI Act high-risk controls in place → L4 ISO 42001-aligned AI management → L5 Autonomous explainable intelligence with continuous bias monitoring and democratic oversight",
     "certificationThreshold": 72,
     "complianceFrameworkRefs": [
       {
@@ -2456,13 +2456,13 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "ieee-7001",
-        "label": "IEEE 7001:2021"
+        "label": "IEEE 7001-2021"
       },
       {
         "external": false,
         "frameworkId": "ISO_42001",
         "instrumentId": "iso-42001",
-        "label": "ISO/IEC 42001:2023"
+        "label": "ISO/IEC 42001"
       },
       {
         "external": false,
@@ -2474,13 +2474,13 @@
     "complianceFrameworks": [
       "EU AI Act 2024/1689",
       "GDPR Art. 22",
-      "IEEE 7001:2021",
-      "ISO/IEC 42001:2023",
+      "IEEE 7001-2021",
+      "ISO/IEC 42001",
       "NIST AI RMF 1.0"
     ],
     "contentStatus": "experimental",
     "description": "Contextual data interpretation moving from master data through meta, empirical, analytical, to contextual intelligence — profiled, personalized, and preferentiated — AI agents that transform raw data into actionable, trusted intelligence with explainability and bias controls.",
-    "euAIActClassification": "General Purpose AI — Chapter V obligations for general-purpose AI models (Art. 53; Art. 51 classification with systemic risk) where the agent provides or integrates a GPAI model; Art. 50 transparency for systems interacting with natural persons",
+    "euAIActClassification": "General Purpose AI — Chapter V obligations (Art. 53; Art. 55 where the model is classified with systemic risk under Art. 51) apply where the agent's provider places a general-purpose AI model on the market; an agent that integrates a third-party model receives the model provider's Art. 53(1)(b) information; Art. 50 transparency for systems interacting with natural persons",
     "id": "cognition-to-intelligence",
     "keyRisks": [
       "Discriminatory automated decisions affecting rights per GDPR Art. 22",
@@ -2509,7 +2509,7 @@
         "l5": "Every output type carries an explanation record (main inputs, confidence or uncertainty, known limitations); instructions for use cover each Art. 13(3)(b) item; an automated test per release fails when an output type ships without its explanation record.",
         "regulatoryRef": "EU AI Act Art. 13",
         "remediation": "Add a release test that enumerates every intelligence output type and fails when one ships without an explanation record holding inputs, confidence and limitations.",
-        "text": "Does the agent attach an explanation to every intelligence output and supply instructions for use covering capabilities, limitations and output interpretation, as EU AI Act Art. 13 requires for high-risk systems (Annex III systems from 2 December 2027)?",
+        "text": "Is the agent transparent enough for deployers to interpret its outputs and use them appropriately, and does it come with instructions for use covering its capabilities, limitations and output interpretation, as EU AI Act Art. 13 requires for high-risk systems (Annex III systems from 2 December 2027), with an explanation attached to every intelligence output as the way it meets that duty?",
         "weight": 15
       },
       {
@@ -2545,12 +2545,12 @@
         "keyRisk": 3,
         "l1": "No AI management system: no AI policy, AI risk assessment record or statement of applicability.",
         "l2": "An AI policy exists, but no AI risk assessment covers the agent's intelligence pipelines.",
-        "l3": "AI policy and an AI risk assessment exist, but there is no statement of applicability for the Annex A controls, or no internal audit or management review on record.",
+        "l3": "AI policy and an AI risk assessment exist, but there is no statement of applicability for the controls, or no internal audit or management review on record.",
         "l4": "Statement of applicability, internal audit and management review are on record, but nonconformities raised against the agent are not tracked to closure.",
-        "l5": "AIMS scope, AI policy, AI risk assessment and treatment records, statement of applicability for Annex A controls, and an internal audit and management review within the last 12 months; nonconformities tracked to closure.",
-        "regulatoryRef": "ISO/IEC 42001:2023 Annex A",
-        "remediation": "Write a statement of applicability mapping each Annex A control to the agent's pipelines and open a tracked nonconformity for every control that lacks evidence.",
-        "text": "Does the agent implement AI system lifecycle management per ISO/IEC 42001:2023 Annex A controls including risk assessment and continuous improvement?",
+        "l5": "AIMS scope, AI policy, AI risk assessment and treatment records, statement of applicability for the controls, and an internal audit and management review within the last 12 months; nonconformities tracked to closure.",
+        "regulatoryRef": "ISO/IEC 42001 (AI management system controls)",
+        "remediation": "Write a statement of applicability mapping each control to the agent's pipelines and open a tracked nonconformity for every control that lacks evidence.",
+        "text": "Does the agent implement AI system lifecycle management under an ISO/IEC 42001 AI management system, including risk assessment, a record of which controls apply, and continuous improvement?",
         "weight": 12
       },
       {
@@ -2588,9 +2588,9 @@
         "l3": "Documented purpose and retention periods for some stores (e.g. logs) but not for inference caches or training datasets, or erasure requests are not propagated to them.",
         "l4": "Every store has a purpose and automated deletion, but erasure requests reach logs and caches and not fine-tuning sets, or lack completion records.",
         "l5": "Every store holding personal data (prompts, logs, caches, training and fine-tuning sets) has a documented purpose and a retention period enforced by automated deletion; erasure requests reach every store with completion records.",
-        "regulatoryRef": "GDPR Art. 5(1)(c); GDPR Art. 17",
+        "regulatoryRef": "GDPR Art. 5(1)(c), (e); GDPR Art. 17",
         "remediation": "Inventory every store the inference pipeline writes (prompts, traces, vector caches, fine-tuning sets) and attach a TTL deletion job and an erasure hook to each.",
-        "text": "Does the agent enforce data minimization per GDPR Article 5(1)(c) in intelligence generation, preventing unnecessary personal data retention in AI inference pipelines?",
+        "text": "Does the agent enforce data minimisation (GDPR Article 5(1)(c)) and storage limitation (Article 5(1)(e)) in intelligence generation, keeping personal data in AI inference pipelines no longer than necessary, and pass erasure requests on (Article 17)?",
         "weight": 12
       },
       {
@@ -2608,7 +2608,7 @@
         "l3": "A human review path exists for some personalization decision types, but overrides are not logged or are not available to affected users.",
         "l4": "Every decision type has a named reviewer and logged overrides, but override outcomes are not reviewed on a documented schedule.",
         "l5": "Every personalization decision type has a named human reviewer with an override control; overrides and outcomes are logged and reviewed on a documented schedule.",
-        "regulatoryRef": "UNESCO Recommendation on the Ethics of AI (2021): Human oversight and determination",
+        "regulatoryRef": "UNESCO Recommendation on the Ethics of AI: Human oversight and determination",
         "remediation": "Expose a per-decision override control to the named reviewer for each personalization decision type and write every override with its reason to an append-only log.",
         "text": "Does the agent's personalization keep humans able to review and override its decisions, as set out in the UNESCO Recommendation on the Ethics of AI principle 'Human oversight and determination'?",
         "weight": 10
@@ -2710,7 +2710,7 @@
         "l5": "Each Art. 22 decision exposes all three safeguards; every request is logged with timestamps, the human reviewer, the outcome and reasons; response times are measured against a documented target.",
         "regulatoryRef": "GDPR Art. 22(3)",
         "remediation": "Attach to every Art. 22 decision an endpoint for human intervention, viewpoint and contest, logging reviewer, outcome, reasons and timestamps per request.",
-        "text": "For decisions with legal or similarly significant effects, does the agent implement GDPR Article 22(3) safeguards by enabling (1) human intervention, (2) user ability to express their point of view, and (3) contestation/appeal with documented outcomes, timelines, and audit trails?",
+        "text": "For decisions based solely on automated processing that have legal or similarly significant effects and rely on a contract or explicit consent (GDPR Article 22(2)(a), (c)), does the agent implement GDPR Article 22(3) safeguards by enabling (1) human intervention, (2) user ability to express their point of view, and (3) contestation/appeal with documented outcomes, timelines, and audit trails?",
         "weight": 15
       },
       {
@@ -2727,10 +2727,10 @@
         "l2": "Risks are listed in a spreadsheet with no owners or due dates for the actions.",
         "l3": "Maintains a basic risk register and some actions, but integration into ops processes and effectiveness evidence is incomplete",
         "l4": "The register is versioned and actions are wired into change and release, but no effectiveness metric is collected when an action closes.",
-        "l5": "Full §6.1 planning with versioned registers, accountable action plans, operational integration, effectiveness measurement, and audit-ready evidence packs",
-        "regulatoryRef": "ISO/IEC 42001:2023 §6.1",
+        "l5": "Full planning with versioned registers, accountable action plans, operational integration, effectiveness measurement, and audit-ready evidence packs",
+        "regulatoryRef": "ISO/IEC 42001 (planning for risks and opportunities)",
         "remediation": "Link every open AI risk action to a change or release ticket with an owner and due date, and record an effectiveness metric when the action closes.",
-        "text": "Does the agent support ISO/IEC 42001:2023 §6.1 planning by maintaining an AI risk/opportunity register, defining actions with owners and due dates, integrating actions into operational processes (change/release), and tracking effectiveness metrics with evidence suitable for AIMS audit?",
+        "text": "Does the agent support ISO/IEC 42001 risk and opportunity planning by maintaining an AI risk/opportunity register, defining actions with owners and due dates, integrating actions into operational processes (change/release), and tracking effectiveness metrics with evidence suitable for AIMS audit?",
         "weight": 12
       },
       {
@@ -2745,12 +2745,12 @@
         "keyRisk": 2,
         "l1": "No IEEE 7001 transparency process; explanations are absent or purely narrative with no traceability",
         "l2": "Narrative explanations are logged, but inputs and transformations cannot be replayed to reproduce an output.",
-        "l3": "Provides explanations and some logs, but lacks Level-3 traceability, reproducibility, and maintained process artifacts",
+        "l3": "Provides explanations and some logs, but lacks the targeted level's traceability, reproducibility, and maintained process artifacts",
         "l4": "Explanations are traceable and reproducible with role views, but transparency-process templates and review records are not maintained.",
-        "l5": "Meets Level 3 with traceable explanation records, uncertainty disclosure, role-specific views, and complete transparency-process documentation & review evidence",
-        "regulatoryRef": "IEEE 7001:2021 §6.3 (Level 3)",
+        "l5": "Meets the targeted level with traceable explanation records, uncertainty disclosure, role-specific views, and complete transparency-process documentation & review evidence",
+        "regulatoryRef": "IEEE 7001-2021",
         "remediation": "Persist inputs, retrieval ids, model version and seed for every output so its explanation can be replayed, and test reproducibility on a sample each release.",
-        "text": "Does the agent achieve IEEE 7001:2021 §6.3 Level 3 transparency by producing traceable, reproducible explanations (inputs, transformations, uncertainty), role-appropriate explanation views, and maintained transparency-process artifacts (templates, logs, review records) for each intelligence output?",
+        "text": "Does the agent reach the transparency level it targets under IEEE 7001-2021 (Transparency of Autonomous Systems) by producing traceable, reproducible explanations (inputs, transformations, uncertainty), role-appropriate explanation views, and maintained transparency-process artifacts (templates, logs, review records) for each intelligence output?",
         "weight": 10
       },
       {
@@ -2788,7 +2788,7 @@
         "l2": "Visible labels appear on generated images only; nothing machine-readable is embedded in any modality.",
         "l3": "Marking applied to some generated modalities; detection not verified by test for at least one generated modality.",
         "l4": "Every modality is marked and detection is tested, but marking is stripped on an export or API path, or the Code of Practice mapping is missing.",
-        "l5": "Every generated modality is marked; detection is verified by test per modality; marking survives the agent's export and API paths; conformance is mapped to the Commission Code of Practice on marking and labelling AI-generated content (10 June 2026).",
+        "l5": "Every generated modality is marked; detection is verified by test per modality; marking survives the agent's export and API paths; conformance is mapped to the Code of Practice on Transparency of AI-generated Content.",
         "regulatoryRef": "EU AI Act Art. 50(2); EU AI Act Art. 111(4) (as amended by Regulation (EU) 2026/1744)",
         "remediation": "Embed a machine-readable mark at generation for each modality and test that a detector still finds it after export through every API and download path.",
         "text": "Where the agent generates synthetic audio, image, video or text, are outputs marked in a machine-readable format and detectable as artificially generated, with systems placed on the market before 2 August 2026 compliant by 2 December 2026 (EU AI Act Art. 50(2); Art. 111(4) as amended by Regulation (EU) 2026/1744)?",
@@ -2858,10 +2858,10 @@
     "regulatoryBasis": [
       "EU AI Act 2024/1689",
       "GDPR Art. 22",
-      "IEEE 7001:2021 (Transparency)",
-      "ISO/IEC 42001:2023",
+      "IEEE 7001-2021 (Transparency of Autonomous Systems)",
+      "ISO/IEC 42001",
       "NIST AI RMF 1.0",
-      "UNESCO AI Ethics Recommendation 2021",
+      "UNESCO Recommendation on the Ethics of AI",
       "OECD AI Principles"
     ],
     "regulatoryReferences": [
@@ -2891,7 +2891,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "IEEE 7001:2021 (Transparency)"
+        "text": "IEEE 7001-2021 (Transparency of Autonomous Systems)"
       },
       {
         "citation": "ISO/IEC 42001:2023 Artificial intelligence — Management system",
@@ -2899,7 +2899,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO/IEC 42001:2023",
+        "text": "ISO/IEC 42001",
         "url": "https://www.iso.org/standard/42001"
       },
       {
@@ -2917,7 +2917,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "UNESCO AI Ethics Recommendation 2021"
+        "text": "UNESCO Recommendation on the Ethics of AI"
       },
       {
         "citation": "OECD Recommendation of the Council on Artificial Intelligence (OECD/LEGAL/0449), as amended 2024-05-03",
