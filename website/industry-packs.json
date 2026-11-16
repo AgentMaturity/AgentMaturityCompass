@@ -529,12 +529,12 @@
      "questions": 15,
      "rules": [
       "IMO MARPOL",
-      "ISO 28000:2022 (Supply Chain Security)",
+      "ISO 28000 (Supply Chain Security)",
       "ISPS Code",
       "EU Port Services Regulation 2017/352",
       "UN TIR Convention",
       "IMDG Code",
-      "ISO 14001:2026",
+      "ISO 14001",
       "C-TPAT"
      ],
      "risks": [

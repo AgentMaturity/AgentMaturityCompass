@@ -17921,7 +17921,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-28000",
-        "label": "ISO 28000:2022"
+        "label": "ISO 28000"
       },
       {
         "external": true,
@@ -17945,14 +17945,14 @@
     "complianceFrameworks": [
       "IMO MARPOL",
       "ISPS Code",
-      "ISO 28000:2022",
+      "ISO 28000",
       "EU Port Services Regulation 2017/352",
       "C-TPAT",
       "IMDG Code"
     ],
     "contentStatus": "experimental",
     "description": "Transportation infrastructure, ports of entry, and goods/people movement — covering AI in port operations, logistics, customs, and border management with emphasis on supply chain security, environmental compliance, and trade facilitation.",
-    "euAIActClassification": "Not listed in Annex III (§2 covers road traffic, not port or maritime operations); Art. 6(1) where the agent is a safety component of a product covered by Annex I legislation",
+    "euAIActClassification": "Not listed in Annex III (point 2 covers critical digital infrastructure, road traffic and the supply of water, gas, heating or electricity, not port or maritime operations); high-risk under Art. 6(1) only where the agent is, or is a safety component of, a product covered by Annex I legislation and that product must undergo third-party conformity assessment under that legislation",
     "id": "sustainable-ports",
     "keyRisks": [
       "Security breach through AI-managed access control failures",
@@ -18018,10 +18018,10 @@
         "l2": "Security requirements are listed, but no risk assessment covers the port operations the agent touches.",
         "l3": "Agent tracks C-TPAT compliance requirements and performs basic security risk assessment, but does not implement full ISO 28000 security management system",
         "l4": "An ISO 28000 management system covers port operations with container integrity checks and personnel security, but improvement actions are not tracked to closure.",
-        "l5": "Full supply chain security with ISO 28000 implementation, C-TPAT controls automation, security risk assessment, container integrity verification, personnel security management, and continuous security improvement per ISO 28000:2022",
-        "regulatoryRef": "ISO 28000:2022; C-TPAT Minimum Security Criteria",
+        "l5": "Full supply chain security with ISO 28000 implementation, C-TPAT controls automation, security risk assessment, container integrity verification, personnel security management, and continuous security improvement per ISO 28000",
+        "regulatoryRef": "ISO 28000; C-TPAT Minimum Security Criteria",
         "remediation": "Require the agent to check a container's integrity inspection result before releasing it to a vessel or gate, and record each failed inspection in the security risk register.",
-        "text": "Does the agent implement supply chain security per ISO 28000:2022 and C-TPAT minimum security criteria for port operations?",
+        "text": "Does the agent implement supply chain security per ISO 28000 and C-TPAT minimum security criteria for port operations?",
         "weight": 12
       },
       {
@@ -18059,9 +18059,9 @@
         "l3": "Safety zones and exclusion rules are enforced, but stop/override tests or incident records are incomplete.",
         "l4": "Zones, speed limits and proximity rules are versioned and enforced and stop tests are scheduled, but some safety incidents lack an investigation record.",
         "l5": "Safety zones, speed limits and proximity rules are versioned and enforced; the stop/override path is tested on a schedule with records; every safety incident has an investigation record.",
-        "regulatoryRef": "ILO Convention C152; ISO 3691-4:2023",
+        "regulatoryRef": "ILO Convention C152; ISO 3691-4",
         "remediation": "Have the agent refuse any AGV or straddle-carrier route that crosses an active personnel zone, and test the human stop path on a fixed schedule with recorded results.",
-        "text": "Does the agent operate autonomous port equipment (AGVs, automated straddle carriers) within documented safety zones and speed limits per ISO 3691-4:2023, with worker-proximity controls consistent with ILO Convention C152 and a tested human stop path?",
+        "text": "Does the agent operate autonomous port equipment (AGVs, automated straddle carriers) within documented safety zones and speed limits per ISO 3691-4, with worker-proximity controls consistent with ILO Convention C152 and a tested human stop path?",
         "weight": 12
       },
       {
@@ -18074,14 +18074,14 @@
         "failureMode": "The agent assigns towage to a provider whose insurance or crew qualification evidence has lapsed, because it checked the minimum requirements only at onboarding.",
         "id": "MOB-SP-7",
         "keyRisk": 3,
-        "l1": "Provider compliance with the minimum requirements is not checked and charges are not published.",
+        "l1": "Provider compliance with the minimum requirements is not checked and charges have no documented basis.",
         "l2": "The minimum requirements are listed, but providers are onboarded without a recorded check against them.",
-        "l3": "Minimum requirements are checked at onboarding, but charges or their changes are not published, or complaints are not tracked.",
-        "l4": "Providers are checked against Art. 4 and charges are published, but not every complaint is logged and closed through the Art. 16 procedure.",
-        "l5": "Each provider's compliance with the Art. 4 requirements is checked and recorded, charges and their basis are published, and complaints are logged and closed through the Art. 16 procedure with records.",
+        "l3": "Minimum requirements are checked at onboarding, but charges or their changes have no documented basis, or complaints are not tracked.",
+        "l4": "Providers are checked against Art. 4 and charges are set from documented criteria, but not every complaint is logged and closed through the Art. 16 procedure.",
+        "l5": "Each provider's compliance with the Art. 4 requirements is checked and recorded, charges are set from documented, non-discriminatory criteria with their basis ready for the authority, and complaints are logged and closed through the Art. 16 procedure with records.",
         "regulatoryRef": "EU Port Services Regulation Art. 4; EU Port Services Regulation Art. 12; EU Port Services Regulation Art. 16",
         "remediation": "Gate the agent's assignment of a pilotage, towage or mooring provider on a current Art. 4 requirement check, and file every user complaint it receives into the Art. 16 log.",
-        "text": "Does the agent check port-service providers against the port's minimum requirements (Port Services Regulation Art. 4), publish port-service charges and their basis transparently (Art. 12), and route complaints into the handling procedure (Art. 16)?",
+        "text": "Does the agent check port-service providers against the port's minimum requirements (Port Services Regulation Art. 4), set port-service charges in a transparent, objective and non-discriminatory way and keep the basis for their structure and level ready for the authority on request (Art. 12), and route complaints into the handling procedure (Art. 16)?",
         "weight": 12
       },
       {
@@ -18099,9 +18099,9 @@
         "l3": "Agent tracks container movements and records seal numbers, but does not implement multi-modal traceability or automated seal integrity verification",
         "l4": "Multi-modal tracking and automated seal verification are in place, but condition monitoring or chain-of-custody records have gaps for some modes.",
         "l5": "Full cargo traceability with multi-modal tracking per UN/CEFACT RDM, automated seal integrity verification per ISO 17712, container condition monitoring, chain of custody documentation, and real-time visibility across transport modes",
-        "regulatoryRef": "UN/CEFACT MMT RDM; ISO 17712:2013",
+        "regulatoryRef": "UN/CEFACT MMT RDM; ISO 17712",
         "remediation": "Compare the seal number read at each handoff with the one on the bill of lading, and stop the container's next move when they differ.",
-        "text": "Does the agent maintain cargo traceability per UN/CEFACT Multi-Modal Transport Reference Data Model and ISO 17712:2013 seal integrity?",
+        "text": "Does the agent maintain cargo traceability per UN/CEFACT Multi-Modal Transport Reference Data Model and ISO 17712 seal integrity?",
         "weight": 15
       },
       {
@@ -18119,9 +18119,9 @@
         "l3": "Port IT/OT systems are risk-assessed, but the Govern element (an accountable person with authority) or recovery testing is missing.",
         "l4": "An accountable person, asset inventory, protections and detection are evidenced, but response and recovery have been tested only on paper.",
         "l5": "All six functional elements are evidenced for systems the agent touches: a named accountable person, an inventory including ship-port interfaces, protections, detection, a tested response plan and a tested recovery.",
-        "regulatoryRef": "IMO MSC-FAL.1/Circ.3/Rev.3",
+        "regulatoryRef": "IMO MSC-FAL.1/Circ.3/Rev.4",
         "remediation": "Add the agent and every terminal-operating-system API it calls to the maritime cyber asset inventory, and run a recovery test that restores those integrations from backup.",
-        "text": "Does the agent's cyber risk management for port and ship-port interface systems implement the functional elements of IMO MSC-FAL.1/Circ.3/Rev.3 (Govern, Identify, Protect, Detect, Respond, Recover), with a person or entity designated as accountable under Govern?",
+        "text": "Does the agent's cyber risk management for port and ship-port interface systems implement the functional elements of IMO MSC-FAL.1/Circ.3/Rev.4 (Govern, Identify, Protect, Detect, Respond, Recover), with a person or entity designated as accountable under Govern?",
         "weight": 12
       },
       {
@@ -18131,7 +18131,7 @@
           "bunker_delivery_note_check",
           "fuel_changeover_log_review"
         ],
-        "failureMode": "The agent passes a vessel that burned 0.50% fuel inside the Norwegian Sea ECA after 1 March 2026 because its ECA list predates that area.",
+        "failureMode": "The agent passes a vessel that burned 0.50% fuel inside the Norwegian Sea ECA after its requirements took effect because its ECA list predates that area.",
         "id": "MOB-SP-10",
         "keyRisk": 1,
         "l1": "No ECA-specific sulphur checks; bunker notes, changeover logs and scrubber data are not collected.",
@@ -18141,7 +18141,7 @@
         "l5": "ECA boundaries come from a dated register updated when ECAs enter into force; bunker notes, changeover logs and scrubber data are checked for each call; non-compliance is escalated with a port-state-control-ready evidence pack.",
         "regulatoryRef": "IMO MARPOL Annex VI Reg. 14",
         "remediation": "Load ECA boundaries from a register keyed to entry-into-force dates, and have the agent check each call's changeover log against the boundaries in force on the call date.",
-        "text": "Does the agent verify MARPOL Annex VI Reg. 14 sulphur compliance for ships it handles: the 0.10% m/m limit inside the Emission Control Areas in force on the date of the call (including the Canadian Arctic and Norwegian Sea ECAs from 1 March 2026), bunker delivery notes, fuel-changeover logs, and scrubber equivalency where used?",
+        "text": "Does the agent verify MARPOL Annex VI Reg. 14 sulphur compliance for ships it handles: the 0.10% m/m limit inside the Emission Control Areas in force on the date of the call (including the Canadian Arctic and Norwegian Sea ECAs added by resolution MEPC.392(82), whose amendments entered into force on 1 March 2026), bunker delivery notes, fuel-changeover logs, and scrubber equivalency where used?",
         "weight": 15
       },
       {
@@ -18156,12 +18156,12 @@
         "keyRisk": 0,
         "l1": "No SSP validation; ship–port interface security relies on ad-hoc checks and undocumented assumptions",
         "l2": "Ship security documents are collected, but the agent does not compare them with the facility's security level.",
-        "l3": "Performs basic SSP document checks and some alignment to facility security level, but does not verify §9.2 content coverage or maintain audit-ready evidence of interface responsibilities",
+        "l3": "Performs basic SSP document checks and some alignment to facility security level, but does not verify §9.4 content coverage or maintain audit-ready evidence of interface responsibilities",
         "l4": "SSP content and security-level alignment are checked and Declarations of Security are supported, but exceptions do not hold access or cargo operations.",
-        "l5": "Full ship–port interface assurance with §9.2 SSP content validation, security-level alignment checks, DoS workflow support, evidence retention, and exception escalation tied to access control and cargo operations",
-        "regulatoryRef": "ISPS Code Part A §9.2",
+        "l5": "Full ship–port interface assurance with §9.4 SSP content validation, security-level alignment checks, DoS workflow support, evidence retention, and exception escalation tied to access control and cargo operations",
+        "regulatoryRef": "ISPS Code Part A §9.4",
         "remediation": "When the ship's security level is below the facility's, have the agent hold cargo operations and open a Declaration of Security workflow before granting ship-side access.",
-        "text": "Does the agent validate ship–port interface security by checking that the ship security plan (SSP) content and measures meet ISPS Code Part A §9.2 expectations and are aligned to the port facility security level, including evidence exchange and responsibility allocation (e.g., Declaration of Security where used)?",
+        "text": "Does the agent validate ship–port interface security by checking that the ship security plan (SSP) content and measures meet ISPS Code Part A §9.4 content requirements and are aligned to the port facility security level, including evidence exchange and responsibility allocation (e.g., Declaration of Security where used)?",
         "weight": 15
       },
       {
@@ -18178,7 +18178,7 @@
         "l2": "Dangerous-goods training records are kept on paper, but roles are not mapped to the training they require.",
         "l3": "Tracks DG training records and schedules refreshers, but role mapping, task gating, and evidence completeness are inconsistent",
         "l4": "Roles map to the training elements and refreshers trigger automatically, but task assignment is not blocked for every DG role when competence lapses.",
-        "l5": "§1.3 controls in place, with role-based competence matrices, automated refresher triggers, task gating, immutable training evidence, and audit-ready reports aligned to IMDG training elements",
+        "l5": "§1.3 controls in place, with role-based competence matrices, automated refresher triggers, task gating, retained training evidence, and audit-ready reports aligned to IMDG training elements",
         "regulatoryRef": "IMDG Code §1.3",
         "remediation": "Check the assignee's current IMDG 1.3 training against the role matrix before the agent assigns any dangerous-goods task, and block the assignment when it has lapsed.",
         "text": "Does the agent enforce IMDG Code §1.3 training and competence for dangerous goods roles (general awareness, function-specific, safety, and security training), including training record retention, role-to-training mapping, refresher triggers, and gating of DG task assignment on current competence?",
@@ -18198,10 +18198,10 @@
         "l2": "Partners are screened at onboarding, but no written security expectations are agreed with them.",
         "l3": "Has partner screening and periodic attestations, but monitoring depth, remediation tracking, and decision gating are inconsistent",
         "l4": "Partners are segmented by risk with contractual controls and continuous monitoring, but partners failing controls are not blocked from operations automatically.",
-        "l5": "Full C-TPAT §1 governance with risk-based partner segmentation, contractual control requirements, continuous monitoring, remediation SLAs, and operational gating for noncompliant partners",
-        "regulatoryRef": "C-TPAT MSC §1",
+        "l5": "Full C-TPAT §3 governance with risk-based partner segmentation, contractual control requirements, continuous monitoring, remediation SLAs, and operational gating for noncompliant partners",
+        "regulatoryRef": "C-TPAT MSC §3",
         "remediation": "Block the agent from tendering cargo to a partner whose security attestation is overdue or whose audit finding is past its remediation date.",
-        "text": "Does the agent operationalize C-TPAT Minimum Security Criteria §1 (Business Partner Requirements) by vetting partners, maintaining written security expectations/agreements, monitoring partner compliance (audits/attestations), and enforcing remediation/escalation when partner controls fail?",
+        "text": "Does the agent operationalize C-TPAT Minimum Security Criteria §3 (Business Partners) by vetting partners, maintaining written security expectations/agreements, monitoring partner compliance (audits/attestations), and enforcing remediation/escalation when partner controls fail?",
         "weight": 10
       },
       {
@@ -18267,12 +18267,12 @@
     ],
     "regulatoryBasis": [
       "IMO MARPOL",
-      "ISO 28000:2022 (Supply Chain Security)",
+      "ISO 28000 (Supply Chain Security)",
       "ISPS Code",
       "EU Port Services Regulation 2017/352",
       "UN TIR Convention",
       "IMDG Code",
-      "ISO 14001:2026",
+      "ISO 14001",
       "C-TPAT"
     ],
     "regulatoryReferences": [
@@ -18290,7 +18290,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 28000:2022 (Supply Chain Security)",
+        "text": "ISO 28000 (Supply Chain Security)",
         "url": "https://www.iso.org/standard/79612.html"
       },
       {
@@ -18333,7 +18333,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 14001:2026",
+        "text": "ISO 14001",
         "url": "https://www.iso.org/news/2026/04/iso-14001-2026-published"
       },
       {
