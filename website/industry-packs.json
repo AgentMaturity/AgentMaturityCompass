@@ -806,10 +806,10 @@
       "EU Data Act 2023/2854",
       "EU Data Governance Act 2022/868",
       "CCPA/CPRA §1798.100(d)",
-      "ISO/IEC 27001:2022",
+      "ISO/IEC 27001",
       "EU NIS2 Directive 2022/2555",
       "OWASP API Security Top 10 2023",
-      "OpenID Connect / OAuth 2.1"
+      "OpenID Connect Core 1.0 / OAuth 2.0 (RFC 6749)"
      ],
      "risks": [
       "Data sovereignty erosion through ecosystem lock-in",

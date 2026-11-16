@@ -10122,7 +10122,7 @@
     "version": "2026.10"
   },
   "networked-ecosystems": {
-    "certificationPath": "L1 Basic API security → L2 GDPR data portability compliance → L3 EU Data Act/DGA compliance → L4 Full ecosystem trust architecture → L5 Autonomous ecosystem orchestration with verified data rights and sovereignty",
+    "certificationPath": "L1 Basic API security → L2 GDPR data portability controls in place → L3 EU Data Act/DGA controls in place → L4 Full ecosystem trust architecture → L5 Autonomous ecosystem orchestration with verified data rights and sovereignty",
     "certificationThreshold": 70,
     "complianceFrameworkRefs": [
       {
@@ -10147,7 +10147,7 @@
         "external": false,
         "frameworkId": "ISO_27001",
         "instrumentId": "iso-27001",
-        "label": "ISO/IEC 27001:2022"
+        "label": "ISO/IEC 27001"
       },
       {
         "external": false,
@@ -10160,12 +10160,12 @@
       "GDPR Art. 20",
       "EU Data Act 2023/2854",
       "EU Data Governance Act 2022/868",
-      "ISO/IEC 27001:2022",
+      "ISO/IEC 27001",
       "OWASP API Top 10 2023"
     ],
     "contentStatus": "experimental",
     "description": "Data connectivity across customer, enterprise, and industry ecosystems — flipping financial ecosystems to human ecosystems — AI agents orchestrating data flows, API ecosystems, and platform integrations with emphasis on interoperability, data rights, and ecosystem trust.",
-    "euAIActClassification": "Annex III §2 where a safety component of critical digital infrastructure; otherwise not listed — Art. 50 transparency applies",
+    "euAIActClassification": "Annex III §2 where a safety component in the management and operation of critical digital infrastructure; otherwise not listed — Art. 50 transparency applies where the agent interacts directly with people or generates synthetic content",
     "id": "networked-ecosystems",
     "keyRisks": [
       "Data sovereignty erosion through ecosystem lock-in",
@@ -10272,7 +10272,7 @@
         "l3": "Interface descriptions are published for some APIs, or data formats are documented but not openly available to ecosystem participants.",
         "l4": "Every API has a published description and open formats, but CI does not validate descriptions against the running service or deprecations lack notice.",
         "l5": "Every exposed API has a published machine-readable description validated in CI against the running service; every exchanged data format is openly documented and versioned; deprecations announced with a documented notice period.",
-        "regulatoryRef": "EU EIF v2",
+        "regulatoryRef": "European Interoperability Framework, COM(2017) 134 (technical interoperability)",
         "remediation": "Publish an OpenAPI 3.1 description for every ecosystem API and add a CI contract test that fails when the running service diverges from it.",
         "text": "Does the agent expose every ecosystem API with a published machine-readable interface description (for example OpenAPI 3.1) and exchange data in openly documented formats, applying the technical interoperability layer of the European Interoperability Framework (COM(2017) 134)?",
         "weight": 10
@@ -10563,10 +10563,10 @@
       "EU Data Act 2023/2854",
       "EU Data Governance Act 2022/868",
       "CCPA/CPRA §1798.100(d)",
-      "ISO/IEC 27001:2022",
+      "ISO/IEC 27001",
       "EU NIS2 Directive 2022/2555",
       "OWASP API Security Top 10 2023",
-      "OpenID Connect / OAuth 2.1"
+      "OpenID Connect Core 1.0 / OAuth 2.0 (RFC 6749)"
     ],
     "regulatoryReferences": [
       {
@@ -10613,7 +10613,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO/IEC 27001:2022",
+        "text": "ISO/IEC 27001",
         "url": "https://www.iso.org/standard/27001"
       },
       {
@@ -10635,12 +10635,11 @@
         "text": "OWASP API Security Top 10 2023"
       },
       {
-        "citation": "OpenID Connect / OAuth 2.1",
-        "instrumentId": "oidc-oauth21",
-        "jurisdiction": "INT",
-        "lastReviewed": "2026-10-03",
+        "citation": "OpenID Connect Core 1.0 / OAuth 2.0 (RFC 6749)",
+        "instrumentId": null,
+        "jurisdiction": "unresolved",
         "status": "unverified",
-        "text": "OpenID Connect / OAuth 2.1"
+        "text": "OpenID Connect Core 1.0 / OAuth 2.0 (RFC 6749)"
       }
     ],
     "riskTier": "high",

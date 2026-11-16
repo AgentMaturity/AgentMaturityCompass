@@ -36,20 +36,24 @@ describe("Industry Pack citation check records", () => {
   });
 
   it("defaults to not checked and expires a check after the maximum age", () => {
-    const fresh = citationCheckSummary(pack, new Date("2026-11-17"));
+    const rows = (CITATION_CHECK_FILES.technology as CitationCheck[]).filter((r) => r.packId === pack.id);
+    const counted = rows.filter((r) => r.verdict === "verified" || r.verdict === "corrected").length;
+    const withUnrecorded = { ...pack, regulatoryBasis: [...pack.regulatoryBasis, "Unrecorded law Art. 1"] };
+    const fresh = citationCheckSummary(withUnrecorded, new Date("2026-11-17"));
     const tne8 = fresh.citations.filter((c) => c.questionId === "TECH-NE-8");
     expect(tne8.map((c) => c.state)).toEqual(["checked", "checked"]);
-    expect(fresh.citations.find((c) => c.questionId === "TECH-NE-1")!.state).toBe("not-checked");
-    expect(fresh.checked).toBe(2);
+    expect(fresh.citations.find((c) => c.citation === "Unrecorded law Art. 1")!.state).toBe("not-checked");
+    expect(fresh.checked).toBe(counted);
     const later = new Date(Date.parse("2026-11-16") + (CITATION_CHECK_MAX_AGE_DAYS + 2) * 86_400_000);
-    const old = citationCheckSummary(pack, later);
+    const old = citationCheckSummary(withUnrecorded, later);
     expect(old.checked).toBe(0);
-    expect(old.counts.expired).toBe(2);
+    expect(old.counts.expired).toBe(rows.length);
   });
 
   it("describe says how many citations are checked and that an AI agent's check is not an expert review", () => {
-    const line = citationCheckLine(citationCheckSummary(pack, new Date("2026-11-17")));
-    expect(line).toMatch(/^2 of \d+ citations checked; 2 of them by an AI agent, not an expert review$/);
+    const summary = citationCheckSummary(pack, new Date("2026-11-17"));
+    const line = citationCheckLine(summary);
+    expect(line).toMatch(new RegExp(`^${summary.checked} of ${summary.total} citations checked; ${summary.checked} of them by an AI agent, not an expert review(; .+)?$`));
     expect(line).not.toMatch(/verified|approved|compliant/i);
   });
 
