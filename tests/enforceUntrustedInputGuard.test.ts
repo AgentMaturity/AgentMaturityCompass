@@ -152,7 +152,7 @@ describe("untrusted-input guard rules", () => {
       requests: [{ name: "process.spawn", args: { binary: "curl", argv: ["https://example.com"] } }], tools, today });
     expect(send.decision).toBe("ask");
     expect(send.reason).toContain("AMC could not read what this session has read before");
-    expect(send.approvals).toEqual([{ toolName: "process.spawn", actionClass: "READ_ONLY", quorumFloor: { requiredApprovals: 1 } }]);
+    expect((send as { approvals?: unknown }).approvals).toEqual([{ toolName: "process.spawn", actionClass: "READ_ONLY", quorumFloor: { requiredApprovals: 1 } }]);
     const read = applyInputGuard({ workspace, agentId: "a", provider: "gemini-cli", sessionId: null, shownAs: "read_file",
       requests: [{ name: "fs.read", args: { path: join(workspace, "workspace", "public.txt") } }], tools, today });
     expect(read.decision).toBe("allow");
