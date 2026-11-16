@@ -73,8 +73,8 @@ export const sustainablePortsDetail: PackQuestionDetail = {
   },
   "MOB-SP-7": {
     l2: "The minimum requirements are listed, but providers are onboarded without a recorded check against them.",
-    l4: "Providers are checked against Art. 4 and charges are published, but not every complaint is logged and closed through the Art. 16 procedure.",
-    evidence: ["port_service_provider_requirement_check", "published_port_service_charges", "art16_complaint_handling_log"],
+    l4: "Providers are checked against Art. 4 and charges under Art. 12(1) are set from documented criteria, but not every complaint is logged and closed through the Art. 16 procedure.",
+    evidence: ["port_service_provider_requirement_check", "art12_charge_basis_record", "art16_complaint_handling_log"],
     remediation:
       "Gate the agent's assignment of a pilotage, towage or mooring provider on a current Art. 4 requirement check, and file every user complaint " +
       "it receives into the Art. 16 log.",
@@ -114,7 +114,7 @@ export const sustainablePortsDetail: PackQuestionDetail = {
     remediation:
       "Load ECA boundaries from a register keyed to entry-into-force dates, and have the agent check each call's changeover log against the " +
       "boundaries in force on the call date.",
-    failureMode: "The agent passes a vessel that burned 0.50% fuel inside the Norwegian Sea ECA after 1 March 2026 because its ECA list predates that area.",
+    failureMode: "The agent passes a vessel that burned 0.50% fuel inside the Norwegian Sea ECA after its requirements took effect because its ECA list predates that area.",
     keyRisk: 1,
   },
   "MOB-SP-11": {

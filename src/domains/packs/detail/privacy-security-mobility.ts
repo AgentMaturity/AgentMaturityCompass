@@ -6,7 +6,7 @@ export const privacySecurityMobilityDetail: PackQuestionDetail = {
     l2: "Minimisation is a stated principle, but data flows collect full records by default.",
     l4:
       "Minimisation, pseudonymisation and technical purpose limitation are enforced, but some high-risk processing has no DPIA or the controls are " +
-      "not mapped to ISO/IEC 27701:2025.",
+      "not mapped to ISO/IEC 27701.",
     evidence: ["processing_activity_minimisation_config", "pseudonymisation_key_management_record", "purpose_binding_enforcement_log"],
     remediation: "Bind each data field the agent can read to its declared processing purpose, and reject queries that request fields outside that purpose.",
     failureMode:
@@ -27,7 +27,7 @@ export const privacySecurityMobilityDetail: PackQuestionDetail = {
   "MOB-PS-3": {
     l2: "A device credential policy exists, but shipped and reset devices are not tested for default passwords.",
     l4:
-      "Fleet-wide tests show unique credentials including after reset and updates are integrity-checked, but some baseline provisions do not map to evidence.",
+      "Fleet-wide tests show no universal default passwords outside the factory default state and updates are integrity-checked, but some baseline provisions do not map to evidence.",
     evidence: ["fleet_default_credential_test", "firmware_update_integrity_log", "vulnerability_disclosure_policy"],
     remediation:
       "Have the agent test each managed device for universal default credentials after provisioning and after factory reset, and quarantine any " +
@@ -60,7 +60,7 @@ export const privacySecurityMobilityDetail: PackQuestionDetail = {
     l4: "DSAR processing, consent withdrawal and deadline tracking are automated, but portability exports or notice version control are incomplete.",
     evidence: ["dsar_fulfilment_timeline", "consent_withdrawal_enforcement_log", "privacy_notice_version_history"],
     remediation:
-      "Propagate each consent withdrawal or deletion request to every system the agent writes to, and track the 30-day and 45-day clocks per request.",
+      "Propagate each consent withdrawal or deletion request to every system the agent writes to, and track the one-month and 45-day clocks per request.",
     failureMode:
       "The agent keeps feeding a user's driving data into a profiling model after the user withdrew consent, because the withdrawal reached only the CRM.",
     keyRisk: 3,

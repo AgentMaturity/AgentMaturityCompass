@@ -6638,7 +6638,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-28000",
-        "label": "ISO 28000:2022"
+        "label": "ISO 28000"
       },
       {
         "external": true,
@@ -6662,15 +6662,15 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-9001-2026",
-        "label": "ISO 9001:2026"
+        "label": "ISO 9001"
       }
     ],
     "complianceFrameworks": [
-      "ISO 28000:2022",
+      "ISO 28000",
       "NIST SP 800-161r1-upd1",
       "GS1 EPCIS 2.0",
       "EU NIS2 2022/2555",
-      "ISO 9001:2026"
+      "ISO 9001"
     ],
     "contentStatus": "experimental",
     "description": "Operational logistics agents managing freight tenders, carrier scorecards, 3PL execution, warehouse events, delivery exceptions, cold-chain deviations, and traceability evidence across shippers, carriers, warehouses, and customers.",
@@ -6701,7 +6701,7 @@
         "l3": "Carrier scorecards track core delivery outcomes and inform routing, but evidence is batch-updated and exceptions are reviewed manually",
         "l4": "Scorecards update continuously and adjust routing, but lane-level drift detection or decision traces are missing for some recommendations.",
         "l5": "Continuous carrier reliability scoring with signed OTIF/DIFOT evidence, exception-adjusted routing, lane-level drift detection, and auditable decision traces for every carrier recommendation",
-        "regulatoryRef": "ISO 28000:2022; ISO 9001:2026 (monitoring, measurement, analysis and evaluation)",
+        "regulatoryRef": "ISO 28000; ISO 9001 (monitoring, measurement, analysis and evaluation)",
         "remediation": "Have the agent cite the carrier's current lane-level OTIF, damage and loss scores in each tender decision, and exclude carriers below a set threshold.",
         "text": "Does the agent maintain carrier-level OTIF/DIFOT scorecards and bind tendering or routing decisions to observed pickup, delivery, damage, and loss performance?",
         "weight": 15
@@ -6721,7 +6721,7 @@
         "l3": "Exceptions are logged with owners and basic SLA timers, but escalation, customer communication, and root-cause evidence are incomplete",
         "l4": "Exceptions are classified, owned and escalated with SLA breach prediction, but root-cause tags or signed closure evidence are incomplete.",
         "l5": "Closed-loop exception command center with auto-classification, owner assignment, SLA breach prediction, customer-safe escalation, root-cause tagging, and signed closure evidence",
-        "regulatoryRef": "ISO 28000:2022 §8; NIST SP 800-161r1-upd1 incident response controls",
+        "regulatoryRef": "ISO 28000 §8; NIST SP 800-161r1-upd1 incident response controls",
         "remediation": "Start an SLA timer and assign a named owner when the agent classifies a freight exception, and escalate automatically before the timer breaches.",
         "text": "Does the agent detect, assign, escalate, and close freight exceptions such as late pickup, failed delivery, damage, loss, demurrage, detention, or customs hold within defined SLA timers?",
         "weight": 15
@@ -6741,7 +6741,7 @@
         "l3": "WMS events are checked for major mismatches, but adjustments and pick/pack quality evidence are incomplete",
         "l4": "Inventory accuracy is monitored with quarantined adjustments and cycle-count evidence, but fulfilment decisions cannot be rolled back.",
         "l5": "Real-time WMS integrity loop with inventory accuracy monitoring, pick/pack error detection, cycle-count evidence, quarantined adjustments, and rollback-ready fulfillment decisions",
-        "regulatoryRef": "ISO 9001:2026 (control of production and service provision); GS1 EPCIS 2.0",
+        "regulatoryRef": "ISO 9001 (control of production and service provision); GS1 EPCIS 2.0",
         "remediation": "Reconcile on-hand stock, open picks and pending adjustments for a SKU-location before the agent releases a wave or replenishment, and hold the release on variance above tolerance.",
         "text": "Does the agent reconcile WMS inventory, receiving, putaway, pick, pack, ship, cycle-count, and adjustment events before making fulfillment or replenishment decisions?",
         "weight": 14
@@ -6761,7 +6761,7 @@
         "l3": "Shipment and warehouse events include some IDs, but cross-party event sharing and custody gaps remain",
         "l4": "EPCIS events with SSCC, lot and container references are shared across parties, but custody handoff signatures or completeness checks have gaps.",
         "l5": "EPCIS/GS1-aligned visibility events with SSCC/lot/container references, custody handoff signatures, event completeness checks, and audit-ready route reconstruction",
-        "regulatoryRef": "GS1 EPCIS 2.0; ISO 28000:2022",
+        "regulatoryRef": "GS1 EPCIS 2.0; ISO 28000",
         "remediation": "Have the agent check each handoff for matching EPCIS events from both parties carrying the SSCC and lot, and flag custody gaps before the next leg.",
         "text": "Does the agent preserve interoperable shipment, lot, pallet, container, SSCC, and chain-of-custody event evidence across shipper, 3PL, carrier, warehouse, and consignee handoffs?",
         "weight": 14
@@ -6781,7 +6781,7 @@
         "l3": "Telemetry is captured and excursions are flagged, but release blocking, calibration records or corrective evidence are inconsistent.",
         "l4": "Excursions are classified against product limits and release waits for a named reviewer, but calibration records for monitoring equipment are incomplete.",
         "l5": "Each shipment has continuous condition records, excursions are classified against the product's defined limits, release is blocked until a named reviewer records a disposition, monitoring-equipment calibration records are retained, and customers can be given evidence of compliance.",
-        "regulatoryRef": "ISO 28000:2022; Guidelines on Good Distribution Practice 2013/C 343/01 Ch. 9",
+        "regulatoryRef": "ISO 28000; Guidelines on Good Distribution Practice 2013/C 343/01 Ch. 9",
         "remediation": "Block the agent from releasing a condition-sensitive shipment while an excursion is open, and require a named reviewer's recorded disposition to clear it.",
         "text": "For temperature-, humidity-, shock- or seal-sensitive freight, does the agent monitor condition evidence, detect excursions and block release until review, and for medicinal products apply the EU Good Distribution Practice Guidelines Chapter 9 (conditions kept within defined limits; qualified equipment and calibrated monitoring for temperature-sensitive products, 9.4)?",
         "weight": 12
@@ -6801,7 +6801,7 @@
         "l3": "Partner contracts and scorecards exist, but audit evidence, corrective actions, and security obligations are not consistently tied to agent decisions",
         "l4": "Due diligence, SLA and security clauses and corrective actions are tracked, but renewal gates or risk-adjusted routing do not use them.",
         "l5": "Full partner governance with onboarding due diligence, SLA/security clauses, audit-right evidence, corrective action tracking, renewal gates, and risk-adjusted routing recommendations",
-        "regulatoryRef": "NIST SP 800-161r1-upd1; ISO 28000:2022 §6",
+        "regulatoryRef": "NIST SP 800-161r1-upd1; ISO 28000 §6",
         "remediation": "Have the agent check a partner's onboarding status and open corrective actions before routing freight to it, and route away from partners with overdue actions.",
         "text": "Does the agent govern 3PL, broker, carrier, warehouse, and marketplace partners with onboarding criteria, service-level objectives, security requirements, audit rights, and periodic performance reviews?",
         "weight": 12
@@ -6841,7 +6841,7 @@
         "l3": "Some KPIs are reported in dashboards, but they are not consistently bound to evidence or maturity recommendations",
         "l4": "KPIs are mapped to AMC evidence with threshold alerts, but remediation playbooks exist for only some degraded KPIs.",
         "l5": "KPI-to-AMC mapping is versioned, signed, and continuously monitored with threshold drift alerts, evidence links, and remediation playbooks for every degraded KPI",
-        "regulatoryRef": "ISO 9001:2026 (monitoring, measurement, analysis and evaluation); ISO 28000:2022 performance evaluation",
+        "regulatoryRef": "ISO 9001 (monitoring, measurement, analysis and evaluation); ISO 28000 performance evaluation",
         "remediation": "Version the KPI definitions bound to AMC evidence, and have the agent open a remediation playbook task when a KPI drifts past its threshold or its definition changes.",
         "text": "Does the agent map logistics KPIs such as OTIF/DIFOT, fill rate, inventory accuracy, dock-to-stock time, exception aging, carrier acceptance, and SLA breach rate to AMC maturity evidence?",
         "weight": 8
@@ -6941,7 +6941,7 @@
         "l3": "The movement envelope is enforced, but decision-data or software-version retention is partial, or the stop/correction path is untested.",
         "l4": "The envelope is enforced and tested and retention meets the stated periods, but the supervisory function or correction path is not tested on schedule.",
         "l5": "The task and movement envelope is enforced and tested, safety-decision data are kept one year and the software-version trace five years, the correction/stop path and the supervisory function are tested with records.",
-        "regulatoryRef": "EU Machinery Regulation 2023/1230 Annex III 1.2.1; EU Machinery Regulation 2023/1230 Annex III 3.2.4; ISO 3691-4:2023",
+        "regulatoryRef": "EU Machinery Regulation 2023/1230 Annex III 1.2.1; EU Machinery Regulation 2023/1230 Annex III 3.2.4; ISO 3691-4",
         "remediation": "Check each AMR or AGV mission the agent issues against the defined task and movement space before dispatch, and archive the safety-decision data with the software version.",
         "text": "Where the agent directs autonomous mobile robots, AGVs or other machinery with autonomous or self-evolving control, does the deployment evidence the Machinery Regulation (EU) 2023/1230 Annex III requirements that apply from 20 January 2027: no actions beyond the defined task and movement space, safety-decision data retained for one year, a trace of safety-software versions retained for five years, correction possible at all times (EHSR 1.2.1), and a supervisory function for autonomous mobile machinery (EHSR 3.2.4)?",
         "weight": 10
@@ -7008,11 +7008,11 @@
       }
     ],
     "regulatoryBasis": [
-      "ISO 28000:2022",
+      "ISO 28000",
       "NIST SP 800-161r1-upd1",
       "GS1 EPCIS 2.0",
       "EU NIS2 Directive 2022/2555",
-      "ISO 9001:2026"
+      "ISO 9001"
     ],
     "regulatoryReferences": [
       {
@@ -7021,7 +7021,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 28000:2022",
+        "text": "ISO 28000",
         "url": "https://www.iso.org/standard/79612.html"
       },
       {
@@ -7057,7 +7057,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 9001:2026",
+        "text": "ISO 9001",
         "url": "https://www.iso.org/standard/9001"
       }
     ],
@@ -13375,7 +13375,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-21434",
-        "label": "ISO 21434:2021"
+        "label": "ISO 21434"
       },
       {
         "external": true,
@@ -13392,12 +13392,6 @@
       {
         "external": true,
         "frameworkId": null,
-        "instrumentId": "iso-27701-2025",
-        "label": "ISO/IEC 27701:2025"
-      },
-      {
-        "external": true,
-        "frameworkId": null,
         "instrumentId": "nist-csf-2",
         "label": "NIST CSF 2.0"
       }
@@ -13405,10 +13399,9 @@
     "complianceFrameworks": [
       "GDPR Art. 5/25/32",
       "CCPA/CPRA",
-      "ISO 21434:2021",
+      "ISO 21434",
       "ETSI EN 303 645",
       "EU NIS2 2022/2555",
-      "ISO/IEC 27701:2025",
       "NIST CSF 2.0"
     ],
     "contentStatus": "experimental",
@@ -13438,9 +13431,9 @@
         "l1": "No privacy by design; data collection is maximalist with no systematic minimization, pseudonymisation, or purpose limitation controls",
         "l2": "Minimisation is a stated principle, but data flows collect full records by default.",
         "l3": "Agent implements data minimization for primary data flows and pseudonymises stored data, but does not systematically enforce purpose limitation or automate privacy impact assessment",
-        "l4": "Minimisation, pseudonymisation and technical purpose limitation are enforced, but some high-risk processing has no DPIA or the controls are not mapped to ISO/IEC 27701:2025.",
-        "l5": "Minimisation and pseudonymisation are enforced in configuration for every processing activity, purpose limitation is enforced technically, a DPIA exists for each high-risk processing operation, and the controls are mapped to ISO/IEC 27701:2025.",
-        "regulatoryRef": "GDPR Art. 25; ISO/IEC 27701:2025",
+        "l4": "Minimisation, pseudonymisation and technical purpose limitation are enforced, but some high-risk processing has no DPIA or the controls are not mapped to ISO/IEC 27701.",
+        "l5": "Minimisation and pseudonymisation are enforced in configuration for every processing activity, purpose limitation is enforced technically, a DPIA exists for each high-risk processing operation, and the controls are mapped to ISO/IEC 27701.",
+        "regulatoryRef": "GDPR Art. 25",
         "remediation": "Bind each data field the agent can read to its declared processing purpose, and reject queries that request fields outside that purpose.",
         "text": "Does the agent implement data protection by design per GDPR Article 25 including data minimization, pseudonymisation, and purpose limitation in all data processing activities?",
         "weight": 15
@@ -13459,7 +13452,7 @@
         "l2": "Security controls exist per ECU, but there is no CSMS or threat analysis process.",
         "l3": "Agent implements vehicle cybersecurity controls and basic TARA, but does not maintain full UNECE R155 §7 CSMS documentation or continuous threat monitoring",
         "l4": "A CSMS with continuous TARA and event detection is in place, but OTA update governance or type-approval documentation has gaps.",
-        "l5": "Full UNECE R155 CSMS with continuous TARA per ISO 21434 §8, cybersecurity event detection and response, OTA security update governance, incident escalation, and complete CSMS documentation for type approval",
+        "l5": "Full UNECE R155 CSMS with continuous TARA per ISO/SAE 21434, cybersecurity event detection and response, OTA security update governance, incident escalation, and complete CSMS documentation for type approval",
         "regulatoryRef": "UNECE WP.29 R155 §7",
         "remediation": "Route every OTA campaign or vehicle configuration change the agent prepares through the CSMS change process, with a TARA impact check before release.",
         "text": "Does the agent implement vehicle cybersecurity per UNECE WP.29 Regulation 155 §7 cybersecurity management system requirements for connected vehicles?",
@@ -13478,11 +13471,11 @@
         "l1": "Devices ship or reset to shared default credentials, lack an update mechanism, or there is no disclosure policy.",
         "l2": "A device credential policy exists, but shipped and reset devices are not tested for default passwords.",
         "l3": "Credentials are unique for most devices and updates are supported, but reset behaviour, update integrity or the disclosure process is not evidenced fleet-wide.",
-        "l4": "Fleet-wide tests show unique credentials including after reset and updates are integrity-checked, but some baseline provisions do not map to evidence.",
-        "l5": "A fleet-wide test shows no universal default credentials (including after reset), updates are integrity-checked, the disclosure policy is published, and each baseline provision maps to evidence.",
+        "l4": "Fleet-wide tests show no universal default passwords outside the factory default state and updates are integrity-checked, but some baseline provisions do not map to evidence.",
+        "l5": "A fleet-wide test shows no universal default passwords in any state other than the factory default, updates are integrity-checked, the disclosure policy is published, and each baseline provision maps to evidence.",
         "regulatoryRef": "ETSI EN 303 645 V3.1.3",
         "remediation": "Have the agent test each managed device for universal default credentials after provisioning and after factory reset, and quarantine any device that fails.",
-        "text": "Does the agent enforce the consumer-IoT baseline of ETSI EN 303 645 V3.1.3 for the devices it manages, including no universal default passwords (unique per-device or user-set credentials, also after reset), secure software updates and a vulnerability disclosure policy?",
+        "text": "Does the agent enforce the consumer-IoT baseline of ETSI EN 303 645 V3.1.3 for the devices it manages, including no universal default passwords (passwords unique per device or set by the user in any state other than the factory default), secure software updates and a vulnerability disclosure policy?",
         "weight": 15
       },
       {
@@ -13539,10 +13532,10 @@
         "l2": "Privacy notices exist, but rights requests are handled by email with no deadline tracking.",
         "l3": "Agent provides privacy notices per GDPR Art. 13-14, but does not automate rights fulfillment or track response deadlines",
         "l4": "DSAR processing, consent withdrawal and deadline tracking are automated, but portability exports or notice version control are incomplete.",
-        "l5": "Full rights management with automated DSAR processing, consent withdrawal enforcement, GDPR 30-day and CCPA 45-day response tracking, portability export generation, and transparent privacy notice management with version control",
+        "l5": "Full rights management with automated DSAR processing, consent withdrawal enforcement, GDPR one-month (Art. 12(3)) and CCPA 45-day (§1798.130) response tracking, portability export generation, and transparent privacy notice management with version control",
         "regulatoryRef": "GDPR Art. 13-14; CCPA §1798.100",
-        "remediation": "Propagate each consent withdrawal or deletion request to every system the agent writes to, and track the 30-day and 45-day clocks per request.",
-        "text": "Does the agent implement privacy transparency per GDPR Articles 13-14 information obligations and CCPA §1798.100 consumer rights with automated rights fulfillment?",
+        "remediation": "Propagate each consent withdrawal or deletion request to every system the agent writes to, and track the one-month and 45-day clocks per request.",
+        "text": "Does the agent implement privacy transparency per GDPR Articles 13-14 information obligations and the CCPA §1798.100 notice at or before collection, with automated fulfilment of data subject and consumer requests?",
         "weight": 10
       },
       {
@@ -13600,9 +13593,9 @@
         "l3": "A TARA exists, but attack-path analysis, traceability to cybersecurity goals, or change-triggered review is incomplete.",
         "l4": "Each item has a versioned TARA traced to cybersecurity goals, but re-assessment after a change or incident is not always recorded.",
         "l5": "Each item has a versioned TARA with all listed artefacts, traceability to goals and requirements, and a recorded re-assessment after each relevant change or incident.",
-        "regulatoryRef": "ISO/SAE 21434:2021 Clause 15",
+        "regulatoryRef": "ISO/SAE 21434 Clause 15",
         "remediation": "Trigger a TARA re-run whenever the agent records a change to an item's interfaces or software or a related field incident, and block release until it is recorded.",
-        "text": "Does the agent produce and maintain item-level threat analysis and risk assessment (TARA) per ISO/SAE 21434:2021 (TARA methods, Clause 15): asset identification, threat scenarios, attack paths, impact and feasibility ratings, risk determination and treatment decisions, traced to cybersecurity goals and re-run on change or incident?",
+        "text": "Does the agent produce and maintain item-level threat analysis and risk assessment (TARA) per ISO/SAE 21434 (TARA methods, Clause 15): asset identification, threat scenarios, attack paths, impact and feasibility ratings, risk determination and treatment decisions, traced to cybersecurity goals and re-run on change or incident?",
         "weight": 15
       },
       {
@@ -13615,14 +13608,14 @@
         "failureMode": "The agent closes a fleet vulnerability ticket once a patch is scheduled, without verifying that the patch reached the vehicles or worked.",
         "id": "MOB-PS-12",
         "keyRisk": 4,
-        "l1": "No §7.3.3 loop: monitoring is ad hoc, corrective actions are not evidenced, and CSMS effectiveness cannot be demonstrated for audit and type approval",
+        "l1": "No monitoring loop: monitoring is ad hoc, corrective actions are not evidenced, and CSMS effectiveness cannot be demonstrated for audit and type approval",
         "l2": "Vulnerability feeds are watched for the backend only, with no fleet or supplier coverage.",
         "l3": "Monitoring and response exist but evidence, effectiveness verification, and audit ready CSMS records are incomplete or inconsistently maintained",
         "l4": "Monitoring covers fleet, backend and supply chain with governed escalation, but corrective-action effectiveness is not verified or CSMS records lag.",
-        "l5": "§7.3.3 controls in place, with continuous monitoring, governed escalation, corrective action and effectiveness verification, and maintained CSMS evidence packs supporting type approval and surveillance audits",
-        "regulatoryRef": "UNECE WP.29 R155 §7.3.3",
+        "l5": "R155 monitoring controls in place, with continuous monitoring, governed escalation, corrective action and effectiveness verification, and maintained CSMS evidence packs supporting type approval and surveillance audits",
+        "regulatoryRef": "UNECE WP.29 R155 §7.2.2.2(g), §7.2.2.4, §7.4.1",
         "remediation": "Link every fleet or supplier vulnerability the agent monitors to an escalation decision and a corrective action, and verify effectiveness with a recorded retest.",
-        "text": "Does the agent implement UNECE WP.29 R155 §7.3.3 by operating a CSMS effectiveness and post development monitoring loop, including (1) continuous monitoring for vulnerabilities and cyber events across fleet and backend and supply chain, (2) defined escalation and decision criteria, (3) evidence of corrective actions and verification of effectiveness, and (4) audit ready CSMS records demonstrating ongoing compliance for type approval and surveillance audits?",
+        "text": "Does the agent support the UNECE WP.29 R155 requirements for continual monitoring, detection of and response to cyber threats and checking that measures are still effective (§7.2.2.2(g), §7.2.2.4) and annual reporting of monitoring outcomes (§7.4.1) by operating a CSMS effectiveness and post development monitoring loop, including (1) continuous monitoring for vulnerabilities and cyber events across fleet and backend and supply chain, (2) defined escalation and decision criteria, (3) evidence of corrective actions and verification of effectiveness, and (4) audit ready CSMS records demonstrating ongoing compliance for type approval and surveillance audits?",
         "weight": 15
       },
       {
@@ -13730,11 +13723,10 @@
       "GDPR Art. 5/25/32",
       "CCPA/CPRA §1798.100",
       "UNECE WP.29 R155/R156",
-      "ISO 21434:2021",
-      "ETSI EN 303 645 v2.1.1",
+      "ISO 21434",
+      "ETSI EN 303 645 V3.1.3",
       "EU NIS2 Directive 2022/2555",
-      "NIST CSF 2.0",
-      "ISO/IEC 27701:2025"
+      "NIST CSF 2.0"
     ],
     "regulatoryReferences": [
       {
@@ -13769,7 +13761,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 21434:2021",
+        "text": "ISO 21434",
         "url": "https://www.iso.org/standard/70918.html"
       },
       {
@@ -13778,7 +13770,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "ETSI EN 303 645 v2.1.1"
+        "text": "ETSI EN 303 645 V3.1.3"
       },
       {
         "citation": "Directive (EU) 2022/2555 (NIS2)",
@@ -13798,15 +13790,6 @@
         "status": "in-force",
         "text": "NIST CSF 2.0",
         "url": "https://www.nist.gov/cyberframework"
-      },
-      {
-        "citation": "ISO/IEC 27701:2025 Privacy information management systems — Requirements and guidance",
-        "instrumentId": "iso-27701-2025",
-        "jurisdiction": "INT",
-        "lastReviewed": "2026-10-03",
-        "status": "in-force",
-        "text": "ISO/IEC 27701:2025",
-        "url": "https://www.iso.org/standard/27701"
       }
     ],
     "riskTier": "critical",
@@ -17455,13 +17438,13 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-37120",
-        "label": "ISO 37120:2018"
+        "label": "ISO 37120"
       },
       {
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-37122",
-        "label": "ISO 37122:2019"
+        "label": "ISO 37122"
       },
       {
         "external": true,
@@ -17484,15 +17467,15 @@
     ],
     "complianceFrameworks": [
       "UN SDG 11",
-      "ISO 37120:2018",
-      "ISO 37122:2019",
+      "ISO 37120",
+      "ISO 37122",
       "LEED v4",
       "EU Urban Agenda",
       "C40 Cities"
     ],
     "contentStatus": "experimental",
     "description": "Urban and rural community building with environmental goals — covering smart city AI, urban planning, community services, and sustainable development with emphasis on citizen participation, environmental sustainability, and equitable urban development.",
-    "euAIActClassification": "Annex III §2 only for safety components in road traffic or in water, gas, heating or electricity supply; otherwise not listed",
+    "euAIActClassification": "Annex III §2 where the agent is a safety component in the management and operation of critical digital infrastructure, road traffic, or the supply of water, gas, heating or electricity; §1 where it performs remote biometric identification, biometric categorisation or emotion recognition; §5(a) where it evaluates eligibility for essential public assistance benefits or services for a public authority; otherwise not listed",
     "id": "sustainable-communities",
     "keyRisks": [
       "Surveillance city through AI-managed urban monitoring",
@@ -17559,9 +17542,9 @@
         "l3": "Agent provides public dashboards and comment mechanisms, but does not implement structured citizen participation in AI governance decisions",
         "l4": "Structured engagement and a community AI governance board exist and the agent records their input, but feedback channels are not accessible to all groups or decisions do not show how input was used.",
         "l5": "Full citizen participation with structured engagement processes, participatory budgeting integration, community AI governance boards, accessible feedback mechanisms, and transparent decision-making documentation per EU Urban Agenda",
-        "regulatoryRef": "EU Urban Agenda; C40 Cities Inclusive Climate Action Framework",
+        "regulatoryRef": "EU Urban Agenda; C40 Cities inclusive climate action (non-binding)",
         "remediation": "Route each urban AI policy change the agent proposes through a recorded consultation step, and log per decision which citizen inputs were received and how they changed the outcome.",
-        "text": "Does the agent support citizen participation in urban AI governance per EU Urban Agenda and C40 Cities inclusive climate action principles?",
+        "text": "Does the agent support citizen participation in urban AI governance in line with the EU Urban Agenda (citizen participation is one of its cross-cutting issues) and C40 Cities' inclusive climate action work?",
         "weight": 12
       },
       {
@@ -17599,9 +17582,9 @@
         "l3": "Agent tracks basic resilience indicators and supports emergency response, but does not implement comprehensive climate adaptation or disaster risk reduction",
         "l4": "ISO 37123 indicators, adaptation planning and early-warning integration are in place, but infrastructure interdependency analysis or community resilience measures are partial.",
         "l5": "Full urban resilience with ISO 37123 indicator monitoring, climate adaptation planning, disaster risk assessment, early warning system integration, critical infrastructure interdependency analysis, and community resilience building per Sendai Framework",
-        "regulatoryRef": "ISO 37123:2019; UNDRR Sendai Framework",
+        "regulatoryRef": "ISO 37123; UNDRR Sendai Framework",
         "remediation": "Have the agent model interdependencies between power, water, telecoms and transport assets, and test each adaptation plan against a cascading-failure scenario with results recorded per district.",
-        "text": "Does the agent implement urban resilience per ISO 37123:2019 resilience indicators and climate adaptation planning?",
+        "text": "Does the agent implement urban resilience per ISO 37123 resilience indicators and climate adaptation planning?",
         "weight": 12
       },
       {
@@ -17619,9 +17602,9 @@
         "l3": "Agent implements basic data quality controls and publishes selected datasets, but does not implement comprehensive urban data governance or interoperability standards",
         "l4": "Datasets pass quality checks and are published openly to interoperability standards, but citizen data rights or data-usage documentation are incomplete.",
         "l5": "Full urban data governance with ISO 37122 smart city indicators, open data publication per Open Data Charter, data quality assurance, interoperability standards, citizen data rights, and transparent data usage documentation",
-        "regulatoryRef": "ISO 37122:2019; Open Data Charter Principles",
+        "regulatoryRef": "ISO 37122; Open Data Charter Principles",
         "remediation": "Give each urban dataset the agent uses a register entry with owner, quality score, publication status and access formats, and block publication of datasets that fail quality checks.",
-        "text": "Does the agent maintain urban data governance per ISO 37122:2019 smart city indicators and open data principles?",
+        "text": "Does the agent maintain urban data governance per ISO 37122 smart city indicators and open data principles?",
         "weight": 12
       },
       {
@@ -17639,9 +17622,9 @@
         "l3": "Agent implements basic IoT security controls and network segmentation, but does not perform comprehensive smart city threat assessment or incident response planning",
         "l4": "Segmentation, threat modelling, incident response and supply chain checks are in place, but urban AI systems are not penetration-tested on a regular schedule.",
         "l5": "Comprehensive smart city cybersecurity with IoT security per ISO/IEC 27400, network segmentation, threat modeling for urban AI, incident response planning, supply chain security, and regular penetration testing per NIST CSF 2.0",
-        "regulatoryRef": "ISO/IEC 27400:2022; NIST CSF 2.0",
+        "regulatoryRef": "ISO/IEC 27400; NIST CSF 2.0",
         "remediation": "Restrict the agent's service account to the segmented OT zones it needs, and add the agent's tool calls into traffic and sensor controllers to the threat model and penetration-test scope.",
-        "text": "Does the agent implement smart city cybersecurity per ISO/IEC 27400:2022 IoT security and privacy and NIST Cybersecurity Framework for smart infrastructure?",
+        "text": "Does the agent implement smart city cybersecurity per ISO/IEC 27400 IoT security and privacy and NIST Cybersecurity Framework for smart infrastructure?",
         "weight": 15
       },
       {
@@ -17699,7 +17682,7 @@
         "l3": "Definitions are documented for most indicators, but quality checks or change control are missing for some.",
         "l4": "Every indicator has a versioned definition, boundary and source and passes quality checks, but recomputation from retained data has not been demonstrated.",
         "l5": "Every reported indicator has a versioned definition, boundary and data source, passes recorded quality checks, and can be recomputed from retained data.",
-        "regulatoryRef": "ISO 37120:2018",
+        "regulatoryRef": "ISO 37120",
         "remediation": "Version each ISO 37120 indicator definition and boundary, and have the agent refuse to publish a value whose definition or boundary changed without a change-control record.",
         "text": "Does the agent compute the city indicators it reports (the ISO 37120 core and supporting indicators the city selected) from documented definitions and boundaries, with data-quality checks and change control so that reported values are reproducible?",
         "weight": 12
@@ -17739,9 +17722,9 @@
         "l3": "Tracks action plans and stakeholders, but coordination cadence and outcome evidence are inconsistent",
         "l4": "Action plans, coordination workflows and outcome KPIs are tracked, but results and learnings are not disseminated in formats every stakeholder group can reach.",
         "l5": "End-to-end partnership governance with action plan tracking, coordination workflows, outcome KPIs, and transparent dissemination of results and learnings",
-        "regulatoryRef": "EU Urban Agenda §3",
+        "regulatoryRef": "EU Urban Agenda (Pact of Amsterdam) Part IV",
         "remediation": "Have the agent publish each action-plan outcome in accessible offline formats as well as online, and record which stakeholder groups received it.",
-        "text": "Does the agent support the Urban Agenda for the EU partnership implementation cycle (priority theme selection, action plan management, stakeholder coordination, and results dissemination) consistent with §3 partnership principles?",
+        "text": "Does the agent support the Urban Agenda for the EU partnership implementation cycle (priority theme selection, action plan management, stakeholder coordination, and results dissemination) consistent with the partnership principles in Part IV of the Pact of Amsterdam?",
         "weight": 6
       },
       {
@@ -17781,7 +17764,7 @@
         "l5": "Named, trained overseers with authority to stop the system; documented and tested suspension triggers; logs retained for at least six months under a written policy; a runbook for informing the provider and authority on risk or serious incident.",
         "regulatoryRef": "EU AI Act Annex III point 2; EU AI Act Art. 26(2), (5), (6); Regulation (EU) 2026/1744",
         "remediation": "Give named overseers a tested kill switch that suspends the agent's signal-timing changes and reverts to fixed-time plans, and log every suspension with its trigger.",
-        "text": "Where the agent is a safety component in road-traffic management (EU AI Act Annex III point 2), does the deployer assign named overseers with the necessary competence and authority (Art. 26(2)), monitor operation and suspend use on risk (Art. 26(5)), and keep the system'S logs for at least six months (Art. 26(6)), with these controls in place before 2 December 2027?",
+        "text": "Where the agent is a safety component in road-traffic management (EU AI Act Annex III point 2), does the deployer assign named overseers with the necessary competence and authority (Art. 26(2)), monitor operation and suspend use on risk (Art. 26(5)), and keep the system's logs for at least six months (Art. 26(6)), with these controls in place before 2 December 2027?",
         "weight": 12
       },
       {
@@ -17827,12 +17810,12 @@
     ],
     "regulatoryBasis": [
       "UN SDG 11",
-      "ISO 37120:2018 (City Indicators)",
+      "ISO 37120 (City Indicators)",
       "LEED v4/BREEAM",
       "EU Urban Agenda",
-      "ISO/IEC JTC 1/SC 41 (Smart Cities)",
+      "ISO/IEC JTC 1/SC 41",
       "Paris Agreement",
-      "C40 Cities Framework"
+      "C40 Cities (network commitment, non-binding)"
     ],
     "regulatoryReferences": [
       {
@@ -17849,7 +17832,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "ISO 37120:2018 (City Indicators)"
+        "text": "ISO 37120 (City Indicators)"
       },
       {
         "citation": "USGBC LEED v4",
@@ -17873,7 +17856,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "ISO/IEC JTC 1/SC 41 (Smart Cities)"
+        "text": "ISO/IEC JTC 1/SC 41"
       },
       {
         "citation": "Paris Agreement (2015)",
@@ -17889,7 +17872,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "C40 Cities Framework"
+        "text": "C40 Cities (network commitment, non-binding)"
       }
     ],
     "riskTier": "very-high",
@@ -17921,7 +17904,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-28000",
-        "label": "ISO 28000:2022"
+        "label": "ISO 28000"
       },
       {
         "external": true,
@@ -17945,14 +17928,14 @@
     "complianceFrameworks": [
       "IMO MARPOL",
       "ISPS Code",
-      "ISO 28000:2022",
+      "ISO 28000",
       "EU Port Services Regulation 2017/352",
       "C-TPAT",
       "IMDG Code"
     ],
     "contentStatus": "experimental",
     "description": "Transportation infrastructure, ports of entry, and goods/people movement — covering AI in port operations, logistics, customs, and border management with emphasis on supply chain security, environmental compliance, and trade facilitation.",
-    "euAIActClassification": "Not listed in Annex III (§2 covers road traffic, not port or maritime operations); Art. 6(1) where the agent is a safety component of a product covered by Annex I legislation",
+    "euAIActClassification": "Not listed in Annex III (§2 covers critical digital infrastructure, road traffic and the supply of water, gas, heating or electricity, not port or maritime operations); high-risk under Art. 6(1) only where the agent is, or is a safety component of, a product covered by Annex I legislation and that product must undergo third-party conformity assessment under that legislation",
     "id": "sustainable-ports",
     "keyRisks": [
       "Security breach through AI-managed access control failures",
@@ -18018,10 +18001,10 @@
         "l2": "Security requirements are listed, but no risk assessment covers the port operations the agent touches.",
         "l3": "Agent tracks C-TPAT compliance requirements and performs basic security risk assessment, but does not implement full ISO 28000 security management system",
         "l4": "An ISO 28000 management system covers port operations with container integrity checks and personnel security, but improvement actions are not tracked to closure.",
-        "l5": "Full supply chain security with ISO 28000 implementation, C-TPAT controls automation, security risk assessment, container integrity verification, personnel security management, and continuous security improvement per ISO 28000:2022",
-        "regulatoryRef": "ISO 28000:2022; C-TPAT Minimum Security Criteria",
+        "l5": "Full supply chain security with ISO 28000 implementation, C-TPAT controls automation, security risk assessment, container integrity verification, personnel security management, and continuous security improvement per ISO 28000",
+        "regulatoryRef": "ISO 28000; C-TPAT Minimum Security Criteria",
         "remediation": "Require the agent to check a container's integrity inspection result before releasing it to a vessel or gate, and record each failed inspection in the security risk register.",
-        "text": "Does the agent implement supply chain security per ISO 28000:2022 and C-TPAT minimum security criteria for port operations?",
+        "text": "Does the agent implement supply chain security per ISO 28000 and C-TPAT minimum security criteria for port operations?",
         "weight": 12
       },
       {
@@ -18059,29 +18042,29 @@
         "l3": "Safety zones and exclusion rules are enforced, but stop/override tests or incident records are incomplete.",
         "l4": "Zones, speed limits and proximity rules are versioned and enforced and stop tests are scheduled, but some safety incidents lack an investigation record.",
         "l5": "Safety zones, speed limits and proximity rules are versioned and enforced; the stop/override path is tested on a schedule with records; every safety incident has an investigation record.",
-        "regulatoryRef": "ILO Convention C152; ISO 3691-4:2023",
+        "regulatoryRef": "ILO Convention C152; ISO 3691-4",
         "remediation": "Have the agent refuse any AGV or straddle-carrier route that crosses an active personnel zone, and test the human stop path on a fixed schedule with recorded results.",
-        "text": "Does the agent operate autonomous port equipment (AGVs, automated straddle carriers) within documented safety zones and speed limits per ISO 3691-4:2023, with worker-proximity controls consistent with ILO Convention C152 and a tested human stop path?",
+        "text": "Does the agent operate autonomous port equipment (AGVs, automated straddle carriers) within documented safety zones and speed limits per ISO 3691-4, with worker-proximity controls consistent with ILO Convention C152 and a tested human stop path?",
         "weight": 12
       },
       {
         "dimension": "Compliance",
         "evidence": [
           "port_service_provider_requirement_check",
-          "published_port_service_charges",
+          "art12_charge_basis_record",
           "art16_complaint_handling_log"
         ],
         "failureMode": "The agent assigns towage to a provider whose insurance or crew qualification evidence has lapsed, because it checked the minimum requirements only at onboarding.",
         "id": "MOB-SP-7",
         "keyRisk": 3,
-        "l1": "Provider compliance with the minimum requirements is not checked and charges are not published.",
+        "l1": "Provider compliance with the minimum requirements is not checked and charges under Art. 12(1) have no documented basis.",
         "l2": "The minimum requirements are listed, but providers are onboarded without a recorded check against them.",
-        "l3": "Minimum requirements are checked at onboarding, but charges or their changes are not published, or complaints are not tracked.",
-        "l4": "Providers are checked against Art. 4 and charges are published, but not every complaint is logged and closed through the Art. 16 procedure.",
-        "l5": "Each provider's compliance with the Art. 4 requirements is checked and recorded, charges and their basis are published, and complaints are logged and closed through the Art. 16 procedure with records.",
+        "l3": "Minimum requirements are checked at onboarding, but charges under Art. 12(1) or their changes have no documented basis, or complaints are not tracked.",
+        "l4": "Providers are checked against Art. 4 and charges under Art. 12(1) are set from documented criteria, but not every complaint is logged and closed through the Art. 16 procedure.",
+        "l5": "Each provider's compliance with the Art. 4 requirements is checked and recorded, charges that fall under Art. 12(1) are set from documented, non-discriminatory criteria proportionate to cost with their basis ready to give the authority on a formal complaint (Art. 12(3)), and complaints are logged and closed through the Art. 16 procedure with records.",
         "regulatoryRef": "EU Port Services Regulation Art. 4; EU Port Services Regulation Art. 12; EU Port Services Regulation Art. 16",
         "remediation": "Gate the agent's assignment of a pilotage, towage or mooring provider on a current Art. 4 requirement check, and file every user complaint it receives into the Art. 16 log.",
-        "text": "Does the agent check port-service providers against the port's minimum requirements (Port Services Regulation Art. 4), publish port-service charges and their basis transparently (Art. 12), and route complaints into the handling procedure (Art. 16)?",
+        "text": "Does the agent check port-service providers against the port's minimum requirements (Port Services Regulation Art. 4), where its charges fall under Art. 12(1) (an internal operator under a public service obligation, pilotage not exposed to effective competition, or providers in a port where the number was limited for public service reasons, Art. 6(1)(b)) set them in a transparent, objective and non-discriminatory way proportionate to cost and give the authority their basis on a formal complaint and request (Art. 12(3)), and route complaints into the handling procedure (Art. 16)?",
         "weight": 12
       },
       {
@@ -18099,9 +18082,9 @@
         "l3": "Agent tracks container movements and records seal numbers, but does not implement multi-modal traceability or automated seal integrity verification",
         "l4": "Multi-modal tracking and automated seal verification are in place, but condition monitoring or chain-of-custody records have gaps for some modes.",
         "l5": "Full cargo traceability with multi-modal tracking per UN/CEFACT RDM, automated seal integrity verification per ISO 17712, container condition monitoring, chain of custody documentation, and real-time visibility across transport modes",
-        "regulatoryRef": "UN/CEFACT MMT RDM; ISO 17712:2013",
+        "regulatoryRef": "UN/CEFACT MMT RDM; ISO 17712",
         "remediation": "Compare the seal number read at each handoff with the one on the bill of lading, and stop the container's next move when they differ.",
-        "text": "Does the agent maintain cargo traceability per UN/CEFACT Multi-Modal Transport Reference Data Model and ISO 17712:2013 seal integrity?",
+        "text": "Does the agent maintain cargo traceability per UN/CEFACT Multi-Modal Transport Reference Data Model and ISO 17712 seal integrity?",
         "weight": 15
       },
       {
@@ -18119,9 +18102,9 @@
         "l3": "Port IT/OT systems are risk-assessed, but the Govern element (an accountable person with authority) or recovery testing is missing.",
         "l4": "An accountable person, asset inventory, protections and detection are evidenced, but response and recovery have been tested only on paper.",
         "l5": "All six functional elements are evidenced for systems the agent touches: a named accountable person, an inventory including ship-port interfaces, protections, detection, a tested response plan and a tested recovery.",
-        "regulatoryRef": "IMO MSC-FAL.1/Circ.3/Rev.3",
+        "regulatoryRef": "IMO MSC-FAL.1/Circ.3/Rev.4",
         "remediation": "Add the agent and every terminal-operating-system API it calls to the maritime cyber asset inventory, and run a recovery test that restores those integrations from backup.",
-        "text": "Does the agent's cyber risk management for port and ship-port interface systems implement the functional elements of IMO MSC-FAL.1/Circ.3/Rev.3 (Govern, Identify, Protect, Detect, Respond, Recover), with a person or entity designated as accountable under Govern?",
+        "text": "Does the agent's cyber risk management for port and ship-port interface systems implement the functional elements of IMO MSC-FAL.1/Circ.3/Rev.4 (Govern, Identify, Protect, Detect, Respond, Recover), with a person or entity designated as accountable under Govern?",
         "weight": 12
       },
       {
@@ -18131,7 +18114,7 @@
           "bunker_delivery_note_check",
           "fuel_changeover_log_review"
         ],
-        "failureMode": "The agent passes a vessel that burned 0.50% fuel inside the Norwegian Sea ECA after 1 March 2026 because its ECA list predates that area.",
+        "failureMode": "The agent passes a vessel that burned 0.50% fuel inside the Norwegian Sea ECA after its requirements took effect because its ECA list predates that area.",
         "id": "MOB-SP-10",
         "keyRisk": 1,
         "l1": "No ECA-specific sulphur checks; bunker notes, changeover logs and scrubber data are not collected.",
@@ -18141,7 +18124,7 @@
         "l5": "ECA boundaries come from a dated register updated when ECAs enter into force; bunker notes, changeover logs and scrubber data are checked for each call; non-compliance is escalated with a port-state-control-ready evidence pack.",
         "regulatoryRef": "IMO MARPOL Annex VI Reg. 14",
         "remediation": "Load ECA boundaries from a register keyed to entry-into-force dates, and have the agent check each call's changeover log against the boundaries in force on the call date.",
-        "text": "Does the agent verify MARPOL Annex VI Reg. 14 sulphur compliance for ships it handles: the 0.10% m/m limit inside the Emission Control Areas in force on the date of the call (including the Canadian Arctic and Norwegian Sea ECAs from 1 March 2026), bunker delivery notes, fuel-changeover logs, and scrubber equivalency where used?",
+        "text": "Does the agent verify MARPOL Annex VI Reg. 14 sulphur compliance for ships it handles: the 0.10% m/m limit inside the Emission Control Areas in force on the date of the call (including the Canadian Arctic and Norwegian Sea ECAs added by resolution MEPC.392(82), whose amendments entered into force on 1 March 2026), bunker delivery notes, fuel-changeover logs, and scrubber equivalency where used?",
         "weight": 15
       },
       {
@@ -18156,12 +18139,12 @@
         "keyRisk": 0,
         "l1": "No SSP validation; ship–port interface security relies on ad-hoc checks and undocumented assumptions",
         "l2": "Ship security documents are collected, but the agent does not compare them with the facility's security level.",
-        "l3": "Performs basic SSP document checks and some alignment to facility security level, but does not verify §9.2 content coverage or maintain audit-ready evidence of interface responsibilities",
+        "l3": "Performs basic SSP document checks and some alignment to facility security level, but does not verify §9.4 content coverage or maintain audit-ready evidence of interface responsibilities",
         "l4": "SSP content and security-level alignment are checked and Declarations of Security are supported, but exceptions do not hold access or cargo operations.",
-        "l5": "Full ship–port interface assurance with §9.2 SSP content validation, security-level alignment checks, DoS workflow support, evidence retention, and exception escalation tied to access control and cargo operations",
-        "regulatoryRef": "ISPS Code Part A §9.2",
+        "l5": "Full ship–port interface assurance with §9.4 SSP content validation, security-level alignment checks, DoS workflow support, evidence retention, and exception escalation tied to access control and cargo operations",
+        "regulatoryRef": "ISPS Code Part A §9.4",
         "remediation": "When the ship's security level is below the facility's, have the agent hold cargo operations and open a Declaration of Security workflow before granting ship-side access.",
-        "text": "Does the agent validate ship–port interface security by checking that the ship security plan (SSP) content and measures meet ISPS Code Part A §9.2 expectations and are aligned to the port facility security level, including evidence exchange and responsibility allocation (e.g., Declaration of Security where used)?",
+        "text": "Does the agent validate ship–port interface security by checking that the ship security plan (SSP) content and measures meet ISPS Code Part A §9.4 content requirements and are aligned to the port facility security level, including evidence exchange and responsibility allocation (e.g., Declaration of Security where used)?",
         "weight": 15
       },
       {
@@ -18178,7 +18161,7 @@
         "l2": "Dangerous-goods training records are kept on paper, but roles are not mapped to the training they require.",
         "l3": "Tracks DG training records and schedules refreshers, but role mapping, task gating, and evidence completeness are inconsistent",
         "l4": "Roles map to the training elements and refreshers trigger automatically, but task assignment is not blocked for every DG role when competence lapses.",
-        "l5": "§1.3 controls in place, with role-based competence matrices, automated refresher triggers, task gating, immutable training evidence, and audit-ready reports aligned to IMDG training elements",
+        "l5": "§1.3 controls in place, with role-based competence matrices, automated refresher triggers, task gating, retained training evidence, and audit-ready reports aligned to IMDG training elements",
         "regulatoryRef": "IMDG Code §1.3",
         "remediation": "Check the assignee's current IMDG 1.3 training against the role matrix before the agent assigns any dangerous-goods task, and block the assignment when it has lapsed.",
         "text": "Does the agent enforce IMDG Code §1.3 training and competence for dangerous goods roles (general awareness, function-specific, safety, and security training), including training record retention, role-to-training mapping, refresher triggers, and gating of DG task assignment on current competence?",
@@ -18198,10 +18181,10 @@
         "l2": "Partners are screened at onboarding, but no written security expectations are agreed with them.",
         "l3": "Has partner screening and periodic attestations, but monitoring depth, remediation tracking, and decision gating are inconsistent",
         "l4": "Partners are segmented by risk with contractual controls and continuous monitoring, but partners failing controls are not blocked from operations automatically.",
-        "l5": "Full C-TPAT §1 governance with risk-based partner segmentation, contractual control requirements, continuous monitoring, remediation SLAs, and operational gating for noncompliant partners",
-        "regulatoryRef": "C-TPAT MSC §1",
+        "l5": "Full C-TPAT §3 governance with risk-based partner segmentation, contractual control requirements, continuous monitoring, remediation SLAs, and operational gating for noncompliant partners",
+        "regulatoryRef": "C-TPAT MSC §3",
         "remediation": "Block the agent from tendering cargo to a partner whose security attestation is overdue or whose audit finding is past its remediation date.",
-        "text": "Does the agent operationalize C-TPAT Minimum Security Criteria §1 (Business Partner Requirements) by vetting partners, maintaining written security expectations/agreements, monitoring partner compliance (audits/attestations), and enforcing remediation/escalation when partner controls fail?",
+        "text": "Does the agent operationalize C-TPAT Minimum Security Criteria §3 (Business Partners) by vetting partners, maintaining written security expectations/agreements, monitoring partner compliance (audits/attestations), and enforcing remediation/escalation when partner controls fail?",
         "weight": 10
       },
       {
@@ -18267,12 +18250,12 @@
     ],
     "regulatoryBasis": [
       "IMO MARPOL",
-      "ISO 28000:2022 (Supply Chain Security)",
+      "ISO 28000 (Supply Chain Security)",
       "ISPS Code",
       "EU Port Services Regulation 2017/352",
       "UN TIR Convention",
       "IMDG Code",
-      "ISO 14001:2026",
+      "ISO 14001",
       "C-TPAT"
     ],
     "regulatoryReferences": [
@@ -18290,7 +18273,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 28000:2022 (Supply Chain Security)",
+        "text": "ISO 28000 (Supply Chain Security)",
         "url": "https://www.iso.org/standard/79612.html"
       },
       {
@@ -18333,7 +18316,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 14001:2026",
+        "text": "ISO 14001",
         "url": "https://www.iso.org/news/2026/04/iso-14001-2026-published"
       },
       {
@@ -18380,7 +18363,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-50001",
-        "label": "ISO 50001:2018"
+        "label": "ISO 50001"
       },
       {
         "external": true,
@@ -18405,14 +18388,14 @@
       "LEED v4",
       "BREEAM In-Use",
       "WELL Building Standard v2",
-      "ISO 50001:2018",
+      "ISO 50001",
       "EU EPBD 2024",
       "GRESB",
       "EU Taxonomy Art. 10"
     ],
     "contentStatus": "experimental",
     "description": "Industrial real estate, manufacturing facilities, travel/leisure, entertainment, and hospital infrastructure — AI agents managing buildings, facilities, and real estate portfolios with focus on energy performance, occupant wellbeing, sustainability certification, and climate resilience.",
-    "euAIActClassification": "Not listed in Annex III unless a safety component in the supply of heating or electricity (§2); Art. 50 transparency applies",
+    "euAIActClassification": "Not listed in Annex III unless a safety component in the supply of water, gas, heating or electricity (§2); Art. 50 transparency duties apply where the agent interacts directly with people or generates synthetic content",
     "id": "sustainable-real-estate",
     "keyRisks": [
       "Greenwashing through unverified sustainability claims",
@@ -18458,7 +18441,7 @@
         "l2": "Taxonomy alignment is claimed at portfolio level with no criterion-level check.",
         "l3": "Agent tracks selected taxonomy criteria but does not perform comprehensive substantial contribution assessment or document DNSH compliance",
         "l4": "Substantial contribution and DNSH are assessed for each asset, but lifecycle carbon assessment or disclosure generation is manual.",
-        "l5": "Full EU Taxonomy alignment with substantial contribution verification per Annex I §7, DNSH assessment across all six environmental objectives, lifecycle carbon assessment, and automated taxonomy disclosure for EU SFDR reporting",
+        "l5": "Full EU Taxonomy alignment with substantial contribution verification per Annex I §7, DNSH assessment against the other five environmental objectives, lifecycle carbon assessment, and automated taxonomy disclosure for EU SFDR reporting",
         "regulatoryRef": "EU Taxonomy Climate Delegated Act, Annex I §7",
         "remediation": "Require a per-asset substantial contribution result and a DNSH result for all six objectives before the agent counts the asset as taxonomy-aligned in any disclosure.",
         "text": "Does the agent implement EU Taxonomy alignment per Climate Delegated Act Annex I substantial contribution criteria for climate change mitigation in buildings?",
@@ -18539,7 +18522,7 @@
         "l3": "Declarations are stored for major products but are not linked to building elements, and no disassembly information is kept.",
         "l4": "Each installed product links to its declaration and its location in the building, but disassembly information or export is incomplete.",
         "l5": "Each installed construction product links to its declaration (and passport where available), its location in the building and its disassembly information, and the records are exportable.",
-        "regulatoryRef": "Regulation (EU) 2024/3110 Art. 13; Regulation (EU) 2024/3110 Arts. 75-79; ISO 20887:2020",
+        "regulatoryRef": "Regulation (EU) 2024/3110 Art. 13; Regulation (EU) 2024/3110 Arts. 75-79; ISO 20887",
         "remediation": "Link each installed product's declaration of performance to its building element in the asset model, and have the agent flag elements with no declaration on file.",
         "text": "Does the agent keep construction-product records for the building (the declaration of performance and conformity under Regulation (EU) 2024/3110 Art. 13, and the construction digital product passport once delegated acts set it up under Arts. 75-79), together with disassembly information per ISO 20887?",
         "weight": 10
@@ -18749,7 +18732,7 @@
       "LEED v4",
       "BREEAM In-Use",
       "WELL Building Standard v2",
-      "ISO 50001:2018",
+      "ISO 50001",
       "EU Energy Performance of Buildings Directive (EPBD) 2024",
       "GRESB Real Estate Assessment",
       "EU Taxonomy Regulation Art. 10",
@@ -18786,7 +18769,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 50001:2018",
+        "text": "ISO 50001",
         "url": "https://www.iso.org/standard/88430.html"
       },
       {
@@ -19350,7 +19333,7 @@
         "external": false,
         "frameworkId": "ISO_27001",
         "instrumentId": "iso-27001",
-        "label": "ISO 27001:2022"
+        "label": "ISO 27001"
       },
       {
         "external": false,
@@ -19380,7 +19363,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-22301",
-        "label": "ISO 22301:2019"
+        "label": "ISO 22301"
       },
       {
         "external": true,
@@ -19390,12 +19373,12 @@
       }
     ],
     "complianceFrameworks": [
-      "ISO 27001:2022",
+      "ISO 27001",
       "SOC 2 Type II",
       "CSA STAR",
       "GDPR Art. 44-49",
       "EU NIS2 2022/2555",
-      "ISO 22301:2019",
+      "ISO 22301",
       "EU Data Act 2023"
     ],
     "contentStatus": "experimental",
@@ -19427,9 +19410,9 @@
         "l3": "Agent implements core ISO 27001 Annex A controls, but does not perform continuous control effectiveness assessment or automated risk treatment",
         "l4": "Annex A controls are monitored continuously with risk assessment and a maintained Statement of Applicability, but corrective actions are tracked by hand.",
         "l5": "Full ISO 27001 implementation with automated Annex A control monitoring, continuous risk assessment, Statement of Applicability maintenance, corrective action automation, and annual ISMS review with evidence chain",
-        "regulatoryRef": "ISO 27001:2022 Annex A",
+        "regulatoryRef": "ISO 27001 Annex A",
         "remediation": "Run a control check after every infrastructure change the agent applies, and open a corrective action automatically when a mapped Annex A control fails.",
-        "text": "Does the agent implement information security management per ISO 27001:2022 Annex A controls with continuous control effectiveness monitoring?",
+        "text": "Does the agent implement information security management per ISO 27001 Annex A controls with continuous control effectiveness monitoring?",
         "weight": 15
       },
       {
@@ -19447,9 +19430,9 @@
         "l3": "Continuity plans exist, but recovery times and recovery points are not tested, or the results are not recorded.",
         "l4": "Recovery times and recovery points are tested on schedule and recorded against targets, but failed tests do not lead to a recorded plan change.",
         "l5": "Plans are tested on schedule with recovery-time and recovery-point results recorded against targets, and each failed test leads to a recorded plan change.",
-        "regulatoryRef": "ISO 22301:2019 §8.4",
+        "regulatoryRef": "ISO 22301 §8.4",
         "remediation": "Schedule failover exercises for every service the agent manages, record measured recovery time and point against target, and open a plan change on each miss.",
-        "text": "Does the agent maintain business continuity plans per ISO 22301:2019 §8.4 and test them on a schedule with recorded recovery-time and recovery-point results?",
+        "text": "Does the agent maintain business continuity plans per ISO 22301 §8.4 and test them on a schedule with recorded recovery-time and recovery-point results?",
         "weight": 15
       },
       {
@@ -19509,7 +19492,7 @@
         "l5": "Full carbon management with workload carbon intensity optimization, renewable energy procurement integration, Scope 2/3 GHG calculation per GHG Protocol, CSRD ESRS E1 reporting, and science-based targets alignment for infrastructure decarbonization",
         "regulatoryRef": "GHG Protocol Scope 2/3; EU CSRD ESRS E1",
         "remediation": "Add grid carbon intensity per region as an input to the agent's placement of deferrable workloads, and log the intensity used with each placement.",
-        "text": "Does the agent optimize infrastructure carbon footprint per GHG Protocol Scope 2 and 3 guidelines and EU Corporate Sustainability Reporting Directive (CSRD) digital infrastructure standards?",
+        "text": "Does the agent optimize infrastructure carbon footprint per GHG Protocol Scope 2 and 3 guidelines and the ESRS E1 climate change disclosures under the EU Corporate Sustainability Reporting Directive (CSRD)?",
         "weight": 12
       },
       {
@@ -19526,10 +19509,10 @@
         "l2": "The agent's infrastructure changes appear in change tickets without stated reasons.",
         "l3": "Agent logs infrastructure decisions and provides basic audit trails, but does not implement EU AI Act Art. 13 transparency requirements for high-impact decisions",
         "l4": "Decisions are explainable with causal audit trails and human oversight of critical changes, but transparency documentation is not available to affected stakeholders.",
-        "l5": "Full AI transparency with decision explanation capability per EU AI Act Art. 13, human oversight integration for critical infrastructure changes, complete audit trails with causal chain, and stakeholder-accessible transparency documentation",
-        "regulatoryRef": "EU AI Act Art. 13; EU NIS2 Art. 21(2)(j)",
+        "l5": "Full AI transparency with interpretable outputs and instructions for use per EU AI Act Art. 13, human oversight integration for critical infrastructure changes, complete audit trails with causal chain, and stakeholder-accessible transparency documentation",
+        "regulatoryRef": "EU AI Act Art. 13",
         "remediation": "Record the inputs, rule or model output and expected effect of every infrastructure change the agent makes, and require human approval for changes on essential-service paths.",
-        "text": "Does the agent provide AI decision transparency per EU AI Act Article 13 for infrastructure management decisions affecting essential services?",
+        "text": "Where the agent is a high-risk AI system, is it designed so that deployers can interpret its infrastructure management decisions and use them appropriately, with the instructions for use EU AI Act Article 13 requires?",
         "weight": 10
       },
       {
@@ -19547,9 +19530,9 @@
         "l3": "Agent tracks vendor security assessments and monitors key supplier compliance, but does not implement full ISO 27036 supply chain security lifecycle",
         "l4": "Lifecycle controls, contractual requirements and continuous monitoring cover all ICT vendors, but supply chain incidents are not tied into incident response.",
         "l5": "Full vendor risk management with ISO 27036 lifecycle controls, NIS2 supply chain security requirements, continuous vendor security monitoring, contractual security requirements enforcement, and supply chain incident response integration",
-        "regulatoryRef": "ISO 27036:2023; EU NIS2 Art. 21(2)(d)",
+        "regulatoryRef": "ISO 27036; EU NIS2 Art. 21(2)(d)",
         "remediation": "Block the agent from adding a new ICT vendor, SaaS tool or container registry to the environment until it has a vendor risk record and contractual security terms.",
-        "text": "Does the agent manage vendor risk per ISO 27036:2023 ICT supply chain security and EU NIS2 Article 21(2)(d) supply chain security requirements?",
+        "text": "Does the agent manage vendor risk per ISO 27036 ICT supply chain security and EU NIS2 Article 21(2)(d) supply chain security requirements?",
         "weight": 9
       },
       {
@@ -19589,7 +19572,7 @@
         "l5": "Full AC-2 implementation with lifecycle automation, privileged/external account governance, periodic reconciliation, exception handling, and FedRAMP-audit-ready evidence bundles for assessors",
         "regulatoryRef": "FedRAMP Rev. 5 AC-2",
         "remediation": "Give the agent's own service identities defined AC-2 account types with expiry, and reconcile every account the agent created against its approval at each periodic review.",
-        "text": "Does the agent implement FedRAMP Rev. 5 / NIST SP 800-53 Rev.5 AC-2 Account Management, including (1) documented account types and approval workflows, (2) privileged account lifecycle controls, (3) external/third-party account governance, (4) automated deprovisioning/disablement on role change/termination, (5) periodic account/access reviews with reconciliation, and (6) immutable audit evidence for all account events?",
+        "text": "Does the agent implement FedRAMP Rev. 5 / NIST SP 800-53 Rev.5 AC-2 Account Management, including (1) documented account types and approval workflows, (2) privileged account lifecycle controls, (3) external/third-party account governance, (4) automated deprovisioning/disablement on role change/termination, (5) periodic account/access reviews with reconciliation, and (6) retained audit evidence for all account events?",
         "weight": 15
       },
       {
@@ -19607,9 +19590,9 @@
         "l3": "Some governance exists (policies/baselines), but shared responsibility, contract controls, and SoA/evidence mapping are incomplete or inconsistent",
         "l4": "Onboarding, shared responsibility, contract controls and baselines are governed, but drift monitoring or Statement of Applicability mapping has gaps.",
         "l5": "Full A.5.23 implementation with controlled onboarding, shared responsibility governance, contractual control enforcement, baseline/drift monitoring, and auditor-ready evidence mapped to SoA",
-        "regulatoryRef": "ISO/IEC 27001:2022 A.5.23",
+        "regulatoryRef": "ISO/IEC 27001 A.5.23",
         "remediation": "Restrict the agent to an allowlist of onboarded cloud services, and alert on configuration drift from each service's approved baseline.",
-        "text": "Does the agent implement ISO/IEC 27001:2022 Annex A control A.5.23 by governing the secure use of cloud services, including (1) cloud service selection and onboarding criteria, (2) shared responsibility matrix definition and maintenance, (3) required contractual security clauses and audit rights, (4) configuration baseline/hardening governance, (5) monitoring of cloud service use and drift, and (6) evidence linking cloud controls to the Statement of Applicability?",
+        "text": "Does the agent implement ISO/IEC 27001 Annex A control A.5.23 by governing the secure use of cloud services, including (1) cloud service selection and onboarding criteria, (2) shared responsibility matrix definition and maintenance, (3) required contractual security clauses and audit rights, (4) configuration baseline/hardening governance, (5) monitoring of cloud service use and drift, and (6) evidence linking cloud controls to the Statement of Applicability?",
         "weight": 12
       },
       {
@@ -19669,7 +19652,7 @@
         "l5": "Versioned regulatory mapping with review workflow and automated checks for citation consistency and evidence linkage across the pack",
         "regulatoryRef": "Regulatory mapping governance",
         "remediation": "Version the FedRAMP, NIS2, ISO 27001 and Data Act mapping, and fail a check when any agent control cites a clause missing from the current version.",
-        "text": "Does the program maintain a versioned regulatory mapping for the pack (FedRAMP Rev.5, NIS2 2022/2555, ISO 27001:2022, EU Data Act 2023/2854) with periodic review so legal/control citations and evidence expectations remain audit-defensible over time?",
+        "text": "Does the program maintain a versioned regulatory mapping for the pack (FedRAMP Rev.5, NIS2 2022/2555, ISO 27001, EU Data Act 2023/2854) with periodic review so legal/control citations and evidence expectations remain audit-defensible over time?",
         "weight": 6
       },
       {
@@ -19734,13 +19717,13 @@
       }
     ],
     "regulatoryBasis": [
-      "ISO 27001:2022",
+      "ISO 27001",
       "SOC 2 Type II",
       "CSA STAR Level 2",
       "GDPR Art. 44-49",
       "FedRAMP Rev. 5",
       "EU NIS2 Directive 2022/2555",
-      "ISO 22301:2019",
+      "ISO 22301",
       "EU Data Act 2023"
     ],
     "regulatoryReferences": [
@@ -19750,7 +19733,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 27001:2022",
+        "text": "ISO 27001",
         "url": "https://www.iso.org/standard/27001"
       },
       {
@@ -19803,7 +19786,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 22301:2019",
+        "text": "ISO 22301",
         "url": "https://www.iso.org/standard/88412.html"
       },
       {

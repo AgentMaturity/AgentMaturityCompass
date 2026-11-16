@@ -20,7 +20,7 @@ describe("freight, 3PL, and warehouse industry pack", () => {
     expect(pack.name).toContain("Freight");
     expect(pack.description).toMatch(/3PL|warehouse/i);
     expect(pack.regulatoryBasis).toEqual(expect.arrayContaining([
-      "ISO 28000:2022",
+      "ISO 28000",
       "NIST SP 800-161r1-upd1",
       "GS1 EPCIS 2.0"
     ]));
