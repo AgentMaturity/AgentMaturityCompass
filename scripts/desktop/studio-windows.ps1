@@ -40,8 +40,12 @@ function Invoke-Limited([int]$Seconds, [string]$WorkingDirectory, [string]$Comma
   $Quoted = (@($Command) + $Arguments | ForEach-Object { '"' + $_ + '"' }) -join " "
   $Out = Join-Path $LogDir "step-out.log"
   $Err = Join-Path $LogDir "step-err.log"
+  # An empty file as input: with this console's input, amc up in a new workspace would ask a question whose words go
+  # to the log, and wait for a key nobody knows to press. With no input it takes the same path as on Linux.
+  $In = Join-Path $LogDir "empty-stdin.txt"
+  Set-Content -LiteralPath $In -Value "" -NoNewline
   $script:Child = Start-Process -FilePath $env:ComSpec -ArgumentList "/d /s /c `"$Quoted`"" -WorkingDirectory $WorkingDirectory `
-    -NoNewWindow -PassThru -RedirectStandardOutput $Out -RedirectStandardError $Err
+    -NoNewWindow -PassThru -RedirectStandardInput $In -RedirectStandardOutput $Out -RedirectStandardError $Err
   $null = $script:Child.Handle # Windows PowerShell 5.1 fills ExitCode only for a process whose handle was read
   $Finished = $script:Child.WaitForExit($Seconds * 1000)
   if (-not $Finished) { Stop-Tree $script:Child.Id }
@@ -158,8 +162,9 @@ function Add-StartMenuShortcut {
   if ($NoShortcut -or (Test-Path -LiteralPath $Link) -or -not (Test-Path -LiteralPath $Icon)) { return }
   $Shell = New-Object -ComObject WScript.Shell
   $Shortcut = $Shell.CreateShortcut($Link)
-  $Shortcut.TargetPath = Join-Path $env:SystemRoot "System32\WindowsPowerShell\v1.0\powershell.exe"
-  $Shortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`""
+  # Through the .cmd file, which keeps the window open after a problem so its message can be read.
+  $Shortcut.TargetPath = $env:ComSpec
+  $Shortcut.Arguments = "/c `"`"$(Join-Path $PSScriptRoot "Agent Maturity Compass Studio.cmd")`"`""
   $Shortcut.WorkingDirectory = $PSScriptRoot
   $Shortcut.IconLocation = "$Icon,0"
   $Shortcut.Description = "Build, run and check AI agents for regulated work."

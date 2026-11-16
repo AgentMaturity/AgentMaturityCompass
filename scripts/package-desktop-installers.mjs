@@ -89,6 +89,20 @@ SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 PACKAGE="$SCRIPT_DIR/${tarballName}"
 PACKAGE_SHA256="${tarballDigest}"
 
+# The one Node.js rule (package.json engines): an older node would install an amc that fails when it runs.
+NODE_FOUND=$(command -v node 2>/dev/null || true)
+if [ -z "$NODE_FOUND" ]; then
+  echo "AMC needs Node.js ${nodeMajor} or newer, and none was found on this computer. Install Node.js from https://nodejs.org and rerun this installer." >&2
+  exit 1
+fi
+NODE_VERSION=$(node --version 2>/dev/null | LC_ALL=C tr -cd 'A-Za-z0-9.+-' | cut -c1-40)
+NODE_MAJOR=$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null || echo 0)
+if ! [ "$NODE_MAJOR" -ge ${nodeMajor} ] 2>/dev/null; then
+  echo "AMC needs Node.js ${nodeMajor} or newer, and the one found on this computer is Node.js \${NODE_VERSION:-unknown} ($NODE_FOUND). Install a newer Node.js from https://nodejs.org and rerun this installer." >&2
+  exit 1
+fi
+echo "Using Node.js $NODE_VERSION ($NODE_FOUND)"
+
 if ! command -v npm >/dev/null 2>&1; then
   echo "npm is required. Install Node.js ${nodeMajor} or newer (npm comes with it) from https://nodejs.org and rerun this installer." >&2
   exit 1
@@ -148,6 +162,19 @@ function writeWindowsInstaller(targetDir, tarballName, tarballDigest) {
 
 $Package = Join-Path $PSScriptRoot "${tarballName}"
 $PackageSha256 = "${tarballDigest}"
+
+# The one Node.js rule (package.json engines): an older node would install an amc that fails when it runs.
+$Node = Get-Command node -ErrorAction SilentlyContinue
+if (-not $Node) {
+  throw "AMC needs Node.js ${nodeMajor} or newer, and none was found on this computer. Install Node.js from https://nodejs.org and rerun this installer."
+}
+$NodeVersion = (& $Node.Source --version) -replace '[^A-Za-z0-9.+-]', ''
+$NodeMajor = 0
+[void][int]::TryParse(($NodeVersion.TrimStart("v") -split "\\.")[0], [ref]$NodeMajor)
+if ($NodeMajor -lt ${nodeMajor}) {
+  throw "AMC needs Node.js ${nodeMajor} or newer, and the one found on this computer is Node.js $NodeVersion ($($Node.Source)). Install a newer Node.js from https://nodejs.org and rerun this installer."
+}
+Write-Host "Using Node.js $NodeVersion ($($Node.Source))"
 
 if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
   Write-Error "npm is required. Install Node.js ${nodeMajor} or newer (npm comes with it) from https://nodejs.org and rerun this installer."

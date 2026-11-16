@@ -19,6 +19,7 @@ function sandbox(): { dir: string; bin: string; log: string } {
   mkdirSync(join(dir, "prefix", "lib", "node_modules"), { recursive: true });
   chmodSync(join(dir, "prefix", "lib", "node_modules"), 0o555);
   const log = join(dir, "npm.log");
+  writeFileSync(join(bin, "node"), "#!/bin/sh\n[ \"$1\" = -p ] && { echo 22; exit 0; }\necho v22.19.0\n", { mode: 0o755 });
   writeFileSync(join(bin, "npm"), `#!/bin/sh\n[ "$1" = prefix ] && { printf '%s\\n' "${join(dir, "prefix")}"; exit 0; }\necho "$*" >>"${log}"\n`, { mode: 0o755 });
   return { dir, bin, log };
 }
@@ -58,7 +59,30 @@ describe.skipIf(!nonRootPosix)("archive installer without root (LIVE-DEPLOY-05, 
     const pathLine = `export PATH="${prefix}/bin:$PATH"`;
     expect(result.stdout).toContain(pathLine);
     expect(result.stdout.indexOf(pathLine)).toBeLessThan(result.stdout.indexOf("Next step: type amc"));
+    expect(result.stdout).toContain(`Using Node.js v22.19.0 (${join(bin, "node")})`);
   });
+
+  it("refuses a Node.js older than the rule before npm runs, naming its version and path (S-10)", () => {
+    const { dir, bin, log } = sandbox();
+    writeFileSync(join(bin, "node"), "#!/bin/sh\n[ \"$1\" = -p ] && { echo 18; exit 0; }\necho v18.20.4\n", { mode: 0o755 });
+    const result = run(archiveInstaller(dir), bin, { AMC_INSTALL_PREFIX: join(dir, "user-prefix") });
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain(`AMC needs Node.js 20 or newer, and the one found on this computer is Node.js v18.20.4 (${join(bin, "node")}).`);
+    expect(existsSync(log)).toBe(false);
+  });
+});
+
+// No PowerShell host runs here: this pins the generated Windows installer's Node check.
+it("install.ps1 checks Node.js against the same rule and names the one it found", () => {
+  const template = readFileSync(resolve("scripts/package-desktop-installers.mjs"), "utf8")
+    .match(/function writeWindowsInstaller\(targetDir, tarballName, tarballDigest\) \{\n {2}const script = `([\s\S]*?)`;\n/)?.[1];
+  expect(template).toBeDefined();
+  const ps1 = new Function("tarballName", "tarballDigest", "nodeMajor", `return \`${template}\`;`)("amc.tgz", "a".repeat(64), 20) as string;
+  expect(ps1).toContain('-split "\\.")[0]');
+  expect(ps1).toContain("if ($NodeMajor -lt 20) {");
+  expect(ps1).toContain("the one found on this computer is Node.js $NodeVersion ($($Node.Source))");
+  expect(ps1).toContain('Write-Host "Using Node.js $NodeVersion ($($Node.Source))"');
+  expect(ps1.indexOf("$NodeMajor -lt 20")).toBeLessThan(ps1.indexOf("npm install -g"));
 });
 
 /** website/install.sh with test mode off: fake node (major for -p, full for --version), npm and a curl that leaves a marker. */

@@ -150,6 +150,8 @@ test.skipIf(process.platform === "win32")("a console that refuses the stored pas
   const run = await box.run("workspace", { CONSOLE_PORT: String(server.port) });
   expect(run.status).toBe(0);
   expect(run.lines).toContain("AMC_SESSION=session-token-0123456789abcdef");
+  // The person is told: a password they set themselves no longer works.
+  expect(run.lines).toContain("AMC_NOTICE=Your console password did not match the one in your macOS Keychain, so AMC set a new one. It is in your Keychain as amc-console (open Keychain Access to see it). A password you set yourself no longer works.");
   const consolePassword = box.secret("amc-console");
   expect(readFileSync(serverPassword, "utf8")).toBe(consolePassword);
   const calls = readFileSync(box.calls, "utf8");

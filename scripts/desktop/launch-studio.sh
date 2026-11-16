@@ -1,8 +1,9 @@
 #!/bin/sh
 # Agent Maturity Compass Studio launcher: launch-studio.sh [info|workspace|demo|stop] (default demo).
 # The macOS app runs it and reads the KEY=value lines it prints on stdout; on Linux amc-studio.sh runs it in a terminal.
-# Lines: AMC_STATUS (progress), AMC_ERROR (why it stopped), AMC_STUDIO_URL, AMC_SESSION (the owner's console session
-# cookie, macOS only), AMC_TITLE, AMC_STARTED, AMC_PACKAGE_DIGEST, AMC_NODE (the Node.js it uses) and the info paths.
+# Lines: AMC_STATUS (progress), AMC_ERROR (why it stopped), AMC_NOTICE (a change the person must know about),
+# AMC_STUDIO_URL, AMC_SESSION (the owner's console session cookie, macOS only), AMC_TITLE, AMC_STARTED,
+# AMC_PACKAGE_DIGEST, AMC_NODE (the Node.js it uses) and the info paths.
 # No secret goes to the log, to a file or into a process's arguments: secrets move through pipes, the environment of
 # amc itself, and the macOS Keychain (security -i reads its command from stdin).
 # Every network step has a time limit, and a signal (the app quitting) stops what this run started before it exits.
@@ -52,8 +53,9 @@ export AMC_STUDIO_PORT="${AMC_STUDIO_PORT:-3232}" AMC_HOST_PORT="${AMC_HOST_PORT
 export AMC_PROXY_PORT="${AMC_PROXY_PORT:-3231}" AMC_DASHBOARD_PORT="${AMC_DASHBOARD_PORT:-4193}" AMC_METRICS_PORT="${AMC_METRICS_PORT:-9484}"
 
 # Preserve an explicitly selected Node/npm runtime. Finder/LaunchServices have
-# a minimal PATH, so append the common installation locations as fallbacks.
-export PATH="$PATH:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+# a minimal PATH, so append the common installation locations as fallbacks. A test may replace them with
+# AMC_LAUNCHER_FALLBACK_PATH (it starts with a colon; set and empty, none are added).
+export PATH="$PATH${AMC_LAUNCHER_FALLBACK_PATH-:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin}"
 
 mkdir -p "$LOG_DIR"
 
@@ -213,10 +215,16 @@ port_taken() {
 }
 
 # Why a taken port stops AMC, in words: another AMC Studio (told by its _studio-daemon command line), or another
-# program named by its process name, or (when this user cannot see the owner) just another program.
+# program named by its process name, or (when no owner can be found) a program that may be either.
 port_problem() {
   HOLDER=$(lsof -nP -iTCP:"$1" -sTCP:LISTEN -t 2>/dev/null | head -n 1 || true)
-  if [ -n "$HOLDER" ] && ps -ww -o command= -p "$HOLDER" 2>/dev/null | grep -q '_studio-daemon'; then
+  # Minimal Linux installs have no lsof; ss names the owner as users:(("node",pid=1234,fd=20)).
+  [ -n "$HOLDER" ] || HOLDER=$(ss -ltnpH "sport = :$1" 2>/dev/null | sed -n 's/.*pid=\([0-9][0-9]*\).*/\1/p' | head -n 1 || true)
+  if [ -z "$HOLDER" ]; then
+    printf '%s' "AMC could not start because another program on $MACHINE uses port $1 (it may be another AMC Studio), which AMC needs. Quit that program or stop that Studio, then $AGAIN."
+    return 0
+  fi
+  if ps -ww -o command= -p "$HOLDER" 2>/dev/null | grep -q '_studio-daemon'; then
     if command -v amc >/dev/null 2>&1; then
       HOW="To stop it, type amc down in Terminal in the folder where it was started"
     else
@@ -225,8 +233,7 @@ port_problem() {
     printf '%s' "AMC could not start because another AMC Studio on $MACHINE already uses port $1, probably one started from a terminal. $HOW, then $AGAIN."
     return 0
   fi
-  NAME=""
-  [ -z "$HOLDER" ] || NAME=$(basename -- "$(ps -o comm= -p "$HOLDER" 2>/dev/null || true)" 2>/dev/null | LC_ALL=C tr -cd 'A-Za-z0-9._ -' | cut -c1-60)
+  NAME=$(basename -- "$(ps -o comm= -p "$HOLDER" 2>/dev/null || true)" 2>/dev/null | LC_ALL=C tr -cd 'A-Za-z0-9._ -' | cut -c1-60)
   if [ -n "$NAME" ]; then NAME=" ($NAME)"; fi
   printf '%s' "AMC could not start because another program on $MACHINE uses port $1$NAME, which AMC needs. Quit that program, then $AGAIN."
 }
@@ -362,6 +369,8 @@ sign_in() {
     if reset_console_password; then
       STATUS=0
       SESSION=$(console_session "$1") || STATUS=$?
+      log "AMC set a new console password for $CONSOLE_USER and keeps it in the Keychain (amc-console)."
+      say "AMC_NOTICE=Your console password did not match the one in your macOS Keychain, so AMC set a new one. It is in your Keychain as amc-console (open Keychain Access to see it). A password you set yourself no longer works."
     fi
   fi
   if [ "$STATUS" != 0 ] || [ -z "$SESSION" ]; then

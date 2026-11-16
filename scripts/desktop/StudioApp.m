@@ -148,6 +148,7 @@ static NSString * const AMCQuitChoiceKey = @"AMCQuitChoice"; // 0 ask, 1 stop AM
       [self forgetSessionCookieThen:^{
         [self setSessionCookie:out[@"AMC_SESSION"] forURL:url then:^{
           [self.webView loadRequest:[NSURLRequest requestWithURL:url]];
+          if (out[@"AMC_NOTICE"].length > 0) [self showNotice:out[@"AMC_NOTICE"]];
         }];
       }];
     }];
@@ -445,6 +446,15 @@ static NSString * const AMCQuitChoiceKey = @"AMCQuitChoice"; // 0 ask, 1 stop AM
   self.statusLabel.stringValue = text;
   self.retryButton.hidden = YES;
   self.logsButton.hidden = YES;
+}
+
+// Something the launcher changed that the person should know about (AMC_NOTICE), shown over the console once.
+- (void)showNotice:(NSString *)text {
+  NSAlert *alert = [[NSAlert alloc] init];
+  alert.messageText = @"AMC changed your console password";
+  alert.informativeText = text;
+  [alert addButtonWithTitle:@"OK"];
+  [alert beginSheetModalForWindow:self.window completionHandler:nil];
 }
 
 - (void)showProblem:(NSString *)text action:(NSString *)actionTitle {

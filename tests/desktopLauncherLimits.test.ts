@@ -113,13 +113,21 @@ test.skipIf(process.platform === "win32")("S-14: a port held by another AMC Stud
   writeFileSync(join(b.stubs, "amc"), "#!/bin/sh\nexit 0\n", { mode: 0o755 });
   const withAmc = await b.start("demo", ports).done;
   expect(withAmc.lines.at(-1)).toBe(`AMC_ERROR=AMC could not start because another AMC Studio on this Mac already uses port ${port}, probably one started from a terminal. To stop it, type amc down in Terminal in the folder where it was started, then click Retry.`);
-  // Finder's PATH has no amc unless one is installed in the folders the launcher adds.
-  if (!["/opt/homebrew/bin/amc", "/usr/local/bin/amc"].some((path) => existsSync(path))) {
-    rmSync(join(b.stubs, "amc"));
-    const withoutAmc = await b.start("demo", ports).done;
-    expect(withoutAmc.lines.at(-1)).toContain("Stop that Studio, or quit the program that started it, then click Retry.");
-    expect(withoutAmc.lines.at(-1)).not.toContain("amc down");
-  }
+  // Finder's PATH has no amc unless one is installed in the folders the launcher adds; the test replaces those folders,
+  // so this half runs on every machine.
+  rmSync(join(b.stubs, "amc"));
+  const withoutAmc = await b.start("demo", { ...ports, AMC_LAUNCHER_FALLBACK_PATH: "" }).done;
+  expect(withoutAmc.lines.at(-1)).toContain("Stop that Studio, or quit the program that started it, then click Retry.");
+  expect(withoutAmc.lines.at(-1)).not.toContain("amc down");
+
+  // No lsof (minimal Linux): ss names the owner, and with neither the message does not guess which kind it is.
+  writeFileSync(join(b.stubs, "lsof"), "#!/bin/sh\nexit 1\n", { mode: 0o755 });
+  writeFileSync(join(b.stubs, "ss"), `#!/bin/sh\necho 'LISTEN 0 511 127.0.0.1:${port} 0.0.0.0:* users:(("node",pid=${holder.pid},fd=20))'\n`, { mode: 0o755 });
+  const bySs = await b.start("demo", { ...ports, AMC_LAUNCHER_FALLBACK_PATH: "" }).done;
+  expect(bySs.lines.at(-1)).toContain(`another AMC Studio on this Mac already uses port ${port}`);
+  writeFileSync(join(b.stubs, "ss"), "#!/bin/sh\nexit 1\n", { mode: 0o755 });
+  const unknown = await b.start("demo", { ...ports, AMC_LAUNCHER_FALLBACK_PATH: "" }).done;
+  expect(unknown.lines.at(-1)).toBe(`AMC_ERROR=AMC could not start because another program on this Mac uses port ${port} (it may be another AMC Studio), which AMC needs. Quit that program or stop that Studio, then click Retry.`);
 }, 30_000);
 
 test.skipIf(process.platform === "win32")("S-16: on Linux the launcher keeps its data under XDG_DATA_HOME and --add-to-menu installs a .desktop file with the icons", async () => {
@@ -174,6 +182,16 @@ test("S-15: the Windows launcher uses the app's ports, checks Node, starts your 
   expect(ps1).toContain("$script:Child.WaitForExit($Seconds * 1000)");
   expect(ps1).toContain('"--fetch-timeout=30000", "--fetch-retries=2"');
   expect(ps1).toContain('$Owner.CommandLine.Contains("_studio-daemon")');
+  // amc up and npm get an empty input, so a first-run question cannot wait unseen for a key (output goes to the log).
+  expect(ps1).toContain('Set-Content -LiteralPath $In -Value "" -NoNewline');
+  expect(ps1).toContain("-RedirectStandardInput $In -RedirectStandardOutput $Out -RedirectStandardError $Err");
+  // The Start menu shortcut goes through the .cmd file, whose pause keeps a problem's words on screen.
+  const packager = readFileSync(resolve("scripts/package-desktop-installers.mjs"), "utf8");
+  expect(packager).toContain('const studioWindowsCmdName = "Agent Maturity Compass Studio.cmd";');
+  expect(packager).toContain("if errorlevel 1 (pause & exit /b 1)");
+  expect(ps1).toContain("$Shortcut.TargetPath = $env:ComSpec");
+  expect(ps1).toContain('$Shortcut.Arguments = "/c `"`"$(Join-Path $PSScriptRoot "Agent Maturity Compass Studio.cmd")`"`""');
+  expect(ps1).not.toContain("powershell.exe");
   // Every placeholder is filled, and no step tells a launcher user to type amc unless amc is on PATH.
   expect(ps1).not.toMatch(/__AMC_[A-Z0-9_]+__/);
   expect(ps1).toContain('if (Get-Command amc -ErrorAction SilentlyContinue) { "To stop it, type amc down');
