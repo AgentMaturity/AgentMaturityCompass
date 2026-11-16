@@ -5,15 +5,19 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { type ChildProcess, spawn, spawnSync } from "node:child_process";
 import { expect, test } from "vitest";
+import { desktopFile } from "../scripts/desktop/files.mjs";
 
 const packager = resolve("scripts/package-desktop-installers.mjs");
+/** The macOS app's launch-studio.sh as the packager fills it. */
+const macLauncher = (tarballName: string, digest: string) =>
+  desktopFile("launch-studio.sh", { STUDIO_OS: "mac", PACKAGE_NAME: tarballName, PACKAGE_SHA256: digest, NODE_MIN_MAJOR: 20 });
 
 test.skipIf(process.platform === "win32")("macOS launcher preserves an operator-selected runtime before Finder fallbacks", () => {
   const directory = mkdtempSync(join(tmpdir(), "amc-launcher-runtime-"));
   try {
     const selectedNode = join(directory, "node");
     writeFileSync(selectedNode, "#!/bin/sh\nprintf '%s' selected-runtime\n", { mode: 0o755 });
-    const source = readFileSync(packager, "utf8");
+    const source = readFileSync(resolve("scripts/desktop/launch-studio.sh"), "utf8");
     const pathSetup = source.match(/^export PATH="[^"]+"$/m)?.[0];
     expect(pathSetup).toBeDefined();
     // Execute the production launcher's PATH setup and a real executable lookup.
@@ -40,10 +44,7 @@ test.skipIf(process.platform === "win32")("moved macOS app installs from its own
     mkdirSync(resources, { recursive: true });
     writeFileSync(join(resources, "amc.tgz"), "packaged amc");
     const digest = createHash("sha256").update("packaged amc").digest("hex");
-    const template = readFileSync(packager, "utf8").match(/const launchScript = `([\s\S]*?)`;\n/)?.[1];
-    expect(template).toBeDefined();
-    // Evaluate the production template literal with the two values the generator substitutes.
-    writeFileSync(join(resources, "launch-studio.sh"), new Function("tarballName", "tarballDigest", `return \`${template}\`;`)("amc.tgz", digest));
+    writeFileSync(join(resources, "launch-studio.sh"), macLauncher("amc.tgz", digest));
 
     const stubs = join(directory, "stubs");
     const calls = join(directory, "calls.log");
@@ -126,8 +127,7 @@ test.skipIf(process.platform === "win32")("macOS launcher reports the console UR
     mkdirSync(resources, { recursive: true });
     writeFileSync(join(resources, "amc.tgz"), "packaged amc");
     const digest = createHash("sha256").update("packaged amc").digest("hex");
-    const template = readFileSync(packager, "utf8").match(/const launchScript = `([\s\S]*?)`;\n/)?.[1];
-    writeFileSync(join(resources, "launch-studio.sh"), new Function("tarballName", "tarballDigest", `return \`${template}\`;`)("amc.tgz", digest));
+    writeFileSync(join(resources, "launch-studio.sh"), macLauncher("amc.tgz", digest));
     const home = join(directory, "home");
     const runtime = join(home, "Library", "Application Support", "Agent Maturity Compass", "runtime");
     mkdirSync(join(runtime, "node_modules", ".bin"), { recursive: true });

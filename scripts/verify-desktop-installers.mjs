@@ -115,6 +115,7 @@ for (const pkg of manifest.packages ?? []) {
       `${base}/install.cmd`,
       `${base}/Agent Maturity Compass Studio.ps1`,
       `${base}/Agent Maturity Compass Studio.cmd`,
+      `${base}/amc-studio.ico`,
       `${base}/README.md`,
       `${base}/LEGAL_NOTICE.md`,
       `${base}/agent-maturity-compass-${manifest.packageVersion}.tgz`
@@ -133,7 +134,11 @@ for (const pkg of manifest.packages ?? []) {
           `${base}/Agent Maturity Compass Studio.app/Contents/Resources/launch-studio.sh`,
           `${appResources}/agent-maturity-compass-${manifest.packageVersion}.tgz`
         ]
-        : [])
+        : [
+          `${base}/launch-studio.sh`,
+          `${base}/amc-studio.sh`,
+          ...[48, 128, 256, 512].map((size) => `${base}/icons/hicolor/${size}x${size}/apps/agent-maturity-compass-studio.png`)
+        ])
     ];
   assertArchiveContains(archivePath, platformEntries);
   if (!archivePath.endsWith(".zip")) assertNoAppleMetadata(archivePath);
@@ -162,7 +167,7 @@ for (const pkg of manifest.packages ?? []) {
   // The Studio launchers install the runtime too, so each must pin the same digest.
   const launcherEntries = pkg.platform === "macos-universal"
     ? [`${appResources}/launch-studio.sh`]
-    : pkg.kind === "windows" ? [`${base}/Agent Maturity Compass Studio.ps1`] : [];
+    : pkg.kind === "windows" ? [`${base}/Agent Maturity Compass Studio.ps1`] : [`${base}/launch-studio.sh`];
   for (const entry of launcherEntries) {
     const launcher = readArchiveEntry(archivePath, entry).toString("utf8");
     if (!launcher.includes(manifest.npmTarball.sha256)) {
@@ -179,6 +184,9 @@ for (const pkg of manifest.packages ?? []) {
   }
   if (pkg.kind === "windows" && !pkg.appLaunchers?.some((launcher) => launcher.kind === "windows-command-launcher")) {
     fail("Windows package must declare the Studio command launcher in appLaunchers");
+  }
+  if (pkg.platform === "linux-x64" && !pkg.appLaunchers?.some((launcher) => launcher.kind === "linux-terminal-launcher")) {
+    fail("Linux package must declare the Studio launcher in appLaunchers");
   }
 }
 

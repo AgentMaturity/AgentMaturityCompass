@@ -31,7 +31,7 @@ function archiveInstaller(dir: string): string {
   writeFileSync(join(dir, "amc.tgz"), "packaged amc");
   const digest = createHash("sha256").update("packaged amc").digest("hex");
   const path = join(dir, "install.sh");
-  writeFileSync(path, new Function("tarballName", "tarballDigest", `return \`${template}\`;`)("amc.tgz", digest), { mode: 0o755 });
+  writeFileSync(path, new Function("tarballName", "tarballDigest", "nodeMajor", `return \`${template}\`;`)("amc.tgz", digest, 20), { mode: 0o755 });
   return path;
 }
 

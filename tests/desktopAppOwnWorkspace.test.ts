@@ -5,11 +5,12 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { spawn } from "node:child_process";
 import { afterEach, expect, test } from "vitest";
+import { desktopFile } from "../scripts/desktop/files.mjs";
 
 // The macOS app's own-workspace path (launch-studio.sh workspace), run against stubs: a Keychain kept in files by a fake
 // security(1), an amc that records what it got, and a console that answers POST /auth/login.
 
-const packager = resolve("scripts/package-desktop-installers.mjs");
+const appSource = resolve("scripts/desktop/StudioApp.m");
 const dirs: string[] = [];
 const servers: Server[] = [];
 afterEach(async () => {
@@ -20,10 +21,8 @@ afterEach(async () => {
 function launcher(resources: string): string {
   writeFileSync(join(resources, "amc.tgz"), "packaged amc");
   const digest = createHash("sha256").update("packaged amc").digest("hex");
-  const template = readFileSync(packager, "utf8").match(/const launchScript = `([\s\S]*?)`;\n/)?.[1];
-  expect(template).toBeDefined();
   const path = join(resources, "launch-studio.sh");
-  writeFileSync(path, new Function("tarballName", "tarballDigest", `return \`${template}\`;`)("amc.tgz", digest));
+  writeFileSync(path, desktopFile("launch-studio.sh", { STUDIO_OS: "mac", PACKAGE_NAME: "amc.tgz", PACKAGE_SHA256: digest, NODE_MIN_MAJOR: 20 }));
   return path;
 }
 
@@ -72,7 +71,8 @@ cp "${stubs}/amc-stub" "$3/node_modules/.bin/amc"
   writeFileSync(join(stubs, "amc-stub"), `#!/bin/sh
 echo "amc $* vault=\${AMC_VAULT_PASSPHRASE:-unset}" >>"${calls}"
 if [ "$1" = up ]; then mkdir -p .amc/studio; printf '{"pid":1,"apiPort":%s}' "$CONSOLE_PORT" > .amc/studio/state.json; fi
-if [ "$1" = user ]; then printf '%s' "$(cat "$6")" > "${dir}/user-init-password"; mkdir -p .amc; echo users > .amc/users.yaml; fi
+if [ "$1 $2" = "user init" ]; then printf '%s' "$(cat "$6")" > "${dir}/user-init-password"; mkdir -p .amc; echo users > .amc/users.yaml; fi
+if [ "$1 $2" = "user password" ]; then printf '%s' "$(cat "$5")" > "${dir}/server-password"; fi
 exit 0
 `, { mode: 0o755 });
   const script = launcher(resources);
@@ -99,6 +99,7 @@ test.skipIf(process.platform === "win32")("first launch creates the own workspac
   expect(first.status).toBe(0);
   expect(first.lines).toEqual([
     expect.stringMatching(/^AMC_PACKAGE_DIGEST=[0-9a-f]{64}$/),
+    expect.stringMatching(/^AMC_NODE=Node\.js v\d+\.\d+\.\d+ \(\/.+\/node\)$/),
     "AMC_STATUS=Installing AMC (first launch only). This takes a minute or two.",
     "AMC_STATUS=Creating your workspace (first launch only).",
     "AMC_STARTED=1",
@@ -138,13 +139,31 @@ test.skipIf(process.platform === "win32")("first launch creates the own workspac
   expect(laterCalls).not.toContain("security -i");
 });
 
-test.skipIf(process.platform === "win32")("a console that refuses the stored password leaves the sign-in page, and a vault without its Keychain entry is not replaced", async () => {
+// S-14: the app never lands on a sign-in page whose password only the Keychain knows. A refused password is replaced
+// once (Keychain and account, with the vault passphrase from the Keychain, never in an argument); if signing in still
+// fails the app is told why.
+test.skipIf(process.platform === "win32")("a console that refuses the stored password gets a new one, and a vault without its Keychain entry is not replaced", async () => {
   const box = sandbox();
-  const server = await consoleServer(() => "a different password");
+  const serverPassword = join(box.dir, "server-password");
+  writeFileSync(serverPassword, "a password set elsewhere");
+  const server = await consoleServer(() => readFileSync(serverPassword, "utf8"));
   const run = await box.run("workspace", { CONSOLE_PORT: String(server.port) });
   expect(run.status).toBe(0);
-  expect(run.lines.some((line) => line.startsWith("AMC_SESSION="))).toBe(false);
-  expect(run.lines.at(-1)).toBe(`AMC_STUDIO_URL=http://127.0.0.1:${server.port}/console/`);
+  expect(run.lines).toContain("AMC_SESSION=session-token-0123456789abcdef");
+  const consolePassword = box.secret("amc-console");
+  expect(readFileSync(serverPassword, "utf8")).toBe(consolePassword);
+  const calls = readFileSync(box.calls, "utf8");
+  expect(calls).toMatch(/amc user password [A-Za-z0-9._-]+ --password-file \/dev\/stdin vault=[A-Za-z0-9]{32}/);
+  expect(calls.split("\n").filter((line) => line.startsWith("security")).join("\n")).not.toContain(consolePassword);
+  expect(readFileSync(join(box.support, "Logs", "studio-launcher.log"), "utf8")).not.toContain(consolePassword);
+
+  // A console that refuses every password: the launcher stops with words the app shows, not a sign-in page.
+  writeFileSync(serverPassword, "");
+  const refusedServer = await consoleServer(() => "never matches");
+  const stuck = await box.run("workspace", { CONSOLE_PORT: String(refusedServer.port) });
+  expect(stuck.status).toBe(1);
+  expect(stuck.lines.some((line) => line.startsWith("AMC_STUDIO_URL="))).toBe(false);
+  expect(stuck.lines.at(-1)).toMatch(/^AMC_ERROR=AMC started, but could not sign you in to the Compass Console\./);
 
   // Setup interrupted after the vault was made, and the Keychain entry is gone: the launcher stops instead of generating
   // a passphrase that could never open that vault.
@@ -154,6 +173,9 @@ test.skipIf(process.platform === "win32")("a console that refuses the stored pas
   const refused = await box.run("workspace", { CONSOLE_PORT: String(server.port) });
   expect(refused.status).toBe(1);
   expect(refused.lines.at(-1)).toMatch(/^AMC_ERROR=Your workspace has a vault, but its passphrase is not in your macOS Keychain/);
+  // The way out names the app's own amc by its full path: an app user has no amc on PATH.
+  expect(refused.lines.at(-1)).toContain(`"${join(box.support, "runtime", "node_modules", ".bin", "amc")}" up`);
+  expect(refused.lines.at(-1)).not.toContain("local-vault-passphrase");
   expect(existsSync(join(box.dir, "keychain", `amc-vault.${box.workspaceKey()}`))).toBe(false);
 });
 
@@ -163,7 +185,7 @@ test.skipIf(process.platform === "win32")("first-launch failures say what to do:
   const finderNode = ["/opt/homebrew/bin/node", "/usr/local/bin/node", "/usr/bin/node", "/bin/node"].some((path) => existsSync(path));
   if (!finderNode) {
     const missing = await box.run("workspace", {}, "/usr/bin:/bin");
-    expect(missing.lines.at(-1)).toMatch(/^AMC_ERROR=AMC needs Node.js 22 or 24 with npm, and none was found on this Mac. Install Node.js from https:\/\/nodejs.org/);
+    expect(missing.lines.at(-1)).toMatch(/^AMC_ERROR=AMC needs Node.js 20 or newer, and none was found on this Mac. Install Node.js from https:\/\/nodejs.org/);
   }
   // A Node too old for AMC is named, with the fix.
   const oldNode = join(box.dir, "old-node");
@@ -171,7 +193,8 @@ test.skipIf(process.platform === "win32")("first-launch failures say what to do:
   writeFileSync(join(oldNode, "node"), "#!/bin/sh\n[ \"$1\" = -p ] && { echo 18; exit 0; }\necho v18.20.0\n", { mode: 0o755 });
   const tooOld = await box.run("workspace", {}, `${oldNode}:${join(box.dir, "stubs")}:/usr/bin:/bin`);
   expect(tooOld.status).toBe(1);
-  expect(tooOld.lines.at(-1)).toBe("AMC_ERROR=AMC needs Node.js 22 or 24, and this Mac has Node.js v18.20.0. Install Node.js 22 or 24 from https://nodejs.org, then click Retry.");
+  // S-10: one rule (package.json engines, >=20), and the message names the node it found.
+  expect(tooOld.lines.at(-1)).toBe(`AMC_ERROR=AMC needs Node.js 20 or newer, and the one found on this Mac is Node.js v18.20.0 (${join(oldNode, "node")}). Install a newer Node.js from https://nodejs.org, then click Retry.`);
 
   writeFileSync(join(box.dir, "stubs", "npm"), "#!/bin/sh\necho 'npm ERR! network' >&2\nexit 1\n", { mode: 0o755 });
   const npmFailed = await box.run("workspace");
@@ -182,7 +205,7 @@ test.skipIf(process.platform === "win32")("first-launch failures say what to do:
 
 // 2026-11-14 review: cookies are not port-scoped, so the app must treat only the launcher's exact origin as the console.
 test("the app keeps the owner session to the console's own port and drops it on stop and switch", () => {
-  const source = readFileSync(packager, "utf8");
+  const source = readFileSync(appSource, "utf8");
   const isConsole = source.match(/- \(BOOL\)isConsoleURL:\(NSURL \*\)url \{([\s\S]*?)\n\}/)?.[1] ?? "";
   expect(isConsole).toContain("[url.port isEqualToNumber:studio.port]");
   expect(isConsole).toContain("studio != nil");

@@ -52,6 +52,9 @@ def main() -> None:
     logo.save(web / "favicon.ico", sizes=[(16, 16), (32, 32), (48, 48), (64, 64)])
     logo.save(ROOT / "scripts/brand/amc-studio.ico", sizes=[(16, 16), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])
     logo.resize((512, 512), Image.LANCZOS).save(ROOT / "scripts/brand/amc-studio.png", optimize=True)
+    # Linux menu icons (the 512 px one is amc-studio.png).
+    for size in (48, 128, 256):
+        logo.resize((size, size), Image.LANCZOS).save(ROOT / f"scripts/brand/amc-studio-{size}.png", optimize=True)
     app = rounded(logo, 1024, 824, 185)
     if sys.platform != "darwin":
         print("skipped amc-studio.icns: iconutil is macOS only")

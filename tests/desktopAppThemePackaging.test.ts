@@ -6,9 +6,15 @@ function read(path: string): string {
   return readFileSync(resolve(process.cwd(), path), "utf8");
 }
 
+/** The packager and the launcher files it fills (scripts/desktop). */
+function desktopSources(): string {
+  return ["scripts/package-desktop-installers.mjs", "scripts/desktop/StudioApp.m", "scripts/desktop/launch-studio.sh",
+    "scripts/desktop/studio-windows.ps1", "scripts/desktop/amc-studio-linux.sh"].map(read).join("\n");
+}
+
 describe("desktop app packaging and visual identity", () => {
   test("desktop package script creates macOS and Windows Studio app launchers", () => {
-    const script = read("scripts/package-desktop-installers.mjs");
+    const script = desktopSources();
 
     expect(script).toContain("writeMacStudioApp");
     expect(script).toContain("Agent Maturity Compass Studio.app");
@@ -34,28 +40,28 @@ describe("desktop app packaging and visual identity", () => {
     expect(script).toContain("PACKAGE_SHA256");
     expect(script).toContain("AMC package checksum mismatch");
     expect(script).toContain("Get-FileHash");
-    expect(script).toContain('ACTUAL_PACKAGE_DIGEST=$(shasum -a 256 "$PACKAGE"');
+    expect(script).toContain('ACTUAL_PACKAGE_DIGEST=$(sha256_of "$PACKAGE")');
     expect(script).toContain('if [ "$ACTUAL_PACKAGE_DIGEST" != "$PACKAGE_DIGEST" ]');
     expect(script).toContain("$ActualPackageDigest = (Get-FileHash -LiteralPath $Package -Algorithm SHA256).Hash.ToLowerInvariant()");
     expect(script).toContain('if ($ActualPackageDigest -ne $PackageDigest.ToLowerInvariant())');
     expect(script).toContain("npm install --prefix");
     expect(script).toContain("node_modules/.bin/amc");
-    expect(script).toContain(String.raw`node_modules\\.bin\\amc.cmd`);
+    expect(script).toContain(String.raw`node_modules\.bin\amc.cmd`);
     expect(script).toContain("studio-workspace");
     expect(script).toContain('cd "$WORKSPACE_DIR"');
-    expect(script).toContain("Set-Location $WorkspaceDir");
-    expect(script).toContain('"$AMC_BIN" up --no-open "$@"');
+    expect(script).toContain("Push-Location -LiteralPath $WorkspaceDir");
+    expect(script).toContain('run_limited "$START_LIMIT" in_dir "$DIR" "$AMC_BIN" up --no-open "$@"');
     expect(script).toContain('start_studio "$DEMO_DIR" --demo');
-    expect(script).toContain("& $AmcBin up --demo");
-    expect(script).toContain("Could not start AMC Studio. See $LogFile.");
+    expect(script).toContain('Start-Studio $DemoDir @("--demo")');
+    expect(script).toContain('Stop-Launcher "AMC could not start. Details are in $LogFile."');
     expect(script).not.toContain('up --demo --no-open >>"$LOG_FILE" 2>&1 || true');
     expect(script).not.toContain("open \\\"http://127.0.0.1:3212/w/demo/console/\\\"");
     expect(script).toContain("writeWindowsStudioApp");
     expect(script).toContain("Agent Maturity Compass Studio.cmd");
     // The launchers open the console on the port Studio bound (state.json apiPort), not an assumed 3212.
-    expect(script).not.toContain("Start-Process \"http://127.0.0.1:3212/w/demo/console/\"");
-    expect(script).toContain("Start-Process \"http://127.0.0.1:$StudioPort/w/demo/console/\"");
-    expect(script).toContain("(Get-Content -LiteralPath $StateFile -Raw | ConvertFrom-Json).apiPort");
+    expect(script).not.toContain("http://127.0.0.1:3212/");
+    expect(script).toContain('$Url = "http://127.0.0.1:$(Get-StudioPort $DemoDir $env:AMC_HOST_PORT)/w/demo/console/"');
+    expect(script).toContain('(Get-Content -LiteralPath (Join-Path $Dir ".amc\\studio\\state.json") -Raw | ConvertFrom-Json).apiPort');
     expect(script).toContain("task.standardOutput = pipe;");
     // Only a loopback console URL the launcher printed is loaded.
     expect(script).toContain('@"http://127[.]0[.]0[.]1:[0-9]{1,5}/(w/demo/)?console/"');
@@ -65,29 +71,30 @@ describe("desktop app packaging and visual identity", () => {
 
   // No PowerShell host runs in CI, so these pin the generated Windows text.
   test("Windows launchers survive Windows PowerShell 5.1, the default execution policy and bracketed folders", () => {
-    const script = read("scripts/package-desktop-installers.mjs");
+    const script = desktopSources();
 
     // Redirected native stderr (npm warnings) must not become a terminating error under "Stop".
     const lines = script.split("\n").map((line) => line.trim());
     const nativeCalls = lines.flatMap((line, index) => (line.endsWith("*>> $LogFile") ? [index] : []));
-    expect(nativeCalls).toHaveLength(3);
+    // amc down is the one native call left with redirected output; npm and amc up run through Invoke-Limited.
+    expect(nativeCalls).toHaveLength(1);
     for (const index of nativeCalls) {
       expect(lines[index - 1]).toBe('$ErrorActionPreference = "Continue"');
       expect(lines.slice(index + 1, index + 3)).toContain('$ErrorActionPreference = "Stop"');
     }
-    expect(script).toContain('powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0${ps1Name}"\\r\\nif errorlevel 1 (pause & exit /b 1)');
+    expect(script).toContain('powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0${ps1Name}" %*\\r\\nif errorlevel 1 (pause & exit /b 1)');
     expect(script).toContain('return platform.kind === "windows" ? ".\\\\install.cmd" : "sh ./install.sh";');
     expect(script).toContain('`& ".\\\\${studioWindowsCmdName}"`');
     expect(script).toContain("Get-FileHash -Algorithm SHA256 -LiteralPath $Package");
     expect(script).toContain("Test-Path -LiteralPath $DigestFile");
     expect(script).toContain("Set-Content -LiteralPath $DigestFile");
     expect(script).not.toMatch(/(?:Test-Path|Get-Content|Set-Content|Get-FileHash)(?: -Algorithm SHA256)? (?:-Path )?\$(?:Package|DigestFile|AmcBin)\b/);
-    expect(script).toContain("Wait-Process -Id $OldPid -Timeout 15");
+    expect(script).toContain("Wait-Process -Id $DaemonPid -Timeout 15");
     expect(script).toContain('process.platform === "win32" && command === "npm"');
   });
 
-  test("macOS app has a main menu and the Linux archive does not describe a launcher it lacks", () => {
-    const script = read("scripts/package-desktop-installers.mjs");
+  test("macOS app has a main menu with Window and Help menus, and a Quit button while AMC starts", () => {
+    const script = desktopSources();
 
     for (const item of ["terminate:", "undo:", "redo:", "cut:", "copy:", "paste:", "selectAll:"]) {
       expect(script).toContain(`@selector(${item})`);
@@ -98,7 +105,14 @@ describe("desktop app packaging and visual identity", () => {
     }
     expect(script).toContain('[self addItem:@"Reload" action:@selector(reload:) key:@"r" to:studioMenu];');
     expect(script).toContain("- (NSApplicationTerminateReply)applicationShouldTerminate:");
-    expect(script).toContain("${appLaunchers.length > 0 ? `The Studio launcher uses the archive's exact package digest");
+    // S-14: Window and Help menus; Quit stays on screen during a start; quitting then stops the launcher run.
+    for (const item of ["performMiniaturize:", "performZoom:", "arrangeInFront:", "openHelp:"]) {
+      expect(script).toContain(`@selector(${item})`);
+    }
+    expect(script).toContain("[NSApp setWindowsMenu:windowMenu];");
+    expect(script).toContain("[NSApp setHelpMenu:helpMenu];");
+    expect(script).toContain('NSButton *quit = [NSButton buttonWithTitle:@"Quit" target:NSApp action:@selector(terminate:)];');
+    expect(script).toContain("[starting terminate];");
   });
 
   test("desktop verifier checks app launcher files inside platform archives", () => {
@@ -117,9 +131,9 @@ describe("desktop app packaging and visual identity", () => {
     expect(verifier).toContain("does not pin the nested npm tarball hash`);");
     // An upgrade stops the previous Studio only when that pid's command line is the Studio daemon (round 2).
     expect(verifier).toMatch(/if \(!launcher\.includes\("_studio-daemon"\)\)/);
-    const packager = read("scripts/package-desktop-installers.mjs");
+    const packager = desktopSources();
     expect(packager).toContain("grep -q '_studio-daemon'");
-    expect(packager).toContain('$OldCommandLine.Contains("_studio-daemon")');
+    expect(packager).toContain('$CommandLine.Contains("_studio-daemon")');
   });
 
   test("Studio dashboard uses the shared website-aligned console shell", () => {

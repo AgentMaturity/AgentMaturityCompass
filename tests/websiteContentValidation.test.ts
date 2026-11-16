@@ -93,7 +93,8 @@ describe("website hero truth", () => {
     expect(desktop).toContain("Studio &gt; Try the Demo switches to the view-only demo, and Studio &gt; Open My Workspace switches back.");
     expect(desktop).toContain("ad-hoc signed, not notarized");
     expect(desktop).toContain("No download of the current version is published");
-    const script = read("scripts/package-desktop-installers.mjs");
+    // The app's words live in its source (scripts/desktop/StudioApp.m), which the packager compiles.
+    const script = read("scripts/package-desktop-installers.mjs") + read("scripts/desktop/StudioApp.m");
     for (const label of ["Set Up My Workspace", "Try the Demo", "Open My Workspace", "/w/demo/console/"]) expect(script).toContain(label);
   });
 
