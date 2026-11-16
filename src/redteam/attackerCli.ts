@@ -30,7 +30,7 @@ function dollars(value: string): number {
 export function withAttackerOptions(command: Command): Command {
   return command
     .option("--attacker-model <provider:model>", "Off by default. A model you name (openai:<model> or anthropic:<model>) writes new attack text " +
-      "for each scenario's injection slot, round by round. AMC sends that model each scenario's goal and the agent's replies and tool calls")
+      "for the place in each test where attack text is inserted, round by round. AMC sends that model each scenario's goal and the agent's replies and tool calls")
     .option("--attacker-rounds <n>", `rounds per scenario with --attacker-model, the first being the pack's own text (default ${DEFAULT_ATTACKER_BUDGET.rounds})`,
       wholeNumber("--attacker-rounds", 50))
     .option("--attacker-max-tokens <n>", `token limit for all attacker model calls in the run (default ${DEFAULT_ATTACKER_BUDGET.maxTokens})`,
