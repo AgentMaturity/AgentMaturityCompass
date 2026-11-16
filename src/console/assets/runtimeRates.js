@@ -13,6 +13,7 @@ export function toolRatesHtml(rates) {
   const decisions = rates.toolDecisions || {}, outcomes = rates.toolOutcomes || {}, replies = rates.modelReplies || {};
   return [
     `<p class="muted">${esc(`Last 24 hours, from ${whole(rates.rowsRead)} recorded row(s). Counts from records, not a judgement of the agent.`)}</p>`,
+    ...(rates.truncated === true ? [`<p class="muted">${esc(`More rows were recorded than AMC reads at once: these numbers count only the newest ${whole(rates.rowsRead)} and leave older rows in the 24 hours out.`)}</p>`] : []),
     line("Denied tool calls", `${whole(decisions.denied)} of ${whole(decisions.total)} (${percent(decisions.denialRate)})`),
     line("Sent to a person", whole(decisions.asked)),
     line("Failed tool calls", `${whole(outcomes.failed)} of ${whole(outcomes.total)} (${percent(outcomes.errorRate)})`),

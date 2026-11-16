@@ -21,7 +21,7 @@ export function printObservedDriftCheck(input: { workspace: string; agentId?: st
     return rows.length === 0 ? 3 : 0;
   }
   const out = (line: string) => console.log(escapeTerminalControls(line));
-  out(`What AMC recorded for agent ${agentId} in the last ${input.window} (${rows.length} row(s)${truncated ? ", only the first 200,000 read" : ""}):`);
+  out(`What AMC recorded for agent ${agentId} in the last ${input.window} (${rows.length} row(s)${truncated ? ", only the newest 200,000 read" : ""}):`);
   out(`  Tool calls decided: ${rates.toolDecisions.total}; denied ${rates.toolDecisions.denied} (${percent(rates.toolDecisions.denialRate)}); sent to a person ${rates.toolDecisions.asked}`);
   out(`  Tool calls reported back: ${rates.toolOutcomes.total}; failed ${rates.toolOutcomes.failed} (${percent(rates.toolOutcomes.errorRate)}); outcome not reported ${rates.toolOutcomes.outcomeUnknown}`);
   out(`  Model replies through the gateway: ${rates.modelReplies.total}; refusals ${rates.modelReplies.refusals} (${percent(rates.modelReplies.refusalRate)}); no stop reason recorded ${rates.modelReplies.refusalUnknown}`);

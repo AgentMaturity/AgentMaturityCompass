@@ -2,8 +2,9 @@
  * Numbers from the rows AMC already records about an agent's traffic, and "observed change" notes about them.
  *
  * Rows read (each counted as recorded; this module does not re-check each row's signature):
- * - gateway `llm_response` rows (2xx): response model, tokens, and whether the reply was a refusal (only where the
- *   gateway recorded a stop reason; the Anthropic stop reason "refusal" counts, anything unrecorded stays unknown);
+ * - gateway `llm_response` rows (2xx): response model, tokens, and whether the reply was a refusal, only where the
+ *   gateway recorded one (src/gateway/replyStop.ts: Anthropic stop reasons, OpenAI `message.refusal` and
+ *   "content_filter"); a reply that does not say stays unknown, so an OpenAI "stop" alone is not counted either way;
  * - hook control decisions (`audit` rows with a control schema): allowed, asked or denied tool calls;
  * - hook post-execution reports (`tool_result` rows): whether the tool call failed, as the provider reported it.
  * A task is one run id, or one recorded session when no run id is set. A note says what changed in the numbers and
@@ -74,7 +75,7 @@ function rowOf(event: { id: string; ts: number; session_id: string; event_type: 
     const status = count(m.statusCode);
     if (status === null || status < 200 || status > 299) return null;
     return { ...base, kind: "model-reply", model: plainName(m.model), tokens: tokensOf(m.usage),
-      refusal: typeof m.stopReason === "string" ? m.stopReason === "refusal" : null };
+      refusal: typeof m.refusal === "boolean" ? m.refusal : null };
   }
   if (event.event_type === "audit" && (m.controlSchemaVersion !== undefined || m.approvalControlSchemaVersion !== undefined)
     && (m.decision === "allow" || m.decision === "deny" || m.decision === "ask")) {
@@ -87,15 +88,20 @@ function rowOf(event: { id: string; ts: number; session_id: string; event_type: 
   return null;
 }
 
-/** Rows of one agent between two times, oldest first; `truncated` when more than the limit were recorded. */
+/**
+ * Rows of one agent between two times, oldest first. Past the limit the newest rows are kept and `truncated` is set,
+ * so a busy agent's latest traffic is never the part left out.
+ */
 export function readObservedRows(workspace: string, input: { agentId: string; sinceTs: number; untilTs: number }): { rows: ObservedRow[]; truncated: boolean } {
   let ledger: ReturnType<typeof openLedger>;
   try { ledger = openLedger(workspace, { readonly: true }); } catch { return { rows: [], truncated: false }; }
   try {
     const events = ledger.db.prepare(`SELECT id, ts, session_id, event_type, meta_json FROM evidence_events
-      WHERE ts >= ? AND ts <= ? AND event_type IN ('llm_response', 'audit', 'tool_result') ORDER BY ts ASC, rowid ASC LIMIT ?`)
-      .all(input.sinceTs, input.untilTs, OBSERVED_ROW_LIMIT + 1) as Array<{ id: string; ts: number; session_id: string; event_type: string; meta_json: string }>;
-    const rows = events.slice(0, OBSERVED_ROW_LIMIT).map((event) => rowOf(event, input.agentId)).filter((row): row is ObservedRow => row !== null);
+      WHERE ts >= ? AND ts <= ? AND event_type IN ('llm_response', 'audit', 'tool_result')
+        AND (CASE WHEN json_valid(meta_json) THEN json_extract(meta_json, '$.agentId') END) = ?
+      ORDER BY ts DESC, rowid DESC LIMIT ?`)
+      .all(input.sinceTs, input.untilTs, input.agentId, OBSERVED_ROW_LIMIT + 1) as Array<{ id: string; ts: number; session_id: string; event_type: string; meta_json: string }>;
+    const rows = events.slice(0, OBSERVED_ROW_LIMIT).reverse().map((event) => rowOf(event, input.agentId)).filter((row): row is ObservedRow => row !== null);
     return { rows, truncated: events.length > OBSERVED_ROW_LIMIT };
   } catch {
     return { rows: [], truncated: false };

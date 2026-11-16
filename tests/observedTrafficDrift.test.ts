@@ -12,6 +12,7 @@ import { openLedger } from "../src/ledger/ledger.js";
 import { observedChangeNotes } from "../src/watch/observedChange.js";
 import { observedRates, readObservedRows, type ObservedRow } from "../src/watch/observedTraffic.js";
 import { initWorkspace } from "../src/workspace.js";
+import { replyStopInfo } from "../src/gateway/replyStop.js";
 import { toolRatesHtml } from "../src/console/assets/runtimeRates.js";
 
 const roots: string[] = [];
@@ -27,9 +28,11 @@ function workspaceWithRows(): string {
     ledger.startSession({ sessionId: "observed-fixture", runtime: "unknown", binaryPath: "fixture", binarySha256: "0".repeat(64) });
     const add = (eventType: "llm_response" | "audit" | "tool_result", meta: Record<string, unknown>) => ledger.appendEvidence({
       sessionId: "observed-fixture", runtime: "unknown", eventType, inline: true, payload: "fixture", meta, ts: NOW - 60_000 });
-    add("llm_response", { agentId: "agent-a", statusCode: 200, model: "example-model", usage: { input_tokens: 100, output_tokens: 20 }, stopReason: "end_turn", run_id: "r1" });
-    add("llm_response", { agentId: "agent-a", statusCode: 200, model: "example-model", usage: { input_tokens: 50, output_tokens: 10 }, stopReason: "refusal", run_id: "r1" });
+    add("llm_response", { agentId: "agent-a", statusCode: 200, model: "example-model", usage: { input_tokens: 100, output_tokens: 20 }, stopReason: "end_turn", refusal: false, run_id: "r1" });
+    add("llm_response", { agentId: "agent-a", statusCode: 200, model: "example-model", usage: { input_tokens: 50, output_tokens: 10 }, stopReason: "refusal", refusal: true, run_id: "r1" });
     add("llm_response", { agentId: "agent-a", statusCode: 200, model: "example-model", usage: { total_tokens: 40 }, run_id: "r2" });
+    // An OpenAI-compatible "stop" says nothing about a refusal: it stays unknown, never "not refused".
+    add("llm_response", { agentId: "agent-a", statusCode: 200, model: "example-model", stopReason: "stop", refusal: null, run_id: "r2" });
     add("llm_response", { agentId: "agent-a", statusCode: 500, model: "example-model" });
     add("audit", { agentId: "agent-a", controlSchemaVersion: 2, decision: "allow" });
     add("audit", { agentId: "agent-a", controlSchemaVersion: 2, decision: "deny" });
@@ -52,7 +55,7 @@ describe("observed traffic numbers", () => {
     expect(observedRates(rows)).toEqual({
       toolDecisions: { total: 3, denied: 1, asked: 1, denialRate: 0.3333 },
       toolOutcomes: { total: 3, failed: 1, outcomeUnknown: 1, errorRate: 0.5 },
-      modelReplies: { total: 3, refusals: 1, refusalUnknown: 1, refusalRate: 0.5, tasks: 2, tokensPerTask: 110 }
+      modelReplies: { total: 4, refusals: 1, refusalUnknown: 2, refusalRate: 0.5, tasks: 2, tokensPerTask: 110 }
     });
   });
 
@@ -84,6 +87,22 @@ describe("observed traffic numbers", () => {
     expect(readFileSync(join(workspace, ".amc", "evidence.sqlite")).equals(ledgerBefore)).toBe(true);
     expect((await call("POST", "/api/v1/runtime/tool-rates")).status).toBe(404);
     expect((await call("GET", "/api/v1/runtime/tool-rates?window=nonsense")).status).toBe(400);
+  });
+});
+
+describe("what the gateway records about a refusal", () => {
+  test("Anthropic: the stop reason decides; refusal is the only refusal", () => {
+    expect(replyStopInfo({ stop_reason: "refusal" })).toEqual({ stopReason: "refusal", refusal: true });
+    expect(replyStopInfo({ stop_reason: "end_turn" })).toEqual({ stopReason: "end_turn", refusal: false });
+  });
+
+  test("OpenAI-compatible: message.refusal and content_filter decide; a bare finish_reason leaves it unknown", () => {
+    const reply = (choice: Record<string, unknown>) => replyStopInfo({ choices: [choice] });
+    expect(reply({ finish_reason: "stop", message: { content: null, refusal: "I can't help with that." } })).toEqual({ stopReason: "stop", refusal: true });
+    expect(reply({ finish_reason: "content_filter", message: { content: "" } })).toEqual({ stopReason: "content_filter", refusal: true });
+    expect(reply({ finish_reason: "stop", message: { content: "ok", refusal: null } })).toEqual({ stopReason: "stop", refusal: false });
+    expect(reply({ finish_reason: "stop", message: { content: "ok" } })).toEqual({ stopReason: "stop" });
+    expect(replyStopInfo({ candidates: [] })).toEqual({});
   });
 });
 
@@ -132,5 +151,7 @@ describe("Runtime page card", () => {
     expect(html).toContain("1 of 4 (25.0%)");
     expect(html).toContain("0 of 2 (not recorded)");
     expect(toolRatesHtml(null)).toContain("No tool-call numbers yet.");
+    expect(toolRatesHtml({ rowsRead: 5, truncated: true })).toContain("count only the newest 5");
+    expect(toolRatesHtml({ rowsRead: 5, truncated: false })).not.toContain("newest");
   });
 });
