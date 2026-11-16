@@ -77,6 +77,10 @@ export async function runRedTeamCiGate(input: RunRedTeamCiGateInput): Promise<Re
     if (!verified.ok) reasons.push(`${verified.reason}: the sealed red-team report does not verify (${verified.detail}).`);
   }
 
+  // Nothing measured is unknown, not secure: no threshold, however low, passes a run where no attack was graded.
+  if (report.evidenceStatus === "INSUFFICIENT_EVIDENCE") {
+    reasons.push(`No attack was measured (${report.inconclusiveScenarios} scenarios not evaluated), so the red-team gate cannot pass.`);
+  }
   if (report.overallScore0to100 < thresholds.minScore0to100) {
     reasons.push(
       `Red-team score ${report.overallScore0to100} is below minimum ${thresholds.minScore0to100}.`
