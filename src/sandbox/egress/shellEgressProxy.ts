@@ -2,7 +2,7 @@ import { randomBytes, timingSafeEqual } from "node:crypto";
 import { lookup } from "node:dns/promises";
 import { createServer, request as httpRequest, type IncomingMessage } from "node:http";
 import { connect, createServer as createTcpServer, isIP, type Server as TcpServer, type Socket } from "node:net";
-import { canonicalHost, decideEgress, pinnedLookup } from "../../enforce/egressAllowlist.js";
+import { canonicalHost, decideEgress, isNonPublicAddress, pinnedLookup } from "../../enforce/egressAllowlist.js";
 import { checkEgress, isEgressRefusal } from "../../residency/checkEgress.js";
 import type { ShellEgressRow } from "../sandboxTypes.js";
 
@@ -57,8 +57,8 @@ export interface ShellEgressOptions {
   /** The trusted workspace and the agent whose call started the shell; never taken from the proxied request. */
   readonly workspace: string;
   readonly agentId: string;
-  /** How to allow an entry (`host`, `host:port` or an IP), in plain words; never "switch the sandbox off". */
-  readonly howToAllow?: (entry: string) => string;
+  /** How to allow the entries (`host`, `host:port` or an IP) together, in plain words; never "switch the sandbox off". */
+  readonly howToAllow?: (entries: readonly string[]) => string;
   /** Listen on this Unix socket path (Linux) instead of 127.0.0.1. */
   readonly listenPath?: string;
 }
@@ -93,28 +93,41 @@ function entriesForPort(list: readonly string[], port: number, defaultPort: numb
   });
 }
 
-/** A decision; `entry` is set on a refusal that listing that entry would lift. */
-export interface EgressVerdict { readonly allowed: boolean; readonly reason: string; readonly entry?: string }
+/** A decision; `entries` is set on a refusal that listing all of those entries would lift. */
+export interface EgressVerdict { readonly allowed: boolean; readonly reason: string; readonly entries?: readonly string[] }
+
+/** `"a"`, `"a" and "b"`, `"a", "b" and "c"`: the entries as a person would list them. */
+export function quoteEntries(entries: readonly string[]): string {
+  const quoted = entries.map(entry => `"${entry}"`);
+  return quoted.length < 2 ? quoted.join("") : `${quoted.slice(0, -1).join(", ")} and ${quoted.at(-1)}`;
+}
 
 /** The allow-list decision on a target and the addresses it will connect to (empty before DNS). */
 export function decideTarget(host: string, port: number, defaultPort: number, addresses: readonly string[],
   allowHosts: readonly string[], narrowings: readonly (readonly string[])[] = []): EgressVerdict {
   const spell = (name: string): string => port === defaultPort ? name : `${isIP(name) === 6 ? `[${name}]` : name}:${port}`;
-  const named = spell(host);
-  const signed = decideEgress(host, addresses, { allowHosts: entriesForPort(allowHosts, port, defaultPort) });
+  const forPort = entriesForPort(allowHosts, port, defaultPort);
+  const signed = decideEgress(host, addresses, { allowHosts: forPort });
   if (!signed.allowed) {
-    if (port !== defaultPort && decideEgress(host, addresses, { allowHosts: entriesForPort(allowHosts, defaultPort, defaultPort) }).allowed) {
-      return { allowed: false, entry: named, reason: `port ${port} is not listed for ${host}; an entry without a port covers port ${defaultPort} only` };
+    // Every entry the person needs: the name unless it is listed, and each non-public address it resolves to.
+    const listed = new Set(forPort.map(canonicalHost));
+    const nameListed = decideEgress(host, [], { allowHosts: forPort }).allowed;
+    const inward = addresses.map(canonicalHost).filter(address => isNonPublicAddress(address) && !listed.has(address));
+    const entries = [...new Set([...(nameListed ? [] : [spell(host)]), ...inward.map(spell)])];
+    const anyPort = allowHosts.flatMap(raw => { const entry = egressEntry(raw); return entry ? [entry.host] : []; });
+    if (!nameListed && decideEgress(host, [], { allowHosts: anyPort }).allowed) {
+      const portless = port !== defaultPort && decideEgress(host, [], { allowHosts: entriesForPort(allowHosts, defaultPort, defaultPort) }).allowed;
+      return { allowed: false, entries, reason: `port ${port} is not listed for ${host}${portless ? `; an entry without a port covers port ${defaultPort} only` : ""}` };
     }
-    const inward = /resolves to non-public address (\S+),/.exec(signed.reason)?.[1];
-    return { allowed: false, entry: inward === undefined ? named : spell(inward), reason: signed.reason };
+    const resolvesInward = !nameListed && inward.length > 0 ? `; it resolves to ${inward.join(" and ")}, and a non-public address needs its own entry` : "";
+    return { allowed: false, entries, reason: `${signed.reason}${resolvesInward}` };
   }
   for (const list of narrowings) {
     if (!decideEgress(host, addresses, { allowHosts: entriesForPort(list, port, defaultPort) }).allowed) {
       return { allowed: false, reason: `${host} is outside the narrower list this session set, so it stays blocked until the session ends (a new session uses the signed list)` };
     }
   }
-  return { allowed: true, entry: named, reason: signed.reason };
+  return { allowed: true, reason: signed.reason };
 }
 
 const LOOPBACK_NAMES = new Set(["127.0.0.1", "localhost", "::1"]);
@@ -131,7 +144,7 @@ async function holdIpv6Loopback(port: number): Promise<TcpServer | null | false>
 export async function startShellEgressProxy(options: ShellEgressOptions): Promise<ShellEgressProxy> {
   const allowHosts = [...options.allowHosts];
   const narrowings = (options.narrowings ?? []).map(list => [...list]);
-  const howToAllow = options.howToAllow ?? ((entry: string) => `add "${entry}" to the allow-list this command was given`);
+  const howToAllow = options.howToAllow ?? ((entries: readonly string[]) => `add ${quoteEntries(entries)} to the allow-list this command was given`);
   const token = randomBytes(24).toString("hex");
   const expected = Buffer.from(`Basic ${Buffer.from(`amc:${token}`).toString("base64")}`);
   const refused = new Map<string, string>();
@@ -144,7 +157,7 @@ export async function startShellEgressProxy(options: ShellEgressOptions): Promis
     try { options.record({ host, port, decision: decision.allowed ? "allow" : "deny", reason: decision.reason }); }
     catch { return false; }
     if (!decision.allowed) {
-      const allow = decision.entry === undefined ? "" : ` To allow it, ${howToAllow(decision.entry)}.`;
+      const allow = decision.entries === undefined ? "" : ` To allow it, ${howToAllow(decision.entries)}.`;
       refused.set(`${host}:${port}`, `amc: blocked a network connection to ${host} port ${port}: ${decision.reason}.${allow}`);
     }
     return decision.allowed;
@@ -169,6 +182,13 @@ export async function startShellEgressProxy(options: ShellEgressOptions): Promis
       return null;
     }
     const byName = decideTarget(host, port, defaultPort, [], allowHosts, narrowings);
+    // "localhost" is answered on this machine (RFC 6761), so looking it up sends nothing out; the refusal can then
+    // name the loopback entries it also needs.
+    if (!byName.allowed && host === "localhost") {
+      const local = await lookup(host, { all: true, verbatim: true }).then(rows => rows.map(row => row.address), () => []);
+      decide(host, port, { ...decideTarget(host, port, defaultPort, local, allowHosts, narrowings), allowed: false });
+      return null;
+    }
     if (!byName.allowed || isIP(host) !== 0) return decide(host, port, preflight(url, byName)) ? [host] : null;
     let addresses: string[] = [];
     try { addresses = (await lookup(host, { all: true, verbatim: true })).map(entry => entry.address); } catch { /* denied below */ }

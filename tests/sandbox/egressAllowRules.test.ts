@@ -3,12 +3,13 @@
  * (sessionEgress.ts) and the plain refusal message. Loopback only: an owned origin on 127.0.0.1.
  */
 import { createServer, request as httpRequest, type Server } from "node:http";
-import { createServer as createTcpServer } from "node:net";
+import { createServer as createTcpServer, isIP } from "node:net";
+import { lookup } from "node:dns/promises";
 import { mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { decideTarget, egressEntry, egressTarget, startShellEgressProxy } from "../../src/sandbox/egress/shellEgressProxy.js";
+import { decideTarget, egressEntry, egressTarget, quoteEntries, startShellEgressProxy } from "../../src/sandbox/egress/shellEgressProxy.js";
 import { narrowSessionEgress, sessionEgressNarrowing, withRefusals } from "../../src/sandbox/egress/sessionEgress.js";
 import { toolDefinitionSchema } from "../../src/toolhub/toolsSchema.js";
 import { initWorkspace } from "../../src/workspace.js";
@@ -34,7 +35,7 @@ describe("allow-list entries and targets", () => {
     expect(decideTarget("evilpkg.example.org", 443, 443, [], list).allowed).toBe(false);
     expect(decideTarget("pkg.example.org", 443, 443, [], list).allowed).toBe(false);
     const port = decideTarget("example.com", 8443, 443, [], list);
-    expect(port).toMatchObject({ allowed: false, entry: "example.com:8443" });
+    expect(port).toMatchObject({ allowed: false, entries: ["example.com:8443"] });
     expect(port.reason).toBe("port 8443 is not listed for example.com; an entry without a port covers port 443 only");
     expect(decideTarget("example.com", 8443, 443, [], [...list, "example.com:8443"]).allowed).toBe(true);
     expect(decideTarget("example.com", 80, 443, [], list).allowed).toBe(false);
@@ -47,10 +48,24 @@ describe("allow-list entries and targets", () => {
       const verdict = decideTarget("api.example.com", 443, 443, [address], [".example.com"]);
       expect(verdict.allowed, address).toBe(false);
       // The hint names the address itself, and listing exactly that entry is what lifts it.
-      expect(decideTarget("api.example.com", 443, 443, [address], [".example.com", verdict.entry!]).allowed, address).toBe(true);
+      expect(decideTarget("api.example.com", 443, 443, [address], [".example.com", ...verdict.entries!]).allowed, address).toBe(true);
     }
     expect(decideTarget("api.example.com", 443, 443, ["10.0.0.7"], [".example.com", "10.0.0.7"]).allowed).toBe(true);
-    expect(decideTarget("127.0.0.1", 3813, 443, [], ["127.0.0.1"]).entry).toBe("127.0.0.1:3813");
+    expect(decideTarget("127.0.0.1", 3813, 443, [], ["127.0.0.1"]).entries).toEqual(["127.0.0.1:3813"]);
+  });
+
+  test("a host listed only at another port is told which port is missing, not that it is unlisted", () => {
+    const verdict = decideTarget("127.0.0.1", 3814, 80, [], ["127.0.0.1:3813"]);
+    expect(verdict).toEqual({ allowed: false, entries: ["127.0.0.1:3814"], reason: "port 3814 is not listed for 127.0.0.1" });
+    expect(decideTarget("example.com", 8443, 443, [], ["example.com:9000"]).reason).toBe("port 8443 is not listed for example.com");
+  });
+
+  test("a refusal for localhost names every entry that lifts it, so following it once is enough", () => {
+    const before = decideTarget("localhost", 3813, 80, ["::1", "127.0.0.1"], []);
+    expect(before.entries).toEqual(["localhost:3813", "[::1]:3813", "127.0.0.1:3813"]);
+    expect(before.reason).toBe("localhost is not in the egress allowlist; it resolves to ::1 and 127.0.0.1, and a non-public address needs its own entry");
+    expect(decideTarget("localhost", 3813, 80, ["::1", "127.0.0.1"], before.entries!).allowed).toBe(true);
+    expect(quoteEntries(before.entries!)).toBe('"localhost:3813", "[::1]:3813" and "127.0.0.1:3813"');
   });
 
   test("the signed schema takes host:port entries and nothing looser", () => {
@@ -67,7 +82,7 @@ describe("per-session narrowing", () => {
     expect(decideTarget("api.example.com", 443, 443, [], signed, [["api.example.com"]]).allowed).toBe(true);
     const outside = decideTarget("www.example.com", 443, 443, [], signed, [["api.example.com"]]);
     expect(outside.allowed).toBe(false);
-    expect(outside.entry).toBeUndefined(); // no "add it" hint: the narrowing, not the signed list, refuses it
+    expect(outside.entries).toBeUndefined(); // no "add it" hint: the narrowing, not the signed list, refuses it
     expect(outside.reason).toMatch(/narrower list this session set/);
     expect(decideTarget("other.org", 443, 443, [], signed, [["other.org"]]).allowed).toBe(false);
     expect(decideTarget("api.example.com", 443, 443, [], signed, [["api.example.com"], ["www.example.com"]]).allowed).toBe(false);
@@ -104,7 +119,7 @@ describe("the proxy on loopback", () => {
   async function ask(allowHosts: string[], method: "GET" | "CONNECT", target: string, extra: Record<string, string> = {}) {
     const rows: ShellEgressRow[] = [];
     const proxy = await startShellEgressProxy({ allowHosts, record: row => rows.push(row), workspace, agentId: "default",
-      howToAllow: entry => `add "${entry}" to the test list` });
+      howToAllow: entries => `add ${quoteEntries(entries)} to the test list` });
     try {
       const result = await new Promise<{ status: number; body: string }>((done, fail) => {
         const req = httpRequest({ host: "127.0.0.1", port: proxy.port!, method, path: target,
@@ -143,6 +158,15 @@ describe("the proxy on loopback", () => {
     expect(status).toBe(403);
     expect(rows).toHaveLength(1);
     expect(refusals).toEqual(['amc: blocked a network connection to blocked.invalid port 443: blocked.invalid is not in the egress allowlist. To allow it, add "blocked.invalid" to the test list.']);
+  });
+
+  test("an unlisted localhost names the loopback entries it also needs, and listing them reaches the server", async () => {
+    const local = (await lookup("localhost", { all: true, verbatim: true })).map(row => row.address);
+    const spelled = local.map(address => isIP(address) === 6 ? `[${address}]:${port}` : `${address}:${port}`);
+    const { status, refusals } = await ask([], "GET", `http://localhost:${port}/x`);
+    expect(status).toBe(403);
+    expect(refusals[0]).toContain(`To allow it, add ${quoteEntries([`localhost:${port}`, ...spelled])} to the test list.`);
+    expect((await ask([`localhost:${port}`, ...spelled], "GET", `http://localhost:${port}/x`)).rows.at(-1)).toMatchObject({ decision: "allow" });
   });
 
   test("holds its port on ::1 too, so localhost:<port> in Seatbelt reaches only the proxy", async () => {

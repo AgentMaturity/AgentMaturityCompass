@@ -54,7 +54,7 @@ export interface SandboxPolicy {
   /** Per-session lists that can only shrink `allowHosts` (src/sandbox/egress/sessionEgress.ts). */
   readonly egressNarrowing?: readonly (readonly string[])[];
   /** How a person allows a refused entry, in plain words, for the refusal message. */
-  readonly egressHowToAllow?: (entry: string) => string;
+  readonly egressHowToAllow?: (entries: readonly string[]) => string;
 }
 
 /** One `NATIVE_SHELL_EGRESS` decision by the shell's egress proxy. */

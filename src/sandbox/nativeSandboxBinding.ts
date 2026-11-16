@@ -6,6 +6,7 @@ import { bashTool } from "../tools/builtin/bashTool.js";
 import type { ToolDefinition, ToolExecution } from "../tools/toolTypes.js";
 import { bwrapBackend } from "./bwrapBackend.js";
 import { sessionEgressNarrowing } from "./egress/sessionEgress.js";
+import { quoteEntries } from "./egress/shellEgressProxy.js";
 import { SandboxRunner } from "./sandboxRunner.js";
 import type { SandboxOutcome, ShellEgressRow } from "./sandboxTypes.js";
 import { seatbeltNativeShell } from "./seatbeltNativeShell.js";
@@ -104,7 +105,7 @@ export function createNativeSandboxBash(options: {
         egressScope: { workspace, agentId: execution.agentId },
         // A rule may have narrowed this session's list; it can only remove hosts (sessionEgress.ts).
         egressNarrowing: sessionEgressNarrowing(execution.ownerStep?.sessionId),
-        egressHowToAllow: (entry: string) => `add "${entry}" under bash, nativeSandbox, egress, allowHosts in .amc/tools.yaml, then sign the file again: amc tools sign`,
+        egressHowToAllow: (entries: readonly string[]) => `add ${quoteEntries(entries)} under bash, nativeSandbox, egress, allowHosts in .amc/tools.yaml, then sign the file again: amc tools sign`,
         ...(options.onOutput ? { onOutput: (stream: "stdout" | "stderr", text: string) => options.onOutput!(execution, stream, text) } : {}),
         ...(recordEgress ? { onEgress: (row: ShellEgressRow) => recordEgress(execution, row) } : {}) };
       const backend = process.platform === "darwin" ? seatbeltNativeShell() : bwrapBackend();
