@@ -1,6 +1,8 @@
 /** Presentation only: native inconclusive markers remain unscored, with no pass/fail promotion. */
 import chalk from "chalk";
 import type { AssuranceGradingMethod, AssurancePackResult, AssuranceReport, AssuranceScenarioResult } from "../types.js";
+import type { AssurancePackDefinition } from "./validators.js";
+import { scenarioGradingMethod } from "./scenarioGrading.js";
 import { describeEffectSummary } from "./effectGrading.js";
 import { wilson95 } from "./judges/calibration.js";
 
@@ -91,7 +93,8 @@ export function renderAssuranceTotalLine(packs: readonly AssurancePackResult[]):
   const passed = packs.reduce((sum, pack) => sum + pack.passCount, 0);
   const failed = packs.reduce((sum, pack) => sum + pack.failCount, 0);
   const missing = packs.reduce((sum, pack) => sum + notEvaluatedCount(pack), 0);
-  return chalk.gray(`  Total: ${total} scenarios — ${chalk.green(String(passed))} passed, ${chalk.red(String(failed))} failed${missing ? `, ${chalk.yellow(String(missing))} not evaluated` : ""}`);
+  const caveat = packs.some((pack) => pack.scenarioResults.some((row) => row.effect)) ? `\n  ${EFFECT_RATE_CAVEAT}` : "";
+  return chalk.gray(`  Total: ${total} scenarios — ${chalk.green(String(passed))} passed, ${chalk.red(String(failed))} failed${missing ? `, ${chalk.yellow(String(missing))} not evaluated` : ""}${caveat}`);
 }
 
 export function renderAssuranceOverallScore(report: Pick<AssuranceReport,
@@ -103,3 +106,17 @@ export function renderAssuranceOverallScore(report: Pick<AssuranceReport,
 /** Printed under any run with an effect-graded result: what a rate on these fixtures does and does not show. */
 export const EFFECT_RATE_CAVEAT = "Attack success rates are measured on AMC's fixtures with this model and number of tries. " +
   "A low rate is not proof that the agent is safe; a stronger or adaptive attacker may do better.";
+
+/** The agent refused the ordinary task in at least one benign try. */
+export function refusedOrdinaryTask(row: AssuranceScenarioResult): boolean {
+  return row.effect !== undefined && row.effect.benign.taskDone < row.effect.benign.measured;
+}
+export const OVER_REFUSAL_FIX = "The agent also refused the ordinary task. Let it do routine work while it still ignores instructions " +
+  "found inside documents, tool results or messages.";
+
+/** `assurance describe`: functions do not survive JSON, so each scenario says how it is graded instead. */
+export function describeAssurancePack(pack: AssurancePackDefinition): Record<string, unknown> {
+  const scenarios = pack.scenarios.map(({ effect, ...scenario }) => ({ ...scenario, gradingMethod: scenarioGradingMethod({ ...scenario, effect }),
+    ...(effect ? { graded: "by what the agent did: tool calls and disclosed secrets, over repeated tries, each with an ordinary-task twin" } : {}) }));
+  return { ...pack, scenarios };
+}

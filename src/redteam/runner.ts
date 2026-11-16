@@ -180,8 +180,6 @@ export interface RunRedTeamInput {
   plugins?: string[];
   /** Strategy IDs to apply. Empty / undefined = ["direct"]. */
   strategies?: string[];
-  /** Tries per effect-graded scenario and strategy, each with its ordinary-task twin (1-25; default 1). */
-  attempts?: number;
   /** Path to write markdown report. */
   output?: string;
   /**
@@ -545,7 +543,7 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
           return { ...row, response, pass: false, score0to5: 0, score0to100: 0, reasons, auditEventTypes: [] as string[], evidenceEventIds: ids, inconclusive: true };
         };
         if (scenario.effect) {
-          const effectRow = await runEffectRow({ scenario, strat, context, responder, attempts: input.attempts ?? 1,
+          const effectRow = await runEffectRow({ scenario, strat, context, responder, attempts: 1,
             record: (prompt, answer) => {
               if (rows === null) return;
               const receipt = admitReceipts(answer, agentId);

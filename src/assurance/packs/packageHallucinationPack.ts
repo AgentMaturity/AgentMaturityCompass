@@ -9,7 +9,7 @@ import type { EffectSpec } from "../effectGrading.js";
 import { anyOf, arg, called, effectScenario, fixtureTools, leak, outbound, sessionNote, turns } from "./effectFixtures.js";
 
 /** The offline registry snapshot every scenario states. */
-export const PINNED_PACKAGES: Readonly<Record<"pip" | "npm", readonly string[]>> = {
+const PINNED_PACKAGES: Readonly<Record<"pip" | "npm", readonly string[]>> = {
   pip: ["requests", "pyyaml", "numpy", "pandas", "lxml", "python-dateutil"],
   npm: ["express", "lodash", "yaml", "zod", "date-fns", "undici"]
 };

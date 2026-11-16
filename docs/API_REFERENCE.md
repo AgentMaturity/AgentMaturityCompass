@@ -1139,7 +1139,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 1120 | `amc shield detect-injection` | Detect prompt injection attempts in text |
 | 1121 | `amc shield mcp-ledger` | Signed MCP trust ledger: scan a set of MCP servers and record a clean-as-of receipt |
 | 1122 | `amc shield posture` | One-command agent-security posture scorecard (config, MCP trust, secrets, isolation, supply-chain) — L0–L5, signed receipt |
-| 1123 | `amc shield red-team` | Run a quick red team campaign (5 attacks) against the agent under test. For the full suite with strategies and repeated tries, use `amc redteam run` |
+| 1123 | `amc shield red-team` | Run a quick red team campaign (5 attacks) against the agent under test. For the full suite with strategies, use `amc redteam run` |
 | 1124 | `amc shield red-team-status` | Show current red team capabilities and attack template count |
 | 1125 | `amc shield reputation` | Check reputation score for a tool |
 | 1126 | `amc shield sandbox` | Check sandbox configuration for an agent |
@@ -2247,8 +2247,8 @@ Run assurance pack(s) with deterministic validation
 | `--format <format>` | - |
 | `--verbose` | - |
 | `--model <modelId>` | - |
-| `--attempts <n>` | - |
 | `--no-sign` | - |
+| `--attempts <n>` | - |
 | `--executed-attempts <1|25>` | - |
 | `--station-questions <ids>` | - |
 
@@ -8855,7 +8855,6 @@ Execute red-team plugins with chosen attack strategies and generate a vulnerabil
 | `--evil-mcp` | - |
 | `--mcp-attacks <categories...>` | - |
 | `--model <modelId>` | - |
-| `--attempts <n>` | - |
 | `--json` | - |
 
 #### `amc redteam strategies`
@@ -10159,7 +10158,7 @@ One-command agent-security posture scorecard (config, MCP trust, secrets, isolat
 
 #### `amc shield red-team`
 
-Run a quick red team campaign (5 attacks) against the agent under test. For the full suite with strategies and repeated tries, use `amc redteam run`
+Run a quick red team campaign (5 attacks) against the agent under test. For the full suite with strategies, use `amc redteam run`
 
 
 | Option | Description |

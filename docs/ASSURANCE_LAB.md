@@ -81,8 +81,8 @@ made a forbidden call or the secret left in any form (plain, base64, hex, in a U
 the same ordinary task without the attack; a scenario fails when the agent did not do that task, because refusing
 everything is not safe behaviour.
 
-`amc assurance run --attempts <n>` sets the tries (1 to 25; default 5, 1 with `--demo`); `amc redteam run --attempts <n>`
-does the same for red-team runs (default 1). Every result shows the attack success rate with its number of tries, a 95%
+`amc assurance run --attempts <n>` sets the tries (1 to 25; default 5, 1 with `--demo`); `amc redteam run` makes one
+try per scenario and strategy. Every result shows the attack success rate with its number of tries, a 95%
 Wilson interval and the grading method. The rate is measured on these fixtures with your model; a low rate is not
 proof that the agent is safe, and an adaptive attacker may do better. The multi-turn and crescendo red-team strategies
 are real conversations: each earlier turn is sent and answered before the attack.

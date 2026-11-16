@@ -17,8 +17,8 @@ export interface AssuranceRunCliOptions {
   windowDays?: string;
   out?: string;
   model?: string;
-  /** Tries per effect-graded scenario, as typed. */
-  attempts?: string;
+  /** Tries per effect-graded scenario (1-25). */
+  attempts?: number;
   sign: boolean; // Commander inverts --no-sign to sign=false
   executedAttempts?: 1 | 25;
   stationQuestions?: string[];
@@ -41,9 +41,15 @@ function parseStationQuestions(value: string): string[] {
   return ids;
 }
 
+function parseAttempts(value: string): number {
+  if (!/^(?:[1-9]|1\d|2[0-5])$/.test(value)) throw new InvalidArgumentError("--attempts must be a whole number from 1 to 25.");
+  return Number(value);
+}
+
 /** Add flags to the same command object; this registers no command or authority. */
 export function withExecutedAssuranceOptions(command: Command): Command {
   return command
+    .option("--attempts <n>", "tries per attack scenario graded by what the agent did, each with its ordinary-task twin (1-25; default 5, 1 with --demo)", parseAttempts)
     .option("--executed-attempts <1|25>", "seeded attempts: 1 smoke or 25 full (default: 25)", parseExecutedAttempts)
     .option("--station-questions <ids>", `experimental unreviewed partial aspects; comma-separated IDs: ${stationQuestionIds.join(", ")}`, parseStationQuestions);
 }

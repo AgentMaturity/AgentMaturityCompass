@@ -105,7 +105,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc assurance patch` | Apply deterministic patch kit for failed assurance findings | `--assuranceRun <id>`<br>`--agent <agentId>`<br>`--apply` | - |
 | `amc assurance policy` | Print current assurance policy | - | - |
 | `amc assurance policy-apply` | Apply assurance policy from YAML/JSON file | `--file <path>` | - |
-| `amc assurance run` | Run assurance pack(s) with deterministic validation | `--agent <agentId>`<br>`--scope <scope>`<br>`--id <id>`<br>`--pack <packId>`<br>`--all`<br>`--demo`<br>`--mode <mode>`<br>`--window <window>`<br>`--window-days <days>`<br>`--out <path>`<br>`--format <format>`<br>`--verbose`<br>`--model <modelId>`<br>`--attempts <n>`<br>`--no-sign`<br>`--executed-attempts <1|25>`<br>`--station-questions <ids>` | - |
+| `amc assurance run` | Run assurance pack(s) with deterministic validation | `--agent <agentId>`<br>`--scope <scope>`<br>`--id <id>`<br>`--pack <packId>`<br>`--all`<br>`--demo`<br>`--mode <mode>`<br>`--window <window>`<br>`--window-days <days>`<br>`--out <path>`<br>`--format <format>`<br>`--verbose`<br>`--model <modelId>`<br>`--no-sign`<br>`--attempts <n>`<br>`--executed-attempts <1|25>`<br>`--station-questions <ids>` | - |
 | `amc assurance runs` | List assurance lab runs | - | - |
 | `amc assurance scheduler` | Assurance scheduler controls | - | - |
 | `amc assurance scheduler disable` | Disable assurance scheduler | - | - |
@@ -990,7 +990,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc redteam attack` | Run attack plugins (prompt-injection, data-exfiltration, privilege-escalation, model-manipulation, denial-of-service) | `--plugins <ids...>`<br>`--model <modelId>`<br>`--json` | - |
 | `amc redteam attack-list` | List available attack plugins | `--json` | - |
 | `amc redteam plugins` | List available attack plugins (assurance packs) | `--json` | - |
-| `amc redteam run` | Execute red-team plugins with chosen attack strategies and generate a vulnerability report | `--plugins <ids...>`<br>`--strategies <ids...>`<br>`--output <path>`<br>`--no-sign`<br>`--evil-mcp`<br>`--mcp-attacks <categories...>`<br>`--model <modelId>`<br>`--attempts <n>`<br>`--json` | - |
+| `amc redteam run` | Execute red-team plugins with chosen attack strategies and generate a vulnerability report | `--plugins <ids...>`<br>`--strategies <ids...>`<br>`--output <path>`<br>`--no-sign`<br>`--evil-mcp`<br>`--mcp-attacks <categories...>`<br>`--model <modelId>`<br>`--json` | - |
 | `amc redteam strategies` | List available attack strategies | `--json` | - |
 | `amc release` | Deterministic release engineering and offline verification | - | - |
 | `amc release init` | Initialize AMC release signing keypair | `--write-private-to <path>` | - |
@@ -1126,7 +1126,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc shield detect-injection` | Detect prompt injection attempts in text | `--json` | - |
 | `amc shield mcp-ledger` | Signed MCP trust ledger: scan a set of MCP servers and record a clean-as-of receipt | `--json`<br>`--out <path>`<br>`--previous <path>` | - |
 | `amc shield posture` | One-command agent-security posture scorecard (config, MCP trust, secrets, isolation, supply-chain) — L0–L5, signed receipt | `--json`<br>`--out <path>` | - |
-| `amc shield red-team` | Run a quick red team campaign (5 attacks) against the agent under test. For the full suite with strategies and repeated tries, use `amc redteam run` | `--rounds <n>`<br>`--categories <list>`<br>`--target <profile>`<br>`--agent <agentId>`<br>`--model <modelId>` | - |
+| `amc shield red-team` | Run a quick red team campaign (5 attacks) against the agent under test. For the full suite with strategies, use `amc redteam run` | `--rounds <n>`<br>`--categories <list>`<br>`--target <profile>`<br>`--agent <agentId>`<br>`--model <modelId>` | - |
 | `amc shield red-team-status` | Show current red team capabilities and attack template count | - | - |
 | `amc shield reputation` | Check reputation score for a tool | `--json` | - |
 | `amc shield sandbox` | Check sandbox configuration for an agent | `--json` | - |
