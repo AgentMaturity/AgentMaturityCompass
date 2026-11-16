@@ -15557,12 +15557,12 @@
         "keyRisk": 3,
         "l1": "No credential transparency; AI-assessed competencies are not documented in verifiable, employer-readable formats",
         "l2": "Credentials are issued as PDF documents listing competencies that employers cannot verify",
-        "l3": "Agent generates digital credentials with basic competency descriptions, but does not implement full Europass DCI or support automated employer verification",
+        "l3": "Agent generates digital credentials with basic competency descriptions, but does not issue European Digital Credentials for Learning or support automated employer verification",
         "l4": "Verifiable Europass digital credentials link to evidence, but the AI assessment method is not stated on the credential",
-        "l5": "Full credential transparency with Europass DCI integration, verifiable competency evidence, employer verification APIs, competency-to-job-requirement mapping, and transparent AI assessment methodology documentation",
-        "regulatoryRef": "Europass DCI",
+        "l5": "Full credential transparency with European Digital Credentials for Learning, verifiable competency evidence, employer verification APIs, competency-to-job-requirement mapping, and transparent AI assessment methodology documentation",
+        "regulatoryRef": "European Digital Credentials for Learning (Europass)",
         "remediation": "Issue each AI-assessed competency as a signed Europass digital credential that links to its assessment evidence and states the AI's role in the assessment.",
-        "text": "Does the agent provide credential transparency per Europass Digital Credentials Infrastructure and support employer verification of AI-assessed competencies?",
+        "text": "Does the agent provide credential transparency through European Digital Credentials for Learning (the Europass digital credential format) and support employer verification of AI-assessed competencies?",
         "weight": 12
       },
       {
@@ -15575,14 +15575,14 @@
         "failureMode": "The agent marks PPE training complete when a worker clicks through the slides and states a respirator rule that is not in the employer's hazard assessment.",
         "id": "EDU-ST-6",
         "keyRisk": 1,
-        "l1": "No safety training compliance; AI-delivered occupational safety training is not validated against regulatory requirements",
+        "l1": "AI-delivered PPE training is not checked against the §1910.132(f) training content",
         "l2": "PPE training content is delivered, but no one checks it against current requirements",
-        "l3": "Agent delivers safety training content aligned with OSHA requirements, but does not verify comprehension or track certification currency",
+        "l3": "Agent delivers safety training content aligned with OSHA requirements, but does not record that each worker has shown understanding before PPE work or track retraining",
         "l4": "Comprehension is verified and training currency is tracked, but incidents do not trigger retraining",
-        "l5": "Safety training controls in place, with regulatory content validation, comprehension verification, certification tracking, refresher scheduling, incident-triggered retraining, and competency evidence documentation per OSHA requirements",
-        "regulatoryRef": "OSHA 29 CFR §1910.132",
+        "l5": "PPE training covers every §1910.132(f)(1) topic; each worker's demonstrated understanding and ability is recorded before PPE work; retraining is triggered by workplace or PPE changes and by observed gaps, with evidence kept",
+        "regulatoryRef": "OSHA 29 CFR §1910.132(f)",
         "remediation": "Gate completion of PPE training on a comprehension check the learner passes, check content against the employer's hazard assessment, and schedule refreshers from a currency tracker.",
-        "text": "Does the agent implement workplace safety training compliance per OSHA 29 CFR §1910.132?",
+        "text": "Where the agent delivers personal protective equipment (PPE) training for a US employer, does it cover what OSHA 29 CFR §1910.132(f) requires — when and what PPE is necessary, how to put it on, take it off, adjust and wear it, its limits, and its care, maintenance, useful life and disposal — record that each worker has shown understanding and the ability to use PPE before PPE work, and retrain when the workplace or the PPE changes or understanding is lacking?",
         "weight": 12
       },
       {
@@ -15720,9 +15720,9 @@
         "l3": "Provides basic explanations and a manual appeal email address, but evidence review and human reconsideration SLAs are undefined",
         "l4": "Reason codes, evidence bundles and an appeal workflow with SLAs exist, but reconsideration outcomes are not audited",
         "l5": "Full oversight and contestability with reason codes, evidence bundles, defined appeal workflow and SLAs, and auditable human reconsideration outcomes",
-        "regulatoryRef": "EU AI Act Art. 14; EU AI Act Annex III §3(a)",
+        "regulatoryRef": "EU AI Act Art. 14; EU AI Act Annex III §3(a), (b)",
         "remediation": "Attach reason codes and the evidence used to every AI placement or assessment outcome, and route appeals to a named reviewer with a tracked deadline.",
-        "text": "For AI influenced vocational training access, placement, or competency assessment decisions, does the agent provide meaningful human oversight and a learner contestation and appeal pathway (clear reasons, evidence review, and timely human reconsideration), consistent with high risk controls expected for Annex III §3(a) systems?",
+        "text": "For AI influenced vocational training access, placement, or competency assessment decisions, does the agent provide meaningful human oversight and a learner contestation and appeal pathway (clear reasons, evidence review, and timely human reconsideration), consistent with the human oversight the EU AI Act expects for high-risk systems under Annex III §3(a) (access and assignment) and §3(b) (evaluating learning outcomes)?",
         "weight": 10
       },
       {
