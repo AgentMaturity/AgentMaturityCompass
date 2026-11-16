@@ -194,3 +194,19 @@ describe("station cards on the home and compliance pages", () => {
     expect(readFileSync(join(fixture, "website/docs/compliance.html"), "utf8")).toBe(compliance);
   });
 });
+
+describe("the count line on a station page", () => {
+  test("refreshes the pack-count line from its own station in the built registry", () => {
+    write("dist/package.json", '{"type":"module"}');
+    write("dist/domains/industryPacks.js",
+      'export function listIndustryPacks() { return [{ stationId: "health", questions: [1, 2, 3] }, { stationId: "wealth", questions: [4] }]; }\n');
+    write("dist/diagnostic/questionBank.js", `export const questionBank = Array.from({ length: 101 }, (_, i) => i);\n`);
+    const page = '<dd class="pack-count">9 packs · 161 experimental, self-reported questions</dd>';
+    write("website/station-health.html", page);
+
+    expect(run("--check").status).toBe(1);
+    const result = run("--write");
+    expect(result.status, result.stderr).toBe(0);
+    expect(readFileSync(join(fixture, "website/station-health.html"), "utf8")).toBe(page.replace("9 packs · 161", "1 packs · 3"));
+  });
+});

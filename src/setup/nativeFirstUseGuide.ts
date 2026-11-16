@@ -196,7 +196,13 @@ export async function inspectNativeFirstUse(options: NativeFirstUseOptions): Pro
       ...(options.userEnvPath === undefined ? {} : { userEnvPath: options.userEnvPath })
     });
     if (ref !== null) result = { ...result, credential: { ref, ...store.describe(ref) } };
-    if (model === null) return finish("needs-model", "MODEL_REQUIRED", "Choose a model ID you can access and rerun the guide with --model. No model default or remote access check is implied.");
+    if (model === null) {
+      // The rerun line carries --model, with MODEL standing for the name the person picks (QA M-08).
+      result = { ...result, recheck: result.recheck === null ? null : { ...result.recheck, argv: [...result.recheck.argv, "--model", "MODEL"] } };
+      return finish("needs-model", "MODEL_REQUIRED", provider === "ollama"
+        ? "Choose a model: ollama list shows the ones on this machine (ollama pull <name> adds one). Rerun the guide with MODEL replaced by that name. No model default is implied."
+        : "Choose a model ID you can access and rerun the guide with MODEL replaced by it. No model default or remote access check is implied.");
+    }
     // Pin the exact inspected file in both actions. The same project and user
     // .env layers still apply, and environment values still have precedence.
     const file = store.paths.file;

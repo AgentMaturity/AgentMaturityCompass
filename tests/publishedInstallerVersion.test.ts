@@ -49,6 +49,20 @@ describe("published installer selection", () => {
     expect(verifyCandidate(root, "v1.1.1").stderr).toContain("release tag mismatch");
   });
 
+  it("reads GITHUB_REF_NAME as a tag only for a tag ref, so a branch build is not a tag mismatch", () => {
+    const root = fixture();
+    const run = (ref: NodeJS.ProcessEnv) => {
+      const env: NodeJS.ProcessEnv = { ...process.env, ...ref };
+      delete env.AMC_RELEASE_TAG;
+      return spawnSync(process.execPath, [resolve("scripts/verify-release-version.mjs")], { cwd: root, env, encoding: "utf8" });
+    };
+    const branch = run({ GITHUB_REF_NAME: "main", GITHUB_REF_TYPE: "branch" });
+    expect(branch.status, branch.stderr).toBe(0);
+    expect(JSON.parse(branch.stdout)).toMatchObject({ version: "2.0.0", tag: null });
+    expect(run({ GITHUB_REF_NAME: "v1.1.1", GITHUB_REF_TYPE: "tag" }).stderr).toContain("release tag mismatch");
+    expect(run({ GITHUB_REF_NAME: "v2.0.0", GITHUB_REF_TYPE: "tag" }).status).toBe(0);
+  });
+
   it.each(["website/install.sh", "website/install.ps1"])("rejects a source-version pin in %s before building Pages", (path) => {
     const root = fixture();
     writeFileSync(join(root, path), readFileSync(join(root, path), "utf8").replace("1.1.1", "2.0.0"));

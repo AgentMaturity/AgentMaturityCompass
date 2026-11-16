@@ -1,3 +1,5 @@
+import { recordRows } from "../pageKit.js";
+
 function esc(text) {
   return String(text)
     .replaceAll("&", "&amp;")
@@ -15,5 +17,5 @@ export function renderPluginDetail(container, detail) {
     container.innerHTML = "<p class=\"muted\">Select a plugin action to view details.</p>";
     return;
   }
-  container.innerHTML = `<pre class="scroll">${esc(JSON.stringify(detail, null, 2))}</pre>`;
+  container.innerHTML = recordRows(detail);
 }

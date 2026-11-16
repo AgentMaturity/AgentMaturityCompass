@@ -90,6 +90,12 @@ function hasAgentFolder(workspace: string, agentId: string): boolean {
   return pathExists(agentRoot(workspace, agentId));
 }
 
+/** True for "default" (this folder's own agent) and for an agent that has a folder under .amc/agents. */
+export function agentExists(workspace: string, agentId: string): boolean {
+  const id = normalizeAgentId(agentId);
+  return id === "default" || hasAgentFolder(workspace, id);
+}
+
 function rootAgentPaths(workspace: string): AgentPaths {
   const amcRoot = fleetRoot(workspace);
   return {

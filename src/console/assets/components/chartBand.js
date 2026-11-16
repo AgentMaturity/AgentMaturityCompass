@@ -23,8 +23,11 @@ export function renderChartBand(canvas, points, forecast, color = "#4AEF79") {
         .filter((p) => Number.isFinite(p.x) && Number.isFinite(p.y))
     : [];
   if (series.length === 0) {
-    ctx.fillStyle = "#64748b";
-    ctx.fillText("No data", 8, 18);
+    ctx.fillStyle = "#9ca3af";
+    ctx.font = "14px system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("No data yet", width / 2, height / 2);
+    ctx.textAlign = "start";
     return;
   }
   const extras = [];

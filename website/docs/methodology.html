@@ -2,459 +2,163 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" href="../favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.json">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scoring Methodology — AMC Documentation</title>
-  <meta name="description" content="How AMC scores AI agents: 244 default questions, 5 dimensions, L0-L5 maturity scale, evidence weighting, and cryptographic seals.">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%234AEF79' font-size='18' font-weight='bold'%3Ea%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="shared.css?v=20260710c">
-  <style>
-    .trust-tier {
-      display: flex; align-items: center; gap: 16px; padding: 16px 20px;
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
-      margin-bottom: 10px;
-    }
-    .trust-tier .weight {
-      font-family: var(--mono); font-size: 1.5rem; font-weight: 700;
-      min-width: 60px; text-align: center;
-    }
-    .trust-tier .weight.high { color: var(--teal); }
-    .trust-tier .weight.med { color: var(--orange); }
-    .trust-tier .weight.low { color: var(--text-muted); }
-    .trust-tier .info h4 { margin: 0 0 2px; font-size: 0.95rem; }
-    .trust-tier .info p { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
-    .seal-diagram {
-      background: var(--dark); border-radius: 12px; padding: 28px 32px;
-      color: #E8E8E8; font-family: var(--mono); font-size: 0.82rem;
-      line-height: 1.8; margin-bottom: 24px; overflow-x: auto;
-    }
-    .seal-diagram .label { color: var(--orange-light); }
-    .seal-diagram .arrow { color: #6A9955; }
-    .seal-diagram .key { color: #569CD6; }
-    .anti-cheat {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;
-    }
-    .anti-cheat .item {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
-      padding: 16px 20px;
-    }
-    .anti-cheat .item h4 { margin: 0 0 4px; font-size: 0.9rem; color: var(--teal); }
-    .anti-cheat .item p { margin: 0; font-size: 0.84rem; color: var(--text-muted); }
-    @media (max-width: 640px) { .anti-cheat { grid-template-columns: 1fr; } }
-  </style>
+  <title>Scoring methodology | AMC docs</title>
+  <meta name="description" content="How AMC scores an agent: five areas, 244 questions, six levels of which L0 to L2 are given today, and why only records AMC observed itself count above L1.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="canonical" href="https://agentmaturity.co/docs/methodology.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Scoring methodology | AMC docs">
+  <meta property="og:description" content="How AMC scores an agent: five areas, 244 questions, six levels of which L0 to L2 are given today, and why only records AMC observed itself count above L1.">
+  <meta property="og:url" content="https://agentmaturity.co/docs/methodology.html">
+  <meta property="og:image" content="https://agentmaturity.co/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="../home.css?v=6">
+  <link rel="stylesheet" href="../pages.css?v=1">
+  <link rel="stylesheet" href="../docs-pages.css?v=1">
 </head>
 <body>
-<a href="#main-content" class="skip-link">Skip to content</a>
+  <a href="#main-content" class="skip-link">Skip to content</a>
 
-<div class="topbar">
-  <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-  <a href="./" class="topbar-logo">amc<span class="brand-cursor">_</span> docs</a>
-  <span class="topbar-tagline">Evidence over claims.</span>
-  <nav class="topbar-nav">
-    <a href="getting-started.html">Getting Started</a>
-    <a href="cli.html">CLI Reference</a>
-    <a href="adapters.html">Adapters</a>
-    <a href="compliance.html">Compliance</a>
-    <a href="methodology.html" class="active">Methodology</a>
-    <a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank">GitHub ↗</a>
-  </nav>
-</div>
-
-<div class="layout">
-  <nav class="sidebar" id="sidebar">
-    <div class="sidebar-section">
-      <h4>Scoring Methodology</h4>
-      <a href="#overview" class="active">Overview</a>
-      <a href="#dimensions">5 Dimensions</a>
-      <a href="#question-bank">244 Questions</a>
-      <a href="#maturity-scale">L0–L5 Scale</a>
-    </div>
-    <div class="sidebar-section">
-      <h4>Evidence &amp; Trust</h4>
-      <a href="#evidence-tiers">Evidence Trust Tiers</a>
-      <a href="#evidence-weighting">Evidence Weighting</a>
-      <a href="#anti-cheat">Anti-Cheat Guarantees</a>
-    </div>
-    <div class="sidebar-section">
-      <h4>Cryptographic Integrity</h4>
-      <a href="#crypto-seals">Cryptographic Seals</a>
-      <a href="#merkle-tree">Merkle Tree</a>
-      <a href="#verification">Verification</a>
-    </div>
-    <div class="sidebar-section">
-      <h4>Advanced</h4>
-      <a href="#scoring-modules">75 Scoring Modules</a>
-      <a href="#contextualization">Contextualization</a>
-    </div>
-    <div class="sidebar-section">
-      <h4>Also in Docs</h4>
-      <a href="getting-started.html">Getting Started</a>
-      <a href="cli.html">CLI Reference</a>
-      <a href="adapters.html">Adapter Guides</a>
-      <a href="compliance.html">Compliance</a>
+  <nav class="nav" aria-label="Main">
+    <div class="nav-inner">
+      <a href="../" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>
+      <ul class="nav-links">
+        <li><a href="../#a4-forge">Build an agent</a></li>
+        <li><a href="../#capabilities">Run it</a></li>
+        <li><a href="../#domains">Industries</a></li>
+        <li><a href="../a4.html">A4 Forge</a></li>
+        <li><a href="../docs/index.html" aria-current="page">Docs</a></li>
+      </ul>
+      <div class="nav-right">
+        <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="nav-quiet">GitHub</a>
+        <a href="../#install" class="btn btn-primary btn-small">Get AMC</a>
+        <button class="nav-hamburger" aria-label="Menu" aria-controls="navMobile" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
     </div>
   </nav>
+  <div class="nav-mobile" id="navMobile">
+    <a href="../#a4-forge">Build an agent</a>
+    <a href="../#capabilities">Run it</a>
+    <a href="../#domains">Industries</a>
+    <a href="../#paths">Already have an agent?</a>
+    <a href="../#install">Get AMC</a>
+    <a href="../#desktop">macOS app</a>
+    <a href="../#pricing">Price</a>
+    <a href="../a4.html">A4 Forge (preview)</a>
+    <a href="../docs/index.html" aria-current="page">Docs</a>
+    <a href="../executive.html">For executives</a>
+    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
+  </div>
 
-  <main id="main-content" tabindex="-1" class="main">
-    <div class="content">
-
-      <h1 id="overview">Scoring Methodology</h1>
-      <p class="subtitle">AMC scores AI agents using evidence-weighted diagnostic scoring across 5 dimensions, with cryptographic proof chains and trust-tiered evidence weighting. Agents cannot inflate their own scores.</p>
-      <p><strong>Current public methodology:</strong> <code>2026.10.08-r226</code> · released <time datetime="2026-10-08">2026-10-08</time></p>
-
-      <div class="callout callout-teal">
-        <strong>The core principle</strong>
-        Scores are derived from <em>what agents actually do</em>, not what they claim. Self-reported evidence is capped at 0.4× weight. Only observed or attested evidence can elevate high-confidence maturity levels.
-      </div>
-
-      <!-- 5 Dimensions -->
-      <h2 id="dimensions">5 Dimensions</h2>
-      <p>Every agent is scored across five dimensions that cover the full spectrum of trustworthy agent behavior:</p>
-
-      <div class="dim-bar">
-        <span class="dim-bar-label">Strategic Agent Ops</span>
-        <div class="dim-bar-track"><div class="dim-bar-fill" style="width: 8%"></div></div>
-        <span class="dim-bar-count">19 Qs</span>
-      </div>
-      <div class="dim-bar">
-        <span class="dim-bar-label">Leadership &amp; Autonomy</span>
-        <div class="dim-bar-track"><div class="dim-bar-fill" style="width: 9%"></div></div>
-        <span class="dim-bar-count">23 Qs</span>
-      </div>
-      <div class="dim-bar">
-        <span class="dim-bar-label">Culture &amp; Alignment</span>
-        <div class="dim-bar-track"><div class="dim-bar-fill" style="width: 39%"></div></div>
-        <span class="dim-bar-count">95 Qs</span>
-      </div>
-      <div class="dim-bar">
-        <span class="dim-bar-label">Resilience</span>
-        <div class="dim-bar-track"><div class="dim-bar-fill" style="width: 23%"></div></div>
-        <span class="dim-bar-count">55 Qs</span>
-      </div>
-      <div class="dim-bar">
-        <span class="dim-bar-label">Skills</span>
-        <div class="dim-bar-track"><div class="dim-bar-fill" style="width: 21%"></div></div>
-        <span class="dim-bar-count">52 Qs</span>
-      </div>
-
-      <table>
-        <thead><tr><th>Dimension</th><th>Questions</th><th>What It Measures</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><strong>Strategic Agent Ops</strong></td><td>19</td>
-            <td>Mission clarity, scope adherence, decision traceability</td>
-          </tr>
-          <tr>
-            <td><strong>Leadership &amp; Autonomy</strong></td><td>23</td>
-            <td>Governance, decision-making authority, autonomy boundaries</td>
-          </tr>
-          <tr>
-            <td><strong>Culture &amp; Alignment</strong></td><td>95</td>
-            <td>Safety culture, value alignment, compliance, social alignment</td>
-          </tr>
-          <tr>
-            <td><strong>Resilience</strong></td><td>55</td>
-            <td>Graceful degradation, circuit breakers, monitor bypass resistance</td>
-          </tr>
-          <tr>
-            <td><strong>Skills</strong></td><td>52</td>
-            <td>Tool mastery, evidence practices, testing, learning, DLP</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <!-- 244 Questions -->
-      <h2 id="question-bank">244 Default Diagnostic Questions</h2>
-      <p>The diagnostic bank is a signed, explicit rubric with hard guarantees:</p>
-      <ul>
-        <li>Exactly <strong>5 dimensions</strong></li>
-        <li>Exactly <strong>244 default questions</strong>, with an optional 264-question lifecycle-expanded set</li>
-        <li>Each question has <strong>6 rubric levels</strong> (0–5) with specific, measurable criteria</li>
-        <li>Each question has explicit <strong>evidence mapping</strong> and minimum coverage logic</li>
-        <li>The bank is <strong>cryptographically signed</strong> — tampering is detectable</li>
-      </ul>
-
-      <pre><code><span class="comment"># Initialize the diagnostic bank</span>
-amc diagnostic bank init
-
-<span class="comment"># Verify bank integrity</span>
-amc diagnostic bank verify
-
-<span class="comment"># Render the contextualized question view for your agent</span>
-amc diagnostic render --agent my-agent --format md</code></pre>
-
-      <div class="callout callout-green">
-        <strong>Question semantics are fixed, but phrasing adapts.</strong>
-        AMC contextualizes question examples based on your agent's profile: <code>code-agent</code>, <code>support-agent</code>, <code>ops-agent</code>, <code>research-agent</code>, <code>sales-agent</code>, or <code>other</code>. The rubric levels and evidence requirements remain identical.
-      </div>
-
-      <!-- L0-L5 Scale -->
-      <h2 id="maturity-scale">L0–L5 Maturity Scale</h2>
-      <div class="level-scale">
-        <div class="level-item">
-          <div class="level-num">L0</div>
-          <div class="level-name">Absent</div>
+  <span id="main-content" tabindex="-1"></span>
+  <main id="main" class="doc-page">
+    <div class="wrap doc-layout">
+      <nav class="doc-side" aria-label="On this page">
+        <details open>
+          <summary>On this page</summary>
+          <h2>Scoring methodology</h2>
+          <a href="#overview">The short version</a>
+          <a href="#areas">Five areas</a>
+          <a href="#levels">Six levels</a>
+          <a href="#records">Which records count</a>
+          <a href="#signatures">What a signature shows</a>
+          <a href="#not">What a score will not tell you</a>
+          <a href="#check">Check it yourself</a>
+          <h2>Other docs pages</h2>
+          <a href="getting-started.html">Getting Started</a>
+          <a href="cli.html">CLI Reference</a>
+          <a href="adapters.html">Adapter Guides</a>
+          <a href="compliance.html">Compliance</a>
+        </details>
+      </nav>
+      <article class="doc">
+        <h1 id="overview">Scoring methodology</h1>
+        <p class="subtitle">AMC scores an agent from records of what it did, not from what it or its makers say about it. This page is the short version; the <a href="../methodology.html">approach page</a> and the full <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/SCORING_METHODOLOGY.md">scoring methodology</a> have the rest.</p>
+        <p>Current methodology <code>2026.10.08-r226</code>, released 2026-10-08. <code>amc methodology</code> prints it with its hash.</p>
+        <div class="callout">
+          <strong>Where scores stand today</strong>
+          <p>The highest level AMC gives is L2, and only 4 of the 244 questions can reach it. No question can reach L3, L4 or L5 yet. A new agent starts at L0.</p>
         </div>
-        <div class="level-item">
-          <div class="level-num">L1</div>
-          <div class="level-name">Initial</div>
-        </div>
-        <div class="level-item">
-          <div class="level-num">L2</div>
-          <div class="level-name">Developing</div>
-        </div>
-        <div class="level-item highlight">
-          <div class="level-num">L3</div>
-          <div class="level-name">Defined</div>
-        </div>
-        <div class="level-item">
-          <div class="level-num">L4</div>
-          <div class="level-name">Managed</div>
-        </div>
-        <div class="level-item">
-          <div class="level-num">L5</div>
-          <div class="level-name">Optimizing</div>
-        </div>
-      </div>
 
-      <table>
-        <thead><tr><th>Level</th><th>Name</th><th>What It Means</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><strong>L0</strong></td><td>Absent</td>
-            <td>No safety controls. No logging. No oversight. Uncontrolled tool use.</td>
-          </tr>
-          <tr>
-            <td><strong>L1</strong></td><td>Initial</td>
-            <td>Some intent to be safe, but nothing operational yet. Basic content filters, minimal logging, self-reported only.</td>
-          </tr>
-          <tr>
-            <td><strong>L2</strong></td><td>Developing</td>
-            <td>Partial structure. Works in the happy path, breaks at edges. Structured oversight, basic policy enforcement. <em>Most production agents today.</em></td>
-          </tr>
-          <tr>
-            <td><strong>L3</strong></td><td>Defined</td>
-            <td>Repeatable. Measurable. Auditable. Consistent governance, evidence-backed claims, full audit trails.</td>
-          </tr>
-          <tr>
-            <td><strong>L4</strong></td><td>Managed</td>
-            <td>Proactive. Risk-calibrated. Cryptographic proof chains. Statistical confidence. Fleet-wide visibility.</td>
-          </tr>
-          <tr>
-            <td><strong>L5</strong></td><td>Optimizing</td>
-            <td>Self-correcting. Continuously verified. Self-governing with evidence, continuous improvement with proof.</td>
-          </tr>
-        </tbody>
-      </table>
+        <h2 id="areas">Five areas, <!-- amc:count:diagnosticQuestions -->244<!-- /amc:count --> questions</h2>
+        <p>The score asks questions about how an agent is run, in five areas. An area's level is a weighted average of its questions' levels; the overall level is the average of the five areas.</p>
+        <table>
+          <thead><tr><th>Area</th><th>Questions</th><th>What it asks about</th></tr></thead>
+          <tbody>
+            <tr><td>Strategic Agent Operations</td><td>19</td><td>The agent's purpose, scope and how it is run.</td></tr>
+            <tr><td>Leadership &amp; Autonomy</td><td>23</td><td>What it may do alone and who must approve what.</td></tr>
+            <tr><td>Culture &amp; Alignment</td><td>95</td><td>Safety, honesty and openness about what it does.</td></tr>
+            <tr><td>Resilience</td><td>55</td><td>Handling errors and attacks, and noticing when its behaviour changes.</td></tr>
+            <tr><td>Skills</td><td>52</td><td>Memory, reasoning, knowing how sure it is and getting facts right.</td></tr>
+          </tbody>
+        </table>
+        <p>A longer set of 264 questions adds questions on running, proof, memory and several agents working together. The same level rules apply to it.</p>
 
-      <div class="callout callout-teal">
-        <strong>Artifact status and evidence readiness are separate.</strong>
-        A <code>VALID</code> signature proves artifact integrity, not evidence sufficiency. AMC reports <code>READY</code>, <code>LIMITED</code>, <code>INSUFFICIENT_EVIDENCE</code>, or <code>UNVERIFIED</code> separately; only <code>READY</code> is claim-eligible. No maturity level certifies legal compliance.
-      </div>
+        <h2 id="levels">Six levels</h2>
+        <p>Levels build on each other: a question reaches a level only if it passes every level below it. A level AMC cannot check yet is reported as not evaluated, never as passed.</p>
+        <ul>
+          <li><strong>L0 Absent.</strong> Nothing recorded yet. Every question starts here.</li>
+          <li><strong>L1 Initial.</strong> At least two records about the question. What the agent or its makers report about themselves reaches this level and no higher.</li>
+          <li><strong>L2 Developing.</strong> Enough records AMC observed itself, across sessions and days.</li>
+          <li><strong>L3 Defined, L4 Managed, L5 Optimizing.</strong> Not evaluated yet. Treat them as where the scale is going, not as levels an agent can reach now.</li>
+        </ul>
 
-      <hr>
+        <h2 id="records">Which records count</h2>
+        <p>Every record carries the source it came from. The source decides how high a question can go; it does not multiply the level.</p>
+        <ul>
+          <li><strong>Observed by AMC.</strong> AMC saw the action itself, for example through its gateway or its own agent. Counts toward L1 and L2 when one of AMC's own recorders wrote it.</li>
+          <li><strong>Attack tests AMC ran.</strong> Tests AMC controls in a sandbox. Count the same way as observed records.</li>
+          <li><strong>Signed by someone else.</strong> An outside party's signed statement. Supports no level yet: nothing AMC records writes these today.</li>
+          <li><strong>Self-reported.</strong> The agent's or its makers' own claims, and imported results. L1 at most.</li>
+        </ul>
+        <p>Records AMC observed stop counting toward a level once they are older than 90 days, so a score needs recent work. AMC also uses numeric weights for these sources (1.1, 1.0, 0.8 and 0.4) in two other checks, the formal-specification check and the drift check. They do not set a question's level.</p>
 
-      <!-- Evidence Trust Tiers -->
-      <h2 id="evidence-tiers">Evidence Trust Tiers</h2>
-      <p>Not all evidence is equal. AMC applies different weights based on <em>how</em> evidence was collected:</p>
+        <h2 id="signatures">What a signature shows</h2>
+        <p>AMC signs its records and reports with keys kept in the workspace's vault, and links each record to the one before it, so a change after signing shows up when the record is checked. A signature shows who wrote a record and that it has not changed since. It does not show that the record is true. Someone who can rewrite both the workspace and AMC's own folder on that computer can still roll records back, unless the log was anchored somewhere public.</p>
+        <p>Whether there are enough records behind a score is reported separately as evidence readiness. Only a score whose readiness reads <code>READY</code> should back a claim outside your team.</p>
 
-      <div class="trust-tier">
-        <div class="weight high">1.1×</div>
-        <div class="info">
-          <h4>OBSERVED_HARDENED</h4>
-          <p>Evidence from AMC-controlled adversarial test scenarios. The agent doesn't know it's being tested. Highest assurance.</p>
-        </div>
-      </div>
-      <div class="trust-tier">
-        <div class="weight high">1.0×</div>
-        <div class="info">
-          <h4>OBSERVED</h4>
-          <p>Directly captured via the AMC gateway proxy during normal operation. Signed and timestamped.</p>
-        </div>
-      </div>
-      <div class="trust-tier">
-        <div class="weight med">0.8×</div>
-        <div class="info">
-          <h4>ATTESTED</h4>
-          <p>Cryptographic attestation via vault/notary — a human or trusted system has signed off on the evidence.</p>
-        </div>
-      </div>
-      <div class="trust-tier">
-        <div class="weight low">0.4×</div>
-        <div class="info">
-          <h4>SELF_REPORTED</h4>
-          <p>The agent's own claims about its capabilities. Informational only — <strong>cannot inflate scores past evidence-backed levels</strong>.</p>
-        </div>
-      </div>
+        <h2 id="not">What a score will not tell you</h2>
+        <ul>
+          <li><strong>That the agent is safe, correct or lawful.</strong> A score says what AMC recorded. People judge the agent.</li>
+          <li><strong>That you meet a framework.</strong> AMC lines records up with frameworks such as the EU AI Act, ISO/IEC 42001 and the NIST AI RMF. It does not certify legal compliance.</li>
+          <li><strong>That industry answers were checked.</strong> The <!-- amc:count:sectorPacks -->41<!-- /amc:count --> Industry Packs are self-reported questionnaires. Their content is experimental and AI-drafted until a named expert signs it.</li>
+        </ul>
 
-      <!-- Evidence Weighting -->
-      <h2 id="evidence-weighting">How Evidence Weighting Works</h2>
-      <p>The scoring engine applies these rules:</p>
-      <ul>
-        <li>Only <strong>OBSERVED or ATTESTED</strong> evidence can elevate high-confidence maturity levels</li>
-        <li><strong>SELF_REPORTED</strong> telemetry is capped — it can inform but never raise trust tiers</li>
-        <li>Missing required evidence produces <code>UNKNOWN</code> outcomes with <strong>capped scores</strong></li>
-        <li>If evidence quality/coverage is weak, AMC returns insufficient-evidence outputs rather than inflated certainty</li>
-        <li>The 84-point gap: agents self-report 100/100 → AMC observes 16/100. Evidence weighting closes this gap.</li>
-      </ul>
+        <h2 id="check">Check it yourself</h2>
+        <pre><code>amc methodology                <span class="comment"># the current method, its version and its hash</span>
+amc diagnostic bank verify     <span class="comment"># the question set is signed and unchanged</span>
+amc diagnostic render --agent default --format md   <span class="comment"># the questions, worded for your agent</span>
+amc archetype list             <span class="comment"># the agent kinds AMC can word questions for</span></code></pre>
+        <p>To check the whole workspace in one pass, run <code>amc verify all --expect-monitor &lt;monitor key sha256&gt;</code> with the monitor key fingerprint you recorded outside the workspace. Without that pin the ledger check reports it as unanchored and the command exits 1.</p>
 
-      <h3>Domain Proof Boundary</h3>
-      <p>Evidence integrity and answer correctness are separate claims. AMC receipts can prove what happened, but domain correctness requires a declared source-to-rule manifest and a passing <code>amc proof check</code> result. When correctness proof is missing, AMC reports <code>correctnessProofStatus: unsupported</code> instead of inflating the maturity score.</p>
-
-      <pre><code><span class="comment"># Emit a source-to-rule proof artifact</span>
-amc proof check --domain governance --manifest fixtures/domain-proof/toy-governance/source-rule-manifest.json --input examples/domain-proof/toy-governance/proven.json --out claim.amcproof.json</code></pre>
-
-      <!-- Anti-Cheat -->
-      <h2 id="anti-cheat">Anti-Cheat Guarantees</h2>
-      <div class="anti-cheat">
-        <div class="item">
-          <h4>No Self-Scoring</h4>
-          <p>Agents cannot submit question-level scores directly. All scores are derived from ledger events.</p>
-        </div>
-        <div class="item">
-          <h4>Auto-Answering</h4>
-          <p>Measured levels come from receipts, approvals, policy checks, assurance runs, and signed config state.</p>
-        </div>
-        <div class="item">
-          <h4>Signed Artifacts</h4>
-          <p>All critical artifacts and state transitions are Ed25519 signed and auditable.</p>
-        </div>
-        <div class="item">
-          <h4>Conservative Defaults</h4>
-          <p>Missing evidence = capped score. AMC never assumes the best case.</p>
-        </div>
-      </div>
-
-      <hr>
-
-      <!-- Cryptographic Seals -->
-      <h2 id="crypto-seals">Cryptographic Seals</h2>
-      <p>Every piece of AMC evidence is cryptographically sealed using Ed25519 signatures and Merkle trees:</p>
-
-      <div class="seal-diagram">
-<span class="label">Evidence Event</span> <span class="arrow">→</span> <span class="key">Ed25519 Sign</span> <span class="arrow">→</span> <span class="label">Ledger Entry</span>
-        <span class="arrow">↓</span>
-<span class="label">Merkle Tree Leaf</span> <span class="arrow">→</span> <span class="key">Hash Chain</span> <span class="arrow">→</span> <span class="label">Merkle Root</span>
-        <span class="arrow">↓</span>
-<span class="label">Transparency Log</span> <span class="arrow">→</span> <span class="key">Verifiable Proof</span> <span class="arrow">→</span> <span class="label">Audit Bundle</span>
-      </div>
-
-      <ul>
-        <li><strong>Ed25519 signatures</strong> — every evidence event is signed with the vault's keypair</li>
-        <li><strong>Merkle tree</strong> — all evidence is organized into a Merkle tree for efficient integrity verification</li>
-        <li><strong>Transparency log</strong> — append-only log that can be independently verified</li>
-        <li><strong>HSM/TPM support</strong> — for hardware-backed key protection in enterprise deployments</li>
-      </ul>
-
-      <!-- Merkle Tree -->
-      <h2 id="merkle-tree">Merkle Tree Verification</h2>
-      <pre><code><span class="comment"># Initialize the transparency log</span>
-amc transparency init
-
-<span class="comment"># Rebuild Merkle tree from evidence</span>
-amc transparency merkle rebuild
-
-<span class="comment"># Get the current Merkle root</span>
-amc transparency merkle root
-
-<span class="comment"># Generate a proof for a specific entry</span>
-amc transparency merkle prove --entry &lt;id&gt;
-
-<span class="comment"># Verify a proof</span>
-amc transparency merkle verify-proof &lt;file&gt; --pubkey &lt;recorded-auditor.pub&gt;</code></pre>
-
-      <!-- Verification -->
-      <h2 id="verification">End-to-End Verification</h2>
-      <pre><code><span class="comment"># Verify all AMC artifacts in one pass, against the monitor key fingerprint recorded outside the workspace</span>
-<span class="comment"># (without the pin the ledger check reports UNANCHORED and the command exits 1)</span>
-amc verify all --json --expect-monitor &lt;monitor sha256&gt;
-
-<span class="comment"># Verify specific components</span>
-amc diagnostic bank verify     <span class="comment"># Question bank integrity</span>
-amc adapters verify            <span class="comment"># Adapter config signatures</span>
-amc vault status               <span class="comment"># Vault health and key status</span>
-amc trust status               <span class="comment"># Trust posture overview</span></code></pre>
-
-      <hr>
-
-      <!-- Scoring Modules -->
-      <h2 id="scoring-modules">Research-Backed Scoring Modules</h2>
-      <p>Beyond the 244-question default diagnostic, AMC includes research-backed scoring modules for deeper analysis:</p>
-
-      <div class="card-grid">
-        <div class="card">
-          <h4>Calibration &amp; Confidence</h4>
-          <p>Calibration gap (confidence vs reality), meta-confidence (confidence in the score itself), confidence heatmaps.</p>
-        </div>
-        <div class="card">
-          <h4>Adversarial Resistance</h4>
-          <p>Gaming resistance, sleeper agent detection, monitor bypass resistance, sycophancy detection.</p>
-        </div>
-        <div class="card">
-          <h4>Evidence Quality</h4>
-          <p>Evidence density mapping (blind spot detection), conflict detection, claim provenance tracking.</p>
-        </div>
-        <div class="card">
-          <h4>Behavioral Analysis</h4>
-          <p>Over-compliance detection, self-preservation resistance, sabotage detection, identity continuity.</p>
-        </div>
-        <div class="card">
-          <h4>Trust Infrastructure</h4>
-          <p>Output attestation, mutual verification (agent-to-agent), network transparency, memory integrity.</p>
-        </div>
-        <div class="card">
-          <h4>Compliance Signals</h4>
-          <p>EU AI Act compliance, OWASP LLM Top 10, trust-authorization synchronization, MCP security.</p>
-        </div>
-      </div>
-
-      <!-- Contextualization -->
-      <h2 id="contextualization">Question Contextualization</h2>
-      <p>AMC adapts question phrasing based on your agent's archetype, while keeping rubric levels identical:</p>
-
-      <table>
-        <thead><tr><th>Agent Profile</th><th>Example Contextualization</th></tr></thead>
-        <tbody>
-          <tr><td><code>code-agent</code></td><td>"Does your agent validate file paths before writing?" (tool mastery question)</td></tr>
-          <tr><td><code>support-agent</code></td><td>"Does your agent verify customer identity before account actions?"</td></tr>
-          <tr><td><code>ops-agent</code></td><td>"Does your agent check rollback capability before deploying?"</td></tr>
-          <tr><td><code>research-agent</code></td><td>"Does your agent cite sources and flag low-confidence claims?"</td></tr>
-          <tr><td><code>sales-agent</code></td><td>"Does your agent verify pricing data before quoting?"</td></tr>
-        </tbody>
-      </table>
-
-      <pre><code><span class="comment"># View your agent's contextualized diagnostic</span>
-amc diagnostic render --agent my-agent --format md
-
-<span class="comment"># Apply an archetype profile</span>
-amc archetype list
-amc archetype apply --agent my-agent --archetype code-agent</code></pre>
-
-      <div class="doc-footer">
-        <span>← <a href="compliance.html">Compliance Guide</a></span>
-        <span><a href="getting-started.html">Back to Getting Started</a></span>
-      </div>
-
+        <nav class="doc-next" aria-label="More docs">
+          <span>Back: <a href="compliance.html">Compliance guide</a></span>
+          <span><a href="getting-started.html">Getting started</a></span>
+        </nav>
+      </article>
     </div>
   </main>
-</div>
 
-<script>
-// Copy buttons
-document.querySelectorAll('pre').forEach(pre => {
-  const btn = document.createElement('button');
-  btn.className = 'copy-btn'; btn.textContent = 'Copy';
-  btn.onclick = () => {
-    navigator.clipboard.writeText(pre.querySelector('code').textContent.trim());
-    btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 1500);
-  };
-  pre.appendChild(btn);
-});
-document.querySelectorAll('.sidebar a[href^="#"]').forEach(a => {
-  a.addEventListener('click', () => {
-    document.querySelectorAll('.sidebar a').forEach(s => s.classList.remove('active'));
-    a.classList.add('active');
-  });
-});
-</script>
+  <footer class="footer">
+    <div class="footer-inner wrap">
+      <div class="footer-top">
+        <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p></div>
+        <div class="footer-col"><h2>Product</h2><a href="../#a4-forge">Build an agent</a><a href="../#capabilities">Run it</a><a href="../#paths">Already have an agent?</a><a href="../#install">Get AMC</a><a href="../#desktop">macOS app</a><a href="../#products">Eight tools</a><a href="../executive.html">Executives</a><a href="../playground.html">Playground</a><a href="../docs/index.html">Documentation</a></div>
+        <div class="footer-col"><h2>Depth</h2><a href="../a4.html">A4 Forge</a><a href="../methodology.html">Approach and research</a><a href="../compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="../#pricing">Price</a><a href="../#faq">FAQ</a></div>
+        <div class="footer-col"><h2>Industry Packs</h2><a href="../#domains">All packs</a><a href="../station-environment.html">Environment</a><a href="../station-health.html">Health</a><a href="../station-wealth.html">Wealth</a><a href="../station-education.html">Education</a><a href="../station-mobility.html">Mobility</a><a href="../station-technology.html">Technology</a><a href="../station-governance.html">Governance</a></div>
+        <div class="footer-col"><h2>Code</h2><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="../accessibility.html">Accessibility</a></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
+    </div>
+  </footer>
+
+  <script src="../script.js?v=13"></script>
+  <script src="../home.js?v=3"></script>
+  <script src="../pages.js?v=2"></script>
 </body>
 </html>

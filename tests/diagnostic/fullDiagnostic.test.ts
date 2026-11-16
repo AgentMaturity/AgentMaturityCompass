@@ -111,10 +111,17 @@ describe("fullDiagnostic", () => {
     expect(q1.level).toBe(0);
   });
 
-  test("percentage thresholds map to correct levels", () => {
+  // CLI-08: the overall level was a percentage band (2% read L1 while every layer was L0). It is now the level the
+  // average answer reached, on the layers' L0-L5 scale; half the questions at 5 and half at 0 average 2.5, which is L2.
+  test("overall level is the level the average answer reached", () => {
     const questions = getAllQuestions();
+    const sample: Record<string, number> = {};
+    for (const q of questions.slice(0, 10)) sample[q.id] = 2;
+    const sparse = scoreFullDiagnostic(sample, 100);
+    expect(sparse.overallLevel).toBe("L0");
+    expect(sparse.percentage).toBeGreaterThan(0); // the percentage band read this as L1
 
-    // ~50% -> L3
+    // ~50% -> L2
     const halfAnswers: Record<string, number> = {};
     let count = 0;
     const halfQuestionCount = Math.ceil(questions.length / 2);
@@ -123,7 +130,7 @@ describe("fullDiagnostic", () => {
       count++;
     }
     const halfResult = scoreFullDiagnostic(halfAnswers, 100);
-    expect(halfResult.overallLevel).toBe("L3");
+    expect(halfResult.overallLevel).toBe("L2");
 
     // ~80% -> L4
     const highAnswers: Record<string, number> = {};

@@ -1,0 +1,112 @@
+/* Reading pages on the home design system: the docs pages, the blog, the changelog, the comparisons, the API page.
+   Link home.css, then pages.css, then this file. home.css resets lists, tables and code for the home page; this
+   file gives long text back its lists, tables and code blocks inside `.doc`, and lays out a page with a side menu. */
+
+/* Older page styles name these colours; they map to the home tokens. */
+:root {
+  --green: var(--accent);
+  --teal: var(--accent);
+  --orange: var(--wait);
+  --orange-pale: rgba(245, 158, 11, 0.1);
+  --text-muted: var(--body);
+  --text-light: var(--muted);
+  --border: var(--line);
+  --border-green: rgba(74, 239, 121, 0.35);
+  --bg-alt: var(--panel);
+  --bg-card: var(--card);
+  --dark: var(--panel);
+  --code-bg: rgba(255, 255, 255, 0.07);
+}
+
+/* ── Layout: a side menu beside the text ─────────────────────────────── */
+.doc-page { padding: calc(var(--nav-h) + clamp(32px, 5vw, 64px)) 0 var(--band); }
+.doc-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: clamp(32px, 5vw, 72px); align-items: start; }
+.doc-side { position: sticky; top: calc(var(--nav-h) + 24px); max-height: calc(100vh - var(--nav-h) - 48px); overflow-y: auto; font-size: 0.92rem; }
+.doc-side summary { display: none; }
+.doc-side h2 { font-family: var(--mono); font-size: 0.76rem; font-weight: 400; color: var(--muted); margin: 22px 0 6px; }
+.doc-side h2:first-of-type { margin-top: 0; }
+.doc-side a { display: block; padding: 4px 0 4px 12px; border-left: 1px solid var(--line); color: var(--body); text-decoration: none; }
+.doc-side a:hover { color: var(--text); border-left-color: var(--line-strong); }
+.doc-side a[aria-current] { color: var(--text); border-left-color: var(--accent); }
+.doc-side a.sub { padding-left: 24px; font-size: 0.86rem; }
+
+/* ── Long text ───────────────────────────────────────────────────────── */
+.doc { min-width: 0; max-width: 48em; }
+.doc-wide { max-width: none; }
+.doc > h1, .doc-head h1 { font-size: clamp(2.2rem, 4vw, 3.2rem); line-height: 1.08; margin-bottom: 16px; }
+.doc .subtitle, .doc .lede { font-size: 1.15rem; line-height: 1.6; color: var(--body); margin-bottom: 28px; max-width: 40em; }
+.doc h2 { font-size: clamp(1.5rem, 2.4vw, 2rem); line-height: 1.15; margin: clamp(48px, 5vw, 72px) 0 16px; padding-top: 24px; border-top: 1px solid var(--line); scroll-margin-top: calc(var(--nav-h) + 16px); }
+.doc > h2:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.doc h3 { margin: 32px 0 10px; scroll-margin-top: calc(var(--nav-h) + 16px); }
+.doc h4 { font-size: 1rem; line-height: 1.4; color: var(--text); margin: 20px 0 6px; }
+.doc p { margin-bottom: 14px; }
+.doc ul, .doc ol { margin: 0 0 16px; padding-left: 22px; }
+.doc ul { list-style: disc; }
+.doc ol { list-style: decimal; }
+.doc li + li { margin-top: 6px; }
+.doc li::marker { color: var(--accent); }
+.doc strong { color: var(--text); font-weight: 600; }
+.doc hr { border: 0; border-top: 1px solid var(--line); margin: 40px 0; }
+.doc :where(p, li, td, dd, .callout) a:not(.btn) { color: var(--text); text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+.doc :where(p, li, td, dd, .callout) a:not(.btn):hover { color: var(--accent); }
+.doc .small { font-size: 0.9rem; color: var(--muted); }
+
+.doc pre { position: relative; margin: 0 0 20px; padding: 18px 20px; overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; font-family: var(--mono); font-size: 0.86rem; line-height: 1.7; color: var(--text); }
+.doc pre code { padding: 0; background: none; font-size: inherit; color: inherit; overflow-wrap: normal; }
+.doc pre .comment { color: var(--muted); }
+.doc pre .keyword, .doc pre .cmd { color: var(--accent); }
+.doc pre .string { color: #e8d9a8; }
+.doc :where(p, li, td) code { overflow-wrap: anywhere; }
+.copy-btn { position: absolute; top: 10px; right: 10px; min-height: 32px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--card); color: var(--body); font-family: var(--mono); font-size: 0.75rem; }
+.copy-btn:hover { color: var(--text); border-color: var(--accent); }
+
+/* A wide table scrolls inside its own box; the page never scrolls sideways. */
+.doc table { display: block; width: 100%; max-width: 100%; overflow-x: auto; border-collapse: collapse; margin: 0 0 24px; font-size: 0.92rem; }
+.doc th, .doc td { padding: 10px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+.doc th { font-family: var(--mono); font-size: 0.78rem; font-weight: 400; color: var(--muted); white-space: nowrap; }
+.doc td:first-child { color: var(--text); }
+.scroll-hint { display: none; font-size: 0.85rem; color: var(--muted); margin: -12px 0 20px; }
+
+/* ── Parts the docs pages share ──────────────────────────────────────── */
+.callout { margin: 0 0 20px; padding: 16px 20px; border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; background: rgba(74, 239, 121, 0.06); font-size: 0.97rem; }
+.callout-orange { border-left-color: var(--wait); background: rgba(245, 158, 11, 0.07); }
+.callout strong:first-child { display: block; margin-bottom: 4px; }
+.callout p:last-child { margin-bottom: 0; }
+.card, .adapter-card, .domain-card { min-width: 0; margin-bottom: 14px; padding: 20px 22px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+.card :is(h3, h4), .adapter-card :is(h3, h4), .domain-card :is(h3, h4) { margin-top: 0; font-size: 1rem; line-height: 1.4; padding: 0; border: 0; }
+.card p { margin-bottom: 0; font-size: 0.95rem; }
+.adapter-card .meta, .domain-card .stats { font-size: 0.85rem; color: var(--muted); margin-bottom: 10px; }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 14px; margin-bottom: 24px; }
+.card-grid .card { margin-bottom: 0; }
+.badge { display: inline-block; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line-strong); font-family: var(--mono); font-size: 0.74rem; color: var(--body); }
+.badge-teal, .badge-green { border-color: var(--border-green); color: var(--accent); }
+.step { display: flex; gap: 16px; margin-bottom: 24px; align-items: flex-start; }
+.step-num { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border: 1px solid var(--line-strong); border-radius: 50%; font-family: var(--mono); font-size: 0.85rem; color: var(--text); }
+.step-content { flex: 1; min-width: 0; }
+.step-content :is(h3, h4) { margin: 4px 0 6px; font-size: 1rem; line-height: 1.4; padding: 0; border: 0; }
+.level-scale { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin-bottom: 24px; }
+.level-item { padding: 12px; border: 1px solid var(--line-strong); border-radius: 10px; }
+.level-item.highlight { border-color: var(--accent); }
+.level-num { font-family: var(--mono); font-size: 1.2rem; color: var(--text); }
+.level-name { font-size: 0.85rem; color: var(--muted); }
+
+/* ── Previous and next page ──────────────────────────────────────────── */
+.doc-next { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: clamp(48px, 6vw, 80px); padding-top: 20px; border-top: 1px solid var(--line); font-size: 0.95rem; }
+.doc-next a { color: var(--text); text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+
+@media (max-width: 1020px) {
+  .doc-layout { grid-template-columns: minmax(0, 1fr); }
+  .doc-side { position: static; max-height: none; overflow: visible; border: 1px solid var(--line); border-radius: 10px; padding: 0 16px; }
+  .doc-side summary { display: flex; align-items: center; justify-content: space-between; min-height: 48px; cursor: pointer; list-style: none; font-weight: 600; color: var(--text); }
+  .doc-side summary::-webkit-details-marker { display: none; }
+  .doc-side summary::after { content: "+"; font-family: var(--mono); color: var(--accent); }
+  .doc-side details[open] summary::after { content: "–"; }
+  .doc-side details[open] { padding-bottom: 14px; }
+}
+@media (max-width: 640px) {
+  .level-scale { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .scroll-hint { display: block; }
+}
+
+/* A reading page goes straight from its hero into the text. */
+.page-hero + .band { padding-top: 0; border-top: 0; }

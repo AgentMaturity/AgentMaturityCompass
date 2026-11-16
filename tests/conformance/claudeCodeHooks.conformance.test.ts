@@ -210,7 +210,9 @@ describe.runIf(enabled)(`Claude Code ${version} hook conformance (P1-23)`, { tim
     };
     expect(existsSync(bashMarker)).toBe(false);
     expect(existsSync(writeTarget)).toBe(false);
-    expect(run.result(1)).toContain("not AMC approval");
+    // WP35d (846617db1): a Write that needs approval is denied pending a signed AMC approval request; Claude Code's
+    // own ask is never the approval (as tests/claudeHookFailClosed.test.ts asserts since e4b6cdf0e).
+    expect(run.result(1)).toMatch(/AMC approval pending: apprreq_\w+\. Approve through amc approvals/);
     expect(run.result(2)).toContain("is not mapped to an allowed ToolHub tool");
     expect(run.result(2)).not.toContain("mcp ran");
     expect(run.result(3)).toContain("AMC protects its hook configuration");

@@ -6,5 +6,5 @@ export function renderValueTrendChart(canvas, points, color = "#4AEF79") {
         .map((row) => Number(row?.value))
         .filter((value) => Number.isFinite(value))
     : [];
-  renderLine(canvas, values.length > 0 ? values : [0], color);
+  renderLine(canvas, values, color);
 }

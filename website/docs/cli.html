@@ -2,11 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" href="../favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.json">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CLI Reference — AMC Documentation</title>
   <meta name="description" content="Complete CLI reference for Agent Maturity Compass — all commands organized by namespace with examples, flags, and environment variables.">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%234AEF79' font-size='18' font-weight='bold'%3Ea%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="shared.css?v=20260710c">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="canonical" href="https://agentmaturity.co/docs/cli.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="CLI Reference — AMC Documentation">
+  <meta property="og:description" content="Complete CLI reference for Agent Maturity Compass — all commands organized by namespace with examples, flags, and environment variables.">
+  <meta property="og:url" content="https://agentmaturity.co/docs/cli.html">
+  <meta property="og:image" content="https://agentmaturity.co/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="../home.css?v=6">
+  <link rel="stylesheet" href="../pages.css?v=1">
+  <link rel="stylesheet" href="../docs-pages.css?v=1">
   <style>
     .ns-toggle { cursor: pointer; user-select: none; }
     .ns-toggle h3 { display: flex; align-items: center; gap: 8px; }
@@ -23,75 +36,86 @@
   </style>
 </head>
 <body>
-<a href="#main-content" class="skip-link">Skip to content</a>
+  <a href="#main-content" class="skip-link">Skip to content</a>
 
-<div class="topbar">
-  <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-  <a href="./" class="topbar-logo">amc<span class="brand-cursor">_</span> docs</a>
-  <span class="topbar-tagline">Evidence over claims.</span>
-  <nav class="topbar-nav">
-    <a href="getting-started.html">Getting Started</a>
-    <a href="cli.html" class="active">CLI Reference</a>
-    <a href="adapters.html">Adapters</a>
-    <a href="compliance.html">Compliance</a>
-    <a href="methodology.html">Methodology</a>
-    <a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank">GitHub ↗</a>
-  </nav>
-</div>
-
-<div class="layout">
-  <nav class="sidebar" id="sidebar">
-    <div class="sidebar-section">
-      <h4>CLI Reference</h4>
-      <a href="#overview" class="active">Overview</a>
-      <a href="#top-commands">Top 20 Commands</a>
-      <a href="#search">Search Commands</a>
-    </div>
-    <div class="sidebar-section">
-      <h4>Namespaces</h4>
-      <a href="#ns-setup" class="sub">Setup &amp; Health</a>
-      <a href="#ns-studio" class="sub">Studio &amp; Control Plane</a>
-      <a href="#ns-config" class="sub">Configuration</a>
-      <a href="#ns-adapters" class="sub">Adapters</a>
-      <a href="#ns-evidence" class="sub">Evidence Capture</a>
-      <a href="#ns-quickscore" class="sub">Rapid Checks &amp; Sharing</a>
-      <a href="#ns-scoring" class="sub">Scoring &amp; Diagnostics</a>
-      <a href="#ns-observability" class="sub">Observability &amp; Trace</a>
-      <a href="#ns-evals" class="sub">Datasets &amp; Lite Scoring</a>
-      <a href="#ns-business" class="sub">Business &amp; Leaderboards</a>
-      <a href="#ns-gateway" class="sub">Gateway &amp; Proxy</a>
-      <a href="#ns-fleet" class="sub">Fleet &amp; Agents</a>
-      <a href="#ns-governor" class="sub">Governor &amp; Policy</a>
-      <a href="#ns-vault" class="sub">Vault &amp; Trust</a>
-      <a href="#ns-assurance" class="sub">Assurance Lab</a>
-      <a href="#ns-compliance" class="sub">Compliance</a>
-      <a href="#ns-ops" class="sub">Operations</a>
-      <a href="#ns-advanced" class="sub">Advanced</a>
-    </div>
-    <div class="sidebar-section">
-      <h4>Reference</h4>
-      <a href="#env-vars">Environment Variables</a>
-      <a href="#exit-codes">Exit Codes</a>
-      <a href="#global-flags">Global Flags</a>
-    </div>
-    <div class="sidebar-section">
-      <h4>Also in Docs</h4>
-      <a href="getting-started.html">Getting Started</a>
-      <a href="adapters.html">Adapter Guides</a>
-      <a href="compliance.html">Compliance</a>
-      <a href="methodology.html">Scoring Methodology</a>
+  <nav class="nav" aria-label="Main">
+    <div class="nav-inner">
+      <a href="../" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>
+      <ul class="nav-links">
+        <li><a href="../#a4-forge">Build an agent</a></li>
+        <li><a href="../#capabilities">Run it</a></li>
+        <li><a href="../#domains">Industries</a></li>
+        <li><a href="../a4.html">A4 Forge</a></li>
+        <li><a href="../docs/index.html" aria-current="page">Docs</a></li>
+      </ul>
+      <div class="nav-right">
+        <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="nav-quiet">GitHub</a>
+        <a href="../#install" class="btn btn-primary btn-small">Get AMC</a>
+        <button class="nav-hamburger" aria-label="Menu" aria-controls="navMobile" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
     </div>
   </nav>
+  <div class="nav-mobile" id="navMobile">
+    <a href="../#a4-forge">Build an agent</a>
+    <a href="../#capabilities">Run it</a>
+    <a href="../#domains">Industries</a>
+    <a href="../#paths">Already have an agent?</a>
+    <a href="../#install">Get AMC</a>
+    <a href="../#desktop">macOS app</a>
+    <a href="../#pricing">Price</a>
+    <a href="../a4.html">A4 Forge (preview)</a>
+    <a href="../docs/index.html" aria-current="page">Docs</a>
+    <a href="../executive.html">For executives</a>
+    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
+  </div>
 
-  <main id="main-content" tabindex="-1" class="main">
-    <div class="content">
-
-      <h1 id="overview">CLI Reference</h1>
+  <span id="main-content" tabindex="-1"></span>
+  <main id="main" class="doc-page">
+    <div class="wrap doc-layout">
+      <nav class="doc-side" aria-label="On this page">
+        <details open>
+          <summary>On this page</summary>
+          <h2>CLI Reference</h2>
+          <a href="#overview">Overview</a>
+          <a href="#top-commands">Top 20 Commands</a>
+          <a href="#search">Search Commands</a>
+          <h2>Namespaces</h2>
+          <a href="#ns-setup" class="sub">Setup &amp; Health</a>
+          <a href="#ns-studio" class="sub">Studio &amp; Control Plane</a>
+          <a href="#ns-config" class="sub">Configuration</a>
+          <a href="#ns-adapters" class="sub">Adapters</a>
+          <a href="#ns-evidence" class="sub">Evidence Capture</a>
+          <a href="#ns-quickscore" class="sub">Rapid Checks &amp; Sharing</a>
+          <a href="#ns-scoring" class="sub">Scoring &amp; Diagnostics</a>
+          <a href="#ns-observability" class="sub">Observability &amp; Trace</a>
+          <a href="#ns-evals" class="sub">Datasets &amp; Lite Scoring</a>
+          <a href="#ns-business" class="sub">Business &amp; Leaderboards</a>
+          <a href="#ns-gateway" class="sub">Gateway &amp; Proxy</a>
+          <a href="#ns-fleet" class="sub">Fleet &amp; Agents</a>
+          <a href="#ns-governor" class="sub">Governor &amp; Policy</a>
+          <a href="#ns-vault" class="sub">Vault &amp; Trust</a>
+          <a href="#ns-assurance" class="sub">Assurance Lab</a>
+          <a href="#ns-compliance" class="sub">Compliance</a>
+          <a href="#ns-ops" class="sub">Operations</a>
+          <a href="#ns-advanced" class="sub">Advanced</a>
+          <h2>Reference</h2>
+          <a href="#env-vars">Environment Variables</a>
+          <a href="#exit-codes">Exit Codes</a>
+          <a href="#global-flags">Global Flags</a>
+          <h2>Other docs pages</h2>
+          <a href="getting-started.html">Getting Started</a>
+          <a href="adapters.html">Adapter Guides</a>
+          <a href="compliance.html">Compliance</a>
+          <a href="methodology.html">Scoring Methodology</a>
+        </details>
+      </nav>
+      <article class="doc">
+<h1 id="overview">CLI Reference</h1>
       <p class="subtitle">Complete reference for all <strong>amc</strong> commands — organized by namespace with examples, flags, and environment variables.</p>
 
       <div class="callout callout-green">
         <strong>By the numbers</strong>
-        The AMC CLI currently registers 1,304 command paths. Every command supports <code>--help</code> for inline documentation.
+        The AMC CLI currently registers 1,302 command paths. Every command supports <code>--help</code> for inline documentation.
       </div>
 
       <!-- Common workflow commands -->
@@ -115,12 +139,12 @@
           <tr><td><code>amc policy controls</code></td><td>Inspect verified Scope, When, Then, and Status across existing signed controls</td><td><code>amc policy controls --json</code></td></tr>
           <tr><td><code>amc policy simulate</code></td><td>Preview one control through its production evaluator without recording</td><td><code>amc policy simulate action:DEPLOY --risk high --mode execute</code></td></tr>
           <tr><td><code>amc policy test</code></td><td>Run deterministic policy fixtures through production evaluators</td><td><code>amc policy test policy-fixtures.yaml --json</code></td></tr>
-          <tr><td><code>amc run</code></td><td>Run full maturity diagnostic</td><td><code>amc run --agent my-agent --window 30</code></td></tr>
+          <tr><td><code>amc run</code></td><td>Run full maturity diagnostic</td><td><code>amc run --window 30d</code></td></tr>
           <tr><td><code>amc run --question-set lifecycle</code></td><td>Run the explicit 264-question lifecycle-expanded diagnostic</td><td><code>amc run --question-set lifecycle</code></td></tr>
           <tr><td><code>amc proof check</code></td><td>Check a claim against a declared source-to-rule manifest and emit an <code>amcproof</code> artifact</td><td><code>amc proof check --domain governance --manifest fixtures/domain-proof/toy-governance/source-rule-manifest.json --input examples/domain-proof/toy-governance/proven.json</code></td></tr>
           <tr><td><code>amc evidence finding-proofs</code></td><td>Trace findings to evidence, resources, receipts, and recommendations</td><td><code>amc evidence finding-proofs list</code></td></tr>
           <tr><td><code>amc report</code></td><td>Render diagnostic report by run ID, alias, prefix, or latest</td><td><code>amc report q1-assessment --share --public-base-url https://reports.example.com/amc</code></td></tr>
-          <tr><td><code>amc badge</code></td><td>Generate maturity badge</td><td><code>amc badge --format html</code></td></tr>
+          <tr><td><code>amc badge</code></td><td>Print a one-line maturity badge</td><td><code>amc badge --agent my-agent</code></td></tr>
           <tr><td><code>amc assurance run</code></td><td>Run red team assurance packs</td><td><code>amc assurance run --scope full</code></td></tr>
           <tr><td><code>amc compliance report</code></td><td>Generate compliance mapping report</td><td><code>amc compliance report --framework EU_AI_ACT</code></td></tr>
           <tr><td><code>amc domain assess</code></td><td>Assess against an industry domain</td><td><code>amc domain assess --domain health</code></td></tr>
@@ -255,8 +279,7 @@
             <tr><td><code>amc quickscore --rapid</code></td><td>Run the lightweight pulse-check mode explicitly</td></tr>
             <tr><td><code>amc quickscore --json</code></td><td>Machine-readable JSON output</td></tr>
             <tr><td><code>amc compliance report --framework EU_AI_ACT</code></td><td>Generate EU AI Act mapping from evidence</td></tr>
-            <tr><td><code>amc badge</code></td><td>Generate a self-made badge from the latest local score; it accepts manual <code>--level</code> and <code>--score</code> overrides, so it is not a maturity or certification mark</td></tr>
-            <tr><td><code>amc badge --format html</code></td><td>HTML <code>&lt;img&gt;</code> tag output</td></tr>
+            <tr><td><code>amc badge</code></td><td>Print a one-line badge from the latest local score. It is self-made, not a certification mark</td></tr>
           </tbody>
         </table>
       </div>
@@ -269,7 +292,7 @@
         <table>
           <thead><tr><th>Command</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>amc run --agent &lt;id&gt; --window &lt;d&gt;</code></td><td>Run maturity diagnostic</td></tr>
+            <tr><td><code>amc run --window &lt;days&gt;d</code></td><td>Run maturity diagnostic</td></tr>
             <tr><td><code>amc run --question-set lifecycle</code></td><td>Opt into lifecycle, evidence, runtime, proof, memory, and fleet question coverage</td></tr>
             <tr><td><code>amc proof check --manifest &lt;path&gt; --input &lt;path&gt;</code></td><td>Emit a fail-closed <code>amcproof</code> artifact for declared source-to-rule correctness checks</td></tr>
             <tr><td><code>amc report &lt;runId|alias|latest&gt;</code></td><td>Render report for a run, saved alias, or latest run</td></tr>
@@ -579,7 +602,7 @@
             <tr><td><code>amc guide --interactive</code></td><td>Cherry-pick which gaps to fix</td></tr>
             <tr><td><code>amc guide --watch</code></td><td>Continuous monitoring + auto-update</td></tr>
             <tr><td><code>amc guide --diff</code></td><td>What improved since last run</td></tr>
-            <tr><td><code>amc guide --ci --target 3</code></td><td>CI gate: fail build if below L3</td></tr>
+            <tr><td><code>amc guide --ci --target 2</code></td><td>CI gate: fail the build if below L2, the highest level today</td></tr>
             <tr><td><code>amc fix --dry-run</code></td><td>Preview what would be generated</td></tr>
             <tr><td><code>amc budgets init|verify|status</code></td><td>Usage budget management</td></tr>
             <tr><td><code>amc drift check|report</code></td><td>Drift/regression detection</td></tr>
@@ -689,16 +712,32 @@
         </tbody>
       </table>
 
-      <div class="doc-footer">
-        <span>← <a href="getting-started.html">Getting Started</a></span>
+        <nav class="doc-next" aria-label="More docs">
+          <span>← <a href="getting-started.html">Getting Started</a></span>
         <span>Next: <a href="adapters.html">Adapter Guides →</a></span>
-      </div>
-
+        </nav>
+      </article>
     </div>
   </main>
-</div>
 
-<script>
+  <footer class="footer">
+    <div class="footer-inner wrap">
+      <div class="footer-top">
+        <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p></div>
+        <div class="footer-col"><h2>Product</h2><a href="../#a4-forge">Build an agent</a><a href="../#capabilities">Run it</a><a href="../#paths">Already have an agent?</a><a href="../#install">Get AMC</a><a href="../#desktop">macOS app</a><a href="../#products">Eight tools</a><a href="../executive.html">Executives</a><a href="../playground.html">Playground</a><a href="../docs/index.html">Documentation</a></div>
+        <div class="footer-col"><h2>Depth</h2><a href="../a4.html">A4 Forge</a><a href="../methodology.html">Approach and research</a><a href="../compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="../#pricing">Price</a><a href="../#faq">FAQ</a></div>
+        <div class="footer-col"><h2>Industry Packs</h2><a href="../#domains">All packs</a><a href="../station-environment.html">Environment</a><a href="../station-health.html">Health</a><a href="../station-wealth.html">Wealth</a><a href="../station-education.html">Education</a><a href="../station-mobility.html">Mobility</a><a href="../station-technology.html">Technology</a><a href="../station-governance.html">Governance</a></div>
+        <div class="footer-col"><h2>Code</h2><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="../accessibility.html">Accessibility</a></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
+    </div>
+  </footer>
+
+  <script src="../script.js?v=13"></script>
+  <script src="../home.js?v=3"></script>
+  <script src="../pages.js?v=2"></script>
+
+  <script>
 // Toggle all namespaces
 let allOpen = false;
 function toggleAll() {
@@ -726,25 +765,6 @@ searchInput.addEventListener('input', () => {
     document.querySelectorAll('.ns-body').forEach(b => b.classList.add('open'));
   }
 });
-
-// Copy buttons
-document.querySelectorAll('pre').forEach(pre => {
-  const btn = document.createElement('button');
-  btn.className = 'copy-btn'; btn.textContent = 'Copy';
-  btn.onclick = () => {
-    navigator.clipboard.writeText(pre.querySelector('code').textContent.trim());
-    btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 1500);
-  };
-  pre.appendChild(btn);
-});
-
-// Sidebar active state
-document.querySelectorAll('.sidebar a[href^="#"]').forEach(a => {
-  a.addEventListener('click', () => {
-    document.querySelectorAll('.sidebar a').forEach(s => s.classList.remove('active'));
-    a.classList.add('active');
-  });
-});
-</script>
+  </script>
 </body>
 </html>

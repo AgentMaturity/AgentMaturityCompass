@@ -19,9 +19,9 @@ export const publicPrivateCollaborationDetail: PackQuestionDetail = {
   "GOV-PPC-2": {
     l2: "Deal milestones are tracked, but no value-for-money assessment informs the agent's recommendations",
     l4:
-      "Lifecycle value-for-money assessment and public transparency reporting exist, but independent audit support or reporting to the oversight body is " +
-      "missing",
-    evidence: ["lifecycle_vfm_assessment", "ppp_transparency_report", "oversight_body_reporting_record"],
+      "A value-for-money pre-test and budget disclosure of all costs and contingent liabilities exist, but independent audit support or reporting to the " +
+      "oversight body is missing",
+    evidence: ["lifecycle_vfm_assessment", "ppp_budget_cost_and_liability_disclosure", "oversight_body_reporting_record"],
     remediation:
       "Require a lifecycle value-for-money assessment reference as an input before the agent recommends proceeding with a PPP, and publish the " +
       "recommendation with that reference for oversight.",
@@ -55,12 +55,14 @@ export const publicPrivateCollaborationDetail: PackQuestionDetail = {
     keyRisk: 0,
   },
   "GOV-PPC-5": {
-    l2: "Partnership outputs are counted, but no SDG indicator or community involvement measure is tracked",
-    l4: "Indicator 17.17.1 monitoring and community involvement are integrated, but outcome attribution or public SDG impact reporting is incomplete",
-    evidence: ["sdg_17_17_1_indicator_dataset", "community_involvement_record", "ppp_outcome_attribution_method"],
+    l2: "Partnership outputs are counted, but the amount committed to each PPP is not recorded and no community involvement measure is tracked",
+    l4:
+      "Amounts committed per PPP are reported for indicator 17.17.1 and community involvement is assessed, but outcome attribution or public reporting " +
+      "is incomplete",
+    evidence: ["ppp_amount_committed_17_17_1_record", "community_involvement_record", "ppp_outcome_attribution_method"],
     remediation:
-      "Add community and SDG outcome measures to the agent's PPP performance dashboard with a documented attribution method, and flag partnerships whose " +
-      "outputs rise while community outcomes fall.",
+      "Record the amount committed to each infrastructure PPP in US dollars for indicator 17.17.1, add community outcome measures to the agent's PPP " +
+      "performance dashboard with a documented attribution method, and flag partnerships whose outputs rise while community outcomes fall.",
     failureMode:
       "The agent reports a PPP as successful on output counts while the affected community's access to the service has fallen, because no community measure " +
       "is tracked.",

@@ -1,3 +1,4 @@
+import { recordRows } from "../pageKit.js";
 function esc(text) {
   return String(text)
     .replaceAll("&", "&amp;")
@@ -17,9 +18,9 @@ export function renderPluginDiff(container, diff) {
   }
   container.innerHTML = `
     <div class="grid">
-      <div class="card"><h4>Added</h4><pre class="scroll">${esc(JSON.stringify(diff.added || [], null, 2))}</pre></div>
-      <div class="card"><h4>Changed</h4><pre class="scroll">${esc(JSON.stringify(diff.changed || [], null, 2))}</pre></div>
-      <div class="card"><h4>Removed</h4><pre class="scroll">${esc(JSON.stringify(diff.removed || [], null, 2))}</pre></div>
+      <div class="card"><h4>Added</h4>${recordRows(diff.added || [])}</div>
+      <div class="card"><h4>Changed</h4>${recordRows(diff.changed || [])}</div>
+      <div class="card"><h4>Removed</h4>${recordRows(diff.removed || [])}</div>
     </div>
   `;
 }

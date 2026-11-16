@@ -22,7 +22,7 @@ cd your-agent-project
 amc
 ```
 
-A signed artifact can still report `INSUFFICIENT_EVIDENCE`. Signing proves integrity; evidence readiness determines whether an external claim is eligible.
+A signed artifact can still report `INSUFFICIENT_EVIDENCE`. A signature shows the record is unchanged; evidence readiness determines whether an external claim is eligible.
 
 ## Next Steps
 

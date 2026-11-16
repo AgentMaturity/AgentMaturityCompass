@@ -6,7 +6,7 @@ Choose what you want to do first. AMC can run a native task, assess evidence, or
 |---|---|---|
 | Not sure yet | `amc` in a terminal | A start menu: watch Claude Code or Codex, chat, open the console, or show the score. [Your first five minutes](FIRST_FIVE_MINUTES.md) walks through it. |
 | Run a native task | `amc agent-loop guide` | Read-only guidance for an explicit provider, model and credential reference. |
-| Assess existing evidence | `amc --no-menu` (or `amc` in a pipe or CI) | Creates or updates an evidence baseline; a valid report can still have insufficient evidence. |
+| Assess existing evidence | `amc --no-menu` (or `amc` in a pipe or CI; `amc --yes` in a folder AMC has not set up yet) | Creates or updates an evidence baseline; a valid report can still have insufficient evidence. |
 | Connect an existing agent | `amc connect --help` | Shows capture and connection options for your existing runtime. |
 
 The native task commands on this page (`amc agent-loop` and the keyless turn below) need the current source build, which is unreleased (the next release is 2.0.0); follow [the source installation](INSTALL.md#option-b-from-github-development) first. The hosted installers and npm give the published 1.1.1, which does not contain them.

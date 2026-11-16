@@ -73,6 +73,12 @@ function defaultTargets(scope: MechanicScope, mode: "DESIRED" | "EXCELLENCE", me
   });
 }
 
+/** The saved targets, or (none saved yet) the defaults loadMechanicTargets would save, made in memory: reading writes nothing. */
+export function readMechanicTargets(workspace: string): MechanicTargets {
+  const path = mechanicTargetsPath(workspace), scope: MechanicScope = { type: "WORKSPACE", id: "workspace" };
+  return pathExists(path) ? mechanicTargetsSchema.parse(YAML.parse(readUtf8(path)) as unknown) : defaultTargets(scope, "DESIRED", measuredTargetMapping(workspace, scope));
+}
+
 export function loadMechanicTargets(workspace: string): MechanicTargets {
   const path = mechanicTargetsPath(workspace);
   if (!pathExists(path)) {

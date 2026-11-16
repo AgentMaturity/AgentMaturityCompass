@@ -204,7 +204,7 @@ export async function verifyDeployment(store: A4Store, projectId: string, releas
   const report = buildVerifierReport({ artifact: { kind: "a4-amc-check-readyz-response", path: `https://${destination}/readyz`,
     sha256: probed.responseSha256 ?? "not_evaluated" }, context: loadTrustContext(),
     integrityErrors: probed.amcCheckStatus === "failed" ? probed.reasonCodes : [], signatures: [], verifiedAt: new Date(now),
-    anchoring: { status: "not-applicable", detail: "a token-less reachability probe; nothing at the destination is signed until P2-40" },
+    anchoring: { status: "not-applicable", detail: "a token-less reachability probe; nothing at the destination is signed yet" },
     warnings: [`release identity: ${IDENTITY_NOT_EVALUATED}`, RUNTIME_NOT_EVALUATED] });
   const check = { schema: "amc.a4-amc-check/v1", checkId, releaseId, projectId, receiptId: receipt.body.deploymentId, environment: body.environment,
     destinationRef: destination, resolvedAddress: probed.resolvedAddress, responseSha256: probed.responseSha256, checks: probed.checks,

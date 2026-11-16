@@ -44,7 +44,16 @@ export const actionPolicyRuleSchema = z.object({
   requireAssurancePacks: z.record(z.string().min(1), assurancePackRequirementSchema).default({}),
   evidenceLogic: policyEvidenceLogicSchema.optional(),
   allowExecute: z.boolean().default(false),
-  requireExecTicket: z.boolean().default(false)
+  requireExecTicket: z.boolean().default(false),
+  /**
+   * An owner's signed choice for a hands-on workspace (`amc init --coding`): a call in this class that a person approved
+   * (a signed per-call approval, rechecked against the call before it runs) runs as EXECUTE even when the run-integrity,
+   * maturity, trust-tier, assurance and sandbox-attestation evidence is missing. Without that approval it stays SIMULATE,
+   * even when all of that evidence is met.
+   * It never lifts a refused or tampered run, findings against the agent, an untrusted config, a freeze, a budget, an
+   * execution ticket, a work order or `allowExecute: false`.
+   */
+  executeOnApproval: z.boolean().optional()
 }).superRefine((rule, context) => {
   if (!rule.evidenceLogic) return;
   try {

@@ -82,7 +82,7 @@ export const networkedEcosystemsDetail: PackQuestionDetail = {
     l2: "Ranking and access decisions are explained only on request, with no fairness assessment.",
     l4:
       "Transparency reports, non-discrimination monitoring and contest routes exist, but business-user " +
-      "access audits or Art. 33 pricing transparency are missing.",
+      "access audits or Art. 9 compensation terms for making data available are missing.",
     evidence: ["ranking_access_decision_report", "business_user_access_audit", "non_discrimination_monitoring_dashboard"],
     remediation:
       "Log every ranking and access decision the agent makes for business users with its parameters, and " +

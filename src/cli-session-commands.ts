@@ -73,9 +73,10 @@ export function registerSessionCommands(program: Command): void {
     .description("Show a session's projected conversation and its event spine")
     .argument("<id>", "session id")
     .option("--json", "Output as JSON")
+    .option("--spine", "Also list every recorded event (the event spine)")
     .option("--limit <rows>", "Read one verified committed page of 1-256 rows (requires --json)")
     .option("--cursor <cursor>", "Continue a verified committed page or reconnect position (requires --json)")
-    .action(async (id: string, opts: { json?: boolean; limit?: string; cursor?: string }) => {
+    .action(async (id: string, opts: { json?: boolean; spine?: boolean; limit?: string; cursor?: string }) => {
       const { readNativeSessionEvents } = await import("./session/readNativeSessionEvents.js");
       const { projectNativeRunUsage, renderNativeRunUsage } = await import("./agent/nativeRunUsage.js");
       const { projectNativeRunDiagnostics, renderNativeRunDiagnostics } = await import("./agent/nativeFailureGuidance.js");
@@ -121,20 +122,21 @@ export function registerSessionCommands(program: Command): void {
           console.log(JSON.stringify({ sessionId: id, spine, history, usage, tokenCounts: sessionTokenCounts(events), context, diagnostics }, null, 2));
           return;
         }
-        console.log(chalk.bold(`Session ${id}`));
-        console.log(chalk.gray(`  ${events.length} events`));
+        console.log(chalk.bold(`Session ${id}`) + chalk.gray(` · ${events.length} events`));
+        const { renderSessionTranscript } = await import("./session/sessionTranscript.js");
+        const transcript = renderSessionTranscript(process.cwd(), events, process.stdout.columns ?? null);
+        console.log(chalk.bold("Transcript (what the model saw)"));
+        for (const line of transcript.lines) console.log(line);
+        if (transcript.unreadable > 0) {
+          const { vaultStatus } = await import("./vault/vault.js");
+          console.log(chalk.yellow(`\n${transcript.unreadable} part(s) could not be shown.${vaultStatus(process.cwd()).unlocked ? "" : " The vault is locked, and message text is stored encrypted: unlock it (amc vault unlock) and run this again."}`));
+        }
+        console.log("");
         console.log(renderNativeRunUsage(usage));
         for (const line of renderSessionContextAccounting(context)) console.log(line);
         console.log(renderNativeRunDiagnostics(diagnostics));
         console.log("");
-        console.log(chalk.bold("Projected conversation (model-visible)"));
-        for (const message of history) {
-          console.log(`  ${chalk.cyan(message.role)}:`);
-          for (const part of message.parts) {
-            console.log(`    - ${part.kind} ${chalk.gray(part.sha256.slice(0, 16))}…`);
-          }
-        }
-        console.log("");
+        if (!opts.spine) { console.log(chalk.gray(`Event spine: ${spine.length} recorded events; add --spine to list them.`)); return; }
         console.log(chalk.bold("Event spine"));
         for (const row of spine) {
           const label = `seq ${String(row.seq).padStart(3)} · turn ${row.turn ?? "-"} · step ${row.step ?? "-"}`;

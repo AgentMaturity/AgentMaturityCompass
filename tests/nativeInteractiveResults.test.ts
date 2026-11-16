@@ -10,6 +10,7 @@ import * as payloadReader from "../src/session/eventPayload.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { lockVault } from "../src/vault/vault.js";
 import { renderNativeInteractiveToolResults } from "../src/setup/nativeInteractiveResults.js";
+import { renderSessionTranscript } from "../src/session/sessionTranscript.js";
 
 // Real signed disposable histories. These tests measure presentation contracts,
 // not human usability, installed-package acceptance or provider correctness.
@@ -45,14 +46,14 @@ describe("native chat recorded tool results", () => {
     const session = start(backend); turn(session, "old result"); turn(session, "latest result", "ERROR"); finish(session);
     const before = loadSessionEventHistory({ workspace }).headEventHash;
     const lines = renderNativeInteractiveToolResults(workspace, "result-session").join("\n");
-    expect(lines).toContain("turn 2"); expect(lines).toContain("fs.read"); expect(lines).toContain("ERROR");
+    expect(lines.split("\n")).toHaveLength(1); expect(lines).toContain("fs.read"); expect(lines).toContain("failed");
     expect(lines).toContain("exit 42"); expect(lines).toContain("latest result"); expect(lines).not.toContain("old result");
     expect(loadSessionEventHistory({ workspace }).headEventHash).toBe(before);
   });
   it("escapes terminal controls in results and never turns an unknown outcome into success", () => {
     const session = start(); turn(session, "unsafe\u001b[2J\rtext\u009b", "TOOL_OUTCOME_UNKNOWN"); finish(session);
     const lines = renderNativeInteractiveToolResults(workspace, "result-session").join("\n");
-    expect(lines).toContain("TOOL_OUTCOME_UNKNOWN"); expect(lines).not.toContain("\u001b");
+    expect(lines).toContain("outcome unknown"); expect(lines).not.toContain("✓"); expect(lines).not.toContain("\u001b");
     expect(lines).not.toContain("\r"); expect(lines).not.toContain("\u009b"); expect(lines).toContain("unsafe");
   });
   it("labels missing payloads without printing invented or stale result text", () => {
@@ -60,13 +61,13 @@ describe("native chat recorded tool results", () => {
     const result = loadSessionEventHistory({ workspace }).events.find(row => row.event_type === "tool/result")!;
     unlinkSync(join(workspace, result.payload_path!));
     const lines = renderNativeInteractiveToolResults(workspace, "result-session").join("\n");
-    expect(lines).toContain("payload missing"); expect(lines).not.toContain("private result");
+    expect(lines).toContain("recorded output missing"); expect(lines).not.toContain("private result");
   });
   it("refuses a payload reader's bytes when they do not match the signed commitment", () => {
     const session = start(); turn(session, "authentic result"); finish(session);
     vi.spyOn(payloadReader, "readEventPayload").mockReturnValue({ status: "ok", bytes: Buffer.from("forged result") });
     const lines = renderNativeInteractiveToolResults(workspace, "result-session").join("\n");
-    expect(lines).toContain("payload digest mismatch"); expect(lines).not.toContain("forged result");
+    expect(lines).toContain("failed its digest check"); expect(lines).not.toContain("forged result");
   });
   it("refuses unauthenticated metadata before reading or presenting its payload", () => {
     const session = start(); turn(session, "must not render"); finish(session);
@@ -78,10 +79,30 @@ describe("native chat recorded tool results", () => {
     const lines = renderNativeInteractiveToolResults(workspace, "result-session").join("\n");
     expect(lines).toContain("Tool results unavailable"); expect(lines).not.toContain("must not render"); expect(read).not.toHaveBeenCalled();
   });
-  it("bounds the number and length of displayed results and identifies hidden output", () => {
-    const session = start(); turn(session, "long output ".repeat(1000), "OK", 10); finish(session);
-    const lines = renderNativeInteractiveToolResults(workspace, "result-session").join("\n");
-    expect(lines).toContain("display truncated"); expect(lines).toContain("2 more tool results"); expect(lines.length).toBeLessThan(22_000);
+  it("shows each call as one bounded line and names the calls it leaves out", () => {
+    const session = start(); turn(session, "long output ".repeat(1000), "OK", 14); finish(session);
+    const lines = renderNativeInteractiveToolResults(workspace, "result-session");
+    expect(lines).toHaveLength(13); expect(lines[0]).toContain("2 earlier tool calls");
+    for (const line of lines.slice(1)) { expect(line).toContain("✓ fs.read"); expect(line.length).toBeLessThan(200); }
+  });
+  // M-12: `amc session show` prints what was said, not content hashes; text it cannot read is named, never invented.
+  it("renders a readable transcript and names a payload it cannot read", () => {
+    const session = start();
+    session.startTurn({ trigger: "user" }); session.startStep();
+    session.recordSystemPrompt("You are an agent.\nRules follow.");
+    session.recordUserMessage("Summarise the notes");
+    session.recordAssistantBlock({ blockIndex: 0, blockKind: "text", stopReason: "end_turn", content: "## Summary\n- two lines" });
+    session.endStep({ stopReason: "end_turn", usage: null }); session.endTurn({ reason: "complete" }); session.sealTurn(); finish(session);
+    const events = loadSessionEventHistory({ workspace }).events.filter(row => row.session_id === "result-session");
+    const shown = renderSessionTranscript(workspace, events, 80);
+    expect(shown.unreadable).toBe(0);
+    expect(shown.lines.join("\n")).toMatch(/System:\n {2}\[system prompt, 2 lines\][\s\S]*You:\n {2}Summarise the notes[\s\S]*Agent:\n {2}Summary\n {4}• two lines/);
+    const user = events.find(row => row.event_type === "user/message")!;
+    unlinkSync(join(workspace, user.payload_path!));
+    const missing = renderSessionTranscript(workspace, events, 80);
+    expect(missing.unreadable).toBe(1);
+    expect(missing.lines.join("\n")).toContain("[text: not readable here]");
+    expect(missing.lines.join("\n")).not.toContain("Summarise the notes");
   });
   it("shows an existing spill locator as a preview boundary without decrypting retained output", () => {
     const session = start("jsonl", true); turn(session, "retained output ".repeat(1000)); finish(session);

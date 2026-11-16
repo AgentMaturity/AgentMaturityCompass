@@ -1,37 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AMC Release Notes | Agent Maturity Compass</title>
-<meta name="description" content="Current Agent Maturity Compass release notes with links to the complete source-controlled changelog and verified releases.">
-<meta property="og:title" content="AMC Release Notes">
-<meta property="og:description" content="What changed in Agent Maturity Compass and where to verify the complete release history.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://agentmaturity.co/changelog.html">
-<meta property="og:image" content="https://agentmaturity.co/og-card.png">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="canonical" href="https://agentmaturity.co/changelog.html">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%234AEF79' font-size='18' font-weight='bold'%3Ea%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="changelog.css?v=1">
+  <meta charset="UTF-8">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AMC Release Notes | Agent Maturity Compass</title>
+  <meta name="description" content="Current Agent Maturity Compass release notes with links to the complete source-controlled changelog and verified releases.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="canonical" href="https://agentmaturity.co/changelog.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="AMC Release Notes">
+  <meta property="og:description" content="What changed in Agent Maturity Compass and where to verify the complete release history.">
+  <meta property="og:url" content="https://agentmaturity.co/changelog.html">
+  <meta property="og:image" content="https://agentmaturity.co/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="home.css?v=6">
+  <link rel="stylesheet" href="pages.css?v=1">
+  <link rel="stylesheet" href="changelog.css?v=2">
 </head>
 <body>
-<a href="#main-content" class="skip-link">Skip to content</a>
+  <a href="#main-content" class="skip-link">Skip to content</a>
 
-<nav class="editorial-topbar" aria-label="Primary">
-  <a href="./" class="editorial-wordmark" aria-label="Agent Maturity Compass home">amc<span class="brand-cursor">_</span><span class="editorial-surface">releases</span></a>
-  <span class="editorial-tagline">Evidence over claims.</span>
-  <div class="editorial-nav-links">
-    <a href="./">Product</a>
-    <a href="docs/">Docs</a>
-    <a href="blog/">Journal</a>
-    <a href="changelog.html" aria-current="page">Releases</a>
-    <a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">GitHub</a>
+  <nav class="nav" aria-label="Main">
+    <div class="nav-inner">
+      <a href="./" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>
+      <ul class="nav-links">
+        <li><a href="./#a4-forge">Build an agent</a></li>
+        <li><a href="./#capabilities">Run it</a></li>
+        <li><a href="./#domains">Industries</a></li>
+        <li><a href="a4.html">A4 Forge</a></li>
+        <li><a href="docs/index.html">Docs</a></li>
+      </ul>
+      <div class="nav-right">
+        <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="nav-quiet">GitHub</a>
+        <a href="./#install" class="btn btn-primary btn-small">Get AMC</a>
+        <button class="nav-hamburger" aria-label="Menu" aria-controls="navMobile" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+  <div class="nav-mobile" id="navMobile">
+    <a href="./#a4-forge">Build an agent</a>
+    <a href="./#capabilities">Run it</a>
+    <a href="./#domains">Industries</a>
+    <a href="./#paths">Already have an agent?</a>
+    <a href="./#install">Get AMC</a>
+    <a href="./#desktop">macOS app</a>
+    <a href="./#pricing">Price</a>
+    <a href="a4.html">A4 Forge (preview)</a>
+    <a href="docs/index.html">Docs</a>
+    <a href="executive.html">For executives</a>
+    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
   </div>
-</nav>
 
 <main id="main-content" tabindex="-1">
-  <header class="hero changelog-hero">
+  <header class="ed-hero changelog-hero">
     <h1>Release notes</h1>
     <p>What changed in AMC, with the complete source-controlled history one link away.</p>
   </header>
@@ -127,9 +152,21 @@
   </div>
 </main>
 
-<footer class="editorial-footer">
-  <p>Agent Maturity Compass · MIT License</p>
-  <p><a href="./">Home</a> · <a href="docs/">Docs</a> · <a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">GitHub</a></p>
-</footer>
+  <footer class="footer">
+    <div class="footer-inner wrap">
+      <div class="footer-top">
+        <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p></div>
+        <div class="footer-col"><h2>Product</h2><a href="./#a4-forge">Build an agent</a><a href="./#capabilities">Run it</a><a href="./#paths">Already have an agent?</a><a href="./#install">Get AMC</a><a href="./#desktop">macOS app</a><a href="./#products">Eight tools</a><a href="executive.html">Executives</a><a href="playground.html">Playground</a><a href="docs/index.html">Documentation</a></div>
+        <div class="footer-col"><h2>Depth</h2><a href="a4.html">A4 Forge</a><a href="methodology.html">Approach and research</a><a href="compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="./#pricing">Price</a><a href="./#faq">FAQ</a></div>
+        <div class="footer-col"><h2>Industry Packs</h2><a href="./#domains">All packs</a><a href="station-environment.html">Environment</a><a href="station-health.html">Health</a><a href="station-wealth.html">Wealth</a><a href="station-education.html">Education</a><a href="station-mobility.html">Mobility</a><a href="station-technology.html">Technology</a><a href="station-governance.html">Governance</a></div>
+        <div class="footer-col"><h2>Code</h2><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="accessibility.html">Accessibility</a></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
+    </div>
+  </footer>
+
+  <script src="script.js?v=13"></script>
+  <script src="home.js?v=3"></script>
+  <script src="pages.js?v=2"></script>
 </body>
 </html>

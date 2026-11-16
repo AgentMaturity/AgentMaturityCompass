@@ -767,7 +767,9 @@ vi.mock("../src/governor/governorCli.js", () => ({
   buildGovernorReport: m.buildGovernorReport
 }));
 vi.mock("../src/score/humanOversightQuality.js", () => ({ assessOversightQuality: m.assessOversightQuality }));
-vi.mock("../src/mode/mode.js", () => ({ getMode: m.getMode, setMode: m.setMode }));
+vi.mock("../src/mode/mode.js", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../src/mode/mode.js")>()), getMode: m.getMode, setMode: m.setMode
+}));
 
 vi.mock("../src/identity/identityCli.js", () => ({
   identityInitCli: m.identityInitCli,

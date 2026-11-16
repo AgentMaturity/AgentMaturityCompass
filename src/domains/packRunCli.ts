@@ -3,13 +3,47 @@
  * choices, per-question levels, the scale note, top gaps and key-risk coverage. Kept here so the command file stays
  * under its size cap. Everything printed is self-reported.
  */
+import { writeFileSync } from "node:fs";
+import { join } from "node:path";
 import chalk from "chalk";
 import type { IndustryPack, IndustryPackQuestion, IndustryPackScoreResult } from "./industryPacks.js";
 import { levelDescriptor } from "./packInsights.js";
 
-/** The five levels `pack run` offers; L2/L4 show the question's descriptor or a neutral "between" label. */
+/** The answer `pack run` records as "skipped": the question stays unanswered, so it is not evaluated. */
+export const SKIP_LEVEL = 0;
+
+/** The five levels `pack run` offers, then a skip; L2/L4 show the question's descriptor or a neutral "between" label. */
 export function packLevelChoices(q: IndustryPackQuestion): Array<{ name: string; short: string; value: number }> {
-  return [1, 2, 3, 4, 5].map((level) => ({ name: `L${level} — ${levelDescriptor(q, level)}`, short: `L${level}`, value: level }));
+  return [
+    ...[1, 2, 3, 4, 5].map((level) => ({ name: `L${level} — ${levelDescriptor(q, level)}`, short: `L${level}`, value: level })),
+    { name: "Skip this question (it stays unanswered and is not scored)", short: "skipped", value: SKIP_LEVEL }
+  ];
+}
+
+/** True for Ctrl-C in an inquirer prompt. */
+export function promptAborted(error: unknown): boolean {
+  return error instanceof Error && (error.name === "ExitPromptError" || /User force closed the prompt/i.test(error.message));
+}
+
+/**
+ * After Ctrl-C: writes the answers given so far to `<pack>-answers.json` in `dir` (never over an existing file) and
+ * returns what to tell the person. With no answers yet, nothing is written.
+ */
+export function saveAnswersOnAbort(packId: string, responses: Record<string, number>, dir: string): string {
+  const count = Object.keys(responses).length;
+  if (count === 0) return "Stopped. No answers were given yet, so nothing was saved.";
+  const body = `${JSON.stringify(responses, null, 2)}\n`;
+  for (let n = 1; ; n++) {
+    const file = join(dir, n === 1 ? `${packId}-answers.json` : `${packId}-answers-${n}.json`);
+    try {
+      writeFileSync(file, body, { flag: "wx", mode: 0o600 });
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "EEXIST") continue;
+      throw error;
+    }
+    return `Stopped. Your ${count} answer${count === 1 ? " is" : "s are"} saved in ${file}.\n`
+      + `Score them with: amc domain pack run --pack ${packId} --responses ${file} (unanswered questions are not scored).`;
+  }
 }
 
 /** Response keys that are not questions of the pack (a typo would otherwise leave a question silently unanswered). */

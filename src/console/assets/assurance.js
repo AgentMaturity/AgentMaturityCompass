@@ -1,3 +1,4 @@
+import { askInline, recordRows } from "./pageKit.js";
 import { renderFindingCard } from "./components/findingCard.js";
 import { renderScoreGauge } from "./components/scoreGauge.js";
 import { renderWaiverBanner } from "./components/waiverBanner.js";
@@ -106,12 +107,12 @@ export async function renderAssurancePage(params) {
         <a href="./assuranceCert">Open Certificate</a>
       </div>
       <p class="muted">Defensive assurance runs against AMC-controlled interfaces only. Trace storage is hashes/refs, not raw prompts/outputs.</p>
-      <pre class="scroll">${escapeHtml(JSON.stringify({
+      ${recordRows({
         policySignature: policy?.signature,
         readinessGate: gate,
         lastCertStatus: certSummary?.status || null,
         thresholds: policy?.policy?.assurancePolicy?.thresholds || null
-      }, null, 2))}</pre>
+      })}
       `
     ),
     params.card(
@@ -149,9 +150,9 @@ export async function renderAssurancePage(params) {
     await renderAssurancePage(params);
   });
 
-  document.getElementById("assuranceIssueCert")?.addEventListener("click", async () => {
+  document.getElementById("assuranceIssueCert")?.addEventListener("click", async (event) => {
     if (!latestRun?.runId) {
-      alert("No assurance run available to certify.");
+      event.currentTarget.insertAdjacentHTML("afterend", `<p class="action-error status-bad" role="alert" data-feedback="1">There is no assurance run to base a certificate on yet. Run assurance first.</p>`);
       return;
     }
     await params.apiPost("/assurance/cert/issue", {
@@ -160,16 +161,17 @@ export async function renderAssurancePage(params) {
     await renderAssurancePage(params);
   });
 
-  document.getElementById("assuranceRequestWaiver")?.addEventListener("click", async () => {
-    const reason = window.prompt("Waiver reason (required)", "Temporary business continuity while remediating assurance findings");
-    if (!reason || reason.trim().length === 0) {
-      return;
-    }
-    const hoursRaw = window.prompt("Waiver hours (1-72)", "24");
-    const hours = Math.max(1, Math.min(72, Number.parseInt(hoursRaw || "24", 10) || 24));
+  document.getElementById("assuranceRequestWaiver")?.addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    const reason = await askInline(button, { label: "Why a waiver is needed (required)", submit: "Next",
+      check: (text) => text.length < 10 ? "Say a little more: the approvers read this." : null });
+    if (!reason) return;
+    const hoursText = await askInline(button, { label: "How many hours the waiver lasts (1 to 72)", value: "24", type: "number", submit: "Request waiver",
+      check: (text) => /^\d+$/.test(text) && Number(text) >= 1 && Number(text) <= 72 ? null : "Enter a whole number from 1 to 72." });
+    if (!hoursText) return;
     await params.apiPost("/assurance/waiver/request", {
-      reason: reason.trim(),
-      hours
+      reason,
+      hours: Number(hoursText)
     });
     await renderAssurancePage(params);
   });

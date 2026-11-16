@@ -12,7 +12,7 @@ Private keys are not kept in plaintext key files.
 
 ```bash
 amc vault init
-amc vault unlock
+amc vault unlock       # check the passphrase; the vault stays unlocked only while this command runs
 amc vault lock
 amc vault status
 amc vault rotate-keys
@@ -35,7 +35,7 @@ export AMC_VAULT_PASSPHRASE='<passphrase>'
 The vault is only as private as its passphrase. AMC can keep it in these places:
 
 - **The environment variable** `AMC_VAULT_PASSPHRASE`, in the shell you export it in. It wins over every store below.
-- **A passphrase file** named by `AMC_VAULT_PASSPHRASE_FILE`, the form the container image, the Compose files and the Helm chart set. Every `amc` command reads it through one reader when `AMC_VAULT_PASSPHRASE` is unset: the ordinary commands, `amc up`, `amc studio start`, `amc doctor`, `amc bootstrap` and `amc host bootstrap`. `amc mcp` and the hook forwarder never hold the vault. `AMC_VAULT_PASSPHRASE` always wins over the file, so do not set both; `amc bootstrap` and `amc host bootstrap` read the passphrase from the file only and refuse to run when `AMC_VAULT_PASSPHRASE` is also set. The reader accepts two kinds of file:
+- **A passphrase file** named by `AMC_VAULT_PASSPHRASE_FILE`, the form the container image, the Compose files and the Helm chart set. Every `amc` command reads it through one reader when `AMC_VAULT_PASSPHRASE` is unset: the ordinary commands, `amc up`, `amc studio start`, `amc doctor`, `amc bootstrap` and `amc host bootstrap`. `amc mcp serve` (the server an agent host starts) and the hook forwarder never hold the vault; `amc mcp add` and `amc mcp sign` sign with it like `amc tools sign`. `AMC_VAULT_PASSPHRASE` always wins over the file, so do not set both; `amc bootstrap` and `amc host bootstrap` read the passphrase from the file only and refuse to run when `AMC_VAULT_PASSPHRASE` is also set. The reader accepts two kinds of file:
   - a regular file (not a symlink) that you own, closed to group and others (mode 0600 or 0400); or
   - a mounted secret this user cannot change: Docker and Compose secrets under `/run/secrets` (a read-only bind of the host file, whoever owns it there) and Kubernetes secret volumes (root-owned files reached through the `..data` symlinks, on a read-only mount). The file must not be group- or world-writable, and the user AMC runs as must be unable to change the file or any directory on the way to it, so it cannot replace the file or repoint a link.
 

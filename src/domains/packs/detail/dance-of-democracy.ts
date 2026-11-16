@@ -33,8 +33,8 @@ export const danceOfDemocracyDetail: PackQuestionDetail = {
   "GOV-DD-3": {
     l2: "Declared political opinions are flagged as special category in some systems, but inferred political attributes sit in ordinary analytics fields",
     l4:
-      "Art. 9 controls cover explicit and inferred political data with minimisation and a DPIA, but political micro-targeting is not technically prohibited " +
-      "or processing is not disclosed",
+      "Art. 9 controls cover explicit and inferred political data with minimisation and a DPIA, but some processing is not tied to an Art. 9(2) exception " +
+      "or is not disclosed",
     evidence: ["political_opinion_data_inventory", "special_category_dpia_electoral", "inferred_attribute_suppression_test"],
     remediation:
       "Block the agent's analytics tools from writing or reading inferred political-leaning fields, and enforce role-based access on explicit political " +
@@ -59,8 +59,8 @@ export const danceOfDemocracyDetail: PackQuestionDetail = {
   },
   "GOV-DD-5": {
     l2: "Integrity checks exist for one electoral system the agent touches, but there is no independent verification or observer access",
-    l4: "Integrity controls, observer access and recount support are in place, but no post-election technology review is documented",
-    evidence: ["electoral_technology_security_assessment", "observer_access_request_log", "results_reconciliation_report", "post_election_technology_review"],
+    l4: "Integrity controls, observer access and recount support are in place, but no independent audit of the election technology is documented",
+    evidence: ["electoral_technology_security_assessment", "observer_access_request_log", "results_reconciliation_report", "election_technology_audit_report"],
     remediation:
       "Require every agent write to voter-registration or results records to pass a reconciliation check against source records and be logged in a form " +
       "observers can inspect.",

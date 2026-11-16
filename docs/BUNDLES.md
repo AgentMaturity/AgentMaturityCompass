@@ -27,7 +27,7 @@ amc bundle diff <bundleA> <bundleB>
 - `evidence/blobs/*` (referenced blobs)
 - `metadata/exportInfo.json`
 
-When the exporting process runs with `AMC_A4_PREVIEW=1` and the run's agent has A4 Forge projects, the bundle also
+When the A4 preview is on in the exporting process (the default; `AMC_A4_PREVIEW=0` turns it off) and the run's agent has A4 Forge projects, the bundle also
 holds `a4/<projectId>.json` for each one: an `amc.a4-record/v1` record of the project rows as stored and the ledger
 rows they name. Each project's chain is verified before it is exported, and one that does not verify refuses the export.
 `a4/index.json` names each project's exported head and `containsSyntheticExamples`, and `manifest.json` lists it and

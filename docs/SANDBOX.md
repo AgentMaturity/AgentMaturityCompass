@@ -326,4 +326,4 @@ The container receives only the variables named in `envKeys` plus the gateway ro
 
 ## Why It Matters for Scoring
 
-Level 5 is not evaluated in this version: it needs a scoped attestation from a registry under pinned trust (P0-09, P3-04), and no registry issues one yet (see [SCORING_METHODOLOGY](SCORING_METHODOLOGY.md)). The runner also keeps a cap for high-risk agents and questions: without `SANDBOX_EXECUTION_ENABLED` evidence in the window, a level-5 result is capped. While level 5 is not evaluated, that cap changes no result.
+Level 5 is not evaluated in this version: it needs a scoped attestation from a registry under pinned trust, and no registry issues one yet (see [SCORING_METHODOLOGY](SCORING_METHODOLOGY.md)). The runner also keeps a cap for high-risk agents and questions: without `SANDBOX_EXECUTION_ENABLED` evidence in the window, a level-5 result is capped. While level 5 is not evaluated, that cap changes no result.

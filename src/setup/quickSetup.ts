@@ -3,6 +3,7 @@ import { join, resolve } from "node:path";
 import inquirer from "inquirer";
 import { presetGatewayConfigForProvider, saveGatewayConfig, signGatewayConfig, type GatewayConfig } from "../gateway/config.js";
 import { pathExists } from "../utils/fs.js";
+import { vaultExists, vaultStatus } from "../vault/vault.js";
 import { initWorkspace } from "../workspace.js";
 import { generatedPassphraseForInit } from "../cli/initPassphrase.js";
 import { rememberEnabled, rememberVaultPassphrase } from "../vault/passphraseStore.js";
@@ -241,6 +242,14 @@ export async function runQuickSetup(options: QuickSetupOptions): Promise<QuickSe
     logger.log("Initialized AMC workspace (.amc/)");
   } else {
     logger.log("Using existing AMC workspace (.amc/)");
+    adoptVaultPassphraseFile();
+    // CLI-24: re-running setup re-signs the gateway preset. Without a terminal the passphrase remembered at the first setup
+    // is not used (only a person at a terminal gets it), so say that here instead of a bare "vault locked".
+    if (vaultExists(workspace) && !vaultStatus(workspace).unlocked && !process.env.AMC_VAULT_PASSPHRASE) {
+      throw new Error("This folder is already set up, and its vault is locked. Without a terminal, AMC does not use the passphrase it "
+        + "remembered when you first ran amc setup. Run amc setup in a terminal, or set AMC_VAULT_PASSPHRASE_FILE to a file that holds "
+        + "the passphrase, then run it again.");
+    }
   }
 
   let config = presetGatewayConfigForProvider(selectedProvider.presetName);

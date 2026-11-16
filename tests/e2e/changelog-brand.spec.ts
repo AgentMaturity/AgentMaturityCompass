@@ -19,8 +19,8 @@ test.describe("AMC changelog brand shell", () => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       await page.goto(changelogUrl);
 
-      await expect(page.locator(".editorial-wordmark")).toHaveText(/amc_releases/);
-      await expect(page.locator(".editorial-tagline")).toHaveText("Evidence over claims.");
+      await expect(page.locator(".nav-brand")).toHaveText("amc_");
+      await expect(page.locator(".footer-tagline")).toContainText("Evidence over claims.");
       await expect(page.getByRole("heading", { level: 1, name: "Release notes" })).toBeVisible();
       await expect(page.getByRole("heading", { level: 2, name: "1.1.1" })).toBeVisible();
       await expect(page.getByRole("link", { name: "Complete changelog" })).toBeVisible();

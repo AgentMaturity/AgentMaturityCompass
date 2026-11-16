@@ -17,8 +17,8 @@ export const LEVEL_SEMANTICS: ReadonlyArray<{ level: Level; name: string; requir
   { level: 1, name: "Self-declared", requires: "rows tagged to the question, or bound to it by its evidence map, that a registered emitter admits by provenance; self-reported input never yields more than L1" },
   { level: 2, name: "Configuration evidence", requires: "observed rows from every emitter the question's evidence map lists for L2; the map, never the row's own tag, binds them" },
   { level: 3, name: "Runtime evidence", requires: "observed runtime or executed test rows from every emitter the question's evidence map lists for L3, bound by the map; keyword matches never count" },
-  { level: 4, name: "Continuity, anchoring and sampling", requires: "not evaluated until anchoring (P1-25, P1-26) and sampling emitters exist" },
-  { level: 5, name: "Independently attested", requires: "not evaluated until a registry issues scoped attestations under pinned trust (P0-09, P3-04)" }
+  { level: 4, name: "Continuity, anchoring and sampling", requires: "not evaluated until anchoring and sampling emitters exist" },
+  { level: 5, name: "Independently attested", requires: "not evaluated until a registry issues scoped attestations under pinned trust" }
 ];
 
 /** The maturity label band an averaged level falls in (inclusive bounds). */
@@ -45,9 +45,9 @@ export function trustLabelFromIntegrity(integrity: number): TrustLabel {
 }
 
 const L4_NOT_EVALUATED =
-  "L4 needs continuity, anchoring (P1-25, P1-26) and a sampling record; no registered emitter produces them yet";
+  "L4 needs continuity, anchoring and a sampling record; no registered emitter produces them yet";
 const L5_NOT_EVALUATED =
-  "L5 needs a scoped attestation signed by a key with purpose attestation in the pinned trust list (P0-09, P3-04); no registry issues one yet";
+  "L5 needs a scoped attestation signed by a key with purpose attestation in the pinned trust list; no registry issues one yet";
 
 /**
  * The gates a question is scored against, rebuilt from its evidence map.

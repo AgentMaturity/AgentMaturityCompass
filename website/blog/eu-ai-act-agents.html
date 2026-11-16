@@ -1,35 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EU AI Act Compliance for AI Agents — What You Need to Know — AMC Blog</title>
-<meta name="description" content="A current, evidence-first guide to EU AI Act obligations for AI agents, including the 2027 and 2028 high-risk timelines and AMC's non-certification boundary.">
-<meta name="author" content="AMC Team">
-<meta property="og:title" content="EU AI Act Compliance for AI Agents — What You Need to Know">
-<meta property="og:description" content="Aug 2026 deadline approaching. What the EU AI Act requires for AI agents and how to prepare.">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://agentmaturity.co/blog/eu-ai-act-agents.html">
-<meta property="og:image" content="https://agentmaturity.co/og-card.png">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="canonical" href="https://agentmaturity.co/blog/eu-ai-act-agents.html">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%234AEF79' font-size='18' font-weight='bold'%3Ea%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="editorial.css?v=1">
-<script src="editorial.js?v=1" defer></script>
+  <meta charset="UTF-8">
+  <link rel="icon" href="../favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EU AI Act Compliance for AI Agents — What You Need to Know — AMC Blog</title>
+  <meta name="description" content="A current, evidence-first guide to EU AI Act obligations for AI agents, including the 2027 and 2028 high-risk timelines and AMC's non-certification boundary.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="canonical" href="https://agentmaturity.co/blog/eu-ai-act-agents.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="EU AI Act Compliance for AI Agents — What You Need to Know">
+  <meta property="og:description" content="Aug 2026 deadline approaching. What the EU AI Act requires for AI agents and how to prepare.">
+  <meta property="og:url" content="https://agentmaturity.co/blog/eu-ai-act-agents.html">
+  <meta property="og:image" content="https://agentmaturity.co/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="../home.css?v=6">
+  <link rel="stylesheet" href="../pages.css?v=1">
+  <link rel="stylesheet" href="../blog/editorial.css?v=2">
+  <meta name="author" content="AMC Team">
+  <meta property="article:section" content="Journal">
+  <script src="../blog/editorial.js?v=1" defer></script>
 </head>
 <body>
-<a href="#main-content" class="skip-link">Skip to content</a>
+  <a href="#main-content" class="skip-link">Skip to content</a>
 
-<nav class="editorial-topbar" aria-label="Primary">
-  <a href="../" class="editorial-wordmark" aria-label="Agent Maturity Compass home">amc<span class="brand-cursor">_</span><span class="editorial-surface">editorial</span></a>
-  <span class="editorial-tagline">Evidence over claims.</span>
-  <div class="editorial-nav-links">
-    <a href="../">Product</a>
-    <a href="../docs/">Docs</a>
-    <a href="./" aria-current="page">Journal</a>
-    <a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">GitHub</a>
+  <nav class="nav" aria-label="Main">
+    <div class="nav-inner">
+      <a href="../" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>
+      <ul class="nav-links">
+        <li><a href="../#a4-forge">Build an agent</a></li>
+        <li><a href="../#capabilities">Run it</a></li>
+        <li><a href="../#domains">Industries</a></li>
+        <li><a href="../a4.html">A4 Forge</a></li>
+        <li><a href="../docs/index.html">Docs</a></li>
+      </ul>
+      <div class="nav-right">
+        <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="nav-quiet">GitHub</a>
+        <a href="../#install" class="btn btn-primary btn-small">Get AMC</a>
+        <button class="nav-hamburger" aria-label="Menu" aria-controls="navMobile" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+  <div class="nav-mobile" id="navMobile">
+    <a href="../#a4-forge">Build an agent</a>
+    <a href="../#capabilities">Run it</a>
+    <a href="../#domains">Industries</a>
+    <a href="../#paths">Already have an agent?</a>
+    <a href="../#install">Get AMC</a>
+    <a href="../#desktop">macOS app</a>
+    <a href="../#pricing">Price</a>
+    <a href="../a4.html">A4 Forge (preview)</a>
+    <a href="../docs/index.html">Docs</a>
+    <a href="../executive.html">For executives</a>
+    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
   </div>
-</nav>
+
 <main id="main-content" tabindex="-1">
 
 <div class="container">
@@ -39,6 +67,7 @@
 <div class="meta">Updated July 10, 2026 · AMC Team · 7 min read</div>
 
 <h1>EU AI Act Compliance for AI Agents — What You Need to Know</h1>
+<aside class="warning-box editor-note"><strong>Note, 15 November 2026.</strong> Parts of this post are out of date. Today the highest level AMC gives is L2: L3, L4 and L5 are not evaluated yet. Where a record came from caps how high a question can go (self-reported records reach L1 at most); it is not a weight. The current way to install AMC is the source build; the one-line installer gives the older 1.1.1 release. <a href="../methodology.html">How the score works today</a>.</aside>
 
 <p>The EU AI Act applies through a staged timeline, and whether an AI-agent deployment is high-risk depends on its intended purpose, role, and use case. Following the AI Omnibus political agreement, the European Commission's current timeline applies Annex III high-risk rules from <strong>2 December 2027</strong> and product-integrated high-risk rules from <strong>2 August 2028</strong>.</p>
 
@@ -149,7 +178,9 @@
 <h3>1. Assess your current state</h3>
 
 <pre><code><span style="color:#6a9955"># Install AMC</span>
-curl -fsSL https://agentmaturity.co/install.sh | sh
+git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
+cd AgentMaturityCompass
+pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link
 
 <span style="color:#6a9955"># Get your baseline score with EU AI Act classification</span>
 amc compliance report --framework EU_AI_ACT</code></pre>
@@ -177,7 +208,7 @@ amc guide --compliance EU_AI_ACT
 <span style="color:#6a9955"># Map remaining gaps to specific regulatory obligations</span>
 amc guide --go</code></pre>
 
-<p>AMC generates concrete artifacts: guardrails configuration, CI pipeline gates that prevent regressions below L3, governance documentation, and framework-specific config files. These aren't templates — they're generated from your agent's actual gap analysis.</p>
+<p>AMC generates concrete artifacts: guardrails configuration, CI pipeline gates that prevent regressions below L2, the highest level AMC gives today, governance documentation, and framework-specific config files. These aren't templates — they're generated from your agent's actual gap analysis.</p>
 
 <h3>4. Generate the audit binder</h3>
 
@@ -197,8 +228,8 @@ amc report &lt;assessment-id&gt; --html eu-compliance-report.html</code></pre>
 <pre><code><span style="color:#6a9955"># Continuous compliance monitoring</span>
 amc guide --watch
 
-<span style="color:#6a9955"># CI gate: fail builds that drop below L3</span>
-amc guide --ci --target 3
+<span style="color:#6a9955"># CI gate: fail builds that drop below L2</span>
+amc guide --ci --target 2
 
 <span style="color:#6a9955"># Track what improved since last assessment</span>
 amc guide --diff</code></pre>
@@ -239,7 +270,9 @@ amc domain report --domain health --output reports/health-compliance.md</code></
 <div class="cta-box">
   <h3>Start your compliance assessment today</h3>
   <p>AMC is open source and MIT-licensed. Get your EU AI Act gap analysis in 2 minutes.</p>
-  <pre><code>curl -fsSL https://agentmaturity.co/install.sh | sh
+  <pre><code>git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
+cd AgentMaturityCompass
+pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link
 amc compliance report --framework EU_AI_ACT</code></pre>
 </div>
 
@@ -260,9 +293,21 @@ amc compliance report --framework EU_AI_ACT</code></pre>
 </div>
 </main>
 
-<footer class="editorial-footer">
-  © 2026 Agent Maturity Compass · MIT License · <a href="../">Home</a> · <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
-</footer>
+  <footer class="footer">
+    <div class="footer-inner wrap">
+      <div class="footer-top">
+        <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p></div>
+        <div class="footer-col"><h2>Product</h2><a href="../#a4-forge">Build an agent</a><a href="../#capabilities">Run it</a><a href="../#paths">Already have an agent?</a><a href="../#install">Get AMC</a><a href="../#desktop">macOS app</a><a href="../#products">Eight tools</a><a href="../executive.html">Executives</a><a href="../playground.html">Playground</a><a href="../docs/index.html">Documentation</a></div>
+        <div class="footer-col"><h2>Depth</h2><a href="../a4.html">A4 Forge</a><a href="../methodology.html">Approach and research</a><a href="../compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="../#pricing">Price</a><a href="../#faq">FAQ</a></div>
+        <div class="footer-col"><h2>Industry Packs</h2><a href="../#domains">All packs</a><a href="../station-environment.html">Environment</a><a href="../station-health.html">Health</a><a href="../station-wealth.html">Wealth</a><a href="../station-education.html">Education</a><a href="../station-mobility.html">Mobility</a><a href="../station-technology.html">Technology</a><a href="../station-governance.html">Governance</a></div>
+        <div class="footer-col"><h2>Code</h2><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="../accessibility.html">Accessibility</a></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
+    </div>
+  </footer>
 
+  <script src="../script.js?v=13"></script>
+  <script src="../home.js?v=3"></script>
+  <script src="../pages.js?v=2"></script>
 </body>
 </html>

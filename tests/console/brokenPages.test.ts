@@ -140,9 +140,11 @@ describe("requests a VIEWER or the demo session is always refused", () => {
     expect(approvals.indexOf('"local-demo") return [];')).toBeLessThan(approvals.indexOf("apiNativeRequest(API)"));
   });
 
-  test("Org pages ask for a recompute only with OWNER or OPERATOR", () => {
-    const load = bodyOf(app, "async function loadLatestOrgScorecard()");
-    expect(load.indexOf('role === "OWNER" || role === "OPERATOR"')).toBeLessThan(load.indexOf("/org/scorecards/recompute"));
+  test("Org pages never recompute on open; the button that does is for OWNER or OPERATOR (C-01)", () => {
+    expect(bodyOf(app, "async function loadLatestOrgScorecard()")).not.toContain("/org/scorecards/recompute");
+    const empty = bodyOf(app, "function noScorecardCard(title, again)");
+    expect(empty).toContain('<button id="orgScoreBuild" data-roles="OWNER,OPERATOR">');
+    expect(empty).toContain('apiPost("/org/scorecards/recompute"');
     expect(app).toContain('<button id="orgRunStartBtn" data-roles="OWNER,OPERATOR">Run</button>');
   });
 });
@@ -198,11 +200,13 @@ describe("load failures and untrusted text (2026-11-14 source audit)", () => {
     expect(app).toContain('merkleVerify ? (merkleVerify.ok ? "OK" : "FAILED") : "could not load');
   });
 
-  test("the agent id from the URL and Ops server text are escaped; Run Retention asks first", () => {
+  test("the agent id from the URL and Ops server text are escaped; removing old records asks first", () => {
     expect(app).toContain("Issue Lease For ${htmlEscape(currentAgent())}");
     const ops = readFileSync("src/console/assets/ops.js", "utf8");
     expect(ops).not.toMatch(/\+ String\(error\) \+/);
     expect(ops).not.toMatch(/"<pre>" \+ JSON\.stringify/);
-    expect(ops).toMatch(/"retention-run"\)\.addEventListener\("click", async \(\) => \{\n  if \(!window\.confirm\(/);
+    // Changed on purpose (C-16, C-07): the browser confirm box became a second press on the button.
+    expect(ops).toMatch(/action\("retention-run", "\/ops\/retention\/run", \{ dryRun: false \}, [^)]*\n\s*"remove old records \(this cannot be undone\)"\);/);
+    expect(ops).toContain("if (confirmWhat && !confirmPress(event.currentTarget, confirmWhat)) return;");
   });
 });

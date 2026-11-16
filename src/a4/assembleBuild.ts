@@ -381,6 +381,23 @@ function settledView(ctx: A4ProducerContext, planned: PlannedSession): NativeTas
 }
 
 /**
+ * What Review would refuse for this caller now, read before anyone presses it: the codes settledView raises (BUILD_SESSION_OPEN,
+ * BUILD_RUNNING, BUILD_FAILED, SESSION_OWNER_REQUIRED, ...), so the guide offers "Close the build session" and not Review too
+ * early (readiness itself reads no native task). Empty off Assemble's Build step, or with no native service to ask.
+ */
+export function reviewRefusals(native: NativeTaskApiContext | undefined, state: A4ProducerContext["state"], principal: A4ProducerContext["principal"] | null): string[] {
+  if (native === undefined || principal === null || state.project.stage !== "assemble" || state.project.step !== "built") return [];
+  const sessions = (assembleSpecOf(state).spec.build as { sessions?: PlannedSession[] } | undefined)?.sessions ?? [];
+  try {
+    for (const planned of sessions) settledView({ native, principal, state } as A4ProducerContext, planned);
+    return [];
+  } catch (error) {
+    const codes = (error as { detail?: { reasonCodes?: unknown } }).detail?.reasonCodes;
+    return Array.isArray(codes) ? codes.map(String).filter((code) => !code.includes(":")) : [String((error as { code?: unknown }).code ?? "BUILD_SESSION_UNREAD")];
+  }
+}
+
+/**
  * The agent's lifecycle stage as `lifecycle/state.json` records it, read without writing (lifecycleStatus writes a
  * default file when there is none): its `currentStage`, or not_evaluated with the reason when the file is absent,
  * unreadable or not this agent's. The file is unsigned: the record names what was read, never more.

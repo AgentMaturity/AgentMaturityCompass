@@ -1,6 +1,6 @@
 # AFTER_FIRST_SCORE.md — What to do after your first AMC score
 
-You ran `amc` and got a full score: in a terminal, by choosing "Just show my score" in the start menu (or with `amc --no-menu`); in a script or CI, `amc` prints it directly. This page explains the next moves without drowning you in every command AMC has.
+You ran `amc` and got a full score: in a terminal, by choosing "Just show my score" in the start menu (or with `amc --no-menu`); in a script or CI, `amc` prints it directly (in a folder AMC has not set up yet, `amc --yes`). This page explains the next moves without drowning you in every command AMC has.
 
 ---
 
@@ -28,7 +28,7 @@ Read the two trust lines separately:
 - **Artifact status** (`VALID`, `INVALID`, `UNSIGNED`) tells you whether the report and seal verify.
 - **Evidence readiness** (`READY`, `LIMITED`, `INSUFFICIENT_EVIDENCE`, `UNVERIFIED`) tells you whether the evidence can support external claims.
 
-A clean first run commonly reports `VALID` plus `INSUFFICIENT_EVIDENCE`. That is not a contradiction. Signing proves integrity, not evidence sufficiency. Only `READY` is claim-eligible.
+A clean first run commonly reports `VALID` plus `INSUFFICIENT_EVIDENCE`. That is not a contradiction. A signature shows the record is unchanged, not that there is enough evidence. Only `READY` is claim-eligible.
 
 ---
 

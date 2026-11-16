@@ -524,7 +524,7 @@ The AI evaluation, security, and governance landscape has exploded into a fragme
 | **Multi-Regulation Packs** | ⚠️ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅✅ | ❌ | ❌ |
 | **Open Source Core** | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ⚠️ |
 | **Docker/Self-Host** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
-| **CLI (1,304 command paths)** | ✅ | ✅ | ✅ | ⚠️ | ❌ | ✅ | ❌ | ❌ | ❌ |
+| **CLI (1,302 command paths)** | ✅ | ✅ | ✅ | ⚠️ | ❌ | ✅ | ❌ | ❌ | ❌ |
 
 Legend: ✅ = Has feature | ✅✅ = Industry-leading | ⚠️ = Partial/basic | ❌ = Missing
 
@@ -568,23 +568,23 @@ Legend: ✅ = Has feature | ✅✅ = Industry-leading | ⚠️ = Partial/basic |
 
 ## 5. AMC's Unique Advantages (What Nobody Else Has)
 
-These are our moats. No competitor replicates these:
+What AMC has (comparisons with other tools are not verified):
 
-### 🏆 Unmatched Advantages
+### Strengths
 
 | Advantage | Why It Matters | Nearest Competitor Gap |
 |-----------|---------------|----------------------|
-| **Cryptographic Evidence Chains (Ed25519, Merkle trees)** | Tamper-proof audit trail. Essential for regulated industries. ZERO competitors have this. | Credo AI generates evidence but can't prove integrity cryptographically. |
-| **L0-L5 Maturity Scoring** | Progression framework, not pass/fail. Shows journey. Maps to capability maturity (CMMI-style). | Everyone else does binary pass/fail or percentage scores. No maturity model. |
-| **Evidence Trust Tiers (SELF_REPORTED 0.4x, OBSERVED 1.0x)** | Distinguishes between claimed and proven behavior. Unique epistemological approach to AI assessment. | Nobody else weights evidence by collection method. |
-| **Deep diagnostic coverage + broad assurance library** | Deepest assessment library in the market by far. Orders of magnitude more than any competitor. | Promptfoo has ~50 vulnerability types. DeepEval has ~50 metrics. AMC goes far beyond point-in-time vuln checks. |
-| **14 framework adapters** | Direct integration with actual agent frameworks (LangChain, CrewAI, AutoGen, etc.) for behavior capture. | Promptfoo connects to apps via API. Nobody adapts to the agent framework itself. |
-| **Gateway behavioral capture** | Sits between agent and LLM, captures real behavior without agent cooperation. | LangSmith requires SDK integration. AMC gateway is transparent. |
-| **Developer-first + governance depth** | CLI (1,304 command paths) + REST API + Docker + Browser playground. Both developer and governance buyer. | Credo AI is enterprise-only. Promptfoo/DeepEval are dev-only. AMC bridges both. |
+| **Cryptographic Evidence Chains (Ed25519, Merkle trees)** | Tamper-evident audit trail: a change after signing shows up when a record is checked. A signature shows who wrote a record and that it is unchanged, not that it is true. | Competitors' coverage of this is not verified. |
+| **L0-L5 Maturity Scoring** | Progression framework, not pass/fail. Maps to capability maturity (CMMI-style). L2 is the highest level given today. | Other tools' scoring: not verified. |
+| **Evidence source caps the level** | Self-reported records reach L1 at most; only records AMC observed itself reach L2, the highest level today. | Competitors' approach is not verified. |
+| **Deep diagnostic coverage + broad assurance library** | A large question bank and assurance pack library. | Other tools' coverage: not verified. |
+| **16 framework adapters** | Direct integration with actual agent frameworks (LangChain, CrewAI, AutoGen, etc.) for behavior capture. | Other tools' framework integration: not verified. |
+| **Gateway behavioral capture** | Sits between agent and LLM, captures real behavior without agent cooperation. | Other tools' capture method: not verified. |
+| **Developer-first + governance depth** | CLI (1,302 command paths) + REST API + Docker + Browser playground. Both developer and governance buyer. | Other tools' audience: not verified. |
 
 ### Strategic Positioning Summary
 
-AMC is the only tool that answers: **"How mature is this AI agent, and can you PROVE it?"**
+AMC answers: **"How mature is this AI agent, and can you show it?"**
 
 - Promptfoo answers: "Is this AI app secure?"
 - DeepEval answers: "Does this LLM output meet quality metrics?"
@@ -592,7 +592,7 @@ AMC is the only tool that answers: **"How mature is this AI agent, and can you P
 - Credo AI answers: "Is my AI compliant with regulations?"
 - Garak answers: "Can this model be broken?"
 
-**AMC uniquely combines assessment depth + evidence integrity + maturity progression + compliance mapping.** Nobody else does this.
+**AMC combines assessment depth, evidence integrity, maturity progression and compliance mapping.** Whether other tools combine these is not verified.
 
 ---
 

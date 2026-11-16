@@ -210,7 +210,7 @@ test("a turn AMC's own budget refused says so instead of a generic failure, and 
   let current = s.poll(actor, task.taskId).task;
   while (current.state === "running" && Date.now() < deadline) { await new Promise(done => setTimeout(done, 50)); current = s.poll(actor, task.taskId).task; }
   expect(current.state).toBe("failed");
-  expect(current.error).toContain("Signed native budget admission refused this dispatch.");
+  expect(current.error).toContain("AMC's signed budget for this agent refused the model request before sending it.");
   expect(current.error).not.toMatch(/provider reported|quota/i);
   expect(rows(task.sessionId).filter(row => row.event_type === "request/header")).toHaveLength(2);
 });

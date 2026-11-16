@@ -4,6 +4,11 @@ Status: proposed. Implemented behind `AMC_A4_PREVIEW=1`: the spine (P0-54, P1-56
 producers (P1-59 to P1-62), the MCP tools and Node client (P1-64) and the `amc a4` command line (P1-65). Owner: lane S
 of epic E17. Date: 2026-10-11.
 
+Note, 2026-11-14: the owner put A4 at the centre of AMC. A4 Forge stays labelled a preview but is now on by default;
+`AMC_A4_PREVIEW=0` turns every A4 route, page and command off (`a4PreviewEnabled()` in `src/a4/a4Schema.ts`). Where this
+ADR says "behind `AMC_A4_PREVIEW=1`", read "behind the A4 preview gate". The gate, the limitation statements and the
+records are unchanged.
+
 ## Context
 
 A4 Forge guides one agent from a brief to a recorded deployment in four stages (`docs/A4_FORGE.md`). Every stage

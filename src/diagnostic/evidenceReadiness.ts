@@ -4,6 +4,14 @@ import type {
   EvidenceReadinessReasonCode
 } from "../types.js";
 
+import type { ParsedEvidenceEvent } from "./gates.js";
+
+/** CLI-01: what the agent did in the window, so an empty score can say it saw the run but accepted none of it. */
+export function recordedActivityOf(events: readonly ParsedEvidenceEvent[]): { events: number; sessions: number } {
+  const rows = events.filter((event) => event.event_type !== "audit");
+  return { events: rows.length, sessions: new Set(rows.map((event) => event.session_id)).size };
+}
+
 export const CLAIM_READY_INTEGRITY = 0.6 as const;
 export const INSUFFICIENT_INTEGRITY_BELOW = 0.4 as const;
 
@@ -18,7 +26,7 @@ export type DiagnosticEvidenceReadinessInput = Pick<
   | "evidenceCoverage"
   | "evidenceTrustCoverage"
   | "importProvenance"
->;
+> & Partial<Pick<DiagnosticReport, "recordedActivity">>;
 
 function readiness(
   status: DiagnosticEvidenceReadiness["status"],
@@ -108,12 +116,22 @@ export function evaluateDiagnosticEvidenceReadiness(
     );
   }
 
+  if (report.evidenceCoverage <= 0 && (report.recordedActivity?.events ?? 0) > 0) {
+    return readiness(
+      "INSUFFICIENT_EVIDENCE",
+      "Recorded activity, no accepted evidence",
+      ["NO_ACCEPTED_EVIDENCE", "LOW_INTEGRITY"],
+      "AMC recorded what this agent did, but none of it is evidence any question accepts, so every level stays L0. A signature shows who wrote a record and that it is unchanged, not that the score is supported. Use this only as a local baseline.",
+      "A run's own output is recorded but not scored. Scored evidence comes from tool calls AMC carries out or checks: run the agent through AMC (amc, then watch Claude Code or Codex, or chat with a model), then rerun amc. amc explain AMC-1.1 shows what one question accepts."
+    );
+  }
+
   if (report.evidenceCoverage <= 0) {
     return readiness(
       "INSUFFICIENT_EVIDENCE",
       "No accepted evidence",
       ["NO_ACCEPTED_EVIDENCE", "LOW_INTEGRITY"],
-      "The artifact seal is valid, but no accepted evidence supports the score. Signing proves integrity, not evidence sufficiency. Use this only as a local baseline.",
+      "The artifact seal is valid, but no accepted evidence supports the score. A signature shows the record is unchanged, not that there is enough evidence. Use this only as a local baseline.",
       "Connect or capture an agent run, ingest accepted evidence, and rerun amc before making maturity, compliance, or deployment claims."
     );
   }
@@ -123,7 +141,7 @@ export function evaluateDiagnosticEvidenceReadiness(
       "INSUFFICIENT_EVIDENCE",
       "Insufficient evidence integrity",
       ["LOW_INTEGRITY"],
-      "The artifact seal is valid, but evidence integrity is below AMC's minimum claim threshold. Signing proves integrity, not evidence sufficiency.",
+      "The artifact seal is valid, but evidence integrity is below AMC's minimum claim threshold. A signature shows the record is unchanged, not that there is enough evidence.",
       "Collect stronger observed or attested evidence, resolve integrity penalties, and rerun amc."
     );
   }

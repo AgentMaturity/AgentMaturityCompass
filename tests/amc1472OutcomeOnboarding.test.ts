@@ -222,6 +222,8 @@ describe("AMC-1472 outcome-based onboarding", () => {
       "signed_proof",
     ]);
     expect(empty.milestones.every((row) => row.status === "WAITING")).toBe(true);
+    // CLI-30: the next step names the mode, so it does not stop on the mode question where there is no terminal.
+    expect(empty.nextAction?.command).toBe("amc connect --agent default --mode supervise");
 
     initAdaptersConfig(workspace);
     setAgentAdapterProfile(workspace, "default", {

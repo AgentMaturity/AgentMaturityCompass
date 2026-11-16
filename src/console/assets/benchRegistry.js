@@ -1,3 +1,4 @@
+import { recordDetails, showResult } from "./pageKit.js";
 import { apiGet, apiPost, onClaims, showSignIn, whoami } from "./api.js";
 import { installClaimStrip } from "./components/claimBadge.js";
 
@@ -32,7 +33,10 @@ function render(root, registriesPayload) {
     ${card(
       "Configured Registries",
       `
-      <pre class="scroll">${esc(JSON.stringify(registriesPayload, null, 2))}</pre>
+      <p class="muted">A benchmark registry is a place AMC can read other teams' published benchmark results from.</p>
+      ${registries.length ? `<ul>${registries.map((row) => `<li><code>${esc(row.id)}</code>${row.type ? ` (${esc(row.type)})` : ""}</li>`).join("")}</ul>` : "<p>No registries set up yet.</p>"}
+      ${recordDetails(registriesPayload)}
+      <label for="benchRegistriesJson">Edit the registry list (JSON), then apply it</label>
       <div class="row wrap">
         <textarea id="benchRegistriesJson" rows="10" style="width:100%">${esc(
           JSON.stringify(registriesPayload.registries, null, 2)
@@ -48,11 +52,13 @@ function render(root, registriesPayload) {
       "Browse Registry",
       `
       <div class="row wrap">
-        <select id="benchRegistryId">
+        <select id="benchRegistryId" aria-label="Registry"${registries.length ? "" : " disabled"}>
           ${registries.map((row) => `<option value="${esc(row.id)}">${esc(row.id)}</option>`).join("")}
         </select>
-        <input id="benchRegistryQuery" placeholder="optional query" />
-        <button id="benchRegistryBrowse">Browse</button>
+        <input id="benchRegistryQuery" placeholder="Search (optional)" aria-label="Search the registry (optional)" />
+        <button id="benchRegistryBrowse"${registries.length ? "" : " disabled"}>Browse</button>
+      </div>
+      <div class="row wrap">${registries.length ? "" : '<p class="muted">Add a registry above first; then you can browse it here.</p>'}
       </div>
       <pre id="benchRegistryBrowseOut" class="scroll"></pre>
     `
@@ -66,12 +72,12 @@ function wireActions() {
     const raw = document.getElementById("benchRegistriesJson")?.value || "";
     const parsed = parseJson(raw);
     if (!parsed) {
-      out.textContent = "registries JSON is invalid";
+      out.textContent = "That is not valid JSON, so nothing was applied. Check the brackets and quotes.";
       return;
     }
     try {
       const result = await apiPost("/bench/registry/add", { replaceAll: true, config: parsed });
-      out.textContent = JSON.stringify(result, null, 2);
+      showResult(out, result);
     } catch (error) {
       out.textContent = String(error);
     }
@@ -84,7 +90,7 @@ function wireActions() {
     try {
       const suffix = query ? `&query=${encodeURIComponent(query)}` : "";
       const data = await apiGet(`/bench/registry/browse?registryId=${encodeURIComponent(id)}${suffix}`);
-      browseOut.textContent = JSON.stringify(data, null, 2);
+      showResult(browseOut, data);
     } catch (error) {
       browseOut.textContent = String(error);
     }

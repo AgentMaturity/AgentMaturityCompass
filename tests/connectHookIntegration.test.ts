@@ -27,7 +27,7 @@ import {
   mapProviderHookEvent,
   removeHookIntegration
 } from "../src/adapters/hookIntegration.js";
-import { forwardProviderHookEvent } from "../src/adapters/hookForwarder.js";
+import { forwardProviderHookEvent, hookWorkspace } from "../src/adapters/hookForwarder.js";
 import { CLAUDE_CONTROL_STATUS_MESSAGE, CLAUDE_STATUS_MESSAGE, claudeActionId } from "../src/adapters/hookProviders/claudeCode.js";
 import { HOOK_CONTROL_INTEGRATION_ID, HOOK_INTEGRATION_ID } from "../src/adapters/hookProviders/installFiles.js";
 import { boundClaudeCode } from "./helpers/claudeCodeHookFixtures.js";
@@ -612,6 +612,24 @@ describe("AMC provider hook integration", () => {
     expect(readFileSync(paths.ignore, "utf8")).toBe(original);
   });
 
+  test("removal deletes the .claude folder only when the install made it and it is empty (CLI-26)", () => {
+    const workspace = newWorkspace();
+    const paths = hookPaths(workspace, "claude-code");
+    installHookIntegration({ workspace, provider: "claude-code", agentId: "folder-agent" });
+    removeHookIntegration({ workspace, provider: "claude-code" });
+    expect(existsSync(dirname(paths.config))).toBe(false);
+    mkdirSync(dirname(paths.config));
+    installHookIntegration({ workspace, provider: "claude-code", agentId: "folder-agent" });
+    removeHookIntegration({ workspace, provider: "claude-code" });
+    expect(existsSync(dirname(paths.config))).toBe(true);
+  });
+
+  test("a Claude Code hook run from a folder below the project uses CLAUDE_PROJECT_DIR (M-11)", () => {
+    expect(hookWorkspace("claude-code", { CLAUDE_PROJECT_DIR: "/project" }, "/project/sub")).toBe("/project");
+    expect(hookWorkspace("claude-code", { CLAUDE_PROJECT_DIR: "relative" }, "/project/sub")).toBe("/project/sub");
+    expect(hookWorkspace("gemini-cli", { CLAUDE_PROJECT_DIR: "/project" }, "/elsewhere")).toBe("/elsewhere");
+  });
+
   test("removal preserves post-install user changes and revokes the dedicated lease", () => {
     const workspace = newWorkspace();
     const paths = hookPaths(workspace, "claude-code");
@@ -742,7 +760,7 @@ describe("AMC provider hook integration", () => {
       // Codex installs in observe mode since P2-17; Cursor still has no pinned hook contract.
       provider: "cursor" as "claude-code",
       agentId: "unsupported-agent"
-    })).toThrowError(expect.objectContaining<Partial<HookIntegrationError>>({ code: "HOOK_PROVIDER_UNSUPPORTED" }));
+    })).toThrowError(expect.objectContaining<Partial<HookIntegrationError>>({ code: "HOOK_PROVIDER_UNSUPPORTED", message: expect.stringContaining("codex") }));
     expect(() => installHookIntegration({
       workspace,
       provider: "claude-code",

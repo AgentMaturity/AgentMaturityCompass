@@ -19,6 +19,8 @@ export function runGovernorCheck(params: {
   riskTier: RiskTier;
   mode: ExecutionMode;
   hasExecTicket?: boolean;
+  /** See GovernorDecisionInput.approvedByPerson: set only by a caller that verifies the approval against the call. */
+  approvedByPerson?: boolean;
 }) {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const policy = loadActionPolicy(params.workspace);
@@ -39,6 +41,7 @@ export function runGovernorCheck(params: {
     freezeStatus: freeze,
     budgetStatus: budget,
     hasExecTicket: params.hasExecTicket,
+    approvedByPerson: params.approvedByPerson,
     policy,
     policySignatureValid: signature.valid
   });

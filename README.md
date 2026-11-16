@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C569-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C609-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -73,7 +73,7 @@ AMC set up this folder (.amc/).
   Just show my score (empty for now)
 ```
 
-Move with the arrow keys and press Enter. The menu only lists what can work right now: a coding agent that is not installed is left out, one that is signed out shows "Sign in to … first", and "Chat with a model" appears when an API key such as `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` is set in your shell. In a pipe, in CI or inside an agent's shell, `amc` prints the score instead, as it always did; `amc --no-menu` or `AMC_NO_MENU=1` does the same in a terminal. `amc --help` lists the few commands you need first; `amc --help --all` lists every command.
+Move with the arrow keys and press Enter. The menu only lists what can work right now: a coding agent that is not installed is left out, one that is signed out shows "Sign in to … first", and "Chat with a model" appears when an API key such as `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` is set in your shell. In a pipe, in CI or inside an agent's shell, `amc` prints the score instead (in a folder AMC has not set up yet, run `amc --yes` so it may create `.amc/` without a terminal to ask); `amc --no-menu` or `AMC_NO_MENU=1` does the same in a terminal. `amc --help` lists the few commands you need first; `amc --help --all` lists every command.
 
 Three short paths:
 
@@ -333,7 +333,7 @@ Industry Packs are free in the current source build: every pack's questions and 
 ```bash
 amc domain pack list                       # all 41 packs and their question counts
 amc domain pack describe --pack <packId>   # a pack's regulatory basis and every question
-amc domain pack run --pack <packId>        # in a terminal: choose L1, L3 or L5 for each question
+amc domain pack run --pack <packId>        # in a terminal: choose L1 to L5 for each question, or skip it
 amc domain pack run --pack <packId> --baseline --json   # no answers: every question not evaluated, no score
 ```
 
@@ -459,19 +459,19 @@ A4 Forge takes one agent from a brief to a recorded, customer-controlled deploym
 
 **What the records are, and are not.** Every record A4 writes is signed and `self_reported` (references to stub-model runs are labelled `synthetic_example`); runtime observations enter only by reference to rows the runtime wrote. A signature proves who wrote a record and that it is unchanged, never that its statement is true, and no A4 output says the agent is safe, correct or lawful. Separation of duties keeps a gate's author, requester and builders from approving it, and under the default approval policy the Assemble completion, Adapt and Activate gates need two approvals each, so a full walk needs the owner plus two more approvers with the roles each gate allows, one of them an AUDITOR for Adapt's completion ([who approves which gate](docs/A4_FORGE.md#approvals-and-separation-of-duties)). Two members of one workspace are not two independent reviews. The regulatory records Adapt uses are `experimental`: drafted by an agent, with citations not yet fetched, hashed or legally reviewed, and approved by no named expert. AMC never deploys: it prepares the plan and records what the operator says happened.
 
-**Try it.** A4 Forge is in the current source build only (see [From source](#from-source)); the published 1.1.1 release does not contain it. Set `AMC_A4_PREVIEW=1` in the environment Studio starts in and for each `amc a4` command; a Studio that is already running keeps its environment, so run `amc down` first. Creating a project needs a signed-in local account with the OWNER or OPERATOR role ([RBAC](docs/RBAC.md)). Workspace OWNERs decide gates as implicit project owners; an APPROVER or AUDITOR decides only once added as a project member with the approver role, so add them before requesting a gate, because adding a member supersedes open gates. On a Studio that does not run under Compose or Helm, Activate's release approval is refused (`deployment.same_host`, P2-40), so the walk ends after Adapt.
+**Try it.** A4 Forge is in the current source build only (see [From source](#from-source)); the published 1.1.1 release does not contain it. It is a preview, on by default: `AMC_A4_PREVIEW=0` in the environment Studio starts in (or of an `amc a4` command) turns it off, and a Studio that is already running keeps its environment. Creating a project needs a signed-in local account with the OWNER or OPERATOR role ([RBAC](docs/RBAC.md)). Workspace OWNERs decide gates as implicit project owners; an APPROVER or AUDITOR decides only once added as a project member with the approver role, so add them before requesting a gate, because adding a member supersedes open gates. On a Studio that does not run under Compose or Helm, Activate's release approval is refused (`deployment.same_host`, P2-40), so the walk ends after Adapt.
 
 ```bash
-AMC_A4_PREVIEW=1 amc up                     # starts Studio with the A4 page
+amc up                                      # starts Studio with the A4 page
 amc user init --username <you>              # first console login (OWNER); with existing logins use amc user add
                                             # then sign in to the Compass Console and start a project on its A4 page
-AMC_A4_PREVIEW=1 amc a4 list                # the projects this identity may read
-AMC_A4_PREVIEW=1 amc a4 guide <projectId>   # the next action, the head seq, and the pins each open gate's decision needs
-AMC_A4_PREVIEW=1 amc a4 readiness <projectId>
+amc a4 list                                 # the projects this identity may read
+amc a4 guide <projectId>                    # the next action, the head seq, and the pins each open gate's decision needs
+amc a4 readiness <projectId>
 amc approvals login --username <you> --token-file <file>   # the session file every amc a4 write names
 # before a gate, add each approver who is not a workspace OWNER (<n>: the head seq amc a4 guide printed)
-AMC_A4_PREVIEW=1 amc a4 members <projectId> --member LOCAL_USER:<userId> --project-role approver --session-token-file <file> --expect-head-seq <n>
-AMC_A4_PREVIEW=1 amc a4 verify <projectId> --trust-list <file> --allow-unanchored   # the chain's integrity (exit 2): a project's ledger is unanchored, so it never reads trusted
+amc a4 members <projectId> --member LOCAL_USER:<userId> --project-role approver --session-token-file <file> --expect-head-seq <n>
+amc a4 verify <projectId> --trust-list <file> --allow-unanchored   # the chain's integrity (exit 2): a project's ledger is unanchored, so it never reads trusted
 ```
 
 **Status: preview.** Without the variable, the `/api/v1/a4` routes answer 404 `A4_PREVIEW_DISABLED`, Studio shows no A4 entry, and every `amc a4` command refuses with exit code 1. `amc mcp serve` started with the variable adds five A4 tools (four reads and a self-reported comment), and the Node SDK's `createA4Client` calls the routes of a Studio that has it. Not available yet: independently reviewed claims (P2-24, P3-21); a real deployment target (P2-40: v1 records a same-host restart of the Studio that built the agent, and AMC's own destination check cannot report `passed`); CI qualification of the Compose and Helm overlays. Details: [docs/A4_FORGE.md](docs/A4_FORGE.md).
@@ -631,7 +631,7 @@ amc up
 amc connect hooks install --provider claude-code --mode control --agent my-agent
 ```
 
-The default `observe` mode preserves unrelated provider settings, adds a managed `.gitignore` rule for `.amc/hooks/`, stores a dedicated `hook:observe` lease outside provider config with mode `0600`, signs its ownership manifest, and removes only the AMC-owned handlers and ignore block. It records requested actions and their completed or failed terminal state under one stable action ID. `hooks health` distinguishes an intact installation awaiting its first event from the latest receipt-verified event and from fail-closed drift, expiry, malformed metadata, or evidence tamper. Last-observed time is historical evidence, not a claim that the provider is live now. A locked Vault cannot authenticate encrypted event bodies, so health exits 2 with `HOOK_EVIDENCE_UNAVAILABLE`; run `amc vault unlock` or set `AMC_VAULT_PASSPHRASE` for non-interactive use. The lifecycle command verifies each receipt and fails closed on missing, ambiguous, conflicting, cross-agent, out-of-order, or tampered evidence. Tool arguments, outputs, error messages, cwd, transcript paths, and raw session IDs are not retained.
+The default `observe` mode preserves unrelated provider settings, adds a managed `.gitignore` rule for `.amc/hooks/`, stores a dedicated `hook:observe` lease outside provider config with mode `0600`, signs its ownership manifest, and removes only the AMC-owned handlers and ignore block. It records requested actions and their completed or failed terminal state under one stable action ID. `hooks health` distinguishes an intact installation awaiting its first event from the latest receipt-verified event and from fail-closed drift, expiry, malformed metadata, or evidence tamper. Last-observed time is historical evidence, not a claim that the provider is live now. A locked Vault cannot authenticate encrypted event bodies, so health exits 2 with `HOOK_EVIDENCE_UNAVAILABLE`; export `AMC_VAULT_PASSPHRASE` in the shell that runs the check (`amc vault unlock` lasts only for its own command). The lifecycle command verifies each receipt and fails closed on missing, ambiguous, conflicting, cross-agent, out-of-order, or tampered evidence. Tool arguments, outputs, error messages, cwd, transcript paths, and raw session IDs are not retained.
 
 `--mode control` is an explicit loopback-only Enforce path. It adds `hook:control`, evaluates raw provider input in memory without retaining it, reuses signed ToolHub, Action Policy, Approval Policy, budget, freeze, maturity, and assurance gates, and binds the exact native response to a signed receipt. For Claude Code AMC only restricts: it denies, or lets a call through with an empty answer so Claude Code's own permissions still decide, and only for AMC's signed decision bound to that exact payload. A provider-local ask is not AMC approval and AMC has no approval path for hook calls, so a call that needs approval is denied. Control mode also installs SessionStart (session registration), UserPromptSubmit (admission) and Stop hooks; [docs/adapters/claude-code-hooks.md](docs/adapters/claude-code-hooks.md) states the claim per hook, the managed-settings delivery and the limits. Gemini CLI has no native `ask` result, so AMC converts that outcome to an explicit deny. Multi-user or distinct-user AMC quorum is never weakened to one provider prompt. Codex is supported in observe mode only (`--provider codex --mode observe`; [codex.md](docs/adapters/codex.md)). Cursor, OpenCode, and other providers remain unsupported until their native per-tool hook contracts are pinned and fixture-tested.
 
@@ -888,7 +888,7 @@ AMC is **free and MIT licensed**, and in the current source build all 41 Industr
 
 | Tier | What you get |
 |---|---|
-| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 41 Industry Packs, all <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, 1,304 registered CLI command paths, browser playground, CI gates |
+| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 41 Industry Packs, all <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, 1,302 registered CLI command paths, browser playground, CI gates |
 | **Enterprise (contact-first; not self-serve)** | Planned priority support, custom pack development, and deployment assistance; not needed for any feature or pack |
 
 > Industry Packs are 41 sector-specific questionnaires (healthcare, finance, education, logistics, government, etc.) that need ongoing regulatory research and expert review; their content stays experimental until a named expert signs it. See [`website/publication-status.json`](website/publication-status.json) for what each distribution channel publishes before making any availability claim.
@@ -923,7 +923,7 @@ AMC is **free and MIT licensed**, and in the current source build all 41 Industr
 | [Community Demo Kit](docs/COMMUNITY_DEMO_KIT.md) | [Why AMC One-Pager](docs/WHY_AMC_ONE_PAGER.md) |
 | [Solo Dev Quickstart](docs/SOLO_DEV_QUICKSTART.md) | [Platform Engineer Quickstart](docs/PLATFORM_ENGINEER_QUICKSTART.md) |
 | [Security & Compliance Quickstart](docs/SECURITY_COMPLIANCE_QUICKSTART.md) | [Troubleshooting](docs/TROUBLESHOOTING.md) |
-| [CLI Reference (1,304 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
+| [CLI Reference (1,302 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
 | [Compatibility Matrix](docs/COMPATIBILITY_MATRIX.md) | [Starter Blueprints](docs/STARTER_BLUEPRINTS.md) |
 | [Install Packages](docs/INSTALL_PACKAGES.md) | [Support Policy](docs/SUPPORT_POLICY.md) |
 | [Release Cadence](docs/RELEASE_CADENCE.md) | [CI Templates](docs/CI_TEMPLATES.md) |
@@ -1038,7 +1038,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,569<!-- /amc:count --> test source files; Vitest reports run outcomes
+cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,609<!-- /amc:count --> test source files; Vitest reports run outcomes
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
@@ -1059,6 +1059,6 @@ cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- a
 ---
 
 <p align="center">
-  <strong><!-- amc:count:diagnosticQuestions -->244<!-- /amc:count --> default diagnostic questions + 20 lifecycle expansion questions · <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs · 41 domain packs · <!-- amc:count:adapters -->16<!-- /amc:count --> adapters · 1,304 CLI command paths</strong><br>
+  <strong><!-- amc:count:diagnosticQuestions -->244<!-- /amc:count --> default diagnostic questions + 20 lifecycle expansion questions · <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs · 41 domain packs · <!-- amc:count:adapters -->16<!-- /amc:count --> adapters · 1,302 CLI command paths</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>

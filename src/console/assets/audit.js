@@ -1,3 +1,4 @@
+import { askInline, recordRows } from "./pageKit.js";
 import { renderControlFamilyCard } from "./components/controlFamilyCard.js";
 import { renderControlStatusChip } from "./components/controlStatusChip.js";
 
@@ -82,11 +83,11 @@ export async function renderAuditPage(params) {
       <div class="muted">integrity=${esc(trust?.integrityIndex ?? "-")} correlation=${esc(trust?.correlationRatio ?? "-")} observed=${esc(trust?.evidenceCoverage?.observedShare ?? "-")}</div>
       <div class="muted">diagnostic cadence: configured=${esc(recurrence?.diagnosticCadence?.configuredHours ?? "-")}h next=${esc(iso(recurrence?.diagnosticCadence?.nextRunTs))}</div>
       <div class="muted">assurance cadence: configured=${esc(recurrence?.assuranceCadence?.configuredHours ?? "-")}h next=${esc(iso(recurrence?.assuranceCadence?.nextRunTs))}</div>
-      <pre class="scroll">${esc(JSON.stringify({
+      ${recordRows({
         policySignature: policy?.signature || null,
         activeMapSignature: activeMap?.signatures?.active || null,
         readiness: auditReadiness || null
-      }, null, 2))}</pre>
+      })}
       `
     ),
     params.card(
@@ -105,8 +106,9 @@ export async function renderAuditPage(params) {
     await renderAuditPage(params);
   });
 
-  document.getElementById("auditExportNow")?.addEventListener("click", async () => {
-    const outFile = window.prompt("Output .amcaudit path", ".amc/audit/binders/exports/workspace/workspace/manual.amcaudit");
+  document.getElementById("auditExportNow")?.addEventListener("click", async (event) => {
+    const outFile = await askInline(event.currentTarget, { label: "Save the binder to (a path inside the workspace, ending in .amcaudit)",
+      value: ".amc/audit/binders/exports/workspace/workspace/manual.amcaudit", submit: "Save", check: (text) => text.endsWith(".amcaudit") ? null : "The file name must end in .amcaudit." });
     if (!outFile) {
       return;
     }

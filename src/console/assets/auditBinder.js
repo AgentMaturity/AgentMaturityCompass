@@ -1,3 +1,4 @@
+import { askInline, recordRows } from "./pageKit.js";
 import { renderEvidenceRefList } from "./components/evidenceRefList.js";
 import { renderControlStatusChip } from "./components/controlStatusChip.js";
 import { renderBinderVerifyPanel } from "./components/binderVerifyPanel.js";
@@ -28,7 +29,8 @@ export async function renderAuditBinderPage(params) {
     ? exports.find((row) => row.binderId === selectedBinderId) || null
     : exports[0] || null;
   const cached = listed?.cache?.workspace || null;
-  const verifyTarget = selected?.binderId || cached?.binderId || "";
+  // Only an exported binder has a signed file to check; the working copy (cache) is not one (it would answer 404).
+  const verifyTarget = selected?.binderId || "";
   const verify = verifyTarget
     ? await params.apiGet(`/audit/binders/${encodeURIComponent(verifyTarget)}/verify`).catch(() => null)
     : null;
@@ -36,9 +38,11 @@ export async function renderAuditBinderPage(params) {
 
   const warnings = [];
   if (!binder) {
-    warnings.push("<div class='card status-warn'><strong>No binder cache/export available.</strong></div>");
+    warnings.push("<div class='card status-warn'><strong>No binder yet.</strong> Refresh the binder on the Audit page, or export a new one below.</div>");
+  } else if (!selected) {
+    warnings.push("<div class='card'><strong>This is the working copy</strong>, not an exported binder, so there is no signed file to check yet. Export a new binder to get one.</div>");
   } else if (!verify?.ok) {
-    warnings.push("<div class='card status-bad'><strong>UNTRUSTED BINDER</strong></div>");
+    warnings.push("<div class='card status-bad'><strong>This binder did not pass its check:</strong> it was changed after signing, or AMC cannot confirm who signed it.</div>");
   }
 
   params.root.innerHTML = [
@@ -64,14 +68,14 @@ export async function renderAuditBinderPage(params) {
     renderBinderVerifyPanel(verify),
     params.card(
       "Sections",
-      `<pre class="scroll">${esc(JSON.stringify({
+      `${recordRows({
         maturity: binder?.sections?.maturity || null,
         governance: binder?.sections?.governance || null,
         modelToolGovernance: binder?.sections?.modelToolGovernance || null,
         assurance: binder?.sections?.assurance || null,
         supplyChainIntegrity: binder?.sections?.supplyChainIntegrity || null,
         recurrence: binder?.sections?.recurrence || null
-      }, null, 2))}</pre>`
+      })}`
     ),
     params.card(
       "Exports",
@@ -87,8 +91,9 @@ export async function renderAuditBinderPage(params) {
     await renderAuditBinderPage(params);
   });
 
-  document.getElementById("auditBinderExport")?.addEventListener("click", async () => {
-    const outFile = window.prompt("Output .amcaudit path", ".amc/audit/binders/exports/workspace/workspace/manual.amcaudit");
+  document.getElementById("auditBinderExport")?.addEventListener("click", async (event) => {
+    const outFile = await askInline(event.currentTarget, { label: "Save the new binder to (a path inside the workspace, ending in .amcaudit)",
+      value: ".amc/audit/binders/exports/workspace/workspace/manual.amcaudit", submit: "Save", check: (text) => text.endsWith(".amcaudit") ? null : "The file name must end in .amcaudit." });
     if (!outFile) {
       return;
     }

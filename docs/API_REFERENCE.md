@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-11-14
+> Auto-generated from source on 2026-11-16
 
 ## Table of Contents
 
@@ -13,11 +13,11 @@
 
 ## CLI Commands
 
-AMC provides 1,304 public CLI command paths in the live command inventory.
+AMC provides 1,302 public CLI command paths in the live command inventory.
 
 | # | Command | Description |
 |---|---------|-------------|
-| 1 | `amc a4` | A4 Forge (preview, AMC_A4_PREVIEW=1): projects, gates, releases and deployments, through the API's own routes |
+| 1 | `amc a4` | A4 Forge (preview, on by default; AMC_A4_PREVIEW=0 turns it off): projects, gates, releases and deployments, through the API's own routes |
 | 2 | `amc a4 approve` | Approve an A4 gate you reviewed (bound to its digests) |
 | 3 | `amc a4 complete` | Consume an approved gate and run the effect it starts (the API's complete) |
 | 4 | `amc a4 deny` | Deny an A4 gate you reviewed (bound to its digests) |
@@ -221,7 +221,7 @@ AMC provides 1,304 public CLI command paths in the live command inventory.
 | 202 | `amc bootstrap` | Bootstrap workspace for production deployment (non-interactive) |
 | 203 | `amc budgets` | Signed autonomy and usage budgets |
 | 204 | `amc budgets init` | - |
-| 205 | `amc budgets reset` | - |
+| 205 | `amc budgets reset` | Record a budget-day reset (it does not restore allowance), or accept earlier unknown model usage |
 | 206 | `amc budgets sign` | Validate and sign the existing reviewed budget limits without changing the policy |
 | 207 | `amc budgets status` | - |
 | 208 | `amc budgets verify` | - |
@@ -735,7 +735,7 @@ AMC provides 1,304 public CLI command paths in the live command inventory.
 | 716 | `amc marketplace undeprecate` | Remove deprecation from a pack |
 | 717 | `amc marketplace uninstall` | Uninstall a pack |
 | 718 | `amc mcp` | AMC Model Context Protocol (MCP) server for AI coding assistants, and scoped MCP server configs for the native loop |
-| 719 | `amc mcp add` | Write an unreviewed MCP server config to the user or project scope; review and sign it before mounting |
+| 719 | `amc mcp add` | Add an MCP server to the user or project scope: at a terminal it shows the server's tools and allows them after you type yes; otherwise it writes an unreviewed file |
 | 720 | `amc mcp config` | Print MCP configuration snippets for supported AI coding assistants |
 | 721 | `amc mcp get` | Show one scoped config (id, project:id or user:id) as --mcp would admit it |
 | 722 | `amc mcp list` | List scoped MCP server configs: scope, path, digest, transport, review and signature state; never secrets |
@@ -1288,39 +1288,37 @@ AMC provides 1,304 public CLI command paths in the live command inventory.
 | 1269 | `amc vault scrub` | Scrub metadata from a file |
 | 1270 | `amc vault secret-share` | Split a secret into shares using Shamir's Secret Sharing |
 | 1271 | `amc vault status` | Show vault status |
-| 1272 | `amc vault unlock` | Unlock vault into memory for signing operations |
+| 1272 | `amc vault unlock` | Check the vault passphrase (the vault stays unlocked only while this command runs) |
 | 1273 | `amc vault zk-commit` | Create a Pedersen commitment to a value |
-| 1274 | `amc vault zk-range-proof` | Create a range commitment for an AMC score threshold (NOT a zero-knowledge proof; unsound, does not verify) |
-| 1275 | `amc vault zk-verify` | Check a range commitment (NOT a zero-knowledge verification; unsound) |
-| 1276 | `amc verify` | Verify integrity across AMC artifacts |
-| 1277 | `amc verify all` | Verify trust/policies/plugins/logs/ledger/artifacts in one pass |
-| 1278 | `amc vibe-audit` | Run static safety checks for AI-generated code |
-| 1279 | `amc watch` | Observability, attestation, and safety testing |
-| 1280 | `amc watch alerts` | Show recent alerts for a monitored agent |
-| 1281 | `amc watch attest` | Attest an agent output |
-| 1282 | `amc watch connect` | Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook) |
-| 1283 | `amc watch explain` | Generate explainability packet for an agent run |
-| 1284 | `amc watch host-hardening` | Check host hardening status for this AMC deployment |
-| 1285 | `amc watch profiler-anomalies` | List detected behavioral anomalies for an agent |
-| 1286 | `amc watch profiler-start` | Start behavioral profiling for an agent |
-| 1287 | `amc watch profiler-status` | Show behavioral profiler status and any recent anomalies |
-| 1288 | `amc watch providers` | Show connected observability providers and trace stats |
-| 1289 | `amc watch safety-test` | Run safety tests for an agent |
-| 1290 | `amc watch start` | Start continuous production monitoring for an agent |
-| 1291 | `amc watch status` | Show all monitored agents and their current state |
-| 1292 | `amc whatif` | Equalizer what-if simulator |
-| 1293 | `amc whatif equalizer` | - |
-| 1294 | `amc whatif targets` | - |
-| 1295 | `amc why-capped` | Show why each question is capped at its current level |
-| 1296 | `amc wire` | Serve the NDJSON JSON-RPC wire; optionally execute accepted work through an owner-configured native route |
-| 1297 | `amc wiring-status` | Show in-process production wiring counters (cannot observe other processes) |
-| 1298 | `amc workorder` | Signed work order operations |
-| 1299 | `amc workorder create` | Create and sign a work order |
-| 1300 | `amc workorder expire` | Expire/revoke a work order |
-| 1301 | `amc workorder list` | List work orders for agent |
-| 1302 | `amc workorder show` | Show signed work order JSON |
-| 1303 | `amc workorder verify` | Verify work order signature |
-| 1304 | `amc wrap` | DEPRECATED — use 'amc adapters run', which also mints a lease and routes through the gateway. Wraps a runtime and captures tamper-evident evidence. |
+| 1274 | `amc verify` | Verify integrity across AMC artifacts |
+| 1275 | `amc verify all` | Verify trust/policies/plugins/logs/ledger/artifacts in one pass |
+| 1276 | `amc vibe-audit` | Run static safety checks for AI-generated code |
+| 1277 | `amc watch` | Observability, attestation, and safety testing |
+| 1278 | `amc watch alerts` | Show recent alerts for a monitored agent |
+| 1279 | `amc watch attest` | Attest an agent output |
+| 1280 | `amc watch connect` | Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook) |
+| 1281 | `amc watch explain` | Generate explainability packet for an agent run |
+| 1282 | `amc watch host-hardening` | Check host hardening status for this AMC deployment |
+| 1283 | `amc watch profiler-anomalies` | List detected behavioral anomalies for an agent |
+| 1284 | `amc watch profiler-start` | Start behavioral profiling for an agent |
+| 1285 | `amc watch profiler-status` | Show behavioral profiler status and any recent anomalies |
+| 1286 | `amc watch providers` | Show connected observability providers and trace stats |
+| 1287 | `amc watch safety-test` | Run safety tests for an agent |
+| 1288 | `amc watch start` | Start continuous production monitoring for an agent |
+| 1289 | `amc watch status` | Show all monitored agents and their current state |
+| 1290 | `amc whatif` | Equalizer what-if simulator |
+| 1291 | `amc whatif equalizer` | - |
+| 1292 | `amc whatif targets` | - |
+| 1293 | `amc why-capped` | Show why each question is capped at its current level |
+| 1294 | `amc wire` | Serve the NDJSON JSON-RPC wire; optionally execute accepted work through an owner-configured native route |
+| 1295 | `amc wiring-status` | Show in-process production wiring counters (cannot observe other processes) |
+| 1296 | `amc workorder` | Signed work order operations |
+| 1297 | `amc workorder create` | Create and sign a work order |
+| 1298 | `amc workorder expire` | Expire/revoke a work order |
+| 1299 | `amc workorder list` | List work orders for agent |
+| 1300 | `amc workorder show` | Show signed work order JSON |
+| 1301 | `amc workorder verify` | Verify work order signature |
+| 1302 | `amc wrap` | DEPRECATED — use 'amc adapters run', which also mints a lease and routes through the gateway. Wraps a runtime and captures tamper-evident evidence. |
 
 ### Command Details
 
@@ -2843,13 +2841,14 @@ Bootstrap workspace for production deployment (non-interactive)
 
 #### `amc budgets reset`
 
--
+Record a budget-day reset (it does not restore allowance), or accept earlier unknown model usage
 
 
 | Option | Description |
 |--------|-------------|
 | `--agent <agentId>` | - |
 | `--day <yyyy-mm-dd>` | - |
+| `--accept-unknown` | - |
 
 #### `amc budgets sign`
 
@@ -3541,6 +3540,7 @@ Alias: `amc comply risk-classify`
 |--------|-------------|
 | `--agent <agentId>` | - |
 | `--capabilities <json>` | - |
+| `--guide` | - |
 | `--biometric` | - |
 | `--critical-infra` | - |
 | `--education` | - |
@@ -3553,9 +3553,15 @@ Alias: `amc comply risk-classify`
 | `--social-scoring` | - |
 | `--subliminal` | - |
 | `--exploits-vulnerabilities` | - |
+| `--crime-prediction` | - |
+| `--face-scraping` | - |
 | `--emotion-recognition` | - |
+| `--sensitive-biometric-categorisation` | - |
+| `--intimate-imagery` | - |
+| `--child-abuse-material` | - |
 | `--chatbot` | - |
 | `--synthetic-content` | - |
+| `--deep-fakes` | - |
 | `--human-interaction` | - |
 | `--safety-component` | - |
 | `--json` | - |
@@ -7003,7 +7009,7 @@ Uninstall a pack
 
 #### `amc mcp add`
 
-Write an unreviewed MCP server config to the user or project scope; review and sign it before mounting
+Add an MCP server to the user or project scope: at a terminal it shows the server's tools and allows them after you type yes; otherwise it writes an unreviewed file
 
 
 | Option | Description |
@@ -7017,6 +7023,9 @@ Write an unreviewed MCP server config to the user or project scope; review and s
 | `--timeout-ms <n>` | - |
 | `--credentials-home <dir>` | - |
 | `--force` | - |
+| `--action-class <class>` | - |
+| `--tool <name>` | - |
+| `--yes` | - |
 | `--json` | - |
 
 #### `amc mcp config`
@@ -9920,6 +9929,7 @@ Show a session's projected conversation and its event spine
 | Option | Description |
 |--------|-------------|
 | `--json` | - |
+| `--spine` | - |
 | `--limit <rows>` | - |
 | `--cursor <cursor>` | - |
 
@@ -11092,17 +11102,6 @@ Create a Pedersen commitment to a value
 | Option | Description |
 |--------|-------------|
 | `--value <n>` | - |
-
-#### `amc vault zk-range-proof`
-
-Create a range commitment for an AMC score threshold (NOT a zero-knowledge proof; unsound, does not verify)
-
-
-| Option | Description |
-|--------|-------------|
-| `--value <n>` | - |
-| `--threshold <n>` | - |
-| `--agent <id>` | - |
 
 #### `amc verify`
 

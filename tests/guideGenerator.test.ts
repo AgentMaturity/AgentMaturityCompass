@@ -461,7 +461,8 @@ describe("guideGenerator", () => {
       const guide = generateGuide({ overall: 0, questionScores: scores, targetLevel: 3 });
       const ocSection = guide.sections.find(s => s.questionId === ocQuestion.id);
       if (ocSection) {
-        expect(ocSection.cliCommands.some(c => c.includes("overCompliance"))).toBe(true);
+        // The pack id is over-compliance (overCompliance named no pack; CLI-18).
+        expect(ocSection.cliCommands).toContain("amc assurance run --pack over-compliance");
       }
     }
   });
@@ -556,7 +557,8 @@ describe("guideGenerator", () => {
 
     expect(md).toContain("Verify this question");
     expect(md).toContain("amc explain");
-    expect(md).toContain("amc score formal-spec --question");
+    // `amc score formal-spec` has no --question option; the guide no longer suggests it (CLI-18).
+    expect(md).not.toContain("formal-spec --question");
   });
 
   it("human markdown includes getting-started for L0-L1 agents", () => {

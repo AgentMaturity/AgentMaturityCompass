@@ -78,8 +78,11 @@ describe("AMC first-party typography artifact", () => {
 
     for (const path of ["website/404.html", "website/methodology.html", "website/vs-promptfoo.html", "website/compliance.html"]) {
       const source = readFileSync(resolve(root, path), "utf8");
-      expect(source, path).toContain("brand.css");
-      expect(source, path).toMatch(/--amc-font-(?:sans|mono)|var\(--amc-font-(?:sans|mono)\)/);
+      // A page either links brand.css itself or links home.css, which imports it and sets its type from it.
+      const styles = source.includes("brand.css") ? source : readFileSync(resolve(root, "website/home.css"), "utf8");
+      expect(source, path).toMatch(/brand\.css|home\.css\?v=\d+/);
+      if (!source.includes("brand.css")) expect(styles).toContain('@import url("./brand.css")');
+      expect(styles, path).toMatch(/--amc-font-(?:sans|mono)|var\(--amc-font-(?:sans|mono)\)/);
     }
   });
 
