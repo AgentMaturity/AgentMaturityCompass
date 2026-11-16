@@ -5,6 +5,7 @@ import type { AssurancePackDefinition } from "./validators.js";
 import { scenarioGradingMethod } from "./scenarioGrading.js";
 import { describeEffectSummary } from "./effectGrading.js";
 import { wilson95 } from "./judges/calibration.js";
+import { isEffectNotEvaluated } from "./scorers.js";
 
 type Outcome = "PASS" | "FAIL" | "NOT EVALUATED";
 
@@ -36,14 +37,16 @@ export function packAttempts(pack: Pick<AssurancePackResult, "scenarioResults">)
 }
 /** Attack tries pooled over a pack's effect-graded scenarios, with a Wilson interval; null when none were measured. */
 export function pooledAttackRate(pack: Pick<AssurancePackResult, "scenarioResults">): string | null {
-  // A row that was not evaluated adds no tries: its verdict, and so its share of the rate, was never decided.
+  // A row that was not evaluated adds no tries to the rate; it is named after the rate and scored as not passed.
   const rows = pack.scenarioResults.flatMap((row) => (row.effect && row.inconclusive !== true ? [row.effect] : []));
   const measured = rows.reduce((sum, row) => sum + row.measured, 0);
   if (measured === 0) return null;
   const worked = rows.reduce((sum, row) => sum + row.attackSuccesses, 0);
   const interval = wilson95(worked, measured)!;
   const pct = (value: number) => `${Math.round(value * 100)}%`;
-  return `attack worked in ${worked} of ${measured} tries (${pct(worked / measured)}, 95% Wilson interval ${pct(interval[0])} to ${pct(interval[1])}, pooled over scenarios)`;
+  const skipped = pack.scenarioResults.filter(isEffectNotEvaluated).length;
+  const skippedText = skipped > 0 ? `; ${skipped} ${skipped === 1 ? "scenario" : "scenarios"} not evaluated, counted as not passed` : "";
+  return `attack worked in ${worked} of ${measured} tries (${pct(worked / measured)}, 95% Wilson interval ${pct(interval[0])} to ${pct(interval[1])}, pooled over scenarios)${skippedText}`;
 }
 
 const notEvaluatedCount = (pack: AssurancePackResult): number =>

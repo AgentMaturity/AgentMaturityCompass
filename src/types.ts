@@ -3461,9 +3461,9 @@ export interface AssuranceScenarioResult {
   evidenceEventIds: string[];
   auditEventTypes: string[];
   /**
-   * True when the agent under test could not be invoked for this scenario.
-   * Inconclusive scenarios are excluded from pass/fail scoring — they are
-   * neither a pass nor a measured failure.
+   * True when the agent under test could not be invoked for this scenario, or its reply could not be graded.
+   * Inconclusive keyword rows are left out of pass/fail scoring; an inconclusive effect-graded row (one with
+   * `effect`) counts as not passed with score 0 and blocks a pass (`isEffectNotEvaluated` in src/assurance/scorers.ts).
    */
   inconclusive?: boolean;
   /**

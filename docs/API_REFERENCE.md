@@ -3298,6 +3298,7 @@ CI gate: run red-team plugins, optional Evil MCP, and score-gaming resistance ch
 | `--max-vulnerabilities <n>` | - |
 | `--max-critical <n>` | - |
 | `--max-high <n>` | - |
+| `--max-inconclusive <n>` | - |
 | `--evil-mcp` | - |
 | `--mcp-attacks <categories...>` | - |
 | `--min-mcp-score <n>` | - |

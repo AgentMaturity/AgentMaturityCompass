@@ -263,7 +263,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc ci check` | One-liner CI gate: quickscore + threshold check (exit 1 if below) | `--min-score <n>`<br>`--min-level <level>`<br>`--agent <agentId>`<br>`--json` | `gate` |
 | `amc ci init` | Generate GitHub workflow and gate policy | `--agent <agentId>`<br>`--no-sign` | - |
 | `amc ci print` | Print suggested CI pipeline steps | `--agent <agentId>` | - |
-| `amc ci redteam` | CI gate: run red-team plugins, optional Evil MCP, and score-gaming resistance checks | `--plugins <ids...>`<br>`--strategies <ids...>`<br>`--min-score <n>`<br>`--max-vulnerabilities <n>`<br>`--max-critical <n>`<br>`--max-high <n>`<br>`--evil-mcp`<br>`--mcp-attacks <categories...>`<br>`--min-mcp-score <n>`<br>`--no-gaming-resistance`<br>`--min-gaming-score <n>`<br>`--sign`<br>`--no-sign`<br>`--json` | - |
+| `amc ci redteam` | CI gate: run red-team plugins, optional Evil MCP, and score-gaming resistance checks | `--plugins <ids...>`<br>`--strategies <ids...>`<br>`--min-score <n>`<br>`--max-vulnerabilities <n>`<br>`--max-critical <n>`<br>`--max-high <n>`<br>`--max-inconclusive <n>`<br>`--evil-mcp`<br>`--mcp-attacks <categories...>`<br>`--min-mcp-score <n>`<br>`--no-gaming-resistance`<br>`--min-gaming-score <n>`<br>`--sign`<br>`--no-sign`<br>`--json` | - |
 | `amc claim-confidence` | Generate per-claim confidence report with citation-backed scoring | `--agent <agentId>` | - |
 | `amc claim-confidence-gate` | Check if claims for given questions pass confidence threshold | `--agent <agentId>`<br>`--questions <ids>` | - |
 | `amc claims` | Evidence claim expiry tracking | - | - |
