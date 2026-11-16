@@ -20851,7 +20851,7 @@ enforce
 
 enforce
   .command("taint <input>")
-  .description("Track tainted input through the system")
+  .description("Demo of taint tracking (not enforced: no AMC decision reads it; for that, see amc guardrails profile untrusted-input-guard)")
   .option("--json", "Output as JSON")
   .action(async (input: string, opts: { json?: boolean }) => {
     try {
@@ -20860,9 +20860,11 @@ enforce
       tracker.markTainted(input, input, "cli");
       const result = tracker.check(input);
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n⚖️  Taint Tracking"));
+      console.log(chalk.bold.hex('#4AEF79')("\n⚖️  Taint Tracking (demo, not enforced)"));
       console.log(chalk.gray("Input:"), input);
       console.log(chalk.gray("Tainted:"), result ? chalk.red("yes") : chalk.green("no"));
+      console.log(chalk.gray("Not enforced: this marks a value in memory for this command only; no hook or tool decision reads it."));
+      console.log(chalk.gray("To have AMC ask before risky actions after untrusted input: amc guardrails profile untrusted-input-guard"));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 

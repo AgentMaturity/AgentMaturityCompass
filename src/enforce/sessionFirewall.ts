@@ -1,3 +1,4 @@
+/** Session firewall. Not enforced: no hook, tool or Studio path calls it, so its results change no decision. */
 import { emitGuardEvent } from './evidenceEmitter.js';
 
 export type SessionState = 'active' | 'suspended' | 'terminated';
