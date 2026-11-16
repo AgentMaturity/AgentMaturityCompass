@@ -3,7 +3,7 @@
  */
 import chalk from "chalk";
 import { agentExists } from "../fleet/paths.js";
-import type { QuestionScore } from "../types.js";
+import type { DiagnosticReport, QuestionScore } from "../types.js";
 
 /** A score for an agent nobody added describes nothing, and scoring it used to create its folder as a side effect (CLI-17). */
 export function refuseUnknownAgent(workspace: string, agentId: string): void {
@@ -22,14 +22,26 @@ export function refuseNewFolderWithoutTerminal(workspace: string): void {
   process.exit(1);
 }
 
-/** The lowest questions by title, with the id in small print for `amc explain`; flag codes stay in the JSON (CLI-20). */
-export async function printTopGaps(gaps: readonly QuestionScore[]): Promise<void> {
-  if (gaps.length === 0) return;
-  const { questionBank } = await import("../diagnostic/questionBank.js");
-  const titles = new Map(questionBank.map((question) => [question.id, question.title]));
+/**
+ * The lowest questions by title, with the id in small print for `amc explain`; flag codes stay in the JSON (CLI-20).
+ * Only questions below the highest level AMC can evaluate for them, and not marked not applicable (P12): a gap no step
+ * can close is not a gap to work on.
+ */
+export async function printTopGaps(scores: readonly QuestionScore[], applicability?: DiagnosticReport["questionApplicability"]): Promise<void> {
+  const { allKnownQuestions } = await import("../diagnostic/questionSets.js");
+  const { reachableLevel } = await import("../diagnostic/levelSemantics.js");
+  const questions = new Map(allKnownQuestions().map((question) => [question.id, question]));
+  const excluded = new Set((applicability?.notApplicable ?? []).map((row) => row.questionId));
+  const gaps = scores
+    .filter((score) => !excluded.has(score.questionId) && score.finalLevel < Math.min(3, reachableLevel(questions.get(score.questionId))))
+    .slice(0, 5);
   console.log("");
-  console.log(chalk.yellow("  Top gaps:"));
-  for (const gap of gaps) console.log(chalk.gray(`    ${titles.get(gap.questionId) ?? gap.questionId}: L${gap.finalLevel} (${gap.questionId})`));
+  if (gaps.length === 0) {
+    console.log(chalk.gray("  Every question is at the highest level AMC can evaluate for it today."));
+    return;
+  }
+  console.log(chalk.yellow("  Top gaps (each can move up a level):"));
+  for (const gap of gaps) console.log(chalk.gray(`    ${questions.get(gap.questionId)?.title ?? gap.questionId}: L${gap.finalLevel} (${gap.questionId})`));
   console.log(chalk.gray(`  Why a question is at its level: amc explain ${gaps[0]!.questionId}`));
 }
 

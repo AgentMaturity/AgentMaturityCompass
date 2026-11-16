@@ -36,20 +36,22 @@ This section supersedes legacy rollup mappings for `AMC-EUAI-1` and `AMC-OWASP-1
 | AMC-EUAI-1 | **AMC-2.10** | Human oversight implementation in runtime operations |
 | AMC-EUAI-1 | **AMC-2.11** | Conformity assessment readiness |
 
-### OWASP LLM Top 10: One Question Per Risk Class
+### OWASP Top 10 for LLM Applications (2025): One Question Per Risk Class
+
+Edition: 2025, from https://genai.owasp.org/llm-top-10/ (read 2026-11-16). AMC-5.14 and AMC-5.17 covered Insecure Plugin Design and Model Theft in the 2023 list; neither is on the 2025 list, so they now cover LLM07 and LLM08.
 
 | Legacy Rollup | New AMC QID | OWASP Risk Class |
 |---|---|---|
-| AMC-OWASP-1 | **AMC-5.8** | LLM01 Prompt Injection |
-| AMC-OWASP-1 | **AMC-5.9** | LLM02 Insecure Output Handling |
-| AMC-OWASP-1 | **AMC-5.10** | LLM03 Training Data Poisoning |
-| AMC-OWASP-1 | **AMC-5.11** | LLM04 Model Denial of Service |
-| AMC-OWASP-1 | **AMC-5.12** | LLM05 Supply Chain Vulnerabilities |
-| AMC-OWASP-1 | **AMC-5.13** | LLM06 Sensitive Information Disclosure |
-| AMC-OWASP-1 | **AMC-5.14** | LLM07 Insecure Plugin Design |
-| AMC-OWASP-1 | **AMC-5.15** | LLM08 Excessive Agency |
-| AMC-OWASP-1 | **AMC-5.16** | LLM09 Overreliance |
-| AMC-OWASP-1 | **AMC-5.17** | LLM10 Model Theft |
+| AMC-OWASP-1 | **AMC-5.8** | LLM01:2025 Prompt Injection |
+| AMC-OWASP-1 | **AMC-5.9** | LLM05:2025 Improper Output Handling |
+| AMC-OWASP-1 | **AMC-5.10** | LLM04:2025 Data and Model Poisoning |
+| AMC-OWASP-1 | **AMC-5.11** | LLM10:2025 Unbounded Consumption |
+| AMC-OWASP-1 | **AMC-5.12** | LLM03:2025 Supply Chain |
+| AMC-OWASP-1 | **AMC-5.13** | LLM02:2025 Sensitive Information Disclosure |
+| AMC-OWASP-1 | **AMC-5.14** | LLM07:2025 System Prompt Leakage |
+| AMC-OWASP-1 | **AMC-5.15** | LLM06:2025 Excessive Agency |
+| AMC-OWASP-1 | **AMC-5.16** | LLM09:2025 Misinformation |
+| AMC-OWASP-1 | **AMC-5.17** | LLM08:2025 Vector and Embedding Weaknesses |
 
 ### ISO/IEC 42005 and 42006 Linkage
 

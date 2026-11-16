@@ -9,12 +9,12 @@ You ran `amc` and got a full score: in a terminal, by choosing "Just show my sco
 AMC scores trust maturity from **L0 to L5**.
 
 High level:
-- **L0 — Absent**: no demonstrated controls
-- **L1 — Initial**: minimal, mostly manual controls
-- **L2 — Developing**: repeatable controls with partial coverage
-- **L3 — Defined**: systematic, documented, evidence-backed controls
-- **L4 — Managed**: measured, proactive, proof-oriented controls
-- **L5 — Optimizing**: continuously verified improvement
+- **L0 — Absent**: not evidenced
+- **L1 — Initial**: self-declared (240 of the 244 questions cannot rise above L1 today)
+- **L2 — Developing**: configuration evidence AMC observed (4 questions can reach it today)
+- **L3 — Defined**: runtime evidence AMC observed (no question can reach it yet)
+- **L4 — Managed**: continuity, anchoring and sampling (not evaluated yet)
+- **L5 — Optimizing**: independently attested (not evaluated yet)
 
 The score matters, but the score alone is not the point.
 

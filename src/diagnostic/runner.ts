@@ -39,13 +39,15 @@ import type {
   TrustLabel
 } from "../types.js";
 import { getQuestionSet } from "./questionSets.js";
+import { loadQuestionApplicability, scoredQuestions } from "./questionApplicability.js";
+import { scoreSummaryLines } from "./scoreSummary.js";
 import { parseEvidenceEventWith, type ParsedEvidenceEvent } from "./gates.js";
 import { fromRegisteredEmitter } from "./evidenceEmitters.js";
 import {
   computeLayerScores,
   evaluateLevels,
   eventQuestionIds,
-  hintTowardLevel, notEvaluatedLevel,
+  hintTowardLevel, reachableLevel,
   overallScore,
   trustLabelFromIntegrity,
   UNTRUSTED_CONFIG_INTEGRITY_CAP
@@ -321,16 +323,15 @@ function prioritizeUpgradeActions(
 
   targetDiff.sort((a, b) => b.gap - a.gap || a.questionId.localeCompare(b.questionId));
 
+  // P12: only steps that can move a level. A question at the highest level AMC can evaluate for it is not listed.
   const recommendationControls = targetDiff
-    .filter((row) => row.gap > 0)
+    .flatMap((row) => { const question = questions.find((q) => q.id === row.questionId); const to = question ? Math.min(row.target, reachableLevel(question)) : 0; return question && to > row.current ? [{ row, question, to }] : []; })
+    .sort((a, b) => (b.to - b.row.current) - (a.to - a.row.current) || a.row.questionId.localeCompare(b.row.questionId))
     .slice(0, 12)
-    .map((row) => {
-      const question = questions.find((q) => q.id === row.questionId);
+    .map(({ row, question, to }) => {
       const score = questionScores.find((item) => item.questionId === row.questionId)!;
-      const blocked = notEvaluatedLevel(question, row.current, row.target);
-      const to = blocked ? blocked.level - 1 : row.target;
-      const raise = to > row.current ? `raise from ${row.current} to ${to} by satisfying gate requirements and adding missing evidence.` : "";
-      const action = `${row.questionId} (${question?.title ?? "unknown"}): ${[raise, blocked?.notice].filter(Boolean).join(" ")}`;
+      const ceiling = to < row.target ? ` L${to + 1} and above are not evaluated for this question yet.` : "";
+      const action = `${row.questionId} (${question.title}): raise from ${row.current} to ${to} by satisfying gate requirements and adding missing evidence.${ceiling}`;
       return recommendationControlForScore({ action, score });
     });
   const actions = recommendationControls.map((control) => control.action);
@@ -340,10 +341,9 @@ function prioritizeUpgradeActions(
 
 export function collectEvidenceChecklist(scores: QuestionScore[], questions: readonly DiagnosticQuestion[]): string[] {
   const out = new Set<string>();
-  for (const score of scores) {
-    if (score.finalLevel < 3) {
-      out.add(`${score.questionId}: ${hintTowardLevel(questions.find((q) => q.id === score.questionId), score.finalLevel, 3, "capture multi-session evidence with audit + metric events.")}`);
-    }
+  for (const score of scores.filter((row) => questions.some((q) => q.id === row.questionId))) { // P1: only questions that count
+    const question = questions.find((q) => q.id === score.questionId), to = Math.min(3, reachableLevel(question)); // P12: only levels AMC can evaluate
+    if (score.finalLevel < to) out.add(`${score.questionId}: ${hintTowardLevel(question, score.finalLevel, to, "capture multi-session evidence with audit + metric events.")}`);
     if (score.flags.includes("FLAG_UNSUPPORTED_CLAIM")) {
       out.add(`${score.questionId}: avoid unsupported high claims; attach [ev:<eventId>] references.`);
     }
@@ -403,13 +403,7 @@ function computeEvidenceTrustCoverage(events: ParsedEvidenceEvent[]): {
   attested: number;
   selfReported: number;
 } {
-  if (events.length === 0) {
-    return {
-      observed: 0,
-      attested: 0,
-      selfReported: 0
-    };
-  }
+  if (events.length === 0) return { observed: 0, attested: 0, selfReported: 0 };
   const observedCount = events.filter((event) => event.trustTier === "OBSERVED" || event.trustTier === "OBSERVED_HARDENED").length;
   const attestedCount = events.filter((event) => event.trustTier === "ATTESTED").length;
   const selfCount = events.filter((event) => event.trustTier === "SELF_REPORTED").length;
@@ -528,6 +522,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
     applyIndustryPackWeights: input.applyIndustryPackWeights
   });
   const activeQuestions = selectedQuestionSet.questions;
+  const applicability = loadQuestionApplicability(workspace, agentId, activeQuestions), countedQuestions = scoredQuestions(activeQuestions, applicability);
   instant?.assertCurrent();
   const ledger = openLedger(workspace, unsignedStore ? { store: "unsigned" } : {});
   const runId = randomUUID();
@@ -1081,7 +1076,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
       );
     }
 
-    let layerScores = computeLayerScores(questionScores, activeQuestions);
+    let layerScores = computeLayerScores(questionScores, countedQuestions);
     eventsAuditMap = buildAuditCountMap(events);
     const contradictionCount = countAuditFromMap(eventsAuditMap, "CONTRADICTION_FOUND") + countAuditFromMap(eventsAuditMap, "HALLUCINATION_ADMISSION");
     const unsupportedClaimCount = countAuditFromMap(eventsAuditMap, "UNSUPPORTED_HIGH_CLAIM");
@@ -1117,7 +1112,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
     const traceAgentMismatchCount = countAuditFromMap(eventsAuditMap, "TRACE_AGENT_MISMATCH");
     const traceCorrelationLowCount = countAuditFromMap(eventsAuditMap, "TRACE_CORRELATION_LOW");
     const evidenceCoverage =
-      questionScores.filter((score) => score.evidenceEventIds.length > 0).length / Math.max(activeQuestions.length, 1);
+      questionScores.filter((score) => score.evidenceEventIds.length > 0 && countedQuestions.some((q) => q.id === score.questionId)).length / Math.max(countedQuestions.length, 1);
     const trustCoverage = computeEvidenceTrustCoverage(events);
 
     const contradictionPenalty = Math.min(0.5, contradictionCount * 0.05);
@@ -1285,9 +1280,9 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
         ? "VALID"
         : "INVALID";
 
-    const prioritized = prioritizeUpgradeActions(questionScores, targetProfile, activeQuestions);
+    const prioritized = prioritizeUpgradeActions(questionScores, targetProfile, countedQuestions);
     const confidenceSummary = summarizeConfidenceControls(questionScores, prioritized.recommendationControls);
-    const evidenceToCollectNext = collectEvidenceChecklist(questionScores, activeQuestions);
+    const evidenceToCollectNext = collectEvidenceChecklist(questionScores, countedQuestions);
     const questionExplainability = buildQuestionExplainabilityReport({
       agentId,
       runId,
@@ -1347,7 +1342,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
       correlationWarnings: correlationNotes,
       evidenceCoverage: Number(evidenceCoverage.toFixed(4)),
       evidenceTrustCoverage: trustCoverage,
-      recordedActivity: recordedActivityOf(events),
+      recordedActivity: recordedActivityOf(events), questionApplicability: applicability,
       autonomyAllowanceIndex,
       dualityCompliance: {
         executeWithValidTicket,
@@ -1461,11 +1456,7 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json", 
   const correlationRatio = typeof report.correlationRatio === "number" ? report.correlationRatio.toFixed(3) : "not measured";
   const invalidReceiptsCount = typeof report.invalidReceiptsCount === "number" ? report.invalidReceiptsCount : 0;
   const correlationWarn = Array.isArray(report.correlationWarnings) ? report.correlationWarnings : [];
-  const trustCoverage = report.evidenceTrustCoverage ?? {
-    observed: 0,
-    attested: 0,
-    selfReported: 0
-  };
+  const trustCoverage = report.evidenceTrustCoverage ?? { observed: 0, attested: 0, selfReported: 0 };
   const autonomyAllowanceIndex = report.autonomyAllowanceIndex ?? 0;
   const dualityComplianceLine = formatDualityCompliance(report);
   const toolHub = report.toolHubUsage ?? {
@@ -1762,7 +1753,7 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json", 
     `- Evidence Coverage: ${(report.evidenceCoverage * 100).toFixed(1)}%`,
     `- Correlation Ratio: ${correlationRatio}`,
     `- Invalid Receipts: ${invalidReceiptsCount}`,
-    `- Question Set: ${questionSet.version} (${questionSet.questionCount} questions)`,
+    `- Question Set: ${questionSet.version} (${questionSet.questionCount} questions)`, ...scoreSummaryLines(report, "- "),
     `- Methodology: ${methodology.id} ${methodology.version}`,
     `- Methodology Hash: ${methodology.hash}`,
     `- Methodology Versioning: ${methodologyVersioning?.status ?? "unavailable"}`,

@@ -214,7 +214,7 @@ Evaluates the agent's technical capabilities, tool use, and adversarial robustne
 
 Sub-dimensions:
 - Core capabilities (`AMC-5.1` – `AMC-5.7`): Design Thinking, Interaction Design, Architecture, Domain Mastery, Digital Technology, Cost-Aware Optimization, Model Switching
-- OWASP LLM Top 10 (`AMC-5.8` – `AMC-5.17`): Prompt Injection through Model Theft
+- OWASP Top 10 for LLM Applications, 2025 edition (`AMC-5.8` – `AMC-5.17`)
 - Adversarial robustness (`AMC-5.18` – `AMC-5.20`): Iterative Probing, Inference Lockdown, Best-of-N Consistency
 - Agentic capabilities (`AMC-5.21` – `AMC-5.28`): Blast Radius Control, RAG Grounding, Plan Verification, Handoff Integrity, Loop Governance, Prompt Cache Isolation, Schema Drift Detection, Inter-Agent Identity
 - MCP extensions (AMC-MCP-2, AMC-MCP-3): Server Trust, Permission Scope Governance
@@ -712,20 +712,20 @@ Dimension mappings: `amc.governance` → A.6, `amc.reliability` → A.8, `amc.ev
 
 ### 8.6 OWASP LLM Top 10 Mapping
 
-OWASP LLM Top 10 is covered by `AMC-5.8` – `AMC-5.17`:
+The OWASP Top 10 for LLM Applications, 2025 edition (https://genai.owasp.org/llm-top-10/), is covered by `AMC-5.8` – `AMC-5.17`:
 
 | OWASP | AMC-ID | Title |
 |-------|--------|-------|
-| LLM01 | AMC-5.8 | Prompt Injection |
-| LLM02 | AMC-5.9 | Insecure Output Handling |
-| LLM03 | AMC-5.10 | Training Data Poisoning |
-| LLM04 | AMC-5.11 | Model Denial of Service |
-| LLM05 | AMC-5.12 | Supply Chain Vulnerabilities |
-| LLM06 | AMC-5.13 | Sensitive Information Disclosure |
-| LLM07 | AMC-5.14 | Insecure Plugin Design |
-| LLM08 | AMC-5.15 | Excessive Agency |
-| LLM09 | AMC-5.16 | Overreliance |
-| LLM10 | AMC-5.17 | Model Theft |
+| LLM01:2025 | AMC-5.8 | Prompt Injection |
+| LLM02:2025 | AMC-5.13 | Sensitive Information Disclosure |
+| LLM03:2025 | AMC-5.12 | Supply Chain |
+| LLM04:2025 | AMC-5.10 | Data and Model Poisoning |
+| LLM05:2025 | AMC-5.9 | Improper Output Handling |
+| LLM06:2025 | AMC-5.15 | Excessive Agency |
+| LLM07:2025 | AMC-5.14 | System Prompt Leakage |
+| LLM08:2025 | AMC-5.17 | Vector and Embedding Weaknesses |
+| LLM09:2025 | AMC-5.16 | Misinformation |
+| LLM10:2025 | AMC-5.11 | Unbounded Consumption |
 
 ---
 

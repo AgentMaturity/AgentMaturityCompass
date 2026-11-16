@@ -16,7 +16,9 @@ describe("improve product-language roadmap", () => {
     const result = runCli(["improve"]);
 
     expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
-    expect(result.stdout).toContain("What L3 means for your product:");
+    // Lane score: AMC cannot evaluate L3 yet, so the heading says what L3 would mean, and self-answers show no L-level.
+    expect(result.stdout).toContain("What L3 would mean for your product (AMC cannot evaluate L3 yet):");
+    expect(result.stdout).toContain("Self-assessed: 0/25 points (0%)");
     expect(result.stdout).toContain("evidence-backed and reviewable");
     expect(result.stdout).toContain("customers can trust the agent's behavior");
     expect(result.stdout).toContain("PM translation:");

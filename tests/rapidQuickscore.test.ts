@@ -29,7 +29,9 @@ describe("rapidQuickscore", () => {
     expect(result.recommendations).toHaveLength(0);
   });
 
-  test("prioritizes the lowest scored questions first", () => {
+  // P12 (lane score): only steps that can move a level. These five questions cannot rise above L1 today, so only the
+  // one at L0 has a step; AMC-1.1 at L2 and AMC-2.1 at L1 are listed no more.
+  test("prioritizes the lowest scored questions first, and only those that can still move", () => {
     const answers: Record<string, number> = {
       "AMC-1.1": 2,
       "AMC-2.1": 1,
@@ -38,11 +40,7 @@ describe("rapidQuickscore", () => {
       "AMC-5.1": 4
     };
     const result = scoreRapidAssessment(answers);
-    expect(result.recommendations.map((r) => r.questionId)).toEqual([
-      "AMC-3.1.1",
-      "AMC-2.1",
-      "AMC-1.1"
-    ]);
+    expect(result.recommendations.map((r) => r.questionId)).toEqual(["AMC-3.1.1"]);
     for (const recommendation of result.recommendations) {
       expect(recommendation.howToImprove.length).toBeGreaterThan(5);
       expect(recommendation.whyItMatters.length).toBeGreaterThan(10);

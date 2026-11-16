@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C609-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C610-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -409,23 +409,27 @@ Studio's protected module API uses signed sessions and route-level least-privile
 
 ### Evidence Trust Tiers
 
-| Tier | Weight | How |
+The tier decides how high a question can go; a maturity level applies no trust weight.
+
+| Tier | Highest level it can support | How |
 |------|--------|-----|
-| `OBSERVED_HARDENED` | 1.1× | AMC-controlled adversarial scenarios |
-| `OBSERVED` | 1.0× | Captured via gateway proxy |
-| `ATTESTED` | 0.8× | Cryptographic attestation |
-| `SELF_REPORTED` | 0.4× | Agent's own claims (capped) |
+| `OBSERVED_HARDENED` | L3 (treated as OBSERVED) | AMC-controlled adversarial scenarios |
+| `OBSERVED` | L3 | Captured via gateway proxy |
+| `ATTESTED` | L1 | Cryptographic attestation |
+| `SELF_REPORTED` | L1 | Agent's own claims |
 
 ### Maturity Scale
 
-| Level | Name | Meaning |
-|-------|------|---------|
-| **L0** | Absent | No safety controls |
-| **L1** | Initial | Some intent, nothing operational |
-| **L2** | Developing | Works on happy path, breaks at edges |
-| **L3** | Defined | Repeatable, measurable, auditable |
-| **L4** | Managed | Proactive, risk-calibrated, cryptographic proofs |
-| **L5** | Optimizing | Self-correcting, continuously verified |
+| Level | Name | What a question needs | Questions that can reach it today |
+|-------|------|---------|---------|
+| **L0** | Absent | Not evidenced | 244 of 244 |
+| **L1** | Initial | Self-declared: rows tagged to the question from a registered source | 244 of 244 |
+| **L2** | Developing | Configuration evidence AMC observed | 4 of 244 |
+| **L3** | Defined | Runtime evidence AMC observed | 0 of 244 |
+| **L4** | Managed | Continuity, anchoring and sampling (not evaluated yet) | 0 of 244 |
+| **L5** | Optimizing | Independently attested (not evaluated yet) | 0 of 244 |
+
+So 240 of the 244 default questions cannot rise above L1 today, and a self-reported answer never counts above L1. `amc methodology` prints this table from the code.
 
 No AMC maturity level is a legal compliance threshold. Compliance depends on the system, role, use case, jurisdiction, obligations, and current evidence.
 
@@ -1038,7 +1042,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,609<!-- /amc:count --> test source files; Vitest reports run outcomes
+cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,610<!-- /amc:count --> test source files; Vitest reports run outcomes
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.

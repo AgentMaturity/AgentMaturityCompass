@@ -65,6 +65,7 @@ import { sha256Hex } from "./utils/hash.js";
 import { canonicalize } from "./utils/json.js";
 import { amcVersion } from "./version.js";
 import { AMC_MATURITY_LEGEND } from "./score/maturityTaxonomy.js";
+import { LEVEL_GUIDE } from "./diagnostic/levelSemantics.js";
 import {
   buildEnforceResourceManifest,
   diffEnforceResourceManifests,
@@ -104,7 +105,7 @@ import {
   unverifiedClaim, withClaimFields, withClaimFieldsEach
 } from "./cli/claimOutput.js";
 import { addRiskClassifyOptions, riskClassifyAction } from "./compliance/euAiActCli.js";
-import { renderDiagnosticReportHtml } from "./cli/reportRenderers.js"; import { emitScoreEvidenceResult } from "./cli/scoreEvidenceOutput.js";
+import { printExecutiveSummary, renderDiagnosticReportHtml } from "./cli/reportRenderers.js"; import { emitScoreEvidenceResult } from "./cli/scoreEvidenceOutput.js";
 import { envelopeForComplianceReport } from "./claims/eligibility/adapters/results.js";
 import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "./claims/eligibility/render.js";
 import { listDecisionReceipts, loadDecisionReceipt, observeDecisionOutcomes, writeDecisionReceipts, type DecisionReceipt } from "./lifecycle/decisionReceipt.js";
@@ -1493,6 +1494,8 @@ async function renderInstantFullScore(
   const score100 = Math.round((avgLevel / 5) * 100);
   const fullQuestionCount = report.questionScores.length;
   const statusExplanation = explainDiagnosticReportStatus(report);
+  const { scoreSummary, scoreSummaryLines } = await import("./diagnostic/scoreSummary.js");
+  const summary = scoreSummary(report);
   if (opts.json) {
     const dimensions = Object.fromEntries(
       report.layerScores.map((layer) => [
@@ -1519,6 +1522,8 @@ async function renderInstantFullScore(
       score: score100,
       level: `L${avgLevel.toFixed(2)}`,
       overallLevel: Number(avgLevel.toFixed(2)),
+      overallRange: summary.band, overallRangeText: summary.range, levelsEvaluableToday: summary.reach,
+      questionApplicability: report.questionApplicability ?? { status: "not_answered", notApplicable: [] },
       trustLabel: report.trustLabel,
       questionCount: fullQuestionCount,
       integrityIndex: Number(report.integrityIndex.toFixed(3)),
@@ -1553,6 +1558,7 @@ async function renderInstantFullScore(
   console.log(chalk.gray(`  Artifact seal: ${report.status} | Evidence: ${statusExplanation.evidenceStatus} | Claims: ${statusExplanation.strongClaimsAllowed ? "ELIGIBLE" : "BLOCKED"}`));
   console.log("");
   console.log(chalk.bold(`  Overall: L${avgLevel.toFixed(2)} (${score100}/100) ${report.trustLabel}`));
+  console.log(chalk.gray(`  ${summary.range.charAt(0).toUpperCase()}${summary.range.slice(1)}`));
   const recorded = report.recordedActivity?.events ?? 0;
   if (report.evidenceCoverage === 0 && recorded > 0) {
     const sessions = report.recordedActivity?.sessions ?? 0;
@@ -1569,8 +1575,9 @@ async function renderInstantFullScore(
     const bar = "█".repeat(lv) + "░".repeat(5 - lv);
     console.log(`  ${layer.layerName.padEnd(28)} L${layer.avgFinalLevel.toFixed(2)} ${bar}`);
   }
-  const gaps = report.questionScores.filter((question) => question.finalLevel < 3).slice(0, 5);
-  await printTopGaps(gaps);
+  await printTopGaps(report.questionScores, report.questionApplicability);
+  console.log("");
+  for (const line of scoreSummaryLines(report, "  ").slice(1)) console.log(chalk.gray(line));
   console.log("");
   if (state.createdWorkspace) {
     console.log(chalk.green("  Created .amc workspace automatically."));
@@ -2353,7 +2360,7 @@ program
   .description("Guided improvement — shows what to fix next based on your current score")
   .option("--json", "emit JSON output", false)
   .action(async (opts: { json: boolean }) => {
-    const { getRapidQuestions, scoreRapidAssessment } = await import("./diagnostic/rapidQuickscore.js");
+    const { getRapidQuestions, rapidSelfAssessmentLine, scoreRapidAssessment } = await import("./diagnostic/rapidQuickscore.js");
 
     // Check if we have a recent quickscore, otherwise run one
     let answers: Record<string, number> = {};
@@ -2371,7 +2378,7 @@ program
           name: "level",
           message: `${question.id}: ${question.title}`,
           choices: question.options.map((option) => ({
-            name: `L${option.level} - ${option.label}`,
+            name: `${option.level} - ${option.label}`,
             value: option.level
           }))
         }]);
@@ -2379,7 +2386,9 @@ program
       }
     }
 
-    const result = scoreRapidAssessment(answers);
+    const { loadQuestionApplicability } = await import("./diagnostic/questionApplicability.js");
+    const excluded = loadQuestionApplicability(process.cwd(), resolveAgentId(process.cwd(), activeAgent(program)), questions).notApplicable.map((row) => row.questionId);
+    const result = scoreRapidAssessment(answers, excluded);
     const claim = selfAnswerClaim("diagnostic:rapidQuickscore", Object.values(answers));
 
     if (opts.json) {
@@ -2388,10 +2397,13 @@ program
     }
 
     console.log("");
-    console.log(chalk.bold(`  Current: ${result.preliminaryLevel} (${result.totalScore}/${result.maxScore} points from ${result.maxScore / 5} self-answers, 0-5 each)`));
+    console.log(chalk.bold(`  ${rapidSelfAssessmentLine(result)}`));
     printClaimResult(claim, opts);
     console.log("");
-    console.log(chalk.bold("  What L3 means for your product:"));
+    const { levelReach } = await import("./diagnostic/levelSemantics.js");
+    const { questionBank } = await import("./diagnostic/questionBank.js");
+    console.log(chalk.gray(`  Levels AMC can evaluate today: ${levelReach(questionBank).sentence}`));
+    console.log(chalk.bold("  What L3 would mean for your product (AMC cannot evaluate L3 yet):"));
     console.log(chalk.gray("  L3 = evidence-backed and reviewable: customers can trust the agent's behavior because key decisions have replayable proof, not just team claims."));
     console.log(chalk.gray("  PM translation: define the product promise, capture proof when the agent acts, and make that proof easy for a reviewer to inspect."));
     console.log(chalk.bold("  L3 examples by agent archetype:"));
@@ -2402,7 +2414,7 @@ program
     console.log("");
 
     if (result.recommendations.length === 0) {
-      console.log(chalk.green("  🎉 You're at L5 across the board. Nothing to improve!"));
+      console.log(chalk.green("  Each of these questions is at the highest level AMC can evaluate for it today. Nothing here can move further yet."));
       console.log("");
       return;
     }
@@ -3430,15 +3442,23 @@ program
   .command("explain <questionId>")
   .description("Plain-English explanation for a diagnostic question (example: AMC-2.1)")
   .option("--json", "emit JSON output", false)
-  .action(async (questionId: string, opts: { json: boolean }) => {
+  .option("--not-applicable <reason>", "mark this question as not applying to the agent, with your reason; it is left out of the score and listed in every report (signs with the vault)")
+  .option("--applicable", "count this question in the score again (signs with the vault)", false)
+  .action(async (questionId: string, opts: { json: boolean; notApplicable?: string; applicable: boolean }) => {
     const { explainDiagnosticQuestion } = await import("./diagnostic/questionExplain.js");
     const explanation = explainDiagnosticQuestion(questionId);
+    if (opts.notApplicable !== undefined || opts.applicable) {
+      const { markQuestionApplicability } = await import("./cli/questionApplicabilityCli.js");
+      markQuestionApplicability(process.cwd(), activeAgent(program), explanation, opts.applicable ? null : opts.notApplicable ?? null);
+      return;
+    }
     if (opts.json) {
       console.log(JSON.stringify(explanation, null, 2));
       return;
     }
     console.log(chalk.bold(`${explanation.questionId} - ${explanation.title}`));
     console.log(`Layer: ${explanation.layerName}`);
+    console.log(`Highest level AMC can evaluate for this question today: L${explanation.highestLevelToday}`);
     console.log(chalk.dim(`Maturity Levels: ${AMC_MATURITY_LEGEND}`));
     console.log("");
     console.log(chalk.hex('#4AEF79')("What it measures:"));
@@ -3462,7 +3482,7 @@ program
     console.log(chalk.gray("  context.mission    ") + "— your agent's stated purpose and scope (document it in AGENTS.md or a charter file)");
     console.log(chalk.gray("  guardrails.alignment") + "— rules that prevent the agent from acting outside its mission (e.g. topic filters, action limits)");
     console.log(chalk.gray("  evidence           ") + "— logged proof that a behavior actually occurred (not just claimed in docs)");
-    console.log(chalk.gray("  L0–L5 levels       ") + "— L0=undocumented, L1=documented, L2=automated checks, L3=evidence-backed, L4=proactive, L5=certifiable");
+    console.log(chalk.gray("  L0–L5 levels       ") + `— ${LEVEL_GUIDE.join("; ")}`);
     console.log(chalk.gray("  tuning knobs       ") + "— configurable parameters that control agent behavior (e.g. temperature, retry limits)");
     console.log(chalk.gray("  gate               ") + "— a pass/fail check that blocks deployment if requirements are not met");
   });
@@ -5512,59 +5532,7 @@ program
     }
 
     if (opts.executive) {
-      const avgLayerScore = report.layerScores.length > 0
-        ? report.layerScores.reduce((s, l) => s + l.avgFinalLevel, 0) / report.layerScores.length
-        : 0;
-      const score = avgLayerScore;
-      const levelNum = Math.min(5, Math.floor(avgLayerScore));
-      const level = `L${levelNum}`;
-      const riskLabel = levelNum >= 4 ? "Low" : levelNum >= 3 ? "Moderate" : levelNum >= 2 ? "Elevated" : "High";
-      const riskColor = levelNum >= 4 ? chalk.green : levelNum >= 3 ? chalk.yellow : chalk.red;
-      console.log(chalk.bold("\n═══════════════════════════════════════════"));
-      console.log(chalk.bold("  AMC Executive Summary"));
-      console.log(chalk.bold("═══════════════════════════════════════════\n"));
-      printClaimResult(claim, {});
-      console.log(chalk.gray("  Agent:        "), report.agentId ?? "default");
-      if (resolved.alias) {
-        console.log(chalk.gray("  Alias:        "), resolved.alias);
-      }
-      console.log(chalk.gray("  Date:         "), new Date(report.ts).toISOString().split("T")[0]);
-      console.log(chalk.gray("  Maturity:     "), chalk.bold(level));
-      console.log(chalk.gray("  Overall Score:"), chalk.bold(`${typeof score === "number" ? score.toFixed(1) : score}/5`));
-      console.log(chalk.gray("  Risk Level:   "), riskColor(riskLabel));
-      console.log(chalk.gray("  Artifact:     "), `${report.status} — ${statusExplanation.artifactLabel}`);
-      console.log(chalk.gray("  Evidence:     "), `${statusExplanation.evidenceStatus} — ${statusExplanation.readinessLabel}`);
-      console.log(chalk.gray("  Claims:       "), statusExplanation.strongClaimsAllowed ? "ELIGIBLE" : "BLOCKED");
-      console.log(chalk.gray("  Claim Boundary:"), statusExplanation.claimBoundary);
-      console.log(chalk.gray("  Evidence Next:"), statusExplanation.nextStep);
-      console.log("");
-      console.log(chalk.bold("  What This Means"));
-      console.log(chalk.gray("  ─────────────────"));
-      const meanings: Record<number, string> = {
-        0: "This agent has no governance controls. It should not be deployed in production.",
-        1: "This agent has basic intent toward safety but lacks operational controls.",
-        2: "This agent has repeatable processes but gaps remain in edge cases.",
-        3: "This agent has defined controls; production readiness still depends on scoped evidence and applicable requirements.",
-        4: "This agent has measured controls and strong proof coverage for the assessed scope.",
-        5: "This agent demonstrates continuously verified controls for the assessed scope.",
-      };
-      console.log(`  ${statusExplanation.strongClaimsAllowed ? meanings[levelNum] ?? meanings[0] : "This score is a local baseline only because evidence is not claim-ready."}`);
-      console.log("");
-      console.log(chalk.bold("  Recommendation"));
-      console.log(chalk.gray("  ─────────────────"));
-      if (!statusExplanation.strongClaimsAllowed) {
-        console.log("  Collect sufficient verified evidence before making deployment, compliance, or audit-readiness claims.");
-      } else if (levelNum >= 3) {
-        console.log("  Review the scoped evidence, applicable controls, and operating risk before production expansion.");
-      } else if (levelNum >= 2) {
-        console.log("  ⚠️  Address identified gaps before production deployment. Run: amc guide --go");
-      } else {
-        console.log("  ❌ Significant governance gaps. Not recommended for production. Run: amc guide --go");
-      }
-      console.log("");
-      console.log(chalk.gray("  Full report: amc report " + resolved.resolvedRunId));
-      console.log(chalk.gray("  Improvement plan: amc guide --go"));
-      console.log(chalk.gray("  EU AI Act mapping: amc quickscore --eu-ai-act\n"));
+      printExecutiveSummary({ report, runId: resolved.resolvedRunId, alias: resolved.alias, statusExplanation, claim });
       return;
     }
     printLabelledReport(generateReport(report, "md", claim) as string);
@@ -22116,13 +22084,13 @@ score
 
 score
   .command("owasp-llm")
-  .description("OWASP LLM Top 10 (2023 v1.1) coverage; not evaluated: file presence is not evidence. The evidence-bound 2025 list is `amc compliance report --framework owasp-llm`")
+  .description("OWASP Top 10 for LLM Applications (2025) coverage; not evaluated: file presence is not evidence. The evidence-bound version is `amc compliance report --framework owasp-llm`")
   .option("--json", "Output as JSON")
   .action(async (opts: { json?: boolean }) => {
     try {
       const { scoreOWASPLLMCoverage } = await import("./score/owaspLLMCoverage.js");
       const result = scoreOWASPLLMCoverage();
-      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🛡️  OWASP LLM Top 10 (2023 v1.1) Coverage"), result, unverifiedClaim("score:owaspLLMCoverage", 0, { regulated: true }), opts)) return;
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🛡️  OWASP Top 10 for LLM Applications (2025) Coverage"), result, unverifiedClaim("score:owaspLLMCoverage", 0, { regulated: true }), opts)) return;
       printNotEvaluatedCriteria(result.risks, result.recommendations);
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
@@ -22387,16 +22355,35 @@ score
 
 score
   .command("task-horizon")
-  .description("Score task-completion time horizon (METR-inspired)")
+  .description("Autonomy span: check the controls AMC lists for a run of a given length (self-reported; not METR's time-horizon measure; a longer run never scores higher)")
+  .option("--minutes <n>", "How long the agent ran on its own, in minutes")
+  .option("--controls <list>", "Controls in place during the run, separated by commas")
+  .option("--human-stepped-in", "A person stepped in during the run")
   .option("--json", "Output as JSON")
-  .action(async (opts: { json?: boolean }) => {
+  .action(async (opts: { json?: boolean; minutes?: string; controls?: string; humanSteppedIn?: boolean }) => {
     try {
-      const { scoreTaskHorizon } = await import("./score/taskHorizon.js");
-      const result = scoreTaskHorizon({ taskDurationMinutes: 0, completedAutonomously: false, activeGovernanceControls: [] });
-      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🎯  Task Horizon"), result, unverifiedClaim("score:taskHorizon", 0), opts)) return;
-      console.log(chalk.gray("Score:"), result.score.toFixed(2));
-      console.log(chalk.gray("Band:"), result.band.label);
-      console.log(chalk.gray("Level:"), result.level);
+      const { scoreTaskHorizon, TASK_HORIZON_BANDS } = await import("./score/taskHorizon.js");
+      const title = chalk.bold.hex('#4AEF79')("\n🎯  Autonomy Span");
+      const claim = unverifiedClaim("score:taskHorizon", 0);
+      if (opts.minutes === undefined) {
+        const nextStep = "Tell AMC how long the agent ran and which controls were in place: amc score task-horizon --minutes 45 --controls \"output validation,tool allowlist\"";
+        const empty = { status: "not_evaluated" as const, score: null, reason: "No run length was given.", nextStep,
+          spans: TASK_HORIZON_BANDS.map((band) => ({ span: band.span, label: band.label, controls: band.governanceRequirements })) };
+        if (emitClaimResult(title, empty, claim, opts)) return;
+        console.log(chalk.gray("Result:"), chalk.yellow("not evaluated"), chalk.gray(`(${empty.reason})`));
+        console.log(chalk.gray(nextStep));
+        return;
+      }
+      const minutes = Number(opts.minutes);
+      if (!Number.isFinite(minutes) || minutes < 0) throw new Error(`--minutes must be a number of minutes, 0 or more. You gave "${opts.minutes}".`);
+      const controls = (opts.controls ?? "").split(",").map((item) => item.trim()).filter(Boolean);
+      const result = scoreTaskHorizon({ taskDurationMinutes: minutes, completedAutonomously: !opts.humanSteppedIn, activeGovernanceControls: controls });
+      if (emitClaimResult(title, result, claim, opts)) return;
+      console.log(chalk.gray("Run length:"), result.band.label);
+      console.log(chalk.gray("Controls in place:"), `${result.score}% of the ${result.band.governanceRequirements.length} listed for a run of this length`);
+      if (result.missingGovernance.length > 0) console.log(chalk.gray("Missing:"), result.missingGovernance.join(", "));
+      console.log(chalk.gray("Risk:"), result.riskLabel);
+      for (const note of result.notes) console.log(chalk.gray(`Note: ${note}`));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 

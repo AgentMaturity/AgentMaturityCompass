@@ -216,17 +216,17 @@ const OPENAI_BEHAVIORAL_SIGNAL_MAP: SignalQuestionMap = [
   }
 ];
 
-const PROMPTFOO_OWASP_SIGNAL_MAP: SignalQuestionMap = [
+const PROMPTFOO_OWASP_SIGNAL_MAP: SignalQuestionMap = [ // OWASP Top 10 for LLM Applications, 2025 numbering
   { pattern: /(llm01|prompt injection|jailbreak|instruction override|indirect injection)/i, questionIds: ["AMC-5.8"] },
-  { pattern: /(llm02|insecure output|xss|script injection|unsafe render|output handling)/i, questionIds: ["AMC-5.9"] },
-  { pattern: /(llm03|data poisoning|poisoned retrieval|rag poison|training data poisoning)/i, questionIds: ["AMC-5.10"] },
-  { pattern: /(llm04|denial of service|dos|resource exhaustion|latency flood|token flood)/i, questionIds: ["AMC-5.11"] },
-  { pattern: /(llm05|supply chain|dependency compromise|artifact tamper|model provenance)/i, questionIds: ["AMC-5.12"] },
-  { pattern: /(llm06|sensitive information|secret leak|pii|exfiltration|credential disclosure)/i, questionIds: ["AMC-5.13"] },
-  { pattern: /(llm07|insecure plugin|tool abuse|function call abuse|schema bypass)/i, questionIds: ["AMC-5.14"] },
-  { pattern: /(llm08|excessive agency|autonomy abuse|unauthorized action)/i, questionIds: ["AMC-5.15"] },
-  { pattern: /(llm09|overreliance|blind trust|automation bias|oversight bypass)/i, questionIds: ["AMC-5.16"] },
-  { pattern: /(llm10|model theft|model extraction|prompt stealing|weight theft)/i, questionIds: ["AMC-5.17"] },
+  { pattern: /(llm02|sensitive information|secret leak|pii|exfiltration|credential disclosure)/i, questionIds: ["AMC-5.13"] },
+  { pattern: /(llm03|supply chain|dependency compromise|artifact tamper|model provenance)/i, questionIds: ["AMC-5.12"] },
+  { pattern: /(llm04|data poisoning|model poisoning|poisoned retrieval|rag poison|training data poisoning)/i, questionIds: ["AMC-5.10"] },
+  { pattern: /(llm05|insecure output|improper output|xss|script injection|unsafe render|output handling)/i, questionIds: ["AMC-5.9"] },
+  { pattern: /(llm06|excessive agency|autonomy abuse|unauthorized action|tool abuse|function call abuse)/i, questionIds: ["AMC-5.15"] },
+  { pattern: /(llm07|system prompt leakage|prompt extraction)/i, questionIds: ["AMC-5.14"] },
+  { pattern: /(llm08|vector and embedding|embedding weakness|vector store|cross-tenant retrieval)/i, questionIds: ["AMC-5.17"] },
+  { pattern: /(llm09|misinformation|overreliance|blind trust|automation bias|oversight bypass)/i, questionIds: ["AMC-5.16"] },
+  { pattern: /(llm10|unbounded consumption|denial of service|dos|resource exhaustion|latency flood|token flood|model theft|model extraction|weight theft)/i, questionIds: ["AMC-5.11"] },
   { pattern: /(echoleak|cve-2025-32711|context leak|system prompt leak|prompt echo)/i, questionIds: ["AMC-5.18"] },
   { pattern: /(garak|pyrit|vulnerability scan|scanner pipeline|llm vuln scan)/i, questionIds: ["AMC-5.19"] }
 ];
