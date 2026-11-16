@@ -13374,8 +13374,8 @@
       {
         "external": true,
         "frameworkId": null,
-        "instrumentId": "iso-21434",
-        "label": "ISO 21434:2021"
+        "instrumentId": null,
+        "label": "ISO/SAE 21434"
       },
       {
         "external": true,
@@ -13392,8 +13392,8 @@
       {
         "external": true,
         "frameworkId": null,
-        "instrumentId": "iso-27701-2025",
-        "label": "ISO/IEC 27701:2025"
+        "instrumentId": null,
+        "label": "ISO/IEC 27701"
       },
       {
         "external": true,
@@ -13405,10 +13405,10 @@
     "complianceFrameworks": [
       "GDPR Art. 5/25/32",
       "CCPA/CPRA",
-      "ISO 21434:2021",
+      "ISO/SAE 21434",
       "ETSI EN 303 645",
       "EU NIS2 2022/2555",
-      "ISO/IEC 27701:2025",
+      "ISO/IEC 27701",
       "NIST CSF 2.0"
     ],
     "contentStatus": "experimental",
@@ -13438,9 +13438,9 @@
         "l1": "No privacy by design; data collection is maximalist with no systematic minimization, pseudonymisation, or purpose limitation controls",
         "l2": "Minimisation is a stated principle, but data flows collect full records by default.",
         "l3": "Agent implements data minimization for primary data flows and pseudonymises stored data, but does not systematically enforce purpose limitation or automate privacy impact assessment",
-        "l4": "Minimisation, pseudonymisation and technical purpose limitation are enforced, but some high-risk processing has no DPIA or the controls are not mapped to ISO/IEC 27701:2025.",
-        "l5": "Minimisation and pseudonymisation are enforced in configuration for every processing activity, purpose limitation is enforced technically, a DPIA exists for each high-risk processing operation, and the controls are mapped to ISO/IEC 27701:2025.",
-        "regulatoryRef": "GDPR Art. 25; ISO/IEC 27701:2025",
+        "l4": "Minimisation, pseudonymisation and technical purpose limitation are enforced, but some high-risk processing has no DPIA or the controls are not mapped to ISO/IEC 27701.",
+        "l5": "Minimisation and pseudonymisation are enforced in configuration for every processing activity, purpose limitation is enforced technically, a DPIA exists for each high-risk processing operation, and the controls are mapped to ISO/IEC 27701.",
+        "regulatoryRef": "GDPR Art. 25; ISO/IEC 27701",
         "remediation": "Bind each data field the agent can read to its declared processing purpose, and reject queries that request fields outside that purpose.",
         "text": "Does the agent implement data protection by design per GDPR Article 25 including data minimization, pseudonymisation, and purpose limitation in all data processing activities?",
         "weight": 15
@@ -13459,7 +13459,7 @@
         "l2": "Security controls exist per ECU, but there is no CSMS or threat analysis process.",
         "l3": "Agent implements vehicle cybersecurity controls and basic TARA, but does not maintain full UNECE R155 §7 CSMS documentation or continuous threat monitoring",
         "l4": "A CSMS with continuous TARA and event detection is in place, but OTA update governance or type-approval documentation has gaps.",
-        "l5": "Full UNECE R155 CSMS with continuous TARA per ISO 21434 §8, cybersecurity event detection and response, OTA security update governance, incident escalation, and complete CSMS documentation for type approval",
+        "l5": "Full UNECE R155 CSMS with continuous TARA per ISO/SAE 21434, cybersecurity event detection and response, OTA security update governance, incident escalation, and complete CSMS documentation for type approval",
         "regulatoryRef": "UNECE WP.29 R155 §7",
         "remediation": "Route every OTA campaign or vehicle configuration change the agent prepares through the CSMS change process, with a TARA impact check before release.",
         "text": "Does the agent implement vehicle cybersecurity per UNECE WP.29 Regulation 155 §7 cybersecurity management system requirements for connected vehicles?",
@@ -13478,11 +13478,11 @@
         "l1": "Devices ship or reset to shared default credentials, lack an update mechanism, or there is no disclosure policy.",
         "l2": "A device credential policy exists, but shipped and reset devices are not tested for default passwords.",
         "l3": "Credentials are unique for most devices and updates are supported, but reset behaviour, update integrity or the disclosure process is not evidenced fleet-wide.",
-        "l4": "Fleet-wide tests show unique credentials including after reset and updates are integrity-checked, but some baseline provisions do not map to evidence.",
-        "l5": "A fleet-wide test shows no universal default credentials (including after reset), updates are integrity-checked, the disclosure policy is published, and each baseline provision maps to evidence.",
+        "l4": "Fleet-wide tests show no universal default passwords outside the factory default state and updates are integrity-checked, but some baseline provisions do not map to evidence.",
+        "l5": "A fleet-wide test shows no universal default passwords in any state other than the factory default, updates are integrity-checked, the disclosure policy is published, and each baseline provision maps to evidence.",
         "regulatoryRef": "ETSI EN 303 645 V3.1.3",
         "remediation": "Have the agent test each managed device for universal default credentials after provisioning and after factory reset, and quarantine any device that fails.",
-        "text": "Does the agent enforce the consumer-IoT baseline of ETSI EN 303 645 V3.1.3 for the devices it manages, including no universal default passwords (unique per-device or user-set credentials, also after reset), secure software updates and a vulnerability disclosure policy?",
+        "text": "Does the agent enforce the consumer-IoT baseline of ETSI EN 303 645 V3.1.3 for the devices it manages, including no universal default passwords (passwords unique per device or set by the user in any state other than the factory default), secure software updates and a vulnerability disclosure policy?",
         "weight": 15
       },
       {
@@ -13539,10 +13539,10 @@
         "l2": "Privacy notices exist, but rights requests are handled by email with no deadline tracking.",
         "l3": "Agent provides privacy notices per GDPR Art. 13-14, but does not automate rights fulfillment or track response deadlines",
         "l4": "DSAR processing, consent withdrawal and deadline tracking are automated, but portability exports or notice version control are incomplete.",
-        "l5": "Full rights management with automated DSAR processing, consent withdrawal enforcement, GDPR 30-day and CCPA 45-day response tracking, portability export generation, and transparent privacy notice management with version control",
+        "l5": "Full rights management with automated DSAR processing, consent withdrawal enforcement, GDPR one-month (Art. 12(3)) and CCPA 45-day (§1798.130) response tracking, portability export generation, and transparent privacy notice management with version control",
         "regulatoryRef": "GDPR Art. 13-14; CCPA §1798.100",
-        "remediation": "Propagate each consent withdrawal or deletion request to every system the agent writes to, and track the 30-day and 45-day clocks per request.",
-        "text": "Does the agent implement privacy transparency per GDPR Articles 13-14 information obligations and CCPA §1798.100 consumer rights with automated rights fulfillment?",
+        "remediation": "Propagate each consent withdrawal or deletion request to every system the agent writes to, and track the one-month and 45-day clocks per request.",
+        "text": "Does the agent implement privacy transparency per GDPR Articles 13-14 information obligations and the CCPA §1798.100 notice at or before collection, with automated fulfilment of data subject and consumer requests?",
         "weight": 10
       },
       {
@@ -13600,9 +13600,9 @@
         "l3": "A TARA exists, but attack-path analysis, traceability to cybersecurity goals, or change-triggered review is incomplete.",
         "l4": "Each item has a versioned TARA traced to cybersecurity goals, but re-assessment after a change or incident is not always recorded.",
         "l5": "Each item has a versioned TARA with all listed artefacts, traceability to goals and requirements, and a recorded re-assessment after each relevant change or incident.",
-        "regulatoryRef": "ISO/SAE 21434:2021 Clause 15",
+        "regulatoryRef": "ISO/SAE 21434 Clause 15",
         "remediation": "Trigger a TARA re-run whenever the agent records a change to an item's interfaces or software or a related field incident, and block release until it is recorded.",
-        "text": "Does the agent produce and maintain item-level threat analysis and risk assessment (TARA) per ISO/SAE 21434:2021 (TARA methods, Clause 15): asset identification, threat scenarios, attack paths, impact and feasibility ratings, risk determination and treatment decisions, traced to cybersecurity goals and re-run on change or incident?",
+        "text": "Does the agent produce and maintain item-level threat analysis and risk assessment (TARA) per ISO/SAE 21434 (TARA methods, Clause 15): asset identification, threat scenarios, attack paths, impact and feasibility ratings, risk determination and treatment decisions, traced to cybersecurity goals and re-run on change or incident?",
         "weight": 15
       },
       {
@@ -13615,14 +13615,14 @@
         "failureMode": "The agent closes a fleet vulnerability ticket once a patch is scheduled, without verifying that the patch reached the vehicles or worked.",
         "id": "MOB-PS-12",
         "keyRisk": 4,
-        "l1": "No §7.3.3 loop: monitoring is ad hoc, corrective actions are not evidenced, and CSMS effectiveness cannot be demonstrated for audit and type approval",
+        "l1": "No monitoring loop: monitoring is ad hoc, corrective actions are not evidenced, and CSMS effectiveness cannot be demonstrated for audit and type approval",
         "l2": "Vulnerability feeds are watched for the backend only, with no fleet or supplier coverage.",
         "l3": "Monitoring and response exist but evidence, effectiveness verification, and audit ready CSMS records are incomplete or inconsistently maintained",
         "l4": "Monitoring covers fleet, backend and supply chain with governed escalation, but corrective-action effectiveness is not verified or CSMS records lag.",
-        "l5": "§7.3.3 controls in place, with continuous monitoring, governed escalation, corrective action and effectiveness verification, and maintained CSMS evidence packs supporting type approval and surveillance audits",
-        "regulatoryRef": "UNECE WP.29 R155 §7.3.3",
+        "l5": "R155 monitoring controls in place, with continuous monitoring, governed escalation, corrective action and effectiveness verification, and maintained CSMS evidence packs supporting type approval and surveillance audits",
+        "regulatoryRef": "UNECE WP.29 R155 §7.2.2.2(g), §7.2.2.4, §7.4.1",
         "remediation": "Link every fleet or supplier vulnerability the agent monitors to an escalation decision and a corrective action, and verify effectiveness with a recorded retest.",
-        "text": "Does the agent implement UNECE WP.29 R155 §7.3.3 by operating a CSMS effectiveness and post development monitoring loop, including (1) continuous monitoring for vulnerabilities and cyber events across fleet and backend and supply chain, (2) defined escalation and decision criteria, (3) evidence of corrective actions and verification of effectiveness, and (4) audit ready CSMS records demonstrating ongoing compliance for type approval and surveillance audits?",
+        "text": "Does the agent support the UNECE WP.29 R155 requirements for continual monitoring, detection of and response to cyber threats and checking that measures are still effective (§7.2.2.2(g), §7.2.2.4) and annual reporting of monitoring outcomes (§7.4.1) by operating a CSMS effectiveness and post development monitoring loop, including (1) continuous monitoring for vulnerabilities and cyber events across fleet and backend and supply chain, (2) defined escalation and decision criteria, (3) evidence of corrective actions and verification of effectiveness, and (4) audit ready CSMS records demonstrating ongoing compliance for type approval and surveillance audits?",
         "weight": 15
       },
       {
@@ -13730,11 +13730,11 @@
       "GDPR Art. 5/25/32",
       "CCPA/CPRA §1798.100",
       "UNECE WP.29 R155/R156",
-      "ISO 21434:2021",
-      "ETSI EN 303 645 v2.1.1",
+      "ISO/SAE 21434",
+      "ETSI EN 303 645 V3.1.3",
       "EU NIS2 Directive 2022/2555",
       "NIST CSF 2.0",
-      "ISO/IEC 27701:2025"
+      "ISO/IEC 27701"
     ],
     "regulatoryReferences": [
       {
@@ -13764,13 +13764,11 @@
         "text": "UNECE WP.29 R155/R156"
       },
       {
-        "citation": "ISO/SAE 21434:2021 Road vehicles — Cybersecurity engineering",
-        "instrumentId": "iso-21434",
-        "jurisdiction": "INT",
-        "lastReviewed": "2026-10-03",
-        "status": "in-force",
-        "text": "ISO 21434:2021",
-        "url": "https://www.iso.org/standard/70918.html"
+        "citation": "ISO/SAE 21434",
+        "instrumentId": null,
+        "jurisdiction": "unresolved",
+        "status": "unverified",
+        "text": "ISO/SAE 21434"
       },
       {
         "citation": "ETSI EN 303 645 Cyber security for consumer IoT",
@@ -13778,7 +13776,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "ETSI EN 303 645 v2.1.1"
+        "text": "ETSI EN 303 645 V3.1.3"
       },
       {
         "citation": "Directive (EU) 2022/2555 (NIS2)",
@@ -13800,13 +13798,11 @@
         "url": "https://www.nist.gov/cyberframework"
       },
       {
-        "citation": "ISO/IEC 27701:2025 Privacy information management systems — Requirements and guidance",
-        "instrumentId": "iso-27701-2025",
-        "jurisdiction": "INT",
-        "lastReviewed": "2026-10-03",
-        "status": "in-force",
-        "text": "ISO/IEC 27701:2025",
-        "url": "https://www.iso.org/standard/27701"
+        "citation": "ISO/IEC 27701",
+        "instrumentId": null,
+        "jurisdiction": "unresolved",
+        "status": "unverified",
+        "text": "ISO/IEC 27701"
       }
     ],
     "riskTier": "critical",
