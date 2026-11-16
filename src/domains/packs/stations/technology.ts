@@ -164,7 +164,7 @@ export const partnershipsProsperity: IndustryPack = {
   riskTier: "high",
   euAIActClassification: "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation and that product must undergo a third-party conformity assessment under that legislation — otherwise Art. 4 (AI literacy) and Art. 5 (prohibited practices) apply, and Art. 50 (transparency) where the agent interacts directly with people or generates synthetic content",
   sdgAlignment: ["SDG 17 — Partnerships for the Goals", "SDG 9 — Industry, Innovation and Infrastructure", "SDG 10 — Reduced Inequalities"],
-  certificationPath: "L1 Basic partnership governance → L2 IP rights management → L3 FRAND/open source licence controls in place → L4 Full SDG 17 partnership framework → L5 Autonomous partnership orchestration with verified equity, IP protection, and measurable prosperity outcomes",
+  certificationPath: "L1 Basic partnership governance → L2 IP rights management → L3 FRAND/open source licence controls in place → L4 SDG 17.16 partnership monitoring and impact reporting → L5 Autonomous partnership orchestration with verified equity, IP protection, and measurable prosperity outcomes",
   keyRisks: ["IP exploitation by dominant partners through AI-facilitated access", "Open source license violation in AI-generated code", "Partnership value extraction without reciprocal benefit", "Trade secret leakage through AI collaboration tools", "Exclusion of developing economy partners from AI-mediated partnerships"],
   certificationThreshold: 68,
   lastReviewed: "2026-10-04",

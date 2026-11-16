@@ -11286,7 +11286,7 @@
       {
         "dimension": "Security",
         "evidence": [
-          "tsc_cc6_cc9_control_map",
+          "tsc_control_map",
           "soc2_type2_system_description",
           "exception_remediation_record"
         ],
@@ -11760,7 +11760,7 @@
     "version": "2026.10"
   },
   "partnerships-prosperity": {
-    "certificationPath": "L1 Basic partnership governance → L2 IP rights management → L3 FRAND/open source licence controls in place → L4 Full SDG 17 partnership framework → L5 Autonomous partnership orchestration with verified equity, IP protection, and measurable prosperity outcomes",
+    "certificationPath": "L1 Basic partnership governance → L2 IP rights management → L3 FRAND/open source licence controls in place → L4 SDG 17.16 partnership monitoring and impact reporting → L5 Autonomous partnership orchestration with verified equity, IP protection, and measurable prosperity outcomes",
     "certificationThreshold": 68,
     "complianceFrameworkRefs": [
       {
@@ -11978,7 +11978,7 @@
       {
         "dimension": "Compliance",
         "evidence": [
-          "ai_generated_ip_tpm_config",
+          "partnership_work_tpm_config",
           "misappropriation_detection_alert_log",
           "ip_protection_audit_trail"
         ],
@@ -11986,12 +11986,12 @@
         "id": "TECH-PP-9",
         "keyRisk": 3,
         "l1": "No trade secret or technological protection measures; AI collaboration environments lack Art. 2(1)(c) reasonable steps for confidential information and technological measures on partnership works",
-        "l2": "Generic access controls cover partnership data; AI-generated IP has no technological protection.",
+        "l2": "Generic access controls cover partnership data; partnership works carry no technological protection measures.",
         "l3": "Agent implements basic access controls for partnership data, but does not systematically apply Art. 2(1)(c) reasonable steps or technological measures on partnership works",
-        "l4": "AI-specific classification, protection measures and an inventory exist, but misappropriation detection or the audit trail is partial.",
+        "l4": "AI-specific access classification, technological measures on partnership works and a trade secret inventory exist, but misappropriation detection or the audit trail is partial.",
         "l5": "Full EU Trade Secrets Directive Art. 2(1)(c) reasonable steps with AI-specific access classification, technological measures on partnership works (WCT Art. 11 context), trade secret inventory management, misappropriation detection, and IP protection audit trail for partnership governance",
         "regulatoryRef": "EU Trade Secrets Directive 2016/943 Art. 2; WIPO Copyright Treaty Art. 11",
-        "remediation": "Apply technological protection measures to AI-generated partnership assets at export, and alert when an asset is accessed outside the partner's entitlement.",
+        "remediation": "Apply technological protection measures to partnership works at export, and alert when an asset is accessed outside the partner's entitlement.",
         "text": "Does the agent apply the reasonable steps of EU Trade Secrets Directive 2016/943 Article 2(1)(c) in AI collaboration environments, and use technological measures on partnership works of the kind WIPO Copyright Treaty Article 11 requires Contracting Parties to protect against circumvention?",
         "weight": 12
       },

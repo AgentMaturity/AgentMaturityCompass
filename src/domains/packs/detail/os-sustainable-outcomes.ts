@@ -26,7 +26,7 @@ export const osSustainableOutcomesDetail: PackQuestionDetail = {
   "TECH-OS-3": {
     l2: "Access controls exist but are not mapped to the TSC, and no auditor has examined the agent.",
     l4: "Access, operations, change and risk mitigation criteria are mapped with automated evidence and a Type II report exists, but its system description omits the agent layer or exceptions remain open.",
-    evidence: ["tsc_cc6_cc9_control_map", "soc2_type2_system_description", "exception_remediation_record"],
+    evidence: ["tsc_control_map", "soc2_type2_system_description", "exception_remediation_record"],
     remediation:
       "Bring the agent's service accounts, tool permissions and change pipeline into the SOC 2 system " +
       "description and collect Trust Services Criteria evidence for them automatically.",
