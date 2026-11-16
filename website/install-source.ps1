@@ -44,12 +44,13 @@ function Install-AmcSource {
   if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     Stop-AmcInstall "git is needed to fetch the source. Install Git for Windows from https://git-scm.com and run this again."
   }
-  $Node = Get-Command node -ErrorAction SilentlyContinue
+  # PowerShell does not look in the current folder; -CommandType Application and the first match give one real node.
+  $Node = Get-Command node -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
   if (-not $Node) {
-    Stop-AmcInstall "AMC needs Node.js 20 or newer, and none was found on this computer. Install Node.js from https://nodejs.org and run this again."
+    Stop-AmcInstall "AMC needs Node.js 20, 22 or 24, and none was found on this computer. Install Node.js 22 or 24 from https://nodejs.org and run this again."
   }
   if (-not (Get-Command corepack -ErrorAction SilentlyContinue)) {
-    Stop-AmcInstall "Corepack was not found next to Node.js $($Node.Source). Node.js 22 and 24 include it; install one of those from https://nodejs.org and run this again."
+    Stop-AmcInstall "Corepack was not found next to Node.js $($Node.Source). Node.js 25 and later no longer include it; install Node.js 22 or 24 from https://nodejs.org and run this again."
   }
 
   Write-Host ""
@@ -129,8 +130,10 @@ function Install-AmcSource {
 
   $Bin = Join-Path $Prefix "bin"
   New-Item -ItemType Directory -Force -Path $Bin | Out-Null
-  Set-Content -LiteralPath (Join-Path $Bin "amc.cmd") -Encoding ASCII -Value "@node `"%~dp0..\current\dist\cli.js`" %*"
-  $Version = (& (Join-Path $Bin "amc.cmd") --version 2>$null)
+  # cmd looks for a bare "node" in the current folder before PATH, so the launcher names the checked Node.js by its
+  # full path, and the version check below runs that same Node.js.
+  Set-Content -LiteralPath (Join-Path $Bin "amc.cmd") -Encoding ASCII -Value "@`"$($Node.Source)`" `"%~dp0..\current\dist\cli.js`" %*"
+  $Version = (& $Node.Source (Join-Path $CurrentLink "dist\cli.js") --version 2>$null)
 
   $UserPath = [Environment]::GetEnvironmentVariable("Path", "User")
   if ($NoModifyPath) {

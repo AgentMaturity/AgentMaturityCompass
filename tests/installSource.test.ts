@@ -34,12 +34,13 @@ if [ "$2" = run ]; then mkdir -p dist; printf '#!/usr/bin/env node\\nconsole.log
 exit 0
 `, { mode: 0o755 });
   const nodeDir = dirname(process.execPath);
-  const run = (...args: string[]) => spawnSync("/bin/sh", [script, "--repo", repo, ...args], {
-    env: { HOME: home, PATH: `${bin}:${nodeDir}:/usr/bin:/bin`, SHELL: "/bin/zsh" }, encoding: "utf8"
+  const run = (...args: string[]) => runIn(home, `${bin}:${nodeDir}:/usr/bin:/bin`, ...args);
+  const runIn = (cwd: string, path: string, ...args: string[]) => spawnSync("/bin/sh", [script, "--repo", repo, ...args], {
+    cwd, env: { HOME: home, PATH: path, SHELL: "/bin/zsh" }, encoding: "utf8"
   });
   const commit = (name: string, file = "x") => { writeFileSync(join(repo, file), name); git(repo, "add", "."); git(repo, "commit", "-qm", name); return git(repo, "rev-parse", "HEAD").stdout.trim(); };
   const head = () => git(repo, "rev-parse", "HEAD").stdout.trim();
-  return { home, repo, calls, run, commit, head, prefix: join(home, ".amc-source") };
+  return { dir, bin, nodeDir, home, repo, calls, run, runIn, commit, head, prefix: join(home, ".amc-source") };
 }
 
 describe.skipIf(process.platform === "win32")("source installer (website/install-source.sh)", () => {
@@ -90,6 +91,23 @@ describe.skipIf(process.platform === "win32")("source installer (website/install
     expect(readlinkSync(join(s.prefix, "current"))).toBe(`builds/${three}`);
   });
 
+  it("never runs a node from the current folder, at install time or through the amc launcher", () => {
+    const s = sandbox();
+    const project = join(s.dir, "project");
+    const planted = join(s.dir, "planted-node-ran");
+    mkdirSync(project);
+    writeFileSync(join(project, "node"), `#!/bin/sh\ntouch "${planted}"\nexit 1\n`, { mode: 0o755 });
+    // An empty PATH entry (the leading ":") means the current folder.
+    const installed = s.runIn(project, `:${s.bin}:${s.nodeDir}:/usr/bin:/bin`);
+    expect(installed.status, installed.stderr).toBe(0);
+    expect(installed.stdout).toContain(`Using Node.js v${process.versions.node} (${join(s.nodeDir, "node")})`);
+    const launcher = readFileSync(join(s.prefix, "bin", "amc"), "utf8");
+    expect(launcher).toBe(`#!/bin/sh\nexec '${join(s.nodeDir, "node")}' '${join(s.prefix, "current", "dist", "cli.js")}' "$@"\n`);
+    const amc = spawnSync(join(s.prefix, "bin", "amc"), ["--version"], { cwd: project, env: { PATH: `:${s.nodeDir}:/usr/bin:/bin` }, encoding: "utf8" });
+    expect(amc.stdout.trim()).toBe("9.9.9");
+    expect(existsSync(planted)).toBe(false);
+  });
+
   it("refuses a Node.js older than package.json engines.node before any build", () => {
     const s = sandbox(">=99");
     const result = s.run();
@@ -130,4 +148,11 @@ it("labels the PowerShell twin untested in its header and its help, and calls on
   expect(text).toContain("UNTESTED on a real Windows machine");
   expect(text).toContain("pnpm install --frozen-lockfile");
   expect(text.trimEnd().split("\n").at(-1)).toBe("Install-AmcSource @args");
+});
+
+it("writes amc.cmd with the checked Node.js's full path in quotes, never a bare node, and checks the version through it", () => {
+  const text = readFileSync(ps1, "utf8");
+  expect(text).toContain('-Value "@`"$($Node.Source)`" `"%~dp0..\\current\\dist\\cli.js`" %*"');
+  expect(text).not.toMatch(/@node\b/);
+  expect(text).toContain('& $Node.Source (Join-Path $CurrentLink "dist\\cli.js") --version');
 });

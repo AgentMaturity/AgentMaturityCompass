@@ -62,7 +62,8 @@ Use Node 22 or 24 LTS. Node 20 reached end of life on April 30, 2026; the packag
 
 ### One command (macOS and Linux)
 
-You need git and Node.js 20 or newer (22 or 24 recommended; both include Corepack). Then run:
+You need git and Node.js 20, 22 or 24 (22 or 24 recommended). These include Corepack, which the script uses to get
+the right pnpm; Node.js 25 and later no longer include it, so install 22 or 24. Then run:
 
 ```bash
 curl -fsSL https://agentmaturity.co/install-source.sh | sh
@@ -75,13 +76,16 @@ Open a new terminal, go to your project folder and type `amc`.
 What it does, step by step:
 
 - Checks for git, Node.js and Corepack, and prints which Node.js it uses. It refuses a Node.js older than the
-  version `package.json` asks for.
+  version `package.json` asks for. It ignores empty or relative PATH entries, so it never runs a `node` that
+  happens to sit in the folder you run it from.
 - Fetches `https://github.com/AgentMaturity/AgentMaturityCompass` over https, at the default branch unless you
   name a ref. It downloads no other script.
 - Installs dependencies exactly as the lockfile lists them (`pnpm install --frozen-lockfile`), with the pnpm version
   `package.json` names, through Corepack. Then it builds (`pnpm run build`).
-- Keeps everything in one folder, `~/.amc-source` (about 2 GB with two builds and the package store), and links
-  `amc` into `~/.amc-source/bin`.
+- Keeps everything in one folder, `~/.amc-source` (about 2 GB with two builds and the package store), and puts a
+  small `amc` launcher in `~/.amc-source/bin`. The launcher names the Node.js the script checked by its full path,
+  so `amc` never runs a `node` from your current folder. If you remove or replace that Node.js, run the install
+  command again.
 - Adds one line, marked `# AMC source install`, to your shell profile (`~/.zshrc` for zsh, `~/.bash_profile` for
   bash on macOS, `~/.bashrc` for bash on Linux, otherwise `~/.profile`), and only if that line is not there yet.
   It says which file it changed. Use `--no-modify-path` to change nothing and print the line instead. For fish it

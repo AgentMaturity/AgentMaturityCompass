@@ -50,10 +50,29 @@ amc_source_install() {
     ""|-*|*..*|*[!A-Za-z0-9._/-]*) fail "--ref must be a branch, a tag or a full commit id: $ref" ;;
   esac
 
+  # An empty or relative PATH entry means "the current folder": drop them, so no node, git or corepack is taken
+  # from wherever this runs.
+  clean_path=""
+  old_ifs=$IFS; IFS=:; set -f
+  for entry in $PATH; do
+    case "$entry" in /*) clean_path="${clean_path:+$clean_path:}$entry" ;; esac
+  done
+  set +f; IFS=$old_ifs
+  PATH=$clean_path; export PATH
+
   command -v git >/dev/null 2>&1 || fail "git is needed to fetch the source. Install it (macOS: xcode-select --install; Linux: your package manager) and run this again."
   node_found=$(command -v node 2>/dev/null || true)
-  [ -n "$node_found" ] || fail "AMC needs Node.js 20 or newer, and none was found on this computer. Install Node.js from https://nodejs.org and run this again."
-  command -v corepack >/dev/null 2>&1 || fail "Corepack was not found next to Node.js $node_found. Node.js 22 and 24 include it; install one of those from https://nodejs.org and run this again."
+  case "$node_found" in
+    /*) ;;
+    *) fail "AMC needs Node.js 20, 22 or 24, and none was found on this computer. Install Node.js 22 or 24 from https://nodejs.org and run this again." ;;
+  esac
+  corepack_bin=$(command -v corepack 2>/dev/null || true)
+  case "$corepack_bin" in
+    /*) ;;
+    *) fail "Corepack was not found next to Node.js $node_found. Node.js 25 and later no longer include it; install Node.js 22 or 24 from https://nodejs.org and run this again." ;;
+  esac
+  # Every later node call, the build's own scripts and the amc launcher use this one checked Node.js.
+  PATH="$(dirname "$node_found"):$PATH"; export PATH
 
   say ""
   say "amc_ source install"
@@ -71,10 +90,10 @@ amc_source_install() {
   commit=$(git -C "$work" rev-parse HEAD)
 
   # The one Node.js rule is package.json engines.node (">=N") of the commit being built.
-  node_min=$(cd "$work" && node -p 'String((/^>=\s*(\d+)/.exec(require("./package.json").engines.node) || [])[1] || "")' 2>/dev/null || true)
+  node_min=$(cd "$work" && "$node_found" -p 'String((/^>=\s*(\d+)/.exec(require("./package.json").engines.node) || [])[1] || "")' 2>/dev/null || true)
   case "$node_min" in ""|*[!0-9]*) fail "package.json at $commit has no engines.node rule of the form >=N" ;; esac
-  node_version=$(node --version 2>/dev/null | LC_ALL=C tr -cd 'A-Za-z0-9.+-' | cut -c1-40)
-  node_major=$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null || echo 0)
+  node_version=$("$node_found" --version 2>/dev/null | LC_ALL=C tr -cd 'A-Za-z0-9.+-' | cut -c1-40)
+  node_major=$("$node_found" -p 'process.versions.node.split(".")[0]' 2>/dev/null || echo 0)
   if ! [ "$node_major" -ge "$node_min" ] 2>/dev/null; then
     fail "AMC needs Node.js $node_min or newer, and the one found on this computer is Node.js ${node_version:-unknown} ($node_found). Install a newer Node.js from https://nodejs.org and run this again."
   fi
@@ -97,9 +116,9 @@ amc_source_install() {
       && export COREPACK_HOME="$prefix/corepack" COREPACK_ENABLE_DOWNLOAD_PROMPT=0 \
          XDG_DATA_HOME="$prefix/data" XDG_CACHE_HOME="$prefix/cache" XDG_STATE_HOME="$prefix/state" \
          npm_config_cache="$prefix/npm-cache" npm_config_update_notifier=false \
-      && corepack pnpm install --frozen-lockfile \
-      && corepack pnpm run build \
-      && node dist/cli.js --version >/dev/null); then
+      && "$corepack_bin" pnpm install --frozen-lockfile \
+      && "$corepack_bin" pnpm run build \
+      && "$node_found" dist/cli.js --version >/dev/null); then
       if [ -n "$current" ]; then
         fail "the build of $commit failed (see the lines above). Your previous AMC, commit $current, is still installed and works."
       fi
@@ -115,7 +134,13 @@ amc_source_install() {
     done
   fi
   mkdir -p "$prefix/bin"
-  ln -sfn ../current/dist/cli.js "$prefix/bin/amc"
+  # A small launcher that names the checked Node.js by its full path; dist/cli.js's own "#!/usr/bin/env node" line
+  # would take whatever node comes first on PATH, which can be one in the current folder. It replaces the symlink
+  # that older installs have (mv, so nothing is written through the symlink into dist/cli.js).
+  quote() { printf "'%s'" "$(printf '%s' "$1" | sed "s/'/'\\\\''/g")"; }
+  printf '#!/bin/sh\nexec %s %s "$@"\n' "$(quote "$node_found")" "$(quote "$prefix/current/dist/cli.js")" > "$prefix/bin/.amc-new"
+  chmod 755 "$prefix/bin/.amc-new"
+  mv -f -- "$prefix/bin/.amc-new" "$prefix/bin/amc"
   version=$("$prefix/bin/amc" --version 2>/dev/null || echo unknown)
 
   path_line="export PATH=\"\$HOME/.amc-source/bin:\$PATH\" $marker"
