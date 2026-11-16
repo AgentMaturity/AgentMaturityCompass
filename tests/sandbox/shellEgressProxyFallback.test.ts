@@ -42,7 +42,7 @@ afterEach(async () => {
 
 async function through(method: "GET" | "CONNECT"): Promise<{ status: number; rows: Row[] }> {
   const rows: Row[] = [];
-  const proxy = await startShellEgressProxy({ allowHosts: ["dual.test", "::1", "127.0.0.1"], record: (row) => rows.push(row), workspace, agentId: "default" });
+  const proxy = await startShellEgressProxy({ allowHosts: [`dual.test:${port}`, `[::1]:${port}`, `127.0.0.1:${port}`], record: (row) => rows.push(row), workspace, agentId: "default" });
   try {
     const status = await new Promise<number>((done, fail) => {
       const req = httpRequest({ host: "127.0.0.1", port: proxy.port, method, path: method === "CONNECT" ? `dual.test:${port}` : `http://dual.test:${port}/x`,
