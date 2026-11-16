@@ -2172,7 +2172,7 @@
     "sourceUrl": "https://www.wto.org/english/docs_e/legal_e/27-trips_04_e.htm",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Citation unchanged. Art. 10 protects computer programs and compilations of data (it says nothing about AI-generated outputs); Arts. 27-34 are the patent section (Section 5 page, wto.org/english/docs_e/legal_e/27-trips_04c_e.htm). TRIPS binds WTO Members, so the question no longer speaks of 'TRIPS-compliant protection' for an agent's outputs; it now asks for rights management that reflects those protections. L1, L3, L5 reworded."
+    "note": "Citation unchanged. Art. 10 protects computer programs and compilations of data (it says nothing about AI-generated outputs); Arts. 27-34 are the patent section (Section 5 page, wto.org/english/docs_e/legal_e/27-trips_04c_e.htm). TRIPS binds WTO Members, so the question no longer asks for TRIPS conformity of an agent's outputs; it now asks for rights management that reflects those protections. L1, L3, L5 reworded."
   },
   {
     "packId": "partnerships-prosperity",
