@@ -117,7 +117,8 @@ describe("receipt-based platform status where users install (LIVE-DEPLOY-10)", (
     for (const line of ["macOS arm64: qualified", "Linux arm64:", "Linux x64, macOS x64, Windows x64:", "Container images:"]) expect(status).toContain(line);
     const desktop = read("docs/DESKTOP_PACKAGES.md");
     expect(desktop).toContain("the CLI natively and Studio under WSL2 are both untested");
-    expect(desktop).toMatch(/Linux archive ships no Studio launcher/);
+    // The Linux archive now carries a Studio launcher (amc-studio.sh); the doc says it was never run on Linux.
+    expect(desktop).toContain("The Linux archive's Studio launcher (`amc-studio.sh`) and the Windows Studio launcher have not been run on those systems.");
   });
 });
 
