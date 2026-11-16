@@ -9,7 +9,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 import { NAMESPACE_FLAGS, bwrapArgv, linuxSocketDenyFilter, type BwrapBind } from "../../src/sandbox/bwrapBackend.js";
-import { EGRESS_MOUNT, linuxSocketEgressFilter, relayCommand } from "../../src/sandbox/bwrapEgress.js";
+import { EGRESS_MOUNT, RELAY_NODE, linuxSocketEgressFilter, relayCommand } from "../../src/sandbox/bwrapEgress.js";
 import { buildSeatbeltProfile } from "../../src/sandbox/seatbeltBackend.js";
 import { buildSeatbeltShellProfile } from "../../src/sandbox/seatbeltNativeShell.js";
 
@@ -93,18 +93,18 @@ describe("Bubblewrap arguments are never looser than at 5551af1dc", () => {
     });
   }
 
-  test("native shell with an allow-list: same namespaces (network unshared), one extra read-only mount, the command under the relay", () => {
+  test("native shell with an allow-list: same namespaces (network unshared), two extra read-only mounts, the command under the relay", () => {
     const { binds, masks, workspace, command } = callers["native shell"]!;
     const before = argvAt5551af1dc(binds, masks, workspace, command);
-    const after = bwrapArgv({ binds: [...binds, { destination: EGRESS_MOUNT, writable: false }], masks, workspace, command: relayCommand(command) });
+    const after = bwrapArgv({ binds: [...binds, { destination: EGRESS_MOUNT, writable: false }, { destination: RELAY_NODE, writable: false }], masks, workspace, command: relayCommand(command) });
     expect(after.slice(0, 1 + NAMESPACE_FLAGS.length)).toEqual(before.slice(0, 1 + NAMESPACE_FLAGS.length));
     expect(after).toContain("--unshare-net");
     const head = (argv: string[]) => argv.slice(0, argv.indexOf("--"));
     const added = head(after).filter((_, index, all) => index >= head(before).length || all[index] !== head(before)[index]);
-    // Only the egress mount was inserted, read-only; everything after it is the old sequence shifted by three.
+    // Only the egress folder and the Node binary over it were inserted, read-only; the rest is the old sequence.
     const at = head(after).indexOf(EGRESS_MOUNT);
-    expect(head(after).slice(at - 2, at + 1)).toEqual(["--ro-bind-fd", String(binds.length + 5), EGRESS_MOUNT]);
-    expect([...head(after).slice(0, at - 2), ...head(after).slice(at + 1)]).toEqual(head(before));
+    expect(head(after).slice(at - 2, at + 4)).toEqual(["--ro-bind-fd", String(binds.length + 5), EGRESS_MOUNT, "--ro-bind-fd", String(binds.length + 6), RELAY_NODE]);
+    expect([...head(after).slice(0, at - 2), ...head(after).slice(at + 4)]).toEqual(head(before));
     expect(added.length).toBeGreaterThan(0);
     expect(after.slice(after.indexOf("--") + 1)).toEqual([...relayCommand([]), ...command]);
     expect(after.filter(arg => arg === "--bind-fd")).toHaveLength(before.filter(arg => arg === "--bind-fd").length);

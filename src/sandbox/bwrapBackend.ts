@@ -6,7 +6,7 @@ import { runProcess } from "../exec/runProcess.js";
 import { PROCESS_LIMIT_LIMITATION, ROOT_PROCESS_LIMIT_LIMITATION, processLimit, withProcessLimit } from "./processCap.js";
 import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTypes.js";
 import { shellSecretPaths } from "./shellSecretPaths.js";
-import { EGRESS_MOUNT, encodeBpf, linuxSocketEgressFilter, prepareRelayDirectory, refuseSocketFiles, relayCommand, socketDenyList, socketFilterHead } from "./bwrapEgress.js";
+import { EGRESS_MOUNT, RELAY_NODE, encodeBpf, linuxSocketEgressFilter, prepareRelayDirectory, refuseSocketFiles, relayCommand, socketDenyList, socketFilterHead } from "./bwrapEgress.js";
 import type { ShellEgressProxy } from "./egress/shellEgressProxy.js";
 
 const BWRAP = "/usr/bin/bwrap";
@@ -252,7 +252,11 @@ export function bwrapBackend(): SandboxBackend {
         bind(workspace, workspace, false);
         // Nested writable binds are applied from outermost to innermost.
         for (const root of writableRoots.sort((a, b) => a.length - b.length)) bind(root, root, true);
-        if (proxy) bind(egressDirectory, EGRESS_MOUNT, false);
+        if (proxy) {
+          bind(egressDirectory, EGRESS_MOUNT, false);
+          // AMC's own Node, pinned by descriptor over the empty file prepareRelayDirectory left; nothing is copied.
+          bind(process.execPath, RELAY_NODE, false);
+        }
         const masks = bwrapReadMasks(workspace, policy.readDeny ?? []);
         if (!masks.ok) return declined(masks.reason);
         const limit = policy.maxProcesses === undefined ? null : processLimit(policy.maxProcesses);

@@ -141,7 +141,7 @@ network tools for those operations. With a signed `nativeSandbox.egress`, the
 shell keeps its empty network namespace and runs under a small relay
 ([ADR-008](adr/008-native-shell-containment.md)): AMC's proxy listens on a Unix
 socket in the launcher's private directory, bound read-only at `/amc-egress`
-with a read-only copy of AMC's Node; the relay listens on 127.0.0.1 inside the
+with AMC's own Node binary mounted read-only by descriptor (not copied); the relay listens on 127.0.0.1 inside the
 namespace and forwards there. For that call the socket filter allows Unix, IPv4
 and IPv6 sockets only (other families and io_uring stay denied), and the launch
 is refused when the workspace holds a socket file or more than 20,000 entries to

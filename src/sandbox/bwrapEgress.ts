@@ -1,4 +1,4 @@
-import { chmodSync, copyFileSync, lstatSync, opendirSync, realpathSync, writeFileSync } from "node:fs";
+import { lstatSync, opendirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 /**
@@ -6,7 +6,8 @@ import { join } from "node:path";
  * egress allow-list. The shell still runs in an empty network namespace. AMC's
  * per-call proxy listens on a Unix socket (mode 0600 directory) in the
  * launcher's private temp directory, which is bound read-only into the sandbox
- * at /amc-egress with a read-only copy of AMC's Node and a small relay script.
+ * at /amc-egress with a small relay script; AMC's Node is bound read-only over
+ * /amc-egress/node by descriptor, as the runtime roots are, never copied.
  * The relay listens on 127.0.0.1 inside the namespace, forwards each connection
  * to that socket, and runs the command with the proxy variables set. Nothing
  * else listens in that namespace, and the host's loopback is not in it.
@@ -20,6 +21,8 @@ import { join } from "node:path";
  * host's are out of reach.
  */
 export const EGRESS_MOUNT = "/amc-egress";
+/** Where the launcher binds AMC's own Node binary, read-only, for the relay. */
+export const RELAY_NODE = `${EGRESS_MOUNT}/node`;
 
 type Instruction = [code: number, jt: number, jf: number, k: number];
 const KILL_PROCESS = 0x80000000, ERRNO_EPERM = 0x00050001, ALLOW = 0x7fff0000;
@@ -119,15 +122,16 @@ server.listen(0, "127.0.0.1", () => {
 });
 `;
 
-/** Write the relay and a read-only copy of AMC's Node into `directory`, which the backend binds at EGRESS_MOUNT. */
+/**
+ * Write the relay into `directory`, which the backend binds at EGRESS_MOUNT, and an empty file for RELAY_NODE to be
+ * mounted on: the mount point exists before the read-only mount, so Bubblewrap never has to create it there.
+ */
 export function prepareRelayDirectory(directory: string): void {
-  const node = join(directory, "node");
-  copyFileSync(realpathSync(process.execPath), node);
-  chmodSync(node, 0o500);
+  writeFileSync(join(directory, "node"), "", { flag: "wx", mode: 0o400 });
   writeFileSync(join(directory, "relay.mjs"), RELAY_SOURCE, { flag: "wx", mode: 0o400 });
 }
 
 /** The command as the sandbox runs it: under the relay, which connects to the proxy socket at EGRESS_MOUNT. */
 export function relayCommand(command: readonly string[]): string[] {
-  return [`${EGRESS_MOUNT}/node`, `${EGRESS_MOUNT}/relay.mjs`, `${EGRESS_MOUNT}/proxy.sock`, ...command];
+  return [RELAY_NODE, `${EGRESS_MOUNT}/relay.mjs`, `${EGRESS_MOUNT}/proxy.sock`, ...command];
 }

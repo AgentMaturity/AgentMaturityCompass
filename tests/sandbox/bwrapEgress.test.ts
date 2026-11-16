@@ -4,13 +4,13 @@
  * The generated Bubblewrap arguments and socket filter are compared in confinementNoLooser.test.ts.
  */
 import { spawn, spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { createServer, type Server } from "node:http";
 import { createServer as createSocketServer } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
-import { RELAY_SOURCE, refuseSocketFiles, relayCommand } from "../../src/sandbox/bwrapEgress.js";
+import { RELAY_NODE, RELAY_SOURCE, prepareRelayDirectory, refuseSocketFiles, relayCommand } from "../../src/sandbox/bwrapEgress.js";
 import { startPolicyEgress } from "../../src/sandbox/egress/sessionEgress.js";
 import { initWorkspace } from "../../src/workspace.js";
 
@@ -76,4 +76,14 @@ test("a workspace holding a socket file is refused; links are not followed", asy
     expect(() => refuseSocketFiles(tree)).toThrow(/holds a socket file/);
   } finally { server.close(); }
   expect(() => refuseSocketFiles(tree, 3)).toThrow(/too many files/);
+});
+
+test("the relay folder holds the script and an empty mount point for Node; Node itself is bound, never copied", () => {
+  const dir = join(root, "relay-dir");
+  mkdirSync(dir, { mode: 0o700 });
+  prepareRelayDirectory(dir);
+  expect(statSync(join(dir, "node")).size).toBe(0);
+  expect(statSync(join(dir, "node")).mode & 0o777).toBe(0o400);
+  expect(readFileSync(join(dir, "relay.mjs"), "utf8")).toBe(RELAY_SOURCE);
+  expect(relayCommand(["/bin/true"])[0]).toBe(RELAY_NODE);
 });
