@@ -624,11 +624,11 @@
      "riskTier": "very-high",
      "questions": 16,
      "rules": [
-      "ISO 28000:2022",
+      "ISO 28000",
       "NIST SP 800-161r1-upd1",
       "GS1 EPCIS 2.0",
       "EU NIS2 Directive 2022/2555",
-      "ISO 9001:2026"
+      "ISO 9001"
      ],
      "risks": [
       "Late, missed, damaged, or lost shipments hidden by weak carrier scorecards",

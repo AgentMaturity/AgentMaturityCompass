@@ -202,7 +202,7 @@
         "id": "MOB-F3W-8",
         "dimension": "Operational KPI Mapping",
         "text": "Does the agent map logistics KPIs such as OTIF/DIFOT, fill rate, inventory accuracy, dock-to-stock time, exception aging, carrier acceptance, and SLA breach rate to AMC maturity evidence?",
-        "regulatoryRef": "ISO 9001:2026 (monitoring, measurement, analysis and evaluation); ISO 28000:2022 performance evaluation",
+        "regulatoryRef": "ISO 9001 (monitoring, measurement, analysis and evaluation); ISO 28000 performance evaluation",
         "l1": "KPIs exist outside AMC and do not affect maturity, routing, or remediation",
         "l3": "Some KPIs are reported in dashboards, but they are not consistently bound to evidence or maturity recommendations",
         "l5": "KPI-to-AMC mapping is versioned, signed, and continuously monitored with threshold drift alerts, evidence links, and remediation playbooks for every degraded KPI",
