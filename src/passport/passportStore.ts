@@ -110,11 +110,11 @@ export function getPassportRevocation(workspace: string, passportId: string): Pa
  * Whether this workspace revoked `passportId`, from the signed list first, then the older local file (which can only add
  * revocations). Throws when the signed list does not verify or is older than one already seen: callers fail closed.
  */
-export function passportRevocationStatus(workspace: string, passportId: string): { revokedTs: number; reason: string | null; source: "signed-list" | "local-file" } | null {
+export function passportRevocationStatus(workspace: string, passportId: string): { revokedTs: number; reason: string | null; recordedIn: "signed-list" | "local-file" } | null {
   const signed = signedPassportRevocation(workspace, passportId);
-  if (signed !== null) return { revokedTs: Date.parse(signed.revokedAt), reason: signed.reason, source: "signed-list" };
+  if (signed !== null) return { revokedTs: Date.parse(signed.revokedAt), reason: signed.reason, recordedIn: "signed-list" };
   const local = getPassportRevocation(workspace, passportId);
-  return local === null ? null : { revokedTs: local.revokedTs, reason: local.reason, source: "local-file" };
+  return local === null ? null : { revokedTs: local.revokedTs, reason: local.reason, recordedIn: "local-file" };
 }
 
 export function revokePassport(params: {

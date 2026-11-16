@@ -40,7 +40,7 @@ describe("amc-verify", () => {
   test("prints six separate results and exits 0, 1 or 3 by them", () => {
     expect(main(argsFor("valid-attestation"))).toBe(0);
     expect(out).toMatch(/integrity\s+pass/);
-    expect(out).toContain("not that its statement is true");
+    expect(out).toContain("not that what it says is true");
     out = "";
     expect(main(argsFor("forged-embedded-key"))).toBe(1);
     expect(out).toMatch(/issuerAdmission\s+fail\s+ISSUER_NOT_PINNED/);

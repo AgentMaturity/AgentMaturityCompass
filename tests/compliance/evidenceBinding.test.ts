@@ -78,6 +78,11 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   // A4 Activate record labels (P1-62, reviewed 2026-10-12 at the 442cd919 merge): a monitor record field no source could
   // fill (src/a4/a4Monitor.ts) and a value claim's recommended lane (src/a4/a4Value.ts). Neither is a ledger meta.source.
   "source_unavailable", "value_contract",
+  // Conditional labels found by the wider scan (vault lane, 2026-11-16), none a ledger meta.source: Aspire's answer
+  // source (src/a4/aspireUnderstand.ts), a session export's payload origin (src/observability/sessionExport.ts), a hook
+  // action identity's id origin (src/bridge/hookActionIdentity.ts), an external-evidence export's producer name
+  // (src/importers/externalEvidenceExport.ts) and a guardrail binding's origin (src/enforce/guardrailRuntimeBindings.ts).
+  "answers.stations", "blob", "derived-request-id", "provider-call-id", "neutral-artifact", "tool-pipeline",
   // A secret pattern's contributing engine (P2-02 hardening, src/shield/redaction/secretPatterns.ts SecretPatternSource),
   // reviewed 2026-10-18 at the codex-full merge. It labels where a redaction pattern came from, never a ledger meta.source.
   "dataflow",
@@ -109,7 +114,12 @@ describe("source-literal enumeration", () => {
   test("every source literal in src is classified", () => {
     const literals = new Set<string>();
     for (const file of sourceFiles("src")) {
-      for (const match of readFileSync(file, "utf8").matchAll(/source: "([a-z_.-]*)"/g)) literals.add(match[1] ?? "");
+      const text = readFileSync(file, "utf8");
+      for (const match of text.matchAll(/source: "([a-z_.-]*)"/g)) literals.add(match[1] ?? "");
+      // A conditional label too: `source: cond ? "none" : "parent-loop"` hid a runtime label (vault lane, 2026-11-16).
+      for (const match of text.matchAll(/source: [^,\n}"]*\?[^,\n}]*/g)) {
+        for (const literal of (match[0] ?? "").matchAll(/"([a-z_.-]*)"/g)) literals.add(literal[1] ?? "");
+      }
     }
     expect(literals.size).toBeGreaterThan(50);
     const unclassified = [...literals].filter((source) =>

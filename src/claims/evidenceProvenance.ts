@@ -27,7 +27,7 @@ export const AMC_RUNTIME_SOURCES: ReadonlySet<string> = new Set([
   "events", "failed-evaluation", "file", "filesystem", "firewall", "fleet", "forecast", "gateway", "hook", "hook_control",
   "host", "identity", "incident-regression", "inference-strategy-comparison", "judge-calibration", "ledger", "leases",
   "linked-recorded-request-outcomes", "live-score-behavior-drift", "local", "model", "native", "none", "ops", "ops.blobs",
-  "override-near-miss-analytics", "plugin", "plugins", "policy", "project-env", "provider", "provider-drift-benchmark",
+  "override-near-miss-analytics", "parent-loop", "plugin", "plugins", "policy", "project-env", "provider", "provider-drift-benchmark",
   "redteam", "registry", "release", "replay-benchmark-corpus", "reports", "request-failure", "retention.auto",
   "risk-cost-latency-slo", "roles", "sdk", "settings", "shield.exploit_confirmation", "stdin_pipe", "studio",
   "studio-audit", "support-observation", "toolhub", "tools", "trace", "transform", "transparency", "trust", "trust-list",

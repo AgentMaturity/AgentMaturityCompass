@@ -437,7 +437,7 @@ describe.concurrent("actual strict CLI result labels in a signed, keyless privat
         } else if (recipe.output === "info-badge" || recipe.output === "badge-url") {
           // Named pipeable formats only: docs/CLAIM_KINDS.md permits labels on stderr, never on a hidden marker.
           // The badge reads the recorded run (P0-28): the seeded signed run's level, or UNKNOWN without one.
-          if (recipe.output === "info-badge") expect(result.stdout).toMatch(/^AMC INFO • maturity=(?:UNKNOWN|\d\.\d)\/5 • assurance=UNKNOWN • risks=UNKNOWN • value=UNKNOWN • ts=\d{4}-\d{2}-\d{2}T[^\n]+\n$/);
+          if (recipe.output === "info-badge") expect(result.stdout).toMatch(/^AMC INFO self-issued • maturity=(?:UNKNOWN|\d\.\d)\/5 • assurance=UNKNOWN • risks=UNKNOWN • value=UNKNOWN • ts=\d{4}-\d{2}-\d{2}T[^\n]+\n$/);
           else expect(result.stdout).toMatch(/^https:\/\/img\.shields\.io\/badge\/AMC-L0_\(0\.0\)-red\?logo=[^\n]+\n$/);
           expect(result.stderr).toMatch(/^Claim: Self-reported · Result: .+ · Evidence: .+ · Enforcement: .+ · Review: .+ · Applicability: .+\n$/);
           expect(result.stdout).not.toContain("Claim:");
