@@ -171,9 +171,9 @@ import {
   removeDelegationEdge,
   listDelegationEdges,
   generateTrustCompositionReportAsync,
-  verifyCrossAgentReceipts,
   type DelegationEdge
 } from "./fleet/trustComposition.js";
+import { agentAddFromObserved, fleetStatusExtras, fleetTagOwner, fleetTrustReceipts, type FleetStatusOptions } from "./fleet/fleetCli.js";
 import {
   createDag,
   appendDagNode,
@@ -14198,7 +14198,13 @@ fleet
   .command("status")
   .description("Show fleet overview (agent count, average score, health)")
   .option("--json", "print full JSON payload", false)
-  .action((opts: { json?: boolean }) => {
+  .option("--inventory", "list every agent: owner, runtime and version, last seen, hooks, budget, freeze and cost", false)
+  .option("--csv", "print the inventory as CSV, for a spreadsheet", false)
+  .option("--window <window>", "how far back the inventory counts cost: 30s, 45m, 12h or 30d", "30d")
+  .option("--freeze <agentId>", "freeze this agent now (stops only calls routed through AMC); needs --reason")
+  .option("--reason <text>", "why you are freezing the agent (with --freeze)")
+  .action(async (opts: FleetStatusOptions) => {
+    if (await fleetStatusExtras(process.cwd(), opts)) return;
     const health = buildFleetHealthDashboard({ workspace: process.cwd() });
     if (emitClaimResult(chalk.bold("\n🌐  Fleet Status"), health, fleetHealthClaim(health), opts)) return;
     console.log(`  Agents:          ${health.agentCount} total, ${health.scoredAgentCount} scored`);
@@ -14283,10 +14289,11 @@ fleetPolicy
 
 fleet
   .command("tag")
-  .description("Tag an agent with an environment")
-  .argument("<agentId>")
-  .requiredOption("--env <environment>", "dev|staging|production")
-  .action((agentId: string, opts: { env: string }) => {
+  .description("Tag an agent with an environment or a named owner")
+  .argument("<agentId>").option("--env <environment>", "dev|staging|production").option("--owner <name>", "the person or team answerable for this agent")
+  .action((agentId: string, opts: { env?: string; owner?: string }) => {
+    fleetTagOwner(process.cwd(), agentId, opts);
+    if (opts.env === undefined) return;
     const result = tagFleetAgentEnvironment({
       workspace: process.cwd(),
       agentId,
@@ -14653,28 +14660,9 @@ fleet
 
 fleet
   .command("trust-receipts")
-  .description("Verify cross-agent receipt chains")
-  .option("--window <window>", "evidence window", "30d")
-  .action((opts: { window: string }) => {
-    const workspace = process.cwd();
-    const edges = listDelegationEdges(workspace);
-    if (edges.length === 0) {
-      console.log("No delegation edges configured. Nothing to verify.");
-      return;
-    }
-    const now = Date.now();
-    const windowMs = parseFloat(opts.window) * 24 * 60 * 60 * 1000;
-    const chains = verifyCrossAgentReceipts(workspace, edges, now - windowMs, now);
-    for (const chain of chains) {
-      const status = chain.chainCoverage >= 0.9 ? chalk.green("OK") : chain.chainCoverage >= 0.5 ? chalk.yellow("PARTIAL") : chalk.red("BROKEN");
-      console.log(`${status} ${chain.fromAgentId} → ${chain.toAgentId}: ${chain.matchedReceipts}/${chain.fromReceiptCount} matched (${(chain.chainCoverage * 100).toFixed(1)}%)`);
-      if (chain.gaps.length > 0) {
-        for (const gap of chain.gaps.slice(0, 5)) {
-          console.log(`    ${chalk.dim(gap)}`);
-        }
-      }
-    }
-  });
+  .description("Count time-window overlap across declared delegations (a heuristic: compares times, checks no signatures)")
+  .option("--window <window>", "how far back to look: 30s, 45m, 12h or 30d", "30d")
+  .action((opts: { window: string }) => fleetTrustReceipts(process.cwd(), opts.window));
 
 fleet
   .command("dag")
@@ -14841,7 +14829,10 @@ fleet
 agent
   .command("add")
   .description("Interactively add an agent to the fleet")
-  .action(async () => {
+  .option("--from-observed <agentId>", "register an agent AMC has already seen, by its id (see: amc fleet status --inventory)")
+  .option("--owner <name>", "the person or team answerable for the agent (with --from-observed)")
+  .action(async (opts: { fromObserved?: string; owner?: string }) => {
+    if (opts.fromObserved !== undefined) return agentAddFromObserved(process.cwd(), opts.fromObserved, opts.owner);
     const created = await addAgentInteractive(process.cwd());
     console.log(chalk.green(`Agent added: ${created.agentId}`));
     console.log(`Config: ${created.configPath}`);

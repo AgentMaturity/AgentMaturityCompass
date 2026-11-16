@@ -164,7 +164,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: (pathname, method, req, res, context) => handleFleetRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
+    handler: (pathname, method, req, res, context) => handleFleetRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority, context.principal)
   },
   {
     id: 'org',

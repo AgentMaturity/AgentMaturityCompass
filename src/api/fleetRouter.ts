@@ -14,7 +14,8 @@ export async function handleFleetRoute(
   req: IncomingMessage,
   res: ServerResponse,
   workspace = process.cwd(),
-  revalidateAuthority?: () => boolean
+  revalidateAuthority?: () => boolean,
+  principal?: string
 ): Promise<boolean> {
   if (!pathname.startsWith('/api/v1/fleet')) return false;
 
@@ -233,6 +234,54 @@ export async function handleFleetRoute(
       apiSuccess(res, { initialized: true, ...result });
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Fleet init failed');
+    }
+    return true;
+  }
+
+  // GET /api/v1/fleet/inventory: one row per agent, and agents AMC has seen but nobody registered. Reads only.
+  // ?format=csv answers a spreadsheet file; ?include=csv adds the same file as text to the JSON (the console's download).
+  if (pathname === '/api/v1/fleet/inventory' && method === 'GET') {
+    try {
+      const { buildFleetInventory } = await import('../fleet/inventory.js');
+      const { fleetInventoryCsv } = await import('../fleet/inventoryRender.js');
+      const { fleetWindowMs } = await import('../fleet/fleetActions.js');
+      const window = queryParam(req.url ?? '', 'window');
+      const inventory = await buildFleetInventory(workspace, window === undefined ? {} : { costWindowMs: fleetWindowMs(window) });
+      const format = queryParam(req.url ?? '', 'format');
+      if (format === 'csv') {
+        res.writeHead(200, { 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': 'attachment; filename="amc-fleet-inventory.csv"' });
+        res.end(fleetInventoryCsv(inventory));
+        return true;
+      }
+      apiSuccess(res, queryParam(req.url ?? '', 'include') === 'csv' ? { ...inventory, csv: fleetInventoryCsv(inventory) } : inventory);
+    } catch (err) {
+      apiError(res, err instanceof Error && /time window/.test(err.message) ? 400 : 500, err instanceof Error ? err.message : 'Could not build the fleet inventory');
+    }
+    return true;
+  }
+
+  // POST /api/v1/fleet/freeze: freeze an agent now (OWNER, like every /fleet write). Stops only calls routed through AMC.
+  if (pathname === '/api/v1/fleet/freeze' && method === 'POST') {
+    const refused = (): never => { if (!res.headersSent) apiError(res, 403, 'Current authority no longer permits this operation'); throw new Error('Current authority no longer permits this operation'); };
+    try {
+      if (!principal) { apiError(res, 403, 'A freeze must name the person who asks for it; sign in and try again.'); return true; }
+      const body = await bodyJson<{ agentId?: unknown; reason?: unknown }>(req);
+      if (typeof body.agentId !== 'string' || typeof body.reason !== 'string' || !body.agentId.trim() || !body.reason.trim()) {
+        apiError(res, 400, 'Say which agent to freeze and why: agentId and reason are both needed.'); return true;
+      }
+      const { freezeAgentNow, FREEZE_SCOPE_NOTE } = await import('../fleet/fleetActions.js');
+      const guard = () => { if (revalidateAuthority !== undefined && !revalidateAuthority()) refused(); };
+      guard();
+      const incident = await freezeAgentNow({ workspace, agentId: body.agentId, reason: body.reason, frozenBy: principal, via: 'studio' }, guard);
+      apiSuccess(res, {
+        frozen: true, agentId: incident.agentId, incidentId: incident.incidentId, actionClasses: incident.freeze.actionClasses,
+        frozenBy: principal, auditEventId: incident.auditEventId, scope: FREEZE_SCOPE_NOTE,
+        lift: `A person lifts it at a terminal: amc freeze lift --agent ${incident.agentId} --incident ${incident.incidentId} --reason "<why it is safe again>"`
+      }, 201);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Freeze failed';
+      if (!res.headersSent) apiError(res, err instanceof KeyProviderError ? err.status : /not registered|Say why|agent mode/.test(message) ? 400 : 500,
+        err instanceof KeyProviderError ? err.code : message);
     }
     return true;
   }
