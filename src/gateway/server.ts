@@ -85,6 +85,8 @@ interface ParsedJsonInfo {
   usage?: Record<string, unknown>;
   requestKind?: string;
   hasToolCalls?: boolean;
+  /** Anthropic `stop_reason` or the first OpenAI choice's `finish_reason`, as the provider sent it (Watch's refusal rate). */
+  stopReason?: string;
 }
 function toHeaderObject(headers: IncomingHttpHeaders): Record<string, string | string[] | undefined> {
   const out = Object.create(null) as Record<string, string | string[] | undefined>;
@@ -533,11 +535,10 @@ function bestEffortJsonInfo(bytes: Buffer, pathname?: string, openaiCompatible =
     const parsed = JSON.parse(bytes.toString("utf8")) as Record<string, unknown>;
     const info: ParsedJsonInfo = {};
 
-    if (typeof parsed.model === "string") {
-      info.model = parsed.model;
-    } else if (typeof parsed.modelId === "string") {
-      info.model = parsed.modelId;
-    }
+    if (typeof parsed.model === "string") info.model = parsed.model; else if (typeof parsed.modelId === "string") info.model = parsed.modelId;
+    const firstChoice = Array.isArray(parsed.choices) && parsed.choices[0] && typeof parsed.choices[0] === "object" ? parsed.choices[0] as Record<string, unknown> : null;
+    const stop = typeof parsed.stop_reason === "string" ? parsed.stop_reason : firstChoice && typeof firstChoice.finish_reason === "string" ? firstChoice.finish_reason : null;
+    if (stop !== null) info.stopReason = stop.slice(0, 64);
 
     if (parsed.usage && typeof parsed.usage === "object") {
       info.usage = parsed.usage as Record<string, unknown>;
@@ -1453,7 +1454,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         upstreamResolvedBaseUrl: upstreamResolved.baseUrl,
         statusCode: upstreamResponse.statusCode ?? 0,
         model: responseInfo.model ?? requestInfo.model,
-        usage: responseInfo.usage ?? requestInfo.usage,
+        usage: responseInfo.usage ?? requestInfo.usage, stopReason: responseInfo.stopReason ?? null,
         request_kind: requestInfo.requestKind ?? responseInfo.requestKind ?? "other",
         openaiCompatible: route.openaiCompatible,
         hasToolCalls: responseInfo.hasToolCalls === true || requestInfo.hasToolCalls === true,
