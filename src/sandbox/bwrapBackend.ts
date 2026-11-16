@@ -1,4 +1,4 @@
-import { closeSync, constants, existsSync, fstatSync, lstatSync, mkdtempSync, openSync, opendirSync, readFileSync, readlinkSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { closeSync, constants, existsSync, fstatSync, lstatSync, mkdirSync, mkdtempSync, openSync, opendirSync, readFileSync, readlinkSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
@@ -6,6 +6,9 @@ import { runProcess } from "../exec/runProcess.js";
 import { PROCESS_LIMIT_LIMITATION, ROOT_PROCESS_LIMIT_LIMITATION, processLimit, withProcessLimit } from "./processCap.js";
 import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTypes.js";
 import { shellSecretPaths } from "./shellSecretPaths.js";
+import { EGRESS_MOUNT, encodeBpf, linuxSocketEgressFilter, prepareRelayDirectory, refuseSocketFiles, relayCommand, socketDenyList, socketFilterHead } from "./bwrapEgress.js";
+import { EgressUnavailable, startPolicyEgress, withRefusals } from "./egress/sessionEgress.js";
+import type { ShellEgressProxy } from "./egress/shellEgressProxy.js";
 
 const BWRAP = "/usr/bin/bwrap";
 const RUNTIME_ROOTS = ["/usr", "/bin", "/lib", "/lib64"] as const;
@@ -109,28 +112,29 @@ function prerequisites(): Check {
 
 /** Original classic-BPF filter: reject other syscall ABIs and socket creation/connection. */
 export function linuxSocketDenyFilter(arch: "x64" | "arm64"): Buffer {
-  const instructions: [number, number, number, number][] = [
-    [0x20, 0, 0, 4], // seccomp_data.arch
-    [0x15, 1, 0, arch === "x64" ? 0xc000003e : 0xc00000b7],
-    [0x06, 0, 0, 0x80000000], // SECCOMP_RET_KILL_PROCESS
-    [0x20, 0, 0, 0] // seccomp_data.nr
-  ];
-  // x32 uses the x86-64 audit architecture with a different syscall table.
-  if (arch === "x64") instructions.push([0x35, 0, 1, 0x40000000], [0x06, 0, 0, 0x00050001]);
   // io_uring can perform socket operations without invoking the corresponding
-  // syscall, so deny its entry points too (same numbers on both supported ABIs).
-  for (const syscall of [...(arch === "x64" ? [41, 53, 42] : [198, 199, 203]), 425, 426, 427]) {
-    instructions.push([0x15, 0, 1, syscall], [0x06, 0, 0, 0x00050001]);
-  }
-  instructions.push([0x06, 0, 0, 0x7fff0000]); // SECCOMP_RET_ALLOW
-  const bytes = Buffer.alloc(instructions.length * 8);
-  instructions.forEach(([code, jt, jf, value], index) => {
-    bytes.writeUInt16LE(code, index * 8);
-    bytes.writeUInt8(jt, index * 8 + 2);
-    bytes.writeUInt8(jf, index * 8 + 3);
-    bytes.writeUInt32LE(value, index * 8 + 4);
-  });
-  return bytes;
+  // syscall, so its entry points are denied too.
+  return encodeBpf([...socketFilterHead(arch, socketDenyList(arch)), [0x06, 0, 0, 0x7fff0000]]); // SECCOMP_RET_ALLOW
+}
+
+const EGRESS_RELAY_LIMITATION = "Network goes only through AMC's proxy, by a relay inside the sandbox; the relay's filter allows Unix and IP sockets, so launch is refused when the workspace holds a socket file, and a socket file a host process creates there during the call is outside this boundary. Tools that ignore HTTP_PROXY, HTTPS_PROXY and ALL_PROXY have no network.";
+
+/** One mount the launcher pinned by descriptor; bind i is passed as fd 5 + i (3 is status, 4 the filter). */
+export interface BwrapBind { readonly destination: string; readonly writable: boolean }
+
+/** The Bubblewrap argv for a pinned layout. Pure, so the generated arguments can be checked on any OS. */
+export function bwrapArgv(layout: { readonly binds: readonly BwrapBind[]; readonly masks: readonly string[];
+  readonly workspace: string; readonly command: readonly string[] }): string[] {
+  const amc = join(layout.workspace, ".amc");
+  return [BWRAP, ...NAMESPACE_FLAGS, "--json-status-fd", "3", "--seccomp", "4",
+    // Create scratch mounts first so a workspace beneath /tmp is not hidden later.
+    "--dev", "/dev", "--tmpfs", "/tmp", "--chmod", "1777", "/tmp",
+    ...layout.binds.flatMap((bind, index) => [bind.writable ? "--bind-fd" : "--ro-bind-fd", String(index + 5), bind.destination]),
+    ...layout.masks,
+    "--tmpfs", amc, "--chmod", "000", amc, "--remount-ro", amc,
+    // Do not expose procfs: it could reopen a launcher-owned descriptor via PID 1.
+    "--tmpfs", "/proc", "--remount-ro", "/proc", "--remount-ro", "/",
+    "--chdir", layout.workspace, "--", ...layout.command];
 }
 
 /**
@@ -189,10 +193,9 @@ export function bwrapBackend(): SandboxBackend {
       if (!available.ok) return declined(available.reason, "unavailable");
       if (!command.length || command.some(argument => argument.includes("\0"))) return declined("Invalid confined command.");
       if (!Number.isFinite(policy.timeoutMs) || policy.timeoutMs <= 0) return declined("A positive finite shell deadline is required.");
-      // Relaying to the egress proxy needs a narrower seccomp filter, which waits for review of ADR-008.
-      if (policy.allowHosts) return declined("A signed shell egress allowlist is not available on Linux yet (its in-namespace relay awaits review of ADR-008). Remove nativeSandbox.egress to run with all networking denied.", "unavailable");
       if (policy.signal?.aborted) return { ...declined("The shell was cancelled before launch."), cancelled: true };
       let temporary: string | undefined;
+      let proxy: ShellEgressProxy | null = null;
       let launched = false;
       const descriptors: number[] = [];
       try {
@@ -208,19 +211,26 @@ export function bwrapBackend(): SandboxBackend {
           }
           return real;
         }))];
-        // All native shell networking is denied, including pathname Unix sockets.
-        // An omitted network field does not grant an exception to this backend.
+        // All native shell networking is denied, including pathname Unix sockets, unless a signed allow-list
+        // routes it through AMC's proxy (bwrapEgress.ts). An omitted network field grants nothing.
         const taskParent = realpathSync(tmpdir());
         if (within(workspace, taskParent)) return declined("Launcher state must be outside the exposed workspace.");
         temporary = mkdtempSync(join(taskParent, "amc-bwrap-"));
         const statusPath = join(temporary, "status.jsonl");
         const filterPath = join(temporary, "sockets.bpf");
-        writeFileSync(filterPath, linuxSocketDenyFilter(process.arch as "x64" | "arm64"), { mode: 0o600 });
+        const egressDirectory = join(temporary, "egress");
+        if (policy.allowHosts) {
+          try { refuseSocketFiles(workspace); } catch (error) { return declined(`${error instanceof Error ? error.message : "The workspace could not be checked for socket files."} Nothing was run.`); }
+          mkdirSync(egressDirectory, { mode: 0o700 });
+          try { proxy = await startPolicyEgress(policy, join(egressDirectory, "proxy.sock")); }
+          catch (error) { return declined(error instanceof EgressUnavailable ? error.message : "AMC's network filter could not start; nothing was run."); }
+          prepareRelayDirectory(egressDirectory);
+        }
+        const arch = process.arch as "x64" | "arm64";
+        writeFileSync(filterPath, proxy ? linuxSocketEgressFilter(arch) : linuxSocketDenyFilter(arch), { mode: 0o600 });
         descriptors.push(openSync(statusPath, constants.O_CREAT | constants.O_EXCL | constants.O_RDWR, 0o600));
         descriptors.push(openSync(filterPath, constants.O_RDONLY));
-        const args: string[] = [BWRAP, ...NAMESPACE_FLAGS, "--json-status-fd", "3", "--seccomp", "4",
-          // Create scratch mounts first so a workspace beneath /tmp is not hidden later.
-          "--dev", "/dev", "--tmpfs", "/tmp", "--chmod", "1777", "/tmp"];
+        const binds: BwrapBind[] = [];
         const readonlyRoots: string[] = [];
         const bind = (path: string, destination: string, writable: boolean): void => {
           const canonical = realpathSync(path);
@@ -231,7 +241,7 @@ export function bwrapBackend(): SandboxBackend {
           const info = fstatSync(fd);
           if (!info.isFile() && !info.isDirectory()) throw new Error("A Linux shell mount source is not a regular file or directory.");
           if (writable) admitWritableDirectory(`/proc/self/fd/${fd}/.`);
-          args.push(writable ? "--bind-fd" : "--ro-bind-fd", String(descriptors.length + 2), destination);
+          binds.push({ destination, writable });
           if (!writable) readonlyRoots.push(destination);
         };
         for (const root of RUNTIME_ROOTS) if (existsSync(root)) bind(root, root, false);
@@ -239,15 +249,12 @@ export function bwrapBackend(): SandboxBackend {
         bind(workspace, workspace, false);
         // Nested writable binds are applied from outermost to innermost.
         for (const root of writableRoots.sort((a, b) => a.length - b.length)) bind(root, root, true);
+        if (proxy) bind(egressDirectory, EGRESS_MOUNT, false);
         const masks = bwrapReadMasks(workspace, policy.readDeny ?? []);
         if (!masks.ok) return declined(masks.reason);
-        args.push(...masks.args);
         const limit = policy.maxProcesses === undefined ? null : processLimit(policy.maxProcesses);
         const capped = limit !== null && process.geteuid?.() !== 0 ? limit : null; // the kernel exempts root from RLIMIT_NPROC
-        args.push("--tmpfs", join(workspace, ".amc"), "--chmod", "000", join(workspace, ".amc"), "--remount-ro", join(workspace, ".amc"),
-          // Do not expose procfs: it could reopen a launcher-owned descriptor via PID 1.
-          "--tmpfs", "/proc", "--remount-ro", "/proc", "--remount-ro", "/",
-          "--chdir", workspace, "--", ...command);
+        const args = bwrapArgv({ binds, masks: masks.args, workspace, command: proxy ? relayCommand(command) : command });
         if (unconsumedFds(args, descriptors.length).length) throw new Error("A launcher fd would reach the command.");
         launched = true;
         // The limit goes on the launcher, before it creates the user namespace: the kernel then holds this user's
@@ -255,9 +262,9 @@ export function bwrapBackend(): SandboxBackend {
         const outcome = await runProcess({ argv: limit === null ? args : withProcessLimit(limit, args), cwd: workspace,
           // /usr/local is already mounted read-only under /usr; without it on PATH a system Node or Python installed
           // there (official tarballs, the node Docker images, GitHub runners) is not found and the launch has no exit.
-          env: { PATH: "/usr/local/bin:/usr/bin:/bin", HOME: "/tmp", TMPDIR: "/tmp", LANG: "C.UTF-8" },
+          env: { PATH: "/usr/local/bin:/usr/bin:/bin", HOME: "/tmp", TMPDIR: "/tmp", LANG: "C.UTF-8", ...(proxy ? { AMC_EGRESS_TOKEN: proxy.token } : {}) },
           stdin: "ignore", stdout: "capture", stderr: "capture", maxCaptureBytes: 64_000,
-          scrubValues: policy.scrubValues ?? [], graceMs: 2_000, timeoutMs: policy.timeoutMs,
+          scrubValues: [...(policy.scrubValues ?? []), ...(proxy ? [proxy.token] : [])], graceMs: 2_000, timeoutMs: policy.timeoutMs,
           ...(policy.onOutput ? { onOutput: policy.onOutput } : {}),
           ...(policy.signal ? { signal: policy.signal } : {}), extraFds: descriptors }).done;
         const status = statSync(statusPath).size <= 64_000 ? bwrapCommandExit(readFileSync(statusPath, "utf8")) : null;
@@ -267,17 +274,19 @@ export function bwrapBackend(): SandboxBackend {
           failure: !applied ? { kind: "runner-failure", reason: "Bubblewrap did not provide a complete command-exit receipt; execution and confinement are unconfirmed." }
             : !outcome.treeExitProven ? { kind: "runner-failure", reason: "The launcher exited but process-group cleanup could not be confirmed." } : null,
           exitCode: applied ? status : null, timedOut: outcome.terminatedBy === "timeout", cancelled: outcome.terminatedBy === "cancel",
-          stdout: outcome.stdout.text, stderr: outcome.stderr.text, writableRoots: applied ? writableRoots : [],
+          stdout: outcome.stdout.text, stderr: withRefusals(outcome.stderr.text, proxy), writableRoots: applied ? writableRoots : [],
           treeExitProven: outcome.treeExitProven, droppedBytes: outcome.stdout.droppedBytes + outcome.stderr.droppedBytes,
           ...(applied ? { enforcement: {
             boundary: "linux-bwrap" as const, hostWrites: "declared-roots-only" as const, reads: "workspace-ro-and-runtime" as const,
-            network: "denied" as const, allowHosts: [], processLimit: capped === null ? null : { mechanism: "rlimit-nproc" as const, max: capped },
+            network: proxy ? "proxy-allowlist" as const : "denied" as const, allowHosts: proxy ? [...(policy.allowHosts ?? [])] : [],
+            processLimit: capped === null ? null : { mechanism: "rlimit-nproc" as const, max: capped },
             readonlyRoots, privateWritableRoots: ["/tmp", "/dev"], launcherStatus: "command-exited" as const,
             sourcePolicySha256: policy.sourcePolicySha256 ?? null,
             limitations: ["No procfs or host environment is exposed; process-introspection tools may fail.",
               "This confines a shell subprocess, not AMC or worker-thread Code Mode.",
               "Existing hard-link aliases and special files in write grants are refused; concurrent trusted host writers are outside this subprocess boundary.",
               "A successful command does not establish a count of denied operations.",
+              ...(proxy ? [EGRESS_RELAY_LIMITATION] : []),
               ...(limit === null ? [] : [capped !== null ? PROCESS_LIMIT_LIMITATION : ROOT_PROCESS_LIMIT_LIMITATION])]
           } } : {})
         };
@@ -285,6 +294,7 @@ export function bwrapBackend(): SandboxBackend {
         // Do not put arbitrary host paths, command text or launcher exceptions into an audit reason.
         return { ...declined("Linux shell admission or launcher execution failed; no unconfined fallback was attempted."), treeExitProven: !launched };
       } finally {
+        proxy?.close();
         for (const fd of descriptors) { try { closeSync(fd); } catch { /* close every owned descriptor */ } }
         if (temporary) rmSync(temporary, { recursive: true, force: true });
       }
