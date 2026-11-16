@@ -1002,22 +1002,7 @@
     "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "rm.coe.int and www.coe.int answered HTTP 403 (Cloudflare block, curl and WebFetch) on 2026-11-16 and search.coe.int returns only a script page, so the text was not read."
-  },
-  {
-    "packId": "dance-of-democracy",
-    "questionId": "GOV-DD-12",
-    "citation": "ODIHR Handbook for the Observation of ICT in Elections (2024)",
-    "instrument": "ODIHR, Handbook for the Observation of Information and Communication Technologies (ICT) in Elections",
-    "clause": "whole document",
-    "verdict": "corrected",
-    "was": "OSCE/ODIHR Electoral Standards",
-    "now": "ODIHR Handbook for the Observation of ICT in Elections (2024)",
-    "sourceTitle": "ODIHR, Handbook for the Observation of Information and Communication Technologies (ICT) in Elections (2024), PDF from odihr.osce.org",
-    "sourceUrl": "https://odihr.osce.org/sites/default/files/f/documents/c/9/558318_0.pdf",
-    "checkedOn": "2026-11-16",
-    "checkedBy": "ai-agent",
-    "note": "'OSCE/ODIHR Electoral Standards' named no document; the question is about observer access to election technology, which the 2024 ODIHR ICT handbook covers (observation methodology, not binding)."
+    "note": "rm.coe.int and www.coe.int answered HTTP 403 (Cloudflare block, curl and WebFetch) on 2026-11-16 and search.coe.int returns only a script page, so the text was not read. The second part of this question's citation, 'OSCE/ODIHR Electoral Standards', named no real document; it was removed rather than replaced, because the replacement (the 2024 ODIHR ICT handbook, cited in GOV-DD-5) has no catalogue record. The question still mentions OSCE/ODIHR observation practice as context."
   },
   {
     "packId": "dance-of-democracy",

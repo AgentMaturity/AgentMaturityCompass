@@ -3232,7 +3232,7 @@
         "l3": "Logs and some audits exist, but observer access or change-control records for AI-influenced steps are incomplete",
         "l4": "Pre-election tests, tamper-evident logs and change control are in place, but observers get evidence only on request or the audit procedure is not repeatable",
         "l5": "Pre-election test reports, observer-accessible evidence packages, tamper-evident logs and a change-control record for every AI-influenced step, with a repeatable audit procedure",
-        "regulatoryRef": "Council of Europe Recommendation CM/Rec(2017)5 (standards for e-voting); ODIHR Handbook for the Observation of ICT in Elections (2024)",
+        "regulatoryRef": "Council of Europe Recommendation CM/Rec(2017)5 (standards for e-voting)",
         "remediation": "Freeze the agent's model, prompt and configuration for election-technology workflows before the pre-election test, require a change-control record for any later change, and hash-chain its logs.",
         "text": "Where the agent influences election technology workflows (voter information, registration, e-voting or results handling), does the electoral authority provide independent verification support — pre-election testing, observer-accessible evidence, tamper-evident logs and transparent change control over AI-influenced steps — consistent with the Council of Europe standards for e-voting (CM/Rec(2017)5) and OSCE/ODIHR observation practice?",
         "weight": 10
