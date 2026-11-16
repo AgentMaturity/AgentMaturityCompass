@@ -139,15 +139,19 @@ Default-deny: a call AMC has no entry for counts as untrusted input and as an ou
 | `git.push`, and git subcommands AMC maps to it (fetch, pull, clone) | yes | | yes |
 | `fs.read`, `glob`, `grep`, `ls` inside the workspace | | if a secret file | |
 | the same outside the workspace | yes | if a secret file | |
-| `process.spawn` of a local program (`ls`, `cat`, `grep`, `find`, `cp`, `rm` and the others in `LOCAL_PROGRAMS`), named bare or from a system folder | if an argument is outside the workspace, a URL or an expansion | if an argument is a secret file | |
-| `process.spawn` of any other program, or a local one told to run another (`find -exec`) | yes | if an argument is a secret file | yes |
-| `fs.write`, `fs.edit`, `apply_patch`, `git.status`, `git.commit` | | | |
+| `process.spawn` of a local program (`ls`, `cat`, `grep`, `cp`, `rm` and the others in `LOCAL_PROGRAMS`), named bare or from a system folder, with only plain words, paths and the options listed for it | if an argument is outside the workspace, a URL or an expansion | if an argument is a secret file | |
+| `process.spawn` of any other program (`rg`, `find`, `sort` and `jq` included), or a local one with an option not listed for it (`--pre=...`, `-f/path`) | yes | if an argument is a secret file | yes |
+| `fs.write`, `fs.edit`, `apply_patch`; `git status` and `git commit` with the subcommand first and only their listed options | | | |
+| `git status` or `git commit` with a global option (`-C`, `-c`, `--git-dir`) or an option not listed | yes | | yes |
 | Any other tool | yes | | yes |
 
 Any call whose ToolHub action class is `NETWORK_EXTERNAL` or `DATA_EXPORT` is an outbound send. A **consequential** call is an
 outbound send or a call of class `WRITE_HIGH`, `DEPLOY`, `FINANCIAL`, `IDENTITY`, `SECURITY`, `NETWORK_EXTERNAL` or
 `DATA_EXPORT`. A **secret file** is one under `~/.ssh`, `~/.aws`, `~/.gnupg` and the other credential stores the shell
-sandbox denies, or named like `.env*`, `id_rsa*`, `*.pem`, `*.key`, `.npmrc`, `.netrc` or `credentials*`.
+sandbox denies, anything in this project's own `.amc` folder, or named like `.env*`, `id_rsa*`, `*.pem`, `*.key`, `.npmrc`,
+`.netrc` or `credentials*`. Paths are judged where they really point: a symlink is followed, a path that does not exist
+yet is judged by its nearest existing folder, and one AMC cannot resolve (a broken link) counts as outside the workspace.
+Every plain argument of a shell program is checked as a path, not only those with a `/` or `~`.
 
 Known limits: two calls a provider starts at the same moment can both be decided before either is recorded; a person
 who can delete rows from the ledger can lower a session's labels (ledger verification reports that).

@@ -19,9 +19,9 @@
  * ponytail: two calls a provider starts at the same moment can both be decided before either row is written; a
  * per-session lock across decide-and-record is the upgrade. Deleting ledger rows lowers labels: ledger chain checks own that.
  */
-import { realpathSync } from "node:fs";
+import { lstatSync, realpathSync } from "node:fs";
 import { homedir } from "node:os";
-import { basename, dirname, isAbsolute, relative, resolve, sep } from "node:path";
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { z } from "zod";
 import { parseShellCommandPlan } from "./shellCommandPlan.js";
 import { openLedger } from "../ledger/ledger.js";
@@ -38,12 +38,29 @@ const RANK: Record<Outcome, number> = { allow: 0, ask: 1, steer: 2, deny: 3 };
 
 /** Calls that change state or communicate outside: asked about once the session has read untrusted input. */
 const CONSEQUENTIAL: ReadonlySet<ActionClass> = new Set(["NETWORK_EXTERNAL", "DATA_EXPORT", "WRITE_HIGH", "DEPLOY", "FINANCIAL", "IDENTITY", "SECURITY"]);
-/** Programs that read and write only what their arguments name and open no network connection. Anything else is unknown. */
-const LOCAL_PROGRAMS = new Set(["ls", "cat", "head", "tail", "wc", "grep", "egrep", "fgrep", "rg", "find", "echo", "printf", "pwd", "sort",
-  "uniq", "cut", "tr", "diff", "cmp", "file", "stat", "du", "df", "date", "true", "false", "test", "which", "basename", "dirname", "realpath",
-  "readlink", "jq", "tee", "touch", "mkdir", "cp", "mv", "rm", "ln", "chmod"]);
-/** Arguments that make a local program run another one (`find -exec`). */
-const RUNS_ANOTHER = new Set(["-exec", "-execdir", "-ok", "-okdir", "--pre"]);
+/**
+ * Programs that read and write only what their arguments name and open no network connection, each with the options it may
+ * carry: single letters (combinable, `-la`) and whole long options. A call is local only when its program is listed AND
+ * every argument is recognised (a plain word or path, `-`, `--`, or a listed option); anything else, a joined value
+ * (`--pre=x`, `-f/etc/x`) included, makes it an unknown program. rg, find, sort and jq are left out: they have options
+ * that run another program or read the environment.
+ */
+const GREP = { short: "0123456789ABCEFHLRcdhilnoqrsvwx" };
+const LOCAL_PROGRAMS: Record<string, { short: string; long?: readonly string[] }> = {
+  ls: { short: "1ACFRSadhlrtu" }, cat: { short: "benstuv" }, head: { short: "0123456789cn" }, tail: { short: "0123456789Ffcnr" },
+  wc: { short: "clmw" }, grep: GREP, egrep: GREP, fgrep: GREP, echo: { short: "Een" }, printf: { short: "" }, pwd: { short: "LP" },
+  uniq: { short: "cdiu" }, cut: { short: "bcdfs" }, tr: { short: "Ccds" }, diff: { short: "BNbiqruw" }, cmp: { short: "ls" },
+  file: { short: "Lbi" }, stat: { short: "L" }, du: { short: "0123456789achks" }, df: { short: "hkP" }, date: { short: "u" },
+  true: { short: "" }, false: { short: "" }, test: { short: "LSabcdefgklnopqrstuwxz" }, which: { short: "as" },
+  basename: { short: "a" }, dirname: { short: "" }, realpath: { short: "e" }, readlink: { short: "fn" }, tee: { short: "a" },
+  touch: { short: "c" }, mkdir: { short: "pv" }, cp: { short: "RafinprPv" }, mv: { short: "finv" }, rm: { short: "Rdfirv" },
+  ln: { short: "fnsv" }, chmod: { short: "Rv" },
+};
+/** `git status` and `git commit` with the subcommand first (no global option such as -C, -c or --git-dir) and these options. */
+const GIT_LOCAL: Record<string, { short: string; long?: readonly string[] }> = {
+  "git.status": { short: "bsuz", long: ["--short", "--porcelain", "--branch", "--long"] },
+  "git.commit": { short: "amqsv", long: ["--all", "--amend", "--no-edit", "--quiet", "--signoff", "--verbose", "--message"] },
+};
 const SECRET_NAME = /^(\.env|id_(rsa|dsa|ecdsa|ed25519)|\.?(npmrc|netrc|pypirc|git-credentials)$|credentials)|\.(pem|key|p12|pfx|jks|keystore)(\.|$)/;
 const READS = new Set(["fs.read", "glob", "grep", "ls"]);
 const LOCAL_TOOLS = new Set(["fs.write", "fs.edit", "apply_patch", "git.status", "git.commit"]);
@@ -55,7 +72,7 @@ export interface CallLabels {
   outbound: boolean;
   actionClass: ActionClass | null;
 }
-interface GuardRequest { name: string; args: Record<string, unknown> }
+interface GuardRequest { name: string; args: Record<string, unknown>; segment?: { binary: string; argv: readonly string[] } | null }
 
 const programName = (binary: unknown) => {
   const name = typeof binary === "string" ? basename(binary) : "";
@@ -63,23 +80,55 @@ const programName = (binary: unknown) => {
 };
 /** Where a system program lives; a program named by a path elsewhere (`./cat`, `/tmp/cat`) is the workspace's own, not cat. */
 const SYSTEM_DIRS = new Set(["/bin", "/usr/bin", "/sbin", "/usr/sbin", "/usr/local/bin", "/opt/homebrew/bin"]);
-/** A program on the local list, named bare or by its system path, and not told to run another. */
-const localProgram = (binary: unknown, argv: readonly unknown[]) => typeof binary === "string"
-  && (!binary.includes("/") || SYSTEM_DIRS.has(dirname(binary))) && LOCAL_PROGRAMS.has(basename(binary))
-  && !argv.some((arg) => RUNS_ANOTHER.has(String(arg)));
+/** Whether every argument is a plain word or path, `-`, `--`, or an option the spec lists; after `--` everything is a word. */
+function argumentsRecognised(spec: { short: string; long?: readonly string[] }, argv: readonly unknown[]): boolean {
+  let words = false;
+  return argv.every((raw) => {
+    const arg = String(raw);
+    if (words || arg === "-" || !arg.startsWith("-")) return true;
+    if (arg === "--") { words = true; return true; }
+    if (arg.startsWith("--")) return spec.long?.includes(arg) ?? false;
+    return arg.slice(1).split("").every((letter) => spec.short.includes(letter));
+  });
+}
+/** A program on the local list, named bare or by its system path, with only arguments the list recognises. */
+function localProgram(binary: unknown, argv: readonly unknown[]): boolean {
+  if (typeof binary !== "string" || (binary.includes("/") && !SYSTEM_DIRS.has(dirname(binary)))) return false;
+  const spec = Object.hasOwn(LOCAL_PROGRAMS, basename(binary)) ? LOCAL_PROGRAMS[basename(binary)] : undefined;
+  return spec !== undefined && argumentsRecognised(spec, argv);
+}
 
+/**
+ * Where `path` really is: symlinks followed (the nearest existing ancestor's real path plus the rest when it does not
+ * exist yet), or null when it cannot be told (a dangling link, an unreadable folder): such a path counts as outside.
+ */
+function realPath(path: string): string | null {
+  const absolute = resolve(path);
+  try { return realpathSync.native(absolute); } catch { /* resolved below */ }
+  try { lstatSync(absolute); return null; } catch { /* does not exist: walk up */ }
+  const parent = dirname(absolute);
+  if (parent === absolute) return null;
+  const base = realPath(parent);
+  return base === null ? null : join(base, basename(absolute));
+}
 function roots(workspace: string): string[] {
-  const out = [resolve(workspace)];
-  try { out.push(realpathSync.native(workspace)); } catch { /* a missing workspace keeps its resolved form */ }
-  return out;
+  const real = realPath(workspace);
+  return real === null ? [resolve(workspace)] : [resolve(workspace), real];
 }
 const inside = (root: string, path: string) => { const rel = relative(root, path); return rel === "" || !(rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel)); };
+/** Whether `path`, followed through any symlink, lies in the project. */
+const inProject = (workspace: string, path: string) => { const real = realPath(path); return real !== null && roots(workspace).some((root) => inside(root, real)); };
 
-/** Whether `path` is a credential store or a secret file by name: private data. */
-function secretPath(path: string): boolean {
-  const resolved = resolve(path), home = homedir();
-  if (SECRET_NAME.test(basename(resolved).toLowerCase())) return true;
-  return [...HOME_SECRET_PATHS.map((entry) => resolve(home, entry)), ...shellSecretPaths()].some((secret) => inside(secret, resolved));
+/**
+ * Whether `path` is private data: a secret file by name, a credential store in the home folder, AMC's own authority
+ * (its home and this project's AMC folder), checked both as written and where it really points.
+ */
+function secretPath(workspace: string, path: string): boolean {
+  const resolved = resolve(path), real = realPath(path), home = homedir();
+  const stores = [...HOME_SECRET_PATHS.map((entry) => resolve(home, entry)), ...shellSecretPaths(), join(resolve(workspace), ".amc")];
+  const storeRoots = stores.flatMap((store) => { const r = realPath(store); return r === null || r === store ? [store] : [store, r]; });
+  return [resolved, ...(real === null ? [] : [real])].some((candidate) => SECRET_NAME.test(basename(candidate).toLowerCase())
+    || storeRoots.some((store) => inside(store, candidate)));
 }
 
 /** What the arguments of a shell program reach: a URL, a path outside the workspace, a secret, or something AMC cannot read. */
@@ -90,10 +139,10 @@ function argumentReach(workspace: string, argv: readonly unknown[]): { outside: 
     if (token.startsWith("-") && !token.includes("=")) continue;
     const value = token.includes("=") && token.startsWith("-") ? token.slice(token.indexOf("=") + 1) : token;
     if (/:\/\/|[$`]/.test(value)) { outside = true; continue; }
-    if (!/[/~]|^\.\.?$/.test(value) && !SECRET_NAME.test(value.toLowerCase())) continue;
+    if (value === "") continue;
     const path = value.startsWith("~") ? resolve(homedir(), value.slice(value.startsWith("~/") ? 2 : 1)) : resolve(workspace, value);
-    if (!roots(workspace).some((root) => inside(root, path))) outside = true;
-    if (secretPath(path)) secret = true;
+    if (!inProject(workspace, path)) outside = true;
+    if (secretPath(workspace, path)) secret = true;
   }
   return { outside, secret };
 }
@@ -117,15 +166,22 @@ export function classifyCall(workspace: string, request: GuardRequest, def: Tool
   else if (name === "http.fetch") { untrusted ??= `a web page (${shownAs})`; outbound = true; }
   else if (name === "git.push") { untrusted ??= `a remote git server (${shownAs})`; outbound = true; }
   else if (READS.has(name)) {
-    const path = typeof args.path === "string" ? args.path : workspace;
-    if (!roots(workspace).some((root) => inside(root, resolve(workspace, path)))) untrusted ??= `a file outside this project (${shownAs})`;
-    if (secretPath(resolve(workspace, path))) priv ??= `a secret file (${shownAs})`;
+    const path = resolve(workspace, typeof args.path === "string" ? args.path : workspace);
+    if (!inProject(workspace, path)) untrusted ??= `a file outside this project (${shownAs})`;
+    if (secretPath(workspace, path)) priv ??= `a secret file (${shownAs})`;
   } else if (program !== null) {
     const argv = Array.isArray(args.argv) ? args.argv : [];
     const reach = argumentReach(workspace, argv);
     if (!localProgram(args.binary, argv)) { untrusted ??= `the output of a program that can reach outside this project (${shownAs}: ${program})`; outbound = true; }
     else if (reach.outside) untrusted ??= `a file outside this project (${shownAs}: ${program})`;
     if (reach.secret) priv ??= `a secret file (${shownAs}: ${program})`;
+  } else if (Object.hasOwn(GIT_LOCAL, name) && request.segment) {
+    const [subcommand, ...rest] = request.segment.argv;
+    const reach = argumentReach(workspace, rest);
+    if (subcommand !== name.slice(4) || !argumentsRecognised(GIT_LOCAL[name]!, rest)) {
+      untrusted ??= `the output of a program that can reach outside this project (${shownAs}: git)`; outbound = true;
+    } else if (reach.outside) untrusted ??= `a file outside this project (${shownAs}: git)`;
+    if (reach.secret) priv ??= `a secret file (${shownAs}: git)`;
   } else if (!LOCAL_TOOLS.has(name)) { untrusted ??= `a tool AMC has no entry for (${shownAs})`; outbound = true; }
   return { tool: program ? `${shownAs}: ${program}` : shownAs, untrusted, private: priv, outbound, actionClass };
 }
@@ -186,6 +242,26 @@ function readSessionLabels(workspace: string, sessionKey: string | null): Sessio
   }
 }
 
+export const MCP_HASHES_AUDIT = "MCP_TOOL_HASHES_RECORDED";
+const scanPayloadSchema = z.object({
+  auditType: z.literal(MCP_HASHES_AUDIT),
+  servers: z.array(z.object({ path: z.string(), serverName: z.string().nullable(),
+    tools: z.array(z.object({ name: z.string(), descriptionSha256: z.string(), schemaSha256: z.string() }).passthrough()) }).passthrough()),
+  changedTools: z.array(z.object({ server: z.string(), tool: z.string() }).passthrough()),
+}).passthrough();
+export type McpHashScan = z.infer<typeof scanPayloadSchema> & { ts: number };
+
+/**
+ * Every MCP hash scan `amc shield mcp-ledger` recorded, oldest first, found by the row's exact audit type and source (never
+ * by text that any row's metadata may contain). Throws when a scan row does not parse: callers count every tool as changed.
+ */
+export function recordedMcpHashScans(ledger: { db: { prepare(sql: string): { all(...params: unknown[]): unknown[] } } }): McpHashScan[] {
+  const rows = ledger.db.prepare("SELECT ts, payload_inline FROM evidence_events WHERE event_type = 'audit' "
+    + "AND json_extract(meta_json, '$.auditType') = ? AND json_extract(meta_json, '$.source') = 'ops' ORDER BY ts, rowid")
+    .all(MCP_HASHES_AUDIT) as Array<{ ts: number; payload_inline: string | null }>;
+  return rows.map((row) => ({ ...scanPayloadSchema.parse(JSON.parse(row.payload_inline ?? "null")), ts: row.ts }));
+}
+
 /** MCP tools whose recorded description or schema changed (shield mcp-ledger) and that no call has run since, as ToolHub names. */
 function changedMcpTools(workspace: string, defs: readonly ToolDefinition[]): Set<string> {
   const mcp = defs.filter((def) => def.context?.kind === "mcp");
@@ -193,17 +269,14 @@ function changedMcpTools(workspace: string, defs: readonly ToolDefinition[]): Se
   const ledger = openLedger(workspace);
   try {
     const flagged = new Set<string>();
-    const rows = ledger.db.prepare("SELECT ts, payload_inline FROM evidence_events WHERE event_type = 'audit' AND instr(meta_json, ?) > 0")
-      .all(MCP_HASHES_AUDIT) as Array<{ ts: number; payload_inline: string | null }>;
-    for (const row of rows) {
-      const changed = z.object({ changedTools: z.array(z.object({ server: z.string(), tool: z.string() })) }).parse(JSON.parse(row.payload_inline ?? "{}")).changedTools;
-      for (const { server, tool } of changed) {
+    for (const scan of recordedMcpHashScans(ledger)) {
+      for (const { server, tool } of scan.changedTools) {
         for (const def of mcp) {
           const context = def.context?.kind === "mcp" ? def.context.server : null;
           if (!context || (context.id !== server && context.name !== server)) continue;
           let name: string;
           try { name = nativeMcpToolName(context.id, tool); } catch { name = tool; }
-          if ((def.name === name || def.name === tool) && ranRows(ledger, def.name, row.ts).every((ran) => !ran.inputGuard.tools.includes(def.name))) flagged.add(def.name);
+          if ((def.name === name || def.name === tool) && ranRows(ledger, def.name, scan.ts).every((ran) => !ran.inputGuard.tools.includes(def.name))) flagged.add(def.name);
         }
       }
     }
@@ -212,7 +285,6 @@ function changedMcpTools(workspace: string, defs: readonly ToolDefinition[]): Se
     ledger.close();
   }
 }
-export const MCP_HASHES_AUDIT = "MCP_TOOL_HASHES_RECORDED";
 
 export interface InputGuardRecord {
   v: 1;

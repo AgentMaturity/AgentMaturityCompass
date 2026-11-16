@@ -120,8 +120,8 @@ export function buildMcpTrustReceipt(params: {
   targets: string[];
   generatedAt: number;
   previous?: Record<string, string> | null;
-  /** The previous receipt's entries (or the servers AMC last recorded), for per-tool changes. */
-  previousEntries?: ReadonlyArray<Pick<McpLedgerEntry, "path" | "serverName" | "tools">> | null;
+  /** The previous receipt's entries (or the servers AMC last recorded), for per-tool changes; "unreadable" counts every tool as changed. */
+  previousEntries?: ReadonlyArray<Pick<McpLedgerEntry, "path" | "serverName" | "tools">> | "unreadable" | null;
 }): McpTrustReceipt {
   const files = collectDefinitionFiles(params.targets);
   const entries: McpLedgerEntry[] = [];
@@ -164,7 +164,9 @@ export function buildMcpTrustReceipt(params: {
     }
   }
 
-  const changedTools = params.previousEntries ? changedToolsSince(entries, params.previousEntries) : null;
+  const changedTools = params.previousEntries === "unreadable"
+    ? entries.flatMap((entry) => entry.tools.map((tool) => ({ server: mcpServerKey(entry), tool: tool.name, changed: ["description" as const, "schema" as const] })))
+    : params.previousEntries ? changedToolsSince(entries, params.previousEntries) : null;
   const body = {
     schemaVersion: "amc.mcp-trust-ledger.v1" as const,
     generatedAt: params.generatedAt,

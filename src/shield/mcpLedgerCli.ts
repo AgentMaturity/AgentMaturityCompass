@@ -1,6 +1,6 @@
 import { join, resolve } from "node:path";
 import chalk from "chalk";
-import { MCP_HASHES_AUDIT } from "../enforce/untrustedInputGuard.js";
+import { MCP_HASHES_AUDIT, recordedMcpHashScans } from "../enforce/untrustedInputGuard.js";
 import { openLedger } from "../ledger/ledger.js";
 import { appendOpsAuditEvent } from "../ops/audit.js";
 import { escapeTerminalControls } from "../tools/builtin/askUserTool.js";
@@ -9,13 +9,11 @@ import { buildMcpTrustReceipt, previousHashMap, type McpLedgerEntry, type McpTru
 
 type RecordedServers = Array<Pick<McpLedgerEntry, "path" | "serverName" | "tools">>;
 
-/** The servers and tool digests the last scan recorded in this workspace's ledger, or null when there is none. */
+/** The servers and tool digests the last scan recorded in this workspace's ledger, or null when there is none; throws when unreadable. */
 function lastRecorded(workspace: string): RecordedServers | null {
   const ledger = openLedger(workspace);
   try {
-    const row = ledger.db.prepare("SELECT payload_inline FROM evidence_events WHERE event_type = 'audit' AND instr(meta_json, ?) > 0 ORDER BY ts DESC LIMIT 1")
-      .get(MCP_HASHES_AUDIT) as { payload_inline: string | null } | undefined;
-    return row?.payload_inline ? (JSON.parse(row.payload_inline) as { servers: RecordedServers }).servers : null;
+    return recordedMcpHashScans(ledger).at(-1)?.servers ?? null;
   } finally {
     ledger.close();
   }
@@ -41,7 +39,7 @@ export function runMcpLedgerCli(params: {
   previous?: string;
 }): void {
   let previous: Record<string, string> | null = null;
-  let previousEntries: RecordedServers | null = null;
+  let previousEntries: RecordedServers | "unreadable" | null = null;
   if (params.previous) {
     const priorPath = resolve(params.workspace, params.previous);
     if (pathExists(priorPath)) {
@@ -55,7 +53,8 @@ export function runMcpLedgerCli(params: {
   const workspaceLedger = pathExists(join(params.workspace, ".amc"));
   let recordNote = "not recorded: no AMC workspace here";
   if (!previousEntries && workspaceLedger) {
-    try { previousEntries = lastRecorded(params.workspace); } catch (error) { recordNote = `the last recorded scan could not be read: ${error instanceof Error ? error.message : String(error)}`; }
+    // An unreadable last scan counts every tool as changed (fail closed), never as "no earlier scan".
+    try { previousEntries = lastRecorded(params.workspace); } catch { previousEntries = "unreadable"; }
   }
   const receipt = buildMcpTrustReceipt({ targets: params.targets, generatedAt: params.now, previous, previousEntries });
   if (workspaceLedger) {
@@ -82,6 +81,7 @@ export function runMcpLedgerCli(params: {
     console.log(chalk.gray("Changed since previous:"),
       receipt.changedSincePrevious.length === 0 ? chalk.green("nothing") : receipt.changedSincePrevious.join(", "));
   }
+  if (previousEntries === "unreadable") console.log(chalk.yellow("AMC could not read the last recorded scan, so every tool counts as changed."));
   if (receipt.changedTools && receipt.changedTools.length > 0) {
     console.log(chalk.yellow("Tool definitions that changed since the last scan (the server's own names):"));
     for (const tool of receipt.changedTools) {
