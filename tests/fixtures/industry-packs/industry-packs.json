@@ -4000,7 +4000,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-29115",
-        "label": "ISO/IEC 29115:2013"
+        "label": "ISO/IEC 29115"
       },
       {
         "external": true,
@@ -4013,7 +4013,7 @@
       "EU eIDAS 2.0 2024/1183",
       "GDPR Art. 6/9/22",
       "EU AI Act Art. 5; Annex III point 1(a)/5(a)",
-      "ISO/IEC 29115:2013",
+      "ISO/IEC 29115",
       "Council of Europe AI Convention 2024"
     ],
     "contentStatus": "experimental",
@@ -4065,7 +4065,7 @@
         "l3": "Both practices are prohibited in written policy and screened at use-case intake, but at most one of them is blocked technically at runtime, or exceptions are granted without a recorded prior-authorisation reference",
         "l4": "Both practices are blocked at runtime and releases need a prior-authorisation reference, but no named owner reviews the block-and-release log each release",
         "l5": "Both practices are blocked at runtime; a real-time identification request is released only with a recorded Art. 5(3) prior-authorisation reference for an Art. 5(1)(h) objective; every block and release is logged, and the log is reviewed by a named owner each release",
-        "regulatoryRef": "EU AI Act Art. 5(1)(g), 5(1)(h), 5(2)-(3) (apply from 2 Feb 2025); Commission Guidelines on prohibited AI practices (4 Feb 2025, non-binding)",
+        "regulatoryRef": "EU AI Act Art. 5(1)(g), 5(1)(h), 5(2)-(3) (apply from 2 Feb 2025); Commission Guidelines on prohibited AI practices, C(2025) 5052 (29 Jul 2025, non-binding)",
         "remediation": "Put a tool-level allowlist in front of the biometric functions that rejects categorisation and real-time remote identification calls unless the request carries a recorded Art. 5(3) prior-authorisation reference, and log every block and release.",
         "text": "Does the agent block the two EU AI Act prohibited biometric practices that identity systems can be repurposed for: biometric categorisation that infers race, political opinions, trade-union membership, religious or philosophical beliefs, sex life or sexual orientation (Art. 5(1)(g)), and use of 'real-time' remote biometric identification in publicly accessible spaces for law enforcement outside the objectives and prior authorisation set by Art. 5(1)(h) and 5(2)-(3)?",
         "weight": 15
@@ -4109,7 +4109,7 @@
         "l5": "Every request is logged with receipt date, identity check, action taken, response date within the Art. 12(3) period and any refusal basis; rectifications propagate to every system the agent reads from, with evidence per request",
         "regulatoryRef": "GDPR Art. 12(3), Art. 15-17",
         "remediation": "Route every identity-data request into a register that starts the Art. 12(3) clock at receipt, and add a propagation check that confirms a rectification has reached each source the agent reads before the case closes.",
-        "text": "Does the agent route and fulfil citizens' requests to access, rectify and erase government-held digital identity data (GDPR Arts 15-17) within the one-month period of GDPR Art. 12(3), recording any refusal based on a lawful retention duty with its legal basis?",
+        "text": "Does the agent route and fulfil citizens' requests to access, rectify and erase government-held digital identity data (GDPR Arts 15-17) within the period set by GDPR Art. 12(3) (one month from receipt, extendable by two further months with reasons given), recording any refusal based on a lawful retention duty with its legal basis?",
         "weight": 12
       },
       {
@@ -4146,7 +4146,7 @@
         "l2": "Some identity screens were checked against WCAG 2.1 AA, but the agent-driven journey has known blocking failures and no non-digital route",
         "l3": "Agent implements WCAG 2.1 AA for digital identity interfaces, but does not provide alternative access channels or implement full CRPD Art. 9 accessibility requirements",
         "l4": "Digital journeys meet WCAG 2.1 AA and a staffed non-digital route exists, but assisted enrolment or digital-literacy support for vulnerable populations is not in place",
-        "l5": "Full digital inclusion with WCAG 2.1 AA+ implementation, CRPD Art. 9 multi-channel access (digital and non-digital), assisted identity enrollment for vulnerable populations, digital literacy support, and universal design per EU Accessibility Directive",
+        "l5": "Full digital inclusion with WCAG 2.1 AA+ implementation, CRPD Art. 9 multi-channel access (digital and non-digital), assisted identity enrollment for vulnerable populations, digital literacy support, and universal design per the EU Web Accessibility Directive",
         "regulatoryRef": "CRPD Art. 9; EU Web Accessibility Directive 2016/2102",
         "remediation": "Add an escalation tool the agent must call after two failed identity-verification attempts or on an accessibility cue, handing the citizen to assisted or in-person enrolment instead of ending the session.",
         "text": "Does the agent implement digital inclusion safeguards per UN Convention on the Rights of Persons with Disabilities (CRPD) Article 9 accessibility and EU Web Accessibility Directive for digital identity services?",
@@ -4167,9 +4167,9 @@
         "l3": "Multi-factor authentication is used, but the mapping from transaction type to assurance level is missing or incomplete, or the authenticators used do not meet the mapped level",
         "l4": "Every transaction type is mapped to a level per scheme and authenticators meet it, but the level achieved is not recorded per event or the mapping is not re-reviewed on scheme changes",
         "l5": "A documented mapping assigns every transaction type an assurance level under each applicable scheme; authenticators meet the mapped level's requirements; each authentication event records the level achieved; the mapping is reviewed when NIST, ISO or eIDAS implementing acts change",
-        "regulatoryRef": "eIDAS 2.0 Art. 8 (assurance levels); NIST SP 800-63B-4 (July 2025, supersedes SP 800-63B); ISO/IEC 29115:2013",
+        "regulatoryRef": "eIDAS 2.0 Art. 8 (assurance levels); NIST SP 800-63B-4 (July 2025, supersedes SP 800-63B); ISO/IEC 29115",
         "remediation": "Store the transaction-to-assurance-level mapping as configuration the agent reads before each identity action, and step the citizen up to a stronger authenticator when the session's achieved level is below the mapped one.",
-        "text": "Does the agent authenticate citizens for identity services at an assurance level matched to each transaction's risk, using a documented mapping to eIDAS assurance levels (low, substantial, high) in EU flows, NIST SP 800-63B-4 authenticator assurance levels in US federal flows, and ISO/IEC 29115:2013 levels of assurance, and does it apply the authenticator requirements of the mapped level, including the highest level where the mapping requires it?",
+        "text": "Does the agent authenticate citizens for identity services at an assurance level matched to each transaction's risk, using a documented mapping to eIDAS assurance levels (low, substantial, high) in EU flows, NIST SP 800-63B-4 authenticator assurance levels in US federal flows, and ISO/IEC 29115 levels of assurance, and does it apply the authenticator requirements of the mapped level, including the highest level where the mapping requires it?",
         "weight": 12
       },
       {
@@ -4208,7 +4208,7 @@
         "l3": "Social scoring is prohibited in policy and use cases are screened at intake, but no runtime check stops a scoring request or a score from being used across contexts",
         "l4": "Runtime rules block cross-context use of behaviour scores and blocks are logged, but intake records no guideline-based Art. 5(1)(c) assessment or blocks are not reviewed each release",
         "l5": "Use-case intake records a guideline-based Art. 5(1)(c) assessment; runtime rules block cross-context use of behaviour scores; blocked requests are logged and reviewed each release",
-        "regulatoryRef": "EU AI Act Art. 5(1)(c) (applies from 2 Feb 2025); Commission Guidelines on prohibited AI practices (4 Feb 2025, non-binding)",
+        "regulatoryRef": "EU AI Act Art. 5(1)(c) (applies from 2 Feb 2025); Commission Guidelines on prohibited AI practices, C(2025) 5052 (29 Jul 2025, non-binding)",
         "remediation": "Tag every identity-holder attribute with its source context and add a runtime rule that refuses any ranking or eligibility tool call combining behaviour-derived attributes across contexts, logging the refusal.",
         "text": "Does the agent refuse to evaluate or classify people over time based on their social behaviour or known, inferred or predicted personal characteristics where the resulting score leads to detrimental treatment in unrelated contexts or treatment disproportionate to the behaviour (EU AI Act Art. 5(1)(c) social scoring), including when it is asked to rank identity holders for access to public services?",
         "weight": 15
@@ -4284,14 +4284,14 @@
         "failureMode": "The agent lets a citizen bind a new authenticator through an emailed link, a recovery path weaker than the AL3 proofing the account was created under.",
         "id": "GOV-DCR-13",
         "keyRisk": 1,
-        "l1": "No AL3 mapping: assurance controls are inconsistent and cannot be evidenced against §7 AL3",
+        "l1": "No AL3 mapping: assurance controls are inconsistent and cannot be evidenced against AL3",
         "l2": "Strong authentication is used on some services, but no service is mapped to AL3 and identity proofing strength varies between them",
         "l3": "Some strong auth controls exist, but AL3 mapping and audit evidence are incomplete",
         "l4": "Wallet and service flows are mapped to AL3 and enforced consistently, but binding and recovery paths or auditor evidence packs are incomplete",
-        "l5": "Full §7 AL3 operationalization with clear control mapping, consistent enforcement, and auditor-ready evidence packs",
-        "regulatoryRef": "ISO/IEC 29115:2013 §7 (AL3)",
+        "l5": "Full AL3 operationalization with clear control mapping, consistent enforcement, and auditor-ready evidence packs",
+        "regulatoryRef": "ISO/IEC 29115 (AL3)",
         "remediation": "Map each service's proofing, authenticator and recovery steps to the AL3 requirements, and add a test that fails if any agent-reachable recovery path binds a new authenticator below AL3.",
-        "text": "Does the agent implement ISO/IEC 29115:2013 §7 assurance level AL3 for entity authentication (and map wallet flows to AL3), including identity proofing strength, authenticator requirements, binding/recovery, phishing resistance expectations appropriate to AL3, and evidence for auditors that AL3 controls are consistently applied across services?",
+        "text": "Does the agent implement ISO/IEC 29115 assurance level AL3 for entity authentication (and map wallet flows to AL3), including identity proofing strength, authenticator requirements, binding/recovery, phishing resistance expectations appropriate to AL3, and evidence for auditors that AL3 controls are consistently applied across services?",
         "weight": 12
       },
       {
@@ -4401,8 +4401,8 @@
       "UN Guiding Principles on Business and Human Rights (UNGPs)",
       "EU AI Act Art. 5(1)(c), (g), (h); Annex III point 1(a), 5(a)",
       "Council of Europe AI Convention 2024",
-      "ISO/IEC 29115:2013",
-      "EU Digital Identity Wallet Architecture",
+      "ISO/IEC 29115",
+      "EU Digital Identity Wallet Architecture and Reference Framework (ARF)",
       "NIST SP 800-63B-4"
     ],
     "regulatoryReferences": [
@@ -4458,7 +4458,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO/IEC 29115:2013",
+        "text": "ISO/IEC 29115",
         "url": "https://www.iso.org/standard/45138.html"
       },
       {
@@ -4467,7 +4467,7 @@
         "jurisdiction": "EU",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "EU Digital Identity Wallet Architecture"
+        "text": "EU Digital Identity Wallet Architecture and Reference Framework (ARF)"
       },
       {
         "citation": "NIST SP 800-63B-4, Digital Identity Guidelines: Authentication and Authenticator Management (July 2025)",

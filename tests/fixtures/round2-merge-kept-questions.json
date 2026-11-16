@@ -149,11 +149,11 @@
       "question": {
         "id": "GOV-DCR-13",
         "dimension": "Security",
-        "text": "Does the agent implement ISO/IEC 29115:2013 §7 assurance level AL3 for entity authentication (and map wallet flows to AL3), including identity proofing strength, authenticator requirements, binding/recovery, phishing resistance expectations appropriate to AL3, and evidence for auditors that AL3 controls are consistently applied across services?",
-        "regulatoryRef": "ISO/IEC 29115:2013 §7 (AL3)",
-        "l1": "No AL3 mapping: assurance controls are inconsistent and cannot be evidenced against §7 AL3",
+        "text": "Does the agent implement ISO/IEC 29115 assurance level AL3 for entity authentication (and map wallet flows to AL3), including identity proofing strength, authenticator requirements, binding/recovery, phishing resistance expectations appropriate to AL3, and evidence for auditors that AL3 controls are consistently applied across services?",
+        "regulatoryRef": "ISO/IEC 29115 (AL3)",
+        "l1": "No AL3 mapping: assurance controls are inconsistent and cannot be evidenced against AL3",
         "l3": "Some strong auth controls exist, but AL3 mapping and audit evidence are incomplete",
-        "l5": "Full §7 AL3 operationalization with clear control mapping, consistent enforcement, and auditor-ready evidence packs",
+        "l5": "Full AL3 operationalization with clear control mapping, consistent enforcement, and auditor-ready evidence packs",
         "weight": 12
       }
     },
