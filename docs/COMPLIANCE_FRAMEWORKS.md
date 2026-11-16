@@ -86,7 +86,7 @@ The EU AI Act establishes requirements for high-risk AI systems:
 
 Limits and relabels (SH-TRUST-04):
 - `owasp-llm` used to be an alias of the OWASP **API** Top 10; it now resolves to this list. `owasp` and `owasp-api` still mean the API list.
-- Only the `owaspGenAI` assurance pack still uses the **2023 v1.1** numbering (where LLM06 is Sensitive Information Disclosure and LLM08 is Excessive Agency) and says so in its title. `amc score owasp-llm`, `GET /api/v1/regulatory/owasp-llm` and the question bank's AMC-5.8–5.17 titles follow LLM01:2025 to LLM10:2025; the first two report no score.
+- The `owaspGenAI` assurance pack, `amc score owasp-llm`, `GET /api/v1/regulatory/owasp-llm` and the question bank's AMC-5.8–5.17 titles all follow LLM01:2025 to LLM10:2025 (https://genai.owasp.org/llm-top-10/, read 2026-11-16). The pack's ten gates ask for a named artifact, which is a claim and is never graded; the scorer and the API route report no score.
 - The 2025 list renumbers several risks; the `excessive-agency` and `overreliance` pack titles name both ids.
 
 ### OWASP Top 10 for Agentic Applications 2026 (`OWASP_AGENTIC`, ASI01–ASI10)

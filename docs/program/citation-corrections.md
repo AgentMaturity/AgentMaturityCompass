@@ -64,6 +64,7 @@ Row numbers follow the P0-24 issue table.
 | 28 | `catalogueUs.ts` `us-fsma-pchf` (candidate only) | Latest final rule note | — | — | — | Record not on main: copy to P1-42 | |
 | 29 | `register.json` `us-nist-ai-rmf`, `us-nist-ai-600-1`, `us-co-sb24-205`, `us-co-sb26-189`, `br-lgpd`, `in-dpdp` | No `affectedPacks` | — | — | — | Not applied: choosing affected packs is an applicability judgment no source states; needs a proposal and expert confirmation (P0-12 follow-up) | |
 | 30 | `certificationRequirements.ts` (candidate only) | Pack source path | — | — | — | File not on main: copy to P1-16 | |
+| 31 | `atlas.json`, `crossFrameworkMapping.ts`, `builtInMappings.ts` MITRE ATLAS | v2026.09 table; `AML.T0019` Publish Poisoned Datasets; `AML.T0025` named Exfiltration via ML Inference API; `AML.T0057` LLM Data Leakage; ML-era names | v2026.10 table (129 techniques, 92 sub-techniques); `AML.T0115.000` Datasets; `AML.T0024` Exfiltration via AI Inference API; `AML.T0136` Exfiltration via AI User Interface; current names | ATLAS v2026.10 data file, sha256 `ac41ee9f…7914ffe142d`, released 2026-10-28 (github.com/mitre-atlas/atlas-data releases) | 2026-11-16 | Applied. v2026.10 has no `AML.T0056`, `AML.T0057` or `AML.T0024.000`–`.002`; `AML.T0019` was already absent. Mappings are still AI-drafted, not expert-reviewed | |
 
 ## Catalogue records
 

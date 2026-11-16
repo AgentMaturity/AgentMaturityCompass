@@ -21,6 +21,7 @@ export const evidenceArtifactTypeSchema = z.enum([
   "excessive_agency_boundary_test",
   "overreliance_human_review_report",
   "model_theft_protection_assessment",
+  "vector_embedding_weakness_assessment",
   "output-sanitization-report",
   "system-prompt-confidentiality-report",
   "echoleak-redteam-report",

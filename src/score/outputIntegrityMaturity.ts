@@ -1,7 +1,7 @@
 /**
  * Output Integrity Maturity
  * Scores validation of LLM outputs before downstream use.
- * Source: OWASP LLM02 (Insecure Output Handling) — downstream code execution,
+ * Source: OWASP LLM05:2025 Improper Output Handling (LLM02 in the 2023 list) — downstream code execution,
  * data injection, XSS via unvalidated LLM output.
  * Also covers prior art self-knowledge: confidence calibration with citation.
  */
@@ -84,7 +84,7 @@ export function scoreOutputIntegrityMaturity(cwd?: string): OutputIntegrityResul
   const hasOutputAuditTrailOutcome = assessCriterion(root, auditPaths);
   hasOutputAuditTrail = hasOutputAuditTrailOutcome.met;
 
-  if (hasOutputValidationOutcome.assessable && !hasOutputValidation) gaps.push("No output validation — LLM outputs used directly without checking (OWASP LLM02)");
+  if (hasOutputValidationOutcome.assessable && !hasOutputValidation) gaps.push("No output validation — LLM outputs used directly without checking (OWASP LLM05:2025)");
   if (hasOutputSanitizationOutcome.assessable && !hasOutputSanitization) gaps.push("No output sanitization — injection via LLM output possible");
   if (hasConfidenceCalibrationOutcome.assessable && !hasConfidenceCalibration) gaps.push("No confidence calibration — agent expresses all outputs with equal fluency regardless of certainty");
   if (hasCitationRequirementOutcome.assessable && !hasCitationRequirement) gaps.push("No citation requirement — outputs lack provenance (self-knowledge gap)");

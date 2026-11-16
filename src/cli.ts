@@ -22028,7 +22028,7 @@ score
 
 score
   .command("output-integrity")
-  .description("Score output integrity maturity (OWASP LLM02, confidence calibration, citation)")
+  .description("Score output integrity maturity (OWASP LLM05:2025, confidence calibration, citation)")
   .option("--json", "Output as JSON")
   .action(async (opts: { json?: boolean }) => {
     try {
