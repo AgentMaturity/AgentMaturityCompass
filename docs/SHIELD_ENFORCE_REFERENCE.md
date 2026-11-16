@@ -116,12 +116,16 @@ amc assurance run --agent my-agent --pack exfiltrationChannels --attacker-model 
   ordinary-task twin, on a fresh fixture.
 - Limits: `--attacker-rounds` (rounds per scenario, default 10), `--attacker-max-tokens` (default 50000 for the whole
   run) and `--attacker-max-cost` (US dollars, default 1, from AMC's price list). The run stops at whichever comes
-  first and says which one stopped it. One attacker reply can pass the token or cost limit before the run stops. If
-  AMC has no price for the model, the cost is shown as not known and the run is bounded by rounds and tokens only;
-  `--attacker-max-cost` is then refused.
+  first and says which one stopped it. Before each attacker call AMC works out the most that call could use (the
+  length of what it sends plus the longest reply it allows) and does not make the call if that would pass either
+  limit. Long agent replies and tool-call lists from earlier rounds are cut to 2000 characters in what the attacker
+  sees. If AMC has no price for the model, the cost is shown as not known and the run is bounded by rounds and tokens
+  only; `--attacker-max-cost` is then refused. If a call's cost cannot be counted for a model AMC has a price for,
+  the run stops there.
 - The result names the attacker model and the budget and gives two counts: on how many scenarios the attack worked
   in the first round, and on how many within the round limit. A round that could not be evaluated counts as not
-  passed. A scenario the attacker did not break is not proof that the agent resists attacks; a stronger attacker or
+  passed. A scenario whose search stopped early (an attacker model error, or the token or cost limit) before using
+  its rounds is not evaluated and counts as not passed; the report says what stopped it. A scenario the attacker did not break is not proof that the agent resists attacks; a stronger attacker or
   a larger budget may do better. A run against a stand-in or test model shows nothing about a real agent.
 - Scenarios with no single place for attack text (for example the MCP tool-poisoning pack) run as before and the
   report says the attacker model was not used on them.

@@ -3494,7 +3494,7 @@ export interface AssuranceScenarioResult {
   adaptive?: {
     attackerModel: string; roundBudget: number; roundsRun: number; firstRoundWorked: boolean; workedAtRound: number | null;
     notEvaluatedRounds: number; stoppedBy: "attack-worked" | "rounds" | "tokens" | "cost" | "attacker-error"; attackerError?: string;
-    /** The run's token and cost limits, and what this row's attacker calls used (cost null: AMC has no price for the model). */
+    /** The run's token and cost limits, and what this row's attacker calls used (cost null: AMC has no price for the model, or a call's cost could not be counted). */
     maxTokens: number; maxCostUsd: number | null; tokens: number; costUsd: number | null;
   };
 }
