@@ -432,8 +432,10 @@ export function registerLateStageCliCommands({
     .option("--evil-mcp", "Also run built-in Evil MCP agent-provider attack scenarios")
     .option("--mcp-attacks <categories...>", "MCP attack categories for --evil-mcp (default: all; aliases: tool_poison, data_exfil, priv_esc, prompt_inject)")
     .option("--model <modelId>", "model id of the agent under attack (or set AMC_ASSURANCE_MODEL)")
+    .option("--attempts <n>", "tries per attack scenario graded by what the agent did, each with its ordinary-task twin (1-25; default 1)")
     .option("--json", "Print JSON report to stdout")
     .action(async (agentId: string | undefined, opts: {
+      attempts?: string;
       plugins?: string[];
       strategies?: string[];
       output?: string;
@@ -444,12 +446,18 @@ export function registerLateStageCliCommands({
       model?: string;
     }) => {
       const workspace = process.cwd();
+      if (opts.attempts !== undefined && !/^(?:[1-9]|1\d|2[0-5])$/.test(opts.attempts)) {
+        console.error(chalk.red(`--attempts must be a whole number from 1 to 25 (got "${opts.attempts}").`));
+        process.exitCode = 1;
+        return;
+      }
       let report: Awaited<ReturnType<typeof runRedTeam>>;
       try {
         report = await runRedTeam({
           workspace,
           agentId,
           model: opts.model,
+          attempts: opts.attempts === undefined ? undefined : Number(opts.attempts),
           plugins: opts.plugins,
           strategies: opts.strategies,
           output: opts.output,

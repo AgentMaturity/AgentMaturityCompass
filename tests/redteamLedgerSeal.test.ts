@@ -71,11 +71,13 @@ describe("signed red-team runs are ledgered and sealed", () => {
       expect(session?.binary_path).toBe("amc-redteam-runner");
       expect(session?.session_seal_sig).toBeTruthy();
       const rows = ledger.getAllEvents().filter((event) => event.session_id === report.sessionId);
-      expect(rows.filter((event) => event.event_type === "stdin").length).toBe(report.pluginResults[0]!.scenarioResults.length);
+      // injection is effect-graded: per scenario one description row, then one attack and one benign exchange (1 try).
+      expect(rows.filter((event) => event.event_type === "stdin").length).toBe(report.pluginResults[0]!.scenarioResults.length * 3);
       expect(rows.every((event) => eventMeta(event).source === "redteam" || eventMeta(event).auditType === "ASSURANCE_RUN_STARTED")).toBe(true);
       // Every graded row names its own stdin, stdout and test rows in that session.
       for (const row of report.pluginResults[0]!.scenarioResults.filter((row) => row.inconclusive !== true)) {
-        expect(row.evidenceEventIds).toHaveLength(3);
+        expect(row.evidenceEventIds).toHaveLength(6);
+        expect(row.evidenceEventIds.slice(0, 3).map((id) => rows.find((event) => event.id === id)?.event_type)).toEqual(["stdin", "stdout", "test"]);
         expect(row.evidenceEventIds.every((id) => rows.some((event) => event.id === id))).toBe(true);
       }
     } finally { ledger.close(); }

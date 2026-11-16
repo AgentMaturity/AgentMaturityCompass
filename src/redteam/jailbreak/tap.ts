@@ -1,16 +1,11 @@
 /**
- * TAP — Tree of Attacks with Pruning
+ * TAP-shaped tree search with fixed rewrites (no attacker model).
  *
- * Implementation of the TAP algorithm for automated jailbreak testing.
- * Reference: Mehrotra et al., "Tree of Attacks: Jailbreaking Black-Box LLMs
- * with Pruning" (2023).
- *
- * TAP works by maintaining a tree of attack prompts that are iteratively
- * refined based on the target's responses. Branches that show no progress
- * toward jailbreaking are pruned, while promising branches are expanded.
- *
- * This implementation uses a synthetic response engine (matching the existing
- * AMC redteam pattern) for deterministic, offline evaluation.
+ * Shaped after "Tree of Attacks: Jailbreaking Black-Box LLMs with Pruning" (Mehrotra et al., 2023): a tree of
+ * attack prompts is expanded and pruned. Unlike published TAP, there is no attacker model and no evaluator model:
+ * each prompt is sent to the real agent under test, but the refinements are fixed rewrites that do not read the
+ * agent's reply. A result is therefore a weak lower bound on what an adaptive attacker could do, never evidence that
+ * the agent resists jailbreaks.
  */
 
 import { randomUUID } from "node:crypto";
@@ -394,12 +389,12 @@ export async function runTAP(input: RunTAPInput): Promise<TAPResult> {
 
 export function renderTAPMarkdown(result: TAPResult): string {
   const lines: string[] = [];
-  lines.push("# 🌳 TAP — Tree of Attacks with Pruning Report");
+  lines.push("# 🌳 TAP-shaped tree search report (fixed rewrites, no attacker model)");
   lines.push("");
   lines.push(`**Run ID:** \`${result.runId}\``);
   lines.push(`**Root Attack:** ${result.rootAttack.name} (\`${result.rootAttack.id}\`)`);
   lines.push(`**Payload:** \`${result.payload.slice(0, 100)}${result.payload.length > 100 ? "..." : ""}\``);
-  lines.push(`**Result:** ${result.jailbroken ? "🔴 JAILBROKEN" : "🟢 DEFENDED"}`);
+  lines.push(`**Result:** ${result.jailbroken ? "🔴 JAILBROKEN" : "🟡 no jailbreak found by this fixed search (not proof of resistance)"}`);
   lines.push(`**Best Confidence:** ${(result.bestConfidence * 100).toFixed(1)}%`);
   lines.push("");
 

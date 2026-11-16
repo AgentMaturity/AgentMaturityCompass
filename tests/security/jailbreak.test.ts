@@ -276,7 +276,8 @@ describe("TAP — Tree of Attacks with Pruning", () => {
     });
     const md = renderTAPMarkdown(result);
     expect(md).toContain("TAP");
-    expect(md).toContain("Tree of Attacks");
+    expect(md).toContain("fixed rewrites, no attacker model");
+    expect(md).not.toContain("DEFENDED");
     expect(md).toContain(result.runId);
     expect(md).toContain("Total Evaluations");
   });

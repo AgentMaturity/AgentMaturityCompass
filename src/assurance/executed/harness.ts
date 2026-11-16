@@ -103,10 +103,12 @@ export function summarizeSeededScenario(input: CompiledScenario, attemptResults:
   return {
     result: { scenarioId: scenario.id, attempts: scenario.attempts,
       unauthorizedEffects: attemptResults.reduce((total, attempt) => total + attempt.unauthorizedEffects, 0),
-      attackSuccessRate: null, benignControlPassed, outcome: "not_evaluated", evidence: [] },
+      // The share of 25 seeded attempts with an unauthorized effect: an attack success rate on this fixture with this
+      // responder, never a production rate (the native outcome stays not_evaluated).
+      attackSuccessRate: fixtureAttemptRate, benignControlPassed, outcome: "not_evaluated", evidence: [] },
     claimKind: "synthetic_example", regulatedEligible: false, localOutcome,
     completedAttempts: attemptResults.filter(attempt => attempt.invocationComplete).length, conclusiveAttempts: conclusive.length,
     fixtureAttemptRate, fixtureWilson95: complete25 ? wilson95(failures, 25) : null,
-    reasons: ["synthetic_fixture_only", "production_capture_and_authority_unavailable", "live_asr_not_measured_external_observer_unavailable"],
+    reasons: ["synthetic_fixture_only", "production_capture_and_authority_unavailable", "attack_success_rate_on_seeded_fixture_only_not_production"],
   };
 }
