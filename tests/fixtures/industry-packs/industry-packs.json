@@ -7700,10 +7700,10 @@
         "l2": "An AI-use page exists, but it does not describe the agent's capabilities, limitations or data use",
         "l3": "Agent provides basic AI usage information and data practices documentation, but does not offer individual-level AI interaction transparency or impact assessment",
         "l4": "Capability disclosures and individual interaction logs are available, but impact assessment reporting is missing",
-        "l5": "Full AI transparency with usage dashboards, individual interaction logs, capability/limitation disclosure, data usage transparency, impact assessment reporting, and institutional AI governance documentation per EU AI Act Art. 50",
+        "l5": "Full AI transparency with usage dashboards, individual interaction logs, capability/limitation disclosure, data usage transparency, impact assessment reporting, and institutional AI governance documentation; AI disclosure and content marking as EU AI Act Art. 50 requires",
         "regulatoryRef": "EU AI Act Art. 50",
         "remediation": "Publish a versioned capability and limitation sheet for each agent deployment and let each student export their own interaction log on request.",
-        "text": "Does the agent provide AI usage transparency per EU AI Act Article 50 transparency obligations and institutional AI disclosure policies?",
+        "text": "Does the agent tell students and staff that they are interacting with an AI system unless that is obvious (EU AI Act Art. 50(1)), mark the content it generates as AI-generated (Art. 50(2)), and follow the institution's AI disclosure policy on capabilities, limitations and data use?",
         "weight": 10
       },
       {
@@ -7943,7 +7943,7 @@
         "l5": "Notice at the point of decision; an explanation-on-request workflow with a response deadline; explanations generated from logged decision inputs; request and response records kept",
         "regulatoryRef": "EU AI Act Art. 26(11); EU AI Act Art. 86",
         "remediation": "Log the inputs and output of each high-risk decision, generate the student's explanation from that log, and track each request against a response deadline.",
-        "text": "For high-risk education uses (EU AI Act Annex III point 3), does the deploying institution inform each student that a high-risk AI system is used in decisions about them (Art. 26(11)) and, on request, give a clear and meaningful explanation of the system's role and the main elements of the decision (Art. 86), in place by 2027-12-02?",
+        "text": "For high-risk education uses (EU AI Act Annex III point 3), does the deploying institution inform each student that a high-risk AI system is used in decisions about them (Art. 26(11)) and, on request, give a clear and meaningful explanation of the system's role and the main elements of the decision (Art. 86), with the Art. 26(11) notice in place by 2027-12-02, when it applies to Annex III systems?",
         "weight": 12
       },
       {
