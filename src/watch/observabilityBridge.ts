@@ -210,8 +210,7 @@ export class OTLPAdapter implements ProviderAdapter {
     const attrs = attrMap(span.attributes ?? []);
     const startNano = Number(span.startTimeUnixNano ?? 0);
     const endNano = Number(span.endTimeUnixNano ?? 0);
-    const startMs = startNano / 1_000_000;
-    const endMs = endNano / 1_000_000;
+    const startMs = startNano / 1_000_000, endMs = endNano / 1_000_000;
     const model = attrs["gen_ai.request.model"] ?? attrs["llm.model"] ?? attrs["ai.model"];
     const usage = attributeUsage(model, attrs);
     const kind = classifySpanKind(span.name, attrs);
