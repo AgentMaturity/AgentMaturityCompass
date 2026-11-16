@@ -182,9 +182,9 @@ export async function handlePassportRoute(
       if (!body.scores || !body.sourceSystem || !body.targetSystem) {
         apiError(res, 400, "scores, sourceSystem, and targetSystem required"); return true;
       }
-      const { translateTrustScores } = await import("../passport/trustInterchange.js");
-      const result = translateTrustScores(body.scores, body.sourceSystem, body.targetSystem);
-      apiSuccess(res, result);
+      const { translateTrustScores, TRANSLATION_NOTICE } = await import("../passport/trustInterchange.js");
+      // The factors are made-up examples: the answer says so beside the numbers.
+      apiSuccess(res, { example: true, notice: TRANSLATION_NOTICE, translations: translateTrustScores(body.scores, body.sourceSystem, body.targetSystem) });
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : "Trust score translation failed");
     }

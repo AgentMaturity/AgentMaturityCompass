@@ -183,7 +183,8 @@ syncBuiltinESMExports();\n`, { mode: 0o600 });
   const token = issueTrustToken("p0-51-local-workspace", auditor.keyId, "p0-51-local-agent", [{
     dimension: "fixture-security", score: 55, level: "L2", evidenceCount: 1, observedShare: 0, lastAssessedAt: Date.now(),
   }], "cli-demo-secret");
-  expect(verifyTrustToken(token, "cli-demo-secret")).toMatchObject({ valid: true, reasons: [] });
+  // The demo secret is public, so a token under it is never valid, even with a matching HMAC (vault lane, 2026-11-16).
+  expect(verifyTrustToken(token, "cli-demo-secret")).toMatchObject({ valid: false, hmacMatches: true, demo: true });
   tokenJson = JSON.stringify(token);
 
   licenseIssuer = testKey();
@@ -338,7 +339,7 @@ describe.each(["formal", "passport"] as const)("Unkeyed CLI %s", (family) => {
   test.each(allowCases)("intact local hash/HMAC remains exit 1 with flags %j", async (...flags: string[]) => {
     const args = family === "formal" ? ["enforce", "verify-certificate", certificateJson] : ["passport", "verify-token", tokenJson];
     const result = await invoke(`${family}-intact-${flags.join("-") || "no-override"}`, [...args, ...flags]);
-    expect(result.status, result.stderr).toBe(1); expect(result.body.valid).toBe(true);
+    expect(result.status, result.stderr).toBe(1); expect(result.body.valid).toBe(family === "formal");
     expect(result.report).toMatchObject({ trusted: false, integrity: { status: "pass" }, overrides: [] });
     expect(result.report.issuerAdmission.signatures[0]).toMatchObject({ status: "not-pinned", keyId: null });
     expect(result.stderr).not.toContain("UNTRUSTED:");

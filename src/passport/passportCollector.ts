@@ -28,7 +28,8 @@ import { questionBank } from "../diagnostic/questionBank.js";
 import { buildEvalScoreExplainabilityPack } from "../diagnostic/questionScoreExplainability.js";
 import { hashPassportId } from "./passportRedaction.js";
 import type { PassportPolicy } from "./passportPolicySchema.js";
-import { passportJsonSchema, type PassportJson } from "./passportSchema.js";
+import { selfIssuance, passportJsonSchema, type PassportJson } from "./passportSchema.js";
+import { passportRevocationListId } from "./passportRevocationList.js";
 import { computePassportExpiresTs } from "./passportConstants.js";
 import { assertNotExample } from "../claims/eligibility/exampleMode.js";
 
@@ -334,7 +335,7 @@ function collectPassportLocalData(params: {
     maturityStatus === "OK";
   const label: "VERIFIED" | "INFORMATIONAL" | "UNTRUSTED" = verifiedEligible ? "VERIFIED" : "INFORMATIONAL";
 
-  const questionScores42 = params.policy.passportPolicy.contents.includeQuestionLevelScores && report
+  const questionScores = params.policy.passportPolicy.contents.includeQuestionLevelScores && report
     ? report.questionScores
       .map((row) => ({
         qIdHash: `q_${hashPassportId(row.questionId, truncBytes)}`,
@@ -425,7 +426,7 @@ function collectPassportLocalData(params: {
       ...(questionExplainabilitySummary ? { questionExplainabilitySummary } : {}),
       ...(questionExplainabilityReplayable !== undefined ? { questionExplainabilityReplayable } : {}),
       ...(questionExplainabilityFailClosed !== undefined ? { questionExplainabilityFailClosed } : {}),
-      ...(questionScores42 ? { questionScores42 } : {})
+      ...(questionScores ? { questionScores } : {})
     },
     strategyFailureRisks: params.policy.passportPolicy.contents.includeFiveStrategyRisks
       ? {
@@ -508,7 +509,8 @@ function collectPassportLocalData(params: {
       merkleRootSha256: "0".repeat(64),
       includedEventProofIds: [],
       calculationManifestSha256: "0".repeat(64)
-    }
+    },
+    issuance: selfIssuance(passportRevocationListId(params.workspace))
   });
 
   const calculationManifest = {

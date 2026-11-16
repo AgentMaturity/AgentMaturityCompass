@@ -7,6 +7,7 @@ import { verifySignedFileWithAuditor, signFileWithAuditor } from "../org/orgSign
 import { PASSPORT_POLICY_CONFIGURED, witnessConfiguration } from "../transparency/configWitness.js";
 import { defaultPassportPolicy, passportPolicySchema, type PassportPolicy } from "./passportPolicySchema.js";
 import { passportJsonSchema, type PassportJson } from "./passportSchema.js";
+import { signedPassportRevocation } from "./passportRevocationList.js";
 
 function scopeSegment(scopeType: "WORKSPACE" | "NODE" | "AGENT"): string {
   if (scopeType === "WORKSPACE") return "workspace";
@@ -103,6 +104,17 @@ function savePassportRevocationFile(workspace: string, data: z.infer<typeof pass
 export function getPassportRevocation(workspace: string, passportId: string): PassportRevocationEntry | null {
   const file = loadPassportRevocationFile(workspace);
   return file.revocations[passportId] ?? null;
+}
+
+/**
+ * Whether this workspace revoked `passportId`, from the signed list first, then the older local file (which can only add
+ * revocations). Throws when the signed list does not verify or is older than one already seen: callers fail closed.
+ */
+export function passportRevocationStatus(workspace: string, passportId: string): { revokedTs: number; reason: string | null; source: "signed-list" | "local-file" } | null {
+  const signed = signedPassportRevocation(workspace, passportId);
+  if (signed !== null) return { revokedTs: Date.parse(signed.revokedAt), reason: signed.reason, source: "signed-list" };
+  const local = getPassportRevocation(workspace, passportId);
+  return local === null ? null : { revokedTs: local.revokedTs, reason: local.reason, source: "local-file" };
 }
 
 export function revokePassport(params: {

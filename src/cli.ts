@@ -795,6 +795,7 @@ import {
   passportVerifyCli,
   passportVerifyPolicyCli
 } from "./passport/passportCli.js";
+import { passportIssuanceLines } from "./passport/passportSchema.js"; import { exportAttestationLine, writeExportAttestation } from "./attest/exportAttestation.js";
 import {
   standardGenerateCliAsync as standardGenerateCli,
   standardListCli,
@@ -8771,10 +8772,10 @@ passport
     console.log(chalk.green("Passport created"));
     // Passports carry no AMC version or run of their own: their figures are self-reported.
     printClaimResult(artifactClaim("passport"), {});
-    console.log(`File: ${out.outFile}`);
+    console.log(`File: ${out.outFile}\n${exportAttestationLine(out.attestation)}`);
     console.log(`sha256: ${out.sha256}`);
     console.log(`passportId: ${out.passport.passportId}`);
-    console.log(`status: ${out.passport.status.label}`);
+    for (const line of passportIssuanceLines(out.passport)) console.log(line);
   });
 
 withTrustFlags(passport
@@ -8783,7 +8784,7 @@ withTrustFlags(passport
   .argument("<file>"), { pubkey: "pin the signer public key (artifact-seal)", json: true })
   .action((file: string, opts: TrustFlags) => {
     const out = passportVerifyCli({ workspace: process.cwd(), file, pubkeyPath: opts.pubkey, trust: trustFromFlags(opts, ["artifact-seal"]) });
-    finishVerify("Passport", out.report, { json: opts.json, result: out, details: [`passportId: ${out.passport?.passportId ?? "unknown"}`],
+    finishVerify("Passport", out.report, { json: opts.json, result: out, details: [`passportId: ${out.passport?.passportId ?? "unknown"}`, ...(out.passport ? passportIssuanceLines(out.passport) : [])],
       claim: artifactClaim("passport") });
   });
 
@@ -8849,7 +8850,7 @@ passport
     const out = passportAttempt.result; passportAttempt.assertCurrent();
     console.log(chalk.green("Passport exported"));
     printClaimResult(artifactClaim("passport"), {});
-    console.log(`File: ${out.outFile}`);
+    console.log(`File: ${out.outFile}\n${exportAttestationLine(out.attestation)}`);
     console.log(`sha256: ${out.sha256}`);
     console.log(`passportId: ${out.passport.passportId}`);
   });
@@ -10259,7 +10260,7 @@ bundle
       agentId: opts.agent ?? activeAgent(program),
       attest: opts.attest === true
     });
-    console.log(chalk.green(`Bundle exported: ${result.outFile}`));
+    console.log(`${chalk.green(`Bundle exported: ${result.outFile}`)}\n${exportAttestationLine(writeExportAttestation(process.cwd(), result.outFile, "amcbundle"))}`);
     if (opts.attest) console.log("Attested: attestations/aibom.cdx.json and attestations/control-results.sigstore.json (DSSE, workspace artifact-seal key: a local audit trail until a trust list pins that key)");
     printClaimResult(runIdClaim(runId, opts.agent ?? activeAgent(program)), {});
     console.log(`Files: ${result.fileCount}, Events: ${result.eventCount}, Sessions: ${result.sessionCount}${result.openSessions.length ? `, open sessions: ${result.openSessions.length} (${result.openSessions.join(", ")}; the export verifies as of its export time)` : ""}`);
@@ -11135,7 +11136,7 @@ assurance
       runId: opts.run,
       outFile: opts.out ? resolve(process.cwd(), opts.out) : undefined
     });
-    console.log(chalk.green(`Assurance certificate issued: ${issued.outFile}`));
+    console.log(`${chalk.green(`Assurance certificate issued: ${issued.outFile}`)}\n${exportAttestationLine(issued.attestation)}`);
     printClaimResult(artifactClaim("assurance:certificate"), {});
     console.log(`certId=${issued.cert.certId}`);
   });
@@ -21677,47 +21678,42 @@ compliance
 // ── Passport Trust Interchange ─────────────────────────────────────────────────
 passport
   .command("issue-token")
-  .description("Issue an AMC Trust Token for an agent")
+  .description("Issue a demo AMC Trust Token for an agent (public demo secret: not a credential, never verified)")
   .requiredOption("--agent <id>", "Agent ID")
   .option("--dimensions <list>", "Comma-separated dimensions to include (e.g. security,privacy)")
   .option("--ttl <hours>", "Token TTL in hours (default: 24)", "24")
-  .action(async (opts: { agent: string; dimensions?: string; ttl?: string }) => {
+  .option("--json", "print the demo token itself")
+  .action(async (opts: { agent: string; dimensions?: string; ttl?: string; json?: boolean }) => {
     try {
-      const { issueTrustToken } = await import("./passport/trustInterchange.js");
-      const ttl = parseInt(opts.ttl ?? "24", 10);
+      const { issueDemoTrustToken, DEMO_TOKEN_NOTICE } = await import("./passport/trustInterchange.js");
       const dimensions = opts.dimensions ? opts.dimensions.split(",").map((d) => d.trim()) : ["security", "privacy", "reliability"];
-      const claims = dimensions.map((dim) => ({
-        dimension: dim,
-        score: 0,
-        level: "L0" as const,
-        evidenceCount: 0,
-        observedShare: 0,
-        lastAssessedAt: Date.now(),
-      }));
-      const token = issueTrustToken("cli-workspace", "cli-pubkey-hash", opts.agent, claims, "cli-demo-secret", { ttlHours: ttl });
-      console.log(chalk.bold.cyan("\n🔑  AMC Trust Token Issued"));
+      const claims = dimensions.map((dim) => ({ dimension: dim, score: 0, level: "L0" as const, evidenceCount: 0, observedShare: 0, lastAssessedAt: Date.now() }));
+      const token = issueDemoTrustToken(opts.agent, claims, { ttlHours: parseInt(opts.ttl ?? "24", 10) });
+      if (opts.json) { console.log(JSON.stringify(token, null, 2)); return; }
+      console.log(chalk.bold.yellow("\nDEMO AMC Trust Token (not a credential)"));
+      console.log(chalk.yellow(DEMO_TOKEN_NOTICE));
       console.log(chalk.gray("Token ID:"), token.tokenId);
       console.log(chalk.gray("Agent:"), token.subject.agentId);
       console.log(chalk.gray("Issued at:"), new Date(token.issuedAt).toISOString());
       console.log(chalk.gray("Expires at:"), new Date(token.expiresAt).toISOString());
-      console.log(chalk.gray("Dimensions:"), dimensions.join(", "));
-      console.log(chalk.gray("Claims:"), token.claims.length);
-      console.log(chalk.yellow("(Full token not displayed for security — use --json for raw output)"));
+      console.log(chalk.gray("Dimensions:"), dimensions.join(", "), chalk.gray(`(${token.claims.length} claims, every score 0: nothing was measured)`));
+      console.log(chalk.gray("Print the demo token with --json."));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
 withTrustFlags(passport
   .command("verify-token <tokenJson>")
-  .description("Verify an AMC Trust Token (pass JSON string)"), { json: true })
+  .description("Check a demo AMC Trust Token (pass JSON string); it is never verified, because the demo secret is public"), { json: true })
   .action(async (tokenJson: string, opts: TrustFlags) => {
     try {
-      const { verifyTrustToken } = await import("./passport/trustInterchange.js");
+      const { verifyTrustToken, DEMO_TOKEN_SECRET, DEMO_TOKEN_NOTICE } = await import("./passport/trustInterchange.js");
       const token = JSON.parse(tokenJson);
-      const result = verifyTrustToken(token, "cli-demo-secret");
+      const result = verifyTrustToken(token, DEMO_TOKEN_SECRET); // always not valid: the demo secret is public
       // The token is an HMAC under a shared secret and names no signer, so it is never trusted (P0-51).
       const report = unsignedArtifactReport({ kind: "trust-token", path: "<tokenJson>", sha256: sha256Hex(tokenJson) },
-        trustFromFlags(opts, ["artifact-seal"]), result.reasons, "signature");
+        trustFromFlags(opts, ["artifact-seal"]), result.reasons.filter((reason) => reason !== DEMO_TOKEN_NOTICE), "signature");
       printClaimResult(unverifiedClaim("passport:trust-token", Array.isArray(token.claims) ? token.claims.length : 0, { signatureValid: result.valid }), { json: opts.json });
+      if (result.demo && !opts.json) { console.log(chalk.red(`NOT VERIFIED: ${DEMO_TOKEN_NOTICE}`)); process.exit(1); }
       finishVerify("Trust token", report, { json: opts.json, result: { ...result, report }, details: [`tokenId: ${token.tokenId ?? "N/A"}`] });
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
@@ -21731,11 +21727,11 @@ passport
   .option("--json", "Output as JSON")
   .action(async (opts: { from: string; to: string; score: string; json?: boolean }) => {
     try {
-      const { translateTrustScores, TRUST_TRANSLATIONS } = await import("./passport/trustInterchange.js");
+      const { translateTrustScores, TRUST_TRANSLATIONS, TRANSLATION_NOTICE } = await import("./passport/trustInterchange.js");
       const scores = { overall: parseFloat(opts.score) };
       const result = translateTrustScores(scores, opts.from, opts.to);
-      if (emitClaimResult(chalk.bold.cyan("\n🔑  Trust Score Translation"), result, unverifiedClaim("passport:translate-score", 1), opts)) return;
-      console.log(chalk.gray("From:"), opts.from);
+      if (emitClaimResult(chalk.bold.cyan("\nTrust Score Translation (example)"), { example: true, notice: TRANSLATION_NOTICE, result }, unverifiedClaim("passport:translate-score", 1), opts)) return;
+      console.log(chalk.yellow(TRANSLATION_NOTICE)); console.log(chalk.gray("From:"), opts.from);
       console.log(chalk.gray("To:"), opts.to);
       console.log(chalk.gray("Input score:"), opts.score);
       const keys = Object.keys(result);

@@ -30,8 +30,10 @@ import {
   passportPolicyPath,
   savePassportPolicy,
   getPassportRevocation,
+  passportRevocationStatus,
   revokePassport
 } from "./passportStore.js";
+import { publishPassportRevocation } from "./passportRevocationList.js";
 import { computePassportExpiresTs } from "./passportConstants.js";
 import { verifyPassportArtifactFile, verifyPassportWorkspace } from "./passportVerifier.js";
 import { loadTrustContext, type TrustContext } from "../trust/trustContext.js";
@@ -353,7 +355,7 @@ function renderPassportBadge(passport: ReturnType<typeof inspectPassportArtifact
     ? String(Math.round(passport.valueDimensions.valueScore))
     : "UNKNOWN";
   const badge = [
-    `AMC ${badgeStatus(passport.status.label)}`,
+    `AMC ${badgeStatus(passport.status.label)} self-issued`,
     `maturity=${maturity}/5`,
     `assurance=${assurance}`,
     `risks=${riskSummary(passport)}`,
@@ -534,7 +536,11 @@ export function passportVerifyPublicForApi(params: {
     trust: loadTrustContext()
   });
   const passport = verified.passport ?? inspectPassportArtifact(found.file).passport;
-  const revocation = getPassportRevocation(params.workspace, passport.passportId);
+  // Fail closed: an unreadable or rolled-back signed revocation list counts as revoked-unknown, so ok stays false.
+  let revocation: ReturnType<typeof passportRevocationStatus> = null;
+  let revocationListError: string | null = null;
+  try { revocation = passportRevocationStatus(params.workspace, passport.passportId); }
+  catch (error) { revocationListError = error instanceof Error ? error.message : String(error); }
   const expiresTs = passportExpiresTs(passport);
   const nowTs = Date.now();
   const expired = nowTs > expiresTs;
@@ -553,6 +559,9 @@ export function passportVerifyPublicForApi(params: {
       message: `passport expired at ${new Date(expiresTs).toISOString()}`
     });
   }
+  if (revocationListError !== null && !runtimeErrors.some((error) => error.code === "PASSPORT_REVOCATION_LIST_INVALID")) {
+    runtimeErrors.push({ code: "PASSPORT_REVOCATION_LIST_INVALID", message: `the passport revocation list could not be checked: ${revocationListError}` });
+  }
   if (revoked && !runtimeErrors.some((error) => error.code === "PASSPORT_REVOKED")) {
     runtimeErrors.push({
       code: "PASSPORT_REVOKED",
@@ -564,7 +573,7 @@ export function passportVerifyPublicForApi(params: {
     baseUrl: params.baseUrl
   });
   return {
-    ok: verified.ok && !expired && !revoked,
+    ok: verified.ok && !expired && !revoked && revocationListError === null,
     passportId: passport.passportId,
     verifiedTs: nowTs,
     fileSha256: verified.fileSha256,
@@ -584,13 +593,20 @@ export function passportVerifyPublicForApi(params: {
   };
 }
 
+function passportFileFor(file: string, passportId: string): { file: string; sha256: string } | null {
+  const inspected = inspectPassportArtifact(file);
+  return inspected.passport.passportId === passportId ? { file, sha256: inspected.sha256 } : null;
+}
+
 export function passportRevokeForApi(params: {
   workspace: string;
   passportId: string;
   reason?: string | null;
   revokedBy?: string | null;
+  /** A .amcpass this workspace made, when it is not under .amc/passport/exports; its passportId must match. */
+  file?: string;
 }) {
-  const found = findPassportExportById(params.workspace, params.passportId);
+  const found = params.file === undefined ? findPassportExportById(params.workspace, params.passportId) : passportFileFor(params.file, params.passportId);
   if (!found) {
     return null;
   }
@@ -600,6 +616,15 @@ export function passportRevokeForApi(params: {
     reason: params.reason,
     revokedBy: params.revokedBy
   });
+  // The signed list an outsider can check. The local revocation above already holds on this machine if signing fails.
+  let signedList: ReturnType<typeof publishPassportRevocation> | null = null;
+  let signedListError: string | null = null;
+  try {
+    signedList = publishPassportRevocation(params.workspace, { passportId: params.passportId, reason: entry.reason ?? "unspecified",
+      expiresTs: passportExpiresTs(inspectPassportArtifact(found.file).passport) });
+  } catch (error) {
+    signedListError = error instanceof Error ? error.message : String(error);
+  }
   appendTransparencyEntry({
     workspace: params.workspace,
     type: "PASSPORT_REVOKED",
@@ -615,7 +640,9 @@ export function passportRevokeForApi(params: {
     passportId: params.passportId,
     revokedTs: entry.revokedTs,
     reason: entry.reason,
-    revokedBy: entry.revokedBy
+    revokedBy: entry.revokedBy,
+    signedList,
+    signedListError
   };
 }
 

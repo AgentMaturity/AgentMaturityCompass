@@ -23,6 +23,8 @@ import {
   passportVerifyUrlForApi
 } from "./passportApi.js";
 import { inspectPassportArtifact } from "./passportArtifact.js";
+import { passportEvidenceMixWords, passportStatusWords } from "./passportSchema.js";
+import { writeExportAttestation } from "../attest/exportAttestation.js";
 import type { TrustContext } from "../trust/trustContext.js";
 
 function parseJsonOrYaml(raw: string): unknown {
@@ -34,7 +36,8 @@ function parseJsonOrYaml(raw: string): unknown {
 }
 
 function renderBadge(passport: ReturnType<typeof inspectPassportArtifact>["passport"]): string {
-  const status = passport.status.label === "INFORMATIONAL" ? "INFO" : passport.status.label;
+  // Every passport is signed by the workspace about its own agent: the badge says so beside the status.
+  const status = `${passport.status.label === "INFORMATIONAL" ? "INFO" : passport.status.label} self-issued`;
   const maturity = typeof passport.maturity.overall === "number" ? passport.maturity.overall.toFixed(1) : "UNKNOWN";
   const assurance = typeof passport.checkpoints.lastAssuranceCert.riskAssuranceScore === "number"
     ? String(Math.round(passport.checkpoints.lastAssuranceCert.riskAssuranceScore))
@@ -244,7 +247,9 @@ function presentPassportShare(params: PassportShareRequest, passport: ReturnType
     `Generated: ${new Date().toISOString()}`,
     `Agent: ${params.agentId}`,
     `Passport ID: ${passport.passportId}`,
-    `Status: ${passport.status.label}`,
+    `Status: ${passportStatusWords(passport.status.label)}`,
+    `Evidence mix: ${passportEvidenceMixWords(passport)}`,
+    "Self-issued: the workspace signed this about its own agent. The signature shows who wrote it and that it is unchanged, not that it is true.",
     `Maturity Overall: ${passport.maturity.overall ?? "UNKNOWN"}`,
     `Strategic Ops: ${passport.maturity.byFiveLayers.strategicOps ?? "UNKNOWN"}`,
     `Leadership: ${passport.maturity.byFiveLayers.leadership ?? "UNKNOWN"}`,
@@ -318,8 +323,10 @@ function presentPassportComparison(params: { agentA: string; agentB: string },
 /** Fixed maintained export leaf; its real mode path adds no new owner rule. */
 export async function passportExportLatestCliAsync(params: Parameters<typeof passportExportLatestCli>[0]) {
   const input = { ...params }, workspace = resolve(input.workspace);
-  return passportExportLatestAttemptForApiAsync({ workspace, scopeType: input.scope.toUpperCase(), scopeId: input.id, outFile: resolve(workspace, input.outFile) },
+  const attempt = await passportExportLatestAttemptForApiAsync({ workspace, scopeType: input.scope.toUpperCase(), scopeId: input.id, outFile: resolve(workspace, input.outFile) },
     { beforePublish: () => assertOwnerMode(workspace, "passport export-latest") });
+  const attestation = writeExportAttestation(workspace, attempt.result.outFile, "amcpass", attempt.result.sha256);
+  return { result: { ...attempt.result, attestation }, assertCurrent: () => attempt.assertCurrent() };
 }
 
 /** Sequential ordinary reads; each miss owns its genuine create, never an atomic two-agent snapshot. */
@@ -379,7 +386,8 @@ export async function passportPolicyApplyCliAsync(params: Parameters<typeof pass
 }
 export async function passportCreateCliAsync(params: Parameters<typeof passportCreateCli>[0]) {
   const input = { ...params }, beforePublish = () => assertPassportCliOwner(input.workspace, "passport create"); beforePublish();
-  return passportCreateForApiAsync({ workspace: input.workspace, scopeType: input.scope.toUpperCase(), scopeId: input.id, outFile: resolve(input.workspace, input.outFile) }, { beforePublish });
+  const out = await passportCreateForApiAsync({ workspace: input.workspace, scopeType: input.scope.toUpperCase(), scopeId: input.id, outFile: resolve(input.workspace, input.outFile) }, { beforePublish });
+  return { ...out, attestation: writeExportAttestation(input.workspace, out.outFile, "amcpass", out.sha256) };
 }
 
 interface SharePdfState {

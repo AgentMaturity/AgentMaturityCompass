@@ -74,6 +74,8 @@ export async function renderPassportPage(params) {
       `
       <p class="muted">A passport is a signed summary of an agent's latest score that you can hand to someone else. The signature shows
       who made it and that it has not changed since; it does not make the score true.</p>
+      <p class="muted">Every passport is self-issued: this workspace signs it about its own agent, using its own clock. "Verified"
+      means this workspace's own checks passed, not that anyone outside checked it.</p>
       ${passport ? "" : `<p>No passport yet for <strong>${esc(params.currentAgent())}</strong>. Create one to see its status here.</p>`}
       <div class="grid">
         ${tile("Status", renderBadgeChip({ status: passport?.status?.label === "INFORMATIONAL" ? "INFO" : passport?.status?.label ?? "UNTRUSTED", badge: passport?.status?.label ?? "UNTRUSTED" }))}

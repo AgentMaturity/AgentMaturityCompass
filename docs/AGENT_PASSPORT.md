@@ -1,6 +1,8 @@
 # Agent Passport
 
-Agent Passport is AMC's shareable maturity credential (`.amcpass`): a deterministic, signed, privacy-safe summary of an agent/workspace posture that can be verified offline.
+Agent Passport (`.amcpass`) is a signed, privacy-safe summary of an agent's or workspace's latest AMC results that you can hand to someone else. They can check it offline, with AMC (`amc passport verify`) or without it (the standalone verifier `amc-verify`, docs/STANDALONE_VERIFIER.md), against a key they pinned themselves.
+
+Every passport is **self-issued**: the workspace signs it, with its own key and its own clock, about its own agent. The signature shows who wrote it and that it is unchanged, not that its figures are true. Nobody outside the workspace checked them.
 
 It is designed for continuous recurrence and unified clarity:
 - generated from current signed AMC checkpoints
@@ -32,13 +34,40 @@ Identifiers are hashed by policy defaults.
 
 ## Status Labels
 
-- `VERIFIED`: integrity/correlation/trust gates pass, assurance gate passes, required proof bindings validate.
-- `INFORMATIONAL`: artifact is valid but one or more verification gates are not met.
-- `UNTRUSTED`: signature/proof/privacy checks fail.
+The status is the issuing workspace's own check, made when the passport was created. It is not an outside verification.
+
+- `VERIFIED`: the workspace's own passport gates passed (integrity, correlation, trust label, assurance certificate, proof bindings). The CLI and console show it as "verified by this workspace's own checks (self-issued)".
+- `INFORMATIONAL`: one or more of those gates were not met; for information only.
+- `UNTRUSTED`: signature, proof or privacy checks failed.
 
 Reasons are deterministic template IDs (no free-form claims).
 
 A trust signal that nothing measured is `null`, never 0: `trust.integrityIndex` without a trusted run, `trust.correlationRatio` when the run's window carried no receipted trace, and `trust.evidenceCoverage` when neither a run nor a signed forecast measured the evidence mix (a forecast built from no runs measured none). A gate with a minimum above 0 then adds `GATE_FAIL_INTEGRITY_NOT_MEASURED` or `GATE_FAIL_CORRELATION_NOT_MEASURED` instead of a low-value reason.
+
+## Who issued it, when, and on what evidence
+
+Passports made from 2026-11-16 carry an `issuance` block inside the signed `passport.json`:
+
+- `issuerRelationship: "self"` and `selfIssued: true`: the workspace signed it about its own agent.
+- `timeBasis: "claimed"`: `generatedTs` and `expiresTs` are the signing machine's own clock; no trusted timestamp vouches for them.
+- `statusBasis: "workspace-own-gates"`: what `status.label` means (above).
+- `revocationListId`: the signed revocation list that would name this passport if it were revoked (below).
+
+The evidence mix is `trust.evidenceCoverage`: the share of evidence AMC observed itself, the share others attested, and the share that was self-reported (`null` when nothing measured it). `amc passport create` and `amc passport verify` print it in words.
+
+The per-question scores are `maturity.questionScores` (hashed question ids). Older passports named the field `questionScores42`; AMC still reads that name.
+
+Compatibility: an AMC version from before 2026-11-16 does not know the `issuance` block and reports a newer passport as a digest mismatch. Update AMC, or check it with `amc-verify`.
+
+## Revoking a passport
+
+```bash
+amc keys revoke --passport ./agent.amcpass --reason "agent retired"   # or the passportId of one under .amc/passport/exports
+```
+
+This records the revocation on this machine and publishes `.amc/passport/revocations.signed.json`, a signed revocation list (`amc.revocation-list`, list id `passports:<workspaceId>`). The workspace's revocation-list key signs it; it carries the time it was issued, a sequence number that goes up by one with every change, and the digest of the list before it. Share that file with the people who check your passports. They check it with `amc-verify ... --revocation-list revocations.signed.json` against the revocation-list key their own trust list pins, and pass `--known-sequence passports:<workspaceId>=<n>` with the highest sequence they have seen, so an older copy is reported as a rollback. The console's revoke button publishes the same list. If the vault is locked, the revocation still holds on this machine, the command says the list was not published, and exits 1.
+
+On this machine, `amc passport verify` reads the signed list; a list that does not verify, or is older than one this machine already saw, makes the passport fail (`PASSPORT_REVOCATION_LIST_INVALID`) rather than pass.
 
 ## Commands
 
@@ -53,7 +82,12 @@ amc passport verify ./agent.amcpass --pubkey <recorded-auditor.pub>
 amc passport show ./agent.amcpass --format badge
 amc passport badge --scope agent --id <agentId>
 amc passport export-latest --scope agent --id <agentId> --out ./agent-latest.amcpass
+amc keys revoke --passport ./agent.amcpass --reason "<why>"
 ```
+
+`create` and `export-latest` also write `<file>.sigstore.json` beside the passport: a DSSE-signed in-toto statement in a key-based Sigstore bundle whose subject is the sha256 of the whole `.amcpass` file (docs/STANDALONE_VERIFIER.md, "Export statements").
+
+`amc passport issue-token`, `verify-token` and `translate-score` are demos. A trust token is signed with a public demo secret that anyone can use, says so inside the token, and is never reported as verified. The score translations use conversion factors AMC made up as examples: NIST AI RMF and ISO/IEC 42001 have no numeric score.
 
 ## Offline Verification
 

@@ -3,8 +3,14 @@
  * Unit tests for src/passport/trustInterchange.ts
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, test } from "vitest";
 import {
+  createVerificationRequest,
+  DEMO_TOKEN_NOTICE,
+  DEMO_TOKEN_SECRET,
+  issueDemoTrustToken,
+  processVerificationRequest,
+  TRANSLATION_NOTICE,
   issueTrustToken,
   verifyTrustToken,
   translateTrustScores,
@@ -176,5 +182,32 @@ describe("translateTrustScores", () => {
       expect(v.confidence).toBeGreaterThan(0);
       expect(v.confidence).toBeLessThanOrEqual(1);
     }
+  });
+});
+
+describe("demo tokens and the shared-secret HMAC (vault lane, 2026-11-16)", () => {
+  test("a demo token says it is a demo and never verifies, even with its HMAC intact", () => {
+    const token = issueDemoTrustToken("agent-1", makeTestClaims());
+    expect(token).toMatchObject({ demo: true, notice: DEMO_TOKEN_NOTICE });
+    expect(verifyTrustToken(token, DEMO_TOKEN_SECRET)).toMatchObject({ valid: false, hmacMatches: true, demo: true });
+    const forged = issueTrustToken("x", "y", "agent-1", makeTestClaims(), DEMO_TOKEN_SECRET);
+    expect(verifyTrustToken(forged, DEMO_TOKEN_SECRET).valid).toBe(false);
+  });
+
+  test("the HMAC covers the claims: changing a nested score breaks it", () => {
+    const token = issueTrustToken(TEST_WORKSPACE, TEST_PUBKEY, TEST_AGENT, makeTestClaims(), TEST_SECRET);
+    expect(verifyTrustToken(token, TEST_SECRET).valid).toBe(true);
+    const raised = { ...token, claims: token.claims.map(claim => ({ ...claim, score: 100 })) };
+    expect(verifyTrustToken(raised, TEST_SECRET)).toMatchObject({ valid: false, hmacMatches: false });
+  });
+
+  test("a federated check verifies no claim inside a token that does not verify", () => {
+    const token = issueDemoTrustToken("agent-1", makeTestClaims());
+    const response = processVerificationRequest(createVerificationRequest("r", token.tokenId, [token.claims[0]!.dimension]), token, "v", DEMO_TOKEN_SECRET);
+    expect(response.verified).toBe(false);
+  });
+
+  test("score translations are labelled made-up examples", () => {
+    expect(TRANSLATION_NOTICE).toMatch(/Example only.*no numeric score/);
   });
 });
