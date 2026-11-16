@@ -22,7 +22,8 @@ describe("wealth station citation check records", () => {
   it("never mark a citation verified or corrected without an https source, and name the hosts tried when unverifiable", () => {
     for (const r of rows) {
       if (r.verdict === "verified" || r.verdict === "corrected") expect(r.sourceUrl ?? "").toMatch(/^https:\/\//);
-      if (r.verdict === "unverifiable" || r.verdict === "superseded") expect(r.note.trim()).not.toBe("");
+      if (r.verdict === "unverifiable") expect(r.note, `${r.packId}/${r.questionId}`).toMatch(/\b[a-z0-9.-]+\.(org|gov|com|int|ch|eu)\b|names no/i);
+      if (r.verdict === "superseded") expect(r.note.trim()).not.toBe("");
     }
   });
 });

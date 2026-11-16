@@ -650,14 +650,14 @@
     "citation": "PCI DSS v4.0.1 Req. 3",
     "instrument": "PCI DSS v4.0.1",
     "clause": "Requirement 3",
-    "verdict": "verified",
+    "verdict": "unverifiable",
     "was": null,
     "now": null,
-    "sourceTitle": "PCI Security Standards Council document library",
-    "sourceUrl": "https://www.pcisecuritystandards.org/document_library/",
+    "sourceTitle": null,
+    "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Version confirmed on the PCI SSC document library; the requirement text is published there as a licensed download and was not re-read here, so only the edition and requirement number were checked."
+    "note": "Edition v4.0.1 confirmed on pcisecuritystandards.org document library; requirement text is a licensed download and was not read."
   },
   {
     "packId": "digital-payments",
@@ -665,14 +665,14 @@
     "citation": "PCI DSS v4.0.1 Req. 4",
     "instrument": "PCI DSS v4.0.1",
     "clause": "Requirement 4",
-    "verdict": "verified",
+    "verdict": "unverifiable",
     "was": null,
     "now": null,
-    "sourceTitle": "PCI Security Standards Council document library",
-    "sourceUrl": "https://www.pcisecuritystandards.org/document_library/",
+    "sourceTitle": null,
+    "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Version confirmed on the PCI SSC document library; the requirement text was not re-read here, so only the edition and requirement number were checked."
+    "note": "Edition v4.0.1 confirmed on pcisecuritystandards.org document library; requirement text is a licensed download and was not read."
   },
   {
     "packId": "digital-payments",
@@ -860,14 +860,14 @@
     "citation": "PCI DSS v4.0.1 Req. 6.4.3",
     "instrument": "PCI DSS v4.0.1",
     "clause": "Requirement 6.4.3",
-    "verdict": "verified",
+    "verdict": "unverifiable",
     "was": null,
     "now": null,
-    "sourceTitle": "PCI Security Standards Council document library",
-    "sourceUrl": "https://www.pcisecuritystandards.org/document_library/",
+    "sourceTitle": null,
+    "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Version confirmed on the PCI SSC document library; the requirement text was not re-read here, so only the edition and requirement number were checked."
+    "note": "Edition v4.0.1 confirmed on pcisecuritystandards.org document library; requirement text is a licensed download and was not read."
   },
   {
     "packId": "digital-payments",
@@ -1917,7 +1917,7 @@
     "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "The foundation's Network page (opened 2026-11-16) does not mention CE100; whether the programme still runs under that name could not be confirmed."
+    "note": "The Ellen MacArthur Foundation's Network page (www.ellenmacarthurfoundation.org/network/overview, opened 2026-11-16) does not mention CE100; whether the programme still runs under that name could not be confirmed."
   },
   {
     "packId": "circular-economy",
@@ -2240,14 +2240,14 @@
     "citation": "MiCA 2023/1114 Art. 91",
     "instrument": "Regulation (EU) 2023/1114 on markets in crypto-assets (MiCA)",
     "clause": "Art. 91(2)(a)",
-    "verdict": "corrected",
-    "was": "MiCA 2023/1114 Art. 91",
-    "now": "MiCA 2023/1114 Art. 91",
+    "verdict": "verified",
+    "was": null,
+    "now": null,
     "sourceTitle": "Regulation (EU) 2023/1114 (MiCA), Official Journal text (Publications Office)",
     "sourceUrl": "https://publications.europa.eu/resource/celex/32023R1114",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Citation text unchanged; the question listed front-running as an Art. 91 example. Art. 91 covers orders giving false or misleading signals (such as wash trades); front-running pending client orders is insider dealing under Arts. 87(1)(b) and 89. Question reworded."
+    "note": "Art. 91(2)(a) covers orders giving false or misleading signals (such as wash trades), so the citation stands. The question used to list front-running as an Art. 91 example; front-running pending client orders is insider dealing under Arts. 87(1)(b) and 89, so the question text was reworded and that citation added."
   },
   {
     "packId": "blockchain",
@@ -2463,15 +2463,15 @@
     "packId": "blockchain",
     "questionId": "WLT-BC-18",
     "citation": "FATF Recommendations 15 and 16",
-    "instrument": "Regulation (EU) 2023/1113 on information accompanying transfers of funds and certain crypto-assets",
-    "clause": "Recital 6",
-    "verdict": "corrected",
-    "was": "FATF Recommendation 15",
-    "now": "FATF Recommendations 15 and 16",
-    "sourceTitle": "Regulation (EU) 2023/1113 (Transfer of Funds Regulation), Official Journal text (Publications Office)",
-    "sourceUrl": "https://publications.europa.eu/resource/celex/32023R1113",
+    "instrument": "FATF Recommendations",
+    "clause": "Recommendations 15 and 16",
+    "verdict": "unverifiable",
+    "was": null,
+    "now": null,
+    "sourceTitle": null,
+    "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Earlier notes flagged R.15 versus R.16. fatf-gafi.org answered HTTP 403 (curl and a second fetch tool), so the FATF text and the threshold value were not checked. Recital 6 of Regulation (EU) 2023/1113 (OJ text opened) names R.15 (new technologies) and R.16 (wire transfers) with their interpretative notes as the standards for virtual asset transfers, so the question now cites both and no longer gives the threshold to R.15 alone."
+    "note": "fatf-gafi.org (www.fatf-gafi.org) answered HTTP 403 on 2026-11-16 for the FATF Recommendations page and the Recommendations PDF, through curl and through a second fetch tool; the FATF text and any threshold value were not checked. The question used to cite Recommendation 15 alone; it now cites Recommendations 15 and 16 because recital 6 of Regulation (EU) 2023/1113 (OJ text opened, https://publications.europa.eu/resource/celex/32023R1113) names R.15 (new technologies) and R.16 (wire transfers) with their interpretative notes as the standards for virtual asset transfers. That recital says nothing about a threshold, so the question no longer says the threshold is set by the Recommendations."
   }
 ]
