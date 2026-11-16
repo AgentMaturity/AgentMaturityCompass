@@ -18,7 +18,15 @@ where the claim stops. The Claude Code contract it relies on is pinned in
 | `SessionStart` | **Registration (lease-holder attestation).** AMC measures its forwarder, the bound Claude Code binary, the executable of the session's process, the settings Claude Code merges, skill and agent frontmatter and the process's arguments, and records a signed registration. A foreign PreToolUse hook, an enabled plugin, a skill or agent that declares hooks, or `--settings`/`--plugin-dir` refuse it, unless managed settings deliver AMC's hooks with `allowManagedHooksOnly` (then only a plugin managed settings force-enable refuses it). | No | The session is not governed: its tool calls are denied |
 | `PostToolUse`, `PostToolUseFailure` | **Observed.** AMC compares the input that ran with the input it authorized (`authorizationMismatch`). A mismatch is observed, not prevented: the tool already ran. | No | A message to Claude; the outcome is not recorded |
 | `Stop` | **Observed.** The end of the turn. AMC never asks Claude Code to keep working. | No (AMC never blocks it) | A message only |
-| Every other hook | Not installed, so nothing is claimed. | | |
+| Every other hook | Not installed in control mode, so nothing is claimed. | | |
+
+**Observe mode watches the whole session.** `amc connect hooks install --provider claude-code --mode observe` also
+installs SessionStart, SessionEnd, UserPromptSubmit, Stop, StopFailure, SubagentStart, SubagentStop, PreCompact,
+PostCompact, PermissionRequest and PermissionDenied (event names from https://code.claude.com/docs/en/hooks, read
+2026-11-16). Each is recorded as Claude Code's own report (self-reported): prompts, messages, tool input and ids AMC does
+not need are kept only as SHA-256 and length; short names such as the event, source or model are kept as plain words.
+A payload AMC cannot read, or an event it does not know, is recorded as unreadable or unknown. These hooks never
+block: they always answer `{}` with exit 0, recorded or not. Control mode is unchanged.
 
 A session without a registration under the current installation is **not governed**: its calls are denied, and
 `amc connect hooks status` does not report "enforced" for it. AMC cannot see a session in which Claude Code ran none of

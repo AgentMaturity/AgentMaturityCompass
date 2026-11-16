@@ -32,8 +32,13 @@ export const QUALIFIED_CLAUDE_CODE_VERSIONS: readonly string[] = Object.keys(CLA
 /** The markers of AMC's handlers (HOOK_INTEGRATION_ID, HOOK_CONTROL_INTEGRATION_ID). Literal: the bridge loads this module. */
 export const CLAUDE_STATUS_MESSAGE = "AMC Observe [amc-observe-v1]";
 export const CLAUDE_CONTROL_STATUS_MESSAGE = "AMC Control [amc-control-v1]";
-/** The hooks a control installation adds to PreToolUse, PostToolUse and PostToolUseFailure. */
-export const CLAUDE_SESSION_HOOKS = ["SessionStart", "Stop", "UserPromptSubmit"] as const;
+/**
+ * The session hooks an observe installation adds to the tool hooks (a control installation adds SessionStart, Stop and
+ * UserPromptSubmit only) (whole-session observation, https://code.claude.com/docs/en/hooks read
+ * 2026-11-16): recorded leniently as Claude Code's own report (bridge/sessionObservations.ts); they never block.
+ */
+export const CLAUDE_OBSERVE_SESSION_HOOKS = ["SessionStart", "SessionEnd", "UserPromptSubmit", "Stop", "StopFailure", "SubagentStart", "SubagentStop",
+  "PreCompact", "PostCompact", "PermissionRequest", "PermissionDenied"] as const;
 /** File-based managed settings (managed-settings.json plus managed-settings.d/*.json), per the managed settings docs. */
 export const CLAUDE_MANAGED_SETTINGS_DIRS: Partial<Record<NodeJS.Platform, string>> = {
   darwin: "/Library/Application Support/ClaudeCode",

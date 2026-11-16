@@ -14,7 +14,7 @@ import { CLAUDE_NOT_GOVERNED_NOTE, claudeCodeGovernance, type ClaudeCodeGovernan
 import { redactBridgeText } from "../bridge/bridgeRedaction.js";
 import { CLAUDE_HOOK_TIMEOUT_SECONDS } from "./hookDeadline.js";
 import {
-  CLAUDE_CODE_HOOK_SOURCE, CLAUDE_CONTROL_STATUS_MESSAGE, CLAUDE_SESSION_HOOKS, CLAUDE_STATUS_MESSAGE, claudeActionId, claudeCodeBindingSchema,
+  CLAUDE_CODE_HOOK_SOURCE, CLAUDE_CONTROL_STATUS_MESSAGE, CLAUDE_OBSERVE_SESSION_HOOKS, CLAUDE_STATUS_MESSAGE, claudeActionId, claudeCodeBindingSchema,
   measureClaudeCode, type ClaudeCodeBinding, type ClaudeCodeInstall,
 } from "./hookProviders/claudeCode.js";
 import { cachedFileSha256, clearPiDigestCache } from "./pi/piInstall.js";
@@ -69,8 +69,8 @@ type ConfigHookProvider = Exclude<HookProvider, "pi" | "acs" | "dsh">;
 export type { HookProvider };
 export type HookIntegrationProvider = HookProvider | "codex"; // what `amc connect hooks` installs: Codex observes only (P2-17)
 const hookProviderSchema = z.enum(["claude-code", "gemini-cli"]);
-const nativeHookEventNameSchema = z.enum(["AfterTool", "BeforeTool", "PostToolUse", "PostToolUseFailure", "PreToolUse", ...CLAUDE_SESSION_HOOKS]);
-const lifecyclePhaseSchema = z.enum(["requested", "completed", "failed", "completed-or-failed", "session-start", "turn-end", "prompt-submit"]);
+const nativeHookEventNameSchema = z.enum(["AfterTool", "BeforeTool", "PostToolUse", "PostToolUseFailure", "PreToolUse", ...CLAUDE_OBSERVE_SESSION_HOOKS]);
+const lifecyclePhaseSchema = z.enum(["requested", "completed", "failed", "completed-or-failed", "session-start", "turn-end", "prompt-submit", "session-event"]);
 const sourceSchema = z.object({
   provider: hookProviderSchema,
   contract: z.string().min(1),
@@ -224,7 +224,7 @@ interface ProviderHookSpec {
   eventType: "action.requested" | "action.completed" | "action.failed" | null;
 }
 
-/** The hooks an installation in `mode` writes. Claude Code control adds SessionStart, Stop and UserPromptSubmit. */
+/** The hooks an installation in `mode` writes. Claude Code control adds SessionStart, Stop and UserPromptSubmit; observe adds every session hook. */
 function providerHookSpecs(provider: ConfigHookProvider, mode: HookMode = "control"): ProviderHookSpec[] {
   return provider === "claude-code"
     ? [
@@ -235,7 +235,7 @@ function providerHookSpecs(provider: ConfigHookProvider, mode: HookMode = "contr
           { eventName: "SessionStart", phase: "session-start", eventType: null },
           { eventName: "Stop", phase: "turn-end", eventType: null },
           { eventName: "UserPromptSubmit", phase: "prompt-submit", eventType: null },
-        ] as const : []),
+        ] as const : CLAUDE_OBSERVE_SESSION_HOOKS.map((eventName) => ({ eventName, phase: "session-event" as const, eventType: null }))),
       ]
     : [
         { eventName: "AfterTool", phase: "completed-or-failed", eventType: "action.completed" },
@@ -458,7 +458,7 @@ function isOwnedHandler(provider: ConfigHookProvider, handler: unknown): handler
 
 function locateOwnedHandlers(config: JsonObject, provider: ConfigHookProvider): LocatedHandler[] {
   const found: LocatedHandler[] = [];
-  for (const { eventName } of providerHookSpecs(provider)) {
+  for (const eventName of new Set([...providerHookSpecs(provider), ...providerHookSpecs(provider, "observe")].map((spec) => spec.eventName))) {
     const groups = eventGroups(config, eventName, false) ?? [];
     groups.forEach((group, groupIndex) => {
       if (!isJsonObject(group)) {

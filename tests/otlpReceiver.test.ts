@@ -32,7 +32,7 @@ beforeAll(async () => {
     if (isOtlpPath(url.pathname)) void handleOtlpHttp({ workspace, req, res, url, pathname: url.pathname });
     else { res.writeHead(404); res.end(); }
   });
-  await new Promise<void>((done) => server.listen(0, "127.0.0.1", done));
+  await new Promise<void>((done) => server.listen(3703, "127.0.0.1", done));
   base = `http://127.0.0.1:${(server.address() as { port: number }).port}`;
 });
 

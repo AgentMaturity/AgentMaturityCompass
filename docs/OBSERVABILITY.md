@@ -59,6 +59,24 @@ Short commands (`amc agent-loop run`, `amc chat`, `amc eval suite run`) flush bu
 - Zipkin targets receive spans and the per-row evidence metrics and logs as pseudo-spans. The aggregated token, cost and duration streams have no Zipkin form: with only Zipkin targets configured they are counted as dropped, never reported as exported. Add an OTLP target to receive them.
 - Metric streams are kept per workspace scope, so a process that records for two workspaces sends each workspace's points under its own residency check.
 
+## Receiving OpenTelemetry from agent runtimes (OTLP/HTTP JSON)
+
+Studio also receives telemetry that an agent runtime sends: `POST /v1/traces`, `/v1/logs` and `/v1/metrics` on Studio's
+own address (loopback only), in the OTLP/HTTP JSON form (OTLP 1.11.1, https://opentelemetry.io/docs/specs/otlp/, read
+2026-11-16). `amc connect --print-env --runtime claude-code` (or `gemini-cli`, `otel`) prints the variables to set, with a
+new 8-hour observe lease in `OTEL_EXPORTER_OTLP_HEADERS`; it writes nothing to the agent's own settings. For Codex it
+prints nothing: Codex documents only the protobuf form, which this receiver does not read.
+
+- Every request needs that lease; without it, or with a lease for another purpose, the answer is 401 with no detail.
+- Limits are checked before anything is stored: 1 MiB per request (also after gzip is inflated), 500 records, 128
+  attributes per record, 16 KiB per string, and the lease's requests per minute. Over a limit the answer is 413 or 429
+  and nothing is recorded. A protobuf body is answered 415.
+- What arrives is the runtime's own report: every row is self-reported, under the lease's agent. Prompt text, outputs
+  and any value that is not a plain name or number are stored as SHA-256 and length only. Rows join hook observations
+  on the session digest, `prompt.id` and `tool_use_id`.
+
+`amc watch connect --provider trace-query` (old name `otlp`) is something else: it polls a tracing backend's query API.
+
 ## `amc usage`: usage and cost across sessions
 
 ```

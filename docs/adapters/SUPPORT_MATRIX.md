@@ -10,7 +10,7 @@ cited qualification record. Everything else is observed or not covered. The supp
 | Harness | Package | Qualified versions | Enforced at | Observed at | Status | Qualification record |
 |---|---|---|---|---|---|---|
 | claude-code | `@anthropic-ai/claude-code` | 2.1.296, 2.1.325 | `PreToolUse`, `UserPromptSubmit` | `SessionStart`, `PostToolUse`, `PostToolUseFailure`, `Stop` | enforced at listed hooks | `qualification/2026-11-16-watch/claude-code-conformance.json` (2026-11-16, sha256 `41d23ccc6fec`) |
-| codex | `@openai/codex` | none (source pin `360319d8`) | none | `PostToolUse` | observe only, no qualified version | none |
+| codex | `@openai/codex` | none (source pin `360319d8`) | none | `PostToolUse`, `session hooks (SessionStart, SessionEnd, UserPromptSubmit, Stop, SubagentStart, SubagentStop, PreCompact, PostCompact, Interrupt)` | observe only, no qualified version | none |
 | dsh | `@deepseek-ai/dsh` | none (source pin `c389f96b`) | none | `launch (process boundary)`, `gateway (model traffic)` | observe only, no qualified version | none |
 | gemini-cli | `@google/gemini-cli` | none (source pin `f354eeba`) | none | `AfterTool` | observe only, no qualified version | none |
 | pi | `@earendil-works/pi-coding-agent` | 1.0.2, 1.0.4, 1.5.2 | `tool_call` | `tool_result` | enforced at listed hooks | `qualification/2026-11-16-watch/pi-conformance.json` (2026-11-16, sha256 `96b30b219f57`) |
@@ -41,6 +41,7 @@ Not covered:
 | Hook | Role | Tools | On hook failure | Backing cases | Contract |
 |---|---|---|---|---|---|
 | `PostToolUse` | observe | every tool Codex reports at PostToolUse | proceeds | none | docs/adapters/codex.md |
+| `session hooks (SessionStart, SessionEnd, UserPromptSubmit, Stop, SubagentStart, SubagentStop, PreCompact, PostCompact, Interrupt)` | observe | none | proceeds | none | docs/adapters/codex.md |
 
 Not covered:
 

@@ -71,12 +71,15 @@ describe("Codex hook CLI output", () => {
 });
 
 describe("Codex observe installation", () => {
-  test("install writes one PostToolUse command hook running AMC's forwarder, with single-quoted paths", () => {
+  test("install writes a PostToolUse and the session command hooks running AMC's forwarder, with single-quoted paths", () => {
     const workspace = controlledWorkspace(agentId);
     const result = installHookIntegration({ workspace, provider: "codex", agentId, mode: "observe" });
     expect(result).toMatchObject({ applied: true, provider: "codex", mode: "observe" });
     const file = JSON.parse(readFileSync(join(workspace, ".codex", "hooks.json"), "utf8")) as { hooks: Record<string, Array<{ hooks: Array<Record<string, unknown>> }>> };
-    expect(Object.keys(file.hooks)).toEqual(["PostToolUse"]);
+    // PostToolUse plus every session hook Codex documents (whole-session observation; never blocks).
+    expect(Object.keys(file.hooks)).toEqual(["PostToolUse", "SessionStart", "SessionEnd", "UserPromptSubmit", "Stop", "SubagentStart", "SubagentStop", "PreCompact",
+      "PostCompact", "Interrupt"]);
+    expect(file.hooks.SessionEnd![0]!.hooks[0]!.timeout).toBe(3);
     const handler = file.hooks.PostToolUse![0]!.hooks[0]!;
     expect(handler).toMatchObject({ type: "command", timeout: 10 });
     expect(handler.command).toMatch(/^'[^']+node[^']*' '[^']+codexObserveForwarder\.js' '[^']+'$/);
